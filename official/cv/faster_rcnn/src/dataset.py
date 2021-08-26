@@ -25,6 +25,7 @@ import mindspore.dataset as de
 import mindspore.dataset.vision.c_transforms as C
 from mindspore.mindrecord import FileWriter
 
+
 def bbox_overlaps(bboxes1, bboxes2, mode='iou'):
     """Calculate the ious between each bbox of bboxes1 and bboxes2.
 
@@ -156,6 +157,7 @@ class Expand:
         boxes += np.tile((left, top), 2)
         return img, boxes, labels
 
+
 def rescale_with_tuple(img, scale):
     h, w = img.shape[:2]
     scale_factor = min(max(scale) / max(h, w), min(scale) / min(h, w))
@@ -164,10 +166,12 @@ def rescale_with_tuple(img, scale):
 
     return rescaled_img, scale_factor
 
+
 def rescale_with_factor(img, scale_factor):
     h, w = img.shape[:2]
     new_size = int(w * float(scale_factor) + 0.5), int(h * float(scale_factor) + 0.5)
     return cv2.resize(img, new_size, interpolation=cv2.INTER_NEAREST)
+
 
 def rescale_column(img, img_shape, gt_bboxes, gt_label, gt_num, config):
     """rescale operation for image"""
@@ -426,17 +430,65 @@ def create_coco_label(is_training, config):
     return image_files, image_anno_dict
 
 
-def anno_parser(annos_str):
-    """Parse annotation from string to list."""
-    annos = []
-    for anno_str in annos_str:
-        anno = list(map(int, anno_str.strip().split(',')))
-        annos.append(anno)
+def parse_json_annos_from_txt(anno_file, config):
+    """for user defined annotations text file, parse it to json format data"""
+    if not os.path.isfile(anno_file):
+        raise RuntimeError("Evaluation annotation file {} is not valid.".format(anno_file))
+
+    annos = {
+        "images": [],
+        "annotations": [],
+        "categories": []
+    }
+
+    # set categories field
+    for i, cls_name in enumerate(config.coco_classes):
+        annos["categories"].append({"id": i, "name": cls_name})
+
+    with open(anno_file, "rb") as f:
+        lines = f.readlines()
+
+    img_id = 1
+    anno_id = 1
+    for line in lines:
+        line_str = line.decode("utf-8").strip()
+        line_split = str(line_str).split(' ')
+        # set image field
+        file_name = line_split[0]
+        annos["images"].append({"file_name": file_name, "id": img_id})
+        # set annotations field
+        for anno_info in line_split[1:]:
+            anno = anno_info.split(",")
+            x = float(anno[0])
+            y = float(anno[1])
+            w = float(anno[2]) - float(anno[0])
+            h = float(anno[3]) - float(anno[1])
+            category_id = int(anno[4])
+            iscrowd = int(anno[5])
+            annos["annotations"].append({"bbox": [x, y, w, h],
+                                         "area": w * h,
+                                         "category_id": category_id,
+                                         "iscrowd": iscrowd,
+                                         "image_id": img_id,
+                                         "id": anno_id})
+            anno_id += 1
+        img_id += 1
+
     return annos
 
 
-def filter_valid_data(image_dir, anno_path):
+def create_train_data_from_txt(image_dir, anno_path):
     """Filter valid image file, which both in image_dir and anno_path."""
+    def anno_parser(annos_str):
+        """Parse annotation from string to list."""
+        annos = []
+        for anno_str in annos_str:
+            anno = anno_str.strip().split(",")
+            xmin, ymin, xmax, ymax = list(map(float, anno[:4]))
+            cls_id = int(anno[4])
+            iscrowd = int(anno[5])
+            annos.append([xmin, ymin, xmax, ymax, cls_id, iscrowd])
+        return annos
     image_files = []
     image_anno_dict = {}
     if not os.path.isdir(image_dir):
@@ -465,7 +517,7 @@ def data_to_mindrecord_byte_image(config, dataset="coco", is_training=True, pref
     if dataset == "coco":
         image_files, image_anno_dict = create_coco_label(is_training, config=config)
     else:
-        image_files, image_anno_dict = filter_valid_data(config.IMAGE_DIR, config.ANNO_PATH)
+        image_files, image_anno_dict = create_train_data_from_txt(config.image_dir, config.anno_path)
 
     fasterrcnn_json = {
         "image": {"type": "bytes"},

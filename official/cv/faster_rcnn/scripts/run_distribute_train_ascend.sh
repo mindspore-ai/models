@@ -59,7 +59,7 @@ then
 exit 1
 fi
 
-mindrecord_dir=$PATH3/MindRecord_COCO_TRAIN/
+mindrecord_dir=$PATH3/FASTERRCNN_MINDRECORD/
 if [ $# -eq 5 ]
 then
     mindrecord_dir=$(get_real_path $5)

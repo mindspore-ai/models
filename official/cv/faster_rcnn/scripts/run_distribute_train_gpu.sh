@@ -50,7 +50,7 @@ export RANK_SIZE=$1
 PRETRAINED_PATH=$2
 PATH3=$4
 
-mindrecord_dir=$PATH3/MindRecord_COCO_TRAIN/
+mindrecord_dir=$PATH3/FASTERRCNN_MINDRECORD/
 if [ $# -eq 5 ]
 then
     mindrecord_dir=$(get_real_path $5)

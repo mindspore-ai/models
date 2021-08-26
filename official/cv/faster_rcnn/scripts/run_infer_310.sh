@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [[ $# -lt 3 || $# -gt 4 ]]; then
-    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi
@@ -29,7 +29,7 @@ get_real_path(){
 }
 model=$(get_real_path $1)
 data_path=$(get_real_path $2)
-ann_file=$(get_real_path $3)
+anno_path=$(get_real_path $3)
 
 device_id=0
 if [ $# == 4 ]; then
@@ -38,7 +38,7 @@ fi
 
 echo "mindir name: "$model
 echo "dataset path: "$data_path
-echo "ann_file: " $ann_file
+echo "anno_path: " $anno_path
 echo "device id: "$device_id
 
 export ASCEND_HOME=/usr/local/Ascend/
@@ -77,7 +77,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --ann_file=$ann_file --result_path=./result_Files &> acc.log &
+    python3.7 ../postprocess.py --anno_path=$anno_path --result_path=./result_Files &> acc.log &
 }
 
 compile_app

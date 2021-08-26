@@ -16,6 +16,8 @@
 """Evaluation for FasterRcnn"""
 import os
 import time
+from collections import defaultdict
+
 import numpy as np
 from pycocotools.coco import COCO
 import mindspore.common.dtype as mstype
@@ -23,7 +25,7 @@ from mindspore import context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.common import set_seed, Parameter
 
-from src.dataset import data_to_mindrecord_byte_image, create_fasterrcnn_dataset
+from src.dataset import data_to_mindrecord_byte_image, create_fasterrcnn_dataset, parse_json_annos_from_txt
 from src.util import coco_eval, bbox2result_1image, results2json
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
@@ -38,8 +40,11 @@ if config.backbone in ("resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152"):
 elif config.backbone == "resnet_v1_50":
     from src.FasterRcnn.faster_rcnn_resnet50v1 import Faster_Rcnn_Resnet
 
-def fasterrcnn_eval(dataset_path, ckpt_path, ann_file):
+
+def fasterrcnn_eval(dataset_path, ckpt_path, anno_path):
     """FasterRcnn evaluation."""
+    if not os.path.isfile(ckpt_path):
+        raise RuntimeError("CheckPoint file {} is not valid.".format(ckpt_path))
     ds = create_fasterrcnn_dataset(config, dataset_path, batch_size=config.test_batch_size, is_training=False)
     net = Faster_Rcnn_Resnet(config)
     param_dict = load_checkpoint(ckpt_path)
@@ -57,7 +62,15 @@ def fasterrcnn_eval(dataset_path, ckpt_path, ann_file):
     eval_iter = 0
     total = ds.get_dataset_size()
     outputs = []
-    dataset_coco = COCO(ann_file)
+
+    if config.dataset != "coco":
+        dataset_coco = COCO()
+        dataset_coco.dataset, dataset_coco.anns, dataset_coco.cats, dataset_coco.imgs = dict(), dict(), dict(), dict()
+        dataset_coco.imgToAnns, dataset_coco.catToImgs = defaultdict(list), defaultdict(list)
+        dataset_coco.dataset = parse_json_annos_from_txt(anno_path, config)
+        dataset_coco.createIndex()
+    else:
+        dataset_coco = COCO(anno_path)
 
     print("\n========================================\n")
     print("total images num: ", total)
@@ -130,7 +143,7 @@ def eval_fasterrcnn():
             else:
                 print("coco_root not exits.")
         else:
-            if os.path.isdir(config.IMAGE_DIR) and os.path.exists(config.ANNO_PATH):
+            if os.path.isdir(config.image_dir) and os.path.exists(config.anno_path):
                 print("Create Mindrecord. It may take some time.")
                 data_to_mindrecord_byte_image(config, "other", False, prefix, file_num=1)
                 print("Create Mindrecord Done, at {}".format(mindrecord_dir))
@@ -139,7 +152,7 @@ def eval_fasterrcnn():
 
     print("CHECKING MINDRECORD FILES DONE!")
     print("Start Eval!")
-    fasterrcnn_eval(mindrecord_file, config.checkpoint_path, config.ann_file)
+    fasterrcnn_eval(mindrecord_file, config.checkpoint_path, config.anno_path)
 
 if __name__ == '__main__':
     eval_fasterrcnn()
