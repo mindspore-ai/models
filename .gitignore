@@ -1,0 +1,109 @@
+# MindSpore
+build/
+mindspore/lib
+output
+*.ir
+st_tests
+kernel_meta/
+somas_meta/
+trace_code_graph_*
+
+# mindspore lite java
+mindspore/lite/java/java/.gradle
+mindspore/lite/java/java/build
+mindspore/lite/java/java/gradle
+mindspore/lite/java/java/gradlew
+mindspore/lite/java/java/gradlew.bat
+mindspore/lite/java/java/app/build
+mindspore/lite/java/java/app/libs
+
+# flatbuffer
+mindspore/lite/tools/converter/parser/tflite/schema_generated.h
+mindspore/lite/tools/converter/parser/caffe/caffe.pb.cc
+mindspore/lite/tools/converter/parser/caffe/caffe.pb.h
+mindspore/lite/tools/converter/parser/onnx/onnx.pb.h
+mindspore/lite/tools/converter/parser/onnx/onnx.pb.h
+mindspore/lite/tools/converter/schema/*.h
+mindspore/lite/tools/converter/schema/inner
+mindspore/lite/schema/*.h
+mindspore/lite/schema/inner
+
+mindspore/lite/src/runtime/kernel/opencl/cl/fp16/*.inc
+mindspore/lite/src/runtime/kernel/opencl/cl/fp32/*.inc
+
+# Cmake files
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+Makefile
+cmake-build-debug
+
+# Dynamic libraries
+*.so
+*.so.*
+*.dylib
+
+# Static libraries
+*.la
+*.lai
+*.a
+*.lib
+
+# Protocol buffers
+*_pb2.py
+*.pb.h
+*.pb.cc
+*.pb
+*_grpc.py
+
+# Object files
+*.o
+
+# Editor
+.vscode
+.idea/
+
+# Cquery
+.cquery_cached_index/
+compile_commands.json
+
+# Ctags and cscope
+tags
+TAGS
+CTAGS
+GTAGS
+GRTAGS
+GSYMS
+GPATH
+cscope.*
+
+# Python files
+*__pycache__*
+.pytest_cache
+
+# Mac files
+*.DS_Store
+
+# Test results
+test_temp_summary_event_file/
+*.dot
+*.dat
+*.svg
+*.perf
+*.info
+*.ckpt
+*.shp
+*.pkl
+*.pb
+.clangd
+mindspore/version.py
+mindspore/default_config.py
+mindspore/device_target.py
+mindspore/package_name.py
+mindspore/.commit_id
+
+# lite test file
+mindspore/lite/test/do_test/
+
+# lite opencl compile file
+*.cl.inc
