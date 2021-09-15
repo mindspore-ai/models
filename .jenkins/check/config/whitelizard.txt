@@ -1,0 +1,7 @@
+# Scene1: 
+#    function_name1, function_name2
+# Scene2: 
+#    file_path:function_name1, function_name2
+#
+models/official/recommend/wide_and_deep/src/wide_and_deep.py:__init__
+models/official/recommend/wide_and_deep_multitable/src/wide_and_deep.py:__init__

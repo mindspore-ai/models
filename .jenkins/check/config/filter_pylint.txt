@@ -1,0 +1,11 @@
+# Overall
+"models/"                                                                                            "invalid-name"
+"models/"                                                                                            "arguments-differ"
+"models/"                                                                                            "unused-argument"
+"models/"                                                                                  "no-value-for-parameter"
+"models/"                                                                                  "import-self"
+
+# official
+"models/official/cv"                                                                       "missing-docstring"
+"models/official/cv"                                                                       "c-extension-no-member"
+"models/official/nlp/bert_thor/src/bert_model.py"                                          "redefined-outer-name"
