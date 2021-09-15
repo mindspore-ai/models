@@ -1,0 +1,6 @@
+mindspore
+numpy
+Pillow
+scikit-image
+opencv-python
+pyyaml
