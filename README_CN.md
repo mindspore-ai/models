@@ -90,11 +90,9 @@
 
 ## 公告
 
-|日期|新闻|
-| ------------ | ------------------------------------------------------------ |
-| 2020年9月25日|支持[MindSpore v1.0.0](https://www.mindspore.cn/news/newschildren/en?id=262) |
-| 2020年9月1日|支持[MindSpore v0.7.0-beta](https://www.mindspore.cn/news/newschildren/en?id=246) |
-| 2020年7月31日|支持[MindSpore v0.6.0-beta](https://www.mindspore.cn/news/newschildren/en?id=237) |
+### 2021.9.15 `models`独立建仓
+
+`models`仓库由原[mindspore仓库](https://gitee.com/mindspore/mindspore)的model_zoo目录独立分离而来，新仓库不继承历史commit记录，如果需要查找历史提2021.9.15之前的提交，请到mindspore仓库进行查询。
 
 ## 关联站点
 

@@ -90,11 +90,9 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 
 ## Announcements
 
-| Date         | News                                                         |
-| ------------ | ------------------------------------------------------------ |
-| September 25, 2020 | Support [MindSpore v1.0.0](https://www.mindspore.cn/news/newschildren/en?id=262) |
-| September 01, 2020 | Support [MindSpore v0.7.0-beta](https://www.mindspore.cn/news/newschildren/en?id=246) |
-| July 31, 2020 | Support [MindSpore v0.6.0-beta](https://www.mindspore.cn/news/newschildren/en?id=237) |
+### 2021.9.15 Set up repository `models`
+
+`models` comes from the directory `model_zoo` of repository [mindspore](https://gitee.com/mindspore/mindspore). This new repository doesn't contain any history of commits about the directory `model_zoo` in `mindspore`, you could refer to the repository `mindspore` for the past commits.
 
 ## Related Website
 
