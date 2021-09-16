@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -212,17 +212,23 @@ def default_recurisive_init(custom_cell):
             pass
 
 
+def filter_checkpoint_parameter_by_list(orgin_dict, param_filter):
+    """remove useless parameters according to filter_list"""
+    for key in list(orgin_dict.keys()):
+        for name in param_filter:
+            if name in key:
+                print("Delete parameter from checkpoint: ", key)
+                del orgin_dict[key]
+                break
+
+
 def load_pretrain_model(ckpt_file, network, args):
     """load pretrain model."""
+
     if os.path.isfile(ckpt_file):
         param_dict = load_checkpoint(ckpt_file)
-        param_dict_new = {}
-        for key, values in param_dict.items():
-            if key.startswith('moments.'):
-                continue
-            elif key.startswith('network.'):
-                param_dict_new[key[8:]] = values
-            else:
-                param_dict_new[key] = values
-        load_param_into_net(network, param_dict_new)
+        if args.filter_weight:
+            filter_list = [x.name for x in network.head.fc.get_parameters()]
+            filter_checkpoint_parameter_by_list(param_dict, filter_list)
+        load_param_into_net(network, param_dict)
         args.logger.info('load model {} success'.format(ckpt_file))
