@@ -107,13 +107,13 @@ DenseNet-100使用的数据集： Cifar-10
 
    # 分布式训练示例
    bash scripts/run_distribute_train.sh [DEVICE_NUM] [RANK_TABLE_FILE] [NET_NAME] [DATASET_NAME] [TRAIN_DATA_DIR]
-   # example bash scripts/run_distribute_train.sh 8 /root/hccl_8p_01234567_10.155.170.71.json densenet121 imagenet /home/DataSet/ImageNet_Original/train/
+   # example bash scripts/run_distribute_train.sh 8 ~/hccl_8p.json densenet121 imagenet /home/DataSet/ImageNet_Original/train/
 
    # 单卡评估示例
    python eval.py --net [NET_NAME] --dataset [DATASET_NAME] --eval_data_dir /PATH/TO/DATASET --ckpt_files /PATH/TO/CHECKPOINT > eval.log 2>&1 &
 
    bash scripts/run_distribute_eval.sh [DEVICE_NUM] [RANDK_TABLE_FILE] [NET_NAME] [DATASET_NAME] [EVAL_DATA_DIR][CKPT_PATH]
-   # example: bash script/run_distribute_eval.sh 8 /root/hccl_8p_01234567_10.155.170.71.json densenet121 imagenet /home/DataSet/ImageNet_Original/train/validation_preprocess/ /home/model/densenet/ckpt/0-120_500.ckpt
+   # example: bash script/run_distribute_eval.sh 8 ~/hccl_8p.json densenet121 imagenet /home/DataSet/ImageNet_Original/train/validation_preprocess/ /home/model/densenet/ckpt/0-120_500.ckpt
    ```
 
   分布式训练需要提前创建JSON格式的HCCL配置文件。
@@ -310,7 +310,7 @@ python train.py --net=[NET_NAME] --dataset=[DATASET_NAME] --train_data_dir=[DATA
 
 ```shell
 bash scripts/run_distribute_train.sh [DEVICE_NUM] [RANK_TABLE_FILE] [NET_NAME] [DATASET_NAME] [TRAIN_DATA_DIR]
-# example bash scripts/run_distribute_train.sh 8 /root/hccl_8p_01234567_10.155.170.71.json densenet121 imagenet /home/DataSet/ImageNet_Original/train/
+# example bash scripts/run_distribute_train.sh 8 ~/hccl_8p.json densenet121 imagenet /home/DataSet/ImageNet_Original/train/
 ```
 
   上述shell脚本将在后台进行分布式训练。可以通过文件`train[X]/output/202x-xx-xx_time_xx_xx_xx/`查看结果日志和模型检查点。在ImageNet数据集上训练DenseNet-121的损失值的实现如下：

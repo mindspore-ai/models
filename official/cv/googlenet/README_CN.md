@@ -107,7 +107,7 @@ GoogleNet由多个inception模块串联起来，可以更加深入。  降维的
 
   # 运行分布式训练示例
   bash scripts/run_train.sh [RANK_TABLE_FILE] [DATASET_NAME]
-  # example: bash scripts/run_train.sh /root/hccl_8p_01234567_10.155.170.71.json cifar10
+  # example: bash scripts/run_train.sh ~/hccl_8p.json cifar10
 
   # 运行评估示例
   python eval.py > eval.log 2>&1 &
@@ -371,7 +371,7 @@ GoogleNet由多个inception模块串联起来，可以更加深入。  降维的
 - Ascend处理器环境运行
 
   ```bash
-  bash scripts/run_train.sh /root/hccl_8p_01234567_10.155.170.71.json cifar10
+  bash scripts/run_train.sh ~/hccl_8p.json cifar10
   ```
 
   上述shell脚本将在后台运行分布训练。您可以通过train_parallel[X]/log文件查看结果。采用以下方式达到损失值：

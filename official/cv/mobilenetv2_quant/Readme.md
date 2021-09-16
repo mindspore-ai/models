@@ -160,7 +160,7 @@ For Learned Step Size Quantization:
           Ascend:  python train.py --device_target Ascend --dataset_path ~/imagenet/train/
           GPU:  python train.py --device_target GPU --dataset_path ~/imagenet/train/
   shell：
-          Ascend: bash run_train.sh Ascend ~/hccl_4p_0123_x.x.x.x.json ~/imagenet/train/ ~/mobilenet.ckpt
+          Ascend: bash run_train.sh Ascend ~/hccl_8p.json ~/imagenet/train/
           GPU: bash run_train.sh GPU 1,2 ~/imagenet/train/ ~/mobilenet.ckpt
 
   # training example for Learned Step Size Quantization
@@ -170,7 +170,7 @@ For Learned Step Size Quantization:
           GPU:  python train.py --device_target GPU --dataset_path ~/imagenet/train/ \
                 --pre_trained ~/mobilenet.ckpt --optim_option "LEARNED_SCALE"
   shell：
-          Ascend: bash run_lsq_train.sh Ascend ~/hccl_4p_0123_x.x.x.x.json ~/imagenet/train/ ~/mobilenet.ckpt
+          Ascend: bash run_lsq_train.sh Ascend ~/hccl_8p.json ~/imagenet/train/ ~/mobilenet.ckpt
           GPU: bash run_lsq_train.sh GPU 1,2 ~/imagenet/train/ ~/mobilenet.ckpt
 ```
 
@@ -179,7 +179,7 @@ For Learned Step Size Quantization:
 Training result will be stored in the example path. Checkpoints trained by `Ascend` will be stored at `./train/device$i/checkpoint` by default, and training log  will be redirected to `./train/device$i/train.log`. Checkpoints trained by `GPU` will be stored in `./train/checkpointckpt_$i` by default, and training log will be redirected to `./train/train.log`.  
 `train.log` is as follows:
 
-``` bash
+``` log
 epoch: [  0/200], step:[  624/  625], loss:[5.258/5.258], time:[140412.236], lr:[0.100]
 epoch time: 140522.500, per step time: 224.836, avg loss: 5.258
 epoch: [  1/200], step:[  624/  625], loss:[3.917/3.917], time:[138221.250], lr:[0.200]
@@ -232,13 +232,13 @@ shell:
 
 Inference result will be stored in the example path, you can find result like the following in `./val/infer.log`.
 
-``` bash
+``` log
 result: {'acc': 0.71976314102564111}
 ```
 
 ## [Model Export](#contents)
 
-```shell
+```python
 python export.py --checkpoint_path [CKPT_PATH] --file_format [EXPORT_FORMAT] --device_target [PLATFORM] --optim_option [OptimizeOption]
 ```
 
@@ -250,7 +250,7 @@ python export.py --checkpoint_path [CKPT_PATH] --file_format [EXPORT_FORMAT] --d
 You should export AIR model at Ascend 910 before  running the command below.
 You can use export_bin_file.py to export ImageNet bin and label for 310 inference.
 
-```shell
+```python
 python export_bin_file.py --dataset_dir [EVAL_DATASET_PATH] --save_dir [SAVE_PATH]
 ```
 
@@ -263,7 +263,7 @@ bash run_infer_310.sh [AIR_PATH] [DATA_PATH] [LABEL_PATH] [DEVICE_ID]
 
 You can view the results through the file "acc.log". The accuracy of the test dataset will be as follows:
 
-```bash
+```log
 'Accuracy':0.7221
 ```
 

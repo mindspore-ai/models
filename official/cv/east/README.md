@@ -81,7 +81,7 @@ Dataset used [ICDAR 2015](https://rrc.cvc.uab.es/?ch=4&com=downloads)
 ```bash
 # distribute training example(8p)
 bash run_distribute_train.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [RANK_TABLE_FILE]
-# example: bash run_distribute_train.sh /home/DataSet/ICDAR2015/ic15/ home/model/east/pretrained/0-150_5004.ckpt /root/hccl_8p_01234567_10.155.170.71.json
+# example: bash run_distribute_train.sh /home/DataSet/ICDAR2015/ic15/ home/model/east/pretrained/0-150_5004.ckpt ~/hccl_8p.json
 
 # standalone training
 bash run_standalone_train_ascend.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [DEVICE_ID]
@@ -106,7 +106,7 @@ bash run_eval_ascend.sh [DATASET_PATH] [CKPT_PATH] [DEVICE_ID]
     Ascend:
       # distribute training example(8p)
       bash run_distribute_train.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [RANK_TABLE_FILE]
-      # example: bash run_distribute_train.sh /home/DataSet/ICDAR2015/ic15/ home/model/east/pretrained/0-150_5004.ckpt /root/hccl_8p_01234567_10.155.170.71.json
+      # example: bash run_distribute_train.sh /home/DataSet/ICDAR2015/ic15/ home/model/east/pretrained/0-150_5004.ckpt ~/hccl_8p.json
 
       # standalone training
       bash run_standalone_train_ascend.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [DEVICE_ID]

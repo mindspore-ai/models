@@ -144,7 +144,7 @@ bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [PRETRAINED_CKPT(options
 
 ```shell
 bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_CKPT(options)]
-# example: bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json
+# example: bash scripts/run_distribute_train_ascend.sh ~/hccl_8p.json
 ```
 
 - 评估：
@@ -239,7 +239,7 @@ bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [PRETRAINED_CKPT(options
 
 ```shell
 bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_CKPT(options)]
-# example: bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json
+# example: bash scripts/run_distribute_train_ascend.sh ~/hccl_8p.json
 ```
 
 结果和检查点分别写入设备`i`的`./train_parallel_{i}`文件夹。  

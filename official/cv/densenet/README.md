@@ -102,13 +102,13 @@ After installing MindSpore via the official website, you can start training and 
 
   # run distributed training example
   bash scripts/run_distribute_train.sh [DEVICE_NUM] [RANK_TABLE_FILE] [NET_NAME] [DATASET_NAME] [TRAIN_DATA_DIR]
-  # example bash scripts/run_distribute_train.sh 8 /root/hccl_8p_01234567_10.155.170.71.json densenet121 imagenet /home/DataSet/ImageNet_Original/train/
+  # example bash scripts/run_distribute_train.sh 8 ~/hccl_8p.json densenet121 imagenet /home/DataSet/ImageNet_Original/train/
 
   # run evaluation example
   python eval.py --net [NET_NAME] --dataset [DATASET_NAME] --eval_data_dir /PATH/TO/DATASET --ckpt_files /PATH/TO/CHECKPOINT > eval.log 2>&1 &
   OR
   bash scripts/run_distribute_eval.sh [DEVICE_NUM] [RANDK_TABLE_FILE] [NET_NAME] [DATASET_NAME] [EVAL_DATA_DIR][CKPT_PATH]
-  # example: bash script/run_distribute_eval.sh 8 /root/hccl_8p_01234567_10.155.170.71.json densenet121 imagenet /home/DataSet/ImageNet_Original/train/validation_preprocess/ /home/model/densenet/ckpt/0-120_500.ckpt
+  # example: bash script/run_distribute_eval.sh 8 ~/hccl_8p.json densenet121 imagenet /home/DataSet/ImageNet_Original/train/validation_preprocess/ /home/model/densenet/ckpt/0-120_500.ckpt
   ```
 
   For distributed training, a hccl configuration file with JSON format needs to be created in advance.
@@ -293,7 +293,7 @@ You can modify the training behaviour through the various flags in the `densenet
   2020-08-22 17:02:19,921:INFO:local passed
   2020-08-22 17:05:43,112:INFO:epoch[2], iter[15011], loss:3.096, mean_fps:6304.53 imgs/sec
   2020-08-22 17:05:43,113:INFO:local passed
-
+  ...
   ```
 
 - running on GPU
@@ -326,7 +326,7 @@ You can modify the training behaviour through the various flags in the `densenet
   ```bash
 
   bash scripts/run_distribute_train.sh [DEVICE_NUM] [RANK_TABLE_FILE] [NET_NAME] [DATASET_NAME] [TRAIN_DATA_DIR]
-  # example bash scripts/run_distribute_train.sh 8 /root/hccl_8p_01234567_10.155.170.71.json densenet121 imagenet /home/DataSet/ImageNet_Original/train/
+  # example bash scripts/run_distribute_train.sh 8 ~/hccl_8p.json densenet121 imagenet /home/DataSet/ImageNet_Original/train/
 
   ```
 
@@ -340,7 +340,8 @@ You can modify the training behaviour through the various flags in the `densenet
   2020-08-22 17:09:05,686:INFO:epoch[3], iter[20015], loss:3.113, mean_fps:6304.37 imgs/sec
   2020-08-22 17:12:28,925:INFO:epoch[4], iter[25019], loss:3.29, mean_fps:6303.07 imgs/sec
   2020-08-22 17:15:52,167:INFO:epoch[5], iter[30023], loss:2.865, mean_fps:6302.98 imgs/sec
-
+  ...
+  ...
   ```
 
 - running on GPU
@@ -367,7 +368,7 @@ You can modify the training behaviour through the various flags in the `densenet
   python eval.py --net [NET_NAME] --dataset [DATASET_NAME] --eval_data_dir /PATH/TO/DATASET --ckpt_files /PATH/TO/CHECKPOINT > eval.log 2>&1 &
   OR
   bash scripts/run_distribute_eval.sh [DEVICE_NUM] [RANDK_TABLE_FILE] [NET_NAME] [DATASET_NAME] [EVAL_DATA_DIR][CKPT_PATH]
-  # example: bash script/run_distribute_eval.sh 8 /root/hccl_8p_01234567_10.155.170.71.json densenet121 imagenet /home/DataSet/ImageNet_Original/train/validation_preprocess/ /home/model/densenet/ckpt/0-120_500.ckpt
+  # example: bash script/run_distribute_eval.sh 8 ~/hccl_8p.json densenet121 imagenet /home/DataSet/ImageNet_Original/train/validation_preprocess/ /home/model/densenet/ckpt/0-120_500.ckpt
 
   ```
 

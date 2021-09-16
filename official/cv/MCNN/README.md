@@ -71,9 +71,9 @@ After installing MindSpore via the official website, you can start training and 
 
 ```bash
 # enter script dir, train MCNN example
-sh run_standalone_train_ascend.sh 0 ./formatted_trainval/shanghaitech_part_A_patches_9/train ./formatted_trainval/shanghaitech_part_A_patches_9/train_den ./formatted_trainval/shanghaitech_part_A_patches_9/val ./formatted_trainval/shanghaitech_part_A_patches_9/val_den ./ckpt
+bash run_standalone_train_ascend.sh 0 ./formatted_trainval/shanghaitech_part_A_patches_9/train ./formatted_trainval/shanghaitech_part_A_patches_9/train_den ./formatted_trainval/shanghaitech_part_A_patches_9/val ./formatted_trainval/shanghaitech_part_A_patches_9/val_den ./ckpt
 # enter script dir, evaluate MCNN example
-sh run_standalone_eval_ascend.sh 0 ./original/shanghaitech/part_A_final/test_data/images ./original/shanghaitech/part_A_final/test_data/ground_truth_csv ./train/ckpt/best.ckpt
+bash run_standalone_eval_ascend.sh 0 ./original/shanghaitech/part_A_final/test_data/images ./original/shanghaitech/part_A_final/test_data/ground_truth_csv ./train/ckpt/best.ckpt
 ```
 
 # [Script Description](#contents)
@@ -126,14 +126,14 @@ Major parameters in train.py and config.py as follows:
 
   ```bash
   # enter script dir, and run the distribute script
-  sh run_distribute_train.sh ./hccl_table.json ./formatted_trainval/shanghaitech_part_A_patches_9/train ./formatted_trainval/shanghaitech_part_A_patches_9/train_den ./formatted_trainval/shanghaitech_part_A_patches_9/val ./formatted_trainval/shanghaitech_part_A_patches_9/val_den ./ckpt
+  bash run_distribute_train.sh ~/hccl_8p.json ./formatted_trainval/shanghaitech_part_A_patches_9/train ./formatted_trainval/shanghaitech_part_A_patches_9/train_den ./formatted_trainval/shanghaitech_part_A_patches_9/val ./formatted_trainval/shanghaitech_part_A_patches_9/val_den ./ckpt
   # enter script dir, and run the standalone script
-  sh run_standalone_train_ascend.sh 0 ./formatted_trainval/shanghaitech_part_A_patches_9/train ./formatted_trainval/shanghaitech_part_A_patches_9/train_den ./formatted_trainval/shanghaitech_part_A_patches_9/val ./formatted_trainval/shanghaitech_part_A_patches_9/val_den ./ckpt
+  bash run_standalone_train_ascend.sh 0 ./formatted_trainval/shanghaitech_part_A_patches_9/train ./formatted_trainval/shanghaitech_part_A_patches_9/train_den ./formatted_trainval/shanghaitech_part_A_patches_9/val ./formatted_trainval/shanghaitech_part_A_patches_9/val_den ./ckpt
   ```
 
   After training, the loss value will be achieved as follows:
 
-  ```text
+  ```log
   # grep "loss is " log
   epoch: 1 step: 305, loss is 0.00041025918
   epoch: 2 step: 305, loss is 3.7117527e-05
@@ -161,7 +161,7 @@ Before running the command below, please check the checkpoint path used for eval
 
   You can view the results through the file "eval_log". The accuracy of the test dataset will be as follows:
 
-  ```text
+  ```log
   # grep "MAE: " eval_log
   MAE: 105.87984801910736 MSE: 161.6687899899305
   ```

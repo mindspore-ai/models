@@ -82,14 +82,21 @@ After installing MindSpore via the official website, you can start training and 
 - running on Ascend
 
   ```bash
+  run squeezenet_residual as example
   # distributed training
   Usage: bash scripts/run_distribute_train.sh [squeezenet|squeezenet_residual] [cifar10|imagenet] [RANK_TABLE_FILE] [DATA_PATH] [PRETRAINED_CKPT_PATH](optional)
+  # example: bash scripts/run_distribute_train.sh squeezenet_residual imagenet ~/hccl_8p.json /home/DataSet/ImageNet_Original/train
+  # example: bash scripts/run_distribute_train.sh squeezenet_residual cifar10 ~/hccl_8p.json /home/DataSet/cifar10/cifar-10-batches-bin
 
   # standalone training
   Usage: bash scripts/run_standalone_train.sh [squeezenet|squeezenet_residual] [cifar10|imagenet] [DEVICE_ID] [DATA_PATH] [PRETRAINED_CKPT_PATH](optional)
+  # example: bash scripts/run_standalone_train.sh squeezenet_residual imagenet 0 /home/DataSet/ImageNet_Original/train
+  # example: bash scripts/run_standalone_train.sh squeezenet_residual cifar10 0 /home/DataSet/cifar10/cifar-10-batches-bin
 
   # run evaluation example
   Usage: bash scripts/run_eval.sh [squeezenet|squeezenet_residual] [cifar10|imagenet] [DEVICE_ID] [DATA_PATH] [CHECKPOINT_PATH]
+  # example bash scripts/run_eval.sh squeezenet_residual cifar10 0 /home/DataSet/cifar10/cifar-10-verify-bin /home/model/squeezenet/ckpt/squeezenet_residual_cifar10-120_1562.ckpt
+  # example bash scripts/run_eval.sh squeezenet_residual imagenet 0 /home/DataSet/ImageNet_Original/validation_preprocess /home/model/squeezenet/ckpt/squeezenet_residual_imagenet-300_5004.ckpt
   ```
 
 - running on GPU
@@ -117,7 +124,7 @@ After installing MindSpore via the official website, you can start training and 
 
    If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training and evaluation as follows:
 
-```python
+```ModelArts
 # run distributed training on modelarts example
 # (1) First, Perform a or b.
 #       a. Set "enable_modelarts=True" on yaml file.
@@ -293,9 +300,13 @@ For more configuration details, please refer the file `*.yaml`.
   ```shell
   # distributed training
   Usage: bash scripts/run_distribute_train.sh [squeezenet|squeezenet_residual] [cifar10|imagenet] [RANK_TABLE_FILE] [DATA_PATH] [PRETRAINED_CKPT_PATH](optional)
+  # example: bash scripts/run_distribute_train.sh squeezenet_residual imagenet ~/hccl_8p.json /home/DataSet/ImageNet_Original/train
+  # example: bash scripts/run_distribute_train.sh squeezenet_residual cifar10 ~/hccl_8p.json /home/DataSet/cifar10/cifar-10-batches-bin
 
   # standalone training
   Usage: bash scripts/run_standalone_train.sh [squeezenet|squeezenet_residual] [cifar10|imagenet] [DEVICE_ID] [DATA_PATH] [PRETRAINED_CKPT_PATH](optional)
+  # example: bash scripts/run_standalone_train.sh squeezenet_residual imagenet 0 /home/DataSet/ImageNet_Original/train
+  # example: bash scripts/run_standalone_train.sh squeezenet_residual cifar10 0 /home/DataSet/cifar10/cifar-10-batches-bin
   ```
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
@@ -308,7 +319,7 @@ Training result will be stored in the example path, whose folder name begins wit
 
 - Training SqueezeNet with CIFAR-10 dataset
 
-```shell
+```log
 # standalone training result
 epoch: 1 step 1562, loss is 1.7103254795074463
 epoch: 2 step 1562, loss is 2.06101131439209
@@ -320,7 +331,7 @@ epoch: 5 step 1562, loss is 1.2140142917633057
 
 - Training SqueezeNet with ImageNet dataset
 
-```shell
+```log
 # distribute training result(8 pcs)
 epoch: 1 step 5004, loss is 5.716324329376221
 epoch: 2 step 5004, loss is 5.350603103637695
@@ -332,7 +343,7 @@ epoch: 5 step 5004, loss is 4.136358261108398
 
 - Training SqueezeNet_Residual with CIFAR-10 dataset
 
-```shell
+```log
 # standalone training result
 epoch: 1 step 1562, loss is 2.298271656036377
 epoch: 2 step 1562, loss is 2.2728664875030518
@@ -344,7 +355,7 @@ epoch: 5 step 1562, loss is 1.3370063304901123
 
 - Training SqueezeNet_Residual with ImageNet dataset
 
-```shell
+```log
 # distribute training result(8 pcs)
 epoch: 1 step 5004, loss is 6.802495002746582
 epoch: 2 step 5004, loss is 6.386072158813477
@@ -363,11 +374,8 @@ epoch: 5 step 5004, loss is 4.888848304748535
 ```shell
 # evaluation
 Usage: bash scripts/run_eval.sh [squeezenet|squeezenet_residual] [cifar10|imagenet] [DEVICE_ID] [DATA_PATH] [CHECKPOINT_PATH]
-```
-
-```shell
-# evaluation example
-bash scripts/run_eval.sh squeezenet cifar10 0 ~/cifar-10-verify-bin train/squeezenet_cifar10-120_1562.ckpt
+# example bash scripts/run_eval.sh squeezenet_residual cifar10 0 /home/DataSet/cifar10/cifar-10-verify-bin /home/model/squeezenet/ckpt/squeezenet_residual_cifar10-120_1562.ckpt
+# example bash scripts/run_eval.sh squeezenet_residual imagenet 0 /home/DataSet/ImageNet_Original/validation_preprocess /home/model/squeezenet/ckpt/squeezenet_residual_imagenet-300_5004.ckpt
 ```
 
 checkpoint can be produced in training process.
@@ -378,25 +386,25 @@ Evaluation result will be stored in the example path, whose folder name is "eval
 
 - Evaluating SqueezeNet with CIFAR-10 dataset
 
-```shell
+```log
 result: {'top_1_accuracy': 0.8896233974358975, 'top_5_accuracy': 0.9965945512820513}
 ```
 
 - Evaluating SqueezeNet with ImageNet dataset
 
-```shell
+```log
 result: {'top_1_accuracy': 0.5851472471190781, 'top_5_accuracy': 0.8105393725992317}
 ```
 
 - Evaluating SqueezeNet_Residual with CIFAR-10 dataset
 
-```shell
+```log
 result: {'top_1_accuracy': 0.9077524038461539, 'top_5_accuracy': 0.9969951923076923}
 ```
 
 - Evaluating SqueezeNet_Residual with ImageNet dataset
 
-```shell
+```log
 result: {'top_1_accuracy': 0.6094950384122919, 'top_5_accuracy': 0.826324423815621}
 ```
 
@@ -406,7 +414,7 @@ result: {'top_1_accuracy': 0.6094950384122919, 'top_5_accuracy': 0.8263244238156
 
 Export MindIR on local
 
-```shell
+```python
 python export.py --checkpoint_file_path [CKPT_PATH] --batch_size [BATCH_SIZE] --net_name [NET] --dataset [DATASET] --file_format [EXPORT_FORMAT] --config_path [CONFIG_PATH]
 ```
 
@@ -418,7 +426,7 @@ The checkpoint_file_path parameter is required,
 
 Export on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start as follows)
 
-```python
+```ModelArts
 # Export on ModelArts
 # (1) Perform a or b.
 #       a. Set "enable_modelarts=True" on default_config.yaml file.
@@ -459,25 +467,25 @@ Inference result is saved in current path, you can find result like this in acc.
 
 - Infer SqueezeNet with CIFAR-10 dataset
 
-```bash
+```log
 'Top1_Accuracy': 83.62%  'Top5_Accuracy': 99.31%
 ```
 
 - Infer SqueezeNet with ImageNet dataset
 
-```bash
+```log
 'Top1_Accuracy': 59.30%  'Top5_Accuracy': 81.40%
 ```
 
 - Infer SqueezeNet_Residual with CIFAR-10 dataset
 
-```bash
+```log
 'Top1_Accuracy': 87.28%  'Top5_Accuracy': 99.58%
 ```
 
 - Infer SqueezeNet_Residual with ImageNet dataset
 
-```bash
+```log
 'Top1_Accuracy': 60.82%  'Top5_Accuracy': 82.56%
 ```
 

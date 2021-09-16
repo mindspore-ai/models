@@ -224,7 +224,7 @@ python create_data.py --create_dataset coco --prefix retinanet_eval.mindrecord -
 Ascend:
 # 八卡并行训练示例(在retinanet目录下运行)：
 bash scripts/run_distribute_train.sh [DEVICE_NUM] [RANK_TABLE_FILE] [MINDRECORD_DIR] [PRE_TRAINED(optional)] [PRE_TRAINED_EPOCH_SIZE(optional)]
-# example: bash scripts/run_distribute_train.sh 8 /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/MindRecord_COCO/
+# example: bash scripts/run_distribute_train.sh 8 ~/hccl_8p.json /home/DataSet/MindRecord_COCO/
 
 # 单卡训练示例(在retinanet目录下运行)：
 bash scripts/run_single_train.sh [DEVICE_ID] [MINDRECORD_DIR]

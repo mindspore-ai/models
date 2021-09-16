@@ -46,7 +46,7 @@ Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>)
     - Note：Data will be processed in dataset.py
 - Download the dataset, the directory structure is as follows:
 
-```bash
+```cifar10
 ├─cifar-10-batches-bin
 │
 └─cifar-10-verify-bin

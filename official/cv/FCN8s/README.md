@@ -225,7 +225,7 @@ ckpt_file: /home/FCN8s/ckpt/FCN8s_1-133_300.ckpt
 
   #Ascend八卡并行训练
   bash scripts/run_train.sh [DEVICE_NUM] rank_table.json
-  # example: bash scripts/run_train.sh 8 /home/hccl_8p_01234567_10.155.170.71.json
+  # example: bash scripts/run_train.sh 8 ~/hccl_8p.json
   ```
 
   分布式训练需要提前创建JSON格式的HCCL配置文件,请遵循[链接说明](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)

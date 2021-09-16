@@ -104,7 +104,7 @@ function cal_acc()
     fi
     mkdir output
     mkdir output_img
-    python ../postprocess.py --dataset_path=$data_path --result_path=result_Files --label_path=$label_path &> acc.log
+    python ../postprocess.py --export_dataset_path=$data_path --result_path=result_Files --label_path=$label_path &> acc.log
     if [ $? -ne 0 ]; then
         echo "calculate accuracy failed"
         exit 1

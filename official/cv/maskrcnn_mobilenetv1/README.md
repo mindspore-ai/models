@@ -107,7 +107,7 @@ pip install mmcv=0.2.14
 
     # distributed training
     bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH] [PRETRAINED_CKPT(optional)]
-    # example: bash run_distribute_train.sh /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/cocodataset/
+    # example: bash run_distribute_train.sh ~/hccl_8p.json /home/DataSet/cocodataset/
 
     # standalone training
     bash run_standalone_train.sh [DATA_PATH] [PRETRAINED_CKPT(optional)]
@@ -351,7 +351,7 @@ On Ascend:
 
 # distributed training
 Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH] [PRETRAINED_CKPT(optional)]
-# example: bash run_distribute_train.sh /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/cocodataset/
+# example: bash run_distribute_train.sh ~/hccl_8p.json /home/DataSet/cocodataset/
 
 # standalone training
 Usage: bash run_standalone_train.sh [DATA_PATH] [PRETRAINED_CKPT(optional)]
@@ -532,7 +532,7 @@ bash run_standalone_train_cpu.sh [PRETRAINED_MODEL](optional)
 
 ```bash
 bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH] [PRETRAINED_MODEL(optional)]
-# example: bash run_distribute_train.sh /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/cocodataset/
+# example: bash run_distribute_train.sh ~/hccl_8p.json /home/DataSet/cocodataset/
 ```
 
 > hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools).

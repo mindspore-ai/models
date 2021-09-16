@@ -39,7 +39,7 @@ Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>)
     - Note：Data will be processed in dataset.py
 - Download the dataset, the directory structure is as follows:
 
-```bash
+```cifar10
 ├─cifar-10-batches-bin
 │
 └─cifar-10-verify-bin
@@ -62,10 +62,14 @@ After installing MindSpore via the official website, you can start training and 
 ```python
 # enter script dir, train SimCLR
 bash run_standalone_train_ascend.sh [cifar10] [TRAIN_DATASET_PATH] [DEVICE_ID]
+# example: bash run_standalone_train_ascend cifar10 /home/DataSet/cifar10/cifar-10-batches-bin/ 0
 or
 bash run_distribution_ascend.sh [DEVICENUM] [RANK_TABLE_FILE] [cifar10] [TRAIN_DATASET_PATH]
+# example: bash run_distribution_ascend.sh 8 ~/hccl_8p.json cifar10 /home/DataSet/cifar10/cifar-10-batches-bin/
+
 # enter script dir, evaluate SimCLR
 bash run_standalone_eval_ascend.sh [cifar10] [DEVICE_ID] [SIMCLR_MODEL_PATH] [TRAIN_DATASET_PATH] [EVAL_DATASET_PATH]
+# example: run_standalone_eval_ascend.sh cifar10 0 /home/model/simclr/ckpt/checkpoint-simclr-100_390.ckpt /home/DataSet/cifar10/cifar-10-batches-bin/ /home/DataSet/cifar10/cifar-10-verify-bin/
 ```
 
 ## [Script Description](#contents)
@@ -152,11 +156,12 @@ Major parameters in linear_eval.py as follows:
 
   ```bash
   bash run_distribution_ascend.sh [DEVICENUM] [RANK_TABLE_FILE] [cifar10] [TRAIN_DATASET_PATH]
+  # example: bash run_distribution_ascend.sh 8 ~/hccl_8p.json cifar10 /home/DataSet/cifar10/cifar-10-batches-bin/
   ```
 
   After training, the loss value will be achieved as follows:
 
-  ```bash
+  ```log
   # grep "loss is " log
   epoch: 1 step: 48, loss is 9.5758915
   epoch time: 253236.075 ms, per step time: 5275.752 ms
@@ -186,11 +191,12 @@ Before running the command below, please check the checkpoint path used for eval
 
   ```bash
   bash run_standalone_eval_ascend.sh [cifar10] [DEVICE_ID] [SIMCLR_MODEL_PATH] [TRAIN_DATASET_PATH] [EVAL_DATASET_PATH]
+  # example: run_standalone_eval_ascend.sh cifar10 0 /home/model/simclr/ckpt/checkpoint-simclr-100_390.ckpt /home/DataSet/cifar10/cifar-10-batches-bin/ /home/DataSet/cifar10/cifar-10-verify-bin/
   ```
 
   You can view the results through the file "eval_log". The accuracy of the test dataset will be as follows:
 
-  ```bash
+  ```log
   # grep "Average accuracy: " eval_log
   'Accuracy': 0.84505
   ```

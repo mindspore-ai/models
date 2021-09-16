@@ -284,7 +284,7 @@ Take training cifar10 as an example, the ds_type parameter is set to cifar10
 ```shell
 # distribute training(8p)
 bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH] [CKPT_PATH]
-# example: bash run_distribute_train.sh /root/hccl_8p_012345467_10.155.170.71.json /home/DataSet/cifar10/ ./ckpt/
+# example: bash run_distribute_train.sh ~/hccl_8p.json /home/DataSet/cifar10/ ./ckpt/
 
 # standalone training
 bash scripts/run_standalone_train.sh [DEVICE_ID] [DATA_PATH] [CKPT_PATH]
