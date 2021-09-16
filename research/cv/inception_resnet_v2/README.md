@@ -50,6 +50,8 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 
 # [Environment Requirements](#contents)
 
+- Hardware（Ascend）
+    - Prepare hardware environment with Ascend processor.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install)
 - For more information, please check the resources below：
@@ -113,13 +115,13 @@ You can start training using python or shell scripts. The usage of shell scripts
 
 ```bash
 # distribute training example(8p)
-bash scripts/run_distribute_train_ascend.sh RANK_TABLE_FILE DATA_DIR
+bash scripts/run_distribute_train_ascend.sh RANK_TABLE_FILE DATA_PATH DATA_DIR
 # standalone training
 bash scripts/run_standalone_train_ascend.sh DEVICE_ID DATA_DIR
 ```
 
 > Notes:
-> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorials/zh-CN/r1.3/intermediate/distributed_training/distributed_training_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/mindspore/tree/r1.3/model_zoo/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
+> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/docs/programming_guide/en/r1.3/distributed_training_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/mindspore/tree/r1.3/model_zoo/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 >
 > This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 
@@ -130,7 +132,7 @@ bash scripts/run_standalone_train_ascend.sh DEVICE_ID DATA_DIR
   shell:
       Ascend:
       # distribute training example(8p)
-      bash scripts/run_distribute_train_ascend.sh RANK_TABLE_FILE DATA_DIR
+      bash scripts/run_distribute_train_ascend.sh RANK_TABLE_FILE DATA_PATH DATA_DIR
       # standalone training
       bash scripts/run_standalone_train_ascend.sh
 ```
@@ -188,8 +190,8 @@ metric: {'Loss': 1.0413, 'Top1-Acc':0.79955, 'Top5-Acc':0.9439}
 | Optimizer           | RMSProp                                       |
 | Loss Function       | SoftmaxCrossEntropyWithLogits                 |
 | Outputs             | probability                                   |
-| Speed               | 1pc: 556 img/s; 8pcs: 4430 img/s              |
-| Total time          | 8pcs: 24h                                     |
+| Total time (8p)     | 24h                                           |
+| performance         | 1p: 556 img/s / 8p: 4430 img/s                |
 
 #### Inference Performance
 
