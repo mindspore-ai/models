@@ -24,6 +24,10 @@ import mindspore.dataset.transforms.c_transforms as CC
 import mindspore.common.dtype as mstype
 from src.model_utils.config import config
 
+if config.device_target == "Ascend":
+    mtype = mstype.float16
+else:
+    mtype = mstype.float32
 
 class PhotoMetricDistortion:
     """Photo Metric Distortion"""
@@ -286,7 +290,7 @@ def create_ctpn_dataset(mindrecord_file, batch_size=1, repeat_num=1, device_num=
     hwc_to_chw = C.HWC2CHW()
     normalize_op = C.Normalize((123.675, 116.28, 103.53), (58.395, 57.12, 57.375))
     type_cast0 = CC.TypeCast(mstype.float32)
-    type_cast1 = CC.TypeCast(mstype.float16)
+    type_cast1 = CC.TypeCast(mtype)
     type_cast2 = CC.TypeCast(mstype.int32)
     type_cast3 = CC.TypeCast(mstype.bool_)
     if is_training:
