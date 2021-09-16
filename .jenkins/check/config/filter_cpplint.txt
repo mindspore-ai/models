@@ -10,3 +10,4 @@
 # models
 "models/official/cv/resnext/infer/mxbase/main_opencv.cpp"                 "runtime/references"
 "models/official/cv/resnext/infer/mxbase/Resnext101ClassifyOpencv.h"                 "runtime/references"
+"models/official/cv/cspdarknet53/infer/mxBase/Cspdarknet53Classify.h"    "runtime/references"
