@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 1 ]
+if [ $# != 2 ]
 then
-    echo "Usage: sh run_standalone_train.sh [DATASET_PATH]"
+    echo "Usage: sh run_distribute_train_gpu.sh [DATASET_PATH] [RANK_SIZE]"
 exit 1
 fi
 
@@ -31,40 +31,36 @@ get_real_path(){
 DATASET_PATH=$(get_real_path $1)
 echo $DATASET_PATH
 
-
 if [ ! -d $DATASET_PATH ]
 then
     echo "error: DATASET_PATH=$DATASET_PATH is not a directory"
 exit 1
 fi
 
+export RANK_SIZE=$2
 
-export DEVICE_NUM=1
-export DEVICE_ID=0
-export RANK_ID=0
-export RANK_SIZE=1
-
-if [ -d "train" ];
-then
-    rm -rf ./train
+if [ -d "distribute_train" ]; then
+  rm -rf ./distribute_train
 fi
-mkdir ./train
-cp ../*.py ./train
-cp ../*.yaml ./train
-cp -r ../src ./train
-cp -r ../model_utils ./train
-cd ./train || exit
-echo "start training for device $DEVICE_ID"
-env > env.log
 
-python train.py \
-    --data_dir=$DATASET_PATH \
-    --is_distributed=0 \
-    --yolov5_version='yolov5s' \
-    --lr=0.01 \
-    --T_max=320 \
-    --max_epoch=320 \
-    --warmup_epochs=4 \
-    --training_shape=640 \
-    --lr_scheduler=cosine_annealing > log.txt 2>&1 &
+mkdir ./distribute_train
+cp ../*.py ./distribute_train
+cp ../*.yaml ./distribute_train
+cp -r ../src ./distribute_train
+cp -r ../model_utils ./distribute_train
+cd ./distribute_train || exit
+
+mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
+nohup python train.py \
+      --device_target=GPU \
+      --per_batch_size=32 \
+      --data_dir=$DATASET_PATH \
+      --is_distributed=1 \
+      --yolov5_version='yolov5s' \
+      --lr=0.025 \
+      --T_max=300 \
+      --max_epoch=300 \
+      --warmup_epochs=20 \
+      --training_shape=640 \
+      --lr_scheduler=cosine_annealing > log.txt 2>&1 &
 cd ..

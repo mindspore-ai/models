@@ -41,7 +41,7 @@ Note that you can run the scripts with **COCO2017 **or any other datasets with t
 After installing MindSpore via the official website, you can start training and evaluation as follows:
 
 ```bash
-#run training example(1p) by python command
+#run training example(1p) on Ascend by python command
 python train.py \
     --data_dir=xxx/dataset \
     --is_distributed=0 \
@@ -56,17 +56,28 @@ python train.py \
 ```bash
 # For Ascend device, distributed training example(8p) by shell script
 bash run_distribute_train.sh xxx/dateset/ xxx/cspdarknet.ckpt rank_table_8pcs.json
+
+# For GPU device, distributed training example(8p) by shell script
+bash run_distribute_train_gpu.sh xxx/dateset [RANK_SIZE]
 ```
 
 ```bash
-# run evaluation by python command
+# run evaluation on Ascend by python command
 python eval.py \
     --data_dir=xxx/dataset \
-    --testing_shape=640 > log.txt 2>&1 &
+    --eval_shape=640 > log.txt 2>&1 &
+
+# run evaluation on GPU by python command
+python eval.py \
+    --device_target="GPU" \
+    --data_dir=xxx/dataset \
+    --yolov5_version='yolov5s' \
+    --pretrained="***/*.ckpt" \
+    --eval_shape=640 > log.txt 2>&1 &
 ```
 
 ```bash
-# run evaluation by shell script
+# run evaluation on Ascend by shell script
 bash run_eval.sh xxx/dataset xxx/yolov5.ckpt
 ```
 
@@ -78,14 +89,20 @@ bash run_eval.sh xxx/dataset xxx/yolov5.ckpt
 ├── model_zoo
     ├── README.md                              // descriptions about all the models
     ├── yolov5
-        ├── README.md                       // descriptions about yolov5
+        ├── README.md                          // descriptions about yolov5
         ├── scripts
         │   ├──run_distribute_train.sh         // launch distributed training(8p) in ascend
-        │   ├──run_eval.sh                // shell script for evaluation
+        │   ├──run_distribute_train_gpu.sh     // launch distributed training(8p) in GPU
+        │   ├──run_standalone_train.sh         // launch 1p training in ascend
+        │   ├──run_eval.sh                     // shell script for evaluation
         │   ├──rank_table_8pcs.json            // the example of rank table settings for 8p training
+        ├──model_utils
+        │   ├──config.py                       // getting config parameters
+        │   ├──device_adapter.py               // getting device info
+        │   ├──local_adapter.py                // getting device info
+        │   ├──moxing_adapter.py               // Decorator
         ├── src
-        │   ├──config.py                       // parameter configuration
-        │   ├──backbone.py                   // backbone of network
+        │   ├──backbone.py                     // backbone of network
         │   ├──distributed_sampler.py          // iterator of dataset
         │   ├──initializer.py                  // initializer of parameters
         │   ├──logger.py                       // log function
@@ -95,9 +112,10 @@ bash run_eval.sh xxx/dataset xxx/yolov5.ckpt
         │   ├──util.py                         // util function
         │   ├──yolo.py                         // yolov5 network
         │   ├──yolo_dataset.py                 // create dataset for YOLOV5
-        ├── train.py                  // training script
-        ├── eval.py                 // evaluation script
-        ├── export.py                 // export script
+        ├── default_config.yaml                // parameter configuration
+        ├── train.py                           // training script
+        ├── eval.py                            // evaluation script
+        ├── export.py                          // export script
 ```
 
 ## [Script Parameters](#contents)
@@ -108,7 +126,7 @@ Major parameters in train.py are:
 optional arguments:
 
   --device_target       device where the code will be implemented: "Ascend", default is "Ascend"
-  --data_dir        Train dataset directory.
+  --data_dir            Train dataset directory.
   --per_batch_size      Batch size for Training. Default: 8.
   --pretrained_backbone The ckpt file of CSPDarknet53. Default: "".
   --resume_yolov5       The ckpt file of YOLOv5, which used to fine tune.Default: ""
@@ -156,6 +174,8 @@ python train.py \
     --per_batch_size=128 \
     --lr_scheduler=cosine_annealing > log.txt 2>&1 &
 ```
+
+You should fine tune the params when run training 1p on GPU
 
 The python command above will run in the background, you can view the results through the file `log.txt`.
 
@@ -224,7 +244,7 @@ Before running the command below, please check the checkpoint path used for eval
 python eval.py \
     --data_dir=xxx/dataset \
     --pretrained=xxx/yolov5.ckpt \
-    --testing_shape=640 > log.txt 2>&1 &
+    --eval_shape=640 > log.txt 2>&1 &
 OR
 # run evaluation by shell script
 bash run_eval.sh xxx/dataset xxx/yolov5.ckpt
@@ -258,34 +278,34 @@ Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
 
 YOLOv5 on 118K images(The annotation and data format must be the same as coco2017)
 
-| Parameters                 | YOLOv5                                                       |
-| -------------------------- | ------------------------------------------------------------ |
-| Resource                   | Ascend 910 ；CPU 2.60GHz，192cores; Memory, 755G             |
-| uploaded Date              | 7/12/2021 (month/day/year)                                   |
-| MindSpore Version          | 1.2.0                                                        |
-| Dataset                    | 118K images                                                  |
-| Training Parameters        | epoch=300, batch_size=8, lr=0.02,momentum=0.9,warmup_epoch=20 |
-| Optimizer                  | Momentum                                                     |
-| Loss Function              | Sigmoid Cross Entropy with logits, Giou Loss                 |
-| outputs                    | boxes and label                                              |
-| Loss                       | 111.970097                                                   |
-| Speed                      | 8p about 450 FPS                                             |
-| Total time                 | 8p 21h28min                                                  |
-| Checkpoint for Fine tuning | 53.62M (.ckpt file)                                          |
-| Scripts                    | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/ |
+| Parameters                 | YOLOv5s                                                      | YOLOv5s                                                      |
+| -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Resource                   | Ascend 910 ；CPU 2.60GHz，192cores; Memory, 755G               | GPU NV SMX2 V100-32G                                         |
+| uploaded Date              | 7/12/2021 (month/day/year)                                   | 9/15/2021 (month/day/year)                                   |
+| MindSpore Version          | 1.2.0                                                        | 1.3.0                                                        |
+| Dataset                    | 118K images                                                  | 118K images                                                  |
+| Training Parameters        | epoch=300, batch_size=8, lr=0.02,momentum=0.9,warmup_epoch=20| epoch=300, batch_size=32, lr=0.025, warmup_epoch=20, 8p      |
+| Optimizer                  | Momentum                                                     | Momentum                                                     |
+| Loss Function              | Sigmoid Cross Entropy with logits, Giou Loss                 | Sigmoid Cross Entropy with logits, Giou Loss                 |
+| outputs                    | boxes and label                                              | boxes and label                                              |
+| Loss                       | 111.970097                                                   | 85                                                           |
+| Speed                      | 8p about 450 FPS                                             | 8p about 290 FPS                                             |
+| Total time                 | 8p 21h28min                                                  | 8p 35h                                                       |
+| Checkpoint for Fine tuning | 53.62M (.ckpt file)                                          | 58.87M (.ckpt file)                                          |
+| Scripts                    | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/ | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/ |
 
 ### Inference Performance
 
-| Parameters          | YOLOv5         |
-| ------------------- | --------------------------- |
-| Resource            | Ascend 910 ；CPU 2.60GHz，192cores; Memory, 755G |
-| Uploaded Date       | 7/12/2021 (month/day/year) |
-| MindSpore Version   | 1.2.0            |
-| Dataset             | 20K images |
-| batch_size          | 1                         |
-| outputs             | box position and sorces, and probability |
-| Accuracy            | mAP >= 36.7%(shape=640) |
-| Model for inference | 56.67M (.ckpt file) |
+| Parameters          | YOLOv5s                                        | YOLOv5s                                      |
+| ------------------- | -----------------------------------------------| ---------------------------------------------|
+| Resource            | Ascend 910 ；CPU 2.60GHz，192cores; Memory, 755G | GPU NV SMX2 V100-32G                         |
+| Uploaded Date       | 7/12/2021 (month/day/year)                     | 9/15/2021 (month/day/year)                   |
+| MindSpore Version   | 1.2.0                                          | 1.3.0                                        |
+| Dataset             | 20K images                                     | 20K images                                   |
+| batch_size          | 1                                              | 1                                            |
+| outputs             | box position and sorces, and probability       | box position and sorces, and probability     |
+| Accuracy            | mAP >= 36.7%(shape=640)                        | mAP >= 36.7%(shape=640)                      |
+| Model for inference | 56.67M (.ckpt file)                            | 58.87M (.ckpt file)                          |
 
 ### Transfer Learning
 
