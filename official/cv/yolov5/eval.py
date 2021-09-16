@@ -14,11 +14,9 @@
 # ============================================================================
 """YoloV5 eval."""
 import os
-import argparse
 import datetime
 import time
 import sys
-import ast
 from collections import defaultdict
 
 import numpy as np
@@ -34,64 +32,36 @@ import mindspore as ms
 from src.yolo import YOLOV5
 from src.logger import get_logger
 from src.yolo_dataset import create_yolo_dataset
-from src.config import ConfigYOLOV5
 
-parser = argparse.ArgumentParser('mindspore coco testing')
+from model_utils.config import config
+from model_utils.moxing_adapter import moxing_wrapper
+from model_utils.device_adapter import get_device_id, get_device_num
 
-# device related
-parser.add_argument('--device_target', type=str, default='Ascend',
-                    help='device where the code will be implemented. (Default: Ascend)')
+config.rank = 0
 
-# dataset related
-parser.add_argument('--data_dir', type=str, default='/data/coco', help='train data dir')
-parser.add_argument('--per_batch_size', default=1, type=int, help='batch size for per gpu')
-
-# network related
-parser.add_argument('--pretrained', default='', type=str, help='model_path, local pretrained model to load')
-parser.add_argument('--yolov5_version', default='yolov5s', type=str,
-                    help='The version of YOLOv5, options: yolov5s, yolov5m, yolov5l, yolov5x')
-
-# logging related
-parser.add_argument('--log_path', type=str, default='outputs/', help='checkpoint save location')
-
-# detect_related
-parser.add_argument('--nms_thresh', type=float, default=0.6, help='threshold for NMS')
-parser.add_argument('--ann_file', type=str, default='', help='path to annotation')
-parser.add_argument('--testing_shape', type=str, default='', help='shape for test ')
-parser.add_argument('--ignore_threshold', type=float, default=0.001, help='threshold to throw low quality boxes')
-parser.add_argument('--multi_label', type=ast.literal_eval, default=True, help='whether to use multi label')
-parser.add_argument('--multi_label_thresh', type=float, default=0.1, help='threshhold to throw low quality boxes')
-parser.add_argument('--is_modelArts', type=int, default=0,
-                    help='Trainning in modelArts or not, 1 for yes, 0 for no. Default: 0')
-
-args, _ = parser.parse_known_args()
-args.rank = 0
-
-if args.is_modelArts:
-    args.data_root = os.path.join(args.data_dir, 'val2017')
-    args.ann_file = os.path.join(args.data_dir, 'annotations')
+if config.is_modelArts:
+    config.data_root = os.path.join(config.data_dir, 'val2017')
+    config.ann_file = os.path.join(config.data_dir, 'annotations')
     import moxing as mox
 
-    local_data_url = os.path.join('/cache/data', str(args.rank))
-    local_annFile = os.path.join('/cache/data', str(args.rank))
-    local_pretrained = os.path.join('/cache/data', str(args.rank))
+    local_data_url = os.path.join(config.data_path, str(config.rank))
+    local_annFile = os.path.join(config.data_path, str(config.rank))
+    local_pretrained = os.path.join(config.data_path, str(config.rank))
 
-    temp_str = args.pretrained.split('/')[-1]
-    args.pretrained = args.pretrained[0:args.pretrained.rfind('/')]
+    temp_str = config.pretrained.split('/')[-1]
+    config.pretrained = config.pretrained[0:config.pretrained.rfind('/')]
 
-    mox.file.copy_parallel(args.data_root, local_data_url)
-    args.data_root = local_data_url
+    mox.file.copy_parallel(config.data_root, local_data_url)
+    config.data_root = local_data_url
 
-    mox.file.copy_parallel(args.ann_file, local_annFile)
-    args.ann_file = os.path.join(local_data_url, 'instances_val2017.json')
+    mox.file.copy_parallel(config.ann_file, local_annFile)
+    config.ann_file = os.path.join(local_data_url, 'instances_val2017.json')
 
-    mox.file.copy_parallel(args.pretrained, local_pretrained)
-    args.pretrained = os.path.join(local_data_url, temp_str)
+    mox.file.copy_parallel(config.pretrained, local_pretrained)
+    config.pretrained = os.path.join(local_data_url, temp_str)
 else:
-    args.data_root = os.path.join(args.data_dir, 'val2017')
-    args.ann_file = os.path.join(
-        args.data_dir,
-        'annotations/instances_val2017.json')
+    config.data_root = os.path.join(config.data_dir, 'val2017')
+    config.ann_file = os.path.join(config.data_dir, 'annotations/instances_val2017.json')
 
 
 class Redirct:
@@ -109,17 +79,8 @@ class DetectionEngine:
     """Detection engine."""
 
     def __init__(self, args_detection):
-        self.ignore_threshold = args_detection.ignore_threshold
-        self.labels = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
-                       'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat',
-                       'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack',
-                       'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball',
-                       'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket',
-                       'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
-                       'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair',
-                       'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote',
-                       'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book',
-                       'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush']
+        self.ignore_threshold = args_detection.test_ignore_threshold
+        self.labels = args_detection.labels
         self.num_classes = len(self.labels)
         self.results = {}
         self.file_path = ''
@@ -128,14 +89,11 @@ class DetectionEngine:
         self._coco = COCO(self.ann_file)
         self._img_ids = list(sorted(self._coco.imgs.keys()))
         self.det_boxes = []
-        self.nms_thresh = args_detection.nms_thresh
+        self.nms_thresh = args_detection.eval_nms_thresh
         self.multi_label = args_detection.multi_label
         self.multi_label_thresh = args_detection.multi_label_thresh
         self.coco_catids = self._coco.getCatIds()
-        self.coco_catIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 27,
-                            28, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 46, 47, 48, 49, 50, 51, 52, 53,
-                            54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 67, 70, 72, 73, 74, 75, 76, 77, 78, 79, 80,
-                            81, 82, 84, 85, 86, 87, 88, 89, 90]
+        self.coco_catIds = args_detection.coco_ids
 
     def do_nms_for_results(self):
         """Get result boxes."""
@@ -335,29 +293,82 @@ def convert_testing_shape(args_testing_shape):
     testing_shape = [int(args_testing_shape), int(args_testing_shape)]
     return testing_shape
 
+def modelarts_pre_process():
+    '''modelarts pre process function.'''
+    def unzip(zip_file, save_dir):
+        import zipfile
+        s_time = time.time()
+        if not os.path.exists(os.path.join(save_dir, config.modelarts_dataset_unzip_name)):
+            zip_isexist = zipfile.is_zipfile(zip_file)
+            if zip_isexist:
+                fz = zipfile.ZipFile(zip_file, 'r')
+                data_num = len(fz.namelist())
+                print("Extract Start...")
+                print("unzip file num: {}".format(data_num))
+                data_print = int(data_num / 100) if data_num > 100 else 1
+                i = 0
+                for file in fz.namelist():
+                    if i % data_print == 0:
+                        print("unzip percent: {}%".format(int(i * 100 / data_num)), flush=True)
+                    i += 1
+                    fz.extract(file, save_dir)
+                print("cost time: {}min:{}s.".format(int((time.time() - s_time) / 60),
+                                                     int(int(time.time() - s_time) % 60)))
+                print("Extract Done.")
+            else:
+                print("This is not zip.")
+        else:
+            print("Zip has been extracted.")
 
-if __name__ == "__main__":
+    if config.need_modelarts_dataset_unzip:
+        zip_file_1 = os.path.join(config.data_path, config.modelarts_dataset_unzip_name + ".zip")
+        save_dir_1 = os.path.join(config.data_path)
+
+        sync_lock = "/tmp/unzip_sync.lock"
+
+        # Each server contains 8 devices as most.
+        if get_device_id() % min(get_device_num(), 8) == 0 and not os.path.exists(sync_lock):
+            print("Zip file path: ", zip_file_1)
+            print("Unzip file save dir: ", save_dir_1)
+            unzip(zip_file_1, save_dir_1)
+            print("===Finish extract data synchronization===")
+            try:
+                os.mknod(sync_lock)
+            except IOError:
+                pass
+
+        while True:
+            if os.path.exists(sync_lock):
+                break
+            time.sleep(1)
+
+        print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
+
+    config.log_path = os.path.join(config.output_path, config.log_path)
+
+@moxing_wrapper(pre_process=modelarts_pre_process)
+def run_eval():
     start_time = time.time()
     device_id = int(os.getenv('DEVICE_ID')) if os.getenv('DEVICE_ID') else 0
     # device_id = 1
-    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=device_id)
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=device_id)
 
     # logger
-    args.outputs_dir = os.path.join(args.log_path, datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
+    config.outputs_dir = os.path.join(config.log_path, datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
     rank_id = int(os.getenv('DEVICE_ID', '0'))
-    args.logger = get_logger(args.outputs_dir, rank_id)
+    config.logger = get_logger(config.outputs_dir, rank_id)
 
     context.reset_auto_parallel_context()
     parallel_mode = ParallelMode.STAND_ALONE
     context.set_auto_parallel_context(parallel_mode=parallel_mode, gradients_mean=True, device_num=1)
 
-    args.logger.info('Creating Network....')
+    config.logger.info('Creating Network....')
     dict_version = {'yolov5s': 0, 'yolov5m': 1, 'yolov5l': 2, 'yolov5x': 3}
-    network = YOLOV5(is_training=False, version=dict_version[args.yolov5_version])
+    network = YOLOV5(is_training=False, version=dict_version[config.yolov5_version])
 
-    args.logger.info(args.pretrained)
-    if os.path.isfile(args.pretrained):
-        param_dict = load_checkpoint(args.pretrained)
+    config.logger.info(config.pretrained)
+    if os.path.isfile(config.pretrained):
+        param_dict = load_checkpoint(config.pretrained)
         param_dict_new = {}
         for key, values in param_dict.items():
             if key.startswith('moments.'):
@@ -367,32 +378,31 @@ if __name__ == "__main__":
             else:
                 param_dict_new[key] = values
         load_param_into_net(network, param_dict_new)
-        args.logger.info('load_model {} success'.format(args.pretrained))
+        config.logger.info('load_model %s success', config.pretrained)
     else:
-        args.logger.info('{} not exists or not a pre-trained file'.format(args.pretrained))
-        assert FileNotFoundError('{} not exists or not a pre-trained file'.format(args.pretrained))
+        config.logger.info('%s not exists or not a pre-trained file', config.pretrained)
+        assert FileNotFoundError('{} not exists or not a pre-trained file'.format(config.pretrained))
         exit(1)
 
-    data_root = args.data_root
-    ann_file = args.ann_file
+    data_root = config.data_root
+    ann_file = config.ann_file
 
-    config = ConfigYOLOV5()
-    if args.testing_shape:
-        config.test_img_shape = convert_testing_shape(args.testing_shape)
+    if config.testing_shape:
+        config.test_img_shape = convert_testing_shape(config.eval_shape)
 
-    ds, data_size = create_yolo_dataset(data_root, ann_file, is_training=False, batch_size=args.per_batch_size,
+    ds, data_size = create_yolo_dataset(data_root, ann_file, is_training=False, batch_size=config.per_batch_size,
                                         max_epoch=1, device_num=1, rank=rank_id, shuffle=False, config=config)
 
-    args.logger.info('testing shape : {}'.format(config.test_img_shape))
-    args.logger.info('total {} images to eval'.format(data_size))
+    config.logger.info('testing shape : %d', config.test_img_shape)
+    config.logger.info('total %d images to eval', data_size)
 
     network.set_train(False)
 
     # init detection engine
-    detection = DetectionEngine(args)
+    detection = DetectionEngine(config)
 
     input_shape = Tensor(tuple(config.test_img_shape), ms.float32)
-    args.logger.info('Start inference....')
+    config.logger.info('Start inference....')
     for image_index, data in enumerate(ds.create_dict_iterator(num_epochs=1)):
         image = data["image"].asnumpy()
         image = np.concatenate((image[..., ::2, ::2], image[..., 1::2, ::2],
@@ -407,16 +417,20 @@ if __name__ == "__main__":
         output_small = output_small.asnumpy()
         image_id_ = image_id_.asnumpy()
         image_shape_ = image_shape_.asnumpy()
-        detection.detect([output_small, output_me, output_big], args.per_batch_size, image_shape_, image_id_)
+        detection.detect([output_small, output_me, output_big], config.per_batch_size, image_shape_, image_id_)
         if image_index % 1000 == 0:
-            args.logger.info('Processing... {:.2f}% '.format(image_index * args.per_batch_size / data_size * 100))
+            config.logger.info('Processing... {:.2f}% '.format(image_index * config.per_batch_size / data_size * 100))
 
-    args.logger.info('Calculating mAP...')
+    config.logger.info('Calculating mAP...')
     detection.do_nms_for_results()
     result_file_path = detection.write_result()
-    args.logger.info('result file path: {}'.format(result_file_path))
+    config.logger.info('result file path: %s', result_file_path)
     eval_result = detection.get_eval_result()
 
     cost_time = time.time() - start_time
-    args.logger.info('\n=============coco eval reulst=========\n' + eval_result)
-    args.logger.info('testing cost time {:.2f}h'.format(cost_time / 3600.))
+    eval_log_string = '\n=============coco eval result=========\n' + eval_result
+    config.logger.info(eval_log_string)
+    config.logger.info('testing cost time %.2f h', cost_time / 3600.)
+
+if __name__ == "__main__":
+    run_eval()

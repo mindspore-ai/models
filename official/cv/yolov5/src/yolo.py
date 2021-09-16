@@ -25,15 +25,15 @@ from mindspore.ops import functional as F
 from mindspore.ops import composite as C
 
 from src.backbone import YOLOv5Backbone, Conv, BottleneckCSP
-from src.config import ConfigYOLOV5
 from src.loss import ConfidenceLoss, ClassLoss
 
+from model_utils.config import config as default_config
 
 class YOLO(nn.Cell):
     def __init__(self, backbone, shape):
         super(YOLO, self).__init__()
         self.backbone = backbone
-        self.config = ConfigYOLOV5()
+        self.config = default_config
 
         self.conv1 = Conv(shape[5], shape[4], k=1, s=1)
         self.CSP5 = BottleneckCSP(shape[5], shape[4], n=1*shape[6], shortcut=False)
@@ -117,7 +117,7 @@ class DetectionBlock(nn.Cell):
 
      Args:
          scale: Character.
-         config: ConfigYOLOV5, Configuration instance.
+         config: config, Configuration instance.
          is_training: Bool, Whether train or not, default True.
 
      Returns:
@@ -127,7 +127,7 @@ class DetectionBlock(nn.Cell):
          DetectionBlock(scale='l',stride=32)
      """
 
-    def __init__(self, scale, config=ConfigYOLOV5(), is_training=True):
+    def __init__(self, scale, config=default_config, is_training=True):
         super(DetectionBlock, self).__init__()
         self.config = config
         if scale == 's':
@@ -240,7 +240,7 @@ class YoloLossBlock(nn.Cell):
     """
     Loss block cell of YOLOV5 network.
     """
-    def __init__(self, scale, config=ConfigYOLOV5()):
+    def __init__(self, scale, config=default_config):
         super(YoloLossBlock, self).__init__()
         self.config = config
         if scale == 's':
@@ -339,7 +339,7 @@ class YOLOV5(nn.Cell):
 
     def __init__(self, is_training, version=0):
         super(YOLOV5, self).__init__()
-        self.config = ConfigYOLOV5()
+        self.config = default_config
 
         # YOLOv5 network
         self.shape = self.config.input_shape[version]
@@ -378,7 +378,7 @@ class YoloWithLossCell(nn.Cell):
     def __init__(self, network):
         super(YoloWithLossCell, self).__init__()
         self.yolo_network = network
-        self.config = ConfigYOLOV5()
+        self.config = default_config
         self.loss_big = YoloLossBlock('l', self.config)
         self.loss_me = YoloLossBlock('m', self.config)
         self.loss_small = YoloLossBlock('s', self.config)

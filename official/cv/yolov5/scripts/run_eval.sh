@@ -55,7 +55,9 @@ then
 fi
 mkdir ./eval
 cp ../*.py ./eval
+cp ../*.yaml ./eval
 cp -r ../src ./eval
+cp -r ../model_utils ./eval
 cd ./eval || exit
 env > env.log
 echo "start inferring for device $DEVICE_ID"
@@ -63,5 +65,5 @@ python eval.py \
     --data_dir=$DATASET_PATH \
     --yolov5_version='yolov5s' \
     --pretrained=$CHECKPOINT_PATH \
-    --testing_shape=640 > log.txt 2>&1 &
+    --eval_shape=640 > log.txt 2>&1 &
 cd ..

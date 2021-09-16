@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-import argparse
 import numpy as np
 
 import mindspore
@@ -21,37 +20,34 @@ from mindspore.train.serialization import export, load_checkpoint, load_param_in
 
 from src.yolo import YOLOV5s_Infer
 
-parser = argparse.ArgumentParser(description='yolov5 export')
-parser.add_argument("--device_id", type=int, default=0, help="Device id")
-parser.add_argument("--batch_size", type=int, default=1, help="batch size")
-parser.add_argument('--yolov5_version', default='yolov5s', type=str,
-                    help='The version of YOLOv5, options: yolov5s, yolov5m, yolov5l, yolov5x')
+from model_utils.config import config
+from model_utils.moxing_adapter import moxing_wrapper
 
-parser.add_argument("--testing_shape", type=int, default=640, help="test shape")
-parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
-parser.add_argument("--file_name", type=str, default="yolov5", help="output file name.")
-parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='MINDIR', help='file format')
-parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"],
-                    default="Ascend", help="device target")
-args = parser.parse_args()
+def modelarts_pre_process():
+    '''modelarts pre process function.'''
+    config.file_name = os.path.join(config.output_path, config.file_name)
 
-context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
-if args.device_target == "Ascend":
-    context.set_context(device_id=args.device_id)
 
-if __name__ == "__main__":
-    ts_shape = args.testing_shape // 2
+@moxing_wrapper(pre_process=modelarts_pre_process)
+def run_export():
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+    if config.device_target == "Ascend":
+        context.set_context(device_id=config.device_id)
+    ts_shape = config.testing_shape // 2
 
     dict_version = {'yolov5s': 0, 'yolov5m': 1, 'yolov5l': 2, 'yolov5x': 3}
-    args.file_name = args.file_name + '_' + args.yolov5_version
+    config.file_name = config.file_name + '_' + config.yolov5_version
 
-    network = YOLOV5s_Infer(args.testing_shape, version=dict_version[args.yolov5_version])
+    network = YOLOV5s_Infer(config.testing_shape, version=dict_version[config.yolov5_version])
     network.set_train(False)
 
-    param_dict = load_checkpoint(args.ckpt_file)
+    param_dict = load_checkpoint(config.ckpt_file)
     load_param_into_net(network, param_dict)
 
-    input_data = Tensor(np.zeros([args.batch_size, 12, ts_shape, ts_shape]), mindspore.float32)
+    input_data = Tensor(np.zeros([config.batch_size, 12, ts_shape, ts_shape]), mindspore.float32)
 
-    export(network, input_data, file_name=args.file_name, file_format=args.file_format)
+    export(network, input_data, file_name=config.file_name, file_format=config.file_format)
     print('==========success export===============')
+
+if __name__ == "__main__":
+    run_export()
