@@ -6,3 +6,7 @@
 "mindspore/model_zoo/official/cv/yolov4_tiny/infer/mxbase/src/Yolov4TinyDetection.h"                 "runtime/references"
 "mindspore/model_zoo/official/cv/yolov4_tiny/infer/mxbase/src/PostProcess/Yolov4TinyMindsporePost.h" "runtime/references"
 "mindspore/model_zoo/official/cv/resnet/infer/ResNet18/mxbase/Resnet18ClassifyOpencv.h" "runtime/references"
+
+# models
+"models/official/cv/resnext/infer/mxbase/main_opencv.cpp"                 "runtime/references"
+"models/official/cv/resnext/infer/mxbase/Resnext101ClassifyOpencv.h"                 "runtime/references"
