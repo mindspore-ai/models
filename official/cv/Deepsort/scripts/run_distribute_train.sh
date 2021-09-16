@@ -27,20 +27,12 @@ get_real_path() {
   fi
 }
 
-get_real_path(){
-  if [ "${1:0:1}" == "/" ]; then
-    echo "$1"
-  else
-    echo "$(realpath -m $PWD/$1)"
-  fi
-}
-
 train_code_path=$(get_real_path $1)
 echo $train_code_path
 
 if [ ! -d $train_code_path ]
 then
-    echo "error: train_code_path=$train_code_path is not a dictionary."
+    echo "error: train_code_path=$train_code_path is not a directory."
 exit 1
 fi
 
@@ -58,7 +50,7 @@ echo $DATA_PATH
 
 if [ ! -d $DATA_PATH ]
 then
-    echo "error: DATA_PATH=$DATA_PATH is not a dictionary."
+    echo "error: DATA_PATH=$DATA_PATH is not a directory."
 exit 1
 fi
 

@@ -32,7 +32,7 @@ from src.model_utils.device_adapter import get_device_num
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 config.do_eval = config.do_eval == 'True'
-config.rank_size = get_device_num() # int(os.environ.get("RANK_SIZE", 1))
+config.rank_size = get_device_num()
 
 set_seed(1)
 
