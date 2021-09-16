@@ -451,3 +451,9 @@ CMRC2018
 # ModelZoo主页
 
 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+
+# FAQ
+
+优先参考[ModelZoo FAQ](https://gitee.com/mindspore/mindspore/tree/master/model_zoo#FAQ)来查找一些常见的公共问题。
+
+- **Q: 当使用 `PYNATICE_MODE` 运行时出现内存溢出怎么办？** **A**: 在 `PYNATIVE_MODE` 下，内存占用会更多，可以尝试减小 batch size 来缓解，例如，对于 XNLI、DBQA 数据集，可将 batchsize 减小到 16。
