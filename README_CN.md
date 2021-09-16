@@ -12,79 +12,101 @@
 
 ## 目录
 
-- [官方](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official)
-    - [计算机视觉](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv)
-        - [图像分类](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv)
-            - [DenseNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/densenet/README.md)
-            - [GoogleNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/googlenet/README.md)
-            - [ResNet-50[基准]](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet/README.md)
-            - [ResNet50_Quant](https://gitee.com/mindspore/mindspore/blob/master/model_zoo/official/cv/resnet50_quant/README.md)
-            - [ResNet-101](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet/README.md)
-            - [ResNeXt-50](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnext/README_CN.md)
-            - [VGG16](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/vgg16/README.md)
-            - [AlexNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/alexnet/README.md)
-            - [LeNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/lenet/README.md)
-            - [LeNet_Quant](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/lenet_quant/Readme.md)
-            - [MobileNetV2](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv2/README.md)
-            - [MobileNetV2_Quant](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv2_quant/Readme.md)
-            - [MobileNetV3](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv3/Readme.md)
-            - [InceptionV3](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/inceptionv3/README.md)
-            - [InceptionV4](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/inceptionv4/README.md)
-        - [目标检测与分割](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv)
-            - [DeepLabV3](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/deeplabv3/README.md)
-            - [Faster R-CNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn/README.md)
-            - [YoloV3-DarkNet53](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_darknet53/README.md)
-            - [YoloV3-ResNet18](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_resnet18/README.md)
-            - [Mask R-CNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/maskrcnn/README.md)
-            - [U-Net](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet/README.md)
-            - [SSD](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd/README.md)
-            - [Warp-CTC](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/warpctc/README.md)
-            - [RetinaFace-ResNet50](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/retinaface_resnet50/README.md)
-        - [关键点检测](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv)
-            - [OpenPose](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/openpose/README.md)
+### 标准网络
 
-    - [自然语言处理](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp)
-        - [BERT[基准]](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/bert/README.md)
-        - [TinyBERT](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/tinybert/README.md)
-        - [GNMT V2](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/gnmt_v2/README.md)
-        - [FastText](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/fasttext/README.md)
-        - [LSTM](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/lstm/README.md)
-        - [MASS](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/mass/README.md)
-        - [Transformer](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/transformer/README.md)
-        - [CPM](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/cpm/README.md)
-    - [推荐系统](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend)
-        - [DeepFM](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/deepfm/README.md)
-        - [NAML](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/naml/README.md)
-        - [Wide&Deep[基准]](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/wide_and_deep/README.md)
-    - [图神经网络](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn)
-        - [BGCF](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/bgcf/README.md)
-        - [GAT](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/gat/README.md)
-        - [GCN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/gcn//README.md)
+|  领域 | 子领域  | 网络   | Ascend | GPU | CPU |
+|:----  |:-------  |:----   |:----:    |:----: |:----: |
+|计算机视觉（CV） | 图像分类（Image Classification）  | [AlexNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/alexnet)   |  ✅ |  ✅ |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [CNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/cnn_direction_model)  |  ✅ |   |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [DenseNet100](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/densenet) |   |   | ✅ |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [DenseNet121](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/densenet) |  ✅ |   |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [DPN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/dpn) |  ✅ |   |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [EfficientNet-B0](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/efficientnet) |   |  ✅ |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [GoogLeNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/googlenet)   |  ✅     | ✅ |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [InceptionV3](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/inceptionv3) |  ✅ |   |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [InceptionV4](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/inceptionv4) |  ✅ |   |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [LeNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/lenet)    |  ✅ |  ✅ | ✅ |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [LeNet（量化）](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/lenet_quant)    |  ✅ |  ✅ |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [MobileNetV1](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv1)        |  ✅ |   |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [MobileNetV2](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv2)        |  ✅ |  ✅ | ✅ |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [MobileNetV2（量化）](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv2_quant)        |  ✅ |  ✅ |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [MobileNetV3](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv3)        |   |  ✅ |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [NASNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/nasnet) |   |  ✅ |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-18](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet)   |  ✅ |   |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-50](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet)   |  ✅ |  ✅ | ✅ |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-50（量化）](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet50_quant)   |  ✅ |   |  |
+|计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-101](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet)        |  ✅ | ✅ |  |
+|计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNeXt50](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnext)    |  ✅ | ✅ |  |
+|计算机视觉（CV）  | 图像分类（Image Classification）  | [SE-ResNet50](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet)       |  ✅ |  |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [ShuffleNetV1](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/shufflenetv1)        |  ✅ |   |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [ShuffleNetV2](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/shufflenetv2) |   |  ✅ |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  |[SqueezeNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/squeezenet) |  ✅ |   |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [Tiny-DarkNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/tinydarknet)  |  ✅ |   |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [VGG16](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/vgg16)  |  ✅ |  ✅ |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [Xception](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/xception) |  ✅ |   |  |
+| 计算机视觉（CV） | 目标检测（Object Detection）  | [CenterFace](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/centerface)     |  ✅ |   |  |
+| 计算机视觉（CV） | 目标检测（Object Detection）  | [CTPN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ctpn)     |  ✅ |   |  |
+| 计算机视觉（CV）  | 目标检测（Object Detection）  | [Faster R-CNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn)  |  ✅ |  ✅ |  |
+| 计算机视觉（CV）  | 目标检测（Object Detection）  | [Mask R-CNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/maskrcnn)  |  ✅ |   |  |
+| 计算机视觉（CV） | 目标检测（Object Detection）  |[Mask R-CNN (MobileNetV1)](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/maskrcnn_mobilenetv1)         |  ✅ |   |  |
+| 计算机视觉（CV） | 目标检测（Object Detection）  | [RetinaFace-ResNet50](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/retinaface_resnet50)   |   |  ✅ |  |
+| 计算机视觉（CV）  | 目标检测（Object Detection）  | [SSD](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd)                   |  ✅ | ✅ | ✅ |
+| 计算机视觉（CV）  | 目标检测（Object Detection）  | [SSD-MobileNetV1-FPN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd)         |  ✅ |   |  |
+| 计算机视觉（CV）  | 目标检测（Object Detection）  | [SSD-Resnet50-FPN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd)                   |  ✅ |  |  |
+| 计算机视觉（CV）  | 目标检测（Object Detection）  | [SSD-VGG16](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd)                   |  ✅ |  |  |
+| 计算机视觉（CV） | 目标检测（Object Detection）  | [WarpCTC](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/warpctc)                    |  ✅ |  ✅ |  |
+| 计算机视觉（CV）  | 目标检测（Object Detection）  | [YOLOv3-ResNet18](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_resnet18)   |  ✅ |   |  |
+| 计算机视觉（CV）  | 目标检测（Object Detection）  | [YOLOv3-DarkNet53](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_darknet53)   |  ✅ |  ✅ |  |
+| 计算机视觉（CV）  | 目标检测（Object Detection）  | [YOLOv3-DarkNet53（量化）](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_darknet53_quant)   |  ✅ |   |  |
+| 计算机视觉（CV） | 目标检测（Object Detection）  |[YOLOv4](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov4)         |  ✅ |   |  |
+| 计算机视觉（CV） | 文本检测（Text Detection）  | [DeepText](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/deeptext)                |  ✅ |   |  |
+| 计算机视觉（CV） | 文本检测（Text Detection）  | [PSENet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/psenet)                |  ✅ |   |  |
+| 计算机视觉（CV） | 文本识别（Text Recognition）  | [CNN+CTC](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/cnnctc)                |  ✅ |   |  |
+| 计算机视觉（CV） | 语义分割（Semantic Segmentation）  | [DeepLabV3](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/deeplabv3)   |  ✅ |   | ✅ |
+| 计算机视觉（CV） | 语义分割（Semantic Segmentation）  | [U-Net2D (Medical)](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet)   |  ✅ |   |  |
+| 计算机视觉（CV） | 语义分割（Semantic Segmentation）  | [U-Net3D (Medical)](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet3d)   |  ✅ |   |  |
+| 计算机视觉（CV） | 语义分割（Semantic Segmentation）  | [U-Net++](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet)                |  ✅ |   |  |
+| 计算机视觉（CV） | 关键点检测（Keypoint Detection）  |[OpenPose](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/openpose)                |  ✅ |   |  |
+| 计算机视觉（CV） | 关键点检测（Keypoint Detection）  |[SimplePoseNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/simple_pose)                |  ✅ |   |  |
+| 计算机视觉（CV） | 光学字符识别（Optical Character Recognition）  |[CRNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/crnn)                |  ✅ |   |  |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [BERT](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/bert)  |  ✅ |  ✅ |  |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [FastText](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/fasttext)    |  ✅ |   |  |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [GNMT v2](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/gnmt_v2)    |  ✅ |   |  |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [GRU](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/gru)            |  ✅ |   |  |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [MASS](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/mass)    |  ✅ |  ✅ |  |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [SentimentNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/lstm)    |  ✅ |  ✅ | ✅ |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [Transformer](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/transformer)  |  ✅ |  ✅ |  |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [TinyBERT](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/tinybert)   |  ✅ |  ✅ |  |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [TextCNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/textcnn)            |  ✅ |   |  |
+| 推荐（Recommender） | 推荐系统、点击率预估（Recommender System, CTR prediction）  | [DeepFM](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/deepfm)    |  ✅ |  ✅ | ✅ |
+| 推荐（Recommender） | 推荐系统、搜索、排序（Recommender System, Search, Ranking）  | [Wide&Deep](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/wide_and_deep)      |  ✅ |  ✅ |  |
+| 推荐（Recommender） | 推荐系统（Recommender System）  | [NAML](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/naml)             |  ✅ |   |  |
+| 推荐（Recommender） | 推荐系统（Recommender System）  | [NCF](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/ncf)    |  ✅ |  |  |
+| 图神经网络（GNN） | 文本分类（Text Classification）  | [GCN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/gcn)  |  ✅ |   |  |
+| 图神经网络（GNN） | 文本分类（Text Classification）  | [GAT](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/gat) |  ✅ |   |  |
+| 图神经网络（GNN） | 推荐系统（Recommender System） | [BGCF](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/bgcf) |  ✅ |   |  |
 
-- [研究](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research)
-    - [计算机视觉](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv)
-        - [GhostNet_Quant](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/ghostnet_quant/Readme.md)
-        - [SSD_GhostNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/ssd_ghostnet/README.md)
-        - [TinyNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/tinynet/README.md)
-        - [CycleGAN](https://gitee.com/mindspore/mindspore/blob/master/model_zoo/research/cv/CycleGAN/README.md)
-        - [人脸属性](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceAttribute/README.md)
-        - [人脸检测](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceDetection/README.md)
-        - [人脸图像质量评估](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceQualityAssessment/README.md)
-        - [人脸识别跟踪](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceRecognitionForTracking/README.md)
-        - [人脸识别](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceRecognition/README.md)
-        - [CenterNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/centernet/README.md)
-    - [自然语言处理](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/nlp)
-        - [DS-CNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/nlp/dscnn/README.md)
-    - [推荐系统](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/recommend)
-        - [AutoDis](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/recommend/autodis/README.md)
-    - [语音](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/audio)
-        - [FCN-4](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/audio/fcn-4/README.md)
-        - [DeepSpeech2](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/audio/deepspeech2/README.md)
-        - [Wavenet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/audio/wavenet/README.md)
-    - [高性能计算](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/hpc)
-        - [GOMO](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/hpc/ocean_model/README.md)
-        - [分子动力学](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/hpc/molecular_dynamics/README.md)
-        - [PINNs](https://gitee.com/mindspore/mindspore/blob/master/model_zoo/research/hpc/pinns/README.md)
+### 研究网络
+
+|  领域 | 子领域  | 网络   | Ascend | GPU | CPU |
+|:----  |:-------  |:----   |:----:    |:----: |:----: |
+| 计算机视觉（CV） | 图像分类（Image Classification）  |[FaceAttributes](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceAttribute)     |  ✅ |   |  |
+| 计算机视觉（CV） | 目标检测（Object Detection）  | [FaceDetection](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceDetection)  |  ✅ |   |  |
+| 计算机视觉（CV） | 图像分类（Image Classification）  |[FaceQualityAssessment](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceQualityAssessment)     |  ✅ |   |  |
+| 计算机视觉（CV） | 图像分类（Image Classification）  |[FaceRecognition](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceRecognition)     |  ✅ |   |  |
+| 计算机视觉（CV） | 图像分类（Image Classification）  |[FaceRecognitionForTracking](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceRecognitionForTracking)     |  ✅ |   |  |
+| 计算机视觉（CV）  | 目标检测（Object Detection）  | [Spnas](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/Spnas)           |  ✅ |   |  |
+| 计算机视觉（CV）  | 目标检测（Object Detection）  | [SSD-GhostNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/ssd_ghostnet)           |  ✅ |   |  |
+| 计算机视觉（CV）  | 关键点检测（Key Point Detection）  | [CenterNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/centernet)          |  ✅ |  | ✅ |
+| 计算机视觉（CV）  | 图像风格迁移（Image Style Transfer）  | [CycleGAN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/CycleGAN)       |       |  | ✅ |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [DS-CNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/nlp/dscnn)          |  ✅ |   |  |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [TextRCNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/nlp/textrcnn)    |  ✅ |   |  |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [TPRR](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/nlp/tprr)  |  ✅ |   |  |
+| 推荐（Recommender） | 推荐系统、点击率预估（Recommender System, CTR prediction） | [AutoDis](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/recommend/autodis)   |  ✅ |   |  |
+|语音（Audio） | 音频标注（Audio Tagging）  | [FCN-4](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/audio/fcn-4)   |  ✅ |   |  |
+|高性能计算（HPC） | 分子动力学（Molecular Dynamics）  |  [DeepPotentialH2O](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/hpc/molecular_dynamics)   |  ✅ |   |  |
+|高性能计算（HPC） | 海洋模型（Ocean Model）  |  [GOMO](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/hpc/ocean_model)   |   |  ✅ |  |
+
 - [社区](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/community)
 
 ## 公告

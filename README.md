@@ -12,79 +12,101 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 
 ## Table of Contents
 
-- [Official](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official)
-    - [Computer Vision](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv)
-        - [Image Classification](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv)
-            - [DenseNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/densenet/README.md)
-            - [GoogleNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/googlenet/README.md)
-            - [ResNet50[benchmark]](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet/README.md)
-            - [ResNet50_Quant](https://gitee.com/mindspore/mindspore/blob/master/model_zoo/official/cv/resnet50_quant/README.md)
-            - [ResNet101](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet/README.md)
-            - [ResNext50](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnext/README.md)
-            - [VGG16](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/vgg16/README.md)
-            - [AlexNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/alexnet/README.md)
-            - [LeNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/lenet/README.md)
-            - [LeNet_Quant](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/lenet_quant/Readme.md)
-            - [MobileNetV2](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv2/README.md)
-            - [MobileNetV2_Quant](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv2_quant/Readme.md)
-            - [MobileNetV3](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv3/Readme.md)
-            - [InceptionV3](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/inceptionv3/README.md)
-            - [InceptionV4](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/inceptionv4/README.md)
-        - [Object Detection and Segmentation](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv)
-            - [DeepLabV3](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/deeplabv3/README.md)
-            - [FasterRCNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn/README.md)
-            - [YoloV3-DarkNet53](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_darknet53/README.md)
-            - [YoloV3-ResNet18](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_resnet18/README.md)
-            - [MaskRCNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/maskrcnn/README.md)
-            - [Unet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet/README.md)
-            - [SSD](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd/README.md)
-            - [Warp-CTC](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/warpctc/README.md)
-            - [RetinaFace-ResNet50](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/retinaface_resnet50/README.md)
-        - [Keypoint Detection](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv)
-            - [OpenPose](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/openpose/README.md)
+### Official
 
-    - [Natural Language Processing](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp)
-        - [BERT[benchmark]](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/bert/README.md)
-        - [TinyBERT](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/tinybert/README.md)
-        - [GNMT V2](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/gnmt_v2/README.md)
-        - [FastText](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/fasttext/README.md)
-        - [LSTM](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/lstm/README.md)
-        - [MASS](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/mass/README.md)
-        - [Transformer](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/transformer/README.md)
-        - [CPM](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/cpm/README.md)
-    - [Recommender Systems](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend)
-        - [DeepFM](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/deepfm/README.md)
-        - [NAML](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/naml/README.md)
-        - [Wide&Deep[benchmark]](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/wide_and_deep/README.md)
-    - [Graph Neural Networks](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn)
-        - [BGCF](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/bgcf/README.md)
-        - [GAT](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/gat/README.md)
-        - [GCN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/gcn//README.md)
+|  Domain | Sub Domain    | Network  | Ascend  | GPU | CPU |
+|:------   |:------| :-----------  |:------:   |:------:  |:-----: |
+|Computer Vision (CV) | Image Classification  | [AlexNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/alexnet)          |  ✅ |  ✅ |   |
+| Computer Vision (CV)  | Image Classification  | [CNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/cnn_direction_model)  |  ✅ |    |   |
+| Computer Vision (CV)  | Image Classification  | [DenseNet100](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/densenet) |    |    | ✅ |
+| Computer Vision (CV)  | Image Classification  | [DenseNet121](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/densenet) |  ✅ |    |   |
+| Computer Vision (CV)  | Image Classification  | [DPN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/dpn) |  ✅ |    |   |
+| Computer Vision (CV)  | Image Classification  | [EfficientNet-B0](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/efficientnet) |    |  ✅ |   |
+| Computer Vision (CV)  | Image Classification  | [GoogLeNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/googlenet)    |  ✅  | ✅ |   |
+| Computer Vision (CV)  | Image Classification  | [InceptionV3](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/inceptionv3)   |  ✅ |    |   |
+| Computer Vision (CV)  | Image Classification  | [InceptionV4](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/inceptionv4)    |  ✅ |    |   |
+| Computer Vision (CV)  | Image Classification  | [LeNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/lenet)              |  ✅ |  ✅ | ✅ |
+| Computer Vision (CV)  | Image Classification  | [LeNet (Quantization)](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/lenet_quant)      |  ✅ |  ✅ |   |
+| Computer Vision (CV)  | Image Classification  | [MobileNetV1](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv1)      |  ✅ |    |   |
+| Computer Vision (CV)  | Image Classification  | [MobileNetV2](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv2)      |  ✅ |  ✅ | ✅ |
+| Computer Vision (CV)  | Image Classification  | [MobileNetV2 (Quantization)](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv2_quant)   |  ✅ |  ✅ |   |
+| Computer Vision (CV)  | Image Classification  | [MobileNetV3](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv3)  |    |  ✅ |   |
+| Computer Vision (CV)  | Image Classification  | [NASNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/nasnet) |    |  ✅ |   |
+| Computer Vision (CV)  | Image Classification  | [ResNet-18](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet)          |  ✅ |    |   |
+| Computer Vision (CV)  | Image Classification  | [ResNet-50](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet)          |  ✅ |  ✅ | ✅ |
+| Computer Vision (CV)  | Image Classification  | [ResNet-50 (Quantization)](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet50_quant)          |  ✅ |    |   |
+|Computer Vision (CV)  | Image Classification  | [ResNet-101](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet)       |  ✅ | ✅ |   |
+|Computer Vision (CV)  | Image Classification  | [ResNeXt50](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnext)     |  ✅ | ✅ |   |
+|Computer Vision (CV)  | Image Classification  | [SE-ResNet50](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet)      |  ✅ |   |   |
+| Computer Vision (CV)  | Image Classification  | [ShuffleNetV1](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/shufflenetv1)  |  ✅ |    |   |
+| Computer Vision (CV)  | Image Classification  | [ShuffleNetV2](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/shufflenetv2) |    |  ✅ |   |
+| Computer Vision (CV)  | Image Classification  | [SqueezeNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/squeezenet) |  ✅ |    |   |
+| Computer Vision (CV)  | Image Classification  | [Tiny-DarkNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/tinydarknet)       |  ✅ |    |   |
+| Computer Vision (CV)  | Image Classification  | [VGG16](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/vgg16)                |  ✅ |  ✅ |   |
+| Computer Vision (CV)  | Image Classification  | [Xception](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/xception)             |  ✅ |    |   |
+| Computer Vision (CV) | Object Detection  | [CenterFace](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/centerface)     |  ✅ |    |   |
+| Computer Vision (CV) | Object Detection  | [CTPN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ctpn)     |  ✅ |    |   |
+| Computer Vision (CV)  | Object Detection  | [Faster R-CNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn)   |  ✅ |  ✅ |   |
+| Computer Vision (CV)  | Object Detection  | [Mask R-CNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/maskrcnn)         |  ✅ |    |   |
+| Computer Vision (CV)  | Object Detection  | [Mask R-CNN (MobileNetV1)](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/maskrcnn_mobilenetv1)    |  ✅ |    |   |
+| Computer Vision (CV) | Object Detection  | [RetinaFace-ResNet50](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/retinaface_resnet50)     |    |  ✅ |   |
+| Computer Vision (CV)  | Object Detection  | [SSD](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd)                   |  ✅ | ✅ | ✅ |
+| Computer Vision (CV)  | Object Detection  | [SSD-MobileNetV1-FPN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd)         |  ✅ |    |   |
+| Computer Vision (CV)  | Object Detection  | [SSD-Resnet50-FPN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd)                   |  ✅ |   |   |
+| Computer Vision (CV)  | Object Detection  | [SSD-VGG16](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd)                   |  ✅ |   |   |
+| Computer Vision (CV) | Object Detection  | [WarpCTC](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/warpctc)                    |  ✅ |  ✅ |   |
+| Computer Vision (CV)  | Object Detection  | [YOLOv3-ResNet18](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_resnet18)    | ✅ |    |   |
+| Computer Vision (CV)  | Object Detection  | [YOLOv3-DarkNet53](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_darknet53)         |  ✅ |  ✅ |   |
+| Computer Vision (CV)  | Object Detection  | [YOLOv3-DarkNet53 (Quantization)](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_darknet53_quant)  |  ✅ |    |   |
+| Computer Vision (CV)  | Object Detection  | [YOLOv4](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov4)         |  ✅ |    |   |
+| Computer Vision (CV) | Text Detection  | [DeepText](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/deeptext)   |  ✅ |    |   |
+| Computer Vision (CV) | Text Detection  | [PSENet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/psenet)   |  ✅ |    |   |
+| Computer Vision (CV) | Text Recognition  | [CNN+CTC](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/cnnctc)                |  ✅ |    |   |
+| Computer Vision (CV) | Semantic Segmentation  | [DeepLabV3](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/deeplabv3)     |  ✅ |    | ✅ |
+| Computer Vision (CV) | Semantic Segmentation  | [U-Net2D (Medical)](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet)                |  ✅ |    |   |
+| Computer Vision (CV) | Semantic Segmentation  | [U-Net3D (Medical)](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet3d)                |  ✅ |    |   |
+| Computer Vision (CV) | Semantic Segmentation  | [U-Net++](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet)                |  ✅ |    |   |
+| Computer Vision (CV) | Keypoint Detection  | [OpenPose](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/openpose)                |  ✅ |    |   |
+| Computer Vision (CV) | Keypoint Detection  | [SimplePoseNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/simple_pose)                |  ✅ |    |   |
+| Computer Vision (CV) | Optical Character Recognition  | [CRNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/crnn)                |  ✅ |    |   |
+| Natural Language Processing (NLP) | Natural Language Understanding  | [BERT](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/bert)        |  ✅ |  ✅ |   |
+| Natural Language Processing (NLP) | Natural Language Understanding  | [FastText](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/fasttext)        |  ✅ |    |   |
+| Natural Language Processing (NLP) | Natural Language Understanding  | [GNMT v2](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/gnmt_v2)        |  ✅ |    |   |
+| Natural Language Processing (NLP) | Natural Language Understanding  | [GRU](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/gru)                |  ✅ |    |   |
+| Natural Language Processing (NLP) | Natural Language Understanding  | [MASS](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/mass)   |  ✅ |  ✅ |   |
+| Natural Language Processing (NLP) | Natural Language Understanding  | [SentimentNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/lstm)      |  ✅ |  ✅ | ✅ |
+| Natural Language Processing (NLP) | Natural Language Understanding  | [Transformer](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/transformer)   |  ✅ |  ✅ |   |
+| Natural Language Processing (NLP) | Natural Language Understanding  | [TinyBERT](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/tinybert)       |  ✅ |  ✅ |   |
+| Natural Language Processing (NLP) | Natural Language Understanding  | [TextCNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/textcnn)                |  ✅ |    |   |
+| Recommender | Recommender System, CTR prediction  | [DeepFM](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/deepfm)                               |  ✅ |  ✅ | ✅ |
+| Recommender | Recommender System, Search, Ranking  | [Wide&Deep](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/wide_and_deep)             |  ✅ |  ✅ |   |
+| Recommender | Recommender System  | [NAML](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/naml)             |  ✅ |    |   |
+| Recommender | Recommender System  | [NCF](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/ncf)             |  ✅ |   |   |
+| Graph Neural Networks (GNN) | Text Classification  | [GCN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/gcn)  |  ✅ |    |   |
+| Graph Neural Networks (GNN) | Text Classification  | [GAT](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/gat)  |  ✅ |    |   |
+| Graph Neural Networks (GNN) | Recommender System | [BGCF](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/bgcf) |  ✅ |    |   |
 
-- [Research](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research)
-    - [Computer Vision](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv)
-        - [GhostNet_Quant](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/ghostnet_quant/Readme.md)
-        - [SSD_GhostNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/ssd_ghostnet/README.md)
-        - [TinyNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/tinynet/README.md)
-        - [CycleGAN](https://gitee.com/mindspore/mindspore/blob/master/model_zoo/research/cv/CycleGAN/README.md)
-        - [FaceAttribute](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceAttribute/README.md)
-        - [FaceDetection](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceDetection/README.md)
-        - [FaceQualityAssessment](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceQualityAssessment/README.md)
-        - [FaceRecognitionForTracking](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceRecognitionForTracking/README.md)
-        - [FaceRecognition](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceRecognition/README.md)
-        - [CenterNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/centernet/README.md)
-    - [Natural Language Processing](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/nlp)
-        - [DS-CNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/nlp/dscnn/README.md)
-    - [Recommender Systems](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/recommend)
-        - [AutoDis](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/recommend/autodis/README.md)
-    - [Audio](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/audio)
-        - [FCN-4](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/audio/fcn-4/README.md)
-        - [DeepSpeech2](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/audio/deepspeech2/README.md)
-        - [Wavenet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/audio/wavenet/README.md)
-    - [High Performance Computing](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/hpc)
-        - [GOMO](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/hpc/ocean_model/README.md)
-        - [Molecular_Dynamics](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/hpc/molecular_dynamics/README.md)
-        - [PINNs](https://gitee.com/mindspore/mindspore/blob/master/model_zoo/research/hpc/pinns/README.md)
+### Research
+
+|  Domain | Sub Domain    | Network  | Ascend | GPU | CPU |
+|:------   |:------| :-----------   |:------:   |:------:  |:-----:  |
+| Computer Vision (CV) | Image Classification  | [FaceAttributes](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceAttribute)     |  ✅ |    |   |
+| Computer Vision (CV) | Object Detection  | [FaceDetection](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceDetection)     |  ✅ |    |   |
+| Computer Vision (CV) | Image Classification  | [FaceQualityAssessment](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceQualityAssessment)     |  ✅ |    |   |
+| Computer Vision (CV) | Image Classification  | [FaceRecognition](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceRecognition)     |  ✅ |    |   |
+| Computer Vision (CV) | Image Classification  | [FaceRecognitionForTracking](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/FaceRecognitionForTracking)     |  ✅ |    |   |
+| Computer Vision (CV) | Object Detection  | [Spnas](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/Spnas)     |  ✅ |    |   |
+| Computer Vision (CV) | Object Detection  | [SSD-GhostNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/ssd_ghostnet)               |  ✅ |    |   |
+| Computer Vision (CV)  | Key Point Detection  | [CenterNet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/centernet)               |  ✅ |   | ✅ |
+| Computer Vision (CV)  | Image Style Transfer  | [CycleGAN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/CycleGAN)             |        |   | ✅ |
+| Natural Language Processing (NLP) | Natural Language Understanding  | [DS-CNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/nlp/dscnn)      |  ✅ |    |   |
+| Natural Language Processing (NLP) | Natural Language Understanding  | [TextRCNN](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/nlp/textrcnn)  |  ✅ |    |   |
+| Natural Language Processing (NLP) | Natural Language Understanding  | [TPRR](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/nlp/tprr)  |  ✅ |    |   |
+| Recommender | Recommender System, CTR prediction | [AutoDis](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/recommend/autodis)          |  ✅ |    |   |
+| Audio | Audio Tagging | [FCN-4](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/audio/fcn-4)   |  ✅ |    |   |
+| High Performance Computing | Molecular Dynamics | [DeepPotentialH2O](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/hpc/molecular_dynamics)   |  ✅ |    |   |
+| High Performance Computing | Ocean Model | [GOMO](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/hpc/ocean_model)   |    |  ✅ |   |
+
 - [Community](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/community)
 
 ## Announcements
