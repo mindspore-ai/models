@@ -37,6 +37,7 @@ is_save_on_master: 1
 
 data_dir: ""
 pretrained: ""
+filter_weight: False
 is_distributed: 1
 per_batch_size: 64
 
