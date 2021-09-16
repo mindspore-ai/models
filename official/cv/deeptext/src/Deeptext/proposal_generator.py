@@ -17,8 +17,9 @@
 import numpy as np
 import mindspore.nn as nn
 import mindspore.common.dtype as mstype
+from mindspore.ops import functional as F
 from mindspore.ops import operations as P
-from mindspore import Tensor
+from mindspore import context, Tensor
 
 
 class Proposal(nn.Cell):
@@ -112,6 +113,7 @@ class Proposal(nn.Cell):
         cfg = config
         self.topK_stage1 = ()
         self.topK_shape = ()
+        self.exec_mode = context.get_context("mode")
         total_max_topk_input = 0
         if not self.training_local:
             self.num_pre = cfg.rpn_nms_pre
@@ -146,6 +148,9 @@ class Proposal(nn.Cell):
                 bbox_pred_list = bbox_pred_list + (rpn_bbox_pred_i,)
 
             proposals, masks = self.get_bboxes_single(cls_score_list, bbox_pred_list, anchor_list)
+            if self.exec_mode == context.PYNATIVE_MODE:
+                proposals = F.stop_gradient(proposals)
+                masks = F.stop_gradient(masks)
             proposals_tuple += (proposals,)
             masks_tuple += (masks,)
         return proposals_tuple, masks_tuple
