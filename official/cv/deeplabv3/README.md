@@ -113,7 +113,7 @@ After installing MindSpore via the official website, you can start training and 
 
 - Prepare backbone
 
-Download resnet101 for here(https://download.mindspore.cn/model_zoo/r1.2/resnet101_ascend_v120_imagenet2012_official_cv_bs32_acc78/resnet101_ascend_v120_imagenet2012_official_cv_bs32_acc78.ckpt).
+Download resnet101 for [here](https://download.mindspore.cn/model_zoo/r1.2/resnet101_ascend_v120_imagenet2012_official_cv_bs32_acc78/resnet101_ascend_v120_imagenet2012_official_cv_bs32_acc78.ckpt).
 
 - Running on Ascend
 
@@ -140,7 +140,7 @@ Enter the shell script to modify the data_file and ckpt_pre_trained parameters
 data_file=/home/DataSet/VOC2012/vocaug_mindrecords/vocaug.mindrecord0
 ckpt_pre_trained=/home/model/deeplabv3/predtrained/resnet101_ascend_v120_imagenet2012_official_cv_bs32_acc78.ckpt
 
-bash run_distribute_train_s16_r1.sh
+bash run_distribute_train_s16_r1.sh ~/hccl_8p.json
 ```
 
 2. Train s8 with vocaug dataset, finetuning from model in previous step, training script is:
@@ -151,7 +151,7 @@ Enter the shell script to modify the data_file and ckpt_pre_trained parameters
 data_file=/home/DataSet/VOC2012/vocaug_mindrecords/vocaug.mindrecord0
 ckpt_pre_trained=/home/model/deeplabv3/predtrained/resnet101_ascend_v120_imagenet2012_official_cv_bs32_acc78.ckpt
 
-bash run_distribute_train_s8_r1.sh
+bash run_distribute_train_s8_r1.sh ~/hccl_8p.json
 ```
 
 3. Train s8 with voctrain dataset, finetuning from model in previous step, training script is:
@@ -164,17 +164,19 @@ data_file=/home/DataSet/VOC2012/voctrain_mindrecords/votrain.mindrecord0
 ckpt_pre_trained=/home/model/deeplabv3/ckpt/deeplabv3-800_330.ckpt
 
 
-bash run_distribute_train_s8_r2.sh
+bash run_distribute_train_s8_r2.sh ~/hccl_8p.json
 ```
 
 - For evaluation, evaluating steps are as follows:
 
 1. Enter the shell script to modify the data_file and ckpt_pre_trained parameters
 
-```default_config.yaml
+```shell
+modify the parameter according local path
 # example:
 data_root=/home/DataSet/VOC2012
 data_lst=/home/DataSet/VOC2012/voc_val_lst.txt
+ckpt_path=/home/model/deeplabv3/ckpt/deeplabv3-800_330.ckpt
 ```
 
 2. Eval s16 with voc val dataset, eval script is:

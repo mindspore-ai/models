@@ -264,8 +264,8 @@ Please follow the instructions in the link [hccn_tools](https://gitee.com/mindsp
 
   shell:
      Ascend: bash run_distribute_train.sh [cifar10|imagenet2012] [RANK_TABLE_FILE] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
-     # example: bash run_distribute_train.sh cifar10 /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/cifar10/cifar-10-batches-bin/
-     # example: bash run_distribute_train.sh imagenet2012 /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/ImageNet_Original/
+     # example: bash run_distribute_train.sh cifar10 ~/hccl_8p.json /home/DataSet/cifar10/cifar-10-batches-bin/
+     # example: bash run_distribute_train.sh imagenet2012 ~/hccl_8p.json /home/DataSet/ImageNet_Original/
 
      CPU: bash run_train_CPU.sh [cifar10|imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
      GPU(single device): bash run_standalone_train_gpu.sh [cifar10|imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)

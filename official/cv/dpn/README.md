@@ -228,7 +228,7 @@ Run `scripts/train_distributed.sh` to train the model distributed. The usage of 
 
 ```text
 bash scripts/train_distributed.sh [rank_table] [train_data_dir] [ckpt_path_to_save]  [rank_size] [eval_each_epoch] [pretrained_ckpt(optional)]
-# example: bash scripts/train_distributed.sh /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/ImageNet_Original/train/ ./ckpt/ 8 0
+# example: bash scripts/train_distributed.sh ~/hccl_8p.json /home/DataSet/ImageNet_Original/train/ ./ckpt/ 8 0
 ```
 
 The above shell script will run distribute training in the background. You can view the results through the file `train_parallel[X]/log.txt` as follows:

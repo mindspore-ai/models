@@ -276,7 +276,7 @@ MobileNetV2总体网络架构如下：
 
   shell:
       Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH]
-      # example: bash run_train.sh Ascend default_config.yaml 8 0,1,2,3,4,5,6,7 /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/ImageNet_Original/
+      # example: bash run_train.sh Ascend default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/
 
       GPU: bash run_train.sh GPU 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH]
       CPU: bash run_train.sh CPU [TRAIN_DATASET_PATH]
@@ -289,7 +289,7 @@ MobileNetV2总体网络架构如下：
 
   shell:
       Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
-      # example: bash run_train.sh Ascend default_config.yaml 8 0,1,2,3,4,5,6,7 /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/predtrain/mobilenet-200_625.ckpt none True
+      # example: bash run_train.sh Ascend default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/predtrain/mobilenet-200_625.ckpt none True
 
       GPU: bash run_train.sh GPU 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH] [CKPT_PATH] none True
       CPU: bash run_train.sh CPU [TRAIN_DATASET_PATH] [CKPT_PATH] none True
@@ -302,7 +302,7 @@ MobileNetV2总体网络架构如下：
 
   shell:
       Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER]
-      # example: bash run_train.sh Ascend default_config.yaml 8 0,1,2,3,4,5,6,7 /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/backbone/mobilenet-200_625.ckpt backbone
+      # example: bash run_train.sh Ascend default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/backbone/mobilenet-200_625.ckpt backbone
       GPU: bash run_train.sh GPU 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH] [CKPT_PATH] backbone
       CPU: bash run_train.sh CPU [TRAIN_DATASET_PATH] [CKPT_PATH] backbone
 ```

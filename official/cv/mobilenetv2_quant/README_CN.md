@@ -164,17 +164,17 @@ MobileNetV2总体网络架构如下：
           Ascend:  python train.py --device_target Ascend --dataset_path ~/imagenet/train/
           GPU:  python train.py --device_target GPU --dataset_path ~/imagenet/train/
   shell：
-          Ascend: bash run_train.sh Ascend ~/hccl_4p_0123_x.x.x.x.json ~/imagenet/train/ ~/mobilenet.ckpt
+          Ascend: bash run_train.sh Ascend ~/hccl_8p.json ~/imagenet/train/
           GPU: bash run_train.sh GPU 1,2 ~/imagenet/train/ ~/mobilenet.ckpt
 
-  # 训练示例-量化步长可学习的量化感知训练  
+  # 训练示例-量化步长可学习的量化感知训练
   python：
           Ascend:  python train.py --device_target Ascend --dataset_path ~/imagenet/train/ \
                    --pre_trained ~/mobilenet.ckpt --optim_option "LEARNED_SCALE"
           GPU:  python train.py --device_target GPU --dataset_path ~/imagenet/train/ \
                 --pre_trained ~/mobilenet.ckpt --optim_option "LEARNED_SCALE"
   shell：
-          Ascend: bash run_lsq_train.sh Ascend ~/hccl_4p_0123_x.x.x.x.json ~/imagenet/train/ ~/mobilenet.ckpt
+          Ascend: bash run_lsq_train.sh Ascend ~/hccl_8p.json ~/imagenet/train/ ~/mobilenet.ckpt
           GPU: bash run_lsq_train.sh GPU 1,2 ~/imagenet/train/ ~/mobilenet.ckpt
 ```
 
@@ -183,7 +183,7 @@ MobileNetV2总体网络架构如下：
 训练结果保存在示例路径中。`Ascend`处理器训练的检查点默认保存在`./train/device$i/checkpoint`，训练日志重定向到`./train/device$i/train.log`。`GPU`处理器训练的检查点默认保存在`./train/checkpointckpt_$i`中，训练日志重定向到`./train/train.log`中。  
 `train.log`内容如下：
 
-```text
+```log
 epoch:[  0/200], step:[  624/  625], loss:[5.258/5.258], time:[140412.236], lr:[0.100]
 epoch time:140522.500, per step time:224.836, avg loss:5.258
 epoch:[  1/200], step:[  624/  625], loss:[3.917/3.917], time:[138221.250], lr:[0.200]
@@ -234,13 +234,13 @@ shell:
 
 推理结果保存在示例路径，可以在`./val/infer.log`中找到如下结果：
 
-```text
+```log
 result:{'acc':0.71976314102564111}
 ```
 
 ## 模型导出
 
-```shell
+```python
 python export.py --checkpoint_path [CKPT_PATH] --file_format [EXPORT_FORMAT] --device_target [PLATFORM] --optim_option [OptimizeOption]
 ```
 
@@ -253,7 +253,7 @@ python export.py --checkpoint_path [CKPT_PATH] --file_format [EXPORT_FORMAT] --d
 在推理之前需要在昇腾910环境上完成AIR模型的导出。
 并使用export_bin_file.py导出ImageNet数据集的bin文件和对应的label文件：
 
-```shell
+```log
 python export_bin_file.py --dataset_dir [EVAL_DATASET_PATH] --save_dir [SAVE_PATH]
 ```
 
@@ -266,7 +266,7 @@ bash run_infer_310.sh [AIR_PATH] [DATA_PATH] [LABEL_PATH] [DEVICE_ID]
 
 您可以通过acc.log文件查看结果。QAT量化推理准确性如下：
 
-```bash
+```log
 'Accuracy':0.7221
 ```
 

@@ -171,8 +171,7 @@ Modify the parameters according to the actual path
 ```bash
 # distribute training
 bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH]
-# example: bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json Pretraining(or Finetune) \
-# /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
+# example: bash scripts/run_distribute_train_ascend.sh ~/hccl_8p.json Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
 
 # standalone training
 bash scrpits/run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]
@@ -226,7 +225,7 @@ ICDAR2013, SCUT-FORU to improve precision and recall, and when doing Finetune, w
     Ascend:
       # distribute training example(8p)
       bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH]
-      # example: bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
+      # example: bash scripts/run_distribute_train_ascend.sh ~/hccl_8p.json Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
 
       # standalone training
       bash run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH]

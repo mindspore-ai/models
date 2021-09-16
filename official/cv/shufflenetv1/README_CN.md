@@ -125,11 +125,14 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
 
   python:
       Ascend单卡训练示例：python train.py --train_dataset_path [DATA_DIR]
+      # example: python train.py --train_dataset_path /home/DataSet/ImageNet_Original/train
 
   shell:
-<<<<<<< HEAD
-      Ascend八卡并行训练: sh scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATA_DIR]
-      Ascend单卡训练示例: sh scripts/run_standalone_train.sh [DEVICE_ID] [DATA_DIR]
+      Ascend八卡并行训练: bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATA_DIR]
+      # example: bash scripts/run_distribute_train.sh ~/hccl_8p.json /home/DataSet/ImageNet_Original/train
+
+      Ascend单卡训练示例: bash scripts/run_standalone_train.sh [DEVICE_ID] [DATA_DIR]
+      # example: bash scripts/run_standalone_train.sh 0 /home/DataSet/ImageNet_Original/train
 
 - running on GPU with gpu default parameters
 
@@ -146,10 +149,6 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
   shell:
       GPU单卡训练示例: sh scripts/run_standalone_train_gpu.sh [DEVICE_ID] [DATA_DIR]
       GPU八卡并行训练: sh scripts/run_distribute_train_gpu.sh [RANK_SIZE] [TRAIN_DATA_DIR]
-=======
-      Ascend八卡并行训练: bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATA_DIR]
-      Ascend单卡训练示例: bash scripts/run_standalone_train.sh [DEVICE_ID] [DATA_DIR]
->>>>>>> fe806b7430... update bash
 ```
 
   分布式训练需要提前创建JSON格式的HCCL配置文件。
@@ -162,7 +161,7 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
 
 ckpt文件将存储在 `save_ckpt_path` 路径下，训练日志将被记录到 `log.txt` 中。训练日志部分示例如下：
 
-```shell
+```log
 epoch time: 99854.980, per step time: 79.820, avg loss: 4.093
 epoch time: 99863.734, per step time: 79.827, avg loss: 4.010
 epoch time: 99859.792, per step time: 79.824, avg loss: 3.869
@@ -180,9 +179,11 @@ epoch time: 99864.092, per step time: 79.827, avg loss: 3.442
 # Ascend评估示例
   python:
       python eval.py --eval_dataset_path [DATA_DIR] --ckpt_path [PATH_CHECKPOINT]
+      # example: python eval.py --eval_dataset_path /home/DataSet/ImageNet_Original/validation_preprocess --ckpt_path /home/model/shufflenetv1/ckpt/shufflenetv1-250_1251
 
   shell:
       bash scripts/run_eval.sh [DEVICE_ID] [DATA_DIR] [PATH_CHECKPOINT]
+      # example: bash scripts/run_eval.sh 0 /home/DataSet/ImageNet_Original/validation_preprocess /home/model/shufflenetv1/ckpt/shufflenetv1-250_1251
 
 # GPU评估示例
   python:
@@ -196,7 +197,7 @@ epoch time: 99864.092, per step time: 79.827, avg loss: 3.442
 
 可以在 `eval_log.txt` 查看评估结果。
 
-```shell
+```log
 result:{'Loss': 2.0479587888106323, 'Top_1_Acc': 0.7385817307692307, 'Top_5_Acc': 0.9135817307692308}, ckpt:'/home/shufflenetv1/train_parallel0/checkpoint/shufflenetv1-250_1251.ckpt', time: 98560.63866615295
 ```
 

@@ -105,7 +105,7 @@ After installing MindSpore via the official website, you can start training and 
 
   # run distributed training example
   bash scripts/run_train.sh [RANK_TABLE_FILE] [DATASET_NAME]
-  # example: bash scripts/run_train.sh /root/hccl_8p_01234567_10.155.170.71.json cifar10
+  # example: bash scripts/run_train.sh ~/hccl_8p.json cifar10
 
   # run evaluation example
   python eval.py > eval.log 2>&1 &
@@ -401,7 +401,7 @@ For more configuration details, please refer the script `config.py`.
 - running on Ascend
 
   ```bash
-  bash scripts/run_train.sh /root/hccl_8p_01234567_10.155.170.71.json cifar10
+  bash scripts/run_train.sh ~/hccl_8p.json cifar10
   ```
 
   The above shell script will run distribute training in the background. You can view the results through the file `train_parallel[X]/log`. The loss value will be achieved as follows:

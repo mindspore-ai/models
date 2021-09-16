@@ -147,7 +147,7 @@ bash scripts/run_standalone_train_gpu.sh $PRETRAINED_CKPT(options)
 
 ```bash
 bash scripts/run_distribute_train_ascend.sh $RANK_TABLE_FILE $PRETRAINED_CKPT(options)
-# example: bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json
+# example: bash scripts/run_distribute_train_ascend.sh ~/hccl_8p.json
 ```
 
 - Distributed GPU Training:
@@ -254,7 +254,7 @@ Results and checkpoints are written to `./train` folder. Log can be found in `./
 
 ```bash
 bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_CKPT(options)]
-# example: bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json
+# example: bash scripts/run_distribute_train_ascend.sh ~/hccl_8p.json
 ```
 
   For distributed training, a hccl configuration file with JSON format needs to be created in advance.

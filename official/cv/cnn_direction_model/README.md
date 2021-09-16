@@ -179,7 +179,7 @@ bash scripts/run_distribute_train_ascend.sh [rank_table] [train_dataset_path] [P
 For example, you can run the shell command below to launch the training procedure.
 
 ```shell
-bash run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json /home/DataSet/FSNS/train/
+bash run_distribute_train_ascend.sh ~/hccl_8p.json /home/DataSet/FSNS/train/
 ```
 
 - running on ModelArts

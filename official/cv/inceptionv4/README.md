@@ -255,7 +255,7 @@ Take training cifar10 as an example, the ds_type parameter is set to cifar10
 ```bash
 # distribute training example(8p)
 bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATA_DIR]
-# example: bash scripts/run_distribute_train_ascend.sh /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/cifar10/
+# example: bash scripts/run_distribute_train_ascend.sh ~/hccl_8p.json /home/DataSet/cifar10/
 
 # standalone training
 bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [DATA_DIR]
@@ -289,7 +289,7 @@ bash scripts/run_standalone_train_cpu.sh DATA_PATH
       Ascend:
       # distribute training example(8p)
       bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATA_DIR]
-      # example: bash scripts/run_distribute_train_ascend.sh /root/hccl_8p_01234567_10.155.170.71.json /home/DataSet/cifar10/
+      # example: bash scripts/run_distribute_train_ascend.sh ~/hccl_8p.json /home/DataSet/cifar10/
 
       # standalone training
       bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [DATA_DIR]

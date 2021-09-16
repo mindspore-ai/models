@@ -290,7 +290,7 @@ ds_type:cifar10
 ```shell
 # 分布式训练示例(8卡)
 bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH] [CKPT_PATH]
-# example: bash run_distribute_train.sh /root/hccl_8p_012345467_10.155.170.71.json /home/DataSet/cifar10/ ./ckpt/
+# example: bash run_distribute_train.sh ~/hccl_8p.json /home/DataSet/cifar10/ ./ckpt/
 
 # 单机训练
 bash scripts/run_standalone_train.sh [DEVICE_ID] [DATA_PATH] [CKPT_PATH]
@@ -312,7 +312,7 @@ bash scripts/run_standalone_train.sh [DEVICE_ID] [DATA_PATH] [CKPT_PATH]
       Ascend:
       # 分布式训练示例(8卡)
       bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH] [CKPT_PATH]
-      # example: bash run_distribute_train.sh /root/hccl_8p_012345467_10.155.170.71.json /home/DataSet/cifar10/ ./ckpt/
+      # example: bash run_distribute_train.sh ~/hccl_8p.json /home/DataSet/cifar10/ ./ckpt/
 
       # 单机训练
       bash scripts/run_standalone_train.sh [DEVICE_ID] [DATA_PATH] [CKPT_PATH]

@@ -134,7 +134,7 @@ bash run_alone_train.sh
 data_file=/home/DataSet/VOC2012/vocaug_mindrecords/vocaug.mindrecord0
 ckpt_pre_trained=/home/model/deeplabv3/predtrained/resnet101_ascend_v120_imagenet2012_official_cv_bs32_acc78.ckpt
 
-bash run_distribute_train_s16_r1.sh
+bash run_distribute_train_s16_r1.sh ~/hccl_8p.json
 ```
 
 2.使用VOCaug数据集训练s8，微调上一步的模型。脚本如下：
@@ -145,7 +145,7 @@ bash run_distribute_train_s16_r1.sh
 data_file=/home/DataSet/VOC2012/vocaug_mindrecords/vocaug.mindrecord0
 ckpt_pre_trained=/home/model/deeplabv3/predtrained/resnet101_ascend_v120_imagenet2012_official_cv_bs32_acc78.ckpt
 
-bash run_distribute_train_s8_r1.sh
+bash run_distribute_train_s8_r1.sh ~/hccl_8p.json
 ```
 
 3.使用VOCtrain数据集训练s8，微调上一步的模型。脚本如下：
@@ -157,17 +157,18 @@ bash run_distribute_train_s8_r1.sh
 data_file=/home/DataSet/VOC2012/voctrain_mindrecords/votrain.mindrecord0
 ckpt_pre_trained=/home/model/deeplabv3/ckpt/deeplabv3-800_330.ckpt
 
-run_distribute_train_s8_r2.sh
+bash run_distribute_train_s8_r2.sh ~/hccl_8p.json
 ```
 
 评估步骤如下：
 
 1. 进入对应的shell脚本修改参数
 
-```default_cofig.yaml
+```shell
 # example:
 data_root=/home/DataSet/VOC2012
 data_lst=/home/DataSet/VOC2012/voc_val_lst.txt
+ckpt_path=/home/model/deeplabv3/ckpt/deeplabv3-800_330.ckpt
 ```
 
 2.使用voc val数据集评估s16。评估脚本如下：

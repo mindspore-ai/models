@@ -98,6 +98,22 @@ Before you start your training process, you need to obtain mindspore imagenet pr
   └─resnet50.ckpt
 ```
 
+```dataset
+ └─ cocodataset
+  └─train2017
+  └─val2017
+  └─annotations
+```
+
+```default_config.yaml
+DATASET:
+    ROOT:/home/DataSet/cocodataset
+MODEL:
+    PRETRAINED:./resnet50.ckpt
+
+# Modify according to local path
+```
+
 ## [Running](#contents)
 
 - running on local
@@ -106,20 +122,23 @@ Before you start your training process, you need to obtain mindspore imagenet pr
 
     ```shell
     bash scripts/train_standalone.sh [CKPT_SAVE_DIR] [DEVICE_ID] [BATCH_SIZE]
+    # example: bash scripts/train_standalone.sh ./ 0 128
     ```
 
     To validate the model, change the settings in `default_config.yaml` to the path of the model you want to validate or setting that on the terminal. For example:
 
-    ```python
+    ```default_config.yaml
     TEST:
         ...
-        MODEL_FILE : './{path}/xxxx.ckpt'
+        MODEL_FILE : /home/model/simple_pose/ckpt/simplepose-140_1170.ckpt
+    # Modify according to local path
     ```
 
     Then, run the shell script `scripts/eval.sh` with the format below:
 
     ```shell
     bash scripts/eval.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [DEVICE_ID]
+    # example: bash scripts/eval.sh /home/model/simple_pose/ckpt/simplepose-140_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
     ```
 
 - running on ModelArts
@@ -211,7 +230,7 @@ Configurations for both training and evaluation are set in `default_config.yaml`
 
 - config for SimplePoseNet on COCO2017 dataset:
 
-```python
+```default_config.yaml
 # These parameters can be modified at the terminal
 ckpt_save_dir: 'checkpoints'                # the folder to save the '*.ckpt' file
 batch_size: 128                             # TRAIN.BATCH_SIZE
@@ -280,17 +299,12 @@ Run `scripts/train_standalone.sh` to train the model standalone. The usage of th
 
 ```shell
 bash scripts/train_standalone.sh [CKPT_SAVE_DIR] [DEVICE_ID] [BATCH_SIZE]
-```
-
-For example, you can run the shell command below to launch the training procedure.
-
-```shell
-bash scripts/train_standalone.sh results/standalone/ 0 128
+# example: bash scripts/train_standalone.sh ./ 0 128
 ```
 
 The script will run training in the background, you can view the results through the file `train_log[X].txt` as follows:
 
-```text
+```log
 loading parse...
 batch size :128
 loading dataset from /data/coco2017/train2017
@@ -314,17 +328,12 @@ Run `scripts/train_distributed.sh` to train the model distributed. The usage of 
 
 ```shell
 bash scripts/train_distributed.sh [MINDSPORE_HCCL_CONFIG_PATH] [CKPT_SAVE_DIR] [RANK_SIZE]
-```
-
-For example, you can run the shell command below to launch the distributed training procedure.
-
-```shell
-bash scripts/train_distributed.sh /home/rank_table.json results/distributed/ 4
+# example: bash scripts/train_distributed.sh /root/hccl_8p_01234567_10.155.170.71.json ./checkpoint 8
 ```
 
 The above shell script will run distribute training in the background. You can view the results through the file `train_parallel[X]/log.txt` as follows:
 
-```text
+```log
 loading parse...
 batch size :64
 loading dataset from /data/coco2017/train2017
@@ -348,17 +357,12 @@ run `scripts/eval.sh` to evaluate the model with one Ascend processor. The usage
 
 ```shell
 bash scripts/eval.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [DEVICE_ID]
-```
-
-For example, you can run the shell command below to launch the validation procedure.
-
-```shell
-bash scripts/eval.sh results/distributed/sim-140_1170.ckpt
+# example: bash scripts/eval.sh /home/model/simple_pose/ckpt/simplepose-140_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
 ```
 
 The above shell command will run validation procedure in the background. You can view the results through the file `eval_log[X].txt`. The result will be achieved as follows:
 
-```text
+```log
 use flip test: True
 loading model ckpt from results/distributed/sim-140_1170.ckpt
 loading dataset from /data/coco2017/val2017
@@ -419,7 +423,7 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 
 Inference result is saved in current path, you can find result like this in acc.log file.
 
-```bash
+```log
 AP: 0.7036180026660003
 ```
 
