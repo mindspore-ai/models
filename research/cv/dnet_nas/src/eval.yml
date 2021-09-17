@@ -16,8 +16,6 @@ eval:
     trainer:
         with_train: False
         type: Trainer
-
-
         epochs: 160
         optimizer:
             type: SGD
@@ -32,4 +30,3 @@ eval:
                 gamma: 0.5
         loss:
             type: CrossEntropyLoss
-
