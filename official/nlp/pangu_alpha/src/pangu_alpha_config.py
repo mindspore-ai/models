@@ -39,7 +39,8 @@ class PanguAlphaConfig:
                  hidden_act='fast_gelu',
                  eod_reset=True,
                  enable_offload=False,
-                 parallel_config=None):
+                 parallel_config=None,
+                 softmax_compute_type=mstype.float16):
         self.batch_size = batch_size
         self.seq_length = seq_length
         self.vocab_size = vocab_size
@@ -59,6 +60,7 @@ class PanguAlphaConfig:
         self.use_past = use_past
         self.eod_reset = eod_reset
         self.enable_offload = enable_offload
+        self.softmax_compute_type = softmax_compute_type
 
     def __str__(self):
         info = "[PANGUALPHAConfig]" + '===' * 10 + '\n'

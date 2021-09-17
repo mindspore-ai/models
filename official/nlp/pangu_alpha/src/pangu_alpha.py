@@ -81,7 +81,8 @@ class QueryLayer(TransformerEncoderLayer):
                  param_init_type=mstype.float32,
                  hidden_act='gelu',
                  use_past=False,
-                 parallel_config=None):
+                 parallel_config=None,
+                 softmax_compute_type=mstype.float32):
         super(QueryLayer, self).__init__(batch_size=batch_size,
                                          hidden_size=hidden_size,
                                          ffn_hidden_size=ffn_hidden_size,
@@ -93,13 +94,14 @@ class QueryLayer(TransformerEncoderLayer):
                                          param_init_type=param_init_type,
                                          hidden_act=hidden_act,
                                          use_past=use_past,
-                                         parallel_config=parallel_config.dp_mp_config)
+                                         parallel_config=parallel_config.dp_mp_config,
+                                         softmax_compute_type=softmax_compute_type)
 
     def construct(self, x, query_vector, input_mask, init_reset=True, batch_valid_length=None):
         r"""
         The forward process of the block.
         """
-        # [bs, seq_length, embedding_size]
+        # [bs * seq_length, embedding_size]
         input_x = self.layernorm1(x)
         input_x = F.cast(input_x, self.dtype)
 
@@ -229,7 +231,7 @@ class PanguAlpha_Model(Cell):
             self.layernorm.set_comm_fusion(2)
         else:
             self.layernorm.set_comm_fusion(config.parallel_config.gradient_aggregation_group)
-        self.layernorm.shard(((config.parallel_config.data_parallel, 1, 1),))
+        self.layernorm.shard(((config.parallel_config.data_parallel, 1),))
         self.layernorm.pipeline_stage = config.parallel_config.pipeline_stage - 1
         # Configure the shard configure of the Embedding layer
         self.embedding.pipeline_stage = 0
@@ -247,7 +249,8 @@ class PanguAlpha_Model(Cell):
                                          lambda_func=set_parallel_configure_for_layer,
                                          param_init_type=config.param_init_type,
                                          use_past=config.use_past,
-                                         parallel_config=config.parallel_config).blocks
+                                         parallel_config=config.parallel_config,
+                                         softmax_compute_type=config.softmax_compute_type).blocks
         copied_parallel_config = copy.deepcopy(config.parallel_config)
         copied_parallel_config.vocab_emb_dp = True
         self.top_query_embedding = VocabEmbedding(vocab_size=config.seq_length,
@@ -291,12 +294,14 @@ class PanguAlpha_Model(Cell):
         r"""forward pass of the model"""
         embed, word_table = self.embedding(input_ids, input_position, init_reset, batch_valid_length)
         hidden_state = P.Cast()(embed, self.dtype)
+        hidden_state = self.reshape_to_2d(hidden_state)
         # encoder_mask = self.create_encoder_mask(encoder_masks)
         if self.blocks is not None:
             for i in range(self.num_layers - 1):
                 hidden_state, _ = self.blocks[i](hidden_state, encoder_masks, init_reset, batch_valid_length)
         if self.is_pipeline:
             top_query_hidden_states, _ = self.top_query_embedding(input_position)
+            top_query_hidden_states = self.reshape_to_2d(top_query_hidden_states)
             encoder_output, _ = self.top_query_layer(hidden_state, top_query_hidden_states,
                                                      encoder_masks, init_reset, batch_valid_length)
             encoder_output = self.layernorm(encoder_output)
@@ -304,10 +309,19 @@ class PanguAlpha_Model(Cell):
             encoder_output = self.layernorm(hidden_state)
             encoder_output = P.Cast()(encoder_output, self.dtype)
             top_query_hidden_states, _ = self.top_query_embedding(input_position)
+            top_query_hidden_states = self.reshape_to_2d(top_query_hidden_states)
             encoder_output, _ = self.top_query_layer(encoder_output, top_query_hidden_states,
                                                      encoder_masks, init_reset, batch_valid_length)
 
         return encoder_output, word_table
+
+    def reshape_to_2d(self, x):
+        r"""reshape nd tensor to 2d, if n <= 2, keep original shape."""
+        shape = F.shape(x)
+        if len(shape) <= 2:
+            return x
+        x = F.reshape(x, (-1, shape[-1]))
+        return x
 
     def load_embedding_from_ckpt(self, load_ckpt_path):
         r"""load the weights from the checkpoint"""
