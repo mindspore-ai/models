@@ -266,7 +266,7 @@ def resize_column(img, img_shape, gt_bboxes, gt_label, gt_num, gt_mask):
 def resize_column_test(img, img_shape, gt_bboxes, gt_label, gt_num, gt_mask):
     """resize operation for image of eval"""
     img_data = img
-    img_data, w_scale, h_scale = cv2.resize(
+    img_data = cv2.resize(
         img_data, (config.img_width, config.img_height), interpolation=cv2.INTER_LINEAR)
     h, w = img_data.shape[:2]
     h_scale = config.img_height / h
