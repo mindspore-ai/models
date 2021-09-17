@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,15 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""hub config."""
-from src.vgg import vgg19 as VGG19
-from model_utils.moxing_adapter import config
+if [ -d out ]; then
+    rm -rf out
+fi
 
-def vgg19(*args, **kwargs):
-    return VGG19(*args, **kwargs)
+mkdir out
+cd out || exit
 
+if [ -f "Makefile" ]; then
+  make clean
+fi
 
-def create_network(name, *args, **kwargs):
-    if name == "vgg19":
-        return vgg19(args=config, *args, **kwargs)
-    raise NotImplementedError(f"{name} is not implemented in the repo")
+cmake .. \
+    -DMINDSPORE_PATH="`pip3.7 show mindspore-ascend | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
+make

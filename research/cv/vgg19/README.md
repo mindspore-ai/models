@@ -257,6 +257,14 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=
     ├── vgg19
         ├── README.md                             // descriptions about vgg
         ├── README_CN.md                          // descriptions about vgg with Chinese
+        ├── ascend310_infer
+        ├── ├── CMakeLists.txt                    // CMake
+        ├── ├── build.sh                          // shell file of build
+        ├── ├── inc
+        ├── ├── ├── utils.h                       // utils.h
+        ├── ├── src
+        ├── ├── ├── main.cc                       // main file
+        ├── ├── ├── utils.cc                      // utils.cc
         ├── model_utils
         │   ├── __init__.py                       // init file
         │   ├── config.py                         // Parse arguments
@@ -447,7 +455,7 @@ python train.py  --config_path=/dir_to_code/imagenet2012_config.yaml --device_ta
 
 ```bash
 # distributed training(4p)
-bash scripts/run_distribute_train_gpu.sh /path/ImageNet2012/train"
+bash scripts/run_distribute_train_gpu.sh /path/ImageNet2012/train
 ```
 
 ### [Evaluation Process](#contents)
@@ -501,7 +509,8 @@ Current batch_Size for imagenet2012 dataset can only be set to 1.
 Inference result is saved in current path, you can find result like this in acc.log file.
 
 ```bash
-'acc': 0.92
+'top1 acc': 0.748
+'top5 acc': 0.922
 ```
 
 ## [Model Description](#contents)
@@ -545,4 +554,4 @@ In dataset.py, we set the seed inside “create_dataset" function. We also use r
 
 ## [ModelZoo Homepage](#contents)  
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+Please check the official [homepage](https://gitee.com/mindspore/models/tree/master/).  
