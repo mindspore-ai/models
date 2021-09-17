@@ -81,7 +81,7 @@ def train_net():
                              do_train=True,
                              repeat_num=1,
                              batch_size=config.batch_size,
-                             target=target)
+                             run_distribute=config.run_distribute)
     step_size = dataset.get_dataset_size()
 
     # define net

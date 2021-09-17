@@ -46,12 +46,12 @@ if __name__ == '__main__':
     rank_id = 0
     group_size = 1
     config = train_config
-    data_sink = (args.device_target == "GPU")
+    data_sink = (args.device_target != "CPU")
     context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, save_graphs=False)
     if args.device_target == "GPU":
         context.set_context(enable_graph_kernel=True)
     if args.is_distributed:
-        init('nccl')
+        init()
         rank_id = get_rank()
         group_size = get_group_size()
         context.reset_auto_parallel_context()

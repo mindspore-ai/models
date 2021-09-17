@@ -14,6 +14,7 @@
 # ============================================================================
 """Dataset preprocessing."""
 import os
+import multiprocessing
 import math as m
 import numpy as np
 from PIL import Image
@@ -67,7 +68,8 @@ def transpose_hwc2whc(image):
     return image
 
 
-def create_dataset(dataset_path, batch_size=1, num_shards=1, shard_id=0, device_target='Ascend'):
+def create_dataset(dataset_path, batch_size=1, num_shards=1, shard_id=0, device_target='Ascend',
+                   num_parallel_workers=8):
     """
      create train or evaluation dataset for warpctc
 
@@ -77,8 +79,12 @@ def create_dataset(dataset_path, batch_size=1, num_shards=1, shard_id=0, device_
         num_shards(int): number of devices
         shard_id(int): rank id
         device_target(str): platform of training, support Ascend and GPU
+        num_parallel_workers(int): Number of data processing threads.
      """
-
+    cores = multiprocessing.cpu_count()
+    if num_parallel_workers > cores:
+        print("The num_parallel_workers {} is set too large, now set it {}".format(num_parallel_workers, cores))
+        num_parallel_workers = cores
     dataset = _CaptchaDataset(dataset_path, config.max_captcha_digits, device_target)
     data_set = ds.GeneratorDataset(dataset, ["image", "label"], shuffle=True, num_shards=num_shards, shard_id=shard_id)
     image_trans = [
@@ -97,11 +103,15 @@ def create_dataset(dataset_path, batch_size=1, num_shards=1, shard_id=0, device_
         c.TypeCast(mstype.int32)
     ]
     if device_target == 'Ascend':
-        data_set = data_set.map(operations=image_trans, input_columns=["image"], num_parallel_workers=8)
-        data_set = data_set.map(operations=transpose_hwc2whc, input_columns=["image"], num_parallel_workers=8)
+        data_set = data_set.map(operations=image_trans, input_columns=["image"],
+                                num_parallel_workers=num_parallel_workers)
+        data_set = data_set.map(operations=transpose_hwc2whc, input_columns=["image"],
+                                num_parallel_workers=num_parallel_workers)
     else:
-        data_set = data_set.map(operations=image_trans_gpu, input_columns=["image"], num_parallel_workers=8)
-    data_set = data_set.map(operations=label_trans, input_columns=["label"], num_parallel_workers=8)
+        data_set = data_set.map(operations=image_trans_gpu, input_columns=["image"],
+                                num_parallel_workers=num_parallel_workers)
+    data_set = data_set.map(operations=label_trans, input_columns=["label"],
+                            num_parallel_workers=num_parallel_workers)
 
     data_set = data_set.batch(batch_size, drop_remainder=True)
     return data_set

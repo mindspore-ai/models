@@ -53,8 +53,7 @@ def eval_net():
     # create dataset
     dataset = create_dataset(dataset_path=config.data_path,
                              do_train=False,
-                             batch_size=config.batch_size,
-                             target=target)
+                             batch_size=config.batch_size)
 
     # define net
     net = squeezenet(num_classes=config.class_num)

@@ -260,6 +260,7 @@ MobileNetV2总体网络架构如下：
 `CKPT_PATH` `FREEZE_LAYER` 和 `FILTER_HEAD` 是可选择的选项, 如果设置`CKPT_PATH`, `FREEZE_LAYER` 也必须同时设置. `FREEZE_LAYER` 可以是 ["none", "backbone"], 如果设置 `FREEZE_LAYER`="backbone", 训练过程中backbone中的参数会被冻结，同时不会从checkpoint中加载head部分的参数. 如果`FILTER_HEAD`=True, 不会从checkpoint中加载head部分的参数.
 
 > RANK_TABLE_FILE 是在Ascned上运行分布式任务时HCCL的配置文件
+> 单卡运行时请设置为RANK_TABLE_FILE=None
 > 我们列出使用分布式服务常见的使用限制，详细的可以查看HCCL对应的使用文档。
 >
 > - 单机场景下支持1、2、4、8卡设备集群，多机场景下支持8*n卡设备集群。

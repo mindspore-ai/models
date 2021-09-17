@@ -259,6 +259,7 @@ You can start training using python or shell scripts. The usage of shell scripts
 `CKPT_PATH` `FREEZE_LAYER` and `FILTER_HEAD` are optional, when set `CKPT_PATH`, `FREEZE_LAYER` must be set. `FREEZE_LAYER` should be in ["none", "backbone"], and if you set `FREEZE_LAYER`="backbone", the parameter in backbone will be freezed when training and the parameter in head will not be load from checkpoint. if `FILTER_HEAD`=True, the parameter in head will not be load from checkpoint.
 
 > RANK_TABLE_FILE is HCCL configuration file when running on Ascend.
+> If you run stand alone please set `RANK_TABLE_FILE=None`.
 > The common restrictions on using the distributed service are as follows. For details, see the HCCL documentation.
 >
 > - In a single-node system, a cluster of 1, 2, 4, or 8 devices is supported. In a multi-node system, a cluster of 8 x N devices is supported.

@@ -15,15 +15,12 @@
 """
 create train or eval dataset.
 """
-import os
+import multiprocessing
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
 import mindspore.dataset.vision.c_transforms as C
 import mindspore.dataset.transforms.c_transforms as C2
 from mindspore.communication.management import init, get_rank, get_group_size
-from src.model_utils.config import config
-from src.model_utils.device_adapter import get_device_num, get_rank_id
-
 
 def create_dataset1(dataset_path, do_train, repeat_num=1, batch_size=32, train_image_size=224, eval_image_size=224,
                     target="Ascend", distribute=False, enable_cache=False, cache_session_id=None):
@@ -42,15 +39,8 @@ def create_dataset1(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
     Returns:
         dataset
     """
-    if target == "Ascend":
-        device_num, rank_id = _get_rank_info()
-    else:
-        if distribute:
-            init()
-            rank_id = get_rank()
-            device_num = get_group_size()
-        else:
-            device_num = 1
+    device_num, rank_id = _get_rank_info(distribute)
+    _check_num_parallel_workers(max_num_parallel_workers=12)
     ds.config.set_prefetch_size(64)
     if device_num == 1:
         data_set = ds.Cifar10Dataset(dataset_path, num_parallel_workers=12, shuffle=True)
@@ -113,15 +103,8 @@ def create_dataset2(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
     Returns:
         dataset
     """
-    if target == "Ascend":
-        device_num, rank_id = _get_rank_info()
-    else:
-        if distribute:
-            init()
-            rank_id = get_rank()
-            device_num = get_group_size()
-        else:
-            device_num = 1
+    device_num, rank_id = _get_rank_info(distribute)
+    _check_num_parallel_workers(max_num_parallel_workers=12)
 
     ds.config.set_prefetch_size(64)
     if device_num == 1:
@@ -192,16 +175,7 @@ def create_dataset_pynative(dataset_path, do_train, repeat_num=1, batch_size=32,
     Returns:
         dataset
     """
-    ds.config.set_numa_enable(True)
-    if target == "Ascend":
-        device_num, rank_id = _get_rank_info()
-    else:
-        if distribute:
-            init()
-            rank_id = get_rank()
-            device_num = get_group_size()
-        else:
-            device_num = 1
+    device_num, rank_id = _get_rank_info(distribute)
 
     if device_num == 1:
         data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=8, shuffle=True)
@@ -269,16 +243,8 @@ def create_dataset3(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
     Returns:
         dataset
     """
-    if target == "Ascend":
-        device_num, rank_id = _get_rank_info()
-    else:
-        if distribute:
-            init()
-            rank_id = get_rank()
-            device_num = get_group_size()
-        else:
-            device_num = 1
-            rank_id = 1
+    device_num, rank_id = _get_rank_info(distribute)
+    _check_num_parallel_workers(max_num_parallel_workers=8)
     if device_num == 1:
         data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=8, shuffle=True)
     else:
@@ -346,15 +312,8 @@ def create_dataset4(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
     Returns:
         dataset
     """
-    if target == "Ascend":
-        device_num, rank_id = _get_rank_info()
-    else:
-        if distribute:
-            init()
-            rank_id = get_rank()
-            device_num = get_group_size()
-        else:
-            device_num = 1
+    device_num, rank_id = _get_rank_info(distribute)
+    _check_num_parallel_workers(max_num_parallel_workers=12)
     ds.config.set_prefetch_size(64)
     if device_num == 1:
         data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=12, shuffle=True)
@@ -404,25 +363,25 @@ def create_dataset4(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
 
     return data_set
 
-def _get_rank_info():
+def _get_rank_info(distribute):
     """
     get rank size and rank id
     """
-    rank_size = int(os.environ.get("RANK_SIZE", 1))
-
-    if config.device_target == "Ascend":
-        if rank_size > 1:
-            rank_size = get_device_num()
-            rank_id = get_rank_id()
-        else:
-            rank_size = 1
-            rank_id = 0
+    if distribute:
+        init()
+        rank_id = get_rank()
+        device_num = get_group_size()
     else:
-        if rank_size > 1:
-            rank_size = get_group_size()
-            rank_id = get_rank()
-        else:
-            rank_size = 1
-            rank_id = 0
+        rank_id = 0
+        device_num = 1
+    return device_num, rank_id
 
-    return rank_size, rank_id
+def _check_num_parallel_workers(max_num_parallel_workers=None):
+    """
+    Check num_parallel_workers used in dataset operations.
+    If num_parallel_workers > the real CPU cores number, set num_parallel_workers = the real CPU cores number.
+    """
+    cores = multiprocessing.cpu_count()
+    if max_num_parallel_workers is not None and cores < max_num_parallel_workers:
+        print("The num_parallel_workers {} is set too large, now set it {}".format(max_num_parallel_workers, cores))
+        ds.config.set_num_parallel_workers(cores)

@@ -76,7 +76,7 @@ def create_dataset(dataset_path, do_train, config, repeat_num=1, enable_cache=Fa
     type_cast_op = C2.TypeCast(mstype.int32)
 
     data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=num_workers)
-    data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=8)
+    data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=num_workers)
 
     # apply shuffle operations
     data_set = data_set.shuffle(buffer_size=buffer_size)

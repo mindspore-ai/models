@@ -15,7 +15,7 @@
 """
 create train or eval dataset.
 """
-import os
+import multiprocessing
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
 import mindspore.dataset.vision.c_transforms as C
@@ -27,7 +27,7 @@ def create_dataset_cifar(dataset_path,
                          do_train,
                          repeat_num=1,
                          batch_size=32,
-                         target="Ascend"):
+                         run_distribute=False):
     """
     create a train or evaluate cifar10 dataset
     Args:
@@ -35,19 +35,12 @@ def create_dataset_cifar(dataset_path,
         do_train(bool): whether dataset is used for train or eval.
         repeat_num(int): the repeat times of dataset. Default: 1
         batch_size(int): the batch size of dataset. Default: 32
-        target(str): the device target. Default: Ascend
-
+        run_distribute(bool): Whether run in distribute or not. Default: False
     Returns:
         dataset
     """
-    if target == "Ascend":
-        device_num, rank_id = _get_rank_info()
-    elif target == "CPU":
-        device_num = 1
-    else:
-        init()
-        rank_id = get_rank()
-        device_num = get_group_size()
+    device_num, rank_id = _get_rank_info(run_distribute)
+    _check_num_parallel_workers(8)
 
     if device_num == 1:
         data_set = ds.Cifar10Dataset(dataset_path,
@@ -102,7 +95,7 @@ def create_dataset_imagenet(dataset_path,
                             do_train,
                             repeat_num=1,
                             batch_size=32,
-                            target="Ascend"):
+                            run_distribute=False):
     """
     create a train or eval imagenet dataset
 
@@ -111,17 +104,13 @@ def create_dataset_imagenet(dataset_path,
         do_train(bool): whether dataset is used for train or eval.
         repeat_num(int): the repeat times of dataset. Default: 1
         batch_size(int): the batch size of dataset. Default: 32
-        target(str): the device target. Default: Ascend
+        run_distribute(bool): Whether run in distribute or not. Default: False
 
     Returns:
         dataset
     """
-    if target == "Ascend":
-        device_num, rank_id = _get_rank_info()
-    else:
-        init()
-        rank_id = get_rank()
-        device_num = get_group_size()
+    device_num, rank_id = _get_rank_info(run_distribute)
+    _check_num_parallel_workers(10)
 
     if device_num == 1:
         data_set = ds.ImageFolderDataset(dataset_path,
@@ -174,17 +163,25 @@ def create_dataset_imagenet(dataset_path,
     return data_set
 
 
-def _get_rank_info():
+def _get_rank_info(distribute):
     """
     get rank size and rank id
     """
-    rank_size = int(os.environ.get("RANK_SIZE", 1))
-
-    if rank_size > 1:
-        rank_size = get_group_size()
+    if distribute:
+        init()
         rank_id = get_rank()
+        device_num = get_group_size()
     else:
-        rank_size = 1
         rank_id = 0
+        device_num = 1
+    return device_num, rank_id
 
-    return rank_size, rank_id
+def _check_num_parallel_workers(max_num_parallel_workers=None):
+    """
+    Check num_parallel_workers used in dataset operations.
+    If num_parallel_workers > the real CPU cores number, set num_parallel_workers = the real CPU cores number.
+    """
+    cores = multiprocessing.cpu_count()
+    if max_num_parallel_workers is not None and cores < max_num_parallel_workers:
+        print("The num_parallel_workers {} is set too large, now set it {}".format(max_num_parallel_workers, cores))
+        ds.config.set_num_parallel_workers(cores)

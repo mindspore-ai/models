@@ -13,8 +13,8 @@
 # limitations under the License.
 # ============================================================================
 """Face detection yolov3 data pre-process."""
+import multiprocessing
 import numpy as np
-
 import mindspore.dataset.vision.py_transforms as P
 import mindspore.dataset as de
 
@@ -246,6 +246,11 @@ compose_map_func = (preprocess_fn)
 def create_dataset(args):
     """Create dataset object."""
     args.logger.info('start create dataloader')
+    cores = multiprocessing.cpu_count()
+    max_num_parallel_workers = 16
+    if cores < max_num_parallel_workers:
+        print("The num_parallel_workers {} is set too large, now set it {}".format(max_num_parallel_workers, cores))
+        de.config.set_num_parallel_workers(cores)
     ds = de.MindDataset(args.mindrecord_path + "0", columns_list=["image", "annotation"], num_shards=args.world_size,
                         shard_id=args.local_rank)
 
