@@ -55,6 +55,9 @@ def train():
         device_id = get_device_id()
         context.set_context(device_id=device_id)
 
+    if config.model_version == 'V1' and config.device_target != 'Ascend':
+        raise ValueError("model version V1 is only supported on Ascend, pls check the config.")
+
     # lr_scale = 1
     if config.run_distribute:
         if config.device_target == 'Ascend':

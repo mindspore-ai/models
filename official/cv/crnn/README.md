@@ -18,6 +18,7 @@
             - [Distributed Training](#distributed-training)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
+        - [Evaluation while training](#evaluation-while-training)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
@@ -43,7 +44,7 @@ CRNN use a vgg16 structure for feature extraction, the appending with two-layer 
 We provide 2 versions of network using different ways to transfer the hidden size to class numbers. You could choose different version by modifying the `model_version` in config yaml.
 
 - V1 using an full connection after the RNN parts.
-- V2 change the output feature size of the last RNN, to output a feature with the same size of class numbers.
+- V2 change the output feature size of the last RNN, to output a feature with the same size of class numbers. V2 also switch to the builtin `LSTM` cell instead of operator `DynamicRNN`, which make the model being supported both on GPU and Ascend.
 
 ## [Dataset](#content)
 
