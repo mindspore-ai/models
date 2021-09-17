@@ -23,10 +23,12 @@ from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
 from model_utils.config import config as default_config
 
+
 if default_config.export_device_target == "Ascend":
     mtype = mstype.float16
 else:
     mtype = mstype.float32
+
 
 class DenseNoTranpose(nn.Cell):
     """Dense method"""
@@ -153,7 +155,7 @@ class Rcnn(nn.Cell):
             bbox_weights = self.cast(self.logicaland(self.greater(labels, 0), mask), mstype.int32) * labels
             if self.use_ambigous_sample:
                 bbox_weights = self.cast(self.logicaland(self.equal(labels, 1), mask), mstype.int32) * labels
-            labels = self.cast(self.onehot(labels, self.num_classes, self.on_value, self.off_value), mstype.float32)
+            labels = self.cast(self.onehot(labels, self.num_classes, self.on_value, self.off_value), x_cls.dtype)
             bbox_targets = self.tile(self.expandims(bbox_targets, 1), (1, self.num_classes, 1))
 
             loss, loss_cls, loss_reg, loss_print = self.loss(x_cls, x_reg, bbox_targets, bbox_weights, labels, mask)
