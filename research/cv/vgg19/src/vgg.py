@@ -127,9 +127,9 @@ cfg = {
 }
 
 
-def vgg19(num_classes=1000, args=None, phase="train"):
+def vgg19(num_classes=1000, args=None, phase="train", **kwargs):
     """
-    Get Vgg19 neural network with batch normalization.
+    Get Vgg19 neural network with Batch Normalization.
 
     Args:
         num_classes (int): Class numbers. Default: 1000.
@@ -137,14 +137,10 @@ def vgg19(num_classes=1000, args=None, phase="train"):
         phase(str): train or test mode.
 
     Returns:
-        Cell, cell instance of Vgg19 neural network with batch normalization.
+        Cell, cell instance of Vgg19 neural network with Batch Normalization.
 
     Examples:
-        >>> vgg19(num_classes=1000, args=args)
+        >>> vgg19(num_classes=1000, args=args, **kwargs)
     """
-
-    if args is None:
-        from .config import cifar_cfg
-        args = cifar_cfg
-    net = Vgg(cfg['19'], num_classes=num_classes, args=args, batch_norm=args.batch_norm, phase=phase)
+    net = Vgg(cfg['19'], num_classes=num_classes, args=args, batch_norm=args.batch_norm, phase=phase, **kwargs)
     return net
