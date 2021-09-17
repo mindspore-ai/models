@@ -217,4 +217,4 @@ In config.py, we set the hidden_dropout_prob, attention_pros_dropout_prob and cl
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

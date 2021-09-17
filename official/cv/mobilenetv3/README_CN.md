@@ -173,7 +173,7 @@ python export.py --device_target [PLATFORM] --checkpoint_path [CKPT_PATH]
 |总时长                 | 1433分钟                  |
 | 参数(M)                 | 5.48M |
 | 微调检查点 | 44M                      |
-|脚本                   | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv3)|
+|脚本                   | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv3)|
 
 # 随机情况说明
 
@@ -181,4 +181,4 @@ python export.py --device_target [PLATFORM] --checkpoint_path [CKPT_PATH]
 
 # ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

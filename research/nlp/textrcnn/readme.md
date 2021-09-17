@@ -265,4 +265,4 @@ Inference result is saved in current path, you can find result like this in acc.
 
 ## [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ Please check the official [homepage](https://gitee.com/mindspore/models).

@@ -214,7 +214,7 @@ python infer.py \
 | Speed                      | 1pc: 90ms/step                                              |
 | Total Time                 | 1pc: 297s                                                   |
 | Checkpoint for Fine Tuning | 104.66M (.ckpt file)                                        |
-| Scripts                    | [TB-Net scripts](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/tbnet) |
+| Scripts                    | [TB-Net scripts](https://gitee.com/mindspore/models/tree/master/official/recommend/tbnet) |
 
 ### Evaluation Performance
 
@@ -247,4 +247,4 @@ python infer.py \
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

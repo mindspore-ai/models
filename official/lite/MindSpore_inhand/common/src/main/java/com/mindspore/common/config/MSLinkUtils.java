@@ -25,6 +25,6 @@ public class MSLinkUtils {
 
     public static final String ME_APK_URL = "https://download.mindspore.cn/model_zoo/official/lite/apk/mindmain.html";
     public static final String ME_HELP_URL = "https://gitee.com/mindspore/mindspore/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0";
-    public static final String ME_CODE_URL = "https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/lite";
+    public static final String ME_CODE_URL = "https://gitee.com/mindspore/models/tree/master/official/lite";
     public static final String ME_STAR_URL = "https://gitee.com/mindspore/mindspore";
 }

@@ -145,4 +145,4 @@ No random situation for evaluation.
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](http://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](http://gitee.com/mindspore/models).

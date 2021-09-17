@@ -115,7 +115,7 @@ After installing MindSpore via the official website, you can start training and 
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
 
 - running on ModelArts
 - If you want to train the model on modelarts, you can refer to the [official guidance document] of modelarts (https://support.huaweicloud.com/modelarts/)
@@ -543,4 +543,4 @@ In dataset.py, we set the seed inside “create_dataset" function. We also use r
 
 # [ModelZoo Homepage](#contents)  
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+Please check the official [homepage](https://gitee.com/mindspore/models).  

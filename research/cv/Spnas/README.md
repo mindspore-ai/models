@@ -9,28 +9,28 @@ SP-NAS is an efficient architecture search algorithm for object detection and se
 This method has two phases:
 
 1. In serial phase, the block sequence with optimal scaling ratio and output channel is found by using the "swap-expand-reignite" search policy. This search policy can guranteen a new searched architecture to completely inherit of weight from arichtectures before morphism.
-2. In parallel phase, parallized network structures are designed, sub-networks integrated by different feature layers are searched to better fuse the high-level and low-level semantic features. The following figure shows the search policy.
+2. In parallel phase, parallelized network structures are designed, sub-networks integrated by different feature layers are searched to better fuse the high-level and low-level semantic features. The following figure shows the search policy.
 
 ![sp-nas](./image/sp_nas.png)
 
 ## Search Space and Search Policy
 
-**Serial-level**
+### Serial-level
 
 - Swap-expand-reignite policy:  Growing starts from a small network to avoid repeated ImageNet pre-training.
-  - The new candidate network is obtained by "switching" or "expanding" the grown network for many times.
-  - Quickly train and evaluate candidate networks based on inherited parameters.
-  - When the growth reaches the bottleneck, the network is re-trained using ImageNet. The number of ignition times is no more than 2.
+- The new candidate network is obtained by "switching" or "expanding" the grown network for many times.
+- Quickly train and evaluate candidate networks based on inherited parameters.
+- When the growth reaches the bottleneck, the network is re-trained using ImageNet. The number of ignition times is no more than 2.
 
 - Constrained optimal network: A serial network with limited network resources (latency, video memory usage, or complexity) is selected to obtain the maximum performance.
 
 - Search space configuration:
-  - Block type: Basic Block, BottleNeck Block, and ResNext;
-  - Network depth: 8 to 60 blocks;
-  - Number of stages: 5 to 7;
-  - Width: Position where the channel size is doubled in the entire sequence.
+- Block type: Basic Block, BottleNeck Block, and ResNext;
+- Network depth: 8 to 60 blocks;
+- Number of stages: 5 to 7;
+- Width: Position where the channel size is doubled in the entire sequence.
 
-**Parallel-level**
+### Parallel-level
 
 - Based on the result SerialNet from the serial search phase (or the existing handcraft serial network such as ResNet series), search for the parallel structure stacked on SerialNet to better utilize and fuse feature information with different resolutions from different feature layers.
 - Search policy: Random sampling to meet the resource constraints: The probability of adding additional subnets is inversely proportional to the FLOPS of the subnets to be added.
@@ -42,7 +42,6 @@ The benchmark datasets can be downloaded as follows:
 
  COCO,
 [COCO2017](https://cocodataset.org/#download),
-
 
 ## Requirements
 
@@ -103,6 +102,7 @@ sh scripts/run_distributed.sh
 > Inference example:
 
 Modify src/eval.yml:
+
 ```bash
 models_folder: [CHECKPOINT_PATH]
 ```
@@ -133,7 +133,6 @@ COCO results:
 | AmoebaNet | 43.4 | - | - | - | - |
 | NAS-FPN | 48.0 | - | - | - | - |
 
-
 ## ModeZoo Homepage
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

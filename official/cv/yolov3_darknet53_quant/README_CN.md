@@ -336,7 +336,7 @@ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.555
 | 总时长                 | 8卡：23.5小时                                                                                |
 | 参数 (M)             | 62.1                                                                                           |
 | 微调检查点 | 474M (.ckpt文件)                                                                              |
-| 脚本                    | [YoloV3-DarkNet53-Quant脚本](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_darknet53_quant) |
+| 脚本                    | [YoloV3-DarkNet53-Quant脚本](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53_quant) |
 
 #### 推理性能
 
@@ -358,4 +358,4 @@ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.555
 
 ## ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

@@ -190,7 +190,7 @@ python export.py --ckpt_path [CHECKPOINT_PATH] --platform [PLATFORM] --file_form
 | Speed                      | 1pc: 400 ms/step;  8pcs:  143 ms/step                       |
 | Total time                 | 1pc: 41:36:07                                               |
 | Checkpoint for Fine tuning | 170.55M(.ckpt file)                                         |
-| Scripts                    | [STGAN script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/STGAN) |
+| Scripts                    | [STGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/STGAN) |
 
 ## [Model Description](#contents)
 
@@ -200,11 +200,11 @@ In dataset.py, we set the seed inside ```create_dataset``` function.
 
 ## [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).
 
 ## FAQ
 
-Please refer to [ModelZoo FAQ](https://gitee.com/mindspore/mindspore/tree/master/model_zoo#FAQ) to get some common FAQ.
+Please refer to [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) to get some common FAQ.
 
 - **Q**: Get "out of memory" error in PYNATIVE_MODE.
   **A**: You can set smaller batch size, e.g. 32, 16.

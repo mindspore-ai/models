@@ -118,7 +118,7 @@ pip install gym
 | Loss Function              | MSELoss                                        |MSELoss                                                     |
 | outputs                    | Reward                                                 | Reward                                                 |
 | Params (M)                 | 7.3k                                                       | 7.3k                                                       |
-| Scripts                    | <<<https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/rl/dqn>>> | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/rl/dqn |
+| Scripts                    | <<<https://gitee.com/mindspore/models/tree/master/official/rl/dqn>>> | https://gitee.com/mindspore/models/tree/master/official/rl/dqn |
 
 ## [Description of Random Situation](#content)
 
@@ -126,4 +126,4 @@ We use random seed in train.py.
 
 ## [ModeZoo Homepage](#contents)  
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

@@ -375,7 +375,7 @@ bash run_distribute_train_gpu.sh [DEVICE_NUM] [PRETRAINED_MODEL] [BACKBONE] [COC
 
 Notes:
 
-1. 运行分布式任务时需要用到RANK_TABLE_FILE指定的rank_table.json。您可以使用[hccl_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)生成该文件。
+1. 运行分布式任务时需要用到RANK_TABLE_FILE指定的rank_table.json。您可以使用[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成该文件。
 2. PRETRAINED_MODEL应该是训练好的ResNet-50检查点。如果需要加载训练好的FasterRcnn的检查点，需要对train.py作如下修改:
 
 ```python
@@ -518,7 +518,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
 | 速度 | 1卡：190毫秒/步；8卡：200毫秒/步 | 1卡：320毫秒/步；8卡：335毫秒/步 |
 | 总时间 | 1卡：37.17小时；8卡：4.89小时 |1卡：63.09小时；8卡：8.25小时 |
 | 参数(M) | 250 |250 |
-| 脚本 | [Faster R-CNN脚本](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn) | [Faster R-CNN脚本](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn) |
+| 脚本 | [Faster R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) | [Faster R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
 
 ### 评估性能
 
@@ -536,4 +536,4 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

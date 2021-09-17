@@ -409,7 +409,7 @@ YOLOv3-tiny on 118K images(The annotation and data format must be the same as co
 | Speed                      | 1p 130 img/s 8p 980  img/s(shape=640)                       |
 | Total time                 | 10h (8p)                                                    |
 | Checkpoint for Fine tuning | 69M (.ckpt file)                                            |
-| Scripts                    | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/|
+| Scripts                    | https://gitee.com/mindspore/models/|
 
 ### Inference Performance
 
@@ -433,4 +433,4 @@ In var_init.py, we set seed for weight initialization
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

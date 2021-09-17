@@ -216,7 +216,7 @@ python infer.py \
 | 速度                  | 单卡：90毫秒/步                                      |
 | 总时长                | 单卡：297秒                                          |
 | 微调检查点             | 104.66M (.ckpt 文件)                                |
-| 脚本                  | [TB-Net脚本](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/tbnet) |
+| 脚本                  | [TB-Net脚本](https://gitee.com/mindspore/models/tree/master/official/recommend/tbnet) |
 
 ### [评估性能](#目录)
 
@@ -249,4 +249,4 @@ python infer.py \
 
 # [ModelZoo主页](#目录)
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。  
+请浏览官网[主页](https://gitee.com/mindspore/models)。  

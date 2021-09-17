@@ -142,7 +142,7 @@ bash scripts/run_standalone_train.sh hccl_8p_01234567_127.0.0.1.json modelnet40_
 
 Distributed training requires the creation of an HCCL configuration file in JSON format in advance. For specific
 operations, see the instructions
-in [hccl_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools).
+in [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
 After training, the loss value will be achieved as follows:
 
@@ -227,4 +227,4 @@ We use random seed in dataset.py, provider.py and pointnet2_utils.py.
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

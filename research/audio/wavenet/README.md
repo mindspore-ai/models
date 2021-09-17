@@ -265,7 +265,7 @@ python export.py --preset=/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json -
 | Speed                      | 1p 1.467s/step                                   |
 | Total time: training       | 1p(mol/gaussian): around 4 days; 2p(mulaw256):around 1 week                                  |
 | Checkpoint                 | 59.79MM/54.87M/54.83M (.ckpt file)                                              |
-| Scripts                    | [WaveNet script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/audio/wavenet) |
+| Scripts                    | [WaveNet script](https://gitee.com/mindspore/models/tree/master/research/audio/wavenet) |
 
 ### Inference Performance On GPU
 
@@ -273,4 +273,4 @@ Audio samples will be demonstrated online soon.
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ Please check the official [homepage](https://gitee.com/mindspore/models).

@@ -131,7 +131,7 @@ sh run_eval_gpu.sh [IMGS_PATH] [ANNOS_PATH] [CHECKPOINT_PATH] [COCO_TEXT_PARSER_
 ```
 
 > Notes:
-> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
+> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 >
 > This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 >
@@ -358,7 +358,7 @@ class 1 precision is 84.24%, recall is 87.40%, F1 is 85.79%
 | Loss Function              | SoftmaxCrossEntropyWithLogits for classification, SmoothL2Loss for bbox regression                  | SoftmaxCrossEntropyWithLogits for classification, SmoothL2Loss for bbox regression  |
 | Loss                       | ~0.008                                                                                              | ~0.116               |
 | Total time (8p)            | 4h                                                                                                  | 9h                   |
-| Scripts                    | [deeptext script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/deeptext) | [deeptext script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/deeptext)  |
+| Scripts                    | [deeptext script](https://gitee.com/mindspore/models/tree/master/official/cv/deeptext) | [deeptext script](https://gitee.com/mindspore/models/tree/master/official/cv/deeptext)  |
 
 #### Inference Performance
 
@@ -398,4 +398,4 @@ We set seed to 1 in train.py.
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

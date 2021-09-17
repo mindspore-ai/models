@@ -184,7 +184,7 @@ bash scripts/run_standalone_train.sh [resnetv2_50|resnetv2_101|resnetv2_152] [ci
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
 
 ### GPU处理器环境运行
 
@@ -313,7 +313,7 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [DEVICE_ID]
 |速度|24.3毫秒/步（8卡） |
 |总时长   | 10分钟 |
 |  微调检查点 | 188.36M（.ckpt文件） |
-| 脚本  | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/resnetv2) |
+| 脚本  | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/resnetv2) |
 
 #### ImageNet2012上的Resnetv2_50
 
@@ -332,7 +332,7 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [DEVICE_ID]
 | 速度          | 325毫秒/步（8卡）                                            |
 | 总时长        | 20.3小时                                                     |
 | 微调检查点    | 195.9M（.ckpt文件）                                          |
-| 脚本          | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/resnetv2) |
+| 脚本          | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/resnetv2) |
 
 # 随机情况说明
 
@@ -340,4 +340,4 @@ dataset.py中设置了“create_dataset”函数内的种子，同时还使用�
 
 # ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

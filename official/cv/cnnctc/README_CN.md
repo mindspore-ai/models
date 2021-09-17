@@ -250,7 +250,7 @@ bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_CKPT(o
 
 > 注意:
 
-  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools).
+  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
 ### 训练结果
 
@@ -415,7 +415,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [DEVICE_ID]
 | 速度 | 1卡：300毫秒/步；8卡：310毫秒/步 |
 | 总时间 | 1卡：18小时；8卡：2.3小时 |
 | 参数(M) | 177 |
-| 脚本 | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/cnnctc> |
+| 脚本 | <https://gitee.com/mindspore/models/tree/master/official/cv/cnnctc> |
 
 ### 评估性能
 
@@ -520,4 +520,4 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [DEVICE_ID]
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

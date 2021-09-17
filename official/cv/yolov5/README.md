@@ -292,7 +292,7 @@ YOLOv5 on 118K images(The annotation and data format must be the same as coco201
 | Speed                      | 8p about 450 FPS                                             | 8p about 290 FPS                                             |
 | Total time                 | 8p 21h28min                                                  | 8p 35h                                                       |
 | Checkpoint for Fine tuning | 53.62M (.ckpt file)                                          | 58.87M (.ckpt file)                                          |
-| Scripts                    | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/ | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/ |
+| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/cv/yolov5 | https://gitee.com/mindspore/models/tree/master/official/cv/yolov5 |
 
 ### Inference Performance
 
@@ -315,4 +315,4 @@ In dataset.py, we set the seed inside “create_dataset" function. We also use r
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+ Please check the official [homepage](https://gitee.com/mindspore/models).  

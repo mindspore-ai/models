@@ -121,7 +121,7 @@ After installing MindSpore via the official website, you can start training and 
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
 
 - running on GPU
 
@@ -536,7 +536,7 @@ Current batch_ Size can only be set to 1.
 | Parameters (M)             | 13.0                                                        | 13.0                   |
 | Checkpoint for Fine tuning | 43.07M (.ckpt file)                                         | 43.07M (.ckpt file)    |
 | Model for inference        | 21.50M (.onnx file),  21.60M(.air file)                     |      |
-| Scripts                    | [googlenet script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/googlenet) | [googlenet script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/googlenet) |
+| Scripts                    | [googlenet script](https://gitee.com/mindspore/models/tree/master/official/cv/googlenet) | [googlenet script](https://gitee.com/mindspore/models/tree/master/official/cv/googlenet) |
 
 #### GoogleNet on 1200k images
 
@@ -727,4 +727,4 @@ In dataset.py, we set the seed inside “create_dataset" function. We also use r
 
 # [ModelZoo Homepage](#contents)  
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+ Please check the official [homepage](https://gitee.com/mindspore/models).  

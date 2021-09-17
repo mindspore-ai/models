@@ -269,7 +269,7 @@ Test set results: accuracy= 0.81300
 | 损失函数              | Softmax交叉熵                                          |
 | 准确率                   | 81.5/70.3                                                      |
 | 参数(B)             | 92160/59344                                                    |
-| 脚本                    | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/gcn> |
+| 脚本                    | <https://gitee.com/mindspore/models/tree/master/official/gnn/gcn> |
 
 ## 随机情况说明
 
@@ -282,4 +282,4 @@ train.py已经设置了一些种子，避免权重初始化的随机性。若需
 
 ## ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

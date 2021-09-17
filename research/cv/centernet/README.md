@@ -579,7 +579,7 @@ CenterNet on 11.8K images(The annotation and data format must be the same as coc
 | Total time: training       | 1p: 4.38 days; 8p: 13-14 h                                     |
 | Total time: evaluation     | keep res: test 1.7h, val 0.7h; fix res: test 50 min, val 12 min|
 | Checkpoint                 | 242M (.ckpt file)                                              |
-| Scripts                    | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/centernet> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/cv/centernet> |
 
 ### Inference Performance On Ascend
 
@@ -604,4 +604,4 @@ In train.py, we set a random seed to make sure that each node has the same initi
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ Please check the official [homepage](https://gitee.com/mindspore/models).

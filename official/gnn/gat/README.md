@@ -281,7 +281,7 @@ test acc=0.84199995
 | Accuracy                             | 83.0/72.5                                 |
 | Speed                                | 0.195s/epoch                              |
 | Total time                           | 39s                                       |
-| Scripts                              | [GAT Script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/gat)  |
+| Scripts                              | [GAT Script](https://gitee.com/mindspore/models/tree/master/official/gnn/gat)  |
 
 ## [Description of random situation](#contents)
 
@@ -289,4 +289,4 @@ GAT model contains lots of dropout operations, if you want to disable dropout, s
 
 ## [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](http://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](http://gitee.com/mindspore/models).

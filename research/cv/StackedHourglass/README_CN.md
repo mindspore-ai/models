@@ -190,4 +190,4 @@ python export.py --ckpt_file [ckpt 文件路径]
 
 # ModelZoo
 
-请核对官方 [主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请核对官方 [主页](https://gitee.com/mindspore/models)。

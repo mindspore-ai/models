@@ -95,7 +95,7 @@ Fat - DeepFFM consists of three parts. The FFM component is a factorization mach
 
   Please follow the instructions in the link below:
 
-  [hccl tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools).
+  [hccl tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
 # [Script Description](#contents)
 
@@ -277,7 +277,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 1pc: 4 hours;                                               |
 | Parameters (M)             | 560.34                                                        |
 | Checkpoint for Fine tuning | 87.65M (.ckpt file)                                           |
-| Scripts                    | [deepfm script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/recommend/Fat-DeepFFM) |
+| Scripts                    | [deepfm script](https://gitee.com/mindspore/models/tree/master/research/recommend/Fat-DeepFFM) |
 
 ### Inference Performance
 
@@ -299,4 +299,4 @@ We set the random seed before training in train.py.
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+Please check the official [homepage](https://gitee.com/mindspore/models).  

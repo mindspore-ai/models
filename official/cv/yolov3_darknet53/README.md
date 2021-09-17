@@ -509,7 +509,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 8pc: 13 hours                                               | 8pc: 18 hours(shape=416)                                    |
 | Parameters (M)             | 62.1                                                        | 62.1                                                        |
 | Checkpoint for Fine tuning | 474M (.ckpt file)                                           | 474M (.ckpt file)                                           |
-| Scripts                    | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_darknet53 | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_darknet53 |
+| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53 | https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53 |
 
 #### Inference Performance
 
@@ -531,4 +531,4 @@ There are random seeds in distributed_sampler.py, transforms.py, yolo_dataset.py
 
 ## [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ Please check the official [homepage](https://gitee.com/mindspore/models).

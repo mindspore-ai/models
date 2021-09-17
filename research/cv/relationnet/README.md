@@ -192,7 +192,7 @@ The ckpt_file parameter is required,
 | Speed                      | 70 ms/episode                          |
 | Total time                 | 4.5h (8p)               |
 | Checkpoint for Fine tuning | 875k (.ckpt file)                                         |
-| Scripts                    | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/relationnet |
+| Scripts                    | https://gitee.com/mindspore/models/tree/master/research/cv/relationnet |
 
 # [Description of Random Situation](#contents)
 
@@ -201,4 +201,4 @@ In net_train.py, we set the random.choice inside ```train``` function.
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+ Please check the official [homepage](https://gitee.com/mindspore/models).  

@@ -222,7 +222,7 @@ The model checkpoint will be saved into `[ckpt_path_to_save]`.
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
 
 Run `scripts/train_distributed.sh` to train the model distributed. The usage of the script is:
 
@@ -411,4 +411,4 @@ In dataset.py, we set the seed inside “create_dataset" function. We also use r
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

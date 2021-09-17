@@ -427,4 +427,4 @@ You will get the result as following in "./scripts/acc.log" if 'dis_dataset' ran
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

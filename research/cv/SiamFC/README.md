@@ -191,5 +191,5 @@ Check the checkpoint path used for evaluation before running the following comma
 |loss function     |BCEWithLogits   |
 |training speed    | epoch time：285693.557 ms per step time :42.961 ms |
 |total time        |about 5 hours    |
-|Script URL        |<https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/SiamFC>  |
+|Script URL        |<https://gitee.com/mindspore/models/tree/master/research/cv/SiamFC>  |
 |Random number seed         |set_seed = 1234     |

@@ -448,4 +448,4 @@ RetinaFace可以使用ResNet50或MobileNet0.25骨干提取图像特征进行检�
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。  
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。  

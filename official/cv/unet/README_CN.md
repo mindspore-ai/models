@@ -472,7 +472,7 @@ bash scripts/run_distribute_train_gpu.sh [RANKSIZE] [DATASET] [CONFIG_PATH]
 | 总时长 | 1卡：2.67分钟；8卡：1.40分钟 | 1卡：5.64分钟；8卡：3.41分钟 |
 | 参数(M)  | 93M                                                       | 93M                                                    |
 | 微调检查点 | 355.11M (.ckpt文件)                                         | 355.11M (.ckpt文件)                        |
-| 脚本                    | [U-Net脚本](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet) | [U-Net脚本](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet) |
+| 脚本                    | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) |
 
 | 参数 | Ascend | GPU |
 | ----- | ------ | ----- |
@@ -491,7 +491,7 @@ bash scripts/run_distribute_train_gpu.sh [RANKSIZE] [DATASET] [CONFIG_PATH]
 | 总时长 | 1卡: 10.8分钟 | 1卡: 8分钟 |
 | 参数(M)  | 27M | 27M |
 | 微调检查点 | 103.4M(.ckpt文件) | 103.4M(.ckpt文件) |
-| 脚本 | [U-Net脚本](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet) | [U-Net脚本](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet) |
+| 脚本 | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) |
 
 ### 用法
 
@@ -609,4 +609,4 @@ dataset.py中设置了“seet_sed”函数内的种子，同时还使用了train
 
 ## ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。  
+请浏览官网[主页](https://gitee.com/mindspore/models)。  

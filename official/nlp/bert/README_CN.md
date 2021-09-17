@@ -773,11 +773,11 @@ run_pretrain.py中设置了随机种子，确保分布式训练中每个节点�
 
 # ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。
 
 # FAQ
 
-优先参考[ModelZoo FAQ](https://gitee.com/mindspore/mindspore/tree/master/model_zoo#FAQ)来查找一些常见的公共问题。
+优先参考[ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ)来查找一些常见的公共问题。
 
 - **Q: 运行过程中发生持续溢出怎么办？**
 

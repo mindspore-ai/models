@@ -443,4 +443,4 @@ config.py中，默认将hidden_dropout_prob和note_pros_dropout_prob设置为0.1
 
 # ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

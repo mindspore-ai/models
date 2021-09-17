@@ -59,7 +59,7 @@ bash scripts/run_evaluation.sh lambada /your/ckpt /your/data acc
 
 For distributed training, an hccl configuration file with JSON format needs to be created in advance.
 Please follow the instructions in the link below:
-https:gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.
+https:gitee.com/mindspore/models/tree/master/utils/hccl_tools.
 
 # [Script Description](#contents)
 
@@ -85,4 +85,4 @@ https:gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

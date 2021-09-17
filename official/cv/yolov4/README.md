@@ -598,7 +598,7 @@ YOLOv4 on 118K images(The annotation and data format must be the same as coco201
 | Speed                      | 1p 53FPS 8p 390FPS(shape=416) 220FPS(dynamic shape)         |
 | Total time                 | 48h(dynamic shape)                                          |
 | Checkpoint for Fine tuning | about 500M (.ckpt file)                                     |
-| Scripts                    | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/master/official/cv/yolov4> |
 
 ### Inference Performance
 
@@ -622,4 +622,4 @@ In var_init.py, we set seed for weight initialization
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ Please check the official [homepage](https://gitee.com/mindspore/models).

@@ -108,7 +108,7 @@ Vit是基于多个transformer encoder模块串联起来，由多个inception模�
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
 
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
 
@@ -529,4 +529,4 @@ python export.py --config_path=[CONFIG_PATH]
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

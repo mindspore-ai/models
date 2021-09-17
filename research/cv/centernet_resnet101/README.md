@@ -564,7 +564,7 @@ CenterNet on 11.8K images(The annotation and data format must be the same as coc
 | Total time: training       | 8p: 23 h                                     |
 | Total time: evaluation     | keep res: test 1h, val 0.7h; fix res: test 40min, val 8min|
 | Checkpoint                 | 591.70MB (.ckpt file)                                              |
-| Scripts                    | [centernet_resnet101 script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/centernet_resnet101) |
+| Scripts                    | [centernet_resnet101 script](https://gitee.com/mindspore/models/tree/master/research/cv/centernet_resnet101) |
 
 ### Inference Performance On Ascend 910
 
@@ -601,10 +601,10 @@ In train.py, we set a random seed to make sure that each node has the same initi
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ Please check the official [homepage](https://gitee.com/mindspore/models).
 
 # FAQ
 
-First refer to [ModelZoo FAQ](https://gitee.com/mindspore/mindspore/tree/master/model_zoo#FAQ) to find some common public questions.
+First refer to [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) to find some common public questions.
 
 - **Q: What to do if memory overflow occurs when using PYNATIVE_MODE？** **A**:Memory overflow is usually because PYNATIVE_MODE requires more memory. Setting the batch size to 31 reduces memory consumption and can be used for network training.

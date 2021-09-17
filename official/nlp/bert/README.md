@@ -195,7 +195,7 @@ For distributed training on single machine, [here](https://gitee.com/mindspore/m
 For distributed training among multiple machines, training command should be executed on each machine in a small time interval. Thus, an hccl.json is needed on each machine. [here](https://gitee.com/mindspore/mindspore/tree/master/config/hccl_multi_machine_multi_rank.json) is an example of hccl.json for multi-machine case.
 
 Please follow the instructions in the link below to create an hccl.json file in need:
-[https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools).
+[https://gitee.com/mindspore/models/tree/master/utils/hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
 For dataset, if you want to set the format and parameters, a schema configuration file with JSON format needs to be created, please refer to [tfrecord](https://www.mindspore.cn/docs/programming_guide/en/master/dataset_loading.html#tfrecord) format.
 
@@ -765,7 +765,7 @@ python run_eval_onnx.py --config_path [../../task_classifier_config.yaml] --eval
 | Total time                 | 63H                                                        | 610H                      |
 | Params (M)                 | 110M                                                       | 110M                      |
 | Checkpoint for Fine tuning | 1.2G(.ckpt file)                                           | 1.2G(.ckpt file)          |
-| Scripts                    | [BERT_base](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/bert)  | [BERT_base](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/bert)     |
+| Scripts                    | [BERT_base](https://gitee.com/mindspore/models/tree/master/official/nlp/bert)  | [BERT_base](https://gitee.com/mindspore/models/tree/master/official/nlp/bert)     |
 
 | Parameters                 | Ascend                                                     |
 | -------------------------- | ---------------------------------------------------------- |
@@ -785,7 +785,7 @@ python run_eval_onnx.py --config_path [../../task_classifier_config.yaml] --eval
 | Total time                 | 180h                                                       |
 | Params (M)                 | 340M                                                       |
 | Checkpoint for Fine tuning | 3.2G(.ckpt file)                                           |
-| Scripts                    | [BERT_NEZHA](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/bert)  |
+| Scripts                    | [BERT_NEZHA](https://gitee.com/mindspore/models/tree/master/official/nlp/bert)  |
 
 #### Inference Performance
 
@@ -814,11 +814,11 @@ In run_pretrain.py, we set a random seed to make sure that each node has the sam
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).
 
 # FAQ
 
-Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/mindspore/tree/master/model_zoo#FAQ) for some common question.
+Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some common question.
 
 - **Q: How to resolve the continually overflow?**
 

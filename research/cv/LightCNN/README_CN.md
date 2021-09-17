@@ -106,7 +106,7 @@ LightCNN适用于有大量噪声的人脸识别数据集，提出了maxout 的�
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 - 生成config json文件用于8卡训练。
-    - [简易教程](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)
+    - [简易教程](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
     - 详细配置方法请参照[官网教程](https://www.mindspore.cn/tutorials/zh-CN/master/intermediate/distributed_training/distributed_training_ascend.html#id3)。
 
 # 快速入门
@@ -428,11 +428,11 @@ python3 eval_blfur.py \
 | 输出 | 概率 |
 | 损失 | 0.10905003 |
 | 性能 | 369,144,120.56 ms（单卡）<br>  85,369,778.48 ms（八卡） |  
-| 脚本 | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/LightCNN) |
+| 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/LightCNN) |
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。
 
 [1]: https://arxiv.org/pdf/1511.02683
 [2]: http://pan.baidu.com/s/1gfxB0iB

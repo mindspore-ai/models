@@ -190,7 +190,7 @@ WideResNet的总体网络架构如下：[链接](https://arxiv.org/abs/1605.0714
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
 
 训练结果保存在示例路径中，文件夹名称以“train”或“train_parallel”开头。您可在此路径下的日志中找到检查点文件以及结果，如下所示。
 
@@ -313,7 +313,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 |总时长   |  70分钟 |
 |参数(M)   | 52.1 |
 |  微调检查点 | 426.49M（.ckpt文件）  |
-| 脚本  | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/wideresnet)  |
+| 脚本  | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/wideresnet)  |
 
 # 随机情况说明
 
@@ -321,10 +321,10 @@ dataset.py中设置了“create_dataset”函数内的种子，同时还使用�
 
 # ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。
 
 # FAQ
 
-优先参考[ModelZoo FAQ](https://gitee.com/mindspore/mindspore/tree/master/model_zoo#FAQ)来查找一些常见的公共问题。
+优先参考[ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ)来查找一些常见的公共问题。
 
 - **Q: 使用PYNATIVE_MODE发生内存溢出怎么办？** **A**：内存溢出通常是因为PYNATIVE_MODE需要更多的内存， 将batch size设置为16降低内存消耗，可进行网络训练。

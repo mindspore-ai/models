@@ -186,7 +186,7 @@ bash run_distribute_train.sh DEVICE_ID EPOCH_SIZE LR DATASET PRE_TRAINED(optiona
 
 > 注意:
 
-  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools).
+  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
 #### 运行
 
@@ -376,7 +376,7 @@ mAP: 0.36858371862143824
 | 最终损失                    | 0.43                               |
 | 精确度 (8p)                 | mAP[0.3710]            |
 | 训练总时间 (8p)             | 34h50m20s                        |
-| 脚本                       | [Retianet script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/retinanet_resnet101) |
+| 脚本                       | [Retianet script](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet101) |
 
 #### 推理性能
 
@@ -397,10 +397,10 @@ mAP: 0.36858371862143824
 
 # [ModelZoo 主页](#内容)
 
-请核对官方 [主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+请核对官方 [主页](https://gitee.com/mindspore/models).
 
 # FAQ
 
-优先参考[ModelZoo FAQ](https://gitee.com/mindspore/mindspore/tree/master/model_zoo#FAQ)来查找一些常见的公共问题。
+优先参考[ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ)来查找一些常见的公共问题。
 
 - **Q: 使用PYNATIVE_MODE发生内存溢出怎么办？** **A**：内存溢出通常是因为PYNATIVE_MODE需要更多的内存， 将batch size设置为16降低内存消耗，可进行网络训练。

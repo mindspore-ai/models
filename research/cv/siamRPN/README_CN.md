@@ -161,7 +161,7 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
 
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
 
@@ -239,4 +239,4 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 
 # ModelZoo主页  
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

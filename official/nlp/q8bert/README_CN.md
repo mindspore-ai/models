@@ -214,4 +214,4 @@ config.py文件中设置hidden_dropout_prob和attention_pros_dropout_prob参数�
 
 # ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

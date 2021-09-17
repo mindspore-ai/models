@@ -179,4 +179,4 @@ We use random in equation.py，which can be set seed to fixed randomness.
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https:#gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+ Please check the official [homepage](https:#gitee.com/mindspore/models).  

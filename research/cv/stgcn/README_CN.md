@@ -134,7 +134,7 @@ BJER4
   bash scripts/run_distribute_train.sh train_code_path data_path n_pred graph_conv_type
   ```
 
-  8P训练时需要将RANK_TABLE_FILE放在scripts文件夹中，RANK_TABLE_FILE[生成方法](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)
+  8P训练时需要将RANK_TABLE_FILE放在scripts文件夹中，RANK_TABLE_FILE[生成方法](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
 
   训练时，训练过程中的epch和step以及此时的loss和精确度会呈现在终端上：
 
@@ -252,4 +252,4 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TAR
 
 # [ModelZoo 主页](#contents)
 
- 请查看官方网站 [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ 请查看官方网站 [homepage](https://gitee.com/mindspore/models).

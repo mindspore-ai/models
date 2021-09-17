@@ -75,7 +75,7 @@ bash wmt14_en_fr.sh
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
 
 # 脚本说明
 
@@ -251,4 +251,4 @@ bash wmt14_en_fr.sh
 
 # ModelZoo主页  
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

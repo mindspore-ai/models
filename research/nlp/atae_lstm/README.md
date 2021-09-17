@@ -229,4 +229,4 @@ python export.py --existed_ckpt="./train/atae_lstm_max.ckpt"
 
 # ModelZoo主页  
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

@@ -292,4 +292,4 @@ bash run_infer_310.sh [The path of the MINDIR for 310 infer] [The path of the da
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

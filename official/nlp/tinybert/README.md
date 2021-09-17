@@ -98,7 +98,7 @@ The backbone structure of TinyBERT is transformer, the transformer contains four
 
     For distributed training on Ascend, a hccl configuration file with JSON format needs to be created in advance.
     Please follow the instructions in the link below:
-    https:gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.
+    https:gitee.com/mindspore/models/tree/master/utils/hccl_tools.
 
     For dataset, if you want to set the format and parameters, a schema configuration file with JSON format needs to be created, please refer to [tfrecord](https://www.mindspore.cn/docs/programming_guide/en/master/dataset_loading.html#tfrecord) format.
 
@@ -569,7 +569,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 17.3h(3poch, 8p)                                           | 48h(3poch, 8p)            |
 | Params (M)                 | 15M                                                        | 15M                       |
 | Checkpoint for task distill| 74M(.ckpt file)                                            | 74M(.ckpt file)           |
-| Scripts                    | [TinyBERT](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/tinybert) |          |
+| Scripts                    | [TinyBERT](https://gitee.com/mindspore/models/tree/master/official/nlp/tinybert) |          |
 
 #### Inference Performance
 
@@ -596,4 +596,4 @@ In run_general_distill.py, we set the random seed to make sure distribute traini
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

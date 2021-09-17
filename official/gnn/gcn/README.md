@@ -267,7 +267,7 @@ Test set results: accuracy= 0.81300
 | Loss Function              | Softmax Cross Entropy                                          |
 | Accuracy                   | 81.5/70.3                                                      |
 | Parameters (B)             | 92160/59344                                                    |
-| Scripts                    | [GCN Script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/gcn) |
+| Scripts                    | [GCN Script](https://gitee.com/mindspore/models/tree/master/official/gnn/gcn) |
 
 ## [Description of Random Situation](#contents)
 
@@ -280,4 +280,4 @@ Some seeds have already been set in train.py to avoid the randomness of weight i
 
 ## [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).
