@@ -39,7 +39,7 @@ Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>)
     - Note：Data will be processed in dataset.py
 - Download the dataset, the directory structure is as follows:
 
-```cifar10
+```bash
 ├─cifar-10-batches-bin
 │
 └─cifar-10-verify-bin
@@ -47,8 +47,8 @@ Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>)
 
 ## [Environment Requirements](#contents)
 
-- Hardware（Ascend）
-    - Prepare hardware environment with Ascend processor.
+- Hardware（Ascend/GPU）
+    - Prepare hardware environment with Ascend or GPU processor.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
@@ -59,17 +59,26 @@ Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>)
 
 After installing MindSpore via the official website, you can start training and evaluation as follows:
 
-```python
+- running on Ascend
+
+```bash
 # enter script dir, train SimCLR
 bash run_standalone_train_ascend.sh [cifar10] [TRAIN_DATASET_PATH] [DEVICE_ID]
-# example: bash run_standalone_train_ascend cifar10 /home/DataSet/cifar10/cifar-10-batches-bin/ 0
 or
-bash run_distribution_ascend.sh [DEVICENUM] [RANK_TABLE_FILE] [cifar10] [TRAIN_DATASET_PATH]
-# example: bash run_distribution_ascend.sh 8 ~/hccl_8p.json cifar10 /home/DataSet/cifar10/cifar-10-batches-bin/
-
+bash run_distribution_train_ascend.sh [DEVICENUM] [RANK_TABLE_FILE] [cifar10] [TRAIN_DATASET_PATH]
 # enter script dir, evaluate SimCLR
 bash run_standalone_eval_ascend.sh [cifar10] [DEVICE_ID] [SIMCLR_MODEL_PATH] [TRAIN_DATASET_PATH] [EVAL_DATASET_PATH]
-# example: run_standalone_eval_ascend.sh cifar10 0 /home/model/simclr/ckpt/checkpoint-simclr-100_390.ckpt /home/DataSet/cifar10/cifar-10-batches-bin/ /home/DataSet/cifar10/cifar-10-verify-bin/
+```
+
+- running on GPU
+
+```bash
+# enter script dir, train SimCLR
+bash run_standalone_train_gpu.sh [cifar10] [TRAIN_DATASET_PATH] [DEVICE_ID]
+or
+bash run_distribution_train_gpu.sh [cifar10] [DEVICE_NUM] [TRAIN_DATASET_PATH]
+# enter script dir, evaluate SimCLR
+bash run_standalone_eval_gpu.sh [cifar10] [DEVICE_ID] [SIMCLR_MODEL_PATH] [TRAIN_DATASET_PATH] [EVAL_DATASET_PATH]
 ```
 
 ## [Script Description](#contents)
@@ -78,30 +87,37 @@ bash run_standalone_eval_ascend.sh [cifar10] [DEVICE_ID] [SIMCLR_MODEL_PATH] [TR
 
 ```bash
 ├── cv
-    ├── SimCLR
-        ├── README.md                    // descriptions about SimCLR
-        ├── requirements.txt             // package needed
+    ├── simclr
+        ├── README.md                                   # descriptions about SimCLR
+        ├── requirements.txt                            # package needed
+        ├── ascend310_infer                             # application for 310 inference
         ├── scripts
-        │   ├──run_distribution_train_ascend.sh         // train in ascend
-        │   ├──run_standalone_train_ascend.sh          // train in ascend
-        │   ├──run_standalone_eval_ascend.sh          //  evaluate in ascend
+        │   ├──run_distribution_train_ascend.sh         # launch distributed training for ascend
+        │   ├──run_distribution_train_gpu.sh            # launch distributed training for gpu
+        │   ├──run_standalone_train_ascend.sh           # launch standalone training for ascend
+        │   ├──run_standalone_train_gpu.sh              # launch standalone training for gpu
+        │   ├──run_standalone_eval_ascend.sh            # evaluate in ascend
+        │   ├──run_standalone_eval_gpu.sh               # evaluate in gpu
+        │   ├──run_standalone_eval_cpu.sh               # evaluate in cpu
         ├── src
-        │   ├──dataset.py             // creating dataset
-        │   ├──lr_generator.py             // generating learning rate
-        │   ├──nt_xent.py             // contrastive cross entropy loss
-        │   ├──optimizer.py             // generating optimizer
-        │   ├──resnet.py             // base encoder network
-        │   ├──simclr_model.py              // simclr architecture
-        ├── train.py               // training script
-        ├── linear_eval.py               //  linear evaluation script
-        ├── export.py             // export model for inference
+        │   ├──dataset.py                               # creating dataset
+        │   ├──lr_generator.py                          # generating learning rate
+        │   ├──nt_xent.py                               # contrastive cross entropy loss
+        │   ├──optimizer.py                             # generating optimizer
+        │   ├──resnet.py                                # base encoder network
+        │   ├──simclr_model.py                          # simclr architecture
+        ├── train.py                                    # training script
+        ├── linear_eval.py                              # linear evaluation script
+        ├── export.py                                   # export model for inference
+        ├── postprocess.py                              # postprocess script
+        ├── preprocess.py                               # preprocess script
 ```
 
 ### [Script Parameters](#contents)
 
 ```python
-Major parameters in train.py as follows:
---device_target: Device target, Currently only Ascend is supported.
+Important parameters in train.py are as follows:
+--device_target: GPU/Ascend.
 --run_cloudbrain: Whether it is running on CloudBrain platform.
 --run_distribute: Run distributed training.
 --device_num: Device num.
@@ -124,8 +140,8 @@ save_checkpoint_epochs: Save checkpoint epochs, default is 1.
 --weight_decay: Weight decay.
 --warmup_epochs: Warmup epochs.
 
-Major parameters in linear_eval.py as follows:
---device_target: Device target, Currently only Ascend is supported.
+Important parameters in linear_eval.py are as follows:
+--device_target: GPU/Ascend/CPU.
 --run_cloudbrain: Whether it is running on CloudBrain platform.
 --run_distribute: Run distributed training.
 --device_num: Device num.
@@ -155,13 +171,12 @@ Major parameters in linear_eval.py as follows:
 - running on Ascend
 
   ```bash
-  bash run_distribution_ascend.sh [DEVICENUM] [RANK_TABLE_FILE] [cifar10] [TRAIN_DATASET_PATH]
-  # example: bash run_distribution_ascend.sh 8 ~/hccl_8p.json cifar10 /home/DataSet/cifar10/cifar-10-batches-bin/
+  bash run_distribution_train_ascend.sh [DEVICENUM] [RANK_TABLE_FILE] [cifar10] [TRAIN_DATASET_PATH]
   ```
 
   After training, the loss value will be achieved as follows:
 
-  ```log
+  ```bash
   # grep "loss is " log
   epoch: 1 step: 48, loss is 9.5758915
   epoch time: 253236.075 ms, per step time: 5275.752 ms
@@ -191,12 +206,11 @@ Before running the command below, please check the checkpoint path used for eval
 
   ```bash
   bash run_standalone_eval_ascend.sh [cifar10] [DEVICE_ID] [SIMCLR_MODEL_PATH] [TRAIN_DATASET_PATH] [EVAL_DATASET_PATH]
-  # example: run_standalone_eval_ascend.sh cifar10 0 /home/model/simclr/ckpt/checkpoint-simclr-100_390.ckpt /home/DataSet/cifar10/cifar-10-batches-bin/ /home/DataSet/cifar10/cifar-10-verify-bin/
   ```
 
   You can view the results through the file "eval_log". The accuracy of the test dataset will be as follows:
 
-  ```log
+  ```bash
   # grep "Average accuracy: " eval_log
   'Accuracy': 0.84505
   ```
@@ -238,7 +252,7 @@ Inference result is saved in current path, you can find result in acc.log file.
 | Parameters                 | Ascend                                                      |
 | -------------------------- | ------------------------------------------------------------|
 | Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G             |
-| uploaded Date              | 30/03/2021 (month/day/year)                                 |
+| uploaded Date              | 03/30/2021 (month/day/year)                                 |
 | MindSpore Version          | 1.1.1                                                       |
 | Dataset                    | CIFAR-10                                                    |
 | Training Parameters        | epoch=100, batch_size=128, device_num=8                     |
