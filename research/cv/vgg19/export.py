@@ -34,7 +34,7 @@ def modelarts_pre_process():
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_export():
-    """export model in mindir/air/onnx"""
+    '''run_export function.'''
     config.image_size = list(map(int, config.image_size.split(',')))
 
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)

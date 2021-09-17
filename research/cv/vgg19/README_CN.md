@@ -272,16 +272,25 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=
     ├── vgg19
         ├── README.md                             // VGG 相关说明
         ├── README_CN.md                          // VGG 相关中文说明
+        ├── ascend310_infer
+        ├── ├── CMakeLists.txt                    // CMake文件
+        ├── ├── build.sh                          // build脚本文件
+        ├── ├── inc
+        ├── ├── ├── utils.h                       // utils类头文件
+        ├── ├── src
+        ├── ├── ├── main.cc                       // 主文件
+        ├── ├── ├── utils.cc                      // utils类实现
         ├── model_utils
-            ├── __init__.py                 // 初始化文件
-            ├── config.py                   // 参数配置
-            ├── device_adapter.py           // ModelArts的设备适配器
-            ├── local_adapter.py            // 本地适配器
-            └── moxing_adapter.py           // ModelArts的模型适配器
+        ├── ├── __init__.py                 // 初始化文件
+        ├── ├── config.py                   // 参数配置
+        ├── ├── device_adapter.py           // ModelArts的设备适配器
+        ├── ├── local_adapter.py            // 本地适配器
+        ├── └── moxing_adapter.py           // ModelArts的模型适配器
         ├── scripts
         │   ├── run_distribute_train.sh           // Ascend 分布式训练shell脚本
         │   ├── run_distribute_train_gpu.sh       // GPU 分布式训练shell脚本
         │   ├── run_eval.sh                       // Ascend 验证shell脚本
+        │   ├── run_infer_310.sh                  // Ascend 310推理脚本
         ├── src
         │   ├── utils
         │   │   ├── logging.py                    // 日志格式设置
@@ -463,7 +472,7 @@ python train.py --config_path=/dir_to_code/imagenet2012_config.yaml --device_tar
 
 ```bash
 # 分布式训练（8p）
-bash scripts/run_distribute_train_gpu.sh /path/ImageNet2012/train"
+bash scripts/run_distribute_train_gpu.sh /path/ImageNet2012/train
 ```
 
 ### 评估过程
@@ -517,7 +526,8 @@ python export.py --config_path [YMAL_CONFIG_PATH] --ckpt_file [CKPT_PATH] --file
 推理结果保存在脚本执行的当前路径，你可以在acc.log中看到以下精度计算结果。
 
 ```bash
-'acc': 0.92
+'top1 acc': 0.748
+'top5 acc': 0.922
 ```
 
 ## 模型描述
@@ -562,4 +572,4 @@ dataset.py中设置了“create_dataset”函数内的种子，同时还使用�
 
 ## ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。  
+请浏览官网[主页](https://gitee.com/mindspore/models/tree/master/)。  
