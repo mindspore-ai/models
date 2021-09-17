@@ -16,6 +16,7 @@
     - [训练脚本用法](#训练脚本用法)
     - [评估脚本用法](#评估脚本用法)
     - [导出脚本用法](#导出脚本用法)
+    - [推理脚本用法](#推理脚本用法)
 - [模型描述](#模型描述)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#ModelZoo主页)
@@ -111,6 +112,7 @@ cifar-10-batches-bin
 ├── run_distribute_train.sh         # Ascend处理器环境多卡训练脚本
 ├── run_eval.sh                     # Ascend处理器环境评估脚本
 ├── run_standalone_train.sh         # Ascend处理器环境单卡训练脚本
+├── run_infer_310.sh                # Ascend 310 推理脚本
 ├── src
 │   ├── config.py                   # 模型训练/测试配置文件
 │   ├── dataset
@@ -337,6 +339,28 @@ optional arguments:
                         Export format.
   --device_target {Ascend,GPU,CPU}
                         Device target.
+```
+
+### 推理脚本用法
+
+将Ascend 910导出好的MINDIR模型传至Ascend 310服务器，运行run_infer_310脚本：
+
+```bash
+#Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` mindir文件路径
+- `DATASET_PATH` 推理数据集路径
+- `NEED_PREPROCESS` 表示数据集是否需要预处理，可在`y`或者`n`中选择，如果选择`y`，cifar10数据集将被处理为bin格式。
+- `DEVICE_ID` 可选，默认值为0。
+
+### 结果
+
+推理结果保存在脚本执行的当前路径，你可以在acc.log中看到以下精度计算结果。
+
+```bash
+'acc': 0.976
 ```
 
 ## 模型描述
