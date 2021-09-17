@@ -115,7 +115,7 @@ def run_train(args_opt):
                               load_ckpt_path=args_opt.load_ckpt_path,
                               param_init_type=mstype.float32 if args_opt.param_init_type == 'fp32' else mstype.float16,
                               enable_offload=bool(args_opt.opt_offload),
-                              hidden_act='fast_gelu' if args_opt.device_taget != "GPU" else 'gelu',
+                              hidden_act='fast_gelu' if args_opt.device_target != "GPU" else 'gelu',
                               parallel_config=parallel_config)
     print("===config is: ", config, flush=True)
     # Define network
