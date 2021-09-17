@@ -37,8 +37,12 @@ def get_pred(file, result_path):
 
 def get_gt_bboxes_labels(label_file, img_file):
     img_data = np.array(Image.open(img_file))
-    img_data, w_scale, h_scale = cv2.resize(
+    img_data = cv2.resize(
         img_data, (config.img_width, config.img_height), interpolation=cv2.INTER_LINEAR)
+    h, w = img_data.shape[:2]
+    h_scale = config.img_height / h
+    w_scale = config.img_width / w
+
     scale_factor = np.array(
         [w_scale, h_scale, w_scale, h_scale], dtype=np.float32)
     img_shape = (config.img_height, config.img_width, 1.0)
