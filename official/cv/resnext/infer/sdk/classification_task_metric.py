@@ -67,13 +67,10 @@ def load_statistical_predict_result(filepath):
         temp = f.readline().strip().split(" ")
         n_label = len(temp)
         data_vec = np.zeros((len(temp)), dtype=np.float32)
-        if n_label == 0:
-            in_type = f.readline()
-            color = f.readline()
-        else:
+        if n_label != 0:
             for ind, cls_ind in enumerate(temp):
                 data_vec[ind] = np.int(cls_ind)
-    return data_vec, n_label, in_type, color
+    return data_vec, n_label
 
 
 def create_visualization_statistical_result(prediction_file_path,
