@@ -31,6 +31,7 @@ avg_core_per_rank=`expr $cores \/ $RANK_SIZE`
 core_gap=`expr $avg_core_per_rank \- 1`
 echo "avg_core_per_rank" $avg_core_per_rank
 echo "core_gap" $core_gap
+mkdir -p output_8p
 for((i=0;i<RANK_SIZE;i++))
 do
     start=`expr $i \* $avg_core_per_rank`
@@ -41,20 +42,20 @@ do
     end=`expr $start \+ $core_gap`
     cmdopt=$start"-"$end
 
-    rm -rf LOG$i
-    mkdir ./LOG$i
-    cp  *.py ./LOG$i
-    cp  *.yaml ./LOG$i
-    cp -r ./src ./LOG$i
-    cd ./LOG$i || exit
+    rm -rf output_8p/LOG$i
+    mkdir ./output_8p/LOG$i
+    cp  *.py ./output_8p/LOG$i
+    cp  *.yaml ./output_8p/LOG$i
+    cp -r ./src ./output_8p/LOG$i
+    cd ./output_8p/LOG$i || exit
     echo "start training for rank $i, device $DEVICE_ID"
 
     env > env.log
-    taskset -c $cmdopt python ../train.py  \
+    taskset -c $cmdopt python ../../train.py  \
     --run_distribute=1 \
     --device_id=$DEVICE_ID \
     --checkpoint_file_path=$PATH_CHECKPOINT \
     --data_path=$DATA_DIR \
     --output_path './output' > log.txt 2>&1 &
-    cd ../
+    cd ../../
 done
