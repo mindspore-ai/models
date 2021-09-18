@@ -26,16 +26,6 @@ from sklearn.metrics import roc_curve
 from src.lightcnn import lightCNN_9Layers4Test
 from src.config import lightcnn_cfg as cfg
 
-parser = argparse.ArgumentParser(description='PyTorch ImageNet Feature Extracting')
-parser.add_argument('--device_target', default='Ascend', choices=['Ascend', 'GPU', 'CPU'], type=str)
-parser.add_argument('--device_id', default=0, type=int)
-parser.add_argument('--resume', default='',
-                    type=str, metavar='PATH', help='path to latest checkpoint (default: none)')
-parser.add_argument('--num_classes', default=79077, type=int,  # !!!
-                    metavar='N', help='number of classes (default: 79077)')
-
-args = parser.parse_args()
-
 
 def extract_feature(img_list):
     """extra features"""
@@ -166,6 +156,15 @@ def lfw_eval(lightcnn_result, lfw_pairs_mat_path):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='PyTorch ImageNet Feature Extracting')
+    parser.add_argument('--device_target', default='Ascend', choices=['Ascend', 'GPU', 'CPU'], type=str)
+    parser.add_argument('--device_id', default=0, type=int)
+    parser.add_argument('--resume', default='',
+                        type=str, metavar='PATH', help='path to latest checkpoint (default: none)')
+    parser.add_argument('--num_classes', default=79077, type=int,  # !!!
+                        metavar='N', help='number of classes (default: 79077)')
+    args = parser.parse_args()
+
     device_id = int(os.getenv('DEVICE_ID'))
     context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=device_id)
     dic = extract_features_to_dict(image_dir=cfg.root_path, list_file=cfg.lfw_img_list)

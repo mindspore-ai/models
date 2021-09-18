@@ -26,16 +26,6 @@ from mindspore.common import dtype as mstype
 from src.lightcnn import lightCNN_9Layers4Test
 from src.config import lightcnn_cfg as cfg
 
-parser = argparse.ArgumentParser(description='PyTorch ImageNet Feature Extracting')
-parser.add_argument('--device_target', default='Ascend', choices=['Ascend', 'GPU', 'CPU'], type=str)
-parser.add_argument('--device_id', default=0, type=int)
-parser.add_argument('--resume', default='',
-                    type=str, metavar='PATH', help='path to latest checkpoint (default: none)')
-parser.add_argument('--num_classes', default=79077, type=int,
-                    metavar='N', help='number of classes (default: 79077)')
-
-args = parser.parse_args()
-
 
 def extract_feature(img_list):
     """extract features from model's predictions"""
@@ -402,6 +392,15 @@ def blufr_eval(lightcnn_result, config_file_path):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='PyTorch ImageNet Feature Extracting')
+    parser.add_argument('--device_target', default='Ascend', choices=['Ascend', 'GPU', 'CPU'], type=str)
+    parser.add_argument('--device_id', default=0, type=int)
+    parser.add_argument('--resume', default='',
+                        type=str, metavar='PATH', help='path to latest checkpoint (default: none)')
+    parser.add_argument('--num_classes', default=79077, type=int,
+                        metavar='N', help='number of classes (default: 79077)')
+    args = parser.parse_args()
+
     device_id = int(os.getenv('DEVICE_ID'))
     context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=device_id)
     feature_dict = extract_features_to_dic(image_dir=cfg.root_path, list_file=cfg.blufr_img_list)

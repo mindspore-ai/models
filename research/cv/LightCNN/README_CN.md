@@ -198,13 +198,16 @@ sh scripts/eval_blufr.sh DEVICE_ID CKPT_FILE
 
 ```shell
 .
+├── README_CN.md
+├── ascend310_infer
 ├── mat_files
-│   ├── blufr_lfw_config.mat                        # lfw 6,000 pairs测试配置文件
-│   └── lfw_pairs.mat                               # lfw BLUFR protocols测试配置文件
+│   ├── blufr_lfw_config.mat                        # lfw BLUFR protocols测试配置文件
+│   └── lfw_pairs.mat                               # lfw 6,000 pairs测试配置文件
 ├── scripts
 │   ├── eval_blufr.sh                               # lfw BLUFR protocols测试脚本
 │   ├── eval_lfw.sh                                 # lfw 6,000 pairs测试脚本
 │   ├── convert.sh                                  # 训练数据集格式转换脚本
+│   ├── run_infer_310.sh                            # 启动Ascend 310 推理shell脚本
 │   ├── train_distribute_8p.sh                      # 8卡并行训练脚本
 │   ├── train_distribute.sh                         # 多卡（2卡/4卡）并行训练脚本
 │   └── train_standalone.sh                         # 单卡训练脚本
@@ -218,8 +221,10 @@ sh scripts/eval_blufr.sh DEVICE_ID CKPT_FILE
 │
 ├── eval_blufr.py                                   # lfw BLUFR protocols测试脚本
 ├── eval_lfw.py                                     # lfw 6,000 pairs测试脚本
-├── train.py                                        # 训练脚本
-└── README.md
+├── export.py                                       # 模型转换脚本
+├── postprocess.py                                  # 310推理后处理及测试脚本
+├── preprocess.py                                   # 310推理数据预处理脚本
+└── train.py                                        # 训练脚本
 ```
 
 注：`mat_files`文件夹中的两个mat文件需要用户自行下载。`blufr_lfw_config.mat`是由[Benchmark of Large-scale Unconstrained Face Recognition][7]下载，解压后文件位置在`/BLUFR/config/lfw/blufr_lfw_config.mat`；`lfw_pairs.mat`由原作者官方代码提供，可[点此][8]跳转下载。
@@ -402,12 +407,51 @@ python3 eval_blfur.py \
 | LightCNN-9(MindSpore版本)| 98.57%| 98.47%  | 95.5% | 89.87% |
 | LightCNN-9(PyTorch版本)| 98.53%| 98.47%  | 94.67% | 77.13% |
 
-- 在lfw BLUFR protoclos上的评估结果
+- 在lfw BLUFR protocols上的评估结果
 
 | **网络** | VR@FAR=0.1% | DIR@RAR=1% |
 | :----------: | :-----: | :----: |
 | LightCNN-9(MindSpore版本) | 96.26% | 81.66%|
 | LightCNN-9(PyTorch版本) | 95.56% | 79.77%|
+
+# 推理过程
+
+## 导出MINDIR
+
+修改`export`文件中的`ckpt_file`并运行。
+
+```bash
+python export.py --ckpt_file [CKPT_PATH] --file_format MINDIR
+```
+
+## 在Ascend310执行推理
+
+在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` mindir文件路径
+- `DATASET_PATH` LFW数据集路径
+- `DEVICE_ID` 可选，默认值为0。
+
+## 结果
+
+推理结果保存在脚本执行的当前路径，你可以在acc.log中查看lfw 6,000 pairs以及lfw BLUFR protocols上的评估结果。
+
+- 在lfw 6,000 pairs上的评估结果
+
+| **网络** | 100% - EER | TPR@RAR=1% | TPR@FAR=0.1% | TPR@FAR|
+| :----------: | :-----: | :----: | :----: | :-----:|
+| LightCNN-9(Ascend310)| 98.6%| 98.43%  | 94.73% | 86.57% |
+
+- 在lfw BLUFR protocols上的评估结果
+
+| **网络** | VR@FAR=0.1% | DIR@RAR=1% |
+| :----------: | :-----: | :----: |
+| LightCNN-9(Ascend310) | 95.61% | 80.47%|
 
 # 模型描述
 
