@@ -80,7 +80,7 @@ echo "start training on $RANK_SIZE devices"
 mkdir ${current_exec_path}/train_distribute_gpu
 cd ${current_exec_path}/train_distribute_gpu || exit
 
-mpirun -n $1 \
+mpirun --allow-run-as-root -n $1 \
     python ${dirname_path}/${SCRIPT_NAME} \
     --lr=4e-3 \
     --per_batch_size=8 \
