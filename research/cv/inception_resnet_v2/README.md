@@ -32,7 +32,7 @@ The overall network architecture of Inception_ResNet_v2 is show below:
 
 # [Dataset](#contents)
 
-Dataset used can refer to paper.
+The dataset used is [ImageNet](https://image-net.org/download.php).
 
 - Dataset size: 125G, 1250k colorful images in 1000 classes
     - Train: 120G, 1200k images
@@ -93,6 +93,7 @@ Major parameters in train.py and config.py are:
 'smooth_factor'              # label smoothing factor
 'weight_decay'               # weight decay
 'momentum'                   # momentum
+'optim'                      # optimizer, Supports [momentum, rmsprop]
 'amp_level'                  # precision training, Supports [O0, O2, O3]
 'decay'                      # decay used in optimize function
 'epsilon'                    # epsilon used in iptimize function
@@ -132,9 +133,19 @@ bash scripts/run_standalone_train_ascend.sh DEVICE_ID DATA_DIR
   shell:
       Ascend:
       # distribute training example(8p)
-      bash scripts/run_distribute_train_ascend.sh RANK_TABLE_FILE DATA_PATH DATA_DIR
+      bash scripts/run_distribute_train_ascend.sh RANK_TABLE_FILE DATA_DIR
       # standalone training
       bash scripts/run_standalone_train_ascend.sh
+```
+
+```bash
+# training example
+  shell:
+      GPU:
+      # distribute training example(8p)
+      bash scripts/run_distribute_train_gpu.sh DEVICE_NUM DEVICE_ID DATA_DIR
+      # standalone training
+      bash scripts/run_standalone_train_gpu.sh DEVICE_ID DATA_DIR
 ```
 
 ### Result
@@ -162,15 +173,29 @@ You can start training using python or shell scripts. The usage of shell scripts
   bash scripts/run_eval_ascend.sh DEVICE_ID DATA_DIR CHECKPOINT_PATH
 ```
 
+- GPU:
+
+```bash
+bash scripts/run_eval_gpu.sh DEVICE_ID DATA_DIR CHECKPOINT_PATH
+```
+
 > checkpoint can be produced in training process.
 
 ### Result
 
 Evaluation result will be stored in the example path, you can find result like the following in `eval.log`.
 
-```python
-metric: {'Loss': 1.0413, 'Top1-Acc':0.79955, 'Top5-Acc':0.9439}
-```
+- Ascend:
+
+    ```python
+    metric: {'Loss': 1.0413, 'Top1-Acc':0.79955, 'Top5-Acc':0.9439}
+    ```
+
+- GPU:
+
+    ```python
+    metric:  {'Loss': 0.8618191335636836, 'Top1-Acc': 0.8026642628205128, 'Top5-Acc': 0.9520833333333333}
+    ```
 
 # [Model description](#contents)
 
@@ -178,33 +203,33 @@ metric: {'Loss': 1.0413, 'Top1-Acc':0.79955, 'Top5-Acc':0.9439}
 
 ### Training Performance
 
-| Parameters          | Ascend                                        |
-| ------------------- | --------------------------------------------- |
-| Model Version       | Inception ResNet v2                           |
-| Resource            | Ascend 910, cpu:2.60GHz 192cores, memory:755G |
-| uploaded Date       | 11/04/2020                                    |
-| MindSpore Version   | 1.2.0                                         |
-| Dataset             | 1200k images                                  |
-| Batch_size          | 128                                           |
-| Training Parameters | src/config.py                                 |
-| Optimizer           | RMSProp                                       |
-| Loss Function       | SoftmaxCrossEntropyWithLogits                 |
-| Outputs             | probability                                   |
-| Total time (8p)     | 24h                                           |
-| performance         | 1p: 556 img/s / 8p: 4430 img/s                |
+| Parameters          | Ascend                                        |GPU                                          |
+| ------------------- | --------------------------------------------- |---------------------------------------------|
+| Model Version       | Inception ResNet v2                           |Inception ResNet v2                          |
+| Resource            | Ascend 910, cpu:2.60GHz 192cores, memory:755G |Tesla V100 SXM2；CPU：2.3GHz，32scores；memory：512G|
+| uploaded Date       | 11/04/2020                                    |09/23/2021                                   |
+| MindSpore Version   | 1.2.0                                         |1.3.0                                        |
+| Dataset             | 1200k images                                  |1200k images                                 |
+| Batch_size          | 128                                           |128                                          |
+| Training Parameters | src/config.py                                 |src/config.py                                |
+| Optimizer           | RMSProp                                       |Momentum                                     |
+| Loss Function       | SoftmaxCrossEntropyWithLogits                 |CrossEntropySmooth                           |
+| Outputs             | probability                                   |probability                                  |
+| Total time          | 24h(8p)                                       |38h(4p)                                      |
+| performance         | 1p: 556 img/s / 8p: 4430 img/s                |4p: 868 ims/s                                |
 
 #### Inference Performance
 
-| Parameters          | Ascend                 |
-| ------------------- | --------------------------- |
-| Model Version       | Inception ResNet v2                    |
-| Resource            | Ascend 910, cpu:2.60GHz 192cores, memory:755G         |
-| Uploaded Date       | 11/04/2020                 |
-| MindSpore Version   | 1.2.0              |
-| Dataset             | 50k images                  |
-| Batch_size          | 128                         |
-| Outputs             | probability                 |
-| Accuracy            | ACC1[79.96%] ACC5[94.40%]                                    |
+| Parameters          | Ascend                      |GPU                        |
+| ------------------- | --------------------------- |---------------------------|
+| Model Version       | Inception ResNet v2         |Inception ResNet v2        |
+| Resource            | Ascend 910, cpu:2.60GHz 192cores, memory:755G|Tesla V100 SXM2, cpu:2.3GHz 32scores, memory: 512G|
+| Uploaded Date       | 11/04/2020                  |09/23/2021                 |
+| MindSpore Version   | 1.2.0                       |1.3.0                      |
+| Dataset             | 50k images                  |50k images                 |
+| Batch_size          | 128                         |128                        |
+| Outputs             | probability                 |probability                |
+| Accuracy            | ACC1[79.96%] ACC5[94.40%]   |ACC1[80.46%] ACC5[95.24%]  |
 
 # [Description of Random Situation](#contents)
 

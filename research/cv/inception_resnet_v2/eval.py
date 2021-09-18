@@ -18,13 +18,14 @@ import os
 
 import mindspore.nn as nn
 from mindspore import context
+from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 
+from src.config import config_ascend, config_gpu
 from src.dataset import create_dataset
 from src.inception_resnet_v2 import Inception_resnet_v2
-from src.config import config_ascend as config
+
 
 def parse_args():
     '''parse_args'''
@@ -35,25 +36,31 @@ def parse_args():
     args_opt = parser.parse_args()
     return args_opt
 
+
 if __name__ == '__main__':
     args = parse_args()
 
     if args.platform == 'Ascend':
+        config = config_ascend
         device_id = int(os.getenv('DEVICE_ID'))
-        context.set_context(device_id=device_id)
+        context.set_context(device_id=device_id, device_target='Ascend')
+    else:
+        config = config_gpu
+        device_id = int(os.getenv('DEVICE_ID'))
+        context.set_context(device_id=device_id, device_target='GPU')
 
-    context.set_context(mode=context.GRAPH_MODE, device_target=args.platform)
+    context.set_context(mode=context.GRAPH_MODE)
     net = Inception_resnet_v2(classes=config.num_classes, is_train=False)
     ckpt = load_checkpoint(args.checkpoint_path)
     load_param_into_net(net, ckpt)
     net.set_train(False)
     dataset = create_dataset(dataset_path=args.dataset_path, do_train=False,
-                             repeat_num=1, batch_size=config.batch_size)
+                             repeat_num=1, batch_size=config.batch_size, config=config)
     loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
     eval_metrics = {'Loss': nn.Loss(),
                     'Top1-Acc': nn.Top1CategoricalAccuracy(),
                     'Top5-Acc': nn.Top5CategoricalAccuracy()}
     model = Model(net, loss, optimizer=None, metrics=eval_metrics)
-    print('='*20, 'Evalute start', '='*20)
+    print('=' * 20, 'Evalute start', '=' * 20)
     metrics = model.eval(dataset)
     print("metric: ", metrics)

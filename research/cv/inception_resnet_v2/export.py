@@ -14,12 +14,12 @@
 # ============================================================================
 """export checkpoint file into air, onnx, mindir models"""
 import argparse
-import numpy as np
 
+import numpy as np
 from mindspore import Tensor, dtype
 from mindspore.train.serialization import load_checkpoint, load_param_into_net, export, context
 
-from src.config import config_ascend as config
+from src.config import config_gpu, config_ascend
 from src.inception_resnet_v2 import Inception_resnet_v2
 
 parser = argparse.ArgumentParser(description='inception_resnet_v2 export')
@@ -34,10 +34,13 @@ parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"
 args = parser.parse_args()
 
 context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
-if args.device_target == "Ascend":
-    context.set_context(device_id=args.device_id)
+context.set_context(device_id=args.device_id)
 
 if __name__ == '__main__':
+    if args.device_target == "GPU":
+        config = config_gpu
+    else:
+        config = config_ascend
     net = Inception_resnet_v2(classes=config.num_classes)
     param_dict = load_checkpoint(args.ckpt_file)
     load_param_into_net(net, param_dict)

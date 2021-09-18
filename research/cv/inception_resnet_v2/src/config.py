@@ -17,6 +17,36 @@ network config setting, will be used in main.py
 """
 from easydict import EasyDict as edict
 
+config_gpu = edict({
+    'is_save_on_master': False,
+
+    'batch_size': 128,
+    'epoch_size': 100,
+    'num_classes': 1000,
+    'work_nums': 8,
+
+    'loss_scale': 1024,
+    'smooth_factor': 0.1,
+    'weight_decay': 0.00001,
+    'optim': "momentum",
+    'momentum': 0.9,
+    'amp_level': 'O2',
+    'decay': 0.9,
+    'epsilon': 1.0,
+
+    'keep_checkpoint_max': 10,
+    'save_checkpoint_epochs': 1,
+
+    'lr_init': 0.0001,
+    'lr_end': 0.000004,
+    'lr_max': 1.,
+    'warmup_epochs': 2,
+    'start_epoch': 1,
+
+    # hardware
+    'device_target': "GPU"
+})
+
 config_ascend = edict({
     'is_save_on_master': False,
 
@@ -29,6 +59,7 @@ config_ascend = edict({
     'smooth_factor': 0.1,
     'weight_decay': 0.00004,
     'momentum': 0.9,
+    'optim': "rmsprop",
     'amp_level': 'O3',
     'decay': 0.9,
     'epsilon': 1.0,
@@ -40,5 +71,7 @@ config_ascend = edict({
     'lr_end': 0.000004,
     'lr_max': 0.4,
     'warmup_epochs': 1,
-    'start_epoch': 1
+    'start_epoch': 1,
+    # hardware
+    'device_target': "Ascend"
 })

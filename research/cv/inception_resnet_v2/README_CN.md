@@ -43,7 +43,7 @@ Inception_ResNet_v2的总体网络架构如下：
 
 # 数据集
 
-所用数据集可参照论文。
+使用的数据集[ImageNet](https://image-net.org/download.php)
 
 - 数据集大小：125G，共1000个类、125万张彩色图像
     - 训练集：120G, 120万张图像
@@ -104,6 +104,7 @@ Major parameters in train.py and config.py are:
 'smooth_factor'              # label smoothing factor
 'weight_decay'               # weight decay
 'momentum'                   # momentum
+'optim'                      # optimizer, Supports [momentum, rmsprop]
 'amp_level'                  # precision training, Supports [O0, O2, O3]
 'decay'                      # decay used in optimize function
 'epsilon'                    # epsilon used in iptimize function
@@ -124,14 +125,23 @@ Major parameters in train.py and config.py are:
 
 - Ascend：
 
-    ```bash
-    # distribute training example(8p)
-    bash scripts/run_distribute_train_ascend.sh RANK_TABLE_FILE DATA_PATH DATA_DIR
-    # standalone training
-    bash scripts/run_standalone_train_ascend.sh DEVICE_ID DATA_DIR
-    ```
+```bash
+# distribute training example(8p)
+bash scripts/run_distribute_train_ascend.sh RANK_TABLE_FILE DATA_DIR
+# standalone training
+bash scripts/run_standalone_train_ascend.sh DEVICE_ID DATA_DIR
+```
 
 > 注：RANK_TABLE_FILE可参考[链接]( https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html)。device_ip可以通过[链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)获取
+
+- GPU:
+
+```bash
+ # distribute training example(8p)
+bash scripts/run_distribute_train_gpu.sh DEVICE_NUM DEVICE_ID DATA_DIR
+# standalone training
+bash scripts/run_standalone_train_gpu.sh DEVICE_ID DATA_DIR
+```
 
 ### 结果
 
@@ -148,6 +158,19 @@ epoch: 3 step: 1251, loss is 3.6242008
 Epoch time: 288507.506, per step time: 230.622
 ```
 
+#### GPU
+
+```python
+epoch: 4 step: 2501, loss is 3.015082
+epoch time: 1485678.302 ms, per step time: 594.034 ms
+epoch: 5 step: 2501, loss is 3.1634908
+epoch time: 1482083.298 ms, per step time: 592.596 ms
+epoch: 6 step: 2501, loss is 3.110878
+epoch time: 1495313.987 ms, per step time: 597.886 ms
+epoch: 7 step: 2501, loss is 2.5345275
+epoch time: 1492864.891 ms, per step time: 596.907 ms
+```
+
 ## 评估过程
 
 ### 用法
@@ -158,6 +181,12 @@ Epoch time: 288507.506, per step time: 230.622
 
 ```bash
 bash scripts/run_eval_ascend.sh DEVICE_ID DATA_DIR CHECKPOINT_PATH
+```
+
+- GPU:
+
+```bash
+bash scripts/run_eval_gpu.sh DEVICE_ID DATA_DIR CHECKPOINT_PATH
 ```
 
 > 训练过程中可以生成模型文件。
@@ -184,30 +213,30 @@ python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 
 ### 训练性能
 
-| 参数                 | Ascend                                    |
-| -------------------------- | ---------------------------------------------- |
-| 模型版本              | Inception ResNet v2                                   |
-| 资源                   | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8   |
-| MindSpore版本          | 0.6.0-beta                                     |
-| 数据集                    | 120万张图像                                   |
-| Batch_size                 | 128                                            |
-| 训练参数        | src/config.py                                  |
-| 优化器                  | RMSProp                                        |
-| 损失函数              | Softmax交叉熵                            |
-| 输出                    | 概率                                    |
-| 损失                       | 1.98                                           |
-| 总时长（8卡）            | 24小时                                            |
+| 参数                 | Ascend                                    |GPU                                               |
+| -------------------------- | ---------------------------------------------- | ---------------------------------------------- |
+| 模型版本              | Inception ResNet v2                                   | Inception ResNet v2  |
+| 资源                   | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8   |Tesla V100 SXM2；CPU：2.3GHz，32核；内存：512G；系统 Ubuntu18.04|
+| MindSpore版本          | 0.6.0-beta                                     |1.3.0                                              |
+| 数据集                    | 120万张图像                                   |120万张图像|
+| Batch_size                 | 128                                            |128|
+| 训练参数        | src/config.py                                  |src/config.py|
+| 优化器                  | RMSProp                                        |Momentum|
+| 损失函数              | Softmax交叉熵                            |Softmax交叉熵+标签平滑|
+| 输出                    | 概率                                    |概率|
+| 损失                       | 1.98                                           |1.57|
+| 总时长           | 24小时（8卡）                                             |38小时（4卡）|
 
 #### 推理性能
 
-| 参数          | Ascend                 |
-| ------------------- | --------------------------- |
-| 模型版本       | Inception ResNet v2    |
-| 资源            |  Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8                 |
-| MindSpore 版本   |  1.2.0                  |
-| 数据集             | 5万张图像                  |
-| Batch_size          | 128                         |
-| 准确率            | ACC1[79.96%] ACC5[94.40%]      |
+| 参数          | Ascend                 |GPU                     |
+| ------------------- | --------------------------- | --------------------------- |
+| 模型版本       | Inception ResNet v2    | Inception ResNet v2 |
+| 资源            |  Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8  |Tesla V100 SXM2；CPU：2.3GHz，32核；内存：512G；系统 Ubuntu18.04|
+| MindSpore 版本   |  1.2.0                  |  1.3.0                  |
+| 数据集             | 5万张图像                  |5万张图像|
+| Batch_size          | 128                         |128            |
+| 准确率            | ACC1[79.96%] ACC5[94.40%]      |ACC1[80.46%] ACC5[95.24%]  |
 
 # 随机情况说明
 
