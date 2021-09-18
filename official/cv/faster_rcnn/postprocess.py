@@ -29,14 +29,14 @@ def modelarts_pre_process():
     pass
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
-def get_eval_result(ann_file, result_path):
+def get_eval_result(anno_path, result_path):
     """ get evaluation result of faster rcnn"""
     max_num = 128
     result_path = result_path
 
     outputs = []
 
-    dataset_coco = COCO(ann_file)
+    dataset_coco = COCO(anno_path)
     img_ids = dataset_coco.getImgIds()
 
     for img_id in img_ids:
@@ -71,4 +71,4 @@ def get_eval_result(ann_file, result_path):
     coco_eval(result_files, eval_types, dataset_coco, single_result=False)
 
 if __name__ == '__main__':
-    get_eval_result(config.ann_file, config.result_path)
+    get_eval_result(config.anno_path, config.result_path)

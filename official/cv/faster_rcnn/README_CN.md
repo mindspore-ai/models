@@ -90,10 +90,10 @@ Faster R-CNN是一个两阶段目标检测网络，该网络采用RPN，可以�
         将数据集信息整理成TXT文件，每行内容如下：
 
         ```txt
-        train2017/0000001.jpg 0,259,401,459,7 35,28,324,201,2 0,30,59,80,2
+        train2017/0000001.jpg 0,259,401,459,7,0 35,28,324,201,2,0 0,30,59,80,2,0
         ```
 
-        每行是按空间分割的图像标注，第一列是图像的相对路径，其余为[xmin,ymin,xmax,ymax,class]格式的框和类信息。从`IMAGE_DIR`（数据集目录）图像路径以及`ANNO_PATH`（TXT文件路径）的相对路径中读取图像。`IMAGE_DIR`和`ANNO_PATH`可在`config_50.yaml、config_101.yaml或config_152.yaml`中设置。
+        每行是按空间分割的图像标注，第一列是图像的相对路径，其余为[xmin,ymin,xmax,ymax,class,is_crowd]格式的框,类和是否是一群物体的信息。从`image_dir`（数据集目录）图像路径以及`anno_path`（TXT文件路径）的相对路径中读取图像。`image_dir`和`anno_path`可在`config_50.yaml、config_101.yaml或config_152.yaml`中设置。
 
 # 快速入门
 
@@ -122,7 +122,7 @@ bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL] [BACKBO
 bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)
 
 #推理
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 ```
 
 ## 在GPU上运行
@@ -477,7 +477,7 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --device_ta
 
 ```shell
 # Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 ```
 
 ### 结果

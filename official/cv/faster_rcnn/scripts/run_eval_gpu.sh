@@ -42,7 +42,7 @@ echo $PATH3
 
 if [ ! -f $PATH1 ]
 then 
-    echo "error: ANN_FILE=$PATH1 is not a file"
+    echo "error: ANNO_PATH=$PATH1 is not a file"
 exit 1
 fi 
 
@@ -58,7 +58,7 @@ then
 exit 1
 fi
 
-mindrecord_dir=$PATH3/MindRecord_COCO_TRAIN/
+mindrecord_dir=$PATH3/FASTERRCNN_MINDRECORD/
 if [ $# -eq 5 ]
 then
     mindrecord_dir=$(get_real_path $5)
@@ -106,5 +106,5 @@ cd ./eval || exit
 env > env.log
 echo "start eval for device $DEVICE_ID"
 python eval.py --config_path=$CONFIG_FILE --coco_root=$PATH3 --mindrecord_dir=$mindrecord_dir \
---device_target="GPU" --device_id=$DEVICE_ID --ann_file=$PATH1 --checkpoint_path=$PATH2 --backbone=$3 &> log &
+--device_target="GPU" --device_id=$DEVICE_ID --anno_path=$PATH1 --checkpoint_path=$PATH2 --backbone=$3 &> log &
 cd ..

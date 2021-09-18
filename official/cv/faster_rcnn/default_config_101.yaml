@@ -154,6 +154,10 @@ coco_classes: ['background', 'person', 'bicycle', 'car', 'motorcycle', 'airplane
                      'teddy bear', 'hair drier', 'toothbrush']
 num_classes: 81
 
+# annotations file(json format or user defined text format)
+anno_path: ''
+image_dir: ''
+
 # train.py FasterRcnn training
 run_distribute: False
 dataset: "coco"
@@ -161,12 +165,9 @@ pre_trained: "/cache/train/fasterrcnn/faster_rcnn-12_7393.ckpt"
 device_id: 0
 device_num: 1
 rank_id: 0
-image_dir: ''
-anno_path: ''
 backbone: 'resnet_v1_101'
 
 # eval.py FasterRcnn evaluation
-ann_file: '/cache/data/annotations/instances_val2017.json'
 checkpoint_path: "/cache/train/fasterrcnn/faster_rcnn-12_7393.ckpt"
 
 # export.py fasterrcnn_export
