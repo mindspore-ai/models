@@ -61,7 +61,7 @@ After dataset preparation, you can start training and evaluation as follows:
 
 ```bash
 # run training example
-bash scripts/run_standalone_train_ascend.sh 0 52 /path/ende-l128-mindrecord
+bash scripts/run_standalone_train_ascend.sh Ascend 0 52 /path/ende-l128-mindrecord
 
 # run distributed training example
 bash scripts/run_distribute_train_ascend.sh 8 52 /path/ende-l128-mindrecord rank_table.json ./default_config.yaml

@@ -494,6 +494,8 @@ The best acc is 0.891176
 
 ```shell
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+#example:
+python export.py --ckpt_file ./2021-09-03_time_16_00_12/tiny_bert_936_100.ckpt --file_name SST-2 --file_format MINDIR --config_path ./td_config/td_config_sst2.yaml
 ```
 
 The ckpt_file parameter is required,

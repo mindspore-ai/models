@@ -1,4 +1,4 @@
-# Contents
+﻿# Contents
 
 - [Contents](#contents)
 - [PanGu-Alpha Description](#pangu-alpha-description)
@@ -137,6 +137,8 @@ Currently the scripts provide three default configures : `2.6B` `13B` and `200B`
 # run distributed training example
 
 bash scripts/run_distribute_train.sh DATASET RANK_TABLE RANK_SIZE TYPE MODE STAGE_NUM MICRO_SIZE PER_BATCH RANK_START
+#example:
+bash scripts/run_distribute_train.sh /data/pangu_30_step_ba64/ /root/hccl_8p.json 8 fp32 2.6B 1 1 8 0 8
 
 ```
 
@@ -283,7 +285,7 @@ ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TAR
   ```shell
   >>> cd scripts
   >>> bash run_standalone_export.sh ${strategy_file_path} ${ckpt_dir_path}
-  ```  
+  ```
 
   Update the parameter `MODE` in `run_standalone_export.sh` from `13B` to `2.6B` if we want to export 2.6B model.
 
@@ -303,7 +305,7 @@ ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TAR
   >>> cd - && mkdir serving_increment/pangu_standalone/pangu/1/
   >>> mv scripts/device_0/* serving_increment/pangu_standalone/pangu/1/
   >>> cd serving_increment
-  ```  
+  ```
 
 - Copy `pangu-alpha/tokenizer` to directory serving_increment/pangu_standalone/pangu/tokenizer.
 
@@ -365,7 +367,7 @@ ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TAR
   >>> cd - && mkdir serving_increment/pangu_distributed/models/
   >>> mv scripts/device_* serving_increment/pangu_distributed/models/
   >>> cd serving_increment
-  ```  
+  ```
 
 - Update MindIR file name serving_increment/pangu_distributed/serving_agent.py if needed.
 - Copy `pangu-alpha/tokenizer` to directory serving_increment/pangu_distributed/pangu/tokenizer.
@@ -439,7 +441,7 @@ successfully.
 >>> cd - && mkdir serving_increment/pangu_distributed/models/
 >>> mv scripts/device_* serving_increment/pangu_distributed/models/
 >>> cd serving_increment
-```  
+```
 
 - In the first machine, update the parameter `rank_size` and `stage_size`(Pipeline stage size) of `serving_increment/pangu_distributed/pangu/servable_config.py`.
 - In the first machine, update the parameter `rank_table_json_file` of `serving_increment/pangu_distributed/serving_server.py`.

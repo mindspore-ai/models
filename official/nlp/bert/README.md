@@ -1,4 +1,4 @@
-# Contents
+﻿# Contents
 
 [查看中文](./README_CN.md)
 
@@ -588,7 +588,15 @@ epoch: 0.0, current epoch percent: 0.002, step: 200, outputs are (Tensor(shape=[
 
 #### evaluation on cola dataset when running on Ascend
 
-Before running the command below, please check the load pretrain checkpoint path has been set. Please set the checkpoint path to be the absolute full path, e.g:"/username/pretrain/checkpoint_100_300.ckpt".
+Before running the command below, please check the load pretrain checkpoint path has been set. Please set the checkpoint path to be the absolute full path, e.g:
+
+--load_pretrain_checkpoint_path="/data/scripts/checkpoint_bert-20000_1.ckpt" \
+
+--train_data_file_path="/data/tnews/train.tf_record" \
+
+--eval_data_file_path="/data/tnews/dev.tf_record" \
+
+--schema_file_path="/data/tnews/dataset.json"
 
 ```bash
 bash scripts/run_classifier.sh
@@ -603,6 +611,18 @@ acc_num XXX, total_num XXX, accuracy 0.588986
 ```
 
 #### evaluation on cluener dataset when running on Ascend
+
+Before running the command below, please check the load pretrain checkpoint path has been set. Please set the checkpoint path to be the absolute full path, e.g:
+
+--label_file_path="/data/cluener/label_file" \
+
+--load_pretrain_checkpoint_path="/data/scripts/checkpoint_bert-20000_1.ckpt" \
+
+--train_data_file_path="/data/cluener/train.tf_record" \
+
+--eval_data_file_path="/data/cluener/dev.tf_record" \
+
+--schema_file_path="/data/cluener/dataset.json"
 
 ```bash
 bash scripts/run_ner.sh
@@ -641,6 +661,16 @@ F1 0.931243
 ```
 
 #### evaluation on squad v1.1 dataset when running on Ascend
+
+Before running the command below, please check the load pretrain checkpoint path has been set. Please set the checkpoint path to be the absolute full path, e.g:
+
+--vocab_file_path="/data/squad/vocab_bert_large_en.txt" \
+
+--load_pretrain_checkpoint_path="/data/scripts/bert_converted.ckpt" \
+
+--train_data_file_path="/data/squad/train.tf_record" \
+
+--eval_json_path="/data/squad/dev-v1.1.json" \
 
 ```bash
 bash scripts/squad.sh

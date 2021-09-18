@@ -66,7 +66,7 @@ python train_and_eval.py --data_path=./data/mindrecord --data_type=mindrecord
 To evaluate the model, command as follows:
 
 ```bash
-python eval.py  --data_path=./data/mindrecord --data_type=mindrecord
+python eval.py  --data_path=./data/mindrecord --data_type=mindrecord --ckpt_path=widedeep_train-8_455.ckpt
 ```
 
 ## [Script Description](#contents)

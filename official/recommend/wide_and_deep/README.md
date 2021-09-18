@@ -92,7 +92,7 @@ python train_and_eval.py --data_path=./data/mindrecord --dataset_type=mindrecord
 To evaluate the model, command as follows:
 
 ```bash
-python eval.py  --data_path=./data/mindrecord --dataset_type=mindrecord
+python eval.py  --data_path=./data/mindrecord --dataset_type=mindrecord --ckpt_path=./ckpt/widedeep_train-15_2582.ckpt
 ```
 
 - Running on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows)
