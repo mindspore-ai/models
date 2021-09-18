@@ -71,6 +71,12 @@ file_format: "MINDIR"
 ckpt_file: ""
 network_dataset: "resnet152_imagenet2012"
 
+# Retrain options
+save_graphs: False
+save_graphs_path: "./graphs"
+has_trained_epoch: 0
+has_trained_step: 0
+
 # postprocess resnet inference
 result_path: ''
 label_path: ''
@@ -93,3 +99,5 @@ checkpoint_path: "The location of the checkpoint file."
 checkpoint_file_path: "The location of the checkpoint file."
 result_path: "result files path."
 label_path: "image file path."
+save_graphs: "Whether save graphs during training, default: False."
+save_graphs_path: "Path to save graphs."
