@@ -403,7 +403,7 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 | 损失                       | 2.8                                                            |
 | 参数 (M)                 | 213.7                                                          |
 | 推理检查点   | 2.4G （.ckpt文件）                                              |
-| 脚本                    | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/transformer> |
+| 脚本                    | <https://gitee.com/mindspore/models/tree/master/official/nlp/transformer> |
 
 #### 评估性能
 
@@ -429,4 +429,4 @@ train.py已经设置了一些种子，避免数据集轮换和权重初始化的
 
 ## ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

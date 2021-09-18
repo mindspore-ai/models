@@ -116,7 +116,7 @@ pip install mmcv=0.2.14
 
     注：
     1. 为加快数据预处理速度，MindSpore提供了MindRecord数据格式。因此，训练前首先需要生成基于COCO2017数据集的MindRecord文件。COCO2017原始数据集转换为MindRecord格式大概需要4小时。
-    2. 进行分布式训练前，需要提前创建JSON格式的[hccl配置文件](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)。
+    2. 进行分布式训练前，需要提前创建JSON格式的[hccl配置文件](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)。
     3. PRETRAINED_CKPT是一个ResNet50检查点，通过ImageNet2012训练。你可以使用ModelZoo中 [resnet50](https://gitee.com/qujianwei/mindspore/tree/master/model_zoo/official/cv/resnet) 脚本来训练, 然后使用src/convert_checkpoint.py把训练好的resnet50的权重文件转换为可加载的权重文件。
 
 4. 执行评估脚本。
@@ -544,7 +544,7 @@ bash run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL]
 
 - Notes
 
-1. 运行分布式任务时要用到由RANK_TABLE_FILE指定的hccl.json文件。您可使用[hccl_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)生成该文件。
+1. 运行分布式任务时要用到由RANK_TABLE_FILE指定的hccl.json文件。您可使用[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成该文件。
 2. PRETRAINED_MODEL应该是训练好的ResNet50检查点。如果此参数未设置，网络将从头开始训练。如果想要加载训练好的MaskRcnn检查点，需要对train.py作如下修改：
 
 ```python
@@ -778,7 +778,7 @@ Accumulating evaluation results...
 | 速度                  | 单卡：250毫秒/步；8P: 260毫秒/步                          |
 | 总时长                | 单卡：52小时；8卡：6.6小时                                |
 | 参数（M）             | 280                                                       |
-| 脚本                  | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/maskrcnn> |
+| 脚本                  | <https://gitee.com/mindspore/models/tree/master/official/cv/maskrcnn> |
 
 ### 评估性能
 
@@ -800,4 +800,4 @@ Accumulating evaluation results...
 
 # ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

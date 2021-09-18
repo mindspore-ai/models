@@ -268,7 +268,7 @@ bash run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID] [CONFIG_PATH]
 - `EPOCH_NUM`：分布式训练的轮次数。
 - `LR`：分布式训练的学习率初始值。
 - `DATASET`：分布式训练的数据集模式。
-- `RANK_TABLE_FILE`：[rank_table.json](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)的路径。最好使用绝对路径。
+- `RANK_TABLE_FILE`：[rank_table.json](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)的路径。最好使用绝对路径。
 - `CONFIG_PATH`: 参数配置。
 - `PRE_TRAINED`：预训练检查点文件的路径。最好使用绝对路径。
 - `PRE_TRAINED_EPOCH_SIZE`：预训练的轮次数。
@@ -528,7 +528,7 @@ mAP: 0.23657619676441116
 | 速度 | 8卡：90毫秒/步 | 8卡：121毫秒/步 |
 | 总时长 | 8卡：4.81小时 | 8卡：12.31小时 |
 | 参数(M) | 34 | 34 |
-|脚本  | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd |
+|脚本  | https://gitee.com/mindspore/models/tree/master/official/cv/ssd | https://gitee.com/mindspore/models/tree/master/official/cv/ssd |
 
 ### 推理性能
 
@@ -550,4 +550,4 @@ dataset.py中设置了“create_dataset”函数内的种子，同时还使用�
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

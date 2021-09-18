@@ -88,7 +88,7 @@ python evaluate_motchallenge.py --data_url="" --train_url="" --detection_url=""
 bash scripts/run_distribute_train.sh train_code_path  RANK_TABLE_FILE DATA_PATH
 ```
 
-Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)
+Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
 
 ## 脚本说明
 
@@ -267,4 +267,4 @@ train.py中设置了随机种子。
 
 ## ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

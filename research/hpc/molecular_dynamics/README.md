@@ -143,5 +143,5 @@ atom_energy: -94.38766   -94.294426  -94.39194   -94.70758   -94.51311   -94.457
 
 ## ModelZoo Homepage
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).
 

@@ -278,7 +278,7 @@ test acc=0.84199995
 | 准确率                             | 83.0/72.5                                 |
 | 速度                                | 0.195s/epoch                              |
 | 总时长                           | 39s                                       |
-| 脚本                              | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/gat>  |
+| 脚本                              | <https://gitee.com/mindspore/models/tree/master/official/gnn/gat>  |
 
 ## 随机情况说明
 
@@ -286,4 +286,4 @@ GAT模型中有很多的dropout操作，如果想关闭dropout，可以在src/co
 
 ## ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

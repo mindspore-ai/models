@@ -99,7 +99,7 @@
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
 
 - GPU处理器环境运行
 
@@ -310,4 +310,4 @@
 
 # ModelZoo主页  
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

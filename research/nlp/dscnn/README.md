@@ -457,4 +457,4 @@ In download_process_data.py, we set the seed for split train, val, test set.
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+ Please check the official [homepage](https://gitee.com/mindspore/models).  

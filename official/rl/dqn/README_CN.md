@@ -115,7 +115,7 @@ pip install gym
 | 损失函数              | MSELoss                                                | MSELoss                                                |
 | 输出                    | 游戏得分值                                                 | 游戏得分值                                                 |
 | 参数量(M)                 | 7.3k                                                       | 7.3k                                                       |
-| 脚本 | <<<<https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/rl/dqn>>>> | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/rl/dqn |
+| 脚本 | <<<<https://gitee.com/mindspore/models/tree/master/official/rl/dqn>>>> | https://gitee.com/mindspore/models/tree/master/official/rl/dqn |
 
 # 随机情况描述
 

@@ -502,7 +502,7 @@ bash run_quant_infer.sh [AIR_PATH] [DATA_PATH] [IMAGE_ID] [IMAGE_SHAPE] [ANN_FIL
 | 总时长                 | 8卡：13小时                                               | 8卡: 18小时(shape=416)                                    |
 | 参数(M)             | 62.1                                                        | 62.1                                                        |
 | 微调检查点 | 474M (.ckpt文件)                                           | 474M (.ckpt文件)                                           |
-| 脚本                    | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_darknet53 | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_darknet53 |
+| 脚本                    | https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53 | https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53 |
 
 ### 推理性能
 
@@ -524,4 +524,4 @@ bash run_quant_infer.sh [AIR_PATH] [DATA_PATH] [IMAGE_ID] [IMAGE_SHAPE] [ANN_FIL
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

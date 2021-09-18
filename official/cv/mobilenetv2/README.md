@@ -427,7 +427,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 753 min                                                    | 845 min                   |
 | Params (M)                 | 3.3 M                                                      | 3.3 M                     |
 | Checkpoint for Fine tuning | 27.3 M                                                     | 27.3 M                    |
-| Scripts                    | [Link](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv2)|
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv2)|
 
 ### Inference Performance
 
@@ -450,4 +450,4 @@ In train.py, we set the seed which is used by numpy.random, mindspore.common.Ini
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

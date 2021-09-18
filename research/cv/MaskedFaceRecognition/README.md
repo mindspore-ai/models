@@ -138,4 +138,4 @@ You will get the result as following in "./scripts/log_inference/outputs/models/
 
 ## [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

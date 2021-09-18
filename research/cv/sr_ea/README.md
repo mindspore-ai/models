@@ -194,7 +194,7 @@ sh scripts/run_distributed.sh  [RANK_TABLE_FILE]
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
 `$RANK_TABLE_FILE` is needed when you are running a distribute task on ascend.
 
 > Or one can run following script for all tasks.
@@ -245,8 +245,8 @@ The Results on super resolution tasks are listed as below.
 | Loss Function              | L1Loss                                                                                     |
 | Output                     | super resolution image                                                                             |
 | PSNR                       | 43.35                                                               |
-| Scripts                    | [sr_ea script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/sr_ea) |
+| Scripts                    | [sr_ea script](https://gitee.com/mindspore/models/tree/master/research/cv/sr_ea) |
 
 ## ModeZoo Homepage
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

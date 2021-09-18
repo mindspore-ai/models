@@ -217,4 +217,4 @@ sh scripts/run_eval.sh CHECKPOINT_PATH
 
 # ModelZoo主页  
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

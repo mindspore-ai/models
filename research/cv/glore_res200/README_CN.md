@@ -119,7 +119,7 @@
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
 
 # 脚本说明
 
@@ -214,7 +214,7 @@
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
 
 训练结果保存在示例路径中，文件夹名称以“train”或“train_parallel”开头。您可在此路径下的日志中找到检查点文件以及结果，如下所示。
 
@@ -303,7 +303,7 @@ result:{'top_1 acc':0.802303685897436}
 | 总时长                 | 33时35分钟                                   |94时08分                          |
 | 参数(M)             | 70.6                                           |70.6
 | 微调检查点| 807.57M（.ckpt文件）                                      |808.28(.ckpt)
-| 脚本                    | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/glore_res200) |
+| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/glore_res200) |
 
 ### 推理性能
 
@@ -326,4 +326,4 @@ transform_utils.py中使用数据增强时采用了随机选择策略，train.py
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)
+ 请浏览官网[主页](https://gitee.com/mindspore/models)

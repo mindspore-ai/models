@@ -554,7 +554,7 @@ python ${train_code_path}/eval.py --data_root=/PATH/TO/DATA  \
 | 损失 | 0.0041095633 |
 | 性能 | 187736.386 ms（单卡，s16）<br>  44474.187 ms（八卡，s16） |  
 | 微调检查点 | 453M （.ckpt文件） |
-| 脚本 | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/deeplabv3plus) |
+| 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/deeplabv3plus) |
 
 # 随机情况说明
 
@@ -562,4 +562,4 @@ dataset.py中设置了“create_dataset”函数内的种子，同时还使用�
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

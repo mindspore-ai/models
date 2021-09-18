@@ -458,7 +458,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Params(M)                | 75.84                           | 75.84                           | 75.84                           | 75.84                           |
 | Checkpoint for inference | 233MB(.ckpt file)               | 230MB(.ckpt)                    | 233MB(.ckpt file)               | 233MB(.ckpt file)               |
 
-All executable scripts can be found in [here](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/wide_and_deep/script)
+All executable scripts can be found in [here](https://gitee.com/mindspore/models/tree/master/official/recommend/wide_and_deep/script)
 
 Note: The result of GPU is tested under the master version. The parameter server mode of the Wide&Deep model is still under development.
 
@@ -500,4 +500,4 @@ There are three random situations:
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

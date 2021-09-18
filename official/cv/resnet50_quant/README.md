@@ -234,7 +234,7 @@ You can view the results through the file "acc.log". The accuracy of the test da
 | Total time                 | 8pcs: 17 hours(30 epochs with pretrained)                   |
 | Parameters (M)             | 25.5                                                        |
 | Checkpoint for Fine tuning | 197M (.ckpt file)                                           |
-| Scripts                    | [resnet50-quant script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet50_quant) |
+| Scripts                    | [resnet50-quant script](https://gitee.com/mindspore/models/tree/master/official/cv/resnet50_quant) |
 
 ### Inference Performance
 
@@ -256,4 +256,4 @@ In dataset.py, we set the seed inside “create_dataset" function. We also use r
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

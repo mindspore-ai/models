@@ -244,4 +244,4 @@ We also use random seed in `src/utils/backbone_dla_conv.py` to initial network w
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

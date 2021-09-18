@@ -190,7 +190,7 @@ bash scripts/run_single_train.sh DEVICE_ID MINDRECORD_DIR PRE_TRAINED(optional) 
 
 > 注意:
 
-  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools).
+  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
 #### 运行
 
@@ -445,7 +445,7 @@ mAP: 0.3499478734634595
 | 最终损失                    | 0.582                                  |
 | 精确度 (8p)                 | mAP[0.3475]               |
 | 训练总时间 (8p)             | 23h16m54s                              |
-| 脚本                       | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/retinanet) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) |
 
 #### 推理性能
 
@@ -466,4 +466,4 @@ mAP: 0.3499478734634595
 
 ## [ModelZoo 主页](#content)
 
-请核对官方 [主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+请核对官方 [主页](https://gitee.com/mindspore/models).

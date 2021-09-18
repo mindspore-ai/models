@@ -400,7 +400,7 @@ Inference result is saved in current path, 'output_file' will generate in path s
 | Loss                       | 2.8                                                            |
 | Params (M)                 | 213.7                                                          |
 | Checkpoint for inference   | 2.4G (.ckpt file)                                              |
-| Scripts                    | [Transformer scripts](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/transformer) |
+| Scripts                    | [Transformer scripts](https://gitee.com/mindspore/models/tree/master/official/nlp/transformer) |
 
 #### Evaluation Performance
 
@@ -426,4 +426,4 @@ Some seeds have already been set in train.py to avoid the randomness of dataset 
 
 ## [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

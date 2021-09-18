@@ -1055,4 +1055,4 @@ tensorflow
 
 # ModelZoo主页  
 
- [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)
+ [链接](https://gitee.com/mindspore/models)

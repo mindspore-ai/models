@@ -396,7 +396,7 @@ For more configuration details, please refer the script `./default_config.yaml` 
 | Loss                       | 63.35                                                          | 55.42                                                         |
 | Params (M)                 | 613                                                            | 613                                                           |
 | Checkpoint for inference   | 1.8G (.ckpt file)                                              | 1.8G (.ckpt file)                                              |
-| Scripts                    | [gnmt_v2](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/gnmt_v2) | [gnmt_v2](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/gnmt_v2) |
+| Scripts                    | [gnmt_v2](https://gitee.com/mindspore/models/tree/master/official/nlp/gnmt_v2) | [gnmt_v2](https://gitee.com/mindspore/models/tree/master/official/nlp/gnmt_v2) |
 
 ### Inference Performance
 
@@ -428,4 +428,4 @@ This model has been validated in the Ascend environment and is not validated on 
 
 # [ModelZoo HomePage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)
+ Please check the official [homepage](https://gitee.com/mindspore/models)

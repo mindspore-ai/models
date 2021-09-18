@@ -321,7 +321,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 1.071 ms/step                          |
 | Total time                 | 32.1s                          |                                       |
 | Checkpoint for Fine tuning | 482k (.ckpt file)                                         |
-| Scripts                    | [LeNet Script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/lenet)s |
+| Scripts                    | [LeNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/lenet)s |
 
 #### Inference Performance
 
@@ -343,4 +343,4 @@ In dataset.py, we set the seed inside ```create_dataset``` function.
 
 ## [ModelZoo Homepage](#contents)  
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+Please check the official [homepage](https://gitee.com/mindspore/models).  

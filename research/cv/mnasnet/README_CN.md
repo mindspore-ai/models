@@ -186,7 +186,7 @@ result: {'Loss': 2.0364865480325163, 'Top_1_Acc': 0.7412459935897436, 'Top_5_Acc
 | 训练总时间 (8p)             | 20.8h                                    |
 | 评估总时间                  | 1min                                    |
 | 参数量 (M)                 | 61M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/mnasnet) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/mnasnet) |
 
 # 随机情况的描述
 
@@ -194,4 +194,4 @@ result: {'Loss': 2.0364865480325163, 'Top_1_Acc': 0.7412459935897436, 'Top_5_Acc
 
 # ModelZoo
 
-请核对官方 [主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请核对官方 [主页](https://gitee.com/mindspore/models)。

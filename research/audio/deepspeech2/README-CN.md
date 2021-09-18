@@ -272,7 +272,7 @@ python export.py --pre_trained_model_path='ckpt_path'
 | 运行速度                      | 2p 2.139s/step                                   |
 | 训练总时间       | 2p: around 1 week;                                  |
 | Checkpoint文件大小                 | 991M (.ckpt file)                                              |
-| 代码                   | [DeepSpeech script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/audio/deepspeech2) |
+| 代码                   | [DeepSpeech script](https://gitee.com/mindspore/models/tree/master/research/audio/deepspeech2) |
 
 ### Inference Performance
 
@@ -290,4 +290,4 @@ python export.py --pre_trained_model_path='ckpt_path'
 
 # [ModelZoo主页](#contents)
 
- [ModelZoo主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ [ModelZoo主页](https://gitee.com/mindspore/models).

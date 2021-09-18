@@ -129,4 +129,4 @@ In `train_eval.py`, we randomly sample a user at each round. We also add Gaussia
 # [ModelZoo Homepage](#contents)
 
 Please check the official
-[homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+[homepage](https://gitee.com/mindspore/models).

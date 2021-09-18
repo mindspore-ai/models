@@ -130,7 +130,7 @@ run_distribute.sh [RANK_TABLE_FILE] [DATASET_PATH] [SAVE_PATH]
 ```
 
 - Notes
-1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools).
+1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
 ### [Training Result](#content)
 
@@ -190,7 +190,7 @@ python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 | Speed                      | 1pc: 420 ms/step;  8pcs:  143 ms/step                          |
 | Total time                 | 1pc: 24.32 hours                                            |
 | Checkpoint for Fine tuning | 79.05M(.ckpt file)                                         |
-| Scripts                    | [dcgan script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/dcgan) |
+| Scripts                    | [dcgan script](https://gitee.com/mindspore/models/tree/master/research/cv/dcgan) |
 
 # [Description of Random Situation](#contents)
 
@@ -198,4 +198,4 @@ We use random seed in train.py and cell.py for weight initialization.
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

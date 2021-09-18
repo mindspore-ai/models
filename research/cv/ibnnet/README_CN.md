@@ -213,7 +213,7 @@ sh scripts/run_eval_gpu.sh path/evalset path/ckpt
 | 总时间 | 1卡：65小时；8卡：9.5小时 |
 | 参数(M) | 46.15 |
 | 微调检查点 | 293M （.ckpt file） |
-| 脚本 | [脚本路径](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/ibnnet) |
+| 脚本 | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/cv/ibnnet) |
 
 ### 推理性能
 
@@ -282,4 +282,4 @@ print("accuracy: ", acc)
 
 # ModelZoo主页  
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

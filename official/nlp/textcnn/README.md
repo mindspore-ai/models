@@ -344,4 +344,4 @@ Inference result is saved in current path, you can find result in acc.log file.
 
 # [ModelZoo Homepage](#contents)  
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+ Please check the official [homepage](https://gitee.com/mindspore/models).  

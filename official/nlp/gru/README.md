@@ -399,7 +399,7 @@ perl multi-bleu.perl target.txt.forbleu < output.txt.forbleu
 | Loss                       | 3.86888                       |2.533958                   |
 | Params (M)                 | 21                            | 21                        |
 | Checkpoint for inference   | 272M (.ckpt file)             | 272M (.ckpt file)         |
-| Scripts                    | [gru](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/gru) |[gru](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/gru) |
+| Scripts                    | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/gru) |[gru](https://gitee.com/mindspore/models/tree/master/official/nlp/gru) |
 
 ### Inference Performance
 
@@ -428,4 +428,4 @@ This model has been validated in the Ascend environment and is not validated on 
 
 # [ModelZoo HomePage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)
+ Please check the official [homepage](https://gitee.com/mindspore/models)

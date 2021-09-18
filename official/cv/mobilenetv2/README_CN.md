@@ -427,7 +427,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_PATH] [DVPP] [DEVICE_ID]
 |总时长                 | 753 min                                                    | 845 min                   |
 | 参数(M)                 | 3.3M                                                      | 3.3M                     |
 | 微调检查点 | 27.3M                                                     | 27.3M                    |
-| 脚本                    | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv2)|
+| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv2)|
 
 ### 推理性能
 
@@ -450,4 +450,4 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_PATH] [DVPP] [DEVICE_ID]
 
 # ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

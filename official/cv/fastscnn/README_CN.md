@@ -95,7 +95,7 @@ python eval.py \
 bash ./scripts/run_eval.sh [train_code_path] [dataset] [resume_path] [resume_name] [output_path]
 ```
 
-Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)
+Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
 
 ## 脚本说明
 
@@ -349,7 +349,7 @@ FastSCNN on “Cityscapes ”
 | Accuracy                   | 55.48%                                                       |
 | Total time                 | 8p：8h20m                                                    |
 | Checkpoint for Fine tuning | 8p: 14.51MB(.ckpt file)                                      |
-| Scripts                    | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/fastscnn |
+| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/cv/fastscnn |
 
 ## 随机情况说明
 
@@ -357,4 +357,4 @@ train.py中设置了随机种子。
 
 ## ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

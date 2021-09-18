@@ -246,7 +246,7 @@ Inference result is saved in current path, you can find result in acc.log file.
 | Loss Function              | NT-Xent Loss                                                |
 | linear eval                | 84.505%                                                     |
 | Total time                 | 25m04s                                                      |
-| Scripts                    | [SimCLR Script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/simclr) | [SimCLR Script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/simclr) |
+| Scripts                    | [SimCLR Script](https://gitee.com/mindspore/models/tree/master/official/cv/simclr) | [SimCLR Script](https://gitee.com/mindspore/models/tree/master/official/cv/simclr) |
 
 ## [Description of Random Situation](#contents)
 
@@ -254,4 +254,4 @@ We set the seed inside dataset.py. We also use random seed in train.py.
 
 ## [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

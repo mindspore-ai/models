@@ -468,4 +468,4 @@ NEED_PREPROCESS为必选项, 在[y|n]中取值，表示数据是否预处理为b
 
 # ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

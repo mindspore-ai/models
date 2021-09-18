@@ -893,7 +893,7 @@ mean Iou 0.7854572371350974
 | Parameters (M)             | 58.2                                       |
 | Checkpoint for Fine tuning | 443M (.ckpt file)                       |
 | Model for inference        | 223M (.air file)                     |
-| Scripts                    | [Link](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/deeplabv3) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/deeplabv3) |
 
 ## Inference Performance
 
@@ -915,4 +915,4 @@ In dataset.py, we set the seed inside "create_dataset" function. We also use ran
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

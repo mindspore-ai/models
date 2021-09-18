@@ -604,7 +604,7 @@ YOLOv4应用于118000张图像上（标注和数据格式必须与COCO 2017相�
 |速度| 1卡：53FPS；8卡：390FPS (shape=416) 220FPS (动态形状)|
 |总时长|48小时（动态形状）|
 |微调检查点|约500M（.ckpt文件）|
-|脚本| <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/> |
+|脚本| <https://gitee.com/mindspore/models/tree/master/official/cv/yolov4> |
 
 ### 推理性能
 
@@ -628,4 +628,4 @@ YOLOv4应用于20000张图像上（标注和数据格式必须与COCO test 2017�
 
 # [ModelZoo主页](#目录)
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

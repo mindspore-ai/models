@@ -331,7 +331,7 @@ We need five or seven parameters for this scripts.
 - `EPOCH_NUM`: epoch num for distributed train.
 - `LR`: learning rate init value for distributed train.
 - `DATASET`：the dataset mode for distributed train.
-- `RANK_TABLE_FILE :` the path of [rank_table.json](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools), it is better to use absolute path.
+- `RANK_TABLE_FILE :` the path of [rank_table.json](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools), it is better to use absolute path.
 - `CONFIG_PATH`: parameter configuration.
 - `PRE_TRAINED :` the path of pretrained checkpoint file, it is better to use absolute path.
 - `PRE_TRAINED_EPOCH_SIZE :` the epoch num of pretrained.
@@ -607,7 +607,7 @@ mAP: 0.23657619676441116
 | Speed               | 8pcs: 90ms/step                                                               | 8pcs: 121ms/step                                                              | 8pcs: 547ms/step                                                              |1pcs: 547ms/step                                                              |
 | Total time          | 8pcs: 4.81hours                                                               | 8pcs: 12.31hours                                                              | 8pcs: 4.22hours                                                               |1pcs: 4.22hours                                                               |
 | Parameters (M)      | 34                                                                            | 34                                                                            | 48M                                                                           |97M                                                                           |
-| Scripts             | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd> | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd> | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd> |<https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/ssd> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |<https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
 
 #### Inference Performance
 
@@ -629,4 +629,4 @@ In dataset.py, we set the seed inside “create_dataset" function. We also use r
 
 ## [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+ Please check the official [homepage](https://gitee.com/mindspore/models).  

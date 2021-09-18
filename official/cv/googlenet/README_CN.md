@@ -123,7 +123,7 @@ GoogleNet由多个inception模块串联起来，可以更加深入。  降维的
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
 
 - GPU处理器环境运行
 
@@ -698,4 +698,4 @@ python export.py --config_path [CONFIG_PATH]
 
 # ModelZoo主页  
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

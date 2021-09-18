@@ -93,7 +93,7 @@ bash run_eval_ascend.sh [DATASET_PATH] [CKPT_PATH] [DEVICE_ID]
 ```
 
 > Notes:
-> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
+> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 >
 > This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 >
@@ -266,7 +266,7 @@ Calculated {"precision": 0.8329088130412634, "recall": 0.7871930669234473, "hmea
 | Loss Function       | Dice for classification, Iou for bbox regression             |
 | Loss                | ~0.27                                                        |
 | Total time (8p)     | 1h20m                                                        |
-| Scripts             | [east script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/east) |
+| Scripts             | [east script](https://gitee.com/mindspore/models/tree/master/official/cv/east) |
 
 #### Inference Performance
 
@@ -298,5 +298,5 @@ We set seed to 1 in train.py.
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).
 

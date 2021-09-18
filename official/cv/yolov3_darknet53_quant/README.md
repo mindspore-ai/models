@@ -325,7 +325,7 @@ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.555
 | Total time                 | 8pc: 23.5 hours                                                                                |
 | Parameters (M)             | 62.1                                                                                           |
 | Checkpoint for Fine tuning | 474M (.ckpt file)                                                                              |
-| Scripts                    | [YoloV3-DarkNet53-Quant Script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/yolov3_darknet53_quant) |
+| Scripts                    | [YoloV3-DarkNet53-Quant Script](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53_quant) |
 
 #### Inference Performance
 
@@ -347,4 +347,4 @@ There are random seeds in distributed_sampler.py, transforms.py, yolo_dataset.py
 
 ## [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+Please check the official [homepage](https://gitee.com/mindspore/models).  

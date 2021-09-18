@@ -473,7 +473,7 @@ The above python command will run in the background. You can view the results th
 | Total time                 | 1pc: 2.67 mins;                                              | 1pc: 5.64 mins;                                              |
 | Parameters (M)             | 93M                                                          | 93M                                                          |
 | Checkpoint for Fine tuning | 355.11M (.ckpt file)                                         | 355.11M (.ckpt file)                                         |
-| Scripts                    | [unet script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet) | [unet script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet) |
+| Scripts                    | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/unet) | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/unet) |
 
 | Parameters | Ascend | GPU |
 | -----| ----- | ----- |
@@ -492,7 +492,7 @@ The above python command will run in the background. You can view the results th
 | Total time | 1pc: 10.8min | 1pc：8min |
 | Parameters (M)  | 27M | 27M |
 | Checkpoint for Fine tuning | 103.4M(.ckpt file) | 103.4M(.ckpt file) |
-| Scripts | [unet script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet) | [unet script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet) |
+| Scripts | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/unet) | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/unet) |
 
 ## [How to use](#contents)
 
@@ -616,4 +616,4 @@ In data_loader.py, we set the seed inside “_get_val_train_indices" function. W
 
 ## [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

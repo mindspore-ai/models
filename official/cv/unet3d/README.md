@@ -285,7 +285,7 @@ After training, you'll get some checkpoint files under the `train_parallel_fp[32
 #### Distributed training on Ascend
 
 > Notes:
-> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
+> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 >
 
 ```shell
@@ -405,7 +405,7 @@ eval average dice is 0.9502010010453671
 | Speed               | 8pcs: 1795ms/step                                         | 8pcs: 1883ms/step                                    |
 | Total time          | 8pcs: 0.62hours                                           | 8pcs: 0.66hours                                     |
 | Parameters (M)      | 34                                                        | 34                                                   |
-| Scripts             | [unet3d script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/unet3d) |
+| Scripts             | [unet3d script](https://gitee.com/mindspore/models/tree/master/official/cv/unet3d) |
 
 #### Inference Performance
 
@@ -426,4 +426,4 @@ We set seed to 1 in train.py.
 
 ## [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

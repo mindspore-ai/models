@@ -195,7 +195,7 @@ epoch time: 1104929.793 ms, per step time: 97.162 ms
 | 总时间        | 1卡：65小时；8卡：8.5小时                                    |
 | 参数(M)       | 85.2                                                         |
 | 微调检查点    | 1249M （.ckpt file）                                         |
-| 脚本          | [脚本路径](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/arcface) |
+| 脚本          | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/cv/arcface) |
 
 ### 推理性能
 
@@ -225,4 +225,4 @@ epoch time: 1104929.793 ms, per step time: 97.162 ms
 
 # ModelZoo主页  
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

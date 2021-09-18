@@ -261,7 +261,7 @@ bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_CKPT(o
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
 
 Results and checkpoints are written to `./train_parallel_{i}` folder for device `i` respectively.
  Log can be found in `./train_parallel_{i}/log_{i}.log` and loss values are recorded in `./train_parallel_{i}/loss.log`.
@@ -468,7 +468,7 @@ accuracy:  0.8533
 | Speed                      | 1pc: 250 ms/step;  8pcs: 260 ms/step                          |
 | Total time                 | 1pc: 15 hours;  8pcs: 1.92 hours                          |
 | Parameters (M)             | 177                                                         |
-| Scripts                    | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/cnnctc> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/master/official/cv/cnnctc> |
 
 | Parameters                 | CNNCTC                                                   |
 | -------------------------- | ----------------------------------------------------------- |
@@ -483,7 +483,7 @@ accuracy:  0.8533
 | Speed                      | 1pc: 1180 ms/step;  8pcs: 1180 ms/step                          |
 | Total time                 | 1pc: 62.9 hours;  8pcs: 8.67 hours                          |
 | Parameters (M)             | 177                                                         |
-| Scripts                    | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/cnnctc> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/master/official/cv/cnnctc> |
 
 ### Evaluation Performance
 
@@ -588,4 +588,4 @@ If you need to use the trained model to perform inference on multiple hardware p
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ Please check the official [homepage](https://gitee.com/mindspore/models).

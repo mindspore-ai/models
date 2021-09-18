@@ -131,7 +131,7 @@ Major parameters in train.py and config.py are:
     bash scripts/run_standalone_train_ascend.sh DEVICE_ID DATA_DIR
     ```
 
-> 注：RANK_TABLE_FILE可参考[链接]( https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html)。device_ip可以通过[链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)获取
+> 注：RANK_TABLE_FILE可参考[链接]( https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html)。device_ip可以通过[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)获取
 
 ### 结果
 
@@ -215,5 +215,5 @@ python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 
 # ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。
 

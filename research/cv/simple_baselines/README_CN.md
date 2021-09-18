@@ -72,7 +72,7 @@ simple_baselines的总体网络架构如下：
 
 - 预训练模型
 
-  当开始训练之前需要获取mindspore图像网络预训练模型，可通过在[official model zoo](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/resnet)中运行Resnet训练脚本来获取模型权重文件，预训练文件名称为resnet50.ckpt。
+  当开始训练之前需要获取mindspore图像网络预训练模型，可通过在[official model zoo](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)中运行Resnet训练脚本来获取模型权重文件，预训练文件名称为resnet50.ckpt。
 
 - 数据集准备
 
@@ -260,4 +260,4 @@ dataset.py中设置了“create_dataset”函数内的种子，同时在model.py
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

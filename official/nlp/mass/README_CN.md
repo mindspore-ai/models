@@ -734,4 +734,4 @@ MASS模型涉及随机失活（dropout）操作，如需禁用此功能，请在
 
 # ModelZoo主页  
 
- [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)
+ [链接](https://gitee.com/mindspore/models)

@@ -137,4 +137,4 @@ The Results on all numbers of labeled target images on GTA5->Cityscapes are list
 
 ## ModeZoo Homepage
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

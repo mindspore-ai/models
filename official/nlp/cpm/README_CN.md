@@ -400,7 +400,7 @@ Zero-shot单机双卡推理性能和精度如下：
 | 损失                   | 0.7                                            |
 | 参数 (M)               | 2597.1                                            |
 | 推理检查点   | 76G （.ckpt文件）                                            |
-| 脚本                    | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/cpm> |
+| 脚本                    | <https://gitee.com/mindspore/models/tree/master/official/nlp/cpm> |
 
 四机32卡Finetune性能和精度如下：
 
@@ -418,7 +418,7 @@ Zero-shot单机双卡推理性能和精度如下：
 | 损失                  | 0.03                                                |
 | 参数 (M)             | 2597.1                                                |
 | 推理检查点   | 57G （.ckpt文件）                                            |
-| 脚本                    | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/nlp/cpm> |
+| 脚本                    | <https://gitee.com/mindspore/models/tree/master/official/nlp/cpm> |
 
 # 随机情况说明
 
@@ -435,4 +435,4 @@ train.py已经设置了一些种子，避免数据集轮换和权重初始化的
 
 # ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

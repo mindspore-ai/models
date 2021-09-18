@@ -54,7 +54,7 @@ Dataset used: [ImageNet2012](http://www.image-net.org/)
 # [Environment Requirements](#contents)
 
 - Hardware（Ascend）
-    - Prepare hardware environment with Ascend processor. Squeezenet1_1 training on GPU performs is not good now, and it is still in research. See [squeezenet in research](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/squeezenet1_1) to get up-to-date details.
+    - Prepare hardware environment with Ascend processor. Squeezenet1_1 training on GPU performs is not good now, and it is still in research. See [squeezenet in research](https://gitee.com/mindspore/models/tree/master/research/cv/squeezenet1_1) to get up-to-date details.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
@@ -158,7 +158,7 @@ checkpoint can be produced in training process and be saved in the folder ./trai
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
-Please follow the instructions in the link [hccl_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools).
+Please follow the instructions in the link [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
 Training result will be stored in the example path, whose folder name begins with "train" or "train_parallel". Under this, you can find checkpoint file together with result like the followings in log.
 
@@ -259,7 +259,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 8pcs: 17.5 ms/step                                          |
 | Total time                 | 8pcs: 5.2 hours                                             | |
 | Checkpoint for Fine tuning | 13.24M (.ckpt file)                                          |
-| Scripts                    | [squeezenet script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/squeezenet) |
+| Scripts                    | [squeezenet script](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) |
 
 ### Inference Performance
 
@@ -335,4 +335,4 @@ In dataset.py, we set the seed inside “create_dataset" function. We also use r
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ Please check the official [homepage](https://gitee.com/mindspore/models).

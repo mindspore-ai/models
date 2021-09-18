@@ -385,7 +385,7 @@ recall_@10:0.10383,     recall_@20:0.15524,     ndcg_@10:0.07503,    ndcg_@20:0.
 | Optimizer                      | Adam                                       | Adam                                       |
 | Loss Function                  | BPR loss                                   | BPR loss                                   |
 | Training Cost                  | 25min                                      | 60min                                      |
-| Scripts                        | [bgcf script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/bgcf) | [bgcf script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/gnn/bgcf) |
+| Scripts                        | [bgcf script](https://gitee.com/mindspore/models/tree/master/official/gnn/bgcf) | [bgcf script](https://gitee.com/mindspore/models/tree/master/official/gnn/bgcf) |
 
 #### Inference Performance
 
@@ -407,4 +407,4 @@ BGCF model contains lots of dropout operations, if you want to disable dropout, 
 
 ## [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](http://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](http://gitee.com/mindspore/models).

@@ -206,7 +206,7 @@ sh run_standalone_train_gpu.sh se-resnet50 imagenet2012 [DATASET_PATH]
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
-Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools).
+Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
 Training result will be stored in the example path, whose folder name begins with "train" or "train_parallel". Under this, you can find checkpoint file together with result like the following in log.
 
@@ -310,7 +310,7 @@ result: {'top_5_accuracy': 93.86%, 'top_1_accuracy': 77.80%}
 | Total time                 | # mins                                                     | 8pcs: 15.9 hours                                           |
 | Parameters (M)             | 285M                                                       | 285M                                                       |
 | Checkpoint for Fine tuning | # M (.ckpt file)                                           | # M (.ckpt file)                                           |
-| Scripts                    | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/SE-Net> |<https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/SE-Net>                                 |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/cv/SE-Net> |<https://gitee.com/mindspore/models/tree/master/research/cv/SE-Net>                                 |
 
 ### Inference Performance
 
@@ -349,4 +349,4 @@ In dataset.py, we set the seed inside "create_dataset" function. We also use ran
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ Please check the official [homepage](https://gitee.com/mindspore/models).

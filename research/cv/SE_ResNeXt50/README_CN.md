@@ -94,7 +94,7 @@ SE-ResNeXt的总体网络架构如下： [链接](https://arxiv.org/abs/1709.015
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
 
 # 脚本说明
 
@@ -280,4 +280,4 @@ SE-ResNeXt的总体网络架构如下： [链接](https://arxiv.org/abs/1709.015
 
 # ModelZoo主页  
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

@@ -267,4 +267,4 @@ sh run_eval.sh [DEVICE_ID] [DATA_NAME]
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

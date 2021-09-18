@@ -155,7 +155,7 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
 
   请遵循以下链接中的说明：
 
-  [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)
+  [链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
 
 ### 结果
 
@@ -322,7 +322,7 @@ Densenet121网络使用ImageNet推理得到的结果如下:
 | 训练总时间 (8p)             | 7.0h                                    | 20.0h                                    |
 | 评估总时间                  | 99s                                    | 58s                                    |
 | 参数量 (M)                 | 44M                                   | 51.3M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/shufflenetv1) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/shufflenetv1) |
 
 # 随机情况的描述
 
@@ -330,4 +330,4 @@ Densenet121网络使用ImageNet推理得到的结果如下:
 
 # ModelZoo
 
-请核对官方 [主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请核对官方 [主页](https://gitee.com/mindspore/models)。

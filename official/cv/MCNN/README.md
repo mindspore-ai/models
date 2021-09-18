@@ -184,7 +184,7 @@ Before running the command below, please check the checkpoint path used for eval
 | Speed                      | 5.79 ms/step                                                  |
 | Total time                 | 23 mins                                                     |
 | Checkpoint for Fine tuning | 500.94KB (.ckpt file)                                           |
-| Scripts                    | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/MCNN | https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/alexnet |
+| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/cv/MCNN | https://gitee.com/mindspore/models/tree/master/official/cv/alexnet |
 
 # [Description of Random Situation](#contents)
 
@@ -192,4 +192,4 @@ In dataset.py, we set the seed inside ```create_dataset``` function.
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

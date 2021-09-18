@@ -422,7 +422,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 7.3 ms/step                                                  | 16.8 ms/step                                     |
 | Total time                 | 6 mins                                                     | 14 mins                                          |
 | Checkpoint for Fine tuning | 445M (.ckpt file)                                           | 445M (.ckpt file)                                |
-| Scripts                    | [AlexNet Script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/alexnet) | [AlexNet Script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/alexnet) |
+| Scripts                    | [AlexNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) | [AlexNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) |
 
 ## [Description of Random Situation](#contents)
 
@@ -430,4 +430,4 @@ In dataset.py, we set the seed inside ```create_dataset``` function.
 
 ## [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

@@ -121,7 +121,7 @@ We provide `convert_ic03.py`, `convert_iiit5k.py`, `convert_svt.py` as exmples f
     For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
     Please follow the instructions in the link below:
-    [hccl_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools).
+    [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
 - Run on docker
 
@@ -446,7 +446,7 @@ result CRNNAccuracy is: 0.7933333333333
 | Total time                 | 557 mins                                          | 189 mins                                          |
 | Parameters (M)             | 83M (.ckpt file)                                  | 96M                                               |
 | Checkpoint for Fine tuning | 20.3M (.ckpt file)                                |                                                   |
-| Scripts                    | [Link](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/crnn) | [Link](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/crnn) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/crnn) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/crnn) |
 
 #### [Evaluation Performance](#contents)
 
@@ -468,4 +468,4 @@ In dataset.py, we set the seed inside “create_dataset" function. We also use r
 
 ## [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)
+Please check the official [homepage](https://gitee.com/mindspore/models)

@@ -179,4 +179,4 @@ We use Depth Resnet Generator on Ascend and Resnet Generator on GPU.
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

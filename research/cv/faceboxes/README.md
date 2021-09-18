@@ -273,7 +273,7 @@ Parameters for both training and evaluation can be set in config.py
 | Total time                 | 4pcs: 7.6 hours                                              |
 | Parameters (M)             | 3.84M                                                        |
 | Checkpoint for Fine tuning | 13M (.ckpt file)                                             |
-| Scripts                    | [faceboxes script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/faceboxes) |
+| Scripts                    | [faceboxes script](https://gitee.com/mindspore/models/tree/master/research/cv/faceboxes) |
 
 # [Description of Random Situation](#contents)
 
@@ -281,4 +281,4 @@ In train.py, we set the seed with setup_seed function.
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+ Please check the official [homepage](https://gitee.com/mindspore/models).  

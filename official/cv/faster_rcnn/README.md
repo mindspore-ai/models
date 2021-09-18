@@ -374,7 +374,7 @@ bash run_distribute_train_gpu.sh [DEVICE_NUM] [PRETRAINED_MODEL] [BACKBONE] [COC
 
 Notes:
 
-1. Rank_table.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools).
+1. Rank_table.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 2. As for PRETRAINED_MODEL，it should be a trained ResNet50 checkpoint. If you need to load Ready-made pretrained FasterRcnn checkpoint, you may make changes to the train.py script as follows.
 
 ```python
@@ -518,7 +518,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 1pc: 190 ms/step;  8pcs: 200 ms/step                          | 1pc: 320 ms/step;  8pcs: 335 ms/step                          |
 | Total time                 | 1pc: 37.17 hours;  8pcs: 4.89 hours                          |1pc: 63.09 hours;  8pcs: 8.25 hours                          |
 | Parameters (M)             | 250                                                         |250                                                         |
-| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn) | [fasterrcnn script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn) |
+| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
 
 ### Inference Performance
 
@@ -536,4 +536,4 @@ Inference result is saved in current path, you can find result like this in acc.
 
 # [ModelZoo Homepage](#contents)  
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ Please check the official [homepage](https://gitee.com/mindspore/models).

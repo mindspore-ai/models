@@ -107,7 +107,7 @@ You can start training using python or shell scripts. The usage of shell scripts
 
     Please follow the instructions in the link below:
 
-    <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools>.
+    <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
 
 - ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows)
 
@@ -253,4 +253,4 @@ In train.py, we set the seed which is used by numpy.random, mindspore.common.Ini
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

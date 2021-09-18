@@ -420,4 +420,4 @@ Saving ../../results/0-2441_61000/.._.._results_0-2441_61000_face_AP_0.7575.png
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).

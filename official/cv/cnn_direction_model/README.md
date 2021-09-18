@@ -168,7 +168,7 @@ Results of evaluation will be printed after evaluation process is completed.
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
 
 Run `scripts/run_distribute_train_ascend.sh` to train the model distributed. The usage of the script is:
 
@@ -311,4 +311,4 @@ In train.py, we set some seeds before training.
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ Please check the official [homepage](https://gitee.com/mindspore/models).

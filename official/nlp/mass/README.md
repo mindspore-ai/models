@@ -733,4 +733,4 @@ The model has been validated on Ascend and GPU environments, not validated on CP
 
 # ModelZoo Homepage  
 
- [Link](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)
+ [Link](https://gitee.com/mindspore/models)

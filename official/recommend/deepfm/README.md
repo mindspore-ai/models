@@ -95,7 +95,7 @@ After installing MindSpore via the official website, you can start training and 
 
   Please follow the instructions in the link below:
 
-  [hccl tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools).
+  [hccl tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
 - running on GPU
 
@@ -430,7 +430,7 @@ auc : 0.8057789065281104
 | Total time                 | 1pc: 90 mins;                                               | To do                  |
 | Parameters (M)             | 16.5                                                        | To do                  |
 | Checkpoint for Fine tuning | 190M (.ckpt file)                                           | To do                  |
-| Scripts                    | [deepfm script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/recommend/deepfm) | To do                  |
+| Scripts                    | [deepfm script](https://gitee.com/mindspore/models/tree/master/official/recommend/deepfm) | To do                  |
 
 ### Inference Performance
 
@@ -452,4 +452,4 @@ We set the random seed before training in train.py.
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+Please check the official [homepage](https://gitee.com/mindspore/models).  

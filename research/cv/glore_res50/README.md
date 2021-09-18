@@ -162,7 +162,7 @@ glore_res的总体网络架构如下：
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
 
 ### 结果
 
@@ -228,7 +228,7 @@ sh run_eval.sh ~/dataset/imagenet 0 ~/ckpt/glore_res50_120-1251.ckpt
 | 总时长                 | 10.98小时 |
 | 参数(M)             | 30.5 |
 | 微调检查点| 233.46M（.ckpt文件）|
-| 脚本                    | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/glore_res50) |
+| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/glore_res50) |
 
 # 随机情况说明
 
@@ -236,4 +236,4 @@ sh run_eval.sh ~/dataset/imagenet 0 ~/ckpt/glore_res50_120-1251.ckpt
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

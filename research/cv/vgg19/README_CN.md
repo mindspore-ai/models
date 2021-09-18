@@ -120,7 +120,7 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --data_dir=[DATA_PATH]  --pre_tr
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 具体操作，参见：
-<https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools>
+<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
 
 - GPU处理器环境运行
 
@@ -551,7 +551,7 @@ python export.py --config_path [YMAL_CONFIG_PATH] --ckpt_file [CKPT_PATH] --file
 | 速度 | 8卡：97.4毫秒/步 |
 | 总时长 | 8卡：6.1小时 |
 | 调优检查点 |    1.1 GB（.ckpt 文件）               |
-| 脚本                  |[VGG19](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/vgg19) |                   |
+| 脚本                  |[VGG19](https://gitee.com/mindspore/models/tree/master/research/cv/vgg19) |                   |
 
 ### 评估性能
 
@@ -572,4 +572,4 @@ dataset.py中设置了“create_dataset”函数内的种子，同时还使用�
 
 ## ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/models/tree/master/)。  
+请浏览官网[主页](https://gitee.com/mindspore/models)。  

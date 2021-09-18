@@ -89,7 +89,7 @@ PoseNet是剑桥大学提出的一种鲁棒、实时的6DOF（单目六自由度
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
 
 - GPU处理器环境运行
 
@@ -300,7 +300,7 @@ PoseNet是剑桥大学提出的一种鲁棒、实时的6DOF（单目六自由度
 | 参数(M)             | 10.7                                                        | 10.7                   |
 | 微调检查点 | 82.91M (.ckpt文件)                                         | 82.91M (.ckpt文件)                |
 | 推理模型        | 41.66M (.mindir文件)                     | 41.66M (.mindir文件)                 |
-| 脚本                    | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/posenet> | <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/posenet> |
+| 脚本                    | <https://gitee.com/mindspore/models/tree/master/official/cv/posenet> | <https://gitee.com/mindspore/models/tree/master/official/cv/posenet> |
 
 #### StMarysChurch上的PoseNet
 
@@ -320,7 +320,7 @@ PoseNet是剑桥大学提出的一种鲁棒、实时的6DOF（单目六自由度
 | 参数(M)             | 10.7                                                        | 10.7                   |
 | 微调检查点 | 82.91M (.ckpt文件)                                         | 82.91M (.ckpt文件)                |
 | 推理模型        | 41.66M (.mindir文件)                     | 41.66M (.mindir文件)                 |
-| 脚本                    | [posenet脚本](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/posenet) | [posenet脚本](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/posenet) |
+| 脚本                    | [posenet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/posenet) | [posenet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/posenet) |
 
 ### 推理性能
 
@@ -360,4 +360,4 @@ PoseNet是剑桥大学提出的一种鲁棒、实时的6DOF（单目六自由度
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

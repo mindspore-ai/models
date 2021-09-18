@@ -169,7 +169,7 @@ python export.py --device_target [PLATFORM] --checkpoint_path [CKPT_PATH]
 | Total time                 | 1433 min                  |
 | Params (M)                 | 5.48 M                    |
 | Checkpoint for Fine tuning | 44 M                      |
-|  Scripts                   | [Link](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/mobilenetv3)|
+|  Scripts                   | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv3)|
 
 # [Description of Random Situation](#contents)
 
@@ -177,4 +177,4 @@ In dataset.py, we set the seed inside “create_dataset" function. We also use r
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).
