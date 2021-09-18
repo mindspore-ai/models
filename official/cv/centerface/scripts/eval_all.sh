@@ -29,6 +29,11 @@ then
 exit 1
 fi
 
+if [ -f log_eval_all.txt ]
+then
+    rm -rf ./log_eval_all.txt
+fi
+
 #for i in $(seq start_epoch end_epoch+1)
 for i in $(seq 89 200)
 do
