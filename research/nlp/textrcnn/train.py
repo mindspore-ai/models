@@ -35,6 +35,7 @@ from src.model_utils.device_adapter import get_device_id
 
 set_seed(0)
 
+
 def modelarts_pre_process():
     '''modelarts pre process function.'''
     cfg.ckpt_folder_path = os.path.join(cfg.output_path, cfg.ckpt_folder_path)
@@ -47,10 +48,12 @@ def run_train():
     context.set_context(
         mode=context.GRAPH_MODE,
         save_graphs=False,
-        device_target="Ascend")
+        device_target=cfg.device_target)
 
     device_id = get_device_id()
     context.set_context(device_id=device_id)
+    if cfg.device_target == "GPU":
+        context.set_context(enable_graph_kernel=True)
 
     if cfg.preprocess == 'true':
         print("============== Starting Data Pre-processing ==============")
@@ -88,6 +91,7 @@ def run_train():
     ckpoint_cb = ModelCheckpoint(prefix=cfg.cell, directory=cfg.ckpt_folder_path, config=config_ck)
     model.train(num_epochs, ds_train, callbacks=[ckpoint_cb, loss_cb, time_cb])
     print("train success")
+
 
 if __name__ == '__main__':
     run_train()

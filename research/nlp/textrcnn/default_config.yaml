@@ -62,4 +62,4 @@ file_format: "file format, choose from MINDIR or AIR"
 
 ---
 file_format: ["AIR", "MINDIR"]
-device_target: ["Ascend"]
+device_target: ["Ascend", "GPU"]
