@@ -204,9 +204,12 @@ def run_train():
     # network
     config.logger.important_info('start create network')
     network = CSPDarknet53(num_classes=config.num_classes)
-    # load_pretrain_model(config.pretrained, network, config)
 
+    dir_path = os.path.dirname(os.path.abspath(__file__))
+    config.pretrained = config.pretrained[2:]
+    config.pretrained = os.path.join(dir_path, config.pretrained)
     print(config.pretrained)
+
     if config.pretrained:
 
         param_dict = load_checkpoint(config.pretrained)

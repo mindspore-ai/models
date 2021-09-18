@@ -19,6 +19,7 @@ import datetime
 
 from mindspore import Tensor
 from mindspore import context
+from mindspore import load_checkpoint, load_param_into_net
 from mindspore.context import ParallelMode
 from mindspore.nn.optim import Momentum
 from mindspore.communication.management import init
@@ -94,6 +95,14 @@ def set_default_args(args):
     args.logger = get_logger(args.outputs_dir, args.rank)
     return args
 
+def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
+    """remove useless parameters according to filter_list"""
+    for key in list(origin_dict.keys()):
+        for name in param_filter:
+            if name in key:
+                print("Delete parameter from checkpoint: ", key)
+                del origin_dict[key]
+                break
 
 def modelarts_pre_process():
     '''modelarts pre process function.'''
@@ -170,7 +179,19 @@ def run_train():
     # network
     config.logger.important_info('start create network')
     network = CSPDarknet53(num_classes=config.num_classes)
-    load_pretrain_model(config.pretrained, network, config)
+
+    print(config.pretrained)
+    if config.pretrained:
+
+        param_dict = load_checkpoint(config.pretrained)
+
+        if config.filter_weight:
+            filter_list = ['head.fc.weight', 'head.fc.bias']
+            filter_checkpoint_parameter_by_list(param_dict, filter_list)
+        load_param_into_net(network, param_dict)
+
+    else:
+        load_pretrain_model(config.pretrained, network, config)
 
     # lr
     lr = get_lr(config)
