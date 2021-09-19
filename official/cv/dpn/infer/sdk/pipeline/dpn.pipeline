@@ -52,7 +52,7 @@
                 "dataSource": "mxpi_tensorinfer0",
                 "postProcessConfigPath": "../models/dpn.cfg",
                 "labelPath": "../models/imagenet1000_clsidx_to_labels.names",
-                "postProcessLibPath": "../../../../../mxVision/lib/modelpostprocessors/libresnet50postprocess.so"
+                "postProcessLibPath": "libresnet50postprocess.so"
             },
             "factory": "mxpi_classpostprocessor",
             "next": "mxpi_dataserialize0"
