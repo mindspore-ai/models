@@ -58,8 +58,16 @@ export RANK_SIZE=8
 export RANK_TABLE_FILE=$RANK_TABLE_FILE
 export MINDSPORE_HCCL_CONFIG_PATH=$RANK_TABLE_FILE
 
+cpus=`cat /proc/cpuinfo| grep "processor"| wc -l`
+avg=`expr $cpus \/ $RANK_SIZE`
+gap=`expr $avg \- 1`
+
 for((i=0; i<${DEVICE_NUM}; i++))
 do
+    start=`expr $i \* $avg`
+    end=`expr $start \+ $gap`
+    cmdopt=$start"-"$end
+
     export DEVICE_ID=$i
     export RANK_ID=$i
     rm -rf ./train_parallel$i
@@ -71,7 +79,7 @@ do
     cd ./train_parallel$i || exit
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     env > env.log
-    python train.py \
+    taskset -c $cmdopt python train.py \
         --data_dir=$DATASET_PATH \
         --pretrained_backbone=$PRETRAINED_BACKBONE \
         --is_distributed=1 \
