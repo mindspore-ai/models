@@ -87,10 +87,15 @@ APP_ERROR DPN::ReadImage(const std::string &imgPath, cv::Mat *imageMat) {
 }
 
 APP_ERROR DPN::ResizeImage(const cv::Mat &srcImageMat, cv::Mat *dstImageMat) {
-    static constexpr uint32_t resizeHeight = 224;
-    static constexpr uint32_t resizeWidth = 224;
+    // first resize image to 256 * 256
+    static constexpr uint32_t resizeHeight = 256;
+    static constexpr uint32_t resizeWidth = 256;
+    cv::Mat scaledImage = srcImageMat;
+    cv::resize(srcImageMat, scaledImage, cv::Size(resizeWidth, resizeHeight));
 
-    cv::resize(srcImageMat, *dstImageMat, cv::Size(resizeWidth, resizeHeight));
+    // then make a centre crop of 224*224
+    cv::Rect myROI(16, 16, 224, 224);
+    *dstImageMat = scaledImage(myROI);
     return APP_ERR_OK;
 }
 
