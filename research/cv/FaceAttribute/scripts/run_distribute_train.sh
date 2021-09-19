@@ -64,16 +64,24 @@ echo $PRETRAINED_BACKBONE
 export RANK_TABLE_FILE=$RANK_TABLE
 export RANK_SIZE=8
 
+cpus=`cat /proc/cpuinfo| grep "processor"| wc -l`
+avg=`expr $cpus \/ $RANK_SIZE`
+gap=`expr $avg \- 1`
+
 echo 'start training'
 for((i=0;i<=$RANK_SIZE-1;i++));
 do
+    start=`expr $i \* $avg`
+    end=`expr $start \+ $gap`
+    cmdopt=$start"-"$end
+
     echo 'start rank '$i
     mkdir ${current_exec_path}/device$i
     cd ${current_exec_path}/device$i || exit
     export RANK_ID=$i
     dev=`expr $i + 0`
     export DEVICE_ID=$dev
-    python ${dirname_path}/${SCRIPT_NAME} \
+    taskset -c $cmdopt python ${dirname_path}/${SCRIPT_NAME} \
         --mindrecord_path=$MINDRECORD_FILE \
         --pretrained=$PRETRAINED_BACKBONE > train.log  2>&1 &
 done
