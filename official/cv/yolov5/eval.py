@@ -387,13 +387,13 @@ def run_eval():
     data_root = config.data_root
     ann_file = config.ann_file
 
-    if config.testing_shape:
+    if config.eval_shape:
         config.test_img_shape = convert_testing_shape(config.eval_shape)
 
     ds, data_size = create_yolo_dataset(data_root, ann_file, is_training=False, batch_size=config.per_batch_size,
                                         max_epoch=1, device_num=1, rank=rank_id, shuffle=False, config=config)
 
-    config.logger.info('testing shape : %d', config.test_img_shape)
+    config.logger.info('testing shape : %s', config.test_img_shape)
     config.logger.info('total %d images to eval', data_size)
 
     network.set_train(False)
