@@ -14,6 +14,10 @@
     - [评估过程](#评估过程)
         - [启动](#启动-1)
         - [结果](#结果-1)
+    - [模型导出](#模型导出)
+    - [推理过程](#推理过程)
+        - [使用方法](#使用方法)
+        - [结果](#结果-2)
 - [模型说明](#模型说明)
     - [训练性能](#训练性能)
 - [随机情况的描述](#随机情况的描述)
@@ -59,21 +63,25 @@ MobileNetV3总体网络架构如下：
 
 ```python
 ├── MobileNetV3
-  ├── README_CN.md     # MobileNetV3相关描述
+  ├── README_CN.md                 # 模型相关描述
+  ├── ascend310_infer              # 实现310推理源代码
   ├── scripts
   │   ├──run_standalone_train.sh   # 用于单卡训练的shell脚本
   │   ├──run_distribute_train.sh   # 用于八卡训练的shell脚本
-  │   └──run_eval.sh    # 用于评估的shell脚本
+  │   ├──run_infer_310.sh          # Ascend推理shell脚本
+  │   └──run_eval.sh               # 用于评估的shell脚本
   ├── src
-  │   ├──config.py      # 参数配置
-  │   ├──dataset.py     # 创建数据集
-  │   ├──loss.py        # 损失函数
-  │   ├──lr_generator.py     # 配置学习率
-  │   ├──mobilenetV3.py      # MobileNetV3架构
-  │   └──monitor.py          # 监控网络损失和其他数据
-  ├── eval.py       # 评估脚本
-  ├── export.py     # 模型格式转换脚本
-  └── train.py      # 训练脚本
+  │   ├──config.py                 # 参数配置
+  │   ├──dataset.py                # 创建数据集
+  │   ├──loss.py                   # 损失函数
+  │   ├──lr_generator.py           # 配置学习率
+  │   ├──mobilenetV3.py            # MobileNetV3架构
+  │   └──Monitor.py                # 监控网络损失和其他数据
+  ├── create_imagenet2012_label.py # 创建数据标签
+  ├── eval.py                      # 评估脚本
+  ├── export.py                    # 模型格式转换脚本
+  ├── postprogress.py              # 310推理后处理脚本
+  └── train.py                     # 训练脚本
 ```
 
 ## 脚本参数
@@ -155,6 +163,35 @@ epoch 5: epoch time: 150594.088, per step time: 141.138, avg loss: 3.607
 result: {'Loss': 2.3101649037352554, 'Top_1_Acc': 0.6746546546546547, 'Top_5_Acc': 0.8722122122122122} ckpt= ./checkpoint/model_0/mobilenetV3-370_625.ckpt
 ```
 
+## 模型导出
+
+```shell
+python export.py --checkpoint_path [CKPT_PATH]
+```
+
+`EXPORT_FORMAT` 可选 ["AIR", "MINDIR"]
+
+## 推理过程
+
+### 使用方法
+
+在推理之前需要在昇腾910环境上完成模型的导出。
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+```
+
+-注意：310推理使用ImageNet数据集. 图片的标签是将所在文件夹排序后获得的从0开始的编号
+
+### 310结果
+
+推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
+
+```python
+accuracy:0.675
+```
+
 # 模型说明
 
 ## 训练性能
@@ -174,7 +211,7 @@ result: {'Loss': 2.3101649037352554, 'Top_1_Acc': 0.6746546546546547, 'Top_5_Acc
 | 训练总时间 (8p)             | 16.4h                                    |
 | 评估总时间                  | 1min                                    |
 | 参数量 (M)                 | 36M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/mobilenetV3_small_x1_0) |
+| 脚本                       | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/mobilenetV3_small_x1_0) |
 
 # 随机情况的描述
 
@@ -182,4 +219,4 @@ result: {'Loss': 2.3101649037352554, 'Top_1_Acc': 0.6746546546546547, 'Top_5_Acc
 
 # ModelZoo
 
-请核对官方 [主页](https://gitee.com/mindspore/models)。
+请核对官方 [主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
