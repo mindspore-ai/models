@@ -17,9 +17,7 @@ import numpy as np
 from mindspore import nn, context
 from mindspore import Parameter, ParameterTuple
 import mindspore.common.dtype as mstype
-from mindspore.ops import functional as F
-from mindspore.ops import composite as C
-from mindspore.ops import operations as P
+import mindspore.ops as ops
 from mindspore.nn import Dropout
 from mindspore.nn.optim import Adam, FTRL, LazyAdam
 from mindspore.common.initializer import Uniform, initializer
@@ -86,9 +84,9 @@ class DenseLayer(nn.Cell):
             weight_init, [input_dim, output_dim], name="weight")
         self.bias = init_method(bias_init, [output_dim], name="bias")
         self.act_func = self._init_activation(act_str)
-        self.matmul = P.MatMul(transpose_b=False)
-        self.bias_add = P.BiasAdd()
-        self.cast = P.Cast()
+        self.matmul = ops.MatMul(transpose_b=False)
+        self.bias_add = ops.BiasAdd()
+        self.cast = ops.Cast()
         self.dropout = Dropout(keep_prob=keep_prob)
         self.use_activation = use_activation
         self.convert_dtype = convert_dtype
@@ -97,11 +95,11 @@ class DenseLayer(nn.Cell):
     def _init_activation(self, act_str):
         act_str = act_str.lower()
         if act_str == "relu":
-            act_func = P.ReLU()
+            act_func = ops.ReLU()
         elif act_str == "sigmoid":
-            act_func = P.Sigmoid()
+            act_func = ops.Sigmoid()
         elif act_str == "tanh":
-            act_func = P.Tanh()
+            act_func = ops.Tanh()
         return act_func
 
     def construct(self, x):
@@ -143,73 +141,42 @@ class WideDeepModel(nn.Cell):
         is_auto_parallel = parallel_mode in (ParallelMode.SEMI_AUTO_PARALLEL, ParallelMode.AUTO_PARALLEL)
         if is_auto_parallel:
             self.batch_size = self.batch_size * get_group_size()
-        is_field_slice = config.field_slice
         sparse = config.sparse
         self.field_size = config.field_size
-        self.vocab_size = config.vocab_size
-        self.vocab_cache_size = config.vocab_cache_size
         self.emb_dim = config.emb_dim
-        self.deep_layer_dims_list = config.deep_layer_dim
-        self.deep_layer_act = config.deep_layer_act
-        self.init_args = config.init_args
         self.weight_init, self.bias_init = config.weight_bias_init
-        self.weight_bias_init = config.weight_bias_init
-        self.emb_init = config.emb_init
-        self.drop_out = config.dropout_flag
-        self.keep_prob = config.keep_prob
         self.deep_input_dims = self.field_size * self.emb_dim
-        self.layer_dims = self.deep_layer_dims_list + [1]
-        self.all_dim_list = [self.deep_input_dims] + self.layer_dims
-
-        init_acts = [('Wide_b', [1], self.emb_init)]
-        var_map = init_var_dict(self.init_args, init_acts)
+        self.all_dim_list = [self.deep_input_dims] + config.deep_layer_dim + [1]
+        init_acts = [('Wide_b', [1], config.emb_init)]
+        var_map = init_var_dict(config.init_args, init_acts)
         self.wide_b = var_map["Wide_b"]
-        self.dense_layer_1 = DenseLayer(self.all_dim_list[0],
-                                        self.all_dim_list[1],
-                                        self.weight_bias_init,
-                                        self.deep_layer_act,
-                                        convert_dtype=True, drop_out=config.dropout_flag)
-        self.dense_layer_2 = DenseLayer(self.all_dim_list[1],
-                                        self.all_dim_list[2],
-                                        self.weight_bias_init,
-                                        self.deep_layer_act,
-                                        convert_dtype=True, drop_out=config.dropout_flag)
-        self.dense_layer_3 = DenseLayer(self.all_dim_list[2],
-                                        self.all_dim_list[3],
-                                        self.weight_bias_init,
-                                        self.deep_layer_act,
-                                        convert_dtype=True, drop_out=config.dropout_flag)
-        self.dense_layer_4 = DenseLayer(self.all_dim_list[3],
-                                        self.all_dim_list[4],
-                                        self.weight_bias_init,
-                                        self.deep_layer_act,
-                                        convert_dtype=True, drop_out=config.dropout_flag)
-        self.dense_layer_5 = DenseLayer(self.all_dim_list[4],
-                                        self.all_dim_list[5],
-                                        self.weight_bias_init,
-                                        self.deep_layer_act,
+        self.dense_layer_1 = DenseLayer(self.all_dim_list[0], self.all_dim_list[1], config.weight_bias_init,
+                                        config.deep_layer_act, convert_dtype=True, drop_out=config.dropout_flag)
+        self.dense_layer_2 = DenseLayer(self.all_dim_list[1], self.all_dim_list[2], config.weight_bias_init,
+                                        config.deep_layer_act, convert_dtype=True, drop_out=config.dropout_flag)
+        self.dense_layer_3 = DenseLayer(self.all_dim_list[2], self.all_dim_list[3], config.weight_bias_init,
+                                        config.deep_layer_act, convert_dtype=True, drop_out=config.dropout_flag)
+        self.dense_layer_4 = DenseLayer(self.all_dim_list[3], self.all_dim_list[4], config.weight_bias_init,
+                                        config.deep_layer_act, convert_dtype=True, drop_out=config.dropout_flag)
+        self.dense_layer_5 = DenseLayer(self.all_dim_list[4], self.all_dim_list[5],
+                                        config.weight_bias_init, config.deep_layer_act,
                                         use_activation=False, convert_dtype=True, drop_out=config.dropout_flag)
-        self.wide_mul = P.Mul()
-        self.deep_mul = P.Mul()
-        self.reduce_sum = P.ReduceSum(keep_dims=False)
-        self.reshape = P.Reshape()
-        self.deep_reshape = P.Reshape()
-        self.square = P.Square()
-        self.shape = P.Shape()
-        self.tile = P.Tile()
-        self.concat = P.Concat(axis=1)
-        self.cast = P.Cast()
-        self.unique = P.Unique().shard(((1,),))
-        self.wide_gatherv2 = P.Gather()
-        self.deep_gatherv2 = P.Gather()
-        if is_auto_parallel and sparse and not is_field_slice and not parameter_server:
-            target = 'DEVICE'
-            if host_device_mix:
-                target = 'CPU'
-            self.wide_embeddinglookup = nn.EmbeddingLookup(self.vocab_size, 1, target=target,
+        self.wide_mul = ops.Mul()
+        self.deep_mul = ops.Mul()
+        self.reduce_sum = ops.ReduceSum(keep_dims=False)
+        self.reshape = ops.Reshape()
+        self.deep_reshape = ops.Reshape()
+        self.square = ops.Square()
+        self.concat = ops.Concat(axis=1)
+        self.unique = ops.Unique().shard(((1,),))
+        self.wide_gatherv2 = ops.Gather()
+        self.deep_gatherv2 = ops.Gather()
+        if is_auto_parallel and sparse and not config.field_slice and not parameter_server:
+            target = 'CPU' if host_device_mix else 'DEVICE'
+            self.wide_embeddinglookup = nn.EmbeddingLookup(config.vocab_size, 1, target=target,
                                                            slice_mode=nn.EmbeddingLookup.TABLE_ROW_SLICE)
             if config.deep_table_slice_mode == "column_slice":
-                self.deep_embeddinglookup = nn.EmbeddingLookup(self.vocab_size, self.emb_dim, target=target,
+                self.deep_embeddinglookup = nn.EmbeddingLookup(config.vocab_size, self.emb_dim, target=target,
                                                                slice_mode=nn.EmbeddingLookup.TABLE_COLUMN_SLICE)
                 self.dense_layer_1.dropout.dropout.shard(((1, get_group_size()),))
                 self.dense_layer_1.matmul.shard(((1, get_group_size()), (get_group_size(), 1)))
@@ -217,16 +184,16 @@ class WideDeepModel(nn.Cell):
                 self.deep_mul.shard(((1, 1, get_group_size()), (1, 1, 1)))
                 self.deep_reshape.add_prim_attr("skip_redistribution", True)
             else:
-                self.deep_embeddinglookup = nn.EmbeddingLookup(self.vocab_size, self.emb_dim, target=target,
+                self.deep_embeddinglookup = nn.EmbeddingLookup(config.vocab_size, self.emb_dim, target=target,
                                                                slice_mode=nn.EmbeddingLookup.TABLE_ROW_SLICE)
             self.reduce_sum.add_prim_attr("cross_batch", True)
             self.embedding_table = self.deep_embeddinglookup.embedding_table
-        elif is_auto_parallel and host_device_mix and is_field_slice and config.full_batch and config.manual_shape:
+        elif is_auto_parallel and host_device_mix and config.field_slice and config.full_batch and config.manual_shape:
             manual_shapes = tuple((s[0] for s in config.manual_shape))
-            self.deep_embeddinglookup = nn.EmbeddingLookup(self.vocab_size, self.emb_dim,
+            self.deep_embeddinglookup = nn.EmbeddingLookup(config.vocab_size, self.emb_dim,
                                                            slice_mode=nn.EmbeddingLookup.FIELD_SLICE,
                                                            manual_shapes=manual_shapes)
-            self.wide_embeddinglookup = nn.EmbeddingLookup(self.vocab_size, 1,
+            self.wide_embeddinglookup = nn.EmbeddingLookup(config.vocab_size, 1,
                                                            slice_mode=nn.EmbeddingLookup.FIELD_SLICE,
                                                            manual_shapes=manual_shapes)
             self.deep_mul.shard(((1, get_group_size(), 1), (1, get_group_size(), 1)))
@@ -236,34 +203,33 @@ class WideDeepModel(nn.Cell):
             self.dense_layer_1.matmul.shard(((1, get_group_size()), (get_group_size(), 1)))
             self.embedding_table = self.deep_embeddinglookup.embedding_table
         elif parameter_server:
-            cache_enable = self.vocab_cache_size > 0
+            cache_enable = config.vocab_cache_size > 0
             target = 'DEVICE' if cache_enable else 'CPU'
             if not cache_enable:
                 sparse = True
             if is_auto_parallel and config.full_batch and cache_enable:
-                self.deep_embeddinglookup = nn.EmbeddingLookup(self.vocab_size, self.emb_dim, target=target,
+                self.deep_embeddinglookup = nn.EmbeddingLookup(config.vocab_size, self.emb_dim, target=target,
                                                                slice_mode=nn.EmbeddingLookup.TABLE_ROW_SLICE,
-                                                               sparse=sparse, vocab_cache_size=self.vocab_cache_size)
-                self.wide_embeddinglookup = nn.EmbeddingLookup(self.vocab_size, 1, target=target,
+                                                               sparse=sparse, vocab_cache_size=config.vocab_cache_size)
+                self.wide_embeddinglookup = nn.EmbeddingLookup(config.vocab_size, 1, target=target,
                                                                slice_mode=nn.EmbeddingLookup.TABLE_ROW_SLICE,
-                                                               sparse=sparse, vocab_cache_size=self.vocab_cache_size)
+                                                               sparse=sparse, vocab_cache_size=config.vocab_cache_size)
             else:
-                self.deep_embeddinglookup = nn.EmbeddingLookup(self.vocab_size, self.emb_dim, target=target,
-                                                               sparse=sparse, vocab_cache_size=self.vocab_cache_size)
-                self.wide_embeddinglookup = nn.EmbeddingLookup(self.vocab_size, 1, target=target, sparse=sparse,
-                                                               vocab_cache_size=self.vocab_cache_size)
+                self.deep_embeddinglookup = nn.EmbeddingLookup(config.vocab_size, self.emb_dim, target=target,
+                                                               sparse=sparse, vocab_cache_size=config.vocab_cache_size)
+                self.wide_embeddinglookup = nn.EmbeddingLookup(config.vocab_size, 1, target=target, sparse=sparse,
+                                                               vocab_cache_size=config.vocab_cache_size)
             self.embedding_table = self.deep_embeddinglookup.embedding_table
             self.deep_embeddinglookup.embedding_table.set_param_ps()
             self.wide_embeddinglookup.embedding_table.set_param_ps()
         else:
-            self.deep_embeddinglookup = nn.EmbeddingLookup(self.vocab_size, self.emb_dim,
+            self.deep_embeddinglookup = nn.EmbeddingLookup(config.vocab_size, self.emb_dim,
                                                            target='DEVICE', sparse=sparse,
-                                                           vocab_cache_size=self.vocab_cache_size)
-            self.wide_embeddinglookup = nn.EmbeddingLookup(self.vocab_size, 1,
+                                                           vocab_cache_size=config.vocab_cache_size)
+            self.wide_embeddinglookup = nn.EmbeddingLookup(config.vocab_size, 1,
                                                            target='DEVICE', sparse=sparse,
-                                                           vocab_cache_size=self.vocab_cache_size)
+                                                           vocab_cache_size=config.vocab_cache_size)
             self.embedding_table = self.deep_embeddinglookup.embedding_table
-
     def construct(self, id_hldr, wt_hldr):
         """
         Args:
@@ -312,12 +278,12 @@ class NetWithLossClass(nn.Cell):
             self.no_l2loss = True
         self.network = network
         self.l2_coef = config.l2_coef
-        self.loss = P.SigmoidCrossEntropyWithLogits()
-        self.square = P.Square()
-        self.reduceMean_false = P.ReduceMean(keep_dims=False)
+        self.loss = ops.SigmoidCrossEntropyWithLogits()
+        self.square = ops.Square()
+        self.reduceMean_false = ops.ReduceMean(keep_dims=False)
         if is_auto_parallel:
             self.reduceMean_false.add_prim_attr("cross_batch", True)
-        self.reduceSum_false = P.ReduceSum(keep_dims=False)
+        self.reduceSum_false = ops.ReduceSum(keep_dims=False)
 
     def construct(self, batch_ids, batch_wts, label):
         '''
@@ -389,11 +355,11 @@ class TrainStepWrap(nn.Cell):
                 self.weights_d, learning_rate=3.5e-4, eps=1e-8, loss_scale=sens)
             self.optimizer_w = FTRL(learning_rate=5e-2, params=self.weights_w,
                                     l1=1e-8, l2=1e-8, initial_accum=1.0, loss_scale=sens)
-        self.hyper_map = C.HyperMap()
-        self.grad_w = C.GradOperation(get_by_list=True,
-                                      sens_param=True)
-        self.grad_d = C.GradOperation(get_by_list=True,
-                                      sens_param=True)
+        self.hyper_map = ops.HyperMap()
+        self.grad_w = ops.GradOperation(get_by_list=True,
+                                        sens_param=True)
+        self.grad_d = ops.GradOperation(get_by_list=True,
+                                        sens_param=True)
         self.sens = sens
         self.loss_net_w = IthOutputCell(network, output_index=0)
         self.loss_net_d = IthOutputCell(network, output_index=1)
@@ -418,8 +384,8 @@ class TrainStepWrap(nn.Cell):
         weights_w = self.weights_w
         weights_d = self.weights_d
         loss_w, loss_d = self.network(batch_ids, batch_wts, label)
-        sens_w = P.Fill()(P.DType()(loss_w), P.Shape()(loss_w), self.sens)
-        sens_d = P.Fill()(P.DType()(loss_d), P.Shape()(loss_d), self.sens)
+        sens_w = ops.Fill()(ops.DType()(loss_w), ops.Shape()(loss_w), self.sens)
+        sens_d = ops.Fill()(ops.DType()(loss_d), ops.Shape()(loss_d), self.sens)
         grads_w = self.grad_w(self.loss_net_w, weights_w)(batch_ids, batch_wts,
                                                           label, sens_w)
         grads_d = self.grad_d(self.loss_net_d, weights_d)(batch_ids, batch_wts,
@@ -427,8 +393,7 @@ class TrainStepWrap(nn.Cell):
         if self.reducer_flag:
             grads_w = self.grad_reducer_w(grads_w)
             grads_d = self.grad_reducer_d(grads_d)
-        return F.depend(loss_w, self.optimizer_w(grads_w)), F.depend(loss_d,
-                                                                     self.optimizer_d(grads_d))
+        return ops.depend(loss_w, self.optimizer_w(grads_w)), ops.depend(loss_d, self.optimizer_d(grads_d))
 
 
 class PredictWithSigmoid(nn.Cell):
@@ -438,7 +403,7 @@ class PredictWithSigmoid(nn.Cell):
     def __init__(self, network):
         super(PredictWithSigmoid, self).__init__()
         self.network = network
-        self.sigmoid = P.Sigmoid()
+        self.sigmoid = ops.Sigmoid()
         parallel_mode = context.get_auto_parallel_context("parallel_mode")
         full_batch = context.get_auto_parallel_context("full_batch")
         is_auto_parallel = parallel_mode in (ParallelMode.SEMI_AUTO_PARALLEL, ParallelMode.AUTO_PARALLEL)
