@@ -107,6 +107,7 @@ class Bottleneck(nn.Cell):
 
         self.relu = nn.ReLU()
         self.downsample = downsample
+        self.add = P.Add()
 
     def construct(self, x):
         """Bottleneck.construct"""
@@ -126,7 +127,7 @@ class Bottleneck(nn.Cell):
         if self.downsample is not None:
             identity = self.downsample(x)
 
-        out = out + identity
+        out = self.add(out, identity)
         out = self.relu(out)
         return out
 
@@ -177,12 +178,13 @@ class ASPP(nn.Cell):
                  use_batch_statistics=True):
         super(ASPP, self).__init__()
         self.phase = phase
+        self.num_classes = num_classes
         out_channels = 256
         self.aspp1 = ASPPConv(in_channels, out_channels, atrous_rates[0], use_batch_statistics=use_batch_statistics)
         self.aspp2 = ASPPConv(in_channels, out_channels, atrous_rates[1], use_batch_statistics=use_batch_statistics)
         self.aspp3 = ASPPConv(in_channels, out_channels, atrous_rates[2], use_batch_statistics=use_batch_statistics)
         self.aspp4 = ASPPConv(in_channels, out_channels, atrous_rates[3], use_batch_statistics=use_batch_statistics)
-        self.aspp_pooling = ASPPPooling(in_channels, out_channels)
+        self.aspp_pooling = ASPPPooling(in_channels, out_channels, use_batch_statistics=use_batch_statistics)
         self.conv1 = nn.Conv2d(out_channels * (len(atrous_rates) + 1), out_channels, kernel_size=1,
                                weight_init='xavier_uniform')
         self.bn1 = nn.BatchNorm2d(out_channels, use_batch_statistics=use_batch_statistics)
