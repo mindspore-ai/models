@@ -29,9 +29,11 @@ def set_parser():
                         help='dataset which is chosen to train (default: AwA)')
     parser.add_argument('--train_mode', type=str, default='att', choices=['att', 'word', 'fusion'],
                         help='mode which is chosen to train (default: attribute)')
-    parser.add_argument('--batch_size', type=int, default=100, help='batch size of one step training')
+    parser.add_argument('--batch_size', type=int, default=100,
+                        help='batch size of one step training, if run script in gpu, the better choice is 64.')
     parser.add_argument('--interval_step', type=int, default=500, help='the interval of printing loss')
-    parser.add_argument('--epoch_size', type=int, default=120, help='epoch of training')
+    parser.add_argument('--epoch_size', type=int, default=120,
+                        help='epoch of training, if run script in gpu, the better choice is 65.')
     parser.add_argument('--data_path', type=str, default='/data/DEM_data', help='path where the dataset is saved')
     parser.add_argument('--save_ckpt', type=str, default='../output',
                         help='if is test, must provide path where the trained ckpt file')

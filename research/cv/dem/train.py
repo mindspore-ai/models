@@ -42,16 +42,21 @@ if __name__ == "__main__":
     # Set graph mode, device id
     set_seed(1000)
     args = set_parser()
-    context.set_context(mode=context.GRAPH_MODE, \
-                        device_target=args.device_target, \
-                        device_id=args.device_id)
+    context.set_context(mode=context.GRAPH_MODE,
+                        device_target=args.device_target)
     if args.distribute:
+        if args.device_target == "Ascend":
+            context.set_context(device_id=args.device_id)
+
         init()
         args.device_num = get_group_size()
         rank_id = get_rank()
-        context.set_auto_parallel_context(parallel_mode=context.ParallelMode.AUTO_PARALLEL, \
-                                          gradients_mean=True, \
-                                          device_num=args.device_num)
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(
+            parallel_mode=context.ParallelMode.DATA_PARALLEL,
+            gradients_mean=True,
+            device_num=args.device_num
+        )
     else:
         rank_id = 0
     # Initialize parameters
@@ -59,7 +64,6 @@ if __name__ == "__main__":
     lr, weight_decay, clip_param = param_cfg(args)
     if np.equal(args.distribute, True):
         lr = lr * 5
-    batch_size = args.batch_size
 
     # Loading datasets and iterators
     if args.dataset == 'AwA':
@@ -121,18 +125,31 @@ if __name__ == "__main__":
     save_ckpt = args.save_ckpt
     ckpt_file_name = save_ckpt + '/train.ckpt'
     interval_step = args.interval_step
-    epoch_size = args.epoch_size
     print("============== Starting Training ==============")
     if np.equal(args.distribute, True):
         now = time.localtime()
         nowt = time.strftime("%Y-%m-%d-%H:%M:%S", now)
         print(nowt)
         loss_cb = LossMonitor(interval_step)
-        ckpt_config = CheckpointConfig(save_checkpoint_steps=interval_step)
-        ckpt_callback = ModelCheckpoint(prefix='auto_parallel', config=ckpt_config)
+        if args.device_target == "Ascend":
+            ckpt_config = CheckpointConfig(save_checkpoint_steps=interval_step)
+            ckpt_callback = ModelCheckpoint(prefix='auto_parallel', config=ckpt_config)
         t1 = time.time()
-        model.train(epoch_size, train_dataset=custom_data, callbacks=[loss_cb, ckpt_callback], dataset_sink_mode=True)
+
+        if args.device_target == "Ascend":
+            model.train(
+                epoch_size,
+                train_dataset=custom_data,
+                callbacks=[loss_cb, ckpt_callback],
+                dataset_sink_mode=True
+            )
+        elif args.device_target == "GPU":
+            model.train(epoch_size, train_dataset=custom_data, callbacks=[loss_cb], dataset_sink_mode=False)
+            ckpt_file_name = save_ckpt + f'/train_{rank_id}.ckpt'
+            save_checkpoint(net, ckpt_file_name)
+
         end = time.time()
+
         t3 = 1000 * (end - t1) / (88 * epoch_size)
         print('total time:', end - start)
         print('speed_8p = %.3f ms/step'%t3)

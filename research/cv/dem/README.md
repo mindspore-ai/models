@@ -75,15 +75,21 @@ unzip DEM_data.zip
 
 #1p example
 # Enter the script dir and start training
-sh run_standalone_train_ascend.sh CUB att /data/DEM_data ../output
+bash run_standalone_train_ascend.sh CUB att /data/DEM_data ../output
+bash scripts/run_standalone_train_gpu.sh CUB att ./data ./output
 
 # Enter the script dir and start evaluating
-sh run_standalone_eval_ascend.sh CUB att /data/DEM_data ../output/train.ckpt
+bash run_standalone_eval_ascend.sh CUB att /data/DEM_data ../output/train.ckpt
+bash scripts/run_standalone_eval_gpu.sh CUB att ../data output/train.ckpt
 
 #8p example
-sh run_distributed_train_ascend.sh [hccl configuration,.json format] CUB att /data/DEM_data
+bash run_distributed_train_ascend.sh [hccl configuration,.json format] CUB att /data/DEM_data
 
-sh run_standalone_eval_ascend.sh CUB att /data/DEM_data ../train_parallel/7/auto_parallel-120_11.ckpt
+bash run_standalone_eval_ascend.sh CUB att /data/DEM_data ../train_parallel/7/auto_parallel-120_11.ckpt
+
+bash scripts/run_distributed_train_gpu.sh CUB att ../data ./output_multi GPU 8
+
+bash scripts/run_standalone_eval_gpu.sh CUB att ../data output/train_0.ckpt
 
 #Note: Word and fusion training in CUB dataset are not supported
 ```
@@ -99,8 +105,11 @@ sh run_standalone_eval_ascend.sh CUB att /data/DEM_data ../train_parallel/7/auto
         ├── README_CN.md                 // descriptions about DEM in Chinese
         ├── requirements.txt             // package needed
         ├── scripts
+        │   ├──run_distributed_train_gpu.sh        // train in gpu with 8p
+        │   ├──run_standalone_train_gpu.sh         // train in gpu with 1p
         │   ├──run_distributed_train_ascend.sh        // train in ascend with 8p
         │   ├──run_standalone_train_ascend.sh         // train in ascend with 1p
+        │   ├──run_standalone_train_gpu.sh         // evaluate in gpu
         │   └──run_standalone_eval_ascend.sh          // evaluate in ascend
         ├── src
         │   ├──dataset.py           // load dataset
@@ -143,11 +152,13 @@ sh run_standalone_eval_ascend.sh CUB att /data/DEM_data ../train_parallel/7/auto
 ```bash
 python train.py --data_path=/YourDataPath --save_ckpt=/YourCkptPath --dataset=[AwA|CUB] --train_mode=[att|word|fusion]
 # or enter script dir, and run the script
-sh run_standalone_train_ascend.sh [AwA|CUB] [att|word|fusion] [DATA_PATH] [SAVE_CKPT]
+bash run_standalone_train_ascend.sh [AwA|CUB] [att|word|fusion] [DATA_PATH] [SAVE_CKPT]
 # 1p example:
-sh run_standalone_train_ascend.sh CUB att /data/DEM_data ../train.ckpt
+bash run_standalone_train_ascend.sh CUB att /data/DEM_data ../train.ckpt
+bash scripts/run_standalone_train_gpu.sh CUB att ../data ./output
 # 8p example:
-sh run_distributed_train_ascend.sh [hccl configuration,.json format] CUB att /data/DEM_data ../train.ckpt
+bash run_distributed_train_ascend.sh [hccl configuration,.json format] CUB att /data/DEM_data ../train.ckpt
+bash scripts/run_distributed_train_gpu.sh CUB att ../data ./output_multi GPU 8
 ```
 
 After training, the loss value will be achieved as follows:
@@ -181,7 +192,8 @@ python eval.py --data_path=/YourDataPath --save_ckpt=/YourCkptPath --dataset=[Aw
 # or enter script dir, and run the script
 sh run_standalone_eval_ascend.sh [AwA|CUB] [att|word|fusion] [DATA_PATH] [SAVE_CKPT]
 # Example:
-sh run_standalone_eval_ascend.sh CUB att /data/DEM_data ../output/train.ckpt
+bash run_standalone_eval_ascend.sh CUB att /data/DEM_data ../output/train.ckpt
+bash scripts/run_standalone_eval_gpu.sh CUB att ../data output/train.ckpt
 ```
 
 The accuracy of the test dataset is as follows:

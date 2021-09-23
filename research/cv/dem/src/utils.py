@@ -47,7 +47,10 @@ def param_cfg(args):
         clip_param = cub_cfg.clip_att
     elif args.dataset == 'AwA':
         if args.train_mode == 'att':
-            lr = awa_cfg.lr_att
+            if args.device_target == "GPU":
+                lr = awa_cfg.lr_att_gpu
+            else:
+                lr = awa_cfg.lr_att
             weight_decay = awa_cfg.wd_att
             clip_param = awa_cfg.clip_att
         elif args.train_mode == 'word':
