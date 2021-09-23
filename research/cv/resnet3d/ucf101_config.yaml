@@ -1,0 +1,100 @@
+# Builtin Configuration(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+is_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+device_target: "Ascend"
+run_distribute: False
+device_id: 0
+
+# ===========================================================================
+# options
+video_path: ""
+annotation_path: ""
+result_path: ""
+pretrain_path: ""
+inference_ckpt_path: ""
+n_classes: 101
+sample_size: 112
+sample_duration: 16
+sample_t_stride: 1
+train_crop: 'center'
+h_flip: False
+colorjitter: False
+train_crop_min_scale: 0.25
+train_crop_min_ratio: 0.75
+train_t_crop: 'random'
+inference_stride: 16
+ignore: True
+start_ft: 'layer4'
+loss_scale: 1024
+momentum: 0.9
+weight_decay: 0.001
+batch_size: 128
+n_epochs: 200
+save_checkpoint_epochs: 1
+keep_checkpoint_max: 20
+lr_decay_mode: 'steps'
+warmup_epochs: 15
+lr_init: 0
+lr_max: 0.03
+lr_end: 0
+eval_in_training: False
+
+---
+# Help description for each configuration
+is_modelarts: "Whether training on modelarts, default: False"
+data_url: "Url for modelarts"
+train_url: "Url for modelarts"
+device_target: 'Target device type'
+
+video_path: "Directory path of jpgs(video frames) converted from avi videos."
+annotation_path: "Annotation file path."
+result_path: "Result directory path."
+pretrain_path: "Pretrained model path (.ckpt)."
+inference_ckpt_path: "Model path for inference (.ckpt)."
+n_classes: "Number of classes. hmdb51: 51, ucf101: 101."
+sample_size: "Height and width of inputs"
+sample_duration: "Temporal duration of inputs"
+sample_t_stride: "If larger than 1, input frames are subsampled with the stride."
+train_crop: "Spatial cropping method in training."
+train_crop_min_scale: "Min scale for random cropping in training."
+train_crop_min_ratio: "Min aspect ratio for random cropping in training."
+train_t_crop: "Temporal cropping method in training."
+inference_stride: "Stride of sliding window in inference."
+start_ft: "Module name of beginning of fine-tuning."
+
+---
+# Choices
+start_ft:
+  -
+   conv1
+  -
+   layer1
+  -
+    layer2
+  -
+    layer3
+  -
+    layer4
+  -
+    fc
+train_crop:
+  -
+    random
+  -
+    center
+train_t_crop:
+  -
+    random
+  -
+    center
+lr_decay_mode:
+  -
+    poly
+  -
+    steps
+  -
+    linear
+  -
+    cosine
