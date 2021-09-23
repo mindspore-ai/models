@@ -357,7 +357,7 @@ def train_net():
 
     # define callbacks
     time_cb = TimeMonitor(data_size=step_size)
-    loss_cb = LossMonitor(config.has_trained_epoch)
+    loss_cb = LossCallBack(config.has_trained_epoch)
     cb = [time_cb, loss_cb]
     ckpt_save_dir = set_save_ckpt_dir()
     if config.save_checkpoint:
