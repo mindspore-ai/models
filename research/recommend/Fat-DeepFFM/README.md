@@ -97,6 +97,31 @@ Fat - DeepFFM consists of three parts. The FFM component is a factorization mach
 
   [hccl tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
+- running on GPU
+
+  ```shell
+  # run training example
+  python train.py \
+    --dataset_path='data/mindrecord' \
+    --ckpt_path='./checkpoint/Fat-DeepFFM' \
+    --eval_file_name='./auc.log' \
+    --loss_file_name='./loss.log' \
+    --device_target='GPU' \
+    --do_eval=True > output.log 2>&1 &
+
+  # run distributed training example
+   bash scripts/run_distribute_train_gpu.sh  8 /dataset_path
+
+  # run evaluation example
+  python eval.py \
+    --dataset_path='dataset/mindrecord' \
+    --ckpt_path='./checkpoint/Fat-DeepFFM.ckpt'\
+    --device_target = 'GPU'\
+    --device_id=0  > eval_output.log 2>&1 &
+  OR
+  bash scripts/run_eval.sh  0 GPU  /dataset_path  /ckpt_path
+  ```
+
 # [Script Description](#contents)
 
 ## [Script and Sample Code](#contents)
@@ -281,17 +306,17 @@ Inference result is saved in current path, you can find result like this in acc.
 
 ### Inference Performance
 
-| Parameters          | Ascend                      |
-| ------------------- | --------------------------- |
-| Model Version       | DeepFM                      |
-| Resource            | Ascend 910; OS Euler2.8     |
-| Uploaded Date       | 06/20/2021 (month/day/year) |
-| MindSpore Version   | 1.2.0                       |
-| Dataset             | Criteo                      |
-| batch_size          | 1000                        |
-| outputs             | AUC                         |
-| AUC                 | 1pc: 80.90%;                |
-| Model for inference | 87.65M (.ckpt file)         |
+| Parameters          | Ascend                      | GPU
+| ------------------- | --------------------------- | ---------------------------
+| Model Version       | DeepFM                      | DeepFM
+| Resource            | Ascend 910; OS Euler2.8     | NV SMX2 V100-32G; OS Euler3.10
+| Uploaded Date       | 06/20/2021 (month/day/year) | 09/04/2021 (month/day/year)
+| MindSpore Version   | 1.2.0                       | 1.3.0
+| Dataset             | Criteo                      | Criteo
+| batch_size          | 1000                        | 1000
+| outputs             | AUC                         | AUC
+| AUC                 | 1pc: 80.90%;                | 8pc: 80.90%;
+| Model for inference | 87.65M (.ckpt file)         | 89.35M (.ckpt file)
 
 # [Description of Random Situation](#contents)
 

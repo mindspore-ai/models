@@ -47,22 +47,20 @@ set_seed(1)
 
 if __name__ == '__main__':
     model_config = ModelConfig()
-    if rank_size > 1:
-        device_id = int(os.getenv('DEVICE_ID'))
-        context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target,
-                            device_id=device_id)
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True,
-                                          all_reduce_fusion_config=[9, 11])
+    device_id = 0
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=device_id)
+    if args.device_target == "Ascend":
+        device_id = int(os.getenv('DEVICE_ID', '0'))
+    if rank_size == 1 or args.device_target == "CPU":
+        rank_id = 0
+    elif rank_size > 1:
         init()
         rank_id = get_rank()
-    else:
-        device_id = int(os.getenv('DEVICE_ID'))
-        context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target,
-                            device_id=device_id)
-        rank_size = None
-        rank_id = None
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(device_num=rank_size,
+                                          parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
+        if args.device_target == "Ascend":
+            context.set_auto_parallel_context(all_reduce_fusion_config=[9, 11])
     print("load dataset...")
     ds_train = get_mindrecord_dataset(args.dataset_path, train_mode=True, epochs=1, batch_size=model_config.batch_size,
                                       rank_size=rank_size, rank_id=rank_id, line_per_sample=1000)
@@ -72,12 +70,12 @@ if __name__ == '__main__':
     time_callback = TimeMonitor(data_size=ds_train.get_dataset_size())
     loss_callback = LossCallback(args.loss_file_name)
     cb = [loss_callback, time_callback]
-    if rank_size == 1 or device_id == 0:
+    if rank_id == 0:
         config_ck = CheckpointConfig(save_checkpoint_steps=ds_train.get_dataset_size() * model_config.epoch_size,
                                      keep_checkpoint_max=model_config.keep_checkpoint_max)
         ckpoint_cb = ModelCheckpoint(prefix=args.ckpt_path, config=config_ck)
         cb += [ckpoint_cb]
-    if args.do_eval and device_id == 0:
+    if args.do_eval and rank_id == 0:
         ds_test = get_mindrecord_dataset(args.dataset_path, train_mode=False)
         eval_callback = AUCCallBack(model, ds_test, eval_file_path=args.eval_file_name)
         cb.append(eval_callback)
