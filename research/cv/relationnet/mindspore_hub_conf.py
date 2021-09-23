@@ -13,13 +13,15 @@
 # limitations under the License.
 # ============================================================================
 """hub config"""
-from src.network import NTS_NET
+from src.relationnet import Encoder_Relation
+from src.config import relationnet_cfg as cfg
 
-def nts_net(*args, **kwargs):
-    return NTS_NET(topK=6, resnet50Path=args.resnet50Path)
+def relation_net(*args, **kwargs):
+    return Encoder_Relation(cfg.feature_dim, cfg.relation_dim)
 
 
 def create_network(name, *args, **kwargs):
-    if name == "nts_net":
-        return nts_net(topK=6, resnet50Path="")
+    """create_network about relationnet_net"""
+    if name == "relationnet":
+        return relation_net()
     raise NotImplementedError(f"{name} is not implemented in the repo")

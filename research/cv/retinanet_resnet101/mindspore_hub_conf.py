@@ -13,13 +13,17 @@
 # limitations under the License.
 # ============================================================================
 """hub config"""
-from src.network import NTS_NET
+from src.retinahead import retinanetWithLossCell, retinahead
+from src.backbone import resnet101
+from src.config import config
 
-def nts_net(*args, **kwargs):
-    return NTS_NET(topK=6, resnet50Path=args.resnet50Path)
+def retinanet101_net(retinanet, *args, **kwargs):
+    return retinanetWithLossCell(retinanet, config)
 
 
 def create_network(name, *args, **kwargs):
-    if name == "nts_net":
-        return nts_net(topK=6, resnet50Path="")
+    if name == "retinanet_resnet101":
+        backbone = resnet101(config.num_classes)
+        retinanet = retinahead(backbone, config)
+        return retinanet101_net(retinanet)
     raise NotImplementedError(f"{name} is not implemented in the repo")

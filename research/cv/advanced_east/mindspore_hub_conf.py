@@ -13,13 +13,15 @@
 # limitations under the License.
 # ============================================================================
 """hub config"""
-from src.network import NTS_NET
+from src.model import get_AdvancedEast_net
 
-def nts_net(*args, **kwargs):
-    return NTS_NET(topK=6, resnet50Path=args.resnet50Path)
+
+def advanced_east(*args, **kwargs):
+    return get_AdvancedEast_net(*args, **kwargs)
 
 
 def create_network(name, *args, **kwargs):
-    if name == "nts_net":
-        return nts_net(topK=6, resnet50Path="")
+    """create_network about advanced_east_net"""
+    if name == "advanced_east":
+        return advanced_east()
     raise NotImplementedError(f"{name} is not implemented in the repo")
