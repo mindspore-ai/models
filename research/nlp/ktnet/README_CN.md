@@ -269,7 +269,7 @@ mv wn_concept2vec.txt nell_concept2vec.txt data/KB_embeddings
       --checkpoints output
   ```
 
-- record数据集的需要训练步骤把‘python scripts/run_KTNET_squad.py’换为‘python scripts/run_KTNET_record.py’
+- record数据集的需要训练步骤把 `python scripts/run_KTNET_squad.py` 换为 `python scripts/run_KTNET_record.py`
 
 ### 评估
 
@@ -313,7 +313,7 @@ mv wn_concept2vec.txt nell_concept2vec.txt data/KB_embeddings
     --checkpoints
 ```
 
-- record数据集的需要评估步骤把‘bash scripts/run_KTNET_squad_eval.sh’换为‘bash scripts/run_KTNET_record_eval.sh’
+- record数据集的需要评估步骤把 `bash scripts/run_KTNET_squad_eval.sh` 换为 `bash scripts/run_KTNET_record_eval.sh`
 
 ## 训练过程
 
@@ -325,7 +325,7 @@ mv wn_concept2vec.txt nell_concept2vec.txt data/KB_embeddings
 # 单机
 bash scripts/run_squad_twomemory.sh [DATAPATH]
 # 分布式训练 8卡
-bash scripts/run_squad_twomemory.sh [DATAPATH] [RANK_TABLE_FILE]
+bash run_squad_twomemory_distribute.sh [DATAPATH] [RANK_TABLE_FILE]
 ```
 
 DATAPATH为必选项，为数据文件存放的路径。
@@ -349,7 +349,7 @@ python run_KTNET_squad.py
 # 单机
 bash scripts/run_record_twomemory.sh [DATAPATH]
 # 分布式训练 8卡
-bash scripts/run_record_twomemory.sh [DATAPATH] [RANK_TABLE_FILE]
+bash run_record_twomemory_distribute.sh [DATAPATH] [RANK_TABLE_FILE]
 ```
 
 DATAPATH为必选项，为数据文件存放的路径。
@@ -438,33 +438,33 @@ NEED_PREPROCESS为必选项, 在[y|n]中取值，表示数据是否预处理为b
 
 ### 训练性能
 
-| 参数                      | Ascend                                                     |Ascend                                                     |
-| --------------------------| ---------------------------------------------------------- |---------------------------------------------------------- |
-| 模型                      | KTNET                                                      |KTNET                                                      |
-| 资源                      |Ascend 910；CPU 2.60GHz，192核；内存 755GB；系统 Euler2.8     |Ascend 910；CPU 2.60GHz，192核；内存 755GB；系统 Euler2.8     |
-| 上传日期                  | 2021-05-12                                                 | 2021-05-12                                                 |
-| 数据集                    |ReCoRD                                                      |SQuAD                                                       |
-| 训练参数                  | src/config.py                                              | src/config.py                                              |
-| 学习率                    | 7e-5                                                       | 4e-5                                                       |
-| 优化器                    | Adam                                                       | Adam                                                       |
-| 损失函数                  | SoftmaxCrossEntropy                                        | SoftmaxCrossEntropy                                        |
-| 轮次                      |   4                                                        |   3                                                        |
-| Batch_size                | 12*8                                                       | 8*8                                                      |
-| 损失                      |0.31248128                                                  |0.35267675                                                  |
-| 速度                      | 428毫秒/步                                                 | 338毫秒/步                                                 |
-| 总时长                    | 2.5小时                                                    | 1小时                                                      |
+| 参数         | Ascend                                                     |Ascend                                                     |
+| -------------| ---------------------------------------------------------- |---------------------------------------------------------- |
+| 模型         | KTNET                                                      | KTNET                                                     |
+| 资源         | Ascend 910；CPU 2.60GHz，192核；内存 755GB；系统 Euler2.8  | Ascend 910；CPU 2.60GHz，192核；内存 755GB；系统 Euler2.8 |
+| 上传日期     | 2021-05-12                                                 | 2021-05-12                                                |
+| 数据集       | ReCoRD                                                     | SQuAD                                                     |
+| 训练参数     | src/config.py                                              | src/config.py                                             |
+| 学习率       | 7e-5                                                       | 4e-5                                                      |
+| 优化器       | Adam                                                       | Adam                                                      |
+| 损失函数     | SoftmaxCrossEntropy                                        | SoftmaxCrossEntropy                                       |
+| 轮次         |   4                                                        |   3                                                       |
+| Batch_size   | 12*8                                                       | 8*8                                                       |
+| 损失         | 0.31248128                                                 | 0.35267675                                                |
+| 速度         | 428毫秒/步                                                 | 338毫秒/步                                                |
+| 总时长       | 2.5小时                                                    | 1小时                                                     |
 
 ### 推理性能
 
-| 参数                       | Ascend                        | Ascend                        |
-| -------------------------- | ----------------------------- | ----------------------------- |
-| 模型                      | KTNET                          | KTNET                          |
-| 数据集                    |ReCoRD                          |ReCoRD                          |
-| 上传日期                  |2021-05-12                      |2021-05-12                      |
-| 数据集                    | ReCoRD                         | ReCoRD                         |
-| f1                        | 71.48                         | 91.31                         |
-| exact_match               | 69.61                         | 84.38                         |
-| 总时长                    | 15分钟                         | 15分钟                         |
+| 参数            | Ascend         | Ascend        |
+| ----------------| ---------------| --------------|
+| 模型            | KTNET          | KTNET         |
+| 数据集          | ReCoRD         | ReCoRD        |
+| 上传日期        | 2021-05-12     | 2021-05-12    |
+| 数据集          | ReCoRD         | ReCoRD        |
+| f1              | 71.48          | 91.31         |
+| exact_match     | 69.61          | 84.38         |
+| 总时长          | 15分钟         | 15分钟        |
 
 # ModelZoo主页
 
