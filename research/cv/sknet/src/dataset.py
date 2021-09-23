@@ -22,8 +22,8 @@ import mindspore.dataset.vision.c_transforms as C
 import mindspore.dataset.transforms.c_transforms as C2
 from mindspore.communication.management import init, get_rank, get_group_size
 
-def create_dataset1(dataset_path, do_train, repeat_num=1, batch_size=32, target="Ascend", distribute=False,
-                    enable_cache=False, cache_session_id=None):
+def create_dataset_cifar10(dataset_path, do_train=False, repeat_num=1, batch_size=32, target="Ascend", distribute=False,
+                           enable_cache=False, cache_session_id=None):
     """
     create a train or evaluate cifar10 dataset for sknet50
     Args:

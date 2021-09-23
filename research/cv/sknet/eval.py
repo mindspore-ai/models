@@ -37,7 +37,7 @@ if __name__ == '__main__':
         from src.sknet50 import sknet50 as sknet
         if args_opt.dataset == "cifar10":
             from src.config import config1 as config
-            from src.dataset import create_dataset1 as create_dataset
+            from src.dataset import create_dataset_cifar10 as create_dataset
 
     target = args_opt.device_target
     # init context
