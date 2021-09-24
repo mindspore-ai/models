@@ -1075,3 +1075,11 @@ In dataset.py, we set the seed inside “create_dataset" function. We also use r
 # [ModelZoo Homepage](#contents)
 
  Please check the official [homepage](https://gitee.com/mindspore/models).
+
+# FAQ
+
+Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some common question.
+
+- **Q: How to use `boost` to get the best performance?**
+
+  **A**: We provide the `boost_level` in the `Model` interface, when you set it to `O1` or `O2` mode, the network will automatically speed up. The high-performance mode has been fully verified on resnet50, you can use the `resnet50_imagenet2012_Boost_config.yaml` to experience this mode. Meanwhile, in `O1` or `O2` mode, it is recommended to set the following environment variables: ` export ENV_FUSION_CLEAR=1; export DATASET_ENABLE_NUMA=True; export ENV_SINGLE_EVAL=1; export SKT_ENABLE=1;`.

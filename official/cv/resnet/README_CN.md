@@ -925,3 +925,11 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 # ModelZoo主页
 
  请浏览官网[主页](https://gitee.com/mindspore/models)。
+
+# FAQ
+
+优先参考[ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ)来查找一些常见的公共问题。
+
+- **Q: 如何使用`boost`功能获取最优的性能？**
+
+  **A**： 我们在`Model`中提供了`boost_level`的入参，当你将其设置为O1或者O2模式时，框架会自动对网络的性能进行优化。当前这个模式已在resnet50上充分验证，你可以使用`resnet50_imagenet2012_Boost_config.yaml`来体验该模式。同时，在O1或者O2模式下，建议设置以下环境变量:`export  ENV_FUSION_CLEAR=1;export DATASET_ENABLE_NUMA=True;export ENV_SINGLE_EVAL=1;export SKT_ENABLE=1;`来获取更好的性能。
