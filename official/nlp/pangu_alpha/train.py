@@ -91,7 +91,6 @@ def add_checkpoint_callback_policy(args_param, callback, rank_id):
 def run_train(args_opt):
     r"""The main training process."""
     os.environ['HCCL_CONNECT_TIMEOUT'] = "6000"
-
     # Set execution mode
     context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
     context.set_context(variable_memory_max_size="31GB")
@@ -134,11 +133,11 @@ def run_train(args_opt):
     config = PanguAlphaConfig(batch_size=batch_size, num_heads=args_opt.num_heads,
                               hidden_size=args_opt.embedding_size, seq_length=args_opt.seq_length,
                               vocab_size=args_opt.vocab_size, num_layers=args_opt.num_layers,
-                              ffn_hidden_size=args_opt.embedding_size * 4,
-                              eod_token=bool(args_opt.eod_reset),
+                              ffn_hidden_size=args_opt.embedding_size * 4, eod_token=bool(args_opt.eod_reset),
                               load_ckpt_path=args_opt.load_ckpt_path,
                               param_init_type=mstype.float32 if args_opt.param_init_type == 'fp32' else mstype.float16,
-                              enable_offload=bool(args_opt.opt_offload),
+                              enable_offload=bool(args_opt.opt_offload), use_moe=bool(args_opt.use_moe),
+                              per_dp_dim_expert_num=args_opt.per_dp_dim_expert_num,
                               hidden_act='fast_gelu' if args_opt.device_target != "GPU" else 'gelu',
                               parallel_config=parallel_config)
     print("===config is: ", config, flush=True)
@@ -151,7 +150,6 @@ def run_train(args_opt):
     # Warm-up and cosine decay learning rate
     lr = LearningRate(learning_rate=args_opt.start_lr, end_learning_rate=args_opt.end_lr,
                       warmup_steps=args_opt.warmup_step, decay_steps=200000)
-
     params = pangu_alpha_with_loss.trainable_params()
     group_params = set_weight_decay(params)
     if args_opt.optimizer == "lamb":
@@ -185,12 +183,9 @@ def run_train(args_opt):
         callback.append(EvalCallBack(model, ds_eval, ppl_metric))
     else:
         model = Model(pangu_alpha_with_grads)
-
     if args_opt.pre_trained:
         load_checkpoint(args_opt, args_opt.sink_size, ds, model, device_num)
-
     add_checkpoint_callback_policy(args_opt, callback, rank)
-
     if args_opt.incremental_training:
         from mindspore.train.serialization import load_distributed_checkpoint
         strategy = model.infer_train_layout(train_dataset=ds, sink_size=args_opt.sink_size)
@@ -202,7 +197,6 @@ def run_train(args_opt):
         load_distributed_checkpoint(model.train_network, ckpt_file_list, strategy)
     print("Dataset size: {}, actual_epoch_num: {}".format(ds.get_dataset_size(), actual_epoch_num), flush=True)
     model.train(actual_epoch_num, ds, callbacks=callback, sink_size=args_opt.sink_size, dataset_sink_mode=True)
-
 
 def load_checkpoint(args_param, sink_size, dataset, model, device_num):
     r"""
@@ -363,6 +357,8 @@ if __name__ == "__main__":
     if opt.per_batch_size == 0:
         raise ValueError("The per_batch_size has not been configured.")
     if opt.stage_num > 1:
+        if bool(opt.use_moe) or bool(opt.opt_offload):
+            raise ValueError("Currently, moe and host device mode is not supported in pipeline parallel.")
         run_train_pipeline(opt)
     else:
         run_train(opt)

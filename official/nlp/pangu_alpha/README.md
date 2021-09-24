@@ -188,6 +188,40 @@ bash scripts/run_distributed_train_gpu.sh RANK_SIZE HOSTFILE DATASET PER_BATCH M
 - PER_BATCH: The batch size for each data parallel-way.
 - MODE: Can be `2.6B`, `13B` and `200B`.
 
+### Training in heterogeneous with MoE
+
+Currently the scripts provide three default configures : `2.6B` `13B` and `200B`. Currently, only support device target Ascend.
+
+```bash
+
+# run distributed training in example
+
+bash scripts/run_distribute_train_moe_host_device.sh DATASET RANK_TABLE RANK_SIZE TYPE MODE STAGE_NUM MICRO_SIZE PER_BATCH RANK_START LOCAL_DEVICE_NUM EXPERT_NUM_PER_EP
+
+```
+
+The above command involves some `args` described below:
+
+- DATASET: The path to the mindrecord files's parent directory . For example: `/home/work/mindrecord/`.
+- RANK_TABLE: The details of the rank table can be found [here](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_ascend.html). It's a json file describes the `device id`, `service ip` and `rank`.
+- RANK_SIZE: The device number. This can be your total device numbers. For example, 8, 16, 32 ...
+- TYPE: The param init type. The parameters will be initialized with float32. Or you can replace it with `fp16`. This will save a little memory used on the device.
+- MODE: The configure mode. This mode will set the `hidden size` and `layers` to make the parameter number near 2.6 billions. The other mode can be `13B` (`hidden size` 5120 and `layers` 40, which needs at least 16 cards to train.) and `200B`.
+- STAGE_NUM: The number of pipeline stages. When the `stage_num` is large than 1, the pipeline parallel mode would be applied. This configure indicates the number of sub graphs in pipeline parallel mode.
+- MICRO_SIZE: The number of micro batches in pipeline parallel mode. It should large than `stage_num`.
+- PER_BATCH: The batch size for each data parallel-way. default 8.
+- RANK_START: The start of rank_id in current machines, it helps to set the rank_id for each machine in multi-machine scenario.
+- LOCAL_DEVICE_NUM: The device number of the local machine.
+- EXPERT_NUM_PER_EP: Expert nums in one data parallel dim.
+
+The following command will launch he program will train 2.6B model with the following command:
+
+```bash
+# run distributed training example in one ascend machine
+
+bash run_distributed_train_moe_host_device.sh /path/dataset /path/hccl.json 8 fp32 2.6B 1 1 16 0 8 6
+```
+
 ### Incremental Training
 
  Before we start Incremental Training, the following two steps must be done:

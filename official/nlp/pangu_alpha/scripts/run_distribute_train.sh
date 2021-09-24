@@ -17,7 +17,7 @@
 echo "=============================================================================================================="
 echo "Please run the script as: "
 echo "bash run_distributed_train.sh DATA_DIR RANK_TABLE_FILE DEVICE_NUM TYPE MODE STAGE_NUM MICRO_SIZE"
-echo "PER_BATCH RANK_START RANK_START LOCAL_DEVICE_NUM"
+echo "PER_BATCH RANK_START LOCAL_DEVICE_NUM"
 echo "for example:"
 echo "#######no pipeline#######"
 echo "bash run_distributed_train.sh /path/dataset /path/hccl.json 8 fp32 2.6B 1 1 16 0 8"

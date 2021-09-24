@@ -178,7 +178,7 @@ class GlobalNorm(nn.Cell):
             global_norms = F.sqrt(global_square_reduce_sum)
         else:
             global_norms = F.sqrt(P.AllReduce()(square_reduce_sum))
-        return global_norms
+        return grads, global_norms
 
 
 class ClipByGlobalNorm(nn.Cell):
@@ -200,7 +200,7 @@ class ClipByGlobalNorm(nn.Cell):
 
     def construct(self, grads):
         """Clip grads by global norm construct"""
-        global_norm_value = self.global_norm(grads)
+        grads, global_norm_value = self.global_norm(grads)
         cond = P.GreaterEqual()(global_norm_value, self.clip_norm)
         global_norm = F.select(cond, global_norm_value, self.clip_norm)
         grads = self.hyper_map(F.partial(apply_global_norm, self.enable_grad_fp16, self.clip_norm, global_norm), grads)
@@ -336,9 +336,14 @@ def add_training_params(opt):
                      choices=["adam", "lamb"],
                      help="select which optimizer to be used, default adam")
     opt.add_argument("--opt_offload",
-                     type=int,
-                     default=0,
+                     type=int, default=0,
                      help="Enable optimizer status offload to host CPU, default is 0")
+    opt.add_argument("--use_moe",
+                     type=int, default=0,
+                     help="Use moe, default is 0")
+    opt.add_argument("--per_dp_dim_expert_num",
+                     type=int, default=1,
+                     help="Expert nums in one data parallel dim, only effective when applying moe, default is 1")
     opt.add_argument("--eod_id",
                      type=int,
                      default=6,

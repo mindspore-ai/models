@@ -25,6 +25,7 @@ from mindspore.ops import functional as F
 from mindspore.nn import Cell
 from mindspore.parallel.nn.transformer import VocabEmbedding, TransformerEncoder, TransformerEncoderLayer, \
     AttentionMask
+from mindspore.parallel.nn import MoEConfig
 from mindspore.parallel.nn.layers import _LayerNorm
 
 
@@ -235,8 +236,11 @@ class PanguAlpha_Model(Cell):
         self.layernorm.pipeline_stage = config.parallel_config.pipeline_stage - 1
         # Configure the shard configure of the Embedding layer
         self.embedding.pipeline_stage = 0
-
         self.num_layers = config.num_layers
+        if config.use_moe:
+            moe_config = MoEConfig(expert_num=config.parallel_config.data_parallel * config.per_dp_dim_expert_num)
+        else:
+            moe_config = MoEConfig(expert_num=1)
         # The shard setting of Transformer is set within the class StackedTransformer
         self.blocks = TransformerEncoder(num_layers=config.num_layers - 1,
                                          batch_size=config.batch_size,
@@ -250,6 +254,7 @@ class PanguAlpha_Model(Cell):
                                          param_init_type=config.param_init_type,
                                          use_past=config.use_past,
                                          parallel_config=config.parallel_config,
+                                         moe_config=moe_config,
                                          softmax_compute_type=config.softmax_compute_type).blocks
         copied_parallel_config = copy.deepcopy(config.parallel_config)
         copied_parallel_config.vocab_emb_dp = True

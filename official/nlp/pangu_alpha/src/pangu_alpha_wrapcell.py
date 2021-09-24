@@ -26,7 +26,7 @@ from mindspore.context import ParallelMode
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
 from mindspore.communication.management import get_group_size
 from mindspore.parallel._utils import _get_enable_parallel_optimizer
-from src.utils import ClipByGlobalNorm
+from src.utils import GlobalNorm, ClipByGlobalNorm
 
 GRADIENT_CLIP_TYPE = 1
 GRADIENT_CLIP_VALUE = 1.0
@@ -68,7 +68,7 @@ reciprocal = P.Reciprocal()
 
 @grad_scale.register("Tensor", "Tensor")
 def tensor_grad_scale(scale, grad):
-    return grad * reciprocal(scale)
+    return grad * P.Cast()(reciprocal(scale), F.dtype(grad))
 
 
 @grad_scale.register("Tensor", "Tensor", "Tensor")
@@ -114,7 +114,12 @@ class PanguAlphaTrainOneStepWithLossScaleCell(TrainOneStepWithLossScaleCell):
         self.optimizer = optimizer
         self.default_lr = Tensor([0.0], dtype=mstype.float32)
         self.enable_global_norm = enable_global_norm
-        self.clip = ClipByGlobalNorm(self.weights, config)
+        self.enable_offload = config.enable_offload
+        self.clip_value = Tensor([1.0], dtype=mstype.float32)
+        if config.enable_offload:
+            self.clip = GlobalNorm(self.weights, config)
+        else:
+            self.clip = ClipByGlobalNorm(self.weights, config)
         self.cast = P.Cast()
 
     def construct(self, input_ids, input_position, attention_mask, layer_past=None, sens=None):
@@ -137,9 +142,9 @@ class PanguAlphaTrainOneStepWithLossScaleCell(TrainOneStepWithLossScaleCell):
         grads = self.grad_reducer(grads)
         grads = self.hyper_map(
             F.partial(grad_scale, scaling_sens), grads)
-
+        clip_value = self.clip_value
         if self.enable_global_norm:
-            grads, _ = self.clip(grads)
+            grads, clip_value = self.clip(grads)
         else:
             grads = self.hyper_map(
                 F.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE),
@@ -150,7 +155,10 @@ class PanguAlphaTrainOneStepWithLossScaleCell(TrainOneStepWithLossScaleCell):
         # If overflow, surpass weights update
         # if not, update weights
         if not overflow:
-            self.optimizer(grads)
+            if self.enable_offload:
+                self.optimizer(grads, clip_value)
+            else:
+                self.optimizer(grads)
         return loss, cond, scaling_sens
 
 
