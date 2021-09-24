@@ -1,0 +1,102 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+data_path: "/cache/data"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+
+
+device_target: "Ascend"
+enable_profiling: False
+
+# ==============================================================================
+# Training options
+
+# distributed parameter
+is_distributed: 0
+local_rank: 0
+world_size: 1
+
+#result_dir
+result_dir: ''
+
+# test weight
+#weight: 'your_test_model'
+#'''2021/8/31'''
+weight: '/home/LiuYi/facerecognition_ascend_v120_humanface_research_cv_bs192_acc93.ckpt'
+test_dir: '/home/cy_mindx/FaceRecognitionInfer/datasets/'
+need_modelarts_dataset_unzip: False
+
+# model define
+backbone: "r100"
+use_se: 0
+emb_size: 256
+act_type: "relu"
+fp16: 1
+pre_bn: 0
+inference: 1
+use_drop: 0
+
+# test and dis batch size
+test_batch_size: 128
+dis_batch_size: 512
+
+# log
+log_interval: 100
+ckpt_path: "outputs/models"
+
+# test and dis image list
+test_img_predix: "test_dataset/"
+test_img_list_jk: "lists/jk_list.txt"
+test_img_list_zj: "lists/zj_list.txt"
+dis_img_predix: "dis_dataset/"
+dis_img_list: "lists/dis_list.txt"
+
+# export option
+batch_size: 16
+file_name: "fr.midnir"
+file_format: "MINDIR"
+export_pre_bn: 0
+export_inference: 1
+export_use_se: 0
+export_emb_size: 256
+export_act_type: "relu"
+export_backbone: "r100"
+export_use_drop: 0
+head: "0"
+
+---
+
+# Help description for each configuration
+enable_modelarts: "Whether training on modelarts, default: False"
+data_url: "Url for modelarts"
+train_url: "Url for modelarts"
+data_path: "The location of the input data."
+output_path: "The location of the output file."
+device_target: 'Target device type'
+enable_profiling: 'Whether enable profiling while training, default: False'
+# Dataset description
+
+test_dir: 'This is the directory where the test need is located  (It is best to fill in the absolute path, so that you can save the probability of error is smaller)'
+test_img_predix: 'Table of contents for the test set img'
+test_img_list_jk: 'Path location of the test set txt file under testdir'
+test_img_list_zj: 'Path location of the test set txt file under testdir'
+dis_img_predix: 'Path location of the different people img under testdir'
+dis_img_list: 'Path location of the different people test set txt file under testdir'
+
+# export option
+batch_size: "batch size"
+file_name: "file name"
+file_format: "file format, choices in ['MINDIR', 'AIR']"
+export_pre_bn: "1: bn-conv-bn-conv-bn, 0: conv-bn-conv-bn"
+export_inference: "use inference backbone"
+export_use_se: "use se block or not"
+export_emb_size: "embedding size of the network (this should be same as emb_size after trained)"
+export_act_type: "activation layer type"
+export_backbone: "backbone network"
+export_use_drop: "whether use dropout in network"
+head: "head type, default is 0"
