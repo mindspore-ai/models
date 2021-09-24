@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,12 +50,12 @@ parser.add_argument("--train_url", type=str, default='', help="train url.")
 # dataset
 parser.add_argument("--train_LR_path", type=str, default='/data/DIV2K/DIV2K_train_LR_bicubic/X4_sub')
 parser.add_argument("--train_GT_path", type=str, default='/data/DIV2K/DIV2K_train_HR_sub')
-parser.add_argument("--val_PSNR_LR_path", type=str, default='/data/DIV2K/Set5/LRbicx4')
-parser.add_argument("--val_PSNR_GT_path", type=str, default='/data/DIV2K/Set5/GTmod12')
-parser.add_argument("--val_GAN_LR_path", type=str, default='/data/DIV2K/Set14/LRbicx4')
-parser.add_argument("--val_GAN_GT_path", type=str, default='/data/DIV2K/Set14/GTmod12')
+parser.add_argument("--val_PSNR_LR_path", type=str, default='/data/Set5/LRbicx4')
+parser.add_argument("--val_PSNR_GT_path", type=str, default='/data/Set5/GTmod12')
+parser.add_argument("--val_GAN_LR_path", type=str, default='/data/Set14/LRbicx4')
+parser.add_argument("--val_GAN_GT_path", type=str, default='/data/Set14/GTmod12')
 
-parser.add_argument("--vgg_ckpt", type=str, default='/data/DIV2K/VGG.ckpt')
+parser.add_argument("--vgg_ckpt", type=str, default='/ckpt/vgg19.ckpt')
 
 parser.add_argument('--upscale_factor', default=4, type=int, choices=[2, 4, 8], help='super resolution upscale factor')
 parser.add_argument("--image_size", type=int, default=128, help="Image size of high resolution image. (default: 128)")
@@ -72,7 +72,7 @@ parser.add_argument("--start_gan_epoch", default=0, type=int, metavar='N',
 parser.add_argument("--gan_steps", default=400000, type=int, metavar="N",
                     help="Number of total gan epochs to run. (default: 400000)")
 parser.add_argument("--sens", default=1024.0, type=float)
-
+parser.add_argument('--platform', type=str, default='Ascend', choices=('Ascend', 'GPU', 'CPU'))
 # distribute
 parser.add_argument("--modelArts", type=int, default=0, help="Run cloud, default: false.")
 parser.add_argument("--run_distribute", type=int, default=0, help="Run distribute, default: false.")
@@ -80,6 +80,7 @@ parser.add_argument("--device_id", type=int, default=0, help="device id, default
 parser.add_argument("--device_num", type=int, default=1, help="number of device, default: 1.")
 parser.add_argument("--rank_id", type=int, default=0, help="Rank id, default: 0.")
 parser.add_argument("--version", type=int, default=0, help="version, default: 0.")
+
 
 
 def evaluate(model, test_data_loader, cur_step, cur_epoch, cur_best_psnr, eval_mode, runs_path):
@@ -106,6 +107,7 @@ def evaluate(model, test_data_loader, cur_step, cur_epoch, cur_best_psnr, eval_m
 if __name__ == '__main__':
     args = parser.parse_args()
     context.set_context(mode=context.GRAPH_MODE, save_graphs=False)
+    context.set_context(device_target=args.platform)
     # distribute
     if args.modelArts:
         import moxing as mox
@@ -139,22 +141,33 @@ if __name__ == '__main__':
         local_train_ckpt_path = './ckpt'
         if args.run_distribute:
             print("distribute")
-            rank_id = int(os.getenv('RANK_ID'))
-            device_id = int(os.getenv("DEVICE_ID"))
-            context.set_context(device_id=device_id)
+            if args.platform == 'Ascend':
+                rank_id = int(os.getenv('RANK_ID'))
+                device_id = int(os.getenv("DEVICE_ID"))
+                context.set_context(device_id=device_id)
+
             device_num = args.device_num
             context.reset_auto_parallel_context()
             context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
                                               device_num=device_num)
             init()
+            if args.platform == 'GPU':
+                rank = get_rank()
+                rank_id = rank
+
             shard_id = rank_id
             num_shards = device_num
             rank = get_rank()
+
         else:
             context.set_context(device_id=args.device_id)
             device_num = args.device_num
             shard_id = None
             num_shards = None
+            if args.platform == 'GPU':
+                rank = 0
+                shard_id = 0
+                num_shards = 1
     # for RRDBNet
     # create dataset
     args.train_batch_size = int(args.train_batch_size // device_num) if args.run_distribute else args.train_batch_size
@@ -183,9 +196,9 @@ if __name__ == '__main__':
     best_psnr = 0.0
 
     if not os.path.exists("./ckpt"):
-        os.makedirs("./ckpt")
+        os.makedirs("./ckpt", exist_ok=True)
     if not os.path.exists("./runs"):
-        os.makedirs("./runs")
+        os.makedirs("./runs", exist_ok=True)
     print('start training:')
 
     print('start training PSNR:')
@@ -212,13 +225,13 @@ if __name__ == '__main__':
         # Check whether the evaluation index of the current model is the highest.
         is_best = psnr > best_psnr
         best_psnr = max(psnr, best_psnr)
-        if is_best:
+        if is_best and rank == 0:
             print("best_psnr saving ckpt    ", end="")
             print(best_psnr)
             save_checkpoint(generator, os.path.join(local_train_ckpt_path, 'psnr_best.ckpt'))
         # save checkpoint every epoch
-        save_checkpoint(generator, os.path.join(local_train_ckpt_path, f'{epoch}_psnr_generator.ckpt'))
-        print(f"{epoch + 1}/{total_psnr_epochs} epoch finished")
+            save_checkpoint(generator, os.path.join(local_train_ckpt_path, f'{epoch}_psnr_generator.ckpt'))
+            print(f"{epoch + 1}/{total_psnr_epochs} epoch finished")
     # for esrgan
     test_gan_ds = create_testdataset(args.val_batch_size, args.val_GAN_LR_path, args.val_GAN_GT_path)
     test_gan_data_loader = test_gan_ds.create_dict_iterator()
@@ -269,15 +282,15 @@ if __name__ == '__main__':
         is_best = psnr > best_psnr
         best_psnr = max(psnr, best_psnr)
         print(best_psnr)
-        if is_best:
+        if is_best and rank == 0:
             print("best_psnr saving ckpt    ", end="")
             print(best_psnr)
             save_checkpoint(generator, os.path.join(local_train_ckpt_path, 'gan_generator_best.ckpt'))
             save_checkpoint(discriminator, os.path.join(local_train_ckpt_path, 'gan_discriminator_best.ckpt'))
         # save checkpoint every epoch
-        save_checkpoint(generator, os.path.join(local_train_ckpt_path, f'{epoch}_gan_generator.ckpt'))
-        save_checkpoint(discriminator, os.path.join(local_train_ckpt_path, f'{epoch}_gan_discriminator.ckpt'))
-        if epoch == total_gan_epochs - 1:
+            save_checkpoint(generator, os.path.join(local_train_ckpt_path, f'{epoch}_gan_generator.ckpt'))
+            save_checkpoint(discriminator, os.path.join(local_train_ckpt_path, f'{epoch}_gan_discriminator.ckpt'))
+        if epoch == total_gan_epochs - 1 and rank == 0:
             save_checkpoint(generator, os.path.join(local_train_ckpt_path, 'gan_generator.ckpt'))
         print(f"{epoch + 1}/{total_gan_epochs} epoch finished")
     print("all")

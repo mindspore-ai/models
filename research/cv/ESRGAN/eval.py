@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,10 +32,11 @@ parser.add_argument("--scale", type=int, default=4)
 parser.add_argument("--generator_path", type=str, default='./ckpt/195_gan_generator.ckpt')
 parser.add_argument("--mode", type=str, default='train')
 parser.add_argument("--device_id", type=int, default=0, help="device id, default: 0.")
-
+parser.add_argument('--platform', type=str, default='Ascend', choices=('Ascend', 'GPU', 'CPU'))
 if __name__ == '__main__':
     args = parser.parse_args()
     context.set_context(mode=context.GRAPH_MODE, device_id=args.device_id, save_graphs=False)
+    context.set_context(device_target=args.platform)
     test_ds = create_testdataset(1, args.test_LR_path, args.test_GT_path)
     test_data_loader = test_ds.create_dict_iterator()
     generator = RRDBNet(3, 3)
