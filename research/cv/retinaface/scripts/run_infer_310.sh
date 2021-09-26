@@ -55,20 +55,6 @@ else
     export ASCEND_OPP_PATH=$ASCEND_HOME/opp
 fi
 
-export ASCEND_HOME=/usr/local/Ascend
-
-export PATH=$ASCEND_HOME/fwkacllib/ccec_compiler/bin:$ASCEND_HOME/fwkacllib/bin:$ASCEND_HOME/toolkit/bin:$PATH
-
-export LD_LIBRARY_PATH=/usr/local/lib/:/usr/local/fwkacllib/lib64:$ASCEND_HOME/driver/lib64:$ASCEND_HOME/add-ons:/usr/local/Ascend/toolkit/lib64:$LD_LIBRARY_PATH
-
-export PYTHONPATH=$ASCEND_HOME/fwkacllib/python/site-packages
-
-export PATH=/usr/local/python375/bin:$PATH
-export NPU_HOST_LIB=/usr/local/Ascend/acllib/lib64/stub
-export ASCEND_OPP_PATH=/usr/local/Ascend/opp
-export ASCEND_AICPU_PATH=/usr/local/Ascend
-export LD_LIBRARY_PATH=/usr/local/lib64/:$LD_LIBRARY_PATH
-
 function preprocess_data()
 {
    if [ -d preprocess_Result ]; then
