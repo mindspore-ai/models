@@ -39,6 +39,8 @@ class PanguAlphaConfig:
                  hidden_act='fast_gelu',
                  eod_reset=True,
                  enable_offload=False,
+                 use_moe=False,
+                 per_dp_dim_expert_num=4,
                  parallel_config=None,
                  softmax_compute_type=mstype.float16):
         self.batch_size = batch_size
@@ -61,6 +63,8 @@ class PanguAlphaConfig:
         self.eod_reset = eod_reset
         self.enable_offload = enable_offload
         self.softmax_compute_type = softmax_compute_type
+        self.use_moe = bool(use_moe)
+        self.per_dp_dim_expert_num = per_dp_dim_expert_num
 
     def __str__(self):
         info = "[PANGUALPHAConfig]" + '===' * 10 + '\n'
@@ -106,7 +110,7 @@ def set_parse(args_opt):
             args_opt.start_lr = 5e-5
             args_opt.end_lr = 1e-6
             args_opt.optimizer_shard = 1
-            args_opt.full_batch = 0
+            args_opt.full_batch = args_opt.opt_offload
             if args_opt.per_batch_size == 0:
                 args_opt.per_batch_size = 8
             if args_opt.stage_num > 1:
@@ -125,7 +129,7 @@ def set_parse(args_opt):
             args_opt.start_lr = 1e-4
             args_opt.end_lr = 1e-6
             args_opt.optimizer_shard = 1
-            args_opt.full_batch = 0
+            args_opt.full_batch = args_opt.opt_offload
             if args_opt.per_batch_size == 0:
                 args_opt.per_batch_size = 16
             if args_opt.stage_num > 1:

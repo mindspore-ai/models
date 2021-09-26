@@ -16,29 +16,27 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run_distributed_train_and_eval.sh DATA_DIR RANK_TABLE_FILE DEVICE_NUM TYPE MODE STAGE_NUM MICRO_SIZE"
-echo "PER_BATCH RANK_START LOCAL_DEVICE_NUM"
+echo "bash run_distributed_train_moe_host_device.sh DATA_DIR RANK_TABLE_FILE DEVICE_NUM TYPE MODE STAGE_NUM MICRO_SIZE"
+echo "PER_BATCH RANK_START LOCAL_DEVICE_NUM EXPERT_NUM_PER_EP"
 echo "for example:"
 echo "#######no pipeline#######"
-echo "bash run_distributed_train_and_eval.sh /path/dataset /path/eval_dataset /path/hccl.json 8 fp32 2.6B 1 1 16 0 8"
-echo "#######pipeline#######"
-echo "bash run_distributed_train_and_eval.sh /path/dataset /path/eval_dataset /path/hccl.json 16 fp32 2.6B 2 4 16 0 8"
-echo "bash run_distributed_train_and_eval.sh /path/dataset /path/eval_dataset /path/hccl.json 16 fp32 2.6B 2 4 16 8 8"
+echo "bash run_distributed_train_moe_host_device.sh /path/dataset /path/hccl.json 8 fp32 2.6B 1 1 16 0 8 6"
 echo "It is better to use absolute path."
+echo "Currently, pipeline parallel is not supported while running the shell."
 echo "=============================================================================================================="
 
 ROOT_PATH=`pwd`
 DATA_DIR=$1
-EVAL_DATA_DIR=$2
-export RANK_TABLE_FILE=$3
-RANK_SIZE=$4
-PARAM_INIT_TYPE=$5
-MODE=$6
-STAGE_NUM=$7
-MICRO_SIZE=$8
-PER_BATCH=$9
-RANK_START=${10}
-LOCAL_DEVICE_NUM=${11}
+export RANK_TABLE_FILE=$2
+RANK_SIZE=$3
+PARAM_INIT_TYPE=$4
+MODE=$5
+STAGE_NUM=$6
+MICRO_SIZE=$7
+PER_BATCH=$8
+RANK_START=$9
+LOCAL_DEVICE_NUM=${10}
+EXPERT_NUM_PER_EP=${11}
 
 for((i=0;i<${LOCAL_DEVICE_NUM};i++));
 do
@@ -49,5 +47,6 @@ do
     export DEVICE_ID=$i
     python ${ROOT_PATH}/train.py --distribute=true --device_num=$RANK_SIZE --data_url=$DATA_DIR --run_type=train \
     --param_init_type=$PARAM_INIT_TYPE --mode=$MODE --stage_num=$STAGE_NUM --micro_size=$MICRO_SIZE \
-    --per_batch_size=$PER_BATCH --train_and_eval_mode=1 --eval_data_url=$EVAL_DATA_DIR > log$i.log 2>&1 &
+    --per_batch_size=$PER_BATCH \
+    --opt_offload=1 --use_moe=1 --per_dp_dim_expert_num=$EXPERT_NUM_PER_EP > log$i.log 2>&1 &
 done
