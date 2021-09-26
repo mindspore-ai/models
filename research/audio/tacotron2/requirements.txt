@@ -1,0 +1,8 @@
+numpy
+librosa
+h5py
+scipy
+doctype
+Unidecode
+inflect
+matplotlib
