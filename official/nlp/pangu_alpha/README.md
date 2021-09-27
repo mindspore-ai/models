@@ -214,12 +214,14 @@ The above command involves some `args` described below:
 - LOCAL_DEVICE_NUM: The device number of the local machine.
 - EXPERT_NUM_PER_EP: Expert nums in one data parallel dim.
 
-The following command will launch he program will train 2.6B model with the following command:
+The following command will launch he program will train 60B model using 8 NPU.
+Mode 2.6B only represents the model configuration is same with 2.6B model which is without MoE.
+Running 0B model using 8 NPU in one server requires that the server has at least 1T host memory.
 
 ```bash
 # run distributed training example in one ascend machine
 
-bash run_distributed_train_moe_host_device.sh /path/dataset /path/hccl.json 8 fp32 2.6B 1 1 16 0 8 6
+bash run_distributed_train_moe_host_device.sh /path/dataset /path/hccl.json 8 fp32 2.6B 1 1 1 0 8 36
 ```
 
 ### Incremental Training

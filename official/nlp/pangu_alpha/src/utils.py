@@ -345,20 +345,16 @@ def add_training_params(opt):
                      type=int, default=1,
                      help="Expert nums in one data parallel dim, only effective when applying moe, default is 1")
     opt.add_argument("--eod_id",
-                     type=int,
-                     default=6,
+                     type=int, default=6,
                      help="The id of end of document")
     opt.add_argument("--epoch_size",
-                     type=int,
-                     default=1,
+                     type=int, default=1,
                      help="The training epoch")
     opt.add_argument("--sink_size",
-                     type=int,
-                     default=2,
+                     type=int, default=2,
                      help="The sink size of the training. default is 2")
     opt.add_argument("--full_batch",
-                     default=1,
-                     type=int,
+                     default=1, type=int,
                      help="Import the full size of a batch for each card, default is 1")
     opt.add_argument("--optimizer_shard",
                      type=int,
@@ -381,13 +377,14 @@ def add_training_params(opt):
                      default=8,
                      help="The model parallel way. default 8")
     opt.add_argument("--word_emb_dp",
-                     type=int,
-                     default=1,
+                     type=int, default=1,
                      choices=[0, 1],
                      help="Whether do data parallel in word embedding. default 1")
+    opt.add_argument("--gradient_aggregation_group",
+                     type=int, default=4,
+                     help="The gradient communication fusion group. default 4")
     opt.add_argument("--data_column_name",
-                     type=str,
-                     default="input_ids",
+                     type=str, default="input_ids",
                      help="Column name of datasets")
 
 

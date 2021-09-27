@@ -20,7 +20,8 @@ echo "bash run_distributed_train_moe_host_device.sh DATA_DIR RANK_TABLE_FILE DEV
 echo "PER_BATCH RANK_START LOCAL_DEVICE_NUM EXPERT_NUM_PER_EP"
 echo "for example:"
 echo "#######no pipeline#######"
-echo "bash run_distributed_train_moe_host_device.sh /path/dataset /path/hccl.json 8 fp32 2.6B 1 1 16 0 8 6"
+echo "#######run 60B model by 8 NPU#######"
+echo "bash run_distributed_train_moe_host_device.sh /path/dataset /path/hccl.json 8 fp32 2.6B 1 1 1 0 8 36"
 echo "It is better to use absolute path."
 echo "Currently, pipeline parallel is not supported while running the shell."
 echo "=============================================================================================================="
@@ -47,6 +48,6 @@ do
     export DEVICE_ID=$i
     python ${ROOT_PATH}/train.py --distribute=true --device_num=$RANK_SIZE --data_url=$DATA_DIR --run_type=train \
     --param_init_type=$PARAM_INIT_TYPE --mode=$MODE --stage_num=$STAGE_NUM --micro_size=$MICRO_SIZE \
-    --per_batch_size=$PER_BATCH \
+    --per_batch_size=$PER_BATCH --gradient_aggregation_group=2 \
     --opt_offload=1 --use_moe=1 --per_dp_dim_expert_num=$EXPERT_NUM_PER_EP > log$i.log 2>&1 &
 done
