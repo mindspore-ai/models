@@ -40,15 +40,14 @@ def create_dataset_cifar(dataset_path,
         dataset
     """
     device_num, rank_id = _get_rank_info(run_distribute)
-    _check_num_parallel_workers(8)
 
     if device_num == 1:
         data_set = ds.Cifar10Dataset(dataset_path,
-                                     num_parallel_workers=8,
+                                     num_parallel_workers=get_num_parallel_workers(8),
                                      shuffle=True)
     else:
         data_set = ds.Cifar10Dataset(dataset_path,
-                                     num_parallel_workers=8,
+                                     num_parallel_workers=get_num_parallel_workers(8),
                                      shuffle=True,
                                      num_shards=device_num,
                                      shard_id=rank_id)
@@ -77,10 +76,10 @@ def create_dataset_cifar(dataset_path,
 
     data_set = data_set.map(operations=type_cast_op,
                             input_columns="label",
-                            num_parallel_workers=8)
+                            num_parallel_workers=get_num_parallel_workers(8))
     data_set = data_set.map(operations=trans,
                             input_columns="image",
-                            num_parallel_workers=8)
+                            num_parallel_workers=get_num_parallel_workers(8))
 
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
@@ -110,7 +109,6 @@ def create_dataset_imagenet(dataset_path,
         dataset
     """
     device_num, rank_id = _get_rank_info(run_distribute)
-    _check_num_parallel_workers(10)
 
     if device_num == 1:
         data_set = ds.ImageFolderDataset(dataset_path,
@@ -152,7 +150,7 @@ def create_dataset_imagenet(dataset_path,
                             input_columns="label")
     data_set = data_set.map(operations=trans,
                             input_columns="image",
-                            num_parallel_workers=10)
+                            num_parallel_workers=get_num_parallel_workers(10))
 
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
@@ -176,12 +174,17 @@ def _get_rank_info(distribute):
         device_num = 1
     return device_num, rank_id
 
-def _check_num_parallel_workers(max_num_parallel_workers=None):
+def get_num_parallel_workers(num_parallel_workers):
     """
-    Check num_parallel_workers used in dataset operations.
+    Get num_parallel_workers used in dataset operations.
     If num_parallel_workers > the real CPU cores number, set num_parallel_workers = the real CPU cores number.
     """
     cores = multiprocessing.cpu_count()
-    if max_num_parallel_workers is not None and cores < max_num_parallel_workers:
-        print("The num_parallel_workers {} is set too large, now set it {}".format(max_num_parallel_workers, cores))
-        ds.config.set_num_parallel_workers(cores)
+    if isinstance(num_parallel_workers, int):
+        if cores < num_parallel_workers:
+            print("The num_parallel_workers {} is set too large, now set it {}".format(num_parallel_workers, cores))
+            num_parallel_workers = cores
+    else:
+        print("The num_parallel_workers {} is invalid, now set it {}".format(num_parallel_workers, min(cores, 8)))
+        num_parallel_workers = min(cores, 8)
+    return num_parallel_workers

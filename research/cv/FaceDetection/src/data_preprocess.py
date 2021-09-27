@@ -246,11 +246,6 @@ compose_map_func = (preprocess_fn)
 def create_dataset(args):
     """Create dataset object."""
     args.logger.info('start create dataloader')
-    cores = multiprocessing.cpu_count()
-    max_num_parallel_workers = 16
-    if cores < max_num_parallel_workers:
-        print("The num_parallel_workers {} is set too large, now set it {}".format(max_num_parallel_workers, cores))
-        de.config.set_num_parallel_workers(cores)
     ds = de.MindDataset(args.mindrecord_path + "0", columns_list=["image", "annotation"], num_shards=args.world_size,
                         shard_id=args.local_rank)
 
@@ -265,9 +260,10 @@ def create_dataset(args):
                               'conf_pos_mask_1', 'conf_neg_mask_1', 'cls_mask_1', 't_coord_1', 't_conf_1',
                               't_cls_1', 'gt_list_1', 'coord_mask_2', 'conf_pos_mask_2', 'conf_neg_mask_2',
                               'cls_mask_2', 't_coord_2', 't_conf_2', 't_cls_2', 'gt_list_2'],
-                operations=compose_map_func, num_parallel_workers=16, python_multiprocessing=True)
+                operations=compose_map_func, num_parallel_workers=get_num_parallel_workers(16),
+                python_multiprocessing=True)
 
-    ds = ds.batch(args.batch_size, drop_remainder=True, num_parallel_workers=8)
+    ds = ds.batch(args.batch_size, drop_remainder=True, num_parallel_workers=get_num_parallel_workers(8))
     ds = ds.repeat(args.max_epoch)
     args.steps_per_epoch = ds.get_dataset_size()
     args.logger.info('args.steps_per_epoch:{}'.format(args.steps_per_epoch))
@@ -276,3 +272,18 @@ def create_dataset(args):
     args.logger.info('end create dataloader')
     args.logger.save_args(args)
     return ds
+
+def get_num_parallel_workers(num_parallel_workers):
+    """
+    Get num_parallel_workers used in dataset operations.
+    If num_parallel_workers > the real CPU cores number, set num_parallel_workers = the real CPU cores number.
+    """
+    cores = multiprocessing.cpu_count()
+    if isinstance(num_parallel_workers, int):
+        if cores < num_parallel_workers:
+            print("The num_parallel_workers {} is set too large, now set it {}".format(num_parallel_workers, cores))
+            num_parallel_workers = cores
+    else:
+        print("The num_parallel_workers {} is invalid, now set it {}".format(num_parallel_workers, min(cores, 8)))
+        num_parallel_workers = min(cores, 8)
+    return num_parallel_workers
