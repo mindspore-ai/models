@@ -102,14 +102,18 @@ if __name__ == '__main__':
         rank = get_rank()
     for epoch in range(args.epoch_num):
         for i, data in enumerate(data_loader):
+            start_time = datetime.datetime.now()
             input_image = Tensor(data["input_images"])
             target_image = Tensor(data["target_images"])
-
             dis_loss, gen_loss = train_net(input_image, target_image)
-
+            end_time = datetime.datetime.now()
+            delta = (end_time - start_time).microseconds
             if i % 100 == 0:
                 print("================start===================")
-                print("Date time: ", datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+                print("Date time: ", start_time)
+                if args.run_distribute:
+                    print("Device ID :", str(rank))
+                print("ms per step :", delta/1000)
                 print("epoch: ", epoch + 1, "/", args.epoch_num)
                 print("step: ", i, "/", steps_per_epoch)
                 print("Dloss: ", dis_loss)
