@@ -40,12 +40,11 @@ def create_dataset1(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
         dataset
     """
     device_num, rank_id = _get_rank_info(distribute)
-    _check_num_parallel_workers(max_num_parallel_workers=12)
     ds.config.set_prefetch_size(64)
     if device_num == 1:
-        data_set = ds.Cifar10Dataset(dataset_path, num_parallel_workers=12, shuffle=True)
+        data_set = ds.Cifar10Dataset(dataset_path, num_parallel_workers=get_num_parallel_workers(12), shuffle=True)
     else:
-        data_set = ds.Cifar10Dataset(dataset_path, num_parallel_workers=12, shuffle=True,
+        data_set = ds.Cifar10Dataset(dataset_path, num_parallel_workers=get_num_parallel_workers(12), shuffle=True,
                                      num_shards=device_num, shard_id=rank_id)
 
     # define map operations
@@ -65,7 +64,8 @@ def create_dataset1(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
 
     type_cast_op = C2.TypeCast(mstype.int32)
 
-    data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=8)
+    data_set = data_set.map(operations=type_cast_op, input_columns="label",
+                            num_parallel_workers=get_num_parallel_workers(8))
     # only enable cache for eval
     if do_train:
         enable_cache = False
@@ -73,9 +73,11 @@ def create_dataset1(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
         if not cache_session_id:
             raise ValueError("A cache session_id must be provided to use cache.")
         eval_cache = ds.DatasetCache(session_id=int(cache_session_id), size=0)
-        data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=8, cache=eval_cache)
+        data_set = data_set.map(operations=trans, input_columns="image",
+                                num_parallel_workers=get_num_parallel_workers(8), cache=eval_cache)
     else:
-        data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=8)
+        data_set = data_set.map(operations=trans, input_columns="image",
+                                num_parallel_workers=get_num_parallel_workers(8))
 
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
@@ -104,13 +106,12 @@ def create_dataset2(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
         dataset
     """
     device_num, rank_id = _get_rank_info(distribute)
-    _check_num_parallel_workers(max_num_parallel_workers=12)
 
     ds.config.set_prefetch_size(64)
     if device_num == 1:
-        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=12, shuffle=True)
+        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=get_num_parallel_workers(12), shuffle=True)
     else:
-        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=12, shuffle=True,
+        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=get_num_parallel_workers(12), shuffle=True,
                                          num_shards=device_num, shard_id=rank_id)
 
     mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
@@ -135,7 +136,7 @@ def create_dataset2(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
 
     type_cast_op = C2.TypeCast(mstype.int32)
 
-    data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=12)
+    data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=get_num_parallel_workers(12))
     # only enable cache for eval
     if do_train:
         enable_cache = False
@@ -143,10 +144,12 @@ def create_dataset2(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
         if not cache_session_id:
             raise ValueError("A cache session_id must be provided to use cache.")
         eval_cache = ds.DatasetCache(session_id=int(cache_session_id), size=0)
-        data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=12,
+        data_set = data_set.map(operations=type_cast_op, input_columns="label",
+                                num_parallel_workers=get_num_parallel_workers(12),
                                 cache=eval_cache)
     else:
-        data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=12)
+        data_set = data_set.map(operations=type_cast_op, input_columns="label",
+                                num_parallel_workers=get_num_parallel_workers(12))
 
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
@@ -178,9 +181,9 @@ def create_dataset_pynative(dataset_path, do_train, repeat_num=1, batch_size=32,
     device_num, rank_id = _get_rank_info(distribute)
 
     if device_num == 1:
-        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=8, shuffle=True)
+        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=get_num_parallel_workers(8), shuffle=True)
     else:
-        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=2, shuffle=True,
+        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=get_num_parallel_workers(2), shuffle=True,
                                          num_shards=device_num, shard_id=rank_id)
 
     mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
@@ -213,10 +216,12 @@ def create_dataset_pynative(dataset_path, do_train, repeat_num=1, batch_size=32,
         if not cache_session_id:
             raise ValueError("A cache session_id must be provided to use cache.")
         eval_cache = ds.DatasetCache(session_id=int(cache_session_id), size=0)
-        data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=2,
+        data_set = data_set.map(operations=type_cast_op, input_columns="label",
+                                num_parallel_workers=get_num_parallel_workers(2),
                                 cache=eval_cache)
     else:
-        data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=2)
+        data_set = data_set.map(operations=type_cast_op, input_columns="label",
+                                num_parallel_workers=get_num_parallel_workers(2))
 
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
@@ -244,11 +249,10 @@ def create_dataset3(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
         dataset
     """
     device_num, rank_id = _get_rank_info(distribute)
-    _check_num_parallel_workers(max_num_parallel_workers=8)
     if device_num == 1:
-        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=8, shuffle=True)
+        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=get_num_parallel_workers(8), shuffle=True)
     else:
-        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=8, shuffle=True,
+        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=get_num_parallel_workers(8), shuffle=True,
                                          num_shards=device_num, shard_id=rank_id)
 
     mean = [0.475 * 255, 0.451 * 255, 0.392 * 255]
@@ -273,7 +277,7 @@ def create_dataset3(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
 
     type_cast_op = C2.TypeCast(mstype.int32)
 
-    data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=8)
+    data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=get_num_parallel_workers(8))
     # only enable cache for eval
     if do_train:
         enable_cache = False
@@ -281,10 +285,12 @@ def create_dataset3(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
         if not cache_session_id:
             raise ValueError("A cache session_id must be provided to use cache.")
         eval_cache = ds.DatasetCache(session_id=int(cache_session_id), size=0)
-        data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=8,
+        data_set = data_set.map(operations=type_cast_op, input_columns="label",
+                                num_parallel_workers=get_num_parallel_workers(8),
                                 cache=eval_cache)
     else:
-        data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=8)
+        data_set = data_set.map(operations=type_cast_op, input_columns="label",
+                                num_parallel_workers=get_num_parallel_workers(8))
 
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
@@ -313,12 +319,11 @@ def create_dataset4(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
         dataset
     """
     device_num, rank_id = _get_rank_info(distribute)
-    _check_num_parallel_workers(max_num_parallel_workers=12)
     ds.config.set_prefetch_size(64)
     if device_num == 1:
-        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=12, shuffle=True)
+        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=get_num_parallel_workers(12), shuffle=True)
     else:
-        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=12, shuffle=True,
+        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=get_num_parallel_workers(12), shuffle=True,
                                          num_shards=device_num, shard_id=rank_id)
 
     mean = [123.68, 116.78, 103.94]
@@ -342,7 +347,7 @@ def create_dataset4(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
         ]
 
     type_cast_op = C2.TypeCast(mstype.int32)
-    data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=12)
+    data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=get_num_parallel_workers(12))
     # only enable cache for eval
     if do_train:
         enable_cache = False
@@ -350,10 +355,12 @@ def create_dataset4(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
         if not cache_session_id:
             raise ValueError("A cache session_id must be provided to use cache.")
         eval_cache = ds.DatasetCache(session_id=int(cache_session_id), size=0)
-        data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=12,
+        data_set = data_set.map(operations=type_cast_op, input_columns="label",
+                                num_parallel_workers=get_num_parallel_workers(12),
                                 cache=eval_cache)
     else:
-        data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=12)
+        data_set = data_set.map(operations=type_cast_op, input_columns="label",
+                                num_parallel_workers=get_num_parallel_workers(12))
 
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
@@ -376,12 +383,17 @@ def _get_rank_info(distribute):
         device_num = 1
     return device_num, rank_id
 
-def _check_num_parallel_workers(max_num_parallel_workers=None):
+def get_num_parallel_workers(num_parallel_workers):
     """
-    Check num_parallel_workers used in dataset operations.
+    Get num_parallel_workers used in dataset operations.
     If num_parallel_workers > the real CPU cores number, set num_parallel_workers = the real CPU cores number.
     """
     cores = multiprocessing.cpu_count()
-    if max_num_parallel_workers is not None and cores < max_num_parallel_workers:
-        print("The num_parallel_workers {} is set too large, now set it {}".format(max_num_parallel_workers, cores))
-        ds.config.set_num_parallel_workers(cores)
+    if isinstance(num_parallel_workers, int):
+        if cores < num_parallel_workers:
+            print("The num_parallel_workers {} is set too large, now set it {}".format(num_parallel_workers, cores))
+            num_parallel_workers = cores
+    else:
+        print("The num_parallel_workers {} is invalid, now set it {}".format(num_parallel_workers, min(cores, 8)))
+        num_parallel_workers = min(cores, 8)
+    return num_parallel_workers
