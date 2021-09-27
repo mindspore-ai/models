@@ -60,6 +60,6 @@ cp -r ../src ./eval
 cd ./eval || exit
 env > env.log
 echo "start evaluation for device $DEVICE_ID"
-python -u eval.py --device_id=$DEVICE_ID --img_url=$PATH1 --ckpt_url=$PATH2 &> log &
+nohup python -u eval.py --device_id=$DEVICE_ID --img_url=$PATH1 --ckpt_url=$PATH2 > eval_log 2>&1 &
 cd ..
 

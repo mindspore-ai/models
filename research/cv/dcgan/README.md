@@ -53,8 +53,8 @@ Train DCGAN Dataset used: [Imagenet-1k](<http://www.image-net.org/index>)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/en/master/index.html)
 
 # [Script Description](#contents)
 
@@ -63,20 +63,34 @@ Train DCGAN Dataset used: [Imagenet-1k](<http://www.image-net.org/index>)
 ```shell
 .
 └─dcgan
-  ├─README.md                             # README
-  ├─scripts                               # shell script
-    ├─run_standalone_train.sh             # training in standalone mode(1pcs)
-    ├─run_distribute_train.sh             # training in parallel mode(8 pcs)
-    └─run_eval.sh                         # evaluation
+  ├─README.md                            # README
+  ├─ ascend310_infer
+      ├─inc
+         └─utils.h                       # 310 inference header file
+      ├─src
+         ├─main.cc                       # 310 inference main file
+         └─utils.cc                      # 310 inference utils file
+      ├─build.sh                         # 310 inference build file
+      └─CMakeLists.txt                   # 310 inference cmake file
+  ├─scripts                              # shell script
+    ├─run_standalone_train.sh            # training in standalone mode(1pcs)
+    ├─run_distribute_train.sh            # training in parallel mode(8 pcs)
+    ├─run_eval.sh                        # evaluation
+    └─run_infer_310.sh                   # infer on 310
   ├─ src
-    ├─dataset.py              // dataset create
-    ├─cell.py                 // network definition
-    ├─dcgan.py                // dcgan structure
-    ├─discriminator.py        // discriminator structure
-    ├─generator.py            // generator structure
-    ├─config.py               // config
- ├─ train.py                  // train dcgan
- ├─ eval.py                   //  eval dcgan
+    ├─dataset.py                         # dataset create
+    ├─cell.py                            # network definition
+    ├─dcgan.py                           # dcgan structure
+    ├─discriminator.py                   # discriminator structure
+    ├─generator.py                       # generator structure
+    └─config.py                          # config
+ ├─ train.py                             # train dcgan
+ ├─ eval.py                              # eval dcgan
+ ├─ preprocess.py                        # preprocess on 310
+ ├─ postprocess.py                       # postprocess on 310
+ ├─ verifyBySklSvmNetD_20_all_310.py     # verify on 310
+ ├─ export.py                            # export checkpoint file
+ └─ export_310.py                        # export checkpoint file for 310
 ```
 
 ## [Script Parameters](#contents)
@@ -94,23 +108,36 @@ Usage: bash run_standalone_train.sh [DATASET_PATH] [SAVE_PATH]
 ### [Parameters Configuration](#contents)
 
 ```txt
-"img_width": 32,           # width of the input images
-"img_height": 32,          # height of the input images
-'num_classes': 1000,
-'epoch_size': 20,
-'batch_size': 128,
-'latent_size': 100,
-'feature_size': 64,
-'channel_size': 3,
-'image_height': 32,
-'image_width': 32,
-'learning_rate': 0.0002,
-'beta1': 0.5
+dcgan_imagenet_cfg {
+    'num_classes': 1000,
+    'epoch_size': 20,
+    'batch_size': 128,
+    'latent_size': 100,
+    'feature_size': 64,
+    'channel_size': 3,
+    'image_height': 32,
+    'image_width': 32,
+    'learning_rate': 0.0002,
+    'beta1': 0.5
+}
+
+dcgan_cifar10_cfg {
+    'num_classes': 10,
+    'ds_length': 60000,
+    'batch_size': 100,
+    'latent_size': 100,
+    'feature_size': 64,
+    'channel_size': 3,
+    'image_height': 32,
+    'image_width': 32,
+    'learning_rate': 0.0002,
+    'beta1': 0.5
+}
 ```
 
 ## [Training Process](#contents)
 
-- Set options in `config.py`, including learning rate, output filename and network hyperparameters. Click [here](https://www.mindspore.cn/docs/programming_guide/en/master/dataset_sample.html) for more information about dataset.
+- Set options in `config.py`, including learning rate, output filename and network hyperparameters. Click [here](https://www.mindspore.cn/tutorial/training/zh-CN/master/use/data_preparation.html) for more information about dataset.
 
 ### [Training](#content)
 
@@ -154,7 +181,14 @@ Date time:  2021-04-13 13:57:28         epoch:  0 / 20         step:  250 / 1001
 
 ```bash
 # infer
-sh run_eval.sh [IMG_URL] [CKPT_URL]
+bush run_eval.sh [IMG_URL] [CKPT_URL]
+```
+
+- Implement inference at Ascend310 platform.
+
+```bash
+# infer
+bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 ```
 
 ### [Evaluation result](#content)
@@ -186,6 +220,7 @@ python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 | Optimizer                  | Adam                                                         |
 | Loss Function              | BCELoss                                      |
 | Output                     | predict class                                               |
+| Accuracy                   | 310: 78.2%                                             |
 | Loss                       | 10.9852                                                     |
 | Speed                      | 1pc: 420 ms/step;  8pcs:  143 ms/step                          |
 | Total time                 | 1pc: 24.32 hours                                            |

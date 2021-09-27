@@ -29,14 +29,13 @@ from src.discriminator import Discriminator
 from src.generator import Generator
 from src.config import dcgan_imagenet_cfg as cfg
 
-parser = argparse.ArgumentParser(description='ntsnet export')
+parser = argparse.ArgumentParser(description='dcgan export')
 parser.add_argument("--run_modelart", type=ast.literal_eval, default=False, help="Run on modelArt, default is false.")
 parser.add_argument("--device_id", type=int, default=0, help="Device id")
 parser.add_argument("--batch_size", type=int, default=128, help="batch size")
 parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file name.")
-parser.add_argument('--data_url', default=None, help='Directory contains CUB_200_2011 dataset.')
 parser.add_argument('--train_url', default=None, help='Directory contains checkpoint file')
-parser.add_argument("--file_name", type=str, default="ntsnet", help="output file name.")
+parser.add_argument("--file_name", type=str, default="dcgan", help="output file name.")
 parser.add_argument("--file_format", type=str, default="MINDIR", help="file format")
 parser.add_argument('--device_target', type=str, default="Ascend",
                     choices=['Ascend', 'GPU', 'CPU'], help='device target (default: Ascend)')

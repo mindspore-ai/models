@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""dcgan dataset"""
+"""dataset preprocessing"""
 import os
 import numpy as np
 
+import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
+import mindspore.dataset.transforms.c_transforms as C
 import mindspore.dataset.vision.c_transforms as vision
-from src.config import dcgan_imagenet_cfg
+from src.config import dcgan_imagenet_cfg, dcgan_cifar10_cfg
 
 
 def create_dataset_imagenet(dataset_path, num_parallel_workers=None):
@@ -32,13 +34,7 @@ def create_dataset_imagenet(dataset_path, num_parallel_workers=None):
         dataset
     """
 
-    device_num, rank_id = _get_rank_info()
-
-    if device_num == 1:
-        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers)
-    else:
-        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers,
-                                         num_shards=device_num, shard_id=rank_id)
+    data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers)
 
     assert dcgan_imagenet_cfg.image_height == dcgan_imagenet_cfg.image_width, "image_height not equal image_width"
     image_size = dcgan_imagenet_cfg.image_height
@@ -67,6 +63,48 @@ def create_dataset_imagenet(dataset_path, num_parallel_workers=None):
     )
 
     data_set = data_set.batch(dcgan_imagenet_cfg.batch_size)
+
+    return data_set
+
+
+def create_dataset_cifar10(dataset_path, num_parallel_workers=None, usage=None):
+    """
+    create a train or eval cifar10 dataset for dcgan
+
+    Args:
+        dataset_path(string): the path of dataset.
+
+    Returns:
+        dataset
+    """
+
+    device_num, rank_id = _get_rank_info()
+
+    if device_num == 1:
+        data_set = ds.Cifar10Dataset(dataset_path, num_parallel_workers=num_parallel_workers, usage=usage)
+    else:
+        data_set = ds.Cifar10Dataset(dataset_path, num_parallel_workers=num_parallel_workers,
+                                     num_shards=device_num, shard_id=rank_id, usage=usage)
+
+    assert dcgan_imagenet_cfg.image_height == dcgan_imagenet_cfg.image_width, "image_height not equal image_width"
+    image_size = dcgan_cifar10_cfg.image_height
+    # define map operations
+    transform_img = [
+        # vision.Decode(),
+        vision.Resize(image_size),
+        vision.CenterCrop(image_size),
+        vision.HWC2CHW()
+    ]
+
+    type_cast_op = C.TypeCast(mstype.int32)
+    data_set = data_set.map(input_columns="image", num_parallel_workers=num_parallel_workers, operations=transform_img,
+                            output_columns="image")
+    data_set = data_set.map(input_columns="image", num_parallel_workers=num_parallel_workers,
+                            operations=lambda x: ((x - 127.5) / 127.5).astype("float32"))
+    data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=num_parallel_workers)
+
+    data_set = data_set.shuffle(buffer_size=dcgan_cifar10_cfg.ds_length)
+    data_set = data_set.batch(dcgan_cifar10_cfg.batch_size)
 
     return data_set
 
