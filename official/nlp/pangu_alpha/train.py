@@ -81,8 +81,9 @@ def add_checkpoint_callback_policy(args_param, callback, rank_id):
                                        append_info=ckpt_append_info
                                        )
 
+        # save checkpoint into rank directory
         ckpoint_cb = ModelCheckpoint(prefix=args_param.ckpt_name_prefix + str(rank_id),
-                                     directory=args_param.save_checkpoint_path,
+                                     directory=os.path.join(args_param.save_checkpoint_path, f"rank_{rank_id}"),
                                      config=ckpt_config)
 
         callback.append(ckpoint_cb)
@@ -208,7 +209,7 @@ def load_checkpoint(args_param, sink_size, dataset, model, device_num):
     # For 2.6B and 13B models, the number of ckpt files is 512.
     ckpt_name = args_param.ckpt_name_prefix
     if os.path.isdir(args_param.pre_trained):
-        ckpt_pattern = os.path.join(args_param.save_checkpoint_path,
+        ckpt_pattern = os.path.join(args_param.save_checkpoint_path, "rank_0",
                                     f"{ckpt_name}*.ckpt")
         ckpt_files = glob.glob(ckpt_pattern)
         if not ckpt_files:
@@ -225,7 +226,7 @@ def load_checkpoint(args_param, sink_size, dataset, model, device_num):
                 depulicate_num = ckpt_file.split("-")[0].split("_")[-1]
                 step_size = ckpt_file.split("-")[-1].split("_")[0]
                 sink_size = ckpt_file.split("-")[-1].split("_")[-1].split(".")[0]
-                ckpt_file_list = [os.path.join(args_param.save_checkpoint_path,
+                ckpt_file_list = [os.path.join(args_param.save_checkpoint_path, f"rank_{ckpt_rank}",
                                                f"{ckpt_name}{ckpt_rank}_{depulicate_num}-{step_size}_{sink_size}.ckpt")
                                   for ckpt_rank in range(device_num)]
                 # Load checkpoint files
@@ -233,7 +234,7 @@ def load_checkpoint(args_param, sink_size, dataset, model, device_num):
             elif len(ckpt_file_length) == 2:
                 step_size = ckpt_file.split("-")[-1].split("_")[0]
                 sink_size = ckpt_file.split("-")[-1].split("_")[-1].split(".")[0]
-                ckpt_file_list = [os.path.join(args_param.save_checkpoint_path,
+                ckpt_file_list = [os.path.join(args_param.save_checkpoint_path, f"rank_{ckpt_rank}",
                                                f"{ckpt_name}{ckpt_rank}-{step_size}_{sink_size}.ckpt")
                                   for ckpt_rank in range(device_num)]
                 # Load checkpoint files
