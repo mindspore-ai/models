@@ -58,7 +58,8 @@ then
     --dataset=$DATASET \
     --device_id=$DEVICE_ID  \
     --config_path=$CONFIG_PATH \
-    --epoch_size=$EPOCH_SIZE > log.txt 2>&1 &
+    --epoch_size=$EPOCH_SIZE \
+    --output_path './output' > log.txt 2>&1 &
 fi
 
 if [ $# == 7 ]
@@ -70,7 +71,8 @@ then
     --pre_trained=$PRE_TRAINED \
     --pre_trained_epoch_size=$PRE_TRAINED_EPOCH_SIZE \
     --config_path=$CONFIG_PATH \
-    --epoch_size=$EPOCH_SIZE > log.txt 2>&1 &
+    --epoch_size=$EPOCH_SIZE \
+    --output_path './output' > log.txt 2>&1 &
 fi
 
 cd ../

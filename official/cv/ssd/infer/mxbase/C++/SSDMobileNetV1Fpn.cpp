@@ -91,46 +91,48 @@ APP_ERROR SSDMobileNetV1Fpn::ReadImage(const std::string &imgPath, MxBase::Tenso
         LogError << "DvppWrapper DvppJpegDecode failed, ret=" << ret << ".";
         return ret;
     }
-    MxBase::MemoryData memoryData(output.data, output.dataSize, MemoryData::MemoryType::MEMORY_DVPP,
+    MxBase::MemoryData memoryData(output.data, output.dataSize, MxBase::MemoryData::MemoryType::MEMORY_DVPP,
                                   deviceId_);
-    if (output.heightStride % VPC_H_ALIGN != 0) {
-        LogError << "Output data height(" << output.heightStride << ") can't be divided by " << VPC_H_ALIGN << ".";
-        MemoryHelper::MxbsFree(memoryData);
+    if (output.heightStride % MxBase::VPC_H_ALIGN != 0) {
+        LogError << "Output data height(" << output.heightStride << ") can't be divided by "
+        << MxBase::VPC_H_ALIGN << ".";
+        MxBase::MemoryHelper::MxbsFree(memoryData);
         return APP_ERR_COMM_INVALID_PARAM;
     }
-    std::vector<uint32_t> shape = {output.heightStride * YUV_BYTE_NU / YUV_BYTE_DE, output.widthStride};
-    tensor = TensorBase(memoryData, false, shape, TENSOR_DTYPE_UINT8);
+    std::vector<uint32_t> shape = {output.heightStride * MxBase::YUV_BYTE_NU / MxBase::YUV_BYTE_DE, output.widthStride};
+    tensor = MxBase::TensorBase(memoryData, false, shape, MxBase::TENSOR_DTYPE_UINT8);
     return APP_ERR_OK;
 }
 
 APP_ERROR SSDMobileNetV1Fpn::Resize(const MxBase::TensorBase &inputTensor, MxBase::TensorBase &outputTensor) {
     auto shape = inputTensor.GetShape();
     MxBase::DvppDataInfo input = {};
-    input.height = shape[0] * YUV_BYTE_DE / YUV_BYTE_NU;
+    input.height = shape[0] * MxBase::YUV_BYTE_DE / MxBase::YUV_BYTE_NU;
     input.width = shape[1];
-    input.heightStride = shape[0] * YUV_BYTE_DE / YUV_BYTE_NU;
+    input.heightStride = shape[0] * MxBase::YUV_BYTE_DE / MxBase::YUV_BYTE_NU;
     input.widthStride = shape[1];
     input.dataSize = inputTensor.GetByteSize();
-    input.data = inputTensor.GetBuffer();
+    input.data = (uint8_t)inputTensor.GetBuffer();
     MxBase::ResizeConfig resize = {};
-    resize.height = resizeHeight;
-    resize.width = resizeWidth;
+    resize.height = MxBase::resizeHeight;
+    resize.width = MxBase::resizeWidth;
     MxBase::DvppDataInfo output = {};
     APP_ERROR ret = dvppWrapper_->VpcResize(input, output, resize);
     if (ret != APP_ERR_OK) {
         LogError << "VpcResize failed, ret=" << ret << ".";
         return ret;
     }
-    MxBase::MemoryData memoryData(output.data, output.dataSize, MemoryData::MemoryType::MEMORY_DVPP,
+    MxBase::MemoryData memoryData(output.data, output.dataSize, MxBase::MemoryData::MemoryType::MEMORY_DVPP,
                                   deviceId_);
-    if (output.heightStride % VPC_H_ALIGN != 0) {
-        LogError << "Output data height(" << output.heightStride << ") can't be divided by " << VPC_H_ALIGN << ".";
-        MemoryHelper::MxbsFree(memoryData);
-        MemoryHelper::MxbsFree(memoryData);
+    if (output.heightStride % MxBase::VPC_H_ALIGN != 0) {
+        LogError << "Output data height(" << output.heightStride << ") can't be divided by "
+        << MxBase::VPC_H_ALIGN << ".";
+        MxBase::MemoryHelper::MxbsFree(memoryData);
+        MxBase::MemoryHelper::MxbsFree(memoryData);
         return APP_ERR_COMM_INVALID_PARAM;
     }
-    shape = {output.heightStride * YUV_BYTE_NU / YUV_BYTE_DE, output.widthStride};
-    outputTensor = TensorBase(memoryData, false, shape, TENSOR_DTYPE_UINT8);
+    shape = {output.heightStride * MxBase::YUV_BYTE_NU / MxBase::YUV_BYTE_DE, output.widthStride};
+    outputTensor = MxBase::TensorBase(memoryData, false, shape, MxBase::TENSOR_DTYPE_UINT8);
     LogInfo << "Output data height: " << output.height << ", width: " << output.width << ".";
     LogInfo << "Output data widthStride: " << output.widthStride << ", heightStride: " << output.heightStride << "."
             << std::endl;
@@ -146,16 +148,16 @@ APP_ERROR SSDMobileNetV1Fpn::Inference(const std::vector<MxBase::TensorBase> &in
         for (size_t j = 0; j < modelDesc_.outputTensors[i].tensorDims.size(); ++j) {
             shape.push_back((uint32_t) modelDesc_.outputTensors[i].tensorDims[j]);
         }
-        TensorBase tensor(shape, dtypes[i], MemoryData::MemoryType::MEMORY_DEVICE, deviceId_);
-        APP_ERROR ret = TensorBase::TensorBaseMalloc(tensor);
+        MxBase::TensorBase tensor(shape, dtypes[i], MxBase::MemoryData::MemoryType::MEMORY_DEVICE, deviceId_);
+        APP_ERROR ret = MxBase::TensorBase::TensorBaseMalloc(tensor);
         if (ret != APP_ERR_OK) {
             LogError << "TensorBaseMalloc failed, ret=" << ret << ".";
             return ret;
         }
         outputs.push_back(tensor);
     }
-    DynamicInfo dynamicInfo = {};
-    dynamicInfo.dynamicType = DynamicType::STATIC_BATCH;
+    MxBase::DynamicInfo dynamicInfo = {};
+    dynamicInfo.dynamicType = MxBase::DynamicType::STATIC_BATCH;
     dynamicInfo.batchSize = 1;
 
     APP_ERROR ret = model_->ModelInference(inputs, outputs, dynamicInfo);
@@ -179,13 +181,13 @@ APP_ERROR SSDMobileNetV1Fpn::PostProcess(const std::vector<MxBase::TensorBase> &
 }
 
 APP_ERROR SSDMobileNetV1Fpn::Process(const std::string &imgPath) {
-    TensorBase image;
+    MxBase::TensorBase image;
     APP_ERROR ret = ReadImage(imgPath, image);
     if (ret != APP_ERR_OK) {
         LogError << "ReadImage failed, ret=" << ret << ".";
         return ret;
     }
-    TensorBase resizeImage;
+    MxBase::TensorBase resizeImage;
     ret = Resize(image, resizeImage);
     if (ret != APP_ERR_OK) {
         LogError << "Resize failed, ret=" << ret << ".";
@@ -202,7 +204,7 @@ APP_ERROR SSDMobileNetV1Fpn::Process(const std::string &imgPath) {
     }
     LogInfo << "Inference success, ret=" << ret << ".";
     std::vector<MxBase::ResizedImageInfo> resizedImageInfos = {};
-    ResizedImageInfo imgInfo = {640, 640, 1024, 683, MxBase::RESIZER_STRETCHING, 0.0};
+    MxBase::ResizedImageInfo imgInfo = {640, 640, 1024, 683, MxBase::RESIZER_STRETCHING, 0.0};
     resizedImageInfos.push_back(imgInfo);
     std::vector<std::vector<MxBase::ObjectInfo>> objectInfos = {};
     std::map<std::string, std::shared_ptr<void>> configParamMap = {};
@@ -217,7 +219,7 @@ APP_ERROR SSDMobileNetV1Fpn::Process(const std::string &imgPath) {
     if (!objectInfos.empty()) {
         std::vector<MxBase::ObjectInfo> objects = objectInfos.at(0);
         for (size_t i = 0; i < objects.size(); i++) {
-            ObjectInfo obj = objects.at(i);
+            MxBase::ObjectInfo obj = objects.at(i);
             LogInfo << "BBox[" << i << "]:[x0=" << obj.x0 << ", y0=" << obj.y0 << ", x1=" << obj.x1
             << ", y1=" << obj.y1 << "], confidence=" << obj.confidence << ", classId=" << obj.classId
             << ", className=" << obj.className << std::endl;
