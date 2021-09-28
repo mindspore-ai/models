@@ -1,4 +1,4 @@
-# ![MindSpore Logo](https://www.mindspore.cn/static/img/logo_black.6a5c850d.png)
+# ![MindSpore Logo](https://gitee.com/mindspore/mindspore/raw/master/docs/MindSpore-logo.png)
 
 ## 欢迎来到MindSpore ModelZoo
 
