@@ -85,7 +85,7 @@ function preprocess_data()
     fi
     mkdir preprocess_Result
 
-    python3.7 ../preprocess.py --dataset_path=$data_path --output_path=./preprocess_Result &> preprocess.log
+    python ../preprocess.py --dataset_path=$data_path --output_path=./preprocess_Result &> preprocess.log
 }
 
 function compile_app()

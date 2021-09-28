@@ -88,7 +88,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --result_files=./result_Files --dataset_path=$data_path --ann_file=$ann_file &> acc.log &
+    python ../postprocess.py --result_files=./result_Files --dataset_path=$data_path --ann_file=$ann_file &> acc.log &
 }
 
 compile_app

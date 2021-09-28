@@ -58,8 +58,8 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --preprocess_path=./preprocess_Result --mindrecord_path=$mindrecord_dir --batch_size=1 &> preprocess.log
-    python3.7 ../bin.py --preprocess_path=./preprocess_Result
+    python ../preprocess.py --preprocess_path=./preprocess_Result --mindrecord_path=$mindrecord_dir --batch_size=1 &> preprocess.log
+    python ../bin.py --preprocess_path=./preprocess_Result
     data_dir=./preprocess_Result
     input0_path=./preprocess_Result/images_bin
 }
@@ -90,7 +90,7 @@ function cal_map()
         rm -rf ./infer_output
     fi
     mkdir infer_output
-    python3.7 ../postprocess.py --result_path=./result_Files --data_dir=$data_dir --save_output_path=./infer_output &> map.log &
+    python ../postprocess.py --result_path=./result_Files --data_dir=$data_dir --save_output_path=./infer_output &> map.log &
 }
 preprocess_data
 if [ $? -ne 0 ]; then

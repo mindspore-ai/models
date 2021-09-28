@@ -79,7 +79,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --config_path=$CONFIG_FILE --preprocess_path=$dataset_path --result_path=./preprocess_Result/ --device_target=$device_target
+    python ../preprocess.py --config_path=$CONFIG_FILE --preprocess_path=$dataset_path --result_path=./preprocess_Result/ --device_target=$device_target
 }
 
 function compile_app()
@@ -106,7 +106,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --config_path=$CONFIG_FILE --result_dir=./result_Files --label_dir=./preprocess_Result/label_ids.npy --device_target=$device_target &> acc.log
+    python ../postprocess.py --config_path=$CONFIG_FILE --result_dir=./result_Files --label_dir=./preprocess_Result/label_ids.npy --device_target=$device_target &> acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

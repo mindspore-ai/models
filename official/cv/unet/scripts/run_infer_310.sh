@@ -76,7 +76,7 @@ function preprocess_data()
         echo "unsupported network"
         exit 1
     fi
-    python3.7 ../preprocess.py --config_path=$config_path
+    python ../preprocess.py --config_path=$config_path
 }
 
 function compile_app()
@@ -110,7 +110,7 @@ function cal_acc()
     elif [ $network == "unet++" ]; then
         config_path="${BASEPATH}/../unet_nested_cell_config.yaml"
     fi
-    python3.7 ../postprocess.py --config_path=$config_path &> acc.log &
+    python ../postprocess.py --config_path=$config_path &> acc.log &
 }
 
 preprocess_data

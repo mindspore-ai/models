@@ -77,7 +77,7 @@ function preprocess_data()
        rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --config_path=$CONFIG_FILE --dataset=$dataset_name --data_path=$dataset_path --result_path=./preprocess_Result/
+    python ../preprocess.py --config_path=$CONFIG_FILE --dataset=$dataset_name --data_path=$dataset_path --result_path=./preprocess_Result/
 }
 
 function compile_app()
@@ -108,7 +108,7 @@ function infer()
 function cal_acc()
 {
 
-    python3.7 ../postprocess.py --config_path=$CONFIG_FILE --result_dir=./result_Files --label_dir=./preprocess_Result/imagenet_label.json   &> acc.log
+    python ../postprocess.py --config_path=$CONFIG_FILE --result_dir=./result_Files --label_dir=./preprocess_Result/imagenet_label.json   &> acc.log
 
 }
 

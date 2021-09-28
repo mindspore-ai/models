@@ -67,7 +67,7 @@ function preprocess_data() {
     rm -rf CriteoBinary
   fi
   mkdir CriteoBinary
-  python3.7 ./GetDatasetBinary.py --dataset_path=$dataset_path --result_path=./CriteoBinary/
+  python ./GetDatasetBinary.py --dataset_path=$dataset_path --result_path=./CriteoBinary/
 }
 
 function compile_app() {
@@ -91,7 +91,7 @@ function infer() {
 }
 
 function cal_acc() {
-  python3.7 ./eval310.py --result_path=./result_Files --label_path=./CriteoBinary/batch_labels &>acc.log
+  python ./eval310.py --result_path=./result_Files --label_path=./CriteoBinary/batch_labels &>acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

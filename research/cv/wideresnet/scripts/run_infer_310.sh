@@ -70,7 +70,7 @@ function preprocess_data()
     fi
     mkdir preprocess_Result
 
-    python3.7 ../preprocess.py --data_path=$data_path --output_path=./preprocess_Result --device_id=$device_id &> preprocess.log
+    python ../preprocess.py --data_path=$data_path --output_path=./preprocess_Result --device_id=$device_id &> preprocess.log
 }
 
 function infer()

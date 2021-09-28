@@ -61,7 +61,7 @@ function preprocess_data()
        rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --val_dataset_folder=$dataset_path
+    python ../preprocess.py --val_dataset_folder=$dataset_path
 }
 
 function compile_app()
@@ -87,7 +87,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --device_id=$device_id &> acc.log
+    python ../postprocess.py --device_id=$device_id &> acc.log
 }
 
 preprocess_data

@@ -101,7 +101,7 @@ function cal_ap()
     if [ -d ${save_path} ]; then
         rm -rf ${save_path}
     fi
-    python3.7 ../postprocess.py --result_path=./result_Files --label_path=$label_path --meta_path=./dataset/meta --save_path=$save_path &> ap.log &
+    python ../postprocess.py --result_path=./result_Files --label_path=$label_path --meta_path=./dataset/meta --save_path=$save_path &> ap.log &
 }
 
 preprocess_data

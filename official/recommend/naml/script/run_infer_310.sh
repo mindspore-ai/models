@@ -110,7 +110,7 @@ function infer()
 
 function cal_acc()
 {
-    python3 ../postprocess.py --result_path=./result_Files --label_path=$browsed_news_path/02_labels_data  &> acc.log
+    python ../postprocess.py --result_path=./result_Files --label_path=$browsed_news_path/02_labels_data  &> acc.log
     if [ $? -ne 0 ]; then
         echo "calculate accuracy failed"
         exit 1
