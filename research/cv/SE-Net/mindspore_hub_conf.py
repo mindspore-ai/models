@@ -13,13 +13,15 @@
 # limitations under the License.
 # ============================================================================
 """hub config"""
-from src.network import NTS_NET
+from src.resnet import se_resnet50 as resnet
+from src.config import config2 as config
 
-def nts_net(*args, **kwargs):
-    return NTS_NET(topK=6, resnet50Path=args.resnet50Path)
+
+def se_resnet50_net(*args, **kwargs):
+    return resnet(class_num=config.class_num)
 
 
 def create_network(name, *args, **kwargs):
-    if name == "nts_net":
-        return nts_net(topK=6, resnet50Path="")
+    if name == "se-net":
+        return se_resnet50_net()
     raise NotImplementedError(f"{name} is not implemented in the repo")

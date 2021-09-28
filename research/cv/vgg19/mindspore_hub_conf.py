@@ -14,6 +14,8 @@
 # ============================================================================
 """hub config."""
 from src.vgg import vgg19 as VGG19
+from src.config import cifar_cfg, imagenet_cfg
+
 
 
 def vgg19(*args, **kwargs):
@@ -21,6 +23,16 @@ def vgg19(*args, **kwargs):
 
 
 def create_network(name, *args, **kwargs):
+    """create_network about vgg19_net"""
     if name == "vgg19":
-        return vgg19(*args, **kwargs)
+        dataset = kwargs.get("dataset", "cifar10")
+        if "dataset" in kwargs:
+            del kwargs["dataset"]
+        if dataset == "cifar10":
+            net = vgg19(args=cifar_cfg)
+        elif dataset == "imagenet2012":
+            net = vgg19(args=imagenet_cfg)
+        else:
+            raise NotImplementedError(f"dataset {dataset} is not implemented in the repo")
+        return net
     raise NotImplementedError(f"{name} is not implemented in the repo")
