@@ -38,9 +38,9 @@ def topk_fun(logits, topk=5):
 def sampler(log_probs_revised, top_p, top_k_num, use_pynative=False):
     """Convert the log_probs to probability"""
     if use_pynative:
-        logits = P.Pow()(10, Tensor(log_probs_revised, mstype.float32))
+        logits = P.Pow()(np.e, Tensor(log_probs_revised, mstype.float32))
     else:
-        logits = np.power(10, np.array(log_probs_revised, np.float32))
+        logits = np.power(np.e, np.array(log_probs_revised, np.float32))
 
         # If top_p is less than 1.0, use top_p sampling
     if top_p < 1.0:
@@ -57,7 +57,7 @@ def sampler(log_probs_revised, top_p, top_k_num, use_pynative=False):
         cumsum_logits = cumsum_logits[0]
         index = index[0]
         sorted_logits = sorted_logits[0]
-        top_p_num = sum(cumsum_logits > top_p)
+        top_p_num = sum(cumsum_logits < top_p) + 1
         # In case the probability is smooth, the sum of 5000 largest probabilities are not large enough
         if top_p_num == 0:
             top_p_num = 5000
