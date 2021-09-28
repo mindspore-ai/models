@@ -53,6 +53,7 @@ then
 exit 1
 fi
 
+cp $PATH4 ../src/
 rm -rf ./train
 mkdir ./train
 cp ../*.py ./train
@@ -63,7 +64,6 @@ cp -r ../model_utils ./train
 cd ./train || exit
 
 export RANK_SIZE=1
-cp $PATH4 ../src/
 
 echo "======start training======"
 
