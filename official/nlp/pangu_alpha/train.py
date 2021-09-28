@@ -128,8 +128,8 @@ def run_train(args_opt):
                                                   pipeline_stage=args_opt.stage_num,
                                                   micro_batch_num=args_opt.micro_size,
                                                   optimizer_shard=bool(args_opt.optimizer_shard),
-                                                  vocab_emb_dp=bool(args_opt.word_emb_dp),
-                                                  recompute=True)
+                                                  vocab_emb_dp=bool(args_opt.word_emb_dp), recompute=True,
+                                                  gradient_aggregation_group=args_opt.gradient_aggregation_group)
     config = PanguAlphaConfig(batch_size=batch_size, num_heads=args_opt.num_heads,
                               hidden_size=args_opt.embedding_size, seq_length=args_opt.seq_length,
                               vocab_size=args_opt.vocab_size, num_layers=args_opt.num_layers,
