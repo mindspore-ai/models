@@ -129,6 +129,9 @@ bash scripts/run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [R
 
 # run eval on Ascend
 bash scripts/run_eval.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
+
+# run inference on Ascend 310
+bash scripts/run_infer_310.sh [CHECKPOINT_PATH](MINDIR) [DATASET PATH] [ANNOTATIONS PATH] [DEVICE ID](OPTION)
 ```
 
 ## [Script Description](#contents)
@@ -142,18 +145,33 @@ bash scripts/run_eval.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
     ├─ README.md                      # descriptions about SSD
     ├─ scripts
       ├─ run_distribute_train.sh      # shell script for distributed on ascend
+      ├─ run_1p_train.sh              # shell script for 1p on ascend
       ├─ run_eval.sh                  # shell script for eval on ascend
+      └─ run_infer_310.sh             # shell script for inference on ascend 310
     ├─ src
       ├─ __init__.py                  # init file
       ├─ box_utils.py                 # bbox utils
+      ├─ anchor_generator.py          # generate anchors
       ├─ eval_utils.py                # metrics utils
       ├─ config.py                    # total config
       ├─ dataset.py                   # create dataset and process dataset
       ├─ init_params.py               # parameters utils
       ├─ lr_schedule.py               # learning ratio generator
+      ├─ mobilenet_v2_fpn.py          # extract features
       └─ ssd.py                       # ssd architecture
+    ├─ ascend310_infer                # 310 inference
+      ├─ inc
+        └─ utils.h
+      ├─ src
+        ├─main.cc
+        └─utils.cc
+      ├─build.sh
+      └─CMakeLists.txt
     ├─ eval.py                        # eval scripts
     ├─ train.py                       # train scripts
+    ├─ export.py                      # transform ckpt into MINDIR, AIR or ONNX
+    ├─ postprocess.py                 # 310 inference
+    └─ requirements.txt                # python environment
 ```
 
 ### [Script Parameters](#contents)
@@ -316,19 +334,19 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 Inference result is saved in current path, you can find result like this in acc.log file.
 
 ```bash
-Average Precision (AP) @[ IoU=0.50:0.95 | area= all   | maxDets=100 ] = 0.256
-Average Precision (AP) @[ IoU=0.50      | area= all   | maxDets=100 ] = 0.422
-Average Precision (AP) @[ IoU=0.75      | area= all   | maxDets=100 ] = 0.262
-Average Precision (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.042
-Average Precision (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.230
-Average Precision (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.453
-Average Recall    (AR) @[ IoU=0.50:0.95 | area= all   | maxDets=  1 ] = 0.263
-Average Recall    (AR) @[ IoU=0.50:0.95 | area= all   | maxDets= 10 ] = 0.410
-Average Recall    (AR) @[ IoU=0.50:0.95 | area= all   | maxDets=100 ] = 0.442
-Average Recall    (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.133
-Average Recall    (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.466
-Average Recall    (AR) @[ IoU=0.50:0.95 | area=large  | maxDets=100 ] = 0.714
-mAP: 0.2561487588412723
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.252
+Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.419
+Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.256
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.041
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.225
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.447
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.261
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.405
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.438
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.125
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.459
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.704
+mAP:0.2522562031397977
 ```
 
 ## [Model Description](#contents)

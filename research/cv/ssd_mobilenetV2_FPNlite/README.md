@@ -131,6 +131,9 @@ bash scripts/run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [R
 
 # run eval on Ascend
 bash scripts/run_eval.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
+
+# run inference on Ascend 310
+bash scripts/run_infer_310.sh [CHECKPOINT_PATH](MINDIR) [DATASET PATH] [ANNOTATIONS PATH] [DEVICE ID](OPTION)
 ```
 
 ## [Script Description](#contents)
@@ -144,7 +147,9 @@ bash scripts/run_eval.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
     ├─ README.md                      # descriptions about SSD
     ├─ scripts
       ├─ run_distribute_train.sh      # shell script for distributed on ascend
+      ├─ run_1p_train.sh              # shell script for 1p on ascend
       ├─ run_eval.sh                  # shell script for eval on ascend
+      └─ run_infer_310.sh             # shell script for inference on ascend 310
     ├─ src
       ├─ __init__.py                  # init file
       ├─ box_utils.py                 # bbox utils
@@ -156,8 +161,19 @@ bash scripts/run_eval.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
       ├─ lr_schedule.py               # learning ratio generator
       ├─ mobilenet_v2_fpn.py          # extract features
       └─ ssd.py                       # ssd architecture
+    ├─ ascend310_infer                # 310 inference
+      ├─ inc
+        └─ utils.h
+      ├─ src
+        ├─main.cc
+        └─utils.cc
+      ├─build.sh
+      └─CMakeLists.txt
     ├─ eval.py                        # eval scripts
     ├─ train.py                       # train scripts
+    ├─ export.py                      # transform ckpt into MINDIR, AIR or ONNX
+    ├─ postprocess.py                 # 310 inference
+    └─ requirements.txt                # python environment
 ```
 
 ### [Script Parameters](#contents)
@@ -320,19 +336,19 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 Inference result is saved in current path, you can find result like this in acc.log file.
 
 ```bash
-Average Precision (AP) @[ IoU=0.50:0.95 | area= all   | maxDets=100 ] = 0.264
-Average Precision (AP) @[ IoU=0.50      | area= all   | maxDets=100 ] = 0.430
-Average Precision (AP) @[ IoU=0.75      | area= all   | maxDets=100 ] = 0.279
-Average Precision (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.078
-Average Precision (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.274
-Average Precision (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.428
-Average Recall    (AR) @[ IoU=0.50:0.95 | area= all   | maxDets=  1 ] = 0.263
-Average Recall    (AR) @[ IoU=0.50:0.95 | area= all   | maxDets= 10 ] = 0.417
-Average Recall    (AR) @[ IoU=0.50:0.95 | area= all   | maxDets=100 ] = 0.466
-Average Recall    (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.164
-Average Recall    (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.528
-Average Recall    (AR) @[ IoU=0.50:0.95 | area=large  | maxDets=100 ] = 0.675
-mAP: 0.2645785822173796
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.227
+Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.388
+Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.229
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.060
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.244
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.366
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.241
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.393
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.446
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.157
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.513
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.649
+mAP:0.2273885741338855
 ```
 
 ## [Model Description](#contents)
