@@ -63,7 +63,7 @@ Transformer具体包括六个编码模块和六个解码模块。每个编码模
 
 ```bash
 # 运行训练示例
-bash scripts/run_standalone_train_ascend.sh 0 52 /path/ende-l128-mindrecord
+bash scripts/run_standalone_train_ascend.sh Ascend 0 52 /path/ende-l128-mindrecord
 
 # 运行分布式训练示例
 bash scripts/run_distribute_train_ascend.sh 8 52 /path/ende-l128-mindrecord rank_table.json ./default_config.yaml

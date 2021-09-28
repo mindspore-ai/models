@@ -1,4 +1,4 @@
-# 目录
+﻿# 目录
 
 <!-- TOC -->
 
@@ -78,14 +78,14 @@ GPU单卡训练命令如下：
 #单卡训练示例
 python train.py --device_target="GPU" > output.train.log 2>&1 &
 #或
-sh scripts/run_train_gpu.sh
+bash scripts/run_train_gpu.sh
 ```
 
 GPU 8卡训练命令如下：
 
 ```bash
 #8卡训练示例
-sh scripts/run_train_multi_gpu.sh
+bash scripts/run_train_multi_gpu.sh
 ```
 
 5. 开始验证。
@@ -95,7 +95,7 @@ sh scripts/run_train_multi_gpu.sh
 ```bash
 python eval.py --ckpt_path=CHECKPOINT_PATH
 #或
-sh scripts/run_eval.sh CHECKPOINT_PATH
+bash scripts/run_eval.sh CHECKPOINT_PATH
 ```
 
 # 脚本说明
@@ -164,7 +164,7 @@ sh scripts/run_eval.sh CHECKPOINT_PATH
 - GPU处理器环境运行
 
   ```bash
-  sh scripts/run_train_multi_gpu.sh
+  bash scripts/run_train_multi_gpu.sh
   ```
 
   上述shell脚本将在后台运行分布训练。您可以通过output.multi_gpu.train.log文件查看结果。
@@ -186,7 +186,7 @@ sh scripts/run_eval.sh CHECKPOINT_PATH
   或者，
 
   ```bash
-  sh scripts/run_eval.sh [CHECKPOINT_PATH]
+  bash scripts/run_eval.sh [CHECKPOINT_PATH]
   ```
 
   上述python命令将在后台运行，您可以通过output.eval.log文件查看结果。

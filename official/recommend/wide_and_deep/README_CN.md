@@ -1,4 +1,4 @@
-# 目录
+﻿# 目录
 
 - [目录](#目录)
 - [Wide&Deep概述](#widedeep概述)
@@ -89,13 +89,13 @@ python src/preprocess_data.py  --data_path=./data/ --dense_dim=13 --slot_dim=26 
 数据集准备就绪后，即可在Ascend上单机训练和评估模型。
 
 ```bash
-python train_and_eval.py --data_path=./data/mindrecord --data_type=mindrecord
+python train_and_eval.py --data_path=./data/mindrecord --dataset_type=mindrecord
 ```
 
 按如下操作评估模型：
 
 ```bash
-python eval.py  --data_path=./data/mindrecord --data_type=mindrecord
+python eval.py  --data_path=./data/mindrecord --dataset_type=mindrecord --ckpt_path=./ckpt/widedeep_train-15_2582.ckpt
 ```
 
 - 在ModelArts上运行（如果想在modelarts中运行，请查看【modelarts】官方文档（https://support.huaweicloud.com/modelarts/），如下开始训练即可）

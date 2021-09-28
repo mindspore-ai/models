@@ -67,7 +67,7 @@ python train_and_eval.py --data_path=./data/mindrecord --data_type=mindrecord
 运行如下命令评估模型：
 
 ```bash
-python eval.py  --data_path=./data/mindrecord --data_type=mindrecord
+python eval.py  --data_path=./data/mindrecord --data_type=mindrecord --ckpt_path=widedeep_train-8_455.ckpt
 ```
 
 ## 脚本说明

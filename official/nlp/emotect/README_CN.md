@@ -1,5 +1,4 @@
-
-# 目录
+﻿# 目录
 
 - [目录](#目录)
 - [概述](#概述)
@@ -151,9 +150,13 @@ bash script/download_data.sh
 
 ```bash
 bash scripts/convert_dataset.sh
+
 # `convert_dataset.sh` depend on ERNIE vocabulary,
+
 # you should download ERNIE model first by:
+
 # sh script/download_model.sh
+
 ```
 
 #### Ascend处理器或GPU上运行
@@ -167,16 +170,22 @@ bash script/download_model.sh
 预训练模型ERNIE下载后，将其转换为MindSpore可加载权重
 
 ```shell
+
 #--input_dir ./pretrain_models/ernie
+
 bash script/paddle_to_midnspore.sh
+
 # only support x86 platform since Paddle don't support ARM
+
 ```
 
 将ERNIE迁移至Mindspore后，执行训练脚本:
 
 ```bash
 bash scripts/run_classifier_finetune_{platform}.sh
+
 # platform: gpu or ascend
+
 ```
 
 模型保存在 ```./save_models```。
@@ -187,11 +196,19 @@ bash scripts/run_classifier_finetune_{platform}.sh
 
 #### Ascend处理器或GPU上运行后评估
 
-根据训练结果，可选择最优的step进行评估，修改```scripts/run_classifier_eval.sh``` 脚本中```load_finetune_checkpoint_path``` 参数，然后执行
+根据训练结果，可选择最优的step进行评估，修改```scripts/run_classifier_eval.sh``` 脚本中参数，例如，
+
+--load_pretrain_checkpoint_path="/data/pretrain_models/ernie.ckpt" \
+
+--train_data_file_path="/emotect_dataset/data/train.mindrecord" \
+
+--eval_data_file_path="/emotect_dataset/data/dev.mindrecord" \
 
 ```shell
 bash scripts/run_classifier_eval_{platform}.sh
+
 # platform: gpu or ascend
+
 ```
 
 ## 310推理
@@ -200,7 +217,9 @@ bash scripts/run_classifier_eval_{platform}.sh
 
 ```shell
 bash scripts/export.sh
+
 # export finetune ckpt to mindir
+
 ```
 
 参数`ckpt_file`，`file_format`已在`export.sh`中设置。
@@ -210,7 +229,9 @@ bash scripts/export.sh
 以下展示了使用minir模型执行推理的示例。
 
 ```shell
+
 # Ascend310推理
+
 bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_FILE_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 ```
 

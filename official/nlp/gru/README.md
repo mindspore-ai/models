@@ -1,4 +1,4 @@
-![](https://www.mindspore.cn/static/img/logo_black.6a5c850d.png)
+﻿![](https://www.mindspore.cn/static/img/logo_black.6a5c850d.png)
 
 <!-- TOC -->
 
@@ -278,6 +278,8 @@ Parameters for both training and evaluation can be set in config.py. All the dat
     cd ./scripts
     bash run_standalone_train_{platform}.sh [DATASET_PATH]
     # platform: ascend or gpu
+    #example：
+    bash run_standalone_train_ascend.sh /Muti30k/mindrecord/multi30k_train_mindrecord_32_0
     ```
 
 - Running scripts for distributed training of GRU. Task training on multiple device and run the following command in bash to be executed in `scripts/`:
@@ -297,6 +299,8 @@ Parameters for both training and evaluation can be set in config.py. All the dat
     cd ./scripts
     bash run_eval_{platform}.sh [CKPT_FILE] [DATASET_PATH]
     # platform: ascend or gpu
+    #example:
+    bash run_eval_ascend.sh /data/ckpt_0/0-20_1807.ckpt /data/mindrecord/multi30k_test_mindrecord_32
     ```
 
 - After evalulation, we will get eval/target.txt and eval/output.txt.Then we can use scripts/parse_output.sh to get the translation.

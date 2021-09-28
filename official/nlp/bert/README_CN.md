@@ -1,5 +1,4 @@
-
-# 目录
+﻿# 目录
 
 [View English](./README.md)
 
@@ -86,13 +85,17 @@ BERT的主干结构为Transformer。对于BERT_base，Transformer包含12个编�
 - 在Ascend上运行
 
 ```bash
+
 # 单机运行预训练示例
+
 bash scripts/run_standalone_pretrain_ascend.sh 0 1 /path/cn-wiki-128
 
 # 分布式运行预训练示例
+
 bash scripts/run_distributed_pretrain_ascend.sh /path/cn-wiki-128 /path/hccl.json
 
 # 运行微调和评估示例
+
 - 如需运行微调任务，请先准备预训练生成的权重文件（ckpt）。
 - 在`finetune_eval_config.py`中设置BERT网络配置和优化器超参。
 
@@ -115,13 +118,17 @@ bash scripts/run_distributed_pretrain_ascend.sh /path/cn-wiki-128 /path/hccl.jso
 - 在GPU上运行
 
 ```bash
+
 # 单机运行预训练示例
+
 bash run_standalone_pretrain_for_gpu.sh 0 1 /path/cn-wiki-128
 
 # 分布式运行预训练示例
+
 bash scripts/run_distributed_pretrain_for_gpu.sh 8 40 /path/cn-wiki-128
 
 # 运行微调和评估示例
+
 - 如需运行微调任务，请先准备预训练生成的权重文件（ckpt）。
 - 在`finetune_eval_config.py`中设置BERT网络配置和优化器超参。
 
@@ -503,7 +510,9 @@ bash scripts/run_standalone_pretrain_ascend.sh 0 1 /path/cn-wiki-128
 以上命令后台运行，您可以在pretraining_log.txt中查看训练日志。训练结束后，您可以在默认脚本路径下脚本文件夹中找到检查点文件，得到如下损失值：
 
 ```text
+
 # grep "epoch" pretraining_log.txt
+
 epoch: 0.0, current epoch percent: 0.000, step: 1, outputs are (Tensor(shape=[1], dtype=Float32, [ 1.0856101e+01]), Tensor(shape=[], dtype=Bool, False), Tensor(shape=[], dtype=Float32, 65536))
 epoch: 0.0, current epoch percent: 0.000, step: 2, outputs are (Tensor(shape=[1], dtype=Float32, [ 1.0821701e+01]), Tensor(shape=[], dtype=Bool, False), Tensor(shape=[], dtype=Float32, 65536))
 ...
@@ -533,7 +542,9 @@ bash scripts/run_distributed_pretrain_ascend.sh /path/cn-wiki-128 /path/hccl.jso
 以上命令后台运行，您可以在pretraining_log.txt中查看训练日志。训练结束后，您可以在默认LOG*文件夹下找到检查点文件，得到如下损失值：
 
 ```text
+
 # grep "epoch" LOG*/pretraining_log.txt
+
 epoch: 0.0, current epoch percent: 0.001, step: 100, outputs are (Tensor(shape=[1], dtype=Float32, [ 1.08209e+01]), Tensor(shape=[], dtype=Bool, False), Tensor(shape=[], dtype=Float32, 65536))
 epoch: 0.0, current epoch percent: 0.002, step: 200, outputs are (Tensor(shape=[1], dtype=Float32, [ 1.07566e+01]), Tensor(shape=[], dtype=Bool, False), Tensor(shape=[], dtype=Float32, 65536))
 ...
@@ -550,7 +561,15 @@ epoch: 0.0, current epoch percent: 0.002, step: 200, outputs are (Tensor(shape=[
 
 #### Ascend处理器上运行后评估cola数据集
 
-运行以下命令前，确保已设置加载与训练检查点路径。请将检查点路径设置为绝对全路径，例如，/username/pretrain/checkpoint_100_300.ckpt。
+运行以下命令前，确保已设置加载与训练检查点路径。请将检查点路径设置为绝对全路径，例如，
+
+--load_pretrain_checkpoint_path="/data/scripts/checkpoint_bert-20000_1.ckpt" \
+
+--train_data_file_path="/data/tnews/train.tf_record" \
+
+--eval_data_file_path="/data/tnews/dev.tf_record" \
+
+--schema_file_path="/data/tnews/dataset.json"
 
 ```bash
 bash scripts/run_classifier.sh
@@ -565,6 +584,18 @@ acc_num XXX, total_num XXX, accuracy 0.588986
 ```
 
 #### Ascend处理器上运行后评估cluener数据集
+
+运行以下命令前，确保已设置加载与训练检查点路径。请将检查点路径设置为绝对全路径，例如，
+
+--label_file_path="/data/finetune/cluener/label_file" \
+
+--load_pretrain_checkpoint_path="/data/scripts/checkpoint_bert-20000_1.ckpt" \
+
+--train_data_file_path="/data/cluener/train.tf_record" \
+
+--eval_data_file_path="/data/cluener/dev.tf_record" \
+
+--schema_file_path="/data/cluener/dataset.json"
 
 ```bash
 bash scripts/run_ner.sh
@@ -603,6 +634,16 @@ F1 0.931243
 
 #### Ascend处理器上运行后评估squad v1.1数据集
 
+运行以下命令前，确保已设置加载与训练检查点路径。请将检查点路径设置为绝对全路径，例如，
+
+--vocab_file_path="/data/squad/vocab_bert_large_en.txt" \
+
+--load_pretrain_checkpoint_path="/data/scripts/bert_converted.ckpt" \
+
+--train_data_file_path="/data/squad/train.tf_record" \
+
+--eval_json_path="/data/squad/dev-v1.1.json" \
+
 ```bash
 bash scripts/squad.sh
 ```
@@ -627,6 +668,7 @@ python export.py --config_path [../../*.yaml] --export_ckpt_file [CKPT_PATH] --e
 - 在ModelArts上导出
 
 ```python
+
 # (1) 上传你的代码到 s3 桶上
 # (2) 在ModelArts上创建训练任务
 # (3) 选择代码目录 /{path}/bert
@@ -650,6 +692,7 @@ python export.py --config_path [../../*.yaml] --export_ckpt_file [CKPT_PATH] --e
 # (9) 在网页上的’资源池选择‘项目下， 选择单卡规格的资源
 # (10) 创建训练作业
 # 你将在{Output file path}下看到 'bert_ner.mindir'文件
+
 ```
 
 参数`export_ckpt_file` 是必需的，`file_format` 必须在 ["AIR", "MINDIR"]中进行选择。
@@ -661,7 +704,9 @@ python export.py --config_path [../../*.yaml] --export_ckpt_file [CKPT_PATH] --e
 在执行推理之前，需要通过export.py导出mindir文件。输入数据文件为bin格式。
 
 ```shell
+
 # Ascend310 推理
+
 bash run_infer_310.sh [MINDIR_PATH] [LABEL_PATH] [DATA_FILE_PATH] [DATASET_FORMAT] [SCHEMA_PATH] [USE_CRF] [NEED_PREPROCESS] [DEVICE_ID]
 ```
 
