@@ -49,6 +49,7 @@ then
 exit 1
 fi
 
+cp $PATH4 ../src/
 rm -rf ./train_parallel
 mkdir ./train_parallel
 cp ../*.py ./train_parallel
@@ -59,7 +60,6 @@ cp -r ../model_utils ./train_parallel
 cd ./train_parallel || exit
 
 export RANK_SIZE=8
-cp $PATH4 ../src/
 
 echo "======start training======"
 
