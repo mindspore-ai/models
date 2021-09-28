@@ -89,8 +89,8 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../create_imagenet2012_label.py  --img_path=$data_path
-    python3.7 ../postprocess.py --dataset=$dataset --result_path=./result_Files --label_path=./imagenet_label.json  &> acc.log
+    python ../create_imagenet2012_label.py  --img_path=$data_path
+    python ../postprocess.py --dataset=$dataset --result_path=./result_Files --label_path=./imagenet_label.json  &> acc.log
 
     if [ $? -ne 0 ]; then
         echo "calculate accuracy failed"

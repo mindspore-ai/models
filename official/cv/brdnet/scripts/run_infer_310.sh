@@ -78,7 +78,7 @@ function preprocess()
     cd ../ || exit
     echo "\nstart preprocess"
     echo "waitting for preprocess finish..."
-    python3.7 preprocess.py --out_dir=$noise_image_path --image_path=$data_path --channel=$channel --sigma=$sigma > preprocess.log 2>&1
+    python preprocess.py --out_dir=$noise_image_path --image_path=$data_path --channel=$channel --sigma=$sigma > preprocess.log 2>&1
     echo "preprocess finished! you can see the log in preprocess.log!"
 }
 
@@ -103,7 +103,7 @@ function cal_psnr()
 {
     echo "\nstart calculate PSNR..."
     echo "waitting for calculate finish..."
-    python3.7 ../cal_psnr.py --image_path=$data_path --output_path=./result_Files --channel=$channel > psnr.log 2>&1
+    python ../cal_psnr.py --image_path=$data_path --output_path=./result_Files --channel=$channel > psnr.log 2>&1
     echo "calculate finished! you can see the log in psnr.log\n"
 }
 

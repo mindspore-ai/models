@@ -85,7 +85,7 @@ function infer()
 
 function cal_recall()
 {
-    python3.7 ../postprocess.py --result_path=./result_Files --data_dir=$data_path &> recall.log &
+    python ../postprocess.py --result_path=./result_Files --data_dir=$data_path &> recall.log &
 }
 
 preprocess_data

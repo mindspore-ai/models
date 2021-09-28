@@ -84,7 +84,7 @@ function preprocess_data()
 
     BASEPATH=$(cd "`dirname $0`" || exit; pwd)
     config_path="${BASEPATH}/../${dataset}_config.yaml"
-    python3.7 ../preprocess.py --config_path=$config_path --output_path=./preprocess_Result
+    python ../preprocess.py --config_path=$config_path --output_path=./preprocess_Result
 }
 
 function infer()

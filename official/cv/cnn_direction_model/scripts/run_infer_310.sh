@@ -57,8 +57,8 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-  #  python3.7 ../preprocess.py --dataset_path=$dataset_path --result_path=./preprocess_Result/
-    python3.7 ../preprocess.py
+  #  python ../preprocess.py --dataset_path=$dataset_path --result_path=./preprocess_Result/
+    python ../preprocess.py
 }
 
 function compile_app()
@@ -92,8 +92,8 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --result_path=./result_Files_lr --label_path=./preprocess_Result/lr_dataset/label &> acc.log
-    python3.7 ../postprocess.py --result_path=./result_Files_rl --label_path=./preprocess_Result/rl_dataset/label &>> acc.log
+    python ../postprocess.py --result_path=./result_Files_lr --label_path=./preprocess_Result/lr_dataset/label &> acc.log
+    python ../postprocess.py --result_path=./result_Files_rl --label_path=./preprocess_Result/rl_dataset/label &>> acc.log
 }
 
 preprocess_data

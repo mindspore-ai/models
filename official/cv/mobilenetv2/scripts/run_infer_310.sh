@@ -89,7 +89,7 @@ function cal_acc()
 {
     BASEPATH=$(cd "`dirname $0`" || exit; pwd)
     CONFIG_FILE="${BASEPATH}/../default_config.yaml"
-    python3.7 ../postprocess.py --config_path=$CONFIG_FILE --result_path=./result_Files --label_path=$label_path &> acc.log &
+    python ../postprocess.py --config_path=$CONFIG_FILE --result_path=./result_Files --label_path=$label_path &> acc.log &
 }
 
 compile_app

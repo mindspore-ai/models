@@ -74,7 +74,7 @@ function preprocess_data()
         rm -rf ./preprocess_result
     fi
     mkdir preprocess_result
-    python3.7 preprocess.py --eval_data_file_path=$eval_data_file_path  --result_path=./preprocess_result/ --dataset=$dataset
+    python preprocess.py --eval_data_file_path=$eval_data_file_path  --result_path=./preprocess_result/ --dataset=$dataset
 }
 
 function compile_app()
@@ -101,7 +101,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 postprocess.py --result_dir=./result_files --label_dir=./preprocess_result/06_data --dataset=$dataset --data_url=$data_url &> acc.log
+    python postprocess.py --result_dir=./result_files --label_dir=./preprocess_result/06_data --dataset=$dataset --data_url=$data_url &> acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

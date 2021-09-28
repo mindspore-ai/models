@@ -77,7 +77,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --data_dir=$dataset_path --result_path=./preprocess_Result/
+    python ../preprocess.py --data_dir=$dataset_path --result_path=./preprocess_Result/
 }
 
 function compile_app()
@@ -104,7 +104,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --result_path=./result_Files --dataset_name=$dataset_name --label_path=./preprocess_Result/label_onehot.npy --mask_path=./preprocess_Result/test_mask.npy &> acc.log
+    python ../postprocess.py --result_path=./result_Files --dataset_name=$dataset_name --label_path=./preprocess_Result/label_onehot.npy --mask_path=./preprocess_Result/test_mask.npy &> acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

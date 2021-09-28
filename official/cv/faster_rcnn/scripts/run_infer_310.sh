@@ -77,7 +77,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --anno_path=$anno_path --result_path=./result_Files &> acc.log &
+    python ../postprocess.py --anno_path=$anno_path --result_path=./result_Files &> acc.log &
 }
 
 compile_app

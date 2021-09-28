@@ -89,7 +89,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --result_path=./result_Files --img_path=$data_path --annFile=$anno_path --image_shape=$image_shape_path --image_id=$image_id_path &> acc.log
+    python ../postprocess.py --result_path=./result_Files --img_path=$data_path --annFile=$anno_path --image_shape=$image_shape_path --image_id=$image_id_path &> acc.log
 }
 
 air_to_om

@@ -71,7 +71,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --data_path=$dataset_path --det_path=$det_path --result_path=./preprocess_Result/  &>preprocess.log
+    python ../preprocess.py --data_path=$dataset_path --det_path=$det_path --result_path=./preprocess_Result/  &>preprocess.log
 }
 
 function compile_app()
@@ -98,7 +98,7 @@ function infer()
 
 function generater_detection()
 {
-    python3.7 ../postprocess.py --det_dir=$det_path --result_dir=./result_Files --output_dir=../detections/ &> detection.log
+    python ../postprocess.py --det_dir=$det_path --result_dir=./result_Files --output_dir=../detections/ &> detection.log
 }
 
 if [ $need_preprocess == "y" ]; then

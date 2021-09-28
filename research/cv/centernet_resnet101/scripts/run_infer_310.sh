@@ -68,7 +68,7 @@ function preprocess_data()
         rm -rf ./preprocess
     fi
     mkdir preprocess
-    python3.7 ../preprocess.py  --val_data_dir=$dataset_path --predict_dir=./preprocess/ >& preprocess.log
+    python ../preprocess.py  --val_data_dir=$dataset_path --predict_dir=./preprocess/ >& preprocess.log
 }
 
 function compile_app()
@@ -118,7 +118,7 @@ function cal_ap()
         rm -rf ./acc
     fi
     mkdir acc
-    python3.7 ../postprocess.py  --result_path=./result_Files --label_path=$dataset_path/annotations/instances_val2017.json --meta_path=./preprocess/meta --save_path=./acc &> acc.log
+    python ../postprocess.py  --result_path=./result_Files --label_path=$dataset_path/annotations/instances_val2017.json --meta_path=./preprocess/meta --save_path=./acc &> acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

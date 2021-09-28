@@ -86,7 +86,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --use_crf=$net_type --do_eval=true --label_file_path=$label_file_path --eval_data_file_path=$eval_data_file_path --dataset_format=$dataset_format --schema_file_path=$schema_file_path --result_path=./preprocess_Result/
+    python ../preprocess.py --use_crf=$net_type --do_eval=true --label_file_path=$label_file_path --eval_data_file_path=$eval_data_file_path --dataset_format=$dataset_format --schema_file_path=$schema_file_path --result_path=./preprocess_Result/
 }
 
 function compile_app()
@@ -113,7 +113,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --result_path=./result_Files --label_dir=./preprocess_Result/03_data --use_crf=$net_type &> acc.log
+    python ../postprocess.py --result_path=./result_Files --label_dir=./preprocess_Result/03_data --use_crf=$net_type &> acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

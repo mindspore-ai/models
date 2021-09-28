@@ -78,7 +78,7 @@ function preprocess()
     cd ../ || exit
     echo "\nstart preprocess"
     echo "waitting for preprocess finish..."
-    python3.7 preprocess.py --out_dir=$out_image_path --image_path=$data_path --image_height=$image_height --image_width=$image_width > preprocess.log 2>&1
+    python preprocess.py --out_dir=$out_image_path --image_path=$data_path --image_height=$image_height --image_width=$image_width > preprocess.log 2>&1
     echo "preprocess finished! you can see the log in preprocess.log!"
 }
 
@@ -103,7 +103,7 @@ function cal_mIoU()
 {
     echo "\nstart calculate mIoU..."
     echo "waitting for calculate finish..."
-    python3.7 ../cal_mIoU.py --label_path=$out_image_path/labels/ --output_path=./result_Files --image_height=$image_height --image_width=$image_width --save_mask=0 >acc.log 2>&1
+    python ../cal_mIoU.py --label_path=$out_image_path/labels/ --output_path=./result_Files --image_height=$image_height --image_width=$image_width --save_mask=0 >acc.log 2>&1
     echo "infer finished! you can see the log in acc.log\n"
 }
 

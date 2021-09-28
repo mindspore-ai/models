@@ -76,7 +76,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py  --val_data_dir=$dataset_path --predict_dir=./preprocess_Result/ >& preprocess.log
+    python ../preprocess.py  --val_data_dir=$dataset_path --predict_dir=./preprocess_Result/ >& preprocess.log
 }
 
 function compile_app()
@@ -103,7 +103,7 @@ function infer()
 
 function generate_img()
 {
-    python3.7 ../postprocess.py  --predict_dir=./preprocess_Result/ --val_data_dir=./preprocess_Result/target_images_ids.npy --device_target=$device_target &> acc.log
+    python ../postprocess.py  --predict_dir=./preprocess_Result/ --val_data_dir=./preprocess_Result/target_images_ids.npy --device_target=$device_target &> acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

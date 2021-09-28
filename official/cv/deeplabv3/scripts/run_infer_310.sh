@@ -80,7 +80,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --data_root=$data_root --data_lst=$data_list_path --scales=1.0 --result_path=./result_Files &> acc.log &
+    python ../postprocess.py --data_root=$data_root --data_lst=$data_list_path --scales=1.0 --result_path=./result_Files &> acc.log &
 }
 
 compile_app

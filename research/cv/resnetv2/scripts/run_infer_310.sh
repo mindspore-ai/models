@@ -74,7 +74,7 @@ function preprocess_data()
     fi
     mkdir preprocess_Result
 
-    python3.7 ../preprocess.py --dataset=$dataset --dataset_path=$data_path --output_path=./preprocess_Result
+    python ../preprocess.py --dataset=$dataset --dataset_path=$data_path --output_path=./preprocess_Result
 }
 
 function infer()
@@ -96,8 +96,8 @@ function cal_acc()
     if [ "${dataset}" == "cifar10" ] || [ "${dataset}" == "cifar100" ]; then
         python ../postprocess.py --dataset=$dataset --label_path=./preprocess_Result/label.npy --result_path=result_Files &> acc.log
     else
-        python3.7 ../create_imagenet2012_label.py  --img_path=$data_path
-        python3.7 ../postprocess.py --dataset=$dataset --result_path=./result_Files --label_path=./imagenet_label.json  &> acc.log
+        python ../create_imagenet2012_label.py  --img_path=$data_path
+        python ../postprocess.py --dataset=$dataset --result_path=./result_Files --label_path=./imagenet_label.json  &> acc.log
     fi
 }
 

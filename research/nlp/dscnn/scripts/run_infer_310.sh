@@ -66,7 +66,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --pre_result_path=./preprocess_Result
+    python ../preprocess.py --pre_result_path=./preprocess_Result
 }
 
 function compile_app()
@@ -93,7 +93,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --label_path=./preprocess_Result/gt_classes.npy --post_result_path=./result_Files &> acc.log
+    python ../postprocess.py --label_path=./preprocess_Result/gt_classes.npy --post_result_path=./result_Files &> acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

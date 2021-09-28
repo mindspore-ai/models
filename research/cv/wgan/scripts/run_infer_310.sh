@@ -75,7 +75,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --config=$config_path --nimages=$nimages --pre_result_path=./preprocess_Result/
+    python ../preprocess.py --config=$config_path --nimages=$nimages --pre_result_path=./preprocess_Result/
 }
 
 function compile_app()
@@ -106,7 +106,7 @@ function cal_acc()
         rm -rf ./infer_output
     fi
     mkdir infer_output
-    python3.7 ../postprocess.py --config=$config_path --output_dir=./infer_output --nimages=$nimages --post_result_path=./result_Files --device_id=$device_id &> acc.log
+    python ../postprocess.py --config=$config_path --output_dir=./infer_output --nimages=$nimages --post_result_path=./result_Files --device_id=$device_id &> acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

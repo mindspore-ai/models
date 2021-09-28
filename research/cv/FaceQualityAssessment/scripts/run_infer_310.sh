@@ -61,7 +61,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --data_path=$data_path --result_path=./preprocess_Result/
+    python ../preprocess.py --data_path=$data_path --result_path=./preprocess_Result/
 }
 
 function compile_app()
@@ -88,7 +88,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --result_path=./result_Files --data_path=./preprocess_Result/image --label_path=./preprocess_Result/label  &> acc.log
+    python ../postprocess.py --result_path=./result_Files --data_path=./preprocess_Result/image --label_path=./preprocess_Result/label  &> acc.log
 }
 
 preprocess_data

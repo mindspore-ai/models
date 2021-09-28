@@ -87,7 +87,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --data_path=$data_path --output_path=./preprocess_Result --config_path=$config_path &> preprocess.log
+    python ../preprocess.py --data_path=$data_path --output_path=./preprocess_Result --config_path=$config_path &> preprocess.log
 }
 
 function infer()
@@ -109,8 +109,8 @@ function cal_acc()
     if [ "x${dataset}" == "xcifar10" ] || [ "x${dataset}" == "xCifar10" ]; then
         python ../postprocess.py --dataset=$dataset --label_path=./preprocess_Result/label --result_path=result_Files --config_path=$config_path &> acc.log
     else
-        python3.7 ../create_imagenet2012_label.py  --img_path=$data_path
-        python3.7 ../postprocess.py --dataset=$dataset --result_path=./result_Files --label_path=./imagenet_label.json --config_path=$config_path &> acc.log
+        python ../create_imagenet2012_label.py  --img_path=$data_path
+        python ../postprocess.py --dataset=$dataset --result_path=./result_Files --label_path=./imagenet_label.json --config_path=$config_path &> acc.log
     fi
     if [ $? -ne 0 ]; then
         echo "calculate accuracy failed"
