@@ -33,6 +33,7 @@ from src.model_utils.device_adapter import get_device_id
 
 set_seed(1)
 
+
 def modelarts_pre_process():
     '''modelarts pre process function.'''
     cfg.ckpt_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), cfg.ckpt_path)
@@ -45,7 +46,7 @@ def run_eval():
     context.set_context(
         mode=context.GRAPH_MODE,
         save_graphs=False,
-        device_target="Ascend")
+        device_target=cfg.device_target)
 
     device_id = get_device_id()
     context.set_context(device_id=device_id)
@@ -64,6 +65,7 @@ def run_eval():
     model = Model(network, loss, metrics={'acc': Accuracy()}, eval_network=eval_net, eval_indexes=[0, 1, 2])
     acc = model.eval(ds_eval, dataset_sink_mode=False)
     print("============== Accuracy:{} ==============".format(acc))
+
 
 if __name__ == '__main__':
     run_eval()

@@ -16,6 +16,7 @@
 import numpy as np
 
 import mindspore.nn as nn
+from mindspore import context
 from mindspore.ops import operations as P
 from mindspore.ops import functional as F
 from mindspore.common.parameter import Parameter
@@ -43,18 +44,23 @@ class textrcnn(nn.Cell):
         self.h1 = Tensor(np.zeros(shape=(self.batch_size, self.num_hiddens)).astype(np.float16))
         self.c1 = Tensor(np.zeros(shape=(self.batch_size, self.num_hiddens)).astype(np.float16))
 
+        self.gpu_flag = context.get_context("device_target") == "GPU"
         if cell == "lstm":
-            self.lstm = P.DynamicRNN(forget_bias=0.0)
-            self.w1_fw = Parameter(
-                np.random.uniform(-k, k, (self.embed_size + self.num_hiddens, 4 * self.num_hiddens)).astype(
-                    np.float16), name="w1_fw")
-            self.b1_fw = Parameter(np.random.uniform(-k, k, (4 * self.num_hiddens)).astype(np.float16),
-                                   name="b1_fw")
-            self.w1_bw = Parameter(
-                np.random.uniform(-k, k, (self.embed_size + self.num_hiddens, 4 * self.num_hiddens)).astype(
-                    np.float16), name="w1_bw")
-            self.b1_bw = Parameter(np.random.uniform(-k, k, (4 * self.num_hiddens)).astype(np.float16),
-                                   name="b1_bw")
+            if self.gpu_flag:
+                self.lstm = nn.LSTM(self.embed_size, self.num_hiddens)
+                self.lstm.to_float(mstype.float16)
+            else:
+                self.lstm = P.DynamicRNN(forget_bias=0.0)
+                self.w1_fw = Parameter(
+                    np.random.uniform(-k, k, (self.embed_size + self.num_hiddens, 4 * self.num_hiddens)).astype(
+                        np.float16), name="w1_fw")
+                self.b1_fw = Parameter(np.random.uniform(-k, k, (4 * self.num_hiddens)).astype(np.float16),
+                                       name="b1_fw")
+                self.w1_bw = Parameter(
+                    np.random.uniform(-k, k, (self.embed_size + self.num_hiddens, 4 * self.num_hiddens)).astype(
+                        np.float16), name="w1_bw")
+                self.b1_bw = Parameter(np.random.uniform(-k, k, (4 * self.num_hiddens)).astype(np.float16),
+                                       name="b1_bw")
             self.h1 = Tensor(np.zeros(shape=(1, self.batch_size, self.num_hiddens)).astype(np.float16))
             self.c1 = Tensor(np.zeros(shape=(1, self.batch_size, self.num_hiddens)).astype(np.float16))
 
@@ -188,12 +194,16 @@ class textrcnn(nn.Cell):
             h1_fw_init = self.h1  # bs, num_hidden
             c1_fw_init = self.c1  # bs, num_hidden
 
-            _, output_fw, _, _, _, _, _, _ = self.lstm(x, self.w1_fw, self.b1_fw, None, h1_fw_init, c1_fw_init)
-            output_fw = self.cast(output_fw, mstype.float16)  # sl, bs, num_hidden
-
             h1_bw_init = self.h1  # bs, num_hidden
             c1_bw_init = self.c1  # bs, num_hidden
-            _, output_bw, _, _, _, _, _, _ = self.lstm(x, self.w1_bw, self.b1_bw, None, h1_bw_init, c1_bw_init)
+
+            if self.gpu_flag:
+                output_fw, _ = self.lstm(x, (h1_fw_init, c1_fw_init))
+                output_bw, _ = self.lstm(x, (h1_bw_init, c1_bw_init))
+            else:
+                _, output_fw, _, _, _, _, _, _ = self.lstm(x, self.w1_fw, self.b1_fw, None, h1_fw_init, c1_fw_init)
+                _, output_bw, _, _, _, _, _, _ = self.lstm(x, self.w1_bw, self.b1_bw, None, h1_bw_init, c1_bw_init)
+            output_fw = self.cast(output_fw, mstype.float16)  # sl, bs, num_hidden
             output_bw = self.cast(output_bw, mstype.float16)  # sl, bs, hidden
 
         c_left = self.concat0((self.left_pad_tensor, output_fw[:F.shape(x)[0] - 1]))  # sl, bs, num_hidden

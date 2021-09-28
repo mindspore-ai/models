@@ -79,6 +79,24 @@ DEVICE_ID=7 python eval.py --ckpt_path {checkpoint path}
 bash scripts/run_eval.sh
 ```
 
+- Running on GPU
+
+  If you are running the scripts for the first time and , you must set the parameter 'preprocess' to 'true' in the `default_config.yaml` and run training to get the folder 'preprocess' containing data。
+
+```python
+# run training
+export CUDA_VISIBLE_DEVICES=[DEVICE_ID]
+python train.py --device_target GPU
+# or you can use the shell script to train in background
+bash scripts/run_train_gpu.sh [DEVICE_ID]
+
+# run evaluating
+export CUDA_VISIBLE_DEVICES=[DEVICE_ID]
+python eval.py --ckpt_path {checkpoint path} --device_target GPU
+# or you can use the shell script to evaluate in background
+bash scripts/run_eval_gpu.sh [CKPT_FILE] [DEVICE_ID]
+```
+
 - Running on ModelArts
 
   If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows
@@ -143,8 +161,10 @@ bash scripts/run_eval.sh
         ├── ascend310_infer             // application for 310 inference
         ├── scripts
         │   ├──run_train.sh             // shell script for train on Ascend
+        │   ├──run_train_gpu.sh         // shell script for train on GPU
         │   ├──run_infer_310.sh         // shell script for 310 infer
         │   └──run_eval.sh              // shell script for evaluation on Ascend
+        │   └──run_eval_gpu.sh          // shell script for evaluation on GPU
         ├── src
         │   ├──model_utils
         │   │  ├──config.py             // parsing parameter configuration file of "*.yaml"
@@ -254,14 +274,14 @@ Inference result is saved in current path, you can find result like this in acc.
 
 ### Performance
 
-| Model                 | MindSpore + Ascend                        | TensorFlow+GPU                       |
-| -------------------------- | ----------------------------- | ------------------------- |
-| Resource                   | Ascend 910; OS Euler2.8                    | NV SMX2 V100-32G          |
-| Version          | 1.0.1                         | 1.4.0                     |
-| Dataset                    | Sentence polarity dataset v1.0                    | Sentence polarity dataset v1.0            |
-| batch_size                 | 64                        | 64                   |
-| Accuracy                   | 0.78                      | 0.78 |
-| Speed                      | 35ms/step                  |  77ms/step                         |
+| Model                      | MindSpore + Ascend              | MindSpore + GPU                |
+| -------------------------- | ------------------------------- | ------------------------------ |
+| Resource                   | Ascend 910; OS Euler2.8         | NV SMX2 V100-32G               |
+| Version                    | 1.0.1                           | 1.5.0                          |
+| Dataset                    | Sentence polarity dataset v1.0  | Sentence polarity dataset v1.0 |
+| batch_size                 | 64                              | 64                             |
+| Accuracy                   | 0.78                            | 0.78                           |
+| Speed                      | 1P:35ms/step                    | 1p:65ms/step                   |
 
 ## [ModelZoo Homepage](#contents)
 
