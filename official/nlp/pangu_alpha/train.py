@@ -30,7 +30,7 @@ from mindspore.nn.wrap.loss_scale import DynamicLossScaleUpdateCell
 import mindspore.common.dtype as mstype
 from mindspore.parallel import set_algo_parameters
 from mindspore.parallel._cost_model_context import _set_multi_subgraphs
-from mindspore.nn.wrap.cell_wrapper import PipelineCell, _VirtualDatasetCell
+from mindspore.nn.wrap.cell_wrapper import PipelineCell, _VirtualDatasetCell, MicroBatchInterleaved
 from mindspore.parallel.nn import TransformerOpParallelConfig, CrossEntropyLoss
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 
@@ -89,6 +89,21 @@ def add_checkpoint_callback_policy(args_param, callback, rank_id):
         callback.append(ckpoint_cb)
 
 
+def set_parallel_context(args_opt):
+    r"""Set parallel context"""
+    D.init()
+    device_num = D.get_group_size()
+    rank = D.get_rank()
+    print("rank_id is {}, device_num is {}".format(rank, device_num))
+    context.reset_auto_parallel_context()
+    context.set_auto_parallel_context(
+        parallel_mode=ParallelMode.SEMI_AUTO_PARALLEL, gradients_mean=False,
+        full_batch=bool(args_opt.full_batch), strategy_ckpt_load_file=args_opt.strategy_load_ckpt_path,
+        enable_parallel_optimizer=bool(args_opt.optimizer_shard), strategy_ckpt_save_file='strategy.ckpt')
+    set_algo_parameters(elementwise_op_strategy_follow=True)
+    _set_multi_subgraphs()
+
+
 def run_train(args_opt):
     r"""The main training process."""
     os.environ['HCCL_CONNECT_TIMEOUT'] = "6000"
@@ -96,21 +111,10 @@ def run_train(args_opt):
     context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
     context.set_context(variable_memory_max_size="31GB")
     # Set parallel context
+    rank = 0
+    device_num = 1
     if args_opt.distribute == "true":
-        D.init()
-        device_num = D.get_group_size()
-        rank = D.get_rank()
-        print("rank_id is {}, device_num is {}".format(rank, device_num))
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(
-            parallel_mode=ParallelMode.SEMI_AUTO_PARALLEL, gradients_mean=False,
-            full_batch=bool(args_opt.full_batch), strategy_ckpt_load_file=args_opt.strategy_load_ckpt_path,
-            enable_parallel_optimizer=bool(args_opt.optimizer_shard), strategy_ckpt_save_file='strategy.ckpt')
-        set_algo_parameters(elementwise_op_strategy_follow=True)
-        _set_multi_subgraphs()
-    else:
-        rank = 0
-        device_num = 1
+        set_parallel_context(args_opt)
     context.set_context(save_graphs=False, save_graphs_path="./graphs_of_device_id_" + str(rank))
     # copy data from the cloud to the /cache/Data
     cache_url = '/cache/Data/'
@@ -125,13 +129,14 @@ def run_train(args_opt):
     model_parallel_num = args_opt.op_level_model_parallel_num
     data_parallel_num = int(device_num / model_parallel_num)
     batch_size = args_opt.per_batch_size * data_parallel_num
+    micro_batch_interleaved = args_opt.micro_batch_interleaved
     parallel_config = TransformerOpParallelConfig(data_parallel=data_parallel_num, model_parallel=model_parallel_num,
                                                   pipeline_stage=args_opt.stage_num,
                                                   micro_batch_num=args_opt.micro_size,
                                                   optimizer_shard=bool(args_opt.optimizer_shard),
                                                   vocab_emb_dp=bool(args_opt.word_emb_dp), recompute=True,
                                                   gradient_aggregation_group=args_opt.gradient_aggregation_group)
-    config = PanguAlphaConfig(batch_size=batch_size, num_heads=args_opt.num_heads,
+    config = PanguAlphaConfig(batch_size=batch_size // micro_batch_interleaved, num_heads=args_opt.num_heads,
                               hidden_size=args_opt.embedding_size, seq_length=args_opt.seq_length,
                               vocab_size=args_opt.vocab_size, num_layers=args_opt.num_layers,
                               ffn_hidden_size=args_opt.embedding_size * 4, eod_token=bool(args_opt.eod_reset),
@@ -145,7 +150,8 @@ def run_train(args_opt):
     # Define network
     pangu_alpha = PanguAlphaModel(config=config)
     loss = CrossEntropyLoss(config.parallel_config.dp_mp_config)
-    pangu_alpha_with_loss_net = PanGUAlphaWithLoss(config, pangu_alpha, loss)
+    pangu_alpha_with_loss_net = MicroBatchInterleaved(PanGUAlphaWithLoss(config, pangu_alpha, loss),
+                                                      micro_batch_interleaved)
     pangu_alpha_with_loss = _VirtualDatasetCell(pangu_alpha_with_loss_net)
     print("=====args_opt is: ", args_opt, flush=True)
     # Warm-up and cosine decay learning rate
@@ -164,9 +170,9 @@ def run_train(args_opt):
     loss_scale_value = math.pow(2, 32)
     epoch_num = args_opt.epoch_size
     # Dataset loading mindrecord files
-    ds = create_dataset(config.batch_size, data_path=cache_url, data_start_index=0, eod_reset=config.eod_reset,
-                        full_batch=bool(args_opt.full_batch), eod_id=args_opt.eod_id, device_num=device_num,
-                        rank=rank, column_name=args_opt.data_column_name, epoch=epoch_num)
+    ds = create_dataset(config.batch_size * micro_batch_interleaved, data_path=cache_url, data_start_index=0,
+                        eod_reset=config.eod_reset, full_batch=bool(args_opt.full_batch), eod_id=args_opt.eod_id,
+                        device_num=device_num, rank=rank, column_name=args_opt.data_column_name, epoch=epoch_num)
     actual_epoch_num = int(epoch_num * ds.get_dataset_size() / args_opt.sink_size)
     callback = [TimeMonitor(args_opt.sink_size), LossCallBack(args_opt.sink_size, rank, 0, 0)]
     update_cell = DynamicLossScaleUpdateCell(loss_scale_value=loss_scale_value, scale_factor=2, scale_window=1000)
@@ -174,7 +180,7 @@ def run_train(args_opt):
         pangu_alpha_with_loss, optimizer=optimizer, scale_update_cell=update_cell, enable_global_norm=True,
         config=config)
     if args_opt.train_and_eval_mode:
-        ds_eval = create_dataset(config.batch_size, data_path=eval_cache_url,
+        ds_eval = create_dataset(config.batch_size * micro_batch_interleaved, data_path=eval_cache_url,
                                  data_start_index=0, eod_reset=config.eod_reset, full_batch=bool(args_opt.full_batch),
                                  eod_id=args_opt.eod_id, device_num=device_num, rank=rank,
                                  column_name=args_opt.data_column_name, epoch=epoch_num,
