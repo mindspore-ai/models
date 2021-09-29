@@ -20,11 +20,10 @@ import argparse
 from mindspore import context
 from mindspore import Tensor
 from mindspore.nn import SGD, RMSProp
-from mindspore.train.model import Model
-from mindspore.context import ParallelMode
+from mindspore.train.model import Model, ParallelMode
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.communication.management import init
+from mindspore.communication.management import get_group_size, get_rank, init
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.common import dtype as mstype
 from mindspore.common import set_seed
@@ -44,6 +43,10 @@ if __name__ == '__main__':
     parser.add_argument('--data_url', type=str, default=None, help='Dataset path')
     parser.add_argument('--train_url', type=str, default=None, help='Train output path')
 
+    # device target
+    parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU"], default="Ascend",
+                        help="device target")
+
     # Ascend parameter
     parser.add_argument('--dataset_path', type=str, default=None, help='Dataset path')
     parser.add_argument('--run_distribute', type=ast.literal_eval, default=False, help='Run distribute')
@@ -53,7 +56,7 @@ if __name__ == '__main__':
     parser.add_argument('--resume', type=str, default='', help='resume training with existed checkpoint')
     args_opt = parser.parse_args()
 
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
 
     # init distributed
     if args_opt.run_modelarts:
@@ -65,16 +68,17 @@ if __name__ == '__main__':
         local_train_url = '/cache/ckpt'
         if device_num > 1:
             init()
-            context.set_auto_parallel_context(device_num=device_num, parallel_mode='data_parallel', gradients_mean=True)
+            context.set_auto_parallel_context(device_num=device_num,
+                                              parallel_mode='data_parallel',
+                                              gradients_mean=True)
             local_data_url = os.path.join(local_data_url, str(device_id))
         mox.file.copy_parallel(args_opt.data_url, local_data_url)
     else:
         if args_opt.run_distribute:
-            device_id = int(os.getenv('DEVICE_ID'))
-            device_num = int(os.getenv('RANK_SIZE'))
-            context.set_context(device_id=device_id)
             init()
             context.reset_auto_parallel_context()
+            device_id = get_rank()
+            device_num = get_group_size()
             context.set_auto_parallel_context(device_num=device_num,
                                               parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
@@ -82,10 +86,10 @@ if __name__ == '__main__':
             context.set_context(device_id=args_opt.device_id)
             device_num = 1
             device_id = 0
-
     # define network
     net = Mnasnet()
-    net.to_float(mstype.float16)
+    if args_opt.device_target == "Ascend":
+        net.to_float(mstype.float16)
     print("model init")
 
     # define loss
@@ -131,8 +135,13 @@ if __name__ == '__main__':
                             momentum=config.momentum, epsilon=config.opt_eps, loss_scale=config.loss_scale)
     print("lr init")
     # define model
-    model = Model(net, loss_fn=loss, optimizer=optimizer, loss_scale_manager=loss_scale,
-                  metrics={'acc'}, amp_level='O3')
+    if args_opt.device_target == "Ascend":
+        model = Model(net, loss_fn=loss, optimizer=optimizer, loss_scale_manager=loss_scale,
+                      metrics={'acc'}, amp_level='O3')
+    elif args_opt.device_target == "GPU":
+        model = Model(net, loss_fn=loss, optimizer=optimizer, loss_scale_manager=loss_scale,
+                      metrics={'acc'})
+
     print('training start.')
     # define callbacks
     cb = [Monitor(lr_init=lr.asnumpy())]

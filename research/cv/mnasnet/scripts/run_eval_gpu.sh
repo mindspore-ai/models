@@ -13,28 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+if [ $# != 2 ]
+then
+    echo "Usage:
+      sh scripts/run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]
+      "
+exit 1
+fi
 
-PATH1=$1
-PATH2=$2
+# check dataset file
+if [ ! -d $1 ]
+then
+    echo "error: DATASET_PATH=$1 is not a directory."
+exit 1
+fi
 
-ulimit -u unlimited
-export DEVICE_NUM=8
-export RANK_SIZE=8
-export RANK_TABLE_FILE=$PATH1
 
-for ((i = 0; i < ${DEVICE_NUM}; i++)); do
-  let deviceID=$i
-  echo $deviceID
-  export DEVICE_ID=$deviceID
-  export RANK_ID=$i
-  rm -rf ./train_parallel$i
-  mkdir ./train_parallel$i
-  cp ../*.py ./train_parallel$i
-  cp *.sh ./train_parallel$i
-  cp -r ../src ./train_parallel$i
-  cd ./train_parallel$i || exit
-  echo "start training for rank $RANK_ID, device $DEVICE_ID"
-  env >env.log
-  python -u train.py --run_distribute=True --dataset_path=$PATH2 > log.txt 2>&1 &
-  cd ..
-done
+# check checkpoint file
+if [ ! -f $2 ]
+then
+    echo "error: CHECKPOINT_PATH=$2 is not a file"
+exit 1
+fi
+
+python ./eval.py --checkpoint_path=$2 --dataset_path=$1 --device_target="GPU" > ./eval.log 2>&1 &
