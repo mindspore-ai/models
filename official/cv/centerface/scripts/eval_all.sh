@@ -34,10 +34,19 @@ then
     rm -rf ./log_eval_all.txt
 fi
 
-#for i in $(seq start_epoch end_epoch+1)
-for i in $(seq 89 200)
+start_epoch=`ls $save_path | sort -n | head -n 1`
+end_epoch=`ls $save_path | sort -n | tail -n 1`
+
+for i in $(seq $start_epoch $end_epoch)
 do
     python ../dependency/evaluate/eval.py --pred=$save_path$i --gt=$ground_truth_path >> log_eval_all.txt 2>&1 &
     sleep 10
 done
 wait
+
+line_number=`awk 'BEGIN{hard=0;nr=0}{if($0~"Hard"){if($4>hard){hard=$4;nr=NR}}}END{print nr}' log_eval_all.txt`
+start_line_number=`expr $line_number - 3`
+end_line_number=`expr $line_number + 1`
+
+echo "The best result " >> log_eval_all.txt
+sed -n "$start_line_number, $end_line_number p" log_eval_all.txt >> log_eval_all.txt
