@@ -302,16 +302,20 @@ Parameters for learning rate:
 
 - 将原数据转换为MindRecord数据格式进行训练：
 
+    - 'bucket'参数通过yaml文件配置
+
     ``` bash
     paste train.tok.clean.bpe.32000.en train.tok.clean.bpe.32000.de > train.all
-    python create_data.py --input_file train.all --vocab_file vocab.bpe.32000 --output_file /path/ende-l128-mindrecord --max_seq_length 128 --bucket [16,32,48,64,128]
+    python create_data.py --input_file train.all --vocab_file vocab.bpe.32000 --output_file /path/ende-l128-mindrecord --max_seq_length 128
     ```
 
 - 将原数据转化为MindRecord数据格式进行评估：
 
+    - 'bucket' 参数通过yaml文件配置
+
     ``` bash
     paste newstest2014.tok.bpe.32000.en newstest2014.tok.bpe.32000.de > test.all
-    python create_data.py --input_file test.all --vocab_file vocab.bpe.32000 --output_file /path/newstest2014-l128-mindrecord --num_splits 1 --max_seq_length 128 --clip_to_max_len True --bucket [128]
+    python create_data.py --input_file test.all --vocab_file vocab.bpe.32000 --output_file /path/newstest2014-l128-mindrecord --num_splits 1 --max_seq_length 128 --clip_to_max_len True
     ```
 
 ### 训练过程
