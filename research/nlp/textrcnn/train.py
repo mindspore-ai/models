@@ -52,7 +52,7 @@ def run_train():
 
     device_id = get_device_id()
     context.set_context(device_id=device_id)
-    if cfg.device_target == "GPU":
+    if cfg.device_target == "GPU" and cfg.cell == "lstm":
         context.set_context(enable_graph_kernel=True)
 
     if cfg.preprocess == 'true':
