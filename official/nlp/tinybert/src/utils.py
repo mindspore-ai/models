@@ -87,33 +87,31 @@ class EvalCallBack(Callback):
         self.global_acc = 0.0
         self.dataset = dataset
 
-    def step_end(self, run_context):
+    def epoch_end(self, run_context):
         """step end and do evaluation"""
-        cb_params = run_context.original_args()
-        if cb_params.cur_step_num % 100 == 0:
-            callback = Accuracy()
-            columns_list = ["input_ids", "input_mask", "segment_ids", "label_ids"]
-            for data in self.dataset.create_dict_iterator(num_epochs=1):
-                input_data = []
-                for i in columns_list:
-                    input_data.append(data[i])
-                input_ids, input_mask, token_type_id, label_ids = input_data
-                self.network.set_train(False)
-                logits = self.network(input_ids, token_type_id, input_mask)
-                callback.update(logits, label_ids)
-            acc = callback.acc_num / callback.total_num
-            with open("./eval.log", "a+") as f:
-                f.write("acc_num {}, total_num{}, accuracy{:.6f}".format(callback.acc_num, callback.total_num,
-                                                                         callback.acc_num / callback.total_num))
-                f.write('\n')
+        callback = Accuracy()
+        columns_list = ["input_ids", "input_mask", "segment_ids", "label_ids"]
+        for data in self.dataset.create_dict_iterator(num_epochs=1):
+            input_data = []
+            for i in columns_list:
+                input_data.append(data[i])
+            input_ids, input_mask, token_type_id, label_ids = input_data
+            self.network.set_train(False)
+            logits = self.network(input_ids, token_type_id, input_mask)
+            callback.update(logits, label_ids)
+        acc = callback.acc_num / callback.total_num
+        with open("./eval.log", "a+") as f:
+            f.write("acc_num {}, total_num{}, accuracy{:.6f}".format(callback.acc_num, callback.total_num,
+                                                                     callback.acc_num / callback.total_num))
+            f.write('\n')
 
-            if acc > self.global_acc:
-                self.global_acc = acc
-                print("The best acc is {}".format(acc))
-                eval_model_ckpt_file = "eval_model.ckpt"
-                if os.path.exists(eval_model_ckpt_file):
-                    os.remove(eval_model_ckpt_file)
-                save_checkpoint(self.network, eval_model_ckpt_file)
+        if acc > self.global_acc:
+            self.global_acc = acc
+            print("The best acc is {}".format(acc))
+            eval_model_ckpt_file = "eval_model.ckpt"
+            if os.path.exists(eval_model_ckpt_file):
+                os.remove(eval_model_ckpt_file)
+            save_checkpoint(self.network, eval_model_ckpt_file)
 
 class BertLearningRate(LearningRateSchedule):
     """

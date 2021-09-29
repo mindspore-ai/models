@@ -39,7 +39,7 @@ python ${PROJECT_DIR}/../run_task_distill.py \
     --td_phase2_epoch_size=3 \
     --do_shuffle="true" \
     --enable_data_sink="true" \
-    --data_sink_steps=100 \
+    --data_sink_steps=-1 \
     --save_ckpt_step=100 \
     --max_ckpt_num=1 \
     --load_teacher_ckpt_path="" \
