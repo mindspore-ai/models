@@ -18,6 +18,7 @@ network config setting, will be used in train.py
 from easydict import EasyDict as edict
 
 awa_cfg = edict({
+    'lr_att_gpu': 1e-6,
     'lr_att': 1e-5,
     'wd_att': 1e-2,
     'clip_att': 0.2,
