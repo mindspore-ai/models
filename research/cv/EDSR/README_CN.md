@@ -235,6 +235,8 @@ sh run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]
 
   如果数据集保存路径为G:\DIV2K，`TRAIN_DATA_DIR`应传入G:\。
 
+  分布式训练需要提前创建JSON格式的HCCL配置文件。具体操作，参见：<https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools>
+
 ## 评估过程
 
 ### 评估
@@ -249,6 +251,30 @@ sh run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]
 
 如果数据集保存路径为G:\DIV2K或者G:\Set5或者G:\Set14或者G:\B100或者G:\Urban100，`TRAIN_DATA_DIR`应传入G:\。
 您可以通过log.txt文件查看结果。
+
+### Ascend310评估
+
+- 评估过程如下。
+
+```bash
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATASET_TYPE] [SCALE] [DEVICE_ID]
+```
+
+`DATASET_TYPE`可选 ["Set5", "Set14", "B100", "Urban100"]
+`SCALE`超分辨率比例可选 ["2", "3", "4"]
+`DEVICE_ID`设备ID， 默认为：0
+
+您可以通过通过`run_infer.log`文件查看结果。
+
+## 模型导出
+
+```bash
+用法：python export.py  [--batch_size] [--ckpt_path] [--file_format]
+选项：
+  --batch_size      输入张量的批次大小。
+  --ckpt_path       检查点路径。
+  --file_format     可选 ['MINDIR', 'AIR', 'ONNX'], 默认['MINDIR']。
+```
 
 # 模型描述
 
@@ -283,6 +309,18 @@ sh run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]
 | batch_size    | 1                                                           |
 | 输出          | 超分辨率图片                                                |
 | PSNR          | Set5:38.2136, Set14:34.0081, B100:32.3590, Urban100:33.0162 |
+
+### 310评估性能
+
+| 参数          | Ascend                                                      |
+| ------------- | ----------------------------------------------------------- |
+| 资源          | Ascend 310                                                  |
+| 上传日期      | 2021-09-29                                                  |
+| MindSpore版本 | 1.4.0                                                       |
+| 数据集        | Set5,Set14,B100,Urban100                                    |
+| batch_size    | 1                                                           |
+| 输出          | 超分辨率图片                                                |
+| 准确率        | Set5:36.6097, Set14:32.8340, B100:30.6077, Urban100:32.3699 |
 
 # 随机情况说明
 

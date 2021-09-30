@@ -24,6 +24,16 @@ import src.model as edsr
 from src.data.srdata import SRData
 from src.data.div2k import DIV2K
 from src.metrics import calc_psnr, quantize, calc_ssim
+
+def unpadding(img, target_shape):
+    h, w = target_shape[2], target_shape[3]
+    _, _, img_h, img_w = img.shape
+    if img_h > h:
+        img = img[:, :, :h, :]
+    if img_w > w:
+        img = img[:, :, :, :w]
+    return img
+
 device_id = int(os.getenv('DEVICE_ID', '0'))
 context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=device_id, save_graphs=False)
 context.set_context(max_call_depth=10000)
@@ -60,6 +70,7 @@ def eval_net():
         pred = net_m(lr)
         pred_np = pred.asnumpy()
         pred_np = quantize(pred_np, 255)
+        pred_np = unpadding(pred_np, hr.shape)
         psnr = calc_psnr(pred_np, hr, args.scale[0], 255.0)
         pred_np = pred_np.reshape(pred_np.shape[-3:]).transpose(1, 2, 0)
         hr = hr.reshape(hr.shape[-3:]).transpose(1, 2, 0)
