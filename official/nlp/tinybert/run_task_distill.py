@@ -108,6 +108,8 @@ def run_predistill():
     dataset_size = dataset.get_dataset_size()
     print('td1 dataset size: ', dataset_size)
     print('td1 dataset repeatcount: ', dataset.get_repeat_count())
+    if args_opt.data_sink_steps == -1:
+        args_opt.data_sink_steps = dataset_size
     if args_opt.enable_data_sink == 'true':
         repeat_count = args_opt.td_phase1_epoch_size * dataset_size // args_opt.data_sink_steps
         time_monitor_steps = args_opt.data_sink_steps
@@ -173,6 +175,8 @@ def run_task_distill(ckpt_file):
     dataset_size = train_dataset.get_dataset_size()
     print('td2 train dataset size: ', dataset_size)
     print('td2 train dataset repeatcount: ', train_dataset.get_repeat_count())
+    if args_opt.data_sink_steps == -1:
+        args_opt.data_sink_steps = dataset_size
     if args_opt.enable_data_sink == 'true':
         repeat_count = args_opt.td_phase2_epoch_size * train_dataset.get_dataset_size() // args_opt.data_sink_steps
         time_monitor_steps = args_opt.data_sink_steps
