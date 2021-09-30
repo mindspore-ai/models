@@ -23,11 +23,10 @@ if __name__ == '__main__':
     args = get_args("test")
     context.set_context(mode=context.GRAPH_MODE, device_id=args.device_id)
     model = STGANModel(args)
-    model.netG.set_train(True)
-    input_shp = [16, 3, 128, 128]
-    input_shp_2 = [16, 4]
+    input_shp = [1, 3, 128, 128]
+    input_shp_2 = [1, 4]
     input_array = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp).astype(np.float32))
     input_array_2 = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp_2).astype(np.float32))
-    G_file = f"{args.file_name}_model"
+
+    G_file = args.file_name + "_model"
     export(model.netG, input_array, input_array_2, file_name=G_file, file_format=args.file_format)
-    

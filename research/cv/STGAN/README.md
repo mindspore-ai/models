@@ -167,7 +167,43 @@ Before running the command below, please check the checkpoint path used for eval
 python export.py --ckpt_path [CHECKPOINT_PATH] --platform [PLATFORM] --file_format[EXPORT_FORMAT]
 ```
 
-`EXPORT_FORMAT` should be "MINDIR"
+If you want to infer the network on Ascend 310, `EXPORT_FORMAT` should be "MINDIR"
+
+## Inference Process
+
+### Infer on Ascend310
+
+Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model. The batch_size can only be set to 1.
+
+```bash
+# Ascend310 inference
+bash run_infer_310.sh [GEN_MINDIR_PATH] [DATA_PATH][NEED_PREPROCESS] [DEVICE_ID]
+```
+
+- `GEN_MINDIR_PATH` specifies path of used "MINDIR" model.
+- `DATA_PATH` specifies path of dataset, dataset structure must be
+
+    ```bash
+    ├── dataroot
+        ├── anno
+            ├── list_attr_celeba.txt
+        ├── image
+            ├── 000001.jpg
+            ├── ...
+    ```
+
+    above `list_attr_celeba.txt` records attributes of all images, you can refer to the list_attr_celeba.txt from dataset CelebA.
+- `NEED_PREPROCESS`  means weather need preprocess or not, it's value is 'y' or 'n'. This step will process the image and label into .bin file and put them in the `process_Data` folder.
+- `DEVICE_ID` is optional, it can be set by environment variable device_id, otherwise the value is zero.
+
+### Result
+
+Inference result is saved in `result_Files/` in current path, Inference time result is saved in `time_Result/`. The edited picture is saved as xxx.jpg format, such as `183800.jpg`.
+
+```bash
+# time result
+NN inference cost average time: 9.98606 ms of infer_count 10
+```
 
 ## Model Description
 
