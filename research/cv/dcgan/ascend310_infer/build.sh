@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,34 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""
-network config setting, will be used in train.py
-"""
-
-from easydict import EasyDict as edict
-
-dcgan_imagenet_cfg = edict({
-    'num_classes': 1000,
-    'epoch_size': 20,
-    'batch_size': 128,
-    'latent_size': 100,
-    'feature_size': 64,
-    'channel_size': 3,
-    'image_height': 32,
-    'image_width': 32,
-    'learning_rate': 0.0002,
-    'beta1': 0.5
-})
-
-dcgan_cifar10_cfg = edict({
-    'num_classes': 10,
-    'ds_length': 60000,
-    'batch_size': 100,
-    'latent_size': 100,
-    'feature_size': 64,
-    'channel_size': 3,
-    'image_height': 32,
-    'image_width': 32,
-    'learning_rate': 0.0002,
-    'beta1': 0.5
-})
+if [ ! -d out ]; then
+  mkdir out
+fi
+cd out || exit
+cmake .. \
+    -DMINDSPORE_PATH="`pip show mindspore-ascend | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
+make

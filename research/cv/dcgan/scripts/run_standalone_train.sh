@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]
+if [ $# != 3 ]
 then
-    echo "Usage: bash run_standalone_train.sh [DATASET_PATH] [SAVE_PATH]"
+    echo "Usage: bash run_standalone_train.sh [DEVICE_ID] [DATA_URL] [TRAIN_URL]"
 exit 1
 fi
 
@@ -27,26 +27,29 @@ get_real_path(){
     echo "$(realpath -m $PWD/$1)"
   fi
 }
-PATH1=$(get_real_path $1)
+
+ID=$1
+echo $ID
+PATH1=$(get_real_path $2)
 echo $PATH1
-PATH2=$(get_real_path $2)
+PATH2=$(get_real_path $3)
 echo $PATH2
 
 if [ ! -d $PATH1 ]
 then
-    echo "error: DATASET_PATH=$PATH1 is not a directory"
+    echo "error: DATA_URL=$PATH1 is not a directory"
 exit 1
 fi
 
 if [ ! -d $PATH2 ]
 then
-    echo "error: SAVE_PATH=$PATH2 is not a directory"
+    echo "error: TRAIN_URL=$PATH2 is not a directory"
 exit 1
 fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=0
+export DEVICE_ID=$ID
 export RANK_ID=0
 export RANK_SIZE=1
 
@@ -59,7 +62,7 @@ cp ../*.py ./train
 cp *.sh ./train
 cp -r ../src ./train
 cd ./train || exit
-echo "start training for device $DEVICE_ID"
+echo "start training for device $ID"
 env > env.log
-python -u train.py --device_id=$DEVICE_ID --dataset_path=$PATH1 --save_path=$PATH2 &> log &
+nohup python -u train.py --device_id=$ID --data_url=$PATH1 --train_url=$PATH2 > train_log 2>&1 &
 cd ..
