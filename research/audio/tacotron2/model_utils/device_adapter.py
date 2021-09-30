@@ -1,4 +1,3 @@
-#!/bin/bash
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-root_path=$(pwd)
-ckpt=$1
-text=$2
-out_dir=$3
-fname=$4
-device_id=$5
-python3 ${root_path}/eval.py --ckpt_pth ${ckpt} --text "${text}" --out_dir ${root_path}/${out_dir} --fname ${fname} --device_id ${device_id}
+
+"""Device adapter for ModelArts"""
+
+from .config import config
+
+if config.enable_modelarts:
+    from .moxing_adapter import get_device_id, get_device_num, get_rank_id, get_job_id
+else:
+    from .local_adapter import get_device_id, get_device_num, get_rank_id, get_job_id
+
+__all__ = [
+    "get_device_id", "get_device_num", "get_rank_id", "get_job_id"
+]

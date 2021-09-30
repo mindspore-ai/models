@@ -22,7 +22,7 @@ from mindspore.common.initializer import initializer, Uniform
 from mindspore import log as logger
 from mindspore.ops.primitive import constexpr
 from src.rnn_cells import rnn_relu_cell, rnn_tanh_cell, gru_cell
-from src.rnn_cells import Lstm_Cell
+from src.rnn_cells import LSTMCell
 
 
 @constexpr
@@ -46,7 +46,7 @@ class DynamicRNN(nn.Cell):
         elif mode == "RNN_TANH":
             cell = rnn_tanh_cell
         elif mode == "LSTM":
-            cell = Lstm_Cell()
+            cell = LSTMCell()
         elif mode == "GRU":
             cell = gru_cell
         else:

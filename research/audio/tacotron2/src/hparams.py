@@ -67,26 +67,12 @@ class hparams:
     postnet_kernel_size = 5
     postnet_n_convolutions = 5
 
-    # Train
-    is_cuda = True
-    pin_mem = True
-    n_workers = 0
-    lr = 2e-3
-    betas = (0.9, 0.999)
-    eps = 1e-6
-    sch = True
+    lr = 0.002
     epoch_num = 2000
-    sch_step = 10000
-    max_iter = 5000
-    batch_size = 32
+    batch_size = 16
     test_batch_size = 1
-    iters_per_log = 10
-    iters_per_sample = 500
-    iters_per_ckpt = 1000
-    weight_decay = 1e-6
-    grad_clip_thresh = 1.0
     mask_padding = True
     p = 10  # mel spec loss penalty
-    eg_text = 'Make America great again!'
-    max_text_len = 188
+
+    max_text_len = 189
     n_symbols = len(symbols)

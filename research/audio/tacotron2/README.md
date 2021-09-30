@@ -1,24 +1,32 @@
 # Contents
 
-- [Tacotron2 Description](#CenterNet-description)
+- [Tacotron2 Description](#tacotron2-description)
+- [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
+- [Quick Start](#quick-start)
 - [Script Description](#script-description)
     - [Script and Sample Code](#script-and-sample-code)
     - [Script Parameters](#script-parameters)
-    - [Training  Process](#training-process)
-    - [Evaluation Process](#evaluation-process)
+    - [Training Process](#training-process)
+    - [Inference Process](#inference-process)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Training Performance](#training-performance)
         - [Inference Performance](#inference-performance)
+- [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 # [Tacotron2 Description](#contents)
 
 Tacotron2 is a TTS models. It contaion two phases, in first phase it use sequence to sequence method to predict mel spectrogram from text sequence,
 in second phase it apply WaveNet as vocoder to convert mel spectrogram to waveform. We support training and evaluation tacotron2 model on Ascend platform.
+
 [Paper](https://arxiv.org/abs/1712.05884): Jonathan, et al. Natural TTS Synthesis by Conditioning WaveNet on Mel Spectrogram Predictions.
+
+# [Model Architecture](#contents)
+
+Tacotron2 substantially is a sequence to sequence model which contain an encoder and a decoder, the encoder is implemented by three conv layers and one BiLSTM layer, and the decoder use  two LSTM layers to decode next state, a location-aware attention is applied between encoder and decoder, then the decoded state is fed into postnet which is implemented by five conv layers to predict mel spectrogram, finally the predicted mel spectrogram features is fed into WaveNet vocoder to synthesis speech signal.
 
 # [Dataset](#contents)
 
@@ -31,7 +39,7 @@ Dataset used: [The LJ Speech Dataset](<https://keithito.com/LJ-Speech-Dataset>)
 
 - The dataset structure is as follows:
 
-    ```path
+    ```text
     .
     └── LJSpeech-1.1
         ├─ wavs                  //audio clips files
@@ -45,107 +53,216 @@ Dataset used: [The LJ Speech Dataset](<https://keithito.com/LJ-Speech-Dataset>)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+
+# [Quick Start](#contents)
+
+After installing MindSpore via the official website, you can start training and evaluation as follows:
+
+- running on Ascend
+
+  ```python
+  # install python3 package
+  pip install -r requirements.txt
+  # generate hdf5 file from dataset
+  python generate_hdf5 --data_path /path/to/LJSpeech-1.1
+  ```
+
+  ```shell
+  cd scripts
+  # run standalone training
+  bash run_standalone_train.sh [DATASET_PATH] [DEVICE_ID] [DATANAME]
+  # example: bash run_standalone_train.sh ../. 0 ljspeech
+
+  # run distributed training
+  bash run_distributed_train.sh [DATASET_PATH] [RANK_TABLE_PATH] [DATANAME] [RANK_SIZE] [DEVICE_BEGIN]
+  # example: bash run_distributed_train.sh ../. ../hccl_8p_01234567_127.0.0.1.json ljspeech 8 0
+
+  # run evaluation
+  bash run_eval.sh [OUTPUT_PATH] [DATANAME] [MODEL_CKPT] [DEVICE_ID]
+  # example: bash run_eval.sh output ljspeech /path/to/model.ckpt 0
+  ```
+
+  For distributed training, a hccl configuration file with JSON format needs to be created in advance.
+
+  Please follow the instructions in the link below:
+
+  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+
+- ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows)
+
+    - Standalone training example on ModelArts
+
+      ```python
+      # run standalone training example
+
+      # (1) Add "config_path='/path_to_code/[DATASET_NAME]_config.yaml'" on the website UI interface.
+      # (2) Perform a or b.
+      #       a. Set "enable_modelarts=True" on [DATASET_NAME]_config.yaml file.
+      #          Set "dataset_path='/cache/data/[DATASET_NAME]'" on [DATASET_NAME]_config.yaml file.
+      #          Set "data_name='[DATASET_NAME]'" on [DATASET_NAME]_config.yaml file.
+      #          (option)Set other parameters on [DATASET_NAME]_config.yaml file you need.
+      #       b. Add "enable_modelarts=True" on the website UI interface.
+      #          Add "dataset_path='/cache/data/[DATASET_NAME]'" on the website UI interface.
+      #          Add "data_name='[DATASET_NAME]'" on the website UI interface.
+      #          (option)Add other parameters on the website UI interface.
+      # (3) Upload a zip dataset to S3 bucket. (you could also upload the origin dataset, but it can be so slow.)
+      # (4) Set the code directory to "/path/to/tacotron2" on the website UI interface.
+      # (5) Set the startup file to "train.py" on the website UI interface.
+      # (6) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
+      # (7) Create your job.
+      ```
+
+    - Distributed Training example on Modelarts
+
+      ```python
+      # run distributed training example
+
+      # (1) Add "config_path='/path_to_code/[DATASET_NAME]_config.yaml'" on the website UI interface.
+      # (2) Perform a or b.
+      #       a. Set "enable_modelarts=True" on [DATASET_NAME]_config.yaml file.
+      #          Set "run_distribute=True" on [DATASET_NAME]_config.yaml file.
+      #          Set "dataset_path='/cache/data/[DATASET_NAME]'" on [DATASET_NAME]_config.yaml file.
+      #          Set "data_name='[DATASET_NAME]'" on [DATASET_NAME]_config.yaml file.
+      #          (option)Set other parameters on [DATASET_NAME]_config.yaml file you need.
+      #       b. Add "enable_modelarts=True" on the website UI interface.
+      #          Add "run_distribute=True" on the website UI interface.
+      #          Add "dataset_path='/cache/data/[DATASET_NAME]'" on the website UI interface.
+      #          Add "data_name='[DATASET_NAME]'" on the website UI interface.
+      #          (option)Add other parameters on the website UI interface.
+      # (3) Upload a zip dataset to S3 bucket. (you could also upload the origin dataset, but it can be so slow.)
+      # (4) Set the code directory to "/path/to/tacotron2" on the website UI interface.
+      # (5) Set the startup file to "train.py" on the website UI interface.
+      # (6) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
+      # (7) Create your job.
+      ```
+
+    - Eval on ModelArts
+
+      ```python
+      # run eval example
+
+      # (1) Add "config_path='/path_to_code/[DATASET_NAME]_config.yaml'" on the website UI interface.
+      # (2) Perform a or b.
+      #       a. Set "enable_modelarts=True" on [DATASET_NAME]_config.yaml file.
+      #          Set "data_name='[DATASET_NAME]'" on [DATASET_NAME]_config.yaml file.
+      #          Set "model_ckpt='/cache/checkpoint_path/model.ckpt'" on [DATASET_NAME]_config.yaml file.
+      #          Set "text='text to synthesize'" on [DATASET_NAME]_config.yaml file.
+      #          Set "checkpoint_url='s3://dir_to_trained_ckpt/'" on [DATASET_NAME]_config.yaml file.
+      #          (option)Set other parameters on [DATASET_NAME]_config.yaml file you need.
+      #       b. Add "enable_modelarts=True" on the website UI interface.
+      #          Add "data_name='[DATASET_NAME]'" on the website UI interface.
+      #          Add "model_ckpt=/cache/checkpoint_path/model.ckpt" on the website UI interface.
+      #          Add "text='text to synthesize'" on the website UI interface.
+      #          Add "checkpoint_url='s3://dir_to_trained_ckpt/'" on the website UI interface.
+      #          (option)Add other parameters on the website UI interface.
+      # (3) Upload or copy your pretrained model to S3 bucket.
+      # (4) Upload a zip dataset to S3 bucket. (you could also upload the origin dataset, but it can be so slow.)
+      # (5) Set the code directory to "/path/to/tacotron2" on the website UI interface.
+      # (6) Set the startup file to "eval.py" on the website UI interface.
+      # (7) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
+      # (8) Create your job.
+      ```
 
 # [Script Description](#contents)
 
 ## [Script and Sample Code](#contents)
 
 ```path
-tacotron2
-├── eval.py                             //  testing and evaluation outputs
+
+tacotron2/
+├── eval.py                             //  evaluate entry
 ├── generate_hdf5.py                    // generate hdf5 file from dataset
-├── requirements.txt                    // reqired package
+├── ljspeech_config.yaml
+├── model_utils
+│  ├── config.py                       // Parse arguments
+│  ├── device_adapter.py               // Device adapter for ModelArts
+│  ├── __init__.py                     // init file
+│  ├── local_adapter.py                // Local adapter
+│  └── moxing_adapter.py               // Moxing adapter for ModelArts
 ├── README.md                           // descriptions about Tacotron2
+├── requirements.txt                // reqired package
 ├── scripts
-│   ├── run_distribute_train_npu.sh    // launch distributed training with ascend platform
-│   ├── run_standalone_eval_npu.sh     // launch standalone evaling with ascend platform
-│   └── run_standalone_train_npu.sh    // launch standalone training with ascend platform
+│  ├── run_distribute_train.sh         // launch distributed training
+│  ├── run_eval.sh                     // launch evaluate
+│  └── run_standalone_train.sh         // launch standalone training
 ├── src
-│   ├── callback.py                     // callbacks to monitor the training
-│   ├── dataset.py                      // generate dataset and sampler
-│   ├── hparams.py                      // Tacotron2 configs
-│   ├── rnn_cells.py                    // rnn cells implements
-│   ├── rnns.py                         // lstm cell with length mask implements
-│   ├── tacotron2.py                    // Tacotron2 networks
-│   ├── text
-│   │   ├── cleaners.py                 // clean text sequence
-│   │   ├── cmudict.py                  // symbols for encoding
-│   │   ├── __init__.py                 // preprocessing and postprocessing text sequunce
-│   │   ├── numbers.py                  // normalize numbers
-│   │   └── symbols.py                  // symbols for encoding
-│   └── utils
-│       ├── audio.py                    // extract audio feature
-│       └── convert.py                  // normalize mel spectrogram by meanvar for WaveNet  
-└── train.py                            // training scripts
+│  ├── callback.py                     // callbacks to monitor the training
+│  ├── dataset.py                      // define dataset and sampler
+│  ├── hparams.py                      // Tacotron2 configs
+│  ├── rnn_cells.py                    // rnn cells implementations
+│  ├── rnns.py                         // lstm implementations with length mask
+│  ├── tacotron2.py                    // Tacotron2 networks
+│  ├── text
+│  │  ├── cleaners.py                  // clean text sequence
+│  │  ├── cmudict.py                   // define cmudict
+│  │  ├── __init__.py                  // processing text sequunce
+│  │  ├── numbers.py                   // normalize numbers
+│  │  └── symbols.py                   // symbols for encoding
+│  └── utils
+│      ├── audio.py                     // extract audio feature
+│      └── convert.py                   // normalize mel spectrogram by meanvar
+└── train.py                            // training entry
 
 ```
 
 ## [Script Parameters](#contents)
 
-### Training
+Parameters for both training and evaluation can be set in [DATASET]_config.yaml
 
-```text
-usage: train.py  [--data_dir DATA_DIR]
-                 [--ckpt_dir CKPT_DIR]
-                 [--ckpt_pth CKPT_PTH]
-                 [--is_distributed IS_DISTRIBUTED]
-                 [--device_id DEVICE_ID]
-                 [--workers WORKERS]
-                 [--pretrained_model PRETRAINED_MODEL]
+- config for LJSpeech-1.1
 
-options:
-    --pretrained_model          pretrained checkpoint path, default is ''
-    --wokers                    num parallel workers, default is 8
-```
+  ```python
+  'pretrain_ckpt': '/path/to/model.ckpt'# use pretrained ckpt at training phase
+  'model_ckpt': '/path/to/model.ckpt'   # use pretrained ckpt at inference phase
+  'lr': 0.002                           # initial learning rate
+  'batch_size': 16                      # training batch size
+  'epoch_num': 2000                     # total training epochs
+  'warmup_epochs': 30                   # warmpup lr epochs
+  'save_ckpt_dir:' './ckpt'             # specify ckpt saving dir
+  'keep_checkpoint_max': 10             # only keep the last keep_checkpoint_max checkpoint
 
-### Evaluation
+  'text': 'text to synthesize'          # specify text to synthesize at inference
+  'dataset_path': '/dir/to/hdf5'        # specify dir to hdf5 file
+  'data_name': 'ljspeech'               # specify dataset name
+  'audioname': 'text2speech'            # specify filename for generated audio
+  'run_distribute': False               # whether distributed training
+  'device_id': 0                        # specify which device to use
+  ```
 
-```text
-usage: eval.py  [--ckpt_pth CKPT_PTH]
-                [--out_dir OUT_DIR]
-                [--fname FNAME]
-                [--device_id DEVICE_ID]
-                [--text TEXT]
+### [Training Process](#content)
 
-options:
-    --out_dir                    dirs to save outputs
-    --fname                      filename to save outputs
-```
+- Running on Ascend
 
-# [Training Process](#contents)
+    - Start task training on a single device and run the shell script
 
-Before training, the dataset should be processed. We use the scripts provided by [keithito](https://github.com/keithito/tacotron) to cleaning the text sequence and encoding symbols to number. In the meantime we extract mel spectrogram from the audio waveform, then pack the text sequence and corresponding mel spectrogram into a hdf5 file, you can run the following command line to install requirements and generate hdf5 file:
+        ```bash
+        cd scripts
+        bash run_standalone_train.sh [DATASET_PATH] [DEVICE_ID] [DATANAME]
+        ```
 
-```shell
-pip install -r requirements.txt
+    - Running scripts for distributed training of Tacotron2. Task training on multiple device and run the following command in bash to be executed in `scripts/`:
 
-python3 generate_hdf5 --data_path path/to/LJSpeech-1.1
-```
+        ```bash
+        cd scripts
+        bash run_distributed_train.sh [DATASET_PATH] [RANK_TABLE_PATH] [DATANAME] [RANK_SIZE] [DEVICE_BEGIN]
+        ```
 
-After preprocessing the dataset, you can get hdf5 file which contain text  sequence and mel spectrogram, then you run the following command line to train the network:
+    Note: `DATASET_PATH` is the directory contains hdf5 file.
 
-```shell
+### [Inference Process](#content)
 
-# standalone training ascend
+- Running on Ascend
 
-bash scripts/run_distribute_train_npu.sh [relative path to hdf5 file] [device id]
+    - Running scripts for evaluation of Tacotron2. The commdan as below.
 
-# distributed training ascend
+        ```bash
+        cd scripts
+        bash run_eval.sh [OUTPUT_PATH] [DATANAME] [MODEL_CKPT] [DEVICE_ID]
+        ```
 
-bash scripts/run_standalone_train_npu.sh [relative path to hdf5 file] [relative path to init config file] [rank size] [device id to begin]
-```
-
-# [Evaluation Process](#contents)
-
-The following script is used to evaluate the model. You should specify text to synthesize. We use '~' as stop token, so the specified text should end with stop token. You can run the following command line to eval the network:
-
-```shell
-# standalone eval ascend
-
-bash scripts/run_standalone_eval_npu.sh [ckpt_pth] [text to synthesis] [save dir] [filename] [device_id]
-```
+    Note: The `OUTPUT_PATH` is the directory to save evaluate outputs
 
 # [Model Description](#contents)
 
@@ -153,33 +270,42 @@ bash scripts/run_standalone_eval_npu.sh [ckpt_pth] [text to synthesis] [save dir
 
 ### Training Performance
 
-| Parameters                 | DeepSpeech                                                      |
+| Parameters                 | Tacotron2                                                      |
 | -------------------------- | ---------------------------------------------------------------|
 | Resource                   | Ascend 910; OS Euler2.8              |
-| uploaded Date              | 9/27/2021 (month/day/year)                                    |
+| uploaded Date              | 10/25/2021 (month/day/year)                                    |
 | MindSpore Version          | 1.3.0                                                          |
 | Dataset                    | LJSpeech-1.1                                                 |
-| Training Parameters        | 8p, epoch=2000, batch_size=32  |
+| Training Parameters        | 8p, epoch=2000, batch_size=16  |
 | Optimizer                  | Adam                                                           |
 | Loss Function              | BinaryCrossEntropy, MSE                                |
 | outputs                    | mel spectrogram                                                     |
 | Loss                       | 0.33                                                        |
-| Total time: training       | 8p: around 2 week;                                  |
+| Speed|1264ms/step|
+| Total time: training       | 8p: 72h/19m/41s;;                                  |
 | Checkpoint                 | 328.9M (.ckpt file)                                              |
 | Scripts                    | [Tacotron2 script](https://gitee.com/mindspore/models/tree/master/research/audio/tacotron2) |
 
 ### Inference Performance
 
-| Parameters                 | DeepSpeech                                                       |
+| Parameters                 | Tacotron2                                                       |
 | -------------------------- | ----------------------------------------------------------------|
 | Resource                   | Ascend 910; OS Euler2.8                   |
-| uploaded Date              | 9/27/2021 (month/day/year)                                 |
+| uploaded Date              | 10/25/2021 (month/day/year)                                 |
 | MindSpore Version          | 1.3.0                                                           |
 | Dataset                    | LJSpeech-1.1                         |
 | batch_size                 | 1                                                               |
 | outputs                    | mel spectrogram                       |
 | Speed       | 1p: cost 125s synthesize 6s mel spectrogram|
 
-# [ModelZoo Homepage](#contents)
+## [Random Situation Description](#content)
+
+There only one random situation.
+
+- Initialization of some model weights.
+
+Some seeds have already been set in train.py to avoid the randomness of weight initialization.
+
+# [ModelZoo Homepage](#contents)  
 
  Please check the official [homepage](https://gitee.com/mindspore/models).
