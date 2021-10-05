@@ -22,14 +22,14 @@ import numpy as np
 
 from mindspore import context
 from mindspore import nn, Tensor
-from mindspore.train.callback import CheckpointConfig, _InternalCallbackParam
+from mindspore.train.callback import CheckpointConfig, _InternalCallbackParam, ModelCheckpoint
 from mindspore.context import ParallelMode
 from mindspore.communication.management import init, get_rank
 from src.dataset import create_dataset_imagenet
 from src.config import dcgan_imagenet_cfg as cfg
 from src.generator import Generator
 from src.discriminator import Discriminator
-from src.cell import WithLossCellD, WithLossCellG, ModelCheckpoint
+from src.cell import WithLossCellD, WithLossCellG
 from src.dcgan import DCGAN
 
 import matplotlib.pyplot as plt
