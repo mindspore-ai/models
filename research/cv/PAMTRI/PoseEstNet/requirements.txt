@@ -1,0 +1,10 @@
+EasyDict==1.7
+opencv-python
+shapely==1.6.4
+Cython
+scipy
+pandas
+pyyaml
+json_tricks
+scikit-image
+yacs
