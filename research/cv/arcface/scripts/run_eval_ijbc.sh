@@ -15,8 +15,8 @@
 # ============================================================================
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run.sh EVAL_PATH CKPT_PATH TARGET"
-echo "For example: bash run.sh path/evalset path/ckpt IJBC"
+echo "bash run.sh EVAL_PATH CKPT_PATH"
+echo "For example: bash run.sh path/evalset path/ckpt"
 echo "It is better to use the absolute path."
 echo "=============================================================================================================="
 
@@ -29,6 +29,6 @@ python eval_ijbc.py \
 --result-dir ms1mv2_arcface_r100 \
 --batch-size 128 \
 --job ms1mv2_arcface_r100 \
---target $3 \
+--target IJBC \
 --network iresnet100 \
 > eval.log 2>&1 &

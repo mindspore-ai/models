@@ -12,13 +12,14 @@
             - [分布式训练](#分布式训练)
         - [评估过程](#评估过程)
             - [评估](#评估)
+        - [导出mindir模型](#导出mindir模型)
+        - [推理过程](#推理过程)
+            - [用法](#用法)
+            - [结果](#结果)
 - [模型描述](#模型描述)
     - [性能](#性能)
+        - [训练性能](#训练性能)
         - [评估性能](#评估性能)
-        - [推理性能](#推理性能)
-        - [使用方法](#使用方法)
-            - [推理](#推理)
-            - [迁移学习](#迁移学习)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#ModelZoo主页)
 
@@ -47,7 +48,7 @@
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/zh-CN/master/index.html)
 
 # 快速入门
 
@@ -55,13 +56,13 @@
 
 ```python
 # 分布式训练运行示例
-bash scripts/run_distribute_train.sh /path/dataset /path/rank_table
+sh scripts/run_distribute_train.sh rank_size /path/dataset
 
 # 单机训练运行示例
-bash scripts/run_standalone_train.sh /path/dataset
+sh scripts/run_standalone_train.sh /path/dataset
 
 # 运行评估示例
-bash scripts/run_eval.sh /path/evalset /path/ckpt
+sh scripts/run_eval.sh /path/evalset /path/ckpt
 ```
 
 ## 脚本说明
@@ -71,20 +72,30 @@ bash scripts/run_eval.sh /path/evalset /path/ckpt
 ```path
 └── Arcface  
  ├── README.md                           // Arcface相关描述
- ├── scripts  
+ ├── ascend310_infer                     //310推理
+  ├── inc
+   ├── utils.h
+  ├── src
+   ├── main.cc
+   ├── utils.cc
+  ├── build.sh
+  └── CMakeLists.txt
+ ├── scripts
+  ├── run_310_infer.sh           // 用于310推理的shell脚本
   ├── run_distribute_train.sh    // 用于分布式训练的shell脚本
   ├── run_standalone_train.sh    // 用于单机训练的shell脚本
-  ├── run_eval_ijbc.sh    // 用于IJBC数据集评估的shell脚本
-  └── run_eval.sh     // 用于评估的shell脚本
- ├──src  
-  ├── export.py  
-  ├── loss.py                       //损失函数
+  ├── run_eval_ijbc.sh           // 用于IJBC数据集评估的shell脚本
+  └── run_eval.sh                // 用于评估的shell脚本
+ ├──src
+  ├── loss.py                         //损失函数
   ├── dataset.py                      // 创建数据集
-  ├── iresnet.py                  // ResNet架构
- ├──val.py                             // 测试脚本
- ├──train.py                            // 训练脚本
- ├──requirements.txt
-
+  ├── iresnet.py                      // ResNet架构
+ ├── val.py                            // 测试脚本
+ ├── train.py                          // 训练脚本
+ ├── export.py
+ ├── requirements.txt
+ ├── preprocess.py                    // 310推理数据预处理
+ ├── preprocess.py                    // 310推理数据后处理
 
 ```
 
@@ -108,7 +119,7 @@ train.py和val.py中主要参数如下：
 ### 分布式训练
 
 ```shell
-bash scripts/run_distribute_train.sh /path/dataset /path/rank_table
+bash scripts/run_distribute_train.sh rank_size /path/dataset
 ```
 
 上述shell脚本将在后台运行分布训练。可以通过`device[X]/train.log`文件查看结果。
@@ -154,7 +165,7 @@ epoch time: 1104929.793 ms, per step time: 97.162 ms
   同时，情确保传入的评估数据集路径为“IJB_release/IJBB/”或“IJB_release/IJBC/”。
 
   ```bash
-  sh scripts/run_eval_ijbc.sh /path/evalset /path/ckpt target_name
+  bash scripts/run_eval_ijbc.sh /path/evalset /path/ckpt
   ```
 
   上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
@@ -173,11 +184,36 @@ epoch time: 1104929.793 ms, per step time: 97.162 ms
   +-----------+-------+-------+--------+-------+-------+-------+
   ```
 
+## 导出mindir模型
+
+```python
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+参数`ckpt_file` 是必需的，`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中进行选择。
+
+# 推理过程
+
+## 用法
+
+在执行推理之前，需要通过export.py导出mindir文件。
+
+```bash
+# Ascend310 推理
+bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
+```
+
+`DEVICE_TARGET` 可选值范围为：['GPU', 'CPU', 'Ascend']，`NEED_PREPROCESS` 表示数据是否需要预处理，可选值范围为：'y' 或者 'n'，这里直接选择‘y’，`DEVICE_ID` 可选, 默认值为0。
+
+### 结果
+
+推理结果保存在当前路径，可在acc.log中看到最终精度结果。
+
 # 模型描述
 
 ## 性能
 
-### 评估性能
+### 训练性能
 
 | 参数          | Arcface                                                      |
 | ------------- | ------------------------------------------------------------ |
@@ -197,7 +233,7 @@ epoch time: 1104929.793 ms, per step time: 97.162 ms
 | 微调检查点    | 1249M （.ckpt file）                                         |
 | 脚本          | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/cv/arcface) |
 
-### 推理性能
+### 评估性能
 
 | 参数          | Arcface                  |
 | ------------- | ------------------------ |
@@ -208,16 +244,6 @@ epoch time: 1104929.793 ms, per step time: 97.162 ms
 | 数据集        | IJBC、IJBB、lfw、cfp_fp、agedb_30、calfw、cplfw |
 | 输出          | 概率                     |
 | 准确性        | lfw:0.998   cfp_fp:0.98   agedb_30:0.981   calfw:0.961   cplfw:0.926   IJB-B:0.943   IJB-C:0.958 |
-
-## 使用方法
-
-### 推理
-
-如果您需要使用已训练模型在GPU、Ascend 910、Ascend 310等多个硬件平台上进行推理，可参考[此处](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/multi_platform_inference.html)。
-
-### 迁移学习
-
-待补充
 
 # 随机情况说明
 
