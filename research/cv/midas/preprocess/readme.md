@@ -1,0 +1,8 @@
+# associate.py脚本
+
+TUM数据集的处理函数，参数first_file为rgb.txt的路径，参数second_file为depth.txt的路径。其余参数默认。最终在associate.py同目录下生成associate.txt，将associate.txt放入数据集同目录下。
+
+# deal.py脚本
+
+Kitti数据集的处理函数，参数depth_path为数据集深度图的路径，参数image_path为原图的路径。txt_path为本目录下write_file.txt文件路径。最终在前一个目录路径下生成Kitti目录，Kiiti目录下生成最终数据集。
+Sintel数据集需分别下载image和depth图像然后合并在一个目录中。Sintel数据集下载完后，深度图需要training文件夹里面的depth文件夹，原图文件夹里面只需要training文件夹里面的final_left文件夹和occlusions文件夹。
