@@ -445,7 +445,7 @@ python export.py
 | Loss Function              | Softmax Cross Entropy                                       | Softmax Cross Entropy                            |
 | outputs                    | probability                                                 | probability                                      |
 | Loss                       | 0.038                                                       | 0.036                                            |
-| Speed                      | 1pc: 564.652 ms/step;                                       | 1pc: 455.460 ms/step;                            |
+| Speed                      | 1pc: 564.652 ms/step;                                       | 1pc: 455.460 ms/step (may need to install numa)  |
 | Scripts                    | [FCN script](https://gitee.com/mindspore/models/tree/master/official/cv/FCN8s)
 
 ### Inference Performance
