@@ -206,7 +206,7 @@ python train.py
 sh run_distribute_train.sh RANK_TABLE_FILE DATA_PATH
 ```
 
-- 生成八卡训练需要的RANK_TABLE_FILE可参考[此处](https://gitee.com/mindspore/mindspore/blob/master/model_zoo/utils/hccl_tools/hccl_tools.py)
+- 生成八卡训练需要的RANK_TABLE_FILE可参考[此处](https://gitee.com/mindspore/models/blob/master/utils/hccl_tools/hccl_tools.py)
 
 ## 评估过程
 

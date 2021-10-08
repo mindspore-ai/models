@@ -423,7 +423,7 @@ Current batch_ Size can only be set to 1.
 | Total time                 | 8pcs: 11 hours                                              |
 | Parameters (M)             | 86.0                                                        |
 | Checkpoint for Fine tuning | 1000M (.ckpt file)                                          |
-| Scripts                    | [vit script](https://gitee.com/mindspore/mindspore/blob/master/model_zoo/official/cv/vit) |
+| Scripts                    | [vit script](https://gitee.com/mindspore/models/tree/master/official/cv/vit) |
 
 ### Inference Performance
 

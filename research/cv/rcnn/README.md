@@ -81,7 +81,7 @@ Dataset used: [VOC2007](https://pjreddie.com/projects/pascal-voc-dataset-mirror/
 
 ## [Preparation](#contents)
 
-You need to have the model of AlexNet that trained over ImageNet2012.Therefore,you can train it with [alexnet](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/alexnet) scripts in modelzoo,and save the checkpoint file in a folder named "models".  The naming of the pretrained model is set in the "src/paths.py" .
+You need to have the model of AlexNet that trained over ImageNet2012.Therefore,you can train it with [alexnet](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) scripts in modelzoo,and save the checkpoint file in a folder named "models".  The naming of the pretrained model is set in the "src/paths.py" .
 
 You also need to create a floder named "data" to save data.The training set and test set are respectively in two folders, one is "VOC2007" and the other is "VOCtest_06-Nov-2007".The paths are also set in the "src/paths.py".
 
@@ -209,7 +209,7 @@ svm_thresh: 0.6, map: 0.31060216644862054
 | Checkpoint for finetune | 214M (.ckpt file)                                         |
 | Checkpoint for SVM | 214M (.ckpt file)                                         |
 | Checkpoint for regression | 214M (.ckpt file)                                         |
-| Scripts                    | [RCNN Scripts](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/rcnn) |
+| Scripts                    | [RCNN Scripts](https://gitee.com/mindspore/models/tree/master/research/cv/rcnn) |
 
 ### [Inference Performance](#contents)
 
