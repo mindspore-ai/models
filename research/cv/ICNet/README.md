@@ -149,7 +149,6 @@ keep_checkpoint_max: 10
 ### Pre-training
 
 The folder Res50V1_PRE contains the scripts for pre-training and its dataset is [image net](https://image-net.org/). More details in [GENet_Res50](https://gitee.com/mindspore/models/tree/master/research/cv/GENet_Res50)
-
 - Usage:
 
 ```shell
@@ -221,18 +220,18 @@ avgtime 0.19648232793807982
 
 ## Performance
 
-### Training Performance
+### Distributed Training Performance
 
 |Parameter              | ICNet                                                   |
 | ------------------- | --------------------------------------------------------- |
 |resources              | Ascend 910；CPU 2.60GHz, 192core；memory：755G |
 |Upload date            |2021.6.1                    |
 |mindspore version      |mindspore1.2.0     |
-|training parameter     |epoch=160,batch_size=32   |
+|training parameter     |epoch=160,batch_size=4   |
 |optimizer              |SGD optimizer，momentum=0.9,weight_decay=0.0001    |
 |loss function          |SoftmaxCrossEntropyLoss   |
-|training speed         | epoch time：285693.557 ms per step time :42.961 ms |
-|total time             |about 5 hours    |
+|training speed         | epoch time：21469.152 ms(8pcs) per step time :230.851 ms(8pcs) |
+|total time             |1h1m34s(8pcs)    |
 |Script URL             |   |
 |Random number seed     |set_seed = 1234     |
 

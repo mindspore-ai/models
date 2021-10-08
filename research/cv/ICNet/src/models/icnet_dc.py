@@ -28,19 +28,19 @@ context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
 class ICNetdc(nn.Cell):
     """Image Cascade Network"""
 
-    def __init__(self, nclass=19, pretrained_path="", istraining=True):
+    def __init__(self, nclass=19, pretrained_path="", istraining=True, norm_layer=nn.SyncBatchNorm):
         super(ICNetdc, self).__init__()
         self.conv_sub1 = nn.SequentialCell(
-            _ConvBNReLU(3, 32, 3, 2),
-            _ConvBNReLU(32, 32, 3, 2),
-            _ConvBNReLU(32, 64, 3, 2)
+            _ConvBNReLU(3, 32, 3, 2, norm_layer=norm_layer),
+            _ConvBNReLU(32, 32, 3, 2, norm_layer=norm_layer),
+            _ConvBNReLU(32, 64, 3, 2, norm_layer=norm_layer)
         )
         self.istraining = istraining
         self.ppm = PyramidPoolingModule()
 
         self.backbone = SegBaseModel(root=pretrained_path)
 
-        self.head = _ICHead(nclass)
+        self.head = _ICHead(nclass, norm_layer=norm_layer)
 
         self.loss = ICNetLoss()
 
@@ -72,7 +72,6 @@ class ICNetdc(nn.Cell):
         else:
             outputs = output
         return outputs
-
 
 class PyramidPoolingModule(nn.Cell):
     """PPM"""

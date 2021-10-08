@@ -29,7 +29,8 @@ from mindspore.train.callback import ModelCheckpoint
 from mindspore.train.callback import LossMonitor
 from mindspore.train.callback import TimeMonitor
 
-device_id = int(os.getenv('RANK_ID'))
+rank_id = int(os.getenv('RANK_ID'))
+device_id = int(os.getenv('DEVICE_ID'))
 device_num = int(os.getenv('RANK_SIZE'))
 
 context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
@@ -52,12 +53,15 @@ def train_net():
     mindrecord_dir = cfg['train']["mindrecord_dir"]
     mindrecord_file = os.path.join(mindrecord_dir, prefix)
     dataset = create_icnet_dataset(mindrecord_file, batch_size=cfg['train']["train_batch_size_percard"],
-                                   device_num=device_num, rank_id=device_id)
+                                   device_num=device_num, rank_id=rank_id)
 
     train_data_size = dataset.get_dataset_size()
     print("data_size", train_data_size)
     epoch = cfg["train"]["epochs"]
-    network = ICNetdc(pretrained_path=cfg["train"]["pretrained_model_path"])  # __init__
+    if device_num > 1:
+        network = ICNetdc(pretrained_path=cfg["train"]["pretrained_model_path"])  # __init__
+    else:
+        network = ICNetdc(pretrained_path=cfg["train"]["pretrained_model_path"], norm_layer=nn.BatchNorm2d)
 
     iters_per_epoch = train_data_size
     total_train_steps = iters_per_epoch * epoch
