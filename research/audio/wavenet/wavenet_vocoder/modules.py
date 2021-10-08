@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """
-modules for wavenet
+Modules for WaveNet.
 """
 from __future__ import with_statement, print_function, absolute_import
 import math

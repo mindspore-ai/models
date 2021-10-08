@@ -18,9 +18,9 @@
 
 # [WaveNet Description](#contents)
 
-WaveNet is a deep neural network for generating raw audio waveforms. The model is fully probabilistic and autoregressive, with the predictive distribution for each audio sample conditioned on all previous ones. We support training and evaluation  on both GPU and CPU.
+WaveNet is a deep neural network for generating raw audio waveforms. The model is fully probabilistic and autoregressive, with the predictive distribution for each audio sample conditioned on all previous ones. We support training and evaluation  on Ascend, GPU, and CPU.
 
-[Paper](https://arxiv.org/pdf/1609.03499.pdf): ord A, Dieleman S, Zen H, et al. Wavenet: A generative model for raw audio
+[Paper](https://arxiv.org/pdf/1609.03499.pdf): Oord A, Dieleman S, Zen H, et al. Wavenet: A generative model for raw audio.
 
 # [Model Architecture](#contents)
 
@@ -47,8 +47,8 @@ Dataset used: [The LJ Speech Dataset](<https://keithito.com/LJ-Speech-Dataset>)
 
 # [Environment Requirements](#contents)
 
-- Hardware（GPU/CPU）
-    - Prepare hardware environment with GPU/CPU processor.
+- Hardware（Ascend/GPU/CPU）
+    - Prepare hardware environment with Ascend/GPU/CPU processor.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
@@ -66,42 +66,45 @@ Dataset used: [The LJ Speech Dataset](<https://keithito.com/LJ-Speech-Dataset>)
 ├── audio
     └──wavenet
         ├── scripts
-        │   ├──run_distribute_train_gpu.sh // launch distributed training with gpu platform(8p)
-        │   ├──run_eval_cpu.sh             // launch evaluation with cpu platform
-        │   ├──run_eval_gpu.sh             // launch evaluation with gpu platform
-        │   ├──run_standalone_train_cpu.sh // launch standalone training with cpu platform
-        │   └──run_standalone_train_gpu.sh // launch standalone training with gpu platform(1p)
-        ├──datasets                        // Note the datasets folder should be downloaded from the above link
-        ├──egs                             // Note the egs folder should be downloaded from the above link  
-        ├──utils                           // Note the utils folder should be downloaded from the above link  
-        ├── audio.py                       // Audio utils. Note this script should be downloaded from the above link
-        ├── compute-meanvar-stats.py       // Compute mean-variance Normalization stats. Note this script should be downloaded from the above link
-        ├── evaluate.py                    // Evaluation
-        ├── export.py                      // Convert mindspore model to air model  
-        ├── hparams.py                     // Hyper-parameter configuration. Note this script should be downloaded from the above link
-        ├── mksubset.py                    // Make subset of dataset. Note this script should be downloaded from the above link
-        ├── preprocess.py                  // Preprocess dataset. Note this script should be downloaded from the above link
-        ├── preprocess_normalize.py        // Perform meanvar Normalization to preprocessed features. Note this script should be downloaded from the above link
-        ├── README.md                      // Descriptions about WaveNet
-        ├── train.py                       // Training scripts
-        ├── train_pytorch.py               // Note this script should be downloaded from the above link. The initial name of this script is train.py in the project from the link
+        │   ├──run_distribute_train_ascend.sh    // launch distributed training with Ascend platform
+        │   ├──run_distribute_train_gpu.sh       // launch distributed training with GPU platform
+        │   ├──run_eval_ascend.sh                // launch evaluation with Ascend platform
+        │   ├──run_eval_gpu.sh                   // launch evaluation with GPU platform
+        │   ├──run_eval_cpu.sh                   // launch evaluation with CPU platform
+        │   ├──run_standalone_train_ascend.sh    // launch standalone training with Ascend platform
+        │   ├──run_standalone_train_gpu.sh       // launch standalone training with GPU platform
+        │   └──run_standalone_train_cpu.sh       // launch standalone training with CPU platform
+        ├── datasets                             // Process audio files for generating train/evaluate data
+        ├── egs                                  // Note the egs folder should be downloaded from the above link  
+        ├── utils                                // Note the utils folder should be downloaded from the above link  
+        ├── audio.py                             // Audio utils. Note this script should be downloaded from the above link
+        ├── compute-meanvar-stats.py             // Compute mean-variance Normalization stats. Note this script should be downloaded from the above link
+        ├── evaluate.py                          // Evaluation
+        ├── export.py                            // Convert mindspore model to air model
+        ├── hparams.py                           // Hyper-parameter configuration. Note this script should be downloaded from the above link
+        ├── mksubset.py                          // Make subset of dataset. Note this script should be downloaded from the above link
+        ├── preprocess.py                        // Preprocess dataset. Note this script should be downloaded from the above link
+        ├── preprocess_normalize.py              // Perform meanvar Normalization to preprocessed features. Note this script should be downloaded from the above link
+        ├── README.md                            // Descriptions about WaveNet
+        ├── train.py                             // Training scripts
+        ├── train_pytorch.py                     // Note this script should be downloaded from the above link. The initial name of this script is train.py in the project from the link
         ├── src
         │   ├──__init__.py
-        │   ├──dataset.py                  // Generate dataloader and data processing entry
-        │   ├──callback.py                 // Callbacks to monitor the training
-        │   ├──lr_generator.py             // Learning rate generator
-        │   └──loss.py                     // Loss function definition
+        │   ├──dataset.py                        // Generate dataloader and data processing entry
+        │   ├──callback.py                       // Callbacks to monitor the training
+        │   ├──lr_generator.py                   // Learning rate generator
+        │   └──loss.py                           // Loss function definition
         └── wavenet_vocoder
             ├──__init__.py
-            ├──conv.py                     // Extended 1D convolution
-            ├──mixture.py                  // Loss function for training and sample function for testing
-            ├──modules.py                  // Modules for Wavenet construction
-            ├──upsample.py                 // Upsample layer definition
-            ├──util.py                     // Utils. Note this script should be downloaded from the above link
-            ├──wavenet.py                  // WaveNet networks
-            └──tfcompat                    // Note this script should be downloaded from the above link
+            ├──conv.py                           // Extended 1D convolution
+            ├──mixture.py                        // Loss function for training and sample function for testing
+            ├──modules.py                        // Modules for Wavenet construction
+            ├──upsample.py                       // Upsample layer definition
+            ├──util.py                           // Utils. Note this script should be downloaded from the above link
+            ├──wavenet.py                        // WaveNet networks
+            └──tfcompat                          // Note this script should be downloaded from the above link
                ├──__init__.py
-               └──hparam.py                // Param management tools
+               └──hparam.py                      // Param management tools
 ```
 
 ## [Script Parameters](#contents)
@@ -112,7 +115,8 @@ Dataset used: [The LJ Speech Dataset](<https://keithito.com/LJ-Speech-Dataset>)
 usage: train.py  [--data_path DATA_PATH] [--preset PRESET]
                  [--checkpoint_dir CHECKPOINT_DIR] [--checkpoint CHECKPOINT]
                  [--speaker_id SPEAKER_ID] [--platform PLATFORM]
-                 [--is_distributed IS_DISTRIBUTED]
+                 [--mode_name MODE] [--is_distributed IS_DISTRIBUTED]
+
 options:
     --data_path                  dataset path
     --preset                     path of preset parameters (json)
@@ -120,6 +124,7 @@ options:
     --checkpoint                 pre-trained ckpt path, default is "./checkpoints"
     --speaker_id                 specific speaker of data in case for multi-speaker datasets, not used currently
     --platform                   specify platform to be used, defeault is "GPU"
+    --mode_name                  specify graph mode, default is "GRAPH"
     --is_distributed             whether distributed training or not
 
 ```
@@ -209,36 +214,52 @@ you can run the following command to train the network:
 
 ```bash
 Standalone training
+Ascend:
+bash ./scripts/run_standalone_train_ascend.sh train.py [/path_to_egs/egs/gaussian/dump/lj/logmelspectrogram/norm/] [/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json] [path_to_save_ckpt] [DEVICE_ID]
+
 GPU:
-bash ./scripts/run_standalone_train_gpu.sh [CUDA_DEVICE_ID] [/path_to_egs/egs/gaussian/dump/lj/logmelspectrogram/norm/] [/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json] [path_to_save_ckpt]
+bash ./scripts/run_standalone_train_gpu.sh [DEVICE_ID] [/path_to_egs/egs/gaussian/dump/lj/logmelspectrogram/norm/] [/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json] [path_to_save_ckpt]
 
 CPU:
 bash ./scripts/run_standalone_train_cpu.sh [/path_to_egs/egs/gaussian/dump/lj/logmelspectrogram/norm/] [/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json] [path_to_save_ckpt]
 
-Distributed training(8p)
+Distributed training
+Ascend:
+bash ./scripts/run_distributed_train_ascend.sh [/path_to_egs/egs/gaussian/dump/lj/logmelspectrogram/norm/] [/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json] [path_to_save_ckpt] [path_to_hccl_config_file] [RANK_SIZE] [FIRST_DEVICE_ID]
+
+GPU(8p):
 bash ./scripts/run_distribute_train_gpu.sh [/path_to_egs/egs/gaussian/dump/lj/logmelspectrogram/norm/] [/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json] [path_to_save_ckpt]
 ```
 
 ## [Evaluation Process](#contents)
 
-WaveNet has a process of auto-regression and this process currently cannot be run in Graph mode(place the auto-regression into `construct`). Therefore, we implement the process in a common function. Here, we provide two kinds of ways to realize the function: using Numpy or using MindSpore ops. One can set `is_numpy` to determine which mode is used. We recommend using numpy since it is much faster than using MindSpore ops. This is because the auto-regression process only calls some simple operation like Matmul and Bias_add. Unlike Graph mode, there will exist some fixed cost each step and this leads to a lower speed. For more information, please refer to
+WaveNet has a process of auto-regression and this process currently cannot be run in Graph mode(place the auto-regression into `construct`). Therefore, we implement the process in a common function. Here, we provide two kinds of ways to realize the function: using Numpy or using MindSpore ops. One can set `is_numpy` to determine which mode is used. We recommend using numpy on GPU since it is much faster than using MindSpore ops. This is because the auto-regression process only calls some simple operation like Matmul and Bias_add. Unlike Graph mode, there will exist some fixed cost each step and this leads to a lower speed. For more information, please refer to
 this [link](https://bbs.huaweicloud.com/forum/thread-94852-1-1.html)
 
 ```bash
 Evaluation
-GPU (using numpy):
-bash ./scripts/run_eval_gpu.sh [CUDA_DEVICE_ID] [/path_to_egs/egs/gaussian/dump/lj/logmelspectrogram/norm/] [/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json] [path_to_load_ckpt] is_numpy [path_to_save_audio]
+Ascend (using mindspore):
+bash ./scripts/run_eval_ascend.sh [DEVICE_ID] evaluate.py [/path_to_egs/egs/gaussian/dump/lj/logmelspectrogram/norm/eval] [/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json] [path_to_load_ckpt] [path_to_save_audio]
+
+Ascend(using numpy):
+bash ./scripts/run_eval_ascend.sh [DEVICE_ID] evaluate.py [/path_to_egs/egs/gaussian/dump/lj/logmelspectrogram/norm/eval] [/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json] [path_to_load_ckpt] is_numpy [path_to_save_audio]
 
 GPU (using mindspore):
-bash ./scripts/run_eval_gpu.sh [CUDA_DEVICE_ID] [/path_to_egs/egs/gaussian/dump/lj/logmelspectrogram/norm/] [/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json] [path_to_load_ckpt] [path_to_save_audio]
+bash ./scripts/run_eval_gpu.sh [CUDA_DEVICE_ID] [/path_to_egs/egs/gaussian/dump/lj/logmelspectrogram/norm/eval] [/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json] [path_to_load_ckpt] [path_to_save_audio]
+
+GPU (using numpy):
+bash ./scripts/run_eval_gpu.sh [CUDA_DEVICE_ID] [/path_to_egs/egs/gaussian/dump/lj/logmelspectrogram/norm/eval] [/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json] [path_to_load_ckpt] is_numpy [path_to_save_audio]
 
 CPU:
-bash ./scripts/run_eval_cpu.sh [/path_to_egs/egs/gaussian/dump/lj/logmelspectrogram/norm/] [/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json] [path_to_load_ckpt] [is_numpy] [path_to_save_audio]
+bash ./scripts/run_eval_cpu.sh [/path_to_egs/egs/gaussian/dump/lj/logmelspectrogram/norm/eval] [/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json] [path_to_load_ckpt] [is_numpy] [path_to_save_audio]
 ```
 
 ## [Convert Process](#contents)
 
 ```bash
+Ascend:
+python export.py --preset=/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json --checkpoint_dir=path_to_dump_hparams --pretrain_ckpt=path_to_load_ckpt --platform=Ascend
+
 GPU:
 python export.py --preset=/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json --checkpoint_dir=path_to_dump_hparams --pretrain_ckpt=path_to_load_ckpt
 
@@ -250,24 +271,24 @@ python export.py --preset=/path_to_egs/egs/gaussian/conf/gaussian_wavenet.json -
 
 ## [Performance](#contents)
 
-### Training Performance on GPU
+### Training Performance
 
-| Parameters                 | WaveNet                                                      |
-| -------------------------- | ---------------------------------------------------------------|
-| Resource                   | NV SMX2 V100-32G              |
-| uploaded Date              | 01/14/2021 (month/day/year)                                    |
-| MindSpore Version          | 1.0.0                                                          |
-| Dataset                    | LJSpeech-1.1                                                 |
-| Training Parameters        | 1p, epoch=600(max), steps=1635 * epoch, batch_size = 8, lr=1e-3   |
-| Optimizer                  | Adam                                                           |
-| Loss Function              | SoftmaxCrossEntropyWithLogits/discretized_mix_logistic/mix_gaussian                                |
-| Loss                       | around 2.0(mulaw256)/around 4.5(mol)/around -6.0(gaussian)                                                     |
-| Speed                      | 1p 1.467s/step                                   |
-| Total time: training       | 1p(mol/gaussian): around 4 days; 2p(mulaw256):around 1 week                                  |
-| Checkpoint                 | 59.79MM/54.87M/54.83M (.ckpt file)                                              |
-| Scripts                    | [WaveNet script](https://gitee.com/mindspore/models/tree/master/research/audio/wavenet) |
+| Parameters           | GPU                                                          | Ascend                                                       |
+| -------------------- | ------------------------------------------------------------ | :----------------------------------------------------------- |
+| Resource             | NV SMX2 V100-32G                                             | Ascend 910                                                   |
+| uploaded Date        | 01/14/2021 (month/day/year)                                  | 09/27/2021 (month/day/year)                                  |
+| MindSpore Version    | 1.0.0                                                        | 1.3.0                                                        |
+| Dataset              | LJSpeech-1.1                                                 | LJSpeech-1.1                                                 |
+| Training Parameters  | 1p, epoch=600(max), steps=1635 * epoch, batch_size = 8, lr=1e-3 | 8p, epoch=2000(max), steps=1635*epoch, batch_size =24, lr=2e-3 |
+| Optimizer            | Adam                                                         | Adam                                                         |
+| Loss Function        | SoftmaxCrossEntropyWithLogits/discretized_mix_logistic/mix_gaussian | SoftmaxCrossEntropyWithLogits/mix_gaussian                   |
+| Loss                 | around 2.0(mulaw256)/around 4.5(mol)/around -6.0(gaussian)   | around -5.0(gaussian)                                        |
+| Speed                | 1p 1.467s/step                                               |                                                              |
+| Total time: training | 1p(mol/gaussian): around 4 days; 2p(mulaw256):around 1 week  | 8p: around 1 week                                            |
+| Checkpoint           | 59.79MM/54.87M/54.83M (.ckpt file)                           | 42.73M (.ckpt file)                                          |
+| Scripts              | [WaveNet script](https://gitee.com/mindspore/models/tree/master/research/audio/wavenet) | [WaveNet script](https://gitee.com/mindspore/models/tree/master/research/audio/wavenet) |
 
-### Inference Performance On GPU
+### Inference Performance
 
 Audio samples will be demonstrated online soon.
 

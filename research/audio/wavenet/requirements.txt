@@ -1,6 +1,7 @@
 numpy
 audio
 nnmnkwii
+docopt
 scipy
 hparams
 librosa

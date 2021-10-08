@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """
-loss function for training and sample function for testing
+Loss function for training and sample function for testing.
 """
 import numpy as np
 import mindspore as ms

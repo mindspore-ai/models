@@ -11,28 +11,33 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""loss function definition"""
+"""
+Loss function definition.
+"""
 import os
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-
-from mindspore import nn, Tensor
+import mindspore as ms
 from mindspore.ops import operations as P
-import mindspore.common.dtype as mstype
-from mindspore import context
-from nnmnkwii import preprocessing as P1
+from mindspore.ops import composite as C
+from mindspore.ops import functional as F
+from mindspore import nn, Tensor, Parameter, context
+from mindspore.context import ParallelMode
+from mindspore.communication.management import get_group_size
+from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
+from mindspore.parallel._utils import _get_gradients_mean
 
+from nnmnkwii import preprocessing as P1
 from wavenet_vocoder.util import is_mulaw_quantize, is_mulaw
 from wavenet_vocoder.mixture import discretized_mix_logistic_loss
 from wavenet_vocoder.mixture import mix_gaussian_loss
 from train_pytorch import to_categorical
 from tqdm import tqdm
 import audio
-import librosa
-import librosa.display
+
 matplotlib.use('Agg')
+
 
 def sequence_mask(sequence_length, max_len=None):
     """make sequence mask"""
@@ -40,14 +45,16 @@ def sequence_mask(sequence_length, max_len=None):
     if max_len is None:
         max_len = np.max(sequence_length)
     batch_size = sequence_length.shape[0]
-    seq_range = np.linspace(0, max_len-1, max_len, dtype=np.int32)
+    seq_range = np.linspace(0, max_len - 1, max_len, dtype=np.int32)
     seq_range_expand = np.tile(np.expand_dims(seq_range, 0), (batch_size, 1))
     seq_length_expand = np.tile(np.expand_dims(sequence_length, 1), (1, max_len))
     seq_length_expand = np.expand_dims(np.array(seq_range_expand < seq_length_expand, dtype=np.float32), -1)
     return Tensor(seq_length_expand)
 
+
 class MaskedCrossEntropyLoss(nn.Cell):
     """MaskedCrossEntropyLoss"""
+
     def __init__(self):
         super(MaskedCrossEntropyLoss, self).__init__()
         self.criterion = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
@@ -59,6 +66,7 @@ class MaskedCrossEntropyLoss(nn.Cell):
 
 class DiscretizedMixturelogisticLoss(nn.Cell):
     """DiscretizedMixturelogisticLoss"""
+
     def __init__(self, hparams):
         super(DiscretizedMixturelogisticLoss, self).__init__()
         self.quantize_channels = hparams.quantize_channels
@@ -76,6 +84,7 @@ class DiscretizedMixturelogisticLoss(nn.Cell):
 
 class MixtureGaussianLoss(nn.Cell):
     """MixtureGaussianLoss"""
+
     def __init__(self, hparams):
         super(MixtureGaussianLoss, self).__init__()
         self.quantize_channels = hparams.quantize_channels
@@ -216,8 +225,6 @@ class NetWithLossClass(nn.Cell):
         self.transpose_op = P.Transpose()
         self.reshape_op = P.Reshape()
         self.is_mulaw_quant = is_mulaw_quantize(hparams.input_type)
-        self.cast = P.Cast()
-
         if self.is_mulaw_quant:
             self.criterion = MaskedCrossEntropyLoss()
         else:
@@ -229,18 +236,17 @@ class NetWithLossClass(nn.Cell):
                 self.criterion = None
                 raise RuntimeError(
                     "Not supported output distribution type: {}".format(hparams.output_distribution))
-        self.device_target = context.get_context("device_target")
 
     def construct(self, x, y, c, g, input_lengths, mask):
         """
 
         Args:
-            x (Tensor): input
-            y (Tensor): predition
-            c (Tensor): local_conditioning
-            g (Tensor): global_conditioning
-            input_lengths (Tensor): input_lengths
-            mask (Tensor): Mask
+            x (Tensor): input.
+            y (Tensor): prediction.
+            c (Tensor): Local conditioning feature.
+            g (Tensor): Global conditioning feature.
+            input_lengths(Tensor): input_lengths.
+            mask (Tensor): Padding mask.
 
         Returns:
             Tensor: Loss tensor
@@ -250,13 +256,195 @@ class NetWithLossClass(nn.Cell):
         if self.is_mulaw_quant:
             y_hat = self.transpose_op(y_hat[:, :, :-1], (0, 2, 1))
             y_hat = self.reshape_op(y_hat, (-1, y_hat.shape[-1]))
-            if self.device_target == "CPU":
-                y = self.cast(y, mstype.float32)
-                y = self.reshape_op(y[:, 1:, 0], (-1,))
-                y = self.cast(y, mstype.int32)
-            else:
-                y = self.reshape_op(y[:, 1:, 0], (-1,))
+            y = self.reshape_op(y[:, 1:, 0], (-1,))
             loss = self.criterion(y_hat, y)
         else:
             loss = self.criterion(y_hat[:, :, :-1], y[:, 1:, :], mask[:, 1:, :])
         return loss
+
+
+GRADIENT_CLIP_TYPE = 1
+GRADIENT_CLIP_VALUE = 5.0
+clip_grad = C.MultitypeFuncGraph("clip_grad")
+
+
+@clip_grad.register("Number", "Number", "Tensor")
+def _clip_grad(clip_type, clip_value, grad):
+    """
+    Clip gradients.
+
+    Inputs:
+        clip_type (int): The way to clip, 0 for 'value', 1 for 'norm'.
+        clip_value (float): Specifies how much to clip.
+        grad (tuple[Tensor]): Gradients.
+
+    Outputs:
+        tuple[Tensor], clipped gradients.
+    """
+    if clip_type not in [0, 1]:
+        return grad
+    dt = F.dtype(grad)
+    if clip_type == 0:
+        new_grad = C.clip_by_value(grad, F.cast(F.tuple_to_array((-clip_value,)), dt),
+                                   F.cast(F.tuple_to_array((clip_value,)), dt))
+    else:
+        new_grad = nn.ClipByNorm()(grad, F.cast(F.tuple_to_array((clip_value,)), dt))
+    return new_grad
+
+
+grad_scale = C.MultitypeFuncGraph("grad_scale")
+reciprocal = P.Reciprocal()
+
+
+@grad_scale.register("Tensor", "Tensor")
+def tensor_grad_scale(scale, grad):
+    return grad * F.cast(reciprocal(scale), F.dtype(grad))
+
+
+_grad_overflow = C.MultitypeFuncGraph("_grad_overflow")
+grad_overflow = P.FloatStatus()
+
+
+@_grad_overflow.register("Tensor")
+def _tensor_grad_overflow(grad):
+    return grad_overflow(grad)
+
+
+compute_norm = C.MultitypeFuncGraph("compute_norm")
+
+
+@compute_norm.register("Tensor")
+def _compute_norm(grad):
+    norm = nn.Norm()
+    norm = norm(F.cast(grad, ms.float32))
+    ret = F.expand_dims(F.cast(norm, ms.float32), 0)
+    return ret
+
+
+grad_div = C.MultitypeFuncGraph("grad_div")
+
+
+@grad_div.register("Tensor", "Tensor")
+def _grad_div(val, grad):
+    div = P.RealDiv()
+    mul = P.Mul()
+    scale = div(1.0, val)
+    ret = mul(grad, scale)
+    return ret
+
+
+class WaveNetTrainOneStepWithLossScaleCell(nn.Cell):
+    """
+    WaveNet training with loss scaling.
+
+    Args:
+        network (Cell): The training WaveNet.
+        optimizer (Cell): Optimizer for updating the weights.
+        scale_sense (Cell): The loss scaling update logic cell.
+
+    Returns:
+        Tuple[Tensor, Tensor, Tensor], loss, overflow, sen.
+    """
+
+    def __init__(self, network, optimizer, scale_update_cell):
+        super(WaveNetTrainOneStepWithLossScaleCell, self).__init__(auto_prefix=False)
+        self.network = network
+        self.network.set_grad()
+        self.network.add_flags(defer_inline=True)
+        self.add_flags(has_effect=True)
+        self.weights = optimizer.parameters
+        self.optimizer = optimizer
+
+        self.hyper_map = C.HyperMap()
+        self.grad = C.GradOperation(get_by_list=True, sens_param=True)
+
+        self.sens = 1.0
+        self.fill = P.Fill()
+        self.dtype = P.DType()
+        self.get_shape = P.Shape()
+        self.cast = P.Cast()
+        self.concat = P.Concat()
+        self.less_equal = P.LessEqual()
+        self.reduce_sum = P.ReduceSum(keep_dims=False)
+        self.scalar_summary = P.ScalarSummary()
+        self.greater = P.Greater()
+        self.select = P.Select()
+        self.alloc_status = P.NPUAllocFloatStatus()
+        self.get_status = P.NPUGetFloatStatus()
+        self.clear_before_grad = P.NPUClearFloatStatus()
+        self.is_distributed = False
+        self.norm = nn.Norm(keep_dims=True)
+        self.base = Tensor(1, ms.float32)
+
+        self.all_reduce = P.AllReduce()
+
+        self.loss_scaling_manager = scale_update_cell
+        self.loss_scale = Parameter(Tensor(scale_update_cell.get_loss_scale(), dtype=ms.float32))
+
+        self.reducer_flag = False
+        self.parallel_mode = context.get_auto_parallel_context("parallel_mode")
+        if self.parallel_mode in [ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL]:
+            self.reducer_flag = True
+            self.is_distributed = True
+        self.grad_reducer = F.identity
+        self.degree = 1
+        if self.reducer_flag:
+            self.degree = get_group_size()
+            mean = _get_gradients_mean()
+            self.grad_reducer = DistributedGradReducer(self.weights, mean, self.degree)
+
+    def construct(self, x, y, c, g, input_lengths, mask):
+        """
+
+        Args:
+            x (Tensor): Source audio signal.
+            y (Tensor): Target audio signal.
+            c (Tensor): Local conditioning feature.
+            g (Tensor): Global conditioning feature.
+            input_lengths(Tensor): input_lengths
+            mask (Tensor): Padding mask.
+
+        Returns:
+            Tuple[Tensor, Tensor, Tensor], loss, overflow, sen.
+
+        """
+        weights = self.weights
+        loss = self.network(x, y, c, g, input_lengths, mask)
+
+        scale_sense = self.loss_scale
+        # Alloc status.
+        init = self.alloc_status()
+        init = F.depend(init, loss)
+
+        # Clear overflow buffer.
+        clear_status = self.clear_before_grad(init)
+        scale_sense = F.depend(scale_sense, clear_status)
+
+        grads = self.grad(self.network, weights)(x, y, c, g, input_lengths, mask, self.cast(scale_sense, ms.float32))
+        grads = self.grad_reducer(grads)
+        grads = self.hyper_map(F.partial(grad_scale, self.degree * scale_sense), grads)
+        grads = self.hyper_map(F.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
+
+        init = F.depend(init, grads)
+        get_status = self.get_status(init)
+        init = F.depend(init, get_status)
+        flag_sum = self.reduce_sum(init, (0,))
+
+        if self.is_distributed:
+            # Sum overflow flag over devices.
+            flag_reduce = self.all_reduce(flag_sum)
+            cond = self.less_equal(self.base, flag_reduce)
+        else:
+            cond = self.less_equal(self.base, flag_sum)
+
+        overflow = self.loss_scaling_manager(self.loss_scale, cond)
+
+        if overflow:
+            succ = False
+        else:
+            succ = self.optimizer(grads)
+
+        self.scalar_summary("training.loss", loss)
+
+        ret = (loss, scale_sense)
+        return F.depend(ret, succ)

@@ -11,14 +11,16 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ============================================================================
-"""learning rate generator"""
+"""
+Learning rate generator.
+"""
 import numpy as np
 
 
+# for GPU/CPU
 def get_lr(init_lr, total_epoch, step_per_epoch,
            anneal_rate=0.5,
-           anneal_interval=200000):
+           anneal_interval=100000):
     """
     Learning rate generating
 
@@ -37,5 +39,18 @@ def get_lr(init_lr, total_epoch, step_per_epoch,
     lr_step = []
     for i in range(total_step):
         lr_step.append(init_lr * anneal_rate ** (i // anneal_interval))
+    learning_rate = np.array(lr_step).astype(np.float32)
+    return learning_rate
+
+
+# for Ascend
+def get_lrv2(init_lr, total_epoch, step_per_epoch,
+             anneal_step=250):
+    total_step = total_epoch * step_per_epoch
+    lr_step = []
+
+    for step in range(total_step):
+        lambda_lr = anneal_step ** 0.5 * min((step + 1) * anneal_step ** -1.5, (step + 1) ** -0.5)
+        lr_step.append(init_lr * lambda_lr)
     learning_rate = np.array(lr_step).astype(np.float32)
     return learning_rate
