@@ -15,13 +15,14 @@
             - [分布式训练](#分布式训练)
         - [评估过程](#评估过程)
             - [评估](#评估)
+        - [导出mindir模型](#导出mindir模型)
+        - [推理过程](#推理过程)
+            - [用法](#用法)
+            - [结果](#结果)
 - [模型描述](#模型描述)
     - [性能](#性能)
+        - [训练性能](#训练性能)
         - [评估性能](#评估性能)
-        - [推理性能](#推理性能)
-        - [使用方法](#使用方法)
-            - [推理](#推理)
-            - [迁移学习](#迁移学习)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#ModelZoo主页)
 
@@ -50,8 +51,8 @@
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorial/training/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/zh-CN/master/index.html)
 
 # 快速入门
 
@@ -75,25 +76,35 @@ sh scripts/run_eval.sh
 ```path
 └── IBNNet  
  ├── README.md                           // IBNNet相关描述
- ├── scripts  
-  ├── run_distribute_train.sh    // 用于分布式训练的shell脚本
+ ├── ascend310_infer                     //310推理
+  ├── inc
+   ├── utils.h
+  ├── src
+   ├── main.cc
+   ├── utils.cc
+  ├── build.sh
+  └── CMakeLists.txt
+ ├── scripts
+  ├── run_310_infer.sh               // 用于310推理的shell脚本
+  ├── run_distribute_train.sh        // 用于分布式训练的shell脚本
   ├── run_distribute_train_gpu.sh    // 用于GPU分布式训练的shell脚本
-  ├── run_standalone_train.sh    // 用于单机训练的shell脚本
-  ├── run_standalone_train.sh    // 用于GPU单机训练的shell脚本
-  ├── run_eval.sh     // 用于评估的shell脚本
-  └── run_eval.sh     // 用于GPU评估的shell脚本
+  ├── run_standalone_train.sh        // 用于单机训练的shell脚本
+  ├── run_standalone_train.sh        // 用于GPU单机训练的shell脚本
+  ├── run_eval.sh                    // 用于评估的shell脚本
+  └── run_eval.sh                    // 用于GPU评估的shell脚本
  ├── src
-  ├── loss.py                       //损失函数
+  ├── loss.py                         //损失函数
   ├── lr_generator.py                 //生成学习率
   ├── config.py                       // 参数配置
   ├── dataset.py                      // 创建数据集
-  ├── resnet_ibn.py                  // IBNNet架构
+  ├── resnet_ibn.py                   // IBNNet架构
  ├── utils
   ├── pth2ckpt.py                       //转换pth文件为ckpt文件
  ├── export.py
  ├── eval.py                             // 测试脚本
  ├── train.py                            // 训练脚本
-
+ ├── preprocess.py                       // 310推理数据预处理
+ ├── preprocess.py                       // 310推理数据后处理
 
 ```
 
@@ -191,11 +202,36 @@ sh scripts/run_eval_gpu.sh path/evalset path/ckpt
 ============== Accuracy:{'top_5_accuracy': 0.93684, 'top_1_accuracy': 0.7743} ==============
 ```
 
+## 导出mindir模型
+
+```python
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+参数`ckpt_file` 是必需的，`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中进行选择。
+
+# 推理过程
+
+## 用法
+
+在执行推理之前，需要通过export.py导出mindir文件。
+
+```bash
+# Ascend310 推理
+bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH]
+```
+
+`MINDIR_PATH` 为mindir文件路径，`DATASET_PATH` 表示数据集路径。
+
+### 结果
+
+推理结果保存在当前路径，可在acc.log中看到最终精度结果。
+
 # 模型描述
 
 ## 性能
 
-### 评估性能
+### 训练性能
 
 | 参数          | IBN-Net                                         |
 | ------------- | ----------------------------------------------- |
@@ -215,7 +251,7 @@ sh scripts/run_eval_gpu.sh path/evalset path/ckpt
 | 微调检查点 | 293M （.ckpt file） |
 | 脚本 | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/cv/ibnnet) |
 
-### 推理性能
+### 评估性能
 
 | 参数          | IBN-Net            |
 | ------------- | ------------------ |
@@ -227,55 +263,6 @@ sh scripts/run_eval_gpu.sh path/evalset path/ckpt
 | 输出          | 概率               |
 | 准确性        | 1卡：77.45%; 8卡：77.45% |
 
-## 使用方法
-
-### 推理
-
-如果您需要使用已训练模型在GPU、Ascend 910、Ascend 310等多个硬件平台上进行推理，可参考[此处](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/multi_platform_inference.html)。操作示例如下：
-
-```python
-# 加载未知数据集进行推理
-dataset = dataset.create_dataset(cfg.data_path, 1, False)
-
-# 定义模型
-net = resnet50_ibn_a(num_classes=1000, pretrained=False)
-param_dict = load_checkpoint(args.ckpt_url)
-load_param_into_net(net, param_dict)
-print('Load Pretrained parameters done!')
-
-criterion = SoftmaxCrossEntropyExpand(sparse=True)
-
-step = train_dataset.get_dataset_size()
-lr = lr_generator(args.lr, train_epoch, steps_per_epoch=step)
-optimizer = nn.SGD(params=net.trainable_params(), learning_rate=lr,
-momentum=args.momentum, weight_decay=args.weight_decay)
-
-# 模型变形
-model = Model(net, loss_fn=criterion, optimizer=optimizer, metrics={"Accuracy": Accuracy()})
-
-time_cb = TimeMonitor(data_size=train_dataset.get_dataset_size())
-loss_cb = LossMonitor()
-
-# 设置并应用检查点参数
-config_ck = CheckpointConfig(save_checkpoint_steps=step, keep_checkpoint_max=5)
-ckpoint_cb = ModelCheckpoint(prefix="ResNet50_" + str(device_id), config=config_ck, directory='/cache/train_output/device_' + str(device_id))
-
-cb = [ckpoint_cb, time_cb, loss_cb, eval_cb]
-model.train(train_epoch, train_dataset, callbacks=cb)
-
-# 加载预训练模型
-param_dict = load_checkpoint(cfg.checkpoint_path)
-load_param_into_net(net, param_dict)
-
-# 对未知数据集进行预测
-acc = model.eval(eval_dataset)
-print("accuracy: ", acc)
-```
-
-### 迁移学习
-
-待补充
-
 # 随机情况说明
 
 在dataset.py中，我们设置了“create_dataset_ImageNet”函数内的种子。
@@ -283,3 +270,4 @@ print("accuracy: ", acc)
 # ModelZoo主页  
 
  请浏览官网[主页](https://gitee.com/mindspore/models)。
+
