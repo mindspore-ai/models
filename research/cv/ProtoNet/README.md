@@ -60,7 +60,7 @@ python train.py
 
 # [Environment Requirements](#contents)
 
-- Hardware(Ascend)
+- Hardware(Ascend&GPU)
     - Prepare hardware environment with Ascend.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
@@ -79,6 +79,12 @@ sh run_standalone_train_ascend.sh "../dataset" 1 60 500
 sh run_standalone_eval_ascend.sh "../dataset" "./output/best_ck.ckpt" 1 5
 # enter script dir, train ProtoNet distributed
 sh run_distribution_ascend.sh "./rank_table.json" "../dataset" 60 500
+# enter script dir, train ProtoNet in GPU.
+sh run_standalone_train_gpu.sh "../dataset" 1 60 500
+# enter script dir, evaluate ProtoNet
+sh run_standalone_eval_gpu.sh "../dataset" "./output/best_ck.ckpt" 1 5
+# enter script dir, train ProtoNet distributed
+sh run_distribution_gpu.sh "../dataset" 60 500
 ```
 
 ## [Script and Sample Code](#contents)
@@ -89,6 +95,9 @@ sh run_distribution_ascend.sh "./rank_table.json" "../dataset" 60 500
         ├── requirements.txt  
         ├── README.md                    // descriptions about lenet
         ├── scripts
+        │   ├──run_standalone_train_gpu.sh          // train in GPU
+        │   ├──run_standalone_eval_gpu.sh          //  evaluate in GPU
+        │   ├──run_distribution_gpu.sh          //  distribution in GPU
         │   ├──run_standalone_train_ascend.sh          // train in ascend
         │   ├──run_standalone_eval_ascend.sh          //  evaluate in ascend
         │   ├──run_distribution_ascend.sh          //  distribution in ascend
@@ -125,7 +134,8 @@ Major parameters in train.py and config.py as follows:
 ### Training
 
 ```bash
-sh run_standalone_train_ascend.sh "../dataset" 1 60 500
+bash run_standalone_train_ascend.sh "../dataset" 1 60 500
+bash run_standalone_train_gpu.sh "../dataset" 1 60 500
 ```
 
 The model checkpoint will be saved in the current directory.
@@ -138,11 +148,13 @@ Before running the command below, please check the checkpoint path used for eval
 
 ```bash
 sh run_standalone_eval_ascend.sh "../dataset" "./output/best_ck.ckpt" 1 5
+sh run_standalone_eval_gpu.sh "../dataset" "./output/best_ck.ckpt" 1 5
 ```
 
 ```shell
 
-Test Acc: 0.9954400658607483  Loss: 0.02102319709956646
+Test Acc in Ascend: 0.9954400658607483  Loss: 0.02102319709956646
+Test Acc in GPU: 0.996999979019165  Loss: 0.013885765336453915
 ```
 
 # [Model Description](#contents)
@@ -151,21 +163,21 @@ Test Acc: 0.9954400658607483  Loss: 0.02102319709956646
 
 ### Evaluation Performance
 
-| Parameters                 | ProtoNet                                                   |
-| -------------------------- | ---------------------------------------------------------- |
-| Resource                   | CentOs 8.2; Ascend 910 ; CPU 2.60GHz，192cores；Memory 755G             |
-| uploaded Date              | 03/26/2021 (month/day/year)                                 |
-| MindSpore Version          | 1.1.1                                                      |
-| Dataset                    | OMNIGLOT                                                    |
-| Training Parameters        | episode=500, class_num = 5, lr=0.001, classes_per_it_tr=60, num_support_tr=5, num_query_tr=5, classes_per_it_val=20, num_support_val=5, num_query_val=15         |
-| Optimizer                  | Adam                                                         |
-| Loss Function              | Prototypicalloss                                             |
-| outputs                    | Accuracy                                                 |
-| Loss                       | 0.002                                                      |
-| Speed                      | 215 ms/step                          |
-| Total time                 | 3 h 23m (8p)                |
-| Checkpoint for Fine tuning | 440 KB (.ckpt file)                                         |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/cv/ProtoNet> |
+| Parameters                 | ProtoNet(Ascend)                                                   |ProtoNet(GPU)                                                   |
+| -------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------- |
+| Resource                   | CentOs 8.2; Ascend 910 ; CPU 2.60GHz，192cores；Memory 755G             | ubuntu 18.04; Tesla V100 ; CPU 2.60GHz             |
+| uploaded Date              | 03/26/2021 (month/day/year)                                 | 08/28/2021 (month/day/year)                                 |
+| MindSpore Version          | 1.1.1                                                      | 1.3.0                                                      |
+| Dataset                    | OMNIGLOT                                                    |OMNIGLOT                                                    |
+| Training Parameters        | episode=500, class_num = 5, lr=0.001, classes_per_it_tr=60, num_support_tr=5, num_query_tr=5, classes_per_it_val=20, num_support_val=5, num_query_val=15         | episode=500, class_num = 5, lr=0.001, classes_per_it_tr=60, num_support_tr=5, num_query_tr=5, classes_per_it_val=20, num_support_val=5, num_query_val=15         |
+| Optimizer                  | Adam                                                         | Adam                                                         |
+| Loss Function              | Prototypicalloss                                             | Prototypicalloss                                             |
+| outputs                    | Accuracy                                                 | Accuracy                                                 |
+| Loss                       | 0.002                                                      | 0.002                                                      |
+| Speed                      | 215 ms/step                          | 144 ms/step                          |
+| Total time                 | 3 h 23m (8p)                | 2 h 48m (8p)                |
+| Checkpoint for Fine tuning | 440 KB (.ckpt file)                                         | 441 KB (.ckpt file)                                         |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/cv/ProtoNet> |<https://gitee.com/mindspore/models/tree/master/research/cv/ProtoNet> |
 
 # [ModelZoo Homepage](#contents)
 

@@ -22,7 +22,7 @@ from mindspore.train import Model
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
 from mindspore import dataset as ds
 import mindspore.context as context
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank
 from mindspore.context import ParallelMode
 from src.EvalCallBack import EvalCallBack
 from src.protonet import WithLossCell
@@ -35,7 +35,7 @@ local_data_url = './cache/data'
 local_train_url = './cache/out'
 
 
-def train(opt, tr_dataloader, net, loss_fn, eval_loss_fn, optim, path, val_dataloader=None):
+def train(opt, tr_dataloader, net, loss_fn, eval_loss_fn, optim, path, rank_id, val_dataloader=None):
     '''
     train function
     '''
@@ -47,11 +47,11 @@ def train(opt, tr_dataloader, net, loss_fn, eval_loss_fn, optim, path, val_datal
 
     eval_data = ds.GeneratorDataset(val_dataloader, column_names=['data', 'label', 'classes'])
 
-    eval_cb = EvalCallBack(opt, my_acc_cell, eval_data, path)
+    eval_cb = EvalCallBack(opt, my_acc_cell, eval_data, path, rank_id)
     config = CheckpointConfig(save_checkpoint_steps=10,
                               keep_checkpoint_max=5,
                               saved_network=net)
-    ckpoint_cb = ModelCheckpoint(prefix='protonet', directory=path, config=config)
+    ckpoint_cb = ModelCheckpoint(prefix=str(rank_id) + '_protonet', directory=path, config=config)
 
     print('==========training test==========')
     starttime = datetime.datetime.now()
@@ -68,24 +68,29 @@ def main():
     global local_train_url
 
     options = get_parser().parse_args()
+    device_num = int(os.environ.get("DEVICE_NUM", 1))
+
+    if options.device_target == "GPU":
+        rank_id = get_rank()
 
     if options.run_offline:
-
-        device_num = int(os.environ.get("DEVICE_NUM", 1))
-
         if device_num > 1:
-
             init()
             context.reset_auto_parallel_context()
             context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
-        context.set_context(device_id=options.device_id)
+
+        if options.device_target == "Ascend":
+            context.set_context(device_id=options.device_id)
+
         local_data_url = options.dataset_root
         local_train_url = options.experiment_root
-        if not os.path.exists(options.experiment_root):
-            os.makedirs(options.experiment_root)
+        if device_num > 1 and options.device_target == "GPU":
+            pass
+        else:
+            if not os.path.exists(options.experiment_root):
+                os.makedirs(options.experiment_root)
     else:
-        device_num = int(os.environ.get("DEVICE_NUM", 1))
         device_id = int(os.getenv("DEVICE_ID"))
 
         import moxing as mox
@@ -114,7 +119,19 @@ def main():
 
     Net = ProtoNet()
     optim = nn.Adam(params=Net.trainable_params(), learning_rate=0.001)
-    train(options, tr_dataloader, Net, loss_fn, eval_loss_fn, optim, local_train_url, val_dataloader)
+    if options.device_target == "Ascend":
+        train(
+            options,
+            tr_dataloader,
+            Net,
+            loss_fn,
+            eval_loss_fn,
+            optim,
+            local_train_url,
+            options.device_id,
+            val_dataloader)
+    elif options.device_target == "GPU":
+        train(options, tr_dataloader, Net, loss_fn, eval_loss_fn, optim, local_train_url, rank_id, val_dataloader)
     if not options.run_offline:
         mox.file.copy_parallel(src_url='./cache/out', dst_url=options.train_url)
 

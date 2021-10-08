@@ -26,7 +26,7 @@ class EvalCallBack(Callback):
     """
     CallBack class
     """
-    def __init__(self, options, net, eval_dataset, path):
+    def __init__(self, options, net, eval_dataset, path, rank_id=0):
         self.net = net
         self.eval_dataset = eval_dataset
         self.path = path
@@ -34,6 +34,7 @@ class EvalCallBack(Callback):
         self.avgloss = 0
         self.bestacc = 0
         self.options = options
+        self.rank_id = rank_id
 
 
     def epoch_begin(self, run_context):
@@ -58,12 +59,12 @@ class EvalCallBack(Callback):
         if self.avgacc > self.bestacc:
             self.bestacc = self.avgacc
             print('Epoch {}: Avg Accuracy: {}(best) Avg Loss:{}'.format(cur_epoch, self.avgacc, self.avgloss))
-            best_path = os.path.join(self.path, 'best_ck.ckpt')
+            best_path = os.path.join(self.path, f'best_ck_{self.rank_id}.ckpt')
             save_checkpoint(cur_net, best_path)
 
         else:
             print('Epoch {}: Avg Accuracy: {} Avg Loss:{}'.format(cur_epoch, self.avgacc, self.avgloss))
-        last_path = os.path.join(self.path, 'last_ck.ckpt')
+        last_path = os.path.join(self.path, f'last_ck_{self.rank_id}.ckpt')
         save_checkpoint(cur_net, last_path)
         print("Best Acc:", self.bestacc)
         print('=========EPOCH {}  END========='.format(cur_epoch))
