@@ -13,21 +13,21 @@
 # limitations under the License.
 # ===========================================================================
 """
-convert resnet pretrain model to faster_rcnn backbone pretrain model
+convert pretrain model to faster_rcnn backbone pretrain model
 """
 from mindspore.train.serialization import load_checkpoint, save_checkpoint
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
 import mindspore.common.dtype as mstype
-from .model_utils.config import config
+from model_utils.config import config
 
 
 def load_weights(model_path, use_fp16_weight):
     """
-    load resnet pretrain checkpoint file.
+    load pretrain checkpoint file.
 
     Args:
-        model_path (str): resnet pretrain checkpoint file .
+        model_path (str): pretrain checkpoint file .
         use_fp16_weight(bool): whether save weight into float16.
 
     Returns:
@@ -59,4 +59,4 @@ def load_weights(model_path, use_fp16_weight):
 
 if __name__ == "__main__":
     parameter_list = load_weights(config.ckpt_file, use_fp16_weight=False)
-    save_checkpoint(parameter_list, "resnet_backbone.ckpt")
+    save_checkpoint(parameter_list, "backbone.ckpt")

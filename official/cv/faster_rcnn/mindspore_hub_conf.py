@@ -15,14 +15,11 @@
 """hub config."""
 
 from src.model_utils.config import config
+from src.FasterRcnn.faster_rcnn import Faster_Rcnn
 
-
-if config.backbone in ("resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152"):
-    from src.FasterRcnn.faster_rcnn_resnet import Faster_Rcnn_Resnet
-elif config.backbone == "resnet_v1_50":
-    from src.FasterRcnn.faster_rcnn_resnet50v1 import Faster_Rcnn_Resnet
+net = Faster_Rcnn(config=config)
 
 def create_network(name, *args, **kwargs):
     if name == "faster_rcnn":
-        return Faster_Rcnn_Resnet(config=config)
+        return net
     raise NotImplementedError(f"{name} is not implemented in the repo")

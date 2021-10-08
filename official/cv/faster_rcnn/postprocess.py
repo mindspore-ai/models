@@ -22,8 +22,8 @@ from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 
 
-dst_width = 1280
-dst_height = 768
+dst_width = config.img_width
+dst_height = config.img_height
 
 def modelarts_pre_process():
     pass
