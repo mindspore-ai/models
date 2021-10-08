@@ -386,6 +386,10 @@ def add_training_params(opt):
     opt.add_argument("--data_column_name",
                      type=str, default="input_ids",
                      help="Column name of datasets")
+    opt.add_argument("--micro_batch_interleaved",
+                     type=int, default=2,
+                     help="Parallel split num of batch size. default 2")
+
 
 
 def add_retrain_params(opt):
