@@ -25,7 +25,7 @@
 
 ### 了解贡献协议与流程
 
-你应该优先参考MindSpore的[CONTRIBUTE.md](../CONTRIBUTING.md)说明来理解MindSpore的开源协议和运作方式，并确保自己已完成CLA的签署。
+你应该优先参考MindSpore的[CONTRIBUTING_CN.md](../CONTRIBUTING_CN.md)说明来理解MindSpore的开源协议和运作方式，并确保自己已完成CLA的签署。
 
 <!--
 ### 确定自己贡献的目标
@@ -45,7 +45,7 @@
 
 ### CodeStyle
 
-参考[CONTRIBUTE.md](../CONTRIBUTING.md)中关于CodeStyle的说明，你应该确保自己的代码与MindSpore的现有代码风格保持一致。
+参考[CONTRIBUTING_CN.md](../CONTRIBUTING_CN.md)中关于CodeStyle的说明，你应该确保自己的代码与MindSpore的现有代码风格保持一致。
 
 ### 目录结构
 
@@ -53,35 +53,35 @@
 
 ```shell
 model_zoo
-├── official                                             # 官方支持模型
-│   └── XXX                   # 模型名
-│       ├── README.md                # 模型说明文档
-│       ├── requirements.txt         # 依赖说明文件
-│       ├── eval.py                 # 精度验证脚本
-│       ├── export.py                # 推理模型导出脚本
-│       ├── scripts                 # 脚本文件
-│       │   ├── run_distributed_train.sh      # 分布式训练脚本
-│       │   ├── run_eval.sh             # 验证脚本
-│       │   └── run_standalone_train.sh       # 单机训练脚本
-│       ├── src                   # 模型定义源码目录
-│       │   ├── XXXNet.py              # 模型结构定义
-│       │   ├── callback.py             # 回调函数定义
-│       │   ├── config.py              # 模型配置参数文件
-│       │   └── dataset.py             # 数据集处理定义
-│       ├── ascend_infer               # （可选）用于在Ascend推理设备上进行离线推理的脚本
-│       ├── third_party               # （可选）第三方代码
-│       │   └── XXXrepo               # （可选）完整克隆自第三方仓库的代码
-│       └── train.py                # 训练脚本
-├── research                    # 非官方研究脚本
-├── community                    # 合作方脚本链接
-└── utils                      # 模型通用工具
+├── official                                    # 官方支持模型
+│   └── XXX                                     # 模型名
+│       ├── README.md                           # 模型说明文档
+│       ├── requirements.txt                    # 依赖说明文件
+│       ├── eval.py                             # 精度验证脚本
+│       ├── export.py                           # 推理模型导出脚本
+│       ├── scripts                             # 脚本文件
+│       │   ├── run_distributed_train.sh        # 分布式训练脚本
+│       │   ├── run_eval.sh                     # 验证脚本
+│       │   └── run_standalone_train.sh         # 单机训练脚本
+│       ├── src                                 # 模型定义源码目录
+│       │   ├── XXXNet.py                       # 模型结构定义
+│       │   ├── callback.py                     # 回调函数定义
+│       │   ├── config.py                       # 模型配置参数文件
+│       │   └── dataset.py                      # 数据集处理定义
+│       ├── ascend_infer                        # （可选）用于在Ascend推理设备上进行离线推理的脚本
+│       ├── third_party                         # （可选）第三方代码
+│       │   └── XXXrepo                         # （可选）完整克隆自第三方仓库的代码
+│       └── train.py                            # 训练脚本
+├── research                                    # 非官方研究脚本
+├── community                                   # 合作方脚本链接
+└── utils                                       # 模型通用工具
 ```
 
 你可以参照以下原则，根据自己的需要在模板基础上做一些适配自己实现的修改
 
 1. 模型根目录下只放置带有`main方法`的可执行脚本，模型的定义文件统一放在`src`目录下，该目录下可以根据自己模型的复杂程度自行组织层次结构。
-2. 配置参数应当与网络定义分离，将所有可配置的参数抽离到`src/config.py`文件中统一定义。
-3. 上传内容应当只包含脚本、代码和文档，**不要上传**任何数据集或checkpoint之类的数据文件。
+2. 配置参数应当与网络定义分离，将所有可配置的参数抽离到`config/`文件夹中，使用.yml格式文件统一定义。
+3. 上传内容应当只包含脚本、代码和文档，**不要上传**任何数据集、以及运行过程中所产生的目录和文件。
 4. third_party用于存放需要引用的第三方代码，但是不要直接将代码拷贝到目录下上传，而应该使用git链接的形式，在使用时下载。
 5. 每个模型的代码应当自成闭包，可以独立的迁移使用，不应当依赖模型目录以外的其他代码。utils内只是通用工具，并非通用函数库。
 6. 上传内容中**不要包含**任何你的个人信息，例如你的主机IP，个人密码，本地目录等。
@@ -95,7 +95,7 @@ model_zoo
 3. 如何使用现有的实现？
 4. 这个模型表现如何？
 
-对此，我们提供了一个基础的[README模版](./README_template.md)，你应该参考此模版来完善自己的说明文档, 也可以参考其他现有模型的readme。
+对此，我们提供了一个基础的[README模版](./README_TEMPLATE_CN.md)，你应该参考此模版来完善自己的说明文档, 也可以参考其他现有模型的readme。
 
 ### 关于第三方引用
 
@@ -127,6 +127,7 @@ model_zoo
 - [ ] 同步添加了必要的测试用例
 - [ ] 所有第三方依赖都已经说明，包括代码引用，python库，数据集，预训练模型等
 - [ ] 工程组织结构符合[目录结构](#目录结构)中的要求。
+- [ ] 完成readme编写，通过CI测试
 
 ## 维护与交流
 
