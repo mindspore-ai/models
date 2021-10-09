@@ -545,3 +545,8 @@ For Serving and flask server, extra requirements:
 Q: `Unexpected error. MindRecordOp init failed, illegal column list`.
 
 A: It's because the feature column name in `dataset.py` is not consistent with the name in mindrecord. Pleasse pass args `--data_column_name your_feature name` to the `run_distribute_train.sh`
+
+Q: `ERROR: device_num must be the power of 2`.
+
+A: The number of the cards must be the power of 2 if we use the parallel training. For example, if we want to train
+the 2.6B model, the number of cards should be 2, 4, 8, 16 and so on.

@@ -19,6 +19,7 @@ import argparse
 import ast
 import os
 import time
+import hashlib
 import numpy as np
 import mindspore.nn as nn
 from mindspore import context
@@ -147,9 +148,16 @@ class GlobalNorm(nn.Cell):
             else:
                 group_size = config.parallel_config.model_parallel
             group_list, group_name = _get_model_parallel_group(group_size)
+            # In avoid of the group name too long
+            hashed = hashlib.md5(group_name.encode()).hexdigest()[:48]
+            print(f"Creating hash value for the group_name hash({group_name})={hashed}")
+            group_name = str(hashed)
             create_group(group_name, group_list)
             self.allreduce = P.AllReduce(group=group_name)
             pipeline_group_list, pipeline_group_name = _get_pipeline_group()
+            hashed = hashlib.md5(pipeline_group_name.encode()).hexdigest()[:48]
+            print(f"Creating hash value for the group_name hash({pipeline_group_name})={hashed}")
+            pipeline_group_name = str(hashed)
             create_group(pipeline_group_name, pipeline_group_list)
             self.allreduce2 = P.AllReduce(group=pipeline_group_name)
         else:
