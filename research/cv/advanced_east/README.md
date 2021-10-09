@@ -245,7 +245,7 @@ The Normalization of model training on Ascend is GN, the model training on GPU i
 | Resources            | Ascend 910 | Tesla V100S-PCIE 32G|
 | MindSpore Version    | 1.1             |1.1                     |
 | Dataset              | MTWI-2018           |MTWI-2018                 |
-| Training Parameters  | epoch=18, batch_size = 8, lr=1e-3  |epoch=84, batch_size = 8, lr=1e-3  |
+| Training Parameters  | epoch=6, batch_size=2, lr=1e-4  |epoch=6, batch_size=2, lr=1e-3  |
 | Optimizer            | AdamWeightDecay             |AdamWeightDecay             |
 | Loss Function        | QuadLoss |QuadLoss |
 | Outputs              |  matrix with size of 3x64x64,3x96x96,3x112x112  |matrix with size of 3x64x64,3x96x96,3x112x112       |

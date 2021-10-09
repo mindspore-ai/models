@@ -16,9 +16,9 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run_standalone_train_ascend.sh"
+echo "bash run_standalone_train_ascend.sh [dataset_path](optional)"
 echo "for example: bash run_standalone_train_ascend.sh"
 echo "=============================================================================================================="
 
   python train_single_size.py  \
-    --device_target="Ascend" > output.train.log 2>&1 &
+    --device_target="Ascend" --data_path $1 > output.train.log 2>&1 &

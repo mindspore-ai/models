@@ -16,14 +16,13 @@
 """export file."""
 
 import numpy as np
-from mindspore import context, Tensor
+from mindspore import Tensor
 from mindspore.train.serialization import export
 from src.models.cycle_gan import get_generator
 from src.utils.args import get_args
 from src.utils.tools import load_ckpt
 
 args = get_args("export")
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=args.device_id)
 
 if __name__ == '__main__':
     G_A = get_generator(args)
