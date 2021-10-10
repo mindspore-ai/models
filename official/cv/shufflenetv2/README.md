@@ -9,6 +9,10 @@
     - [Training Process](#training-process)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
+    - [Inference Process](#inference-process)
+        - [Export MindIR](#export-mindir)
+        - [Infer on Ascend310](#infer-on-ascend310)
+        - [result](#result-2)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Training Performance](#evaluation-performance)
@@ -31,42 +35,44 @@ The overall network architecture of ShuffleNetV2 is show below:
 
 Dataset used: [imagenet](http://www.image-net.org/)
 
-- Dataset size: ~125G, 1.2W colorful images in 1000 classes
-    - Train: 120G, 1.2W images
+- Dataset size: ~125G, 1.2M colorful images in 1000 classes
+    - Train: 120G, 1.2M images
     - Test: 5G, 50000 images
 - Data format: RGB images.
     - Note: Data will be processed in src/dataset.py
 
 # [Environment Requirements](#contents)
 
-- Hardware(GPU)
-    - Prepare hardware environment with GPU processor.
+- Hardware(Ascend/GPU)
+    - Prepare hardware environment with Ascend or GPU processor.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below:
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.3/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.3/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/en/master/index.html)
 
 # [Script description](#contents)
 
 ## [Script and sample code](#contents)
 
-```python
+```text
 +-- ShuffleNetV2
   +-- Readme.md     # descriptions about ShuffleNetV2
   +-- scripts
-    +--run_distribute_train_for_gpu.sh   # shell script for distributed training
-    +--run_eval_for_gpu.sh         # shell script for evaluation
-    +--run_standalone_train_for_gpu.sh   # shell script for standalone training
+    +--run_distribute_train_for_ascebd.sh   # shell script for distributed Ascend training
+    +--run_distribute_train_for_gpu.sh      # shell script for distributed GPU training
+    +--run_eval_for_ascend.sh               # shell script for Ascend evaluation
+    +--run_eval_for_gpu.sh                  # shell script for GPU evaluation
+    +--run_standalone_train_for_gpu.sh      # shell script for standalone GPU training
   +-- src
-    +--config.py      # parameter configuration
-    +--dataset.py     # creating dataset
-    +--loss.py        # loss function for network
-    +--lr_generator.py     # learning rate config
-  +-- train.py      # training script
-  +-- eval.py       # evaluation script
-  +-- blocks.py     # ShuffleNetV2 blocks
-  +-- network.py    # ShuffleNetV2 model network
+    +--config.py                            # parameter configuration
+    +--CrossEntropySmooth.py                # loss function for GPU training
+    +--dataset.py                           # creating dataset
+    +--loss.py                              # loss function for network
+    +--lr_generator.py                      # learning rate config
+    +--shufflenetv2.py                      # ShuffleNetV2 model network
+  +-- train.py                              # training script
+  +-- eval.py                               # evaluation script
 ```
 
 ## [Training process](#contents)
@@ -75,6 +81,7 @@ Dataset used: [imagenet](http://www.image-net.org/)
 
 You can start training using python or shell scripts. The usage of shell scripts as follows:
 
+- Distributed training on Ascend: sh run_distribute_train_for_ascend.sh [RANK_TABLE_FILE] [DATASET_PATH]
 - Distributed training on GPU: sh run_standalone_train_for_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]
 - Standalone training on GPU: sh run_standalone_train_for_gpu.sh [DATASET_PATH]
 
@@ -83,10 +90,10 @@ You can start training using python or shell scripts. The usage of shell scripts
 ```bash
 # training example
   python:
-      GPU: mpirun --allow-run-as-root -n 8 --output-filename log_output --merge-stderr-to-stdout python train.py --is_distributed=True --platform='GPU' --dataset_path='~/imagenet/train/' > train.log 2>&1 &
+      GPU: mpirun --allow-run-as-root -n 8 --output-filename log_output --merge-stderr-to-stdout python train.py --is_distributed=True --platform='GPU' --dataset_path='~/imagenet' > train.log 2>&1 &
 
   shell:
-      GPU: cd scripts & sh run_distribute_train_for_gpu.sh 8 0,1,2,3,4,5,6,7 ~/imagenet/train/
+      GPU: cd scripts & sh run_distribute_train_for_gpu.sh 8 0,1,2,3,4,5,6,7 ~/imagenet
 ```
 
 ### Result
@@ -99,24 +106,61 @@ Training result will be stored in the example path. Checkpoints will be stored a
 
 You can start evaluation using python or shell scripts. The usage of shell scripts as follows:
 
-- GPU: sh run_eval_for_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]
+- Ascend: sh run_eval_for_ascend.sh [DATASET_PATH] [CHECKPOINT]
+- GPU: sh run_eval_for_gpu.sh [DATASET_PATH] [CHECKPOINT]
 
 ### Launch
 
 ```bash
 # infer example
   python:
-      GPU: CUDA_VISIBLE_DEVICES=0 python eval.py --platform='GPU' --dataset_path='~/imagenet/val/' > eval.log 2>&1 &
+      Ascend: python eval.py --platform='Ascend' --dataset_path='~/imagenet' --checkpoint='checkpoint_file' > eval.log 2>&1 &
+      GPU: CUDA_VISIBLE_DEVICES=0 python eval.py --platform='GPU' --dataset_path='~/imagenet/val/' --checkpoint='checkpoint_file'> eval.log 2>&1 &
 
   shell:
-      GPU: cd scripts & sh run_eval_for_gpu.sh '~/imagenet/val/' 'checkpoint_file'
+      Ascend: cd scripts & sh run_eval_for_ascend.sh '~/imagenet' 'checkpoint_file'
+      GPU: cd scripts & sh run_eval_for_gpu.sh '~/imagenet' 'checkpoint_file'
 ```
-
-> checkpoint can be produced in training process.
 
 ### Result
 
 Inference result will be stored in the example path, you can find result in `eval.log`.
+
+## Inference Process
+
+### [Export MindIR](#contents)
+
+Export MindIR on local
+
+```shell
+python export.py --device_target [PLATFORM] --ckpt_file [CKPT_FILE] --file_format [FILE_FORMAT] --file_name [OUTPUT_FILE_BASE_NAME]
+```
+
+The checkpoint_file_path parameter is required,
+`PLATFORM` should be in ["Ascend", "GPU", "CPU"]
+`FILE_FORMAT` should be in ["AIR", "ONNX", "MINDIR"]
+
+### Infer on Ascend310
+
+Before performing inference, the mindir file must bu exported by `export.py` script. We only provide an example of inference using MINDIR model.
+Current batch_Size can only be set to 1.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` should be the filename of the MINDIR model.
+- `DATASET_NAME` should be imagenet2012.
+- `DATASET_PATH` should be the path of the val in imaagenet2012 dataset.
+- `NEED_PREPROCESS` can be y or n.
+- `DEVICE_ID` is optional, default value is 0.
+
+### result
+
+Inference result is saved in current path, you can find result like this in acc.log file.
+Top1 acc:  0.69608
+Top5 acc:  0.88726
 
 # [Model description](#contents)
 
@@ -124,29 +168,30 @@ Inference result will be stored in the example path, you can find result in `eva
 
 ### Training Performance
 
-| Parameters                 | ShuffleNetV2              |
-| -------------------------- | ------------------------- |
-| Resource                   | NV SMX2 V100-32G          |
-| uploaded Date              | 09/24/2020                |
-| MindSpore Version          | 1.0.0                     |
-| Dataset                    | ImageNet                  |
-| Training Parameters        | src/config.py             |
-| Optimizer                  | Momentum                  |
-| Loss Function              | CrossEntropySmooth        |
-| Accuracy                   | 69.4%(TOP1)               |
-| Total time                 | 49 h 8ps                  |
+| Parameters                 | Ascend 910                    | GPU                           |
+| -------------------------- | ----------------------------- |-------------------------------|
+| Model Version              | ShuffleNetV2                  | ShuffleNetV2                  |
+| Resource                   | Ascend 910                    | NV SMX2 V100-32G              |
+| uploaded Date              | 10/09/2021 (month/day/year)   | 09/24/2020 (month/day/year)   |
+| MindSpore Version          | 1.3.0                         | 1.0.0                         |
+| Dataset                    | ImageNet                      | ImageNet                      |
+| Training Parameters        | src/config.py                 | src/config.py                 |
+| Optimizer                  | Momentum                      | Momentum                      |
+| Loss Function              | SoftmaxCrossEntropyWithLogits | CrossEntropySmooth            |
+| Accuracy                   | 69.59%(TOP1)                  | 69.4%(TOP1)                   |
+| Total time                 | 11.6 h 8ps                    | 49 h 8ps                      |
 
 ### Inference Performance
 
-| Parameters                 |                           |
-| -------------------------- | ------------------------- |
-| Resource                   | NV SMX2 V100-32G          |
-| uploaded Date              | 09/24/2020                |
-| MindSpore Version          | 1.0.0                     |
-| Dataset                    | ImageNet, 1.2W            |
-| batch_size                 | 128                        |
-| outputs                    | probability               |
-| Accuracy                   | acc=69.4%(TOP1)           |
+| Parameters                 | Ascend 910                    | GPU                           |
+| -------------------------- | ----------------------------- |-------------------------------|
+| Resource                   | Ascend 910                    | NV SMX2 V100-32G              |
+| uploaded Date              | 10/09/2021 (month/day/year)   | 09/24/2020 (month/day/year)   |
+| MindSpore Version          | 1.3.0                         | 1.0.0                         |
+| Dataset                    | ImageNet                      | ImageNet                      |
+| batch_size                 | 125                           | 128                           |
+| outputs                    | probability                   | probability                   |
+| Accuracy                   | acc=69.59%(TOP1)              | acc=69.4%(TOP1)               |
 
 # [ModelZoo Homepage](#contents)
 

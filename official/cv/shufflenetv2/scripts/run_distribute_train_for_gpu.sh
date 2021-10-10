@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,32 +13,44 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 3 ] && [ $# != 4 ]
+if [ $# -lt 3 ] || [ $# -gt 4 ]
 then
     echo "Usage: 
-          sh run_distribute_train_for_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
+          sh run_distribute_train_for_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [PRETRAINED_CKPT_FILE](optional)
           "
 exit 1
 fi
 
-if [ $1 -lt 1 ] && [ $1 -gt 8 ]
+# check device number
+if [ "$1" -eq "$1" ] 2>/dev/null
 then
-    echo "error: DEVICE_NUM=$1 is not in (1-8)"
+    if [ $1 -lt 1 ] || [ $1 -gt 8 ]
+    then
+        echo "error: DEVICE_NUM=$1 is not in (1-8)"
+    exit 1
+    fi
+else
+    echo "error: DEVICE_NUM=$1 is not a number"
 exit 1
 fi
 
-# check dataset file
+# check dataset path
 if [ ! -d $3 ]
 then
     echo "error: DATASET_PATH=$3 is not a directory"    
 exit 1
 fi
 
+# check PRETRAINED_CKPT_FILE
+if [ $# == 4 ] && [ ! -f $4 ]
+then
+    echo "error: PRETRAINED_CKPT_FILE=$4 is not a file"    
+exit 1
+fi
+
 export DEVICE_NUM=$1
 export RANK_SIZE=$1
 
-BASEPATH=$(cd "`dirname $0`" || exit; pwd)
-export PYTHONPATH=${BASEPATH}:$PYTHONPATH
 if [ -d "../train" ];
 then
     rm -rf ../train
@@ -51,12 +63,12 @@ export CUDA_VISIBLE_DEVICES="$2"
 if [ $# == 3 ]
 then
     mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
-    python ${BASEPATH}/../train.py --platform='GPU' --is_distributed=True --dataset_path=$3 > train.log 2>&1 &
+    python ../train.py --platform='GPU' --is_distributed=True --enable_tobgr=True --normalize=False --use_nn_default_loss=False --dataset_path=$3 > train.log 2>&1 &
 fi
 
 if [ $# == 4 ]
 then
-    mpirun -n $1 --allow-run-as-root \
-    python ${BASEPATH}/../train.py --platform='GPU' --is_distributed=True --dataset_path=$3 --resume=$4 > train.log 2>&1 &
+    mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+    python ../train.py --platform='GPU' --is_distributed=True --enable_tobgr=True --normalize=False --use_nn_default_loss=False --dataset_path=$3 --resume=$4 > train.log 2>&1 &
 fi
 
