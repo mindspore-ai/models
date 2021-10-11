@@ -141,8 +141,6 @@ def get_config():
     default, helper, choices = parse_yaml(path_args.config_path)
     args = parse_cli_to_yaml(parser=parser, cfg=default, helper=helper, choices=choices, cfg_path=path_args.config_path)
     final_config = merge(args, default)
-    pprint(final_config)
-    print("Please check the above information for the configurations", flush=True)
     final_config = Config(final_config)
     extra_operations(final_config)
     return final_config
