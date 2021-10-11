@@ -212,7 +212,7 @@ def parse_args():
 
 
 if __name__ == "__main__":
-    context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True,
+    context.set_context(mode=context.GRAPH_MODE,
                         device_target="Ascend", save_graphs=False)
     args = parse_args()
     if args.run_modelarts:

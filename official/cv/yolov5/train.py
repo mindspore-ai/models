@@ -54,7 +54,7 @@ def set_default():
         outputs_dir = config.ckpt_path
 
     device_id = get_device_id()
-    context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True, device_target=config.device_target,
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target,
                         save_graphs=False, device_id=device_id)
     # init distributed
     if config.is_distributed:

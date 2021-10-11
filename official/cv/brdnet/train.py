@@ -86,7 +86,7 @@ def get_lr(steps_per_epoch, max_epoch, init_lr):
 
 
 device_id = int(os.getenv('DEVICE_ID', '0'))
-context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True,
+context.set_context(mode=context.GRAPH_MODE,
                     device_target=args.device_target, save_graphs=False)
 
 def train():
