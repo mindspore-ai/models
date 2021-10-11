@@ -1,0 +1,33 @@
+syntax = "proto3";
+package mxpiopenposeproto;
+message MxpiMetaHeader
+{
+string parentName = 1;
+int32 memberId = 2;
+string dataSource = 3;
+}
+
+message MxpiSkeletonInfo
+{
+int32 cocoSkeletonIndex1 = 1;
+int32 cocoSkeletonIndex2 = 2;
+float x0 = 3;
+float y0 = 4;
+float point1Score = 5;
+float x1 = 6;
+float y1 = 7;
+float point2Score = 8;
+float skeletonScore = 9;
+}
+
+message MxpiPersonInfo
+{
+repeated MxpiMetaHeader headerVec = 1;
+repeated MxpiSkeletonInfo skeletonInfoVec = 2;
+float score = 3;
+}
+
+message MxpiPersonList
+{
+repeated MxpiPersonInfo personInfoVec = 1;
+}
