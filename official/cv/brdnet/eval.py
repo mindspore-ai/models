@@ -172,7 +172,7 @@ def test(model_path):
 if __name__ == '__main__':
 
     device_id = int(os.getenv('DEVICE_ID', '0'))
-    context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True,
+    context.set_context(mode=context.GRAPH_MODE,
                         device_target=args.device_target, device_id=device_id, save_graphs=False)
 
     args.logger = get_logger(save_dir, "BRDNet", 0)
