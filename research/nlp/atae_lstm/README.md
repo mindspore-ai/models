@@ -201,6 +201,24 @@ AttentionLSTM模型的输入由aspect和word向量组成，输入部分输入单
 python export.py --existed_ckpt="./train/atae_lstm_max.ckpt"
 ```
 
+## 推理过程
+
+### 用法
+
+在执行推理之前，需要通过export.py导出mindir文件。输入文件为bin格式。
+
+```shell
+# Ascend310 推理
+bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_TARGET] [DEVICE_ID]
+```
+
+`DEVICE_TARGET` 可选值范围为：['GPU', 'CPU', 'Ascend']；
+`DEVICE_ID` 可选, 默认值为0.
+
+### 结果
+
+推理结果保存在当前路径，可在acc.log中看到最终精度结果。
+
 # 模型描述
 
 ## 性能
