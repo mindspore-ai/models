@@ -37,7 +37,7 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 parser = argparse.ArgumentParser(description='MindSpore SimCLR')
 parser.add_argument('--device_target', type=str, default='Ascend',
-                    help='Device target, Currently only Ascend is supported.')
+                    help='Device target, Currently GPU,Ascend are supported.')
 parser.add_argument('--run_cloudbrain', type=ast.literal_eval, default=True,
                     help='Whether it is running on CloudBrain platform.')
 parser.add_argument('--run_distribute', type=ast.literal_eval, default=True, help='Run distributed training.')
@@ -80,9 +80,9 @@ local_data_url = './cache/data'
 local_train_url = './cache/train'
 _local_train_url = local_train_url
 
-if args.device_target != "Ascend":
+if args.device_target != "Ascend" and args.device_target != "GPU":
     raise ValueError("Unsupported device target.")
-if args.run_distribute:
+if args.run_distribute and args.device_target == "Ascend":
     device_id = os.getenv("DEVICE_ID", default=None)
     if device_id is None:
         raise ValueError("Unsupported device id.")
@@ -102,6 +102,14 @@ if args.run_distribute:
     local_data_url = os.path.join(local_data_url, str(args.device_id))
     local_train_url = os.path.join(local_train_url, str(args.device_id))
     args.train_output_path = os.path.join(args.train_output_path, str(args.device_id))
+elif args.run_distribute and args.device_target == "GPU":
+    # GPU target
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, save_graphs=args.save_graphs)
+    init()
+    context.set_auto_parallel_context(device_num=args.device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                      gradients_mean=True)
+    context.set_auto_parallel_context(all_reduce_fusion_config=[85, 160])
+    args.train_output_path = os.path.join(args.train_output_path, str(get_rank()))
 else:
     context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target,
                         save_graphs=args.save_graphs, device_id=args.device_id)

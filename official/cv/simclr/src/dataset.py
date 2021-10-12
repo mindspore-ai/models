@@ -47,7 +47,7 @@ def create_dataset(args, dataset_mode, repeat_num=1):
         dataset_path = args.train_dataset_path
     else:
         dataset_path = args.eval_dataset_path
-    if args.run_distribute and args.device_target == "Ascend":
+    if args.run_distribute:
         data_set = ds.Cifar10Dataset(dataset_path, num_parallel_workers=8, shuffle=True,
                                      num_shards=args.device_num, shard_id=args.device_id)
     else:
@@ -57,8 +57,12 @@ def create_dataset(args, dataset_mode, repeat_num=1):
     if dataset_mode == "train_endcoder":
         if args.use_crop:
             trans += [C.Resize(256, interpolation=Inter.BICUBIC)]
-            trans += [C.RandomResizedCrop(size=(32, 32), scale=(0.31, 1),
-                                          interpolation=Inter.BICUBIC, max_attempts=100)]
+            if (args.run_distribute and args.device_target == "GPU"):
+                trans += [C.RandomResizedCrop(size=(32, 32), scale=(0.18, 1),
+                                              interpolation=Inter.BICUBIC, max_attempts=100)]
+            else:
+                trans += [C.RandomResizedCrop(size=(32, 32), scale=(0.31, 1),
+                                              interpolation=Inter.BICUBIC, max_attempts=100)]
         if args.use_flip:
             trans += [C.RandomHorizontalFlip(prob=0.5)]
         if args.use_color_jitter:

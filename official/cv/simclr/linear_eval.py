@@ -23,7 +23,7 @@ import os
 import argparse
 import numpy as np
 import mindspore.common.dtype as mstype
-from mindspore import nn
+from mindspore import nn, Tensor
 from mindspore import ops
 from mindspore import context
 from mindspore.common.initializer import TruncatedNormal
@@ -41,7 +41,7 @@ from src.optimizer import get_eval_optimizer as get_optimizer
 
 parser = argparse.ArgumentParser(description='Linear Evaluation Protocol')
 parser.add_argument('--device_target', type=str, default='Ascend',
-                    help='Device target, Currently only Ascend is supported.')
+                    help='Device target, Currently CPU,GPU,Ascend are supported.')
 parser.add_argument('--run_distribute', type=ast.literal_eval, default=False, help='Running distributed evaluation.')
 parser.add_argument('--run_cloudbrain', type=ast.literal_eval, default=True,
                     help='Whether it is running on CloudBrain platform.')
@@ -80,7 +80,7 @@ local_data_url = './cache/data'
 local_train_url = './cache/train'
 _local_train_url = local_train_url
 
-if args.device_target != "Ascend":
+if args.device_target != "Ascend" and args.device_target != "GPU" and args.device_target != "CPU":
     raise ValueError("Unsupported device target.")
 if args.run_distribute:
     device_id = os.getenv("DEVICE_ID", default=None)
@@ -186,14 +186,14 @@ if __name__ == "__main__":
         for _, data in enumerate(dataset, start=1):
             _, images, labels = data
             features = simclr_model.inference(images)
-            dataset_train.append([features, labels])
+            dataset_train.append([features.asnumpy(), labels.asnumpy()])
         reporter.info('==========start training linear classifier===============')
         # Train.
         for _ in range(args.epoch_size):
             reporter.epoch_start()
             for idx, data in enumerate(dataset_train, start=1):
                 features, labels = data
-                out = net_Train(features, labels)
+                out = net_Train(Tensor(features), Tensor(labels))
                 reporter.step_end(out)
             reporter.epoch_end(classifier)
         reporter.info('==========end training  linear classifier===============')

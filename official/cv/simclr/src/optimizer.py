@@ -21,10 +21,16 @@ def get_train_optimizer(net, steps_per_epoch, args):
     generate optimizer for updating the weights.
     """
     if args.optimizer == "Adam":
-        lr = get_lr(lr_init=1e-4, lr_end=1e-6, lr_max=9e-4,
-                    warmup_epochs=args.warmup_epochs, total_epochs=args.epoch_size,
-                    steps_per_epoch=steps_per_epoch,
-                    lr_decay_mode="linear")
+        if args.run_distribute:
+            lr = get_lr(lr_init=1e-4, lr_end=1e-6, lr_max=9e-4,
+                        warmup_epochs=args.warmup_epochs, total_epochs=args.epoch_size,
+                        steps_per_epoch=steps_per_epoch,
+                        lr_decay_mode="linear")
+        else:
+            lr = get_lr(lr_init=1e-5, lr_end=1e-7, lr_max=9e-5,
+                        warmup_epochs=args.warmup_epochs, total_epochs=args.epoch_size,
+                        steps_per_epoch=steps_per_epoch,
+                        lr_decay_mode="linear")
         lr = Tensor(lr)
         decayed_params = []
         no_decayed_params = []
@@ -43,7 +49,7 @@ def get_train_optimizer(net, steps_per_epoch, args):
     return optimizer
 
 def get_eval_optimizer(net, steps_per_epoch, args):
-    lr = get_lr(lr_init=1e-3, lr_end=6e-6, lr_max=1e-2,
+    lr = get_lr(lr_init=1e-3, lr_end=1e-5, lr_max=1e-2,
                 warmup_epochs=5, total_epochs=args.epoch_size,
                 steps_per_epoch=steps_per_epoch,
                 lr_decay_mode="linear")
