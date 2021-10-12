@@ -33,6 +33,10 @@ if __name__ == '__main__':
     # modelarts parameter
     parser.add_argument('--data_url', type=str, default=None, help='Dataset path')
     parser.add_argument('--train_url', type=str, default=None, help='Train output path')
+
+    # device target
+    parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU"], default="Ascend",
+                        help="device target")
     # Ascend parameter
     parser.add_argument('--dataset_path', type=str, default=None, help='Dataset path')
     parser.add_argument('--checkpoint_path', type=str, default=None, help='Checkpoint file path')
@@ -41,7 +45,7 @@ if __name__ == '__main__':
     parser.add_argument('--run_modelarts', type=ast.literal_eval, default=False, help='Run distribute')
     args_opt = parser.parse_args()
 
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', save_graphs=False)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
 
     if args_opt.run_modelarts:
         import moxing as mox
@@ -53,8 +57,6 @@ if __name__ == '__main__':
         local_train_url = '/cache/ckpt/'
         mox.file.copy_parallel(args_opt.data_url, local_data_url)
         mox.file.copy_parallel(args_opt.train_url, local_train_url)
-    else:
-        context.set_context(device_id=args_opt.device_id)
 
     # create dataset
     if args_opt.run_modelarts:
@@ -89,6 +91,7 @@ if __name__ == '__main__':
     # eval model
     res = model.eval(dataset)
     if args_opt.run_modelarts:
-        print("result:", res, "ckpt=", local_data_url)
+        if args_opt.device_target == "Ascend":
+            print("result:", res, "ckpt=", local_data_url)
     else:
         print("result:", res, "ckpt=", args_opt.checkpoint_path)

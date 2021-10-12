@@ -19,4 +19,3 @@ DATA_DIR=$2
 python ./train.py  \
     --device_id=$DEVICE_ID  \
     --dataset_path=$DATA_DIR > log.txt 2>&1 &
-

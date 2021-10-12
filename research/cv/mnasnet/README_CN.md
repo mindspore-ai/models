@@ -45,8 +45,8 @@ Mnasnet总体网络架构如下：
 
 # 环境要求
 
-- 硬件（Ascend）
-    - 使用Ascend来搭建硬件环境。
+- 硬件（Ascend/GPU）
+    - 使用Ascend或者GPU来搭建硬件环境。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
@@ -57,13 +57,16 @@ Mnasnet总体网络架构如下：
 
 ## 脚本和样例代码
 
-```python
+```bash
 ├── mnasnet
   ├── README_CN.md                 # MNasNet架构相关描述
   ├── scripts
-  │   ├──run_standalone_train.sh   # 用于单卡训练的shell脚本
-  │   ├──run_distribute_train.sh   # 用于八卡训练的shell脚本
-  │   └──run_eval.sh               # 用于评估的shell脚本
+  │   ├──run_standalone_train.sh   # 用于Ascend单卡训练的shell脚本
+  │   ├──run_distribute_train.sh   # 用于Ascend八卡训练的shell脚本
+  │   ├──run_eval.sh               # 用于Ascend评估的shell脚本
+  │   ├──run_standalone_train_gpu.sh   # 用于GPU单卡训练的shell脚本
+  │   ├──run_distribute_train_gpu.sh   # 用于GPU八卡训练的shell脚本
+  │   └──run_eval_gpu.sh               # 用于GPU评估的shell脚本
   ├── src
   │   ├──models                    # MNasNet架构
   │   │   └──mnasnet.py
@@ -87,15 +90,15 @@ Mnasnet总体网络架构如下：
 'loss_scale': 1024,                       # loss scale
 'momentum': 0.9,                          # 动量参数
 'weight_decay': 1e-5,                     # 权重衰减率
-'epoch_size': 350,                        # 模型迭代次数
+'epoch_size': 250,                        # 模型迭代次数: Ascend:250, GPU:300
 'save_checkpoint': True,                  # 是否保存ckpt文件
 'save_checkpoint_epochs': 1,              # 每迭代相应次数保存一个ckpt文件
 'keep_checkpoint_max': 5,                 # 保存ckpt文件的最大数量
 'save_checkpoint_path': "./checkpoint",   # 保存ckpt文件的路径
 'opt': 'rmsprop',                         # 优化器
 'opt_eps': 0.001,                         # 改善数值稳定性的优化器参数
-'warmup_epochs': 2,                       # warmup epoch数量
-'lr_decay_mode': 'liner',                 # 学习率下降方式
+'warmup_epochs': 5,                       # warmup epoch数量
+'lr_decay_mode': 'other',                 # 学习率下降方式
 'use_label_smooth': True,                 # 是否使用label smooth
 'label_smooth_factor': 0.1,               # 标签平滑因子
 'lr_init': 0.0001,                        # 初始学习率
@@ -114,11 +117,18 @@ Mnasnet总体网络架构如下：
   python:
       Ascend单卡训练示例：python train.py --device_id [DEVICE_ID] --dataset_path [DATA_DIR]
 
+      GPU单卡训练示例：python train.py --dataset_path [DATA_DIR] --device_target="GPU"
+
   shell:
-      Ascend单卡训练示例: sh ./scripts/run_standalone_train.sh [DEVICE_ID] [DATA_DIR]
+      Ascend单卡训练示例: bash ./scripts/run_standalone_train.sh [DEVICE_ID] [DATA_DIR]
       Ascend八卡并行训练:
           cd ./scripts/
-          sh ./run_distribute_train.sh [RANK_TABLE_FILE] [DATA_DIR]
+          bash ./run_distribute_train.sh [RANK_TABLE_FILE] [DATA_DIR]
+
+      GPU单卡训练示例: bash scripts/run_standalone_train_gpu.sh [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
+      GPU八卡并行训练:
+          cd ./scripts/
+          bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
 ```
 
 ### 结果
@@ -151,17 +161,19 @@ epoch time: 301278.408, per step time: 482.045, avg loss: 3.689
 ```shell
 # 评估示例
   python:
-      python eval.py --device_id [DEVICE_ID] --dataset_path [DATA_DIR] --checkpoint_path [PATH_CHECKPOINT]
+      Ascend评估：python eval.py --device_id [DEVICE_ID] --dataset_path [DATA_DIR] --checkpoint_path [PATH_CHECKPOINT]
+      GPU评估：python ./eval.py --checkpoint_path [PATH_CHECKPOINT] --dataset_path [DATA_DIR] --device_target="GPU"
 
   shell:
-      sh ./scripts/run_eval.sh [DEVICE_ID] [DATA_DIR] [PATH_CHECKPOINT]
+      Ascend评估：bash ./scripts/run_eval.sh [DEVICE_ID] [DATA_DIR] [PATH_CHECKPOINT]
+      GPU评估：bash scripts/run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 > 训练过程中可以生成ckpt文件。
 
 ### 结果
 
-可以在 `eval_log.txt` 查看评估结果。
+可以在 `eval.log` 查看评估结果。
 
 ```shell
 result: {'Loss': 2.0364865480325163, 'Top_1_Acc': 0.7412459935897436, 'Top_5_Acc': 0.9159655448717948} ckpt= /disk2/mnas3/model_0/Mnasnet-rank0-250_625.ckpt
@@ -171,22 +183,22 @@ result: {'Loss': 2.0364865480325163, 'Top_1_Acc': 0.7412459935897436, 'Top_5_Acc
 
 ## 训练性能
 
-| 参数                        | Ascend                                |
-| -------------------------- | ------------------------------------- |
-| 模型名称                    | MNasNet                          |
-| 运行环境                    | Ascend 910；CPU 2.60GHz，192核；内存：755G                    |
-| 上传时间                    | 2021-6-11                             |
-| MindSpore 版本             | 1.2.0                                 |
-| 数据集                      | imagenet                              |
-| 训练参数                    | src/config.py                         |
-| 优化器                      | RMSProp                              |
-| 损失函数                    | CrossEntropySmooth         |
-| 最终损失                    | 2.099                                |
-| 精确度 (8p)                 | Top1[74.1%], Top5[91.6%]               |
-| 训练总时间 (8p)             | 20.8h                                    |
-| 评估总时间                  | 1min                                    |
-| 参数量 (M)                 | 61M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/mnasnet) |
+| 参数                        | Ascend                                |       GPU    |
+| -------------------------- | ------------------------------------- | ------------------------------------ |
+| 模型名称                    | MNasNet                          |   MNasNet                                |
+| 运行环境                    | Ascend 910；CPU 2.60GHz，192核；内存：755G | Tesla V100-PCIE 32G; CPU 2.30GHz 56核；内存 256GB  |
+| 上传时间                    | 2021-6-11                             |    2021-7-30                        |
+| MindSpore 版本             | 1.2.0                                 |     1.3.0                            |
+| 数据集                      | imagenet                              |  imagenet                           |
+| 训练参数                    | src/config.py                         |  src/config.py, 其中epoch_size为300 |
+| 优化器                      | RMSProp                              |   RMSProp                 |
+| 损失函数                    | CrossEntropySmooth                   |   CrossEntropySmooth      |
+| 最终损失                    | 2.099                                |   2.023                   |
+| 精确度 (8p)                 | Top1[74.1%], Top5[91.6%]               |  Top1[74.3%], Top5[91.8%]  |
+| 训练总时间 (8p)             | 20.8h                                    |  48h  |
+| 评估总时间                  | 1min                                    |  1min   |
+| 参数量 (M)                 | 61M                                   |     61M
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/mnasnet) | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/mnasnet) |
 
 # 随机情况的描述
 
@@ -194,4 +206,6 @@ result: {'Loss': 2.0364865480325163, 'Top_1_Acc': 0.7412459935897436, 'Top_5_Acc
 
 # ModelZoo
 
+  │   └──run_eval.sh                   # 用于Ascend评估的shell脚本
+  │   └──run_eval_gpu.sh               # 用于GPU评估的shell脚本
 请核对官方 [主页](https://gitee.com/mindspore/models)。
