@@ -13,8 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """
-Upsampling
-
+Upsampling.
 """
 from __future__ import with_statement, print_function, absolute_import
 import numpy as np

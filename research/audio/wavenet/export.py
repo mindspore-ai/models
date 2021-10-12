@@ -12,17 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""export mindir."""
+"""
+Export mindir.
+"""
 import json
 from os.path import join
 import argparse
 from warnings import warn
-import numpy as np
 from hparams import hparams, hparams_debug_string
 from mindspore import context, Tensor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net, export
 from wavenet_vocoder import WaveNet
 from wavenet_vocoder.util import is_mulaw_quantize, is_scalar_input
+import numpy as np
 from src.loss import PredictNet
 
 parser = argparse.ArgumentParser(description='TTS training')
@@ -32,13 +34,13 @@ parser.add_argument('--checkpoint_dir', type=str, default='./checkpoints_test',
 parser.add_argument('--speaker_id', type=str, default='',
                     help=' Use specific speaker of data in case for multi-speaker datasets.')
 parser.add_argument('--pretrain_ckpt', type=str, default='', help='Pretrained checkpoint path')
-parser.add_argument('--platform', type=str, default='GPU', choices=('GPU', 'CPU'),
-                    help='run platform, support GPU and CPU. Default: GPU')
+parser.add_argument('--platform', type=str, default='GPU', help='Running device')
 args = parser.parse_args()
 
 if __name__ == '__main__':
 
-    context.set_context(mode=context.GRAPH_MODE, device_target=args.platform, save_graphs=False)
+    target = args.platform
+    context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
 
     speaker_id = int(args.speaker_id) if args.speaker_id != '' else None
     if args.preset is not None:
@@ -86,15 +88,19 @@ if __name__ == '__main__':
 
     Net = PredictNet(model)
     Net.set_train(False)
+    if target != "Ascend":
+        receptive_field = model.receptive_field
+        print("Receptive field (samples / ms): {} / {}".format(receptive_field, receptive_field / fs * 1000))
     param_dict = load_checkpoint(args.pretrain_ckpt)
     load_param_into_net(model, param_dict)
     print('Successfully loading the pre-trained model')
 
     if is_mulaw_quantize(hparams.input_type):
         x = np.array(np.random.random((2, 256, 10240)), dtype=np.float32)
+        c = np.array(np.random.random((2, 80, 44)), dtype=np.float32)
     else:
-        x = np.array(np.random.random((2, 1, 10240)), dtype=np.float32)
-    c = np.array(np.random.random((2, 80, 44)), dtype=np.float32)
+        x = np.array(np.random.random((2, 1, 4096)), dtype=np.float32)
+        c = np.array(np.random.random((2, 80, 20)), dtype=np.float32)
     g = np.array([0, 0], dtype=np.int64)
 
     export(Net, Tensor(x), Tensor(c), Tensor(g), file_name="WaveNet", file_format='MINDIR')
