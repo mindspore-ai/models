@@ -47,7 +47,6 @@ def modelarts_pre_process():
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_alexnet():
-    print(config)
     print('device id:', get_device_id())
     print('device num:', get_device_num())
     print('rank id:', get_rank_id())

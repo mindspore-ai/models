@@ -155,7 +155,7 @@ def run_post_process():
     """
     run post process
     """
-    print(config)
+    print(config, flush=True)
     cfg = config
     lr_scale = cfg.scale
 

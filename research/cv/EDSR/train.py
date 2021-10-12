@@ -109,7 +109,7 @@ def run_train():
     """
     run train
     """
-    print(config)
+    print(config, flush=True)
     cfg = config
 
     init_env(cfg)
