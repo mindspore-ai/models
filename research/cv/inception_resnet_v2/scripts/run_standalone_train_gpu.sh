@@ -15,7 +15,7 @@
 # ============================================================================
 
 export RANK_SIZE="1"
-export DEVICE_ID="1"
+export DEVICE_ID=$1
 DATA_DIR=$2
 
 rm -rf train_standalone
@@ -25,5 +25,6 @@ echo  "start training for device id $DEVICE_ID"
 env > env.log
 python -u ../train.py \
     --device_id=$DEVICE_ID \
+    --platform=GPU \
     --dataset_path=$DATA_DIR > log.txt 2>&1 &
 cd ../

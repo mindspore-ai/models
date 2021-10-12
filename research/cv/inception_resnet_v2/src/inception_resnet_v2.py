@@ -245,6 +245,7 @@ class InceptionC(nn.Cell):
         self.concat = P.Concat(1)
         if not self.noReLU:
             self.relu = nn.ReLU()
+        self.print = P.Print()
 
     def construct(self, x):
         x0 = self.branch0(x)
@@ -280,7 +281,7 @@ class Inception_resnet_v2(nn.Cell):
         self.conv2d_7b = Conv2d(2080, 1536, kernel_size=1, stride=1)
         self.avgpool = P.ReduceMean(keep_dims=False)
         self.softmax = nn.DenseBnAct(
-            1536, classes, weight_init="XavierUniform", has_bias=True, has_bn=True, activation="logsoftmax")
+            1536, classes, weight_init="XavierUniform", has_bias=True, has_bn=False)
         if is_train:
             self.dropout = nn.Dropout(0.8)
         else:

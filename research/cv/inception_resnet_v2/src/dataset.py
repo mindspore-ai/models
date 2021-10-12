@@ -14,18 +14,14 @@
 # ============================================================================
 """Create train or eval dataset."""
 import os
+
 import mindspore.common.dtype as mstype
 import mindspore.dataset as de
-import mindspore.dataset.vision.c_transforms as C
 import mindspore.dataset.transforms.c_transforms as C2
-from src.config import config_ascend as config
+import mindspore.dataset.vision.c_transforms as C
 
 
-device_id = int(os.getenv('DEVICE_ID'))
-device_num = int(os.getenv('RANK_SIZE'))
-
-
-def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32):
+def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32, config=None):
     """
     Create a train or eval dataset.
 
@@ -40,12 +36,13 @@ def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32):
     """
 
     do_shuffle = bool(do_train)
+    device_num, rank_id = _get_rank_info()
 
     if device_num == 1 or not do_train:
         ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=config.work_nums, shuffle=do_shuffle)
     else:
         ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=config.work_nums,
-                                   shuffle=do_shuffle, num_shards=device_num, shard_id=device_id)
+                                   shuffle=do_shuffle, num_shards=device_num, shard_id=rank_id)
 
     image_length = 299
     if do_train:
@@ -53,16 +50,16 @@ def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32):
             C.RandomCropDecodeResize(image_length, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
             C.RandomHorizontalFlip(prob=0.5),
             C.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4)
-            ]
+        ]
     else:
         trans = [
             C.Decode(),
-            C.Resize((int(image_length/0.875), int(image_length/0.875))),
+            C.Resize((int(image_length / 0.875), int(image_length / 0.875))),
             C.CenterCrop(image_length)
-            ]
+        ]
     trans += [
         C.Rescale(1.0 / 255.0, 0.0),
-        C.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+        C.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         C.HWC2CHW()
     ]
 
@@ -77,3 +74,19 @@ def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32):
     # apply dataset repeat operation
     ds = ds.repeat(repeat_num)
     return ds
+
+
+def _get_rank_info():
+    """
+    get rank size and rank id
+    """
+    rank_size = int(os.environ.get("RANK_SIZE", 1))
+
+    if rank_size > 1:
+        from mindspore.communication.management import get_rank, get_group_size
+        rank_size = get_group_size()
+        rank_id = get_rank()
+    else:
+        rank_size = rank_id = None
+
+    return rank_size, rank_id
