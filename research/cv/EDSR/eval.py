@@ -154,7 +154,7 @@ def run_eval():
     """
     run eval
     """
-    print(config)
+    print(config, flush=True)
     cfg = config
 
     init_env(cfg)
