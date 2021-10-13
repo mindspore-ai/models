@@ -33,6 +33,7 @@ from mindspore.parallel import set_algo_parameters
 from mindspore.parallel._cost_model_context import _set_multi_subgraphs
 from mindspore.nn.wrap.cell_wrapper import PipelineCell, _VirtualDatasetCell
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
+from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 from src.dataset import create_dataset
 from src.pangu_alpha import PanguAlpha, PanguAlphaWithLoss, CrossEntropyLoss
@@ -182,7 +183,7 @@ def run_train(args_opt):
     model = Model(pangu_alpha_with_grads)
 
     if args_opt.pre_trained:
-        load_checkpoint(args_opt, callback_size, ds, model, device_num)
+        restore_checkpoint(args_opt, callback_size, ds, model, pangu_alpha_with_grads, actual_epoch_num)
 
     add_checkpoint_callback_policy(args_opt, callback, rank)
 
@@ -221,50 +222,28 @@ def add_checkpoint_callback_policy(args_param, callback, rank_id):
         callback.append(ckpoint_cb)
 
 
-def load_checkpoint(args_param, sink_size, dataset, model, device_num):
+def restore_checkpoint(args_param, sink_size, dataset, model, network, epoch):
     r"""
     Load checkpoint process.
     """
-    from mindspore.train.serialization import load_distributed_checkpoint
-    strategy = model.infer_train_layout(train_dataset=dataset, sink_size=sink_size)
-    print("======start load_distributed checkpoint", flush=True)
-    # For 2.6B and 13B models, the number of ckpt files is 512.
+    print("======start single checkpoint", flush=True)
     ckpt_name = args_param.ckpt_name_prefix
-    if os.path.isdir(args_param.pre_trained):
-        ckpt_pattern = os.path.join(args_param.save_checkpoint_path, "rank_0",
-                                    f"{ckpt_name}*.ckpt")
-        ckpt_files = glob.glob(ckpt_pattern)
-        if not ckpt_files:
-            print(f"There is no ckpt file in {args_param.load_ckpt_path}, "
-                  f"pre_trained is unsupported.")
-        else:
-            ckpt_files.sort(key=os.path.getmtime, reverse=True)
-            time_stamp = datetime.datetime.now()
-            print(f"time stamp {time_stamp.strftime('%Y.%m.%d-%H:%M:%S')} pre trained ckpt model {ckpt_files} loading",
-                  flush=True)
-            ckpt_file = os.path.basename(ckpt_files[0])
-            ckpt_file_length = ckpt_file.split("_")
-            if len(ckpt_file_length) == 3:
-                depulicate_num = ckpt_file.split("-")[0].split("_")[-1]
-                step_size = ckpt_file.split("-")[-1].split("_")[0]
-                sink_size = ckpt_file.split("-")[-1].split("_")[-1].split(".")[0]
-                ckpt_file_list = [os.path.join(args_param.save_checkpoint_path, f"rank_{ckpt_rank}",
-                                               f"{ckpt_name}{ckpt_rank}_{depulicate_num}-{step_size}_{sink_size}.ckpt")
-                                  for ckpt_rank in range(device_num)]
-                # Load checkpoint files
-                load_distributed_checkpoint(model.train_network, ckpt_file_list, strategy)
-            elif len(ckpt_file_length) == 2:
-                step_size = ckpt_file.split("-")[-1].split("_")[0]
-                sink_size = ckpt_file.split("-")[-1].split("_")[-1].split(".")[0]
-                ckpt_file_list = [os.path.join(args_param.save_checkpoint_path, f"rank_{ckpt_rank}",
-                                               f"{ckpt_name}{ckpt_rank}-{step_size}_{sink_size}.ckpt")
-                                  for ckpt_rank in range(device_num)]
-                # Load checkpoint files
-                load_distributed_checkpoint(model.train_network, ckpt_file_list, strategy)
-            else:
-                print(f"Please check {args_param.pre_trained} value.")
-    else:
-        print(f"Please check {args_param.pre_trained} value.")
+    ckpt_pattern = os.path.join(args_param.save_checkpoint_path, "rank_{}".format(D.get_rank()),
+                                f"{ckpt_name}*.ckpt")
+    ckpt_files = glob.glob(ckpt_pattern)
+    if not ckpt_files:
+        raise ValueError(f"There is no ckpt file in {args_param.load_ckpt_path}, "
+                         f"pre_trained is unsupported, current ckpt_files found is {ckpt_files} "
+                         f"with pattern {ckpt_pattern}")
+    ckpt_files.sort(key=os.path.getmtime, reverse=True)
+    time_stamp = datetime.datetime.now()
+    print(f"time stamp {time_stamp.strftime('%Y.%m.%d-%H:%M:%S')} pre trained ckpt model {ckpt_files} loading",
+          flush=True)
+    # Load checkpoint files latest file
+    print(f'Start to load from {ckpt_files[0]}')
+    param_dict = load_checkpoint(ckpt_files[0])
+    model.build(train_dataset=dataset, sink_size=sink_size, epoch=epoch)
+    load_param_into_net(network, param_dict)
 
 
 def run_train_pipeline(args_opt):

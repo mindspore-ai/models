@@ -104,7 +104,7 @@ As the format of the downstream tasks can be various, the `preprocess.py` provid
 Suppose the text data is under the `./data` and **each text file ends with 'txt'**, we can run the following command to generate the mindrecord files with seq_length=1025.
 
 ```bash
-python -m src.preprocess --input_glob  data/*.txt --tokenizer gpt --eot 50256 --data_column_name input_ids --seq_length 1025
+python -m src.preprocess --input_glob  'data/*.txt' --tokenizer gpt --eot 50256 --data_column_name input_ids --seq_length 1025
 ```
 
 The script will chunk the each line with 1025 tokens. For the chunk with no more 1025 tokens, the chunk will be ignored.
@@ -492,3 +492,7 @@ For Serving and flask server, extra requirements:
 Q: `Unexpected error. MindRecordOp init failed, illegal column list`.
 
 A: It's because the feature column name in `dataset.py` is not consistent with the name in mindrecord. Pleasse pass args `--data_column_name your_feature name` to the `run_distribute_train.sh`
+
+Q: `ERROR: device_num must be the power of 2`.
+
+A: The number of the cards must be the power of 2 if we use the parallel training. For example, if we want to train the 2.6B model, the number of cards should be 2, 4, 8, 16 and so on.
