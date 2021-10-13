@@ -17,10 +17,8 @@
 if [ $# != 2 ]
 then
     echo "=============================================================================================================="
-    echo "Usage: bash scripts/run_distribute_train8p.sh [RANK_TABLE_FILE] [PROJECT_PATH]"
-    echo "Please run the script as: "
-    echo "bash scripts/run_distribute_train8p.sh [RANK_TABLE_FILE] [PROJECT_PATH]"
-    echo "for example: bash scripts/run_distribute_train8p.sh /absolute/path/to/RANK_TABLE_FILE /root/ICNet/"
+    echo "Usage: bash scripts/run_train1p.sh [PROJECT_PATH] [DEVICE_ID]"
+    echo "for example: bash scripts/run_train1p.sh /root/ICNet/ 0"
     echo "=============================================================================================================="
     exit 1
 fi
@@ -33,33 +31,22 @@ get_real_path(){
   fi
 }
 
-PATH2=$(get_real_path $2)
+PATH1=$(get_real_path $1)
 
 
-if [ ! -d $PATH2 ]
+if [ ! -d $PATH1 ]
 then
-    echo "error: PROJECT_PATH=$PATH2 is not a directory"
+    echo "error: PROJECT_PATH=$PATH1 is not a directory"
 exit 1
 fi
 
-export HCCL_CONNECT_TIMEOUT=600
-export RANK_SIZE=8
 
-for((i=0;i<$RANK_SIZE;i++))
-do
-    rm -rf LOG$i
-    mkdir ./LOG$i
-    cp ./*.py ./LOG$i
-    cp -r ./src ./LOG$i
-    cd ./LOG$i || exit
-    export RANK_TABLE_FILE=$1
-    export RANK_SIZE=8
-    export RANK_ID=$i
-    export DEVICE_ID=$i
-    echo "start training for rank $i, device $DEVICE_ID"
-    env > env.log
+rm -rf LOG
+mkdir ./LOG
+export RANK_SIZE=1
+export RANK_ID=0
+export DEVICE_ID=$2
+echo "start training for device $DEVICE_ID"
+env > env.log
 
-    python3 train.py --project_path=$PATH2 > log.txt 2>&1 &
-
-    cd ../
-done
+python3 train.py --project_path=$PATH1 > log.txt 2>&1 &
