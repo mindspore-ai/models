@@ -86,27 +86,6 @@ bash run_standalone_eval_ascend.sh [DATA_PATH] [CKPT_NAME]
 - Running on [ModelArts](https://support.huaweicloud.com/modelarts/)
 
     ```bash
-    # Train 8p with Ascend
-    # (1) Perform a or b.
-    #       a. Set "enable_modelarts=True" on default_config.yaml file.
-    #          Set "distribute=True" on default_config.yaml file.
-    #          Set "data_path='/cache/data'" on default_config.yaml file.
-    #          Set "ckpt_path='/cache/train'" on default_config.yaml file.
-    #          (optional)Set "checkpoint_url='s3://dir_to_your_pretrained/'" on default_config.yaml file.
-    #          Set other parameters on default_config.yaml file you need.
-    #       b. Add "enable_modelarts=True" on the website UI interface.
-    #          Add "data_path='/cache/data'" on the website UI interface.
-    #          Add "ckpt_path='/cache/train'" on the website UI interface.
-    #          (optional)Add "checkpoint_url='s3://dir_to_your_pretrained/'" on the website UI interface.
-    #          Add other parameters on the website UI interface.
-    # (2) Prepare model code.
-    # (3) Upload or copy your pretrained model to S3 bucket if you want to finetune.
-    # (4) Upload the original mnist_data dataset to S3 bucket.
-    # (5) Set the code directory to "/path/lenet" on the website UI interface.
-    # (6) Set the startup file to "train.py" on the website UI interface.
-    # (7) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
-    # (8) Create your job.
-    #
     # Train 1p with Ascend
     # (1) Perform a or b.
     #       a. Set "enable_modelarts=True" on default_config.yaml file.
