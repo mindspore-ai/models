@@ -9,7 +9,8 @@
     - [Script Parameters](#script-parameters)
     - [Training Process](#training-process)
         - [Prepare Dataset](#prepare-dataset)
-        - [Distributed Training](#distributed-training)
+        - [Pre-training](#pre-training)
+        - [Training](#training)
         - [Training Results](#training-results)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
@@ -159,7 +160,13 @@ The folder Res50V1_PRE contains the scripts for pre-training and its dataset is 
 
 The hccl.json file specified by [RANK_TABLE_FILE] is used when running distributed tasks. You can use [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) to generate this file.
 
-### Distributed Training
+### Training
+
+- Train on a single card
+
+```shell
+    bash scripts/run_train1p.sh [PROJECT_PATH] [DEVICE_ID]
+```
 
 - Run distributed train in ascend processor environment
 

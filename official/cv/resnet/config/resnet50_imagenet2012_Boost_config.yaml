@@ -23,7 +23,7 @@ batch_size: 256
 loss_scale: 1024
 momentum: 0.85
 weight_decay: 5.0e-5
-epoch_size: 45 
+epoch_size: 38
 pretrain_epoch_size: 0
 save_checkpoint: False
 save_checkpoint_epochs: 5
@@ -33,7 +33,7 @@ lr_decay_mode: "poly"
 use_label_smooth: True
 label_smooth_factor: 0.1
 lr_init: 0
-lr_max: 13.01
+lr_max: 13.96
 lr_end: 0.0
 lars_epsilon: 0.0
 lars_coefficient: 0.001
