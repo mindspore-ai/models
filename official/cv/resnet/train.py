@@ -133,8 +133,6 @@ def set_parameter():
     if target == "CPU":
         config.run_distribute = False
 
-    config.save_graphs = not config.pre_trained
-
     # init context
     if config.mode_name == 'GRAPH':
         if target == "Ascend":
