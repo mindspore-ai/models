@@ -17,14 +17,18 @@
 echo "=============================================================================================================="
 echo "Please run the script as: "
 echo "bash run.sh DATA_PATH"
-echo "For example: bash run.sh path/MS1M"
+echo "For example: bash run.sh /path/dataset"
 echo "It is better to use the absolute path."
 echo "=============================================================================================================="
-
-# shellcheck disable=SC2034
+EXE_PATH=$(pwd)
 DATA_PATH=$1
 
 python train.py  \
---data_url DATA_PATH \
---device_num 1 \
-> train.log 2>&1 &
+    --epochs 100 \
+    --train_url "$EXE_PATH" \
+    --data_url "$DATA_PATH" \
+    --device_target "GPU" \
+    --pretrained \
+    > train.log 2>&1 &
+echo "start training"
+cd ../
