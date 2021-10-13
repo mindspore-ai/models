@@ -46,7 +46,7 @@ mkdir ./LOG
 export RANK_SIZE=1
 export RANK_ID=0
 export DEVICE_ID=$2
-echo "start training for rank $i, device $DEVICE_ID"
+echo "start training for device $DEVICE_ID"
 env > env.log
 
-python3 train.py --project_path=$PATH2 > log.txt 2>&1 &
+python3 train.py --project_path=$PATH1 > log.txt 2>&1 &
