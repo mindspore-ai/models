@@ -27,7 +27,31 @@ def linear_warmup_lr(current_step, warmup_steps, base_lr, init_lr):
 
 
 def warmup_step_lr(lr, lr_epochs, steps_per_epoch, warmup_epochs, max_epoch, gamma=0.1):
-    """Warmup step learning rate."""
+    """
+    Warmup step learning rate.
+
+    We use warmup step to optimize learning rate. Learning rate will increase from
+    0 to the learning rate you set by
+    linear_warmup_lr(initlr + \\frac{currentstep}{warmupstep}\\times (baselr - initlr)).
+    After the increasing step, it will drop by
+    polynomial(lr\\times gamma^{stepscounter_i}, stepcounter is the number of steps in
+    this epoch).
+
+    Args:
+        lr(float): The learning rate you set.
+        lr_epochs(list): Index of the epoch which leads a decay of learning rate.
+        steps_per_epoch(int): Steps in one epoch.
+        warmup_epochs(int): Index of the epoch which ends the warm_up step.
+        max_epoch(int): Numbers of epochs.
+        gamma(float): Parameter in decay function. Default:0.1.
+
+    Returns:
+        ndarray, learning rate of each step.
+
+    Examples:
+        >>> warmup_step_lr(0.01, [1,3,5,7,9], 1000, 5, 10)
+        <<< array([2.e-06, 4.e-06, 6.e-06, ..., 1.e-05, 1.e-05, 1.e-05], dtype=float32)
+    """
     base_lr = lr
     warmup_init_lr = 0
     total_steps = int(max_epoch * steps_per_epoch)
@@ -52,10 +76,54 @@ def warmup_step_lr(lr, lr_epochs, steps_per_epoch, warmup_epochs, max_epoch, gam
 
 
 def multi_step_lr(lr, milestones, steps_per_epoch, max_epoch, gamma=0.1):
+    """
+    Multi step learning rate.
+
+    We use multi step to optimize learning rate. Learning rate will drop from the
+    lr you set at milestone by
+    polynomial(lr\\times gamma^{stepscounter_i}, stepcounter is the number of steps
+    in this epoch).
+
+    Args:
+        lr(float): The learning rate you set.
+        lr_epochs(list): Index of the epoch which leads a decay of learning rate.
+        steps_per_epoch(int): Steps in one epoch.
+        max_epoch(int): Numbers of epochs.
+        gamma(float): Parameter in decay function. Default:0.1.
+
+    Returns:
+        ndarray, learning rate of each step.
+
+    Examples:
+        >>> multi_step_lr(0.01, [1,3,5,7,9], 1000, 10)
+        <<< array([1.e-02, 1.e-02, 1.e-02, ..., 1.e-07, 1.e-07, 1.e-07], dtype=float32)
+    """
     return warmup_step_lr(lr, milestones, steps_per_epoch, 0, max_epoch, gamma=gamma)
 
 
 def step_lr(lr, epoch_size, steps_per_epoch, max_epoch, gamma=0.1):
+    """
+    Step drop learning rate.
+
+    We use step drop to optimize learning rate.Learning rate will drop from the lr you
+    set each epoch_size by
+    polynomial(lr\\times gamma^{stepscounter_i}, stepcounter is the number of steps
+    in this epoch).
+
+    Args:
+        lr(float): The learning rate you set.
+        epoch_size(int): Numbers of epochs one decay.
+        steps_per_epoch(int): Steps in one epoch.
+        max_epoch(int): Numbers of epochs.
+        gamma(float): Parameter in decay function. Default:0.1.
+
+    Returns:
+        ndarray, learning rate of each step.
+
+    Examples:
+        >>> step_lr(0.01, 5, 1000, 10)
+        <<< array([0.01 , 0.01 , 0.01 , ..., 0.001, 0.001, 0.001], dtype=float32)
+    """
     lr_epochs = []
     for i in range(1, max_epoch):
         if i % epoch_size == 0:
