@@ -10,6 +10,7 @@ output_path: "/cache/train"
 load_path: "/cache/checkpoint_path"
 device_target: "Ascend"
 enable_profiling: False
+loss_scale: 128
 
 # ==============================================================================
 pos_dir: 'data/rt-polaritydata/rt-polarity.pos'
