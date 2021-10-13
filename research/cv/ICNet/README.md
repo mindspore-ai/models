@@ -148,7 +148,7 @@ keep_checkpoint_max: 10
 
 ### Pre-training
 
-The folder Res50V1_PRE contains the scripts for pre-training and its dataset is [image net](https://image-net.org/). More details in [GENet_Res50](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/GENet_Res50)
+The folder Res50V1_PRE contains the scripts for pre-training and its dataset is [image net](https://image-net.org/). More details in [GENet_Res50](https://gitee.com/mindspore/models/tree/master/research/cv/GENet_Res50)
 
 - Usage:
 
@@ -158,9 +158,15 @@ The folder Res50V1_PRE contains the scripts for pre-training and its dataset is 
 
 - Notes:
 
-The hccl.json file specified by [RANK_TABLE_FILE] is used when running distributed tasks. You can use [hccl_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools) to generate this file.
+The hccl.json file specified by [RANK_TABLE_FILE] is used when running distributed tasks. You can use [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) to generate this file.
 
-### Distributed Training
+### Training
+
+- Train on a single card
+
+```shell
+    bash scripts/run_train1p.sh [PROJECT_PATH] [DEVICE_ID]
+```
 
 - Run distributed train in ascend processor environment
 
@@ -221,18 +227,18 @@ avgtime 0.19648232793807982
 
 ## Performance
 
-### Training Performance
+### Distributed Training Performance
 
 |Parameter              | ICNet                                                   |
 | ------------------- | --------------------------------------------------------- |
 |resources              | Ascend 910；CPU 2.60GHz, 192core；memory：755G |
 |Upload date            |2021.6.1                    |
 |mindspore version      |mindspore1.2.0     |
-|training parameter     |epoch=160,batch_size=32   |
+|training parameter     |epoch=160,batch_size=4   |
 |optimizer              |SGD optimizer，momentum=0.9,weight_decay=0.0001    |
 |loss function          |SoftmaxCrossEntropyLoss   |
-|training speed         | epoch time：285693.557 ms per step time :42.961 ms |
-|total time             |about 5 hours    |
+|training speed         | epoch time：21469.152 ms(8pcs) per step time :230.851 ms(8pcs) |
+|total time             |1h1m34s(8pcs)    |
 |Script URL             |   |
 |Random number seed     |set_seed = 1234     |
 
@@ -242,4 +248,4 @@ The seed in the `create_icnet_dataset` function is set in `cityscapes_mindrecord
 
 # [ModelZoo Homepage](#Content)
 
-Please visit the official website [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please visit the official website [homepage](https://gitee.com/mindspore/models).
