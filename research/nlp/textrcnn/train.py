@@ -24,6 +24,7 @@ from mindspore.train import Model
 from mindspore.nn.metrics import Accuracy
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.common import set_seed
+from mindspore.train.loss_scale_manager import FixedLossScaleManager
 
 from src.dataset import create_dataset
 from src.dataset import convert_to_mindrecord
@@ -52,8 +53,6 @@ def run_train():
 
     device_id = get_device_id()
     context.set_context(device_id=device_id)
-    if cfg.device_target == "GPU" and cfg.cell == "lstm":
-        context.set_context(enable_graph_kernel=True)
 
     if cfg.preprocess == 'true':
         print("============== Starting Data Pre-processing ==============")
@@ -72,18 +71,23 @@ def run_train():
 
     ds_train = create_dataset(cfg.preprocess_path, cfg.batch_size, True)
     step_size = ds_train.get_dataset_size()
-
+    cfg.loss_scale = cfg.loss_scale if cfg.cell == "lstm" and cfg.device_target == "GPU" else 1.0
+    loss_scale = FixedLossScaleManager(cfg.loss_scale, drop_overflow_update=True)
     loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True)
     lr = get_lr(cfg, step_size)
     num_epochs = cfg.num_epochs
     if cfg.cell == "lstm":
         num_epochs = cfg.lstm_num_epochs
 
-    opt = nn.Adam(params=network.trainable_params(), learning_rate=lr)
+    opt = nn.Adam(params=network.trainable_params(), learning_rate=lr, loss_scale=cfg.loss_scale)
 
     loss_cb = LossMonitor()
     time_cb = TimeMonitor()
-    model = Model(network, loss, opt, {'acc': Accuracy()}, amp_level="O3")
+    if cfg.cell == "lstm" and cfg.device_target == "GPU":
+        model = Model(network, loss_fn=loss, optimizer=opt, metrics={'acc': Accuracy()}, amp_level="O3",
+                      loss_scale_manager=loss_scale)
+    else:
+        model = Model(network, loss_fn=loss, optimizer=opt, metrics={'acc': Accuracy()}, amp_level="O3")
 
     print("============== Starting Training ==============")
     config_ck = CheckpointConfig(save_checkpoint_steps=cfg.save_checkpoint_steps,
