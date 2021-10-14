@@ -135,6 +135,8 @@ MindSpore is Apache 2.0 licensed. Please see the LICENSE file.
 
 ## FAQ
 
+For more information about `MindSpore` framework, please refer to [FAQ](https://www.mindspore.cn/docs/faq/en/master/index.html)
+
 - **Q: How to resolve the lack of memory while using the model directly under "models" with errors such as *Failed to alloc memory pool memory*?**
 
   **A**: The typical reason for insufficient memory when directly using models under "models" is due to differences in operating mode (`PYNATIVE_MODE`), operating environment configuration, and license control (AI-TOKEN). `PYNATIVE_MODE` usually uses more memory than `GRAPH_MODE` , especially in the training graph that needs back propagation calculation, you can try to use some smaller batch size; the operating environment will also cause similar problems due to the different configurations of NPU cores, memory, etc.; different gears of License control (AI-TOKEN ) will cause different memory overhead during execution. You can also try to use some smaller batch sizes.
