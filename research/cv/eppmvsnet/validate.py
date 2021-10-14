@@ -74,7 +74,7 @@ def get_opts():
 if __name__ == "__main__":
     args = get_opts()
     context.set_context(mode=0, device_target='GPU', device_id=args.gpu_id, save_graphs=False,
-                        enable_graph_kernel=True)
+                        enable_graph_kernel=False)
 
     dataset = BlendedMVSDataset(args.root_dir, args.split, n_views=args.n_views, depth_interval=args.depth_interval,
                                 img_wh=tuple(args.img_wh), levels=args.levels, scan=args.scan)
