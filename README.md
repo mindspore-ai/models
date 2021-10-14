@@ -135,10 +135,10 @@ MindSpore is Apache 2.0 licensed. Please see the LICENSE file.
 
 ## FAQ
 
-- **Q: How to resolve the lack of memory while using `PYNATIVE_MODE` with errors such as *Failed to alloc memory pool memory*?**
+- **Q: How to resolve the lack of memory while using the model directly under "models" with errors such as *Failed to alloc memory pool memory*?**
 
-  **A**: `PYNATIVE_MODE` usually requires more memory than `GRAPH_MODE`, especially in training process which have to deal with back propagation. You could try using smaller batch size.
+  **A**: The typical reason for insufficient memory when directly using models under "models" is due to differences in operating mode (`PYNATIVE_MODE`), operating environment configuration, and license control (AI-TOKEN). `PYNATIVE_MODE` usually uses more memory than `GRAPH_MODE` , especially in the training graph that needs back propagation calculation, you can try to use some smaller batch size; the operating environment will also cause similar problems due to the different configurations of NPU cores, memory, etc.; different gears of License control (AI-TOKEN ) will cause different memory overhead during execution. You can also try to use some smaller batch sizes.
 
-- **Q: How to resolve the error about the interface not supported, such as `cann not import`?**
+- **Q: How to resolve the error about the interface are not supported in some network operations, such as `cann not import`?**
 
   **A**: Please check the version of MindSpore and the branch you fetch the modelzoo scripts. Some model scripits in latest branch will use new interface in the latest version of MindSpore.
