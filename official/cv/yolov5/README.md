@@ -12,6 +12,10 @@
         - [Distributed Training](#distributed-training)  
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
+    - [Inference Process](#inference-process)
+        - [Export MindIR](#export-mindir)
+        - [Infer on Ascend310](#infer-on-ascend310)
+        - [result](#result)
 - [Model Description](#model-description)
 - [Performance](#performance)  
     - [Evaluation Performance](#evaluation-performance)
@@ -268,6 +272,51 @@ Average Recall (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.395
 Average Recall (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.619
 Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
 2020-12-21 17:16:40,322:INFO:testing cost time 0.35h
+```
+
+## Inference Process
+
+### [Export MindIR](#contents)
+
+```shell
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+The ckpt_file parameter is required,
+`file_format` should be in ["AIR", "MINDIR"]
+
+### Infer on Ascend310
+
+Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
+Current batch_Size can only be set to 1.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DVPP] [DEVICE_ID]
+```
+
+- `DVPP` is mandatory, and must choose from ["DVPP", "CPU"], it's case-insensitive. The DVPP hardware restricts width 16-alignment and height even-alignment. Therefore, the network needs to use the CPU operator to process images.
+- `DATA_PATH` is mandatory, path of the dataset containing images.
+- `ANN_FILE` is mandatory, path to annotation file.
+- `DEVICE_ID` is optional, default value is 0.
+
+### result
+
+Inference result is saved in current path, you can find result like this in acc.log file.
+
+```bash
+Average Precision (AP) @[ IoU=0.50:0.95 | area= all | maxDets=100 ] = 0.369
+Average Precision (AP) @[ IoU=0.50 | area= all | maxDets=100 ] = 0.573
+Average Precision (AP) @[ IoU=0.75 | area= all | maxDets=100 ] = 0.395
+Average Precision (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.218
+Average Precision (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.418
+Average Precision (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.482
+Average Recall (AR) @[ IoU=0.50:0.95 | area= all | maxDets= 1 ] = 0.298
+Average Recall (AR) @[ IoU=0.50:0.95 | area= all | maxDets= 10 ] = 0.501
+Average Recall (AR) @[ IoU=0.50:0.95 | area= all | maxDets=100 ] = 0.557
+Average Recall (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.395
+Average Recall (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.619
+Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
 ```
 
 # [Model Description](#contents)
