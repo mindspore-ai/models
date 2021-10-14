@@ -399,16 +399,16 @@ You will get the result as following in "./scripts/acc.log" if 'dis_dataset' ran
 | Parameters                 | Face Recognition                                            | Face Recognition   |
 | -------------------------- | ----------------------------------------------------------- | ------------------ |
 | Model Version              | V1                                                          | V1                 |
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | NV SMX2 V100-32G   |
-| uploaded Date              | 09/30/2020 (month/day/year)                        | 29/07/2021 (month/day/year) |
-| MindSpore Version          | 1.0.0                                                       | 1.3.0              |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | NV PCIE V100-32G   |
+| uploaded Date              | 09/30/2020 (month/day/year)                        | 14/10/2021 (month/day/year) |
+| MindSpore Version          | 1.0.0                                                       | 1.5.0              |
 | Dataset                    | 4.7 million images                                          | 4.7 million images |
 | Training Parameters        | epoch=100, batch_size=192, momentum=0.9 | epoch=18(base:9, beta:9), batch_size=192, momentum=0.9 |
 | Optimizer                  | Momentum                                                    | Momentum           |
 | Loss Function              | Cross Entropy                                               | Cross Entropy      |
 | outputs                    | probability                                                 | probability        |
-| Speed                      | 1pc: 350-600 fps; 8pcs: 2500-4500 fps    | base: 1pc: 310-360 fps, 8pcs: 2000-2500 fps; beta: 1pc: 420-470 fps, 8pcs: 3000-3500 fps; |
-| Total time                 | 1pc: NA hours; 8pcs: 10 hours   | 1pc: NA hours; 8pcs: 5.5(base) + 3.7(beta) hours |
+| Speed                      | 1pc: 350-600 fps; 8pcs: 2500-4500 fps    | base: 1pc: 290-310 fps, 8pcs: 2050-2150 fps; beta: 1pc: 400-430 fps, 8pcs: 2810-2860 fps |
+| Total time                 | 1pc: NA hours; 8pcs: 10 hours   | 1pc: NA hours; 8pcs: 5.6(base) + 4.2(beta) hours |
 | Checkpoint for Fine tuning | 584M (.ckpt file)            | 768M (.ckpt file, base), 582M (.ckpt file, beta)  |
 
 ### Evaluation Performance

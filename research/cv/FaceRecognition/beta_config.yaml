@@ -45,7 +45,7 @@ lr_scale: 1
 lr_epochs: "8,14,18"
 weight_decay: 0.0002
 momentum: 0.9
-max_epoch: 20
+max_epoch: 9
 pretrained: "your_pretrained_model"
 warmup_epochs: 2
 
