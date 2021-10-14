@@ -135,7 +135,7 @@ MindSpore已获得Apache 2.0许可，请参见LICENSE文件。
 
 ## FAQ
 
-- **Q: 由于运行模式`PYNATIVE_MODE`运行模型出现错误内存不足，例如*Failed to alloc memory pool memory*, 该怎么处理?**
+- **Q: 直接使用models下的模型出现错误内存不足，例如*Failed to alloc memory pool memory*, 该怎么处理?**
 
   **A**: 直接使用models下的模型出现内存不足典型的原因是由于运行模式（`PYNATIVE_MODE`)、运行环境配置、License控制（AI-TOKEN）的不同造成的：`PYNATIVE_MODE`通常比`GRAPH_MODE`使用更多内存，尤其是在需要进行反向传播计算的训练图中，你可以尝试使用一些更小的batch size；运行环境由于NPU的核数、内存等配置不同也会产生类似问题；License控制（AI-TOKEN）的不同档位会造成执行过程中内存开销不同，也可以尝试使用一些更小的batch size。
 
