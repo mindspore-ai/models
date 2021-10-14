@@ -16,14 +16,16 @@
 import math
 import os
 import time
+
 import numpy as np
+import mindspore.common.dtype as mstype
 from mindspore import ops, load_checkpoint, load_param_into_net, Tensor, nn
 from mindspore.ops import functional as F
 from mindspore.ops import operations as P
-import mindspore.common.dtype as mstype
 from mindspore.train.callback import Callback, ModelCheckpoint
-from src.resnet import resnet50
+
 from src.config import config
+from src.resnet import resnet50
 
 m_for_scrutinizer = config.m_for_scrutinizer
 K = config.topK
@@ -151,6 +153,7 @@ class NTS_NET(nn.Cell):
         if resnet50Path != "":
             param_dict = load_checkpoint(resnet50Path)
             load_param_into_net(feature_extractor, param_dict)
+            print(20 * '=' + "Load Weights Successfully" + 20 * '=')
         self.feature_extractor = feature_extractor  # Backbone
         self.feature_extractor.end_point = _fc(512 * 4, num_classes)
         self.navigator = Navigator()  # Navigator
@@ -258,7 +261,6 @@ class WithLossCell(nn.Cell):
         self.oneTensor = Tensor(1.0, mstype.float32)
         self.zeroTensor = Tensor(0.0, mstype.float32)
         self.opReshape = ops.Reshape()
-        self.opOnehot = ops.OneHot()
         self.oplogsoftmax = ops.LogSoftmax()
         self.opZeros = ops.Zeros()
         self.opOnes = ops.Ones()
@@ -282,11 +284,10 @@ class WithLossCell(nn.Cell):
         log_softmax_teacher_out = -1 * self.oplogsoftmax(teacher_out)
         log_softmax_teacher_out_result = self.opGatherD(log_softmax_teacher_out, 1, origin_label_repeatk_unsqueeze)
         log_softmax_teacher_out_result = self.opReshape(log_softmax_teacher_out_result, (batch_size, K))
-        oneHotLabel = self.opOnehot(origin_label, num_classes, self.oneTensor, self.zeroTensor)
         # using resnet_out to calculate resnet_real_out_loss
-        resnet_real_out_loss = self._loss_fn(resnet_out, oneHotLabel)
+        resnet_real_out_loss = self._loss_fn(resnet_out, origin_label)
         # using scrutinizer_out to calculate scrutinizer_out_loss
-        scrutinizer_out_loss = self._loss_fn(scrutinizer_out, oneHotLabel)
+        scrutinizer_out_loss = self._loss_fn(scrutinizer_out, origin_label)
         # using teacher_out and top_k_info to calculate ranking loss
         loss = self.opZeros((), mstype.float32)
         num = top_k_info.shape[0]
@@ -301,9 +302,8 @@ class WithLossCell(nn.Cell):
             loss_p = self.reducesumop(loss_p_temp)
             loss += loss_p
         rank_loss = loss / num
-        oneHotLabel2 = self.opOnehot(origin_label_repeatk, num_classes, self.oneTensor, self.zeroTensor)
         # using teacher_out to calculate teacher_loss
-        teacher_loss = self._loss_fn(teacher_out, oneHotLabel2)
+        teacher_loss = self._loss_fn(teacher_out, origin_label_repeatk)
         total_loss = resnet_real_out_loss + rank_loss + scrutinizer_out_loss + teacher_loss
         return total_loss
 

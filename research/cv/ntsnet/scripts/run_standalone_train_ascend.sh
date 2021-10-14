@@ -14,11 +14,17 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 3 ]
-then 
-    echo "Usage: sh run_eval.sh [DATA_URL] [TRAIN_URL] [CKPT_FILENAME]"
+if [ $# != 2 ]
+then
+    echo "Usage: bash run_standalone_train_ascend.sh [DATA_URL] [TRAIN_URL] [DEVICE_ID(optional)]"
 exit 1
 fi
+
+export DEVICE_ID=0
+
+if [ $# = 3 ] ; then
+  export DEVICE_ID=$3
+fi;
 
 get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
@@ -27,46 +33,38 @@ get_real_path(){
     echo "$(realpath -m $PWD/$1)"
   fi
 }
-
 PATH1=$(get_real_path $1)
+echo $PATH1
 PATH2=$(get_real_path $2)
-PATH3=$(get_real_path $3)
+echo $PATH2
 
 if [ ! -d $PATH1 ]
-then 
+then
     echo "error: DATA_URL=$PATH1 is not a directory"
-exit 1
-fi 
-
-if [ ! -d $PATH2 ]
-then 
-    echo "error: TRAIN_URL=$PATH2 is not a directory"
 exit 1
 fi
 
-if [ ! -f $PATH3 ]
+if [ ! -d $PATH2 ]
 then
-    echo "error: CKPT_FILENAME=$PATH3 is not a file"
+    echo "error: TRAIN_URL=$PATH2 is not a directory"
 exit 1
 fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=0
-export RANK_SIZE=$DEVICE_NUM
 export RANK_ID=0
+export RANK_SIZE=1
 
-if [ -d "eval" ];
+if [ -d "train" ];
 then
-    rm -rf ./eval
+    rm -rf ./train
 fi
-mkdir ./eval
-cp ../*.py ./eval
-cp *.sh ./eval
-cp -r ../src ./eval
-cd ./eval || exit
+mkdir ./train
+cp ../*.py ./train
+cp *.sh ./train
+cp -r ../src ./train
+cd ./train || exit
+echo "start training for device $DEVICE_ID"
 env > env.log
-echo "start evaluation for device $DEVICE_ID"
-python eval.py --device_id=$DEVICE_ID --data_url=$PATH1 --train_url=$PATH2 \
-                --ckpt_filename=$PATH3 &> log &
+python train.py --device_id=$DEVICE_ID --data_url=$PATH1 --train_url=$PATH2 --device_target="Ascend"&> log &
 cd ..
