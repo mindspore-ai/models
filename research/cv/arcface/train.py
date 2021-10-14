@@ -22,12 +22,10 @@ import numpy as np
 import mindspore.nn as nn
 from mindspore import context, Tensor
 import mindspore.ops as ops
-from mindspore.context import ParallelMode
-from mindspore.train.model import Model
+from mindspore.train.model import Model, ParallelMode
 from mindspore import dtype as mstype
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
-from mindspore.communication.management import init
-from mindspore.communication import management as MutiDev
+from mindspore.communication.management import init, get_rank
 from mindspore.parallel import _cost_model_context as cost_model_context
 from mindspore.parallel import set_algo_parameters
 
@@ -60,17 +58,17 @@ parser.add_argument('--weight-decay', '--wd', default=1e-4, type=float,
                     metavar='W', help='weight decay (default: 1e-4)')
 # Device options
 parser.add_argument('--device_target', type=str,
-                    default='Ascend', choices=['GPU', 'Ascend', 'CPU'])
+                    default='Ascend', choices=['GPU', 'Ascend'])
 parser.add_argument('--device_num', type=int, default=8)
 parser.add_argument('--device_id', type=int, default=0)
-parser.add_argument('--modelarts', type=bool, default=False)
+parser.add_argument('--modelarts', action="store_true", help="using modelarts")
 
 args = parser.parse_args()
 
 
 def lr_generator(lr_init, total_epochs, steps_per_epoch):
-    '''lr_generator
-    '''
+    """lr_generator
+    """
     lr_each_step = []
     for i in range(total_epochs):
         if i in args.schedule:
@@ -82,9 +80,9 @@ def lr_generator(lr_init, total_epochs, steps_per_epoch):
 
 
 class MyNetWithLoss(nn.Cell):
-    '''
+    """
     WithLossCell
-    '''
+    """
     def __init__(self, backbone, cfg):
         super(MyNetWithLoss, self).__init__(auto_prefix=False)
         self._backbone = backbone.to_float(mstype.float16)
@@ -103,20 +101,27 @@ if __name__ == "__main__":
     target = args.device_target
     context.set_context(mode=context.GRAPH_MODE,
                         device_target=target, save_graphs=False)
+    device_id = args.device_id
     if args.device_num > 1:
-        device_id = int(os.getenv('DEVICE_ID'))
-        context.set_context(device_id=device_id)
+        if target == 'Ascend':
+            device_id = int(os.getenv('DEVICE_ID'))
+            context.set_context(device_id=device_id)
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True,
+                                              )
+            cost_model_context.set_cost_model_context(device_memory_capacity=32.0 * 1024.0 * 1024.0 * 1024.0,
+                                                      costmodel_gamma=0.001,
+                                                      costmodel_beta=280.0)
+            set_algo_parameters(elementwise_op_strategy_follow=True)
+            init()
+        elif target == 'GPU':
+            init()
+            context.set_auto_parallel_context(device_num=args.device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True,
+                                              auto_parallel_search_mode="recursive_programming")
     else:
-        context.set_context(device_id=args.device_id)
-    if args.device_num > 1:
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True,
-                                          )
-        cost_model_context.set_cost_model_context(device_memory_capacity=32.0 * 1024.0 * 1024.0 * 1024.0,
-                                                  costmodel_gamma=0.001,
-                                                  costmodel_beta=280.0)
-        set_algo_parameters(elementwise_op_strategy_follow=True)
-        init()
+        device_id = int(os.getenv('DEVICE_ID'))
 
     if args.modelarts:
         import moxing as mox
@@ -125,7 +130,7 @@ if __name__ == "__main__":
             src_url=args.data_url, dst_url='/cache/data_path_' + os.getenv('DEVICE_ID'))
         zip_command = "unzip -o -q /cache/data_path_" + os.getenv('DEVICE_ID') \
                       + "/MS1M.zip -d /cache/data_path_" + \
-            os.getenv('DEVICE_ID')
+                      os.getenv('DEVICE_ID')
         os.system(zip_command)
         train_dataset = create_dataset(dataset_path='/cache/data_path_' + os.getenv('DEVICE_ID') + '/MS1M/',
                                        do_train=True,
@@ -142,26 +147,25 @@ if __name__ == "__main__":
 
     model = Model(train_net, optimizer=optimizer)
 
-    time_cb = TimeMonitor(data_size=train_dataset.get_dataset_size())
-    loss_cb = LossMonitor()
-    cb = [time_cb, loss_cb]
     config_ck = CheckpointConfig(
-        save_checkpoint_steps=60, keep_checkpoint_max=5)
+        save_checkpoint_steps=60, keep_checkpoint_max=20)
     if args.modelarts:
         ckpt_cb = ModelCheckpoint(prefix="ArcFace-", config=config_ck,
                                   directory='/cache/train_output/')
-        cb.append(ckpt_cb)
     else:
-        if args.device_num == 8 and MutiDev.get_rank() % 8 == 0:
-            ckpt_cb = ModelCheckpoint(prefix="ArcFace-", config=config_ck,
-                                      directory=args.train_url)
-            cb.append(ckpt_cb)
-        if args.device_num == 1:
-            ckpt_cb = ModelCheckpoint(prefix="ArcFace-", config=config_ck,
-                                      directory=args.train_url)
-            cb.append(ckpt_cb)
-
-    model.train(train_epoch, train_dataset, callbacks=cb, dataset_sink_mode=True)
+        ckpt_cb = ModelCheckpoint(prefix="ArcFace-", config=config_ck,
+                                  directory=args.train_url)
+    time_cb = TimeMonitor(data_size=train_dataset.get_dataset_size())
+    loss_cb = LossMonitor()
+    cb = [ckpt_cb, time_cb, loss_cb]
+    if args.device_num == 1:
+        model.train(train_epoch, train_dataset,
+                    callbacks=cb, dataset_sink_mode=True)
+    elif args.device_num > 1 and get_rank() % 8 == 0:
+        model.train(train_epoch, train_dataset,
+                    callbacks=cb, dataset_sink_mode=True)
+    else:
+        model.train(train_epoch, train_dataset, dataset_sink_mode=True)
     if args.modelarts:
         mox.file.copy_parallel(
             src_url='/cache/train_output', dst_url=args.train_url)

@@ -13,18 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+if [ -d out ]; then
+    rm -rf out
+fi
 
-echo "=============================================================================================================="
-echo "Please run the script as: "
-echo "bash run.sh DATA_PATH"
-echo "For example: bash run.sh path/MS1M"
-echo "It is better to use the absolute path."
-echo "=============================================================================================================="
+mkdir out
+cd out || exit
 
-# shellcheck disable=SC2034
-DATA_PATH=$1
+if [ -f "Makefile" ]; then
+  make clean
+fi
 
-python train.py  \
---data_url DATA_PATH \
---device_num 1 \
-> train.log 2>&1 &
+cmake .. \
+    -DMINDSPORE_PATH="`pip3.7 show mindspore-ascend | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
+make

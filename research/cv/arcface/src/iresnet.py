@@ -22,7 +22,11 @@ __all__ = ['iresnet18', 'iresnet34', 'iresnet50', 'iresnet100']
 
 
 def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1):
-    """3x3 convolution with padding"""
+    """
+    3x3 convolution with padding
+
+    # noqa: DAR201
+    """
     return nn.Conv2d(in_planes,
                      out_planes,
                      kernel_size=3,
@@ -35,7 +39,11 @@ def conv3x3(in_planes, out_planes, stride=1, groups=1, dilation=1):
 
 
 def conv1x1(in_planes, out_planes, stride=1):
-    """1x1 convolution"""
+    """
+    1x1 convolution
+
+    # noqa: DAR201
+    """
     return nn.Conv2d(in_planes,
                      out_planes,
                      kernel_size=1,
@@ -67,7 +75,7 @@ class IBasicBlock(nn.Cell):
             planes,
             eps=1e-05,
         )
-        self.prelu = nn.PReLU(planes)  # ?
+        self.prelu = nn.PReLU(planes)
         self.conv2 = conv3x3(planes, planes, stride)
         self.bn3 = nn.BatchNorm2d(
             planes,
@@ -78,6 +86,8 @@ class IBasicBlock(nn.Cell):
 
     def construct(self, x):
         '''construct
+
+        # noqa: DAR201
         '''
         identity = x
 
@@ -173,6 +183,8 @@ class IResNet(nn.Cell):
 
     def construct(self, x):
         '''construct
+
+        # noqa: DAR201
         '''
         x = self.conv1(x)
         x = self.bn1(x)
