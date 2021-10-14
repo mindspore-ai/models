@@ -104,7 +104,7 @@ As the format of the downstream tasks can be various, the `preprocess.py` provid
 Suppose the text data is under the `./data` and **each text file ends with 'txt'**, we can run the following command to generate the mindrecord files with seq_length=1025.
 
 ```bash
-python -m src.preprocess --input_glob  data/*.txt --tokenizer gpt --eot 50256 --data_column_name input_ids --seq_length 1025
+python -m src.preprocess --input_glob  'data/*.txt' --tokenizer gpt --eot 50256 --data_column_name input_ids --seq_length 1025
 ```
 
 The script will chunk the each line with 1025 tokens. For the chunk with no more 1025 tokens, the chunk will be ignored.

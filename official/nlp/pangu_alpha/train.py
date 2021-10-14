@@ -215,9 +215,10 @@ def restore_checkpoint(args_param, sink_size, dataset, model, network, epoch):
                                 f"{ckpt_name}*.ckpt")
     ckpt_files = glob.glob(ckpt_pattern)
     if not ckpt_files:
-        raise ValueError(f"There is no ckpt file in {args_param.load_ckpt_path}, "
-                         f"pre_trained is unsupported, current ckpt_files found is {ckpt_files} "
-                         f"with pattern {ckpt_pattern}")
+        print(f"There is no ckpt file in {args_param.save_checkpoint_path}, "
+              f"current ckpt_files found is {ckpt_files} "
+              f"with pattern {ckpt_pattern}, so skip the loading.")
+        return
     ckpt_files.sort(key=os.path.getmtime, reverse=True)
     time_stamp = datetime.datetime.now()
     print(f"time stamp {time_stamp.strftime('%Y.%m.%d-%H:%M:%S')} pre trained ckpt model {ckpt_files} loading",
