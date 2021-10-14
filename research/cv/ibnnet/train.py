@@ -20,8 +20,7 @@ import os
 
 import mindspore.nn as nn
 from mindspore import context
-from mindspore.context import ParallelMode
-from mindspore.train.model import Model
+from mindspore.train.model import Model, ParallelMode
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor, Callback
 from mindspore.nn.metrics import Accuracy
@@ -97,7 +96,8 @@ if __name__ == "__main__":
     if args.device_num > 1:
         if target == 'Ascend':
             device_id = int(os.getenv('DEVICE_ID'))
-            context.set_context(device_id=device_id)
+            context.set_context(device_id=device_id,
+                                enable_auto_mixed_precision=True)
             context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True,
                                               auto_parallel_search_mode="recursive_programming")
