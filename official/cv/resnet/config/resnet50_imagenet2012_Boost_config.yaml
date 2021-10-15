@@ -23,7 +23,7 @@ batch_size: 256
 loss_scale: 1024
 momentum: 0.85
 weight_decay: 5.0e-5
-epoch_size: 45 
+epoch_size: 60
 pretrain_epoch_size: 0
 save_checkpoint: False
 save_checkpoint_epochs: 5
@@ -47,7 +47,7 @@ eval_dataset_path: ""
 parameter_server: False
 filter_weight: False
 save_best_ckpt: True
-eval_start_epoch: 1
+eval_start_epoch: 30
 eval_interval: 1
 enable_cache: False
 cache_session_id: ""
