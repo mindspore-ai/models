@@ -12,15 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""evaluation"""
+"""
+Evaluation.
+"""
 import os
 from os.path import join
 import argparse
 import glob
+import math
+import audio
 import numpy as np
 from scipy.io import wavfile
 from hparams import hparams, hparams_debug_string
-import audio
 from tqdm import tqdm
 from mindspore import context, Tensor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -38,10 +41,10 @@ parser.add_argument('--preset', type=str, required=True, default='', help='Path 
 parser.add_argument('--pretrain_ckpt', type=str, default='', help='Pretrained checkpoint path')
 parser.add_argument('--is_numpy', action="store_true", default=False, help='Using numpy for inference or not')
 parser.add_argument('--output_path', type=str, default='./out_wave/', help='Path to save generated audios')
+parser.add_argument('--platform', type=str, default='GPU', choices=('Ascend', 'GPU', 'CPU'),
+                    help='run platform, support Ascend, GPU and CPU. Default: GPU')
 parser.add_argument('--speaker_id', type=str, default='',
                     help=' Use specific speaker of data in case for multi-speaker datasets.')
-parser.add_argument('--platform', type=str, default='GPU', choices=('GPU', 'CPU'),
-                    help='run platform, support GPU and CPU. Default: GPU')
 args = parser.parse_args()
 
 
@@ -79,14 +82,20 @@ def batch_wavegen(hparam, net, c_input=None, g_input=None, tqdm_=None, is_numpy=
     B = c_input.shape[0]
     net.set_train(False)
 
-    if hparam.upsample_conditional_features:
-        length = (c_input.shape[-1] - hparam.cin_pad * 2) * audio.get_hop_size()
-    else:
-        # already dupulicated
-        length = c_input.shape[-1]
+    n_frames = c_input.shape[-1]
+    y_hat_list = []
+    chunk_wise = 16 + 2 * hparam.cin_pad
+    for k in range(math.ceil(n_frames / chunk_wise)):
+        start = k * chunk_wise
+        end = min(n_frames, (k + 1) * chunk_wise)
+        lens = (end - start - hparam.cin_pad * 2) * audio.get_hop_size()
 
-    y_hat = net.incremental_forward(c=c_input, g=g_input, T=length, tqdm=tqdm_, softmax=True, quantize=True,
-                                    log_scale_min=hparam.log_scale_min, is_numpy=is_numpy)
+        y_hat = net.incremental_forward(c_=c_input[:, :, start: end], g=g_input, T=lens, tqdm=tqdm_, softmax=True,
+                                        quantize=True,
+                                        log_scale_min=hparam.log_scale_min, is_numpy=is_numpy)
+        y_hat_list.append(y_hat)
+
+    y_hat = np.concatenate(y_hat_list, axis=2)
 
     if is_mulaw_quantize(hparam.input_type):
         # needs to be float since mulaw_inv returns in range of [-1, 1]
@@ -185,7 +194,13 @@ def save_ref_audio(hparam, ref, length, target_wav_path_):
 
 
 if __name__ == '__main__':
-    context.set_context(mode=context.GRAPH_MODE, device_target=args.platform, save_graphs=False)
+
+    device_id = int(os.getenv("DEVICE_ID"))
+    if args.platform == 'CPU':
+        context.set_context(mode=0, device_target=args.platform, save_graphs=False)
+    else:
+        context.set_context(mode=1, device_target=args.platform, device_id=device_id)
+
     speaker_id = int(args.speaker_id) if args.speaker_id != '' else None
     if args.preset is not None:
         with open(args.preset) as f:

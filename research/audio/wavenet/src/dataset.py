@@ -21,7 +21,8 @@ import audio
 from nnmnkwii.datasets import FileSourceDataset
 from nnmnkwii import preprocessing as P
 from wavenet_vocoder.util import is_mulaw_quantize
-from train_pytorch import _pad, _pad_2d, to_categorical, ensure_divisible, RawAudioDataSource, MelSpecDataSource, assert_ready_for_upsampling
+from train_pytorch import _pad, _pad_2d, to_categorical, ensure_divisible, RawAudioDataSource, MelSpecDataSource, \
+    assert_ready_for_upsampling
 import mindspore.dataset.engine as de
 
 
@@ -36,14 +37,15 @@ def sequence_mask(sequence_length, max_len=None):
     seq_length_expand = np.expand_dims(np.array(seq_range_expand < seq_length_expand, dtype=np.float32), -1)
     return seq_length_expand
 
+
 class DistributedSampler():
-    """function to distribute and shuffle sample
-    """
+    """function to distribute and shuffle sample"""
+
     def __init__(self, dataset, rank, group_size, shuffle=True, seed=0):
         self.dataset = dataset
         self.rank = rank
         self.group_size = group_size
-        self.dataset_len = len(self.dataset)
+        self.dataset_len = len(self.dataset)  # num steps per epoch = 1635
         self.num_samplers = int(math.ceil(self.dataset_len * 1.0 / self.group_size))
         self.total_size = self.num_samplers * self.group_size
         self.shuffle = shuffle
@@ -71,10 +73,12 @@ def process_condition_batch(max_time_steps, hparams, batch):
     new_batch = []
     for batch_ in batch:
         x, c, g = batch_
+
         if hparams.upsample_conditional_features:
             assert_ready_for_upsampling(x, c, cin_pad=0)
             if max_time_steps is not None:
                 max_steps = ensure_divisible(max_time_steps, audio.get_hop_size(), True)
+
                 if len(x) > max_steps:
                     max_time_frames = max_steps // audio.get_hop_size()
                     s = np.random.randint(cin_pad, len(c) - max_time_frames - cin_pad)
@@ -106,11 +110,11 @@ def process_no_condition_batch(max_time_steps, batch):
     return new_batch
 
 
-
 def collate_fn(batch, hparams):
     """
     Create batch
     """
+
     local_conditioning = len(batch[0]) >= 2 and hparams.cin_channels > 0
     global_conditioning = len(batch[0]) >= 3 and hparams.gin_channels > 0
 
@@ -126,7 +130,7 @@ def collate_fn(batch, hparams):
     else:
         new_batch = process_no_condition_batch(max_time_steps, batch)
     batch = new_batch
-    # Lengths
+
     input_lengths = [len(x[0]) for x in batch]
     max_input_len = max(input_lengths)
     # (B, T, C)
@@ -138,7 +142,8 @@ def collate_fn(batch, hparams):
              in batch], dtype=np.float32)
     else:
         x_batch = np.array([_pad_2d(x[0].reshape(-1, 1), max_input_len)
-                            for x in batch], dtype=np.float32)
+                            for x in batch], dtype=np.float32)  # pad zero to 2d wave with max input length
+
     assert len(x_batch.shape) == 3
 
     # (B, T)
@@ -147,13 +152,15 @@ def collate_fn(batch, hparams):
         y_batch = np.array([_pad(x[0], max_input_len, constant_values=padding_value)
                             for x in batch], dtype=np.int32)
     else:
-        y_batch = np.array([_pad(x[0], max_input_len) for x in batch], dtype=np.float32)
+        y_batch = np.array([_pad(x[0], max_input_len) for x in batch],
+                           dtype=np.float32)  # pad zero to 1d wave with max input length
     assert len(y_batch.shape) == 2
 
     # (B, T, D)
     if local_conditioning:
         max_len = max([len(x[1]) for x in batch])
-        c_batch = np.array([_pad_2d(x[1], max_len) for x in batch], dtype=np.float32)
+        c_batch = np.array([_pad_2d(x[1], max_len) for x in batch],
+                           dtype=np.float32)  # pad zero to 2d logmel with max mel length
         assert len(c_batch.shape) == 3
         # (B x C x T)
         c_batch = c_batch.transpose((0, 2, 1))
@@ -163,10 +170,10 @@ def collate_fn(batch, hparams):
     if global_conditioning:
         g_batch = [x[2] for x in batch]
     else:
-        # g_batch = None # MindSpore does not support None input
+        # g_batch = None # Mindspore do not support None type
         g_batch = np.zeros(hparams.batch_size, dtype=np.int64)
 
-    # Convert to channel first (B, C, T)
+    # Convert to channel first i.e., (B, C, T)
     x_batch = x_batch.transpose((0, 2, 1))
     # Add extra axis
     if is_mulaw_quantize(hparams.input_type):
@@ -183,17 +190,17 @@ def collate_fn(batch, hparams):
 
 class DualDataset():
     """Create Dataset loader for audio Mel and Audio"""
+
     def __init__(self, X, Mel, length, batch_size, hparams):
         self.multi_speaker = X.file_data_source.multi_speaker
         self.X = X
         self.Mel = Mel
         self.length = length
         self.hparams = hparams
+
         self.sorted_index = list(np.argsort(length))
         self.bins = [self.sorted_index[i:i + batch_size] for i in range(0, len(self.sorted_index), batch_size)]
-        if len(self.sorted_index) / batch_size != 0:
-            self.bins.append(self.sorted_index[-batch_size:])
-        self.size = len(self.bins)
+        self.size = len(self.bins)  # num_steps_per_epoch
 
     def __getitem__(self, idx):
         if self.multi_speaker:
@@ -203,7 +210,8 @@ class DualDataset():
 
         combined_data = []
         mel_len, audio_len = [], []
-        for i in self.bins[idx]:
+        for i in self.bins[idx]:  # one batch data
+
             if self.Mel is not None:
                 mel = self.Mel[i]
                 raw_audio = self.X[i]
@@ -250,6 +258,7 @@ def get_data_loaders(dump_root, speaker_id, hparams=None, rank_id=None, group_si
         Mel = None
     print("length of the dataset is {}".format(len(X)))
     length_x = np.array(X.file_data_source.lengths)
+
     dataset = DualDataset(X, Mel, length_x, batch_size=hparams.batch_size, hparams=hparams)
     sampler = DistributedSampler(dataset, rank_id, group_size, shuffle=True, seed=0)
     data_loaders = de.GeneratorDataset(dataset, ["x_batch", "y_batch", "c_batch", "g_batch", "input_lengths", "mask"],

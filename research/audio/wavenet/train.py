@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""train_criteo."""
+"""
+Train_criteo.
+"""
 import os
 from os.path import join
 import json
@@ -20,20 +22,25 @@ import argparse
 from warnings import warn
 from hparams import hparams, hparams_debug_string
 
+import mindspore
 from mindspore import context, Tensor
 from mindspore.context import ParallelMode
-from mindspore.communication.management import init, get_rank, get_group_size
+from mindspore.communication.management import init, get_rank
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.nn.optim import Adam
+from mindspore.nn.optim import Adam # Momentum, Adagrad, SGD
 from mindspore.nn import TrainOneStepCell
+from mindspore.nn.wrap.loss_scale import DynamicLossScaleUpdateCell
 from mindspore.train import Model
-from src.lr_generator import get_lr
+from mindspore.train.callback import SummaryCollector
+from src.lr_generator import get_lr, get_lrv2
 from src.dataset import get_data_loaders
-from src.loss import NetWithLossClass
+from src.loss import NetWithLossClass, WaveNetTrainOneStepWithLossScaleCell
 from src.callback import Monitor
 from wavenet_vocoder import WaveNet
 from wavenet_vocoder.util import is_mulaw_quantize, is_scalar_input
+
+mindspore.common.set_seed(1024)
 
 parser = argparse.ArgumentParser(description='TTS training')
 parser.add_argument('--data_path', type=str, required=True, default='',
@@ -44,25 +51,37 @@ parser.add_argument('--checkpoint_dir', type=str, default='./checkpoints_test',
 parser.add_argument('--checkpoint', type=str, default='', help='Restore model from checkpoint path if given.')
 parser.add_argument('--speaker_id', type=str, default='',
                     help=' Use specific speaker of data in case for multi-speaker datasets.')
-parser.add_argument('--platform', type=str, default='GPU', choices=('GPU', 'CPU'),
-                    help='run platform, support GPU and CPU. Default: GPU')
+parser.add_argument('--platform', type=str, default='GPU', choices=('Ascend', 'GPU', 'CPU'),
+                    help='run platform, support Ascend, GPU and CPU. Default: GPU')
+parser.add_argument('--mode_name', type=str, default='GRAPH', choices=('GRAPH', 'PYNATIVE'), help='Choose Mode')
 parser.add_argument('--is_distributed', action="store_true", default=False, help='Distributed training')
 args = parser.parse_args()
 
 if __name__ == '__main__':
-    if args.is_distributed:
-        init('nccl')
-        rank_id = get_rank()
-        group_size = get_group_size()
-        context.set_context(mode=context.GRAPH_MODE, device_target="GPU", save_graphs=False)
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(device_num=get_group_size(), parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
-    else:
-        context.set_context(mode=context.GRAPH_MODE, device_target=args.platform, save_graphs=False)
-        rank_id = 0
-        group_size = 1
 
+    # init context
+    target = args.platform
+    if args.mode_name == 'GRAPH':
+        context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
+    else:
+        context.set_context(mode=context.PYNATIVE_MODE, device_target=target, save_graphs=False)
+
+    rank_id = int(os.getenv('RANK_ID'))
+    group_size = int(os.getenv('RANK_SIZE'))
+    device_id = int(os.getenv("DEVICE_ID"))
+    context.set_context(device_id=device_id)
+
+    if args.is_distributed:
+        context.reset_auto_parallel_context()
+        # Ascend
+        if target == 'Ascend':
+            context.set_auto_parallel_context(device_num=group_size, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True, parameter_broadcast=True)
+        # GPU
+        else:
+            context.set_auto_parallel_context(device_num=group_size, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+        init()
     speaker_id = int(args.speaker_id) if args.speaker_id != '' else None
     if args.preset is not None:
         with open(args.preset) as f:
@@ -111,27 +130,52 @@ if __name__ == '__main__':
         scalar_input=is_scalar_input(hparams.input_type),
         output_distribution=hparams.output_distribution,
     )
+
     loss_net = NetWithLossClass(model, hparams)
-    lr = get_lr(hparams.optimizer_params["lr"], hparams.nepochs, step_size_per_epoch)
-    lr = Tensor(lr)
+    if target == 'Ascend':
+        lr = get_lrv2(hparams.optimizer_params["lr"], hparams.nepochs, step_size_per_epoch, step_size_per_epoch * 30)
+        lr = Tensor(lr)
 
-    if args.checkpoint != '':
-        param_dict = load_checkpoint(args.pre_trained_model_path)
-        load_param_into_net(model, param_dict)
-        print('Successfully loading the pre-trained model')
+        resume_epoch = None
+        if args.checkpoint != '':
+            resume_epoch = 600  # pre-trained training epochs
+            resume_step = int(args.checkpoint.split('_')[-1].split('.')[0])
+            lr = lr[resume_epoch * step_size_per_epoch:]
+            param_dict = load_checkpoint(args.checkpoint)
+            load_param_into_net(model, param_dict)
+            print('Successfully loading the pre-trained model')
+        loss_scale = mindspore.train.loss_scale_manager.DynamicLossScaleManager(2 ** 16, 2, 1000)
+        scale_update_cell = DynamicLossScaleUpdateCell(loss_scale_value=2 ** 12,
+                                                       scale_factor=2,
+                                                       scale_window=1024)
+        weights = model.trainable_params()
+        optimizer = Adam(weights, learning_rate=lr)
+        train_net = WaveNetTrainOneStepWithLossScaleCell(loss_net, optimizer, scale_update_cell)
+    else:
+        lr = get_lr(hparams.optimizer_params["lr"], hparams.nepochs, step_size_per_epoch)
+        lr = Tensor(lr)
+        if arg.checkpoint != '':
+            param_dict = load_checkpoint(args.checkpoint)
+            load_param_into_net(model, param_dict)
+            print('Successfully loading the pre-trained model')
+        weights = model.trainable_params()
+        optimizer = Adam(weights, learning_rate=lr, loss_scale=1024.)
+        train_net = TrainOneStepCell(loss_net, optimizer)
 
-    weights = model.trainable_params()
-    optimizer = Adam(weights, learning_rate=lr, loss_scale=1024.)
-    train_net = TrainOneStepCell(loss_net, optimizer)
-
+    summary_collector = SummaryCollector(summary_dir='summary_dir/device_{}'.format(device_id), collect_freq=1)
     model = Model(train_net)
     lr_cb = Monitor(lr)
     callback_list = [lr_cb]
     if args.is_distributed:
         ckpt_path = os.path.join(args.checkpoint_dir, 'ckpt_' + str(get_rank()) + '/')
+
     else:
         ckpt_path = args.checkpoint_dir
-    config_ck = CheckpointConfig(save_checkpoint_steps=step_size_per_epoch, keep_checkpoint_max=10)
+    config_ck = CheckpointConfig(save_checkpoint_steps=step_size_per_epoch, keep_checkpoint_max=hparams.nepochs)
     ckpt_cb = ModelCheckpoint(prefix='wavenet', directory=ckpt_path, config=config_ck)
     callback_list.append(ckpt_cb)
-    model.train(hparams.nepochs, data_loaders, callbacks=callback_list, dataset_sink_mode=False)
+    callback_list.append(summary_collector)
+    if target == 'Ascend' and resume_epoch is not None:
+        model.train(hparams.nepochs - resume_epoch, data_loaders, callbacks=callback_list, dataset_sink_mode=False)
+    else:
+        model.train(hparams.nepochs, data_loaders, callbacks=callback_list, dataset_sink_mode=False)
