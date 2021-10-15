@@ -192,6 +192,9 @@ def run_train(args_opt):
         model = Model(pangu_alpha_with_grads)
     if args_opt.pre_trained:
         restore_checkpoint(args_opt, args_opt.sink_size, ds, model, pangu_alpha_with_grads, epoch=actual_epoch_num)
+
+    callback = [TimeMonitor(args_opt.sink_size), LossCallBack(args_opt.sink_size, rank, args_opt.has_trained_epoches,
+                                                              args_opt.has_trained_steps)]
     add_checkpoint_callback_policy(args_opt, callback, rank)
     if args_opt.incremental_training:
         strategy = model.infer_train_layout(train_dataset=ds, sink_size=args_opt.sink_size)
@@ -226,8 +229,12 @@ def restore_checkpoint(args_param, sink_size, dataset, model, network, epoch):
     # Load checkpoint files latest file
     print(f'Start to load from {ckpt_files[0]}')
     param_dict = load_checkpoint(ckpt_files[0])
+    if param_dict.get("epoch_num") and param_dict.get("step_num"):
+        args_param.has_trained_epoches = int(param_dict["epoch_num"].data.asnumpy())
+        args_param.has_trained_step = int(param_dict["step_num"].data.asnumpy())
     model.build(train_dataset=dataset, sink_size=sink_size, epoch=epoch)
     load_param_into_net(network, param_dict)
+
 
 def run_train_pipeline(args_opt):
     r"""The main training process in pipeline."""
