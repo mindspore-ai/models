@@ -133,7 +133,7 @@ def run_predistill():
 
     optimizer = AdamWeightDecay(group_params, learning_rate=lr_schedule, eps=optimizer_cfg.AdamWeightDecay.eps)
     callback = [TimeMonitor(time_monitor_steps), LossCallBack(), ModelSaveCkpt(netwithloss.bert,
-                                                                               args_opt.save_ckpt_step,
+                                                                               dataset_size,
                                                                                args_opt.max_ckpt_num,
                                                                                td_phase1_save_ckpt_dir)]
     if enable_loss_scale:
@@ -212,7 +212,7 @@ def run_task_distill(ckpt_file):
     else:
         callback = [TimeMonitor(time_monitor_steps), LossCallBack(),
                     ModelSaveCkpt(netwithloss.bert,
-                                  args_opt.save_ckpt_step,
+                                  dataset_size,
                                   args_opt.max_ckpt_num,
                                   td_phase2_save_ckpt_dir)]
     if enable_loss_scale:
