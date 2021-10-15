@@ -184,7 +184,10 @@ def run_train(args_opt):
 
     if args_opt.pre_trained:
         restore_checkpoint(args_opt, callback_size, ds, model, pangu_alpha_with_grads, actual_epoch_num)
-
+    callback = [
+        TimeMonitor(callback_size),
+        LossCallBack(callback_size, rank, args_opt.has_trained_epoches, args_opt.has_trained_steps)
+    ]
     add_checkpoint_callback_policy(args_opt, callback, rank)
 
     if args_opt.incremental_training:
@@ -243,6 +246,10 @@ def restore_checkpoint(args_param, sink_size, dataset, model, network, epoch):
     # Load checkpoint files latest file
     print(f'Start to load from {ckpt_files[0]}')
     param_dict = load_checkpoint(ckpt_files[0])
+    if param_dict.get("epoch_num") and param_dict.get("step_num"):
+        args_param.has_trained_epoches = int(param_dict["epoch_num"].data.asnumpy())
+        args_param.has_trained_steps = int(param_dict["step_num"].data.asnumpy())
+
     model.build(train_dataset=dataset, sink_size=sink_size, epoch=epoch)
     load_param_into_net(network, param_dict)
 
