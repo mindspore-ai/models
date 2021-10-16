@@ -1,0 +1,127 @@
+algorithm:
+  name: "AttentionLSTM"
+  framework: "mindspore"
+  description: 
+    zh: "基于MindSpore框架的Ascend910训练"
+    en: "Ascend910 training based on mindspore framework"
+train:
+  on_modelarts:
+    entry: "start.py"
+    comm_para:
+      input_path:
+        - name: "data_url"
+          type: "string"
+          desc: 
+            zh: "数据集路径"
+            en: "dataset path"
+      output_path:
+        - name: "train_url"
+          type: "string"
+          desc: 
+            zh: "模型输出路径"
+            en: "The output path of models"
+    custom_para:
+      - name: "batch_size"
+        type: int
+        required: true
+        default: 1
+        desc: 
+          zh: "训练批次大小"
+          en: "batch size"
+        editable: true
+      - name: "dim_hidden"
+        type: int
+        required: true
+        default: 300
+        desc: 
+          zh: "hidden层维度"
+          en: "hidden dimension"
+        editable: true
+      - name: "rseed"
+        type: int
+        required: true
+        default: 4373337
+        desc: 
+          zh: "随机种子"
+          en: "random seed"
+        editable: true
+      - name: "dim_word"
+        type: int
+        required: true
+        default: 300
+        desc: 
+          zh: "词向量维度"
+          en: "word dimension"
+        editable: true
+      - name: "dim_aspect"
+        type: int
+        required: true
+        default: 100
+        desc: 
+          zh: "aspect向量维度"
+          en: "aspect dimension"
+        editable: true
+      - name: "lr"
+        type: float
+        required: true
+        default: 0.002
+        desc: 
+          zh: "学习率"
+          en: "learning rate"
+        editable: true
+      - name: "momentum"
+        type: float
+        required: true
+        default: 0.91
+        desc: 
+          zh: "动量"
+          en: "momentum"
+        editable: true
+      - name: "weight_decay"
+        type: float
+        required: true
+        default: 1e-3
+        desc: 
+          zh: "权重衰减值"
+          en: "weight decay"
+        editable: true
+      - name: "vocab_size"
+        type: int
+        required: true
+        default: 5177
+        desc: 
+          zh: "单词表大小"
+          en: "vocabulary size"
+        editable: true
+      - name: "dropout_prob"
+        type: float
+        required: true
+        default: 0.6
+        desc: 
+          zh: "dropout概率"
+          en: "dropout probability"
+        editable: true
+      - name: "aspect_num"
+        type: int
+        required: true
+        default: 5
+        desc: 
+          zh: "aspect词的数量"
+          en: "aspect number"
+        editable: true
+      - name: "grained"
+        type: int
+        required: true
+        default: 3
+        desc: 
+          zh: "极性分类个数"
+          en: "grained number"
+        editable: true
+      - name: "epoch_size"
+        type: int
+        required: true
+        default: 25
+        desc: 
+          zh: "总计训练epoch数"
+          en: "epoch size"
+        editable: true
