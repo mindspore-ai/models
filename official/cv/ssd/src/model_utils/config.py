@@ -117,9 +117,11 @@ def get_config():
     """
     parser = argparse.ArgumentParser(description="default name", add_help=False)
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    parser.add_argument("--config_path", type=str, default=os.path.join(current_dir, \
-        "../../ssd300_config.yaml"), help="Config file path")
+
+    parser.add_argument("--config_path", type=str,
+                        default="ssd300_config.yaml", help="Config file path")
     path_args, _ = parser.parse_known_args()
+    path_args.config_path = os.path.join(current_dir, "../../", path_args.config_path)
     default, helper, choices = parse_yaml(path_args.config_path)
     pprint(default)
     args = parse_cli_to_yaml(parser=parser, cfg=default, helper=helper, choices=choices, cfg_path=path_args.config_path)

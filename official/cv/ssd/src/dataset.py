@@ -364,7 +364,7 @@ def voc_data_to_mindrecord(mindrecord_dir, is_training, prefix="ssd.mindrecord",
 
 def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="ssd.mindrecord", file_num=8):
     """Create MindRecord file."""
-    mindrecord_dir = config.mindrecord_dir
+    mindrecord_dir = os.path.join(config.data_path, config.mindrecord_dir)
     mindrecord_path = os.path.join(mindrecord_dir, prefix)
     writer = FileWriter(mindrecord_path, file_num)
     if dataset == "coco":
