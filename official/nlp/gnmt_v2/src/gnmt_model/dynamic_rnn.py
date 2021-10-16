@@ -79,7 +79,7 @@ class DynamicRNNCell(nn.Cell):
         if self.is_ascend:
             w = self.cast(self.dynamicRNN_w, self.compute_type)
             b = self.cast(self.dynamicRNN_b, self.compute_type)
-            output, hn, cn = self.rnn(x, w, b, None, init_h, init_c)
+            output, hn, cn, _, _, _, _, _ = self.rnn(x, w, b, None, init_h, init_c)
         else:
             output, (hn, cn) = self.lstm(x, (init_h, init_c))
         return output, hn, cn
