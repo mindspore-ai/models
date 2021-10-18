@@ -16,6 +16,7 @@
 
 import numpy as np
 
+from mindspore import context
 from mindspore.common import dtype as mstype
 from mindspore.common.initializer import initializer
 from mindspore.nn import Optimizer
@@ -230,6 +231,8 @@ class Adam(Optimizer):
 
         self.lr_scalar = P.ScalarSummary()
 
+        self.exec_mode = context.get_context("mode")
+
     def construct(self, gradients):
         """Adam optimizer."""
         params = self.parameters
@@ -239,7 +242,9 @@ class Adam(Optimizer):
         gradients = self.scale_grad(gradients)
         lr = self.get_lr()
 
-        self.lr_scalar("learning_rate", lr)
+        #currently, Summary operators only support graph mode
+        if self.exec_mode == context.GRAPH_MODE:
+            self.lr_scalar("learning_rate", lr)
 
         beta1_power = self.beta1_power * self.beta1
         self.beta1_power = beta1_power
