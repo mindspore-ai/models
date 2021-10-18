@@ -49,6 +49,7 @@ export DEVICE_NUM=1
 export DEVICE_ID=0
 export RANK_ID=0
 export RANK_SIZE=1
+export CPU_BIND_NUM=24
 
 if [ -d "train" ];
 then
@@ -63,7 +64,18 @@ cd ./train || exit
 echo "start training for device $DEVICE_ID"
 env > env.log
 
-python train.py \
+cpus=`cat /proc/cpuinfo| grep "processor"| wc -l`
+if [ $cpus -ge $CPU_BIND_NUM ]
+then
+  start=`expr $cpus - $CPU_BIND_NUM`
+  end=`expr $cpus - 1`
+else
+  start=0
+  end=`expr $cpus - 1`
+fi
+cmdopt=$start"-"$end
+
+taskset -c $cmdopt python train.py \
     --data_dir=$DATASET_PATH \
     --pretrained_backbone=$PRETRAINED_BACKBONE \
     --is_distributed=0 \
