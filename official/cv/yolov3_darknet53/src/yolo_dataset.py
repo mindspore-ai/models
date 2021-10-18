@@ -167,7 +167,6 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, max_epoch, device_num,
                                 "gt_box1", "gt_box2", "gt_box3"]
         if device_num != 8:
             ds = de.GeneratorDataset(yolo_dataset, column_names=dataset_column_names,
-                                     num_parallel_workers=min(32, num_parallel_workers),
                                      sampler=distributed_sampler)
             ds = ds.batch(batch_size, per_batch_map=multi_scale_trans, input_columns=dataset_column_names,
                           num_parallel_workers=min(32, num_parallel_workers), drop_remainder=True)
