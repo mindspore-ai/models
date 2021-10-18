@@ -121,6 +121,8 @@ Here is the ModelZoo for MindSpore which support different devices including Asc
 
 If you are looking for exclusive models only for Ascend using different ML platform, you could refer to [Ascend ModelZoo](https://hiascend.com/software/modelzoo) and corresponding [gitee repository](https://gitee.com/ascend/modelzoo)
 
+If you are looking for some pretrained checkpoint of mindspore, you could refer to [MindSpore Hub](https://www.mindspore.cn/resources/hub/en) or [Download Website](https://download.mindspore.cn/model_zoo/).
+
 ## Disclaimers
 
 Mindspore only provides scripts that downloads and preprocesses public datasets. We do not own these datasets and are not responsible for their quality or maintenance. Please make sure you have permission to use the dataset under the dataset’s license. The models trained on these dataset are for non-commercial research and educational purpose only.
@@ -144,3 +146,10 @@ For more information about `MindSpore` framework, please refer to [FAQ](https://
 - **Q: How to resolve the error about the interface are not supported in some network operations, such as `cann not import`?**
 
   **A**: Please check the version of MindSpore and the branch you fetch the modelzoo scripts. Some model scripits in latest branch will use new interface in the latest version of MindSpore.
+
+- **Q: How to run the scripts on Windows system?**
+
+  **A**: Most the start-up scripts are written in `bash`, but we usually can't run bash directly on Windows. You can try start python directly without bash scripts. If you really need the start-up bash scripts, we suggest you the following method to get a bash environment on Windows:
+    1. Use a virtual system or docker container with linux system. Then run the scripts in the virtual system or container.
+    2. Use WSL, you could turn on the `Windows Subsystem for Linux` on Windows to obtain an linux system which could run the bash scripts.
+    3. Use some bash tools on Windows, such as [cygwin](http://www.cygwin.com) and [git bash](https://gitforwindows.org).

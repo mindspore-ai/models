@@ -121,6 +121,8 @@
 
 相应的专属于Ascend平台的多框架模型可以参考[昇腾ModelZoo](https://hiascend.com/software/modelzoo)以及对应的[代码仓](https://gitee.com/ascend/modelzoo)。
 
+MindSpore相关的预训练模型可以在[MindSpore hub](https://www.mindspore.cn/resources/hub/en)或[下载中心](https://download.mindspore.cn/model_zoo/).
+
 ## 免责声明
 
 MindSpore仅提供下载和预处理公共数据集的脚本。我们不拥有这些数据集，也不对它们的质量负责或维护。请确保您具有在数据集许可下使用该数据集的权限。在这些数据集上训练的模型仅用于非商业研究和教学目的。
@@ -144,3 +146,11 @@ MindSpore已获得Apache 2.0许可，请参见LICENSE文件。
 - **Q: 一些网络运行中报错接口不存在，例如cannot import，该怎么处理?**
 
   **A**: 优先检查一下获取网络脚本的分支，与所使用的MindSpore版本是否一致，部分新分支中的模型脚本会使用一些新版本MindSpore才支持的接口，从而在使用老版本MindSpore时会发生报错.
+
+- **Q: 在windows环境上要怎么运行网络脚本？**
+
+  **A**: 多数模型都是使用bash作为启动脚本，在Windows环境上无法直接使用bash命令，你可以考虑直接运行python命令而不是bash启动脚本 ，如果你确实想需要使用bash脚本，你可以考虑使用以下几种方法来运行模型：
+    1. 使用虚拟环境，可以构造一个linux的虚拟机或docker容器，然后在虚拟环境中运行脚本
+    2. 使用WSL，可以开启Windows的linux子系统来在Windows系统中运行linux，然后再WSL中运行脚本。
+    3. 使用Windows Bash，需要获取一个可以直接在Windows上运行bash的环境，常见的选择是[cygwin](http://www.cygwin.com)或[git bash](https://gitforwindows.org)
+    4. 跳过bash脚本，直接调用python程序。
