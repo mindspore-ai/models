@@ -110,9 +110,23 @@ def main():
 
     # construct hccn_table
     device_ips: Dict[Any, Any] = {}
-    for device_id in device_num_list:
-        ret = os.popen("hccn_tool -i %d -ip -g" % device_id).readlines()
-        device_ips[str(device_id)] = ret[0].split(":")[1].replace('\n', '')
+    try:
+        for device_id in device_num_list:
+            ret = os.popen("hccn_tool -i %d -ip -g" % device_id).readlines()
+            device_ips[str(device_id)] = ret[0].split(":")[1].replace('\n', '')
+    except IndexError:
+        print("Failed to call hccn_tool, try to read /etc/hccn.conf instead")
+        try:
+            with open('/etc/hccn.conf', 'r') as fin:
+                for hccn_item in fin.readlines():
+                    if hccn_item.strip().startswith('address_'):
+                        device_id, device_ip = hccn_item.split('=')
+                        device_id = device_id.split('_')[1]
+                        device_ips[device_id] = device_ip.strip()
+        except OSError:
+            print("Failed to read /etc/hccn.conf")
+            raise SystemError("Failed to find information for hccl")
+
     hccn_table = {'version': '1.0',
                   'server_count': '1',
                   'server_list': []}
