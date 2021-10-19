@@ -94,7 +94,7 @@ class SignedSAGEConvolution(nn.Cell):
         self.out_channels = out_channels
         self.norm = norm
         self.norm_embed = norm_embed
-        self.matmul = ops.MatMul()
+        self.matmul = nn.MatMul().to_float(ms.float16)
         self.l2_normalize = ops.L2Normalize(epsilon=1e-12, axis=-1)
         self.concat = ops.Concat(axis=1)
         self.weight_tensor = Tensor(shape=[self.in_channels, out_channels], dtype=ms.float32,
