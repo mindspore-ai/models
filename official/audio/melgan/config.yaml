@@ -1,0 +1,65 @@
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+network: "melgan"
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+run_distribute: 0
+enable_profiling: False
+data_path: "/cache/data"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path/"
+device_target: "Ascend"
+checkpoint_path: "./checkpoint/"
+checkpoint_file_path: ""
+
+# ==============================================================================
+# Training options
+device_id: 1
+pre_trained: False
+checkpoint_path:  './melgan_20-215_176000.ckpt'
+lr_g: 0.0001
+lr_d: 0.0001
+batch_size: 4
+epoch_size: 5000
+momentum: 0.9
+leaky_alpha: 0.2
+train_length: 32
+
+beta1: 0.9
+beta2: 0.999
+weight_decay: 0.0
+
+hop_size: 256
+mel_num: 80
+filter_length: 1024
+win_length: 1024
+segment_length: 16000
+pad_short: 2000
+sample: 22050
+data_path: 'dataset/data/'
+save_steps: 10000
+save_checkpoint_name: 'melgan'
+save_checkpoint_path: './saved_model'
+
+# Evaluation options
+eval_data_path: 'dataset/val_data/'
+eval_model_path: './melgan_20-215_176000.ckpt'
+output_path: 'output/'
+eval_length: 240
