@@ -121,7 +121,7 @@
 
 相应的专属于Ascend平台的多框架模型可以参考[昇腾ModelZoo](https://hiascend.com/software/modelzoo)以及对应的[代码仓](https://gitee.com/ascend/modelzoo)。
 
-MindSpore相关的预训练模型可以在[MindSpore hub](https://www.mindspore.cn/resources/hub/en)或[下载中心](https://download.mindspore.cn/model_zoo/).
+MindSpore相关的预训练模型可以在[MindSpore hub](https://www.mindspore.cn/resources/hub)或[下载中心](https://download.mindspore.cn/model_zoo/).
 
 ## 免责声明
 
