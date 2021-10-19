@@ -12,7 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""WaveNet construction"""
+"""
+WaveNet construction.
+"""
 from __future__ import with_statement, print_function, absolute_import
 
 import math
@@ -48,9 +50,9 @@ class WaveNet(nn.Cell):
         gin_channels (int): Global conditioning channels. If given negative value, global conditioning is disabled.
         n_speakers (int): Number of speakers. This is used when global conditioning is enabled.
         upsample_conditional_features (bool): Whether upsampling local conditioning features by resize_nearestneighbor
-            and conv or not.
+        and conv or not.
         scalar_input (Bool): If True, scalar input ([-1, 1]) is expected, otherwise, quantized one-hot vector
-            is expected.
+        is expected.
         use_speaker_embedding (Bool): Use speaker embedding or Not.
 
     """
@@ -75,7 +77,6 @@ class WaveNet(nn.Cell):
         self.reshape_op = P.Reshape()
         self.zeros_op = P.Zeros()
         self.ones_op = P.Ones()
-        self.relu_op = P.ReLU()
         self.squeeze_op = P.Squeeze()
         self.expandim_op = P.ExpandDims()
         self.transpose_op = P.Transpose()
@@ -86,7 +87,7 @@ class WaveNet(nn.Cell):
         self.output_distribution = output_distribution
         self.fack_data = P.Zeros()
         assert layers % stacks == 0
-        layers_per_stack = layers // stacks
+        layers_per_stack = layers // stacks  # 24 / 4 = 6
         if scalar_input:
             self.first_conv = Conv1d1x1(1, residual_channels)
         else:
@@ -94,7 +95,7 @@ class WaveNet(nn.Cell):
 
         conv_layers = []
         for layer in range(layers):
-            dilation = 2 ** (layer % layers_per_stack)
+            dilation = 2 ** (layer % layers_per_stack)  # 1, 2, 4, 8, 16, 32
             conv = ResidualConv1dGLU(
                 residual_channels, gate_channels,
                 kernel_size=kernel_size,
@@ -124,7 +125,7 @@ class WaveNet(nn.Cell):
         else:
             self.upsample_net = None
 
-        self.factor = math.sqrt(1.0 / len(self.conv_layers))
+        self.factor = math.sqrt(1.0 / len(self.conv_layers))  # sqrt( 1 / 24)
 
     def _expand_global_features(self, batch_size, time_step, g_fp, is_expand=True):
         """Expand global conditioning features to all time steps
@@ -152,7 +153,7 @@ class WaveNet(nn.Cell):
         expand_fp = self.transpose_op(expand_fp, (0, 2, 1))
         return expand_fp
 
-    def construct(self, x, c=None, g=None, softmax=False):
+    def construct(self, x, cond=None, g=None, softmax=False):
         """
 
         Args:
@@ -165,27 +166,28 @@ class WaveNet(nn.Cell):
             Tensor: Net output
 
         """
+
         g = None
         B, _, T = x.shape
         if g is not None:
             if self.embed_speakers is not None:
                 g = self.embed_speakers(self.reshape_op(g, (B, -1)))
                 g = self.transpose_op(g, (0, 2, 1))
-        g_bct = self._expand_global_features(B, T, g, is_expand=True)
+        g_bct = self._expand_global_features(B, T, g, is_expand=True)  # None
 
-        if c is not None and self.upsample_net is not None:
-            c = self.upsample_net(c)
+        if cond is not None and self.upsample_net is not None:
+            cond = self.upsample_net(cond)  # [B, 128, 10240]
 
         x = self.first_conv(x)
         skips = 0
         for f in self.conv_layers:
-            x, h = f(x, c, g_bct)
-            skips += h
+            x, hidden = f(x, cond, g_bct)  # x=[B, 128, 10240], hidden=[B, 128, 10240]
+            skips += hidden
         skips *= self.factor
 
-        x = skips
+        x = skips  # x=[B, 128, 10240]
         for f in self.last_conv_layers:
-            x = f(x)
+            x = f(x)  # x=[B, 2, 10240]
         x = self.softmax(x) if softmax else x
 
         return x
@@ -199,7 +201,7 @@ class WaveNet(nn.Cell):
         x -= np.max(x, axis=1, keepdims=True)
         return np.exp(x) / np.sum(np.exp(x), axis=1, keepdims=True)
 
-    def incremental_forward(self, initial_input=None, c=None, g=None,
+    def incremental_forward(self, initial_input=None, c_=None, g=None,
                             T=100, test_inputs=None,
                             tqdm=lambda x: x, softmax=True, quantize=True,
                             log_scale_min=-50.0, is_numpy=True):
@@ -249,13 +251,13 @@ class WaveNet(nn.Cell):
         g_btc = self._expand_global_features(B, T, g, is_expand=False)
 
         # Local conditioning
-        if c is not None:
-            B = c.shape[0]
+        if c_ is not None:
+            B = c_.shape[0]
             if self.upsample_net is not None:
-                c = self.upsample_net(c)
-                assert c.shape[-1] == T
-            if c.shape[-1] == T:
-                c = self.transpose_op(c, (0, 2, 1))
+                c_ = self.upsample_net(c_)
+                assert c_.shape[-1] == T
+            if c_.shape[-1] == T:
+                c_ = self.transpose_op(c_, (0, 2, 1))
 
         outputs = []
         if initial_input is None:
@@ -269,50 +271,37 @@ class WaveNet(nn.Cell):
             if initial_input.shape[1] == self.out_channels:
                 initial_input = self.transpose_op(initial_input, (0, 2, 1))
 
-        if is_numpy:
-            current_input = initial_input.asnumpy()
-        else:
-            current_input = initial_input
+        current_input = initial_input.asnumpy()
 
         for t in tqdm(range(T)):
             if test_inputs is not None and t < test_inputs.shape[1]:
                 current_input = self.expandim_op(test_inputs[:, t, :], 1)
             else:
                 if t > 0:
-                    if not is_numpy:
-                        current_input = Tensor(outputs[-1])
-                    else:
-                        current_input = outputs[-1]
+                    current_input = outputs[-1]
 
             # Conditioning features for single time step
-            ct = None if c is None else self.expandim_op(c[:, t, :], 1)
+            ct = None if c_ is None else self.expandim_op(c_[:, t, :], 1)
             gt = None if g is None else self.expandim_op(g_btc[:, t, :], 1)
 
             x = current_input
-
-            if is_numpy:
-                ct = ct.asnumpy()
-            x = self.first_conv.incremental_forward(x, is_numpy=is_numpy)
+            ct = ct.asnumpy()
+            x = self.first_conv.incremental_forward(x)
 
             skips = 0
             for f in self.conv_layers:
-                x, h = f.incremental_forward(x, ct, gt, is_numpy=is_numpy)
+                x, h = f.incremental_forward(x, ct, gt)
                 skips += h
             skips *= self.factor
             x = skips
 
             for f in self.last_conv_layers:
                 try:
-                    x = f.incremental_forward(x, is_numpy=is_numpy)
+                    x = f.incremental_forward(x)
                 except AttributeError:
-                    if is_numpy:
-                        x = self.relu_numpy(x)
-                    else:
-                        x = self.relu_op(x)
+                    x = self.relu_numpy(x)
 
             # Generate next input by sampling
-            if not is_numpy:
-                x = x.asnumpy()
             if self.scalar_input:
                 if self.output_distribution == "Logistic":
                     x = sample_from_discretized_mix_logistic(x.reshape((B, -1, 1)), log_scale_min=log_scale_min)
