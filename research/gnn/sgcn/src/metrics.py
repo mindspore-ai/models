@@ -13,6 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """Loss and accuracy."""
+from mindspore import dtype as mstype
 import mindspore.nn as nn
 from mindspore.common.parameter import ParameterTuple
 from mindspore.ops import functional as F
@@ -34,7 +35,7 @@ class SGCNLoss(nn.Cell):
         self.concat = ops.Concat(axis=1)
         self.concat0 = ops.Concat(axis=0)
         self.log_softmax = nn.LogSoftmax(axis=1)
-        self.matmul = ops.MatMul()
+        self.matmul = nn.MatMul().to_float(mstype.float16)
         self.ce = nn.SoftmaxCrossEntropyWithLogits(sparse=True)
         self.lamb = lamb
 
