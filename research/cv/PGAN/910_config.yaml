@@ -1,0 +1,53 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+data_path: "/cache/data"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+device_target: "Ascend"
+
+
+# ==============================================================================
+# options
+dataset_name: "celeba"
+name: "celeba"
+resume_load_scale: -1
+batch_size: 16
+train_data_path: ""
+resume_check_d: "checkpoint_path/"
+resume_check_g: "checkpoint_path/"
+ckpt_save_dir: "./checkpoint"
+model_save_step: 10000
+#network
+scales: [4, 8, 16, 32, 64, 128]
+depth: [512, 512, 512, 512, 256, 128]
+num_batch: [48000, 96000, 96000, 96000, 96000, 96000]
+alpha_jumps: [0, 600, 600, 600, 600, 600]
+alpha_size_jumps: [32, 32, 32, 32, 32, 32]
+# optimizer and lr related
+lr: 0.001
+# loss related
+loss_scale_value: 12
+scale_factor: 10
+scale_window: 1000
+# export option
+ckpt_file: ""
+file_name: "PGAN"
+file_format: "MINDIR"
+
+---
+
+# Help description for each configuration
+enable_modelarts: "Whether training on modelarts, default: False"
+data_url: "Url for modelarts"
+train_url: "Url for modelarts"
+data_path: "The location of the input data."
+output_path: "The location of the output file."
+device_target: 'Target device type'
+enable_profiling: 'Whether enable profiling while training, default: False'
+
+file_format: "choices in ['AIR', 'ONNX', 'MINDIR']"
