@@ -231,8 +231,11 @@ def run_train():
             epoch_time_used = time.time() - t_epoch
             epoch = int(i / config.steps_per_epoch)
             fps = config.per_batch_size * config.world_size * config.steps_per_epoch / epoch_time_used
+            pre_step_time = epoch_time_used / config.steps_per_epoch
             config.logger.info('=================================================')
-            config.logger.info('epoch time: epoch[{}], iter[{}], {:.2f} imgs/sec'.format(epoch, i, fps))
+            config.logger.info('epoch[{}], iter[{}], {:.2f} imgs/sec'.format(epoch, i, fps))
+            config.logger.info('epoch[{}], epoch time: {:5.3f} ms, pre step time: {:5.3f} ms'.format(
+                epoch, epoch_time_used * 1000, pre_step_time * 1000))
             config.logger.info('=================================================')
             t_epoch = time.time()
 

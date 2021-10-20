@@ -250,8 +250,11 @@ def run_train():
             epoch_time_used = time.time() - t_epoch
             epoch = int(i / cfg.steps_per_epoch)
             fps = cfg.per_batch_size * cfg.world_size * cfg.steps_per_epoch / epoch_time_used
+            pre_step_time = epoch_time_used / cfg.steps_per_epoch
             cfg.logger.info('=================================================')
-            cfg.logger.info('epoch time: epoch[{}], iter[{}], {:.2f} imgs/sec'.format(epoch, i, fps))
+            cfg.logger.info('epoch[{}], iter[{}], fps: {:.2f}'.format(epoch, i, fps))
+            cfg.logger.info('epoch[{}], epoch time: {:5.3f} ms, pre step time: {:5.3f} ms'.format(
+                epoch, epoch_time_used * 1000, pre_step_time * 1000))
             cfg.logger.info('=================================================')
             t_epoch = time.time()
 
