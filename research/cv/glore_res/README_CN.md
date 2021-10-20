@@ -126,7 +126,7 @@ glore_res200网络模型的backbone是ResNet200, 在Stage2, Stage3中分别均�
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
 
 # 脚本说明
 
