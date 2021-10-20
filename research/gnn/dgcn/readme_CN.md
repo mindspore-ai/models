@@ -265,7 +265,7 @@ python export.py --ckpt_file ./checkpoint/cora/dgcn.ckpt
 | 训练时间       |3分钟/3分钟/8分钟      |
 | 卡数          |单卡                  |
 | 准确率        | 82.8/72.2/80.3       |
-| 脚本          |[DGCN脚本](https://gitee.com/mindspore/models/tree/master/research/gcn/dgcn)                      |
+| 脚本          |[DGCN脚本](https://gitee.com/mindspore/models/tree/master/research/gnn/dgcn)                      |
 
 ## 随机情况说明
 

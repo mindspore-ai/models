@@ -137,7 +137,7 @@ dcgan_cifar10_cfg {
 
 ## [Training Process](#contents)
 
-- Set options in `config.py`, including learning rate, output filename and network hyperparameters. Click [here](https://www.mindspore.cn/tutorial/training/zh-CN/master/use/data_preparation.html) for more information about dataset.
+- Set options in `config.py`, including learning rate, output filename and network hyperparameters. Click [here](https://www.mindspore.cn/docs/programming_guide/en/master/dataset_sample.html) for more information about dataset.
 
 ### [Training](#content)
 
