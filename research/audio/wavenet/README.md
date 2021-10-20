@@ -295,3 +295,11 @@ Audio samples will be demonstrated online soon.
 # [ModelZoo Homepage](#contents)
 
  Please check the official [homepage](https://gitee.com/mindspore/models).
+
+## FAQ
+
+Please refer to [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) to get some common FAQ.
+
+- **Q: What third-party packages are required and how to install them?**
+
+  **A**: nnmnkwii, librosa(preferably 0.4.0) and tqdm are needed in order to run wavenet. Instructions on how to install these packages can be found at [nnmnkwii](https://github.com/r9y9/nnmnkwii). On windows systems, specifically, installing nnmnkwii requires pysptk installed, which then requires Microsoft Visual C++ 14.0 installed previously.
