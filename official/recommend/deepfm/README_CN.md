@@ -102,8 +102,6 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
 
 - 在GPU上运行
 
-  如在GPU上运行,请配置文件src/config.py中的`device_target`从 `Ascend`改为`GPU`。
-
   ```训练示例
   # 运行训练示例
   python train.py \
@@ -115,7 +113,7 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
     --do_eval=True > ms_log/output.log 2>&1 &
 
   # 运行分布式训练示例
-  bash scripts/run_distribute_train.sh 8 /dataset_path
+  bash scripts/run_distribute_train_gpu.sh 8 /dataset_path
 
   # 运行评估示例
   python eval.py \
@@ -244,11 +242,17 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
     ├─run_distribute_train_gpu.sh     # 在GPU上进行分布式训练(8卡)
     └─run_eval.sh                     # 在Ascend处理器或GPU上进行评估
   ├─src
+    ├─model_utils
+      ├─__init__.py
+      ├─config.py
+      ├─device_target.py
+      ├─local_adapter.py
+      └─moxing_adapter.py
     ├─__init__.py                     # python init文件
-    ├─config.py                       # 参数配置
     ├─callback.py                     # 定义回调功能
     ├─deepfm.py                       # DeepFM网络
     ├─dataset.py                      # 创建DeepFM数据集
+    └─preprocess_data.py              # 数据预处理
   ├─eval.py                           # 评估网络
   └─train.py                          # 训练网络
 ```
@@ -295,7 +299,7 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
 - Ascend处理器上运行
 
   ```运行命令
-  python trin.py \
+  python train.py \
     --dataset_path='dataset/train' \
     --ckpt_path='./checkpoint' \
     --eval_file_name='auc.log' \

@@ -99,8 +99,6 @@ After installing MindSpore via the official website, you can start training and 
 
 - running on GPU
 
-  For running on GPU, please change `device_target` from `Ascend` to `GPU` in configuration file src/config.py
-
   ```shell
   # run training example
   python train.py \
@@ -112,7 +110,7 @@ After installing MindSpore via the official website, you can start training and 
     --do_eval=True > ms_log/output.log 2>&1 &
 
   # run distributed training example
-  bash scripts/run_distribute_train.sh 8 /dataset_path
+  bash scripts/run_distribute_train_gpu.sh 8 /dataset_path
 
   # run evaluation example
   python eval.py \
@@ -260,11 +258,17 @@ After installing MindSpore via the official website, you can start training and 
     ├─run_distribute_train_gpu.sh     # launch distributed training(8p) in GPU
     └─run_eval.sh                     # launch evaluating in Ascend or GPU
   ├─src
+    ├─model_utils
+     ├─__init__.py
+     ├─config.py
+     ├─device_target.py
+     ├─local_adapter.py
+     └─moxing_adapter.py
     ├─__init__.py                     # python init file
-    ├─config.py                       # parameter configuration
     ├─callback.py                     # define callback function
     ├─deepfm.py                       # deepfm network
     ├─dataset.py                      # create dataset for deepfm
+    └─preprocess_data.py              # data preprocess
   ├─eval.py                           # eval net
   └─train.py                          # train net
 ```
