@@ -36,7 +36,7 @@ export PATH=/usr/local/python3.7.5/bin:${install_path}/atc/ccec_compiler/bin:${i
 export PYTHONPATH=${install_path}/atc/python/site-packages:${install_path}/latest/atc/python/site-packages/auto_tune.egg/auto_tune:${install_path}/atc/python/site-packages/schedule_search.egg
 export ASCEND_OPP_PATH=${install_path}/opp
 
-export ASCEND_SLOG_PRINT_TO_STDOUT=1
+export ASCEND_SLOG_PRINT_TO_STDOUT=0
 
 echo "Input AIR file path: ${input_air_path}"
 echo "Output OM file path: ${output_om_path}"
