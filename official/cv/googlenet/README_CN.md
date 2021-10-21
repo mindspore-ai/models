@@ -127,7 +127,7 @@ GoogleNet由多个inception模块串联起来，可以更加深入。  降维的
 
 - GPU处理器环境运行
 
-  为了在GPU处理器环境运行，请将配置文件src/config.py中的`device_target`从`Ascend`改为`GPU`
+  为了在GPU处理器环境运行，请将配置文件[dataset]_config.yaml中的`device_target`从`Ascend`改为`GPU`
 
   ```python
   # 运行训练示例
@@ -147,10 +147,14 @@ GoogleNet由多个inception模块串联起来，可以更加深入。  降维的
 
   ```python
   # 运行训练示例
+  bash run_train_cpu.sh
+  OR
   nohup python train.py --config_path=cifar10_config_cpu.yaml --dataset_name=cifar10  > train.log 2>&1 &
 
   # 运行评估示例
-  nohup python eval.py --checkpoint_path=[CHECKPOINT_PATH] > eval.log 2>&1 &
+  bash run_eval_cpu.sh
+  OR
+  nohup python eval.py --checkpoint_path=[CHECKPOINT_PATH] --config_path=cifar10_config_cpu.yaml > eval.log 2>&1 &
   ```
 
 默认使用CIFAR-10数据集。您也可以将`$dataset_type`传入脚本，以便选择其他数据集。如需查看更多详情，请参考指定脚本。
