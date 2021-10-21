@@ -238,13 +238,13 @@ The entire code structure is as following:
     # Train 1p with Ascend
     # (1) Perform a or b.
     #       a. Set "enable_modelarts=True" on base_config.yaml file.
-    #          Set "run_platform='Ascend'" on default_config.yaml file.
+    #          Set "run_platform=Ascend" on default_config.yaml file.
     #          Set "mindrecord_path='/cache/data/face_detect_dataset/mindrecord_train/data.mindrecord'" on default_config.yaml file.
     #          (optional)Set "checkpoint_url='s3://dir_to_your_pretrain/'" on default_config.yaml file.
     #          (optional)Set "pretrained='/cache/checkpoint_path/model.ckpt'" on default_config.yaml file.
     #          Set other parameters on default_config.yaml file you need.
     #       b. Add "enable_modelarts=True" on the website UI interface.
-    #          Add "run_platform='Ascend'" on the website UI interface.
+    #          Add "run_platform=Ascend" on the website UI interface.
     #          Add "mindrecord_path='/cache/data/face_detect_dataset/mindrecord_train/data.mindrecord'" on the website UI interface.
     #          (optional)Add "checkpoint_url='s3://dir_to_your_pretrain/'" on the website UI interface.
     #          (optional)Add "pretrained='/cache/checkpoint_path/model.ckpt'" on the website UI interface.
@@ -259,13 +259,13 @@ The entire code structure is as following:
     # Eval 1p with Ascend
     # (1) Perform a or b.
     #       a. Set "enable_modelarts=True" on base_config.yaml file.
-    #          Set "run_platform='Ascend'" on default_config.yaml file.
+    #          Set "run_platform=Ascend" on default_config.yaml file.
     #          Set "mindrecord_path='/cache/data/face_detect_dataset/mindrecord_train/data.mindrecord'" on default_config.yaml file.
     #          Set "checkpoint_url='s3://dir_to_your_pretrain/'" on default_config.yaml file.
     #          Set "pretrained='/cache/checkpoint_path/model.ckpt'" on default_config.yaml file.
     #          Set other parameters on default_config.yaml file you need.
     #       b. Add "enable_modelarts=True" on the website UI interface.
-    #          Add "run_platform='Ascend'" on the website UI interface.
+    #          Add "run_platform=Ascend" on the website UI interface.
     #          Add "mindrecord_path='/cache/data/face_detect_dataset/mindrecord_test/data.mindrecord'" on the website UI interface.
     #          Add "checkpoint_url='s3://dir_to_your_pretrain/'" on the website UI interface.
     #          Add "pretrained='/cache/checkpoint_path/model.ckpt'" on the website UI interface.

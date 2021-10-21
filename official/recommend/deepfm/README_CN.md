@@ -79,7 +79,7 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
     --ckpt_path='./checkpoint' \
     --eval_file_name='auc.log' \
     --loss_file_name='loss.log' \
-    --device_target='Ascend' \
+    --device_target=Ascend \
     --do_eval=True > ms_log/output.log 2>&1 &
 
   # 运行分布式训练示例
@@ -89,7 +89,7 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
   python eval.py \
     --dataset_path='dataset/test' \
     --checkpoint_path='./checkpoint/deepfm.ckpt' \
-    --device_target='Ascend' > ms_log/eval_output.log 2>&1 &
+    --device_target=Ascend > ms_log/eval_output.log 2>&1 &
   OR
   bash scripts/run_eval.sh 0 Ascend /dataset_path /checkpoint_path/deepfm.ckpt
   ```
@@ -111,7 +111,7 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
     --ckpt_path='./checkpoint' \
     --eval_file_name='auc.log' \
     --loss_file_name='loss.log' \
-    --device_target='GPU' \
+    --device_target=GPU \
     --do_eval=True > ms_log/output.log 2>&1 &
 
   # 运行分布式训练示例
@@ -121,7 +121,7 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
   python eval.py \
     --dataset_path='dataset/test' \
     --checkpoint_path='./checkpoint/deepfm.ckpt' \
-    --device_target='GPU' > ms_log/eval_output.log 2>&1 &
+    --device_target=GPU > ms_log/eval_output.log 2>&1 &
   OR
   bash scripts/run_eval.sh 0 GPU /dataset_path /checkpoint_path/deepfm.ckpt
   ```
@@ -300,7 +300,7 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
     --ckpt_path='./checkpoint' \
     --eval_file_name='auc.log' \
     --loss_file_name='loss.log' \
-    --device_target='Ascend' \
+    --device_target=Ascend \
     --do_eval=True > ms_log/output.log 2>&1 &
   ```
 
@@ -344,7 +344,7 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
   python eval.py \
     --dataset_path='dataset/test' \
     --checkpoint_path='./checkpoint/deepfm.ckpt' \
-    --device_target='Ascend' > ms_log/eval_output.log 2>&1 &
+    --device_target=Ascend > ms_log/eval_output.log 2>&1 &
   OR
   bash scripts/run_eval.sh 0 Ascend /dataset_path /checkpoint_path/deepfm.ckpt
   ```

@@ -62,14 +62,14 @@ After installing MindSpore via the official website, you can start training and 
     --ckpt_path='./checkpoint' \
     --eval_file_name='auc.log' \
     --loss_file_name='loss.log' \
-    --device_target='Ascend' \
+    --device_target=Ascend \
     --do_eval=True > ms_log/output.log 2>&1 &
 
   # run evaluation example
   python eval.py \
     --test_data_dir='dataset/test' \
     --checkpoint_path='./checkpoint/autodis.ckpt' \
-    --device_target='Ascend' > ms_log/eval_output.log 2>&1 &
+    --device_target=Ascend > ms_log/eval_output.log 2>&1 &
   OR
   bash scripts/run_eval.sh 0 Ascend /test_data_dir /checkpoint_path/autodis.ckpt
   ```
@@ -191,7 +191,7 @@ Parameters for both training and evaluation can be set in `default_config.yaml`
     --ckpt_path='./checkpoint' \
     --eval_file_name='auc.log' \
     --loss_file_name='loss.log' \
-    --device_target='Ascend' \
+    --device_target=Ascend \
     --do_eval=True > ms_log/output.log 2>&1 &
   ```
 
@@ -219,7 +219,7 @@ Parameters for both training and evaluation can be set in `default_config.yaml`
   python eval.py \
     --test_data_dir='dataset/test' \
     --checkpoint_path='./checkpoint/autodis.ckpt' \
-    --device_target='Ascend' > ms_log/eval_output.log 2>&1 &
+    --device_target=Ascend > ms_log/eval_output.log 2>&1 &
   OR
   bash scripts/run_eval.sh 0 Ascend /test_data_dir /checkpoint_path/autodis.ckpt
   ```

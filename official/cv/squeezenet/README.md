@@ -695,14 +695,14 @@ If you need to use the trained model to perform inference on multiple hardware p
   # Set context
   device_id = int(os.getenv('DEVICE_ID'))
   context.set_context(mode=context.GRAPH_MODE,
-                      device_target='Ascend',
+                      device_target=Ascend,
                       device_id=device_id)
 
   # Load unseen dataset for inference
   dataset = create_dataset(dataset_path=config.data_path,
                            do_train=False,
                            batch_size=config.batch_size,
-                           target='Ascend')
+                           target=Ascend)
 
   # Define model
   net = squeezenet(num_classes=config.class_num)
@@ -731,7 +731,7 @@ If you need to use the trained model to perform inference on multiple hardware p
                            do_train=True,
                            repeat_num=1,
                            batch_size=config.batch_size,
-                           target='Ascend')
+                           target=Ascend)
   step_size = dataset.get_dataset_size()
 
   # define net

@@ -76,7 +76,7 @@ After installing MindSpore via the official website, you can start training and 
     --ckpt_path='./checkpoint' \
     --eval_file_name='auc.log' \
     --loss_file_name='loss.log' \
-    --device_target='Ascend' \
+    --device_target=Ascend \
     --do_eval=True > ms_log/output.log 2>&1 &
 
   # run distributed training example
@@ -86,7 +86,7 @@ After installing MindSpore via the official website, you can start training and 
   python eval.py \
     --dataset_path='dataset/test' \
     --checkpoint_path='./checkpoint/deepfm.ckpt' \
-    --device_target='Ascend' > ms_log/eval_output.log 2>&1 &
+    --device_target=Ascend > ms_log/eval_output.log 2>&1 &
   OR
   bash scripts/run_eval.sh 0 Ascend /dataset_path /checkpoint_path/deepfm.ckpt
   ```
@@ -108,7 +108,7 @@ After installing MindSpore via the official website, you can start training and 
     --ckpt_path='./checkpoint' \
     --eval_file_name='auc.log' \
     --loss_file_name='loss.log' \
-    --device_target='GPU' \
+    --device_target=GPU \
     --do_eval=True > ms_log/output.log 2>&1 &
 
   # run distributed training example
@@ -118,7 +118,7 @@ After installing MindSpore via the official website, you can start training and 
   python eval.py \
     --dataset_path='dataset/test' \
     --checkpoint_path='./checkpoint/deepfm.ckpt' \
-    --device_target='GPU' > ms_log/eval_output.log 2>&1 &
+    --device_target=GPU > ms_log/eval_output.log 2>&1 &
   OR
   bash scripts/run_eval.sh 0 GPU /dataset_path /checkpoint_path/deepfm.ckpt
   ```
@@ -132,14 +132,14 @@ After installing MindSpore via the official website, you can start training and 
     --ckpt_path='./checkpoint' \
     --eval_file_name='auc.log' \
     --loss_file_name='loss.log' \
-    --device_target='CPU' \
+    --device_target=CPU \
     --do_eval=True > ms_log/output.log 2>&1 &
 
   # run evaluation example
   python eval.py \
     --dataset_path='dataset/test' \
     --checkpoint_path='./checkpoint/deepfm.ckpt' \
-    --device_target='CPU' > ms_log/eval_output.log 2>&1 &
+    --device_target=CPU > ms_log/eval_output.log 2>&1 &
   ```
 
 - Running on [ModelArts](https://support.huaweicloud.com/modelarts/)
@@ -316,7 +316,7 @@ Parameters for both training and evaluation can be set in config.py
     --ckpt_path='./checkpoint' \
     --eval_file_name='auc.log' \
     --loss_file_name='loss.log' \
-    --device_target='Ascend' \
+    --device_target=Ascend \
     --do_eval=True > ms_log/output.log 2>&1 &
   ```
 
@@ -362,7 +362,7 @@ Parameters for both training and evaluation can be set in config.py
   python eval.py \
     --dataset_path='dataset/test' \
     --checkpoint_path='./checkpoint/deepfm.ckpt' \
-    --device_target='Ascend' > ms_log/eval_output.log 2>&1 &
+    --device_target=Ascend > ms_log/eval_output.log 2>&1 &
   OR
   bash scripts/run_eval.sh 0 Ascend /dataset_path /checkpoint_path/deepfm.ckpt
   ```

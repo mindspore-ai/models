@@ -84,12 +84,12 @@ After dataset preparation, you can start training and evaluation as follows:
     #       a. Set "enable_modelarts=True" on [DATASET_NAME]_config.yaml file.
     #          Set "dataset_path='/cache/data/[DATASET_NAME]'" on [DATASET_NAME]_config.yaml file.
     #          Set "data_name='[DATASET_NAME]'" on [DATASET_NAME]_config.yaml file.
-    #          (option)Set "device_target='GPU'" on [DATASET_NAME]_config.yaml file if run with GPU.
+    #          (option)Set "device_target=GPU" on [DATASET_NAME]_config.yaml file if run with GPU.
     #          (option)Set other parameters on [DATASET_NAME]_config.yaml file you need.
     #       b. Add "enable_modelarts=True" on the website UI interface.
     #          Add "dataset_path='/cache/data/[DATASET_NAME]'" on the website UI interface.
     #          Add "data_name='[DATASET_NAME]'" on the website UI interface.
-    #          (option)Set "device_target='GPU'" on the website UI interface if run with GPU.
+    #          (option)Set "device_target=GPU" on the website UI interface if run with GPU.
     #          (option)Set other parameters on the website UI interface.
     # (3) Upload a zip dataset to S3 bucket. (you could also upload the origin dataset, but it can be so slow.)
     # (4) Set the code directory to "/path/fasttext" on the website UI interface.
@@ -105,14 +105,14 @@ After dataset preparation, you can start training and evaluation as follows:
     #          Set "data_name='[DATASET_NAME]'" on [DATASET_NAME]_config.yaml file.
     #          Set "checkpoint_url='s3://dir_to_trained_ckpt/'" on [DATASET_NAME]_config.yaml file.
     #          Set "model_ckpt='/cache/checkpoint_path/model.ckpt'" on [DATASET_NAME]_config.yaml file.
-    #          (option)Set "device_target='GPU'" on [DATASET_NAME]_config.yaml file if run with GPU.
+    #          (option)Set "device_target=GPU" on [DATASET_NAME]_config.yaml file if run with GPU.
     #          (option)Set other parameters on [DATASET_NAME]_config.yaml file you need.
     #       b. Add "enable_modelarts=True" on the website UI interface.
     #          Add "dataset_path='/cache/data/[DATASET_NAME]'" on the website UI interface.
     #          Add "data_name='[DATASET_NAME]'" on the website UI interface.
     #          Add "checkpoint_url='s3://dir_to_trained_ckpt/'" on the website UI interface.
     #          Add "model_ckpt='/cache/checkpoint_path/model.ckpt'" on the website UI interface.
-    #          (option)Set "device_target='GPU'" on the website UI interface if run with GPU.
+    #          (option)Set "device_target=GPU" on the website UI interface if run with GPU.
     #          (option)Set other parameters on the website UI interface.
     # (3) Upload or copy your trained model to S3 bucket.
     # (4) Upload a zip dataset to S3 bucket. (you could also upload the origin dataset, but it can be so slow.)

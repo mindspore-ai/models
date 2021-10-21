@@ -83,13 +83,13 @@
 
   ```bash
   # 运行训练示例
-  python train.py --device_id=0 --device_type='Ascend' > train.log 2>&1 &
+  python train.py --device_id=0 --device_type=Ascend > train.log 2>&1 &
 
   # 运行分布式训练示例
   bash ./scripts/run_train_ascend.sh [RANK_TABLE_FILE]
 
   # 运行评估示例
-  python eval.py --checkpoint_path ./ckpt_0 --device_type='Ascend' > ./eval.log 2>&1 &
+  python eval.py --checkpoint_path ./ckpt_0 --device_type=Ascend > ./eval.log 2>&1 &
 
   # 运行推理示例
   bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
@@ -107,13 +107,13 @@
 
   ```bash
   # 运行训练示例
-  python train.py --device_id=0 --device_type='GPU' > train_gpu.log 2>&1 &
+  python train.py --device_id=0 --device_type=GPU > train_gpu.log 2>&1 &
 
   # 运行分布式训练示例
   bash ./scripts/run_train_gpu.sh 8 0,1,2,3,4,5,6,7
 
   # 运行评估示例
-  python eval.py --checkpoint_path ./ckpt_0 --device_type='GPU' > ./eval_gpu.log 2>&1 &
+  python eval.py --checkpoint_path ./ckpt_0 --device_type=GPU > ./eval_gpu.log 2>&1 &
   ```
 
 # 脚本说明
@@ -176,7 +176,7 @@
 - Ascend处理器环境运行
 
   ```bash
-  python train.py --device_id=0 --device_type='Ascend' > train.log 2>&1 &
+  python train.py --device_id=0 --device_type=Ascend > train.log 2>&1 &
   ```
 
   上述python命令将在后台运行，可以通过生成的train.log文件查看结果。
@@ -196,7 +196,7 @@
   为了在GPU处理器环境运行，请将配置文件src/config.py中的device_target从Ascend改为GPU。
 
   ```bash
-  python train.py --device_id=0 --device_type='GPU' > train_gpu.log 2>&1 &
+  python train.py --device_id=0 --device_type=GPU > train_gpu.log 2>&1 &
   ```
 
   上述python命令将在后台运行，可以通过生成的train_gpu.log文件查看结果。
@@ -232,7 +232,7 @@
   “./ckpt_0”是保存了训练好的.ckpt模型文件的目录。
 
   ```bash
-  python eval.py --checkpoint_path ./ckpt_0 --device_type='Ascend' > ./eval.log 2>&1 &
+  python eval.py --checkpoint_path ./ckpt_0 --device_type=Ascend > ./eval.log 2>&1 &
   ```
 
 - 在GPU处理器环境运行时评估ImageNet-1k数据集
@@ -240,7 +240,7 @@
   “./ckpt_0”是保存了训练好的.ckpt模型文件的目录。
 
   ```bash
-  python eval.py --checkpoint_path ./ckpt_0 --device_type='GPU' > ./eval_gpu.log 2>&1 &
+  python eval.py --checkpoint_path ./ckpt_0 --device_type=GPU > ./eval_gpu.log 2>&1 &
   OR
   bash ./scripts/run_eval.sh
   ```

@@ -1,5 +1,6 @@
 # Contents
 
+- [Contents](#contents)
 - [DenseNet Description](#densenet-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
@@ -12,17 +13,20 @@
     - [Script Parameters](#script-parameters)
     - [Training Process](#training-process)
         - [Training](#training)
-        - [Distributed Training](#distributed-training)  
+        - [Distributed Training](#distributed-training)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
     - [Export Process](#export-process)
-        - [Export](#Export)
-    - [Inferenct Process](#Inferenct-process)
-        - [Inferenct](#Inferenct)
+        - [export](#export)
+    - [Inference Process](#inference-process)
+        - [Inference](#inference)
 - [Model Description](#model-description)
     - [Performance](#performance)
+        - [DenseNet121](#densenet121)
         - [Training accuracy results](#training-accuracy-results)
         - [Training performance results](#training-performance-results)
+        - [DenseNet100](#densenet100)
+        - [Training performance](#training-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -179,13 +183,13 @@ After installing MindSpore via the official website, you can start training and 
 
   # run training example
   export CUDA_VISIBLE_DEVICES=0
-  python train.py --net=[NET_NAME] --dataset=[DATASET_NAME] --train_data_dir=[DATASET_PATH] --is_distributed=0 --device_target='GPU' > train.log 2>&1 &
+  python train.py --net=[NET_NAME] --dataset=[DATASET_NAME] --train_data_dir=[DATASET_PATH] --is_distributed=0 --device_target=GPU > train.log 2>&1 &
 
   # run distributed training example
   bash run_distribute_train_gpu.sh 8 0,1,2,3,4,5,6,7  [NET_NAME] [DATASET_NAME] [DATASET_PATH]
 
   # run evaluation example
-  python eval.py --net=[NET_NAME] --dataset=[DATASET_NAME] --eval_data_dir=[DATASET_PATH] --device_target='GPU' --ckpt_files=[CHECKPOINT_PATH] > eval.log 2>&1 &
+  python eval.py --net=[NET_NAME] --dataset=[DATASET_NAME] --eval_data_dir=[DATASET_PATH] --device_target=GPU --ckpt_files=[CHECKPOINT_PATH] > eval.log 2>&1 &
   OR
   bash run_distribute_eval_gpu.sh 1 0  [NET_NAME] [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH]
 
@@ -301,7 +305,7 @@ You can modify the training behaviour through the various flags in the `densenet
   ```python
 
   export CUDA_VISIBLE_DEVICES=0
-  python train.py --net [NET_NAME] --dataset [DATASET_NAME] --train_data_dir=[DATASET_PATH] --is_distributed=0 --device_target='GPU' > train.log 2>&1 &
+  python train.py --net [NET_NAME] --dataset [DATASET_NAME] --train_data_dir=[DATASET_PATH] --is_distributed=0 --device_target=GPU > train.log 2>&1 &
 
   ```
 
@@ -313,7 +317,7 @@ You can modify the training behaviour through the various flags in the `densenet
 
   ```python
 
-  python train.py --net=[NET_NAME] --dataset=[DATASET_NAME] --train_data_dir=[DATASET_PATH] --is_distributed=0 --device_target='CPU' > train.log 2>&1 &
+  python train.py --net=[NET_NAME] --dataset=[DATASET_NAME] --train_data_dir=[DATASET_PATH] --is_distributed=0 --device_target=CPU > train.log 2>&1 &
 
   ```
 
@@ -387,7 +391,7 @@ You can modify the training behaviour through the various flags in the `densenet
 
   ```python
 
-  python eval.py --net=[NET_NAME] --dataset=[DATASET_NAME] --eval_data_dir=[DATASET_PATH] --device_target='GPU' --ckpt_files=[CHECKPOINT_PATH] > eval.log 2>&1 &
+  python eval.py --net=[NET_NAME] --dataset=[DATASET_NAME] --eval_data_dir=[DATASET_PATH] --device_target=GPU --ckpt_files=[CHECKPOINT_PATH] > eval.log 2>&1 &
   OR
   bash run_distribute_eval_gpu.sh 1 0 [NET_NAME] [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH]
 
@@ -416,7 +420,7 @@ You can modify the training behaviour through the various flags in the `densenet
 
   ```python
 
-  python eval.py --net=[NET_NAME] --dataset=[DATASET_NAME] --eval_data_dir=[DATASET_PATH] --device_target='CPU' --ckpt_files=[CHECKPOINT_PATH] > eval.log 2>&1 &
+  python eval.py --net=[NET_NAME] --dataset=[DATASET_NAME] --eval_data_dir=[DATASET_PATH] --device_target=CPU --ckpt_files=[CHECKPOINT_PATH] > eval.log 2>&1 &
 
   ```
 

@@ -83,7 +83,7 @@ You can start training using python or shell scripts. The usage of shell scripts
 ```bash
 # training example
   python:
-      GPU: mpirun --allow-run-as-root -n 8 --output-filename log_output --merge-stderr-to-stdout python train.py --is_distributed=True --platform='GPU' --dataset_path='~/imagenet/train/' > train.log 2>&1 &
+      GPU: mpirun --allow-run-as-root -n 8 --output-filename log_output --merge-stderr-to-stdout python train.py --is_distributed=True --platform=GPU --dataset_path='~/imagenet/train/' > train.log 2>&1 &
 
   shell:
       GPU: cd scripts & bash run_distribute_train_for_gpu.sh 8 0,1,2,3,4,5,6,7 ~/imagenet/train/
@@ -106,7 +106,7 @@ You can start evaluation using python or shell scripts. The usage of shell scrip
 ```bash
 # infer example
   python:
-      GPU: CUDA_VISIBLE_DEVICES=0 python eval.py --platform='GPU' --dataset_path='~/imagenet/val/' > eval.log 2>&1 &
+      GPU: CUDA_VISIBLE_DEVICES=0 python eval.py --platform=GPU --dataset_path='~/imagenet/val/' > eval.log 2>&1 &
 
   shell:
       GPU: cd scripts & bash run_eval_for_gpu.sh '~/imagenet/val/' 'checkpoint_file'

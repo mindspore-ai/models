@@ -24,8 +24,11 @@
         - [推理](#推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
+        - [DenseNet121](#densenet121)
         - [训练准确率结果](#训练准确率结果)
         - [训练性能结果](#训练性能结果)
+        - [DenseNet100](#densenet100)
+        - [训练结果](#训练结果)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
 
@@ -178,13 +181,13 @@ DenseNet-100使用的数据集： Cifar-10
   ```python
   # 训练示例
   export CUDA_VISIBLE_DEVICES=0
-  python train.py --net=[NET_NAME] --dataset=[DATASET_NAME] --train_data_dir=[DATASET_PATH] --is_distributed=0 --device_target='GPU' > train.log 2>&1 &
+  python train.py --net=[NET_NAME] --dataset=[DATASET_NAME] --train_data_dir=[DATASET_PATH] --is_distributed=0 --device_target=GPU > train.log 2>&1 &
 
   # 分布式训练示例
   bash run_distribute_train_gpu.sh 8 0,1,2,3,4,5,6,7 [NET_NAME] [DATASET_NAME] [DATASET_PATH]
 
   # 评估示例
-  python eval.py --net=[NET_NAME] --dataset=[DATASET_NAME] --eval_data_dir=[DATASET_PATH] --device_target='GPU' --ckpt_files=[CHECKPOINT_PATH] > eval.log 2>&1 &
+  python eval.py --net=[NET_NAME] --dataset=[DATASET_NAME] --eval_data_dir=[DATASET_PATH] --device_target=GPU --ckpt_files=[CHECKPOINT_PATH] > eval.log 2>&1 &
   OR
   bash run_distribute_eval_gpu.sh 1 0 [NET_NAME] [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH]
   ```
@@ -291,7 +294,7 @@ DenseNet-100使用的数据集： Cifar-10
 
 ```python
 export CUDA_VISIBLE_DEVICES=0
-python train.py --net=[NET_NAME] --dataset=[DATASET_NAME] --train_data_dir=[DATASET_PATH] --is_distributed=0 --device_target='GPU' > train.log 2>&1 &
+python train.py --net=[NET_NAME] --dataset=[DATASET_NAME] --train_data_dir=[DATASET_PATH] --is_distributed=0 --device_target=GPU > train.log 2>&1 &
 ```
 
 以上python命令在后台运行，在`output/202x-xx-xx_time_xx_xx/`目录下生成日志和模型检查点。
@@ -299,7 +302,7 @@ python train.py --net=[NET_NAME] --dataset=[DATASET_NAME] --train_data_dir=[DATA
 - CPU处理器环境运行
 
 ```python
-python train.py --net=[NET_NAME] --dataset=[DATASET_NAME] --train_data_dir=[DATASET_PATH] --is_distributed=0 --device_target='CPU' > train.log 2>&1 &
+python train.py --net=[NET_NAME] --dataset=[DATASET_NAME] --train_data_dir=[DATASET_PATH] --is_distributed=0 --device_target=CPU > train.log 2>&1 &
 ```
 
 以上python命令在后台运行，在`output/202x-xx-xx_time_xx_xx/`目录下生成日志和模型检查点。
@@ -362,7 +365,7 @@ bash run_distribute_train_gpu.sh 8 0,1,2,3,4,5,6,7 [NET_NAME] [DATASET_NAME] [DA
   运行以下命令进行评估。
 
   ```eval
-  python eval.py --net=[NET_NAME] --dataset=[DATASET_NAME] --eval_data_dir=[DATASET_PATH] --device_target='GPU' --ckpt_files=[CHECKPOINT_PATH] > eval.log 2>&1 &
+  python eval.py --net=[NET_NAME] --dataset=[DATASET_NAME] --eval_data_dir=[DATASET_PATH] --device_target=GPU --ckpt_files=[CHECKPOINT_PATH] > eval.log 2>&1 &
   OR
   bash run_distribute_eval_gpu.sh 1 0 [NET_NAME] [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH]
   ```
@@ -385,7 +388,7 @@ bash run_distribute_train_gpu.sh 8 0,1,2,3,4,5,6,7 [NET_NAME] [DATASET_NAME] [DA
   运行以下命令进行评估。
 
   ```eval
-  python eval.py --net=[NET_NAME] --dataset=[DATASET_NAME] --eval_data_dir=[DATASET_PATH] --device_target='CPU' --ckpt_files=[CHECKPOINT_PATH] > eval.log 2>&1 &
+  python eval.py --net=[NET_NAME] --dataset=[DATASET_NAME] --eval_data_dir=[DATASET_PATH] --device_target=CPU --ckpt_files=[CHECKPOINT_PATH] > eval.log 2>&1 &
   ```
 
   上述python命令在后台运行。可以通过“eval/eval.log”文件查看结果。DenseNet-100在Cifar-10的测试数据集的准确率如下：

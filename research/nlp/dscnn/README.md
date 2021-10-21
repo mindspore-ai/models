@@ -102,7 +102,7 @@ First set the config for data, train, eval in src/config.py
 
   ```python
   # run training example
-  python train.py --amp_level 'O3' --device_target='GPU' --train_feat_dir your train dataset dir
+  python train.py --amp_level 'O3' --device_target=GPU --train_feat_dir your train dataset dir
 
   # run evaluation example
   # if you want to eval a specific model, you should specify model_dir to the ckpt path:
