@@ -232,13 +232,13 @@ sh run_eval_gpu.sh [IMGS_PATH] [ANNOS_PATH] [CHECKPOINT_PATH] [COCO_TEXT_PARSER_
 #       a. Set "enable_modelarts=True" on default_config.yaml file.
 #          Set "checkpoint_url='s3://dir_to_trained_model/'" on default_config.yaml file.
 #          Set "ckpt_file='/cache/checkpoint_path/model.ckpt'" on default_config.yaml file.
-#          Set "device_target='Ascend'" on default_config.yaml file.
+#          Set "device_target=Ascend" on default_config.yaml file.
 #          Set "file_format='MINDIR'" on default_config.yaml file.
 #          Set other parameters on default_config.yaml file you need.
 #       b. Add "enable_modelarts=True" on the website UI interface.
 #          Add "checkpoint_url='s3://dir_to_trained_model/'" on the website UI interface.
 #          Add "ckpt_file='/cache/checkpoint_path/model.ckpt'" on the website UI interface.
-#          Add "device_target='Ascend'" on the website UI interface.
+#          Add "device_target=Ascend" on the website UI interface.
 #          Add "file_format='MINDIR'" on the website UI interface.
 #          Add other parameters on the website UI interface.
 # (2) Set the code directory to "/path/deeptext" on the website UI interface.

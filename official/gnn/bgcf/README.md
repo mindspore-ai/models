@@ -123,7 +123,7 @@ After installing MindSpore via the official website and Dataset is correctly gen
       #       a. Set "enable_modelarts=True" on default_config.yaml file.
       #          Set "datapath='/cache/data/amazon_beauty/data_mr'" on default_config.yaml file.
       #          Set "ckptpath='./ckpts'" on default_config.yaml file.
-      #          (options)Set "device_target='GPU'" on default_config.yaml file if run on GPU.
+      #          (options)Set "device_target=GPU" on default_config.yaml file if run on GPU.
       #          (options)Set "num_epoch=680" on default_config.yaml file if run on GPU.
       #          (options)Set "dist_reg=0" on default_config.yaml file if run on GPU.
       #          Set other parameters on default_config.yaml file you need.
@@ -150,7 +150,7 @@ After installing MindSpore via the official website and Dataset is correctly gen
       #          Set "datapath='/cache/data/amazon_beauty/data_mr'" on default_config.yaml file.
       #          Set "ckptpath='/cache/checkpoint_path'" on default_config.yaml file.
       #          Set "checkpoint_url='s3://dir_to_your_trained_ckpt/'" on default_config.yaml file.
-      #          (options)Set "device_target='GPU'" on default_config.yaml file if run on GPU.
+      #          (options)Set "device_target=GPU" on default_config.yaml file if run on GPU.
       #          (options)Set "num_epoch=680" on default_config.yaml file if run on GPU.
       #          (options)Set "dist_reg=0" on default_config.yaml file if run on GPU.
       #          Set other parameters on default_config.yaml file you need.
@@ -179,7 +179,7 @@ After installing MindSpore via the official website and Dataset is correctly gen
       #          Set "checkpoint_url='s3://dir_to_your_trained_ckpt/'" on default_config.yaml file.
       #          Set "file_name='bgcf'" on default_config.yaml file.
       #          Set "file_format='AIR'" on default_config.yaml file.
-      #          (options)Set "device_target='GPU'" on default_config.yaml file if run on GPU.
+      #          (options)Set "device_target=GPU" on default_config.yaml file if run on GPU.
       #          Set other parameters on default_config.yaml file you need.
       #       b. Add "enable_modelarts=True" on the website UI interface.
       #          Add "ckpt_file=/cache/checkpoint_path/model.ckpt" on the website UI interface.

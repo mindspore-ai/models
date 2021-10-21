@@ -117,7 +117,7 @@ You can start training using python or shell scripts. The usage of shell scripts
       # (1) Add "config_path='/path_to_code/MINDlarge_config.yaml'" on the website UI interface.
       # (2) Perform a or b.
       #       a. Set "enable_modelarts=True" on MINDlarge_config.yaml file.
-      #          Set "platform='Ascend'" on MINDlarge_config.yaml file.
+      #          Set "platform=Ascend" on MINDlarge_config.yaml file.
       #          Set "dataset='large'" on MINDlarge_config.yaml file.
       #          Set "dataset_path='/cache/data/MINDlarge'" on MINDlarge_config.yaml file.
       #          Set "save_checkpoint_path='./checkpoint'" on MINDlarge_config.yaml file.
@@ -145,7 +145,7 @@ You can start training using python or shell scripts. The usage of shell scripts
       # (1) Add "config_path='/path_to_code/MINDlarge_config.yaml'" on the website UI interface.
       # (2) Perform a or b.
       #       a. Set "enable_modelarts=True" on MINDlarge_config.yaml file.
-      #          Set "platform='Ascend'" on MINDlarge_config.yaml file.
+      #          Set "platform=Ascend" on MINDlarge_config.yaml file.
       #          Set "dataset='large'" on MINDlarge_config.yaml file.
       #          Set "dataset_path='/cache/data/MINDlarge'" on MINDlarge_config.yaml file.
       #          Set "checkpoint_url='s3://dir_to_trained_ckpt/'" on MINDlarge_config.yaml file.
@@ -172,7 +172,7 @@ You can start training using python or shell scripts. The usage of shell scripts
       # (1) Add "config_path='/path_to_code/MINDlarge_config.yaml'" on the website UI interface.
       # (2) Perform a or b.
       #       a. Set "enable_modelarts=True" on MINDlarge_config.yaml file.
-      #          Set "platform='Ascend'" on MINDlarge_config.yaml file.
+      #          Set "platform=Ascend" on MINDlarge_config.yaml file.
       #          Set "file_format='AIR'" on MINDlarge_config.yaml file.
       #          Set "batch_size=1" on MINDlarge_config.yaml file.
       #          Set "checkpoint_url='s3://dir_to_trained_ckpt/'" on MINDlarge_config.yaml file.

@@ -75,7 +75,7 @@ Fat - DeepFFM consists of three parts. The FFM component is a factorization mach
     --ckpt_path='./checkpoint/Fat-DeepFFM' \
     --eval_file_name='./auc.log' \
     --loss_file_name='./loss.log' \
-    --device_target='Ascend' \
+    --device_target=Ascend \
     --do_eval=True > output.log 2>&1 &
 
   # run distributed training example
@@ -106,7 +106,7 @@ Fat - DeepFFM consists of three parts. The FFM component is a factorization mach
     --ckpt_path='./checkpoint/Fat-DeepFFM' \
     --eval_file_name='./auc.log' \
     --loss_file_name='./loss.log' \
-    --device_target='GPU' \
+    --device_target=GPU \
     --do_eval=True > output.log 2>&1 &
 
   # run distributed training example
@@ -196,7 +196,7 @@ Parameters for both training and evaluation can be set in config.py
     --ckpt_path='./checkpoint' \
     --eval_file_name='./auc.log' \
     --loss_file_name='./loss.log' \
-    --device_target='Ascend' \
+    --device_target=Ascend \
     --do_eval=True > output.log 2>&1 &
   ```
 
@@ -237,7 +237,7 @@ Parameters for both training and evaluation can be set in config.py
     --dataset_path=' /dataset_path' \
     --checkpoint_path='/ckpt_path' \
     --device_id=0 \
-    --device_target='Ascend' > ms_log/eval_output.log 2>&1 &
+    --device_target=Ascend > ms_log/eval_output.log 2>&1 &
   OR
    bash scripts/run_eval.sh  0 Ascend  /dataset_path  /ckpt_path
   ```

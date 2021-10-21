@@ -136,7 +136,7 @@ BGCF包含两个主要模块。首先是抽样，它生成基于节点复制的�
       #       a. 在 default_config.yaml 文件中设置 "enable_modelarts=True"
       #          在 default_config.yaml 文件中设置 "datapath='/cache/data/amazon_beauty/data_mr'"
       #          在 default_config.yaml 文件中设置 "ckptpath='./ckpts'"
-      #          (可选)如果选择GPU运行，在 default_config.yaml 文件中设置 "device_target='GPU'"
+      #          (可选)如果选择GPU运行，在 default_config.yaml 文件中设置 "device_target=GPU"
       #          (可选)如果选择GPU运行，在 default_config.yaml 文件中设置 "num_epoch=680"
       #          (可选)如果选择GPU运行，在 default_config.yaml 文件中设置 "dist_reg=0"
       #          在 default_config.yaml 文件中设置 其他参数
@@ -162,7 +162,7 @@ BGCF包含两个主要模块。首先是抽样，它生成基于节点复制的�
       #       a. 在 default_config.yaml 文件中设置 "enable_modelarts=True"
       #          在 default_config.yaml 文件中设置 "datapath='/cache/data/amazon_beauty/data_mr'"
       #          在 default_config.yaml 文件中设置 "ckptpath='./ckpts'"
-      #          (可选)如果选择GPU运行，在 default_config.yaml 文件中设置 "device_target='GPU'"
+      #          (可选)如果选择GPU运行，在 default_config.yaml 文件中设置 "device_target=GPU"
       #          (可选)如果选择GPU运行，在 default_config.yaml 文件中设置 "num_epoch=680"
       #          (可选)如果选择GPU运行，在 default_config.yaml 文件中设置 "dist_reg=0"
       #          在 default_config.yaml 文件中设置 其他参数
@@ -190,7 +190,7 @@ BGCF包含两个主要模块。首先是抽样，它生成基于节点复制的�
       #          在 default_config.yaml 文件中设置 "checkpoint_url='s3://dir_to_your_trained_ckpt/'"
       #          在 default_config.yaml 文件中设置 "file_name='bgcf'"
       #          在 default_config.yaml 文件中设置 "file_format='AIR'"
-      #          (可选)在 default_config.yaml 文件中设置 "device_target='GPU'"
+      #          (可选)在 default_config.yaml 文件中设置 "device_target=GPU"
       #          在 default_config.yaml 文件中设置 其他参数
       #       b. 在网页上设置 "enable_modelarts=True"
       #          在网页上设置 "ckpt_file=/cache/checkpoint_path/model.ckpt"
