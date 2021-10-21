@@ -8,9 +8,11 @@
 - [Quick Start](#quick-start)
     - [Install Requirements](#install-requirements)
     - [Dataset Generation](#dataset-generation)
+        - [Incremental Training](#incremental-training)
     - [Training](#training)
         - [Training on Ascend](#training-on-ascend)
         - [Training on GPU](#training-on-gpu)
+        - [Training in heterogeneous with MoE](#training-in-heterogeneous-with-moe)
         - [Incremental Training](#incremental-training-1)
     - [Prediction](#prediction)
         - [Download Checkpoint](#download-checkpoint)
@@ -18,10 +20,11 @@
         - [Prediction in Standalone mode](#prediction-in-standalone-mode)
     - [Serving](#serving)
         - [Preparation](#preparation)
-        - [Serving 13B or 2.6B in Standalone mode](#serving-13b-or-26b-in-standalone-mode-ascend910nvidia-gpu)
-        - [Serving 13B or 2.6B in Distributed mode](#serving-13b-or-26b-in-distributed-mode-ascend910-8-cards)
-        - [Serving in Distributed mode [multi machines]](#serving-in-distributed-mode-ascend910-8-cards--n-machine)
+        - [Serving 13B or 2.6B in Standalone mode [Ascend910/Nvidia GPU]](#serving-13b-or-26b-in-standalone-mode-ascend910nvidia-gpu)
+        - [Serving 13B or 2.6B in Distributed mode [Ascend910 8 cards]](#serving-13b-or-26b-in-distributed-mode-ascend910-8-cards)
+        - [Serving in Distributed mode [Ascend910 8 cards * N machine]](#serving-in-distributed-mode-ascend910-8-cards--n-machine)
 - [Script Description](#script-description)
+    - [Script and Sample Code](#script-and-sample-code)
 - [ModelZoo Homepage](#modelzoo-homepage)
 - [Requirements](#requirements)
 - [FAQ](#faq)
@@ -375,8 +378,8 @@ ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TAR
 - Generate [rank table file](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
   ```shell
-  # mindspore/model_zoo/utils/hccl_tools/hccl_tools.py
-  >>> python3 ../../../utils/hccl_tools/hccl_tools.py --device_num "[0,8]"
+  # models/utils/hccl_tools/hccl_tools.
+  >>> python3 models/utils/hccl_tools/hccl_tools.py --device_num "[0,8]"
   >>> mv hccl_8p_01234567*.json serving_increment/pangu_distributed/hccl_8p.json
   ```
 

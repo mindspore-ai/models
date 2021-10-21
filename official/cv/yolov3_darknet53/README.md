@@ -100,7 +100,7 @@ Dataset used: [COCO2014](https://cocodataset.org/#download)
       wget https://pjreddie.com/media/files/darknet53.conv.74
       ```
 
-    - Genatating hccl_8p.json, Run the script of model_zoo/utils/hccl_tools/hccl_tools.py.
+    - Genatating hccl_8p.json, Run the script of utils/hccl_tools/hccl_tools.py.
       The following parameter "[0-8)" indicates that the hccl_8p.json file of cards 0 to 7 is generated.
 
       ```

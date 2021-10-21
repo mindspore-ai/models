@@ -95,7 +95,7 @@ YOLOv4需要CSPDarknet53主干来提取图像特征进行检测。 您可以从�
 - 在运行网络之前，准备CSPDarknet53.ckpt和hccl_8p.json文件。
     - 请参考[预训练模型]。
 
-    - 生成hccl_8p.json，运行model_zoo/utils/hccl_tools/hccl_tools.py脚本。  
+    - 生成hccl_8p.json，运行utils/hccl_tools/hccl_tools.py脚本。  
       以下参数“[0-8)”表示生成0~7卡的hccl_8p.json文件。
 
       ```

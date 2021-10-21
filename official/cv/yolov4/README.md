@@ -87,7 +87,7 @@ other datasets need to use the same format as MS COCO.
 - Prepare the CSPDarknet53.ckpt and hccl_8p.json files, before run network.
     - Please refer to [Pretrain Model]
 
-    - Genatating hccl_8p.json, Run the script of model_zoo/utils/hccl_tools/hccl_tools.py.
+    - Genatating hccl_8p.json, Run the script of utils/hccl_tools/hccl_tools.py.
       The following parameter "[0-8)" indicates that the hccl_8p.json file of cards 0 to 7 is generated.
 
       ```
