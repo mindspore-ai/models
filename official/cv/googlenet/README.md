@@ -125,7 +125,7 @@ After installing MindSpore via the official website, you can start training and 
 
 - running on GPU
 
-  For running on GPU, please change `device_target` from `Ascend` to `GPU` in configuration file src/config.py
+  For running on GPU, please change `device_target` from `Ascend` to `GPU` in configuration file [dataset]_config.yaml
 
   ```python
   # run training example
@@ -145,10 +145,14 @@ After installing MindSpore via the official website, you can start training and 
 
   ```python
   # run training example
+  bash run_train_cpu.sh
+  OR
   nohup python train.py --config_path=cifar10_config_cpu.yaml --dataset_name=cifar10 > train.log 2>&1 &
 
   # run evaluation example
-  nohup python eval.py --checkpoint_path=[CHECKPOINT_PATH] > eval.log 2>&1 &  
+  bash run_eval_cpu.sh
+  OR
+  nohup python eval.py --checkpoint_path=[CHECKPOINT_PATH] --config_path=cifar10_config_cpu.yaml > eval.log 2>&1 &
   ```
 
 We use CIFAR-10 dataset by default. Your can also pass `$dataset_type` to the scripts so that select different datasets. For more details, please refer the specify script.
