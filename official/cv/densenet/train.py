@@ -71,7 +71,7 @@ class ProgressMonitor(Callback):
         self.configs.logger.info('start network train...')
 
     def epoch_begin(self, run_context):
-        pass
+        self.me_epoch_start_time = time.time()
 
     def epoch_end(self, run_context, *me_args):
         """process epoch end"""
@@ -82,10 +82,13 @@ class ProgressMonitor(Callback):
         time_used = time.time() - self.me_epoch_start_time
         fps_mean = self.configs.per_batch_size * (me_step - self.me_epoch_start_step_num) * \
                    self.configs.group_size / time_used
-        self.configs.logger.info('epoch[{}], iter[{}], loss:{}, mean_fps:{:.2f} imgs/sec'.format(real_epoch
-                                                                                                 , me_step,
-                                                                                                 cb_params.net_outputs,
-                                                                                                 fps_mean))
+        self.configs.logger.info('epoch[{}], iter[{}], loss:{}, epoch_time:{:.2f} ms, per_step_time:{:.2f} ms, '
+                                 'mean_fps:{:.2f} imgs/sec'.format(real_epoch,
+                                                                   me_step,
+                                                                   cb_params.net_outputs,
+                                                                   time_used * 1000,
+                                                                   time_used * 1000 / self.configs.steps_per_epoch,
+                                                                   fps_mean))
         if self.configs.rank_save_ckpt_flag:
             import glob
             ckpts = glob.glob(os.path.join(self.configs.outputs_dir, '*.ckpt'))
@@ -100,7 +103,6 @@ class ProgressMonitor(Callback):
                                          'ckpt_fn:{}'.format(real_epoch, me_step, cb_params.net_outputs, ckpt, ckpt_fn))
 
         self.me_epoch_start_step_num = me_step
-        self.me_epoch_start_time = time.time()
 
     def step_begin(self, run_context):
         pass
