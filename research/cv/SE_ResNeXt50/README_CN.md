@@ -3,7 +3,7 @@
 <!-- TOC -->
 
 - [目录](#目录)
-- [SE-ResNeXt描述](#SE-ResNeXt描述)
+- [SE-ResNeXt描述](#se-resnext描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [特性](#特性)
@@ -25,9 +25,9 @@
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
-            - [ImageNet-1k上的SE-ResNeXt50](#ImageNet-1k上的SE-ResNeXt50)
+            - [ImageNet-1k上的SE-ResNeXt50](#imagenet-1k上的se-resnext50)
         - [推理性能](#推理性能)
-            - [ImageNet-1k上的SE-ResNeXt50](#ImageNet-1k上的SE-ResNeXt50)
+            - [ImageNet-1k上的SE-ResNeXt50](#imagenet-1k上的se-resnext50-1)
 - [ModelZoo主页](#modelzoo主页)
 
 <!-- /TOC -->
@@ -266,7 +266,7 @@ SE-ResNeXt的总体网络架构如下： [链接](https://arxiv.org/abs/1709.015
 
 ### 推理性能
 
-#### ImageNet-1k上的FishNet99
+#### ImageNet-1k上的SE-ResNeXt50
 
 | 参数                 | Ascend                                                       |
 | -------------------------- | ----------------------------------------------------------- |

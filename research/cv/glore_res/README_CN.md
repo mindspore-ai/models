@@ -432,4 +432,4 @@ transform_utils.py中使用数据增强时采用了随机选择策略，train.py
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)
+ 请浏览官网[主页](https://gitee.com/mindspore/models)

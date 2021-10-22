@@ -232,4 +232,4 @@ In train.py, we set the seed which is used by numpy.random, mindspore.common.Ini
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).  
+ Please check the official [homepage](https://gitee.com/mindspore/models).  
