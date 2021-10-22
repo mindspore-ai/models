@@ -18,6 +18,7 @@ import os
 import multiprocessing
 import cv2
 from PIL import Image
+import numpy as np
 from pycocotools.coco import COCO
 import mindspore.dataset as de
 import mindspore.dataset.vision.c_transforms as CV
@@ -97,9 +98,10 @@ class COCOYoloDataset:
         coco = self.coco
         img_id = self.img_ids[index]
         img_path = coco.loadImgs(img_id)[0]["file_name"]
-        img = Image.open(os.path.join(self.root, img_path)).convert("RGB")
         if not self.is_training:
+            img = Image.open(os.path.join(self.root, img_path)).convert("RGB")
             return img, img_id
+        img = np.fromfile(os.path.join(self.root, img_path), dtype="int8")
 
         ann_ids = coco.getAnnIds(imgIds=img_id)
         target = coco.loadAnns(ann_ids)
@@ -168,10 +170,12 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, max_epoch, device_num,
         if device_num != 8:
             ds = de.GeneratorDataset(yolo_dataset, column_names=dataset_column_names,
                                      sampler=distributed_sampler)
+            ds = ds.map(operations=CV.Decode(), input_columns=["image"])
             ds = ds.batch(batch_size, per_batch_map=multi_scale_trans, input_columns=dataset_column_names,
                           num_parallel_workers=min(32, num_parallel_workers), drop_remainder=True)
         else:
             ds = de.GeneratorDataset(yolo_dataset, column_names=dataset_column_names, sampler=distributed_sampler)
+            ds = ds.map(operations=CV.Decode(), input_columns=["image"])
             ds = ds.batch(batch_size, per_batch_map=multi_scale_trans, input_columns=dataset_column_names,
                           num_parallel_workers=min(8, num_parallel_workers), drop_remainder=True)
     else:

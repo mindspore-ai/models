@@ -64,16 +64,20 @@ cd ./train || exit
 echo "start training for device $DEVICE_ID"
 env > env.log
 
-cpus=`cat /proc/cpuinfo| grep "processor"| wc -l`
-if [ $cpus -ge $CPU_BIND_NUM ]
+cmdopt=`lscpu | grep NUMA | tail -1 | awk '{print $4}'`
+if test -z $cmdopt
 then
-  start=`expr $cpus - $CPU_BIND_NUM`
-  end=`expr $cpus - 1`
-else
-  start=0
-  end=`expr $cpus - 1`
+  cpus=`cat /proc/cpuinfo| grep "processor"| wc -l`
+  if [ $cpus -ge $CPU_BIND_NUM ]
+  then
+    start=`expr $cpus - $CPU_BIND_NUM`
+    end=`expr $cpus - 1`
+  else
+    start=0
+    end=`expr $cpus - 1`
+  fi
+  cmdopt=$start"-"$end
 fi
-cmdopt=$start"-"$end
 
 taskset -c $cmdopt python train.py \
     --data_dir=$DATASET_PATH \
