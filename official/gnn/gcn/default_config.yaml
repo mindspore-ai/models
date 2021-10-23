@@ -20,6 +20,7 @@ eval_nodes_num: 500
 test_nodes_num: 1000
 save_TSNE: False
 save_ckptpath: "ckpts/"
+train_with_eval: False
 
 
 ---
