@@ -167,27 +167,27 @@ If you want to run in modelarts, please check the official documentation of [mod
 
 ```python
 # run distributed training on modelarts example
-# (1) First, Perform a or b.
+# (1) Add "config_path='/path_to_code/resnet50_imagenet2012_config.yaml'" on the website UI interface.
+# (2) First, Perform a or b.
 #       a. Set "enable_modelarts=True" on yaml file.
 #          Set other parameters on yaml file you need.
 #       b. Add "enable_modelarts=True" on the website UI interface.
 #          Add other parameters on the website UI interface.
-# (2) Set the config directory to "config_path=/The path of config in S3/"
 # (3) Set the code directory to "/path/resnet" on the website UI interface.
 # (4) Set the startup file to "train.py" on the website UI interface.
 # (5) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
 # (6) Create your job.
 
 # run evaluation on modelarts example
-# (1) Copy or upload your trained model to S3 bucket.
-# (2) Perform a or b.
+# (1) Add "config_path='/path_to_code/resnet50_imagenet2012_config.yaml'" on the website UI interface.
+# (2) Copy or upload your trained model to S3 bucket.
+# (3) Perform a or b.
 #       a. Set "enable_modelarts=True" on yaml file.
 #          Set "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" on yaml file.
 #          Set "checkpoint_url=/The path of checkpoint in S3/" on yaml file.
 #       b. Add "enable_modelarts=True" on the website UI interface.
 #          Add "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" on the website UI interface.
 #          Add "checkpoint_url=/The path of checkpoint in S3/" on the website UI interface.
-# (3) Set the config directory to "config_path=/The path of config in S3/"
 # (4) Set the code directory to "/path/resnet" on the website UI interface.
 # (5) Set the startup file to "eval.py" on the website UI interface.
 # (6) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
@@ -660,7 +660,8 @@ Export on ModelArts (If you want to run in modelarts, please check the official 
 
 ```python
 # Export on ModelArts
-# (1) Perform a or b.
+# (1) Add "config_path='/path_to_code/resnet50_imagenet2012_config.yaml'" on the website UI interface.
+# (2) Perform a or b.
 #       a. Set "enable_modelarts=True" on default_config.yaml file.
 #          Set "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" on default_config.yaml file.
 #          Set "checkpoint_url='s3://dir_to_trained_ckpt/'" on default_config.yaml file.
@@ -673,7 +674,6 @@ Export on ModelArts (If you want to run in modelarts, please check the official 
 #          Add "file_name='./resnet'" on the website UI interface.
 #          Add "file_format='AIR'" on the website UI interface.
 #          Add other parameters on the website UI interface.
-# (2) Set the config_path="/path/yaml file" on the website UI interface.
 # (3) Set the code directory to "/path/resnet" on the website UI interface.
 # (4) Set the startup file to "export.py" on the website UI interface.
 # (5) Set the "Output file path" and "Job log path" to your path on the website UI interface.

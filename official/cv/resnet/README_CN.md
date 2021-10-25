@@ -151,12 +151,12 @@ bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]  [CONFIG_PATH]
 
 ```python
 # 在modelarts上使用分布式训练的示例：
-# (1) 选址a或者b其中一种方式。
+# (1) 在网页上设置 "config_path='/path_to_code/resnet50_imagenet2012_config.yaml'"
+# (2) 选址a或者b其中一种方式。
 #       a. 设置 "enable_modelarts=True" 。
 #          在yaml文件上设置网络所需的参数。
 #       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
 #          在modelarts的界面上设置网络所需的参数。
-# (2) 在modelarts的界面上设置配置文件的路径"config_path=/The path of config in S3/"
 # (3) 在modelarts的界面上设置代码的路径 "/path/resnet"。
 # (4) 在modelarts的界面上设置模型的启动文件 "train.py" 。
 # (5) 在modelarts的界面上设置模型的数据路径 "Dataset path" ,
@@ -164,20 +164,20 @@ bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]  [CONFIG_PATH]
 # (6) 开始模型的训练。
 
 # 在modelarts上使用模型推理的示例
-# (1) 把训练好的模型地方到桶的对应位置。
-# (2) 选址a或者b其中一种方式。
+# (1) 在网页上设置 "config_path='/path_to_code/resnet50_imagenet2012_config.yaml'"
+# (2) 把训练好的模型地方到桶的对应位置。
+# (3) 选址a或者b其中一种方式。
 #       a. 设置 "enable_modelarts=True"
 #          设置 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt" 在 yaml 文件.
 #          设置 "checkpoint_url=/The path of checkpoint in S3/" 在 yaml 文件.
 #       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
 #          增加 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" 参数在modearts的界面上。
 #          增加 "checkpoint_url=/The path of checkpoint in S3/" 参数在modearts的界面上。
-# (2) 在modelarts的界面上设置配置文件的路径"config_path=/The path of config in S3/"
-# (3) 在modelarts的界面上设置代码的路径 "/path/resnet"。
-# (4) 在modelarts的界面上设置模型的启动文件 "eval.py" 。
-# (5) 在modelarts的界面上设置模型的数据路径 "Dataset path" ,
+# (4) 在modelarts的界面上设置代码的路径 "/path/resnet"。
+# (5) 在modelarts的界面上设置模型的启动文件 "eval.py" 。
+# (6) 在modelarts的界面上设置模型的数据路径 "Dataset path" ,
 # 模型的输出路径"Output file path" 和模型的日志路径 "Job log path" 。
-# (6) 开始模型的推理。
+# (7) 开始模型的推理。
 ```
 
 # 脚本说明
@@ -621,8 +621,9 @@ python export.py --checkpoint_file_path [CKPT_PATH] --file_name [FILE_NAME] --fi
 ModelArts导出mindir
 
 ```python
-# (1) 把训练好的模型地方到桶的对应位置。
-# (2) 选址a或者b其中一种方式。
+# (1) 在网页上设置 "config_path='/path_to_code/resnet50_imagenet2012_config.yaml'"
+# (2) 把训练好的模型地方到桶的对应位置。
+# (3) 选址a或者b其中一种方式。
 #       a. 设置 "enable_modelarts=True"
 #          设置 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt" 在 yaml 文件。
 #          设置 "checkpoint_url=/The path of checkpoint in S3/" 在 yaml 文件。
@@ -633,7 +634,6 @@ ModelArts导出mindir
 #          增加 "checkpoint_url=/The path of checkpoint in S3/" 参数在modearts的界面上。
 #          设置 "file_name='./resnet'"参数在modearts的界面上。
 #          设置 "file_format='AIR'" 参数在modearts的界面上。
-# (3) 设置网络配置文件的路径 "config_path=/The path of config in S3/"
 # (4) 在modelarts的界面上设置代码的路径 "/path/resnet"。
 # (5) 在modelarts的界面上设置模型的启动文件 "export.py" 。
 # 模型的输出路径"Output file path" 和模型的日志路径 "Job log path" 。
