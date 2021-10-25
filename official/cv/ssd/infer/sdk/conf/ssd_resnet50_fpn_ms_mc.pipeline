@@ -53,7 +53,7 @@
             "props": {
                 "dataSource": "mxpi_tensorinfer0",
                 "postProcessConfigPath": "../conf/ssd_resnet50_fpn_ms_on_mc_postprocess.cfg",
-                "labelPath": "../conf/ssd_resnet50_fpn_mc.names",
+                "labelPath": "../../ssd_resnet50_fpn_mc.names",
                 "postProcessLibPath": "/usr/local/sdk_home/mxManufacture/lib/modelpostprocessors/libSsdMobilenetFpn_MindsporePost.so"
             },
             "factory": "mxpi_objectpostprocessor",

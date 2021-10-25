@@ -65,6 +65,26 @@ flags.mark_flag_as_required("det_result_json")
 flags.mark_flag_as_required("output_path_name")
 
 
+def get_img_set(anno_json_path):
+    """Get image path and annotation from COCO."""
+    need_img_ids = []
+    coco = COCO(anno_json_path)
+    image_ids = coco.getImgIds()
+    print("first dataset is {}".format(len(image_ids)))
+    for img_id in image_ids:
+        iscrowd = False
+        anno_ids = coco.getAnnIds(imgIds=img_id, iscrowd=None)
+        anno = coco.loadAnns(anno_ids)
+        for label in anno:
+            iscrowd = iscrowd or label["iscrowd"]
+
+        if iscrowd:
+            continue
+        need_img_ids.append(img_id)
+
+    return need_img_ids
+
+
 def main(unused_arg):
     del unused_arg
     out_put_dir = os.path.dirname(FLAGS.output_path_name)
@@ -73,14 +93,16 @@ def main(unused_arg):
 
     fw = open(FLAGS.output_path_name, "a+")
     now_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    head_info = f"{'-'*50}mAP Test starts @ {now_time_str}{'-'*50}\n"
+    head_info = f"{'-' * 50}mAP Test starts @ {now_time_str}{'-' * 50}\n"
     fw.write(head_info)
     fw.flush()
 
     cocoGt = COCO(FLAGS.annotations_json)
     cocoDt = cocoGt.loadRes(FLAGS.det_result_json)
     cocoEval = COCOeval(cocoGt, cocoDt, FLAGS.anno_type)
-    cocoEval.params.imgIds = sorted(cocoGt.getImgIds())
+    image_ids = get_img_set(FLAGS.annotations_json)
+    print("final dataset is {}".format(len(image_ids)))
+    cocoEval.params.imgIds = sorted(image_ids)
     cocoEval.evaluate()
     cocoEval.accumulate()
     cocoEval.summarize()
@@ -92,7 +114,7 @@ def main(unused_arg):
         fw.write(line % cocoEval.stats[i] + "\n")
 
     end_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    tail_info = f"{'-'*50}mAP Test ends @ {end_time_str}{'-'*50}\n"
+    tail_info = f"{'-' * 50}mAP Test ends @ {end_time_str}{'-' * 50}\n"
     fw.write(tail_info)
     fw.close()
 

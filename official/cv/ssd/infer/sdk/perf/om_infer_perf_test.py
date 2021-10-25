@@ -25,7 +25,6 @@ from StreamManagerApi import InProtobufVector
 from StreamManagerApi import MxDataInput
 from StreamManagerApi import MxProtobufIn
 from StreamManagerApi import StreamManagerApi
-from StreamManagerApi import StringVector
 from absl import app
 from absl import flags
 
@@ -124,10 +123,9 @@ flags.mark_flag_as_required("output_dir")
 
 
 def draw_image(input_image, bboxes, output_img):
-    # 原图
     image = cv2.imread(input_image)
 
-    # 模型推理输出数据，需要往后处理代码中增加几行输出文档的代码
+    # For model reasoning output data,add several lines of output document code
     color_index_dict = {
         0: (0, 0, 255),
         1: (0, 255, 0),
@@ -144,11 +142,10 @@ def draw_image(input_image, bboxes, output_img):
         color_key = index % 10
         color = color_index_dict.get(color_key)
         # Coordinate must be integer.
-        # bbox = list(map(lambda cor: int(cor), bbox))
+        bbox = list(map(int, bbox))
         # pdb.set_trace()
         cv2.rectangle(image, (bbox[0], bbox[1]), (bbox[2], bbox[3]), color, 2)
 
-    # 新的图片
     cv2.imwrite(output_img, image)
 
 
@@ -297,8 +294,6 @@ def send_img_with_opencv_handled(stream_manager_api, img_file_name):
         print("Failed to send data to stream.")
         exit()
 
-    key_vec = StringVector()
-    key_vec.push_back(b"mxpi_modelinfer0")
     return unique_id
 
 
@@ -434,7 +429,7 @@ def send_many_images(stream_manager_api):
 
     end = time.time()
     time_str = (
-        f"\nSend all images data took: {round((end-start)*1000, 2)} ms\n"
+        f"\nSend all images data took: {round((end - start) * 1000, 2)} ms\n"
     )
     print(time_str)
     with open(PERF_REPORT_TXT, "a+") as fw:
@@ -580,13 +575,6 @@ def main(unused_arg):
     global TXT_DIR
     global PERF_REPORT_TXT
     global DET_RESULT_JSON
-    # '''
-    # output_dir
-    # |_boxed_imgs
-    # |_txts
-    # |_per_report_npu.txt
-    # |_det_result_npu.json
-    # '''
 
     BOXED_IMG_DIR = os.path.join(FLAGS.output_dir, "boxed_imgs")
     TXT_DIR = os.path.join(FLAGS.output_dir, "txts")
@@ -603,7 +591,7 @@ def main(unused_arg):
         os.makedirs(BOXED_IMG_DIR)
 
     now_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    head_info = f"{'-'*50}Perf Test On NPU starts @ {now_time_str}{'-'*50}\n"
+    head_info = f"{'-' * 50}Perf Test On NPU starts @ {now_time_str}{'-' * 50}\n"
     with open(PERF_REPORT_TXT, "a+") as fw:
         fw.write(head_info)
 
@@ -615,7 +603,7 @@ def main(unused_arg):
         infer_imgs_in_dir_with_open_cv()
 
     end_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    tail_info = f"{'-'*50}Perf Test On NPU ends @ {end_time_str}{'-'*50}\n"
+    tail_info = f"{'-' * 50}Perf Test On NPU ends @ {end_time_str}{'-' * 50}\n"
     with open(PERF_REPORT_TXT, "a+") as fw:
         fw.write(tail_info)
 

@@ -1,14 +1,24 @@
 #!/bin/bash
-
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
 # Simple log helper functions
 info() { echo -e "\033[1;34m[INFO ][MxStream] $1\033[1;37m" ; }
 warn() { echo >&2 -e "\033[1;31m[WARN ][MxStream] $1\033[1;37m" ; }
 
 PY_PATH=/usr/bin/python3.7
 
-# export MX_SDK_HOME=/home/run/mxVision
-
-#export ASCEND_AICPU_PATH=/usr/local/Ascend/ascend-toolkit/20.2.rc1/arm64-linux
 export LD_LIBRARY_PATH=${MX_SDK_HOME}/lib:${MX_SDK_HOME}/opensource/lib:${LD_LIBRARY_PATH}
 export PYTHONPATH=${MX_SDK_HOME}/python:${PYTHONPATH}
 export GST_PLUGIN_PATH=${MX_SDK_HOME}/opensource/lib/gstreamer-1.0:${MX_SDK_HOME}/lib/plugins

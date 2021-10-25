@@ -72,6 +72,8 @@ def eval_net():
     elif config.dataset == "voc":
         voc_root = os.path.join(config.data_path, config.voc_root)
         json_path = os.path.join(voc_root, config.voc_json)
+    elif config.dataset == "other":
+        json_path = config.instances_set
     else:
         raise ValueError('SSD eval only support dataset mode is coco and voc!')
 
