@@ -98,11 +98,12 @@ YOLOv3使用DarkNet53执行特征提取，这是YOLOv2中的Darknet-19和残差�
       可以从网站[下载](https://pjreddie.com/media/files/darknet53.conv.74) darknet53.conv.74文件。
       也可以在linux系统中使用指令下载该文件。
 
-   ```command
+      ```command
       wget https://pjreddie.com/media/files/darknet53.conv.74
       ```
 
     - 可以运行model_zoo/utils/hccl_tools/路径下的hccl_tools.py脚本生成hccl_8p.json文件，下面指令中参数"[0, 8)"表示生成0-7的8卡hccl_8p.json文件。
+        - 该命令生成的json文件名为 hccl_8p_01234567_{host_ip}.json, 为了表述方便，统一使用hccl_8p.json表示该json文件。
 
       ```command
       python hccl_tools.py --device_num "[0,8)"
@@ -116,7 +117,7 @@ YOLOv3使用DarkNet53执行特征提取，这是YOLOv2中的Darknet-19和残差�
   # 通过python命令执行训练示例(1卡)。
   python train.py \
       --data_dir=./dataset/coco2014 \
-      --pretrained_backbone=darknet53_backbone.ckpt \
+      --pretrained_backbone=backbone_darknet53.ckpt \
       --is_distributed=0 \
       --lr=0.001 \
       --loss_scale=1024 \
@@ -128,25 +129,28 @@ YOLOv3使用DarkNet53执行特征提取，这是YOLOv2中的Darknet-19和残差�
       --lr_scheduler=cosine_annealing > log.txt 2>&1 &
 
   # 对于Ascend设备，shell脚本单机训练示例(1卡)
-  bash run_standalone_train.sh dataset/coco2014 darknet53_backbone.ckpt
+  bash run_standalone_train.sh dataset/coco2014 backbone_darknet53.ckpt
 
   # 对于GPU设备，shell脚本单机训练示例(1卡)
-  bash run_standalone_train_gpu.sh dataset/coco2014 darknet53_backbone.ckpt
+  bash run_standalone_train_gpu.sh dataset/coco2014 backbone_darknet53.ckpt
 
   # 对于Ascend设备，使用shell脚本分布式训练示例(8卡)
-  bash run_distribute_train.sh dataset/coco2014 darknet53_backbone.ckpt rank_table_8p.json
+  bash run_distribute_train.sh dataset/coco2014 backbone_darknet53.ckpt hccl_8p.json
 
   # 对于GPU设备，使用shell脚本分布式训练示例(8卡)
-  bash run_distribute_train_gpu.sh dataset/coco2014 darknet53_backbone.ckpt
+  bash run_distribute_train_gpu.sh dataset/coco2014 backbone_darknet53.ckpt
 
   # 使用python命令评估
+    - 对于standalone训练模式, 训练生成的ckpt文件存放在 train/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0 目录下。
+    - 对于分布式训练模式, 训练生成的ckpt文件存放在 train_parallel0/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0 目录下。
+
   python eval.py \
       --data_dir=./dataset/coco2014 \
-      --pretrained=yolov3.ckpt \
+      --pretrained=train_parallel0/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0/0-99_31680.ckpt \
       --testing_shape=416 > log.txt 2>&1 &
 
   # 通过shell脚本运行评估
-  bash run_eval.sh dataset/coco2014/ checkpoint/0-319_102400.ckpt
+  bash run_eval.sh dataset/coco2014/ train_parallel0/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0/0-99_31680.ckpt
   ```
 
 - 在 [ModelArts](https://support.huaweicloud.com/modelarts/) 上训练
@@ -296,7 +300,7 @@ train.py中主要参数如下：
 ```python
 python train.py \
     --data_dir=./dataset/coco2014 \
-    --pretrained_backbone=darknet53_backbone.ckpt \
+    --pretrained_backbone=backbone_darknet53.ckpt \
     --is_distributed=0 \
     --lr=0.001 \
     --loss_scale=1024 \
@@ -327,13 +331,13 @@ python train.py \
 对于Ascend设备，使用shell脚本分布式训练示例(8卡)
 
 ```shell script
-bash run_distribute_train.sh dataset/coco2014 darknet53_backbone.ckpt rank_table_8p.json
+bash run_distribute_train.sh dataset/coco2014 backbone_darknet53.ckpt hccl_8p.json
 ```
 
 对于GPU设备，使用shell脚本分布式训练示例(8卡)
 
 ```shell script
-bash run_distribute_train_gpu.sh dataset/coco2014 darknet53_backbone.ckpt
+bash run_distribute_train_gpu.sh dataset/coco2014 backbone_darknet53.ckpt
 ```
 
 上述shell脚本将在后台运行分布训练。您可以通过`train_parallel0/log.txt`文件查看结果。损失值的实现如下：
@@ -362,14 +366,14 @@ epoch[319], iter[102300], loss:35.430038, 423.49 imgs/sec, lr:2.409552052995423e
 ```python
 python eval.py \
     --data_dir=./dataset/coco2014 \
-    --pretrained=yolov3.ckpt \
+    --pretrained=train_parallel0/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0/0-99_31680.ckpt \
     --testing_shape=416 > log.txt 2>&1 &
 ```
 
 或者
 
 ```shell script
-bash run_eval.sh dataset/coco2014/ checkpoint/0-319_102400.ckpt
+bash run_eval.sh dataset/coco2014/ train_parallel0/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0/0-99_31680.ckpt
 ```
 
 上述python命令将在后台运行，您可以通过log.txt文件查看结果。测试数据集的mAP如下：
@@ -397,7 +401,7 @@ bash run_eval.sh dataset/coco2014/ checkpoint/0-319_102400.ckpt
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --keep_detect [Bool]
 ```
 
-参数`ckpt_file` 是必需的，目前,`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中进行选择。
+参数`ckpt_file` 是必需的，目前,`EXPORT_FORMAT` 必须在 ["AIR", "ONNX", "MINDIR"]中进行选择。
 参数`keep_detect` 是否保留坐标检测模块, 默认为True
 
 ## 推理过程
