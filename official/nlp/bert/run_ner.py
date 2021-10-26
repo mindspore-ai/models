@@ -234,8 +234,7 @@ def run_ner():
                 load_finetune_checkpoint_dir = _cur_dir
             else:
                 load_finetune_checkpoint_dir = make_directory(save_finetune_checkpoint_path)
-            load_finetune_checkpoint_path = LoadNewestCkpt(load_finetune_checkpoint_dir,
-                                                           ds.get_dataset_size(), epoch_num, "ner")
+            load_finetune_checkpoint_path = LoadNewestCkpt(load_finetune_checkpoint_dir, "ner")
 
     if args_opt.do_eval.lower() == "true":
         ds = create_ner_dataset(batch_size=args_opt.eval_batch_size, repeat_count=1,
