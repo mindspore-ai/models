@@ -15,7 +15,8 @@
 # ============================================================================
 if [ $# == 5 ]
 then
-    python ./evaluate.py --data_path=$1 --preset=$2 --pretrain_ckpt=$3 --is_numpy --output_path=$5 > eval.log 2>&1 &
+    python ./evaluate.py --data_path=$1 --preset=$2 --pretrain_ckpt=$3 --is_numpy --output_path=$5 --platform=CPU \
+    > eval.log 2>&1 &
 else
-    python ./evaluate.py --data_path=$1 --preset=$2 --pretrain_ckpt=$3 --output_path=$4 > eval.log 2>&1 &
+    python ./evaluate.py --data_path=$1 --preset=$2 --pretrain_ckpt=$3 --output_path=$4 --platform=CPU > eval.log 2>&1 &
 fi

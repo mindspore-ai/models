@@ -195,10 +195,10 @@ def save_ref_audio(hparam, ref, length, target_wav_path_):
 
 if __name__ == '__main__':
 
-    device_id = int(os.getenv("DEVICE_ID"))
-    if args.platform == 'CPU':
+    if args.platform != 'Ascend':
         context.set_context(mode=0, device_target=args.platform, save_graphs=False)
     else:
+        device_id = int(os.getenv("DEVICE_ID"))
         context.set_context(mode=1, device_target=args.platform, device_id=device_id)
 
     speaker_id = int(args.speaker_id) if args.speaker_id != '' else None
