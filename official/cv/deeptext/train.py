@@ -33,7 +33,7 @@ from mindspore import context, Tensor, Parameter
 from mindspore.common import set_seed
 from mindspore.communication.management import init, get_group_size, get_rank
 from mindspore.context import ParallelMode
-from mindspore.nn import Momentum
+from mindspore.nn import Momentum, TrainOneStepWithLossScaleCell
 from mindspore.train import Model
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -103,6 +103,8 @@ def modelarts_pre_process():
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_train():
     device_type = "Ascend" if context.get_context("device_target") == "Ascend" else "GPU"
+    if device_type == "GPU":
+        context.set_context(enable_graph_kernel=True)
     if config.run_distribute:
         init()
         if device_type == "Ascend":
@@ -180,6 +182,10 @@ def run_train():
                                mean=True, degree=device_num)
     else:
         net = TrainOneStepCell(net_with_loss, opt, sens=config.loss_scale)
+
+    if device_type == "GPU":
+        scaling_sens = Tensor(np.full((1), config.loss_scale), dtype=mstype.float32)
+        net = TrainOneStepWithLossScaleCell(net_with_loss, opt, scale_sense=scaling_sens)
 
     time_cb = TimeMonitor(data_size=dataset_size)
     loss_cb = LossCallBack(rank_id=rank)
