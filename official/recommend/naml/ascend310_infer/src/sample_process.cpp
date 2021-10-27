@@ -318,17 +318,17 @@ void SampleProcess::DestroyResource() {
     }
     INFO_LOG("end to destroy context");
 
-    ret = aclrtResetDevice(deviceId_);
-    if (ret != ACL_ERROR_NONE) {
-        ERROR_LOG("reset device failed");
-    }
-    INFO_LOG("end to reset device is %d", deviceId_);
-
     ret = aclFinalize();
     if (ret != ACL_ERROR_NONE) {
         ERROR_LOG("finalize acl failed");
     }
     INFO_LOG("end to finalize acl");
+
+    ret = aclrtResetDevice(deviceId_);
+    if (ret != ACL_ERROR_NONE) {
+        ERROR_LOG("reset device failed");
+    }
+    INFO_LOG("end to reset device is %d", deviceId_);
 }
 
 std::vector<std::string> SampleProcess::GetModelExecCostTimeInfo() {
