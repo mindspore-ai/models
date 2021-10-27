@@ -101,8 +101,8 @@ After installing MindSpore via the official website, you can start training and 
 Note:
 
 1. the first run will generate the mindeocrd file, which will take a long time.
-2. pretrained model is a resnet50 checkpoint that trained over ImageNet2012.you can train it with [resnet50](https://gitee.com/qujianwei/mindspore/tree/master/model_zoo/official/cv/resnet) scripts in modelzoo, and use src/convert_checkpoint.py to get the pretrain model.
-3. BACKBONE_MODEL is a checkpoint file trained with [resnet50](https://gitee.com/qujianwei/mindspore/tree/master/model_zoo/official/cv/resnet) scripts in modelzoo.PRETRAINED_MODEL is a checkpoint file after convert.VALIDATION_JSON_FILE is label file. CHECKPOINT_PATH is a checkpoint file after trained.
+2. pretrained model is a resnet50 checkpoint that trained over ImageNet2012.you can train it with [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) scripts in modelzoo, and use src/convert_checkpoint.py to get the pretrain model.
+3. BACKBONE_MODEL is a checkpoint file trained with [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) scripts in modelzoo.PRETRAINED_MODEL is a checkpoint file after convert.VALIDATION_JSON_FILE is label file. CHECKPOINT_PATH is a checkpoint file after trained.
 
 ## Run on Ascend
 
