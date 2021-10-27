@@ -81,7 +81,7 @@ class PtLinspace(Cell):
 
     def construct(self, start, end, steps):
         lin_x = ()
-        step = (end - start + 1) / steps
+        step = (end - start + 1) // steps
         for i in range(start, end + 1, step):
             lin_x += (i,)
         lin_x = self.tuple_to_array(lin_x)
@@ -212,7 +212,7 @@ class YoloLoss(Cell):
         num_anchors = self.num_anchors
 
         num_classes = self.num_classes
-        num_channels = output_d[1] / num_anchors
+        num_channels = output_d[1] // num_anchors
         height = output_d[2]
         width = output_d[3]
         output = self.reshape(output, (num_batch, num_anchors, num_channels, height * width))
@@ -225,7 +225,7 @@ class YoloLoss(Cell):
         perm = (0, 2, 1)
         cls = self.transpose(cls, perm)
         cls_shp = self.shape(cls)
-        cls = self.reshape(cls, (cls_shp[0] * cls_shp[1] * cls_shp[2] / num_classes, num_classes))
+        cls = self.reshape(cls, (cls_shp[0] * cls_shp[1] * cls_shp[2] // num_classes, num_classes))
 
         lin_x = self.pt_linspace(0, width - 1, width)
         lin_x = self.tile(lin_x, (height,))
