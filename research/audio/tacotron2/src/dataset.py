@@ -36,6 +36,7 @@ class Sampler():
         self.sample_indexes += self.sample_indexes[:(
             self.total_sample_nums - self.sample_nums)]
         print('total training samples: {}'.format(len(self.sample_indexes)))
+        print('batch_size : {}'.format(self.batch_size))
         num_steps_per_epoch = int(
             math.ceil(
                 self.sample_nums /
@@ -59,7 +60,7 @@ class Sampler():
                                for i in range(0, len(sample_indexes), self.batch_size)]
 
         index = []
-        for step_idx in step_indexes[::self.group_size]:
+        for step_idx in step_indexes[self.rank::self.group_size]:
             index.extend(sample_indexes_bins[step_idx])
         return iter(index)
 

@@ -96,7 +96,6 @@ class Tacotron2Loss(nn.Cell):
         self.get_shape = P.Shape()
         self.n_frames_per_step = hps.n_frames_per_step
         self.p = hps.p
-        self.scalar_summary = P.ScalarSummary()
 
     def construct(self, model_output, targets):
         ''' construct '''
@@ -109,8 +108,6 @@ class Tacotron2Loss(nn.Cell):
         mel_loss = self.mse(self.p * mel_out, self.p * mel_target) + \
             self.mse(self.p * mel_out_postnet, self.p * mel_target)
         gate_loss = self.bce(gate_out, gate_target)
-        self.scalar_summary('mel_loss', mel_loss)
-        self.scalar_summary('gate_loss', gate_loss)
         return mel_loss + gate_loss
 
 
@@ -173,6 +170,7 @@ class Attention(nn.Cell):
                                attention_weights_cat):
         '''get alignment '''
         processed_query = self.expand_dims(self.query_layer(query), 1)
+
         processed_attention_weights = self.location_layer(
             attention_weights_cat)
         processed_attention = self.tanh(
@@ -194,7 +192,7 @@ class Attention(nn.Cell):
         alignment = self.get_alignment_energies(
             attention_hidden_state, processed_memory, attention_weights_cat)
 
-        if F.reduce_sum(F.cast(mask, mindspore.float32)) != 0:
+        if mask is not None:
             alignment = self.select(
                 mask,
                 alignment,
@@ -202,6 +200,7 @@ class Attention(nn.Cell):
                     mindspore.float32,
                     self.get_shape(mask),
                     self.score_values))
+
         attention_weights = self.softmax(alignment)
         attention_context = self.bmm(
             self.expand_dims(
@@ -209,6 +208,23 @@ class Attention(nn.Cell):
         attention_context = self.squeeze_(attention_context)
         return attention_context, attention_weights
 
+    def inference(
+            self,
+            attention_hidden_state,
+            memory,
+            processed_memory,
+            attention_weights_cat,
+            mask=None):
+        ''' construct '''
+        alignment = self.get_alignment_energies(
+            attention_hidden_state, processed_memory, attention_weights_cat)
+
+        attention_weights = self.softmax(alignment)
+        attention_context = self.bmm(
+            self.expand_dims(
+                attention_weights, 1), memory)
+        attention_context = self.squeeze_(attention_context)
+        return attention_context, attention_weights
 
 class Prenet(nn.Cell):
     ''' prenet '''
@@ -538,6 +554,52 @@ class Decode(nn.Cell):
             attention_hidden,
             attention_cell)
 
+    def inference(self, decoder_input, attention_hidden,
+                  attention_cell, attention_weights, attention_weights_cum,
+                  attention_context, memory, processed_memory,
+                  decoder_hidden, decoder_cell, mask):
+        ''' construct '''
+        cell_input = self.concat_((decoder_input, attention_context))
+        attention_hidden, attention_cell = self.attention_rnn(
+            cell_input, attention_hidden, attention_cell)
+
+        attention_hidden = self.dropout_attention(attention_hidden)
+
+        attention_weights_cat = self.concat_dim1(
+            (self.expand_dims(attention_weights, 1),
+             self.expand_dims(attention_weights_cum, 1)))
+
+        attention_context, attention_weights = self.attention_layer.inference(
+            attention_hidden, memory, processed_memory,
+            attention_weights_cat, mask)
+
+        attention_weights_cum += attention_weights
+        decoder_input = self.concat_(
+            (attention_hidden, attention_context))
+
+        decoder_hidden, decoder_cell = self.decoder_rnn(
+            decoder_input, decoder_hidden, decoder_cell)
+
+        decoder_hidden = self.dropout_decoder(decoder_hidden)
+
+        decoder_hidden_attention_context = self.concat_dim1(
+            (decoder_hidden, attention_context))
+
+        decoder_output = self.linear_projection(
+            decoder_hidden_attention_context)
+
+        gate_prediction = self.gate_layer(decoder_hidden_attention_context)
+
+        return (
+            decoder_output,
+            gate_prediction,
+            attention_weights,
+            attention_weights_cum,
+            attention_context,
+            decoder_hidden,
+            decoder_cell,
+            attention_hidden,
+            attention_cell)
 
 class Decoder(nn.Cell):
     ''' decoder '''
@@ -687,8 +749,8 @@ class Decoder(nn.Cell):
             attention_cell = self.decode(decoder_input,
                                          attention_hidden, attention_cell,
                                          attention_weights, attention_weights_cum, attention_context,
-                                         memory, mask, processed_memory,
-                                         decoder_hidden, decoder_cell)
+                                         memory, processed_memory,
+                                         decoder_hidden, decoder_cell, mask)
 
             mel_outputs += (mel_output,)
             gate_outputs += (self.squeeze(gate_output),)
@@ -725,11 +787,11 @@ class Decoder(nn.Cell):
             decoder_input = self.prenet(decoder_input)
             mel_output, gate_output, attention_weights, attention_weights_cum, \
             attention_context, decoder_hidden, decoder_cell, attention_hidden, \
-            attention_cell = self.decode(decoder_input,
-                                         attention_hidden, attention_cell,
-                                         attention_weights, attention_weights_cum, attention_context,
-                                         memory, processed_memory,
-                                         decoder_hidden, decoder_cell, mask)
+            attention_cell = self.decode.inference(decoder_input,
+                                                   attention_hidden, attention_cell,
+                                                   attention_weights, attention_weights_cum, attention_context,
+                                                   memory, processed_memory,
+                                                   decoder_hidden, decoder_cell, mask)
 
             mel_outputs += (mel_output,)
             gate_outputs += (self.squeeze(gate_output),)
@@ -883,7 +945,6 @@ class NetWithLossClass(nn.Cell):
         super(NetWithLossClass, self).__init__()
         self.model = model
         self.loss_fn = loss_fn
-        self.histo_summary = P.HistogramSummary()
         self.sigmoid = P.Sigmoid()
 
     def construct(
@@ -903,10 +964,6 @@ class NetWithLossClass(nn.Cell):
             text_mask,
             mel_mask,
             rnn_mask)
-        self.histo_summary('predicted_mel', out[0])
-        self.histo_summary('ground_mel', mel_padded)
-        self.histo_summary('predicted_gate', self.sigmoid(out[2]))
-        self.histo_summary('groud_gate', gate_padded)
         loss = self.loss_fn(out, (mel_padded, gate_padded))
         return loss
 
@@ -1066,7 +1123,6 @@ class TrainStepWrap(nn.Cell):
         self.concat = P.Concat()
         self.less_equal = P.LessEqual()
         self.reduce_sum = P.ReduceSum(keep_dims=False)
-        self.scalar_summary = P.ScalarSummary()
         self.greater = P.Greater()
         self.select = P.Select()
         self.alloc_status = P.NPUAllocFloatStatus()
@@ -1171,8 +1227,6 @@ class TrainStepWrap(nn.Cell):
             succ = False
         else:
             succ = self.optimizer(grads)
-
-        self.scalar_summary("loss", loss)
 
         ret = (loss, scale_sense)
         return F.depend(ret, succ)

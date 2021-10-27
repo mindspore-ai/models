@@ -14,34 +14,46 @@
 # ============================================================================
 '''training model'''
 import os
-import argparse
+import os.path
+import time
 import numpy as np
 import mindspore
 import mindspore.dataset as ds
 
 from mindspore.context import ParallelMode
-from mindspore.communication.management import init
-from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
+from mindspore.communication import management as MultiDevice
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.nn.wrap.loss_scale import DynamicLossScaleUpdateCell
 from mindspore import context
 from mindspore import Model
 from mindspore import Tensor
 from mindspore.nn.optim import Adam
-from mindspore.train.callback import SummaryCollector
 
 from src.hparams import hparams as hps
 from src.dataset import ljdataset, Sampler
-from src.callback import Monitor, get_lr
+from src.callback import get_lr, LossCallBack
 from src.tacotron2 import Tacotron2, Tacotron2Loss, NetWithLossClass, TrainStepWrap
+
+from model_utils.config import config
+from model_utils.moxing_adapter import moxing_wrapper
+from model_utils.device_adapter import get_device_id, get_device_num
+
+def get_ms_timestamp():
+    '''get timestamp'''
+    t = time.time()
+    return int(round(t * 1000))
 
 np.random.seed(0)
 mindspore.common.set_seed(1024)
+time_stamp_init = False
+time_stamp_first = 0
 
+context.set_context(mode=context.GRAPH_MODE, save_graphs=False, device_target=config.device_target)
 
-def prepare_dataloaders(fdir, rank, group_size, args):
+def prepare_dataloaders(dataset_path, rank_id, group_size):
     '''prepare dataloaders'''
-    dataset = ljdataset(fdir, group_size)
+    dataset = ljdataset(dataset_path, group_size)
     ds_dataset = ds.GeneratorDataset(dataset,
                                      ['text_padded',
                                       'input_lengths',
@@ -50,47 +62,75 @@ def prepare_dataloaders(fdir, rank, group_size, args):
                                       'text_mask',
                                       'mel_mask',
                                       'rnn_mask'],
-                                     num_parallel_workers=int(args.workers),
+                                     num_parallel_workers=4,
                                      sampler=Sampler(dataset.sample_nums,
-                                                     rank,
-                                                     group_size),
-                                     shard_id=rank,
-                                     num_shards=group_size)
+                                                     rank_id,
+                                                     group_size))
     ds_dataset = ds_dataset.batch(hps.batch_size)
     return ds_dataset
 
 
-def train(args):
+def modelarts_pre_process():
+    '''modelarts pre process function.'''
+    def unzip(zip_file, save_dir):
+        import zipfile
+        s_time = time.time()
+        if not os.path.exists(os.path.join(save_dir, config.modelarts_dataset_unzip_name)):
+            zip_isexist = zipfile.is_zipfile(zip_file)
+            if zip_isexist:
+                fz = zipfile.ZipFile(zip_file, 'r')
+                data_num = len(fz.namelist())
+                print("Extract Start...")
+                print("unzip file num: {}".format(data_num))
+                data_print = int(data_num / 100) if data_num > 100 else 1
+                i = 0
+                for file in fz.namelist():
+                    if i % data_print == 0:
+                        print("unzip percent: {}%".format(int(i * 100 / data_num)), flush=True)
+                    i += 1
+                    fz.extract(file, save_dir)
+                print("cost time: {}min:{}s.".format(int((time.time() - s_time) / 60),
+                                                     int(int(time.time() - s_time) % 60)))
+                print("Extract Done.")
+            else:
+                print("This is not zip.")
+        else:
+            print("Zip has been extracted.")
+
+    if config.need_modelarts_dataset_unzip:
+        zip_file_1 = os.path.join(config.data_path, config.modelarts_dataset_unzip_name + ".zip")
+        save_dir_1 = os.path.join(config.data_path)
+
+        sync_lock = "/tmp/unzip_sync.lock"
+
+        # Each server contains 8 devices as most.
+        if get_device_id() % min(get_device_num(), 8) == 0 and not os.path.exists(sync_lock):
+            print("Zip file path: ", zip_file_1)
+            print("Unzip file save dir: ", save_dir_1)
+            unzip(zip_file_1, save_dir_1)
+            print("===Finish extract data synchronization===")
+            try:
+                os.mknod(sync_lock)
+            except IOError:
+                pass
+
+        while True:
+            if os.path.exists(sync_lock):
+                break
+            time.sleep(1)
+
+        print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
+
+    config.save_ckpt_dir = os.path.join(config.output_path, config.save_ckpt_dir)
+
+def _build_training_pipeline(pre_dataset, run_distribute=False):
     ''' training '''
-    if args.is_distributed in "true":
-        rank = int(os.getenv("RANK_ID"))
-        group_size = int(os.getenv("RANK_SIZE"))
-        device_id = int(os.getenv("DEVICE_ID"))
-        context.set_context(
-            mode=0,
-            device_target="Ascend",
-            device_id=device_id)
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(
-            parallel_mode=ParallelMode.DATA_PARALLEL,
-            gradients_mean=True,
-            device_num=group_size)
-        init()
-    else:
-        device_id = int(args.device_id)
-        context.set_context(
-            mode=1,
-            device_target="Ascend",
-            device_id=device_id,
-            reserve_class_name_in_scope=False)
-        rank = 0
-        group_size = 1
-    train_loader = prepare_dataloaders(args.data_dir, rank, group_size, args)
-    epoch_num = hps.epoch_num
 
-    steps_per_epoch = train_loader.get_dataset_size()
+    epoch_num = config.epoch_num
 
-    learning_rate = get_lr(hps.lr, epoch_num, steps_per_epoch, steps_per_epoch * 30)
+    steps_per_epoch = pre_dataset.get_dataset_size()
+
+    learning_rate = get_lr(config.lr, epoch_num, steps_per_epoch, steps_per_epoch * config.warmup_epochs)
     learning_rate = Tensor(learning_rate)
 
     scale_update_cell = DynamicLossScaleUpdateCell(loss_scale_value=2**12,
@@ -100,19 +140,16 @@ def train(args):
     loss_fn = Tacotron2Loss()
     loss_net = NetWithLossClass(net, loss_fn)
 
-    if args.ckpt_dir != '' and not os.path.isdir(args.ckpt_dir):
-        os.makedirs(args.ckpt_dir)
-        os.chmod(args.ckpt_dir, 0o775)
 
     resume_epoch = None
-    if args.pretrained_model != '':
-        resume_epoch = int(args.pretrained_model.split('-')[-1].split('_')[0])
+    if config.pretrain_ckpt:
+        resume_epoch = int(config.pretrain_ckpt.split('-')[-1].split('_')[0])
         learning_rate = learning_rate[resume_epoch * steps_per_epoch:]
-        param_dict = load_checkpoint(args.pretrained_model)
+        param_dict = load_checkpoint(config.pretrain_ckpt)
         load_param_into_net(net, param_dict)
         print(
             'Successfully loading the pretrained model {}'.format(
-                args.pretrained_model))
+                config.pretrain_ckpt))
 
     optimizer = Adam(params=net.trainable_params(), learning_rate=learning_rate)
 
@@ -121,74 +158,93 @@ def train(args):
 
     model = Model(train_net)
 
-    if args.is_distributed in 'true':
-        ckpt_path = os.path.join(
-            args.ckpt_dir,
-            'device' + str(device_id) + '/')
-        summary_collector = SummaryCollector(
-            summary_dir='summary_dir/device{}/'.format(device_id), collect_freq=1)
+    ckpt_config = CheckpointConfig(save_checkpoint_steps=steps_per_epoch,
+                                   keep_checkpoint_max=config.keep_ckpt_max)
+
+
+    callbacks = [LossCallBack(steps_per_epoch),
+                 TimeMonitor(data_size=steps_per_epoch)]
+
+    ckpt_callback = ModelCheckpoint(prefix='tacotron2',
+                                    directory=os.path.join(config.save_ckpt_dir,
+                                                           'ckpt_{}'.format(os.getenv("DEVICE_ID"))),
+                                    config=ckpt_config)
+
+    callbacks.append(ckpt_callback)
+
+
+    print("Prepare to Training....")
+    if resume_epoch is not None:
+        epoch_num = epoch_num - resume_epoch
+
+    print("Epoch size ", epoch_num)
+    if run_distribute:
+        print(f" | Rank {MultiDevice.get_rank()} Call model train.")
+
+    model.train(
+        epoch_num,
+        pre_dataset,
+        callbacks=callbacks,
+        dataset_sink_mode=True)
+
+
+def set_parallel_env():
+    '''set parallel context'''
+    context.reset_auto_parallel_context()
+    MultiDevice.init()
+    context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
+                                      device_num=MultiDevice.get_group_size(),
+                                      gradients_mean=True)
+
+def train_paralle(input_file_path):
+    """
+    Train model on multi device
+    Args:
+        input_file_path: preprocessed dataset path
+    """
+    set_parallel_env()
+    print("Starting traning on multiple devices. |~ _ ~| |~ _ ~| |~ _ ~| |~ _ ~|")
+    hps.batch_size = config.batch_size
+
+    dataset_path = os.path.join(input_file_path, 'ljdataset.hdf5')
+    print('dataset_path : {}'.format(dataset_path))
+    preprocessed_data = prepare_dataloaders(dataset_path,
+                                            MultiDevice.get_rank(),
+                                            MultiDevice.get_group_size())
+
+    _build_training_pipeline(preprocessed_data, True)
+
+def train_single(input_file_path):
+    """
+    Train model on single device
+    Args:
+        input_file_path: preprocessed dataset path
+    """
+    print("Staring training on single device.")
+    hps.batch_size = config.batch_size
+
+    dataset_path = os.path.join(input_file_path, 'ljdataset.hdf5')
+    print('dataset_path : {}'.format(dataset_path))
+    preprocessed_data = prepare_dataloaders(dataset_path,
+                                            rank_id=0,
+                                            group_size=1)
+
+    _build_training_pipeline(preprocessed_data)
+
+@moxing_wrapper(pre_process=modelarts_pre_process)
+def run_train():
+    '''run train.'''
+    if config.device_target == "Ascend":
+        config.rank_id = get_device_id()
     else:
-        ckpt_path = os.path.join(args.ckpt_dir, 'single/')
-        summary_collector = SummaryCollector(
-            summary_dir='summary_dir/standalone/', collect_freq=1)
-    config_ck = CheckpointConfig(
-        save_checkpoint_steps=steps_per_epoch,
-        keep_checkpoint_max=epoch_num)
-    ckpt_cb = ModelCheckpoint(
-        prefix='tacotron2',
-        directory=ckpt_path,
-        config=config_ck)
-    if resume_epoch is None:
-        model.train(
-            epoch_num,
-            train_loader,
-            callbacks=[
-                Monitor(learning_rate),
-                summary_collector,
-                ckpt_cb],
-            dataset_sink_mode=False)
+        raise ValueError("Not support device target: {}".format(config.device_target))
+
+    device_num = get_device_num()
+    if device_num > 1:
+        train_paralle(config.dataset_path)
     else:
-        model.train(
-            epoch_num - resume_epoch,
-            train_loader,
-            callbacks=[
-                Monitor(learning_rate),
-                summary_collector,
-                ckpt_cb],
-            dataset_sink_mode=False)
+        train_single(config.dataset_path)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--data_dir', type=str, default='ljdataset.hdf5',
-                        help='directory to load data')
-    parser.add_argument(
-        '-cd',
-        '--ckpt_dir',
-        type=str,
-        default='mindspore_ckpt',
-        help='directory to save checkpoints')
-    parser.add_argument('-cp', '--ckpt_pth', type=str, default='',
-                        help='path to load checkpoints')
-    parser.add_argument(
-        '-dist',
-        '--is_distributed',
-        type=str,
-        default='true',
-        help='distributed training')
-    parser.add_argument('--device_id', type=str, default='3',
-                        help='choose device id')
-    parser.add_argument(
-        '--workers',
-        type=str,
-        default='8',
-        help='num parallel workers')
-    parser.add_argument(
-        '-p',
-        '--pretrained_model',
-        type=str,
-        default='',
-        help='pretrained model path')
-    Args = parser.parse_args()
-
-    train(Args)
+    run_train()
