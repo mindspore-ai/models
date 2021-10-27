@@ -16,14 +16,10 @@
 import mindspore as ms
 import mindspore.nn as nn
 import mindspore.ops as ops
-from mindspore import context
 from src.loss import ICNetLoss
 from src.models.resnet50_v1 import get_resnet50v1b
 
 __all__ = ['ICNetdc']
-
-context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
-
 
 class ICNetdc(nn.Cell):
     """Image Cascade Network"""
