@@ -94,7 +94,8 @@ def modelarts_pre_process():
         print("#" * 200, os.listdir(os.path.join(config.data_path, config.modelarts_dataset_unzip_name)))
 
         config.dataset_path = os.path.join(config.data_path, config.modelarts_dataset_unzip_name)
-    config.pretrain_ckpt = os.path.join(config.output_path, config.pretrain_ckpt)
+    if config.pretrain_ckpt:
+        config.pretrain_ckpt = os.path.join(config.output_path, config.pretrain_ckpt)
 
 def build_params_groups(net):
     decayed_params = []
