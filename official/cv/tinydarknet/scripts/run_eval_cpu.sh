@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 1 ] && [ $# != 2 ]  && [ $# != 3 ]
 then
-  echo "Usage bash scripts/run_train_cpu.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]"
+  echo "Usage bash scripts/run_eval_cpu.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]"
 exit 1
 fi
 
