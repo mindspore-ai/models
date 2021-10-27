@@ -16,17 +16,17 @@
 import time
 import os
 import math
-from mindspore import nn, load_checkpoint, context
+from mindspore import nn, load_checkpoint, context, save_checkpoint
 import mindspore.common.dtype as mstype
 from mindspore.common import set_seed
 from mindspore.train.model import Model
 from mindspore.train.loss_scale_manager import DynamicLossScaleManager
 from mindspore.context import ParallelMode
 from mindspore.communication.management import init
+from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, LossMonitor, TimeMonitor
 from src.naml import NAML, NAMLWithLossCell
 from src.dataset import create_dataset, MINDPreprocess
 from src.utils import process_data
-from src.callback import Monitor
 
 from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper
@@ -144,13 +144,17 @@ def run_train():
         model = Model(net_with_loss, optimizer=opt, loss_scale_manager=loss_scale_manager)
     else:
         model = Model(net_with_loss, optimizer=opt)
-    cb = [Monitor(config)]
-    epochs = config.epochs
-    if config.sink_mode:
-        epochs = int(config.epochs * config.dataset_size / config.print_times)
+
+    # checkpoint
+    cb = [TimeMonitor(data_size=config.dataset_size), LossMonitor()]
+    if config.rank == 0:
+        ckpt_config = CheckpointConfig(save_checkpoint_steps=config.dataset_size)
+        cb.append(ModelCheckpoint(prefix="naml", directory=config.save_checkpoint_path, config=ckpt_config))
+
     start_time = time.time()
     print("======================= Start Train ==========================", flush=True)
-    model.train(epochs, dataset, callbacks=cb, dataset_sink_mode=config.sink_mode, sink_size=config.print_times)
+    model.train(config.epochs, dataset, callbacks=cb, dataset_sink_mode=config.sink_mode)
+    save_checkpoint(net_with_loss, os.path.join(config.save_checkpoint_path, "naml_last.ckpt"))
     end_time = time.time()
     print("==============================================================")
     print("processor_name: {}".format(config.platform))

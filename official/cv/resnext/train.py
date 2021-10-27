@@ -14,7 +14,6 @@
 # ============================================================================
 """train ImageNet."""
 import os
-import time
 import datetime
 
 import mindspore.nn as nn
@@ -22,11 +21,10 @@ from mindspore import Tensor, context
 from mindspore.context import ParallelMode
 from mindspore.nn.optim import Momentum
 from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.train.callback import ModelCheckpoint
-from mindspore.train.callback import CheckpointConfig, Callback
 from mindspore.train.model import Model
 from mindspore.train.loss_scale_manager import DynamicLossScaleManager, FixedLossScaleManager
 from mindspore.common import set_seed
+from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, LossMonitor, TimeMonitor
 
 from src.dataset import classification_dataset
 from src.crossentropy import CrossEntropy
@@ -51,57 +49,6 @@ class BuildTrainNetwork(nn.Cell):
         output = self.network(input_data)
         loss = self.criterion(output, label)
         return loss
-
-class ProgressMonitor(Callback):
-    """monitor loss and time"""
-    def __init__(self, args):
-        super(ProgressMonitor, self).__init__()
-        self.me_epoch_start_time = 0
-        self.me_epoch_start_step_num = 0
-        self.args = args
-        self.ckpt_history = []
-
-    def begin(self, run_context):
-        self.args.logger.info('start network train...')
-
-    def epoch_begin(self, run_context):
-        pass
-
-    def epoch_end(self, run_context, *me_args):
-        cb_params = run_context.original_args()
-        me_step = cb_params.cur_step_num - 1
-
-        real_epoch = me_step // self.args.steps_per_epoch
-        time_used = time.time() - self.me_epoch_start_time
-        fps_mean = self.args.per_batch_size * (me_step-self.me_epoch_start_step_num) * self.args.group_size / time_used
-        self.args.logger.info('epoch[{}], iter[{}], loss:{}, mean_fps:{:.2f}'
-                              'imgs/sec'.format(real_epoch, me_step, cb_params.net_outputs, fps_mean))
-
-        if self.args.rank_save_ckpt_flag:
-            import glob
-            ckpts = glob.glob(os.path.join(self.args.outputs_dir, '*.ckpt'))
-            for ckpt in ckpts:
-                ckpt_fn = os.path.basename(ckpt)
-                if not ckpt_fn.startswith('{}-'.format(self.args.rank)):
-                    continue
-                if ckpt in self.ckpt_history:
-                    continue
-                self.ckpt_history.append(ckpt)
-                self.args.logger.info('epoch[{}], iter[{}], loss:{}, ckpt:{},'
-                                      'ckpt_fn:{}'.format(real_epoch, me_step, cb_params.net_outputs, ckpt, ckpt_fn))
-
-
-        self.me_epoch_start_step_num = me_step
-        self.me_epoch_start_time = time.time()
-
-    def step_begin(self, run_context):
-        pass
-
-    def step_end(self, run_context, *me_args):
-        pass
-
-    def end(self, run_context):
-        self.args.logger.info('end network train...')
 
 
 def set_parameters():
@@ -190,8 +137,7 @@ def train():
                   metrics={'acc'}, amp_level="O3")
 
     # checkpoint save
-    progress_cb = ProgressMonitor(config)
-    callbacks = [progress_cb,]
+    callbacks = [TimeMonitor(data_size=config.steps_per_epoch), LossMonitor()]
     if config.rank_save_ckpt_flag:
         ckpt_config = CheckpointConfig(save_checkpoint_steps=config.ckpt_interval * config.steps_per_epoch,
                                        keep_checkpoint_max=config.ckpt_save_max)
