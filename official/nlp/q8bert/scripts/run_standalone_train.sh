@@ -37,6 +37,7 @@ PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 CUR_DIR=`pwd`
 export GLOG_log_dir=${CUR_DIR}/ms_log
 export GLOG_logtostderr=0
+export MS_COMPILER_OP_LEVEL=1
 
 python ${PROJECT_DIR}/../train.py \
     --task_name=$task_name \
