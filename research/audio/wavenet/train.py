@@ -66,10 +66,15 @@ if __name__ == '__main__':
     else:
         context.set_context(mode=context.PYNATIVE_MODE, device_target=target, save_graphs=False)
 
-    rank_id = int(os.getenv('RANK_ID'))
-    group_size = int(os.getenv('RANK_SIZE'))
-    device_id = int(os.getenv("DEVICE_ID"))
-    context.set_context(device_id=device_id)
+    if target == 'Ascend':
+        rank_id = int(os.getenv('RANK_ID'))
+        group_size = int(os.getenv('RANK_SIZE'))
+        device_id = int(os.getenv("DEVICE_ID"))
+        context.set_context(device_id=device_id)
+    else:
+        rank_id = 0
+        group_size = 1
+        device_id = 0
 
     if args.is_distributed:
         context.reset_auto_parallel_context()
@@ -154,7 +159,7 @@ if __name__ == '__main__':
     else:
         lr = get_lr(hparams.optimizer_params["lr"], hparams.nepochs, step_size_per_epoch)
         lr = Tensor(lr)
-        if arg.checkpoint != '':
+        if args.checkpoint != '':
             param_dict = load_checkpoint(args.checkpoint)
             load_param_into_net(model, param_dict)
             print('Successfully loading the pre-trained model')
