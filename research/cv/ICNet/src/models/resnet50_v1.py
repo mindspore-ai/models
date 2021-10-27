@@ -279,7 +279,7 @@ def get_resnet50v1b(class_num=1001, ckpt_root='', pretrained=True):
                         strides=[1, 2, 2, 2],
                         num_classes=class_num)
 
-    if pretrained:
+    if pretrained and model.training:
         pretrained_ckpt = ckpt_root
         param_dict = load_checkpoint(pretrained_ckpt)
         load_param_into_net(model, param_dict)
