@@ -237,7 +237,7 @@ Parameters for both training and evaluation can be set in `default_config.yaml`
 - Export on local
 
   ```shell
-  # The ckpt_file parameter is required, `EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+  # The ckpt_file parameter is required, `FILE_FORMAT` should be in ["AIR", "MINDIR"]
   python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
   ```
 

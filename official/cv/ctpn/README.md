@@ -344,7 +344,7 @@ Evaluation result will be stored in the example path, you can find result like t
 ## Model Export
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_format[EXPORT_FORMAT]
+python export.py --ckpt_file [CKPT_PATH] --file_format [EXPORT_FORMAT]
 ```
 
 - Export MindIR on Modelarts

@@ -509,10 +509,10 @@ Export MindIR on local
 Before exporting, you need to modify the parameter in the configuration — checkpoint_file_path and batch_ Size . checkpoint_ file_ Path is the CKPT file path, batch_ Size is set to 1.
 
 ```shell
-python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[air_model_name] --file_format=AIR
+python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[air_model_name] --file_format=[EXPORT_FORMAT]
 ```
 
-The checkpoint_file_path parameter is required,
+The `checkpoint_file_path` parameter is required,
 `EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
 
 Export on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start as follows)
@@ -524,13 +524,13 @@ Export on ModelArts (If you want to run in modelarts, please check the official 
 #          Set "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" on default_config.yaml file.
 #          Set "checkpoint_url='s3://dir_to_trained_ckpt/'" on default_config.yaml file.
 #          Set "file_name='./unet'" on default_config.yaml file.
-#          Set "file_format='AIR'" on default_config.yaml file.
+#          Set "file_format='MINDIR'" on default_config.yaml file.
 #          Set other parameters on default_config.yaml file you need.
 #       b. Add "enable_modelarts=True" on the website UI interface.
 #          Add "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" on the website UI interface.
 #          Add "checkpoint_url='s3://dir_to_trained_ckpt/'" on the website UI interface.
 #          Add "file_name='./unet'" on the website UI interface.
-#          Add "file_format='AIR'" on the website UI interface.
+#          Add "file_format='MINDIR'" on the website UI interface.
 #          Add other parameters on the website UI interface.
 # (2) Set the config_path="/path/yaml file" on the website UI interface.
 # (3) Set the code directory to "/path/unet" on the website UI interface.

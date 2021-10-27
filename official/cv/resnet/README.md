@@ -696,7 +696,7 @@ python export.py --checkpoint_file_path [CKPT_PATH] --file_name [FILE_NAME] --fi
 ```
 
 The checkpoint_file_path parameter is required,
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+`FILE_FORMAT` should be in ["AIR", "MINDIR"]
 
 Export on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start as follows)
 

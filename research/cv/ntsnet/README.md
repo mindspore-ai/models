@@ -186,7 +186,7 @@ accuracy: 0.876
 ## Model Export
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format[EXPORT_FORMAT]
+python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format [EXPORT_FORMAT]
 ```
 
 `EXPORT_FORMAT` should be "MINDIR"

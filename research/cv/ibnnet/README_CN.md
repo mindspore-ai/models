@@ -208,7 +208,7 @@ sh scripts/run_eval_gpu.sh path/evalset path/ckpt
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
 ```
 
-参数`ckpt_file` 是必需的，`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中进行选择。
+参数`ckpt_file` 是必需的，`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中进行选择。
 
 # 推理过程
 

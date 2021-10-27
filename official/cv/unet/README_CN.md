@@ -508,7 +508,7 @@ bash scripts/run_distribute_train_gpu.sh [RANKSIZE] [DATASET] [CONFIG_PATH]
 本地导出mindir
 
 ```shell
-python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[air_model_name] --file_format=AIR
+python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[air_model_name] --file_format=MINDIR
 ```
 
 ModelArts导出mindir
@@ -520,12 +520,12 @@ ModelArts导出mindir
 #          设置 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt" 在 yaml 文件。
 #          设置 "checkpoint_url=/The path of checkpoint in S3/" 在 yaml 文件。
 #          设置 "file_name='./unet'"参数在yaml文件。
-#          设置 "file_format='AIR'" 参数在yaml文件。
+#          设置 "file_format='MINDIR'" 参数在yaml文件。
 #       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
 #          增加 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" 参数在modearts的界面上。
 #          增加 "checkpoint_url=/The path of checkpoint in S3/" 参数在modearts的界面上。
 #          设置 "file_name='./unet'"参数在modearts的界面上。
-#          设置 "file_format='AIR'" 参数在modearts的界面上。
+#          设置 "file_format='MINDIR'" 参数在modearts的界面上。
 # (3) 设置网络配置文件的路径 "config_path=/The path of config in S3/"
 # (4) 在modelarts的界面上设置代码的路径 "/path/unet"。
 # (5) 在modelarts的界面上设置模型的启动文件 "export.py" 。

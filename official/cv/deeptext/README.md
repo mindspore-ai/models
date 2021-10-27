@@ -313,7 +313,7 @@ class 1 precision is 84.49%, recall is 88.28%
 ## Model Export
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format[EXPORT_FORMAT]
+python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format [EXPORT_FORMAT]
 ```
 
 `EXPORT_FORMAT` should be in ["AIR", "MINDIR"]

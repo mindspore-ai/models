@@ -328,7 +328,7 @@ python export.py --ckpt [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_
 ```
 
 The ckpt_file parameter is required,
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+`FILE_FORMAT` should be in ["AIR", "MINDIR"]
 
 - Export MindIR on Modelarts
 

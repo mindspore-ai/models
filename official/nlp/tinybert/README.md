@@ -499,7 +499,7 @@ python export.py --ckpt_file ./2021-09-03_time_16_00_12/tiny_bert_936_100.ckpt -
 ```
 
 The ckpt_file parameter is required,
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+`FILE_FORMAT` should be in ["AIR", "MINDIR"]
 
 - Export on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start as follows)
 

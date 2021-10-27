@@ -244,8 +244,8 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 示例
 
 ```text
-python export.py --ckpt_file ./checkpoint/cora/dgcn.ckpt
-参数ckpt_file为必填项，`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
+python export.py --ckpt_file ./checkpoint/cora/dgcn.ckpt  --file_format MINDIR
+参数ckpt_file为必填项，`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
 ```
 
 ## 模型描述

@@ -370,7 +370,7 @@ python export.py --pretrained [CKPT_PATH] --batch_size 1 --file_name [FILE_NAME]
 The ckpt_file parameter is required,
 `batch_size` should be set to 1
 `pretrained` is the ckpt file path referenced
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+`FILE_FORMAT` should be in ["AIR", "MINDIR"]
 
 for example, on Ascend:
 

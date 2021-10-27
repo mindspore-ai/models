@@ -283,7 +283,7 @@ python export.py --ckpt [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_
 ```
 
 参数ckpt为必填项，
-`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
+`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
 
 - 在modelarts上导出MindIR
 

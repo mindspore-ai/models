@@ -242,7 +242,7 @@ python export.py --config_path [CONFIG_PATH]--ckpt_file [CKPT_PATH] --file_name 
 ```
 
 The ckpt_file parameter is required,
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+`FILE_FORMAT` should be in ["AIR", "MINDIR"]
 
 ### Infer on Ascend310
 

@@ -347,7 +347,7 @@ YOLOv3 Tiny是YOLOv3的一个轻量级变体，它使用池化层并减少卷积
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
 ```
 
-参数ckpt_file 是必需的，EXPORT_FORMAT 选择 "MINDIR"。
+参数ckpt_file 是必需的，FILE_FORMAT 选择 "MINDIR"。
 
 ## 推理过程
 
