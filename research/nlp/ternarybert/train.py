@@ -23,6 +23,8 @@ from mindspore import context
 from mindspore.train.model import Model
 from mindspore.nn.optim import AdamWeightDecay
 from mindspore import set_seed
+from mindspore.train.callback import TimeMonitor
+
 from src.dataset import create_dataset
 from src.utils import StepCallBack, ModelSaveCkpt, EvalCallBack, BertLearningRate
 from src.config import train_cfg, eval_cfg, teacher_net_cfg, student_net_cfg, task_cfg
@@ -54,7 +56,7 @@ def parse_args():
                         help='If do_eval is True, the evaluation will be ran every eval_ckpt_step. (Default: 50)')
     parser.add_argument('--max_ckpt_num', type=int, default=10,
                         help='The number of checkpoints will not be larger than max_ckpt_num. (Default: 10)')
-    parser.add_argument('--data_sink_steps', type=int, default=1, help='Sink steps for each epoch. (Default: 1)')
+    parser.add_argument('--data_sink_steps', type=int, default=100, help='Sink steps for each epoch. (Default: 1)')
     parser.add_argument('--teacher_model_dir', type=str, default='', help='The checkpoint directory of teacher model.')
     parser.add_argument('--student_model_dir', type=str, default='', help='The checkpoint directory of student model.')
     parser.add_argument('--data_dir', type=str, default='', help='Data directory.')
@@ -117,8 +119,10 @@ def run_task_distill(args_opt):
 
     if args_opt.enable_data_sink:
         repeat_count = args_opt.epoch_size * dataset_size // args_opt.data_sink_steps
+        time_monitor_steps = args_opt.data_sink_steps
     else:
         repeat_count = args_opt.epoch_size
+        time_monitor_steps = dataset_size
 
     netwithloss = BertNetworkWithLoss(teacher_config=teacher_net_cfg, teacher_ckpt=teacher_ckpt,
                                       student_config=student_net_cfg, student_ckpt=student_ckpt,
@@ -143,7 +147,8 @@ def run_task_distill(args_opt):
 
     if args_opt.do_eval:
         eval_dataset = list(eval_dataset.create_dict_iterator())
-        callback = [EvalCallBack(network=netwithloss.bert,
+        callback = [TimeMonitor(time_monitor_steps),
+                    EvalCallBack(network=netwithloss.bert,
                                  dataset=eval_dataset,
                                  eval_ckpt_step=args_opt.eval_ckpt_step,
                                  save_ckpt_dir=save_ckpt_dir,
@@ -152,7 +157,7 @@ def run_task_distill(args_opt):
                                  clip_value=student_net_cfg.weight_clip_value,
                                  metrics=task.metrics)]
     else:
-        callback = [StepCallBack(),
+        callback = [TimeMonitor(time_monitor_steps), StepCallBack(),
                     ModelSaveCkpt(network=netwithloss.bert,
                                   save_ckpt_step=args_opt.save_ckpt_step,
                                   max_ckpt_num=args_opt.max_ckpt_num,
