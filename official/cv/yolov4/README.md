@@ -493,7 +493,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 ```
 
 The ckpt_file parameter is required,
-`EXPORT_FORMAT` should be in ["AIR", "ONNX", "MINDIR"]
+`FILE_FORMAT` should be in ["AIR", "ONNX", "MINDIR"]
 `keep_detect` keep the detect module or not, default: True
 
 ## [Inference Process](#contents)

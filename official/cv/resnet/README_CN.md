@@ -662,7 +662,7 @@ python export.py --checkpoint_file_path [CKPT_PATH] --file_name [FILE_NAME] --fi
 ```
 
 参数checkpoint_file_path为必填项，
-`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
+`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
 
 ModelArts导出mindir
 

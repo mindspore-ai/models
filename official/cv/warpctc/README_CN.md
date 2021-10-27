@@ -318,7 +318,7 @@ bash run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DEVICE_TARGET]
   ```
 
 参数ckpt_file为必填项，
-`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
+`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
 
 ### 在Ascend310执行推理
 

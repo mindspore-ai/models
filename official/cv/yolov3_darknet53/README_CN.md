@@ -401,7 +401,7 @@ bash run_eval.sh dataset/coco2014/ train_parallel0/outputs/{year}-{month}-{day}_
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --keep_detect [Bool]
 ```
 
-参数`ckpt_file` 是必需的，目前,`EXPORT_FORMAT` 必须在 ["AIR", "ONNX", "MINDIR"]中进行选择。
+参数`ckpt_file` 是必需的，目前,`FILE_FORMAT` 必须在 ["AIR", "ONNX", "MINDIR"]中进行选择。
 参数`keep_detect` 是否保留坐标检测模块, 默认为True
 
 ## 推理过程

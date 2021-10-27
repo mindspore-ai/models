@@ -222,7 +222,7 @@ python export.py --ckpt_simclr_encoder [SIMCLR_CKPT_PATH] --ckpt_linear_classifi
 ```
 
 The parameters ckpt_simclr_encoder and ckpt_linear_classifier are required,
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+`FILE_FORMAT` should be in ["AIR", "MINDIR"]
 
 ## [Inference Process](#contents)
 

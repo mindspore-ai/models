@@ -166,11 +166,11 @@ You can view the results through the file "log". The accuracy of the test datase
 
 ```shell
 # export model
-python export.py --ckpt_file ./scripts/ckpt/omniglot_encoder_relation_network5way_1shot.ckpt
+python export.py --ckpt_file ./scripts/ckpt/omniglot_encoder_relation_network5way_1shot.ckpt --file_format [FILE_FORMAT]
 ```
 
 The ckpt_file parameter is required,
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+`FILE_FORMAT` should be in ["AIR", "MINDIR"]
 
 # [Model Description](#contents)
 

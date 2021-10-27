@@ -650,7 +650,7 @@ Export on ModelArts (If you want to run in modelarts, please check the official 
 ```
 
 The ckpt_file parameter is required,
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+`FILE_FORMAT` should be in ["AIR", "MINDIR"]
 
 ### Infer on Ascend310
 

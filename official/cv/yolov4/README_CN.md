@@ -501,7 +501,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 ```
 
 必须设置ckpt_file参数。
-`EXPORT_FORMAT`取值为["AIR", "ONNX", "MINDIR"]。
+`FILE_FORMAT`取值为["AIR", "ONNX", "MINDIR"]。
 
 ## [推理过程](#目录)
 

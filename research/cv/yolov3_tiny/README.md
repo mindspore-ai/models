@@ -352,6 +352,9 @@ Currently, batchsize can only set to 1.
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
 ```
 
+The ckpt_file parameter is required,
+`FILE_FORMAT` should be "MINDIR".
+
 ## [Inference Process]
 
 ### Usage
