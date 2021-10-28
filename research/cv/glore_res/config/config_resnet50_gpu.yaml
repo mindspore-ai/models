@@ -44,6 +44,7 @@ device_target: "GPU"
 device_id: 0
 device_num: 8
 data_url: ""
+eval_data_url: ""
 pretrained_ckpt: ""
 parameter_server: ""
 

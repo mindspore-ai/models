@@ -25,7 +25,7 @@ from mindspore import context
 from mindspore import dataset as de
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from src.glore_resnet import glore_resnet200, glore_resnet50
+from src.glore_resnet import glore_resnet200, glore_resnet50, glore_resnet101
 from src.dataset import create_eval_dataset
 from src.dataset import create_dataset_ImageNet as ImageNet
 from src.loss import CrossEntropySmooth, SoftmaxCrossEntropyExpand
@@ -50,13 +50,13 @@ if __name__ == '__main__':
                         device_id=device_id)
 
     # dataset
-    eval_dataset_path = os.path.join(config.data_url, 'val')
+    eval_dataset_path = os.path.abspath(config.eval_data_url)
     if config.isModelArts:
-        mox.file.copy_parallel(src_url=config.data_url, dst_url='/cache/dataset')
+        mox.file.copy_parallel(src_url=config.eval_data_url, dst_url='/cache/dataset')
         eval_dataset_path = '/cache/dataset/'
     if config.net == 'resnet50':
         predict_data = create_eval_dataset(dataset_path=eval_dataset_path, repeat_num=1, batch_size=config.batch_size)
-    elif config.net == 'resnet200':
+    else:
         predict_data = ImageNet(dataset_path=eval_dataset_path,
                                 do_train=False,
                                 repeat_num=1,
@@ -71,6 +71,8 @@ if __name__ == '__main__':
         net = glore_resnet50(class_num=config.class_num, use_glore=config.use_glore)
     elif config.net == 'resnet200':
         net = glore_resnet200(class_num=config.class_num, use_glore=config.use_glore)
+    elif config.net == 'resnet101':
+        net = glore_resnet101(class_num=config.class_num, use_glore=config.use_glore)
 
     # load checkpoint
     param_dict = load_checkpoint(config.ckpt_url)

@@ -21,9 +21,9 @@ echo "For example: bash run_distribute_train.sh /path/dataset /path/rank_table .
 echo "It is better to use the absolute path."
 echo "=============================================================================================================="
 set -e
-if [ $# != 3 ]
+if [ $# != 4 ]
 then
-    echo "Usage: bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE] [CONFIG_PATH]"
+    echo "Usage: bash run_distribute_train.sh [TRAIN_DATA_PATH] [RANK_TABLE] [CONFIG_PATH] [EVAL_DATA_PATH]"
     exit 1
 fi
 get_real_path(){
@@ -37,6 +37,7 @@ DATA_PATH=$(get_real_path $1)
 export DATA_PATH=${DATA_PATH}
 RANK_TABLE=$(get_real_path $2)
 CONFIG_PATH=$(get_real_path $3)
+EVAL_DATA_PATH=$(get_real_path $4)
 export RANK_TABLE_FILE=${RANK_TABLE}
 export RANK_SIZE=8
 
@@ -58,7 +59,7 @@ do
     export RANK_ID=$i
     echo "start training for device $i"
     env > env$i.log
-    python3 train.py --data_url $1 --isModelArts False --run_distribute True --config_path=$CONFIG_PATH > train$i.log 2>&1 &
+    python3 train.py --data_url $DATA_PATH --isModelArts False --run_distribute True --config_path=$CONFIG_PATH --eval_data_url $EVAL_DATA_PATH > train$i.log 2>&1 &
     if [ $? -eq 0 ];then
         echo "start training for device$i" 
     else

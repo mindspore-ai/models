@@ -30,9 +30,11 @@
     - [性能](#性能)
         - [训练性能](#训练性能)
             - [ImageNet2012上的Glore_resnet50](#imagenet2012上的glore_resnet50)
+            - [ImageNet2012上的Glore_resnet101](#imagenet2012上的glore_resnet101)
             - [ImageNet2012上的Glore_resnet200](#imagenet2012上的glore_resnet200)
         - [推理性能](#推理性能)
             - [ImageNet2012上的Glore_resnet50](#imagenet2012上的glore_resnet50)
+            - [ImageNet2012上的Glore_resnet101](#imagenet2012上的glore_resnet101)
             - [ImageNet2012上的Glore_resnet200](#imagenet2012上的glore_resnet200)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
@@ -100,26 +102,26 @@ glore_res200网络模型的backbone是ResNet200, 在Stage2, Stage3中分别均�
 
 ```bash
 # 分布式训练
-用法:bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE] [CONFIG_PATH]
+用法:bash run_distribute_train.sh [TRAIN_DATA_PATH] [RANK_TABLE] [CONFIG_PATH] [EVAL_DATA_PATH]
 
 # 单机训练
-用法:bash run_standalone_train.sh [DATASET_PATH] [DEVICE_ID] [CONFIG_PATH]
+用法:bash run_standalone_train.sh [TRAIN_DATA_PATH] [DEVICE_ID] [CONFIG_PATH] [EVAL_DATA_PATH]
 
 # 运行评估示例
-用法:bash run_eval.sh [DATASET_PATH] [DEVICE_ID] [CHECKPOINT_PATH] [CONFIG_PATH]
+用法:bash run_eval.sh [EVAL_DATA_PATH] [DEVICE_ID] [CHECKPOINT_PATH] [CONFIG_PATH]
 ```
 
 - GPU处理器环境运行
 
 ```bash
 # 分布式训练
-用法:bash run_distribute_train_gpu.sh [DATASET_PATH] [RANK_SIZE] [CONFIG_PATH]
+用法:bash run_distribute_train_gpu.sh [TRAIN_DATA_PATH] [EVAL_DATA_PATH] [RANK_SIZE] [CONFIG_PATH]
 
 # 单机训练
-用法:bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH]
+用法:bash run_standalone_train.sh [TRAIN_DATA_PATH] [DEVICE_ID] [CONFIG_PATH] [EVAL_DATA_PATH]
 
 # 运行评估示例
-用法:bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
+用法:bash run_eval.sh [EVAL_DATA_PATH] [DEVICE_ID] [CHECKPOINT_PATH] [CONFIG_PATH]
 ```
 
   对于分布式训练，需要提前创建JSON格式的hccl配置文件。
@@ -136,6 +138,12 @@ glore_res200网络模型的backbone是ResNet200, 在Stage2, Stage3中分别均�
 .
 └──Glore_resnet
   ├── README.md
+  ├── config
+    ├── config_resnet50_ascend.yaml            # Ascend glore_resnet50配置
+    ├── config_resnet50_gpu.yaml            # GPU glore_resnet50配置
+    ├── config_resnet101_gpu.yaml            # GPU glore_resnet101配置
+    ├── config_resnet200_ascend.yaml            # Ascend glore_resnet200配置
+    └── config_resnet200_gpu.yaml            # GPU glore_resnet200配置
   ├── script
     ├── run_distribute_train.sh            # 启动Ascend分布式训练（8卡）
     ├── run_distribute_train_gpu.sh        # 启动GPU分布式训练（8卡）
@@ -212,6 +220,27 @@ glore_res200网络模型的backbone是ResNet200, 在Stage2, Stage3中分别均�
 "lr_end":0.0,                    # 最小学习率
 ```
 
+- 配置Glore_resnet101在ImageNet2012数据集参数(GPU)。
+
+```text
+"class_num":1000,                # 数据集类数
+"batch_size":64,                 # 输入张量的批次大小
+"loss_scale":1024,               # 损失等级
+"momentum":0.08,                 # 动量优化器
+"weight_decay":0.0002,           # 权重衰减
+"epoch_size":150,                # 此值仅适用于训练；应用于推理时固定为1
+"pretrain_epoch_size":0,         # 加载预训练检查点之前已经训练好的模型的周期大小；实际训练周期大小等于epoch_size减去pretrain_epoch_size
+"save_checkpoint":True,          # 是否保存检查点
+"save_checkpoint_epochs":5,      # 两个检查点之间的周期间隔；默认情况下，最后一个检查点将在最后一个周期完成后保存
+"keep_checkpoint_max":10,        # 只保存最后一个keep_checkpoint_max检查点
+"save_checkpoint_path":"./",     # 检查点相对于执行路径的保存路径
+"warmup_epochs":0,               # 热身周期数
+"lr_decay_mode":"poly",          # 用于生成学习率的衰减模式
+"lr_init":0.1,                   # 初始学习率
+"lr_max":0.4,                    # 最大学习率
+"lr_end":0.0,                    # 最小学习率
+```
+
 - 配置Glore_resnet200在ImageNet2012数据集参数(Ascend)。
 
 ```text
@@ -264,13 +293,13 @@ glore_res200网络模型的backbone是ResNet200, 在Stage2, Stage3中分别均�
 
 ```text
 # 分布式训练
-用法:bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE] [CONFIG_PATH]
+用法:bash run_distribute_train.sh [TRAIN_DATA_PATH] [RANK_TABLE] [CONFIG_PATH] [EVAL_DATA_PATH]
 
 # 单机训练
-用法:bash run_standalone_train.sh [DATASET_PATH] [DEVICE_ID] [CONFIG_PATH]
+用法:bash run_standalone_train.sh [TRAIN_DATA_PATH] [RANK_TABLE] [CONFIG_PATH] [EVAL_DATA_PATH]
 
 # 运行推理示例
-用法:bash run_eval.sh [DATASET_PATH] [DEVICE_ID] [CHECKPOINT_PATH] [CONFIG_PATH]
+用法:bash run_eval.sh [EVAL_DATA_PATH] [DEVICE_ID] [CHECKPOINT_PATH] [CONFIG_PATH]
 ```
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
@@ -283,13 +312,14 @@ glore_res200网络模型的backbone是ResNet200, 在Stage2, Stage3中分别均�
 
 ```text
 # 分布式训练
-用法:bash run_distribute_train_gpu.sh [DATASET_PATH] [RANK_SIZE] [CONFIG_PATH]
+用法:bash run_distribute_train_gpu.sh [TRAIN_DATA_PATH] [EVAL_DATA_PATH] [RANK_SIZE] [CONFIG_PATH]
+示例:bash run_distribute_train_gpu.sh ~/Imagenet_Original/train/ ~/Imagenet_Original/val/ 8 ../config/config_resnet50_gpu.yaml
 
 # 单机训练
-用法:bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH]
+用法:bash run_standalone_train.sh [TRAIN_DATA_PATH] [CONFIG_PATH] [EVAL_DATA_PATH]
 
 # 运行推理示例
-用法:bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
+用法:bash run_eval.sh [EVAL_DATA_PATH] [DEVICE_ID] [CHECKPOINT_PATH] [CONFIG_PATH]
 ```
 
 ## 训练结果
@@ -303,6 +333,18 @@ epoch:2 step:1251, loss is 4.339285
 epoch:3 step:1251, loss is 3.9819345
 epoch:4 step:1251, loss is 3.5608528
 epoch:5 step:1251, loss is 3.3024906
+...
+```
+
+- 使用ImageNet2012数据集训练Glore_resnet101（8 pcs）
+
+```text
+# 分布式训练结果（8P）
+epoch:1 step:5004, loss is 4.7398486
+epoch:2 step:5004, loss is 4.129058
+epoch:3 step:5004, loss is 3.5034246
+epoch:4 step:5004, loss is 3.4452052
+epoch:5 step:5004, loss is 3.148675
 ...
 ```
 
@@ -326,24 +368,24 @@ epoch:5 step:1251, loss is 4.080069
 
 ```bash
 # 推理
-Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
+Usage: bash run_eval.sh [EVAL_DATA_PATH] [DEVICE_ID] [CHECKPOINT_PATH] [CONFIG_PATH]
 ```
 
 ```bash
 # 推理示例
-bash run_eval.sh ~/Imagenet_Original/ 0 ~/glore_resnet200-150_1251.ckpt ../config/config_resnet50_gpu.yaml
+bash run_eval.sh ~/Imagenet_Original/val/ 0 ~/glore_resnet200-150_1251.ckpt ../config/config_resnet50_gpu.yaml
 ```
 
 #### GPU处理器环境运行
 
 ```bash
 # 推理
-Usage: bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
+Usage: bash run_eval_gpu.sh [EVAL_DATA_PATH] [DEVICE_ID] [CHECKPOINT_PATH] [CONFIG_PATH]
 ```
 
 ```bash
 # 推理示例
-bash run_eval.sh ~/Imagenet  ~/glore_resnet200-150_2502.ckpt ../config/config_resnet50_gpu.yaml
+bash run_eval.sh ~/Imagenet/val/  ~/glore_resnet200-150_2502.ckpt ../config/config_resnet50_gpu.yaml
 ```
 
 ## 推理结果
@@ -376,6 +418,26 @@ result:{'top_1 acc':0.802303685897436}
 | 总时长                 | 10.98小时                                   |58.5 小时                          |
 | 参数(M)             | 30.5                                            |30.5                          |
 | 微调检查点| 233.46M（.ckpt文件）                                      |233.46M（.ckpt文件）                          |
+| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/glore_res) |
+
+#### ImageNet2012上的Glore_resnet101
+
+| 参数                 |          GPU                       |
+| --------------------------|------------------------------------|
+| 模型版本              |Glore_resnet101                     |
+| 资源                   |GPU-V100 PCIE 32G                     |
+| 上传日期              |2021-10-22                         |
+| MindSpore版本          | r1.5                                  |1.5.0                          |
+| 数据集                    | ImageNet2012                      |
+| 训练参数        |epoch=150, steps per epoch=5004, batch_size = 32 |
+| 优化器                  | NAG                                           |
+| 损失函数              |SoftmaxCrossEntropyExpand          |
+| 输出                    |概率                               |
+| 损失                       |1.7463021                        |
+| 速度                      |33 毫秒/步（8卡）             |
+| 总时长                 |30 小时                          |
+| 参数(M)             |57                          |
+| 微调检查点|579.06M（.ckpt文件）                          |
 | 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/glore_res) |
 
 #### ImageNet2012上的Glore_resnet200
@@ -413,6 +475,19 @@ result:{'top_1 acc':0.802303685897436}
 | 输出             | 概率                     |概率                         |
 | 准确性            | 8卡: 78.44%             |8卡：78.50%                 |
 
+#### ImageNet2012上的Glore_resnet101
+
+| 参数          | GPU                      |
+| ------------------- | ----------------------|
+| 模型版本       | Glore_resnet101              |
+| 资源            | GPU-V100(SXM2)                |
+| 上传日期       | 2021-10-22                  |
+| MindSpore版本   | 1.5.0                 |
+| 数据集             | ImageNet2012测试集(6.4GB)             |
+| batch_size          | 32                   |
+| 输出             | 概率                     |
+| 准确性            | 8卡: 79.663%            |
+
 #### ImageNet2012上的Glore_resnet200
 
 | 参数          | Ascend                      |   GPU                        |
@@ -432,4 +507,4 @@ transform_utils.py中使用数据增强时采用了随机选择策略，train.py
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/models)
+ 请浏览官网[主页](https://gitee.com/mindspore/models/)
