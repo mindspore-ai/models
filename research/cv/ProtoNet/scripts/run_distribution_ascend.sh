@@ -45,10 +45,11 @@ do
     mkdir ./train_parallel$i
     cp -r ./src ./train_parallel$i
     cp ./train.py ./train_parallel$i
+    cp ./model_init.py ./train_parallel$i
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     cd ./train_parallel$i ||exit
     env > env.log
-    python train.py --data_path=$DATA_PATH \
+    python train.py --dataset_root=$DATA_PATH \
                     --device_id=$DEVICE_ID --device_target="Ascend" \
                     --classes_per_it_tr=$TRAIN_CLASS > log 2>&1 &
     cd ..
