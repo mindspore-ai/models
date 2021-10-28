@@ -9,7 +9,7 @@ def modelDownloadUrl = "https://download.mindspore.cn/model_zoo/official/lite/mo
 def mindsporeLite_Version = "mindspore-lite-1.5.0-android-aarch64"
 def mindsporeLite_Version_AAR = "mindspore-lite-maven-1.5.0"
 
-def mindsporeLiteDownloadUrl = "https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.5.0-rc1/MindSpore/lite/release/android/gpu/${mindsporeLite_Version}.tar.gz"
+def mindsporeLiteDownloadUrl = "https://ms-release.obs.cn-north-4.myhuaweicloud.com/1.5.0/MindSpore/lite/release/android/gpu/${mindsporeLite_Version}.tar.gz"
 def targetRoot = "libs/"
 def mindSporeLibrary = "${targetRoot}${mindsporeLite_Version}.tar.gz"
 def mindSporeLibraryAAR = "${targetRoot}${mindsporeLite_Version}/${mindsporeLite_Version_AAR}.zip"
