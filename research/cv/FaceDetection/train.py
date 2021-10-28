@@ -169,12 +169,12 @@ def run_train():
             else:
                 scale_manager.update_loss_scale(False)
             config.logger.info('rank[{:d}], iter[{}], loss[{}], overflow:{}, loss_scale:{}, lr:{}, batch_images:{}, '
-                               'batch_labels:{}'.format(config.local_rank, i, loss0, overflow, scaling_sens,
+                               'batch_labels:{}'.format(config.local_rank, i + 1, loss0, overflow, scaling_sens,
                                                         config.lr[i], batch_images.shape, batch_labels.shape))
         else:
             loss0 = train_net(*input_list)
             config.logger.info('rank[{:d}], iter[{}], loss[{}], lr:{}, batch_images:{}, '
-                               'batch_labels:{}'.format(config.local_rank, i, loss0,
+                               'batch_labels:{}'.format(config.local_rank, i + 1, loss0,
                                                         config.lr[i], batch_images.shape, batch_labels.shape))
         # save ckpt
         cb_params.cur_step_num = i + 1  # current step number
@@ -187,24 +187,24 @@ def run_train():
             time_for_graph_compile = time.time() - create_network_start
             config.logger.important_info('Yolov3, graph compile time={:.2f}s'.format(time_for_graph_compile))
 
-        if i % config.steps_per_epoch == 0:
+        if (i + 1) % config.steps_per_epoch == 0:
             cb_params.cur_epoch_num += 1
 
-        if i % config.log_interval == 0 and config.local_rank == 0:
+        if (i + 1) % config.log_interval == 0 and config.local_rank == 0:
             time_used = time.time() - t_end
-            epoch = int(i / config.steps_per_epoch)
+            epoch = int((i + 1) / config.steps_per_epoch)
             fps = config.batch_size * (i - old_progress) * config.world_size / time_used
-            config.logger.info('epoch[{}], iter[{}], loss:[{}], {:.2f} imgs/sec'.format(epoch, i, loss0, fps))
+            config.logger.info('epoch[{}], iter[{}], loss:[{}], {:.2f} imgs/sec'.format(epoch, i + 1, loss0, fps))
             t_end = time.time()
             old_progress = i
 
-        if i % config.steps_per_epoch == 0 and config.local_rank == 0:
+        if (i + 1) % config.steps_per_epoch == 0 and config.local_rank == 0:
             epoch_time_used = time.time() - t_epoch
-            epoch = int(i / config.steps_per_epoch)
+            epoch = int((i + 1) / config.steps_per_epoch)
             fps = config.batch_size * config.world_size * config.steps_per_epoch / epoch_time_used
             config.logger.info('=================================================')
-            config.logger.info('epoch[{}], iter[{}], {:.2f} imgs/sec'.format(epoch, i, fps))
-            config.logger.info('epoch[{}], epoch time: {:5.3f} ms, pre step time: {:5.3f} ms'.format(
+            config.logger.info('epoch[{}], iter[{}], {:.2f} imgs/sec'.format(epoch, i + 1, fps))
+            config.logger.info('epoch[{}], epoch time: {:5.3f} ms, per step time: {:5.3f} ms'.format(
                 epoch, epoch_time_used * 1000, epoch_time_used * 1000 / config.steps_per_epoch))
             config.logger.info('=================================================')
             t_epoch = time.time()

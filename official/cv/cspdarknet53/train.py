@@ -47,8 +47,8 @@ class ProgressMonitor(Callback):
     """monitor loss and cost time."""
     def __init__(self, args):
         super(ProgressMonitor, self).__init__()
-        self.me_epoch_start_time = 0
-        self.me_epoch_start_step_num = 0
+        self.me_epoch_start_time = time.time()
+        self.me_epoch_start_step_num = -1
         self.args = args
 
     def epoch_end(self, run_context):

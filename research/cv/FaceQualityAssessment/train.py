@@ -206,24 +206,24 @@ def run_train():
             time_for_graph_compile = time.time() - create_network_start
             cfg.logger.important_info('{}, graph compile time={:.2f}s'.format(cfg.task, time_for_graph_compile))
 
-        if i % cfg.log_interval == 0 and cfg.local_rank == 0:
+        if (i + 1) % cfg.log_interval == 0 and cfg.local_rank == 0:
             time_used = time.time() - t_end
-            epoch = int(i / cfg.steps_per_epoch)
+            epoch = int((i + 1) / cfg.steps_per_epoch)
             fps = cfg.per_batch_size * (i - old_progress) * cfg.world_size / time_used
-            cfg.logger.info('epoch[{}], iter[{}], {}, {:.2f} imgs/sec'.format(epoch, i, loss_meter, fps))
+            cfg.logger.info('epoch[{}], iter[{}], {}, {:.2f} imgs/sec'.format(epoch, i + 1, loss_meter, fps))
             t_end = time.time()
             loss_meter.reset()
             old_progress = i
 
-        if i % cfg.steps_per_epoch == 0 and cfg.local_rank == 0:
+        if (i + 1) % cfg.steps_per_epoch == 0 and cfg.local_rank == 0:
             epoch_time_used = time.time() - t_epoch
-            epoch = int(i / cfg.steps_per_epoch)
+            epoch = int((i + 1) / cfg.steps_per_epoch)
             fps = cfg.per_batch_size * cfg.world_size * cfg.steps_per_epoch / epoch_time_used
-            pre_step_time = epoch_time_used / cfg.steps_per_epoch
+            per_step_time = epoch_time_used / cfg.steps_per_epoch
             cfg.logger.info('=================================================')
-            cfg.logger.info('epoch[{}], iter[{}], {:.2f} imgs/sec'.format(epoch, i, fps))
-            cfg.logger.info('epoch[{}], epoch time: {:5.3f} ms, pre step time: {:5.3f} ms'.format(
-                epoch, epoch_time_used * 1000, pre_step_time * 1000))
+            cfg.logger.info('epoch[{}], iter[{}], {:.2f} imgs/sec'.format(epoch, i + 1, fps))
+            cfg.logger.info('epoch[{}], epoch time: {:5.3f} ms, per step time: {:5.3f} ms'.format(
+                epoch, epoch_time_used * 1000, per_step_time * 1000))
             cfg.logger.info('=================================================')
             t_epoch = time.time()
 
