@@ -587,7 +587,7 @@ Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
 
 ```bash
 # 评估示例
-bash run_eval.sh resnet50 cifar10 ~/cifar10-10-verify-bin ~/resnet50_cifar10/train_parallel0/resnet-90_195.ckpt --config_path /*.yaml
+bash run_eval.sh ~/cifar10-10-verify-bin  /resnet50_cifar10/train_parallel0/resnet-90_195.ckpt config/resnet50_cifar10_config.yaml
 ```
 
 > 训练过程中可以生成检查点。
@@ -689,7 +689,7 @@ ModelArts导出mindir
 ### 在Ascend310执行推理
 
 在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
-目前仅支持batch_Size为1的推理。精度计算过程需要70G+的内存，否则进程将会因为超出内存被系统终止。
+目前仅支持batch_Size为1的推理。
 
 ```shell
 # Ascend310 inference
@@ -776,7 +776,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | 总时长                 | 4分钟                          | 11分钟       |
 | 参数(M)             | 11.2                                                         | 11.2                         |
 | 微调检查点 | 86（.ckpt文件）                                         |
-| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) |
+| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
 
 #### ImageNet2012上的ResNet18
 
@@ -796,7 +796,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | 总时长                 | 110分钟                          | 130分钟       |
 | 参数(M)             | 11.7                                                         | 11.7 |
 | 微调检查点| 90M（.ckpt文件）                                         |  90M（.ckpt文件） |
-| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) |
+| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
 
 #### CIFAR-10上的ResNet50
 
@@ -816,7 +816,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | 总时长                 | 6分钟                          | 20.2分钟|
 | 参数(M)             | 25.5                                                         | 25.5 |
 | 微调检查点 | 179.7M（.ckpt文件）                                         | 179.7M（.ckpt文件） |
-| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) |
+| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
 
 #### ImageNet2012上的ResNet50
 
@@ -836,7 +836,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | 总时长                 | 114分钟                          | 500分钟|
 | 参数(M)             | 25.5                                                         | 25.5 |
 | 微调检查点| 197M（.ckpt文件）                                         | 197M（.ckpt文件）     |
-| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) |
+| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
 
 #### ImageNet2012上的ResNet34
 
@@ -856,7 +856,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | 总时长                 | 112分钟                          |
 | 参数(M)             | 20.79                                                         |
 | 微调检查点| 166M（.ckpt文件）                                         |
-| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) |
+| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config)|
 
 #### ImageNet2012上的ResNet101
 
@@ -876,7 +876,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | 总时长                 | 301分钟                          | 1100分钟|
 | 参数(M)             | 44.6                                                        | 44.6 |
 | 微调检查点| 343M（.ckpt文件）                                         | 343M（.ckpt文件）     |
-|脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) |
+|配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
 
 #### ImageNet2012上的ResNet152
 
@@ -896,7 +896,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 |总时长   |  577分钟 |
 |参数(M)   | 60.19 |
 |  微调检查点 | 462M（.ckpt文件）  |
-| 脚本  | [链接](https://gitee.com/panpanrui/mindspore/tree/master/model_zoo/official/cv/resnet152)  |
+| 配置文件  | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config)  |
 
 #### ImageNet2012上的SE-ResNet50
 
@@ -916,7 +916,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | 总时长                 | 49.3分钟                                                  |
 | 参数(M)             | 25.5                                                         |
 | 微调检查点 | 215.9M （.ckpt文件）                                         |
-|脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) |
+|配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
 
 # 随机情况说明
 
