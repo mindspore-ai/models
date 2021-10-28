@@ -177,8 +177,7 @@ def run_squad():
                 load_finetune_checkpoint_dir = _cur_dir
             else:
                 load_finetune_checkpoint_dir = make_directory(save_finetune_checkpoint_path)
-            load_finetune_checkpoint_path = LoadNewestCkpt(load_finetune_checkpoint_dir,
-                                                           ds.get_dataset_size(), epoch_num, "squad")
+            load_finetune_checkpoint_path = LoadNewestCkpt(load_finetune_checkpoint_dir, "squad")
 
     if args_opt.do_eval.lower() == "true":
         from src import tokenization

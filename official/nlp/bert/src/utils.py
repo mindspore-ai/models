@@ -113,30 +113,21 @@ class LossCallBack(Callback):
             print("epoch: {}, step: {}, outputs are {}".format(cb_params.cur_epoch_num, cb_params.cur_step_num,
                                                                str(cb_params.net_outputs)), flush=True)
 
-def LoadNewestCkpt(load_finetune_checkpoint_dir, steps_per_epoch, epoch_num, prefix):
+
+def LoadNewestCkpt(load_finetune_checkpoint_dir, prefix):
     """
     Find the ckpt finetune generated and load it into eval network.
     """
     files = os.listdir(load_finetune_checkpoint_dir)
-    pre_len = len(prefix)
-    max_num = 0
+    max_time = 0
     for filename in files:
-        name_ext = os.path.splitext(filename)
-        if name_ext[-1] != ".ckpt":
-            continue
-        if filename.find(prefix) == 0 and not filename[pre_len].isalpha():
-            index = filename[pre_len:].find("-")
-            if index == 0 and max_num == 0:
-                load_finetune_checkpoint_path = os.path.join(load_finetune_checkpoint_dir, filename)
-            elif index not in (0, -1):
-                name_split = name_ext[-2].split('_')
-                if (steps_per_epoch != int(name_split[len(name_split)-1])) \
-                        or (epoch_num != int(filename[pre_len + index + 1:pre_len + index + 2])):
-                    continue
-                num = filename[pre_len + 1:pre_len + index]
-                if int(num) > max_num:
-                    max_num = int(num)
-                    load_finetune_checkpoint_path = os.path.join(load_finetune_checkpoint_dir, filename)
+        if filename.startswith(prefix) and filename.endswith(".ckpt"):
+            full_path = os.path.join(load_finetune_checkpoint_dir, filename)
+            mtime = os.path.getmtime(full_path)
+            if mtime > max_time:
+                max_time = mtime
+                load_finetune_checkpoint_path = full_path
+    print("Find the newest checkpoint: ", load_finetune_checkpoint_path)
     return load_finetune_checkpoint_path
 
 
