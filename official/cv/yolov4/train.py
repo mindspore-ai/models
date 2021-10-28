@@ -273,7 +273,7 @@ def run_train():
     for i, data in enumerate(data_loader):
         images = data["image"]
         input_shape = images.shape[2:4]
-        config.logger.info('iter[%d], shape%d', i, input_shape[0])
+        config.logger.info('iter[%d], shape%d', i + 1, input_shape[0])
 
         images = Tensor.from_numpy(images)
         batch_y_true_0 = Tensor.from_numpy(data['bbox1'])
@@ -294,12 +294,12 @@ def run_train():
             cb_params.batch_num = i + 2
             ckpt_cb.step_end(run_context)
 
-        if i % config.log_interval == 0:
+        if (i + 1) % config.log_interval == 0:
             time_used = time.time() - t_end
-            epoch = int(i / config.steps_per_epoch)
+            epoch = int((i + 1) / config.steps_per_epoch)
             fps = config.per_batch_size * (i - old_progress) * config.group_size / time_used
             if config.rank == 0:
-                config.logger.info('epoch[{}], iter[{}], {}, pre step time: {:.2f} ms, fps: {:.2f}, lr:{}'.format(
+                config.logger.info('epoch[{}], iter[{}], {}, per step time: {:.2f} ms, fps: {:.2f}, lr:{}'.format(
                     epoch, i, loss_meter, 1000 * time_used / (i - old_progress), fps, lr[i]))
             t_end = time.time()
             loss_meter.reset()

@@ -209,7 +209,7 @@ def run_train():
             cb_params.batch_num = i + 2
             ckpt_cb.step_end(run_context)
 
-        if i % config.steps_per_epoch == 0 and config.local_rank == 0:
+        if (i + 1) % config.steps_per_epoch == 0 and config.local_rank == 0:
             cb_params.cur_epoch_num += 1
 
         if i == 0:
@@ -217,25 +217,25 @@ def run_train():
             config.logger.important_info(
                 '{}, graph compile time={:.2f}s'.format(config.backbone, time_for_graph_compile))
 
-        if i % config.log_interval == 0 and config.local_rank == 0:
+        if (i + 1) % config.log_interval == 0 and config.local_rank == 0:
             time_used = time.time() - t_end
-            epoch = int(i / config.steps_per_epoch)
+            epoch = int((i + 1) / config.steps_per_epoch)
             fps = config.per_batch_size * (i - old_progress) * config.world_size / time_used
-            config.logger.info('epoch[{}], iter[{}], {}, {:.2f} imgs/sec'.format(epoch, i, loss_meter, fps))
+            config.logger.info('epoch[{}], iter[{}], {}, {:.2f} imgs/sec'.format(epoch, i + 1, loss_meter, fps))
 
             t_end = time.time()
             loss_meter.reset()
             old_progress = i
 
-        if i % config.steps_per_epoch == 0 and config.local_rank == 0:
+        if (i + 1) % config.steps_per_epoch == 0 and config.local_rank == 0:
             epoch_time_used = time.time() - t_epoch
-            epoch = int(i / config.steps_per_epoch)
+            epoch = int((i + 1) / config.steps_per_epoch)
             fps = config.per_batch_size * config.world_size * config.steps_per_epoch / epoch_time_used
-            pre_step_time = epoch_time_used / config.steps_per_epoch
+            per_step_time = epoch_time_used / config.steps_per_epoch
             config.logger.info('=================================================')
-            config.logger.info('epoch[{}], iter[{}], {:.2f} imgs/sec'.format(epoch, i, fps))
-            config.logger.info('epoch[{}], epoch time: {:5.3f} ms, pre step time: {:5.3f} ms'.format(
-                epoch, epoch_time_used * 1000, pre_step_time * 1000))
+            config.logger.info('epoch[{}], iter[{}], {:.2f} imgs/sec'.format(epoch, i + 1, fps))
+            config.logger.info('epoch[{}], epoch time: {:5.3f} ms, per step time: {:5.3f} ms'.format(
+                epoch, epoch_time_used * 1000, per_step_time * 1000))
             config.logger.info('=================================================')
             t_epoch = time.time()
 
