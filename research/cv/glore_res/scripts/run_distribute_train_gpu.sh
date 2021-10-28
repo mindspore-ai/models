@@ -20,9 +20,9 @@ echo "bash run_distribute_train_gpu.sh DATA_PATH RANK_SIZE CONFIG_PATH"
 echo "For example: bash run_distribute_train.sh /path/dataset 8 ../config/config_resnet50_gpu.yaml"
 echo "It is better to use the absolute path."
 echo "=============================================================================================================="
-if [ $# != 3 ]
+if [ $# != 4 ]
 then
-    echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [RANK_SIZE] [CONFIG_PATH]"
+    echo "Usage: bash run_distribute_train_gpu.sh [TRAIN_DATA_PATH] [EVAL_DATA_PATH] [RANK_SIZE] [CONFIG_PATH]"
     exit 1
 fi
 
@@ -35,12 +35,13 @@ get_real_path(){
 }
 
 set -e
-DEVICE_NUM=$2
+DEVICE_NUM=$3
 DATA_PATH=$(get_real_path $1)
-CONFIG_PATH=$(get_real_path $3)
+EVAL_DATA_PATH=$(get_real_path $2)
+CONFIG_PATH=$(get_real_path $4)
 export DATA_PATH=${DATA_PATH}
-export DEVICE_NUM=$2
-export RANK_SIZE=$2
+export DEVICE_NUM=$3
+export RANK_SIZE=$3
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
 cd ../
@@ -56,5 +57,5 @@ env > env.log
 echo "start training"
     mpirun -n $2 --allow-run-as-root \
            python3 train.py --data_url=$DATA_PATH --isModelArts=False --run_distribute=True \
-           --device_target="GPU" --config_path=$CONFIG_PATH --device_num $2 > train.log 2>&1 &
+           --device_target="GPU" --config_path=$CONFIG_PATH --eval_data_url=$EVAL_DATA_PATH --device_num $2 > train.log 2>&1 &
 

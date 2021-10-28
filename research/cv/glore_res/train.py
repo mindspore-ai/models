@@ -86,8 +86,8 @@ if __name__ == '__main__':
     # get device_num, device_id after device init
     device_num, device_id = _get_rank_info()
     #create dataset
-    train_dataset_path = os.path.join(config.data_url, 'train')
-    eval_dataset_path = os.path.join(config.data_url, 'val')
+    train_dataset_path = os.path.abspath(config.data_url)
+    eval_dataset_path = os.path.abspath(config.eval_data_url)
 
     # download dataset from obs to cache if train on ModelArts
     if config.net == 'resnet50':

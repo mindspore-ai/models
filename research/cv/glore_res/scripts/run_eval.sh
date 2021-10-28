@@ -51,7 +51,7 @@ cd ../
 export DEVICE_ID=$2
 export RANK_ID=0
 env > env0.log
-python3 eval.py --data_url $1 --isModelArts False --device_id $2 --ckpt_url $CKPT_PATH --config_path=$CONFIG_PATH > eval.log 2>&1
+python3 eval.py --eval_data_url $1 --isModelArts False --device_id $2 --ckpt_url $CKPT_PATH --config_path=$CONFIG_PATH > eval.log 2>&1
 
 if [ $? -eq 0 ];then
     echo "testing success"
