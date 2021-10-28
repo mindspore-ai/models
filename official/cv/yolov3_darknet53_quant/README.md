@@ -201,7 +201,7 @@ optional arguments:
 bash run_distribute_train.sh dataset/coco2014 yolov3_darknet53_noquant.ckpt rank_table_8p.json
 ```
 
-The above shell script will run distribute training in the background. You can view the results through the file `train_parallel[X]/log.txt`. The loss value will be achieved as follows:
+The above shell script will run distribute training in the background. You can view the results through the file `train_parallel0/log.txt`. The loss value will be achieved as follows:
 
 ```bash
 # distribute training result(8p)

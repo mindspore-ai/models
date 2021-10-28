@@ -208,7 +208,7 @@ train.py中主要参数如下：
 bash run_distribute_train.sh dataset/coco2014 yolov3_darknet53_noquant.ckpt rank_table_8p.json
 ```
 
-上述shell脚本将在后台运行分布训练。您可以通过`train_parallel[X]/log.txt`文件查看结果。损失值的实现如下：
+上述shell脚本将在后台运行分布训练。您可以通过`train_parallel0/log.txt`文件查看结果。损失值的实现如下：
 
 ```text
 # 分布式训练示例(8卡)
