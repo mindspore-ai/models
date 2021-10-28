@@ -616,12 +616,12 @@ epoch: [0/1] step: [100/5004], loss is 6.814013Epoch time: 3437.154 ms, fps: 148
 
 ```bash
 # evaluation
-Usage: bash run_eval.sh [DATASET_PATH] [CONFIG_PATH] [CHECKPOINT_PATH]
+Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
 ```
 
 ```bash
 # evaluation example
-bash run_eval.sh resnet50 cifar10 ~/cifar10-10-verify-bin ~/resnet50_cifar10/train_parallel0/resnet-90_195.ckpt --config_path /.yaml
+bash run_eval.sh ~/cifar10-10-verify-bin /resnet50_cifar10/train_parallel0/resnet-90_195.ckpt config/resnet50_cifar10_config.yaml
 ```
 
 > checkpoint can be produced in training process.
@@ -726,7 +726,7 @@ Export on ModelArts (If you want to run in modelarts, please check the official 
 ### Infer on Ascend310
 
 Before performing inference, the mindir file must bu exported by `export.py` script. We only provide an example of inference using MINDIR model.
-Current batch_Size can only be set to 1. The precision calculation process needs about 70G+ memory space, otherwise the process will be killed for execeeding memory limits.
+Current batch_Size can only be set to 1.
 
 ```shell
 # Ascend310 inference
@@ -813,7 +813,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 4 mins                          | 11 minds    |
 | Parameters (M)             | 11.2                                                        | 11.2          |
 | Checkpoint for Fine tuning | 86M (.ckpt file)                                         | 85.4 (.ckpt file)     |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
 
 #### ResNet18 on ImageNet2012
 
@@ -833,7 +833,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 110 mins                        | 130 mins            |
 | Parameters (M)             | 11.7                                                       | 11.7 |
 | Checkpoint for Fine tuning | 90M (.ckpt file)                                         |  90M (.ckpt file)                                         |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
 
 #### ResNet50 on CIFAR-10
 
@@ -853,7 +853,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 6 mins                          | 20.2 mins|
 | Parameters (M)             | 25.5                                                         | 25.5 |
 | Checkpoint for Fine tuning | 179.7M (.ckpt file)                                         |179.7M (.ckpt file)|
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
 
 #### ResNet50 on ImageNet2012
 
@@ -873,12 +873,12 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 114 mins                          | 260 mins|
 | Parameters (M)             | 25.5                                                         | 25.5 |
 | Checkpoint for Fine tuning | 197M (.ckpt file)                                         |197M (.ckpt file)     |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
 
 #### ResNet34 on ImageNet2012
 
 | Parameters                 | Ascend 910                                                   |
-| -------------------------- | -------------------------------------- |---------------------------------- |
+| -------------------------- | -------------------------------------- |
 | Model Version              | ResNet50-v1.5                                                |
 | Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8  |
 | uploaded Date              | 07/05/2020 (month/day/year)  ；                        |
@@ -893,7 +893,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 112 mins                          |
 | Parameters (M)             | 20.79                                                         |
 | Checkpoint for Fine tuning | 166M (.ckpt file)                                         |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
 
 #### ResNet101 on ImageNet2012
 
@@ -913,7 +913,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 301 mins                          | 1100 mins|
 | Parameters (M)             | 44.6                                                        | 44.6 |
 | Checkpoint for Fine tuning | 343M (.ckpt file)                                         |343M (.ckpt file)     |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
 
 #### ResNet152 on ImageNet2012
 
@@ -933,7 +933,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time   |  577 mins |
 | Parameters(M)   | 60.19 |
 | Checkpoint for Fine tuning | 462M（.ckpt file）  |
-| Scripts  | [Link](https://gitee.com/panpanrui/mindspore/tree/master/model_zoo/official/cv/resnet152)  |
+| config  | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config)  |
 
 #### SE-ResNet50 on ImageNet2012
 
@@ -953,7 +953,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 49.3 mins                                                  |
 | Parameters (M)             | 25.5                                                         |
 | Checkpoint for Fine tuning | 215.9M (.ckpt file)                                         |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
 
 ### Inference Performance
 
@@ -969,7 +969,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | batch_size          | 32                          |
 | outputs             | probability                 |
 | Accuracy            | 94.02%                      |
-| Model for inference | 43M (.air file)             |
+| Model for inference | 43M (.mindir file)             |
 
 #### ResNet18 on ImageNet2012
 
@@ -983,7 +983,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | batch_size          | 256                         |
 | outputs             | probability                 |
 | Accuracy            | 70.53%                      |
-| Model for inference | 45M (.air file)             |
+| Model for inference | 45M (.mindir file)             |
 
 #### ResNet34 on ImageNet2012
 
@@ -997,7 +997,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | batch_size          | 256                         |
 | outputs             | probability                 |
 | Accuracy            | 73.67%                      |
-| Model for inference | 70M (.air file)             |
+| Model for inference | 70M (.mindir file)             |
 
 #### ResNet50 on CIFAR-10
 
@@ -1011,7 +1011,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | batch_size          | 32                          | 32                          |
 | outputs             | probability                 | probability                 |
 | Accuracy            | 91.44%                      | 91.37%                      |
-| Model for inference | 91M (.air file)         |  |
+| Model for inference | 91M (.mindir file)         |  |
 
 #### ResNet50 on ImageNet2012
 
@@ -1025,7 +1025,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | batch_size          | 256                         | 256                          |
 | outputs             | probability                 | probability                 |
 | Accuracy            | 76.70%                      | 76.74%                      |
-| Model for inference | 98M (.air file)         |  |
+| Model for inference | 98M (.mindir file)         |  |
 
 #### ResNet101 on ImageNet2012
 
@@ -1039,7 +1039,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | batch_size          | 32                          | 32                          |
 | outputs             | probability                 | probability                 |
 | Accuracy            | 78.53%                      | 78.64%                      |
-| Model for inference | 171M (.air file)         |  |
+| Model for inference | 171M (.mindir file)         |  |
 
 #### ResNet152 on ImageNet2012
 
@@ -1053,7 +1053,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | batch_size          | 32                          |
 | outputs             | probability                 |
 | Accuracy            | 78.60%                      |
-| Model for inference | 236M (.air file)            |
+| Model for inference | 236M (.mindir file)            |
 
 #### SE-ResNet50 on ImageNet2012
 
@@ -1067,7 +1067,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | batch_size          | 32                          |
 | outputs             | probability                 |
 | Accuracy            | 76.80%                      |
-| Model for inference | 109M (.air file)            |
+| Model for inference | 109M (.mindir file)            |
 
 # [Description of Random Situation](#contents)
 
