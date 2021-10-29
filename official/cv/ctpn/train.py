@@ -17,9 +17,10 @@
 import os
 import ast
 import operator
+import numpy as np
 import mindspore.common.dtype as mstype
-from mindspore import context, Tensor
-from mindspore.communication.management import init
+from mindspore import context, Tensor, Parameter
+from mindspore.communication.management import init, get_group_size, get_rank
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
 from mindspore.train import Model
 from mindspore.context import ParallelMode
@@ -34,13 +35,14 @@ from src.eval_utils import eval_for_ctpn, get_eval_result
 from src.eval_callback import EvalCallBack
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
-from src.model_utils.device_adapter import get_device_num, get_device_id, get_rank_id
+from src.model_utils.device_adapter import get_device_id
 
 
 set_seed(1)
 
 
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=get_device_id(), save_graphs=True)
+context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, \
+    device_id=get_device_id(), save_graphs=True)
 
 
 binOps = {
@@ -89,16 +91,17 @@ def train():
     config.num_step = config.img_width // 16
     config.rnn_batch_size = config.img_height // 16
     config.weight_decay = arithmeticeval(config.weight_decay)
-
     if config.run_distribute:
-        rank = get_rank_id()
-        device_num = get_device_num()
+        init()
+        context.reset_auto_parallel_context()
+        rank = get_rank()
+        device_num = get_group_size()
         context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
                                           gradients_mean=True)
-        init()
     else:
         rank = 0
         device_num = 1
+
     if config.task_type == "Pretraining":
         print("Start to do pretraining")
         mindrecord_file = config.pretraining_dataset_file
@@ -132,6 +135,12 @@ def train():
         for item in list(param_dict.keys()):
             if not item.startswith('vgg16_feature_extractor'):
                 param_dict.pop(item)
+
+        if config.device_target == "GPU":
+            print("Converting pretrained checkpoint from fp16 to fp32.")
+            for key, value in param_dict.items():
+                tensor = value.asnumpy().astype(np.float32)
+                param_dict[key] = Parameter(tensor, key)
         load_param_into_net(net, param_dict)
     else:
         if load_path != "":

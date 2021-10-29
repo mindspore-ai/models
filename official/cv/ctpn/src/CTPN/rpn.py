@@ -17,9 +17,17 @@ import numpy as np
 import mindspore.nn as nn
 import mindspore.common.dtype as mstype
 from mindspore.ops import operations as P
-from mindspore import Tensor
+from mindspore import Tensor, context
 from mindspore.ops import functional as F
 from src.CTPN.bbox_assign_sample import BboxAssignSample
+
+
+if context.get_context("device_target") == "Ascend":
+    mtype = mstype.float16
+    nptype = np.float16
+else:
+    mtype = mstype.float32
+    nptype = np.float32
 
 class RpnRegClsBlock(nn.Cell):
     """
@@ -46,9 +54,9 @@ class RpnRegClsBlock(nn.Cell):
         self.shape = P.Shape()
         self.reshape = P.Reshape()
         self.shape = (-1, 2*config.hidden_size)
-        self.lstm_fc = nn.Dense(2*config.hidden_size, 512).to_float(mstype.float16)
-        self.rpn_cls = nn.Dense(in_channels=512, out_channels=num_anchors * cls_out_channels).to_float(mstype.float16)
-        self.rpn_reg = nn.Dense(in_channels=512, out_channels=num_anchors * 4).to_float(mstype.float16)
+        self.lstm_fc = nn.Dense(2*config.hidden_size, 512).to_float(mtype)
+        self.rpn_cls = nn.Dense(in_channels=512, out_channels=num_anchors * cls_out_channels).to_float(mtype)
+        self.rpn_reg = nn.Dense(in_channels=512, out_channels=num_anchors * 4).to_float(mtype)
         self.shape1 = (-1, config.num_step, config.rnn_batch_size)
         self.shape2 = (config.batch_size, -1, config.rnn_batch_size, config.num_step)
         self.transpose = P.Transpose()
@@ -105,7 +113,7 @@ class RPN(nn.Cell):
         self.batch_size = batch_size
         self.test_batch_size = cfg_rpn.test_batch_size
         self.num_layers = 1
-        self.real_ratio = Tensor(np.ones((1, 1)).astype(np.float16))
+        self.real_ratio = Tensor(np.ones((1, 1)).astype(nptype))
         self.use_sigmoid_cls = config.use_sigmoid_cls
         if config.use_sigmoid_cls:
             self.reshape_shape_cls = (-1,)
@@ -121,15 +129,15 @@ class RPN(nn.Cell):
         self.reshape = P.Reshape()
         self.concat = P.Concat(axis=0)
         self.fill = P.Fill()
-        self.placeh1 = Tensor(np.ones((1,)).astype(np.float16))
+        self.placeh1 = Tensor(np.ones((1,)).astype(nptype))
 
         self.trans_shape = (0, 2, 3, 1)
 
         self.reshape_shape_reg = (-1, 4)
         self.softmax = nn.Softmax()
-        self.rpn_loss_reg_weight = Tensor(np.array(cfg_rpn.rpn_loss_reg_weight).astype(np.float16))
-        self.rpn_loss_cls_weight = Tensor(np.array(cfg_rpn.rpn_loss_cls_weight).astype(np.float16))
-        self.num_expected_total = Tensor(np.array(cfg_rpn.num_expected_neg * self.batch_size).astype(np.float16))
+        self.rpn_loss_reg_weight = Tensor(np.array(cfg_rpn.rpn_loss_reg_weight).astype(nptype))
+        self.rpn_loss_cls_weight = Tensor(np.array(cfg_rpn.rpn_loss_cls_weight).astype(nptype))
+        self.num_expected_total = Tensor(np.array(cfg_rpn.num_expected_neg * self.batch_size).astype(nptype))
         self.num_bboxes = cfg_rpn.num_bboxes
         self.get_targets = BboxAssignSample(cfg_rpn, self.batch_size, self.num_bboxes, False)
         self.CheckValid = P.CheckValid()
@@ -139,9 +147,9 @@ class RPN(nn.Cell):
         self.cast = P.Cast()
         self.tile = P.Tile()
         self.zeros_like = P.ZerosLike()
-        self.loss = Tensor(np.zeros((1,)).astype(np.float16))
-        self.clsloss = Tensor(np.zeros((1,)).astype(np.float16))
-        self.regloss = Tensor(np.zeros((1,)).astype(np.float16))
+        self.loss = Tensor(np.zeros((1,)).astype(nptype))
+        self.clsloss = Tensor(np.zeros((1,)).astype(nptype))
+        self.regloss = Tensor(np.zeros((1,)).astype(nptype))
 
     def _make_rpn_layer(self, num_layers, in_channels, feat_channels, num_anchors, cls_out_channels):
         """
@@ -190,8 +198,8 @@ class RPN(nn.Cell):
                                                                                  self.cast(valid_flag_list,
                                                                                            mstype.bool_),
                                                                                  anchor_list, gt_valids_i)
-                bbox_weight = self.cast(bbox_weight, mstype.float16)
-                label_weight = self.cast(label_weight, mstype.float16)
+                bbox_weight = self.cast(bbox_weight, mtype)
+                label_weight = self.cast(label_weight, mtype)
                 bbox_targets += (bbox_target,)
                 bbox_weights += (bbox_weight,)
                 labels += (label,)

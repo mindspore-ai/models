@@ -75,8 +75,11 @@ Here we used 6 datasets for training, and 1 datasets for Evaluation.
   ├── scripts
   │   ├── eval_res.sh                       # calculate precision and recall
   │   ├── run_distribute_train_ascend.sh    # launch distributed training with ascend platform(8p)
+  │   ├── run_distribute_train_gpu.sh       # launch distributed training with gpu platform(8p)
   │   ├── run_eval_ascend.sh                # launch evaluating with ascend platform
-  │   ├──run_infer_310.sh                   # shell script for 310 inference
+  │   ├── run_eval_gpu.sh                   # launch evaluating with gpu platform
+  │   ├── run_infer_310.sh                  # shell script for 310 inference
+  │   ├── run_standalone_train_gpu.sh       # launch standalone training with gpu platform(1p)
   │   └── run_standalone_train_ascend.sh    # launch standalone training with ascend platform(1p)
   ├── src
   │   ├── CTPN
@@ -101,6 +104,7 @@ Here we used 6 datasets for training, and 1 datasets for Evaluation.
   │   ├── eval_callback.py                  # evaluation callback while training
   │   ├── eval_utils.py                     # evaluation function
   │   ├── lr_schedule.py                    # learning rate scheduler
+  │   ├── weight_init.py                    # lstm initialization
   │   ├── network_define.py                 # network definition
   │   └── text_connector
   │       ├── __init__.py                   # package init file
@@ -170,7 +174,8 @@ Modify the parameters according to the actual path
 ```bash
 # distribute training
 bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH]
-# example: bash scripts/run_distribute_train_ascend.sh ~/hccl_8p.json Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
+# example: bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json Pretraining(or Finetune) \
+# /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
 
 # standalone training
 bash scrpits/run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]
@@ -179,6 +184,24 @@ example: bash scrpits/run_standalone_train_ascend.sh Pretraining(or Finetune) /h
 # evaluation:
 bash scripts/run_eval_ascend.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
 # example: bash script/run_eval_ascend.sh /home/DataSet/ctpn_dataset/ICDAR2013/test \
+# /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
+```
+
+- GPU:
+
+```bash
+# distribute training
+bash scripts/run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH]
+# example: bash scripts/run_distribute_train_gpu.sh Pretraining(or Finetune) \
+# /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
+
+# standalone training
+bash scrpits/run_standalone_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]
+example: bash scrpits/run_standalone_train_gpu.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt 0
+
+# evaluation:
+bash scripts/run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+# example: bash script/run_eval_gpu.sh /home/DataSet/ctpn_dataset/ICDAR2013/test \
 # /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
 ```
 
@@ -224,11 +247,21 @@ ICDAR2013, SCUT-FORU to improve precision and recall, and when doing Finetune, w
     Ascend:
       # distribute training example(8p)
       bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH]
-      # example: bash scripts/run_distribute_train_ascend.sh ~/hccl_8p.json Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
+      # example: bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
 
       # standalone training
       bash run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH]
       # example: bash scrpits/run_standalone_train_ascend.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt 0
+
+  shell:
+    GPU:
+      # distribute training example(8p)
+      bash run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH]
+      # example: bash scripts/run_distribute_train_gpu.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
+
+      # standalone training
+      bash run_standalone_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH]
+      # example: bash scrpits/run_standalone_train_gpu.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt 0
 ```
 
 ### Result
@@ -313,6 +346,13 @@ You can start training using python or shell scripts. The usage of shell scripts
   # example: bash script/run_eval_ascend.sh /home/DataSet/ctpn_dataset/ICDAR2013/test /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
 ```
 
+- GPU:
+
+```bash
+  bash run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+  # example: bash script/run_eval_gpu.sh /home/DataSet/ctpn_dataset/ICDAR2013/test /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
+```
+
 After eval, you can get serval archive file named submit_ctpn-xx_xxxx.zip, which contains the name of your checkpoint file.To evalulate it, you can use the scripts provided by the ICDAR2013 network, you can download the Deteval scripts from the [link](https://rrc.cvc.uab.es/?com=downloads&action=download&ch=2&f=aHR0cHM6Ly9ycmMuY3ZjLnVhYi5lcy9zdGFuZGFsb25lcy9zY3JpcHRfdGVzdF9jaDJfdDFfZTItMTU3Nzk4MzA2Ny56aXA=)
 After download the scripts, unzip it and put it under ctpn/scripts and use eval_res.sh to get the result.You will get files as below:
 
@@ -339,6 +379,12 @@ Evaluation result will be stored in the example path, you can find result like t
 
 ```text
 {"precision": 0.90791, "recall": 0.86118, "hmean": 0.88393}
+```
+
+Evaluation result on GPU will be as follows:
+
+```text
+{"precision": 0.9346, "recall": 0.8621, "hmean": 0.8969}
 ```
 
 ## Model Export
@@ -411,34 +457,34 @@ Evaluation result will be stored in the example path, you can find result like t
 
 ### Training Performance
 
-| Parameters                 | Ascend                                                       |
-| -------------------------- | ------------------------------------------------------------ |
-| Model Version              | CTPN                                                     |
-| Resource                   | Ascend 910; cpu 2.60GHz, 192cores; memory 755G; OS Euler2.8                |
-| uploaded Date              | 02/06/2021                                                   |
-| MindSpore Version          | 1.1.1                                                        |
-| Dataset                    | 16930 images                                                 |
-| Batch_size                 | 2                                                            |
-| Training Parameters        | src/config.py                                                |
-| Optimizer                  | Momentum                                                     |
-| Loss Function              | SoftmaxCrossEntropyWithLogits for classification, SmoothL2Loss for bbox regression|
-| Loss                       | ~0.04                                                       |
-| Total time (8p)            | 6h                                                           |
-| Scripts                    | [ctpn script](https://gitee.com/mindspore/models/tree/master/official/cv/ctpn) |
+| Parameters                 | Ascend                                                       | GPU                                              |
+| -------------------------- | ------------------------------------------------------------ |------------------------------------------------------------ |
+| Model Version              | CTPN                                                         | CTPN                                                     |
+| Resource                   | Ascend 910; cpu 2.60GHz, 192cores; memory 755G; OS Euler2.8  | Tesla V100 PCIE 32GB; CPU 2.60GHz; 104cores; Memory 790G; EulerOS 2.0     |
+| uploaded Date              | 02/06/2021                                                   | 09/20/2021                                                   |
+| MindSpore Version          | 1.1.1                                                        | 1.5.0                                                        |
+| Dataset                    | 16930 images                                                 | 16930 images                                                 |
+| Batch_size                 | 2                                                            | 2                                                            |
+| Training Parameters        | src/config.py                                                | src/config.py                                                |
+| Optimizer                  | Momentum                                                     | Momentum                                                     |
+| Loss Function              | SoftmaxCrossEntropyWithLogits for classification, SmoothL2Loss for bbox regression| SoftmaxCrossEntropyWithLogits for classification, SmoothL2Loss for bbox regression|
+| Loss                       | ~0.04                                                        | ~0.04                                                       |
+| Total time (8p)            | 6h                                                           | 11h                                                           |
+| Scripts                    | [ctpn script](https://gitee.com/mindspore/models/tree/master/official/cv/ctpn) | [ctpn script](https://gitee.com/mindspore/models/tree/master/official/cv/ctpn)     |
 
 #### Inference Performance
 
-| Parameters          | Ascend                 |
-| ------------------- | --------------------------- |
-| Model Version       | CTPN                 |
-| Resource            | Ascend 910; cpu 2.60GHz, 192cores; memory 755G; OS Euler2.8         |
-| Uploaded Date       | 02/06/2020                 |
-| MindSpore Version   | 1.1.1              |
-| Dataset             | 229 images                  |
-| Batch_size          | 1                         |
-| Accuracy            | precision=0.9079, recall=0.8611 F-measure:0.8839 |
-| Total time          | 1 min                      |
-| Model for inference | 135M (.ckpt file)   |
+| Parameters          | Ascend                                        | GPU                 |
+| ------------------- | --------------------------------------------- | --------------------------- |
+| Model Version       | CTPN                                          | CTPN                 |
+| Resource            | Ascend 910; cpu 2.60GHz, 192cores; memory 755G; OS Euler2.8   | Tesla V100 PCIE 32GB; CPU 2.60GHz; 104cores; Memory 790G; EulerOS 2.0 |
+| Uploaded Date       | 02/06/2021                                    | 09/20/2021                 |
+| MindSpore Version   | 1.1.1                                         | 1.5.0              |
+| Dataset             | 229 images                                    |229 images                  |
+| Batch_size          | 1                                             |1                         |
+| Accuracy            | precision=0.9079, recall=0.8611 F-measure:0.8839 | precision=0.9346, recall=0.8621 F-measure:0.8969 |
+| Total time          | 1 min                                         |1 min                      |
+| Model for inference | 135M (.ckpt file)                             | 135M (.ckpt file)           |
 
 #### Training performance results
 
@@ -449,6 +495,14 @@ Evaluation result will be stored in the example path, you can find result like t
 | **Ascend** | train performance |
 | :--------: | :---------------: |
 |     8p     |     84 img/s     |
+
+| **GPU** | train performance |
+| :--------: | :---------------: |
+|     1p     |     6 img/s      |
+
+| **GPU** | train performance |
+| :--------: | :---------------: |
+|     8p     |     52 img/s     |
 
 # [Description of Random Situation](#contents)
 

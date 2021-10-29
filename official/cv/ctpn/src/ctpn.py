@@ -15,6 +15,7 @@
 """CPTN network definition."""
 
 import numpy as np
+from mindspore import context
 import mindspore.nn as nn
 from mindspore import Tensor, Parameter
 from mindspore.common import dtype as mstype
@@ -23,6 +24,16 @@ from src.CTPN.rpn import RPN
 from src.CTPN.anchor_generator import AnchorGenerator
 from src.CTPN.proposal_generator import Proposal
 from src.CTPN.vgg16 import VGG16FeatureExtraction
+from src.weight_init import lstm_default_state
+
+if context.get_context("device_target") == "Ascend":
+    mtype = mstype.float16
+    nptype = np.float16
+    device_target = "Ascend"
+else:
+    mtype = mstype.float32
+    nptype = np.float32
+    device_target = "GPU"
 
 class BiLSTM(nn.Cell):
     """
@@ -68,7 +79,7 @@ class BiLSTM(nn.Cell):
     def construct(self, x):
         if self.use_dropout:
             x = self.dropout(x)
-        x = self.cast(x, mstype.float16)
+        x = self.cast(x, mtype)
         bw_x = self.reverse_seq(x)
         y1, _, _, _, _, _, _, _ = self.rnn1(x, self.w1, self.b1, None, self.h1, self.c1)
         y1_bw, _, _, _, _, _, _, _ = self.rnn_bw(bw_x, self.w1_bw, self.b1_bw, None, self.h1_bw, self.c1_bw)
@@ -92,9 +103,14 @@ class CTPN(nn.Cell):
         self.num_step = config.num_step
         self.input_size = config.input_size
         self.hidden_size = config.hidden_size
-        self.vgg16_feature_extractor = VGG16FeatureExtraction().to_float(mstype.float16)
-        self.conv = nn.Conv2d(512, 512, kernel_size=3, padding=0, pad_mode='same').to_float(mstype.float16)
-        self.rnn = BiLSTM(self.config, batch_size=self.batch_size).to_float(mstype.float16)
+        self.vgg16_feature_extractor = VGG16FeatureExtraction().to_float(mtype)
+        self.conv = nn.Conv2d(512, 512, kernel_size=3, padding=0, pad_mode='same').to_float(mtype)
+        self.rnn = BiLSTM(self.config, batch_size=self.batch_size).to_float(mtype)
+        self.rnn2 = nn.LSTM(input_size=self.input_size,
+                            hidden_size=self.hidden_size,
+                            bidirectional=True).to_float(mtype)
+        self.h, self.c = lstm_default_state(self.batch_size * config.rnn_batch_size,
+                                            self.hidden_size, bidirectional=True)
         self.reshape = P.Reshape()
         self.transpose = P.Transpose()
         self.cast = P.Cast()
@@ -115,14 +131,18 @@ class CTPN(nn.Cell):
                                                 config.activate_num_classes,
                                                 config.use_sigmoid_cls)
         self.proposal_generator_test.set_train_local(config, False)
+
     def construct(self, img_data, gt_bboxes, gt_labels, gt_valids, img_metas=None):
         x = self.vgg16_feature_extractor(img_data)
         x = self.conv(x)
-        x = self.cast(x, mstype.float16)
+        x = self.cast(x, mtype)
         x = self.transpose(x, (0, 2, 1, 3))
         x = self.reshape(x, (-1, self.input_size, self.num_step))
         x = self.transpose(x, (2, 0, 1))
-        x = self.rnn(x)
+        if device_target == "Ascend":
+            x = self.rnn(x)
+        else:
+            x, _ = self.rnn2(x, (self.h, self.c))
         rpn_loss, cls_score, bbox_pred, rpn_cls_loss, rpn_reg_loss = self.rpn_with_loss(x,
                                                                                         img_metas,
                                                                                         self.anchor_list,
@@ -136,9 +156,17 @@ class CTPN(nn.Cell):
 
     def get_anchors(self, featmap_size):
         anchors = self.anchor_generator.grid_anchors(featmap_size)
-        return Tensor(anchors, mstype.float16)
+        return Tensor(anchors, mtype)
+
 
 class CTPN_Infer(nn.Cell):
+    """
+     Define CTPN_Infer network
+
+     Args:
+        config(EasyDict): config for ctpn network
+        batch_size(int): batch size of input data, only support 1
+     """
     def __init__(self, config, batch_size):
         super(CTPN_Infer, self).__init__()
         self.network = CTPN(config, batch_size=batch_size, is_training=False)
