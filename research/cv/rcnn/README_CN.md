@@ -1,70 +1,71 @@
-# Contents
 
-- [RCNN Description](#RCNN-description)
-- [Model Architecture](#model-architecture)
-- [Dataset](#dataset)
-- [Environment Requirements](#environment-requirements)
-- [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Preparation](#data-preprocessing)
-    - [Data Preprocessing](#data-preprocessing)
-    - [Training Process](#training-process)
-        - [Training](#training)
-        - [Distributed Training](#distributed-training)
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
-- [Model Description](#model-description)
-    - [Performance](#performance)  
-        - [Training Performance](#training-performance)
-        - [Inference Performance](#inference-performance)
-- [Description of Random Situation](#description-of-random-situation)
-- [ModelZoo Homepage](#modelzoo-homepage)
+# 目录
 
-# [RCNN Description](#contents)
+- [RCNN 简介](#RCNN简介)
+- [模型结构](#模型结构)
+- [数据集](#数据集)
+- [环境配置](#环境配置)
+- [脚本简介](#脚本简介)
+    - [脚本和示例代码](#脚本和示例代码)
+    - [准备](#准备)
+    - [数据预处理](#数据预处理)
+    - [训练过程](#训练过程)
+        - [训练](#训练)
+        - [分布式训练](#分布式训练)
+    - [评估过程](#评估过程)
+        - [评估](#评估)
+- [模型简介](#模型简介)
+    - [性能](#性能)  
+        - [训练](#训练性能)
+        - [推理](#推理性能)
+- [随机情况简介](#随机情况简介)
+- [ModelZoo主页](#Modelzoo主页)
 
-RCNN (regions with CNN features) is a milestone in the application of CNN method to target detection.With the help of CNN's good feature extraction and classification performance, the transformation of target detection problem is realized by the region proposal method.
+# [RCNN简介](#contents)
 
-[Paper](https://arxiv.org/abs/1311.2524) Ross Girshick,Jeff Donahue,Trevor Darrell,Jitendra Malik. "Rich feature hierarchies for accurate object detection and semantic segmentation." IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2014.
+RCNN(Regions with CNN features)是将CNN方法应用到目标检测问题上的一个里程碑,借助CNN良好的特征提取和分类性能,通过RegionProposal方法实现目标检测问题的转化。
 
-# [Model architecture](#contents)
+[论文](https://arxiv.org/abs/1311.2524) Ross Girshick,Jeff Donahue,Trevor Darrell,Jitendra Malik. "Rich feature hierarchies for accurate object detection and semantic segmentation." IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2014.
 
-The overall network architecture of R-CNN is show below: [Link](https://arxiv.org/abs/1311.2524)
+# [模型结构](#contents)
 
-# [Dataset](#contents)
+R-CNN的整体网络架构详情，请参考链接: [Link](https://arxiv.org/abs/1311.2524)
 
-Dataset used: [VOC2007](https://pjreddie.com/projects/pascal-voc-dataset-mirror/)
+# [数据集](#contents)
 
-- Dataset size: ~870M, 17125 colorful images in 20 classes
-    - Train: 439M, 9963 images
-    - Test: 431M, 7162 images
-- Data format: RGB images.
-    - Note: Data will be processed in src/dataset.py
+使用的数据集: [VOC2007](https://pjreddie.com/projects/pascal-voc-dataset-mirror/)
 
-# [Environment Requirements](#contents)
+- 数据集大小: ~870M, 17125张彩色图像共20类
+    - 训练集: 439M, 9963张图像
+    - 测试集: 431M, 7162张图像
+- 数据格式: RGB图像
+    - 通过 src/dataset.py 进行处理
 
-- Hardware（GPU/Ascend/CPU）
-    - Prepare hardware environment with GPU/Ascend/CPU processor.
-- Framework
+# [环境配置](#contents)
+
+- 硬件（GPU/Ascend/CPU）
+    - 准备GPU/Ascend/CPU服务器环境.
+- 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
-- For more information, please check the resources below：
+- 更多详情，点击下面链接：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.3/index.html)
 
-# [Script description](#contents)
+# [脚本简介](#contents)
 
-## [Script and sample code](#contents)
+## [脚本和示例代码](#contents)
 
 ```shell
 ├── RCNN
   ├── README.md              # descriptions about RCNN
   ├── README_CN.md           # descriptions about RCNN in Chinese
-  ├── scripts
-  │   ├──run_distribute_train_ascend.sh        # shell script for distributed on Ascend
-  │   ├──run_distribute_train_gpu.sh           # shell script for distributed on GPU
-  │   ├──run_standalone_eval_ascend.sh         # shell script for evaluation on Ascend
-  │   ├──run_standalone_train_ascend.sh        # shell script for single on Ascend
-  │   ├──run_standalone_eval_gpu.sh            # shell script for evaluation on GPU
-  │   ├──run_standalone_train_gpu.sh           # shell script for distributed on GPU
+  ├──scripts
+  │   ├── run_distribute_train_ascend.sh        # shell script for distributed on Ascend
+  │   ├── run_distribute_train_gpu.sh           # shell script for distributed on GPU
+  │   ├── run_standalone_eval_ascend.sh         # shell script for evaluation on Ascend
+  │   ├── run_standalone_train_ascend.sh        # shell script for single on Ascend
+  │   ├── run_standalone_train_gpu.sh           # shell script for training on GPU
+  │   ├── run_standalone_eval_gpu.sh            # shell script for evaluation on GPU
   ├── src
   │   ├── common
   │   │   ├──logger.py                  # logger utils
@@ -77,41 +78,38 @@ Dataset used: [VOC2007](https://pjreddie.com/projects/pascal-voc-dataset-mirror/
   │   ├──generator_lr.py     # learning rate config
   │   ├──model.py            # RCNN architecture
   │   ├──paths.py            # network config setting, will be used in train.py and eval.py
-  ├──process_data.py        # preprocess the dataset
+  ├──process_data.py          # preprocess the dataset
   ├──train.py               # training script
   ├──eval.py                # evaluation script
   ├──requirements.txt       # python extension packages
 ```
 
-## [Preparation](#contents)
+## [准备](#contents)
 
-You need to have the model of AlexNet that trained over ImageNet2012.Therefore,you can train it with [alexnet](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) scripts in modelzoo,and save the checkpoint file in a folder named "models".  The naming of the pretrained model is set in the "src/paths.py" .
+准备AlexNet在ImageNet2012上的预训练模型，可直接通过链接下载[link](https://download.mindspore.cn/)；也可自己训练，脚本参考[Modelzoo](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/alexnet)，并将checkpoints文件保存在“models”文件夹中。您还需要创建一个名为“data”的文件夹来存放数据集和处理后的数据。训练集和测试集分别在两个文件夹中，一个是“VOC2007”，另一个是“VOCtest_06-Nov-2007”。 路径也在“src/paths.py”中设置。
 
-You also need to create a floder named "data" to save data.The training set and test set are respectively in two folders, one is "VOC2007" and the other is "VOCtest_06-Nov-2007".The paths are also set in the "src/paths.py".
+## [数据预处理](#contents)
 
-## [Data Preprocessing](#contents)
-
-Run this script,it will extract thousands of candidate regions whose categories are independent from each image and generate data used in finetune, SVM and regression phases according to the IOU thresholds.
-Note: Please make sure that the relevant dependencies in requirements.txt have been installed.
+运行此脚本，它将从每个图像中提取数千个类别独立的候选区域，并根据 IOU 阈值生成用于finetune、SVM 和regression的数据。
+注意：请确保requirements.txt中相关依赖已经安装。
 
 ```shell
 python process_data.py
  ```
 
-## [Training Process](#contents)
+## [训练过程](#contents)
 
-### [Training](#contents)
+### [训练](#contents)
 
-- running on Ascend：
+- 在Ascend上进行训练：
 
 ```shell
 bash scripts/run_standalone_train_ascend.sh 0
  ```
 
-  The command above will run in the background, you can view the results through the file logs
+上述命令将在后台运行，你可以在日志文件查看结果。
 
-  After training, you'll get some checkpoint files under the script folder by default. The loss value will be achieved as follows:
-  <!-- After training, you'll get some checkpoint files under the script folder by default. The loss value will be achieved as follows: -->
+训练后，默认会在脚本文件夹下得到一些checkpoints文件，loss如下所示：:
 
 ```shell
 # grep "loss is " logs/trainer_finetune_DEBUG.txt
@@ -131,19 +129,15 @@ bash scripts/run_standalone_train_ascend.sh 0
 ...
 ```
 
-  The model checkpoint file will be saved in the folder "models".
-  <!-- The model checkpoint will be saved in the directory models.  -->
+所有的checkpoints文件都将保存在“models”文件夹。
 
-- running on GPU：
+- 在GPU上训练：
 
-```shell
+通过执行如下命令进行训练：
+
 bash scripts/run_standalone_train_gpu.sh 0
- ```
 
-  The command above will run in the background, you can view the results through the file logs
-
-  After training, you'll get some checkpoint files under the script folder by default. The loss value will be achieved as follows:
-  <!-- After training, you'll get some checkpoint files under the script folder by default. The loss value will be achieved as follows: -->
+训练后，默认会在脚本文件夹下得到一些checkpoints文件，可以在日志文件中查看结果，loss如下所示：
 
 ```shell
 # grep loss is  logs/trainer_finetune_DEBUG.txt
@@ -173,18 +167,17 @@ bash scripts/run_standalone_train_gpu.sh 0
 ...
 ```
 
-  The model checkpoint file will be saved in the folder "models".
-  <!-- The model checkpoint will be saved in the directory models.  -->
+所有的checkpoints文件都将保存在“models”文件夹。
 
-### [Distributed Training](#contents)
+### [分布式训练](#contents)
 
-- distributed running on Ascend：
+- 在Ascend上进行分布式训练：
 
 ```shell
 bash ./scripts/run_distribute_train_ascend.sh rank_table.json
 ```
 
-  The above shell script will run distribute training in the background. You can view the results through the file train_parallel[X]/logs. The loss value will be achieved as follows:
+上述脚本将在后台运行. 您可以通过文件 train_parallel[X]/logs 查看结果。 损失如下:
 
 ```shell
 # grep "loss is " train_parallel*/logs/trainer_finetune_DEBUG.txt
@@ -204,13 +197,13 @@ bash ./scripts/run_distribute_train_ascend.sh rank_table.json
 ...
 ```
 
-- distributed running on GPU：
+- 在GPU上进行分布式训练：
 
 ```shell
 bash scripts/run_distribute_train_gpu.sh
 ```
 
-The above shell script will run distribute training in the background.
+上述脚本将在后台运行。
 
 ```shell
 # grep loss is  log_train_finetune
@@ -241,19 +234,19 @@ scripts/log_train_regression:[2021-11-09 14:40:58.586][DEBUG] trainer.py(121)->t
 ...
 ```
 
-## [Evaluation Process](#contents)
+## [评估过程](#contents)
 
-### [Evaluation](#contents)
+### [评估](#contents)
 
-- evaluation on VOC2007 dataset when running on Ascend:
+- 在Ascend上用VOC2007数据集进行评估:
 
-  Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path.
+在运行以下命令之前，请检查用于评估的checkpoints路径，请将checkpoints路径设置为绝对完整路径。
 
 ```shell
 bash scripts/run_standalone_eval_ascend.sh 0
  ```
 
-  The above python command will run in the background. You can view the results through the file "eval.log". The accuracy of the test dataset will be as follows:
+上面的脚本将在后台运行。您可以通过“eval.log”查看结果,测试数据集的准确率如下：
 
 ```shell
 # grep "accuracy: " scripts/result.txt
@@ -262,15 +255,17 @@ svm_thresh: 0.3, map: 0.3158392904125691
 svm_thresh: 0.6, map: 0.31060216644862054
 ```
 
-- evaluation on VOC2007 dataset when running on GPU:
+- 在GPU上用VOC2007数据集进行评估：
 
-  Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path.
+在运行以下命令之前，请检查用于评估的checkpoints路径，请将checkpoints路径设置为绝对完整路径。
 
 ```shell
+
 bash scripts/run_standalone_eval_gpu.sh 0
+
  ```
 
-  The above python command will run in the background. You can view the results through the file "eval.log". The accuracy of the test dataset will be as follows:
+上面的python命令将在后台运行。您可以通过“result.txt”查看结果,测试数据集的准确率如下：
 
 ```shell
 # grep map scripts/result.txt
@@ -279,11 +274,11 @@ svm_thresh: 0.3, map: 0.3190850349142451
 svm_thresh: 0.6, map: 0.3254243053285871
 ```
 
-# [Model Description](#contents)
+# [模型简介](#contents)
 
-## [Performance](#contents)
+## [性能](#contents)
 
-### [Training Performance](#contents)
+### [训练性能](#contents)
 
 | Parameters                 | Ascend                                                      |GPU                                                      |
 | -------------------------- | ------------------------------------------------------ | ----------------------------------------------------------- |
@@ -312,7 +307,7 @@ svm_thresh: 0.6, map: 0.3254243053285871
 | Checkpoint for regression | 214M (.ckpt file)                                         |214M (.ckpt file)|
 | Scripts                    | [RCNN Scripts](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/rcnn) |[RCNN Scripts](https://gitee.com/mindspore/models/research/cv/rcnn) |
 
-### [Inference Performance](#contents)
+### [推理性能](#contents)
 
 | Parameters          | Ascend                      |GPU                      |
 | ------------------- | --------------------------- |--------------------------- |
@@ -325,12 +320,10 @@ svm_thresh: 0.6, map: 0.3254243053285871
 | Outputs             | mAP                 | mAP                 |
 | Accuracy            | 31.58%                 | 32.54%                 |
 
-# [Description of Random Situation](#contents)
+# [随机情况简介](#contents)
 
-In src/common/mindspore_utils.py, we set the seed inside “initialize" function of "MSUtils" class. We use random seed in train.py.
+在src/common/mindspore_utils.py中，我们在“MSUtils”类的“初始化”函数中设置了种子。我们在train.py中使用随机种子。
 
-In train.py, we set the seed which is used by numpy.random, mindspore.common.Initializer, mindspore.ops.composite.random_ops and mindspore.nn.probability.distribution.
+# [ModelZoo主页](#contents)
 
-# [ModelZoo Homepage](#contents)
-
- Please check the official [homepage](https://gitee.com/mindspore/models).  
+请查看[官方网站](https://gitee.com/mindspore/models)。

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 """
 Evaluation for RCNN.
 """
-import argparse
 import os
 import pickle
 import time
@@ -36,6 +35,7 @@ from src.common.logger import Logger
 from src.common.mindspore_utils import MSUtils
 from src.model import AlexNetCombine, BBoxNet
 from src.utils.util import compute_transto, iou, check_dir, all_cls, label_list
+from src.utils.config import config
 
 logger = Logger(os.path.basename(__file__))
 mean = [0.453 * 255, 0.433 * 255, 0.398 * 255]
@@ -59,10 +59,10 @@ def local_norm(img, mean_, std_):
 
     return new_img
 
-
+work_nums = config.work_nums
 def process_svm(val_data_root=os.path.join(paths.Data.ss_root, 'test'),
                 img_data_root=os.path.abspath(paths.Data.jpeg_test),
-                svm_thresh_=0.6, batch_size=64, svm_model_path=paths.Model.svm, num_workers=8):
+                svm_thresh_=0.6, batch_size=64, svm_model_path=paths.Model.svm, num_workers=work_nums):
     """
 
     :param val_data_root: validation data root
@@ -220,7 +220,7 @@ def process_nms(svm_result_inner):
 
 
 def process_bbox_regression(nms_result_, img_data_root=os.path.abspath(paths.Data.jpeg_test),
-                            batch_size=64, reg_model_path=paths.Model.regression, num_workers=8):
+                            batch_size=64, reg_model_path=paths.Model.regression, num_workers=work_nums):
     """
 
     :param nms_result_: nms result
@@ -398,7 +398,7 @@ def calc_ap_read_one_file(cls, recs):
             pic_id = line[0]
             R = [obj for obj in recs[pic_id] if obj['name'] == cls]
             bbox = np.array([x['bbox'] for x in R])
-            difficult = np.array([x['difficult'] for x in R]).astype(np.bool)
+            difficult = np.array([x['difficult'] for x in R]).astype(np.bool_)
             det = [False] * len(R)
             npos = npos + sum(~difficult)
             class_recs[pic_id] = {'bbox': bbox,
@@ -507,16 +507,16 @@ def calc_map(result_file_dir):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--device', type=int, default=0)
-    namespace = parser.parse_args()
 
     current_time = time.strftime("%Y%m%d_%H%M%S", time.localtime())
 
-    MSUtils.initialize('Ascend', device_id=namespace.device)
-    mindspore.dataset.config.set_prefetch_size(4096 * 16)
+    device_type = config.device_type
+    device_id = config.device_id
+    eval_batch_size = config.eval_batch_size
+    MSUtils.initialize(device=device_type, device_id=config.device_id)
+    mindspore.dataset.config.set_prefetch_size(eval_batch_size * 1)
 
-    svm_result = process_svm(svm_thresh_=0, batch_size=4096, num_workers=32,
+    svm_result = process_svm(svm_thresh_=0, batch_size=eval_batch_size, num_workers=work_nums,
                              svm_model_path=paths.Model.svm)
 
     svm_threshes = [0.0, 0.3, 0.6]
@@ -524,7 +524,7 @@ if __name__ == '__main__':
         svm_result_ = [line for line in svm_result if line['prob'] > svm_thresh]
         logger.info("the thresh is %s, svm has finished ,there are %s rects left" % (svm_thresh, len(svm_result_)))
         nms_result = process_nms(svm_result_)
-        cls_list_ = process_bbox_regression(nms_result, batch_size=1024, num_workers=32,
+        cls_list_ = process_bbox_regression(nms_result, batch_size=eval_batch_size, num_workers=work_nums,
                                             reg_model_path=paths.Model.regression)
         save_result(cls_list_, dir_name="bbox_regression_thresh%s_" % svm_thresh + current_time)
         mAP = calc_map("bbox_regression_thresh%s_" % svm_thresh + current_time)
