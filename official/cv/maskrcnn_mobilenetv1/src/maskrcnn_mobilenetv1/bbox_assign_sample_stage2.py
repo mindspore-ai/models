@@ -79,12 +79,17 @@ class BboxAssignSampleForRcnn(nn.Cell):
         self.tile = P.Tile()
 
         # Check
-        if context.get_context("device_target") == "CPU":
-            self.check_gt_one = Tensor(np.array(-1 * np.ones((self.num_gts, 4)), dtype=np.float32))
-            self.check_anchor_two = Tensor(np.array(-2 * np.ones((self.num_bboxes, 4)), dtype=np.float32))
+        if context.get_context("device_target") == "CPU" or context.get_context("device_target") == "GPU":
+            self.cast_type = mstype.float32
+            self.np_cast_type = np.float32
+            self.int_cast_type = np.int32
         else:
-            self.check_gt_one = Tensor(np.array(-1 * np.ones((self.num_gts, 4)), dtype=np.float16))
-            self.check_anchor_two = Tensor(np.array(-2 * np.ones((self.num_bboxes, 4)), dtype=np.float16))
+            self.cast_type = mstype.float16
+            self.np_cast_type = np.float16
+            self.int_cast_type = np.uint8
+
+        self.check_gt_one = Tensor(np.array(-1 * np.ones((self.num_gts, 4)), dtype=self.np_cast_type))
+        self.check_anchor_two = Tensor(np.array(-2 * np.ones((self.num_bboxes, 4)), dtype=self.np_cast_type))
 
         # Init tensor
         self.assigned_gt_inds = Tensor(np.array(-1 * np.ones(num_bboxes), dtype=np.int32))
@@ -94,33 +99,30 @@ class BboxAssignSampleForRcnn(nn.Cell):
         self.assigned_pos_ones = Tensor(np.array(np.ones(self.num_expected_pos), dtype=np.int32))
 
         self.gt_ignores = Tensor(np.array(-1 * np.ones(self.num_gts), dtype=np.int32))
-        self.range_pos_size = Tensor(np.arange(self.num_expected_pos).astype(np.float16))
+        self.range_pos_size = Tensor(np.arange(self.num_expected_pos).astype(self.np_cast_type))
         self.check_neg_mask = Tensor(np.array(np.ones(self.num_expected_neg - self.num_expected_pos), dtype=np.bool))
 
-        if context.get_context("device_target") == "CPU":
-            self.bboxs_neg_mask = Tensor(np.zeros((self.num_expected_neg, 4), dtype=np.float32))
-            self.labels_neg_mask = Tensor(np.array(np.zeros(self.num_expected_neg), dtype=np.int32))
-        else:
-            self.bboxs_neg_mask = Tensor(np.zeros((self.num_expected_neg, 4), dtype=np.float16))
-            self.labels_neg_mask = Tensor(np.array(np.zeros(self.num_expected_neg), dtype=np.uint8))
+        self.bboxs_neg_mask = Tensor(np.zeros((self.num_expected_neg, 4), dtype=self.np_cast_type))
+        self.labels_neg_mask = Tensor(np.array(np.zeros(self.num_expected_neg), dtype=self.int_cast_type))
 
         self.reshape_shape_pos = (self.num_expected_pos, 1)
         self.reshape_shape_neg = (self.num_expected_neg, 1)
 
-        self.scalar_zero = Tensor(0.0, dtype=mstype.float16)
-        self.scalar_neg_iou_thr = Tensor(self.neg_iou_thr, dtype=mstype.float16)
-        self.scalar_pos_iou_thr = Tensor(self.pos_iou_thr, dtype=mstype.float16)
-        self.scalar_min_pos_iou = Tensor(self.min_pos_iou, dtype=mstype.float16)
+        self.scalar_zero = Tensor(0.0, dtype=self.cast_type)
+        self.scalar_neg_iou_thr = Tensor(self.neg_iou_thr, dtype=self.cast_type)
+        self.scalar_pos_iou_thr = Tensor(self.pos_iou_thr, dtype=self.cast_type)
+        self.scalar_min_pos_iou = Tensor(self.min_pos_iou, dtype=self.cast_type)
 
         self.expand_dims = P.ExpandDims()
         self.split = P.Split(axis=1, output_num=4)
         self.concat_last_axis = P.Concat(axis=-1)
         self.round = P.Round()
-        self.image_h_w = Tensor([cfg.img_height, cfg.img_width, cfg.img_height, cfg.img_width], dtype=mstype.float16)
+        self.image_h_w = Tensor([cfg.img_height, cfg.img_width, cfg.img_height, cfg.img_width], dtype=self.cast_type)
         self.range = nn.Range(start=0, limit=cfg.num_expected_pos_stage2)
         self.crop_and_resize = P.CropAndResize(method="bilinear_v2")
         self.mask_shape = (cfg.mask_shape[0], cfg.mask_shape[1])
         self.squeeze_mask_last = P.Squeeze(axis=-1)
+
     def construct(self, gt_bboxes_i, gt_labels_i, valid_mask, bboxes, gt_valids, gt_masks_i):
         gt_bboxes_i = self.select(self.cast(self.tile(self.reshape(self.cast(gt_valids, mstype.int32), \
                                   (self.num_gts, 1)), (1, 4)), mstype.bool_), \
@@ -163,12 +165,12 @@ class BboxAssignSampleForRcnn(nn.Cell):
         # Get pos index
         pos_index, valid_pos_index = self.random_choice_with_mask_pos(self.greater(assigned_gt_inds5, 0))
 
-        pos_check_valid = self.cast(self.greater(assigned_gt_inds5, 0), mstype.float16)
+        pos_check_valid = self.cast(self.greater(assigned_gt_inds5, 0), self.cast_type)
         pos_check_valid = self.sum_inds(pos_check_valid, -1)
         valid_pos_index = self.less(self.range_pos_size, pos_check_valid)
         pos_index = pos_index * self.reshape(self.cast(valid_pos_index, mstype.int32), (self.num_expected_pos, 1))
 
-        num_pos = self.sum_inds(self.cast(self.logicalnot(valid_pos_index), mstype.float16), -1)
+        num_pos = self.sum_inds(self.cast(self.logicalnot(valid_pos_index), self.cast_type), -1)
         valid_pos_index = self.cast(valid_pos_index, mstype.int32)
         pos_index = self.reshape(pos_index, self.reshape_shape_pos)
         valid_pos_index = self.reshape(valid_pos_index, self.reshape_shape_pos)
@@ -218,7 +220,7 @@ class BboxAssignSampleForRcnn(nn.Cell):
         # convert gt masks targets be 0 or 1 to use with binary cross entropy loss.
         pos_masks_fb = self.round(pos_masks_fb)
 
-        pos_masks_fb = self.cast(pos_masks_fb, mstype.float16)
+        pos_masks_fb = self.cast(pos_masks_fb, self.cast_type)
         total_bboxes = self.concat((pos_bboxes_, neg_bboxes_))
         total_deltas = self.concat((pos_bbox_targets_, self.bboxs_neg_mask))
         total_labels = self.concat((pos_gt_labels, self.labels_neg_mask))

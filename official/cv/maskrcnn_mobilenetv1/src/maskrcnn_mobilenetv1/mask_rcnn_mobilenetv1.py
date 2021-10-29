@@ -486,7 +486,7 @@ class Mask_Rcnn_Mobilenetv1(nn.Cell):
 
     def init_datatype(self):
         self.platform = context.get_context("device_target")
-        if self.platform == "CPU":
+        if self.platform == "CPU" or self.platform == "GPU":
             self.platform_dtype = np.float32
             self.platform_mstype = mstype.float32
             self.int_dtype = np.int32

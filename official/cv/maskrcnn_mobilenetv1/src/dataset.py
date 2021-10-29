@@ -314,7 +314,7 @@ def flip_column(img, img_shape, gt_bboxes, gt_label, gt_num, gt_mask):
 
 def transpose_column(img, img_shape, gt_bboxes, gt_label, gt_num, gt_mask):
     """transpose operation for image"""
-    if context.get_context("device_target") == "CPU":
+    if context.get_context("device_target") == "CPU" or context.get_context("device_target") == "GPU":
         platform_dtype = np.float32
     else:
         platform_dtype = np.float16

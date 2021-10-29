@@ -101,9 +101,11 @@ class RPN(nn.Cell):
                  cls_out_channels):
         super(RPN, self).__init__()
         cfg_rpn = config
-        if context.get_context("device_target") == "CPU":
+        if context.get_context("device_target") == "CPU" or context.get_context("device_target") == "GPU":
+            self.platform_dtype = np.float32
             self.platform_mstype = mstype.float32
         else:
+            self.platform_dtype = np.float16
             self.platform_mstype = mstype.float16
         self.num_bboxes = cfg_rpn.num_bboxes
         self.slice_index = ()
@@ -119,7 +121,7 @@ class RPN(nn.Cell):
         self.batch_size = batch_size
         self.test_batch_size = cfg_rpn.test_batch_size
         self.num_layers = 5
-        self.real_ratio = Tensor(np.ones((1, 1)).astype(np.float16))
+        self.real_ratio = Tensor(np.ones((1, 1)).astype(self.platform_dtype))
 
         self.rpn_convs_list = nn.layer.CellList(self._make_rpn_layer(self.num_layers, in_channels, feat_channels,
                                                                      num_anchors, cls_out_channels))
@@ -128,15 +130,16 @@ class RPN(nn.Cell):
         self.reshape = P.Reshape()
         self.concat = P.Concat(axis=0)
         self.fill = P.Fill()
-        self.placeh1 = Tensor(np.ones((1,)).astype(np.float16))
+        self.placeh1 = Tensor(np.ones((1,)).astype(self.platform_dtype))
 
         self.trans_shape = (0, 2, 3, 1)
 
         self.reshape_shape_reg = (-1, 4)
         self.reshape_shape_cls = (-1,)
-        self.rpn_loss_reg_weight = Tensor(np.array(cfg_rpn.rpn_loss_reg_weight).astype(np.float16))
-        self.rpn_loss_cls_weight = Tensor(np.array(cfg_rpn.rpn_loss_cls_weight).astype(np.float16))
-        self.num_expected_total = Tensor(np.array(cfg_rpn.num_expected_neg * self.batch_size).astype(np.float16))
+        self.rpn_loss_reg_weight = Tensor(np.array(cfg_rpn.rpn_loss_reg_weight).astype(self.platform_dtype))
+        self.rpn_loss_cls_weight = Tensor(np.array(cfg_rpn.rpn_loss_cls_weight).astype(self.platform_dtype))
+        self.num_expected_total = Tensor(np.array(cfg_rpn.num_expected_neg * \
+                                                  self.batch_size).astype(self.platform_dtype))
         self.num_bboxes = cfg_rpn.num_bboxes
         self.get_targets = BboxAssignSample(cfg_rpn, self.batch_size, self.num_bboxes, False)
         self.CheckValid = P.CheckValid()
@@ -147,9 +150,9 @@ class RPN(nn.Cell):
         self.cast = P.Cast()
         self.tile = P.Tile()
         self.zeros_like = P.ZerosLike()
-        self.loss = Tensor(np.zeros((1,)).astype(np.float16))
-        self.clsloss = Tensor(np.zeros((1,)).astype(np.float16))
-        self.regloss = Tensor(np.zeros((1,)).astype(np.float16))
+        self.loss = Tensor(np.zeros((1,)).astype(self.platform_dtype))
+        self.clsloss = Tensor(np.zeros((1,)).astype(self.platform_dtype))
+        self.regloss = Tensor(np.zeros((1,)).astype(self.platform_dtype))
 
     def _make_rpn_layer(self, num_layers, in_channels, feat_channels, num_anchors, cls_out_channels):
         """

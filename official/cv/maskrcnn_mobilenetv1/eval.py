@@ -31,9 +31,6 @@ from src.util import coco_eval, bbox2result_1image, results2json, get_seg_masks
 
 
 set_seed(1)
-context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
-if config.device_target == "Ascend":
-    context.set_context(device_id=config.device_id)
 
 def maskrcnn_eval(dataset_path, ckpt_path, ann_file):
     """MaskRcnn evaluation."""
@@ -166,6 +163,14 @@ def modelarts_process():
 
 @moxing_wrapper(pre_process=modelarts_process)
 def eval_():
+    device_target = config.device_target
+    context.set_context(mode=context.GRAPH_MODE, device_target=device_target)
+
+    if config.device_target == "Ascend":
+        context.set_context(device_id=config.device_id)
+    else:
+        context.set_context(device_id=get_device_id())
+
     config.mindrecord_dir = os.path.join(config.coco_root, config.mindrecord_dir)
     print('\nconfig:\n', config)
 

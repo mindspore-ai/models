@@ -67,7 +67,7 @@ class FeatPyramidNeck(nn.Cell):
                  out_channels,
                  num_outs):
         super(FeatPyramidNeck, self).__init__()
-        if context.get_context("device_target") == "CPU":
+        if context.get_context("device_target") == "CPU" or context.get_context("device_target") == "GPU":
             self.platform_mstype = mstype.float32
         else:
             self.platform_mstype = mstype.float16
@@ -82,9 +82,9 @@ class FeatPyramidNeck(nn.Cell):
 
         for _, channel in enumerate(in_channels):
             l_conv = _conv(channel, out_channels, kernel_size=1, stride=1, padding=0,
-                           pad_mode='valid').to_float(mstype.float16)
+                           pad_mode='valid').to_float(self.platform_mstype)
             fpn_conv = _conv(out_channels, out_channels, kernel_size=3, stride=1, padding=0,
-                             pad_mode='same').to_float(mstype.float16)
+                             pad_mode='same').to_float(self.platform_mstype)
             self.lateral_convs_list_.append(l_conv)
             self.fpn_convs_.append(fpn_conv)
         self.lateral_convs_list = nn.layer.CellList(self.lateral_convs_list_)

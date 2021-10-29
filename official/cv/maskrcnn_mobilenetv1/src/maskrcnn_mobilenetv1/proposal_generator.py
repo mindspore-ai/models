@@ -49,6 +49,14 @@ class Proposal(nn.Cell):
                  target_stds=(1.0, 1.0, 1.0, 1.0)
                  ):
         super(Proposal, self).__init__()
+
+        if context.get_context("device_target") == "CPU" or context.get_context("device_target") == "GPU":
+            self.platform_dtype = np.float32
+            self.platform_mstype = mstype.float32
+        else:
+            self.platform_dtype = np.float16
+            self.platform_mstype = mstype.float16
+
         cfg = config
         self.batch_size = batch_size
         self.num_classes = num_classes
@@ -102,7 +110,7 @@ class Proposal(nn.Cell):
         self.tile = P.Tile()
         self.set_train_local(config, training=True)
 
-        self.multi_10 = Tensor(10.0, mstype.float16)
+        self.multi_10 = Tensor(10.0, self.platform_mstype)
 
         self.platform = context.get_context("device_target")
 
@@ -131,7 +139,7 @@ class Proposal(nn.Cell):
         self.topKv2 = P.TopK(sorted=True)
         self.topK_shape_stage2 = (self.max_num, 1)
         self.min_float_num = -65536.0
-        self.topK_mask = Tensor(self.min_float_num * np.ones(total_max_topk_input, np.float16))
+        self.topK_mask = Tensor(self.min_float_num * np.ones(total_max_topk_input, self.platform_dtype))
 
     def construct(self, rpn_cls_score_total, rpn_bbox_pred_total, anchor_list):
         proposals_tuple = ()
@@ -162,22 +170,22 @@ class Proposal(nn.Cell):
 
             rpn_cls_score = self.reshape(rpn_cls_score, self.reshape_shape)
             rpn_cls_score = self.activation(rpn_cls_score)
-            rpn_cls_score_process = self.cast(self.squeeze(rpn_cls_score[::, 0::]), mstype.float16)
+            rpn_cls_score_process = self.cast(self.squeeze(rpn_cls_score[::, 0::]), self.platform_mstype)
 
-            rpn_bbox_pred_process = self.cast(self.reshape(rpn_bbox_pred, (-1, 4)), mstype.float16)
+            rpn_bbox_pred_process = self.cast(self.reshape(rpn_bbox_pred, (-1, 4)), self.platform_mstype)
 
             scores_sorted, topk_inds = self.topKv2(rpn_cls_score_process, self.topK_stage1[idx])
 
             topk_inds = self.reshape(topk_inds, self.topK_shape[idx])
 
             bboxes_sorted = self.gatherND(rpn_bbox_pred_process, topk_inds)
-            anchors_sorted = self.cast(self.gatherND(anchors, topk_inds), mstype.float16)
+            anchors_sorted = self.cast(self.gatherND(anchors, topk_inds), self.platform_mstype)
 
             proposals_decode = self.decode(anchors_sorted, bboxes_sorted)
 
             proposals_decode = self.concat_axis1((proposals_decode, self.reshape(scores_sorted, self.topK_shape[idx])))
 
-            if self.platform == "CPU":
+            if self.platform == "CPU" or self.platform == "GPU":
                 proposals_decode = self.cast(proposals_decode, mstype.float32)
 
             proposals, _, mask_valid = self.nms(proposals_decode)
@@ -190,10 +198,7 @@ class Proposal(nn.Cell):
 
         _, _, _, _, scores = self.split(proposals)
         scores = self.squeeze(scores)
-        if self.platform == "CPU":
-            topk_mask = self.cast(self.topK_mask, mstype.float32)
-        else:
-            topk_mask = self.cast(self.topK_mask, mstype.float16)
+        topk_mask = self.cast(self.topK_mask, self.platform_mstype)
         scores_using = self.select(masks, scores, topk_mask)
 
         _, topk_inds = self.topKv2(scores_using, self.max_num)

@@ -1,4 +1,4 @@
-# Contents
+﻿# Contents
 
 - [MaskRCNN Description](#maskrcnn-description)
 - [Model Architecture](#model-architecture)
@@ -59,7 +59,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 # [Environment Requirements](#contents)
 
 - Hardware（Ascend/CPU）
-    - Prepare hardware environment with Ascend or CPU processor.
+    - Prepare hardware environment with Ascend or CPU processor or GPU.
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below:
@@ -117,6 +117,11 @@ pip install mmcv=0.2.14
 
     # standalone training
     bash run_standalone_train_cpu.sh [PRETRAINED_PATH](optional)
+
+    On GPU:
+
+    # distributed training
+    bash run_distribute_train_gpu.sh [DATA_PATH] [PRETRAINED_PATH] (optional)
     ```
 
     Note:
@@ -130,11 +135,14 @@ pip install mmcv=0.2.14
 
     ```bash
     # Evaluation on Ascend
-    bash run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH]
-    # example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-5_7393.ckpt /home/DataSet/cocodataset/
+    bash run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
+    # example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-5_7393.ckpt /home/DataSet/cocodataset/ "Ascend"
 
     # Evaluation on CPU
     bash run_eval_cpu.sh [ANN_FILE] [CHECKPOINT_PATH]
+
+    # Evaluation on GPU
+    bash run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
     ```
 
     Note:
@@ -305,10 +313,11 @@ pip install mmcv=0.2.14
   ├─scripts                               # shell script
     ├─run_standalone_train.sh             # training in standalone mode on Ascend(1pcs)
     ├─run_standalone_train_cpu.sh         # training in standalone mode on CPU(1pcs)
+    ├─run_distribute_train_gpu.sh         # training in parallel mode on GPU(8pcs)
     ├─run_distribute_train.sh             # training in parallel mode on Ascend(8 pcs)
     ├─run_infer_310.sh                    # shell script for 310 inference
     ├─run_eval_cpu.sh                     # evaluation on CPU
-    └─run_eval.sh                         # evaluation on Ascend
+    └─run_eval.sh                         # evaluation on Ascend or GPU
   ├─src
     ├─maskrcnn_mobilenetv1
       ├─__init__.py
@@ -361,6 +370,11 @@ On CPU:
 
 # standalone training
 Usage: bash run_standalone_train_cpu.sh [PRETRAINED_MODEL](optional)
+
+On GPU:
+
+# distributed training
+Usage: bash run_distribute_train_gpu.sh [DATA_PATH] [PRETRAINED_PATH] (optional)
 ```
 
 ### [Parameters Configuration](#contents)
@@ -539,6 +553,12 @@ bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH] [PRETRAINED_MODEL(opt
 > As for PRETRAINED_MODEL, if not set, the model will be trained from the very beginning. Ready-made pretrained_models are not available now. Stay tuned.
 > This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 
+- Run `run_distribute_train_gpu.sh` for distributed training of Mask model on GPU.
+
+```bash
+bash run_distribute_train_gpu.sh [DATA_PATH] [PRETRAINED_PATH]
+```
+
 ### [Training Result](#content)
 
 Training result will be stored in the example path, whose folder name begins with "train" or "train_parallel". You can find checkpoint file together with result like the following in loss_rankid.log.
@@ -564,12 +584,20 @@ Training result will be stored in the example path, whose folder name begins wit
 
 ```bash
 # infer
-bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH]
-# example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-5_7393.ckpt /home/DataSet/cocodataset/
+bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
+# example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-5_7393.ckpt /home/DataSet/cocodataset/ "Ascend"
 ```
 
 > As for the COCO2017 dataset, VALIDATION_ANN_FILE_JSON is refer to the annotations/instances_val2017.json in the dataset directory.  
 > Checkpoint can be produced and saved in training process, whose folder name begins with "train/checkpoint" or "train_parallel*/checkpoint".
+
+- Run `run_eval.sh` for evaluation on gpu.
+
+```bash
+# infer
+bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
+# example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-12_7393.ckpt /home/DataSet/cocodataset/ "GPU"
+```
 
 ### [Evaluation result](#content)
 
@@ -671,21 +699,21 @@ Accumulating evaluation results...
 
 ### Evaluation Performance
 
-| Parameters                 | Ascend                                                      |
-| -------------------------- | ----------------------------------------------------------- |
-| Model Version              | V1                                                          |
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8             |
-| uploaded Date              | 12/01/2020 (month/day/year)                                 |
-| MindSpore Version          | 1.0.0                                                       |
-| Dataset                    | COCO2017                                                    |
-| Training Parameters        | epoch=12,  batch_size = 2                                   |
-| Optimizer                  | SGD                                                         |
-| Loss Function              | Softmax Cross Entropy, Sigmoid Cross Entropy, SmoothL1Loss  |
-| Output                     | Probability                                                 |
-| Loss                       | 0.88387                                                     |
-| Speed                      | 8pcs: 249 ms/step                                           |
-| Total time                 | 8pcs: 6.23 hours                                            |
-| Scripts                    | [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/maskrcnn_mobilenetv1) |
+| Parameters                 | Ascend                                                      | GPU                                                         |
+| -------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------- |
+| Model Version              | V1                                                          | V1                                                          |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | GPU(Tesla V100-PCIE); CPU 2.60 GHz, 26 cores; Memory 790G; OS Euler2.0             |
+| uploaded Date              | 12/01/2020 (month/day/year)                                 | 09/21/2021 (month/day/year)                                 |
+| MindSpore Version          | 1.0.0                                                       | 1.5.0                                                       |
+| Dataset                    | COCO2017                                                    | COCO2017                                                    |
+| Training Parameters        | epoch=12,  batch_size = 2                                   | epoch=12,  batch_size = 2                                   |
+| Optimizer                  | Momentum                                                    | Momentum                                                         |
+| Loss Function              | Softmax Cross Entropy, Sigmoid Cross Entropy, SmoothL1Loss  | Softmax Cross Entropy, Sigmoid Cross Entropy, SmoothL1Loss  |
+| Output                     | Probability                                                 | Probability                                                 |
+| Loss                       | 0.88387                                                     | 0.60763                                                     |
+| Speed                      | 8pcs: 249 ms/step                                           | 8pcs: 795.645 ms/step                                       |
+| Total time                 | 8pcs: 6.23 hours                                            | 8pcs: 19.6 hours                                            |
+| Scripts                    | [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/maskrcnn_mobilenetv1) |  [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/maskrcnn_mobilenetv1) |
 
 ### Inference Performance
 
