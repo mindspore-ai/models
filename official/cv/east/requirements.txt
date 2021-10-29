@@ -1,0 +1,6 @@
+numpy~=1.19.5
+opencv-python~=4.4.0.44
+shapely~=1.7.1
+pillow~=6.2.0
+lanms~=1.0.2
+polygon3~=3.0.9.1

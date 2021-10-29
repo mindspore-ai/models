@@ -40,7 +40,7 @@ parser.add_argument(
 
 parser.add_argument(
     '--test_img_path',
-    default='/data/icdar2015/Test/image/',
+    default='./data/icdar2015/Test/image/',
     type=str,
     help='Train dataset directory.')
 parser.add_argument('--checkpoint_path', default='best.ckpt', type=str,

@@ -20,9 +20,9 @@ from mindspore.context import ParallelMode
 from mindspore.nn.optim.adam import Adam
 from mindspore import Tensor, Model
 from mindspore import context
-from mindspore.communication.management import init
 import mindspore as ms
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
+from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.common import set_seed
 from mindspore.profiler.profiling import Profiler
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -49,17 +49,17 @@ parser.add_argument(
     '--device_id',
     type=int,
     default=0,
-    help='device where the code will be implemented. (Default: Ascend)')
+    help='device id where the model will be implemented. (Default: 0)')
 
 # dataset related
 parser.add_argument(
     '--data_dir',
-    default='/data/icdar2015/Training/',
+    default='./data/icdar2015/Training/',
     type=str,
     help='Train dataset directory.')
 parser.add_argument(
     '--per_batch_size',
-    default=24,
+    default=8,
     type=int,
     help='Batch size for Training. Default: 24.')
 parser.add_argument(
@@ -71,7 +71,7 @@ parser.add_argument(
 # network related
 parser.add_argument(
     '--pretrained_backbone',
-    default='/data/vgg/0-150_5004.ckpt',
+    default='./data/vgg/0-150_5004.ckpt',
     type=str,
     help='The ckpt file of ResNet. Default: "".')
 parser.add_argument(
@@ -184,14 +184,15 @@ if args.is_distributed:
         init()
     else:
         init("nccl")
-    args.rank = int(os.getenv('DEVICE_ID'))
-    args.group_size = int(os.getenv('RANK_SIZE'))
+    args.group_size = get_group_size()
+    args.rank = get_rank()
 
 context.set_context(
     mode=context.GRAPH_MODE,
     device_target=args.device_target,
     save_graphs=False,
-    device_id=args.rank)
+    device_id=args.rank,
+    enable_graph_kernel=True)
 
 # select for master rank save ckpt or all rank save, compatible for model
 # parallel
@@ -241,7 +242,7 @@ if __name__ == "__main__":
     degree = 1
     if args.is_distributed:
         parallel_mode = ParallelMode.DATA_PARALLEL
-        degree = int(os.getenv('RANK_SIZE'))
+        degree = args.group_size
     context.set_auto_parallel_context(
         parallel_mode=parallel_mode,
         gradients_mean=True,
@@ -259,8 +260,8 @@ if __name__ == "__main__":
 
     network = EastWithLossCell(network)
     if args.resume_east:
-        parm_dict = load_checkpoint(args.resume_east)
-        load_param_into_net(network, parm_dict)
+        param_dict = load_checkpoint(args.resume_east)
+        load_param_into_net(network, param_dict)
         args.logger.info('finish get resume east')
 
     args.logger.info('finish get network')
@@ -299,19 +300,14 @@ if __name__ == "__main__":
         prefix="checkpoint_east",
         directory=save_ckpt_path,
         config=config_ck)
-    callback = []
-    if args.rank == 0:
-        callback = [
-            TimeMonitor(
-                data_size=data_size),
-            LossMonitor(),
-            ckpoint_cb]
-
-    save_ckpt_path = os.path.join(
-        args.outputs_dir, 'ckpt_' + str(args.rank) + '/')
+    callback = [
+        TimeMonitor(data_size=data_size),
+        LossMonitor(),
+        ckpoint_cb
+    ]
     model.train(
         args.max_epoch,
         ds,
         callbacks=callback,
-        dataset_sink_mode=False)
+        dataset_sink_mode=True)
     args.logger.info('==========end training===============')

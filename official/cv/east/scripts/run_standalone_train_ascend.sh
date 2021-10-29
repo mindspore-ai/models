@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_eval.sh [DATASET_PATH] [CKPT_PATH] [DEVICE_ID]"
+    echo "Usage: bash run_distribute_train_ascend.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [DEVICE_ID]"
 exit 1
 fi
 
@@ -28,9 +28,11 @@ get_real_path(){
 }
 
 DATASET_PATH=$(get_real_path $1)
-CKPT_PATH=$(get_real_path $2)
+PRETRAINED_BACKBONE=$(get_real_path $2)
+RANK_TABLE_FILE=$(get_real_path $3)
 echo $DATASET_PATH
-echo $CKPT_PATH
+echo $PRETRAINED_BACKBONE
+echo $RANK_TABLE_FILE
 
 if [ ! -d $DATASET_PATH ]
 then
@@ -38,9 +40,9 @@ then
 exit 1
 fi
 
-if [ ! -f $CKPT_PATH ]
+if [ ! -f $PRETRAINED_BACKBONE ]
 then
-    echo "error: CKPT_PATH=$CKPT_PATH is not a file"
+    echo "error: PRETRAINED_PATH=$PRETRAINED_BACKBONE is not a file"
 exit 1
 fi
 
@@ -50,17 +52,20 @@ export DEVICE_ID=$3
 export RANK_ID=$3
 export RANK_SIZE=1
 
-rm -rf ./eval_standalone
-mkdir ./eval_standalone
-cp ../*.py ./eval_standalone
-cp -r ../src ./eval_standalone
-cp -r ../evaluate ./eval_standalone
-cp -r ../lanms ./eval_standalone
-cd ./eval_standalone || exit
+rm -rf ./train_standalone
+mkdir ./train_standalone
+cp ../*.py ./train_standalone
+cp -r ../src ./train_standalone
+cd ./train_standalone || exit
 echo "start training for rank $RANK_ID, device $DEVICE_ID"
 env > env.log
-python eval.py \
-    --test_img_path=$DATASET_PATH \
-    --checkpoint_path=$CKPT_PATH \
-    --device_num=$DEVICE_ID > log.txt 2>&1 &
+python train.py \
+    --data_dir=$DATASET_PATH \
+    --pretrained_backbone=$PRETRAINED_BACKBONE \
+    --device_id=$DEVICE_ID \
+    --is_distributed=0 \
+    --lr=0.001 \
+    --max_epoch=600 \
+    --per_batch_size=24 \
+    --lr_scheduler=my_lr  > log.txt 2>&1 &
 cd ..
