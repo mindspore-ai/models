@@ -102,7 +102,7 @@ YOLOv3使用DarkNet53执行特征提取，这是YOLOv2中的Darknet-19和残差�
       wget https://pjreddie.com/media/files/darknet53.conv.74
       ```
 
-    - 可以运行model_zoo/utils/hccl_tools/路径下的hccl_tools.py脚本生成hccl_8p.json文件，下面指令中参数"[0, 8)"表示生成0-7的8卡hccl_8p.json文件。
+    - 可以运行models/utils/hccl_tools/路径下的hccl_tools.py脚本生成hccl_8p.json文件，下面指令中参数"[0, 8)"表示生成0-7的8卡hccl_8p.json文件。
         - 该命令生成的json文件名为 hccl_8p_01234567_{host_ip}.json, 为了表述方便，统一使用hccl_8p.json表示该json文件。
 
       ```command
