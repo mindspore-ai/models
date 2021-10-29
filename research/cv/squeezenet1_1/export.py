@@ -47,7 +47,7 @@ if args.device_target == "Ascend":
 if __name__ == '__main__':
     net = squeezenet(num_classes=num_classes)
 
-    param_dict = load_checkpoint(args.ckpt_file)
+    param_dict = load_checkpoint(args.checkpoint_path)
     load_param_into_net(net, param_dict)
 
     input_data = Tensor(np.zeros([args.batch_size, 3, args.height, args.width], np.float32))
