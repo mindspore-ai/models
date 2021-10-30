@@ -55,7 +55,7 @@ cp src/*.py ./train_parallel/src
 cd ./train_parallel
 env > env.log
 echo "start training"
-    mpirun -n $2 --allow-run-as-root \
+    mpirun -n $3 --allow-run-as-root \
            python3 train.py --data_url=$DATA_PATH --isModelArts=False --run_distribute=True \
-           --device_target="GPU" --config_path=$CONFIG_PATH --eval_data_url=$EVAL_DATA_PATH --device_num $2 > train.log 2>&1 &
+           --device_target="GPU" --config_path=$CONFIG_PATH --eval_data_url=$EVAL_DATA_PATH --device_num $3 > train.log 2>&1 &
 
