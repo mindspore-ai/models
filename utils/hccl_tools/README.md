@@ -48,6 +48,6 @@ hccl_[server_count]s_[rank_size]p.json
 
 Please note that, the server order in the output config file comes from the order of input file list.
 
-For example, running `python merge_hccl.py hccl_1.json hccl_2.json`. The 8 devices in hccl_1.json will be rank 0~7, and the 8 devices in hccl_2.json will be rank 8~15.
+For example, running `python merge_hccl.py hccl_1.json hccl_2.json`. The 8 devices in hccl_1.json will be rank `0~7`, and the 8 devices in hccl_2.json will be rank `8~15`.
 
 While running with wildcard, the exact order is not determined, which is decided by the system. Usually this will result in dictionary order just like `ls` command, but we still suggest you check the result carefully if the order does matter in your situation.
