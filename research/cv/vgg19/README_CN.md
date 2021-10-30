@@ -109,6 +109,8 @@ VGG 19网络主要由几个基本模块（包括卷积层和池化层）和三�
 
 ```python
 # 训练示例
+bash run_standalone_train_ascend.sh [YAML_CONFIG_PATH] [DATA_PATH]
+
 python train.py  --config_path=[YAML_CONFIG_PATH] --data_dir=[DATA_PATH] --dataset=[DATASET_TYPE] > output.train.log 2>&1 &
 
 # 分布式训练示例
@@ -120,7 +122,7 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --data_dir=[DATA_PATH]  --pre_tr
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 具体操作，参见：
-<https://gitee.com/mindspore/mindspore/tree/r1.3/model_zoo/utils/hccl_tools>
+<https://gitee.com/mindspore/models/tree/r1.3/utils/hccl_tools>
 
 - GPU处理器环境运行
 
@@ -386,14 +388,14 @@ has_dropout: True                 # 是否使用Dropout层
 
 ```bash
 num_classes: 1000                   # 数据集类数
-lr: 0.01                            # 学习率
+lr: 0.04                            # 学习率
 lr_init: 0.01                       # 初始学习率
 lr_max: 0.1                         # 最大学习率
 lr_epochs: '30,60,90,120'           # 基于变化lr的轮次
 lr_scheduler: "cosine_annealing"    # 学习率模式
 warmup_epochs: 0                    # 热身轮次数
-batch_size: 32                      # 输入张量的批次大小
-max_epoch: 150                      # 只对训练有效，推理固定值为1
+batch_size: 64                      # 输入张量的批次大小
+max_epoch: 90                       # 只对训练有效，推理固定值为1
 momentum: 0.9                       # 动量
 weight_decay: 1e-4                  # 权重衰减
 loss_scale: 1024                    # 损失放大
@@ -403,7 +405,7 @@ buffer_size: 10                     # 混洗缓冲区大小
 image_size: '224,224'               # 图像大小
 pad_mode: 'pad'                     # conv2d的填充方式
 padding: 1                          # conv2d的填充值
-has_bias: True                      # conv2d是否有偏差
+has_bias: False                     # conv2d是否有偏差
 batch_norm: False                   # 在conv2d中是否有batch_norm
 keep_checkpoint_max: 10             # 只保留最后一个keep_checkpoint_max检查点
 initialize_mode: "KaimingNormal"    # conv2d init模式
@@ -472,7 +474,7 @@ python train.py --config_path=/dir_to_code/imagenet2012_config.yaml --device_tar
 
 ```bash
 # 分布式训练（8p）
-bash scripts/run_distribute_train_gpu.sh /path/ImageNet2012/train"
+bash scripts/run_distribute_train_gpu.sh /path/ImageNet2012/train
 ```
 
 ### 评估过程
@@ -510,7 +512,7 @@ python export.py --config_path [YMAL_CONFIG_PATH] --ckpt_file [CKPT_PATH] --file
 ```
 
 参数ckpt_file为必填项，
-`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
+`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
 
 ### 在Ascend310执行推理
 
@@ -551,7 +553,7 @@ python export.py --config_path [YMAL_CONFIG_PATH] --ckpt_file [CKPT_PATH] --file
 | 速度 | 8卡：97.4毫秒/步 |
 | 总时长 | 8卡：6.1小时 |
 | 调优检查点 |    1.1 GB（.ckpt 文件）               |
-| 脚本                  |[VGG19](https://gitee.com/mindspore/mindspore/tree/r1.3/model_zoo/research/cv/vgg19) |                   |
+| 脚本                  |[VGG19](https://gitee.com/mindspore/models/tree/r1.3/research/cv/vgg19) |                   |
 
 ### 评估性能
 
@@ -572,4 +574,4 @@ dataset.py中设置了“create_dataset”函数内的种子，同时还使用�
 
 ## ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/models/tree/r1.3/)。  
+请浏览官网[主页](https://gitee.com/mindspore/models/tree/r1.3)。  

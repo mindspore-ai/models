@@ -52,7 +52,7 @@ is_save_on_master: 1
 is_distributed: 0
 
 # eval options
-per_batch_size: 1
+per_batch_size: 32
 graph_ckpt: 1
 log_path: "outputs/"
 
