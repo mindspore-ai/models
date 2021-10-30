@@ -185,8 +185,7 @@ class RCAN(nn.Cell):
         n_feats = args.n_feats
         kernel_size = 3
         reduction = args.reduction
-        idx = args.task_id
-        scale = args.scale[idx]
+        scale = args.scale
         self.dytpe = mstype.float16
 
         # RGB mean for DIV2K
@@ -226,3 +225,26 @@ class RCAN(nn.Cell):
         x = self.tail(res)
         x = self.add_mean(x)
         return x
+
+    def load_pre_trained_param_dict(self, new_param_dict, strict=True):
+        """
+        load pre_trained param dict from rcan_x2
+        """
+        own_param = self.parameters_dict()
+        for name, new_param in new_param_dict.items():
+            if len(name) >= 4 and name[:4] == "net.":
+                name = name[4:]
+            if name in own_param:
+                if isinstance(new_param, Parameter):
+                    param = own_param[name]
+                    if tuple(param.data.shape) == tuple(new_param.data.shape):
+                        param.set_data(type(param.data)(new_param.data))
+                    elif name.find('tail') == -1:
+                        raise RuntimeError('While copying the parameter named {}, '
+                                           'whose dimensions in the model are {} and '
+                                           'whose dimensions in the checkpoint are {}.'
+                                           .format(name, own_param[name].shape, new_param.shape))
+                elif strict:
+                    if name.find('tail') == -1:
+                        raise KeyError('unexpected key "{}" in parameters_dict()'
+                                       .format(name))

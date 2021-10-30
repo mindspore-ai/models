@@ -147,7 +147,7 @@ DIV2K
 ### 训练
 
 ```bash
-用法：python train.py [--device_target][--dir_data]
+用法：python train.py [--device_target][--dir_data][--scale]
               [--ckpt_path][--test_every][--task_id]
 选项：
   --device_target       训练后端类型，Ascend，默认为Ascend。
@@ -155,6 +155,7 @@ DIV2K
   --ckpt_path           存放检查点的路径。
   --test_every          每N批进行一次试验。
   --task_id             任务ID。
+  --scale               超分倍数。
 ```
 
 ### 评估
@@ -194,7 +195,7 @@ DIV2K
 "n_resgroups":10,                    # 残差组数
 "reduction":16,                      # 特征映射数减少
 "patch_size":48,                     # 输出块大小
-"scale":'2',                         # 超分辨率比例尺
+"scale":'2',                         # 超分辨率比例尺,可选2,3,4
 "task_id":0,                         # 任务id
 "n_colors":3,                        # 颜色通道数
 "n_resblocks":20,                    # 残差块数
@@ -239,6 +240,21 @@ sh scripts/eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]
 ```
 
 - 上述python命令在后台运行，可通过`eval.log`文件查看结果。
+
+### Ascend310评估
+
+- 评估过程如下，需要指定数据集类型为“Set5”或“B100”。
+
+```bash
+sh run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATASET_TYPE] [SCALE] [DEVICE_ID]
+```
+
+- MINDIR_PATH mindir模型文件路径
+- DATA_PATH 数据集路径
+- DATASET_TYPE 数据集名称(Set5, B100)
+- SCALE 超分辨率比例(2, 3, 4)
+- DEVICE_ID 设备ID， 默认为：0
+- 上述python命令在后台运行，可通过`run_infer.log`文件查看结果。
 
 ## 模型导出
 
@@ -287,6 +303,19 @@ sh scripts/eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]
 | batch_size          |   1                        |
 | 输出 | 超分辨率图片 |
 | 准确率 | 单卡：Set5: 38.15/B100:32.28 |
+
+### 310评估性能
+
+| 参数  | RCAN(Ascend)                         |
+| ------------------- | --------------------------- |
+| 模型版本      | RCAN                       |
+| 资源        | Ascend 310                  |
+| 上传日期              | 2021-09-28                    |
+| MindSpore版本   | 1.3.0                 |
+| 数据集 | Set5,B100 |
+| batch_size          |   1                        |
+| 输出 | 超分辨率图片 |
+| 准确率 | 单卡：Set5: 37.27/B100:31.00 |
 
 # ModelZoo主页
 
