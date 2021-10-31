@@ -126,7 +126,6 @@ def get_config():
     final_config = merge(args, default)
     pprint(final_config)
     print("Please check the above information for the configurations", flush=True)
-    pprint(final_config)
     return Config(final_config)
 
 config = get_config()
