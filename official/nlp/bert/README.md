@@ -61,7 +61,7 @@ The backbone structure of BERT is transformer. For BERT_base, the transformer co
     - Extract and refine texts in the dataset with [WikiExtractor](https://github.com/attardi/wikiextractor). The commands are as follows:
         - pip install wikiextractor
         - python -m wikiextractor.WikiExtractor -o <output file path> -b <output file size> <Wikipedia dump file>
-    - Convert the dataset to TFRecord format. Please refer to create_pretraining_data.py file in [BERT](https://github.com/google-research/bert) repository and download vocab.txt here, if AttributeError: module 'tokenization' has no attribute 'FullTokenizer' occur, please install bert-tensorflow.
+    - Extracted text data from `WikiExtractor` cannot be trained directly, you have to preprocess the data and convert the dataset to TFRecord format. Please refer to create_pretraining_data.py file in [BERT](https://github.com/google-research/bert) repository and download vocab.txt here, if AttributeError: module 'tokenization' has no attribute 'FullTokenizer' occur, please install bert-tensorflow.
 - Create fine-tune dataset
     - Download dataset for fine-tuning and evaluation such as [CLUENER](https://github.com/CLUEbenchmark/CLUENER2020), [TNEWS](https://github.com/CLUEbenchmark/CLUE), [SQuAD v1.1 train dataset](https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json), [SQuAD v1.1 eval dataset](https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json), etc.
     - Convert dataset files from JSON format to TFRECORD format, please refer to run_classifier.py or run_squad.py file in [BERT](https://github.com/google-research/bert) repository.
@@ -91,7 +91,7 @@ bash scripts/run_distributed_pretrain_ascend.sh /path/cn-wiki-128 /path/hccl.jso
 
 # run fine-tuning and evaluation example
 - If you are going to run a fine-tuning task, please prepare a checkpoint generated from pre-training.
-- Set bert network config and optimizer hyperparameters in `finetune_eval_config.py`.
+- Set bert network config and optimizer hyperparameters in `task_[DOWNSTREAM_TASK]_config.yaml`.
 
 - Classification task: Set task related hyperparameters in scripts/run_classifier.sh.
 - Run `bash scripts/run_classifier.sh` for fine-tuning of BERT-base and BERT-NEZHA model.
@@ -120,7 +120,7 @@ bash scripts/run_distributed_pretrain_for_gpu.sh 8 40 /path/cn-wiki-128
 
 # run fine-tuning and evaluation example
 - If you are going to run a fine-tuning task, please prepare a checkpoint generated from pre-training.
-- Set bert network config and optimizer hyperparameters in `finetune_eval_config.py`.
+- Set bert network config and optimizer hyperparameters in `task_[DOWNSTREAM_TASK]_config.yaml`.
 
 - Classification task: Set task related hyperparameters in scripts/run_classifier.sh.
 - Run `bash scripts/run_classifier.sh` for fine-tuning of BERT-base and BERT-NEZHA model.
@@ -179,7 +179,7 @@ If you want to run in modelarts, please check the official documentation of [mod
   #         1. Add ”enable_modelarts=True“
   #         2. Set other parameters, other parameter configuration can refer to `run_ner.sh`(or run_squad.sh or run_classifier.sh) under the folder '{path}/bert/scripts/'.
   #     Note that vocab_file_path, label_file_path, train_data_file_path, eval_data_file_path, schema_file_path fill in the relative path relative to the path selected in step 7.
-  #     Finally, "config_path=../../*.yaml" must be added on the web page (select the *.yaml configuration file according to the downstream task)
+  #     Finally, "config_path=/path/*.yaml" must be added on the web page (select the *.yaml configuration file according to the downstream task)
   # (6) Upload the dataset to S3 bucket.
   # (7) Check the "data storage location" on the website UI interface and set the "Dataset path" path (there is only data or zip package under this path).
   # (8) Set the "Output file path" and "Job log path" to your path on the website UI interface.
@@ -190,12 +190,10 @@ If you want to run in modelarts, please check the official documentation of [mod
 
 For distributed training on Ascend, an hccl configuration file with JSON format needs to be created in advance.
 
-For distributed training on single machine, [here](https://gitee.com/mindspore/mindspore/tree/master/config/hccl_single_machine_multi_rank.json) is an example hccl.json.
-
-For distributed training among multiple machines, training command should be executed on each machine in a small time interval. Thus, an hccl.json is needed on each machine. [here](https://gitee.com/mindspore/mindspore/tree/master/config/hccl_multi_machine_multi_rank.json) is an example of hccl.json for multi-machine case.
-
 Please follow the instructions in the link below to create an hccl.json file in need:
 [https://gitee.com/mindspore/models/tree/master/utils/hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+
+For distributed training among multiple machines, training command should be executed on each machine in a small time interval. Thus, an hccl.json is needed on each machine. [merge_hccl](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools#merge_hccl) is a tool to create hccl.json for multi-machine case.
 
 For dataset, if you want to set the format and parameters, a schema configuration file with JSON format needs to be created, please refer to [tfrecord](https://www.mindspore.cn/docs/programming_guide/en/master/dataset_loading.html#tfrecord) format.
 
@@ -437,14 +435,14 @@ options:
 
 ## Options and Parameters
 
-Parameters for training and evaluation can be set in file `config.py` and `finetune_eval_config.py` respectively.
+Parameters for training and downstream task can be set in yaml config file respectively.
 
 ### Options
 
 ```text
 config for lossscale and etc.
     bert_network                    version of BERT model: base | nezha, default is base
-    batch_size                      batch size of input dataset: N, default is 16
+    batch_size                      batch size of input dataset: N, default is 32
     loss_scale_value                initial value of loss scale: N, default is 2^32
     scale_factor                    factor used to update loss scale: N, default is 2
     scale_window                    steps for once updatation of loss scale: N, default is 1000
@@ -690,7 +688,7 @@ The result will be as follows:
 We only support export with fine-tuned downstream task model and yaml config file, because the pretrained model is useless in inferences task.
 
 ```shell
-python export.py --config_path [../../*.yaml] --export_ckpt_file [CKPT_PATH] --export_file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --config_path [/path/*.yaml] --export_ckpt_file [CKPT_PATH] --export_file_name [FILE_NAME] --file_format [FILE_FORMAT]
 ```
 
 - Export on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start as follows)
@@ -713,7 +711,7 @@ python export.py --config_path [../../*.yaml] --export_ckpt_file [CKPT_PATH] --e
 #         3. Add ”export_file_name=bert_ner“
 #         4. Add ”file_format=MINDIR“
 #         5. Add ”label_file_path：{path}/*.txt“('label_file_path' refers to the relative path relative to the folder selected in step 7.)
-#     Finally, "config_path=../../*.yaml" must be added on the web page (select the *.yaml configuration file according to the downstream task)
+#     Finally, "config_path=/path/*.yaml" must be added on the web page (select the *.yaml configuration file according to the downstream task)
 # (7) Check the "data storage location" on the website UI interface and set the "Dataset path" path.
 # (8) Set the "Output file path" and "Job log path" to your path on the website UI interface.
 # (9) Under the item "resource pool selection", select the specification of a single card.
@@ -753,7 +751,7 @@ Currently, the ONNX model of Bert classification task can be exported, and third
 - export ONNX
 
 ```shell
-python export.py --config_path [../../task_classifier_config.yaml] --file_format ["ONNX"] --export_ckpt_file [CKPT_PATH] --num_class [NUM_CLASS] --export_file_name [EXPORT_FILE_NAME]
+python export.py --config_path [/path/*.yaml] --file_format ["ONNX"] --export_ckpt_file [CKPT_PATH] --num_class [NUM_CLASS] --export_file_name [EXPORT_FILE_NAME]
 ```
 
 'CKPT_PATH' is mandatory, it is the path of the CKPT file that has been trained for a certain classification task model.
@@ -765,7 +763,7 @@ After running, the ONNX model of Bert will be saved in the current file director
 - Load ONNX and inference
 
 ```shell
-python run_eval_onnx.py --config_path [../../task_classifier_config.yaml] --eval_data_file_path [EVAL_DATA_FILE_PATH] -export_file_name [EXPORT_FILE_NAME]
+python run_eval_onnx.py --config_path [/path/*.yaml] --eval_data_file_path [EVAL_DATA_FILE_PATH] -export_file_name [EXPORT_FILE_NAME]
 ```
 
 'EVAL_DATA_FILE_PATH' is mandatory, it is the eval data of the dataset used by the classification task.
