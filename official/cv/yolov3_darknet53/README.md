@@ -296,6 +296,10 @@ optional arguments:
                         Fix training shape. Default: ""
   --resize_rate RESIZE_RATE
                         Resize rate for multi-scale training. Default: None
+  --bind_cpu BIND_CPU
+                        Whether bind cpu when distributed training. Default: True
+  --device_num DEVICE_NUM
+                        Device numbers per server. Default: 8
 ```
 
 ### [Training Process](#contents)

@@ -158,6 +158,8 @@ optional arguments:
   --need_profiler       Whether use profiler. 0 for no, 1 for yes. Default: 0
   --training_shape      Fix training shape. Default: ""
   --resize_rate         Resize rate for multi-scale training. Default: 10
+  --bind_cpu            Whether bind cpu when distributed training. Default: True
+  --device_num          Device numbers per server. Default: 8
 ```
 
 ## [Training Process](#contents)

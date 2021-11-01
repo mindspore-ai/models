@@ -150,10 +150,12 @@ def run_train():
     if config.rank == 0:
         ckpt_config = CheckpointConfig(save_checkpoint_steps=config.dataset_size)
         cb.append(ModelCheckpoint(prefix="naml", directory=config.save_checkpoint_path, config=ckpt_config))
-
+    epochs = config.epochs
+    if config.sink_mode:
+        epochs = int(config.epochs * config.dataset_size / config.print_times)
     start_time = time.time()
     print("======================= Start Train ==========================", flush=True)
-    model.train(config.epochs, dataset, callbacks=cb, dataset_sink_mode=config.sink_mode)
+    model.train(epochs, dataset, callbacks=cb, dataset_sink_mode=config.sink_mode, sink_size=config.print_times)
     save_checkpoint(net_with_loss, os.path.join(config.save_checkpoint_path, "naml_last.ckpt"))
     end_time = time.time()
     print("==============================================================")

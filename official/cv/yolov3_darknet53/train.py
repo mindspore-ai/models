@@ -54,6 +54,19 @@ class BuildTrainNetwork(nn.Cell):
         loss = self.criterion(output, label)
         return loss
 
+def cpu_affinity(rank_id, device_num):
+    """Bind CPU cores according to rank_id and device_num."""
+    import psutil
+    cores = psutil.cpu_count()
+    if cores < device_num:
+        return
+    process = psutil.Process()
+    used_cpu_num = cores // device_num
+    rank_id = rank_id % device_num
+    used_cpu_list = [i for i in range(rank_id * used_cpu_num, (rank_id + 1) * used_cpu_num)]
+    process.cpu_affinity(used_cpu_list)
+    print(f"==== {rank_id}/{device_num} ==== bind cpu: {used_cpu_list}")
+
 
 def conver_training_shape(args):
     training_shape = [int(args.training_shape), int(args.training_shape)]
@@ -82,12 +95,11 @@ def network_init(args):
 
     # init distributed
     if args.is_distributed:
-        if args.device_target == "Ascend":
-            init()
-        else:
-            init("nccl")
+        init()
         args.rank = get_rank()
         args.group_size = get_group_size()
+        if args.device_target == "GPU" and args.bind_cpu:
+            cpu_affinity(args.rank, min(args.group_size, args.device_num))
 
     # select for master rank save ckpt or all rank save, compatible for model parallel
     args.rank_save_ckpt_flag = 0

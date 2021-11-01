@@ -291,6 +291,10 @@ train.py中主要参数如下：
                         固定训练形状。默认设置：""。
   --resize_rate RESIZE_RATE
                         多尺度训练的调整率。默认设置：None。
+  --bind_cpu BIND_CPU
+                        多卡运行是否绑核。默认设置：True
+  --device_num DEVICE_NUM
+                        一台服务器有多少张卡。默认设置：8
 ```
 
 ## 训练过程
