@@ -63,7 +63,7 @@ BERT的主干结构为Transformer。对于BERT_base，Transformer包含12个编�
     - 使用[WikiExtractor](https://github.com/attardi/wikiextractor)提取和整理数据集中的文本，使用步骤如下：
         - pip install wikiextractor
         - python -m wikiextractor.WikiExtractor -o <output file path> -b <output file size> <Wikipedia dump file>
-    - 将数据集转换为TFRecord格式。详见[BERT](https://github.com/google-research/bert)代码仓中的create_pretraining_data.py文件，同时下载对应的vocab.txt文件, 如果出现AttributeError: module 'tokenization' has no attribute 'FullTokenizer’，请安装bert-tensorflow。
+    - `WikiExtarctor`提取出来的原始文本并不能直接使用，还需要将数据集预处理并转换为TFRecord格式。详见[BERT](https://github.com/google-research/bert)代码仓中的create_pretraining_data.py文件，同时下载对应的vocab.txt文件, 如果出现AttributeError: module 'tokenization' has no attribute 'FullTokenizer’，请安装bert-tensorflow。
 - 生成下游任务数据集
     - 下载数据集进行微调和评估，如[CLUENER](https://github.com/CLUEbenchmark/CLUENER2020)、[TNEWS](https://github.com/CLUEbenchmark/CLUE)、[SQuAD v1.1训练集](https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json)、[SQuAD v1.1验证集](https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json)等。
     - 将数据集文件从JSON格式转换为TFRecord格式。详见[BERT](https://github.com/google-research/bert)代码仓中的run_classifier.py或run_squad.py文件。
@@ -97,7 +97,7 @@ bash scripts/run_distributed_pretrain_ascend.sh /path/cn-wiki-128 /path/hccl.jso
 # 运行微调和评估示例
 
 - 如需运行微调任务，请先准备预训练生成的权重文件（ckpt）。
-- 在`finetune_eval_config.py`中设置BERT网络配置和优化器超参。
+- 在`task_[DOWNSTREAM_TASK]_config.yaml`中设置BERT网络配置和优化器超参。
 
 - 分类任务：在scripts/run_classifier.sh中设置任务相关的超参。
 - 运行`bash scripts/run_classifier.sh`，对BERT-base和BERT-NEZHA模型进行微调。
@@ -130,7 +130,7 @@ bash scripts/run_distributed_pretrain_for_gpu.sh 8 40 /path/cn-wiki-128
 # 运行微调和评估示例
 
 - 如需运行微调任务，请先准备预训练生成的权重文件（ckpt）。
-- 在`finetune_eval_config.py`中设置BERT网络配置和优化器超参。
+- 在`task_[DOWNSTREAM_TASK]_config.yaml`中设置BERT网络配置和优化器超参。
 
 - 分类任务：在scripts/run_classifier.sh中设置任务相关的超参。
 - 运行`bash scripts/run_classifier.sh`，对BERT-base和BERT-NEZHA模型进行微调。
@@ -187,7 +187,7 @@ bash scripts/run_distributed_pretrain_for_gpu.sh 8 40 /path/cn-wiki-128
     #         1. 添加 ”enable_modelarts=True“
     #         2. 添加其它参数，其它参数配置可以参考 './scripts/'下的 `run_ner.sh`或`run_squad.sh`或`run_classifier.sh`
     #     注意vocab_file_path，label_file_path，train_data_file_path，eval_data_file_path，schema_file_path填写相对于第7步所选路径的相对路径。
-    #     最后必须在网页上添加 “config_path=../../*.yaml”(根据下游任务选择 *.yaml 配置文件)
+    #     最后必须在网页上添加 “config_path=/path/*.yaml”(根据下游任务选择 *.yaml 配置文件)
     # (6) 上传你的 数据 到 s3 桶上
     # (7) 在网页上勾选数据存储位置，设置“训练数据集”路径（该路径下仅有 数据/数据zip压缩包）
     # (8) 在网页上设置“训练输出文件路径”、“作业日志路径”
@@ -198,11 +198,11 @@ bash scripts/run_distributed_pretrain_for_gpu.sh 8 40 /path/cn-wiki-128
 
 在Ascend设备上做分布式训练时，请提前创建JSON格式的HCCL配置文件。
 
-在Ascend设备上做单机分布式训练时，请参考[here](https://gitee.com/mindspore/mindspore/tree/master/config/hccl_single_machine_multi_rank.json)创建HCCL配置文件。
+在Ascend设备上做单机分布式训练时，请参考[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)创建HCCL配置文件。
 
-在Ascend设备上做多机分布式训练时，训练命令需要在很短的时间间隔内在各台设备上执行。因此，每台设备上都需要准备HCCL配置文件。请参考[here](https://gitee.com/mindspore/mindspore/tree/master/config/hccl_multi_machine_multi_rank.json)创建多机的HCCL配置文件。
+在Ascend设备上做多机分布式训练时，训练命令需要在很短的时间间隔内在各台设备上执行。因此，每台设备上都需要准备HCCL配置文件。请参考[merge_hccl](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools#merge_hccl)创建多机的HCCL配置文件。
 
-如需设置数据集格式和参数，请创建JSON格式的模式配置文件，详见[TFRecord](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/dataset_loading.html#tfrecord)格式。
+如需设置数据集格式和参数，请创建JSON格式的schema配置文件，详见[TFRecord](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/dataset_loading.html#tfrecord)格式。
 
 ```text
 For pretraining, schema file contains ["input_ids", "input_mask", "segment_ids", "next_sentence_labels", "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"].
@@ -440,14 +440,14 @@ options:
 
 ## 选项及参数
 
-可以在`config.py`和`finetune_eval_config.py`文件中分别配置训练和评估参数。
+可以在yaml配置文件中分别配置预训练和下游任务的参数。
 
 ### 选项
 
 ```text
 config for lossscale and etc.
     bert_network                    BERT模型版本，可选项为base或nezha，默认为base
-    batch_size                      输入数据集的批次大小，默认为16
+    batch_size                      输入数据集的批次大小，默认为32
     loss_scale_value                损失放大初始值，默认为2^32
     scale_factor                    损失放大的更新因子，默认为2
     scale_window                    损失放大的一次更新步数，默认为1000
@@ -662,7 +662,7 @@ bash scripts/squad.sh
 - 在本地导出
 
 ```shell
-python export.py --config_path [../../*.yaml] --export_ckpt_file [CKPT_PATH] --export_file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --config_path [/path/*.yaml] --export_ckpt_file [CKPT_PATH] --export_file_name [FILE_NAME] --file_format [FILE_FORMAT]
 ```
 
 - 在ModelArts上导出
@@ -686,7 +686,7 @@ python export.py --config_path [../../*.yaml] --export_ckpt_file [CKPT_PATH] --e
 #         3. 添加 ”export_file_name=bert_ner“
 #         4. 添加 ”file_format=MINDIR“
 #         5. 添加 ”label_file_path：{path}/*.txt“('label_file_path'指相对于第7步所选文件夹的相对路径)
-#     最后必须在网页上添加 “config_path=../../*.yaml”(根据下游任务选择 *.yaml 配置文件)
+#     最后必须在网页上添加 “config_path=/path/*.yaml”(根据下游任务选择 *.yaml 配置文件)
 # (7) 在网页上勾选数据存储位置，设置“训练数据集”路径
 # (8) 在网页上设置“训练输出文件路径”、“作业日志路径”
 # (9) 在网页上的’资源池选择‘项目下， 选择单卡规格的资源
@@ -729,7 +729,7 @@ F1 0.931243
 - 导出ONNX
 
 ```shell
-python export.py --config_path [../../task_classifier_config.yaml] --file_format ["ONNX"] --export_ckpt_file [CKPT_PATH] --num_class [NUM_CLASS] --export_file_name [EXPORT_FILE_NAME]
+python export.py --config_path [/path/*.yaml] --file_format ["ONNX"] --export_ckpt_file [CKPT_PATH] --num_class [NUM_CLASS] --export_file_name [EXPORT_FILE_NAME]
 ```
 
 `CKPT_PATH`为必选项, 是某个分类任务模型训练完毕的ckpt文件路径。
@@ -741,7 +741,7 @@ python export.py --config_path [../../task_classifier_config.yaml] --file_format
 - 加载ONNX并推理
 
 ```shell
-python run_eval_onnx.py --config_path [../../task_classifier_config.yaml] --eval_data_file_path [EVAL_DATA_FILE_PATH] --export_file_name [EXPORT_FILE_NAME]
+python run_eval_onnx.py --config_path [/path/*.yaml] --eval_data_file_path [EVAL_DATA_FILE_PATH] --export_file_name [EXPORT_FILE_NAME]
 ```
 
 `EVAL_DATA_FILE_PATH`为必选项, 是该分类任务所用数据集的eval数据。
