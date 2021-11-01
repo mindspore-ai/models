@@ -72,11 +72,6 @@ def log_discretized_logistic(x, mean, logscale, inverse_bin_width):
 
     return logp
 
-# def discretized_logistic_cdf(x, mean, logscale, inverse_bin_width):
-#     scale = _exp(logscale)
-#     cdf = _sigmoid((x + 0.5 / inverse_bin_width - mean) / scale)
-#     return cdf
-
 
 def normal_cdf(value, loc, std):
     """CDF of normal distribution"""
@@ -89,11 +84,6 @@ def log_discretized_normal(x, mean, logvar, inverse_bin_width):
     log_p = _log(normal_cdf(x + 0.5 / inverse_bin_width, mean, std)
                  - normal_cdf(x - 0.5 / inverse_bin_width, mean, std) + 1e-7)
     return log_p
-
-# def discretized_normal_cdf(x, mean, logvar, inverse_bin_width):
-#     std = _exp(0.5 * logvar)
-#     cdf = normal_cdf(x + 0.5 / inverse_bin_width, mean, std)
-#     return cdf
 
 
 def log_mixture_discretized_normal(x, mean, logvar, pi, inverse_bin_width):
