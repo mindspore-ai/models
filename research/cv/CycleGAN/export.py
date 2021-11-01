@@ -16,13 +16,14 @@
 """export file."""
 
 import numpy as np
-from mindspore import Tensor
+from mindspore import context, Tensor
 from mindspore.train.serialization import export
 from src.models.cycle_gan import get_generator
 from src.utils.args import get_args
 from src.utils.tools import load_ckpt
 
 args = get_args("export")
+context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=args.device_id)
 
 if __name__ == '__main__':
     G_A = get_generator(args)
@@ -35,7 +36,7 @@ if __name__ == '__main__':
 
     input_shp = [args.export_batch_size, 3, args.image_size, args.image_size]
     input_array = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp).astype(np.float32))
-    G_A_file = f"{args.export_file_name}_BtoA"
+    G_A_file = f"{args.export_file_name}_AtoB"
     export(G_A, input_array, file_name=G_A_file, file_format=args.export_file_format)
-    G_B_file = f"{args.export_file_name}_AtoB"
+    G_B_file = f"{args.export_file_name}_BtoA"
     export(G_B, input_array, file_name=G_B_file, file_format=args.export_file_format)

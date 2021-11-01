@@ -9,7 +9,10 @@
     - [Script Parameters](#script-parameters)
     - [Training](#training-process)
     - [Evaluation](#evaluation-process)
-    - [Prediction Process](#prediction-process)
+    - [Inference Process](#inference-process)
+        - [Export MindIR](#export-mindir)
+        - [Infer on Ascend310](#infer-on-ascend)
+        - [Result](#result)
 - [Model Description](#model-description)
     - [Performance](#performance)  
         - [Training Performance](#evaluation-performance)
@@ -55,17 +58,27 @@ The entire code structure is as following:
 
 ```markdown
 .CycleGAN
-├─ README.md                           # descriptions about CycleGAN
+├─ README.md                            # descriptions about CycleGAN
 ├─ data
-  └─download_cyclegan_dataset.sh.py    # download dataset
+  └─ download_cyclegan_dataset.sh.py    # download dataset
 ├── scripts
-  └─run_train_ascend.sh                # launch ascend training(1 pcs)
-  └─run_train_standalone_gpu.sh        # launch gpu training(1 pcs)
-  └─run_train_distributed_gpu.sh       # launch gpu training(8 pcs)
-  └─run_eval_ascend.sh                 # launch ascend eval
-  └─run_eval_gpu.sh                    # launch gpu eval
+  └─ run_train_ascend.sh                # launch ascend training(1 pcs)
+  └─ run_train_standalone_gpu.sh        # launch gpu training(1 pcs)
+  └─ run_train_distributed_gpu.sh       # launch gpu training(8 pcs)
+  └─ run_eval_ascend.sh                 # launch ascend eval
+  └─ run_eval_gpu.sh                    # launch gpu eval
+  └─ run_infer_310.sh                   # launch 310 infer
 ├─ imgs
-  └─objects-transfiguration.jpg        # CycleGAN Imgs
+  └─ objects-transfiguration.jpg        # CycleGAN Imgs
+├─ ascend310_infer
+  ├─ src
+    ├─ main.cc                         # Ascend-310 inference source code
+    └─ utils.cc                        # Ascend-310 inference source code
+  ├─ inc
+    └─ utils.h                         # Ascend-310 inference source code
+  ├─ build.sh                          # Ascend-310 inference source code
+  ├─ CMakeLists.txt                    # CMakeLists of Ascend-310 inference program
+  └─ fusion_switch.cfg                 # Use BatchNorm2d instead of InstanceNorm2d
 ├─ src
   ├─ __init__.py                       # init file
   ├─ dataset
@@ -86,7 +99,9 @@ The entire code structure is as following:
     └─ tools.py                        # utils for cyclegan
 ├─ eval.py                             # generate images from A->B and B->A
 ├─ train.py                            # train script
-└─ export.py                           # export mindir script
+├─ export.py                           # export mindir script
+├─ preprocess.py                       # data preprocessing script for scend-310 inference
+└─ postprocess.py                      # data post-processing script for scend-310 inference
 ```
 
 ## [Script Parameters](#contents)
@@ -143,6 +158,38 @@ python eval.py --platform [PLATFORM] --dataroot [DATA_PATH] --G_A_ckpt [G_A_CKPT
 ```
 
 **Note: You will get the result as following in "./outputs_dir/predict".**
+
+## [Inference Process](#contents)
+
+### [Export MindIR](#contents)
+
+```bash
+python export.py --G_A_ckpt [CKPT_PATH_A] --G_B_ckpt [CKPT_PATH_A] --export_batch_size 1 --export_file_name [FILE_NAME] --export_file_format [FILE_FORMAT]
+```
+
+### [Infer on Ascend310](#contents)
+
+Before performing inference, the mindir file must be exported by `export.py`.Current batch_Size can only be set to 1.
+
+```shell
+# Ascend310 inference
+bash ./scripts/run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATA_MODE] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
+```
+
+- `DATA_PATH` is mandatory, and must specify original data path.
+- `DATA_MODE` is the translation direction of CycleGAN, it's value is 'AtoB' or 'BtoA'.
+- `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'.
+- `DEVICE_ID` is optional, default value is 0.
+
+for example, on Ascend:
+
+```bash
+bash ./scripts/run_infer_310.sh ./310_infer/CycleGAN_AtoB.mindir ./data/horse2zebra AtoB y Ascend 0
+```
+
+### [Result](#contents)
+
+Inference result is saved in current path, you can find result in infer_output_img file.
 
 # [Model Description](#contents)
 
