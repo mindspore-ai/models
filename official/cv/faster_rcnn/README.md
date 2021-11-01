@@ -109,7 +109,7 @@ Note:
 ```shell
 
 # convert checkpoint
-python convert_checkpoint.py --ckpt_file=[BACKBONE_MODEL]
+python -m src.convert_checkpoint --ckpt_file=[BACKBONE_MODEL]
 
 # standalone training
 bash run_standalone_train_ascend.sh [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)
@@ -129,7 +129,7 @@ bash run_infer_310.sh [AIR_PATH] [DATA_PATH] [ANN_FILE_PATH]
 ```shell
 
 # convert checkpoint
-python convert_checkpoint.py --ckpt_file=[BACKBONE_MODEL]
+python -m src.convert_checkpoint --ckpt_file=[BACKBONE_MODEL]
 
 # standalone training
 bash run_standalone_train_gpu.sh [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)
