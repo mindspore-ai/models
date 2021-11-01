@@ -61,13 +61,13 @@ Currently we support host-device mode with multi-dimensional partition parallel 
 1. Clone the Code
 
 ```bash
-git clone https://gitee.com/mindspore/mindspore.git
-cd mindspore/model_zoo/official/recommend/wide_and_deep
+git clone https://gitee.com/mindspore/models.git
+cd models/official/recommend/wide_and_deep
 ```
 
 2. Download the Dataset
 
-  > Please refer to [1] to obtain the download link
+  > Please refer to [1](#dataset) to obtain the download link
 
 ```bash
 mkdir -p data/origin_data && cd data/origin_data
@@ -86,13 +86,13 @@ python src/preprocess_data.py  --data_path=./data/ --dense_dim=13 --slot_dim=26 
 Once the dataset is ready, the model can be trained and evaluated on the single device(Ascend) by the command as follows:
 
 ```bash
-python train_and_eval.py --data_path=./data/mindrecord --dataset_type=mindrecord
+python train_and_eval.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=Ascend
 ```
 
 To evaluate the model, command as follows:
 
 ```bash
-python eval.py  --data_path=./data/mindrecord --dataset_type=mindrecord --ckpt_path=./ckpt/widedeep_train-15_2582.ckpt
+python eval.py  --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=Ascend --ckpt_path=./ckpt/widedeep_train-15_2582.ckpt
 ```
 
 - Running on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows)
@@ -312,7 +312,7 @@ wget DATA_LINK
 tar -zxvf dac.tar.gz
 ```
 
-> Please refer to [1] to obtain the download link
+> Please refer to [1](#dataset) to obtain the download link
 
 2. Use this script to preprocess the data
 
@@ -344,7 +344,7 @@ python src/preprocess_data.py --data_path=./syn_data/  --dense_dim=13 --slot_dim
 To train and evaluate the model, command as follows:
 
 ```python
-python train_and_eval.py
+python train_and_eval.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=Ascend
 ```
 
 ### [SingleDevice For Cache Mode](#contents)
@@ -352,7 +352,7 @@ python train_and_eval.py
 To train and evaluate the model, command as follows:
 
 ```python
-python train_and_eval.py  --vocab_size=200000  --vocab_cache_size=160000
+python train_and_eval.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=Ascend --sparse=True --vocab_size=200000 --vocab_cache_size=160000
 ```
 
 ### [Distribute Training](#contents)
@@ -402,15 +402,15 @@ bash run_parameter_server_train.sh RANK_SIZE EPOCHS DATASET RANK_TABLE_FILE SERV
 To evaluate the model, command as follows:
 
 ```python
-python eval.py
+python eval.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=Ascend --ckpt_path=./ckpt/widedeep_train-15_2582.ckpt
 ```
 
 ## Inference Process
 
 ### [Export MindIR](#contents)
 
-```shell
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```python
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --device_target [DEVICE_TARGET] --file_format [FILE_FORMAT]
 ```
 
 The ckpt_file parameter is required,
@@ -448,7 +448,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Resource                 | Ascend 910; OS Euler2.8                      | Tesla V100-PCIE 32G             | Ascend 910; OS Euler2.8                     | Ascend 910; OS Euler2.8                      |
 | Uploaded Date            | 07/05/2021 (month/day/year)     | 07/05/2021 (month/day/year)     | 07/05/2021 (month/day/year)     | 07/05/2021 (month/day/year)     |
 | MindSpore Version        | 1.3.0                           | 1.3.0                           | 1.3.0                           | 1.3.0                           |
-| Dataset                  | [1]                             | [1]                             | [1]                             | [1]                             |
+| Dataset                  | [1](#dataset)                   | [1](#dataset)                   | [1](#dataset)                   | [1](#dataset)                   |
 | Training Parameters      | Epoch=15,<br />batch_size=16000 | Epoch=15,<br />batch_size=16000 | Epoch=15,<br />batch_size=16000 | Epoch=15,<br />batch_size=16000 |
 | Optimizer                | FTRL,Adam                       | FTRL,Adam                       | FTRL,Adam                       | FTRL,Adam                       |
 | Loss Function            | SigmoidCrossEntroy              | SigmoidCrossEntroy              | SigmoidCrossEntroy              | SigmoidCrossEntroy              |

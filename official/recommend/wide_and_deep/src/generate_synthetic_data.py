@@ -16,7 +16,7 @@
 """Generate the synthetic data for wide&deep model training"""
 import time
 import numpy as np
-from .model_utils.config import config
+from src.model_utils.config import config
 
 def generate_data(output_path, label_dim, number_examples, dense_dim, slot_dim, vocabulary_size, random_slot_values):
     """

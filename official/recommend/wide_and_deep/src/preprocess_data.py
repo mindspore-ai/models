@@ -18,7 +18,7 @@ import pickle
 import collections
 import numpy as np
 from mindspore.mindrecord import FileWriter
-from .model_utils.config import config
+from src.model_utils.config import config
 
 class StatsDict():
     """preprocessed data"""
