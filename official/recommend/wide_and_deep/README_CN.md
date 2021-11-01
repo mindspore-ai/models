@@ -1,7 +1,7 @@
 ﻿# 目录
 
 - [目录](#目录)
-- [Wide&Deep概述](#widedeep概述)
+- [Wide&Deep概述](#Wide&Deep概述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [环境要求](#环境要求)
@@ -64,13 +64,13 @@ Wide&Deep模型训练了宽线性模型和深度学习神经网络，结合了�
 1. 克隆代码。
 
 ```bash
-git clone https://gitee.com/mindspore/mindspore.git
-cd mindspore/model_zoo/official/recommend/wide_and_deep
+git clone https://gitee.com/mindspore/models.git
+cd models/official/recommend/wide_and_deep
 ```
 
 2. 下载数据集。
 
-  > 请参考[1]获得下载链接。
+  > 请参考[1](#数据集)获得下载链接。
 
 ```bash
 mkdir -p data/origin_data && cd data/origin_data
@@ -89,13 +89,13 @@ python src/preprocess_data.py  --data_path=./data/ --dense_dim=13 --slot_dim=26 
 数据集准备就绪后，即可在Ascend上单机训练和评估模型。
 
 ```bash
-python train_and_eval.py --data_path=./data/mindrecord --dataset_type=mindrecord
+python train_and_eval.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=Ascend
 ```
 
 按如下操作评估模型：
 
 ```bash
-python eval.py  --data_path=./data/mindrecord --dataset_type=mindrecord --ckpt_path=./ckpt/widedeep_train-15_2582.ckpt
+python eval.py  --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=Ascend --ckpt_path=./ckpt/widedeep_train-15_2582.ckpt
 ```
 
 - 在ModelArts上运行（如果想在modelarts中运行，请查看【modelarts】官方文档（https://support.huaweicloud.com/modelarts/），如下开始训练即可）
@@ -316,7 +316,7 @@ wget DATA_LINK
 tar -zxvf dac.tar.gz
 ```
 
-> 从[1]获取下载链接。
+> 从[1](#数据集)获取下载链接。
 
 2. 使用此脚本预处理数据。
 
@@ -348,7 +348,7 @@ python src/preprocess_data.py --data_path=./syn_data/  --dense_dim=13 --slot_dim
 运行如下命令训练和评估模型：
 
 ```bash
-python train_and_eval.py
+python train_and_eval.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=Ascend
 ```
 
 ### 单机训练缓存模式
@@ -356,7 +356,7 @@ python train_and_eval.py
 运行如下命令训练和评估模型：
 
 ```bash
-python train_and_eval.py  --vocab_size=200000  --vocab_cache_size=160000
+python train_and_eval.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=Ascend --sparse=True --vocab_size=200000 --vocab_cache_size=160000
 ```
 
 ### 分布式训练
@@ -405,16 +405,8 @@ bash run_parameter_server_train.sh RANK_SIZE EPOCHS DATASET RANK_TABLE_FILE SERV
 
 运行如下命令评估模型：
 
-```bash
-python eval.py
-```
-
-## [Evaluation Process](#contents)
-
-To evaluate the model, command as follows:
-
 ```python
-python eval.py
+python eval.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=Ascend --ckpt_path=./ckpt/widedeep_train-15_2582.ckpt
 ```
 
 ## 推理过程
@@ -422,7 +414,7 @@ python eval.py
 ### [导出MindIR](#contents)
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --device_target [DEVICE_TARGET] --file_format [FILE_FORMAT]
 ```
 
 参数ckpt_file为必填项，
@@ -460,7 +452,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DATA_TYPE] [NEED_PREPROCESS]
 | 资源                 |Ascend 910；系统 Euler2.8                | Tesla V100-PCIE 32G             | Ascend 910；系统 Euler2.8                      | Ascend 910；系统 Euler2.8                      |
 | 上传日期            | 2021-07-05     |  2021-07-05    | 2021-07-05   | 2021-07-05     |
 | MindSpore版本        | 1.3.0                      | 1.3.0                          | 1.3.0                      | 1.3.0                      |
-| 数据集                  | [1]                             | [1]                             | [1]                             | [1]                             |
+| 数据集                  | [1](#数据集)                     | [1](#数据集)                       | [1](#数据集)                       | [1](#数据集)                       |
 | 训练参数      | Epoch=15,<br />batch_size=16000 | Epoch=15,<br />batch_size=16000 | Epoch=15,<br />batch_size=16000 | Epoch=15,<br />batch_size=16000 |
 | 优化器                | FTRL,Adam                       | FTRL,Adam                       | FTRL,Adam                       | FTRL,Adam                       |
 | 损失函数            | Sigmoid交叉熵              | Sigmoid交叉熵              | Sigmoid交叉熵              | Sigmoid交叉熵              |
