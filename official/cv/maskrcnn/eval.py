@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -158,10 +158,11 @@ def modelarts_process():
     config.checkpoint_path = os.path.join(config.output_path, config.ckpt_path)
     config.ann_file = os.path.join(config.coco_root, config.ann_file)
 
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=get_device_id())
-
 @moxing_wrapper(pre_process=modelarts_process)
 def eval_():
+    device_target = config.device_target
+    context.set_context(mode=context.GRAPH_MODE, device_target=device_target, device_id=get_device_id())
+
     config.mindrecord_dir = os.path.join(config.coco_root, config.mindrecord_dir)
     print('\neval.py config:\n', config)
     prefix = "MaskRcnn_eval.mindrecord"
