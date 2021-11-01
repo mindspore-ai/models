@@ -14,38 +14,36 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 3 || $# -gt 4 ]]; then
-    echo "Usage: bash run_infer_310.sh [NETWORK] [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
-    DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero.
-    NEED_PREPROCESS means weather need preprocess or not, it's value is 'y' or 'n'."
+if [[ $# -lt 2 || $# -gt 3 ]]; then
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+    NEED_PREPROCESS means weather need preprocess or not, it's value is 'y' or 'n'.
+    DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi
 
 get_real_path(){
-  if [ "${1:0:1}" == "/" ]; then
-    echo "$1"
-  else
-    echo "$(realpath -m $PWD/$1)"
-  fi
+    if [ "${1:0:1}" == "/" ]; then
+        echo "$1"
+    else
+        echo "$(realpath -m $PWD/$1)"
+    fi
 }
+model=$(get_real_path $1)
 
-network=$1
-model=$(get_real_path $2)
-if [ "$3" == "y" ] || [ "$3" == "n" ];then
-    need_preprocess=$3
+if [ "$2" == "y" ] || [ "$2" == "n" ];then
+    need_preprocess=$2
 else
   echo "weather need preprocess or not, it's value must be in [y, n]"
   exit 1
 fi
 
 device_id=0
-if [ $# == 4 ]; then
-    device_id=$4
+if [ $# == 3 ]; then
+    device_id=$3
 fi
 
-echo "network: " $network
 echo "mindir name: "$model
-echo "need preprocess or not: "$need_preprocess
+echo "need preprocess: "$need_preprocess
 echo "device id: "$device_id
 
 export ASCEND_HOME=/usr/local/Ascend/
@@ -68,25 +66,12 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-
-    BASEPATH=$(cd "`dirname $0`" || exit; pwd)
-    if [ $network == "unet" ]; then
-        config_path="${BASEPATH}/../unet_simple_config.yaml"
-    elif [ $network == "unet++" ]; then
-        config_path="${BASEPATH}/../unet_nested_cell_config.yaml"
-    else
-        echo "unsupported network"
-        exit 1
-    fi
-    python ../preprocess.py --config_path=$config_path
+    python ../preprocess.py --pre_result_path=./preprocess_Result/
 }
 
 function compile_app()
 {
-    cd ../ascend310_infer/src || exit
-    if [ -f "Makefile" ]; then
-        make clean
-    fi
+    cd ../ascend310_infer || exit
     bash build.sh &> build.log
 }
 
@@ -96,29 +81,27 @@ function infer()
     if [ -d result_Files ]; then
         rm -rf ./result_Files
     fi
-     if [ -d time_Result ]; then
+    if [ -d time_Result ]; then
         rm -rf ./time_Result
     fi
     mkdir result_Files
     mkdir time_Result
-    ../ascend310_infer/src/main --mindir_path=$model --dataset_path=./preprocess_Result/ --device_id=$device_id --need_preprocess=$need_preprocess &> infer.log
+
+    ../ascend310_infer/out/main --mindir_path=$model --input0_path=./preprocess_Result/00_d_coord --input1_path=./preprocess_Result/01_d_nlist --input2_path=./preprocess_Result/02_frames --input3_path=./preprocess_Result/03_avg --input4_path=./preprocess_Result/04_std --input5_path=./preprocess_Result/05_atype --input6_path=./preprocess_Result/06_nlist --device_id=$device_id &> infer.log
+
 }
 
 function cal_acc()
 {
-    BASEPATH=$(cd "`dirname $0`" || exit; pwd)
-    if [ $network == "unet" ]; then
-        config_path="${BASEPATH}/../unet_simple_config.yaml"
-    elif [ $network == "unet++" ]; then
-        config_path="${BASEPATH}/../unet_nested_cell_config.yaml"
-    fi
-    python ../postprocess.py --config_path=$config_path &> acc.log &
+    python ../postprocess.py --post_result_path=./result_Files &> acc.log
 }
 
-preprocess_data
-if [ $? -ne 0 ]; then
-    echo "preprocess dataset failed"
-    exit 1
+if [ $need_preprocess == "y" ]; then
+    preprocess_data
+    if [ $? -ne 0 ]; then
+        echo "preprocess dataset failed"
+        exit 1
+    fi
 fi
 compile_app
 if [ $? -ne 0 ]; then
@@ -127,7 +110,7 @@ if [ $? -ne 0 ]; then
 fi
 infer
 if [ $? -ne 0 ]; then
-    echo "execute inference failed"
+    echo " execute inference failed"
     exit 1
 fi
 cal_acc

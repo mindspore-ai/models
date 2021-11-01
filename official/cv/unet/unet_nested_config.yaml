@@ -53,7 +53,7 @@ result_path: ""
 width: 572
 height: 572
 file_name: "unet"
-file_format: "AIR"
+file_format: "MINDIR"
 
 ---
 # Help description for each configuration

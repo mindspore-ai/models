@@ -509,7 +509,7 @@ Export MindIR on local
 Before exporting, you need to modify the parameter in the configuration — checkpoint_file_path and batch_ Size . checkpoint_ file_ Path is the CKPT file path, batch_ Size is set to 1.
 
 ```shell
-python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[air_model_name] --file_format=[EXPORT_FORMAT]
+python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[model_name] --file_format=[EXPORT_FORMAT]
 ```
 
 The `checkpoint_file_path` parameter is required,
@@ -546,6 +546,8 @@ Before performing inference, the MINDIR file must be exported by export script o
 bash run_infer_310.sh [NETWORK] [MINDIR_PATH] [DEVICE_ID] [NEED_PREPROCESS]
 ```
 
+`NETWORK` Now, the supported networks are `unet` and `unet++`. The corresponding configuration files are `unet_simple_config.yaml` and `unet_nested_cell_config.yaml` respectively.
+`NEED_PREPROCESS` indicates whether data needs to be preprocessed. `y` means that data needs to be preprocessed. If `y` is selected, the dataset of `unet` is processed in the numpy format, the `unet++` validation dataset will be separated from the raw dataset for inference, and the value in `yaml` configuration file need to be set，for example，change the value of `batch_size` to 1 and set the dataset path.
 `DEVICE_ID` is optional, default value is 0.
 
 Inference result is saved in current path, you can find result in acc.log file.

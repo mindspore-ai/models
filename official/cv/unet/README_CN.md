@@ -508,7 +508,7 @@ bash scripts/run_distribute_train_gpu.sh [RANKSIZE] [DATASET] [CONFIG_PATH]
 本地导出mindir
 
 ```shell
-python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[air_model_name] --file_format=MINDIR
+python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[model_name] --file_format=MINDIR
 ```
 
 ModelArts导出mindir
@@ -537,9 +537,11 @@ ModelArts导出mindir
 
 ```shell
 # Ascend310 推理
-bash run_infer_310.sh [NETWORK] [MINDIR_PATH] [DEVICE_ID] [NEED_PREPROCESS]
+bash run_infer_310.sh [NETWORK] [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 ```
 
+`NETWORK` 目前支持的网络为unet及unet++，对应的配置文件分别为`unet_simple_config.yaml`及`unet_nested_cell_config.yaml`。
+`NEED_PREPROCESS` 表示是否需要对数据进行预处理，`y`表示需要预处理，`n`表示不需要，如果选择`y`，unet的数据集将会被处理为numpy格式，`unet++`的数据集将会分离出验证集进行推理，另外，预处理所调用的配置文件中需要修改batch_size值为1，数据集路径也需要设置。
 `DEVICE_ID` 可选，默认值为 0。
 
 推理结果保存在当前路径，可在acc.log中看到最终精度结果。

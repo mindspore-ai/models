@@ -42,7 +42,7 @@ keep_checkpoint_max: 10
 eval_activate: "Softmax"
 eval_resize: False
 checkpoint_path: "./checkpoint/"
-checkpoint_file_path: "ckpt_unet_medical_adam-4-75.ckpt"
+checkpoint_file_path: "ckpt_unet_medical_adam-4_75.ckpt"
 rst_path: "./result_Files/"
 result_path: ""
 
@@ -50,7 +50,7 @@ result_path: ""
 width: 572
 height: 572
 file_name: "unet"
-file_format: "AIR"
+file_format: "MINDIR"
 
 ---
 # Help description for each configuration
