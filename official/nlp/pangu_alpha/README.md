@@ -76,15 +76,16 @@ The above dataset is preprocessed with 1024 tokens for each example. The default
 
 ## Install Requirements
 
-The following table gives a description of the tested environment, scripts and MindSpore version.
+The following table gives a description of the tested environment, scripts and MindSpore version. **Note the model
+ supports only the graph mode**.
 
 | Parallel Mode      | MindSpore Version | GPU(V100)              | Ascend (Ascend 910)              |
 | -----------------  | ----------------- | ---------------------- | -------------------------------- |
-| data parallel      | 1.3.0 & master    | Supported              | Supported                        |
-| model parallel     | 1.3.0 & master    | Supported              | Supported                        |
-| optimizer parallel | 1.3.0 & master    | Supported              | Supported                        |
-| recompute          | 1.3.0 & master    | Supported              | Supported                        |
-| pipeline parallel  | 1.3.0 & master    | Not Supported          | Supported                        |
+| data parallel      | 1.5.0 & master    | Supported              | Supported                        |
+| model parallel     | 1.5.0 & master    | Supported              | Supported                        |
+| optimizer parallel | 1.5.0 & master    | Supported              | Supported                        |
+| recompute          | 1.5.0 & master    | Supported              | Supported                        |
+| pipeline parallel  | 1.5.0 & master    | Not Supported          | Supported                        |
 
 To obtain the pangu_alpha's script, you need `git` to clone the mindspore's code as followings:
 
@@ -300,7 +301,7 @@ ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TAR
 
 ### Preparation
 
-- Pip install MindSpore and MindSpore Serving 1.3 or later.
+- Pip install MindSpore and MindSpore Serving 1.5 or later.
 - Pip install flask, flask-apscheduler, jieba, sentencepiece and other whl package if needed.
 - Download [PanGu-Alpha repository](https://git.openi.org.cn/PCL-Platform.Intelligence/PanGu-Alpha), we will need
   `pangu-alpha/strategy_load_ckpt` and `pangu-alpha/tokenizer` in the following process.
