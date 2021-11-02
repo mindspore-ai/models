@@ -31,7 +31,7 @@ get_real_path(){
 }
 config_path=$(get_real_path "./imagenet2012_config.yaml")
 
-mpirun -n 8 --output-filename log_output --merge-stderr-to-stdout \
+mpirun --allow-run-as-root -n 8 --output-filename log_output --merge-stderr-to-stdout \
   python train.py  \
     --config_path=$config_path \
     --device_target="GPU" \
