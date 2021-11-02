@@ -90,10 +90,11 @@ Result SampleProcess::InitResource() {
     return SUCCESS;
 }
 
-Result SampleProcess::CreateModelProcessInstance(std::vector<std::string> omPaths,
-                                                 std::vector<std::string> inputDataPaths,
-                                                 std::vector<std::string> inputIdPaths,
-                                                 uint32_t batchSize) {
+Result SampleProcess::CreateModelProcessInstance(const std::vector<std::string> &omPaths,
+                                                 const std::vector<std::string> &inputDataPaths,
+                                                 const std::vector<std::string> &inputIdPaths,
+                                                 uint32_t batchSize,
+                                                 std::map<int, std::shared_ptr<ModelProcess>> *modelProcessContainer) {
     for (int i = 0; i < omPaths.size(); ++i) {
         std::cout << "om_path : " << omPaths[i]  << std::endl;
         auto processModel = std::make_shared<ModelProcess>(inputDataPaths[i], inputIdPaths[i], batchSize);
@@ -108,8 +109,7 @@ Result SampleProcess::CreateModelProcessInstance(std::vector<std::string> omPath
             ERROR_LOG("create model description failed");
             return FAILED;
         }
-
-        modelProcessContainer_.emplace(i, processModel);
+        modelProcessContainer->emplace(i, processModel);
     }
 
     return SUCCESS;
@@ -132,13 +132,15 @@ Result SampleProcess::Process(const std::vector<std::string> &omPaths,
                               const std::vector<std::string> &inputIdPaths,
                               const std::string &browsedNewsPath,
                               uint32_t batchSize) {
+    INFO_LOG("Start do sample process");
     struct timeval totalStart;
     struct timeval totalEnd;
+    std::map<int, std::shared_ptr<ModelProcess>> modelProcessContainer;
 
-    CreateModelProcessInstance(omPaths, inputDataPaths, inputIdPaths, batchSize);
+    CreateModelProcessInstance(omPaths, inputDataPaths, inputIdPaths, batchSize, &modelProcessContainer);
 
-    uint32_t fileNum = modelProcessContainer_[0]->ReadFiles();
-    std::string historyDir = modelProcessContainer_[1]->GetInputDataPath() + "/00_history_data";
+    uint32_t fileNum = modelProcessContainer[0]->ReadFiles();
+    std::string historyDir = modelProcessContainer[1]->GetInputDataPath() + "/00_history_data";
     std::vector<std::string> historyFile = Utils::GetAllBins(historyDir);
 
     size_t historySize = historyFile.size();
@@ -147,12 +149,12 @@ Result SampleProcess::Process(const std::vector<std::string> &omPaths,
     uint32_t browsedFileNum = ReadBrowsedData(browsedNewsPath);
 
     gettimeofday(&totalStart, NULL);
-    modelProcessContainer_[0]->ExecuteWithFile(fileNum);
+    modelProcessContainer[0]->ExecuteWithFile(fileNum);
 
-    std::map<int, void *> result = modelProcessContainer_[0]->GetResult();
+    std::map<int, void *> result = modelProcessContainer[0]->GetResult();
 
-    std::vector<uint32_t> model1OutputBuffSize = modelProcessContainer_[0]->GetOutputSize();
-    std::vector<uint32_t> inputBuffSize = modelProcessContainer_[1]->GetInputSize();
+    std::vector<uint32_t> model1OutputBuffSize = modelProcessContainer[0]->GetOutputSize();
+    std::vector<uint32_t> inputBuffSize = modelProcessContainer[1]->GetInputSize();
 
     uint32_t singleDatsSize = model1OutputBuffSize[0] / batchSize;
     void* browedNews = NULL;
@@ -173,19 +175,21 @@ Result SampleProcess::Process(const std::vector<std::string> &omPaths,
                 }
             }
         }
-        modelProcessContainer_[1]->CpyDataToDevice(browedNews, inputBuffSize[0], 0);
-        modelProcessContainer_[1]->Execute(i);
+        modelProcessContainer[1]->CpyDataToDevice(browedNews, inputBuffSize[0], 0);
+        modelProcessContainer[1]->Execute(i);
         gettimeofday(&end, NULL);
         startTime_ms = (1.0 * start.tv_sec * 1000000 + start.tv_usec) / 1000;
         endTime_ms = (1.0 * end.tv_sec * 1000000 + end.tv_usec) / 1000;
         secondModelCostTime_map_.insert(std::pair<double, double>(startTime_ms, endTime_ms));
     }
 
-    GetPred(browsedFileNum);
+    GetPred(&modelProcessContainer, browsedFileNum);
     gettimeofday(&totalEnd, NULL);
     startTime_ms = (1.0 * totalStart.tv_sec * 1000000 + totalStart.tv_usec) / 1000;
     endTime_ms = (1.0 * totalEnd.tv_sec * 1000000 + totalEnd.tv_usec) / 1000;
     totalCostTime_map_.insert(std::pair<double, double>(startTime_ms, endTime_ms));
+    time_cost_.clear();
+    time_cost_.emplace_back(modelProcessContainer[0]->GetCostTimeInfo());
     aclrtFreeHost(browedNews);
     return SUCCESS;
 }
@@ -221,9 +225,10 @@ uint32_t SampleProcess::ReadBrowsedData(const std::string &browsedNewsPath) {
     return fileNum;
 }
 
-Result SampleProcess::GetPred(uint32_t fileNum) {
-    std::map<int, void *> newsEncodeResult = modelProcessContainer_[0]->GetResult();
-    std::map<int, void *> userEncodeResult = modelProcessContainer_[1]->GetResult();
+Result SampleProcess::GetPred(std::map<int, std::shared_ptr<ModelProcess>> *modelProcessContainer,
+                              uint32_t fileNum) {
+    std::map<int, void *> newsEncodeResult = (*modelProcessContainer)[0]->GetResult();
+    std::map<int, void *> userEncodeResult = (*modelProcessContainer)[1]->GetResult();
 
     uint32_t perThreadNum = fileNum / threadNum_;
     std::vector<std::thread> threads;
@@ -332,9 +337,6 @@ void SampleProcess::DestroyResource() {
 }
 
 std::vector<std::string> SampleProcess::GetModelExecCostTimeInfo() {
-    std::vector<std::string> result;
-
-    result.emplace_back(modelProcessContainer_[0]->GetCostTimeInfo());
     double secondModelAverage = 0.0;
     int infer_cnt = 0;
 
@@ -348,12 +350,12 @@ std::vector<std::string> SampleProcess::GetModelExecCostTimeInfo() {
     std::stringstream timeCost;
     timeCost << "second model inference cost average time: "<< secondModelAverage <<
         " ms of infer_count " << infer_cnt << std::endl;
-    result.emplace_back(timeCost.str());
+    time_cost_.emplace_back(timeCost.str());
 
     double totalCostTime = totalCostTime_map_.begin()->second - totalCostTime_map_.begin()->first;
     std::stringstream totalTimeCost;
     totalTimeCost << "total inference cost time: "<< totalCostTime << " ms; count " << infer_cnt << std::endl;
-    result.emplace_back(totalTimeCost.str());
+    time_cost_.emplace_back(totalTimeCost.str());
 
-    return result;
+    return time_cost_;
 }

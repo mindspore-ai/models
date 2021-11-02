@@ -14,6 +14,7 @@
         - [训练过程](#训练过程)
         - [评估过程](#评估过程)
         - [MINDIR模型导出过程](#MINDIR模型导出过程)
+        - [Ascend310推理过程](#Ascend310推理过程)
     - [模型描述](#模型描述)
         - [性能](#性能)
     - [随机情况说明](#随机情况说明)
@@ -113,6 +114,7 @@ bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt
   | ├─run_export.sh               # 模型导出运行脚本
   | ├─run_eval.sh                 # 评估运行脚本
   | ├─run_distributed_train.sh    # 多卡训练脚本
+  | ├─run_infer_310.sh            # Ascend310推理脚本
   | └─run_standalone_train.sh     # 单卡训练脚本
   |
   ├─src
@@ -125,6 +127,8 @@ bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt
   ├─requirements.txt                # 依赖包
   ├─train.py                        # 训练
   ├─eval.py                         # 评估
+  ├─preprocess.py                   # 预处理
+  ├─postprocess.py                  # 后处理
   └─export.py                       # 模型导出
 ```
 
@@ -230,9 +234,34 @@ sgcn.mindir exported successfully!
 ==========================================
 ```
 
+### Ascend310推理过程
+
+#### 运行
+
+在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用mindir模型执行推理的示例。注意，对不同数据集的精度指标进行推理时，需要修改`postprocess.py`文件中对应的`checkpoint`参数。
+
+```shell
+# Ascend310 推理
+bash ./scripts/run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+```
+
+- `DATASET_NAME` 表示数据集名称，取值范围： ['bitcoin-alpha', 'bitcoin-otc']。
+- `NEED_PREPROCESS` 表示数据是否需要预处理，取值范围：'y' 或者 'n'。
+- `DEVICE_ID` 可选，默认值为0。
+
+#### 结果
+
+推理结果保存在脚本执行的当前路径，你可以在`acc.log`中看到以下精度计算结果，这里以bitcoin-otc数据集为例。
+
+```text
+==========================================
+Test set results: auc= 0.87464 f1= 0.93635
+==========================================
+```
+
 ## 模型描述
 
-### 性能
+### Ascend910性能
 
 | 参数                 | SGCN                                                            |
 | -------------------------- | -------------------------------------------------------------- |
@@ -246,6 +275,21 @@ sgcn.mindir exported successfully!
 | AUC                   | 0.8663 / 0.7979                                                      |
 | F1-Score             | 0.9309 / 0.9527                                                    |
 | 脚本                    | [SGCN](https://gitee.com/mindspore/models/tree/master/research/gnn/sgcn) |
+
+### Ascend310性能
+
+| 参数          | SGCN                                                         |
+| ------------- | ------------------------------------------------------------ |
+| 资源          | Ascend 310服务器                                             |
+| 上传日期      | 2021-11-01                                                   |
+| MindSpore版本 | 1.3.0                                                        |
+| 数据集        | Bitcoin-OTC / Bitcoin-Alpha                                  |
+| 训练参数      | epoch=500, lr=0.01, weight_decay=1e-5                        |
+| 优化器        | Adam                                                         |
+| 损失函数      | Softmax交叉熵                                                |
+| AUC           | 0.8746 / 0.8227                                              |
+| F1-Score      | 0.9363 / 0.9543                                              |
+| 脚本          | [SGCN](https://gitee.com/mindspore/models/tree/master/research/gnn/sgcn) |
 
 ## 随机情况说明
 
