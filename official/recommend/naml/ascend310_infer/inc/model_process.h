@@ -83,8 +83,6 @@ class ModelProcess {
     std::vector<uint32_t> outputBuffSize_;
 
     std::map<int, void *> result_;
-    std::vector<void *> resultMem_;
-    std::vector<void *> fileBuffMem_;
     std::string inputDataPath_;
     std::string idFilePath_;
     std::vector<std::vector<void *>> fileBuff_;
