@@ -99,7 +99,7 @@ Dataset used: [ImageNet2012](http://www.image-net.org/)
 
  ```bash
 └─dataset
-    ├─ilsvrc                # train dataset
+    ├─train                 # train dataset
     └─validation_preprocess # evaluate dataset
 ```
 
@@ -123,6 +123,11 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 # [Quick Start](#contents)
 
 After installing MindSpore via the official website, you can start training and evaluation as follows:
+
+> - <font size=2>During training, if CIFAR-10 dataset is used, DATASET_PATH={CIFAR-10 directory}/cifar-10-batches-bin;</font>
+>   <font size=2>If you are using ImageNet2012 dataset, DATASET_PATH={ImageNet2012 directory}/train</font>
+> - <font size=2>During evaluating and inferring, if CIFAR-10 dataset is used, DATASET_PATH={CIFAR-10 directory}/cifar-10-verify-bin;</font>
+>   <font size=2>If you are using ImageNet2012 dataset, DATASET_PATH={ImageNet2012 directory}/validation_preprocess</font>
 
 - Running on Ascend
 

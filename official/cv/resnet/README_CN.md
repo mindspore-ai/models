@@ -95,7 +95,7 @@ ResNet的总体网络架构如下：
 
  ```text
 └─dataset
-    ├─ilsvrc                # 训练数据集
+    ├─train                 # 训练数据集
     └─validation_preprocess # 评估数据集
 ```
 
@@ -120,6 +120,11 @@ ResNet的总体网络架构如下：
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
+> - <font size=2>训练时，如果使用CIFAR-10数据集, DATASET_PATH={CIFAR-10路径}/cifar-10-batches-bin;</font>
+>   <font size=2>如果使用ImageNet2012数据集, DATASET_PATH={ImageNet2012路径}/train</font>
+> - <font size=2>评估和推理时，如果使用CIFAR-10数据集, DATASET_PATH={CIFAR-10路径}/cifar-10-verify-bin;</font>
+>   <font size=2>如果使用ImageNet2012数据集, DATASET_PATH={ImageNet2012路径}/validation_preprocess</font>
+
 - Ascend处理器环境运行
 
 ```text
@@ -131,6 +136,7 @@ ResNet的总体网络架构如下：
 
 # 运行评估示例
 用法：bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
+
 ```
 
 - GPU处理器环境运行
@@ -151,7 +157,7 @@ bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]  [CONFIG_PATH]
 
 ```python
 # 在modelarts上使用分布式训练的示例：
-# (1) 选址a或者b其中一种方式。
+# (1) 选择a或者b其中一种方式。
 #       a. 设置 "enable_modelarts=True" 。
 #          在yaml文件上设置网络所需的参数。
 #       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
@@ -165,7 +171,7 @@ bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]  [CONFIG_PATH]
 
 # 在modelarts上使用模型推理的示例
 # (1) 把训练好的模型地方到桶的对应位置。
-# (2) 选址a或者b其中一种方式。
+# (2) 选择a或者b其中一种方式。
 #       a. 设置 "enable_modelarts=True"
 #          设置 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt" 在 yaml 文件.
 #          设置 "checkpoint_url=/The path of checkpoint in S3/" 在 yaml 文件.
@@ -589,7 +595,7 @@ ModelArts导出mindir
 
 ```python
 # (1) 把训练好的模型地方到桶的对应位置。
-# (2) 选址a或者b其中一种方式。
+# (2) 选择a或者b其中一种方式。
 #       a. 设置 "enable_modelarts=True"
 #          设置 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt" 在 yaml 文件。
 #          设置 "checkpoint_url=/The path of checkpoint in S3/" 在 yaml 文件。
