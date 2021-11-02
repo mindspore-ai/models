@@ -56,7 +56,12 @@ class LossCallBack(Callback):
 
     def step_end(self, run_context):
         cb_params = run_context.original_args()
-        loss = cb_params.net_outputs.asnumpy()
+        loss = cb_params.net_outputs
+        if isinstance(loss, (tuple, list)):
+            if isinstance(loss[0], Tensor) and isinstance(loss[0].asnumpy(), np.ndarray):
+                loss = loss[0].asnumpy()
+        else:
+            loss = loss.asnumpy()
         cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
 
         self.count += 1
