@@ -165,6 +165,8 @@ The entire code structure is as following:
 
 - Distribute mode (recommended)
 
+    Note the distribute mode(HYBRID MODE) can be run only on graph mode.
+
     # Distribute training on Ascend
 
     ```bash
