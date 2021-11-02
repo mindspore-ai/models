@@ -75,17 +75,6 @@ void ModelProcess::DestroyResource() {
     DestroyDesc();
     DestroyInput();
     DestroyOutput();
-    for (auto addr : resultMem_) {
-        if (addr != nullptr) {
-            aclrtFreeHost(addr);
-        }
-    }
-
-    for (auto addr : fileBuffMem_) {
-        if (addr != nullptr) {
-            aclrtFreeHost(addr);
-        }
-    }
     return;
 }
 
@@ -272,6 +261,7 @@ void ModelProcess::OutputModelResult() {
             ret = aclrtMemcpy(outHostData, len, data, len, ACL_MEMCPY_DEVICE_TO_HOST);
             if (ret != ACL_ERROR_NONE) {
                 ERROR_LOG("aclrtMemcpy failed, ret[%d]", ret);
+                (void)aclrtFreeHost(outHostData);
                 return;
             }
 
@@ -375,7 +365,6 @@ void ModelProcess::CpyOutputFromDeviceToHost(uint32_t index) {
             ERROR_LOG("aclrtMallocHost failed, ret[%d]", ret);
             return;
         }
-        resultMem_.emplace_back(outHostData);
         ret = aclrtMemcpy(outHostData, bufferSize, data, bufferSize, ACL_MEMCPY_DEVICE_TO_HOST);
         if (ret != ACL_ERROR_NONE) {
             ERROR_LOG("aclrtMemcpy failed, ret[%d]", ret);
@@ -407,7 +396,6 @@ std::vector<std::vector<void *>> ModelProcess::ReadInputFiles(std::vector<std::v
         for (int j = 0; j < fileNum; ++j) {
             inputHostBuff = Utils::ReadBinFile(inputFiles[i][j], &inputHostBuffSize);
             buff[i].emplace_back(inputHostBuff);
-            fileBuffMem_.emplace_back(inputHostBuff);
             (*fileSize)[i].emplace_back(inputHostBuffSize);
         }
     }
