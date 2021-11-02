@@ -43,5 +43,4 @@ def parameter_parser():
     parser.add_argument('--device_id', type=int, default=0, help='device id of Ascend (Default: 0)')
     parser.add_argument("--data_path", type=str, default="data/MNIST_Data/", help="dataset path")
     parser.add_argument("--distribute", type=bool, default=False, help="Run distribute, default is false.")
-
     return parser.parse_args()

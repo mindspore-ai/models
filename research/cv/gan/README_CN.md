@@ -107,6 +107,26 @@ bash ./scripts/run_eval.sh [DEVICE_ID]
   bash ./scripts/run_eval.sh 0
   ```
 
+# 310推理
+
+- 生成.mindir文件
+
+  ```bash
+  python export.py
+
+  ```
+
+- 执行310推理脚本
+
+  ```bash
+  bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
+
+  示例：
+
+  bash run_infer_310.sh /home/gan3/output.mindir /home/gan3/data/MNIST_Data/ 0
+
+  ```
+
 # 脚本说明
 
 ## 脚本及样例代码
@@ -115,19 +135,26 @@ bash ./scripts/run_eval.sh [DEVICE_ID]
 ├──gan
     ├── README_CN.md           # README
     ├── requirements.txt       # required modules
-    ├─scripts                  # shell script
+    ├── scripts                  # shell script
         ├─run_standalone_train.sh            # training in standalone mode
         ├─run_distributed_train.sh    # training in parallel mode
         ├─export.sh            # export checkpoints into mindir model
-        └─run_eval.sh          # evaluation
-    ├─ src
+        ├─run_eval.sh          # evaluation
+        └─run_infer_310.sh     # 310 inference
+    ├── src
         ├─loss.py              # loss function
         ├─gan.py               # define the construction of gan
         ├─param_parse.py       # parameter parser
         └─dataset.py           # dataset create
+    ├── ascend310_infer         # 310 inference
+        ├─ main.cc             # 310 inference
+        ├─ CMakeLists.txt      # compile
+        └─ build.sh            # script of main.cc
     ├── train.py               # train model
     ├── export.py              # export checkpoints into mindir model
-    ├── eval.py                # test model
+    ├── preprocess.py       # fixed noise
+    ├── postprocess.py      # eval the result of 310 infer
+    └── eval.py                # test model
 ```
 
 ## 训练过程
