@@ -108,7 +108,7 @@ Faster R-CNN是一个两阶段目标检测网络，该网络采用RPN，可以�
 ```shell
 
 # 权重文件转换
-python convert_checkpoint.py --ckpt_file=[BACKBONE_MODEL]
+python -m src.convert_checkpoint --ckpt_file=[BACKBONE_MODEL]
 
 # 单机训练
 sh run_standalone_train_ascend.sh [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)
@@ -128,7 +128,7 @@ sh run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
 ```shell
 
 # 权重文件转换
-python convert_checkpoint.py --ckpt_file=[BACKBONE_MODEL]
+python -m src.convert_checkpoint --ckpt_file=[BACKBONE_MODEL]
 
 # 单机训练
 sh run_standalone_train_gpu.sh [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)

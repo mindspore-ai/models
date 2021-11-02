@@ -82,7 +82,7 @@ GCN包含两个图卷积层。每一层以节点特征和邻接矩阵为输入�
 
 ```buildoutcfg
 cd ./scripts
-# SRC_PATH为下载的数据集文件路径，DATASET_NAME为Cora或Citeseer
+# SRC_PATH为下载的数据集文件路径，DATASET_NAME为cora或Citeseer
 sh run_process_data.sh [SRC_PATH] [DATASET_NAME]
 ```
 
