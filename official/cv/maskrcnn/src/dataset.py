@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,10 @@ from mindspore.mindrecord import FileWriter
 
 from .model_utils.config import config
 
+if config.device_target == "Ascend":
+    np_cast_type = np.float16
+else:
+    np_cast_type = np.float32
 
 def bbox_overlaps(bboxes1, bboxes2, mode='iou'):
     """Calculate the ious between each bbox of bboxes1 and bboxes2.
@@ -300,9 +304,9 @@ def flip_column(img, img_shape, gt_bboxes, gt_label, gt_num, gt_mask):
 def transpose_column(img, img_shape, gt_bboxes, gt_label, gt_num, gt_mask):
     """transpose operation for image"""
     img_data = img.transpose(2, 0, 1).copy()
-    img_data = img_data.astype(np.float16)
-    img_shape = img_shape.astype(np.float16)
-    gt_bboxes = gt_bboxes.astype(np.float16)
+    img_data = img_data.astype(np_cast_type)
+    img_shape = img_shape.astype(np_cast_type)
+    gt_bboxes = gt_bboxes.astype(np_cast_type)
     gt_label = gt_label.astype(np.int32)
     gt_num = gt_num.astype(np.bool)
     gt_mask_data = gt_mask.astype(np.bool)

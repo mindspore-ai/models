@@ -14,10 +14,12 @@
         - [Parameters Configuration](#parameters-configuration)
     - [Training Process](#training-process)
         - [Training](#training)
-        - [Distributed Training](#distributed-training)
+        - [Distributed Training Ascend](#distributed-training-ascend)
+        - [Distributed Training GPU](#distributed-training-gpu)
         - [Training Result](#training-result)
     - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+        - [Evaluation Ascend](#evaluation-ascend)
+        - [Evaluation GPU](#evaluation-gpu)
         - [Evaluation result](#evaluation-result)
     - [Model Export](#model-export)
     - [Inference Process](#inference-process)
@@ -26,7 +28,8 @@
     - [Post Training Quantization](#post-training-quantization)
 - [Model Description](#model-description)
     - [Performance](#performance)
-        - [Evaluation Performance](#evaluation-performance)
+        - [Evaluation Performance Ascend](#evaluation-performance-ascend)
+        - [Evaluation Performance GPU](#evaluation-performance-gpu)
         - [Inference Performance](#inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
@@ -58,8 +61,9 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 
 # [Environment Requirements](#contents)
 
-- Hardware（Ascend）
-    - Prepare hardware environment with Ascend processor.
+- Hardware（Ascend or GPU）
+    - Prepare hardware environment with Ascend processor or
+    - Prepare hardware environment with GPU and CUDA.
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - Docker base image
@@ -102,13 +106,16 @@ pip install mmcv=0.2.14
     Each row is an image annotation split by spaces. The first column is a relative path of image, followed by columns containing box and class information in the format [xmin,ymin,xmax,ymax,class]. We read image from an image path joined by the `IMAGE_DIR`(dataset directory) and the relative path in `ANNO_PATH`(the TXT file path), which can be set in `config.py`.
 
 3. Execute train script.
-    After dataset preparation, you can start training as follows:
+    After dataset preparation, you can start training on Ascend as follows:
 
     ```
-    # distributed training
-    bash run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_CKPT]
+    # distributed training on Ascend
+    bash run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_PATH] [DATA_PATH]
 
-    # standalone training
+    # distributed training on GPU
+    bash run_distribute_train_gpu.sh [PRETRAINED_CKPT] [DATA_PATH]
+
+    # standalone training on Ascend
     bash run_standalone_train.sh [PRETRAINED_CKPT]
     ```
 
@@ -119,11 +126,11 @@ pip install mmcv=0.2.14
     4. For large models like MaskRCNN, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 
 4. Execute eval script.
-   After training, you can start evaluation as follows:
+   After training, set device_target: "Ascend" or "GPU" in default_config.yaml, then you can start evaluation as follows:
 
    ```shell
-   # Evaluation
-   bash run_eval.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH]
+   # Evaluation on Ascend/GPU
+   bash run_eval.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [DATA_PATH]
    ```
 
    Note:
@@ -331,8 +338,9 @@ bash run_eval.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [DATA_PATH]
   ├─README.md                             # README
   ├─ascend310_infer                       #application for 310 inference
   ├─scripts                               # shell script
-    ├─run_standalone_train.sh             # training in standalone mode(1pcs)
-    ├─run_distribute_train.sh             # training in parallel mode(8 pcs)
+    ├─run_standalone_train.sh             # training in standalone mode on ascend(1pcs)
+    ├─run_distribute_train.sh             # training in parallel mode on ascend(8 pcs)
+    ├─run_distribute_train_gpu.sh         # training in parallel mode on gpu(8 pcs)
     ├─run_infer_310.sh                    #shell script for 310 inference
     └─run_eval.sh                         # evaluation
   ├─src
@@ -372,8 +380,11 @@ bash run_eval.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [DATA_PATH]
 ### [Training Script Parameters](#contents)
 
 ```shell
-# distributed training
-Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL]
+# distributed training on ascend
+Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_PATH] [DATA_PATH]
+
+# distributed training on gpu
+Usage: bash run_distribute_train_gpu.sh [PRETRAINED_MODEL] [DATA_PATH]
 
 # standalone training
 Usage: bash run_standalone_train.sh [PRETRAINED_MODEL]
@@ -539,12 +550,12 @@ Usage: bash run_standalone_train.sh [PRETRAINED_MODEL]
 bash run_standalone_train.sh [PRETRAINED_MODEL]
 ```
 
-### [Distributed Training](#content)
+### [Distributed Training Ascend](#content)
 
 - Run `run_distribute_train.sh` for distributed training of Mask model.
 
 ```bash
-bash run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL]
+bash run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_PATH] [DATA_PATH]
 ```
 
 - Notes
@@ -579,6 +590,14 @@ bash run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL]
 
 3. This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 
+### [Distributed Training GPU](#content)
+
+- Run `run_distribute_train_gpu.sh` for distributed training of Mask model on gpu.
+
+```bash
+bash run_distribute_train_gpu.sh [PRETRAINED_MODEL] [DATA_PATH]
+```
+
 ### [Training Result](#content)
 
 Training result will be stored in the example path, whose folder name begins with "train" or "train_parallel". You can find checkpoint file together with result like the following in loss_rankid.log.
@@ -596,19 +615,30 @@ epoch: 12 step: 7393 ,rpn_loss: 0.00547, rcnn_loss: 0.39258, rpn_cls_loss: 0.002
 
 ## [Evaluation Process](#contents)
 
-### [Evaluation](#content)
+### [Evaluation Ascend](#content)
 
-- Run `run_eval.sh` for evaluation.
+- Set device_target: "Ascend" in default_config.yaml for evaluation on Ascend.
 
 ```bash
 # infer
-bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH]
+bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH]
 ```
 
 > As for the COCO2017 dataset, VALIDATION_ANN_FILE_JSON is refer to the annotations/instances_val2017.json in the dataset directory.  
 > checkpoint can be produced and saved in training process, whose folder name begins with "train/checkpoint" or "train_parallel*/checkpoint".
 >
 > Images size in dataset should be equal to the annotation size in VALIDATION_ANN_FILE_JSON, otherwise the evaluation result cannot be displayed properly.
+
+### [Evaluation GPU](#content)
+
+- Set device_target: "GPU" in default_config.yaml for evaluation on GPU.
+
+```bash
+# infer
+bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH]
+```
+
+>Result will be in eval/log_eval.txt.
 
 ### [Evaluation result](#content)
 
@@ -771,24 +801,24 @@ Accumulating evaluation results...
 
 ### Evaluation Performance
 
-| Parameters                 | Ascend                                                      |
-| -------------------------- | ----------------------------------------------------------- |
-| Model Version              | V1                                                          |
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8             |
-| uploaded Date              | 07/05/2021 (month/day/year)                                 |
-| MindSpore Version          | 1.3.0                                                       |
-| Dataset                    | COCO2017                                                    |
-| Training Parameters        | epoch=12,  batch_size = 2                                   |
-| Optimizer                  | SGD                                                         |
-| Loss Function              | Softmax Cross Entropy, Sigmoid Cross Entropy, SmoothL1Loss  |
-| Output                     | Probability                                                 |
-| Loss                       | 0.39804                                                     |
-| Speed                      | 1pc: 193 ms/step;  8pcs: 207 ms/step                        |
-| Total time                 | 1pc: 46 hours;  8pcs: 5.38 hours                            |
-| Parameters (M)             | 84.8                                                        |
-| Checkpoint for Fine tuning | 85M(.ckpt file)                                             |
-| Model for inference        | 571M(.air file)                                             |
-| Scripts                    | [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/maskrcnn) |
+| Parameters                 | Ascend                                                      | GPU                                                         |
+| -------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------- |
+| Model Version              | V1                                                          | V1                                                          |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | GPU(Tesla V100-PCIE); CPU 2.60 GHz, 26 cores; Memory 790G; OS Euler2.0 |
+| uploaded Date              | 07/05/2021 (month/day/year)                                 | 08/30/2021 (month/day/year)                                 |
+| MindSpore Version          | 1.3.0                                                       | 1.5.0                                                       |
+| Dataset                    | COCO2017                                                    | COCO2017                                                    |
+| Training Parameters        | epoch=12,  batch_size = 2                                   | epoch=12,  batch_size = 2                                   |
+| Optimizer                  | Momentum                                                    | Momentum                                                    |
+| Loss Function              | Softmax Cross Entropy, Sigmoid Cross Entropy, SmoothL1Loss  | Softmax Cross Entropy, Sigmoid Cross Entropy, SmoothL1Loss  |
+| Output                     | Probability                                                 | Probability                                                 |
+| Loss                       | 0.39804                                                     | 0.16566                                                     |
+| Speed                      | 1pc: 193 ms/step;  8pcs: 207 ms/step                        | 8pcs: 754 ms/step                                           |
+| Total time                 | 1pc: 46 hours;  8pcs: 5.38 hours                            | 8pcs: 17.5 hours                                            |
+| Parameters (M)             | 84.8                                                        | 84.8                                                        |
+| Checkpoint for Fine tuning | 85M(.ckpt file)                                             | 85M(.ckpt file)                                             |
+| Model for inference        | 571M(.air file)                                             | N/A                                                         |
+| Scripts                    | [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/maskrcnn) | [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/maskrcnn) |
 
 ### Inference Performance
 

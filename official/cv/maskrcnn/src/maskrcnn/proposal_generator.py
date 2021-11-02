@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ import mindspore.nn as nn
 import mindspore.common.dtype as mstype
 from mindspore.ops import operations as P
 from mindspore import Tensor
+from mindspore import context
 
 
 class Proposal(nn.Cell):
@@ -50,6 +51,14 @@ class Proposal(nn.Cell):
                  ):
         super(Proposal, self).__init__()
         cfg = config
+
+        if context.get_context("device_target") == "Ascend":
+            self.cast_type = mstype.float16
+            self.np_cast_type = np.float16
+        else:
+            self.cast_type = mstype.float32
+            self.np_cast_type = np.float32
+
         self.batch_size = batch_size
         self.num_classes = num_classes
         self.target_means = target_means
@@ -102,7 +111,7 @@ class Proposal(nn.Cell):
         self.tile = P.Tile()
         self.set_train_local(config, training=True)
 
-        self.multi_10 = Tensor(10.0, mstype.float16)
+        self.multi_10 = Tensor(10.0, self.cast_type)
 
     def set_train_local(self, config, training=True):
         """Set training flag."""
@@ -129,7 +138,7 @@ class Proposal(nn.Cell):
         self.topKv2 = P.TopK(sorted=True)
         self.topK_shape_stage2 = (self.max_num, 1)
         self.min_float_num = -65536.0
-        self.topK_mask = Tensor(self.min_float_num * np.ones(total_max_topk_input, np.float16))
+        self.topK_mask = Tensor(self.min_float_num * np.ones(total_max_topk_input, self.np_cast_type))
 
     def construct(self, rpn_cls_score_total, rpn_bbox_pred_total, anchor_list):
         proposals_tuple = ()
@@ -160,16 +169,16 @@ class Proposal(nn.Cell):
 
             rpn_cls_score = self.reshape(rpn_cls_score, self.reshape_shape)
             rpn_cls_score = self.activation(rpn_cls_score)
-            rpn_cls_score_process = self.cast(self.squeeze(rpn_cls_score[::, 0::]), mstype.float16)
+            rpn_cls_score_process = self.cast(self.squeeze(rpn_cls_score[::, 0::]), self.cast_type)
 
-            rpn_bbox_pred_process = self.cast(self.reshape(rpn_bbox_pred, (-1, 4)), mstype.float16)
+            rpn_bbox_pred_process = self.cast(self.reshape(rpn_bbox_pred, (-1, 4)), self.cast_type)
 
             scores_sorted, topk_inds = self.topKv2(rpn_cls_score_process, self.topK_stage1[idx])
 
             topk_inds = self.reshape(topk_inds, self.topK_shape[idx])
 
             bboxes_sorted = self.gatherND(rpn_bbox_pred_process, topk_inds)
-            anchors_sorted = self.cast(self.gatherND(anchors, topk_inds), mstype.float16)
+            anchors_sorted = self.cast(self.gatherND(anchors, topk_inds), self.cast_type)
 
             proposals_decode = self.decode(anchors_sorted, bboxes_sorted)
 
@@ -184,7 +193,7 @@ class Proposal(nn.Cell):
 
         _, _, _, _, scores = self.split(proposals)
         scores = self.squeeze(scores)
-        topk_mask = self.cast(self.topK_mask, mstype.float16)
+        topk_mask = self.cast(self.topK_mask, self.cast_type)
         scores_using = self.select(masks, scores, topk_mask)
 
         _, topk_inds = self.topKv2(scores_using, self.max_num)

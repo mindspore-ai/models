@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import numpy as np
 import mindspore.nn as nn
 from mindspore.ops import operations as P
 from mindspore.common.tensor import Tensor
+from mindspore import context
 import mindspore.common.dtype as mstype
 
 
@@ -45,12 +46,20 @@ class BboxAssignSample(nn.Cell):
     def __init__(self, config, batch_size, num_bboxes, add_gt_as_proposals):
         super(BboxAssignSample, self).__init__()
         cfg = config
+
+        if context.get_context("device_target") == "Ascend":
+            self.cast_type = mstype.float16
+            self.np_cast_type = np.float16
+        else:
+            self.cast_type = mstype.float32
+            self.np_cast_type = np.float32
+
         self.batch_size = batch_size
 
-        self.neg_iou_thr = Tensor(cfg.neg_iou_thr, mstype.float16)
-        self.pos_iou_thr = Tensor(cfg.pos_iou_thr, mstype.float16)
-        self.min_pos_iou = Tensor(cfg.min_pos_iou, mstype.float16)
-        self.zero_thr = Tensor(0.0, mstype.float16)
+        self.neg_iou_thr = Tensor(cfg.neg_iou_thr, self.cast_type)
+        self.pos_iou_thr = Tensor(cfg.pos_iou_thr, self.cast_type)
+        self.min_pos_iou = Tensor(cfg.min_pos_iou, self.cast_type)
+        self.zero_thr = Tensor(0.0, self.cast_type)
 
         self.num_bboxes = num_bboxes
         self.num_gts = cfg.num_gts
@@ -92,10 +101,9 @@ class BboxAssignSample(nn.Cell):
         self.assigned_pos_ones = Tensor(np.array(np.ones(self.num_expected_pos), dtype=np.int32))
 
         self.check_neg_mask = Tensor(np.array(np.ones(self.num_expected_neg - self.num_expected_pos), dtype=np.bool))
-        self.range_pos_size = Tensor(np.arange(self.num_expected_pos).astype(np.float16))
-        self.check_gt_one = Tensor(np.array(-1 * np.ones((self.num_gts, 4)), dtype=np.float16))
-        self.check_anchor_two = Tensor(np.array(-2 * np.ones((self.num_bboxes, 4)), dtype=np.float16))
-
+        self.range_pos_size = Tensor(np.arange(self.num_expected_pos).astype(self.np_cast_type))
+        self.check_gt_one = Tensor(np.array(-1 * np.ones((self.num_gts, 4)), dtype=self.np_cast_type))
+        self.check_anchor_two = Tensor(np.array(-2 * np.ones((self.num_bboxes, 4)), dtype=self.np_cast_type))
 
     def construct(self, gt_bboxes_i, gt_labels_i, valid_mask, bboxes, gt_valids):
         gt_bboxes_i = self.select(self.cast(self.tile(self.reshape(self.cast(gt_valids, mstype.int32), \
@@ -129,7 +137,7 @@ class BboxAssignSample(nn.Cell):
 
         pos_index, valid_pos_index = self.random_choice_with_mask_pos(self.greater(assigned_gt_inds5, 0))
 
-        pos_check_valid = self.cast(self.greater(assigned_gt_inds5, 0), mstype.float16)
+        pos_check_valid = self.cast(self.greater(assigned_gt_inds5, 0), self.cast_type)
         pos_check_valid = self.sum_inds(pos_check_valid, -1)
         valid_pos_index = self.less(self.range_pos_size, pos_check_valid)
         pos_index = pos_index * self.reshape(self.cast(valid_pos_index, mstype.int32), (self.num_expected_pos, 1))
@@ -140,7 +148,7 @@ class BboxAssignSample(nn.Cell):
 
         neg_index, valid_neg_index = self.random_choice_with_mask_neg(self.equal(assigned_gt_inds5, 0))
 
-        num_pos = self.cast(self.logicalnot(valid_pos_index), mstype.float16)
+        num_pos = self.cast(self.logicalnot(valid_pos_index), self.cast_type)
         num_pos = self.sum_inds(num_pos, -1)
         unvalid_pos_index = self.less(self.range_pos_size, num_pos)
         valid_neg_index = self.logicaland(self.concat((self.check_neg_mask, unvalid_pos_index)), valid_neg_index)

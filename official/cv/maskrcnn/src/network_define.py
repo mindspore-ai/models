@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ from mindspore.ops import functional as F
 from mindspore import ParameterTuple
 from mindspore.train.callback import Callback
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
+from .model_utils.config import config
 
 time_stamp_init = False
 time_stamp_first = 0
@@ -134,7 +135,12 @@ class TrainOneStepCell(nn.Cell):
         self.optimizer = optimizer
         self.grad = C.GradOperation(get_by_list=True,
                                     sens_param=True)
-        self.sens = Tensor((np.ones((1,)) * sens).astype(np.float16))
+
+        if config.device_target == "Ascend":
+            self.sens = Tensor((np.ones((1,)) * sens).astype(np.float16))
+        else:
+            self.sens = Tensor((np.ones((1,)) * sens).astype(np.float32))
+
         self.reduce_flag = reduce_flag
         self.hyper_map = C.HyperMap()
         if reduce_flag:

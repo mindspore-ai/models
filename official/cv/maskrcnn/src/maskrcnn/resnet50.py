@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,12 @@ from mindspore.ops import operations as P
 from mindspore.common.tensor import Tensor
 from mindspore.ops import functional as F
 import mindspore.common.dtype as mstype
+from mindspore import context
 
+if context.get_context("device_target") == "Ascend":
+    ms_cast_type = mstype.float16
+else:
+    ms_cast_type = mstype.float32
 
 def weight_init_ones(shape):
     """Weight init."""
@@ -33,7 +38,7 @@ def _conv(in_channels, out_channels, kernel_size=3, stride=1, padding=0, pad_mod
     weights = weight_init_ones(shape)
     return nn.Conv2d(in_channels, out_channels,
                      kernel_size=kernel_size, stride=stride, padding=padding,
-                     pad_mode=pad_mode, weight_init=weights, has_bias=False).to_float(mstype.float16)
+                     pad_mode=pad_mode, weight_init=weights, has_bias=False).to_float(ms_cast_type)
 
 
 def _BatchNorm2dInit(out_chls, momentum=0.1, affine=True, use_batch_statistics=True):

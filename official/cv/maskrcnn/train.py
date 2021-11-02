@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,15 +27,14 @@ from src.dataset import data_to_mindrecord_byte_image, create_maskrcnn_dataset
 from src.lr_schedule import dynamic_lr
 
 import mindspore.common.dtype as mstype
-from mindspore import context, Tensor
-from mindspore.communication.management import init
+from mindspore import context, Tensor, Parameter
+from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
 from mindspore.train import Model
 from mindspore.context import ParallelMode
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.nn import Momentum
 from mindspore.common import set_seed
-from mindspore.communication.management import get_rank, get_group_size
 
 set_seed(1)
 
@@ -95,17 +94,75 @@ def modelarts_pre_process():
     config.pre_trained = os.path.join(config.coco_root, config.pre_trained)
     config.save_checkpoint_path = config.output_path
 
+def create_mindrecord_dir(prefix, mindrecord_dir):
+    if not os.path.isdir(mindrecord_dir):
+        os.makedirs(mindrecord_dir)
+    if config.dataset == "coco":
+        if os.path.isdir(config.coco_root):
+            print("Create Mindrecord.")
+            data_to_mindrecord_byte_image("coco", True, prefix)
+            print("Create Mindrecord Done, at {}".format(mindrecord_dir))
+        else:
+            raise Exception("coco_root not exits.")
+    else:
+        if os.path.isdir(config.IMAGE_DIR) and os.path.exists(config.ANNO_PATH):
+            print("Create Mindrecord.")
+            data_to_mindrecord_byte_image("other", True, prefix)
+            print("Create Mindrecord Done, at {}".format(mindrecord_dir))
+        else:
+            raise Exception("IMAGE_DIR or ANNO_PATH not exits.")
+    while not os.path.exists(mindrecord_file+".db"):
+        time.sleep(5)
 
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=get_device_id())
+def load_pretrained_ckpt(net, load_path, device_target):
+    param_dict = load_checkpoint(load_path)
+
+    if config.pretrain_epoch_size == 0:
+        key_mapping = {'down_sample_layer.1.beta': 'bn_down_sample.beta',
+                       'down_sample_layer.1.gamma': 'bn_down_sample.gamma',
+                       'down_sample_layer.0.weight': 'conv_down_sample.weight',
+                       'down_sample_layer.1.moving_mean': 'bn_down_sample.moving_mean',
+                       'down_sample_layer.1.moving_variance': 'bn_down_sample.moving_variance',
+                       }
+        for oldkey in list(param_dict.keys()):
+            if not oldkey.startswith(('backbone', 'end_point', 'global_step',
+                                      'learning_rate', 'moments', 'momentum')):
+                data = param_dict.pop(oldkey)
+                newkey = 'backbone.' + oldkey
+                param_dict[newkey] = data
+                oldkey = newkey
+            for k, v in key_mapping.items():
+                if k in oldkey:
+                    newkey = oldkey.replace(k, v)
+                    param_dict[newkey] = param_dict.pop(oldkey)
+                    break
+
+        for item in list(param_dict.keys()):
+            if not (item.startswith('backbone') or item.startswith('rcnn_mask')):
+                param_dict.pop(item)
+
+        if device_target == 'GPU':
+            for key, value in param_dict.items():
+                tensor = Tensor(value, mstype.float32)
+                param_dict[key] = Parameter(tensor, key)
+
+    load_param_into_net(net, param_dict)
+    return net
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_maskrcnn():
+    device_target = config.device_target
+    context.set_context(mode=context.GRAPH_MODE, device_target=device_target, device_id=get_device_id())
+
     config.mindrecord_dir = os.path.join(config.coco_root, config.mindrecord_dir)
     print('\ntrain.py config:\n', config)
     print("Start train for maskrcnn!")
+
+    dataset_sink_mode_flag = True
     if not config.do_eval and config.run_distribute:
         init()
         rank = get_rank()
+        dataset_sink_mode_flag = device_target == 'Ascend'
         device_num = get_group_size()
         context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
                                           gradients_mean=True)
@@ -121,24 +178,7 @@ def train_maskrcnn():
     mindrecord_dir = config.mindrecord_dir
     mindrecord_file = os.path.join(mindrecord_dir, prefix + "0")
     if rank == 0 and not os.path.exists(mindrecord_file):
-        if not os.path.isdir(mindrecord_dir):
-            os.makedirs(mindrecord_dir)
-        if config.dataset == "coco":
-            if os.path.isdir(config.coco_root):
-                print("Create Mindrecord.")
-                data_to_mindrecord_byte_image("coco", True, prefix)
-                print("Create Mindrecord Done, at {}".format(mindrecord_dir))
-            else:
-                raise Exception("coco_root not exits.")
-        else:
-            if os.path.isdir(config.IMAGE_DIR) and os.path.exists(config.ANNO_PATH):
-                print("Create Mindrecord.")
-                data_to_mindrecord_byte_image("other", True, prefix)
-                print("Create Mindrecord Done, at {}".format(mindrecord_dir))
-            else:
-                raise Exception("IMAGE_DIR or ANNO_PATH not exits.")
-    while not os.path.exists(mindrecord_file+".db"):
-        time.sleep(5)
+        create_mindrecord_dir(prefix, mindrecord_dir)
 
     if not config.only_create_dataset:
         # loss_scale = float(config.loss_scale)
@@ -155,12 +195,8 @@ def train_maskrcnn():
 
         load_path = config.pre_trained
         if load_path != "":
-            param_dict = load_checkpoint(load_path)
-            if config.pretrain_epoch_size == 0:
-                for item in list(param_dict.keys()):
-                    if not (item.startswith('backbone') or item.startswith('rcnn_mask')):
-                        param_dict.pop(item)
-            load_param_into_net(net, param_dict)
+            print("Loading pretrained resnet50 checkpoint")
+            net = load_pretrained_ckpt(net=net, load_path=load_path, device_target=device_target)
 
         loss = LossNet()
         lr = Tensor(dynamic_lr(config, rank_size=device_num, start_steps=config.pretrain_epoch_size * dataset_size),
@@ -186,7 +222,7 @@ def train_maskrcnn():
             cb += [ckpoint_cb]
 
         model = Model(net)
-        model.train(config.epoch_size, dataset, callbacks=cb)
+        model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=dataset_sink_mode_flag)
 
 
 if __name__ == '__main__':
