@@ -50,6 +50,8 @@ is_save_on_master: 1
 is_distributed: 1
 rank: 0
 group_size: 1
+bind_cpu: True
+device_num: 8
 
 # profiler init
 need_profiler: 0
@@ -153,6 +155,8 @@ ckpt_path: "Checkpoint save location."
 ckpt_interval: "Save checkpoint interval."
 is_save_on_master: "Save ckpt on master or all rank, 1 for master, 0 for all ranks."
 is_distributed: "Distribute train or not, 1 for yes, 0 for no."
+bind_cpu: "Whether bind cpu when distributed training."
+device_num: "Device numbers per server"
 rank: "Local rank of distributed."
 group_size: "World size of device."
 need_profiler: "Whether use profiler. 0 for no, 1 for yes."

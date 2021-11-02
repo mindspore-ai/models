@@ -38,6 +38,19 @@ from model_utils.device_adapter import get_device_id, get_device_num
 
 ms.set_seed(1)
 
+def cpu_affinity(rank_id, device_num):
+    """Bind CPU cores according to rank_id and device_num."""
+    import psutil
+    cores = psutil.cpu_count()
+    if cores < device_num:
+        return
+    process = psutil.Process()
+    used_cpu_num = cores // device_num
+    rank_id = rank_id % device_num
+    used_cpu_list = [i for i in range(rank_id * used_cpu_num, (rank_id + 1) * used_cpu_num)]
+    process.cpu_affinity(used_cpu_list)
+    print(f"==== {rank_id}/{device_num} ==== bind cpu: {used_cpu_list}")
+
 def set_default():
     if config.lr_scheduler == 'cosine_annealing' and config.max_epoch > config.T_max:
         config.T_max = config.max_epoch
@@ -58,12 +71,15 @@ def set_default():
                         save_graphs=False, device_id=device_id)
     # init distributed
     if config.is_distributed:
-        if config.device_target == "Ascend":
-            init()
-        else:
-            init("nccl")
+        init()
         config.rank = get_rank()
         config.group_size = get_group_size()
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
+                                          device_num=config.group_size)
+
+    if config.device_target == "GPU" and config.bind_cpu:
+        cpu_affinity(config.rank, min(config.group_size, config.device_num))
 
     config.rank_save_ckpt_flag = 0
     if config.is_save_on_master:
@@ -148,14 +164,6 @@ def run_train():
 
         mox.file.copy_parallel(config.annFile, local_annFile)
         config.annFile = os.path.join(local_data_url, 'instances_train2017.json')
-
-    context.reset_auto_parallel_context()
-    parallel_mode = ParallelMode.STAND_ALONE
-    degree = 1
-    if config.is_distributed:
-        parallel_mode = ParallelMode.DATA_PARALLEL
-        degree = get_group_size()
-    context.set_auto_parallel_context(parallel_mode=parallel_mode, gradients_mean=True, device_num=degree)
 
     dict_version = {'yolov5s': 0, 'yolov5m': 1, 'yolov5l': 2, 'yolov5x': 3}
     network = YOLOV5(is_training=True, version=dict_version[config.yolov5_version])
