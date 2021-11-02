@@ -83,8 +83,7 @@ if __name__ == '__main__':
     local_data_path = args_opt.data_url
     print('Download data:')
     dataset = create_dataset(dataset_path=local_data_path,
-                             do_train=True,
-                             target="Ascend")
+                             do_train=True)
 
     step_size = dataset.get_dataset_size()
     print('steps:', step_size)
