@@ -121,6 +121,20 @@ def extra_operations(cfg):
         cfg: Object after instantiation of class 'Config'.
     """
     cfg.train_config.Adam.decay_filter = lambda x: x.name.endswith('.bias') or x.name.endswith('.beta') or x.name.endswith('.gamma')
+    if cfg.num_classes:
+        cfg.dataset_config.num_classes = int(cfg.num_classes)
+        cfg.net_config.num_classes = int(cfg.num_classes)
+    if cfg.batch_size:
+        cfg.train_config.batch_size = int(cfg.batch_size)
+    if cfg.lr_schedule:
+        cfg.train_config.lr_schedule = cfg.lr_schedule
+    if cfg.learning_rate:
+        cfg.train_config.PolyDecay.learning_rate = float(cfg.learning_rate)
+        cfg.train_config.MultiDecay.learning_rate = float(cfg.learning_rate)
+    if cfg.end_learning_rate:
+        cfg.train_config.PolyDecay.end_learning_rate = float(cfg.end_learning_rate)
+    if cfg.multi_epochs:
+        cfg.train_config.MultiDecay.multi_epochs = [int(list(cfg.multi_epochs)[1]), int(list(cfg.multi_epochs)[3])]
     cfg.export_config.input_res = cfg.dataset_config.input_res
     if cfg.export_load_ckpt:
         cfg.export_config.ckpt_file = cfg.export_load_ckpt

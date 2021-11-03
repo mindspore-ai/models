@@ -22,16 +22,23 @@ save_result_dir: ""
 device_id: 0
 device_num: 1
 
+filter_weight: 'false'
 distribute: 'false'
 need_profiler: "false"
 profiler_path: "./profiler"
 epoch_size: 1
+batch_size: ""
+num_classes: ""
+lr_schedule: ""
+learning_rate: ""
+multi_epochs: ""
+end_learning_rate: ""
 train_steps: -1
 enable_save_ckpt: "true"
 do_shuffle: "true"
 enable_data_sink: "true"
 data_sink_steps: -1
-save_checkpoint_path: ""
+save_checkpoint_path: "checkpoints"
 load_checkpoint_path: ""
 save_checkpoint_steps: 1221
 save_checkpoint_num: 1
@@ -228,8 +235,8 @@ eval_config:
 export_config:
     input_res: dataset_config.input_res
     ckpt_file: "./ckpt_file.ckpt"
-    export_format: "MINDIR"
-    export_name: "CenterNet_ObjectDetection"
+    export_format: "AIR"
+    export_name: "CenterNet_Hourglass"
 
 ---
 # Help description for each configuration
@@ -272,4 +279,4 @@ need_profiler: ["true", "false"]
 enable_save_ckpt: ["true", "false"]
 do_shuffle: ["true", "false"]
 enable_data_sink: ["true", "false"]
-export_format: ["MINDIR"]
+export_format: ["MINDIR", "AIR"]
