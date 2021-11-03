@@ -41,7 +41,7 @@ from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper
 from model_utils.device_adapter import get_device_id, get_device_num
 
-set_seed(1)
+set_seed(100)
 
 class BuildTrainNetwork(nn.Cell):
     def __init__(self, network, criterion):

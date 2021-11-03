@@ -147,6 +147,7 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, max_epoch, device_num,
                         config=None, is_training=True, shuffle=True):
     """Create dataset for YOLOV3."""
     cv2.setNumThreads(0)
+    de.config.set_seed(100)
 
     if is_training:
         filter_crowd = True
