@@ -186,3 +186,31 @@ class TrainNetWrapper(nn.Cell):
         loss = self.loss_train_net(adj, feature)
         accuracy = self.accuracy(self.network(adj, feature))
         return loss, accuracy
+
+class Loss_Gpu(nn.Cell):
+    """Softmax cross-entropy loss with masking."""
+    def __init__(self, mask, weight_decay, param):
+        super(Loss_Gpu, self).__init__(auto_prefix=False)
+        self.mask = Tensor(mask)
+        self.loss = P.SoftmaxCrossEntropyWithLogits()
+        self.one = Tensor(1.0, mstype.float32)
+        self.zero = Tensor(0.0, mstype.float32)
+        self.mean = P.ReduceMean()
+        self.cast = P.Cast()
+        self.l2_loss = P.L2Loss()
+        self.reduce_sum = P.ReduceSum()
+        self.weight_decay = weight_decay
+        self.param = param
+
+    def construct(self, preds, label):
+        """Calculate loss"""
+        param = self.l2_loss(self.param)
+        loss = self.weight_decay * param
+        preds = self.cast(preds, mstype.float32)
+        loss = loss + self.loss(preds, label)[0]
+        mask = self.cast(self.mask, mstype.float32)
+        mask_reduce = self.mean(mask)
+        mask = mask / mask_reduce
+        loss = loss * mask
+        loss = self.mean(loss)
+        return loss

@@ -101,3 +101,25 @@ class GCN(nn.Cell):
         output0 = self.layer0(adj, feature)
         output1 = self.layer1(adj, output0)
         return output1
+
+class GCN_GPU(nn.Cell):
+    """
+    GCN GPU architecture.
+
+    Args:
+        config (ConfigGCN): Configuration for GCN.
+        adj (numpy.ndarray): Numbers of block in different layers.
+        feature (numpy.ndarray): Input channel in each layer.
+        output_dim (int): The number of output channels, equal to classes num.
+    """
+
+    def __init__(self, config, input_dim, output_dim, adj):
+        super(GCN_GPU, self).__init__()
+        self.layer0 = GraphConvolution(input_dim, config.hidden1, activation="relu", dropout_ratio=config.dropout)
+        self.layer1 = GraphConvolution(config.hidden1, output_dim, dropout_ratio=None)
+        self.adj = adj
+    def construct(self, feature):
+        output0 = self.layer0(self.adj, feature)
+        output1 = self.layer1(self.adj, output0)
+        return output1
+        

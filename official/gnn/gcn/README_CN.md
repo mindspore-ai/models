@@ -102,6 +102,13 @@ bash run_process_data.sh ./data citeseer
 bash run_train.sh [DATASET_NAME]
 ```
 
+- Running on local with GPU
+
+```bash
+# 在 cora 或 citeseer 数据集上训练, DATASET_PATH设置为数据集目录，DATASET_NAME 设置为 cora 或 citeseer
+bash run_train.sh [DATASET_PATH] [DATASET_NAME]
+```
+
 - Running on [ModelArts](https://support.huaweicloud.com/modelarts/)
 
 ```bash
@@ -157,6 +164,8 @@ bash run_train.sh [DATASET_NAME]
   ├─scripts
   | ├─run_infer_310.sh     # Ascend310 推理shell脚本
   | ├─run_process_data.sh  # 生成MindRecord格式的数据集
+  | ├─run_train_gpu.sh     # 启动GPU后端的训练
+  | ├─run_eval_gpu.sh      # 启动GPU后端的推理
   | └─run_train.sh         # 启动训练，目前只支持Ascend后端
   |
   ├─src
@@ -184,6 +193,14 @@ bash run_train.sh [DATASET_NAME]
 "dropout": 0.5,                   # 第一图卷积层dropout率
 "weight_decay": 5e-4,             # 第一图卷积层参数的权重衰减
 "early_stopping": 10,             # 早停容限
+"save_ckpt_steps": 549            # 保存ckpt的步数
+"keep_ckpt_max": 10               # 保存ckpt的最大步数
+"ckpt_dir": './ckpt'              # 保存ckpt的文件夹
+"best_ckpt_dir": './best_ckpt’    # 最好ckpt的文件夹
+"best_ckpt_name": 'best.ckpt'     # 最好ckpt的文件名
+"eval_start_epoch": 100           # 从哪一步开始eval
+"save_best_ckpt": True            # 是否存储最好的ckpt
+"eval_interval": 1                # eval间隔
 ```
 
 ### 培训、评估、测试过程
@@ -198,7 +215,14 @@ bash run_train.sh [DATASET_NAME]
 #### 启动
 
 ```bash
-bash run_train.sh cora
+# 在Ascend上使用Cora或Citeseer数据集进行训练，DATASET_NAME为Cora或Citeseer
+bash run_train.sh [DATASET_NAME]
+
+# 在GPU上使用Cora或Citeseer数据集进行训练，DATASET_PATH设置为数据集目录，DATASET_NAME为Cora或Citeseer
+bash run_train_gpu.sh [DATASET_PATH] [DATASET_NAME]
+
+# 在GPU上对Cora或Citeseer数据集进行测试
+bash run_eval_gpu.sh [DATASET_PATH] [DATASET_NAME] [CKPT]
 ```
 
 #### 结果
@@ -258,18 +282,18 @@ Test set results: accuracy= 0.81300
 
 ### 性能
 
-| 参数                 | GCN                                                            |
-| -------------------------- | -------------------------------------------------------------- |
-| 资源                   | Ascend 910；系统 Euler2.8                                                     |
-| 上传日期              | 2021-07-05                                    |
-| MindSpore版本          | 1.3.0                                                     |
-| 数据集                    | Cora/Citeseer                                                  |
-| 训练参数        | epoch=200                                                      |
-| 优化器                 | Adam                                                           |
-| 损失函数              | Softmax交叉熵                                          |
-| 准确率                   | 81.5/70.3                                                      |
-| 参数(B)             | 92160/59344                                                    |
-| 脚本                    | <https://gitee.com/mindspore/models/tree/master/official/gnn/gcn> |
+| 参数                 | GCN                                                            | GCN |
+| -------------------------- | -------------------------------------------------------------- | -------------------------- |
+| 资源                   | Ascend 910；系统 Euler2.8                                                     | NV SMX3 V100-32G |
+| 上传日期              | 2020-06-09                                    | 2021-05-06 |
+| MindSpore版本          | 0.5.0-beta                                                     | 1.1.0 |
+| 数据集                    | Cora/Citeseer                                                  | Cora/Citeseer |
+| 训练参数        | epoch=200                                                      | epoch=200 |
+| 优化器                 | Adam                                                           | Adam |
+| 损失函数              | Softmax交叉熵                                          | Softmax交叉熵 |
+| 准确率                   | 81.5/70.3                                                      | 86.8/76.7 |
+| 参数(B)             | 92160/59344                                                    | 92160/59344 |
+| 脚本                    | [GCN](https://gitee.com/mindspore/models/tree/master/official/gnn/gcn) | [GCN](https://gitee.com/mindspore/models/tree/master/official/gnn/gcn) |
 
 ## 随机情况说明
 
