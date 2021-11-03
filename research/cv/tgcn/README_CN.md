@@ -17,9 +17,13 @@
     - [MINDIR模型导出流程](#MINDIR模型导出流程)
         - [运行](#运行)
         - [结果](#结果)
+    - [Ascend310推理流程](#Ascend310推理流程)
+        - [运行](#运行)
+        - [结果](#结果)
 - [模型说明](#模型说明)
     - [训练性能](#训练性能)
     - [评估性能](#评估性能)
+    - [Ascend310推理性能](#Ascend310推理性能)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#ModelZoo主页)
 
@@ -65,16 +69,16 @@ T-GCN模型主要由两大模块构成，分别为图卷积网络（Graph Convol
 .
 └─tgcn
   ├─data
-    ├─SZ-taxi
+    ├─SZ-taxi          # SZ-taxi数据集
         ├─adj.csv      # 邻接矩阵
         └─feature.csv  # 特征矩阵
-    ├─Los-loop
+    ├─Los-loop         # Los-loop数据集s
         ├─adj.csv      # 邻接矩阵
         └─feature.csv  # 特征矩阵
 ...
 ```
 
-准备好数据集后，即可按顺序依次进行模型训练与评估/导出操作：
+组织好数据集后，即可按顺序依次进行模型训练与评估/导出等操作：
 
 - 训练：
 
@@ -110,7 +114,7 @@ bash ./scripts/run_eval.sh [DEVICE_ID]
   bash ./scripts/run_eval.sh 0
   ```
 
-- MINDIR模型导出
+- MINDIR模型导出：
 
 ```python
 # MINDIR模型导出
@@ -122,6 +126,20 @@ bash ./scripts/run_export.sh [DEVICE_ID]
 ```python
 # MINDIR模型导出
 bash ./scripts/run_export.sh 0
+```
+
+- Ascend310推理：
+
+```python
+# Ascend310推理
+bash ./scripts/run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
+```
+
+示例：
+
+```python
+# Ascend310推理
+bash ./scripts/run_infer_310.sh ./outputs/SZ-taxi_1.mindir ./data y Ascend 0
 ```
 
 # [脚本说明](#目录)
@@ -137,7 +155,9 @@ bash ./scripts/run_export.sh 0
     ├─run_distributed_train_ascend.sh   # Ascend多卡训练运行脚本
     ├─run_eval.sh                       # 评估运行脚本
     ├─run_export.sh                     # MINDIR模型导出运行脚本
+    ├─run_infer_310.sh                  # 310推理运行脚本
     └─run_standalone_train.sh           # 单卡训练运行脚本
+  ├─ascend310_infer                     # 实现310推理源代码
   ├─src
     ├─model
         ├─__init__.py
@@ -152,12 +172,14 @@ bash ./scripts/run_export.sh 0
     └─task.py                           # 监督预测任务
   ├─eval.py                             # 评估
   ├─export.py                           # MINDIR模型导出
+  ├─preprocess.py                       # 310推理预处理
+  ├─postprocess.py                      # 310推理后处理
   └─train.py                            # 训练
 ```
 
 ## [脚本参数](#目录)
 
-- 训练、评估、MINDIR模型导出等操作相关参数皆在`config.py`脚本中设定：
+- 训练、评估、MINDIR模型导出、Ascend310推理等操作相关任务参数皆在`./src/config.py`脚本中设定：
 
 ```python
 class ConfigTGCN:
@@ -175,13 +197,13 @@ class ConfigTGCN:
     data_sink = True
 ```
 
-如需查阅相关参数信息说明，请参阅`config.py`脚本内容。
+如需查阅相关参数信息说明，请参阅`./src/config.py`脚本内容，也可参阅论文原文。
 
 ## [训练流程](#目录)
 
 ### [运行](#目录)
 
-开始训练前，请确认已在`config.py`脚本中完成相关训练参数设定，在同一任务下，后续评估流程与MINDIR模型导出流程请保持参数一致。
+开始训练前，请确认已在`./src/config.py`脚本中完成相关训练参数设定。在同一任务下，后续评估、MINDIR模型导出、Ascend310推理等流程请保持参数一致。
 
 ```python
 # 单卡训练
@@ -242,7 +264,7 @@ Ascend多卡训练与单卡训练所展示信息的形式基本一致，运行�
 
 ### [运行](#目录)
 
-在完成训练流程的基础上，评估流程将自动从`./checkpoints`目录加载对应任务的最优检查点（.ckpt 文件）用于模型评估。
+在完成训练流程的基础上，评估流程将基于`./src/config.py`脚本中的参数设定自动从`./checkpoints`目录加载对应任务的最优检查点（.ckpt 文件）用于模型评估。
 
 ```python
 # 评估
@@ -270,7 +292,7 @@ bash ./scripts/run_eval.sh 0
 
 ### [运行](#目录)
 
-在完成训练流程的基础上，MINDIR模型导出流程将自动从`./checkpoints`目录加载对应任务的最优检查点（.ckpt 文件）用于对应MINDIR模型导出。
+在完成训练流程的基础上，MINDIR模型导出流程将基于`./src/config.py`脚本中的参数设定自动从`./checkpoints`目录加载对应任务的最优检查点（.ckpt 文件）用于对应MINDIR模型导出。
 
 ```python
 # MINDIR模型导出
@@ -290,7 +312,37 @@ SZ-taxi_1.mindir exported successfully!
 ==========================================
 ```
 
-同时MINDIR模型文件将导出至`./outputs`目录下，供后续进一步使用（如`./outputs/SZ-taxi_1.mindir`）。
+同时MINDIR模型文件将导出至`./outputs`目录下（如`./outputs/SZ-taxi_1.mindir`），供后续Ascend310推理使用等。
+
+## [Ascend310推理流程](#目录)
+
+### [运行](#目录)
+
+在完成MINDIR模型导出的基础上，基于`./src/config.py`脚本中的参数设定，Ascend310推理流程将加载对应任务导出的MINDIR模型（.mindir 文件）用于对应Ascend310推理任务。
+
+- 请注意：目前仅支持batch_size为1的Ascend310推理功能，即MINDIR模型必须基于batch_size=1的训练过程导出得到。
+
+```python
+# Ascend310推理
+# 用法：
+bash ./scripts/run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
+# 示例：
+bash ./scripts/run_infer_310.sh ./outputs/SZ-taxi_1.mindir ./data y Ascend 0
+```
+
+### [结果](#目录)
+
+若Ascend310推理执行成功，可通过`cat ./acc.log`查看推理精度有关信息，如：
+
+```python
+RMSE 4.4604 | MAE 3.2427 | ACC 0.6882 | R_2 0.8137 | VAR 0.8166
+```
+
+同时也可通过`cat ./time_Result/test_perform_static.txt`查看推理性能有关信息，如：
+
+```python
+NN inference cost average time: 3.51738 ms of infer_count 591
+```
 
 # [模型说明](#目录)
 
@@ -299,7 +351,7 @@ SZ-taxi_1.mindir exported successfully!
 - 下表中训练性能由T-GCN模型基于SZ-taxi数据集分别预测未来15分钟、30分钟、45分钟、60分钟（即pre_len分别取1、2、3、4）的交通速度得到，相关指标为4组训练任务平均值：
 
 | 参数 | Ascend |
-| -------------------------- | -----------------------------------------------------------|
+| ------------------- | -------------------|
 | 模型名称 | T-GCN |
 | 运行环境 | 操作系统 Euler 2.8；Ascend 910；处理器 2.60GHz，192核心；内存，755G |
 | 上传日期 | 2021-09-30 |
@@ -307,8 +359,8 @@ SZ-taxi_1.mindir exported successfully!
 | 数据集 | SZ-taxi（hidden_dim=100；seq_len=4） |
 | 训练参数 | seed=1；epoch=3000；batch_size = 64；lr=0.001；train_split_rate = 0.8；weight_decay = 1.5e-3 |
 | 优化器 | Adam with Weight Decay |
-| 损失函数 | 自定义损失函数                                               |
-| 输出 | 交通速度预测值                                              |
+| 损失函数 | 自定义损失函数 |
+| 输出 | 交通速度预测值 |
 | 平均检查点（.ckpt 文件）大小 | 839 KB |
 | 平均性能 | 单卡：23毫秒/步，871毫秒/轮；8卡：25毫秒/步，101毫秒/轮 |
 | 平均总耗时 | 单卡：49分19秒；8卡：11分35秒 |
@@ -317,7 +369,7 @@ SZ-taxi_1.mindir exported successfully!
 - 下表中训练性能由T-GCN模型基于Los-loop数据集分别预测未来15分钟、30分钟、45分钟、60分钟（即pre_len分别取3、6、9、12）的交通速度得到，相关指标为4组训练任务平均值：
 
 | 参数 | Ascend |
-| -------------------------- | -----------------------------------------------------------|
+| ------------------- | ------------------- |
 | 模型名称 | T-GCN |
 | 运行环境 | 操作系统 Euler 2.8；Ascend 910；处理器 2.60GHz，192核心；内存，755G |
 | 上传日期 | 2021-09-30 |
@@ -325,8 +377,8 @@ SZ-taxi_1.mindir exported successfully!
 | 数据集 | Los-loop（hidden_dim=64；seq_len=12） |
 | 训练参数 | seed=1；epoch=3000；batch_size = 64；lr=0.001；train_split_rate = 0.8；weight_decay = 1.5e-3 |
 | 优化器 | Adam with Weight Decay |
-| 损失函数 | 自定义损失函数                                               |
-| 输出 | 交通速度预测值                                              |
+| 损失函数 | 自定义损失函数 |
+| 输出 | 交通速度预测值 |
 | 平均检查点（.ckpt 文件）大小 | 993KB |
 | 平均性能 | 单卡：44毫秒/步，1066毫秒/轮；8卡：46毫秒/步，139毫秒/轮 |
 | 平均总耗时 | 单卡：1时00分40秒；8卡：15分05秒 |
@@ -336,41 +388,75 @@ SZ-taxi_1.mindir exported successfully!
 
 - 下表中评估性能由T-GCN模型基于SZ-taxi数据集分别预测未来15分钟、30分钟、45分钟、60分钟（即pre_len分别取1、2、3、4）的交通速度得到，相关指标为4组评估任务平均值：
 
-| 参数 | Ascend|
-| ------------------- | ---------------------------|
+| 参数 | Ascend |
+| ------------------- | ------------------- |
 | 模型名称 | T-GCN |
 | 运行环境 | 操作系统 Euler 2.8；Ascend 910；处理器 2.60GHz，192核心；内存，755G |
 | 上传日期 | 2021-09-30 |
 | MindSpore版本 | 1.3.0 |
-| 数据集 | SZ-taxi（hidden_dim=100；seq_len=4） |
+| 数据集 | SZ-taxi（hidden_dim=100；seq_len=4；batch_size = 64） |
 | 输出 | 交通速度预测值 |
-| 均方根误差（RMSE）平均值 | 4.1003                                                       |
-| 平均绝对误差（MAE）平均值 | 2.7498                                                       |
-| 预测准确率（Accuracy）平均值 | 0.7144                                                       |
-| R平方（$R^2$）平均值 | 0.8458                                                       |
+| 均方根误差（RMSE）平均值 | 4.1003 |
+| 平均绝对误差（MAE）平均值 | 2.7498 |
+| 预测准确率（Accuracy）平均值 | 0.7144 |
+| R平方（$R^2$）平均值 | 0.8458 |
 | 可释方差（Explained Variance）平均值 | 0.8461 |
 | 脚本 | [评估脚本](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn/eval.py) |
 
 - 下表中评估性能由T-GCN模型基于Los-loop数据集分别预测未来15分钟、30分钟、45分钟、60分钟（即pre_len分别取3、6、9、12）的交通速度得到，相关指标为4组评估任务平均值：
 
-| 参数 | Ascend|
-| ------------------- | ---------------------------|
+| 参数 | Ascend |
+| ------------------- | ------------------- |
 | 模型名称 | T-GCN |
 | 运行环境 | 操作系统 Euler 2.8；Ascend 910；处理器 2.60GHz，192核心；内存，755G |
 | 上传日期 | 2021-09-30 |
 | MindSpore版本 | 1.3.0 |
-| 数据集 | Los-loop（hidden_dim=64；seq_len=12） |
+| 数据集 | Los-loop（hidden_dim=64；seq_len=12；batch_size = 64） |
 | 输出 | 交通速度预测值 |
 | 均方根误差（RMSE）平均值 | 6.1869 |
 | 平均绝对误差（MAE）平均值 | 3.8552 |
-| 预测准确率（Accuracy）平均值 | 0.8946                                                       |
-| R平方（$R^2$）平均值 | 0.8000                                                       |
-| 可释方差（Explained Variance）平均值 | 0.8002                                                       |
+| 预测准确率（Accuracy）平均值 | 0.8946 |
+| R平方（$R^2$）平均值 | 0.8000 |
+| 可释方差（Explained Variance）平均值 | 0.8002 |
 | 脚本 | [评估脚本](https://gitee.com/mindspore/models/tree/master/research/cv/tgcn/eval.py) |
+
+## [Ascend310推理性能](#目录)
+
+- 下表中Ascend310推理性能由T-GCN模型基于SZ-taxi数据集分别预测未来15分钟、30分钟、45分钟、60分钟（即pre_len分别取1、2、3、4）的交通速度得到，相关指标为4组评估任务平均值：
+
+| 参数 | Ascend |
+| ------------------- | ------------------- |
+| 模型名称 | T-GCN |
+| 运行环境 | Ascend 310 |
+| 上传日期 | 2021-11-03 |
+| MindSpore版本 | 1.3.0 |
+| 数据集 | SZ-taxi（hidden_dim=100；seq_len=4；batch_size = 1） |
+| 输出 | 交通速度预测值 |
+| 均方根误差（RMSE）平均值 | 4.2559 |
+| 平均绝对误差（MAE）平均值 | 3.0077 |
+| 预测准确率（Accuracy）平均值 | 0.7025 |
+| R平方（$R^2$）平均值 | 0.8307 |
+| 可释方差（Explained Variance）平均值 | 0.8334 |
+
+- 下表中Ascend310推理性能由T-GCN模型基于Los-loop数据集分别预测未来15分钟、30分钟、45分钟、60分钟（即pre_len分别取3、6、9、12）的交通速度得到，相关指标为4组评估任务平均值：
+
+| 参数 | Ascend |
+| ------------------- | ------------------- |
+| 模型名称 | T-GCN |
+| 运行环境 | Ascend 310 |
+| 上传日期 | 2021-11-03 |
+| MindSpore版本 | 1.3.0 |
+| 数据集 | Los-loop（hidden_dim=64；seq_len=12；batch_size = 1） |
+| 输出 | 交通速度预测值 |
+| 均方根误差（RMSE）平均值 | 6.5038 |
+| 平均绝对误差（MAE）平均值 | 4.2996 |
+| 预测准确率（Accuracy）平均值 | 0.8854 |
+| R平方（$R^2$）平均值 | 0.6388 |
+| 可释方差（Explained Variance）平均值 | 0.6517 |
 
 # [随机情况说明](#目录)
 
-`train.py`脚本中使用`mindspore.set_seed()`对全局随机种子进行了固定（默认值为1），可在`config.py`脚本中进行修改。
+`./train.py`脚本中使用`mindspore.set_seed()`对全局随机种子进行了固定（默认值为1），可在`./src/config.py`脚本中进行修改。
 
 # [ModelZoo主页](#目录)
 
