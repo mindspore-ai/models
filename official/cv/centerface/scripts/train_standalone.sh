@@ -116,7 +116,24 @@ cd ${current_exec_path}/device$use_device_id || exit
 export RANK_ID=0
 dev=`expr $use_device_id + 0`
 export DEVICE_ID=$dev
-python ${dirname_path}/${SCRIPT_NAME} \
+export CPU_BIND_NUM=24
+
+cmdopt=`lscpu | grep NUMA | tail -1 | awk '{print $4}'`
+if test -z $cmdopt
+then
+  cpus=`cat /proc/cpuinfo| grep "processor"| wc -l`
+  if [ $cpus -ge $CPU_BIND_NUM ]
+  then
+    start=`expr $cpus - $CPU_BIND_NUM`
+    end=`expr $cpus - 1`
+  else
+    start=0
+    end=`expr $cpus - 1`
+  fi
+  cmdopt=$start"-"$end
+fi
+
+taskset -c $cmdopt python ${dirname_path}/${SCRIPT_NAME} \
     --lr=5e-4 \
     --per_batch_size=8 \
     --is_distributed=0 \
