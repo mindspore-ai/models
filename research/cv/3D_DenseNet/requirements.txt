@@ -1,0 +1,7 @@
+opencv_python==4.5.2.52
+numpy==1.19.4
+MedPy==0.4.0
+h5py==3.4.0
+mindspore==1.3.0
+PyYAML==5.4.1
+SimpleITK==2.1.1
