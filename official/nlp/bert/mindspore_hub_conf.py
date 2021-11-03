@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,10 +52,25 @@ bert_net_cfg_nezha = BertConfig(
     dtype=mstype.float32,
     compute_type=mstype.float16
 )
+bert_finetuning = BertConfig(
+    seq_length=128,
+    vocab_size=21128,
+    hidden_size=768,
+    num_hidden_layers=24,
+    num_attention_heads=16,
+    intermediate_size=3072,
+    hidden_act="gelu",
+    hidden_dropout_prob=0.1,
+    attention_probs_dropout_prob=0.1,
+    max_position_embeddings=512,
+    type_vocab_size=2,
+    initializer_range=0.02,
+    use_relative_positions=True,
+    dtype=mstype.float16
+)
 def create_network(name, *args, **kwargs):
-    '''
-    Create bert network for base and nezha.
-    '''
+    """Create bert network for base and nezha."""
+
     if name == 'bert_base':
         if "seq_length" in kwargs:
             bert_net_cfg_base.seq_length = kwargs["seq_length"]
@@ -66,4 +81,9 @@ def create_network(name, *args, **kwargs):
             bert_net_cfg_nezha.seq_length = kwargs["seq_length"]
         is_training = kwargs.get("is_training", False)
         return BertModel(bert_net_cfg_nezha, is_training, *args)
+    if name == 'bert_finetuning':
+        if "seq_length" in kwargs:
+            bert_finetuning.seq_length = kwargs["seq_length"]
+        is_training = kwargs.get("is_training", False)
+        return BertModel(bert_finetuning, is_training, *args)
     raise NotImplementedError(f"{name} is not implemented in the repo")

@@ -14,7 +14,7 @@
 # ============================================================================
 """hub config"""
 from src.Deeptext.deeptext_vgg16 import Deeptext_VGG16
-from src.config import config
+from model_utils.config import config
 
 def deeptext_net(*args, **kwargs):
     return Deeptext_VGG16(*args, **kwargs)

@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,12 +14,24 @@
 # ============================================================================
 """hub config."""
 from src.bgcf import BGCF
+from model_utils.config import config
+
 
 def bgcf(*args, **kwargs):
     return BGCF(*args, **kwargs)
 
 
 def create_network(name, *args, **kwargs):
+    """Creates a bgcf."""
     if name == "bgcf":
-        return bgcf(*args, **kwargs)
+        config.num_user = 7068
+        config.num_item = 3570
+        bgcfnet = BGCF([config.input_dim, config.num_user, config.num_item],
+                       config.embedded_dimension,
+                       config.activation,
+                       [0.0, 0.0, 0.0],
+                       config.num_user,
+                       config.num_item,
+                       config.input_dim)
+        return bgcfnet
     raise NotImplementedError(f"{name} is not implemented in the repo")

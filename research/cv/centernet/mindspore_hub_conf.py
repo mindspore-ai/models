@@ -13,16 +13,15 @@
 # limitations under the License.
 # ============================================================================
 """hub config"""
-from src import CenterNetMultiPoseEval
-from src.config import net_config, eval_config
+from src.model_utils.config import net_config
+from src import CenterNetMultiPoseLossCell
 
 def centernet_net(*args, **kwargs):
-    return CenterNetMultiPoseEval(*args, **kwargs)
+    return CenterNetMultiPoseLossCell(*args, **kwargs)
 
 def create_network(name, *args, **kwargs):
     """create_network about centernet"""
     if name == "centernet":
-        # True, if device is Ascend
-        enable_nms_fp16 = True
-        return centernet_net(net_config, eval_config, enable_nms_fp16, *args, **kwargs)
+        net_with_loss = CenterNetMultiPoseLossCell(net_config)
+        return net_with_loss
     raise NotImplementedError(f"{name} is not implemented in the repo")

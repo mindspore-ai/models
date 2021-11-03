@@ -14,10 +14,11 @@
 # ============================================================================
 """hub config."""
 from src.network import DenseNet121, DenseNet100
+from src.model_utils.config import config
 
 def create_network(name, *args, **kwargs):
     if name == 'densenet121':
-        return DenseNet121(*args, **kwargs)
+        return DenseNet121(config.num_classes)
     if name == 'densenet100':
         return DenseNet100(*args, **kwargs)
     raise NotImplementedError(f"{name} is not implemented in the repo")
