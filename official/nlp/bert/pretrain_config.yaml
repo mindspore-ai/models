@@ -46,7 +46,7 @@ enable_global_norm: False
 train_with_eval: 'false'
 eval_data_dir: ""
 schema_file: ""
-finetune_ckpt: ""
+eval_ckpt: ""
 eval_samples: 300000
 # bucket list, default: []
 bucket_list: []

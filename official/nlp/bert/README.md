@@ -64,7 +64,7 @@ The backbone structure of BERT is transformer. For BERT_base, the transformer co
     - Extracted text data from `WikiExtractor` cannot be trained directly, you have to preprocess the data and convert the dataset to TFRecord format. Please refer to create_pretraining_data.py file in [BERT](https://github.com/google-research/bert) repository and download vocab.txt here, if AttributeError: module 'tokenization' has no attribute 'FullTokenizer' occur, please install bert-tensorflow.
 - Create fine-tune dataset
     - Download dataset for fine-tuning and evaluation such as [CLUENER](https://github.com/CLUEbenchmark/CLUENER2020), [TNEWS](https://github.com/CLUEbenchmark/CLUE), [SQuAD v1.1 train dataset](https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json), [SQuAD v1.1 eval dataset](https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json), etc.
-    - Convert dataset files from JSON format to TFRECORD format, please refer to run_classifier.py or run_squad.py file in [BERT](https://github.com/google-research/bert) repository.
+    - We haven't provide the scripts to create tfrecord yet, while converting dataset files from JSON format to TFRECORD format, please refer to run_classifier.py or run_squad.py file in [BERT](https://github.com/google-research/bert) repository or the CLUE official repository [CLUE](https://github.com/CLUEbenchmark/CLUE/blob/master/baselines/models/bert/run_classifier.py) and [CLUENER](https://github.com/CLUEbenchmark/CLUENER2020/tree/master/tf_version)
 
 # [Environment Requirements](#contents)
 
@@ -88,6 +88,10 @@ bash scripts/run_standalone_pretrain_ascend.sh 0 1 /path/cn-wiki-128
 
 # run distributed pre-training example
 bash scripts/run_distributed_pretrain_ascend.sh /path/cn-wiki-128 /path/hccl.json
+
+# run the evaluation for pre-training example
+# Modify the `eval_ckpt` and `eval_data_dir` in pretrain_config.yaml
+python pretrain_eval.py
 
 # run fine-tuning and evaluation example
 - If you are going to run a fine-tuning task, please prepare a checkpoint generated from pre-training.

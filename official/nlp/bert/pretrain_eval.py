@@ -36,7 +36,7 @@ def bert_predict():
     dataset = create_eval_dataset(cfg.batch_size, 1, data_dir=cfg.eval_data_dir)
     net_for_pretraining = BertPretrainEval(bert_net_cfg)
     net_for_pretraining.set_train(False)
-    param_dict = load_checkpoint(cfg.finetune_ckpt)
+    param_dict = load_checkpoint(cfg.eval_ckpt)
     load_param_into_net(net_for_pretraining, param_dict)
     model = Model(net_for_pretraining)
     return model, dataset, net_for_pretraining
@@ -47,7 +47,7 @@ def MLM_eval():
     Evaluate function
     '''
     _, dataset, net_for_pretraining = bert_predict()
-    net = Model(net_for_pretraining, eval_network=net_for_pretraining, eval_indexes=[0, 1],
+    net = Model(net_for_pretraining, eval_network=net_for_pretraining,
                 metrics={'name': BertMetric(cfg.batch_size)})
     res = net.eval(dataset, dataset_sink_mode=False)
     print("==============================================================")
