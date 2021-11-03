@@ -852,7 +852,7 @@ class BertPretrainEval(nn.Cell):
     Evaluate MaskedLM prediction scores
     '''
     def __init__(self, config, network=None):
-        super(BertPretrainEval, self).__init__()
+        super(BertPretrainEval, self).__init__(auto_prefix=False)
         if network is None:
             self.network = BertPreTraining(config, False, False)
         else:
