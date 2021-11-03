@@ -14,21 +14,22 @@
 # ============================================================================
 """hub config"""
 from src.attention_ocr import AttentionOCRInfer
-from src.config import config
+from src.model_utils.config import config
+
 
 def crnnseq2seqocr_net(*args, **kwargs):
     return AttentionOCRInfer(*args, **kwargs)
 
+
 def create_network(name, *args, **kwargs):
     """create_network about crnn_seq2seq_ocr"""
     if name == "crnn_seq2seq_ocr":
-        return crnnseq2seqocr_net(config.batch_size,
-                                  int(config.img_width / 4),
-                                  config.encoder_hidden_size,
-                                  config.decoder_hidden_size,
-                                  config.decoder_output_size,
-                                  config.max_length,
-                                  config.dropout_p,
-                                  *args,
-                                  **kwargs)
+        network = crnnseq2seqocr_net(config.batch_size,
+                                     int(config.img_width / 4),
+                                     config.encoder_hidden_size,
+                                     config.decoder_hidden_size,
+                                     config.decoder_output_size,
+                                     config.max_length,
+                                     config.dropout_p)
+        return network
     raise NotImplementedError(f"{name} is not implemented in the repo")

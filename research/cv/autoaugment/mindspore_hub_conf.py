@@ -15,10 +15,12 @@
 """MindSpore Hub config"""
 
 from src.network import WRN
+from src.config import Config
 
+conf = Config(training=True)
 
 def create_network(name, *args, **kwargs):
     """Creates a WideResNet."""
     if name == 'WRN':
-        return WRN(*args, **kwargs)
+        return WRN(160, 3, conf.class_num)
     raise NotImplementedError('%s is not implemented in the repo' % name)

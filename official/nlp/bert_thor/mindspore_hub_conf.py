@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
 '''
 Bert hub interface for bert_thor
 '''
-from src.bert_model import BertModel
 from src.bert_model import BertConfig
+from src import BertNetworkWithLoss
 import mindspore.common.dtype as mstype
+
+
 bert_net_cfg = BertConfig(
     seq_length=512,
     vocab_size=30522,
@@ -36,10 +38,9 @@ bert_net_cfg = BertConfig(
     compute_type=mstype.float16
 )
 def create_network(name, *args, **kwargs):
-    '''
-    Create bert network for bert_thor.
-    '''
+    """Create bert network for bert_thor."""
+
     if name == 'bert_thor':
-        is_training = kwargs.get("is_training", default=False)
-        return BertModel(bert_net_cfg, is_training, *args)
+        net_with_loss = BertNetworkWithLoss(bert_net_cfg, True)
+        return net_with_loss
     raise NotImplementedError(f"{name} is not implemented in the repo")
