@@ -35,6 +35,7 @@ PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 CUR_DIR=`pwd`
 export GLOG_log_dir=${CUR_DIR}/ms_log
 export GLOG_logtostderr=0
+export DEVICE_ID=$DEVICE_ID
 
 python ${PROJECT_DIR}/../train.py  \
     --distribute=false \
@@ -45,10 +46,11 @@ python ${PROJECT_DIR}/../train.py  \
     --do_shuffle=true \
     --enable_data_sink=true \
     --data_sink_steps=-1 \
-    --epoch_size=130 \
+    --epoch_size=330 \
     --load_checkpoint_path=$LOAD_CHECKPOINT_PATH \
-    --save_checkpoint_steps=4580 \
+    --save_checkpoint_steps=3664 \
     --save_checkpoint_num=1 \
     --mindrecord_dir=$MINDRECORD_DIR \
     --mindrecord_prefix="coco_det.train.mind" \
+    --visual_image=false \
     --save_result_dir="" > training_log.txt 2>&1 &
