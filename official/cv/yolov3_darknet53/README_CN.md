@@ -102,7 +102,7 @@ YOLOv3使用DarkNet53执行特征提取，这是YOLOv2中的Darknet-19和残差�
       wget https://pjreddie.com/media/files/darknet53.conv.74
       ```
 
-    - 可以运行models/utils/hccl_tools/路径下的hccl_tools.py脚本生成hccl_8p.json文件，下面指令中参数"[0, 8)"表示生成0-7的8卡hccl_8p.json文件。
+    - 可以运行models/utils/hccl_tools/路径下的hccl_tools.py脚本生成hccl_8p.json文件，下面指令中参数"[0, 8)"表示生成0-7的8卡hccl_8p.json文件。（仅适用于Ascend场景）
         - 该命令生成的json文件名为 hccl_8p_01234567_{host_ip}.json, 为了表述方便，统一使用hccl_8p.json表示该json文件。
 
       ```command
@@ -420,7 +420,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 ```
 
-`DEVICE_ID` 可选，默认值为 0。
+`DEVICE_ID` 可选，默认值为 0。DATA_PATH为推理数据所在的路径，ANNO_PATH为数据注解文件，为json文件，如instances_val2014.json。
 
 ### 结果
 
@@ -443,17 +443,19 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.551
 ```
 
-## [训练后量化推理](#contents)
+## [训练后量化推理（仅在Ascend场景下）](#contents)
 
 训练后量化推理的相关执行脚本文件在"ascend310_quant_infer"目录下，依次执行以下步骤实现训练后量化推理。本训练后量化工程基于COCO2014数据集。
 
-1、生成Ascend310平台AIR模型推理需要的.bin格式数据。
+1、在Ascend910环境上，生成Ascend310平台AIR模型推理需要的.bin格式数据。
 
 ```shell
 python export_bin.py --config_path [YMAL CONFIG PATH] --data_dir [DATA DIR] --annFile [ANNOTATION FILE PATH]
 ```
 
-2、导出训练后量化的AIR格式模型。
+其中，[DATA DIR]为推理数据的路径，[ANNOTATION FILE PATH]为用到的注解文件路径
+
+2、在Ascend910环境上，生成训练后量化的AIR格式模型。
 
 导出训练后量化模型需要配套的量化工具包，参考[官方地址](https://www.hiascend.com/software/cann/community)
 
@@ -461,14 +463,19 @@ python export_bin.py --config_path [YMAL CONFIG PATH] --data_dir [DATA DIR] --an
 python post_quant.py --config_path [YMAL CONFIG PATH] --ckpt_file [CKPT_PATH] --data_dir [DATASET PATH] --annFile [ANNOTATION FILE PATH]
 ```
 
+其中，[DATASET PATH]为推理数据的路径，[ANNOTATION FILE PATH]为注解文件的路径。
+
 导出的模型会存储在./result/yolov3_quant.air。
 
-3、在Ascend310执行推理量化模型。
+3、将前两步生成的数据拷贝到310环境上，在Ascend310执行推理量化模型。
 
 ```shell
 # Ascend310 quant inference
+cd ascend310_quant_infer/
 bash run_quant_infer.sh [AIR_PATH] [DATA_PATH] [IMAGE_ID] [IMAGE_SHAPE] [ANN_FILE]
 ```
+
+其中，AIR_PATH为第二步生成的air文件路径，DATA_PATH为推理数据的路径，IMAGE_ID为第一步生成的image_id相关二进制文件，IMAGE_SHAPE为第一步生成的shape相关二进制文件，ANN_FILE为注解文件路径
 
 推理结果保存在脚本执行的当前路径，可以在acc.log中看到精度计算结果。
 
@@ -510,7 +517,6 @@ bash run_quant_infer.sh [AIR_PATH] [DATA_PATH] [IMAGE_ID] [IMAGE_SHAPE] [ANN_FIL
 | 总时长                 | 8卡：13小时                                               | 8卡: 18小时(shape=416)                                    |
 | 参数(M)             | 62.1                                                        | 62.1                                                        |
 | 微调检查点 | 474M (.ckpt文件)                                           | 474M (.ckpt文件)                                           |
-| 脚本                    | https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53 | https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53 |
 
 ### 推理性能
 
