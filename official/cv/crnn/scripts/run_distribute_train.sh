@@ -53,7 +53,8 @@ if [ "GPU" == $PLATFORM ]; then
   cd $WORKDIR || exit
   echo "start distributed training with $DEVICE_NUM GPUs."
   env >env.log
-  mpirun --allow-run-as-root -n $DEVICE_NUM python train.py --train_dataset=$DATASET_NAME --train_dataset_path=$PATH2 --device_target=GPU --run_distribute=True > log.txt 2>&1 &
+  mpirun --allow-run-as-root -n $DEVICE_NUM --output-filename log_output --merge-stderr-to-stdout \
+    python train.py --train_dataset=$DATASET_NAME --train_dataset_path=$PATH2 --device_target=GPU --run_distribute=True > log.txt 2>&1 &
   cd ..
 elif [ "Ascend" == $PLATFORM ]; then
   PATH1=$(get_real_path $4)

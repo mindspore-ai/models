@@ -35,6 +35,6 @@ cp *.py ./train_parallel
 cd ./train_parallel
 env > env.log
 echo "start training"
-    mpirun -n $2 --allow-run-as-root \
+    mpirun -n $2 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
     python train.py --device_num $2 --device_target GPU --data_url $1 \
     > train.log 2>&1 &

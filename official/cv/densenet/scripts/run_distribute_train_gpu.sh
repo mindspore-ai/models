@@ -44,13 +44,14 @@ if [ -f $6 ]  # pretrained ckpt
 then
     if [ $1 -gt 1 ]
     then
-        mpirun -n $1 --allow-run-as-root python3 ${BASEPATH}/../train.py \
-                                                 --net=$3 \
-                                                 --dataset=$4 \
-                                                 --is_distributed=1 \
-                                                 --train_data_dir=$5 \
-                                                 --device_target='GPU' \
-                                                 --train_pretrained=$6 > train.log 2>&1 &
+        mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+            python3 ${BASEPATH}/../train.py \
+                    --net=$3 \
+                    --dataset=$4 \
+                    --is_distributed=1 \
+                    --train_data_dir=$5 \
+                    --device_target='GPU' \
+                    --train_pretrained=$6 > train.log 2>&1 &
     else
         python3 ${BASEPATH}/../train.py \
                 --net=$3 \
@@ -63,12 +64,13 @@ then
 else
     if [ $1 -gt 1 ]
     then
-        mpirun -n $1 --allow-run-as-root python3 ${BASEPATH}/../train.py \
-                                                 --net=$3 \
-                                                 --dataset=$4 \
-                                                 --is_distributed=1 \
-                                                 --train_data_dir=$5 \
-                                                 --device_target='GPU' > train.log 2>&1 &
+        mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+            python3 ${BASEPATH}/../train.py \
+                    --net=$3 \
+                    --dataset=$4 \
+                    --is_distributed=1 \
+                    --train_data_dir=$5 \
+                    --device_target='GPU' > train.log 2>&1 &
     else
         python3 ${BASEPATH}/../train.py \
                 --net=$3 \

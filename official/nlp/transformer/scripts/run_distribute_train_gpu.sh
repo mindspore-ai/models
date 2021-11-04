@@ -34,7 +34,7 @@ EPOCH_SIZE=$2
 DATA_PATH=$3
 echo $RANK_SIZE
 
-mpirun -n $RANK_SIZE \
+mpirun -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
     python train.py  \
     --config_path=$CONFIG_PATH \
     --distribute="true" \

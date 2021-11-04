@@ -42,12 +42,14 @@ cd train_distribute_gpu
 
 if [ $# == 3 ]
 then
-  mpirun -n $1 --allow-run-as-root python ${dirname_path}/${SCRIPT_NAME} \
+  mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+  python ${dirname_path}/${SCRIPT_NAME} \
       --world_size=$1 \
       --device_target='GPU' \
       --mindrecord_path=$3 > train.log 2>&1 &
 else
-  mpirun -n $1 --allow-run-as-root python ${dirname_path}/${SCRIPT_NAME} \
+  mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+  python ${dirname_path}/${SCRIPT_NAME} \
       --world_size=$1 \
       --device_target='GPU' \
       --mindrecord_path=$3 \

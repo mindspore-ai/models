@@ -35,4 +35,5 @@ export RANK_SIZE=$1
 export CUDA_VISIBLE_DEVICES="$2"
 
 cd ../
-mpirun -n $1 --allow-run-as-root python3 train.py --device_target 'GPU' --isModelArts False --dataset_path ${DATA_PATH} --pre_ckpt_path ${PRETRAINED_PATH} > train.log 2>&1 &
+mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+    python3 train.py --device_target 'GPU' --isModelArts False --dataset_path ${DATA_PATH} --pre_ckpt_path ${PRETRAINED_PATH} > train.log 2>&1 &

@@ -49,5 +49,6 @@ export DEVICE_NUM=8
 export RANK_SIZE=8
 
 echo "start training"
-mpirun --allow-run-as-root -n $RANK_SIZE python train.py --run_distribute=True --task_type=$TASK_TYPE --pre_trained=$PATH2 --device_target="GPU" &> log &
+mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
+    python train.py --run_distribute=True --task_type=$TASK_TYPE --pre_trained=$PATH2 --device_target="GPU" &> log &
 cd ..
