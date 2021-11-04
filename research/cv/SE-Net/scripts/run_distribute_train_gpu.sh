@@ -33,7 +33,7 @@ cd ./train_parallel || exit
 
 echo "start distributed training with $DEVICE_NUM GPUs."
 
-mpirun --allow-run-as-root -n $DEVICE_NUM \
+mpirun --allow-run-as-root -n $DEVICE_NUM --output-filename log_output --merge-stderr-to-stdout \
     python train.py \
     --device_target="GPU" \
     --net=$NET \

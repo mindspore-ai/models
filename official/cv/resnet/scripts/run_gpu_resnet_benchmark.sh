@@ -50,18 +50,21 @@ fi
 
 if [ $# == 5 ]
 then
-    mpirun --allow-run-as-root -n $5 python ${self_path}/../gpu_resnet_benchmark.py --run_distribute=True \
-    --data_path=$DATAPATH --config_path=$2 --batch_size=$3 --dtype=$4
+    mpirun --allow-run-as-root -n $5 --output-filename log_output --merge-stderr-to-stdout \
+        python ${self_path}/../gpu_resnet_benchmark.py --run_distribute=True \
+        --data_path=$DATAPATH --config_path=$2 --batch_size=$3 --dtype=$4
 fi
 
 if [ $# == 6 ]
 then
-    mpirun --allow-run-as-root -n $5 python ${self_path}/../gpu_resnet_benchmark.py --run_distribute=True \
-    --data_path=$DATAPATH --config_path=$2 --batch_size=$3 --dtype=$4 --save_ckpt=$6
+    mpirun --allow-run-as-root -n $5 --output-filename log_output --merge-stderr-to-stdout \
+        python ${self_path}/../gpu_resnet_benchmark.py --run_distribute=True \
+        --data_path=$DATAPATH --config_path=$2 --batch_size=$3 --dtype=$4 --save_ckpt=$6
 fi
 
 if [ $# == 7 ]
 then
-    mpirun --allow-run-as-root -n $5 python ${self_path}/../gpu_resnet_benchmark.py --run_distribute=True \
-    --data_path=$DATAPATH --config_path=$2 --batch_size=$3 --dtype=$4 --save_ckpt=$6 --checkpoint_file_path=$7
+    mpirun --allow-run-as-root -n $5 --output-filename log_output --merge-stderr-to-stdout \
+        python ${self_path}/../gpu_resnet_benchmark.py --run_distribute=True \
+        --data_path=$DATAPATH --config_path=$2 --batch_size=$3 --dtype=$4 --save_ckpt=$6 --checkpoint_file_path=$7
 fi

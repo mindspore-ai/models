@@ -44,10 +44,11 @@ if [ -f $4 ]  # pre_trained ckpt
 then 
     if [ $1 -gt 1 ]
     then
-        mpirun -n $1 --allow-run-as-root python3 ${BASEPATH}/../train.py \
-                                                 --dataset_path=$3 \
-                                                 --run_distribute=True \
-                                                 --pre_trained=$4 > log.txt 2>&1 &
+        mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+            python3 ${BASEPATH}/../train.py \
+                    --dataset_path=$3 \
+                    --run_distribute=True \
+                    --pre_trained=$4 > log.txt 2>&1 &
     else
         python3 ${BASEPATH}/../train.py \
                 --dataset_path=$3 \
@@ -56,9 +57,10 @@ then
 else
     if [ $1 -gt 1 ]
     then
-        mpirun -n $1 --allow-run-as-root python3 ${BASEPATH}/../train.py \
-                                                 --run_distribute=True \
-                                                 --dataset_path=$3 > log.txt 2>&1 &
+        mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+            python3 ${BASEPATH}/../train.py \
+                    --run_distribute=True \
+                    --dataset_path=$3 > log.txt 2>&1 &
     else
         python3 ${BASEPATH}/../train.py \
                 --dataset_path=$3 > log.txt 2>&1 &

@@ -55,5 +55,6 @@ cp -r ../src ./train_parallel_fp32
 cd ./train_parallel_fp32 || exit
 echo "start distributed training with $DEVICE_NUM GPUs."
 env > env.log
-mpirun --allow-run-as-root -n $DEVICE_NUM python train.py --run_distribute=True --data_path=$PATH1 --output_path './output' --device_target='GPU' --checkpoint_path='./' > train.log 2>&1 &
+mpirun --allow-run-as-root -n $DEVICE_NUM --output-filename log_output --merge-stderr-to-stdout \
+    python train.py --run_distribute=True --data_path=$PATH1 --output_path './output' --device_target='GPU' --checkpoint_path='./' > train.log 2>&1 &
 cd ..

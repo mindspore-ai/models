@@ -38,7 +38,7 @@ cp ../src/*.py ./train_parallel/src
 cd ./train_parallel
 env > env.log
 echo "start training"
-    mpirun -n $1 --allow-run-as-root \
+    mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
            python train.py --device_num $1 \
                            --dataset $2 --is_modelarts False \
                            --run_distribute True \

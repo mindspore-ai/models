@@ -50,12 +50,13 @@ export CUDA_VISIBLE_DEVICES="$2"
 
 if [ $1 -gt 1 ]
 then
-    mpirun -n $1 --allow-run-as-root python3 ${BASEPATH}/../eval.py \
-                                             --net=$3 \
-                                             --dataset=$4 \
-                                             --eval_data_dir=$5 \
-                                             --device_target='GPU' \
-                                             --ckpt_files=$6 > eval.log 2>&1 &
+    mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+        python3 ${BASEPATH}/../eval.py \
+                --net=$3 \
+                --dataset=$4 \
+                --eval_data_dir=$5 \
+                --device_target='GPU' \
+                --ckpt_files=$6 > eval.log 2>&1 &
 else
 
     python3 ${BASEPATH}/../eval.py \

@@ -44,12 +44,13 @@ if [ $4 ] # pretrained ckpt
 then
   if [ $1 -gt 1 ]
   then
-    mpirun -n $1 --allow-run-as-root python ${BASEPATH}/../train.py \
-                                                  --train_label_file=$3 \
-                                                  --is_distributed=1 \
-                                                  --per_batch_size=32 \
-                                                  --device_target='GPU' \
-                                                  --pretrained=$4 > train.log  2>&1 &
+    mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+        python ${BASEPATH}/../train.py \
+               --train_label_file=$3 \
+               --is_distributed=1 \
+               --per_batch_size=32 \
+               --device_target='GPU' \
+               --pretrained=$4 > train.log  2>&1 &
   else
     python ${BASEPATH}/../train.py \
             --train_label_file=$3 \
@@ -61,11 +62,12 @@ then
 else
   if [ $1 -gt 1 ]
   then
-    mpirun -n $1 --allow-run-as-root python ${BASEPATH}/../train.py \
-                                                  --train_label_file=$3 \
-                                                  --is_distributed=1 \
-                                                  --per_batch_size=32 \
-                                                  --device_target='GPU' > train.log  2>&1 &
+    mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+        python ${BASEPATH}/../train.py \
+               --train_label_file=$3 \
+               --is_distributed=1 \
+               --per_batch_size=32 \
+               --device_target='GPU' > train.log  2>&1 &
   else
     python ${BASEPATH}/../train.py \
             --train_label_file=$3 \

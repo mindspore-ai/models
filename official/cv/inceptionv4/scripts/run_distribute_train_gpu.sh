@@ -30,5 +30,6 @@ CONFIG_FILE="${BASE_PATH}/../default_config_gpu.yaml"
 
 echo "start training"
 
-mpirun -n $RANK_SIZE --allow-run-as-root python train.py --config_path=$CONFIG_FILE --dataset_path=$DATA_DIR \
+mpirun -n $RANK_SIZE --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+    python train.py --config_path=$CONFIG_FILE --dataset_path=$DATA_DIR \
 --platform='GPU' > train.log 2>&1 &

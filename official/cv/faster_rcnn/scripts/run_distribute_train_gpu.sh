@@ -82,7 +82,7 @@ fi
 
 echo "start training on $RANK_SIZE devices"
 
-mpirun -n $RANK_SIZE \
+mpirun -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
     python train.py  \
     --config_path=$CONFIG_FILE \
     --run_distribute=True \

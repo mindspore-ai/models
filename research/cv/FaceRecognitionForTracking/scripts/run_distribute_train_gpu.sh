@@ -48,12 +48,13 @@ then
   then
     config_path="${BASEPATH}/../reid_8p_gpu_config.yaml"
     echo "config path 8p is : ${config_path}"
-    mpirun -n $1 --allow-run-as-root python3 ${BASEPATH}/../train.py \
-                                                  --config_path=$config_path \
-                                                  --data_dir=$3 \
-                                                  --is_distributed=1 \
-                                                  --device_target='GPU' \
-                                                  --pretrained=$4
+    mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+        python3 ${BASEPATH}/../train.py \
+                --config_path=$config_path \
+                --data_dir=$3 \
+                --is_distributed=1 \
+                --device_target='GPU' \
+                --pretrained=$4
   else
     python3 ${BASEPATH}/../train.py \
             --data_dir=$3 \
@@ -66,11 +67,12 @@ else
   then
     config_path="${BASEPATH}/../reid_8p_gpu_config.yaml"
     echo "config path 8p is : ${config_path}"
-    mpirun -n $1 --allow-run-as-root python3 ${BASEPATH}/../train.py \
-                                                  --config_path=$config_path \
-                                                  --data_dir=$3 \
-                                                  --is_distributed=1 \
-                                                  --device_target='GPU'
+    mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+        python3 ${BASEPATH}/../train.py \
+                --config_path=$config_path \
+                --data_dir=$3 \
+                --is_distributed=1 \
+                --device_target='GPU'
   else
     python3 ${BASEPATH}/../train.py \
             --data_dir=$3 \

@@ -23,5 +23,6 @@ echo "==========================================================================
 
 
 
-mpirun --allow-run-as-root -n 8 python train.py \
-        --device_target="GPU" --is_distributed=1 > output.multi_gpu.train.log 2>&1 &
+mpirun --allow-run-as-root -n 8 --output-filename log_output --merge-stderr-to-stdout \
+        python train.py \
+            --device_target="GPU" --is_distributed=1 > output.multi_gpu.train.log 2>&1 &

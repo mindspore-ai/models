@@ -55,7 +55,8 @@ mkdir ${current_exec_path}/device_parallel
 cd ${current_exec_path}/device_parallel || exit
 echo $curtime >> starttime
 
-time mpirun -n $RANK_SIZE --allow-run-as-root python3 ${current_exec_path}/train.py \
+time mpirun -n $RANK_SIZE --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+        python3 ${current_exec_path}/train.py \
                                 --model tinynet_c \
                                 --drop 0.2 \
                                 --drop-connect 0 \
