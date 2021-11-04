@@ -207,7 +207,7 @@ if __name__ == "__main__":
     if cfg.get_mindrecord:
         context.set_context(device_target='Ascend', mode=context.GRAPH_MODE, device_id=get_device_id())
 
-        for cmn in cfg.mr_nam:
+        for cmn in cfg.mr_name:
             if cmn in ['train', 'val']:
                 convert_to_mindrecord('music_tagging_{}_tmp.csv'.format(cmn),
                                       cfg.npy_path, cfg.mr_path, cmn,
