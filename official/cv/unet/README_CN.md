@@ -103,12 +103,12 @@ UNet++是U-Net的增强版本，使用了新的跨层链接方式和深层监督
 
 我们提供了一个脚本来将 COCO 和 Cell_Nuclei 数据集（[Unet++ 原论文](https://arxiv.org/abs/1912.05074) 中使用）转换为multi-class格式。
 
-1. 在unet下选择*.yaml文件，根据需要修改参数。
+1. 在unet下根据不同数据集选择 unet_*_cell_config.yaml 或 unet_*_coco_config.yaml 文件，根据需要修改参数。
 
 2. 运行转换脚本:
 
 ```shell
-python preprocess_dataset.py --config_path path/unet/*.yaml  --data_path /data/save_data_path
+python preprocess_dataset.py --config_path path/unet/unet_nested_cell_config.yaml  --data_path /data/save_data_path
 ```
 
 ## 环境要求
@@ -169,7 +169,7 @@ python preprocess_dataset.py --config_path path/unet/*.yaml  --data_path /data/s
 
 - Docker中运行
 
-创建docker镜像(讲版本号换成你实际使用的版本)
+创建docker镜像(将版本号换成你实际使用的版本)
 
 ```shell
 # build docker
@@ -190,7 +190,7 @@ bash scripts/docker_start.sh unet:20.1.0 [DATA_DIR] [MODEL_DIR]
 
 ```text
 # 在modelarts上使用分布式训练的示例：
-# (1) 选址a或者b其中一种方式。
+# (1) 选择a或者b其中一种方式。
 #       a. 设置 "enable_modelarts=True" 。
 #          在yaml文件上设置网络所需的参数。
 #       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
@@ -204,7 +204,7 @@ bash scripts/docker_start.sh unet:20.1.0 [DATA_DIR] [MODEL_DIR]
 
 # 在modelarts上使用模型推理的示例
 # (1) 把训练好的模型地方到桶的对应位置。
-# (2) 选址a或者b其中一种方式。
+# (2) 选择a或者b其中一种方式。
 #       a.  设置 "enable_modelarts=True"
 #          设置 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt" 在 yaml 文件.
 #          设置 "checkpoint_url=/The path of checkpoint in S3/" 在 yaml 文件.
@@ -389,10 +389,10 @@ bash scripts/docker_start.sh unet:20.1.0 [DATA_DIR] [MODEL_DIR]
 bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET]
 ```
 
-上述shell脚本在后台运行分布式训练。可通过`logs/device[X]/log.log`文件查看结果。损失值如下：
+上述shell脚本在后台运行分布式训练。可通过`LOG[X]/log.log`文件查看结果。损失值如下：
 
 ```shell
-# grep "loss is" logs/device0/log.log
+# grep "loss is" LOG0/log.log
 step: 1, loss is 0.70524895, fps is 0.15914689861221412
 step: 2, loss is 0.6925452, fps is 56.43668656967454
 ...
@@ -410,7 +410,7 @@ bash scripts/run_distribute_train_gpu.sh [RANKSIZE] [DATASET] [CONFIG_PATH]
 
 #### 训练时推理
 
-训练时推理需要在启动文件中添加`run_eval` 并设置为True。与此同时需要设置: `save_best_ckpt`, `eval_start_epoch`, `eval_interval`, `eval_metrics` 。
+训练时推理需要在启动文件中添加`run_eval` 并设置为True。如果在coco数据集上进行训练则同时需要设置: `eval_start_epoch`, `eval_interval`, `eval_metrics` 。
 
 ## 评估过程
 
@@ -515,7 +515,7 @@ ModelArts导出mindir
 
 ```text
 # (1) 把训练好的模型地方到桶的对应位置。
-# (2) 选址a或者b其中一种方式。
+# (2) 选择a或者b其中一种方式。
 #       a.  设置 "enable_modelarts=True"
 #          设置 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt" 在 yaml 文件。
 #          设置 "checkpoint_url=/The path of checkpoint in S3/" 在 yaml 文件。
@@ -594,7 +594,7 @@ Cross valid dice coeff is: 0.9139793866877975
 
 #### 迁移学习
 
-首先像上面讲的那样讲继续训练的权重加载进来。然后将`transfer_training`设置成True。配置中还有一个 `filter_weight`参数，用于将一些不能适用于不同数据集的权重过滤掉。通常这个`filter_weight`的参数不需要修改，其默认值通常是和模型的分类数相关的参数。例如：
+首先像上面讲的那样将继续训练的权重加载进来。然后将`transfer_training`设置成True。配置中还有一个 `filter_weight`参数，用于将一些不能适用于不同数据集的权重过滤掉。通常这个`filter_weight`的参数不需要修改，其默认值通常是和模型的分类数相关的参数。例如：
 
 ```yaml
     'resume': True,
