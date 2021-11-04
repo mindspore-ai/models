@@ -99,60 +99,6 @@ run_ascend(){
     done    
 }
 
-# run_gpu(){
-
-#     if [ $# -gt 3 ] || [ $# -lt 2 ]
-#     then
-#         echo "Usage:  sh run_train_distribute_quant.sh  [GPU] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)\n "
-#         exit 1
-#     fi
-
-#     PATH1=$(get_real_path $2)
-    
-#     if [ $# == 3 ]
-#     then 
-#         PATH2=$(get_real_path $3)
-#     fi
-
-#     if [ ! -d $PATH1 ]
-#     then 
-#         echo "error: DATASET_PATH=$PATH1 is not a directory"
-#         exit 1
-#     fi 
-
-#     if [ $# == 3 ] && [ ! -f $PATH2 ]
-#     then
-#         echo "error: PRETRAINED_CKPT_PATH=$PATH2 is not a file"
-#         exit 1
-#     fi
-
-#     ulimit -u unlimited
-#     export RANK_SIZE=2
-#     #export CUDA_VISIBLE_DEVICES=1,2
-
-#     rm -rf ./train_parallel
-#     mkdir ./train_parallel
-#     cp ../*.py ./train_parallel
-#     cp *.sh ./train_parallel
-#     cp -r ../src ./train_parallel
-#     cp -r ../models ./train_parallel
-#     cd ./train_parallel || exit
-#     echo "start training"
-#     env > env.log
-#     if [ $# == 2 ]
-#     then
-#         mpirun --allow-run-as-root -n $RANK_SIZE
-#         python train.py --device_target=$1  --dataset_path=$PATH1 &> log &
-#     fi
-    
-#     if [ $# == 3 ]
-#     then
-#         mpirun --allow-run-as-root -n $RANK_SIZE
-#         python train.py --device_traget=$1  --dataset_path=$PATH1 --pre_trained=$PATH2 &> log &
-#     fi
-#     cd ..
-# }
-
 
 if [ $1 = "Ascend" ] ; then
     run_ascend "$@"
