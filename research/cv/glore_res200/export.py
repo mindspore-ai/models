@@ -22,7 +22,7 @@ import numpy as np
 from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
 import mindspore.common.dtype as ms
 
-from src.config import config
+from src.config import config1, config2
 from src.glore_resnet200 import glore_resnet200
 
 parser = argparse.ArgumentParser(description='Classification')
@@ -36,9 +36,11 @@ parser.add_argument("--ckpt_path", type=str, default=None)
 
 args = parser.parse_args()
 
-context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
+context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
 if args.device_target == "Ascend":
-    context.set_context(device_id=args.device_id)
+    config = config1
+elif args.device_target == "GPU":
+    config = config2
 
 if __name__ == '__main__':
     net = glore_resnet200(class_num=config.class_num)
