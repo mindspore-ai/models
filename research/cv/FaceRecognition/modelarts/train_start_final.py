@@ -62,7 +62,7 @@ parser.add_argument('--train_url',
                     type=str,
                     help="setting dir of training output")
 parser.add_argument('--pretrained',
-                    default=None,
+                    default='',
                     type=str,
                     help="setting dir of ckpt")
 
