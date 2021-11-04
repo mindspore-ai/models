@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     net = GetPoseResNet(config)
 
-    assert cfg.checkpoint_dir is not None, "cfg.checkpoint_dir is None."
+    assert args.ckpt_url is not None, "args.ckpt_url is None."
     param_dict = load_checkpoint(args.ckpt_url)
     load_param_into_net(net, param_dict)
 
