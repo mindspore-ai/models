@@ -61,7 +61,7 @@ def eval_alexnet():
         model = Model(network, loss, opt, metrics={"Accuracy": Accuracy()})
 
     elif config.dataset_name == 'imagenet':
-        network = AlexNet(config.num_classes, phase='test')
+        network = AlexNet(config.num_classes, phase='test', off_load=True)
         loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
         ds_eval = create_dataset_imagenet(config, config.data_path, config.batch_size, training=False)
         param_dict = load_checkpoint(config.ckpt_path)

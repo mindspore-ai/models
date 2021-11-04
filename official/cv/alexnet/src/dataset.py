@@ -17,6 +17,7 @@ Produce the dataset
 """
 
 import os
+from multiprocessing import cpu_count
 import mindspore.dataset as ds
 import mindspore.dataset.transforms.c_transforms as C
 import mindspore.dataset.vision.c_transforms as CV
@@ -85,8 +86,9 @@ def create_dataset_imagenet(cfg, dataset_path, batch_size=32, repeat_num=1, trai
 
     num_parallel_workers = 16
     if device_num == 1:
-        num_parallel_workers = 48
-        ds.config.set_prefetch_size(8)
+        num_parallel_workers = 96
+        if num_parallel_workers > cpu_count():
+            num_parallel_workers = cpu_count()
     else:
         ds.config.set_numa_enable(True)
     data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=4,
@@ -95,24 +97,19 @@ def create_dataset_imagenet(cfg, dataset_path, batch_size=32, repeat_num=1, trai
 
     assert cfg.image_height == cfg.image_width, "imagenet_cfg.image_height not equal imagenet_cfg.image_width"
     image_size = cfg.image_height
-    mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
-    std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
 
     # define map operations
+    transform_img = []
     if training:
         transform_img = [
             CV.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
-            CV.RandomHorizontalFlip(prob=0.5),
-            CV.Normalize(mean=mean, std=std),
-            CV.HWC2CHW()
+            CV.RandomHorizontalFlip(prob=0.5)
         ]
     else:
         transform_img = [
             CV.Decode(),
             CV.Resize((256, 256)),
-            CV.CenterCrop(image_size),
-            CV.Normalize(mean=mean, std=std),
-            CV.HWC2CHW()
+            CV.CenterCrop(image_size)
         ]
 
     data_set = data_set.map(input_columns="image", num_parallel_workers=num_parallel_workers,
