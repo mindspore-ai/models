@@ -99,12 +99,12 @@ If set `split`=1.0, you should split train dataset and val dataset by directorie
 
 We support script to convert COCO and a Cell_Nuclei dataset used in used in [Unet++ original paper](https://arxiv.org/abs/1912.05074) to mulyi-class dataset format.
 
-1. Select `*.yaml` file under `unet` and modify the parameters as needed.
+1. Select `unet_*_cell_config.yaml` or `unet_*_coco_config.yaml` file according to different datasets under `unet` and modify the parameters as needed.
 
 2. run script to convert to mulyi-class dataset format:
 
 ```shell
-python preprocess_dataset.py --config_path path/unet/*.yaml  --data_path /data/save_data_path
+python preprocess_dataset.py --config_path path/unet/unet_nested_cell_config.yaml  --data_path /data/save_data_path
 ```
 
 ## [Environment Requirements](#contents)
@@ -390,10 +390,10 @@ The python command above will run in the background, you can view the results th
 bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET]
 ```
 
-  The above shell script will run distribute training in the background.   You can view the results through the file `logs/device[X]/log.log`.     The loss value will be achieved as follows:
+  The above shell script will run distribute training in the background.   You can view the results through the file `LOG[X]/log.log`.     The loss value will be achieved as follows:
 
   ```shell
-  # grep "loss is" logs/device0/log.log
+  # grep "loss is" LOG0/log.log
   step: 1, loss is 0.70524895, fps is 0.15914689861221412
   step: 2, loss is 0.6925452, fps is 56.43668656967454
   ...
@@ -411,7 +411,7 @@ bash scripts/run_distribute_train_gpu.sh [RANKSIZE] [DATASET] [CONFIG_PATH]
 
 #### Evaluation while training
 
-You can add `run_eval` to start shell and set it True, if you want evaluation while training. And you can set argument option: `save_best_ckpt`, `eval_start_epoch`, `eval_interval`, `eval_metrics` when `run_eval` is True.
+You can add `run_eval` to start shell and set it True, if you want evaluation while training. And you can set argument option: `eval_start_epoch`, `eval_interval`, `eval_metrics` if train on coco dataset.
 
 ## [Evaluation Process](#contents)
 
