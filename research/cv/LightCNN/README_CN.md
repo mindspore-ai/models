@@ -106,8 +106,8 @@ LightCNN适用于有大量噪声的人脸识别数据集，提出了maxout 的�
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.3/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.3/index.html)
 - 生成config json文件用于8卡训练。
-    - [简易教程](https://gitee.com/mindspore/mindspore/tree/r1.3/model_zoo/utils/hccl_tools)
-    - 详细配置方法请参照[官网教程](https://www.mindspore.cn/tutorial/training/zh-CN/r1.2/advanced_use/distributed_training_ascend.html#id4)。
+    - [简易教程](https://gitee.com/mindspore/models/tree/r1.3/utils/hccl_tools)
+    - 详细配置方法请参照[官网教程](https://www.mindspore.cn/tutorials/zh-CN/r1.3/intermediate/distributed_training/distributed_training_ascend.html#id3)。
 
 # 快速入门
 
@@ -428,18 +428,18 @@ python3 eval_blfur.py \
 | 输出 | 概率 |
 | 损失 | 0.10905003 |
 | 性能 | 369,144,120.56 ms（单卡）<br>  85,369,778.48 ms（八卡） |  
-| 脚本 | [链接](https://gitee.com/mindspore/mindspore/tree/r1.3/model_zoo/research/cv/LightCNN) |
+| 脚本 | [链接](https://gitee.com/mindspore/models/tree/r1.3/research/cv/LightCNN)|
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/r1.3/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models/tree/r1.3)。
 
 [1]: https://arxiv.org/pdf/1511.02683
 [2]: http://pan.baidu.com/s/1gfxB0iB
 [3]: https://drive.google.com/file/d/0ByNaVHFekDPRbFg1YTNiMUxNYXc/view?usp=sharing
 [4]: https://hyper.ai/datasets/5543
 [5]: https://pan.baidu.com/s/1eR6vHFO
-[6]: https://www.mindspore.cn/tutorial/training/zh-CN/r1.2/advanced_use/enable_mixed_precision.html
+[6]: https://www.mindspore.cn/docs/programming_guide/zh-CN/master/enable_mixed_precision.html
 [7]: http://www.cbsr.ia.ac.cn/users/scliao/projects/blufr/BLUFR.zip
-[8]: https://github.com/AlfredXiangWu/face_verification_experiment/blob/r1.3/code/lfw_pairs.mat
-[9]: https://github.com/AlfredXiangWu/face_verification_experiment/blob/r1.3/results/LightenedCNN_B_lfw.mat
+[8]: https://github.com/AlfredXiangWu/face_verification_experiment/blob/master/code/lfw_pairs.mat
+[9]: https://github.com/AlfredXiangWu/face_verification_experiment/blob/master/results/LightenedCNN_B_lfw.mat
