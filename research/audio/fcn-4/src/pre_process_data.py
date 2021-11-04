@@ -43,7 +43,16 @@ def compute_melgram(audio_path, save_path='', filename='', save_npy=True):
     HOP_LEN = 256
     DURA = 29.12  # to make it 1366 frame..
 
-    src, _ = librosa.load(audio_path, sr=SR)  # whole signal
+    try:
+        src, _ = librosa.load(audio_path, sr=SR)  # whole signal
+    except EOFError:
+        print('File was damaged: ', audio_path)
+        print('Now skip it!')
+        return
+    except FileNotFoundError:
+        print('Failed to load the file: ', audio_path)
+        print('Now skip it!')
+        return
     n_sample = src.shape[0]
     n_sample_fit = int(DURA * SR)
 
@@ -61,7 +70,6 @@ def compute_melgram(audio_path, save_path='', filename='', save_npy=True):
 
         save_path = save_path + filename[:-4] + '.npy'
         np.save(save_path, ret)
-    return ret
 
 
 def get_data(features_data, labels_data):
