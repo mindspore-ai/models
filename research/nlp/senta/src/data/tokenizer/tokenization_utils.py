@@ -136,7 +136,7 @@ class BpeEncoder():
                     j = word.index(first, i)
                     new_word.extend(word[i:j])
                     i = j
-                except IOError:
+                except ValueError:
                     new_word.extend(word[i:])
                     break
 
