@@ -172,7 +172,7 @@ GhostNet的总体网络架构如下：[链接](https://arxiv.org/pdf/1911.11907.
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
 
 训练结果保存在示例路径中，文件夹名称以“train”或“train_parallel”开头。您可在此路径下的日志中找到检查点文件以及结果，如下所示。
 
@@ -233,7 +233,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 ```
 
 参数ckpt_file为必填项，
-`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
+`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
 
 ## 在Ascend310执行推理
 
@@ -277,7 +277,7 @@ Total data: 50000, top1 accuracy: 0.73816, top5 accuracy: 0.9178.
 |总时长   |  39小时 |
 |参数(M)   | 5.18 |
 |  微调检查点 | 42.05M（.ckpt文件）  |
-| 脚本  | [链接](https://gitee.com/alreadyhad/mindspore/tree/r1.3/model_zoo/research/cv/ghostnet)  |
+| 脚本  | [链接](https://gitee.com/mindspore/models/tree/r1.3/research/cv/ghostnet)  |
 
 # 随机情况说明
 

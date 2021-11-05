@@ -9,6 +9,7 @@ include_directories(${MINDSPORE_PATH}/include)
 include_directories(${PROJECT_SRC_ROOT}/../)
 find_library(MS_LIB libmindspore.so ${MINDSPORE_PATH}/lib)
 file(GLOB_RECURSE MD_LIB ${MINDSPORE_PATH}/_c_dataengine*)
+find_package(gflags REQUIRED)
 
 add_executable(main main.cc utils.cc)
 target_link_libraries(main ${MS_LIB} ${MD_LIB} gflags)

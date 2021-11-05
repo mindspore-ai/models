@@ -26,15 +26,7 @@ args = parser.parse_args()
 
 
 def get_top5_acc(top5_arg, gt_class):
-    """
-    get top5 accuracy
-    Args:
-        top5_arg:
-        gt_class:
-
-    Returns:
-
-    """
+    """get top5 accuracy"""
     sub_count = 0
     for top5, gt in zip(top5_arg, gt_class):
         if gt in top5:
@@ -43,15 +35,7 @@ def get_top5_acc(top5_arg, gt_class):
 
 
 def cal_acc_imagenet(result_path, label_path):
-    """
-    top1 accuracy, top5 accuracy
-    Args:
-        result_path:
-        label_path:
-
-    Returns:
-
-    """
+    """top1 accuracy, top5 accuracy"""
     files = os.listdir(result_path)
     with open(label_path, "r") as label:
         labels = json.load(label)
