@@ -6,3 +6,7 @@
 "models/research/cv/FaceRecognition/infer/mxbase/facerecognition/FaceRecognition.h"  "runtime/references"
 "models/research/cv/FaceRecognition/infer/mxbase/facerecognition/FaceRecognition.cpp"  "runtime/references"
 "models/research/cv/FaceRecognition/infer/mxbase/facerecognition/main_opencv.cpp"  "runtime/references"
+"models/research/cv/FaceRecognitionForTracking/infer/mxbase/src/FaceRecognitionForTracking.h"  "runtime/references"
+"models/research/cv/FaceRecognitionForTracking/infer/mxbase/src/FaceRecognitionForTracking.cpp"  "runtime/references"
+"models/research/cv/FaceRecognitionForTracking/infer/util/plugins/MxpiTransposePlugin.h"  "runtime/references"
+"models/research/cv/FaceRecognitionForTracking/infer/util/plugins/MxpiTransposePlugin.h"  "build/namespaces"
