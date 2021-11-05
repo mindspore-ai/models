@@ -178,7 +178,7 @@ bash scripts/run_distribute_train.sh /path/dataset /path/hccl.json 16 fp32 2.6B 
 
 For distributed training, an hccl configuration file with JSON format needs to be created in advance.
 Please follow the instructions in the link below:
-https:gitee.com/mindspore/models/tree/master/utils/hccl_tools.
+https:gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools.
 
 ### Training on GPU
 
@@ -376,7 +376,7 @@ ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TAR
 
 ### Serving 13B or 2.6B in Distributed mode [Ascend910 8 cards]
 
-- Generate [rank table file](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+- Generate [rank table file](https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools).
 
   ```shell
   # models/utils/hccl_tools/hccl_tools.
@@ -459,7 +459,7 @@ ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TAR
 
 ### Serving in Distributed mode [Ascend910 8 cards * N machine]
 
-- Generate [rank table file](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+- Generate [rank table file](https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools).
 - In every machine, prepare for checkpoint files and embedding files. We can also use 13B as a test example.
 - In every machine, use scripts/run_cluster_export.sh to export MindIR models, and move all device* to
   'serving_increment/pangu_distributed/models/'.

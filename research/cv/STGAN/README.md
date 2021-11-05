@@ -190,7 +190,7 @@ python export.py --ckpt_path [CHECKPOINT_PATH] --platform [PLATFORM] --file_form
 | Speed                      | 1pc: 400 ms/step;  8pcs:  143 ms/step                       |
 | Total time                 | 1pc: 41:36:07                                               |
 | Checkpoint for Fine tuning | 170.55M(.ckpt file)                                         |
-| Scripts                    | [STGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/STGAN) |
+| Scripts                    | [STGAN script](https://gitee.com/mindspore/models/tree/r1.5/research/cv/STGAN) |
 
 ## [Model Description](#contents)
 

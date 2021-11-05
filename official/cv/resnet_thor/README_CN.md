@@ -83,7 +83,7 @@ bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [DEVICE_NUM]
 bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
-> 对于分布式训练，需要提前创建JSON格式的HCCL配置文件。关于配置文件，可以参考[HCCL_TOOL](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+> 对于分布式训练，需要提前创建JSON格式的HCCL配置文件。关于配置文件，可以参考[HCCL_TOOL](https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools)
 。
 
 - GPU处理器环境运行
@@ -281,7 +281,7 @@ epoch： 36 step: 5004，loss is 1.645802
 | 总时间（按75.9%计算） | 72分钟 | 229分钟 |
 | 参数(M) | 25.5 |25.5 |
 | checkpoint | 491M（.ckpt file） | 380M（.ckpt file） |
-| 脚本 |[链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet_thor) |[链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet_thor) |
+| 脚本 |[链接](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet_thor) |[链接](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet_thor) |
 
 ### 推理性能
 

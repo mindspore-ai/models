@@ -281,7 +281,7 @@ test acc=0.84199995
 | Accuracy                             | 83.0/72.5                                 |
 | Speed                                | 0.195s/epoch                              |
 | Total time                           | 39s                                       |
-| Scripts                              | [GAT Script](https://gitee.com/mindspore/models/tree/master/official/gnn/gat)  |
+| Scripts                              | [GAT Script](https://gitee.com/mindspore/models/tree/r1.5/official/gnn/gat)  |
 
 ## [Description of random situation](#contents)
 

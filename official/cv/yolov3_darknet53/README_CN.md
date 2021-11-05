@@ -506,7 +506,7 @@ bash run_quant_infer.sh [AIR_PATH] [DATA_PATH] [IMAGE_ID] [IMAGE_SHAPE] [ANN_FIL
 | 总时长                 | 8卡：13小时                                               | 8卡: 18小时(shape=416)                                    |
 | 参数(M)             | 62.1                                                        | 62.1                                                        |
 | 微调检查点 | 474M (.ckpt文件)                                           | 474M (.ckpt文件)                                           |
-| 脚本                    | https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53 | https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53 |
+| 脚本                    | https://gitee.com/mindspore/models/tree/r1.5/official/cv/yolov3_darknet53 | https://gitee.com/mindspore/models/tree/r1.5/official/cv/yolov3_darknet53 |
 
 ### 推理性能
 

@@ -325,7 +325,7 @@ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.555
 | Total time                 | 8pc: 23.5 hours                                                                                |
 | Parameters (M)             | 62.1                                                                                           |
 | Checkpoint for Fine tuning | 474M (.ckpt file)                                                                              |
-| Scripts                    | [YoloV3-DarkNet53-Quant Script](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53_quant) |
+| Scripts                    | [YoloV3-DarkNet53-Quant Script](https://gitee.com/mindspore/models/tree/r1.5/official/cv/yolov3_darknet53_quant) |
 
 #### Inference Performance
 

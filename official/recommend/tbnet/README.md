@@ -214,7 +214,7 @@ python infer.py \
 | Speed                      | 1pc: 90ms/step                                              |
 | Total Time                 | 1pc: 297s                                                   |
 | Checkpoint for Fine Tuning | 104.66M (.ckpt file)                                        |
-| Scripts                    | [TB-Net scripts](https://gitee.com/mindspore/models/tree/master/official/recommend/tbnet) |
+| Scripts                    | [TB-Net scripts](https://gitee.com/mindspore/models/tree/r1.5/official/recommend/tbnet) |
 
 ### Evaluation Performance
 

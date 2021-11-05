@@ -228,7 +228,7 @@ ckpt_file: /home/FCN8s/ckpt/FCN8s_1-133_300.ckpt
   # example: bash scripts/run_train.sh 8 ~/hccl_8p.json
   ```
 
-  分布式训练需要提前创建JSON格式的HCCL配置文件,请遵循[链接说明](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+  分布式训练需要提前创建JSON格式的HCCL配置文件,请遵循[链接说明](https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools)
 
 - running on GPU with gpu default parameters
 
@@ -446,7 +446,7 @@ python export.py
 | outputs                    | probability                                                 | probability                                      |
 | Loss                       | 0.038                                                       | 0.036                                            |
 | Speed                      | 1pc: 564.652 ms/step;                                       | 1pc: 455.460 ms/step;                            |
-| Scripts                    | [FCN script](https://gitee.com/mindspore/models/tree/master/official/cv/FCN8s)
+| Scripts                    | [FCN script](https://gitee.com/mindspore/models/tree/r1.5/official/cv/FCN8s)
 
 ### Inference Performance
 

@@ -117,7 +117,7 @@ python export.py
 | Total time                 | 1pc: 10h;                                                 |
 | Parameters (M)             | 8.423  M                                                   |
 | Checkpoint for Fine tuning | 32.15M (.ckpt file)                                            |
-| Scripts                    | [StarGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/StarGAN) |
+| Scripts                    | [StarGAN script](https://gitee.com/mindspore/models/tree/r1.5/research/cv/StarGAN) |
 
 ### Inference Performance
 

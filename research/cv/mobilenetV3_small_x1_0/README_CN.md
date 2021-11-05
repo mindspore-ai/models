@@ -174,7 +174,7 @@ result: {'Loss': 2.3101649037352554, 'Top_1_Acc': 0.6746546546546547, 'Top_5_Acc
 | 训练总时间 (8p)             | 16.4h                                    |
 | 评估总时间                  | 1min                                    |
 | 参数量 (M)                 | 36M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/mobilenetV3_small_x1_0) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/r1.5/research/cv/mobilenetV3_small_x1_0) |
 
 # 随机情况的描述
 

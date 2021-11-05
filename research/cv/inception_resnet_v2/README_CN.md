@@ -132,7 +132,7 @@ bash scripts/run_distribute_train_ascend.sh RANK_TABLE_FILE DATA_DIR
 bash scripts/run_standalone_train_ascend.sh DEVICE_ID DATA_DIR
 ```
 
-> 注：RANK_TABLE_FILE可参考[链接]( https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html)。device_ip可以通过[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)获取
+> 注：RANK_TABLE_FILE可参考[链接]( https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html)。device_ip可以通过[链接](https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools)获取
 
 - GPU:
 

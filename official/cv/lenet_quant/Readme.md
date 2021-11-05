@@ -214,7 +214,7 @@ You can view the results through the file "acc.log". The accuracy of the test da
 | Speed                      |3.29 ms/step                                                 |
 | Total time                 | 40s                                                         |
 | Checkpoint for Fine tuning | 482k (.ckpt file)                                           |
-| Scripts                    | [scripts](https://gitee.com/mindspore/models/tree/master/official/cv/lenet) |
+| Scripts                    | [scripts](https://gitee.com/mindspore/models/tree/r1.5/official/cv/lenet) |
 
 ## [Description of Random Situation](#contents)
 

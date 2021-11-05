@@ -96,7 +96,7 @@ python eval.py \
 sh run_eval.sh [train_code_path] [test_dir] [sigma] [channel] [pretrain_path] [ckpt_name]
 ```
 
-Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools)
 
 ## 脚本说明
 
@@ -521,7 +521,7 @@ BRDNet on “waterloo5050step40colorimage”
 | Speed                      | 8p about 7000FPS to 7400FPS                                                    |
 | Total time                 | 8p  about 2h 14min                                                             |
 | Checkpoint for Fine tuning | 8p: 13.68MB , 1p: 19.76MB (.ckpt file)                                         |
-| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/cv/brdnet |
+| Scripts                    | https://gitee.com/mindspore/models/tree/r1.5/official/cv/brdnet |
 
 ## 随机情况说明
 

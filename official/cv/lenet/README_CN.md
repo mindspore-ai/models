@@ -298,7 +298,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [DEVICE_ID]
 | 速度                 | 1.0毫秒/步                                             |
 | 总时长               | 32.1秒                                                  |
 | 微调检查点 | 482k (.ckpt文件)                                                  |
-| 脚本                 | [LeNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/lenet) |
+| 脚本                 | [LeNet脚本](https://gitee.com/mindspore/models/tree/r1.5/official/cv/lenet) |
 
 ### 推理性能
 

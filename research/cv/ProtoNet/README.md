@@ -177,7 +177,7 @@ Test Acc in GPU: 0.996999979019165  Loss: 0.013885765336453915
 | Speed                      | 215 ms/step                          | 144 ms/step                          |
 | Total time                 | 3 h 23m (8p)                | 2 h 48m (8p)                |
 | Checkpoint for Fine tuning | 440 KB (.ckpt file)                                         | 441 KB (.ckpt file)                                         |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/cv/ProtoNet> |<https://gitee.com/mindspore/models/tree/master/research/cv/ProtoNet> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/r1.5/research/cv/ProtoNet> |<https://gitee.com/mindspore/models/tree/r1.5/research/cv/ProtoNet> |
 
 # [ModelZoo Homepage](#contents)
 

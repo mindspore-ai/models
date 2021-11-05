@@ -134,7 +134,7 @@ BJER4
   bash scripts/run_distribute_train.sh train_code_path data_path n_pred graph_conv_type
   ```
 
-  8P训练时需要将RANK_TABLE_FILE放在scripts文件夹中，RANK_TABLE_FILE[生成方法](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+  8P训练时需要将RANK_TABLE_FILE放在scripts文件夹中，RANK_TABLE_FILE[生成方法](https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools)
 
   训练时，训练过程中的epch和step以及此时的loss和精确度会呈现在终端上：
 

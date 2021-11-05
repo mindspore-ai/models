@@ -169,7 +169,7 @@ python export.py --device_target [PLATFORM] --checkpoint_path [CKPT_PATH]
 | Total time                 | 1433 min                  |
 | Params (M)                 | 5.48 M                    |
 | Checkpoint for Fine tuning | 44 M                      |
-|  Scripts                   | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv3)|
+|  Scripts                   | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/mobilenetv3)|
 
 # [Description of Random Situation](#contents)
 

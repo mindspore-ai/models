@@ -249,7 +249,7 @@ bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH]
 | 总时间 | 1卡：65小时；8卡：9.5小时 |
 | 参数(M) | 46.15 |
 | 微调检查点 | 293M （.ckpt file） |
-| 脚本 | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/cv/ibnnet) |
+| 脚本 | [脚本路径](https://gitee.com/mindspore/models/tree/r1.5/research/cv/ibnnet) |
 
 ### 评估性能
 

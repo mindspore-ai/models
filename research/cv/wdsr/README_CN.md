@@ -274,7 +274,7 @@ FILE_FORMAT 可选 ['MINDIR', 'AIR', 'ONNX'], 默认['MINDIR']。
 | 速度          | 8卡：约130毫秒/步                                            |
 | 总时长        | 8卡：0.5小时                                                   |
 | 微调检查点    | 35 MB(.ckpt文件)                                        |
-| 脚本          | [WDSR](https://gitee.com/mindspore/models/tree/master/research/cv/wdsr) |
+| 脚本          | [WDSR](https://gitee.com/mindspore/models/tree/r1.5/research/cv/wdsr) |
 
 ### 评估性能
 

@@ -423,7 +423,7 @@ Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
-Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+Please follow the instructions in the link [hccn_tools](https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools).
 
 Training result will be stored in the example path, whose folder name begins with "train" or "train_parallel". Under this, you can find checkpoint file together with result like the following in log.
 
@@ -818,7 +818,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 4 mins                          | 11 minds    |
 | Parameters (M)             | 11.2                                                        | 11.2          |
 | Checkpoint for Fine tuning | 86M (.ckpt file)                                         | 85.4 (.ckpt file)     |
-| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet/config) |
 
 #### ResNet18 on ImageNet2012
 
@@ -838,7 +838,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 110 mins                        | 130 mins            |
 | Parameters (M)             | 11.7                                                       | 11.7 |
 | Checkpoint for Fine tuning | 90M (.ckpt file)                                         |  90M (.ckpt file)                                         |
-| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet/config) |
 
 #### ResNet50 on CIFAR-10
 
@@ -858,7 +858,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 6 mins                          | 20.2 mins|
 | Parameters (M)             | 25.5                                                         | 25.5 |
 | Checkpoint for Fine tuning | 179.7M (.ckpt file)                                         |179.7M (.ckpt file)|
-| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet/config) |
 
 #### ResNet50 on ImageNet2012
 
@@ -878,7 +878,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 114 mins                          | 260 mins|
 | Parameters (M)             | 25.5                                                         | 25.5 |
 | Checkpoint for Fine tuning | 197M (.ckpt file)                                         |197M (.ckpt file)     |
-| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet/config) |
 
 #### ResNet34 on ImageNet2012
 
@@ -898,7 +898,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 112 mins                          |
 | Parameters (M)             | 20.79                                                         |
 | Checkpoint for Fine tuning | 166M (.ckpt file)                                         |
-| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet/config) |
 
 #### ResNet101 on ImageNet2012
 
@@ -918,7 +918,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 301 mins                          | 1100 mins|
 | Parameters (M)             | 44.6                                                        | 44.6 |
 | Checkpoint for Fine tuning | 343M (.ckpt file)                                         |343M (.ckpt file)     |
-| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet/config) |
 
 #### ResNet152 on ImageNet2012
 
@@ -938,7 +938,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time   |  577 mins |
 | Parameters(M)   | 60.19 |
 | Checkpoint for Fine tuning | 462M（.ckpt file）  |
-| config  | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config)  |
+| config  | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet/config)  |
 
 #### SE-ResNet50 on ImageNet2012
 
@@ -958,7 +958,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 49.3 mins                                                  |
 | Parameters (M)             | 25.5                                                         |
 | Checkpoint for Fine tuning | 215.9M (.ckpt file)                                         |
-| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet/config) |
 
 ### Inference Performance
 

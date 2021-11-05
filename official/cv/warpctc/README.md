@@ -89,7 +89,7 @@ The dataset is self-generated using a third-party library called [captcha](https
 
     Please follow the instructions in the link below:
 
-    <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+    <https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools>.
 
     - Running on GPU
 
@@ -361,7 +361,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 30 mins                                       | 5 mins|
 | Parameters (M)             | 2.75                                          | 2.75 |
 | Checkpoint for Fine tuning | 20.3M (.ckpt file)                            | 20.3M (.ckpt file) |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/warpctc) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/warpctc) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/warpctc) | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/warpctc) |
 
 #### [Evaluation Performance](#contents)
 

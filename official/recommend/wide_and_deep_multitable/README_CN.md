@@ -183,7 +183,7 @@ python eval.py
 | 参数(M)                 | 349                             | 349                             |
 | 推理检查点 | 1.1GB(.ckpt文件)               | 1.1GB(.ckpt文件)               |
 
-所有可执行脚本参见[这里](https://gitee.com/mindspore/models/tree/master/official/recommend/wide_and_deep/script)。
+所有可执行脚本参见[这里](https://gitee.com/mindspore/models/tree/r1.5/official/recommend/wide_and_deep/script)。
 
 #### 评估性能
 
