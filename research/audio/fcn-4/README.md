@@ -72,7 +72,7 @@ After installing MindSpore via the official website, you can start training and 
 after having your dataset, first convert the audio clip into mindrecord dataset by using the following codes
 
 ```shell
-python pre_process_data.py --device_id 0
+python src/pre_process_data.py --device_id 0
 ```
 
 Then, you can start training the model by using the following codes
