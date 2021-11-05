@@ -20,3 +20,4 @@ from . import musictagger
 from . import loss
 from . import dataset
 from . import pre_process_data
+from . import model_utils
