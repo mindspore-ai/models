@@ -73,7 +73,9 @@ if __name__ == '__main__':
                                               parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True,
                                               auto_parallel_search_mode="recursive_programming")
+        rank = get_rank()
     else:
+        rank = 0
         if args_opt.device_id is not None:
             context.set_context(device_id=args_opt.device_id)
         else:
@@ -101,7 +103,7 @@ if __name__ == '__main__':
         time.sleep(5)
 
     dataset = create_posenet_dataset(mindrecord_file, batch_size=dataset_cfg.batch_size,
-                                     device_num=args_opt.device_num, is_training=True)
+                                     device_num=args_opt.device_num, rank_id=rank, is_training=True)
     step_per_epoch = dataset.get_dataset_size()
 
     net_with_loss = PosenetWithLoss(cfg.pre_trained)
@@ -124,7 +126,7 @@ if __name__ == '__main__':
                                           directory=save_checkpoint_path,
                                           config=config_ck)
                 cb += [ckpt_cb]
-            if args_opt.device_num > 1 and get_rank() % 8 == 0:
+            if args_opt.device_num > 1 and rank == 0:
                 ckpt_cb = ModelCheckpoint(prefix='train_posenet_' + args_opt.dataset,
                                           directory=save_checkpoint_path,
                                           config=config_ck)
@@ -139,7 +141,7 @@ if __name__ == '__main__':
                                           directory=save_checkpoint_path,
                                           config=config_ck)
                 cb += [ckpt_cb]
-            if args_opt.device_num > 1 and get_rank() % 8 == 0:
+            if args_opt.device_num > 1 and rank == 0:
                 ckpt_cb = ModelCheckpoint(prefix='train_posenet_' + args_opt.dataset,
                                           directory=save_checkpoint_path,
                                           config=config_ck)
