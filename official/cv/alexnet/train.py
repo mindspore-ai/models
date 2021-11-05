@@ -81,9 +81,12 @@ def train_alexnet():
     else:
         context.set_context(device_id=get_device_id())
 
+    _off_load = False
     if config.dataset_name == "cifar10":
         ds_train = create_dataset_cifar10(config, config.data_path, config.batch_size, target=config.device_target)
     elif config.dataset_name == "imagenet":
+        # Imagenet dataset normalize and transpose will work on device
+        _off_load = True
         ds_train = create_dataset_imagenet(config, config.data_path, config.batch_size)
     else:
         raise ValueError("Unsupported dataset.")
@@ -91,7 +94,7 @@ def train_alexnet():
     if ds_train.get_dataset_size() == 0:
         raise ValueError("Please check dataset size > 0 and batch_size <= dataset size")
 
-    network = AlexNet(config.num_classes, phase='train')
+    network = AlexNet(config.num_classes, phase='train', off_load=_off_load)
 
     loss_scale_manager = None
     metrics = None

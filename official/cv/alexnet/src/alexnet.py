@@ -13,8 +13,12 @@
 # limitations under the License.
 # ============================================================================
 """Alexnet."""
+import numpy as np
 import mindspore.nn as nn
 from mindspore.ops import operations as P
+from mindspore.ops import functional as F
+from mindspore.common.tensor import Tensor
+import mindspore.common.dtype as mstype
 
 def conv(in_channels, out_channels, kernel_size, stride=1, padding=0, pad_mode="valid", has_bias=True):
     return nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, stride=stride, padding=padding,
@@ -23,12 +27,37 @@ def conv(in_channels, out_channels, kernel_size, stride=1, padding=0, pad_mode="
 def fc_with_initialize(input_channels, out_channels, has_bias=True):
     return nn.Dense(input_channels, out_channels, has_bias=has_bias)
 
+class DataNormTranspose(nn.Cell):
+    """Normalize an tensor image with mean and standard deviation.
+
+    Given mean: (R, G, B) and std: (R, G, B),
+    will normalize each channel of the torch.*Tensor, i.e.
+    channel = (channel - mean) / std
+
+    Args:
+        mean (sequence): Sequence of means for R, G, B channels respectively.
+        std (sequence): Sequence of standard deviations for R, G, B channels
+            respectively.
+    """
+    def __init__(self):
+        super(DataNormTranspose, self).__init__()
+        self.mean = Tensor(np.array([0.485 * 255, 0.456 * 255, 0.406 * 255]).reshape((1, 1, 1, 3)), mstype.float32)
+        self.std = Tensor(np.array([0.229 * 255, 0.224 * 255, 0.225 * 255]).reshape((1, 1, 1, 3)), mstype.float32)
+
+    def construct(self, x):
+        x = (x - self.mean) / self.std
+        x = F.transpose(x, (0, 3, 1, 2))
+        return x
+
 class AlexNet(nn.Cell):
     """
     Alexnet
     """
-    def __init__(self, num_classes=10, channel=3, phase='train', include_top=True):
+    def __init__(self, num_classes=10, channel=3, phase='train', include_top=True, off_load=False):
         super(AlexNet, self).__init__()
+        self.off_load = off_load
+        if self.off_load is True:
+            self.data_trans = DataNormTranspose()
         self.conv1 = conv(channel, 64, 11, stride=4, pad_mode="same", has_bias=True)
         self.conv2 = conv(64, 128, 5, pad_mode="same", has_bias=True)
         self.conv3 = conv(128, 192, 3, pad_mode="same", has_bias=True)
@@ -49,6 +78,8 @@ class AlexNet(nn.Cell):
 
     def construct(self, x):
         """define network"""
+        if self.off_load is True:
+            x = self.data_trans(x)
         x = self.conv1(x)
         x = self.relu(x)
         x = self.max_pool2d(x)
