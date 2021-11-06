@@ -89,7 +89,7 @@ class ErnieTextFieldReader():
         padded_ids, input_mask = pad_batch_data(src_ids,
                                                 pad_idx=self.field_config.padding_id,
                                                 return_input_mask=True,
-                                                return_seq_lens=True)
+                                                return_seq_lens=False)
         sent_ids_batch = pad_batch_data(sentence_ids, pad_idx=self.field_config.padding_id)
         pos_ids_batch = pad_batch_data(position_ids, pad_idx=self.field_config.padding_id)
 
