@@ -28,11 +28,11 @@ from src.models import BRDNet
 ## Params
 parser = argparse.ArgumentParser()
 
-parser.add_argument('--batch_size', default=32, type=int, help='batch size')
+parser.add_argument('--batch_size', default=1, type=int, help='batch size')
 parser.add_argument('--channel', default=3, type=int
                     , help='image channel, 3 for color, 1 for gray')
-parser.add_argument("--image_height", type=int, default=50, help="Image height.")
-parser.add_argument("--image_width", type=int, default=50, help="Image width.")
+parser.add_argument("--image_height", type=int, default=500, help="Image height.")
+parser.add_argument("--image_width", type=int, default=500, help="Image width.")
 parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
 parser.add_argument("--file_name", type=str, default="brdnet", help="output file name.")
 parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="AIR", help="file format")

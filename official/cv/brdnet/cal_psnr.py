@@ -41,20 +41,23 @@ def calculate_psnr(image1, image2):
     rmse = math.sqrt(np.mean(diff**2.))
     return 20*math.log10(1.0/rmse)
 
-def cal_psnr(output_path, image_path):
-    file_list = glob.glob(image_path+'*') # image_path must end by '/'
+def cal_psnr():
+    image_list = glob.glob(os.path.join(args.image_path, '*'))
     psnr = []   #after denoise
 
     start_time = time.time()
-    for file in file_list:
-        filename = file.split('/')[-1].split('.')[0]    # get the name of image file
+    for image in sorted(image_list):
+        filename = image.split('/')[-1].split('.')[0]    # get the name of image file
         # read image
         if args.channel == 3:
-            img_clean = np.array(Image.open(file), dtype='float32') / 255.0
+            img_clean = np.array(Image.open(image).resize((args.image_width, \
+                                 args.image_height), Image.ANTIALIAS), dtype='float32') / 255.0
         else:
-            img_clean = np.expand_dims(np.array(Image.open(file).convert('L'), dtype='float32') / 255.0, axis=2)
+            assert args.channel == 1
+            img_clean = np.expand_dims(np.array(Image.open(image).resize((args.image_width, \
+                        args.image_height), Image.ANTIALIAS).convert('L'), dtype='float32') / 255.0, axis=2)
 
-        result_file = os.path.join(output_path, filename+"_noise_0.bin")
+        result_file = os.path.join(args.output_path, filename+"_noise_0.bin")
         y_predict = np.fromfile(result_file, dtype=np.float32)
         y_predict = y_predict.reshape(args.channel, args.image_height, args.image_width)
         img_out = y_predict.transpose((1, 2, 0))#HWC
@@ -70,4 +73,4 @@ def cal_psnr(output_path, image_path):
     print("Time cost:"+str(time_used)+" seconds!")
 
 if __name__ == '__main__':
-    cal_psnr(args.output_path, args.image_path)
+    cal_psnr()

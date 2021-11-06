@@ -62,7 +62,7 @@ BRDNet 包含上下两个分支。上分支仅仅包含残差学习与 BRN；下
 通过官方网站安装 MindSpore 后，您可以按照如下步骤进行训练和评估：
 
 ```shell
-#通过 python 命令行运行单卡训练脚本。 请注意 train_data 需要以"/"结尾
+#通过 python 命令行运行单卡训练脚本。
 python train.py \
 --train_data=xxx/dataset/waterloo5050step40colorimage/ \
 --sigma=15 \
@@ -74,11 +74,11 @@ python train.py \
 --is_distributed=0 \
 --epoch=50 > log.txt 2>&1 &
 
-#通过 sh 命令启动单卡训练。(对 train_data 等参数的路径格式无要求，内部会自动转为绝对路径以及以"/"结尾)
-sh ./scripts/run_train.sh [train_code_path] [train_data] [batch_size] [sigma] [channel] [epoch] [lr]
+#通过 bash 命令启动单卡训练。
+bash ./scripts/run_train.sh [train_code_path] [train_data] [batch_size] [sigma] [channel] [epoch] [lr]
 
 #Ascend多卡训练。
-sh run_distribute_train.sh [train_code_path] [train_data] [batch_size] [sigma] [channel] [epoch] [lr] [rank_table_file_path]
+bash run_distribute_train.sh [train_code_path] [train_data] [batch_size] [sigma] [channel] [epoch] [lr] [rank_table_file_path]
 
 # 通过 python 命令行运行推理脚本。请注意 test_dir 需要以"/"结尾;
 # pretrain_path 指 ckpt 所在目录，为了兼容 modelarts，将其拆分为了 “路径” 与 “文件名”
@@ -92,8 +92,8 @@ python eval.py \
 --output_path=./output/ \
 --is_distributed=0 > log.txt 2>&1 &
 
-#通过 sh 命令启动推理。(对 test_dir 等参数的路径格式无要求，内部会自动转为绝对路径以及以"/"结尾)
-sh run_eval.sh [train_code_path] [test_dir] [sigma] [channel] [pretrain_path] [ckpt_name]
+#通过 bash 命令启动推理。(对 test_dir 等参数的路径格式无要求，内部会自动转为绝对路径以及以"/"结尾)
+bash run_eval.sh [train_code_path] [test_dir] [sigma] [channel] [pretrain_path] [ckpt_name]
 ```
 
 Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
@@ -122,7 +122,6 @@ Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/m
         │   ├──run_infer_310.sh                // 启动310推理的脚本
         ├── src
         │   ├──dataset.py                      // 数据集处理
-        │   ├──distributed_sampler.py          // 8卡并行时的数据集切分操作
         │   ├──logger.py                       // 日志打印文件
         │   ├──models.py                       // 模型结构
         ├── export.py                          // 将权重文件导出为 MINDIR 等格式的脚本
@@ -143,7 +142,8 @@ train.py 中的主要参数如下:
 --epoch: 训练次数
 --lr: 初始学习率
 --save_every: 权重保存频率（每 N 个 epoch 保存一次）
---pretrain: 预训练文件（接着该文件继续训练）
+--resume_path: 预训练文件路径（接着该文件继续训练）
+--resume_name: 预训练文件名
 --use_modelarts: 是否使用 modelarts（1 for True, 0 for False; 设置为 1 时将使用 moxing 从 obs 拷贝数据）
 --train_url: （ modelsarts 需要的参数，但因该名称存在歧义而在代码中未使用）
 --data_url: （ modelsarts 需要的参数，但因该名称存在歧义而在代码中未使用）
@@ -201,7 +201,7 @@ cal_psnr.py 中的主要参数如下:
 - Ascend处理器环境运行
 
   ```shell
-  #通过 python 命令行运行单卡训练脚本。 请注意 train_data 需要以"/"结尾
+  #通过 python 命令行运行单卡训练脚本。
   python train.py \
   --train_data=xxx/dataset/waterloo5050step40colorimage/ \
   --sigma=15 \
@@ -213,13 +213,13 @@ cal_psnr.py 中的主要参数如下:
   --is_distributed=0 \
   --epoch=50 > log.txt 2>&1 &
 
-  #通过 sh 命令启动单卡训练。(对 train_data 等参数的路径格式无要求，内部会自动转为绝对路径以及以"/"结尾)
-  sh ./scripts/run_train.sh [train_code_path] [train_data] [batch_size] [sigma] [channel] [epoch] [lr]
+  #通过 bash 命令启动单卡训练。
+  bash ./scripts/run_train.sh [train_code_path] [train_data] [batch_size] [sigma] [channel] [epoch] [lr]
 
   #上述命令均会使脚本在后台运行，日志将输出到 log.txt，可通过查看该文件了解训练详情
 
   #Ascend多卡训练(2、4、8卡配置请自行修改run_distribute_train.sh，默认8卡)
-  sh run_distribute_train.sh [train_code_path] [train_data] [batch_size] [sigma] [channel] [epoch] [lr] [rank_table_file_path]
+  bash run_distribute_train.sh [train_code_path] [train_data] [batch_size] [sigma] [channel] [epoch] [lr] [rank_table_file_path]
   ```
 
   注意：第一次运行时可能会较长时间停留在如下界面，这是因为当一个 epoch 运行完成后才会打印日志，请耐心等待。
@@ -401,8 +401,8 @@ cal_psnr.py 中的主要参数如下:
   --output_path=./output/ \
   --is_distributed=0 > log.txt 2>&1 &
 
-  #通过 sh 命令启动评估 (对 test_dir 等参数的路径格式无要求，内部会自动转为绝对路径以及以"/"结尾)
-  sh run_eval.sh [train_code_path] [test_dir] [sigma] [channel] [pretrain_path] [ckpt_name]
+  #通过 bash 命令启动评估 (对 test_dir 等参数的路径格式无要求，内部会自动转为绝对路径以及以"/"结尾)
+  bash run_eval.sh [train_code_path] [test_dir] [sigma] [channel] [pretrain_path] [ckpt_name]
   ```
 
   ```python
@@ -493,8 +493,8 @@ cal_psnr.py 中的主要参数如下:
 - 在 Ascend 310 处理器环境运行
 
   ```python
-  #通过 sh 命令启动推理
-  sh run_infer_310.sh [model_path] [data_path] [noise_image_path] [sigma] [channel] [device_id]
+  #通过 bash 命令启动推理
+  bash run_infer_310.sh [model_path] [data_path] [noise_image_path] [sigma] [channel] [device_id]
   #上述命令将完成推理所需的全部工作。执行完成后，将产生 preprocess.log、infer.log、psnr.log 三个日志文件。
   #如果您需要单独执行各部分代码，可以参照 run_infer_310.sh 内的流程分别进行编译、图片预处理、推理和 PSNR 计算，请注意核对各部分所需参数！
   ```
