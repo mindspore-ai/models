@@ -16,7 +16,7 @@
 
 # shellcheck disable=SC1073
 if [[ $# -lt 2 || $# -gt 3 ]];then
-    echo "Usage: sh run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi
@@ -78,8 +78,8 @@ function infer() {
 
 function cal_acc()
 {
-    python3.7 ../create_imagenet2012_label.py  --img_path=$data_path
-    python3.7 ../postprocess.py  --result_path=./result_Files --label_path=./imagenet_label.json &> acc.log
+    python ../create_imagenet2012_label.py  --img_path=$data_path
+    python ../postprocess.py  --result_path=./result_Files --label_path=./imagenet_label.json &> acc.log
 }
 
 compile_app

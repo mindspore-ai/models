@@ -20,14 +20,14 @@ import mindspore.dataset.transforms.c_transforms as C2
 import mindspore.dataset.vision.c_transforms as C
 
 
-def create_dataset(dataset_path, do_train, repeat_num=1, infer_910=True, device_id=0, batch_size=128):
+def create_dataset(dataset_path, do_train, infer_910=True, device_id=0, batch_size=128, target="Ascend"):
     """
     create a train or eval dataset
 
     Args:
-        batch_size:
-        device_id:
-        infer_910:
+        batch_size: The dataset batch size
+        device_id: Ascend device id
+        infer_910: infer 910 or not
         dataset_path(string): the path of dataset.
         do_train(bool): whether dataset is used for train or eval.
         rank (int): The shard ID within num_shards (default=None).
@@ -52,7 +52,7 @@ def create_dataset(dataset_path, do_train, repeat_num=1, infer_910=True, device_
         ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=8, shuffle=True)
     else:
         ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=8, shuffle=True,
-                                   num_shards=device_num, shard_id=rank_id)
+                                   num_shards=device_num, shard_id=device_id)
 
     mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
     std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
