@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 6 ]; then
+if [ $# != 7 ]; then
   echo "Usage: sh run_distribute_train.sh [train_code_path] [dataset]" \
-       "[epochs] [batch_size] [lr] [output_path]"
+       "[epochs] [batch_size] [lr] [output_path] [rank_table_file_path]"
   exit 1
 fi
 
@@ -50,10 +50,9 @@ fi
 
 ulimit -c unlimited
 export SLOG_PRINT_TO_STDOUT=0
-export RANK_TABLE_FILE=${train_code_path}scripts/hccl_8p_01234567_10.155.170.118.json
+export RANK_TABLE_FILE=${7}
 export RANK_SIZE=8
 export RANK_START_ID=0
-
 
 for((i=0;i<=$RANK_SIZE-1;i++));
 do
@@ -65,7 +64,7 @@ do
     fi
     mkdir ${train_code_path}/device${DEVICE_ID}
     cd ${train_code_path}/device${DEVICE_ID} || exit
-    nohup python ${train_code_path}train.py --is_distributed=1 \
+    nohup python ${train_code_path}train.py --is_distributed=1 --device_target=Ascend \
     --dataset=${dataset} \
     --epochs=$3 \
     --batch_size=$4 \

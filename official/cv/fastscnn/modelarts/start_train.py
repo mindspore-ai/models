@@ -12,13 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-'''train.py'''
+'''train scripts for modelarts'''
 import os
 import argparse
 import datetime
+import moxing as mox
+import numpy as np
 
 import mindspore
 import mindspore.nn as nn
+from mindspore import export
 from mindspore import context
 from mindspore.train import Model
 from mindspore.dataset import config
@@ -37,7 +40,6 @@ from src.lr_scheduler import LRScheduler
 from src.dataloader import create_CitySegmentation
 from src.fast_scnn import FastSCNN, FastSCNNWithLossCell
 from src.util import SegmentationMetric, EvalCallBack, TempLoss
-
 
 def parse_args():
     """Training Options for Segmentation Experiments"""
@@ -71,16 +73,16 @@ def parse_args():
     parser.add_argument('--eval_while_train', type=int, default=1, help='eval while training')
     parser.add_argument('--eval_steps', type=int, default=10, help='each N epochs we eval')
     parser.add_argument('--eval_start_epoch', type=int, default=850, help='eval_start_epoch')
-    parser.add_argument('--use_modelarts', type=int, default=0,
-                        help='when set True, we should load dataset from obs with moxing')
     parser.add_argument('--train_url', type=str, default='train_url/',
                         help='needed by modelarts, but we donot use it because the name is ambiguous')
     parser.add_argument('--data_url', type=str, default='data_url/',
                         help='needed by modelarts, but we donot use it because the name is ambiguous')
-    parser.add_argument('--output_path', type=str, default='./outputs/',
-                        help='output_path,when use_modelarts is set True, it will be cache/output/')
+    parser.add_argument('--output_path', type=str, default='cache/output/',
+                        help='output_path, default is cache/output/')
     parser.add_argument('--outer_path', type=str, default='s3://output/',
                         help='obs path,to store e.g ckpt files ')
+    parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], \
+                        default="AIR", help="file format")
 
     parser.add_argument('--device_target', type=str, default='Ascend',
                         help='device where the code will be implemented. (Default: Ascend)')
@@ -101,45 +103,43 @@ device_id = int(os.getenv('DEVICE_ID', '0'))
 context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, save_graphs=False)
 save_dir = os.path.join(args.output_path, datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
 
+
+def copy_data_from_obs():
+    args.logger.info("copying dataset from obs to cache....")
+    mox.file.copy_parallel(args.dataset, 'cache/dataset')
+    args.logger.info("copying dataset finished....")
+    args.dataset = 'cache/dataset/'
+
+    # resume checkpoint if needed
+    if args.resume_path:
+        args.logger.info("copying resume checkpoint from obs to cache....")
+        mox.file.copy_parallel(args.resume_path, 'cache/resume_path')
+        args.logger.info("copying resume checkpoint finished....")
+        args.resume_path = 'cache/resume_path/'
+
+def copy_data_to_obs():
+    args.logger.info("copying files from cache to obs....")
+    mox.file.copy_parallel(save_dir, args.outer_path)
+    args.logger.info("copying finished....")
+
+def export_models():
+    args.logger.info("exporting model....")
+    net = FastSCNN(num_classes=19, aux=args.aux)
+    param_dict = load_checkpoint(os.path.join(save_dir, str(args.rank) + "_best_map.ckpt"))
+    load_param_into_net(net, param_dict)
+    input_arr = Tensor(np.zeros([1, 3, \
+                                args.crop_size[0], args.crop_size[1]]), mindspore.float32)
+    export(net, input_arr, file_name=os.path.join(save_dir, str(args.rank) + "_best_map"), \
+           file_format=args.file_format)
+    args.logger.info("export model finished....")
+
 def train():
     '''train'''
-    if args.is_distributed:
-        assert args.device_target == "Ascend"
-        context.set_context(device_id=device_id)
-        init("hccl")
-        args.rank = get_rank()
-        args.group_size = get_group_size()
-        device_num = args.group_size
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL)
-    else:
-        if args.device_target in ["Ascend", "GPU"]:
-            context.set_context(device_id=device_id)
-
-    config.set_enable_shared_mem(False) #we may get OOM when it set to 'True'
-    # select for master rank save ckpt or all rank save, compatible for model parallel
-    args.rank_save_ckpt_flag = 0
-    if args.is_save_on_master:
-        if args.rank == 0:
-            args.rank_save_ckpt_flag = 1
-    else:
-        args.rank_save_ckpt_flag = 1
-
-    args.logger = get_logger(save_dir, "Fast_SCNN", args.rank)
-    args.logger.save_args(args)
-
     # image transform
     input_transform = Compose([
         ToTensor(),
         Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
     ])
-
-    if args.use_modelarts:
-        import moxing as mox
-        args.logger.info("copying dataset from obs to cache....")
-        mox.file.copy_parallel(args.dataset, 'cache/dataset')
-        args.logger.info("copying dataset finished....")
-        args.dataset = 'cache/dataset/'
 
     train_dataset, args.steps_per_epoch = create_CitySegmentation(args, data_path=args.dataset, \
                         split=args.train_split, mode='train', transform=input_transform, \
@@ -151,13 +151,6 @@ def train():
 
     # resume checkpoint if needed
     if args.resume_path:
-        if args.use_modelarts:
-            import moxing as mox
-            args.logger.info("copying resume checkpoint from obs to cache....")
-            mox.file.copy_parallel(args.resume_path, 'cache/resume_path')
-            args.logger.info("copying resume checkpoint finished....")
-            args.resume_path = 'cache/resume_path/'
-
         args.resume_path = os.path.join(args.resume_path, args.resume_name)
         args.logger.info('loading resume checkpoint {} into network'.format(args.resume_path))
         load_param_into_net(f_model, load_checkpoint(args.resume_path))
@@ -183,7 +176,7 @@ def train():
         loss_cb = LossMonitor()
         callbacks = [time_cb, loss_cb]
     else:
-        callbacks = None
+        callbacks = []
 
     if args.rank_save_ckpt_flag:
         ckpt_config = CheckpointConfig(save_checkpoint_steps=args.steps_per_epoch*args.save_every,
@@ -206,19 +199,41 @@ def train():
 
         eval_cb = EvalCallBack(network_eval, val_dataset, interval=args.eval_steps,
                                eval_start_epoch=args.eval_start_epoch, save_best_ckpt=True,
-                               ckpt_directory=save_dir, besk_ckpt_name="best_map.ckpt",
+                               ckpt_directory=save_dir, besk_ckpt_name=str(args.rank) + "_best_map.ckpt",
                                metrics_name=("pixAcc", "mIou"))
         callbacks.append(eval_cb)
 
     model.train(args.epochs, train_dataset, callbacks=callbacks, dataset_sink_mode=True)
-
     args.logger.info("training finished....")
-    if args.use_modelarts:
-        import moxing as mox
-        args.logger.info("copying files from cache to obs....")
-        mox.file.copy_parallel(save_dir, args.outer_path)
-        args.logger.info("copying finished....")
 
 if __name__ == '__main__':
+    if args.is_distributed:
+        assert args.device_target == "Ascend"
+        context.set_context(device_id=device_id)
+        init()
+        args.rank = get_rank()
+        args.group_size = get_group_size()
+        device_num = args.group_size
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL)
+    else:
+        if args.device_target in ["Ascend", "GPU"]:
+            context.set_context(device_id=device_id)
+
+    # select for master rank save ckpt or all rank save, compatible for model parallel
+    args.rank_save_ckpt_flag = 0
+    if args.is_save_on_master:
+        if args.rank == 0:
+            args.rank_save_ckpt_flag = 1
+    else:
+        args.rank_save_ckpt_flag = 1
+
+    config.set_enable_shared_mem(False)
+    args.logger = get_logger(save_dir, "Fast_SCNN", args.rank)
+    args.logger.save_args(args)
+
     print('Starting training, Total Epochs: %d' % (args.epochs))
+    copy_data_from_obs()
     train()
+    export_models()
+    copy_data_to_obs()

@@ -80,7 +80,7 @@ python train.py \
 bash ./scripts/run_train.sh [train_code_path] [dataset] [epochs] [batch_size] [lr] [output_path]
 
 #Ascend多卡训练。
-bash ./scripts/run_distribute_train.sh [train_code_path] [dataset] [epochs] [batch_size] [lr] [output_path]
+bash ./scripts/run_distribute_train.sh [train_code_path] [dataset] [epochs] [batch_size] [lr] [output_path] [rank_table_file_path]
 
 # 通过 python 命令行运行推理脚本。
 # resume_path 指 ckpt 所在目录，为了兼容 modelarts，将其拆分为了 “路径” 与 “文件名”
@@ -116,16 +116,15 @@ Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/m
         │   ├──fusion_switch.cfg             // 配置文件
         ├──cal_mIoU.py                       // 310 推理时计算mIoU的脚本
         ├──preprocess.py                     // 310 推理时预处理验证集的脚本
-        ├──score.py                          // 310 推理时计算mIoU的脚本
         ├── README_CN.md                     // fastscnn 的说明文件
         ├── scripts
         │   ├──run_distribute_train.sh       // Ascend 8卡训练脚本
         │   ├──run_eval.sh                   // 推理启动脚本
         │   ├──run_train.sh                  // 训练启动脚本
         │   ├──run_infer_310.sh              // 启动310推理的脚本
+        │   ├──docker_start.sh               // 使用 MindX 推理时的 docker 启动脚本
         ├── src
         │   ├──dataloader.py                 // 数据集处理
-        │   ├──distributed_sampler.py        // 8卡并行时的数据集切分操作
         │   ├──fast_scnn.py                  // 模型结构
         │   ├──logger.py                     // 日志打印文件
         │   ├──loss.py                       // 损失函数
@@ -237,7 +236,7 @@ cal_mIoU.py 中的主要参数如下:
   #上述命令均会使脚本在后台运行，日志将输出到 log.txt，可通过查看该文件了解训练详情
 
   #Ascend多卡训练(2、4、8卡配置请自行修改run_distribute_train.sh，默认8卡)
-  bash ./scripts/run_distribute_train.sh [train_code_path] [dataset] [epochs] [batch_size] [lr] [output_path]
+  bash ./scripts/run_distribute_train.sh [train_code_path] [dataset] [epochs] [batch_size] [lr] [output_path] [rank_table_file_path]
   ```
 
   训练完成后，您可以在 --output_path 参数指定的目录下找到保存的权重文件，训练过程中的部分 loss 收敛情况如下（4卡并行）：
@@ -349,7 +348,7 @@ FastSCNN on “Cityscapes ”
 | Accuracy                   | 55.48%                                                       |
 | Total time                 | 8p：8h20m                                                    |
 | Checkpoint for Fine tuning | 8p: 14.51MB(.ckpt file)                                      |
-| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/cv/fastscnn |
+| Scripts                    | [FastSCNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/fastscnn) |
 
 ## 随机情况说明
 

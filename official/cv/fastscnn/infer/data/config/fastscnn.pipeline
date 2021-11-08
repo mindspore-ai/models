@@ -1,0 +1,26 @@
+{
+"fastscnn": {
+    "appsrc0": {
+        "factory": "appsrc",
+        "next": "modelInfer"
+        },
+    "modelInfer": {
+        "props": {
+            "modelPath": "../data/model/fastscnn.om",
+            "dataSource": "appsrc0"
+        },
+        "factory": "mxpi_tensorinfer",
+        "next": "dataserialize"
+        },
+    "dataserialize": {
+        "props": {
+             "outputDataKeys": "modelInfer"
+        },
+        "factory": "mxpi_dataserialize",
+        "next": "appsink0"
+    },
+    "appsink0": {
+        "factory": "appsink"
+    }
+  }
+}

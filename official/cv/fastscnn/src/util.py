@@ -24,13 +24,7 @@ from mindspore import save_checkpoint
 from mindspore import log as logger
 from mindspore.train.callback import Callback
 from mindspore.common.tensor import Tensor
-
-def apply_eval(eval_param_dict):
-    """run Evaluation"""
-    model = eval_param_dict["model"]
-    dataset = eval_param_dict["dataset"]
-    eval_score = model.eval(dataset, dataset_sink_mode=False)["SegmentationMetric"]
-    return eval_score
+from src.score import batch_pix_accuracy, batch_intersection_union
 
 class TempLoss(nn.Cell):
     """A temp loss cell."""
@@ -63,8 +57,6 @@ class SegmentationMetric(nn.Metric):
         """
         preds, labels = inputs[0], inputs[-1]
         preds = preds[0]
-        #print("preds:",preds)
-        #print("labels:",labels)
         def evaluate_worker(self, pred, label):
             correct, labeled = batch_pix_accuracy(pred.asnumpy(), label.asnumpy())
             inter, union = batch_intersection_union(pred.asnumpy(), label.asnumpy(), self.nclass)
@@ -100,26 +92,26 @@ class EvalCallBack(Callback):
     Evaluation callback when training.
 
     Args:
-        eval_function (function): evaluation function.
-        eval_param_dict (dict): evaluation parameters' configure dict.
+        network (function): evaluation network.
+        dataloader (dict): evaluation dataloader.
         interval (int): run evaluation interval, default is 1.
         eval_start_epoch (int): evaluation start epoch, default is 1.
         save_best_ckpt (bool): Whether to save best checkpoint, default is True.
         besk_ckpt_name (str): bast checkpoint name, default is `best.ckpt`.
-        metrics_name (str): evaluation metrics name, default is `acc`.
+        metrics_name (str): evaluation metrics name, default is ("pixAcc", "mIou").
 
     Returns:
         None
 
     Examples:
-        >>> EvalCallBack(eval_function, eval_param_dict)
+        >>> EvalCallBack(network, dataloader)
     """
 
-    def __init__(self, eval_function, eval_param_dict, interval=1, eval_start_epoch=1, \
-        save_best_ckpt=True, ckpt_directory="./", besk_ckpt_name="best.ckpt", metrics_name="acc"):
+    def __init__(self, network, dataloader, interval=1, eval_start_epoch=1, \
+        save_best_ckpt=True, ckpt_directory="./", besk_ckpt_name="best.ckpt", metrics_name=("pixAcc", "mIou")):
         super(EvalCallBack, self).__init__()
-        self.eval_param_dict = eval_param_dict
-        self.eval_function = eval_function
+        self.network = network
+        self.dataloader = dataloader
         self.eval_start_epoch = eval_start_epoch
         if interval < 1:
             raise ValueError("interval should >= 1.")
@@ -147,7 +139,7 @@ class EvalCallBack(Callback):
         cb_params = run_context.original_args()
         cur_epoch = cb_params.cur_epoch_num
         if cur_epoch >= self.eval_start_epoch and (cur_epoch - self.eval_start_epoch) % self.interval == 0:
-            res = self.eval_function(self.eval_param_dict)
+            res = self.network.eval(self.dataloader, dataset_sink_mode=True)['SegmentationMetric']
             print(datetime.now().strftime('%Y-%m-%d %H:%M:%S,%f')[:-3],\
                   ":INFO: epoch: {}, {}: {}, {}: {}".format(cur_epoch, self.metrics_name[0], \
                   res[0]*100, self.metrics_name[1], res[1]*100), flush=True)
@@ -167,94 +159,3 @@ class EvalCallBack(Callback):
         print(datetime.now().strftime('%Y-%m-%d %H:%M:%S,%f')[:-3],\
         ":INFO: End training, the best {0} is: {1}, it's epoch is {2}".format(self.metrics_name[1],\
                         self.best_res*100, self.best_epoch), flush=True)
-
-def batch_pix_accuracy(output, target):
-    """PixAcc"""
-    # inputs are numpy array, output 4D NCHW where 'C' means label classes, target 3D NHW
-
-    predict = np.argmax(output.astype(np.int64), 1) + 1
-    target = target.astype(np.int64) + 1
-    pixel_labeled = (target > 0).sum()
-    pixel_correct = ((predict == target) * (target > 0)).sum()
-    assert pixel_correct <= pixel_labeled, "Correct area should be smaller than Labeled"
-    return pixel_correct, pixel_labeled
-
-def batch_intersection_union(output, target, nclass):
-    """mIoU"""
-    # inputs are numpy array, output 4D, target 3D
-    mini = 1
-    maxi = nclass
-    nbins = nclass
-    predict = np.argmax(output.astype(np.float32), 1) + 1
-    target = target.astype(np.float32) + 1
-
-    predict = predict.astype(np.float32) * (target > 0).astype(np.float32)
-    intersection = predict * (predict == target).astype(np.float32)
-    # areas of intersection and union
-    # element 0 in intersection occur the main difference from np.bincount. set boundary to -1 is necessary.
-    area_inter, _ = np.histogram(intersection, bins=nbins, range=(mini, maxi))
-    area_pred, _ = np.histogram(predict, bins=nbins, range=(mini, maxi))
-    area_lab, _ = np.histogram(target, bins=nbins, range=(mini, maxi))
-    area_union = area_pred + area_lab - area_inter
-    assert (area_inter > area_union).sum() == 0, "Intersection area should be smaller than Union area"
-    return area_inter.astype(np.float32), area_union.astype(np.float32)
-
-
-def pixelAccuracy(imPred, imLab):
-    """
-    This function takes the prediction and label of a single image, returns pixel-wise accuracy
-    To compute over many images do:
-    for i = range(Nimages):
-         (pixel_accuracy[i], pixel_correct[i], pixel_labeled[i]) = \
-            pixelAccuracy(imPred[i], imLab[i])
-    mean_pixel_accuracy = 1.0 * np.sum(pixel_correct) / (np.spacing(1) + np.sum(pixel_labeled))
-    """
-    # Remove classes from unlabeled pixels in gt image.
-    # We should not penalize detections in unlabeled portions of the image.
-    pixel_labeled = np.sum(imLab >= 0)
-    pixel_correct = np.sum((imPred == imLab) * (imLab >= 0))
-    pixel_accuracy = 1.0 * pixel_correct / pixel_labeled
-    return (pixel_accuracy, pixel_correct, pixel_labeled)
-
-def intersectionAndUnion(imPred, imLab, numClass):
-    """
-    This function takes the prediction and label of a single image,
-    returns intersection and union areas for each class
-    To compute over many images do:
-    for i in range(Nimages):
-        (area_intersection[:,i], area_union[:,i]) = intersectionAndUnion(imPred[i], imLab[i])
-    IoU = 1.0 * np.sum(area_intersection, axis=1) / np.sum(np.spacing(1)+area_union, axis=1)
-    """
-    # Remove classes from unlabeled pixels in gt image.
-    # We should not penalize detections in unlabeled portions of the image.
-    imPred = imPred * (imLab >= 0)
-
-    # Compute area intersection:
-    intersection = imPred * (imPred == imLab)
-    (area_intersection, _) = np.histogram(intersection, bins=numClass, range=(1, numClass))
-
-    # Compute area union:
-    (area_pred, _) = np.histogram(imPred, bins=numClass, range=(1, numClass))
-    (area_lab, _) = np.histogram(imLab, bins=numClass, range=(1, numClass))
-    area_union = area_pred + area_lab - area_intersection
-    return (area_intersection, area_union)
-
-
-def hist_info(pred, label, num_cls):
-    assert pred.shape == label.shape
-    k = (label >= 0) & (label < num_cls)
-    labeled = np.sum(k)
-    correct = np.sum((pred[k] == label[k]))
-
-    return np.bincount(num_cls * label[k].astype(int) + pred[k], minlength=num_cls ** 2).\
-                                   reshape(num_cls, num_cls), labeled, correct
-
-def compute_score(hist, correct, labeled):
-    iu = np.diag(hist) / (hist.sum(1) + hist.sum(0) - np.diag(hist))
-    mean_IU = np.nanmean(iu)
-    mean_IU_no_back = np.nanmean(iu[1:])
-    #freq = hist.sum(1) / hist.sum()
-    # freq_IU = (iu[freq > 0] * freq[freq > 0]).sum()
-    mean_pixel_acc = correct / labeled
-
-    return iu, mean_IU, mean_IU_no_back, mean_pixel_acc

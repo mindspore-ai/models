@@ -21,8 +21,6 @@ import mindspore.dataset as ds
 import mindspore.dataset.vision.c_transforms as CV
 
 from src.seg_data_base import SegmentationDataset
-from src.distributed_sampler import DistributedSampler
-
 
 __all__ = ['CitySegmentation']
 
@@ -162,20 +160,17 @@ def create_CitySegmentation(args, data_path='../dataset/', split='train', mode=N
     '''create_CitySegmentation'''
     dataset = CitySegmentation(args, root=data_path, split=split, mode=mode, \
                                base_size=base_size, crop_size=crop_size)
-    dataset_len = len(dataset)
-    distributed_sampler = DistributedSampler(dataset_len, device_num, rank, shuffle=shuffle)
-
     data_set = ds.GeneratorDataset(dataset, column_names=["image", "label"], num_parallel_workers=8, \
-                                   shuffle=shuffle, sampler=distributed_sampler)
+                                   shuffle=shuffle, num_shards=device_num, shard_id=rank)
     # general resize, normalize and toTensor
     if transform is not None:
         data_set = data_set.map(input_columns=["image"], operations=transform, num_parallel_workers=8)
     else:
         hwc_to_chw = CV.HWC2CHW()
         data_set = data_set.map(input_columns=["image"], operations=hwc_to_chw, num_parallel_workers=8)
-
     data_set = data_set.batch(batch_size, drop_remainder=True)
-    return data_set, dataset_len
+
+    return data_set, data_set.get_dataset_size()
 
 if __name__ == '__main__':
 
