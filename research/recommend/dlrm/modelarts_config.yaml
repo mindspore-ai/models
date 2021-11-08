@@ -1,0 +1,115 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: True
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+data_path: "/cache/data"
+load_path: "/cache/checkpoint_path"
+device_target: Ascend
+enable_profiling: False
+embedding_target: DEVICE
+
+# ==============================================================================
+#"""data config"""
+categorical_feature_sizes: [1460, 583, 10131227, 2202608, 305, 24, 12517, 633, 3, 93145, 5683, 8351593, 3194, 27, 14992, 5461306, 10, 5652, 2173, 4, 7046547, 18, 15, 286181, 105, 142572]
+data_vocab_size: 184965
+train_num_of_parts: 21
+test_num_of_parts: 3
+batch_size: 128 # 16000
+test_batch_size: 16384
+data_field_size: 39
+data_format: 1
+
+#"""model config"""
+data_emb_dim: 16
+bottom_mlp_args: [512, 256, 64, 16]
+top_mlp_args: [512, 256, 1]
+init_args: [-0.01, 0.01]
+weight_bias_init: ['normal', 'normal']
+keep_prob: 1.0
+convert_dtype: True  # full precision or half precision
+interaction_op: 'dot'
+interaction_itself: False
+optimizer: 'sgd'
+sparse: True
+embedding_type: 'multi'
+
+# """train config"""
+l2_coef: 0.00008 # 8e-5
+learning_rate: 0.2 # 0.15
+epsilon: 0.00000005 # 5e-8
+loss_scale: 1024.0
+train_epochs: 1 # 5
+save_checkpoint: True
+ckpt_file_name_prefix: "dlrm"
+save_checkpoint_steps: 1
+keep_checkpoint_max: 50
+eval_callback: True
+loss_callback: True
+random_seed: 123
+
+# train.py 'CTR Prediction'
+dataset_path: "/cache/data/"
+output_path: "/cache/output"
+ckpt_path: "/cache/checkpoint_path"
+eval_file_name: "/cache/output/acc.log"
+loss_file_name: "/cache/output/loss.log"
+do_eval: 'True'
+
+# eval.py 'CTR Prediction'
+checkpoint_path: "/cache/checkpoint_path"
+
+# export.py "dlrm export"
+device_id: 0
+file_name: "dlrm"
+file_format: "MINDIR"  # "AIR"
+
+# 'preprocess.'
+result_path: '/cache/preprocess_Result'
+
+# 'postprocess'
+label_path: '/cache/preprocess_Result/02_labels'
+
+dense_dim: 13
+slot_dim: 26
+threshold: 100
+train_line_count: 45840617
+skip_id_convert: 0
+
+# ====================================
+host_device_mix: 0  # Not use now
+
+---
+# Config description for each option
+enable_modelarts: 'Whether training on modelarts, default: False'
+data_url: 'Dataset url for obs'
+train_url: 'Training output url for obs'
+data_path: 'Dataset path for local'
+output_path: 'Training output path for local'
+
+device_target: "device target, support Ascend, GPU and CPU."
+dataset_path: 'Dataset path'
+batch_size: "batch size"
+ckpt_path: 'Checkpoint path'
+eval_file_name: 'Auc log file path. Default: "./auc.log"'
+loss_file_name: 'Loss log file path. Default: "./loss.log"'
+do_eval: 'Do evaluation or not, only support "True" or "False". Default: "True"'
+checkpoint_path: 'Checkpoint file path'
+device_id: "Device id"
+ckpt_file: "Checkpoint file path."
+file_name: "output file name."
+file_format: "file format"
+result_path: 'Result path'
+# result_path: "./result_Files" # 'result path'
+label_path: 'label path'
+
+dense_dim: 'The number of your continues fields'
+slot_dim: 'The number of your sparse fields, it can also be called catelogy features.'
+threshold: 'Word frequency below this will be regarded as OOV. It aims to reduce the vocab size'
+train_line_count: 'The number of examples in your dataset'
+skip_id_convert: 'Skip the id convert, regarding the original id as the final id.'
+---
+device_target: ['Ascend', 'GPU', 'CPU']
+file_format: ["AIR", "ONNX", "MINDIR"]
+freeze_layer: ["", "none", "backbone"]
+skip_id_convert: [0, 1]
