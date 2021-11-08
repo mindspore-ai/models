@@ -185,7 +185,7 @@ bash run_distribute_train.sh DEVICE_ID EPOCH_SIZE LR DATASET PRE_TRAINED(optiona
 
 > 注意:
 
-  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools).
 
 #### 运行
 
@@ -374,7 +374,7 @@ mAP: 0.35625723922139957
 | 最终损失                    | 0.69                               |
 | 精确度 (8p)                 | mAP[0.3571]            |
 | 训练总时间 (8p)             | 41h32m20s                        |
-| 脚本                       | [Retianet script](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet152) |
+| 脚本                       | [Retianet script](https://gitee.com/mindspore/models/tree/r1.5/research/cv/retinanet_resnet152) |
 
 #### 推理性能
 

@@ -336,7 +336,7 @@ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.555
 | 总时长                 | 8卡：23.5小时                                                                                |
 | 参数 (M)             | 62.1                                                                                           |
 | 微调检查点 | 474M (.ckpt文件)                                                                              |
-| 脚本                    | [YoloV3-DarkNet53-Quant脚本](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53_quant) |
+| 脚本                    | [YoloV3-DarkNet53-Quant脚本](https://gitee.com/mindspore/models/tree/r1.5/official/cv/yolov3_darknet53_quant) |
 
 #### 推理性能
 

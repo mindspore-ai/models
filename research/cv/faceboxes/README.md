@@ -273,7 +273,7 @@ Parameters for both training and evaluation can be set in config.py
 | Total time                 | 4pcs: 7.6 hours                                              |
 | Parameters (M)             | 3.84M                                                        |
 | Checkpoint for Fine tuning | 13M (.ckpt file)                                             |
-| Scripts                    | [faceboxes script](https://gitee.com/mindspore/models/tree/master/research/cv/faceboxes) |
+| Scripts                    | [faceboxes script](https://gitee.com/mindspore/models/tree/r1.5/research/cv/faceboxes) |
 
 # [Description of Random Situation](#contents)
 

@@ -300,7 +300,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 1.071 ms/step                          |
 | Total time                 | 32.1s                          |                                       |
 | Checkpoint for Fine tuning | 482k (.ckpt file)                                         |
-| Scripts                    | [LeNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/lenet)s |
+| Scripts                    | [LeNet Script](https://gitee.com/mindspore/models/tree/r1.5/official/cv/lenet)s |
 
 #### Inference Performance
 

@@ -173,7 +173,7 @@ python export.py --device_target [PLATFORM] --checkpoint_path [CKPT_PATH]
 |总时长                 | 1433分钟                  |
 | 参数(M)                 | 5.48M |
 | 微调检查点 | 44M                      |
-|脚本                   | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv3)|
+|脚本                   | [链接](https://gitee.com/mindspore/models/tree/r1.5/official/cv/mobilenetv3)|
 
 # 随机情况说明
 

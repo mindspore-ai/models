@@ -893,7 +893,7 @@ mean Iou 0.7854572371350974
 | Parameters (M)             | 58.2                                       |
 | Checkpoint for Fine tuning | 443M (.ckpt file)                       |
 | Model for inference        | 223M (.air file)                     |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/deeplabv3) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/deeplabv3) |
 
 ## Inference Performance
 

@@ -178,7 +178,7 @@ result: {'Loss': 1.8745046273255959, 'Top_1_Acc': 0.7668870192307692, 'Top_5_Acc
 | 训练总时间 (8p)             | 29.5h                                    |
 | 评估总时间                  | 1min                                    |
 | 参数量 (M)                 | 61M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/efficientnet-b0) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/r1.5/research/cv/efficientnet-b0) |
 
 # 随机情况的描述
 

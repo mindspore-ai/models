@@ -123,7 +123,7 @@ bash run_distributed_train_ascend.sh /path/to/MNIST_Data/train /path/to/hccl_8p_
 ```
 
 - Notes
-1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools).
 
 ### [Training Result](#content)
 
@@ -170,7 +170,7 @@ python  export.py --ckpt_dir /path/to/train/ckpt/G_50.ckpt
 | Loss                       | g_loss: 4.9693 d_loss: 0.1540                                                               |
 | Total time                 | 7.5 mins(8p)                                                                                     |
 | Checkpoint for Fine tuning | 26.2M(.ckpt file)                                                                           |
-| Scripts                    | [cgan script](https://gitee.com/mindspore/models/tree/master/research/cv/CGAN) |
+| Scripts                    | [cgan script](https://gitee.com/mindspore/models/tree/r1.5/research/cv/CGAN) |
 
 # [Description of Random Situation](#contents)
 

@@ -100,7 +100,7 @@ epoch: 12 step: 7393 ,rpn_loss: 0.00547, rcnn_loss: 0.39258, rpn_cls_loss: 0.002
 | Total time                 | 4 mins                                                       | 11 minds                                      |
 | Parameters (M)             | 11.2                                                         | 11.2                                          |
 | Checkpoint for Fine tuning | 86M (.ckpt file)                                             | 85.4 (.ckpt file)                             |
-| Scripts                    | [link](https://gitee.com/mindspore/models/tree/master/official/cv/)                       |
+| Scripts                    | [link](https://gitee.com/mindspore/models/tree/r1.5/official/cv/)                       |
 
 ### 推理性能
 
@@ -130,7 +130,7 @@ epoch: 12 step: 7393 ,rpn_loss: 0.00547, rcnn_loss: 0.39258, rpn_cls_loss: 0.002
 
 ## 贡献指南
 
-如果你想参与贡献昇思的工作当中，请阅读[昇思贡献指南](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/master/how_to_contribute)
+如果你想参与贡献昇思的工作当中，请阅读[昇思贡献指南](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/r1.5/how_to_contribute)
 
 ###贡献者
 

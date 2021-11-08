@@ -231,7 +231,7 @@ bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TAR
 | 总时间        | 1卡：65小时；8卡：8.5小时                                    |
 | 参数(M)       | 85.2                                                         |
 | 微调检查点    | 1249M （.ckpt file）                                         |
-| 脚本          | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/cv/arcface) |
+| 脚本          | [脚本路径](https://gitee.com/mindspore/models/tree/r1.5/research/cv/arcface) |
 
 ### 评估性能
 

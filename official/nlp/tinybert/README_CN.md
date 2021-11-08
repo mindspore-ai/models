@@ -103,7 +103,7 @@ TinyBERT模型的主干结构是转换器，转换器包含四个编码器模块
 
     若在Ascend设备上运行分布式训练，请提前创建JSON格式的HCCL配置文件。
     详情参见如下链接：
-    https:gitee.com/mindspore/models/tree/master/utils/hccl_tools.
+    https:gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools.
 
     如需设置数据集格式和参数，请创建JSON格式的视图配置文件，详见[TFRecord](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/dataset_loading.html#tfrecord) 格式。
 

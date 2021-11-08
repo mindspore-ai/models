@@ -216,7 +216,7 @@ python infer.py \
 | 速度                  | 单卡：90毫秒/步                                      |
 | 总时长                | 单卡：297秒                                          |
 | 微调检查点             | 104.66M (.ckpt 文件)                                |
-| 脚本                  | [TB-Net脚本](https://gitee.com/mindspore/models/tree/master/official/recommend/tbnet) |
+| 脚本                  | [TB-Net脚本](https://gitee.com/mindspore/models/tree/r1.5/official/recommend/tbnet) |
 
 ### [评估性能](#目录)
 

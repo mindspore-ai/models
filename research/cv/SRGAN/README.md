@@ -41,7 +41,7 @@ Validation and eval evaluationdataset used: [Set5](http://people.rennes.inria.fr
 
 The process of training SRGAN needs a pretrained VGG19 based on Imagenet.
 
-[Training scripts](<https://gitee.com/mindspore/models/tree/master/official/cv/vgg16>)|
+[Training scripts](<https://gitee.com/mindspore/models/tree/r1.5/official/cv/vgg16>)|
 [VGG19 pretrained model](<https://download.mindspore.cn/model_zoo/>)
 
 # [Environment Requirements](#contents)
@@ -143,7 +143,7 @@ Evaluation result will be stored in the scripts/result. Under this, you can find
 | Speed                      | 1pc(Ascend): 540 ms/step; 8pcs:  1500 ms/step               |
 | Total time                 | 8pcs: 8h                                                    |
 | Checkpoint for Fine tuning | 184M (.ckpt file)                                           |
-| Scripts                    | [srgan script](https://gitee.com/mindspore/models/tree/master/research/cv/SRGAN) |
+| Scripts                    | [srgan script](https://gitee.com/mindspore/models/tree/r1.5/research/cv/SRGAN) |
 
 ### Evaluation Performance
 

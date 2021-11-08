@@ -78,7 +78,7 @@ After installing MindSpore via the official website, you can start training and 
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools>.
 
 - running on ModelArts
 
@@ -304,7 +304,7 @@ Inference result is saved in current path, you can find result in acc.log file.
 | Total time                 | 1pc: 90 mins;                                               |
 | Parameters (M)             | 16.5                                                        |
 | Checkpoint for Fine tuning | 191M (.ckpt file)                                           |
-| Scripts                    | [AutoDis script](https://gitee.com/mindspore/models/tree/master/research/recommend/autodis) |
+| Scripts                    | [AutoDis script](https://gitee.com/mindspore/models/tree/r1.5/research/recommend/autodis) |
 
 ### Inference Performance
 

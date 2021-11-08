@@ -154,7 +154,7 @@ bash ./scripts/run_standalone_train.sh 0
 bash ./scripts/run_distributed_train.sh ./rank_table_8pcs.json 8 0 ./input/bitcoin_otc.csv True
 ```
 
-其中，Ascend多卡训练还需要将相应`RANK_TABLE_FILE`文件的放置目录输入脚本（如`./rank_table_8pcs.json`），`RANK_TABLE_FILE`可按[此方法](#https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成。
+其中，Ascend多卡训练还需要将相应`RANK_TABLE_FILE`文件的放置目录输入脚本（如`./rank_table_8pcs.json`），`RANK_TABLE_FILE`可按[此方法](#https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools)生成。
 
 #### 结果
 
@@ -245,7 +245,7 @@ sgcn.mindir exported successfully!
 | 损失函数              | Softmax交叉熵                                          |
 | AUC                   | 0.8663 / 0.7979                                                      |
 | F1-Score             | 0.9309 / 0.9527                                                    |
-| 脚本                    | [SGCN](https://gitee.com/mindspore/models/tree/master/research/gnn/sgcn) |
+| 脚本                    | [SGCN](https://gitee.com/mindspore/models/tree/r1.5/research/gnn/sgcn) |
 
 ## 随机情况说明
 

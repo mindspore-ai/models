@@ -198,9 +198,9 @@ bash scripts/run_distributed_pretrain_for_gpu.sh 8 40 /path/cn-wiki-128
 
 在Ascend设备上做分布式训练时，请提前创建JSON格式的HCCL配置文件。
 
-在Ascend设备上做单机分布式训练时，请参考[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)创建HCCL配置文件。
+在Ascend设备上做单机分布式训练时，请参考[hccl_tools](https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools)创建HCCL配置文件。
 
-在Ascend设备上做多机分布式训练时，训练命令需要在很短的时间间隔内在各台设备上执行。因此，每台设备上都需要准备HCCL配置文件。请参考[merge_hccl](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools#merge_hccl)创建多机的HCCL配置文件。
+在Ascend设备上做多机分布式训练时，训练命令需要在很短的时间间隔内在各台设备上执行。因此，每台设备上都需要准备HCCL配置文件。请参考[merge_hccl](https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools#merge_hccl)创建多机的HCCL配置文件。
 
 如需设置数据集格式和参数，请创建JSON格式的schema配置文件，详见[TFRecord](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/dataset_loading.html#tfrecord)格式。
 

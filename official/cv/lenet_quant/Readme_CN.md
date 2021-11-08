@@ -216,7 +216,7 @@ bash run_infer_310.sh [AIR_PATH] [DATA_PATH] [LABEL_PATH] [DEVICE_ID]
 | 速度                      |3.29毫秒/步                                                 |
 | 总时长                 | 40秒                                                         |
 | 微调检查点 | 482k (.ckpt文件)                                           |
-| 脚本                    | [脚本](https://gitee.com/mindspore/models/tree/master/official/cv/lenet) |
+| 脚本                    | [脚本](https://gitee.com/mindspore/models/tree/r1.5/official/cv/lenet) |
 
 ## 随机情况说明
 

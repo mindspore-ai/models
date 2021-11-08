@@ -192,7 +192,7 @@ The ckpt_file parameter is required,
 | Speed                      | 70 ms/episode                          |
 | Total time                 | 4.5h (8p)               |
 | Checkpoint for Fine tuning | 875k (.ckpt file)                                         |
-| Scripts                    | https://gitee.com/mindspore/models/tree/master/research/cv/relationnet |
+| Scripts                    | https://gitee.com/mindspore/models/tree/r1.5/research/cv/relationnet |
 
 # [Description of Random Situation](#contents)
 

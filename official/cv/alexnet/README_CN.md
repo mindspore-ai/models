@@ -348,7 +348,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 | 速度 | 7毫秒/步 | 16.8毫秒/步 | 120毫秒/步 |
 | 总时间 | 6分钟 | 14分钟| 190分钟 |
 | 微调检查点 | 445M （.ckpt文件） | 445M （.ckpt文件） | 459M （.ckpt文件）|
-| 脚本 | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) |
+| 脚本 | [AlexNet脚本](https://gitee.com/mindspore/models/tree/r1.5/official/cv/alexnet) | [AlexNet脚本](https://gitee.com/mindspore/models/tree/r1.5/official/cv/alexnet) | [AlexNet脚本](https://gitee.com/mindspore/models/tree/r1.5/official/cv/alexnet) |
 
 ## 随机情况说明
 

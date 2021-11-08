@@ -146,7 +146,7 @@ bash run_train.sh [RANK_TABLE_FILE] [DATA_URL] [TRAIN_URL]
 ```
 
 - Notes
-1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools).
 2. As for PRETRAINED_MODEL，it should be a trained ResNet50 checkpoint.
 
 ### [Training Result](#content)
@@ -213,7 +213,7 @@ python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 | Total time                 | 8pcs: 5.93 hours                                            |
 | Parameters                 | 87.6                                                        |
 | Checkpoint for Fine tuning | 333.07M(.ckpt file)                                         |
-| Scripts                    | [ntsnet script](https://gitee.com/mindspore/models/tree/master/research/cv/ntsnet) |
+| Scripts                    | [ntsnet script](https://gitee.com/mindspore/models/tree/r1.5/research/cv/ntsnet) |
 
 # [Description of Random Situation](#contents)
 

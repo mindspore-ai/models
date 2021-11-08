@@ -513,7 +513,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 8pc: 13 hours                                               | 8pc: 18 hours(shape=416)                                    |
 | Parameters (M)             | 62.1                                                        | 62.1                                                        |
 | Checkpoint for Fine tuning | 474M (.ckpt file)                                           | 474M (.ckpt file)                                           |
-| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53 | https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53 |
+| Scripts                    | https://gitee.com/mindspore/models/tree/r1.5/official/cv/yolov3_darknet53 | https://gitee.com/mindspore/models/tree/r1.5/official/cv/yolov3_darknet53 |
 
 #### Inference Performance
 

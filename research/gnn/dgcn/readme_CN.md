@@ -123,7 +123,7 @@ bash run_train.sh [DATASET_NAME][DEVICE_ID]
 bash run_train_8p.sh [RANK_TABLE] [RANK_SIZE] [DEVICE_START] [DATASET_NAME] [DISTRIBUTED]
 ```
 
-rank_table用[此方法](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成并放在script文件夹下
+rank_table用[此方法](https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools)生成并放在script文件夹下
 
 ##### 启动
 
@@ -265,7 +265,7 @@ python export.py --ckpt_file ./checkpoint/cora/dgcn.ckpt  --file_format MINDIR
 | 训练时间       |3分钟/3分钟/8分钟      |
 | 卡数          |单卡                  |
 | 准确率        | 82.8/72.2/80.3       |
-| 脚本          |[DGCN脚本](https://gitee.com/mindspore/models/tree/master/research/gnn/dgcn)                      |
+| 脚本          |[DGCN脚本](https://gitee.com/mindspore/models/tree/r1.5/research/gnn/dgcn)                      |
 
 ## 随机情况说明
 

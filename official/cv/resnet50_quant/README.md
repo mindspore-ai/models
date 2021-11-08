@@ -234,7 +234,7 @@ You can view the results through the file "acc.log". The accuracy of the test da
 | Total time                 | 8pcs: 17 hours(30 epochs with pretrained)                   |
 | Parameters (M)             | 25.5                                                        |
 | Checkpoint for Fine tuning | 197M (.ckpt file)                                           |
-| Scripts                    | [resnet50-quant script](https://gitee.com/mindspore/models/tree/master/official/cv/resnet50_quant) |
+| Scripts                    | [resnet50-quant script](https://gitee.com/mindspore/models/tree/r1.5/official/cv/resnet50_quant) |
 
 ### Inference Performance
 

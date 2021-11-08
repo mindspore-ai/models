@@ -184,7 +184,7 @@ Before running the command below, please check the checkpoint path used for eval
 | Speed                      | 5.79 ms/step                                                  |
 | Total time                 | 23 mins                                                     |
 | Checkpoint for Fine tuning | 500.94KB (.ckpt file)                                           |
-| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/cv/MCNN | https://gitee.com/mindspore/models/tree/master/official/cv/alexnet |
+| Scripts                    | https://gitee.com/mindspore/models/tree/r1.5/official/cv/MCNN | https://gitee.com/mindspore/models/tree/r1.5/official/cv/alexnet |
 
 # [Description of Random Situation](#contents)
 
