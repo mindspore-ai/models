@@ -1,0 +1,72 @@
+{
+    "face_quality_assessment": {
+        "stream_config": {
+            "deviceId": "0"
+        },
+        "appsrc0": {
+            "props": {
+                "blocksize": "4096000"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_imagedecoder0"
+        },
+        "mxpi_imagedecoder0": {
+            "props": {
+                "cvProcessor": "opencv",
+                "outputDataFormat": "RGB",
+                "dataType": "float32"
+            },
+            "factory": "mxpi_imagedecoder",
+            "next": "mxpi_imageresize0"
+        },
+        "mxpi_imageresize0": {
+            "props": {
+                "cvProcessor": "opencv",
+                "resizeType": "Resizer_Stretch",
+                "dataSource": "mxpi_imagedecoder0",
+                "resizeHeight": "96",
+                "resizeWidth": "96"
+            },
+            "factory": "mxpi_imageresize",
+            "next": "mxpi_transposeplugin0"
+        },
+        "mxpi_transposeplugin0": {
+            "props": {
+                "dataSource": "mxpi_imageresize0"
+            },
+            "factory": "mxpi_transposeplugin",
+            "next": "mxpi_imagenormalize0"
+        },
+        "mxpi_imagenormalize0": {
+            "props": {
+                "dataSource": "mxpi_transposeplugin0",
+                "alpha": "0, 0, 0",
+                "beta": "255, 255, 255",
+                "dataType": "FLOAT32"
+            },
+            "factory": "mxpi_imagenormalize",
+            "next": "mxpi_tensorinfer0"
+        },
+        "mxpi_tensorinfer0": {
+            "props": {
+                "dataSource": "mxpi_imagenormalize0",
+                "modelPath": "../convert/FQA.om"
+            },
+            "factory": "mxpi_tensorinfer",
+            "next": "mxpi_dumpdata0"
+        },
+        "mxpi_dumpdata0": {
+            "props": {
+                "requiredMetaDataKeys": "mxpi_tensorinfer0"
+            },
+            "factory": "mxpi_dumpdata",
+            "next": "appsink0"
+        },
+        "appsink0": {
+            "props": {
+                "blocksize": "4096000"
+            },
+            "factory": "appsink"
+        }
+    }
+}
