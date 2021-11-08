@@ -4,6 +4,7 @@ enable_modelarts: False
 data_url: ""
 train_url: ""
 checkpoint_url: ""
+bucket_name: "textrcnn-ms"
 # Path for local
 data_path: "/cache/data"
 output_path: "/cache/train"
@@ -16,8 +17,8 @@ loss_scale: 128
 pos_dir: 'data/rt-polaritydata/rt-polarity.pos'
 neg_dir: 'data/rt-polaritydata/rt-polarity.neg'
 num_epochs: 10
-lstm_num_epochs: 15
-batch_size: 64
+lstm_num_epochs: 10
+batch_size: 1
 cell: 'gru'
 ckpt_folder_path: './ckpt'
 preprocess_path: './preprocess'
@@ -31,16 +32,16 @@ lstm_lr_warm_up_epochs: 2
 lstm_lr_adjust_epochs: 9
 emb_path: './word2vec'
 embed_size: 300
-save_checkpoint_steps: 149
+save_checkpoint_steps: 9594
 keep_checkpoint_max: 10
 ckpt_path: ''
 
 # Export related
 ckpt_file: ''
 file_name: 'textrcnn'
-file_format: "MINDIR"
+file_format: "AIR"
 
-# postprocess and result_path related
+# post_process and result_path related
 pre_result_path: "./preprocess_Result"
 label_path: "./preprocess_Result/label_ids.npy"
 result_path: "./result_Files"
