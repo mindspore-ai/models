@@ -61,9 +61,12 @@ EfficientNet总体网络架构如下：
 ├── EfficientNet-B3
   ├── README_CN.md                 # EfficientNet-B3相关描述
   ├── scripts
-  │   ├──run_standalone_train.sh   # 用于单卡训练的shell脚本
-  │   ├──run_distribute_train.sh   # 用于八卡训练的shell脚本
-  │   └──run_eval.sh               # 用于评估的shell脚本
+  │   ├──run_standalone_train.sh       # 用于单卡Asced训练的shell脚本
+  │   ├──run_standalone_train_gpu.sh   # 用于单卡GPU训练的shell脚本
+  │   ├──run_distribute_train.sh       # 用于八卡Ascend训练的shell脚本
+  │   ├──run_distribute_train_gpu.sh   # 用于八卡GPU训练的shell脚本
+  │   └──run_eval.sh                   # 用于Asced评估的shell脚本
+  │   └──run_eval_gpu.sh               # 用于GPU评估的shell脚本
   ├── src
   │   ├──models                    # EfficientNet-B3架构
   │   │   ├──effnet.py
@@ -114,10 +117,13 @@ EfficientNet总体网络架构如下：
 # 训练示例
   python:
       Ascend单卡训练示例：python train.py --device_id [DEVICE_ID] --dataset_path [DATA_DIR]
+      GPU单卡训练示例：python train.py --device_target GPU --device_id [DEVICE_ID] --dataset_path [DATA_DIR]
 
   shell:
-      Ascend单卡训练示例: sh ./run_standalone_train.sh [DEVICE_ID] [DATA_DIR]
-      Ascend八卡并行训练: sh ./run_distribute_train.sh [RANK_TABLE_FILE] [DATA_DIR]
+      Ascend单卡训练示例: bash ./run_standalone_train.sh [DEVICE_ID] [DATA_DIR]
+      Ascend八卡并行训练: bash ./run_distribute_train.sh [RANK_TABLE_FILE] [DATA_DIR]
+      GPU单卡训练示例: bash ./run_standalone_train_gpu.sh [DEVICE_ID] [DATA_DIR]
+      GPU八卡并行训练: bash ./run_distribute_train_gpu.sh [RANK_SIZE] [DATA_DIR]
 ```
 
 ### 结果
@@ -161,17 +167,17 @@ result: {'Loss': 1.7236452958522699, 'Top_1_Acc': 0.8045072115384615, 'Top_5_Acc
 
 ## 训练性能
 
-| 参数                        | Ascend                                |
-| -------------------------- | ------------------------------------- |
-| 模型名称                    | EfficientNet                          |
-| 模型版本                    | B3                           |
-| 运行环境                    | HUAWEI CLOUD Modelarts                     |
-| 数据集                      | imagenet                              |
-| 训练参数                    | src/config.py                         |
-| 优化器                      | RMSProp                              |
-| 损失函数                    | CrossEntropySmooth         |
-| 最终损失                    | 1.72                                  |
-| 精确度 (8p)                 | Top1[80.5%], Top5[95%]               |
+| 参数                        | Ascend                                | GPU                                |
+| -------------------------- | ------------------------------------- |------------------------------------- |
+| 模型名称                    | EfficientNet                          |EfficientNet                          |
+| 模型版本                    | B3                           |B3                           |
+| 运行环境                    | HUAWEI CLOUD Modelarts                     |Tesla V100；系统 Euler2.8                 |
+| 数据集                      | imagenet                              |imagenet                              |
+| 训练参数                    | src/config.py                         |src/config.py                         |
+| 优化器                      | RMSProp                              |RMSProp                              |
+| 损失函数                    | CrossEntropySmooth         |CrossEntropySmooth         |
+| 最终损失                    | 1.72                                  |1.72                                  |
+| 精确度 (8p)                 | Top1[80.5%], Top5[95%]               |Top1[80.5%], Top5[95%]               |
 
 # 随机情况的描述
 
