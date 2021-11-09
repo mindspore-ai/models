@@ -47,7 +47,7 @@ class FpnMask(nn.Cell):
     def __init__(self, input_channels, output_channels, num_classes):
         super(FpnMask, self).__init__()
         self.platform = context.get_context("device_target")
-        if self.platform == "CPU":
+        if self.platform == "CPU" or self.platform == "GPU":
             self.platform_mstype = mstype.float32
         else:
             self.platform_mstype = mstype.float16
@@ -121,11 +121,13 @@ class RcnnMask(nn.Cell):
         super(RcnnMask, self).__init__()
         cfg = config
         self.platform = context.get_context("device_target")
-        if self.platform == "CPU":
+        if self.platform == "CPU" or self.platform == "GPU":
+            self.platform_dtype = np.float32
             self.platform_mstype = mstype.float32
         else:
+            self.platform_dtype = np.float16
             self.platform_mstype = mstype.float16
-        self.rcnn_loss_mask_fb_weight = Tensor(np.array(cfg.rcnn_loss_mask_fb_weight).astype(np.float16))
+        self.rcnn_loss_mask_fb_weight = Tensor(np.array(cfg.rcnn_loss_mask_fb_weight).astype(self.platform_dtype))
         self.rcnn_mask_out_channels = cfg.rcnn_mask_out_channels
         self.target_means = target_means
         self.target_stds = target_stds
@@ -149,7 +151,7 @@ class RcnnMask(nn.Cell):
         self.num_bboxes = cfg.num_expected_pos_stage2 * batch_size
         rmv_first = np.ones((self.num_bboxes, self.num_classes))
         rmv_first[:, 0] = np.zeros((self.num_bboxes,))
-        self.rmv_first_tensor = Tensor(rmv_first.astype(np.float16))
+        self.rmv_first_tensor = Tensor(rmv_first.astype(self.platform_dtype))
         self.mean_loss = P.ReduceMean()
         self.maximum = P.Maximum()
 
@@ -180,7 +182,7 @@ class RcnnMask(nn.Cell):
         loss_mask_fb = self.loss_mask(masks_fb_pred, masks_fb_targets)
         loss_mask_fb = self.mean_loss(loss_mask_fb, (2, 3))
         loss_mask_fb = loss_mask_fb * bbox_weights
-        if self.platform == "CPU":
+        if self.platform == "CPU" or self.platform == "GPU":
             sum_weight = self.sum_loss(weights, (0,))
             loss_mask_fb = loss_mask_fb / self.maximum(self.expanddims(sum_weight, 0), 1)
         else:

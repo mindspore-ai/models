@@ -41,7 +41,7 @@ class FpnCls(nn.Cell):
     """dense layer of classification and box head"""
     def __init__(self, input_channels, output_channels, num_classes, pool_size):
         super(FpnCls, self).__init__()
-        if context.get_context("device_target") == "CPU":
+        if context.get_context("device_target") == "CPU" or context.get_context("device_target") == "GPU":
             self.platform_mstype = mstype.float32
         else:
             self.platform_mstype = mstype.float16
@@ -105,10 +105,12 @@ class RcnnCls(nn.Cell):
                  ):
         super(RcnnCls, self).__init__()
         cfg = config
-        if context.get_context("device_target") == "CPU":
+        if context.get_context("device_target") == "CPU" or context.get_context("device_target") == "GPU":
             self.platform_mstype = mstype.float32
+            self.platform_dtype = np.float32
         else:
             self.platform_mstype = mstype.float16
+            self.platform_dtype = np.float16
         self.rcnn_fc_out_channels = cfg.rcnn_fc_out_channels
         self.target_means = target_means
         self.target_stds = target_stds
@@ -141,7 +143,7 @@ class RcnnCls(nn.Cell):
 
         rmv_first = np.ones((self.num_bboxes, self.num_classes))
         rmv_first[:, 0] = np.zeros((self.num_bboxes,))
-        self.rmv_first_tensor = Tensor(rmv_first.astype(np.float16))
+        self.rmv_first_tensor = Tensor(rmv_first.astype(self.platform_dtype))
 
         self.num_bboxes_test = cfg.rpn_max_num * cfg.test_batch_size
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 3 ]
+if [ $# != 4 ]
 then 
-    echo "Usage: sh run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH]"
+    echo "Usage: sh run_eval.sh [ANN_FILE] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]"
 exit 1
 fi
 
@@ -46,6 +46,8 @@ then
 exit 1
 fi 
 
+DEVICE_TARGET="${4:-Ascend}"
+
 ulimit -u unlimited
 export DEVICE_NUM=1
 export RANK_SIZE=$DEVICE_NUM
@@ -64,5 +66,6 @@ cp -r ../src ./eval
 cd ./eval || exit
 env > env.log
 echo "start eval for device $DEVICE_ID"
-python eval.py --device_id=$DEVICE_ID --ann_file=$PATH1 --checkpoint_path=$PATH2 --coco_root=$PATH3 &> log.txt &
+python eval.py --device_target=$DEVICE_TARGET --device_id=$DEVICE_ID --ann_file=$PATH1 \
+--checkpoint_path=$PATH2 --coco_root=$PATH3 &> log.txt &
 cd ..

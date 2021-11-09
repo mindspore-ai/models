@@ -167,7 +167,7 @@ class TrainOneStepCell(nn.Cell):
         self.optimizer = optimizer
         self.grad = C.GradOperation(get_by_list=True,
                                     sens_param=True)
-        if context.get_context("device_target") == "CPU":
+        if context.get_context("device_target") == "CPU" or context.get_context("device_target") == "GPU":
             self.sens = Tensor((np.ones((1,)) * sens).astype(np.float32))
         else:
             self.sens = Tensor((np.ones((1,)) * sens).astype(np.float16))
