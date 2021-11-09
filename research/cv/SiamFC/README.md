@@ -12,6 +12,7 @@
         - [Training](#training)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
+    - [Ascend310 infer](#evaluation-process)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
@@ -90,10 +91,16 @@ After installing mindspree through the official website, you can follow the foll
 ```python
     ├── SiamFC
         ├── README.md                    // Notes on siamfc
+        ├── ascend310_infer             // Implementation inference script on ascend310
+        │   ├──inc                      //Head file
+        │   ├──src                      //Main.cc and utils.cc file 
+        │   ├──build.sh                 //Build file
+        │   ├──CMakeLists.txt           //Required library files
         ├── scripts
         │   ├──ma-pre-start.sh          // Create environment before modelarts training
         │   ├──run_standalone_train_ascend.sh             // Single card training in ascend
         │   ├──run_distribution_ascend.sh          // Multi card distributed training in ascend
+        │   ├──run_infer_310.sh         //310infer scripts
         ├── src
         │   ├──alexnet.py             // Create dataset
         │   ├──config.py              // Alexnet architecture
@@ -175,6 +182,22 @@ Check the checkpoint path used for evaluation before running the following comma
   SiamFC_159_50_6650.ckpt -prec_score:0.777 -succ_score:0.589 _succ_rate:0.754
 ```
 
+## Ascend310 infer
+
+Check the checkpoint path used for evaluation before running the following command.
+
+Run this reference scripts need two different MINDIR
+
+```bash
+  python export.py  --device_id=${DEVICE_ID} --model_path=${MODEL_PATH} --file_name_export1=${SAVE_MODEL_PATH1} --file_name_export2=${SAVE_MODEL_PATH2} --file_name=${FILE_FORMAT} --device_target=${DEVICE_TARGET}
+```
+
+- Running in ascend310 device processor environment
+
+```bash
+   bash run_infer_310.sh [MODEL_PATH1] [MODEL_PATH2] [DATASET_PATH] [CODE_PATH] [DEVICE_TARGET] [DEVICE_ID]
+```
+
 # [Model description](#Contents)
 
 ## performance
@@ -193,3 +216,18 @@ Check the checkpoint path used for evaluation before running the following comma
 |total time        |about 5 hours    |
 |Script URL        |<https://gitee.com/mindspore/models/tree/master/research/cv/SiamFC>  |
 |Random number seed         |set_seed = 1234     |
+
+## performance
+
+### Inference on Ascend310 Performance
+
+|parameter   | Ascend        |
+| -------------------------- | --------------------------------------------|
+|Model Version     | SiamFC               |
+|Upload date   |2021.11.1                        |
+|mindspore version   |mindspore1.3.0             |
+|Dataset    | OTB2013                           |
+|total time        |about 5 minutes               |
+|outputs        |probability          |
+|Accuracy         |prec_score:0.779 -succ_score:0.588 _succ_rate:0.756     |
+

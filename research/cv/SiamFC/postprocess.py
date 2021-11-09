@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""start eval """
+"""post process for 310 inference"""
 from __future__ import absolute_import
 import argparse
 import os
@@ -20,16 +20,12 @@ import sys
 from got10k.experiments import ExperimentOTB
 from mindspore import context
 from src import SiamFCTracker
-
 sys.path.append(os.getcwd())
-
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='siamfc tracking')
     parser.add_argument('--device_id', type=int, default=7
                         , help='device id of GPU or Ascend')
-    parser.add_argument('--model_path', default='/root/models/siamfc_{}.ckpt/SiamFC_177-47_6650.ckpt'
-                                                , type=str, help='eval one special video')
+
     parser.add_argument('--dataset_path', default='/root/datasets/OTB2013', type=str)
 
     args = parser.parse_args()
@@ -38,13 +34,17 @@ if __name__ == '__main__':
         device_id=args.device_id,
         save_graphs=False,
         device_target='Ascend')
-    tracker = SiamFCTracker(model_path=args.model_path)
 
     root_dir = os.path.abspath(args.dataset_path)
     e = ExperimentOTB(root_dir, version=2013)
-    e.run(tracker, visualize=False)
-    prec_score, succ_score, succ_rate = e.report([tracker.name])
-    ss = '-prec_score:%.3f -succ_score:%.3f -succ_rate:%.3f' % (float(prec_score),
-                                                                float(succ_score),
-                                                                float(succ_rate))
-    print(args.model_path.split('/')[-1], ss)
+    prec_score = e.report(['SiamFC'])['SiamFC']['overall']
+    score = ['success_score', 'precision_score', 'success_rate']
+    mydic = []
+    for key in score:
+        mydic.append(prec_score[key])
+    ss = '-prec_score:%.3f -succ_score:%.3f -succ_rate:%.3f' % (float(mydic[1]),
+                                                                float(mydic[0]),
+                                                                float(mydic[2]))
+
+
+    print(ss)
