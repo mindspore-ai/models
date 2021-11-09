@@ -208,7 +208,7 @@ python export.py --task_name [TASK_NAME] --ckpt_file [CKPT_FILE] --file_format [
 
 # 随机情况说明
 
-run_train.py脚本中设置了do_shuffle参数用于轮换数据集。
+train.py脚本中设置了do_shuffle参数用于轮换数据集。
 
 config.py文件中设置hidden_dropout_prob和attention_pros_dropout_prob参数，使网络节点随机失活。
 
