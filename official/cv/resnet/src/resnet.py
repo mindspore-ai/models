@@ -218,7 +218,7 @@ class ResidualBlock(nn.Cell):
 
         self.conv3 = _conv1x1(channel, out_channel, stride=1, use_se=self.use_se)
         self.bn3 = _bn(out_channel)
-        if config.optimizer == "Thor" or config.net_name == "resnet152":
+        if config.optimizer == "Thor" or config.net_name == "resnet152" or config.net_name == "resnet101":
             self.bn3 = _bn_last(out_channel)
         if self.se_block:
             self.se_global_pool = P.ReduceMean(keep_dims=False)
