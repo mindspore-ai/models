@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [[ $# -gt 5 ]]; then
-    echo "Usage: bash ./scripts/run_train_8p.sh [RANK_TABLE] [RANK_SIZE] [DEVICE_START] [DATASET_NAME] [DISTRIBUTED]"
+    echo "Usage: bash run_train_8p.sh [RANK_TABLE] [RANK_SIZE] [DEVICE_START] [DATASET_NAME] [DISTRIBUTED]"
 exit 1
 fi
 
@@ -38,6 +38,7 @@ do
     cp -r ../src ./device$i
     cp -r ../data ./device$i
     cp ../*.py ./device$i
+    cp *.sh ./device$i
     echo "Start training for rank $RANK_ID, device $DEVICE_ID"
     cd ./device$i
     env > env.log

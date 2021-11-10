@@ -50,7 +50,7 @@ def run_train(learning_rate=0.01, n_epochs=200, dataset=None, dropout_rate=0.5,
               hidden_size=36):
     """run train."""
     context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
-    if args.device_target == "Ascend":
+    if args.device_target == "Ascend" and not args.distributed:
         context.set_context(device_id=args.device_id)
     if args.distributed:
         device_id = int(os.getenv('DEVICE_ID'))
