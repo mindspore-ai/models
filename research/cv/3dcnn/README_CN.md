@@ -1,0 +1,259 @@
+# 目录
+
+<!-- TOC -->
+
+- [目录](#目录)
+- [3DCNN描述](#3DCNN描述)
+- [模型架构](#模型架构)
+- [数据集](#数据集)
+- [环境要求](#环境要求)
+- [快速入门](#快速入门)
+- [脚本说明](#脚本说明)
+    - [脚本及样例代码](#脚本及样例代码)
+    - [脚本参数](#脚本参数)
+    - [训练过程](#训练过程)
+    - [评估过程](#评估过程)
+- [模型描述](#模型描述)
+    - [性能](#性能)
+        - [评估性能](#评估性能)
+- [随机情况说明](#随机情况说明)
+- [ModelZoo主页](#modelzoo主页)
+
+<!-- /TOC -->
+
+# 3DCNN描述
+
+3DCNN是2018年提出的基于3D卷积神经网络，用于自动分割胶质瘤,并在BraTs 2017训练数据集上进行验证。由于胶质瘤的位置、结构和形状在不同患者之间存在显著差异，3DCNN模型通过从两个接受域尺度提取特征来获取多尺度上下文信息。为了充分利用肿瘤的结构，3DCNN将坏死和非增强肿瘤(NCR/NET)、瘤周水肿(ED)和GD-增强肿瘤(ET)的不同病变区域分层。此外，模型利用紧密连接的卷积块进一步提高性能，使用局部训练模式来训练模型，以缓解肿瘤区域和非肿瘤区域不平衡问题。
+
+[论文](https://arxiv.org/pdf/1802.02427v2.pdf) ： Chen, Lele, et al. "MRI tumor segmentation with densely connected 3D CNN." Medical Imaging 2018: Image Processing. Vol. 10574. International Society for Optics and Photonics, 2018.
+
+# 模型架构
+
+3DCNN的总体网络架构如下：
+[链接](https://arxiv.org/pdf/1802.02427v2.pdf)
+
+# 数据集
+
+使用的数据集：
+
+- [BraTS 2017](<http://braintumorsegmentation.org/>) 是BraTS 2017挑战赛的训练数据集。数据集具有210名患者的MRI扫描图像，每名患者有FLAIR、T1、T1-CE和T2四种扫描数据。本模型只用使用BraTS 2017下HGG的数据集。
+    - 训练集：168名患者MRI扫描图像
+    - 测试集：42名患者MRI扫描图像
+    - 注：数据集通过在src/n4correction.py中进行N4ITK偏差修正处理，得到了修正后的数据集[N4Correction BraTS 2017](<https://pan.baidu.com/s/1Sshq6-3uNxCb6OzMwWobkg/>) (提取码：1111)。本模型使用数据集是通过N4ITK偏差修正处理后的数据集。
+
+特别说明：
+
+BraTS 2017原始数据集的文件目录结构如下所示：
+
+```text
+├── MICCAI_BraTS17_Data_Training
+    ├── HGG
+        ├─ Brats17_2013_2_1
+            ├─ Brats17_2013_2_1_flair.nii.gz
+            ├─ Brats17_2013_2_1_t1.nii.gz
+            ├─ Brats17_2013_2_1_t1ce.nii.gz
+            ├─ Brats17_2013_2_1_t2.nii.gz
+            └─ Brats17_2013_2_1_seg.nii.gz
+        ├─ ...
+```
+
+经过N4ITK修正后数据集的文件目录结构如下所示：
+
+```text
+├── MICCAI_BraTS17_Data_Training
+    ├── HGG
+        ├─ Brats17_2013_2_1
+            ├─ Brats17_2013_2_1_flair.nii.gz
+            ├─ Brats17_2013_2_1_flair_corrected.nii.gz
+            ├─ Brats17_2013_2_1_t2.nii.gz
+            ├─ Brats17_2013_2_1_t2_corrected.nii.gz
+            ├─ Brats17_2013_2_1_t1.nii.gz
+            ├─ Brats17_2013_2_1_t1_corrected.nii.gz
+            ├─ Brats17_2013_2_1_t1ce.nii.gz
+            ├─ Brats17_2013_2_1_t1ce_corrected.nii.gz
+            └─ Brats17_2013_2_1_seg.nii.gz
+        ├─ ...
+```
+
+# 环境要求
+
+- 硬件（Ascend）
+    - 使用Ascend处理器来搭建硬件环境。
+- 框架
+    - [MindSpore](https://www.mindspore.cn/install/en)
+- 如需查看详情，请参见如下资源：
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+
+# 快速入门
+
+通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
+
+- Ascend处理器环境运行
+
+    ```bash
+    # 分布式训练
+    用法：bash run_distribute_train.sh [DATA_PATH] [TRAIN_PATH] [RANK_TABLE_FILE]
+
+    # 单机训练
+    用法：bash run_standalone_train.sh [DATA_PATH] [TRAIN_PATH] [DEVICE_ID]
+
+    # 运行评估示例
+    用法：bash run_eval.sh [DATA_PATH] [TEST_PATH] [CKPT_PATH] [DEVICE_ID]
+    ```
+
+# 脚本说明
+
+## 脚本及样例代码
+
+```bash
+.
+└── 3dcnn
+    ├── README.md                         # 所有模型相关说明
+    ├── scripts
+    │   ├── run_distribute_train.sh       # 启动Ascend分布式训练（8卡）
+    │   ├── run_eval.sh                   # 启动Ascend评估
+    │   ├── run_standalone_train.sh       # 启动Ascend单机训练（单卡）
+    ├── src
+    │   ├── config.py                     # yaml文件解析
+    │   ├── dataset.py                    # 创建数据集
+    │   ├── initializer.py                # glorot_normal权重初始化
+    │   ├── loss.py                       # 损失定义
+    │   ├── lr_schedule.py                # 动态学习率生成器
+    │   ├── models.py                     # 3DCNN架构
+    │   ├── n4correction.py               # N4ITK偏差修正数据集
+    │   ├── test.txt                      # 测试数据集
+    │   ├── train.txt                     # 训练数据集
+    ├── train.py                          # 训练脚本
+    ├── eval.py                           # 评估脚本
+    ├── export.py                         # 推理模型导出脚本
+    ├── config.yaml                       # 参数配置
+```
+
+## 脚本参数
+
+在config.py中可以同时配置训练参数和评估参数。
+
+- 配置3DCNN和BraTS 2017数据集。
+
+  ```python
+  'data_path':Path('~your_path/BraTS17/HGG/')    # 训练和评估数据集的绝对全路径
+  'train_path': "./src/train.txt"                # 训练集路径
+  'test_path': "./src/test.txt"                  # 测试集路径
+  'ckpt_path':'./dense24-5_4200.ckpt'            # checkpoint文件保存的绝对全路径
+  'correction': 'True'                           # 是否修正数据集
+  'model': 'dense24'                             # 模型名字
+  'epoch_size':5                                 # 总计训练epoch数
+  'batch_size':2                                 # 训练批次大小
+  'num_classes':5                                # 数据集类数
+  'offset_width':12                              # 评估模型滑动窗口的图像宽度
+  'offset_height':12                             # 评估模型滑动窗口的图像高度
+  'offset_channel':12                            # 评估模型滑动窗口的图像通道数
+  'width_size':38                                # 输入到模型的图像宽度
+  'height_size':38                               # 输入到模型的图像高度
+  'channel_size':38                              # 输入到模型的图像通道数
+  'pred_size':12                                 # 模型输出的图像宽度，高度，通道数
+  'lr':0.005                                    # 学习率
+  'momentum':0.9                                 # 动量
+  'weight_decay': 0.001                          # 权重衰减值
+  'warmup_step':6720                            # 热身步数
+  'warmup_ratio':0                               # 热身率
+  'keep_checkpoint_max':5                        # 只保存最后一个keep_checkpoint_max检查点
+  'device_target':'Ascend'                       # 运行设备
+  'device_id':0                                  # 用于训练或评估数据集的设备ID使用run_distribute_train.sh进行分布式训练时可以忽略。
+  ```
+
+更多配置细节请参考脚本`config.yaml`。
+
+## 训练过程
+
+### 训练
+
+- Ascend处理器环境运行
+
+    ```bash
+    # 分布式训练
+    用法：bash run_distribute_train.sh [DATA_PATH] [TRAIN_PATH] [RANK_TABLE_FILE]
+
+    # 单机训练
+    用法：bash run_standalone_train.sh [DATA_PATH] [TRAIN_PATH] [DEVICE_ID]
+    ```
+
+    分布式训练需要提前创建JSON格式的HCCL配置文件。
+
+    具体操作，参见[hccl_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools) 中的说明。
+
+### 结果
+
+- 使用修正后的BraTS 2017数据集3DCNN
+
+    ```bash
+    # 分布式训练结果（8P）
+    epoch: 1 step: 4200, loss is 0.432982
+    epoch time: 1591579.692 ms, per step time: 378.948 ms
+    epoch: 2 step: 4200, loss is 0.6555363
+    epoch time: 1446606.528 ms, per step time: 344.430 ms
+    epoch: 3 step: 4200, loss is 0.23770252
+    epoch time: 1446406.834 ms, per step time: 344.383 ms
+    epoch: 4 step: 4200, loss is 0.51601326
+    epoch time: 1446402.737 ms, per step time: 344.382 ms
+    epoch: 5 step: 4200, loss is 0.07842843
+    epoch time: 1446404.419 ms, per step time: 344.382 ms
+    ```
+
+## 评估过程
+
+### 评估
+
+- Ascend处理器环境运行
+
+    ```bash
+    # 分布式训练
+    用法：bash run_eval.sh [DATA_PATH] [TEST_PATH] [CKPT_PATH] [DEVICE_ID]
+    ```
+
+### 结果
+
+上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
+
+```bash
+mean dice whole:
+[0.99771376 0.81746066]
+mean dice core:
+[0.99902476 0.77739729]
+mean dice enhance:
+[0.99929174 0.75328799]
+```
+
+# 模型描述
+
+## 性能
+
+### 评估性能
+
+#### BraTS2017上的3DCNN
+
+| 参数                 | Ascend 910
+| -------------------------- | -------------------------------------- |
+| 模型版本              | 3DCNN
+| 资源                   | Ascend 910；CPU：2.60GHz，192核；内存：755G |
+| 上传日期              | 2021-10-16 |
+| MindSpore版本          | r1.3 |
+| 数据集                    | BraTS 2017 |
+| 训练参数        | epoch=5, steps per epoch=4200, batch_size=2 |
+| 优化器                  | SGD |
+| 损失函数              | Softmax交叉熵 |
+| 输出                    | 概率 |
+| 损失                       | 0.07842843 |
+| 速度                      | 345毫秒/步（8卡）|
+| 总时长                 | 2.9小时 |
+| 微调检查点| 9.1M (.ckpt文件)）|
+| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/3dcnn) |
+
+# 随机情况说明
+
+在dataset.py中，我们设置了“create_dataset”函数内的种子，同时还使用了train.py中的随机种子。
+
+# ModelZoo主页  
+
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。
