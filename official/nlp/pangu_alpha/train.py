@@ -111,7 +111,7 @@ def run_train(args_opt):
     os.environ['HCCL_CONNECT_TIMEOUT'] = "6000"
     # Set execution mode
     context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
-    context.set_context(variable_memory_max_size="31GB")
+    context.set_context(variable_memory_max_size="30GB")
     # Set parallel context
     rank = 0
     device_num = 1
@@ -242,7 +242,7 @@ def run_train_pipeline(args_opt):
     os.environ['HCCL_CONNECT_TIMEOUT'] = "6000"
 
     context.set_context(save_graphs=False, mode=context.GRAPH_MODE, device_target=args_opt.device_target)
-    context.set_context(variable_memory_max_size="31GB")
+    context.set_context(variable_memory_max_size="30GB")
     if args_opt.distribute == "true":
         D.init()
         device_num = D.get_group_size()
