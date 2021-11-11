@@ -102,6 +102,22 @@ BraTS 2017原始数据集的文件目录结构如下所示：
     用法：bash run_eval.sh [DATA_PATH] [TEST_PATH] [CKPT_PATH] [DEVICE_ID]
     ```
 
+- GPU处理器环境运行
+
+  ```bash
+  # MindRecord数据集生成 (本次结果在SAMPLE_NUM=400下得到)
+  用法：bash convert_dataset.sh [DATA_PATH] [TRAIN_PATH] [MINDRECORD_PATH] [SAMPLE_NUM]
+
+  # 分布式训练
+  用法：bash run_distribute_train_gpu.sh [MINDRECORD_PATH] [CONFIG_PATH]
+
+  # 单机训练
+  用法：bash run_standalone_train_gpu.sh [MINDRECORD_PATH] [CONFIG_PATH] [DEVICE_ID]
+
+  # 运行评估示例
+  用法：bash run_eval_gpu.sh [DATA_PATH] [TEST_PATH] [CKPT_PATH] [CONFIG_PATH] [DEVICE_ID]
+  ```
+
 # 脚本说明
 
 ## 脚本及样例代码
@@ -114,6 +130,10 @@ BraTS 2017原始数据集的文件目录结构如下所示：
     │   ├── run_distribute_train.sh       # 启动Ascend分布式训练（8卡）
     │   ├── run_eval.sh                   # 启动Ascend评估
     │   ├── run_standalone_train.sh       # 启动Ascend单机训练（单卡）
+    │   ├── convert_dataset.sh            # 生成mindrecord格式的数据集
+    │   ├── run_distribute_train_gpu.sh   # 启动GPU分布式训练（8卡）
+    │   ├── run_standalone_train_gpu.sh   # 启动GPU单机训练（单卡）
+    │   ├── run_eval_gpu.sh               # 启动GPU评估
     ├── src
     │   ├── config.py                     # yaml文件解析
     │   ├── dataset.py                    # 创建数据集
@@ -122,12 +142,14 @@ BraTS 2017原始数据集的文件目录结构如下所示：
     │   ├── lr_schedule.py                # 动态学习率生成器
     │   ├── models.py                     # 3DCNN架构
     │   ├── n4correction.py               # N4ITK偏差修正数据集
+    │   ├── mindrecord_generator.py       # mindrecord格式数据集生成
     │   ├── test.txt                      # 测试数据集
     │   ├── train.txt                     # 训练数据集
     ├── train.py                          # 训练脚本
     ├── eval.py                           # 评估脚本
     ├── export.py                         # 推理模型导出脚本
-    ├── config.yaml                       # 参数配置
+    ├── config.yaml                       # Ascend训练参数配置
+    ├── config_gpu.yaml                   # GPU训练参数配置
 ```
 
 ## 脚本参数
@@ -138,11 +160,16 @@ BraTS 2017原始数据集的文件目录结构如下所示：
 
   ```python
   'data_path':Path('~your_path/BraTS17/HGG/')    # 训练和评估数据集的绝对全路径
+  'mindrecord_path': Path                        # mindrecord数据集绝对全路径
   'train_path': "./src/train.txt"                # 训练集路径
   'test_path': "./src/test.txt"                  # 测试集路径
   'ckpt_path':'./dense24-5_4200.ckpt'            # checkpoint文件保存的绝对全路径
   'correction': 'True'                           # 是否修正数据集
   'model': 'dense24'                             # 模型名字
+  'use_optimizer': 'SGD'                         # 使用的优化器
+  'use_dynamic_lr': True                         # 是否使用动态学习率
+  'use_loss_scale': False                        # 是否使用loss scale
+  'use_mindrecord': False                        # 是否使用mindrecord格式的数据集
   'epoch_size':5                                 # 总计训练epoch数
   'batch_size':2                                 # 训练批次大小
   'num_classes':5                                # 数据集类数
@@ -153,17 +180,18 @@ BraTS 2017原始数据集的文件目录结构如下所示：
   'height_size':38                               # 输入到模型的图像高度
   'channel_size':38                              # 输入到模型的图像通道数
   'pred_size':12                                 # 模型输出的图像宽度，高度，通道数
-  'lr':0.005                                    # 学习率
+  'lr':0.005                                     # 学习率
+  'loss_scale': 128.0                            # loss_scale的值
   'momentum':0.9                                 # 动量
   'weight_decay': 0.001                          # 权重衰减值
-  'warmup_step':6720                            # 热身步数
+  'warmup_step':6720                             # 热身步数
   'warmup_ratio':0                               # 热身率
   'keep_checkpoint_max':5                        # 只保存最后一个keep_checkpoint_max检查点
   'device_target':'Ascend'                       # 运行设备
   'device_id':0                                  # 用于训练或评估数据集的设备ID使用run_distribute_train.sh进行分布式训练时可以忽略。
   ```
 
-更多配置细节请参考脚本`config.yaml`。
+更多配置细节请参考脚本`config.yaml/config_gpu.yaml`。
 
 ## 训练过程
 
@@ -177,6 +205,19 @@ BraTS 2017原始数据集的文件目录结构如下所示：
 
     # 单机训练
     用法：bash run_standalone_train.sh [DATA_PATH] [TRAIN_PATH] [DEVICE_ID]
+    ```
+
+- GPU处理器环境运行
+
+    ```bash
+    # MindRecord数据集生成 (本次结果在SAMPLE_NUM=400下得到)
+    用法：bash convert_dataset.sh [DATA_PATH] [TRAIN_PATH] [MINDRECORD_PATH] [SAMPLE_NUM]
+
+    # 分布式训练（默认八卡）
+    用法：bash run_distribute_train_gpu.sh [MINDRECORD_PATH] [CONFIG_PATH]
+
+    # 单机训练
+    用法：bash run_standalone_train_gpu.sh [MINDRECORD_PATH] [CONFIG_PATH] [DEVICE_ID]
     ```
 
     分布式训练需要提前创建JSON格式的HCCL配置文件。
@@ -207,12 +248,21 @@ BraTS 2017原始数据集的文件目录结构如下所示：
 
 - Ascend处理器环境运行
 
-    ```bash
-    # 分布式训练
-    用法：bash run_eval.sh [DATA_PATH] [TEST_PATH] [CKPT_PATH] [DEVICE_ID]
-    ```
+```bash
+# 分布式训练
+用法：bash run_eval.sh [DATA_PATH] [TEST_PATH] [CKPT_PATH] [DEVICE_ID]
+```
+
+- GPU处理器环境运行
+
+```bash
+# 分布式训练
+用法：bash run_eval_gpu.sh [DATA_PATH] [TEST_PATH] [CKPT_PATH] [CONFIG_PATH] [DEVICE_ID]
+```
 
 ### 结果
+
+- Ascend处理器环境运行结果
 
 上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
 
@@ -225,6 +275,19 @@ mean dice enhance:
 [0.99929174 0.75328799]
 ```
 
+- GPU处理器环境运行结果
+
+上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
+
+```bash
+mean dice whole:
+[0.99780174 0.82293876]
+mean dice core:
+[0.99905320 0.78296646]
+mean dice enhance:
+[0.99930122 0.75698223]
+```
+
 # 模型描述
 
 ## 性能
@@ -233,26 +296,26 @@ mean dice enhance:
 
 #### BraTS2017上的3DCNN
 
-| 参数                 | Ascend 910
-| -------------------------- | -------------------------------------- |
-| 模型版本              | 3DCNN
-| 资源                   | Ascend 910；CPU：2.60GHz，192核；内存：755G |
-| 上传日期              | 2021-10-16 |
-| MindSpore版本          | r1.3 |
-| 数据集                    | BraTS 2017 |
-| 训练参数        | epoch=5, steps per epoch=4200, batch_size=2 |
-| 优化器                  | SGD |
-| 损失函数              | Softmax交叉熵 |
-| 输出                    | 概率 |
-| 损失                       | 0.07842843 |
-| 速度                      | 345毫秒/步（8卡）|
-| 总时长                 | 2.9小时 |
-| 微调检查点| 9.1M (.ckpt文件)）|
-| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/3dcnn) |
+| 参数          | Ascend 910                                                   | GPU V100                                                     |
+| ------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 模型版本      | 3DCNN                                                        | 3DCNN                                                        |
+| 资源          | Ascend 910；CPU：2.60GHz，192核；内存：755G                  | Telsa GPU V100                                               |
+| 上传日期      | 2021-10-16                                                   | 2021-11-11                                                   |
+| MindSpore版本 | r1.3                                                         | r1.5                                                         |
+| 数据集        | BraTS 2017                                                   | BraTS 2017                                                   |
+| 训练参数      | epoch=5, steps per epoch=4200, batch_size=2                  | epoch=5, steps per epoch=8400, batch_size=2                  |
+| 优化器        | SGD                                                          | Adam                                                         |
+| 损失函数      | Softmax交叉熵                                                | Softmax交叉熵                                                |
+| 输出          | 概率                                                         | 概率                                                         |
+| 损失          | 0.07842843                                                   | 0.08314727                                                   |
+| 速度          | 345毫秒/步(8卡)                                              | 339毫秒/步(8卡)                                              |
+| 总时长        | 2.9小时                                                      | 3.9小时                                                      |
+| 微调检查点    | 9.1M (.ckpt文件)                                             | 9.1M (.ckpt文件)                                             |
+| 脚本          | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/3dcnn) | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/3dcnn) |
 
 # 随机情况说明
 
-在dataset.py中，我们设置了“create_dataset”函数内的种子，同时还使用了train.py中的随机种子。
+在dataset.py中，我们设置了“create_dataset”函数内的种子，同时还使用了train.py中的随机种子，mindrecord_generator.py使用了随机种子。
 
 # ModelZoo主页  
 

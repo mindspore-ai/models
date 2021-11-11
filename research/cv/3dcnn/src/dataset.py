@@ -201,14 +201,14 @@ class DatasetGenerator:
         return len(self.flair_t2_node)
 
 
-def create_dataset(data_path, train_path, HSIZE=38, WSIZE=38, CSIZE=38, PSIZE=12, batch_size=2, correction=False,
-                   target="Ascend"):
+def create_dataset(data_path="", train_path="", HSIZE=38, WSIZE=38, CSIZE=38, PSIZE=12, batch_size=2, correction=False,
+                   target="Ascend", mindrecord_path="", use_mindrecord=False, group_size=1, device_id=0):
     """
     create a train dataset
 
     Args:
-        data_path(string): the path of dataset.
-        train_path(string): the path of train file.
+        data_path(string): the path of dataset Default: "".
+        train_path(string): the path of train file Default: "".
         HSIZE(int): the size of height. Default: 38
         WSIZE(int): the size of width. Default: 38
         CSIZE(int): the size of depth. Default: 38
@@ -216,17 +216,35 @@ def create_dataset(data_path, train_path, HSIZE=38, WSIZE=38, CSIZE=38, PSIZE=12
         batch_size(int): the batch size of dataset. Default: 32
         correction(bool): Whether to correct the image. Default: False
         target(str): the device target. Default: Ascend
-
+        mindrecord_path(str): the mindrecord path. used for GPU train
+        group_size(int): the number of training device. Default: 1
+        device_id(int): device target for train. Default: 0
+        use_mindrecord(bool): if use mindrecord dataset to train
     Returns:
         dataset
     """
     if target == "Ascend":
         rank_size, rank_id = _get_rank_info()
+    elif target == "GPU":
+        rank_size, rank_id = group_size, device_id
 
-    flair_t2_node, t1_t1ce_node, label_batchs = LoadData(data_path, train_path, HSIZE, WSIZE, CSIZE, PSIZE, correction)
-    train_ds = DatasetGenerator(flair_t2_node=flair_t2_node, t1_t1ce_node=t1_t1ce_node, label=label_batchs)
-    train_loader = ds.GeneratorDataset(train_ds, column_names=["flair_t2_node", "t1_t1ce_node", "label"],
-                                       num_parallel_workers=8, shuffle=True, num_shards=rank_size, shard_id=rank_id)
+    if use_mindrecord:
+        if group_size == 1:
+            rank_size = None
+            rank_id = None
+
+        train_loader = ds.MindDataset(dataset_file=mindrecord_path,
+                                      columns_list=["flair_t2_node", "t1_t1ce_node", "label"],
+                                      num_parallel_workers=8,
+                                      num_shards=rank_size,
+                                      shard_id=rank_id)
+    else:
+        flair_t2_node, t1_t1ce_node, label_batchs = LoadData(data_path, train_path, HSIZE,
+                                                             WSIZE, CSIZE, PSIZE, correction)
+        train_ds = DatasetGenerator(flair_t2_node=flair_t2_node, t1_t1ce_node=t1_t1ce_node, label=label_batchs)
+        train_loader = ds.GeneratorDataset(train_ds, column_names=["flair_t2_node", "t1_t1ce_node", "label"],
+                                           num_parallel_workers=8, shuffle=True, num_shards=rank_size, shard_id=rank_id)
+
     type_cast_float32_op = C2.TypeCast(mstype.float32)
     train_loader = train_loader.map(operations=type_cast_float32_op, input_columns="flair_t2_node",
                                     num_parallel_workers=8)
@@ -236,7 +254,6 @@ def create_dataset(data_path, train_path, HSIZE=38, WSIZE=38, CSIZE=38, PSIZE=12
     train_loader = train_loader.map(operations=type_cast_int32_op, input_columns="label", num_parallel_workers=8)
     train_loader = train_loader.batch(batch_size=batch_size, drop_remainder=True, num_parallel_workers=8)
     return train_loader
-
 
 def _get_rank_info():
     """
