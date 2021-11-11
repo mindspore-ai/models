@@ -86,13 +86,16 @@ After installing MindSpore via the official website, you can start training and 
 - Running on Ascend
 
     ```shell script
-    #run standalone training example
+    # generator mindrecord dataset
+    python train.py --only_create_dataset=True --mindrecord_dir={MINDRECORD_DIR} --image_dir={DATA_PATH} --anno_path={ANNO_PATH}
+
+    # run standalone training example
     bash run_standalone_train.sh [DEVICE_ID] [EPOCH_SIZE] [MINDRECORD_DIR] [IMAGE_DIR] [ANNO_PATH]
 
-    #run distributed training example
+    # run distributed training example
     bash run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [MINDRECORD_DIR] [IMAGE_DIR] [ANNO_PATH] [RANK_TABLE_FILE]
 
-    #run evaluation example
+    # run evaluation example
     bash run_eval.sh [DEVICE_ID] [CKPT_PATH] [MINDRECORD_DIR] [IMAGE_DIR] [ANNO_PATH]
     ```
 

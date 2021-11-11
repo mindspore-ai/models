@@ -88,6 +88,8 @@ YOLOv3整体网络架构如下：
 - Ascend处理器环境运行
 
     ```shell script
+    # 生成mindrecord数据
+    python train.py --only_create_dataset=True --mindrecord_dir={MINDRECORD_DIR} --image_dir={DATA_PATH} --anno_path={ANNO_PATH}
     # 运行单机训练示例
     bash run_standalone_train.sh [DEVICE_ID] [EPOCH_SIZE] [MINDRECORD_DIR] [IMAGE_DIR] [ANNO_PATH]
     # 运行分布式训练示例

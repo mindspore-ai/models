@@ -264,6 +264,11 @@ def filter_valid_data(image_dir, anno_path):
         if os.path.isfile(os.path.join(image_dir, file_name)):
             image_anno_dict[file_name] = anno_parser(line_split[1:])
             image_files.append(file_name)
+        else:
+            raise ValueError("there is no file {}, it is construct by parameter "
+                             "image_dir:{} and first field in file {} every "
+                             "line, please check them.".format(os.path.join(image_dir, file_name),
+                                                               image_dir, anno_path))
     return image_files, image_anno_dict
 
 
