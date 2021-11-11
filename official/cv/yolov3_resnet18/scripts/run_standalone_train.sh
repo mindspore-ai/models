@@ -32,7 +32,7 @@ cd $BASE_PATH/../ || exit
 
 export RANK_SIZE=1
 export DEVICE_ID=$1
-export RANK_ID=$1
+export RANK_ID=0
 
 if [ $# == 5 ]
 then
