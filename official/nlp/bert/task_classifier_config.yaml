@@ -78,7 +78,8 @@ data_url: "Url for modelarts"
 train_url: "Url for modelarts"
 data_path: "The location of the input data."
 output_path: "The location of the output file."
-device_target: "Running platform, choose from Ascend or CPU, and default is Ascend."
+device_target: "Running platform, choose from Ascend, GPU or CPU(On the CPU, only the export and inference of "
+               "the onnx model is supported), and default is Ascend."
 enable_profiling: 'Whether enable profiling while training, default: False'
 
 assessment_method: "assessment_method including [Mcc, Spearman_correlation, Accuracy, F1], default is Accuracy"
@@ -104,7 +105,7 @@ export_file_name: "bert output air name."
 file_format: "file format"
 ---
 # chocies
-device_target: ['Ascend', 'GPU']
+device_target: ['Ascend', 'GPU', 'CPU']
 assessment_method: ["Mcc", "Spearman_correlation", "Accuracy", "F1"]
 do_train: ["true", "false"]
 do_eval: ["true", "false"]
