@@ -44,6 +44,13 @@ ckpt_file: "./dense24-5_4200.ckpt"
 file_name: "dense24"
 file_format: "MINDIR"
 
+# 310 infer options
+pre_result_path: "./preprocess_Result"
+post_result_path: "./result_Files"
+image_width: 240
+image_height: 240
+image_channel: 155
+
 ---
 # Help description for each configuration
 data_path: "The directory of data."
