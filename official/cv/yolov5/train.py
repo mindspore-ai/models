@@ -242,9 +242,11 @@ def run_train():
             time_used = time.time() - t_end
             epoch = int(i / config.steps_per_epoch)
             fps = config.per_batch_size * (i - old_progress) * config.group_size / time_used
+            per_step_time = time_used / config.log_interval * 1000
             if config.rank == 0:
-                config.logger.info('epoch[{}], iter[{}], {}, fps:{:.2f} imgs/sec, '
-                                   'lr:{}'.format(epoch, i, loss_meter, fps, lr[i]))
+                config.logger.info(
+                    'epoch[{}], iter[{}], {}, {:.2f} imgs/sec, lr:{},'
+                    ' per step time:{}ms'.format(epoch, i, loss_meter, fps, lr[i], per_step_time))
             t_end = time.time()
             loss_meter.reset()
             old_progress = i
