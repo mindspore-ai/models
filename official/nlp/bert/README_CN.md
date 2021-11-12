@@ -326,7 +326,7 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
                         [--data_dir DATA_DIR] [--schema_dir SCHEMA_DIR] [train_steps N]
 
 选项：
-    --device_target            代码实现设备，可选项为Ascend或CPU。默认为Ascend
+    --device_target            代码实现设备，可选项为Ascend或GPU。默认为Ascend
     --distribute               是否多卡预训练，可选项为true（多卡预训练）或false。默认为false
     --epoch_size               轮次，默认为1
     --device_num               使用设备数量，默认为1
@@ -361,7 +361,7 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
                     [--eval_data_file_path EVAL_DATA_FILE_PATH]
                     [--schema_file_path SCHEMA_FILE_PATH]
 选项：
-    --device_target                   代码实现设备，可选项为Ascend或CPU。默认为Ascend
+    --device_target                   代码实现设备，可选项为Ascend或GPU。默认为Ascend
     --do_train                        是否基于训练集开始训练，可选项为true或false
     --do_eval                         是否基于开发集开始评估，可选项为true或false
     --assessment_method               评估方法，可选项为f1或clue_benchmark
@@ -393,7 +393,7 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
                     [--eval_data_file_path EVAL_DATA_FILE_PATH]
                     [--schema_file_path SCHEMA_FILE_PATH]
 options:
-    --device_target                   代码实现设备，可选项为Ascend或CPU。默认为Ascend
+    --device_target                   代码实现设备，可选项为Ascend或GPU。默认为Ascend
     --do_train                        是否基于训练集开始训练，可选项为true或false
     --do_eval                         是否基于开发集开始评估，可选项为true或false
     --device_id                       任务运行的设备ID
@@ -421,7 +421,7 @@ usage: run_classifier.py [--device_target DEVICE_TARGET] [--do_train DO_TRAIN] [
                          [--eval_data_file_path EVAL_DATA_FILE_PATH]
                          [--schema_file_path SCHEMA_FILE_PATH]
 options:
-    --device_target                   任务运行的目标设备，可选项为Ascend或CPU
+    --device_target                   任务运行的目标设备，可选项为Ascend或GPU
     --do_train                        是否基于训练集开始训练，可选项为true或false
     --do_eval                         是否基于开发集开始评估，可选项为true或false
     --assessment_method               评估方法，可选项为accuracy、f1、mcc、spearman_correlation
@@ -729,23 +729,26 @@ F1 0.931243
 - 导出ONNX
 
 ```shell
-python export.py --config_path [/path/*.yaml] --file_format ["ONNX"] --export_ckpt_file [CKPT_PATH] --num_class [NUM_CLASS] --export_file_name [EXPORT_FILE_NAME]
+python export.py --config_path [/path/*.yaml] --file_format ["ONNX"] --export_ckpt_file [CKPT_PATH] --device_target
+ [DEVICE_TARGET] --num_class [NUM_CLASS] --export_file_name [EXPORT_FILE_NAME]
 ```
 
 `CKPT_PATH`为必选项, 是某个分类任务模型训练完毕的ckpt文件路径。
 `NUM_CLASS`为必选项, 是该分类任务模型的类别数。
 `EXPORT_FILE_NAME`为可选项, 是导出ONNX模型的名字, 如果未设置则ONNX模型会以默认名保存在当前目录下。
+`DEVICE_TARGET`为可选项, 是硬件平台类型, 默认为Ascend, 当硬件平台是Ascend时无需设置, 当硬件平台是GPU或CPU时, 应设置该选项为对应平台。
 
 运行结束后, 当前文件目录下会保存bert该分类任务模型的ONNX模型。
 
 - 加载ONNX并推理
 
 ```shell
-python run_eval_onnx.py --config_path [/path/*.yaml] --eval_data_file_path [EVAL_DATA_FILE_PATH] --export_file_name [EXPORT_FILE_NAME]
+python run_eval_onnx.py --config_path [/path/*.yaml] --eval_data_file_path [EVAL_DATA_FILE_PATH] --export_file_name [EXPORT_FILE_NAME] --device_target [DEVICE_TARGET]
 ```
 
 `EVAL_DATA_FILE_PATH`为必选项, 是该分类任务所用数据集的eval数据。
 `EXPORT_FILE_NAME`为可选项, 是导出ONNX步骤中ONNX的模型名, 此处用于加载指定ONNX模型进行推理。
+`DEVICE_TARGET`为可选项, 是硬件平台类型, 默认为Ascend, 当硬件平台是Ascend时无需设置, 当硬件平台是GPU或CPU时, 应设置该选项为对应平台。
 
 ## 模型描述
 
