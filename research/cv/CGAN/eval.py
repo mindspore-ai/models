@@ -50,31 +50,34 @@ def main():
 
     # training argument
     input_dim = 100
+    n_col = 20
+    n_row = 10
+    n_image = n_row * n_col
 
     # create G Cell & D Cell
     netG = Generator(input_dim)
 
-    latent_code_eval = Tensor(np.random.randn(200, input_dim), dtype=mstype.float32)
+    latent_code_eval = Tensor(np.random.randn(n_image, input_dim), dtype=mstype.float32)
 
-    label_eval = np.zeros((200, 10))
-    for i in range(200):
-        j = i // 20
+    label_eval = np.zeros((n_image, 10))
+    for i in range(n_image):
+        j = i // n_col
         label_eval[i][j] = 1
     label_eval = Tensor(label_eval, dtype=mstype.float32)
 
-    fig, ax = plt.subplots(10, 20, figsize=(10, 5))
-    for digit, num in itertools.product(range(10), range(20)):
+    fig, ax = plt.subplots(n_row, n_col, figsize=(10, 5))
+    for digit, num in itertools.product(range(n_row), range(n_col)):
         ax[digit, num].get_xaxis().set_visible(False)
         ax[digit, num].get_yaxis().set_visible(False)
 
     param_G = load_checkpoint(args.ckpt_dir)
     load_param_into_net(netG, param_G)
     gen_imgs_eval = netG(latent_code_eval, label_eval)
-    for i in range(200):
-        if (i + 1) % 20 == 0:
+    for i in range(n_image):
+        if (i + 1) % n_col == 0:
             print("process ========= {}/200".format(i+1))
-        digit = i // 20
-        num = i % 20
+        digit = i // n_col
+        num = i % n_col
         img = gen_imgs_eval[i].asnumpy().reshape((28, 28))
         ax[digit, num].cla()
         ax[digit, num].imshow(img * 127.5 + 127.5, cmap="gray")

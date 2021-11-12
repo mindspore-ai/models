@@ -17,7 +17,6 @@ import argparse
 import numpy as np
 from mindspore import Tensor
 from mindspore import context
-from mindspore.common import dtype as mstype
 from mindspore.train.serialization import load_checkpoint, load_param_into_net, export
 from src.model import Generator
 
@@ -40,16 +39,20 @@ def main():
 
     # training argument
     input_dim = 100
+    n_col = 20
+    n_row = 10
+    n_image = n_row * n_col
+
     # create G Cell & D Cell
     netG = Generator(input_dim)
 
-    latent_code_eval = Tensor(np.random.randn(200, input_dim), dtype=mstype.float32)
+    latent_code_eval = Tensor(np.random.randn(n_image, input_dim).astype(np.float32))
 
-    label_eval = np.zeros((200, 10))
-    for i in range(200):
-        j = i // 20
+    label_eval = np.zeros((n_image, 10), dtype=np.float32)
+    for i in range(n_image):
+        j = i // n_col
         label_eval[i][j] = 1
-    label_eval = Tensor(label_eval, dtype=mstype.float32)
+    label_eval = Tensor(label_eval.astype(np.float32))
 
     param_G = load_checkpoint(args.ckpt_dir)
     load_param_into_net(netG, param_G)
