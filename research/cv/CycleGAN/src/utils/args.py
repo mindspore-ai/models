@@ -76,6 +76,8 @@ parser.add_argument('--pad_mode', type=str, default='CONSTANT', choices=('CONSTA
 # additional parameters
 parser.add_argument('--dataroot', default='./data/horse2zebra/', \
                     help='path of images (should have subfolders trainA, trainB, testA, testB, etc).')
+parser.add_argument('--data_dir', default='testA', choices=('testA', 'testB'), \
+                    help='the translation direction of CycleGAN.')
 parser.add_argument('--outputs_dir', type=str, default='./outputs', \
                     help='models are saved here, default is ./outputs.')
 parser.add_argument('--load_ckpt', type=ast.literal_eval, default=False, \
