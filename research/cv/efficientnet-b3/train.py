@@ -23,8 +23,8 @@ from mindspore.nn import SGD, RMSProp
 from mindspore.train.model import Model
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.communication.management import init
-from mindspore.train.loss_scale_manager import FixedLossScaleManager
+from mindspore.communication.management import init, get_rank, get_group_size
+from mindspore.train.loss_scale_manager import FixedLossScaleManager, DynamicLossScaleManager
 from mindspore.common import dtype as mstype
 from mindspore.common import set_seed
 
@@ -44,6 +44,7 @@ if __name__ == '__main__':
     parser.add_argument('--train_url', type=str, default=None, help='Train output path')
 
     # Ascend parameter
+    parser.add_argument('--device_target', type=str, choices=["Ascend", "GPU"], default="Ascend", help='Device target')
     parser.add_argument('--dataset_path', type=str, default=None, help='Dataset path')
     parser.add_argument('--run_distribute', type=ast.literal_eval, default=False, help='Run distribute')
     parser.add_argument('--device_id', type=int, default=0, help='Device id')
@@ -52,12 +53,14 @@ if __name__ == '__main__':
     parser.add_argument('--resume', type=str, default='', help='resume training with existed checkpoint')
     args_opt = parser.parse_args()
 
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, save_graphs=False)
 
     # init distributed
     if args_opt.run_modelarts:
         import moxing as mox
+
         device_id = int(os.getenv('DEVICE_ID'))
+        rank = int(os.getenv('RANK_ID'))
         device_num = int(os.getenv('RANK_SIZE'))
         context.set_context(device_id=device_id)
         local_data_url = '/cache/data'
@@ -69,10 +72,11 @@ if __name__ == '__main__':
         mox.file.copy_parallel(args_opt.data_url, local_data_url)
     else:
         if args_opt.run_distribute:
-            device_id = int(os.getenv('DEVICE_ID'))
-            device_num = int(os.getenv('RANK_SIZE'))
-            context.set_context(device_id=device_id)
+            if os.getenv('DEVICE_ID', "not_set").isdigit():
+                context.set_context(device_id=int(os.getenv("DEVICE_ID")))
             init()
+            rank = get_rank()
+            device_num = get_group_size()
             context.reset_auto_parallel_context()
             context.set_auto_parallel_context(device_num=device_num,
                                               parallel_mode=context.ParallelMode.DATA_PARALLEL,
@@ -80,7 +84,7 @@ if __name__ == '__main__':
         else:
             context.set_context(device_id=args_opt.device_id)
             device_num = 1
-            device_id = 0
+            rank = 0
 
     # define network
     net = EfficientNet()
@@ -96,12 +100,12 @@ if __name__ == '__main__':
         dataset = create_dataset(dataset_path=local_data_url,
                                  do_train=True,
                                  batch_size=config.batch_size,
-                                 device_num=device_num, rank=device_id)
+                                 device_num=device_num, rank=rank)
     else:
         dataset = create_dataset(dataset_path=args_opt.dataset_path,
                                  do_train=True,
                                  batch_size=config.batch_size,
-                                 device_num=device_num, rank=device_id)
+                                 device_num=device_num, rank=rank)
     step_size = dataset.get_dataset_size()
 
     # resume
@@ -110,7 +114,11 @@ if __name__ == '__main__':
         load_param_into_net(net, ckpt)
 
     # get learning rate
-    loss_scale = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
+    if args_opt.device_target == "Ascend":
+        loss_scale = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
+    else:
+        loss_scale = DynamicLossScaleManager(init_loss_scale=2 ** 16, scale_factor=2, scale_window=2000)
+        config.loss_scale = 1.0
     lr = Tensor(get_lr(lr_init=config.lr_init,
                        lr_end=config.lr_end,
                        lr_max=config.lr_max,
@@ -133,17 +141,17 @@ if __name__ == '__main__':
 
     # define callbacks
     cb = [Monitor(lr_init=lr.asnumpy())]
-    if config.save_checkpoint and (device_num == 1 or device_id == 0):
+    if config.save_checkpoint and (device_num == 1 or rank == 0):
         config_ck = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_epochs * step_size,
                                      keep_checkpoint_max=config.keep_checkpoint_max)
         if args_opt.run_modelarts:
-            ckpt_cb = ModelCheckpoint(f"Efficientnet_b3-rank{device_id}", directory=local_train_url, config=config_ck)
+            ckpt_cb = ModelCheckpoint(f"Efficientnet_b3-rank{rank}", directory=local_train_url, config=config_ck)
         else:
-            save_ckpt_path = os.path.join(config.save_checkpoint_path, 'model_' + str(device_id) + '/')
-            ckpt_cb = ModelCheckpoint(f"Efficientnet_b3-rank{device_id}", directory=save_ckpt_path, config=config_ck)
+            save_ckpt_path = os.path.join(config.save_checkpoint_path, 'model_' + str(rank) + '/')
+            ckpt_cb = ModelCheckpoint(f"Efficientnet_b3-rank{rank}", directory=save_ckpt_path, config=config_ck)
         cb += [ckpt_cb]
 
     # begine train
     model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
-    if args_opt.run_modelarts and config.save_checkpoint and (device_num == 1 or device_id == 0):
+    if args_opt.run_modelarts and config.save_checkpoint and (device_num == 1 or rank == 0):
         mox.file.copy_parallel(local_train_url, args_opt.train_url)

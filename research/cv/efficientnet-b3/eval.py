@@ -34,6 +34,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_url', type=str, default=None, help='Dataset path')
     parser.add_argument('--train_url', type=str, default=None, help='Train output path')
     # Ascend parameter
+    parser.add_argument('--device_target', type=str, choices=["Ascend", "GPU"], default="Ascend", help='Device target')
     parser.add_argument('--dataset_path', type=str, default=None, help='Dataset path')
     parser.add_argument('--checkpoint_path', type=str, default=None, help='Checkpoint file path')
     parser.add_argument('--device_id', type=int, default=0, help='Device id')
@@ -41,7 +42,7 @@ if __name__ == '__main__':
     parser.add_argument('--run_modelarts', type=ast.literal_eval, default=False, help='Run distribute')
     args_opt = parser.parse_args()
 
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', save_graphs=False)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, save_graphs=False)
 
     if args_opt.run_modelarts:
         import moxing as mox
