@@ -1,0 +1,63 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+data_path: "/cache/data/"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+checkpoint_path: './checkpoint/'
+checkpoint_file: './checkpoint/MMoE_train-50_6236.ckpt'
+device_target: Ascend
+enable_profiling: False
+
+ckpt_path: "/cache/train"
+ckpt_file: "/cache/train/MMoE_train-50_6236.ckpt"
+# ==============================================================================
+# Training options
+epoch_size: 100
+keep_checkpoint_max: 10
+learning_rate: 0.001
+batch_size: 32
+num_features: 499
+num_experts: 8
+units: 4
+MINDIR_name: 'MMoE.MINDIR'
+ckpt_file_path: './MMoE_train-50_6236.ckpt'
+
+dataset_name: 'census_income'
+dataset_sink_mode: True
+run_distribute: False
+device_id: 0
+save_checkpoint: True
+save_checkpoint_epochs: 1
+lr: 0.0005
+local_data_path: '../data'
+
+# Model Description
+model_name: MMoE
+file_name: 'MMoE'
+file_format: 'MINDIR'
+
+# 'preprocess.'
+result_path: './preprocess_Result'
+
+# 'postprocess.'
+label1_path: './scripts/preprocess_Result/01_label1'
+label2_path: './scripts/preprocess_Result/02_label2'
+result_bin_path: './scripts/result_Files'
+income_path: './result_Files/income_output'
+marital_path: './result_Files/marital_output'
+---
+# Config description for each option
+enable_modelarts: 'Whether training on modelarts, default: False'
+data_url: 'Dataset url for obs'
+train_url: 'Training output url for obs'
+data_path: 'Dataset path for local'
+output_path: 'Training output path for local'
+
+device_target: 'Target device type'
+enable_profiling: 'Whether enable profiling while training, default: False'
+
+---
+device_target: ['Ascend', 'GPU', 'CPU']
