@@ -164,7 +164,6 @@ def save_losses(G_losses, D_losses, name):
         plt.plot(G_losses, 'ro-', label="G")
     if D_losses is not None:
         plt.plot(D_losses, 'bo--', label="D")
-
     plt.xlabel("epoch")
     plt.ylabel("Losses")
     plt.legend()

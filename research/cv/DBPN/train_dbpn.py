@@ -21,6 +21,7 @@ Example:
        --val_LR_path="/data/DBPN_data/Set5/LR" --val_GT_path="/data/DBPN_data/Set5/HR"
 """
 import os
+import os.path as osp
 import time
 import warnings
 
@@ -41,20 +42,26 @@ from src.util.utils import save_img, save_losses, save_psnr, compute_psnr
 warnings.filterwarnings(action="ignore", category=UserWarning, module="DBPN")
 
 args = get_args()
-mindspore.set_seed(args.seed)
 print(args)
-
+mindspore.set_seed(args.seed)
 epoch_loss = []
 best_avgpsnr = 0
 eval_mean_psnr = []
 
-save_eval_path = os.path.join(args.Results, args.valDataset, args.model_type)
-if not os.path.exists(save_eval_path):
+# create save eval folder
+save_eval_path = osp.join(os.getcwd(), args.Results, args.valDataset, args.model_type)
+if not osp.exists(save_eval_path):
     os.makedirs(save_eval_path)
 
-save_loss_path = 'results/genloss/'
+# create save loss folder
+save_loss_path = osp.join(os.getcwd(), 'results/genloss')
 if not os.path.exists(save_loss_path):
     os.makedirs(save_loss_path)
+
+# create save ckpt folder
+saveckpt = osp.join(os.getcwd(), os.getcwd(), args.save_folder)
+if not osp.exists(saveckpt):
+    os.makedirs(saveckpt)
 
 
 def train(trainoneStep, trainds, valds, net, eval_flag=False):
@@ -84,9 +91,12 @@ def train(trainoneStep, trainds, valds, net, eval_flag=False):
         t1 = time.time()
         mean = e_loss / steps
         epoch_loss.append(mean)
-        print("Epoch {} Complete: Avg. Loss: {:.4f}|| Time: {} min {}s.".format(epoch, mean, int((t1 - t0) / 60),
-                                                                                int(int(t1 - t0) % 60)))
-        name = os.path.join(save_loss_path, args.valDataset + '_' + args.model_type)
+        print("Epoch {} Complete: Avg. Loss: {:.4f} || "
+              "Time: {} min {}s.".format(epoch, mean, int((t1 - t0) / 60), int(int(t1 - t0) % 60)))
+        step_time = (t1 - t0) / steps
+        print('per step needs time:{:.2f}ms'.format(step_time * 1000))
+        lossname = "{}-{}.png".format(args.valDataset, args.model_type)
+        name = os.path.join(save_loss_path, lossname)
         save_losses(epoch_loss, None, name)
         if eval_flag:
             mean_psnr = 0
@@ -103,11 +113,13 @@ def train(trainoneStep, trainds, valds, net, eval_flag=False):
             mean_psnr = mean_psnr / val_steps
             print("Epoch {} Complete: Avg. PSNR: {:.4f}|| Timer:{:.2f} min".format(epoch, mean_psnr, (et1 - et0) / 60))
             eval_mean_psnr.append(mean_psnr)
-            savepath = os.path.join(save_loss_path, "%s_%s_psnr" % (args.valDataset, args.model_type))
+            save_psnr_name = "{}-{}-psnr.png".format(args.valDataset, args.model_type)
+            savepath = os.path.join(save_loss_path, save_psnr_name)
             save_psnr(eval_mean_psnr, savepath, args.model_type)
             if best_avgpsnr < mean_psnr:
                 best_avgpsnr = mean_psnr
-                save_ckpt = os.path.join(args.save_folder, '{}_{}_best.ckpt'.format(args.valDataset, args.model_type))
+                checkpoint_name = '{}-{}-best.ckpt'.format(args.valDataset, args.model_type)
+                save_ckpt = os.path.join(saveckpt, checkpoint_name)
                 save_checkpoint(trainoneStep.network, save_ckpt)
 
 
@@ -155,6 +167,5 @@ if __name__ == '__main__':
     else:
         from src.trainonestep.trainonestepgen import TrainOnestepGen
     trainonestepNet = TrainOnestepGen(lossNetwork, optimizer, sens=args.sens)
-
     train(trainonestepNet, train_ds, val_ds, model, args.eval_flag)
     print('========= best_psnr=', best_avgpsnr, "db")

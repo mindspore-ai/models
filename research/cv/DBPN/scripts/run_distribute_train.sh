@@ -13,14 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if [ $# != 7 ]
+if [ $# != 9 ]
 then
   echo "==========================================================================="
   echo "Please run the script as: "
   echo "For example:"
   echo "cd DBPN"
-  echo "Usage: sh run_distribute_train.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] [TRAIN_GT_PATH] [VAL_GT_PATH] [VAL_LR_PATH] [MODE]"
-  echo "bash scripts/run_distribute_train.sh 8 1 ./hccl_8p.json /data/DBPN_data/DIV2K_train_HR /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR False"
+  echo "Usage: bash run_distribute_train.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] [MODEL_TYPE] [TRAIN_GT_PATH] [VAL_GT_PATH] [VAL_LR_PATH] [BATCHSIZE] [MODE]"
+  echo "bash run_distribute_train.sh 8 1 ./hccl_8p.json DDBPN /data/DBPN_data/DIV2K_train_HR /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR 4 False"
+  echo "bash run_distribute_train.sh 8 1 ./hccl_8p.json DBPN /data/DBPN_data/DIV2K_train_HR /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR 4 True"
   echo "MODE control the way of trian gan network or only train generator"
   echo "Using absolute path is recommended"
   echo "==========================================================================="
@@ -28,33 +29,32 @@ then
 fi
 
 export RANK_TABLE_FILE=$3
-export RANK_START_ID=4
+export RANK_START_ID=0
+export RANK_SIZE=$1
 
 for((i=0;i<$1;i++))
 do
         export DEVICE_ID=$((i + RANK_START_ID))
-        rm -rf ./train_parallel$i
-        mkdir ./train_parallel$i
-
-        cp -r ../src ./train_parallel$i
-        cp -r ../*.py ./train_parallel$i
-        cd ./train_parallel$i || exit
         export RANK_ID=$i
         echo "start training for rank $i, device $DEVICE_ID"
         env > env.log
-        if [ $# == 7 ]
+        if [ $9 == "False" ]
         then
-          if [ $7 == "False" ]
-          then
-              mkdir -p ./train_parallel$i/ckpt/gen
-              python ./train_dbpn.py --run_distribute=$2 --device_num=$1 --device_id=$DEVICE_ID \
-                                   --train_GT_path=$4 --val_GT_path=$5 --val_LR_path=$6  > paralletrain.log 2>&1 &
-          else
-              mkdir -p ./train_parallel$i/ckpt/gan
-              cp /home/HEU_535/zhijing/DBPN_final/ckpt/gan/dbpn_100.ckpt ./train_parallel$i/ckpt/gan/
-              python ./train_dbpngan.py --run_distribute=$2 --device_num=$1 --device_id=$DEVICE_ID \
-                                    --train_GT_path=$4 --val_GT_path=$5 --val_LR_path=$6  > paralletrain.log 2>&1 &
-          fi
+            rm -rf ./train_dbpn_parallel$i
+            mkdir ./train_dbpn_parallel$i
+            cp -r ../src ./train_dbpn_parallel$i
+            cp -r ../*.py ./train_dbpn_parallel$i
+            cd ./train_dbpn_parallel$i || exit
+            python train_dbpn.py --device_num=$1 --run_distribute=$2 --model_type=$4 --device_id=$DEVICE_ID \
+                                 --train_GT_path=$5 --val_GT_path=$6 --val_LR_path=$7 --batchSize=$8 > paralletrain.log 2>&1 &
+        else
+            rm -rf ./train_dbpngan_parallel$i
+            mkdir ./train_dbpngan_parallel$i
+            cp -r ../src ./train_dbpngan_parallel$i
+            cp -r ../*.py ./train_dbpngan_parallel$i
+            cd ./train_dbpngan_parallel$i || exit
+            python train_dbpngan.py --device_num=$1 --run_distribute=$2 --model_type=$4 --device_id=$DEVICE_ID \
+                                  --train_GT_path=$5 --val_GT_path=$6 --val_LR_path=$7 --batchSize=$8 > paralletrain.log 2>&1 &
         fi
         cd ..
 done
