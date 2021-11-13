@@ -20,3 +20,7 @@
 "models/research/cv/stgcn/infer/mxbase/src/stgcnUtil.h" "runtime/references"
 "models/research/cv/stgcn/infer/mxbase/src/stgcnUtil.cpp" "runtime/references"
 "models/research/cv/stgcn/infer/mxbase/src/main.cpp" "runtime/references"
+
+
+"models/research/cv/FaceAttribute/infer/mxbase/faceattribute/FaceAttribute.h" "runtime/references"
+"models/research/cv/FaceAttribute/infer/mxbase/faceattribute/FaceAttribute.cpp" "runtime/references"
