@@ -13,21 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
-if [[ $# -gt 2 ]]; then
-    echo "Usage: bash run_eval.sh [CHECKPOINT] [DATASET]"
-exit 1
+if [ -d out ]; then
+    rm -rf out
 fi
 
-DATASET_NAME=$2
-CHECKPOINT=$1
+mkdir out
+cd out || exit
 
-if [ ! -d "eval" ]; then
-        mkdir eval
+if [ -f "Makefile" ]; then
+  make clean
 fi
-cp ../*.py ./eval
-cp -r ../src ./eval
-cp -r ../data ./eval
-cp -r ../checkpoint ./eval
-cd ./eval || exit
-nohup python -u eval.py --checkpoint=$CHECKPOINT --dataset=$DATASET_NAME > eval.log 2>&1 &
+
+cmake .. \
+    -DMINDSPORE_PATH="`pip3.7 show mindspore-ascend | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
+make

@@ -14,9 +14,11 @@
             - [用法](#用法)
             - [启动](#启动)
             - [结果](#结果)
-    - [导出MindIR模型](#导出mindir模型)
+    - [推理过程](#推理过程)
+       - [导出MindIR](#导出mindir)
+       - [在Ascend310执行推理](#在Ascend310执行推理)
     - [模型描述](#模型描述)
-        - [性能](#性能)
+    - [性能](#性能)
     - [随机情况说明](#随机情况说明)
 
 <!-- /TOC -->
@@ -235,7 +237,9 @@ Convolution Layers:[(1433, 36), (36, 7)]
 Eval results: loss= 0.52596 accuracy= 0.82800 time= 13.57054
 ```
 
-## [导出MindIR模型](#contents)
+## 推理过程
+
+### [导出MindIR](#contents)
 
 ```shell
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
@@ -244,8 +248,29 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 示例
 
 ```text
-python export.py --ckpt_file ./checkpoint/cora/dgcn.ckpt  --file_format MINDIR
-参数ckpt_file为必填项，`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
+python export.py --ckpt_file ./checkpoint/cora/dgcn.ckpt
+参数ckpt_file为必填项，`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
+```
+
+### 在Ascend310执行推理
+
+在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
+
+```shell
+# Ascend310 推理
+bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [NEED_PREPROCESS] [DEVICE_ID]
+```
+
+- `DATASET_NAME` 表示数据集名称，取值范围： ['cora', 'citeseer'， 'pubmed']。
+- `NEED_PREPROCESS` 表示数据是否需要预处理，取值范围：'y' 或者 'n'。
+- `DEVICE_ID` 可选，默认值为0。
+
+### result
+
+推理结果保存在脚本执行的当前路径，你可以在acc.log中看到以下精度计算结果。
+
+```bash
+Test set results: accuracy= 0.82800
 ```
 
 ## 模型描述
