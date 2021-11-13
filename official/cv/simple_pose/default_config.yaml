@@ -10,7 +10,11 @@ output_path: "/cache/train"
 load_path: "/cache/checkpoint_path"
 device_target: "Ascend"
 enable_profiling: False
-
+EPOCH: ''
+air_path: ''
+EXPORT_FILE_FORMAT: ''
+img_path: ''
+infer_result_dir: ''
 modelarts_dataset_unzip_name: ''
 # ==============================================================================
 # Parameters that can be modified at the terminal
