@@ -23,7 +23,7 @@ from src.model_utils.moxing_adapter import moxing_wrapper
 
 @moxing_wrapper()
 def export_model(ckpt_path):
-    network = C3D(num_classes=config.num_class)
+    network = C3D(num_classes=config.num_classes)
     network.set_train(False)
     param_dict = load_checkpoint(ckpt_path)
     load_param_into_net(network, param_dict)
