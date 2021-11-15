@@ -65,7 +65,7 @@ def parse_args():
     parser.add_argument('--data_url', required=False, default=None, help='Location of data.')
     parser.add_argument('--train_url', required=False, default=None, help='Location of training outputs.')
     parser.add_argument('--device_id', required=False, default=None, type=int, help='Location of training outputs.')
-    parser.add_argument('--run_distribute', required=False, default=False, help='Location of training outputs.')
+    parser.add_argument('--run_distribute', type=ast.literal_eval, default=False, help='Location of training outputs.')
     parser.add_argument('--is_model_arts', type=ast.literal_eval, default=False, help='Location of training outputs.')
     args = parser.parse_args()
     return args
