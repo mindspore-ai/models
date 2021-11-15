@@ -213,7 +213,7 @@ bash scripts/run_eval_gpu.sh [DATASET_PATH] [DATASET_NAME] [CKPT_PATH] [RESULT_P
 bash run_infer_310.sh [The path of the MINDIR for 310 infer] [The path of the dataset for 310 infer] y Ascend 0
 ```
 
-**Note:**: Before executing 310 infer, create the MINDIR/AIR model using "python export.py --ckpt [The path of the CKPT for exporting] --train_data_dir [The path of the training dataset]".
+**Note:**: Before executing 310 infer, create the MINDIR/AIR model using "python export.py --ckpt [The path of the CKPT for exporting] --file_name [FILE_NAME] --file_format [MINDIR]".
 
 # [Model Description](#contents)
 
