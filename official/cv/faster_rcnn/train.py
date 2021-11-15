@@ -36,7 +36,6 @@ from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id, get_device_num, get_rank_id
 
-
 set_seed(1)
 context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
 
@@ -44,7 +43,7 @@ if config.backbone in ("resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152"):
     from src.FasterRcnn.faster_rcnn_resnet import Faster_Rcnn_Resnet
 elif config.backbone == "resnet_v1_50":
     from src.FasterRcnn.faster_rcnn_resnet50v1 import Faster_Rcnn_Resnet
-    config.epoch_size = 20
+    # config.epoch_size = 20
 
 if config.device_target == "GPU":
     context.set_context(enable_graph_kernel=True)
@@ -122,6 +121,7 @@ def train_fasterrcnn_():
 def modelarts_pre_process():
     config.save_checkpoint_path = config.output_path
 
+
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_fasterrcnn():
     """ train_fasterrcnn """
@@ -150,7 +150,6 @@ def train_fasterrcnn():
                     newkey = oldkey.replace(k, v)
                     param_dict[newkey] = param_dict.pop(oldkey)
                     break
-
         for item in list(param_dict.keys()):
             if not item.startswith('backbone'):
                 param_dict.pop(item)
@@ -186,8 +185,25 @@ def train_fasterrcnn():
         ckpoint_cb = ModelCheckpoint(prefix='faster_rcnn', directory=save_checkpoint_path, config=ckptconfig)
         cb += [ckpoint_cb]
 
+    if config.run_eval:
+        from src.eval_callback import EvalCallBack
+        from src.eval_utils import create_eval_mindrecord, apply_eval
+        config.prefix = "FasterRcnn_eval.mindrecord"
+        anno_json = os.path.join(config.coco_root, "annotations/instances_val2017.json")
+        mindrecord_path = os.path.join(config.coco_root, "FASTERRCNN_MINDRECORD", config.prefix)
+        config.instance_set = "annotations/instances_val2017.json"
+
+        if not os.path.exists(mindrecord_path):
+            config.mindrecord_file = mindrecord_path
+            create_eval_mindrecord(config)
+        eval_net = Faster_Rcnn_Resnet(config)
+        eval_cb = EvalCallBack(config, eval_net, apply_eval, dataset_size, mindrecord_path, anno_json,
+                               save_checkpoint_path)
+        cb += [eval_cb]
+
     model = Model(net)
-    model.train(config.epoch_size, dataset, callbacks=cb)
+    model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=False)
+
 
 if __name__ == '__main__':
     train_fasterrcnn()

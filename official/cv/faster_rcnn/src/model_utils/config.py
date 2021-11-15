@@ -120,9 +120,19 @@ def get_config():
     path_args, _ = parser.parse_known_args()
     default, helper, choices = parse_yaml(path_args.config_path)
     args = parse_cli_to_yaml(parser=parser, cfg=default, helper=helper, choices=choices, cfg_path=path_args.config_path)
-    final_config = merge(args, default)
-    pprint(final_config)
+    default = Config(merge(args, default))
+    default.feature_shapes = [
+        [default.img_height // 4, default.img_width // 4],
+        [default.img_height // 8, default.img_width // 8],
+        [default.img_height // 16, default.img_width // 16],
+        [default.img_height // 32, default.img_width // 32],
+        [default.img_height // 64, default.img_width // 64],
+    ]
+    default.num_bboxes = default.num_anchors * sum([lst[0] * lst[1] for lst in default.feature_shapes])
+    pprint(default)
     print("Please check the above information for the configurations", flush=True)
-    return Config(final_config)
+
+    return default
+
 
 config = get_config()
