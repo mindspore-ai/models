@@ -78,8 +78,7 @@ data_url: "Url for modelarts"
 train_url: "Url for modelarts"
 data_path: "The location of the input data."
 output_path: "The location of the output file."
-device_target: "Running platform, choose from Ascend, GPU or CPU(On the CPU, only the export and inference of "
-               "the onnx model is supported), and default is Ascend."
+device_target: "Running platform, choose from Ascend, GPU or CPU(On the CPU, only the export and inference of the onnx model is supported), and default is Ascend."
 enable_profiling: 'Whether enable profiling while training, default: False'
 
 assessment_method: "assessment_method including [Mcc, Spearman_correlation, Accuracy, F1], default is Accuracy"
