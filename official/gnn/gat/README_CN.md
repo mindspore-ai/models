@@ -94,7 +94,7 @@
 
 ## 环境要求
 
-- 硬件（Ascend）
+- 硬件（Ascend/GPU）
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
@@ -107,9 +107,16 @@
 
 - Ascend处理器环境运行
 
-  ```text
+  ```shell
   # 使用Cora数据集运行训练示例，DATASET_NAME为cora
   bash run_train_ascend.sh [DATASET_NAME]
+  ```
+
+-GPU处理器环境运行
+
+  ```shell
+  # 使用Cora数据集运行训练示例，DATASET_NAME为cora
+  bash run_train_gpu.h [DATASET_NAME] [DATASET_DIR]
   ```
 
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
@@ -168,7 +175,8 @@
   ├─README.md
   ├─scripts
   | ├─run_process_data_ascend.sh  # 生成MindRecord格式的数据集
-  | └─run_train_ascend.sh         # 启动训练
+  | ├─run_train_gpu.sh         # 启动GPU训练
+  | └─run_train_ascend.sh         # 启动Ascend训练
   |
   ├─src
   | ├─dataset.py           # 数据预处理
@@ -207,7 +215,7 @@
 
 - Ascend处理器环境运行
 
-  ```python
+  ```shell
   bash run_train_ascend.sh [DATASET_NAME]
   ```
 
@@ -227,6 +235,31 @@
   Epoch:198, train loss=1.47566 train_acc=0.51429 | val_loss=1.42948 val_acc=0.81000
   Epoch:199, train loss=1.56411 train_acc=0.55000 | val_loss=1.42632 val_acc=0.80600
   Test loss=1.5366285, test acc=0.84199995
+  ...
+  ```
+
+- GPU处理器环境运行
+
+  ```shell
+  bash run_train_gpu.sh [DATASET_NAME] [DATASET_DIR]
+  ```
+
+  训练结果将保存在脚本路径下，文件夹名称以“train”开头。您可在日志中找到结果
+  ，如下所示。
+
+  ```python
+  Epoch:0, train loss=1.98709, train acc=0.39286 | val loss=1.98289, val acc=0.11600, time=9.33760,
+  Epoch:1, train loss=1.97645, train acc=0.35000 | val loss=1.97966, val acc=0.08200, time=0.08991,
+  Epoch:2, train loss=1.97862, train acc=0.28571 | val loss=1.97775, val acc=0.07400, time=0.08560,
+  Epoch:3, train loss=1.96789, train acc=0.25000 | val loss=1.97626, val acc=0.08800, time=0.09191,
+  Epoch:4, train loss=1.96938, train acc=0.26429 | val loss=1.97316, val acc=0.12800, time=0.08851,
+  ...
+  Epoch:195, train loss=1.52878, train acc=0.54286 | val loss=1.53312, val acc=0.80400, time=0.08753,
+  Epoch:196, train loss=1.71779, train acc=0.36429 | val loss=1.53045, val acc=0.80200, time=0.08570,
+  Epoch:197, train loss=1.59465, train acc=0.51429 | val loss=1.52906, val acc=0.80200, time=0.08549,
+  Epoch:198, train loss=1.54321, train acc=0.52857 | val loss=1.52826, val acc=0.81200, time=0.08514,
+  Epoch:199, train loss=1.59484, train acc=0.49286 | val loss=1.52897, val acc=0.81200, time=0.08544,
+  Test loss=1.5759763, test acc=0.8419999
   ...
   ```
 
@@ -266,19 +299,19 @@ test acc=0.84199995
 
 ### 性能
 
-| 参数                            | GAT                                       |
-| ------------------------------------ | ----------------------------------------- |
-| 资源                             | Ascend 910；系统 Euler2.8                               |
-| 上传日期                        | 2021-07-05                |
-| MindSpore版本                    | 1.3.0                                |
-| 数据集                              | Cora/Citeseer                             |
-| 训练参数                   | epoch=200                                 |
-| 优化器                            | Adam                                      |
-| 损失函数                        | Softmax交叉熵                     |
-| 准确率                             | 83.0/72.5                                 |
-| 速度                                | 0.195s/epoch                              |
-| 总时长                           | 39s                                       |
-| 脚本                              | <https://gitee.com/mindspore/models/tree/master/official/gnn/gat>  |
+| 参数                            | GAT                                       | GAT                                  |
+| ------------------------------------ | ----------------------------------------- | ----------------------------------------- |
+| 资源                             | Ascend 910；系统 Euler2.8                               | Tesla V100-PCIE                |
+| 上传日期                        | 2021-07-05                | 2021-10-20     |
+| MindSpore版本                    | 1.3.0                                | 1.5.0-rc1                    |
+| 数据集                              | Cora/Citeseer                             | Cora/Citeseer               |
+| 训练参数                   | epoch=200                                 | epoch=200                       |
+| 优化器                            | Adam                                      | Adam                                  |
+| 损失函数                        | Softmax交叉熵                     | Softmax交叉熵         |
+| 准确率                             | 83.0/72.5                                 | 83.0/72.5                        |
+| 速度                                | 0.195s/epoch                              | 0.086s/epoch |
+| 总时长                           | 39s                                       | 17.2s |
+| 脚本                              | [GAT脚本](https://gitee.com/mindspore/models/tree/master/official/gnn/gat) | [GAT脚本](https://gitee.com/mindspore/models/tree/master/official/gnn/gat) |
 
 ## 随机情况说明
 

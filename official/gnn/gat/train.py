@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,16 +14,19 @@
 # ============================================================================
 """Test train gat"""
 import os
+import time
+import numpy as np
+
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.dataset import load_and_process
 from src.gat import GAT
 from src.utils import LossAccuracyWrapper, TrainGAT
 
-import numpy as np
 import mindspore.context as context
 from mindspore.train.serialization import save_checkpoint, load_checkpoint
 from mindspore import Tensor
+
 
 
 def modelarts_pre_process():
@@ -36,7 +39,7 @@ def gnn_train():
     if not os.path.exists("ckpts"):
         os.mkdir("ckpts")
     context.set_context(mode=context.GRAPH_MODE,
-                        device_target="Ascend",
+                        device_target=config.device_target,
                         save_graphs=False)
     # train parameters
     hid_units = config.hid_units
@@ -60,6 +63,8 @@ def gnn_train():
                   attn_drop=config.attn_dropout,
                   ftr_drop=config.feature_dropout)
     gat_net.add_flags_recursive(fp16=True)
+    if config.dataset == "citeseer" and config.device_target == "GPU":
+        gat_net.add_flags_recursive(fp32=True)
 
     feature = Tensor(feature)
     biases = Tensor(biases)
@@ -69,28 +74,26 @@ def gnn_train():
                                    y_val,
                                    eval_mask,
                                    l2_coeff)
-
     train_net = TrainGAT(gat_net,
                          num_class,
                          y_train,
                          train_mask,
                          lr,
                          l2_coeff)
-
     train_net.set_train(True)
     val_acc_max = 0.0
     val_loss_min = np.inf
     for _epoch in range(num_epochs):
+        epoch_start = time.time()
         train_result = train_net(feature, biases)
         train_loss = train_result[0].asnumpy()
         train_acc = train_result[1].asnumpy()
-
         eval_result = eval_net(feature, biases)
         eval_loss = eval_result[0].asnumpy()
         eval_acc = eval_result[1].asnumpy()
-
-        print("Epoch:{}, train loss={:.5f}, train acc={:.5f} | val loss={:.5f}, val acc={:.5f}".format(
-            _epoch, train_loss, train_acc, eval_loss, eval_acc))
+        epoch_time = time.time() - epoch_start
+        print("Epoch:{}, train loss={:.5f}, train acc={:.5f} | val loss={:.5f}, val acc={:.5f}, time={:.5f},".format(
+            _epoch, train_loss, train_acc, eval_loss, eval_acc, epoch_time))
         if eval_acc >= val_acc_max or eval_loss < val_loss_min:
             if eval_acc >= val_acc_max and eval_loss < val_loss_min:
                 val_acc_model = eval_acc
@@ -116,7 +119,8 @@ def gnn_train():
                        ftr_drop=0.0)
     load_checkpoint("ckpts/gat.ckpt", net=gat_net_test)
     gat_net_test.add_flags_recursive(fp16=True)
-
+    if config.dataset == "citeseer" and config.device_target == "GPU":
+        gat_net_test.add_flags_recursive(fp32=True)
     test_net = LossAccuracyWrapper(gat_net_test,
                                    num_class,
                                    y_test,
