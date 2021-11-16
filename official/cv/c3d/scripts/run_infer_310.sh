@@ -14,8 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 2 || $# -gt 3 ]]; then
-    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+if [[ $# -lt 3 || $# -gt 4 ]]; then
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATASET] [NEED_PREPROCESS] [DEVICE_ID]
+    DATASET must be 'HMDB51' or 'UCF101'.
     NEED_PREPROCESS means weather need preprocess or not, it's value is 'y' or 'n'.
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
@@ -30,19 +31,27 @@ get_real_path(){
 }
 model=$(get_real_path $1)
 
-if [ "$2" == "y" ] || [ "$2" == "n" ];then
-    need_preprocess=$2
+if [ "$2" == "HMDB51" ] || [ "$2" == "UCF101" ];then
+    dataset=$2
+else
+  echo "DATASET must be HMDB51 or UCF101."
+  exit 1
+fi
+
+if [ "$3" == "y" ] || [ "$3" == "n" ];then
+    need_preprocess=$3
 else
   echo "weather need preprocess or not, it's value must be in [y, n]"
   exit 1
 fi
 
 device_id=0
-if [ $# == 3 ]; then
-    device_id=$3
+if [ $# == 4 ]; then
+    device_id=$4
 fi
 
 echo "mindir name: "$model
+echo "dataset: "$dataset
 echo "need preprocess: "$need_preprocess
 echo "device id: "$device_id
 
@@ -66,7 +75,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py
+    python3.7 ../preprocess.py --batch_size 1
 }
 
 function compile_app()
@@ -93,7 +102,11 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py &> acc.log
+    if [ "$dataset" == "HMDB51" ]; then
+        python3.7 ../postprocess.py  --batch_size 1 &> acc.log
+    else
+      python3.7 ../postprocess.py  --num_classes 101 --batch_size 1 &> acc.log
+    fi
 }
 
 if [ $need_preprocess == "y" ]; then
@@ -113,7 +126,7 @@ if [ $? -ne 0 ]; then
     echo " execute inference failed"
     exit 1
 fi
-# cal_acc
+cal_acc
 if [ $? -ne 0 ]; then
     echo "calculate accuracy failed"
     exit 1
