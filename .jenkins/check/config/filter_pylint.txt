@@ -9,3 +9,6 @@
 "models/official/cv"                                                                       "missing-docstring"
 "models/official/cv"                                                                       "c-extension-no-member"
 "models/official/nlp/bert_thor/src/bert_model.py"                                          "redefined-outer-name"
+
+# research
+"models/research/cvtmodel"                                                                  "missing-docstring"
