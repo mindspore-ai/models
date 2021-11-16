@@ -55,7 +55,7 @@ do
     echo "start training for device $i"
     env > env$i.log
     python train.py --run_distribute True \
-                    --dataset $1 --device_num $2 \
+                    --dataset $1 --device_num 8 \
                     --is_modelarts False \
                     --device_target "Ascend" > train$i.log 2>&1 &
     echo "$i finish"

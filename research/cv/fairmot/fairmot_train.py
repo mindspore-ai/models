@@ -21,6 +21,7 @@ from mindspore import dtype as mstype
 from mindspore import Model
 import mindspore.nn as nn
 import mindspore.dataset as ds
+from mindspore.common import set_seed
 from mindspore.context import ParallelMode
 from mindspore.train.callback import TimeMonitor, ModelCheckpoint, CheckpointConfig
 from mindspore.communication.management import init
@@ -33,7 +34,8 @@ from src.utils.lr_schedule import dynamic_lr
 from src.utils.jde import JointDataset
 from src.utils.callback import LossCallback
 
-
+set_seed(1234)
+ds.config.set_seed(1234)
 def train(opt):
     """train fairmot."""
     local_data_path = '/cache/data'
@@ -69,8 +71,7 @@ def train(opt):
         context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False)
         context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
                                           gradients_mean=True,
-                                          device_num=device_num,
-                                          parameter_broadcast=True
+                                          device_num=device_num
                                           )
         init()
     else:
