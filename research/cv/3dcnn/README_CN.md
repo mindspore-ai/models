@@ -181,7 +181,7 @@ BraTS 2017原始数据集的文件目录结构如下所示：
 
     分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-    具体操作，参见[hccl_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools) 中的说明。
+    具体操作，参见[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) 中的说明。
 
 ### 结果
 
