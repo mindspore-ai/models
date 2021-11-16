@@ -24,3 +24,6 @@
 
 "models/research/cv/FaceAttribute/infer/mxbase/faceattribute/FaceAttribute.h" "runtime/references"
 "models/research/cv/FaceAttribute/infer/mxbase/faceattribute/FaceAttribute.cpp" "runtime/references"
+
+"models/official/cv/lenet/infer/mxbase/LenetOpencv.h" "runtime/references"
+"models/official/cv/lenet/infer/mxbase/main_opencv.cpp" "runtime/references"
