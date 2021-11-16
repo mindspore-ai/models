@@ -7,7 +7,7 @@
     - [Script and Sample Code](#script-and-sample-code)
     - [Training Process](#training-process)
     - [Prediction Process](#prediction-process)
-    - [Export MindIR](#export-mindir)
+    - [Ascend 310 Infer](#export-mindir)
 - [Model Description](#model-description)
     - [Performance](#performance)  
         - [Evaluation Performance](#evaluation-performance)
@@ -57,6 +57,7 @@ The dataset can be employed as the training and test sets for the following comp
 .
 └─ cv
   └─ StarGAN
+    ├── ascend310_infer                    # 310 infer directory
     ├─ src
       ├─ __init__.py                       # init file
       ├─ cell.py                           # StarGAN model define
@@ -65,11 +66,17 @@ The dataset can be employed as the training and test sets for the following comp
       ├─ config.py                         # parse args
       ├─ dataset.py                        # prepare celebA dataset to cyclegan format
       ├─ reporter.py                       # Reporter class
-      ├─ loss.py                           # losses for StarGAN
-    ├─ cityscape_eval.py                   # cityscape dataset eval script
+      └─ loss.py                           # losses for StarGAN
+    ├─ scripts
+      ├─ run_distribute_train.sh           # launch distributed training(8p) in ascend
+      ├─ run_standalone_train_ascend.sh    # launch standalone training(1p) in ascend
+      ├─ eval_ascend.sh                    # launch evaluating in ascend
+      └─ run_infer_310.sh                  # shell script for 310 inference
     ├─ eval.py                             # translate attritubes from original images
     ├─ train.py                            # train script
     ├─ export.py                           # export mindir script
+    ├─ preprocess.py                       # convert images and labels to bin
+    ├─ postprocess.py                      # convert bin to images
     └─ README.md                           # descriptions about StarGAN
 ```
 
@@ -88,14 +95,25 @@ python eval.py
 ```
 
 **Note: the result will saved at `./results/`.**
+## [Ascen 310 infer](#contents)
 
-## [Export MindIR](#contents)
+### [Export MindIR]
 
 ```bash
 python export.py
 ```
 
 **Note: The file_name parameter is the prefix, the final file will as StarGAN_G.[FILE_FORMAT].**
+
+### Infer on Ascend 310
+
+```bash
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` Directionary of MINDIR
+- `DATA_PATH` Directionary of dataset
+- `DEVICE_ID` Optional, default 0
 
 # [Model Description](#contents)
 
@@ -129,6 +147,16 @@ python export.py
 | MindSpore Version   | 1.1.1                       |
 | Dataset             | CelebA                    |
 | batch_size          | 4                          |
+| outputs             | image                      |
+
+| Parameters          | Ascend 310                      |
+| ------------------- | --------------------------- |
+| Model Version       | StarGAN                  |
+| Resource            | Ascend                  |
+| Uploaded Date       | 09/17/2021 (month/day/year) |
+| MindSpore Version   | 1.2                       |
+| Dataset             | CelebA                    |
+| batch_size          | 1                         |
 | outputs             | image                      |
 
 # [ModelZoo Homepage](#contents)

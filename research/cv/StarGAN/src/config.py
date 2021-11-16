@@ -67,8 +67,8 @@ def get_config():
 
 
     # Directories.
-    parser.add_argument('--celeba_image_dir', type=str, default=r'/home/data/celeba/images')
-    parser.add_argument('--attr_path', type=str, default=r'/home/data/celeba/list_attr_celeba.txt')
+    parser.add_argument('--celeba_image_dir', type=str, default=r'./dataset/img_celeba')
+    parser.add_argument('--attr_path', type=str, default=r'./dataset/list_attr_celeba.txt')
     parser.add_argument('--rafd_image_dir', type=str, default='data/RaFD/train')
     parser.add_argument('--log_dir', type=str, default='stargan/logs')
     parser.add_argument('--model_save_dir', type=str, default='./models/')
@@ -81,7 +81,7 @@ def get_config():
     parser.add_argument('--lr_update_step', type=int, default=1000)
 
     # export
-    parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='AIR', \
+    parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='MINDIR', \
                         help='file format')
 
 

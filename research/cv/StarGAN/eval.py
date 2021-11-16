@@ -30,12 +30,12 @@ from src.dataset import dataloader
 
 if __name__ == "__main__":
 
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=1)
+    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=0)
     config = get_config()
     G, D = get_network(config)
     para_g, _ = resume_model(config, G, D)
     load_param_into_net(G, para_g)
-
+    G.set_train(False)
     if not os.path.exists(config.result_dir):
         os.mkdir(config.result_dir)
     # Define Dataset
