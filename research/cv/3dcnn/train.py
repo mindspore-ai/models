@@ -24,9 +24,9 @@ from mindspore import context
 from mindspore.common import set_seed
 import mindspore.common.dtype as mstype
 from mindspore.train.model import Model, ParallelMode
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
-
+from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from src.models import Dense24
 from src.lr_schedule import dynamic_lr
 from src.dataset import create_dataset
@@ -45,14 +45,31 @@ if __name__ == '__main__':
     # init context
     context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
     if config.run_distribute:
-        device_id = int(os.getenv('DEVICE_ID'))
-        context.set_context(device_id=device_id)
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=False)
-        init()
+        if target == "Ascend":
+            device_id = int(os.getenv('DEVICE_ID'))
+            context.set_context(device_id=device_id)
+            group_size = 8
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=False)
+            init()
+        else:
+            # target == "GPU"
+            init()
+            device_id = get_rank()
+            group_size = get_group_size()
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              device_num=group_size,
+                                              gradients_mean=False)
     else:
-        device_id = int(os.getenv('DEVICE_ID', '0'))
-        context.set_context(device_id=device_id)
+        if target == "Ascend":
+            device_id = int(os.getenv('DEVICE_ID', '0'))
+            context.set_context(device_id=device_id)
+        else:
+            # target == "GPU"
+            device_id = int(config.device_id)
+            context.set_context(device_id=device_id)
+            group_size = 1
+
 
     if config.isModelArts:
         mox.file.copy_parallel(src_url=config.data_url, dst_url='/cache/dataset/device_{}'.format(device_id))
@@ -69,7 +86,10 @@ if __name__ == '__main__':
     # create dataset
     train_dataset = create_dataset(train_dataset_path, config.train_path, config.height_size, config.width_size,
                                    config.channel_size, config.pred_size, config.batch_size, config.correction,
-                                   target="Ascend")
+                                   target=target, mindrecord_path=config.mindrecord_path,
+                                   use_mindrecord=config.use_mindrecord, group_size=group_size,
+                                   device_id=device_id)
+
     train_data_size = train_dataset.get_dataset_size()
 
     # create network
@@ -77,14 +97,28 @@ if __name__ == '__main__':
     net_with_loss = NetWithLoss(network, config.num_classes)
     network.set_train(True)
 
-    # lr = config.lr
     rank_size = int(os.getenv("RANK_SIZE", "1"))
-    lr = Tensor(dynamic_lr(config, train_data_size, rank_size), mstype.float32)
+    if config.use_dynamic_lr:
+        lr = Tensor(dynamic_lr(config, train_data_size, rank_size), mstype.float32)
+    else:
+        lr = Tensor(float(config.lr), mstype.float32)
 
-    # optimizer
-    optimizer = nn.SGD(params=network.trainable_params(), learning_rate=lr, momentum=config.momentum,
-                       weight_decay=config.weight_decay, nesterov=True)
-    model = Model(net_with_loss, optimizer=optimizer)
+    if config.use_loss_scale:
+        loss_scale = config.loss_scale
+        scale_manager = FixedLossScaleManager(loss_scale=loss_scale, drop_overflow_update=True)
+    else:
+        scale_manager = None
+        loss_scale = 1.0
+
+    if config.use_optimizer == "SGD":
+        optimizer = nn.SGD(params=network.trainable_params(), learning_rate=lr, momentum=config.momentum,
+                           weight_decay=config.weight_decay, nesterov=True)
+    elif config.use_optimizer == "Adam":
+        optimizer = nn.Adam(params=network.trainable_params(),
+                            learning_rate=lr,
+                            loss_scale=loss_scale)
+
+    model = Model(net_with_loss, optimizer=optimizer, loss_scale_manager=scale_manager)
 
     # save checkpoint
     time_cb = TimeMonitor(data_size=train_data_size)
@@ -95,14 +129,14 @@ if __name__ == '__main__':
     if config.isModelArts:
         save_checkpoint_path = '/cache/train_output/device_{}/'.format(device_id)
     else:
-        save_checkpoint_path = './ckpt_{}/'.format(device_id)
+        save_checkpoint_path = './result/ckpt_{}/'.format(device_id)
 
     ckpoint_cb = ModelCheckpoint(prefix='{}'.format(config.model),
                                  directory=save_checkpoint_path,
                                  config=ckpt_config)
     callbacks_list = [loss_cb, time_cb, ckpoint_cb]
     print("============== Starting Training ==============")
-    model.train(config.epoch_size, train_dataset, callbacks=callbacks_list, dataset_sink_mode=True)
+    model.train(config.epoch_size, train_dataset, callbacks=callbacks_list, dataset_sink_mode=config.dataset_sink_mode)
 
     if config.isModelArts:
         mox.file.copy_parallel(src_url='/cache/train_output', dst_url=config.train_url)
