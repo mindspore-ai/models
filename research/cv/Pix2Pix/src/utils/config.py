@@ -58,6 +58,12 @@ def get_args():
     parser.add_argument('--dataset_size', type=int, default=400, choices=(400, 1096),
                         help='for Facade_dataset,the number is 400; for Maps_dataset,the number is 1096.')
 
+    # export settings
+    parser.add_argument("--image_size", type=int, default=256, help="images size, default is 256.")
+    parser.add_argument("--file_name", type=str, default="Pix2Pix", help="output file name.")
+    parser.add_argument("--file_format", type=str, default="MINDIR", choices=["AIR", "ONNX", "MINDIR"],
+                        help="file format")
+
     # The location of input and output data
     parser.add_argument('--train_data_dir', type=str, default=None, help='the file path of input data during training.')
     parser.add_argument('--val_data_dir', type=str, default=None, help='the file path of input data during validating.')

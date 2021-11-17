@@ -59,6 +59,8 @@ def decode_image(img):
 
     return (img.asnumpy()[0] * std + mean).astype(np.uint8).transpose((1, 2, 0))   # ——>（256，256，3）
 
+def pass_args():
+    return args
 
 def get_lr():
     """
