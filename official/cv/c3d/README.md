@@ -425,11 +425,13 @@ eval result: top_1 79.381%
 ### [Export MindIR](#contents)
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --ckpt_file [CKPT_PATH] --mindir_file_name [FILE_NAME] --file_format [FILE_FORMAT] --num_classes [NUM_CLASSES] --batch_size [BATCH_SIZE]
 ```
 
-The ckpt_file parameter is required,
-`file_format` should be in ["AIR", "MINDIR"]
+- `ckpt_file` parameter is mandotory.
+- `file_format` should be in ["AIR", "MINDIR"].
+- `NUM_CLASSES` Number of total classes in the dataset, 51 for HMDB51 and 101 for UCF101.
+- `BATCH_SIZE` Since currently mindir does not support dynamic shapes, this network only supports inference with batch_size of 1.
 
 ### Infer on Ascend310
 

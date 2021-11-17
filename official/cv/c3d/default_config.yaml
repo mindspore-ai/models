@@ -58,5 +58,5 @@ mindir_file_name:  'C3D'               # Save file path
 file_format:       'MINDIR'              # Save file format
 
 # 310 infer
-pre_result_path:   './pre_result_path'          # Mindspore ckpt file path
-post_result_path:  './result_Files'               # Save file path
+pre_result_path:   './preprocess_Result'          # save preprocess result file path
+post_result_path:  './result_Files'               # Save postprocess result file path
