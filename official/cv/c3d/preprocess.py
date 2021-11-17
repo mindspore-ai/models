@@ -31,7 +31,6 @@ def gen_bin(data_dir):
 
     image_path = os.path.join(data_dir, "image")
     label_path = os.path.join(data_dir, "label_bs" + str(config.batch_size) + ".npy")
-    os.makedirs(image_path)
     label_list = []
 
     for index, (input_data, label) in enumerate(dataset):
