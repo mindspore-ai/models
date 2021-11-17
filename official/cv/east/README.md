@@ -40,6 +40,20 @@ Dataset used [ICDAR 2015](https://rrc.cvc.uab.es/?ch=4&com=downloads)
     - Train: 88.5MB, 1000 images
     - Test:43.3MB, 500 images
 
+In this project, the file organization is recommended as below:
+
+```shell
+.
+└─data
+  ├─icdar2015
+    ├─Training                           # Training set
+      ├─image                            # Images in training set
+      ├─groundTruth                      # GT in training set
+    └─Test                               # Test set
+      ├─image                            # Images in training set
+      ├─groundTruth                      # GT in training set
+```
+
 # [Features](#contents)
 
 # [Environment Requirements](#contents)
@@ -61,16 +75,19 @@ Dataset used [ICDAR 2015](https://rrc.cvc.uab.es/?ch=4&com=downloads)
 └─east
   ├─README.md
   ├─scripts
-    ├─run_standalone_train.sh     # launch standalone training with ascend platform(1p)
-    ├─run_distribute.sh           # launch distributed training with ascend platform(8p)
-    └─run_eval.sh                 # launch evaluating with ascend platform
+    ├─run_standalone_train_ascend.sh     # launch standalone training with ascend platform(1p)
+    ├─run_standalone_train_gpu.sh        # launch standalone training with GPU platform(1p)
+    ├─run_distribute_ascend.sh           # launch distributed training with ascend platform(8p)
+    ├─run_distribute_gpu.sh              # launch distributed training with GPU platform(8p)
+    ├─run_eval_ascend.sh                 # launch evaluating with ascend platform
+    └─run_eval.sh                        # launch evaluating with GPU platform
   ├─src
     ├─dataset.py                      # data proprocessing
     ├─lr_schedule.py                  # learning rate scheduler
     ├─east.py                         # network definition
-    └─utils.py                        # some functions which is commonly used
-    └─distributed_sampler.py          # distributed train
-    └─initializer.py                  # init
+    ├─utils.py                        # some functions which is commonly used
+    ├─distributed_sampler.py          # distributed train
+    ├─initializer.py                  # init
     └─logger.py                       # logger output
   ├─eval.py                           # eval net
   └─train.py                          # train net
@@ -84,8 +101,8 @@ Dataset used [ICDAR 2015](https://rrc.cvc.uab.es/?ch=4&com=downloads)
 
 ```bash
 # distribute training example(8p)
-bash run_distribute_train.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [RANK_TABLE_FILE]
-# example: bash run_distribute_train.sh /home/DataSet/ICDAR2015/ic15/ home/model/east/pretrained/0-150_5004.ckpt ~/hccl_8p.json
+bash run_distribute_train_ascend.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [RANK_TABLE_FILE]
+# example: bash run_distribute_train_ascend.sh /home/DataSet/ICDAR2015/ic15/ home/model/east/pretrained/0-150_5004.ckpt ~/hccl_8p.json
 
 # standalone training
 bash run_standalone_train_ascend.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [DEVICE_ID]
@@ -96,8 +113,24 @@ bash run_eval_ascend.sh [DATASET_PATH] [CKPT_PATH] [DEVICE_ID]
 # example: bash run_eval_ascend.sh /home/DataSet/ICDAR2015/ch4_test_images/ home/model/east/ckpt/checkpoint_east-600_15.ckpt
 ```
 
+- GPU:
+
+```bash
+# distribute training example(8p)
+bash run_distribute_train_gpu.sh [DATASET_PATH] [PRETRAINED_BACKBONE]
+# example: bash run_distribute_train_gpu.sh /home/DataSet/ICDAR2015/ic15/ home/model/east/pretrained/0-150_5004.ckpt
+
+# standalone training
+bash run_standalone_train_gpu.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [DEVICE_ID]
+# example: bash run_standalone_train_gpu.sh /home/DataSet/ICDAR2015/ic15/ home/model/east/pretrained/0-150_5004.ckpt 0
+
+# evaluation:
+bash run_eval_gpu.sh [DATASET_PATH] [CKPT_PATH] [DEVICE_ID]
+# example: bash run_eval_gpu.sh /home/DataSet/ICDAR2015/ch4_test_images/ home/model/east/ckpt/checkpoint_east-600_15.ckpt
+```
+
 > Notes:
-> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
+> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 >
 > This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 >
@@ -109,12 +142,21 @@ bash run_eval_ascend.sh [DATASET_PATH] [CKPT_PATH] [DEVICE_ID]
   shell:
     Ascend:
       # distribute training example(8p)
-      bash run_distribute_train.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [RANK_TABLE_FILE]
-      # example: bash run_distribute_train.sh /home/DataSet/ICDAR2015/ic15/ home/model/east/pretrained/0-150_5004.ckpt ~/hccl_8p.json
+      bash run_distribute_train_ascend.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [RANK_TABLE_FILE]
+      # example: bash run_distribute_train_ascend.sh /home/DataSet/ICDAR2015/ic15/ home/model/east/pretrained/0-150_5004.ckpt ~/hccl_8p.json
 
       # standalone training
       bash run_standalone_train_ascend.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [DEVICE_ID]
       # example: bash run_standalone_train_ascend.sh /home/DataSet/ICDAR2015/ic15/ home/model/east/pretrained/0-150_5004.ckpt 0
+
+    GPU:
+      # distribute training example(8p)
+      bash run_distribute_train_gpu.sh [DATASET_PATH] [PRETRAINED_BACKBONE]
+      # example: bash run_distribute_train_gpu.sh /home/DataSet/ICDAR2015/ic15/ home/model/east/pretrained/0-150_5004.ckpt
+
+      # standalone training
+      bash run_standalone_train_gpu.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [DEVICE_ID]
+      # example: bash run_standalone_train_gpu.sh /home/DataSet/ICDAR2015/ic15/ home/model/east/pretrained/0-150_5004.ckpt 0
 ```
 
 ### Result
@@ -239,13 +281,16 @@ You can start training using python or shell scripts. The usage of shell scripts
       Ascend:
             bash run_eval_ascend.sh [DATASET_PATH] [CKPT_PATH] [DEVICE_ID]
            # example: bash run_eval_ascend.sh /home/DataSet/ICDAR2015/ch4_test_images/ home/model/east/ckpt/checkpoint_east-600_15.ckpt
+      GPU:
+            bash run_eval_gpu.sh [DATASET_PATH] [CKPT_PATH] [DEVICE_ID]
+           # example: bash run_eval_gpu.sh /home/DataSet/ICDAR2015/ch4_test_images/ home/model/east/ckpt/checkpoint_east-600_15.ckpt
 ```
 
 > checkpoint can be produced in training process.
 
 ### Result
 
-Evaluation result will be stored in the example path, you can find result like the followings in `log`.
+Evaluation result will be stored in the output file of evaluation script, you can find result like the followings in `log`.
 
 ```python
 Calculated {"precision": 0.8329088130412634, "recall": 0.7871930669234473, "hmean": 0.8094059405940593, "AP": 0}
@@ -288,44 +333,46 @@ Calculated {"precision": 0.8329088130412634, "recall": 0.7871930669234473, "hmea
 
 ### Training Performance
 
-| Parameters          | Ascend                                                       |
-| ------------------- | ------------------------------------------------------------ |
-| Model Version       | EAST                                                         |
-| Resource            | Ascend 910, cpu:2.60GHz 192cores, memory:755G                |
-| uploaded Date       | 04/27/2021                                                   |
-| MindSpore Version   | 1.1.1                                                        |
-| Dataset             | 1000 images                                                  |
-| Batch_size          | 8                                                            |
-| Training Parameters | epoch=600, batch_size=8, lr=0.001                            |
-| Optimizer           | Adam                                                         |
-| Loss Function       | Dice for classification, Iou for bbox regression             |
-| Loss                | ~0.27                                                        |
-| Total time (8p)     | 1h20m                                                        |
-| Scripts             | [east script](https://gitee.com/mindspore/models/tree/master/official/cv/east) |
+| Parameters          | Ascend                                                       | GPU                                                          |
+| ------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Model Version       | EAST                                                         | EAST                                                         |
+| Resource            | Ascend 910, cpu:2.60GHz 192cores, memory:755G                | Tesla V100S-PCIE 32G, cpu:2.60GHz 20 cores, memory:188G      |
+| uploaded Date       | 04/27/2021                                                   | 10/20/2021                                                   |
+| MindSpore Version   | 1.1.1                                                        | 1.5.0                                                        |
+| Dataset             | 1000 images                                                  | 1000 images                                                  |
+| Batch_size          | 8                                                            | 8                                                            |
+| Training Parameters | epoch=600, batch_size=8, lr=0.001                            | epoch=600(400 epochs for 1 GPU), batch_size=8, lr=0.001      |
+| Optimizer           | Adam                                                         | Adam                                                         |
+| Loss Function       | Dice for classification, Iou for bbox regression             | Dice for classification, Iou for bbox regression             |
+| Loss                | ~0.27                                                        | ~0.27                                                        |
+| Total time (8p)     | 1h20m                                                        | 1h05m                                                        |
+| Scripts             | [east script](https://gitee.com/mindspore/models/tree/master/official/cv/east) |[east script](https://gitee.com/mindspore/models/tree/master/official/cv/east) |
 
 #### Inference Performance
 
-| Parameters          | Ascend                 |
-| ------------------- | --------------------------- |
-| Model Version       | EAST              |
-| Resource            | Ascend 910, cpu:2.60GHz 192cores, memory:755G         |
-| Uploaded Date       | 12/27/2021                 |
-| MindSpore Version   | 1.1.1              |
-| Dataset             | 500 images               |
-| Batch_size          | 1                         |
-| Accuracy            | "precision": 0.8329088130412634, "recall": 0.7871930669234473, "hmean": 0.8094059405940593 |
-| Total time          | 2 min                      |
-| Model for inference | 172.7M (.ckpt file) |
+| Parameters          | Ascend                                                       | GPU                                                          |
+| ------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Model Version       | EAST                                                         | EAST                                                         |
+| Resource            | Ascend 910, cpu:2.60GHz 192cores, memory:755G                | Tesla V100S-PCIE 32G, cpu:2.60GHz 20 cores, memory:188G      |
+| uploaded Date       | 04/27/2021                                                   | 10/20/2021                                                   |
+| MindSpore Version   | 1.1.1                                                        | 1.5.0                                                        |
+| Dataset             | 500 images                                                   | 500 images                                                   |
+| Batch_size          | 1                                                            | 1                                                            |
+| Accuracy            | "precision": 0.8329088130412634, "recall": 0.7871930669234473, "hmean": 0.8094059405940593 | "precision": 0.82767109798129, "recall": 0.8093403948001926, "hmean": 0.8184031158714704, "AP": 0|
+| Total time          | 2 min                      | 1.2 min                      |
+| Model for inference | 172.7M (.ckpt file) | 172.7M (.ckpt file) |
 
 #### Training performance results
 
 | **Ascend** | train performance |
 | :--------: | :---------------: |
 |     1p     |    51.25 img/s    |
-
-| **Ascend** | train performance |
-| :--------: | :---------------: |
 |     8p     |     300 img/s     |
+
+| **GPU**    | train performance |
+| :--------: | :---------------: |
+|     1p     |    34.33 img/s    |
+|     8p     |   153.85 img/s    |
 
 # [Description of Random Situation](#contents)
 
@@ -334,4 +381,3 @@ We set seed to 1 in train.py.
 # [ModelZoo Homepage](#contents)
 
 Please check the official [homepage](https://gitee.com/mindspore/models).
-

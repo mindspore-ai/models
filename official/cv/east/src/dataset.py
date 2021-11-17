@@ -449,7 +449,7 @@ def create_east_dataset(
         is_training=True):
     east_data = ICDAREASTDataset(img_path=img_root, gt_path=txt_root)
     distributed_sampler = DistributedSampler(
-        len(east_data), device_num, rank, shuffle=True)
+        len(east_data), device_num, 0 if device_num == 1 else rank, shuffle=True)
 
     trans_list = [CV.RandomColorAdjust(0.5, 0.5, 0.5, 0.25),
                   CV.Rescale(1 / 255.0, 0),

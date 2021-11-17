@@ -79,7 +79,7 @@ function infer()
 function cal_acc()
 {
     cd .. || exit
-    python postprocess.py --result_path=./scripts/result_Files  &> ./acc.log &
+    python3.7 postprocess.py --result_path=./scripts/result_Files  &> ./acc.log &
 }
 
 
