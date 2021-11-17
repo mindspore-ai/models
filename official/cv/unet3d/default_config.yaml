@@ -14,6 +14,8 @@ load_path: "/cache/checkpoint_path/"
 device_target: "Ascend"
 checkpoint_path: "./checkpoint/"
 checkpoint_file_path: "Unet3d-9-877.ckpt"
+input_data_path: "/path/to/input_image/"
+output_data_path: "/path/to/output_image/"
 
 # ==============================================================================
 # Training options
@@ -57,3 +59,5 @@ epoch_size: "Total training epochs."
 keep_checkpoint_max: "keep the last keep_checkpoint_max checkpoint"
 checkpoint_path: "The location of the checkpoint file."
 checkpoint_file_path: "The location of the checkpoint file."
+input_data_path: "Input image directory to be processed."
+output_data_path: "The output directory to save nifti format data."

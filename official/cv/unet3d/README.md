@@ -79,7 +79,7 @@ After installing MindSpore via the official website, you can start training and 
 ```shell
 
 Convert dataset into mifti format.
-python ./src/convert_nifti.py --input_path=/path/to/input_image/ --output_path=/path/to/output_image/
+python ./src/convert_nifti.py --input_data_path=/path/to/input_image/ --output_data_path=/path/to/output_image/
 
 ```
 

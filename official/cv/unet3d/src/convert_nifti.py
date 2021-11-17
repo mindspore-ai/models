@@ -14,15 +14,10 @@
 # ============================================================================
 
 import os
-import argparse
 from pathlib import Path
 import SimpleITK as sitk
 from src.model_utils.config import config
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--input_path", type=str, help="Input image directory to be processed.")
-parser.add_argument("--output_path", type=str, help="Output file path.")
-args = parser.parse_args()
 
 def get_list_of_files_in_dir(directory, file_types='*'):
     """
@@ -33,6 +28,7 @@ def get_list_of_files_in_dir(directory, file_types='*'):
         file_types (str): The file_types to filter the files.
     """
     return [f for f in Path(directory).glob(file_types) if f.is_file()]
+
 
 def convert_nifti(input_dir, output_dir, roi_size, file_types):
     """
@@ -58,5 +54,6 @@ def convert_nifti(input_dir, output_dir, roi_size, file_types):
         sitk.WriteImage(img, output_path)
         print("create output file {} success.".format(output_path))
 
+
 if __name__ == '__main__':
-    convert_nifti(args.input_path, args.output_path, config.roi_size, "*.mhd")
+    convert_nifti(config.input_data_path, config.output_data_path, config.roi_size, "*.mhd")
