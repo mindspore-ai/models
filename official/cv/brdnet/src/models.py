@@ -32,21 +32,27 @@ class BRDNet(nn.Cell):
     def __init__(self, channel):
         super(BRDNet, self).__init__()
 
-        self.Conv2d_1 = nn.Conv2d(channel, 64, kernel_size=(3, 3), stride=(1, 1), pad_mode='same', has_bias=True)
+        self.Conv2d_1 = nn.Conv2d(channel, 64, kernel_size=(3, 3), stride=(1, 1), \
+                                  pad_mode='same', has_bias=True)
         self.BRN_1 = nn.BatchNorm2d(64, eps=1e-3)
         self.layer1 = self.make_layer1(15)
-        self.Conv2d_2 = nn.Conv2d(64, channel, kernel_size=(3, 3), stride=(1, 1), pad_mode='same', has_bias=True)
-        self.Conv2d_3 = nn.Conv2d(channel, 64, kernel_size=(3, 3), stride=(1, 1), pad_mode='same', has_bias=True)
+        self.Conv2d_2 = nn.Conv2d(64, channel, kernel_size=(3, 3), stride=(1, 1), \
+                                  pad_mode='same', has_bias=True)
+        self.Conv2d_3 = nn.Conv2d(channel, 64, kernel_size=(3, 3), stride=(1, 1), \
+                                  pad_mode='same', has_bias=True)
         self.BRN_2 = nn.BatchNorm2d(64, eps=1e-3)
         self.layer2 = self.make_layer2(7)
-        self.Conv2d_4 = nn.Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), pad_mode='same', has_bias=True)
+        self.Conv2d_4 = nn.Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), \
+                                  pad_mode='same', has_bias=True)
         self.BRN_3 = nn.BatchNorm2d(64, eps=1e-3)
         self.layer3 = self.make_layer2(6)
-        self.Conv2d_5 = nn.Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), pad_mode='same', has_bias=True)
+        self.Conv2d_5 = nn.Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), \
+                                  pad_mode='same', has_bias=True)
         self.BRN_4 = nn.BatchNorm2d(64, eps=1e-3)
-        self.Conv2d_6 = nn.Conv2d(64, channel, kernel_size=(3, 3), stride=(1, 1), pad_mode='same', has_bias=True)
-        self.Conv2d_7 = nn.Conv2d(channel*2, channel, kernel_size=(3, 3), stride=(1, 1), pad_mode='same', has_bias=True)
-
+        self.Conv2d_6 = nn.Conv2d(64, channel, kernel_size=(3, 3), stride=(1, 1), \
+                                  pad_mode='same', has_bias=True)
+        self.Conv2d_7 = nn.Conv2d(channel*2, channel, kernel_size=(3, 3), stride=(1, 1), \
+                                  pad_mode='same', has_bias=True)
         self.relu = nn.ReLU()
         self.sub = ops.Sub()
         self.concat = ops.Concat(axis=1)#NCHW
@@ -55,7 +61,8 @@ class BRDNet(nn.Cell):
         layers = []
         assert nums > 0
         for _ in range(nums):
-            layers.append(nn.Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), pad_mode='same', has_bias=True))
+            layers.append(nn.Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), \
+                                    pad_mode='same', has_bias=True))
             layers.append(nn.BatchNorm2d(64, eps=1e-3))
             layers.append(nn.ReLU())
         return nn.SequentialCell(layers)
@@ -112,7 +119,8 @@ class BRDWithLossCell(nn.Cell):
     def __init__(self, network):
         super(BRDWithLossCell, self).__init__()
         self.network = network
-        self.loss = nn.MSELoss(reduction='sum') #we use 'sum' instead of 'mean' to avoid the loss becoming too small
+        self.loss = nn.MSELoss(reduction='sum') #we use 'sum' instead of 'mean' to avoid
+                                                #the loss becoming too small
     def construct(self, images, targets):
         output = self.network(images)
         return self.loss(output, targets)

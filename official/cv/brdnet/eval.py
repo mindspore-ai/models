@@ -87,7 +87,7 @@ def test(model_path):
         args.logger.info("copying test dataset finished....")
         args.test_dir = 'cache/test/'
 
-    file_list = glob.glob(args.test_dir+'*') # args.test_dir must end by '/'
+    file_list = glob.glob(os.path.join(args.test_dir, "*"))
     model.set_train(False)
 
     cast = P.Cast()
@@ -104,7 +104,8 @@ def test(model_path):
         if args.channel == 3:
             img_clean = np.array(Image.open(file), dtype='float32') / 255.0
         else:
-            img_clean = np.expand_dims(np.array(Image.open(file).convert('L'), dtype='float32') / 255.0, axis=2)
+            img_clean = np.expand_dims(np.array(Image.open(file).convert('L'), \
+                                       dtype='float32') / 255.0, axis=2)
 
         np.random.seed(0) #obtain the same random data when it is in the test phase
         img_test = img_clean + np.random.normal(0, args.sigma/255.0, img_clean.shape)
