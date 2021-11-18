@@ -57,8 +57,8 @@ def walk_through_the_folder_for_crop(aligned_db_folder, result_folder):
 
 
 if __name__ == '__main__':
-    aligned_folder = "/disk3/wcy/aligned_images_DB"
-    result_f = "/disk3/wcy/crop_images_DB"
+    aligned_folder = "../data/aligned_images_DB"
+    result_f = "../data/crop_images_DB"
     if not aligned_folder.endswith('/'):
         aligned_folder += '/'
     if not result_f.endswith('/'):

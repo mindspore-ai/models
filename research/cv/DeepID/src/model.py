@@ -23,8 +23,9 @@ class DeepID(nn.Cell):
     """
     DeepID Module
     """
-    def __init__(self, num_channels, class_num):
+    def __init__(self, num_channels, class_num, feature=False):
         super(DeepID, self).__init__()
+        self.feature = feature
         self.block1 = nn.SequentialCell(nn.Conv2d(in_channels=num_channels, out_channels=20,
                                                   kernel_size=4, has_bias=True, pad_mode='valid'),
                                         nn.ReLU(),
@@ -64,6 +65,8 @@ class DeepID(nn.Cell):
 
         x = self.concat((x1, x2))
         out1 = self.dense_layer(x)
+        if self.feature:
+            return out1
         out = self.class_layer(out1)
 
         return out

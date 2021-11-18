@@ -107,10 +107,10 @@ def print_network(model, name):
     print('The number of parameters: {}'.format(num_params))
 
 
-def get_network(args, num_class):
+def get_network(args, num_class, feature=False):
     """Create and initial a generator and a discriminator."""
 
-    deepID = DeepID(args.input_dim, num_class)
+    deepID = DeepID(args.input_dim, num_class, feature)
 
     init_weights(deepID, 'truncatedNormal', math.sqrt(5))
 

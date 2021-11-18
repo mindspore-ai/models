@@ -71,7 +71,7 @@ class Youtube:
             file = None
             print('Error mode!')
         lines = csv.reader(open(file))
-        lines.__next__()
+        #lines.__next__()
         lines = list(lines)
         random.seed(1234)
         random.shuffle(lines)
@@ -93,8 +93,8 @@ class Youtube:
 
         else:
             test_img1, test_img2, test_label = dataset[idx][0].split()
-            test_img1 = np.asarray(Image.open(test_img1))
-            test_img2 = np.asarray(Image.open(test_img2))
+            test_img1 = np.asarray(Image.open(os.path.join(root_dir, test_img1)))
+            test_img2 = np.asarray(Image.open(os.path.join(root_dir, test_img2)))
             test_img1 = np.squeeze(self.transform(test_img1))
             test_img2 = np.squeeze(self.transform(test_img2))
             test_label = int(test_label)

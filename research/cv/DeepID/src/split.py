@@ -76,10 +76,10 @@ def set_to_csv_file(data_set, file_name):
 
 if __name__ == '__main__':
     random.seed(7)
-    src = "data/crop_images_DB"
-    test = "data/test_set.csv"
-    valid = "data/valid_set.csv"
-    train = "data/train_set.csv"
+    src = "../data/crop_images_DB"
+    test = "../data/test_set.csv"
+    valid = "../data/valid_set.csv"
+    train = "../data/train_set.csv"
     if not src.endswith('/'):
         src += '/'
 
