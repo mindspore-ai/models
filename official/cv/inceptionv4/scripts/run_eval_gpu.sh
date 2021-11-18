@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,21 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
-rm -rf evaluation
-mkdir evaluation
-cp ./*.py ./evaluation
-cp ./*.yaml ./evaluation
-cp -r ./src ./evaluation
-cd ./evaluation || exit
-
-export DEVICE_ID=0
-export RANK_SIZE=1
+if [ $# -lt 2 ]; then
+    echo "Usage: bash run_infer_310.sh [DATA_DIR] [CKPT_DIR]"
+exit 1
+fi
 
 DATA_DIR=$1
 CKPT_DIR=$2
-BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
+BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
 CONFIG_FILE="${BASE_PATH}/../default_config_gpu.yaml"
+
+if [ -d "evaluation" ]; then
+    rm -rf evaluation
+fi
+mkdir evaluation
+cp $BASE_PATH/../*.py ./evaluation
+cp $BASE_PATH/../*.yaml ./evaluation
+cp -r $BASE_PATH/../src ./evaluation
+cd evaluation || exit
+
+export DEVICE_ID=0
+export RANK_SIZE=1
 
 echo "start evaluation"
 
