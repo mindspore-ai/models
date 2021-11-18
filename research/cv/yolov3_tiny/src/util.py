@@ -17,7 +17,7 @@ from mindspore.train.serialization import load_checkpoint
 import mindspore.nn as nn
 import mindspore.common.dtype as mstype
 
-from .yolo import YoloLossBlock
+from .yolo import YOLOLossBlock
 
 
 class AverageMeter:
@@ -35,12 +35,14 @@ class AverageMeter:
         self.count = 0
 
     def reset(self):
+        """reset"""
         self.val = 0
         self.avg = 0
         self.sum = 0
         self.count = 0
 
     def update(self, val, n=1):
+        """update"""
         self.val = val
         self.sum += val * n
         self.count += n
@@ -169,6 +171,7 @@ class ShapeRecord:
         }
 
     def set(self, shape):
+        """set"""
         if len(shape) > 1:
             shape = shape[0]
         shape = int(shape)
@@ -176,6 +179,7 @@ class ShapeRecord:
         self.shape_record['total'] += 1
 
     def show(self, logger):
+        """show"""
         for key in self.shape_record:
             rate = self.shape_record[key] / float(self.shape_record['total'])
             logger.info('shape {}: {:.2f}%'.format(key, rate*100))
@@ -184,5 +188,5 @@ class ShapeRecord:
 def keep_loss_fp32(network):
     """Keep loss of network with float32"""
     for _, cell in network.cells_and_names():
-        if isinstance(cell, (YoloLossBlock,)):
+        if isinstance(cell, (YOLOLossBlock,)):
             cell.to_float(mstype.float32)

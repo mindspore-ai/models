@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 1 ]
+if [ $# != 2 ]
 then
-    echo "Usage: bash run_standalone_train.sh [DATASET_PATH]"
+    echo "Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]"
 exit 1
 fi
 
@@ -24,46 +24,46 @@ get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
     echo "$1"
   else
-    echo "$(realpath -m $PWD/$1)"
+    realpath -m "$PWD/$1"
   fi
 }
+DATASET_PATH=$(get_real_path "$1")
+CHECKPOINT_PATH=$(get_real_path "$2")
+echo "$DATASET_PATH"
+echo "$CHECKPOINT_PATH"
 
-DATASET_PATH=$(get_real_path $1)
-echo $DATASET_PATH
-
-
-if [ ! -d $DATASET_PATH ]
+if [ ! -d "$DATASET_PATH" ]
 then
-    echo "error: DATASET_PATH=$DATASET_PATH is not a directory"
+    echo "error: DATASET_PATH=$PATH1 is not a directory"
 exit 1
 fi
 
+if [ ! -f "$CHECKPOINT_PATH" ]
+then
+    echo "error: CHECKPOINT_PATH=$PATH2 is not a file"
+exit 1
+fi
 
 export DEVICE_NUM=1
 export DEVICE_ID=0
+export RANK_SIZE=$DEVICE_NUM
 export RANK_ID=0
-export RANK_SIZE=1
 
-if [ -d "train" ];
+if [ -d "eval" ];
 then
-    rm -rf ./train
+    rm -rf ./eval
 fi
-mkdir ./train
-cp ../*.py ./train
-cp -r ../src ./train
-cd ./train || exit
-echo "start training for device $DEVICE_ID"
+mkdir ./eval
+cp ../*.py ./eval
+cp ../*.yaml ./eval
+cp -r ../src ./eval
+cp -r ../model_utils ./eval
+cd ./eval || exit
 env > env.log
-
-python train.py \
-    --data_dir=$DATASET_PATH \
-    --is_distributed=0 \
-    --lr=0.01 \
-    --t_max=300 \
-    --max_epoch=300 \
-    --warmup_epochs=4 \
-    --training_shape=640 \
-    --per_batch_size=32 \
-    --weight_decay=0.016 \
-    --lr_scheduler=cosine_annealing > log.txt 2>&1 &
+echo "start inferring for device $DEVICE_ID"
+python eval.py \
+    --data_dir="$DATASET_PATH" \
+    --pretrained="$CHECKPOINT_PATH" \
+    --device_target='GPU' \
+    --testing_shape=640 > log.txt 2>&1 &
 cd ..

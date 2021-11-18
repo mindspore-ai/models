@@ -13,29 +13,38 @@
 # limitations under the License.
 # ============================================================================
 """Yolo train."""
+import datetime
 import os
 import time
-import datetime
+
 import mindspore as ms
-from mindspore.context import ParallelMode
-from mindspore.nn.optim.momentum import Momentum
 from mindspore import Tensor
 from mindspore import context
-from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.train.callback import ModelCheckpoint, RunContext
-from mindspore.train.callback import _InternalCallbackParam, CheckpointConfig
+from mindspore.communication.management import get_group_size
+from mindspore.communication.management import get_rank
+from mindspore.communication.management import init
+from mindspore.context import ParallelMode
+from mindspore.nn.optim.momentum import Momentum
 from mindspore.profiler.profiling import Profiler
-
-from src.yolo import YOLOV3, YoloWithLossCell, TrainingWrapper
-from src.logger import get_logger
-from src.util import AverageMeter, get_param_groups
-from src.lr_scheduler import get_lr
-from src.yolo_dataset import create_yolo_dataset
-from src.initializer import default_recurisive_init, load_yolo_params
+from mindspore.train.callback import CheckpointConfig
+from mindspore.train.callback import ModelCheckpoint
+from mindspore.train.callback import RunContext
+from mindspore.train.callback import _InternalCallbackParam
 
 from model_utils.config import config
+from model_utils.device_adapter import get_device_id
+from model_utils.device_adapter import get_device_num
 from model_utils.moxing_adapter import moxing_wrapper
-from model_utils.device_adapter import get_device_id, get_device_num
+from src.initializer import default_recurisive_init
+from src.initializer import load_yolo_params
+from src.logger import get_logger
+from src.lr_scheduler import get_lr
+from src.util import AverageMeter
+from src.util import get_param_groups
+from src.yolo import TrainingWrapper
+from src.yolo import YOLOWithLossCell
+from src.yolo import YOLOv3
+from src.yolo_dataset import create_yolo_dataset
 
 ms.set_seed(1)
 
@@ -52,9 +61,7 @@ def set_default():
     config.data_val_root = os.path.join(config.data_dir, 'val2017')
     config.ann_val_file = os.path.join(config.data_dir, 'annotations/instances_val2017.json')
 
-    device_id = int(os.getenv('DEVICE_ID', '0'))
-    context.set_context(mode=context.GRAPH_MODE,
-                        device_target=config.device_target, save_graphs=False, device_id=device_id)
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
 
     if config.need_profiler:
         profiler = Profiler(output_path=config.outputs_dir, is_detail=True, is_show_op_path=True)
@@ -94,7 +101,7 @@ def convert_training_shape(args_training_shape):
 
 
 def modelarts_pre_process():
-    '''modelarts pre process function.'''
+    """modelarts pre process function."""
     def unzip(zip_file, save_dir):
         import zipfile
         s_time = time.time()
@@ -147,35 +154,65 @@ def modelarts_pre_process():
     config.save_checkpoint_dir = os.path.join(config.output_path, config.save_checkpoint_dir)
 
 
-@moxing_wrapper(pre_process=modelarts_pre_process)
-def run_train():
-    """Train start"""
-    profiler = set_default()
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=get_device_id())
-    loss_meter = AverageMeter('loss')
+def setup_training():
+    """Setup Mindspore context"""
     context.reset_auto_parallel_context()
-    parallel_mode = ParallelMode.STAND_ALONE
-    degree = 1
+
     if config.is_distributed:
         parallel_mode = ParallelMode.DATA_PARALLEL
         degree = get_group_size()
+    else:
+        degree = 1
+        parallel_mode = ParallelMode.STAND_ALONE
     context.set_auto_parallel_context(parallel_mode=parallel_mode, gradients_mean=True, device_num=degree)
 
-    network = YOLOV3(is_training=True)
-    # default is kaiming-normal
-    default_recurisive_init(network)
-    load_yolo_params(config, network)
-
-    network = YoloWithLossCell(network)
+    if config.resume_epoch:
+        config.remain_epochs = config.max_epoch - config.resume_epoch
+    else:
+        config.remain_epochs = config.max_epoch
+        config.resume_epoch = 0
 
     if config.training_shape:
         config.multi_scale = [convert_training_shape(config.training_shape)]
     if config.resize_rate:
         config.resize_rate = config.resize_rate
 
-    ds, data_size = create_yolo_dataset(image_dir=config.data_root, anno_path=config.ann_file, is_training=True,
-                                        batch_size=config.per_batch_size, max_epoch=config.max_epoch,
-                                        device_num=config.group_size, rank=config.rank, config=config)
+
+def prepare_network():
+    """Prepare Network"""
+    network = YOLOv3(is_training=True)
+    # default is kaiming-normal
+    default_recurisive_init(network)
+    load_yolo_params(config, network)
+
+    network = YOLOWithLossCell(network)
+    return network
+
+
+def prepare_dataset():
+    """Prepare dataset"""
+    return create_yolo_dataset(
+        image_dir=config.data_root,
+        anno_path=config.ann_file,
+        is_training=True,
+        batch_size=config.per_batch_size,
+        max_epoch=config.max_epoch,
+        device_num=config.group_size,
+        rank=config.rank,
+        config=config,
+        num_parallel_workers=config.num_parallel_workers
+    )
+
+
+@moxing_wrapper(pre_process=modelarts_pre_process)
+def run_train():
+    """Train start"""
+    profiler = set_default()
+    setup_training()
+    loss_meter = AverageMeter('loss')
+    network = prepare_network()
+
+    ds, data_size = prepare_dataset()
     config.logger.info('Finish loading dataset')
 
     config.steps_per_epoch = int(data_size / config.per_batch_size / config.group_size)
@@ -185,11 +222,13 @@ def run_train():
 
     lr = get_lr(config)
 
-    opt = Momentum(params=get_param_groups(network),
-                   learning_rate=Tensor(lr),
-                   momentum=config.momentum,
-                   weight_decay=config.weight_decay,
-                   loss_scale=config.loss_scale)
+    opt = Momentum(
+        params=get_param_groups(network),
+        learning_rate=Tensor(lr),
+        momentum=config.momentum,
+        weight_decay=config.weight_decay,
+        loss_scale=config.loss_scale
+    )
 
     network = TrainingWrapper(network, opt, config.loss_scale)
     network.set_train()
@@ -197,12 +236,9 @@ def run_train():
     if config.rank_save_ckpt_flag:
         # checkpoint save
         ckpt_max_num = config.max_epoch * config.steps_per_epoch // config.ckpt_interval
-        ckpt_config = CheckpointConfig(save_checkpoint_steps=config.ckpt_interval,
-                                       keep_checkpoint_max=ckpt_max_num)
-        save_ckpt_path = os.path.join(config.outputs_dir, 'ckpt_' + str(config.rank) + '/')
-        ckpt_cb = ModelCheckpoint(config=ckpt_config,
-                                  directory=save_ckpt_path,
-                                  prefix='{}'.format(config.rank))
+        ckpt_config = CheckpointConfig(save_checkpoint_steps=config.ckpt_interval, keep_checkpoint_max=ckpt_max_num)
+        save_ckpt_path = os.path.join(config.outputs_dir, f'ckpt_{config.rank}/')
+        ckpt_cb = ModelCheckpoint(config=ckpt_config, directory=save_ckpt_path, prefix='{}'.format(config.rank))
         cb_params = _InternalCallbackParam()
         cb_params.train_network = network
         cb_params.epoch_num = ckpt_max_num
@@ -210,11 +246,17 @@ def run_train():
         run_context = RunContext(cb_params)
         ckpt_cb.begin(run_context)
 
-    old_progress = -1
     t_end = time.time()
-    data_loader = ds.create_dict_iterator(output_numpy=True, num_epochs=1)
 
-    for i, data in enumerate(data_loader):
+    data_loader = ds.create_dict_iterator(output_numpy=True, num_epochs=config.remain_epochs)
+
+    i_start = config.resume_epoch * config.steps_per_epoch
+    if config.rank_save_ckpt_flag:
+        cb_params.cur_epoch_num = config.resume_epoch + 1
+        # pylint: disable=protected-access
+        ckpt_cb._last_triggered_step = i_start
+    old_progress = i_start - 1
+    for i, data in enumerate(data_loader, i_start):
         images = data["image"]
         images = Tensor.from_numpy(images)
         batch_y_true_0 = Tensor.from_numpy(data['bbox1'])
@@ -237,7 +279,10 @@ def run_train():
             fps = config.per_batch_size * (i - old_progress) * config.group_size / time_used
             if config.rank == 0:
                 config.logger.info(
-                    'epoch[{}], iter[{}], {}, fps:{:.2f} imgs/sec, lr:{}'.format(epoch, i, loss_meter, fps, lr[i]))
+                    'epoch[{}], iter[{}], {}, fps:{:.2f} imgs/sec, lr:{}'.format(
+                        epoch, i, loss_meter, fps, lr[i - i_start]
+                    )
+                )
             t_end = time.time()
             loss_meter.reset()
             old_progress = i
@@ -251,6 +296,7 @@ def run_train():
                 break
 
     config.logger.info('==========end training===============')
+
 
 if __name__ == "__main__":
     run_train()

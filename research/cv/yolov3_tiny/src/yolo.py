@@ -15,20 +15,22 @@
 """YOLO based on DarkNet."""
 import mindspore as ms
 import mindspore.nn as nn
-from mindspore.common.tensor import Tensor
 from mindspore import context
-from mindspore.context import ParallelMode
-from mindspore.parallel._auto_parallel_context import auto_parallel_context
+from mindspore.common.tensor import Tensor
 from mindspore.communication.management import get_group_size
-from mindspore.ops import operations as P
-from mindspore.ops import functional as F
+from mindspore.context import ParallelMode
 from mindspore.ops import composite as C
+from mindspore.ops import functional as F
+from mindspore.ops import operations as P
+from mindspore.parallel._auto_parallel_context import auto_parallel_context
 
-from src.tiny import Tiny
-from src.loss import ConfidenceLoss, ClassLoss
 from model_utils.config import config
+from src.loss import ClassLoss
+from src.loss import ConfidenceLoss
+from src.tiny import Tiny
 
-class YOLOv3_Tiny(nn.Cell):
+
+class YOLOv3Tiny(nn.Cell):
     """
      YOLO Network.
 
@@ -42,7 +44,7 @@ class YOLOv3_Tiny(nn.Cell):
          YOLOv3_Tiny(backbone)
      """
     def __init__(self, backbone):
-        super(YOLOv3_Tiny, self).__init__()
+        super(YOLOv3Tiny, self).__init__()
 
         self.backbone = backbone
         self.head1 = nn.Conv2d(512, 255, kernel_size=1, stride=1, has_bias=True)
@@ -50,6 +52,7 @@ class YOLOv3_Tiny(nn.Cell):
         self.concat = P.Concat(axis=1)
 
     def construct(self, x):
+        """Build a forward graph"""
         # input_shape of x is (batch_size, 3, h, w)
         # feature_map1 is (batch_size, backbone_shape1, h/32, w/32)
         # feature_map2 is (batch_size, backbone_shape2, h/16, w/16)
@@ -59,7 +62,6 @@ class YOLOv3_Tiny(nn.Cell):
         small_object_output = self.head2(feature_map2)
 
         return big_object_output, small_object_output
-
 
 
 class DetectionBlock(nn.Cell):
@@ -90,10 +92,10 @@ class DetectionBlock(nn.Cell):
             self.scale_x_y = 1.1
             self.offset_x_y = 0.05
         else:
-            raise KeyError("Invalid scale value for DetectionBlock")
+            raise ValueError(f"Invalid scale {scale} value for DetectionBlock, expected 's' or 'l'.")
         self.anchors = Tensor([self.config.anchor_scales[i] for i in idx], ms.float32)
         self.num_anchors_per_scale = 3
-        self.num_attrib = 4+1+self.config.num_classes
+        self.num_attrib = 4 + 1 + self.config.num_classes
         self.lambda_coord = 1
 
         self.sigmoid = nn.Sigmoid()
@@ -103,7 +105,7 @@ class DetectionBlock(nn.Cell):
         self.conf_training = is_training
 
     def construct(self, x, input_shape):
-        """construct method"""
+        """Build a forward graph"""
         num_batch = P.Shape()(x)[0]
         grid_size = P.Shape()(x)[2:4]
 
@@ -133,8 +135,8 @@ class DetectionBlock(nn.Cell):
 
         # gridsize1 is x
         # gridsize0 is y
-        box_xy = (self.scale_x_y * self.sigmoid(box_xy) - self.offset_x_y + grid) / \
-                 P.Cast()(F.tuple_to_array((grid_size[1], grid_size[0])), ms.float32)
+        box_xy = ((self.scale_x_y * self.sigmoid(box_xy) - self.offset_x_y + grid) /
+                  P.Cast()(F.tuple_to_array((grid_size[1], grid_size[0])), ms.float32))
         # box_wh is w->h
         box_wh = P.Exp()(box_wh) * self.anchors / input_shape
         box_confidence = self.sigmoid(box_confidence)
@@ -160,8 +162,8 @@ class Iou(nn.Cell):
         """
         box1_xy = box1[:, :, :, :, :, :2]
         box1_wh = box1[:, :, :, :, :, 2:4]
-        box1_mins = box1_xy - box1_wh / F.scalar_to_array(2.0) # topLeft
-        box1_maxs = box1_xy + box1_wh / F.scalar_to_array(2.0) # rightDown
+        box1_mins = box1_xy - box1_wh / F.scalar_to_array(2.0)  # topLeft
+        box1_maxs = box1_xy + box1_wh / F.scalar_to_array(2.0)  # rightDown
 
         box2_xy = box2[:, :, :, :, :, :2]
         box2_wh = box2[:, :, :, :, :, 2:4]
@@ -172,8 +174,8 @@ class Iou(nn.Cell):
         intersect_maxs = self.min(box1_maxs, box2_maxs)
         intersect_wh = self.max(intersect_maxs - intersect_mins, F.scalar_to_array(0.0))
         # P.squeeze: for effiecient slice
-        intersect_area = P.Squeeze(-1)(intersect_wh[:, :, :, :, :, 0:1]) * \
-                         P.Squeeze(-1)(intersect_wh[:, :, :, :, :, 1:2])
+        intersect_area = (P.Squeeze(-1)(intersect_wh[:, :, :, :, :, 0:1]) *
+                          P.Squeeze(-1)(intersect_wh[:, :, :, :, :, 1:2]))
         box1_area = P.Squeeze(-1)(box1_wh[:, :, :, :, :, 0:1]) * P.Squeeze(-1)(box1_wh[:, :, :, :, :, 1:2])
         box2_area = P.Squeeze(-1)(box2_wh[:, :, :, :, :, 0:1]) * P.Squeeze(-1)(box2_wh[:, :, :, :, :, 1:2])
         iou = intersect_area / (box1_area + box2_area - intersect_area)
@@ -181,21 +183,20 @@ class Iou(nn.Cell):
         return iou
 
 
-class YoloLossBlock(nn.Cell):
+class YOLOLossBlock(nn.Cell):
     """
     Loss block cell of YOLO network.
     """
     def __init__(self, scale, config_yb=None):
-        super(YoloLossBlock, self).__init__()
+        super(YOLOLossBlock, self).__init__()
         self.config = config_yb
         if scale == 's':
             # anchor mask
             idx = (0, 1, 2)
         elif scale == 'l':
             idx = (3, 4, 5)
-
         else:
-            raise KeyError("Invalid scale value for DetectionBlock")
+            raise ValueError(f"Invalid scale {scale} value for YOLOLossBlock, expected 's' or 'l'.")
         self.anchors = Tensor([self.config.anchor_scales[i] for i in idx], ms.float32)
         self.ignore_threshold = Tensor(self.config.ignore_threshold, ms.float32)
         self.concat = P.Concat(axis=-1)
@@ -219,16 +220,8 @@ class YoloLossBlock(nn.Cell):
         class_probs = y_true[:, :, :, :, 5:]
         true_boxes = y_true[:, :, :, :, :4]
 
-        grid_shape = P.Shape()(prediction)[1:3]
-        grid_shape = P.Cast()(F.tuple_to_array(grid_shape[::-1]), ms.float32)
-
         pred_boxes = self.concat((pred_xy, pred_wh))
-        true_wh = y_true[:, :, :, :, 2:4]
-        true_wh = P.Select()(P.Equal()(true_wh, 0.0),
-                             P.Fill()(P.DType()(true_wh),
-                                      P.Shape()(true_wh), 1.0),
-                             true_wh)
-        true_wh = P.Log()(true_wh / self.anchors * input_shape)
+
         # 2-w*h for large picture, use small scale, since small obj need more precise
         box_loss_scale = 2 - y_true[:, :, :, :, 2:3] * y_true[:, :, :, :, 3:4]
 
@@ -267,7 +260,7 @@ class YoloLossBlock(nn.Cell):
         return loss / batch_size
 
 
-class YOLOV3(nn.Cell):
+class YOLOv3(nn.Cell):
     """
     YOLO network.
 
@@ -282,17 +275,18 @@ class YOLOV3(nn.Cell):
     """
 
     def __init__(self, is_training, config_y=config):
-        super(YOLOV3, self).__init__()
+        super(YOLOv3, self).__init__()
         self.config = config_y
 
         # YOLO network
-        self.feature_map = YOLOv3_Tiny(backbone=Tiny())
+        self.feature_map = YOLOv3Tiny(backbone=Tiny())
 
         # prediction on the default anchor boxes
         self.detect_1 = DetectionBlock('l', is_training=is_training)
         self.detect_2 = DetectionBlock('s', is_training=is_training)
 
     def construct(self, x, input_shape):
+        """Build a forward graph"""
         big_object_output, small_object_output = self.feature_map(x)
         output_big = self.detect_1(big_object_output, input_shape)
         output_small = self.detect_2(small_object_output, input_shape)
@@ -300,31 +294,32 @@ class YOLOV3(nn.Cell):
         return output_big, output_small
 
 
-class YOLOV3_Infer(nn.Cell):
+class YOLOv3Inference(nn.Cell):
     """
-    YOLOV3 Infer.
+    YOLOv3 Infer.
     """
-    def __init__(self, inputshape):
-        super(YOLOV3_Infer, self).__init__()
-        self.network = YOLOV3(is_training=False)
-        self.inputshape = inputshape
+    def __init__(self, input_shape):
+        super(YOLOv3Inference, self).__init__()
+        self.network = YOLOv3(is_training=False)
+        self.input_shape = input_shape
 
     def construct(self, x):
-        return self.network(x, self.inputshape)
+        return self.network(x, self.input_shape)
 
 
-class YoloWithLossCell(nn.Cell):
-    """YOLO loss."""
+class YOLOWithLossCell(nn.Cell):
+    """Yolov3-Tiny with loss cell"""
     def __init__(self, network, config_ywl=config):
-        super(YoloWithLossCell, self).__init__()
+        super(YOLOWithLossCell, self).__init__()
         self.yolo_network = network
         self.config = config_ywl
-        self.loss_big = YoloLossBlock('l', self.config)
-        self.loss_small = YoloLossBlock('s', self.config)
+        self.loss_big = YOLOLossBlock('l', self.config)
+        self.loss_small = YOLOLossBlock('s', self.config)
         self.tenser_to_array = P.TupleToArray()
         self.large_scale = self.config.large_scale
 
     def construct(self, x, y_true_0, y_true_1, gt_0, gt_1):
+        """Build a forward graph"""
         input_shape = F.shape(x)[2:4]
         input_shape = F.cast(self.tenser_to_array(input_shape), ms.float32)
         yolo_out = self.yolo_network(x, input_shape)
@@ -357,6 +352,7 @@ class TrainingWrapper(nn.Cell):
             self.grad_reducer = nn.DistributedGradReducer(optimizer.parameters, mean, degree)
 
     def construct(self, *args):
+        """Build a forward graph"""
         weights = self.weights
         loss = self.network(*args)
         sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
@@ -403,7 +399,9 @@ class Giou(nn.Cell):
         giou = C.clip_by_value(giou, -1.0, 1.0)
         return giou
 
+
 def xywh2x1y1x2y2(box_xywh):
+    """xywh to x1y1x2y2"""
     boxes_x1 = box_xywh[..., 0:1] - box_xywh[..., 2:3] / 2
     boxes_y1 = box_xywh[..., 1:2] - box_xywh[..., 3:4] / 2
     boxes_x2 = box_xywh[..., 0:1] + box_xywh[..., 2:3] / 2

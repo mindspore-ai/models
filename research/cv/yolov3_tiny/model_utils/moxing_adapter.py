@@ -12,35 +12,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
 """Moxing adapter for ModelArts"""
 
-import os
 import functools
+import os
+
 from mindspore import context
+
 from .config import config
 
 _global_sync_count = 0
 
+
 def get_device_id():
+    """Get device id"""
     device_id = os.getenv('DEVICE_ID', '0')
     return int(device_id)
 
 
 def get_device_num():
+    """Get device num"""
     device_num = os.getenv('RANK_SIZE', '1')
     return int(device_num)
 
 
 def get_rank_id():
+    """Get rank id"""
     global_rank_id = os.getenv('RANK_ID', '0')
     return int(global_rank_id)
 
 
 def get_job_id():
+    """Get job id"""
     job_id = os.getenv('JOB_ID')
     job_id = job_id if job_id != "" else "default"
     return job_id
+
 
 def sync_data(from_path, to_path):
     """

@@ -47,7 +47,7 @@ YOLOv3 Tiny是YOLOv3的一个轻量级变体，它使用池化层并减少卷积
 使用的数据集：[COCO 2017](<http://images.cocodataset.org/>)
 
 - 数据集大小：19 GB
-    - 训练集：18 GB，118000张图片  
+    - 训练集：18 GB，118000张图片
     - 验证集：1GB，5000张图片
     - 标注：241 MB，包含实例，字幕，person_keypoints等
 - 数据格式：图片和json文件
@@ -149,50 +149,55 @@ YOLOv3 Tiny是YOLOv3的一个轻量级变体，它使用池化层并减少卷积
 
 ```text
 └── cv
-    ├── README.md                           // 所有模型相关说明
-    ├── README_CN.md                        // 所有模型相关中文说明
-    ├── mindspore_hub_conf.md               // Mindspore Hub配置
-    └── YOLOv3_Tiny
-        ├── README.md                       // YOLOv3_Tiny相关说明
-        ├── README_CN.md                    // YOLOv3_Tiny相关说明中文版
-        ├── mindspore_hub_conf.py   // hub配置
+    ├── README.md                            // 所有模型相关说明
+    ├── README_CN.md                         // 所有模型相关中文说明
+    ├── default_config.yaml                  // main config for training and evaluating
+    ├── mindspore_hub_conf.md                // Mindspore Hub配置
+    ├── requirements.txt
+    └── yolov3_tiny
+        ├── README.md                        // yolov3_tiny相关说明
+        ├── README_CN.md                     // yolov3_tiny相关说明中文版
+        ├── mindspore_hub_conf.py            // hub配置
         ├─model_utils
-            ├── __init__.py                 // 初始化脚本
-            ├── config.py                   // 参数配置项
-            ├── device_adapter.py           // ModelArts的设备适配器
-            ├── local_adapter.py            // 本地适配器
-            └── moxing_adapter.py           // ModelArts的模型适配器
-                ├── scripts
-            ├── run_distribute_train.sh     // Ascend上分布式shell脚本
-            ├── run_standalone_train.sh     // Ascend上分布式shell脚本
-                ├-- run_infer_310.sh        // 310上评估的shell脚本
-            └── run_eval.sh                 // Ascend上评估的shell脚本
+            ├── __init__.py                  // 初始化脚本
+            ├── config.py                    // 参数配置项
+            ├── device_adapter.py            // ModelArts的设备适配器
+            ├── local_adapter.py             // 本地适配器
+            └── moxing_adapter.py            // ModelArts的模型适配器
+        ├── scripts
+            ├── run_distribute_train.sh      // Ascend上分布式shell脚本
+            ├── run_distribute_train_gpu.sh  // launch distributed training(8p) on GPU
+            ├── run_standalone_train.sh      // Ascend上分布式shell脚本
+            ├── run_standalone_train_gpu.sh  // launch standalone traininng(1p) on GPU
+            ├── run_infer_310.sh             // 310上评估的shell脚本
+            ├── run_eval.sh                  // Ascend上评估的shell脚本
+            └─run_eval_gpu.sh                // launch evaluating on GPU
         ├── src
-            ├─__init__.py                   // 初始化脚本
-            ├─config.py                     // 参数配置项
-            ├─tiny.py                       // 主干网络
-            ├─distributed_sampler.py        // 数据采样
-            ├─initializer.py                // 参数初始化
-            ├─logger.py                     // 日志
-            ├─loss.py                       // 损失函数
-            ├─lr_scheduler.py               // 学习率生成器
-            ├─transforms.py                 // 数据预处理模块
-            ├─util.py                       // 工具函数
-            ├─yolo.py                       // yolo 网络
-            ├─yolo_dataset.py               // 构建数据模块
-            ├─postprocess.py                // 用于310推理后处理脚本
+            ├─__init__.py                    // 初始化脚本
+            ├─config.py                      // 参数配置项
+            ├─tiny.py                        // 主干网络
+            ├─distributed_sampler.py         // 数据采样
+            ├─initializer.py                 // 参数初始化
+            ├─logger.py                      // 日志
+            ├─loss.py                        // 损失函数
+            ├─lr_scheduler.py                // 学习率生成器
+            ├─transforms.py                  // 数据预处理模块
+            ├─util.py                        // 工具函数
+            ├─yolo.py                        // yolo 网络
+            ├─yolo_dataset.py                // 构建数据模块
+            ├─postprocess.py                 // 用于310推理后处理脚本
         ├─ascend310_infer
             ├─inc
-              └─utils.h                     // utils的头文件
+              └─utils.h                      // utils的头文件
             ├─src
-              ├─main.cc                     // 310推理的主函数
-              └─utils.cc                    // utils 的源文件
-            ├─aipp.cfg                      // 310推理的配置项
-            ├─build.sh                      // 构建可执行脚本
-            └─CMakeLists.txt                // CMakeLists
-        ├── eval.py                         // 验证脚本
-        ├── export.py                       // 导出脚本
-        └── train.py                        // 训练脚本
+              ├─main.cc                      // 310推理的主函数
+              └─utils.cc                     // utils 的源文件
+            ├─aipp.cfg                       // 310推理的配置项
+            ├─build.sh                       // 构建可执行脚本
+            └─CMakeLists.txt                 // CMakeLists
+        ├── eval.py                          // 验证脚本
+        ├── export.py                        // 导出脚本
+        └── train.py                         // 训练脚本
 ```
 
 ## 脚本参数
@@ -264,7 +269,7 @@ YOLOv3 Tiny是YOLOv3的一个轻量级变体，它使用池化层并减少卷积
 - 单机模式
 
     ```shell script
-    sh run_standalone_train.sh coco_dataset
+    bash run_standalone_train.sh coco_dataset
     ```
 
     输入变量为数据集目录路径。
@@ -290,7 +295,7 @@ YOLOv3 Tiny是YOLOv3的一个轻量级变体，它使用池化层并减少卷积
 - 分布式模式
 
     ```shell
-        sh run_distribute_train.sh coco_dataset rank_table_8p.json
+        bash run_distribute_train.sh coco_dataset rank_table_8p.json
     ```
 
     输入变量为数据集目录路径、rank列表
@@ -317,7 +322,7 @@ YOLOv3 Tiny是YOLOv3的一个轻量级变体，它使用池化层并减少卷积
 ### Ascend评估
 
   ```shell script
-  sh run_eval.sh coco_dataset checkpoint/yolo.ckpt
+  bash run_eval.sh coco_dataset checkpoint/yolo.ckpt
   ```
 
 输入变量为数据集目录路径、模型路径。

@@ -13,16 +13,21 @@
 # limitations under the License.
 # ============================================================================
 """YoloV3 postprocess."""
-import os
 import argparse
 import datetime
+import os
+
 import numpy as np
 from PIL import Image
+
 from eval import DetectionEngine
 
+
 def get_img_size(file_name):
+    """Get image size"""
     img = Image.open(file_name)
     return img.size
+
 
 parser = argparse.ArgumentParser('YoloV3 postprocess')
 parser.add_argument('--result_path', type=str, required=True, help='result files path.')
@@ -35,6 +40,7 @@ parser.add_argument('--log_path', type=str, default='outputs/', help='inference 
 parser.add_argument('--multi_label', type=bool, default=True, help='whether to use multi label')
 parser.add_argument('--multi_label_thresh', type=float, default=0.15, help='threshhold to throw low quality boxes')
 args = parser.parse_args()
+
 
 if __name__ == "__main__":
     args.outputs_dir = os.path.join(args.log_path,

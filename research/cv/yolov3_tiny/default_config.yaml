@@ -22,6 +22,7 @@ per_batch_size: 32
 # network related
 pretrained_backbone: ""
 resume_yolo: ""
+resume_epoch: 0
 
 # optimizer and lr related
 lr_scheduler: "cosine_annealing"
@@ -81,6 +82,7 @@ input_file: ""
 output_file: ""
 
 # Other default config
+num_parallel_workers: 8
 hue: 0.015
 saturation: 1.5
 value: 0.4

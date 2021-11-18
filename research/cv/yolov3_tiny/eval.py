@@ -13,39 +13,42 @@
 # limitations under the License.
 # ============================================================================
 """Yolo eval."""
-import os
 import datetime
-import time
+import os
 import sys
+import time
 from collections import defaultdict
 
 import numpy as np
+from mindspore import Tensor
+from mindspore import context
+from mindspore import dtype as mstype
+from mindspore.context import ParallelMode
+from mindspore.train.serialization import load_checkpoint
+from mindspore.train.serialization import load_param_into_net
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 
-from mindspore import Tensor
-from mindspore.context import ParallelMode
-from mindspore import context
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
-import mindspore as ms
-
-from src.yolo import YOLOV3
-from src.logger import get_logger
-from src.yolo_dataset import create_yolo_dataset
-
 from model_utils.config import config
+from model_utils.device_adapter import get_device_id
+from model_utils.device_adapter import get_device_num
 from model_utils.moxing_adapter import moxing_wrapper
-from model_utils.device_adapter import get_device_id, get_device_num
+from src.logger import get_logger
+from src.yolo import YOLOv3
+from src.yolo_dataset import create_yolo_dataset
 
 
 class Redirct:
+    """Redirct"""
     def __init__(self):
         self.content = ""
 
     def write(self, content):
+        """write"""
         self.content += content
 
     def flush(self):
+        """flush"""
         self.content = ""
 
 
@@ -356,7 +359,7 @@ def run_test():
     context.set_auto_parallel_context(parallel_mode=parallel_mode, gradients_mean=True, device_num=1)
 
     config.logger.info('Creating Network....')
-    network = YOLOV3(is_training=False)
+    network = YOLOv3(is_training=False)
 
     config.logger.info(config.pretrained)
     if os.path.isfile(config.pretrained):
@@ -382,9 +385,17 @@ def run_test():
     if config.testing_shape:
         config.test_img_shape = convert_testing_shape(config.testing_shape)
 
-    ds, data_size = create_yolo_dataset(data_root, ann_file, is_training=False, batch_size=config.per_batch_size,
-                                        max_epoch=1, device_num=1, rank=rank_id, shuffle=False,
-                                        config=config)
+    ds, data_size = create_yolo_dataset(
+        data_root,
+        ann_file,
+        is_training=False,
+        batch_size=config.per_batch_size,
+        max_epoch=1,
+        device_num=1,
+        rank=rank_id,
+        shuffle=False,
+        config=config
+    )
 
     config.logger.info('testing shape : %s', config.test_img_shape)
     config.logger.info('total %s images to eval', data_size)
@@ -395,7 +406,7 @@ def run_test():
     print('config: %s', config)
     detection = DetectionEngine(config)
 
-    input_shape = Tensor(tuple(config.test_img_shape), ms.float32)
+    input_shape = Tensor(tuple(config.test_img_shape), mstype.float32)
     config.logger.info('Start inference....')
     for image_index, data in enumerate(ds.create_dict_iterator(num_epochs=1)):
         image = data["image"].asnumpy()
@@ -409,7 +420,7 @@ def run_test():
         image_id_ = image_id_.asnumpy()
         image_shape_ = image_shape_.asnumpy()
         detection.detect([output_small, output_big], config.per_batch_size, image_shape_, image_id_)
-        if image_index % 1000 == 0:
+        if image_index % (1000 // config.per_batch_size) == 0:
             config.logger.info('Processing... {:.2f}% '.format(image_index * config.per_batch_size / data_size * 100))
 
     config.logger.info('Calculating mAP...')

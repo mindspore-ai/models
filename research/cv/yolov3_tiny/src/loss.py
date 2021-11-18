@@ -13,8 +13,9 @@
 # limitations under the License.
 # ============================================================================
 """YOLO loss."""
-from mindspore.ops import operations as P
 import mindspore.nn as nn
+from mindspore.ops import operations as P
+
 
 class ConfidenceLoss(nn.Cell):
     """Loss for confidence."""
@@ -24,9 +25,10 @@ class ConfidenceLoss(nn.Cell):
         self.reduce_sum = P.ReduceSum()
 
     def construct(self, object_mask, predict_confidence, ignore_mask):
+        """Build a forward graph"""
         confidence_loss = self.cross_entropy(predict_confidence, object_mask)
         confidence_loss = object_mask * confidence_loss + (1 - object_mask) * confidence_loss * ignore_mask
-        confidence_loss = self.reduce_sum(confidence_loss, ())
+        confidence_loss = self.reduce_sum(confidence_loss)
         return confidence_loss
 
 
@@ -38,6 +40,7 @@ class ClassLoss(nn.Cell):
         self.reduce_sum = P.ReduceSum()
 
     def construct(self, object_mask, predict_class, class_probs):
+        """Build a forward graph"""
         class_loss = object_mask * self.cross_entropy(predict_class, class_probs)
-        class_loss = self.reduce_sum(class_loss, ())
+        class_loss = self.reduce_sum(class_loss)
         return class_loss

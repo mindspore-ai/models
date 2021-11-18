@@ -52,10 +52,12 @@ def warmup_step_lr(lr, lr_epochs, steps_per_epoch, warmup_epochs, max_epoch, gam
 
 
 def multi_step_lr(lr, milestones, steps_per_epoch, max_epoch, gamma=0.1):
+    """Multi step learning rate"""
     return warmup_step_lr(lr, milestones, steps_per_epoch, 0, max_epoch, gamma=gamma)
 
 
 def step_lr(lr, epoch_size, steps_per_epoch, max_epoch, gamma=0.1):
+    """Step learning rate"""
     lr_epochs = []
     for i in range(1, max_epoch):
         if i % epoch_size == 0:
@@ -119,7 +121,7 @@ def warmup_cosine_annealing_lr_sample(lr, steps_per_epoch, warmup_epochs, max_ep
     step_sample = 2
     tobe_sampled_epoch = 60
     end_sampled_epoch = start_sample_epoch + step_sample*tobe_sampled_epoch
-    max_sampled_epoch = max_epoch+tobe_sampled_epoch
+    max_sampled_epoch = max_epoch + tobe_sampled_epoch
     t_max = max_sampled_epoch
 
     base_lr = lr
@@ -147,34 +149,44 @@ def warmup_cosine_annealing_lr_sample(lr, steps_per_epoch, warmup_epochs, max_ep
 def get_lr(args):
     """generate learning rate."""
     if args.lr_scheduler == 'exponential':
-        lr = warmup_step_lr(args.lr,
-                            args.lr_epochs,
-                            args.steps_per_epoch,
-                            args.warmup_epochs,
-                            args.max_epoch,
-                            gamma=args.lr_gamma,
-                            )
+        lr = warmup_step_lr(
+            args.lr,
+            args.lr_epochs,
+            args.steps_per_epoch,
+            args.warmup_epochs,
+            args.max_epoch,
+            gamma=args.lr_gamma,
+        )
     elif args.lr_scheduler == 'cosine_annealing':
-        lr = warmup_cosine_annealing_lr(args.lr,
-                                        args.steps_per_epoch,
-                                        args.warmup_epochs,
-                                        args.max_epoch,
-                                        args.t_max,
-                                        args.eta_min)
+        lr = warmup_cosine_annealing_lr(
+            args.lr,
+            args.steps_per_epoch,
+            args.warmup_epochs,
+            args.max_epoch,
+            args.t_max,
+            args.eta_min
+        )
     elif args.lr_scheduler == 'cosine_annealing_V2':
-        lr = warmup_cosine_annealing_lr_V2(args.lr,
-                                           args.steps_per_epoch,
-                                           args.warmup_epochs,
-                                           args.max_epoch,
-                                           args.t_max,
-                                           args.eta_min)
+        lr = warmup_cosine_annealing_lr_V2(
+            args.lr,
+            args.steps_per_epoch,
+            args.warmup_epochs,
+            args.max_epoch,
+            args.t_max,
+            args.eta_min
+        )
     elif args.lr_scheduler == 'cosine_annealing_sample':
-        lr = warmup_cosine_annealing_lr_sample(args.lr,
-                                               args.steps_per_epoch,
-                                               args.warmup_epochs,
-                                               args.max_epoch,
-                                               args.t_max,
-                                               args.eta_min)
+        lr = warmup_cosine_annealing_lr_sample(
+            args.lr,
+            args.steps_per_epoch,
+            args.warmup_epochs,
+            args.max_epoch,
+            args.t_max,
+            args.eta_min
+        )
     else:
         raise NotImplementedError(args.lr_scheduler)
+
+    if args.resume_epoch:
+        lr = lr[args.resume_epoch * args.steps_per_epoch:]
     return lr
