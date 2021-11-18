@@ -27,3 +27,7 @@
 
 "models/official/cv/lenet/infer/mxbase/LenetOpencv.h" "runtime/references"
 "models/official/cv/lenet/infer/mxbase/main_opencv.cpp" "runtime/references"
+
+"models/research/cv/squeezenet1_1/infer/mxbase/Squeezenet1_1ClassifyOpencv.h"  "runtime/references"
+"models/research/cv/squeezenet1_1/infer/mxbase/main_opencv.cpp"  "runtime/references"
+"models/research/cv/squeezenet1_1/infer/mxbase/Squeezenet1_1ClassifyOpencv.cpp"  "runtime/references"

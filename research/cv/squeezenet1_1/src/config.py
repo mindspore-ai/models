@@ -18,7 +18,7 @@ network config setting, will be used in train.py and eval.py
 from easydict import EasyDict as ed
 
 # config for squeezenet, imagenet
-config = ed({
+config_imagenet = ed({
     "class_num": 1000,
     "batch_size": 32,
     "loss_scale": 1024,
@@ -34,6 +34,26 @@ config = ed({
     "lr_decay_mode": "poly",
     "use_label_smooth": True,
     "label_smooth_factor": 0.1,
+    "lr_init": 0,
+    "lr_end": 0,
+    "lr_max": 0.01
+})
+
+# config for squeezenet, cifar10
+config_cifar = ed({
+    "class_num": 10,
+    "batch_size": 32,
+    "loss_scale": 1024,
+    "momentum": 0.9,
+    "weight_decay": 1e-4,
+    "epoch_size": 120,
+    "pretrain_epoch_size": 0,
+    "save_checkpoint": True,
+    "save_checkpoint_epochs": 1,
+    "keep_checkpoint_max": 10,
+    "save_checkpoint_path": "./",
+    "warmup_epochs": 5,
+    "lr_decay_mode": "poly",
     "lr_init": 0,
     "lr_end": 0,
     "lr_max": 0.01

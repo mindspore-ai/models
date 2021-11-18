@@ -24,7 +24,7 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.CrossEntropySmooth import CrossEntropySmooth
 from src.squeezenet import SqueezeNet as squeezenet
 from src.dataset import create_dataset_imagenet as create_dataset
-from src.config import config
+from src.config import config_imagenet as config
 
 local_data_url = '/cache/data'
 local_ckpt_url = '/cache/ckpt.ckpt'

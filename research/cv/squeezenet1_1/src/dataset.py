@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """
-create train or eval dataset.
+create train or eval dataset of imagenet and cifar10.
 """
 import os
 import mindspore.common.dtype as mstype
@@ -83,6 +83,81 @@ def create_dataset_imagenet(dataset_path,
             C.Resize((256, 256)),
             C.CenterCrop(image_size),
             C.Normalize(mean=mean, std=std),
+            C.HWC2CHW()
+        ]
+
+    type_cast_op = C2.TypeCast(mstype.int32)
+
+    data_set = data_set.map(operations=type_cast_op,
+                            input_columns="label",
+                            num_parallel_workers=8)
+    data_set = data_set.map(operations=trans,
+                            input_columns="image",
+                            num_parallel_workers=8)
+
+    # apply batch operations
+    data_set = data_set.batch(batch_size, drop_remainder=True)
+
+    # apply dataset repeat operation
+    data_set = data_set.repeat(repeat_num)
+
+    return data_set
+
+def create_dataset_cifar(dataset_path,
+                         do_train,
+                         repeat_num=1,
+                         batch_size=32,
+                         target="Ascend",
+                         run_distribute=False):
+    """
+    create a train or evaluate cifar10 dataset
+    Args:
+        dataset_path(string): the path of dataset.
+        do_train(bool): whether dataset is used for train or eval.
+        repeat_num(int): the repeat times of dataset. Default: 1
+        batch_size(int): the batch size of dataset. Default: 32
+        target(str): the device target. Default: Ascend
+
+    Returns:
+        dataset
+    """
+    if target == "Ascend":
+        if run_distribute:
+            device_num = int(os.getenv("RANK_SIZE"))
+            device_id = int(os.getenv("DEVICE_ID"))
+        else:
+            device_num = 1
+    else:
+        raise ValueError("Unsupported device target.")
+
+    if device_num == 1:
+        data_set = ds.Cifar10Dataset(dataset_path,
+                                     num_parallel_workers=8,
+                                     shuffle=True)
+    else:
+        data_set = ds.Cifar10Dataset(dataset_path,
+                                     num_parallel_workers=8,
+                                     shuffle=True,
+                                     num_shards=device_num,
+                                     shard_id=device_id)
+
+    # define map operations
+    if do_train:
+        trans = [
+            C.RandomCrop((32, 32), (4, 4, 4, 4)),
+            C.RandomHorizontalFlip(prob=0.5),
+            C.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4),
+            C.Resize((227, 227)),
+            C.Rescale(1.0 / 255.0, 0.0),
+            C.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
+            C.CutOut(112),
+            C.HWC2CHW()
+        ]
+    else:
+        trans = [
+            C.Resize((227, 227)),
+            C.Rescale(1.0 / 255.0, 0.0),
+            C.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
             C.HWC2CHW()
         ]
 
