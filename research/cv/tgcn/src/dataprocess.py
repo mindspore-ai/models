@@ -118,13 +118,14 @@ def generate_dataset_np(feat, seq_len, pre_len, split_ratio, normalize=True, tim
     return np.array(train_inputs), np.array(train_targets), np.array(eval_inputs), np.array(eval_targets)
 
 
-def generate_dataset_ms(config, training):
+def generate_dataset_ms(config, training, abs_path=None):
     """
     Generate MindSpore dataset from ndarrays
 
     Args:
         config(ConfigTGCN): configuration of parameters
         training(bool): generate training dataset or evaluation dataset
+        abs_path(str): absolute data directory path
 
     Returns:
         dataset: MindSpore dataset for training/evaluation
@@ -135,7 +136,7 @@ def generate_dataset_ms(config, training):
     split_ratio = config.train_split_rate
     batch_size = config.batch_size
 
-    feat, _ = load_feat_matrix(dataset)
+    feat, _ = load_feat_matrix(dataset, abs_path)
     train_inputs, train_targets, eval_inputs, eval_targets = generate_dataset_np(feat, seq_len, pre_len, split_ratio)
 
     if training:

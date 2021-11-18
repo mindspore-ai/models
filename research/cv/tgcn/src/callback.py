@@ -70,13 +70,16 @@ class SaveCallback(Callback):
 
     def epoch_end(self, run_context):
         """Evaluate the network and save the best checkpoint (minimum RMSE)"""
-        cb_params = run_context.original_args()
-        result = self.model.eval(self.ds_eval)
-        print('Eval RMSE:', '{:.6f}'.format(result['RMSE']))
         if not os.path.exists('checkpoints'):
             os.mkdir('checkpoints')
-        if result['RMSE'] < self.rmse:
-            self.rmse = result['RMSE']
-            file_name = self.config.dataset + '_' + str(self.config.pre_len) + '.ckpt'
+        cb_params = run_context.original_args()
+        file_name = self.config.dataset + '_' + str(self.config.pre_len) + '.ckpt'
+        if self.config.save_best:
+            result = self.model.eval(self.ds_eval)
+            print('Eval RMSE:', '{:.6f}'.format(result['RMSE']))
+            if result['RMSE'] < self.rmse:
+                self.rmse = result['RMSE']
+                save_checkpoint(save_obj=cb_params.train_network, ckpt_file_name=os.path.join('checkpoints', file_name))
+                print("Best checkpoint saved!")
+        else:
             save_checkpoint(save_obj=cb_params.train_network, ckpt_file_name=os.path.join('checkpoints', file_name))
-            print("Best checkpoint saved!")

@@ -150,9 +150,11 @@ bash ./scripts/run_infer_310.sh ./outputs/SZ-taxi_1.mindir ./data y Ascend 0
 .
 └─tgcn
   ├─README_CN.md                        # 中文指南
+  ├─README.md                           # 英文指南
   ├─requirements.txt                    # pip依赖文件
   ├─scripts
     ├─run_distributed_train_ascend.sh   # Ascend多卡训练运行脚本
+    ├─run_distributed_train_gpu.sh      # GPU多卡训练运行脚本
     ├─run_eval.sh                       # 评估运行脚本
     ├─run_export.sh                     # MINDIR模型导出运行脚本
     ├─run_infer_310.sh                  # 310推理运行脚本
