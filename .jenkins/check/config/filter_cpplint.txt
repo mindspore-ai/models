@@ -18,7 +18,7 @@
 "models/research/cv/FaceQualityAssessment/infer/util/plugins/MxpiTransposePlugin.cpp"  "runtime/references"
 
 "models/research/cv/stgcn/infer/mxbase/src/stgcnUtil.h" "runtime/references"
-"models/research/cv/stgcn/infer/mxbase/src/stgcnUtil.cpp" "runtime/references"
+"models/research/cv/stgcn/infer/mxbase/src/stgcnUtil.cpp" "runtime/references""models/official/cv/resnext/infer/mxbase/src/resnext50Classify.h" "runtime/references"
 "models/research/cv/stgcn/infer/mxbase/src/main.cpp" "runtime/references"
 
 
@@ -32,3 +32,4 @@
 "models/research/cv/squeezenet1_1/infer/mxbase/main_opencv.cpp"  "runtime/references"
 "models/research/cv/squeezenet1_1/infer/mxbase/Squeezenet1_1ClassifyOpencv.cpp"  "runtime/references"
 "models/official/cv/vgg16/infer/mxbase/src/Vgg16Classify.h"  "runtime/references"
+"models/official/cv/resnext/infer/mxbase/src/resnext50Classify.h" "runtime/references"
