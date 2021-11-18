@@ -15,7 +15,7 @@
 """CenterNet Init."""
 
 from src.dataset import COCOHP
-from .centernet_det import GatherDetectionFeatureCell, CenterNetLossCell, \
+from .centernet_det import GatherDetectionFeatureCell, CenterNetLossCell,\
     CenterNetWithLossScaleCell, CenterNetWithoutLossScaleCell, CenterNetDetEval
 from .visual import visual_allimages, visual_image
 from .decode import DetectionDecode

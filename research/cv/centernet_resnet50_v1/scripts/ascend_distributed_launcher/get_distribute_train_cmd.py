@@ -57,10 +57,8 @@ def append_cmd(cmd, s):
     cmd += "\n"
     return cmd
 
-
 def append_cmd_env(cmd, key, value):
     return append_cmd(cmd, "export " + str(key) + "=" + str(value))
-
 
 def distribute_train():
     """
@@ -154,7 +152,7 @@ def distribute_train():
         run_cmd += " --mindrecord_dir=" + mindrecord_dir
         run_cmd += " --load_checkpoint_path=" + load_checkpoint_path
         run_cmd += ' --device_id=' + str(device_id) + ' --device_num=' \
-                   + str(rank_size) + ' >./training_log.txt 2>&1 &'
+               + str(rank_size) + ' >./training_log.txt 2>&1 &'
 
         cmd = append_cmd(cmd, run_cmd)
         cmd = append_cmd(cmd, "cd -")
@@ -162,7 +160,6 @@ def distribute_train():
 
     with open(args.cmd_file, "w") as f:
         f.write(cmd)
-
 
 if __name__ == "__main__":
     distribute_train()
