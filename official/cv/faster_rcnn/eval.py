@@ -78,7 +78,6 @@ def fasterrcnn_eval(dataset_path, ckpt_path, anno_path):
     max_num = 128
     for data in ds.create_dict_iterator(num_epochs=1):
         eval_iter = eval_iter + 1
-
         img_data = data['image']
         img_metas = data['image_shape']
         gt_bboxes = data['box']
@@ -117,12 +116,12 @@ def fasterrcnn_eval(dataset_path, ckpt_path, anno_path):
     eval_types = ["bbox"]
     result_files = results2json(dataset_coco, outputs, "./results.pkl")
 
-    coco_eval(result_files, eval_types, dataset_coco, single_result=True)
+    coco_eval(config, result_files, eval_types, dataset_coco, single_result=False)
 
 
 def modelarts_pre_process():
     pass
-    # config.ckpt_path = os.path.join(config.output_path, str(get_rank_id()), config.checkpoint_path)
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def eval_fasterrcnn():
@@ -153,6 +152,37 @@ def eval_fasterrcnn():
     print("CHECKING MINDRECORD FILES DONE!")
     print("Start Eval!")
     fasterrcnn_eval(mindrecord_file, config.checkpoint_path, config.anno_path)
+
+    flags = [0] * 3
+    config.eval_result_path = os.path.abspath("./eval_result")
+    if os.path.exists(config.eval_result_path):
+        result_files = os.listdir(config.eval_result_path)
+        for file in result_files:
+            if file == "statistics.csv":
+                with open(os.path.join(config.eval_result_path, "statistics.csv"), "r") as f:
+                    res = f.readlines()
+                if len(res) > 1:
+                    if "class_name" in res[3] and "tp_num" in res[3] and len(res[4].strip().split(",")) > 1:
+                        flags[0] = 1
+            elif file in ("precision_ng_images", "recall_ng_images", "ok_images"):
+                imgs = os.listdir(os.path.join(config.eval_result_path, file))
+                if imgs:
+                    flags[1] = 1
+
+            elif file == "pr_curve_image":
+                imgs = os.listdir(os.path.join(config.eval_result_path, "pr_curve_image"))
+                if imgs:
+                    flags[2] = 1
+            else:
+                pass
+
+    if sum(flags) == 3:
+        print("eval success.")
+        exit(0)
+    else:
+        print("eval failed.")
+        exit(-1)
+
 
 if __name__ == '__main__':
     eval_fasterrcnn()

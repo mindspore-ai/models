@@ -13,10 +13,15 @@
 # limitations under the License.
 # ============================================================================
 """coco eval for fasterrcnn"""
+
 import json
+import os
+import csv
+import shutil
 import numpy as np
 from pycocotools.coco import COCO
-from pycocotools.cocoeval import COCOeval
+from src.detecteval import DetectEval
+
 
 _init_value = np.array(0.0)
 summary_init = {
@@ -35,7 +40,18 @@ summary_init = {
 }
 
 
-def coco_eval(result_files, result_types, coco, max_dets=(100, 300, 1000), single_result=False):
+def write_list_to_csv(file_path, data_to_write, append=False):
+    # print('Saving data into file [{}]...'.format(file_path))
+    if append:
+        open_mode = 'a'
+    else:
+        open_mode = 'w'
+    with open(file_path, open_mode) as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(data_to_write)
+
+
+def coco_eval(config, result_files, result_types, coco, max_dets=(100, 300, 1000), single_result=False):
     """coco eval for fasterrcnn"""
     anns = json.load(open(result_files['bbox']))
     if not anns:
@@ -53,7 +69,7 @@ def coco_eval(result_files, result_types, coco, max_dets=(100, 300, 1000), singl
         gt_img_ids = coco.getImgIds()
         det_img_ids = coco_dets.getImgIds()
         iou_type = 'bbox' if res_type == 'proposal' else res_type
-        cocoEval = COCOeval(coco, coco_dets, iou_type)
+        cocoEval = DetectEval(coco, coco_dets, iou_type)
         if res_type == 'proposal':
             cocoEval.params.useCats = 0
             cocoEval.params.maxDets = list(max_dets)
@@ -63,7 +79,7 @@ def coco_eval(result_files, result_types, coco, max_dets=(100, 300, 1000), singl
         if single_result:
             res_dict = dict()
             for id_i in tgt_ids:
-                cocoEval = COCOeval(coco, coco_dets, iou_type)
+                cocoEval = DetectEval(coco, coco_dets, iou_type)
                 if res_type == 'proposal':
                     cocoEval.params.useCats = 0
                     cocoEval.params.maxDets = list(max_dets)
@@ -74,7 +90,7 @@ def coco_eval(result_files, result_types, coco, max_dets=(100, 300, 1000), singl
                 cocoEval.summarize()
                 res_dict.update({coco.imgs[id_i]['file_name']: cocoEval.stats[1]})
 
-        cocoEval = COCOeval(coco, coco_dets, iou_type)
+        cocoEval = DetectEval(coco, coco_dets, iou_type)
         if res_type == 'proposal':
             cocoEval.params.useCats = 0
             cocoEval.params.maxDets = list(max_dets)
@@ -99,7 +115,74 @@ def coco_eval(result_files, result_types, coco, max_dets=(100, 300, 1000), singl
             'Recall/AR@100 (large)': cocoEval.stats[11],
         }
 
-    return summary_metrics
+        print("summary_metrics: ")
+        print(summary_metrics)
+
+        res = calcuate_pr_rc_f1(config, coco, coco_dets, tgt_ids, iou_type)
+
+    return res
+
+
+def calcuate_pr_rc_f1(config, coco, coco_dets, tgt_ids, iou_type):
+    cocoEval = DetectEval(coco, coco_dets, iou_type)
+    cocoEval.params.imgIds = tgt_ids
+    cocoEval.evaluate()
+    cocoEval.accumulate()
+    cocoEval.summarize()
+    stats_all = cocoEval.stats
+
+    eval_result_path = os.path.abspath("./eval_result")
+    if os.path.exists(eval_result_path):
+        shutil.rmtree(eval_result_path)
+    os.mkdir(eval_result_path)
+
+    result_csv = os.path.join(eval_result_path, "statistics.csv")
+    eval_item = ["ap@0.5:0.95", "ap@0.5", "ap@0.75", "ar@0.5:0.95", "ar@0.5", "ar@0.75"]
+    write_list_to_csv(result_csv, eval_item, append=False)
+    eval_result = [round(stats_all[0], 3), round(stats_all[1], 3), round(stats_all[2], 3), round(stats_all[6], 3),
+                   round(stats_all[7], 3), round(stats_all[8], 3)]
+    write_list_to_csv(result_csv, eval_result, append=True)
+    write_list_to_csv(result_csv, [], append=True)
+    # 1.2 plot_pr_curve
+    cocoEval.plot_pr_curve(eval_result_path)
+
+    # 2
+    E = DetectEval(coco, coco_dets, iou_type)
+    E.params.iouThrs = [0.5]
+    E.params.maxDets = [100]
+    E.params.areaRng = [[0 ** 2, 1e5 ** 2]]
+    E.evaluate()
+    # 2.1 plot hist_curve of every class's tp's confidence and fp's confidence
+    confidence_dict = E.compute_tp_fp_confidence()
+    E.plot_hist_curve(confidence_dict, eval_result_path)
+
+    # 2.2 write best_threshold and p r to csv and plot
+    cat_pr_dict, cat_pr_dict_origin = E.compute_precison_recall_f1()
+    # E.write_best_confidence_threshold(cat_pr_dict, cat_pr_dict_origin, eval_result_path)
+    best_confidence_thres = E.write_best_confidence_threshold(cat_pr_dict, cat_pr_dict_origin, eval_result_path)
+    print("best_confidence_thres: ", best_confidence_thres)
+    E.plot_mc_curve(cat_pr_dict, eval_result_path)
+
+    # 3
+    # 3.1 compute every class's p r and save every class's p and r at iou = 0.5
+    E = DetectEval(coco, coco_dets, iouType='bbox')
+    E.params.iouThrs = [0.5]
+    E.params.maxDets = [100]
+    E.params.areaRng = [[0 ** 2, 1e5 ** 2]]
+    E.evaluate()
+    E.accumulate()
+    result = E.evaluate_every_class()
+    print_info = ["class_name", "tp_num", "gt_num", "dt_num", "precision", "recall"]
+    write_list_to_csv(result_csv, print_info, append=True)
+    print("class_name", "tp_num", "gt_num", "dt_num", "precision", "recall")
+    for class_result in result:
+        print(class_result)
+        write_list_to_csv(result_csv, class_result, append=True)
+
+    # 3.2 save ng / ok images
+    E.save_images(config, eval_result_path, 0.5)
+
+    return stats_all[0]
 
 
 def xyxy2xywh(bbox):

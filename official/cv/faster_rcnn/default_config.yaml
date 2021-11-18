@@ -18,12 +18,6 @@ flip_ratio: 0.5
 expand_ratio: 1.0
 
 # anchor
-feature_shapes:
-- [192, 320]
-- [96, 160]
-- [48, 80]
-- [24, 40]
-- [12, 20]
 anchor_scales: [8]
 anchor_ratios: [0.5, 1.0, 2.0]
 anchor_strides: [4, 8, 16, 32, 64]
@@ -52,7 +46,6 @@ rpn_target_stds: [1.0, 1.0, 1.0, 1.0]
 neg_iou_thr: 0.3
 pos_iou_thr: 0.7
 min_pos_iou: 0.3
-num_bboxes: 245520
 num_gts: 128
 num_expected_neg: 256
 num_expected_pos: 128
@@ -121,7 +114,9 @@ batch_size: 2
 loss_scale: 256
 momentum: 0.91
 weight_decay: 0.00001
-epoch_size: 12
+epoch_size: 20
+run_eval: False
+interval: 1
 save_checkpoint: True
 save_checkpoint_epochs: 1
 keep_checkpoint_max: 5
@@ -152,6 +147,7 @@ coco_classes: ['background', 'person', 'bicycle', 'car', 'motorcycle', 'airplane
                      'refrigerator', 'book', 'clock', 'vase', 'scissors',
                      'teddy bear', 'hair drier', 'toothbrush']
 num_classes: 81
+prefix: ""
 
 # annotations file(json format or user defined text format)
 anno_path: ''
@@ -209,6 +205,7 @@ checkpoint_path: "Checkpoint file path."
 ckpt_file: 'fasterrcnn ckpt file.'
 result_path: "result file path."
 backbone: "backbone network name, options:resnet_v1_50, resnet_v1.5_50, resnet_v1_101, resnet_v1_152"
+interval: "val interval"
 
 ---
 device_target: ['Ascend', 'GPU', 'CPU']
