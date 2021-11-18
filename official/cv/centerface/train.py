@@ -290,6 +290,10 @@ if __name__ == "__main__":
                     'epoch[{}], {}, {:.2f} imgs/sec, lr:{}'
                     .format(epoch, loss_meter, fps, lr[i + (epoch-1)*config.steps_per_epoch])
                 )
+                print(
+                    "epoch time: {:5.3f} ms, per step time: {:5.3f} ms"
+                    .format(time_used*1000, time_used*1000/config.steps_per_epoch)
+                )
             t_end = time.time()
             loss_meter.reset()
 
