@@ -13,6 +13,7 @@
             - [Training](#training)
         - [Evaluation Process](#evaluation-process)
             - [Evaluation](#evaluation)
+            - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
@@ -186,25 +187,27 @@ bash run_standalone_eval_ascend.sh [cifar10|imagenet] [DATA_PATH] [CKPT_NAME] [D
 ```bash
 ├── cv
     ├── alexnet
-        ├── README.md                    // descriptions about alexnet
-        ├── requirements.txt             // package needed
+        ├── README.md                                // descriptions about alexnet
+        ├── requirements.txt                         // package needed
         ├── scripts
-        │   ├──run_standalone_train_gpu.sh             // train in gpu
-        │   ├──run_standalone_train_ascend.sh          // train in ascend
-        │   ├──run_standalone_eval_gpu.sh             //  evaluate in gpu
-        │   ├──run_standalone_eval_ascend.sh          //  evaluate in ascend
+        │   ├──run_standalone_train_gpu.sh           // train in gpu
+        │   ├──run_standalone_train_ascend.sh        // train in ascend
+        │   ├──run_standalone_eval_gpu.sh            //  evaluate in gpu
+        │   ├──run_standalone_eval_ascend.sh         //  evaluate in ascend
+        |   ├──run_onnx_eval.sh                      // evaluate using onnx model
         ├── src
-        │   ├──dataset.py             // creating dataset
-        │   ├──alexnet.py              // alexnet architecture
+        │   ├──dataset.py                            // creating dataset
+        │   ├──alexnet.py                            // alexnet architecture
         │   └──model_utils
-        │       ├──config.py               // Processing configuration parameters
-        │       ├──device_adapter.py       // Get cloud ID
-        │       ├──local_adapter.py        // Get local ID
-        │       └──moxing_adapter.py       // Parameter processing
-        ├── default_config.yaml            // Training parameter profile(cifar10)
-        ├── config_imagenet.yaml           // Training parameter profile(imagenet)
-        ├── train.py               // training script
-        ├── eval.py                // evaluation script
+        │       ├──config.py                         // Processing configuration parameters
+        │       ├──device_adapter.py                 // Get cloud ID
+        │       ├──local_adapter.py                  // Get local ID
+        │       └──moxing_adapter.py                 // Parameter processing
+        ├── default_config.yaml                      // Training parameter profile(cifar10)
+        ├── config_imagenet.yaml                     // Training parameter profile(imagenet)
+        ├── train.py                                 // training script
+        ├── eval.py                                  // evaluation script
+        ├── eval_onnx.py                             // evaluation script for onnx model
 ```
 
 ### [Script Parameters](#contents)
@@ -303,6 +306,40 @@ Before running the command below, please check the checkpoint path used for eval
   'Accuracy': 0.88512
   ```
 
+#### ONNX Evaluation
+
+- Export your model to ONNX
+
+  ```bash
+  # when using cifar10 dataset
+  python export.py --config_path default_config.yaml --ckpt_file /path/to/checkpoint.ckpt --file_name /path/to/exported.onnx --file_format ONNX --device_target CPU
+
+  # when using imagenet dataset
+  python export.py --config_path config_imagenet.yaml --ckpt_file /path/to/checkpoint.ckpt --file_name /path/to/exported.onnx --file_format ONNX --device_target CPU
+  ```
+
+- Run ONNX evaluation. Specify dataset type as "cifar10" or "imagenet"
+
+  ```bash
+  # when using cifar10 dataset
+  python eval_onnx.py --config_path default_config.yaml --data_path cifar-10-verify-bin --file_name /path/to/exported.onnx --device_target GPU > eval_log 2>&1 &
+
+  # when using imagenet dataset
+  python eval_onnx.py --config_path config_imagenet.yaml --data_path imagenet_val --file_name /path/to/exported.onnx --device_target GPU > output.eval_onnx.log 2>&1 &
+  ```
+
+    - The above python command will run in the background, you can view the results through the file `output.eval_onnx.log`. You will get the accuracy as following:
+
+    ```bash
+    # when using cifar10 dataset
+    # grep "accuracy" output.eval_onnx.log
+    accuracy: 0.8952
+
+    # when using the imagenet dataset
+    top-1 accuracy: 0.5787
+    top-5 accuracy: 0.8010
+    ```
+
 ## [Inference Process](#contents)
 
 ### [Export MindIR](#contents)
@@ -327,7 +364,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 - `MINDIR_PATH` specifies path of used "MINDIR" OR "AIR" model.
 - `DATASET_NAME` specifies datasets used to infer. value can be chosen between 'cifar10' and 'imagenet2012', defaulted is 'cifar10'
 - `DATASET_PATH` specifies path of cifar10 datasets
-- `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n', if you choose y, the cifar10 dataset will be processed in bin format, the imagenet2012 dataset will generate label json file.  
+- `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n', if you choose y, the cifar10 dataset will be processed in bin format, the imagenet2012 dataset will generate label json file.
 - `DEVICE_ID` is optional, default value is 0.
 
 ### [Result](#contents)

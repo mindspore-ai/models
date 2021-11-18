@@ -10,6 +10,7 @@ checkpoint_path: './checkpoint/'
 checkpoint_file: './checkpoint/checkpoint_alexnet-30_1562.ckpt'
 device_target: Ascend
 enable_profiling: False
+num_parallel_workers: 8
 
 ckpt_path: "/cache/train"
 ckpt_file: "/cache/train/checkpoint_alexnet-30_1562.ckpt"

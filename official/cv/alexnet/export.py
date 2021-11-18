@@ -37,10 +37,10 @@ def modelarts_process():
 def export_alexnet():
     """ export_alexnet """
     if config.dataset_name == 'imagenet':
-        net = AlexNet(num_classes=config.num_classes)
+        net = AlexNet(num_classes=config.num_classes, off_load=True)
         param_dict = load_checkpoint(config.ckpt_file)
         load_param_into_net(net, param_dict)
-        input_arr = Tensor(np.zeros([1, 3, config.image_height, config.image_width]), ms.float32)
+        input_arr = Tensor(np.zeros([config.batch_size, config.image_height, config.image_width, 3]), ms.uint8)
         export(net, input_arr, file_name=config.file_name, file_format=config.file_format)
     else:
         net = AlexNet(num_classes=config.num_classes)
