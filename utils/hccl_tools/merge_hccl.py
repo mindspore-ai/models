@@ -59,7 +59,7 @@ if __name__ == "__main__":
         server_list = j['server_list']
         for server in server_list:
             for device in server['device']:
-                device['rank_id'] = rank_id
+                device['rank_id'] = str(rank_id)
                 rank_id += 1
         hccl_table['server_list'].extend(server_list)
 
