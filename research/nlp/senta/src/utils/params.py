@@ -25,7 +25,7 @@ def replace_none(params):
                 try:
                     value = chr(int(value, base=16))
                     print("ord(value): ", ord(value))
-                except IOError:
+                except ValueError:
                     pass
                 params[key] = value
         return params
