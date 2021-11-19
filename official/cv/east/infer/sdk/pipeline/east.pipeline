@@ -33,7 +33,7 @@
             "funcLanguage":"c++",
             "dataSource": "mxpi_tensorinfer0",
             "postProcessConfigPath": "../data/models/east.cfg",
-            "postProcessLibPath": "./mxpi/build/libeastpostprocessor.so"
+            "postProcessLibPath": "../mxbase/build/libeastpostprocessor.so"
           },
           "factory": "mxpi_textobjectpostprocessor",
           "next": "mxpi_dataserialize0"

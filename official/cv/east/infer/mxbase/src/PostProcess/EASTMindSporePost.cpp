@@ -43,7 +43,7 @@ namespace MxBase {
 
         configData_.GetFileValue<float>("NMS_THRESH", nmsThresh_);
         configData_.GetFileValue<float>("SCORE_THRESH", scoreThresh_);
-        configData_.GetFileValue<int>("OUT_SIZE", outSize_);
+        configData_.GetFileValue<uint32_t>("OUT_SIZE", outSize_);
 
         LogInfo << "End to Init EASTPostProcess.";
         return APP_ERR_OK;
@@ -151,7 +151,7 @@ namespace MxBase {
     void EASTPostProcess::GetTextObjectInfo(const std::vector<std::vector<float>> &polys,
                                             const std::vector<MxBase::ResizedImageInfo> &resizedImageInfos,
                                             std::vector<TextObjectInfo> *textsInfos) {
-        auto boxes = lanms::merge_quadrangle_n9(polys, nmsThresh_);
+        auto boxes = lanms::MergeQuadrangleN9(polys, nmsThresh_);
         std::vector<std::vector<float>> ans;
         for (size_t i = 0; i < boxes.size(); i++) {
             auto &p = boxes[i];
