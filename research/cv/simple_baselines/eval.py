@@ -29,7 +29,7 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.config import config
 from src.pose_resnet import GetPoseResNet
 from src.dataset import flip_pairs
-from src.dataset import CreateDatasetCoco
+from src.dataset import keypoint_dataset
 from src.utils.coco import evaluate
 from src.utils.transforms import flip_back
 from src.utils.inference import get_final_preds
@@ -42,8 +42,8 @@ device_id = int(os.getenv('DEVICE_ID'))
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Evaluate')
-    parser.add_argument('--data_url', required=False, default=None, help='Location of data.')
-    parser.add_argument('--train_url', required=False, default=None, help='Location of evaluate outputs.')
+    parser.add_argument('--data_url', required=True, default=None, help='Location of data.')
+    parser.add_argument('--train_url', required=True, default=None, help='Location of evaluate outputs.')
     args = parser.parse_args()
     return args
 
@@ -117,7 +117,7 @@ def main():
     print('loading model ckpt from {}'.format(ckpt_name))
     load_param_into_net(model, load_checkpoint(ckpt_name))
 
-    valid_dataset = CreateDatasetCoco(
+    valid_dataset, _ = keypoint_dataset(
         train_mode=False,
         num_parallel_workers=config.TEST.NUM_PARALLEL_WORKERS,
     )

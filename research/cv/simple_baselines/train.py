@@ -32,7 +32,7 @@ from mindspore.common import set_seed
 from src.config import config
 from src.pose_resnet import GetPoseResNet
 from src.network_with_loss import JointsMSELoss, PoseResNetWithLoss
-from src.dataset import CreateDatasetCoco
+from src.dataset import keypoint_dataset
 
 if config.MODELARTS.IS_MODEL_ARTS:
     import moxing as mox
@@ -61,11 +61,16 @@ def get_lr(begin_epoch,
     return learning_rate
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Simpleposenet training")
+    '''
+    args
+    '''
+    parser = argparse.ArgumentParser(description="Simplebaseline training")
     parser.add_argument('--data_url', required=False, default=None, help='Location of data.')
     parser.add_argument('--train_url', required=False, default=None, help='Location of training outputs.')
     parser.add_argument('--device_id', required=False, default=None, type=int, help='Location of training outputs.')
-    parser.add_argument('--run_distribute', type=ast.literal_eval, default=False, help='Location of training outputs.')
+    parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"], default="Ascend",
+                        help="device target")
+    parser.add_argument('--run_distribute', required=False, default=False, help='Location of training outputs.')
     parser.add_argument('--is_model_arts', type=ast.literal_eval, default=False, help='Location of training outputs.')
     args = parser.parse_args()
     return args
@@ -74,12 +79,13 @@ def main():
     print("loading parse...")
     args = parse_args()
     device_id = args.device_id
+    device_target = args.device_target
     config.GENERAL.RUN_DISTRIBUTE = args.run_distribute
     config.MODELARTS.IS_MODEL_ARTS = args.is_model_arts
     if config.GENERAL.RUN_DISTRIBUTE or config.MODELARTS.IS_MODEL_ARTS:
         device_id = int(os.getenv('DEVICE_ID'))
     context.set_context(mode=context.GRAPH_MODE,
-                        device_target="Ascend",
+                        device_target=device_target,
                         save_graphs=False,
                         device_id=device_id)
 
@@ -97,11 +103,12 @@ def main():
     if config.MODELARTS.IS_MODEL_ARTS:
         mox.file.copy_parallel(src_url=args.data_url, dst_url=config.MODELARTS.CACHE_INPUT)
 
-    dataset = CreateDatasetCoco(rank=rank,
-                                group_size=device_num,
-                                train_mode=True,
-                                num_parallel_workers=config.TRAIN.NUM_PARALLEL_WORKERS,
-                                )
+    dataset, _ = keypoint_dataset(config,
+                                  rank=rank,
+                                  group_size=device_num,
+                                  train_mode=True,
+                                  num_parallel_workers=config.TRAIN.NUM_PARALLEL_WORKERS,
+                                  )
     net = GetPoseResNet(config)
     loss = JointsMSELoss(config.LOSS.USE_TARGET_WEIGHT)
     net_with_loss = PoseResNetWithLoss(net, loss)
