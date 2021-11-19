@@ -53,8 +53,8 @@ Dataset used: [CelebA](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html)
 
 ## [Environment Requirements](#contents)
 
-- Hardware（Ascend）
-    - Prepare hardware environment with Ascend processor.
+- Hardware（Ascend/GPU）
+    - Prepare hardware environment with Ascend processor.It also supports the use of GPU processor to prepare the hardware environment.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
@@ -65,14 +65,27 @@ Dataset used: [CelebA](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html)
 
 After installing MindSpore via the official website, you can start training and evaluation as follows:
 
-```python
-# enter script dir, train STGAN
-sh scripts/run_standalone_train.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID]
-# distributed training
-sh scripts/run_distribute_train.sh [RANK_TABLE_FILE] [EXPERIMENT_NAME] [DATA_PATH]
-# enter script dir, evaluate STGAN
-sh scripts/run_eval.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID] [CHECKPOINT_PATH]
-```
+- running on Ascend
+
+    ```python
+    # train STGAN
+    sh scripts/run_standalone_train.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID]
+    # distributed training
+    sh scripts/run_distribute_train.sh [RANK_TABLE_FILE] [EXPERIMENT_NAME] [DATA_PATH]
+    # evaluate STGAN
+    sh scripts/run_eval.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID] [CHECKPOINT_PATH]
+    ```
+
+- running on GPU
+
+    ```python
+    # train STGAN
+    sh scripts/run_standalone_train_gpu.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID]
+    # distributed training
+    sh scripts/run_distribute_train_gpu.sh [EXPERIMENT_NAME] [DATA_PATH]
+    # evaluate STGAN, if you want to evaluate distributed training result, you should enter ./train_parallel
+    sh scripts/run_eval_gpu.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID] [CHECKPOINT_PATH]
+    ```
 
 ## [Script Description](#contents)
 
@@ -84,9 +97,13 @@ sh scripts/run_eval.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID] [CHECKPOINT_PAT
         ├── README.md                    // descriptions about STGAN
         ├── requirements.txt             // package needed
         ├── scripts
-        │   ├──run_standalone_train.sh             // train in ascend
-        │   ├──run_eval.sh             //  evaluate in ascend
-        │   ├──run_distribute_train.sh             // distributed train in ascend
+        │   ├──docker_start.sh                  // start docker container
+        │   ├──run_standalone_train.sh          // train in ascend
+        │   ├──run_eval.sh                      //  evaluate in ascend
+        │   ├──run_distribute_train.sh          // distributed train in ascend
+        │   ├──run_standalone_train_gpu.sh      // train in GPU
+        │   ├──run_eval_gpu.sh                  //  evaluate in GPU
+        │   ├──run_distribute_train_gpu.sh      // distributed train in GPU
         ├── src
             ├── dataset
                 ├── datasets.py                 // creating dataset
@@ -114,7 +131,7 @@ Major parameters in train.py and utils/args.py as follows:
 --n_epochs: Total training epochs.
 --batch_size: Training batch size.
 --image_size: Image size used as input to the model.
---device_target: Device where the code will be implemented. Optional value is "Ascend".
+--device_target: Device where the code will be implemented. Optional value is "Ascend" or "GPU".
 ```
 
 ### [Training Process](#contents)
@@ -125,10 +142,20 @@ Major parameters in train.py and utils/args.py as follows:
 
   ```bash
   python train.py --dataroot ./dataset --experiment_name 128 > log 2>&1 &
-  # or enter script dir, and run the script
+  # or run the script
   sh scripts/run_standalone_train.sh ./dataset 128 0
   # distributed training
   sh scripts/run_distribute_train.sh ./config/rank_table_8pcs.json 128 /data/dataset
+  ```
+
+- running on GPU
+
+  ```bash
+  python train.py --dataroot ./dataset --experiment_name 128 --platform="GPU" > log 2>&1 &
+  # or run the script
+  sh scripts/run_standalone_train_gpu.sh ./dataset 128 0
+  # distributed training
+  sh scripts/run_distribute_train_gpu.sh 128 /data/dataset
   ```
 
   After training, the loss value will be achieved as follows:
@@ -155,8 +182,16 @@ Before running the command below, please check the checkpoint path used for eval
 
   ```bash
   python eval.py --dataroot ./dataset --experiment_name 128 > eval_log.txt 2>&1 &
-  # or enter script dir, and run the script
+  # or run the script
   sh scripts/run_eval.sh ./dataset 128 0 ./ckpt/generator.ckpt
+  ```
+
+- running on GPU
+
+  ```bash
+  python eval.py --dataroot ./dataset --experiment_name 128 --platform="GPU" > eval_log.txt 2>&1 &
+  # or run the script (if you want to evaluate distributed training result, you should enter ./train_parallel, then run the script)
+  sh scripts/run_eval_gpu.sh ./dataset 128 0 ./ckpt/generator.ckpt
   ```
 
   You can view the results in the output directory, which contains a batch of result sample images.
@@ -175,22 +210,22 @@ python export.py --ckpt_path [CHECKPOINT_PATH] --platform [PLATFORM] --file_form
 
 #### Evaluation Performance
 
-| Parameters                 | Ascend                                                      |
-| -------------------------- | ----------------------------------------------------------- |
-| Model Version              | V1                                                          |
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G             |
-| uploaded Date              | 05/07/2021 (month/day/year)                                 |
-| MindSpore Version          | 1.2.0                                                       |
-| Dataset                    | CelebA                                                      |
-| Training Parameters        | epoch=100,  batch_size = 128                                |
-| Optimizer                  | Adam                                                        |
-| Loss Function              | Loss                                                        |
-| Output                     | predict class                                               |
-| Loss                       | 6.5523                                                      |
-| Speed                      | 1pc: 400 ms/step;  8pcs:  143 ms/step                       |
-| Total time                 | 1pc: 41:36:07                                               |
-| Checkpoint for Fine tuning | 170.55M(.ckpt file)                                         |
-| Scripts                    | [STGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/STGAN) |
+| Parameters                 | Ascend                                                      | GPU |
+| -------------------------- | ----------------------------------------------------------- | --- |
+| Model Version              | V1                                                          | V1 |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G             | RTX-3090 |
+| uploaded Date              | 05/07/2021 (month/day/year)                                 | 11/23/2021 (month/day/year) |
+| MindSpore Version          | 1.2.0                                                       | 1.5.0rc1 |
+| Dataset                    | CelebA                                                      | CelebA |
+| Training Parameters        | epoch=100,  batch_size = 128                                | epoch=100, batch_size=64 |
+| Optimizer                  | Adam                                                        | Adam |
+| Loss Function              | Loss                                                        | Loss |
+| Output                     | predict class                                               | image |
+| Loss                       | 6.5523                                                      | 31.23 |
+| Speed                      | 1pc: 400 ms/step;  8pcs:  143 ms/step                       | 1pc: 369 ms/step;  8pcs:  68 ms/step |
+| Total time                 | 1pc: 41:36:07                                               | 1pc: 29:15:09 |
+| Checkpoint for Fine tuning | 170.55M(.ckpt file)                                         | 283.76M(.ckpt file) |
+| Scripts                    | [STGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/STGAN) | [STGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/STGAN) |
 
 ## [Model Description](#contents)
 

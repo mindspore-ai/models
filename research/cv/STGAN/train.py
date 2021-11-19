@@ -13,6 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """ STGAN TRAIN"""
+import time
 import tqdm
 
 from mindspore.common import set_seed
@@ -44,8 +45,9 @@ def train():
     model = STGANModel(args)
     it_count = 0
 
-    for _ in tqdm.trange(args.n_epochs, desc='Epoch Loop'):
-        for _ in tqdm.trange(iter_per_epoch, desc='Inner Epoch Loop'):
+    for _ in tqdm.trange(args.n_epochs, desc='Epoch Loop', unit='epoch'):
+        start_epoch_time = time.time()
+        for _ in tqdm.trange(iter_per_epoch, desc='Step Loop', unit='step'):
             if model.current_iteration > it_count:
                 it_count += 1
                 continue
@@ -56,11 +58,11 @@ def train():
                 model.optimize_parameters()
 
                 # saving model
-                if (it_count + 1) % args.save_freq == 0:
+                if (it_count + 1) % args.save_freq == 0 and args.rank == 0:
                     model.save_networks()
 
                 # sampling
-                if (it_count + 1) % args.sample_freq == 0:
+                if (it_count + 1) % args.sample_freq == 0 and args.rank == 0:
                     model.eval(data_loader)
 
             except KeyboardInterrupt:
@@ -69,7 +71,9 @@ def train():
 
             it_count += 1
             model.current_iteration = it_count
-
+        if args.rank == 0:
+            with open('performance.log', "a") as f:
+                f.write('average speed: {}ms/step\n'.format((time.time() - start_epoch_time)*1000/iter_per_epoch))
     model.save_networks()
     print('\n\n=============== finish training ===============\n\n')
 
