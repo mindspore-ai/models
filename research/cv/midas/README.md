@@ -14,6 +14,7 @@
     - [脚本参数](#脚本参数)
     - [训练过程](#训练过程)
     - [评估过程](#评估过程)
+- [推理过程](#推理过程)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -73,10 +74,49 @@ Midas的总体网络架构如下：
 
 - 预训练模型
 
-  当开始训练之前需要获取mindspore图像网络预训练模型，使用在resnext101上训练出来的预训练模型[resnext101_32x8d_wsl](<https://download.pytorch.org/models/ig_resnext101_32x8-c38310e5.pth>).
+  当开始训练之前需要获取mindspore图像网络预训练模型，使用在resnext101上训练出来的预训练模型[resnext101_32x8d_wsl](<https://download.pytorch.org/models/ig_resnext101_32x8-c38310e5.pth>),下载完pth文件之后,运行`src/utils/pth2ckpt.py`将pth文件转换为ckpt文件,转换完之后将ckpt文件命名为`midas_resnext_101_WSL.ckpt`并存放于`midas/ckpt/`目录下即可.
 - 数据集准备
 
-  midas网络模型使用ReDWeb数据集用于训练,使用DIW,ETH3D,Sintel,KITTI,NYU,TUM数据集进行推理,数据集可通过[ReDWeb](<https://www.paperswithcode.com/dataset/redweb>),[DIW](https://github.com/princeton-vl/relative_depth),[ETH3D](https://www.eth3d.net/),[Sintel](http://sintel.is.tue.mpg.de/),[Kitti](http://www.cvlibs.net/datasets/kitti/raw_data.php),[NYU](https://cs.nyu.edu/~silberman/datasets/),[TUM](https://vision.in.tum.de/data/datasets/rgbd-dataset)官方网站下载使用。
+  midas网络模型使用ReDWeb数据集用于训练,使用Sintel,KITTI,TUM数据集进行推理,数据集可通过[ReDWeb](<https://www.paperswithcode.com/dataset/redweb>),[Sintel](http://sintel.is.tue.mpg.de),[Kitti](http://www.cvlibs.net/datasets/kitti/raw_data.php),[TUM](https://vision.in.tum.de/data/datasets/rgbd-dataset/download#freiburg2_desk_with_person)官方网站下载使用.
+  Sintel数据集需要分别下载原图和深度图，放入到Sintel数据集文件夹中。TUM数据集根据处理函数得到associate.txt进行匹配数据。所有处理函数在preprocess文件夹下，具体可参考preprocess文件夹下的readme.md。
+- 下载完数据集之后,按如下目录格式存放数据集和代码并将`midas/mixdata.json`和数据集放到`data/`目录下即可:
+
+    ```path
+        └── midas
+        └── data
+            ├── mixdata.json
+            ├── ReDWeb_V1
+            |   ├─ Imgs
+            |   └─ RDs
+            ├── Kitti_raw_data
+            |   ├─ 2011_09_26_drive_0002_sync
+            |   |   ├─depth
+            |   |   └─image
+            |   ├─ ...
+            |   |   ├─depth
+            |   |   └─image
+            |   ├─ 2011_10_03_drive_0047_sync
+            |   |   ├─depth
+            |   |   └─image
+            ├── TUM
+            |   ├─ rgbd_dataset_freiburg2_desk_with_person
+            |   |   ├─ associate.txt
+            |   |   ├─ depth.txt
+            |   |   ├─ rgb.txt
+            |   |   ├─ rgb
+            |   |   |   ├─ rgb
+            |   |   |   ├─ 1311870426.504412.png
+            |   |   |   ├─ ...
+            |   |   |   └─ 1311870426.557430.png
+            |   |   |   ├─ depth
+            |   |   |   ├─ 1311870427.207687.png
+            |   |   |   ├─ ...
+            |   |   |   └─ 1311870427.376229.png
+            ├── Sintel
+            |   ├─ depth
+            |   ├─ final_left
+            |   └─ occlusions
+    ```
 
 - Ascend处理器环境运行
 
@@ -99,10 +139,19 @@ Midas的总体网络架构如下：
 
 └──midas
   ├── README.md
+  ├── ascend310_infer
+    ├── inc
+        └── utils.sh                       # 310头文件
+    ├── src
+        ├── main.cc                        # 310主函数
+        └── utils.cc                       # 310函数
+    ├── build.sh                           # 编译310环境
+    └── CMakeLists.txt                     # 310推理环境
   ├── scripts
     ├── run_distribute_train.sh            # 启动Ascend分布式训练（8卡）
     ├── run_eval.sh                        # 启动Ascend评估
-    └── run_standalone_train.sh            # 启动Ascend单机训练（单卡）
+    ├── run_standalone_train.sh            # 启动Ascend单机训练（单卡）
+    └── run_infer_310.sh                   # 启动Ascend的310推理
   ├── src
     ├── utils
         ├── loadImgDepth.py                # 读取数据集
@@ -117,6 +166,7 @@ Midas的总体网络架构如下：
   ├── midas_eval.py                        # 评估网络
   ├── midas_export.py                      # 模型导出
   ├── midas_run.py                         # 模型运行
+  ├── postprocess.py                       # 310后处理
   └── midas_train.py                       # 训练网络
 ```
 
@@ -240,7 +290,39 @@ sh run_eval.sh [DEVICE_ID] [DATA_NAME]
 打开val.json查看推理的结果,如下所示：
 
 ```text
-{"Kitti": 24.222 "Sintel":0.323 "TUM":15.08 "ETH3D":0.158 "NYU":20.499 }
+{"Kitti": 24.222 "Sintel":0.323 "TUM":15.08 }
+```
+
+# 推理过程
+
+## 导出MindIR
+
+```shell
+python midas_export.py
+```
+
+参数在config.yaml文件中设置
+
+### 在Ascend310执行推理
+
+在执行推理前，mindir文件必须通过`midas_export.py`脚本导出。以下展示了使用mindir模型执行推理的示例。
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MODEL_PATH] [DATA_PATH] [DATASET_NAME] [DEVICE_ID]
+```
+
+- `MODEL_PATH` mindir文件路径
+- `DATA_PATH` 推理数据集路径
+- `DATASET_NAME` 推理数据集名称，名称分别为Kitti，TUM，Sintel。
+- `DEVICE_ID` 可选，默认值为0。
+
+### 结果
+
+推理结果保存在脚本执行的当前路径，你可以在result_val.json中看到以下精度计算结果。
+
+```text
+{"Kitti": 18.27 "Sintel":0.314 "TUM":13.27 }
 ```
 
 # 模型描述
@@ -263,7 +345,7 @@ sh run_eval.sh [DEVICE_ID] [DATA_NAME]
 | 优化器           | Adam                        |
 | 损失函数       | 自定义损失函数          |
 | 速度               | 8pc: 423.4 ms/step        |
-| 训练性能   | "Kitti": 24.222 "Sintel":0.323    "TUM":15.08  "ETH3D":0.158 "NYU":20.499   |
+| 训练性能   | "Kitti": 24.222 "Sintel":0.323  "TUM":15.08    |
 
 # ModelZoo主页
 
