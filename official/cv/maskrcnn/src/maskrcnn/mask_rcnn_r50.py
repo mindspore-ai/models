@@ -600,7 +600,7 @@ class Mask_Rcnn_Resnet50(nn.Cell):
                                                        self.cast(x[1], mstype.float32),
                                                        self.cast(x[2], mstype.float32),
                                                        self.cast(x[3], mstype.float32))
-        roi_feats_mask_test = self.cast(roi_feats_mask_test, mstype.float32)
+        roi_feats_mask_test = self.cast(roi_feats_mask_test, self.cast_type)
         mask_fb_pred_all = self.rcnn_mask(roi_feats_mask_test)
         return mask_fb_pred_all
 
