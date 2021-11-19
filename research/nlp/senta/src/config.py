@@ -72,12 +72,12 @@ sstcfg = {
                         "split_char": " ",
                         "unk_token": "[UNK]",
                         "params": {
-                            "bpe_vocab_file": "../roberta_en.vocab.bpe",
-                            "bpe_json_file": "../roberta_en.encoder.json"
+                            "bpe_vocab_file": "roberta_en.vocab.bpe",
+                            "bpe_json_file": "roberta_en.encoder.json"
                         }
                     },
                     "need_convert": True,
-                    "vocab_path": "../roberta_en.vocab.txt",
+                    "vocab_path": "roberta_en.vocab.txt",
                     "max_seq_len": 512,
                     "truncation_type": 0,
                     "padding_id": 1,
@@ -90,7 +90,7 @@ sstcfg = {
                 }
             ],
             "config": {
-                "data_path": "../data/en/finetune/SST-2/train",
+                "data_path": "data/en/finetune/SST-2/train",
                 "shuffle": True,
                 "batch_size": 1,
                 "epoch": 10,
@@ -122,12 +122,12 @@ sstcfg = {
                         "split_char": " ",
                         "unk_token": "[UNK]",
                         "params": {
-                            "bpe_vocab_file": "../roberta_en.vocab.bpe",
-                            "bpe_json_file": "../roberta_en.encoder.json"
+                            "bpe_vocab_file": "roberta_en.vocab.bpe",
+                            "bpe_json_file": "roberta_en.encoder.json"
                         }
                     },
                     "need_convert": True,
-                    "vocab_path": "../roberta_en.vocab.txt",
+                    "vocab_path": "roberta_en.vocab.txt",
                     "max_seq_len": 512,
                     "truncation_type": 0,
                     "padding_id": 1,
@@ -153,7 +153,7 @@ sstcfg = {
                 }
             ],
             "config": {
-                "data_path": "../data/en/finetune/SST-2/test",
+                "data_path": "data/en/finetune/SST-2/test",
                 "shuffle": False,
                 "batch_size": 1,
                 "epoch": 1,
@@ -197,12 +197,12 @@ sstcfg = {
                         "split_char": " ",
                         "unk_token": "[UNK]",
                         "params": {
-                            "bpe_vocab_file": "../roberta_en.vocab.bpe",
-                            "bpe_json_file": "../roberta_en.encoder.json"
+                            "bpe_vocab_file": "roberta_en.vocab.bpe",
+                            "bpe_json_file": "roberta_en.encoder.json"
                         }
                     },
                     "need_convert": True,
-                    "vocab_path": "../roberta_en.vocab.txt",
+                    "vocab_path": "roberta_en.vocab.txt",
                     "max_seq_len": 512,
                     "truncation_type": 0,
                     "padding_id": 1,
@@ -216,7 +216,7 @@ sstcfg = {
                 }
             ],
             "config": {
-                "data_path": "../data/en/finetune/SST-2/dev",
+                "data_path": "data/en/finetune/SST-2/dev",
                 "shuffle": False,
                 "batch_size": 1,
                 "epoch": 1,
@@ -267,12 +267,12 @@ semcfg = {
                         "split_char": " ",
                         "unk_token": "[UNK]",
                         "params": {
-                            "bpe_vocab_file": "../roberta_en.vocab.bpe",
-                            "bpe_json_file": "../roberta_en.encoder.json"
+                            "bpe_vocab_file": "roberta_en.vocab.bpe",
+                            "bpe_json_file": "roberta_en.encoder.json"
                         }
                     },
                     "need_convert": True,
-                    "vocab_path": "../roberta_en.vocab.txt",
+                    "vocab_path": "roberta_en.vocab.txt",
                     "max_seq_len": 512,
                     "truncation_type": 0,
                     "padding_id": 1,
@@ -292,12 +292,12 @@ semcfg = {
                         "split_char": " ",
                         "unk_token": "[UNK]",
                         "params": {
-                            "bpe_vocab_file": "../roberta_en.vocab.bpe",
-                            "bpe_json_file": "../roberta_en.encoder.json"
+                            "bpe_vocab_file": "roberta_en.vocab.bpe",
+                            "bpe_json_file": "roberta_en.encoder.json"
                         }
                     },
                     "need_convert": True,
-                    "vocab_path": "../roberta_en.vocab.txt",
+                    "vocab_path": "roberta_en.vocab.txt",
                     "max_seq_len": 512,
                     "truncation_type": 0,
                     "padding_id": 1,
@@ -322,15 +322,15 @@ semcfg = {
                 }
             ],
             "config": {
-                "data_path": "../data/en/finetune/absa_laptops/train",
+                "data_path": "data/en/finetune/absa_laptops/train",
                 "shuffle": True,
                 "batch_size": 1,
                 "epoch": 10,
                 "sampling_rate": 1.0,
                 "extra_params": {
-                    "vocab_path": "../roberta_en.vocab.txt",
-                    "bpe_vocab_file": "../roberta_en.vocab.bpe",
-                    "bpe_json_file": "../roberta_en.encoder.json",
+                    "vocab_path": "roberta_en.vocab.txt",
+                    "bpe_vocab_file": "roberta_en.vocab.bpe",
+                    "bpe_json_file": "roberta_en.encoder.json",
                     "label_map_config": "",
                     "max_seq_len": 512,
                     "do_lower_case": True,
@@ -369,12 +369,12 @@ semcfg = {
                         "split_char": " ",
                         "unk_token": "[UNK]",
                         "params": {
-                            "bpe_vocab_file": "../roberta_en.vocab.bpe",
-                            "bpe_json_file": "../roberta_en.encoder.json"
+                            "bpe_vocab_file": "roberta_en.vocab.bpe",
+                            "bpe_json_file": "roberta_en.encoder.json"
                         }
                     },
                     "need_convert": True,
-                    "vocab_path": "../roberta_en.vocab.txt",
+                    "vocab_path": "roberta_en.vocab.txt",
                     "max_seq_len": 512,
                     "truncation_type": 0,
                     "padding_id": 1,
@@ -395,12 +395,12 @@ semcfg = {
                         "split_char": " ",
                         "unk_token": "[UNK]",
                         "params": {
-                            "bpe_vocab_file": "../roberta_en.vocab.bpe",
-                            "bpe_json_file": "../roberta_en.encoder.json"
+                            "bpe_vocab_file": "roberta_en.vocab.bpe",
+                            "bpe_json_file": "roberta_en.encoder.json"
                         }
                     },
                     "need_convert": True,
-                    "vocab_path": "../roberta_en.vocab.txt",
+                    "vocab_path": "roberta_en.vocab.txt",
                     "max_seq_len": 512,
                     "truncation_type": 0,
                     "padding_id": 1,
@@ -426,15 +426,15 @@ semcfg = {
                 }
             ],
             "config": {
-                "data_path": "../data/en/finetune/absa_laptops/test",
+                "data_path": "data/en/finetune/absa_laptops/test",
                 "shuffle": False,
                 "batch_size": 1,
                 "epoch": 1,
                 "sampling_rate": 1.0,
                 "extra_params": {
-                    "vocab_path": "../roberta_en.vocab.txt",
-                    "bpe_vocab_file": "../roberta_en.vocab.bpe",
-                    "bpe_json_file": "../roberta_en.encoder.json",
+                    "vocab_path": "roberta_en.vocab.txt",
+                    "bpe_vocab_file": "roberta_en.vocab.bpe",
+                    "bpe_json_file": "roberta_en.encoder.json",
                     "label_map_config": "",
                     "max_seq_len": 512,
                     "do_lower_case": True,

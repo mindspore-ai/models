@@ -109,13 +109,13 @@ if __name__ == "__main__":
         train_wrapper = dataset_reader.train_reader.data_generator()
         make_dataset(
             wrapper=train_wrapper,
-            output_path='../data/',
+            output_path='data/',
             task_name=args.job,
             mode="train")
         dev_wrapper = dataset_reader.dev_reader.data_generator()
         make_dataset(
             wrapper=dev_wrapper,
-            output_path='../data/',
+            output_path='data/',
             task_name=args.job,
             mode="dev")
     if args.job == "Sem-L":
@@ -127,12 +127,12 @@ if __name__ == "__main__":
         train_wrapper = dataset_reader.train_reader.data_generator()
         make_dataset(
             wrapper=train_wrapper,
-            output_path='../data/',
+            output_path='data/',
             task_name=args.job,
             mode="train")
         dev_wrapper = dataset_reader.test_reader.data_generator()
         make_dataset(
             wrapper=dev_wrapper,
-            output_path='../data/',
+            output_path='data/',
             task_name=args.job,
             mode="dev")
