@@ -22,7 +22,6 @@ import numpy as np
 from pycocotools.coco import COCO
 from src.detecteval import DetectEval
 
-
 _init_value = np.array(0.0)
 summary_init = {
     'Precision/mAP': _init_value,
@@ -51,7 +50,8 @@ def write_list_to_csv(file_path, data_to_write, append=False):
         writer.writerow(data_to_write)
 
 
-def coco_eval(config, result_files, result_types, coco, max_dets=(100, 300, 1000), single_result=False):
+def coco_eval(config, result_files, result_types, coco, max_dets=(100, 300, 1000), single_result=False,
+              plot_detect_result=False):
     """coco eval for fasterrcnn"""
     anns = json.load(open(result_files['bbox']))
     if not anns:
@@ -118,9 +118,11 @@ def coco_eval(config, result_files, result_types, coco, max_dets=(100, 300, 1000
         print("summary_metrics: ")
         print(summary_metrics)
 
-        res = calcuate_pr_rc_f1(config, coco, coco_dets, tgt_ids, iou_type)
+        if plot_detect_result:
+            res = calcuate_pr_rc_f1(config, coco, coco_dets, tgt_ids, iou_type)
+            return res
 
-    return res
+    return summary_metrics
 
 
 def calcuate_pr_rc_f1(config, coco, coco_dets, tgt_ids, iou_type):
@@ -192,7 +194,8 @@ def xyxy2xywh(bbox):
         _bbox[1],
         _bbox[2] - _bbox[0] + 1,
         _bbox[3] - _bbox[1] + 1,
-        ]
+    ]
+
 
 def bbox2result_1image(bboxes, labels, num_classes):
     """Convert detection results to a list of numpy arrays.
@@ -211,11 +214,12 @@ def bbox2result_1image(bboxes, labels, num_classes):
         result = [bboxes[labels == i, :] for i in range(num_classes - 1)]
     return result
 
+
 def proposal2json(dataset, results):
     """convert proposal to json mode"""
     img_ids = dataset.getImgIds()
     json_results = []
-    dataset_len = dataset.get_dataset_size()*2
+    dataset_len = dataset.get_dataset_size() * 2
     for idx in range(dataset_len):
         img_id = img_ids[idx]
         bboxes = results[idx]
@@ -227,6 +231,7 @@ def proposal2json(dataset, results):
             data['category_id'] = 1
             json_results.append(data)
     return json_results
+
 
 def det2json(dataset, results):
     """convert det to json mode"""
@@ -248,6 +253,7 @@ def det2json(dataset, results):
                 data['category_id'] = cat_ids[label]
                 json_results.append(data)
     return json_results
+
 
 def segm2json(dataset, results):
     """convert segm to json mode"""
@@ -282,6 +288,7 @@ def segm2json(dataset, results):
                 data['segmentation'] = segms[i]
                 segm_json_results.append(data)
     return bbox_json_results, segm_json_results
+
 
 def results2json(dataset, results, out_file):
     """convert result convert to json mode"""

@@ -68,7 +68,7 @@ def get_eval_result(anno_path, result_path):
 
     eval_types = ["bbox"]
     result_files = results2json(dataset_coco, outputs, "./results.pkl")
-    coco_eval(result_files, eval_types, dataset_coco, single_result=False)
+    coco_eval(config, result_files, eval_types, dataset_coco, single_result=False)
 
 if __name__ == '__main__':
     get_eval_result(config.anno_path, config.result_path)
