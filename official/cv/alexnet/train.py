@@ -38,8 +38,8 @@ from mindspore.nn.metrics import Accuracy
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.common import set_seed
 
-set_seed(1)
-de.config.set_seed(1)
+set_seed(1234)
+de.config.set_seed(2345)
 
 def modelarts_pre_process():
     pass
