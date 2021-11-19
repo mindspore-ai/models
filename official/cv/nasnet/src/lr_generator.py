@@ -16,7 +16,6 @@
 import math
 import numpy as np
 
-
 def get_lr(lr_init, lr_decay_rate, num_epoch_per_decay, total_epochs, steps_per_epoch, is_stair=False):
     """
     generate learning rate array

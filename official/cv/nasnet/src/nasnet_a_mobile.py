@@ -18,7 +18,9 @@ import numpy as np
 from mindspore import context
 from mindspore import Tensor
 import mindspore.nn as nn
+
 from mindspore.nn.loss.loss import LossBase
+
 import mindspore.ops.operations as P
 import mindspore.ops.functional as F
 import mindspore.ops.composite as C
