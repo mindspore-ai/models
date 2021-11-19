@@ -14,6 +14,7 @@
 # ============================================================================
 """Entry point for training AttGAN network"""
 
+import time
 import argparse
 import datetime
 import json
@@ -96,6 +97,7 @@ def parse(arg=None):
     parser.add_argument('--resume_model', action='store_true')
     parser.add_argument('--gen_ckpt_name', type=str, default='')
     parser.add_argument('--dis_ckpt_name', type=str, default='')
+    parser.add_argument('--platform', type=str, default='Ascend', choices=('Ascend', 'GPU'))
 
     return parser.parse_args(arg)
 
@@ -108,7 +110,7 @@ args.n_attrs = len(args.attrs)
 
 # initialize environment
 set_seed(1)
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False)
+context.set_context(mode=context.GRAPH_MODE, device_target=args.platform, save_graphs=False)
 
 if args.run_distribute:
     if os.getenv("DEVICE_ID", "not_set").isdigit():
@@ -208,7 +210,7 @@ if __name__ == '__main__':
 
     it = 0
     for epoch in range(args.epochs):
-
+        start_epoch_time = time.time()
         for data in progressbar(train_loader, train_iter):
             img_a = data["image"]
             att_a = data["attr"]
@@ -240,3 +242,7 @@ if __name__ == '__main__':
                 ckpt_cb_gen.step_end(gen_run_context)
                 ckpt_cb_dis.step_end(dis_run_context)
             it += 1
+        if rank == 0:
+            speed = (time.time() - start_epoch_time)*1000/train_dataset.get_dataset_size()
+            with open('performance.log', "a") as f:
+                f.write('average speed: {}ms/step\n'.format(speed))
