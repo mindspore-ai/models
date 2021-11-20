@@ -13,9 +13,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-export DEVICE_ID=$1
-DATA_DIR=$2
-python ./train.py  \
-    --device_id=$DEVICE_ID  \
-    --dataset_path=$DATA_DIR > log.txt 2>&1 &
+if [ $# != 3 ];then
+  echo "usage sh run_eval_gpu.sh [device_id(0)] [checkpoint_path] [dataset_path] "
+exit 1
+fi
 
+# check dataset file
+if [ ! -d $3 ];then
+    echo "error: DATASET_PATH=$3 is not a directory"
+exit 1
+fi
+
+if [ ! -f $2 ];then
+  echo "error: RANK_TABLE_FILE=$2 is not a file"
+  exit 1
+fi
+
+export DEVICE_ID=$1
+PATH_CHECKPOINT=$2
+DATA_DIR=$3
+
+python3 ../eval.py  \
+    --device_id=$DEVICE_ID \
+    --checkpoint_path=$PATH_CHECKPOINT \
+    --dataset_path=$DATA_DIR \
+    --device_target=GPU > eval.log 2>&1 &

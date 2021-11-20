@@ -20,17 +20,17 @@ import argparse
 from mindspore import context
 from mindspore import Tensor
 from mindspore.nn import SGD, RMSProp
-from mindspore.train.model import Model
+from mindspore.train.model import Model, ParallelMode
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_group_size, get_rank
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.common import dtype as mstype
 from mindspore.common import set_seed
 
 from src.lr_generator import get_lr
 from src.models.effnet import EfficientNet
-from src.config import config
+from src.config import config_gpu, config_ascend
 from src.monitor import Monitor
 from src.dataset import create_dataset
 from src.loss import CrossEntropySmooth
@@ -50,13 +50,15 @@ if __name__ == '__main__':
 
     parser.add_argument('--run_modelarts', type=ast.literal_eval, default=False, help='Run mode')
     parser.add_argument('--resume', type=str, default='', help='resume training with existed checkpoint')
+    parser.add_argument('--device_target', type=str, choices=["Ascend", "GPU"], default="Ascend", help='Device target')
     args_opt = parser.parse_args()
 
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, save_graphs=False)
 
     # init distributed
     if args_opt.run_modelarts:
         import moxing as mox
+
         device_id = int(os.getenv('DEVICE_ID'))
         device_num = int(os.getenv('RANK_SIZE'))
         context.set_context(device_id=device_id)
@@ -69,14 +71,24 @@ if __name__ == '__main__':
         mox.file.copy_parallel(args_opt.data_url, local_data_url)
     else:
         if args_opt.run_distribute:
-            device_id = int(os.getenv('DEVICE_ID'))
-            device_num = int(os.getenv('RANK_SIZE'))
-            context.set_context(device_id=device_id)
-            init()
-            context.reset_auto_parallel_context()
-            context.set_auto_parallel_context(device_num=device_num,
-                                              parallel_mode=context.ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
+            if args_opt.device_target == "GPU":
+                init()
+                context.reset_auto_parallel_context()
+                device_id = get_rank()
+                device_num = get_group_size()
+                print("run distribute......", "deviceNum:", device_num, ",rank_id:", device_id)
+                context.set_auto_parallel_context(device_num=device_num,
+                                                  parallel_mode=ParallelMode.DATA_PARALLEL,
+                                                  gradients_mean=True)
+            else:
+                device_id = int(os.getenv('DEVICE_ID'))
+                device_num = int(os.getenv('RANK_SIZE'))
+                context.set_context(device_id=device_id)
+                init()
+                context.reset_auto_parallel_context()
+                context.set_auto_parallel_context(device_num=device_num,
+                                                  parallel_mode=context.ParallelMode.DATA_PARALLEL,
+                                                  gradients_mean=True)
         else:
             context.set_context(device_id=args_opt.device_id)
             device_num = 1
@@ -85,6 +97,11 @@ if __name__ == '__main__':
     # define network
     net = EfficientNet()
     net.to_float(mstype.float16)
+
+    if args_opt.device_target == "Ascend":
+        config = config_ascend
+    elif args_opt.device_target == "GPU":
+        config = config_gpu
 
     # define loss
     if not config.use_label_smooth:

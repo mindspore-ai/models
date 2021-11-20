@@ -13,27 +13,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 3 ];then
-  echo "usage sh run_eval.sh [device_id(0)] [checkpoint_path] [dataset_path]"
+if [ $# != 3 ]
+then
+    echo "usage sh run_distribute_gpu.sh [device_num] [device_id(0,1,2,3,4,5,6,7)] [dataset_path]"
 exit 1
 fi
 
 # check dataset file
-if [ ! -d $3 ];then
+if [ ! -d $3 ]
+then
     echo "error: DATASET_PATH=$3 is not a directory"
 exit 1
 fi
 
-if [ ! -f $2 ];then
-  echo "error: PATH_CHECKPOINT=$2 is not a file"
-  exit 1
+export DEVICE_NUM=$1
+export RANK_SIZE=$1
+
+#create train directory to save train.log
+BASEPATH=$(cd "`dirname $0`" || exit; pwd)
+echo $BASEPATH
+if [ -d "../train" ];
+then
+    rm -rf ../train
 fi
+mkdir ../train
+cd ../train || exit
 
-export DEVICE_ID=$1
-PATH_CHECKPOINT=$2
-DATA_DIR=$3
+export CUDA_VISIBLE_DEVICES="$2"
+mpirun --allow-run-as-root -n $1  --output-filename log_output --merge-stderr-to-stdout \
+ python ${BASEPATH}/../train.py \
+    --run_distribute True \
+    --dataset_path $3 \
+    --device_target GPU > train.log 2>&1 &
 
-python ./eval.py  \
-    --device_id=$DEVICE_ID \
-    --checkpoint_path=$PATH_CHECKPOINT \
-    --dataset_path=$DATA_DIR > eval.log 2>&1 &
+
+

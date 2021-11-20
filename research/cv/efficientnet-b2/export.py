@@ -20,17 +20,17 @@ import numpy as np
 from mindspore import context, Tensor, load_checkpoint, load_param_into_net, export
 from src.models.effnet import EfficientNet
 
-
 parser = argparse.ArgumentParser(description='Image classification')
 parser.add_argument('--checkpoint_path', type=str, required=True, help='Checkpoint file path')
 parser.add_argument("--file_name", type=str, default="efficientnet-b2", help="output file name.")
 parser.add_argument('--width', type=int, default=260, help='input width')
 parser.add_argument('--height', type=int, default=260, help='input height')
 parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
+parser.add_argument('--device_target', type=str, choices=["Ascend", "GPU"], default="Ascend", help='Device target')
 args_opt = parser.parse_args()
 
 if __name__ == '__main__':
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
 
     net = EfficientNet(1.1, 1.2, dropout_rate=0.3)
 

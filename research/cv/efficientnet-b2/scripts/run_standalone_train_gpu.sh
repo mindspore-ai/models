@@ -13,9 +13,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-export DEVICE_ID=$1
-DATA_DIR=$2
-python ./train.py  \
-    --device_id=$DEVICE_ID  \
-    --dataset_path=$DATA_DIR > log.txt 2>&1 &
+if [ $# != 2 ]
+then
+    echo "usage sh run_distribute_gpu.sh [device_id] [dataset_path]"
+exit 1
+fi
 
+# check dataset file
+if [ ! -d $2 ]
+then
+    echo "error: DATASET_PATH=$2 is not a directory"
+exit 1
+fi
+
+#create train directory to save train.log
+BASEPATH=$(cd "`dirname $0`" || exit; pwd)
+echo $BASEPATH
+if [ -d "../train" ];
+then
+    rm -rf ../train
+fi
+mkdir ../train
+cd ../train || exit
+
+export CUDA_VISIBLE_DEVICES=$1
+python ${BASEPATH}/../train.py \
+        --dataset_path $2 \
+        --device_target GPU > train.log 2>&1 &
