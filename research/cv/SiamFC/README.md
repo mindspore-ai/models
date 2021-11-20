@@ -39,8 +39,8 @@ used Dataset :[ILSVRC2015-VID](http://bvisionweb1.cs.unc.edu/ilsvrc2015/ILSVRC20
 
 # [Environmental requirements](#Contents)
 
-- Hardware :(Ascend)
-    - Prepare Ascend processor to build hardware environment
+- Hardware :(Ascend/GPU)
+    - Prepare Ascend/GPU processor to build hardware environment
 - frame:
     - [Mindspore](https://www.mindspore.cn/install/en)
 - For details, please refer to the following resources:
@@ -57,31 +57,60 @@ After installing mindspree through the official website, you can follow the foll
 
 - Run the python script to preprocess the data set
 
-  python src/create_dataset_ILSVRC.py -d data_dir -o output_dir
+  ```bash
+  # create dataset
+  python src/create_dataset_ILSVRC.py --d data_dir --o output_dir
 
-- Run Python script to create LMDB
+  # Run Python script to create LMDB
+  python src/create_lmdb.py --d data_dir --o output_dir
 
-  python src/create_lmdb.py -d data_dir -o output_dir
-
-  for example：
+  for example:
   data_dir = '/data/VID/ILSVRC_VID_CURATION_train'
   output_dir = '/data/VID/ILSVRC_VID_CURATION_train.lmdb'
 
   __Remarks:The encrypted pathname is used as the index.Therefore,you cannot change the location of the dataset
   after creating it, because you need to find the corresponding image according to the index.__
+  ```
 
-- Run the script for training
+- Run on Ascend
 
-  bash run_standalone_train_ascend.sh [Device_ID] [Dataset_path]
+  ```bash
+  # run training example
+  python train.py --device_id [DEVICE_ID] --data_path [DATA_PATH] > log.txt 2>&1 &
+
+  # run bash training example
+  bash scripts/run_standalone_train_ascend.sh [Device_ID] [Dataset_path]
   Remarks:For the training set position after preprocessing
 
-- more
-
+  # more
   This example is single card training.
 
-- Run the script for evaluation
+  # Run the python script for evaluation
+  python eval.py --device_id [DEVICE_ID] --model_path [MODEL_PATH] --dataset_path [DATASET_PATH] > log.txt 2>&1 &
 
-  python eval.py,need got10k toolkit,the dataset is OTB2013(50) or OTB2015(100)
+  # Run the bash script for evaluation
+  bash scripts/run_eval_ascend.sh DEVICE_ID MODEL_PATH DATASET_PATH
+  ```
+
+- Run on GPU
+
+  ```bash
+  # run training example.
+  python train.py --device_id [DEVICE_ID] --data_path [DATA_PATH] --eval_data [EVAL_DATA_PATH] > log.txt 2>&1 &
+
+  # run bash training example.
+  bash scripts/run_standalone_train_gpu.sh [Device_ID] [Dataset_path] [Eval_Data_Path]
+  Remarks:For the training set position after preprocessing
+
+  # more
+  This example is single card training.
+
+  # Run the python script for evaluation.
+  python eval.py --device_id [DEVICE_ID] --model_path [MODEL_PATH] --dataset_path [DATASET_PATH] --device_target [DEVICE_TARGET] > log.txt 2>&1 &
+
+  # Run the bash script for evaluation.
+  bash scripts/run_eval_gpu.sh DEVICE_ID MODEL_PATH DATASET_PATH
+  ```
 
 # [Script description](#Contents)
 
@@ -128,52 +157,95 @@ python train.py and config.py The main parameters are as follows:
 
 ### Training
 
-- Running in ascend processor environment
+- Running in Ascend processor environment
 
-```python
-  python train.py  --device_id=${DEVICE_ID} --data_path=${DATASET_PATH}
-```
+  ```bash
+    python train.py  --device_id=${DEVICE_ID} --data_path=${DATASET_PATH}
+  ```
 
-- After training, the loss value is as follows:
+  # After training, the loss value is as follows
 
-```bash
-  grep "loss is " log
-  epoch: 1 step: 1, loss is 1.14123213
-  ...
-  epoch: 1 step: 1536, loss is 0.5234123
-  epoch: 1 step: 1537, loss is 0.4523326
-  epoch: 1 step: 1538, loss is 0.6235748
- ...
-```
+  ```bash
+    grep "loss is " log
+    epoch: 1 step: 1, loss is 1.14123213
+    ...
+    epoch: 1 step: 1536, loss is 0.5234123
+    epoch: 1 step: 1537, loss is 0.4523326
+    epoch: 1 step: 1538, loss is 0.6235748
+   ...
+  ```
 
-- Model checkpoints are saved in the current directory.
+  # Model checkpoints are saved in the current directory
 
-- After training, the loss value is as follows:
+  # After training, the loss value is as follows
 
-```bash
-  grep "loss is " log:
-  epoch: 30 step: 1, loss is 0.12534634
-  ...
-  epoch: 30 step: 1560, loss is 0.2364573
-  epoch: 30 step: 1561, loss is 0.156347
-  epoch: 30 step: 1561, loss is 0.173423
-```
+  ```bash
+    grep "loss is " log:
+    epoch: 30 step: 1, loss is 0.12534634
+    ...
+    epoch: 30 step: 1560, loss is 0.2364573
+    epoch: 30 step: 1561, loss is 0.156347
+    epoch: 30 step: 1561, loss is 0.173423
+  ```
+
+- Running in GPU processor environment
+
+  ```bash
+    python train.py  --device_id=${DEVICE_ID} --data_path=${DATASET_PATH} --device_target "GPU"
+  ```
+
+  # After training, the loss value is as follows
+
+  ```bash
+    grep "loss is " log
+    epoch: 1 step: 6650, loss is 0.3076
+    ...
+    epoch: 2 step: 6650, loss is 0.1665
+    epoch: 3 step: 6650, loss is 0.44
+    epoch: 4 step: 6650, loss is 0.3164
+   ...
+  ```
+
+  # Model checkpoints are saved in the current directory
+
+  # After training, the loss value is as follows
+
+  ```bash
+    grep "loss is " log:
+    epoch: 20 step: 6650, loss is 0.1871
+    ...
+    epoch: 48 step: 6650, loss is 0.1437
+    epoch: 49 step: 6650, loss is 0.1476
+    epoch: 50 step: 6650, loss is 0.1718
+  ```
 
 ## Evaluation process
 
 Check the checkpoint path used for evaluation before running the following command.
 
-- Running in ascend processor environment
+- Running in Ascend processor environment
 
-```bash
-  python eval.py  --device_id=${DEVICE_ID} --model_path=${MODEL_PATH}
-```
+  ```bash
+    python eval.py  --device_id=${DEVICE_ID} --model_path=${MODEL_PATH}
+  ```
 
-  The results were as follows:
+    The results were as follows:
 
-```bash
-  SiamFC_159_50_6650.ckpt -prec_score:0.777 -succ_score:0.589 _succ_rate:0.754
-```
+  ```bash
+    SiamFC_159_50_6650.ckpt -prec_score:0.777 -succ_score:0.589 _succ_rate:0.754
+  ```
+
+- Running in GPU processor environment
+
+  ```bash
+    python eval.py  --device_id=${DEVICE_ID} --model_path=${MODEL_PATH} --device_target "GPU"
+  ```
+
+    The results were as follows:
+
+  ```bash
+    SiamFC-50_6650.ckpt -prec_score:0.791 -succ_score:0.591 -succ_rate:0.761
+  ```
 
 # [Model description](#Contents)
 
@@ -181,15 +253,15 @@ Check the checkpoint path used for evaluation before running the following comma
 
 ### Evaluate performance
 
-|parameter   | Ascend        |
-| -------------------------- | ---------------------------------------------- |
-|resources     | Ascend 910；CPU 2.60GHz, 192core；memory：755G |
-|Upload date   |2021.5.20         |
-|mindspore version   |mindspore1.2.0     |
-|training parameter | epoch=50,step=6650,batch_size=8,lr_init=1e-2,lr_endl=1e-5   |
-|optimizer     |SGD optimizer，momentum=0.0,weight_decay=0.0    |
-|loss function     |BCEWithLogits   |
-|training speed    | epoch time：285693.557 ms per step time :42.961 ms |
-|total time        |about 5 hours    |
-|Script URL        |<https://gitee.com/mindspore/models/tree/r1.5/research/cv/SiamFC>  |
-|Random number seed         |set_seed = 1234     |
+|parameter   | Ascend        | GPU                                                                  |
+| -------------------------- | ---------------------------------------------- |---------------------|
+|resources     | Ascend 910；CPU 2.60GHz, 192core；memory：755G | GPU GTX3090： CPU 2.90GHz, 64core；memory：251G |
+|Upload date   |2021.5.20         | 2021.11.19        |
+|mindspore version   |mindspore1.2.0     |    mindspore 1.5        |
+|training parameter | epoch=50,step=6650,batch_size=8,lr_init=1e-2,lr_endl=1e-5   | epoch=50,step=6650,batch_size=8,lr_init=3.5e-2,lr_endl=1e-5 |
+|optimizer     |SGD optimizer，momentum=0.0,weight_decay=0.0    |  SGD optimizer，momentum=0.0,weight_decay=0.0   |
+|loss function     |BCEWithLogits   |     BCEWithLogits     |
+|training speed    | epoch time：285693.557 ms per step time :42.961 ms |  epoch time：122536.251 per step time :18.427 ms   |
+|total time        |about 5 hours    |    about 1.5 hours
+|Script URL        |[SiamFC](https://gitee.com/mindspore/models/tree/master/research/cv/SiamFC)  |  [SiamFC](https://gitee.com/mindspore/models/tree/master/research/cv/SiamFC)|
+|Random number seed         |set_seed = 1234     |  set_seed = 1234     |

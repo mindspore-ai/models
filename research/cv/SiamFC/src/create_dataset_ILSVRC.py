@@ -14,10 +14,10 @@
 # ============================================================================
 """start create_dataset_ILSVRC"""
 import pickle
+import sys
 import os
 import functools
 import xml.etree.ElementTree as ET
-import sys
 import argparse
 import multiprocessing
 from multiprocessing import Pool
