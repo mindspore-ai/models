@@ -16,6 +16,11 @@
         - [分布式训练](#分布式训练)
     - [评估过程](#评估过程)
         - [评估](#评估)
+    - [导出过程](#导出过程)
+        - [导出](#导出)
+    - [推理过程](#推理过程)
+        - [前处理](#前处理)
+        - [推理](#推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -274,6 +279,44 @@ PoseNet是剑桥大学提出的一种鲁棒、实时的6DOF（单目六自由度
 
   ```bash
   Median error  3.56644630432129 m  and  3.07089155413442 degrees
+  ```
+
+## 导出过程
+
+### 导出
+
+在执行推理之前，需要通过export.py导出mindir文件。
+
+```shell
+python export.py --ckpt_url [CKPT_URL] --dataset [DATASET]
+```
+
+ckpt_url和dataset为必填项。
+
+## 推理过程
+
+### 前处理
+
+在执行推理前，需要进行数据集预处理，将image和label转换为bin文件。
+
+```shell
+python precess.py --result_path [RESULT_PATH]
+```
+
+result_path 为输出路径。
+
+### 推理
+
+在还行推理之前我们需要先导出模型，mindir可以在本地环境上导出。batch_size只支持1。
+
+- 在昇腾310上使用KingsCollege数据集进行推理
+
+  推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
+
+  ```shell
+  # Ascend310 inference
+  bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_PATH] [DEVICE_ID]
+  Median error  1.8618096113204956 m  and  4.133928879581082 degrees.
   ```
 
 # 模型描述
