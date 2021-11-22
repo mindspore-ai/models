@@ -12,20 +12,42 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""export AIR file."""
+"""export MINDIR file."""
 import argparse
 import numpy as np
+import mindspore.nn as nn
+import mindspore.ops as ops
 from mindspore import Tensor, context, load_checkpoint, load_param_into_net, export
 from src.deeplab_v3plus import DeepLabV3Plus
 
-context.set_context(mode=context.GRAPH_MODE, save_graphs=False)
+context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
+
+
+class BuildEvalNetwork(nn.Cell):
+    """BuildEvalNetwork"""
+
+    def __init__(self, net, input_format="NCHW"):
+        super(BuildEvalNetwork, self).__init__()
+        self.network = net
+        self.softmax = nn.Softmax(axis=1)
+        self.transpose = ops.Transpose()
+        self.format = input_format
+
+    def construct(self, x):
+        if self.format == "NHWC":
+            x = self.transpose(x, (0, 3, 1, 2))
+        output = self.network(x)
+        output = self.softmax(output)
+        return output
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='checkpoint export')
-    parser.add_argument('--checkpoint', type=str, default='', help='checkpoint of deeplabv3 (Default: None)')
-    parser.add_argument('--model', type=str, default='DeepLabV3plus_s8',
+    parser.add_argument('--checkpoint', type=str, default='', help='checkpoint of deeplabv3+ (Default: None)')
+    parser.add_argument('--filename', type=str, default='deeplabv3plus16.mindir', help='filename of model')
+    parser.add_argument('--model', type=str, default='DeepLabV3plus_s16',
                         choices=['DeepLabV3plus_s16', 'DeepLabV3plus_s8'],
-                        help='Select model structure (Default: DeepLabV3plus_s8)')
+                        help='Select model structure (Default: DeepLabV3plus_s16)')
     parser.add_argument('--num_classes', type=int, default=21, help='the number of classes (Default: 21)')
     args = parser.parse_args()
 
@@ -33,9 +55,10 @@ if __name__ == '__main__':
         network = DeepLabV3Plus('eval', args.num_classes, 16, True)
     else:
         network = DeepLabV3Plus('eval', args.num_classes, 8, True)
+    network = BuildEvalNetwork(network, "NCHW")
     param_dict = load_checkpoint(args.checkpoint)
 
     # load the parameter into net
     load_param_into_net(network, param_dict)
-    input_data = np.random.uniform(0.0, 1.0, size=[32, 3, 513, 513]).astype(np.float32)
-    export(network, Tensor(input_data), file_name=args.model + '-300_11.air', file_format='AIR')
+    input_data = Tensor(np.ones([1, 3, 513, 513]).astype(np.float32))
+    export(network, input_data, file_name=args.filename, file_format='MINDIR')

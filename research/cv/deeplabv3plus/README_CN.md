@@ -25,6 +25,10 @@
             - [GPU处理器环境运行](#gpu处理器环境运行-1)
         - [结果](#结果-1)
             - [训练准确率](#训练准确率)
+    - [导出mindir模型](#导出mindir模型)
+    - [推理过程](#推理过程)
+        - [用法](#用法-2)
+        - [结果](#结果-2)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -275,7 +279,7 @@ bash run_eval_s8_multiscale_flip_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PAT
     ├── loss.py                               # DeepLabV3+的损失定义
   ├── eval.py                                 # 评估网络
   ├── train.py                                # 训练网络
-  ├──requirements.txt                        # requirements文件
+  ├──requirements.txt                         # requirements文件
   └──README.md
 ```
 
@@ -579,6 +583,42 @@ python ${train_code_path}/eval.py --data_root=/PATH/TO/DATA  \
 
 注意：OS指输出步长（output stride）， MS指多尺度（multiscale）。
 
+## 导出mindir模型
+
+```shell
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+参数`ckpt_file` 是必需的，`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中进行选择。
+
+## 推理过程
+
+### 用法
+
+```shell
+# Ascend310 推理
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_ID]
+```
+
+`MINDIR_PATH` mindir模型的路径
+
+`DATA_PATH` 测试集的文件实际路径（./VOCdevkit/VOC2012/JPEGImages/）
+
+`DATA_ROOT` Pascal VOC数据集和语义边界数据集的根目录
+
+`DATA_LIST` 数据清单voc_val_lst.txt的路径，该清单由get_dataset_list.py可得
+
+`DEVICE_ID` 可选，默认值为 0
+
+### 结果
+
+推理结果保存在当前路径，可在acc.log中看到最终精度结果。
+
+| **Network**    | OS=16 | OS=8 |  mIOU  |
+| :----------: | :-----: | :-----: | :-----: |
+| deeplab_v3+ |  √    |      | 79.63 |
+| deeplab_v3+ |       | √    | 79.33 |
+
 # 模型描述
 
 ## 性能
@@ -599,7 +639,7 @@ python ${train_code_path}/eval.py --data_root=/PATH/TO/DATA  \
 | 损失 | 0.0041095633 |0.003395824|
 | 性能 | 187736.386 ms（单卡，s16）<br>  44474.187 ms（八卡，s16） |  1080 ms/step（单卡，s16）|  
 | 微调检查点 | 453M （.ckpt文件） | 454M （.ckpt文件）|
-| 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/deeplabv3plus) |[链接](https://gitee.com/mindspore/models/tree/master/research/cv/deeplabv3plus) |
+| 脚本 | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/deeplabv3plus) |[链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/deeplabv3plus) |
 
 # 随机情况说明
 
@@ -607,4 +647,4 @@ dataset.py中设置了“create_dataset”函数内的种子，同时还使用�
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/models)。
+ 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
