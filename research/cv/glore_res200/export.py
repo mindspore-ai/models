@@ -22,7 +22,7 @@ import numpy as np
 from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
 import mindspore.common.dtype as ms
 
-from src.config import config
+from src.config import config1 as config
 from src.glore_resnet200 import glore_resnet200
 
 parser = argparse.ArgumentParser(description='Classification')
