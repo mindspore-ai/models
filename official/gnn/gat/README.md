@@ -109,8 +109,8 @@ After installing MindSpore via the official website and Dataset is correctly gen
 - running on Ascend
 
   ```bash
-  # run training example with cora dataset, DATASET_NAME is cora
-  bash run_train_ascend.sh [DATASET_NAME]
+  # run training example with cora dataset, DATASET_NAME is cora, DEVICE_ID is the card number(optional) to run the program.
+    bash run_train_ascend.sh [DATASET_NAME] [DATASET_DIR] [DEVICE_ID](optional)
   ```
 
 - running on GPU
@@ -219,7 +219,7 @@ Parameters for both training and evaluation can be set in default_config.yaml.
 - running on Ascend
 
   ```shell
-  bash run_train_ascend.sh [DATASET_NAME]
+  bash run_train_ascend.sh [DATASET_NAME] [DATASET_DIR] [DEVICE_ID](optional)
   ```
 
   Training result will be stored in the scripts path, whose folder name begins with "train". You can find the result like the

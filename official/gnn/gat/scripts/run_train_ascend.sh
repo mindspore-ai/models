@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]
+if [[ $# != 2 && $# != 3 ]]
 then 
-    echo "Usage: sh run_train_ascend.sh [DATASET_NAME] [DATA_DIR]"
+    echo "Usage: sh run_train_ascend.sh [DATASET_NAME] [DATASET_DIR] [DEVICE_ID](optional)"
 exit 1
 fi
 
@@ -27,7 +27,12 @@ echo $DATASET_NAME
 ulimit -u unlimited
 export DEVICE_NUM=1
 export RANK_SIZE=$DEVICE_NUM
-export DEVICE_ID=0
+if [ -z $3 ]
+then
+    export DEVICE_ID=0
+else
+    export DEVICE_ID=$3
+fi
 export RANK_ID=0
 
 if [ -d "train" ];

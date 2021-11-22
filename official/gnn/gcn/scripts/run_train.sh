@@ -14,19 +14,25 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 1 ]
+if [[ $# != 2 && $# != 3 ]]
 then 
-    echo "Usage: sh run_train.sh [DATASET_NAME]"
+    echo "Usage: sh run_train.sh [DATASET_PATH] [DATASET_NAME] [DEVICE_ID](optional)"
 exit 1
 fi
 
-DATASET_NAME=$1
+DATASET_PATH=$1
+DATASET_NAME=$2
 echo $DATASET_NAME
 
 ulimit -u unlimited
 export DEVICE_NUM=1
 export RANK_SIZE=$DEVICE_NUM
-export DEVICE_ID=0
+if [ -z $3 ]
+then
+    export DEVICE_ID=0
+else
+    export DEVICE_ID=$3
+fi
 export RANK_ID=0
 
 if [ -d "train" ];
@@ -46,12 +52,12 @@ echo "start training for device $DEVICE_ID"
 
 if [ $DATASET_NAME == cora ]
 then
-    python train.py --data_dir=../data_mr/$DATASET_NAME --train_nodes_num=140 &> log &
+    python train.py --data_dir=$DATASET_PATH --train_nodes_num=140 &> log &
 fi
 
 if [ $DATASET_NAME == citeseer ]
 then
-    python train.py --data_dir=../data_mr/$DATASET_NAME --train_nodes_num=120 &> log &
+    python train.py --data_dir=$DATASET_PATH --train_nodes_num=120 &> log &
 fi
 cd ..
 

@@ -38,7 +38,7 @@ DataConfig:
     batch_size: 1000
     data_field_size: 39
     # dataset format, 1: mindrecord, 2: tfrecord, 3: h5
-    data_format: 2
+    data_format: 1
 # Model related
 ModelConfig:
     batch_size: DataConfig.batch_size
