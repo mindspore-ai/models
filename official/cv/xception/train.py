@@ -22,7 +22,7 @@ from mindspore.nn.optim.momentum import Momentum
 from mindspore.train.model import Model, ParallelMode
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor, LossMonitor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.common import dtype as mstype
 from mindspore.common import set_seed
@@ -33,7 +33,7 @@ from src.dataset import create_dataset
 from src.loss import CrossEntropySmooth
 from src.model_utils.config import config as args_opt, config_gpu, config_ascend
 from src.model_utils.moxing_adapter import moxing_wrapper
-from src.model_utils.device_adapter import get_device_id, get_rank_id, get_device_num
+from src.model_utils.device_adapter import get_device_id, get_device_num
 set_seed(1)
 
 
@@ -108,8 +108,8 @@ def run_train():
         context.set_context(device_id=get_device_id(), mode=context.GRAPH_MODE, device_target=args_opt.device_target,
                             save_graphs=False)
         init()
-        rank = get_rank_id()
-        group_size = get_device_num()
+        rank = get_rank()
+        group_size = get_group_size()
         parallel_mode = ParallelMode.DATA_PARALLEL
         context.set_auto_parallel_context(parallel_mode=parallel_mode, device_num=group_size, gradients_mean=True)
     else:
