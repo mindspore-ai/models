@@ -639,7 +639,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_
 | 损失 | 0.0041095633 |0.003395824|
 | 性能 | 187736.386 ms（单卡，s16）<br>  44474.187 ms（八卡，s16） |  1080 ms/step（单卡，s16）|  
 | 微调检查点 | 453M （.ckpt文件） | 454M （.ckpt文件）|
-| 脚本 | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/deeplabv3plus) |[链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/deeplabv3plus) |
+| 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/deeplabv3plus) |[链接](https://gitee.com/mindspore/models/tree/master/research/cv/deeplabv3plus) |
 
 # 随机情况说明
 
