@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 3 ]; then
-  echo "Usage: sh run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]"
+if [ $# != 2 ]; then
+  echo "Usage: sh run_gpu_distribute.sh  [TRAIN_DATA_DIR] [DEVICE_NUM]"
   exit 1
 fi
 
@@ -28,35 +28,32 @@ get_real_path() {
 }
 
 PATH1=$(get_real_path $1)
-PATH2=$(get_real_path $2)
-DATASET_TYPE=$3
+DEVICE_NUM=$2
 
 if [ ! -d $PATH1 ]; then
-  echo "error: TEST_DATA_DIR=$PATH1 is not a directory"
+  echo "error: TRAIN_DATA_DIR=$PATH1 is not a directory"
   exit 1
 fi
 
-if [ ! -f $PATH2 ]; then
-  echo "error: CHECKPOINT_PATH=$PATH2 is not a file"
-  exit 1
+if [ -d "train_parallel" ]; then
+    rm -rf ./train_parallel
 fi
+mkdir ./train_parallel
+cp ../*.py ./train_parallel
+cp -r ../src ./train_parallel
+cd ./train_parallel || exit
 
-if [ -d "eval" ]; then
-  rm -rf ./eval
-fi
-mkdir ./eval
-cp ../*.py ./eval
-cp -r ../src ./eval
-cd ./eval || exit
 env >env.log
-echo "start evaluation ..."
 
-python eval.py \
-    --dir_data=${PATH1} \
-    --test_only \
-    --ext "img" \
-    --data_test=${DATASET_TYPE} \
-    --ckpt_path=${PATH2} \
-    --data_range "801-900" \
-    --task_id 0 \
-    --scale 2 > eval.log 2>&1 &
+nohup mpirun --allow-run-as-root -n $DEVICE_NUM \
+python train.py \
+      --run_distribute 1 \
+      --device_num $DEVICE_NUM \
+      --batch_size 16 \
+      --lr 5e-4 \
+      --scale 2 \
+      --task_id 0 \
+      --dir_data $PATH1 \
+      --epochs 300 \
+      --test_every 1000 \
+      --patch_size 48 > train.log 2>&1 &

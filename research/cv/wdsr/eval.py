@@ -20,13 +20,21 @@ from mindspore import Tensor, context
 from mindspore.common import dtype as mstype
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.args import args
-import src.model as wdsr
+from src.model import WDSR
 from src.data.srdata import SRData
 from src.data.div2k import DIV2K
 from src.metrics import calc_psnr, quantize, calc_ssim
-device_id = int(os.getenv('DEVICE_ID', '0'))
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=device_id, save_graphs=False)
-context.set_context(max_call_depth=10000)
+
+if args.device_target == 'GPU':
+    context.set_context(mode=context.GRAPH_MODE,
+                        device_target=args.device_target,
+                        save_graphs=False)
+    context.set_context(max_call_depth=10000)
+elif args.device_target == 'Ascend':
+    device_id = int(os.getenv('DEVICE_ID', '0'))
+    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=device_id, save_graphs=False)
+    context.set_context(max_call_depth=10000)
+
 def eval_net():
     """eval"""
     if args.epochs == 0:
@@ -43,7 +51,7 @@ def eval_net():
     train_de_dataset = ds.GeneratorDataset(train_dataset, ['LR', 'HR'], shuffle=False)
     train_de_dataset = train_de_dataset.batch(1, drop_remainder=True)
     train_loader = train_de_dataset.create_dict_iterator(output_numpy=True)
-    net_m = wdsr.WDSR()
+    net_m = WDSR(scale=args.scale[args.task_id], n_resblocks=args.n_resblocks, n_feats=args.n_feats)
     if args.ckpt_path:
         param_dict = load_checkpoint(args.ckpt_path)
         load_param_into_net(net_m, param_dict)

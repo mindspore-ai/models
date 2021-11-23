@@ -65,11 +65,8 @@ class PixelShuffle(nn.Cell):
 
 class WDSR(nn.Cell):
     """main structure of wdsr"""
-    def __init__(self):
+    def __init__(self, scale=2, n_resblocks=8, n_feats=64):
         super(WDSR, self).__init__()
-        scale = 2
-        n_resblocks = 8
-        n_feats = 64
         self.sub_mean = MeanShift(255)
         self.add_mean = MeanShift(255, sign=1)
         # define head module
