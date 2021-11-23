@@ -17,7 +17,7 @@ import os
 import argparse
 import numpy as np
 
-parser = argparse.ArgumentParser(description='post process for resnest 310 inference')
+parser = argparse.ArgumentParser(description='post process for 310 inference')
 parser.add_argument("--dataset", type=str, default="imagenet", help="result file path")
 parser.add_argument("--result_path", type=str, required=True, help="result file path")
 parser.add_argument("--label_file", type=str, required=True, help="label file")
@@ -31,7 +31,7 @@ def get_top5_acc(top5_arg, gt_class):
     return sub_count
 
 def read_label(label_file):
-    '''read lebel file'''
+    '''read label file'''
     f = open(label_file, "r")
     lines = f.readlines()
 
@@ -44,7 +44,7 @@ def read_label(label_file):
     return img_label
 
 def cal_acc(dataset, result_path, label_file):
-    '''acc cal main function'''
+    '''main acc calculation function'''
     img_label = read_label(label_file)
 
     img_tot = 0

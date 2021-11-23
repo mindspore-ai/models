@@ -23,7 +23,7 @@ from mindspore import context, Tensor
 from mindspore.train.serialization import export, load_checkpoint, load_param_into_net
 
 parser = argparse.ArgumentParser(description='post process for 310 inference')
-parser.add_argument("--backbone", type=str, required=True, default="wideresnet101V2", help="model backbone")
+parser.add_argument("--backbone", type=str, required=True, default="wideresnet101", help="model backbone")
 parser.add_argument("--ckpt_path", type=str, required=True, help="checkpoint file path")
 parser.add_argument("--file_name", type=str, default="wideresnet101V2", help="file name")
 parser.add_argument("--file_format", type=str, default="MINDIR", choices=["MINDIR", "AIR"], help="file format")

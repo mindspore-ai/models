@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 5 || $# -gt 6 ]]; then 
-    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [BACKBONE] [DATASET] [DATA_PATH] [LABEL_FILE] [DEVICE_ID]
+if [[ $# -lt 4 || $# -gt 5 ]]; then 
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [BACKBONE] [DATASET] [DATA_PATH] [DEVICE_ID]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi
@@ -32,18 +32,16 @@ model=$(get_real_path $1)
 backbone=$2
 dataset=$3
 data_path=$(get_real_path $4)
-label_file=$(get_real_path $5)
 
 device_id=0
 
-if [ $# == 6 ]; then
-    device_id=$6
+if [ $# == 5 ]; then
+    device_id=$5
 fi
 
 echo $model
 echo $dataset
 echo $data_path
-echo $label_file
 echo $device_id
 
 export ASCEND_HOME=/usr/local/Ascend/
@@ -73,6 +71,15 @@ elif [ "$backbone" == "resnest269" ]; then
     resize=416
     crop=416
 fi
+
+function preprocess_data()
+{
+    if [ -d preprocess_Result ]; then
+        rm -rf ./preprocess_Result
+    fi
+    mkdir preprocess_Result
+    python ../preprocess.py --data_path=$data_path
+}
 
 function compile_app()
 {
@@ -109,13 +116,14 @@ function infer()
 
 function cal_acc()
 {
-    python ../postprocess.py --dataset=$dataset --label_file=$label_file --result_path=result_Files &> acc.log
+    python ../postprocess.py --dataset=$dataset --label_file=./preprocess_Result/imagenet_label.txt --result_path=result_Files &> acc.log
     if [ $? -ne 0 ]; then
         echo "calculate accuracy failed"
         exit 1
     fi
 }
 
+preprocess_data
 compile_app
 infer
 cal_acc

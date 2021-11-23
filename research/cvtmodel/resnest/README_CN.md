@@ -67,6 +67,7 @@ ResNeSt使用的数据集： ImageNet
         │   ├── resnest200.py             // resnest-200模型文件
         │   ├── resnest269.py             // resnest-269模型文件
         ├── export.py                   // 导出脚本
+        ├── preprocess.py                   // 数据预处理脚本
         ├── postprocess.py                   // 310 推理后处理脚本
 ```
 
@@ -78,7 +79,7 @@ ResNeSt使用的数据集： ImageNet
 python export.py --backbone [NET_NAME] --ckpt_path [CKPT_PATH] --device_target [DEVICE_TARGET] --device_id 0 --file_format [EXPORT_FORMAT] --file_name [FILE_NAME]
 ```
 
-`backbone` 可选 ["ResNeSt50", "ResNeSt101", "ResNeSt200", "ResNeSt269"]
+`backbone` 可选 ["resnest50", "resnest101", "resnest200", "resnest269"]
 `EXPORT_FORMAT` 可选 ["AIR", "MINDIR"]
 
 ## 推理过程
@@ -89,10 +90,10 @@ python export.py --backbone [NET_NAME] --ckpt_path [CKPT_PATH] --device_target [
 
 ```shell
 # 昇腾310 推理
-bash run_infer_310.sh [MINDIR_PATH] [BACKBONE] [DATASET] [DATA_PATH] [LABEL_FILE] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [BACKBONE] [DATASET] [DATA_PATH] [DEVICE_ID]
 ```
 
--注: Densnet系列网络使用ImageNet数据集,图片的label是将文件夹排序后从0开始编号所得的数字.
+-注: ResNeSt系列网络使用ImageNet数据集。
 
 推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
 ResNeSt-50网络使用ImageNet推理得到的结果如下:
