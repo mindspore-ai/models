@@ -121,7 +121,7 @@ if __name__ == "__main__":
         #get denoised image
         residual = network(data["noisy"]).asnumpy() * 255
         noisy_img = data["noisy"].asnumpy() * 255
-        denoised = np.clip(noisy - residual, 0, 255).astype("uint8")
+        denoised = np.clip(noisy_img - residual, 0, 255).astype("uint8")
         denoised = np.squeeze(denoised)
         clear = np.squeeze(clear)
         noisy_img = np.squeeze(noisy_img)
