@@ -156,13 +156,13 @@ def inference(img, net, c, s):
     forward pass at test time
     calls post_process to post process results
     """
-
+    scale_ratio = 200
     height, width = img.shape[0:2]
     center = (width / 2, height / 2)
-    scale = max(height, width) / 200
+    scale = max(height, width) / scale_ratio
     res = (args.input_res, args.input_res)
 
-    mat_ = src.utils.img.get_transform(center, scale, res)[:2]
+    mat_ = src.utils.img.get_transform(center, scale, res, scale_ratio)[:2]
     inp = img / 255
 
     tmp1 = net(mindspore.Tensor([inp], dtype=mindspore.float32)).asnumpy()

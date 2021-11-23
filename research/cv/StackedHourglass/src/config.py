@@ -52,9 +52,11 @@ def parse_args():
     parser.add_argument("--train_num_eval", type=int, default=300)
     parser.add_argument("--ckpt_file", type=str, default="")
     # Export
-    parser.add_argument("--file_name", type=str, default="stackedhourglass")
+    parser.add_argument("--file_name", type=str, default="Hourglass")
     parser.add_argument("--file_format", type=str, default="MINDIR")
-
+    # infer_310
+    parser.add_argument("--result_path", type=str, default="../ascend310_infer/preprocess_Result")
+    parser.add_argument("--out_path", type=str, default="../ascend310_infer/result_Files")
     args = parser.parse_known_args()[0]
 
     return args

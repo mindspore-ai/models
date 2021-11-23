@@ -15,7 +15,10 @@
     - [评估过程](#评估过程)
         - [运行](#运行-1)
         - [结果](#结果-1)
-    - [导出](#导出)
+    - [导出模型](#导出模型)
+    - [推理过程](#推理过程)
+        - [运行](#运行-2)
+        - [结果](#结果-2)
 - [模型说明](#模型说明)
     - [训练性能（2HG）](#训练性能2hg)
 - [随机情况的描述](#随机情况的描述)
@@ -156,12 +159,46 @@ Tra PCK @, 0.5 , hip : 0.918 , count: 587
 [...]
 ```
 
-## 导出
+## 导出模型
 
 可以使用 `export.py` 脚本进行模型导出，使用方法为：
 
 ```sh
 python export.py --ckpt_file [ckpt 文件路径]
+```
+
+参数`ckpt_file` 是必需的
+
+## 推理过程
+
+### 用法
+
+```shell
+# Ascend310 推理
+bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID] [DATASET_PATH]
+```
+
+- `MINDIR_PATH` mindir模型的路径
+- `NEED_PREPROCESS` 表示数据集是否需要预处理，MPII数据集将被处理为bin格式，默认值为 y
+- `DEVICE_ID` 可选，默认值为 0
+- `DATASET_PATH` mpii数据集文件夹所在的路径
+
+### 结果
+
+推理结果保存在脚本执行的当前路径，，可在acc.log中看到最终精度结果。
+
+```text
+all :
+Val PCK @, 0.5 , total : 0.882 , count: 44239
+Tra PCK @, 0.5 , total : 0.938 , count: 4443
+Val PCK @, 0.5 , ankle : 0.765 , count: 4234
+Tra PCK @, 0.5 , ankle : 0.847 , count: 392
+Val PCK @, 0.5 , knee : 0.819 , count: 4963
+Tra PCK @, 0.5 , knee : 0.91 , count: 499
+Val PCK @, 0.5 , hip : 0.871 , count: 5777
+Tra PCK @, 0.5 , hip : 0.918 , count: 587
+
+[...]
 ```
 
 # 模型说明
