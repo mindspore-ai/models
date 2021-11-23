@@ -61,6 +61,7 @@ Wide Resnet使用的数据集： ImageNet
         ├── src
         │   ├── wide_resnet101_2.py             // Wide Resnet-101 V2模型文件
         ├── export.py                   // 导出脚本
+        ├── preprocess.py                   // 数据预处理脚本
         ├── postprocess.py                   // 310 推理后处理脚本
 ```
 
@@ -83,10 +84,10 @@ python export.py --backbone [NET_NAME] --ckpt_path [CKPT_PATH] --device_target [
 
 ```shell
 # 昇腾310 推理
-bash run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [LABEL_FILE] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [DEVICE_ID]
 ```
 
--注: Wide-Resnet系列网络使用ImageNet数据集,图片的label是将文件夹排序后从0开始编号所得的数字.
+-注: Wide-Resnet系列网络使用imagenet数据集。
 
 推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
 Wide Resnet101 V2网络使用ImageNet推理得到的结果如下:

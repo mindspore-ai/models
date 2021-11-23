@@ -65,6 +65,7 @@ DenseNet使用的数据集： ImageNet
         │   ├── densenet169.py             // densenet-169模型文件
         │   ├── densenet201.py             // densenet-201模型文件
         ├── export.py                   // 导出脚本
+        ├── preprocess.py                   // 数据预处理脚本
         ├── postprocess.py                   // 310 推理后处理脚本
 ```
 
@@ -87,10 +88,10 @@ python export.py --backbone [NET_NAME] --ckpt_path [CKPT_PATH] --device_target [
 
 ```shell
 # 昇腾310 推理
-bash run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [LABEL_FILE] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [DEVICE_ID]
 ```
 
--注: Densnet系列网络使用ImageNet数据集,图片的label是将文件夹排序后从0开始编号所得的数字.
+-注: Densnet系列网络使用imagenet数据集。
 
 推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
 Densenet-121网络使用ImageNet推理得到的结果如下:
