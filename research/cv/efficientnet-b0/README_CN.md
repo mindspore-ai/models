@@ -14,6 +14,10 @@
     - [评估过程](#评估过程)
         - [启动](#启动-1)
         - [结果](#结果-1)
+    - [模型导出](#模型导出)
+    - [推理过程](#推理过程)
+        - [使用方法](#使用方法)
+        - [结果](#结果-2)
 - [模型说明](#模型说明)
     - [训练性能](#训练性能)
 - [随机情况的描述](#随机情况的描述)
@@ -50,8 +54,8 @@ EfficientNet总体网络架构如下：
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore 教程](https://www.mindspore.cn/tutorial/training/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/zh-CN/master/index.html)
 
 # 脚本说明
 
@@ -59,13 +63,15 @@ EfficientNet总体网络架构如下：
 
 ```python
 ├── EfficientNet-B0
-  ├── README_CN.md                 # EfficientNet-B0相关描述
+  ├── README_CN.md                 # 模型相关描述
+  ├── ascend310_infer              # 实现310推理源代码
   ├── scripts
   │   ├──run_standalone_train.sh   # 用于单卡训练的shell脚本
   │   ├──run_distribute_train.sh   # 用于八卡训练的shell脚本
+  │   ├──run_infer_310.sh          # Ascend推理shell脚本
   │   └──run_eval.sh               # 用于评估的shell脚本
   ├── src
-  │   ├──models                    # EfficientNet-B0架构
+  │   ├──models                    # 模型架构
   │   │   ├──effnet.py
   │   │   └──layers.py
   │   ├──config.py                 # 参数配置
@@ -73,8 +79,10 @@ EfficientNet总体网络架构如下：
   │   ├──loss.py                   # 损失函数
   │   ├──lr_generator.py           # 配置学习率
   │   └──Monitor.py                # 监控网络损失和其他数据
+  ├── create_imagenet2012_label.py # 创建数据标签
   ├── eval.py                      # 评估脚本
   ├── export.py                    # 模型格式转换脚本
+  ├── postprogress.py              # 310推理后处理脚本
   └── train.py                     # 训练脚本
 ```
 
@@ -159,6 +167,35 @@ epoch 5: epoch time: 297314.768, per step time: 475.704, avg loss: 3.356
 result: {'Loss': 1.8745046273255959, 'Top_1_Acc': 0.7668870192307692, 'Top_5_Acc': 0.9318509615384616} ckpt= ./checkpoint/model_0/Efficientnet_b0-rank0-350_625.ckpt
 ```
 
+## 模型导出
+
+```shell
+python export.py --checkpoint_path [CKPT_PATH] --file_name [OUT_FILE] --file_format[EXPORT_FORMAT]
+```
+
+`EXPORT_FORMAT` 可选 ["AIR", "MINDIR"]
+
+## 推理过程
+
+### 使用方法
+
+在推理之前需要在昇腾910环境上完成模型的导出。
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+```
+
+-注意：310推理使用ImageNet数据集. 图片的标签是将所在文件夹排序后获得的从0开始的编号
+
+### 310结果
+
+推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
+
+```python
+accuracy:0.767
+```
+
 # 模型说明
 
 ## 训练性能
@@ -178,7 +215,7 @@ result: {'Loss': 1.8745046273255959, 'Top_1_Acc': 0.7668870192307692, 'Top_5_Acc
 | 训练总时间 (8p)             | 29.5h                                    |
 | 评估总时间                  | 1min                                    |
 | 参数量 (M)                 | 61M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/efficientnet-b0) |
+| 脚本                       | [链接](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/efficientnet-b0) |
 
 # 随机情况的描述
 
@@ -186,4 +223,4 @@ result: {'Loss': 1.8745046273255959, 'Top_1_Acc': 0.7668870192307692, 'Top_5_Acc
 
 # ModelZoo
 
-请核对官方 [主页](https://gitee.com/mindspore/models)。
+请核对官方 [主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
