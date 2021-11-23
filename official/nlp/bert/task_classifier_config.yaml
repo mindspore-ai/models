@@ -33,7 +33,7 @@ schema_file_path: ""
 export_batch_size: 1
 export_ckpt_file: ''
 export_file_name: 'bert_classifier'
-file_format: 'AIR'
+file_format: 'MINDIR'
 
 optimizer_cfg:
     optimizer: 'Lamb'
