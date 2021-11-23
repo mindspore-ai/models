@@ -55,19 +55,23 @@
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 - 下载数据集Cora，Citeseer和Pubmed，[可点此下载](https://github.com/kimiyoung/planetoid/tree/master/data)
-- 将数据集放到任意路径，文件夹应该包含如下文件（以Cora数据集为例）：
+- 将数据集放到代码目录下，文件夹应该包含如下文件（以Cora数据集为例）：
 
 ```text
 .
-└─data
-    ├─ind.cora.allx
-    ├─ind.cora.ally
-    ├─ind.cora.graph
-    ├─ind.cora.test.index
-    ├─ind.cora.tx
-    ├─ind.cora.ty
-    ├─ind.cora.x
-    └─ind.cora.y
+└─dgcn
+  ├─scripts
+  ├─src
+  ├─data
+  | ├─ind.cora.allx
+  | ├─ind.cora.ally
+  | ├─ind.cora.graph
+  | ├─ind.cora.test.index
+  | ├─ind.cora.tx
+  | ├─ind.cora.ty
+  | ├─ind.cora.x
+  | └─ind.cora.y
+  ...
 ```
 
 ## 脚本说明
@@ -79,9 +83,12 @@
 └─dgcn
   |
   ├─scripts
-  | ├─run_eval.sh          # 启动评估
-  | ├─run_train_8p.sh      # 启动多卡训练
-  | └─run_train.sh         # 启动训练
+  | ├─run_eval.sh          # Ascend启动评估
+  | ├─run_eval_gpu.sh      # GPU启动评估
+  | ├─run_train_8p.sh      # Ascend启动多卡训练
+  | ├─run_train_8p_gpu.sh  # GPU启动多卡训练
+  | ├─run_train.sh         # Ascend启动训练
+  | └─run_train_gpu.sh     # GPU启动训练
   |
   ├─src
   | ├─config.py            # 参数配置
@@ -123,15 +130,29 @@ bash run_train.sh [DATASET_NAME][DEVICE_ID]
 多卡模式下：
 #rank_size为总卡数，device_start为起始卡的序号，distributed请设置为True
 bash run_train_8p.sh [RANK_TABLE] [RANK_SIZE] [DEVICE_START] [DATASET_NAME] [DISTRIBUTED]
+###
+# GPU处理器运行
+cd ./script
+单卡模式下：
+# 使用Cora或Citeseer或Pubmed数据集进行训练，DATASET_NAME为cora或citeseer或pubmed
+bash run_train_gpu.sh [DATASET_NAME] [DEVICE_ID]
+多卡模式下：
+# DEVICE_NUM为总卡数，VISIABLE_DEVICES(0,1,2,3,4,5,6,7)为卡的物理序号列表
+bash run_train_8p_gpu.sh [DATASET_NAME] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
 ```
 
-rank_table用[此方法](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成并放在script文件夹下
+- rank_table用[此方法](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成并放在script文件夹下
+- 注意：代码中early_stopping机制可能会导致训练早停，但不影响实验结果
 
 ##### 启动
 
 ```bash
+# Ascend处理器运行
 单卡：bash run_train.sh cora 4
 多卡：bash run_train_8p.sh ./hccl_8p_01234567_127.0.0.1.json 8 0 cora True
+# GPU处理器运行
+单卡：bash run_train_gpu.sh cora
+多卡：bash run_train_8p_gpu.sh cora 8 0,1,2,3,4,5,6,7
 ```
 
 ##### 结果
@@ -211,14 +232,22 @@ Finished
 #### 评估过程
 
 ```bash
+# Ascend处理器运行
+# CHECKPOINT为保存的模型文件绝对路径
 cd ./script
 bash run_eval.sh [CHECKPOINT] [DATASET]
+# GPU处理器运行
+cd ./script
+bash run_eval_gpu.sh [CHECKPOINT] [DATASET_NAME]
 ```
 
 ##### 启动
 
 ```bash
+# Ascend处理器运
 bash run_eval.sh ./checkpoint/cora/dgcn.ckpt cora
+# GPU处理器运行
+bash run_eval_gpu.sh ./checkpoint/cora/dgcn.ckpt cora
 ```
 
 ##### 结果
@@ -277,21 +306,21 @@ Test set results: accuracy= 0.82800
 
 ### 性能
 
-| 参数          | DGCN                 |
-| ------------- | -------------------- |
-| 资源          | Ascend 910；CPU 2.60GHz，192核；内存 755G；操作系统 Euler2.8|
-| 上传日期      | 2021-09-25           |
-| MindSpore版本 | 1.3.0                |
-| 数据集        | cora/citeseer/pubmed |
-| 训练参数      | epoch=200,dropout=0.5,learning_rate:cora和pubmed设置为0.01，citeseer设置为0.0153            |
-| 优化器        | Adam                 |
-| 损失函数      | Softmax交叉熵        |
-| 损失          |0.06288/0.3948/0.00199|
-| 训练时间       |3分钟/3分钟/8分钟      |
-| 卡数          |单卡                  |
-| 准确率        | 82.8/72.2/80.3       |
-| 脚本          |[DGCN脚本](https://gitee.com/mindspore/models/tree/master/research/gnn/dgcn)                      |
+| 参数          | Ascend 910                                                   | GPU                                                          |
+| ------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 资源          | Ascend 910                                                   | GPU                                                          |
+| 上传日期      | 2021-09-25                                                   | 2021-10-30                                                   |
+| MindSpore版本 | 1.3.0                                                        | 1.4.1                                                        |
+| 数据集        | cora/citeseer/pubmed                                         | cora/citeseer/pubmed                                         |
+| 训练参数      | epoch=200,dropout=0.5,learning_rate:cora和pubmed设置为0.01，citeseer设置为0.0153 | epoch=200,dropout=0.5,learning_rate: 详见代码                |
+| 优化器        | Adam                                                         | Adam                                                         |
+| 损失函数      | Softmax交叉熵                                                | Softmax交叉熵                                                |
+| 损失          | 0.06288/0.3948/0.00199                                       | 0.06255/0.3899/0.00201                                       |
+| 训练时间      | 3分钟/3分钟/8分钟                                            | 2分钟/2分钟/7分钟                                            |
+| 卡数          | 单卡                                                         | 单卡                                                         |
+| 准确率        | 82.8/72.2/80.3                                               | 82.8/72.2/80.2                                               |
+| 脚本          | [DGCN脚本](https://gitee.com/mindspore/models/tree/master/research/gnn/dgcn) | [DGCN脚本](https://gitee.com/mindspore/models/tree/master/research/gnn/dgcn) |
 
 ## 随机情况说明
 
-train.py和eval.py脚本中使用mindspore.set_seed()对全局随机种子进行了固定，可在对应的parser中进行修改即可，cora和pubmed默认为1024，citeseer默认为1235。
+train.py和eval.py脚本中使用mindspore.set_seed()对全局随机种子进行了固定，可在对应的parser中进行修改即可，cora和pubmed默认为1024，citeseer默认为1235，GPU参数详见代码。
