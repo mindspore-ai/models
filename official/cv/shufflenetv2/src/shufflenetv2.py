@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@ import numpy as np
 from mindspore import Tensor
 import mindspore.nn as nn
 import mindspore.ops.operations as P
-
 
 class ShuffleV2Block(nn.Cell):
     def __init__(self, inp, oup, mid_channels, *, ksize, stride):
@@ -42,6 +41,7 @@ class ShuffleV2Block(nn.Cell):
             # dw
             nn.Conv2d(in_channels=mid_channels, out_channels=mid_channels, kernel_size=ksize, stride=stride,
                       pad_mode='pad', padding=pad, group=mid_channels, has_bias=False),
+
             nn.BatchNorm2d(num_features=mid_channels, momentum=0.9),
             # pw-linear
             nn.Conv2d(in_channels=mid_channels, out_channels=outputs, kernel_size=1, stride=1,
@@ -66,10 +66,13 @@ class ShuffleV2Block(nn.Cell):
             self.branch_proj = nn.SequentialCell(branch_proj)
         else:
             self.branch_proj = None
+        self.squeeze = P.Squeeze(axis=0)
 
     def construct(self, old_x):
         if self.stride == 1:
             x_proj, x = self.channel_shuffle(old_x)
+            x_proj = self.squeeze(x_proj)
+            x = self.squeeze(x)
             return P.Concat(1)((x_proj, self.branch_main(x)))
         if self.stride == 2:
             x_proj = old_x
@@ -82,7 +85,7 @@ class ShuffleV2Block(nn.Cell):
         x = P.Reshape()(x, (batchsize * num_channels // 2, 2, height * width,))
         x = P.Transpose()(x, (1, 0, 2,))
         x = P.Reshape()(x, (2, -1, num_channels // 2, height, width,))
-        return x[0], x[1]
+        return x[0:1, :, :, :, :], x[-1:, :, :, :, :]
 
 
 class ShuffleNetV2(nn.Cell):
@@ -142,13 +145,14 @@ class ShuffleNetV2(nn.Cell):
             self.dropout = nn.Dropout(keep_prob=0.8)
         self.classifier = nn.SequentialCell([nn.Dense(in_channels=self.stage_out_channels[-1],
                                                       out_channels=n_class, has_bias=False)])
-        ##TODO init weights
+        ## init weights
         self._initialize_weights()
 
     def construct(self, x):
         x = self.first_conv(x)
         x = self.maxpool(x)
         x = self.features(x)
+
         x = self.conv_last(x)
 
         x = self.globalpool(x)

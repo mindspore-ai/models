@@ -116,7 +116,7 @@ def fasterrcnn_eval(dataset_path, ckpt_path, anno_path):
     eval_types = ["bbox"]
     result_files = results2json(dataset_coco, outputs, "./results.pkl")
 
-    coco_eval(config, result_files, eval_types, dataset_coco, single_result=False, plot_detect_result=True)
+    coco_eval(config, result_files, eval_types, dataset_coco, single_result=False)
 
 
 def modelarts_pre_process():
