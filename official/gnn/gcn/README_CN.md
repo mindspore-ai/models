@@ -98,15 +98,15 @@ bash run_process_data.sh ./data citeseer
 - Running on local with Ascend
 
 ```bash
-# 在 cora 或 citeseer 数据集上训练, DATASET_NAME 设置为 cora 或 citeseer
-bash run_train.sh [DATASET_NAME]
+# 在 cora 或 citeseer 数据集上训练, DATASET_NAME 设置为 cora 或 citeseer, DEVICE_ID为使用的卡号（可选）。
+bash run_train.sh [DATASET_PATH] [DATASET_NAME] [DEVICE_ID](optional)
 ```
 
 - Running on local with GPU
 
 ```bash
 # 在 cora 或 citeseer 数据集上训练, DATASET_PATH设置为数据集目录，DATASET_NAME 设置为 cora 或 citeseer
-bash run_train.sh [DATASET_PATH] [DATASET_NAME]
+bash run_train_gpu.sh [DATASET_PATH] [DATASET_NAME]
 ```
 
 - Running on [ModelArts](https://support.huaweicloud.com/modelarts/)
@@ -208,15 +208,15 @@ bash run_train.sh [DATASET_PATH] [DATASET_NAME]
 #### 用法
 
 ```text
-# 使用Cora或Citeseer数据集进行训练，DATASET_NAME为Cora或Citeseer
-bash run_train.sh [DATASET_NAME]
+# 使用Cora或Citeseer数据集进行训练，DATASET_NAME为Cora或Citeseer, DEVICE_ID为使用的卡号（可选）。
+bash run_train.sh [DATASET_PATH] [DATASET_NAME] [DEVICE_ID](optional)
 ```
 
 #### 启动
 
 ```bash
-# 在Ascend上使用Cora或Citeseer数据集进行训练，DATASET_NAME为Cora或Citeseer
-bash run_train.sh [DATASET_NAME]
+# 在Ascend上使用Cora或Citeseer数据集进行训练，DATASET_NAME为Cora或Citeseer, DEVICE_ID为使用的卡号（可选）。
+bash run_train.sh [DATASET_PATH] [DATASET_NAME] [DEVICE_ID](optional)
 
 # 在GPU上使用Cora或Citeseer数据集进行训练，DATASET_PATH设置为数据集目录，DATASET_NAME为Cora或Citeseer
 bash run_train_gpu.sh [DATASET_PATH] [DATASET_NAME]

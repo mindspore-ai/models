@@ -108,8 +108,8 @@
 - Ascend处理器环境运行
 
   ```shell
-  # 使用Cora数据集运行训练示例，DATASET_NAME为cora
-  bash run_train_ascend.sh [DATASET_NAME]
+  # 使用Cora数据集运行训练示例，DATASET_NAME为cora, DEVICE_ID为使用的卡号（可选）。
+  bash run_train_ascend.sh [DATASET_NAME] [DATASET_DIR] [DEVICE_ID](optional)
   ```
 
 -GPU处理器环境运行
@@ -216,7 +216,7 @@
 - Ascend处理器环境运行
 
   ```shell
-  bash run_train_ascend.sh [DATASET_NAME]
+  bash run_train_ascend.sh [DATASET_NAME] [DATASET_DIR] [DEVICE_ID](optional)
   ```
 
   训练结果将保存在脚本路径下，文件夹名称以“train”开头。您可在日志中找到结果

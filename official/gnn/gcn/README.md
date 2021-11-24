@@ -96,15 +96,15 @@ bash run_process_data.sh ./data citeseer
 - Running on local with Ascend
 
 ```bash
-# run train with cora or citeseer dataset, DATASET_NAME is cora or citeseer
-bash run_train.sh [DATASET_NAME]
+# run train with cora or citeseer dataset, DATASET_NAME is cora or citeseer, DEVICE_ID is the card number(optional) to run the program.
+bash run_train.sh [DATASET_PATH] [DATASET_NAME] [DEVICE_ID](optional)
 ```
 
 - Running on local with GPU
 
 ```bash
 # run train with cora or citeseer dataset, DATASET_PATH is the path of dataset, DATASET_NAME is cora or citeseer
-bash run_train.sh [DATASET_PATH] [DATASET_NAME]
+bash run_train_gpu.sh [DATASET_PATH] [DATASET_NAME]
 ```
 
 - Running on [ModelArts](https://support.huaweicloud.com/modelarts/)
@@ -208,14 +208,14 @@ Parameters for training can be set in config.py.
 #### Usage
 
 ```bash
-# run train with cora or citeseer dataset, DATASET_NAME is cora or citeseer
-bash run_train.sh [DATASET_NAME]
+# run train with cora or citeseer dataset, DATASET_NAME is cora or citeseer, DEVICE_ID is the card number(optional) to run the program.
+bash run_train.sh [DATASET_PATH] [DATASET_NAME] [DEVICE_ID](optional)
 ```
 
 #### Launch
 
 ```bash
-bash run_train.sh cora
+bash run_train.sh {dataset_path} cora|citeseer
 ```
 
 #### Result
