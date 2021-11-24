@@ -26,12 +26,12 @@
         - [推理](#推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
+        - [训练性能](#训练性能)
+            - [CIFAR-10上训练GoogleNet](#cifar-10上训练googlenet)
+            - [ImageNet2012上训练GoogleNet](#imagenet2012上训练googlenet)
         - [评估性能](#评估性能)
-            - [CIFAR-10上的GoogleNet](#cifar-10上的googlenet)
-            - [120万张图像上的GoogleNet](#120万张图像上的googlenet)
-        - [推理性能](#推理性能)
-            - [CIFAR-10上的GoogleNet](#cifar-10上的googlenet-1)
-            - [120万张图像上的GoogleNet](#120万张图像上的googlenet-1)
+            - [CIFAR-10上评估GoogleNet](#cifar-10上评估googlenet)
+            - [ImageNet2012上评估GoogleNet](#imagenet2012上评估googlenet)
     - [使用流程](#使用流程)
         - [推理](#推理-1)
         - [继续训练预训练模型](#继续训练预训练模型)
@@ -61,12 +61,12 @@ GoogleNet由多个inception模块串联起来，可以更加深入。  降维的
 - 数据格式：二进制文件
     - 注：数据将在src/dataset.py中处理。
 
-所用数据集可参照论文。
+使用的数据集：[ImageNet2012](http://www.image-net.org/)
 
-- 数据集大小：125G，共1000个类、125万张彩色图像
-    - 训练集：120G，共120万张图像
-    - 测试集：5G，共5万张图像
-- 数据格式：RGB
+- 数据集大小：共1000个类、224*224彩色图像
+    - 训练集：共1,281,167张图像
+    - 测试集：共50,000张图像
+- 数据格式：JPEG
     - 注：数据将在src/dataset.py中处理。
 
 # 特性
@@ -318,10 +318,42 @@ GoogleNet由多个inception模块串联起来，可以更加深入。  降维的
   'data_path':'./cifar10'  # 训练和评估数据集的绝对全路径
   'device_target':'Ascend' # 运行设备
   'device_id':4            # 用于训练或评估数据集的设备ID使用run_train.sh进行分布式训练时可以忽略。
-  'keep_checkpoint_max':10 # 只保存最后一个keep_checkpoint_max检查点
+  'keep_checkpoint_max':10 # 最多保存checkpoint文件的数量
   'checkpoint_path':'./train_googlenet_cifar10-125_390.ckpt'  # checkpoint文件保存的绝对全路径
   'onnx_filename':'googlenet.onnx' # export.py中使用的onnx模型文件名
   'geir_filename':'googlenet.geir' # export.py中使用的geir模型文件名
+  ```
+
+- 配置GoogleNet和ImageNet2012数据集。
+
+  ```python
+  'pre_trained': 'False'    # 是否基于预训练模型训练
+  'num_classes': 1000       # 数据集类数
+  'lr_init': 0.1            # 初始学习率
+  'batch_size': 256         # 训练批次大小
+  'epoch_size': 300         # 总计训练epoch数
+  'momentum': 0.9           # 动量
+  'weight_decay': 1e-4      # 权重衰减值
+  'image_height': 224       # 输入到模型的图像高度
+  'image_width': 224        # 输入到模型的图像宽度
+  'data_path': './ImageNet_Original/train/'  # 训练数据集的绝对全路径
+  'val_data_path': './ImageNet_Original/val/'  # 评估数据集的绝对全路径
+  'device_target': 'Ascend' # 运行程序的目标设备
+  'device_id': 0            # 训练或者评估使用的设备卡号。 如果是分布式训练，忽略该参数。
+  'keep_checkpoint_max': 10 # 最多保存checkpoint文件的数量
+  'checkpoint_path': './train_googlenet_cifar10-125_390.ckpt'  # 保存checkpoint文件的绝对全路径
+  'onnx_filename': 'googlenet.onnx' # export.py使用的onnx模型的文件名
+  'air_filename': 'googlenet.air'   # export.py使用的air模型的文件名
+  'lr_scheduler': 'exponential'     # 学习率调度器
+  'lr_epochs': [70, 140, 210, 280]  # lr改变的epoch数
+  'lr_gamma': 0.3            # 指数衰减学习率调度器学习率衰减因子
+  'eta_min': 0.0             # 余弦退火学习率调度器的最小学习率
+  'T_max': 150               # 余弦退火学习率调度器cos周期的1/2
+  'warmup_epochs': 0         # 学习率预热epoch数
+  'is_dynamic_loss_scale': 0 # 是否是动态loss scale
+  'loss_scale': 1024         # loss scale
+  'label_smooth_factor': 0.1 # 标签平滑因子
+  'use_label_smooth': True   # 标签平滑
   ```
 
 更多配置细节请参考脚本`config.py`。
@@ -488,9 +520,9 @@ python export.py --config_path [CONFIG_PATH]
 
 ## 性能
 
-### 评估性能
+### 训练性能
 
-#### CIFAR-10上的GoogleNet
+#### CIFAR-10上训练GoogleNet
 
 | 参数                 | Ascend                                                      | GPU                    |
 | -------------------------- | ----------------------------------------------------------- | ---------------------- |
@@ -511,7 +543,7 @@ python export.py --config_path [CONFIG_PATH]
 | 推理模型        | 21.50M (.onnx文件),  21.60M(.air文件)                     |      |
 | 脚本                    | [googlenet脚本](https://gitee.com/mindspore/mindspore/tree/r0.7/model_zoo/official/cv/googlenet) | [googlenet 脚本](https://gitee.com/mindspore/mindspore/tree/r0.6/model_zoo/official/cv/googlenet) |
 
-#### 120万张图像上的GoogleNet
+#### ImageNet2012上训练GoogleNet
 
 | 参数                 | Ascend                                                      |
 | -------------------------- | ----------------------------------------------------------- |
@@ -519,7 +551,7 @@ python export.py --config_path [CONFIG_PATH]
 | 资源                   | Ascend 910；CPU 2.60GHz，56核；内存 314G；系统 Euler2.8               |
 | 上传日期              | 2021-07-05                                 |
 | MindSpore版本          | 1.3.0                                                       |
-| 数据集                    | 120万张图像                                                |
+| 数据集                    | ImageNet2012                                                |
 | 训练参数        | epoch=300, steps=5000, batch_size=256, lr=0.1               |
 | 优化器                  | Momentum                                                    |
 | 损失函数              | Softmax交叉熵                                       |
@@ -531,9 +563,9 @@ python export.py --config_path [CONFIG_PATH]
 | 微调检查点 | 52M (.ckpt文件)                                            |
 | 脚本                    | [googlenet脚本](https://gitee.com/mindspore/mindspore/tree/r0.7/model_zoo/official/cv/googlenet) |
 
-### 推理性能
+### 评估性能
 
-#### CIFAR-10上的GoogleNet
+#### CIFAR-10上评估GoogleNet
 
 | 参数          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -547,7 +579,7 @@ python export.py --config_path [CONFIG_PATH]
 | 准确性            | 单卡: 93.4%;  8卡：92.17%   | 单卡：93%, 8卡：92.89%      |
 | 推理模型 | 21.50M (.onnx文件)         |  |
 
-#### 120万张图像上的GoogleNet
+#### ImageNet2012上评估GoogleNet
 
 | 参数          | Ascend                      |
 | ------------------- | --------------------------- |
@@ -555,7 +587,7 @@ python export.py --config_path [CONFIG_PATH]
 | 资源            |  Ascend 910；系统 Euler2.8                 |
 | 上传日期       | 2021-07-05 |
 | MindSpore版本   | 1.3.0                       |
-| 数据集             | 12万张图像                |
+| 数据集             | ImageNet2012                |
 | batch_size          | 256                         |
 | 输出             | 概率                 |
 | 准确性            | 8卡: 71.81%                |
