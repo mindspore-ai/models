@@ -28,13 +28,12 @@ import cv2
 import mindspore.dataset as ds
 import mindspore.dataset.vision.c_transforms as C
 from src.utils.transforms import fliplr_joints, get_affine_transform, affine_transform
-from src.config import config
 
-ds.config.set_seed(config.GENERAL.DATASET_SEED) # Set Random Seed
+ds.config.set_seed(1) # Set Random Seed
 flip_pairs = [[1, 2], [3, 4], [5, 6], [7, 8],
               [9, 10], [11, 12], [13, 14], [15, 16]]
 
-class CocoDatasetGenerator:
+class KeypointDatasetGenerator:
     '''
     About the specific operations of coco2017 data set processing
     '''
@@ -301,41 +300,38 @@ class CocoDatasetGenerator:
     def __len__(self):
         return len(self.db)
 
-def CreateDatasetCoco(rank=0,
-                      group_size=1,
-                      train_mode=True,
-                      num_parallel_workers=8,
-                      transform=None,
-                      shuffle=None):
-    '''
-    CreateDatasetCoco
-    '''
+def keypoint_dataset(config,
+                     ann_file=None,
+                     image_path=None,
+                     bbox_file=None,
+                     rank=0,
+                     group_size=1,
+                     train_mode=True,
+                     num_parallel_workers=8,
+                     transform=None,
+                     shuffle=None):
+    """
+    A function that returns an imagenet dataset for classification. The mode of input dataset should be "folder" .
+
+    Args:
+        rank (int): The shard ID within num_shards (default=None).
+        group_size (int): Number of shards that the dataset should be divided
+            into (default=None).
+         mode (str): "train" or others. Default: " train".
+        num_parallel_workers (int): Number of workers to read the data. Default: None.
+    """
+    # config
     per_batch_size = config.TRAIN.BATCH_SIZE if train_mode else config.TEST.BATCH_SIZE
-
-    image_path = ''
-    ann_file = ''
-    bbox_file = ''
-    if config.MODELARTS.IS_MODEL_ARTS:
-        image_path = config.MODELARTS.CACHE_INPUT
-        ann_file = config.MODELARTS.CACHE_INPUT
-        bbox_file = config.MODELARTS.CACHE_INPUT
-    else:
-        image_path = config.DATASET.ROOT
-        ann_file = config.DATASET.ROOT
-        bbox_file = config.DATASET.ROOT
-
-    if train_mode:
-        image_path = image_path + config.DATASET.TRAIN_SET
-        ann_file = ann_file + config.DATASET.TRAIN_JSON
-    else:
-        image_path = image_path + config.DATASET.TEST_SET
-        ann_file = ann_file + config.DATASET.TEST_JSON
-    bbox_file = bbox_file + config.TEST.COCO_BBOX_FILE
-
+    image_path = image_path if image_path else os.path.join(config.DATASET.ROOT,
+                                                            config.DATASET.TRAIN_SET
+                                                            if train_mode else config.DATASET.TEST_SET)
     print('loading dataset from {}'.format(image_path))
-
+    ann_file = ann_file if ann_file else os.path.join(config.DATASET.ROOT,
+                                                      'annotations/person_keypoints_{}2017.json'.format(
+                                                          'train' if train_mode else 'val'))
     shuffle = shuffle if shuffle is not None else train_mode
-    dataset_generator = CocoDatasetGenerator(config, is_train=train_mode)
+    # gen dataset db
+    dataset_generator = KeypointDatasetGenerator(config, is_train=train_mode)
 
     if not train_mode and config.TEST.USE_GT_BBOX:
         print('loading bbox file from {}'.format(bbox_file))
@@ -343,12 +339,15 @@ def CreateDatasetCoco(rank=0,
     else:
         dataset_generator.load_gt_dataset(image_path, ann_file)
 
-    coco_dataset = ds.GeneratorDataset(dataset_generator,
-                                       column_names=["image", "target", "weight", "scale", "center", "score", "id"],
-                                       num_parallel_workers=num_parallel_workers,
-                                       num_shards=group_size,
-                                       shard_id=rank,
-                                       shuffle=shuffle)
+    # construct dataset
+    de_dataset = ds.GeneratorDataset(dataset_generator,
+                                     column_names=["image", "target", "weight", "scale", "center", "score", "id"],
+                                     num_parallel_workers=num_parallel_workers,
+                                     num_shards=group_size,
+                                     shard_id=rank,
+                                     shuffle=shuffle)
+
+    # inputs map functions
     if transform is None:
         transform_img = [
             C.Rescale(1.0 / 255.0, 0.0),
@@ -357,9 +356,11 @@ def CreateDatasetCoco(rank=0,
         ]
     else:
         transform_img = transform
-    coco_dataset = coco_dataset.map(input_columns="image",
-                                    num_parallel_workers=num_parallel_workers,
-                                    operations=transform_img)
-    coco_dataset = coco_dataset.batch(per_batch_size, drop_remainder=train_mode)
+    de_dataset = de_dataset.map(input_columns="image",
+                                num_parallel_workers=num_parallel_workers,
+                                operations=transform_img)
 
-    return coco_dataset
+    # batch
+    de_dataset = de_dataset.batch(per_batch_size, drop_remainder=train_mode)
+
+    return de_dataset, dataset_generator

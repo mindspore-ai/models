@@ -35,7 +35,7 @@ config.MODELARTS.CACHE_OUTPUT = '/cache/train_out/'
 
 # model
 config.MODEL = edict()
-config.MODEL.IS_TRAINED = True
+config.MODEL.IS_TRAINED = False
 config.MODEL.INIT_WEIGHTS = True
 config.MODEL.PRETRAINED = 'resnet50.ckpt'
 config.MODEL.NUM_JOINTS = 17
@@ -62,11 +62,11 @@ config.LOSS.USE_TARGET_WEIGHT = True
 # dataset
 config.DATASET = edict()
 config.DATASET.TYPE = 'COCO'
-config.DATASET.ROOT = '/opt_data/xidian_wks/zhao/simple_baselines/coco2017/'
+config.DATASET.ROOT = '/home/dataset/coco/'
 config.DATASET.TRAIN_SET = 'train2017'
 config.DATASET.TRAIN_JSON = 'annotations/person_keypoints_train2017.json'
 config.DATASET.TEST_SET = 'val2017'
-config.DATASET.TEST_JSON = 'annotations/person_keypoints_val2017.json'
+config.DATASET.TEST_JSON = 'annotations/COCO_val2017_detections_AP_H_56_person.json'
 
 # training data augmentation
 config.DATASET.FLIP = True
@@ -84,18 +84,18 @@ config.TRAIN.LR_FACTOR = 0.1
 config.TRAIN.LR_STEP = [90, 120]
 config.TRAIN.NUM_PARALLEL_WORKERS = 8
 config.TRAIN.SAVE_CKPT = True
-config.TRAIN.CKPT_PATH = "/opt_data/xidian_wks/zhao/simple_baselines/"
+config.TRAIN.CKPT_PATH = "/home/dataset/coco/"
 
 # valid
 config.TEST = edict()
-config.TEST.BATCH_SIZE = 32
+config.TEST.BATCH_SIZE = 1
 config.TEST.FLIP_TEST = True
 config.TEST.POST_PROCESS = True
 config.TEST.SHIFT_HEATMAP = True
 config.TEST.USE_GT_BBOX = False
 config.TEST.NUM_PARALLEL_WORKERS = 2
-config.TEST.MODEL_FILE = 'multi_train_poseresnet_commit_0-140_292.ckpt'
-config.TEST.COCO_BBOX_FILE = 'annotations/COCO_val2017_detections_AP_H_56_person.json'
+config.TEST.MODEL_FILE = '/home/dataset/coco/multi_train_poseresnet_commit_0-140_292.ckpt'
+config.TEST.COCO_BBOX_FILE = '/home/dataset/coco/annotations/COCO_val2017_detections_AP_H_56_person.json'
 config.TEST.OUTPUT_DIR = 'results/'
 
 # nms
@@ -104,3 +104,21 @@ config.TEST.IN_VIS_THRE = 0.2
 config.TEST.BBOX_THRE = 1.0
 config.TEST.IMAGE_THRE = 0.0
 config.TEST.NMS_THRE = 1.0
+
+#310 infer-related
+config.INFER = edict()
+config.INFER.PRE_RESULT_PATH = './preprocess_Result'
+config.INFER.POST_RESULT_PATH = './result_Files'
+
+# Help description for each configuration
+config.enable_modelarts = "Whether training on modelarts, default: False"
+config.data_url = "Url for modelarts"
+config.train_url = "Url for modelarts"
+config.data_path = "The location of the input data."
+config.output_path = "The location of the output file."
+config.device_target = "Running platform, choose from Ascend, GPU or CPU, and default is Ascend."
+config.enable_profiling = 'Whether enable profiling while training, default: False'
+# Parameters that can be modified at the terminal
+config.ckpt_save_dir = "ckpt path to save"
+config.batch_size = "training batch size"
+config.run_distribute = "Run distribute, default is false."

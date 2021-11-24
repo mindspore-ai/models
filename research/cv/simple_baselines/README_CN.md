@@ -231,6 +231,59 @@ coco eval results saved to /cache/train_output/multi_train_poseresnet_v5_2-140_2
 AP: 0.704
 ```
 
+## 推理过程
+
+### [导出mindir]
+
+- 本地导出
+
+```shell
+python export.py
+```
+
+- 在ModelArts上导出（如果想在modelarts中运行，请查看【modelarts】官方文档（https://support huaweicloud.com/modelarts/），如下启动即可）
+
+```python
+# (1) Upload the code folder to S3 bucket.
+# (2) Click to "create training task" on the website UI interface.
+# (3) Set the code directory to "/{path}/simple_pose" on the website UI interface.
+# (4) Set the startup file to /{path}/simple_pose/export.py" on the website UI interface.
+# (5) Perform a .
+#     a. setting parameters in /{path}/simple_pose/default_config.yaml.
+#         1. Set ”enable_modelarts: True“
+#         2. Set “TEST.MODEL_FILE: ./{path}/*.ckpt”('TEST.MODEL_FILE' indicates the path of the weight file to be exported relative to the file `export.py`, and the weight file must be included in the code directory.)
+#         3. Set ”EXPORT.FILE_NAME: simple_pose“
+#         4. Set ”EXPORT.FILE_FORMAT：MINDIR“
+# (7) Check the "data storage location" on the website UI interface and set the "Dataset path" path (This step is useless, but necessary.).
+# (8) Set the "Output file path" and "Job log path" to your path on the website UI interface.
+# (9) Under the item "resource pool selection", select the specification of a single card.
+# (10) Create your job.
+# You will see simple_pose.mindir under {Output file path}.
+```
+
+`FILE_FORMAT` 变量应该在["AIR", "MINDIR"]中选择
+
+### 310推理
+
+在执行推理之前，mindir 文件必须通过 `export.py` 脚本导出。 我们仅提供使用 MINDIR 模型进行推理的示例。
+网络在处理数据集的时候，如果最后一个batch不够，不会自动补充，简单来说，batch_Size设置为1会更好。
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+```
+
+- `NEED_PREPROCESS` 表示以二进制格式处理数据集，其值为“y”或“n”。
+- `DEVICE_ID` 是可选的，默认值为 0。
+
+### 结果
+
+推理结果保存在当前路径中，您可以在 acc.log 文件中找到这样的结果。
+
+```bash
+AP: 0.7139169694686592
+```
+
 # 模型描述
 
 ## 性能
