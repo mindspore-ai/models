@@ -246,6 +246,21 @@ TEST_DATA_DIR = "~DATA/"。
 
 您可以通过eval.log文件查看结果。
 
+### Ascend310评估
+
+- 评估过程如下，需要指定数据集类型为“div2k”。
+
+```bash
+sh run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATASET_TYPE] [SCALE] [DEVICE_ID]
+```
+
+- MINDIR_PATH mindir模型文件路径
+- DATA_PATH 数据集路径
+- DATASET_TYPE 数据集名称(div2k)
+- SCALE 超分辨率比例(2, 3, 4)
+- DEVICE_ID 设备ID， 默认为：0
+- 上述python命令在后台运行，可通过`run_infer.log`文件查看结果。
+
 # 模型导出
 
 ```bash
@@ -287,6 +302,18 @@ FILE_FORMAT 可选 ['MINDIR', 'AIR', 'ONNX'], 默认['MINDIR']。
 | batch_size    | 1                                                           |
 | 输出          | 超分辨率图片                                                |
 | PSNR          | DIV2K 34.7780                                               |
+
+### 310评估性能
+
+| 参数          | Ascend                                                      |
+| ------------- | ----------------------------------------------------------- |
+| 资源          | Ascend 310                                                  |
+| 上传日期      | 2021-10-4                                                    |
+| MindSpore版本 | 1.3.0                                                       |
+| 数据集        | DIV2K                                                       |
+| batch_size    | 1                                                           |
+| 输出          | 超分辨率图片                                                |
+| PSNR          | DIV2K 33.5745                                               |
 
 # 随机情况说明
 

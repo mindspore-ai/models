@@ -35,7 +35,7 @@ def run_export(args1):
     load_param_into_net(net, param_dict)
     net.set_train(False)
     print('load mindspore net and checkpoint successfully.')
-    inputs = Tensor(np.zeros([args1.batch_size, 3, 678, 1020], np.float32))
+    inputs = Tensor(np.zeros([args1.batch_size, 3, 1020, 1020], np.float32))
     export(net, inputs, file_name=args.file_name, file_format=args.file_format)
     print('export successfully!')
 
