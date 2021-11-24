@@ -30,11 +30,11 @@ export CUDA_VISIBLE_DEVICES=$DEVICE_ID
 BASEPATH=$(cd "`dirname $0`" || exit; pwd)
 CONFIG_FILE="${BASEPATH}/../gpu_default_config.yaml"
 
-if [ -d "../eval" ]; then
-    rm -rf ../eval
+if [ -d "eval" ]; then
+    rm -rf eval
 fi
-mkdir ../eval
-cd ../eval || exit
+mkdir eval
+cd eval || exit
 
 python ${BASEPATH}/../eval.py \
     --config_path=$CONFIG_FILE \

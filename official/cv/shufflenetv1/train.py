@@ -58,6 +58,8 @@ def train():
         group_size = 1
         context.set_context(device_id=config.device_id)
 
+    if config.device_target == "GPU":
+        context.set_context(enable_graph_kernel=True)
     # define network
     net = ShuffleNetV1(model_size=config.model_size, n_class=config.num_classes)
 

@@ -25,7 +25,7 @@ keep_checkpoint_max: 5
 save_ckpt_path: "./"
 save_checkpoint_epochs: 1
 save_checkpoint: True
-amp_level: "O2"
+amp_level: "O0"
 is_distributed: False
 train_dataset_path: ""
 resume: ""
