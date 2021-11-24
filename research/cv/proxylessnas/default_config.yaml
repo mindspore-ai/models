@@ -1,0 +1,99 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unlesee you know exactly what you are doing)
+enable_modelarts: False
+# url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# path for local
+data_path: "/cache/data"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+device_target: "Ascend"
+enable_profiling: False
+
+# ======================================================================================
+# common options
+num_classes: 1000 
+device_id: 0
+rank: 0
+group_size: 1
+
+# ======================================================================================
+# Training options
+epoch_size: 360  
+keep_checkpoint_max: 80
+save_ckpt_path: "./"
+save_checkpoint_epochs: 1
+save_checkpoint: True
+is_distributed: False
+dataset_path: "../imagenet"
+resume: ""
+resume_epoch: 1
+random_seed: 1
+
+work_nums: 8
+cutout: True
+cutout_length: 56
+
+amp_level: "O3"
+
+# the enable_graph_kernale is False by default
+enable_graph_kernel: False
+
+# On ascend 910, the enable_reduce_precision is True by default
+enable_reduce_precision: True
+
+# DynamicLossScaleManager config
+# default: init_loss_scale=2 ** 24, scale_factor=2, scale_window=2000
+scale_factor: 2
+scale_window: 2000
+
+# Dataset config
+train_batch_size: 131
+train_mini_steps: 8
+
+val_batch_size: 125
+
+enable_eval_on_train_dataset: False 
+
+#drop remainder : True for GPU, False for Ascend
+drop_remainder: False
+
+#learning rate config
+lr_init: 0.2
+
+#loss conifg
+enable_label_smooth: True
+label_smooth_factor: 0.1
+
+#optimization config
+weight_decay: 0.0001
+momentum: 0.9
+
+#mode config
+use_pynative_mode: False
+# ======================================================================================
+# Eval options
+checkpoint: ""
+enable_checkpoint_dir: False
+checkpoint_dir: ""
+
+# ======================================================================================
+# export options
+file_name: "proxylessnas_mobile"
+file_format: "MINDIR"
+
+---
+# Help description for each configuration
+enable_modelarts: "Whether training on modelarts default: False"
+data_url: "Url for modelarts"
+train_url: "Url for modelarts"
+data_path: "The location of input data"
+output_path: "The location of the output file"
+device_target: "device id of GPU or Ascend. (Default: Ascend)"
+enable_profiling: "Whether enable profiling while training default: False"
+is_distributed: "distributed training"
+resume: "resume training with existed checkpoint"
+device_id: "device id"
+file_name: "output file name"
+file_format: "file format choices [AIR MINDIR ONNX]"
