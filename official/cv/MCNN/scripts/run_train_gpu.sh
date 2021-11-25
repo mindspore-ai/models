@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,23 +13,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""
-network config setting, will be used in train.py
-"""
 
-from easydict import EasyDict as edict
+export DEVICE_ID=0
+export DEVICE_NUM=$1
+export RANK_SIZE=$1
+export CUDA_VISIBLE_DEVICES="$2"
 
-crowd_cfg = edict({
-    'lr': 0.000028,  # 0.00001 if device_num == 1； 0.000028 device_num=8
-    'momentum': 0.0,
-    'epoch_size': 800,
-    'batch_size': 1,
-    'buffer_size': 1000,
-    'save_checkpoint_steps': 1,
-    'keep_checkpoint_max': 10,
-    'air_name': "mcnn",
-    'local_path': '/cache/val_path',
-    'local_gt_path': '/cache/val_gt_path',
-    'local_ckpt_url': '/cache/ckpt',
-    'ckptpath': "obs://MCNN/ckpt"
-})
+if [ $1 -lt 1 ] && [ $1 -gt 8 ]
+then
+    echo "error: DEVICE_NUM=$1 is not in (1-8)"
+exit 1
+fi
+
+
+if [ $1 -gt 1 ]
+then
+    echo "----Multi card task start----"
+    mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+    python train.py &> log &
+else
+    python train.py &> log &
+fi

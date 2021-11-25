@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ Data operations, will be used in train.py and eval.py
 import os
 import math
 import mindspore.dataset as ds
+from mindspore.communication.management import get_rank
 
 
 def create_dataset(data_loader, target="Ascend", train=True):
@@ -58,16 +59,22 @@ def create_dataset(data_loader, target="Ascend", train=True):
 
     dataset_generator = GetDatasetGenerator()
     sampler = MySampler(dataset_generator, local_rank=0, world_size=8)
-
+    device_num = 1
+    rank_id = 0
     if target == "Ascend":
         # device_num, rank_id = _get_rank_info()
-        device_num = int(os.getenv("RANK_SIZE"))
-        rank_id = int(os.getenv("DEVICE_ID"))
-        sampler = MySampler(dataset_generator, local_rank=rank_id, world_size=8)
-    if target != "Ascend" or device_num == 1 or (not train):
+        device_num = int(os.getenv("RANK_SIZE", '1'))
+        rank_id = int(os.getenv("DEVICE_ID", '0'))
+        sampler = MySampler(dataset_generator, local_rank=rank_id, world_size=device_num)
+    elif target == "GPU":
+        device_num = int(os.getenv("RANK_SIZE", '1'))
+        if device_num > 1:
+            rank_id = get_rank()
+            sampler = MySampler(dataset_generator, local_rank=rank_id, world_size=device_num)
+    if device_num == 1 or (not train):
         data_set = ds.GeneratorDataset(dataset_generator, ["data", "gt_density"])
     else:
-        data_set = ds.GeneratorDataset(dataset_generator, ["data", "gt_density"], num_parallel_workers=8,
+        data_set = ds.GeneratorDataset(dataset_generator, ["data", "gt_density"], num_parallel_workers=device_num,
                                        num_shards=device_num, shard_id=rank_id, sampler=sampler)
 
     return data_set

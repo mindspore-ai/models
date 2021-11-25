@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ import os
 import argparse
 import ast
 import numpy as np
-from mindspore.communication.management import init
 import mindspore.nn as nn
 from mindspore.context import ParallelMode
 from mindspore import context, Tensor
+from mindspore.communication.management import init, get_rank
 from mindspore.train.callback import LossMonitor, TimeMonitor
 from mindspore.train import Model
 from src.data_loader import ImageDataLoader
@@ -37,42 +37,54 @@ from src.Mcnn_Callback import mcnn_callback
 parser = argparse.ArgumentParser(description='MindSpore MCNN Example')
 parser.add_argument('--run_offline', type=ast.literal_eval,
                     default=True, help='run in offline is False or True')
-parser.add_argument('--device_target', type=str, default="Ascend", choices=['Ascend'],
+parser.add_argument('--device_target', type=str, default="Ascend", choices=['Ascend', 'GPU', 'CPU'],
                     help='device where the code will be implemented (default: Ascend)')
-parser.add_argument('--device_id', type=int, default=0, help='device id of Ascend. (Default: 0)')
-parser.add_argument('--ckpt_path', type=str, default="/cache/train_output", help='Location of ckpt.')
+parser.add_argument('--ckpt_path', type=str, default="./train_output", help='Location of ckpt.')
 
 parser.add_argument('--data_url', default=None, help='Location of data.')
 parser.add_argument('--train_url', default=None, help='Location of training outputs.')
 
-parser.add_argument('--train_path', required=True, default=None, help='Location of data.')
-parser.add_argument('--train_gt_path', required=True, default=None, help='Location of data.')
-parser.add_argument('--val_path', required=True,
-                    default='/data/formatted_trainval/shanghaitech_part_A_patches_9/val',
+parser.add_argument('--train_path', default='../MCNN/data/formatted_trainval/shanghaitech_part_A_patches_9/train',
                     help='Location of data.')
-parser.add_argument('--val_gt_path', required=True,
-                    default='/data/formatted_trainval/shanghaitech_part_A_patches_9/val_den',
+parser.add_argument('--train_gt_path',
+                    default='../MCNN/data/formatted_trainval/shanghaitech_part_A_patches_9/train_den',
+                    help='Location of data.')
+parser.add_argument('--val_path', default='../MCNN/data/formatted_trainval/shanghaitech_part_A_patches_9/val',
+                    help='Location of data.')
+parser.add_argument('--val_gt_path', default='../MCNN/data/formatted_trainval/shanghaitech_part_A_patches_9/val_den',
                     help='Location of data.')
 args = parser.parse_args()
 rand_seed = 64678
 np.random.seed(rand_seed)
 
 if __name__ == "__main__":
-    device_num = int(os.getenv("RANK_SIZE"))
+    device_num = int(os.getenv("RANK_SIZE", '1'))
+    device_id = int(os.getenv("DEVICE_ID", '0'))
 
+    print("device_id:", device_id)
     print("device_num:", device_num)
     device_target = args.device_target
     context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
     context.set_context(save_graphs=False)
 
-    if device_target == "Ascend":
-        context.set_context(device_id=args.device_id)
-
+    if device_target == "GPU":
+        context.set_context(enable_graph_kernel=False)
+        device_id = 0
         if device_num > 1:
+            init()
             context.reset_auto_parallel_context()
             context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
+            device_id = get_rank()
+    elif device_target == "Ascend":
+        context.set_context(device_id=device_id)
+
+        if device_num > 1:
             init()
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+
     else:
         raise ValueError("Unsupported platform.")
     if args.run_offline:
@@ -106,14 +118,11 @@ if __name__ == "__main__":
     lr = Tensor(get_lr_sha(0, cfg['lr'], cfg['epoch_size'], ds_train.get_dataset_size()))
     net_opt = nn.Adam(list(filter(lambda p: p.requires_grad, network.get_parameters())), learning_rate=lr)
 
-    if args.device_target != "Ascend":
-        model = Model(network, net_loss, net_opt)
-    else:
-        model = Model(network, net_loss, net_opt, amp_level="O2")
+    model = Model(network, net_loss, optimizer=net_opt, metrics=None, amp_level="O2")
 
     print("============== Starting Training ==============")
     time_cb = TimeMonitor(data_size=ds_train.get_dataset_size())
-    eval_callback = mcnn_callback(network, ds_val, args.run_offline, args.ckpt_path)
+    eval_callback = mcnn_callback(network, ds_val, args.run_offline, args.ckpt_path, device_target)
     model.train(cfg['epoch_size'], ds_train, callbacks=[time_cb, eval_callback, LossMonitor(1)])
     if not args.run_offline:
-        mox.file.copy_parallel(src_url='/cache/train_output', dst_url="obs://lhb1234/MCNN/ckpt")
+        mox.file.copy_parallel(src_url='/cache/train_output', dst_url="obs://MCNN/ckpt")

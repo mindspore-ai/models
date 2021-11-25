@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,7 +55,6 @@ class ImageDataLoader_3channel():
                                   header=None).values
                 den = den.astype(np.float32, copy=False)
                 if self.gt_downsample:
-                    # print(den.shape)
                     wd_1 = wd_1 // 4
                     ht_1 = ht_1 // 4
                     den = cv2.resize(den, (wd_1, ht_1))

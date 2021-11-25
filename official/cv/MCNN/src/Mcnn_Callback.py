@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 import os
 from mindspore.train.callback import Callback
 from mindspore.train.serialization import save_checkpoint
+from mindspore.communication.management import get_rank
 from src.evaluate_model import evaluate_model
 
 
 class mcnn_callback(Callback):
-    def __init__(self, net, eval_data, run_offline, ckpt_path):
+    def __init__(self, net, eval_data, run_offline, ckpt_path, device_target):
         self.net = net
         self.eval_data = eval_data
         self.best_mae = 999999
@@ -29,6 +30,7 @@ class mcnn_callback(Callback):
         self.path_url = "/cache/train_output"
         self.run_offline = run_offline
         self.ckpt_path = ckpt_path
+        self.device_target = device_target
 
     def epoch_end(self, run_context):
         # print(self.net.trainable_params()[0].data.asnumpy()[0][0])
@@ -40,14 +42,16 @@ class mcnn_callback(Callback):
                 self.best_mae = mae
                 self.best_mse = mse
                 self.best_epoch = cur_epoch
-                device_id = int(os.getenv("DEVICE_ID"))
-                device_num = int(os.getenv("RANK_SIZE"))
-                if (device_num == 1) or (device_num == 8 and device_id == 0):
+                device_num = int(os.getenv("RANK_SIZE", '1'))
+                if device_num > 1 and self.device_target == "GPU":
+                    device_id = get_rank()
+                else:
+                    device_id = int(os.getenv("DEVICE_ID", '0'))
+                if (device_num == 1) or (device_id == 0):
                     # save_checkpoint(self.net, path_url+'/best.ckpt')
                     if self.run_offline:
                         self.path_url = self.ckpt_path
-                    if not os.path.exists(self.path_url):
-                        os.makedirs(self.path_url, exist_ok=True)
+
                     save_checkpoint(self.net, os.path.join(self.path_url, 'best.ckpt'))
 
             log_text = 'EPOCH: %d, MAE: %.1f, MSE: %0.1f' % (cur_epoch, mae, mse)
