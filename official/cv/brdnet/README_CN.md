@@ -120,6 +120,7 @@ Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/m
         │   ├──run_eval.sh                     // 推理启动脚本
         │   ├──run_train.sh                    // 训练启动脚本
         │   ├──run_infer_310.sh                // 启动310推理的脚本
+        │   ├──docker_start.sh                 // 使用 MindX 推理时的 docker 启动脚本
         ├── src
         │   ├──dataset.py                      // 数据集处理
         │   ├──logger.py                       // 日志打印文件
@@ -521,7 +522,7 @@ BRDNet on “waterloo5050step40colorimage”
 | Speed                      | 8p about 7000FPS to 7400FPS                                                    |
 | Total time                 | 8p  about 2h 14min                                                             |
 | Checkpoint for Fine tuning | 8p: 13.68MB , 1p: 19.76MB (.ckpt file)                                         |
-| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/cv/brdnet |
+| Scripts                    | [BRDNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/brdnet) |
 
 ## 随机情况说明
 
