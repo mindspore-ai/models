@@ -1,0 +1,20 @@
+{
+    "mcnn_opencv": {
+        "appsrc0": {
+            "factory": "appsrc",
+            "next": "mxpi_tensorinfer0"
+        },
+        "mxpi_tensorinfer0": {
+            "props": {
+                "dataSource": "appsrc0",
+                "modelPath": "../model/mcnn.om",
+                "waitingTime": "2000"
+            },
+            "factory": "mxpi_tensorinfer",
+            "next": "appsink0"
+        },
+        "appsink0": {
+            "factory": "appsink"
+        }
+    } 
+}
