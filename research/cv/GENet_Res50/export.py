@@ -17,6 +17,7 @@ import argparse
 import numpy as np
 
 from mindspore import Tensor, context, load_checkpoint, load_param_into_net, export
+import mindspore.common.dtype as mstype
 from src.GENet import GE_resnet50 as net
 from src.config import config1 as config
 
@@ -50,6 +51,7 @@ if __name__ == '__main__':
     mlp = trans_char_to_bool(args_opt.mlp)
     extra = trans_char_to_bool(args_opt.extra)
     network = net(class_num=config.class_num, extra=extra, mlp=mlp)
+    network.to_float(mstype.float32)
 
     # load checkpoint
     if args_opt.pre_trained:
