@@ -15,12 +15,12 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run_train_Ascend.sh [DEVICE_ID] [PRE_TRAINED](optional)"
+echo "bash run_train_standalone_GPU.sh [DEVICE_ID] [PRE_TRAINED](optional)"
 echo "=============================================================================================================="
 
 if [ $# -lt 1 ]
 then
-    echo "Usage: sh run_train_cpu.sh [DEVICE_ID] [PRE_TRAINED](optional)"
+    echo "Usage: sh run_train_standalone_GPU.sh [DEVICE_ID] [PRE_TRAINED](optional)"
     exit 1
 fi
 export DEVICE_ID=$1
@@ -34,9 +34,9 @@ mkdir ./train_GPU
 cd ./train_GPU || exit
 mkdir src
 cd ../
-cp ../*.py ./train_GPU
-cp ../*.yaml ./train_GPU
-cp -r ../src ./train_GPU/
+cp ./*.py ./train_GPU
+cp ./*.yaml ./train_GPU
+cp -r ./src ./train_GPU/
 cd ./train_GPU
 
 

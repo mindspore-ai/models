@@ -15,12 +15,12 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run_train_GPU.sh [DEVICE_ID] [CKPT_FILES]"
+echo "bash run_eval_standalone_GPU.sh [DEVICE_ID] [CKPT_FILES]"
 echo "=============================================================================================================="
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh run_train_GPU.sh [DEVICE_ID] [CKPT_FILES]"
+    echo "Usage: sh run_eval_standalone_GPU.sh [DEVICE_ID] [CKPT_FILES]"
     exit 1
 fi
 

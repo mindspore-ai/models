@@ -16,13 +16,13 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run_distribute_train.sh"
-echo "For example: bash run_distribute_train.sh"
+echo "bash run_distribute_train_GPU.sh [DEVICE_NUM] [CUDA_VISIBLE_DEVICES(0,1,2,3,4,5,6,7)]"
+echo "For example: bash run_distribute_train_GPU.sh 8 0,1,2,3,4,5,6,7"
 echo "=============================================================================================================="
 set -e
 if [ $# -lt 1 ]
 then
-    echo "Usage: sh run_distribute_train.sh [DEVICE_NUM] [CUDA_VISIBLE_DEVICES(0,1,2,3,4,5,6,7)]"
+    echo "Usage: sh run_distribute_train_GPU.sh [DEVICE_NUM] [CUDA_VISIBLE_DEVICES(0,1,2,3,4,5,6,7)]"
     exit 1
 fi
 export DEVICE_NUM=$1
@@ -39,9 +39,9 @@ mkdir GPU_distributed
 cd ./GPU_distributed
 mkdir src
 cd ../
-cp ../*.py ./GPU_distributed
-cp ../*.yaml ./GPU_distributed
-cp -r ../src ./GPU_distributed
+cp ./*.py ./GPU_distributed
+cp ./*.yaml ./GPU_distributed
+cp -r ./src ./GPU_distributed
 cd ./GPU_distributed
 
 echo "start training for GPU"
