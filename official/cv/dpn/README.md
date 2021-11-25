@@ -318,10 +318,10 @@ DPN evaluate success!
 ### [Export MindIR](#contents)
 
 ```shell
-python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --config_path [CONFIG_PATH] --checkpoint_path [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
 ```
 
-The ckpt_file parameter is required,
+The `checkpoint_path` parameter is required,
 `FILE_FORMAT` should be in ["AIR", "MINDIR"]
 
 - Export MindIR on Modelarts
@@ -356,7 +356,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 ```
 
 - `MINDIR_PATH` specifies path of used "MINDIR" OR "AIR" model.
-- `DATASET_PATH` specifies path of cifar10 datasets
+- `DATASET_PATH` specifies path of imagenet2012 datasets
 - `DEVICE_ID` is optional, default value is 0.
 
 ### [Result](#contents)
