@@ -202,7 +202,7 @@ def train_fasterrcnn():
         cb += [eval_cb]
 
     model = Model(net)
-    model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=False)
+    model.train(config.epoch_size, dataset, callbacks=cb)
 
 
 if __name__ == '__main__':
