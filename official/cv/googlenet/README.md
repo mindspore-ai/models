@@ -24,12 +24,12 @@
         - [Inference](#inference)
 - [Model Description](#model-description)
     - [Performance](#performance)
-        - [Evaluation Performance](#evaluation-performance)
-            - [GoogleNet on CIFAR-10](#googlenet-on-cifar-10)
-            - [GoogleNet on 1200k images](#googlenet-on-1200k-images)
+        - [Training Performance](#training-performance)
+            - [GoogleNet train on CIFAR-10](#googlenet-train-on-cifar-10)
+            - [GoogleNet train on ImageNet2012](#googlenet-train-on-imagenet2012)
         - [Inference Performance](#inference-performance)
-            - [GoogleNet on CIFAR-10](#googlenet-on-cifar-10-1)
-            - [GoogleNet on 1200k images](#googlenet-on-1200k-images-1)
+            - [GoogleNet infer on CIFAR-10](#googlenet-infer-on-cifar-10)
+            - [GoogleNet infer on ImageNet2012](#googlenet-infer-on-imagenet2012)
     - [How to use](#how-to-use)
         - [Inference](#inference-1)
         - [Continue Training on the Pretrained Model](#continue-training-on-the-pretrained-model)
@@ -59,12 +59,12 @@ Dataset used: [CIFAR-10](http://www.cs.toronto.edu/~kriz/cifar.html)
 - Data format：binary files
     - Note：Data will be processed in src/dataset.py
 
-Dataset used can refer to paper.
+Dataset used: [ImageNet2012](http://www.image-net.org/)
 
-- Dataset size: 125G, 1250k colorful images in 1000 classes
-    - Train: 120G, 1200k images
-    - Test: 5G, 50k images
-- Data format: RGB images.
+- Dataset size: 224*224 colorful images in 1000 classes
+    - Train：1,281,167 images  
+    - Test： 50,000 images
+- Data format：jpeg
     - Note: Data will be processed in src/dataset.py
 
 # [Features](#contents)
@@ -519,9 +519,9 @@ Current batch_ Size can only be set to 1.
 
 ## [Performance](#contents)
 
-### Evaluation Performance
+### Training Performance
 
-#### GoogleNet on CIFAR-10
+#### GoogleNet train on CIFAR-10
 
 | Parameters                 | Ascend                                                      | GPU                    |
 | -------------------------- | ----------------------------------------------------------- | ---------------------- |
@@ -542,7 +542,7 @@ Current batch_ Size can only be set to 1.
 | Model for inference        | 21.50M (.onnx file),  21.60M(.air file)                     |      |
 | Scripts                    | [googlenet script](https://gitee.com/mindspore/models/tree/master/official/cv/googlenet) | [googlenet script](https://gitee.com/mindspore/models/tree/master/official/cv/googlenet) |
 
-#### GoogleNet on 1200k images
+#### GoogleNet train on ImageNet2012
 
 | Parameters                 | Ascend                                                      |
 | -------------------------- | ----------------------------------------------------------- |
@@ -550,7 +550,7 @@ Current batch_ Size can only be set to 1.
 | Resource                   | Ascend 910; CPU 2.60GHz, 56cores; Memory 314G; OS Euler2.8               |
 | uploaded Date              | 07/05/2021 (month/day/year)                                 |
 | MindSpore Version          | 1.3.0                                                       |
-| Dataset                    | 1200k images                                                |
+| Dataset                    | ImageNet2012                                                |
 | Training Parameters        | epoch=300, steps=5000, batch_size=256, lr=0.1               |
 | Optimizer                  | Momentum                                                    |
 | Loss Function              | Softmax Cross Entropy                                       |
@@ -564,7 +564,7 @@ Current batch_ Size can only be set to 1.
 
 ### Inference Performance
 
-#### GoogleNet on CIFAR-10
+#### GoogleNet infer on CIFAR-10
 
 | Parameters          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -578,7 +578,7 @@ Current batch_ Size can only be set to 1.
 | Accuracy            | 1pc: 93.4%;  8pcs: 92.17%   | 1pc: 93%, 8pcs: 92.89%      |
 | Model for inference | 21.50M (.onnx file)         |  |
 
-#### GoogleNet on 1200k images
+#### GoogleNet infer on ImageNet2012
 
 | Parameters          | Ascend                      |
 | ------------------- | --------------------------- |
@@ -586,7 +586,7 @@ Current batch_ Size can only be set to 1.
 | Resource            | Ascend 910; OS Euler2.8                  |
 | Uploaded Date       | 07/05/2021 (month/day/year) |
 | MindSpore Version   | 1.3.0                       |
-| Dataset             | 1200k images                |
+| Dataset             | ImageNet2012                |
 | batch_size          | 256                         |
 | outputs             | probability                 |
 | Accuracy            | 8pcs: 71.81%                |
