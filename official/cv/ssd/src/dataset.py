@@ -331,6 +331,7 @@ def filter_valid_data(image_dir, anno_path):
         file_name = line_split[0]
         image_path = os.path.join(image_dir, file_name)
         if os.path.isfile(image_path):
+            img_id = int(os.path.basename(file_name).split('.')[0])
             images.append(img_id)
             image_path_dict[img_id] = image_path
             image_anno_dict[img_id] = anno_parser(line_split[1:])
@@ -373,7 +374,7 @@ def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="ssd.
         images, image_path_dict, image_anno_dict = filter_valid_data(config.image_dir, config.anno_path)
 
     ssd_json = {
-        "img_id": {"type": "int32", "shape": [1]},
+        "img_id": {"type": "int64", "shape": [1]},
         "image": {"type": "bytes"},
         "annotation": {"type": "int32", "shape": [-1, 5]},
     }
@@ -384,7 +385,7 @@ def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="ssd.
         with open(image_path, 'rb') as f:
             img = f.read()
         annos = np.array(image_anno_dict[img_id], dtype=np.int32)
-        img_id = np.array([img_id], dtype=np.int32)
+        img_id = np.array([img_id], dtype=np.int)
         row = {"img_id": img_id, "image": img, "annotation": annos}
         writer.write_raw_data([row])
     writer.commit()
