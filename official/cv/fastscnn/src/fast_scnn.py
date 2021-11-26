@@ -256,7 +256,8 @@ class FastSCNNWithLossCell(nn.Cell):
         super(FastSCNNWithLossCell, self).__init__()
         self.network = network
         self.aux = args.aux
-        self.loss = MixSoftmaxCrossEntropyLoss(args, aux=args.aux, aux_weight=args.aux_weight)
+        self.loss = MixSoftmaxCrossEntropyLoss(args, aux=args.aux, aux_weight=args.aux_weight,
+                                               one_d_length=args.batch_size*args.crop_size[0]*args.crop_size[1])
     def construct(self, images, targets):
         outputs = self.network(images)
         if self.aux:

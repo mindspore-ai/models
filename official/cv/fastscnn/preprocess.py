@@ -119,7 +119,7 @@ def crop_imageAndLabel(out_dir, image_path, image_height, image_width):
     if not os.path.exists(os.path.join(out_dir, "labels")):
         os.makedirs(os.path.join(out_dir, "labels"))
 
-    assert os.path.exists(image_path), "Please put dataset in {SEG_ROOT}/datasets/cityscapes"
+    assert os.path.exists(image_path), "Please put dataset in " + str(image_path)
     images, mask_paths = _get_city_pairs(image_path, 'val')
     assert len(images) == len(mask_paths)
     if not images:
