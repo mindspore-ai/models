@@ -195,43 +195,62 @@ DenseNet-100使用的数据集： Cifar-10
 
 ```shell
 ├── model_zoo
-    ├── README.md                          // 所有模型的说明
+    ├── README.md                            // 所有模型的说明
     ├── densenet
-        ├── README.md                    // DenseNet相关说明
-        ├── README_CN.md                 // DenseNet相关说明
-        ├── ascend310_infer              // 实现310推理源代码
-        ├── scripts
-        │   ├── run_distribute_train.sh             // Ascend分布式shell脚本
-        │   ├── run_distribute_train_gpu.sh             // GPU分布式shell脚本
-        │   ├── run_distribute_eval.sh              // Ascend评估shell脚本
-        │   ├── run_infer_310.sh                    // Ascend 310 推理shell脚本
-        │   ├── run_distribute_eval_gpu.sh              // GPU评估shell脚本
-        │   ├── run_eval_cpu.sh              // CPU训练shell脚本
-        │   ├── run_train_cpu.sh              // CPU评估shell脚本
-        ├── src
-        │   ├── datasets             // 数据集处理函数
-        │   ├── losses
-        │       ├──crossentropy.py            // DenseNet损失函数
-        │   ├── lr_scheduler
-        │       ├──lr_scheduler.py            // DenseNet学习率调度函数
-        │   ├── network
-        │       ├──densenet.py            // DenseNet架构
-        │   ├──optimizers            // DenseNet优化函数
-        │   ├──utils
-        │       ├──logging.py            // 日志函数
-        │       ├──var_init.py            // DenseNet变量init函数
-        │   ├── model_utils
-        │       ├──config.py             // 参数配置
-        │       ├──moxing_adapter.py     // modelarts设备配置
-        │       ├──device_adapter.py     // 设备配置
-        │       ├──local_adapter.py      // 本地设备配置
-        ├── train.py                    // 训练脚本
-        ├── eval.py                     //  评估脚本
-        ├── mindspore_hub_conf.py       //  hub配置脚本
-        ├── export.py                   // 导出脚本
+        ├── ascend310_infer                  // 实现310推理源代码
+        │  ├── build.sh
+        │  ├── CMakeLists.txt
+        │  ├── image_id.txt
+        │  ├── inc
+        │      ├── utils.h
+        │  ├── src
+        │      ├── main.cc
+        │      ├── utils.cc
+        ├── densenet100_config.yaml          // 配置文件
+        ├── densenet121_config.yaml          // 配置文件
+        ├── eval.py                          // 评估脚本
+        ├── export.py                        // 导出脚本
+        ├── mindspore_hub_conf.py            // hub配置脚本
         ├── postprocess.py                   // 310 推理后处理脚本
-        ├── densenet100_config.yaml         //  配置文件
-        ├── densenet100_config.yaml       //  配置文件
+        ├── README_CN.md                     // DenseNet相关说明
+        ├── README.md                        // DenseNet相关说明
+        ├── requirements.txt
+        ├── scripts
+        │   ├── run_distribute_eval_gpu.sh   // GPU评估shell脚本
+        │   ├── run_distribute_eval.sh       // Ascend评估shell脚本
+        │   ├── run_distribute_train_gpu.sh  // GPU分布式shell脚本
+        │   ├── run_distribute_train.sh      // Ascend分布式shell脚本
+        │   ├── run_eval_cpu.sh              // CPU训练shell脚本
+        │   ├── run_infer_310.sh             // Ascend 310 推理shell脚本
+        │   ├── run_train_cpu.sh             // CPU评估shell脚本
+        ├── src
+        │   ├── datasets                     // 数据集处理函数
+        │       ├── classification.py
+        │       ├── __init__.py
+        │       ├── sampler.py
+        │   ├── losses
+        │       ├── crossentropy.py          // DenseNet损失函数
+        │       ├── __init__.py
+        │   ├── lr_scheduler
+        │       ├── __init__.py
+        │       ├── lr_scheduler.py          // DenseNet学习率调度函数
+        │   ├── model_utils
+        │       ├── config.py                // 参数配置
+        │       ├── device_adapter.py        // 设备配置
+        │       ├── __init__.py
+        │       ├── local_adapter.py         // 本地设备配置
+        │       ├── moxing_adapter.py        // modelarts设备配置
+        │   ├── network
+        │       ├── densenet.py              // DenseNet架构
+        │       ├── __init__.py
+        │   ├── optimizers                   // DenseNet优化函数
+        │       ├── __init__.py
+        │   ├── utils
+        │       ├── __init__.py
+        │       ├── logging.py               // 日志函数
+        │       ├── var_init.py              // DenseNet变量init函数
+        ├── train.py                         // 训练脚本
+
 ```
 
 ## 脚本参数
