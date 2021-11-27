@@ -32,8 +32,8 @@ from src.config import ConfigDGCN
 
 parser = argparse.ArgumentParser(description="run DGCN")
 parser.add_argument("--device_id", type=int, default=0, help="Device id")
-parser.add_argument("--seed", type=int, default=1024, help="random seed")
-parser.add_argument("--lr", type=float, default=0.01, help="learning rate")
+parser.add_argument("--seed", type=int, default=0, help="random seed")
+parser.add_argument("--lr", type=float, default=0.005, help="learning rate")
 parser.add_argument("--dataset", type=str, default='cora', choices=['cora', 'citeseer', 'pubmed'], help="Dataset.")
 parser.add_argument("--device_target", type=str, default="Ascend",
                     choices=["Ascend", "GPU"], help="device target (default: Ascend)")
@@ -44,19 +44,40 @@ if args.dataset == "citeseer":
     args.seed = 1235
     args.lr = 0.0153
 
+if args.device_target == "GPU":
+    if args.dataset == "cora":
+        args.seed = 1024
+        args.lr = 0.03430959018564401
+    if args.dataset == "citeseer":
+        args.seed = 852
+        args.lr = 0.02229329021215099
+    if args.dataset == "pubmed":
+        args.seed = 829
+        args.lr = 0.029074859603424454
+
 set_seed(args.seed)
 
 def run_train(learning_rate=0.01, n_epochs=200, dataset=None, dropout_rate=0.5,
               hidden_size=36):
     """run train."""
+    device_num = int(os.getenv('DEVICE_NUM'))
     context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
-    if args.device_target == "Ascend" and not args.distributed:
+    if args.device_target == "Ascend":
+        if not args.distributed:
+            context.set_context(device_id=args.device_id)
+        if args.distributed:
+            device_id = int(os.getenv('DEVICE_ID'))
+            context.set_context(device_id=device_id)
+            init()
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
+    elif args.device_target == "GPU":
         context.set_context(device_id=args.device_id)
-    if args.distributed:
-        device_id = int(os.getenv('DEVICE_ID'))
-        context.set_context(device_id=device_id)
-        init()
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
+        if args.distributed:
+            init()
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(device_num=device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
     adj, features, y_train, y_val, y_test, train_mask, val_mask, test_mask, labels = dp.load_graph_data(dataset)
     train_mask = np.reshape(train_mask, (-1, len(train_mask)))
     val_mask = np.reshape(val_mask, (-1, len(val_mask)))
@@ -146,6 +167,7 @@ def run_train(learning_rate=0.01, n_epochs=200, dataset=None, dropout_rate=0.5,
 if __name__ == "__main__":
     data = args.dataset
     config = ConfigDGCN()
+
     print("Testing on the dataset: " + data)
     if data in ['cora', 'citeseer', 'pubmed']:
         run_train(dataset=data, learning_rate=args.lr,

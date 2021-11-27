@@ -34,7 +34,7 @@ def main():
     parser = argparse.ArgumentParser(description="DGCN eval")
     parser.add_argument("--device_id", help="device_id", default=0, type=int)
     parser.add_argument("--device_target", type=str, default="Ascend",
-                        choices=["Ascend"], help="device target (default: Ascend)")
+                        choices=["Ascend", "GPU"], help="device target (default: Ascend)")
     parser.add_argument("--checkpoint", type=str, required=True, help="Checkpoint file path.")
     parser.add_argument("--seed", type=int, default=1024,
                         help="Random seed for sklearn pre-training. Default is 42.")

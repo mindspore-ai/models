@@ -39,21 +39,21 @@ if __name__ == "__main__":
     if args.dataset == "cora":
         input_dim = 1433
         output_dim = 7
-        diffusions = Tensor(np.zeros((2708, 2708), np.float16))
-        ppmi = Tensor(np.zeros((2708, 2708), np.float16))
-        features = Tensor(np.zeros((2708, 1433), np.float16))
+        diffusions = Tensor(np.zeros((2708, 2708), np.float32))
+        ppmi = Tensor(np.zeros((2708, 2708), np.float32))
+        features = Tensor(np.zeros((2708, 1433), np.float32))
     if args.dataset == "citeseer":
         input_dim = 3703
         output_dim = 6
-        diffusions = Tensor(np.zeros((3327, 3327), np.float16))
-        ppmi = Tensor(np.zeros((3327, 3327), np.float16))
-        features = Tensor(np.zeros((3327, 3703), np.float16))
+        diffusions = Tensor(np.zeros((3312, 3312), np.float32))
+        ppmi = Tensor(np.zeros((3312, 3312), np.float32))
+        features = Tensor(np.zeros((3312, 3703), np.float32))
     if args.dataset == "pubmed":
-        input_dim = 500
+        input_dim = 3703
         output_dim = 3
-        diffusions = Tensor(np.zeros((19717, 19717), np.float16))
-        ppmi = Tensor(np.zeros((19717, 19717), np.float16))
-        features = Tensor(np.zeros((19717, 500), np.float16))
+        diffusions = Tensor(np.zeros((19717, 19717), np.float32))
+        ppmi = Tensor(np.zeros((19717, 19717), np.float32))
+        features = Tensor(np.zeros((19717, 500), np.float32))
 
 
     dgcn_net = DGCN(input_dim=input_dim, hidden_dim=config.hidden1, output_dim=output_dim, dropout=config.dropout)
@@ -61,8 +61,7 @@ if __name__ == "__main__":
     dgcn_net.add_flags_recursive(fp16=True)
     param_dict = load_checkpoint(args.ckpt_file)
     load_param_into_net(dgcn_net, param_dict)
-    input_data = [diffusions, ppmi, features]
-    export(dgcn_net, *input_data, file_name=args.file_name, file_format=args.file_format)
+    export(dgcn_net, diffusions, ppmi, features, file_name=args.file_name, file_format=args.file_format)
     print("==========================================")
     print(args.file_name + ".mindir exported successfully!")
     print("==========================================")
