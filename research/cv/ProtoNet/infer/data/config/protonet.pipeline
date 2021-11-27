@@ -1,0 +1,39 @@
+
+{
+"protonet": {
+    "stream_config": {
+            "deviceId": "0"
+        },
+    "appsrc0": {
+        "props": {
+                "blocksize": "409600"
+            },
+        "factory": "appsrc",
+        "next": "tensorinfer0"
+    },
+    "tensorinfer0": {
+        "props": {
+        "modelPath": "../data/model/protonet.om",
+        "dataSource": "appsrc0",
+        "waitingTime": "2000",
+        "outputDeviceId": "-1"
+    },
+        "factory": "mxpi_tensorinfer",
+    "next": "dataserialize"
+    },
+    "dataserialize": {
+        "props": {
+            "outputDataKeys": "tensorinfer0"
+        },
+        "factory": "mxpi_dataserialize",
+        "next": "appsink0"
+    },
+    "appsink0": {
+               "props": {
+                "blocksize": "4096000"
+            },
+        "factory": "appsink"
+    }
+}
+}
+
