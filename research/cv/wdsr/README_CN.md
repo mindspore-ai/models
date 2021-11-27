@@ -111,7 +111,7 @@ WDSR网络主要由几个基本模块（包括卷积层和池化层）组成。�
 
 # 环境要求
 
-- 硬件（Ascend）
+- 硬件（Ascend/GPU）
     - 使用ascend处理器来搭建硬件环境。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
@@ -124,18 +124,24 @@ WDSR网络主要由几个基本模块（包括卷积层和池化层）组成。�
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
 ```shell
-#单卡训练
+# 单卡训练
+# Ascend
 sh run_ascend_standalone.sh [TRAIN_DATA_DIR]
+# GPU
+bash run_gpu_standalone.sh [TRAIN_DATA_DIR]
 ```
 
 ```shell
-#分布式训练
+# 分布式训练
+# Ascend
 sh run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
+# GPU
+bash run_gpu_distribute.sh [TRAIN_DATA_DIR] [DEVICE_NUM]
 ```
 
 ```python
 #评估
-sh run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]
+bash run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]
 ```
 
 # 脚本说明
@@ -145,11 +151,11 @@ sh run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]
 ```bash
 WDSR
    ├── README_CN.md                           //自述文件
-   ├── eval.py                                //评估脚本
-   ├── export.py
    ├── script
    │        ├── run_ascend_distribute.sh      //Ascend分布式训练shell脚本
    │        ├── run_ascend_standalone.sh      //Ascend单卡训练shell脚本
+   │        ├── run_gpu_distribute.sh         //GPU分布式训练shell脚本
+   │        ├── run_gpu_standalone.sh         //GPU单卡训练shell脚本
    │        └── run_eval.sh                   //eval验证shell脚本
    ├── src
    │     ├── args.py                          //超参数
@@ -160,8 +166,10 @@ WDSR
    │     │      └── srdata.py                 //所有数据集
    │     ├── metrics.py                       //PSNR和SSIM计算器
    │     ├── model.py                         //WDSR网络
-   │     └── utils.py                         //训练脚本
-   └── train.py                               //训练脚本
+   │     └── utils.py                         //辅助函数
+   ├── train.py                               //训练脚本
+   ├── eval.py                                //评估脚本
+   └── export.py
 ```
 
 ## 脚本参数
@@ -169,43 +177,30 @@ WDSR
 主要参数如下:
 
 ```python
-  -h, --help            show this help message and exit
-  --dir_data DIR_DATA   dataset directory
-  --data_train DATA_TRAIN
-                        train dataset name
-  --data_test DATA_TEST
-                        test dataset name
-  --data_range DATA_RANGE
-                        train/test data range
-  --ext EXT             dataset file extension
-  --scale SCALE         super resolution scale
-  --patch_size PATCH_SIZE
-                        output patch size
-  --rgb_range RGB_RANGE
-                        maximum value of RGB
-  --n_colors N_COLORS   number of color channels to use
-  --no_augment          do not use data augmentation
-  --model MODEL         model name
-  --n_resblocks N_RESBLOCKS
-                        number of residual blocks
-  --n_feats N_FEATS     number of feature maps
-  --res_scale RES_SCALE
-                        residual scaling
-  --test_every TEST_EVERY
-                        do test per every N batches
-  --epochs EPOCHS       number of epochs to train
-  --batch_size BATCH_SIZE
-                        input batch size for training
-  --test_only           set this option to test the model
-  --lr LR               learning rate
-  --ckpt_save_path CKPT_SAVE_PATH
-                        path to save ckpt
-  --ckpt_save_interval CKPT_SAVE_INTERVAL
-                        save ckpt frequency, unit is epoch
-  --ckpt_save_max CKPT_SAVE_MAX
-                        max number of saved ckpt
-  --ckpt_path CKPT_PATH
-                        path of saved ckpt
+  -h, --help                  show this help message and exit
+  --dir_data DIR_DATA         dataset directory
+  --data_train DATA_TRAIN     train dataset name
+  --data_test DATA_TEST       test dataset name
+  --data_range DATA_RANGE     train/test data range
+  --ext EXT                   dataset file extension
+  --scale SCALE               super-resolution scale
+  --patch_size PATCH_SIZE     output patch size
+  --rgb_range RGB_RANGE       maximum value of RGB
+  --n_colors N_COLORS         number of color channels to use
+  --no_augment                do not use data augmentation
+  --model MODEL               model name
+  --n_resblocks N_RESBLOCKS   number of residual blocks
+  --n_feats N_FEATS           number of feature maps
+  --res_scale RES_SCALE       residual scaling
+  --test_every TEST_EVERY     do test per every N batches
+  --epochs EPOCHS             number of epochs to train
+  --batch_size BATCH_SIZE     input batch size for training
+  --test_only                 set this option to test the model
+  --lr LR                     learning rate
+  --ckpt_path CKPT_PATH       path of saved ckpt
+  --ckpt_save_path CKPT_SAVE_PATH              path to save ckpt
+  --ckpt_save_interval CKPT_SAVE_INTERVAL      save ckpt frequency, unit is epoch
+  --ckpt_save_max CKPT_SAVE_MAX                max number of saved ckpt
   --task_id TASK_ID
 
 ```
@@ -220,6 +215,12 @@ WDSR
   sh run_ascend_standalone.sh [TRAIN_DATA_DIR]
   ```
 
+- GPU环境运行
+
+  ```bash
+  sh run_gpu_standalone.sh [TRAIN_DATA_DIR]
+  ```
+
   上述python命令将在后台运行，您可以通过train.log文件查看结果。
 
 ### 分布式训练
@@ -228,6 +229,12 @@ WDSR
 
   ```bash
   sh run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
+  ```
+
+- GPU环境运行
+
+  ```bash
+  sh run_gpu_distribute.sh [TRAIN_DATA_DIR] [DEVICE_NUM]
   ```
 
 TRAIN_DATA_DIR = "~DATA/"。
@@ -275,33 +282,33 @@ FILE_FORMAT 可选 ['MINDIR', 'AIR', 'ONNX'], 默认['MINDIR']。
 
 ### 训练性能
 
-| 参数          | Ascend                                                       |
-| ------------- | ------------------------------------------------------------ |
-| 资源          | Ascend 910                                                   |
-| 上传日期      | 2021-7-4                                                     |
-| MindSpore版本 | 1.2.0                                                        |
-| 数据集        | DIV2K                                                        |
-| 训练参数      | epoch=1000, steps=100, batch_size =16, lr=0.0001            |
-| 优化器        | Adam                                                         |
-| 损失函数      | L1                                                           |
-| 输出          | 超分辨率图片                                                 |
-| 损失          | 3.5                                                          |
-| 速度          | 8卡：约130毫秒/步                                            |
-| 总时长        | 8卡：0.5小时                                                   |
-| 微调检查点    | 35 MB(.ckpt文件)                                        |
-| 脚本          | [WDSR](https://gitee.com/mindspore/models/tree/master/research/cv/wdsr) |
+| 参数          | Ascend                                                       | GPU|
+| ------------- | ------------------------------------------------------------ |----|
+| 资源          | Ascend 910                                                   |NVIDIA GeForce RTX 3090|
+| 上传日期      | 2021-7-4                                                     |2021-11-22|
+| MindSpore版本 | 1.2.0                                                        |1.5.0|
+| 数据集        | DIV2K                                                        |DIV2K|
+| 训练参数      | epoch=1000, steps=100, batch_size =16, lr=0.0001            |epoch=300, batch_size=16, lr=0.0005|
+| 优化器        | Adam                                                         |Adam|
+| 损失函数      | L1                                                           |L1|
+| 输出          | 超分辨率图片                                                 |超分辨率图片|
+| 损失          | 3.5                                                          |3.3|
+| 速度          | 8卡：约130毫秒/步                                            |8卡：约140毫秒/步|
+| 总时长        | 8卡：0.5小时                                                   |8卡：1.5小时|
+| 微调检查点    | 35 MB(.ckpt文件)                                        |14 MB(.ckpt文件)|
+| 脚本          | [WDSR](https://gitee.com/mindspore/models/tree/master/research/cv/wdsr) |[WDSR](https://gitee.com/mindspore/models/tree/master/research/cv/wdsr)|
 
 ### 评估性能
 
-| 参数          | Ascend                                                      |
-| ------------- | ----------------------------------------------------------- |
-| 资源          | Ascend 910                                                  |
-| 上传日期      | 2021-7-4                                                    |
-| MindSpore版本 | 1.2.0                                                       |
-| 数据集        | DIV2K                                                       |
-| batch_size    | 1                                                           |
-| 输出          | 超分辨率图片                                                |
-| PSNR          | DIV2K 34.7780                                               |
+| 参数          | Ascend                                                      |GPU                    |
+| ------------- | ----------------------------------------------------------- |----------------------|
+| 资源          | Ascend 910                                                  |NVIDIA GeForce RTX 3090|
+| 上传日期      | 2021-7-4                                                    |2021-11-22              |
+| MindSpore版本 | 1.2.0                                                       |1.5.0                  |
+| 数据集        | DIV2K                                                       |DIV2K                   |
+| batch_size    | 1                                                           |1                      |
+| 输出          | 超分辨率图片                                                  |超分辨率图片              |
+| PSNR          | DIV2K 34.7780                                               |DIV2K 35.9735          |
 
 ### 310评估性能
 

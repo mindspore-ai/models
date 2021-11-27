@@ -22,7 +22,7 @@ parser.add_argument('--data_train', type=str, default='DIV2K',
                     help='train dataset name')
 parser.add_argument('--data_test', type=str, default='DIV2K',
                     help='test dataset name')
-parser.add_argument('--data_range', type=str, default='1-800/801-900',
+parser.add_argument('--data_range', type=str, default='1-800/801-810',
                     help='train/test data range')
 parser.add_argument('--ext', type=str, default='sep',
                     help='dataset file extension')
@@ -61,7 +61,7 @@ parser.add_argument('--init_loss_scale', type=float, default=65536.,
                     help='scaling factor')
 parser.add_argument('--loss_scale', type=float, default=1024.0,
                     help='loss_scale')
-parser.add_argument('--decay', type=str, default='200',
+parser.add_argument('--decay', type=int, default=200,
                     help='learning rate decay type')
 parser.add_argument('--betas', type=tuple, default=(0.9, 0.999),
                     help='ADAM beta')
@@ -80,8 +80,21 @@ parser.add_argument('--ckpt_save_max', type=int, default=5,
                     help='max number of saved ckpt')
 parser.add_argument('--ckpt_path', type=str, default='',
                     help='path of saved ckpt')
+# sr result specifications
+parser.add_argument('--save_dir', type=str, default='result',
+                    help='file name to save')
+parser.add_argument('--save_result', action='store_true',
+                    help='save output results')
 # alltask
 parser.add_argument('--task_id', type=int, default=0)
+parser.add_argument('--pre_trained', type=str, default='', help='model_path, local pretrained model to load')
+parser.add_argument('--device_target', type=str, default='GPU', choices=("GPU"),
+                    help="Device target, support GPU.")
+parser.add_argument("--run_distribute", type=int, default=False,
+                    help="Run distribute, default: false.")
+parser.add_argument('--device_num', type=int, default=1, help='Device num.')
+parser.add_argument("--device_id", type=int, default=0, help="device id, default: 0.")
+parser.add_argument("--rank_id", type=int, default=0, help="Rank id, default: 0.")
 # rgb_mean
 parser.add_argument('--r_mean', type=float, default=0.4488,
                     help='r_mean')
@@ -89,6 +102,7 @@ parser.add_argument('--g_mean', type=float, default=0.4371,
                     help='g_mean')
 parser.add_argument('--b_mean', type=float, default=0.4040,
                     help='b_mean')
+
 args, unparsed = parser.parse_known_args()
 args.scale = [int(x) for x in args.scale.split("+")]
 args.data_train = args.data_train.split('+')
