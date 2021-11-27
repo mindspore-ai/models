@@ -43,14 +43,15 @@ parser = argparse.ArgumentParser(description='MindSpore SPPNet')
 parser.add_argument('--sink_size', type=int, default=-1, help='control the amount of data in each sink')
 parser.add_argument('--train_model', type=str, default='sppnet_single', help='chose the training model',
                     choices=['sppnet_single', 'sppnet_mult', 'zfnet'])
-parser.add_argument('--device_target', type=str, default="Ascend",
-                    help='device where the code will be implemented (default: Ascend)')
+parser.add_argument('--device_target', type=str, default="Ascend", help='chose the device for train',
+                    choices=['Ascend', 'GPU'])
 parser.add_argument('--train_path', type=str,
                     default="./imagenet_original/train",
                     help='path where the train dataset is saved')
 parser.add_argument('--eval_path', type=str,
                     default="./imagenet_original/val",
                     help='path where the validate dataset is saved')
+parser.add_argument('--is_distributed', type=int, default=0, help='distributed training')
 parser.add_argument('--ckpt_path', type=str, default="./ckpt", help='if is test, must provide\
                         path where the trained ckpt file')
 parser.add_argument('--dataset_sink_mode', type=ast.literal_eval,
@@ -75,18 +76,19 @@ if __name__ == "__main__":
     context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
     context.set_context(save_graphs=False)
 
-    if device_target == "Ascend":
-        context.set_context(device_id=args.device_id)
-
-        if device_num > 1:
-            init()
-            device_num = get_group_size()
-            print("device_num:", device_num)
-            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              global_rank=args.device_id,
-                                              gradients_mean=True)
+    if args.is_distributed:
+        if args.device_target == "Ascend":
+            context.set_context(device_id=device_id)
+            init("hccl")
+        else:
+            assert args.device_target == "GPU"
+            init("nccl")
+        args.device_id = get_rank()
+        args.device_num = get_group_size()
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(device_num=args.device_num, parallel_mode=ParallelMode.DATA_PARALLEL)
     else:
-        raise ValueError("Unsupported platform.")
+        context.set_context(device_id=args.device_id)
 
     if args.train_model == "zfnet":
         cfg = zfnet_cfg
@@ -146,11 +148,8 @@ if __name__ == "__main__":
     else:
         loss_scale_manager = FixedLossScaleManager(cfg.loss_scale, drop_overflow_update=False)
 
-    if device_target == "Ascend":
-        model = Model(network, loss_fn=loss, optimizer=opt, metrics=metrics, amp_level="O2", keep_batchnorm_fp32=False,
-                      loss_scale_manager=loss_scale_manager)
-    else:
-        raise ValueError("Unsupported platform.")
+    model = Model(network, loss_fn=loss, optimizer=opt, metrics=metrics, amp_level="O2", keep_batchnorm_fp32=False,
+                  loss_scale_manager=loss_scale_manager)
 
     if device_num > 1:
         ckpt_save_dir = os.path.join(args.ckpt_path + "_" + str(get_rank()))
@@ -161,17 +160,18 @@ if __name__ == "__main__":
     eval_dataset = create_dataset_imagenet(args.eval_path, cfg.batch_size, training=False)
     evalParamDict = {"model": model, "dataset": eval_dataset}
     if args.train_model == "sppnet_mult":
-        eval_cb = EvalCallBackMult(apply_eval, evalParamDict, eval_start_epoch=1)
+        eval_cb = EvalCallBackMult(apply_eval, evalParamDict, eval_start_epoch=1, ckpt_directory=ckpt_save_dir)
     else:
-        eval_cb = EvalCallBack(apply_eval, evalParamDict, eval_start_epoch=1, train_model_name=args.train_model)
+        eval_cb = EvalCallBack(apply_eval, evalParamDict, eval_start_epoch=1, train_model_name=args.train_model,
+                               ckpt_directory=ckpt_save_dir)
     loss_cb = LossMonitor(per_print_times=step_per_epoch)
     time_cb = TimeMonitor(data_size=step_per_epoch)
 
     print("============== Starting Training ==============")
 
     if args.train_model == "sppnet_mult":
-        ds_train_mult_size = create_dataset_imagenet(args.train_path, 'sppnet_mult', cfg.batch_size,
-                                                     training=True, image_size=180)
+        ds_train_180 = create_dataset_imagenet(args.train_path, 'sppnet_mult', cfg.batch_size,
+                                               training=True, image_size=180)
         for per_epoch in range(cfg.epoch_size):
             print("================ Epoch:{} ==================".format(per_epoch+1))
             if per_epoch % 2 == 0:
@@ -179,7 +179,7 @@ if __name__ == "__main__":
                 model.train(1, ds_train, callbacks=cb, dataset_sink_mode=False, sink_size=args.sink_size)
             else:
                 cb = [time_cb, loss_cb]
-                model.train(1, ds_train_mult_size, callbacks=cb, dataset_sink_mode=False, sink_size=args.sink_size)
+                model.train(1, ds_train_180, callbacks=cb, dataset_sink_mode=False, sink_size=args.sink_size)
     else:
         cb = [time_cb, loss_cb, eval_cb]
         model.train(cfg.epoch_size, ds_train, callbacks=cb, dataset_sink_mode=True, sink_size=args.sink_size)

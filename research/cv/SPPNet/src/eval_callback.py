@@ -55,9 +55,9 @@ class EvalCallBack(Callback):
         self.save_best_ckpt = save_best_ckpt
         self.best_epoch = 0
         if train_model_name == "sppnet_single":
-            self.best_res = {'top_1_accuracy': 0.6482, 'top_5_accuracy': 0.8566}
+            self.best_res = {'top_1_accuracy': 0.64, 'top_5_accuracy': 0.84}
         else:
-            self.best_res = {'top_1_accuracy': 0.6381, 'top_5_accuracy': 0.8504}
+            self.best_res = {'top_1_accuracy': 0.63, 'top_5_accuracy': 0.84}
         if not os.path.isdir(ckpt_directory):
             os.makedirs(ckpt_directory)
         self.bast_ckpt_path = os.path.join(ckpt_directory, besk_ckpt_name)
