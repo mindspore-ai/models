@@ -175,3 +175,20 @@ class FeatureCollectCell(nn.Cell):
         feature = output[0]
 
         return feature, label, training
+
+class FeatureCollectCell310(nn.Cell):
+    """
+    get features from net
+    """
+
+    def __init__(self, network):
+        super(FeatureCollectCell310, self).__init__(auto_prefix=False)
+        self._network = network
+        self.shape = P.Shape()
+        self.sum = P.ReduceSum()
+
+    def construct(self, data):
+        output = self._network(data, data, data)  # redundant input
+        feature = output[0]
+
+        return feature
