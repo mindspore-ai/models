@@ -14,11 +14,11 @@
 # limitations under the License.
 # ============================================================================
 
-#Usage: sh run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE] [DEVICE_NUM]
+#Usage: bash run_distribute_train.sh [DATA_URL] [RANK_TABLE_FILE] [DEVICE_NUM]
 
 
 ulimit -u unlimited
-export DATASET_PATH=$1
+export DATA_URL=$1
 export RANK_TABLE_FILE=$2
 export DEVICE_NUM=$3
 export RANK_SIZE=$DEVICE_NUM
@@ -38,7 +38,7 @@ do
     cd ./train_parallel$i || exit
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     env > env.log
-    python train.py --run_distribute=True --device_num=$DEVICE_NUM --dataset_path=$DATASET_PATH  &> log &
+    python train.py --run_distribute=True --device_num=$DEVICE_NUM --data_url=$DATA_URL  &> log &
 
     cd ..
 done

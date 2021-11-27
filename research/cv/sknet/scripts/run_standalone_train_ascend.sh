@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,32 +13,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""
-network config setting, will be used in train.py and eval.py
-"""
-from easydict import EasyDict as ed
 
-cfg = ed({
-    'optimizer': 'Momentum',
-    'infer_label': {}
-})
+if [ $# != 2 ]
+then 
+    echo "Usage: bash run_standalone_train.sh [DATA_URL] [DEVICE_ID]"
+exit 1
+fi
 
-# config for sknet50, cifar10
-config1 = ed({
-    "class_num": 10,
-    "batch_size": 32,
-    "loss_scale": 1024,
-    "momentum": 0.9,
-    "weight_decay": 1e-4,
-    "epoch_size": 90,
-    "pretrain_epoch_size": 0,
-    "save_checkpoint": True,
-    "save_checkpoint_epochs": 1,
-    "keep_checkpoint_max": 90,
-    "save_checkpoint_path": "./ckpt",
-    "warmup_epochs": 5,
-    "lr_decay_mode": "poly",
-    "lr_init": 0.01,
-    "lr_end": 0.00001,
-    "lr_max": 0.1
-})
+ulimit -u unlimited
+export DEVICE_NUM=1
+export DEVICE_ID=$2
+export RANK_ID=0
+export RANK_SIZE=1
+export DATASET_PATH=$1
+
+
+if [ -d "train" ];
+then
+    rm -rf ./train
+fi
+
+mkdir ./train
+cp ../*.py ./train
+cp *.sh ./train
+cp -r ../src ./train
+cd ./train || exit
+echo "start training for device $DEVICE_ID"
+env > env.log
+python train.py --data_url=$DATA_URL --device_target=Ascend --device_id=DEVICE_ID &> log &
+cd ..
+

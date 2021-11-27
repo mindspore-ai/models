@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,32 +14,34 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 1 ]
-then 
-    echo "Usage: sh run_standalone_train.sh [DATASET_PATH]"
+if [ $# -lt 3 ]
+then
+    echo "Usage: bash run_train_gpu.sh [DATA_URL] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DEVICE_NUM]"
 exit 1
 fi
 
-ulimit -u unlimited
-export DEVICE_NUM=1
-export DEVICE_ID=0
-export RANK_ID=0
-export RANK_SIZE=1
-export DATASET_PATH=$1
+if [ $3 -lt 1 ] && [ $3 -gt 8 ]
+then
+    echo "error: DEVICE_NUM=$3 is not in (1-8)"
+exit 1
+fi
 
+DATA_URL=$1
 
-if [ -d "train" ];
+export DEVICE_NUM=$3
+export RANK_SIZE=$3
+
+BASEPATH=$(cd "`dirname $0`" || exit; pwd)
+export PYTHONPATH=${BASEPATH}:$PYTHONPATH
+if [ -d "./train" ];
 then
     rm -rf ./train
 fi
-
 mkdir ./train
-cp ../*.py ./train
-cp *.sh ./train
-cp -r ../src ./train
 cd ./train || exit
-echo "start training for device $DEVICE_ID"
-env > env.log
-python train.py --dataset_path=$DATASET_PATH &> log &
-cd ..
+
+export CUDA_VISIBLE_DEVICES="$2"
+
+mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+python3 ${BASEPATH}/../train.py --run_distribute=True --device_target=GPU --data_url=$DATA_URL> train_gpu.log 2>&1 &
 
