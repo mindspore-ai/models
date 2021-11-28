@@ -11,26 +11,26 @@ enable_profiling: False
 
 # ==============================================================================
 # config
-
-img_width: 1280
-img_height: 768
+img_width: 1024
+img_height: 1024
 keep_ratio: True
 flip_ratio: 0.5
 expand_ratio: 1.0
 
 # anchor
+feature_shapes:
+- [254, 254]
+- [125, 125]
+- [62, 62]
+- [30, 30]
+- [15, 15]
 anchor_scales: [8]
 anchor_ratios: [0.5, 1.0, 2.0]
 anchor_strides: [4, 8, 16, 32, 64]
 num_anchors: 3
 
-# resnet
-resnet_block: [3, 4, 23, 3]
-resnet_in_channels: [64, 256, 512, 1024]
-resnet_out_channels: [256, 512, 1024, 2048]
-
 # fpn
-fpn_in_channels: [256, 512, 1024, 2048]
+fpn_in_channels: [64, 192, 1088, 2080]
 fpn_out_channels: 256
 fpn_num_outs: 5
 
@@ -47,6 +47,7 @@ rpn_target_stds: [1.0, 1.0, 1.0, 1.0]
 neg_iou_thr: 0.3
 pos_iou_thr: 0.7
 min_pos_iou: 0.3
+num_bboxes: 255330
 num_gts: 128
 num_expected_neg: 256
 num_expected_pos: 128
@@ -104,7 +105,7 @@ rpn_head_use_sigmoid: True
 rpn_head_weight: 1.0
 
 # LR
-base_lr: 0.02
+base_lr: 0.05
 warmup_step: 500
 warmup_ratio: 0.0625
 sgd_step: [8, 11]
@@ -116,8 +117,6 @@ loss_scale: 256
 momentum: 0.91
 weight_decay: 0.00001
 epoch_size: 20
-run_eval: False
-interval: 1
 save_checkpoint: True
 save_checkpoint_epochs: 1
 keep_checkpoint_max: 5
@@ -127,8 +126,8 @@ save_checkpoint_path: "./"
 num_parallel_workers: 8
 # Parallelize Python operations with multiple worker processes
 python_multiprocessing: True
-mindrecord_dir: "/disk2/dataset/COCO2017/MindRecord_COCO_TRAIN"
-coco_root: "/disk2/dataset/COCO2017"
+mindrecord_dir: "/cache/data/MindRecord_COCO_TRAIN"
+coco_root: "/cache/data"
 train_data_type: "train2017"
 val_data_type: "val2017"
 instance_set: "annotations/instances_{}.json"
@@ -148,29 +147,28 @@ coco_classes: ['background', 'person', 'bicycle', 'car', 'motorcycle', 'airplane
                      'refrigerator', 'book', 'clock', 'vase', 'scissors',
                      'teddy bear', 'hair drier', 'toothbrush']
 num_classes: 81
-prefix: ""
 
 # train.py FasterRcnn training
 run_distribute: False
 dataset: "coco"
-pre_trained: "/cache/train/fasterrcnn/faster_rcnn-12_7393.ckpt"
+pre_trained: "/cache/checkpoint_path/backbone.ckpt"
 device_id: 0
 device_num: 1
 rank_id: 0
 image_dir: ''
 anno_path: ''
-backbone: 'resnet_v1_101'
+backbone: 'inception_resnet_v2'
 
 # eval.py FasterRcnn evaluation
 ann_file: '/cache/data/annotations/instances_val2017.json'
-checkpoint_path: "/cache/train/fasterrcnn/faster_rcnn-12_7393.ckpt"
+checkpoint_path: "/cache/checkpoint_path/faster_rcnn-20_7393.ckpt"
 
 # export.py fasterrcnn_export
 file_name: "faster_rcnn"
 file_format: "AIR"
-ckpt_file: "/cache/train/fasterrcnn/faster_rcnn-12_7393.ckpt"
+ckpt_file: ""
 
-# postprocess ("./src/config_50.yaml")
+# postprocess ("./src/default_config_InceptionResnetV2.yaml")
 #ann_file: ''
 result_path: ''
 
@@ -205,7 +203,6 @@ checkpoint_path: "Checkpoint file path."
 ckpt_file: 'fasterrcnn ckpt file.'
 result_path: "result file path."
 backbone: "backbone network name, options:resnet_v1_50, resnet_v1.5_50, resnet_v1_101, resnet_v1_152"
-interval: "val interval"
 
 ---
 device_target: ['Ascend', 'GPU', 'CPU']

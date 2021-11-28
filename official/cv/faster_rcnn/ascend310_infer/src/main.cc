@@ -54,9 +54,8 @@ using mindspore::dataset::vision::Decode;
 DEFINE_string(mindir_path, "", "mindir path");
 DEFINE_string(dataset_path, ".", "dataset path");
 DEFINE_int32(device_id, 0, "device id");
-
-const int IMAGEWIDTH = 1280;
-const int IMAGEHEIGHT = 768;
+DEFINE_int32(IMAGEWIDTH, 1280, "image width");
+DEFINE_int32(IMAGEHEIGHT, 768, "image height");
 
 int PadImage(const MSTensor &input, MSTensor *output) {
     std::shared_ptr<TensorTransform> normalize(new Normalize({103.53, 116.28, 123.675},
@@ -67,12 +66,12 @@ int PadImage(const MSTensor &input, MSTensor *output) {
     auto imgPad = MSTensor();
 
     float widthScale, heightScale;
-    widthScale = static_cast<float>(IMAGEWIDTH) / shape[1];
-    heightScale = static_cast<float>(IMAGEHEIGHT) / shape[0];
+    widthScale = static_cast<float>(FLAGS_IMAGEWIDTH) / shape[1];
+    heightScale = static_cast<float>(FLAGS_IMAGEHEIGHT) / shape[0];
     Status ret;
     if (widthScale < heightScale) {
         int heightSize = shape[0]*widthScale;
-        std::shared_ptr<TensorTransform> resize(new Resize({heightSize, IMAGEWIDTH}));
+        std::shared_ptr<TensorTransform> resize(new Resize({heightSize, FLAGS_IMAGEWIDTH}));
         Execute composeResizeWidth({resize});
         ret = composeResizeWidth(input, &imgResize);
         if (ret != kSuccess) {
@@ -80,7 +79,7 @@ int PadImage(const MSTensor &input, MSTensor *output) {
             return 1;
         }
 
-        int paddingSize = IMAGEHEIGHT - heightSize;
+        int paddingSize = FLAGS_IMAGEHEIGHT - heightSize;
         std::shared_ptr<TensorTransform> pad(new Pad({0, 0, 0, paddingSize}));
         Execute composePad({pad});
         ret = composePad(imgResize, &imgPad);
@@ -96,7 +95,7 @@ int PadImage(const MSTensor &input, MSTensor *output) {
         }
     } else {
         int widthSize = shape[1]*heightScale;
-        std::shared_ptr<TensorTransform> resize(new Resize({IMAGEHEIGHT, widthSize}));
+        std::shared_ptr<TensorTransform> resize(new Resize({FLAGS_IMAGEHEIGHT, widthSize}));
         Execute composeResizeHeight({resize});
         ret = composeResizeHeight(input, &imgResize);
         if (ret != kSuccess) {
@@ -104,7 +103,7 @@ int PadImage(const MSTensor &input, MSTensor *output) {
             return 1;
         }
 
-        int paddingSize = IMAGEWIDTH - widthSize;
+        int paddingSize = FLAGS_IMAGEWIDTH - widthSize;
         std::shared_ptr<TensorTransform> pad(new Pad({0, 0, paddingSize, 0}));
         Execute composePad({pad});
         ret = composePad(imgResize, &imgPad);
@@ -184,8 +183,8 @@ int main(int argc, char **argv) {
 
         std::vector<int64_t> shape = imgDecode.Shape();
 
-        float widthScale = static_cast<float>(IMAGEWIDTH) / shape[1];
-        float heightScale = static_cast<float>(IMAGEHEIGHT) / shape[0];
+        float widthScale = static_cast<float>(FLAGS_IMAGEWIDTH) / shape[1];
+        float heightScale = static_cast<float>(FLAGS_IMAGEHEIGHT) / shape[0];
         float resizeScale = widthScale < heightScale ? widthScale : heightScale;
 
         float imgInfo[4];
@@ -217,10 +216,10 @@ int main(int argc, char **argv) {
     int inferCount = 0;
 
     for (auto iter = costTime_map.begin(); iter != costTime_map.end(); iter++) {
-    double diff = 0.0;
-    diff = iter->second - iter->first;
-    average += diff;
-    inferCount++;
+        double diff = 0.0;
+        diff = iter->second - iter->first;
+        average += diff;
+        inferCount++;
     }
     average = average / inferCount;
     std::stringstream timeCost;

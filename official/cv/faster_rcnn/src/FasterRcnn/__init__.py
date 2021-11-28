@@ -24,9 +24,11 @@ from .rcnn import Rcnn
 from .rpn import RPN
 from .roi_align import SingleRoIExtractor
 from .anchor_generator import AnchorGenerator
+from .inceptionresnetv2 import InceptionResNetV2
 
 __all__ = [
     "ResNetFea", "BboxAssignSample", "BboxAssignSampleForRcnn",
     "FeatPyramidNeck", "Proposal", "Rcnn",
-    "RPN", "SingleRoIExtractor", "AnchorGenerator", "ResidualBlockUsing", "ResidualBlockUsing_V1"
+    "RPN", "SingleRoIExtractor", "AnchorGenerator", "ResidualBlockUsing", "ResidualBlockUsing_V1",
+    "InceptionResNetV2"
 ]
