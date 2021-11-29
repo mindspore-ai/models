@@ -345,7 +345,6 @@ def train_dataset_creator(rank, group_size, shuffle=True):
     sampler = DistributedSampler(dataset, rank, group_size, shuffle)
     data_set = ds.GeneratorDataset(dataset, ['img', 'gt_text', 'gt_kernels', 'training_mask'], num_parallel_workers=8,
                                    sampler=sampler)
-    data_set = data_set.repeat(1)
     data_set = data_set.batch(config.TRAIN_BATCH_SIZE, drop_remainder=config.TRAIN_DROP_REMAINDER)
     return data_set
 

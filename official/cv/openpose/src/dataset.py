@@ -547,7 +547,6 @@ def valdata(jsonpath, imgpath, rank, group_size, mode='val', maskpath=''):
     dataset = txtdataset(val, imgpath, maskpath, config.insize, mode=mode)
     sampler = DistributedSampler(dataset, rank, group_size)
     ds = de.GeneratorDataset(dataset, ['img', 'img_id'], num_parallel_workers=8, sampler=sampler)
-    ds = ds.repeat(1)
     return ds
 
 

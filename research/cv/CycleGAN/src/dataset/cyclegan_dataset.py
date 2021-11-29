@@ -164,7 +164,6 @@ def create_dataset(args):
         ds = ds.map(operations=trans, input_columns=["image_A"], num_parallel_workers=num_parallel_workers)
         ds = ds.map(operations=trans, input_columns=["image_B"], num_parallel_workers=num_parallel_workers)
         ds = ds.batch(batch_size, drop_remainder=True)
-        ds = ds.repeat(1)
     else:
         datadir = os.path.join(dataroot, args.data_dir)
         dataset = ImageFolderDataset(datadir, max_dataset_size=max_dataset_size)
@@ -177,7 +176,6 @@ def create_dataset(args):
         ]
         ds = ds.map(operations=trans, input_columns=["image"], num_parallel_workers=num_parallel_workers)
         ds = ds.batch(1, drop_remainder=True)
-        ds = ds.repeat(1)
     args.dataset_size = len(dataset)
     return ds
     

@@ -260,5 +260,4 @@ def create_multi_class_dataset(data_dir, img_size, repeat, batch_size, num_class
                           python_multiprocessing=python_multiprocessing,
                           num_parallel_workers=num_parallel_workers)
     dataset = dataset.batch(batch_size, drop_remainder=is_train)
-    dataset = dataset.repeat(1)
     return dataset

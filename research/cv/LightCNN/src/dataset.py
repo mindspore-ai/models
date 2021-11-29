@@ -97,7 +97,6 @@ def create_dataset(mode, data_url, data_list, batch_size, resize_size=144,
                           num_parallel_workers=num_of_workers)
 
     dataset = dataset.batch(batch_size, num_parallel_workers=num_of_workers, drop_remainder=drop_last)
-    dataset = dataset.repeat(1)
 
     return dataset
 

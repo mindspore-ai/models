@@ -151,7 +151,6 @@ def run_eval():
     network = backbone_HwYolov3(num_classes, num_anchors_list, config)
     network = load_pretrain(network, config)
 
-    ds = ds.repeat(1)
 
     det = {}
     img_size = {}
