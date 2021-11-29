@@ -42,7 +42,7 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
 
 ## 数据集
 
-- [1] A dataset used in  Huifeng Guo, Ruiming Tang, Yunming Ye, Zhenguo Li, Xiuqiang He. DeepFM: A Factorization-Machine based Neural Network for CTR Prediction[J]. 2017.
+- [Criteo Kaggle Display Advertising Challenge Dataset](http://go.criteo.net/criteo-research-kaggle-display-advertising-challenge-dataset.tar.gz)
 
 ## 环境要求
 
@@ -67,7 +67,7 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
   tar -zxvf dac.tar.gz
 
   #数据集预处理脚步执行
-  python src/preprocess_data.py  --data_path=./data/ --dense_dim=13 --slot_dim=26 --threshold=100 --train_line_count=45840617 --skip_id_convert=0
+  python -m src.preprocess_data  --data_path=./data/ --dense_dim=13 --slot_dim=26 --threshold=100 --train_line_count=45840617 --skip_id_convert=0
   '''
 
 - Ascend处理器环境运行

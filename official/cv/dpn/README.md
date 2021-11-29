@@ -111,24 +111,35 @@ bash scripts/eval.sh [device_id] [eval_data_dir] [checkpoint_path]
 The structure of the files in this repository is shown below.
 
 ```text
-└─ mindspore-dpns
+└─ dpn
+    ├─ ascend310_infer            // application for 310 inference
+    ├─ infer                      // inference
+    ├─ modelarts                  // run model on modelarts
     ├─ scripts
-    │   ├─ eval.sh                // launch ascend standalone evaluation
-    │   ├─ train_distributed.sh   // launch ascend distributed training
-    │   └─ train_standalone.sh    // launch ascend standalone training
+       ├─ docker_start.sh
+       ├─ eval.sh                // launch ascend standalone evaluation
+       ├─ run_infer_310.sh       //  310 infer
+       ├─ train_distributed.sh   // launch ascend distributed training
+       └─ train_standalone.sh    // launch ascend standalone training
     ├─ src
-    │   ├─ config.py              // network and running config
-    │   ├─ crossentropy.py        // loss function
-    │   ├─ dpn.py                 // dpns implementation
-    │   ├─ imagenet_dataset.py    // dataset processor and provider
-    │   └─ lr_scheduler.py        // dpn learning rate scheduler
-    ├── model_utils
-        ├──config.py             // Parameter config
-        ├──moxing_adapter.py     // modelarts device configuration
-        ├──device_adapter.py     // Device Config
-        ├──local_adapter.py      // local device config
+       ├─ callbacks.py           // user-defined callbacks
+       ├─ crossentropy.py        // user-defined loss functions
+       ├─ dpn.py                 // dpns implementation
+       ├─ imagenet_dataset.py    // dataset processor and provider
+       ├─ lr_scheduler.py        // dpn learning rate scheduler
+       ├── model_utils
+           ├── __init__.py
+           ├── config.py             // configuration and parameters parse
+           ├── moxing_adapter.py     // modelarts device configuration
+           ├── device_adapter.py     // Device Config
+           ├── local_adapter.py      // local device config
+    ├─ default_config.yaml        // default configuration file
     ├─ eval.py                    // evaluation script
     ├─ train.py                   // training script
+    ├─ mindspore_hub_conf.py      // mindspore hub interface
+    ├─ postprocess.py             // post-processing script for 310 inference
+    ├─ preprocess.py              // dataset preprocess script
+    ├─ requirements.txt           // dependent package description file
     ├─ export.py                  // export model
     └─ README.md                  // descriptions about this repository
 ```
@@ -318,7 +329,7 @@ DPN evaluate success!
 ### [Export MindIR](#contents)
 
 ```shell
-python export.py --config_path [CONFIG_PATH] --checkpoint_path [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --file_name [filename] --file_format [file format] --checkpoint_path [ckpt path]
 ```
 
 The `checkpoint_path` parameter is required,
