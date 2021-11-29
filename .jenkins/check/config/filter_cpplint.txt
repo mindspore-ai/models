@@ -37,3 +37,5 @@
 "models/research/cv/SE-Net/infer/mxbase/src/Senet_resnet50_opencv.h"                 "runtime/references"
 "models/research/cv/SE-Net/infer/mxbase/src/main.cpp"                                "runtime/references"
 "models/research/cv/midas/infer/mxbase/src/Midas.h"           "runtime/references"
+
+"models/research/cv/inception_resnet_v2/infer/mxbase/InceptionResnetV2Classify.h" "runtime/references"
