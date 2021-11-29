@@ -50,7 +50,7 @@ def get_config():
 
         # trainer
         "breakpoint_training_path": "",
-        "batch_size": 128,
+        "batch_size": 96,
         "epochs": 1000,
         "epoch_stage": [600, 400],
         "lr_schedule": "cosine_lr",

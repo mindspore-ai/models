@@ -67,6 +67,9 @@ def run_export():
         export(test_net, tensor_input_data, file_name=config.file_name, file_format=config.file_format)
 
         print("export model success.")
+    else:
+        print('load model {} failed, please check the path of model, evaluating end'.format(config.pretrained))
+        exit(0)
 
 
 if __name__ == "__main__":
