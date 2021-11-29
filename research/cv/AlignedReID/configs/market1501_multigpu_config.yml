@@ -1,0 +1,97 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+data_path: "/cache/data"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+device_target: "GPU"
+need_modelarts_dataset_unzip: False
+modelarts_dataset_unzip_name: "market1501"
+
+# ==============================================================================
+# options
+lr_init: 0.0002 # 2e-4
+start_decay_epoch: 301
+ims_per_id: 4
+ids_per_batch: 8
+max_epoch: 600
+dataset: "market1501"
+data_dir: "/wrk_dir/dataset/market1501/images/"
+partitions_file: "/wrk_dir/dataset/market1501/partitions.pkl"
+image_size: '256,128'
+image_mean: '0.486,0.459,0.408'
+image_std: '0.229,0.224,0.225'
+is_save_on_master: 1
+is_print_on_master: 0
+# Should be replaced by args in run script on multigpu
+is_distributed: 0
+
+# loss options
+weight_decay: 0.0005 # 5e-4
+global_loss_margin: 0.3
+local_loss_margin: 0.3
+g_loss_weight: 1
+l_loss_weight: 0.0
+id_loss_weight: 0.0
+
+# train options
+pre_trained: ""
+pre_trained_backbone: "/wrk_dir/dataset/models/resnet50.ckpt"
+log_interval: 4
+ckpt_path: "/wrk_dir/dataset/models/logs/"
+ckpt_interval: 2
+keep_checkpoint_max: 2
+train_log_path: "/wrk_dir/dataset/models/logs/"
+
+# eval options
+per_batch_size: 512
+log_path: "/wrk_dir/dataset/models/logs/"
+eval_model: ""
+
+# export options
+ckpt_file: ""
+file_name: "aligned_reid_market1501"
+file_format: "MINDIR"
+
+---
+
+# Help description for each configuration
+device_target: "device where the code will be implemented."
+start_decay_epoch: "epoch for start exponential decay"
+ims_per_id: "number of images for person in epoch"
+ids_per_batch: "number of person in batch (there are ims_per_id images for person in batch)"
+dataset: "choices in ['market1501']"
+data_dir: "data dir"
+partitions_file: "prepared pkl file with labels, train test splitting e.t.c."
+is_save_on_master: "save only main thread checkpoint"
+is_print_on_master: "print only main thread logs"
+
+# loss options
+weight_decay: "optimizer weight decay"
+global_loss_margin: "margin for global MarginRankingLoss"
+local_loss_margin: "margin for local MarginRankingLoss"
+g_loss_weight: "weight of global loss"
+l_loss_weight: "weight of local loss"
+id_loss_weight: "weight of identity loss"
+
+# train options
+pre_trained: "model_path, local pretrained model to load"
+pre_trained_backbone: "model_path, local pretrained ResNet50 backbone to load"
+log_interval: "logging interval"
+ckpt_path: "checkpoint save location"
+ckpt_interval: "num of epochs between checkpoints"
+keep_checkpoint_max: "max number of checkpoints"
+train_log_path: "path for saving train logs"
+
+# eval options
+log_path: "path for saving evaluation logs"
+eval_model: "path to model for evaluation"
+
+# export options
+ckpt_file: "checkpoint file"
+file_name: "output file name"
+file_format: "file format, choices in ['MINDIR']"
