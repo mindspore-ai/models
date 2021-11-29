@@ -17,21 +17,48 @@ network config setting, will be used in train.py and eval.py
 """
 from easydict import EasyDict as ed
 
-config = ed({
+config_ascend = ed({
     "save_checkpoint": True,
-    "save_checkpoint_epochs": 112,
-    "keep_checkpoint_max": 10000,
+    "save_checkpoint_epochs": 2,
+    "keep_checkpoint_max": 10,
     "learning_rate": 0.001,
     "m_for_scrutinizer": 4,
     "topK": 6,
     "input_size": (448, 448),
+    "crop_pct_size": (600, 600),
     "weight_decay": 1e-4,
     "momentum": 0.9,
-    "num_epochs": 112,
+    "num_epochs": 200,
     "num_classes": 200,
     "num_train_images": 5994,
     "num_test_images": 5794,
     "batch_size": 8,
     "prefix": "ntsnet",
-    "lossLogName": "loss.log"
+    "lossLogName": "loss.log",
+    "lr_scheduler": "cosine",
+    "lr_step": [200, 200],
+    "optimizer": "momentum"
+})
+
+config_gpu = ed({
+    "save_checkpoint": True,
+    "save_checkpoint_epochs": 2,
+    "keep_checkpoint_max": 10,
+    "learning_rate": 0.001,
+    "m_for_scrutinizer": 4,
+    "topK": 6,
+    "input_size": (448, 448),
+    "crop_pct_size": (600, 600),
+    "weight_decay": 1e-4,
+    "momentum": 0.9,
+    "num_epochs": 200,
+    "num_classes": 200,
+    "num_train_images": 5994,
+    "num_test_images": 5794,
+    "batch_size": 16,
+    "prefix": "ntsnet",
+    "lossLogName": "loss.log",
+    "lr_scheduler": "cosine",
+    "lr_step": [60, 100],
+    "optimizer": "momentum"
 })

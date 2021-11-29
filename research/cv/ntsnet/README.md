@@ -39,7 +39,7 @@ Please download the datasets [CUB_200_2011.tgz] and unzip it, then put all train
 The directory structure is as follows:
 
 ```path
-.
+├─resnet50.ckpt
 └─cub_200_2011
   ├─train
   └─test
@@ -116,38 +116,54 @@ Usage: bash run_standalone_train.sh [DATA_URL] [TRAIN_URL]
 "sgd_momentum": 0.9,                                                           # momentum in optimizer
 
 # train
-"batch_size": 8,
+"batch_size": 8, # 16 for gpu
 "weight_decay": 1e-4,
 "epoch_size": 200,                                                             # total epoch size
 "save_checkpoint": True,                                                       # whether save checkpoint or not
 "save_checkpoint_epochs": 1,                                                   # save checkpoint interval
-"num_classes": 200
+"num_classes": 200,
+"lr_scheduler": "cosine",                                                      # lr_scheduler, support cosine or step
+"optimizer": "momentum"
 ```
 
 ## [Training Process](#contents)
 
 - Set options in `config.py`, including learning rate, output filename and network hyperparameters. Click [here](https://www.mindspore.cn/docs/programming_guide/en/master/dataset_sample.html) for more information about dataset.
+- Get ResNet50 pretrained model from [Mindspore Hub](https://www.mindspore.cn/resources/hub/details?MindSpore/ascend/v1.2/resnet50_v1.2_imagenet2012)
 
 ### [Training](#content)
 
-- Run `run_standalone_train.sh` for non-distributed training of NTS-Net model.
+- Run `run_standalone_train_ascend.sh` for non-distributed training of NTS-Net model in Ascend.
 
 ```bash
-# standalone training
-bash run_standalone_train.sh [DATA_URL] [TRAIN_URL]
+# standalone training in ascend
+bash run_standalone_train_ascend.sh [DATA_URL] [TRAIN_URL] [DEVICE_ID(optional)]
+```
+
+- Run `run_standalone_train_gpu.sh` for non-distributed training of NTS-Net model in GPU.
+
+```bash
+# standalone training in gpu
+bash run_standalone_train_gpu.sh [DATA_URL] [TRAIN_URL] [DEVICE_ID(optional)]
 ```
 
 ### [Distributed Training](#content)
 
-- Run `run_distribute_train.sh` for distributed training of NTS-Net model.
+- Run `run_distribute_train_ascend.sh` for distributed training of NTS-Net model in Ascend.
 
 ```bash
-bash run_train.sh [RANK_TABLE_FILE] [DATA_URL] [TRAIN_URL]
+bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATA_URL] [TRAIN_URL]
+```
+
+- Run `run_distribute_train_gpu.sh` for distributed training of NTS-Net model in GPU.
+
+```bash
+bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATA_URL] [TRAIN_URL]
 ```
 
 - Notes
 1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
-2. As for PRETRAINED_MODEL，it should be a trained ResNet50 checkpoint.
+2. As for PRETRAINED_MODEL, it should be a trained ResNet50 checkpoint, name the pretraied weight to resnet50.ckpt and put it in dataset directory. See [Training Process](#Training Process)
 
 ### [Training Result](#content)
 
@@ -167,11 +183,18 @@ epoch: 6 step: 750 ,loss: 17.74093
 
 ### [Evaluation](#content)
 
-- Run `run_eval.sh` for evaluation.
+- Run `run_eval_ascend.sh` for evaluation.
 
 ```bash
-# infer
-sh run_eval.sh [DATA_URL] [TRAIN_URL] [CKPT_FILENAME]
+# infer on Ascend
+sh run_eval_ascend.sh [DATA_URL] [TRAIN_URL] [CKPT_FILENAME] [DEVICE_ID(optional)]
+```
+
+- Run `run_eval_gpu.sh` for evaluation.
+
+```bash
+# infer on GPU
+sh run_eval_gpu.sh [DATA_URL] [TRAIN_URL] [CKPT_FILENAME] [DEVICE_ID(optional)]
 ```
 
 ### [Evaluation result](#content)
@@ -197,23 +220,23 @@ python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 
 ### Evaluation Performance
 
-| Parameters                 | Ascend                                                      |
-| -------------------------- | ----------------------------------------------------------- |
-| Model Version              | V1                                                          |
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G             |
-| uploaded Date              | 16/04/2021 (month/day/year)                                 |
-| MindSpore Version          | 1.1.1                                                       |
-| Dataset                    | cub200-2011                                                 |
-| Training Parameters        | epoch=200,  batch_size = 8                                  |
-| Optimizer                  | SGD                                                         |
-| Loss Function              | Softmax Cross Entropy                                       |
-| Output                     | predict class                                               |
-| Loss                       | 10.9852                                                     |
-| Speed                      | 1pc: 130 ms/step;  8pcs: 138 ms/step                        |
-| Total time                 | 8pcs: 5.93 hours                                            |
-| Parameters                 | 87.6                                                        |
-| Checkpoint for Fine tuning | 333.07M(.ckpt file)                                         |
-| Scripts                    | [ntsnet script](https://gitee.com/mindspore/models/tree/master/research/cv/ntsnet) |
+| Parameters                 | Ascend                                                      | Telsa V100-PCIE                                                      |
+| -------------------------- | ----------------------------------------------------------- | --------------------------------------------------------- |
+| Model Version              | V1                                                          | V1                                                        |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G             | TeslaA100; CPU 2.3GHz, 40cores; Memory 377G               |
+| uploaded Date              | 16/04/2021 (day/month/year)                                 | 05/10/2021 (day/month/year)                               |
+| MindSpore Version          | 1.1.1                                                       | 1.5.0rc1                                                  |
+| Dataset                    | cub200-2011                                                 | cub200-2011                                               |
+| Training Parameters        | epoch=200,  batch_size = 8                                  | epoch=200,  batch_size = 16                               |
+| Optimizer                  | SGD                                                         | Momentum                                                  |
+| Loss Function              | Softmax Cross Entropy                                       | Softmax Cross Entropy                                     |
+| Output                     | predict class                                               | predict class                                             |
+| Loss                       | 10.9852                                                     | 12.195317                                                 |
+| Speed                      | 1pc: 130 ms/step;  8pcs: 138 ms/step                        | 1pc: 480 ms/step;                                         |
+| Total time                 | 8pcs: 5.93 hours                                            |                                                           |
+| Parameters                 | 87.6                                                        | 87.5                                                      |
+| Checkpoint for Fine tuning | 333.07M(.ckpt file)                                         | 222.03(.ckpt file)                                        |
+| Scripts                    | [ntsnet script](https://gitee.com/mindspore/models/tree/master/research/cv/ntsnet) | [ntsnet script](https://gitee.com/mindspore/models/tree/master/research/cv/ntsnet)|
 
 # [Description of Random Situation](#contents)
 

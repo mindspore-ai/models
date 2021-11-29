@@ -18,9 +18,10 @@ import ast
 import os
 
 import numpy as np
-
-from mindspore import Tensor, context, load_checkpoint, load_param_into_net, export
 import mindspore.common.dtype as mstype
+from mindspore import Tensor, context, load_checkpoint, load_param_into_net, export
+
+
 from src.network import NTS_NET
 
 parser = argparse.ArgumentParser(description='ntsnet export')
@@ -37,8 +38,8 @@ parser.add_argument('--device_target', type=str, default="Ascend",
 args = parser.parse_args()
 
 context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
-if args.device_target == "Ascend":
-    context.set_context(device_id=args.device_id)
+context.set_context(device_id=args.device_id)
+
 if args.run_modelart:
     import moxing as mox
 
