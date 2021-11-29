@@ -1,0 +1,28 @@
+{
+    "im_midas": {
+        "stream_config": {
+            "deviceId": "0"
+        },
+        "appsrc0": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_modelinfer0"
+        },
+
+        "mxpi_modelinfer0": {
+            "props": {
+                "dataSource": "appsrc0",
+                "modelPath": "./convert/midas_no_transpose.om"
+
+            },
+            "factory": "mxpi_modelinfer",
+            "next": "appsink0"
+        },
+
+        "appsink0": {
+            "factory": "appsink"
+        }
+    }
+}

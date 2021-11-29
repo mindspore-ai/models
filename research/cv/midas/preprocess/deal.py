@@ -29,7 +29,6 @@ def deal(args):
         for line in f.readlines():
             line = line.strip('\n')
             all_path = line.split(' ')
-            all_path[0] = all_path[0].split('/')[1]
             val_path = os.path.join(args.depth_path, 'val', all_path[0], 'proj_depth',
                                     'groundtruth', 'image_02', all_path[1] + '.png')
             target_path = '../Kitti/' + all_path[0]
