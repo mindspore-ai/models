@@ -102,7 +102,7 @@ if [ $# == 4 ]
 then
   mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
            python train.py --config_path=$CONFIG_FILE --run_distribute=True  --device_num=$DEVICE_NUM \
-           --device_target="GPU" --data_path=$PATH1 --run_eval=$RUN_EVAL --eval_data_path=$EVAL_DATASET_PATH \
+           --device_target="GPU" --data_path=$PATH1 --run_eval=$RUN_EVAL --eval_dataset_path=$EVAL_DATASET_PATH \
            --enable_cache=True --cache_session_id=$CACHE_SESSION_ID --output_path './output' &> log &
   if [ "x${RUN_EVAL}" == "xTrue" ]
   then
