@@ -53,6 +53,6 @@ do
     python train.py \
                    --dataset_path=$2 \
                    --is_distributed=True \
-                   --device_target=Ascend > log.txt 2>&1 &
+                   --device_target=Ascend > ascend_distribute_train_log.txt 2>&1 &
     cd ..
 done

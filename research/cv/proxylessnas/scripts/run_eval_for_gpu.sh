@@ -49,4 +49,4 @@ fi
 DEVICE_ID=$1
 DATASET_PATH=$2
 CHECKPOINT=$3
-CUDA_VISIBLE_DEVICES=$DEVICE_ID python ../eval.py --device_target='GPU' --device_id=$DEVICE_ID --drop_remainder=True --dataset_path=$DATASET_PATH --checkpoint=$CHECKPOINT > eval.log 2>&1 &
+CUDA_VISIBLE_DEVICES=$DEVICE_ID python ../eval.py --device_target='GPU' --device_id=$DEVICE_ID --drop_remainder=True --dataset_path=$DATASET_PATH --checkpoint=$CHECKPOINT > gpu_eval.log 2>&1 &
