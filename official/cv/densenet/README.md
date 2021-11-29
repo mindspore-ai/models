@@ -199,46 +199,63 @@ After installing MindSpore via the official website, you can start training and 
 
 ## [Script and Sample Code](#contents)
 
-```densenet
-
+```DenseNet
 ├── model_zoo
-    ├── README.md                          // descriptions about all the models
+    ├── README.md                            // descriptions about all the models
     ├── densenet
-        ├── README.md                    // descriptions about densenet
-        ├── README_CN.md                    // descriptions about densenet
-        ├── ascend310_infer              // application for 310 inference
-        ├── scripts
-        │   ├── run_distribute_train.sh             // shell script for distributed on Ascend
-        │   ├── run_distribute_train_gpu.sh             // shell script for distributed on GPU
-        │   ├── run_distribute_eval.sh              // shell script for evaluation on Ascend
-        │   ├── run_infer_310.sh                    // shell script for 310 inference
-        │   ├── run_distribute_eval_gpu.sh              // shell script for evaluation on GPU
-        │   ├── run_eval_cpu.sh                        // shell script for train on cpu
-        │   ├── run_train_cpu.sh                      //  shell script for evaluation on cpu
-        ├── src
-        │   ├── datasets             // dataset processing function
-        │   ├── losses
-        │       ├──crossentropy.py            // densenet loss function
-        │   ├── lr_scheduler
-        │       ├──lr_scheduler.py            // densenet learning rate schedule function
-        │   ├── network
-        │       ├──densenet.py            // densenet architecture
-        │   ├──optimizers            // densenet optimize function
-        │   ├──utils
-        │       ├──logging.py            // logging function
-        │       ├──var_init.py            // densenet variable init function
-        │   ├── model_utils
-        │       ├──config.py             // Parameter config
-        │       ├──moxing_adapter.py     // modelarts device configuration
-        │       ├──device_adapter.py     // Device Config
-        │       ├──local_adapter.py      // local device config
-        ├── train.py               // training script
-        ├── eval.py               //  evaluation script
-        ├── mindspore_hub_conf.py       //  hub config script
+        ├── ascend310_infer                  // application for 310 inference
+        │  ├── build.sh
+        │  ├── CMakeLists.txt
+        │  ├── image_id.txt
+        │  ├── inc
+        │      ├── utils.h
+        │  ├── src
+        │      ├── main.cc
+        │      ├── utils.cc
+        ├── densenet100_config.yaml          // config file
+        ├── densenet121_config.yaml          // config file
+        ├── eval.py                          // evaluation script
+        ├── export.py                        // export script
+        ├── mindspore_hub_conf.py            // hub config script
         ├── postprocess.py                   // 310 Inference post-processing script
-        ├── export.py                   // Export script
-        ├── densenet100_config.yaml      //  config file
-        ├── densenet100_config.yaml      //  config file
+        ├── README_CN.md                     // descriptions about DenseNet
+        ├── README.md                        // descriptions about DenseNet
+        ├── requirements.txt
+        ├── scripts
+        │   ├── run_distribute_eval_gpu.sh   // shell script for evaluation on GPU
+        │   ├── run_distribute_eval.sh       // shell script for evaluation on Ascend
+        │   ├── run_distribute_train_gpu.sh  // shell script for distributed on GPU
+        │   ├── run_distribute_train.sh      // shell script for distributed on Ascend
+        │   ├── run_eval_cpu.sh              // shell script for train on cpu
+        │   ├── run_infer_310.sh             // shell script for 310 inference
+        │   ├── run_train_cpu.sh             // shell script for evaluation on cpu
+        ├── src
+        │   ├── datasets                     // dataset processing function
+        │       ├── classification.py
+        │       ├── __init__.py
+        │       ├── sampler.py
+        │   ├── losses
+        │       ├── crossentropy.py          // DenseNet loss function
+        │       ├── __init__.py
+        │   ├── lr_scheduler
+        │       ├── __init__.py
+        │       ├── lr_scheduler.py          // DenseNet learning rate schedule function
+        │   ├── model_utils
+        │       ├── config.py                // Parameter config
+        │       ├── device_adapter.py        // Device Config
+        │       ├── __init__.py
+        │       ├── local_adapter.py         // local device config
+        │       ├── moxing_adapter.py        // modelarts device configuration
+        │   ├── network
+        │       ├── densenet.py              // DenseNet architecture
+        │       ├── __init__.py
+        │   ├── optimizers                   // DenseNet optimize function
+        │       ├── __init__.py
+        │   ├── utils
+        │       ├── __init__.py
+        │       ├── logging.py               // logging function
+        │       ├── var_init.py              // DenseNet variable init function
+        ├── train.py                         // training script
 
 ```
 
