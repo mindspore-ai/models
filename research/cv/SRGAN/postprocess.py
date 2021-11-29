@@ -13,63 +13,65 @@
 # limitations under the License.
 # ============================================================================
 
-"""file for evaling"""
+"""postprocess"""
+import os
 import argparse
+from PIL import Image
 import numpy as np
+from src.dataset.testdataset import create_testdataset
+from mindspore import context
 from skimage.color import rgb2ycbcr
 from skimage.metrics import peak_signal_noise_ratio
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.common import set_seed
-from mindspore import context
-import mindspore.ops as ops
-from src.model.generator import Generator
-from src.dataset.testdataset import create_testdataset
-from PIL import Image
-
-set_seed(1)
 parser = argparse.ArgumentParser(description="SRGAN eval")
-parser.add_argument("--test_LR_path", type=str, default='../Set14/LR')
-parser.add_argument("--test_GT_path", type=str, default='../Set14/HR')
-parser.add_argument("--res_num", type=int, default=16)
-parser.add_argument("--scale", type=int, default=4)
-parser.add_argument("--generator_path", type=str, default='./ckpt/pre_trained_model_400.ckpt')
-parser.add_argument("--mode", type=str, default='train')
+parser.add_argument("--test_LR_path", type=str, default='/home/SRGANprofile/Set14/LR')
+parser.add_argument("--test_GT_path", type=str, default='/home/SRGANprofile/Set14/HR')
+parser.add_argument("--result_path", type=str, default='./result_Files')
 parser.add_argument("--device_id", type=int, default=0, help="device id, default: 0.")
-i = 0
+parser.add_argument("--scale", type=int, default=4)
+args = parser.parse_args()
+context.set_context(mode=context.GRAPH_MODE, device_id=args.device_id)
+
+def unpadding(img, target_shape):
+    a, b = target_shape[0], target_shape[1]
+    img_h, img_w, _ = img.shape
+    if img_h > a:
+        img = img[:a, :, :]
+    if img_w > b:
+        img = img[:, :b, :]
+    return img
+
+
 if __name__ == '__main__':
-    args = parser.parse_args()
-    context.set_context(mode=context.GRAPH_MODE, device_id=args.device_id, save_graphs=False)
-    test_ds = create_testdataset(1, args.test_LR_path, args.test_GT_path)
-    test_data_loader = test_ds.create_dict_iterator()
-    generator = Generator(4)
-    params = load_checkpoint(args.generator_path)
-    load_param_into_net(generator, params)
-    op = ops.ReduceSum(keep_dims=False)
-    psnr_list = []
     i = 0
-    print("=======starting test=====")
+    args = parser.parse_args()
+    test_ds = create_testdataset(1, args.test_LR_path, args.test_GT_path)
+    test_data_loader = test_ds.create_dict_iterator(output_numpy=True)
+    sr_list = []
+    psnr_list = []
+    for j in range(0, 12):
+        f_name = os.path.join(args.result_path, "SRGAN_data_" + str(j) + "_0.bin")
+        sr = np.fromfile(f_name, np.float32).reshape(3, 800, 800)
+        sr_list.append(sr)
     for data in test_data_loader:
         lr = data['LR']
+        sr = sr_list[i]
+        i = i+1
         gt = data['HR']
         bs, c, h, w = lr.shape[:4]
-        gt = gt[:, :, : h * args.scale, : w *args.scale]
-
-        output = generator(lr)
-        output = op(output, 0)
-        output = output.asnumpy()
-        output = np.clip(output, -1.0, 1.0)
-        gt = op(gt, 0)
-
-        output = (output + 1.0) / 2.0
+        gt = gt[:, :, : h * 4, : w *4]
+        gt = gt[0]
         gt = (gt + 1.0) / 2.0
-
-        output = output.transpose(1, 2, 0)
-        gt = gt.asnumpy()
         gt = gt.transpose(1, 2, 0)
+        output = sr.transpose(1, 2, 0)
+        output = unpadding(output, gt.shape)
+        output = (output + 1.0) / 2.0
         result = Image.fromarray((output * 255.0).astype(np.uint8))
         y_output = rgb2ycbcr(output)[args.scale:-args.scale, args.scale:-args.scale, :1]
         y_gt = rgb2ycbcr(gt)[args.scale:-args.scale, args.scale:-args.scale, :1]
-
         psnr = peak_signal_noise_ratio(y_output / 255.0, y_gt / 255.0, data_range=1.0)
+        psnr = float('%.2f' % psnr)
         psnr_list.append(psnr)
-    print("avg PSNR:", np.mean(psnr_list))
+    x = np.mean(psnr_list)
+    x = float('%.2f' % x)
+    print("avg PSNR:", x)
+ 
