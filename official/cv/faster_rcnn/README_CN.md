@@ -73,7 +73,7 @@ Faster R-CNN是一个两阶段目标检测网络，该网络采用RPN，可以�
         pip install mmcv==0.2.14
         ```
 
-        根据模型运行需要，对应地在`config_50.yaml、config_101.yaml或config_152.yaml`中更改COCO_ROOT和其他需要的设置。目录结构如下：
+        根据模型运行需要，对应地在`default_config.yaml、default_config_101.yaml、default_config_152.yaml或default_config_InceptionResnetV2.yaml`中更改COCO_ROOT和其他需要的设置。目录结构如下：
 
         ```path
         .
@@ -90,10 +90,10 @@ Faster R-CNN是一个两阶段目标检测网络，该网络采用RPN，可以�
         将数据集信息整理成TXT文件，每行内容如下：
 
         ```txt
-        train2017/0000001.jpg 0,259,401,459,7,0 35,28,324,201,2,0 0,30,59,80,2,0
+        train2017/0000001.jpg 0,259,401,459,7 35,28,324,201,2 0,30,59,80,2
         ```
 
-        每行是按空间分割的图像标注，第一列是图像的相对路径，其余为[xmin,ymin,xmax,ymax,class,is_crowd]格式的框,类和是否是一群物体的信息。从`image_dir`（数据集目录）图像路径以及`anno_path`（TXT文件路径）的相对路径中读取图像。`image_dir`和`anno_path`可在`config_50.yaml、config_101.yaml或config_152.yaml`中设置。
+        每行是按空间分割的图像标注，第一列是图像的相对路径，其余为[xmin,ymin,xmax,ymax,class]格式的框和类信息。从`IMAGE_DIR`（数据集目录）图像路径以及`ANNO_PATH`（TXT文件路径）的相对路径中读取图像。`IMAGE_DIR`和`ANNO_PATH`可在`default_config.yaml、default_config_101.yaml、default_config_152.yaml或default_config_InceptionResnetV2.yaml`中设置。
 
 # 快速入门
 
@@ -122,7 +122,7 @@ bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL] [BACKBO
 bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)
 
 #推理
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [image_width] [image_height] [DEVICE_ID]
 ```
 
 ## 在GPU上运行
@@ -179,7 +179,7 @@ bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COC
 
 ```shell
 # 推理
-bash run_infer_310.sh [AIR_PATH] [DATA_PATH] [ANN_FILE_PATH] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [image_width] [image_height] [DEVICE_ID]
 ```
 
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
@@ -308,13 +308,13 @@ bash run_infer_310.sh [AIR_PATH] [DATA_PATH] [ANN_FILE_PATH] [DEVICE_ID]
       ├─anchor_generator.py          // 锚点生成器
       ├─bbox_assign_sample.py        // 第一阶段采样器
       ├─bbox_assign_sample_stage2.py // 第二阶段采样器
-      ├─faster_rcnn_resnet.py        // Faster R-CNN网络
-      ├─faster_rcnn_resnet50v1.py    // 以Resnet50v1.0作为backbone的Faster R-CNN网络
+      ├─faster_rcnn.py               // Faster R-CNN网络
       ├─fpn_neck.py                  // 特征金字塔网络
       ├─proposal_generator.py        // 候选生成器
       ├─rcnn.py                      // R-CNN网络
       ├─resnet.py                    // 骨干网络
       ├─resnet50v1.py                // Resnet50v1.0骨干网络
+      ├─inceptionresnetv2.py         // inception resnet v2骨干网络
       ├─roi_align.py                 // ROI对齐网络
       └─rpn.py                       // 区域候选网络
     ├─dataset.py                     // 创建并处理数据集
@@ -329,6 +329,7 @@ bash run_infer_310.sh [AIR_PATH] [DATA_PATH] [ANN_FILE_PATH] [DEVICE_ID]
   ├─default_config.yaml              // Resnet50相关配置
   ├─default_config_101.yaml          // Resnet101相关配置
   ├─default_config_152.yaml          // Resnet152相关配置
+  ├─default_config_InceptionResnetV2.yaml   // inception resnet v2相关配置
   ├─export.py                        // 导出 AIR,MINDIR模型的脚本
   ├─eval.py                          // 评估脚本
   ├─postprogress.py                  // 310推理后处理脚本
@@ -336,13 +337,14 @@ bash run_infer_310.sh [AIR_PATH] [DATA_PATH] [ANN_FILE_PATH] [DEVICE_ID]
 ```
 
 ```bash
-`BACKBONE` should be in ["resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152", "resnet_v1_50"]
+`BACKBONE` should be in ["resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152", "resnet_v1_50", "inception_resnet_v2"]
 
-if backbone in ("resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152"):
+if backbone in ("resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152", "inception_resnet_v2"):
     from src.FasterRcnn.faster_rcnn_resnet import Faster_Rcnn_Resnet
     "resnet_v1.5_50" -> "./default_config.yaml"
     "resnet_v1_101"  -> "./default_config_101.yaml"
     "resnet_v1_152"  -> "./default_config_152.yaml"
+    "inception_resnet_v2"  -> "./default_config_InceptionResnetV2.yaml"
 
 elif backbone == "resnet_v1_50":
     from src.FasterRcnn.faster_rcnn_resnet50v1 import Faster_Rcnn_Resnet
@@ -402,7 +404,7 @@ Notes:
         load_param_into_net(net, param_dict)
 ```
 
-3. config_50.yaml、config_101.yaml、config_152.yaml中包含原数据集路径，可以选择“coco_root”或“image_dir”。
+3. default_config.yaml、default_config_101.yaml、default_config_152.yaml或default_config_InceptionResnetV2.yaml中包含原数据集路径，可以选择“coco_root”或“image_dir”。
 
 ### 结果
 
@@ -467,7 +469,7 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --device_ta
 ```
 
 `EXPORT_FORMAT` 可选 ["AIR", "MINDIR"]
-`BACKBONE` 可选 ["resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152", "resnet_v1_50"]
+`BACKBONE` 可选 ["resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152", "resnet_v1_50", "inception_resnet_v2"]
 
 ## 推理过程
 
@@ -477,7 +479,7 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --device_ta
 
 ```shell
 # Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [image_width] [image_height] [DEVICE_ID]
 ```
 
 ### 结果

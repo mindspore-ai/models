@@ -89,10 +89,10 @@ Dataset used: [COCO2017](<https://cocodataset.org/>)
         Organize the dataset information into a TXT file, each row in the file is as follows:
 
         ```log
-        train2017/0000001.jpg 0,259,401,459,7,0 35,28,324,201,2,0 0,30,59,80,2,0
+        train2017/0000001.jpg 0,259,401,459,7 35,28,324,201,2 0,30,59,80,2
         ```
 
-        Each row is an image annotation which split by space, the first column is a relative path of image, the others are box, class and if it is crowd information of the format [xmin,ymin,xmax,ymax,class,is_crowd]. We read image from an image path joined by the `image_dir`(dataset directory) and the relative path in `anno_path`(the TXT file path), `image_dir` and `anno_path` are setting in `default_config_50.yaml、default_config_101.yaml or default_config_152.yaml`.
+        Each row is an image annotation which split by space, the first column is a relative path of image, the others are box and class information of the format [xmin,ymin,xmax,ymax,class]. We read image from an image path joined by the `IMAGE_DIR`(dataset directory) and the relative path in `ANNO_PATH`(the TXT file path), `IMAGE_DIR` and `ANNO_PATH` are setting in `default_config_50.yaml、default_config_101.yaml or default_config_152.yaml`.
 
 # Quick Start
 
@@ -178,7 +178,7 @@ bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COC
 
 ```shell
 # inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
 ```
 
 - Running on [ModelArts](https://support.huaweicloud.com/modelarts/)
@@ -477,7 +477,7 @@ The following example only supports mindir inference with batch_size=1.
 
 ```shell
 # Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
 ```
 
 ### result
@@ -518,7 +518,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 1pc: 190 ms/step;  8pcs: 200 ms/step                          | 1pc: 320 ms/step;  8pcs: 335 ms/step                          |
 | Total time                 | 1pc: 37.17 hours;  8pcs: 4.89 hours                          |1pc: 63.09 hours;  8pcs: 8.25 hours                          |
 | Parameters (M)             | 250                                                         |250                                                         |
-| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
+| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn) | [fasterrcnn script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn) |
 
 ### Inference Performance
 
@@ -536,4 +536,4 @@ Inference result is saved in current path, you can find result like this in acc.
 
 # [ModelZoo Homepage](#contents)  
 
- Please check the official [homepage](https://gitee.com/mindspore/models).
+ Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).

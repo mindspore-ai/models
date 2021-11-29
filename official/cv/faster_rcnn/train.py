@@ -29,6 +29,7 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.nn import SGD
 from mindspore.common import set_seed
 
+from src.FasterRcnn.faster_rcnn import Faster_Rcnn
 from src.network_define import LossCallBack, WithLossCell, TrainOneStepCell, LossNet
 from src.dataset import data_to_mindrecord_byte_image, create_fasterrcnn_dataset
 from src.lr_schedule import dynamic_lr
@@ -38,12 +39,6 @@ from src.model_utils.device_adapter import get_device_id, get_device_num, get_ra
 
 set_seed(1)
 context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
-
-if config.backbone in ("resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152"):
-    from src.FasterRcnn.faster_rcnn_resnet import Faster_Rcnn_Resnet
-elif config.backbone == "resnet_v1_50":
-    from src.FasterRcnn.faster_rcnn_resnet50v1 import Faster_Rcnn_Resnet
-    # config.epoch_size = 20
 
 if config.device_target == "GPU":
     context.set_context(enable_graph_kernel=True)
@@ -126,7 +121,7 @@ def modelarts_pre_process():
 def train_fasterrcnn():
     """ train_fasterrcnn """
     dataset_size, dataset = train_fasterrcnn_()
-    net = Faster_Rcnn_Resnet(config=config)
+    net = Faster_Rcnn(config=config)
     net = net.set_train()
 
     load_path = config.pre_trained
@@ -196,13 +191,15 @@ def train_fasterrcnn():
         if not os.path.exists(mindrecord_path):
             config.mindrecord_file = mindrecord_path
             create_eval_mindrecord(config)
-        eval_net = Faster_Rcnn_Resnet(config)
+        eval_net = Faster_Rcnn(config)
         eval_cb = EvalCallBack(config, eval_net, apply_eval, dataset_size, mindrecord_path, anno_json,
                                save_checkpoint_path)
         cb += [eval_cb]
 
     model = Model(net)
-    model.train(config.epoch_size, dataset, callbacks=cb)
+    model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=False)
+
+
 
 
 if __name__ == '__main__':

@@ -20,16 +20,11 @@ from mindspore import Tensor, load_checkpoint, load_param_into_net, export, cont
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id
-
+from src.FasterRcnn.faster_rcnn import FasterRcnn_Infer
 
 context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
 if config.device_target == "Ascend":
     context.set_context(device_id=get_device_id())
-
-if config.backbone in ("resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152"):
-    from src.FasterRcnn.faster_rcnn_resnet import FasterRcnn_Infer
-elif config.backbone == "resnet_v1_50":
-    from src.FasterRcnn.faster_rcnn_resnet50v1 import FasterRcnn_Infer
 
 def modelarts_pre_process():
     pass

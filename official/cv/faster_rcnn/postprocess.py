@@ -22,21 +22,21 @@ from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 
 
-dst_width = 1280
-dst_height = 768
+dst_width = config.img_width
+dst_height = config.img_height
 
 def modelarts_pre_process():
     pass
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
-def get_eval_result(anno_path, result_path):
+def get_eval_result(ann_file, result_path):
     """ get evaluation result of faster rcnn"""
     max_num = 128
     result_path = result_path
 
     outputs = []
 
-    dataset_coco = COCO(anno_path)
+    dataset_coco = COCO(ann_file)
     img_ids = dataset_coco.getImgIds()
 
     for img_id in img_ids:
@@ -71,4 +71,4 @@ def get_eval_result(anno_path, result_path):
     coco_eval(result_files, eval_types, dataset_coco, single_result=False)
 
 if __name__ == '__main__':
-    get_eval_result(config.anno_path, config.result_path)
+    get_eval_result(config.ann_file, config.result_path)

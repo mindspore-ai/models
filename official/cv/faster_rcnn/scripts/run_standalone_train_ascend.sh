@@ -20,9 +20,9 @@ then
 exit 1
 fi
 
-if [ $2 != "resnet_v1_50" ] && [ $2 != "resnet_v1.5_50" ] && [ $2 != "resnet_v1_101" ] && [ $2 != "resnet_v1_152" ]
+if [ $2 != "resnet_v1_50" ] && [ $2 != "resnet_v1.5_50" ] && [ $2 != "resnet_v1_101" ] && [ $2 != "resnet_v1_152" ] && [ $2 != "inception_resnet_v2" ]
 then 
-  echo "error: the selected backbone must be resnet_v1_50, resnet_v1.5_50, resnet_v1_101, resnet_v1_152"
+  echo "error: the selected backbone must be resnet_v1_50, resnet_v1.5_50, resnet_v1_101, resnet_v1_152, inception_resnet_v2"
 exit 1
 fi
 
@@ -51,7 +51,7 @@ then
 exit 1
 fi
 
-mindrecord_dir=$PATH2/FASTERRCNN_MINDRECORD/
+mindrecord_dir=$PATH2/MindRecord_COCO_TRAIN/
 if [ $# -eq 4 ]
 then
     mindrecord_dir=$(get_real_path $4)
@@ -73,6 +73,8 @@ if [ $# -ge 1 ]; then
     CONFIG_FILE="${BASE_PATH}/../default_config_152.yaml"
   elif [ $2 == 'resnet_v1_50' ]; then
     CONFIG_FILE="${BASE_PATH}/../default_config.yaml"
+  elif [ $2 == 'inception_resnet_v2' ]; then
+    CONFIG_FILE="${BASE_PATH}/../default_config_InceptionResnetV2.yaml"
   else
     echo "Unrecognized parameter"
     exit 1
