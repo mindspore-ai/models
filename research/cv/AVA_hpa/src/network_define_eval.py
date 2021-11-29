@@ -62,6 +62,15 @@ class EvalCell(nn.Cell):
         outputs = self._network(data)
         return outputs, label, nslice
 
+class EvalCell310(nn.Cell):
+    """eval cell"""
+    def __init__(self, network):
+        super(EvalCell310, self).__init__(auto_prefix=False)
+        self._network = network
+
+    def construct(self, data):
+        outputs = self._network(data)
+        return outputs
 
 class EvalMetric(nn.Metric):
     """eval metric"""
