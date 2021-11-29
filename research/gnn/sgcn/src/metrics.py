@@ -13,12 +13,14 @@
 # limitations under the License.
 # ============================================================================
 """Loss and accuracy."""
-import mindspore as ms
 import mindspore.nn as nn
-from mindspore.common.parameter import ParameterTuple
-from mindspore.ops import functional as F
 import mindspore.ops as ops
-import mindspore.numpy as mnp
+from mindspore import context
+from mindspore.common.parameter import ParameterTuple
+from mindspore.communication.management import get_group_size
+from mindspore.context import ParallelMode
+from mindspore.ops import functional as F
+from mindspore.parallel._auto_parallel_context import auto_parallel_context
 
 
 class SGCNLoss(nn.Cell):
@@ -35,12 +37,14 @@ class SGCNLoss(nn.Cell):
         self.concat = ops.Concat(axis=1)
         self.concat0 = ops.Concat(axis=0)
         self.log_softmax = nn.LogSoftmax(axis=1)
-        self.matmul = nn.MatMul().to_float(ms.float16)
         self.ce = nn.SoftmaxCrossEntropyWithLogits(sparse=True)
         self.lamb = lamb
 
-    def calculate_regression_loss(self, z, target, regression_positive_i, regression_positive_j, regression_positive_k,
-                                  regression_negative_i, regression_negative_j, regression_negative_k):
+    def calculate_regression_loss(
+            self, z, target,
+            regression_positive_i, regression_positive_j, regression_positive_k,
+            regression_negative_i, regression_negative_j, regression_negative_k
+    ):
         """
         Calculating the regression loss for all pairs of nodes.
         Args:
@@ -71,7 +75,7 @@ class SGCNLoss(nn.Cell):
         surr_pos_i = self.concat((positive_z_i, positive_z_k))
         surr_pos_j = self.concat((positive_z_j, positive_z_k))
         features = self.concat0((pos, neg, surr_neg_i, surr_neg_j, surr_pos_i, surr_pos_j))
-        predictions = self.matmul(features, self.regression_weights) + self.regression_bias
+        predictions = ops.matmul(features, self.regression_weights) + self.regression_bias
         loss_term = self.ce(predictions, target).mean()
         return loss_term
 
@@ -85,11 +89,11 @@ class SGCNLoss(nn.Cell):
             positive_k(Int): A tensor with given values.
 
         Returns:
-            mnp.clip(out, 0, None).mean()(Tensor): positive_embedding_loss
+            ops.maximum(out, 0).mean(): positive_embedding_loss
         """
         i, j, k = positive_i, positive_j, positive_k
         out = self.pow((z[i] - z[j]), 2.0).sum(axis=1) - self.pow((z[i] - z[k]), 2.0).sum(axis=1)
-        return mnp.clip(out, 0, None).mean()
+        return ops.maximum(out, 0).mean()
 
     def calculate_negative_embedding_loss(self, z, negative_i, negative_j, negative_k):
         """
@@ -101,16 +105,19 @@ class SGCNLoss(nn.Cell):
             negative_k(Int): A tensor with given values.
 
         Returns:
-            mnp.clip(out, 0, None).mean()(Tensor): negative_embedding_loss
+            ops.maximum(out, 0).mean(): negative_embedding_loss
         """
         i, j, k = negative_i, negative_j, negative_k
         out = self.pow((z[i] - z[k]), 2.0).sum(axis=1) - self.pow((z[i] - z[j]), 2.0).sum(axis=1)
-        return mnp.clip(out, 0, None).mean()
+        return ops.maximum(out, 0).mean()
 
-    def construct(self, z, target,
-                  regression_positive_i, regression_positive_j, regression_positive_k,
-                  regression_negative_i, regression_negative_j, regression_negative_k,
-                  positive_i, positive_j, positive_k, negative_i, negative_j, negative_k):
+    def construct(
+            self, z, target,
+            regression_positive_i, regression_positive_j, regression_positive_k,
+            regression_negative_i, regression_negative_j, regression_negative_k,
+            positive_i, positive_j, positive_k,
+            negative_i, negative_j, negative_k
+    ):
         """
         Calculating the embedding losses, regression loss and weight regularization loss.
         Args:
@@ -134,10 +141,12 @@ class SGCNLoss(nn.Cell):
         """
         loss_term_1 = self.calculate_positive_embedding_loss(z, positive_i, positive_j, positive_k)
         loss_term_2 = self.calculate_negative_embedding_loss(z, negative_i, negative_j, negative_k)
-        regression_loss = self.calculate_regression_loss(z, target, regression_positive_i, regression_positive_j,
-                                                         regression_positive_k, regression_negative_i,
-                                                         regression_negative_j, regression_negative_k,)
-        loss_term = regression_loss+self.lamb*(loss_term_1+loss_term_2)
+        regression_loss = self.calculate_regression_loss(
+            z, target,
+            regression_positive_i, regression_positive_j, regression_positive_k,
+            regression_negative_i, regression_negative_j, regression_negative_k
+        )
+        loss_term = regression_loss + self.lamb * (loss_term_1 + loss_term_2)
         return loss_term
 
 
@@ -145,20 +154,28 @@ class LossWrapper(nn.Cell):
     """
     Wraps the GCN model with loss.
     """
-
     def __init__(self, network, label, lamb):
         super(LossWrapper, self).__init__(auto_prefix=False)
         self.network = network
         self.label = label
         self.loss = SGCNLoss(network.regression_weights, network.regression_bias, lamb)
 
-    def construct(self, removed_pos, removed_neg, regression_positive_i,
-                  regression_positive_j, regression_positive_k, regression_negative_i, regression_negative_j,
-                  regression_negative_k, positive_i, positive_j, positive_k, negative_i, negative_j, negative_k):
+    def construct(
+            self, removed_pos, removed_neg,
+            regression_positive_i, regression_positive_j, regression_positive_k,
+            regression_negative_i, regression_negative_j, regression_negative_k,
+            positive_i, positive_j, positive_k,
+            negative_i, negative_j, negative_k
+    ):
+        """Build a forward graph"""
         preds = self.network(removed_pos, removed_neg)
-        loss = self.loss(preds, self.label, regression_positive_i,
-                         regression_positive_j, regression_positive_k, regression_negative_i, regression_negative_j,
-                         regression_negative_k, positive_i, positive_j, positive_k, negative_i, negative_j, negative_k)
+        loss = self.loss(
+            preds, self.label,
+            regression_positive_i, regression_positive_j, regression_positive_k,
+            regression_negative_i, regression_negative_j, regression_negative_k,
+            positive_i, positive_j, positive_k,
+            negative_i, negative_j, negative_k
+        )
         return loss
 
 
@@ -191,10 +208,26 @@ class TrainOneStepCell(nn.Cell):
         self.dtype = ops.DType()
         self.shape = ops.Shape()
         self.print = ops.Print()
+        self.reducer_flag = False
+        self.grad_reducer = None
+        self.parallel_mode = context.get_auto_parallel_context("parallel_mode")
+        if self.parallel_mode in [ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL]:
+            self.reducer_flag = True
+        if self.reducer_flag:
+            mean = context.get_auto_parallel_context("gradients_mean")
+            if auto_parallel_context().get_device_num_is_set():
+                degree = context.get_auto_parallel_context("device_num")
+            else:
+                degree = get_group_size()
+            self.grad_reducer = nn.DistributedGradReducer(optimizer.parameters, mean, degree)
 
-    def construct(self, removed_pos, removed_neg, regression_positive_i,
-                  regression_positive_j, regression_positive_k, regression_negative_i, regression_negative_j,
-                  regression_negative_k, positive_i, positive_j, positive_k, negative_i, negative_j, negative_k):
+    def construct(
+            self, removed_pos, removed_neg,
+            regression_positive_i, regression_positive_j, regression_positive_k,
+            regression_negative_i, regression_negative_j, regression_negative_k,
+            positive_i, positive_j, positive_k,
+            negative_i, negative_j, negative_k
+    ):
         """
         trainonestepcell construct
         Args:
@@ -217,16 +250,24 @@ class TrainOneStepCell(nn.Cell):
             F.depend(loss, self.optimizer(grads))(Tensor): sgcn_loss
         """
         weights = self.weights
-        loss = self.network(removed_pos, removed_neg, regression_positive_i,
-                            regression_positive_j, regression_positive_k, regression_negative_i, regression_negative_j,
-                            regression_negative_k, positive_i, positive_j, positive_k, negative_i, negative_j,
-                            negative_k)
+        loss = self.network(
+            removed_pos, removed_neg,
+            regression_positive_i, regression_positive_j, regression_positive_k,
+            regression_negative_i, regression_negative_j, regression_negative_k,
+            positive_i, positive_j, positive_k,
+            negative_i, negative_j, negative_k
+        )
         sens = self.fill(self.dtype(loss), self.shape(loss), self.sens)
-        grads = self.grad(self.network, weights)(removed_pos, removed_neg,
-                                                 regression_positive_i, regression_positive_j, regression_positive_k,
-                                                 regression_negative_i, regression_negative_j, regression_negative_k,
-                                                 positive_i, positive_j, positive_k, negative_i, negative_j, negative_k,
-                                                 sens)
+        grads = self.grad(self.network, weights)(
+            removed_pos, removed_neg,
+            regression_positive_i, regression_positive_j, regression_positive_k,
+            regression_negative_i, regression_negative_j, regression_negative_k,
+            positive_i, positive_j, positive_k,
+            negative_i, negative_j, negative_k,
+            sens
+        )
+        if self.reducer_flag:
+            grads = self.grad_reducer(grads)
         return F.depend(loss, self.optimizer(grads))
 
 
@@ -239,15 +280,26 @@ class TrainNetWrapper(nn.Cell):
         super(TrainNetWrapper, self).__init__(auto_prefix=False)
         self.network = network
         loss_net = LossWrapper(network, label, lamb)
-        optimizer = nn.Adam(loss_net.trainable_params(),
-                            learning_rate=learning_rate, weight_decay=weight_decay)
+        optimizer = nn.Adam(
+            loss_net.trainable_params(),
+            learning_rate=learning_rate,
+            weight_decay=weight_decay
+        )
         self.loss_train_net = TrainOneStepCell(loss_net, optimizer)
 
-    def construct(self, removed_pos, removed_neg, regression_positive_i,
-                  regression_positive_j, regression_positive_k, regression_negative_i, regression_negative_j,
-                  regression_negative_k, positive_i, positive_j, positive_k, negative_i, negative_j, negative_k):
-        loss = self.loss_train_net(removed_pos, removed_neg, regression_positive_i,
-                                   regression_positive_j, regression_positive_k, regression_negative_i,
-                                   regression_negative_j, regression_negative_k, positive_i, positive_j, positive_k,
-                                   negative_i, negative_j, negative_k)
+    def construct(
+            self, removed_pos, removed_neg,
+            regression_positive_i, regression_positive_j, regression_positive_k,
+            regression_negative_i, regression_negative_j, regression_negative_k,
+            positive_i, positive_j, positive_k,
+            negative_i, negative_j, negative_k
+    ):
+        """Build a forward graph"""
+        loss = self.loss_train_net(
+            removed_pos, removed_neg,
+            regression_positive_i, regression_positive_j, regression_positive_k,
+            regression_negative_i, regression_negative_j, regression_negative_k,
+            positive_i, positive_j, positive_k,
+            negative_i, negative_j, negative_k
+        )
         return loss

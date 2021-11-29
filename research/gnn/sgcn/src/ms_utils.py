@@ -15,12 +15,13 @@
 """Data reading utils."""
 import numpy as np
 import pandas as pd
-from scipy import sparse
-from texttable import Texttable
-from sklearn.decomposition import TruncatedSVD
-from sklearn.metrics import roc_auc_score, f1_score
-import mindspore.numpy as mnp
 from mindspore import Tensor
+from mindspore import numpy as mnp
+from scipy import sparse
+from sklearn.decomposition import TruncatedSVD
+from sklearn.metrics import f1_score
+from sklearn.metrics import roc_auc_score
+from texttable import Texttable
 
 
 def read_graph(args):
@@ -79,6 +80,7 @@ def score_printer(logs):
     t.add_rows([per for i, per in enumerate(logs["performance"]) if i % 10 == 0])
     print(t.draw())
 
+
 def setup_features(args, positive_edges, negative_edges, node_count):
     """
     Setting up the node features as a numpy array.
@@ -96,6 +98,7 @@ def setup_features(args, positive_edges, negative_edges, node_count):
     else:
         X = create_general_features(args)
     return X
+
 
 def create_general_features(args):
     """
@@ -129,16 +132,23 @@ def create_spectral_features(args, positive_edges, negative_edges, node_count):
     index_2 = [edge[1] for edge in train_edges]
     values = [1]*len(p_edges) + [-1]*len(n_edges)
     shaping = (node_count, node_count)
-    signed_A = sparse.csr_matrix(sparse.coo_matrix((values, (index_1, index_2)),
-                                                   shape=shaping,
-                                                   dtype=np.float32))
+    signed_A = sparse.csr_matrix(
+        sparse.coo_matrix(
+            (values, (index_1, index_2)),
+            shape=shaping,
+            dtype=np.float32
+        )
+    )
 
-    svd = TruncatedSVD(n_components=args.reduction_dimensions,
-                       n_iter=args.reduction_iterations,
-                       random_state=args.seed)
+    svd = TruncatedSVD(
+        n_components=args.reduction_dimensions,
+        n_iter=args.reduction_iterations,
+        random_state=args.seed
+    )
     svd.fit(signed_A)
     X = svd.components_.T
     return X
+
 
 def maybe_num_nodes(edge_index, num_nodes=None):
     """

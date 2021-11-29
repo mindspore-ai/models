@@ -14,13 +14,18 @@
 # ============================================================================
 """SGCN runner."""
 import os
+
 from mindspore import context
 from mindspore.common import set_seed
 from mindspore.communication import init
+from mindspore.communication.management import get_rank
 from mindspore.context import ParallelMode
-from src.sgcn import SignedGCNTrainer
+
+from src.ms_utils import read_graph
+from src.ms_utils import score_printer
+from src.ms_utils import tab_printer
 from src.param_parser import parameter_parser
-from src.ms_utils import tab_printer, read_graph, score_printer
+from src.sgcn import SignedGCNTrainer
 
 
 def main():
@@ -32,24 +37,34 @@ def main():
     """
     args = parameter_parser()
     set_seed(args.seed)
-    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
-    if args.device_target == "Ascend":
-        context.set_context(device_id=args.device_id)
+    device_id = int(os.getenv('DEVICE_ID', args.device_id))
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=device_id)
+    args.rank_log_save_ckpt_flag = 1
     if args.distributed:
-        device_id = int(os.getenv('DEVICE_ID'))
-        context.set_context(device_id=device_id)
-        init()
+        if args.device_target == 'Ascend':
+            init()
+        else:
+            init('nccl')
         context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
-    tab_printer(args)
+        args.rank = get_rank()
+        if args.rank != 0:
+            args.rank_log_save_ckpt_flag = 0
     edges = read_graph(args)
-    trainer = SignedGCNTrainer(args, edges)
-    print('******************** set up dataset... ********************')
-    trainer.setup_dataset()
-    print('******************** set up dataset! ********************')
-    trainer.create_and_train_model()
-    print('******************** finish training! ********************')
-    if args.test_size > 0:
-        score_printer(trainer.logs)
+    if args.rank_log_save_ckpt_flag:
+        tab_printer(args)
+        trainer = SignedGCNTrainer(args, edges)
+        print('******************** set up dataset... ********************')
+        trainer.setup_dataset()
+        print('******************** set up dataset! ********************')
+        print("\nTraining started.\n")
+        trainer.create_and_train_model()
+        print('******************** finish training! ********************')
+        if args.test_size > 0:
+            score_printer(trainer.logs)
+    else:
+        trainer = SignedGCNTrainer(args, edges)
+        trainer.setup_dataset()
+        trainer.create_and_train_model()
 
 
 if __name__ == "__main__":

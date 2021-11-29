@@ -12,34 +12,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
 """
 postprocess.
 """
-import os
 import argparse
+import os
+
 import numpy as np
+from mindspore import context
+from mindspore import load_checkpoint
+
 from src.ms_utils import calculate_auc
-from mindspore import context, load_checkpoint
 
 
 def softmax(x):
+    """Softmax"""
     t_max = np.max(x, axis=1, keepdims=True)  # returns max of each row and keeps same dims
     e_x = np.exp(x - t_max)  # subtracts each row with its max value
     t_sum = np.sum(e_x, axis=1, keepdims=True)  # returns sum of each row and keeps same dims
     f_x = e_x / t_sum
     return f_x
 
-def score_model(preds, test_pos, test_neg, weight, bias):
-    """
-    Score the model on the test set edges in each epoch.
-    Args:
-        epoch (LongTensor): Training epochs.
 
-    Returns:
-        auc(Float32): AUC result.
-        f1(Float32): F1-Score result.
-    """
+def score_model(preds, test_pos, test_neg, weight, bias):
+    """Score the model on the test set edges."""
     score_positive_edges = np.array(test_pos, dtype=np.int32).T
     score_negative_edges = np.array(test_neg, dtype=np.int32).T
     test_positive_z = np.concatenate((preds[score_positive_edges[0, :], :],
@@ -49,11 +45,12 @@ def score_model(preds, test_pos, test_neg, weight, bias):
     # operands could not be broadcast together with shapes (4288,128) (128,3)
     scores = np.dot(np.concatenate((test_positive_z, test_negative_z), axis=0), weight) + bias
     probability_scores = np.exp(softmax(scores))
-    predictions = probability_scores[:, 0]/probability_scores[:, 0:2].sum(1)
+    predictions = probability_scores[:, 0] / probability_scores[:, 0: 2].sum(1)
     # predictions = predictions.asnumpy()
-    targets = [0]*len(test_pos) + [1]*len(test_neg)
+    targets = [0] * len(test_pos) + [1] * len(test_neg)
     auc, f1 = calculate_auc(targets, predictions)
     return auc, f1
+
 
 def get_acc():
     """get infer Accuracy."""
@@ -90,7 +87,6 @@ def get_acc():
     print(param_dict)
     print(type(param_dict['regression_weights']))
     print(param_dict['regression_weights'])
-    # load_param_into_net(net, param_dict)
     pred = np.fromfile('./result_Files/repos_0.bin', np.float32)
 
     if args_opt.dataset_name == 'bitcoin-otc':
@@ -101,6 +97,7 @@ def get_acc():
     auc, f1 = score_model(pred, test_pos, test_neg, param_dict['regression_weights'].asnumpy(),
                           param_dict['regression_bias'].asnumpy())
     print("Test set results:", "auc=", "{:.5f}".format(auc), "f1=", "{:.5f}".format(f1))
+
 
 if __name__ == '__main__':
     get_acc()

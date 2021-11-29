@@ -107,29 +107,38 @@ bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt
 
 ```text
 .
-└─sgcn
-  ├─README_CN.md                  # 中文指南
-  |
-  ├─scripts
-  | ├─run_export.sh               # 模型导出运行脚本
-  | ├─run_eval.sh                 # 评估运行脚本
-  | ├─run_distributed_train.sh    # 多卡训练脚本
-  | ├─run_infer_310.sh            # Ascend310推理脚本
-  | └─run_standalone_train.sh     # 单卡训练脚本
-  |
-  ├─src
-  | ├─param_parser.py               # 参数配置
-  | ├─ms_utils.py                   # 功能函数定义
-  | ├─sgcn.py                       # SGCN骨干
-  | ├─signedsageconvolution.py      # 定义图卷积层
-  | └─metrics.py                    # 计算损失和反向传播
-  |
-  ├─requirements.txt                # 依赖包
-  ├─train.py                        # 训练
-  ├─eval.py                         # 评估
-  ├─preprocess.py                   # 预处理
-  ├─postprocess.py                  # 后处理
-  └─export.py                       # 模型导出
+└── sgcn
+    └── ascend310_infer
+        ├── build.sh
+        ├── CMakeLists.txt
+        ├── inc
+        │   └── utils.h
+        └── src
+            ├── main.cc
+            └── utils.cc
+    ├── eval.py                                 # 评估
+    ├── export.py                               # 模型导出
+    ├── postprocess.py                          # 后处理
+    ├── preprocess.py                           # 预处理
+    ├── README_CN.md                            # 中文指南
+    ├── README.md
+    ├── requirements.txt                        # 依赖包
+    └── scripts
+        ├── run_distributed_train_gpu.sh
+        ├── run_distributed_train.sh            # 多卡训练脚本
+        ├── run_eval_gpu.sh
+        ├── run_eval.sh                         # 评估运行脚本
+        ├── run_export.sh                       # 模型导出运行脚本
+        ├── run_infer_310.sh                    # Ascend310推理脚本
+        ├── run_standalone_train_gpu.sh
+        └── run_standalone_train.sh             # 单卡训练脚本
+    └── src
+        ├── metrics.py                          # 计算损失和反向传播
+        ├── ms_utils.py                         # 功能函数定义
+        ├── param_parser.py                     # 参数配置
+        ├── sgcn.py                             # SGCN骨干
+        └── signedsageconvolution.py            # 定义图卷积层
+    └── train.py                                # 训练
 ```
 
 ### 脚本参数

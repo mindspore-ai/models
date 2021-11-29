@@ -14,57 +14,83 @@
 # ============================================================================
 """Layer classes."""
 import math
+
 import numpy as np
-import mindspore as ms
-import mindspore.nn as nn
-import mindspore.ops as ops
-from mindspore import Parameter, Tensor
-import mindspore.numpy as mnp
+from mindspore import Parameter
+from mindspore import Tensor
+from mindspore import dtype as mstype
+from mindspore import nn
+from mindspore import numpy as mnp
+from mindspore import ops
 from mindspore.common.initializer import Uniform
 from mindspore.ops.primitive import constexpr
 
 
-def maybe_num_nodes(index, num_nodes=None):
-    return index.max().item() + 1 if num_nodes is None else num_nodes
-
-
 @constexpr
 def range_tensor(start, end):
-    return Tensor(np.arange(start, end), ms.int32)
+    """
+    Create range tensor.
+    Args:
+        start: Min value.
+        end: Max values.
 
-
-@constexpr  # input_x parameter -> tensor
-def construct_tensor(input_x):
-    return Tensor(input_x.asnumpy())
+    Returns:
+        Tensor(np.arange(start, end), ms.int32)
+    """
+    return Tensor(np.arange(start, end), mstype.int32)
 
 
 def add_self_loops(edge_index, num_nodes):
-    N = maybe_num_nodes(edge_index, num_nodes)
-    loop_index = mnp.arange(0, N)
+    """
+    Add self loops.
+    Args:
+        edge_index: Edges.
+        num_nodes: Number of nodes.
+
+    Returns:
+        Edges with self loops.
+    """
+    loop_index = mnp.arange(0, num_nodes, dtype=mstype.int32)
     loop_index = ops.ExpandDims()(loop_index, 0)
-    loop_index = ops.Tile()(loop_index, (2, 1)).astype("int32")
+    loop_index = ops.Tile()(loop_index, (2, 1))
     edge_index = ops.Concat(1)((edge_index, loop_index))
     return edge_index
 
 
-@constexpr
-def loops_out(start, end):
-    return Tensor(mnp.zeros((start, end)))
-
-
 def ms_scatter_add(src, index, dim_size):
-    out = loops_out(dim_size, src.shape[1])
-    out = ops.ScatterAdd()(out, index.astype("int32"), src)
+    """
+    Scatters a tensor into a new tensor depending on the specified indices.
+    Args:
+        src: The source Tensor to be scattered.
+        index: The index of scattering in the new tensor.
+        dim_size: Define the shape of the output tensor.
+
+    Returns:
+        Scattered tensor.
+    """
+    shape = (dim_size, src.shape[1])
+    indices = ops.ExpandDims()(index.astype("int32"), 0).T
+    out = ops.ScatterNd()(indices, src, shape)
     return out
 
 
 def ms_scatter_mean2(src, index, dim_size):
+    """
+    Scatters a tensor into a new tensor depending on the specified indices.
+    Args:
+        src: The source Tensor to be scattered.
+        index: The index of scattering in the new tensor.
+        dim_size: Define the shape of the output tensor.
+
+    Returns:
+        Scattered normalize tensor.
+    """
     shape = (dim_size, src.shape[1])
     indices = ops.ExpandDims()(index.astype("int32"), 0).T
     res = ops.ScatterNd()(indices, src, shape)
     tag = mnp.ones((src.shape[0], src.shape[1]))
     tag = ops.ScatterNd()(indices, tag, shape)
-    tag = tag + (tag == 0).astype("int32")
+    tag = ops.maximum(tag, 1)
     out = ops.Div()(res, tag)
     return out
 
@@ -72,10 +98,13 @@ def ms_scatter_mean2(src, index, dim_size):
 class SignedSAGEConvolution(nn.Cell):
     """
     Abstract Signed SAGE convolution class.
-    :param in_channels: Number of features.
-    :param out_channels: Number of filters.
-    :param norm_embed: Normalize embedding -- boolean.
-    :param bias: Add bias or no.
+    Args:
+        in_channels: Number of features.
+        out_channels: Number of filters.
+        name: Name.
+        norm: Normalize data.
+        norm_embed: Normalize embedding - boolean.
+        bias: Add bias or no.
     """
     def __init__(self,
                  in_channels,
@@ -90,16 +119,19 @@ class SignedSAGEConvolution(nn.Cell):
         self.out_channels = out_channels
         self.norm = norm
         self.norm_embed = norm_embed
-        self.matmul = nn.MatMul().to_float(ms.float16)
         self.l2_normalize = ops.L2Normalize(epsilon=1e-12, axis=-1)
         self.concat = ops.Concat(axis=1)
-        self.weight_tensor = Tensor(shape=[self.in_channels, out_channels], dtype=ms.float32,
+        self.weight_tensor = Tensor(shape=[self.in_channels, out_channels], dtype=mstype.float32,
                                     init=Uniform(scale=1.0 / math.sqrt(self.in_channels)))
         self.weight = Parameter(self.weight_tensor, name=name + 'weight')
         print('self.weight', type(self.weight), self.weight.shape, self.weight.dtype)
         self.weight_data = list(self.weight)
         if bias:
-            tmp = Tensor(shape=[out_channels], dtype=ms.float32, init=Uniform(scale=1.0 / math.sqrt(self.in_channels)))
+            tmp = Tensor(
+                shape=[out_channels],
+                dtype=mstype.float32,
+                init=Uniform(scale=1.0 / math.sqrt(self.in_channels))
+            )
             self.bias = Parameter(tmp, name=name + 'bias')
         else:
             self.register_parameter("bias", None)
@@ -132,7 +164,7 @@ class SignedSAGEConvolutionBase(SignedSAGEConvolution):
         else:
             out = ms_scatter_add(x[col], row, dim_size=x.shape[0])
         out = self.concat((out, x))
-        out = self.matmul(out, self.weight)
+        out = ops.matmul(out, self.weight)
         if self.bias is not None:
             out = out + self.bias
         if self.norm_embed:
@@ -162,14 +194,14 @@ class SignedSAGEConvolutionDeep(SignedSAGEConvolution):
         row_pos, col_pos = edge_index_pos
         row_neg, col_neg = edge_index_neg
         if self.norm:
-            out_1 = ms_scatter_mean2(x_1[col_pos], row_pos, dim=0, dim_size=x_1.shape[0])
-            out_2 = ms_scatter_mean2(x_2[col_neg], row_neg, dim=0, dim_size=x_2.shape[0])
+            out_1 = ms_scatter_mean2(x_1[col_pos], row_pos, dim_size=x_1.shape[0])
+            out_2 = ms_scatter_mean2(x_2[col_neg], row_neg, dim_size=x_2.shape[0])
         else:
-            out_1 = ms_scatter_add(x_1[col_pos], row_pos, dim=0, dim_size=x_1.shape[0])
-            out_2 = ms_scatter_add(x_2[col_neg], row_neg, dim=0, dim_size=x_2.shape[0])
+            out_1 = ms_scatter_add(x_1[col_pos], row_pos, dim_size=x_1.shape[0])
+            out_2 = ms_scatter_add(x_2[col_neg], row_neg, dim_size=x_2.shape[0])
 
         out = self.concat((out_1, out_2, x_1))
-        out = self.matmul(out, self.weight)
+        out = ops.matmul(out, self.weight)
         if self.bias is not None:
             out = out + self.bias
         if self.norm_embed:
