@@ -90,14 +90,14 @@ APP_ERROR SSDResnet50Fpn::ReadImage(const std::string &imgPath, MxBase::TensorBa
         return ret;
     }
     MxBase::MemoryData memoryData(reinterpret_cast<void *>(output.data), output.dataSize,
-                                  MemoryData::MemoryType::MEMORY_DVPP, deviceId_);
+                                  MxBase::MemoryData::MemoryType::MEMORY_DVPP, deviceId_);
     if (output.heightStride % VPC_H_ALIGN != 0) {
         LogError << "Output data height(" << output.heightStride << ") can't be divided by " << VPC_H_ALIGN << ".";
-        MemoryHelper::MxbsFree(memoryData);
+        MxBase::MemoryHelper::MxbsFree(memoryData);
         return APP_ERR_COMM_INVALID_PARAM;
     }
     std::vector<uint32_t> shape = {output.heightStride * YUV_BYTE_NU / YUV_BYTE_DE, output.widthStride};
-    tensor = TensorBase(memoryData, false, shape, TENSOR_DTYPE_UINT8);
+    tensor = MxBase::TensorBase(memoryData, false, shape, MxBase::ENSOR_DTYPE_UINT8);
     return APP_ERR_OK;
 }
 
@@ -122,15 +122,15 @@ APP_ERROR SSDResnet50Fpn::Resize(const MxBase::TensorBase &inputTensor, MxBase::
         return ret;
     }
     MxBase::MemoryData memoryData(reinterpret_cast<void *>(output.data), output.dataSize,
-                                  MemoryData::MemoryType::MEMORY_DVPP, deviceId_);
+                                  MxBase::MemoryData::MemoryType::MEMORY_DVPP, deviceId_);
     if (output.heightStride % VPC_H_ALIGN != 0) {
         LogError << "Output data height(" << output.heightStride << ") can't be divided by " << VPC_H_ALIGN << ".";
-        MemoryHelper::MxbsFree(memoryData);
-        MemoryHelper::MxbsFree(memoryData);
+        MxBase::MemoryHelper::MxbsFree(memoryData);
+        MxBase::MemoryHelper::MxbsFree(memoryData);
         return APP_ERR_COMM_INVALID_PARAM;
     }
     shape = {output.heightStride * YUV_BYTE_NU / YUV_BYTE_DE, output.widthStride};
-    outputTensor = TensorBase(memoryData, false, shape, TENSOR_DTYPE_UINT8);
+    outputTensor = MxBase::TensorBase(memoryData, false, shape, MxBase::TENSOR_DTYPE_UINT8);
     LogInfo << "Output data height: " << output.height << ", width: " << output.width << ".";
     LogInfo << "Output data widthStride: " << output.widthStride << ", heightStride: " << output.heightStride << "."
             << std::endl;
@@ -146,8 +146,8 @@ APP_ERROR SSDResnet50Fpn::Inference(const std::vector<MxBase::TensorBase> &input
         for (size_t j = 0; j < modelDesc_.outputTensors[i].tensorDims.size(); ++j) {
             shape.push_back((uint32_t) modelDesc_.outputTensors[i].tensorDims[j]);
         }
-        TensorBase tensor(shape, dtypes[i], MemoryData::MemoryType::MEMORY_DEVICE, deviceId_);
-        APP_ERROR ret = TensorBase::TensorBaseMalloc(tensor);
+        MxBase::TensorBase tensor(shape, dtypes[i], MxBase::MemoryData::MemoryType::MEMORY_DEVICE, deviceId_);
+        APP_ERROR ret = MxBase::TensorBase::TensorBaseMalloc(tensor);
         if (ret != APP_ERR_OK) {
             LogError << "TensorBaseMalloc failed, ret=" << ret << ".";
             return ret;
@@ -179,13 +179,13 @@ APP_ERROR SSDResnet50Fpn::PostProcess(const std::vector<MxBase::TensorBase> &inp
 }
 
 APP_ERROR SSDResnet50Fpn::Process(const std::string &imgPath) {
-    TensorBase image;
+    MxBase::TensorBase image;
     APP_ERROR ret = ReadImage(imgPath, image);
     if (ret != APP_ERR_OK) {
         LogError << "ReadImage failed, ret=" << ret << ".";
         return ret;
     }
-    TensorBase resizeImage;
+    MxBase::TensorBase resizeImage;
     ret = Resize(image, resizeImage);
     if (ret != APP_ERR_OK) {
         LogError << "Resize failed, ret=" << ret << ".";
@@ -201,7 +201,7 @@ APP_ERROR SSDResnet50Fpn::Process(const std::string &imgPath) {
     }
     LogInfo << "Inference success, ret=" << ret << ".";
     std::vector<MxBase::ResizedImageInfo> resizedImageInfos = {};
-    ResizedImageInfo imgInfo = {640, 640, 1024, 683, MxBase::RESIZER_STRETCHING, 0.0};
+    MxBase::ResizedImageInfo imgInfo = {640, 640, 1024, 683, MxBase::RESIZER_STRETCHING, 0.0};
     resizedImageInfos.push_back(imgInfo);
     std::vector<std::vector<MxBase::ObjectInfo>> objectInfos = {};
     std::map<std::string, std::shared_ptr<void>> configParamMap = {};
@@ -218,7 +218,7 @@ APP_ERROR SSDResnet50Fpn::Process(const std::string &imgPath) {
 
     std::vector<MxBase::ObjectInfo> objects = objectInfos.at(0);
     for (size_t i = 0; i < objects.size(); i++) {
-        ObjectInfo obj = objects.at(i);
+        MxBase::ObjectInfo obj = objects.at(i);
         LogInfo << "BBox[" << i << "]:[x0=" << obj.x0 << ", y0=" << obj.y0 << ", x1=" << obj.x1 << ", y1=" << obj.y1
                 << "], confidence=" << obj.confidence << ", classId=" << obj.classId << ", className=" << obj.className
                 << std::endl;
