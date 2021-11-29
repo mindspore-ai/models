@@ -28,21 +28,16 @@ from src.util import coco_eval, bbox2result_1image, results2json
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id
-
+from src.FasterRcnn.faster_rcnn import Faster_Rcnn
 
 set_seed(1)
 context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
 
-if config.backbone in ("resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152"):
-    from src.FasterRcnn.faster_rcnn_resnet import Faster_Rcnn_Resnet
-elif config.backbone == "resnet_v1_50":
-    from src.FasterRcnn.faster_rcnn_resnet50v1 import Faster_Rcnn_Resnet
-
 def fasterrcnn_eval(dataset_path, ckpt_path, ann_file):
     """FasterRcnn evaluation."""
     ds = create_fasterrcnn_dataset(config, dataset_path, batch_size=config.test_batch_size, is_training=False)
-    net = Faster_Rcnn_Resnet(config)
     param_dict = load_checkpoint(ckpt_path)
+    net = Faster_Rcnn(config=config)
     if config.device_target == "GPU":
         for key, value in param_dict.items():
             tensor = value.asnumpy().astype(np.float32)

@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""FasterRcnn based on ResNet."""
+"""FasterRcnn"""
 
 import numpy as np
 import mindspore.nn as nn
@@ -21,7 +21,6 @@ from mindspore.ops import operations as P
 from mindspore.common.tensor import Tensor
 import mindspore.common.dtype as mstype
 from mindspore.ops import functional as F
-from .resnet import ResNetFea, ResidualBlockUsing
 from .bbox_assign_sample_stage2 import BboxAssignSampleForRcnn
 from .fpn_neck import FeatPyramidNeck
 from .proposal_generator import Proposal
@@ -30,13 +29,21 @@ from .rpn import RPN
 from .roi_align import SingleRoIExtractor
 from .anchor_generator import AnchorGenerator
 
+if config.backbone in ("resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152"):
+    from .resnet import ResNetFea, ResidualBlockUsing
+elif config.backbone == "resnet_v1_50":
+    from .resnet import ResNetFea
+    from .resnet50v1 import ResidualBlockUsing_V1
+elif config.backbone == 'inception_resnet_v2':
+    from .inceptionresnetv2 import InceptionResNetV2
 
-class Faster_Rcnn_Resnet(nn.Cell):
+
+class Faster_Rcnn(nn.Cell):
     """
     FasterRcnn Network.
 
     Note:
-        backbone = resnet
+        backbone = config.backbone
 
     Returns:
         Tuple, tuple of output tensor.
@@ -48,10 +55,10 @@ class Faster_Rcnn_Resnet(nn.Cell):
         rcnn_reg_loss: Scalar, Regression loss of RCNN subnet.
 
     Examples:
-        net = Faster_Rcnn_Resnet()
+        net = Faster_Rcnn()
     """
     def __init__(self, config):
-        super(Faster_Rcnn_Resnet, self).__init__()
+        super(Faster_Rcnn, self).__init__()
         self.dtype = np.float32
         self.ms_type = mstype.float32
         self.train_batch_size = config.batch_size
@@ -79,17 +86,19 @@ class Faster_Rcnn_Resnet(nn.Cell):
 
         self.anchor_list = self.get_anchors(featmap_sizes)
 
-        # Backbone resnet
-        self.backbone = ResNetFea(ResidualBlockUsing,
-                                  config.resnet_block,
-                                  config.resnet_in_channels,
-                                  config.resnet_out_channels,
-                                  False)
+        # Backbone
+        if config.backbone in ("resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152"):
+            self.backbone = ResNetFea(ResidualBlockUsing, config.resnet_block, config.resnet_in_channels,
+                                      config.resnet_out_channels, False)
+        elif config.backbone == "resnet_v1_50":
+            self.backbone = ResNetFea(ResidualBlockUsing_V1, config.resnet_block, config.resnet_in_channels,
+                                      config.resnet_out_channels, False)
+        elif config.backbone == 'inception_resnet_v2':
+            self.backbone = InceptionResNetV2()
 
         # Fpn
-        self.fpn_ncek = FeatPyramidNeck(config.fpn_in_channels,
-                                        config.fpn_out_channels,
-                                        config.fpn_num_outs)
+        self.fpn_neck = FeatPyramidNeck(config.fpn_in_channels, \
+        config.fpn_out_channels, config.fpn_num_outs)
 
         # Rpn and rpn loss
         self.gt_labels_stage1 = Tensor(np.ones((self.train_batch_size, config.num_gts)).astype(np.uint8))
@@ -246,7 +255,7 @@ class Faster_Rcnn_Resnet(nn.Cell):
             Tuple,tuple of output tensor
         """
         x = self.backbone(img_data)
-        x = self.fpn_ncek(x)
+        x = self.fpn_neck(x)
 
         rpn_loss, cls_score, bbox_pred, rpn_cls_loss, rpn_reg_loss, _ = self.rpn_with_loss(x,
                                                                                            img_metas,
@@ -480,7 +489,7 @@ class Faster_Rcnn_Resnet(nn.Cell):
 class FasterRcnn_Infer(nn.Cell):
     def __init__(self, config):
         super(FasterRcnn_Infer, self).__init__()
-        self.network = Faster_Rcnn_Resnet(config)
+        self.network = Faster_Rcnn(config)
         self.network.set_train(False)
 
     def construct(self, img_data, img_metas):

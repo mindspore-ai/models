@@ -35,15 +35,10 @@ from src.lr_schedule import dynamic_lr
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id, get_device_num, get_rank_id
-
+from src.FasterRcnn.faster_rcnn import Faster_Rcnn
 
 set_seed(1)
 context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
-
-if config.backbone in ("resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152"):
-    from src.FasterRcnn.faster_rcnn_resnet import Faster_Rcnn_Resnet
-elif config.backbone == "resnet_v1_50":
-    from src.FasterRcnn.faster_rcnn_resnet50v1 import Faster_Rcnn_Resnet
 
 if config.device_target == "GPU":
     context.set_context(enable_graph_kernel=True)
@@ -125,7 +120,7 @@ def modelarts_pre_process():
 def train_fasterrcnn():
     """ train_fasterrcnn """
     dataset_size, dataset = train_fasterrcnn_()
-    net = Faster_Rcnn_Resnet(config=config)
+    net = Faster_Rcnn(config=config)
     net = net.set_train()
 
     load_path = config.pre_trained

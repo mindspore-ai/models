@@ -84,9 +84,9 @@ class FeatPyramidNeck(nn.Cell):
             self.fpn_convs_.append(fpn_conv)
         self.lateral_convs_list = nn.layer.CellList(self.lateral_convs_list_)
         self.fpn_convs_list = nn.layer.CellList(self.fpn_convs_)
-        self.interpolate1 = P.ResizeNearestNeighbor((48, 80))
-        self.interpolate2 = P.ResizeNearestNeighbor((96, 160))
-        self.interpolate3 = P.ResizeNearestNeighbor((192, 320))
+        self.interpolate1 = P.ResizeNearestNeighbor(config.feature_shapes[2])
+        self.interpolate2 = P.ResizeNearestNeighbor(config.feature_shapes[1])
+        self.interpolate3 = P.ResizeNearestNeighbor(config.feature_shapes[0])
         self.maxpool = P.MaxPool(kernel_size=1, strides=2, pad_mode="same")
 
     def construct(self, inputs):

@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 3 || $# -gt 4 ]]; then
-    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
+if [[ $# -lt 3 || $# -gt 6 ]]; then
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [image_width] [image_height] [DEVICE_ID]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi
@@ -30,10 +30,12 @@ get_real_path(){
 model=$(get_real_path $1)
 data_path=$(get_real_path $2)
 ann_file=$(get_real_path $3)
+image_width=$4
+image_height=$5
 
 device_id=0
-if [ $# == 4 ]; then
-    device_id=$4
+if [ $# == 6 ]; then
+    device_id=$6
 fi
 
 echo "mindir name: "$model
@@ -72,7 +74,7 @@ function infer()
     fi
     mkdir result_Files
     mkdir time_Result
-    ../ascend310_infer/out/main --mindir_path=$model --dataset_path=$data_path --device_id=$device_id &> infer.log
+    ../ascend310_infer/out/main --mindir_path=$model --dataset_path=$data_path --device_id=$device_id --IMAGEWIDTH=$image_width --IMAGEHEIGHT=$image_height &> infer.log
 }
 
 function cal_acc()
