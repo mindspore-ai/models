@@ -299,8 +299,9 @@ class PanguAlpha_Model(Cell):
         r"""forward pass of the model"""
         embed, word_table = self.embedding(input_ids, input_position, init_reset, batch_valid_length)
         hidden_state = P.Cast()(embed, self.dtype)
-        hidden_state = self.reshape_to_2d(hidden_state)
-        # encoder_mask = self.create_encoder_mask(encoder_masks)
+        # the input of the incremental prediction is 3d
+        if self._phase != 'predict':
+            hidden_state = self.reshape_to_2d(hidden_state)
         if self.blocks is not None:
             for i in range(self.num_layers - 1):
                 hidden_state, _ = self.blocks[i](hidden_state, encoder_masks, init_reset, batch_valid_length)
@@ -311,6 +312,7 @@ class PanguAlpha_Model(Cell):
                                                      encoder_masks, init_reset, batch_valid_length)
             encoder_output = self.layernorm(encoder_output)
         else:
+            hidden_state = self.reshape_to_2d(hidden_state)
             encoder_output = self.layernorm(hidden_state)
             encoder_output = P.Cast()(encoder_output, self.dtype)
             top_query_hidden_states, _ = self.top_query_embedding(input_position)
@@ -468,14 +470,19 @@ class EvalNet(nn.Cell):
         self.log_softmax = P.LogSoftmax().shard(((1, 1, 1),))
         self.get_attention_mask = AttentionMask(seq_length)
         self.expand = P.ExpandDims().shard(((1, 1, 1),))
+        # used for incremental prediction
+        self.all_ones_attention_mask = Tensor(np.ones((1, 1, seq_length)), mstype.float32)
 
     def construct(self, input_ids, current_index, init_reset=True, batch_valid_length=None):
         """evaluation net"""
         input_mask = F.cast(F.not_equal(input_ids, self.pad_token), mstype.float32)
         bs, seq_length = F.shape(input_ids)
-        attention_mask = self.get_attention_mask(input_mask)
         input_position = F.tuple_to_array(F.make_range(seq_length))
         input_position = P.Tile()(input_position, (bs, 1))
+        if self.is_first_iteration:
+            attention_mask = self.get_attention_mask(input_mask)
+        else:
+            attention_mask = P.Tile()(self.all_ones_attention_mask, (bs, 1, 1))
         logits = self.backbone(input_ids, input_position, attention_mask,
                                init_reset, batch_valid_length)
         index = current_index.view(1,)

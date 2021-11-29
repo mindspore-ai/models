@@ -533,7 +533,7 @@ Please check the official [homepage](https://gitee.com/mindspore/models).
 
 # [Requirements](#contents)
 
-- mindspore 1.2.1 or higher version
+- mindspore 1.5.0 or higher version
 - jieba 0.42.1
 - sentencepiece 0.1.94
 - transformers >= 4.7.0
@@ -554,3 +554,9 @@ Q: `ERROR: device_num must be the power of 2`.
 
 A: The number of the cards must be the power of 2 if we use the parallel training. For example, if we want to train
 the 2.6B model, the number of cards should be 2, 4, 8, 16 and so on.
+
+Q: How to modify the the network's hyperparameter?
+
+A: The pre-defined hyperparameter of the network is in the function `set_parse` of `src/pangu_alpha_config.py`. The
+parameter determines the layer numbers, hidden size and so on. The data parallel number is determined in `train.py` by
+`device_num / model_parallel`.
