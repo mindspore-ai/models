@@ -16,22 +16,18 @@
 Process the test set with the .ckpt model in turn.
 """
 import argparse
+
 import mindspore.nn as nn
 from mindspore import context
-from mindspore.train.model import Model
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.common import set_seed
-from mindspore import Tensor
-from mindspore.common import dtype as mstype
-from mindspore.nn.loss.loss import LossBase
-from mindspore.ops import functional as F
-from mindspore.ops import operations as P
+from mindspore.train.model import Model
+from mindspore.train.serialization import load_checkpoint
+from mindspore.train.serialization import load_param_into_net
 
+import src.net_config as configs
 from src.config import cifar10_cfg
 from src.dataset import create_dataset_cifar10
-
 from src.modeling_ms import VisionTransformer
-import src.net_config as configs
 
 set_seed(1)
 
@@ -40,26 +36,10 @@ parser.add_argument('--dataset_name', type=str, default='cifar10', choices=['cif
                     help='dataset name.')
 parser.add_argument('--sub_type', type=str, default='ViT-B_16',
                     choices=['ViT-B_16', 'ViT-B_32', 'ViT-L_16', 'ViT-L_32', 'ViT-H_14', 'testing'])
-parser.add_argument('--checkpoint_path', type=str, default='./ckpt_0', help='Checkpoint file path')
-parser.add_argument('--id', type=int, default=0, help='Device id')
+parser.add_argument('--checkpoint_path', type=str, default='./ckpt_0', help='checkpoint file path')
+parser.add_argument('--device_target', type=str, default='GPU', help='device target Ascend or GPU. (Default: GPU)')
+parser.add_argument('--id', type=int, default=0, help='device id of Ascend or GPU. (Default: 0)')
 args_opt = parser.parse_args()
-
-
-class CrossEntropySmooth(LossBase):
-    """CrossEntropy"""
-    def __init__(self, sparse=True, reduction='mean', smooth_factor=0., num_classes=1000):
-        super(CrossEntropySmooth, self).__init__()
-        self.onehot = P.OneHot()
-        self.sparse = sparse
-        self.on_value = Tensor(1.0 - smooth_factor, mstype.float32)
-        self.off_value = Tensor(1.0 * smooth_factor / (num_classes - 1), mstype.float32)
-        self.ce = nn.SoftmaxCrossEntropyWithLogits(reduction=reduction)
-
-    def construct(self, logit, label):
-        if self.sparse:
-            label = self.onehot(label, F.shape(logit)[1], self.on_value, self.off_value)
-        loss_ = self.ce(logit, label)
-        return loss_
 
 
 if __name__ == '__main__':
@@ -70,20 +50,40 @@ if __name__ == '__main__':
                'ViT-H_14': configs.get_h14_config,
                'R50-ViT-B_16': configs.get_r50_b16_config,
                'testing': configs.get_testing}
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=args_opt.id)
+
     if args_opt.dataset_name == "cifar10":
         cfg = cifar10_cfg
-        net = VisionTransformer(CONFIGS[args_opt.sub_type], num_classes=cfg.num_classes)
-        loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-        opt = nn.Momentum(net.trainable_params(), 0.01, cfg.momentum, weight_decay=cfg.weight_decay)
-        dataset = create_dataset_cifar10(cfg.val_data_path, 1, False)
-        param_dict = load_checkpoint(args_opt.checkpoint_path)
-        print("load checkpoint from [{}].".format(args_opt.checkpoint_path))
-        load_param_into_net(net, param_dict)
-        net.set_train(False)
-        model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'})
     else:
         raise ValueError("dataset is not support.")
+
+    if args_opt.device_target is None:
+        device_target = cfg.device_target
+    else:
+        device_target = args_opt.device_target
+
+    context.set_context(
+        mode=context.GRAPH_MODE,
+        device_target=device_target,
+        device_id=args_opt.id,
+    )
+
+    dataset = create_dataset_cifar10(
+        device=device_target,
+        data_home=cfg.val_data_path,
+        repeat_num=1,
+        training=False,
+    )
+
+    net = VisionTransformer(CONFIGS[args_opt.sub_type], num_classes=cfg.num_classes)
+    loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+    opt = nn.Momentum(net.trainable_params(), 0.01, cfg.momentum, weight_decay=cfg.weight_decay)
+
+    param_dict = load_checkpoint(args_opt.checkpoint_path)
+    print("load checkpoint from [{}].".format(args_opt.checkpoint_path))
+
+    load_param_into_net(net, param_dict)
+    net.set_train(False)
+    model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'})
 
     acc = model.eval(dataset)
     print(f"model's accuracy is {acc}")

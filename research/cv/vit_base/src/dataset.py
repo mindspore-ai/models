@@ -21,15 +21,32 @@ import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
 import mindspore.dataset.transforms.c_transforms as C
 import mindspore.dataset.vision.c_transforms as vision
+from mindspore.communication.management import get_group_size
+from mindspore.communication.management import get_rank
+
 from src.config import cifar10_cfg
 
-def create_dataset_cifar10(data_home, repeat_num=1, device_num=1, training=True):
-    """Data operations."""
+
+def create_dataset_cifar10(data_home, device, repeat_num=1, device_num=1, training=True):
+    """
+    Create a train or eval cifar-10 dataset for vit-base
+
+    Args:
+        data_home(str): the path of dataset.
+        device(str): device(str): target device platform.
+        repeat_num(int): the repeat times of dataset. Default: 1
+        device_num(int): num of target devices. Default: 1
+        training(bool): whether dataset is used for train or eval.
+
+    Returns:
+        dataset
+    """
+
     if device_num > 1:
-        rank_size, rank_id = _get_rank_info()
+        rank_size, rank_id = _get_rank_info(device_target=device)
         data_set = ds.Cifar10Dataset(data_home, num_shards=rank_size, shard_id=rank_id, shuffle=True)
     else:
-        data_set = ds.Cifar10Dataset(data_home, shuffle=False)
+        data_set = ds.Cifar10Dataset(data_home, shuffle=True)
 
     resize_height = cifar10_cfg.image_height
     resize_width = cifar10_cfg.image_width
@@ -64,17 +81,20 @@ def create_dataset_cifar10(data_home, repeat_num=1, device_num=1, training=True)
     return data_set
 
 
-def _get_rank_info():
-    """
-    get rank size and rank id
-    """
-    rank_size = int(os.environ.get("RANK_SIZE", 1))
+def _get_rank_info(device_target):
+    """get rank size and rank id"""
+    if device_target == 'Ascend':
+        rank_size = int(os.environ.get("RANK_SIZE", 1))
 
-    if rank_size > 1:
-        from mindspore.communication.management import get_rank, get_group_size
+        if rank_size > 1:
+            rank_size = get_group_size()
+            rank_id = get_rank()
+        else:
+            rank_size = rank_id = None
+    elif device_target == 'GPU':
         rank_size = get_group_size()
         rank_id = get_rank()
     else:
-        rank_size = rank_id = None
+        raise ValueError("Unsupported platform.")
 
     return rank_size, rank_id

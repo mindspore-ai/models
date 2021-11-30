@@ -17,6 +17,7 @@ network config setting, will be used in main.py
 """
 from easydict import EasyDict as edict
 
+
 cifar10_cfg = edict({
     'name': 'cifar10',
     'pre_trained': True,  # False
@@ -33,7 +34,7 @@ cifar10_cfg = edict({
     'device_target': 'Ascend',
     'device_id': 0,
     'keep_checkpoint_max': 2,
-    'checkpoint_path': '/dataset/cifar10_pre_checkpoint_based_imagenet21k.ckpt',
+    'checkpoint_path': '/dataset/cifar10_pre_checkpoint_based_imagenet21k.ckpt',  # Can choose .ckpt or .npz
     'onnx_filename': 'vit_base',
     'air_filename': 'vit_base',
 
