@@ -20,6 +20,7 @@ from src.utils.cunstom_op import GlobalAvgPooling
 
 __all__ = ['CommonHead']
 
+
 class CommonHead(nn.Cell):
     """
     common architecture definition.
@@ -27,14 +28,19 @@ class CommonHead(nn.Cell):
     Args:
         num_classes (int): Number of classes.
         out_channels (int): Output channels.
+        fp16 (bool): Whether to use FP16 type for the head computation. Default True.
 
     Returns:
         Tensor, output tensor.
     """
-    def __init__(self, num_classes, out_channels):
+    def __init__(self, num_classes, out_channels, fp16=True):
         super(CommonHead, self).__init__()
         self.avgpool = GlobalAvgPooling()
-        self.fc = nn.Dense(out_channels, num_classes, has_bias=True).add_flags_recursive(fp16=True)
+        dense_cell = nn.Dense(out_channels, num_classes, has_bias=True)
+        if fp16:
+            self.fc = dense_cell.add_flags_recursive(fp16=True)
+        else:
+            self.fc = dense_cell
 
     def construct(self, x):
         x = self.avgpool(x)

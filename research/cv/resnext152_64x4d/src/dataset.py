@@ -64,7 +64,8 @@ def classification_dataset(data_dir, image_size, per_batch_size, max_epoch, rank
                            class_indexing=None,
                            drop_remainder=True,
                            transform=None,
-                           target_transform=None):
+                           target_transform=None,
+                           use_python_multiprocessing=False):
     """
     A function that returns a dataset for classification. The mode of input dataset could be "folder" or "txt".
     If it is "folder", all images within one folder have the same label. If it is "txt", all paths of images
@@ -90,6 +91,8 @@ def classification_dataset(data_dir, image_size, per_batch_size, max_epoch, rank
             (default=None, the folder names will be sorted
             alphabetically and each class will be given a
             unique index starting from 0).
+        use_python_multiprocessing (bool): Parallelize Python operations with multiple worker processes.
+            Default: False.
 
     Examples:
         >>> from src.dataset import classification_dataset
@@ -145,9 +148,11 @@ def classification_dataset(data_dir, image_size, per_batch_size, max_epoch, rank
         de_dataset = de.GeneratorDataset(dataset, ["image", "label"], sampler=sampler)
 
     de_dataset = de_dataset.map(operations=transform_img, input_columns="image",
-                                num_parallel_workers=num_parallel_workers)
+                                num_parallel_workers=num_parallel_workers,
+                                python_multiprocessing=use_python_multiprocessing)
     de_dataset = de_dataset.map(operations=transform_label, input_columns="label",
-                                num_parallel_workers=num_parallel_workers)
+                                num_parallel_workers=num_parallel_workers,
+                                python_multiprocessing=False)
 
     columns_to_project = ["image", "label"]
     de_dataset = de_dataset.project(columns=columns_to_project)
