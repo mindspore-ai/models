@@ -149,7 +149,6 @@ class CelebADataLoader:
                                             num_parallel_workers=min(
                                                 32, num_parallel_workers))
             test_dataset = test_dataset.batch(batch_size, drop_remainder=True)
-            test_dataset = test_dataset.repeat(1)
 
             self.test_loader = test_dataset.create_dict_iterator()
 

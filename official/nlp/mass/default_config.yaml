@@ -68,7 +68,7 @@ output: ""
 device_id: 0
 ckpt_file: ""
 file_name: "mass"
-file_format: "AIR"
+file_format: "MINDIR"
 vocab_file: ""
 result_path: "./preprocess_Result/"
 source_id_folder: "./preprocess_Result/00_source_eos_ids"

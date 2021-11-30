@@ -79,7 +79,6 @@ def get_dataloader(img_predix_all, img_list_all, batch_size):
     dataset_column_names = ["image", "path", "index"]
     ds = de.GeneratorDataset(dataset, column_names=dataset_column_names, sampler=sampler)
     ds = ds.batch(batch_size, num_parallel_workers=8, drop_remainder=False)
-    ds = ds.repeat(1)
 
     return ds, len(dataset), dataset.get_all_labels()
 

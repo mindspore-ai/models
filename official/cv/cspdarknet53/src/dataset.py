@@ -114,6 +114,6 @@ def create_dataset(data_dir, image_size, per_batch_size, rank, group_size,
     de_dataset = de_dataset.project(columns=columns_to_project)
 
     de_dataset = de_dataset.batch(per_batch_size, drop_remainder=drop_remainder)
-    de_dataset = de_dataset.repeat(1)
+
 
     return de_dataset

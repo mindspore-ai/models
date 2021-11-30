@@ -74,7 +74,6 @@ def preprocess():
     single_scale_trans = SingleScaleTrans_Infer(resize=config.input_shape)
     ds = ds.batch(config.batch_size, per_batch_map=single_scale_trans,
                   input_columns=["image", "annotation", "image_name", "image_size"], num_parallel_workers=8)
-    ds = ds.repeat(1)
     for data in ds.create_tuple_iterator(output_numpy=True):
         images, labels, image_name, image_size = data[0:4]
         images = Image.fromarray(images[0].astype('uint8')).convert('RGB')

@@ -42,7 +42,6 @@ def create_train_dataset(data_path, model_type, noise_level=25, batch_size=128):
     # apply DatasetOps
     dataloader = dataloader.shuffle(buffer_size=10000)
     dataloader = dataloader.batch(batch_size, drop_remainder=True)
-    dataloader = dataloader.repeat(1) #here 400 images as an epoch , on the paper 128x1600 patches as a epoch
     return dataloader
 
 class DnCNN_train_Dataset():

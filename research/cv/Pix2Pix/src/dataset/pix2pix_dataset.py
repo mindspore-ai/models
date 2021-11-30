@@ -119,7 +119,6 @@ def create_train_dataset(dataset):
     train_ds = train_ds.map(operations=trans, input_columns=["target_images"])
 
     train_ds = train_ds.batch(1, drop_remainder=True)
-    train_ds = train_ds.repeat(1)
 
     return train_ds
 
@@ -168,6 +167,5 @@ def create_val_dataset(dataset):
     val_ds = val_ds.map(operations=trans, input_columns=["input_images"])
     val_ds = val_ds.map(operations=trans, input_columns=["target_images"])
     val_ds = val_ds.batch(1, drop_remainder=True)
-    val_ds = val_ds.repeat(1)
 
     return val_ds
