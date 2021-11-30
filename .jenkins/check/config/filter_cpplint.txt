@@ -41,3 +41,7 @@
 "models/research/cv/inception_resnet_v2/infer/mxbase/InceptionResnetV2Classify.h" "runtime/references"
 
 "models/official/cv/LearningToSeeInTheDark/infer/mxbase/src/LearningToSeeInTheDark.h"  "runtime/references"
+
+"models/official/cv/squeezenet/infer/mxbase/src/squeezenetResidual.h"  "runtime/references"
+"models/official/cv/squeezenet/infer/mxbase/src/main.cpp"    "runtime/references"
+
