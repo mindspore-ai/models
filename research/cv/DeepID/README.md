@@ -54,7 +54,7 @@ python crop.py
 
 After cropping images, change **src_folder** in split.py and split data into two set, One is for train and one is for valid.
 
-```python
+```bash
 python split.py
 ```
 
@@ -75,11 +75,13 @@ python split.py
 ```shell
 .
 └─ DeepID
+  ├── ascend310_infer                 // 310 infer directory
   ├─ README.md                        // Descriptions about DeepID
   ├─ scripts
     ├─ run_standalone_train_ascend.sh // Train standalone
     ├─ run_distribute_train_ascend.sh // Train distribute
     └─ run_eval_ascend.sh             // Evaluation
+    └─ run_infer_310.sh               // 310 inference
   ├─src
     ├─ dataset.py                     // Prepare dataset
     ├─ loss.py                        // Loss function
@@ -92,11 +94,13 @@ python split.py
   ├─ eval.py                          // Evaluation script
   ├─ train.py                         // Train script
   ├─ export.py                        // Export mindir script
+  ├─ preprocess.py                    // Convert images and labels to bin
+  ├─ postprocess.py                   // Calculate accuracy
 ```
 
 ## Script parameters
 
-```shell
+```bash
 'data_url':'./data/'      # Dataset path
 'epochs':200              # Total epochs
 'lr':1e-4                 # Learning rate
@@ -131,6 +135,25 @@ sh run_distribute_train.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE]
 # Evaluation on Ascend
 sh eval_ascend.sh [DEVICE_NUM] [DEVICE_ID]
 ```
+
+## [Ascen 310 infer](#contents)
+
+### Export MindIR
+
+```bash
+python export.py
+```
+
+### Infer on Ascend 310
+
+```bash
+cd scripts
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` Directionary of MINDIR
+- `DATA_PATH` Directionary of dataset
+- `DEVICE_ID` Optional, default 0
 
 # [Result](#Contents)
 
@@ -171,6 +194,16 @@ Valid dataset accuracy: 0.9683
 | MindSpore Version   | 1.3.1                           |
 | Dataset             | Youtube Face                    |
 | batch_size          | 512                             |
+| outputs             | Accuracy = 96.83%               |
+
+| Parameters          | Ascend 310                      |
+| ------------------- | ---------------------------     |
+| Model Version       | DeepID                          |
+| Resource            | Ascend                          |
+| Uploaded Date       | 11/30/2021 (month/day/year)     |
+| MindSpore Version   | 1.3.1                           |
+| Dataset             | Youtube Face                    |
+| batch_size          | 1                               |
 | outputs             | Accuracy = 96.83%               |
 
 # [ModelZoo Homepage](#Contents)
