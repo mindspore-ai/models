@@ -78,7 +78,6 @@ do
         --max_epoch=300 \
         --warmup_epochs=20 \
         --per_batch_size=16 \
-        --training_shape=640 \
         --lr_scheduler=cosine_annealing  > log.txt 2>&1 &
     cd ..
 done

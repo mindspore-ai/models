@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """YOLOV5 loss."""
-from mindspore.ops import operations as P
+import mindspore.ops as ops
 import mindspore.nn as nn
 
 
@@ -22,8 +22,8 @@ class ConfidenceLoss(nn.Cell):
 
     def __init__(self):
         super(ConfidenceLoss, self).__init__()
-        self.cross_entropy = P.SigmoidCrossEntropyWithLogits()
-        self.reduce_sum = P.ReduceSum()
+        self.cross_entropy = ops.SigmoidCrossEntropyWithLogits()
+        self.reduce_sum = ops.ReduceSum()
 
     def construct(self, object_mask, predict_confidence, ignore_mask):
         confidence_loss = self.cross_entropy(predict_confidence, object_mask)
@@ -37,8 +37,8 @@ class ClassLoss(nn.Cell):
 
     def __init__(self):
         super(ClassLoss, self).__init__()
-        self.cross_entropy = P.SigmoidCrossEntropyWithLogits()
-        self.reduce_sum = P.ReduceSum()
+        self.cross_entropy = ops.SigmoidCrossEntropyWithLogits()
+        self.reduce_sum = ops.ReduceSum()
 
     def construct(self, object_mask, predict_class, class_probs):
         class_loss = object_mask * self.cross_entropy(predict_class, class_probs)

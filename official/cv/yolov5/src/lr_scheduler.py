@@ -144,19 +144,19 @@ def warmup_cosine_annealing_lr_sample(lr, steps_per_epoch, warmup_epochs, max_ep
     return np.array(lr_each_step).astype(np.float32)
 
 
-def get_lr(args):
+def get_lr(args, steps_per_epoch):
     """generate learning rate."""
     if args.lr_scheduler == 'exponential':
-        lr = warmup_step_lr(args.lr, args.lr_epochs, args.steps_per_epoch, args.warmup_epochs, args.max_epoch,
+        lr = warmup_step_lr(args.lr, args.lr_epochs, steps_per_epoch, args.warmup_epochs, args.max_epoch,
                             gamma=args.lr_gamma)
     elif args.lr_scheduler == 'cosine_annealing':
-        lr = warmup_cosine_annealing_lr(args.lr, args.steps_per_epoch, args.warmup_epochs,
+        lr = warmup_cosine_annealing_lr(args.lr, steps_per_epoch, args.warmup_epochs,
                                         args.max_epoch, args.T_max, args.eta_min)
     elif args.lr_scheduler == 'cosine_annealing_V2':
-        lr = warmup_cosine_annealing_lr_V2(args.lr, args.steps_per_epoch, args.warmup_epochs,
+        lr = warmup_cosine_annealing_lr_V2(args.lr, steps_per_epoch, args.warmup_epochs,
                                            args.max_epoch, args.T_max, args.eta_min)
     elif args.lr_scheduler == 'cosine_annealing_sample':
-        lr = warmup_cosine_annealing_lr_sample(args.lr, args.steps_per_epoch, args.warmup_epochs,
+        lr = warmup_cosine_annealing_lr_sample(args.lr, steps_per_epoch, args.warmup_epochs,
                                                args.max_epoch, args.T_max, args.eta_min)
     else:
         raise NotImplementedError(args.lr_scheduler)

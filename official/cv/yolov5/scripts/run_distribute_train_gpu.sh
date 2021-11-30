@@ -61,6 +61,5 @@ nohup python train.py \
       --T_max=300 \
       --max_epoch=300 \
       --warmup_epochs=20 \
-      --training_shape=640 \
       --lr_scheduler=cosine_annealing > log.txt 2>&1 &
 cd ..

@@ -12,41 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-import numpy as np
-
-import mindspore
-from mindspore import context, Tensor
-from mindspore.train.serialization import export, load_checkpoint, load_param_into_net
+import mindspore as ms
 
 from src.yolo import YOLOV5s_Infer
 
 from model_utils.config import config
-from model_utils.moxing_adapter import moxing_wrapper
-
-def modelarts_pre_process():
-    '''modelarts pre process function.'''
-    config.file_name = os.path.join(config.output_path, config.file_name)
+from model_utils.moxing_adapter import moxing_wrapper, modelarts_export_preprocess
 
 
-@moxing_wrapper(pre_process=modelarts_pre_process)
+@moxing_wrapper(pre_process=modelarts_export_preprocess, pre_args=[config])
 def run_export():
-    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target)
     if config.device_target == "Ascend":
-        context.set_context(device_id=config.device_id)
-    ts_shape = config.testing_shape // 2
+        ms.set_context(device_id=config.device_id)
 
     dict_version = {'yolov5s': 0, 'yolov5m': 1, 'yolov5l': 2, 'yolov5x': 3}
     config.file_name = config.file_name + '_' + config.yolov5_version
 
-    network = YOLOV5s_Infer(config.testing_shape, version=dict_version[config.yolov5_version])
+    network = YOLOV5s_Infer(config.testing_shape[0], version=dict_version[config.yolov5_version])
     network.set_train(False)
 
-    param_dict = load_checkpoint(config.ckpt_file)
-    load_param_into_net(network, param_dict)
+    param_dict = ms.load_checkpoint(config.ckpt_file)
+    ms.load_param_into_net(network, param_dict)
 
-    input_data = Tensor(np.zeros([config.batch_size, 12, ts_shape, ts_shape]), mindspore.float32)
+    input_data = ms.numpy.zeros([config.batch_size, 12, *config.testing_shape], ms.float32)
 
-    export(network, input_data, file_name=config.file_name, file_format=config.file_format)
+    ms.export(network, input_data, file_name=config.file_name, file_format=config.file_format)
     print('==========success export===============')
 
 if __name__ == "__main__":

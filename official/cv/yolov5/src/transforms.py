@@ -20,7 +20,7 @@ import copy
 import numpy as np
 from PIL import Image
 import cv2
-import mindspore.dataset.vision.py_transforms as PV
+import mindspore.dataset as ds
 
 
 def _rand(a=0., b=1.):
@@ -524,7 +524,7 @@ class MultiScaleTrans:
 
     def __call__(self, img, anno, input_size, mosaic_flag):
         if mosaic_flag[0] == 0:
-            img = PV.Decode()(img)
+            img = ds.vision.py_transforms.Decode()(img)
         img, anno = preprocess_fn(img, anno, self.config, input_size, self.device_num)
         return img, anno, np.array(img.shape[0:2])
 

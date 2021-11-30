@@ -15,14 +15,7 @@
 """YOLOv5 based on DarkNet."""
 import mindspore as ms
 import mindspore.nn as nn
-from mindspore.common.tensor import Tensor
-from mindspore import context
-from mindspore.context import ParallelMode
-from mindspore.parallel._auto_parallel_context import auto_parallel_context
-from mindspore.communication.management import get_group_size
-from mindspore.ops import operations as P
-from mindspore.ops import functional as F
-from mindspore.ops import composite as C
+import mindspore.ops as ops
 
 from src.backbone import YOLOv5Backbone, Conv, BottleneckCSP
 from src.loss import ConfidenceLoss, ClassLoss
@@ -47,7 +40,7 @@ class YOLO(nn.Cell):
         self.back_block2 = YoloBlock(shape[4], self.config.out_channel)
         self.back_block3 = YoloBlock(shape[5], self.config.out_channel)
 
-        self.concat = P.Concat(axis=1)
+        self.concat = ops.Concat(axis=1)
 
     def construct(self, x):
         """
@@ -56,17 +49,17 @@ class YOLO(nn.Cell):
         feature_map2 is (batch_size, backbone_shape[3], h/16, w/16)
         feature_map3 is (batch_size, backbone_shape[4], h/32, w/32)
         """
-        img_height = P.Shape()(x)[2] * 2
-        img_width = P.Shape()(x)[3] * 2
+        img_height = ops.Shape()(x)[2] * 2
+        img_width = ops.Shape()(x)[3] * 2
 
         feature_map1, feature_map2, feature_map3 = self.backbone(x)
 
         c1 = self.conv1(feature_map3)
-        ups1 = P.ResizeNearestNeighbor((img_height // 16, img_width // 16))(c1)
+        ups1 = ops.ResizeNearestNeighbor((img_height // 16, img_width // 16))(c1)
         c2 = self.concat((ups1, feature_map2))
         c3 = self.CSP5(c2)
         c4 = self.conv2(c3)
-        ups2 = P.ResizeNearestNeighbor((img_height // 8, img_width // 8))(c4)
+        ups2 = ops.ResizeNearestNeighbor((img_height // 8, img_width // 8))(c4)
         c5 = self.concat((ups2, feature_map1))
         # out
         c6 = self.CSP6(c5)
@@ -144,35 +137,35 @@ class DetectionBlock(nn.Cell):
             self.offset_x_y = 0.025
         else:
             raise KeyError("Invalid scale value for DetectionBlock")
-        self.anchors = Tensor([self.config.anchor_scales[i] for i in idx], ms.float32)
+        self.anchors = ms.Tensor([self.config.anchor_scales[i] for i in idx], ms.float32)
         self.num_anchors_per_scale = 3
         self.num_attrib = 4+1+self.config.num_classes
         self.lambda_coord = 1
 
         self.sigmoid = nn.Sigmoid()
-        self.reshape = P.Reshape()
-        self.tile = P.Tile()
-        self.concat = P.Concat(axis=-1)
-        self.pow = P.Pow()
+        self.reshape = ops.Reshape()
+        self.tile = ops.Tile()
+        self.concat = ops.Concat(axis=-1)
+        self.pow = ops.Pow()
         self.conf_training = is_training
 
     def construct(self, x, input_shape):
         """construct method"""
-        num_batch = P.Shape()(x)[0]
-        grid_size = P.Shape()(x)[2:4]
+        num_batch = ops.Shape()(x)[0]
+        grid_size = ops.Shape()(x)[2:4]
 
         # Reshape and transpose the feature to [n, grid_size[0], grid_size[1], 3, num_attrib]
-        prediction = P.Reshape()(x, (num_batch,
-                                     self.num_anchors_per_scale,
-                                     self.num_attrib,
-                                     grid_size[0],
-                                     grid_size[1]))
-        prediction = P.Transpose()(prediction, (0, 3, 4, 1, 2))
+        prediction = ops.Reshape()(x, (num_batch,
+                                       self.num_anchors_per_scale,
+                                       self.num_attrib,
+                                       grid_size[0],
+                                       grid_size[1]))
+        prediction = ops.Transpose()(prediction, (0, 3, 4, 1, 2))
 
         range_x = range(grid_size[1])
         range_y = range(grid_size[0])
-        grid_x = P.Cast()(F.tuple_to_array(range_x), ms.float32)
-        grid_y = P.Cast()(F.tuple_to_array(range_y), ms.float32)
+        grid_x = ops.Cast()(ops.tuple_to_array(range_x), ms.float32)
+        grid_y = ops.Cast()(ops.tuple_to_array(range_y), ms.float32)
         # Tensor of shape [grid_size[0], grid_size[1], 1, 1] representing the coordinate of x/y axis for each grid
         # [batch, gridx, gridy, 1, 1]
         grid_x = self.tile(self.reshape(grid_x, (1, 1, -1, 1, 1)), (1, grid_size[0], 1, 1, 1))
@@ -188,9 +181,9 @@ class DetectionBlock(nn.Cell):
         # gridsize1 is x
         # gridsize0 is y
         box_xy = (self.scale_x_y * self.sigmoid(box_xy) - self.offset_x_y + grid) / \
-                 P.Cast()(F.tuple_to_array((grid_size[1], grid_size[0])), ms.float32)
+                 ops.Cast()(ops.tuple_to_array((grid_size[1], grid_size[0])), ms.float32)
         # box_wh is w->h
-        box_wh = P.Exp()(box_wh) * self.anchors / input_shape
+        box_wh = ops.Exp()(box_wh) * self.anchors / input_shape
 
         box_confidence = self.sigmoid(box_confidence)
         box_probs = self.sigmoid(box_probs)
@@ -204,8 +197,8 @@ class Iou(nn.Cell):
     """Calculate the iou of boxes"""
     def __init__(self):
         super(Iou, self).__init__()
-        self.min = P.Minimum()
-        self.max = P.Maximum()
+        self.min = ops.Minimum()
+        self.max = ops.Maximum()
 
     def construct(self, box1, box2):
         """
@@ -215,22 +208,24 @@ class Iou(nn.Cell):
         """
         box1_xy = box1[:, :, :, :, :, :2]
         box1_wh = box1[:, :, :, :, :, 2:4]
-        box1_mins = box1_xy - box1_wh / F.scalar_to_array(2.0) # topLeft
-        box1_maxs = box1_xy + box1_wh / F.scalar_to_array(2.0) # rightDown
+        box1_mins = box1_xy - box1_wh / ops.scalar_to_array(2.0) # topLeft
+        box1_maxs = box1_xy + box1_wh / ops.scalar_to_array(2.0) # rightDown
 
         box2_xy = box2[:, :, :, :, :, :2]
         box2_wh = box2[:, :, :, :, :, 2:4]
-        box2_mins = box2_xy - box2_wh / F.scalar_to_array(2.0)
-        box2_maxs = box2_xy + box2_wh / F.scalar_to_array(2.0)
+        box2_mins = box2_xy - box2_wh / ops.scalar_to_array(2.0)
+        box2_maxs = box2_xy + box2_wh / ops.scalar_to_array(2.0)
 
         intersect_mins = self.max(box1_mins, box2_mins)
         intersect_maxs = self.min(box1_maxs, box2_maxs)
-        intersect_wh = self.max(intersect_maxs - intersect_mins, F.scalar_to_array(0.0))
-        # P.squeeze: for effiecient slice
-        intersect_area = P.Squeeze(-1)(intersect_wh[:, :, :, :, :, 0:1]) * \
-                         P.Squeeze(-1)(intersect_wh[:, :, :, :, :, 1:2])
-        box1_area = P.Squeeze(-1)(box1_wh[:, :, :, :, :, 0:1]) * P.Squeeze(-1)(box1_wh[:, :, :, :, :, 1:2])
-        box2_area = P.Squeeze(-1)(box2_wh[:, :, :, :, :, 0:1]) * P.Squeeze(-1)(box2_wh[:, :, :, :, :, 1:2])
+        intersect_wh = self.max(intersect_maxs - intersect_mins, ops.scalar_to_array(0.0))
+        # ops.squeeze: for effiecient slice
+        intersect_area = ops.Squeeze(-1)(intersect_wh[:, :, :, :, :, 0:1]) * \
+                         ops.Squeeze(-1)(intersect_wh[:, :, :, :, :, 1:2])
+        box1_area = ops.Squeeze(-1)(box1_wh[:, :, :, :, :, 0:1]) * \
+                    ops.Squeeze(-1)(box1_wh[:, :, :, :, :, 1:2])
+        box2_area = ops.Squeeze(-1)(box2_wh[:, :, :, :, :, 0:1]) * \
+                    ops.Squeeze(-1)(box2_wh[:, :, :, :, :, 1:2])
         iou = intersect_area / (box1_area + box2_area - intersect_area)
         # iou : [batch, gx, gy, anchors, maxboxes]
         return iou
@@ -252,15 +247,15 @@ class YoloLossBlock(nn.Cell):
             idx = (6, 7, 8)
         else:
             raise KeyError("Invalid scale value for DetectionBlock")
-        self.anchors = Tensor([self.config.anchor_scales[i] for i in idx], ms.float32)
-        self.ignore_threshold = Tensor(self.config.ignore_threshold, ms.float32)
-        self.concat = P.Concat(axis=-1)
+        self.anchors = ms.Tensor([self.config.anchor_scales[i] for i in idx], ms.float32)
+        self.ignore_threshold = ms.Tensor(self.config.ignore_threshold, ms.float32)
+        self.concat = ops.Concat(axis=-1)
         self.iou = Iou()
-        self.reduce_max = P.ReduceMax(keep_dims=False)
+        self.reduce_max = ops.ReduceMax(keep_dims=False)
         self.confidence_loss = ConfidenceLoss()
         self.class_loss = ClassLoss()
 
-        self.reduce_sum = P.ReduceSum()
+        self.reduce_sum = ops.ReduceSum()
         self.g_iou = GIou()
 
     def construct(self, prediction, pred_xy, pred_wh, y_true, gt_box, input_shape):
@@ -275,24 +270,23 @@ class YoloLossBlock(nn.Cell):
         class_probs = y_true[:, :, :, :, 5:]
         true_boxes = y_true[:, :, :, :, :4]
 
-        grid_shape = P.Shape()(prediction)[1:3]
-        grid_shape = P.Cast()(F.tuple_to_array(grid_shape[::-1]), ms.float32)
+        grid_shape = ops.Shape()(prediction)[1:3]
+        grid_shape = ops.Cast()(ops.tuple_to_array(grid_shape[::-1]), ms.float32)
 
         pred_boxes = self.concat((pred_xy, pred_wh))
         true_wh = y_true[:, :, :, :, 2:4]
-        true_wh = P.Select()(P.Equal()(true_wh, 0.0),
-                             P.Fill()(P.DType()(true_wh),
-                                      P.Shape()(true_wh), 1.0),
-                             true_wh)
-        true_wh = P.Log()(true_wh / self.anchors * input_shape)
+        true_wh = ops.Select()(ops.Equal()(true_wh, 0.0),
+                               ops.Fill()(ops.DType()(true_wh), ops.Shape()(true_wh), 1.0),
+                               true_wh)
+        true_wh = ops.Log()(true_wh / self.anchors * input_shape)
         # 2-w*h for large picture, use small scale, since small obj need more precise
         box_loss_scale = 2 - y_true[:, :, :, :, 2:3] * y_true[:, :, :, :, 3:4]
 
-        gt_shape = P.Shape()(gt_box)
-        gt_box = P.Reshape()(gt_box, (gt_shape[0], 1, 1, 1, gt_shape[1], gt_shape[2]))
+        gt_shape = ops.Shape()(gt_box)
+        gt_box = ops.Reshape()(gt_box, (gt_shape[0], 1, 1, 1, gt_shape[1], gt_shape[2]))
 
         # add one more dimension for broadcast
-        iou = self.iou(P.ExpandDims()(pred_boxes, -2), gt_box)
+        iou = self.iou(ops.ExpandDims()(pred_boxes, -2), gt_box)
         # gt_box is x,y,h,w after normalize
         # [batch, grid[0], grid[1], num_anchor, num_gt]
         best_iou = self.reduce_max(iou, -1)
@@ -300,26 +294,26 @@ class YoloLossBlock(nn.Cell):
 
         # ignore_mask IOU too small
         ignore_mask = best_iou < self.ignore_threshold
-        ignore_mask = P.Cast()(ignore_mask, ms.float32)
-        ignore_mask = P.ExpandDims()(ignore_mask, -1)
+        ignore_mask = ops.Cast()(ignore_mask, ms.float32)
+        ignore_mask = ops.ExpandDims()(ignore_mask, -1)
         # ignore_mask backpro will cause a lot maximunGrad and minimumGrad time consume.
         # so we turn off its gradient
-        ignore_mask = F.stop_gradient(ignore_mask)
+        ignore_mask = ops.stop_gradient(ignore_mask)
 
         confidence_loss = self.confidence_loss(object_mask, prediction[:, :, :, :, 4:5], ignore_mask)
         class_loss = self.class_loss(object_mask, prediction[:, :, :, :, 5:], class_probs)
 
-        object_mask_me = P.Reshape()(object_mask, (-1, 1))  # [8, 72, 72, 3, 1]
-        box_loss_scale_me = P.Reshape()(box_loss_scale, (-1, 1))
+        object_mask_me = ops.Reshape()(object_mask, (-1, 1))  # [8, 72, 72, 3, 1]
+        box_loss_scale_me = ops.Reshape()(box_loss_scale, (-1, 1))
         pred_boxes_me = xywh2x1y1x2y2(pred_boxes)
-        pred_boxes_me = P.Reshape()(pred_boxes_me, (-1, 4))
+        pred_boxes_me = ops.Reshape()(pred_boxes_me, (-1, 4))
         true_boxes_me = xywh2x1y1x2y2(true_boxes)
-        true_boxes_me = P.Reshape()(true_boxes_me, (-1, 4))
+        true_boxes_me = ops.Reshape()(true_boxes_me, (-1, 4))
         c_iou = self.g_iou(pred_boxes_me, true_boxes_me)
         c_iou_loss = object_mask_me * box_loss_scale_me * (1 - c_iou)
         c_iou_loss_me = self.reduce_sum(c_iou_loss, ())
         loss = c_iou_loss_me * 4 + confidence_loss + class_loss
-        batch_size = P.Shape()(prediction)[0]
+        batch_size = ops.Shape()(prediction)[0]
         return loss / batch_size
 
 
@@ -382,11 +376,11 @@ class YoloWithLossCell(nn.Cell):
         self.loss_big = YoloLossBlock('l', self.config)
         self.loss_me = YoloLossBlock('m', self.config)
         self.loss_small = YoloLossBlock('s', self.config)
-        self.tenser_to_array = P.TupleToArray()
+        self.tenser_to_array = ops.TupleToArray()
 
     def construct(self, x, y_true_0, y_true_1, y_true_2, gt_0, gt_1, gt_2, input_shape):
-        input_shape = F.shape(x)[2:4]
-        input_shape = F.cast(self.tenser_to_array(input_shape) * 2, ms.float32)
+        input_shape = ops.shape(x)[2:4]
+        input_shape = ops.cast(self.tenser_to_array(input_shape) * 2, ms.float32)
 
         yolo_out = self.yolo_network(x, input_shape)
         loss_l = self.loss_big(*yolo_out[0], y_true_0, gt_0, input_shape)
@@ -395,50 +389,17 @@ class YoloWithLossCell(nn.Cell):
         return loss_l + loss_m + loss_s * 0.2
 
 
-class TrainingWrapper(nn.Cell):
-    """Training wrapper."""
-    def __init__(self, network, optimizer, sens=1.0):
-        super(TrainingWrapper, self).__init__(auto_prefix=False)
-        self.network = network
-        self.network.set_grad()
-        self.weights = optimizer.parameters
-        self.optimizer = optimizer
-        self.grad = C.GradOperation(get_by_list=True, sens_param=True)
-        self.sens = sens
-        self.reducer_flag = False
-        self.grad_reducer = None
-        self.parallel_mode = context.get_auto_parallel_context("parallel_mode")
-        if self.parallel_mode in [ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL]:
-            self.reducer_flag = True
-        if self.reducer_flag:
-            mean = context.get_auto_parallel_context("gradients_mean")
-            if auto_parallel_context().get_device_num_is_set():
-                degree = context.get_auto_parallel_context("device_num")
-            else:
-                degree = get_group_size()
-            self.grad_reducer = nn.DistributedGradReducer(optimizer.parameters, mean, degree)
-
-    def construct(self, *args):
-        weights = self.weights
-        loss = self.network(*args)
-        sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
-        grads = self.grad(self.network, weights)(*args, sens)
-        if self.reducer_flag:
-            grads = self.grad_reducer(grads)
-        return F.depend(loss, self.optimizer(grads))
-
-
 class GIou(nn.Cell):
     """Calculating giou"""
     def __init__(self):
         super(GIou, self).__init__()
-        self.cast = P.Cast()
-        self.reshape = P.Reshape()
-        self.min = P.Minimum()
-        self.max = P.Maximum()
-        self.concat = P.Concat(axis=1)
-        self.mean = P.ReduceMean()
-        self.div = P.RealDiv()
+        self.cast = ops.Cast()
+        self.reshape = ops.Reshape()
+        self.min = ops.Minimum()
+        self.max = ops.Maximum()
+        self.concat = ops.Concat(axis=1)
+        self.mean = ops.ReduceMean()
+        self.div = ops.RealDiv()
         self.eps = 0.000001
 
     def construct(self, box_p, box_gt):
@@ -462,7 +423,7 @@ class GIou(nn.Cell):
         res_mid0 = c_area - union
         res_mid1 = self.div(self.cast(res_mid0, ms.float32), self.cast(c_area, ms.float32))
         giou = iou - res_mid1
-        giou = C.clip_by_value(giou, -1.0, 1.0)
+        giou = ops.clip_by_value(giou, -1.0, 1.0)
         return giou
 
 
@@ -471,6 +432,6 @@ def xywh2x1y1x2y2(box_xywh):
     boxes_y1 = box_xywh[..., 1:2] - box_xywh[..., 3:4] / 2
     boxes_x2 = box_xywh[..., 0:1] + box_xywh[..., 2:3] / 2
     boxes_y2 = box_xywh[..., 1:2] + box_xywh[..., 3:4] / 2
-    boxes_x1y1x2y2 = P.Concat(-1)((boxes_x1, boxes_y1, boxes_x2, boxes_y2))
+    boxes_x1y1x2y2 = ops.Concat(-1)((boxes_x1, boxes_y1, boxes_x2, boxes_y2))
 
     return boxes_x1y1x2y2

@@ -65,6 +65,5 @@ python train.py \
     --T_max=320 \
     --max_epoch=320 \
     --warmup_epochs=4 \
-    --training_shape=640 \
     --lr_scheduler=cosine_annealing > log.txt 2>&1 &
 cd ..
