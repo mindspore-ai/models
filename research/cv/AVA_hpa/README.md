@@ -11,6 +11,10 @@
     - [Pre-training Process](#pre-training-process)
     - [Training Process](#training-process)
     - [Evaluation](#evaluation)
+    - [Inference Process](#inference-process)
+        - [Export MindIR](#export-mindir)
+        - [Infer on Ascend310](#infer-on-ascend310)
+        - [result](#result)
 
 # [AVA_hpa Description](#contents)
 
@@ -254,3 +258,32 @@ The value of performance will be achieved as follows:
 ```shell
 {'results_return': ( 0.6975821515082009, 0.7734114826162249, 0.9415286419176973)} #macroF1,microF1,auc
 ```
+
+## Inference Process
+
+### [Export MindIR](#contents)
+
+```shell
+python export.py --ckpt_path [CKPT_PATH] --model_arch [MODEL_ARCH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+- The `CKPT_PATH` parameter is required.
+- `MODEL_ARCH` is model architecture, should be in ['resnet18', 'resnet50', 'resnet101'].
+- `file_format` should be in ["AIR", "MINDIR"]
+
+### Infer on Ascend310
+
+Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+```
+
+- `DATASET_PATH` is the hpa dataset path.
+- `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'.
+- `DEVICE_ID` is optional, default value is 0.
+
+### result
+
+Inference result is saved in current path, you can find result like this in acc.log file.
