@@ -24,9 +24,9 @@ from src.model.generator import Generator
 
 parser = argparse.ArgumentParser(description="SRGAN export")
 parser.add_argument('--file_name', type=str, default='SRGAN', help='output file name prefix.')
-parser.add_argument('--file_format', type=str, choices=['AIR', 'ONNX', 'MINDIR'], default='AIR', \
+parser.add_argument('--file_format', type=str, choices=['AIR', 'ONNX', 'MINDIR'], default='MINDIR', \
                     help='file format')
-parser.add_argument("--generator_path", type=str, default='./scripts/srgan0/src/ckpt/G_model_1000.ckpt')
+parser.add_argument("--generator_path", type=str, default='')
 parser.add_argument("--device_id", type=int, default=0, help="device id, default: 0.")
 
 if __name__ == '__main__':
@@ -35,8 +35,9 @@ if __name__ == '__main__':
     generator = Generator(4)
     params = load_checkpoint(args.generator_path)
     load_param_into_net(generator, params)
-    generator.set_train(True)
-    input_shp = [16, 3, 96, 96]
+    generator.set_train(False)
+    input_shp = [1, 3, 126, 126]
     input_array = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp).astype(np.float32))
     G_file = f"{args.file_name}_model"
+    generator(input_array)
     export(generator, input_array, file_name=G_file, file_format=args.file_format)

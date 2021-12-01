@@ -9,6 +9,10 @@
     - [Script and Sample Code](#script-and-sample-code)
     - [Script Parameters](#script-parameters)
     - [Training Process](#training-process)
+- [Inference Process](#inference-process)
+    - [Export MindIR](#export-mindir)
+    - [Infer on Ascend310](#infer-on-ascend310)
+    - [Result](#result)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Training Performance](#training-performance)  
@@ -122,6 +126,34 @@ eg: sh run_eval.sh ./ckpt/best.ckpt ./Set14/LR ./Set14/HR 0
 ### [Evaluation result](#content)
 
 Evaluation result will be stored in the scripts/result. Under this, you can find generator pictures.
+
+# [Inference Process](#contents)
+
+## [Export MindIR](#contents)
+
+```shell
+python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+The ckpt_file parameter is required,
+`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+
+## [Infer on Ascend310](#contents)
+
+Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [TEST_LR_PATH] [TEST_GT_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+```
+
+### [Result](#contents)
+
+Inference result is saved in current path, you can find result like this in acc.log file.
+
+```bash
+'avg psnr': 27.4
+```
 
 # [Model Description](#contents)
 

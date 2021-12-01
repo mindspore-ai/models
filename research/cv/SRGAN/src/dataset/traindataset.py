@@ -18,6 +18,7 @@
 import os
 import random
 import math
+import multiprocessing
 import numpy as np
 from PIL import Image
 import mindspore.dataset as ds
@@ -110,18 +111,26 @@ class MySampler():
 
 def create_traindataset(batchsize, LR_path, GT_path):
     """"create SRGAN dataset"""
+
+    device_num = int(os.getenv("RANK_SIZE", "1"))
+    rank_id = int(os.getenv("RANK_ID", "0"))
+    cores = multiprocessing.cpu_count()
+    num_parallel_workers = int(cores / device_num)
     parallel_mode = context.get_auto_parallel_context("parallel_mode")
     if parallel_mode in [ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL]:
         dataset = mydata(LR_path, GT_path, in_memory=True)
-        sampler = MySampler(dataset, local_rank=0, world_size=4)
-        device_num = int(os.getenv("RANK_SIZE"))
-        rank_id = int(os.getenv("DEVICE_ID"))
-        sampler = MySampler(dataset, local_rank=rank_id, world_size=4)
-        DS = ds.GeneratorDataset(dataset, column_names=['LR', 'HR'], shuffle=True,
-                                 num_shards=device_num, shard_id=rank_id, sampler=sampler)
-        DS = DS.batch(batchsize, drop_remainder=True)
+        sampler = MySampler(dataset, local_rank=rank_id, world_size=device_num)
+        dataloader = ds.GeneratorDataset(dataset, column_names=['LR', 'HR'], shuffle=True,
+                                         num_shards=device_num, shard_id=rank_id, sampler=sampler,
+                                         python_multiprocessing=True,
+                                         num_parallel_workers=min(12, num_parallel_workers)
+                                         )
+        dataloader = dataloaderS.batch(batchsize, drop_remainder=True,
+                                       num_parallel_workers=min(8, num_parallel_workers))
     else:
         dataset = mydata(LR_path, GT_path, in_memory=True)
-        DS = ds.GeneratorDataset(dataset, column_names=['LR', 'HR'], shuffle=True)
-        DS = DS.batch(batchsize)
-    return DS
+        dataloader = ds.GeneratorDataset(dataset, column_names=['LR', 'HR'], shuffle=True,
+                                         python_multiprocessing=True,
+                                         num_parallel_workers=min(12, num_parallel_workers))
+        dataloader = dataloader.batch(batchsize, drop_remainder=True, num_parallel_workers=min(8, num_parallel_workers))
+    return dataloader

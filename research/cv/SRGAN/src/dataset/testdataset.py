@@ -57,8 +57,10 @@ class mydata:
         return  img_item['LR'], img_item['GT']
 
 def create_testdataset(batchsize, LR_path, GT_path):
-    """create testdataset"""
+    """create testdataset
+    # noqa: DAR201
+    """
     dataset = mydata(LR_path, GT_path, in_memory=False)
-    DS = ds.GeneratorDataset(dataset, column_names=["LR", "HR"])
-    DS = DS.batch(batchsize)
-    return DS
+    dataloader = ds.GeneratorDataset(dataset, column_names=["LR", "HR"], shuffle=False)
+    dataloader = dataloader.batch(batchsize)
+    return dataloader
