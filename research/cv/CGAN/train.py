@@ -14,6 +14,7 @@
 # ============================================================================
 """train"""
 import os
+import ast
 import time
 import argparse
 import numpy as np
@@ -33,7 +34,7 @@ from src.cell import GenWithLossCell, DisWithLossCell, TrainOneStepCell
 def preLauch():
     """parse the console argument"""
     parser = argparse.ArgumentParser(description='MindSpore cgan training')
-    parser.add_argument("--distribute", type=bool, default=False,
+    parser.add_argument("--distribute", type=ast.literal_eval, default=False,
                         help="Run distribute, default is false.")
     parser.add_argument('--device_id', type=int, default=0,
                         help='device id of Ascend (Default: 0)')

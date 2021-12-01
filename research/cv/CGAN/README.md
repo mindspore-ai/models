@@ -1,26 +1,30 @@
 # Contents
 
+- [Contents](#contents)
 - [CGAN Description](#cgan-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
 - [Script Description](#script-description)
     - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-        - [Training Script Parameters](#training-script-parameters)
+        - [Script Parameters](#script-parameters)
+    - [Training Script Parameters](#training-script-parameters)
     - [Training Process](#training-process)
         - [Training](#training)
         - [Distributed Training](#distributed-training)
         - [Training Result](#training-result)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
-        - [Evaluation result](#evaluation-result)
+        - [Evaluation Result](#evaluation-result)
     - [Model Export](#model-export)
+    - [Ascend310 Inference Process](#ascend310-inference-process)
+        - [Export MINDIR file](#export-mindir-file)
+        - [Ascend310 Inference](#ascend310-inference)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
 - [Description of Random Situation](#description-of-random-situation)
-- [ModelZoo Homepage](#modelzoo-homepage)
+- [Model_Zoo Homepage](#model_zoo-homepage)
 
 # [CGAN Description](#contents)
 
@@ -78,6 +82,7 @@ Train CGAN Dataset used: [MNIST](<http://yann.lecun.com/exdb/mnist/>)
     ├─run_standalone_train.sh            # training in standalone mode(1pcs)
     ├─run_distributed_train_ascend.sh    # training in parallel mode(8 pcs)
     └─run_eval_ascend.sh    # evaluation
+    └─run_infer_310.sh      # 310inference
   ├─ src
     ├─dataset.py            # dataset create
     ├─cell.py               # network definition
@@ -86,6 +91,10 @@ Train CGAN Dataset used: [MNIST](<http://yann.lecun.com/exdb/mnist/>)
   ├─ train.py               # train cgan
   ├─ eval.py                # eval cgan
   ├─ export.py              # export mindir
+  ├─ postprocess.py         # 310 postprocess
+  ├─ preprocess.py          # 310 preprocess
+  ├─ ascend310_infer        # 310 main
+
 ```
 
 ## [Script Parameters](#contents)
@@ -140,7 +149,7 @@ Training result will be stored in `img_eval`.
 bash run_eval_ascend.sh /path/to/script/train_parallel/0/ckpt/G_50.ckpt 0
 ```
 
-### [Evaluation result](#content)
+### [Evaluation Result](#content)
 
 Evaluation result will be stored in the img_eval path. Under this, you can find generator result in result.png.
 
@@ -149,6 +158,25 @@ Evaluation result will be stored in the img_eval path. Under this, you can find 
 ```bash
 python  export.py --ckpt_dir /path/to/train/ckpt/G_50.ckpt
 ```
+
+## [Ascend310 Inference Process](#contents)
+
+### [Export MINDIR file](#content)
+
+```bash
+python  export.py --ckpt_dir /path/to/train/ckpt/G_50.ckpt
+```
+
+### [Ascend310 Inference](#content)
+
+- Run `run_infer_310.sh` for Ascend310 inference.
+
+```bash
+# infer
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+```
+
+Ascend310 inference result will be stored in the postprocess_Result path. Under this, you can find generator result in result.png.
 
 # Model Description
 
