@@ -27,7 +27,8 @@ from mindspore.nn.loss.loss import _Loss
 from mindspore.ops import functional as F
 from mindspore.ops import operations as P
 from mindspore.train.model import Model
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore.train.serialization import load_checkpoint
+from mindspore.train.serialization import load_param_into_net
 
 import src.spnasnet as spnasnet
 from src.config import imagenet_cfg
@@ -38,6 +39,10 @@ set_seed(1)
 parser = argparse.ArgumentParser(description='single-path-nas')
 parser.add_argument('--dataset_name', type=str, default='imagenet', choices=['imagenet',],
                     help='dataset name.')
+parser.add_argument('--val_data_path', type=str, default=None,
+                    help='Path to the validation dataset (e.g. "/datasets/imagenet/val/")')
+parser.add_argument('--device_target', type=str, choices=['Ascend', 'GPU', 'CPU'],
+                    default=None, help='Target device: Ascend, GPU or CPU')
 parser.add_argument('--checkpoint_path', type=str, default='./ckpt_0', help='Checkpoint file path or dir path')
 parser.add_argument('--device_id', type=int, default=None, help='device id of Ascend. (Default: None)')
 args_opt = parser.parse_args()
@@ -65,18 +70,27 @@ if __name__ == '__main__':
 
     if args_opt.dataset_name == "imagenet":
         cfg = imagenet_cfg
-        dataset = create_dataset_imagenet(cfg.val_data_path, 1, False)
-        if not cfg.use_label_smooth:
-            cfg.label_smooth_factor = 0.0
-        loss = CrossEntropySmooth(sparse=True, reduction="mean",
-                                  smooth_factor=cfg.label_smooth_factor, num_classes=cfg.num_classes)
-        net = spnasnet.spnasnet(num_classes=cfg.num_classes)
-        model = Model(net, loss_fn=loss, metrics={'top_1_accuracy', 'top_5_accuracy'})
 
+        if args_opt.val_data_path is not None:
+            cfg.val_data_path = args_opt.val_data_path
+
+        if args_opt.device_target is not None:
+            cfg.device_target = args_opt.device_target
+
+        device_target = cfg.device_target
+        dataset_drop_reminder = (device_target == 'GPU')
+
+        dataset = create_dataset_imagenet(cfg.val_data_path, 1, False, drop_reminder=dataset_drop_reminder)
     else:
         raise ValueError("dataset is not support.")
 
-    device_target = cfg.device_target
+    if not cfg.use_label_smooth:
+        cfg.label_smooth_factor = 0.0
+    loss = CrossEntropySmooth(sparse=True, reduction="mean",
+                              smooth_factor=cfg.label_smooth_factor, num_classes=cfg.num_classes)
+    net = spnasnet.spnasnet(num_classes=cfg.num_classes)
+    model = Model(net, loss_fn=loss, metrics={'top_1_accuracy', 'top_5_accuracy'})
+
     context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target)
     if device_target == "Ascend":
         if args_opt.device_id is not None:
@@ -84,14 +98,16 @@ if __name__ == '__main__':
         else:
             context.set_context(device_id=cfg.device_id)
 
+    print(f'Checkpoint path: {args_opt.checkpoint_path}')
+
     if os.path.isfile(args_opt.checkpoint_path) and args_opt.checkpoint_path.endswith('.ckpt'):
         param_dict = load_checkpoint(args_opt.checkpoint_path)
         load_param_into_net(net, param_dict)
         net.set_train(False)
         acc = model.eval(dataset)
-        print(f"model {args_opt.checkpoint_path}'s accuracy is {acc}")
+        print(f"model {args_opt.checkpoint_path}'s accuracy is {acc}", flush=True)
     elif os.path.isdir(args_opt.checkpoint_path):
-        file_list = os.listdir(args_opt.checkpoint_path)
+        file_list = sorted(os.listdir(args_opt.checkpoint_path))
         for filename in file_list:
             de_path = os.path.join(args_opt.checkpoint_path, filename)
             if de_path.endswith('.ckpt'):
@@ -100,6 +116,6 @@ if __name__ == '__main__':
                 net.set_train(False)
 
                 acc = model.eval(dataset)
-                print(f"model {de_path}'s accuracy is {acc}")
+                print(f"model {de_path}'s accuracy is {acc}", flush=True)
     else:
         raise ValueError("args_opt.checkpoint_path must be a checkpoint file or dir contains checkpoint(s)")

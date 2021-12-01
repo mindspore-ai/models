@@ -42,7 +42,7 @@ imagenet_cfg = edict({
     'lr_epochs': [30, 60, 90],
     'lr_gamma': 0.3,
     'eta_min': 0.0,
-    'T_max': 150,
+    'T_max': 180,
     'warmup_epochs': 0,
 
     # loss related

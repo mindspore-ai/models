@@ -101,19 +101,33 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
 
 ```bash
 ├── model_zoo
-  ├── README_CN.md             // Single-Path-NAS相关说明
   ├── scripts
-  │   ├──run_train.sh          // 分布式到Ascend的shell脚本
-  │   ├──run_eval.sh           // 测试脚本
-  │   ├──run_infer_310.sh      // 310推理脚本
+  │   ├──run_distribute_train.sh              // 分布式到Ascend的shell脚本
+  │   ├──run_distribute_train_gou.sh          // Shell script for running the GPU distributed training
+  │   ├──run_standalone_train.sh              // Shell script for running the Ascend standalone training
+  │   ├──run_standalone_train_gpu.sh          // Shell script for running the GPU standalone training
+  │   ├──run_eval.sh                          // 测试脚本
+  │   ├──run_eval_gpu.sh                      // Shell script for running the GPU evaluation
+  │   ├──run_infer_310.sh                     // 310推理脚本
   ├── src
-  │   ├──lr_scheduler          // 学习率相关文件夹，包含学习率变化策略的py文件
-  │   ├──dataset.py            // 创建数据集
-  │   ├──CrossEntropySmooth.py // 损失函数相关
-  │   ├──spnasnet.py           //  Single-Path-NAS网络架构
-  │   ├──config.py             // 参数配置
-  │   ├──utils.py              // spnasnet.py的自定义网络模块
-  ├── train.py                 // 训练和测试文件
+  │   ├──lr_scheduler                         // 学习率相关文件夹，包含学习率变化策略的py文件
+  │   │   ├──__init__.py
+  │   │   ├──linear_warmup.py                 // Definitions for the warm-up functionality
+  │   │   ├──warmup_cosine_annealing_lr.py    // Definitions for the cosine annealing learning rate schedule
+  │   │   ├──warmup_step_lr.py                // Definitions for the exponential learning rate schedule
+  │   ├──__init__.py
+  │   ├──dataset.py                           // 创建数据集
+  │   ├──CrossEntropySmooth.py                // 损失函数相关
+  │   ├──spnasnet.py                          // Single-Path-NAS网络架构
+  │   ├──config.py                            // 参数配置
+  │   ├──utils.py                             // spnasnet.py的自定义网络模块
+  ├── create_imagenet2012_label.py            // Creating ImageNet labels
+  ├── eval.py                                 // Evaluate the trained model
+  ├── export.py                               // Export model to other formats
+  ├── postprocess.py                          // Postprocess for the Ascend 310 inference.
+  ├── README.md                               // Single-Path-NAS related instruction in English
+  ├── README_CN.md                            // Single-Path-NAS相关说明
+  ├── train.py                                // 训练和测试文件
 ```
 
 ## 脚本参数
