@@ -16,8 +16,8 @@
 
 echo "========================================================================"
 echo "Please run the script as: "
-echo "bash run.sh RANK_SIZE"
-echo "For example: bash run_distribute.sh 8"
+echo "bash run.sh RANK_SIZE CKPT_PATH"
+echo "For example: bash run_distribute.sh 8 ./ckpt/midas_resnext_101_WSL.ckpt"
 echo "It is better to use the absolute path."
 echo "========================================================================"
 set -e
@@ -65,7 +65,7 @@ do
     export RANK_ID=$i
     echo "start training for device $i"
     env > env$i.log
-    python midas_train.py --run_distribute True --is_modelarts False > train$i.log 2>&1 &
+    python midas_train.py --run_distribute True --is_modelarts False --model_weights $2> train$i.log 2>&1 &
     echo "$i finish"
     cd ../
 done
