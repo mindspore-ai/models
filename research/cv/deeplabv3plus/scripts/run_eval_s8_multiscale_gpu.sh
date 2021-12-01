@@ -42,7 +42,7 @@ cd ${eval_path} || exit
 
 python ./eval.py  --data_root=$DATA_ROOT  \
                   --data_lst=$DATA_LST  \
-                  --batch_size=8  \
+                  --batch_size=16  \
                   --crop_size=513  \
                   --ignore_label=255  \
                   --num_classes=21  \
