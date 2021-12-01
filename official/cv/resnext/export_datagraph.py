@@ -16,9 +16,8 @@
 resnext export mindir.
 """
 import os
-import numpy as np
 from mindspore.common import dtype as mstype
-from mindspore import context, Tensor, load_checkpoint, load_param_into_net, export
+from mindspore import context, load_checkpoint, load_param_into_net, export
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.image_classification import get_network
@@ -46,12 +45,9 @@ def run_export():
     else:
         auto_mixed_precision(network)
     network.set_train(False)
-    input_shp = [config.batch_size, 3, config.height, config.width]
 
-    de_dataset = classification_dataset("src/", config.image_size, config.per_batch_size, 1, 0, 1, mode="eval")
-
-    input_array = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp).astype(np.float32))
-    export(network, input_array, file_name=config.file_name, file_format=config.file_format, dataset=de_dataset)
+    de_dataset = classification_dataset("src/", config.image_size, 1, 1, 0, 1, mode="eval")
+    export(network, de_dataset, file_name=config.file_name, file_format=config.file_format)
 
 if __name__ == '__main__':
     run_export()
