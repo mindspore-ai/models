@@ -1,0 +1,83 @@
+{
+    "model_config": "./config/uniter-base-three.json",
+    "output_dir": "output/ftcap_coco_bu",
+    "mrm_prob": 0.15,
+    "itm_neg_prob": 0.5,
+    "itm_ot_lambda": 0.1,
+    "max_txt_len": 60,
+    "conf_th": 0.2,
+    "max_bb": 100,
+    "min_bb": 10,
+    "num_bb": 36,
+    "train_batch_size": 50,
+    "val_batch_size": 50,
+    "gradient_accumulation_steps": 1,
+    "start_learning_rate": 5e-05,
+    "valid_steps": 1000,
+    "decay_steps": 100000,
+    "optim": "adamw",
+    "betas": [
+        0.9,
+        0.98
+    ],
+    "dropout": 0.1,
+    "weight_decay": 0.01,
+    "grad_norm": 5.0,
+    "warmup_steps": 1000,
+    "seed": 42,
+    "fp16": true,
+    "n_workers": 12,
+    "audio_preprocess_config": "./fastspeech2_ms/config/AISHELL3/preprocess.yaml",
+    "audio_model_config": "./fastspeech2_ms/config/AISHELL3/model.yaml",
+    "pin_mem": true,
+    "ids_train_path": "/store0/dataset/coco_data/cocodata_zh/train_coco_v2.json",
+    "vocab_path": "/store0/dataset/coco_data/cocodata_zh/ids_to_tokens_zh.json",
+    "use_validate": false,
+    "use_img_output": true,
+    "use_audio_output": true,
+    "data_type": 2,
+    "show_time": true,
+    "name_txt": "id2len_two_mscoco.json",
+    "name_img": "img2len_two.json",
+    "name_audio": "audio2len.json",
+    "name_txt_only": "none",
+    "caption_eval_gt" : "/store0/dataset/coco_data/captions_test5k.json",
+    "train_datasets": [
+        {
+            "name": "coco",
+            "db": [
+                "/store0/dataset/coco_data/cocodata_zh"
+            ],
+            "img": [
+                "/store0/dataset/coco_data/cocodata_bufeat"
+            ],
+            "audio": [
+                "/store0/dataset/coco_data/cocodata_bufeat"
+            ],
+            "tasks": [
+                "ftCap"
+            ],
+            "mix_ratio": [
+                1
+            ]
+        }
+    ],
+    "ids_val_path": "/store0/dataset/coco_data/cocodata_zh/val_coco_v2_firstsent.json",
+    "val_datasets": [
+        {
+            "name": "coco",
+            "db": [
+                "/store0/dataset/coco_data/cocodata_zh"
+            ],
+            "img": [
+                "/store0/dataset/coco_data/cocodata_bufeat"
+            ],
+            "audio":[
+                "/store0/dataset/coco_data/cocodata_bufeat"
+            ],
+            "tasks": [
+                "ftCap"
+            ]
+        }
+    ]
+}

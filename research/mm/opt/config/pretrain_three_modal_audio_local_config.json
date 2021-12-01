@@ -1,0 +1,78 @@
+{
+  "model_config": "./config/cross_modal_encoder_small_config.json",
+  "output_dir": "./pretrain/huawei-test",
+  "mrm_prob": 0.15,
+  "itm_neg_prob": 0.5,
+  "itm_ot_lambda": 0.1,
+  "max_txt_len": 60,
+  "conf_th": 0.2,
+  "max_bb": 100,
+  "min_bb": 10,
+  "num_bb": 36,
+  "train_batch_size": 2560,
+  "val_batch_size": 2560,
+  "gradient_accumulation_steps": 1,
+  "learning_rate": 5e-05,
+  "valid_steps": 1000,
+  "num_train_steps": 1000000,
+  "optim": "adamw",
+  "betas": [
+    0.9,
+    0.98
+  ],
+  "dropout": 0.1,
+  "weight_decay": 0.01,
+  "grad_norm": 5.0,
+  "warmup_steps": 1000,
+  "seed": 42,
+  "fp16": true,
+  "n_workers": 12,
+  "pin_mem": true,
+  "ids_train_path": "/root/dataset/three_zh_small_data/baidu_data_1000w_zh/train_aishell3.json",
+  "vocab_path": "/root/dataset/three_zh_small_data/baidu_data_1000w_zh/ids_to_tokens_zh.json",
+  "img_token_path": "/root/dataset/three_zh_small_data",
+  "use_validate": false,
+  "show_time": true,
+  "name_txt": "id2len_aishell3_zh.json",
+  "audio_preprocess_config": "./fastspeech2_ms/config/AISHELL3/preprocess.yaml",
+  "audio_model_config": "./fastspeech2_ms/config/AISHELL3/model.yaml",
+  "audio_mel_path": "/root/dataset/phoneme/AISHELL3",
+  "train_datasets": [
+    {
+      "name": "open",
+      "db": [
+        "/root/dataset/three_zh_small_data/baidu_data_1000w_zh"
+      ],
+      "img": [
+        "/root/dataset/three_zh_small_data/baidu_img_1000w_feat"
+      ],
+      "audio": [
+        "/root/dataset/three_zh_small_data/baidu_audio_1000w"
+      ],
+      "tasks": [
+        "adText"
+      ],
+      "mix_ratio": [
+        1
+      ]
+    }
+  ],
+  "ids_val_path": "/root/dataset/three_zh_small_data/baidu_data_1000w_zh/val_aishell3.json",
+  "val_datasets": [
+    {
+      "name": "open",
+      "db": [
+        "/root/dataset/three_zh_small_data/baidu_data_1000w_zh"
+      ],
+      "img": [
+        "/root/dataset/three_zh_small_data/baidu_img_1000w_feat"
+      ],
+      "audio": [
+        "/root/dataset/three_zh_small_data/baidu_audio_1000w"
+      ],
+      "tasks": [
+        "adText"
+      ]
+    }
+  ]
+}
