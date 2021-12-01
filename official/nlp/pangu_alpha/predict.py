@@ -101,6 +101,7 @@ def load_model(args_opt):
         eod_reset=False,
         parallel_config=parallel_config,
         load_ckpt_path=args_opt.load_ckpt_path,
+        run_type=args_opt.run_type,
         param_init_type=mstype.float32 if args_opt.param_init_type == 'fp32' else mstype.float16)
     print("===config is: ", config, flush=True)
     print("=====args_opt is: ", args_opt, flush=True)
