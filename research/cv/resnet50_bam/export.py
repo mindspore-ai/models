@@ -17,15 +17,20 @@
 python export.py
 """
 import argparse
-import numpy as np
 
-from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
+import numpy as np
+from mindspore import Tensor
+from mindspore import context
+from mindspore import export
+from mindspore import load_checkpoint
+from mindspore import load_param_into_net
 
 import src.ResNet50_BAM as ResNet_BAM
 from src.config import imagenet_cfg
 
 parser = argparse.ArgumentParser(description='ResNet50_BAM export')
 parser.add_argument("--device_id", type=int, default=0, help="Device id")
+parser.add_argument("--device_target", type=str, default='Ascend', choices=['Ascend', 'GPU'], help="Device id")
 parser.add_argument("--batch_size", type=int, default=1, help="batch size")
 parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
 parser.add_argument("--file_name", type=str, default="ResNet50-BAM", help="output file name.")
@@ -34,8 +39,9 @@ parser.add_argument('--height', type=int, default=224, help='input height')
 parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
 args = parser.parse_args()
 
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
+context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
 context.set_context(device_id=args.device_id)
+
 
 if __name__ == '__main__':
 

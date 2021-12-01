@@ -16,32 +16,39 @@
 Train.
 """
 import argparse
+import math
 import os
 
-import math
 import numpy as np
-
-import mindspore.nn as nn
 from mindspore import Tensor
 from mindspore import context
-from mindspore.communication.management import init
-from mindspore.nn.optim.momentum import Momentum
-from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
-from mindspore.train.loss_scale_manager import DynamicLossScaleManager, FixedLossScaleManager
-from mindspore.train.model import Model
-from mindspore.context import ParallelMode
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.common import set_seed
+from mindspore import nn
 from mindspore.common import dtype as mstype
+from mindspore.common import set_seed
+from mindspore.communication.management import get_group_size
+from mindspore.communication.management import get_rank
+from mindspore.communication.management import init
+from mindspore.context import ParallelMode
 from mindspore.nn.loss.loss import _Loss
+from mindspore.nn.optim.momentum import Momentum
 from mindspore.ops import functional as F
 from mindspore.ops import operations as P
+from mindspore.train.callback import CheckpointConfig
+from mindspore.train.callback import ModelCheckpoint
+from mindspore.train.callback import TimeMonitor
+from mindspore.train.loss_scale_manager import DynamicLossScaleManager
+from mindspore.train.loss_scale_manager import FixedLossScaleManager
+from mindspore.train.model import Model
+from mindspore.train.serialization import load_checkpoint
+from mindspore.train.serialization import load_param_into_net
 
+import src.ResNet50_BAM as ResNet_BAM
 from src.config import imagenet_cfg
 from src.dataset import create_dataset_imagenet
-import src.ResNet50_BAM as ResNet_BAM
+from src.my_lossmonitor import MyLossMonitor
 
 set_seed(1)
+
 
 def lr_steps_imagenet(_cfg, steps_per_epoch):
     """lr step for imagenet"""
@@ -102,27 +109,53 @@ class CrossEntropySmooth(_Loss):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Classification')
-    parser.add_argument('--device_id', type=int, default=None, help='device id of Ascend. (Default: None)')
-    args_opt = parser.parse_args()
+    parser.add_argument('--device_target', type=str, default=None, choices=['Ascend', 'GPU'],
+                        help='device where the code will be implemented (default: Ascend)')
+    parser.add_argument('--device_id', type=int, default=None, help='device id of Ascend or GPU. (Default: None)')
+    parser.add_argument('--device_num', type=int, default=1, help='number of devices. (Default: 1)')
+    parser.add_argument('--lr_init', type=float, default=None, help='Learning rate.')
 
+    parser.add_argument('--is_distributed', type=int, default=0,
+                        help='Whether to use distributed GPU training. (Default: 0)')
+
+    args_opt = parser.parse_args()
     cfg = imagenet_cfg
 
+    if args_opt.lr_init is not None:
+        cfg.lr_init = args_opt.lr_init
+
     # set context
-    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target)
-    context.set_context(enable_graph_kernel=True)
-    device_num = int(os.getenv('RANK_SIZE', '1'))
-    device_id = int(os.getenv('DEVICE_ID', '0'))
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
+    if args_opt.device_target is not None:
+        cfg.device_target = args_opt.device_target
+    if args_opt.device_target == 'Ascend':
+        context.set_context(enable_graph_kernel=True)
 
-    if args_opt.device_id is not None:
-        context.set_context(device_id=args_opt.device_id)
+        device_num = int(os.getenv('DEVICE_NUM', '1'))
+        device_id = int(os.getenv('DEVICE_ID', '0'))
+
+        if args_opt.device_id is not None:
+            context.set_context(device_id=args_opt.device_id)
+        else:
+            context.set_context(device_id=cfg.device_id)
+
+        if device_num > 1:
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(device_num=args_opt.device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+            init()
     else:
-        context.set_context(device_id=cfg.device_id)
-
-    if device_num > 1:
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
-        init()
+        device_num = 1
+        device_id = 0
+        if args_opt.is_distributed:
+            init()
+            device_num = get_group_size()
+            device_id = get_rank()
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(device_num=device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
 
     dataset = create_dataset_imagenet(cfg.data_path, 1)
 
@@ -137,7 +170,6 @@ if __name__ == '__main__':
     loss_scale_manager = None
 
     lr = lr_steps_imagenet(cfg, batch_num)
-
 
     def get_param_groups(network):
         """ get param groups """
@@ -159,7 +191,6 @@ if __name__ == '__main__':
 
         return [{'params': no_decay_params, 'weight_decay': 0.0}, {'params': decay_params}]
 
-
     if cfg.is_dynamic_loss_scale:
         cfg.loss_scale = 1
 
@@ -173,22 +204,27 @@ if __name__ == '__main__':
     loss = CrossEntropySmooth(sparse=True, reduction="mean",
                               smooth_factor=cfg.label_smooth_factor, num_classes=cfg.num_classes)
 
-    if cfg.is_dynamic_loss_scale == 1:
-        loss_scale_manager = DynamicLossScaleManager(init_loss_scale=65536, scale_factor=2, scale_window=2000)
+    if args_opt.device_target == 'Ascend':
+        if cfg.is_dynamic_loss_scale == 1:
+            loss_scale_manager = DynamicLossScaleManager(init_loss_scale=65536, scale_factor=2, scale_window=2000)
+        else:
+            loss_scale_manager = FixedLossScaleManager(cfg.loss_scale, drop_overflow_update=False)
     else:
         loss_scale_manager = FixedLossScaleManager(cfg.loss_scale, drop_overflow_update=False)
 
     model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'},
-                  amp_level="O3", keep_batchnorm_fp32=False, loss_scale_manager=loss_scale_manager)
+                  amp_level="O3", keep_batchnorm_fp32=False,
+                  loss_scale_manager=loss_scale_manager,
+                  )
 
     config_ck = CheckpointConfig(save_checkpoint_steps=batch_num * 2, keep_checkpoint_max=cfg.keep_checkpoint_max)
     time_cb = TimeMonitor(data_size=batch_num)
     ckpt_save_dir = "./ckpt/"
     ckpoint_cb = ModelCheckpoint(prefix="train_resnet50_bam_imagenet", directory=ckpt_save_dir,
                                  config=config_ck)
-    loss_cb = LossMonitor()
+    loss_cb = MyLossMonitor(per_print_times=1 if cfg.use_dataset_sink else 100)
     cbs = [time_cb, ckpoint_cb, loss_cb]
     if device_num > 1 and device_id != 0:
         cbs = [time_cb, loss_cb]
-    model.train(cfg.epoch_size, dataset, callbacks=cbs)
+    model.train(cfg.epoch_size, dataset, callbacks=cbs, dataset_sink_mode=cfg.use_dataset_sink)
     print("train success")
