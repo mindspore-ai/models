@@ -106,12 +106,12 @@ def eval_result_print(assessment_method="accuracy", callback=None):
         raise ValueError("Assessment method not supported, support: [accuracy, f1, mcc, spearman_correlation]")
 
 
-def do_eval(dataset=None, network=None, use_crf="", num_class=41, assessment_method="accuracy", data_file="",
-            load_checkpoint_path="", vocab_file="", label_file="", tag_to_index=None, batch_size=1):
+def do_eval(dataset=None, network=None, use_crf="", with_lstm="", num_class=41, assessment_method="accuracy",
+            data_file="", load_checkpoint_path="", vocab_file="", label_file="", tag_to_index=None, batch_size=1):
     """ do eval """
     if load_checkpoint_path == "":
         raise ValueError("Finetune model missed, evaluation task must load finetune model!")
-    net_for_pretraining = network(bert_net_cfg, batch_size, False, num_class,
+    net_for_pretraining = network(bert_net_cfg, batch_size, False, num_class, with_lstm=(with_lstm.lower() == "true"),
                                   use_crf=(use_crf.lower() == "true"), tag_to_index=tag_to_index)
     net_for_pretraining.set_train(False)
     param_dict = load_checkpoint(load_checkpoint_path)
@@ -216,6 +216,7 @@ def run_ner():
     if args_opt.do_train.lower() == "true":
         netwithloss = BertNER(bert_net_cfg, args_opt.train_batch_size, True, num_labels=number_labels,
                               use_crf=(args_opt.use_crf.lower() == "true"),
+                              with_lstm=(args_opt.with_lstm.lower() == "true"),
                               tag_to_index=tag_to_index, dropout_prob=0.1)
         ds = create_ner_dataset(batch_size=args_opt.train_batch_size, repeat_count=1,
                                 assessment_method=assessment_method, data_file_path=args_opt.train_data_file_path,
@@ -241,7 +242,7 @@ def run_ner():
                                 assessment_method=assessment_method, data_file_path=args_opt.eval_data_file_path,
                                 schema_file_path=args_opt.schema_file_path, dataset_format=args_opt.dataset_format,
                                 do_shuffle=(args_opt.eval_data_shuffle.lower() == "true"), drop_remainder=False)
-        do_eval(ds, BertNER, args_opt.use_crf, number_labels, assessment_method,
+        do_eval(ds, BertNER, args_opt.use_crf, args_opt.with_lstm, number_labels, assessment_method,
                 args_opt.eval_data_file_path, load_finetune_checkpoint_path, args_opt.vocab_file_path,
                 args_opt.label_file_path, tag_to_index, args_opt.eval_batch_size)
 

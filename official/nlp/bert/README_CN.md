@@ -350,7 +350,7 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
 
 ```shell
 用法：run_ner.py   [--device_target DEVICE_TARGET] [--do_train DO_TRAIN] [----do_eval DO_EVAL]
-                    [--assessment_method ASSESSMENT_METHOD] [--use_crf USE_CRF]
+                    [--assessment_method ASSESSMENT_METHOD] [--use_crf USE_CRF] [--with_lstm WITH_LSTM]
                     [--device_id N] [--epoch_num N] [--vocab_file_path VOCAB_FILE_PATH]
                     [--label2id_file_path LABEL2ID_FILE_PATH]
                     [--train_data_shuffle TRAIN_DATA_SHUFFLE]
@@ -366,6 +366,7 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
     --do_eval                         是否基于开发集开始评估，可选项为true或false
     --assessment_method               评估方法，可选项为f1或clue_benchmark
     --use_crf                         是否采用CRF来计算损失，可选项为true或false
+    --with_lstm                       是否在bert后接lstm子网络提升性能，可选项为true或false
     --device_id                       任务运行的设备ID
     --epoch_num                       训练轮次总数
     --train_data_shuffle              是否使能训练数据集轮换，默认为true

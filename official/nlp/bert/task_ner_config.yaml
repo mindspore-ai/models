@@ -17,6 +17,7 @@ assessment_method: "BF1"
 do_train: "false"
 do_eval: "false"
 use_crf: "false"
+with_lstm: "false"
 device_id: 0
 epoch_num: 5
 train_data_shuffle: "true"
@@ -115,6 +116,7 @@ assessment_method: ["BF1", "clue_benchmark", "MF1"]
 do_train: ["true", "false"]
 do_eval: ["true", "false"]
 use_crf: ["true", "false"]
+with_lstm: ["true", "false"]
 train_data_shuffle: ["true", "false"]
 eval_data_shuffle: ["true", "false"]
 dataset_format: ["mindrecord", "tfrecord"]
