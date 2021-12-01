@@ -45,3 +45,6 @@
 "models/official/cv/squeezenet/infer/mxbase/src/squeezenetResidual.h"  "runtime/references"
 "models/official/cv/squeezenet/infer/mxbase/src/main.cpp"    "runtime/references"
 
+"models/official/cv/posenet/infer/mxbase/src/Posenet.h" "runtime/references"
+"models/official/cv/posenet/infer/mxbase/src/Posenet.cpp" "runtime/references"
+"models/official/cv/posenet/infer/mxbase/src/main.cpp" "runtime/references"
