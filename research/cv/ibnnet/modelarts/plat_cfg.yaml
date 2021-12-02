@@ -1,0 +1,48 @@
+algorithm:
+  name: "IBN-Net"
+  framework: "mindspore"
+  description: 
+    zh: "基于MindSpore框架的IBN-Net图像分类网络模型"
+    en: "Ibn-net image classification network model based on MindSpore framework"
+train:
+  on_modelarts:
+    entry: "modelarts/start.py"
+    comm_para:
+      input_path:
+        - name: "data_url"
+          type: "string"
+          desc: 
+            zh: "数据集路径"
+            en: "data url"
+      output_path:
+        - name: "train_url"
+          desc: 
+            zh: "输出路径"
+            en: "output path"
+    custom_para:
+      - name: "epochs"
+        type: int
+        required: true
+        default: 100
+        desc: 
+          zh: "运行的迭代数"
+          en: "number of total epochs to run"
+
+convert:
+  entry: "infer/convert/convert_om.sh"
+  parameters:
+    - name: "model_path"
+      required: true
+      desc: 
+        zh: "air模型路径"
+        en: ""
+    - name: "aipp_cfg_file"
+      required: true
+      desc: 
+        zh: "aipp配置文件路径"
+        en: ""
+    - name: "output_model_name"
+      required: true
+      desc: 
+        zh: "输出模型名"
+        en: ""
