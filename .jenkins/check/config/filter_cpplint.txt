@@ -48,3 +48,5 @@
 "models/official/cv/posenet/infer/mxbase/src/Posenet.h" "runtime/references"
 "models/official/cv/posenet/infer/mxbase/src/Posenet.cpp" "runtime/references"
 "models/official/cv/posenet/infer/mxbase/src/main.cpp" "runtime/references"
+
+"models/research/cv/ibnnet/infer/mxbase/src/IbnnetOpencv.h" "runtime/references"
