@@ -34,12 +34,17 @@ pretrain_path: "./"
 ckpt_name: "best_map.ckpt"
 
 # export settings stand alone, other hyperparameters are shared with training
-export_batch_size: 1
+export_batch_size: 2
 image_height: 512
 image_width: 512
 ckpt_file: "./best_map.ckpt"
 file_name: "unet3plus"
-file_format: "AIR"
+file_format: "MINDIR"
+
+#310 infer
+pre_result_path: "./preprocess_Result"
+post_result_path: "./result_Files"
+label_path: "./preprocess_Result/label.npy"
 
 # dataset preprocess settings
 source_path: "../origin_dataset/train/"
