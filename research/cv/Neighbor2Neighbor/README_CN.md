@@ -15,6 +15,10 @@
         - [训练](#训练)
     - [评估过程](#评估过程)
         - [评估](#评估)
+    - [推理过程](#推理过程)
+        - [导出MindIR](#导出mindir)
+        - [在Ascend310执行推理](#在ascend310执行推理)
+        - [结果](#结果)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -318,6 +322,49 @@ increase_ratio: 2.0
   ```
 
   运行完成后，您可以在 output_path 指定的目录下找到推理运行日志和去噪前后的图片。
+
+### 推理过程
+
+#### 导出MindIR
+
+```shell
+python export.py --ckpt_file [CKPT_PATH] --dataset [DATASET]--file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+参数ckpt_file为必填项，
+`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
+`DATASET` 使用的推理数据集名称，默认为`Kodak`，可在`Kodak`或者`BSD300`中选择。
+
+#### 在Ascend310执行推理
+
+在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
+使用配置文件默认的export_batch_size导出MINDIR文件
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATASET] [INPUT_PATH] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` mindir文件路径
+- `DATASET` 使用的推理数据集名称，默认为`Kodak`，可在`Kodak`或者`BSD300`中选择
+- `INPUT_PATH` 推理数据集路径
+- `DEVICE_ID` 可选，默认值为0。
+
+#### 结果
+
+推理结果保存在脚本执行的当前路径，你可以在acc.log中看到以下精度计算结果。
+
+```bash
+# Kodak
+Before denoise: Average PSNR_b = 20.1734, SSIM_b = 0.3186;
+After denoise: Average PSNR = 32.1237, SSIM_b = 0.8788;
+```
+
+```bash
+# BSD300
+Before denoise: Average PSNR_b = 20.1734, SSIM_b = 0.3865;
+After denoise: Average PSNR = 30.9367, SSIM_b = 0.8766;
+```
 
 ## 模型描述
 
