@@ -38,6 +38,7 @@ ckpt_name: "best_map.ckpt"
 save_denoised_images: 1
 
 # export settings stand alone, other hyperparameters are shared with training
+dataset: "Kodak"
 export_batch_size: 1
 image_height: 512
 image_width: 512

@@ -32,7 +32,11 @@ if __name__ == '__main__':
 
     param_dict = load_checkpoint(cfg.ckpt_file)
     load_param_into_net(net, param_dict)
-
-    input_arr = Tensor(np.zeros([cfg.export_batch_size, 3, \
-                                cfg.image_height, cfg.image_width]), ms.float32)
-    export(net, input_arr, file_name=cfg.file_name, file_format=cfg.file_format)
+    if cfg.dataset == 'Kodak':
+        input_arr = Tensor(np.zeros([cfg.export_batch_size, 3, \
+                                    768, 768]), ms.float32)
+    else:
+        input_arr = Tensor(np.zeros([cfg.export_batch_size, 3, \
+                                    512, 512]), ms.float32)
+    filename = cfg.file_name + cfg.dataset
+    export(net, input_arr, file_name=filename, file_format=cfg.file_format)
