@@ -44,7 +44,7 @@ Currently we support host-device mode with multi-dimensional partition parallel 
 
 # [Dataset](#contents)
 
-- [1] A dataset used in  Guo H , Tang R , Ye Y , et al. DeepFM: A Factorization-Machine based Neural Network for CTR Prediction[J]. 2017.
+- [Criteo Kaggle Display Advertising Challenge Dataset](http://go.criteo.net/criteo-research-kaggle-display-advertising-challenge-dataset.tar.gz)
 
 # [Environment Requirements](#contents)
 

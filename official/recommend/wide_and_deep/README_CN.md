@@ -47,7 +47,7 @@ Wide&Deep模型训练了宽线性模型和深度学习神经网络，结合了�
 
 # 数据集
 
-- [1] Guo H 、Tang R和Ye Y等人使用的数据集。 DeepFM: A Factorization-Machine based Neural Network for CTR Prediction[J].2017.
+- [Criteo Kaggle Display Advertising Challenge Dataset](http://go.criteo.net/criteo-research-kaggle-display-advertising-challenge-dataset.tar.gz)
 
 # 环境要求
 

@@ -28,13 +28,14 @@ from .rcnn import Rcnn
 from .rpn import RPN
 from .roi_align import SingleRoIExtractor
 from .anchor_generator import AnchorGenerator
+from ..model_utils.config import config as default_cfg
 
-if config.backbone in ("resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152"):
+if default_cfg.backbone in ("resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152"):
     from .resnet import ResNetFea, ResidualBlockUsing
-elif config.backbone == "resnet_v1_50":
+elif default_cfg.backbone == "resnet_v1_50":
     from .resnet import ResNetFea
     from .resnet50v1 import ResidualBlockUsing_V1
-elif config.backbone == 'inception_resnet_v2':
+elif default_cfg.backbone == 'inception_resnet_v2':
     from .inceptionresnetv2 import InceptionResNetV2
 
 

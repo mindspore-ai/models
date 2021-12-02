@@ -38,7 +38,7 @@ The FM and deep component share the same input raw feature vector, which enables
 
 # [Dataset](#contents)
 
-- [1] A dataset used in  Huifeng Guo, Ruiming Tang, Yunming Ye, Zhenguo Li, Xiuqiang He. DeepFM: A Factorization-Machine based Neural Network for CTR Prediction[J]. 2017.
+- [Criteo Kaggle Display Advertising Challenge Dataset](http://go.criteo.net/criteo-research-kaggle-display-advertising-challenge-dataset.tar.gz)
 
 # [Environment Requirements](#contents)
 
@@ -64,7 +64,7 @@ After installing MindSpore via the official website, you can start training and 
   tar -zxvf dac.tar.gz
 
   #preprocess dataset
-  python src/preprocess_data.py  --data_path=./data/ --dense_dim=13 --slot_dim=26 --threshold=100 --train_line_count=45840617 --skip_id_convert=0
+  python -m src.preprocess_data  --data_path=./data/ --dense_dim=13 --slot_dim=26 --threshold=100 --train_line_count=45840617 --skip_id_convert=0
   '''
 
 - running on Ascend
