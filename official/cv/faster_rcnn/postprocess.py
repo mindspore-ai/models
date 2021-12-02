@@ -25,8 +25,10 @@ from src.model_utils.moxing_adapter import moxing_wrapper
 dst_width = config.img_width
 dst_height = config.img_height
 
+
 def modelarts_pre_process():
     pass
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def get_eval_result(ann_file, result_path):
@@ -68,7 +70,8 @@ def get_eval_result(ann_file, result_path):
 
     eval_types = ["bbox"]
     result_files = results2json(dataset_coco, outputs, "./results.pkl")
-    coco_eval(result_files, eval_types, dataset_coco, single_result=False)
+    coco_eval(config, result_files, eval_types, dataset_coco, single_result=False)
+
 
 if __name__ == '__main__':
     get_eval_result(config.ann_file, config.result_path)
