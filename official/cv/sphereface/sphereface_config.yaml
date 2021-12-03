@@ -23,8 +23,8 @@ group_size: 1
 # Training options
 label_smooth: 1
 smooth_factor: 0.15
-train_data_dir: "/home/casia_landmark.txt"
-train_img_dir : "/home/CASIA-WebFace/"
+train_data_dir: "./dataset/casia_landmark.txt"
+train_img_dir : "./dataset/CASIA-WebFace/"
 train_pretrained: ""
 model_train_url: ""
 image_size: "112, 96"
@@ -48,11 +48,11 @@ save_ckpt_path: "./"
 is_save_on_master: 1
 
 # Eval options
-eval_data_dir: "/home/stu/Sphereface/sphereface/scripts/result_Files"
-ckpt_files: "/home/stu/Sphereface/sphereface/0-20_1775.ckpt"
-datatxt_src: '/home/stu/Sphereface/lfw_landmark.txt'
-pairtxt_src: '/home/stu/Sphereface/pairs.txt'
-datasrc: '/home/stu/Sphereface/lfw/'
+eval_data_dir: "./result_Files"
+ckpt_files: "./ckpt/0-20_1775.ckpt"
+datatxt_src: './dataset/lfw_landmark.txt'
+pairtxt_src: './dataset/pairs.txt'
+datasrc: './dataset/lfw/'
 log_path: ""
 eval_url: ""
 

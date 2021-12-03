@@ -134,12 +134,11 @@ def train():
         parallel_mode = ParallelMode.DATA_PARALLEL
         init()
         config.group_size = get_group_size()
+        config.rank = get_rank()
     if config.device_target == 'Ascend':
         devid = get_device_id()
         context.set_context(device_id=devid)
         config.rank = get_rank_id()
-    elif config.device_target == 'GPU':
-        config.rank = get_rank()
 
     # init loss_scale set
     if config.is_dynamic_loss_scale == 1:
