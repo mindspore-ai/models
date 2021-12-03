@@ -67,9 +67,12 @@ SRGAN
 
 ├─ README.md                   # descriptions about SRGAN
 ├── scripts  
- ├─ run_distribute_train.sh                # launch ascend training(8 pcs)
- ├─ run_eval.sh                   # launch ascend eval
- └─ run_stranalone_train.sh             # launch ascend training(1 pcs)
+ ├─ run_distribute_train.sh                # launch ascend training(8 pcs Ascend)
+ ├─ run_eval.sh                   # launch ascend eval (Ascend)
+ ├─ run_stranalone_train.sh             # launch ascend training(1 pcs Ascend)
+ ├─ run_distribute_train_gpu.sh                # launch ascend training(8 pcs GPU)
+ ├─ run_eval_gpu.sh                   # launch ascend eval(GPU)
+ └─ run_stranalone_train_gpu.sh             # launch ascend training(1 pcs GPU)
 ├─ src  
  ├─ ckpt                       # save ckpt  
  ├─ dataset
@@ -99,13 +102,32 @@ SRGAN
 
 ```shell
 # distributed training
-Usage: sh run_distribute_train.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] [LRPATH] [GTPATH] [VGGCKPT] [VLRPATH] [VGTPATH]
 
-eg: sh run_distribute_train.sh 8 1 ./hccl_8p.json ./DIV2K_train_LR_bicubic/X4 ./DIV2K_train_HR ./vgg.ckpt ./Set5/LR ./Set5/HR
+Ascend:
+
+Usage: bash run_distribute_train.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] [LRPATH] [GTPATH] [VGGCKPT] [VLRPATH] [VGTPATH]
+
+eg: bash run_distribute_train.sh 8 1 ./hccl_8p.json ./DIV2K_train_LR_bicubic/X4 ./DIV2K_train_HR ./vgg.ckpt ./Set5/LR ./Set5/HR
+
+GPU:
+
+Usage: bash run_distribute_train_gpu.sh [DEVICE_NUM] [LRPATH] [GTPATH] [VGGCKPT] [VLRPATH] [VGTPATH]
+
+eg: bash run_distribute_train_gpu.sh 8  ./DIV2K_train_LR_bicubic/X4 ./DIV2K_train_HR ./vgg.ckpt ./Set5/LR ./Set5/HR
+
 # standalone training
-Usage: sh run_standalone_train.sh [DEVICE_ID] [LRPATH] [GTPATH] [VGGCKPT] [VLRPATH] [VGTPATH]
 
-eg: sh run_standalone_train.sh 0 ./DIV2K_train_LR_bicubic/X4 ./DIV2K_train_HR ./vgg.ckpt ./Set5/LR ./Set5/HR
+Ascend:
+
+Usage: bash run_standalone_train_gpu.sh [DEVICE_ID] [LRPATH] [GTPATH] [VGGCKPT] [VLRPATH] [VGTPATH]
+
+eg: bash run_standalone_train_gpu.sh 0 ./DIV2K_train_LR_bicubic/X4 ./DIV2K_train_HR ./vgg.ckpt ./Set5/LR ./Set5/HR
+
+GPU:
+
+Usage: Usage: bash run_standalone_train_gpu.sh  [LRPATH] [GTPATH] [VGGCKPT] [VLRPATH] [VGTPATH]
+
+eg: bash run_standalone_train_gpu.sh   ./DIV2K_train_LR_bicubic/X4 ./DIV2K_train_HR ./vgg.ckpt ./Set5/LR ./Set5/HR
 ```
 
 ### [Training Result](#content)
@@ -118,9 +140,18 @@ Training result will be stored in scripts/train_parallel0/ckpt. You can find che
 
 ```bash
 # evaling
-sh run_eval.sh [CKPT] [EVALLRPATH] [EVALGTPATH] [DEVICE_ID]
 
-eg: sh run_eval.sh ./ckpt/best.ckpt ./Set14/LR ./Set14/HR 0
+Ascend:
+
+Usage: bash run_eval.sh [CKPT] [EVALLRPATH] [EVALGTPATH] [DEVICE_ID]
+
+eg: bash run_eval.sh ./ckpt/best.ckpt ./Set14/LR ./Set14/HR 0
+
+GPU:
+
+Usage: bash run_eval_gpu.sh [CKPT] [EVALLRPATH] [EVALGTPATH] [DEVICE_ID]
+
+eg: bash run_eval_gpu.sh ./ckpt/best.ckpt ./Set14/LR ./Set14/HR 0
 ```
 
 ### [Evaluation result](#content)
@@ -161,32 +192,29 @@ Inference result is saved in current path, you can find result like this in acc.
 
 ### Training Performance
 
-| Parameters                 |                                                             |
-| -------------------------- | ----------------------------------------------------------- |
-| Model Version              | V1                                                          |
-| Resource                   | CentOs 8.2; Ascend 910; CPU 2.60GHz, 192cores; Memory 755G  |
-| MindSpore Version          | 1.2.0                                                       |
-| Dataset                    | DIV2K                                                       |
-| Training Parameters        | epoch=2000+1000,  batch_size = 16                           |
-| Optimizer                  | Adam                                                        |
-| Loss Function              | BCELoss  MSELoss VGGLoss                                    |
-| outputs                    | super-resolution pictures                                   |
-| Accuracy                   | Set14 psnr 27.03                                            |
-| Speed                      | 1pc(Ascend): 540 ms/step; 8pcs:  1500 ms/step               |
-| Total time                 | 8pcs: 8h                                                    |
-| Checkpoint for Fine tuning | 184M (.ckpt file)                                           |
-| Scripts                    | [srgan script](https://gitee.com/mindspore/models/tree/master/research/cv/SRGAN) |
+| Parameters                 | Ascend 910                       | NVIDIA GeForce RTX 3090                     |
+| -------------------------- | ---------------------------------|---------------------------------------------|
+| Model Version              | V1                               | V1                                          |
+| MindSpore Version          | 1.2.0                            | 1.6.0                                       |
+| Dataset                    | DIV2K                            | DIV2K                                       |
+| Training Parameters        | epoch=2000+1000,  batch_size = 16| epoch=2000+1000,  batch_size = 16           |
+| Optimizer                  | Adam                             | Adam                                        |
+| Loss Function              | BCELoss  MSELoss VGGLoss         | BCELoss  MSELoss VGGLoss                    |
+| outputs                    | super-resolution pictures        | super-resolution pictures                   |
+| Accuracy                   | Set14 psnr 27.03                 | Set14 psnr 27.57                            |
+| Speed                      | 1pc:540 ms/step;8pcs:1500 ms/step| 1pc: 260+260ms/step; 8pcs: 460+520ms/step   |
+| Checkpoint for Fine tuning | 184M (.ckpt file)                | 193M (.ckpt file)                           |
+| Scripts                    | [srgan script](https://gitee.com/mindspore/models/tree/master/research/cv/SRGAN)|[srgan script](https://gitee.com/mindspore/models/tree/master/research/cv/SRGAN)|
 
 ### Evaluation Performance
 
-| Parameters          | single Ascend                                              |
-| ------------------- | -----------------------------------------------------------|
-| Model Version       | v1                                                         |
-| Resource            | CentOs 8.2; Ascend 910; CPU 2.60GHz, 192cores; Memory 755G |
-| MindSpore Version   | 1.2.0                                                      |
-| Dataset             | Set14                                                      |
-| batch_size          | 1                                                          |
-| outputs             | super-resolution pictures                                  |
+| Parameters          | Ascend 910               | NVIDIA GeForce RTX 3090         |
+| ------------------- | -------------------------|---------------------------------|
+| Model Version       | V1                       | V1                              |
+| MindSpore Version   | 1.2.0                    | 1.6.0                           |
+| Dataset             | Set14                    | Set14                           |
+| batch_size          | 1                        | 1                               |
+| outputs             | super-resolution pictures| super-resolution pictures       |
 
 # [ModelZoo Homepage](#contents)
 

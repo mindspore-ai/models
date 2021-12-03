@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,13 +18,13 @@ import argparse
 import numpy as np
 from skimage.color import rgb2ycbcr
 from skimage.metrics import peak_signal_noise_ratio
+from PIL import Image
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.common import set_seed
 from mindspore import context
 import mindspore.ops as ops
 from src.model.generator import Generator
 from src.dataset.testdataset import create_testdataset
-from PIL import Image
 
 set_seed(1)
 parser = argparse.ArgumentParser(description="SRGAN eval")
@@ -35,6 +35,8 @@ parser.add_argument("--scale", type=int, default=4)
 parser.add_argument("--generator_path", type=str, default='./ckpt/pre_trained_model_400.ckpt')
 parser.add_argument("--mode", type=str, default='train')
 parser.add_argument("--device_id", type=int, default=0, help="device id, default: 0.")
+parser.add_argument('--platform', type=str, default='Ascend', choices=('Ascend', 'GPU', 'CPU'))
+
 i = 0
 if __name__ == '__main__':
     args = parser.parse_args()
