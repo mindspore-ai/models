@@ -81,7 +81,7 @@ After installing MindSpore via the official website and download the dataset, yo
 
   # run evaluation example
   export CUDA_VISIBLE_DEVICES=0
-  python eval.py > eval.log 2>&1 &  
+  python eval.py > eval.log 2>&1 &
   OR
   bash run_standalone_gpu_eval.sh 0
   ```
