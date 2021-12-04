@@ -36,18 +36,10 @@ if python -c "import nms" > /dev/null 2>&1
 then
     echo "NMS module already exits, no need reinstall."
 else
-    if [ -f './CenterNet' ]
-    then
-        echo "NMS module was not found, but has been downloaded"
-    else
-        echo "NMS module was not found, install it now..."
-        git clone https://github.com/xingyizhou/CenterNet.git
-    fi
-    cd CenterNet/src/lib/external/ || exit
+    cd infer/sdk/external || exit
     make
-    python setup.py install
+    python3.7 setup.py install
     cd - || exit
-    rm -rf CenterNet
 fi
 
 python ${PROJECT_DIR}/../eval.py  \
