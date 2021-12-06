@@ -5,7 +5,6 @@ data_url: ""
 train_url: ""
 checkpoint_url: ""
 # Path for local
-output_dir: "/cache"
 data_path: "/cache/data"
 output_path: "/cache/train"
 load_path: "/cache/checkpoint_path"
@@ -21,6 +20,7 @@ yolov5_version: "yolov5s"
 pretrained_backbone: ""
 resume_yolov5: ""
 pretrained_checkpoint: ""
+output_dir: "./output"
 
 lr_scheduler: "cosine_annealing"
 lr: 0.013
@@ -37,24 +37,19 @@ label_smooth: 0
 label_smooth_factor: 0.1
 log_interval: 100
 ckpt_path: "outputs/"
-ckpt_interval: -1
-is_save_on_master: 1
 is_distributed: 0
 bind_cpu: True
 device_num: 8
 rank: 0
 group_size: 1
 need_profiler: 0
-training_shape: ""
 resize_rate: 10
-is_modelArts: 0
 
 # Eval options
 pretrained: ""
 log_path: "outputs/"
 ann_val_file: ""
 eval_nms_thresh: 0.6
-eval_shape: ""
 ignore_threshold: 0.7
 test_ignore_threshold: 0.001
 multi_label: True
@@ -63,7 +58,7 @@ multi_label_thresh: 0.1
 # Export options
 device_id: 0
 batch_size: 1
-testing_shape: 640
+testing_shape: [640, 640]
 ckpt_file: ""
 file_name: "yolov5"
 file_format: "MINDIR"
@@ -77,21 +72,6 @@ saturation: 1.5
 value: 0.4
 jitter: 0.3
 
-multi_scale: [[320, 320],
-              [352, 352],
-              [384, 384],
-              [416, 416],
-              [448, 448],
-              [480, 480],
-              [512, 512],
-              [544, 544],
-              [576, 576],
-              [608, 608],
-              [640, 640],
-              [672, 672],
-              [704, 704],
-              [736, 736],
-              [768, 768]]
 num_classes: 80
 max_box: 150
 
@@ -166,7 +146,6 @@ device_num: "Device numbers per server"
 rank: "Local rank of distributed."
 group_size: "World size of device."
 need_profiler: "Whether use profiler. 0 for no, 1 for yes."
-training_shape: "Fix training shape."
 resize_rate: "Resize rate for multi-scale training."
 ann_file: "path to annotation"
 each_multiscale: "Apply multi-scale for each scale"

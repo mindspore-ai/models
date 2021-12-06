@@ -20,8 +20,7 @@ import numpy as np
 import cv2
 from PIL import Image
 from pycocotools.coco import COCO
-import mindspore.dataset as de
-import mindspore.dataset.vision.c_transforms as CV
+import mindspore.dataset as ds
 from src.distributed_sampler import DistributedSampler
 from src.transforms import reshape_fn, MultiScaleTrans, PreprocessTrueBox
 
@@ -225,11 +224,11 @@ class COCOYoloDataset:
         return [x_min, y_min, x_min+w, y_min+h]
 
 
-def create_yolo_dataset(image_dir, anno_path, batch_size, max_epoch, device_num, rank,
+def create_yolo_dataset(image_dir, anno_path, batch_size, device_num, rank,
                         config=None, is_training=True, shuffle=True):
     """Create dataset for YOLOV5."""
     cv2.setNumThreads(0)
-    de.config.set_enable_shared_mem(True)
+    ds.config.set_enable_shared_mem(True)
     if is_training:
         filter_crowd = True
         remove_empty_anno = True
@@ -241,7 +240,7 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, max_epoch, device_num,
                                    remove_images_without_annotations=remove_empty_anno, is_training=is_training)
     distributed_sampler = DistributedSampler(len(yolo_dataset), device_num, rank, shuffle=shuffle)
     yolo_dataset.size = len(distributed_sampler)
-    hwc_to_chw = CV.HWC2CHW()
+    hwc_to_chw = ds.vision.c_transforms.HWC2CHW()
 
     config.dataset_size = len(yolo_dataset)
     cores = multiprocessing.cpu_count()
@@ -258,34 +257,34 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, max_epoch, device_num,
         map2_out_column_names = ["annotation", "bbox1", "bbox2", "bbox3",
                                  "gt_box1", "gt_box2", "gt_box3"]
 
-        ds = de.GeneratorDataset(yolo_dataset, column_names=dataset_column_names, sampler=distributed_sampler,
-                                 python_multiprocessing=True, num_parallel_workers=min(4, num_parallel_workers))
-        ds = ds.map(operations=multi_scale_trans, input_columns=dataset_column_names,
-                    output_columns=map1_out_column_names, column_order=map1_out_column_names,
-                    num_parallel_workers=min(12, num_parallel_workers), python_multiprocessing=True)
-        ds = ds.map(operations=PreprocessTrueBox(config), input_columns=map2_in_column_names,
-                    output_columns=map2_out_column_names, column_order=output_column_names,
-                    num_parallel_workers=min(4, num_parallel_workers), python_multiprocessing=False)
+        dataset = ds.GeneratorDataset(yolo_dataset, column_names=dataset_column_names, sampler=distributed_sampler,
+                                      python_multiprocessing=True, num_parallel_workers=min(4, num_parallel_workers))
+        dataset = dataset.map(operations=multi_scale_trans, input_columns=dataset_column_names,
+                              output_columns=map1_out_column_names, column_order=map1_out_column_names,
+                              num_parallel_workers=min(12, num_parallel_workers), python_multiprocessing=True)
+        dataset = dataset.map(operations=PreprocessTrueBox(config), input_columns=map2_in_column_names,
+                              output_columns=map2_out_column_names, column_order=output_column_names,
+                              num_parallel_workers=min(4, num_parallel_workers), python_multiprocessing=False)
         mean = [m * 255 for m in [0.485, 0.456, 0.406]]
         std = [s * 255 for s in [0.229, 0.224, 0.225]]
-        ds = ds.map([CV.Normalize(mean, std),
-                     hwc_to_chw], num_parallel_workers=min(4, num_parallel_workers))
+        dataset = dataset.map([ds.vision.c_transforms.Normalize(mean, std), hwc_to_chw],
+                              num_parallel_workers=min(4, num_parallel_workers))
 
         def concatenate(images):
             images = np.concatenate((images[..., ::2, ::2], images[..., 1::2, ::2],
                                      images[..., ::2, 1::2], images[..., 1::2, 1::2]), axis=0)
             return images
-        ds = ds.map(operations=concatenate, input_columns="image", num_parallel_workers=min(4, num_parallel_workers))
-        ds = ds.batch(batch_size, num_parallel_workers=min(4, num_parallel_workers), drop_remainder=True)
+        dataset = dataset.map(operations=concatenate, input_columns="image",
+                              num_parallel_workers=min(4, num_parallel_workers))
+        dataset = dataset.batch(batch_size, num_parallel_workers=min(4, num_parallel_workers), drop_remainder=True)
     else:
-        ds = de.GeneratorDataset(yolo_dataset, column_names=["image", "img_id"],
-                                 sampler=distributed_sampler)
+        dataset = ds.GeneratorDataset(yolo_dataset, column_names=["image", "img_id"],
+                                      sampler=distributed_sampler)
         compose_map_func = (lambda image, img_id: reshape_fn(image, img_id, config))
-        ds = ds.map(operations=compose_map_func, input_columns=["image", "img_id"],
-                    output_columns=["image", "image_shape", "img_id"],
-                    column_order=["image", "image_shape", "img_id"],
-                    num_parallel_workers=8)
-        ds = ds.map(operations=hwc_to_chw, input_columns=["image"], num_parallel_workers=8)
-        ds = ds.batch(batch_size, drop_remainder=True)
-    ds = ds.repeat(max_epoch)
-    return ds, len(yolo_dataset)
+        dataset = dataset.map(operations=compose_map_func, input_columns=["image", "img_id"],
+                              output_columns=["image", "image_shape", "img_id"],
+                              column_order=["image", "image_shape", "img_id"],
+                              num_parallel_workers=8)
+        dataset = dataset.map(operations=hwc_to_chw, input_columns=["image"], num_parallel_workers=8)
+        dataset = dataset.batch(batch_size, drop_remainder=True)
+    return dataset

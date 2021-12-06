@@ -17,7 +17,7 @@
 
 import os
 import functools
-from mindspore import context
+import mindspore as ms
 from .config import config
 
 _global_sync_count = 0
@@ -72,8 +72,67 @@ def sync_data(from_path, to_path):
 
     print("Finish sync data from {} to {}.".format(from_path, to_path))
 
+def modelarts_pre_process(args):
+    '''modelarts pre process function.'''
+    def unzip(zip_file, save_dir):
+        import zipfile
+        s_time = time.time()
+        if not os.path.exists(os.path.join(save_dir, args.modelarts_dataset_unzip_name)):
+            zip_isexist = zipfile.is_zipfile(zip_file)
+            if zip_isexist:
+                fz = zipfile.ZipFile(zip_file, 'r')
+                data_num = len(fz.namelist())
+                print("Extract Start...")
+                print("unzip file num: {}".format(data_num))
+                data_print = int(data_num / 100) if data_num > 100 else 1
+                i = 0
+                for file in fz.namelist():
+                    if i % data_print == 0:
+                        print("unzip percent: {}%".format(int(i * 100 / data_num)), flush=True)
+                    i += 1
+                    fz.extract(file, save_dir)
+                print("cost time: {}min:{}s.".format(int((time.time() - s_time) / 60),
+                                                     int(int(time.time() - s_time) % 60)))
+                print("Extract Done.")
+            else:
+                print("This is not zip.")
+        else:
+            print("Zip has been extracted.")
 
-def moxing_wrapper(pre_process=None, post_process=None):
+    if args.need_modelarts_dataset_unzip:
+        zip_file_1 = os.path.join(args.data_path, args.modelarts_dataset_unzip_name + ".zip")
+        save_dir_1 = os.path.join(args.data_path)
+
+        sync_lock = "/tmp/unzip_sync.lock"
+
+        # Each server contains 8 devices as most.
+        if get_device_id() % min(get_device_num(), 8) == 0 and not os.path.exists(sync_lock):
+            print("Zip file path: ", zip_file_1)
+            print("Unzip file save dir: ", save_dir_1)
+            unzip(zip_file_1, save_dir_1)
+            print("===Finish extract data synchronization===")
+            try:
+                os.mknod(sync_lock)
+            except IOError:
+                pass
+
+        while True:
+            if os.path.exists(sync_lock):
+                break
+            time.sleep(1)
+
+        print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
+
+    args.output_dir = os.path.join(args.output_path, args.output_dir)
+    args.ckpt_path = os.path.join(args.output_path, args.ckpt_path)
+
+def modelarts_post_process():
+    sync_data(from_path='/cache/output', to_path='obs://hit-cyf/yolov5_npu/outputs/')
+
+def modelarts_export_preprocess(args):
+    args.file_name = os.path.join(args.output_path, args.file_name)
+
+def moxing_wrapper(pre_process=None, post_process=None, **kwargs):
     """
     Moxing wrapper to download dataset and upload outputs.
     """
@@ -92,14 +151,17 @@ def moxing_wrapper(pre_process=None, post_process=None):
                     sync_data(config.train_url, config.output_path)
                     print("Workspace downloaded: ", os.listdir(config.output_path))
 
-                context.set_context(save_graphs_path=os.path.join(config.output_path, str(get_rank_id())))
+                ms.set_context(save_graphs_path=os.path.join(config.output_path, str(get_rank_id())))
                 config.device_num = get_device_num()
                 config.device_id = get_device_id()
                 if not os.path.exists(config.output_path):
                     os.makedirs(config.output_path)
 
                 if pre_process:
-                    pre_process()
+                    if "pre_args" in kwargs.keys():
+                        pre_process(*kwargs["pre_args"])
+                    else:
+                        pre_process()
 
             # Run the main function
             run_func(*args, **kwargs)
@@ -107,7 +169,10 @@ def moxing_wrapper(pre_process=None, post_process=None):
             # Upload data to train_url
             if config.enable_modelarts:
                 if post_process:
-                    post_process()
+                    if "post_args" in kwargs.keys():
+                        post_process(*kwargs["post_args"])
+                    else:
+                        post_process()
 
                 if config.train_url:
                     print("Start to copy output directory")

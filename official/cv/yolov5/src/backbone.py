@@ -14,7 +14,7 @@
 # ============================================================================
 """DarkNet model."""
 import mindspore.nn as nn
-from mindspore.ops import operations as P
+import mindspore.ops as ops
 
 
 class Bottleneck(nn.Cell):
@@ -46,7 +46,7 @@ class BottleneckCSP(nn.Cell):
         self.conv3 = Conv(2 * c_, c2, 1)  # act=FReLU(c2)
         self.m = nn.SequentialCell(
             [Bottleneck(c_, c_, shortcut, e=1.0) for _ in range(n)])
-        self.concat = P.Concat(axis=1)
+        self.concat = ops.Concat(axis=1)
 
     def construct(self, x):
         c1 = self.conv1(x)
@@ -69,7 +69,7 @@ class SPP(nn.Cell):
         self.maxpool1 = nn.MaxPool2d(kernel_size=5, stride=1, pad_mode='same')
         self.maxpool2 = nn.MaxPool2d(kernel_size=9, stride=1, pad_mode='same')
         self.maxpool3 = nn.MaxPool2d(kernel_size=13, stride=1, pad_mode='same')
-        self.concat = P.Concat(axis=1)
+        self.concat = ops.Concat(axis=1)
 
     def construct(self, x):
         c1 = self.conv1(x)
@@ -95,7 +95,7 @@ class Focus(nn.Cell):
 class SiLU(nn.Cell):
     def __init__(self):
         super(SiLU, self).__init__()
-        self.sigmoid = P.Sigmoid()
+        self.sigmoid = ops.Sigmoid()
 
     def construct(self, x):
         return x * self.sigmoid(x)
@@ -134,7 +134,7 @@ class Conv(nn.Cell):
             has_bias=False)
         self.bn = nn.BatchNorm2d(c2, momentum=momentum, eps=eps)
         self.act = SiLU() if act is True else (
-            act if isinstance(act, nn.Cell) else P.Identity())
+            act if isinstance(act, nn.Cell) else ops.Identity())
 
     def construct(self, x):
         return self.act(self.bn(self.conv(x)))

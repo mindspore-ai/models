@@ -16,9 +16,7 @@
 import math
 from functools import reduce
 import numpy as np
-from mindspore.common import initializer as init
-from mindspore.common.initializer import Initializer as MeInitializer
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+import mindspore as ms
 import mindspore.nn as nn
 
 
@@ -141,7 +139,7 @@ def _calculate_fan_in_and_fan_out(arr):
     return fan_in, fan_out
 
 
-class KaimingUniform(MeInitializer):
+class KaimingUniform(ms.common.initializer.Initializer):
     """Kaiming uniform initializer."""
 
     def __init__(self, a=0, mode='fan_in', nonlinearity='leaky_relu'):
@@ -159,17 +157,21 @@ def default_recurisive_init(custom_cell):
     """Initialize parameter."""
     for _, cell in custom_cell.cells_and_names():
         if isinstance(cell, nn.Conv2d):
-            cell.weight.set_data(init.initializer(KaimingUniform(a=math.sqrt(5)), cell.weight.shape, cell.weight.dtype))
+            cell.weight.set_data(ms.common.initializer.initializer(KaimingUniform(a=math.sqrt(5)),
+                                                                   cell.weight.shape, cell.weight.dtype))
             if cell.bias is not None:
                 fan_in, _ = _calculate_fan_in_and_fan_out(cell.weight)
                 bound = 1 / math.sqrt(fan_in)
-                cell.bias.set_data(init.initializer(init.Uniform(bound), cell.bias.shape, cell.bias.dtype))
+                cell.bias.set_data(ms.common.initializer.initializer(ms.common.initializer.Uniform(bound),
+                                                                     cell.bias.shape, cell.bias.dtype))
         elif isinstance(cell, nn.Dense):
-            cell.weight.set_data(init.initializer(KaimingUniform(a=math.sqrt(5)), cell.weight.shape, cell.weight.dtype))
+            cell.weight.set_data(ms.common.initializer.initializer(KaimingUniform(a=math.sqrt(5)),
+                                                                   cell.weight.shape, cell.weight.dtype))
             if cell.bias is not None:
                 fan_in, _ = _calculate_fan_in_and_fan_out(cell.weight)
                 bound = 1 / math.sqrt(fan_in)
-                cell.bias.set_data(init.initializer(init.Uniform(bound), cell.bias.shape, cell.bias.dtype))
+                cell.bias.set_data(ms.common.initializer.initializer(ms.common.initializer.Uniform(bound),
+                                                                     cell.bias.shape, cell.bias.dtype))
         elif isinstance(cell, (nn.BatchNorm2d, nn.BatchNorm1d)):
             pass
 
@@ -177,7 +179,7 @@ def default_recurisive_init(custom_cell):
 def load_yolov5_params(args, network):
     """Load yolov5 backbone parameter from checkpoint."""
     if args.resume_yolov5:
-        param_dict = load_checkpoint(args.resume_yolov5)
+        param_dict = ms.callback.load_checkpoint(args.resume_yolov5)
         param_dict_new = {}
         for key, values in param_dict.items():
             if key.startswith('moments.'):
@@ -190,11 +192,11 @@ def load_yolov5_params(args, network):
                 args.logger.info('in resume {}'.format(key))
 
         args.logger.info('resume finished')
-        load_param_into_net(network, param_dict_new)
+        ms.callback.load_param_into_net(network, param_dict_new)
         args.logger.info('load_model {} success'.format(args.resume_yolov5))
 
     if args.pretrained_backbone:
-        param_dict = load_checkpoint(args.pretrained_backbone)
+        param_dict = ms.callback.load_checkpoint(args.pretrained_backbone)
         param_dict_new = {}
         for key, values in param_dict.items():
             if key.startswith('moments.'):
@@ -207,5 +209,5 @@ def load_yolov5_params(args, network):
                 args.logger.info('in resume {}'.format(key))
 
         args.logger.info('pretrained finished')
-        load_param_into_net(network, param_dict_new)
+        ms.callback.load_param_into_net(network, param_dict_new)
         args.logger.info('load_model {} success'.format(args.pretrained_backbone))

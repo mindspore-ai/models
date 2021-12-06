@@ -14,7 +14,7 @@
 # ============================================================================
 """DarkNet model."""
 import mindspore.nn as nn
-from mindspore.ops import operations as P
+import mindspore.ops as ops
 
 
 class Concat(nn.Cell):
@@ -22,7 +22,7 @@ class Concat(nn.Cell):
     def __init__(self, dimension=1):
         super(Concat, self).__init__()
         self.d = dimension
-        self.concat = P.Concat(self.d)
+        self.concat = ops.Concat(self.d)
 
     def forward(self, x):
         return self.concat
@@ -53,7 +53,7 @@ class BottleneckCSP(nn.Cell):
         self.bn = nn.BatchNorm2d(2 * c_, momentum=0.9, eps=1e-5)  # applied to cat(cv2, cv3)
         self.act = nn.LeakyReLU(0.1)
         self.m = nn.SequentialCell([Bottleneck(c_, c_, shortcut, e=1.0) for _ in range(n)])
-        self.concat = P.Concat(1)
+        self.concat = ops.Concat(1)
 
     def construct(self, x):
         y1 = self.cv3(self.m(self.cv1(x)))
@@ -71,7 +71,7 @@ class C3(nn.Cell):
         self.cv2 = Conv(c1, c_, 1, 1)
         self.cv3 = Conv(2 * c_, c2, 1)  # act=FReLU(c2)
         self.m = nn.SequentialCell([Bottleneck(c_, c_, shortcut, e=1.0) for _ in range(n)])
-        self.concat = P.Concat(1)
+        self.concat = ops.Concat(1)
 
     def construct(self, x):
         y1 = self.m(self.cv1(x))
@@ -91,7 +91,7 @@ class SPP(nn.Cell):
         self.maxpool1 = nn.MaxPool2d(kernel_size=5, stride=1, pad_mode='same')
         self.maxpool2 = nn.MaxPool2d(kernel_size=9, stride=1, pad_mode='same')
         self.maxpool3 = nn.MaxPool2d(kernel_size=13, stride=1, pad_mode='same')
-        self.concat = P.Concat(1)
+        self.concat = ops.Concat(1)
 
     def construct(self, x):
         x = self.cv1(x)
@@ -107,11 +107,11 @@ class Focus(nn.Cell):
     def __init__(self, c1, c2, k=1, s=1, p=None, act=True):
         super(Focus, self).__init__()
         self.conv = Conv(c1 * 4, c2, k, s, p, act)
-        self.concat = P.Concat(1)
+        self.concat = ops.Concat(1)
 
     def construct(self, x):
-        w = P.Shape()(x)[2]
-        h = P.Shape()(x)[3]
+        w = ops.Shape()(x)[2]
+        h = ops.Shape()(x)[3]
         concat4 = self.concat((x[..., 0:w:2, 0:h:2], x[..., 1:w:2, 0:h:2], x[..., 0:w:2, 1:h:2], x[..., 1:w:2, 1:h:2]))
         return self.conv(concat4)
 
@@ -129,7 +129,7 @@ class Focusv2(nn.Cell):
 class SiLU(nn.Cell):
     def __init__(self):
         super(SiLU, self).__init__()
-        self.sigmoid = P.Sigmoid()
+        self.sigmoid = ops.Sigmoid()
 
     def construct(self, x):
         return x * self.sigmoid(x)
@@ -160,7 +160,7 @@ class Conv(nn.Cell):
             self.pad_mode = 'pad'
         self.conv = nn.Conv2d(c1, c2, k, s, padding=self.padding, pad_mode=self.pad_mode, has_bias=False)
         self.bn = nn.BatchNorm2d(c2, momentum=momentum, eps=eps)
-        self.act = SiLU() if act is True else (act if isinstance(act, nn.Cell) else P.Identity())
+        self.act = SiLU() if act is True else (act if isinstance(act, nn.Cell) else ops.operations.Identity())
 
     def construct(self, x):
         return self.act(self.bn(self.conv(x)))
@@ -172,8 +172,8 @@ class YOLOv5Backbone(nn.Cell):
         super(YOLOv5Backbone, self).__init__()
 
         # self.outchannel = 1024
-        # self.concat = P.Concat(axis=1)
-        # self.add = P.TensorAdd()
+        # self.concat = ops.Concat(axis=1)
+        # self.add = ops.TensorAdd()
 
         self.focusv2 = Focusv2(3, 32, k=3, s=1)
         self.conv1 = Conv(32, 64, k=3, s=2)

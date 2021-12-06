@@ -150,8 +150,6 @@ optional arguments:
   --label_smooth_factor Smooth strength of original one-hot. Default: 0.1
   --log_interval        Logging interval steps. Default: 100
   --ckpt_path           Checkpoint save location. Default: outputs/
-  --ckpt_interval       Save checkpoint interval. Default: None
-  --is_save_on_master   Save ckpt on master or all rank, 1 for master, 0 for all ranks. Default: 1
   --is_distributed      Distribute train or not, 1 for yes, 0 for no. Default: 1
   --rank                Local rank of distributed. Default: 0
   --group_size          World size of device. Default: 1

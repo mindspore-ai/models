@@ -64,6 +64,5 @@ echo "start inferring for device $DEVICE_ID"
 python eval.py \
     --data_dir=$DATASET_PATH \
     --yolov5_version='yolov5s' \
-    --pretrained=$CHECKPOINT_PATH \
-    --eval_shape=640 > log.txt 2>&1 &
+    --pretrained=$CHECKPOINT_PATH > log.txt 2>&1 &
 cd ..
