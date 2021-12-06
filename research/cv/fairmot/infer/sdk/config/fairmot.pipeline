@@ -1,0 +1,33 @@
+{
+    "im_fairmot": {
+        "stream_config": {
+            "deviceId": "0"
+        },
+        "appsrc0": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_modelinfer0"
+        },
+        "mxpi_modelinfer0": {
+            "props": {
+                "dataSource": "appsrc0",
+                "modelPath": "../convert/fairmot.om",
+                "tensorFormat": "1"
+            },
+            "factory": "mxpi_modelinfer",
+            "next": "mxpi_dataserialize0"
+        },
+        "mxpi_dataserialize0": {
+            "props": {
+                "outputDataKeys": "mxpi_modelinfer0"
+            },
+            "factory": "mxpi_dataserialize",
+            "next": "appsink0"
+        },
+        "appsink0": {
+            "factory": "appsink"
+        }
+    }
+}
