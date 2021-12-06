@@ -13,7 +13,6 @@
 # limitations under the License.
 # ============================================================================
 """RDN eval script"""
-import glob
 import os
 import numpy as np
 import mindspore.dataset as ds
@@ -27,16 +26,20 @@ from src.data.div2k import DIV2K
 from src.metrics import calc_psnr, quantize, calc_ssim
 
 device_id = int(os.getenv('DEVICE_ID', '0'))
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=device_id, save_graphs=False)
-context.set_context(max_call_depth=10000)
+if args.device_target == 'GPU':
+    context.set_context(mode=context.GRAPH_MODE,
+                        device_target='GPU',
+                        device_id=device_id,
+                        save_graphs=False)
+elif args.device_target == 'Ascend':
+    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=device_id, save_graphs=False)
+    context.set_context(max_call_depth=10000)
+else:
+    raise ValueError('Unsupported device target.')
 
 
 def eval_net():
     """eval"""
-    max_psnr = []
-    max_ssim = []
-    dir_name = os.path.dirname(args.ckpt_path)
-    names = sorted(glob.glob(os.path.join(dir_name, '*' + ".ckpt")), reverse=True)
     if args.epochs == 0:
         args.epochs = 1e8
     for arg in vars(args):
@@ -54,30 +57,29 @@ def eval_net():
     net_m = rdn.RDN(args)
     net_m.set_train(False)
     print('load mindspore RDN net successfully.')
-    for i in range(5):
-        ckpt_path = names[i]
-        param_dict = load_checkpoint(ckpt_path)
-        load_param_into_net(net_m, param_dict)
-        num_imgs = train_de_dataset.get_dataset_size()
-        psnrs = np.zeros((num_imgs, 1))
-        ssims = np.zeros((num_imgs, 1))
-        for batch_idx, imgs in enumerate(train_loader):
-            lr = imgs['LR']
-            hr = imgs['HR']
-            lr = Tensor(lr, mstype.float32)
-            pred = net_m(lr)
-            pred_np = pred.asnumpy()
-            pred_np = quantize(pred_np, 255)
-            psnr = calc_psnr(pred_np, hr, args.scale[0], 255.0)
-            pred_np = pred_np.reshape(pred_np.shape[-3:]).transpose(1, 2, 0)
-            hr = hr.reshape(hr.shape[-3:]).transpose(1, 2, 0)
-            ssim = calc_ssim(pred_np, hr, args.scale[0])
-            psnrs[batch_idx, 0] = psnr
-            ssims[batch_idx, 0] = ssim
-        max_psnr.append(psnrs.mean(axis=0)[0])
-        max_ssim.append(ssims.mean(axis=0)[0])
-    print('Mean psnr of %s x%s is %.4f' % (args.data_test[0], args.scale[0], max(max_psnr)))
-    print('Mean ssim of %s x%s is %.4f' % (args.data_test[0], args.scale[0], max(max_ssim)))
+    ckpt_path = args.ckpt_path
+    param_dict = load_checkpoint(ckpt_path)
+    load_param_into_net(net_m, param_dict)
+    num_imgs = train_de_dataset.get_dataset_size()
+    psnrs = np.zeros((num_imgs, 1))
+    ssims = np.zeros((num_imgs, 1))
+    for batch_idx, imgs in enumerate(train_loader):
+        lr = imgs['LR']
+        hr = imgs['HR']
+        lr = Tensor(lr, mstype.float32)
+        pred = net_m(lr)
+        pred_np = pred.asnumpy()
+        pred_np = quantize(pred_np, 255)
+        psnr = calc_psnr(pred_np, hr, args.scale[0], 255.0)
+        pred_np = pred_np.reshape(pred_np.shape[-3:]).transpose(1, 2, 0)
+        hr = hr.reshape(hr.shape[-3:]).transpose(1, 2, 0)
+        ssim = calc_ssim(pred_np, hr, args.scale[0])
+        psnrs[batch_idx, 0] = psnr
+        ssims[batch_idx, 0] = ssim
+        print('psnr of %s x%s is %.4f' % (args.data_test[0], args.scale[0], psnr))
+        print('ssim of %s x%s is %.4f' % (args.data_test[0], args.scale[0], ssim))
+    print('Mean psnr of %s x%s is %.4f' % (args.data_test[0], args.scale[0], psnrs.mean(axis=0)[0]))
+    print('Mean ssim of %s x%s is %.4f' % (args.data_test[0], args.scale[0], ssims.mean(axis=0)[0]))
 
 
 if __name__ == '__main__':

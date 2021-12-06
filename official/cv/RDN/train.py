@@ -19,7 +19,7 @@ from mindspore import dataset as ds
 import mindspore.nn as nn
 from mindspore.context import ParallelMode
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.common import set_seed
 from mindspore.train.model import Model
@@ -35,20 +35,36 @@ def train_net():
     device_id = int(os.getenv('DEVICE_ID', '0'))
     start_id = int(os.getenv('START_ID', str(device_id)))
     rank_id = int(os.getenv('RANK_ID', '0'))
-    device_num = int(os.getenv('DEVICE_NUM', '1'))
-    # if distribute:
-    if device_num > 1:
-        init()
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          device_num=device_num, gradients_mean=True)
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False, device_id=device_id)
+
+    if args.device_target == 'GPU':
+        context.set_context(mode=context.GRAPH_MODE,
+                            device_target='GPU',
+                            device_id=device_id,
+                            save_graphs=False)
+        if args.device_num > 1:
+            print("distribute")
+            init("nccl")
+            context.reset_auto_parallel_context()
+            rank_id = get_rank()
+            context.set_auto_parallel_context(device_num=args.device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+    elif args.device_target == 'Ascend':
+        # if distribute:
+        if args.device_num > 1:
+            init()
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              device_num=args.device_num, gradients_mean=True)
+        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False, device_id=device_id)
+    else:
+        raise ValueError('Unsupported device target.')
+
     train_dataset = DIV2K(args, name=args.data_train, train=True, benchmark=False)
     train_dataset.set_scale(args.task_id)
-    train_de_dataset = ds.GeneratorDataset(train_dataset, ["LR", "HR"], num_shards=device_num,
+    train_de_dataset = ds.GeneratorDataset(train_dataset, ["LR", "HR"], num_shards=args.device_num,
                                            shard_id=rank_id, shuffle=True)
     train_de_dataset = train_de_dataset.batch(args.batch_size, drop_remainder=True)
     net_m = RDN(args)
-    print("Init RDN net successfully")
+    print(f"Init RDN net successfully,I'm rank [{rank_id}]")
     if args.ckpt_path:
         param_dict = load_checkpoint(args.ckpt_path)
         load_param_into_net(net_m, param_dict)
@@ -71,7 +87,7 @@ def train_net():
                                  keep_checkpoint_max=args.ckpt_save_max)
     ckpt_cb = ModelCheckpoint(prefix="rdn", directory=args.ckpt_save_path, config=config_ck)
 
-    if device_id == start_id:
+    if rank_id == start_id:
         cb += [ckpt_cb]
     model.train(args.epochs, train_de_dataset, callbacks=cb, dataset_sink_mode=True)
 

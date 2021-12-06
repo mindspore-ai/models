@@ -82,6 +82,9 @@ parser.add_argument('--ckpt_path', type=str, default='',
                     help='path of saved ckpt')
 # alltask
 parser.add_argument('--task_id', type=int, default=0)
+parser.add_argument('--device_target', type=str, default='Ascend', choices=("GPU", "Ascend"),
+                    help="Device target, support GPU.")
+parser.add_argument('--device_num', type=int, default=1, help='Device num.')
 # rgb_mean
 parser.add_argument('--r_mean', type=float, default=0.4488,
                     help='r_mean')

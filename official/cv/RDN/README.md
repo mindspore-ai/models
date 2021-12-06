@@ -83,8 +83,9 @@ DIV2K
 
 # 环境要求
 
-- 硬件（Ascend）
-    - 准备Ascend处理器搭建硬件环境。
+- 硬件
+    - Ascend: 准备Ascend处理器搭建硬件环境。
+    - GPU: 准备GPU处理器搭建硬件环境。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
@@ -205,15 +206,37 @@ sh scripts/run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR] [DEVICE_N
 
 - 分布式训练需要提前创建JSON格式的HCCL配置文件。具体操作，参见：<https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools>
 
+#### GPU处理器环境运行RDN
+
+- 单设备训练（1p)
+- 二倍超分task_id 0
+- 三倍超分task_id 1
+- 四倍超分task_id 2
+- 需要指定训练集路径(TRAIN_DATA_DIR)
+
+```bash
+bash scripts/run_gpu_standalone.sh [TRAIN_DATA_DIR]
+```
+
+- 分布式训练
+- 二倍超分task_id 0
+- 三倍超分task_id 1
+- 四倍超分task_id 2
+- 需要指定训练集路径(TRAIN_DATA_DIR)和芯片数量(DEVICE_NUM)
+
+```bash
+bash scripts/run_gpu_distribute.sh [TRAIN_DATA_DIR] [DEVICE_NUM]
+```
+
 ## 评估过程
 
 ### 评估
 
 - 评估过程如下，需要指定数据集类型(DATASET_TYPE)为“Set5”。
-- 需要指定测试集路径(TEST_DATA_DIR)、ckpt文件路径(CHECKPOINT_PATH)和芯片序号(DEVICE_ID)
+- 需要指定测试集路径(TEST_DATA_DIR)、ckpt文件路径(CHECKPOINT_PATH)和推理设备
 
 ```bash
-sh scripts/eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE] [DEVICE_ID]
+bash scripts/eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE] [DEVICE_TARGET]
 ```
 
 - 上述python命令在后台运行，可通过`eval.log`文件查看结果。
@@ -255,33 +278,33 @@ sh scripts/eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE] [DEVICE_ID]
 
 ### 训练性能
 
-| 参数           | RDN(Ascend)                                  |
-| -------------------------- | ---------------------------------------------- |
-| 模型版本                | RDN                                         |
-| 资源                   | Ascend 910；                    |
-| 上传日期              | 2021-09-15                                           |
-| MindSpore版本        | 1.2.0                                       |
-| 数据集                |DIV2K                                   |
-| 训练参数  |epoch=1800, batch_size = 16, lr=0.00005  |
-| 优化器                  | Adam                                                        |
-| 损失函数 | L1loss |
-| 输出              | 超分辨率图片                                                |
-| 速度 | 1卡：146毫秒/步 |
-| 总时长 | 1卡：60小时 |
-| 调优检查点 |    0.25 GB（.ckpt 文件）               |
+| 参数           | RDN(Ascend)                |  RDN(GPU)                  |
+| -------------------------- | --------------| ------------------- |
+| 模型版本                | RDN               | RDN                  |
+| 资源                   | Ascend 910；      | GeForce RTX 3090      |
+| 上传日期              | 2021-09-15         | 2021-11-30            |
+| MindSpore版本        | 1.2.0             |  1.5.0            |
+| 数据集                |DIV2K             | DIV2K                  |
+| 训练参数  |epoch=1800, batch_size = 16, lr=0.00005  | epoch=300,batch_size=16,lr=0.00005 |
+| 优化器                  | Adam           | Adam                     |
+| 损失函数 | L1loss |              L1Loss                         |
+| 输出              | 超分辨率图片          |超分变率图像               |
+| 速度 | 1卡：146毫秒/步 |          1卡:351毫秒/步 ;8卡:约445毫秒/步    |
+| 总时长 | 1卡：60小时 |            1卡:约52小时 ;8卡:约4.8小时 |
+| 调优检查点 |    0.25 GB（.ckpt 文件）    |  0.25 GB（.ckpt 文件）|
 
 ### 评估性能
 
-| 参数  | RDN(Ascend)                         |
-| ------------------- | --------------------------- |
-| 模型版本      | RDN                       |
-| 资源        | Ascend 910                  |
-| 上传日期              | 2021-09-15                    |
-| MindSpore版本   | 1.2.0                 |
-| 数据集 | Set5 |
-| batch_size          |   1                        |
-| 输出 | 超分辨率图片 |
-| 准确率 | 单卡：Set5: psnr:38.2302/ssim:0.9612 |
+| 参数  | RDN(Ascend)    | RDN（GPU）                     |
+| ------| --------------|---------------------------- |
+| 模型版本      | RDN     |RDN                  |
+| 资源        | Ascend 910   |  GeForce RTX 3090             |
+| 上传日期              | 2021-09-15 | 2021-11-30                   |
+| MindSpore版本   | 1.2.0       |1.5.0                  |
+| 数据集 | Set5 |Set5|
+| batch_size          |   1     |1                   |
+| 输出 | 超分辨率图片 |超分辨率图片 |
+| 准确率 | 单卡：Set5: psnr:38.2302/ssim:0.9612 |8卡：Set5: psnr:38.0654/ssim:0.9610  |
 
 ### 推理性能
 
