@@ -14,6 +14,7 @@
 # ============================================================================
 """export checkpoint file into AIR MINDIR ONNX models"""
 import argparse
+import ast
 import numpy as np
 
 import mindspore as ms
@@ -33,7 +34,13 @@ if __name__ == '__main__':
     parser.add_argument("--device_target", type=str, default="Ascend",
                         choices=["Ascend", "GPU", "CPU"],
                         help="device where the code will be implemented (default: Ascend)")
+    parser.add_argument('--overwrite_config', type=ast.literal_eval, default=False,
+                        help='whether to overwrite the config according to the arguments')
+    parser.add_argument('--num_classes', type=int, default=1000, help='number of classes')
+
     args = parser.parse_args()
+    if args.overwrite_config:
+        cfg.num_classes = args.num_classes
 
     context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
     if args.device_target == "Ascend" or args.device_target == "GPU":

@@ -17,5 +17,8 @@
 "models/official/cv/resnet/infer/se_ResNet50/mxbase/main.cpp"    "runtime/references"
 "models/official/cv/resnet/infer/se_ResNet50/mxbase/se_ResNet50.h"    "runtime/references"
 
+"models/official/cv/nasnet/infer/mxbase/NASNet_A_MobileClassifyOpencv.h"  "runtime/references"
+"models/official/cv/nasnet/infer/mxbase/main_opencv.cpp"    "runtime/references"
+
 "models/official/cv/shufflenetv2/infer/mxbase/ShuffleNetV2ClassifyOpencv.h"  "runtime/references"
 "models/official/cv/shufflenetv2/infer/mxbase/main_opencv.cpp"    "runtime/references"
