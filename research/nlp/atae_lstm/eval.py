@@ -37,6 +37,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='ATAE_LSTM eval entry point.')
     parser.add_argument("--config", type=str, required=True, help="configuration address.")
     parser.add_argument("--data_url", type=str, required=True, help="input dataset.")
+    parser.add_argument("--eval_ckpt", type=str, required=True, help="ckpt to eval")
     parser.add_argument("--is_modelarts", type=bool, default=False, help="is modelarts platform")
 
     args, _ = parser.parse_known_args()
@@ -44,7 +45,8 @@ if __name__ == '__main__':
     config = get_config(args.config)
 
     context.set_context(mode=context.GRAPH_MODE,
-                        device_target="Ascend")
+                        device_target="Ascend",
+                        device_id=0)
 
     data_menu = args.data_url
 
@@ -55,7 +57,7 @@ if __name__ == '__main__':
 
     eval_dataset = data_menu + 'test.mindrecord'
     word_path = data_menu + 'weight.npz'
-    ckpt_path = data_menu + 'atae-lstm_max.ckpt'
+    ckpt_path = args.eval_ckpt
 
     dataset = load_dataset(input_files=eval_dataset,
                            batch_size=config.batch_size)

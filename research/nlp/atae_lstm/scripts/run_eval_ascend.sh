@@ -16,14 +16,16 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_eval_ascend.sh DATA_DIR"
+echo "sh run_eval_ascend.sh [DATA_DIR] [CKPT_FILE]"
 echo "for example:"
 echo "sh run_eval_ascend.sh \
-  /home/workspace/atae_lstm/data/"
+  /home/workspace/atae_lstm/data/ \
+  /home/workspace/atae_lstm/train/atae-lstm_max.ckpt"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 
 DATA_DIR=$1
+CKPT_FILE=$2
 
 current_exec_path=$(pwd)
 echo ${current_exec_path}
@@ -38,4 +40,5 @@ mkdir ./eval
 
 python eval.py \
     --config=${current_exec_path}/src/model_utils/config.json \
+    --eval_ckpt=$CKPT_FILE \
     --data_url=$DATA_DIR > ./eval/infer_log.log 2>&1 &

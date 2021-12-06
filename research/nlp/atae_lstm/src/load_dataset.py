@@ -40,9 +40,6 @@ def load_dataset(input_files, batch_size, sink_mode=False,
     if not isinstance(sink_mode, bool):
         raise ValueError("`sink` must be type of bool.")
 
-    for datafile in input_files:
-        print(" | Loading", datafile, ".")
-
     data_set = ds.MindDataset(
         input_files, columns_list=["content", "sen_len", "aspect", "solution"],
         shuffle=False, num_shards=rank_size, shard_id=rank_id,

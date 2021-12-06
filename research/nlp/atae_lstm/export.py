@@ -21,11 +21,17 @@ from mindspore import Tensor, context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.common import dtype as mstype
 from mindspore.train.serialization import export
+from mindspore import set_seed
 
-from src.config import config
+from src.config import Config
 from src.model import AttentionLstm
 
 parser = argparse.ArgumentParser(description="ATAE_LSTM export")
+parser.add_argument("--word_path", type=str, required=True, help="word vector path")
+parser.add_argument("--config",
+                    type=str,
+                    default="src/model_utils/config.json",
+                    help="configuration address.")
 parser.add_argument("--existed_ckpt",
                     type=str,
                     default="train/atae-lstm_max.ckpt",
@@ -45,13 +51,22 @@ context.set_context(
     mode=context.GRAPH_MODE,
     save_graphs=False,
     device_target="Ascend",
-    device_id=6
+    device_id=0
 )
 
+def get_config(config_json):
+    """get atae_lstm configuration"""
+    cfg = Config.from_json_file(config_json)
+    return cfg
+
 if __name__ == "__main__":
+    config = get_config(args.config)
+
     existed_ckpt = args.existed_ckpt
 
-    r = np.load(config.word_vector)
+    word_path = args.word_path
+    set_seed(config.rseed)
+    r = np.load(word_path)
     word_vector = r['weight']
     weight = Tensor(word_vector, mstype.float32)
 
@@ -66,3 +81,4 @@ if __name__ == "__main__":
     aspect = Tensor(np.array([1]).astype(np.int32))
 
     export(network, x, x_len, aspect, file_name=args.file_name, file_format=args.file_format)
+    
