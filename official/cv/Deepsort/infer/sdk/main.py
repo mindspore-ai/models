@@ -12,10 +12,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+
 import os
 import argparse
 import cv2
 import numpy as np
+
+import MxpiDataType_pb2 as MxpiDataType
+
+from StreamManagerApi import StreamManagerApi, InProtobufVector, \
+    MxProtobufIn, StringVector
+
+def send_source_data(appsrc_id, tensor, stream_name, stream_manager):
+    """
+    Construct the input of the stream,
+    send inputs data to a specified stream based on streamName.
+
+    Returns:
+        bool: send data success or not
+    """
+    tensor_package_list = MxpiDataType.MxpiTensorPackageList()
+    tensor_package = tensor_package_list.tensorPackageVec.add()
+    array_bytes = tensor.tobytes()
+    tensor_vec = tensor_package.tensorVec.add()
+    tensor_vec.deviceId = 0
+    tensor_vec.memType = 0
+    for i in tensor.shape:
+        tensor_vec.tensorShape.append(i)
+    tensor_vec.dataStr = array_bytes
+    tensor_vec.tensorDataSize = len(array_bytes)
+    key = "appsrc{}".format(appsrc_id).encode('utf-8')
+    protobuf_vec = InProtobufVector()
+    protobuf = MxProtobufIn()
+    protobuf.key = key
+    protobuf.type = b'MxTools.MxpiTensorPackageList'
+    protobuf.protobuf = tensor_package_list.SerializeToString()
+    protobuf_vec.push_back(protobuf)
+
+    ret = stream_manager.SendProtobuf(stream_name, appsrc_id, protobuf_vec)
+    if ret < 0:
+        print("Failed to send data to stream.")
+        return False
+    return True
 
 
 def extract_image_patch(image, bbox, patch_shape=None):
@@ -96,7 +134,6 @@ def preprocess(im_crops):
     im_batch = np.array(im_batch)
     return im_batch
 
-
 def get_features(bbox_xywh, ori_img):
     im_crops = []
     for box in bbox_xywh:
@@ -112,7 +149,7 @@ def get_features(bbox_xywh, ori_img):
         features = np.array([])
     return features
 
-def generate_detections(mot_dir, img_path, det_path=None):
+def generate_detections(mot_dir, img_path, stream_manager_api, stream_name, det_path=None):
     """Generate detections with features.
 
     Parameters
@@ -132,8 +169,9 @@ def generate_detections(mot_dir, img_path, det_path=None):
 
     """
 
-    count = 0
     for sequence in sorted(os.listdir(mot_dir)):
+        results = []
+        #dets = []
         print("Processing %s" % sequence)
         sequence_dir = os.path.join(mot_dir, sequence)
 
@@ -165,25 +203,71 @@ def generate_detections(mot_dir, img_path, det_path=None):
             features = get_features(rows[:, 2:6].copy(), bgr_image)
 
             for data in features:
-                file_name = "DeepSort_data_bs" + str(1) + "_" + str(count) + ".bin"
-                file_path = img_path + "/" + file_name
-                data.tofile(file_path)
-                count += 1
+                uniqueId = send_source_data(0, data, stream_name, stream_manager_api)
+                if uniqueId < 0:
+                    print("Failed to send data to stream.")
+                    return
+                key_vec = StringVector()
+                key_vec.push_back(b'mxpi_tensorinfer0')
+                infer_result = stream_manager_api.GetProtobuf(stream_name, 0, key_vec)
+                if infer_result.size() == 0:
+                    print("inferResult is null")
+                    return
+                if infer_result[0].errorCode != 0:
+                    print("GetProtobuf error. errorCode=%d" % (infer_result[0].errorCode))
+                    return
+                result = MxpiDataType.MxpiTensorPackageList()
+                result.ParseFromString(infer_result[0].messageBuf)
+                res = np.frombuffer(result.tensorPackageVec[0].tensorVec[0].dataStr, dtype='<f4')
+                results.append(res)
 
-def parse_args():
+        detection = []
+        detection += [np.r_[(row, feature)] for row, feature in zip(detections_in, results)]
+        output_filename = os.path.join(img_path, "%s.npy" % os.path.splitext(os.path.basename(sequence))[0])
+        np.save(output_filename, np.asarray(detection), allow_pickle=False)
+
+
+def inference():
     """
-    Parse command line arguments.
+    read pipeline and do infer
     """
-    parser = argparse.ArgumentParser(description="Ascend 310 feature extractor")
-    parser.add_argument('--data_path', type=str, default='', help='MOT directory.')
-    parser.add_argument('--det_path', type=str, default='', help='Det directory.')
-    parser.add_argument('--result_path', type=str, default='', help='Inference output directory.')
-
-    return parser.parse_args()
-
-if __name__ == "__main__":
     args = parse_args()
 
-    image_path = os.path.join(args.result_path, "00_data")
-    os.mkdir(image_path)
-    generate_detections(args.data_path, image_path, args.det_path)
+    # init stream manager
+    stream_manager_api = StreamManagerApi()
+    ret = stream_manager_api.InitManager()
+    if ret != 0:
+        print("Failed to init Stream manager, ret=%s" % str(ret))
+        return
+
+    # create streams by pipeline config file
+    with open(os.path.realpath(args.pipeline), 'rb') as f:
+        pipeline_str = f.read()
+    ret = stream_manager_api.CreateMultipleStreams(pipeline_str)
+    if ret != 0:
+        print("Failed to create Stream, ret=%s" % str(ret))
+        return
+
+    stream_name = b'im_deepsort'
+    if not os.path.exists(args.output_path):
+        os.makedirs(args.output_path)
+
+    generate_detections(args.image_path, args.output_path, stream_manager_api, stream_name, args.det_path)
+    # destroy streams
+    stream_manager_api.DestroyAllStreams()
+
+def parse_args():
+    """set and check parameters."""
+    parser = argparse.ArgumentParser(description="FastSCNN process")
+    parser.add_argument("--pipeline", type=str, default="./deepsort.pipeline", help="SDK infer pipeline")
+    parser.add_argument("--image_path", type=str, default=None, help="root path of image")
+    parser.add_argument("--det_path", type=str, default=None, help="root path of label")
+    parser.add_argument('--image_width', default=64, type=int, help='resized image width')
+    parser.add_argument('--image_height', default=128, type=int, help='resized image height')
+    parser.add_argument('--save_mask', default=1, type=int, help='0 for False, 1 for True')
+    parser.add_argument('--output_path', default='./outputs', type=str, help='')
+    args_opt = parser.parse_args()
+    return args_opt
+
+if __name__ == '__main__':
+    inference()
