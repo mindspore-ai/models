@@ -33,6 +33,8 @@
 "models/research/cv/squeezenet1_1/infer/mxbase/Squeezenet1_1ClassifyOpencv.cpp"  "runtime/references"
 "models/official/cv/vgg16/infer/mxbase/src/Vgg16Classify.h"  "runtime/references"
 "models/official/cv/resnext/infer/mxbase/src/resnext50Classify.h" "runtime/references"
+"models/official/cv/cnn_direction_model/infer/mxbase/src/Cnndirection.h" "runtime/references"
+"models/official/cv/cnn_direction_model/infer/mxbase/src/main.cpp" "runtime/references"
 
 "models/research/cv/SE-Net/infer/mxbase/src/Senet_resnet50_opencv.h"                 "runtime/references"
 "models/research/cv/SE-Net/infer/mxbase/src/main.cpp"                                "runtime/references"
