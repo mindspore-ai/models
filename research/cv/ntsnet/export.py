@@ -26,10 +26,10 @@ from src.network import NTS_NET
 parser = argparse.ArgumentParser(description='ntsnet export')
 parser.add_argument("--run_modelart", type=ast.literal_eval, default=False, help="Run on modelArt, default is false.")
 parser.add_argument("--device_id", type=int, default=0, help="Device id")
-parser.add_argument("--batch_size", type=int, default=8, help="batch size")
+parser.add_argument("--batch_size", type=int, default=1, help="batch size")
 parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file name.")
-parser.add_argument('--data_url', default=None, help='Directory contains CUB_200_2011 dataset.')
 parser.add_argument('--train_url', default=None, help='Directory contains checkpoint file')
+parser.add_argument('--data_url', default=None, help='Directory contains CUB_200_2011 dataset.')
 parser.add_argument("--file_name", type=str, default="ntsnet", help="output file name.")
 parser.add_argument("--file_format", type=str, default="MINDIR", help="file format")
 parser.add_argument('--device_target', type=str, default="Ascend",
@@ -48,7 +48,7 @@ if args.run_modelart:
                            dst_url=os.path.join(local_output_url, args.ckpt_file))
 
 if __name__ == '__main__':
-    net = NTS_NET(topK=6)
+    net = NTS_NET(topK=6, flag910=False)
     if args.run_modelart:
         param_dict = load_checkpoint(os.path.join(local_output_url, args.ckpt_file))
     else:
