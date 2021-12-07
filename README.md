@@ -141,7 +141,13 @@ For more information about `MindSpore` framework, please refer to [FAQ](https://
 
 - **Q: How to resolve the lack of memory while using the model directly under "models" with errors such as *Failed to alloc memory pool memory*?**
 
-  **A**: The typical reason for insufficient memory when directly using models under "models" is due to differences in operating mode (`PYNATIVE_MODE`), operating environment configuration, and license control (AI-TOKEN). `PYNATIVE_MODE` usually uses more memory than `GRAPH_MODE` , especially in the training graph that needs back propagation calculation, you can try to use some smaller batch size; the operating environment will also cause similar problems due to the different configurations of NPU cores, memory, etc.; different gears of License control (AI-TOKEN ) will cause different memory overhead during execution. You can also try to use some smaller batch sizes.
+  **A**: The typical reason for insufficient memory when directly using models under "models" is due to differences in operating mode (`PYNATIVE_MODE`), operating environment configuration, and license control (AI-TOKEN).
+    - `PYNATIVE_MODE` usually uses more memory than `GRAPH_MODE` , especially in the training graph that needs back propagation calculation, there are two ways to try to solve this problem.
+        Method 1: You can try to use some smaller batch size;
+        Method 2: Add context.set_context(mempool_block_size="XXGB"), where the current maximum effective value of "XX" can be set to "31".
+        If method 1 and method 2 are used in combination, the effect will be better.
+    - The operating environment will also cause similar problems due to the different configurations of NPU cores, memory, etc.;
+    - Different gears of License control (AI-TOKEN ) will cause different memory overhead during execution. You can also try to use some smaller batch sizes.
 
 - **Q: How to resolve the error about the interface are not supported in some network operations, such as `cann not import`?**
 
