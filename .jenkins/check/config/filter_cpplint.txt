@@ -51,6 +51,9 @@
 
 "models/research/cv/ibnnet/infer/mxbase/src/IbnnetOpencv.h" "runtime/references"
 
+"models/official/cv/nasnet/infer/mxbase/NASNet_A_MobileClassifyOpencv.h"  "runtime/references"
+"models/official/cv/nasnet/infer/mxbase/main_opencv.cpp"    "runtime/references"
+
 "models/official/cv/shufflenetv2/infer/mxbase/ShuffleNetV2ClassifyOpencv.h"  "runtime/references"
 "models/official/cv/shufflenetv2/infer/mxbase/main_opencv.cpp"    "runtime/references"
 
