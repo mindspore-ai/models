@@ -61,5 +61,5 @@ cp -r ../src ./train$3
 cd ./train$3 || exit
 echo "start training for device $DEVICE_ID"
 env > env.log
-python train.py --device_id=$DEVICE_ID --data_url=$PATH1 --train_url=$PATH2 --device_target="GPU"&> log &
+python train_gpu.py --device_id=$DEVICE_ID --data_url=$PATH1 --train_url=$PATH2 --device_target="GPU"&> log &
 cd ..
