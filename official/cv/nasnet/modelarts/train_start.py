@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ import argparse
 import ast
 import os
 import time
+from collections import OrderedDict
+import numpy as np
 
 from mindspore import Tensor
 from mindspore import context
@@ -28,11 +30,60 @@ from mindspore.train.model import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.common import set_seed
 from mindspore.common import dtype as mstype
+from mindspore import export
 
 from src.config import nasnet_a_mobile_config_gpu, nasnet_a_mobile_config_ascend
 from src.dataset import create_dataset
-from src.nasnet_a_mobile import NASNetAMobileWithLoss
+from src.nasnet_a_mobile import NASNetAMobileWithLoss, NASNetAMobile
 from src.lr_generator import get_lr
+
+def export_models(checkpoint_path):
+    net = NASNetAMobile(num_classes=config.num_classes, is_training=False)
+
+    file_list = []
+    for root, _, files in os.walk(checkpoint_path):
+        for file in files:
+            if os.path.splitext(file)[1] == '.ckpt':
+                file_list.append(os.path.join(root, file))
+
+    file_list.sort(key=os.path.getmtime, reverse=True)
+    exported_count = 0
+
+    for checkpoint in file_list:
+        ckpt_dict = load_checkpoint(checkpoint)
+
+        parameter_dict = OrderedDict()
+        for name in ckpt_dict:
+            new_name = name
+            if new_name.startswith("network."):
+                new_name = new_name.replace("network.", "")
+            parameter_dict[new_name] = ckpt_dict[name]
+        load_param_into_net(net, parameter_dict)
+
+        output_file = checkpoint.replace('.ckpt', '')
+        input_data = Tensor(np.zeros([1, 3, 224, 224]), mstype.float32)
+
+        if args_opt.export_mindir_model:
+            export(net, input_data, file_name=output_file, file_format="MINDIR")
+        if args_opt.export_air_model and context.get_context("device_target") == "Ascend":
+            export(net, input_data, file_name=output_file, file_format="AIR")
+        if args_opt.export_onnx_model:
+            export(net, input_data, file_name=output_file, file_format="ONNX")
+
+        print(checkpoint, 'is exported')
+
+        exported_count += 1
+        if exported_count >= args_opt.export_checkpoint_count:
+            print('exported checkpoint count =', exported_count)
+            break
+
+def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
+    for key in list(origin_dict.keys()):
+        for name in param_filter:
+            if name in key:
+                print("Delete parameter from checkpoint: ", key)
+                del origin_dict[key]
+                break
 
 if __name__ == '__main__':
     start_time = time.time()
@@ -41,6 +92,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset_path', type=str, default='../imagenet', help='Dataset path')
     parser.add_argument('--resume', type=str, default='',
                         help='resume training with existed checkpoint')
+    parser.add_argument('--resume_epoch', type=int, default=1, help='Resume from which epoch')
     parser.add_argument('--is_distributed', type=ast.literal_eval, default=False,
                         help='distributed training')
     parser.add_argument('--platform', type=str, default='Ascend', choices=('Ascend', 'GPU'),
@@ -55,8 +107,22 @@ if __name__ == '__main__':
     parser.add_argument('--use_pynative_mode', type=ast.literal_eval, default=False,
                         help='whether to use pynative mode for device(Default: False)')
 
-    parser.add_argument('--use_nn_default_loss', type=ast.literal_eval, default=True,
-                        help='whether to use nn.SoftmaxCrossEntropyWithLogits(Default: True)')
+    parser.add_argument('--amp_level', type=str, default='O0', help='level for mixed precision training')
+
+    parser.add_argument('--remove_classifier_parameter', type=ast.literal_eval, default=False,
+                        help='whether to filter the classifier parameter in the checkpoint (Default: False)')
+
+    parser.add_argument('--export_mindir_model', type=ast.literal_eval, default=True,
+                        help='whether to export MINDIR model (Default: True)')
+
+    parser.add_argument('--export_air_model', type=ast.literal_eval, default=True,
+                        help='whether to export AIR model on Ascend 910 (Default: True)')
+
+    parser.add_argument('--export_onnx_model', type=ast.literal_eval, default=False,
+                        help='whether to export ONNX model (Default: False)')
+
+    parser.add_argument('--export_checkpoint_count', type=int, default=1,
+                        help='export how many checkpoints reversed from the last epoch (Default: 1)')
 
     parser.add_argument('--overwrite_config', type=ast.literal_eval, default=False,
                         help='whether to overwrite the config according to the arguments')
@@ -66,6 +132,8 @@ if __name__ == '__main__':
     parser.add_argument('--num_classes', type=int, default=1000, help='number of classes')
     parser.add_argument('--cutout', type=ast.literal_eval, default=False,
                         help='whether to cutout the data for trainning(Default: False)')
+    parser.add_argument('--train_batch_size', type=int, default=32, help='batch size for training')
+    parser.add_argument('--lr_init', type=float, default=0.32, help='learning rate for training')
 
     args_opt = parser.parse_args()
 
@@ -82,8 +150,12 @@ if __name__ == '__main__':
         config.epoch_size = args_opt.epoch_size
         config.num_classes = args_opt.num_classes
         config.cutout = args_opt.cutout
+        config.train_batch_size = args_opt.train_batch_size
+        config.lr_init = args_opt.lr_init
 
     print('epoch_size = ', config.epoch_size, ' num_classes = ', config.num_classes)
+    print('train_batch_size = ', config.train_batch_size, ' lr_init = ', config.lr_init)
+    print('cutout = ', config.cutout, ' cutout_length =', config.cutout_length)
 
     set_seed(config.random_seed)
 
@@ -161,6 +233,16 @@ if __name__ == '__main__':
     net_with_loss = NASNetAMobileWithLoss(config)
     if resume != '':
         ckpt = load_checkpoint(resume)
+
+        print('remove_classifier_parameter = ', args_opt.remove_classifier_parameter)
+
+        if args_opt.remove_classifier_parameter:
+            filter_list = [x.name for x in net_with_loss.network.classifier.get_parameters()]
+            filter_checkpoint_parameter_by_list(ckpt, filter_list)
+
+            filter_list = [x.name for x in net_with_loss.network.aux_logits.fc.get_parameters()]
+            filter_checkpoint_parameter_by_list(ckpt, filter_list)
+
         load_param_into_net(net_with_loss, ckpt)
         print(resume, ' is loaded')
 
@@ -169,17 +251,12 @@ if __name__ == '__main__':
                 num_epoch_per_decay=config.num_epoch_per_decay, total_epochs=config.epoch_size,
                 steps_per_epoch=batches_per_epoch, is_stair=True)
     if resume:
-        name_dir = os.path.basename(resume)
-        name, ext = name_dir.split(".")
-        split_result = name.split("_")
-        split_2 = split_result[-2].split("-")
-        resume_epoch = int(split_2[-1])
-        step_num_in_epoch = int(split_result[-1])
-        assert step_num_in_epoch == train_dataset.get_dataset_size()\
-        , "This script only supports resuming at the end of epoch"
+        resume_epoch = args_opt.resume_epoch
+        step_num_in_epoch = train_dataset.get_dataset_size()
         lr = lr[step_num_in_epoch * resume_epoch:]
         # adjust the epoch_size in config so that the source code for model.train will be simplified.
         config.epoch_size = config.epoch_size - resume_epoch
+        print('Effective epoch_size = ', config.epoch_size)
     lr = Tensor(lr, mstype.float32)
 
     # optimizer
@@ -198,7 +275,10 @@ if __name__ == '__main__':
 
     # high performance
     net_with_loss.set_train()
-    model = Model(net_with_loss, optimizer=optimizer)
+
+    print('amp_level = ', args_opt.amp_level)
+
+    model = Model(net_with_loss, optimizer=optimizer, amp_level=args_opt.amp_level)
 
     print("============== Starting Training ==============")
     loss_cb = LossMonitor(per_print_times=batches_per_epoch)
@@ -222,6 +302,8 @@ if __name__ == '__main__':
         print("!!!!!!!!!!!!!! Train Failed !!!!!!!!!!!!!!!!!!!")
     else:
         print("============== Train Success ==================")
+
+    export_models(save_checkpoint_path)
 
     print("data_url   = ", args_opt.data_url)
     print("cutout = ", config.cutout, " cutout_length = ", config.cutout_length)
