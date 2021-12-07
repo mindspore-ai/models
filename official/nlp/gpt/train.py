@@ -27,10 +27,12 @@ from mindspore.context import ParallelMode
 import mindspore.nn as nn
 from mindspore.train.callback import TimeMonitor, LossMonitor, ModelCheckpoint, CheckpointConfig
 from mindspore.nn.wrap.loss_scale import DynamicLossScaleUpdateCell
+from mindspore.nn.transformer.loss import CrossEntropyLoss
+from mindspore.nn.transformer.transformer import TransformerOpParallelConfig
 import mindspore.common.dtype as mstype
 from mindspore.common import set_seed
 from src.dataset import create_dataset
-from src.gpt import GPT, GPTWithLoss, CrossEntropyLoss
+from src.gpt import GPT, GPTWithLoss
 from src.gpt_wrapcell import GPTTrainOneStepWithLossScaleCell
 from src.utils import GPTConfig, LearningRate
 
@@ -49,6 +51,7 @@ def run_train():
     parser.add_argument("--start_lr", type=float, default="5e-5", help="Start learning rate, default is 5e-5.")
     parser.add_argument("--end_lr", type=float, default="1e-10", help="End learning rate, default is 1e-10.")
     parser.add_argument("--sink_size", type=int, default=100, help="Sink size for every iteration, default is 100")
+    parser.add_argument("--model_parallel_num", type=int, default=8, help="Num of model parallel, default is 8")
 
 
     args_opt = parser.parse_args()
@@ -80,7 +83,11 @@ def run_train():
                        compute_dtype=mstype.float16,
                        use_past=False)
     gpt = GPT(config)
-    loss = CrossEntropyLoss(config)
+    model_parallel_num = args_opt.model_parallel_num
+    data_parallel_num = int(device_num / model_parallel_num)
+    parallel_config = TransformerOpParallelConfig(data_parallel=data_parallel_num,
+                                                  model_parallel=model_parallel_num)
+    loss = CrossEntropyLoss(parallel_config.dp_mp_config)
     gpt_with_loss = GPTWithLoss(gpt, loss)
 
     ds = create_dataset(config.batch_size, data_path=args_opt.data_path, device_num=device_num, rank=rank)

@@ -42,7 +42,8 @@ def generate(model, origin_inputs, seq_length, end_token=50256):
     print("input_ids is ", input_ids)
     while valid_length < seq_length:
         inputs = Tensor(input_ids, mstype.int32)
-        logits = model(inputs).asnumpy()
+        inputs_mask = Tensor((input_ids != 0), mstype.float32)
+        logits = model(inputs, inputs_mask).asnumpy()
         logits = logits.reshape(bs, seq_length, -1)
         probs = logits[0, valid_length-1, :]
         p_args = probs.argsort()[::-1][:TOPK]
