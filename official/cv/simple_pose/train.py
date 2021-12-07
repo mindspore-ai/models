@@ -145,12 +145,15 @@ def run_train():
     if rank == 0 or device_num == 1:
         rank_save_flag = True
 
-        # create dataset
+    # create
+    num_parallel_workers = 16
+    if config.run_distribute:
+        num_parallel_workers = 8
     dataset, _ = keypoint_dataset(config,
                                   rank=rank,
                                   group_size=device_num,
                                   train_mode=True,
-                                  num_parallel_workers=8)
+                                  num_parallel_workers=num_parallel_workers)
 
     # network
     net = get_pose_net(config, True, ckpt_path=config.MODEL.PRETRAINED)

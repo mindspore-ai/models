@@ -15,8 +15,10 @@
 # ============================================================================
 
 if [[ $# -lt 3 || $# -gt 6 ]]; then
-    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [image_width] [image_height] [DEVICE_ID]
-    DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [DEVICE_ID](optional)
+    IMAGE_WIDTH, IMAGE_HEIGHT and DEVICE_ID is optional. IMAGE_WIDTH and IMAGE_HEIGHT must be set at the same time
+    or not at the same time. IMAGE_WIDTH default value is 1280, IMAGE_HEIGHT default value is 760, DEVICE_ID can be 
+    set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi
 
@@ -30,12 +32,23 @@ get_real_path(){
 model=$(get_real_path $1)
 data_path=$(get_real_path $2)
 anno_path=$(get_real_path $3)
-image_width=$4
-image_height=$5
-
 device_id=0
-if [ $# == 4 ]; then
+image_width=1280
+image_height=768
+
+if [ $# -eq 4 ]; then
     device_id=$4
+fi
+
+if [ $# -eq 5 ]; then
+    image_width=$4
+    image_height=$5
+fi
+
+if [ $# -eq 6 ]; then
+    image_width=$4
+    image_height=$5
+    device_id=$6
 fi
 
 echo "mindir name: "$model
