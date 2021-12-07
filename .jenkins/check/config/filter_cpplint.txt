@@ -61,3 +61,7 @@
 
 "models/research/cv/fairmot/infer/mxbase/src/Fairmot.h" "runtime/references"
 "models/research/cv/fairmot/infer/mxbase/src/PostProcess/FairmotMindsporePost.h" "runtime/references"
+
+"models/official/cv/tinydarknet/infer/mxbase/TinydarknetClassify.h" "runtime/references"
+"models/official/cv/tinydarknet/infer/mxbase/TinydarknetClassify.cpp" "runtime/references"
+"models/official/cv/tinydarknet/infer/mxbase/main.cpp" "runtime/references"
