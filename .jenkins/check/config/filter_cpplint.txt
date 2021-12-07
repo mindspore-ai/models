@@ -22,3 +22,5 @@
 
 "models/official/cv/shufflenetv2/infer/mxbase/ShuffleNetV2ClassifyOpencv.h"  "runtime/references"
 "models/official/cv/shufflenetv2/infer/mxbase/main_opencv.cpp"    "runtime/references"
+
+"models/official/cv/lenet_quant/infer/mxbase/src/Lenet_quant.h"    "runtime/references"
