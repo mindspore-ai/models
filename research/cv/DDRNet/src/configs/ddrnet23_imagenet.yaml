@@ -1,0 +1,55 @@
+# Architecture Top1-75.9%
+arch: DDRNet23
+
+# ===== Dataset ===== #
+data_url: ./data/imagenet
+set: ImageNet
+num_classes: 1000
+mix_up: 0.8
+cutmix: 1.0
+color_jitter: 0.4
+auto_augment: rand-m9-mstd0.5-inc1
+interpolation: bicubic
+re_prob: 0.25
+re_mode: pixel
+re_count: 1
+mixup_prob: 1.
+switch_prob: 0.5
+mixup_mode: batch
+mixup_off_epoch: 0. # use mixup during training
+image_size: 224
+crop_pct: 0.875
+
+
+# ===== Learning Rate Policy ======== #
+optimizer: momentum
+use_nesterov: True
+base_lr: 0.1
+warmup_lr: 0.000001
+min_lr: 0.00001
+lr_scheduler: cosine_lr
+warmup_length: 10
+lr_adjust: 30 # for multistep lr
+
+
+# ===== Network training config ===== #
+amp_level: O2
+keep_bn_fp32: True
+beta: [ 0.9, 0.999 ]
+clip_global_norm_value: 5.
+clip_global_norm: True
+is_dynamic_loss_scale: True
+epochs: 300
+label_smoothing: 0.1
+loss_scale: 1024
+weight_decay: 0.0001
+decay: 0.9 # for rmsprop
+momentum: 0.9
+batch_size: 128
+
+# ===== Hardware setup ===== #
+num_parallel_workers: 16
+device_target: Ascend
+
+# ===== Model config ===== #
+drop_path_rate: 0.1
