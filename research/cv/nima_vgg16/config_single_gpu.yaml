@@ -1,0 +1,52 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+distribute: "false"
+# Path for local or modelarts
+data_path: "/PATH/TO/AVA_dataset/images/"
+label_path: "/PATH/TO/AVA_dataset/AVA.txt"
+output_path: "s3://~output/"
+
+# ==============================================================================
+# options
+device_target: "GPU"
+dataset_name: "AVA_Dataset"
+batch_size: 32
+epoch_size: 50
+num_parallel_workers: 8
+learning_rate: 0.000125
+momentum: 0.95
+weight_decay: 0.001
+bf_crop_size: 256
+image_size: 224
+pad_mode: "pad"
+padding: 1
+batch_norm: True
+has_bias: False
+initialize_mode: "KaimingNormal"
+has_dropout: True
+train_label_path: "/PATH/TO/AVA_dataset/AVA_train.txt"
+val_label_path: "/PATH/TO/AVA_dataset/AVA_test.txt"
+keep_checkpoint_max: 10
+checkpoint_path: "/PATH/TO/vgg16_bn_ascend_v130_imagenet2012_official_cv_bs64_top1acc74.33__top5acc92.1.ckpt"
+ckpt_filename: "NIMA"
+ckpt_save_dir: "./model/"
+device_id: 0
+
+# eval or export option
+val_data_path: "/PATH/TO/AVA_dataset/images/"
+ckpt_file: "PATH/TO/CKPT"
+file_name: "NIMA"
+file_format: "MINDIR"
+file_save: "./model/"
+
+---
+
+# Help description for each configuration
+enable_modelarts: "Whether training on modelarts, default: False"
+is_distributed: "Whether training use multiple cards, default: False"
+data_url: "Url for modelarts"
+train_url: "Url for modelarts"
+output_path: "The location of the output file that uses modelarts."
+data_path: "The location of the input data."
+device_target: 'Target device type'
+enable_profiling: 'Whether enable profiling while training, default: False'
