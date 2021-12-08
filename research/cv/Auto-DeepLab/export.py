@@ -23,7 +23,7 @@ from src.utils.utils import BuildEvalNetwork
 
 context.set_context(mode=context.GRAPH_MODE, save_graphs=False)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     args = obtain_autodeeplab_args()
     args.total_iters = 0
 

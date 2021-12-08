@@ -22,10 +22,12 @@
             - [Ascend](#ascend-1)
     - [Evaluation](#evaluation)
     - [Export](#export)
+    - [Inference](#inference)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Training Accuracy](#training-accuracy)
         - [Distributed Training Performance](#distributed-training-performance)
+        - [Inference Performance on Ascend310](#inference-performance-on-ascend310)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 # [Auto-DeepLab Description](#contents)
@@ -350,6 +352,15 @@ bash scripts/run_eval.sh [DATASET_PATH] [CKPT_FILE] [OUTPUT_PATH]
 python export.py --filter_multiplier=20 --parallel=False --ckpt_name=[CKPT_NAME]
 ```
 
+## [Inference](#contents)
+
+- Inference on Ascend310 device
+
+```bash
+cd /PATH/TO/Auto-DeepLab/scripts
+bash run_infer_310.sh /PATH/TO/MINDIR/Auto-DeepLab-s.mindir /PATH/TO/DATASET/cityscapes/ 0
+```
+
 # [Model Description](#contents)
 
 ## [Performance](#contents)
@@ -375,7 +386,7 @@ be 16 or larger. Simply, we set batch size = 16 and Epoch 1300, 2700, 4000 corre
 | Resource                   | Ascend 910 * 8; CPU 2.60GHz, 192cores; Memory 755G          |
 | uploaded Date              | 11/11/2021 (month/day/year)                                 |
 | MindSpore Version          | 1.3.0                                                       |
-| Dataset                    | Cityscapes                                                  |
+| Dataset                    | Cityscapes (cropped 769*769)                                |
 | Training Parameters        | epoch=(1300, 2700, 4000), batch_size = 16, lr=0.05, bn_momentum=0.995                   |
 | Optimizer                  | Momentum                                                    |
 | Loss Function              | Cross Entropy with Online Hard Example Mining               |
@@ -383,6 +394,16 @@ be 16 or larger. Simply, we set batch size = 16 and Epoch 1300, 2700, 4000 corre
 | Speed                      | 589.757 ms/step (8pcs)                                      |
 | Total time                 | (42, 82, 125) hour (8pcs)                                   |
 | Checkpoint                 | 85.37m (.ckpt file)                                         |
+
+### Inference Performance on Ascend310
+
+| Parameters                 | Auto-DeepLab                         |
+| -------------------------- | ------------------------------------ |
+| Resource                   | Ascend 310 * 1                       |
+| uploaded Date              | 12/6/2021 (month/day/year)          |
+| MindSpore Version          | 1.3.0                                |
+| Dataset                    | Cityscapes (full image 1024*2048)    |
+| Speed                      | 1677.48 ms/img                       |
 
 # [ModelZoo Homepage](#contents)
 
