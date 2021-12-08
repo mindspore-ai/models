@@ -19,7 +19,7 @@ import ast
 import datetime
 from mindspore.context import ParallelMode
 from mindspore import context
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank
 
 def add_basic_parameters(parser):
     """ add basic parameters """
@@ -266,7 +266,7 @@ def get_args(phase):
         assert args.experiment_name != default_experiment_name, "--experiment_name should be assigned in test mode"
     if args.continue_train:
         assert args.experiment_name != default_experiment_name, "--experiment_name should be assigned in continue"
-    if args.device_num > 1 and args.platform != "CPU":
+    if args.device_num > 1 and args.platform == "Ascend":
         context.set_context(mode=context.GRAPH_MODE,
                             device_target=args.platform,
                             save_graphs=args.save_graphs,
@@ -278,6 +278,12 @@ def get_args(phase):
             device_num=args.device_num)
         init()
         args.rank = int(os.environ["DEVICE_ID"])
+    elif args.device_num > 1 and args.platform == "GPU":
+        init()
+        context.reset_auto_parallel_context()
+        args.rank = get_rank()
+        context.set_auto_parallel_context(device_num=args.device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                          gradients_mean=True)
     else:
         context.set_context(mode=context.GRAPH_MODE,
                             device_target=args.platform,

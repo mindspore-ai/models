@@ -48,14 +48,15 @@ class BaseModel(ABC):
                         ), 'Checkpoint path not found at %s' % self.save_dir
                 self.current_iteration = self.args.continue_iter
             else:
-                if not os.path.exists(self.save_dir):
+                if not os.path.exists(self.save_dir) and self.args.rank == 0:
                     mkdirs(self.save_dir)
+
 
         # save config
         self.config_save_path = os.path.join(self.save_dir, 'config')
-        if not os.path.exists(self.config_save_path):
+        if not os.path.exists(self.config_save_path) and self.args.rank == 0:
             mkdirs(self.config_save_path)
-        if self.isTrain:
+        if self.isTrain and self.args.rank == 0:
             with open(os.path.join(self.config_save_path, 'train.conf'),
                       'w') as f:
                 f.write(json.dumps(vars(self.args)))
@@ -67,7 +68,7 @@ class BaseModel(ABC):
         # sample save path
         if self.isTrain:
             self.sample_save_path = os.path.join(self.save_dir, 'sample')
-            if not os.path.exists(self.sample_save_path):
+            if not os.path.exists(self.sample_save_path) and self.args.rank == 0:
                 mkdirs(self.sample_save_path)
 
         # test result save path
@@ -79,7 +80,7 @@ class BaseModel(ABC):
         # train log save path
         if self.isTrain:
             self.train_log_path = os.path.join(self.save_dir, 'logs')
-            if not os.path.exists(self.train_log_path):
+            if not os.path.exists(self.train_log_path) and self.args.rank == 0:
                 mkdirs(self.train_log_path)
 
     @abstractmethod
@@ -109,7 +110,7 @@ class BaseModel(ABC):
     def save_networks(self):
         """ saving networks """
         for name in self.model_names:
-            if isinstance(name, str):
+            if isinstance(name, str) and self.args.rank == 0:
                 save_filename = '%s_%s.ckpt' % (self.current_iteration, name)
                 save_filename_latest = 'latest_%s.ckpt' % name
                 save_path = os.path.join(self.save_dir, 'ckpt')
