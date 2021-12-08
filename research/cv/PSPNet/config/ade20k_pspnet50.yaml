@@ -1,0 +1,53 @@
+DATA:
+  data_root: /home/HEU_535/PSPNet/data/ADE/
+  art_data_root: /cache/data/ADE
+  train_list: /home/HEU_535/PSPNet/data/ADE/training_list.txt
+  art_train_list: /cache/data/ADE/training_list.txt
+  val_list: /home/HEU_535/PSPNet/data/ADE/val_list.txt
+  art_val_list: /cache/data/ADE/val_list.txt
+  classes: 150
+  prefix: ADE
+  save_dir: /home/HEU_535/PSPNet/checkpoints/
+  backbone: resnet50
+  pretrain_path: /home/HEU_535/PSPNet/data/resnet_deepbase.ckpt
+  art_pretrain_path: /cache/data/ADE/resnet_deepbase.ckpt
+  ckpt: /home/HEU_535/PSPNet/checkpoints/8P/ADE-100_316.ckpt
+  obs_save: obs://harbin-engineering-uni/PSPnet/save_checkpoint/ADE/
+
+TRAIN:
+  arch: psp
+  feature_size: 60
+  train_h: 473
+  train_w: 473
+  scale_min: 0.5  # minimum random scale
+  scale_max: 2.0  # maximum random scale
+  rotate_min: -10  # minimum random rotate
+  rotate_max: 10  # maximum random rotate
+  zoom_factor: 8  # zoom factor for final prediction during training, be in [1, 2, 4, 8]
+  ignore_label: 255
+  aux_weight: 0.4
+  data_name: ade
+  batch_size: 8  # batch size for training
+  art_batch_size: 4
+  batch_size_val: 8  # batch size for validation during training
+  base_lr: 0.005
+  art_base_lr: 0.04
+  epochs: 100
+  start_epoch: 0
+  power: 0.9
+  momentum: 0.9
+  weight_decay: 0.0001
+
+
+TEST:
+  test_list: /home/HEU_535/PSPNet/data/ADE/list/validation.txt
+  split: val  # split in [train, val and test]
+  base_size: 512  # based size for scaling
+  test_h: 473
+  test_w: 473
+  scales: [1.0]  # evaluation scales, ms as [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
+  index_start: 0  # evaluation start index in list
+  index_step: 0  # evaluation step index in list, 0 means to end
+  result_path: /home/HEU_535/PSPNet/result/ade/
+  color_txt: /home/HEU_535/PSPNet/config/ade20k/ade20k_colors.txt
+  name_txt: /home/HEU_535/PSPNet/config/ade20k/ade20k_names.txt
