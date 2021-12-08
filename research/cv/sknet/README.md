@@ -1,21 +1,38 @@
 # Contents
 
-- [SK-Net Description](#sK-net-description)
+- [Contents](#contents)
+- [SK-Net Description](#sk-net-description)
+- [Description](#description)
+- [Paper](#paper)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Features](#features)
-    - [Mixed Precision](#mixed-precision)
+- [Mixed Precision](#mixed-precision)
 - [Environment Requirements](#environment-requirements)
 - [Quick Start](#quick-start)
 - [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-    - [Evaluation Process](#evaluation-process)
+- [Script and Sample Code](#script-and-sample-code)
+- [Script Parameters](#script-parameters)
+- [Training Process](#training-process)
+- [Usage](#usage)
+- [Running on Ascend](#running-on-ascend)
+- [Result](#result)
+- [Evaluation Process](#evaluation-process)
+- [Usage](#usage-1)
+- [Running on Ascend](#running-on-ascend-1)
+- [Result](#result-1)
+- [Inference Process](#inference-process)
+- [Export MindIR](#export-mindir)
+- [Infer on Ascend310](#infer-on-ascend310)
+- [Result](#result-2)
 - [Model Description](#model-description)
-    - [Performance](#performance)
-        - [Evaluation Performance](#evaluation-performance)
-        - [Inference Performance](#inference-performance)
+- [Performance](#performance)
+- [Evaluation Performance](#evaluation-performance)
+- [SKNet50 on CIFRA10](#sknet50-on-cifra10)
+- [Inference Performance](#inference-performance)
+- [SKNet50 on CIFAR10](#sknet50-on-cifar10)
+- [310 Inference Performance](#310-inference-performance)
+- [SKNet50 on CIFAR10](#sknet50-on-cifar10-1)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -93,10 +110,16 @@ python eval.py --checkpoint_path=/resnet/sknet_90.ckpt --dataset_path=/data/cifa
 ```text
 └──SK-Net
   ├── README.md
+  ├── ascend310_infer
+    ├── inc
+    ├── src
+    ├── build.sh                         # make process  
+    ├── CMakeLists.txt                   # cmake configuration  
   ├── scripts
     ├── run_distribute_train.sh            # launch ascend distributed training(8 pcs)
     ├── run_eval.sh                        # launch ascend evaluation
     ├── run_standalone_train.sh            # launch ascend standalone training(1 pcs)
+    ├── run_infer_310.sh                   # launch 310 infer  
   ├── src
     ├── config.py                          # parameter configuration
     ├── CrossEntropySmooth.py              # loss definition
@@ -108,6 +131,8 @@ python eval.py --checkpoint_path=/resnet/sknet_90.ckpt --dataset_path=/data/cifa
   ├── export.py                            # export model for inference
   ├── eval.py                              # eval net
   └── train.py                             # train net
+  ├── preprocess.py                        # preprocess scripts
+  ├── postprocess.py                       # postprocess scripts
 ```
 
 ## [Script Parameters](#contents)
@@ -187,6 +212,41 @@ bash run_eval.sh [DATASET_PATH]  [CHECKPOINT_PATH]
 result: {'top_5_accuracy': 0.9982972756410257, 'top_1_accuracy': 0.9449118589743589}
 ```
 
+## [Inference Process](#contents)
+
+### Export MindIR
+
+```bash
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+The ckpt_file parameter is required,
+`FILE_NAME` is the name of the AIR/ONNX/MINDIR file.
+`FILE_FORMAT` should be in ["AIR","ONNX", "MINDIR"]
+
+### Infer on Ascend310
+
+Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED PREPROCESS] [DEVICE_ID]
+```
+
+- DATASET_NAME can choose from ['cifar10', 'imagenet2012'].
+- NEED_PREPROCESS means weather need preprocess or not, it's value is 'y' or 'n'.
+- DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
+- `DVPP` is mandatory, and must choose from ["DVPP", "CPU"], it's case-insensitive. SE-net only support CPU mode.
+- `DEVICE_ID` is optional, default value is 0.
+
+### Result
+
+Inference result is saved in current path, you can find result like this in acc.log file.
+
+```bash
+result: {'top_1_accuracy': 0.9449118589743589}
+```
+
 # [Model Description](#contents)
 
 ## [Performance](#contents)
@@ -226,6 +286,20 @@ result: {'top_5_accuracy': 0.9982972756410257, 'top_1_accuracy': 0.9449118589743
 | Dataset             | CIFAR10                |
 | batch_size          | 32                          |
 | Accuracy            | 94.49%                      |
+
+### 310 Inference Performance
+
+#### SKNet50 on CIFAR10
+
+| Parameters          | Ascend                      |
+| ------------------- | --------------------------- |
+| Model Version       | SKNet50                 |
+| Resource            | Ascend 310                  |
+| Uploaded Date       | 09/23/2021 (month/day/year) |
+| MindSpore Version   | 1.3.0                 |
+| Dataset             | CIFAR10                |
+| batch_size          | 32                          |
+| Accuracy            | 95.49%                      |
 
 # [Description of Random Situation](#contents)
 
