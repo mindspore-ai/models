@@ -17,6 +17,11 @@
 "models/research/cv/FaceQualityAssessment/infer/util/plugins/MxpiTransposePlugin.h"  "build/namespaces"
 "models/research/cv/FaceQualityAssessment/infer/util/plugins/MxpiTransposePlugin.cpp"  "runtime/references"
 
+"models/official/cv/Deepsort/infer/mxbase/src/main.cpp" "runtime/references"
+"models/official/cv/Deepsort/infer/mxbase/src/Deepsort.h" "runtime/references"
+"models/official/cv/Deepsort/infer/mxbase/src/Deepsort.cpp" "runtime/references"
+"models/official/cv/Deepsort/infer/mxbase/src/KalmanFilter/tracker.h" "runtime/references"
+
 "models/research/cv/stgcn/infer/mxbase/src/stgcnUtil.h" "runtime/references"
 "models/research/cv/stgcn/infer/mxbase/src/stgcnUtil.cpp" "runtime/references""models/official/cv/resnext/infer/mxbase/src/resnext50Classify.h" "runtime/references"
 "models/research/cv/stgcn/infer/mxbase/src/main.cpp" "runtime/references"

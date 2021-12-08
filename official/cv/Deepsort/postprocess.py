@@ -28,7 +28,7 @@ if __name__ == "__main__":
     rst_path = args.result_dir
     start = end = 0
 
-    for sequence in os.listdir(args.det_dir):
+    for sequence in sorted(os.listdir(args.det_dir)):
         #sequence_dir = os.path.join(mot_dir, sequence)
         start = end
         detection_dir = os.path.join(args.det_dir, sequence)
