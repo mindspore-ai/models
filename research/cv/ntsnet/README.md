@@ -36,7 +36,7 @@ Dataset used: [Caltech-UCSD Birds-200-2011](<http://www.vision.caltech.edu/visip
 
 Please download the datasets [CUB_200_2011.tgz] and unzip it, then put all training images into a directory named "train", put all testing images into a directory named "test".
 
-The directory structure is as follows:
+The directory structure is as follows, you need to split the dataset by yourself followed by "train_test_split.txt" in the original dataset:
 
 ```path
 .
@@ -185,11 +185,35 @@ accuracy: 0.876
 
 ## Model Export
 
+### [Export MindIR](#contents)
+
+when export mindir file in Ascend 910, the cropAndResize operator differs from 310 and 910. Specifically, 310 requires an input shape (N,C,H,W) while 910 requires an input shape (N,H,W,C). You need to invalid the CropAndResize Validator check in 910 mindspore environment to export successfully.
+
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format [EXPORT_FORMAT]
+python export.py --ckpt_file [CKPT_PATH] --train_url [TRAIN_URL]
 ```
 
-`EXPORT_FORMAT` should be "MINDIR"
+- `ckpt_file` Checkpoint file name.
+- `train_url` should be Directory contains checkpoint file.
+
+## Inference Process
+
+### Infer on Ascend310
+
+Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` The absolute path of ntsnet.mindir.
+- `DATASET_PATH` The CUB_200_2011 dataset test directory.
+- `DEVICE_ID` is optional, default value is 0.
+
+### result
+
+Inference result is saved in current path, you can find result like this in acc.log file.
 
 # Model Description
 
@@ -221,7 +245,7 @@ We use random seed in train.py and eval.py for weight initialization.
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/models).
+Please check the official [homepage](https://gitee.com/mindspore/models/tree/r1.5).
 
 # FAQ
 

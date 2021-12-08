@@ -14,14 +14,12 @@
 # ============================================================================
 """ntsnet network wrapper."""
 import math
-import os
-import time
 import numpy as np
 from mindspore import ops, load_checkpoint, load_param_into_net, Tensor, nn
 from mindspore.ops import functional as F
 from mindspore.ops import operations as P
 import mindspore.common.dtype as mstype
-from mindspore.train.callback import Callback, ModelCheckpoint
+
 from src.resnet import resnet50
 from src.config import config
 
@@ -144,7 +142,7 @@ class Navigator(nn.Cell):
 class NTS_NET(nn.Cell):
     """Ntsnet"""
 
-    def __init__(self, topK=6, resnet50Path=""):
+    def __init__(self, topK=6, resnet50Path="", flag910=True):
         """Ntsnet init"""
         super(NTS_NET, self).__init__()
         feature_extractor = resnet50(1001)
@@ -178,15 +176,21 @@ class NTS_NET(nn.Cell):
                                      mstype.float32)
         self.gatherND = ops.GatherNd()
         self.gatherD = ops.GatherD()
+        self.gather = ops.Gather()
         self.squeezeop = P.Squeeze()
         self.select = P.Select()
         self.perm = (1, 2, 0)
         self.box_index = self.opzeros(((K,)), mstype.int32)
-        self.crop_size = (224, 224)
+        self.flag910 = flag910
+        if self.flag910:
+            self.crop_size = (224, 224)
+        else:
+            self.crop_size = Tensor([224, 224], mstype.int32)
         self.perm2 = (0, 3, 1, 2)
         self.m_for_scrutinizer = m_for_scrutinizer
         self.sortop = ops.Sort(descending=True)
         self.stackop = ops.Stack()
+        self.sliceop = ops.Slice()
 
     def construct(self, x):
         """Ntsnet construct"""
@@ -218,14 +222,20 @@ class NTS_NET(nn.Cell):
             top_k_info.append(self.opReshape(bbox_topk[::, 4:5:1], (-1,)))
             # crop from x_pad and resize to a fixed size using bilinear
             temp_pad = self.opReshape(x_pad[i:i + 1:1, ::, ::, ::], (3, 896, 896))
-            temp_pad = self.transpose(temp_pad, self.perm)
+            if self.flag910:
+                temp_pad = self.transpose(temp_pad, self.perm)
             tensor_image = self.opReshape(temp_pad, (1,) + temp_pad.shape)
             tensor_box = self.gatherND(edge_anchors_sorted_concat, topK_indices)
             tensor_box = tensor_box / 895
             current_img_for_teacher = self.opsCropResize(tensor_image, tensor_box, self.box_index, self.crop_size)
             # the image cropped will be used to extractor feature and calculate loss
-            current_img_for_teacher = self.opReshape(current_img_for_teacher, (-1, 224, 224, 3))
-            current_img_for_teacher = self.transpose(current_img_for_teacher, self.perm2)
+
+            if self.flag910:
+                current_img_for_teacher = self.opReshape(current_img_for_teacher, (-1, 224, 224, 3))
+                current_img_for_teacher = self.transpose(current_img_for_teacher, self.perm2)
+
+
+
             current_img_for_teacher = self.opReshape(current_img_for_teacher, (-1, 3, 224, 224))
             current_img_for_teachers.append(current_img_for_teacher)
         feature = self.opReshape(feature, (batch_size, 1, -1))
@@ -268,6 +278,8 @@ class WithLossCell(nn.Cell):
         self.reducesumop = ops.ReduceSum()
         self.oprepeat = ops.repeat_elements
         self.cast = ops.Cast()
+        self.gather = ops.Gather()
+        self.sliceop = ops.Slice()
 
     def construct(self, image_data, label):
         """WithLossCell construct"""
@@ -291,10 +303,12 @@ class WithLossCell(nn.Cell):
         loss = self.opZeros((), mstype.float32)
         num = top_k_info.shape[0]
         for i in range(K):
-            log_softmax_teacher_out_inlabel_unsqueeze = self.opReshape(log_softmax_teacher_out_result[::, i:i + 1:1],
-                                                                       (-1, 1))
+            tt = self.sliceop(log_softmax_teacher_out_result, (0, i), (log_softmax_teacher_out_result.shape[0], 1))
+            log_softmax_teacher_out_inlabel_unsqueeze = self.opReshape(tt, (-1, 1))
+            # log_softmax_teacher_out_inlabel_unsqueeze = self.opReshape(log_softmax_teacher_out_result[::, i:i + 1:1],(-1, 1))
             compareX = log_softmax_teacher_out_result > log_softmax_teacher_out_inlabel_unsqueeze
-            pivot = self.opReshape(top_k_info[::, i:i + 1:1], (-1, 1))
+            pivot = self.opReshape(self.sliceop(top_k_info, (0, i), (top_k_info.shape[0], 1)), (-1, 1))
+            # pivot = self.opReshape(top_k_info[::, i:i + 1:1], (-1, 1))
             information = 1 - pivot + top_k_info
             loss_p = information * compareX
             loss_p_temp = self.opRelu(loss_p)
@@ -311,88 +325,3 @@ class WithLossCell(nn.Cell):
     def backbone_network(self):
         """WithLossCell backbone"""
         return self._backbone
-
-
-class NtsnetModelCheckpoint(ModelCheckpoint):
-    """
-    The checkpoint callback class.
-    It is called to combine with train process and save the model and network parameters after training.
-    Note:
-        In the distributed training scenario, please specify different directories for each training process
-        to save the checkpoint file. Otherwise, the training may fail.
-    Args:
-        prefix (str): The prefix name of checkpoint files. Default: "CKP".
-        directory (str): The path of the folder which will be saved in the checkpoint file. Default: None.
-        ckconfig (CheckpointConfig): Checkpoint strategy configuration. Default: None.
-    Raises:
-        ValueError: If the prefix is invalid.
-        TypeError: If the config is not CheckpointConfig type.
-    """
-
-    def __init__(self, prefix='CKP', directory=None, ckconfig=None,
-                 device_num=1, device_id=0, args=None, run_modelart=False):
-        super(NtsnetModelCheckpoint, self).__init__(prefix, directory, ckconfig)
-        self.run_modelart = run_modelart
-        self.device_num = device_num
-        self.device_id = device_id
-        self.args = args
-
-    def _save_ckpt(self, cb_params, force_to_save=False):
-        super()._save_ckpt(cb_params, force_to_save)
-        if self.run_modelart and (self.device_num == 1 or self.device_id == 0):
-            import moxing as mox
-            mox.file.copy_parallel(src_url=cur_file, dst_url=os.path.join(self.args.train_url, cur_ckpoint_file))
-
-
-class LossCallBack(Callback):
-    """
-    Monitor the loss in training.
-    If the loss is NAN or INF terminating training.
-    Note:
-        If per_print_times is 0 do not print loss.
-    Args:
-        per_print_times (int): Print loss every times. Default: 1.
-    """
-
-    def __init__(self, per_print_times=1, rank_id=0, local_output_url="",
-                 device_num=1, device_id=0, args=None, run_modelart=False):
-        super(LossCallBack, self).__init__()
-        if not isinstance(per_print_times, int) or per_print_times < 0:
-            raise ValueError("print_step must be int and >= 0.")
-        self._per_print_times = per_print_times
-        self.count = 0
-        self.rpn_loss_sum = 0
-        self.rpn_cls_loss_sum = 0
-        self.rpn_reg_loss_sum = 0
-        self.rank_id = rank_id
-        self.local_output_url = local_output_url
-        self.device_num = device_num
-        self.device_id = device_id
-        self.args = args
-        self.time_stamp_first = time.time()
-        self.run_modelart = run_modelart
-
-    def step_end(self, run_context):
-        """
-            Called after each step finished.
-            Args:
-            run_context (RunContext): Include some information of the model.
-        """
-        cb_params = run_context.original_args()
-        rpn_loss = cb_params.net_outputs.asnumpy()
-        self.count += 1
-        self.rpn_loss_sum += float(rpn_loss)
-        cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
-        if self.count >= 1:
-            time_stamp_current = time.time()
-            rpn_loss = self.rpn_loss_sum / self.count
-            loss_file = open(os.path.join(self.local_output_url, lossLogName), "a+")
-            loss_file.write("%lu epoch: %s step: %s ,rpn_loss: %.5f" %
-                            (time_stamp_current - self.time_stamp_first, cb_params.cur_epoch_num, cur_step_in_epoch,
-                             rpn_loss))
-            loss_file.write("\n")
-            loss_file.close()
-            if self.run_modelart and (self.device_num == 1 or self.device_id == 0):
-                import moxing as mox
-                mox.file.copy_parallel(src_url=os.path.join(self.local_output_url, lossLogName),
-                                       dst_url=os.path.join(self.args.train_url, lossLogName))
