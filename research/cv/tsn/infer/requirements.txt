@@ -1,0 +1,4 @@
+pillow
+numpy
+sklearn
+opencv-python
