@@ -67,6 +67,6 @@ cp -r ../src ./eval
 cd ./eval || exit
 env > env.log
 echo "start evaluation for device $DEVICE_ID"
-python eval.py --device_id=$DEVICE_ID --data_url=$PATH1 --train_url=$PATH2 \
+python eval_gpu.py --device_id=$DEVICE_ID --data_url=$PATH1 --train_url=$PATH2 \
                 --ckpt_filename=$PATH3 --device_target="GPU" &> log &
 cd ..

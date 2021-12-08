@@ -14,17 +14,11 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -lt 3 ] ||  [ $# -gt 4 ]
+if [ $# != 3 ]
 then 
-    echo "Usage: sh run_eval_ascend.sh [DATA_URL] [TRAIN_URL] [CKPT_FILENAME] [DEVICE_ID(optional)]"
+    echo "Usage: sh run_eval_ascend.sh [DATA_URL] [TRAIN_URL] [CKPT_FILENAME]"
 exit 1
 fi
-
-export DEVICE_ID=0
-
-if [ $# = 4 ] ; then
-  export DEVICE_ID=$4
-fi;
 
 get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
@@ -36,7 +30,7 @@ get_real_path(){
 
 PATH1=$(get_real_path $1)
 PATH2=$(get_real_path $2)
-PATH3=$3
+PATH3=$(get_real_path $3)
 
 if [ ! -d $PATH1 ]
 then 
@@ -50,9 +44,15 @@ then
 exit 1
 fi
 
+if [ ! -f $PATH3 ]
+then
+    echo "error: CKPT_FILENAME=$PATH3 is not a file"
+exit 1
+fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
+export DEVICE_ID=0
 export RANK_SIZE=$DEVICE_NUM
 export RANK_ID=0
 
@@ -68,5 +68,5 @@ cd ./eval || exit
 env > env.log
 echo "start evaluation for device $DEVICE_ID"
 python eval.py --device_id=$DEVICE_ID --data_url=$PATH1 --train_url=$PATH2 \
-                --ckpt_filename=$PATH3 --device_target="Ascend" &> log &
+                --ckpt_filename=$PATH3 &> log &
 cd ..

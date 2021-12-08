@@ -47,7 +47,7 @@ export CUDA_VISIBLE_DEVICES="$2"
 
 if [ $1 -gt 1 ]; then
   mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
-  python3 ${BASEPATH}/../train.py --device_target="GPU" --run_distribute True --data_url=$DATA_DIR --train_url=$TRAIN_URL >train_gpu.log 2>&1 &
+  python3 ${BASEPATH}/../train_gpu.py --device_target="GPU" --run_distribute True --data_url=$DATA_DIR --train_url=$TRAIN_URL >train_gpu.log 2>&1 &
 else
-  python3 ${BASEPATH}/../train.py --device_target="GPU" --data_url=$DATA_DIR --train_url=$TRAIN_URL >train_gpu.log 2>&1 &
+  python3 ${BASEPATH}/../train_gpu.py --device_target="GPU" --data_url=$DATA_DIR --train_url=$TRAIN_URL >train_gpu.log 2>&1 &
 fi

@@ -36,7 +36,7 @@ Dataset used: [Caltech-UCSD Birds-200-2011](<http://www.vision.caltech.edu/visip
 
 Please download the datasets [CUB_200_2011.tgz] and unzip it, then put all training images into a directory named "train", put all testing images into a directory named "test".
 
-The directory structure is as follows:
+The directory structure is as follows, you need to split the dataset by yourself followed by "train_test_split.txt" in the original dataset:
 
 ```path
 ├─resnet50.ckpt
@@ -64,10 +64,13 @@ The directory structure is as follows:
 └─ntsnet
   ├─README.md                             # README
   ├─scripts                               # shell script
-    ├─run_standalone_train.sh             # training in standalone mode(1pcs)
-    ├─run_distribute_train.sh             # training in parallel mode(8 pcs)
-    └─run_eval.sh                         # evaluation
+    ├─run_standalone_train_ascend.sh             # training in standalone mode(1pcs)
+    ├─run_distribute_train_ascend.sh             # training in parallel mode(8 pcs)
+    └─run_eval_ascend.sh                         # evaluation
   ├─src
+    ├─config_gpu.py                       # network configuration
+    ├─dataset_gpu.py                      # dataset utils
+    ├─lr_generator_gpu.py                 # leanring rate generator
     ├─config.py                           # network configuration
     ├─dataset.py                          # dataset utils
     ├─lr_generator.py                     # leanring rate generator
@@ -76,7 +79,9 @@ The directory structure is as follows:
   ├─mindspore_hub_conf.py                 # mindspore hub interface
   ├─export.py                             # script to export MINDIR model
   ├─eval.py                               # evaluation scripts
-  └─train.py                              # training scripts
+  ├─train.py                              # training scripts
+  ├─eval_gpu.py                               # evaluation scripts
+  └─train_gpu.py                              # training scripts
 ```
 
 ## [Script Parameters](#contents)
@@ -85,10 +90,10 @@ The directory structure is as follows:
 
 ```shell
 # distributed training
-Usage: bash run_train.sh [RANK_TABLE_FILE] [DATA_URL] [TRAIN_URL]
+Usage: bash run_train_ascend.sh [RANK_TABLE_FILE] [DATA_URL] [TRAIN_URL]
 
 # standalone training
-Usage: bash run_standalone_train.sh [DATA_URL] [TRAIN_URL]
+Usage: bash run_standalone_train_ascend.sh [DATA_URL] [TRAIN_URL]
 ```
 
 ### [Parameters Configuration](#contents)
@@ -133,7 +138,7 @@ Usage: bash run_standalone_train.sh [DATA_URL] [TRAIN_URL]
 
 ### [Training](#content)
 
-- Run `run_standalone_train_ascend.sh` for non-distributed training of NTS-Net model in Ascend.
+- Run `run_standalone_train_ascend.sh` for non-distributed training of NTS-Net model.
 
 ```bash
 # standalone training in ascend
@@ -208,11 +213,35 @@ accuracy: 0.876
 
 ## Model Export
 
+### [Export MindIR](#contents)
+
+when export mindir file in Ascend 910, the cropAndResize operator differs from 310 and 910. Specifically, 310 requires an input shape (N,C,H,W) while 910 requires an input shape (N,H,W,C). You need to invalid the CropAndResize Validator check in 910 mindspore environment to export successfully.
+
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format [EXPORT_FORMAT]
+python export.py --ckpt_file [CKPT_PATH] --train_url [TRAIN_URL]
 ```
 
-`EXPORT_FORMAT` should be "MINDIR"
+- `ckpt_file` Checkpoint file name.
+- `train_url` should be Directory contains checkpoint file.
+
+## Inference Process
+
+### Infer on Ascend310
+
+Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` The absolute path of ntsnet.mindir.
+- `DATASET_PATH` The CUB_200_2011 dataset test directory.
+- `DEVICE_ID` is optional, default value is 0.
+
+### result
+
+Inference result is saved in current path, you can find result like this in acc.log file.
 
 # Model Description
 

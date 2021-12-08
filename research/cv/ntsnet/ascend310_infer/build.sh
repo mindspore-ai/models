@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,26 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""
-network config setting, will be used in train.py and eval.py
-"""
-from easydict import EasyDict as ed
-
-config = ed({
-    "save_checkpoint": True,
-    "save_checkpoint_epochs": 112,
-    "keep_checkpoint_max": 10000,
-    "learning_rate": 0.001,
-    "m_for_scrutinizer": 4,
-    "topK": 6,
-    "input_size": (448, 448),
-    "weight_decay": 1e-4,
-    "momentum": 0.9,
-    "num_epochs": 112,
-    "num_classes": 200,
-    "num_train_images": 5994,
-    "num_test_images": 5794,
-    "batch_size": 8,
-    "prefix": "ntsnet",
-    "lossLogName": "loss.log"
-})
+if [ ! -d out ]; then
+  mkdir out
+fi
+cd out || exit
+cmake .. \
+    -DMINDSPORE_PATH="`pip show mindspore-ascend | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
+make

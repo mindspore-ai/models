@@ -14,69 +14,41 @@
 # ============================================================================
 
 """ntsnet dataset"""
-import os
-
-import mindspore.dataset as de
+import mindspore.dataset as ds
 import mindspore.dataset.vision.c_transforms as vision
 from mindspore.dataset.vision import Inter
-
-from src.config import config
-
-mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
-std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
 
 
 def create_dataset_train(train_path, batch_size):
     """create train dataset"""
-    device_num, rank_id = _get_rank_info()
-
-    if device_num == 1:
-        train_data_set = de.ImageFolderDataset(train_path, num_parallel_workers=8, shuffle=True)
-    else:
-        train_data_set = de.ImageFolderDataset(train_path, num_parallel_workers=8,
-                                               shuffle=True, num_shards=device_num, shard_id=rank_id)
-
+    train_data_set = ds.ImageFolderDataset(train_path, shuffle=True)
     # define map operations
     transform_img = [
         vision.Decode(),
-        vision.Resize(config.crop_pct_size, Inter.BILINEAR),
-        vision.RandomCrop(config.input_size),
+        vision.Resize([448, 448], Inter.LINEAR),
         vision.RandomHorizontalFlip(),
-        vision.Normalize(mean=mean, std=std),
         vision.HWC2CHW()
     ]
-    train_data_set = train_data_set.map(input_columns="image", num_parallel_workers=8, operations=transform_img)
-    train_data_set = train_data_set.batch(batch_size, drop_remainder=True)
+    train_data_set = train_data_set.map(input_columns="image", num_parallel_workers=8, operations=transform_img,
+                                        output_columns="image")
+    train_data_set = train_data_set.map(input_columns="image", num_parallel_workers=8,
+                                        operations=lambda x: (x / 255).astype("float32"))
+    train_data_set = train_data_set.batch(batch_size)
     return train_data_set
 
 
 def create_dataset_test(test_path, batch_size):
     """create test dataset"""
-    test_data_set = de.ImageFolderDataset(test_path, shuffle=False)
+    test_data_set = ds.ImageFolderDataset(test_path, shuffle=False)
     # define map operations
     transform_img = [
         vision.Decode(),
-        vision.Resize(config.crop_pct_size, Inter.BILINEAR),
-        vision.CenterCrop(config.input_size),
-        vision.Normalize(mean=mean, std=std),
+        vision.Resize([448, 448], Inter.LINEAR),
         vision.HWC2CHW()
     ]
-    test_data_set = test_data_set.map(input_columns="image", num_parallel_workers=8, operations=transform_img)
-    test_data_set = test_data_set.batch(batch_size, drop_remainder=True)
+    test_data_set = test_data_set.map(input_columns="image", num_parallel_workers=8, operations=transform_img,
+                                      output_columns="image")
+    test_data_set = test_data_set.map(input_columns="image", num_parallel_workers=8,
+                                      operations=lambda x: (x / 255).astype("float32"))
+    test_data_set = test_data_set.batch(batch_size)
     return test_data_set
-
-
-def _get_rank_info():
-    """
-    get rank size and rank id
-    """
-    rank_size = int(os.environ.get("RANK_SIZE", 1))
-
-    if rank_size > 1:
-        from mindspore.communication.management import get_rank, get_group_size
-        rank_size = get_group_size()
-        rank_id = get_rank()
-    else:
-        rank_size = rank_id = None
-
-    return rank_size, rank_id

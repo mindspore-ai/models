@@ -16,15 +16,9 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: bash run_standalone_train_ascend.sh [DATA_URL] [TRAIN_URL] [DEVICE_ID(optional)]"
+    echo "Usage: bash run_standalone_train_ascend.sh [DATA_URL] [TRAIN_URL]"
 exit 1
 fi
-
-export DEVICE_ID=0
-
-if [ $# = 3 ] ; then
-  export DEVICE_ID=$3
-fi;
 
 get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
@@ -52,6 +46,7 @@ fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
+export DEVICE_ID=0
 export RANK_ID=0
 export RANK_SIZE=1
 
@@ -66,5 +61,5 @@ cp -r ../src ./train
 cd ./train || exit
 echo "start training for device $DEVICE_ID"
 env > env.log
-python train.py --device_id=$DEVICE_ID --data_url=$PATH1 --train_url=$PATH2 --device_target="Ascend"&> log &
+python train.py --device_id=$DEVICE_ID --data_url=$PATH1 --train_url=$PATH2 &> log &
 cd ..
