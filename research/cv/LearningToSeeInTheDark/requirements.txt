@@ -1,0 +1,8 @@
+numpy==1.21.2
+Pillow==8.3.2
+PyYAML==6.0
+rawpy==0.16.0
+scikit-image==0.18.3
+scipy==1.2.1
+h5py
+easydict

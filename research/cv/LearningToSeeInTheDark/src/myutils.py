@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,10 @@
 # limitations under the License.
 # ============================================================================
 """Train one step with loss scale"""
+import os
+import glob
+import h5py
+import numpy as np
 from mindspore import nn
 from mindspore.ops import operations as P
 from mindspore.ops import functional as F
@@ -23,6 +27,49 @@ from mindspore.common import dtype as mstype
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
 from mindspore.context import ParallelMode
 from mindspore.parallel._utils import _get_device_num, _get_parallel_mode, _get_gradients_mean
+
+
+def pack_raw(raw):
+    """ pack sony raw data into 4 channels """
+
+    im = np.maximum(raw - 512, 0) / (16383 - 512)  # subtract the black level
+    im = np.expand_dims(im, axis=2)
+    img_shape = im.shape
+    H = img_shape[0]
+    W = img_shape[1]
+
+    out = np.concatenate((im[0:H:2, 0:W:2, :],
+                          im[0:H:2, 1:W:2, :],
+                          im[1:H:2, 1:W:2, :],
+                          im[1:H:2, 0:W:2, :]), axis=2)
+    return out
+
+
+def get_test_data(input_dir1, gt_dir1, test_ids1):
+    """ trans input raw data into arrays then pack into a list """
+
+    final_test_inputs = []
+    for test_id in test_ids1:
+        in_files = glob.glob(input_dir1 + '%05d_00*.hdf5' % test_id)
+
+        gt_files = glob.glob(gt_dir1 + '%05d_00*.hdf5' % test_id)
+        gt_path = gt_files[0]
+        gt_fn = os.path.basename(gt_path)
+        gt_exposure = float(gt_fn[9: -6])
+
+        for in_path in in_files:
+
+            in_fn = os.path.basename(in_path)
+            in_exposure = float(in_fn[9: -6])
+            ratio = min(gt_exposure / in_exposure, 300.0)
+            ima = h5py.File(in_path, 'r')
+            in_rawed = ima.get('in')[:]
+            input_image = np.expand_dims(pack_raw(in_rawed), axis=0) * ratio
+            input_image = np.minimum(input_image, 1.0)
+            input_image = input_image.transpose([0, 3, 1, 2])
+            input_image = np.float32(input_image)
+            final_test_inputs.append(input_image)
+    return final_test_inputs
 
 
 class WithLossCell(nn.Cell):

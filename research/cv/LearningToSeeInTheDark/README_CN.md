@@ -15,10 +15,12 @@
 - [训练过程](#训练过程)
     - [用法](#用法)
         - [Ascend处理器环境运行](#Ascend处理器环境运行)
+        - [GPU处理器环境运行](#GPU)
     - [结果](#结果)
 - [评估过程](#评估过程)
     - [用法](#用法-1)
         - [Ascend处理器环境运行](#Ascend处理器环境运行-1)
+        - [GPU处理器环境运行](#GPU处理器环境运行)
     - [结果](#结果-1)
 - [推理过程](#推理过程)
     - [导出MindIR](#导出MindIR)
@@ -60,6 +62,8 @@ Leraning To See In The dark 是在2018年提出的，基于全卷积神经网络
 python preprocess.py --raw_path [RAW_PATH] --save_path [SAVE_PATH]
 ```
 
+- 注意GPU版本无需此步骤，使用原始数据集即可。
+
 - 数据集分类（文件名开头）：
 
     - 0: 训练数据集
@@ -84,6 +88,9 @@ python preprocess.py --raw_path [RAW_PATH] --save_path [SAVE_PATH]
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
+- GPU
+    - see requirements.txt
+
 # 快速入门
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
@@ -92,13 +99,29 @@ python preprocess.py --raw_path [RAW_PATH] --save_path [SAVE_PATH]
 
 ```Shell
 # 分布式训练
-用法：sh run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
+用法：bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
 
 # 单机训练
-用法：sh run_standalone_train.sh [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
+用法：bash run_standalone_train.sh [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
 
 # 运行评估示例
-用法：sh run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
+用法：bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
+```
+
+Ascend配置文件在src/configs.py中，当训练内存不足时，请考虑降低batch_size
+
+- GPU
+
+修改配置文件如src/Sony_config.yaml,注意修改数据集存放路径input_dir和gt_dir指向原始数据集中的short和long文件夹，
+根据需要，在scripts的脚本中配置CONFIG_PATH为需要使用的yaml配置文件路径，使用bash执行相应功能。
+
+```Shell
+# 分布式训练
+用法：bash run_distribute_train_gpu.sh
+# 单机训练
+用法：bash run_standalone_train_gpu.sh
+# 运行评估示例
+用法：bash run_eval_gpu.sh
 ```
 
 # 脚本说明
@@ -112,11 +135,16 @@ python preprocess.py --raw_path [RAW_PATH] --save_path [SAVE_PATH]
     ├── run_distribute_train.sh            # 启动Ascend分布式训练（8卡）
     ├── run_eval.sh                        # 启动Ascend评估
     └── run_standalone_train.sh            # 启动Ascend单机训练（单卡）
+    └── run_distribute_train_gpu.sh        # 启动GPU分布式训练
+    └── run_eval_gpu.sh                    # 启动GPU测试
+    └── run_standalone_train_gpu.sh        # 启动GPU单机训练（单卡）
   ├── src
     ├── myutils.py                         # TrainOneStepWithLossScale & GradClip
     └── unet_parts.py                      # 网络主题结构的部分定义
-  ├── eval.py                              # 评估网络
-  └── train.py                             # 训练网络
+    └── data_utils.py                      # 数据读取
+    └── unet.py                            # GPU适配网络
+  ├── test_sony.py                         # 评估网络
+  └── train_sony.py                        # 训练网络
 ```
 
 # 脚本参数
@@ -142,11 +170,19 @@ python preprocess.py --raw_path [RAW_PATH] --save_path [SAVE_PATH]
 ### Ascend处理器环境运行
 
 ```Shell
+
 # 分布式训练
-用法：sh run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
+用法：bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
 
 # 单机训练
-用法：sh run_standalone_train.sh [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
+用法：bash run_standalone_train.sh [DATASET_PATH] [PRETRAINED_CKPT_PATH]（可选）
+
+# GPU
+# 分布式训练
+用法：bash run_distribute_train_gpu.sh
+
+# 单机训练
+用法：bash run_standalone_train_gpu.sh
 
 ```
 
@@ -155,6 +191,10 @@ python preprocess.py --raw_path [RAW_PATH] --save_path [SAVE_PATH]
 具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
 
 训练结果保存在示例路径中，文件夹名称以“train”或“train_parallel”开头。您可在此路径下的日志中找到检查点文件以及结果，如下所示。
+
+使用GPU进行训练参考
+https://www.mindspore.cn/tutorials/zh-CN/r1.6/intermediate/distributed_training/distributed_training_gpu.html
+或使用官方镜像https://github.com/mindspore-ai/mindspore
 
 ## 结果
 
@@ -176,12 +216,20 @@ epoch: 5 step: 4, loss is 0.19579497
 
 ```Shell
 # 评估
-Usage: sh run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
+Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 ```Shell
 # 评估示例
-sh  run_eval.sh  /data/dataset/ImageNet/imagenet_original  Resnet152-140_5004.ckpt
+bash  run_eval.sh  /data/dataset/ImageNet/imagenet_original  Resnet152-140_5004.ckpt
+```
+
+### GPU处理器环境运行
+
+在config中指定checkpoint路径，在脚本中CONFIG_PATH指定config路径
+
+```Shell
+bash run_eval_gpu.sh
 ```
 
 ## 结果

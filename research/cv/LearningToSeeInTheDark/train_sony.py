@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,111 +14,153 @@
 # ============================================================================
 """train"""
 from __future__ import division
+import sys
 import os
+import time
 import glob
-import argparse as arg
+import argparse
 import ast
+import yaml
 import h5py
 import numpy as np
-from mindspore import context, Model
-from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
-from mindspore.nn.loss import L1Loss
+import mindspore
+from mindspore import Tensor, context, Model
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor, Callback
 from mindspore.nn.dynamic_lr import piecewise_constant_lr as pc_lr
 from mindspore.nn.dynamic_lr import warmup_lr
 import mindspore.dataset as ds
-from mindspore.communication.management import init
 import mindspore.nn as nn
 from mindspore.context import ParallelMode
 from mindspore.train.loss_scale_manager import DynamicLossScaleManager
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from src.unet_parts import DoubleConv, Down, Up, OutConv
-from src.myutils import GNMTTrainOneStepWithLossScaleCell, WithLossCell
-from src.configs import config
+from mindspore.communication import get_rank, get_group_size
 
 
-class UNet(nn.Cell):
-    """ Unet """
-    def __init__(self, n_channels, n_classes):
-        super(UNet, self).__init__()
-        self.n_channels = n_channels
-        self.n_classes = n_classes
-        self.inc = DoubleConv(n_channels, 32)
-        self.down1 = Down(32, 64)
-        self.down2 = Down(64, 128)
-        self.down3 = Down(128, 256)
-        self.down4 = Down(256, 512)
-        self.up1 = Up(512, 256)
-        self.up2 = Up(256, 128)
-        self.up3 = Up(128, 64)
-        self.up4 = Up(64, 32)
-        self.outc = OutConv(32, n_classes)
+def parse_arguments(argv):
+    """receive arguments"""
+    parser = argparse.ArgumentParser()
+    # Ascend device
+    parser.add_argument('--device_target', default='Ascend',
+                        help='device where the code will be implemented')
+    parser.add_argument('--data_url', required=False, default=None, help='Location of data')
+    parser.add_argument('--pre_trained', required=False, default=None, help='Ckpt file path')
+    parser.add_argument('--run_distribute', type=ast.literal_eval, required=False, default=None,
+                        help='If run distributed')
+    # gpu device
+    parser.add_argument('--config', type=str, default="src/Sony_config.yaml",
+                        help='Directory of config.')
+    parser.add_argument('--device_num', type=int, default=1,
+                        help='number of GPUs')
 
-    def construct(self, x):
-        """ Unet construct """
-        x1 = self.inc(x)
-        x2 = self.down1(x1)
-        x3 = self.down2(x2)
-        x4 = self.down3(x3)
-        x5 = self.down4(x4)
-        x = self.up1(x5, x4)
-        x = self.up2(x, x3)
-        x = self.up3(x, x2)
-        x = self.up4(x, x1)
-        logits = self.outc(x)
-        return logits
+    return parser.parse_args(argv)
 
 
-def pack_raw(raw):
-    """ pack sony raw data into 4 channels """
-    im = np.maximum(raw - 512, 0) / (16383 - 512)  # subtract the black level
+class StepLossTimeMonitor(Callback):
+    """Monitor"""
+    def __init__(self, batch_size, per_print_times=1):
+        """init"""
+        super(StepLossTimeMonitor, self).__init__()
+        if not isinstance(per_print_times, int) or per_print_times < 0:
+            raise ValueError("print_step must be int and >= 0.")
+        self._per_print_times = per_print_times
+        self.batch_size = batch_size
 
-    im = np.expand_dims(im, axis=2)
-    img_shape = im.shape
-    H = img_shape[0]
-    W = img_shape[1]
+    def step_begin(self, run_context):
+        """runs on step begin"""
+        self.step_time = time.time()
 
-    out = np.concatenate((im[0:H:2, 0:W:2, :],
-                          im[0:H:2, 1:W:2, :],
-                          im[1:H:2, 1:W:2, :],
-                          im[1:H:2, 0:W:2, :]), axis=2)
-    return out
+    def step_end(self, run_context):
+        """runs on step end"""
+        step_seconds = time.time() - self.step_time
+        step_fps = self.batch_size * 1.0 / step_seconds
+
+        cb_params = run_context.original_args()
+        loss = cb_params.net_outputs
+
+        if isinstance(loss, (tuple, list)):
+            if isinstance(loss[0], Tensor) and isinstance(loss[0].asnumpy(), np.ndarray):
+                loss = loss[0]
+
+        if isinstance(loss, Tensor) and isinstance(loss.asnumpy(), np.ndarray):
+            loss = np.mean(loss.asnumpy())
+
+        cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
+
+        if isinstance(loss, float) and (np.isnan(loss) or np.isinf(loss)):
+            raise ValueError("epoch: {} step: {}. Invalid loss, terminating training.".format(
+                cb_params.cur_epoch_num, cur_step_in_epoch))
+        self.losses.append(loss)
+        if self._per_print_times != 0 and cb_params.cur_step_num % self._per_print_times == 0:
+            print("step: {}, loss is {}, fps is {}".format(cur_step_in_epoch, loss, step_fps))
+
+    def epoch_begin(self, run_context):
+        """runs on epoch begin"""
+        self.epoch_start = time.time()
+        self.losses = []
+
+    def epoch_end(self, run_context):
+        """runs on epoch end"""
+        cb_params = run_context.original_args()
+        epoch_cost = time.time() - self.epoch_start
+        step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
+        step_fps = self.batch_size * 1.0 * step_in_epoch / epoch_cost
+        print("epoch: {:3d}, avg loss:{:.4f}, total cost: {:.3f} s, per step fps:{:5.3f}".format(
+            cb_params.cur_epoch_num, np.mean(self.losses), epoch_cost, step_fps))
 
 
-def get_dataset(input_dir1, gt_dir1, train_ids1, num_shards=None, shard_id=None, distribute=False):
-    """ get mindspore dataset from raw data """
-    input_final_data = []
-    gt_final_data = []
-    for train_id in train_ids1:
-        in_files = glob.glob(input_dir1 + '%05d_00*.hdf5' % train_id)
+def train_gpu(args):
+    from mindspore.communication import init
+    from src.unet import UNet
+    from src.data_utils import Sony
 
-        gt_files = glob.glob(gt_dir1 + '%05d_00*.hdf5' % train_id)
-        gt_path = gt_files[0]
-        gt_fn = os.path.basename(gt_path)
-        gt_exposure = float(gt_fn[9: -6])
-        gt = h5py.File(gt_path, 'r')
-        gt_rawed = gt.get('gt')[:]
-        gt_image = np.expand_dims(np.float32(gt_rawed / 65535.0), axis=0)
-        gt_image = gt_image.transpose([0, 3, 1, 2])
+    with open(args.config, 'r') as f:
+        config = yaml.safe_load(f)
 
-        for in_path in in_files:
-            gt_final_data.append(gt_image[0])
+    if args.device_num > 1:
+        init()
+        mindspore.context.set_auto_parallel_context(device_num=args.device_num,
+                                                    parameter_broadcast=True,
+                                                    parallel_mode=ParallelMode.DATA_PARALLEL,
+                                                    gradients_mean=True)
+        rank = get_rank()
 
-            in_fn = os.path.basename(in_path)
-            in_exposure = float(in_fn[9: -6])
-            ratio = min(gt_exposure / in_exposure, 300)
-            im = h5py.File(in_path, 'r')
-            in_rawed = im.get('in')[:]
-            input_image = np.expand_dims(pack_raw(in_rawed), axis=0) * ratio
-            input_image = np.float32(input_image)
-            input_image = input_image.transpose([0, 3, 1, 2])
-            input_final_data.append(input_image[0])
-    data = (input_final_data, gt_final_data)
-    if distribute:
-        datasets = ds.NumpySlicesDataset(data, ['input', 'label'], shuffle=False,
-                                         num_shards=num_shards, shard_id=shard_id)
     else:
-        datasets = ds.NumpySlicesDataset(data, ['input', 'label'], shuffle=False)
-    return datasets
+        mindspore.context.set_context(mode=config["mode"], device_target=config["device"],
+                                      device_id=config["device_id"])
+        rank = 0
+
+    # dataset
+    sony = Sony(config["input_dir"], config["gt_dir"])
+    if args.device_num > 1:
+        rank_id = get_rank()
+        rank_size = get_group_size()
+        dataset = ds.GeneratorDataset(sony, ["data", "label"], shuffle=False, num_shards=rank_size, shard_id=rank_id)
+        dataset = dataset.batch(batch_size=config["batch_size"], drop_remainder=True)
+    else:
+        dataset = ds.GeneratorDataset(sony, ["data", "label"], shuffle=False)
+        dataset = dataset.batch(batch_size=config["batch_size"], drop_remainder=True)
+
+    # model
+    unet = UNet()
+
+    # loss
+    loss = nn.L1Loss()
+    # opt
+    optimizer = nn.Adam(params=unet.trainable_params(), learning_rate=config["lr"])
+
+    # call back
+    ckpt_config = CheckpointConfig(save_checkpoint_steps=len(sony),
+                                   keep_checkpoint_max=10)
+    print("checkpoint dir: ", config["checkpoint_dir"]+'ckpt_{}/'.format(rank))
+    ckpoint_cb = ModelCheckpoint(prefix='ckpt_sony_ms_adam',
+                                 directory=config["checkpoint_dir"]+'ckpt_{}/'.format(rank),
+                                 config=ckpt_config)
+
+    callbacks = [StepLossTimeMonitor(batch_size=config["batch_size"], per_print_times=1), ckpoint_cb]
+
+    # train
+    model = Model(unet, loss_fn=loss, optimizer=optimizer)
+    model.train(config["epochs"], dataset, callbacks=callbacks)
 
 
 def dynamic_lr(steps_per_epoch, warmup_epochss):   # if warmup, plus warmup_epochs
@@ -157,16 +199,50 @@ def RandomCropAndFlip(image, label):
     return image, label
 
 
-if __name__ == "__main__":
+def train_ascend(args):
+    from mindspore.communication.management import init
+    from mindspore.nn.loss import L1Loss
+    from src.myutils import pack_raw
+    from src.unet_parts import UNet
+    from src.configs import config
+    from src.myutils import GNMTTrainOneStepWithLossScaleCell, WithLossCell
 
-    parser = arg.ArgumentParser(description='Mindspore SID Example')
-    parser.add_argument('--device_target', default='Ascend',
-                        help='device where the code will be implemented')
-    parser.add_argument('--data_url', required=True, default=None, help='Location of data')
-    parser.add_argument('--pre_trained', required=False, default=None, help='Ckpt file path')
-    parser.add_argument('--run_distribute', type=ast.literal_eval, required=False, default=None,
-                        help='If run distributed')
-    args = parser.parse_args()
+    def get_dataset(input_dir1, gt_dir1, train_ids1, num_shards=None, shard_id=None, distribute=False):
+        """ get mindspore dataset from raw data """
+        input_final_data = []
+        gt_final_data = []
+        for train_id in train_ids1:
+            in_files = glob.glob(input_dir1 + '%05d_00*.hdf5' % train_id)
+
+            gt_files = glob.glob(gt_dir1 + '%05d_00*.hdf5' % train_id)
+            gt_path = gt_files[0]
+            gt_fn = os.path.basename(gt_path)
+            gt_exposure = float(gt_fn[9: -6])
+            gt = h5py.File(gt_path, 'r')
+            gt_rawed = gt.get('gt')[:]
+            gt_image = np.expand_dims(np.float32(gt_rawed / 65535.0), axis=0)
+            gt_image = gt_image.transpose([0, 3, 1, 2])
+
+            for in_path in in_files:
+                gt_final_data.append(gt_image[0])
+
+                in_fn = os.path.basename(in_path)
+                in_exposure = float(in_fn[9: -6])
+                ratio = min(gt_exposure / in_exposure, 300)
+                im = h5py.File(in_path, 'r')
+                in_rawed = im.get('in')[:]
+                input_image = np.expand_dims(pack_raw(in_rawed), axis=0) * ratio
+                input_image = np.float32(input_image)
+                input_image = input_image.transpose([0, 3, 1, 2])
+                input_final_data.append(input_image[0])
+        data = (input_final_data, gt_final_data)
+        if distribute:
+            datasets = ds.NumpySlicesDataset(data, ['input', 'label'], shuffle=False,
+                                             num_shards=num_shards, shard_id=shard_id)
+        else:
+            datasets = ds.NumpySlicesDataset(data, ['input', 'label'], shuffle=False)
+        return datasets
+
     context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
 
     if args.run_distribute:
@@ -221,3 +297,14 @@ if __name__ == "__main__":
     model.train(epoch=config.total_epochs, train_dataset=dataset,
                 callbacks=callbacks_list,
                 dataset_sink_mode=True)
+
+
+def train(args):
+    if args.device_target == 'Ascend':
+        train_ascend(args)
+    elif args.device_target == 'GPU':
+        train_gpu(args)
+
+
+if __name__ == "__main__":
+    train(parse_arguments(sys.argv[1:]))
