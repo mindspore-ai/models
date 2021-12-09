@@ -126,7 +126,7 @@ device_id: 0
 batch_size: 1
 ckpt_file: ''
 file_name: "centerface"
-file_format: 'AIR'
+file_format: 'MINDIR'
 
 # centerface preprocess"
 dataset_path: ''

@@ -67,7 +67,7 @@ result_path: "./preprocess_Result/"
 # export options
 ckpt_file: ""
 file_name: "vgg16"
-file_format: "AIR"
+file_format: "MINDIR"
 
 
 ---

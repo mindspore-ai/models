@@ -34,7 +34,7 @@ is_dynamic_loss_scale: 0
 # Model Description
 model_name: alexnet
 file_name: 'alexnet'
-file_format: 'AIR'
+file_format: 'MINDIR'
 
 dataset_name: 'imagenet'
 sink_size: -1

@@ -63,7 +63,7 @@ batch_size: 1
 testing_shape: 608
 ckpt_file: ""
 file_name: "yolov4"
-file_format: "AIR"
+file_format: "MINDIR"
 keep_detect: True
 
 # Other default config

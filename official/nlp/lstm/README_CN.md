@@ -400,10 +400,12 @@ Ascend:
 ## 导出mindir模型
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [YAML_CONFIG_PATH]
 ```
 
-参数`ckpt_file` 是必需的，`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中进行选择。
+- `ckpt_file` 是必需的。
+- `FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中进行选择。
+- `YAML_CONFIG_PATH` 默认是 `default_config.yaml`。
 
 ## 推理过程
 
@@ -416,9 +418,9 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
 ```
 
-`DEVICE_TARGET` 可选值范围为：['GPU', 'CPU', 'Ascend']
-`NEED_PREPROCESS` 表示数据是否需要预处理，可选值范围为：'y' 或者 'n'
-`DEVICE_ID` 可选, 默认值为0.
+- `DEVICE_TARGET` 可选值范围为：['GPU', 'CPU', 'Ascend']
+- `NEED_PREPROCESS` 表示数据是否需要预处理，可选值范围为：'y' 或者 'n'
+- `DEVICE_ID` 可选, 默认值为0
 
 ### 结果
 

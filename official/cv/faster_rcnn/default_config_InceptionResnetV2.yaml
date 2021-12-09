@@ -165,7 +165,7 @@ checkpoint_path: "/cache/checkpoint_path/faster_rcnn-20_7393.ckpt"
 
 # export.py fasterrcnn_export
 file_name: "faster_rcnn"
-file_format: "AIR"
+file_format: "MINDIR"
 ckpt_file: ""
 
 # postprocess ("./src/default_config_InceptionResnetV2.yaml")
