@@ -118,7 +118,7 @@ After installing MindSpore via the official website, you can start training and 
 python train.py --config_path=[YAML_CONFIG_PATH] --data_dir=[DATA_PATH] --dataset=[DATASET_TYPE] > output.train.log 2>&1 &
 
 # run distributed training example
-bash scripts/run_distribute_train.sh [RANL_TABLE_JSON] [DATA_PATH] --dataset=[DATASET_TYPE]
+bash scripts/run_distribute_train.sh [RANL_TABLE_JSON] [DATA_PATH] [DATASET_TYPE](optional)
 
 # run evaluation example
 python eval.py --config_path=[YAML_CONFIG_PATH] --data_dir=[DATA_PATH]  --pre_trained=[PRE_TRAINED] --dataset=[DATASET_TYPE] > output.eval.log 2>&1 &
@@ -273,11 +273,14 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=
 ### [Script and Sample Code](#contents)
 
 ```bash
-├── model_zoo
+├── models
     ├── README.md                                 // descriptions about all the models
-    ├── vgg16
+    ├── official/cv/vgg16
         ├── README.md                             // descriptions about vgg
         ├── README_CN.md                          // descriptions about vgg with Chinese
+        ├── ascend310_infer                       // Ascend310 infer folder
+        ├── ascend310_quant_infer                 // Ascend310 infer folder (quant)
+        ├── infer                                 // MindX infer folder
         ├── model_utils
         │   ├── __init__.py                       // init file
         │   ├── config.py                         // Parse arguments
@@ -308,6 +311,8 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=
         ├── mindspore_hub_conf.py                 // mindspore_hub_conf script
         ├── cifar10_config.yaml                   // Configurations for cifar10
         ├── imagenet2012_config.yaml              // Configurations for imagenet2012
+        ├── export.py                             // model convert script
+        └── requirements.txt                      // requirements
 ```
 
 ### [Script Parameters](#contents)
@@ -350,7 +355,7 @@ parameters/options:
 
 ### [Parameter configuration](#contents)
 
-Parameters for both training and evaluation can be set in cifar10_config.yaml/cifar10_config.yaml.
+Parameters for both training and evaluation can be set in cifar10_config.yaml/imagenet2012_config.yaml.
 
 - config for vgg16, CIFAR-10 dataset
 
