@@ -19,6 +19,8 @@
 
 "models/official/cv/Deepsort/infer/mxbase/src/main.cpp" "runtime/references"
 "models/official/cv/Deepsort/infer/mxbase/src/Deepsort.h" "runtime/references"
+"models/official/cv/densenet/infer/mxbase/Densenet121.h" "runtime/references"
+"models/official/cv/densenet/infer/mxbase/main.cpp" "runtime/references"
 "models/official/cv/Deepsort/infer/mxbase/src/Deepsort.cpp" "runtime/references"
 "models/official/cv/Deepsort/infer/mxbase/src/KalmanFilter/tracker.h" "runtime/references"
 
