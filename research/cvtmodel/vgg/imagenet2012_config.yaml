@@ -1,0 +1,48 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+data_path: "/cache/data"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+device_target: "Ascend"
+need_modelarts_dataset_unzip: True
+modelarts_dataset_unzip_name: "ImageNet"
+
+# ==============================================================================
+# options
+data_dir: ""
+backbone: "vgg11"
+num_classes: 1000
+image_size: '224,224'
+
+# postprocess options
+result_dir: ""
+label_dir: ""
+dataset_name: "imagenet2012"
+
+# preprocess options
+result_path: "./preprocess_Result/"
+
+# export options
+batch_size: 1
+ckpt_file: ""
+file_name: "vgg"
+file_format: "MINDIR"
+
+---
+
+# postprocess options
+result_dir: "result files path."
+label_dir: "image file path."
+
+# preprocess options
+result_path: "result path"
+
+# export options
+ckpt_file: "checkpoint file."
+file_name: "model file name."
+file_format: "model format, choices in ['AIR', 'MINDIR']"
