@@ -72,3 +72,6 @@
 "models/official/cv/tinydarknet/infer/mxbase/TinydarknetClassify.h" "runtime/references"
 "models/official/cv/tinydarknet/infer/mxbase/TinydarknetClassify.cpp" "runtime/references"
 "models/official/cv/tinydarknet/infer/mxbase/main.cpp" "runtime/references"
+
+"models/official/cv/resnet/infer/ResNet152/mxbase/Resnet152ClassifyOpencv.h"                 "runtime/references"
+"models/official/cv/resnet/infer/ResNet18/mxbase/Resnet18ClassifyOpencv.h"                   "runtime/references"
