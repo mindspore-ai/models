@@ -120,6 +120,13 @@ def run_train(args_opt):
     if args_opt.distribute == "true":
         rank, device_num = set_parallel_context(args_opt)
     context.set_context(save_graphs=False, save_graphs_path="./graphs_of_device_id_" + str(rank))
+
+    # env variable prepare
+    group_info_file = os.getenv("GROUP_INFO_FILE")
+    if group_info_file:
+        with open(os.path.expanduser("job/code/group_info_env"), "a") as outfile:
+            outfile.write(f"export GROUP_INFO_FILE_REFLECT={group_info_file}\n")
+
     # copy data from the cloud to the /cache/Data
     cache_url = '/cache/Data/'
     eval_cache_url = '/cache/EvalData/'
@@ -224,7 +231,21 @@ def restore_checkpoint(args_param, sink_size, dataset, model, network, epoch):
     ckpt_name = args_param.ckpt_name_prefix
     ckpt_pattern = os.path.join(args_param.save_checkpoint_path, "rank_{}".format(D.get_rank()),
                                 f"{ckpt_name}*.ckpt")
-    ckpt_files = glob.glob(ckpt_pattern)
+    ckpt_all_files = glob.glob(ckpt_pattern)
+
+    if not ckpt_all_files:
+        print(f"There is no ckpt file in {args_param.save_checkpoint_path}, "
+              f"current ckpt_files found is {ckpt_all_files} "
+              f"with pattern {ckpt_pattern}, so skip the loading.")
+
+    ckpt_exp_pattern = os.path.join(args_param.save_checkpoint_path, "rank_{}".format(D.get_rank()),
+                                    f"{ckpt_name}*_breakpoint.ckpt")
+    ckpt_exp_files = glob.glob(ckpt_exp_pattern)
+    ckpt_files = []
+    for file in ckpt_all_files:
+        if file not in ckpt_exp_files:
+            ckpt_files.append(file)
+
     if not ckpt_files:
         print(f"There is no ckpt file in {args_param.save_checkpoint_path}, "
               f"current ckpt_files found is {ckpt_files} "
