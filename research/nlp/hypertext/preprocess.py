@@ -12,26 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""eval file"""
+"""preprocess data"""
 import argparse
+import os
+import shutil
 
-from mindspore import load_checkpoint, load_param_into_net, context
-from mindspore.ops import Squeeze, Argmax
-from mindspore.common import dtype as mstype
-from mindspore import numpy as mnp
+from mindspore import context
+import numpy as np
 from src.config import Config
 from src.dataset import build_dataset, build_dataloader
-from src.hypertext import HModel
 
 parser = argparse.ArgumentParser(description='HyperText Text Classification')
 parser.add_argument('--model', type=str, default='HyperText',
                     help='HyperText')
-parser.add_argument('--modelPath', default='./output/hypertext_iflytek.ckpt', type=str, help='save model path')
 parser.add_argument('--datasetdir', default='./data/iflytek_public', type=str,
                     help='dataset dir iflytek_public tnews_public')
-parser.add_argument('--batch_size', default=32, type=int, help='batch_size')
+parser.add_argument('--batch_size', default=1, type=int, help='batch_size')
 parser.add_argument('--datasetType', default='iflytek', type=str, help='iflytek/tnews')
-parser.add_argument('--device', default='GPU', type=str, help='device GPU Ascend')
+parser.add_argument('--device', default='Ascend', type=str, help='device GPU Ascend')
 args = parser.parse_args()
 
 config = Config(args.datasetdir, None, args.device)
@@ -44,22 +42,35 @@ if config.device == 'GPU':
 elif config.device == 'Ascend':
     context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
 vocab, train_data, dev_data, test_data = build_dataset(config, use_word=True, min_freq=int(config.min_freq))
-test_iter = build_dataloader(test_data, config.batch_size, config.max_length)
+test_iter = build_dataloader(test_data, args.batch_size, config.max_length)
 config.n_vocab = len(vocab)
-model_path = args.modelPath
-hmodel = HModel(config).to_float(mstype.float16)
-param_dict = load_checkpoint(model_path)
-load_param_into_net(hmodel, param_dict)
-squ = Squeeze(-1)
-argmax = Argmax(output_type=mstype.int32)
-cur, total = 0, 0
+ids_path = os.path.join('./preprocess_Result/', "00_ids")
+ngrad_path = os.path.join('./preprocess_Result/', "01_ngrad")
+label_path = os.path.join('./preprocess_Result/', "02_label")
+if os.path.isdir(ids_path):
+    shutil.rmtree(ids_path)
+if os.path.isdir(ngrad_path):
+    shutil.rmtree(ngrad_path)
+if os.path.isdir(label_path):
+    shutil.rmtree(label_path)
+
+os.makedirs(ids_path)
+os.makedirs(ngrad_path)
+os.makedirs(label_path)
+
 print('----------start test model-------------')
+idx = 0
 for d in test_iter.create_dict_iterator():
-    hmodel.set_train(False)
-    out = hmodel(d['ids'], d['ngrad_ids'])
-    predict = argmax(out)
-    acc = predict == squ(d['label'])
-    acc = mnp.array(acc, dtype=mnp.float32)
-    cur += (mnp.sum(acc, -1))
-    total += len(acc)
-print('acc:', cur / total)
+    ids_rst = d['ids'].asnumpy().astype(np.int32)
+    ids_name = "hypertext_ids_bs" + str(args.batch_size) + "_" + str(idx) + ".bin"
+    ids_real_path = os.path.join(ids_path, ids_name)
+    ids_rst.tofile(ids_real_path)
+    ngrad_ids = d['ngrad_ids'].asnumpy().astype(np.int32)
+    ngrad_name = "hypertext_ngrad_bs" + str(args.batch_size) + "_" + str(idx) + ".bin"
+    ngrad_real_path = os.path.join(ngrad_path, ngrad_name)
+    ngrad_ids.tofile(ngrad_real_path)
+    label = d['label'].asnumpy().astype(np.int32)
+    label_name = "hypertext_label_bs" + str(args.batch_size) + "_" + str(idx) + ".bin"
+    label_real_path = os.path.join(label_path, label_name)
+    label.tofile(label_real_path)
+    idx += 1
