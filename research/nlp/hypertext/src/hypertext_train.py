@@ -109,7 +109,7 @@ class EvalCallBack(Callback):
             out = net_work(d['ids'], d['ngrad_ids'])
             predict = argmax(out)
             acc = predict == squ(d['label'])
-            acc = mnp.array(acc, dtype=mnp.float16)
+            acc = mnp.array(acc, dtype=mnp.float32)
             cur += (mnp.sum(acc, -1))
             total += len(acc)
         return cur / total

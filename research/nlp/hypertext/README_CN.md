@@ -21,7 +21,10 @@
         - [评估性能](#评估性能)
             - [tnews上的HyperText](#tnews上的HyperText)
             - [iflytek上的HyperText](#iflytek上的HyperText)
-- [导出过程](#导出过程)
+- [推理过程](#推理过程)
+    - [导出MindIR](#导出mindir)
+    - [在Ascend310执行推理](#在ascend310执行推理)
+    - [结果](#结果)
 - [ModelZoo主页](#ModelZoo主页)
 
 # HyperText概述
@@ -99,6 +102,7 @@ bash run_eval.sh [DATASET_DIR] [DATASET_TYPE] [MODEL_PATH] [DEVICE]
     │── scripts
     │   │──run_standalone_train.sh   # 训练的shell脚本
     │   │──run_eval.sh   # 评估的shell脚本
+    │   │──run_infer_310.sh   # Ascend310推理的shell脚本
     │   │──data_process.sh   # 在Ascend上评估的shell脚本
     │   │──run_gpu_distributed_train   # 在GPU上分布式训练的shell脚本
     │── output  # 输出文件，包括保存的模型，训练日志，评估日志
@@ -114,6 +118,8 @@ bash run_eval.sh [DATASET_DIR] [DATASET_TYPE] [MODEL_PATH] [DEVICE]
     │   │──radam_optimizer.py   # 优化器
     │── train.py   # 训练脚本
     │── eval.py   # 评估脚本
+    │── preprocess.py   # 推理预处理脚本
+    │── postprocess.py   # 推理精度计算脚本
     │── create_dataset.py   # 数据处理脚本
     │── export.py   # 将checkpoint文件导出到air/mindir
 ```
@@ -222,9 +228,66 @@ iflytek
 python eval.py --datasetdir ./data/iflytek_public --datasetType iflytek  --modelPath ./output/hypertext_iflytek.ckpt --device GPU
 ```
 
-### 评估性能
+# 推理过程
 
-#### tnews上的HyperText
+## 导出MindIR
+
+可以使用如下命令导出mindir文件
+
+- Ascend处理器环境运行
+
+```shell
+tnews
+python export.py --modelPath ./output/hypertext_tnews.ckpt --datasetType tnews --device Ascend --batch_size 1
+iflytek
+python export.py --modelPath ./output/hypertext_iflytek.ckpt --datasetType iflytek --device Ascend --batch_size 1
+```
+
+- GPU处理器环境运行
+
+```shell
+tnews
+python export.py --modelPath ./output/hypertext_tnews.ckpt --datasetType tnews --device GPU
+iflytek
+python export.py --modelPath ./output/hypertext_iflytek.ckpt --datasetType iflytek --device GPU
+```
+
+## 在Ascend310执行推理
+
+在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
+使用配置文件默认的export_batch_size导出MINDIR文件
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` mindir文件路径
+- `DATASET` 使用的推理数据集名称，默认为`iflytek`，可在`iflytek`或者`tnews`中选择
+- `INPUT_PATH` 推理数据集路径
+- `DEVICE_ID` 可选，默认值为0。
+
+## 结果
+
+推理结果保存在脚本执行的当前路径，你可以在acc.log中看到以下精度计算结果。
+
+```bash
+# iflytek
+acc: 0.5687865022712524
+```
+
+```bash
+# tnews
+acc: 0.8180614591317679
+```
+
+## 模型描述
+
+### 性能
+
+#### 评估性能
+
+##### tnews上的HyperText
 
 | 参数                 | Ascend 910                                                   | GPU |
 | -------------------| --------------------------------------  | -------------------------------------- |
@@ -238,9 +301,9 @@ python eval.py --datasetdir ./data/iflytek_public --datasetType iflytek  --model
 | 损失函数              | SoftmaxCrossEntropyWithLogits               | SoftmaxCrossEntropyWithLogits |
 | 输出                    | 精度                                                          |  精度 |
 | 损失                      | 0.9087                                                    |  0.905 |
-| 速度                      | 1958.810毫秒/步（8卡）                          | 315.949毫秒/步（8卡） |
+| 速度                      | 1958.810毫秒/步（单卡）                          | 315.949毫秒/步（单卡） |
 
-#### iflytek上的HyperText
+##### iflytek上的HyperText
 
 | 参数                 | Ascend 910                                                   | GPU |
 | -------------------------- | -------------------------------------- | -------------------------------------- |
@@ -254,33 +317,7 @@ python eval.py --datasetdir ./data/iflytek_public --datasetType iflytek  --model
 | 损失函数              | SoftmaxCrossEntropyWithLogits               | SoftmaxCrossEntropyWithLogits |
 | 输出                    | 精度                                                          |  精度 |
 | 损失                      | 0.57                                                        |  0.5776 |
-| 速度                      | 395.895毫秒/步（8卡）                            | 597.672毫秒/步（8卡） |
-
-tnews多卡精度: 0.8833
-
-iflytek多卡精度: 0.556
-
-# 导出过程
-
-可以使用如下命令导出mindir文件
-
-- Ascend处理器环境运行
-
-```shell
-tnews
-python export.py --modelPath ./output/hypertext_tnews.ckpt --datasetType tnews --device Ascend
-iflytek
-python export.py --modelPath ./output/hypertext_iflytek.ckpt --datasetType iflytek --device Ascend
-```
-
-- GPU处理器环境运行
-
-```shell
-tnews
-python export.py --modelPath ./output/hypertext_tnews.ckpt --datasetType tnews --device GPU
-iflytek
-python export.py --modelPath ./output/hypertext_iflytek.ckpt --datasetType iflytek --device GPU
-```
+| 速度                      | 395.895毫秒/步（单卡）                            | 597.672毫秒/步（单卡） |
 
 # ModelZoo主页
 
