@@ -15,15 +15,10 @@
 
 """Evaluation for NAML"""
 import os
-import argparse
+from model_utils.config import config
 import numpy as np
 
 from sklearn.metrics import roc_auc_score
-
-parser = argparse.ArgumentParser(description="")
-parser.add_argument("--result_path", type=str, default="", help="Device id")
-parser.add_argument("--label_path", type=str, default="", help="output file name.")
-args = parser.parse_args()
 
 def AUC(y_true, y_pred):
     return roc_auc_score(y_true, y_pred)
@@ -79,15 +74,23 @@ class NAMLMetric:
 
 def get_metric(result_path, label_path, metric):
     """get accuracy"""
-    result_files = os.listdir(result_path)
-    for file in result_files:
-        result_file = os.path.join(result_path, file)
+    label_list = os.listdir(label_path)
+    for file in label_list:
+        f = file.split(".bin")[0] + "_0.bin"
+        result_file = os.path.join(result_path, f)
+        if not os.path.exists(result_file):
+            print("exclude file:", file)
+            continue
         pred = np.fromfile(result_file, dtype=np.float32)
+        if pred.size == 0:
+            print("exclude file:", file)
+            continue
 
         label_file = os.path.join(label_path, file)
         label = np.fromfile(label_file, dtype=np.int32)
 
         if np.nan in pred:
+            print("exclude file:", file)
             continue
         metric.update(pred, label)
 
@@ -96,4 +99,4 @@ def get_metric(result_path, label_path, metric):
 
 if __name__ == "__main__":
     naml_metric = NAMLMetric()
-    get_metric(args.result_path, args.label_path, naml_metric)
+    get_metric(config.result_path, config.label_path, naml_metric)

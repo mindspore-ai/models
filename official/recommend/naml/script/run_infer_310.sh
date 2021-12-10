@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 8 || $# -gt 9 ]]; then 
-    echo "Usage: sh run_infer_310.sh [NEWS_MODEL] [USER_MODEL] [NEWS_DATASET_PATH] [USER_DATASET_PATH] [NEWS_ID_PATH] [USER_ID_PATH] [BROWSED_NEWS_PATH] [SOC_VERSION] [DEVICE_ID]
+if [[ $# -lt 2 || $# -gt 3 ]]; then
+    echo "Usage: bash run_infer_310.sh [NEWS_MODEL] [USER_MODEL] [DEVICE_ID]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi
@@ -30,16 +30,10 @@ get_real_path(){
 
 news_model=$(get_real_path $1)
 user_model=$(get_real_path $2)
-news_dataset_path=$(get_real_path $3)
-user_dataset_path=$(get_real_path $4)
-news_id_path=$(get_real_path $5)
-user_id_path=$(get_real_path $6)
-browsed_news_path=$(get_real_path $7)
-soc_version=$8
 
-if [ $# == 9 ]; then
-    device_id=$9
-elif [ $# == 8 ]; then
+if [ $# == 3 ]; then
+    device_id=$3
+elif [ $# == 2 ]; then
     if [ -z $device_id ]; then
         device_id=0
     else
@@ -49,11 +43,6 @@ fi
 
 echo $news_model
 echo $user_model
-echo $news_dataset_path
-echo $news_id_path
-echo $user_id_path
-echo $browsed_news_path
-echo $soc_version
 echo $device_id
 
 export ASCEND_HOME=/usr/local/Ascend/
@@ -70,10 +59,17 @@ else
     export ASCEND_OPP_PATH=$ASCEND_HOME/opp
 fi
 
-function air_to_om()
+function preprocess_data()
 {
-    atc --framework=1 --model=$news_model --output=news_encoder --soc_version=$soc_version
-    atc --framework=1 --model=$user_model --output=user_encoder --soc_version=$soc_version
+    if [ -d preprocess_Result ]; then
+        rm -rf ./preprocess_Result
+    fi
+    mkdir preprocess_Result
+    python3.7 ../preprocess.py --preprocess_path=./preprocess_Result &> preprocess.log
+    if [ $? -ne 0 ]; then
+        echo "preprocess data failed"
+        exit 1
+    fi
 }
 
 function compile_app()
@@ -101,7 +97,7 @@ function infer()
     fi
     mkdir result_Files
     mkdir time_Result
-    ../ascend310_infer/out/main --news_om_path news_encoder.om  --user_om_path user_encoder.om --news_dataset_path $news_dataset_path --user_dataset_path $user_dataset_path --newsid_data_path $news_id_path --userid_data_path $user_id_path --browsed_news_path $browsed_news_path &> infer.log
+    ../ascend310_infer/out/main --news_mindir=$news_model --user_mindir=$user_model --device_id=$device_id --base_path=./preprocess_Result &> infer.log
     if [ $? -ne 0 ]; then
         echo "execute inference failed"
         exit 1
@@ -110,14 +106,14 @@ function infer()
 
 function cal_acc()
 {
-    python ../postprocess.py --result_path=./result_Files --label_path=$browsed_news_path/02_labels_data  &> acc.log
+    python ../postprocess.py --result_path=./result_Files --label_path=./preprocess_Result/browsed_news_test_data/02_labels_data  &> acc.log
     if [ $? -ne 0 ]; then
         echo "calculate accuracy failed"
         exit 1
     fi
 }
 
-air_to_om
+preprocess_data
 compile_app
 infer
 cal_acc

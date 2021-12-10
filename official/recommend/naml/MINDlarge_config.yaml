@@ -43,14 +43,14 @@ category_embedding_dim: 112
 query_vector_dim: 208
 n_filters: 400
 window_size: 3
-checkpoint_path: ""
-batch_size: 64
+checkpoint_path: "naml/naml_large_new.ckpt"
+batch_size: 16
 
 # train option
 beta1: 0.9
 beta2: 0.999
 epsilon: 0.00000001 # 1e-8
-neg_sample: 4
+neg_sample: -1  #when training, neg_sample=4, when test, neg_sample=-1
 mixed: True
 sink_mode: True
 weight_decay: True
@@ -63,8 +63,13 @@ eval_neg_sample: -1
 
 # export option
 export_file_dir: "./"
-file_format: "AIR"
+file_format: "MINDIR"
 export_neg_sample: -1
+
+# infer option
+preprocess_path: "./"
+result_path: "./"
+label_path: "./"
 
 ---
 
