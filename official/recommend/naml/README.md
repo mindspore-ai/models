@@ -53,11 +53,11 @@ You can download the dataset and put the directory in structure as follows:
 ├── naml
   ├── README.md                    # descriptions about NAML
   ├── model_utils
-  │   ├──__init__.py              // module init file
-  │   ├──config.py                // Parse arguments
-  │   ├──device_adapter.py        // Device adapter for ModelArts
-  │   ├──local_adapter.py         // Local adapter
-  │   ├──moxing_adapter.py        // Moxing adapter for ModelArts
+  │   ├──__init__.py               # module init file
+  │   ├──config.py                 # Parse arguments
+  │   ├──device_adapter.py         # Device adapter for ModelArts
+  │   ├──local_adapter.py          # Local adapter
+  │   ├──moxing_adapter.py         # Moxing adapter for ModelArts
   ├── scripts
   │   ├──run_distribute_train.sh   # shell script for distribute training
   │   ├──run_train.sh              # shell script for training
@@ -76,7 +76,8 @@ You can download the dataset and put the directory in structure as follows:
   ├── train.py                     # training script
   ├── eval.py                      # evaluation script
   ├── export.py                    # export mindir script
-  └── postprogress.py              # post process for 310 inference
+  ├── preprocess.py                # preprocess input data
+  └── postprocess.py               # post process for 310 inference
 ```
 
 ## [Training process](#contents)
@@ -200,6 +201,17 @@ python export.py --platform [PLATFORM] --checkpoint_path [CHECKPOINT_PATH] --fil
 
 - `EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
 
+## [Infer on Ascend310](#contents)
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [NEWS_MODEL] [USER_MODEL] [DEVICE_ID]
+```
+
+- `NEWS_MODEL` specifies path of news "MINDIR" OR "AIR" model.
+- `USER_MODEL` specifies path of user "MINDIR" OR "AIR" model.
+- `DEVICE_ID` is optional, default value is 0.
+
 # [Model Description](#contents)
 
 ## [Performance](#contents)
@@ -239,12 +251,12 @@ python export.py --platform [PLATFORM] --checkpoint_path [CHECKPOINT_PATH] --fil
 | ------------------- | --------------------------- |
 | Model Version       | NAML                        |
 | Resource            | Ascend 310                  |
-| Uploaded Date       | 03/13/2021 (month/day/year) |
-| MindSpore Version   | 1.2.0                       |  
+| Uploaded Date       | 12/10/2021 (month/day/year) |
+| MindSpore Version   | 1.6.0                       |  
 | Dataset             | MINDlarge                   |
-| batch_size          | 64                          |
+| batch_size          | 16                          |
 | outputs             | probability                 |
-| Accuracy            | AUC: 0.667                  |
+| Accuracy            | AUC: 0.6669                 |
 
 # [Description of Random Situation](#contents)
 

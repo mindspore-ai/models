@@ -14,43 +14,19 @@
  * limitations under the License.
  */
 
-#ifndef MINDSPORE_MODEL_ZOO_NAML_UTILS_H_
-#define MINDSPORE_MODEL_ZOO_NAML_UTILS_H_
+#ifndef MINDSPORE_INFERENCE_UTILS_H_
+#define MINDSPORE_INFERENCE_UTILS_H_
 
-#pragma once
+#include <sys/stat.h>
 #include <dirent.h>
-#include <iostream>
 #include <vector>
 #include <string>
+#include <memory>
+#include "include/api/types.h"
 
-#define INFO_LOG(fmt, args...) fprintf(stdout, "[INFO]  " fmt "\n", ##args)
-#define WARN_LOG(fmt, args...) fprintf(stdout, "[WARN]  " fmt "\n", ##args)
-#define ERROR_LOG(fmt, args...) fprintf(stdout, "[ERROR] " fmt "\n", ##args)
-
-typedef enum Result {
-    SUCCESS = 0,
-    FAILED = 1
-} Result;
-
-class Utils {
- public:
-    static void *GetDeviceBufferOfFile(std::string fileName, uint32_t *fileSize);
-
-    static void *ReadBinFile(std::string fileName, uint32_t *fileSize);
-
-    static std::vector <std::vector<std::string>> GetAllInputData(std::string dir_name);
-
-    static DIR *OpenDir(std::string dir_name);
-
-    static std::string RealPath(std::string path);
-
-    static std::vector <std::string> GetAllBins(std::string dir_name);
-
-    static Result ReadFileToVector(std::string newsIdFileName, uint32_t batchSize, std::vector<int> *newsId);
-    static Result ReadFileToVector(std::string newsIdFileName, std::vector<int> *newsId);
-    static Result ReadFileToVector(std::string newsIdFileName, uint32_t batchSize, uint32_t count,
-                                   std::vector<std::vector<int>> *newsId);
-};
-#pragma once
-
+std::vector<std::string> GetAllFiles(std::string_view dirName);
+DIR *OpenDir(std::string_view dirName);
+std::string RealPath(std::string_view path);
+mindspore::MSTensor ReadFileToTensor(const std::string &file);
+int WriteResult(const std::string& imageFile, const std::vector<mindspore::MSTensor> &outputs);
 #endif
