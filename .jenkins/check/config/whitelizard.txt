@@ -37,5 +37,21 @@ models/research/cvtmodel/regnet/src/regnet_y_32gf.py:__init__
 models/research/cvtmodel/regnet/src/regnet_x_8gf.py:__init__
 models/research/cvtmodel/regnet/src/regnet_x_32gf.py:__init__
 models/research/cvtmodel/regnet/src/regnet_x_16gf.py:__init__
-
+models/research/cvtmodel/hrnet/src/hrnet_w30.py:__init__
+models/research/cvtmodel/hrnet/src/hrnet_w30.py:construct
+models/research/cvtmodel/hrnet/src/hrnet_w48.py:__init__
+models/research/cvtmodel/hrnet/src/hrnet_w48.py:construct
+models/research/cvtmodel/hrnet/src/hrnet_w64.py:__init__
+models/research/cvtmodel/hrnet/src/hrnet_w64.py:construct
+models/research/cvtmodel/hrnet/src/hrnet_w40.py:__init__
+models/research/cvtmodel/hrnet/src/hrnet_w40.py:construct
+models/research/cvtmodel/hrnet/src/hrnet_w18_small.py:__init__
+models/research/cvtmodel/resnet_ipl/src/resnetrs200.py:__init__
+models/research/cvtmodel/resnet_ipl/src/gernet_l.py:__init__
+models/research/cvtmodel/resnet_ipl/src/resnet51q.py:__init__
+models/research/cvtmodel/resnet_ipl/src/seresnet152d.py:__init__
+models/research/cvtmodel/resnet_ipl/src/resnest101e.py:__init__
+models/research/cvtmodel/resnet_ipl/src/resnet26t.py:__init__
+models/research/cvtmodel/resnet_ipl/src/resnet101d.py:__init__
+models/research/cvtmodel/resnet_ipl/src/resnetrs50.py:__init__
 
