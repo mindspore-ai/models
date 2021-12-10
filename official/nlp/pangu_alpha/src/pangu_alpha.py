@@ -290,6 +290,7 @@ class PanguAlpha_Model(Cell):
 
         if config.load_ckpt_path:
             self.load_embedding_from_ckpt(config.load_ckpt_path)
+        self.run_type = config.run_type
 
     def construct(self, input_ids,
                   input_position,
@@ -300,7 +301,7 @@ class PanguAlpha_Model(Cell):
         embed, word_table = self.embedding(input_ids, input_position, init_reset, batch_valid_length)
         hidden_state = P.Cast()(embed, self.dtype)
         # the input of the incremental prediction is 3d
-        if self._phase != 'predict':
+        if self.run_type != 'predict':
             hidden_state = self.reshape_to_2d(hidden_state)
         if self.blocks is not None:
             for i in range(self.num_layers - 1):
@@ -479,10 +480,10 @@ class EvalNet(nn.Cell):
         bs, seq_length = F.shape(input_ids)
         input_position = F.tuple_to_array(F.make_range(seq_length))
         input_position = P.Tile()(input_position, (bs, 1))
-        if self.is_first_iteration:
-            attention_mask = self.get_attention_mask(input_mask)
-        else:
+        if self.is_first_iteration is False:
             attention_mask = P.Tile()(self.all_ones_attention_mask, (bs, 1, 1))
+        else:
+            attention_mask = self.get_attention_mask(input_mask)
         logits = self.backbone(input_ids, input_position, attention_mask,
                                init_reset, batch_valid_length)
         index = current_index.view(1,)

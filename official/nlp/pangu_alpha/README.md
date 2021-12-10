@@ -159,7 +159,7 @@ The above command involves some `args` described below:
 - RANK_START: The start of rank_id in current machines, it helps to set the rank_id for each machine in multi-machine scenario.
 - LOCAL_DEVICE_NUM: The device number of the local machine.
 
-The following command will launch he program will train 2.6B model with the following command:
+The following command will launch the program to train 2.6B model:
 
 ```bash
 # run distributed training example in one ascend machine
@@ -179,6 +179,9 @@ bash scripts/run_distribute_train.sh /path/dataset /path/hccl.json 16 fp32 2.6B 
 For distributed training, an hccl configuration file with JSON format needs to be created in advance.
 Please follow the instructions in the link below:
 https:gitee.com/mindspore/models/tree/master/utils/hccl_tools.
+
+Once you start training, the training log is redirected to device{rank_id}/log{rank_id}.txt(For example,
+device0/log0.log).
 
 ### Training on GPU
 
@@ -220,9 +223,9 @@ The above command involves some `args` described below:
 - LOCAL_DEVICE_NUM: The device number of the local machine.
 - EXPERT_NUM_PER_EP: Expert nums in one data parallel dim.
 
-The following command will launch he program will train 60B model using 8 NPU.
+The following command will launch the program to train 60B model using 8 NPU.
 Mode 2.6B only represents the model configuration is same with 2.6B model which is without MoE.
-Running 0B model using 8 NPU in one server requires that the server has at least 1T host memory.
+Training 60B model using 8 NPU in one server requires that the server has at least 1TB host memory.
 
 ```bash
 # run distributed training example in one ascend machine
@@ -232,7 +235,7 @@ bash run_distributed_train_moe_host_device.sh /path/dataset /path/hccl.json 8 fp
 
 ### Incremental Training
 
- Before we start Incremental Training, the following two steps must be done:
+Before we start Incremental Training, the following two steps must be done:
 
 1. Process the dataset using the released vocab, please refer to the [Increnmental Training in Dataset Generatiogn](#Incremental Training)
 2. Download the`checkpoint` and `strategy` file according to the  [Download Checkpoint](#Download Checkpoint). Each host should own the complete checkpoint files.
@@ -291,8 +294,8 @@ ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B fp32
 The following script will run prediction on 1 Ascend cards or 1 Nvidia GPU. The difference is the net is initialized with float16 type.
 
 ```bash
-$FILE_PATH=/home/your_path/ckpts
-$DEVICE_TARGET=Ascend # or GPU
+export FILE_PATH=/home/your_path/ckpts
+export DEVICE_TARGET=Ascend # or GPU
 bash scripts/run_standalone_predict.sh ${FILE_PATH}/strategy_load_ckpt/strategy.ckpt \
 ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TARGET
 ```

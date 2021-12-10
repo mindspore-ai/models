@@ -27,9 +27,9 @@ export CKPT_NAME='filerted'
 
 for((i=0;i<$RANK_SIZE;i++));
 do
-  rm -rf ${execute_path}/device_$i/
-  mkdir ${execute_path}/device_$i/
-  cd ${execute_path}/device_$i/ || exit
+  rm -rf ${execute_path}/device$i/
+  mkdir ${execute_path}/device$i/
+  cd ${execute_path}/device$i/ || exit
   export RANK_ID=$i
   export DEVICE_ID=$i
   python -s ${self_path}/../predict.py --strategy_load_ckpt_path=$STRATEGY --load_ckpt_path=$CKPT_PATH \

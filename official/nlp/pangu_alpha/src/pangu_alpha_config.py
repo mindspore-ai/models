@@ -42,6 +42,7 @@ class PanguAlphaConfig:
                  use_moe=False,
                  per_dp_dim_expert_num=4,
                  parallel_config=None,
+                 run_type='train',
                  softmax_compute_type=mstype.float16):
         self.batch_size = batch_size
         self.seq_length = seq_length
@@ -65,11 +66,12 @@ class PanguAlphaConfig:
         self.softmax_compute_type = softmax_compute_type
         self.use_moe = bool(use_moe)
         self.per_dp_dim_expert_num = per_dp_dim_expert_num
+        self.run_type = run_type
 
     def __str__(self):
-        info = "[PANGUALPHAConfig]" + '===' * 10 + '\n'
+        info = '===' * 10 + "[PANGUALPHAConfig]" + '===' * 10 + '\n'
         for k, v in self.__dict__.items():
-            var_info = "{}:{}\n".format(k, v)
+            var_info = "--{}:{}\n".format(k, v)
             info += var_info
         info += '=' * 10
         return info
