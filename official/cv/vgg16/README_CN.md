@@ -120,7 +120,7 @@ VGG 16网络主要由几个基本模块（包括卷积层和池化层）和三�
 python train.py  --config_path=[YAML_CONFIG_PATH] --data_dir=[DATA_PATH] --dataset=[DATASET_TYPE] > output.train.log 2>&1 &
 
 # 分布式训练示例
-bash scripts/run_distribute_train.sh [RANL_TABLE_JSON] [DATA_PATH] --dataset=[DATASET_TYPE]
+bash scripts/run_distribute_train.sh [RANL_TABLE_JSON] [DATA_PATH] [DATASET_TYPE](optional)
 
 # 评估示例
 python eval.py --config_path=[YAML_CONFIG_PATH] --data_dir=[DATA_PATH]  --pre_trained=[PRE_TRAINED] --dataset=[DATASET_TYPE] > output.eval.log 2>&1 &
@@ -275,17 +275,20 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=
 ### 脚本及样例代码
 
 ```bash
-├── model_zoo
+├── models
     ├── README.md                                 // 所有模型相关说明
-    ├── vgg16
+    ├── official/cv/vgg16
         ├── README.md                             // VGG 相关说明
         ├── README_CN.md                          // VGG 相关中文说明
+        ├── ascend310_infer                       // Ascend310 推理目录
+        ├── ascend310_quant_infer                 // Ascend310 推理目录（量化）
+        ├── infer                                 // MindX 推理目录
         ├── model_utils
-            ├── __init__.py                 // 初始化文件
-            ├── config.py                   // 参数配置
-            ├── device_adapter.py           // ModelArts的设备适配器
-            ├── local_adapter.py            // 本地适配器
-            └── moxing_adapter.py           // ModelArts的模型适配器
+        │   ├── __init__.py                 // 初始化文件
+        │   ├── config.py                   // 参数配置
+        │   ├── device_adapter.py           // ModelArts的设备适配器
+        │   ├── local_adapter.py            // 本地适配器
+        │   └── moxing_adapter.py           // ModelArts的模型适配器
         ├── scripts
         │   ├── run_distribute_train.sh           // Ascend 分布式训练shell脚本
         │   ├── run_distribute_train_gpu.sh       // GPU 分布式训练shell脚本
@@ -310,6 +313,8 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=
         ├── mindspore_hub_conf.py                 // mindspore hub 脚本
         ├── cifar10_config.yaml                   // cifar10 配置文件
         ├── imagenet2012_config.yaml              // imagenet2012 配置文件
+        ├── export.py                             // 模型格式转换脚本
+        └── requirements.txt                      // requirements
 ```
 
 ### 脚本参数
@@ -352,7 +357,7 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=
 
 ### 参数配置
 
-在 cifar10_config.yaml/cifar10_config.yaml 中可以同时配置训练参数和评估参数。
+在 cifar10_config.yaml/imagenet2012_config.yaml 中可以同时配置训练参数和评估参数。
 
 - 配置VGG16，CIFAR-10数据集
 
