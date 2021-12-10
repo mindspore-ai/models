@@ -38,7 +38,7 @@ device_id: 0
 export_batch_size: 1
 ckpt_file: ""
 file_name: "yolov3_resnet18"
-file_format: "AIR"
+file_format: "MINDIR"
 
 ---
 

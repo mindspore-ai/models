@@ -38,7 +38,7 @@ lr: 0.01
 # Model Description
 model_name: alexnet
 file_name: 'alexnet'
-file_format: 'AIR'
+file_format: 'MINDIR'
 
 
 ---

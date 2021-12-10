@@ -399,11 +399,12 @@ Ascend:
 ## [Export MindIR](#contents)
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [YAML_CONFIG_PATH]
 ```
 
-The ckpt_file parameter is required,
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+- `ckpt_file` parameter is required.
+- `FILE_FORMAT` should be in ["AIR", "MINDIR"].
+- `YAML_CONFIG_PATH` default is `default_config.yaml`.
 
 ## [Inference Process](#contents)
 

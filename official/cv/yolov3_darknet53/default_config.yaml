@@ -74,7 +74,7 @@ device_id: 0
 batch_size: 1
 ckpt_file: ""
 file_name: "yolov3_darknet53"
-file_format: "AIR" # ["AIR", "ONNX", "MINDIR"]
+file_format: "MINDIR" # ["AIR", "ONNX", "MINDIR"]
 keep_detect: True
 
 # PostProcess option
