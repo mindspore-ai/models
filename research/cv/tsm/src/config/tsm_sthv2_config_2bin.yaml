@@ -1,0 +1,63 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+run_distribute: False
+enable_profiling: False
+data_path: "/cache/data/"
+output_path: "/cache/train/"
+load_path: "/cache/data/"
+device_target: "Ascend"
+checkpoint_path: "./checkpoint/"
+checkpoint_file_path: ""
+
+dataset: "somethingv2"
+modality: "RGB"
+train_list: 
+val_list: 
+root_path: 
+arch: "resnet50"
+num_segments: 8
+consensus_type: "avg"
+k: 3
+dropout: 0.5
+loss_type: "nll"
+img_feature_dim: 256
+suffix: None
+pretrain: "imagenet"
+tune_from: "resnet50.ckpt"
+epochs: 50
+batch_size: 1
+lr: 0.01
+lr_type: "step"
+lr_steps: [20.0, 40.0]
+momentum: 0.9
+weight_decay: 0.0005
+clip_gradient: 20.0
+no_partialbn: True
+print_freq: 20
+eval_freq: 1
+workers: 1
+resume: 
+evaluate: False
+snapshot_pref: 
+start_epoch: 0
+gpus: None 
+rank: 0
+flow_prefix: 
+root_log: "log"
+root_model: "checkpoint"
+shift: True
+shift_div: 8
+shift_place: "blockres"
+temporal_pool: False
+non_local: False
+dense_sample: False
+test_filename: "ssd-50_2639.ckpt"
+
+---
+
+
