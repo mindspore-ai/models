@@ -89,7 +89,7 @@ def parse_yaml(yaml_path):
                 cfg, cfg_helper, cfg_choices = cfgs
             else:
                 raise ValueError("At most 3 docs (config, description for help, choices) are supported in config yaml")
-            print(cfg_helper)
+            # print(cfg_helper)
         except:
             raise ValueError("Failed to parse yaml")
     return cfg, cfg_helper, cfg_choices

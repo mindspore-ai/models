@@ -108,6 +108,6 @@ cp -r ../src ./eval
 cd ./eval || exit
 env > env.log
 echo "start eval for device $DEVICE_ID"
-python eval.py --config_path=$CONFIG_FILE --device_id=$DEVICE_ID --ann_file=$PATH1 --checkpoint_path=$PATH2 \
+python eval.py --config_path=$CONFIG_FILE --device_id=$DEVICE_ID --anno_path=$PATH1 --checkpoint_path=$PATH2 \
 --backbone=$3 --coco_root=$PATH3 --mindrecord_dir=$mindrecord_dir &> log &
 cd ..

@@ -16,7 +16,9 @@
 
 if [ $# -le 2 ]
 then 
-    echo "Usage: sh run_standalone_train_gpu.sh [PRETRAINED_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)"
+    echo "Usage: 
+    bash run_standalone_train_gpu.sh [PRETRAINED_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)
+    "
 exit 1
 fi
 
@@ -83,24 +85,21 @@ else
   CONFIG_FILE="${BASE_PATH}/../default_config.yaml"
 fi
 
-ulimit -u unlimited
 export DEVICE_NUM=1
 export DEVICE_ID=0
 export RANK_ID=0
 export RANK_SIZE=1
 
-if [ -d "train" ];
+export PYTHONPATH=${BASE_PATH}:$PYTHONPATH
+if [ -d "../train" ];
 then
-    rm -rf ./train
+    rm -rf ../train
 fi
-mkdir ./train
-cp ../*.py ./train
-cp ../*.yaml ./train
-cp *.sh ./train
-cp -r ../src ./train
-cd ./train || exit
+mkdir ../train
+cd ../train || exit
+
 echo "start training for device $DEVICE_ID"
 env > env.log
-python train.py --config_path=$CONFIG_FILE --coco_root=$PATH2 --mindrecord_dir=$mindrecord_dir \
---device_id=$DEVICE_ID --pre_trained=$PATH1 --device_target="GPU" --backbone=$2 &> log &
-cd ..
+pwd
+python ${BASE_PATH}/../train.py --config_path=$CONFIG_FILE --coco_root=$PATH2 --mindrecord_dir=$mindrecord_dir \
+--device_id=$DEVICE_ID --pre_trained=$PATH1 --device_target="GPU" --backbone=$2 &> train.log &

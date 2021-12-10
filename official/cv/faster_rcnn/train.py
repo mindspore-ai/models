@@ -17,6 +17,8 @@
 
 import os
 import time
+from pprint import pprint
+
 import numpy as np
 
 import mindspore.common.dtype as mstype
@@ -29,6 +31,8 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.nn import SGD
 from mindspore.common import set_seed
 
+from mindspore.train.callback import SummaryCollector
+
 from src.FasterRcnn.faster_rcnn import Faster_Rcnn
 from src.network_define import LossCallBack, WithLossCell, TrainOneStepCell, LossNet
 from src.dataset import data_to_mindrecord_byte_image, create_fasterrcnn_dataset
@@ -36,29 +40,6 @@ from src.lr_schedule import dynamic_lr
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id, get_device_num, get_rank_id
-
-set_seed(1)
-context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
-
-if config.device_target == "GPU":
-    context.set_context(enable_graph_kernel=True)
-if config.run_distribute:
-    if config.device_target == "Ascend":
-        rank = get_rank_id()
-        device_num = get_device_num()
-        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
-        init()
-    else:
-        init("nccl")
-        context.reset_auto_parallel_context()
-        rank = get_rank()
-        device_num = get_group_size()
-        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
-else:
-    rank = 0
-    device_num = 1
 
 
 def train_fasterrcnn_():
@@ -120,12 +101,17 @@ def modelarts_pre_process():
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_fasterrcnn():
     """ train_fasterrcnn """
+    print(f"\n[{rank}] - rank id of process")
     dataset_size, dataset = train_fasterrcnn_()
+
+    print(f"\n[{rank}]", "===> Creating network...")
     net = Faster_Rcnn(config=config)
     net = net.set_train()
+    print(f"[{rank}]", "\t Done!\n")
 
     load_path = config.pre_trained
     if load_path != "":
+        print(f"\n[{rank}]", "===> Loading from checkpoint:", load_path)
         param_dict = load_checkpoint(load_path)
 
         key_mapping = {'down_sample_layer.1.beta': 'bn_down_sample.beta',
@@ -153,32 +139,44 @@ def train_fasterrcnn():
             tensor = value.asnumpy().astype(np.float32)
             param_dict[key] = Parameter(tensor, key)
         load_param_into_net(net, param_dict)
+    print(f"[{rank}]", "\tDone!\n")
 
     device_type = "Ascend" if context.get_context("device_target") == "Ascend" else "Others"
+    print(f"\n[{rank}]", "===> Device type:", device_type, "\n")
     if device_type == "Ascend":
         net.to_float(mstype.float16)
 
+    print(f"\n[{rank}]", "===> Creating loss, lr and opt objects...")
     loss = LossNet()
     lr = Tensor(dynamic_lr(config, dataset_size), mstype.float32)
 
     opt = SGD(params=net.trainable_params(), learning_rate=lr, momentum=config.momentum,
               weight_decay=config.weight_decay, loss_scale=config.loss_scale)
     net_with_loss = WithLossCell(net, loss)
+    print(f"[{rank}]", "\tDone!\n")
     if config.run_distribute:
+        print(f"\n[{rank}]", "===> Run distributed training...\n")
         net = TrainOneStepCell(net_with_loss, opt, sens=config.loss_scale, reduce_flag=True,
                                mean=True, degree=device_num)
     else:
+        print(f"\n[{rank}]", "===> Run single GPU training...\n")
         net = TrainOneStepCell(net_with_loss, opt, sens=config.loss_scale)
 
+    print(f"\n[{rank}]", "===> Creating callbacks...")
+    summary_collector = SummaryCollector(summary_dir)
     time_cb = TimeMonitor(data_size=dataset_size)
-    loss_cb = LossCallBack(rank_id=rank)
-    cb = [time_cb, loss_cb]
+    loss_cb = LossCallBack(per_print_times=dataset_size, rank_id=rank)
+    cb = [time_cb, loss_cb, summary_collector]
+    print(f"[{rank}]", "\tDone!\n")
+
+    print(f"\n[{rank}]", "===> Configurating checkpoint saving...")
     if config.save_checkpoint:
         ckptconfig = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_epochs * dataset_size,
                                       keep_checkpoint_max=config.keep_checkpoint_max)
         save_checkpoint_path = os.path.join(config.save_checkpoint_path, "ckpt_" + str(rank) + "/")
         ckpoint_cb = ModelCheckpoint(prefix='faster_rcnn', directory=save_checkpoint_path, config=ckptconfig)
         cb += [ckpoint_cb]
+    print(f"[{rank}]", "\tDone!\n")
 
     if config.run_eval:
         from src.eval_callback import EvalCallBack
@@ -203,4 +201,36 @@ def train_fasterrcnn():
 
 
 if __name__ == '__main__':
+    set_seed(1)
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
+
+    local_path = '/'.join(os.path.realpath(__file__).split('/')[:-1])
+    summary_dir = local_path + "/train/summary/"
+
+    if config.device_target == "GPU":
+        context.set_context(enable_graph_kernel=True)
+    if config.run_distribute:
+        if config.device_target == "Ascend":
+            rank = get_rank_id()
+            device_num = get_device_num()
+            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+            init()
+            summary_dir += "thread_num_" + str(rank) + "/"
+        else:
+            init("nccl")
+            context.reset_auto_parallel_context()
+            rank = get_rank()
+            device_num = get_group_size()
+            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+            summary_dir += "thread_num_" + str(rank) + "/"
+    else:
+        rank = 0
+        device_num = 1
+
+    print()  # just for readability
+    pprint(config)
+    print(f"\n[{rank}] Please check the above information for the configurations\n\n", flush=True)
+
     train_fasterrcnn()

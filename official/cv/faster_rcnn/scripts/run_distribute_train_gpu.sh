@@ -16,14 +16,16 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_distribute_train_gpu.sh DEVICE_NUM PRETRAINED_PATH BACKBONE COCO_ROOT MINDRECORD_DIR(option)"
-echo "for example: sh run_distribute_train_gpu.sh 8 /path/pretrain.ckpt resnet_v1_50 cocodataset mindrecord_dir(option)"
+echo "bash run_distribute_train_gpu.sh DEVICE_NUM PRETRAINED_PATH BACKBONE COCO_ROOT MINDRECORD_DIR(option)"
+echo "for example: bash run_distribute_train_gpu.sh 8 /path/pretrain.ckpt resnet_v1_50 cocodataset mindrecord_dir(option)"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 
 if [ $# -le 3 ]
 then
-    echo "Usage: sh run_distribute_train_gpu.sh [DEVICE_NUM] [PRETRAINED_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)"
+    echo "Usage: 
+    bash run_distribute_train_gpu.sh [DEVICE_NUM] [PRETRAINED_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)
+    "
 exit 1
 fi
 
@@ -40,11 +42,6 @@ get_real_path(){
     echo "$(realpath -m $PWD/$1)"
   fi
 }
-
-rm -rf run_distribute_train
-mkdir run_distribute_train
-cp -rf ../src/ ../train.py ../*.yaml ./run_distribute_train
-cd run_distribute_train || exit
 
 export RANK_SIZE=$1
 PRETRAINED_PATH=$2
@@ -65,13 +62,13 @@ echo $mindrecord_dir
 BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
 if [ $# -ge 1 ]; then
   if [ $3 == 'resnet_v1.5_50' ]; then
-    CONFIG_FILE="${BASE_PATH}/default_config.yaml"
+    CONFIG_FILE="${BASE_PATH}/../default_config.yaml"
   elif [ $3 == 'resnet_v1_101' ]; then
-    CONFIG_FILE="${BASE_PATH}/default_config_101.yaml"
+    CONFIG_FILE="${BASE_PATH}/../default_config_101.yaml"
   elif [ $3 == 'resnet_v1_152' ]; then
-    CONFIG_FILE="${BASE_PATH}/default_config_152.yaml"
+    CONFIG_FILE="${BASE_PATH}/../default_config_152.yaml"
   elif [ $3 == 'resnet_v1_50' ]; then
-    CONFIG_FILE="${BASE_PATH}/default_config.yaml"
+    CONFIG_FILE="${BASE_PATH}/../default_config.yaml"
   elif [ $3 == 'inception_resnet_v2' ]; then
     CONFIG_FILE="${BASE_PATH}/../default_config_InceptionResnetV2.yaml"
   else
@@ -82,10 +79,17 @@ else
   CONFIG_FILE="${BASE_PATH}/default_config.yaml"
 fi
 
-echo "start training on $RANK_SIZE devices"
+if [ -d "../train" ];
+then
+    rm -rf ../train
+fi
+mkdir ../train
+cd ../train || exit
 
-mpirun -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
-    python train.py  \
+echo "start training on $RANK_SIZE devices"
+env > env.log
+mpirun -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout --allow-run-as-root \
+    python ${BASE_PATH}/../train.py  \
     --config_path=$CONFIG_FILE \
     --run_distribute=True \
     --device_target="GPU" \
@@ -93,4 +97,4 @@ mpirun -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
     --pre_trained=$PRETRAINED_PATH \
     --backbone=$3 \
     --coco_root=$PATH3 \
-    --mindrecord_dir=$mindrecord_dir > log 2>&1 &
+    --mindrecord_dir=$mindrecord_dir > train.log 2>&1 &
