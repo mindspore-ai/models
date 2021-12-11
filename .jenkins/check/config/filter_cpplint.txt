@@ -77,3 +77,5 @@
 "models/official/cv/resnet/infer/ResNet18/mxbase/Resnet18ClassifyOpencv.h"                   "runtime/references"
 "models/official/cv/googlenet/infer/mxbase/src/Googlenet.h"                 "runtime/references"
 "models/official/cv/googlenet/infer/mxbase/src/main.cpp"                    "runtime/references"
+"models/official/cv/retinanet/infer/mxbase/retinanetDetection/RetinanetDetection.h"     "runtime/references"
+"models/official/cv/retinanet/infer/mxbase/retinanetDetection/RetinanetDetection.cpp"   "runtime/references"
