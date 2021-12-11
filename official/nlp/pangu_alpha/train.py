@@ -349,7 +349,8 @@ def restore_exception_checkpoint(args_param, sink_size, dataset, model, network,
         restore_ranks_map_json = json.loads(restore_ranks_map)
         map_rank_id = D.get_rank()
         for key in restore_ranks_map_json.keys():
-            if str(D.get_rank()) in key:
+            key_list = list(key.split(","))
+            if str(D.get_rank()) in key_list:
                 map_rank_id = restore_ranks_map_json.get(key)
 
         print(f"loading map rank id {map_rank_id}")
@@ -392,6 +393,7 @@ def set_pipeline_parallel_context(args_opt):
     _set_multi_subgraphs()
     return rank_id, device_num
 
+
 def run_train_pipeline(args_opt):
     r"""The main training process in pipeline."""
     # Set hccl connect time
@@ -420,13 +422,11 @@ def run_train_pipeline(args_opt):
     per_batch_size = args_opt.per_batch_size
     batch_size = per_batch_size * data_parallel_num * args_opt.micro_size
     micro_batch_interleaved = args_opt.micro_batch_interleaved
-    parallel_config = TransformerOpParallelConfig(data_parallel=data_parallel_num,
-                                                  model_parallel=model_parallel_num,
+    parallel_config = TransformerOpParallelConfig(data_parallel=data_parallel_num, model_parallel=model_parallel_num,
                                                   pipeline_stage=args_opt.stage_num,
                                                   micro_batch_num=args_opt.micro_size,
                                                   optimizer_shard=bool(args_opt.optimizer_shard),
-                                                  vocab_emb_dp=bool(args_opt.word_emb_dp),
-                                                  recompute=True)
+                                                  vocab_emb_dp=bool(args_opt.word_emb_dp), recompute=True)
     config = PanguAlphaConfig(batch_size=batch_size // parallel_config.micro_batch_num // micro_batch_interleaved,
                               num_heads=args_opt.num_heads, hidden_size=args_opt.embedding_size,
                               seq_length=args_opt.seq_length, vocab_size=args_opt.vocab_size,
@@ -456,8 +456,7 @@ def run_train_pipeline(args_opt):
         optimizer = nn.AdamWeightDecay(group_params, learning_rate=lr, beta1=0.9, beta2=0.95, eps=1e-8)
 
     ds = create_dataset(config.batch_size * parallel_config.micro_batch_num * micro_batch_interleaved,
-                        data_path=cache_url,
-                        device_num=stage_device_num,
+                        data_path=cache_url, device_num=stage_device_num,
                         rank=rank_id % stage_device_num, eod_reset=True, data_start_index=0,
                         full_batch=context.get_auto_parallel_context("full_batch"),
                         column_name=args_opt.data_column_name)
@@ -486,6 +485,17 @@ def run_train_pipeline(args_opt):
         callback.append(eval_callback)
     else:
         model = Model(pangu_alpha_with_grads)
+
+    if args_opt.pre_trained:
+        flag = restore_exception_checkpoint(args_opt, callback_size, ds, model,
+                                            pangu_alpha_with_grads, epoch=actual_epoch_num)
+        if not flag:
+            restore_checkpoint(args_opt, callback_size, ds, model, pangu_alpha_with_grads, epoch=actual_epoch_num)
+
+    callback = [TimeMonitor(callback_size), LossCallBack(callback_size, rank_id, args_opt.has_trained_epoches,
+                                                         args_opt.has_trained_steps)]
+    add_checkpoint_callback_policy(args_opt, callback, rank_id)
+
     model.train(actual_epoch_num, ds, callbacks=callback,
                 sink_size=callback_size, dataset_sink_mode=True)
 
