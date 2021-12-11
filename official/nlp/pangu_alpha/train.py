@@ -339,7 +339,8 @@ def restore_exception_checkpoint(args_param, sink_size, dataset, model, network,
         restore_ranks_map_json = json.loads(restore_ranks_map)
         map_rank_id = D.get_rank()
         for key in restore_ranks_map_json.keys():
-            if str(D.get_rank()) in key:
+            key_list = list(key.split(","))
+            if str(D.get_rank()) in key_list:
                 map_rank_id = restore_ranks_map_json.get(key)
 
         print(f"loading map rank id {map_rank_id}")
@@ -366,6 +367,28 @@ def restore_exception_checkpoint(args_param, sink_size, dataset, model, network,
         return True
 
 
+def set_pipeline_parallel_context(args_opt):
+    r"""
+    Set run_train_pipeline function parallel context.
+    """
+    D.init()
+    device_num = D.get_group_size()
+    rank_id = D.get_rank()
+    print("rank_id is {}, device_num is {}".format(rank_id, device_num))
+    context.reset_auto_parallel_context()
+    context.set_auto_parallel_context(
+        parallel_mode=ParallelMode.SEMI_AUTO_PARALLEL,
+        gradients_mean=False,
+        full_batch=bool(args_opt.full_batch),
+        loss_repeated_mean=True,
+        device_num=device_num,
+        enable_parallel_optimizer=bool(args_opt.optimizer_shard),
+        pipeline_stages=args_opt.stage_num)
+    set_algo_parameters(elementwise_op_strategy_follow=True)
+    _set_multi_subgraphs()
+    return rank_id, device_num
+
+
 def run_train_pipeline(args_opt):
     r"""
     The main training process in pipeline.
@@ -375,25 +398,11 @@ def run_train_pipeline(args_opt):
 
     context.set_context(save_graphs=False, mode=context.GRAPH_MODE, device_target=args_opt.device_target)
     context.set_context(variable_memory_max_size="31GB")
+    rank_id = int(os.getenv("RANK_ID"))
+    device_num = 1
     if args_opt.distribute == "true":
-        D.init()
-        device_num = D.get_group_size()
-        rank_id = D.get_rank()
-        print("rank_id is {}, device_num is {}".format(rank_id, device_num))
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(
-            parallel_mode=ParallelMode.SEMI_AUTO_PARALLEL,
-            gradients_mean=False,
-            full_batch=bool(args_opt.full_batch),
-            loss_repeated_mean=True,
-            device_num=device_num,
-            enable_parallel_optimizer=bool(args_opt.optimizer_shard),
-            pipeline_stages=args_opt.stage_num)
-        set_algo_parameters(elementwise_op_strategy_follow=True)
-        _set_multi_subgraphs()
-    else:
-        rank_id = int(os.getenv("RANK_ID"))
-        device_num = 1
+        rank_id, device_num = set_pipeline_parallel_context(args_opt)
+
     # copy data from the cloud to the /cache/Data
     cache_url = '/cache/Data/'
     if args_opt.offline:
@@ -463,6 +472,17 @@ def run_train_pipeline(args_opt):
     pangu_alpha_with_grads = PanguAlphaTrainPipelineWithLossScaleCell(
         pangu_alpha_with_loss, optimizer=optimizer, config=config, scale_update_cell=update_cell)
     model = Model(pangu_alpha_with_grads)
+    if args_opt.pre_trained:
+        flag = restore_exception_checkpoint(args_opt, callback_size, ds, model,
+                                            pangu_alpha_with_grads, epoch=actual_epoch_num)
+        if not flag:
+            restore_checkpoint(args_opt, callback_size, ds, model, pangu_alpha_with_grads, epoch=actual_epoch_num)
+
+    callback = [
+        TimeMonitor(callback_size),
+        LossCallBack(callback_size, rank_id, args_opt.has_trained_epoches, args_opt.has_trained_steps)
+    ]
+    add_checkpoint_callback_policy(args_opt, callback, rank_id)
     model.train(actual_epoch_num, ds, callbacks=callback,
                 sink_size=callback_size, dataset_sink_mode=True)
 
