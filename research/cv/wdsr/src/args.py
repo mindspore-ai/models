@@ -88,8 +88,8 @@ parser.add_argument('--save_result', action='store_true',
 # alltask
 parser.add_argument('--task_id', type=int, default=0)
 parser.add_argument('--pre_trained', type=str, default='', help='model_path, local pretrained model to load')
-parser.add_argument('--device_target', type=str, default='GPU', choices=("GPU"),
-                    help="Device target, support GPU.")
+parser.add_argument('--device_target', type=str, default='Ascend', choices=("GPU", "Ascend"),
+                    help="Device target, support GPU and Ascend.")
 parser.add_argument("--run_distribute", type=int, default=False,
                     help="Run distribute, default: false.")
 parser.add_argument('--device_num', type=int, default=1, help='Device num.')
