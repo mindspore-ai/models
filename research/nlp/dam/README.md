@@ -212,22 +212,30 @@ After training, you'll get some checkpoint files under `./output/ubuntu/` folder
 
 ```bash
 # training result(8p)-ubuntu
-step time 2647.684097290039
-step time 2648.6032009124756
-step time 2647.829294204712
-step time 2647.589921951294
-step time 2648.9861011505127
-step time 2647.5231647491455
-step time 2648.2014656066895
-epoch: 1 step: 3850 global_step: 3850, loss is 0.3610387
-epoch: 1 step: 3850 global_step: 3850, loss is 0.43725
-epoch: 1 step: 3850 global_step: 3850, loss is 0.32302663
-epoch: 1 step: 3850 global_step: 3850, loss is 0.39590475
-epoch: 1 step: 3850 global_step: 3850, loss is 0.27697793
-step time 2648.0748653411865
-epoch: 1 step: 3850 global_step: 3850, loss is 0.44682306
-epoch: 1 step: 3850 global_step: 3850, loss is 0.32795233
-epoch: 1 step: 3850 global_step: 3850, loss is 0.33162415
+step time 197.62039184570312
+step time 197.71790504455566
+epoch: 1 step: 3853 global_step: 3853, loss is 0.21962138
+epoch: 1 step: 3853 global_step: 3853, loss is 0.21994969
+epoch: 1 step: 3853 global_step: 3853, loss is 0.32234603
+epoch: 1 step: 3853 global_step: 3853, loss is 0.37376451
+epoch: 1 step: 3853 global_step: 3853, loss is 0.5122621
+epoch: 1 step: 3853 global_step: 3853, loss is 0.20732686
+step time 197.07393646240234
+step time 197.10779190063477
+step time 197.42536544799805
+step time 197.4952220916748
+step time 197.47066497802734
+epoch: 1 step: 3854 global_step: 3854, loss is 0.2575438
+epoch: 1 step: 3854 global_step: 3854, loss is 0.29517844
+epoch: 1 step: 3854 global_step: 3854, loss is 0.17604485
+epoch: 1 step: 3854 global_step: 3854, loss is 0.22759959
+epoch: 1 step: 3854 global_step: 3854, loss is 0.43964553
+step time 197.8461742401123
+step time 198.20117950439453
+step time 198.29559326171875
+epoch: 1 step: 3854 global_step: 3854, loss is 0.2520399
+epoch: 1 step: 3854 global_step: 3854, loss is 0.3967452
+epoch: 1 step: 3854 global_step: 3854, loss is 0.3976175
 ```
 
 ## [Evaluation Process](#contents)
@@ -238,7 +246,7 @@ epoch: 1 step: 3850 global_step: 3850, loss is 0.33162415
 
   Before running the command below, please check the checkpoint path used for evaluation.
 
-```shell
+```bash
 bash scripts/run_eval.sh [DEVICE_ID] [MODEL_NAME ] [EVAL_BATCH_SIZE] [DATA_ROOT] [CKPT_PATH] [CKPT_NAME] [OUTPUT_PATH]
 ```
 
@@ -247,7 +255,7 @@ bash scripts/run_eval.sh [DEVICE_ID] [MODEL_NAME ] [EVAL_BATCH_SIZE] [DATA_ROOT]
 The results were as follows:
 
 ```bash
-Ubuntu:R2@1/R10@1/R10@2/R10@5  0.939/0.768/0.873/0.969
+Ubuntu:R2@1/R10@1/R10@2/R10@5  0.937/0.765/0.870/0.968
 ````
 
 # [Model Description](#contents)
@@ -265,9 +273,9 @@ Ubuntu:R2@1/R10@1/R10@2/R10@5  0.939/0.768/0.873/0.969
 | Optimizer           | Adam                                                         |
 | Loss Function       | SigmoidCrossEntropyWithLogits                                |
 | Outputs             | score                                                        |
-| Accuracy            | 0.939/0.768/0.873/0.969 (Ubuntu)                             |
-| Speed               | 2648.20 ms/step (8pcs)                                       |
-| Total time          | 5h (8pcs)                                                    |
+| Accuracy            | 0.937/0.765/0.870/0.968 (Ubuntu)                             |
+| Speed               | 197.425 ms/step (8pcs);                                      |
+| Total time          | 3h (8pcs)                                                    |
 | Checkpoint          | 1010.56 M (.ckpt file)                                       |
 
 # [Description of Random Situation](#Content)

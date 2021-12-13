@@ -43,11 +43,10 @@ class DotSim(nn.Cell):
         self.sqrt = P.Sqrt()
         self.maximum = P.Maximum()
         self.cast = P.Cast()
-        self.batch_matmul_trans_b = BatchMatMulCell(transpose_a=False, transpose_b=True).to_float(mstype.float16)
+        self.batch_matmul_trans_b = BatchMatMulCell(transpose_a=False, transpose_b=True)
 
     def construct(self, x, y):
         sim = self.batch_matmul_trans_b(x, y)
-        sim = self.cast(sim, mstype.float32)
         if self.is_norm:
             scale = self.sqrt(self.cast(x.shape[-1], mstype.float32))
             scale = self.maximum(scale, 1.0)
@@ -153,14 +152,19 @@ class PositionalEncodingVector(nn.Cell):
 
 
 class BatchMatMulCell(nn.Cell):
-    """BatchMatMulCell"""
+    """BatchMatMulCell compute with fp16"""
     def __init__(self, transpose_a=False, transpose_b=False):
         super(BatchMatMulCell, self).__init__()
         self.batch_matmul = P.BatchMatMul(transpose_a=transpose_a, transpose_b=transpose_b)
         self.cast = P.Cast()
 
     def construct(self, x, y):
-        return self.batch_matmul(x, y)
+        """Convert the input to fp16 for calculation"""
+        x = self.cast(x, mstype.float16)
+        y = self.cast(y, mstype.float16)
+        out = self.batch_matmul(x, y)
+        out = self.cast(out, mstype.float32)
+        return out
 
 
 def get_mask(row_lengths, col_lengths, max_row_length, max_col_length):
@@ -182,7 +186,7 @@ def get_mask(row_lengths, col_lengths, max_row_length, max_col_length):
     row_mask = P.cast(P.expand_dims(row_mask, -1), mstype.float32)
     col_mask = P.cast(P.expand_dims(col_mask, -1), mstype.float32)
 
-    mask = P.BatchMatMul(transpose_b=True)(row_mask, col_mask)
+    mask = BatchMatMulCell(transpose_b=True)(row_mask, col_mask)
     return mask
 
 
