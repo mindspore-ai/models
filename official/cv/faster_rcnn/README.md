@@ -188,13 +188,13 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
     # (1) Perform a or b.
     #       a. Set "enable_modelarts=True" on default_config.yaml file.
     #          Set "distribute=True" on default_config.yaml file.
-    #          Set "dataset_path='/cache/data'" on default_config.yaml file.
+    #          Set "data_path='/cache/data'" on default_config.yaml file.
     #          Set "epoch_size: 20" on default_config.yaml file.
     #          (optional)Set "checkpoint_url='s3://dir_to_your_pretrained/'" on default_config.yaml file.
     #          Set other parameters on default_config.yaml file you need.
     #       b. Add "enable_modelarts=True" on the website UI interface.
     #          Add "distribute=True" on the website UI interface.
-    #          Add "dataset_path=/cache/data" on the website UI interface.
+    #          Add "data_path=/cache/data" on the website UI interface.
     #          Add "epoch_size: 20" on the website UI interface.
     #          (optional)Add "checkpoint_url='s3://dir_to_your_pretrained/'" on the website UI interface.
     #          Add other parameters on the website UI interface.
@@ -213,12 +213,12 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
     # Train 1p with Ascend
     # (1) Perform a or b.
     #       a. Set "enable_modelarts=True" on default_config.yaml file.
-    #          Set "dataset_path='/cache/data'" on default_config.yaml file.
+    #          Set "data_path='/cache/data'" on default_config.yaml file.
     #          Set "epoch_size: 20" on default_config.yaml file.
     #          (optional)Set "checkpoint_url='s3://dir_to_your_pretrained/'" on default_config.yaml file.
     #          Set other parameters on default_config.yaml file you need.
     #       b. Add "enable_modelarts=True" on the website UI interface.
-    #          Add "dataset_path='/cache/data'" on the website UI interface.
+    #          Add "data_path='/cache/data'" on the website UI interface.
     #          Add "epoch_size: 20" on the website UI interface.
     #          (optional)Add "checkpoint_url='s3://dir_to_your_pretrained/'" on the website UI interface.
     #          Add other parameters on the website UI interface.
@@ -239,12 +239,12 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
     #       a. Set "enable_modelarts=True" on default_config.yaml file.
     #          Set "checkpoint_url='s3://dir_to_your_trained_model/'" on base_config.yaml file.
     #          Set "checkpoint='./faster_rcnn/faster_rcnn_trained.ckpt'" on default_config.yaml file.
-    #          Set "dataset_path='/cache/data'" on default_config.yaml file.
+    #          Set "data_path='/cache/data'" on default_config.yaml file.
     #          Set other parameters on default_config.yaml file you need.
     #       b. Add "enable_modelarts=True" on the website UI interface.
     #          Add "checkpoint_url='s3://dir_to_your_trained_model/'" on the website UI interface.
     #          Add "checkpoint='./faster_rcnn/faster_rcnn_trained.ckpt'" on the website UI interface.
-    #          Add "dataset_path='/cache/data'" on the website UI interface.
+    #          Add "data_path='/cache/data'" on the website UI interface.
     #          Add other parameters on the website UI interface.
     # (2) Prepare model code
     # (3) Upload or copy your trained model to S3 bucket.

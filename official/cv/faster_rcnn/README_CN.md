@@ -189,13 +189,13 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
     # (1) 执行a或者b
     #       a. 在 default_config.yaml 文件中设置 "enable_modelarts=True"
     #          在 default_config.yaml 文件中设置 "distribute=True"
-    #          在 default_config.yaml 文件中设置 "dataset_path='/cache/data'"
+    #          在 default_config.yaml 文件中设置 "data_path='/cache/data'"
     #          在 default_config.yaml 文件中设置 "epoch_size: 20"
     #          (可选)在 default_config.yaml 文件中设置 "checkpoint_url='s3://dir_to_your_pretrained/'"
     #          在 default_config.yaml 文件中设置 其他参数
     #       b. 在网页上设置 "enable_modelarts=True"
     #          在网页上设置 "distribute=True"
-    #          在网页上设置 "dataset_path=/cache/data"
+    #          在网页上设置 "data_path=/cache/data"
     #          在网页上设置 "epoch_size: 20"
     #          (可选)在网页上设置 "checkpoint_url='s3://dir_to_your_pretrained/'"
     #          在网页上设置 其他参数
@@ -214,12 +214,12 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
     # 在 ModelArts 上使用单卡训练
     # (1) 执行a或者b
     #       a. 在 default_config.yaml 文件中设置 "enable_modelarts=True"
-    #          在 default_config.yaml 文件中设置 "dataset_path='/cache/data'"
+    #          在 default_config.yaml 文件中设置 "data_path='/cache/data'"
     #          在 default_config.yaml 文件中设置 "epoch_size: 20"
     #          (可选)在 default_config.yaml 文件中设置 "checkpoint_url='s3://dir_to_your_pretrained/'"
     #          在 default_config.yaml 文件中设置 其他参数
     #       b. 在网页上设置 "enable_modelarts=True"
-    #          在网页上设置 "dataset_path='/cache/data'"
+    #          在网页上设置 "data_path='/cache/data'"
     #          在网页上设置 "epoch_size: 20"
     #          (可选)在网页上设置 "checkpoint_url='s3://dir_to_your_pretrained/'"
     #          在网页上设置 其他参数
@@ -240,12 +240,12 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
     #       a. 在 default_config.yaml 文件中设置 "enable_modelarts=True"
     #          在 default_config.yaml 文件中设置 "checkpoint_url='s3://dir_to_your_trained_model/'"
     #          在 default_config.yaml 文件中设置 "checkpoint='./faster_rcnn/faster_rcnn_trained.ckpt'"
-    #          在 default_config.yaml 文件中设置 "dataset_path='/cache/data'"
+    #          在 default_config.yaml 文件中设置 "data_path='/cache/data'"
     #          在 default_config.yaml 文件中设置 其他参数
     #       b. 在网页上设置 "enable_modelarts=True"
     #          在网页上设置 "checkpoint_url='s3://dir_to_your_trained_model/'"
     #          在网页上设置 "checkpoint='./faster_rcnn/faster_rcnn_trained.ckpt'"
-    #          在网页上设置 "dataset_path='/cache/data'"
+    #          在网页上设置 "data_path='/cache/data'"
     #          在网页上设置 其他参数
     # (2) 准备模型代码
     # (3) 上传你训练好的模型到 S3 桶上
