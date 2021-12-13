@@ -9,7 +9,7 @@
     - [特性](#特性)
         - [混合精度](#混合精度)
 - [环境要求](#环境要求)
-  - [脚本说明](#脚本说明)
+- [脚本说明](#脚本说明)
   - [脚本和样例代码](#脚本和样例代码)
       - [脚本参数](#脚本参数)
   - [训练过程](#训练过程)
@@ -20,6 +20,10 @@
     - [用法](#用法-1)
     - [启动](#启动-1)
     - [结果](#结果-1)
+  - [推理过程](#推理过程)
+    - [导出MindIR](#导出mindir)
+    - [在Ascend310执行推理](#在ascend310执行推理)
+    - [结果](#结果)
 - [模型描述](#模型描述)
   - [性能](#性能)
       - [训练性能](#训练性能)
@@ -81,23 +85,27 @@ Imagenet 2017和Imagenet 2012 数据集一致
 
 ## 脚本和样例代码
 
-```python
+```bash
 ├── GENet_Res50
-  ├── Readme.md
+  ├── README_CN.md                    # 中文文档
+  ├── ascend310_infer                           # 实现310推理源代码
   ├── scripts
-  │   ├──run_distribute_train.sh # 使用昇腾处理器进行八卡训练的shell脚本
-  │   ├──run_train.sh    # 使用昇腾处理器进行单卡训练的shell脚本
-  │   ├──run_eval.sh  # 使用昇腾处理器进行评估的单卡shell脚本
-  ├──src
-  │   ├──config.py # 参数配置
-  │   ├──dataset.py # 创建数据集
-  │   ├──lr_generator.py # 配置学习速率
-  │   ├──crossentropy.py # 定义GENet_Res50的交叉熵
-  │   ├──GENet.py # GENet_Res50的网络模型
-  │   ├──GEBlock.py # GENet_Res50的Block模型
+      ├── run_distribute_train.sh # 使用昇腾处理器进行八卡训练的shell脚本
+      ├── run_train.sh    # 使用昇腾处理器进行单卡训练的shell脚本
+      ├── run_eval.sh  # 使用昇腾处理器进行评估的单卡shell脚本
+      └── run_infer_310.sh  # Ascend推理shell脚本
+  ├── src
+      ├── config.py # 参数配置
+      ├── dataset.py # 创建数据集
+      ├── lr_generator.py # 配置学习速率
+      ├── crossentropy.py # 定义GENet_Res50的交叉熵
+      ├── GENet.py # GENet_Res50的网络模型
+      └── GEBlock.py # GENet_Res50的Block模型
   ├── train.py # 训练脚本
   ├── eval.py # 评估脚本
-  ├── export.py
+  ├── export.py  # 导出 AIR,MINDIR模型的脚本
+  ├── requirements.txt  # 额外需要的第三方包
+  └── postprocess.py  # 310推理后处理脚本
 ```
 
 ### 脚本参数
@@ -183,6 +191,37 @@ epoch: 5 step: 5000, loss is 3.1978393
 
 ```python
 result: {'top_5_accuracy': 0.9412860576923077, 'top_1_accuracy': 0.7847355769230769}
+```
+
+## 推理过程
+
+### 导出MindIR
+
+```shell
+python export.py --pre_trained=[CKPT_PATH] --mlp=["True"|"False"] --extra=["True"|"False"] --file_format=[FILE_FORMAT]
+```
+
+参数pre_trained为必填项，
+`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
+
+### 在Ascend310执行推理
+
+在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
+目前仅支持batch_Size为1的推理。精度计算过程需要70G+的内存，否则进程将会因为超出内存被系统终止。
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+```
+
+- `DEVICE_ID` 可选，默认值为0。
+
+### 结果
+
+推理结果保存在脚本执行的当前路径，你可以在acc.log中看到以下精度计算结果。
+
+```bash
+top1_accuracy:0.7846, top5_accuracy:0.94136
 ```
 
 # 模型描述
