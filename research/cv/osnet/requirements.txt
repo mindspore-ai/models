@@ -1,0 +1,5 @@
+numpy==1.21.3
+h5py
+scipy
+future
+imageio
