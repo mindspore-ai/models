@@ -78,7 +78,7 @@ AttentionLSTM模型的输入由aspect和word向量组成，输入部分输入单
   bash run_train_ascend.sh [DATA_DIR] [OUTPUT_DIR]
 
   # 运行评估示例
-  bash run_eval_ascend.sh [DATA_DIR]
+  bash run_eval_ascend.sh [DATA_DIR] [CKPT_FILE]
   ```
 
 # 脚本说明
@@ -116,19 +116,18 @@ AttentionLSTM模型的输入由aspect和word向量组成，输入部分输入单
 ```python
 'batch_size':1          # 训练批次大小
 'epoch_size':25         # 总计训练epoch数
-'momentum':0.91         # 动量
+'momentum':0.89         # 动量
 'weight_decay':1e-3     # 权重衰减值
 'dim_hidden': 300       # hidden层维度
-'rseed': int(1000*time.time()) % 19491001
+'rseed': 1
 'dim_word': 300         # 词向量维度
 'dim_aspect': 100       # aspect向量维度
 'optimizer': 'Momentum' # 优化器类型
-'regular': 0.001        # L2 loss权重
 'vocab_size': 5177      # 单词表大小
 'dropout_prob': 0.6     # dropout概率
 'aspect_num': 5         # aspect词的数量
 'grained': 3            # 极性分类个数
-'lr': 0.002             # 学习率
+'lr': 0.0125             # 学习率
 ```
 
 更多配置细节请参考脚本`config.json`。
@@ -179,16 +178,16 @@ AttentionLSTM模型的输入由aspect和word向量组成，输入部分输入单
 - 在Ascend环境运行时评估数据集
 
   ```bash
-  # 把训练生成的ckpt文件放入./data/文件夹下
-  bash run_eval_ascend.sh \
-      /home/workspace/atae_lstm/data/
+    sh run_eval_ascend.sh \
+        /home/workspace/atae_lstm/data/ \
+        /home/workspace/atae_lstm/train/atae-lstm_max.ckpt
   ```
 
   上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
 
   ```bash
   # grep "accuracy:" eval.log
-  accuracy:{'acc':0.827}
+  accuracy:{'acc':0.8253}
   ```
 
 ## 导出过程
@@ -198,7 +197,8 @@ AttentionLSTM模型的输入由aspect和word向量组成，输入部分输入单
 可以使用如下命令导出mindir文件
 
 ```shell
-python export.py --existed_ckpt="./train/atae_lstm_max.ckpt"
+python export.py --existed_ckpt="./train/atae-lstm_max.ckpt" \
+                 --word_path="./data/weight.npz"
 ```
 
 ## 推理过程
@@ -208,6 +208,9 @@ python export.py --existed_ckpt="./train/atae_lstm_max.ckpt"
 在执行推理之前，需要通过export.py导出mindir文件。输入文件为bin格式。
 
 ```shell
+# 文件预处理
+python preprocess.py --data_path="./data/test.mindrecord"
+
 # Ascend310 推理
 bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_TARGET] [DEVICE_ID]
 ```
@@ -228,18 +231,14 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_TARGET] [DEVICE_ID]
 |     参数      |                          Ascend                          |
 | :-----------: | :------------------------------------------------------: |
 |     资源      | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 |
-|   上传日期    |                        2021-06-29                        |
-| MindSpore版本 |                          1.2.1                           |
+|   上传日期    |                        2021-12-11                        |
+| MindSpore版本 |                          1.5.0                           |
 |    数据集     |                    SemEval 2014 task4                    |
-|   训练参数    |       epoch=25, step=2990, batch_size=1, lr=0.002        |
-|    优化器     |                         AdaGrad                          |
+|   训练参数    |       epoch=25, step=2990, batch_size=1, lr=0.0125        |
+|    优化器     |                         Momentum                          |
 |   参数（M)    |                           2.68                           |
 |  微调检查点   |                           26M                            |
 |   推理模型    |             9.9M(.air文件)、11M(.mindir文件)             |
-
-### 迁移学习
-
-待补充
 
 # 随机情况说明
 

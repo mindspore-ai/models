@@ -121,7 +121,7 @@ if __name__ == '__main__':
     net = AttentionLstm(config, weight, is_train=True)
     model_with_loss = NetWithLoss(net, batch_size=1)
 
-    epoch_size = 25
+    epoch_size = config.epoch
     step_per_epoch = dataset_train.get_dataset_size()
     optimizer = nn.Momentum(params=net.trainable_params(),
                             learning_rate=config.lr,
@@ -137,7 +137,7 @@ if __name__ == '__main__':
     summary_collector = SummaryCollector(summary_dir='./train/summary_dir')
     cb = [time_cb, loss_cb, summary_collector]
     config_ck = CheckpointConfig(save_checkpoint_steps=step_per_epoch,
-                                 keep_checkpoint_max=epoch_size)
+                                 keep_checkpoint_max=config.keep_checkpoint_max)
     ckpoint_cb = ModelCheckpoint(prefix="atae-lstm", directory='./train/', config=config_ck)
     cb.append(ckpoint_cb)
 

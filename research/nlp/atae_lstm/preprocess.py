@@ -18,10 +18,11 @@
 import argparse
 import os
 
-from src.config import config
+from src.config import Config
 from src.load_dataset import load_dataset
 
 parser = argparse.ArgumentParser(description='preprocess')
+parser.add_argument('--data_path', type=str, required=True, help='result path')
 parser.add_argument('--result_path', type=str,
                     default='./preprocess_Result/', help='result path')
 parser.add_argument('--device_target', type=str, default="Ascend",
@@ -30,9 +31,8 @@ parser.add_argument('--device_target', type=str, default="Ascend",
 args = parser.parse_args()
 
 if __name__ == '__main__':
-
-    dataset = load_dataset(input_files=config.test_dataset,
-                           batch_size=1)
+    dataset = load_dataset(input_files=args.data_path, batch_size=1)
+    config = Config()
 
     content_path = os.path.join(args.result_path, "00_content")
     sen_len_path = os.path.join(args.result_path, "01_sen_len")

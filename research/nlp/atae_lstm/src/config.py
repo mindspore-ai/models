@@ -40,6 +40,7 @@ class Config:
                  aspect_num=5,
                  grained=3,
                  save_graphs=False,
+                 keep_checkpoint_max=5,
                  dtype=mstype.float32):
 
         self.save_graphs = save_graphs
@@ -64,6 +65,7 @@ class Config:
         self.dim_aspect = dim_aspect
         self.aspect_num = aspect_num
         self.grained = grained
+        self.keep_checkpoint_max = keep_checkpoint_max
 
     @classmethod
     def from_dict(cls, json_object):
