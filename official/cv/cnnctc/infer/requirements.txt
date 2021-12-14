@@ -1,0 +1,4 @@
+numpy
+lmdb
+pillow
+six
