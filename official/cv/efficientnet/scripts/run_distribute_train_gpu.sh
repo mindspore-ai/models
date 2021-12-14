@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 4 ] && [ $# != 5 ]
+if [ $# != 5 ] && [ $# != 6 ]
 then
     echo "Usage:
-          sh run_distribute_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_TYPE] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
+          bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_TYPE] [DATASET_PATH] [MODEL_NAME] [PRETRAINED_CKPT_PATH](optional)
           "
 exit 1
 fi
@@ -41,11 +41,30 @@ then
 exit 1
 fi
 
+# check model name
+if [[ $5 != "efficientnet_b0" ]] && [[ $5 != "efficientnet_b1" ]]
+then
+    echo "error: Only supported for efficientnet_b0 and efficientnet_b1, but MODEL_NAME=$5."
+exit 1
+fi
+
 export DEVICE_NUM=$1
 export RANK_SIZE=$1
 
 BASEPATH=$(cd "`dirname $0`" || exit; pwd)
 export PYTHONPATH=${BASEPATH}:$PYTHONPATH
+
+if [[ $5 == "efficientnet_b0" ]] && [[ $3 == "ImageNet" ]]; then
+    CONFIG_FILE="${BASEPATH}/../efficientnet_b0_imagenet_config.yaml"
+elif [[ $5 == "efficientnet_b0" ]] && [[ $3 == "CIFAR10" ]]; then
+    CONFIG_FILE="${BASEPATH}/../efficientnet_b0_cifar10_config.yaml"
+elif [[ $5 == "efficientnet_b1" ]] && [[ $3 == "ImageNet" ]]; then
+    CONFIG_FILE="${BASEPATH}/../efficientnet_b1_imagenet_config.yaml"
+else
+    echo "Unrecognized parameter"
+    exit 1
+fi
+
 if [ -d "../train" ];
 then
     rm -rf ../train
@@ -55,24 +74,28 @@ cd ../train || exit
 
 export CUDA_VISIBLE_DEVICES="$2"
 
-if [ $# == 4 ]
-then
-    mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
-    python ${BASEPATH}/../train.py \
-        --distributed \
-        --platform GPU \
-        --dataset $3 \
-        --data_path $4 > train.log 2>&1 &
-fi
-
 if [ $# == 5 ]
 then
     mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
     python ${BASEPATH}/../train.py \
+        --config_path $CONFIG_FILE \
+        --distributed True \
         --platform GPU \
-        --distributed \
         --dataset $3 \
         --data_path $4 \
-        --resume $5 > train.log 2>&1 &
+        --model $5 > train.log 2>&1 &
+fi
+
+if [ $# == 6 ]
+then
+    mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+    python ${BASEPATH}/../train.py \
+        --config_path $CONFIG_FILE \
+        --platform GPU \
+        --distributed True \
+        --dataset $3 \
+        --data_path $4 \
+        --model $5 \
+        --resume $6 > train.log 2>&1 &
 fi
 

@@ -13,10 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 2 ] && [ $# != 3 ]
+if [ $# != 3 ] && [ $# != 4 ]
 then
     echo "Usage: 
-          sh run_standalone_train_gpu.sh [DATASET_TYPE] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
+          bash run_standalone_train_gpu.sh [DATASET_TYPE] [DATASET_PATH] [MODEL_NAME] [PRETRAINED_CKPT_PATH](optional)
           "
 exit 1
 fi
@@ -35,9 +35,27 @@ then
 exit 1
 fi
 
+# check model name
+if [[ $3 != "efficientnet_b0" ]] && [[ $3 != "efficientnet_b1" ]]
+then
+    echo "error: Only supported for efficientnet_b0 and efficientnet_b1, but MODEL_NAME=$3."
+exit 1
+fi
 
 BASEPATH=$(cd "`dirname $0`" || exit; pwd)
 export PYTHONPATH=${BASEPATH}:$PYTHONPATH
+
+if [[ $3 == "efficientnet_b0" ]] && [[ $1 == "ImageNet" ]]; then
+    CONFIG_FILE="${BASEPATH}/../efficientnet_b0_imagenet_config.yaml"
+elif [[ $3 == "efficientnet_b0" ]] && [[ $1 == "CIFAR10" ]]; then
+    CONFIG_FILE="${BASEPATH}/../efficientnet_b0_cifar10_config.yaml"
+elif [[ $3 == "efficientnet_b1" ]] && [[ $1 == "ImageNet" ]]; then
+    CONFIG_FILE="${BASEPATH}/../efficientnet_b1_imagenet_config.yaml"
+else
+    echo "Unrecognized parameter"
+    exit 1
+fi
+
 if [ -d "../train" ];
 then
     rm -rf ../train
@@ -46,12 +64,12 @@ mkdir ../train
 cd ../train || exit
 
 
-if [ $# == 2 ]
-then
-    python ${BASEPATH}/../train.py --dataset $1 --data_path $2 --platform GPU > train.log 2>&1 &
-fi
-
 if [ $# == 3 ]
 then
-    python ${BASEPATH}/../train.py --dataset $1 --data_path $2 --platform GPU --resume $3 > train.log 2>&1 &
+    python ${BASEPATH}/../train.py --config_path $CONFIG_FILE --dataset $1 --data_path $2 --platform GPU --model $3 > train.log 2>&1 &
+fi
+
+if [ $# == 4 ]
+then
+    python ${BASEPATH}/../train.py --config_path $CONFIG_FILE --dataset $1 --data_path $2 --platform GPU --model $3 --resume $4 > train.log 2>&1 &
 fi

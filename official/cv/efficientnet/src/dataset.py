@@ -25,10 +25,10 @@ import mindspore.dataset.vision.c_transforms as C
 from mindspore.communication.management import get_group_size, get_rank
 from mindspore.dataset.vision import Inter
 
-from src.config import basic_config, dataset_config, resize_value
+from src.config import config
 from src.transform import RandAugment
 
-ds.config.set_seed(basic_config.random_seed)
+ds.config.set_seed(config.random_seed)
 
 
 crop_pct = 0.875
@@ -39,6 +39,7 @@ scale = (0.08, 1.0)
 ratio = (3./4., 4./3.)
 inter_str = 'bicubic'
 
+
 def str2MsInter(method):
     if method == 'bicubic':
         return Inter.BICUBIC
@@ -46,18 +47,31 @@ def str2MsInter(method):
         return Inter.NEAREST
     return Inter.BILINEAR
 
-def create_dataset(datatype_type, train_data_url, batch_size, workers=8, distributed=False):
+
+def _get_img_size(model_name):
+    if model_name in ('efficientnet_b0', 'b0'):
+        return config.resize_value
+    if model_name in ('efficientnet_b1', 'b1'):
+        return config.resize_value
+    raise NotImplementedError("This model currently not supported")
+
+
+def create_dataset(datatype_type, model_name, train_data_url,
+                   batch_size, workers=8, distributed=False):
+    """ Create dataset for training """
     if not os.path.exists(train_data_url):
         raise ValueError('Path not exists')
+
+    img_size = _get_img_size(model_name)
 
     interpolation = str2MsInter(inter_str)
 
     c_decode_op = C.Decode()
     type_cast_op = C2.TypeCast(mstype.int32)
-    random_resize_crop_op = C.RandomResizedCrop(size=(resize_value, resize_value), scale=scale, ratio=ratio,
-                                                interpolation=interpolation)
+    random_resize_crop_op = C.RandomResizedCrop(size=(img_size, img_size), scale=scale,
+                                                ratio=ratio, interpolation=interpolation)
     random_horizontal_flip_op = C.RandomHorizontalFlip(0.5)
-    efficient_rand_augment = RandAugment(dataset_config[datatype_type])
+    efficient_rand_augment = RandAugment(config)
 
     # load dataset
     rank_id = get_rank() if distributed else 0
@@ -96,13 +110,16 @@ def create_dataset(datatype_type, train_data_url, batch_size, workers=8, distrib
     return ds_train
 
 
-def create_dataset_val(datatype_type, val_data_url, batch_size=128, workers=8, distributed=False):
+def create_dataset_val(datatype_type, model_name, val_data_url,
+                       batch_size=128, workers=8, distributed=False):
+    """ Create validation dataset """
     if not os.path.exists(val_data_url):
         raise ValueError('Path not exists')
 
+    img_size = _get_img_size(model_name)
+
     interpolation = str2MsInter(inter_method)
 
-    img_size = resize_value
     if isinstance(img_size, tuple):
         assert len(img_size) == 2
         if img_size[-1] == img_size[-2]:
@@ -115,9 +132,10 @@ def create_dataset_val(datatype_type, val_data_url, batch_size=128, workers=8, d
     type_cast_op = C2.TypeCast(mstype.int32)
     decode_op = C.Decode()
     resize_op = C.Resize(size=scale_size, interpolation=interpolation)
-    center_crop = C.CenterCrop(size=resize_value)
+    center_crop = C.CenterCrop(size=img_size)
     rescale_op = C.Rescale(rescale, shift)
-    normalize_op = C.Normalize(dataset_config[datatype_type].mean, dataset_config[datatype_type].std)
+    normalize_op = C.Normalize(config.mean,
+                               config.std)
     changeswap_op = C.HWC2CHW()
 
     # load dataset
