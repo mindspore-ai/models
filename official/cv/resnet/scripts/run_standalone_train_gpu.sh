@@ -105,7 +105,7 @@ fi
 if [ $# == 4 ]
 then
     python train.py --device_target="GPU" --data_path=$PATH1 --run_eval=$RUN_EVAL \
-           --eval_data_path=$EVAL_DATASET_PATH --enable_cache=True --cache_session_id=$CACHE_SESSION_ID \
+           --eval_dataset_path=$EVAL_DATASET_PATH --enable_cache=True --cache_session_id=$CACHE_SESSION_ID \
            --config_path=$CONFIG_FILE --output_path './output' &> log &
     if [ "x${RUN_EVAL}" == "xTrue" ]
     then
