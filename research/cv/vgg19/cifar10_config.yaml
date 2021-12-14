@@ -45,11 +45,14 @@ pre_trained: ""
 lr_gamma: 0.1
 eta_min: 0.0
 T_max: 90
-log_interval: 100
+log_interval: 100 # 1
 ckpt_path: "outputs/"
-ckpt_interval: 5
+ckpt_interval: 5 # 1
 is_save_on_master: 1
 is_distributed: 0
+device_id: 1
+rank: 0
+group_size: 1
 
 # eval options
 per_batch_size: 32
@@ -69,11 +72,10 @@ ckpt_file: ""
 file_name: "vgg19"
 file_format: "AIR"
 
-
 ---
-
 # Help description for each configuration
-device_target: "device where the code will be implemented."
+device_target: "Run platform, choices in ['Ascend', 'GPU'] when training and evaling,
+                choices in ['Ascend', 'GPU', 'CPU'] when export."
 dataset: "choices in ['cifar10', 'imagenet2012']"
 data_dir: "data dir"
 pre_trained: "model_path, local pretrained model to load"
@@ -102,4 +104,9 @@ result_path: "result path"
 # export options
 ckpt_file: "vgg19 ckpt file."
 file_name: "vgg19 output file name."
-file_format: "file format, choices in ['AIR', 'ONNX', 'MINDIR']"
+file_format: "file format"
+
+---
+file_format: ['AIR', 'ONNX', 'MINDIR']
+device_target: ['Ascend', 'GPU']
+dataset: ['cifar10', 'imagenet2012']

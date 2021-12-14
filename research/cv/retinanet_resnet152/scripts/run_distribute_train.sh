@@ -49,6 +49,7 @@ do
     rm -rf LOG$i
     mkdir ./LOG$i
     cp ./*.py ./LOG$i
+    cp ./*.yaml ./LOG$i
     cp -r ./src ./LOG$i
     cp -r ./scripts ./LOG$i
     cd ./LOG$i || exit

@@ -17,8 +17,7 @@
 import os
 import json
 import numpy as np
-from .config import config
-
+from .model_utils.config import config
 
 def apply_softnms(dets, scores, sigma=0.5, method=2, thresh=0.001, Nt=0.1):
     '''
