@@ -146,7 +146,6 @@ def create_dataset(dataset_path,
 
 
 def get_dataset(dataset_name, do_train, dataset_path, args):
-    """get_dataset"""
     if dataset_name == "imagenet":
         if do_train:
             data = create_dataset(dataset_path=dataset_path,
@@ -165,7 +164,26 @@ def get_dataset(dataset_name, do_train, dataset_path, args):
                                   interpolation=args.interpolation,
                                   batch_size=args.eval_batch_size,
                                   num_workers=args.eval_num_workers)
+    elif dataset_name == "cifar10":
+        if do_train:
+            data = create_dataset(dataset_path=dataset_path,
+                                  do_train=True,
+                                  image_size=args.train_image_size,
+                                  interpolation=args.interpolation,
+                                  autoaugment=args.autoaugment,
+                                  mixup=args.mixup,
+                                  crop_min=args.crop_min,
+                                  batch_size=args.batch_size,
+                                  num_classes=10,
+                                  num_workers=args.train_num_workers)
+        else:
+            data = create_dataset(dataset_path=dataset_path,
+                                  do_train=False,
+                                  image_size=args.eval_image_size,
+                                  interpolation=args.interpolation,
+                                  batch_size=args.eval_batch_size,
+                                  num_classes=10,
+                                  num_workers=args.eval_num_workers)
     else:
         raise NotImplementedError
-
     return data
