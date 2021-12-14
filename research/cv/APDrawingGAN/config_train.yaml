@@ -1,0 +1,71 @@
+# Copyright 2021 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+# ==============================================================================
+# Training options
+
+phase : 'train'
+serial_batches : False
+dataset_mode : 'aligned'
+resize_or_crop : 'resize_and_crop'
+continue_train : False
+loadSize : 512
+fineSize : 512
+input_nc : 3
+output_nc : 1
+ngf : 64
+ndf : 64
+netG : "unet_256"
+netD : 'basic'
+nnG : 9
+n_layers_D : 3
+name : 'formal'
+norm : "batch"
+comb_op : 1
+soft_border : 0
+epoch_count : 1
+EYE_H : 40
+EYE_W : 56
+NOSE_H : 48
+NOSE_W : 48
+MOUTH_H : 40
+MOUTH_W : 64
+which_direction : 'AtoB'
+niter_decay : 0
+beta1 : 0.5
+lr : 0.0002
+no_lsgan : True
+pool_size : 50
+lambda_L1 : 100.0
+lambda_local : 25.0
+lambda_chamfer : 0.1
+lambda_chamfer2 : 0.1
+netG_dt : 'unet_512'
+netG_line : 'unet_512'
+gan_loss_strategy : 2
+addw_eye : 1.0
+addw_nose : 1.0
+addw_mouth : 1.0
+addw_hair : 1.0
+addw_bg : 1.0
+init_type : 'normal'
+init_gain : 0.02
+num_parallel_workers : 4
+rank_id : 0
+no_l1_loss : False
+no_G_local_loss : False
+
+
