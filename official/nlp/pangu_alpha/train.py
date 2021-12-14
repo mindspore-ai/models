@@ -120,6 +120,13 @@ def run_train(args_opt):
     if args_opt.distribute == "true":
         rank, device_num = set_parallel_context(args_opt)
     context.set_context(save_graphs=False, save_graphs_path="./graphs_of_device_id_" + str(rank))
+
+    # env variable prepare
+    group_info_file = os.getenv("GROUP_INFO_FILE")
+    if group_info_file:
+        with open(os.path.expanduser("job/code/group_info_env"), "a") as outfile:
+            outfile.write(f"export GROUP_INFO_FILE_REFLECT={group_info_file}\n")
+
     # copy data from the cloud to the /cache/Data
     cache_url = '/cache/Data/'
     eval_cache_url = '/cache/EvalData/'
@@ -221,12 +228,28 @@ def restore_checkpoint(args_param, sink_size, dataset, model, network, epoch):
     ckpt_name = args_param.ckpt_name_prefix
     ckpt_pattern = os.path.join(args_param.save_checkpoint_path, "rank_{}".format(D.get_rank()),
                                 f"{ckpt_name}*.ckpt")
-    ckpt_files = glob.glob(ckpt_pattern)
+    ckpt_all_files = glob.glob(ckpt_pattern)
+
+    if not ckpt_all_files:
+        print(f"There is no ckpt file in {args_param.save_checkpoint_path}, "
+              f"current ckpt_files found is {ckpt_all_files} "
+              f"with pattern {ckpt_pattern}, so skip the loading.")
+        return
+
+    ckpt_exp_pattern = os.path.join(args_param.save_checkpoint_path, "rank_{}".format(D.get_rank()),
+                                    f"{ckpt_name}*_breakpoint.ckpt")
+    ckpt_exp_files = glob.glob(ckpt_exp_pattern)
+    ckpt_files = []
+    for file in ckpt_all_files:
+        if file not in ckpt_exp_files:
+            ckpt_files.append(file)
+
     if not ckpt_files:
         print(f"There is no ckpt file in {args_param.save_checkpoint_path}, "
               f"current ckpt_files found is {ckpt_files} "
               f"with pattern {ckpt_pattern}, so skip the loading.")
         return
+
     ckpt_files.sort(key=os.path.getmtime, reverse=True)
     time_stamp = datetime.datetime.now()
     print(f"time stamp {time_stamp.strftime('%Y.%m.%d-%H:%M:%S')} pre trained ckpt model {ckpt_files} loading",
@@ -330,7 +353,8 @@ def restore_exception_checkpoint(args_param, sink_size, dataset, model, network,
         restore_ranks_map_json = json.loads(restore_ranks_map)
         map_rank_id = D.get_rank()
         for key in restore_ranks_map_json.keys():
-            if str(D.get_rank()) in key:
+            key_list = list(key.split(","))
+            if str(D.get_rank()) in key_list:
                 map_rank_id = restore_ranks_map_json.get(key)
 
         print(f"loading map rank id {map_rank_id}")
@@ -364,22 +388,12 @@ def run_train_pipeline(args_opt):
 
     context.set_context(save_graphs=False, mode=context.GRAPH_MODE, device_target=args_opt.device_target)
     context.set_context(variable_memory_max_size="31GB")
+
+    rank_id = 0
+    device_num = 1
     if args_opt.distribute == "true":
-        D.init()
-        device_num = D.get_group_size()
-        rank_id = D.get_rank()
-        print("rank_id is {}, device_num is {}".format(rank_id, device_num))
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(
-            parallel_mode=ParallelMode.SEMI_AUTO_PARALLEL, gradients_mean=False,
-            full_batch=bool(args_opt.full_batch), loss_repeated_mean=True,
-            device_num=device_num, enable_parallel_optimizer=bool(args_opt.optimizer_shard),
-            pipeline_stages=args_opt.stage_num)
-        set_algo_parameters(elementwise_op_strategy_follow=True)
-        _set_multi_subgraphs()
-    else:
-        rank_id = int(os.getenv("RANK_ID"))
-        device_num = 1
+        rank_id, device_num = set_parallel_context(args_opt)
+
     # copy data from the cloud to the /cache/Data
     cache_url = '/cache/Data/'
     eval_cache_url = '/cache/EvalData/'
@@ -460,6 +474,17 @@ def run_train_pipeline(args_opt):
         callback.append(eval_callback)
     else:
         model = Model(pangu_alpha_with_grads)
+
+    if args_opt.pre_trained:
+        flag = restore_exception_checkpoint(args_opt, callback_size, ds, model,
+                                            pangu_alpha_with_grads, epoch=actual_epoch_num)
+        if not flag:
+            restore_checkpoint(args_opt, callback_size, ds, model, pangu_alpha_with_grads, epoch=actual_epoch_num)
+
+    callback = [TimeMonitor(callback_size), LossCallBack(callback_size, rank_id, args_opt.has_trained_epoches,
+                                                         args_opt.has_trained_steps)]
+    add_checkpoint_callback_policy(args_opt, callback, rank_id)
+
     model.train(actual_epoch_num, ds, callbacks=callback,
                 sink_size=callback_size, dataset_sink_mode=True)
 
