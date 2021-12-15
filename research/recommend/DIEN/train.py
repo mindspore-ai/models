@@ -131,7 +131,7 @@ def modelarts():
                 'DEVICE_ID') + '/Electronics_train_1.mindrecord'
         else:
             train_dataset_path = '/cache/dataset/device_' + os.getenv('DEVICE_ID') + '/Books_train_1.mindrecord'
-        ds_train = ds.MindDataset(dataset_file=train_dataset_path, num_parallel_workers=8,
+        ds_train = ds.MindDataset(train_dataset_path, num_parallel_workers=8,
                                   shuffle=True,
                                   num_shards=device_num,
                                   shard_id=device_id)
@@ -161,7 +161,7 @@ def modelarts():
         cat_voc_path = '/cache/dataset_mindrecord/' + dataset_type + '/cat_voc.pkl'
         meta_path = '/cache/dataset_mindrecord/' + dataset_type + '/item-info'
         review_path = '/cache/dataset_mindrecord/' + dataset_type + '/reviews-info'
-        ds_train = ds.MindDataset(dataset_file=train_dataset_path,
+        ds_train = ds.MindDataset(train_dataset_path,
                                   num_parallel_workers=8, shuffle=True)
         save_checkpoint_path = '/cache/ckpt/'
         mox.file.make_dirs(save_checkpoint_path)
@@ -191,7 +191,7 @@ def not_modelarts(target):
         if target == 'Ascend':
             rank_id = get_rank()
             rank_size = get_group_size()
-            ds_train = ds.MindDataset(dataset_file=train_mindrecord_path,
+            ds_train = ds.MindDataset(train_mindrecord_path,
                                       num_shards=rank_size,
                                       shard_id=rank_id)
             device_id = int(os.getenv('DEVICE_ID'))

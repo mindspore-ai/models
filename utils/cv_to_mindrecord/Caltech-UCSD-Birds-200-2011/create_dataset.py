@@ -15,10 +15,11 @@
 """create MindDataset by MindRecord"""
 import mindspore.dataset as ds
 
+
 def create_dataset(data_file):
     """create MindDataset"""
     num_readers = 4
-    data_set = ds.MindDataset(dataset_file=data_file,
+    data_set = ds.MindDataset(data_file,
                               num_parallel_workers=num_readers,
                               shuffle=True)
     index = 0
@@ -28,6 +29,7 @@ def create_dataset(data_file):
         if index % 1000 == 0:
             print(">> read rows: {}".format(index))
     print(">> total rows: {}".format(index))
+
 
 if __name__ == '__main__':
     create_dataset('output/CUB_200_2011.mindrecord')

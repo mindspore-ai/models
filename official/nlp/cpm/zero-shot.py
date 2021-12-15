@@ -76,7 +76,7 @@ class CPMForInfer(nn.Cell):
 
 def _load_dataset(dataset_path, batch_size, rank_size=None, rank_id=None, shuffle=True, drop_remainder=True):
     """Loader for data."""
-    data = ds.MindDataset(dataset_file=dataset_path,
+    data = ds.MindDataset(dataset_path,
                           columns_list=["sid", "cid", "input_ids", "loss_mask", "labels", "size"],
                           shuffle=shuffle,
                           num_shards=rank_size,
