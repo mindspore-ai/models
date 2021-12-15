@@ -49,8 +49,8 @@ class YOLO(nn.Cell):
         feature_map2 is (batch_size, backbone_shape[3], h/16, w/16)
         feature_map3 is (batch_size, backbone_shape[4], h/32, w/32)
         """
-        img_height = ops.Shape()(x)[2] * 2
-        img_width = ops.Shape()(x)[3] * 2
+        img_height = x.shape[2] * 2
+        img_width = x.shape[3] * 2
 
         feature_map1, feature_map2, feature_map3 = self.backbone(x)
 
@@ -147,25 +147,26 @@ class DetectionBlock(nn.Cell):
         self.tile = ops.Tile()
         self.concat = ops.Concat(axis=-1)
         self.pow = ops.Pow()
+        self.transpose = ops.Transpose()
+        self.cast = ops.Cast()
+        self.exp = ops.Exp()
         self.conf_training = is_training
 
     def construct(self, x, input_shape):
         """construct method"""
-        num_batch = ops.Shape()(x)[0]
-        grid_size = ops.Shape()(x)[2:4]
+        num_batch = x.shape[0]
+        grid_size = x.shape[2:4]
 
         # Reshape and transpose the feature to [n, grid_size[0], grid_size[1], 3, num_attrib]
-        prediction = ops.Reshape()(x, (num_batch,
-                                       self.num_anchors_per_scale,
-                                       self.num_attrib,
-                                       grid_size[0],
-                                       grid_size[1]))
-        prediction = ops.Transpose()(prediction, (0, 3, 4, 1, 2))
+        prediction = self.reshape(x, (num_batch,
+                                      self.num_anchors_per_scale,
+                                      self.num_attrib,
+                                      grid_size[0],
+                                      grid_size[1]))
+        prediction = self.transpose(prediction, (0, 3, 4, 1, 2))
 
-        range_x = range(grid_size[1])
-        range_y = range(grid_size[0])
-        grid_x = ops.Cast()(ops.tuple_to_array(range_x), ms.float32)
-        grid_y = ops.Cast()(ops.tuple_to_array(range_y), ms.float32)
+        grid_x = ms.numpy.arange(grid_size[1])
+        grid_y = ms.numpy.arange(grid_size[0])
         # Tensor of shape [grid_size[0], grid_size[1], 1, 1] representing the coordinate of x/y axis for each grid
         # [batch, gridx, gridy, 1, 1]
         grid_x = self.tile(self.reshape(grid_x, (1, 1, -1, 1, 1)), (1, grid_size[0], 1, 1, 1))
@@ -181,9 +182,9 @@ class DetectionBlock(nn.Cell):
         # gridsize1 is x
         # gridsize0 is y
         box_xy = (self.scale_x_y * self.sigmoid(box_xy) - self.offset_x_y + grid) / \
-                 ops.Cast()(ops.tuple_to_array((grid_size[1], grid_size[0])), ms.float32)
+                 self.cast(ops.tuple_to_array((grid_size[1], grid_size[0])), ms.float32)
         # box_wh is w->h
-        box_wh = ops.Exp()(box_wh) * self.anchors / input_shape
+        box_wh = self.exp(box_wh) * self.anchors / input_shape
 
         box_confidence = self.sigmoid(box_confidence)
         box_probs = self.sigmoid(box_probs)
@@ -199,6 +200,7 @@ class Iou(nn.Cell):
         super(Iou, self).__init__()
         self.min = ops.Minimum()
         self.max = ops.Maximum()
+        self.squeeze = ops.Squeeze(-1)
 
     def construct(self, box1, box2):
         """
@@ -219,13 +221,13 @@ class Iou(nn.Cell):
         intersect_mins = self.max(box1_mins, box2_mins)
         intersect_maxs = self.min(box1_maxs, box2_maxs)
         intersect_wh = self.max(intersect_maxs - intersect_mins, ops.scalar_to_array(0.0))
-        # ops.squeeze: for effiecient slice
-        intersect_area = ops.Squeeze(-1)(intersect_wh[:, :, :, :, :, 0:1]) * \
-                         ops.Squeeze(-1)(intersect_wh[:, :, :, :, :, 1:2])
-        box1_area = ops.Squeeze(-1)(box1_wh[:, :, :, :, :, 0:1]) * \
-                    ops.Squeeze(-1)(box1_wh[:, :, :, :, :, 1:2])
-        box2_area = ops.Squeeze(-1)(box2_wh[:, :, :, :, :, 0:1]) * \
-                    ops.Squeeze(-1)(box2_wh[:, :, :, :, :, 1:2])
+        # self.squeeze: for effiecient slice
+        intersect_area = self.squeeze(intersect_wh[:, :, :, :, :, 0:1]) * \
+                         self.squeeze(intersect_wh[:, :, :, :, :, 1:2])
+        box1_area = self.squeeze(box1_wh[:, :, :, :, :, 0:1]) * \
+                    self.squeeze(box1_wh[:, :, :, :, :, 1:2])
+        box2_area = self.squeeze(box2_wh[:, :, :, :, :, 0:1]) * \
+                    self.squeeze(box2_wh[:, :, :, :, :, 1:2])
         iou = intersect_area / (box1_area + box2_area - intersect_area)
         # iou : [batch, gx, gy, anchors, maxboxes]
         return iou
@@ -256,6 +258,14 @@ class YoloLossBlock(nn.Cell):
         self.class_loss = ClassLoss()
 
         self.reduce_sum = ops.ReduceSum()
+        self.cast = ops.Cast()
+        self.select = ops.Select()
+        self.equal = ops.Equal()
+        self.reshape = ops.Reshape()
+        self.expand_dims = ops.ExpandDims()
+        self.ones_like = ops.OnesLike()
+        self.log = ops.Log()
+        self.tuple_to_array = ops.TupleToArray()
         self.g_iou = GIou()
 
     def construct(self, prediction, pred_xy, pred_wh, y_true, gt_box, input_shape):
@@ -270,23 +280,23 @@ class YoloLossBlock(nn.Cell):
         class_probs = y_true[:, :, :, :, 5:]
         true_boxes = y_true[:, :, :, :, :4]
 
-        grid_shape = ops.Shape()(prediction)[1:3]
-        grid_shape = ops.Cast()(ops.tuple_to_array(grid_shape[::-1]), ms.float32)
+        grid_shape = prediction.shape[1:3]
+        grid_shape = self.cast(self.tuple_to_array(grid_shape[::-1]), ms.float32)
 
         pred_boxes = self.concat((pred_xy, pred_wh))
         true_wh = y_true[:, :, :, :, 2:4]
-        true_wh = ops.Select()(ops.Equal()(true_wh, 0.0),
-                               ops.Fill()(ops.DType()(true_wh), ops.Shape()(true_wh), 1.0),
-                               true_wh)
-        true_wh = ops.Log()(true_wh / self.anchors * input_shape)
+        true_wh = self.select(self.equal(true_wh, 0.0),
+                              self.ones_like(true_wh),
+                              true_wh)
+        true_wh = self.log(true_wh / self.anchors * input_shape)
         # 2-w*h for large picture, use small scale, since small obj need more precise
         box_loss_scale = 2 - y_true[:, :, :, :, 2:3] * y_true[:, :, :, :, 3:4]
 
-        gt_shape = ops.Shape()(gt_box)
-        gt_box = ops.Reshape()(gt_box, (gt_shape[0], 1, 1, 1, gt_shape[1], gt_shape[2]))
+        gt_shape = gt_box.shape
+        gt_box = self.reshape(gt_box, (gt_shape[0], 1, 1, 1, gt_shape[1], gt_shape[2]))
 
         # add one more dimension for broadcast
-        iou = self.iou(ops.ExpandDims()(pred_boxes, -2), gt_box)
+        iou = self.iou(self.expand_dims(pred_boxes, -2), gt_box)
         # gt_box is x,y,h,w after normalize
         # [batch, grid[0], grid[1], num_anchor, num_gt]
         best_iou = self.reduce_max(iou, -1)
@@ -294,8 +304,8 @@ class YoloLossBlock(nn.Cell):
 
         # ignore_mask IOU too small
         ignore_mask = best_iou < self.ignore_threshold
-        ignore_mask = ops.Cast()(ignore_mask, ms.float32)
-        ignore_mask = ops.ExpandDims()(ignore_mask, -1)
+        ignore_mask = self.cast(ignore_mask, ms.float32)
+        ignore_mask = self.expand_dims(ignore_mask, -1)
         # ignore_mask backpro will cause a lot maximunGrad and minimumGrad time consume.
         # so we turn off its gradient
         ignore_mask = ops.stop_gradient(ignore_mask)
@@ -303,17 +313,17 @@ class YoloLossBlock(nn.Cell):
         confidence_loss = self.confidence_loss(object_mask, prediction[:, :, :, :, 4:5], ignore_mask)
         class_loss = self.class_loss(object_mask, prediction[:, :, :, :, 5:], class_probs)
 
-        object_mask_me = ops.Reshape()(object_mask, (-1, 1))  # [8, 72, 72, 3, 1]
-        box_loss_scale_me = ops.Reshape()(box_loss_scale, (-1, 1))
+        object_mask_me = self.reshape(object_mask, (-1, 1))  # [8, 72, 72, 3, 1]
+        box_loss_scale_me = self.reshape(box_loss_scale, (-1, 1))
         pred_boxes_me = xywh2x1y1x2y2(pred_boxes)
-        pred_boxes_me = ops.Reshape()(pred_boxes_me, (-1, 4))
+        pred_boxes_me = self.reshape(pred_boxes_me, (-1, 4))
         true_boxes_me = xywh2x1y1x2y2(true_boxes)
-        true_boxes_me = ops.Reshape()(true_boxes_me, (-1, 4))
+        true_boxes_me = self.reshape(true_boxes_me, (-1, 4))
         c_iou = self.g_iou(pred_boxes_me, true_boxes_me)
         c_iou_loss = object_mask_me * box_loss_scale_me * (1 - c_iou)
         c_iou_loss_me = self.reduce_sum(c_iou_loss, ())
         loss = c_iou_loss_me * 4 + confidence_loss + class_loss
-        batch_size = ops.Shape()(prediction)[0]
+        batch_size = prediction.shape[0]
         return loss / batch_size
 
 
@@ -377,10 +387,11 @@ class YoloWithLossCell(nn.Cell):
         self.loss_me = YoloLossBlock('m', self.config)
         self.loss_small = YoloLossBlock('s', self.config)
         self.tenser_to_array = ops.TupleToArray()
+        self.cast = ops.Cast()
 
     def construct(self, x, y_true_0, y_true_1, y_true_2, gt_0, gt_1, gt_2, input_shape):
-        input_shape = ops.shape(x)[2:4]
-        input_shape = ops.cast(self.tenser_to_array(input_shape) * 2, ms.float32)
+        input_shape = x.shape[2:4]
+        input_shape = self.cast(self.tenser_to_array(input_shape) * 2, ms.float32)
 
         yolo_out = self.yolo_network(x, input_shape)
         loss_l = self.loss_big(*yolo_out[0], y_true_0, gt_0, input_shape)
