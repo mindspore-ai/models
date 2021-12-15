@@ -1,0 +1,5 @@
+Cython
+pycocotools
+numpy
+opencv-python
+pycocotools
