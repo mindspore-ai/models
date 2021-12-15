@@ -42,6 +42,7 @@ DATASET=$4
 rm -rf LOG$1
 mkdir ./LOG$1
 cp ./*.py ./LOG$1
+cp ./*.yaml ./LOG$1
 cp -r ./src ./LOG$1
 cd ./LOG$1 || exit
 echo "start training for device $1"

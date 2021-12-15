@@ -16,7 +16,6 @@
 """Evaluation for retinanet"""
 
 import os
-import argparse
 import time
 import numpy as np
 from mindspore import context, Tensor
@@ -24,7 +23,9 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.retinahead import retinahead, retinanetInferWithDecoder
 from src.backbone import resnet152
 from src.dataset import create_retinanet_dataset, data_to_mindrecord_byte_image, voc_data_to_mindrecord
-from src.config import config
+from src.model_utils.config import config
+from src.model_utils.moxing_adapter import moxing_wrapper
+from src.model_utils.device_adapter import get_device_id
 from src.coco_eval import metrics
 from src.box_utils import default_boxes
 
@@ -71,32 +72,32 @@ def retinanet_eval(dataset_path, ckpt_path):
     print(f"mAP: {mAP}")
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='retinanet evaluation')
-    parser.add_argument("--device_id", type=int, default=3, help="Device id, default is 0.")
-    parser.add_argument("--dataset", type=str, default="coco", help="Dataset, default is coco.")
-    parser.add_argument("--run_platform", type=str, default="Ascend", choices=("Ascend", "GPU"),
-                        help="run platform, only support Ascend and GPU.")
-    args_opt = parser.parse_args()
+def modelarts_process():
+    if config.need_modelarts_dataset_unzip:
+        config.coco_root = os.path.join(config.coco_root, config.modelarts_dataset_unzip_name)
+        print(os.listdir(os.path.join(config.data_path, config.modelarts_dataset_unzip_name)))
 
-    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.run_platform, device_id=args_opt.device_id)
+@moxing_wrapper(pre_process=modelarts_process)
+def eval_retinanet_resnet152():
+    """ eval_retinanet_resnet152 """
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.run_platform, device_id=get_device_id())
 
     prefix = "retinanet_eval.mindrecord"
     mindrecord_dir = config.mindrecord_dir
     mindrecord_file = os.path.join(mindrecord_dir, prefix + "0")
-    if args_opt.dataset == "voc":
+    if config.dataset == "voc":
         config.coco_root = config.voc_root
     if not os.path.exists(mindrecord_file):
         if not os.path.isdir(mindrecord_dir):
             os.makedirs(mindrecord_dir)
-        if args_opt.dataset == "coco":
+        if config.dataset == "coco":
             if os.path.isdir(config.coco_root):
                 print("Create Mindrecord.")
                 data_to_mindrecord_byte_image("coco", False, prefix)
                 print("Create Mindrecord Done, at {}".format(mindrecord_dir))
             else:
                 print("coco_root not exits.")
-        elif args_opt.dataset == "voc":
+        elif config.dataset == "voc":
             if os.path.isdir(config.voc_dir) and os.path.isdir(config.voc_root):
                 print("Create Mindrecord.")
                 voc_data_to_mindrecord(mindrecord_dir, False, prefix)
@@ -113,3 +114,6 @@ if __name__ == '__main__':
 
     print("Start Eval!")
     retinanet_eval(mindrecord_file, config.checkpoint_path)
+
+if __name__ == '__main__':
+    eval_retinanet_resnet152()

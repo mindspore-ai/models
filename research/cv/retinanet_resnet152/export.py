@@ -13,27 +13,25 @@
 # limitations under the License.
 # ============================================================================
 """export for retinanet"""
-import argparse
 import numpy as np
 import mindspore.common.dtype as mstype
 from mindspore import context, Tensor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net, export
 from src.retinahead import  retinahead, retinanetInferWithDecoder
-from src.config import config
+from src.model_utils.config import config
+from src.model_utils.moxing_adapter import moxing_wrapper
+from src.model_utils.device_adapter import get_device_id
 from src.box_utils import default_boxes
 from src.backbone import resnet152
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='retinanet evaluation')
-    parser.add_argument("--device_id", type=int, default=0, help="Device id, default is 0.")
-    parser.add_argument("--run_platform", type=str, default="Ascend", choices=("Ascend"),
-                        help="run platform, only support Ascend.")
-    parser.add_argument("--file_format", type=str, choices=["AIR", "MINDIR"], default="MINDIR", help="file format")
-    parser.add_argument("--batch_size", type=int, default=1, help="batch size")
-    parser.add_argument("--file_name", type=str, default="retinanet", help="output file name.")
-    args_opt = parser.parse_args()
-    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.run_platform, device_id=args_opt.device_id)
+def modelarts_process():
+    pass
+
+@moxing_wrapper(pre_process=modelarts_process)
+def export_retinanet_resnet152():
+    """ export_retinanet_resnet152 """
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.run_platform, device_id=get_device_id())
 
     backbone = resnet152(config.num_classes)
     net = retinahead(backbone, config)
@@ -42,6 +40,9 @@ if __name__ == '__main__':
     net.init_parameters_data()
     load_param_into_net(net, param_dict)
     net.set_train(False)
-    shape = [args_opt.batch_size, 3] + config.img_shape
+    shape = [config.batch_size, 3] + config.img_shape
     input_data = Tensor(np.zeros(shape), mstype.float32)
-    export(net, input_data, file_name=args_opt.file_name, file_format=args_opt.file_format)
+    export(net, input_data, file_name=config.file_name, file_format=config.file_format)
+
+if __name__ == '__main__':
+    export_retinanet_resnet152()

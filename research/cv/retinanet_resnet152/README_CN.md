@@ -72,6 +72,105 @@ MSCOCO2017
     - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
+- 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
+
+    ```python
+    # 在 ModelArts 上使用8卡训练
+    # (1) 执行a或者b
+    #       a. 在 default_config.yaml 文件中设置 "enable_modelarts=True"
+    #          在 default_config.yaml 文件中设置 "distribute=True"
+    #          在 default_config.yaml 文件中设置 "coco_root='/cache/data'"
+    #          在 default_config.yaml 文件中设置 "epoch_size=500"
+    #          (可选)在 default_config.yaml 文件中设置 "checkpoint_path='s3://dir_to_your_pretrained/'"
+    #          在 default_config.yaml 文件中设置其他参数
+    #       b. 在网页上设置 "enable_modelarts=True"
+    #          在网页上设置 "distribute=True"
+    #          在网页上设置 "coco_root=/cache/data"
+    #          在网页上设置 "epoch_size=500"
+    #          (可选)在网页上设置 "checkpoint_path='s3://dir_to_your_pretrained/'"
+    #          在网页上设置其他参数
+    # (2) 准备模型代码
+    # (3) 如果选择微调您的模型，请上传你的预训练模型到 S3 桶上
+    # (4) 执行a或者b (推荐选择 a)
+    #       a. 第一, 将该数据集压缩为一个 ".zip" 文件。
+    #          第二, 上传你的压缩数据集到 S3 桶上 (你也可以上传未压缩的数据集，但那可能会很慢。)
+    #       b. 上传原始数据集到 S3 桶上。
+    #           (数据集转换发生在训练过程中，需要花费较多的时间。每次训练的时候都会重新进行转换。)
+    # (5) 在网页上设置你的代码路径为 "/path/retinanet"
+    # (6) 在网页上设置启动文件为 "train.py"
+    # (7) 在网页上设置"训练数据集"、"训练输出文件路径"、"作业日志路径"等
+    # (8) 创建训练作业
+    #
+    # 在 ModelArts 上使用单卡训练
+    # (1) 执行a或者b
+    #       a. 在 default_config.yaml 文件中设置 "enable_modelarts=True"
+    #          在 default_config.yaml 文件中设置 "coco_root='/cache/data'"
+    #          在 default_config.yaml 文件中设置 "epoch_size=500"
+    #          (可选)在 default_config.yaml 文件中设置 "checkpoint_path='s3://dir_to_your_pretrained/'"
+    #          在 default_config.yaml 文件中设置其他参数
+    #       b. 在网页上设置 "enable_modelarts=True"
+    #          在网页上设置 "coco_root='/cache/data'"
+    #          在网页上设置 "epoch_size=500"
+    #          (可选)在网页上设置 "checkpoint_path='s3://dir_to_your_pretrained/'"
+    #          在网页上设置其他参数
+    # (2) 准备模型代码
+    # (3) 如果选择微调您的模型，上传你的预训练模型到 S3 桶上
+    # (4) 执行a或者b (推荐选择 a)
+    #       a. 第一, 将该数据集压缩为一个 ".zip" 文件。
+    #          第二, 上传你的压缩数据集到 S3 桶上 (你也可以上传未压缩的数据集，但那可能会很慢。)
+    #       b. 上传原始数据集到 S3 桶上。
+    #           (数据集转换发生在训练过程中，需要花费较多的时间。每次训练的时候都会重新进行转换。)
+    # (5) 在网页上设置你的代码路径为 "/path/retinanet"
+    # (6) 在网页上设置启动文件为 "train.py"
+    # (7) 在网页上设置"训练数据集"、"训练输出文件路径"、"作业日志路径"等
+    # (8) 创建训练作业
+    #
+    # 在 ModelArts 上使用单卡验证
+    # (1) 执行a或者b
+    #       a. 在 default_config.yaml 文件中设置 "enable_modelarts=True"
+    #          在 default_config.yaml 文件中设置 "checkpoint_path='s3://dir_to_your_trained_model/'"
+    #          在 default_config.yaml 文件中设置 "mindrecord_dir='./MindRecord_COCO'"
+    #          在 default_config.yaml 文件中设置 "coco_root='/cache/data'"
+    #          在 default_config.yaml 文件中设置其他参数
+    #       b. 在网页上设置 "enable_modelarts=True"
+    #          在网页上设置 "checkpoint_path='s3://dir_to_your_trained_model/'"
+    #          在网页上设置 "mindrecord_dir='./MindRecord_COCO'"
+    #          在网页上设置 "coco_root='/cache/data'"
+    #          在网页上设置其他参数
+    # (2) 准备模型代码
+    # (3) 上传你训练好的模型到 S3 桶上
+    # (4) 执行a或者b (推荐选择 a)
+    #       a. 第一, 将该数据集压缩为一个 ".zip" 文件。
+    #          第二, 上传你的压缩数据集到 S3 桶上 (你也可以上传未压缩的数据集，但那可能会很慢。)
+    #       b. 上传原始数据集到 S3 桶上。
+    #           (数据集转换发生在训练过程中，需要花费较多的时间。每次训练的时候都会重新进行转换。)
+    # (5) 在网页上设置你的代码路径为 "/path/retinanet"
+    # (6) 在网页上设置启动文件为 "eval.py"
+    # (7) 在网页上设置"训练数据集"、"训练输出文件路径"、"作业日志路径"等
+    # (8) 创建训练作业
+    ```
+
+- 在 ModelArts 进行导出 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
+
+    ```python
+    # (1) 执行 a 或者 b.
+    #       a. 在 default_config.yaml 文件中设置 "enable_modelarts=True"
+    #          在 default_config.yaml 文件中设置 "file_name='retinanet'"
+    #          在 default_config.yaml 文件中设置 "file_format='MINDIR'"
+    #          在 base_config.yaml 文件中设置 "checkpoint_path='/The path of checkpoint in S3/'"
+    #          在 base_config.yaml 文件中设置其他参数
+    #       b. 在网页上设置 "enable_modelarts=True"
+    #          在网页上设置 "file_name='retinanet'"
+    #          在网页上设置 "file_format='MINDIR'"
+    #          在网页上设置 "checkpoint_path='/The path of checkpoint in S3/'"
+    #          在网页上设置其他参数
+    # (2) 上传你的预训练模型到 S3 桶上
+    # (3) 在网页上设置你的代码路径为 "/path/retinanet"
+    # (4) 在网页上设置启动文件为 "export.py"
+    # (5) 在网页上设置"训练数据集"、"训练输出文件路径"、"作业日志路径"等
+    # (6) 创建训练作业
+    ```
+
 ## [脚本说明](#content)
 
 ### [脚本和示例代码](#content)
@@ -87,7 +186,6 @@ MSCOCO2017
   ├─src
     ├─backbone.py                             # 网络模型定义
     ├─bottleneck.py                           # 网络颈部定义
-    ├─config.py                               # 参数配置
     ├─dataset.py                              # 数据预处理
     ├─retinahead.py                           # 网络预测头部定义
     ├─init_params.py                          # 参数初始化
@@ -95,6 +193,12 @@ MSCOCO2017
     ├─coco_eval                               # coco数据集评估
     ├─box_utils.py                            # 先验框设置
     ├─_init_.py                               # 初始化
+    └──model_utils
+       ├──config.py                           # 训练配置
+       ├──device_adapter.py                   # 获取云上id
+       ├──local_adapter.py                    # 获取本地id
+       └──moxing_adapter.py                   # 参数处理
+  ├─default_config.yaml                       # 参数配置
   ├─train.py                                  # 网络训练脚本
   └─eval.py                                   # 网络推理脚本
 
@@ -103,7 +207,7 @@ MSCOCO2017
 ### [脚本参数](#content)
 
 ```python
-在train.py和config.py脚本中使用到的主要参数是:
+在train.py和default_config.yaml脚本中使用到的主要参数是:
 "img_shape": [640, 640],                                                                        # 图像尺寸
 "num_retinanet_boxes": 76725,                                                                   # 设置的先验框总数
 "match_thershold": 0.5,                                                                         # 匹配阈值
@@ -282,7 +386,7 @@ mAP: 0.3571988469737286
 
 #### 用途
 
-导出模型前要修改config.py文件中的checkpoint_path配置项，值为checkpoint的路径。
+导出模型前要修改default_config.yaml文件中的checkpoint_path配置项，值为checkpoint的路径。
 
 ```shell
 python export.py --file_name [RUN_PLATFORM] --file_format[EXPORT_FORMAT] --checkpoint_path [CHECKPOINT PATH]
@@ -296,32 +400,12 @@ python export.py --file_name [RUN_PLATFORM] --file_format[EXPORT_FORMAT] --check
 python export.py
 ```
 
-- 在modelarts上导出MindIR
-
-```Modelarts
-在ModelArts上导出MindIR示例
-# (1) 选择a(修改yaml文件参数)或者b(ModelArts创建训练作业修改参数)其中一种方式。
-#       a. 设置 "enable_modelarts=True"
-#          设置 "file_name=retinanet"
-#          设置 "file_format=MINDIR"
-#          设置 "checkpoint_path=/cache/data/checkpoint/checkpoint file name"
-
-#       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
-#          在modelarts的界面上设置方法a所需要的参数
-#          注意：路径参数不需要加引号
-# (2)设置网络配置文件的路径 "_config_path=/The path of config in default_config.yaml/"
-# (3) 在modelarts的界面上设置代码的路径 "/path/retinanet"。
-# (4) 在modelarts的界面上设置模型的启动文件 "export.py" 。
-# (5) 在modelarts的界面上设置模型的数据路径 ".../MindRecord_COCO"(选择MindRecord_COCO文件夹路径) ,
-# MindIR的输出路径"Output file path" 和模型的日志路径 "Job log path" 。
-```
-
 ### [推理过程](#content)
 
 #### 用 途
 
 在推理之前需要在昇腾910环境上完成模型的导出。推理时要将iscrowd为true的图片排除掉。在ascend310_infer目录下保存了去排除后的图片id。
-还需要修改config.py文件中的coco_root、val_data_type、instances_set配置项，值分别取coco数据集的目录，推理所用数据集的目录名称，推理完成后计算精度用的annotation文件，instances_set是用val_data_type拼接起来的，要保证文件正确并且存在。
+还需要修改default_config.yaml文件中的coco_root、val_data_type、instances_set配置项，值分别取coco数据集的目录，推理所用数据集的目录名称，推理完成后计算精度用的annotation文件，instances_set是用val_data_type拼接起来的，要保证文件正确并且存在。
 
 ```shell
 # Ascend310 inference
@@ -368,7 +452,7 @@ mAP: 0.35625723922139957
 | MindSpore 版本             | 1.0.1                                 |
 | 数据集                      | 123287 张图片                          |
 | Batch_size                 | 16                                   |
-| 训练参数                    | src/config.py                         |
+| 训练参数                    | default_config.yaml                   |
 | 优化器                      | Momentum                              |
 | 损失函数                    | Focal loss                            |
 | 最终损失                    | 0.69                               |
@@ -387,7 +471,7 @@ mAP: 0.35625723922139957
 | 数据集              | 5k 张图片                   |
 | Batch_size          | 1                          |
 | 精确度              | mAP[0.3571]                  |
-| 总时间              | 12 mins and 03 seconds       |
+| 总时间              | 12m3s       |
 
 # [随机情况的描述](#内容)
 

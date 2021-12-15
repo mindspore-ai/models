@@ -1,4 +1,3 @@
-#!/bin/bash
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,37 +13,15 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]
-then
-    echo "Usage: sh run_eval.sh [DATASET] [DEVICE_ID]"
-exit 1
-fi
+"""Device adapter for ModelArts"""
 
-DATASET=$1
-echo $DATASET
+from .config import config
 
+if config.enable_modelarts:
+    from .moxing_adapter import get_device_id, get_device_num, get_rank_id, get_job_id
+else:
+    from .local_adapter import get_device_id, get_device_num, get_rank_id, get_job_id
 
-export DEVICE_NUM=1
-export DEVICE_ID=$2
-export RANK_SIZE=$DEVICE_NUM
-export RANK_ID=0
-
-BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
-cd $BASE_PATH/../ || exit
-
-if [ -d "eval$2" ];
-then
-    rm -rf ./eval$2
-fi
-
-mkdir ./eval$2
-cp ./*.py ./eval$2
-cp ./*.yaml ./eval$2
-cp -r ./src ./eval$2
-cd ./eval$2 || exit
-env > env.log
-echo "start inferring for device $DEVICE_ID"
-python eval.py \
-    --dataset=$DATASET \
-    --device_id=$2 > log.txt 2>&1 &
-cd ..
+__all__ = [
+    "get_device_id", "get_device_num", "get_rank_id", "get_job_id"
+]

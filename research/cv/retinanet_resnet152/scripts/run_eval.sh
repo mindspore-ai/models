@@ -39,6 +39,7 @@ fi
 
 mkdir ./eval$2
 cp ./*.py ./eval$2
+cp ./*.yaml ./eval$2
 cp -r ./src ./eval$2
 cd ./eval$2 || exit
 env > env.log

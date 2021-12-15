@@ -1,4 +1,3 @@
-#!/bin/bash
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,37 +13,24 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]
-then
-    echo "Usage: sh run_eval.sh [DATASET] [DEVICE_ID]"
-exit 1
-fi
+"""Local adapter"""
 
-DATASET=$1
-echo $DATASET
+import os
+
+def get_device_id():
+    device_id = os.getenv('DEVICE_ID', '0')
+    return int(device_id)
 
 
-export DEVICE_NUM=1
-export DEVICE_ID=$2
-export RANK_SIZE=$DEVICE_NUM
-export RANK_ID=0
+def get_device_num():
+    device_num = os.getenv('RANK_SIZE', '1')
+    return int(device_num)
 
-BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
-cd $BASE_PATH/../ || exit
 
-if [ -d "eval$2" ];
-then
-    rm -rf ./eval$2
-fi
+def get_rank_id():
+    global_rank_id = os.getenv('RANK_ID', '0')
+    return int(global_rank_id)
 
-mkdir ./eval$2
-cp ./*.py ./eval$2
-cp ./*.yaml ./eval$2
-cp -r ./src ./eval$2
-cd ./eval$2 || exit
-env > env.log
-echo "start inferring for device $DEVICE_ID"
-python eval.py \
-    --dataset=$DATASET \
-    --device_id=$2 > log.txt 2>&1 &
-cd ..
+
+def get_job_id():
+    return "Local Job"

@@ -16,17 +16,11 @@
 """Evaluation for retinanet"""
 
 import os
-import argparse
 import numpy as np
 from PIL import Image
 from src.coco_eval import metrics
-from src.config import config
+from src.model_utils.config import config
 
-parser = argparse.ArgumentParser(description='retinanet evaluation')
-parser.add_argument("--result_path", type=str, required=True, help="result file path.")
-parser.add_argument("--img_path", type=str, required=True, help="image file path.")
-parser.add_argument("--img_id_file", type=str, required=True, help="image id file.")
-args = parser.parse_args()
 
 def get_pred(result_path, img_id):
     boxes_file = os.path.join(result_path, img_id + '_0.bin')
@@ -73,4 +67,4 @@ def cal_acc(result_path, img_path, img_id_file):
     print(f"mAP: {mAP}")
 
 if __name__ == '__main__':
-    cal_acc(args.result_path, args.img_path, args.img_id_file)
+    cal_acc(config.result_path, config.img_path, config.img_id_file)
