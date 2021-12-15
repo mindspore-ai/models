@@ -30,6 +30,13 @@ class ConfigTGCN:
     # Global random seed
     seed = 1
 
+    # Use 'save_best = True' for saving model checkpoints with best RMSE on evaluation dataset
+    # WARNING! Will decrease performance due to the need of evaluation after each epoch
+    save_best = True
+
+    # Dataset absolute path
+    data_path = './data/'
+
     # Choose datasets: ['SZ-taxi', 'Los-loop', etc]
     dataset = 'SZ-taxi'
 

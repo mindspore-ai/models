@@ -15,8 +15,8 @@
 # ============================================================================
 
 
-if [[ $# -ne 4 ]]; then
-    echo "Usage: bash ./scripts/run_distributed_train_ascend.sh [RANK_TABLE] [RANK_SIZE] [DEVICE_START] [DATA_PATH]"
+if [[ $# -ne 3 ]]; then
+    echo "Usage: bash ./scripts/run_distributed_train_ascend.sh [RANK_TABLE] [RANK_SIZE] [DEVICE_START]"
 exit 1
 fi
 
@@ -40,7 +40,7 @@ do
     cd ./device$i
     mkdir ./logs
     env > ./logs/env.log
-    nohup python -u train.py --device_id=$DEVICE_ID --data_path=$DATA_PATH --distributed True > ./logs/train.log 2>&1 &
+    nohup python -u train.py --device_id=$DEVICE_ID --distributed True > ./logs/train.log 2>&1 &
     echo "Start training for rank $RANK_ID, device $DEVICE_ID. PID: $!"
     echo $! > ./logs/train.pid
     cd ..
