@@ -34,7 +34,7 @@
 
 # [Model Architecture](#contents)
 
-The backbone structure of TernaryBERT is transformer, the transformer contains six encoder modules, one encoder contains one self-attention module and one self-attention module contains one attention module.  
+The backbone structure of TernaryBERT is transformer, the transformer contains six encoder modules, one encoder contains one self-attention module and one self-attention module contains one attention module. The pretrained teacher model and student model are provided [here](https://download.mindspore.cn/model_zoo/research/nlp/ternarybert/).
 
 # [Dataset](#contents)
 
@@ -60,15 +60,15 @@ After installing MindSpore via the official website, you can start training and 
 
 # run training example
 
-bash scripts/run_train.sh
+bash scripts/run_train.sh [TASK_NAME] [DEVICE_TARGET] [TEACHER_MODEL_DIR] [STUDENT_MODEL_DIR] [DATA_DIR]
 
-Before running the shell script, please set the `task_name`, `teacher_model_dir`, `student_model_dir` and `data_dir` in the run_train.sh file first.
+Before running the shell script, please set the `task_name`, `device_target`, `teacher_model_dir`, `student_model_dir` and `data_dir` in the run_train.sh file first.
 
 # run evaluation example
 
-bash scripts/run_eval.sh
+bash scripts/run_eval.sh [TASK_NAME] [DEVICE_TARGET] [MODEL_DIR] [DATA_DIR]
 
-Before running the shell script, please set the `task_name`, `model_dir` and `data_dir` in the run_eval.sh file first.
+Before running the shell script, please set the `task_name`, `device_target`, `model_dir` and `data_dir` in the run_eval.sh file first.
 ```
 
 # [Script Description](#contents)
@@ -104,7 +104,7 @@ Before running the shell script, please set the `task_name`, `model_dir` and `da
 
 ```text
 
-usage: train.py    [--h] [--device_target {GPU,Ascend}] [--do_eval {true,false}] [--epoch_size EPOCH_SIZE]
+usage: train.py    [--h] [--device_target GPU] [--do_eval {true,false}] [--epoch_size EPOCH_SIZE]
                    [--device_id DEVICE_ID] [--do_shuffle {true,false}] [--enable_data_sink {true,false}] [--save_ckpt_step SAVE_CKPT_STEP]
                    [--eval_ckpt_step EVAL_CKPT_STEP] [--max_ckpt_num MAX_CKPT_NUM] [--data_sink_steps DATA_SINK_STEPS]
                    [--teacher_model_dir TEACHER_MODEL_DIR] [--student_model_dir STUDENT_MODEL_DIR] [--data_dir DATA_DIR]
@@ -112,7 +112,7 @@ usage: train.py    [--h] [--device_target {GPU,Ascend}] [--do_eval {true,false}]
                    [--train_batch_size TRAIN_BATCH_SIZE] [--eval_batch_size EVAL_BATCH_SIZE]
 
 options:
-    --device_target                 Device where the code will be implemented: "GPU" | "Ascend", default is "GPU"
+    --device_target                 Device where the code will be implemented: "GPU"
     --do_eval                       Do eval task during training or not: "true" | "false", default is "true"
     --epoch_size                    Epoch size for train phase: N, default is 3
     --device_id                     Device id: N, default is 0
@@ -138,11 +138,11 @@ options:
 
 ```text
 
-usage: eval.py    [--h] [--device_target {GPU,Ascend}] [--device_id DEVICE_ID] [--model_dir MODEL_DIR] [--data_dir DATA_DIR]
+usage: eval.py    [--h] [--device_target GPU] [--device_id DEVICE_ID] [--model_dir MODEL_DIR] [--data_dir DATA_DIR]
                   [--task_name {sts-b,qnli,mnli}] [--dataset_type DATASET_TYPE] [--batch_size BATCH_SIZE]
 
 options:
-    --device_target                 Device where the code will be implemented: "GPU" | "Ascend", default is "GPU"
+    --device_target                 Device where the code will be implemented: "GPU"
     --device_id                     Device id: N, default is 0
     --model_dir                     The checkpoint directory of model: PATH, default is ""
     --data_dir                      Data directory: PATH, default is ""
@@ -236,7 +236,7 @@ Before running the command below, please check `teacher_model_dir`, `student_mod
 ```text
 
 python
-    python train.py --task_name='sts-b' --device_target="Ascend" --teacher_model_dir='/home/xxx/model_dir/' --student_model_dir='/home/xxx/model_dir/' --data_dir='/home/xxx/data_dir/'
+    python train.py --task_name='sts-b' --device_target="GPU" --teacher_model_dir='/home/xxx/model_dir/' --student_model_dir='/home/xxx/model_dir/' --data_dir='/home/xxx/data_dir/'
 shell
     bash scripts/run_train.sh [TASK_NAME] [DEVICE_TARGET] [TEACHER_MODEL_DIR] [STUDENT_MODEL_DIR] [DATA_DIR]
 
@@ -266,7 +266,7 @@ If you want to after running and continue to eval.
 ```text
 
 python
-    python eval.py --task_name='sts-b' --device_target="Ascend" --model_dir='/home/xxx/model_dir/' --data_dir='/home/xxx/data_dir/'
+    python eval.py --task_name='sts-b' --device_target="GPU" --model_dir='/home/xxx/model_dir/' --data_dir='/home/xxx/data_dir/'
 shell
     bash scripts/run_eval.sh [TASK_NAME] [DEVICE_TARGET] [MODEL_DIR] [DATA_DIR]
 
@@ -291,15 +291,15 @@ The best Pearsonr: 87.58388835685437
 
 ### training Performance
 
-| Parameters                   | Ascend                                                     | GPU                       |
-| -------------------------- | ---------------------------------------------------------- | ------------------------- |
-| Model Version              | TernaryBERT                                                   | TernaryBERT                           |
-| Resource                   | Ascend 910, cpu 2.60GHz, cores 172, mem 755G, os Euler2.8               | NV GeForce GTX1080ti, cpu 2.00GHz, cores 56, mem 251G, os Ubuntu 16.04         |
-| Date              | 2021-6-10                                           | 2021-6-10      |
-| MindSpore Version          | 1.2.0                                                      | 1.2.0                     |
-| Dataset                    | STS-B                                                | STS-B              |
-| batch_size                    | 16                                                | 16              |
-| Metric value                 | 87.1                                                        | 87.5                       |
+| Parameters                                                                    | GPU                       |
+| -------------------------- | ------------------------- |
+| Model Version              | TernaryBERT                           |
+| Resource                   | NV GeForce GTX1080ti, cpu 2.00GHz, cores 56, mem 251G, os Ubuntu 16.04         |
+| Date              | 2021-6-10      |
+| MindSpore Version          | 1.2.0                     |
+| Dataset                    | STS-B              |
+| batch_size                    | 16              |
+| Metric value                 | 87.5                       |
 
 # [Description of Random Situation](#contents)
 
