@@ -28,7 +28,7 @@ def parse_args():
     parser.add_argument('--device_id', type=int, default=0)
     parser.add_argument('--parallel', type=ast.literal_eval, default=False)
     parser.add_argument('--seed', type=int, default=1)
-    parser.add_argument('--is_emb_init', type=ast.literal_eval, default=False)
+    parser.add_argument('--is_emb_init', type=ast.literal_eval, default=True)
     parser.add_argument('--do_eval', type=ast.literal_eval, default=False,
                         help="Whether side training changes verification.")
     # net args

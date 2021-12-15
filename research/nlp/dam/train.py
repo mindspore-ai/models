@@ -14,11 +14,13 @@
 # ===========================================================================
 """Train function"""
 import os
+import time
 import numpy as np
 import mindspore
 from mindspore import nn
 from mindspore import dataset as ds
 from mindspore import context, Model
+from mindspore import ParameterTuple
 from mindspore.context import ParallelMode
 from mindspore.communication.management import init
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
@@ -36,7 +38,6 @@ rank_id = int(os.getenv('RANK_ID'))
 print("RANK_SIZE: ", device_num)
 print("DEVICE_ID: ", device_id)
 print("RANK_ID: ", rank_id)
-root = "/cache/"
 
 
 def prepare_seed(seed):
@@ -69,11 +70,12 @@ def train(config):
     if config.modelArts:
         import moxing as mox
         mox.file.shift('os', 'mox')
+        init()
         context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
                                           parameter_broadcast=True, gradients_mean=True)
-        init()
         shard_id = rank_id
         num_shards = device_num
+        root = "/cache/"
         obs_data_path = config.data_url
         if config.model_name == "DAM_ubuntu":
             local_data_path = os.path.join(root, "ubuntu_data")
@@ -94,9 +96,9 @@ def train(config):
         local_train_path = config.output_path
 
         if config.parallel:
-            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              parameter_broadcast=True, gradients_mean=True)
             init()
+            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
             shard_id = rank_id
             num_shards = device_num
             local_train_path = os.path.join(local_train_path, str(device_id))
@@ -126,7 +128,6 @@ def train(config):
     else:
         emb_init = None
     dam_net = DAMNet(config, emb_init=emb_init, is_emb_init=config.is_emb_init)
-    print(dam_net.trainable_params())
 
     iter_per_epoch = train_dataset.get_dataset_size()
     total_iters = iter_per_epoch * config.epoch_size
@@ -136,8 +137,8 @@ def train(config):
                                  max_iteration=total_iters,
                                  is_stair=True)
     lr = mindspore.Tensor(np.array(lr).astype(np.float32))
-    optimizer = nn.Adam(params=dam_net.trainable_params(), learning_rate=lr)
     train_net = DAMNetWithLoss(dam_net)
+    optimizer = nn.Adam(params=ParameterTuple(train_net.trainable_params()), learning_rate=lr)
     train_net = DAMTrainOneStepCell(train_net, optimizer, sens=config.loss_scale)
     eval_net = PredictWithNet(dam_net)
     metric = EvalMetric(config.model_name)
@@ -170,6 +171,7 @@ def train(config):
         cbs.append(eval_callback)
 
     print("############## Start training ##############")
+    print(time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time())))
     model.train(epoch=config.epoch_size, train_dataset=train_dataset, callbacks=cbs, dataset_sink_mode=False)
 
     if config.modelArts:
@@ -179,13 +181,8 @@ def train(config):
 
 if __name__ == '__main__':
     args = conf.parse_args()
-    if args.model_name == "DAM_ubuntu":
-        args.vocab_size = 434512
-        args.channel1_dim = 32
-    elif args.model_name == "DAM_douban":
+    if args.model_name == "DAM_douban":
         args.vocab_size = 172130
         args.channel1_dim = 16
-    else:
-        raise RuntimeError('{} does not exist'.format(args.model_name))
     print("args: ", args)
     train(args)

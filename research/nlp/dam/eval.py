@@ -125,13 +125,8 @@ def evaluate(config):
 
 if __name__ == '__main__':
     args = conf.parse_args()
-    if args.model_name == "DAM_ubuntu":
-        args.vocab_size = 434512
-        args.channel1_dim = 32
-    elif args.model_name == "DAM_douban":
+    if args.model_name == "DAM_douban":
         args.vocab_size = 172130
         args.channel1_dim = 16
-    else:
-        raise RuntimeError('{} does not exist'.format(args.model_name))
     print("args: ", args)
     evaluate(args)
