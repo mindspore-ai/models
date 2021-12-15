@@ -14,25 +14,33 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 1 ]
+if [ $# != 0 ] && [ $# != 1 ]
 then
-    echo "Usage: bash run_eval.sh checkpoint_path_dir/checkpoint_path_file"
-exit 1
+  echo "Usage: bash run_standalone_train_gpu.sh [TRAIN_DATASET](optional)"
+  exit 1
 fi
 
-
-if [ ! -d $1 ] && [ ! -f $1 ]
+if [ $# == 1 ] && [ ! -d $1 ]
 then
-    echo "error: checkpoint_path=$1 is neither a directory nor a file"
-    exit 1
+  echo "error: TRAIN_DATASET=$1 is not a directory"
+  exit 1
 fi
-
 
 ulimit -u unlimited
-export DEVICE_NUM=1
-export DEVICE_ID=0
-export RANK_SIZE=$DEVICE_NUM
-export RANK_ID=0
 
-echo "start evaluation for device $DEVICE_ID"
-python eval.py --checkpoint_path=$1 > ./eval.log 2>&1 &
+rm -rf ./train_standalone
+mkdir ./train_standalone
+cp ./*.py ./train_standalone
+cp -r ./src ./train_standalone
+cd ./train_standalone || exit
+env > env.log
+
+if [ $# == 0 ]
+then
+  python train.py --device_target='GPU' --lr_init=0.26 > log.txt 2>&1 &
+fi
+
+if [ $# == 1 ]
+then
+  python train.py --device_target='GPU' --data_path="$1" --lr_init=0.26 > log.txt 2>&1 &
+fi

@@ -16,7 +16,7 @@
 
 if [ $# != 0 ]
 then
-    echo "Usage: sh run_train.sh"
+    echo "Usage: bash run_train.sh"
 exit 1
 fi
 

@@ -33,11 +33,11 @@ parser.add_argument('--width', type=int, default=224, help='input width')
 parser.add_argument('--height', type=int, default=224, help='input height')
 parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
 parser.add_argument("--device_target", type=str, default="Ascend",
-                    choices=["Ascend",], help="device target(default: Ascend)")
+                    choices=["Ascend", "GPU"], help="device target(default: Ascend)")
 args = parser.parse_args()
 
 context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
-if args.device_target == "Ascend":
+if args.device_target in ["Ascend", "GPU"]:
     context.set_context(device_id=args.device_id)
 else:
     raise ValueError("Unsupported platform.")
