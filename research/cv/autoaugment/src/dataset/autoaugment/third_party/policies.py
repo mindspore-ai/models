@@ -16,9 +16,9 @@
 Good policies found by the AutoAugment paper.
 """
 
+def cifar_policies_exp0():
+    """AutoAugment policies found on Cifar in experiment 0."""
 
-def good_policies():
-    """AutoAugment policies found on Cifar."""
     exp0_0 = [
         [('Invert', 0.1, 7), ('Contrast', 0.2, 6)],
         [('Rotate', 0.7, 2), ('TranslateX', 0.3, 9)],
@@ -43,6 +43,12 @@ def good_policies():
         [('AutoContrast', 0.8, 0), ('TranslateY', 0.7, 9)],
         [('TranslateY', 0.2, 7), ('Color', 0.9, 6)],
         [('Equalize', 0.7, 6), ('Color', 0.4, 9)]]
+    exp0s = exp0_0 + exp0_1 + exp0_2 + exp0_3
+    return exp0s
+
+
+def cifar_policies_exp1():
+    """AutoAugment policies found on Cifar in experiment 1."""
     exp1_0 = [
         [('ShearY', 0.2, 7), ('Posterize', 0.3, 7)],
         [('Color', 0.4, 3), ('Brightness', 0.6, 7)],
@@ -85,6 +91,12 @@ def good_policies():
         [('TranslateY', 0.9, 0), ('TranslateY', 0.5, 9)],
         [('AutoContrast', 0.5, 3), ('Solarize', 0.3, 4)],
         [('Solarize', 0.5, 3), ('Equalize', 0.4, 4)]]
+    exp1s = exp1_0 + exp1_1 + exp1_2 + exp1_3 + exp1_4 + exp1_5 + exp1_6
+    return exp1s
+
+
+def cifar_policies_exp2():
+    """AutoAugment policies found on Cifar in experiment 2."""
     exp2_0 = [
         [('Color', 0.7, 7), ('TranslateX', 0.5, 8)],
         [('Equalize', 0.3, 7), ('AutoContrast', 0.4, 8)],
@@ -133,8 +145,47 @@ def good_policies():
         [('AutoContrast', 0.6, 1), ('AutoContrast', 0.7, 8)],
         [('Equalize', 0.2, 0), ('AutoContrast', 0.1, 2)],
         [('Equalize', 0.6, 9), ('Equalize', 0.4, 4)]]
-    exp0s = exp0_0 + exp0_1 + exp0_2 + exp0_3
-    exp1s = exp1_0 + exp1_1 + exp1_2 + exp1_3 + exp1_4 + exp1_5 + exp1_6
-    exp2s = exp2_0 + exp2_1 + exp2_2 + exp2_3 + exp2_4 + exp2_5 + exp2_6 + \
-        exp2_7
+
+    exp2s = exp2_0 + exp2_1 + exp2_2 + exp2_3 + exp2_4 + exp2_5 + exp2_6 + exp2_7
+    return exp2s
+
+
+def good_policies():
+    """AutoAugment policies found on Cifar."""
+    exp0s = cifar_policies_exp0()
+    exp1s = cifar_policies_exp1()
+    exp2s = cifar_policies_exp2()
+
     return exp0s + exp1s + exp2s
+
+
+def svhn_good_policies():
+    """ AutoAugment policies for SVHN dataset from paper"""
+    exp = [
+        [('ShearX', 0.9, 4), ('Invert', 0.2, 3)],
+        [('ShearY', 0.9, 8), ('Invert', 0.7, 5)],
+        [('Equalize', 0.6, 5), ('Solarize', 0.6, 6)],
+        [('Invert', 0.9, 3), ('Equalize', 0.6, 3)],
+        [('Equalize', 0.6, 1), ('Rotate', 0.9, 3)],
+        [('ShearX', 0.9, 4), ('AutoContrast', 0.8, 3)],
+        [('ShearY', 0.9, 8), ('Invert', 0.4, 5)],
+        [('ShearY', 0.9, 5), ('Solarize', 0.2, 6)],
+        [('Invert', 0.9, 6), ('AutoContrast', 0.8, 1)],
+        [('Equalize', 0.6, 3), ('Rotate', 0.9, 3)],
+        [('ShearX', 0.9, 4), ('Solarize', 0.3, 3)],
+        [('ShearY', 0.8, 8), ('Invert', 0.7, 4)],
+        [('Equalize', 0.9, 5), ('TranslateY', 0.6, 6)],
+        [('Invert', 0.9, 4), ('Equalize', 0.6, 7)],
+        [('Contrast', 0.3, 3), ('Rotate', 0.8, 4)],
+        [('Invert', 0.8, 5), ('TranslateY', 0.0, 2)],
+        [('ShearY', 0.7, 6), ('Solarize', 0.4, 8)],
+        [('Invert', 0.6, 4), ('Rotate', 0.8, 4)],
+        [('ShearY', 0.3, 7), ('TranslateX', 0.9, 3)],
+        [('ShearX', 0.1, 6), ('Invert', 0.6, 5)],
+        [('Solarize', 0.7, 2), ('TranslateY', 0.6, 7)],
+        [('ShearY', 0.8, 4), ('Invert', 0.8, 8)],
+        [('ShearX', 0.7, 9), ('TranslateY', 0.8, 3)],
+        [('ShearY', 0.8, 5), ('AutoContrast', 0.7, 3)],
+        [('ShearX', 0.7, 2), ('Invert', 0.1, 5)],
+    ]
+    return exp

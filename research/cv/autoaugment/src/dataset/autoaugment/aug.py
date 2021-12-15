@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import random
 import mindspore.dataset.vision.py_transforms as py_trans
 
 from .third_party.policies import good_policies
+from .third_party.policies import svhn_good_policies
 from .ops import OperatorClasses, RandomCutout
 
 
@@ -52,8 +53,10 @@ class Augment:
             mean=None, std=None,
     ):
         self.index = index
-        if policies is None:
+        if policies == 'cifar10':
             self.policies = good_policies()
+        elif policies == 'svhn':
+            self.policies = svhn_good_policies()
         else:
             self.policies = policies
 
@@ -101,12 +104,15 @@ class Augment:
             img = self._apply(name, prob, level, img)
 
         if self.enable_basic:
-            img = self.random_crop(img)
             img = self.random_flip(img)
-            img = self.cutout(img)
+            if self.policies == 'cifar10':
+                img = self.random_flip(img)
+                img = self.random_crop(img)
+                img = self.random_flip(img)
+                img = self.cutout(img)
 
         if not self.as_pil:
             img = self.to_tensor(img)
-            if self.normalize is not None:
-                img = self.normalize(img)
+            # if self.normalize is not None:
+            img = self.normalize(img)
         return img

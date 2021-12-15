@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
 # ============================================================================
 
 if [ $# != 2 ]; then
-    echo "Usage: 
-bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH]"
+    echo "Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH]"
     exit 1
 fi
 
@@ -34,7 +33,7 @@ for ((i=0; i<${RANK_SIZE}; i++)); do
         --dataset_path=$2 \
         --run_distribute=True \
         --lr_max=0.8 \
-        > train-${i}.log 2>&1 & 
+        > train-${i}.log 2>&1 &
     pid=$!
     PID_LIST+=("${pid}")
 done

@@ -14,18 +14,14 @@
 # limitations under the License.
 # ============================================================================
 
-export DEVICE_ID=0
-export DEVICE_NUM=1
-export RANK_ID=0
-export RANK_SIZE=1
-
-if [ $# == 1 ]; then
-    python ../train.py \
-        --dataset cifar10 \
-        --dataset_path $1 \
-        > train.log 2>&1 &
+if [ $# == 2 ]; then
+    python test.py \
+        --checkpoint_path $1 \
+        --dataset svhn \
+        --dataset_path $2 \
+        --device_target=GPU \
+        > eval.log 2>&1 &
 else
-    echo "Usage: \
-bash run_standalone_train.sh [DATASET_PATH]"
+    echo "Usage:bash run_eval.sh [CHECKPOINT_PATH] [DATASET_PATH]"
     exit 1
 fi

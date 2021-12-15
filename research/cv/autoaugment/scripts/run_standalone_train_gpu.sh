@@ -14,18 +14,15 @@
 # limitations under the License.
 # ============================================================================
 
-export DEVICE_ID=0
-export DEVICE_NUM=1
-export RANK_ID=0
-export RANK_SIZE=1
-
 if [ $# == 1 ]; then
-    python ../train.py \
-        --dataset cifar10 \
+    python train.py \
+        --dataset svhn \
         --dataset_path $1 \
+        --device_target=GPU \
+        --lr_init=0.01 \
+        --epoch_size=50 \
         > train.log 2>&1 &
 else
-    echo "Usage: \
-bash run_standalone_train.sh [DATASET_PATH]"
+    echo "Usage: bash run_standalone_train_gpu.sh [DATASET_PATH]"
     exit 1
 fi
