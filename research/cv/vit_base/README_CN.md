@@ -60,8 +60,8 @@ vit_base的总体网络架构如下： [链接](https://arxiv.org/abs/2010.11929
 
 # 环境要求
 
-- 硬件（Ascend）
-    - 使用Ascend来搭建硬件环境。
+- 硬件（Ascend or GPU）
+    - 使用Ascend or GPU 来搭建硬件环境。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
@@ -72,21 +72,26 @@ vit_base的总体网络架构如下： [链接](https://arxiv.org/abs/2010.11929
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估，特别地，进行训练前需要先下载官方基于ImageNet21k的预训练模型[ViT-B_16](https://console.cloud.google.com/storage/vit_models/) ，并将其转换为MindSpore支持的ckpt格式模型，命名为"cifar10_pre_checkpoint_based_imagenet21k.ckpt"，和训练集测试集数据放于同一级目录下：
 
-- Ascend处理器环境运行
+- Ascend or GPU 处理器环境运行
 
   ```python
   # 运行训练示例
-  python train.py --device_id=0 --dataset_name='cifar10' > train.log 2>&1 &
-  OR
+  # Ascend
   bash ./scripts/run_standalone_train_ascend.sh [DEVICE_ID] [DATASET_NAME]
+  # GPU
+  bash ./scripts/run_standalone_train_gpu.sh [DATASET_NAME] [DEVICE_ID] [LR_INIT] [LOGS_CKPT_DIR]
 
   # 运行分布式训练示例
-  bash ./scripts/run_distribution_train_ascend.sh [RANK_TABLE] [DEVICE_NUM] [DEVICE_START] [DATASET_NAME]
+  # Ascend
+  bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE] [DEVICE_NUM] [DEVICE_START] [DATASET_NAME]
+  # GPU
+  bash ./scripts/run_distribute_train_gpu.sh [DATASET_NAME] [DEVICE_NUM] [LR_INIT] [LOGS_CKPT_DIR]
 
   # 运行评估示例
-  python eval.py --checkpoint_path [CKPT_PATH] ./eval.log 2>&1 &
-  OR
+  # Ascend
   bash ./scripts/run_standalone_eval_ascend.sh [CKPT_PATH]
+  # GPU
+  bash ./scripts/run_standalone_eval_gpu.sh [DATASET_NAME] [DEVICE_ID] [CKPT_PATH]
 
   # 运行推理示例
   bash run_infer_310.sh ../vit_base.mindir Cifar10 /home/dataset/cifar-10-verify-bin/ 0
@@ -119,26 +124,29 @@ vit_base的总体网络架构如下： [链接](https://arxiv.org/abs/2010.11929
 ## 脚本及样例代码
 
 ```bash
-├── models
-    ├── README.md                                  // 所有模型相关说明
-    ├── vit_base
-        ├── README_CN.md                           // vit_base相关说明
-        ├── ascend310_infer                        // 实现310推理源代码
-        ├── scripts
-        │   ├──run_distribution_train_ascend.sh    // 分布式到Ascend的shell脚本
-        │   ├──run_infer_310.sh                    // Ascend推理的shell脚本
-        │   ├──run_standalone_eval_ascend.sh       // Ascend评估的shell脚本
-        │   ├──run_standalone_train_ascend.sh      // Ascend单卡训练的shell脚本
-        ├── src
-        │   ├──config.py                           // 参数配置
-        │   ├──dataset.py                          // 创建数据集
-        │   ├──modeling_ms.py                      // vit_base架构
-        │   ├──net_config.py                       // 结构参数配置
-        ├── eval.py                                // 评估脚本
-        ├── export.py                              // 将checkpoint文件导出到air/mindir
-        ├── postprocess.py                         // 310推理后处理脚本
-        ├── preprocess.py                          // 310推理前处理脚本
-        ├── train.py                               // 训练脚本
+├── vit_base
+    ├── README.md                              // vit_base相关说明 (ENG)
+    ├── README_CN.md                           // vit_base相关说明 (CN)
+    ├── ascend310_infer                        // 实现310推理源代码
+    ├── scripts
+    │   ├──run_distribute_train_ascend.sh    // 分布式到Ascend的shell脚本
+    │   ├──run_distribute_train_gpu.sh       // 分布式到GPU的shell脚本
+    │   ├──run_infer_310.sh                    // Ascend推理的shell脚本
+    │   ├──run_standalone_eval_ascend.sh       // Ascend评估的shell脚本
+    │   ├──run_standalone_eval_gpu.sh          // GPU评估的shell脚本
+    │   ├──run_standalone_train_ascend.sh      // Ascend单卡训练的shell脚本
+    │   └──run_standalone_train_gpu.sh         // GPU单卡训练的shell脚本
+    ├── src
+    │   ├──config.py                           // 参数配置
+    │   ├──dataset.py                          // 创建数据集
+    │   ├──modeling_ms.py                      // vit_base架构
+    │   └──net_config.py                       // 结构参数配置
+    │   └──npz_converter.py                    // 将 .npz 检查点转换为 .ckpt
+    ├── eval.py                                // 评估脚本
+    ├── export.py                              // 将checkpoint文件导出到air/mindir
+    ├── postprocess.py                         // 310推理后处理脚本
+    ├── preprocess.py                          // 310推理前处理脚本
+    └── train.py                               // 训练脚本
 ```
 
 ## 脚本参数
@@ -175,12 +183,13 @@ vit_base的总体网络架构如下： [链接](https://arxiv.org/abs/2010.11929
 
 ### 训练
 
-- Ascend处理器环境运行
+- Ascend or GPU 处理器环境运行
 
   ```bash
-  python train.py --device_id=0 --dataset_name='cifar10' > train.log 2>&1 &
-  OR
+  # Ascend
   bash ./scripts/run_standalone_train_ascend.sh [DEVICE_ID] [DATASET_NAME]
+  # GPU
+  bash ./scripts/run_standalone_train_gpu.sh [DATASET_NAME] [DEVICE_ID] [LR_INIT] [LOGS_CKPT_DIR]
   ```
 
   上述python命令将在后台运行，可以通过生成的train.log文件查看结果。
@@ -201,12 +210,16 @@ vit_base的总体网络架构如下： [链接](https://arxiv.org/abs/2010.11929
   {'acc': 0.9597355769230769}
   ```
 
+  注意：如果您想在训练期间验证模型，请在 `train.py` 中设置标志 `--do_val=True`
 ### 分布式训练
 
-- Ascend处理器环境运行
+- Ascend or GPU 处理器环境运行
 
   ```bash
-  bash ./scripts/run_distribution_train_ascend.sh [RANK_TABLE] [DEVICE_NUM] [DEVICE_START] [DATASET_NAME]
+  # Ascend
+  bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE] [DEVICE_NUM] [DEVICE_START] [DATASET_NAME]
+  # GPU
+  bash ./scripts/run_distribute_train_gpu.sh [DATASET_NAME] [DEVICE_NUM] [LR_INIT] [LOGS_CKPT_DIR]
   ```
 
   上述shell脚本将在后台运行分布训练。
@@ -231,12 +244,13 @@ vit_base的总体网络架构如下： [链接](https://arxiv.org/abs/2010.11929
 
 ### 评估
 
-- 在Ascend环境运行时评估CIFAR-10数据集
+- 在Ascend or GPU 环境运行时评估CIFAR-10数据集
 
   ```bash
-  python eval.py --checkpoint_path [CKPT_PATH] ./eval.log 2>&1 &
-  OR
+  # Ascend
   bash ./scripts/run_standalone_eval_ascend.sh [CKPT_PATH]
+  # GPU
+  bash ./scripts/run_standalone_eval_gpu.sh [DATASET_NAME] [DEVICE_ID] [CKPT_PATH]
   ```
 
 ## 导出过程
@@ -279,20 +293,20 @@ vit_base的总体网络架构如下： [链接](https://arxiv.org/abs/2010.11929
 
 #### CIFAR-10上的vit_base
 
-| 参数                 | Ascend                                                      |
-| -------------------------- | ----------------------------------------------------------- |
-| 模型版本              | vit_base                                                |
-| 资源                   | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Red Hat 8.3.1-5         |
-| 上传日期              | 2021-10-26                                 |
-| MindSpore版本          | 1.3.0                                                 |
-| 数据集                    | CIFAR-10                                                |
-| 训练参数        | epoch=60, batch_size=32, lr_init=0.013（双卡并行训练时）             |
-| 优化器                  | Momentum                                                    |
-| 损失函数              | Softmax交叉熵                                       |
-| 输出                    | 概率                                                 |
-| 分类准确率             | 双卡：98.99%               |
-| 速度                      | 单卡：157毫秒/步；八卡：174毫秒/步                        |
-| 总时长                 | 双卡：2.48小时/60轮                                             |
+| 参数                 | Ascend                                                      | GPU |
+| -------------------------- | ------------------------|----------------------------------- |
+| 模型版本              | vit_base                                                |vit_base   |
+| 资源                   | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Red Hat 8.3.1-5         | 1 Nvidia Tesla V100-PCIE, CPU 3.40GHz; 8 Nvidia RTX 3090, CPU 2.90GHz |
+| 上传日期              | 2021-10-26                                 | 2021-11-29 |
+| MindSpore版本          | 1.3.0                                                 | 1.5.0 |
+| 数据集                    | CIFAR-10                                                | CIFAR-10 |
+| 训练参数        | epoch=60, batch_size=32, lr_init=0.013（双卡并行训练时）             | epoch=60, batch_size=32, lr_init=0.0065 or 0.052（1 or 8 GPUs）|
+| 优化器                  | Momentum                                                    | Momentum |
+| 损失函数              | Softmax交叉熵                                       | Softmax交叉熵 |
+| 输出                    | 概率                                                 | 概率 |
+| 分类准确率             | 双卡：98.99%               | 单卡: 98.84%; 八张牌: 98.83%
+| 速度                      | 单卡：157毫秒/步；八卡：174毫秒/步                        | 单卡：467毫秒/步；八卡：469毫秒/步 |
+| 总时长                 | 双卡：2.48小时/60轮                                             | 单卡: 12.1小时/60轮; 八卡: 1.52小时/60轮 |
 
 ### 推理性能
 
@@ -308,6 +322,6 @@ vit_base的总体网络架构如下： [链接](https://arxiv.org/abs/2010.11929
 | 分类准确率             | 98.54%                       |
 | 速度                      | NN inference cost average time: 52.2274 ms of infer_count 10000           |
 
-# ModelZoo主页  
+# ModelZoo主页
 
  请浏览官网[主页](https://gitee.com/mindspore/models) 。
