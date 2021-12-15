@@ -34,7 +34,7 @@ if __name__ == "__main__":
         elif dataset_type == 'Electronics':
             test_mindrecord_path = os.path.join(args_opt.mindrecord_path, 'Electronics_test.mindrecord')
 
-        ds_test = ds.MindDataset(dataset_file=test_mindrecord_path)
+        ds_test = ds.MindDataset(test_mindrecord_path)
 
         dataset_path = os.path.join(args_opt.binary_files_path, dataset_type + "_data")
         mid_mask_path = os.path.join(dataset_path, "mid_mask")

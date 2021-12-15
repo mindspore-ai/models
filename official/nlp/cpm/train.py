@@ -75,7 +75,7 @@ def _load_dataset(dataset_path, batch_size, rank_size=None, rank_id=None, shuffl
                   is_training=True):
     """Loader for data."""
     ds.config.set_seed(1)
-    data = ds.MindDataset(dataset_file=dataset_path,
+    data = ds.MindDataset(dataset_path,
                           columns_list=["truth", "input_ids", "loss_mask", "labels", "size"],
                           shuffle=shuffle)
 

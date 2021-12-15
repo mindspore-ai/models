@@ -233,7 +233,7 @@ def create_dataset(data_path="", train_path="", HSIZE=38, WSIZE=38, CSIZE=38, PS
             rank_size = None
             rank_id = None
 
-        train_loader = ds.MindDataset(dataset_file=mindrecord_path,
+        train_loader = ds.MindDataset(mindrecord_path,
                                       columns_list=["flair_t2_node", "t1_t1ce_node", "label"],
                                       num_parallel_workers=8,
                                       num_shards=rank_size,

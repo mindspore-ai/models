@@ -48,25 +48,25 @@ def create_dataset(data_path,
 
     if target != "Ascend" or device_num == 1:
         if training:
-            ds = de.MindDataset(dataset_file=input_file,
+            ds = de.MindDataset(input_file,
                                 columns_list=['data', 'income_labels', 'married_labels'],
                                 num_parallel_workers=32,
                                 shuffle=True)
         else:
-            ds = de.MindDataset(dataset_file=input_file,
+            ds = de.MindDataset(input_file,
                                 columns_list=['data', 'income_labels', 'married_labels'],
                                 num_parallel_workers=32,
                                 shuffle=False)
     else:
         if training:
-            ds = de.MindDataset(dataset_file=input_file,
+            ds = de.MindDataset(input_file,
                                 columns_list=['data', 'income_labels', 'married_labels'],
                                 num_parallel_workers=4,
                                 shuffle=True,
                                 num_shards=device_num,
                                 shard_id=rank_id)
         else:
-            ds = de.MindDataset(dataset_file=input_file,
+            ds = de.MindDataset(input_file,
                                 columns_list=['data', 'income_labels', 'married_labels'],
                                 num_parallel_workers=4,
                                 shuffle=False,

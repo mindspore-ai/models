@@ -393,5 +393,5 @@ def create_mindrecord(train_data, maxlen, MINDRECORD_FILE):
 
 
 def create_dataset(MINDRECORD_FILE):
-    data_set = ds.MindDataset(dataset_file=MINDRECORD_FILE)
+    data_set = ds.MindDataset(MINDRECORD_FILE)
     return data_set

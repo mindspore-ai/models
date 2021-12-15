@@ -82,7 +82,7 @@ class SegDataset:
 
     def get_dataset(self, repeat=1):
         de.config.set_numa_enable(True)
-        data_set = de.MindDataset(dataset_file=self.data_file, columns_list=["data", "label"],
+        data_set = de.MindDataset(self.data_file, columns_list=["data", "label"],
                                   shuffle=True, num_parallel_workers=self.num_readers,
                                   num_shards=self.shard_num, shard_id=self.shard_id)
         transforms_list = self.preprocess_
