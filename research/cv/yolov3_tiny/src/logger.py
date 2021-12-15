@@ -13,9 +13,9 @@
 # limitations under the License.
 # ============================================================================
 """Custom Logger."""
+import logging
 import os
 import sys
-import logging
 from datetime import datetime
 
 
@@ -51,10 +51,12 @@ class LOGGER(logging.Logger):
         self.addHandler(fh)
 
     def info(self, msg, *args, **kwargs):
+        """info"""
         if self.isEnabledFor(logging.INFO):
             self._log(logging.INFO, msg, args, **kwargs)
 
     def save_args(self, args):
+        """save args"""
         self.info('Args:')
         args_dict = vars(args)
         for key in args_dict.keys():
@@ -62,6 +64,7 @@ class LOGGER(logging.Logger):
         self.info('')
 
     def important_info(self, msg, *args, **kwargs):
+        """important info"""
         if self.isEnabledFor(logging.INFO) and self.rank == 0:
             line_width = 2
             important_msg = '\n'

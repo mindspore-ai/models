@@ -14,32 +14,36 @@
 # ============================================================================
 """export model for YOLO"""
 import os
-import numpy as np
-import mindspore
-from mindspore import context, Tensor
-from mindspore.train.serialization import export, load_checkpoint, load_param_into_net
 
-from src.yolo import YOLOV3_Infer
+import numpy as np
+from mindspore import Tensor
+from mindspore import context
+from mindspore import dtype as mstype
+from mindspore.train.serialization import export
+from mindspore.train.serialization import load_checkpoint
+from mindspore.train.serialization import load_param_into_net
+
 from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper
+from src.yolo import YOLOv3Inference
 
 
 def modelarts_pre_process():
-    '''modelarts pre process function.'''
+    """modelarts pre process function."""
     config.file_name = os.path.join(config.output_path, config.file_name)
 
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_export():
-    '''export model to ir file'''
+    """export model to ir file"""
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
     if config.device_target == "Ascend":
         context.set_context(device_id=config.device_id)
-    network = YOLOV3_Infer(config.test_img_shape)
+    network = YOLOv3Inference(config.test_img_shape)
     param_dict = load_checkpoint(config.ckpt_file)
     load_param_into_net(network, param_dict)
     shape = [config.batch_size, 3] + config.test_img_shape
-    input_data = Tensor(np.zeros(shape), mindspore.float32)
+    input_data = Tensor(np.zeros(shape), mstype.float32)
     export(network, input_data, file_name=config.file_name, file_format=config.file_format)
 
 

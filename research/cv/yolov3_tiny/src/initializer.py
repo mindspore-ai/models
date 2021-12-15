@@ -15,12 +15,16 @@
 """Parameter init."""
 import math
 from functools import reduce
+
 import numpy as np
+from mindspore import nn
 from mindspore.common import initializer as init
 from mindspore.common.initializer import Initializer as MeInitializer
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
-import mindspore.nn as nn
+from mindspore.train.serialization import load_checkpoint
+from mindspore.train.serialization import load_param_into_net
+
 from .util import load_backbone
+
 
 def calculate_gain(nonlinearity, param=None):
     r"""Return the recommended gain value for the given nonlinearity function.
@@ -67,7 +71,7 @@ def calculate_gain(nonlinearity, param=None):
 def _assignment(arr, num):
     """Assign the value of 'num' and 'arr'."""
     if arr.shape == ():
-        arr = arr.reshape((1))
+        arr = arr.reshape(1)
         arr[:] = num
         arr = arr.reshape(())
     else:
@@ -79,6 +83,7 @@ def _assignment(arr, num):
 
 
 def _calculate_correct_fan(array, mode):
+    """calculate correct fan"""
     mode = mode.lower()
     valid_modes = ['fan_in', 'fan_out']
     if mode not in valid_modes:
@@ -101,7 +106,7 @@ def kaiming_uniform_(arr, a=0, mode='fan_in', nonlinearity='leaky_relu'):
     Also known as He initialization.
 
     Args:
-        tensor: an n-dimensional `Tensor`
+        arr: an n-dimensional `Tensor`
         a: the negative slope of the rectifier used after this layer (only
         used with ``'leaky_relu'``)
         mode: either ``'fan_in'`` (default) or ``'fan_out'``. Choosing ``'fan_in'``
@@ -126,7 +131,8 @@ def _calculate_fan_in_and_fan_out(arr):
     """Calculate fan in and fan out."""
     dimensions = len(arr.shape)
     if dimensions < 2:
-        raise ValueError("Fan in and fan out can not be computed for array with fewer than 2 dimensions")
+        raise ValueError(f"Fan in and fan out can not be computed for array with fewer than 2 dimensions, "
+                         f"got {dimensions} dimensions")
 
     num_input_fmaps = arr.shape[1]
     num_output_fmaps = arr.shape[0]
@@ -156,25 +162,41 @@ def default_recurisive_init(custom_cell):
     """Initialize parameter."""
     for _, cell in custom_cell.cells_and_names():
         if isinstance(cell, nn.Conv2d):
-            cell.weight.set_data(init.initializer(KaimingUniform(a=math.sqrt(5)),
-                                                  cell.weight.shape,
-                                                  cell.weight.dtype))
+            cell.weight.set_data(
+                init.initializer(
+                    KaimingUniform(a=math.sqrt(5)),
+                    cell.weight.shape,
+                    cell.weight.dtype
+                )
+            )
             if cell.bias is not None:
                 fan_in, _ = _calculate_fan_in_and_fan_out(cell.weight)
                 bound = 1 / math.sqrt(fan_in)
-                cell.bias.set_data(init.initializer(init.Uniform(bound),
-                                                    cell.bias.shape,
-                                                    cell.bias.dtype))
+                cell.bias.set_data(
+                    init.initializer(
+                        init.Uniform(bound),
+                        cell.bias.shape,
+                        cell.bias.dtype
+                    )
+                )
         elif isinstance(cell, nn.Dense):
-            cell.weight.set_data(init.initializer(KaimingUniform(a=math.sqrt(5)),
-                                                  cell.weight.shape,
-                                                  cell.weight.dtype))
+            cell.weight.set_data(
+                init.initializer(
+                    KaimingUniform(a=math.sqrt(5)),
+                    cell.weight.shape,
+                    cell.weight.dtype
+                )
+            )
             if cell.bias is not None:
                 fan_in, _ = _calculate_fan_in_and_fan_out(cell.weight)
                 bound = 1 / math.sqrt(fan_in)
-                cell.bias.set_data(init.initializer(init.Uniform(bound),
-                                                    cell.bias.shape,
-                                                    cell.bias.dtype))
+                cell.bias.set_data(
+                    init.initializer(
+                        init.Uniform(bound),
+                        cell.bias.shape,
+                        cell.bias.dtype
+                    )
+                )
         elif isinstance(cell, (nn.BatchNorm2d, nn.BatchNorm1d)):
             pass
 

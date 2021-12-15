@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 1 ]
+if [ $# != 3 ]
 then
-    echo "Usage: bash run_standalone_train.sh [DATASET_PATH]"
+    echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [DEVICE_NUM] [CPUS_PER_RANK]"
 exit 1
 fi
 
@@ -28,42 +28,34 @@ get_real_path(){
   fi
 }
 
-DATASET_PATH=$(get_real_path $1)
-echo $DATASET_PATH
+DATASET_PATH=$(get_real_path "$1")
+DEVICE_NUM=$2
+CPUS_PER_RANK=$3
+echo "$DATASET_PATH"
 
-
-if [ ! -d $DATASET_PATH ]
+if [ ! -d "$DATASET_PATH" ]
 then
     echo "error: DATASET_PATH=$DATASET_PATH is not a directory"
 exit 1
 fi
 
-
-export DEVICE_NUM=1
-export DEVICE_ID=0
-export RANK_ID=0
-export RANK_SIZE=1
-
-if [ -d "train" ];
-then
-    rm -rf ./train
-fi
-mkdir ./train
-cp ../*.py ./train
-cp -r ../src ./train
-cd ./train || exit
-echo "start training for device $DEVICE_ID"
+rm -rf ./train_parallel
+mkdir ./train_parallel
+cp ../*.py ./train_parallel
+cp ../*.yaml ./train_parallel
+cp -r ../src ./train_parallel
+cp -r ../model_utils ./train_parallel
+cd ./train_parallel || exit
 env > env.log
-
+mpirun --allow-run-as-root -n "$DEVICE_NUM" --cpus-per-rank "$CPUS_PER_RANK" --output-filename log_output --merge-stderr-to-stdout \
 python train.py \
-    --data_dir=$DATASET_PATH \
-    --is_distributed=0 \
-    --lr=0.01 \
+    --data_dir="$DATASET_PATH" \
+    --device_target=GPU \
+    --is_distributed=1 \
+    --lr=0.002 \
     --t_max=300 \
     --max_epoch=300 \
     --warmup_epochs=4 \
     --training_shape=640 \
-    --per_batch_size=32 \
-    --weight_decay=0.016 \
-    --lr_scheduler=cosine_annealing > log.txt 2>&1 &
+    --lr_scheduler=cosine_annealing  > log.txt 2>&1 &
 cd ..

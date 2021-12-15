@@ -17,26 +17,24 @@ import mindspore.nn as nn
 from mindspore.ops import operations as P
 
 
-def conv_block(in_channels,
-               out_channels,
-               kernel_size,
-               stride,
-               dilation=1):
+def conv_block(in_channels, out_channels, kernel_size, stride, dilation=1):
     """Get a conv2d batchnorm and relu layer"""
     pad_mode = 'same'
     padding = 0
 
-    return nn.SequentialCell(
-        [nn.Conv2d(in_channels,
-                   out_channels,
-                   kernel_size=kernel_size,
-                   stride=stride,
-                   padding=padding,
-                   dilation=dilation,
-                   pad_mode=pad_mode),
-         nn.BatchNorm2d(out_channels, momentum=0.9),
-         nn.LeakyReLU(alpha=0.1)]
-    )
+    return nn.SequentialCell([
+        nn.Conv2d(
+            in_channels,
+            out_channels,
+            kernel_size=kernel_size,
+            stride=stride,
+            padding=padding,
+            dilation=dilation,
+            pad_mode=pad_mode
+        ),
+        nn.BatchNorm2d(out_channels, momentum=0.9),
+        nn.LeakyReLU(alpha=0.1)
+    ])
 
 
 class Tiny(nn.Cell):

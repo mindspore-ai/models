@@ -15,11 +15,13 @@
 
 """Parse arguments"""
 
-import os
-import ast
 import argparse
+import ast
+import os
 from pprint import pformat
+
 import yaml
+
 
 class Config:
     """
@@ -47,6 +49,7 @@ def parse_cli_to_yaml(parser, cfg, helper=None, choices=None, cfg_path="default_
         parser: Parent parser.
         cfg: Base configuration.
         helper: Helper description.
+        choices: Choices description.
         cfg_path: Path to the default yaml config.
     """
     parser = argparse.ArgumentParser(description="[REPLACE THIS at config.py]",
@@ -122,5 +125,6 @@ def get_config():
     args = parse_cli_to_yaml(parser=parser, cfg=default, helper=helper, choices=choices, cfg_path=path_args.config_path)
     final_config = merge(args, default)
     return Config(final_config)
+
 
 config = get_config()

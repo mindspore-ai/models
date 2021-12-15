@@ -13,14 +13,14 @@
 # limitations under the License.
 # ============================================================================
 """Preprocess dataset."""
-import random
-import threading
 import copy
+import random
 
-import numpy as np
-from PIL import Image
 import cv2
 import mindspore.dataset.vision.py_transforms as PV
+import numpy as np
+from PIL import Image
+
 
 def _rand(a=0., b=1.):
     return np.random.rand() * (b - a) + a
@@ -64,7 +64,7 @@ def statistic_normalize_img(img, statistic_norm):
     # img: RGB
     if isinstance(img, Image.Image):
         img = np.array(img)
-    img = img/255.
+    img = img / 255.
     mean = np.array([0.485, 0.456, 0.406])
     std = np.array([0.229, 0.224, 0.225])
     if statistic_norm:
@@ -132,8 +132,16 @@ def pil_image_reshape(interp):
     return reshape_type[interp]
 
 
-def _preprocess_true_boxes(true_boxes, anchors, in_shape, num_classes, max_boxes, label_smooth,
-                           label_smooth_factor=0.1, iou_threshold=0.213):
+def _preprocess_true_boxes(
+        true_boxes,
+        anchors,
+        in_shape,
+        num_classes,
+        max_boxes,
+        label_smooth,
+        label_smooth_factor=0.1,
+        iou_threshold=0.213
+):
     """
     Introduction
     ------------
@@ -146,7 +154,6 @@ def _preprocess_true_boxes(true_boxes, anchors, in_shape, num_classes, max_boxes
     num_layers = anchors.shape[0] // 3
     anchor_mask = [[3, 4, 5], [0, 1, 2]]
     true_boxes = np.array(true_boxes, dtype='float32')
-    # input_shape = np.array([in_shape, in_shape], dtype='int32')
     input_shape = np.array(in_shape, dtype='int32')
     boxes_xy = (true_boxes[..., 0:2] + true_boxes[..., 2:4]) // 2.
     # trans to box center point
@@ -156,9 +163,11 @@ def _preprocess_true_boxes(true_boxes, anchors, in_shape, num_classes, max_boxes
     true_boxes[..., 2:4] = boxes_wh / input_shape[::-1]
     # true_boxes = [xywh]
     grid_shapes = [input_shape // 32, input_shape // 16]
-    # grid_shape [h, w]s
-    y_true = [np.zeros((grid_shapes[l][0], grid_shapes[l][1], len(anchor_mask[l]),
-                        5 + num_classes), dtype='float32') for l in range(num_layers)]
+    # grid_shape [h, w]
+    y_true = [
+        np.zeros((grid_shapes[l][0], grid_shapes[l][1], len(anchor_mask[l]), 5 + num_classes), dtype='float32')
+        for l in range(num_layers)
+    ]
     # y_true [gridy, gridx]
     # 这里扩充维度是为了后面应用广播计算每个图中所有box的anchor互相之间的iou
     anchors = np.expand_dims(anchors, 0)
@@ -199,14 +208,14 @@ def _preprocess_true_boxes(true_boxes, anchors, in_shape, num_classes, max_boxes
                     y_true[l][j, i, k, 0:4] = true_boxes[t, 0:4]
                     y_true[l][j, i, k, 4] = 1.
 
-                    # lable-smooth
+                    # label-smooth
                     if label_smooth:
                         sigma = label_smooth_factor / (num_classes - 1)
                         y_true[l][j, i, k, 5:] = sigma
                         y_true[l][j, i, k, 5 + c] = 1 - label_smooth_factor
                     else:
                         y_true[l][j, i, k, 5 + c] = 1.
-        #best anchor for gt
+        # best anchor for gt
         best_anchor = np.argmax(iou, axis=-1)
         for t, n in enumerate(best_anchor):
             for l in range(num_layers):
@@ -219,7 +228,7 @@ def _preprocess_true_boxes(true_boxes, anchors, in_shape, num_classes, max_boxes
                     y_true[l][j, i, k, 0:4] = true_boxes[t, 0:4]
                     y_true[l][j, i, k, 4] = 1.
 
-                    # lable-smooth
+                    # label-smooth
                     if label_smooth:
                         sigma = label_smooth_factor / (num_classes - 1)
                         y_true[l][j, i, k, 5:] = sigma
@@ -254,7 +263,7 @@ def _preprocess_true_boxes(true_boxes, anchors, in_shape, num_classes, max_boxes
 
 
 class PreprocessTrueBox:
-    """Preprocess Gt Box."""
+    """PreprocessTrueBox"""
     def __init__(self, config):
         self.anchor_scales = config.anchor_scales
         self.num_classes = config.num_classes
@@ -263,15 +272,21 @@ class PreprocessTrueBox:
         self.label_smooth_factor = config.label_smooth_factor
 
     def __call__(self, anno, input_shape):
-        bbox_true_1, bbox_true_2, gt_box1, gt_box2 = \
-            _preprocess_true_boxes(true_boxes=anno, anchors=self.anchor_scales, in_shape=input_shape,
-                                   num_classes=self.num_classes, max_boxes=self.max_box,
-                                   label_smooth=self.label_smooth, label_smooth_factor=self.label_smooth_factor)
+        bbox_true_1, bbox_true_2, gt_box1, gt_box2 = _preprocess_true_boxes(
+            true_boxes=anno,
+            anchors=self.anchor_scales,
+            in_shape=input_shape,
+            num_classes=self.num_classes,
+            max_boxes=self.max_box,
+            label_smooth=self.label_smooth,
+            label_smooth_factor=self.label_smooth_factor
+        )
+
         return anno, np.array(bbox_true_1), np.array(bbox_true_2), np.array(gt_box1), np.array(gt_box2)
 
 
 def _reshape_data(image, image_size):
-    """Reshape image."""
+    """Reshape data"""
     if not isinstance(image, Image.Image):
         image = Image.fromarray(image)
     ori_w, ori_h = image.size
@@ -381,8 +396,18 @@ def _choose_candidate_by_constraints(max_trial, input_w, input_h, image_w, image
     return candidates
 
 
-def _correct_bbox_by_candidates(candidates, input_w, input_h, image_w,
-                                image_h, flip, box, box_data, allow_outside_center, max_boxes):
+def _correct_bbox_by_candidates(
+        candidates,
+        input_w,
+        input_h,
+        image_w,
+        image_h,
+        flip,
+        box,
+        box_data,
+        allow_outside_center,
+        max_boxes
+):
     """Calculate correct boxes."""
     while candidates:
         if len(candidates) > 1:
@@ -400,7 +425,8 @@ def _correct_bbox_by_candidates(candidates, input_w, input_h, image_w,
         if allow_outside_center:
             pass
         else:
-            t_box = t_box[np.logical_and((t_box[:, 0] + t_box[:, 2])/2. >= 0., (t_box[:, 1] + t_box[:, 3])/2. >= 0.)]
+            t_box = t_box[np.logical_and((t_box[:, 0] + t_box[:, 2]) / 2. >= 0.,
+                                         (t_box[:, 1] + t_box[:, 3]) / 2. >= 0.)]
             t_box = t_box[np.logical_and((t_box[:, 0] + t_box[:, 2]) / 2. <= input_w,
                                          (t_box[:, 1] + t_box[:, 3]) / 2. <= input_h)]
 
@@ -421,8 +447,7 @@ def _correct_bbox_by_candidates(candidates, input_w, input_h, image_w,
     return np.zeros(shape=[max_boxes, 5], dtype=np.float64), (0, 0, nw, nh)
 
 
-def _data_aug(image, box, jitter, hue, sat, val, image_input_size, max_boxes,
-              anchors, num_classes, max_trial=10, device_num=1):
+def _data_aug(image, box, jitter, hue, sat, val, image_input_size, max_boxes, max_trial=10, device_num=1):
     """Crop an image randomly with bounding box constraints.
 
         This data augmentation is used in training of
@@ -444,24 +469,28 @@ def _data_aug(image, box, jitter, hue, sat, val, image_input_size, max_boxes,
     flip = _rand() < .5
     box_data = np.zeros((max_boxes, 5))
 
-    candidates = _choose_candidate_by_constraints(use_constraints=False,
-                                                  max_trial=max_trial,
-                                                  input_w=input_w,
-                                                  input_h=input_h,
-                                                  image_w=image_w,
-                                                  image_h=image_h,
-                                                  jitter=jitter,
-                                                  box=box)
-    box_data, candidate = _correct_bbox_by_candidates(candidates=candidates,
-                                                      input_w=input_w,
-                                                      input_h=input_h,
-                                                      image_w=image_w,
-                                                      image_h=image_h,
-                                                      flip=flip,
-                                                      box=box,
-                                                      box_data=box_data,
-                                                      allow_outside_center=True,
-                                                      max_boxes=max_boxes)
+    candidates = _choose_candidate_by_constraints(
+        use_constraints=False,
+        max_trial=max_trial,
+        input_w=input_w,
+        input_h=input_h,
+        image_w=image_w,
+        image_h=image_h,
+        jitter=jitter,
+        box=box
+    )
+    box_data, candidate = _correct_bbox_by_candidates(
+        candidates=candidates,
+        input_w=input_w,
+        input_h=input_h,
+        image_w=image_w,
+        image_h=image_h,
+        flip=flip,
+        box=box,
+        box_data=box_data,
+        allow_outside_center=True,
+        max_boxes=max_boxes
+    )
     dx, dy, nw, nh = candidate
     interp = get_interp_method(interp=10)
     image = image.resize((nw, nh), pil_image_reshape(interp))
@@ -481,21 +510,27 @@ def _data_aug(image, box, jitter, hue, sat, val, image_input_size, max_boxes,
 
 def preprocess_fn(image, box, config, input_size, device_num):
     """Preprocess data function."""
-    config_anchors = config.anchor_scales
-    anchors = np.array([list(x) for x in config_anchors])
     max_boxes = config.max_box
-    num_classes = config.num_classes
     jitter = config.jitter
     hue = config.hue
     sat = config.saturation
     val = config.value
-    image, anno = _data_aug(image, box, jitter=jitter, hue=hue, sat=sat, val=val,
-                            image_input_size=input_size, max_boxes=max_boxes,
-                            num_classes=num_classes, anchors=anchors, device_num=device_num)
+    image, anno = _data_aug(
+        image,
+        box,
+        jitter=jitter,
+        hue=hue,
+        sat=sat,
+        val=val,
+        image_input_size=input_size,
+        max_boxes=max_boxes,
+        device_num=device_num
+    )
     return image, anno
 
 
 def reshape_fn(image, img_id, config):
+    """Reshape fn"""
     input_size = config.test_img_shape
     image, ori_image_shape = _reshape_data(image, image_size=input_size)
     return image, ori_image_shape, img_id
@@ -521,6 +556,7 @@ class MultiScaleTrans:
         self.label_smooth_factor = config.label_smooth_factor
 
     def generate_seed_list(self, init_seed=1234, seed_num=int(1e6), seed_range=(1, 1000)):
+        """Generate seed list"""
         seed_list = []
         random.seed(init_seed)
         for _ in range(seed_num):
@@ -533,78 +569,3 @@ class MultiScaleTrans:
             img = PV.Decode()(img)
         img, anno = preprocess_fn(img, anno, self.config, input_size, self.device_num)
         return img, anno, np.array(img.shape[0:2])
-
-
-def thread_batch_preprocess_true_box(annos, config, input_shape, result_index, batch_bbox_true_1, batch_bbox_true_2,
-                                     batch_bbox_true_3, batch_gt_box1, batch_gt_box2, batch_gt_box3):
-    """Preprocess true box for multi-thread."""
-    i = 0
-    for anno in annos:
-        bbox_true_1, bbox_true_2, bbox_true_3, gt_box1, gt_box2, gt_box3 = \
-            _preprocess_true_boxes(true_boxes=anno, anchors=config.anchor_scales, in_shape=input_shape,
-                                   num_classes=config.num_classes, max_boxes=config.max_box,
-                                   label_smooth=config.label_smooth, label_smooth_factor=config.label_smooth_factor)
-        batch_bbox_true_1[result_index + i] = bbox_true_1
-        batch_bbox_true_2[result_index + i] = bbox_true_2
-        batch_bbox_true_3[result_index + i] = bbox_true_3
-        batch_gt_box1[result_index + i] = gt_box1
-        batch_gt_box2[result_index + i] = gt_box2
-        batch_gt_box3[result_index + i] = gt_box3
-        i = i + 1
-
-
-def batch_preprocess_true_box(annos, config, input_shape):
-    """Preprocess true box with multi-thread."""
-    batch_bbox_true_1 = []
-    batch_bbox_true_2 = []
-    batch_bbox_true_3 = []
-    batch_gt_box1 = []
-    batch_gt_box2 = []
-    batch_gt_box3 = []
-    threads = []
-
-    step = 4
-    for index in range(0, len(annos), step):
-        for _ in range(step):
-            batch_bbox_true_1.append(None)
-            batch_bbox_true_2.append(None)
-            batch_bbox_true_3.append(None)
-            batch_gt_box1.append(None)
-            batch_gt_box2.append(None)
-            batch_gt_box3.append(None)
-        step_anno = annos[index: index + step]
-        t = threading.Thread(target=thread_batch_preprocess_true_box,
-                             args=(step_anno, config, input_shape, index, batch_bbox_true_1, batch_bbox_true_2,
-                                   batch_bbox_true_3, batch_gt_box1, batch_gt_box2, batch_gt_box3))
-        t.start()
-        threads.append(t)
-
-    for t in threads:
-        t.join()
-
-    return np.array(batch_bbox_true_1), np.array(batch_bbox_true_2), np.array(batch_bbox_true_3), \
-           np.array(batch_gt_box1), np.array(batch_gt_box2), np.array(batch_gt_box3)
-
-
-def batch_preprocess_true_box_single(annos, config, input_shape):
-    """Preprocess true boxes."""
-    batch_bbox_true_1 = []
-    batch_bbox_true_2 = []
-    batch_bbox_true_3 = []
-    batch_gt_box1 = []
-    batch_gt_box2 = []
-    batch_gt_box3 = []
-    for anno in annos:
-        bbox_true_1, bbox_true_2, bbox_true_3, gt_box1, gt_box2, gt_box3 = \
-            _preprocess_true_boxes(true_boxes=anno, anchors=config.anchor_scales, in_shape=input_shape,
-                                   num_classes=config.num_classes, max_boxes=config.max_box,
-                                   label_smooth=config.label_smooth, label_smooth_factor=config.label_smooth_factor)
-        batch_bbox_true_1.append(bbox_true_1)
-        batch_bbox_true_2.append(bbox_true_2)
-        batch_bbox_true_3.append(bbox_true_3)
-        batch_gt_box1.append(gt_box1)
-        batch_gt_box2.append(gt_box2)
-        batch_gt_box3.append(gt_box3)
-
-    return np.array(batch_bbox_true_1), np.array(batch_bbox_true_2), np.array(batch_bbox_true_3), \
-           np.array(batch_gt_box1), np.array(batch_gt_box2), np.array(batch_gt_box3)

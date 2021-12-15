@@ -13,10 +13,12 @@
 # limitations under the License.
 # ============================================================================
 """hub config."""
-from src.yolo import YOLOV3
+from src.yolo import YOLOv3
+
 
 def create_network(name, *args, **kwargs):
+    """Create network"""
     if name == "yolov3_tiny":
-        yolov3_net = YOLOV3(is_training=True)
+        yolov3_net = YOLOv3(is_training=True)
         return yolov3_net
     raise NotImplementedError(f"{name} is not implemented in the repo")
