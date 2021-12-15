@@ -43,14 +43,12 @@ from src.vgg import vgg19
 
 from model_utils.moxing_adapter import config
 from model_utils.moxing_adapter import moxing_wrapper
-from model_utils.device_adapter import get_device_id, get_device_num
+from model_utils.device_adapter import get_device_id, get_rank_id, get_device_num
 
 set_seed(1)
 
-
 def modelarts_pre_process():
     '''modelarts pre process function.'''
-
     def unzip(zip_file, save_dir):
         import zipfile
         s_time = time.time()
@@ -123,7 +121,9 @@ def run_train():
     _enable_graph_kernel = config.device_target == "GPU"
     context.set_context(mode=context.GRAPH_MODE,
                         enable_graph_kernel=_enable_graph_kernel, device_target=config.device_target)
+    config.rank = get_rank_id()
     config.device_id = get_device_id()
+    config.group_size = get_device_num()
 
     if config.is_distributed:
         if config.device_target == "Ascend":
@@ -135,8 +135,7 @@ def run_train():
             else:
                 if not config.need_modelarts_dataset_unzip:
                     init()
-        config.rank = get_rank()
-        config.group_size = get_group_size()
+
         device_num = config.group_size
         context.reset_auto_parallel_context()
         context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
@@ -234,7 +233,6 @@ def run_train():
         callbacks.append(ckpt_cb)
 
     model.train(config.max_epoch, dataset, callbacks=callbacks)
-
 
 if __name__ == '__main__':
     run_train()

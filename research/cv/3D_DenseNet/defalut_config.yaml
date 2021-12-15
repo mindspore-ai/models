@@ -1,0 +1,72 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_fp16_gpu: False
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+run_distribute: False
+enable_profiling: False
+data_path: "/cache/data"
+output_path: "./saved"
+load_path: "./checkpoint_path/"
+device_target: "Ascend"
+checkpoint_path: "./checkpoint/"
+train_dir: "/cache/data/data_train_nocut"
+val_dir: "/cache/data/data_val_nocut"
+eval_dir : "data/data_val"
+test_dit : "data/iseg-testing"
+iseg_data_path: "iseg-2017/iSeg-2017-Training"
+iseg_target_path: "data_train_nocut"
+checkpoint_file_path: "model_3d_denseseg_v1_1-20000_36.ckpt"
+
+# ==============================================================================
+# Training options
+lr: 0.0002
+batch_size: 1
+val_batch: 1
+epoch_size: 20000
+warmup_step: 120
+warmup_ratio: 0.3
+num_classes: 4
+num_init_features: 32
+save_checkpoint_steps : 5000
+keep_checkpoint_max: 16
+growth_rate: 16
+block_config : [4,4]
+loss_scale: 256.0
+drop_rate: 0.2
+
+
+
+# 310 infer options
+device_id: 0
+ckpt_file: "./saved/model_3d_denseseg_v1_1-20000_36.ckpt"
+file_name: "3D"
+file_format: "MINDIR"
+infer_batch_size: 1
+in_channels: 2
+roi_size: [64,64,64]
+
+pre_result_path: "./preprocess_Result"
+post_result_path: "./result_Files"
+
+---
+# Help description for each configuration
+enable_modelarts: "Whether training on modelarts, default: False"
+enable_fp16_gpu: "Whether training on gpu with fp16, default: False"
+data_url: "Dataset url for obs"
+train_url: "Training output url for obs"
+checkpoint_url: "The location of checkpoint for obs"
+data_path: "Dataset path for local"
+output_path: "Training output path for local"
+load_path: "The location of checkpoint for obs"
+device_target: "Target device type, available: [Ascend, GPU, CPU]"
+enable_profiling: "Whether enable profiling while training, default: False"
+num_classes: "Class for dataset"
+batch_size: "Batch size for training and evaluation"
+epoch_size: "Total training epochs."
+keep_checkpoint_max: "keep the last keep_checkpoint_max checkpoint"
+checkpoint_path: "The location of the checkpoint file."
+checkpoint_file_path: "The location of the checkpoint file."
