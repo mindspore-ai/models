@@ -203,8 +203,11 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 ```shell
 .
 └─Inception-v3
+  ├─README_CN.md
   ├─README.md
-  ├─ascend310_infer                           # application for 310 inference
+  ├─ascend310_infer                           # application for 310 inference'
+  ├─infer
+  ├─modelarts
   ├─scripts
     ├─run_standalone_train_cpu.sh             # launch standalone training with cpu platform
     ├─run_standalone_train_gpu.sh             # launch standalone training with gpu platform(1p)
@@ -230,6 +233,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
   ├─default_config_gpu.yaml         # Training parameter profile(gpu)
   ├─eval.py                           # eval net
   ├─export.py                         # convert checkpoint
+  ├─mindspore_hub_conf.py             # create network model
   ├─postprogress.py                   # post process for 310 inference
   └─train.py                          # train net
 ```

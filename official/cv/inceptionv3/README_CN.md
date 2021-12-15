@@ -207,8 +207,11 @@ InceptionV3的总体网络架构如下：
 ```shell
 .
 └─Inception-v3
+  ├─README_CN.md
   ├─README.md
   ├─ascend310_infer                           # 实现310推理源代码
+  ├─infer
+  ├─modelarts
   ├─scripts
     ├─run_standalone_train_cpu.sh             # 启动CPU训练
     ├─run_standalone_train_gpu.sh             # 启动GPU单机训练（单卡）
@@ -234,6 +237,7 @@ InceptionV3的总体网络架构如下：
   ├─default_config_gpu.yaml           # 训练配置参数(gpu)
   ├─eval.py                           # 评估网络
   ├─export.py                         # 导出 AIR,MINDIR模型的脚本
+  ├─mindspore_hub_conf.py             # 创建网络模型
   ├─postprogress.py                   # 310推理后处理脚本
   └─train.py                          # 训练网络
 ```
