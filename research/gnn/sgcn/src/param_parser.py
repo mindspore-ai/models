@@ -14,6 +14,9 @@
 # ============================================================================
 """SGCN parameter parser."""
 import argparse
+import ast
+
+
 def parameter_parser():
     """
     A method to parse up command line parameters.
@@ -22,7 +25,7 @@ def parameter_parser():
     Representations are sorted by node ID.
     """
     parser = argparse.ArgumentParser(description="Run SGCN.")
-    parser.add_argument("--distributed", type=bool, default=False, help="Device id")
+    parser.add_argument("--distributed", type=ast.literal_eval, default=False, help="Distributed train")
     parser.add_argument("--device_id", type=int, default=0, help="Device id")
     parser.add_argument("--checkpoint_file", type=str, default='sgcn_alpha', help="Checkpoint file path.")
     parser.add_argument("--device_target", type=str, default="Ascend",
@@ -34,10 +37,6 @@ def parameter_parser():
     parser.add_argument("--features-path",
                         nargs="?",
                         default="./input/bitcoin_alpha.csv", help="Edge list csv.")
-
-    parser.add_argument("--log-path",
-                        nargs="?",
-                        default="./logs/bitcoin_alpha_logs.json", help="Log json.")
 
     parser.add_argument("--epochs",
                         type=int,
@@ -69,7 +68,7 @@ def parameter_parser():
 
     parser.add_argument("--weight-decay",
                         type=float,
-                        default=10**-5, help="Learning rate. Default is 10^-5.")
+                        default=10**-5, help="Weight decay. Default is 10^-5.")
 
     parser.add_argument("--spectral-features",
                         dest="spectral_features",
@@ -78,6 +77,10 @@ def parameter_parser():
     parser.add_argument("--general-features",
                         dest="spectral_features",
                         action="store_false")
+
+    parser.add_argument("--norm", type=ast.literal_eval, default=True, help="Normalize features or not.")
+    parser.add_argument("--norm-embed", type=ast.literal_eval, default=True, help="Normalize embedding or not.")
+    parser.add_argument("--bias", type=ast.literal_eval, default=True, help="Add bias or not.")
 
     parser.set_defaults(spectral_features=True)
 

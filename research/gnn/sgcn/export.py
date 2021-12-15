@@ -16,10 +16,17 @@
 Export script
 """
 import argparse
-from mindspore import Tensor, context, load_checkpoint, export, load_param_into_net
+import ast
 
-from src.sgcn import SignedGraphConvolutionalNetwork, SignedGCNTrainer
+from mindspore import Tensor
+from mindspore import context
+from mindspore import export
+from mindspore import load_checkpoint
+from mindspore import load_param_into_net
+
 from src.ms_utils import read_graph
+from src.sgcn import SignedGCNTrainer
+from src.sgcn import SignedGraphConvolutionalNetwork
 
 
 def remove_self_loops(edge_index):
@@ -35,12 +42,14 @@ def remove_self_loops(edge_index):
     edge_index = edge_index.asnumpy()[:, mask.asnumpy()]
     return Tensor(edge_index)
 
+
 def main():
+    """main"""
     # Set DEVICE_ID
     parser = argparse.ArgumentParser(description="SGCN eval")
-    parser.add_argument("--device_id", help="device_id", default=7, type=int)
+    parser.add_argument("--device_id", help="device_id", default=0, type=int)
     parser.add_argument("--device_target", type=str, default="Ascend",
-                        choices=["Ascend"], help="device target (default: Ascend)")
+                        choices=["Ascend", "GPU"], help="device target (default: Ascend)")
     parser.add_argument("--checkpoint_file", type=str, default='sgcn_otc_auc.ckpt', help="Checkpoint file path.")
     parser.add_argument("--edge_path", nargs="?",
                         default="./input/bitcoin_otc.csv", help="Edge list csv.")
@@ -57,6 +66,11 @@ def main():
                         default=64, help="Number of SVD feature extraction dimensions. Default is 64.")
     parser.add_argument("--file_name", type=str, default="sgcn", help="output file name.")
     parser.add_argument("--file_format", type=str, choices=["AIR", "MINDIR"], default="MINDIR", help="file format")
+    parser.add_argument("--norm", type=ast.literal_eval, default=True,
+                        help="If true scatter_mean is used, else scatter_add.")
+    parser.add_argument("--norm-embed", type=ast.literal_eval, default=True, help="Normalize embedding or not.")
+    parser.add_argument("--bias", type=ast.literal_eval, default=True, help="Add bias or not.")
+
     args = parser.parse_args()
 
     # Runtime
@@ -67,7 +81,7 @@ def main():
     dataset = trainer.setup_dataset()
     input_x, pos_edg, neg_edg = dataset[0], dataset[1], dataset[2]
     repos, reneg = remove_self_loops(pos_edg), remove_self_loops(neg_edg)
-    net = SignedGraphConvolutionalNetwork(input_x)
+    net = SignedGraphConvolutionalNetwork(input_x, args.norm, args.norm_embed, args.bias)
     # Load parameters from checkpoint into network
     param_dict = load_checkpoint(args.checkpoint_file)
     load_param_into_net(net, param_dict)

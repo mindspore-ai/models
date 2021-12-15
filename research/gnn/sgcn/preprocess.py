@@ -17,21 +17,24 @@ Evaluation script
 """
 import argparse
 import os
+
 import numpy as np
-from src.ms_utils import read_graph, setup_features
-from sklearn.model_selection import train_test_split
 from mindspore import context
 from mindspore.common import set_seed
+from sklearn.model_selection import train_test_split
+
+from src.ms_utils import read_graph
+from src.ms_utils import setup_features
 
 
 def setup_dataset(args, edges):
     """
     Returns:
-        self.X(Tensor): Dataset.
-        self.positive_edges(Tensor): Positive edges for training.
-        self.negative_edges(Tensor): Negative edges for training.
-        self.test_positive_edges(Tensor): Positive edges for testing.
-        self.test_negative_edges(Tensor): Negative edges for testing.
+        X(Tensor): Dataset.
+        positive_edges(Tensor): Positive edges for training.
+        negative_edges(Tensor): Negative edges for training.
+        test_positive_edges(Tensor): Positive edges for testing.
+        test_negative_edges(Tensor): Negative edges for testing.
     """
     positive_edges, test_positive_edges = train_test_split(edges["positive_edges"],
                                                            test_size=args.test_size, random_state=1)
@@ -50,6 +53,7 @@ def setup_dataset(args, edges):
     print(positive_edges.dtype, negative_edges.dtype, y.dtype)
     return X, positive_edges, negative_edges, test_positive_edges, test_negative_edges
 
+
 def remove_self_loops(edge_index):
     """
     remove self loops
@@ -64,8 +68,8 @@ def remove_self_loops(edge_index):
     return edge_index
 
 
-
 def main():
+    """main"""
     # Set DEVICE_ID
     parser = argparse.ArgumentParser(description="SGCN eval")
     parser.add_argument("--device_id", help="device_id", default=2, type=int)

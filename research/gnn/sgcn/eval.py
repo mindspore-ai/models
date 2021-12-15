@@ -16,14 +16,20 @@
 Evaluation script
 """
 import argparse
-from src.sgcn import SignedGraphConvolutionalNetwork, SignedGCNTrainer
-from src.ms_utils import read_graph, calculate_auc
+import ast
 
-from mindspore import context, Tensor
-from mindspore import load_checkpoint, load_param_into_net
-from mindspore.common import set_seed
 import mindspore.numpy as mnp
 import mindspore.ops as ops
+from mindspore import Tensor
+from mindspore import context
+from mindspore import load_checkpoint
+from mindspore import load_param_into_net
+from mindspore.common import set_seed
+
+from src.ms_utils import calculate_auc
+from src.ms_utils import read_graph
+from src.sgcn import SignedGCNTrainer
+from src.sgcn import SignedGraphConvolutionalNetwork
 
 
 def remove_self_loops(edge_index):
@@ -40,11 +46,12 @@ def remove_self_loops(edge_index):
     return Tensor(edge_index)
 
 def main():
+    """main"""
     # Set DEVICE_ID
     parser = argparse.ArgumentParser(description="SGCN eval")
     parser.add_argument("--device_id", help="device_id", default=0, type=int)
     parser.add_argument("--device_target", type=str, default="Ascend",
-                        choices=["Ascend"], help="device target (default: Ascend)")
+                        choices=["Ascend", "GPU"], help="device target (default: Ascend)")
     parser.add_argument("--checkpoint_auc", type=str, required=True, help="Checkpoint file path.")
     parser.add_argument("--checkpoint_f1", type=str, required=True, help="Checkpoint file path.")
     parser.add_argument("--edge_path", nargs="?",
@@ -60,6 +67,10 @@ def main():
                         default=30, help="Number of SVD iterations. Default is 30.")
     parser.add_argument("--reduction-dimensions", type=int,
                         default=64, help="Number of SVD feature extraction dimensions. Default is 64.")
+    parser.add_argument("--norm", type=ast.literal_eval, default=True,
+                        help="If true scatter_mean is used, else scatter_add.")
+    parser.add_argument("--norm-embed", type=ast.literal_eval, default=True, help="Normalize embedding or not.")
+    parser.add_argument("--bias", type=ast.literal_eval, default=True, help="Add bias or not.")
 
     args = parser.parse_args()
     set_seed(args.seed)
@@ -70,8 +81,8 @@ def main():
     trainer = SignedGCNTrainer(args, edges)
     input_x, pos_edg, neg_edg, pos_test, neg_test = trainer.setup_dataset()
     repos, reneg = remove_self_loops(pos_edg), remove_self_loops(neg_edg)
-    net_auc = SignedGraphConvolutionalNetwork(input_x)
-    net_f1 = SignedGraphConvolutionalNetwork(input_x)
+    net_auc = SignedGraphConvolutionalNetwork(input_x, args.norm, args.norm_embed, args.bias)
+    net_f1 = SignedGraphConvolutionalNetwork(input_x, args.norm, args.norm_embed, args.bias)
     # Load parameters from checkpoint into network
     param_dict = load_checkpoint(args.checkpoint_auc)
     load_param_into_net(net_auc, param_dict)
@@ -85,8 +96,8 @@ def main():
                                           res[score_positive_edges[1, :], :]))
     test_negative_z = ops.Concat(axis=1)((res[score_negative_edges[0, :], :],
                                           res[score_negative_edges[1, :], :]))
-    scores = ops.MatMul()(ops.Concat(axis=0)((test_positive_z, test_negative_z)),
-                          net_auc.regression_weights) + net_auc.regression_bias
+    scores = ops.matmul(ops.Concat(axis=0)((test_positive_z, test_negative_z)),
+                        net_auc.regression_weights) + net_auc.regression_bias
     probability_scores = ops.Exp()(ops.Softmax(axis=1)(scores))
     predictions = probability_scores[:, 0] / probability_scores[:, 0:2].sum(1)
     predictions = predictions.asnumpy()
@@ -98,8 +109,8 @@ def main():
                                           res[score_positive_edges[1, :], :]))
     test_negative_z = ops.Concat(axis=1)((res[score_negative_edges[0, :], :],
                                           res[score_negative_edges[1, :], :]))
-    scores = ops.MatMul()(ops.Concat(axis=0)((test_positive_z, test_negative_z)),
-                          net_f1.regression_weights) + net_f1.regression_bias
+    scores = ops.matmul(ops.Concat(axis=0)((test_positive_z, test_negative_z)),
+                        net_f1.regression_weights) + net_f1.regression_bias
     probability_scores = ops.Exp()(ops.Softmax(axis=1)(scores))
     predictions = probability_scores[:, 0] / probability_scores[:, 0:2].sum(1)
     predictions = predictions.asnumpy()
@@ -110,6 +121,7 @@ def main():
     print('AUC:', '{:.6f}'.format(auc))
     print('F1-Score:', '{:.6f}'.format(f1))
     print("============================")
+
 
 if __name__ == "__main__":
     main()

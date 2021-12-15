@@ -14,50 +14,96 @@
 # ============================================================================
 """SGCN runner."""
 import time
+
 import numpy as np
+from mindspore import Parameter
+from mindspore import Tensor
+from mindspore import dtype as mstype
+from mindspore import nn
+from mindspore import numpy as mnp
+from mindspore import ops
+from mindspore import save_checkpoint
+from mindspore.common.initializer import XavierUniform
+from mindspore.common.initializer import Zero
+from mindspore.ops.primitive import constexpr
 from sklearn.model_selection import train_test_split
 
-from src.ms_utils import calculate_auc, setup_features, maybe_num_nodes
-from src.signedsageconvolution import SignedSAGEConvolutionBase, SignedSAGEConvolutionDeep
 from src.metrics import TrainNetWrapper
-
-import mindspore as ms
-import mindspore.numpy as mnp
-import mindspore.nn as nn
-import mindspore.ops as ops
-from mindspore.ops.primitive import constexpr
-from mindspore import Parameter, Tensor, save_checkpoint
-from mindspore import dtype as mstype
-from mindspore.common.initializer import XavierUniform, Zero
+from src.ms_utils import calculate_auc
+from src.ms_utils import maybe_num_nodes
+from src.ms_utils import setup_features
+from src.signedsageconvolution import SignedSAGEConvolutionBase
+from src.signedsageconvolution import SignedSAGEConvolutionDeep
 
 
 @constexpr
 def ms_isin(a, b):
+    """
+    Calculates elements from a which contains in b.
+    Args:
+        a: Input array.
+        b: The values against which to test each value of input array.
+
+    Returns:
+        Tensor(np.isin(a.asnumpy(), b.asnumpy()), mstype.bool_)
+    """
     return Tensor(np.isin(a.asnumpy(), b.asnumpy()), mstype.bool_)
+
 
 @constexpr
 def construct_tensor(size_rest, num_nodes):
+    """
+    Create tensor with integers from the uniform distribution.
+    Args:
+        size_rest: Output shape.
+        num_nodes: Upper boundary of the output interval.
+
+    Returns:
+         Random integers from the uniform distribution.
+    """
     minval = Tensor(0, mstype.int32)
     maxval = Tensor(num_nodes, mstype.int32)
     tmp = Tensor(ops.UniformInt(seed=10)((size_rest,), minval, maxval))
     return tmp
 
+
 @constexpr
 def range_tensor(start, end):
-    return Tensor(np.arange(start, end), ms.int32)
+    """
+    Create range tensor.
+    Args:
+        start: Min value.
+        end: Max values.
+
+    Returns:
+        Tensor(np.arange(start, end), mstype.int32)
+    """
+    return Tensor(np.arange(start, end), mstype.int32)
+
 
 @constexpr
 def ms_nonzero(a):
+    """
+    Create tensor with the indices of the elements that are non-zero.
+    Args:
+        a: Input array.
+
+    Returns:
+        Tensor(res, dtype=mstype.int32).squeeze(axis=0)
+    """
     res = a.asnumpy().nonzero()
     if res[0].shape[0] == 0:
         return res[0]
-    return Tensor(res, dtype=ms.int32).squeeze(axis=0)
+    return Tensor(res, dtype=mstype.int32).squeeze(axis=0)
+
 
 @constexpr
 def ms_appendindex(rest_index, rest, res):
+    """ms_appendindex"""
     for temp in rest_index:
         res.append(int((rest[int(temp)]).asnumpy()))
     return Tensor(res)
+
 
 class SignedGraphConvolutionalNetwork(nn.Cell):
     """
@@ -67,15 +113,16 @@ class SignedGraphConvolutionalNetwork(nn.Cell):
     https://arxiv.org/abs/1808.06354
     SGCN Initialization.
     """
-    def __init__(self, x):
+    def __init__(self, x, norm, norm_embed, bias):
         super(SignedGraphConvolutionalNetwork, self).__init__()
         self.X = x
         self.h_pos, self.h_neg = [], []
         self.tanh = ops.Tanh()
         self.op = ops.Concat(axis=1)
-        print('******************** set up layers... ********************')
+        self.norm = norm
+        self.norm_embed = norm_embed
+        self.bias = bias
         self.setup_layers()
-        print('******************** set up layers! ********************')
 
     def setup_layers(self):
         """
@@ -85,15 +132,52 @@ class SignedGraphConvolutionalNetwork(nn.Cell):
         self.nodes = range(self.X.shape[0])
         self.neurons = [96, 64, 32]
         self.layers = len(self.neurons)
-        self.positive_base_aggregator = SignedSAGEConvolutionBase(self.X.shape[1]*2, self.neurons[0])
-        self.negative_base_aggregator = SignedSAGEConvolutionBase(self.X.shape[1]*2, self.neurons[0])
-        self.positive_aggregator_1 = SignedSAGEConvolutionDeep(3 * self.neurons[0], self.neurons[1])
-        self.positive_aggregator_2 = SignedSAGEConvolutionDeep(3 * self.neurons[1], self.neurons[2])
-        self.negative_aggregator_1 = SignedSAGEConvolutionDeep(3 * self.neurons[0], self.neurons[1])
-        self.negative_aggregator_2 = SignedSAGEConvolutionDeep(3 * self.neurons[1], self.neurons[2])
-        self.regression_weights = Parameter(Tensor(shape=(4 * self.neurons[-1], 3), dtype=ms.float32,
-                                                   init=XavierUniform(gain=1.0)))
-        self.regression_bias = Parameter(Tensor(shape=3, dtype=ms.float32, init=Zero()))
+        self.positive_base_aggregator = SignedSAGEConvolutionBase(
+            self.X.shape[1]*2,
+            self.neurons[0],
+            norm=self.norm,
+            norm_embed=self.norm_embed,
+            bias=self.bias
+        )
+        self.negative_base_aggregator = SignedSAGEConvolutionBase(
+            self.X.shape[1]*2,
+            self.neurons[0],
+            norm=self.norm,
+            norm_embed=self.norm_embed,
+            bias=self.bias
+        )
+        self.positive_aggregator_1 = SignedSAGEConvolutionDeep(
+            3 * self.neurons[0],
+            self.neurons[1],
+            norm=self.norm,
+            norm_embed=self.norm_embed,
+            bias=self.bias
+        )
+        self.positive_aggregator_2 = SignedSAGEConvolutionDeep(
+            3 * self.neurons[1],
+            self.neurons[2],
+            norm=self.norm,
+            norm_embed=self.norm_embed,
+            bias=self.bias
+        )
+        self.negative_aggregator_1 = SignedSAGEConvolutionDeep(
+            3 * self.neurons[0],
+            self.neurons[1],
+            norm=self.norm,
+            norm_embed=self.norm_embed,
+            bias=self.bias
+        )
+        self.negative_aggregator_2 = SignedSAGEConvolutionDeep(
+            3 * self.neurons[1],
+            self.neurons[2],
+            norm=self.norm,
+            norm_embed=self.norm_embed,
+            bias=self.bias
+        )
+        self.regression_weights = Parameter(
+            Tensor(shape=(4 * self.neurons[-1], 3), dtype=mstype.float32, init=XavierUniform(gain=1.0))
+        )
+        self.regression_bias = Parameter(Tensor(shape=3, dtype=mstype.float32, init=Zero()))
 
     def construct(self, removed_pos, removed_neg):
         """
@@ -115,7 +199,8 @@ class SignedGraphConvolutionalNetwork(nn.Cell):
         z = self.op((h_pos[-1], h_neg[-1]))
         return z
 
-class SignedGCNTrainer():
+
+class SignedGCNTrainer:
     """
     Object to train and score the SGCN, log the model behaviour and save the output.
     """
@@ -150,9 +235,9 @@ class SignedGCNTrainer():
                                 (self.negative_edges), #list
                                 self.edges["ncount"]) #int
         self.X = mnp.array((self.X).tolist())
-        self.positive_edges = mnp.array(self.positive_edges, dtype=ms.int32).T
-        self.negative_edges = mnp.array(self.negative_edges, dtype=ms.int32).T
-        self.y = mnp.array([0 if i < int(self.ecount/2) else 1 for i in range(self.ecount)]+[2]*(self.ecount*2))
+        self.positive_edges = mnp.array(self.positive_edges, dtype=mstype.int32).T
+        self.negative_edges = mnp.array(self.negative_edges, dtype=mstype.int32).T
+        self.y = mnp.array([0 if i < int(self.ecount / 2) else 1 for i in range(self.ecount)] + [2] * (self.ecount * 2))
         self.y = mnp.array(self.y, mnp.int32)
         self.X = mnp.array(self.X, mnp.float32)
         print('self.positive_edges', self.positive_edges.shape, type(self.positive_edges))
@@ -165,8 +250,7 @@ class SignedGCNTrainer():
         """
         Model training and scoring.
         """
-        print("\nTraining started.\n")
-        self.model = SignedGraphConvolutionalNetwork(self.X)
+        self.model = SignedGraphConvolutionalNetwork(self.X, self.args.norm, self.args.norm_embed, self.args.bias)
         self.removed_pos = self.remove_self_loops(self.positive_edges)
         self.removed_neg = self.remove_self_loops(self.negative_edges)
         train_z = self.model(self.removed_pos, self.removed_neg)
@@ -189,20 +273,23 @@ class SignedGCNTrainer():
             negative_i, negative_j, negative_k, = self.structured_sampling(self.negative_edges, num_nodes)
             train_loss = train_net(self.removed_pos, self.removed_neg,
                                    regression_positive_i, regression_positive_j, regression_positive_k,
-                                   regression_negative_i, regression_negative_j, regression_negative_k, positive_i,
-                                   positive_j, positive_k, negative_i, negative_j, negative_k)
+                                   regression_negative_i, regression_negative_j, regression_negative_k,
+                                   positive_i, positive_j, positive_k, negative_i, negative_j, negative_k)
             auc, f1 = self.score_model(epoch)
-            print("Epoch:", '%04d' % (epoch + 1), "train_loss=", train_loss,
-                  "time=", (time.time() - t), "auc=", auc, "f1=", f1)
-            if auc > best_auc:
-                best_auc = auc
-                save_checkpoint(self.model, self.args.checkpoint_file + '_auc.ckpt')
-                print('Best AUC checkpoint has been saved.')
-            if f1 > best_f1:
-                best_f1 = f1
-                save_checkpoint(self.model, self.args.checkpoint_file + '_f1.ckpt')
-                print('Best F1-Score checkpoint has been saved.')
-        print('Training fished! The best AUC and F1-Score is:', best_auc, best_f1, 'Total time:', time.time() - t0)
+            if self.args.rank_log_save_ckpt_flag:
+                print("Epoch:", '%04d' % (epoch + 1), "train_loss=", train_loss,
+                      "time=", (time.time() - t), "auc=", auc, "f1=", f1)
+                if auc > best_auc:
+                    best_auc = auc
+                    save_checkpoint(self.model, self.args.checkpoint_file + '_auc.ckpt')
+                    print('Best AUC checkpoint has been saved.')
+                if f1 > best_f1:
+                    best_f1 = f1
+                    save_checkpoint(self.model, self.args.checkpoint_file + '_f1.ckpt')
+                    print('Best F1-Score checkpoint has been saved.')
+        if self.args.rank_log_save_ckpt_flag:
+            print('Training fished! The best AUC and F1-Score is:', best_auc, best_f1, 'Total time:', time.time() - t0)
+
     def structured_sampling(self, edge_index, num_nodes=None):
         """
         Samples a negative edge for every positive edge
@@ -268,12 +355,12 @@ class SignedGCNTrainer():
                                               self.train_z[score_positive_edges[1, :], :]))
         test_negative_z = ops.Concat(axis=1)((self.train_z[score_negative_edges[0, :], :],
                                               self.train_z[score_negative_edges[1, :], :]))
-        scores = ops.MatMul()(ops.Concat(axis=0)((test_positive_z, test_negative_z)),
-                              self.model.regression_weights) + self.model.regression_bias
+        scores = ops.matmul(ops.Concat(axis=0)((test_positive_z, test_negative_z)),
+                            self.model.regression_weights) + self.model.regression_bias
         probability_scores = ops.Exp()(ops.Softmax(axis=1)(scores))
-        predictions = probability_scores[:, 0]/probability_scores[:, 0:2].sum(1)
+        predictions = probability_scores[:, 0] / probability_scores[:, 0: 2].sum(1)
         predictions = predictions.asnumpy()
-        targets = [0]*len(self.test_positive_edges) + [1]*len(self.test_negative_edges)
+        targets = [0] * len(self.test_positive_edges) + [1] * len(self.test_negative_edges)
         auc, f1 = calculate_auc(targets, predictions)
         self.logs["performance"].append([epoch+1, auc, f1])
         return auc, f1
