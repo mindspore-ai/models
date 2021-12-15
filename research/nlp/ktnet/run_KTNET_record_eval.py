@@ -22,6 +22,7 @@ import numpy as np
 
 from src.KTNET_eval import KTNET_eval
 from src.reader.record_twomemory import DataProcessor, write_predictions
+from postprocess import read_concept_embedding
 from utils.args import ArgumentGroup
 
 import mindspore
@@ -30,6 +31,7 @@ from mindspore.common.tensor import Tensor
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 import mindspore.ops as ops
+from mindspore.common import set_seed
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
@@ -150,10 +152,9 @@ def parse_args():
     return args
 
 
-def do_eval(processor, eval_concept_settings, eval_output_name='eval_result.json', network=None,
+def do_eval(args, processor, eval_concept_settings, eval_output_name='eval_result.json', network=None,
             load_checkpoint_path=""):
     """evaluate KTNET"""
-    args = parse_args()
     if load_checkpoint_path == "":
         raise ValueError("Finetune model missed, evaluation task must load finetune model!")
 
@@ -236,30 +237,9 @@ def do_eval(processor, eval_concept_settings, eval_output_name='eval_result.json
     print("==============================================================")
 
 
-def read_concept_embedding(embedding_path):
-    """read concept embedding"""
-    fin = open(embedding_path, encoding='utf-8')
-    info = [line.strip() for line in fin]
-    dim = len(info[0].split(' ')[1:])
-    embedding_mat = []
-    id2concept, concept2id = [], {}
-    # add padding concept into vocab
-    id2concept.append('<pad_concept>')
-    concept2id['<pad_concept>'] = 0
-    embedding_mat.append([0.0 for _ in range(dim)])
-    for line in info:
-        concept_name = line.split(' ')[0]
-        embedding = [float(value_str) for value_str in line.split(' ')[1:]]
-        assert len(embedding) == dim and not np.any(np.isnan(embedding))
-        embedding_mat.append(embedding)
-        concept2id[concept_name] = len(id2concept)
-        id2concept.append(concept_name)
-    return concept2id
-
-
-def run_KTNET():
+def run_ktnet(args):
     """run ktnet task"""
-    args = parse_args()
+    set_seed(args.random_seed)
 
     wn_concept2id = read_concept_embedding(args.wn_concept_embedding_path)
     nell_concept2id = read_concept_embedding(args.nell_concept_embedding_path)
@@ -269,8 +249,8 @@ def run_KTNET():
                          "least one of them must be True.")
 
     target = args.device_target
-    if target == "Ascend":
-        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=args.device_id)
+    if target in ("Ascend", "GPU"):
+        context.set_context(mode=context.GRAPH_MODE, device_target=target, device_id=args.device_id)
     else:
         raise Exception("Target error, GPU or Ascend is supported.")
 
@@ -293,9 +273,9 @@ def run_KTNET():
             doc_stride=args.doc_stride,
             max_query_length=args.max_query_length)
 
-        do_eval(processor, eval_concept_settings, network=KTNET_eval,
+        do_eval(args, processor, eval_concept_settings, network=KTNET_eval,
                 load_checkpoint_path=args.load_checkpoint_path)
 
 
 if __name__ == "__main__":
-    run_KTNET()
+    run_ktnet(parse_args())

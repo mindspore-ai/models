@@ -15,9 +15,9 @@
 """Convert data."""
 
 import argparse
-import numpy as np
 from src.reader.record_twomemory import DataProcessor as RecordDataProcessor
 from src.reader.squad_twomemory import DataProcessor as SquadDataProcessor
+from postprocess import read_concept_embedding
 from mindspore.mindrecord import FileWriter
 
 
@@ -28,27 +28,6 @@ def parse_args():
 
     args = parser.parse_args()
     return args
-
-
-def read_concept_embedding(embedding_path):
-    """read concept embedding"""
-    fin = open(embedding_path, encoding='utf-8')
-    info = [line.strip() for line in fin]
-    dim = len(info[0].split(' ')[1:])
-    embedding_mat = []
-    id2concept, concept2id = [], {}
-    # add padding concept into vocab
-    id2concept.append('<pad_concept>')
-    concept2id['<pad_concept>'] = 0
-    embedding_mat.append([0.0 for _ in range(dim)])
-    for line in info:
-        concept_name = line.split(' ')[0]
-        embedding = [float(value_str) for value_str in line.split(' ')[1:]]
-        assert len(embedding) == dim and not np.any(np.isnan(embedding))
-        embedding_mat.append(embedding)
-        concept2id[concept_name] = len(id2concept)
-        id2concept.append(concept_name)
-    return concept2id
 
 
 def convert_record_train_data():
@@ -100,7 +79,7 @@ def convert_record_train_data():
         }
         datalist.append(sample)
 
-    print("record predict data process end")
+    print("record train data process end")
     writer = FileWriter(file_name=args.data_url + "/ReCoRD/train.mindrecord", shard_num=1)
     nlp_schema = {
         "src_ids": {"type": "int64", "shape": [384]},
@@ -164,7 +143,7 @@ def convert_record_predict_data():
         }
         datalist.append(sample)
 
-    print("squad predict data process end")
+    print("record predict data process end")
     writer = FileWriter(file_name=args.data_url + "/ReCoRD/dev.mindrecord", shard_num=1)
     nlp_schema = {
         "src_ids": {"type": "int64", "shape": [384]},
