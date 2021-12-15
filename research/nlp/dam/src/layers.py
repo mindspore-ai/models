@@ -108,9 +108,7 @@ class Attention(nn.Cell):
             print('use attention dropout')
             self.dropout = nn.Dropout(drop_prob)
         self.softmax = P.Softmax(axis=-1)
-        self.weighted_sum = op.BatchMatMulCell().to_float(mstype.float16)
-
-        self.cast = P.Cast()
+        self.weighted_sum = op.BatchMatMulCell()
 
     def construct(self, Q, K, V, Q_lengths, K_lengths):
         """Attention Compute Unit"""
@@ -124,7 +122,6 @@ class Attention(nn.Cell):
         if self.drop_prob is not None:
             attention = self.dropout(attention)
         out = self.weighted_sum(attention, V)
-        out = self.cast(out, mstype.float32)
 
         return out
 
@@ -146,6 +143,7 @@ class FFN(nn.Cell):
 
     def construct(self, x):
         """Dense Unit"""
+        x = self.cast(x, mstype.float16)
         x = self.fc1(x)
         x = self.relu(x)
         out = self.fc2(x)

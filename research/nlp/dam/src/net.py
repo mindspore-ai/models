@@ -22,6 +22,7 @@ import mindspore.common.dtype as mstype
 from mindspore.ops import functional as F
 from mindspore.context import ParallelMode
 from mindspore.common.tensor import Tensor
+from mindspore import ParameterTuple
 from mindspore.parallel._utils import _get_device_num
 
 import src.layers as layers
@@ -103,7 +104,7 @@ class DAMNet(nn.Cell):
         self.stack_1 = P.Stack(axis=1)
         self.stack_2 = P.Stack(axis=2)
         self.concat = P.Concat(axis=1)
-        self.batch_matmul = P.BatchMatMul(transpose_a=False, transpose_b=True)
+        self.batch_matmul_tran_b = op.BatchMatMulCell(transpose_a=False, transpose_b=True)
 
         self.cnn_3d = layers.CNN3d(2 * (self.stack_num + 1), self.channel1_dim, self.channel2_dim)
         self.flatten = nn.Flatten()
@@ -152,7 +153,7 @@ class DAMNet(nn.Cell):
             r_a_t = self.concat((r_a_t, hr))
             t_a_r = self.concat((t_a_r, hu))
 
-            sim = self.batch_matmul(t_a_r, r_a_t) / self.sqrt(self.cast(200, mstype.float32))
+            sim = self.batch_matmul_tran_b(t_a_r, r_a_t) / self.sqrt(self.cast(200, mstype.float32))
             # sim shape: [batch_size, 2*(stack_num+1), max_turn_len, max_turn_len]
 
             sim_turns.append(sim)
@@ -219,12 +220,10 @@ class DAMTrainOneStepCell(nn.Cell):
         super(DAMTrainOneStepCell, self).__init__(auto_prefix=False)
         self.network = network
         self.network.set_grad()
-        self.weights = optimizer.parameters
+        self.weights = ParameterTuple(network.trainable_params())
         self.optimizer = optimizer
-        self.grad = C.GradOperation(get_by_list=True, sens_param=True)
+        self.grad = C.GradOperation(get_by_list=True, sens_param=False)
         self.sens = sens
-        if self.sens > 1:
-            print("Using loss scale.")
         self.enable_clip_grad = enable_clip_grad
         if self.enable_clip_grad:
             print("Using grads clip.")
@@ -255,13 +254,10 @@ class DAMTrainOneStepCell(nn.Cell):
 
         weights = self.weights
         loss = self.network(turns, every_turn_len, response, response_len, labels)
-        sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
-        grads = self.grad(self.network, weights)(turns, every_turn_len, response, response_len, labels, sens)
+        grads = self.grad(self.network, weights)(turns, every_turn_len, response, response_len, labels)
         if self.reducer_flag:
             # apply grad reducer on grads
             grads = self.grad_reducer(grads)
-        if self.sens > 1:
-            grads = self.hyper_map(F.partial(grad_scale, F.scalar_to_array(self.sens)), grads)
         if self.enable_clip_grad:  # grads clip
             grads = self.hyper_map(F.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
         succ = self.optimizer(grads)
