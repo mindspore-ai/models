@@ -13,33 +13,42 @@
 # limitations under the License.
 # ============================================================================
 """train ImageNet."""
+import argparse
+import ast
+import datetime
 import os
 import time
-import ast
-import argparse
-import datetime
 
 import mindspore.nn as nn
-from mindspore import Tensor, context
+from mindspore import Tensor
+from mindspore import context
+from mindspore.common import set_seed
+from mindspore.communication.management import get_group_size
+from mindspore.communication.management import get_rank
+from mindspore.communication.management import init
 from mindspore.context import ParallelMode
 from mindspore.nn.optim import Momentum
-from mindspore.communication.management import init, get_rank, get_group_size
+from mindspore.train.callback import Callback
+from mindspore.train.callback import CheckpointConfig
+from mindspore.train.callback import LossMonitor
 from mindspore.train.callback import ModelCheckpoint
-from mindspore.train.callback import CheckpointConfig, Callback
+from mindspore.train.callback import TimeMonitor
+from mindspore.train.loss_scale_manager import DynamicLossScaleManager
+from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.train.model import Model
-from mindspore.train.loss_scale_manager import DynamicLossScaleManager, FixedLossScaleManager
-from mindspore.common import set_seed
 
-from src.dataset import classification_dataset
+from src.config import config
 from src.crossentropy import CrossEntropy
+from src.dataset import classification_dataset
+from src.eval_callback import EvalCallBack
+from src.image_classification import get_network
 from src.lr_generator import get_lr
 from src.utils.logging import get_logger
 from src.utils.optimizers__init__ import get_param_groups
 from src.utils.var_init import load_pretrain_model
-from src.image_classification import get_network
-from src.config import config
-from src.eval_callback import EvalCallBack
+
 set_seed(1)
+
 
 class BuildTrainNetwork(nn.Cell):
     """build training network"""
@@ -52,6 +61,7 @@ class BuildTrainNetwork(nn.Cell):
         output = self.network(input_data)
         loss = self.criterion(output, label)
         return loss
+
 
 class ProgressMonitor(Callback):
     """monitor loss and time"""
@@ -103,7 +113,6 @@ class ProgressMonitor(Callback):
                                                           ckpt,
                                                           ckpt_fn))
 
-
         self.me_epoch_start_step_num = me_step
         self.me_epoch_start_time = time.time()
 
@@ -117,9 +126,8 @@ class ProgressMonitor(Callback):
         self.args.logger.info('end network train...')
 
 
-def parse_args(cloud_args=None):
-    """parameters"""
-    parser = argparse.ArgumentParser('mindspore classification training')
+def add_arguments(parser):
+    """Add arguments to the parser"""
     parser.add_argument('--platform', type=str, default='Ascend',
                         choices=('Ascend', 'GPU'), help='run platform')
 
@@ -134,16 +142,23 @@ def parse_args(cloud_args=None):
 
     # distributed related
     parser.add_argument('--is_distributed', type=int, default=1, help='if multi device')
+    # Data sink
+    parser.add_argument('--data_sink_mode',
+                        type=int,
+                        default=None,
+                        help='(0 or 1) Turn data sink off or on.')
+    # Learning rate
+    parser.add_argument('--lr', type=float, default=None, help='Learning rate')
     # roma obs
     parser.add_argument('--train_url', type=str, default="", help='train url')
-    #new argument
+    # new argument
     parser.add_argument("--eval_interval", type=int, default=1,
                         help="Evaluation interval when run_eval is True, default is 1.")
     parser.add_argument("--eval_start_epoch", type=int, default=120,
                         help="Evaluation start epoch when run_eval is True, default is 120.")
     parser.add_argument("--save_best_ckpt", type=ast.literal_eval, default=True,
                         help="Save best checkpoint when run_eval is True, default is True.")
-    #dataset of eval dataset
+    # dataset of eval dataset
     parser.add_argument('--eval_data_dir',
                         type=str,
                         default='',
@@ -156,7 +171,7 @@ def parse_args(cloud_args=None):
                         type=ast.literal_eval,
                         default=True,
                         help="Run evaluation when training, default is True.")
-    #best ckpt
+    # best ckpt
     parser.add_argument('--eval_log_path',
                         type=str,
                         default='eval_outputs/',
@@ -165,11 +180,24 @@ def parse_args(cloud_args=None):
                         type=int,
                         default=0,
                         help='if multi device')
+    parser.add_argument('--use_python_multiprocessing',
+                        type=int,
+                        default=None,
+                        help='(0 or 1) Parallelize Python operations '
+                             'with multiple worker processes.')
+
+
+def parse_args(cloud_args=None):
+    """parameters"""
+    parser = argparse.ArgumentParser('mindspore classification training')
+    add_arguments(parser)
+
     args, _ = parser.parse_known_args()
     args = merge_args(args, cloud_args)
     args.image_size = config['image_size']
     args.num_classes = config['num_classes']
-    args.lr = config['lr']
+    if args.lr is None:
+        args.lr = config['lr']
     args.lr_scheduler = config['lr_scheduler']
     args.lr_epochs = config['lr_epochs']
     args.lr_gamma = config['lr_gamma']
@@ -189,9 +217,18 @@ def parse_args(cloud_args=None):
     args.is_save_on_master = config['is_save_on_master']
     args.rank = config['rank']
     args.group_size = config['group_size']
+    if args.data_sink_mode is None:
+        args.data_sink_mode = config['data_sink_mode']
+    else:
+        args.data_sink_mode = bool(args.data_sink_mode)
     args.lr_epochs = list(map(int, args.lr_epochs.split(',')))
     args.image_size = list(map(int, args.image_size.split(',')))
+    if args.use_python_multiprocessing is None:
+        args.use_python_multiprocessing = config['use_python_multiprocessing']
+    else:
+        args.use_python_multiprocessing = bool(args.use_python_multiprocessing)
 
+    # context.set_context(mode=context.PYNATIVE_MODE,
     context.set_context(mode=context.GRAPH_MODE,
                         device_target=args.platform, save_graphs=False)
     # init distributed
@@ -220,6 +257,7 @@ def parse_args(cloud_args=None):
     args.logger = get_logger(args.outputs_dir, args.rank)
     return args
 
+
 def merge_args(args, cloud_args):
     """dictionary"""
     args_dict = vars(args)
@@ -233,6 +271,7 @@ def merge_args(args, cloud_args):
                 args_dict[key] = val
     return args
 
+
 def apply_eval(eval_param):
     eval_model = eval_param["model"]
     eval_ds = eval_param["dataset"]
@@ -240,11 +279,13 @@ def apply_eval(eval_param):
     res = eval_model.eval(eval_ds)
     return res[metrics_name]
 
+
 def train(cloud_args=None):
     """training process"""
     args = parse_args(cloud_args)
-    if os.getenv('DEVICE_ID', "not_set").isdigit():
-        context.set_context(device_id=int(os.getenv('DEVICE_ID')))
+    if args.platform == 'Ascend':
+        if os.getenv('DEVICE_ID', "not_set").isdigit():
+            context.set_context(device_id=int(os.getenv('DEVICE_ID')))
 
     # init distributed
     if args.is_distributed:
@@ -258,13 +299,16 @@ def train(cloud_args=None):
     de_dataset.map_model = 4  # !!!important
     args.steps_per_epoch = de_dataset.get_dataset_size()
 
-
-    #eval_dataset
+    # eval_dataset
     args.logger.save_args(args)
     # network
     args.logger.important_info('start create network')
     # get network and init
-    network = get_network(num_classes=args.num_classes, platform=args.platform)
+    if args.platform == 'Ascend':
+        network = get_network(num_classes=args.num_classes, platform=args.platform)
+    else:
+        network = get_network(num_classes=args.num_classes, platform=args.platform, fp16=False)
+
     load_pretrain_model(args.pretrained, network, args)
     # lr scheduler
     lr = get_lr(args)
@@ -278,19 +322,30 @@ def train(cloud_args=None):
     if not args.label_smooth:
         args.label_smooth_factor = 0.0
     loss = CrossEntropy(smooth_factor=args.label_smooth_factor, num_classes=args.num_classes)
-    if args.is_dynamic_loss_scale == 1:
-        loss_scale_manager = DynamicLossScaleManager(init_loss_scale=65536,
-                                                     scale_factor=2,
-                                                     scale_window=2000)
+
+    if args.platform == 'Ascend':
+        if args.is_dynamic_loss_scale == 1:
+            loss_scale_manager = DynamicLossScaleManager(init_loss_scale=65536,
+                                                         scale_factor=2,
+                                                         scale_window=2000)
+        else:
+            loss_scale_manager = FixedLossScaleManager(args.loss_scale, drop_overflow_update=False)
+
     else:
-        loss_scale_manager = FixedLossScaleManager(args.loss_scale, drop_overflow_update=False)
+        loss_scale_manager = None
+
     model = Model(network, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale_manager,
-                  metrics={'acc'}, amp_level="O3")
+                  metrics={'acc'}, amp_level='O3')
+
     # checkpoint save
     progress_cb = ProgressMonitor(args)
-    callbacks = [progress_cb,]
-    #code like eval.py
-    #if run eval
+    callbacks = [progress_cb, TimeMonitor()]
+
+    if args.rank == 0 and not args.data_sink_mode:
+        callbacks.append(LossMonitor(100))
+
+    # code like eval.py
+    # if run eval
     if args.run_eval:
         if args.eval_data_dir is None or (not os.path.isdir(args.eval_data_dir)):
             raise ValueError("{} is not a existing path.".format(args.eval_data_dir))
@@ -312,6 +367,7 @@ def train(cloud_args=None):
                                      metrics_name="acc"
                                      )
         callbacks.append(eval_callback)
+
     if args.rank_save_ckpt_flag:
         ckpt_config = CheckpointConfig(save_checkpoint_steps=args.ckpt_interval * args.steps_per_epoch,
                                        keep_checkpoint_max=args.ckpt_save_max)
@@ -321,7 +377,7 @@ def train(cloud_args=None):
                                   prefix='{}'.format(args.rank))
         callbacks.append(ckpt_cb)
 
-    model.train(args.max_epoch, de_dataset, callbacks=callbacks, dataset_sink_mode=True)
+    model.train(args.max_epoch, de_dataset, callbacks=callbacks, dataset_sink_mode=args.data_sink_mode)
 
 
 if __name__ == "__main__":

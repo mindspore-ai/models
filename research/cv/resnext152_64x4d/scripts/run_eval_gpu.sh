@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,30 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""config"""
-config = {
-    "image_size": '224,224',
-    "num_classes": 1000,
-    "lr": 0.4,
-    "lr_scheduler": 'cosine_annealing',
-    "lr_epochs": '30,60,90,120',
-    "lr_gamma": 0.1,
-    "eta_min": 0,
-    "T_max": 150,
-    "max_epoch": 150,
-    "warmup_epochs": 1,
-    "weight_decay": 0.0001,
-    "momentum": 0.9,
-    "is_dynamic_loss_scale": 0,
-    "loss_scale": 1024,
-    "label_smooth": 1,
-    "label_smooth_factor": 0.1,
-    "ckpt_interval": 2,
-    "ckpt_save_max": 30,
-    "ckpt_path": 'outputs_demo/',
-    "is_save_on_master": 1,
-    "rank": 0,
-    "group_size": 1,
-    "data_sink_mode": True,
-    "use_python_multiprocessing": False,
-}
+
+if [ $# != 2 ]
+then
+    echo "===================================================================================================="
+    echo "Please run the script as: "
+    echo "bash run_eval_gpu.sh DATA_DIR PATH_CHECKPOINT"
+    echo "for example: bash run_eval_gpu.sh /path/ImageNet2012/val /path/trained/model.ckpt"
+    echo "===================================================================================================="
+    exit 1
+fi
+
+DATA_DIR=$1
+PATH_CHECKPOINT=$2
+
+python eval.py  \
+    --pretrained=$PATH_CHECKPOINT \
+    --platform=GPU \
+    --data_dir=$DATA_DIR > eval_log.txt 2>&1 &

@@ -71,12 +71,15 @@ ResNeXt整体网络架构如下：
 
 ```path
 .
-└─resnext152
+└─resnext152_64x4d
   ├─README.md
   ├─scripts
     ├─run_standalone_train.sh         # 启动Ascend单机训练（单卡）
+    ├─run_standalone_train_gpu.sh     # launch standalone training for gpu (1p)
     ├─run_distribute_train.sh         # 启动Ascend分布式训练（8卡）
-    └─run_eval.sh                     # 启动评估
+    ├─run_distribute_train_gpu.sh     # launch distributed training for gpu (8p)
+    ├─run_eval.sh                     # 启动评估
+    └─run_eval_gpu.sh                 # launch evaluating for gpu
   ├─src
     ├─backbone
       ├─_init_.py                     # 初始化
@@ -100,8 +103,10 @@ ResNeXt整体网络架构如下：
     ├─warmup_cosine_annealing.py      # 每次迭代的学习率
     ├─warmup_step_lr.py               # 热身迭代学习率
   ├─eval.py                           # 评估网络
-  ├──train.py                         # 训练网络
-  ├──mindspore_hub_conf.py            #  MindSpore Hub接口
+  ├─export.py                         # export mindir script
+  ├─train.py                          # 训练网络
+  ├─README.md                         # Documentation in English
+  ├─README_CN.md                      # Documentation in Chinese
 ```
 
 ## 脚本参数
@@ -109,7 +114,7 @@ ResNeXt整体网络架构如下：
 在config.py中可以同时配置训练和评估参数。
 
 ```python
-"image_height": '224,224'                 # 图像大小
+"image_size": '224,224'                   # 图像大小
 "num_classes": 1000,                      # 数据集类数
 "per_batch_size": 128,                    # 输入张量的批次大小
 "lr": 0.05,                               # 基础学习率

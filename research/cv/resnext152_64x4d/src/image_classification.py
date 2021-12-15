@@ -16,11 +16,15 @@
 Image classifiation.
 """
 import math
+
 import mindspore.nn as nn
+import mindspore.ops.operations as P
 from mindspore.common import initializer as init
+
 import src.backbone as backbones
 import src.head as heads
-from src.utils.var_init import default_recurisive_init, KaimingNormal
+from src.utils.var_init import KaimingNormal
+from src.utils.var_init import default_recurisive_init
 
 
 class ImageClassificationNetwork(nn.Cell):
@@ -64,16 +68,22 @@ class Resnet(ImageClassificationNetwork):
     Args:
         backbone_name (string): backbone.
         num_classes (int): number of classes, Default is 1000.
+        platform (str): Target platform (Ascend, GPU), Default Ascend.
+        include_top (bool): Whether to include the model head. Default True
+        activation (str): Activation at the end of the network. Default None.
+        fp16 (bool): Whether to use FP16 type for the head computation. Default True.
     Returns:
         Resnet.
     """
 
-    def __init__(self, backbone_name, num_classes=1000, platform="Ascend", include_top=True, activation="None"):
+    def __init__(self, backbone_name, num_classes=1000, platform="Ascend",
+                 include_top=True, activation="None", fp16=True):
         self.backbone_name = backbone_name
         backbone = backbones.__dict__[self.backbone_name](platform=platform)
         out_channels = backbone.get_out_channels()
         head = heads.CommonHead(num_classes=num_classes,
-                                out_channels=out_channels)
+                                out_channels=out_channels,
+                                fp16=fp16)
         super(Resnet, self).__init__(backbone, head, include_top, activation)
 
         default_recurisive_init(self)
