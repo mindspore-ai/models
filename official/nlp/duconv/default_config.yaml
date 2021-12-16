@@ -1,0 +1,57 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+data_url: ""
+train_url: ""
+data_path: "/cache/data"
+output_path: "/cache/checkpoint"
+load_path: "/cache/checkpoint_path"
+checkpoint_path: './checkpoint/'
+checkpoint_file: './checkpoint/match_kn_gene_rank_0-30_877.ckpt'
+device_target: Ascend
+enable_profiling: False
+
+# ==============================================================================
+# Training options
+epoch: 30
+task_name: match_kn_gene
+max_seq_length: 512
+learning_rate: 0.1
+weight_decay: 0.01
+batch_size: 128
+vocab_size: 14373
+warmup_proportion: 0.1
+train_data_shuffle: True
+run_distribute: False
+device_num: 1
+device_id: 0
+is_save_on_master: 1
+# data_sink_steps: 1000
+save_checkpoint_steps: 400
+rank_save_ckpt_flag: True
+train_data_file_path: "/cache/data/"
+save_checkpoint_path: "/cache/checkpoint"
+eval_data_file_path: "/cache/data/"
+load_checkpoint_path: ""
+save_file_path: ""
+dataset_sink_mode: True
+
+# Model Description
+model_name: DuConv
+file_name: 'DuConv'
+file_format: 'MindIR'
+
+
+---
+# Config description for each option
+enable_modelarts: 'Whether training on modelarts, default: False'
+data_url: 'Dataset url for obs'
+train_url: 'Training output url for obs'
+data_path: 'Dataset path for local'
+output_path: 'Training output path for local'
+
+device_target: 'Target device type'
+enable_profiling: 'Whether enable profiling while training, default: False'
+
+---
+device_target: ['Ascend', 'GPU']
+task_name: ['match', 'match_kn', 'match_kn_gene']
