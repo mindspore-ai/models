@@ -1,0 +1,4 @@
+opencv-python
+scikit-learn
+faiss-cpu
+yacs
