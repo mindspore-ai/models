@@ -15,6 +15,7 @@
 """
 mobilenetv3_small export.
 """
+
 import argparse
 import numpy as np
 from mindspore import context, Tensor, load_checkpoint, load_param_into_net, export

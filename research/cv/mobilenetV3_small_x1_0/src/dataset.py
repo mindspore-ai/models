@@ -15,6 +15,8 @@
 """
 create train or eval dataset.
 """
+import multiprocessing
+
 import mindspore.common.dtype as mstype
 import mindspore.dataset.engine as de
 import mindspore.dataset.vision.c_transforms as C
@@ -36,10 +38,12 @@ def create_dataset(dataset_path, do_train, batch_size=16, device_num=1, rank=0):
         dataset
     """
     if device_num == 1:
-        ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=64, shuffle=True)
+        ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=multiprocessing.cpu_count(), shuffle=True)
     else:
-        ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=64, shuffle=True,
-                                   num_shards=device_num, shard_id=rank)
+        ds = de.ImageFolderDataset(
+            dataset_path, num_parallel_workers=int(multiprocessing.cpu_count() / device_num),
+            shuffle=True, num_shards=device_num, shard_id=rank
+        )
     # define map operations
     if do_train:
         trans = [

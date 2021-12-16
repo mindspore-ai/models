@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 2 ]; then
-  echo "Usage: sh run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH]"
+  echo "Usage: bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATASET_PATH]"
   exit 1
 fi
 
@@ -56,6 +56,6 @@ for ((i = 0; i < ${DEVICE_NUM}; i++)); do
   cd ./train_parallel$i || exit
   echo "start training for rank $RANK_ID, device $DEVICE_ID"
   env >env.log
-  python train.py --dataset_path=$PATH2 --run_distribute=True > log.txt 2>&1 &
+  python train.py --dataset_path=$PATH2 --run_distribute=True --device_target="Ascend" > log.txt 2>&1 &
   cd ..
 done
