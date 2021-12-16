@@ -32,7 +32,7 @@
             "props": {
                 "waitingTime": "3000",
                 "dataSource": "mxpi_imageresize0",
-                "modelPath": "/home/test/ssd_resnet50/ssd_resnet50.om"
+                "modelPath": "../convert/ssd_resnet50.om"
             },
             "factory": "mxpi_tensorinfer",
             "next": "mxpi_objectpostprocessor0"
@@ -40,8 +40,8 @@
         "mxpi_objectpostprocessor0": {
             "props": {
                 "dataSource": "mxpi_tensorinfer0",
-                "postProcessConfigPath": "/home/test/ssd_resnet50/infer/sdk/conf/ssd_mobilenet_v1_fpn_ms_on_coco_postprocess.cfg",
-                "labelPath": "/home/test/ssd_resnet50/infer/sdk/conf/coco.names",
+                "postProcessConfigPath": "./conf/ssd_mobilenet_v1_fpn_ms_on_coco_postprocess.cfg",
+                "labelPath": "./conf/coco.names",
                 "postProcessLibPath": "/usr/local/sdk_home/mxManufacture/lib/modelpostprocessors/libSsdMobilenetFpn_MindsporePost.so"
             },
             "factory": "mxpi_objectpostprocessor",
