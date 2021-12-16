@@ -24,21 +24,21 @@ get_real_path(){
     if [ "${1:0:1}" == "/" ]; then
         echo "$1"
     else
-        echo "$(realpath -m $PWD/$1)"
+        realpath -m "$PWD"/"$1"
     fi
 }
 
-model=$(get_real_path $1)
-data_path=$(get_real_path $2)
+model=$(get_real_path "$1")
+data_path=$(get_real_path "$2")
 
 device_id=0
 if [ $# == 3 ]; then
     device_id=$3
 fi
 
-echo "mindir name: "$model
-echo "dataset path: "$data_path
-echo "device id: "$device_id
+echo "mindir name: ""$model"
+echo "dataset path: ""$data_path"
+echo "device id: ""$device_id"
 
 export ASCEND_HOME=/usr/local/Ascend/
 if [ -d ${ASCEND_HOME}/ascend-toolkit ]; then
@@ -70,7 +70,7 @@ function preprocess_data()
     fi
     mkdir preprocess_Result
 
-    python ../preprocess.py --data_path=$data_path --output_path=./preprocess_Result --device_id=$device_id &> preprocess.log
+    python3 ../preprocess.py --data_path="$data_path" --output_path=./preprocess_Result --device_id="$device_id" &> preprocess.log
 }
 
 function infer()
@@ -84,13 +84,13 @@ function infer()
     fi
     mkdir result_Files
     mkdir time_Result
-    ../ascend310_infer/src/main --mindir_path=$model --dataset_path=$data_path --device_id=$device_id  &> infer.log
+    ../ascend310_infer/src/main --mindir_path="$model" --dataset_path="$data_path" --device_id="$device_id"  &> infer.log
 }
 
 function cal_acc()
 {
-    python ../postprocess.py --label_path=./preprocess_Result/label --result_path=result_Files &> acc.log
-    if [ $? -ne 0 ]; then
+    
+    if ! python ../postprocess.py --label_path=./preprocess_Result/label --result_path=result_Files &> acc.log ; then
         echo "calculate accuracy failed"
         exit 1
     fi
@@ -99,18 +99,18 @@ function cal_acc()
 preprocess_data
 data_path=./preprocess_Result/img_data
 
-compile_app
-if [ $? -ne 0 ]; then
+
+if ! compile_app; then
     echo "compile app code failed"
     exit 1
 fi
-infer
-if [ $? -ne 0 ]; then
+
+if ! infer; then
     echo " execute inference failed"
     exit 1
 fi
-cal_acc
-if [ $? -ne 0 ]; then
+
+if ! cal_acc; then
     echo "calculate accuracy failed"
     exit 1
 fi

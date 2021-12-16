@@ -27,6 +27,7 @@ from src.wide_resnet import wideresnet
 
 parser = argparse.ArgumentParser(description='WideResNet export')
 parser.add_argument("--device_id", type=int, default=0, help="Device id")
+parser.add_argument("--device_target", type=str, default='Ascend', choices=["Ascend", "GPU"], help="Device target")
 parser.add_argument("--run_modelart", type=ast.literal_eval, default=False, help="Run on modelArt, default is false.")
 parser.add_argument('--data_url', default=None, help='Directory contains cifar10 dataset.')
 parser.add_argument('--train_url', default=None, help='Directory contains checkpoint file')

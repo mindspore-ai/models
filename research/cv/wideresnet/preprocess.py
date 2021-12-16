@@ -14,24 +14,19 @@
 # ============================================================================
 """train WideResNet."""
 import os
-import argparse
 from src.dataset import create_dataset
+from src.model_utils.config import config as cfg
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='Ascend WideResnet cifar10 310 preprocess')
-    parser.add_argument('--data_path', type=str, required=True, help='Location of data')
-    parser.add_argument('--output_path', type=str, required=True, help='Location of output data.')
-    parser.add_argument('--device_id', required=True, default=0, help='device_id')
-    args = parser.parse_args()
 
     # create dataset
-    dataset = create_dataset(dataset_path=args.data_path, do_train=False,
-                             infer_910=False, device_id=args.device_id, batch_size=1)
+    dataset = create_dataset(dataset_path=cfg.data_path, do_train=False,
+                             infer_910=False, device_id=cfg.device_id, batch_size=1)
     step_size = dataset.get_dataset_size()
 
-    img_path = os.path.join(args.output_path, "img_data")
-    label_path = os.path.join(args.output_path, "label")
+    img_path = os.path.join(cfg.output_path, "img_data")
+    label_path = os.path.join(cfg.output_path, "label")
     os.makedirs(img_path)
     os.makedirs(label_path)
 

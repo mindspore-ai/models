@@ -86,25 +86,32 @@ WideResNet的总体网络架构如下：[链接](https://arxiv.org/abs/1605.0714
 
 - Ascend处理器环境运行
 
-```Shell
-# 分布式训练
-用法：bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_URL] [CKPT_URL] [MODELART]
-[DATA_URL]是数据集的路径。
-[MODELART]为True时执行ModelArts云上版本，[CKPT_URL]是训练过程中保存ckpt文件的路径。
-[MODELART]为False时执行线下版本，[CKPT_URL]用“”省略，只保留最佳ckpt结果，文件名为‘WideResNet_best.ckpt’。
-。
+```bash
+# 分布式培训
+ 使用方法: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [EXPERIMENT_LABEL]
+ [DATASET_PATH] 是数据集的路径.
+.
 
-# 单机训练
-用法：bash run_standalone_train.sh [DATA_URL] [CKPT_URL] [MODELART]
-[DATA_URL]是数据集的路径。
-[MODELART]为True时执行ModelArts云上版本，[CKPT_URL]是训练过程中保存ckpt文件的路径。
-[MODELART]为False时执行线下版本，[CKPT_URL]用“”省略，只保留最佳ckpt结果，文件名为‘WideResNet_best.ckpt’。
+# 独立培训
+ 使用方法: bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [EXPERIMENT_LABEL]
+[ DATASET_PATH] 是数据集的路径.
+
 
 # 运行评估示例
-用法：bash run_eval.sh [DATA_URL] [CKPT_URL] [MODELART]
-[DATA_URL]是数据集的路径。
-[CKPT_URL]训练好的ckpt文件。
-[MODELART]为True时执行ModelArts云上版本，为Flase执行线下脚本。
+ 使用方法: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]
+[ DATASET_PATH] 是数据集的路径.
+[ CHECKPOINT_PATH] 训练好的ckpt文件.
+```
+
+- GPU处理器环境运行
+
+```bash
+# 分布式培训
+bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)
+
+# 独立培训
+bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)
+
 ```
 
 # 脚本说明
@@ -174,25 +181,53 @@ WideResNet的总体网络架构如下：[链接](https://arxiv.org/abs/1605.0714
 
 ## Ascend处理器环境运行
 
-```Shell
-# 分布式训练
-用法：bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_URL] [CKPT_URL] [MODELART]
-[DATA_URL]是数据集的路径。
-[MODELART]为True时执行ModelArts云上版本，[CKPT_URL]是训练过程中保存ckpt文件的路径。
-[MODELART]为False时执行线下版本，[CKPT_URL]用“”省略，只保留最佳ckpt结果，文件名为‘WideResNet_best.ckpt’。
+```bash
+# 分布式培训
+ usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [LABEL]
+[ DATASET_PATH] 是数据集的路径.
 
-# 单机训练
-用法：bash run_standalone_train.sh [DATA_URL] [CKPT_URL] [MODELART]
-[DATA_URL]是数据集的路径。
-[MODELART]为True时执行ModelArts云上版本，[CKPT_URL]是训练过程中保存ckpt文件的路径。
-[MODELART]为False时执行线下版本，[CKPT_URL]用“”省略，只保留最佳ckpt结果，文件名为‘WideResNet_best.ckpt’。
+
+# 独立培训
+ usage: bash bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [LABEL]
+[ DATASET_PATH] 是数据集的路径.
+
 ```
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)中的说明。
 
 训练结果保存在示例路径中，文件夹名称以“train”或“train_parallel”开头。您可在此路径下的日志中找到检查点文件以及结果，如下所示。
+
+## GPU处理器环境运行
+
+```bash
+# 分布式培训
+bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [EXPERIMENT_LABEL]
+
+# 独立培训
+bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [EXPERIMENT_LABEL]
+```
+
+对于分布式培训，需要提前创建主机文件配置。
+
+请按照链接中的说明操作 [GPU-Multi-Host](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_gpu.html).
+
+## 培训时的评估
+
+```bash
+# 带评估示例的分布式培训 GPU处理器环境运行:
+bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [EXPERIMENT_LABEL] [RUN_EVAL] [EVAL_DATASET_PATH]
+
+# 带有评估示例的独立培训 GPU处理器环境运行:
+bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [EXPERIMENT_LABEL] [RUN_EVAL] [EVAL_DATASET_PATH]
+
+# 带评估示例的分布式培训 Ascend处理器环境运行:
+bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [LABEL] [RUN_EVAL] [EVAL_DATASET_PATH]
+
+# 带有评估示例的独立培训 Ascend处理器环境运行:
+bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [LABEL] [RUN_EVAL] [EVAL_DATASET_PATH]
+```
 
 ## 结果
 
@@ -297,23 +332,23 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 
 #### cifar10上的WideResNet
 
-| 参数 | Ascend 910  |
-|---|---|
-| 模型版本  | WideResNet  |
-| 资源  |  Ascend 910；CPU：2.60GHz，192核；内存：755G |
-| 上传日期  |2021-05-20 ;  |
-| MindSpore版本  | 1.2.1 |
-| 数据集  |  cifar10 |
-| 训练参数  | epoch=300, steps per epoch=195, batch_size = 32  |
-| 优化器  | Momentum  |
-| 损失函数  |Softmax交叉熵  |
-| 输出  | 概率 |
-|  损失 | 0.545541  |
-|速度|65.2毫秒/步（8卡） |
-|总时长   |  70分钟 |
-|参数(M)   | 52.1 |
-|  微调检查点 | 426.49M（.ckpt文件）  |
-| 脚本  | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/wideresnet)  |
+| 参数 | Ascend 910  | GPU | GPU |
+|---|---|---|---|
+| 模型版本  | WideResNet  |   WideResNet-40-10 |WideResNet-40-10 |
+| 资源  |  Ascend 910；CPU：2.60GHz，192核；内存：755G |  GeForce RTX 3090-24G (8 pcs)        | Tesla V100-PCIE 32G；CPU：2.60GHz 52cores ；RAM：754G (8 pcs)|
+| 上传日期  |2021-05-20 ;  |2021-10-07 | 2021-11-30 |
+| MindSpore版本  | 1.2.1 |1.3.0 | 1.6.0.20211122 |
+| 数据集  |  cifar10 |cifar10 |cifar10 |
+| 训练参数  | epoch=300, steps per epoch=195, batch_size = 32  |epoch=300, steps per epoch=781, batch_size = 64      | epoch=300, steps per epoch=195, batch_size = 32 |
+| 优化器  | Momentum  |Momentum  |Momentum  |
+| 损失函数  |Softmax交叉熵  | Softmax交叉熵  | Softmax交叉熵  |
+| 输出  | 概率 |概率 |概率 |
+|  损失 | 0.545541  |0.545572    | 0.545078 |
+|速度|65.2毫秒/步（8卡） |275 毫秒/步（8 卡） | 147毫秒/步 (8 卡); 95毫秒/步 (1 卡) |
+|总时长   |  70分钟 |16.8 工作时数    | ~ 2.4工作时数|
+|参数(M)   | 52.1 |52.1 |52.1 |
+|  微调检查点 | 426.49M（.ckpt文件）  |428M（.ckpt文件）  |- |
+| 脚本  | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/wideresnet)  |[链接](https://gitee.com/mindspore/models/tree/master/research/cv/wideresnet)  |[链接](https://gitee.com/mindspore/models/tree/master/research/cv/wideresnet)  |
 
 # 随机情况说明
 
@@ -321,10 +356,10 @@ dataset.py中设置了“create_dataset”函数内的种子，同时还使用�
 
 # ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/models)。
+请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
 
 # FAQ
 
-优先参考[ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ)来查找一些常见的公共问题。
+优先参考[ModelZoo FAQ](https://gitee.com/mindspore/mindspore/tree/master/model_zoo#FAQ)来查找一些常见的公共问题。
 
 - **Q: 使用PYNATIVE_MODE发生内存溢出怎么办？** **A**：内存溢出通常是因为PYNATIVE_MODE需要更多的内存， 将batch size设置为16降低内存消耗，可进行网络训练。

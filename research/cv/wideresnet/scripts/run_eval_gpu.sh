@@ -16,7 +16,7 @@
 
 if [ $# != 3 ]
 then 
-    echo "Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]"
+    echo "Usage: bash run_eval_gpu.sh [DATASET_PATH] [CONFIG_PATH] [CHECKPOINT_PATH]"
 exit 1
 fi
 
@@ -24,28 +24,33 @@ get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
     echo "$1"
   else
-    echo "$(realpath -m $PWD/$1)"
+    realpath -m "$PWD"/"$1"
   fi
 }
 
-PATH1=$(get_real_path $1)
-PATH2=$(get_real_path $2)
-CONFIG_FILE=$(get_real_path $3)
+DATASET_PATH=$(get_real_path "$1")
+CONFIG_PATH=$(get_real_path "$2")
+CHECKPOINT_PATH=$(get_real_path "$3")
 
-
-if [ ! -d $PATH1 ]
+if [ ! -d "$DATASET_PATH" ]
 then 
-    echo "error: DATASET_PATH=$PATH1 is not a directory"
+    echo "error: DATASET_PATH='$DATASET_PATH' is not a directory"
 exit 1
 fi 
 
-if [ ! -f $PATH2 ]
+if [ ! -f "$CONFIG_PATH" ]
 then 
-    echo "error: CHECKPOINT_PATH=$PATH2 is not a file"
+    echo "error: CHECKPOINT_PATH=$CONFIG_PATH is not a file"
 exit 1
 fi 
 
-ulimit -u unlimited
+if [ ! -f "$CHECKPOINT_PATH" ]
+then 
+    echo "error: CHECKPOINT_PATH=$CHECKPOINT_PATH is not a file"
+exit 1
+fi 
+
+#ulimit -u unlimited
 export DEVICE_NUM=1
 export DEVICE_ID=0
 export RANK_SIZE=$DEVICE_NUM
@@ -57,11 +62,10 @@ then
 fi
 mkdir ./eval
 cp ../*.py ./eval
-cp *.sh ./eval
-cp -r ../config/*.yaml ./eval
+cp -- *.sh ./eval
 cp -r ../src ./eval
 cd ./eval || exit
 env > env.log
 echo "start evaluation for device $DEVICE_ID"
-python eval.py --data_path=$PATH1 --checkpoint_file_path=$PATH2 --config_path=$CONFIG_FILE &> log &
+python eval.py --device_target "GPU" --data_path="$DATASET_PATH" --config_path="$CONFIG_PATH" --checkpoint_file_path="$CHECKPOINT_PATH" &> log &
 cd ..

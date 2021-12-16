@@ -14,14 +14,10 @@
 # ============================================================================
 """post process for 310 inference"""
 import os
-import argparse
 import numpy as np
+from src.model_utils.config import config as cfg
 
 batch_size = 1
-parser = argparse.ArgumentParser(description="WideResNet inference")
-parser.add_argument("--result_path", required=True, help="result files path.")
-parser.add_argument("--label_path", required=True, help="image file path.")
-args = parser.parse_args()
 
 
 def get_top5_acc(top5_arg, gt_class):
@@ -44,11 +40,11 @@ def cal_acc_cifar10(result_path, label_path):
     result_shape = (1, 10)
 
     files = os.listdir(result_path)
-    for file in files:
-        full_file_path = os.path.join(result_path, file)
+    for _file in files:
+        full_file_path = os.path.join(result_path, _file)
         if os.path.isfile(full_file_path):
             result = np.fromfile(full_file_path, dtype=np.float32).reshape(result_shape)
-            label_file = os.path.join(label_path, file.split(".bin")[0][:-2] + ".bin")
+            label_file = os.path.join(label_path, _file.split(".bin")[0][:-2] + ".bin")
             gt_classes = np.fromfile(label_file, dtype=np.int32)
 
             top1_output = np.argmax(result, (-1))
@@ -69,4 +65,4 @@ def cal_acc_cifar10(result_path, label_path):
 
 if __name__ == '__main__':
 
-    cal_acc_cifar10(args.result_path, args.label_path)
+    cal_acc_cifar10(cfg.result_path, cfg.label_path)

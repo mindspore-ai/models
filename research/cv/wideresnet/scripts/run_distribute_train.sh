@@ -12,12 +12,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ==========================================================================
+# ============================================================================
 
-if [ $# != 4 ]
+CURPATH="$(dirname "$0")"
+# shellcheck source=/dev/null
+. ${CURPATH}/cache_util.sh
+
+if [ $# != 3 ] && [ $# != 4 ] && [ $# != 5 ]
 then
-  echo "Usage: bash run_standalone_train.sh [RANK_TABLE_FILE] [DATA_URL] [CKPT_URL] [MODELART]"
-exit 1
+  echo "Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [LABEL] [PRETRAINED_CKPT_PATH](optional)"
+  echo "       bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [LABEL] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)"
+  exit 1
 fi
 
 get_real_path(){
@@ -30,51 +35,99 @@ get_real_path(){
 
 PATH1=$(get_real_path $1)
 PATH2=$(get_real_path $2)
-PATH3=$(get_real_path $3)
-PATH4=$4
-echo "$PATH1"
-echo "$PATH2"
-echo "$PATH3"
-echo "$PATH4"
+CONFIG_FILE=$(get_real_path $3)
+LABEL=$4
+
+if [ $# == 5 ]
+then 
+    PATH3=$(get_real_path $5)
+fi
+
+if [ $# == 6 ]
+then
+  RUN_EVAL=$5
+  EVAL_DATASET_PATH=$(get_real_path $6)
+fi
+
+if [ ! -f $PATH1 ]
+then 
+    echo "error: RANK_TABLE_FILE=$PATH1 is not a file"
+exit 1
+fi 
 
 if [ ! -d $PATH2 ]
+then 
+    echo "error: DATASET_PATH=$PATH2 is not a directory"
+exit 1
+fi 
+
+if [ $# == 5 ] && [ ! -f $PATH3 ]
 then
-    echo "error: DATA_URL=$PATH2 is not a directory"
+    echo "error: PRETRAINED_CKPT_PATH=$PATH3 is not a file"
 exit 1
 fi
 
-if [ ! -d $PATH3 ]
+if [ "${RUN_EVAL}" == "True" ] && [ ! -d $EVAL_DATASET_PATH ]
 then
-    echo "error: CKPT_URL=$PATH3 is not a directory"
-exit 1
+  echo "error: EVAL_DATASET_PATH=$EVAL_DATASET_PATH is not a directory"
+  exit 1
+fi
+
+if [ "${RUN_EVAL}" == "True" ]
+then
+  bootup_cache_server
+  CACHE_SESSION_ID=$(generate_cache_session)
 fi
 
 ulimit -u unlimited
 export DEVICE_NUM=8
 export RANK_SIZE=8
 export RANK_TABLE_FILE=$PATH1
-export MINDSPORE_HCCL_CONFIG_PATH=$PATH1
 
-DATA_URL=$2
-export DATA_URL=${DATA_URL}
+export SERVER_ID=0
+rank_start=$((DEVICE_NUM * SERVER_ID))
 
-for((i=0;i<${RANK_SIZE};i++))
+cpus=`cat /proc/cpuinfo| grep "processor"| wc -l`
+avg=`expr $cpus \/ $DEVICE_NUM`
+gap=`expr $avg \- 1`
+
+for((i=0; i<${DEVICE_NUM}; i++))
 do
-    rm -rf device$i
-    mkdir device$i
-    cp ../*.py ./device$i
-    cp *.sh ./device$i
-    cp -r ../src ./device$i
-    cd ./device$i
-    export DEVICE_ID=$i
-    export RANK_ID=$i
-    echo "start training for device $i"
-    env > env$i.log
-
+    start=`expr $i \* $avg`
+    end=`expr $start \+ $gap`
+    cmdopt=$start"-"$end
+    export DEVICE_ID=${i}
+    export RANK_ID=$((rank_start + i))
+    rm -rf ./train_parallel$i
+    mkdir ./train_parallel$i
+    cp ../*.py ./train_parallel$i
+    cp *.sh ./train_parallel$i
+    cp -r ../config/*.yaml ./train_parallel$i
+    cp -r ../src ./train_parallel$i
+    cd ./train_parallel$i || exit
+    echo "start training for rank $RANK_ID, device $DEVICE_ID"
+    env > env.log
     if [ $# == 4 ]
+    then    
+        taskset -c $cmdopt python train.py --run_distribute=True --device_num=$RANK_SIZE --data_path=$PATH2 \
+        --config_path=$CONFIG_FILE --experiment_label=$LABEL &> log &
+    fi
+    
+    if [ $# == 5 ]
     then
-        python train.py --data_url=$PATH2 --ckpt_url=$PATH3 --modelart=$PATH4 &> train.log &
+        taskset -c $cmdopt python train.py --run_distribute=True --device_num=$RANK_SIZE --data_path=$PATH2 --pre_trained=$PATH3 \
+        --config_path=$CONFIG_FILE --experiment_label=$LABEL &> log &
     fi
 
-    cd ../
+    if [ $# == 6 ]
+    then
+      taskset -c $cmdopt python train.py --run_distribute=True --device_num=$RANK_SIZE --data_path=$PATH2 \
+      --run_eval=$RUN_EVAL --eval_dataset_path=$EVAL_DATASET_PATH --enable_cache=True \
+      --cache_session_id=$CACHE_SESSION_ID --config_path=$CONFIG_FILE  --experiment_label=$LABEL &> log &
+      if [ "${RUN_EVAL}" == "True" ]
+      then
+        echo -e "\nWhen training run is done, remember to shut down the cache server via \"cache_admin --stop\""
+      fi
+    fi
+    cd ..
 done
