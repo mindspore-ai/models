@@ -1,5 +1,5 @@
-numpy
-easydict
 opencv-python
+numpy
+Pillow
 pycocotools
-pillow
+tqdm

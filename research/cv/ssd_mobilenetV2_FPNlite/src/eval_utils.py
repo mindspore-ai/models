@@ -16,7 +16,7 @@
 
 import json
 import numpy as np
-from .config import config
+from src.model_utils.config import config as cfg
 
 
 def apply_nms(all_boxes, all_scores, thres, max_boxes):
@@ -58,10 +58,10 @@ def metrics(pred_data, anno_json):
     """Calculate mAP of predicted bboxes."""
     from pycocotools.coco import COCO
     from pycocotools.cocoeval import COCOeval
-    num_classes = config.num_classes
+    num_classes = cfg.num_classes
 
     #Classes need to train or test.
-    val_cls = config.classes
+    val_cls = cfg.classes
     val_cls_dict = {}
     for i, cls in enumerate(val_cls):
         val_cls_dict[i] = cls
@@ -87,12 +87,12 @@ def metrics(pred_data, anno_json):
 
         for c in range(1, num_classes):
             class_box_scores = box_scores[:, c]
-            score_mask = class_box_scores > config.min_score
+            score_mask = class_box_scores > cfg.min_score
             class_box_scores = class_box_scores[score_mask]
             class_boxes = pred_boxes[score_mask] * [h, w, h, w]
 
             if score_mask.any():
-                nms_index = apply_nms(class_boxes, class_box_scores, config.nms_threshold, config.max_boxes)
+                nms_index = apply_nms(class_boxes, class_box_scores, cfg.nms_threshold, cfg.max_boxes)
                 class_boxes = class_boxes[nms_index]
                 class_box_scores = class_box_scores[nms_index]
 

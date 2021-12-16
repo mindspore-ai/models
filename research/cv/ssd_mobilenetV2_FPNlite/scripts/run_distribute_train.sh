@@ -21,62 +21,66 @@ echo "for example: sh run_distribute_train.sh 8 500 0.2 coco /data/hccl.json /op
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 
-if [ $# != 5 ] && [ $# != 7 ]
+if [ $# != 6 ] && [ $# != 8 ]
 then
-    echo "Usage: sh run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] \
+    echo "Usage: sh run_distribute_train.sh [CONFIG_FILE] [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] \
 [RANK_TABLE_FILE] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)"
     exit 1
 fi
 
 # Before start distribute train, first create mindrecord files.
-BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
-cd $BASE_PATH/../ || exit
-python train.py --only_create_dataset=True --dataset=$4
+BASE_PATH=$(cd "$(dirname "$0")" || exit; pwd)
+cd "$BASE_PATH"/../ || exit
+python train.py --only_create_dataset=True --dataset="$4"
 
 echo "After running the script, the network runs in the background. The log will be generated in LOGx/log.txt"
 
-export RANK_SIZE=$1
-EPOCH_SIZE=$2
-LR=$3
-DATASET=$4
-PRE_TRAINED=$6
-PRE_TRAINED_EPOCH_SIZE=$7
-export RANK_TABLE_FILE=$5
+CONFIG_PATH=$1
+export RANK_SIZE=$2
+EPOCH_SIZE=$3
+LR=$4
+DATASET=$5
+export RANK_TABLE_FILE=$6
+PRE_TRAINED=$7
+PRE_TRAINED_EPOCH_SIZE=$8
 
 for((i=0;i<RANK_SIZE;i++))
 do
     export DEVICE_ID=$i
-    rm -rf LOG$i
-    mkdir ./LOG$i
-    cp ./*.py ./LOG$i
-    cp -r ./src ./LOG$i
-    cp -r ./scripts ./LOG$i
-    cd ./LOG$i || exit
+    rm -rf LOG"$i"
+    mkdir ./LOG"$i"
+    cp ./*.py ./LOG"$i"
+    cp -r ./src ./LOG"$i"
+    cp -r ./scripts ./LOG"$i"
+    cp -r ./config/*.yaml ./LOG"$i"
+    cd ./LOG"$i" || exit
     export RANK_ID=$i
     echo "start training for rank $i, device $DEVICE_ID"
     env > env.log
     if [ $# == 5 ]
     then
         python train.py  \
+        --config_path="$CONFIG_PATH" \
         --distribute=True  \
-        --lr=$LR \
-        --dataset=$DATASET \
-        --device_num=$RANK_SIZE  \
-        --device_id=$DEVICE_ID  \
-        --epoch_size=$EPOCH_SIZE > log.txt 2>&1 &
+        --lr="$LR" \
+        --dataset="$DATASET" \
+        --device_num="$RANK_SIZE"  \
+        --device_id="$DEVICE_ID"  \
+        --epoch_size="$EPOCH_SIZE" > log.txt 2>&1 &
     fi
 
     if [ $# == 7 ]
     then
         python train.py  \
+        --config_path="$CONFIG_PATH" \
         --distribute=True  \
-        --lr=$LR \
-        --dataset=$DATASET \
-        --device_num=$RANK_SIZE  \
-        --device_id=$DEVICE_ID  \
-        --pre_trained=$PRE_TRAINED \
-        --pre_trained_epoch_size=$PRE_TRAINED_EPOCH_SIZE \
-        --epoch_size=$EPOCH_SIZE > log.txt 2>&1 &
+        --lr="$LR" \
+        --dataset="$DATASET" \
+        --device_num="$RANK_SIZE"  \
+        --device_id="$DEVICE_ID"  \
+        --pre_trained="$PRE_TRAINED" \
+        --pre_trained_epoch_size="$PRE_TRAINED_EPOCH_SIZE" \
+        --epoch_size="$EPOCH_SIZE" > log.txt 2>&1 &
     fi
 
     cd ../

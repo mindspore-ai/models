@@ -20,54 +20,68 @@ echo "for example: sh run_1p_train.sh 8 500 0.2 coco /opt/ssd-300.ckpt(optional)
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 
-if [ $# != 4 ] && [ $# != 6 ]
+if [ $# != 5 ] && [ $# != 7 ]
 then
-    echo "Usage: sh run_1p_train.sh [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] \
+    echo "Usage: sh run_1p_train.sh [CONFIG_FILE] [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] \
 [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)"
     exit 1
 fi
 
 # Before start 1pc train, first create mindrecord files.
-BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
-cd $BASE_PATH/../ || exit
-python train.py --only_create_dataset=True --dataset=$4
+BASE_PATH=$(cd "$(dirname "$0")" || exit; pwd)
+cd "$BASE_PATH"/../ || exit
+python train.py --only_create_dataset=True --dataset="$4"
 
 echo "After running the script, the network runs in the background. The log will be generated in LOGx/log.txt"
 
-DEVICE_ID=$1
-EPOCH_SIZE=$2
-LR=$3
-DATASET=$4
-PRE_TRAINED=$5
-PRE_TRAINED_EPOCH_SIZE=$6
+CONFIG_PATH=$1
+DEVICE_ID=$2
+EPOCH_SIZE=$3
+LR=$4
+DATASET=$5
 
-rm -rf LOG$1
-mkdir ./LOG$1
-cp ./*.py ./LOG$1
-cp -r ./src ./LOG$1
-cp -r ./scripts ./LOG$1
-cd ./LOG$1 || exit
-
-echo "start training for device $1"
-env > env.log
-if [ $# == 4 ]
+if [[ ! -f $CONFIG_PATH ]]
 then
-    python train.py  \
-    --lr=$LR \
-    --dataset=$DATASET \
-    --device_id=$DEVICE_ID  \
-    --epoch_size=$EPOCH_SIZE > log.txt 2>&1 &
+    echo "error: CONFIG_FILE=$CONFIG_PATH is not a file"
+exit 1
 fi
 
-if [ $# == 6 ]
+if [ $# == 7 ]
+then
+    PRE_TRAINED=$6
+    PRE_TRAINED_EPOCH_SIZE=$7
+fi
+
+rm -rf LOG"${DEVICE_ID}"
+mkdir ./LOG"${DEVICE_ID}"
+cp ./*.py ./LOG"${DEVICE_ID}"
+cp -r ./src ./LOG"${DEVICE_ID}"
+cp -r ./scripts ./LOG"${DEVICE_ID}"
+cp -r ./config/*.yaml ./LOG"${DEVICE_ID}"
+cd ./LOG"${DEVICE_ID}" || exit
+
+echo "start training for device ${DEVICE_ID}"
+env > env.log
+if [ $# == 5 ]
 then
     python train.py  \
-    --lr=$LR \
-    --dataset=$DATASET \
-    --device_id=$DEVICE_ID  \
-    --pre_trained=$PRE_TRAINED \
-    --pre_trained_epoch_size=$PRE_TRAINED_EPOCH_SIZE \
-    --epoch_size=$EPOCH_SIZE > log.txt 2>&1 &
+    --config_path="$CONFIG_PATH" \
+    --lr="$LR" \
+    --dataset="$DATASET" \
+    --device_id="$DEVICE_ID"  \
+    --epoch_size="$EPOCH_SIZE" > log.txt 2>&1 &
+fi
+
+if [ $# == 7 ]
+then
+    python train.py  \
+    --config_path="$CONFIG_PATH" \
+    --lr="$LR" \
+    --dataset="$DATASET" \
+    --device_id="$DEVICE_ID"  \
+    --pre_trained="$PRE_TRAINED" \
+    --pre_trained_epoch_size="$PRE_TRAINED_EPOCH_SIZE" \
+    --epoch_size="$EPOCH_SIZE" > log.txt 2>&1 &
 fi
 
 cd ../

@@ -22,12 +22,14 @@ import json
 import xml.etree.ElementTree as et
 import numpy as np
 import cv2
+from tqdm import tqdm
 
 import mindspore.dataset as de
 import mindspore.dataset.vision.c_transforms as C
 from mindspore.mindrecord import FileWriter
-from .config import config
+from src.model_utils.config import config as cfg
 from .box_utils import jaccard_numpy, ssd_bboxes_encode
+
 
 
 def _rand(a=0., b=1.):
@@ -154,13 +156,13 @@ def preprocess_fn(img_id, image, box, is_training):
         box, label, num_match = ssd_bboxes_encode(box)
         return image, box, label, num_match
 
-    return _data_aug(image, box, is_training, image_size=config.img_shape)
+    return _data_aug(image, box, is_training, image_size=cfg.img_shape)
 
 
 def create_voc_label(is_training):
     """Get image path and annotation from VOC."""
-    voc_root = config.voc_root
-    cls_map = {name: i for i, name in enumerate(config.classes)}
+    voc_root = cfg.voc_root
+    cls_map = {name: i for i, name in enumerate(cfg.classes)}
     sub_dir = 'train' if is_training else 'eval'
     voc_dir = os.path.join(voc_root, sub_dir)
     if not os.path.isdir(voc_dir):
@@ -173,7 +175,7 @@ def create_voc_label(is_training):
         anno_dir = os.path.join(voc_dir, 'Annotations')
 
     if not is_training:
-        json_file = os.path.join(config.voc_root, config.voc_json)
+        json_file = os.path.join(cfg.voc_root, cfg.voc_json)
         file_dir = os.path.split(json_file)[0]
         if not os.path.isdir(file_dir):
             os.makedirs(file_dir)
@@ -185,7 +187,7 @@ def create_voc_label(is_training):
     image_anno_dict = {}
     images = []
     id_iter = 0
-    for anno_file in os.listdir(anno_dir):
+    for anno_file in tqdm(os.listdir(anno_dir)):
         print(anno_file)
         if not anno_file.endswith('xml'):
             continue
@@ -201,10 +203,10 @@ def create_voc_label(is_training):
             continue
 
         labels = []
-        for obj in root_node.iter('object'):
+        for obj in tqdm(root_node.iter('object')):
             cls_name = obj.find('name').text
             if cls_name not in cls_map:
-                print(f'Label "{cls_name}" not in "{config.classes}"')
+                print(f'Label "{cls_name}" not in "{cfg.classes}"')
                 continue
             bnd_box = obj.find('bndbox')
             x_min = int(float(bnd_box.find('xmin').text)) - 1
@@ -253,18 +255,18 @@ def create_coco_label(is_training):
     """Get image path and annotation from COCO."""
     from pycocotools.coco import COCO
 
-    coco_root = config.coco_root
-    data_type = config.val_data_type
+    coco_root = cfg.coco_root
+    data_type = cfg.val_data_type
     if is_training:
-        data_type = config.train_data_type
+        data_type = cfg.train_data_type
 
     # Classes need to train or test.
-    train_cls = config.classes
+    train_cls = cfg.classes
     train_cls_dict = {}
     for i, cls in enumerate(train_cls):
         train_cls_dict[cls] = i
 
-    anno_json = os.path.join(coco_root, config.instances_set.format(data_type))
+    anno_json = os.path.join(coco_root, cfg.instances_set.format(data_type))
 
     coco = COCO(anno_json)
     classs_dict = {}
@@ -277,7 +279,7 @@ def create_coco_label(is_training):
     image_path_dict = {}
     image_anno_dict = {}
 
-    for img_id in image_ids:
+    for img_id in tqdm(image_ids):
         image_info = coco.loadImgs(img_id)
         file_name = image_info[0]["file_name"]
         anno_ids = coco.getAnnIds(imgIds=img_id, iscrowd=None)
@@ -285,7 +287,7 @@ def create_coco_label(is_training):
         image_path = os.path.join(coco_root, data_type, file_name)
         annos = []
         iscrowd = False
-        for label in anno:
+        for label in tqdm(anno):
             bbox = label["bbox"]
             class_name = classs_dict[label["category_id"]]
             iscrowd = iscrowd or label["iscrowd"]
@@ -307,7 +309,7 @@ def create_coco_label(is_training):
 def anno_parser(annos_str):
     """Parse annotation from string to list."""
     annos = []
-    for anno_str in annos_str:
+    for anno_str in tqdm(annos_str):
         anno = list(map(int, anno_str.strip().split(',')))
         annos.append(anno)
     return annos
@@ -325,7 +327,7 @@ def filter_valid_data(image_dir, anno_path):
 
     with open(anno_path, "rb") as f:
         lines = f.readlines()
-    for img_id, line in enumerate(lines):
+    for img_id, line in tqdm(enumerate(lines)):
         line_str = line.decode("utf-8").strip()
         line_split = str(line_str).split(' ')
         file_name = line_split[0]
@@ -364,13 +366,13 @@ def voc_data_to_mindrecord(mindrecord_dir, is_training, prefix="ssd.mindrecord",
 
 def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="ssd.mindrecord", file_num=8):
     """Create MindRecord file."""
-    mindrecord_dir = config.mindrecord_dir
+    mindrecord_dir = cfg.mindrecord_dir
     mindrecord_path = os.path.join(mindrecord_dir, prefix)
     writer = FileWriter(mindrecord_path, file_num)
     if dataset == "coco":
         images, image_path_dict, image_anno_dict = create_coco_label(is_training)
     else:
-        images, image_path_dict, image_anno_dict = filter_valid_data(config.image_dir, config.anno_path)
+        images, image_path_dict, image_anno_dict = filter_valid_data(cfg.image_dir, cfg.anno_path)
 
     ssd_json = {
         "img_id": {"type": "int32", "shape": [1]},
@@ -391,8 +393,9 @@ def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="ssd.
 
 
 def create_ssd_dataset(mindrecord_file, batch_size=32, repeat_num=10, device_num=1, rank=0,
-                       is_training=True, num_parallel_workers=64, use_multiprocessing=True):
+                       is_training=True, num_parallel_workers=7, use_multiprocessing=True):
     """Create SSD dataset with MindDataset."""
+    print("Creating ssd dataset is started!")
     ds = de.MindDataset(mindrecord_file, columns_list=["img_id", "image", "annotation"], num_shards=device_num,
                         shard_id=rank, num_parallel_workers=num_parallel_workers, shuffle=is_training)
     decode = C.Decode()
@@ -423,30 +426,30 @@ def create_mindrecord(dataset="coco", prefix="ssd.mindrecord", is_training=True)
     """create mindrecord file"""
     print("Start create dataset!")
 
-    # It will generate mindrecord file in config.mindrecord_dir,
+    # It will generate mindrecord file in cfg.mindrecord_dir,
     # and the file name is ssd.mindrecord0, 1, ... file_num.
 
-    mindrecord_dir = config.mindrecord_dir
+    mindrecord_dir = cfg.mindrecord_dir
     mindrecord_file = os.path.join(mindrecord_dir, prefix + "0")
     if not os.path.exists(mindrecord_file):
         if not os.path.isdir(mindrecord_dir):
             os.makedirs(mindrecord_dir)
         if dataset == "coco":
-            if os.path.isdir(config.coco_root):
+            if os.path.isdir(cfg.coco_root):
                 print("Create Mindrecord.")
                 data_to_mindrecord_byte_image("coco", is_training, prefix)
                 print("Create Mindrecord Done, at {}".format(mindrecord_dir))
             else:
                 print("coco_root not exits.")
         elif dataset == "voc":
-            if os.path.isdir(config.voc_root):
+            if os.path.isdir(cfg.voc_root):
                 print("Create Mindrecord.")
                 voc_data_to_mindrecord(mindrecord_dir, is_training, prefix)
                 print("Create Mindrecord Done, at {}".format(mindrecord_dir))
             else:
                 print("voc_root not exits.")
         else:
-            if os.path.isdir(config.image_dir) and os.path.exists(config.anno_path):
+            if os.path.isdir(cfg.image_dir) and os.path.exists(cfg.anno_path):
                 print("Create Mindrecord.")
                 data_to_mindrecord_byte_image("other", is_training, prefix)
                 print("Create Mindrecord Done, at {}".format(mindrecord_dir))
