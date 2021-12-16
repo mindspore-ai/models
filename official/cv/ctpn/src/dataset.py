@@ -279,7 +279,7 @@ def anno_parser(annos_str):
         annos.append(anno)
     return annos
 
-def create_ctpn_dataset(mindrecord_file, batch_size=1, repeat_num=1, device_num=1, rank_id=0,
+def create_ctpn_dataset(mindrecord_file, batch_size=1, device_num=1, rank_id=0,
                         is_training=True, num_parallel_workers=12):
     """Creatr ctpn dataset with MindDataset."""
     ds = de.MindDataset(mindrecord_file, columns_list=["image", "annotation"], num_shards=device_num, shard_id=rank_id,\
@@ -321,5 +321,4 @@ def create_ctpn_dataset(mindrecord_file, batch_size=1, repeat_num=1, device_num=
     ds = ds.map(operations=[type_cast2], input_columns=["label"])
     ds = ds.map(operations=[type_cast3], input_columns=["valid_num"])
     ds = ds.batch(batch_size, drop_remainder=True)
-    ds = ds.repeat(repeat_num)
     return ds

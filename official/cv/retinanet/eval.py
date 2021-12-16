@@ -158,7 +158,7 @@ def retinanet_eval():
     make_dataset_dir(mindrecord_dir, mindrecord_file, prefix)
 
     batch_size = 1
-    ds = create_retinanet_dataset(mindrecord_file, batch_size=batch_size, repeat_num=1, is_training=False)
+    ds = create_retinanet_dataset(mindrecord_file, batch_size=batch_size, is_training=False)
     backbone = resnet50(config.num_classes)
     net = retinanet50(backbone, config)
     net = retinanetInferWithDecoder(net, Tensor(default_boxes), config)

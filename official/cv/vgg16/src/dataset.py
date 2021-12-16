@@ -26,7 +26,7 @@ from src.utils.sampler import DistributedSampler
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-def vgg_create_dataset(data_home, image_size, batch_size, rank_id=0, rank_size=1, repeat_num=1, training=True):
+def vgg_create_dataset(data_home, image_size, batch_size, rank_id=0, rank_size=1, training=True):
     """Data operations."""
     data_dir = os.path.join(data_home, "cifar-10-batches-bin")
     if not training:
@@ -56,9 +56,6 @@ def vgg_create_dataset(data_home, image_size, batch_size, rank_id=0, rank_size=1
     data_set = data_set.map(operations=type_cast_op, input_columns="label")
     data_set = data_set.map(operations=c_trans, input_columns="image")
 
-    # apply repeat operations
-    data_set = data_set.repeat(repeat_num)
-
     # apply shuffle operations
     data_set = data_set.shuffle(buffer_size=10)
 
@@ -75,7 +72,6 @@ def classification_dataset(data_dir, image_size, per_batch_size, rank=0, group_s
                            num_parallel_workers=None,
                            shuffle=None,
                            sampler=None,
-                           repeat_num=1,
                            class_indexing=None,
                            drop_remainder=True,
                            transform=None,
@@ -163,7 +159,6 @@ def classification_dataset(data_dir, image_size, per_batch_size, rank=0, group_s
     de_dataset = de_dataset.project(columns=columns_to_project)
 
     de_dataset = de_dataset.batch(per_batch_size, drop_remainder=drop_remainder)
-    de_dataset = de_dataset.repeat(repeat_num)
 
     return de_dataset
 

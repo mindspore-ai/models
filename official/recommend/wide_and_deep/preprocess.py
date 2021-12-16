@@ -28,7 +28,7 @@ def generate_bin():
         dataset_type = DataType.MINDRECORD
     else:
         dataset_type = DataType.H5
-    ds = create_dataset(data_path, train_mode=False, epochs=1,
+    ds = create_dataset(data_path, train_mode=False,
                         batch_size=batch_size, data_type=dataset_type)
     feat_ids_path = os.path.join(config.result_path, "00_feat_ids")
     feat_vals_path = os.path.join(config.result_path, "01_feat_vals")

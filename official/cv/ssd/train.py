@@ -95,7 +95,9 @@ def train_net():
 
     rank = 0
     device_num = 1
+    loss_scale = float(config.loss_scale)
     if config.device_target == "CPU":
+        loss_scale = 1.0
         context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
     else:
         context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=config.device_id)
@@ -115,13 +117,9 @@ def train_net():
     if config.only_create_dataset:
         return
 
-    loss_scale = float(config.loss_scale)
-    if config.device_target == "CPU":
-        loss_scale = 1.0
-
     # When create MindDataset, using the fitst mindrecord file, such as ssd.mindrecord0.
     use_multiprocessing = (config.device_target != "CPU")
-    dataset = create_ssd_dataset(mindrecord_file, repeat_num=1, batch_size=config.batch_size,
+    dataset = create_ssd_dataset(mindrecord_file, batch_size=config.batch_size,
                                  device_num=device_num, rank=rank, use_multiprocessing=use_multiprocessing)
 
     dataset_size = dataset.get_dataset_size()
@@ -162,7 +160,7 @@ def train_net():
         eval_net = SsdInferWithDecoder(ssd, Tensor(default_boxes), config)
         eval_net.set_train(False)
         mindrecord_file = create_mindrecord(config.dataset, "ssd_eval.mindrecord", False)
-        eval_dataset = create_ssd_dataset(mindrecord_file, batch_size=config.batch_size, repeat_num=1,
+        eval_dataset = create_ssd_dataset(mindrecord_file, batch_size=config.batch_size,
                                           is_training=False, use_multiprocessing=False)
         if config.dataset == "coco":
             anno_json = os.path.join(config.coco_root, config.instances_set.format(config.val_data_type))

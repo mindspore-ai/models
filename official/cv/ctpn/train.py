@@ -122,12 +122,11 @@ def train():
     # loss_scale = float(config.loss_scale)
 
     # When create MindDataset, using the fitst mindrecord file, such as ctpn_pretrain.mindrecord0.
-    dataset = create_ctpn_dataset(mindrecord_file, repeat_num=1, \
+    dataset = create_ctpn_dataset(mindrecord_file, \
         batch_size=config.batch_size, device_num=device_num, rank_id=rank)
     dataset_size = dataset.get_dataset_size()
     net = CTPN(config=config, batch_size=config.batch_size)
     net = net.set_train()
-
     load_path = config.pre_trained
     if config.task_type == "Pretraining":
         print("load backbone vgg16 ckpt {}".format(config.pre_trained))
@@ -135,7 +134,6 @@ def train():
         for item in list(param_dict.keys()):
             if not item.startswith('vgg16_feature_extractor'):
                 param_dict.pop(item)
-
         if config.device_target == "GPU":
             print("Converting pretrained checkpoint from fp16 to fp32.")
             for key, value in param_dict.items():
@@ -157,7 +155,6 @@ def train():
             mean=True, degree=device_num)
     else:
         net_with_grads = TrainOneStepCell(net_with_loss, opt, sens=config.loss_scale)
-
     time_cb = TimeMonitor(data_size=dataset_size)
     loss_cb = LossCallBack(rank_id=rank)
     cb = [time_cb, loss_cb]
@@ -173,7 +170,7 @@ def train():
         if config.eval_image_path is None or (not os.path.isdir(config.eval_image_path)):
             raise ValueError("{} is not a existing path.".format(config.eval_image_path))
         eval_dataset = create_ctpn_dataset(config.eval_dataset_path, \
-            batch_size=config.batch_size, repeat_num=1, is_training=False)
+            batch_size=config.batch_size, is_training=False)
         eval_net = net
         eval_param_dict = {"eval_network": eval_net, "eval_dataset": eval_dataset, \
             "eval_image_path": config.eval_image_path}
@@ -184,7 +181,6 @@ def train():
         cb += [eval_cb]
     model = Model(net_with_grads)
     model.train(config.total_epoch, dataset, callbacks=cb, dataset_sink_mode=True)
-
 
 if __name__ == '__main__':
     train()

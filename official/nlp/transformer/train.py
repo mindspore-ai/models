@@ -142,8 +142,9 @@ def run_transformer_train():
         device_num = 1
         rank_id = 0
         save_ckpt_path = os.path.join(config.save_checkpoint_path, 'ckpt_0/')
-    dataset = create_transformer_dataset(epoch_count=1, rank_size=device_num,
-                                         rank_id=rank_id, do_shuffle=config.do_shuffle,
+    dataset = create_transformer_dataset(rank_size=device_num,
+                                         rank_id=rank_id,
+                                         do_shuffle=config.do_shuffle,
                                          dataset_path=config.data_path,
                                          bucket_boundaries=config.bucket_boundaries,
                                          device_target=config.device_target)

@@ -94,7 +94,7 @@ def run_classifier_onnx():
     if args_opt.eval_data_file_path == "":
         raise ValueError("'eval_data_file_path' must be set when do onnx evaluation task")
     assessment_method = args_opt.assessment_method.lower()
-    ds = create_classification_dataset(batch_size=args_opt.eval_batch_size, repeat_count=1,
+    ds = create_classification_dataset(batch_size=args_opt.eval_batch_size,
                                        assessment_method=assessment_method,
                                        data_file_path=args_opt.eval_data_file_path,
                                        schema_file_path=args_opt.schema_file_path,

@@ -23,7 +23,7 @@ from mindspore.mindrecord import FileWriter
 from .imdb import ImdbParser
 
 
-def lstm_create_dataset(data_home, batch_size, repeat_num=1, training=True, device_num=1, rank=0):
+def lstm_create_dataset(data_home, batch_size, training=True, device_num=1, rank=0):
     """Data operations."""
     ds.config.set_seed(1)
     data_dir = os.path.join(data_home, "aclImdb_train.mindrecord0")
@@ -36,7 +36,6 @@ def lstm_create_dataset(data_home, batch_size, repeat_num=1, training=True, devi
     # apply map operations on images
     data_set = data_set.shuffle(buffer_size=data_set.get_dataset_size())
     data_set = data_set.batch(batch_size=batch_size, drop_remainder=True)
-    data_set = data_set.repeat(count=repeat_num)
 
     return data_set
 

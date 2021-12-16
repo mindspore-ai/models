@@ -69,14 +69,12 @@ def set_parameters():
     config.logger = get_logger(config.outputs_dir, config.rank)
     return config
 
-
 def get_top5_acc(top5_arg, gt_class):
     sub_count = 0
     for top5, gt in zip(top5_arg, gt_class):
         if gt in top5:
             sub_count += 1
     return sub_count
-
 
 def get_result(model, top1_correct, top5_correct, img_tot):
     """calculate top1 and top5 value."""

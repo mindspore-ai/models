@@ -41,16 +41,13 @@ def eval_lenet():
 
     network = LeNet5(config.num_classes)
     net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
-    # repeat_size = config.epoch_size
-    net_opt = nn.Momentum(network.trainable_params(), config.lr, config.momentum)
-    model = Model(network, net_loss, net_opt, metrics={"Accuracy": Accuracy()})
+    model = Model(network, net_loss, metrics={"Accuracy": Accuracy()})
 
     print("============== Starting Testing ==============")
     param_dict = load_checkpoint(config.ckpt_path)
     load_param_into_net(network, param_dict)
     ds_eval = create_dataset(os.path.join(config.data_path, "test"),
-                             config.batch_size,
-                             1)
+                             config.batch_size,)
     if ds_eval.get_dataset_size() == 0:
         raise ValueError("Please check dataset size > 0 and batch_size <= dataset size")
 

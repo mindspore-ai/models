@@ -63,7 +63,7 @@ if __name__ == "__main__":
     args = parse_args()
     assessment_method = args.assessment_method.lower()
     if args.do_eval.lower() == "true":
-        ds = create_ner_dataset(batch_size=args.eval_batch_size, repeat_count=1,
+        ds = create_ner_dataset(batch_size=args.eval_batch_size,
                                 assessment_method=assessment_method, data_file_path=args.eval_data_file_path,
                                 schema_file_path=args.schema_file_path, dataset_format=args.dataset_format,
                                 do_shuffle=(args.eval_data_shuffle.lower() == "true"), drop_remainder=False)

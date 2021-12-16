@@ -167,7 +167,7 @@ def run_squad():
     netwithloss = BertSquad(bert_net_cfg, True, 2, dropout_prob=0.1)
 
     if args_opt.do_train.lower() == "true":
-        ds = create_squad_dataset(batch_size=args_opt.train_batch_size, repeat_count=1,
+        ds = create_squad_dataset(batch_size=args_opt.train_batch_size,
                                   data_file_path=args_opt.train_data_file_path,
                                   schema_file_path=args_opt.schema_file_path,
                                   do_shuffle=(args_opt.train_data_shuffle.lower() == "true"))
@@ -195,7 +195,7 @@ def run_squad():
             is_training=False,
             output_fn=None,
             vocab_file=args_opt.vocab_file_path)
-        ds = create_squad_dataset(batch_size=args_opt.eval_batch_size, repeat_count=1,
+        ds = create_squad_dataset(batch_size=args_opt.eval_batch_size,
                                   data_file_path=eval_features,
                                   schema_file_path=args_opt.schema_file_path, is_training=False,
                                   do_shuffle=(args_opt.eval_data_shuffle.lower() == "true"))

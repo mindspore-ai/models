@@ -74,7 +74,8 @@ def eval_net():
         if not config.use_label_smooth:
             config.label_smooth_factor = 0.0
         loss = CrossEntropySmooth(sparse=True, reduction='mean',
-                                  smooth_factor=config.label_smooth_factor, num_classes=config.class_num)
+                                  smooth_factor=config.label_smooth_factor,
+                                  num_classes=config.class_num)
     else:
         loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
 

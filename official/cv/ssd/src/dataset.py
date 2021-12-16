@@ -391,7 +391,7 @@ def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="ssd.
     writer.commit()
 
 
-def create_ssd_dataset(mindrecord_file, batch_size=32, repeat_num=10, device_num=1, rank=0,
+def create_ssd_dataset(mindrecord_file, batch_size=32, device_num=1, rank=0,
                        is_training=True, num_parallel_workers=6, use_multiprocessing=True):
     """Create SSD dataset with MindDataset."""
     cores = multiprocessing.cpu_count()
@@ -420,7 +420,6 @@ def create_ssd_dataset(mindrecord_file, batch_size=32, repeat_num=10, device_num
     ds = ds.map(operations=trans, input_columns=["image"], python_multiprocessing=use_multiprocessing,
                 num_parallel_workers=num_parallel_workers)
     ds = ds.batch(batch_size, drop_remainder=True)
-    ds = ds.repeat(repeat_num)
     return ds
 
 

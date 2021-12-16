@@ -114,7 +114,7 @@ def create_bert_dataset(device_num=1, rank=0, do_shuffle="true", data_dir=None, 
     return data_set
 
 
-def create_ner_dataset(batch_size=1, repeat_count=1, assessment_method="accuracy", data_file_path=None,
+def create_ner_dataset(batch_size=1, assessment_method="accuracy", data_file_path=None,
                        dataset_format="mindrecord", schema_file_path=None, do_shuffle=True, drop_remainder=True):
     """create finetune or evaluation dataset"""
     type_cast_op = C.TypeCast(mstype.int32)
@@ -134,13 +134,12 @@ def create_ner_dataset(batch_size=1, repeat_count=1, assessment_method="accuracy
     dataset = dataset.map(operations=type_cast_op, input_columns="segment_ids")
     dataset = dataset.map(operations=type_cast_op, input_columns="input_mask")
     dataset = dataset.map(operations=type_cast_op, input_columns="input_ids")
-    dataset = dataset.repeat(repeat_count)
     # apply batch operations
     dataset = dataset.batch(batch_size, drop_remainder=drop_remainder)
     return dataset
 
 
-def create_classification_dataset(batch_size=1, repeat_count=1, assessment_method="accuracy",
+def create_classification_dataset(batch_size=1, assessment_method="accuracy",
                                   data_file_path=None, schema_file_path=None, do_shuffle=True):
     """create finetune or evaluation dataset"""
     type_cast_op = C.TypeCast(mstype.int32)
@@ -155,7 +154,6 @@ def create_classification_dataset(batch_size=1, repeat_count=1, assessment_metho
     data_set = data_set.map(operations=type_cast_op, input_columns="segment_ids")
     data_set = data_set.map(operations=type_cast_op, input_columns="input_mask")
     data_set = data_set.map(operations=type_cast_op, input_columns="input_ids")
-    data_set = data_set.repeat(repeat_count)
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
     return data_set
@@ -166,7 +164,7 @@ def generator_squad(data_features):
         yield (feature.input_ids, feature.input_mask, feature.segment_ids, feature.unique_id)
 
 
-def create_squad_dataset(batch_size=1, repeat_count=1, data_file_path=None, schema_file_path=None,
+def create_squad_dataset(batch_size=1, data_file_path=None, schema_file_path=None,
                          is_training=True, do_shuffle=True):
     """create finetune or evaluation dataset"""
     type_cast_op = C.TypeCast(mstype.int32)
@@ -184,7 +182,6 @@ def create_squad_dataset(batch_size=1, repeat_count=1, data_file_path=None, sche
     data_set = data_set.map(operations=type_cast_op, input_columns="input_mask")
     data_set = data_set.map(operations=type_cast_op, input_columns="input_ids")
     data_set = data_set.map(operations=type_cast_op, input_columns="unique_ids")
-    data_set = data_set.repeat(repeat_count)
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
     return data_set

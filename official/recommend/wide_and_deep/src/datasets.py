@@ -142,7 +142,7 @@ class H5Dataset():
                     y.astype(dtype=np.float32))
 
 
-def _get_h5_dataset(data_dir, train_mode=True, epochs=1, batch_size=1000):
+def _get_h5_dataset(data_dir, train_mode=True, batch_size=1000):
     """
     get_h5_dataset
     """
@@ -162,7 +162,6 @@ def _get_h5_dataset(data_dir, train_mode=True, epochs=1, batch_size=1000):
             yield train_eval_gen.__next__()
 
     data_set = ds.GeneratorDataset(_iter_h5_data(), ["ids", "weights", "labels"])
-    data_set = data_set.repeat(epochs)
     return data_set
 
 
@@ -198,7 +197,7 @@ def _padding_func(batch_size, manual_shape, target_column, field_size=39):
     return padding_func
 
 
-def _get_tf_dataset(data_dir, train_mode=True, epochs=1, batch_size=1000,
+def _get_tf_dataset(data_dir, train_mode=True, batch_size=1000,
                     line_per_sample=1000, rank_size=None, rank_id=None,
                     manual_shape=None, target_column=40):
     """
@@ -228,11 +227,10 @@ def _get_tf_dataset(data_dir, train_mode=True, epochs=1, batch_size=1000,
     data_set = data_set.map(operations=_padding_func(batch_size, manual_shape, target_column),
                             input_columns=['feat_ids', 'feat_vals', 'label'],
                             column_order=['feat_ids', 'feat_vals', 'label'], num_parallel_workers=8)
-    data_set = data_set.repeat(epochs)
     return data_set
 
 
-def _get_mindrecord_dataset(directory, train_mode=True, epochs=1, batch_size=1000,
+def _get_mindrecord_dataset(directory, train_mode=True, batch_size=1000,
                             line_per_sample=1000, rank_size=None, rank_id=None,
                             manual_shape=None, target_column=40):
     """
@@ -268,7 +266,6 @@ def _get_mindrecord_dataset(directory, train_mode=True, epochs=1, batch_size=100
                             input_columns=['feat_ids', 'feat_vals', 'label'],
                             column_order=['feat_ids', 'feat_vals', 'label'],
                             num_parallel_workers=8)
-    data_set = data_set.repeat(epochs)
     return data_set
 
 
@@ -336,21 +333,21 @@ def compute_manual_shape(config, worker_size):
     config.vocab_size = int(vocab_total)
 
 
-def create_dataset(data_dir, train_mode=True, epochs=1, batch_size=1000,
+def create_dataset(data_dir, train_mode=True, batch_size=1000,
                    data_type=DataType.TFRECORD, line_per_sample=1000,
                    rank_size=None, rank_id=None, manual_shape=None, target_column=40):
     """
     create_dataset
     """
     if data_type == DataType.TFRECORD:
-        return _get_tf_dataset(data_dir, train_mode, epochs, batch_size,
+        return _get_tf_dataset(data_dir, train_mode, batch_size,
                                line_per_sample, rank_size=rank_size, rank_id=rank_id,
                                manual_shape=manual_shape, target_column=target_column)
     if data_type == DataType.MINDRECORD:
-        return _get_mindrecord_dataset(data_dir, train_mode, epochs, batch_size,
+        return _get_mindrecord_dataset(data_dir, train_mode, batch_size,
                                        line_per_sample, rank_size=rank_size, rank_id=rank_id,
                                        manual_shape=manual_shape, target_column=target_column)
 
     if rank_size > 1:
         raise RuntimeError("please use tfrecord dataset.")
-    return _get_h5_dataset(data_dir, train_mode, epochs, batch_size)
+    return _get_h5_dataset(data_dir, train_mode, batch_size)

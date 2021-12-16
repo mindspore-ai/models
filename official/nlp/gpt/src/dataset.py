@@ -44,5 +44,4 @@ def create_dataset(batch_size, data_path, device_num=1, rank=0, drop=True):
     type_cast_op = C.TypeCast(mstype.int32)
     dataset = dataset.map(input_columns="input_ids", operations=type_cast_op)
     dataset = dataset.batch(batch_size, drop_remainder=drop)
-    dataset = dataset.repeat(1)
     return dataset
