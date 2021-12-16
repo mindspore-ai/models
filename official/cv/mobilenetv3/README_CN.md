@@ -17,7 +17,10 @@
         - [用法](#用法-1)
         - [启动](#启动-1)
         - [结果](#结果-1)
-    - [导出MINDIR](#导出mindir)
+    - [推理过程](#推理过程)
+        - [导出MindIR](#导出mindir)
+        - [在Ascend310执行推理](#在ascend310执行推理)
+        - [结果](#结果)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [训练性能](#训练性能)
@@ -68,6 +71,7 @@ MobileNetV3总体网络架构如下：
   ├── scripts
   │   ├──run_train.sh   # 用于训练的shell脚本
   │   ├──run_eval.sh    # 用于评估的shell脚本
+  │   ├──run_infer_310.sh    # 用于Ascend310推理的脚本
   ├── src
   │   ├──config.py      # 参数配置
   │   ├──dataset.py     # 创建数据集
@@ -76,6 +80,8 @@ MobileNetV3总体网络架构如下：
   │   ├──mobilenetV3.py      # MobileNetV3架构
   ├── train.py      # 训练脚本
   ├── eval.py       #  评估脚本
+  ├── preprocess.py      # 310推理数据预处理脚本
+  ├── postprocess.py       #  310推理结果计算脚本
   ├── mindspore_hub_conf.py       #  MindSpore Hub接口
 ```
 
@@ -143,12 +149,38 @@ epoch time:138331.250, per step time:221.330, avg loss:3.917
 result:{'acc':0.71976314102564111} ckpt=/path/to/checkpoint/mobilenet-200_625.ckpt
 ```
 
-## 导出MINDIR
+## 推理过程
 
-修改`src/config.py`文件中的`export_mode`和`export_file`, 运行`export.py`。
+### 导出MindIR
+
+```shell
+python export.py --checkpoint_path [CKPT_PATH] --device_target [DEVICE] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+参数checkpoint_path为必填项，
+`DEVICE` 须在['Ascend', 'CPU', 'GPU']中选择。
+`FILE_FORMAT` 须在设置为"MINDIR"。
+
+### 在Ascend310执行推理
+
+在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
+目前imagenet2012数据集仅支持batch_Size为1的推理。
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` mindir文件路径
+- `DATA_PATH` 推理数据集路径
+- `DEVICE_ID` 可选，默认值为0。
+
+### 结果
+
+推理结果保存在脚本执行的当前路径，你可以在acc.log中看到以下精度计算结果。
 
 ```bash
-python export.py --device_target [PLATFORM] --checkpoint_path [CKPT_PATH]
+Eval: top1_correct=37051, tot=50000, acc=74.10%
 ```
 
 # 模型描述
