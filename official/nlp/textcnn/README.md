@@ -30,7 +30,9 @@ The basic network structure design of TextCNN can refer to the paper "Convolutio
 
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 
-Dataset used: [Movie Review Data](<http://www.cs.cornell.edu/people/pabo/movie-review-data/>)
+Dataset used:
+
+1. [Movie Review Data](<http://www.cs.cornell.edu/people/pabo/movie-review-data/>)
 
 - Dataset size：1.18M，5331 positive and 5331 negative processed sentences / snippets.
     - Train：1.06M, 9596 sentences / snippets
@@ -38,6 +40,12 @@ Dataset used: [Movie Review Data](<http://www.cs.cornell.edu/people/pabo/movie-r
 - Data format：text
     - Please click [here](<http://www.cs.cornell.edu/people/pabo/movie-review-data/rt-polaritydata.tar.gz>) to download the data, and change the files into utf-8. Then put it into the `data` directory.
     - Note：Data will be processed in src/dataset.py
+
+2. [SST2](https://dl.fbaipublicfiles.com/glue/data/SST-2.zip)
+    - Train 3.7M, 67350 sentences / snippets
+    - Test 193K, 1821 sentences / snippets
+
+3. [SUBJ](http://www.cs.cornell.edu/people/pabo/movie-review-data/rotten_imdb.tar.gz)
 
 # [Environment Requirements](#contents)
 
@@ -92,7 +100,7 @@ After installing MindSpore via the official website, you can start training and 
                  --checkpoint_file_path [CKPT_FILE] \
                  --data_path [DATA_PATH] > eval.log 2>&1 &
   OR
-  sh scripts/run_eval.sh [CKPT_FILE] [DATASET] [DATA_PATH]
+  sh scripts/run_eval_gpu.sh [CKPT_FILE] [DATASET] [DATA_PATH]
   ```
 
 If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training and evaluation as follows:
@@ -304,12 +312,12 @@ Before performing inference, the mindir file must be exported by export.py. Inpu
 
 ```shell
 # Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DATASET_NAME] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [NEED_PREPROCESS] [DEVICE_ID]
 ```
 
 `DATASET_NAME` must choose from ['MR', 'SUBJ', 'SST2']
 `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'."
-`DEVICE_ID` is optional, default value is 0.
+`DEVICE_ID` is optional, it can be set by environment variable DEVICE_ID, default value is 0.
 
 ### result
 
@@ -326,22 +334,103 @@ Inference result is saved in current path, you can find result in acc.log file.
 
 ### TextCNN on Movie Review Dataset
 
-| Parameters          | Ascend                                                |
-| ------------------- | ----------------------------------------------------- |
-| Model Version       | TextCNN                                               |
-| Resource            |Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8    |
-| uploaded Date       | 11/10/2020 (month/day/year)                           |
-| MindSpore Version   | 1.0.1                                                 |
-| Dataset             | Movie Review Data                                     |
-| Training Parameters | epoch=4, steps=149, batch_size = 64                   |
-| Optimizer           | Adam                                                  |
-| Loss Function       | Softmax Cross Entropy                                 |
-| outputs             | probability                                           |
-| Loss                | 0.1724                                                |
-| Speed               | 1pc: 12.069 ms/step                                   |
-| Total time          | 1pc: 13s                                              |
+#### Training Performance
+
+| Parameters          | Ascend                                                | GPU
+| ------------------- | ----------------------------------------------------- |----------------------------------------------- |
+| Model Version       | TextCNN                                               | TextCNN
+| Resource            |Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8    | Nvidia V100 SXM2; CPU 1.526GHz; 72cores; Memory 42G; OS Ubuntu16 |
+| uploaded Date       | 11/10/2020 (month/day/year)                           | 12/16/2021 (month/day/year)                    |
+| MindSpore Version   | 1.0.1                                                 | 1.5.0                                          |
+| Dataset             | Movie Review Data                                     | Movie Review Data                              |
+| Training Parameters | epoch=4, steps=149, batch_size=64                     | epoch=4, steps=149, batch_size=64              |
+| Optimizer           | Adam                                                  | Adam                                           |
+| Loss Function       | Softmax Cross Entropy                                 | Softmax Cross Entropy                          |
+| outputs             | probability                                           | probability                                    |
+| Loss                | 0.1724                                                | 0.1072                                         |
+| Speed               | 1pc: 12.069 ms/step                                   | 1pc: 4.226 ms/step                             |
+| Total time          | 1pc: 28.074s                                          | 1pc: 13.274s                                   |
 | Scripts             | [textcnn script](https://gitee.com/xinyunfan/textcnn) |
 
-# [ModelZoo Homepage](#contents)  
+#### Evaluation Performance
+
+| Parameters          | Ascend                                         | GPU                                          |
+| ------------------- | -----------------------------------------------| ---------------------------------------------|
+| Resource            |Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | Nvidia V100 SXM2; CPU 1.526GHz; 72cores; Memory 42G; OS Ubuntu16 |
+| Uploaded Date       | 12/16/2021 (month/day/year)                    | 12/16/2021 (month/day/year)                  |
+| MindSpore Version   | 1.5.0                                          | 1.5.0                                        |
+| Dataset             | Movie Review Data                              | Movie Review Data                            |
+| batch_size          | 64                                             | 64                                           |
+| outputs             | accuracy                                       | accuracy                                     |
+| Accuracy            | 0.7705                                         | 0.7764                                       |
+| Model for inference | 9.9M (.ckpt file)                              | 9.9M (.ckpt file)                            |
+
+### TextCNN on SST2 Dataset
+
+#### Training Performance
+
+| Parameters          | Ascend                                                | GPU
+| ------------------- | ----------------------------------------------------- |----------------------------------------------- |
+| Model Version       | TextCNN                                               | TextCNN
+| Resource            |Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8    | Nvidia V100 SXM2; CPU 1.526GHz; 72cores; Memory 42G; OS Ubuntu16 |
+| uploaded Date       | 12/16/2020 (month/day/year)                           | 12/16/2021 (month/day/year)                    |
+| MindSpore Version   | 1.5.0                                                 | 1.5.0                                          |
+| Dataset             | SST2                                                  | SST2                                           |
+| Training Parameters | epoch=4, steps=149, batch_size=64                     | epoch=4, steps=149, batch_size=64              |
+| Optimizer           | Adam                                                  | Adam                                           |
+| Loss Function       | Softmax Cross Entropy                                 | Softmax Cross Entropy                          |
+| outputs             | probability                                           | probability                                    |
+| Loss                | 0.1665                                                | 0.1582                                         |
+| Speed               | 1pc: 6.398 ms/step                                    | 1pc: 3.945 ms/step                             |
+| Total time          | 1pc: 58.455s                                          | 1pc: 29.257s                                   |
+| Scripts             | [textcnn script](https://gitee.com/xinyunfan/textcnn) |
+
+#### Evaluation Performance
+
+| Parameters          | Ascend                                         | GPU                                          |
+| ------------------- | -----------------------------------------------| ---------------------------------------------|
+| Resource            |Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | Nvidia V100 SXM2; CPU 1.526GHz; 72cores; Memory 42G; OS Ubuntu16 |
+| Uploaded Date       | 12/16/2021 (month/day/year)                    | 12/16/2021 (month/day/year)                  |
+| MindSpore Version   | 1.5.0                                          | 1.5.0                                        |
+| Dataset             | SST2                                           | SST2                                         |
+| batch_size          | 64                                             | 64                                           |
+| outputs             | accuracy                                       | accuracy                                     |
+| Accuracy            | 0.8437                                         | 0.8353                                       |
+| Model for inference | 7.7M (.ckpt file)                              | 7.7M (.ckpt file)                            |
+
+### TextCNN on SUBJ
+
+#### Training Performance
+
+| Parameters          | Ascend                                                | GPU
+| ------------------- | ----------------------------------------------------- |----------------------------------------------- |
+| Model Version       | TextCNN                                               | TextCNN
+| Resource            |Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8    | Nvidia V100 SXM2; CPU 1.526GHz; 72cores; Memory 42G; OS Ubuntu16 |
+| uploaded Date       | 12/16/2020 (month/day/year)                           | 12/16/2021 (month/day/year)                    |
+| MindSpore Version   | 1.5.0                                                 | 1.5.0                                          |
+| Dataset             | SUBJ                                                  | SST2                                           |
+| Training Parameters | epoch=4, steps=149, batch_size=64                     | epoch=4, steps=149, batch_size=64              |
+| Optimizer           | Adam                                                  | Adam                                           |
+| Loss Function       | Softmax Cross Entropy                                 | Softmax Cross Entropy                          |
+| outputs             | probability                                           | probability                                    |
+| Loss                | 0.0350                                                | 0.0930                                         |
+| Speed               | 1pc: 6.565ms/step                                     | 1pc: 4.345 ms/step                             |
+| Total time          | 1pc: 33.817s                                          | 1pc: 13.507s                                   |
+| Scripts             | [textcnn script](https://gitee.com/xinyunfan/textcnn) |
+
+#### Evaluation Performance
+
+| Parameters          | Ascend                                         | GPU                                          |
+| ------------------- | -----------------------------------------------| ---------------------------------------------|
+| Resource            |Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | Nvidia V100 SXM2; CPU 1.526GHz; 72cores; Memory 42G; OS Ubuntu16 |
+| Uploaded Date       | 12/16/2021 (month/day/year)                    | 12/16/2021 (month/day/year)                  |
+| MindSpore Version   | 1.5.0                                          | 1.5.0                                        |
+| Dataset             | SST2                                           | SST2                                         |
+| batch_size          | 64                                             | 64                                           |
+| outputs             | accuracy                                       | accuracy                                     |
+| Accuracy            | 0.9052                                         | 0.8927                                       |
+| Model for inference | 11M (.ckpt file)                               | 11M (.ckpt file)                             |
+
+# [ModelZoo Homepage](#contents)
 
  Please check the official [homepage](https://gitee.com/mindspore/models).  
