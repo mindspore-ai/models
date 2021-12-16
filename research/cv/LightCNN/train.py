@@ -14,24 +14,25 @@
 # ============================================================================
 """"train LightCNN."""
 
-import os
 import argparse
+import ast
+import os
 
-import mindspore.nn as nn
-from mindspore.train import Model
-from mindspore.common import set_seed
-from mindspore import context, Tensor
 import mindspore.common.dtype as mstype
-from mindspore.context import ParallelMode
+import mindspore.nn as nn
+from mindspore import context, Tensor
+from mindspore.common import set_seed
 from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
+from mindspore.context import ParallelMode
 from mindspore.nn.metrics import Accuracy, Top1CategoricalAccuracy, Top5CategoricalAccuracy
+from mindspore.train import Model
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
+from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
-from src.lr_generator import get_lr
-from src.config import lightcnn_cfg as cfg
+from src.config import get_cfg
 from src.dataset import create_dataset
 from src.lightcnn import lightCNN_9Layers
+from src.lr_generator import get_lr
 
 
 def parse_args():
@@ -42,61 +43,68 @@ def parse_args():
     parser.add_argument('--device_id', default=0, type=int)
     parser.add_argument('--ckpt_path', type=str, default="", help='if is test, must provide\
                         path where the trained mat_files file')
-    parser.add_argument('--run_distribute', type=int, default=0, help='0 -- run standalone, 1 -- run distribute')
+    parser.add_argument('--run_distribute', type=ast.literal_eval, default=False, help='Run distribute')
     parser.add_argument('--resume', type=str, default='', help="resume model's checkpoint, please use \
                         checkpoint file name")
-
-    args = parser.parse_args()
-
-    return args
+    parser.add_argument('--dataset_path', type=str, default='', help="the path to the folder with all the data")
+    return parser.parse_args()
 
 
-def main():
-    """Main entrance for training"""
+if __name__ == '__main__':
     args = parse_args()
     set_seed(1)
 
+    cfg = get_cfg(args.dataset_path)
+
     # context parameters
     device_id = int(os.getenv('DEVICE_ID', '0'))
-    device_num = 1
+    device_num = int(os.getenv('DEVICE_NUM', '1'))
     rank_id = 0
 
     # init environment(distribute or not)
     if args.run_distribute:
-        device_num = int(os.getenv('DEVICE_NUM'))
-        rank_id = int(os.getenv("RANK_ID"))
-        context.set_context(mode=context.GRAPH_MODE,
-                            device_target=args.device_target, device_id=device_id)
-        init()
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(device_num=device_num,
-                                          parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
+        if args.device_target == 'Ascend':
+            device_num = int(os.getenv('DEVICE_NUM'))
+            rank_id = int(os.getenv("RANK_ID"))
+            context.set_context(mode=context.GRAPH_MODE,
+                                device_target=args.device_target, device_id=device_id)
+            init()
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(device_num=device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+        else:  # args.device_target == 'GPU'
+            init()
+            device_id = get_rank()
+            device_num = get_group_size()
+            context.set_auto_parallel_context(device_num=device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
     else:
         context.set_context(mode=context.GRAPH_MODE,
                             device_target=args.device_target, device_id=device_id)
-
-    # define save checkpoint flag
-    is_save_checkpoint = True
-    if rank_id != 0:
-        is_save_checkpoint = False
 
     # define dataset
     if args.run_distribute:
-        ds_train = create_dataset(mode='Train',
-                                  data_url=cfg.data_path,
-                                  data_list=cfg.train_list,
-                                  batch_size=cfg.batch_size,
-                                  num_of_workers=8,
-                                  is_distributed=True,
-                                  group_size=get_group_size(),
-                                  rank=get_rank(),
-                                  seed=0
-                                  )
+        ds_train = create_dataset(
+            mode='Train',
+            data_url=cfg.data_path,
+            data_list=cfg.train_list,
+            batch_size=cfg.batch_size,
+            # num_of_workers=8,
+            is_distributed=True,
+            group_size=get_group_size(),
+            rank=get_rank(),
+            seed=0
+        )
     else:
-        ds_train = create_dataset(mode='Train', data_url=cfg.data_path, data_list=cfg.train_list,
-                                  batch_size=cfg.batch_size, num_of_workers=8)
-
+        ds_train = create_dataset(
+            mode='Train',
+            data_url=cfg.data_path,
+            data_list=cfg.train_list,
+            batch_size=cfg.batch_size,
+            # num_of_workers=8
+        )
     # define network
     network = lightCNN_9Layers(cfg.num_classes)
 
@@ -162,15 +170,21 @@ def main():
     time_cb = TimeMonitor(data_size=ds_train.get_dataset_size())
     callbacks.append(time_cb)
     callbacks.append(LossMonitor())
-    if is_save_checkpoint:
-        config_ck = CheckpointConfig(save_checkpoint_steps=cfg.save_checkpoint_steps,
-                                     keep_checkpoint_max=cfg.keep_checkpoint_max)
-        ckpoint_cb = ModelCheckpoint(prefix="checkpoint_lightcnn", directory=args.ckpt_path, config=config_ck)
-        callbacks.append(ckpoint_cb)
+
+    config_ck = CheckpointConfig(
+        save_checkpoint_steps=cfg.save_checkpoint_steps, keep_checkpoint_max=cfg.keep_checkpoint_max
+    )
+    if args.device_target == 'Ascend':
+        if rank_id == 0:
+            ckpoint_cb = ModelCheckpoint(prefix="checkpoint_lightcnn", directory=args.ckpt_path, config=config_ck)
+    else:
+        if device_num == 1:
+            save_ckpt_path = os.path.join('./checkpoint', 'model_' + str(device_id) + '/')
+        else:
+            save_ckpt_path = os.path.join('./checkpoint', 'ckpt_' + str(device_id) + '/')
+        ckpoint_cb = ModelCheckpoint(prefix="lightcnn", directory=save_ckpt_path, config=config_ck)
+
+    callbacks.append(ckpoint_cb)
 
     print("============== Starting Training ==============")
     model.train(cfg['epochs'], ds_train, callbacks=callbacks)
-
-
-if __name__ == '__main__':
-    main()
