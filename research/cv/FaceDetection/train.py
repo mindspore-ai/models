@@ -27,7 +27,7 @@ from mindspore.train.callback import ModelCheckpoint, RunContext
 from mindspore.train.callback import CheckpointConfig
 from mindspore.common import dtype as mstype
 
-from src.logging import get_logger
+from src.log import get_logger
 from src.data_preprocess import create_dataset
 from src.network_define import define_network
 
@@ -99,9 +99,8 @@ def modelarts_pre_process():
     config.ckpt_path = os.path.join(config.output_path, "output")
 
 
-@moxing_wrapper(pre_process=modelarts_pre_process)
-def run_train():
-    '''train'''
+def init_parameters():
+    '''init parameters'''
     config.world_size = get_device_num()
     config.local_rank = get_rank_id()
     if config.run_platform == "CPU":
@@ -116,6 +115,12 @@ def run_train():
     config.outputs_dir = os.path.join(config.ckpt_path, datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
     print('config.outputs_dir', config.outputs_dir)
     config.num_anchors_list = [len(x) for x in config.anchors_mask]
+    config.logger = get_logger(config.outputs_dir, config.local_rank)
+
+
+@moxing_wrapper(pre_process=modelarts_pre_process)
+def run_train():
+    '''train'''
     print('=============yolov3 start trainging==================')
     devid = int(os.getenv('DEVICE_ID', '0')) if config.run_platform != 'CPU' else 0
     context.set_context(mode=context.GRAPH_MODE, device_target=config.run_platform, save_graphs=False, device_id=devid)
@@ -126,7 +131,6 @@ def run_train():
         config.world_size = get_group_size()
         context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, device_num=config.world_size,
                                           gradients_mean=True)
-    config.logger = get_logger(config.outputs_dir, config.local_rank)
 
     # dataloader
     ds = create_dataset(config)

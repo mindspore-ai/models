@@ -31,7 +31,7 @@ from src.FaceAttribute.resnet18 import get_resnet18
 from src.FaceAttribute.loss_factory import get_loss
 from src.dataset_train import data_generator
 from src.lrsche_factory import warmup_step
-from src.logging import get_logger, AverageMeter
+from src.log import get_logger, AverageMeter
 from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper
 from model_utils.device_adapter import get_device_id, get_device_num

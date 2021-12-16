@@ -129,7 +129,7 @@ The entire code structure is as following:
       └─ resnet18_softmax.py                # network backbone with softmax
     ├─ dataset_eval.py                      # dataset loading and preprocessing for evaluating
     ├─ dataset_train.py                     # dataset loading and preprocessing for training
-    ├─ logging.py                           # log function
+    ├─ log.py                               # log function
     ├─ lrsche_factory.py                    # generate learning rate
     ├─ data_to_mindrecord_train.py          # convert dataset to mindrecord for training
     ├─ data_to_mindrecord_train_append.py   # add dataset to an existed mindrecord for training
