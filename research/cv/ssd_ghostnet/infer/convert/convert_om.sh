@@ -19,13 +19,6 @@ input_air_path=$1
 output_om_path=$2
 aipp_cfg=$3
 
-export ASCEND_ATC_PATH=/usr/local/Ascend/atc/bin/atc
-export LD_LIBRARY_PATH=/usr/local/Ascend/atc/lib64:$LD_LIBRARY_PATH
-export PATH=/usr/local/python3.7.5/bin:/usr/local/Ascend/atc/ccec_compiler/bin:/usr/local/Ascend/atc/bin:$PATH
-export PYTHONPATH=/usr/local/Ascend/atc/python/site-packages:/usr/local/Ascend/atc/python/site-packages/auto_tune.egg/auto_tune:/usr/local/Ascend/atc/python/site-packages/schedule_search.egg
-export ASCEND_OPP_PATH=/usr/local/Ascend/opp
-
-export ASCEND_SLOG_PRINT_TO_STDOUT=1
 
 echo "Input AIR file path: ${input_air_path}"
 echo "Output OM file path: ${output_om_path}"
