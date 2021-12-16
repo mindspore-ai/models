@@ -15,13 +15,12 @@
 # ============================================================================
 # an simple tutorial as follows, more parameters can be setting
 
-if [ $# != 3 ]
-then
-    echo "Usage: bash run_standalone_train_ascend.sh [CKPT_DIR] [DATA_PATH] [DEVICE_ID]"
-exit 1
+if [ $# != 2 ]; then
+  echo "Usage: bash run_distribution_gpu.sh [DATASET_PATH] [DEVICE_NUM]"
+  exit 1
 fi
 
-get_real_path(){
+get_real_path() {
   if [ "${1:0:1}" == "/" ]; then
     echo "$1"
   else
@@ -29,9 +28,27 @@ get_real_path(){
   fi
 }
 
-export CKPT_DIR=$(get_real_path $1)
-export DATA_PATH=$(get_real_path $2)
-export DEVICE_ID=$3
+DATASET_PATH=$(get_real_path $1)
 
-python -u ../train.py --ckpt_dir=$CKPT_DIR --data_path=$DATA_PATH \
-                      --device_id=$DEVICE_ID --device_target="Ascend" &> train.log &
+if [ ! -d $DATASET_PATH ]; then
+  echo "error: DATASET_PATH=$DATASET_PATH is not a directory"
+  exit 1
+fi
+
+ulimit -u unlimited
+export DEVICE_NUM=$2
+export RANK_SIZE=$2
+
+rm -rf ./train_parallel
+mkdir ./train_parallel
+cp ../*.py ./train_parallel
+cp *.sh ./train_parallel
+cp -r ../src ./train_parallel
+cd ./train_parallel || exit
+
+if [ $# == 2 ]
+then
+    mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
+           python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU" \
+           --data_path=$DATASET_PATH &> log &
+fi

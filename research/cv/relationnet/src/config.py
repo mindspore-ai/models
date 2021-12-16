@@ -15,6 +15,7 @@
 """
 network config setting, will be used in train.py
 """
+
 from easydict import EasyDict as edict
 
 relationnet_cfg = edict({

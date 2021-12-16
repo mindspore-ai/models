@@ -17,7 +17,7 @@
 
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_distribution_ascend.sh [RANK_TABLE_FILE] [CKPTS_DIR] [DATA_PATH]"
+    echo "Usage: bash run_distribution_ascend.sh [RANK_TABLE_FILE] [CKPTS_DIR] [DATA_PATH]"
 exit 1
 fi
 
@@ -54,10 +54,11 @@ do
     mkdir ./train_parallel$i
     cp -r ../src ./train_parallel$i
     cp ../train.py ./train_parallel$i
+    cp ../argparser.py ./train_parallel$i
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     cd ./train_parallel$i ||exit
     env > env.log
-    python -u train.py --device_id=$i --ckpt_dir=$CKPTS_DIR --data_path=$DATA_PATH &> log &
+    python -u train.py --device_id=$i --ckpt_dir=$CKPTS_DIR --run_distribute=True \
+                       --data_path=$DATA_PATH --device_target="Ascend" &> log &
     cd ..
 done
-

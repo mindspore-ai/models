@@ -13,19 +13,24 @@
 # limitations under the License.
 # ============================================================================
 """net train"""
+
+import datetime
 import os
 import random
+
 import numpy as np
-from mindspore import save_checkpoint
 import mindspore.ops as ops
-from mindspore.ops import operations as P
 from mindspore import Tensor
+from mindspore import save_checkpoint
 from mindspore.common import dtype as mstype
+from mindspore.ops import operations as P
+
 import src.dataset as dt
 from src.config import relationnet_cfg as cfg
 
 scatter = ops.ScatterNd()
 concat0dim = ops.Concat(axis=0)
+
 
 def train(metatrain_character_folders, metatest_character_folders, netloss, net_g, encoder_relation,
           local_train_url, args):
@@ -33,7 +38,11 @@ def train(metatrain_character_folders, metatest_character_folders, netloss, net_
     print("=" * 10 + "Training" + "=" * 10)
     last_accuracy = 0.0
     last_accuracy_episode = 0
+    episodes_1k_running_times = []
+    episode_5k_start_time = datetime.datetime.now()
     for episode in range(cfg.episode):
+        episode_start_time = datetime.datetime.now()
+
         degrees = random.choice([0, 90, 180, 270])
         flip = random.choice([True, False])
         task = dt.OmniglotTask(metatrain_character_folders, cfg.class_num, cfg.sample_num_per_class,
@@ -60,11 +69,24 @@ def train(metatrain_character_folders, metatest_character_folders, netloss, net_
         loss = netloss(train_input, one_hot_labels)
         _ = net_g(train_input, one_hot_labels)
 
+        episode_end_time = datetime.datetime.now()
+        episodes_1k_running_times.append((episode_end_time - episode_start_time).total_seconds())
+
         if (episode + 1) % 1000 == 0:
             print('-' * 5 + 'Episode {}/{}'.format(episode + 1, cfg.episode) + '-' * 5)
-            print('Episode: {} Train, Loss(MSE): {}'.format(episode + 1, loss))
+            print('Episode: {} Train, Loss(MSE): {}, One episode average time: {} msec, 1000 episodes time: {} sec'
+                  .format(
+                      episode + 1,
+                      loss,
+                      np.mean(episodes_1k_running_times) * 1000,
+                      np.sum(episodes_1k_running_times)
+                  ))
+            episodes_1k_running_times = []
 
         if (episode + 1) % 5000 == 0:
+            testing_start_time = datetime.datetime.now()
+            episode_5k_end_time = datetime.datetime.now()
+            print(f"5000 episodes time: {(episode_5k_end_time - episode_5k_start_time).total_seconds()} sec")
             print("=" * 10 + "Testing" + "=" * 10)
             total_rewards = 0
 
@@ -108,3 +130,7 @@ def train(metatrain_character_folders, metatest_character_folders, netloss, net_
                 last_accuracy = test_accuracy
                 last_accuracy_episode = episode + 1
             print("Best_accuracy : %.4f  in Episode : %d" % (last_accuracy, last_accuracy_episode))
+
+            testing_end_time = datetime.datetime.now()
+            print(f"Testing time: {(testing_end_time - testing_start_time).total_seconds()} sec")
+            episode_5k_start_time = datetime.datetime.now()

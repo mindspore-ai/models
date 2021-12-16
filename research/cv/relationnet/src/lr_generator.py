@@ -15,6 +15,8 @@
 """generate lr"""
 
 import numpy as np
+
+
 def _generate_steps_lr(lr_init, lr_max, total_steps, warmup_steps, global_step=0):
     """
     Applies three steps decay to generate learning rate array.
