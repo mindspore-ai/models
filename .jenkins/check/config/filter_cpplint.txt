@@ -19,6 +19,8 @@
 
 "models/official/cv/vit/infer/mxbase/src/VIT.h"  "runtime/references"
 
+"models/research/cv/vehiclenet/infer/mxbase/src/Vehiclenet.h"  "runtime/references"
+
 "models/official/cv/Deepsort/infer/mxbase/src/main.cpp" "runtime/references"
 "models/official/cv/Deepsort/infer/mxbase/src/Deepsort.h" "runtime/references"
 "models/official/cv/densenet/infer/mxbase/Densenet121.h" "runtime/references"
