@@ -52,87 +52,46 @@ KTNET模型包含四层：
 
 - 在训练模型之前，应该对相关知识进行检索和编码。在这个项目中，我们使用了两个 kb: WordNet 和 NELL。WordNet 记录词汇之间的关系，NELL 存储关于实体的信念。下面的过程描述如何为 MRC 样本检索相关的 WordNet 同义词集和 NELL 概念。
 
-  ```bash
-  curl -O https://raw.githubusercontent.com/bishanyang/kblstm/master/embeddings/wn_concept2vec.txt
-  curl -O https://raw.githubusercontent.com/bishanyang/kblstm/master/embeddings/nell_concept2vec.txt
-  mv wn_concept2vec.txt nell_concept2vec.txt data/KB_embeddings
-  ```
+```准备知识库的向量表示
+curl -O https://raw.githubusercontent.com/bishanyang/kblstm/master/embeddings/wn_concept2vec.txt
+curl -O https://raw.githubusercontent.com/bishanyang/kblstm/master/embeddings/nell_concept2vec.txt
+mv wn_concept2vec.txt nell_concept2vec.txt data/KB_embeddings
+```
 
 - retrieve_nell文件准备
   [Retrieve NELL](https://baidu-nlp.bj.bcebos.com/KTNET_preprocess_nell_concepts.tar.gz)
   请将下载的文件解压后放入此存储库的data/retrieve_nell/目录中
-
-  ```bash
-  wget -c https://baidu-nlp.bj.bcebos.com/KTNET_preprocess_nell_concepts.tar.gz -O - | tar -xz
-  ```
-
 - retrieve_wordnet文件准备
   [Retrieve WordNet](https://baidu-nlp.bj.bcebos.com/KTNET_preprocess_wordnet_concepts.tar.gz)
   请将下载的文件解压后放入此存储库的data/retrieve_wordnet/目录中
-
-  ```bash
-  wget -c https://baidu-nlp.bj.bcebos.com/KTNET_preprocess_wordnet_concepts.tar.gz -O - | tar -xz
-  ```
-
 - tokenization_record文件准备
   [Tokenization record](https://baidu-nlp.bj.bcebos.com/KTNET_preprocess_tokenize_result_record.tar.gz)
   请将下载的文件解压后放入此存储库的data/tokenization_record/目录中
-
-  ```bash
-  wget -c https://baidu-nlp.bj.bcebos.com/KTNET_preprocess_tokenize_result_record.tar.gz -O - | tar -xz
-  ```
-
 - tokenization_squad文件准备
   [Tokenization squad](https://baidu-nlp.bj.bcebos.com/KTNET_preprocess_tokenize_result_squad.tar.gz)
   请将下载的文件解压后放入此存储库的data/tokenization_squad/目录中
-
-  ```bash
-  wget -c https://baidu-nlp.bj.bcebos.com/KTNET_preprocess_tokenize_result_squad.tar.gz -O - | tar -xz
-  ```
 
 # 数据集
 
 - ReCoRD:
   ReCoRD（read-understanding with Commonsense Reasoning Dataset）是一个需要常识推理的大规模MRC数据集。JSON格式的官方数据集可以使用下载链接如下
-    - 训练集下载[train](https://drive.google.com/file/d/1PoHmphyH79pETNws8kU2OwuerU7SWLHj/view) - 216 MB, 100000
-    - 测试集下载[dev](https://drive.google.com/file/d/1WNaxBpXEGgPbymTzyN249P4ub-uU5dkO/view) - 24,3 MB, 10000
+    - 训练集下载[train](https://drive.google.com/file/d/1PoHmphyH79pETNws8kU2OwuerU7SWLHj/view)
+    - 测试集下载[dev](https://drive.google.com/file/d/1WNaxBpXEGgPbymTzyN249P4ub-uU5dkO/view)
     请将下载的文件train.json和dev.json放入此存储库的data/ReCoRD/目录中
 
 - SQuAD v1.1:
   SQuAD v1.1是一个著名的提取MRC数据集，由众工为维基百科文章创建的问题组成
-
-  ```bash
-  cd data/SQuAD
-  curl -O https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json
-  curl -O https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json
-  ```
-
-  请将下载的文件train-v1.1.json和dev-v1.1.json放入此存储库的data/SQuAD/目录中
-
-- 准备 BERT checkpoint
-
-  ```bash
-  cd data
-  wget https://bert-models.bj.bcebos.com/cased_L-24_H-1024_A-16.tar.gz --no-check-certificate
-  tar xvf cased_L-24_H-1024_A-16.tar.gz
-  rm -rf cased_L-24_H-1024_A-16.tar.gz
-  ```
+    - 训练集下载[train](https://drive.google.com/file/d/1PoHmphyH79pETNws8kU2OwuerU7SWLHj/view)
+    - 测试集下载[dev](https://drive.google.com/file/d/1WNaxBpXEGgPbymTzyN249P4ub-uU5dkO/view)
+    请将下载的文件train-v1.1.json和dev-v1.1.json放入此存储库的data/SQuAD/目录中
 
 - 运行以下命令将ReCoRD和SQuAD两个数据集转换为mindrecord格式，在
 
-  ```bash
+  ```数据转换格式
   python src/data_convert.py --data_url=./data
   ```
 
   参数data_url表示data数据文件夹的路径，默认为./data。运行成功后自动将两个数据集都转换为mindrecord格式，并分别存储在data/ReCoRD/目录中和data/SQuAD/目录中。
-
-- 将 BERT checkpoint 转换为Mindspore对应的格式(需要mindspore和paddle的环境)
-
-  ```bash
-  python src/bert_ms_format.py --data_url=./data
-  ```
-
-  参数data_url表示data数据文件夹的路径，默认为./data。运行成功后将在data/cased_L-24_H-1024_A-16目录下生成BERT的checkpoint，名称为roberta.ckpt。
 
 数据文件整体目录结构如下所示
 
@@ -190,9 +149,12 @@ KTNET模型包含四层：
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - 其他
     - python >= 3.7
-    - mindspore 1.6.0.20211129
+    - mindspore 1.2
     - paddlepaddle 2.0
     - NLTK >= 3.3 (with WordNet 3.0)
+    - tqdm
+    - CoreNLP (3.8.0 version is recommended)
+    - Pycorenlp
 
 - 更多关于Mindspore的信息，请查看以下资源：
   - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
@@ -206,23 +168,15 @@ KTNET模型包含四层：
 .
 └─KTNET
   ├─README.md
-  ├─README_CN.md
   ├─scripts
     ├─__init__.py
     ├─export.sh                           # 模型输出脚本
-    ├─run_infer_310.sh
     ├─run_record_twomemory.sh             # Ascend设备上单机训练shell脚本（record数据集）
-    ├─run_record_twomemory_gpu.sh
     ├─run_record_twomemory_distribute.sh  # Ascend设备上8机训练shell脚本（record数据集）
-    ├─run_record_twomemory_distribute_gpu.sh
     ├─run_squad_twomemory.sh              # Ascend设备上单机训练shell脚本（squad数据集）
-    ├─run_squad_twomemory_gpu.sh
     ├─run_squad_twomemory_distribute.sh   # Ascend设备上8机训练shell脚本（squad数据集）
-    ├─run_squad_twomemory_distribute_gpu.sh
     ├─run_squad_eval.sh                   # Ascend设备上单机评估shell脚本（record数据集）
-    ├─run_squad_eval_gpu.sh
     ├─run_record_eval.sh                  # Ascend设备上单机评估shell脚本（squad数据集）
-    ├─run_record_eval_gpu.sh
     ├─export.sh
   ├─src
     ├─reader                              # 数据预处理
@@ -245,28 +199,34 @@ KTNET模型包含四层：
     ├─__init__.py
     ├─args.py
     ├─util.py
-  ├─ascend310_infer
-    ├─inc
-      ├─utils.h
-    ├─src
-      ├─main.cc
-      ├─utils.cc
-    ├─build.sh
-    ├─CMakeLists.txt
   ├─run_KTNET_squad.py                    # 训练网络（squad数据集）
   ├─run_KTNET_squad_eval.py               # 评估网络（squad数据集）
   ├─run_KTNET_record.py                   # 训练网络（record数据集）
   ├─run_KTNET_record_eval.py              # 评估网络（record数据集）
   ├─export.py
-  ├─postprocess.py
-  ├─preprocess.py
 ```
 
 ## 脚本参数
 
 ### 训练
 
-- 模型训练SQuAD
+- 准备 BERT checkpoint
+
+  ```bash
+  cd data
+  wget https://bert-models.bj.bcebos.com/cased_L-24_H-1024_A-16.tar.gz --no-check-certificate
+  tar xvf cased_L-24_H-1024_A-16.tar.gz
+  ```
+
+- 将 BERT checkpoint 转换为Mindspore对应的格式(需要mindspore和paddle的环境)
+
+  ```bash
+  python src/bert_ms_format.py --data_url=./data
+  ```
+
+  参数data_url表示data数据文件夹的路径，默认为./data。运行成功后将在data/cased_L-24_H-1024_A-16目录下生成BERT的checkpoint，名称为roberta.ckpt。
+
+- 模型训练
 
   ``` bash
   python scripts/run_KTNET_squad.py  [--device_target DEVICE_TARGET] [--device_id N] [batch_size N] [--do_train True] [--do_predict False] [--do_lower_case False] [--init_pretraining_params INIT_PRETRAINING_PARAMS] [--load_pretrain_checkpoint_path LOAD_PRETRAIN_CHECKPOINT_PATH] [--load_checkpoint_path LOAD_CHECKPOINT_PATH] [--train_file TRAIN_FILE] [--predict_file PREDICT_FILE] [--train_mindrecord_file TRAIN_MINDRECORD_FILE] [--predict_mindrecord_file PREDICT_MINDRECORD_FILE] [-vocab_path VOCAB_PATH] [--bert_config_path BERT_CONFIG_PATH] [ --freeze False] [--save_steps N] [--weight_decay F] [-warmup_proportion F] [--learning_rate F] [--epoch N] [--max_seq_len N] [--doc_stride N] [--wn_concept_embedding_path WN_CONCEPT_EMBEDDING_PATH] [--nell_concept_embedding_path NELL_CONCEPT_EMBEDDING_PATH] [--use_wordnet USE_WORDNET] [--use_nell True] [--random_seed N]  [--is_modelarts True] [--checkpoints CHECKPOINT]  
@@ -400,46 +360,6 @@ DATAPATH为必选项，为数据文件存放的路径。
 python run_KTNET_record.py
 ```
 
-#### GPU处理器上运行squad数据集
-
-```bash
-# 单机
-bash scripts/run_squad_twomemory_gpu.sh [DATAPATH]
-# 分布式训练 8卡
-bash scripts/run_squad_twomemory_distribute_gpu.sh [DATAPATH] [DEVICE_NUM]
-```
-
-DATAPATH为必选项，为数据文件存放的路径。
-
-output/train_squad.log中查看训练日志。训练结束后，您可以在默认脚本路径下脚本文件夹中找到检查点文件，得到如下损失值：
-
-```text
-# train_squad.log
-epoch: 1 step: 1, loss is 5.964628
-epoch: 1 step: 1, loss is 6.228141
-...
-```
-
-#### GPU处理器上运行record数据集
-
-```bash
-# 单机
-bash scripts/run_record_twomemory_gpu.sh [DATAPATH]
-# 分布式训练 8卡
-bash scripts/run_record_twomemory_distribute_gpu.sh [DATAPATH] [DEVICE_NUM]
-```
-
-DATAPATH为必选项，为数据文件存放的路径。
-
-output/train_squad.log中查看训练日志。训练结束后，您可以在默认脚本路径下脚本文件夹中找到检查点文件，得到如下损失值：
-
-```text
-# train_record.log
-epoch: 1 step: 2, loss is 6.11811
-epoch: 1 step: 2, loss is 5.9109883
-...
-```
-
 ## 评估过程
 
 ### 用法
@@ -486,36 +406,6 @@ DATAPATH为必选项，为数据文件存放的路径。CHECKPOINT_PATH为必选
 python run_KTNET_record_eval.py
 ```
 
-#### GPU处理器上运行后评估squad数据集
-
-```bash
-bash scripts/run_squad_eval_gpu.sh [DATAPATH] [CHECKPOINT_PATH]
-```
-
-DATAPATH为必选项，为数据文件存放的路径。CHECKPOINT_PATH为必选项，为ckpt文件存放的路径。
-
-以上命令后台运行，您可以在eval_squad.log中查看训练日志。
-
-```text
-"exact_match": 84.24,
-"f1": 91.06
-```
-
-#### GPU处理器上运行后评估record数据集
-
-```bash
-bash scripts/run_record_eval_gpu.sh [DATAPATH] [CHECKPOINT_PATH]
-```
-
-DATAPATH为必选项，为数据文件存放的路径。CHECKPOINT_PATH为必选项，为ckpt文件存放的路径。
-
-以上命令后台运行，您可以在eval_squad.log中查看训练日志。
-
-```text
-"exact_match": 68.95,
-"f1": 70.86
-```
-
 ## 推理过程
 
 ### 用法
@@ -548,57 +438,32 @@ NEED_PREPROCESS为必选项, 在[y|n]中取值，表示数据是否预处理为b
 
 ### 训练性能
 
-- ReCoRD
-
-| 参数         | Ascend                                                     | GPU (1pcs)                  | GPU (8pcs)                  |
-| ------------| ---------------------------------------------------------- | ---------------------------- | --------------------------- |
-| 模型         | KTNET                                                      | KTNET                       | KTNET                       |
-| 资源         | Ascend 910；CPU 2.60GHz，192核；内存 755GB；系统 Euler2.8     | GPU(Tesla V100-PCIE 32G)；CPU：2.60GHz 52cores ；RAM：754G; Mindspore 1.6.0.20211129 | GPU(Tesla V100-PCIE 32G)；CPU：2.60GHz 52cores ；RAM：754G; Mindspore 1.6.0.20211129 |
-| 上传日期     | 2021-05-12                                                 | 2021-10-29                  | 2021-10-29                   |
-| 数据集       | ReCoRD                                                     | ReCoRD                      | ReCoRD                      |
-| 训练参数     | 轮次=4, batch_size=12*8, 学习率=7e-5                         | 轮次=4, batch_size=12, 学习率=6e-5   | 轮次=4, batch_size=12*8, 学习率=6e-5   |
-| 优化器       | Adam                                                       | Adam                        | Adam                         |
-| 损失函数     | SoftmaxCrossEntropy                                        | SoftmaxCrossEntropy         | SoftmaxCrossEntropy          |
-| 损失         | 0.31248128                                                 | 0.2                         | 0.11                        |
-| 速度         | 428毫秒/步                                                 | 668.1毫秒/步                  | 960毫秒/步                    |
-| 总时长       | 2.5小时                                                    | 6小时14分钟                   | 1小时7分钟                    |
-
-- SQuAD
-
-| 参数         | Ascend                                                 | GPU (1pcs)            | GPU (8pcs)            |
-| ------------| ------------------------------------------------------ | --------------------- | --------------------- |
-| 模型         | KTNET                                                  | KTNET | KTNET |
-| 资源         | Ascend 910；CPU 2.60GHz，192核；内存 755GB；系统 Euler2.8 | GPU(Tesla V100-PCIE 32G)；CPU：2.60GHz 52cores ；RAM：754G; Mindspore 1.6.0.20211129 | GPU(Tesla V100-PCIE 32G)；CPU：2.60GHz 52cores ；RAM：754G; Mindspore 1.6.0.20211129 |
-| 上传日期     | 2021-05-12                                              | 2021-10-29 | 2021-10-29 |
-| 数据集       | SQuAD                                                   | SQuAD | SQuAD |
-| 训练参数     | 轮次=3, batch_size=8*8, 学习率=4e-5                       | 轮次=3, batch_size=8, 学习率=4e-5 | 轮次=3, batch_size=8*8, 学习率=4e-5 |
-| 优化器       | Adam                                                    | Adam | Adam |
-| 损失函数     | SSoftmaxCrossEntropy                                    | SoftmaxCrossEntropy | SoftmaxCrossEntropy |
-| 损失         | 0.35267675                                             | 0.3                 | 0.336353            |
-| 速度         | 338毫秒/步                                              | 474.5毫秒/步         | 760毫秒/步         |
-| 总时长       | 1小时                                                    | 4小时20分钟         | 52分钟               |
-
-### 评估性能
-
-| 参数           | Ascend         |  GPU          | Ascend        | GPU          |
-| --------------| ---------------| ------------- | --------------| ------------ |
-| 模型           | KTNET          | KTNET         | KTNET         | KTNET        |
-| 数据集         | ReCoRD         | ReCoRD        | SQuAd         | SQuAd        |
-| 上传日期       | 2021-05-12     | 2021-10-29    | 2021-05-12    | 2021-10-29   |
-| F1            | 70.62          | 70.58         | 71.62         | 91.42        |
-| exact_match   | 69.00          | 68.63         | 71.00         | 84.67        |
-| 总时长         | 15分钟          | 15分钟        | 15分钟         | 15分钟        |
+| 参数         | Ascend                                                     |Ascend                                                     |
+| -------------| ---------------------------------------------------------- |---------------------------------------------------------- |
+| 模型         | KTNET                                                      | KTNET                                                     |
+| 资源         | Ascend 910；CPU 2.60GHz，192核；内存 755GB；系统 Euler2.8  | Ascend 910；CPU 2.60GHz，192核；内存 755GB；系统 Euler2.8 |
+| 上传日期     | 2021-05-12                                                 | 2021-05-12                                                |
+| 数据集       | ReCoRD                                                     | SQuAD                                                     |
+| 训练参数     | src/config.py                                              | src/config.py                                             |
+| 学习率       | 7e-5                                                       | 4e-5                                                      |
+| 优化器       | Adam                                                       | Adam                                                      |
+| 损失函数     | SoftmaxCrossEntropy                                        | SoftmaxCrossEntropy                                       |
+| 轮次         |   4                                                        |   3                                                       |
+| Batch_size   | 12*8                                                       | 8*8                                                       |
+| 损失         | 0.31248128                                                 | 0.35267675                                                |
+| 速度         | 428毫秒/步                                                 | 338毫秒/步                                                |
+| 总时长       | 2.5小时                                                    | 1小时                                                     |
 
 ### 推理性能
 
 | 参数            | Ascend         | Ascend        |
-| ---------------| ---------------| --------------|
+| ----------------| ---------------| --------------|
 | 模型            | KTNET          | KTNET         |
 | 数据集          | ReCoRD         | ReCoRD        |
 | 上传日期        | 2021-05-12     | 2021-05-12    |
 | 数据集          | ReCoRD         | ReCoRD        |
-| f1             | 71.48          | 91.31         |
-| exact_match    | 69.61          | 84.38         |
+| f1              | 71.48          | 91.31         |
+| exact_match     | 69.61          | 84.38         |
 | 总时长          | 15分钟         | 15分钟        |
 
 # ModelZoo主页

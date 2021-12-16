@@ -19,13 +19,15 @@ import collections
 import os
 import logging
 import ast
+import numpy as np
 
 from src.KTNET import KTNET
+from src.KTNET_eval import KTNET_eval
 from src.dataset import create_train_dataset
 from utils.util import CustomWarmUpLR
 from utils.args import ArgumentGroup
 
-from mindspore import context
+from mindspore import context, Tensor, export
 from mindspore.train.model import Model
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor, LossMonitor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -34,6 +36,7 @@ from mindspore.nn.wrap import TrainOneStepWithLossScaleCell
 from mindspore.nn.wrap.loss_scale import DynamicLossScaleUpdateCell
 from mindspore.communication.management import init
 from mindspore.context import ParallelMode
+import mindspore.common.dtype as mstype
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
@@ -65,6 +68,7 @@ RawResult = collections.namedtuple("RawResult",
                                    ["unique_id", "start_logits", "end_logits"])
 
 device_id = int(os.getenv('DEVICE_ID', "0"))
+device_num = int(os.getenv('RANK_SIZE', "0"))
 
 
 def parse_args():
@@ -144,7 +148,6 @@ def parse_args():
                            'path of retrieved concepts for devset')
 
     parser.add_argument('--device_target', type=str, default='Ascend', help='')
-    parser.add_argument('--is_distribute', type=ast.literal_eval, default=False, help='')
     parser.add_argument('--device_num', type=int, default=1, help='')
     parser.add_argument('--device_id', type=int, default=0, help='')
     parser.add_argument('--load_pretrain_checkpoint_path', type=str, default="data/cased_L-24_H-1024_A-16/roberta.ckpt",
@@ -158,6 +161,13 @@ def parse_args():
     parser.add_argument('--is_modelarts', type=str, default="true", help='')
     parser.add_argument('--save_url', type=str, default="/cache/", help='')
     parser.add_argument('--log_url', type=str, default="/tmp/log/", help='')
+
+    parser.add_argument("--train_wn_max_concept_length", type=int, default=49, help="wn_concept_length")
+    parser.add_argument("--train_nell_max_concept_length", type=int, default=27,
+                        help="nell_concept_length")
+    parser.add_argument("--file_name", type=str, default="/cache/output/air/KTNET_squad.air",
+                        help="KTNET output air name.")
+    parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="AIR", help="file format")
 
     args = parser.parse_args()
     return args
@@ -204,7 +214,42 @@ def do_train(dataset=None, network=None, load_checkpoint_path="", save_checkpoin
 
         if device_id == 0:
             mox.file.copy_parallel(args.save_url, args.train_url)
-            mox.file.copy_parallel(args.log_url, args.train_url + "/tmp")
+            # mox.file.copy_parallel(args.log_url, args.train_url + "/tmp")
+
+def do_export():
+    """export KTNET model"""
+    args = parse_args()
+    net = KTNET_eval(bert_config=bert_config,
+                     max_wn_concept_length=49,
+                     max_nell_concept_length=27,
+                     wn_vocab_size=40944,
+                     wn_embedding_size=112,
+                     nell_vocab_size=288,
+                     nell_embedding_size=112,
+                     bert_size=1024,
+                     is_training=True,
+                     freeze=False)
+
+    load_checkpoint("/cache/output/finetune_checkpoint/KTNET_squad-1_11010.ckpt", net=net)
+    net.set_train(False)
+
+    input_mask = Tensor(np.zeros([1, args.max_seq_len]), mstype.float32)
+    src_ids = Tensor(np.zeros([1, args.max_seq_len]), mstype.int64)
+    pos_ids = Tensor(np.zeros([1, args.max_seq_len]), mstype.int64)
+    sent_ids = Tensor(np.zeros([1, args.max_seq_len]), mstype.int64)
+    wn_concept_ids = Tensor(np.zeros([1, args.max_seq_len, args.train_wn_max_concept_length, 1]),
+                            mstype.int64)
+    nell_concept_ids = Tensor(np.zeros([1, args.max_seq_len, args.train_nell_max_concept_length, 1]),
+                              mstype.int64)
+    unique_id = Tensor(np.zeros([1, 1]), mstype.int64)
+
+    input_data = [input_mask, src_ids, pos_ids, sent_ids, wn_concept_ids, nell_concept_ids,
+                  unique_id]
+    export(net, *input_data, file_name=args.file_name, file_format=args.file_format)
+
+    if args.is_modelarts.lower() == "true":
+        import moxing as mox
+        mox.file.copy_parallel(args.save_url, args.train_url)
 
 
 def run_KTNET():
@@ -223,12 +268,6 @@ def run_KTNET():
     target = args.device_target
     if target == "Ascend":
         context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=device_id)
-        if args.is_distribute:
-            context.set_auto_parallel_context(device_num=args.device_num,
-                                              parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
-            init()
-
     else:
         raise Exception("Target error, GPU or Ascend is supported.")
 
@@ -238,10 +277,10 @@ def run_KTNET():
 
     if args.is_modelarts.lower() == "true":
         init()
-        os.chdir('/home/work/user-job-dir/ktnet/')
+        os.chdir('/home/ma-user/modelarts/user-job-dir/ktnet/')
 
     if args.is_modelarts.lower() == "true":
-        context.set_auto_parallel_context(device_num=args.device_num,
+        context.set_auto_parallel_context(device_num=device_num,
                                           parallel_mode=ParallelMode.DATA_PARALLEL,
                                           gradients_mean=True)
 
@@ -252,13 +291,13 @@ def run_KTNET():
         ds = create_train_dataset(batch_size=args.batch_size,
                                   data_file=fp + args.train_mindrecord_file,
                                   do_shuffle=True,
-                                  device_num=args.device_num, rank=device_id,
+                                  device_num=device_num, rank=device_id,
                                   num_parallel_workers=8)
     else:
         ds = create_train_dataset(batch_size=args.batch_size,
                                   data_file=args.train_mindrecord_file,
                                   do_shuffle=True,
-                                  device_num=args.device_num, rank=device_id,
+                                  device_num=args.device_num, rank=args.device_id,
                                   num_parallel_workers=8)
 
     if args.do_train:
@@ -279,6 +318,7 @@ def run_KTNET():
         print("batch_size: {}".format(args.batch_size))
 
         do_train(ds, netwithloss, args.load_pretrain_checkpoint_path, args.save_finetune_checkpoint_path, epoch_num)
+        do_export()
 
 
 if __name__ == "__main__":

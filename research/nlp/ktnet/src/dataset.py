@@ -39,7 +39,7 @@ def create_train_dataset(data_file=None, do_shuffle=True, device_num=1, rank=0, 
     dataset = dataset.map(operations=type_int32, input_columns="start_positions")
     dataset = dataset.map(operations=type_int32, input_columns="end_positions")
 
-    dataset = dataset.batch(batch_size, True)
+    dataset = dataset.batch(batch_size, True, 8)
 
     return dataset
 

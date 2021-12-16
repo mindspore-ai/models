@@ -22,8 +22,8 @@ import ast
 
 from src.KTNET import KTNET
 from src.dataset import create_train_dataset
-from utils.util import CustomWarmUpLR
 from utils.args import ArgumentGroup
+from utils.util import CustomWarmUpLR
 
 from mindspore import context
 from mindspore.train.model import Model
@@ -32,9 +32,8 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.nn.optim import Adam
 from mindspore.nn.wrap import TrainOneStepWithLossScaleCell
 from mindspore.nn.wrap.loss_scale import DynamicLossScaleUpdateCell
-from mindspore.communication.management import init, get_rank, get_group_size
+from mindspore.communication.management import init
 from mindspore.context import ParallelMode
-from mindspore.common import set_seed
 
 logging.basicConfig(format='%(asctime)s - %(levelname)s - %(name)s - %(message)s',
                     datefmt='%m/%d/%Y %H:%M:%S',
@@ -162,13 +161,13 @@ def parse_args():
     return args
 
 
-def do_train(args, dataset=None, network=None, load_checkpoint_path="", save_checkpoint_path="", epoch_num=1):
+def do_train(dataset=None, network=None, load_checkpoint_path="", save_checkpoint_path="", epoch_num=1):
     """train KTNET model"""
     if load_checkpoint_path == "":
         raise ValueError("Pretrain model missed, finetune task must load pretrain model!")
 
+    args = parse_args()
     step_per_epoch = dataset.get_dataset_size()
-    print("Total steps per epoch: {}".format(step_per_epoch))
 
     # optimizer
     max_train_steps = epoch_num * dataset.get_dataset_size()
@@ -177,16 +176,11 @@ def do_train(args, dataset=None, network=None, load_checkpoint_path="", save_che
                                  max_train_steps=max_train_steps)
     optimizer = Adam(network.trainable_params(), learning_rate=lr_schedule, eps=1e-6)
 
-    # save checkpoint
-    if args.device_target == "GPU" and args.is_distribute:
-        save_checkpoint_path = os.path.join(save_checkpoint_path, "ckpt_" + str(device_id) + "/")
-
+    # load checkpoint into network
     ckpt_config = CheckpointConfig(save_checkpoint_steps=step_per_epoch, keep_checkpoint_max=10)
     ckpoint_cb = ModelCheckpoint(prefix="KTNET_record",
                                  directory=None if save_checkpoint_path == "" else save_checkpoint_path,
                                  config=ckpt_config)
-
-    # load checkpoint into network
     param_dict = load_checkpoint(load_checkpoint_path)
     load_param_into_net(network, param_dict)
 
@@ -212,60 +206,52 @@ def do_train(args, dataset=None, network=None, load_checkpoint_path="", save_che
             mox.file.copy_parallel(args.log_url, args.train_url + "/tmp")
 
 
-def run_ktnet(args):
+def run_KTNET():
     """run ktnet task"""
-    set_seed(args.random_seed)
+    args = parse_args()
     epoch_num = args.epoch
     global device_id
-
     if args.is_modelarts.lower() == "false":
         device_id = args.device_id
+    fp = args.save_url + 'data_' + str(device_id) + '/'
 
     if not (args.do_train or args.do_predict or args.do_val):
-        raise ValueError("For args `do_train` and `do_predict`, at least one of them must be True.")
+        raise ValueError("For args `do_train` and `do_predict`, at "
+                         "least one of them must be True.")
 
     target = args.device_target
-    context.set_context(mode=context.GRAPH_MODE, device_target=target)
     if target == "Ascend":
-        device_id = int(os.getenv('DEVICE_ID'))
-        context.set_context(device_id=device_id)
+        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=device_id)
         if args.is_distribute:
             context.set_auto_parallel_context(device_num=args.device_num,
                                               parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
             init()
-    elif target == "GPU":
-        if args.is_distribute:
-            init()
-            device_id = get_rank()
-            device_num = get_group_size()
-            context.set_auto_parallel_context(device_num=device_num,
-                                              parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
     else:
         raise Exception("Target error, GPU or Ascend is supported.")
+
+    save_dir = args.save_url + "model/"
+    if not os.path.isdir(save_dir):
+        os.makedirs(save_dir)
 
     if args.is_modelarts.lower() == "true":
         init()
         os.chdir('/home/work/user-job-dir/ktnet/')
 
-        save_dir = args.save_url + "model/"
-        if not os.path.isdir(save_dir):
-            os.makedirs(save_dir)
-
+    if args.is_modelarts.lower() == "true":
         context.set_auto_parallel_context(device_num=args.device_num,
                                           parallel_mode=ParallelMode.DATA_PARALLEL,
                                           gradients_mean=True)
 
+    if args.is_modelarts.lower() == "true":
         import moxing as mox
-        fp = args.save_url + 'data_' + str(device_id) + '/'
+
         mox.file.copy_parallel(args.data_url + "/", fp)
         ds = create_train_dataset(batch_size=args.batch_size,
                                   data_file=fp + args.train_mindrecord_file,
                                   do_shuffle=True,
                                   device_num=args.device_num, rank=device_id,
                                   num_parallel_workers=8)
-
     else:
         ds = create_train_dataset(batch_size=args.batch_size,
                                   data_file=args.train_mindrecord_file,
@@ -290,9 +276,8 @@ def run_ktnet(args):
         print("model_name: KTNET")
         print("batch_size: {}".format(args.batch_size))
 
-        do_train(args, ds, netwithloss, args.load_pretrain_checkpoint_path,
-                 args.save_finetune_checkpoint_path, epoch_num)
+        do_train(ds, netwithloss, args.load_pretrain_checkpoint_path, args.save_finetune_checkpoint_path, epoch_num)
 
 
 if __name__ == "__main__":
-    run_ktnet(parse_args())
+    run_KTNET()
