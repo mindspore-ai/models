@@ -242,13 +242,37 @@ Parameters for both training and evaluation can be set in config.py
   python eval.py
   ```
 
-  The results will be shown after running the above python command:
+  The results will be shown after running the above python command.
+
+## [Inference Process](#contents)
+
+### Export MindIR
+
+```shell
+python export.py --checkpoint_path [CKPT_PATH]
+```
+
+You will get the model of the format `.mindir`.
+
+### Infer on Ascend310
+
+Before performing inference, the mindir file must be exported by `export.py` script. *Please note that we do the inference using fixed image shape  `(1024 x 1024)`, so the performance is lower than that of FaceBoxes on Ascend 910.*
+
+```shell
+# Ascend310 inference
+cd scripts/
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+```
+
+### result
+
+Inference result is saved in current path, you can find result like this in acc.log file.
 
   ```text
-  # cat eval.log
-  Easy   Val AP : 0.8510
-  Medium Val AP : 0.7692
-  Hard   Val AP : 0.4032
+  # cat acc.log
+  Easy   Val AP : 0.7996
+  Medium Val AP : 0.7187
+  Hard   Val AP : 0.4013
   ```
 
 # [Model Description](#contents)
@@ -268,12 +292,26 @@ Parameters for both training and evaluation can be set in config.py
 | Optimizer                  | SGD                                                          |
 | Loss Function              | MultiBoxLoss + Softmax Cross Entropy                         |
 | outputs                    | bounding box + confidence                                    |
+| Accuracy            | Easy：0.8510；Medium：0.7692；Hard：0.4032            |
 | Loss                       | 2.780                                                        |
 | Speed                      | 4pcs: 92 ms/step                                             |
 | Total time                 | 4pcs: 7.6 hours                                              |
 | Parameters (M)             | 3.84M                                                        |
 | Checkpoint for Fine tuning | 13M (.ckpt file)                                             |
 | Scripts                    | [faceboxes script](https://gitee.com/mindspore/models/tree/master/research/cv/faceboxes) |
+
+### Inference Performance
+
+| Parameters          | Ascend                      |
+| ------------------- | --------------------------- |
+| Model Version       | FaceBoxes                   |
+| Resource            | Ascend 310               |
+| Uploaded Date       | 12/03/2021 (month/day/year) |
+| Dataset             | WiderFace                   |
+| batch_size          | 1                           |
+| outputs             | bounding box + confidence                    |
+| Accuracy            | Easy：0.7996；Medium：0.7187；Hard：0.4013            |
+| Model for inference | 4.1M(.mindir file)           |
 
 # [Description of Random Situation](#contents)
 
