@@ -26,6 +26,7 @@
         - [训练性能](#训练性能)
         - [评估性能](#评估性能)
 - [随机情况说明](#随机情况说明)
+- [版本更新说明](#版本更新说明)
 - [ModelZoo主页](#modelzoo主页)
 
 <!-- /TOC -->
@@ -464,6 +465,10 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TAR
 
 - 轮换数据集。
 - 初始化部分模型权重。
+
+# 版本更新说明
+
+由于MindSpore1.5版本后（>1.5）LSTM多后端统一，旧版Checkpoint无法直接加载使用。
 
 # ModelZoo主页
 

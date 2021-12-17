@@ -25,6 +25,7 @@
         - [Training Performance](#training-performance)
         - [Evaluation Performance](#evaluation-performance)
 - [Description of Random Situation](#description-of-random-situation)
+- [Description of MindSpore Version](#description-of-mindspore-version)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 # [LSTM Description](#contents)
@@ -463,6 +464,11 @@ There are three random situations:
 
 - Shuffle of the dataset.
 - Initialization of some model weights.
+
+# [Description of MindSpore Version](#contents)
+
+Due to the upgrade of MindSpore(>1.5), the checkpoint file trained from old version cannot load to
+network directly.
 
 # [ModelZoo Homepage](#contents)
 
