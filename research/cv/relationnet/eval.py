@@ -13,53 +13,39 @@
 # limitations under the License.
 # ============================================================================
 """eval"""
-import argparse
+
 import os
 import random
+
 import numpy as np
+import scipy.special as sc
+import scipy.stats
 from mindspore import context
-from mindspore.ops import operations as ops
 from mindspore import load_checkpoint, load_param_into_net
+from mindspore.common import dtype as mstype
 from mindspore.communication.management import init
 from mindspore.context import ParallelMode
-from mindspore.common import dtype as mstype
+from mindspore.ops import operations as ops
+
 import src.dataset as dt
 from src.config import relationnet_cfg as cfg
 from src.relationnet import Encoder_Relation, weight_init
-import scipy.stats
-import scipy.special as sc
-
-
-parser = argparse.ArgumentParser(description="One Shot Visual Recognition")
-parser.add_argument("-u", "--hidden_unit", type=int, default=10)
-parser.add_argument("-dt", "--device_target", type=str, default='Ascend', choices=("Ascend"),
-                    help="Device target, support Ascend.")
-parser.add_argument("-di", "--device_id", type=int, default=0)
-parser.add_argument("--ckpt_dir", default='./ckpt/', help='the path of output')
-parser.add_argument("--data_path", default='/data/omniglot_resized/',
-                    help="Path where the dataset is saved")
-parser.add_argument("--data_url", default=None)
-parser.add_argument("--train_url", default=None)
-parser.add_argument("--cloud", default=None, help='if run on cloud')
-args = parser.parse_args()
-
-
-context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
-
+from argparser import arg_parser
 
 # init operators
 concat0dim = ops.Concat(axis=0)
 
 
 def mean_confidence_interval(data, confidence=0.95):
-    a = 1.0*np.array(data)
+    a = 1.0 * np.array(data)
     n = len(a)
     m, se = np.mean(a), scipy.stats.sem(a)
-    h = se * sc.stdtrit(n-1, (1+confidence)/2.)
+    h = se * sc.stdtrit(n - 1, (1 + confidence) / 2.)
     return m, h
 
 
-def main():
+def main(args):
+    device_id = int(os.getenv("DEVICE_ID", args.device_id))
     local_data_url = args.data_path
     local_train_url = args.ckpt_dir
     # if run on the cloud
@@ -88,20 +74,20 @@ def main():
         mox.file.copy_parallel(src_url=args.ckpt_dir, dst_url=local_train_url)
     else:
         # run on the local server
-        context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
+        context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=device_id)
         context.set_context(save_graphs=False)
 
     # Step 1: init data folders
     print("init data folders")
     _, metatest_character_folders = dt.omniglot_character_folders(data_path=local_data_url)
 
-    #Step 4 : init networks
+    # Step 4 : init networks
     print("init neural networks")
     encoder_relation = Encoder_Relation(cfg.feature_dim, cfg.relation_dim)
     encoder_relation.set_train(False)
     weight_init(encoder_relation)
 
-    #load parameters
+    # load parameters
     if os.path.exists(local_train_url):
         param_dict = load_checkpoint(local_train_url)
         load_param_into_net(encoder_relation, param_dict)
@@ -140,10 +126,10 @@ def main():
         test_accuracy, h = mean_confidence_interval(accuracies)
         total_accuracy += test_accuracy
         print('-' * 5 + 'Episode {}/{}'.format(episode + 1, cfg.eval_episode) + '-' * 5)
-        print("test accuracy: %.4f or %.4f%%  h: %f" % (test_accuracy, test_accuracy*100, h))
+        print("test accuracy: %.4f or %.4f%%  h: %f" % (test_accuracy, test_accuracy * 100, h))
 
-    print("aver_accuracy : %.2f" % (total_accuracy/cfg.eval_episode*100))
+    print("Average accuracy: %.4f" % (total_accuracy / cfg.eval_episode))
 
 
 if __name__ == '__main__':
-    main()
+    main(arg_parser())

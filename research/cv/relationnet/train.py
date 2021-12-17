@@ -14,45 +14,33 @@
 # ============================================================================
 """train"""
 
-import argparse
 import os
+
 import mindspore.nn as nn
-from mindspore import context
-from mindspore.context import ParallelMode
 import mindspore.ops as ops
 from mindspore import Tensor
+from mindspore import context
 from mindspore.common import dtype as mstype
-from mindspore.communication.management import init, get_rank
-import src.dataset as dt
-from src.lr_generator import _generate_steps_lr
-from src.config import relationnet_cfg as cfg
-from src.relationnet import Encoder_Relation, weight_init, TrainOneStepCell
-from src.net_train import train
+from mindspore.communication.management import init, get_rank, get_group_size
+from mindspore.context import ParallelMode
 
-parser = argparse.ArgumentParser(description="One Shot Visual Recognition")
-parser.add_argument("-g", "--gpu", type=int, default=0)
-parser.add_argument("-u", "--hidden_unit", type=int, default=10)
-parser.add_argument("-dt", "--device_target", type=str, default='Ascend', choices=("Ascend"),
-                    help="Device target, support Ascend")
-parser.add_argument("-di", "--device_id", type=int, default=0)
-parser.add_argument("--ckpt_dir", default='./ckpt/', help='the path of output')
-parser.add_argument("--data_path", default='/data/omniglot_resized/',
-                    help="Path where the dataset is saved")
-parser.add_argument("--data_url", default=None)
-parser.add_argument("--train_url", default=None)
-parser.add_argument("--cloud", default=None, help='if run on cloud')
-args = parser.parse_args()
+import src.dataset as dt
+from src.config import relationnet_cfg as cfg
+from src.lr_generator import _generate_steps_lr
+from src.net_train import train
+from src.relationnet import Encoder_Relation, weight_init, TrainOneStepCell
+from argparser import arg_parser
 
 # init operators
 scatter = ops.ScatterNd()
 concat0dim = ops.Concat(axis=0)
 
 
-def main():
+def main(args):
     local_data_url = args.data_path
     local_train_url = args.ckpt_dir
     device_num = int(os.getenv("RANK_SIZE", "1"))
-    device_id = int(os.getenv("DEVICE_ID"))
+    device_id = int(os.getenv("DEVICE_ID", args.device_id))
     # if run on the cloud
     if args.cloud:
         import moxing as mox
@@ -65,7 +53,7 @@ def main():
             context.set_context(device_id=device_id)
             if device_num > 1:
                 cfg.episode = int(cfg.episode / 2)
-                cfg.learning_rate = cfg.learning_rate*2
+                cfg.learning_rate = cfg.learning_rate * 2
                 context.reset_auto_parallel_context()
                 context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
                                                   gradients_mean=True)
@@ -78,17 +66,34 @@ def main():
         mox.file.copy_parallel(src_url=args.data_url, dst_url=local_data_url)
     else:
         # run on the local server
-        context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
-        context.set_context(save_graphs=False)
+        context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, save_graphs=False)
+
         if device_num > 1:
-            cfg.episode = int(cfg.episode / 2)
-            cfg.learning_rate = cfg.learning_rate*2
-            context.reset_auto_parallel_context()
-            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
-            init()
+            if args.device_target == 'Ascend':
+                cfg.episode = int(cfg.episode / 2)
+                cfg.learning_rate = cfg.learning_rate * 2
+                context.reset_auto_parallel_context()
+                context.set_auto_parallel_context(
+                    device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                    gradients_mean=True
+                )
+                init()
+            else:
+                init()
+                device_id = get_rank()
+                device_num = get_group_size()
+                context.set_auto_parallel_context(
+                    device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                    gradients_mean=True, parameter_broadcast=True
+                )
+        else:
+            context.set_context(device_id=args.device_id)
 
     # Step 1 : create output dir
+
+    if args.run_distribute and args.device_target == 'GPU':
+        local_train_url = os.path.join(args.ckpt_dir, "ckpt_" + str(device_id) + "/")
+
     if not os.path.exists(local_train_url):
         os.makedirs(local_train_url)
 
@@ -121,11 +126,17 @@ def main():
     netloss = nn.WithLossCell(encoder_relation, criterion)
     net_g = TrainOneStepCell(netloss, optim)
 
-
     # train
-    train(metatrain_character_folders=metatrain_character_folders, metatest_character_folders=metatest_character_folders
-          , netloss=netloss, net_g=net_g, encoder_relation=encoder_relation, local_train_url=local_train_url, args=args)
+    train(
+        metatrain_character_folders=metatrain_character_folders,
+        metatest_character_folders=metatest_character_folders,
+        netloss=netloss,
+        net_g=net_g,
+        encoder_relation=encoder_relation,
+        local_train_url=local_train_url,
+        args=args
+    )
 
 
 if __name__ == '__main__':
-    main()
+    main(arg_parser())

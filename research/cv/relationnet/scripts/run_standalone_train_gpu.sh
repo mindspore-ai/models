@@ -13,10 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+# an simple tutorial as follows, more parameters can be setting
 
 if [ $# != 3 ]
 then
-    echo "Usage: bash run_standalone_eval_ascend.sh [CKPT_DIR] [DATA_PATH] [DEVICE_ID]"
+    echo "Usage: bash run_standalone_train_gpu.sh [CKPT_DIR] [DATA_PATH] [DEVICE_ID]"
 exit 1
 fi
 
@@ -32,5 +33,5 @@ export CKPT_DIR=$(get_real_path $1)
 export DATA_PATH=$(get_real_path $2)
 export DEVICE_ID=$3
 
-python -u ../eval.py --ckpt_dir=$CKPT_DIR --data_path=$DATA_PATH \
-                     --device_id=$DEVICE_ID --device_target="Ascend" &> eval.log &
+python -u ../train.py --ckpt_dir=$CKPT_DIR --data_path=$DATA_PATH \
+                      --device_id=$DEVICE_ID --device_target="GPU" &> train.log &
