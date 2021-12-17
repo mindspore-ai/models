@@ -156,7 +156,7 @@ cd LightCNN/
 
 # 运行单卡训练
 # DEVICE_ID: Ascend处理器的id，需用户指定
-sh scripts/train_standalone.sh DEVICE_ID
+bash scripts/train_standalone.sh DEVICE_ID
 ```
 
 运行一下训练脚本配置多卡训练参数：
@@ -168,11 +168,11 @@ cd LightCNN/scripts
 # hccl.json: Ascend配置信息，需用户自行配置，与八卡不同，详见官网教程
 # DEVICE_NUM应与train_distribute.sh中修改device_ids的长度相同
 # 需进入train_distribute.sh 修改device_ids=(id1 id2) 或 device_ids=(id1 id2 id3 id4)
-sh train_distribute.sh hccl.json DEVICE_NUM
+bash train_distribute.sh hccl.json DEVICE_NUM
 
 # 运行8卡训练
 # hccl.json: Ascend配置信息，需用户自行配置
-sh train_distribute_8p.sh hccl.json
+bash train_distribute_8p.sh hccl.json
 ```
 
 评估步骤如下：
@@ -184,12 +184,12 @@ cd LightCNN/
 # 评估LightCNN在lfw 6,000 pairs上的表现
 # DEVICE_ID: Ascend处理器id
 # CKPT_FILE: checkpoint权重文件
-sh scripts/eval_lfw.sh DEVICE_ID CKPT_FILE
+bash scripts/eval_lfw.sh DEVICE_ID CKPT_FILE
 
 # 评估LightCNN在lfw BLUFR protocols上的表现
 # DEVICE_ID: Ascend处理器id
 # CKPT_FILE: checkpoint权重文件
-sh scripts/eval_blufr.sh DEVICE_ID CKPT_FILE
+bash scripts/eval_blufr.sh DEVICE_ID CKPT_FILE
 ```
 
 # 脚本说明
@@ -359,12 +359,12 @@ cd LightCNN/
 # 评估LightCNN在lfw 6,000 pairs上的表现
 # DEVICE_ID: Ascend处理器id
 # CKPT_FILE: checkpoint权重文件
-sh scripts/eval_lfw.sh DEVICE_ID CKPT_FILE
+bash scripts/eval_lfw.sh DEVICE_ID CKPT_FILE
 
 # 评估LightCNN在lfw BLUFR protocols上的表现
 # DEVICE_ID: Ascend处理器id
 # CKPT_FILE: checkpoint权重文件
-sh scripts/eval_blufr.sh DEVICE_ID CKPT_FILE
+bash scripts/eval_blufr.sh DEVICE_ID CKPT_FILE
 ```
 
 测试脚本示例如下：
@@ -457,22 +457,55 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 
 ## 性能
 
+### 训练性能
+
+| 参数 | Ascend 910| GPU Tesla V100 (single) | GPU Tesla V100 (8 pcs) |
+| ------ | --------- | --------------------- | ----------------------- |
+| 模型版本 | LightCNN | LightCNN | LightCNN |
+| 资源 | Ascend 910 | GPU(Tesla V100-PCIE 32G)；CPU：2.70GHz 52cores ；RAM：1.5T | GPU(Tesla V100-PCIE 32G)；CPU：2.70GHz 52cores ；RAM：1.5T |
+| 上传日期 | 2021-05-16 | 2021-11-09 | 2021-11-09 |
+| MindSpore版本 | 1.1.1 | 1.6.0.20211125 | 1.6.0.20211125 |
+| 数据集 | MS-Celeb-1M, LFW | MS-Celeb-1M, LFW | MS-Celeb-1M, LFW |
+| 训练参数 | epoch = 80, batch_size = 128, lr = 0.01 | epoch = 80, batch_size = 128, lr = 0.01 | epoch = 80, batch_size = 128, lr = 0.01 |
+| 优化器 | SGD | SGD | SGD |
+| 损失函数 | Softmax交叉熵 | Softmax交叉熵 | Softmax交叉熵 |
+| 输出 | 概率 | 概率 | 概率 |
+| 损失 | 0.10905003 |0.10246127| 0.10246127 |
+| 速度 | - | 147.1 毫秒/步 | 191.5 毫秒/步 |
+| 总时长 | 369,144,120.56 ms（单卡）<br>  85,369,778.48 ms（八卡） | 129小时 | 21小时 |
+| 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/LightCNN) |
+
 ### 评估性能
 
-| 参数 | Ascend 910|
-| -------------------------- | -------------------------------------- |
-| 模型版本 | LightCNN |
-| 资源 | Ascend 910 |
-| 上传日期 | 2021-05-16 |
-| MindSpore版本 | 1.1.1 |
-| 数据集 | MS-Celeb-1M, LFW |
-| 训练参数 | epoch = 80, batch_size = 128, lr = 0.01 |
-| 优化器 | SGD |
-| 损失函数 | Softmax交叉熵 |
-| 输出 | 概率 |
-| 损失 | 0.10905003 |
-| 性能 | 369,144,120.56 ms（单卡）<br>  85,369,778.48 ms（八卡） |  
-| 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/LightCNN) |
+- on lfw 6,000 pairs
+
+| Parameters | Ascend 910| GPU GeForce RTX 3090 |
+| ---------- |---------- | -------------------- |
+| 模型版本 | LightCNN |LightCNN|
+| 资源 | Ascend 910 | Ubuntu 18.04.6, GF RTX3090, CPU 2.90GHz, 64cores, RAM 252GB|
+| 上传日期 | 2021-05-16 |2021-11-09|
+| MindSpore版本 | 1.1.1 |1.5.0|
+| 数据集 | MS-Celeb-1M, LFW (6,000 pairs) |MS-Celeb-1M, LFW (6,000 pairs) |
+| Batch_size | 1 | 1 |
+| 100% - EER | 98.57% |98.13%|
+| TPR@RAR=1% | 98.47% |97.73%|
+| TPR@FAR=0.1% | 95.5% |93.07%|
+| TPR@FAR=0% | 89.87% |78.60%|
+| 总时长 || 5分钟 |
+
+- on lfw BLUFR protoclos
+
+| Parameters | Ascend 910| GPU GeForce RTX 3090 |
+| ---------- |---------- | -------------------- |
+| 模型版本 | LightCNN |LightCNN|
+| 资源 | Ascend 910 | Ubuntu 18.04.6, GF RTX3090, CPU 2.90GHz, 64cores, RAM 252GB|
+| 上传日期 | 2021-05-16 |2021-11-09|
+| MindSpore版本 | 1.1.1 |1.5.0|
+| 数据集 | MS-Celeb-1M, LFW (BLUFR protoclos) |MS-Celeb-1M, LFW (BLUFR protoclos) |
+| Batch_size | 1 | 1 |
+| VR@FAR=0.1% | 96.26% |94.13%|
+| DIR@RAR=1% | 81.66% |74.80%|
+| 总时长 || 10分钟 |
 
 # ModelZoo主页
 

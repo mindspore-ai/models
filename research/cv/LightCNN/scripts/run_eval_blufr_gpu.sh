@@ -14,12 +14,12 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 1 ]; then
-  echo "Usage: sh train_distribute_8p [RANK_TABLE_FILE]"
+if [ $# != 3 ]; then
+  echo "Usage: sh run_eval_blufr_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID]"
   exit 1
 fi
 
-get_real_path() {
+get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
     echo "$1"
   else
@@ -28,32 +28,35 @@ get_real_path() {
 }
 
 PATH1=$(get_real_path $1)
+PATH2=$(get_real_path $2)
 
-if [ ! -f "$PATH1" ]; then
-  echo "error: RANK_TABLE_FILE=$PATH1 is not a file"
-  exit 1
+if [ ! -d $PATH1 ]
+then
+    echo "error: DATASET_PATH=$PATH1 is not a directory"
+exit 1
 fi
 
-export DEVICE_NUM=8
-export RANK_SIZE=8
-export RANK_TABLE_FILE=$PATH1
+if [ ! -f $PATH2 ]
+then
+    echo "error: CHECKPOINT_PATH=$PATH2 is not a file"
+exit 1
+fi
 
+export DEVICE_ID=$3
 
-for ((i = 0; i < ${DEVICE_NUM}; i++)); do
-  export DEVICE_ID=$i
-  export RANK_ID=$i
-  rm -rf ./train_parallel$i
-  mkdir ./train_parallel$i
-  cp ../*.py ./train_parallel$i
-  cp *.sh ./train_parallel$i
-  cp -r ../src ./train_parallel$i
-  cd ./train_parallel$i || exit
-  echo "start training for rank $RANK_ID, device $DEVICE_ID"
-  env >env.log
-  python3 train.py \
-    --device_target Ascend \
-    --device_id "$DEVICE_ID" \
-    --run_distribute=True \
-    --ckpt_path ./ckpt_files > train_distribute_8p.log 2>&1 &
-  cd ..
-done
+if [ -d "eval_blufr" ];
+then
+    rm -rf ./eval_blufr
+fi
+
+mkdir ./eval_blufr
+cp ../*.py ./eval_blufr
+cp *.sh ./eval_blufr
+cp -r ../src ./eval_blufr
+cd ./eval_blufr || exit
+env > env.log
+echo "start evaluation for device $DEVICE_ID"
+
+python eval_blufr.py --dataset_path=$PATH1 --resume=$PATH2 \
+                   --device_id=$DEVICE_ID --device_target="GPU" > log 2>&1 &
+cd ..

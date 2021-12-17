@@ -24,7 +24,7 @@ from mindspore import context, load_param_into_net, load_checkpoint, Tensor
 from sklearn.metrics import roc_curve
 
 from src.lightcnn import lightCNN_9Layers4Test
-from src.config import lightcnn_cfg as cfg
+from src.config import get_cfg
 
 
 def extract_feature(img_list):
@@ -33,7 +33,7 @@ def extract_feature(img_list):
     model.set_train(False)
 
     if os.path.isfile(args.resume):
-        print("=> loading checkpoint '{}'".format(args.resume))
+        print("=> loading checkpoint '{}'".format(args.resume), flush=True)
         params_dict = load_checkpoint(args.resume)
         load_param_into_net(model, params_dict)
     else:
@@ -44,7 +44,8 @@ def extract_feature(img_list):
     features = np.empty(features_shape, dtype='float32', order='C')
 
     for idx, img_name in enumerate(img_list):
-        print('%d images processed' % (idx + 1,))
+        if idx % 100 == 0 or idx == len(img_list) - 1:
+            print('%d images processed' % (idx + 1,), flush=True)
         img = cv2.imread(os.path.join(cfg.root_path, img_name), cv2.IMREAD_GRAYSCALE)
         if img.shape != (128, 128):
             img = cv2.resize(img, (128, 128))
@@ -57,10 +58,9 @@ def extract_feature(img_list):
     return features
 
 
-def load_image_list(img_dir, list_file_name):
+def load_image_list(img_dir, list_file):
     """load image list"""
-    img_dir_cp = img_dir.replace('/image', '')
-    list_file_path = os.path.join(img_dir_cp, list_file_name)
+    list_file_path = list_file
     f = open(list_file_path, 'r')
     image_list = []
     labels = []
@@ -163,9 +163,12 @@ if __name__ == '__main__':
                         type=str, metavar='PATH', help='path to latest checkpoint (default: none)')
     parser.add_argument('--num_classes', default=79077, type=int,  # !!!
                         metavar='N', help='number of classes (default: 79077)')
+    parser.add_argument('--dataset_path', type=str, default='', help="the path to the folder with all the data")
     args = parser.parse_args()
 
     device_id = int(os.getenv('DEVICE_ID'))
     context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=device_id)
+
+    cfg = get_cfg(args.dataset_path)
     dic = extract_features_to_dict(image_dir=cfg.root_path, list_file=cfg.lfw_img_list)
     lfw_eval(dic, lfw_pairs_mat_path=cfg.lfw_pairs_mat_path)

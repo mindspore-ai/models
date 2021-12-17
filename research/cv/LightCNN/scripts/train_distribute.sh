@@ -55,7 +55,7 @@ for ((i = 0; i < ${DEVICE_NUM}; i++)); do
   python3 train.py \
     --device_target Ascend \
     --device_id $DEVICE_ID \
-    --run_distribute 1 \
+    --run_distribute=True \
     --ckpt_path ./ckpt_files > train_distribute.log 2>&1 &
   cd ..
 done

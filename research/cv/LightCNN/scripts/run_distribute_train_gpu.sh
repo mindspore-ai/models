@@ -15,11 +15,11 @@
 # ============================================================================
 
 if [ $# != 1 ]; then
-  echo "Usage: sh train_distribute_8p [RANK_TABLE_FILE]"
+  echo "Usage: sh run_distribute_train_gpu.sh [DATASET_PATH]"
   exit 1
 fi
 
-get_real_path() {
+get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
     echo "$1"
   else
@@ -27,33 +27,29 @@ get_real_path() {
   fi
 }
 
-PATH1=$(get_real_path $1)
+DATASET_PATH=$(get_real_path $1)
 
-if [ ! -f "$PATH1" ]; then
-  echo "error: RANK_TABLE_FILE=$PATH1 is not a file"
+if [ ! -d $DATASET_PATH ]; then
+  echo "error: DATASET_PATH=$DATASET_PATH is not a directory"
   exit 1
 fi
 
+ulimit -u unlimited
 export DEVICE_NUM=8
-export RANK_SIZE=8
-export RANK_TABLE_FILE=$PATH1
 
+if [ -d "train_parallel" ];
+then
+    rm -rf ./train_parallel
+fi
 
-for ((i = 0; i < ${DEVICE_NUM}; i++)); do
-  export DEVICE_ID=$i
-  export RANK_ID=$i
-  rm -rf ./train_parallel$i
-  mkdir ./train_parallel$i
-  cp ../*.py ./train_parallel$i
-  cp *.sh ./train_parallel$i
-  cp -r ../src ./train_parallel$i
-  cd ./train_parallel$i || exit
-  echo "start training for rank $RANK_ID, device $DEVICE_ID"
-  env >env.log
-  python3 train.py \
-    --device_target Ascend \
-    --device_id "$DEVICE_ID" \
-    --run_distribute=True \
-    --ckpt_path ./ckpt_files > train_distribute_8p.log 2>&1 &
-  cd ..
-done
+rm -rf ./train_parallel
+mkdir ./train_parallel
+cp ../*.py ./train_parallel
+cp *.sh ./train_parallel
+cp -r ../src ./train_parallel
+cd ./train_parallel || exit
+echo "start distribute training for $DEVICE_NUM GPUs"
+env > env.log
+
+mpirun --allow-run-as-root -n $DEVICE_NUM --output-filename log_output --merge-stderr-to-stdout \
+       python train.py --run_distribute=True --device_target="GPU" --dataset_path=$DATASET_PATH &> log &
