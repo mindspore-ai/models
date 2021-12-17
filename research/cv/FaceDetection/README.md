@@ -109,7 +109,7 @@ The entire code structure is as following:
       ├─ yolo_postprocess.py                # post process
       └─ yolov3.py                          # network
     ├─ data_preprocess.py                   # preprocess
-    ├─ logging.py                           # log function
+    ├─ log.py                               # log function
     ├─ lrsche_factory.py                    # generate learning rate
     ├─ network_define.py                    # network define
     ├─ transforms.py                        # data transforms
