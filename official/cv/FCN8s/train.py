@@ -41,6 +41,19 @@ def modelarts_pre_process():
     pass
 
 
+def get_filter_param_dict(input_config, param_dict):
+    if input_config.filter_weight:
+        for key in list(param_dict.keys()):
+            for filter_key in input_config.filter_list:
+                if filter_key != key:
+                    continue
+                del param_dict[key]
+        print('load_model {} success'.format(input_config.ckpt_pre_trained))
+    else:
+        print('Set filter_weight is false, load pretrained_checkpoint.')
+    return param_dict
+
+
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train():
     device_num = get_device_num()
@@ -116,6 +129,7 @@ def train():
     # load pretrained FCN8s
     elif config.ckpt_pre_trained:
         param_dict = load_checkpoint(config.ckpt_pre_trained)
+        param_dict = get_filter_param_dict(config, param_dict)
         load_param_into_net(net, param_dict)
 
     # optimizer

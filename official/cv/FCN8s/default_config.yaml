@@ -10,6 +10,13 @@ output_path: "/cache/train"
 load_path: "/cache/checkpoint_path"
 device_target: "Ascend"
 enable_profiling: False
+filter_weight: False
+filter_list: ["score_fr.weight", "upscore2.weight",
+              "score_pool4.weight", "upscore_pool4.weight",
+              "score_pool3.weight", "upscore8.weight",
+              "moments.score_fr.weight", "moments.upscore2.weight",
+              "moments.score_pool4.weight", "moments.upscore_pool4.weight",
+              "moments.score_pool3.weight", "moments.upscore8.weight"]
 
 # ======================================================================================
 # common options
