@@ -79,10 +79,12 @@ MSCOCO2017
 .
 └─NAS_FPN
   ├─README.md
+  ├──ascend310_infer                          # Ascend310推理
   ├─scripts
     ├─run_single_train.sh                     # 使用Ascend环境单卡训练
     ├─run_distribute_train.sh                 # 使用Ascend环境八卡并行训练
     ├─run_eval.sh                             # 使用Ascend环境运行推理脚本
+    ├─run_infer_310.sh                        # Ascend推理shell脚本
   ├─src
     ├─dataset.py                              # 数据预处理
     ├─retinanet_nasfpn.py                     # 整个网络模型定义
@@ -94,6 +96,7 @@ MSCOCO2017
     ├─resnet.py                               # resnet主干网络
     ├─retinahead.py                           # 检测头
     ├─box_utils.py                            # 先验框设置
+    ├─coco_eval.py                            # coco数据集评估
     ├──model_utils
       ├──config.py                            # 参数生成
       ├──device_adapter.py                    # 设备相关信息
@@ -101,6 +104,7 @@ MSCOCO2017
       ├──moxing_adapter.py                    # 装饰器(主要用于ModelArts数据拷贝)
   ├─train.py                                  # 网络训练脚本
   ├─export.py                                 # 导出 AIR,MINDIR模型的脚本
+  ├─postprogress.py                           # 310推理后处理脚本
   └─eval.py                                   # 网络推理脚本
   └─create_data.py                            # 构建Mindrecord数据集脚本
   └─default_config.yaml                       # 参数配置
@@ -358,9 +362,34 @@ python export.py  --file_name retinanet_nasfpn --file_format MINDIR --checkpoint
 
 #### <span id="usage">用法</span>
 
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
+```
+
 #### <span id="running">运行</span>
 
+```运行
+bash run_infer_310.sh ../retinanet_nasfpn.mindir /home/datasets/COCO2017/val2017 /home/datasets/COCO2017/annotations/instances_val2017.json 0
+```
+
 #### <span id="outcome">结果</span>
+
+```mAP
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.417
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.607
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.457
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.223
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.450
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.553
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.358
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.573
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.620
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.414
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.666
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.754
+mAP: 0.41668179380388803
+```
 
 ## [模型说明](#content)
 
@@ -386,6 +415,19 @@ python export.py  --file_name retinanet_nasfpn --file_format MINDIR --checkpoint
 | 脚本                       |  [链接](https://gitee.com/mindspore/models/tree/master/research/cv/nas-fpn)|
 
 #### 推理性能
+
+#### 推理性能
+
+| 参数                 | Ascend                      |
+| ------------------- | --------------------------- |
+| 模型名称             | NAS_FPN                |
+| 运行环境             | Ascend 310；CPU 2.6GHz，192cores；Memory 755G；系统 Euler2.8|
+| 上传时间             | 12/17/2021                  |
+| MindSpore 版本      | 1.5.0                        |
+| 数据集              | 5000 张图片                   |
+| Batch_size          | 1                          |
+| 精确度              | mAP[0.4166]                  |
+| 推理速度 (ms/img)   | 213.508 ms             |
 
 ## [随机情况的描述](#content)
 
