@@ -16,15 +16,15 @@
 """Bbox utils"""
 
 import numpy as np
-from .config import config
 from .anchor_generator import GridAnchorGenerator
+from .model_utils.config import config as cfg
 
-generator = GridAnchorGenerator(config.img_shape, 4, 2, [1.0, 2.0, 0.5])
-default_boxes, default_boxes_tlbr = generator.generate_multi_levels(config.steps)
+generator = GridAnchorGenerator(cfg.img_shape, 4, 2, [1.0, 2.0, 0.5])
+default_boxes, default_boxes_tlbr = generator.generate_multi_levels(cfg.steps)
 
 y1, x1, y2, x2 = np.split(default_boxes_tlbr[:, :4], 4, axis=-1)
 vol_anchors = (x2 - x1) * (y2 - y1)
-matching_threshold = config.match_threshold
+matching_threshold = cfg.match_threshold
 
 
 def ssd_bboxes_encode(boxes):
@@ -56,9 +56,9 @@ def ssd_bboxes_encode(boxes):
         jaccard = inter_vol / union_vol
         return np.squeeze(jaccard)
 
-    pre_scores = np.zeros((config.num_ssd_boxes), dtype=np.float32)
-    t_boxes = np.zeros((config.num_ssd_boxes, 4), dtype=np.float32)
-    t_label = np.zeros((config.num_ssd_boxes), dtype=np.int64)
+    pre_scores = np.zeros((cfg.num_ssd_boxes), dtype=np.float32)
+    t_boxes = np.zeros((cfg.num_ssd_boxes, 4), dtype=np.float32)
+    t_label = np.zeros((cfg.num_ssd_boxes), dtype=np.int64)
     for bbox in boxes:
         label = int(bbox[4])
         scores = jaccard_with_anchors(bbox)
@@ -74,16 +74,16 @@ def ssd_bboxes_encode(boxes):
     index = np.nonzero(t_label)
 
     # Transform to tlbr.
-    bboxes = np.zeros((config.num_ssd_boxes, 4), dtype=np.float32)
+    bboxes = np.zeros((cfg.num_ssd_boxes, 4), dtype=np.float32)
     bboxes[:, [0, 1]] = (t_boxes[:, [0, 1]] + t_boxes[:, [2, 3]]) / 2
     bboxes[:, [2, 3]] = t_boxes[:, [2, 3]] - t_boxes[:, [0, 1]]
 
     # Encode features.
     bboxes_t = bboxes[index]
     default_boxes_t = default_boxes[index]
-    bboxes_t[:, :2] = (bboxes_t[:, :2] - default_boxes_t[:, :2]) / (default_boxes_t[:, 2:] * config.prior_scaling[0])
+    bboxes_t[:, :2] = (bboxes_t[:, :2] - default_boxes_t[:, :2]) / (default_boxes_t[:, 2:] * cfg.prior_scaling[0])
     tmp = np.maximum(bboxes_t[:, 2:4] / default_boxes_t[:, 2:4], 0.000001)
-    bboxes_t[:, 2:4] = np.log(tmp) / config.prior_scaling[1]
+    bboxes_t[:, 2:4] = np.log(tmp) / cfg.prior_scaling[1]
     bboxes[index] = bboxes_t
 
     num_match = np.array([len(np.nonzero(t_label)[0])], dtype=np.int32)
@@ -94,8 +94,8 @@ def ssd_bboxes_decode(boxes):
     """Decode predict boxes to [y, x, h, w]"""
     boxes_t = boxes.copy()
     default_boxes_t = default_boxes.copy()
-    boxes_t[:, :2] = boxes_t[:, :2] * config.prior_scaling[0] * default_boxes_t[:, 2:] + default_boxes_t[:, :2]
-    boxes_t[:, 2:4] = np.exp(boxes_t[:, 2:4] * config.prior_scaling[1]) * default_boxes_t[:, 2:4]
+    boxes_t[:, :2] = boxes_t[:, :2] * cfg.prior_scaling[0] * default_boxes_t[:, 2:] + default_boxes_t[:, :2]
+    boxes_t[:, 2:4] = np.exp(boxes_t[:, 2:4] * cfg.prior_scaling[1]) * default_boxes_t[:, 2:4]
 
     bboxes = np.zeros((len(boxes_t), 4), dtype=np.float32)
 

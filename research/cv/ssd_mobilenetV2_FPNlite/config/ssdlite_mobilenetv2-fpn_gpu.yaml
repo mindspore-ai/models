@@ -1,0 +1,126 @@
+#train.py/eval.py script args
+run_platform: "GPU"
+only_create_dataset: False
+distribute: False
+device_id: 0
+device_num: 1
+lr: 0.4
+mode: "not-sink"
+dataset: "coco"
+data_url: ""
+train_url: ""
+modelarts_mode: False
+mindrecord_mode: "mindrecord"
+epoch_size: 500
+batch_size: 32
+pre_trained: ""
+checkpoint_path: "Checkpoint file path."
+pre_trained_epoch_size: 0
+save_checkpoint_epochs: 10
+loss_scale: 1024
+filter_weight: False
+freeze_layer: "none"
+
+#postprocess.py script args
+result_path: ""
+img_path: ""
+anno_path: ""
+drop: False
+
+#modelarts
+enable_modelarts: False
+model: "ssd_mobilenet_v2_fpn"
+img_shape: [320, 320]
+num_ssd_boxes: 12804
+neg_pre_positive: 3
+match_threshold: 0.5
+nms_threshold: 0.6
+min_score: 0.1
+max_boxes: 100
+
+# learning rate settings
+global_step: 0
+lr_init: 0.01333
+lr_end_rate: 0.0
+warmup_epochs: 4
+momentum: 0.9
+weight_decay: 1.5e-4
+
+# network
+num_default: [6, 6, 6, 6, 6]
+extras_in_channels: [32, 96, 1280, 32, 32]
+extras_out_channels: [32, 32, 32, 32, 32]
+extras_strides: [1, 1, 2, 2, 2, 2]
+extras_ratio: [0.2, 0.2, 0.2, 0.25, 0.5, 0.25]
+feature_size: [40, 20, 10, 5, 3]
+min_scale: 0.2
+max_scale: 0.95
+aspect_ratios: [[2, 3], [2, 3], [2, 3], [2, 3], [2, 3], [2, 3]]
+steps: [8, 16, 32, 64, 108]
+prior_scaling: [0.1, 0.2]
+gamma: 2.0
+alpha: 0.75
+num_addition_layers: 4
+
+# `mindrecord_dir` and `coco_root` are better to use absolute path.
+mindrecord_dir: "/home/mindspore/MIPT_team/Datasets/COCO2017/MindRecord_COCO"
+coco_root: "/home/mindspore/MIPT_team/Datasets/COCO2017/"
+train_data_type: "train2017"
+val_data_type: "val2017"
+instances_set: "annotations/instances_{}.json"
+classes: ['background', 'person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus',
+            'train', 'truck', 'boat', 'traffic light', 'fire hydrant',
+            'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog',
+            'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra',
+            'giraffe', 'backpack', 'umbrella', 'handbag', 'tie',
+            'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball',
+            'kite', 'baseball bat', 'baseball glove', 'skateboard',
+            'surfboard', 'tennis racket', 'bottle', 'wine glass', 'cup',
+            'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
+            'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza',
+            'donut', 'cake', 'chair', 'couch', 'potted plant', 'bed',
+            'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote',
+            'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink',
+            'refrigerator', 'book', 'clock', 'vase', 'scissors',
+            'teddy bear', 'hair drier', 'toothbrush']
+num_classes: 81
+# The annotation.json position of voc validation dataset.
+voc_json: "annotations/voc_instances_val.json"
+# voc original dataset.
+voc_root: "/data/voc_dataset"
+# if coco or voc used, `image_dir` and `anno_path` are useless.
+image_dir: ""
+anno_path: ""
+ckpt_directory: './'
+best_ckpt_name: "best.ckpt"
+
+
+---
+# Help description for each configuration
+run_platform: "Run platform. default - GPU, Choices: Ascend, GPU, CPU."
+only_create_dataset: "If set it true, only create Mindrecord, default is False."
+distribute: "Run distribute, default is False."
+device_id: "Device id, default is 0."
+device_num: "Use device nums, default is 1."
+lr: "Base learning rate (max learning rate) for cosine decay lr scheduler, default is 0.4."
+mode: "Run sink mode or not, default is sink."
+dataset: "Dataset, default is coco. Choices - 'coco', 'voc', 'other'."
+data_url: 'Dataset path'
+train_url: 'Train output path'
+modelarts_mode: 'train on modelarts or not, default is False'
+mindrecord_mode: "type of data, default is mindrecord. choices - 'coco', 'mindrecord'."
+epoch_size: "Epoch size, default is 500."
+batch_size: "Batch size, default is 32."
+pre_trained: "Pretrained Checkpoint file path."
+checkpoint_path: "Checkpoint file path."
+pre_trained_epoch_size: "Pretrained epoch size."
+save_checkpoint_epochs: "Save checkpoint epochs, default is 10."
+loss_scale: "Loss scale, default is 1024."
+filter_weight: "Filter head weight parameters, default is False."
+freeze_layer: "freeze the weights of network, support freeze the backbone's weights \
+default is not freezing. choices- 'none', 'backbone'."
+
+result_path: "result files path."
+img_path: "image file path."
+anno_path: "annotation json file path."
+drop: "drop iscrowd images or not."

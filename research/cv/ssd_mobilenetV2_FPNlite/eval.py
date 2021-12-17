@@ -15,26 +15,24 @@
 
 """Evaluation for SSD"""
 
-import ast
 import os
-import argparse
 import time
 import numpy as np
 from mindspore import context, Tensor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.ssd import SsdInferWithDecoder, ssd_mobilenet_v2_fpn
 from src.dataset import create_ssd_dataset, create_mindrecord
-from src.config import config
 from src.eval_utils import metrics
 from src.box_utils import default_boxes
+from src.model_utils.config import config as cfg
 
 def ssd_eval(dataset_path, ckpt_path, anno_json):
     """SSD evaluation."""
     batch_size = 1
     ds = create_ssd_dataset(dataset_path, batch_size=batch_size, repeat_num=1,
                             is_training=False, use_multiprocessing=False)
-    net = ssd_mobilenet_v2_fpn(config=config)
-    net = SsdInferWithDecoder(net, Tensor(default_boxes), config)
+    net = ssd_mobilenet_v2_fpn(config=cfg)
+    net = SsdInferWithDecoder(net, Tensor(default_boxes), cfg)
 
     print("Load Checkpoint!")
     param_dict = load_checkpoint(ckpt_path)
@@ -70,52 +68,39 @@ def ssd_eval(dataset_path, ckpt_path, anno_json):
     print("\n========================================\n")
     print(f"mAP: {mAP}")
 
-def get_eval_args():
-    """get arguments"""
-    parser = argparse.ArgumentParser(description='SSD evaluation')
-    parser.add_argument("--device_id", type=int, default=0, help="Device id, default is 0.")
-    parser.add_argument("--dataset", type=str, default="coco", help="Dataset, default is coco.")
-    parser.add_argument("--checkpoint_path", type=str, required=True, help="Checkpoint file path.")
-    parser.add_argument("--run_platform", type=str, default="Ascend", choices=("Ascend"),
-                        help="run platform, support Ascend.")
-    parser.add_argument('--modelarts_mode', type=ast.literal_eval, default=False,
-                        help='train on modelarts or not, default is False')
-    parser.add_argument('--data_url', type=str, default=None, help='Dataset path')
-    parser.add_argument('--train_url', type=str, default=None, help='Train output path')
-    parser.add_argument('--mindrecord_mode', type=str, default="mindrecord", choices=("coco", "mindrecord"),
-                        help='type of data, default is mindrecord')
-    return parser.parse_args()
 
 if __name__ == '__main__':
-    args_opt = get_eval_args()
-    if args_opt.modelarts_mode:
+    if cfg.modelarts_mode:
         import moxing as mox
         device_id = int(os.getenv('DEVICE_ID'))
-        context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.run_platform, device_id=device_id)
-        config.coco_root = os.path.join(config.coco_root, str(device_id))
-        config.mindrecord_dir = os.path.join(config.mindrecord_dir, str(device_id))
+        context.set_context(mode=context.GRAPH_MODE, device_target=cfg.run_platform, device_id=device_id)
+        cfg.coco_root = os.path.join(cfg.coco_root, str(device_id))
+        cfg.mindrecord_dir = os.path.join(cfg.mindrecord_dir, str(device_id))
         checkpoint_path = "/cache/ckpt/"
         checkpoint_path = os.path.join(checkpoint_path, str(device_id))
-        mox.file.copy_parallel(args_opt.checkpoint_path, checkpoint_path)
-        if args_opt.mindrecord_mode == "mindrecord":
-            mox.file.copy_parallel(args_opt.data_url, config.mindrecord_dir)
+        mox.file.copy_parallel(cfg.checkpoint_path, checkpoint_path)
+        if cfg.mindrecord_mode == "mindrecord":
+            mox.file.copy_parallel(cfg.data_url, cfg.mindrecord_dir)
         else:
-            mox.file.copy_parallel(args_opt.data_url, config.coco_root)
+            mox.file.copy_parallel(cfg.data_url, cfg.coco_root)
     else:
-        context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.run_platform, device_id=args_opt.device_id)
+        context.set_context(mode=context.GRAPH_MODE, device_target=cfg.run_platform)
+        if cfg.run_platform == "Ascend":
+            device_id = int(os.getenv('DEVICE_ID'))
+            context.set_context(device_id=device_id)
 
-    mindrecord_file = create_mindrecord(args_opt.dataset, "ssd_eval.mindrecord", False)
+    mindrecord_file = create_mindrecord(cfg.dataset, "ssd_eval.mindrecord", False)
 
-    if args_opt.dataset == "coco":
-        json_path = os.path.join(config.coco_root, config.instances_set.format(config.val_data_type))
-    elif args_opt.dataset == "voc":
-        json_path = os.path.join(config.voc_root, config.voc_json)
+    if cfg.dataset == "coco":
+        json_path = os.path.join(cfg.coco_root, cfg.instances_set.format(cfg.val_data_type))
+    elif cfg.dataset == "voc":
+        json_path = os.path.join(cfg.voc_root, cfg.voc_json)
     else:
         raise ValueError('SSD eval only support dataset mode is coco and voc!')
     print("Start Eval!")
-    if args_opt.modelarts_mode:
+    if cfg.modelarts_mode:
         checkpoint_path = checkpoint_path + '/ssd-500_458.ckpt'
         ssd_eval(mindrecord_file, checkpoint_path, json_path)
-        mox.file.copy_parallel(config.mindrecord_dir, args_opt.train_url)
+        mox.file.copy_parallel(cfg.mindrecord_dir, cfg.train_url)
     else:
-        ssd_eval(mindrecord_file, args_opt.checkpoint_path, json_path)
+        ssd_eval(mindrecord_file, cfg.checkpoint_path, json_path)

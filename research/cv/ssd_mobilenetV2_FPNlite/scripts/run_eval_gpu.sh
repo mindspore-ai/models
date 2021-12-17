@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 # ============================================================================
 
 if [ $# != 4 ]
-then
-    echo "Usage: sh run_eval.sh [CONFIG_FILE] [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]"
+then 
+    echo "Usage: bash run_eval_gpu.sh [CONFIG_FILE] [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]"
 exit 1
 fi
 
@@ -30,15 +30,9 @@ get_real_path(){
 
 CONFIG_PATH=$(get_real_path "$1")
 DATASET=$2
-CHECKPOINT_PATH=$(get_real_path "$3")
-echo "$DATASET"
-echo "$CHECKPOINT_PATH"
+CKPT_PATH=$(get_real_path "$3")
+DEVICE_ID_=$4
 
-if [ ! -f "$CHECKPOINT_PATH" ]
-then
-    echo "error: CHECKPOINT_PATH=$PATH2 is not a file"
-exit 1
-fi
 
 if [[ ! -f $CONFIG_PATH ]]
 then
@@ -46,29 +40,34 @@ then
 exit 1
 fi
 
+if [ ! -f "$CKPT_PATH" ]
+then 
+    echo "error: CHECKPOINT_PATH=$CKPT_PATH is not a file"
+exit 1
+fi 
+
+#ulimit -u unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=$4
+export DEVICE_ID=$DEVICE_ID_
 export RANK_SIZE=$DEVICE_NUM
 export RANK_ID=0
 
-BASE_PATH=$(cd "$(dirname "$0")" || exit; pwd)
-cd "$BASE_PATH"/../ || exit
-
-if [ -d "eval$DEVICE_ID" ];
+if [ -d "eval" ];
 then
-    rm -rf ./eval"$DEVICE_ID"
+    rm -rf ./eval
 fi
-
-mkdir ./eval"$DEVICE_ID"
-cp ./*.py ./eval"$DEVICE_ID"
-cp -r ./src ./eval"$DEVICE_ID"
-cp -r ./config/*.yaml ./eval"$DEVICE_ID"
-cd ./eval"$DEVICE_ID" || exit
+mkdir ./eval
+cp ../*.py ./eval
+cp -- *.sh ./eval
+cp -r ../src ./eval
+cp -r ../config/*.yaml ./eval
+cd ./eval || exit
 env > env.log
-echo "start inferring for device $DEVICE_ID"
+echo "start evaluation for device $DEVICE_ID"
 python eval.py \
-    --config_path="$CONFIG_PATH" \
-    --dataset="$DATASET" \
-    --checkpoint_path="$CHECKPOINT_PATH" \
-    --device_id="$DEVICE_ID" > log.txt 2>&1 &
+--config_path="$CONFIG_PATH" \
+--dataset="$DATASET" \
+--checkpoint_path="$CKPT_PATH" \
+--run_platform="GPU" \
+--device_id="$DEVICE_ID" &> log &
 cd ..

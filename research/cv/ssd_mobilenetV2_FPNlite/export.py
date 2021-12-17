@@ -14,37 +14,28 @@
 # ============================================================================
 
 """export"""
-import argparse
 import numpy as np
 
 from mindspore import context, Tensor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net, export
 import mindspore.common.dtype as mstype
 from src.ssd import SsdInferWithDecoder, ssd_mobilenet_v2_fpn
-from src.config import config
 from src.box_utils import default_boxes
+from src.model_utils.config import config as cfg
 
-parser = argparse.ArgumentParser(description='SSD export')
-parser.add_argument("--device_id", type=int, default=0, help="Device id")
-parser.add_argument("--batch_size", type=int, default=1, help="batch size")
-parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
-parser.add_argument("--file_name", type=str, default="ssd", help="output file name.")
-parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='AIR', help='file format')
-parser.add_argument("--device_target", type=str, choices=["Ascend"], default="Ascend",
-                    help="device target")
-args = parser.parse_args()
-
-context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
+context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target)
+if cfg.device_target != "GPU":
+    context.set_context(device_id=cfg.device_id)
 
 if __name__ == '__main__':
-    net = ssd_mobilenet_v2_fpn(config=config)
-    net = SsdInferWithDecoder(net, Tensor(default_boxes), config)
+    net = ssd_mobilenet_v2_fpn(config=cfg)
+    net = SsdInferWithDecoder(net, Tensor(default_boxes), cfg)
 
-    param_dict = load_checkpoint(args.ckpt_file)
+    param_dict = load_checkpoint(cfg.ckpt_file)
     net.init_parameters_data()
     load_param_into_net(net, param_dict)
     net.set_train(False)
 
-    input_shp = [args.batch_size, 3] + config.img_shape
+    input_shp = [cfg.batch_size, 3] + cfg.img_shape
     input_array = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp), mstype.float32)
-    export(net, input_array, file_name=args.file_name, file_format=args.file_format)
+    export(net, input_array, file_name=cfg.file_name, file_format=cfg.file_format)

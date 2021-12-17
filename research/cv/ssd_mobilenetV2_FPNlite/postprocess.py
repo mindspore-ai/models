@@ -1,3 +1,4 @@
+# pylint: disable=no-member
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,19 +15,10 @@
 # ============================================================================
 """post process for 310 inference"""
 import os
-import argparse
 import numpy as np
 from PIL import Image
-
-from src.config import config
 from src.eval_utils import metrics
-
-parser = argparse.ArgumentParser(description="ssd_mobilenetv2 acc calculation")
-parser.add_argument("--result_path", type=str, required=True, help="result files path.")
-parser.add_argument("--img_path", type=str, required=True, help="image file path.")
-parser.add_argument("--anno_path", type=str, required=True, help="annotation json file path.")
-parser.add_argument("--drop", action="store_true", help="drop iscrowd images or not.")
-args = parser.parse_args()
+from src.model_utils.config import config as cfg
 
 def get_imgSize(file_name):
     img = Image.open(file_name)
@@ -34,10 +26,10 @@ def get_imgSize(file_name):
 
 def get_result(result_path, img_id_file_path):
     '''calculate map result for this net'''
-    anno_json = args.anno_path
-    if args.drop:
+    anno_json = cfg.anno_path
+    if cfg.drop:
         from pycocotools.coco import COCO
-        train_cls = config.classes
+        train_cls = cfg.classes
         train_cls_dict = {}
         for i, cls in enumerate(train_cls):
             train_cls_dict[cls] = i
@@ -53,7 +45,7 @@ def get_result(result_path, img_id_file_path):
     for file in files:
         img_ids_name = file.split('.')[0]
         img_id = int(np.squeeze(img_ids_name))
-        if args.drop:
+        if cfg.drop:
             anno_ids = coco.getAnnIds(imgIds=img_id, iscrowd=None)
             anno = coco.loadAnns(anno_ids)
             annos = []
@@ -73,8 +65,8 @@ def get_result(result_path, img_id_file_path):
         image_shape = np.array([img_size[1], img_size[0]])
         result_path_0 = os.path.join(result_path, img_ids_name + "_0.bin")
         result_path_1 = os.path.join(result_path, img_ids_name + "_1.bin")
-        boxes = np.fromfile(result_path_0, dtype=np.float32).reshape(config.num_ssd_boxes, 4)
-        box_scores = np.fromfile(result_path_1, dtype=np.float32).reshape(config.num_ssd_boxes, config.num_classes)
+        boxes = np.fromfile(result_path_0, dtype=np.float32).reshape(cfg.num_ssd_boxes, 4)
+        box_scores = np.fromfile(result_path_1, dtype=np.float32).reshape(cfg.num_ssd_boxes, cfg.num_classes)
 
         pred_data.append({
             "boxes": boxes,
@@ -86,4 +78,4 @@ def get_result(result_path, img_id_file_path):
     print(f" mAP:{mAP}")
 
 if __name__ == '__main__':
-    get_result(args.result_path, args.img_path)
+    get_result(cfg.result_path, cfg.img_path)
