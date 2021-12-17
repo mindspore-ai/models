@@ -1,0 +1,73 @@
+{
+  "im_efficientnet_b3": {
+    "stream_config": {
+      "deviceId": "0"
+    },
+    "appsrc0": {
+      "props": {
+        "blocksize": "409600"
+      },
+      "factory": "appsrc",
+      "next": "mxpi_imagedecoder0"
+    },
+    "mxpi_imagedecoder0": {
+      "props": {
+        "handleMethod": "opencv"
+      },
+      "factory": "mxpi_imagedecoder",
+      "next": "mxpi_imageresize0"
+    },
+    "mxpi_imageresize0": {
+      "props": {
+        "handleMethod": "opencv",
+        "resizeHeight": "320",
+        "resizeWidth": "320",
+        "resizeType": "Resizer_Stretch"
+      },
+      "factory": "mxpi_imageresize",
+      "next": "mxpi_imagecrop0"
+    },
+    "mxpi_imagecrop0": {
+          "props": {
+            "dataSource": "mxpi_imageresize0",
+            "cropHeight": "300",
+            "cropWidth": "300"
+          },
+          "factory": "mxpi_opencvcentercrop",
+          "next": "mxpi_tensorinfer0"
+        },
+    "mxpi_tensorinfer0": {
+      "props": {
+        "dataSource": "mxpi_imagecrop0",
+        "modelPath": "../data/model/efficient_b3.om",
+        "waitingTime": "1",
+        "outputDeviceId": "-1"
+      },
+      "factory": "mxpi_tensorinfer",
+      "next": "mxpi_classpostprocessor0"
+    },
+    "mxpi_classpostprocessor0": {
+     "props": {
+        "dataSource": "mxpi_tensorinfer0",
+        "postProcessConfigPath": "../data/config/efficientnet_b3.cfg",
+        "labelPath": "../data/config/imagenet1000_clsidx_to_labels.names",
+        "postProcessLibPath": "/usr/local/sdk_home/mxManufacture/lib/modelpostprocessors/libresnet50postprocess.so"
+                },
+     "factory": "mxpi_classpostprocessor",
+     "next": "mxpi_dataserialize0"
+     },
+    "mxpi_dataserialize0": {
+      "props": {
+        "outputDataKeys": "mxpi_classpostprocessor0"
+      },
+      "factory": "mxpi_dataserialize",
+      "next": "appsink0"
+    },
+    "appsink0": {
+      "props": {
+        "blocksize": "4096000"
+      },
+      "factory": "appsink"
+    }
+  }
+}
