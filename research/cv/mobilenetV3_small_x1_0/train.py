@@ -15,8 +15,6 @@
 """train_imagenet."""
 
 import os
-import ast
-import argparse
 from mindspore import context
 from mindspore import Tensor
 
@@ -28,7 +26,7 @@ from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.common import set_seed
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank, get_group_size
 
 from src.dataset import create_dataset
 from src.lr_generator import get_lr
@@ -36,30 +34,18 @@ from src.config import config
 from src.loss import CrossEntropyWithLabelSmooth
 from src.monitor import Monitor
 from src.mobilenetv3 import mobilenet_v3_small
+from argparser import arg_parser
 
-set_seed(1)
 
-parser = argparse.ArgumentParser(description='Image classification')
-# modelarts parameter
-parser.add_argument('--data_url', type=str, default=None, help='Dataset path')
-parser.add_argument('--train_url', type=str, default=None, help='Train output path')
-# Ascend parameter
-parser.add_argument('--dataset_path', type=str, default=None, help='Dataset path')
-parser.add_argument('--run_distribute', type=ast.literal_eval, default=False, help='Run distribute')
-parser.add_argument('--device_id', type=int, default=0, help='Device id')
+def main(args_opt):
+    set_seed(1)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, save_graphs=False)
+    device_num = int(os.getenv('RANK_SIZE', '1'))
 
-parser.add_argument('--run_modelarts', type=ast.literal_eval, default=False, help='Run mode')
-parser.add_argument('--pre_trained', type=str, default=None, help='Pretrained checkpoint path')
-args_opt = parser.parse_args()
-
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False)
-
-if __name__ == '__main__':
     # init distributed
     if args_opt.run_modelarts:
         import moxing as mox
         device_id = int(os.getenv('DEVICE_ID'))
-        device_num = int(os.getenv('RANK_SIZE'))
         context.set_context(device_id=device_id)
         local_data_url = '/cache/data'
         local_train_url = '/cache/ckpt'
@@ -70,18 +56,25 @@ if __name__ == '__main__':
         mox.file.copy_parallel(args_opt.data_url, local_data_url)
     else:
         if args_opt.run_distribute:
-            device_id = int(os.getenv('DEVICE_ID'))
-            device_num = int(os.getenv('RANK_SIZE'))
-            context.set_context(device_id=device_id)
-            init()
-            context.reset_auto_parallel_context()
-            context.set_auto_parallel_context(device_num=device_num,
-                                              parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
+            if args_opt.device_target == 'Ascend':
+                device_id = int(os.getenv('DEVICE_ID'))
+                context.set_context(device_id=device_id)
+                init()
+                context.reset_auto_parallel_context()
+                context.set_auto_parallel_context(device_num=device_num,
+                                                  parallel_mode=ParallelMode.DATA_PARALLEL,
+                                                  gradients_mean=True)
+            elif args_opt.device_target == "GPU":
+                init()
+                device_id = get_rank()
+                device_num = get_group_size()
+                context.set_auto_parallel_context(device_num=device_num,
+                                                  parallel_mode=ParallelMode.DATA_PARALLEL,
+                                                  gradients_mean=True)
         else:
-            context.set_context(device_id=args_opt.device_id)
+            device_id = int(args_opt.device_id)
+            context.set_context(device_id=device_id)
             device_num = 1
-            device_id = 0
     # define net
     net = mobilenet_v3_small(num_classes=config.num_classes, multiplier=1.)
     # define loss
@@ -107,8 +100,7 @@ if __name__ == '__main__':
         param_dict = load_checkpoint(args_opt.pre_trained)
         load_param_into_net(net, param_dict)
     # define optimizer
-    loss_scale = FixedLossScaleManager(
-        config.loss_scale, drop_overflow_update=False)
+    loss_scale = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
     lr = Tensor(get_lr(global_step=0,
                        lr_init=0,
                        lr_end=0,
@@ -124,16 +116,24 @@ if __name__ == '__main__':
 
     cb = [Monitor(lr_init=lr.asnumpy())]
 
-    if config.save_checkpoint and (device_num == 1 or device_id == 0):
+    if config.save_checkpoint:
         config_ck = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_epochs * step_size,
                                      keep_checkpoint_max=config.keep_checkpoint_max)
-        if args_opt.run_modelarts:
-            ckpt_cb = ModelCheckpoint(prefix="mobilenetV3", directory=local_train_url, config=config_ck)
-        else:
-            save_ckpt_path = os.path.join(config.save_checkpoint_path, 'model_' + str(device_id) + '/')
-            ckpt_cb = ModelCheckpoint(prefix="mobilenetV3", directory=save_ckpt_path, config=config_ck)
+        if device_num == 1 or device_id == 0:
+            if args_opt.run_modelarts:
+                save_ckpt_path = local_train_url
+            else:
+                save_ckpt_path = os.path.join(config.save_checkpoint_path, 'model_' + str(device_id) + '/')
+        if args_opt.device_target == "GPU" and args_opt.run_distribute:
+            save_ckpt_path = os.path.join(config.save_checkpoint_path, "ckpt_" + str(device_id) + "/")
+
+        ckpt_cb = ModelCheckpoint(prefix="mobilenetV3", directory=save_ckpt_path, config=config_ck)
         cb += [ckpt_cb]
-    # begine train
+    # begin train
     model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
     if args_opt.run_modelarts and config.save_checkpoint and (device_num == 1 or device_id == 0):
         mox.file.copy_parallel(local_train_url, args_opt.train_url)
+
+
+if __name__ == '__main__':
+    main(arg_parser())

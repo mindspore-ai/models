@@ -15,9 +15,8 @@
 """
 eval.
 """
+
 import os
-import argparse
-import ast
 from mindspore import context
 from mindspore import nn
 from mindspore.train.model import Model
@@ -27,22 +26,13 @@ from src.dataset import create_dataset
 from src.config import config
 from src.loss import CrossEntropyWithLabelSmooth
 from src.mobilenetv3 import mobilenet_v3_small
+from argparser import arg_parser
 
-parser = argparse.ArgumentParser(description='Image classification')
-# modelarts parameter
-parser.add_argument('--data_url', type=str, default=None, help='Dataset path')
-parser.add_argument('--train_url', type=str, default=None, help='Train output path')
-# Ascend parameter
-parser.add_argument('--dataset_path', type=str, default=None, help='Dataset path')
-parser.add_argument('--checkpoint_path', type=str, default=None, help='Checkpoint file path')
-parser.add_argument('--device_id', type=int, default=0, help='Device id')
-
-parser.add_argument('--run_modelarts', type=ast.literal_eval, default=False, help='Run distribute')
-args_opt = parser.parse_args()
-
-set_seed(1)
 
 if __name__ == '__main__':
+    set_seed(1)
+    args_opt = arg_parser()
+
     if args_opt.run_modelarts:
         import moxing as mox
 
@@ -56,7 +46,7 @@ if __name__ == '__main__':
     else:
         context.set_context(device_id=args_opt.device_id)
 
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', save_graphs=False)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, save_graphs=False)
     net = mobilenet_v3_small(num_classes=config.num_classes, multiplier=1.)
 
     if args_opt.run_modelarts:

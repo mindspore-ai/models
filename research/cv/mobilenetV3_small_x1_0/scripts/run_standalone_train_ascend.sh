@@ -14,9 +14,23 @@
 # limitations under the License.
 # ============================================================================
 
-export DEVICE_ID=$1
-DATA_DIR=$2
-python ./train.py  \
-    --device_id=$DEVICE_ID  \
-    --dataset_path=$DATA_DIR > log.txt 2>&1 &
+if [ $# != 2 ]
+then
+    echo "Usage: bash run_standalone_train_ascend.sh [DATASET_PATH] [DEVICE_ID]"
+exit 1
+fi
+
+get_real_path(){
+  if [ "${1:0:1}" == "/" ]; then
+    echo "$1"
+  else
+    echo "$(realpath -m $PWD/$1)"
+  fi
+}
+
+export DATASET_PATH=$(get_real_path $1)
+export DEVICE_ID=$2
+
+python -u ../train.py --dataset_path=$DATASET_PATH --device_id=$DEVICE_ID \
+                      --device_target="Ascend" &> train.log &
 
