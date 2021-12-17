@@ -36,9 +36,15 @@ Dataset used: [Sentence polarity dataset v1.0](http://www.cs.cornell.edu/people/
 - Dataset size：10662 movie comments in 2 classes, 9596 comments for train set, 1066 comments for test set.
 - Data format：text files. The processed data is in ```./data/```
 
+Dataset used: [Movie Review Data](<http://www.cs.cornell.edu/people/pabo/movie-review-data/>)
+
+- Dataset size：1.18M，5331 positive and 5331 negative processed sentences / snippets.
+    - Train：1.06M, 9596 sentences / snippets
+    - Test：0.12M, 1066 sentences / snippets
+
 ## [Environment Requirements](#contents)
 
-- Hardware: Ascend
+- Hardware: Ascend/GPU
 - Framework: [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：[MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html), [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html).
 
@@ -65,7 +71,14 @@ Dataset used: [Sentence polarity dataset v1.0](http://www.cs.cornell.edu/people/
 
 - Running on Ascend
 
-  If you are running the scripts for the first time and , you must set the parameter 'preprocess' to 'true' in the `default_config.yaml` and run training to get the folder 'preprocess' containing data。
+  If you are running the scripts for the first time and , you must prepare dataset and set these parameters in the `default_config.yaml`.
+
+  data_path: "YOUR_SENTENCE_DATA_PATH",     # e.g. ./Sentence-polarity-dataset-v1.0/data
+  pos_dir: "DATA_POS_FILE",                 # e.g. ./rt_polaritydata/rt-polarity.pos
+  neg_dir: "DATA_NEG_FILE",                 # e.g. ./rt_polaritydata/rt-polarity.neg
+  preprocess: "true",
+  data_root: "YOUR_SENTENCE_DATA_PATH",     # e.g. ./Sentence-polarity-dataset-v1.0/data
+  emb_path: "YOUR_SENTENCE_WORD2VEC_PATH"   # e.g. ./Sentence-polarity-dataset-v1.0/word2vec
 
 ```python
 # run training
@@ -81,7 +94,14 @@ bash scripts/run_eval.sh
 
 - Running on GPU
 
-  If you are running the scripts for the first time and , you must set the parameter 'preprocess' to 'true' in the `default_config.yaml` and run training to get the folder 'preprocess' containing data。
+  If you are running the scripts for the first time and , you must prepare dataset and set these parameters in the `default_config.yaml`.
+
+  data_path: "YOUR_SENTENCE_DATA_PATH",     # e.g. ./Sentence-polarity-dataset-v1.0/data
+  pos_dir: "DATA_POS_FILE",                 # e.g. ./rt_polaritydata/rt-polarity.pos
+  neg_dir: "DATA_NEG_FILE",                 # e.g. ./rt_polaritydata/rt-polarity.neg
+  preprocess: "true",
+  data_root: "YOUR_SENTENCE_DATA_PATH",     # e.g. ./Sentence-polarity-dataset-v1.0/data
+  emb_path: "YOUR_SENTENCE_WORD2VEC_PATH"   # e.g. ./Sentence-polarity-dataset-v1.0/word2vec
 
 ```python
 # run training
@@ -274,14 +294,27 @@ Inference result is saved in current path, you can find result like this in acc.
 
 ### Performance
 
+#### Training Performance
+
 | Model                      | MindSpore + Ascend              | MindSpore + GPU                |
 | -------------------------- | ------------------------------- | ------------------------------ |
 | Resource                   | Ascend 910; OS Euler2.8         | NV SMX2 V100-32G               |
 | Version                    | 1.0.1                           | 1.5.0                          |
 | Dataset                    | Sentence polarity dataset v1.0  | Sentence polarity dataset v1.0 |
+| epoch_size                 | 10                              | 10                             |
 | batch_size                 | 64                              | 64                             |
-| Accuracy                   | 0.78                            | 0.78                           |
-| Speed                      | 1P:35ms/step                    | 1p:65ms/step                   |
+| loss                       | 0.1720                          | 0.2501                         |
+| Speed                      | 1P:23.876 ms/step               | 1p:69.084 ms/step              |
+
+#### Evaluation Performance
+
+| Model                      | MindSpore + Ascend              | MindSpore + GPU                |
+| -------------------------- | ------------------------------- | ------------------------------ |
+| Resource                   | Ascend 910; OS Euler2.8         | NV SMX2 V100-32G               |
+| Version                    | 1.5.0                           | 1.5.0                          |
+| Dataset                    | Sentence polarity dataset v1.0  | Sentence polarity dataset v1.0 |
+| batch_size                 | 64                              | 64                             |
+| Accuracy                   | 0.7930                          | 0.8076                         |
 
 ## [ModelZoo Homepage](#contents)
 
