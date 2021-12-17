@@ -11,6 +11,9 @@ data_url: ""
 train_url: ""
 checkpoint_url: ""
 eval_checkpoint: ""
+result_path: "./scripts/result_Files/"
+head_positive_path: ""
+tail_positive_path: ""
 
 # ==============================================================================
 lr: 0.00005

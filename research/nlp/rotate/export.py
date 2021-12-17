@@ -16,8 +16,9 @@
 import numpy as np
 from mindspore import context, Tensor
 from mindspore.train.serialization import export, load_checkpoint, load_param_into_net
+import mindspore.nn as nn
+from mindspore.ops import operations as P
 
-from eval import KGEModel
 from src.rotate import ModelBuilder
 from src.dataset import get_entity_and_relation
 from src.model_utils.config import config
@@ -33,6 +34,36 @@ def modelarts_process():
     pass
 
 
+class KGEModel_Export(nn.Cell):
+    """
+    Generate sorted candidate entity id and positive sample.
+
+    Args:
+        network (nn.Cell): Trained model with entity embedding and relation embedding.
+        mode (str): which negative sample mode ('head-mode' or 'tail-mode').
+
+    Returns:
+        argsort: entity id sorted by score
+
+    """
+
+    def __init__(self, network, mode='head-mode'):
+        super(KGEModel_Export, self).__init__()
+        self.network = network
+        self.mode = mode
+        self.sort = P.Sort(axis=1, descending=True)
+
+    def construct(self, positive_sample, negative_sample, filter_bias):
+        """ Sort candidate entity id and positive sample entity id. """
+        if self.mode == 'head-mode':
+            score = self.network.construct_head((positive_sample, negative_sample))
+        else:
+            score = self.network.construct_tail((positive_sample, negative_sample))
+        score += filter_bias
+        _, argsort = self.sort(score)
+        return argsort
+
+
 @moxing_wrapper(pre_process=modelarts_process)
 def export_rotate():
     """ export_rotate """
@@ -43,14 +74,15 @@ def export_rotate():
     network = model_builder.get_eval_net()
     model_params = load_checkpoint(ckpt_file_name=config.eval_checkpoint)
     load_param_into_net(net=network, parameter_dict=model_params)
-    infer_net_head = KGEModel(network=network, mode='head-mode')
-    infer_net_tail = KGEModel(network=network, mode='tail-mode')
+
+    infer_net_head = KGEModel_Export(network=network, mode='head-mode')
+    infer_net_tail = KGEModel_Export(network=network, mode='tail-mode')
     infer_net_head.set_train(False)
     infer_net_tail.set_train(False)
 
-    positive_sample = Tensor(np.ones([config.batch_size, 3]).astype(np.int32))
-    negative_sample = Tensor(np.ones([config.batch_size, config.negative_sample_size]).astype(np.int32))
-    filter_bias = Tensor(np.ones([config.batch_size, 1]).astype(np.float32))
+    positive_sample = Tensor(np.ones([config.test_batch_size, 3]).astype(np.int32))
+    negative_sample = Tensor(np.ones([config.test_batch_size, config.num_entity]).astype(np.int32))
+    filter_bias = Tensor(np.ones([config.test_batch_size, config.num_entity]).astype(np.float32))
 
     input_data = [positive_sample, negative_sample, filter_bias]
     export(
