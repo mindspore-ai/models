@@ -21,9 +21,11 @@ import mindspore.common.dtype as mstype
 import mindspore.dataset.engine as de
 import mindspore.dataset.vision.c_transforms as C
 import mindspore.dataset.transforms.c_transforms as C2
+from mindspore.communication.management import init, get_rank, get_group_size
 
 
-def create_dataset(dataset_path, do_train, repeat_num=1, infer_910=True, device_id=0, batch_size=32):
+def create_dataset(dataset_path, do_train, repeat_num=1, infer_910=False, device_id=0,\
+    batch_size=32, distribute: bool = False, target: str = "GPU"):
     """
     create a train or evaluate cifar10 dataset for WideResnet
     Args:
@@ -31,17 +33,23 @@ def create_dataset(dataset_path, do_train, repeat_num=1, infer_910=True, device_
         do_train(bool): whether dataset is used for train or eval.
         repeat_num(int): the repeat times of dataset. Default: 1
         batch_size(int): the batch size of dataset. Default: 32
-        infer_910(bool): infer 910 or infer 310. Default: True
-        device_id(int): infer 310 device_id. Default: 0
+
     Returns:
         dataset
     """
+    num_parallel_workers = 5
 
-    device_num = 1
-    device_id = device_id
-    if infer_910:
-        device_id = int(os.getenv('DEVICE_ID'))
+    if target == "Ascend" and infer_910:
+        rank_id = int(os.getenv('DEVICE_ID'))
         device_num = int(os.getenv('RANK_SIZE'))
+    else:
+        if distribute:
+            init()
+            rank_id = get_rank()
+            device_num = get_group_size()
+        else:
+            device_num = 1
+            rank_id = 0
 
     if do_train:
         dataset_path = os.path.join(dataset_path, 'train')
@@ -49,15 +57,19 @@ def create_dataset(dataset_path, do_train, repeat_num=1, infer_910=True, device_
         dataset_path = os.path.join(dataset_path, 'eval')
 
     if device_num == 1:
-        ds = de.Cifar10Dataset(dataset_path)
+        ds = de.Cifar10Dataset(dataset_path,
+                               num_parallel_workers=num_parallel_workers,
+                               shuffle=True)
     else:
         if do_train:
-            ds = de.Cifar10Dataset(dataset_path, num_parallel_workers=8, shuffle=True,
-                                   num_shards=device_num, shard_id=device_id)
+            ds = de.Cifar10Dataset(dataset_path,
+                                   num_parallel_workers=num_parallel_workers,
+                                   shuffle=True,
+                                   num_shards=device_num,
+                                   shard_id=rank_id)
         else:
             ds = de.Cifar10Dataset(dataset_path)
 
-    # define map operations
     trans = []
     if do_train:
         trans += [
@@ -72,8 +84,12 @@ def create_dataset(dataset_path, do_train, repeat_num=1, infer_910=True, device_
 
     type_cast_op = C2.TypeCast(mstype.int32)
 
-    ds = ds.map(operations=type_cast_op, input_columns="label", num_parallel_workers=8)
-    ds = ds.map(operations=trans, input_columns="image", num_parallel_workers=8)
+    ds = ds.map(operations=type_cast_op,
+                input_columns="label",
+                num_parallel_workers=num_parallel_workers)
+    ds = ds.map(operations=trans,
+                input_columns="image",
+                num_parallel_workers=num_parallel_workers)
 
     ds = ds.batch(batch_size, drop_remainder=True)
 

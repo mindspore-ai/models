@@ -17,57 +17,47 @@
 python eval.py
 """
 import os
-import ast
-import argparse
 from mindspore import context
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore.train.summary.summary_record import SummaryRecord
 
 from src.cross_entropy_smooth import CrossEntropySmooth
 from src.wide_resnet import wideresnet
 from src.dataset import create_dataset
-from src.config import config_WideResnet as cfg
+from src.model_utils.config import config as cfg
 
-
-parser = argparse.ArgumentParser(description='Ascend WideResNet CIFAR10 Eval')
-parser.add_argument('--data_url', required=True, default=None, help='Location of data')
-parser.add_argument('--ckpt_url', type=str, default=None, help='location of ckpt')
-parser.add_argument('--modelart', required=True, type=ast.literal_eval, default=False,
-                    help='training on modelart or not, default is False')
-args = parser.parse_args()
-
-device_id = int(os.getenv('DEVICE_ID'))
-device_num = int(os.getenv('RANK_SIZE'))
+from src.callbacks import PredictionsCallback
 
 if __name__ == '__main__':
 
-    target = 'Ascend'
-
-    context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False,
-                        device_id=int(os.environ["DEVICE_ID"]))
-
-    data_path = '/cache/data_path'
-
-    if args.modelart:
-        import moxing as mox
-        mox.file.copy_parallel(src_url=args.data_url, dst_url=data_path)
+    target = cfg.device_target
+    if target == "Ascend":
+        context.set_context(mode=context.GRAPH_MODE,
+                            device_target=target,
+                            save_graphs=False,
+                            device_id=int(os.environ["DEVICE_ID"]))
     else:
-        data_path = args.data_url
+        context.set_context(mode=context.GRAPH_MODE,
+                            device_target=target,
+                            save_graphs=False)
+    data_path = cfg.data_path
+
+    if cfg.modelart:
+        import moxing as mox
+        mox.file.copy_parallel(cfg.ckpt_url, dst_url=cfg.checkpoint_file_path)
+        param_dict = load_checkpoint('/cache/ckpt_path/WideResNet_best.ckpt')
+    else:
+        param_dict = load_checkpoint(cfg.checkpoint_file_path)
 
     ds_eval = create_dataset(dataset_path=data_path,
                              do_train=False,
                              repeat_num=cfg.repeat_num,
-                             batch_size=cfg.batch_size)
+                             batch_size=cfg.batch_size,
+                             target=target,
+                             infer_910=cfg.infer_910)
 
-    net = wideresnet()
-
-    ckpt_path = '/cache/ckpt_path/'
-    if args.modelart:
-        import moxing as mox
-        mox.file.copy_parallel(args.ckpt_url, dst_url=ckpt_path)
-        param_dict = load_checkpoint('/cache/ckpt_path/WideResNet_best.ckpt')
-    else:
-        param_dict = load_checkpoint(args.ckpt_url)
+    net = wideresnet(mode='eval', batch_size=cfg.batch_size)
     load_param_into_net(net, param_dict)
     net.set_train(False)
 
@@ -78,6 +68,12 @@ if __name__ == '__main__':
 
     model = Model(net, loss_fn=loss, metrics={'top_1_accuracy'})
 
-    output = model.eval(ds_eval)
 
+    output_path = os.path.join(cfg.output_path, "eval_exp_" + cfg.experiment_label)
+    summary_save_dir = output_path +  cfg.summary_dir
+
+    cb = []
+    with SummaryRecord(summary_save_dir) as summary_record:
+        cb += [PredictionsCallback(summary_record=summary_record, summary_freq=cfg.collection_freq)]
+        output = model.eval(ds_eval, callbacks=cb)
     print("result:", output)

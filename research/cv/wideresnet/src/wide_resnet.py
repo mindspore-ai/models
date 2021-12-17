@@ -27,7 +27,11 @@ class WideBasic(nn.Cell):
 
         self.bn1 = nn.BatchNorm2d(in_channels)
         self.relu = nn.ReLU()
-        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=stride, has_bias=True)
+        self.conv1 = nn.Conv2d(in_channels,
+                               out_channels,
+                               kernel_size=3,
+                               stride=stride,
+                               has_bias=True)
         self.bn2 = nn.BatchNorm2d(out_channels)
         self.dropout = nn.Dropout(keep_prob=0.7)
         self.conv2 = nn.Conv2d(out_channels, out_channels, kernel_size=3, stride=1, has_bias=True)
@@ -58,12 +62,12 @@ class WideBasic(nn.Cell):
 
         return x + shortcut
 
-
 class WideResNet(nn.Cell):
     """
     WideReNet
     """
-    def __init__(self, num_classes, block, depth=50, widen_factor=1):
+    def __init__(self, num_classes, block, depth=50, widen_factor=1,
+                 mode: str = 'train', batch_size: int = 32):
         """
         classes, block, depth, widen_factor
         """
@@ -84,12 +88,31 @@ class WideResNet(nn.Cell):
         self.linear = nn.Dense(64 * k, num_classes, has_bias=True)
 
         self.bn1 = nn.BatchNorm2d(16)
+        self.softmax = nn.Softmax()
 
+
+        self._mode = mode
+        self._uniform_real = ops.UniformReal(8)
+        self._im_summary = ops.ImageSummary()
+        self._tensor_summary = ops.TensorSummary()
+        self._batch_size = batch_size
+
+    #It needed for visualization cifar10 using MindInsight
+    #TODO - Change dataset preprocessing and remove it
+    def denormalize(self, x):
+        for i in range(self._batch_size):
+            x[i][0] = (x[i][0] * 0.2023 + 0.4914).astype("int32") #R
+            x[i][1] = (x[i][1] * 0.1994 + 0.4822).astype("int32") #G
+            x[i][2] = (x[i][2] * 0.2010 + 0.4465).astype("int32") #B
+        return x
 
     def construct(self, x):
         """
         WideResNet construct
         """
+        identity = x
+        if self._mode == 'eval':
+            self._im_summary('input_images', self.denormalize(identity))
 
         x = self.conv1(x)
         x = self.bn1(x)
@@ -103,6 +126,8 @@ class WideResNet(nn.Cell):
         x = self.flatten(x)
         x = self.linear(x)
 
+        if self._mode == 'eval':
+            self._tensor_summary('probs', self.softmax(x))
         return x
 
     def _make_layer(self, block, out_channels, num_blocks, stride):
@@ -119,6 +144,11 @@ class WideResNet(nn.Cell):
         return nn.SequentialCell(*layers)
 
 
-def wideresnet(depth=40, widen_factor=10):
-    net = WideResNet(10, WideBasic, depth=depth, widen_factor=widen_factor)
+def wideresnet(depth=40, widen_factor=10, mode: str = 'train', batch_size: int = 32):
+    net = WideResNet(10,
+                     WideBasic,
+                     depth=depth,
+                     widen_factor=widen_factor,
+                     mode=mode,
+                     batch_size=batch_size)
     return net

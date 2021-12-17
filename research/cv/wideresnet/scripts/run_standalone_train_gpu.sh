@@ -16,12 +16,12 @@
 
 CURPATH="$(dirname "$0")"
 # shellcheck source=/dev/null
-. ${CURPATH}/cache_util.sh
+. "${CURPATH}"/cache_util.sh
 
-if [ $# != 3 ] && [ $# != 4 ] && [ $# != 5 ]
+if [ $# != 3 ] && [ $# != 4 ] && [ $# != 5 ] && [ $# != 6 ]
 then 
-    echo "Usage: bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [LABEL] [PRETRAINED_CKPT_PATH](optional)"
-    echo "bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [LABEL] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)"
+    echo "Usage: bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [EXPERIMENT_LABEL] [PRETRAINED_CKPT_PATH](optional)"
+    echo " bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [EXPERIMENT_LABEL] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)"
 exit 1
 fi
 
@@ -29,37 +29,39 @@ get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
     echo "$1"
   else
-    echo "$(realpath -m $PWD/$1)"
+    realpath -m "$PWD"/"$1"
   fi
 }
 
-PATH1=$(get_real_path $1)
-CONFIG_FILE=$(get_real_path $2)
-LABEL=$3
+DATASET_PATH=$(get_real_path "$1")
+CONFIG_FILE=$(get_real_path "$2")
+EXPERIMENT_LABEL=$3
+
 if [ $# == 4 ]
 then
-    PATH2=$(get_real_path $4)
+    PRETRAINED_CKPT_PATH=$(get_real_path "$4")
 fi
 
 if [ $# == 5 ]
 then
   RUN_EVAL=$4
-  EVAL_DATASET_PATH=$(get_real_path $5)
+  EVAL_DATASET_PATH=$(get_real_path "$5")
 fi
 
-if [ ! -d $PATH1 ]
+if [ ! -d "$DATASET_PATH" ]
 then 
-    echo "error: DATASET_PATH=$PATH1 is not a directory"
+    echo "error: DATASET_PATH='$DATASET_PATH' is not a directory"
 exit 1
 fi
 
-if [ $# == 4 ] && [ ! -f $PATH2 ]
+if [[ $# == 4 && ! -f "$PRETRAINED_CKPT_PATH" ]]
 then
-    echo "error: PRETRAINED_CKPT_PATH=$PATH2 is not a file"
+    echo "error: PRETRAINED_CKPT_PATH=$PRETRAINED_CKPT_PATH is not a file"
 exit 1
 fi
 
-if [ "${RUN_EVAL}" == "True" ] && [ ! -d $EVAL_DATASET_PATH ]
+
+if [ "${RUN_EVAL}" == "True" ] && [ ! -d "$EVAL_DATASET_PATH" ]
 then
   echo "error: EVAL_DATASET_PATH=$EVAL_DATASET_PATH is not a directory"
   exit 1
@@ -71,8 +73,9 @@ then
   CACHE_SESSION_ID=$(generate_cache_session)
 fi
 
-ulimit -u unlimited
+#ulimit -u unlimited
 export DEVICE_NUM=1
+export DEVICE_ID=0
 export RANK_ID=0
 export RANK_SIZE=1
 
@@ -83,26 +86,29 @@ fi
 mkdir ./train
 cp ../config/*.yaml ./train
 cp ../*.py ./train
-cp *.sh ./train
+cp -- *.sh ./train
 cp -r ../src ./train
 cd ./train || exit
 echo "start training for device $DEVICE_ID"
 env > env.log
-if [ $# ==  3 ]
+
+if [ $# == 3 ]
 then
-    python train.py  --data_path=$PATH1 --config_path=$CONFIG_FILE --experiment_label=$LABEL &> log &
+    python train.py --device_target "GPU" --data_path="$DATASET_PATH" --config_path="$CONFIG_FILE" --experiment_label="$EXPERIMENT_LABEL" &> log & 
 fi
+
 
 if [ $# == 4 ]
 then
-    python train.py --data_path=$PATH1 --pre_trained=$PATH2 --config_path=$CONFIG_FILE --experiment_label=$LABEL &> log &
+    python train.py --device_target "GPU" --data_path="$DATASET_PATH" --pre_trained="$PRETRAINED_CKPT_PATH" \
+    --config_path="$CONFIG_FILE" --experiment_label="$EXPERIMENT_LABEL" &> log &
 fi
 
 if [ $# == 5 ]
 then
-    python train.py --data_path=$PATH1 --run_eval=$RUN_EVAL --eval_data_path=$EVAL_DATASET_PATH \
-           --enable_cache=True --cache_session_id=$CACHE_SESSION_ID \
-           --config_path=$CONFIG_FILE --experiment_label=$LABEL &> log &
+    python train.py --device_target "GPU" --data_path="$DATASET_PATH" --run_eval="$RUN_EVAL" \
+           --eval_data_path="$EVAL_DATASET_PATH" --enable_cache=True --cache_session_id="$CACHE_SESSION_ID" \
+           --config_path="$CONFIG_FILE" --experiment_label="$EXPERIMENT_LABEL" &> log &
     if [ "${RUN_EVAL}" == "True" ]
     then
       echo -e "\nWhen training run is done, remember to shut down the cache server via \"cache_admin --stop\""

@@ -1,0 +1,69 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+# Path for local
+run_distribute: False
+run_eval: False
+eval_data_path: ""
+enable_cache: False
+cache_session_id: 0
+eval_start_epoch: 1
+eval_interval: 1
+save_best_ckpt: True
+acc_lower_bound: 0.94 
+
+
+device_target: "Ascend"
+device_id: 0
+infer_910: False
+
+modelart: False
+data_url: "data_url"
+ckpt_url: "ckpt_url"
+
+device_num: 1
+output_path: "/root/experiments/"
+experiment_label: ""
+data_path: "/cache/data"
+save_checkpoint_path: "/checkpoint/"
+checkpoint_file_path: ""
+use_summary_collector: True
+collection_freq: 30
+summary_dir: "/summary/"
+
+
+result_path: "result_path"
+label_path: "label_path"
+
+# ==============================================================================
+# Training options
+num_classes: 10
+batch_size: 64
+loss_scale: 32
+momentum: 0.9
+weight_decay: 0.0005
+epoch_size: 300
+pretrain_epoch_size: 0
+save_checkpoint: True
+save_checkpoint_epochs: 5
+keep_checkpoint_max: 10
+pre_trained: ""
+filter_weight: False
+warmup_epochs: 5
+lr_init: 0.1
+repeat_num: 1
+
+widen_factor: 10
+depth: 40
+
+use_label_smooth: True
+label_smooth_factor: 0.1
+
+---
+# Help description for each configuration
+data_path: "Dataset path for local"
+output_path: "Training output path for local"
+num_classes: "Class for dataset"
+batch_size: "Batch size for training and evaluation"
+epoch_size: "Total training epochs."
+save_checkpoint_path: "The location of the checkpoint file."
+filter_weight: "Allows you to leave the classifier uninitialized, when training from checkpoint."
+acc_lower_bound: The level of accuracy after which a more frequent accuracy check is enabled to preserve the best result
