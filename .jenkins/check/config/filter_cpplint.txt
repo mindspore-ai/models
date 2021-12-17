@@ -70,6 +70,9 @@
 "models/official/cv/nasnet/infer/mxbase/NASNet_A_MobileClassifyOpencv.h"  "runtime/references"
 "models/official/cv/nasnet/infer/mxbase/main_opencv.cpp"    "runtime/references"
 
+"models/official/cv/FCN8s/infer/mxbase/src/FCN8s.h"  "runtime/references"
+"models/official/cv/FCN8s/infer/mxbase/src/main.cpp"    "runtime/references"
+
 "models/research/cv/mnasnet/infer/mxbase/main.cpp"    "runtime/references"
 "models/research/cv/mnasnet/infer/mxbase/mnasnetClassifyOpencv.cpp"    "runtime/references"
 "models/research/cv/mnasnet/infer/mxbase/mnasnetClassifyOpencv.h"    "runtime/references"
