@@ -40,14 +40,14 @@ has_dropout: True
 
 # train option
 dataset: "imagenet2012"
-data_dir: ""
+data_dir: "/cache/data"
 pre_trained: ""
 lr_gamma: 0.1
 eta_min: 0.0
 T_max: 90
-log_interval: 100 # 1
+log_interval: 100
 ckpt_path: "outputs/"
-ckpt_interval: 5 # 1
+ckpt_interval: 5
 is_save_on_master: 1
 is_distributed: 0
 device_id: 1
