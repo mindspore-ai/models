@@ -12,13 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""train imagenet."""
-import argparse
 import math
 import random
+import os
 
 import numpy as np
 import mindspore
+from mindspore import nn
 from mindspore import Tensor, context
 from mindspore.communication.management import get_group_size, get_rank, init
 from mindspore.nn import SGD, RMSProp
@@ -28,14 +28,18 @@ from mindspore.train.callback import (CheckpointConfig, LossMonitor,
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from src.config import basic_config, dataset_config
-from src.dataset import create_dataset
-from src.efficientnet import efficientnet_b0
-from src.loss import LabelSmoothingCrossEntropy
+from mindspore.train.callback import SummaryCollector
 
-mindspore.common.set_seed(basic_config.random_seed)
-random.seed(basic_config.random_seed)
-np.random.seed(basic_config.random_seed)
+from src.config import config
+from src.dataset import create_dataset, create_dataset_val
+from src.efficientnet import efficientnet_b0, efficientnet_b1
+from src.loss import LabelSmoothingCrossEntropy
+from src.callbacks import EvalCallBack
+
+
+mindspore.common.set_seed(config.random_seed)
+random.seed(config.random_seed)
+np.random.seed(config.random_seed)
 
 
 def get_lr(base_lr, total_epochs, steps_per_epoch, decay_steps=1,
@@ -53,41 +57,69 @@ def get_lr(base_lr, total_epochs, steps_per_epoch, decay_steps=1,
         decay_nums = math.floor(steps / decay_steps)
         decay_rate = math.pow(self_decay_rate, decay_nums)
         decay_lr = base_lr * decay_rate
-        lr = cond * warmup_lr + (1 - cond) * decay_lr
-        lr_each_step.append(lr)
+        step_lr = cond * warmup_lr + (1 - cond) * decay_lr
+        lr_each_step.append(step_lr)
     lr_each_step = lr_each_step[global_steps:]
     lr_each_step = np.array(lr_each_step).astype(np.float32)
     return lr_each_step
 
 
-parser = argparse.ArgumentParser(description='Training configuration', add_help=False)
-parser.add_argument('--data_path', type=str, metavar='DIR', required=True, help='path to dataset')
-parser.add_argument('--dataset', type=str, default='ImageNet', choices=['ImageNet', 'CIFAR10'],
-                    help='ImageNet or CIFAR10')
-parser.add_argument('--distributed', action='store_true', default=False)
-parser.add_argument('--platform', type=str, default='GPU', choices=('GPU', 'CPU'), help='run platform')
-parser.add_argument('--resume', default='', type=str, metavar='PATH',
-                    help='Resume full model and optimizer state from checkpoint (default: none)')
+def _create_net():
+    if config.model == 'efficientnet_b0':
+        return efficientnet_b0(num_classes=config.num_classes,
+                               cfg=config,
+                               drop_rate=config.drop,
+                               drop_connect_rate=config.drop_connect,
+                               global_pool=config.gp,
+                               bn_tf=config.bn_tf,
+                              )
+    if config.model == 'efficientnet_b1':
+        return efficientnet_b1(num_classes=config.num_classes,
+                               cfg=config,
+                               drop_rate=config.drop,
+                               drop_connect_rate=config.drop_connect,
+                               global_pool=config.gp,
+                               bn_tf=config.bn_tf,
+                              )
+    raise NotImplementedError("This model currently not supported")
 
 
-def main():
-    args, _ = parser.parse_known_args()
-    print(args)
+def _create_optim(net_, lr_):
+    if config.opt == 'sgd':
+        return SGD(net_.trainable_params(), learning_rate=lr_, momentum=config.momentum,
+                   weight_decay=config.weight_decay,
+                   loss_scale=config.loss_scale
+                  )
+    if config.opt == 'rmsprop':
+        return RMSProp(net_.trainable_params(), learning_rate=lr_, decay=0.9,
+                       weight_decay=config.weight_decay, momentum=config.momentum,
+                       epsilon=config.opt_eps, loss_scale=config.loss_scale
+                      )
+    raise NotImplementedError("This optimizer currently not supported")
+
+
+if __name__ == '__main__':
+    print("\n=====> Loading...")
+    print("\n===> Configuration:")
+    print(config)
+
+    local_path = '/'.join(os.path.realpath(__file__).split('/')[:-1])
+    summary_dir = local_path + "/train/summary/"
 
     rank_id, rank_size = 0, 1
     context.set_context(mode=context.GRAPH_MODE)
 
-    if args.platform == "GPU":
+    if config.platform == "GPU":
         dataset_sink_mode = True
         context.set_context(device_target='GPU', enable_graph_kernel=True)
-    elif args.platform == "CPU":
+    elif config.platform == "CPU":
         dataset_sink_mode = False
         context.set_context(device_target='CPU')
     else:
         raise NotImplementedError("Training only supported for CPU and GPU.")
 
-    if args.distributed:
-        if args.platform == "GPU":
+    if config.distributed:
+        if config.platform == "GPU":
             init("nccl")
         else:
             raise NotImplementedError("Distributed Training only supported for GPU.")
@@ -96,72 +128,102 @@ def main():
         rank_size = get_group_size()
         context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
                                           gradients_mean=True, device_num=rank_size)
+        summary_dir += "thread_num_" + str(rank_id) + "/"
 
-    dataset_type = args.dataset.lower()
-    cfg = dataset_config[dataset_type].cfg
+    print("\n===> Creating summary collector callback with path:")
+    summary_cb = SummaryCollector(summary_dir)
 
-    net = efficientnet_b0(num_classes=cfg.num_classes,
-                          cfg=dataset_config[dataset_type],
-                          drop_rate=cfg.drop,
-                          drop_connect_rate=cfg.drop_connect,
-                          global_pool=cfg.gp,
-                          bn_tf=cfg.bn_tf,
-                          )
+    if config.model == 'efficientnet_b0':
+        model_name = 'efficientnet_b0'
+    elif config.model == 'efficientnet_b1':
+        model_name = 'efficientnet_b1'
+    else:
+        raise NotImplementedError("This model currently not supported")
 
-    train_data_url = args.data_path
+    dataset_type = config.dataset.lower()
+
+    print(f"\n===> Creating {model_name} network...")
+
+    net = _create_net()
+
+    if dataset_type == 'imagenet':
+        data_url = config.data_path
+        train_data_url = data_url + '/train'
+        val_data_url = data_url + '/val'
+    elif dataset_type == 'cifar10':
+        data_url = config.data_path
+        train_data_url = data_url
+        val_data_url = data_url
+
+    print(f"\n===> Creating train dataset from path: {train_data_url} ...")
+
     train_dataset = create_dataset(
-        dataset_type, train_data_url, cfg.batch_size, workers=cfg.workers, distributed=args.distributed)
+        dataset_type, model_name, train_data_url, config.batch_size,
+        workers=config.workers, distributed=config.distributed)
     batches_per_epoch = train_dataset.get_dataset_size()
     print("Batches_per_epoch: ", batches_per_epoch)
 
-    loss_cb = LossMonitor(per_print_times=1 if args.platform == "CPU" else batches_per_epoch)
-    loss = LabelSmoothingCrossEntropy(smooth_factor=cfg.smoothing, num_classes=cfg.num_classes)
+    print(f"\n===> Creating validation dataset from path: {val_data_url} ...")
+
+    val_dataset = create_dataset_val(
+        dataset_type, model_name, val_data_url, config.batch_size,
+        workers=config.workers, distributed=config.distributed)
+
+    print("\n===> Creating Loss...")
+
+    loss_cb = LossMonitor(per_print_times=1 if config.platform == "CPU" else batches_per_epoch)
+    loss = LabelSmoothingCrossEntropy(smooth_factor=config.smoothing, num_classes=config.num_classes)
     time_cb = TimeMonitor(data_size=batches_per_epoch)
     loss_scale_manager = FixedLossScaleManager(
-        cfg.loss_scale, drop_overflow_update=False)
+        config.loss_scale, drop_overflow_update=False)
 
-    callbacks = [time_cb, loss_cb]
+    callbacks = [time_cb, loss_cb, summary_cb]
 
-    if cfg.save_checkpoint:
+    print("\n===> Creating metrics for validation...")
+
+    eval_metrics = {'Loss': nn.Loss(),
+                    'Top1-Acc': nn.Top1CategoricalAccuracy(),
+                    'Top5-Acc': nn.Top5CategoricalAccuracy()}
+
+    if config.save_checkpoint:
         config_ck = CheckpointConfig(
-            save_checkpoint_steps=batches_per_epoch, keep_checkpoint_max=cfg.keep_checkpoint_max)
+            save_checkpoint_steps=batches_per_epoch, keep_checkpoint_max=config.keep_checkpoint_max)
         ckpoint_cb = ModelCheckpoint(
-            prefix=cfg.model, directory='./ckpt_' + str(rank_id) + '/', config=config_ck)
+            prefix=config.model, directory='./ckpt_' + str(rank_id) + '/', config=config_ck)
         callbacks += [ckpoint_cb]
 
-    lr = Tensor(get_lr(base_lr=cfg.lr, total_epochs=cfg.epochs, steps_per_epoch=batches_per_epoch,
-                       decay_steps=cfg.decay_epochs, decay_rate=cfg.decay_rate,
-                       warmup_steps=cfg.warmup_epochs, warmup_lr_init=cfg.warmup_lr_init,
-                       global_epoch=cfg.resume_start_epoch))
-    if cfg.opt == 'sgd':
-        optimizer = SGD(net.trainable_params(), learning_rate=lr, momentum=cfg.momentum,
-                        weight_decay=cfg.weight_decay,
-                        loss_scale=cfg.loss_scale
-                        )
-    elif cfg.opt == 'rmsprop':
-        optimizer = RMSProp(net.trainable_params(), learning_rate=lr, decay=0.9, weight_decay=cfg.weight_decay,
-                            momentum=cfg.momentum, epsilon=cfg.opt_eps, loss_scale=cfg.loss_scale
-                            )
+    lr = Tensor(get_lr(base_lr=config.lr, total_epochs=config.epochs, steps_per_epoch=batches_per_epoch,
+                       decay_steps=config.decay_epochs, decay_rate=config.decay_rate,
+                       warmup_steps=config.warmup_epochs, warmup_lr_init=config.warmup_lr_init,
+                       global_epoch=config.resume_start_epoch))
+
+    optimizer = _create_optim(net, lr)
 
     loss.add_flags_recursive(fp32=True, fp16=False)
 
-    if args.resume:
-        ckpt = load_checkpoint(args.resume)
+    if config.resume:
+        print("\n===> Resuming from checkpoint...")
+        ckpt = load_checkpoint(config.resume)
         load_param_into_net(net, ckpt)
+
+    print("\n===> Creating Model object...")
 
     model = Model(net, loss, optimizer,
                   loss_scale_manager=loss_scale_manager,
-                  amp_level=cfg.amp_level
+                  amp_level=config.amp_level,
+                  metrics=eval_metrics
                   )
 
-    if args.resume:
-        real_epoch = cfg.epochs - cfg.resume_start_epoch
+    eval_log = {"Epoch": [], "Val_Loss": [], "Val_Top1-Acc": [], "Val_Top5-Acc": []}
+    eval_cb = EvalCallBack(model, val_dataset, eval_per_epoch=10, eval_log=eval_log)
+    callbacks += [eval_cb]
+
+    print("\n=====> Finished loading, starting training...\n\n")
+
+    if config.resume:
+        real_epoch = config.epochs - config.resume_start_epoch
         model.train(real_epoch, train_dataset,
                     callbacks=callbacks, dataset_sink_mode=dataset_sink_mode)
     else:
-        model.train(cfg.epochs, train_dataset,
+        model.train(config.epochs, train_dataset,
                     callbacks=callbacks, dataset_sink_mode=dataset_sink_mode)
-
-
-if __name__ == '__main__':
-    main()

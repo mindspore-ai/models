@@ -19,7 +19,7 @@ import re
 from copy import deepcopy
 
 import mindspore as ms
-import mindspore.nn as nn
+from mindspore import nn
 from mindspore.common.initializer import (Normal, One, Uniform, Zero)
 from mindspore.ops import operations as P
 from mindspore.ops.composite import clip_by_value
@@ -710,12 +710,15 @@ def _gen_efficientnet(channel_multiplier=1.0, depth_multiplier=1.0, num_classes=
 
 def efficientnet_b0(num_classes=1000, in_chans=3, cfg=None, **kwargs):
     """ EfficientNet-B0 """
-    default_cfg = default_cfgs['efficientnet_b0']
-    default_cfg["num_classes"] = num_classes
-    if cfg:
-        default_cfg.update({k: v for k, v in cfg.items() if k in default_cfg})
     model = _gen_efficientnet(
         channel_multiplier=1.0, depth_multiplier=1.0,
         num_classes=num_classes, in_chans=in_chans, **kwargs)
-    model.default_cfg = default_cfg
+    return model
+
+
+def efficientnet_b1(num_classes=1000, in_chans=3, cfg=None, **kwargs):
+    """ EfficientNet-B1 """
+    model = _gen_efficientnet(
+        channel_multiplier=1.0, depth_multiplier=1.1,
+        num_classes=num_classes, in_chans=in_chans, **kwargs)
     return model

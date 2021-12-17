@@ -54,6 +54,23 @@ Note: Data will be processed in src/dataset.py
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
 
+# [Quick Start](#contents)
+
+After installing MindSpore via the official website, you can start training and evaluation as follows:
+
+- Training on GPU:
+
+```bash
+bash run_standalone_train_gpu.sh [DATASET_TYPE] [DATASET_PATH] [MODEL_NAME] [PRETRAINED_CKPT_PATH](optional)
+```
+
+- Evaluation on GPU:
+
+```bash
+cd scripts
+bash run_eval_cpu.sh [DATASET_TYPE] [DATASET_PATH] [MODEL_NAME] [CHECKPOINT_PATH]
+```
+
 # [Script description](#contents)
 
 ## [Script and sample code](#contents)
@@ -63,26 +80,37 @@ Note: Data will be processed in src/dataset.py
 └─efficientnet
   ├─README.md
   ├─scripts
-    ├─run_train_cpu.sh                # launch training with cpu platform
-    ├─run_standalone_train_gpu.sh     # launch standalone training with gpu platform
-    ├─run_distribute_train_gpu.sh     # launch distributed training with gpu platform
-    ├─run_eval_cpu.sh                 # launch evaluating with cpu platform
-    └─run_eval_gpu.sh                 # launch evaluating with gpu platform
+    ├─run_train_cpu.sh                    # launch training with cpu platform
+    ├─run_standalone_train_gpu.sh         # launch standalone training with gpu platform
+    ├─run_distribute_train_gpu.sh         # launch distributed training with gpu platform
+    ├─run_eval_cpu.sh                     # launch evaluating with cpu platform
+    └─run_eval_gpu.sh                     # launch evaluating with gpu platform
   ├─src
-    ├─config.py                       # parameter configuration
-    ├─dataset.py                      # data preprocessing
-    ├─efficientnet.py                 # network definition
-    ├─loss.py                         # Customized loss function
-    ├─transform_utils.py              # random augment utils
-    ├─transform.py                    # random augment class
-├─eval.py                             # eval net
-└─train.py                            # train net
+    ├─callbacks.py                        # callback for model evaluation during training
+    ├─config.py                           # parameter configuration
+    ├─dataset.py                          # data preprocessing
+    ├─efficientnet.py                     # network definition
+    ├─loss.py                             # Customized loss function
+    ├─transform_utils.py                  # random augment utils
+    ├─transform.py                        # random augment class
+  ├─efficientnet_b0_cifar10_config.yaml   # config for EfficientNet-B0 CIFAR10 training
+  ├─efficientnet_b0_imagenet_config.yaml  # config for EfficientNet-B0 ImageNet training
+  ├─efficientnet_b1_imagenet_config.yaml  # config for EfficientNet-B1 ImageNet training
+  ├─eval.py                               # eval net
+  ├─train.py                              # train net
+  ├─export.py                             # export net
+  ├─mindspore_hub_conf.py                 # midnspore hub configuration file
+  └─requirements.txt                      # pip requirements
 
 ```
 
 ## [Script Parameters](#contents)
 
-Parameters for both training and evaluating can be set in config.py.
+Parameters for both training and evaluating can be set in one of configuration files:
+
+- ```efficientnet_b0_cifar10_config.yaml```
+- ```efficientnet_b0_imagenet_config.yaml```
+- ```efficientnet_b1_imagenet_config.yaml```
 
 1. ImageNet Config for GPU:
 
@@ -150,15 +178,15 @@ Parameters for both training and evaluating can be set in config.py.
 
 ```bash
     # distribute training
-    bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_TYPE] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
+    bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_TYPE] [DATASET_PATH] [MODEL_NAME] [PRETRAINED_CKPT_PATH](optional)
     # standalone training
-    bash run_standalone_train_gpu.sh [DATASET_TYPE] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
+    bash run_standalone_train_gpu.sh [DATASET_TYPE] [DATASET_PATH] [MODEL_NAME] [PRETRAINED_CKPT_PATH](optional)
 ```
 
 2. CPU
 
 ```bash
-    bash run_train_cpu.sh [DATASET_TYPE] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
+    bash run_train_cpu.sh [DATASET_TYPE] [DATASET_PATH] [MODEL_NAME] [PRETRAINED_CKPT_PATH](optional)
 ```
 
 ### Launch Example
@@ -166,15 +194,15 @@ Parameters for both training and evaluating can be set in config.py.
 ```bash
 # distributed training example(8p) for GPU
 cd scripts
-bash run_distribute_train_gpu.sh 8 0,1,2,3,4,5,6,7 ImageNet /dataset/train
+bash run_distribute_train_gpu.sh 8 0,1,2,3,4,5,6,7 ImageNet ./dataset
 
 # standalone training example for GPU
 cd scripts
-bash run_standalone_train_gpu.sh ImageNet /dataset/train
+bash run_standalone_train_gpu.sh ImageNet ./dataset
 
 # training example for CPU
 cd scripts
-bash run_train_cpu.sh ImageNet /dataset/train
+bash run_train_cpu.sh ImageNet ./dataset
 ```
 
 You can find checkpoint file together with result in log.
@@ -186,13 +214,13 @@ You can find checkpoint file together with result in log.
 1. CPU
 
 ```bash
-bash run_eval_cpu.sh [DATASET_TYPE] [DATASET_PATH] [CHECKPOINT_PATH]
+bash run_eval_cpu.sh [DATASET_TYPE] [DATASET_PATH] [MODEL_NAME] [CHECKPOINT_PATH]
 ```
 
 2. GPU
 
 ```bash
-bash run_eval_gpu.sh [DATASET_TYPE] [DATASET_PATH] [CHECKPOINT_PATH]
+bash run_eval_gpu.sh [DATASET_TYPE] [DATASET_PATH] [MODEL_NAME] [CHECKPOINT_PATH]
 ```
 
 #### Launch Example
@@ -200,11 +228,11 @@ bash run_eval_gpu.sh [DATASET_TYPE] [DATASET_PATH] [CHECKPOINT_PATH]
 ```bash
 # Evaluation with checkpoint for GPU
 cd scripts
-bash run_eval_gpu.sh ImageNet /dataset/eval ./checkpoint/efficientnet_b0-600_1251.ckpt
+bash run_eval_gpu.sh ImageNet ./dataset ./checkpoint/efficientnet_b0-600_1251.ckpt
 
 # Evaluation with checkpoint for CPU
 cd scripts
-bash run_eval_cpu.sh ImageNet /dataset/eval ./checkpoint/efficientnet_b0-600_1251.ckpt
+bash run_eval_cpu.sh ImageNet ./dataset ./checkpoint/efficientnet_b0-600_1251.ckpt
 ```
 
 #### Result
@@ -221,31 +249,31 @@ acc=76.96%(TOP1)
 
 ### Training Performance
 
-| Parameters                 | efficientnet_b0           |
-| -------------------------- | ------------------------- |
-| Resource                   | NV SMX2 V100-32G          |
-| uploaded Date              | 10/26/2020                |
-| MindSpore Version          | 1.0.0                     |
-| Dataset                    | ImageNet                  |
-| Training Parameters        | src/config.py             |
-| Optimizer                  | rmsprop                   |
-| Loss Function              | LabelSmoothingCrossEntropy|
-| Loss                       | 1.8886                    |
-| Accuracy                   | 76.96%(TOP1)              |
-| Total time                 | 132 h 8ps                 |
-| Checkpoint for Fine tuning | 64 M(.ckpt file)          |
+| Parameters                 | efficientnet_b0           | efficientnet_b1           |
+| -------------------------- | ------------------------- | ------------------------- |
+| Resource                   | NV SMX2 V100-32G          | GPU(Tesla V100-PCIE 32G)；CPU：2.70GHz 52cores；RAM：1.5T |
+| uploaded Date              | 10/26/2020                | 10/22/2021                |
+| MindSpore Version          | 1.0.0                     | 1.6.0.20211119            |
+| Dataset                    | ImageNet                  | ImageNet                  |
+| Training Parameters        | src/config.py             | src/config.py             |
+| Optimizer                  | rmsprop                   | rmsprop                   |
+| Loss Function              | LabelSmoothingCrossEntropy| LabelSmoothingCrossEntropy|
+| Loss                       | 1.8886                    | 1.8227                    |
+| Accuracy                   | 76.96%(TOP1)              | 78.44%(TOP1)              |
+| Total time                 | 132 h 8ps                 | 164 h 28 m  (8p: 252ms/step, 1p：239ms/step) |
+| Checkpoint for Fine tuning | 64 M(.ckpt file)          | 100 M(.ckpt file)         |
 
 ### Inference Performance
 
-| Parameters        |                  |
-| ----------------- | ---------------- |
-| Resource          | NV SMX2 V100-32G |
-| uploaded Date     | 10/26/2020       |
-| MindSpore Version | 1.0.0            |
-| Dataset           | ImageNet         |
-| batch_size        | 128              |
-| outputs           | probability      |
-| Accuracy          | acc=76.96%(TOP1) |
+| Parameters        | efficientnet_b0  | efficientnet_b1  |
+| ----------------- | ---------------- | ---------------- |
+| Resource          | NV SMX2 V100-32G | RTX 3090 24G     |
+| uploaded Date     | 10/26/2020       | 10/22/2021       |
+| MindSpore Version | 1.0.0            | 1.6.0.20211119   |
+| Dataset           | ImageNet         | ImageNet         |
+| batch_size        | 128              | 128              |
+| outputs           | probability      | probability      |
+| Accuracy          | acc=76.96%(TOP1) | acc=78.44%(TOP1) |
 
 ## [Performance in CIFAR-10](#contents)
 
@@ -256,7 +284,7 @@ acc=76.96%(TOP1)
 | Resource                   | NV GTX 1080Ti-12G          |
 | uploaded Date              | 06/28/2021                 |
 | MindSpore Version          | 1.3.0                      |
-| DataseCIFAR                | CIFAR-10                   |
+| Dataset                    | CIFAR-10                   |
 | Training Parameters        | src/config.py              |
 | Optimizer                  | rmsprop                    |
 | Loss Function              | LabelSmoothingCrossEntropy |
@@ -267,7 +295,7 @@ acc=76.96%(TOP1)
 
 ### Inference Performance
 
-| Parameters        |                  |
+| Parameters        | efficientnet_b0  |
 | ----------------- | ---------------- |
 | Resource          | NV GTX 1080Ti-12G|
 | uploaded Date     | 06/28/2021       |
