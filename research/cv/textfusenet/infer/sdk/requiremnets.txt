@@ -1,0 +1,3 @@
+mmcv==1.3.18
+Polygon3==3.0.9.1
+Shapely
