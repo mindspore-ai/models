@@ -14,13 +14,8 @@
 # ============================================================================
 """post process for 310 inference"""
 import os
-import argparse
 import numpy as np
-
-parser = argparse.ArgumentParser(description='SE_net calcul acc')
-parser.add_argument("--result_path", type=str, required=True, default='', help="result file path")
-parser.add_argument("--data_path", type=str, required=True, default='', help="data path")
-args = parser.parse_args()
+from src.model_utils.config import config
 
 
 def get_top5_acc(top_arg, gt_class):
@@ -70,4 +65,4 @@ def cal_acc_imagenet(result_path, data_path):
 
 
 if __name__ == '__main__':
-    cal_acc_imagenet(args.result_path, args.data_path)
+    cal_acc_imagenet(config.result_path, config.data_path)

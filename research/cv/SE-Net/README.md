@@ -89,17 +89,17 @@ After installing MindSpore via the official website, you can start training and 
 ```bash
 # distributed training
 Usage:
-bash run_distribute_train.sh se-resnet50 imagenet2012 [RANK_TABLE_FILE] [DATASET_PATH]
+bash run_distribute_train.sh [NET] [DATASET] [RANK_TABLE_FILE] [DATASET_PATH]
 
 # standalone training
 Usage:
 export DEVICE_ID=0
-python train.py --net=se-resnet50  --dataset=imagenet2012  --dataset_path=[DATASET_PATH]
+python train.py --net=[NET]  --dataset=[DATASET]  --dataset_path=[DATASET_PATH]
 
 # run evaluation example
 Usage:
 export DEVICE_ID=0
-python eval.py --net=se-resnet50 --dataset=imagenet2012 --checkpoint_path=[CHECKPOINT_PATH] --dataset_path=[DATASET_PATH]
+python eval.py --net=[NET] --dataset=[DATASET] --checkpoint_path=[CHECKPOINT_PATH] --dataset_path=[DATASET_PATH]
 ```
 
 - Running on GPU
@@ -107,15 +107,15 @@ python eval.py --net=se-resnet50 --dataset=imagenet2012 --checkpoint_path=[CHECK
 ```bash
 # distributed training
 Usage:
-sh run_distribute_train_gpu.sh se-resnet50 imagenet2012 [DATASET_PATH]
+bash run_distribute_train_gpu.sh [NET] [DATASET] [DATASET_PATH]
 
 # standalone training
 Usage:
-sh run_standalone_train_gpu.sh se-resnet50 imagenet2012 [DATASET_PATH]
+bash run_standalone_train_gpu.sh [NET] [DATASET] [DATASET_PATH]
 
 # run evaluation example
 Usage:
-sh run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]
+bash run_eval_gpu.sh [NET] [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 # [Script Description](#contents)
@@ -127,6 +127,9 @@ sh run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]
 └──SE-Net
   ├── README.md
   ├── ascend310_infer                      # application for 310 inference
+  ├── config                               # parameter configuration
+    ├── se-resnet50_imagenet2012_config_gpu.yaml
+    └── se-resnet101_imagenet2012_config_gpu.yaml
   ├── scripts
     ├── run_distribute_train.sh            # launch ascend distributed training(8 pcs)
     ├── run_distribute_train_gpu.sh        # launch gpu distributed training(8 pcs)
@@ -134,13 +137,14 @@ sh run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]
     ├── run_eval_gpu.sh                    # launch gpu evaluation
     ├── run_standalone_train.sh            # launch ascend standalone training(1 pcs)
     ├── run_standalone_train_gpu.sh        # launch gpu standalone training(1 pcs)
-    └─ run_infer_310.sh                    # shell script for 310inference on ascend
+    └── run_infer_310.sh                    # shell script for 310inference on ascend
   ├── src
-    ├── config.py                          # parameter configuration
+    ├── model_utils
+      └── config.py                        # parameter configuration
     ├── CrossEntropySmooth.py              # loss definition for ImageNet2012 dataset
     ├── dataset.py                         # data preprocessing
     ├── lr_generator.py                    # generate learning rate for each step
-    ├── resnet.py                          # resnet50 backbone
+    ├── resnet.py                          # resnet50 and resnet101 backbones
     └── se.py                              # se-block definition
   ├── export.py                            # export model for inference
   ├── eval.py                              # eval net
@@ -197,11 +201,11 @@ bash run_standalone_train.sh  se-resnet50  imagenet2012   /data/imagenet/train/
 ```bash
 # distributed training
 Usage:
-sh run_distribute_train_gpu.sh se-resnet50 imagenet2012 [DATASET_PATH]
+bash run_distribute_train_gpu.sh se-resnet50 imagenet2012 [DATASET_PATH]
 
 # standalone training
 Usage:
-sh run_standalone_train_gpu.sh se-resnet50 imagenet2012 [DATASET_PATH]
+bash run_standalone_train_gpu.sh se-resnet50 imagenet2012 [DATASET_PATH]
 ```
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
@@ -243,7 +247,7 @@ bash run_eval.sh /imagenet/val/  /path/to/resnet-90_625.ckpt
 #### Running on GPU
 
 ```bash
-sh run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]
+bash run_eval_gpu.sh [se-resnet50] [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 ### Result
@@ -252,6 +256,12 @@ sh run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]
 
 ```bash
 result: {'top_5_accuracy': 0.9385269007731959, 'top_1_accuracy': 0.7774645618556701}
+```
+
+- Evaluating SE-ResNet101 with ImageNet2012 dataset
+
+```bash
+result: {'top_5_accuracy': 0.9467147435897436, 'top_1_accuracy': 0.7908052884615384}
 ```
 
 ## [Inference Process](#contents)
