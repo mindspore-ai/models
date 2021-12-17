@@ -16,6 +16,7 @@
 import os
 import random
 import json
+import time
 from mindspore import Tensor
 import mindspore.nn as nn
 import mindspore.dataset as ds
@@ -34,6 +35,7 @@ from src.cell import GenTrainOneStepCell, DisTrainOneStepCell
 from src.args import get_args
 
 if __name__ == '__main__':
+    t_begin = time.time()
     args_opt = get_args('train')
     print(args_opt)
 
@@ -175,6 +177,7 @@ if __name__ == '__main__':
 
     gen_iterations = 0
 
+    t0 = time.time()
     # Train
     for epoch in range(args_opt.niter):  # niter: the num of epoch
         data_iter = dataset.create_dict_iterator()
@@ -214,9 +217,13 @@ if __name__ == '__main__':
             loss_G = netG_train(noise)
             gen_iterations += 1
 
+            t1 = time.time()
             print('[%d/%d][%d/%d][%d] Loss_D: %f Loss_G: %f'
                   % (epoch, args_opt.niter, i, length, gen_iterations,
                      loss_D.asnumpy(), loss_G.asnumpy()))
+
+            print('step_cost: %.4f seconds' % (float(t1 - t0)))
+            t0 = t1
 
             if gen_iterations % 500 == 0:
                 fake = netG(fixed_noise)
@@ -228,5 +235,8 @@ if __name__ == '__main__':
 
     if args_opt.is_modelarts:
         mox.file.copy_parallel(src_url='/cache/train_output', dst_url=args_opt.train_url)
+
+    t_end = time.time()
+    print('total_cost: %.4f seconds' % (float(t_end - t_begin)))
 
     print("Train success!")
