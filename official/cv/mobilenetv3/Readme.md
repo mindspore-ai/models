@@ -11,10 +11,10 @@
         - [Usage](#usage)
         - [Launch](#launch)
         - [Result](#result)
-    - [Eval process](#eval-process)
-        - [Usage](#usage-1)
-        - [Launch](#launch-1)
-        - [Result](#result-1)
+    - [Inference Process](#inference-process)
+        - [Export MindIR](#export-mindir)
+        - [Infer on Ascend310](#infer-on-ascend310)
+        - [Result](#result)
     - [Export MindIR](#export-mindir)
 - [Model description](#model-description)
     - [Performance](#performance)
@@ -64,6 +64,7 @@ Dataset used: [imagenet](http://www.image-net.org/)
   ├── scripts
   │   ├──run_train.sh        # shell script for train
   │   ├──run_eval.sh         # shell script for evaluation
+  │   ├──run_infer_310.sh         # shell script for inference
   ├── src
   │   ├──config.py           # parameter configuration
   │   ├──dataset.py          # creating dataset
@@ -72,6 +73,8 @@ Dataset used: [imagenet](http://www.image-net.org/)
   ├── train.py               # training script
   ├── eval.py                #  evaluation script
   ├── export.py              # export mindir script
+  ├── preprocess.py              # inference data preprocess script
+  ├── postprocess.py              # inference result calculation script  
   ├── mindspore_hub_conf.py  #  mindspore hub interface
 ```
 
@@ -139,12 +142,38 @@ Inference result will be stored in the example path, you can find result like th
 result: {'acc': 0.71976314102564111} ckpt=/path/to/checkpoint/mobilenet-200_625.ckpt
 ```
 
-## [Export MindIR](#contents)
+## [Inference Process](#contents)
 
-Change the export mode and export file in `src/config.py`, and run `export.py`.
+### [Export MindIR](#contents)
 
-```python
-python export.py --device_target [PLATFORM] --checkpoint_path [CKPT_PATH]
+```shell
+python export.py --checkpoint_path [CKPT_PATH] --device_target [DEVICE] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+The ckpt_file parameter is required,
+`DEVICE` should be in ['Ascend', 'GPU', 'CPU']
+`FILE_FORMAT` should be in "MINDIR"
+
+### [Infer on Ascend310](#contents)
+
+Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
+Current batch_Size for imagenet2012 dataset can only be set to 1.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` specifies path of used "MINDIR" model.
+- `DATA_PATH` specifies path of imagenet datasets.
+- `DEVICE_ID` is optional, default value is 0.
+
+### [Result](#contents)
+
+Inference result is saved in current path, you can find result like this in acc.log file.
+
+```bash
+Eval: top1_correct=37051, tot=50000, acc=74.10%
 ```
 
 # [Model description](#contents)
