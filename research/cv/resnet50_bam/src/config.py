@@ -15,11 +15,13 @@
 """
 network config setting, will be used in main.py
 """
+
 from easydict import EasyDict as edict
 
 imagenet_cfg = edict({
     'name': 'imagenet',
     'pre_trained': False,
+    'use_dataset_sink': True,
     'num_classes': 1000,
     'lr_init': 0.02,  # 1P: 0.02, 8P: 0.18
     'batch_size': 128,

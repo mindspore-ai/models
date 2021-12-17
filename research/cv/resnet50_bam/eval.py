@@ -37,6 +37,11 @@ set_seed(1)
 
 parser = argparse.ArgumentParser(description='resnet50_bam')
 parser.add_argument('--checkpoint_path', type=str, default='./ckpt', help='Checkpoint file path')
+parser.add_argument('--device_target', type=str, default="Ascend", choices=['Ascend', 'GPU'],
+                    help='device where the code will be implemented (default: Ascend)')
+parser.add_argument('--device_id', type=str, default=0, help='Device id.')
+
+
 args_opt = parser.parse_args()
 
 
@@ -68,12 +73,16 @@ if __name__ == '__main__':
     net = ResNet_BAM.ResidualNet("ImageNet", 50, cfg.num_classes, "BAM")
     model = Model(net, loss_fn=loss, metrics={'top_1_accuracy', 'top_5_accuracy'})
 
-    device_target = cfg.device_target
-    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target)
+    device_target = args_opt.device_target
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
     if device_target == "Ascend":
         context.set_context(device_id=cfg.device_id)
+    if device_target == "GPU":
+        context.set_context(device_id=args_opt.device_id)
 
     file_list = os.listdir(args_opt.checkpoint_path)
+    file_list = sorted(file_list, reverse=True)
+
     for filename in file_list:
         de_path = os.path.join(args_opt.checkpoint_path, filename)
         if de_path.endswith('.ckpt'):

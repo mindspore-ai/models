@@ -102,20 +102,27 @@ resnet50_bam的作者提出了一个简单但是有效的Attention模型——BA
 ├── model_zoo
     ├── README.md                       // 所有模型相关说明
     ├── resnet50_bam
+        ├── README.md                   // resnet50_bam description in English
         ├── README_CN.md                // resnet50_bam相关说明
         ├── ascend310_infer             // 实现310推理源代码
         ├── scripts
         │   ├──run_distribute_train.sh  // 分布式到Ascend的shell脚本
+        │   ├──run_distribute_train_gpu.sh  // 8P GPU training
         │   ├──run_eval.sh              // Ascend评估的shell脚本
+        │   ├──run_eval_gpu.sh              // GPU evaluation
         │   ├──run_infer_310.sh         // Ascend推理shell脚本
+        │   ├──run_standalone_train_gpu.sh  // 1P GPU training
         ├── src
         │   ├──config.py                // 参数配置
         │   ├──dataset.py               // 创建数据集
+        │   ├──my_lossmonitor.py          // loss monitor
         │   ├──ResNet50_BAM.py          // resnet50_bam架构
         ├── eval.py                     // 评估脚本
         ├── export.py                   // 将checkpoint文件导出到air/mindir
         ├── postprocess.py              // 310推理后处理脚本
         ├── train.py                    // 训练脚本
+        ├── create_imagenet2012_label.py // create imagenet 2012 label
+
 ```
 
 ## 脚本参数
@@ -215,34 +222,34 @@ resnet50_bam的作者提出了一个简单但是有效的Attention模型——BA
 
 #### ImageNet2012上的resnet50_bam
 
-| 参数                 | Ascend                                                       |
-| -------------------------- | ----------------------------------------------------------- |
-| 模型版本              | resnet50_bam                                                |
-| 资源                   | Ascend 910               |
-| 上传日期              | 2021-06-02                                 |
-| MindSpore版本          | 1.2.0                                                 |
-| 数据集                    | ImageNet2012                                               |
-| 训练参数        | epoch=160, batch_size=128, lr_init=0.02（单卡为0.02,八卡为0.18）               |
-| 优化器                  | Momentum                                                    |
-| 损失函数              | Softmax交叉熵                                       |
-| 输出                    | 概率                                                 |
-| 分类准确率             | 单卡：top1:77.23%,top5:93.56%；八卡：top1:77.35%,top5:93.56%                       |
-| 速度                      | 单卡：96毫秒/步；八卡：101毫秒/步                        |
-| 总时长                 | 单卡：45.2小时/160轮；八卡：5.7小时/160轮                                   |
+| 参数                 | Ascend                                                      | GPU                                                       |
+| ------------------- | ---------------------------------------------------------   |-----------------------------------------------------------|
+| 模型版本              | resnet50_bam                                               |resnet50_bam                                              |
+| 资源                 | Ascend 910                                                 |V100-PCIE                                                  |
+| 上传日期              | 2021-06-02                                                 |2021-12-02                                                         |
+| MindSpore版本        | 1.2.0                                                       |1.5.0 (Docker build, CUDA 11.1)                           |
+| 数据集                | ImageNet2012                                                  |ImageNet2012                                              |
+| 训练参数              | epoch=160, batch_size=128, lr_init=0.02（单卡为0.02,八卡为0.18）  |epoch=160, batch_size=128, lr_init=0.18 (for eight cards) |
+| 优化器               | Momentum                                                         |Momentum                                                  |
+| 损失函数              | Softmax交叉熵                                                        |Softmax cross entropy                                     |
+| 输出                 | 概率                                                              |Probability                                               |
+| 分类准确率             | 单卡：top1:77.23%,top5:93.56%；八卡：top1:77.35%,top5:93.56%          |Eight cards: top1: 77.36%, top5: 93.26%                   |
+| 速度                  | 单卡：96毫秒/步；八卡：101毫秒/步                                   |1p: 185 ms/step, 8P: 228ms/step        |
+| 总时长                | 单卡：45.2小时/160轮；八卡：5.7小时/160轮                               |Single card: 81 hours; Eight cards: 12.7 hours                 |
 
 ### 推理性能
 
 #### ImageNet2012上的resnet50_bam
 
-| 参数                 | Ascend                                                       |
-| -------------------------- | ----------------------------------------------------------- |
-| 模型版本              | resnet50_bam                                                |
-| 资源                   | Ascend 310               |
-| 上传日期              | 2021-06-16                                 |
-| MindSpore版本          | 1.2.0                                                 |
-| 数据集                    | ImageNet2012                                                |
-| 分类准确率             | top1:77.23%,top5:93.54%                       |
-| 速度                      | Average time 4.8305 ms of infer_count 50000                        |
+| 参数                 | Ascend                                                       |GPU                                    |
+| -------------------------- | ----------------------------------------------------------- |-------------------------------------- |
+| 模型版本              | resnet50_bam                                                |resnet50_bam                           |
+| 资源                   | Ascend 310               |V100-PCIE                               |
+| 上传日期              | 2021-06-16                                 |2021-12-02                                      |
+| MindSpore版本          | 1.2.0                                                 |1.5.0 (docker build, CUDA 11.1)        |
+| 数据集                    | ImageNet2012                                                |ImageNet2012                           |
+| 分类准确率             | top1:77.23%,top5:93.54%                       |top1: 77.36%, top5: 93.26%  (8 cards)  |
+| 速度                      | Average time 4.8305 ms of infer_count 50000                        |751 images/second (~1.3 ms/image)        |
 
 # ModelZoo主页
 
