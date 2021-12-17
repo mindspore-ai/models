@@ -27,6 +27,7 @@
             - [Evaluation Performance](#evaluation-performance)
             - [Inference Performance](#inference-performance)
     - [Description of Random Situation](#description-of-random-situation)
+    - [Description of MindSpore Version](#description-of-mindspore-version)
     - [ModelZoo Homepage](#modelzoo-homepage)
 
 ## [WarpCTC Description](#contents)
@@ -394,6 +395,11 @@ Inference result is saved in current path, you can find result like this in acc.
 ## [Description of Random Situation](#contents)
 
 In dataset.py, we set the seed inside “create_dataset" function. We also use random seed in train.py for weight initialization.
+
+# [Description of MindSpore Version](#contents)
+
+Due to the upgrade of MindSpore(>1.5), the checkpoint file trained from old version cannot load to
+network directly.
 
 ## [ModelZoo Homepage](#contents)
 

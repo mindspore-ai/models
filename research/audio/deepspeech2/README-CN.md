@@ -17,6 +17,7 @@
 - [性能](#性能)
     - [训练性能](#训练性能)
     - [推理性能](#推理性能)
+- [版本更新说明](#版本更新说明)
 - [ModelZoo主页](#modelzoo主页)
 
 # [DeepSpeech2介绍](#contents)
@@ -287,6 +288,10 @@ python export.py --pre_trained_model_path='ckpt_path'
 | 精确度(无噪声)       | 2p: WER: 9.902  CER: 3.317  8p: WER: 11.593  CER: 3.907|
 | 精确度(有噪声)      | 2p: WER: 28.693 CER: 12.473 8p: WER: 31.397  CER: 13.696|
 | 模型大小        | 330M (.mindir file)                                              |
+
+# 版本更新说明
+
+由于MindSpore1.5版本后（>1.5）LSTM多后端统一，旧版Checkpoint无法直接加载使用。
 
 # [ModelZoo主页](#contents)
 

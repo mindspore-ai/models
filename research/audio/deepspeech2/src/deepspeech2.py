@@ -21,8 +21,7 @@ import math
 import numpy as np
 import mindspore.common.dtype as mstype
 from mindspore.ops import operations as P
-from mindspore import nn, Tensor, ParameterTuple, Parameter
-from mindspore.common.initializer import initializer
+from mindspore import nn, Tensor
 
 
 class SequenceWise(nn.Cell):
@@ -135,28 +134,9 @@ class BatchRNN(nn.Cell):
 
         for i in range(num_layers):
             layers.append(
-                nn.LSTMCell(input_size=input_size_list[i], hidden_size=hidden_size, bidirectional=bidirectional,
-                            has_bias=self.has_bias))
-
-        weights = []
-        for i in range(num_layers):
-            weight_size = (input_size_list[i] + hidden_size) * hidden_size * self.num_directions * 4
-            if self.has_bias:
-                if device_target == "GPU":
-                    bias_size = self.num_directions * hidden_size * 4 * 2
-                else:
-                    bias_size = self.num_directions * hidden_size * 4
-                weight_size = weight_size + bias_size
-
-            stdv = 1 / math.sqrt(hidden_size)
-            w_np = np.random.uniform(-stdv, stdv, (weight_size, 1, 1)).astype(np.float32)
-
-            weights.append(Parameter(initializer(Tensor(w_np), w_np.shape), name="weight" + str(i)))
-
-        self.h, self.c = self.stack_lstm_default_state(batch_size, hidden_size, num_layers=num_layers,
-                                                       bidirectional=bidirectional)
+                nn.LSTM(input_size=input_size_list[i], hidden_size=hidden_size, bidirectional=bidirectional,
+                        has_bias=self.has_bias))
         self.lstms = layers
-        self.weight = ParameterTuple(tuple(weights))
 
         if batch_norm:
             batch_norm_layer = []
@@ -164,21 +144,11 @@ class BatchRNN(nn.Cell):
                 batch_norm_layer.append(nn.BatchNorm1d(hidden_size))
             self.batch_norm_list = batch_norm_layer
 
-    def stack_lstm_default_state(self, batch_size, hidden_size, num_layers, bidirectional):
-        """init default input."""
-        num_directions = 2 if bidirectional else 1
-        h_list = c_list = []
-        for _ in range(num_layers):
-            h_list.append(Tensor(np.zeros((num_directions, batch_size, hidden_size)).astype(np.float32)))
-            c_list.append(Tensor(np.zeros((num_directions, batch_size, hidden_size)).astype(np.float32)))
-        h, c = tuple(h_list), tuple(c_list)
-        return h, c
-
     def construct(self, x):
         for i in range(self.num_layers):
             if self.is_batch_norm and i > 0:
                 x = self.batch_norm_list[i - 1](x)
-            x, _, _, _, _ = self.lstms[i](x, self.h[i], self.c[i], self.weight[i])
+            x, _ = self.lstms[i](x)
             if self.bidirectional:
                 size = self.shape_op(x)
                 x = self.reshape_op(x, (size[0], size[1], 2, -1))
