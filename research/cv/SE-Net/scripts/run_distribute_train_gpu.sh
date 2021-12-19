@@ -14,30 +14,63 @@
 # limitations under the License.
 # ============================================================================
 
-#Usage: sh run_distribute_train.sh [se-resnet50] [imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
+if [ $# != 2 ] && [ $# != 3 ] 
+then 
+    echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)"
+    exit 1
+fi
 
+get_real_path(){
+  if [ "${1:0:1}" == "/" ]; then
+    echo "$1"
+  else
+    echo "$(realpath -m $PWD/$1)"
+  fi
+}
+
+PATH1=$(get_real_path $1)
+CONFIG_FILE=$(get_real_path $2)
+
+if [ $# == 3 ]
+then 
+    PATH2=$(get_real_path $3)
+fi
+
+if [ ! -d $PATH1 ]
+then 
+    echo "error: DATASET_PATH=$PATH1 is not a directory"
+    exit 1
+fi 
+
+if [ $# == 3 ] && [ ! -f $PATH2 ]
+then
+    echo "error: PRETRAINED_CKPT_PATH=$PATH2 is not a file"
+    exit 1
+fi
 
 ulimit -u unlimited
 export DEVICE_NUM=8
 export RANK_SIZE=8
-export NET=$1
-export DATASET=$2
-export DATASET_PATH=$3
 
 rm -rf ./train_parallel
 mkdir ./train_parallel
 cp ../*.py ./train_parallel
 cp *.sh ./train_parallel
+cp -r ../config/*.yaml ./train_parallel
 cp -r ../src ./train_parallel
 cd ./train_parallel || exit
 
-echo "start distributed training with $DEVICE_NUM GPUs."
-
-mpirun --allow-run-as-root -n $DEVICE_NUM --output-filename log_output --merge-stderr-to-stdout \
-    python train.py \
-    --device_target="GPU" \
-    --net=$NET \
-    --dataset=$DATASET \
-    --run_distribute=True \
-    --device_num=$DEVICE_NUM \
-    --dataset_path=$DATASET_PATH > log 2>&1 &
+if [ $# == 2 ]
+then
+    mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
+           python train.py --config_path=$CONFIG_FILE --run_distribute=True --device_num=$DEVICE_NUM \
+           --device_target="GPU" --data_path=$PATH1 --output_path './output' &> log &
+fi
+    
+if [ $# == 3 ]
+then
+    mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
+           python train.py  --config_path=$CONFIG_FILE --run_distribute=True --device_num=$DEVICE_NUM \
+           --device_target="GPU" --data_path=$PATH1 --pre_trained=$PATH2 --output_path './output' &> log &
+fi
+cd ..

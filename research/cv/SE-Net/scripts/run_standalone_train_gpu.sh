@@ -14,9 +14,37 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 3 ]
+if [ $# != 2 ] && [ $# != 3 ]
 then 
-    echo "Usage: sh run_standalone_train.sh [NET] [DATASET_NAME] [DATASET_PATH]"
+    echo "Usage: bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)"
+exit 1
+fi
+
+get_real_path(){
+  if [ "${1:0:1}" == "/" ]; then
+    echo "$1"
+  else
+    echo "$(realpath -m $PWD/$1)"
+  fi
+}
+
+PATH1=$(get_real_path $1)
+CONFIG_FILE=$(get_real_path $2)
+
+if [ $# == 3 ]
+then
+    PATH2=$(get_real_path $3)
+fi
+
+if [ ! -d $PATH1 ]
+then 
+    echo "error: DATASET_PATH=$PATH1 is not a directory"
+exit 1
+fi
+
+if [ $# == 3 ] && [ ! -f $PATH2 ]
+then
+    echo "error: PRETRAINED_CKPT_PATH=$PATH2 is not a file"
 exit 1
 fi
 
@@ -25,22 +53,28 @@ export DEVICE_NUM=1
 export DEVICE_ID=0
 export RANK_ID=0
 export RANK_SIZE=1
-export NET=$1
-export DATASET=$2
-export DATASET_PATH=$3
-
 
 if [ -d "train" ];
 then
     rm -rf ./train
 fi
-
 mkdir ./train
+cp ../config/*.yaml ./train
 cp ../*.py ./train
 cp *.sh ./train
 cp -r ../src ./train
 cd ./train || exit
-echo "start training for GPU device $DEVICE_ID"
+echo "start training for device $DEVICE_ID"
 env > env.log
-python train.py --device_target="GPU" --net=$NET --dataset=$DATASET --dataset_path=$DATASET_PATH > log 2>&1 &
+if [ $# == 2 ]
+then
+    python train.py --device_target="GPU" --data_path=$PATH1 \
+    --config_path=$CONFIG_FILE --output_path './output' &> log &
+fi
+
+if [ $# == 3 ]
+then
+    python train.py --device_target="GPU" --data_path=$PATH1 --pre_trained=$PATH2 \
+    --config_path=$CONFIG_FILE --output_path './output' &> log &
+fi
 cd ..

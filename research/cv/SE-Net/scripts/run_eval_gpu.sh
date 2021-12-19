@@ -14,19 +14,42 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]
+if [ $# != 3 ]
 then 
-    echo "Usage: sh run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]"
+    echo "Usage: bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH] [CONFIG_PATH]"
 exit 1
 fi
+
+get_real_path(){
+  if [ "${1:0:1}" == "/" ]; then
+    echo "$1"
+  else
+    echo "$(realpath -m $PWD/$1)"
+  fi
+}
+
+PATH1=$(get_real_path $1)
+PATH2=$(get_real_path $2)
+CONFIG_FILE=$(get_real_path $3)
+
+
+if [ ! -d $PATH1 ]
+then 
+    echo "error: DATASET_PATH=$PATH1 is not a directory"
+exit 1
+fi 
+
+if [ ! -f $PATH2 ]
+then 
+    echo "error: CHECKPOINT_PATH=$PATH2 is not a file"
+exit 1
+fi 
 
 ulimit -u unlimited
 export DEVICE_NUM=1
 export DEVICE_ID=0
 export RANK_SIZE=$DEVICE_NUM
 export RANK_ID=0
-export DATA_PATH=$1
-export CKPT_PATH=$2
 
 if [ -d "eval" ];
 then
@@ -35,11 +58,11 @@ fi
 mkdir ./eval
 cp ../*.py ./eval
 cp *.sh ./eval
+cp -r ../config/*.yaml ./eval
 cp -r ../src ./eval
 cd ./eval || exit
 env > env.log
 echo "start evaluation for device $DEVICE_ID"
-
-python eval.py  --device_target="GPU" --dataset_path=$DATA_PATH --checkpoint_path=$CKPT_PATH  > log 2>&1 &
-
+python eval.py --data_path=$PATH1 --checkpoint_file_path=$PATH2 --device_target="GPU" \
+--config_path=$CONFIG_FILE &> log &
 cd ..

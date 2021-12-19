@@ -16,35 +16,30 @@
 ##############export checkpoint file into air and onnx models#################
 python export.py
 """
-import argparse
 import numpy as np
 
 from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
-from src.config import config2 as config
-from src.resnet import se_resnet50 as resnet
+from src.model_utils.config import config
 
-parser = argparse.ArgumentParser(description='resnet export')
-parser.add_argument('--network_dataset', type=str, default="se-resnet50", choices=["se-resnet50"],
-                    help='network and dataset name.')
-parser.add_argument("--device_id", type=int, default=0, help="Device id")
-parser.add_argument("--batch_size", type=int, default=1, help="batch size")
-parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
-parser.add_argument("--file_name", type=str, default="resnet", help="output file name.")
-parser.add_argument('--width', type=int, default=224, help='input width')
-parser.add_argument('--height', type=int, default=224, help='input height')
-parser.add_argument("--file_format", type=str, choices=["AIR", "MINDIR"], default="AIR", help="file format")
-parser.add_argument("--device_target", type=str, default="Ascend",
-                    choices=["Ascend", "GPU", "CPU"], help="device target(default: Ascend)")
-args = parser.parse_args()
+context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+if config.device_target == "Ascend":
+    context.set_context(device_id=config.device_id)
 
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
-if args.device_target == "Ascend":
-    context.set_context(device_id=args.device_id)
+def run_export():
+    """run export."""
+    if config.network_dataset == 'se-resnet50_imagenet2012':
+        from src.resnet import resnet50 as resnet
+    elif config.network_dataset == 'se-resnet101_imagenet2012':
+        from src.resnet import resnet101 as resnet
+    else:
+        raise ValueError("The network and dataset are not supported yet.")
 
-if __name__ == '__main__':
     net = resnet(config.class_num)
-    param_dict = load_checkpoint(args.ckpt_file)
+    param_dict = load_checkpoint(config.checkpoint_file_path)
     load_param_into_net(net, param_dict)
 
-    input_arr = Tensor(np.zeros([args.batch_size, 3, args.height, args.width], np.float32))
-    export(net, input_arr, file_name=args.file_name, file_format=args.file_format)
+    input_arr = Tensor(np.zeros([config.batch_size, 3, config.height, config.width], np.float32))
+    export(net, input_arr, file_name=config.file_name, file_format=config.file_format)
+
+if __name__ == '__main__':
+    run_export()
