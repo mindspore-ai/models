@@ -124,6 +124,7 @@ def coco_eval(config, result_files, result_types, coco, max_dets=(100, 300, 1000
 
     if plot_detect_result:
         return res
+
     return summary_metrics
 
 

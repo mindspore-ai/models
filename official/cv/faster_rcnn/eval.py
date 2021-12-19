@@ -32,8 +32,6 @@ from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id
 from src.FasterRcnn.faster_rcnn import Faster_Rcnn
 
-set_seed(1)
-context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
 
 def fasterrcnn_eval(dataset_path, ckpt_path, anno_path):
     """FasterRcnn evaluation."""
@@ -42,6 +40,16 @@ def fasterrcnn_eval(dataset_path, ckpt_path, anno_path):
     ds = create_fasterrcnn_dataset(config, dataset_path, batch_size=config.test_batch_size, is_training=False)
     net = Faster_Rcnn(config)
     param_dict = load_checkpoint(ckpt_path)
+
+    # in previous version of code there was a typo in layer name 'fpn_neck': it was 'fpn_ncek'
+    # in order to make backward compatibility with checkpoints created with that typo
+    # we need to manually check and rename that layer in param_dict
+    for key, value in param_dict.items():
+        if key.startswith('fpn_ncek'):
+            new_key = key.replace('fpn_ncek', 'fpn_neck')
+            param_dict[new_key] = param_dict.pop(key)
+            print(f"param_dict fixed typo: {key} renamed to {new_key}")
+
     if config.device_target == "GPU":
         for key, value in param_dict.items():
             tensor = value.asnumpy().astype(np.float32)
@@ -104,13 +112,14 @@ def fasterrcnn_eval(dataset_path, ckpt_path, anno_path):
                 all_labels_tmp_mask = all_labels_tmp_mask[inds]
 
             outputs_tmp = bbox2result_1image(all_bboxes_tmp_mask, all_labels_tmp_mask, config.num_classes)
-
             outputs.append(outputs_tmp)
 
     eval_types = ["bbox"]
     result_files = results2json(dataset_coco, outputs, "./results.pkl")
 
-    coco_eval(config, result_files, eval_types, dataset_coco, single_result=True, plot_detect_result=True)
+    coco_eval(config, result_files, eval_types, dataset_coco,
+              single_result=False, plot_detect_result=True)
+    print("\nEvaluation done!")
 
 
 def modelarts_pre_process():
@@ -145,7 +154,11 @@ def eval_fasterrcnn():
 
     print("CHECKING MINDRECORD FILES DONE!")
     print("Start Eval!")
+    start_time = time.time()
     fasterrcnn_eval(mindrecord_file, config.checkpoint_path, config.anno_path)
+    end_time = time.time()
+    total_time = end_time - start_time
+    print("\nDone!\nTime taken: {:.2f} seconds".format(total_time))
 
     flags = [0] * 3
     config.eval_result_path = os.path.abspath("./eval_result")
@@ -171,12 +184,15 @@ def eval_fasterrcnn():
                 pass
 
     if sum(flags) == 3:
-        print("eval success.")
+        print("Successfully created 'eval_results' visualizations")
         exit(0)
     else:
-        print("eval failed.")
+        print("Failed to create 'eval_results' visualizations")
         exit(-1)
 
 
 if __name__ == '__main__':
+    set_seed(1)
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
+
     eval_fasterrcnn()

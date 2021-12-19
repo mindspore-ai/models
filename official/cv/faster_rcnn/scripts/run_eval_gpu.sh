@@ -16,7 +16,9 @@
 
 if [ $# -le 3 ]
 then 
-    echo "Usage: sh run_eval_gpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)"
+    echo "Usage: 
+    bash run_eval_gpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)
+    "
 exit 1
 fi
 
@@ -95,18 +97,15 @@ export RANK_SIZE=$DEVICE_NUM
 export DEVICE_ID=0
 export RANK_ID=0
 
-if [ -d "eval" ];
+if [ -d "../eval" ];
 then
-    rm -rf ./eval
+    rm -rf ../eval
 fi
-mkdir ./eval
-cp ../*.py ./eval
-cp ../*.yaml ./eval
-cp *.sh ./eval
-cp -r ../src ./eval
-cd ./eval || exit
-env > env.log
+mkdir ../eval
+cd ../eval || exit
+
 echo "start eval for device $DEVICE_ID"
-python eval.py --config_path=$CONFIG_FILE --coco_root=$PATH3 --mindrecord_dir=$mindrecord_dir \
---device_target="GPU" --device_id=$DEVICE_ID --ann_file=$PATH1 --checkpoint_path=$PATH2 --backbone=$3 &> log &
-cd ..
+env > env.log
+pwd
+python ${BASE_PATH}/../eval.py --config_path=$CONFIG_FILE --coco_root=$PATH3 --mindrecord_dir=$mindrecord_dir \
+--device_target="GPU" --device_id=$DEVICE_ID --anno_path=$PATH1 --checkpoint_path=$PATH2 --backbone=$3 &> eval.log &

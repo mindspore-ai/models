@@ -26,6 +26,7 @@ from matplotlib import gridspec
 import seaborn as sns
 
 
+plt.switch_backend('agg')
 warnings.filterwarnings("ignore")
 COLOR_MAP = [
     (0, 255, 255),
@@ -753,7 +754,9 @@ class DetectEval(COCOeval):
             os.mkdir(savefig_path)
         for l in correct_conf_dict.keys():
             plt.figure(figsize=(7, 7))
-            if l in incorrect_conf_dict.keys() and correct_conf_dict[l] and incorrect_conf_dict[l]:
+            if l in incorrect_conf_dict.keys() and \
+                    len(correct_conf_dict[l]) > 1 and \
+                    len(incorrect_conf_dict[l]) > 1:
                 gs = gridspec.GridSpec(4, 1)
                 plt.subplot(gs[:3, 0])
                 correct_conf_dict[l].sort()
@@ -790,7 +793,7 @@ class DetectEval(COCOeval):
                 table.set_fontsize(10)
                 table.scale(1, 1.5)
                 plt.savefig(os.path.join(savefig_path, l) + '.jpg')
-            elif correct_conf_dict[l]:
+            elif len(correct_conf_dict[l]) > 1:
                 gs = gridspec.GridSpec(4, 1)
                 plt.subplot(gs[:3, 0])
                 correct_conf_dict[l].sort()
@@ -817,7 +820,7 @@ class DetectEval(COCOeval):
                 table.set_fontsize(10)
                 table.scale(1, 1.5)
                 plt.savefig(os.path.join(savefig_path, l) + '.jpg')
-            elif l in incorrect_conf_dict.keys() and incorrect_conf_dict[l]:
+            elif l in incorrect_conf_dict.keys() and len(incorrect_conf_dict[l]) > 1:
                 gs = gridspec.GridSpec(4, 1)
                 plt.subplot(gs[:3, 0])
                 incorrect_conf_dict[l].sort()

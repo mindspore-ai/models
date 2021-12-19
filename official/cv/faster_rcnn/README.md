@@ -292,7 +292,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
 .
 └─faster_rcnn
   ├─README.md                         // descriptions about fasterrcnn
-  ├─ascend310_infer                   //application for 310 inference
+  ├─ascend310_infer                   // application for 310 inference
   ├─scripts
     ├─run_standalone_train_ascend.sh  // shell script for standalone on ascend
     ├─run_standalone_train_gpu.sh     // shell script for standalone on GPU
@@ -329,8 +329,9 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
   ├─default_config_101.yaml           // config for ResNet101
   ├─default_config_152.yaml           // config for ResNet152
   ├─export.py                         // script to export AIR,MINDIR,ONNX model
-  ├─eval.py                           //eval scripts
-  ├─postprogress.py                   // post process for 310 inference
+  ├─eval.py                           // eval script
+  ├─postprocess.py                    // post process for 310 inference
+  ├─requirements.txt                  // requirements file
   └─train.py                          // train scripts
 ```
 
@@ -505,34 +506,82 @@ Inference result is saved in current path, you can find result like this in acc.
 
 ### Evaluation Performance
 
-| Parameters                 | Ascend                                                   | GPU                                                 |
-| -------------------------- | ----------------------------------------------------------- |----------------------------------------------------------- |
-| Model Version              | V1                                                | V1                                                |
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8             |V100-PCIE 32G            |
-| uploaded Date              | 08/31/2020 (month/day/year)                                 |02/10/2021 (month/day/year)                                 |
-| MindSpore Version          | 1.0.0                                                       |1.2.0                                                       |
-| Dataset                    | COCO2017                                                   |COCO2017                                                   |
-| Training Parameters        | epoch=12,  batch_size=2          |epoch=12,  batch_size=2          |
-| Optimizer                  | SGD                                                         |SGD                                                         |
-| Loss Function              | Softmax Cross Entropy ,Sigmoid Cross Entropy,SmoothL1Loss|Softmax Cross Entropy ,Sigmoid Cross Entropy,SmoothL1Loss|
-| Speed                      | 1pc: 190 ms/step;  8pcs: 200 ms/step                          | 1pc: 320 ms/step;  8pcs: 335 ms/step                          |
-| Total time                 | 1pc: 37.17 hours;  8pcs: 4.89 hours                          |1pc: 63.09 hours;  8pcs: 8.25 hours                          |
-| Parameters (M)             | 250                                                         |250                                                         |
-| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn) | [fasterrcnn script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn) |
+#### ResNet-50 backbone
+
+| Parameters                 | Ascend                                                      | GPU                                                 |
+| -------------------------- | ----------------------------------------------------------- |---------------------------------------------------- |
+| Model Version              | V1                                                          | V1                                                  |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | 8 x RTX3090 24GB                                    |
+| uploaded Date              | 08/31/2020 (month/day/year)                                 | 11/19/2021 (month/day/year)                         |
+| MindSpore Version          | 1.0.0                                                       | 1.3.0                                               |
+| Dataset                    | COCO2017                                                    | COCO2017                                            |
+| Training Parameters        | epoch=12,  batch_size=2                                     | epoch=20,  batch_size=2                             |
+| Optimizer                  | SGD                                                         | SGD                                                 |
+| Loss Function              | Softmax Cross Entropy ,Sigmoid Cross Entropy,SmoothL1Loss   | Softmax Cross Entropy ,Sigmoid Cross Entropy,SmoothL1Loss |
+| Speed                      | 1pc: 190 ms/step;  8pcs: 200 ms/step                        | 1pc: 288 ms/step;  8pcs: 346 ms/step                |
+| Total time                 | 1pc: 37.17 hours;  8pcs: 4.89 hours                         | 1pc: 63.09 hours;  8pcs: 8.25 hours                 |
+| Parameters (M)             | 250                                                         | 250                                                 |
+| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
+
+#### ResNet-101 backbone
+
+| Parameters                 | GPU                                                 |
+| -------------------------- | --------------------------------------------------- |
+| Model Version              | ResNet_V1_101                                       |
+| Resource                   | 8 x RTX3090 24GB                                    |
+| uploaded Date              | 11/08/2021 (month/day/year)                         |
+| MindSpore Version          | 1.3.0                                               |
+| Dataset                    | COCO2017                                            |
+| Training Parameters        | epoch=20,  batch_size=2, lr=0.02                    |
+| Optimizer                  | SGD                                                 |
+| Loss Function              | Softmax Cross Entropy, Sigmoid Cross Entropy, SmoothL1Loss |
+| Speed                      | 1pc: 369 ms/step;  8pcs: 456 ms/step                |
+| Total time                 | 8pcs: 18.98 hours                                   |
+| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
 
 ### Inference Performance
 
-| Parameters          | Ascend                |GPU                |
+#### ResNet-50 backbone
+
+| Parameters          | Ascend                      | GPU                        |
 | ------------------- | --------------------------- |--------------------------- |
-| Model Version       | V1                | V1                |
-| Resource            | Ascend 910; OS Euler2.8                  |GPU                   |
-| Uploaded Date       | 08/31/2020 (month/day/year) |02/10/2021 (month/day/year) |
-| MindSpore Version   | 1.0.0                       | 1.2.0                       |
-| Dataset             | COCO2017    |COCO2017    |
-| batch_size          | 2                         |2                         |
-| outputs             | mAP                 |mAP                 |
-| Accuracy            |  IoU=0.50: 58.6%  | IoU=0.50: 59.1%  |
-| Model for inference | 250M (.ckpt file)         |250M (.ckpt file)         |
+| Model Version       | V1                          | V1                         |
+| Resource            | Ascend 910; OS Euler2.8     | 8 x RTX3090 24GB           |
+| Uploaded Date       | 08/31/2020 (month/day/year) | 11/19/2021 (month/day/year)|
+| MindSpore Version   | 1.0.0                       | 1.3.0                      |
+| Dataset             | COCO2017                    | COCO2017                   |
+| batch_size          | 2                           | 2                          |
+| outputs             | mAP                         | mAP                        |
+| Accuracy            | IoU=0.50: 58.6%             | IoU=0.50: 61.3%            |
+| Model for inference | 250M (.ckpt file)           | 500M (.ckpt file)          |
+
+#### ResNet-101 backbone
+
+| Parameters          | GPU                         |
+| ------------------- | --------------------------- |
+| Model Version       | ResNet_V1_101               |
+| Resource            | RTX3090 24GB                |
+| Uploaded Date       | 11/08/2021 (month/day/year) |
+| MindSpore Version   | 1.3.0                       |
+| Dataset             | COCO2017                    |
+| batch_size          | 2                           |
+| outputs             | mAP                         |
+| Accuracy            | IoU=0.50: 63.8%             |
+| Model for inference | 728M (.ckpt file)           |
+
+#### ResNet-152 backbone
+
+| Parameters          | GPU                         |
+| ------------------- | --------------------------- |
+| Model Version       | V1                          |
+| Resource            | RTX3090 24GB                |
+| Uploaded Date       | 10/30/2021 (month/day/year) |
+| MindSpore Version   | 1.3.0                       |
+| Dataset             | COCO2017                    |
+| batch_size          | 2                           |
+| outputs             | mAP                         |
+| Accuracy            | IoU=0.50: 64.4%             |
+| Model for inference | 250M (.ckpt file)           |
 
 # [ModelZoo Homepage](#contents)  
 
