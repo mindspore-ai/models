@@ -1,0 +1,47 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# Url for modelarts
+data_url: ""        # set on the page
+train_url: ""       # set on the page
+checkpoint_url: ""  # set on the page
+# Path for local
+data_path: "/cache/data"              # download data to data_path from data_url(obs address) 
+output_path: "/cache/train"           # upload output data from output_path dirs to train_url(obs address)
+load_path: "/cache/checkpoint_path"   # download checkpoint to load_path from checkpoint_url(obs address)
+device_target: "Ascend"
+need_modelarts_dataset_unzip: False
+modelarts_dataset_unzip_name: ""
+
+# ==============================================================================
+# options
+epoch_num: 2000
+warmup_epochs: 30
+batch_size: 16
+lr: 0.0005
+pretrain_ckpt: "" # if modelarts: '/cache/checkpoint_path/model.ckpt'" set on the page; else: set /path/to/model.ckpt
+save_ckpt_dir: "./ckpt/"
+keep_ckpt_max: 10
+text: "Once move to the directory, then, execute the following main script with a chainer backend.~"
+audioname: "text2speech"
+dataset_path: ""   # set dataset dir; if modelarts: set /cache/data/ on the page; else: set dataset dir '../'
+data_name: "ljspeech"
+run_distribute: True
+model_ckpt: ""  #  used when eval; if modelarts: set /cache/checkpoint_path/model.ckpt; else: set /path/to/model.ckpt 
+# export option
+device_id: 0
+ckpt_file: ""
+file_name: "tacotron2"
+file_format: "MINDIR"
+---
+
+# Help description for each configuration
+device_target: "Device target"
+dataset_path: "FastText input data file path."
+data_name: "dataset name. choice in ['ljspeech']"
+run_distribute: "Run distribute, default: false."
+model_ckpt: "existed checkpoint address."
+# export option
+device_id: "Device id"
+ckpt_file: "Checkpoint file path"
+file_name: "Output file name"
+file_format: "Output file format, choice in ['AIR', 'ONNX', 'MINDIR']"
