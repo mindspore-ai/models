@@ -13,9 +13,12 @@
     - [脚本参数](#脚本参数)
     - [训练过程](#训练过程)
     - [评估过程](#评估过程)
+    - [导出过程](#导出过程)
+    - [推理过程](#推理过程)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
+        - [推理性能](#推理性能)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
 
@@ -125,8 +128,10 @@ BraTS 2017原始数据集的文件目录结构如下所示：
 ```bash
 .
 └── 3dcnn
+    ├── ascend_310_infer                  # 310推理
     ├── README.md                         # 所有模型相关说明
     ├── scripts
+    │   ├── run_310_infer.sh              # 用于310推理的shell脚本
     │   ├── run_distribute_train.sh       # 启动Ascend分布式训练（8卡）
     │   ├── run_eval.sh                   # 启动Ascend评估
     │   ├── run_standalone_train.sh       # 启动Ascend单机训练（单卡）
@@ -148,6 +153,8 @@ BraTS 2017原始数据集的文件目录结构如下所示：
     ├── train.py                          # 训练脚本
     ├── eval.py                           # 评估脚本
     ├── export.py                         # 推理模型导出脚本
+    ├── preprocess.py                     # 310推理数据预处理
+    ├── postprocess.py                    # 310推理数据后处理
     ├── config.yaml                       # Ascend训练参数配置
     ├── config_gpu.yaml                   # GPU训练参数配置
 ```
@@ -288,6 +295,33 @@ mean dice enhance:
 [0.99930122 0.75698223]
 ```
 
+## 导出过程
+
+### 导出
+
+```shell
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+参数ckpt_file 是必需的，EXPORT_FORMAT 必须在 ["AIR", "MINDIR"]中进行选择。
+
+## 推理过程
+
+### 推理
+
+在执行推理之前，需要通过export.py导出mindir文件
+
+- 在昇腾310上使用修正后的BraST 2017训练数据集进行推理
+
+  执行推理的命令如下所示，其中`MINDIR_PATH`是mindir文件路径；`DATASET_PATH`是数据集路径；`TEST_PATH`是推理数据路径；`DEVICE_ID`可选，默认值为0。
+
+  推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
+
+  ```shell
+  # Ascend310 推理
+  bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [TEST_PATH] [DEVICE_ID]
+  ```
+
 # 模型描述
 
 ## 性能
@@ -312,6 +346,21 @@ mean dice enhance:
 | 总时长        | 2.9小时                                                      | 3.9小时                                                      |
 | 微调检查点    | 9.1M (.ckpt文件)                                             | 9.1M (.ckpt文件)                                             |
 | 脚本          | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/3dcnn) | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/3dcnn) |
+
+### 推理性能
+
+#### BraTS2017上的3DCNN
+
+| 参数          | Ascend                      |
+| ------------------- | --------------------------- |
+| 模型版本       | 3DCNN                |
+| 资源            |  Ascend 310；系统 Eulerosv2r8                  |
+| 上传日期       | 2021-11-11 |
+| MindSpore 版本   | r1.5                       |
+| 数据集             | BraTS 2017     |
+| 输出             | 概率                 |
+| 准确性            | whole: 81.74%; core: 77.73%; enhance: 75.32% |
+| 推理模型 | 3.26M (.mindir文件)         |
 
 # 随机情况说明
 
