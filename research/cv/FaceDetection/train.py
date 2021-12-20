@@ -121,6 +121,7 @@ def init_parameters():
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_train():
     '''train'''
+    init_parameters()
     print('=============yolov3 start trainging==================')
     devid = int(os.getenv('DEVICE_ID', '0')) if config.run_platform != 'CPU' else 0
     context.set_context(mode=context.GRAPH_MODE, device_target=config.run_platform, save_graphs=False, device_id=devid)
