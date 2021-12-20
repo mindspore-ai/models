@@ -26,7 +26,7 @@ from mindspore.nn import Cell
 from mindspore.parallel.nn.transformer import VocabEmbedding, TransformerEncoder, TransformerEncoderLayer, \
     AttentionMask
 from mindspore.parallel.nn import MoEConfig
-from mindspore.parallel.nn.layers import _LayerNorm
+from mindspore.parallel.nn.layers import _LayerNorm, _Dropout
 
 
 class EmbeddingLayer(nn.Cell):
@@ -49,8 +49,8 @@ class EmbeddingLayer(nn.Cell):
                                                  parallel_config=copied_parallel_config.embedding_dp_mp_config)
         self.add = P.Add().shard(
             ((config.parallel_config.data_parallel, 1, 1), (config.parallel_config.data_parallel, 1, 1)))
-        self.dropout = nn.Dropout(1 - config.dropout_rate)
-        self.dropout.dropout.shard(((config.parallel_config.data_parallel, 1, 1),))
+        self.dropout = _Dropout(1 - config.dropout_rate)
+        self.dropout.shard(((config.parallel_config.data_parallel, 1, 1),))
         self.is_first_iteration = True
         self.use_past = config.use_past
         self.batch_size = config.batch_size
