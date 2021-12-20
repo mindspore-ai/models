@@ -12,11 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""hub config."""
-from src.tnt import tnt_b
-
-
-def create_network(name, *args, **kwargs):
-    if name == 'TNT-B':
-        return tnt_b(*args, **kwargs)
-    raise NotImplementedError(f"{name} is not implemented in the repo")
+"""init train one step"""
+from .train_one_step_with_scale_and_clip_global_norm \
+    import TrainOneStepWithLossScaleCellGlobalNormClip as TrainClipGrad
