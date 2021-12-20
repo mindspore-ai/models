@@ -80,6 +80,14 @@
 "models/official/cv/shufflenetv2/infer/mxbase/ShuffleNetV2ClassifyOpencv.h"  "runtime/references"
 "models/official/cv/shufflenetv2/infer/mxbase/main_opencv.cpp"    "runtime/references"
 
+"models/official/recommend/wide_and_deep/infer/mxbase/MxBaseInfer.h"  "runtime/references"
+"models/official/recommend/wide_and_deep/infer/mxbase/MxDeepFmPostProcessor.h"  "runtime/references"
+"models/official/recommend/wide_and_deep/infer/mxbase/main.cpp"  "runtime/references"
+"models/official/recommend/wide_and_deep/infer/mxbase/FunctionTimer.h"  "runtime/references"
+"models/official/recommend/wide_and_deep/infer/sdk/sample/CommandFlagParser.h"  "runtime/references"
+"models/official/recommend/wide_and_deep/infer/sdk/sample/FunctionTimer.h"  "runtime/references"
+"models/official/recommend/wide_and_deep/infer/sdk/sample/main.cpp"  "runtime/references"
+
 "models/research/cv/fairmot/infer/mxbase/src/Fairmot.h" "runtime/references"
 
 "models/research/cv/textfusenet/infer/mxbase/src/Textfusenet.h" "runtime/references"
