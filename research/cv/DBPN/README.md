@@ -40,7 +40,7 @@ Train DBPN Dataset used: [DIV2K](<https://data.vision.ee.ethz.ch/cvl/DIV2K/>)
 - Note: Data will be processed in src/dataset/traindataset.py
 
 Validation and eval evaluationdataset
-used: [Set5](<http://people.rennes.inria.fr/a line.Roumy/results/SR_BMVC12.html>) [Set14](<https://sites.google.com/site/romanzeyde/research-interests>)
+used: [Set5](<http://people.rennes.inria.fr/Aline.Roumy/results/SR_BMVC12.html>) [Set14](<https://sites.google.com/site/romanzeyde/research-interests>)
 
 - Note:Data will be processed in src/dataset/dataset.py
 
@@ -52,7 +52,7 @@ used: [Set5](<http://people.rennes.inria.fr/a line.Roumy/results/SR_BMVC12.html>
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
 
 # [Script Description](#contents)
 
