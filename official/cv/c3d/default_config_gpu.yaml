@@ -1,5 +1,5 @@
 # Device
-device_target:     "Ascend"
+device_target:     "GPU"
 # ==============================================================================
 # Dataset Setup
 clip_length:       16                    # Number of frames within a clip
@@ -17,36 +17,36 @@ preprocess:        default               # String argument to select preprocessi
 # Experiment Setup
 model:             C3D                   # Name of model to be loaded
 acc_metric:        Accuracy              # Accuracy metric
-batch_size:        16                    # Numbers of videos in a mini-batch
-dataset:           HMDB51                # Name of dataset, 'HMDB51' or 'UCF101'
-epoch:             30                    # Total number of epochs
+batch_size:        8                    # Numbers of videos in a mini-batch
+dataset:           UCF101                # Name of dataset
+epoch:             150                   # Total number of epochs
 gamma:             0.1                   # Multiplier with which to change learning rate
-json_path:         /Data/hmdb-51_json/   # Path to the json file for the given dataset
-img_path:          /Data/hmdb-51_img/    # Path to the img file for the given dataset
-pre_trained:       1                     # Load pretrained network
-pre_trained_ckpt_path : ./pretrained_model/pre_trained_model.ckpt # pre_trained model ckpt file path
-sport1m_mean_file_path: ./pretrained_model/sport1m_train16_128_mean.npy # Sport1m data distribution information
-num_classes:       51                    # Number of total classes in the dataset, 51 for HMDB51 and 101 for UCF101
+json_path:         ./ucf101/JSON         # Path to the json file for the given dataset
+img_path:          ./ucf101/UCF-101_img  # Path to the img file for the given dataset
+num_classes:       101                   # Number of total classes in the dataset
 loss_type:         M_XENTROPY            # Loss function
-lr:                1e-4                  # Learning rate
-milestones:        [10, 20]              # Epoch values to change learning rate
+lr:                0.000245                  # Learning rate
+milestones:        [15, 30, 75]              # Epoch values to change learning rate
 momentum:          0.9                   # Momentum value in optimizer
 loss_scale:        1.0
-num_workers:       8                     # Number of CPU worker used to load data
+num_workers:       4                     # Number of CPU worker used to load data
 opt:               sgd                   # Name of optimizer
+pre_trained:       1                     # Load pretrained network
 save_dir:          ./results             # Path to results directory
 seed:              666                   # Seed for reproducibility
 weight_decay:      0.0005                # Weight decay
-amp_level_diff:    O0                    #amp_level for ascend
-enable_graph_kernel_diff: False           #enable_graph_kernel for ascend
+sport1m_mean_file_path: ./pretrained_model/sport1m_train16_128_mean.npy   # Path to sports1m pretrained model
+pre_trained_ckpt_path: ./pretrained_model/c3d-pretrained.ckpt   # Path to c3d pretrained model
+amp_level_diff:    O2                    #amp_level for gpu
+enable_graph_kernel_diff: True           #enable_graph_kernel for gpu
 
 # Train Setup
 is_distributed:    0                     # Distributed training or not
-is_save_on_master: 1                     # Only save ckpt on master device
+is_evalcallback:   1                     # Using evalcallback or not
 device_id:         0                     # Device id
 ckpt_path:         ./result/ckpt         # Ckpt save path
 ckpt_interval:     1                     # Saving ckpt interval
-keep_checkpoint_max: 40                  # Max ckpt file number
+keep_checkpoint_max: 3                 # Max ckpt file number
 
 # Modelarts Setup
 enable_modelarts:  0                     # Is training on modelarts
@@ -56,9 +56,5 @@ train_url:         ''                    # Train path
 
 # Export Setup
 ckpt_file:         './C3D.ckpt'          # Mindspore ckpt file path
-mindir_file_name:  'C3D'               # Save file path
-file_format:       'MINDIR'              # Save file format
-
-# 310 infer
-pre_result_path:   './preprocess_Result'          # save preprocess result file path
-post_result_path:  './result_Files'               # Save postprocess result file path
+mindir_file_name:  './C3D'               # Save file path
+file_format:       'mindir'              # Save file format

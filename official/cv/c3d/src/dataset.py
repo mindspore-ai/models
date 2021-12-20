@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -88,19 +88,6 @@ class video_Dataset():
 
     def __len__(self):
         return len(self.samples)
-
-    def __iter__(self):
-        self._index = 0
-        return self
-
-    def __next__(self):
-        # pylint: disable = no-else-return
-        if self._index < len(self.samples):
-            item = self.__getitem__(self._index)
-            self._index += 1
-            return item
-        else:
-            raise StopIteration
 
     def _getClips(self):
         self.samples = []
@@ -218,21 +205,20 @@ class video_Dataset():
         return final_video
 
 
-def classification_dataset(per_batch_size, shuffle=None, repeat_num=1, drop_remainder=True):
+def classification_dataset(per_batch_size, group_size, shuffle=True, repeat_num=1, drop_remainder=True):
     dataset = video_Dataset()
     dataset_len = len(dataset)
-    if shuffle:
-        num_parallel_workers = config.num_workers
-        if config.is_distributed:
-            de_dataset = de.GeneratorDataset(dataset, ["video", "label"], num_parallel_workers=num_parallel_workers,
-                                             shuffle=shuffle, num_shards=config.group_size, shard_id=config.rank)
-        else:
-            de_dataset = de.GeneratorDataset(dataset, ["video", "label"], num_parallel_workers=num_parallel_workers,
-                                             shuffle=shuffle)
-    else:
-        num_parallel_workers = 1
+
+    num_parallel_workers = config.num_workers
+    if group_size > 1:
+        de_dataset = de.GeneratorDataset(dataset, ["video", "label"], num_parallel_workers=num_parallel_workers,
+                                         shuffle=shuffle, num_shards=group_size, shard_id=config.rank)
+    elif group_size == 1:
         de_dataset = de.GeneratorDataset(dataset, ["video", "label"], num_parallel_workers=num_parallel_workers,
                                          shuffle=shuffle)
+    else:
+        raise ValueError("Invalid group size: %d" % group_size)
+
     columns_to_project = ["video", "label"]
     de_dataset = de_dataset.project(columns=columns_to_project)
 
