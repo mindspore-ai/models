@@ -29,6 +29,7 @@
             - [评估性能](#评估性能)
         - [推理性能](#推理性能)
     - [随机情况说明](#随机情况说明)
+    - [版本更新说明](#版本更新说明)
     - [ModelZoo主页](#modelzoo主页)
 
 <!-- /TOC -->
@@ -397,6 +398,10 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 ## 随机情况说明
 
 在dataset.py中设置“create_dataset”函数内的种子。使用train.py中的随机种子进行权重初始化。
+
+# 版本更新说明
+
+由于MindSpore1.5版本后（>1.5）LSTM多后端统一，旧版Checkpoint无法直接加载使用。
 
 ## ModelZoo主页
 

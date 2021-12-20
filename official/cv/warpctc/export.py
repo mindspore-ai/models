@@ -19,7 +19,7 @@ import numpy as np
 
 from mindspore import Tensor, context, load_checkpoint, load_param_into_net, export
 
-from src.warpctc import StackedRNN, StackedRNNForGPU, StackedRNNForCPU
+from src.warpctc import StackedRNN
 from src.model_utils.config import config
 from src.model_utils.device_adapter import get_device_id
 from src.model_utils.moxing_adapter import moxing_wrapper
@@ -45,13 +45,8 @@ def run_export():
     batch_size = config.batch_size
     hidden_size = config.hidden_size
     image = Tensor(np.zeros([batch_size, 3, captcha_height, captcha_width], np.float32))
-    if config.device_target == 'Ascend':
-        net = StackedRNN(input_size=input_size, batch_size=batch_size, hidden_size=hidden_size)
-        image = Tensor(np.zeros([batch_size, 3, captcha_height, captcha_width], np.float16))
-    elif config.device_target == 'GPU':
-        net = StackedRNNForGPU(input_size=input_size, batch_size=batch_size, hidden_size=hidden_size)
-    else:
-        net = StackedRNNForCPU(input_size=input_size, batch_size=batch_size, hidden_size=hidden_size)
+    net = StackedRNN(input_size=input_size, hidden_size=hidden_size)
+
     param_dict = load_checkpoint(config.ckpt_file)
     load_param_into_net(net, param_dict)
     net.set_train(False)

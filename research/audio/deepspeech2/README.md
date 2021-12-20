@@ -14,6 +14,7 @@
     - [Performance](#performance)
         - [Training Performance](#training-performance)
         - [Inference Performance](#inference-performance)
+- [Description of MindSpore Version](#description-of-mindspore-version)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 # [DeepSpeech2 Description](#contents)
@@ -291,6 +292,11 @@ python export.py --pre_trained_model_path='ckpt_path'
 | Accuracy(test-clean)       | 2p: WER: 9.902  CER: 3.317  8p: WER: 11.593  CER: 3.907|
 | Accuracy(test-others)      | 2p: WER: 28.693 CER: 12.473 8p: WER: 31.397  CER: 13.696|
 | Model for inference        | 330M (.mindir file)                                              |
+
+# [Description of MindSpore Version](#contents)
+
+Due to the upgrade of MindSpore(>1.5), the checkpoint file trained from old version cannot load to
+network directly.
 
 # [ModelZoo Homepage](#contents)
 

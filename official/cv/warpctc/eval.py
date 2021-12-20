@@ -23,7 +23,7 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 from src.loss import CTCLoss
 from src.dataset import create_dataset
-from src.warpctc import StackedRNN, StackedRNNForGPU, StackedRNNForCPU
+from src.warpctc import StackedRNN
 from src.metric import WarpCTCAccuracy
 
 from src.model_utils.moxing_adapter import moxing_wrapper
@@ -101,12 +101,7 @@ def run_eval():
     loss = CTCLoss(max_sequence_length=config.captcha_width,
                    max_label_length=max_captcha_digits,
                    batch_size=config.batch_size)
-    if config.device_target == 'Ascend':
-        net = StackedRNN(input_size=input_size, batch_size=config.batch_size, hidden_size=config.hidden_size)
-    elif config.device_target == 'GPU':
-        net = StackedRNNForGPU(input_size=input_size, batch_size=config.batch_size, hidden_size=config.hidden_size)
-    else:
-        net = StackedRNNForCPU(input_size=input_size, batch_size=config.batch_size, hidden_size=config.hidden_size)
+    net = StackedRNN(input_size=input_size, hidden_size=config.hidden_size)
 
     # load checkpoint
     param_dict = load_checkpoint(config.checkpoint_path)

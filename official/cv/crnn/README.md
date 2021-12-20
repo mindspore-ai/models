@@ -29,6 +29,7 @@
             - [Training Performance](#training-performance)
             - [Evaluation Performance](#evaluation-performance)
     - [Description of Random Situation](#description-of-random-situation)
+    - [Description of MindSpore Version](#description-of-mindspore-version)
     - [ModelZoo Homepage](#modelzoo-homepage)
 
 ## [CRNN Description](#contents)
@@ -465,6 +466,11 @@ result CRNNAccuracy is: 0.7933333333333
 ## [Description of Random Situation](#contents)
 
 In dataset.py, we set the seed inside “create_dataset" function. We also use random seed in train.py for weight initialization.
+
+# [Description of MindSpore Version](#contents)
+
+Due to the upgrade of MindSpore(>1.5), the checkpoint file trained from old version cannot load to
+network directly.
 
 ## [ModelZoo Homepage](#contents)
 
