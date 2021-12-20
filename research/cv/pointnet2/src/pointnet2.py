@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 import mindspore.nn as nn
 import mindspore.ops as P
-from mindspore.nn.loss.loss import _Loss
+from mindspore.nn.loss.loss import LossBase
 from mindspore.ops import functional as F
 
 from src.layers import Dense
@@ -74,7 +74,7 @@ class PointNet2(nn.Cell):
         return x
 
 
-class NLLLoss(_Loss):
+class NLLLoss(LossBase):
     """NLL loss"""
 
     def __init__(self, reduction='mean'):

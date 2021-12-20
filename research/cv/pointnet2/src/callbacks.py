@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 import moxing as mox
 from mindspore.train.callback import Callback
+from mindspore.profiler import Profiler
 
 
 class MoxCallBack(Callback):
@@ -32,3 +33,26 @@ class MoxCallBack(Callback):
         cb_params = run_context.original_args()
         if cb_params.cur_epoch_num % self.mox_freq == 0:
             mox.file.copy_parallel(self.local_train_url, self.train_url)
+
+
+class ProfileCallBack(Callback):
+    def __init__(self, start_step, stop_step):
+        super(ProfileCallBack, self).__init__()
+        self.start_step = start_step
+        self.stop_step = stop_step
+        self.profiler = Profiler(start_profile=False, output_path="./profile/")
+
+    def step_begin(self, run_context):
+        cb_params = run_context.original_args()
+        step_num = cb_params.cur_step_num
+        if step_num == self.start_step:
+            self.profiler.start()
+
+    def step_end(self, run_context):
+        cb_params = run_context.original_args()
+        step_num = cb_params.cur_step_num
+        if step_num == self.stop_step:
+            self.profiler.stop()
+
+    def end(self, run_context):
+        self.profiler.analyse()
