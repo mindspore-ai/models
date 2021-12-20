@@ -575,17 +575,38 @@ Inference result is saved in current path, you can find result like this in acc.
 
 #### Inference Performance
 
+> SST2 dataset
 | Parameters                 | Ascend                        | GPU                       |
 | -------------------------- | ----------------------------- | ------------------------- |
 | Model Version              |                               |                           |
-| Resource                   | Ascend 910; OS Euler2.8                      | NV SMX2 V100-32G          |
+| Resource                   | Ascend 910; OS Euler2.8       | NV SMX2 V100-32G          |
 | uploaded Date              | 07/05/2021                    | 07/05/2021                |
 | MindSpore Version          | 1.3.0                         | 1.3.0                     |
 | Dataset                    | SST-2,                        | SST-2                     |
 | batch_size                 | 32                            | 32                        |
 | Accuracy                   | 0.902777                      | 0.9086                    |
-| Speed                      |                               |                           |
-| Total time                 |                               |                           |
+| Model for inference        | 74M(.ckpt file)               | 74M(.ckpt file)           |
+> QNLI dataset
+| Parameters                 | Ascend                        | GPU                       |
+| --------------             | ----------------------------- | ------------------------- |
+| Model Version              |                               |                           |
+| Resource                   | Ascend 910; OS Euler2.8       | NV SMX2 V100-32G          |
+| uploaded Date              | 2021-12-17                    | 2021-12-17                |
+| MindSpore Version          | 1.5.0                         | 1.5.0                     |
+| Dataset                    | QNLI                          | QNLI                      |
+| batch_size                 | 32                            | 32                        |
+| Accuracy                   | 0.8860                        | 0.8755                    |
+| Model for inference        | 74M(.ckpt file)               | 74M(.ckpt file)           |
+> MNLI dataset
+| Parameters                 | Ascend                        | GPU                       |
+| --------------             | ----------------------------- | ------------------------- |
+| Model Version              |                               |                           |
+| Resource                   | Ascend 910；系统 Euler2.8      | NV SMX2 V100-32G          |
+| uploaded Date              | 2021-12-17                    | 2021-12-17                |
+| MindSpore Version          | 1.5.0                         | 1.5.0                     |
+| Dataset                    | QNLI                          | QNLI                      |
+| batch_size                 | 32                            | 32                        |
+| Accuracy                   | 0.8116                        | 0.9086                    |
 | Model for inference        | 74M(.ckpt file)               | 74M(.ckpt file)           |
 
 # [Description of Random Situation](#contents)
