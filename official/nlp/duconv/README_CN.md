@@ -301,7 +301,7 @@ Proactive Conversation模型包含四个部分：
 
 ```shell
 
-bash export.sh [TASK_NAME] [CHECK_POINT_PATH] [FILE_FORMAT]
+bash run_export.sh [TASK_NAME] [CHECK_POINT_PATH] [FILE_FORMAT]
 
 ```
 
@@ -311,11 +311,24 @@ bash export.sh [TASK_NAME] [CHECK_POINT_PATH] [FILE_FORMAT]
 
 在还行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
 
-- 在昇腾310上进行推理
+在昇腾310上进行推理
 
-  ```shell
-  # Ascend310 inference
-  ```
+```shell
+# Ascend310 inference
+
+bash run_infer_310.sh [MINDIR_PATH] [DATA_FILE_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+```
+
+`NEED_PREPROCESS` 为必选项, 在[y|n]中取值，表示数据是否预处理为bin格式。
+`DEVICE_ID` 可选，默认值为 0。
+
+### 结果
+
+- 推理结果保存在当前路径，可在acc.log中看到最终精度结果。
+
+```eval log
+31.71%
+```
 
 # 模型描述
 
