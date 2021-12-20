@@ -27,6 +27,7 @@ class YOLO(nn.Cell):
         super(YOLO, self).__init__()
         self.backbone = backbone
         self.config = default_config
+        self.config.out_channel = (self.config.num_classes + 5) * 3
 
         self.conv1 = Conv(shape[5], shape[4], k=1, s=1)
         self.CSP5 = BottleneckCSP(shape[5], shape[4], n=1*shape[6], shortcut=False)
