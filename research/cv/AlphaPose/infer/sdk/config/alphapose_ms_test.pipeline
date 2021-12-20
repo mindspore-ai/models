@@ -1,0 +1,28 @@
+{
+    "im_midas": {
+        "stream_config": {
+            "deviceId": "0"
+        },
+        "appsrc0": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_modelinfer0"
+        },
+
+        "mxpi_modelinfer0": {
+            "props": {
+                "dataSource": "appsrc0",
+                "modelPath": "/home/data/xd_mindx/csl/csl-tyl/mindx_midas/infer/convert/alphapose.om"
+
+            },
+            "factory": "mxpi_modelinfer",
+            "next": "appsink0"
+        },
+
+        "appsink0": {
+            "factory": "appsink"
+        }
+    }
+}
