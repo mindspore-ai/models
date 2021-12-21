@@ -61,6 +61,7 @@ if __name__ == "__main__":
 
     config.checkpoint_path = os.path.abspath(config.checkpoint_path)
     context.set_context(device_target=config.device_target, mode=context.GRAPH_MODE)
+    context.set_context(enable_auto_mixed_precision=config.mixed_precision)
     if config.device_target == 'Ascend':
         context.set_context(device_id=get_device_id())
 
