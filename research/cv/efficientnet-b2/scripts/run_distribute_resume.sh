@@ -13,27 +13,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 3 ];then
-  echo "usage sh run_eval.sh [device_id(0)] [checkpoint_path] [dataset_path]"
+
+# when use this shell to resume training,you should rename the ckpt to the interrupt epoch
+# for example:
+# mv best_acc.ckpt Efficientnet_b2-rank0-100_1251.ckpt
+if [ $# != 5 ]
+then
+    echo "usage sh run_distribute_resume.sh [device_num] [device_id(0,1,2,3,4,5,6,7)] [dataset_path] [resume] [device_target] "
 exit 1
 fi
 
 # check dataset file
-if [ ! -d $3 ];then
+if [ ! -d $3 ]
+then
     echo "error: DATASET_PATH=$3 is not a directory"
 exit 1
 fi
 
-if [ ! -f $2 ];then
-  echo "error: PATH_CHECKPOINT=$2 is not a file"
-  exit 1
-fi
+BASEPATH=$(cd "`dirname $0`" || exit; pwd)
 
-export DEVICE_ID=$1
-PATH_CHECKPOINT=$2
-DATA_DIR=$3
+export DEVICE_NUM=$1
+export RANK_SIZE=$1
 
-python ./eval.py  \
-    --device_id=$DEVICE_ID \
-    --checkpoint_path=$PATH_CHECKPOINT \
-    --dataset_path=$DATA_DIR > eval.log 2>&1 &
+cd ../train || exit
+
+export CUDA_VISIBLE_DEVICES="$2"
+mpirun --allow-run-as-root -n $1  --output-filename log_output --merge-stderr-to-stdout \
+python ${BASEPATH}/../train.py \
+    --run_distribute True \
+    --dataset_path $3 \
+    --resume $4 \
+    --device_target $5 > train.log 2>&1 &
+
+

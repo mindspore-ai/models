@@ -25,7 +25,8 @@
 
 EfficientNet是一种卷积神经网络架构和缩放方法，它使用复合系数统一缩放深度/宽度/分辨率的所有维度。与任意缩放这些因素的常规做法不同，EfficientNet缩放方法使用一组固定的缩放系数来均匀缩放网络宽度，深度和分辨率。（2019年）
 
-[论文](https://arxiv.org/abs/1905.11946)：Mingxing Tan, Quoc V. Le. EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks. 2019.
+[论文](https://arxiv.org/abs/1905.11946)：Mingxing Tan, Quoc V. Le. EfficientNet: Rethinking Model Scaling for
+Convolutional Neural Networks. 2019.
 
 # 模型架构
 
@@ -58,24 +59,28 @@ EfficientNet总体网络架构如下：
 ## 脚本和示例代码
 
 ```python
-├── EfficientNet-B2
-  ├── README_CN.md                 # EfficientNet-B2相关描述
-  ├── scripts
-  │   ├──run_standalone_train.sh   # 用于单卡训练的shell脚本
-  │   ├──run_distribute_train.sh   # 用于八卡训练的shell脚本
-  │   └──run_eval.sh               # 用于评估的shell脚本
-  ├── src
-  │   ├──models                    # EfficientNet-B2架构
-  │   │   ├──effnet.py
-  │   │   └──layers.py
-  │   ├──config.py                 # 参数配置
-  │   ├──dataset.py                # 创建数据集
-  │   ├──loss.py                   # 损失函数
-  │   ├──lr_generator.py           # 配置学习率
-  │   └──Monitor.py                # 监控网络损失和其他数据
-  ├── eval.py                      # 评估脚本
-  ├── export.py                    # 模型格式转换脚本
-  └── train.py                     # 训练脚本
+├── EfficientNet - B2
+├── README_CN.md  # EfficientNet-B2相关描述
+├── scripts
+│   ├──run_standalone_train.sh  # 用于单卡训练的shell脚本
+│   ├──run_standalone_train_gpu.sh  # 用于单卡GPU训练的shell脚本
+│   ├──run_distribute_train.sh  # 用于八卡训练的shell脚本
+│   ├──run_train_gpu.sh  # 用于八卡GPU训练的shell脚本
+│   ├──run_eval_gpu.sh  # 用于评估的GPUshell脚本
+│   ├──run_distribute_resume.sh  # 用于恢复训练的shell脚本
+│   └──run_eval.sh  # 用于评估的shell脚本
+├── src
+│   ├──models  # EfficientNet-B2架构
+│   │   ├──effnet.py
+│   │   └──layers.py
+│   ├──config.py  # 参数配置
+│   ├──dataset.py  # 创建数据集
+│   ├──loss.py  # 损失函数
+│   ├──lr_generator.py  # 配置学习率
+│   └──Monitor.py  # 监控网络损失和其他数据
+├── eval.py  # 评估脚本
+├── export.py  # 模型格式转换脚本
+└── train.py  # 训练脚本
 ```
 
 ## 脚本参数
@@ -83,25 +88,25 @@ EfficientNet总体网络架构如下：
 模型训练和评估过程中使用的参数可以在config.py中设置:
 
 ```python
-'class_num': 1000,                        # 数据集类别数
-'batch_size': 256,                        # 数据批次大小
-'loss_scale': 1024,                       # loss scale
-'momentum': 0.9,                          # 动量参数
-'weight_decay': 1e-5,                     # 权重衰减率
-'epoch_size': 350,                        # 模型迭代次数
-'save_checkpoint': True,                  # 是否保存ckpt文件
-'save_checkpoint_epochs': 1,              # 每迭代相应次数保存一个ckpt文件
-'keep_checkpoint_max': 5,                 # 保存ckpt文件的最大数量
-'save_checkpoint_path': "./checkpoint",   # 保存ckpt文件的路径
-'opt': 'rmsprop',                         # 优化器
-'opt_eps': 0.001,                         # 改善数值稳定性的优化器参数
-'warmup_epochs': 2,                       # warmup epoch数量
-'lr_decay_mode': 'liner',                 # 学习率下降方式
-'use_label_smooth': True,                 # 是否使用label smooth
-'label_smooth_factor': 0.1,               # 标签平滑因子
-'lr_init': 0.0001,                        # 初始学习率
-'lr_max': 0.13,                            # 最大学习率
-'lr_end': 0.00001,                        # 最终学习率
+'class_num': 1000,  # 数据集类别数
+'batch_size': 256,  # 数据批次大小
+'loss_scale': 1024,  # loss scale
+'momentum': 0.9,  # 动量参数
+'weight_decay': 1e-5,  # 权重衰减率
+'epoch_size': 350,  # 模型迭代次数
+'save_checkpoint': True,  # 是否保存ckpt文件
+'save_checkpoint_epochs': 1,  # 每迭代相应次数保存一个ckpt文件
+'keep_checkpoint_max': 5,  # 保存ckpt文件的最大数量
+'save_checkpoint_path': "./checkpoint",  # 保存ckpt文件的路径
+'opt': 'rmsprop',  # 优化器
+'opt_eps': 0.001,  # 改善数值稳定性的优化器参数
+'warmup_epochs': 2,  # warmup epoch数量
+'lr_decay_mode': 'liner',  # 学习率下降方式
+'use_label_smooth': True,  # 是否使用label smooth
+'label_smooth_factor': 0.1,  # 标签平滑因子
+'lr_init': 0.0001,  # 初始学习率
+'lr_max': 0.13,  # 最大学习率
+'lr_end': 0.00001,  # 最终学习率
 ```
 
 ## 训练过程
@@ -114,10 +119,13 @@ EfficientNet总体网络架构如下：
 # 训练示例
   python:
       Ascend单卡训练示例：python train.py --device_id [DEVICE_ID] --dataset_path [DATA_DIR]
+      GPU单卡训练示例：python train.py --device_id [DEVICE_ID] --dataset_path [DATA_DIR] --dataset_target [DEVICE_TARGET]
 
   shell:
-      Ascend单卡训练示例: sh ./run_standalone_train.sh [DEVICE_ID] [DATA_DIR]
-      Ascend八卡并行训练: sh ./run_distribute_train.sh [RANK_TABLE_FILE] [DATA_DIR]
+      Ascend单卡训练示例: bash ./run_standalone_train.sh [DEVICE_ID] [DATA_DIR]
+      Ascend八卡并行训练: bash ./run_distribute_train.sh [RANK_TABLE_FILE] [DATA_DIR]
+      GPU单卡训练示例：bash ./run_standalone_train_gpu.sh [DEVICE_ID] [DATA_DIR]
+      GPU八卡并行训练：bash ./run_train_gpu.sh [DEVICE_NUM] [DEVICE_ID(0,1,2,3,4,5,6,7)] [DATA_DIR]
 ```
 
 ### 结果
@@ -141,10 +149,12 @@ epoch 5: epoch time: 645621.756, per step time: 1032.995, avg loss: 3.342
 ```shell
 # 评估示例
   python:
-      python eval.py --device_id [DEVICE_ID] --dataset_path [DATA_DIR] --checkpoint_path [PATH_CHECKPOINT]
+      Ascend评估示例：python eval.py --device_id [DEVICE_ID] --dataset_path [DATA_DIR] --checkpoint_path [PATH_CHECKPOINT]
+      GPU评估示例：python eval.py [DEVICE_ID] [PATH_CHECKPOINT] [DATA_DIR] [DEVICE_TARGET]
 
   shell:
-      sh ./run_eval.sh [DEVICE_ID] [DATA_DIR] [PATH_CHECKPOINT]
+      Ascend评估示例：bash ./run_eval.sh [DEVICE_ID] [DATA_DIR] [PATH_CHECKPOINT]
+      GPU评估示例：bash run_eval_gpu.sh [DEVICE_ID] [PATH_CHECKPOINT] [DATA_DIR] [DEVICE_TARGET]
 ```
 
 > 训练过程中可以生成ckpt文件。
@@ -161,20 +171,20 @@ result: {'Loss': 1.7495090191180889, 'Top_1_Acc': 0.7979567307692308, 'Top_5_Acc
 
 ## 训练性能
 
-| 参数                        | Ascend                                |
-| -------------------------- | ------------------------------------- |
-| 模型名称                    | EfficientNet                          |
-| 模型版本                    | B2                           |
-| 运行环境                    | HUAWEI CLOUD Modelarts                     |
-| 上传时间                    | 2021-8-17                             |
-| 数据集                      | imagenet                              |
-| 训练参数                    | src/config.py                         |
-| 优化器                      | RMSProp                              |
-| 损失函数                    | CrossEntropySmooth         |
-| 最终损失                    | 1.75                                  |
-| 精确度 (8p)                 | Top1[79.80%], Top5[94.69%]               |
-| 训练总时间 (8p)             | 64.87h                                    |
-| 评估总时间                  | 1min                                    |
+| 参数                        | Ascend                                | GPU                             |
+| -------------------------- | ------------------------------------- | ------------------------------------- |
+| 模型名称                    | EfficientNet                          | EfficientNet              |
+| 模型版本                    | B2                           | B2                         |
+| 运行环境                    | HUAWEI CLOUD Modelarts                     | Ubuntu 18.04 GeForce RTX 3090 |
+| 上传时间                    | 2021-8-17                             | 2021-11-20                  |
+| 数据集                      | imagenet                              | imagenet                     |
+| 训练参数                    | src/config.py                         | src/config.py            |
+| 优化器                      | RMSProp                              | RMSProp                       |
+| 损失函数                    | CrossEntropySmooth         | CrossEntropySmooth |
+| 最终损失                    | 1.75                                  | 1.76                              |
+| 精确度 (8p)                 | Top1[79.80%], Top5[94.69%]               | Top1[79.57%], Top5[94.72%] |
+| 训练总时间 (8p)             | 64.87h                                    | 105h                               |
+| 评估总时间                  | 1min                                    | 2min                               |
 
 # 随机情况的描述
 

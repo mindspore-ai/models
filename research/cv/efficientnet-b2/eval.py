@@ -22,7 +22,7 @@ from mindspore.common import set_seed
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 from src.models.effnet import EfficientNet
-from src.config import config
+from src.config import config_gpu, config_ascend
 from src.dataset import create_dataset
 from src.loss import CrossEntropySmooth
 
@@ -39,9 +39,10 @@ if __name__ == '__main__':
     parser.add_argument('--device_id', type=int, default=0, help='Device id')
 
     parser.add_argument('--run_modelarts', type=ast.literal_eval, default=False, help='Run distribute')
+    parser.add_argument('--device_target', type=str, choices=["Ascend", "GPU"], default="Ascend", help='Device target')
     args_opt = parser.parse_args()
 
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', save_graphs=False)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, save_graphs=False)
 
     if args_opt.run_modelarts:
         import moxing as mox
@@ -55,6 +56,11 @@ if __name__ == '__main__':
         mox.file.copy_parallel(args_opt.train_url, local_train_url)
     else:
         context.set_context(device_id=args_opt.device_id)
+
+    if args_opt.device_target == "GPU":
+        config = config_gpu
+    else:
+        config = config_ascend
 
     # create dataset
     if args_opt.run_modelarts:
@@ -87,7 +93,7 @@ if __name__ == '__main__':
     model = Model(net, loss_fn=loss, metrics=eval_metrics)
 
     # eval model
-    res = model.eval(dataset)
+    res = model.eval(dataset, dataset_sink_mode=False)
     if args_opt.run_modelarts:
         print("result:", res, "ckpt=", local_data_url)
     else:
