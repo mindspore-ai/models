@@ -34,5 +34,6 @@ do
   export DEVICE_ID=$i
   python -s ${self_path}/../predict.py --strategy_load_ckpt_path=$STRATEGY --load_ckpt_path=$CKPT_PATH \
                   --load_ckpt_name=$CKPT_NAME --mode=$MODE --run_type=predict --param_init_type=$PARAM_INIT_TYPE \
-                  --export=1 --distribute=false --device_target=$DEVICE_TARGET >log$i.log 2>&1 &
+                  --export=1 --distribute=false \
+                  --device_target=$DEVICE_TARGET >log$i.log 2>&1 &
 done
