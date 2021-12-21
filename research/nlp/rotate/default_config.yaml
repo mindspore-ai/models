@@ -1,0 +1,30 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+enable_profiling: False
+
+# path
+data_path: "./Data/wn18rr/"
+output_path: "./checkpoints/"
+device_target: Ascend
+experiment_name: "rotate"
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+eval_checkpoint: ""
+result_path: "./scripts/result_Files/"
+head_positive_path: ""
+tail_positive_path: ""
+
+# ==============================================================================
+lr: 0.00005
+gamma: 6.0
+max_steps: 80000
+batch_size: 512
+test_batch_size: 8
+hidden_dim: 500
+negative_sample_size: 1024
+adversarial_temperature: 0.5
+double_entity_embedding: True
+double_relation_embedding: False
+use_dynamic_loss_scale: True
+file_format: "MINDIR"
