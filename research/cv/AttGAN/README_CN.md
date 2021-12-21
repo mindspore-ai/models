@@ -52,8 +52,8 @@ CelebFaces Attributes Dataset (CelebA) 是一个大规模的人脸属性数据�
 
 # 环境要求
 
-- 硬件（Ascend）
-    - 使用Ascend来搭建硬件环境。
+- 硬件（Ascend/GPU）
+    - 使用Ascend或GPU来搭建硬件环境。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
@@ -96,6 +96,21 @@ CelebFaces Attributes Dataset (CelebA) 是一个大规模的人脸属性数据�
 
   [注意] 以上路径均应设置为绝对路径
 
+- GPU处理器环境运行
+
+  ```python
+  # 运行训练示例
+  bash run_single_train_gpu.sh 128_shortcut1_inject1_none_GPU /path/data/img_align_celeba /path/data/list_attr_celeba.txt
+
+  # 运行分布式训练示例
+  bash run_distribute_train_gpu.sh distribute_train /path/data/img_align_celeba /path/data/list_attr_celeba.txt
+
+  # 运行评估示例
+  bash run_eval_gpu.sh 128_shortcut1_inject1_none_GPU /path/data/custom/ /path/data/list_attr_custom.txt generator-119_84999.ckpt
+  ```
+
+  对于评估脚本，需要提前创建存放自定义图片(jpg)的目录以及属性编辑文件，同Ascend的处理。
+
 # 脚本说明
 
 ## 脚本及样例代码
@@ -106,9 +121,13 @@ CelebFaces Attributes Dataset (CelebA) 是一个大规模的人脸属性数据�
   └─ AttGAN
     ├── ascend310_infer                    # 310推理目录
     ├── scripts
-      ├──run_distribute_train.sh           # 分布式训练的shell脚本
-      ├──run_single_train.sh               # 单卡训练的shell脚本
-      ├──run_eval.sh                       # 评估脚本
+      ├──run_distribute_train.sh           # Ascend分布式训练的shell脚本
+      ├──run_single_train.sh               # Ascend单卡训练的shell脚本
+      ├──run_eval.sh                       # Ascend评估脚本
+      ├──run_distribute_train_gpu.sh       # GPU分布式训练的shell脚本
+      ├──run_distribute_eval_gpu.sh        # 对GPU分布式训练结果评估的shell脚本
+      ├──run_single_train_gpu.sh           # GPU单卡训练的shell脚本
+      ├──run_eval_gpu.sh                   # GPU评估脚本
       ├──run_infer_310.sh                  # 推理脚本
     ├─ src
       ├─ __init__.py                       # 初始化文件
@@ -143,6 +162,16 @@ CelebFaces Attributes Dataset (CelebA) 是一个大规模的人脸属性数据�
 
   训练结束后，当前目录下会生成output目录，在该目录下会根据你设置的experiment_name参数生成相应的子目录，训练时的参数保存在该子目录下的setting.txt文件中，checkpoint文件保存在`output/experiment_name/rank0`下。如果需要生成setting.txt文件，只需要执行一次train.py文件即可，此时脚本会根据设定的参数生成对应的setting.txt文件。该文件会被用于推理脚本。
 
+- GPU处理器环境运行
+
+  ```bash
+  bash run_single_train_gpu.sh [EXPERIMENT_NAME] [DATA_PATH] [ATTR_PATH]
+  如：
+  bash run_single_train_gpu.sh 128_shortcut1_inject1_none_GPU /path/data/img_align_celeba /path/data/list_attr_celeba.txt
+  ```
+
+  训练结束后，在AttGAN目录下会生成output目录，其余与Ascend处理器环境相同。
+
 ### 分布式训练
 
 - Ascend处理器环境运行
@@ -152,6 +181,16 @@ CelebFaces Attributes Dataset (CelebA) 是一个大规模的人脸属性数据�
   ```
 
   上述shell脚本将在后台运行分布式训练。该脚本将在脚本目录下生成相应的LOG{RANK_ID}目录，每个进程的输出记录在相应LOG{RANK_ID}目录下的log.txt文件中。checkpoint文件保存在output/experiment_name/rank{RANK_ID}下。
+
+- GPU处理器环境运行
+
+  ```bash
+  bash run_distribute_train_gpu.sh [EXPERIMENT_NAME] [DATA_PATH] [ATTR_PATH]
+  如：
+  bash run_distribute_train_gpu.sh distribute_train /path/data/img_align_celeba /path/data/list_attr_celeba.txt
+  ```
+
+  上述shell脚本将在后台运行GPU分布式训练。该脚本将在scripts/train_parallel/log_output/1/目录下生成相应的rank.{RANK_ID}目录，每个进程的输出记录在相应rank.{RANK_ID}目录下的stdout文件中。checkpoint文件保存在scripts/train_parallel/output/distribute1/checkpoint/rank0/下。
 
 ## 评估过程
 
@@ -169,6 +208,27 @@ CelebFaces Attributes Dataset (CelebA) 是一个大规模的人脸属性数据�
   ```
 
   测试脚本执行完成后，用户进入当前目录下的`output/{experiment_name}/custom_img`下查看修改好的图片。
+
+- 在GPU环境运行时评估自定义数据集
+  评估时选择已经生成好的检查点文件，作为参数传入测试脚本，对应参数为`GEN_CKPT_NAME`(保存了编码器和解码器的参数)
+
+  ```bash
+  bash run_eval_gpu.sh [EXPERIMENT_NAME] [CUSTOM_DATA_PATH] [CUSTOM_ATTR_PATH] [GEN_CKPT_NAME]
+  如：
+  bash run_eval_gpu.sh 128_shortcut1_inject1_none_GPU /path/data/custom/ /path/data/list_attr_custom.txt generator-119_84999.ckpt
+  ```
+
+  测试脚本执行完成后，用户进入当前目录下的`output/{experiment_name}/custom_img`下查看修改好的图片。
+
+- 在GPU环境运行时对GPU分布式训练结果评估自定义数据集
+
+  ```bash
+  bash run_distribute_eval_gpu.sh [EXPERIMENT_NAME] [CUSTOM_DATA_PATH] [CUSTOM_ATTR_PATH] [GEN_CKPT_NAME]
+  如：
+  bash run_distribute_eval_gpu.sh distribute_train /path/data/custom/ /path/data/list_attr_custom.txt generator-119_84999.ckpt
+  ```
+
+  测试脚本执行完成后，用户进入`scripts/train_parallel/output/{experiment_name}/custom_testing/`下查看修改好的图片。
 
 ## 推理过程
 
@@ -211,32 +271,32 @@ bash run_infer_310.sh [GEN_MINDIR_PATH] [ATTR_FILE_PATH] [DATA_PATH] [NEED_PREPR
 
 #### CelebA上的AttGAN
 
-| 参数                       | Ascend 910                                                  |
-| -------------------------- | ----------------------------------------------------------- |
-| 模型版本                   | AttGAN                                                      |
-| 资源                       | Ascend                                                      |
-| 上传日期                   | 06/30/2021 (month/day/year)                                 |
-| MindSpore版本              | 1.2.0                                                       |
-| 数据集                     | CelebA                                                      |
-| 训练参数                   | batch_size=32, lr=0.0002                                    |
-| 优化器                     | Adam                                                        |
-| 生成器输出                 | image                                                       |
-| 速度                       | 5.56 step/s                                                 |
-| 脚本                       | [AttGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/AttGAN) |
+| 参数                       | Ascend 910                                                  | GPU   |
+| -------------------------- | ----------------------------------------------------------- | ----- |
+| 模型版本                   | AttGAN                                                      | AttGAN |
+| 资源                       | Ascend                                                      | RTX-3090 |
+| 上传日期                   | 06/30/2021 (month/day/year)                                 | 11/23/2021 (month/day/year) |
+| MindSpore版本              | 1.2.0                                                       | 1.5.0rc1 |
+| 数据集                     | CelebA                                                      | CelebA |
+| 训练参数                   | batch_size=32, lr=0.0002                                    | batch_size=32, lr=0.0002 |
+| 优化器                     | Adam                                                        | Adam |
+| 生成器输出                 | image                                                       | image |
+| 速度                       | 5.56 step/s                                                 | 6.67 step/s |
+| 脚本                       | [AttGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/AttGAN) | [AttGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/AttGAN) |
 
 ### 推理性能
 
 #### CelebA上的AttGAN
 
-| 参数                       | Ascend 910                                                  |
-| -------------------------- | ----------------------------------------------------------- |
-| 模型版本                   | AttGAN                                                      |
-| 资源                       | Ascend                                                      |
-| 上传日期                   | 06/30/2021 (month/day/year)                                 |
-| MindSpore版本              | 1.2.0                                                       |
-| 数据集                     | CelebA                                                      |
-| 推理参数                   | batch_size=1                                                |
-| 输出                       | image                                                       |
+| 参数                       | Ascend 910                                                  | GPU   |
+| -------------------------- | ----------------------------------------------------------- | ----- |
+| 模型版本                   | AttGAN                                                      | AttGAN |
+| 资源                       | Ascend                                                      | RTX-3090 |
+| 上传日期                   | 06/30/2021 (month/day/year)                                 | 11/23/2021 (month/day/year) |
+| MindSpore版本              | 1.2.0                                                       | 1.5.0rc1 |
+| 数据集                     | CelebA                                                      | CelebA |
+| 推理参数                   | batch_size=1                                                | batch_size=1 |
+| 输出                       | image                                                       | image |
 
 推理完成后可以获得对原图像进行属性编辑后的图片slide.
 

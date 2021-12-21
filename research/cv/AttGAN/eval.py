@@ -35,10 +35,6 @@ from src.data import get_loader, Custom
 from src.helpers import Progressbar
 from src.utils import resume_generator, denorm
 
-device_id = int(os.getenv('DEVICE_ID'))
-context.set_context(mode=context.PYNATIVE_MODE, device_target="Ascend", save_graphs=False, device_id=device_id)
-
-
 def parse(arg=None):
     """Define configuration of Evaluation"""
     parser = argparse.ArgumentParser()
@@ -51,11 +47,15 @@ def parse(arg=None):
     parser.add_argument('--custom_attr', type=str, default='../data/list_attr_custom.txt')
     parser.add_argument('--shortcut_layers', dest='shortcut_layers', type=int, default=1)
     parser.add_argument('--inject_layers', dest='inject_layers', type=int, default=1)
+    parser.add_argument('--platform', type=str, default='Ascend', choices=('Ascend', 'GPU'))
     return parser.parse_args(arg)
 
 
 args_ = parse()
 print(args_)
+
+device_id = int(os.getenv('DEVICE_ID'))
+context.set_context(mode=context.PYNATIVE_MODE, device_target=args_.platform, save_graphs=False, device_id=device_id)
 
 with open(join('output', args_.experiment_name, 'setting.txt'), 'r') as f:
     args = json.load(f, object_hook=lambda d: argparse.Namespace(**d))
@@ -87,7 +87,7 @@ else:
                               )
     test_len = len(test_dataset)
 dataset_column_names = ["image", "attr"]
-num_parallel_workers = 8
+num_parallel_workers = 1
 ds = de.GeneratorDataset(test_dataset, column_names=dataset_column_names,
                          num_parallel_workers=min(32, num_parallel_workers))
 ds = ds.batch(1, num_parallel_workers=min(8, num_parallel_workers), drop_remainder=False)
