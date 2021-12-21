@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 4 ]; then
-  echo "Usage: sh run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE] [DEVICE_TARGET]"
+if [ $# != 1 ]; then
+  echo "Usage: sh run_gpu_standalone_train.sh [TRAIN_DATA_DIR]"
   exit 1
 fi
 
@@ -27,35 +27,30 @@ get_real_path() {
   fi
 }
 
-PATH1=$(get_real_path $1)
-PATH2=$(get_real_path $2)
-DATASET_TYPE=$3
-export DEVICE_TARGET=$4
-if [ ! -d $PATH1 ]; then
-  echo "error: TEST_DATA_DIR=$PATH1 is not a directory"
+MY_PATH=$(get_real_path $1)
+
+if [ ! -d $MY_PATH ]; then
+  echo "error: TRAIN_DATA_DIR=$MY_PATH is not a directory"
   exit 1
 fi
 
-if [ ! -f $PATH2 ]; then
-  echo "error: CHECKPOINT_PATH=$PATH2 is not a file"
-  exit 1
+
+if [ -d "train" ]; then
+    rm -rf ./train
 fi
 
-if [ -d "eval" ]; then
-  rm -rf ./eval
-fi
-mkdir ./eval
-cp ../*.py ./eval
-cp -r ../src ./eval
-cd ./eval || exit
+mkdir ./train
+cp ../*.py ./train
+cp -r ../src ./train
+cd ./train || exit
+
 env >env.log
-echo "start evaluation ..."
 
-python eval.py \
-    --device_target ${DEVICE_TARGET} \
-    --dir_data=${PATH1} \
-    --test_only \
-    --data_test=${DATASET_TYPE} \
-    --ckpt_path=${PATH2} \
-    --task_id 0 \
-    --scale 2 > eval.log 2>&1 &
+nohup python train.py \
+      --device_target GPU \
+      --batch_size 16 \
+      --lr 1e-4 \
+      --scale 2 \
+      --dir_data $MY_PATH \
+      --epochs 500 \
+      --patch_size 48 > nohup_standalone_train.log 2>&1 &
