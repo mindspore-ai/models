@@ -75,16 +75,17 @@ After installing MindSpore via the official website, you can start training and 
 - running on Ascend：
 
   ```python
-  # run training example
-  bash ./scripts/run_standalone_train.sh 0
+  # run in standalone environment
+  cd scripts/
+  bash run_standalone_train.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10|imagenet]
 
-  # run distributed training example
-  bash ./scripts/run_distribute_train.sh /{path}/*.json
+  # run in distribute environment
+  cd scripts/
+  bash run_distribute_train.sh [RANK_TABLE_FILE] [cifar10|imagenet] [TRAIN_DATA_DIR]
 
-  # run evaluation example
-  python eval.py > eval.log 2>&1 &
-  OR
-  bash ./script/run_eval.sh
+  # evaluation
+  cd scripts/
+  bash run_train.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
   ```
 
   For distributed training, a hccl configuration file [RANK_TABLE_FILE] with JSON format needs to be created in advance.
@@ -98,11 +99,11 @@ After installing MindSpore via the official website, you can start training and 
   ```python
   # GPU standalone training example
   python train.py  \
-  --config_path=./imagenet_config_gpu.yaml \
+  --config_path=./config/imagenet_config_gpu.yaml \
   --dataset_name=imagenet --train_data_dir=../dataset/imagenet_original/train --device_target=GPU
-  OR
-  cd scripts
-  bash run_distribute_train_gpu.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10 | imagenet]
+  # OR
+  cd scripts/
+  bash run_standalone_train_gpu.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10|imagenet]
 
   # GPU distribute training example
   export RANK_SIZE=8
@@ -112,14 +113,15 @@ After installing MindSpore via the official website, you can start training and 
   --dataset_name=imagenet \
   --train_data_dir=../dataset/imagenet_original/train \
   --device_target=GPU
-  OR
-  bash scripts/run_distribute_train_gpu.sh [RANK_SIZE] [TRAIN_DATA_DIR] [cifar10 | imagenet]
+  # OR
+  cd scripts/
+  bash run_distribute_train_gpu.sh [RANK_SIZE] [TRAIN_DATA_DIR] [cifar10|imagenet]
 
   # GPU evaluation example
   python eval.py -device_target=GPU --val_data_dir=../dataset/imagenet_original/val --dataset_name=imagenet --config_path=./config/imagenet_config_gpu.yaml \
   --checkpoint_path=$PATH2
-  OR
-  bash scripts/run_train_gpu.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
+  # OR
+  bash run_eval_gpu.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
   ```
 
 - Running on ModelArts
@@ -265,7 +267,8 @@ For more configuration details, please refer the script `imagenet_config.yaml`.
 - running on Ascend：
 
   ```python
-  bash ./scripts/run_standalone_train.sh [DEVICE_ID]
+  cd scripts/
+  bash run_standalone_train.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10|imagenet]
   ```
 
   The command above will run in the background, you can view the results through the file train.log.
@@ -290,7 +293,7 @@ For more configuration details, please refer the script `imagenet_config.yaml`.
 - running on GPU：
 
   ```python
-  cd scripts
+  cd scripts/
   bash run_standalone_train_gpu.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10|imagenet]
   ```
 
@@ -313,7 +316,8 @@ For more configuration details, please refer the script `imagenet_config.yaml`.
 - running on CPU
 
   ```python
-  bash scripts/run_train_cpu.sh [TRAIN_DATA_DIR] [cifar10|imagenet]
+  cd scripts/
+  bash run_train_cpu.sh [TRAIN_DATA_DIR] [cifar10|imagenet]
   ```
 
 ### [Distributed Training](#contents)
@@ -321,7 +325,8 @@ For more configuration details, please refer the script `imagenet_config.yaml`.
 - running on Ascend：
 
   ```python
-  bash ./scripts/run_distribute_train.sh [RANK_TABLE_FILE]
+  cd scripts/
+  bash run_distribute_train.sh [RANK_TABLE_FILE] [cifar10|imagenet] [TRAIN_DATA_DIR]
   ```
 
   The above shell script will run distribute training in the background. You can view the results through the file train_parallel[X]/log. The loss value will be achieved as follows:
@@ -340,7 +345,8 @@ For more configuration details, please refer the script `imagenet_config.yaml`.
 - running on GPU：
 
   ```python
-  bash scripts/run_distribute_train_gpu.sh [RANK_SIZE] [TRAIN_DATA_DIR] [cifar10|imagenet]
+  cd scripts/
+  bash run_standalone_train_gpu.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10|imagenet]
   ```
 
   The above shell script will run distribute training in the background. You can view the results through the file train_parallel[X]/log. The loss value will be achieved as follows:
@@ -365,9 +371,9 @@ For more configuration details, please refer the script `imagenet_config.yaml`.
   Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path, e.g., "/username/tinydaeknet/train_tinydarknet.ckpt".
 
   ```python
-  python eval.py > eval.log 2>&1 &  
-  OR
-  bash scripts/run_eval.sh
+  python eval.py  --val_data_dir=VAL_DATA_PATH --dataset_name=cifar10|imagenet --config_path=CONFIG_FILE --checkpoint_path=CHECKPOINT_PATH
+  # OR
+  bash run_eval.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
   ```
 
   The above python command will run in the background. You can view the results through the file "eval.log". The accuracy of the test dataset will be as follows:
@@ -389,7 +395,7 @@ For more configuration details, please refer the script `imagenet_config.yaml`.
   Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path, e.g., "/username/tinydaeknet/train_tinydarknet.ckpt".
 
   ```python
-  bash scripts/run_train_gpu.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
+  bash run_eval_gpu.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
   ```
 
   The above python command will run in the background. You can view the results through the file "eval.log". The accuracy of the test dataset will be as follows:
@@ -411,7 +417,7 @@ For more configuration details, please refer the script `imagenet_config.yaml`.
   Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path, e.g., "/username/tinydaeknet/train_tinydarknet.ckpt".
 
   ```python
-  bash scripts/run_eval.sh [VAL_DATA_DIR] [imagenet|cifar10] [CHECKPOINT_PATH]
+  bash run_eval_cpu.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
   ```
 
   You can view the results through the file "eval.log". The accuracy of the test dataset will be as follows:
@@ -429,7 +435,7 @@ For more configuration details, please refer the script `imagenet_config.yaml`.
 
 ```shell
 # Ascend310 inference
-python export.py --dataset [DATASET] --file_name [FILE_NAME] --file_format [EXPORT_FORMAT]
+python export.py --dataset_name [DATASET] --file_name [FILE_NAME] --file_format [EXPORT_FORMAT]
 ```
 
 - Export on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start as follows)
@@ -488,33 +494,33 @@ Inference result is saved in current path, you can find result like this in acc.
 
 ### [Training Performance](#contents)
 
-| Parameters                        | Ascend                                                      | GPU                                                 |
-| -------------------------- | ------------------------------------------------------------| ----------------------------------------------------|
-| Model Version                   | V1                                                          | V1                                                  |
-| Resource                        | Ascend 910；CPU 2.60GHz，56cores；内存 314G；系统 Euler2.8  | PCIE V100-32G                                    |
-| Uploaded Date                   | 2020/12/22                                                  | 2021/07/15                         |
-| MindSpore Version              | 1.1.0                                                       | 1.3.0                                               |
-| Dataset                     | 1200k images                                               | 1200k images                           |
-| Training Parameters                   | epoch=500, steps=1251, batch_size=128, lr=0.1               | epoch=500, steps=1251, batch_size = 128, lr=0.005   |
-| Optimizer                     | Momentum                                                    | Momentum                                            |
-| Loss Function                   | Softmax Cross Entropy                                       | Softmax Cross Entropy                               |
-| Speed                       | 8pc: 104 ms/step                                            | 8pc: 255 ms/step                                          |
-| Parameters(M)                    | 4.0;                                                        | 4.0;                               |
+| Parameters                        | Ascend                                                      | GPU                                                 |                       CPU                        |
+| -------------------------- | ------------------------------------------------------------| ----------------------------------------------------|------------------------------------------------|
+| Model Version                   | V1                                                          | V1                                                  |                       V1                      |
+| Resource                        | Ascend 910；CPU 2.60GHz，56cores；内存 314G；系统 Euler2.8  | PCIE V100-32G                                    |                     CPU 72cores, Memory 503G               |
+| Uploaded Date                   | 2020/12/22                                                  | 2021/07/15                         |                        2021/12/22                   |
+| MindSpore Version              | 1.1.0                                                       | 1.3.0                                               |                        1.5.0                 |
+| Dataset                     | 1200k images                                               | 1200k images                           |                       1200k图片                        |
+| Training Parameters                   | epoch=500, steps=1251, batch_size=128, lr=0.1               | epoch=500, steps=1251, batch_size = 128, lr=0.005   |            epoch=500, steps=10009, batch_size=128, lr=0.1                |
+| Optimizer                     | Momentum                                                    | Momentum                                            |                      Momentum                   |
+| Loss Function                   | Softmax Cross Entropy                                       | Softmax Cross Entropy                               |                   Softmax Cross Entropy                  |
+| Speed                       | 8pc: 104 ms/step                                            | 8pc: 255 ms/step                                          |                          1p：11081 ms/step                     |
+| Parameters(M)                    | 4.0;                                                        | 4.0;                               |                             4.0;                       |
 | Scripts                       | [Tiny-Darknet scripts](https://gitee.com/mindspore/models/tree/master/official/cv/tinydarknet)
 
 ### [Evaluation Performance](#contents)
 
-| Parameters                 | Ascend                            | GPU                               |
-| ------------------- | ----------------------------------| ----------------------------------|
-| Model Version             | V1                                | V1                                |
-| Resource                |  Ascend 910；Euler2.8        | PCIE V100-32G                  |
-| Uploaded Date            | 2020/12/22                        | 2021/7/15                         |
-| MindSpore Version       | 1.1.0                             | 1.3.0                             |
-| Dataset              | 200k images                        | 200k images                        |
-| batch_size          | 128                               | 128                               |
-| Outputs                | probability                          | probability                          |
-| Accuracy              | 8pcs Top-1: 58.7%; Top-5: 81.7%    | 8pcs Top-1: 58.9%; Top-5: 81.7%    |
-| Model for inference            | 11.6M (.ckpt file)                 | 10.06M (.ckpt file)                |
+| Parameters          | Ascend                            | GPU                               |                              |
+| ------------------- | ----------------------------------| ----------------------------------|------------------------------|
+| Model Version       | V1                                | V1                                | V1                           |
+| Resource            |  Ascend 910; Euler2.8             | PCIE V100-32G                     | CPU 72cores, Memory 503G     |
+| Uploaded Date       | 2020/12/22                        | 2021/7/15                         | 2020/12/22                   |
+| MindSpore Version   | 1.1.0                             | 1.3.0                             | 1.5.0                        |
+| Dataset             | 200k images                       | 200k images                       | 200k images                  |
+| batch_size          | 128                               | 128                               | 128                          |
+| Outputs             | probability                       | probability                       | probability                  |
+| Accuracy            | 8pcs Top-1: 58.7%; Top-5: 81.7%   | 8pcs Top-1: 58.9%; Top-5: 81.7%   | 1p: Top-1: 58.7%; Top-5:81.5 |
+| Model for inference | 11.6M (.ckpt file)                | 10.06M (.ckpt file)               | 11.6M (.ckpt file)           |
 
 ### [Inference Performance](#contents)
 

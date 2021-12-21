@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 1 ] && [ $# != 2 ]  && [ $# != 3 ]
+if [ $# != 3 ]
 then
-  echo "Usage bash scripts/run_train_gpu.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]"
+  echo "Usage: bash run_eval_gpu.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]"
 exit 1
 fi
 
@@ -53,12 +53,12 @@ fi
 
 rm -rf ./eval
 mkdir ./eval
-cp -r ./src ./eval
-cp ./eval.py ./eval
-cp -r ./config ./eval
-env >env.log
+cp -r ../src ./eval
+cp ../eval.py ./eval
+cp -r ../config ./eval
+env > env.log
 echo "start evaluation for device GPU"
 cd ./eval || exit
 python ./eval.py --device_target=GPU --val_data_dir=$PATH1 --dataset_name=$2 --config_path=$CONFIG_FILE \
---checkpoint_path=$PATH2 > ./eval.log 2>&1 &
+    --checkpoint_path=$PATH2 > ./eval.log 2>&1 &
 cd ..
