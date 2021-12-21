@@ -120,7 +120,7 @@ def run_train():
     net = NAML(config, word_embedding)
     net_with_loss = NAMLWithLossCell(net)
     if config.checkpoint_path:
-        load_checkpoint(config.pretrain_checkpoint, net_with_loss)
+        load_checkpoint(config.checkpoint_path, net_with_loss)
     mindpreprocess_train = MINDPreprocess(vars(config), dataset_path=config.train_dataset_path)
     dataset = create_dataset(mindpreprocess_train, batch_size=config.batch_size, rank=config.rank,
                              group_size=config.device_num)
