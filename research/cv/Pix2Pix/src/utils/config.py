@@ -69,5 +69,13 @@ def get_args():
     parser.add_argument('--ckpt', type=str, default=None, help='during validating, the file path of the CKPT used.')
     parser.add_argument('--predict_dir', type=str, default='./results/predict/',
                         help='during validating, the file path of Generated image.')
+
+    # modelarts
+    parser.add_argument("--data_url", type=str, default="./dataset", help='real input file path')
+    parser.add_argument("--modelarts_data_dir", type=str, default="/cache/dataset", help='modelart input path')
+    parser.add_argument("--modelarts_result_dir", type=str, default="/cache/result", help='modelart output path.')
+    parser.add_argument("--obs_result_dir", type=str, default="./output", help='real output file path include .ckpt and .air')  # modelarts -> obs
+    parser.add_argument("--modelarts_attrs", type=str, default="")
+
     args = parser.parse_args()
     return args

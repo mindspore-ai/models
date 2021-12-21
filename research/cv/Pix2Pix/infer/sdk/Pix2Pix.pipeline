@@ -1,0 +1,20 @@
+{
+    "Pix2Pix": {
+        "appsrc0": {
+            "factory": "appsrc",
+            "next": "mxpi_tensorinfer0"
+        },
+        "mxpi_tensorinfer0": {
+            "props": {
+                "dataSource": "appsrc0",
+                "modelPath": "../data/Pix2Pix_for_facades.om",
+                "waitingTime": "2000"
+            },
+            "factory": "mxpi_tensorinfer",
+            "next": "appsink0"
+        },
+        "appsink0": {
+            "factory": "appsink"
+        }
+    } 
+}
