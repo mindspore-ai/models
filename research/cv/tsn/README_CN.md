@@ -56,7 +56,7 @@ Dataset used:
 
 - running on Ascend with default parameters
 
-  ```python
+  ```bash
   # 单卡训练
   python train.py --data_url "" --train_url "" --dataset ucf101 --train_list_path "" --train_list "" --modality "" --pretrained_path "" --pre_trained_name "" --run_distribute False --run_modelarts False
 
@@ -77,24 +77,28 @@ Dataset used:
 
 ## [脚本以及简单代码](#contents)
 
-```text
+```path
 ├── TSN
     ├── scripts
-        ├── run_distribute_train.sh     //traing on Ascend with 8P
+        ├── run_distribute_train_ascend.sh       //training on Ascend with 8P
+        ├── run_distribute_gpu.sh                //training on GPU with 8P
+        ├── run_eval_gpu.sh.sh               //evaling Flow+RGB on GPU
+        ├── run_standalone_train_gpu.sh      //training on GPU with 1P
+        ├── run_test_gpu.sh                  //testing Flow or RGB on GPU
     ├── src
-        ├──basic_ops.py       // basic operation
-        ├──config.py          // parameter
-        ├──dataset.py          // create dataset
-        ├──metrics.py       // calculation accuracy
-        ├──models.py       // network
-        ├──network.py          // backbone
-        ├──transforms.py          // process dataset
-        ├──tsn_for_train.py       // clip
-        ├──util.py       // util
-        ├──video_funcs.py          // util for test
-    ├── eval_scores.py                 // fusion accuracy
-    ├── test_net.py                 // tesing network performance
-    ├── train.py                // traing network
+        ├──basic_ops.py                     // basic operation
+        ├──config.py                        // parameter
+        ├──dataset.py                       // create dataset
+        ├──metrics.py                       // calculation accuracy
+        ├──models.py                        // network
+        ├──network.py                       // backbone
+        ├──transforms.py                    // process dataset
+        ├──tsn_for_train.py                 // clip
+        ├──util.py                          // util
+        ├──video_funcs.py                   // util for test
+    ├── eval_scores.py                      // fusion accuracy
+    ├── test_net.py                         // tesing network performance
+    ├── train.py                            // traing network
 ```
 
 ## [脚本参数](#contents)
@@ -103,7 +107,7 @@ Dataset used:
 
 - config for TSN
 
-  ```python
+  ```bash
      tsn_flow = edict({
     'learning_rate': 0.005,
     'epochs': 340,
@@ -122,7 +126,7 @@ Dataset used:
 
 - running on Ascend
 
-  ```python
+  ```bash
   #1P训练
   python train.py --data_url "" --train_url "" --dataset ucf101 --train_list_path "" --train_list "" --modality "" --pretrained_path "" --pre_trained_name "" --run_distribute False --run_modelarts False
 
@@ -135,7 +139,26 @@ Dataset used:
 
   #For rgb models:
   bash run_distribute_train.sh  [RANK_TABLE_FILE] [TRAIN_URL] [DATASET_PATH] [DATASET] [TRAIN_LIST_PATH] [TRAIN_LIST] RGB [PRETRAINED_PATH] [PRETRAINED_PATH_NAME]
+
   ```
+
+- running on GPU
+
+  ```bash
+  #1P训练
+  bash run_standalone_train_gpu.sh [DATASET_PATH] [DATASET] [TRAIN_LIST_PATH] [TRAIN_LIST] [MODALITY] [PRETRAINED_PATH] [PRETRAINED_PATH_NAME] [DEVICE_ID]
+
+  #8P训练
+  bash run_distribute_train_gpu.sh [DATASET_PATH] [DATASET] [TRAIN_LIST_PATH] [TRAIN_LIST] [MODALITY] [PRETRAINED_PATH] [PRETRAINED_PATH_NAME]
+  ```
+
+  [DATASET_PATH]：data所在文件夹/data/data_extracted/ucf101/tvl1
+  [DATASET]:ucf101
+  [TRAIN_LIST_PATH]:data所在文件夹/data/data_extracted/ucf101/
+  [TRAIN_LIST]:ucf101_train_split_1_rawframes.txt
+  [MODALITY]: RGB或者Flow
+  [PRETRAINED_PATH]:ckpt预训练文件所在文件夹
+  [PRETRAINED_PATH_NAME]:ckpt预训练文件tsn_rgb.ckpt或者tsn_flow.ckpt
 
 - flow、warmup_flow、rgb三者之间是数据集不同(ucf101数据处理不同)
 
@@ -143,7 +166,7 @@ Dataset used:
 
   训练时，训练过程中的epch和step以及此时的loss和精确度会呈现在终端上：
 
-  ```python
+  ```bash
     epoch: 1 step: 1, loss is 4.61211
     epoch: 1 step: 2, loss is 4.601388
     epoch: 1 step: 3, loss is 4.611535
@@ -163,7 +186,9 @@ Dataset used:
   ...
   ```
 
-  此模型的checkpoint存储在train_parallel0/checkpoint路径中
+  -Ascend:模型的checkpoint存储在train_parallel0/checkpoint路径中
+
+  -GPU:模型的checkpoint存储在tsn/checkpoint路径中
 
 ## [评估步骤](#contents)
 
@@ -173,7 +198,7 @@ Dataset used:
 
   在使用命令运行时，需要传入模型参数地址、模型参数名称、空域卷积方式、预测时段。
 
-  ```python
+  ```bash
   #For flow models:
   python test_net.py --weights "" --device_id 0 --dataset "" --modality Flow --test_list "" --dataset_path "" --save_scores ""
 
@@ -190,11 +215,37 @@ Dataset used:
 
   以上的python命令会在终端上运行，你可以在终端上查看此次评估的结果。测试集的精确度会以如下方式呈现：
 
-  ```python
+  ```bash
   RGB:Accuracy 86.0%
   Flow:Accuracy 87.6%
   Warmup_Flow:Accuracy 87.4%
   RGB+Flow+Warmup_Flow:Accuracy 93.1%
+  ```
+
+- 在GPU上使用ucf101 测试集进行评估
+
+  在使用命令运行时，需要传入模型参数地址、模型参数名称、空域卷积方式、预测时段。
+
+  ```bash
+  #For flow models:
+  bash run_test_gpu.sh [ROOT_PATH] [CKPT_PATH] [MODALITY] [DEVICE_ID]
+
+  #For rgb models:
+  bash run_test_gpu.sh [ROOT_PATH] [CKPT_PATH] [MODALITY] [DEVICE_ID]
+
+  #For RGB+Flow:
+  bash run_eval_gpu.sh [ROOT_PATH] [RGB_NAME] [FLOW_NAME]
+
+  ```
+
+ - score_files_flow、score_files_rgb为在test_net.py中生成的npz文件
+
+  以上的python命令会在终端上运行，你可以在终端上查看此次评估的结果。测试集的精确度会以如下方式呈现：
+
+  ```bash
+  RGB:Accuracy 85.5%
+  Flow:Accuracy 88.4%
+  RGB+Flow:Accuracy 93.7%
   ```
 
 ## [导出mindir模型](#contents)
@@ -228,37 +279,37 @@ cat acc.log
 
 #### TSN on ucf101(Flow)
 
-| Parameters                 | ModelArts
-| -------------------------- | -----------------------------------------------------------
-| Model Version              | TSN
-| Resource                   | Ascend 910 ；CPU 2.60GHz，192cores；Memory，755G
-| uploaded Date              | 08/11/2021 (month/day/year)
-| MindSpore Version          | 1.3.0
-| Dataset                    | UCF101
-| Training Parameters        | epoch=340, steps=75, batch_size=8, lr=0.001
-| Optimizer                  | SGD
-| Loss Function              | SoftmaxCrossEntropyWithLogits
-| outputs                    | accuracy
-| Loss                       | 0.183
-| Speed                      | 8pc: 300.601 ms/step;
-| Total time                      | 8pc: 4h;
-| Scripts                    | [TSN script]
+| Parameters                 | ModelArts                                                |GPU |
+| -------------------------- | ---------------------------------------------------------|----|
+| Model Version              | TSN                                                      |TSN |
+| Resource                   | Ascend 910 ；CPU 2.60GHz，192cores；Memory，755G          | NV SMX2 V100-32G         |
+| uploaded Date              | 08/11/2021 (month/day/year)                              |01/06/2022(month/day/year)|
+| MindSpore Version          | 1.3.0                                                    |1.6.0|
+| Dataset                    | UCF101                                                   |UCF101|
+| Training Parameters        | epoch=340, steps=75, batch_size=8, lr=0.001              |epoch=340, steps=75, batch_size=8, lr=0.005  |
+| Optimizer                  | SGD                                                      |SGD|
+| Loss Function              | SoftmaxCrossEntropyWithLogits                            |SoftmaxCrossEntropyWithLogits |
+| outputs                    | accuracy                                                 |accuracy|
+| Loss                       | 0.183                                                    |0.1615
+| Speed                      | 8pc: 300.601 ms/step;                                    |8pc:250 ms/step|
+| Total time                 | 8pc: 4h;                                                 |8pc:2.5h|
+| Scripts                    | [TSN script](https://gitee.com/mindspore/models/tree/master/research/cv/tsn) |
 
 ### Inference Performance
 
-#### TSN on ucf101(Optical Flow + Warped Flow + RGB)
+#### TSN on ucf101
 
-| Parameters          | Ascend
-| ------------------- | ---------------------------
-| Model Version       | TSN
-| Resource            | Ascend 910
-| Uploaded Date       | 08/11/2021 (month/day/year)
-| MindSpore Version   | 1.3.0
-| Dataset             | UCF101
-| batch_size          | 16
-| outputs             | accuracy
-| accuracy                 | 93.1%
-| Model for inference | about 40M(.ckpt fil)
+| Parameters          | Ascend(Flow + Warped Flow + RGB) |GPU (Flow+RGB) |
+| ------------------- | ----------------------------|-------------------|
+| Model Version       | TSN                         |TSN                |
+| Resource            | Ascend 910                  | V100                  |
+| Uploaded Date       | 08/11/2021 (month/day/year) |01/06/2022(month/day/year) |
+| MindSpore Version   | 1.3.0                       |1.6.0              |
+| Dataset             | UCF101                      |UCF101             |
+| batch_size          | 16                          |16                 |
+| outputs             | accuracy                    |acuuracy           |
+| accuracy            | 93.1%                       |93.7%              |
+| Model for inference | about 40M(.ckpt fil)        |about 40M(.ckpt fil)|
 
 # [随机事件介绍](#contents)
 

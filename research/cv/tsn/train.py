@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import random
 import zipfile
 import numpy as np
 
+import mindspore as ms
 import mindspore.nn as nn
 import mindspore.dataset as ds
 
@@ -28,7 +29,7 @@ from mindspore.common import set_seed
 from mindspore.train.model import Model
 from mindspore.context import ParallelMode
 from mindspore.train.callback import LossMonitor
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.train.callback import TimeMonitor, ModelCheckpoint, CheckpointConfig
 
@@ -46,8 +47,8 @@ np.random.seed(1234)
 ds.config.set_seed(1234)
 
 parser = argparse.ArgumentParser(description="MindSpore implementation of Temporal Segment Networks")
-parser.add_argument('--platform', type=str, default='Ascend', choices=['Ascend'],
-                    help='Running platform, only support Ascend now. Default is Ascend.')
+parser.add_argument('--platform', type=str, default='Ascend', choices=['Ascend', 'GPU'],
+                    help='Running platform, only support Ascend now. Default is GPU.')
 parser.add_argument('--data_url', type=str, default='')
 parser.add_argument('--file_name', type=str, default='')
 parser.add_argument('--train_url', type=str, default='')
@@ -75,14 +76,15 @@ parser.add_argument('--lr_steps', default=110, type=int, help='epochs to decay l
 parser.add_argument('--momentum', default=0.9, type=float, help='momentum')
 parser.add_argument('--weight_decay', default=5e-4, type=float, help='weight decay (default: 5e-4)')
 
-parser.add_argument('--dataset_sink_mode', default=False, type=bool, help='')
+parser.add_argument('--dataset_sink_mode', default=True, type=ast.literal_eval,
+                    help='dataset sink mode, if True one epoch return one loss.')
 
 # ========================= Monitor Configs ==========================
 parser.add_argument('--run_distribute', type=ast.literal_eval, default=False, help='Run distribute')
 parser.add_argument('--run_modelarts', type=ast.literal_eval, default=False, help='Run on modelarts')
-parser.add_argument('--workers', default=16, type=int, help='number of data loading workers')
+parser.add_argument('--workers', default=8, type=int, help='number of data loading workers')
 parser.add_argument('--save_check_point', type=ast.literal_eval, default=True)
-parser.add_argument('--ckpt_save_dir', type=str, default="./checkpoint")
+parser.add_argument('--ckpt_save_dir', type=str, default="./checkpoint/")
 parser.add_argument('--snapshot_pref', type=str, default="ucf101_bninception_")
 parser.add_argument('--flow_prefix', default="flow_", type=str)
 
@@ -127,11 +129,10 @@ if __name__ == '__main__':
         train_list = local_list_url + '/' + args.train_list
     else:
         if args.run_distribute:
-            device_id = int(os.getenv('DEVICE_ID'))
-            device_num = int(os.getenv('RANK_SIZE'))
-            rank = device_id
-            context.set_context(device_id=device_id)
             init()
+            rank = get_rank()
+            device_num = get_group_size()
+
             context.reset_auto_parallel_context()
             context.set_auto_parallel_context(device_num=device_num,\
                 parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
@@ -182,9 +183,10 @@ if __name__ == '__main__':
         raise ValueError('Unknown modality ' + args.modality)
 
     net = TSN(num_class, args.num_segments, args.modality, base_model=args.arch,\
-         consensus_type=args.consensus_type, dropout=args.dropout)
+         consensus_type=args.consensus_type, dropout=args.dropout).to_float(ms.float16)
 
     param_dict = load_checkpoint(pre_trained+args.pre_trained_name)
+
     load_param_into_net(net, param_dict)
 
     crop_size = net.crop_size
@@ -228,7 +230,7 @@ if __name__ == '__main__':
                         {'params': group5, 'lr': lr*1, 'weight_decay': 0}]
 
     # define loss function (criterion) and optimizer
-    criterion = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+    criterion = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean').to_float(ms.float32)
 
     #define callbacks
     loss_cb = LossMonitor()
@@ -242,10 +244,11 @@ if __name__ == '__main__':
 
     model = Model(network)
 
-    if args.save_check_point and (device_num == 1 or device_id == 0):
-        config_ck = CheckpointConfig(save_checkpoint_steps=data_size*args.epochs, keep_checkpoint_max=1)
+    if args.save_check_point and (device_num == 1 or rank == 0):
+        config_ck = CheckpointConfig(save_checkpoint_steps=data_size, keep_checkpoint_max=5)
+        save_ckpt_path = os.path.join(args.ckpt_save_dir, args.modality)
         ckpoint_cb = ModelCheckpoint(prefix=args.snapshot_pref+args.modality,\
-                 directory=local_train_url, config=config_ck)
+                 directory=save_ckpt_path, config=config_ck)
         callbacks += [ckpoint_cb]
 
     model.train(args.epochs, train_loader, callbacks=callbacks, dataset_sink_mode=args.dataset_sink_mode)
