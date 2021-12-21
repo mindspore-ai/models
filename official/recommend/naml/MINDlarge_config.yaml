@@ -43,14 +43,14 @@ category_embedding_dim: 112
 query_vector_dim: 208
 n_filters: 400
 window_size: 3
-checkpoint_path: "naml/naml_large_new.ckpt"
-batch_size: 16
+checkpoint_path: "" # change to naml_large_new.ckpt path when export
+batch_size: 64 # change to 16 when export or infer
 
 # train option
 beta1: 0.9
 beta2: 0.999
 epsilon: 0.00000001 # 1e-8
-neg_sample: -1  #when training, neg_sample=4, when test, neg_sample=-1
+neg_sample: 4  #when training, neg_sample=4, when test, neg_sample=-1
 mixed: True
 sink_mode: True
 weight_decay: True
