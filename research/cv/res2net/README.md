@@ -476,8 +476,9 @@ Export MindIR on local
 python export.py --checkpoint_file_path [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [CONFIG_PATH]
 ```
 
-The checkpoint_file_path parameter is required,
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+- The `checkpoint_file_path` parameter is required.
+- `file_format` should be in ["AIR", "MINDIR"]
+- `config_path` is the path of configuration yaml file, default is `res2net50_cifar10_config.yaml`.
 
 Export on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start as follows)
 
@@ -502,6 +503,27 @@ Export on ModelArts (If you want to run in modelarts, please check the official 
 # (5) Set the "Output file path" and "Job log path" to your path on the website UI interface.
 # (6) Create your job.
 ```
+
+### Infer on Ascend310
+
+Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
+For ImageNet2012, current batch_Size can only be set to 1.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [NET_TYPE] [DATASET] [DATA_PATH] [CONFIG_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+```
+
+- `NET_TYPE` can choose from [res2net50, res2net152, res2net101, se-res2net50].
+- `DATASET` can choose from [cifar10, imagenet].
+- `DATA_PATH` is the path of test dataset.
+- `CONFIG_PATH` is the config file of `NET_TYPE`.
+- `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'.
+- `DEVICE_ID` is optional, default value is 0.
+
+### result
+
+Inference result is saved in current path, you can find result like this in acc.log file.
 
 # [Model Description](#contents)
 

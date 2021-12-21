@@ -14,6 +14,10 @@
     - [Evaluation Process](#evaluation-process)
         - [Evaluation Usage](#usage)
         - [Evaluation Result](#result)
+    - [Inference Process](#inference-process)
+        - [Export MindIR](#export-mindir)
+        - [Infer on Ascend310](#infer-on-ascend310)
+        - [result](#result)
 - [Model Description](#model-description)
     - [Performance](#performance)  
         - [Evaluation Performance](#evaluation-performance)
@@ -474,6 +478,36 @@ The following example only supports mindir inference with batch_size=1.
 # Ascend310 inference
 bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 ```
+
+## Inference Process
+
+### [Export MindIR](#contents)
+
+```shell
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [CONFIG_PATH]
+```
+
+- The `ckpt_file` parameter is required.
+- `file_format` should be in ["AIR", "MINDIR"].
+- Default `config_path` is `default_config.yaml`.
+
+### Infer on Ascend310
+
+Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
+Current batch_Size can only be set to 1.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
+```
+
+- `DATA_PATH` is the path of test dataset.
+- `ANNO_PATH` is the annotation file path of test dataset.
+- `DEVICE_ID` is optional, default value is 0.
+
+### result
+
+Inference result is saved in current path, you can find result like this in acc.log file.
 
 # Model Description
 

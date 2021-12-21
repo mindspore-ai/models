@@ -685,9 +685,9 @@ class Faster_Rcnn_Res2net(nn.Cell):
         return multi_level_anchors
 
 
-class FasterRcnn_Infer(nn.Cell):
+class Faster_Rcnn_Res2net_Infer(nn.Cell):
     def __init__(self, config):
-        super(FasterRcnn_Infer, self).__init__()
+        super(Faster_Rcnn_Res2net_Infer, self).__init__()
         self.network = Faster_Rcnn_Res2net(config)
         self.network.set_train(False)
 
