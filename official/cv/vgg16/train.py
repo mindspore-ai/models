@@ -139,7 +139,7 @@ def run_train():
         device_num = config.group_size
         context.reset_auto_parallel_context()
         context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True, all_reduce_fusion_config=[2, 18])
+                                          gradients_mean=True, all_reduce_fusion_config=[15, 18])
     else:
         if config.device_target == "Ascend":
             context.set_context(device_id=config.device_id)
