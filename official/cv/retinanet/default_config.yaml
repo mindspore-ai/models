@@ -33,7 +33,7 @@ min_score: 0.1
 max_boxes: 100
 
 # learning rate settings
-lr: 0.1
+lr: 0.09
 global_step: 0
 lr_init: 1e-6
 lr_end_rate: 5e-3
