@@ -22,7 +22,7 @@ from mindspore.train.model import ParallelMode
 from mindspore.nn.optim import Momentum
 from mindspore.common import dtype as mstype
 from mindspore.train.serialization import load_checkpoint
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank, get_group_size
 from src.log import get_logger
 from src.dataset import audio_dataset
 from src.ds_cnn import DSCNN
@@ -31,7 +31,7 @@ from src.lr_scheduler import MultiStepLR, CosineAnnealingLR
 from src.callback import ProgressMonitor, callback_func
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
-from src.model_utils.device_adapter import get_device_id, get_rank_id, get_device_num
+from src.model_utils.device_adapter import get_device_id
 
 
 def get_top5_acc(top5_arg, gt_class):
@@ -104,8 +104,8 @@ def train():
         if get_device_id():
             context.set_context(device_id=get_device_id())
         init()
-        rank = get_rank_id()
-        device_num = get_device_num()
+        rank = get_rank()
+        device_num = get_group_size()
         parallel_mode = ParallelMode.DATA_PARALLEL
         context.set_auto_parallel_context(parallel_mode=parallel_mode, device_num=device_num, gradients_mean=True)
     else:

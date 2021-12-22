@@ -257,8 +257,8 @@ Parameters for both training and evaluation can be set in default_config.yaml.
   for shell script:
 
   ```python
-  # sh scripts/run_train_gpu.sh [device_num] [cuda_visible_devices] [amp_level]
-  sh scripts/run_train_gpu.sh 1 0 'O3'
+  # sh scripts/run_train_gpu.sh [device_num] [cuda_visible_devices] [train_feat_dir]
+  sh scripts/run_train_gpu.sh 1 0 ./dscnn_dataset/
   ```
 
   The checkpoints and log will be saved in the train_outputs.

@@ -34,9 +34,9 @@ if [ $1 -gt 1 ]
 then
     echo "start distributed trainning network"
     mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
-    python train.py --is_distributed=1 --device_target="GPU" --train_feat_dir=$3 > train.log 2>&1 &
+    python train.py --is_distributed=1 --amp_level="O3" --device_target="GPU" --train_feat_dir=$3 > train.log 2>&1 &
 else
     echo "start trainning network"
-    python train.py --train_feat_dir=$3 --device_target='GPU' > train.log 2>&1 &
+    python train.py --train_feat_dir=$3 --amp_level="O3" --device_target='GPU' > train.log 2>&1 &
 fi
 cd ..
