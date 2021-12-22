@@ -35,7 +35,7 @@ class StackedRNN(nn.Cell):
      """
 
     def __init__(self, input_size, hidden_size=512, num_layer=2):
-        super(StackedRNNForGPU, self).__init__()
+        super(StackedRNN, self).__init__()
         self.batch_size = batch_size
         self.input_size = input_size
         self.num_classes = 11
