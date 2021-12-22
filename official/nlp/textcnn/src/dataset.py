@@ -23,6 +23,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import mindspore.dataset as ds
+from mindspore import context
 
 
 
@@ -128,8 +129,12 @@ class MovieReview(DataProcessor):
         self.maxlen = float("-inf")
         self.Pos = []
         self.Neg = []
+        if context.get_context("device_target") == "CPU":
+            encoding = "Latin1"
+        else:
+            encoding = None
         for filename in self.files:
-            with codecs.open(filename, 'r', 'Latin1') as f:
+            with codecs.open(filename, 'r', encoding) as f:
                 ff = f.read()
             with codecs.open(filename, 'w', 'utf-8') as file_object:
                 file_object.write(ff)
