@@ -13,21 +13,18 @@
 # limitations under the License.
 # ============================================================================
 """export checkpoint file into air, onnx, mindir models"""
+import os
 import numpy as np
-
 import mindspore.common.dtype as mstype
 from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id
-
+from src.FasterRcnn.faster_rcnn_res2net import Faster_Rcnn_Res2net_Infer
 
 context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
 if config.device_target == "Ascend":
     context.set_context(device_id=get_device_id())
-
-if config.backbone in ("res2net_50", "res2net_101", "res2net_152"):
-    from src.FasterRcnn.faster_rcnn_res2net import FasterRcnn_Infer
 
 def modelarts_pre_process():
     pass
@@ -35,9 +32,15 @@ def modelarts_pre_process():
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def export_fasterrcnn():
     """ export_fasterrcnn """
-    net = FasterRcnn_Infer(config=config)
-
-    param_dict = load_checkpoint(config.ckpt_file)
+    ckpt_path = config.ckpt_file
+    if not os.path.isfile(ckpt_path):
+        raise RuntimeError("CheckPoint file {} is not valid.".format(ckpt_path))
+    net = Faster_Rcnn_Res2net_Infer(config=config)
+    param_dict = load_checkpoint(ckpt_path)
+    if config.device_target == "GPU":
+        for key, value in param_dict.items():
+            tensor = value.asnumpy().astype(np.float32)
+            param_dict[key] = Parameter(tensor, key)
 
     param_dict_new = {}
     for key, value in param_dict.items():

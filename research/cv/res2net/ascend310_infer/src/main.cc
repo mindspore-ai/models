@@ -86,31 +86,26 @@ int main(int argc, char **argv) {
     std::map<double, double> costTime_map;
     size_t size = all_files.size();
 
-    std::shared_ptr<TensorTransform> decode = std::make_shared<Decode>();
-    std::shared_ptr<TensorTransform> hwc2chw = std::make_shared<HWC2CHW>();
+    auto decode = Decode();
+    auto resize = Resize({256});
+    auto resize292 = Resize({292});
+    auto centercrop = CenterCrop({224});
+    auto centercrop256 = CenterCrop({256});
+    auto normalize = Normalize({123.675, 116.28, 103.53}, {58.395, 57.12, 57.375});
+    auto normalize1 = Normalize({121.125, 115.005, 99.96}, {70.125, 68.085, 70.89});
+    auto normalize2 = Normalize({123.68, 116.78, 103.94}, {1.0, 1.0, 1.0});
+    auto hwc2chw = HWC2CHW();
 
-    std::shared_ptr<TensorTransform> resize = std::make_shared<Resize>(std::vector<int>{256});
-    std::shared_ptr<TensorTransform> centercrop = std::make_shared<CenterCrop>(std::vector<int>{224});
-    std::shared_ptr<TensorTransform> normalize = std::make_shared<Normalize>(
-        std::vector<float>{123.675, 116.28, 103.53}, std::vector<float>{58.395, 57.12, 57.375});
+    std::vector<std::reference_wrapper<TensorTransform>> trans_list;
 
-    std::shared_ptr<TensorTransform> normalizeres2net101 = std::make_shared<Normalize>(
-        std::vector<float>{121.125, 115.005, 99.96}, std::vector<float>{70.125, 68.085, 70.89});
-
-    std::shared_ptr<TensorTransform> sr_resize = std::make_shared<Resize>(std::vector<int>{292});
-    std::shared_ptr<TensorTransform> sr_centercrop = std::make_shared<CenterCrop>(std::vector<int>{256});
-    std::shared_ptr<TensorTransform> sr_normalize = std::make_shared<Normalize>(
-        std::vector<float>{123.68, 116.78, 103.94}, std::vector<float>{1.0, 1.0, 1.0});
-
-    std::vector<std::shared_ptr<TensorTransform>> trans_list;
-
-    if (FLAGS_network == "se-res2net50") {
-        trans_list = {decode, sr_resize, sr_centercrop, sr_normalize, hwc2chw};
-    } else if (FLAGS_network == "res2net101") {
-        trans_list = {decode, resize, centercrop, normalizeres2net101, hwc2chw};
-    } else {
+    if ((FLAGS_network == "res2net50") || (FLAGS_network == "res2net152")) {
         trans_list = {decode, resize, centercrop, normalize, hwc2chw};
+    } else if (FLAGS_network == "res2net101") {
+        trans_list = {decode, resize, centercrop, normalize1, hwc2chw};
+    } else {
+        trans_list = {decode, resize292, centercrop256, normalize2, hwc2chw};
     }
+
     mindspore::dataset::Execute SingleOp(trans_list);
 
     for (size_t i = 0; i < size; ++i) {

@@ -21,10 +21,6 @@ from src.util import coco_eval, bbox2result_1image, results2json
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 
-
-dst_width = 1280
-dst_height = 768
-
 def modelarts_pre_process():
     pass
 
@@ -32,6 +28,7 @@ def modelarts_pre_process():
 def get_eval_result(anno_path, result_path):
     """ get evaluation result of faster rcnn"""
     max_num = 128
+    config.test_batch_size = 1
     result_path = result_path
 
     outputs = []
@@ -46,29 +43,32 @@ def get_eval_result(anno_path, result_path):
         label_result_file = os.path.join(result_path, file_id + "_1.bin")
         mask_result_file = os.path.join(result_path, file_id + "_2.bin")
 
-        all_bbox = np.fromfile(bbox_result_file, dtype=np.float16).reshape(80000, 5)
-        all_label = np.fromfile(label_result_file, dtype=np.int32).reshape(80000, 1)
-        all_mask = np.fromfile(mask_result_file, dtype=np.bool_).reshape(80000, 1)
+        all_bbox = np.fromfile(bbox_result_file, dtype=np.float16).reshape(config.test_batch_size, 80000, 5)
+        all_label = np.fromfile(label_result_file, dtype=np.int32).reshape(config.test_batch_size, 80000, 1)
+        all_mask = np.fromfile(mask_result_file, dtype=np.bool_).reshape(config.test_batch_size, 80000, 1)
 
-        all_bbox_squee = np.squeeze(all_bbox)
-        all_label_squee = np.squeeze(all_label)
-        all_mask_squee = np.squeeze(all_mask)
+        for j in range(config.test_batch_size):
+            all_bbox_squee = np.squeeze(all_bbox[j, :, :])
+            all_label_squee = np.squeeze(all_label[j, :, :])
+            all_mask_squee = np.squeeze(all_mask[j, :, :])
 
-        all_bboxes_tmp_mask = all_bbox_squee[all_mask_squee, :]
-        all_labels_tmp_mask = all_label_squee[all_mask_squee]
+            all_bboxes_tmp_mask = all_bbox_squee[all_mask_squee, :]
+            all_labels_tmp_mask = all_label_squee[all_mask_squee]
 
-        if all_bboxes_tmp_mask.shape[0] > max_num:
-            inds = np.argsort(-all_bboxes_tmp_mask[:, -1])
-            inds = inds[:max_num]
-            all_bboxes_tmp_mask = all_bboxes_tmp_mask[inds]
-            all_labels_tmp_mask = all_labels_tmp_mask[inds]
+            if all_bboxes_tmp_mask.shape[0] > max_num:
+                inds = np.argsort(-all_bboxes_tmp_mask[:, -1])
+                inds = inds[:max_num]
+                all_bboxes_tmp_mask = all_bboxes_tmp_mask[inds]
+                all_labels_tmp_mask = all_labels_tmp_mask[inds]
 
-        outputs_tmp = bbox2result_1image(all_bboxes_tmp_mask, all_labels_tmp_mask, config.num_classes)
-        outputs.append(outputs_tmp)
+            outputs_tmp = bbox2result_1image(all_bboxes_tmp_mask, all_labels_tmp_mask, config.num_classes)
+
+            outputs.append(outputs_tmp)
 
     eval_types = ["bbox"]
     result_files = results2json(dataset_coco, outputs, "./results.pkl")
-    coco_eval(result_files, eval_types, dataset_coco, single_result=False)
+
+    coco_eval(result_files, eval_types, dataset_coco, single_result=True)
 
 if __name__ == '__main__':
     get_eval_result(config.anno_path, config.result_path)
