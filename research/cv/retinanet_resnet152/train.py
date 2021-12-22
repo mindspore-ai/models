@@ -66,7 +66,7 @@ def main():
                         help="Run distribute, default is False.")
     parser.add_argument("--device_id", type=int, default=0, help="Device id, default is 0.")
     parser.add_argument("--device_num", type=int, default=1, help="Use device nums, default is 1.")
-    parser.add_argument("--lr", type=float, default=0.1, help="Learning rate, default is 0.1.")
+    parser.add_argument("--lr", type=float, default=0.09, help="Learning rate, default is 0.09.")
     parser.add_argument("--mode", type=str, default="sink", help="Run sink mode or not, default is sink.")
     parser.add_argument("--dataset", type=str, default="coco", help="Dataset, default is coco.")
     parser.add_argument("--epoch_size", type=int, default=500, help="Epoch size, default is 500.")

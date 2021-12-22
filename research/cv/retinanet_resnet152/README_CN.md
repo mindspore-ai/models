@@ -203,12 +203,12 @@ bash run_distribute_train.sh DEVICE_ID EPOCH_SIZE LR DATASET PRE_TRAINED(optiona
 
       # 八卡并行训练示例(在retinanet目录下运行)：
 
-      bash scripts/run_distribute_train.sh 8 500 0.1 coco RANK_TABLE_FILE(创建的RANK_TABLE_FILE的地址) PRE_TRAINED(预训练checkpoint地址) PRE_TRAINED_EPOCH_SIZE（预训练EPOCH大小）
-      例如：bash scripts/run_distribute_train.sh 8 500 0.1 coco scripts/rank_table_8pcs.json /dataset/retinanet-322_458.ckpt 322
+      bash scripts/run_distribute_train.sh 8 500 0.09 coco RANK_TABLE_FILE(创建的RANK_TABLE_FILE的地址) PRE_TRAINED(预训练checkpoint地址) PRE_TRAINED_EPOCH_SIZE（预训练EPOCH大小）
+      例如：bash scripts/run_distribute_train.sh 8 500 0.09 coco scripts/rank_table_8pcs.json /dataset/retinanet-322_458.ckpt 322
 
       # 单卡训练示例(在retinanet目录下运行)：
 
-      bash scripts/run_single_train.sh 0 500 0.1 coco /dataset/retinanet-322_458.ckpt 322
+      bash scripts/run_single_train.sh 0 500 0.09 coco /dataset/retinanet-322_458.ckpt 322
 
 ```
 
