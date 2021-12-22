@@ -16,7 +16,6 @@
 
 if [[ $# -lt 3 || $# -gt 4 ]]; then
     echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
-    DVPP is mandatory, and must choose from [DVPP|CPU], it's case-insensitive
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi

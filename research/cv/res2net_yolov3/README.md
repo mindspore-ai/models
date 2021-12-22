@@ -16,6 +16,9 @@
             - [Evaluation](#evaluation)
         - [Export MindIR](#export-mindir)
         - [Inference Process](#inference-process)
+            - [Export MindIR](#export-mindir)
+            - [Infer on Ascend310](#infer-on-ascend310)
+            - [Result](#result)
         - [Post Training Quantization](#post-training-quantization)
     - [Model Description](#model-description)
         - [Performance](#performance)
@@ -175,6 +178,8 @@ Dataset used: [coco2017](https://cocodataset.org/#download)
     ├─yolo.py                         # yolov3 network
     ├─yolo_dataset.py                 # create dataset for YOLOV3
   ├─eval.py                           # eval net
+  ├─export.py                         # export mindir script
+  ├─postprocess.py                         # inference result calculation script
   └─train.py                          # train net
 ```
 
@@ -339,6 +344,8 @@ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.469
 Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.592
 ```
 
+## [Inference Process](#contents)
+
 ### [Export MindIR](#contents)
 
 Currently, batchsize can only set to 1.
@@ -348,8 +355,53 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 ```
 
 The ckpt_file parameter is required,
-Currently,`FILE_FORMAT` should be in ["AIR", "ONNX", "MINDIR"]
+Currently,`FILE_FORMAT` should be "MINDIR"
 `keep_detect` keep the detect module or not, default: True
+
+### [Infer on Ascend310](#contents)
+
+Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` specifies path of used "MINDIR" model.
+- `DATA_PATH` specifies path of dataset.
+- `ANNO_PATH` specifies path of annotation file.
+- `DEVICE_ID` is optional, default value is 0.
+
+### [Result](#contents)
+
+Inference result is saved in current path, you can find result like this in acc.log file.
+
+```bash
+=============coco eval result=========
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.303
+
+Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.535
+
+Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.310
+
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.151
+
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.348
+
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.423
+
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.252
+
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.402
+
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.430
+
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.267
+
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.472
+
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.560
+```
 
 ## [Model Description](#contents)
 
