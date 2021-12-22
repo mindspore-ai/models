@@ -15,6 +15,7 @@
 """Parameter init."""
 import math
 import mindspore as ms
+from mindspore import nn
 
 
 def default_recurisive_init(custom_cell):
