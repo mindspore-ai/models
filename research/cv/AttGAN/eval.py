@@ -36,7 +36,7 @@ from src.helpers import Progressbar
 from src.utils import resume_generator, denorm
 
 device_id = int(os.getenv('DEVICE_ID'))
-context.set_context(mode=context.PYNATIVE_MODE, device_target="Ascend", save_graphs=False, device_id=device_id)
+context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False, device_id=device_id)
 
 
 def parse(arg=None):
@@ -91,7 +91,7 @@ num_parallel_workers = 8
 ds = de.GeneratorDataset(test_dataset, column_names=dataset_column_names,
                          num_parallel_workers=min(32, num_parallel_workers))
 ds = ds.batch(1, num_parallel_workers=min(8, num_parallel_workers), drop_remainder=False)
-test_dataset_iter = ds.create_dict_iterator()
+test_dataset_iter = ds.create_dict_iterator(num_epochs=1)
 
 if args.num_test is None:
     print('Testing images:', test_len)
@@ -132,7 +132,7 @@ for data in test_dataset_iter:
         att_b_ = (att_b * 2 - 1) * args.thres_int
         if i > 0:
             att_b_[..., i - 1] = att_b_[..., i - 1] * args.test_int / args.thres_int
-        samples.append(gen(img_a, att_b_, mode="enc-dec"))
+        samples.append(gen(img_a, att_b_))
     cat = ops.Concat(axis=3)
     samples = cat(samples).asnumpy()
     result = denorm(samples)
