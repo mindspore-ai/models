@@ -202,7 +202,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 
 ### [Training Process](#contents)
 
-To train the model, run `train.py`. If the `mindrecord_dir` is empty, it will generate [mindrecord](https://www.mindspore.cn/tutorial/training/zh-CN/master/advanced_use/convert_dataset.html) files by `coco_root`(coco dataset), `voc_root`(voc dataset) or `image_dir` and `anno_path`(own dataset). **Note if mindrecord_dir isn't empty, it will use mindrecord_dir instead of raw images.**
+To train the model, run `train.py`. If the `mindrecord_dir` is empty, it will generate [mindrecord](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/convert_dataset.html) files by `coco_root`(coco dataset), `voc_root`(voc dataset) or `image_dir` and `anno_path`(own dataset). **Note if mindrecord_dir isn't empty, it will use mindrecord_dir instead of raw images.**
 
 #### Training on Ascend
 
@@ -220,7 +220,7 @@ To train the model, run `train.py`. If the `mindrecord_dir` is empty, it will ge
 
 We need five or six parameters for this scripts.
 
-- `RANK_TABLE_FILE :` the path of [rank_table.json](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools), it is better to use absolute path.
+- `RANK_TABLE_FILE :` the path of [rank_table.json](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools), it is better to use absolute path.
 - `DATASET`：the dataset mode for distributed train.
 - `DATASET_PATH`：the dataset path for distributed train.
 - `MINDRECIRD_PATH`：the mindrecord path for distributed train.

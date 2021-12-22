@@ -45,10 +45,10 @@ Dataset used:
 - 硬件（Ascend/GPU）
     - 需要准备具有Ascend或GPU处理能力的硬件环境.
 - 框架
-    - [MindSpore](https://www.mindspore.cn/install/en)
+    - [MindSpore](https://www.mindspore.cn/install)
 - 如需获取更多信息，请查看如下链接：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorial/training/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
 # [快速开始](#contents)
 
@@ -139,7 +139,7 @@ Dataset used:
 
 - flow、warmup_flow、rgb三者之间是数据集不同(ucf101数据处理不同)
 
-  8P训练时需要将RANK_TABLE_FILE放在scripts文件夹中，RANK_TABLE_FILE[生成方法](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)
+  8P训练时需要将RANK_TABLE_FILE放在scripts文件夹中，RANK_TABLE_FILE[生成方法](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
 
   训练时，训练过程中的epch和step以及此时的loss和精确度会呈现在终端上：
 

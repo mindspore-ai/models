@@ -115,7 +115,7 @@ python3 generate_video_jpgs.py --video_path ~/dataset/hmdb51/videos/ --target_pa
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
   - [MindSpore教程](https://www.mindspore.cn/tutorial/training/zh-CN/master/index.html)
-  - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/zh-CN/master/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
 # 快速入门
 
@@ -225,7 +225,7 @@ python3 generate_video_jpgs.py --video_path ~/dataset/hmdb51/videos/ --target_pa
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
 
 ### 结果
 
