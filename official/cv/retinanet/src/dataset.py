@@ -387,7 +387,7 @@ def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="reti
     writer.commit()
 
 
-def create_retinanet_dataset(mindrecord_file, batch_size, device_num, rank=0,
+def create_retinanet_dataset(mindrecord_file, batch_size, device_num=1, rank=0,
                              is_training=True, num_parallel_workers=24):
     """Creatr retinanet dataset with MindDataset."""
     ds = de.MindDataset(mindrecord_file, columns_list=["img_id", "image", "annotation"], num_shards=device_num,
