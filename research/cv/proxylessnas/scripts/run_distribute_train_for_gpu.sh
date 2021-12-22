@@ -28,4 +28,4 @@ fi
 
 DATASET_PATH=$1
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 mpirun --allow-run-as-root -n 8 --output-filename log_output --merge-stderr-to-stdout \
-  python ../train.py --is_distributed=True --device_target='GPU' --drop_remainder=True --dataset_path=$DATASET_PATH > train.log 2>&1 &
+  python ../train.py --is_distributed=True --device_target='GPU' --drop_remainder=True --dataset_path=$DATASET_PATH > gpu_distribute_train.log 2>&1 &

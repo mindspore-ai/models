@@ -41,5 +41,5 @@ fi
 
 DEVICE_ID=$1
 DATASET_PATH=$2
-python ../train.py --device_target=Ascend --device_id=$DEVICE_ID --dataset_path=$DATASET_PATH > train.log 2>&1 &
+python ../train.py --device_target=Ascend --device_id=$DEVICE_ID --dataset_path=$DATASET_PATH > ascend_standalone_train.log 2>&1 &
 

@@ -42,4 +42,4 @@ fi
 mkdir ../eval
 cd ../eval || exit
 
-python ../eval.py --device_target=Ascend --dataset_path=$1 --checkpoint=$2 > ./eval.log 2>&1 &
+python ../eval.py --device_target=Ascend --dataset_path=$1 --checkpoint=$2 > ./ascend_eval.log 2>&1 &
