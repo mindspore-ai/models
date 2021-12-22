@@ -32,7 +32,7 @@ wget -nc -nv -O ${OUTPUT_DIR_DATA}/europarl-v7-fr-en.tgz \
 
 echo "Downloading Common Crawl corpus. This may take a while..."
 wget -nc -nv -O ${OUTPUT_DIR_DATA}/common-crawl.tgz \
-  http://www.statmt.org/wmt14/training-parallel-commoncrawl.tgz
+  http://www.statmt.org/wmt13/training-parallel-commoncrawl.tgz
 
 echo "Downloading News Commentary v11. This may take a while..."
 wget -nc -nv -O ${OUTPUT_DIR_DATA}/nc-v9.tgz \
@@ -56,13 +56,13 @@ tar -xvzf "${OUTPUT_DIR_DATA}/test.tgz" -C "${OUTPUT_DIR_DATA}/test"
 # Concatenate Training data
 cat "${OUTPUT_DIR_DATA}/europarl-v7-fr-en/europarl-v7.fr-en.en" \
   "${OUTPUT_DIR_DATA}/common-crawl/commoncrawl.fr-en.en" \
-  "${OUTPUT_DIR_DATA}/nc-v9/training-parallel-nc-v9/news-commentary-v9.fr-en.en" \
+  "${OUTPUT_DIR_DATA}/nc-v9/training/news-commentary-v9.fr-en.en" \
   > "${OUTPUT_DIR}/train.en"
 wc -l "${OUTPUT_DIR}/train.en"
 
-cat "${OUTPUT_DIR_DATA}/europarl-v7-de-en/europarl-v7.fr-en.fr" \
+cat "${OUTPUT_DIR_DATA}/europarl-v7-fr-en/europarl-v7.fr-en.fr" \
   "${OUTPUT_DIR_DATA}/common-crawl/commoncrawl.fr-en.fr" \
-  "${OUTPUT_DIR_DATA}/nc-v9/training-parallel-nc-v9/news-commentary-v9.fr-en.fr" \
+  "${OUTPUT_DIR_DATA}/nc-v9/training/news-commentary-v9.fr-en.fr" \
   > "${OUTPUT_DIR}/train.fr"
 wc -l "${OUTPUT_DIR}/train.fr"
 
@@ -77,14 +77,14 @@ fi
 
 # Convert newstest2014 data into raw text format
 ${OUTPUT_DIR}/mosesdecoder/scripts/ems/support/input-from-sgm.perl \
-  < ${OUTPUT_DIR_DATA}/test/test/newstest2014-fren-src.fr.sgm \
-  > ${OUTPUT_DIR_DATA}/test/test/newstest2014.fr
+  < ${OUTPUT_DIR_DATA}/test/test-full/newstest2014-fren-src.fr.sgm \
+  > ${OUTPUT_DIR_DATA}/test/test-full/newstest2014.fr
 ${OUTPUT_DIR}/mosesdecoder/scripts/ems/support/input-from-sgm.perl \
-  < ${OUTPUT_DIR_DATA}/test/test/newstest2014-fren-ref.en.sgm \
-  > ${OUTPUT_DIR_DATA}/test/test/newstest2014.en
+  < ${OUTPUT_DIR_DATA}/test/test-full/newstest2014-fren-ref.en.sgm \
+  > ${OUTPUT_DIR_DATA}/test/test-full/newstest2014.en
 
-cp ${OUTPUT_DIR_DATA}/test/test/newstest2014.fr ${OUTPUT_DIR}
-cp ${OUTPUT_DIR_DATA}/test/test/newstest2014.en ${OUTPUT_DIR}
+cp ${OUTPUT_DIR_DATA}/test/test-full/newstest2014.fr ${OUTPUT_DIR}
+cp ${OUTPUT_DIR_DATA}/test/test-full/newstest2014.en ${OUTPUT_DIR}
 
 # Tokenize data
 for f in ${OUTPUT_DIR}/*.fr; do
