@@ -17,6 +17,8 @@
 "models/research/cv/FaceQualityAssessment/infer/util/plugins/MxpiTransposePlugin.h"  "build/namespaces"
 "models/research/cv/FaceQualityAssessment/infer/util/plugins/MxpiTransposePlugin.cpp"  "runtime/references"
 
+"models/research/cv/mobilenetV3_small_x1_0/infer/mxbase/mobilenetv3_smallClassify.h"  "runtime/references"
+
 "models/official/cv/vit/infer/mxbase/src/VIT.h"  "runtime/references"
 
 "models/research/cv/vehiclenet/infer/mxbase/src/Vehiclenet.h"  "runtime/references"
