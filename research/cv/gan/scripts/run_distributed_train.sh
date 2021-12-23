@@ -37,6 +37,6 @@ do
     echo "Start training for rank $RANK_ID, device $DEVICE_ID"
     cd ./device$i
     env > env.log
-    nohup python train.py --device_id=$DEVICE_ID --distribute=True --data_path="../data/MNIST_Data/" > distributed_train.log 2>&1 &
+    nohup python train.py --device_id=$DEVICE_ID --distribute=True > distributed_train.log 2>&1 &
     cd ..
 done

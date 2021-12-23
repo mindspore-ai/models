@@ -152,15 +152,11 @@ def parzen(samples):
 
 context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
 
-
-
 test_latent_code_parzen = Tensor(np.random.normal(size=(10000, opt.latent_dim)), dtype=mstype.float32)
 
 if __name__ == '__main__':
     generator = Generator(opt.latent_dim)
-
-    ckpt_file_name = 'checkpoints/' + str(opt.n_epochs-1) + '.ckpt'
-    param_dict = load_checkpoint(ckpt_file_name)
+    param_dict = load_checkpoint(opt.ckpt_path)
     load_param_into_net(generator, param_dict)
     imag = generator(test_latent_code_parzen)
     imag = imag * 127.5 + 127.5
