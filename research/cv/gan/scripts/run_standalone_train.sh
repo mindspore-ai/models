@@ -19,6 +19,12 @@ if [[ $# -gt 1 ]]; then
 exit 1
 fi
 
+ulimit -u unlimited
+export DEVICE_NUM=1
+export DEVICE_ID=$1
+export RANK_ID=0
+export RANK_SIZE=1
+
 if [ ! -d "logs" ]; then
         mkdir logs
 fi
