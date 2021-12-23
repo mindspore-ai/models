@@ -167,6 +167,7 @@ bash ./scripts/run_eval.sh [DEVICE_ID]
   python train.py > train.log 2>&1 &
   ```
 
+- 在训练之前，需要在src/param_parser.py下修改data_path为训练集路径
   上述python命令将在后台运行，您可以通过train.log文件查看结果。
 
   训练结束后，您可在默认脚本文件夹下找到检查点文件。采用以下方式达到损失值：
@@ -185,6 +186,8 @@ bash ./scripts/run_eval.sh [DEVICE_ID]
   python eval.py > eval.log 2>&1 &
 
   ```
+
+- 在推理之前，需要在src/param_parser.py下修改ckpt_path为真实推理ckpt的路径
 
 # 模型描述
 

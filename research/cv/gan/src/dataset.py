@@ -127,9 +127,7 @@ class DatasetGenerator_valid:
 def create_dataset_train(batch_size=5, repeat_size=1, latent_size=100):
     """create dataset train"""
     dataset_generator = DatasetGenerator()
-
-    dataset1 = ds.GeneratorDataset(dataset_generator, ["image", "label"], shuffle=False)
-
+    dataset1 = ds.GeneratorDataset(dataset_generator, ["image", "label"], shuffle=True)
     mnist_ds = dataset1.map(
         operations=lambda x: (
             x.astype("float32"),
@@ -145,10 +143,8 @@ def create_dataset_train(batch_size=5, repeat_size=1, latent_size=100):
 def create_dataset_train_dis(batch_size=5, repeat_size=1, latent_size=100):
     """create dataset train"""
     dataset_generator = DatasetGenerator()
-
     dataset1 = ds.GeneratorDataset(dataset_generator, ["image", "label"],
-                                   shuffle=False, num_shards=get_group_size(), shard_id=get_rank())
-
+                                   shuffle=True, num_shards=get_group_size(), shard_id=get_rank())
     mnist_ds = dataset1.map(
         operations=lambda x: (
             x.astype("float32"),
@@ -165,9 +161,7 @@ def create_dataset_train_dis(batch_size=5, repeat_size=1, latent_size=100):
 def create_dataset_valid(batch_size=5, repeat_size=1, latent_size=100):
     """create dataset valid"""
     dataset_generator = DatasetGenerator_valid()
-
     dataset = ds.GeneratorDataset(dataset_generator, ["image", "label"], shuffle=False)
-
     mnist_ds = dataset.map(
         operations=lambda x: (
             x[-10000:].astype("float32"),

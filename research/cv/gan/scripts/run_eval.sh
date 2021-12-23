@@ -23,4 +23,5 @@ if [ ! -d "logs" ]; then
         mkdir logs
 fi
 
+export DEVICE_ID=$1
 nohup python -u eval.py > logs/eval.log 2>&1 &
