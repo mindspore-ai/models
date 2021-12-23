@@ -9,6 +9,10 @@
     - [Script Description](#script-description)
         - [Script and Sample Code](#script-and-sample-code)
         - [Script Parameters](#script-parameters)
+        - [Inference Process](#inference-process)
+            - [Export MindIR](#export-mindir)
+            - [Infer on Ascend310](#infer-on-ascend310)
+            - [Result](#result)
     - [Model Description](#model-description)
         - [Performance](#performance)
             - [Training Performance](#training-performance)
@@ -134,6 +138,8 @@ python infer.py \
 .
 └─tbnet
   ├─README.md
+  ├── scripts
+  │   └─run_infer_310.sh    # Ascend310 inference script
   ├─data
     ├─steam
         ├─config.json               # data and training parameter configuration
@@ -149,6 +155,9 @@ python infer.py \
     ├─metrics.py                    # model metrics
     ├─steam.py                      # 'steam' dataset text explainer
     └─tbnet.py                      # TB-Net model
+  ├─export.py                         # export mindir script
+  ├─preprocess.py                         # inference data preprocess script
+  ├─postprocess.py                         # inference result calculation script
   ├─eval.py                         # evaluation
   ├─infer.py                        # inference and explanation
   └─train.py                        # training
@@ -191,6 +200,40 @@ python infer.py \
 --device_id       device id
 --device_target   run code on GPU
 --run_mode        run code by GRAPH mode or PYNATIVE mode
+```
+
+## [Inference Process](#contents)
+
+### [Export MindIR](#contents)
+
+```shell
+python export.py --checkpoint_id [ID] --device_target [DEVICE] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+The ckpt_file parameter is required,
+`ID` should be an integer within range
+`DEVICE` should be in ['Ascend', 'GPU']
+`FILE_FORMAT` should be in "MINDIR"
+
+### [Infer on Ascend310](#contents)
+
+Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` specifies path of used "MINDIR" model.
+- `DATA_PATH` specifies path of test.csv
+- `DEVICE_ID` is optional, default value is 0.
+
+### [Result](#contents)
+
+Inference result is saved in current path, you can find result like this in acc.log file.
+
+```bash
+auc: 0.8251359368836292
 ```
 
 # [Model Description](#contents)
