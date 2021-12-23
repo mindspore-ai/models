@@ -15,6 +15,10 @@
         - [分布式训练](#分布式训练)
     - [评估过程](#评估过程)
         - [评估](#评估)
+    - [推理过程](#推理过程)
+        - [导出MindIR](#导出MindIR)
+        - [在Ascend310执行推理](#在Ascend310执行推理)
+        - [结果](#结果)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -153,6 +157,33 @@ CelebFaces Attributes Dataset (CelebA) 是一个大规模的人脸属性数据�
 
   测试脚本执行完成后，用户进入当前目录下的`img_eval/`下查看生成的人脸图片。
 
+## 推理过程
+
+### 导出MindIR
+
+```shell
+python export.py --checkpoint_g [GENERATOR_CKPT_NAME] --device_id [DEVICE_ID]
+```
+
+脚本会在当前目录下生成对应的MINDIR文件。
+
+### 在Ascend310执行推理
+
+在执行推理前，必须通过export脚本导出MINDIR模型。以下命令展示了如何通过命令在Ascend310上对图片进行属性编辑：
+
+```bash
+bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [NIMAGES] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` MINDIR文件的路径
+- `NEED_PREPROCESS` 表示属性编辑文件是否需要预处理，可以在y或者n中选择，如果选择y，表示进行预处理（在第一次执行推理时需要设置为y）
+- `NIMAGES` 表示生成图片的数量.
+- `DEVICE_ID` 可选，默认值为0.
+
+### 结果
+
+推理结果保存在脚本执行的目录下，属性编辑后的图片保存在`result_Files/`目录下，推理的时间统计结果保存在`time_Result/`目录下。编辑后的图片以`generated_{NUMBER}.png`的格式保存.
+
 # 模型描述
 
 ## 性能
@@ -175,6 +206,6 @@ CelebFaces Attributes Dataset (CelebA) 是一个大规模的人脸属性数据�
 | 收敛loss                    |G:[-232.61 to 273.87] loss D:[-27.736 to 2.601]                             |
 | 脚本                       | [PGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/PGAN) |
 
-# ModelZoo主页  
+# ModelZoo主页
 
  请浏览官网[主页](https://gitee.com/mindspore/models)
