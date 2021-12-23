@@ -44,7 +44,8 @@
 
 # 模型架构
 
-MMoE的总体网络架构如下：[链接](https://www.kdd.org/kdd2018/accepted-paper/view)
+MMoE的总体网络架构如下：
+![Architecture](http://img.5iqiqu.com/images5/52/528211eb81718499fc2475dfcdcd690e.png)
 
 # 数据集
 

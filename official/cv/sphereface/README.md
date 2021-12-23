@@ -47,7 +47,7 @@ A variety of network architectures are given in the Sphereface paper. This code 
 
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 
-Dataset used: [CASIA-WebFace](http://www.cbsr.ia.ac.cn/english/CASIA-WebFace-Database.html)
+Dataset used: [CASIA-WebFace](https://www.google.com/search?q=CASIA-WebFace&rlz=1C1GCEU_en__894__894&oq=CASIA-WebFace)
 
 - Dataset size：4G，494,414 250*250 colorful images in 10575 classes
     - Train：3.7G，454,000 images  
