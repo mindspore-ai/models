@@ -18,6 +18,9 @@
             - [样例](#样例-1)
             - [结果](#结果)
     - [模型导出](#模型导出)
+    - [推理过程](#推理过程)
+        - [用法](#用法-2)
+        - [结果](#结果-1)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [训练性能](#训练性能)
@@ -69,9 +72,18 @@ ResNeXt整体网络架构如下：
 
 ## 脚本及样例代码
 
-```path
+```python
 .
 └─resnext152_64x4d
+  ├─ascend310_infer                   # 310的推理代码
+    ├─inc
+      ├─utils.h                       # 工具库头文件
+    ├─src
+      ├─build.sh                      # 运行脚本
+      ├─CMakeLists.txt                # cmake文件
+      ├─main_preprocess.cc            # 预处理
+      ├─main.cc                       # 主函数入口
+      ├─utils.cc                      # 工具库函数实现
   ├─README.md
   ├─scripts
     ├─run_standalone_train.sh         # 启动Ascend单机训练（单卡）
@@ -84,8 +96,14 @@ ResNeXt整体网络架构如下：
     ├─backbone
       ├─_init_.py                     # 初始化
       ├─resnet.py                     # ResNeXt152骨干
+    ├─model_utils
+      ├─config.py                     # 相关参数
+      ├─device_adapter.py             # Device adapter for ModelArts
+      ├─local_adapter.py              # Local adapter
+      ├─moxing_adapter.py             # Moxing adapter for ModelArts
     ├─utils
       ├─_init_.py                     # 初始化
+      ├─auto_mixed_precision.py       # 混合精度
       ├─cunstom_op.py                 # 网络操作
       ├─logging.py                    # 打印日志
       ├─optimizers_init_.py           # 获取参数
@@ -102,9 +120,13 @@ ResNeXt整体网络架构如下：
     ├─linear_warmup.py                # 线性热身学习率
     ├─warmup_cosine_annealing.py      # 每次迭代的学习率
     ├─warmup_step_lr.py               # 热身迭代学习率
+  ├─create_imagenet2012_label.py      # 创建标签
+  ├─default_config.yaml               # 参数
   ├─eval.py                           # 评估网络
   ├─export.py                         # export mindir script
+  ├─postprocess.py                    # 310的后期处理
   ├─train.py                          # 训练网络
+  ├─requirements.txt                  # 需要的python库
   ├─README.md                         # Documentation in English
   ├─README_CN.md                      # Documentation in Chinese
 ```
@@ -113,7 +135,7 @@ ResNeXt整体网络架构如下：
 
 在config.py中可以同时配置训练和评估参数。
 
-```python
+```config
 "image_size": '224,224'                   # 图像大小
 "num_classes": 1000,                      # 数据集类数
 "per_batch_size": 128,                    # 输入张量的批次大小
@@ -208,6 +230,18 @@ acc=80.08%(TOP1)
 acc=94.71%(TOP5)
 ```
 
+Example for the GPU evaluation:
+
+```text
+...
+[DATE/TIME]:INFO:load model /path/to/checkpoints/ckpt_0/0-148_10009.ckpt success
+[DATE/TIME]:INFO:Inference Performance: 218.14 img/sec
+[DATE/TIME]:INFO:before results=[[39666], [46445], [49984]]
+[DATE/TIME]:INFO:after results=[[39666] [46445] [49984]]
+[DATE/TIME]:INFO:after allreduce eval: top1_correct=39666, tot=49984,acc=79.36%(TOP1)
+[DATE/TIME]:INFO:after allreduce eval: top5_correct=46445, tot=49984,acc=92.92%(TOP5)
+```
+
 ## 模型导出
 
 ```shell
@@ -216,37 +250,58 @@ python export.py --device_target [PLATFORM] --ckpt_file [CKPT_PATH] --file_forma
 
 `EXPORT_FORMAT` 可选 ["AIR", "ONNX", "MINDIR"].
 
+## 推理过程
+
+### 用法
+
+在执行推理之前，需要通过export.py导出mindir文件。目前仅可处理batch_size为1。
+
+```shell
+#Ascend310 推理
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+```
+
+`MINDIR_PATH`为生成的mindir的路径，`DATA_PATH`为imagenet的数据集路径，`DEVICE_ID`可选，默认值为0。
+
+### 结果
+
+推理结果保存在当前路径，可在acc.log中看到最终精度结果。
+
+```shell
+Total data: 50000, top1 accuracy: 0.79174, top5 accuracy: 0.94178.
+```
+
 # 模型描述
 
 ## 性能
 
 ### 训练性能
 
-| 参数 | ResNeXt152 |
-| -------------------------- | ---------------------------------------------------------- |
-| 资源                   | Ascend 910；CPU：2.60GHz，192核；内存：755GB              |
-| 上传日期              | 2021-6-30                                          |
-| MindSpore版本          | 1.2                                                    |
-| 数据集 | ImageNet |
-| 训练参数        | src/config.py                                           |
-| 优化器                  | Momentum                                                        |
-| 损失函数             | Softmax交叉熵 |
-| 损失                       | 1.2892 |
-| 准确率 | 80.08%(TOP1)                                          |
-| 总时长                 | 7.8小时 （8卡） |
-| 调优检查点 | 192 M（.ckpt文件） |
+| 参数       | ResNeXt152                                    | ResNeXt152                                   |
+| ---------- | --------------------------------------------- | -------------------------------------------- |
+| 资源       | Ascend 910, cpu:2.60GHz 192cores, memory:755G | 8x V100, Intel Xeon Gold 6226R CPU @ 2.90GHz |
+| 上传日期   | 06/30/2021                                    | 06/30/2021                                   |
+| 版本信息   | 1.3                                           | 1.5.0 (docker build, CUDA 11.1)              |
+| 数据集     | ImageNet                                      | ImageNet                                     |
+| 训练参数   | src/config.py                                 | src/config.py; lr=0.05, per_batch_size=16    |
+| 优化器     | Momentum                                      | Momentum                                     |
+| 损失函数   | SoftmaxCrossEntropy                           | SoftmaxCrossEntropy                          |
+| 损失       | 1.28923                                       | 2.172222                                     |
+| 准确率     | 80.08%(TOP1)                                  | 79.36%(TOP1) (148 epoch, early stopping)     |
+| 总时长     | 7.8 h 8ps                                     | 2 days 45 minutes (8P, processes)            |
+| 调优检查点 | 192 M(.ckpt file)                             | -                                            |
 
 #### 推理性能
 
-| 参数                 |                      |
-| -------------------------- | -------------------- |
-| 资源                   | Ascend 910          |
-| 上传日期              | 2021-6-20 |
-| MindSpore版本         | 1.2             |
-| 数据集 | ImageNet， 1.2万 |
-| batch_size                 | 1                    |
-| 输出 | 概率 |
-| 准确率 | acc=80.08%(TOP1) |
+| 参数       |                  |                  |                  |
+| ---------- | ---------------- | ---------------- | ---------------- |
+| 资源       | Ascend 910       | GPU V100         | Ascend 310       |
+| 上传日期   | 06/20/2021       | 2021-10-27       | 2021-10-27       |
+| 版本信息   | 1.2              | 1.5.0, CUDA 11.1 | 1.3.0            |
+| 数据集     | ImageNet, 1.2W   | ImageNet, 1.2W   | ImageNet, 1.2W   |
+| batch_size | 1                | 32               | 1                |
+| outputs    | probability      | probability      | probability      |
+| 准确率     | acc=80.08%(TOP1) | acc=79.36%(TOP1) | acc=79.34%(TOP1) |
 
 # 随机情况说明
 
