@@ -13,7 +13,10 @@
 # limitations under the License.
 # ============================================================================
 """mnist noisy dataset"""
+import os
 import shutil
+import numpy as np
+from PIL import Image
 from src.datasets.mnist_sampler import load_pkl, dump_pkl, load_mnist, \
     get_noisy_sampler, get_number_sampler, to_image, put_numbers
 
