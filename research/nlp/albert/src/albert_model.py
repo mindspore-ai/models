@@ -937,7 +937,7 @@ class AlbertTransformer(nn.Cell):
 
         all_encoder_layers = ()
         for layer_idx in range(self.num_hidden_layers):
-            group_idx = int(layer_idx / self.num_hidden_layers * self.num_hidden_groups)
+            group_idx = layer_idx / self.num_hidden_layers * self.num_hidden_groups
             layer_module = self.group[group_idx]
             layer_outputs = layer_module(prev_output, attention_mask)
             prev_output = layer_outputs[-1]

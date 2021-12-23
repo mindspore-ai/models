@@ -25,6 +25,10 @@
     - [Evaluation](#evaluation)
         - [evaluation on SST-2 dataset when running on Ascend](#evaluation-on-cola-dataset-when-running-on-ascend)
         - [evaluation on squad v1.1 dataset when running on Ascend](#evaluation-on-squad-v11-dataset-when-running-on-ascend)
+        - [Export MindIR](#export-mindir)
+        - [Inference Process](#inference-process)
+            - [Usage](#usage)
+            - [result](#result)
     - [Model Description](#model-description)
     - [Performance](#performance)
         - [Pretraining Performance](#pretraining-performance)
@@ -237,6 +241,7 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
 ```shell
 .
 └─albert
+  ├─ascend310_infer
   ├─README.md
   ├──convert_tf_ckpt
         ├──read_weight_tf.py                # read tensorflow pretrain model
@@ -595,6 +600,34 @@ We only support export with fine-tuned downstream task model and yaml config fil
 
 ```shell
 python export.py --config_path [/path/*.yaml] --export_ckpt_file [CKPT_PATH] --export_file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+### [Inference Process](#contents)
+
+#### Usage
+
+Before performing inference, the mindir file must be exported by export.py. Input files must be in bin format.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [LABEL_PATH] [DATA_FILE_PATH] [DATASET_FORMAT] [NEED_PREPROCESS] [TASK_TYPE] [EVAL_JSON_PATH] [DEVICE_ID]
+
+# An example of task classifier (MNLI dataset):
+bash run_infer_310.sh /your/path/mnli.mindir /your/path/mnli_dev.mindrecord y mnli 2
+```
+
+`NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'.
+
+`EVAL_JSON_PATH` is original eval dataset of task squadv1, must be provided if task type is squadv1.
+
+`DEVICE_ID` is optional, it can be set by environment variable device_id, otherwise the value is zero.
+
+#### result
+
+Inference result is saved in current path, you can find result in acc.log file.
+
+```eval log
+acc_num 8096 , total_num 9815, accuracy 0.824860
 ```
 
 ## [Model Description](#contents)
