@@ -132,11 +132,9 @@ epoch: 12 step: 7393 ,rpn_loss: 0.00547, rcnn_loss: 0.39258, rpn_cls_loss: 0.002
 
 如果你想参与贡献昇思的工作当中，请阅读[昇思贡献指南](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/master/how_to_contribute)
 
-###贡献者
+### 贡献者
 
--在昇腾910上，训练和评估部分的工作贡献者是 'XXX'
--在昇腾910上，推理部分的工作贡献者是 'XXX'
--...
+* [c34](https://gitee.com/c_34) (Huawei)
 
 ## ModelZoo 主页
 

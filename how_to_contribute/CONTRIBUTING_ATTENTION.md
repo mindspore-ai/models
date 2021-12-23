@@ -2,10 +2,9 @@
 
 <!-- TOC -->
 
-- [How To Contribute MindSpore ModelZoo](#how-to-contribute-mindSpore-modelZoo)
+- [How To Contribute MindSpore ModelZoo](#how-to-contribute-mindspore-modelzoo)
     - [Preparation](#preparation)
         - [Understand Contribution Agreements And Procedures](#understand-contribution-agreements-and-procedures)
-        - [Define Goals For Your Contributions](#define-goals-for-your-contributions)
     - [Submit Code](#submit-code)
         - [CodeStyle](#codestyle)
         - [Directory Structure](#directory-structure)
@@ -16,6 +15,7 @@
             - [Reference Other System Libraries](#reference-other-system-libraries)
         - [Submit The Self-Check List](#submit-the-self-check-list)
     - [Maintenance And Communication](#maintenance-and-communication)
+        - [Signature](#signature)
 
 <!-- TOC -->
 
@@ -137,3 +137,7 @@ Your submitted code should be fully reviewed and self-checked by referring to th
 We appreciate your contribution to the MindSpore community, and we encourage you to keep an eye on your code after you complete a submission. You can mark your signature, email address and other contact information in the README of the submitted model, and keep an eye on your Gitee and Github information.
 
 Other developers may be using the model you submitted and may have some questions during use. In this case, you can communicate with you in detail through issues, in-site messages, emails, etc.
+
+### Signature
+
+You could sign your name, your homepage on gitee or github, and your organization in readme just like the chapter *Contributor* in the readme template.

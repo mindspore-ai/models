@@ -5,11 +5,12 @@
 - [MindSpore contributing guidelines](#mindspore-contributing-guidelines)
     - [Contributor License Agreement](#contributor-license-agreement)
     - [Getting Started](#getting-started)
-    - [Contribution workflow](#contribution-workflow)
+    - [Contribution Workflow](#contribution-workflow)
         - [Code style](#code-style)
         - [Fork-Pull development model](#fork-pull-development-model)
         - [Report issues](#report-issues)
         - [Propose PRs](#propose-prs)
+        - [Contribute models](#contribute-models)
 
 <!-- /TOC -->
 
@@ -132,3 +133,7 @@ When reporting issues, refer to this format:
 - Make sure your commit history being ordered.
 - Always keep your branch up with the master branch.
 - For bug-fix PRs, make sure all related issues being linked.
+
+### Contribute models
+
+You can follow [how_to_contribute](how_to_contribute) to get more information about how to contribute a model.
