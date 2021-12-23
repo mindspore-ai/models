@@ -49,7 +49,7 @@ Sphereface论文中给出了多种网络架构，本代码仅实现了其20层�
 
 # 数据集
 
-使用的数据集：[CASIA-WebFace](<http://www.cbsr.ia.ac.cn/english/CASIA-WebFace-Database.html>)
+使用的数据集：[CASIA-WebFace](https://www.google.com/search?q=CASIA-WebFace&rlz=1C1GCEU_en__894__894&oq=CASIA-WebFace)
 
 - 数据集大小：4G，共10575个类、494414张250x250彩色或黑白图像
     - 训练集：3.7G，共45万张图像
