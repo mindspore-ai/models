@@ -526,9 +526,17 @@ The best acc is 0.891176
 参数ckpt_file为必填项，
 `FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
 
-### 在Ascend310执行推理
+### 在Ascend310执行推理  
 
-在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
+#### 代码补齐  
+
+由于NLP部分推理代码使用了开源代码，此部分代码单独建立了一个repo保存->[推理第三方开源代码](https://gitee.com/Stan.Xu/bert_tokenizer.git)，在运行推理之前请先完成以下步骤：  
+
+```shell
+# 1. mkdir ./infer/opensource  
+# 2. 下载开源代码 https://gitee.com/Stan.Xu/bert_tokenizer.git  
+# 3. 将repo下所有代码文件放入./infer/opensource  
+```
 
 ```shell
 # Ascend310 inference

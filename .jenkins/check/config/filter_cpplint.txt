@@ -34,6 +34,10 @@
 "models/research/cv/stgcn/infer/mxbase/src/stgcnUtil.cpp" "runtime/references""models/official/cv/resnext/infer/mxbase/src/resnext50Classify.h" "runtime/references"
 "models/research/cv/stgcn/infer/mxbase/src/main.cpp" "runtime/references"
 
+"models/official/nlp/tinybert/infer/mxbase/MxBaseInfer.h" "runtime/references"
+"models/official/nlp/tinybert/infer/opensource/tokenizer.h" "runtime/references"
+"models/official/nlp/tinybert/infer/opensource/uninorms.h" "runtime/references"
+"models/official/nlp/tinybert/infer/sdk/sample/main.cpp" "runtime/references"
 
 "models/research/cv/FaceAttribute/infer/mxbase/faceattribute/FaceAttribute.h" "runtime/references"
 "models/research/cv/FaceAttribute/infer/mxbase/faceattribute/FaceAttribute.cpp" "runtime/references"

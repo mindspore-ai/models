@@ -1,4 +1,4 @@
-﻿# Contents
+﻿﻿# Contents
 
 - [Contents](#contents)
 - [TinyBERT Description](#tinybert-description)
@@ -528,6 +528,16 @@ The ckpt_file parameter is required,
 ```
 
 ### Infer on Ascend310
+
+#### code supplement  
+
+NLP infer using a few opensource code, those code save as another repo->[NLP_infer_opensource](https://gitee.com/Stan.Xu/bert_tokenizer.git),supplement those code before you run infer code.step like below:  
+
+```shell
+# 1. mkdir ./infer/opensource  
+# 2. downloading code form https://gitee.com/Stan.Xu/bert_tokenizer.git  
+# 3. all code file in this repo, move to ./infer/opensource  
+```  
 
 Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
 
