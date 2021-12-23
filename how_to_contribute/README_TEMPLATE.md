@@ -138,9 +138,7 @@ If you want to contribute, please review the [contribution guidelines](https://g
 
 ### Contributors
 
-- Training and evaluation on Ascend910 is contributed by `XXX`.
-- Inference on Ascend310 is contributed by `XXX`.
-- ...
+* [c34](https://gitee.com/c_34) (Huawei)
 
 ## ModeZoo Homepage
 
