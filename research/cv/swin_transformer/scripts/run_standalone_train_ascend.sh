@@ -1,21 +1,21 @@
 #!/bin/bash
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
-# Licensed under the Apache License, Version 2.0 (the License);
+# Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-# httpwww.apache.orglicensesLICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an AS IS BASIS,
+# distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
 if [ $# -lt 2 ]
 then
-    echo Usage bash .scriptsrun_standalone_train_ascend.sh [DEVICE_ID] [CONFIG_PATH]
+    echo "Usage: bash ./scripts/run_standalone_train_ascend.sh [DEVICE_ID] [CONFIG_PATH]"
 exit 1
 fi
 
@@ -25,12 +25,12 @@ export DEVICE_ID=$1
 CONFIG_PATH=$2
 
 rm -rf train_standalone
-mkdir .train_standalone
-cd .train_standalone  exit
-echo  start training for device id $DEVICE_ID
-env  env.log
-python -u ..train.py \
+mkdir ./train_standalone
+cd ./train_standalone || exit
+echo  "start training for device id $DEVICE_ID"
+env > env.log
+python -u ../train.py \
     --device_id=$DEVICE_ID \
-    --device_target=Ascend \
-    --swin_config=$CONFIG_PATH  log.txt 2&1 &
-cd ..
+    --device_target="Ascend" \
+    --swin_config=$CONFIG_PATH > log.txt 2>&1 &
+cd ../

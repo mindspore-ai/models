@@ -14,6 +14,7 @@
 # ============================================================================
 """global args for SwinTransformer"""
 import argparse
+import ast
 import os
 import sys
 
@@ -29,10 +30,11 @@ def parse_arguments():
     global args
     parser = argparse.ArgumentParser(description="MindSpore SwinTransformer Training")
 
-    parser.add_argument("-a", "--arch", metavar="ARCH", default="ResNet18", help="model architecture")
+    parser.add_argument("-a", "--arch", metavar="ARCH", default="swin_tiny_patch4_window7_224",
+                        help="model architecture")
     parser.add_argument("--accumulation_step", default=1, type=int, help="accumulation step")
-    parser.add_argument("--amp_level", default="O2", choices=["O0", "O2", "O3"], help="AMP Level")
-    parser.add_argument("--ape", default=False, type=bool, help="absolute position embedding")
+    parser.add_argument("--amp_level", default="O2", choices=["O0", "O1", "O2", "O3"], help="AMP Level")
+    parser.add_argument("--ape", default=False, type=ast.literal_eval, help="absolute position embedding")
     parser.add_argument("--batch-size", default=128, type=int, metavar="N",
                         help="mini-batch size (default: 256), this is the total "
                              "batch size of all GPUs on the current node when "
@@ -40,7 +42,7 @@ def parse_arguments():
     parser.add_argument("--beta", default=[0.9, 0.999], type=lambda x: [float(a) for a in x.split(",")],
                         help="beta for optimizer")
     parser.add_argument("--clip_global_norm_value", default=5., type=float, help="Clip grad value")
-    parser.add_argument("--crop", default=True, type=bool, help="Crop when testing")
+    parser.add_argument("--crop", default=True, type=ast.literal_eval, help="Crop when testing")
     parser.add_argument('--data_url', default="./data", help='Location of data.')
     parser.add_argument("--device_id", default=0, type=int, help="Device Id")
     parser.add_argument("--device_num", default=1, type=int, help="device num")
@@ -72,7 +74,7 @@ def parse_arguments():
     parser.add_argument("--momentum", default=0.9, type=float, metavar="M", help="momentum")
     parser.add_argument("--num_classes", default=1000, type=int)
     parser.add_argument("--patch_size", type=int, default=4, help="patch_size")
-    parser.add_argument("--patch_norm", type=bool, default=True, help="patch_norm")
+    parser.add_argument("--patch_norm", type=ast.literal_eval, default=True, help="patch_norm")
     parser.add_argument("--pretrained", dest="pretrained", default=None, type=str, help="use pre-trained model")
     parser.add_argument("--swin_config", help="Config file to use (see configs dir)", default=None, required=True)
     parser.add_argument("--seed", default=0, type=int, help="seed for initializing training. ")
@@ -80,7 +82,7 @@ def parse_arguments():
     parser.add_argument("--label_smoothing", type=float, help="Label smoothing to use, default 0.0", default=0.1)
     parser.add_argument("--image_size", default=224, help="Image Size.", type=int)
     parser.add_argument('--train_url', default="./", help='Location of training outputs.')
-    parser.add_argument("--run_modelarts", type=bool, default=False, help="Whether run on modelarts")
+    parser.add_argument("--run_modelarts", type=ast.literal_eval, default=False, help="Whether run on modelarts")
     args = parser.parse_args()
 
     # Allow for use from notebook without config file
