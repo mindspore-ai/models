@@ -11,6 +11,10 @@
     - [脚本说明](#脚本说明)
         - [脚本和样例代码](#脚本和样例代码)
         - [脚本参数](#脚本参数)
+        - [推理过程](#推理过程)
+            - [导出MindIR](#导出mindir)
+            - [在Ascend310执行推理](#在ascend310执行推理)
+            - [结果](#结果)
     - [模型描述](#模型描述)
         - [性能](#性能)
             - [训练性能](#训练性能)
@@ -136,6 +140,8 @@ python infer.py \
 .
 └─tbnet
   ├─README.md
+  ├── scripts
+  │   └─run_infer_310.sh    # 用于Ascend310推理的脚本
   ├─data
     ├─steam
         ├─config.json               # 数据和训练参数配置
@@ -151,6 +157,9 @@ python infer.py \
     ├─metrics.py                    # 模型度量
     ├─steam.py                      # 'steam'数据集文本解析
     └─tbnet.py                      # TB-Net网络
+  ├─export.py                         # 导出MINDIR脚本
+  ├─preprocess.py                         # 推理数据预处理脚本
+  ├─postprocess.py                         # 推理结果计算脚本
   ├─eval.py                         # 评估网络
   ├─infer.py                        # 推理和解释
   └─train.py                        # 训练网络
@@ -193,6 +202,39 @@ python infer.py \
 --device_id       device id
 --device_target   run code on GPU
 --run_mode        run code by GRAPH mode or PYNATIVE mode
+```
+
+## 推理过程
+
+### 导出MindIR
+
+```shell
+python export.py --checkpoint_id [ID] --device_target [DEVICE] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+参数checkpoint_id为必填项，
+`DEVICE` 须在['Ascend', 'CPU']中选择。
+`FILE_FORMAT` 须在设置为"MINDIR"。
+
+### 在Ascend310执行推理
+
+在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` mindir文件路径
+- `DATA_PATH` 推理数据集test.csv路径
+- `DEVICE_ID` 可选，默认值为0。
+
+### 结果
+
+推理结果保存在脚本执行的当前路径，你可以在acc.log中看到以下精度计算结果。
+
+```bash
+auc: 0.8251359368836292
 ```
 
 # [模型描述](#目录)
