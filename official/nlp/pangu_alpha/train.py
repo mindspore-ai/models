@@ -113,7 +113,7 @@ def run_train(args_opt):
     os.environ['HCCL_CONNECT_TIMEOUT'] = "6000"
     # Set execution mode
     context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
-    context.set_context(variable_memory_max_size="31GB")
+    context.set_context(variable_memory_max_size="30GB")
     # Set parallel context
     rank = 0
     device_num = 1
@@ -124,7 +124,7 @@ def run_train(args_opt):
     # env variable prepare
     group_info_file = os.getenv("GROUP_INFO_FILE")
     if group_info_file:
-        with open(os.path.expanduser("job/code/group_info_env"), "a") as outfile:
+        with open(os.path.expanduser("/job/code/group_info_env"), "a") as outfile:
             outfile.write(f"export GROUP_INFO_FILE_REFLECT={group_info_file}\n")
 
     # copy data from the cloud to the /cache/Data
@@ -381,18 +381,37 @@ def restore_exception_checkpoint(args_param, sink_size, dataset, model, network,
         return True
 
 
+def set_pipeline_parallel_context(args_opt):
+    """
+    Set prarllel context in pipeline training process
+    """
+    D.init()
+    device_num = D.get_group_size()
+    rank_id = D.get_rank()
+    print("rank_id is {}, device_num is {}".format(rank_id, device_num))
+    context.reset_auto_parallel_context()
+    context.set_auto_parallel_context(
+        parallel_mode=ParallelMode.SEMI_AUTO_PARALLEL, gradients_mean=False,
+        full_batch=bool(args_opt.full_batch), loss_repeated_mean=True,
+        device_num=device_num, enable_parallel_optimizer=bool(args_opt.optimizer_shard),
+        pipeline_stages=args_opt.stage_num)
+    set_algo_parameters(elementwise_op_strategy_follow=True)
+    _set_multi_subgraphs()
+    return rank_id, device_num
+
+
 def run_train_pipeline(args_opt):
     r"""The main training process in pipeline."""
     # Set hccl connect time
     os.environ['HCCL_CONNECT_TIMEOUT'] = "6000"
 
     context.set_context(save_graphs=False, mode=context.GRAPH_MODE, device_target=args_opt.device_target)
-    context.set_context(variable_memory_max_size="31GB")
+    context.set_context(variable_memory_max_size="30GB")
 
     rank_id = 0
     device_num = 1
     if args_opt.distribute == "true":
-        rank_id, device_num = set_parallel_context(args_opt)
+        rank_id, device_num = set_pipeline_parallel_context(args_opt)
 
     # copy data from the cloud to the /cache/Data
     cache_url = '/cache/Data/'
