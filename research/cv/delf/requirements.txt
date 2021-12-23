@@ -1,0 +1,9 @@
+numpy
+annoy
+pillow
+csv
+pandas
+h5py
+matplotlib
+scipy
+scikit-image
