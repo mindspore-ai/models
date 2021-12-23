@@ -20,7 +20,7 @@ import mindspore.dataset.transforms.c_transforms as deC
 from .model_utils.config import config
 
 de.config.set_seed(1)
-def create_transformer_dataset(epoch_count=1, rank_size=1, rank_id=0, do_shuffle="true", dataset_path=None,
+def create_transformer_dataset(rank_size=1, rank_id=0, do_shuffle="true", dataset_path=None,
                                bucket_boundaries=None, device_target="Ascend"):
     """create dataset"""
     def batch_per_bucket(bucket_len, dataset_path):
@@ -41,7 +41,6 @@ def create_transformer_dataset(epoch_count=1, rank_size=1, rank_id=0, do_shuffle
         # apply batch operations
 
         ds = ds.batch(config.batch_size, drop_remainder=True)
-        ds = ds.repeat(epoch_count)
         return ds
 
     for i, _ in enumerate(bucket_boundaries):

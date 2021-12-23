@@ -28,13 +28,10 @@ from src.model_utils.device_adapter import get_device_id
 
 set_seed(1)
 
-
 context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
-
 
 def modelarts_pre_process():
     pass
-
 
 def modelarts_post_process():
     local_path = os.path.join(config.modelarts_home, config.object_name)
@@ -53,7 +50,7 @@ def ctpn_infer_test():
     config.rnn_batch_size = config.img_height // 16
 
     print("ckpt path is {}".format(config.checkpoint_path))
-    ds = create_ctpn_dataset(config.dataset_path, batch_size=config.test_batch_size, repeat_num=1, is_training=False)
+    ds = create_ctpn_dataset(config.dataset_path, batch_size=config.test_batch_size, is_training=False)
     total = ds.get_dataset_size()
     print("eval dataset size is {}".format(total))
     net = CTPN(config, batch_size=config.test_batch_size, is_training=False)

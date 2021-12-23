@@ -179,7 +179,7 @@ def run_classifier():
                           assessment_method=assessment_method)
 
     if args_opt.do_train.lower() == "true":
-        ds = create_classification_dataset(batch_size=args_opt.train_batch_size, repeat_count=1,
+        ds = create_classification_dataset(batch_size=args_opt.train_batch_size,
                                            assessment_method=assessment_method,
                                            data_file_path=args_opt.train_data_file_path,
                                            schema_file_path=args_opt.schema_file_path,
@@ -194,7 +194,7 @@ def run_classifier():
             load_finetune_checkpoint_path = LoadNewestCkpt(load_finetune_checkpoint_dir, "classifier")
 
     if args_opt.do_eval.lower() == "true":
-        ds = create_classification_dataset(batch_size=args_opt.eval_batch_size, repeat_count=1,
+        ds = create_classification_dataset(batch_size=args_opt.eval_batch_size,
                                            assessment_method=assessment_method,
                                            data_file_path=args_opt.eval_data_file_path,
                                            schema_file_path=args_opt.schema_file_path,

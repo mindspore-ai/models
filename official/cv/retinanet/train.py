@@ -143,9 +143,10 @@ def main():
     loss_scale = float(config.loss_scale)
 
     # When create MindDataset, using the fitst mindrecord file, such as retinanet.mindrecord0.
-    dataset = create_retinanet_dataset(mindrecord_file, repeat_num=1,
-                                       num_parallel_workers=config.workers,
-                                       batch_size=config.batch_size, device_num=device_num, rank=rank)
+    dataset = create_retinanet_dataset(mindrecord_file, num_parallel_workers=config.workers,
+                                       batch_size=config.batch_size,
+                                       device_num=device_num,
+                                       rank=rank)
 
     dataset_size = dataset.get_dataset_size()
     print("Create dataset done!")

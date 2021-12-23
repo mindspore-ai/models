@@ -314,7 +314,7 @@ def train_net():
     target = config.device_target
     set_parameter()
     ckpt_param_dict = load_pre_trained_checkpoint()
-    dataset = create_dataset(dataset_path=config.data_path, do_train=True, repeat_num=1,
+    dataset = create_dataset(dataset_path=config.data_path, do_train=True,
                              batch_size=config.batch_size, train_image_size=config.train_image_size,
                              eval_image_size=config.eval_image_size, target=target,
                              distribute=config.run_distribute)

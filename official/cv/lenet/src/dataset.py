@@ -23,8 +23,7 @@ from mindspore.dataset.vision import Inter
 from mindspore.common import dtype as mstype
 
 
-def create_dataset(data_path, batch_size=32, repeat_size=1,
-                   num_parallel_workers=1):
+def create_dataset(data_path, batch_size=32, num_parallel_workers=1):
     """
     create dataset for train or test
     """
@@ -55,6 +54,5 @@ def create_dataset(data_path, batch_size=32, repeat_size=1,
     buffer_size = 10000
     mnist_ds = mnist_ds.shuffle(buffer_size=buffer_size)  # 10000 as in LeNet train script
     mnist_ds = mnist_ds.batch(batch_size, drop_remainder=True)
-    mnist_ds = mnist_ds.repeat(repeat_size)
 
     return mnist_ds

@@ -22,7 +22,6 @@ import mindspore.nn as nn
 
 from mindspore import Tensor, context
 from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.nn.optim.momentum import Momentum
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.ops import operations as P
@@ -148,11 +147,8 @@ def run_eval():
 
     if config.dataset == "cifar10":
         net = vgg16(num_classes=config.num_classes, args=config)
-        opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), 0.01, config.momentum,
-                       weight_decay=config.weight_decay)
         loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-        model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'})
-
+        model = Model(net, loss_fn=loss, metrics={'acc'})
         param_dict = load_checkpoint(config.pre_trained)
         load_param_into_net(net, param_dict)
         net.set_train(False)

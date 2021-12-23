@@ -28,7 +28,7 @@ from src.model_utils.moxing_adapter import moxing_wrapper
 def ssd_eval(dataset_path, ckpt_path, anno_json):
     """SSD evaluation."""
     batch_size = 1
-    ds = create_ssd_dataset(dataset_path, batch_size=batch_size, repeat_num=1,
+    ds = create_ssd_dataset(dataset_path, batch_size=batch_size,
                             is_training=False, use_multiprocessing=False)
     if config.model_name == "ssd300":
         net = SSD300(ssd_mobilenet_v2(), config, is_training=False)

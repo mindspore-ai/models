@@ -82,10 +82,10 @@ def train_and_eval(config):
     else:
         dataset_type = DataType.H5
     print("epochs is {}".format(epochs))
-    ds_train = create_dataset(data_path, train_mode=True, epochs=1,
+    ds_train = create_dataset(data_path, train_mode=True,
                               batch_size=batch_size, rank_id=get_rank(),
                               rank_size=get_group_size(), data_type=dataset_type)
-    ds_eval = create_dataset(data_path, train_mode=False, epochs=1,
+    ds_eval = create_dataset(data_path, train_mode=False,
                              batch_size=batch_size, rank_id=get_rank(),
                              rank_size=get_group_size(), data_type=dataset_type)
     print("ds_train.size: {}".format(ds_train.get_dataset_size()))

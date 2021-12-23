@@ -22,7 +22,7 @@ import mindspore.dataset.vision.c_transforms as C
 import mindspore.dataset.transforms.c_transforms as C2
 from mindspore.communication.management import init, get_rank, get_group_size
 
-def create_dataset1(dataset_path, do_train, repeat_num=1, batch_size=32, train_image_size=224, eval_image_size=224,
+def create_dataset1(dataset_path, do_train, batch_size=32, train_image_size=224, eval_image_size=224,
                     target="Ascend", distribute=False, enable_cache=False, cache_session_id=None):
     """
     create a train or evaluate cifar10 dataset for resnet50
@@ -81,13 +81,10 @@ def create_dataset1(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
 
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
-    # apply dataset repeat operation
-    data_set = data_set.repeat(repeat_num)
 
     return data_set
 
-
-def create_dataset2(dataset_path, do_train, repeat_num=1, batch_size=32, train_image_size=224, eval_image_size=224,
+def create_dataset2(dataset_path, do_train, batch_size=32, train_image_size=224, eval_image_size=224,
                     target="Ascend", distribute=False, enable_cache=False, cache_session_id=None):
     """
     create a train or eval imagenet2012 dataset for resnet50
@@ -154,12 +151,9 @@ def create_dataset2(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
 
-    # apply dataset repeat operation
-    data_set = data_set.repeat(repeat_num)
-
     return data_set
 
-def create_dataset_pynative(dataset_path, do_train, repeat_num=1, batch_size=32, train_image_size=224,
+def create_dataset_pynative(dataset_path, do_train, batch_size=32, train_image_size=224,
                             eval_image_size=224, target="Ascend", distribute=False, enable_cache=False,
                             cache_session_id=None):
     """
@@ -226,12 +220,9 @@ def create_dataset_pynative(dataset_path, do_train, repeat_num=1, batch_size=32,
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
 
-    # apply dataset repeat operation
-    data_set = data_set.repeat(repeat_num)
-
     return data_set
 
-def create_dataset3(dataset_path, do_train, repeat_num=1, batch_size=32, train_image_size=224, eval_image_size=224,
+def create_dataset3(dataset_path, do_train, batch_size=32, train_image_size=224, eval_image_size=224,
                     target="Ascend", distribute=False, enable_cache=False, cache_session_id=None):
     """
     create a train or eval imagenet2012 dataset for resnet101
@@ -294,13 +285,10 @@ def create_dataset3(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
 
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
-    # apply dataset repeat operation
-    data_set = data_set.repeat(repeat_num)
 
     return data_set
 
-
-def create_dataset4(dataset_path, do_train, repeat_num=1, batch_size=32, train_image_size=224, eval_image_size=224,
+def create_dataset4(dataset_path, do_train, batch_size=32, train_image_size=224, eval_image_size=224,
                     target="Ascend", distribute=False, enable_cache=False, cache_session_id=None):
     """
     create a train or eval imagenet2012 dataset for se-resnet50
@@ -364,9 +352,6 @@ def create_dataset4(dataset_path, do_train, repeat_num=1, batch_size=32, train_i
 
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
-
-    # apply dataset repeat operation
-    data_set = data_set.repeat(repeat_num)
 
     return data_set
 

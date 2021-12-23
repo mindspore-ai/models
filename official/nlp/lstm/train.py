@@ -85,7 +85,7 @@ def train_lstm():
     if config.pre_trained:
         load_param_into_net(network, load_checkpoint(config.pre_trained))
 
-    ds_train = lstm_create_dataset(config.preprocess_path, config.batch_size, 1, device_num=device_num, rank=rank)
+    ds_train = lstm_create_dataset(config.preprocess_path, config.batch_size, device_num=device_num, rank=rank)
 
     loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
     if config.dynamic_lr:

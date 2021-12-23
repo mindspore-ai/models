@@ -217,7 +217,7 @@ def run_ner():
         netwithloss = BertNER(bert_net_cfg, args_opt.train_batch_size, True, num_labels=number_labels,
                               use_crf=(args_opt.use_crf.lower() == "true"),
                               tag_to_index=tag_to_index, dropout_prob=0.1)
-        ds = create_ner_dataset(batch_size=args_opt.train_batch_size, repeat_count=1,
+        ds = create_ner_dataset(batch_size=args_opt.train_batch_size,
                                 assessment_method=assessment_method, data_file_path=args_opt.train_data_file_path,
                                 schema_file_path=args_opt.schema_file_path, dataset_format=args_opt.dataset_format,
                                 do_shuffle=(args_opt.train_data_shuffle.lower() == "true"))
@@ -237,7 +237,7 @@ def run_ner():
             load_finetune_checkpoint_path = LoadNewestCkpt(load_finetune_checkpoint_dir, "ner")
 
     if args_opt.do_eval.lower() == "true":
-        ds = create_ner_dataset(batch_size=args_opt.eval_batch_size, repeat_count=1,
+        ds = create_ner_dataset(batch_size=args_opt.eval_batch_size,
                                 assessment_method=assessment_method, data_file_path=args_opt.eval_data_file_path,
                                 schema_file_path=args_opt.schema_file_path, dataset_format=args_opt.dataset_format,
                                 do_shuffle=(args_opt.eval_data_shuffle.lower() == "true"), drop_remainder=False)
