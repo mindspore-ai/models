@@ -15,7 +15,10 @@
 '''train the gan model'''
 from src.loss import GenWithLossCell
 from src.loss import DisWithLossCell
+import numpy as np
 from mindspore import nn
+from mindspore import Tensor, Parameter
+from mindspore.common import initializer
 import mindspore.ops.operations as P
 import mindspore.ops.functional as F
 import mindspore.ops.composite as C
@@ -29,6 +32,37 @@ class Reshape(nn.Cell):
     def construct(self, x):
         return self.reshape(x, self.shape)
 
+class InstanceNorm2d(nn.Cell):
+    """InstanceNorm2d"""
+
+    def __init__(self, channel):
+        super(InstanceNorm2d, self).__init__()
+        self.gamma = Parameter(initializer.initializer(
+            init=Tensor(np.ones(shape=[1, channel, 1, 1], dtype=np.float32)), shape=[1, channel, 1, 1]),
+                               name='gamma')
+        self.beta = Parameter(initializer.initializer(init=initializer.Zero(), shape=[1, channel, 1, 1]),
+                              name='beta')
+        self.reduceMean = P.ReduceMean(keep_dims=True)
+        self.square = P.Square()
+        self.sub = P.Sub()
+        self.add = P.Add()
+        self.rsqrt = P.Rsqrt()
+        self.mul = P.Mul()
+        self.tile = P.Tile()
+        self.reshape = P.Reshape()
+        self.eps = Tensor(np.ones(shape=[1, channel, 1, 1], dtype=np.float32) * 1e-5)
+        self.cast2fp32 = P.Cast()
+
+    def construct(self, x):
+        mean = self.reduceMean(x, (2, 3))
+        mean_stop_grad = F.stop_gradient(mean)
+        variance = self.reduceMean(self.square(self.sub(x, mean_stop_grad)), (2, 3))
+        variance = variance + self.eps
+        inv = self.rsqrt(variance)
+        normalized = self.sub(x, mean) * inv
+        x_IN = self.add(self.mul(self.gamma, normalized), self.beta)
+        return x_IN
+
 class Generator(nn.Cell):
     """generator"""
 
@@ -38,15 +72,15 @@ class Generator(nn.Cell):
 
         self.network.append(nn.Dense(latent_size, 256 * 7 * 7, has_bias=False))
         self.network.append(Reshape((-1, 256, 7, 7)))
-        self.network.append(nn.BatchNorm2d(256))
+        self.network.append(InstanceNorm2d(256))
         self.network.append(nn.ReLU())
 
         self.network.append(nn.Conv2dTranspose(256, 128, 5, 1))
-        self.network.append(nn.BatchNorm2d(128))
+        self.network.append(InstanceNorm2d(128))
         self.network.append(nn.ReLU())
 
         self.network.append(nn.Conv2dTranspose(128, 64, 5, 2))
-        self.network.append(nn.BatchNorm2d(64))
+        self.network.append(InstanceNorm2d(64))
         self.network.append(nn.ReLU())
 
         self.network.append(nn.Conv2dTranspose(64, 1, 5, 2))
@@ -64,11 +98,11 @@ class Discriminator(nn.Cell):
         self.network = nn.SequentialCell()
 
         self.network.append(nn.Conv2d(1, 64, 5, 2))
-        self.network.append(nn.BatchNorm2d(64))
+        self.network.append(InstanceNorm2d(64))
         self.network.append(nn.LeakyReLU())
 
         self.network.append(nn.Conv2d(64, 128, 5, 2))
-        self.network.append(nn.BatchNorm2d(128))
+        self.network.append(InstanceNorm2d(128))
         self.network.append(nn.LeakyReLU())
 
         self.network.append(nn.Flatten())

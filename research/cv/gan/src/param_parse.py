@@ -41,6 +41,7 @@ def parameter_parser():
     parser.add_argument("--batch_size_t", type=int, default=10, help="size of the test batches")
     parser.add_argument("--batch_size_v", type=int, default=1000, help="size of the valid batches")
     parser.add_argument('--device_id', type=int, default=0, help='device id of Ascend (Default: 0)')
-    parser.add_argument("--data_path", type=str, default="data/MNIST_Data/", help="dataset path")
+    parser.add_argument("--data_path", type=str, default="mnist/", help="dataset path")  # change to train data path
+    parser.add_argument("--ckpt_path", type=str, default="", help="eval ckpt path")  # change to eval ckpt path
     parser.add_argument("--distribute", type=bool, default=False, help="Run distribute, default is false.")
     return parser.parse_args()
