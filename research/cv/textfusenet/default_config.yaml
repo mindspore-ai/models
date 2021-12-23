@@ -1,0 +1,211 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+data_path: "/data/"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+checkpoint_path: './checkpoint/'
+checkpoint_file: './checkpoint/text_fuse_net-200_603.ckpt'
+device_target: Ascend
+enable_profiling: False
+
+pre_trained: "/cache/data"
+coco_root: "/data/"
+ckpt_path: './src/resnet101.ckpt'
+ann_file: "totaltext_train.json"
+# ==============================================================================
+modelarts_dataset_unzip_name: 'cocodataset'
+need_modelarts_dataset_unzip: True
+
+img_path: ''
+result_path: ''
+
+# Training options
+img_width: 1280
+img_height: 768
+keep_ratio: True
+flip_ratio: 0.5
+expand_ratio: 1.0
+
+max_instance_count: 128
+mask_shape: [28, 28]
+
+# anchor
+feature_shapes:
+- [192, 320]
+- [96, 160]
+- [48, 80]
+- [24, 40]
+- [12, 20]
+anchor_scales: [8]
+anchor_ratios: [0.5, 1.0, 2.0]
+anchor_strides: [4, 8, 16, 32, 64]
+num_anchors: 3
+
+# resnet
+resnet_block: [3, 4, 23, 3]
+resnet_in_channels: [64, 256, 512, 1024]
+resnet_out_channels: [256, 512, 1024, 2048]
+
+# fpn
+fpn_in_channels: [256, 512, 1024, 2048]
+fpn_out_channels: 256
+fpn_num_outs: 5
+
+# rpn
+rpn_in_channels: 256
+rpn_feat_channels: 256
+rpn_loss_cls_weight: 1.0
+rpn_loss_reg_weight: 1.0
+rpn_cls_out_channels: 1
+rpn_target_means: [0., 0., 0., 0.]
+rpn_target_stds: [1.0, 1.0, 1.0, 1.0]
+
+# bbox_assign_sampler
+neg_iou_thr: 0.3
+pos_iou_thr: 0.7
+min_pos_iou: 0.3
+num_bboxes: 245520
+num_gts: 128
+num_expected_neg: 256
+num_expected_pos: 128
+
+# proposal
+activate_num_classes: 2
+use_sigmoid_cls: True
+
+# roi_align
+roi_layer: {type: 'RoIAlign', out_size: 7, mask_out_size: 14, sample_num: 2}
+roi_align_out_channels: 256
+roi_align_featmap_strides: [4, 8, 16, 32]
+roi_align_finest_scale: 56
+roi_sample_num: 640
+
+# bbox_assign_sampler_stage2
+neg_iou_thr_stage2: 0.5
+pos_iou_thr_stage2: 0.5
+min_pos_iou_stage2: 0.5
+num_bboxes_stage2: 2000
+num_expected_pos_stage2: 128
+num_expected_neg_stage2: 512
+num_expected_total_stage2: 512
+
+# rcnn
+rcnn_num_layers: 2
+rcnn_in_channels: 256
+rcnn_fc_out_channels: 1024
+rcnn_mask_out_channels: 256
+rcnn_loss_cls_weight: 1
+rcnn_loss_reg_weight: 1
+rcnn_loss_mask_fb_weight: 1
+rcnn_target_means: [0., 0., 0., 0.]
+rcnn_target_stds: [0.1, 0.1, 0.2, 0.2]
+textfusenet_channels: 256
+# train proposal
+rpn_proposal_nms_across_levels: False
+rpn_proposal_nms_pre: 2000
+rpn_proposal_nms_post: 2000
+rpn_proposal_max_num: 2000
+rpn_proposal_nms_thr: 0.7
+rpn_proposal_min_bbox_size: 0
+
+# test proposal
+rpn_nms_across_levels: False
+rpn_nms_pre: 1000
+rpn_nms_post: 1000
+rpn_max_num: 1000
+rpn_nms_thr: 0.7
+rpn_min_bbox_min_size: 0
+test_roi_number: 100
+test_score_thr: 0.2
+test_iou_thr: 0.3
+test_max_per_img: 100
+test_batch_size: 1
+
+rpn_head_use_sigmoid: True
+rpn_head_weight: 1.0
+mask_thr_binary: 0.5
+
+# LR
+base_lr: 0.001
+base_step: 1206
+total_epoch: 201
+warmup_step: 500
+warmup_ratio: 0.333333
+sgd_momentum: 0.9
+
+# train
+batch_size: 1
+loss_scale: 1
+momentum: 0.91
+weight_decay: 0.0001 # 1e-4
+pretrain_epoch_size: 0
+epoch_size: 200
+save_checkpoint: True
+save_checkpoint_epochs: 50
+keep_checkpoint_max: 200
+save_checkpoint_path: "./"
+
+mindrecord_dir: "/data/mindrecord/textfusenet"
+train_data_type: "train"
+val_data_type: "test"
+instance_set: "annotations/totaltext_{}.json"
+coco_classes: ['background', 'text', '0', '1', '2', '3', '4', '5', '6','7', '8', '9','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f','g','h','i','j','k','l','m', 'n', 'o','p','q','r','s','t','u','v','w','x','y','z']
+num_classes: 64
+
+only_create_dataset: False 
+run_distribute: False 
+do_train: True      
+do_eval: False  
+dataset: "coco"
+device_id: 1
+device_num: 1
+rank_id: 0
+
+# textfusenet export
+file_name: "textfusenet"
+file_format: "MINDIR"
+ckpt_file: 'resnet101.ckpt'
+ckpt_file_local: 'scripts/train/ckpt_0/textfusenet-200_603.ckpt'
+
+# other
+learning_rate: 0.002
+buffer_size: 1000
+save_checkpoint_steps: 1562
+sink_size: -1
+dataset_sink_mode: True
+lr: 0.01
+
+# Model Description
+model_name: textfusenet
+
+
+---
+# Config description for each option
+enable_modelarts: 'Whether training on modelarts, default: False'
+data_url: 'Dataset url for obs'
+train_url: 'Training output url for obs'
+data_path: 'Dataset path for local'
+output_path: 'Training output path for local'
+ann_file: 'Ann file, default is val.json.'
+
+device_target: 'Target device type' 
+enable_profiling: 'Whether enable profiling while training, default: False'
+only_create_dataset: 'If set it true, only create Mindrecord, default is false.'
+run_distribute: 'Run distribute, default is false.'
+do_train: 'Do train or not, default is true.'
+do_eval: 'Do eval or not, default is false.'
+dataset: 'Dataset, default is coco.'
+pre_trained: 'Pretrain file path.'
+device_id: 'Device id, default is 0.'
+device_num: 'Use device nums, default is 1.'
+rank_id: 'Rank id, default is 0.'
+file_format: 'file format' 
+img_path: "image file path."
+result_path: "result file path."
+
+---
+device_target: ['Ascend', 'GPU', 'CPU']
+file_format: ["AIR", "ONNX", "MINDIR"]
