@@ -16,7 +16,7 @@
 if [ $# != 5 ] ; then
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_eval.sh DEVICE_TARGET DEVICE_ID MINDRECORD_DATA CKPT_PATH CONFIG_PATH"
+echo "sh scripts/run_eval.sh DEVICE_TARGET DEVICE_ID MINDRECORD_DATA CKPT_PATH CONFIG_PATH"
 echo "for example: sh run_eval.sh Ascend 0 /your/path/evaluation.mindrecord /your/path/checkpoint_file ./default_config_large_gpu.yaml"
 echo "Note: set the checkpoint and dataset path in default_config.yaml"
 echo "=============================================================================================================="

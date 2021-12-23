@@ -59,15 +59,36 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 
 After dataset preparation, you can start training and evaluation as follows:
 
+In Ascend environment
+
 ```bash
 # run training example
-bash scripts/run_standalone_train_ascend.sh Ascend 0 52 /path/ende-l128-mindrecord
+bash scripts/run_standalone_train.sh Ascend [DEVICE_ID] [EPOCH_SIZE] [GRADIENT_ACCUMULATE_STEP] [DATA_PATH]
+# EPOCH_SIZE recommend 52, GRADIENT_ACCUMULATE_STEP recommend 8 or 1
 
 # run distributed training example
-bash scripts/run_distribute_train_ascend.sh 8 52 /path/ende-l128-mindrecord rank_table.json ./default_config.yaml
+bash scripts/run_distribute_train_ascend.sh [DEVICE_NUM] [EPOCH_SIZE] [DATA_PATH] [RANK_TABLE_FILE] [CONFIG_PATH]
+# EPOCH_SIZE recommend 52
 
 # run evaluation example
-python eval.py > eval.log 2>&1 &
+bash scripts/run_eval.sh Ascend [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_PATH]
+# CONFIG_PATH　should be consistent with training
+```
+
+In GPU environment
+
+```bash
+# run training example
+bash scripts/run_standalone_train.sh GPU [DEVICE_ID] [EPOCH_SIZE] [GRADIENT_ACCUMULATE_STEP] [DATA_PATH]
+# EPOCH_SIZE recommend 52, GRADIENT_ACCUMULATE_STEP recommend 8 or 1
+
+# run distributed training example
+bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [EPOCH_SIZE] [DATA_PATH] [CONFIG_PATH]
+# EPOCH_SIZE recommend 52
+
+# run evaluation example
+bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_PATH]
+# CONFIG_PATH　should be consistent with training
 ```
 
 - Running on [ModelArts](https://support.huaweicloud.com/modelarts/)
@@ -322,25 +343,28 @@ Parameters for learning rate:
 - Run `run_standalone_train.sh` for non-distributed training of Transformer model.
 
     ``` bash
-    bash scripts/run_standalone_train.sh DEVICE_TARGET DEVICE_ID EPOCH_SIZE GRADIENT_ACCUMULATE_STEP DATA_PATH
+    bash scripts/run_standalone_train.sh [DEVICE_TARGET] [DEVICE_ID] [EPOCH_SIZE] [GRADIENT_ACCUMULATE_STEP] [DATA_PATH]
     ```
 
 - Run `run_distribute_train_ascend.sh` for distributed training of Transformer model.
 
     ``` bash
-    bash scripts/run_distribute_train_ascend.sh DEVICE_NUM EPOCH_SIZE DATA_PATH RANK_TABLE_FILE CONFIG_PATH
+    # Ascend environment
+    bash scripts/run_distribute_train_ascend.sh [DEVICE_NUM] [EPOCH_SIZE] [DATA_PATH] [RANK_TABLE_FILE] [CONFIG_PATH]
+    # GPU environment
+    bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [EPOCH_SIZE] [DATA_PATH] [CONFIG_PATH]
     ```
 
 **Attention**: data sink mode can not be used in transformer since the input data have different sequence lengths.
 
 ## [Evaluation Process](#contents)
 
-- Set options in `default_config.yaml`. Make sure the 'data_file', 'model_file' and 'output_file' are set to your own path.
+- Set options in [CONFIG_PATH], that should be consistent with training. Make sure the 'device_target', 'data_file', 'model_file' and 'output_file' are set to your own path.
 
 - Run `eval.py` for evaluation of Transformer model.
 
     ```bash
-    python eval.py
+    python eval.py --config_path=[CONFIG_PATH]
     ```
 
 - Run `process_output.sh` to process the output token ids to get the real translation results.
@@ -390,33 +414,33 @@ Inference result is saved in current path, 'output_file' will generate in path s
 
 #### Training Performance
 
-| Parameters                 | Ascend                                                         |
-| -------------------------- | -------------------------------------------------------------- |
-| Resource                   | Ascend 910; OS Euler2.8                                                 |
-| uploaded Date              | 07/05/2021 (month/day/year)                                    |
-| MindSpore Version          | 1.3.0                                                          |
-| Dataset                    | WMT Englis-German                                              |
-| Training Parameters        | epoch=52, batch_size=96                                        |
-| Optimizer                  | Adam                                                           |
-| Loss Function              | Softmax Cross Entropy                                          |
-| BLEU Score                 | 28.7                                                           |
-| Speed                      | 400ms/step (8pcs)                                              |
-| Loss                       | 2.8                                                            |
-| Params (M)                 | 213.7                                                          |
-| Checkpoint for inference   | 2.4G (.ckpt file)                                              |
+| Parameters                 | Ascend                                     | GPU                             |
+| -------------------------- | -------------------------------------------| --------------------------------|
+| Resource                   | Ascend 910; OS Euler2.8                    | GPU(Tesla V100 SXM2)            |
+| uploaded Date              | 07/05/2021 (month/day/year)                | 12/21/2021 (month/day/year)     |
+| MindSpore Version          | 1.3.0                                      | 1.5.0                           |
+| Dataset                    | WMT Englis-German                          | WMT Englis-German               |
+| Training Parameters        | epoch=52, batch_size=96                    | epoch=52, batch_size=96         |
+| Optimizer                  | Adam                                       | Adam                            |
+| Loss Function              | Softmax Cross Entropy                      | Softmax Cross Entropy           |
+| BLEU Score                 | 28.7                                       | 29.1                            |
+| Speed                      | 400ms/step (8pcs)                          | 337 ms/step (8pcs)              |
+| Loss                       | 2.8                                        | 2.9                             |
+| Params (M)                 | 213.7                                      | 213.7                           |
+| Checkpoint for inference   | 2.4G (.ckpt file)                          | 2.4G (.ckpt file)               |
 | Scripts                    | [Transformer scripts](https://gitee.com/mindspore/models/tree/master/official/nlp/transformer) |
 
 #### Evaluation Performance
 
-| Parameters          | Ascend                      |
-| ------------------- | --------------------------- |
-| Resource            | Ascend 910; OS Euler2.8                |
-| Uploaded Date       | 07/05/2021 (month/day/year) |
-| MindSpore Version   | 1.3.0                       |
-| Dataset             | WMT newstest2014            |
-| batch_size          | 1                           |
-| outputs             | BLEU score                  |
-| Accuracy            | BLEU=28.7                   |
+| Parameters          | Ascend                      | GPU                         |
+| ------------------- | --------------------------- | ----------------------------|
+| Resource            | Ascend 910; OS Euler2.8     | GPU(Tesla V100 SXM2)        |
+| Uploaded Date       | 07/05/2021 (month/day/year) | 12/21/2021 (month/day/year) |
+| MindSpore Version   | 1.3.0                       | 1.5.0                       |
+| Dataset             | WMT newstest2014            | WMT newstest2014            |
+| batch_size          | 1                           | 1                           |
+| outputs             | BLEU score                  | BLEU score                  |
+| Accuracy            | BLEU=28.7                   | BLEU=29.1                   |
 
 ## [Description of Random Situation](#contents)
 

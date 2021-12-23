@@ -49,8 +49,8 @@ Transformer具体包括六个编码模块和六个解码模块。每个编码模
 
 ## 环境要求
 
-- 硬件（Ascend处理器）
-    - 使用Ascend处理器准备硬件环境。
+- 硬件（Ascend处理器/CPU处理器）
+    - 使用Ascend/GPu处理器准备硬件环境。
 - 框架
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - 如需查看详情，请参见如下资源：
@@ -61,15 +61,36 @@ Transformer具体包括六个编码模块和六个解码模块。每个编码模
 
 数据集准备完成后，请按照如下步骤开始训练和评估：
 
+Ascend环境下:
+
 ```bash
 # 运行训练示例
-bash scripts/run_standalone_train_ascend.sh Ascend 0 52 /path/ende-l128-mindrecord
+bash scripts/run_standalone_train.sh Ascend [DEVICE_ID] [EPOCH_SIZE] [GRADIENT_ACCUMULATE_STEP] [DATA_PATH]
+# EPOCH_SIZE 推荐52, GRADIENT_ACCUMULATE_STEP 推荐8或者1
 
 # 运行分布式训练示例
-bash scripts/run_distribute_train_ascend.sh 8 52 /path/ende-l128-mindrecord rank_table.json ./default_config.yaml
+bash scripts/run_distribute_train_ascend.sh [DEVICE_NUM] [EPOCH_SIZE] [DATA_PATH] [RANK_TABLE_FILE] [CONFIG_PATH]
+# EPOCH_SIZE 推荐52
 
 # 运行评估示例
-python eval.py > eval.log 2>&1 &
+bash scripts/run_eval.sh Ascend [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_PATH]
+# CONFIG_PATH要和训练时保持一致
+```
+
+GPU环境下:
+
+```bash
+# 运行训练示例
+bash scripts/run_standalone_train.sh GPU [DEVICE_ID] [EPOCH_SIZE] [GRADIENT_ACCUMULATE_STEP] [DATA_PATH]
+# EPOCH_SIZE 推荐52, GRADIENT_ACCUMULATE_STEP 推荐8或者1
+
+# 运行分布式训练示例
+bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [EPOCH_SIZE] [DATA_PATH] [CONFIG_PATH]
+# EPOCH_SIZE 推荐52
+
+# 运行评估示例
+bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_PATH]
+# CONFIG_PATH要和训练时保持一致
 ```
 
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
@@ -325,25 +346,28 @@ Parameters for learning rate:
 - 运行`run_standalone_train.sh`，进行Transformer模型的非分布式训练。
 
     ``` bash
-    bash scripts/run_standalone_train.sh DEVICE_TARGET DEVICE_ID EPOCH_SIZE GRADIENT_ACCUMULATE_STEP DATA_PATH
+    bash scripts/run_standalone_train.sh [DEVICE_TARGET] [DEVICE_ID] [EPOCH_SIZE] [GRADIENT_ACCUMULATE_STEP] [DATA_PATH]
     ```
 
 - 运行`run_distribute_train_ascend.sh`，进行Transformer模型的非分布式训练。
 
     ``` bash
-    bash scripts/run_distribute_train_ascend.sh DEVICE_NUM EPOCH_SIZE DATA_PATH RANK_TABLE_FILE CONFIG_PATH
+    # Ascend environment
+    bash scripts/run_distribute_train_ascend.sh [DEVICE_NUM] [EPOCH_SIZE] [DATA_PATH] [RANK_TABLE_FILE] [CONFIG_PATH]
+    # GPU environment
+    bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [EPOCH_SIZE] [DATA_PATH] [CONFIG_PATH]
     ```
 
 **注意**：由于网络输入中有不同句长的数据，所以数据下沉模式不可使用。
 
 ### 评估过程
 
-- 在`default_config.yaml`中设置选项。确保已设置了‘data_file'、'model_file’和'output_file'文件路径。
+- 在[CONFIG_PATH]中设置选项，此时的[CONFIG_PATH]要和训练时保持一致。确保已设置了'device_target', 'data_file'、'model_file'和'output_file'文件路径。
 
 - 运行`eval.py`，评估Transformer模型。
 
     ```bash
-    python eval.py
+    python eval.py --config_path=[CONFIG_PATH]
     ```
 
 - 运行`process_output.sh`，处理输出标记ids，获得真实翻译结果。
@@ -393,33 +417,33 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 
 #### 训练性能
 
-| 参数                | Ascend                                                    |
-| -------------------------- | -------------------------------------------------------------- |
-| 资源                  | Ascend 910；系统 Euler2.8                                                   |
-| 上传日期              | 2021-07-05                                    |
-| MindSpore版本          | 1.3.0                                                     |
-| 数据集                    | WMT英-德翻译数据集                                              |
-| 训练参数        | epoch=52, batch_size=96                                        |
-| 优化器                 | Adam                                                           |
-| 损失函数              | Softmax Cross Entropy                                          |
-| BLEU分数                 | 28.7                                                           |
-| 速度                      | 400毫秒/步(8卡)                                              |
-| 损失                       | 2.8                                                            |
-| 参数 (M)                 | 213.7                                                          |
-| 推理检查点   | 2.4G （.ckpt文件）                                              |
-| 脚本                    | <https://gitee.com/mindspore/models/tree/master/official/nlp/transformer> |
+| 参数                        | Ascend                           | GPU                             |
+| -------------------------- | -------------------------------- | --------------------------------|
+| 资源                        | Ascend 910；系统 Euler2.8         | GPU(Tesla V100 SXM2)            |
+| 上传日期                    | 2021-07-05                        | 2021-12-21                      |
+| MindSpore版本               | 1.3.0                            | 1.5.0                           |
+| 数据集                      | WMT英-德翻译数据集                  | WMT英-德翻译数据集                |
+| 训练参数                     | epoch=52, batch_size=96          | epoch=52, batch_size=96         |
+| 优化器                      | Adam                              | Adam                            |
+| 损失函数                     | Softmax Cross Entropy            | Softmax Cross Entropy           |
+| BLEU分数                    | 28.7                              | 29.1                           |
+| 速度                        | 400毫秒/步(8卡)                    | 337 ms/step(8卡)                |
+| 损失                        | 2.8                               | 2.9                            |
+| 参数 (M)                    | 213.7                             | 213.7                          |
+| 推理检查点                   | 2.4G （.ckpt文件）                 | 2.4G                            |
+| 脚本                        | <https://gitee.com/mindspore/models/tree/master/official/nlp/transformer> |
 
 #### 评估性能
 
-| 参数          | Ascend                   |
-| ------------------- | --------------------------- |
-|资源| Ascend 910；系统 Euler2.8  |
-| 上传日期       | 2021-07-05 |
-| MindSpore版本   | 1.3.0                  |
-| 数据集             | WMT newstest2014            |
-| batch_size          | 1                           |
-| 输出             | BLEU score                  |
-| 准确率            | BLEU=28.7                   |
+| 参数          | Ascend                   |                   GPU                 |
+| ------------------- | --------------------------- | ----------------------------|
+|资源| Ascend 910；系统 Euler2.8  |                GPU(Tesla V100 SXM2)         |
+| 上传日期       | 2021-07-05 |              2021-12-21                        |
+| MindSpore版本   | 1.3.0                  |        1.5.0                      |
+| 数据集             | WMT newstest2014            | WMT newstest2014            |
+| batch_size          | 1                           | 1                           |
+| 输出             | BLEU score                  | BLEU score                  |
+| 准确率            | BLEU=28.7                   | BLEU=29.1                   |
 
 ## 随机情况说明
 

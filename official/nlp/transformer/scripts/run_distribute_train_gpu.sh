@@ -16,7 +16,7 @@
 if [ $# != 4 ] ; then
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_distribute_train_gpu.sh DEVICE_NUM EPOCH_SIZE DATA_PATH CONFIG_PATH"
+echo "bash scripts/run_distribute_train_gpu.sh DEVICE_NUM EPOCH_SIZE DATA_PATH CONFIG_PATH"
 echo "for example: sh run_distribute_train_gpu.sh 8 55 /path/ende-l128-mindrecord00 ./default_config_large_gpu.yaml"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
