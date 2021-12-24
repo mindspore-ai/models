@@ -26,6 +26,7 @@ parser.add_argument("--batch_size", type=int, default=1, help="batch size")
 parser.add_argument("--ckpt_path", type=str, required=True, help="path of checkpoint file")
 parser.add_argument("--file_name", type=str, default="rcan", help="output file name.")
 parser.add_argument("--file_format", type=str, default="MINDIR", choices=['MINDIR', 'AIR', 'ONNX'], help="file format")
+parser.add_argument("--scale", type=str, default='4', help="super resolution scale")
 args_1 = parser.parse_args()
 
 
@@ -38,7 +39,7 @@ def run_export(args):
     load_param_into_net(net, param_dict)
     net.set_train(False)
     print('load mindspore net and checkpoint successfully.')
-    inputs = Tensor(np.zeros([args.batch_size, 3, 678, 1020], np.float32))
+    inputs = Tensor(np.zeros([args.batch_size, 3, 1020, 1020], np.float32))
     export(net, inputs, file_name=args.file_name, file_format=args.file_format)
     print('export successfully!')
 
