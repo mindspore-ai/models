@@ -561,6 +561,33 @@ Our result were obtained by running the applicable training script. To achieve t
 
 Note: There OS is output stride, and MS is multiscale.
 
+# Export MindIR
+
+```python
+python export.py --ckpt_path [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --model [MODEL] --freeze_bn [MODE]
+- The `ckpt_file` parameter is required
+- The `file_format` should be in ["AIR", "MINDIR"]
+- The `model` should be in ["deeplab_v3_s8", "deeplab_v3_s16"]
+- The `freeze_bn` should be in [True, False]
+```
+
+# Inference Process
+
+## Usage
+
+Before performing inference, the air file must be exported by `export.py`. Current batch_Size can only be set to 1. The precision calculation process needs about 70G+ memory space.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_ID]
+```
+
+DEVICE_ID is optional, default value is 0.
+
+## result
+
+Inference result is saved in current path, you can find result in acc.log file.
+
 # [Model Description](#contents)
 
 ## [Performance](#contents)

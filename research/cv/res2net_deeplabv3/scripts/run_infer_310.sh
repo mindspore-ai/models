@@ -75,12 +75,12 @@ function infer()
     fi
     mkdir result_Files
     mkdir time_Result
-    ../ascend310_infer/out/main --mindir_path=$model --dataset_path=$data_root --image_list=$data_list_path --device_id=$device_id --fusion_switch_path=../ascend310_infer/fusion_switch.cfg &> infer.log
+    ../ascend310_infer/out/main --mindir_path=$model --dataset_path=$data_root --image_list=$data_list_path --device_id=$device_id &> infer.log
 }
 
 function cal_acc()
 {
-    python ../postprocess.py --data_root=$data_root --data_lst=$data_list_path --scales=1.0 --result_path=./result_Files &> acc.log &
+    python ../postprocess.py --data_root=$data_root --data_lst=$data_list_path --scales_type=0 --result_path=./result_Files &> acc.log
 }
 
 compile_app
