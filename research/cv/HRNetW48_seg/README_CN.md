@@ -25,6 +25,11 @@
         - [导出MindIR](#导出mindir)
         - [在Ascend310执行推理](#在ascend310执行推理)
         - [结果](#结果)
+    - [MindX推理](#mindx推理)
+        - [导出AIR](#导出air)
+        - [导出OM](#导出om)
+        - [MxBase推理](#mxbase推理)
+        - [SDK推理](#sdk推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -188,7 +193,31 @@ bash scripts/run_eval.sh [DEVICE_ID] [DATASET_PATH] [CHECKPOINT_PATH]
 │   │       ├─ CMakeLists.txt
 │   │       ├─ main.cc
 │   │       └─ utils.cc
+│   ├─ infer                                # MindX推理相关脚本
+│   │   ├─ convert                          # om模型转换相关脚本
+│   │   │   ├─ convert.sh                   # om模型转换执行脚本
+│   │   │   └─ hrnetw48seg_aipp.cfg         # om模型转换配置信息
+│   │   ├─ data                             # 推理过程所需数据信息
+│   │   │   └─ config
+│   │   │       ├─ hrnetw48seg.cfg
+│   │   │       ├─ hrnetw48seg.names
+│   │   │       └─ hrnetw48seg.pipeline
+│   │   ├─ mxbase                           # MxBase推理相关脚本
+│   │   │   ├─ src
+│   │   │   │   ├─ hrnetw48seg.cpp
+│   │   │   │   ├─ hrnetw48seg.h
+│   │   │   │   └─ main.cpp
+│   │   │   ├─ build.sh                     # MxBase推理执行脚本
+│   │   │   └─ CMakeLists.txt
+│   │   ├─ sdk                              # SDK推理相关脚本
+│   │   │   ├─ cityscapes.py
+│   │   │   ├─ do_infer.sh                  # SDK推理执行脚本
+│   │   │   └─ main.py
+│   │   └─ docker_start.sh                  # 镜像启动
+│   ├─ modelarts                            # ModelArts训练相关脚本
+│   │   └─ start.py                         # ModelArts训练启动脚本
 │   ├─ scripts                              # Ascend执行脚本
+│   │   ├─ docker_start.sh                  # MindX推理及MxBase推理docker启动
 │   │   ├─ ascend310_inference.sh           # 启动Ascend310推理（单卡）
 │   │   ├─ run_standalone_train.sh          # 启动Ascend910单机训练（单卡）
 │   │   ├─ run_distribute_train.sh          # 启动Ascend910分布式训练（8卡）
@@ -281,7 +310,7 @@ bash scripts/run_eval.sh [DEVICE_ID] [DATASET_PATH] [CHECKPOINT_PATH]
 
 2. 自行训练
 
-   HRNet分类任务已经实现了MindSpore版本，并提供可达到目标精度的超参，可自行训练获取预训练模型。详情请参考：[HRNet图像分类-MindSpore实现]() 。
+   HRNet分类任务已经实现了MindSpore版本，并提供可达到目标精度的超参，可自行训练获取预训练模型。详情请参考：[HRNet图像分类-MindSpore实现](https://git.openi.org.cn/OpenModelZoo/HRNet-cls) 。
 
 ### 用法
 
@@ -394,6 +423,53 @@ iou array:
  0.80365232]
 ============================================
 ```
+
+## MindX推理
+
+### 导出AIR
+
+```bash
+python export.py --device_id [DEVICE_ID] --checkpoint_file [CKPT_PATH] --file_name [FILE_NAME] --file_format AIR --device_target Ascend --dataset [DATASET]
+```
+
+### 导出OM
+
+```bash
+cd ./infer/convert/
+bash convert.sh [AIR_MODEL_PATH] [AIPP_CONFIG_PATH] [OM_MODEL_NAME]
+
+# Example
+bash convert.sh ./hrnetw48seg.air ./hrnetw48seg_aipp.cfg ../data/model/hrnetw48seg
+```
+
+其中， `[OM_MODEL_NAME]` 为om模型输出路径，默认路径为 `../data/model/hrnetw48seg` 。用户亦可自定义，但需要在 `./infer/data/config/hrnetw48seg.pipeline` 和 `./infer/mxbase/src/main.cpp` 脚本中进行文件名统一。
+
+### MxBase推理
+
+```bash
+# 执行MxBase推理
+cd ./infer/mxbase/
+bash build.sh
+build/hrnetw48seg [TEST_IMAGE_PATH]
+
+# Example
+build/hrnetw48seg ./test.png
+```
+
+推理结果为输入图片的语义分割效果图，输出位置与输入图片相同，命名以 `_infer` 结尾。
+
+### SDK推理
+
+```bash
+# 执行SDK推理
+cd ./infer/sdk/
+bash do_infer.sh [DATA_PATH] [DATA_LST_PATH]
+
+# Example
+bash do_infer.sh ../data/input/cityscapes ../data/input/cityscapes/val.lst
+```
+
+推理得到测试集全部图片的语义分割效果图，结果存储于 `./inferResults/` 目录。精度结果在推理结束后打印在执行窗口，与910推理的精度差异可控制在0.5%以内。
 
 # 模型描述
 
