@@ -1,0 +1,5 @@
+easydict~=1.9
+imageio~=2.9.0
+opencv_python~=4.5.1.48
+Pillow~=8.4.0
+scikit_image~=0.18.1
