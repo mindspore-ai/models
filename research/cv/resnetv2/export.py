@@ -21,9 +21,9 @@ from mindspore import Tensor, load_checkpoint, load_param_into_net, export, cont
 parser = argparse.ArgumentParser(description='resnet export')
 parser.add_argument('--net', type=str, default='resnetv2_50',
                     help='Resnetv2 Model, resnetv2_50, resnetv2_101, resnetv2_152')
-parser.add_argument('--dataset', type=str, default='cifar10', help='Dataset, cifar10, cifar100, imagenet2012')
+parser.add_argument('--dataset', type=str, default='cifar10', help='Dataset, cifar10, cifar100')
 parser.add_argument("--device_id", type=int, default=0, help="Device id")
-parser.add_argument("--batch_size", type=int, default=64, help="batch size")
+parser.add_argument("--batch_size", type=int, default=32, help="batch size")
 parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
 parser.add_argument("--file_name", type=str, default="resnetv2", help="output file name.")
 parser.add_argument('--width', type=int, default=32, help='input width')
@@ -54,8 +54,6 @@ if __name__ == '__main__':
             from src.config import config1 as config
         elif args.dataset == 'cifar100':
             from src.config import config2 as config
-        elif args.dataset == 'imagenet2012':
-            raise ValueError("ImageNet2012 dataset not yet supported")
         else:
             raise ValueError("dataset is not support.")
     else:

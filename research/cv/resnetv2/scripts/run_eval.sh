@@ -19,9 +19,9 @@ then
   exit 1
 fi
 
-if [ $2 != "cifar10" ] && [ $2 != "imagenet2012" ]
+if [ $2 != "cifar10" ] && [ $2 != "cifar100" ]
 then 
-    echo "error: the selected dataset is neither cifar10 nor imagenet2012"
+    echo "error: the selected dataset is neither cifar10 nor cifar100"
     exit 1
 fi
 

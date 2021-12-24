@@ -5,7 +5,7 @@
 
 ResNet系列模型是在2015年提出的，该网络创新性的提出了残差结构，通过堆叠多个残差结构从而构建了ResNet网络。ResNet一定程度上解决了传统的卷积网络或全连接网络或多或少存在信息丢失的问题。通过将输入信息传递给输出，确保信息完整性，使得网络深度得以不断加深的同时避免了梯度消失或爆炸的影响。ResNetv2是何凯明团队在ResNet发表后，又进一步对其网络结构进行了改进和优化，通过推导证明了前向参数和反向梯度如果直接从Residual Block传递到下一个Residual Block而不用经过ReLU等操作，效果会更好。因此调整了激活层和BN层与卷积层的运算先后顺序，并经过实验验证在深度网络中ResNetv2会有更好的收敛效果。
 
-如下为MindSpore使用Cifar10/ImageNet2012数据集对ResNetv2_50/ResNetv2_101/ResNetv2_152进行训练的示例。
+如下为MindSpore使用Cifar10/Cifar100数据集对ResNetv2_50/ResNetv2_101/ResNetv2_152进行训练的示例。
 
 ## 论文
 
@@ -17,7 +17,7 @@ ResNet系列模型是在2015年提出的，该网络创新性的提出了残差�
 
 # 数据集
 
-使用的数据集：[Cifar10](https://www.cs.toronto.edu/~kriz/cifar.html)
+使用的数据集：[cifar10|cifar100](https://www.cs.toronto.edu/~kriz/cifar.html)
 
 - 数据集大小：共10个类、60,000个32*32彩色图像
     - 训练集：50,000个图像
@@ -30,21 +30,6 @@ ResNet系列模型是在2015年提出的，该网络创新性的提出了残差�
 ├─cifar-10-batches-bin
 │
 └─cifar-10-verify-bin
-```
-
-使用的数据集：[ImageNet2012](http://www.image-net.org/)
-
-- 数据集大小：共1000个类、224*224彩色图像
-    - 训练集：共1,281,167张图像
-    - 测试集：共50,000张图像
-- 数据格式：JPEG
-    - 注：数据在dataset.py中处理。
-- 下载数据集，目录结构如下：
-
-```text
-└─dataset
-   ├─ilsvrc                # 训练数据集
-   └─validation_preprocess # 评估数据集
 ```
 
 # 环境要求
@@ -66,15 +51,15 @@ ResNet系列模型是在2015年提出的，该网络创新性的提出了残差�
 ```Shell
 # 分布式训练
 用法：
-bash scripts/run_distribute_train.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagenet2012] [RANK_TABLE_FILE] [DATASET_PATH]
+bash scripts/run_distribute_train.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|cifar100] [RANK_TABLE_FILE] [DATASET_PATH]
 
 # 单机训练
 用法：
-bash scripts/run_standalone_train.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagenet2012] [DATASET_PATH]
+bash scripts/run_standalone_train.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|cifar100] [DATASET_PATH]
 
 # 运行评估示例
 用法：
-bash scripts/run_eval.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
+bash scripts/run_eval.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|cifar100] [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 - GPU处理器环境运行
@@ -82,15 +67,15 @@ bash scripts/run_eval.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagen
 ```shell
 # 分布式训练
 用法：
-bash scripts/run_distribute_train_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagenet2012] [RANK_TABLE_FILE] [DATASET_PATH]
+bash scripts/run_distribute_train_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|cifar100] [RANK_TABLE_FILE] [DATASET_PATH]
 
 # 单机训练
 用法：
-bash scripts/run_standalone_train_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagenet2012] [DATASET_PATH]
+bash scripts/run_standalone_train_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|cifar100] [DATASET_PATH]
 
 # 运行评估示例
 用法：
-bash scripts/run_eval_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
+bash scripts/run_eval_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|cifar100] [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 # 脚本说明
@@ -110,7 +95,6 @@ bash scripts/run_eval_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|im
   ├── src
     ├── config.py                          # 参数配置
     ├── dataset.py                         # 数据预处理
-    ├── CrossEntropySmooth.py              # ImageNet2012数据集的损失定义
     ├── lr_generator.py                    # 生成每个步骤的学习率
     └── resnetv2.py                        # ResNet骨干网络
   ├── eval.py                              # 评估网络
@@ -143,29 +127,6 @@ bash scripts/run_eval_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|im
 "lr_max":0.1,                           # 最大学习率
 ```
 
-- 配置ResNetv2_50和imagenet2012数据集。
-
-```python
-"class_num":1001,                       # 数据集类数
-"batch_size":64,                        # 输入张量的批次大小
-"loss_scale":1024,                      # 损失等级
-"momentum":0.9,                         # 动量优化器
-"weight_decay":1e-4,                    # 权重衰减
-"epoch_size":100,                       # 训练周期大小
-"save_checkpoint":True,                 # 是否保存检查点
-"save_checkpoint_epochs":5,             # 两个检查点之间的周期间隔；默认情况下，最后一个检查点将在最后一个周期完成后保存
-"keep_checkpoint_max":10,               # 只保存最后一个keep_checkpoint_max检查点
-"save_checkpoint_path":"./checkpoint",  # 检查点相对于执行路径的保存路径
-"low_memory": True,                     # 显存不足时可设置为Ture，默认为False
-"warmup_epochs":5,                      # 热身周期数
-"use_label_smooth":True,                # 标签平滑
-"label_smooth_factor":0.1,              # 标签平滑因子
-"lr_decay_mode":"cosine",               # 用于生成学习率的衰减模式
-"lr_init":0.05,                         # 基础学习率
-"lr_end":0.0000001,                     # 最终学习率
-"lr_max":0.05,                          # 最大学习率
-```
-
 # 训练过程
 
 ## 用法
@@ -175,11 +136,11 @@ bash scripts/run_eval_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|im
 ```Shell
 # 分布式训练
 用法：
-bash scripts/run_distribute_train.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagenet2012] [RANK_TABLE_FILE] [DATASET_PATH]
+bash scripts/run_distribute_train.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|cifar100] [RANK_TABLE_FILE] [DATASET_PATH]
 
 # 单机训练
 用法：
-bash scripts/run_standalone_train.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagenet2012] [DATASET_PATH]
+bash scripts/run_standalone_train.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|cifar100] [DATASET_PATH]
 ```
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
@@ -191,11 +152,11 @@ bash scripts/run_standalone_train.sh [resnetv2_50|resnetv2_101|resnetv2_152] [ci
 ```shell
 # 分布式训练
 用法：
-bash scripts/run_distribute_train_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagenet2012] [RANK_TABLE_FILE] [DATASET_PATH]
+bash scripts/run_distribute_train_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|cifar100] [RANK_TABLE_FILE] [DATASET_PATH]
 
 # 单机训练
 用法：
-bash scripts/run_standalone_train_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagenet2012] [DATASET_PATH]
+bash scripts/run_standalone_train_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|cifar100] [DATASET_PATH]
 ```
 
 ## 结果
@@ -213,19 +174,6 @@ epoch time: 4737.401 ms, per step time: 24.166 ms
 ...
 ```
 
-- 使用imagenet2012数据集训练ResNetv2_50
-
-```text
-# Ascend分布式训练结果 (8P)
-epoch: 61 step: 2502, loss is 2.4235027
-epoch time: 813367.327 ms, per step time: 325.087 ms
-epoch: 62 step: 2502, loss is 2.0396166
-epoch time: 813387.109 ms, per step time: 325.095 ms
-epoch: 63 step: 2502, loss is 1.7643375
-epoch time: 813347.102 ms, per step time: 325.075 ms
-...
-```
-
 # 评估过程
 
 ## 用法
@@ -235,7 +183,7 @@ epoch time: 813347.102 ms, per step time: 325.075 ms
 ```Shell
 # 评估
 用法：
-bash scripts/run_eval.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
+bash scripts/run_eval.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|cifar100] [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 ### GPU处理器环境运行
@@ -243,7 +191,7 @@ bash scripts/run_eval.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagen
 ```shell
 # 运行评估示例
 用法：
-bash scripts/run_eval_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]
+bash scripts/run_eval_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|cifar100] [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 ## 结果
@@ -256,18 +204,12 @@ bash scripts/run_eval_gpu.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|im
 result: {'top_5_accuracy': 0.9988982371794872, 'top_1_accuracy': 0.9502283653846154}
 ```
 
-- 使用imagenet2012数据集评估ResNetv2_50
-
-```text
-result: {'top_1_accuracy': 0.7606515786082474, 'top_5_accuracy': 0.9271504510309279}
-```
-
 ## 推理过程
 
 ### [导出MindIR](#contents)
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --dataset [cifar10|cifar100]
 ```
 
 参数ckpt_file为必填项，
@@ -314,25 +256,6 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [DEVICE_ID]
 |总时长   | 10分钟 |
 |  微调检查点 | 188.36M（.ckpt文件） |
 | 脚本  | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/resnetv2) |
-
-#### ImageNet2012上的Resnetv2_50
-
-| 参数          | Ascend 910                                                   |
-| ------------- | ------------------------------------------------------------ |
-| 模型版本      | ResNetv2_50                                                  |
-| 资源          | Ascend 910；CPU：2.60GHz，192核；内存：755G                  |
-| 上传日期      | 2021-05-6 ;                                                  |
-| MindSpore版本 | 1.2.0                                                        |
-| 数据集        | ImageNet2012                                                 |
-| 训练参数      | epoch=90, steps per epoch=2502, batch_size=64                |
-| 优化器        | Momentum                                                     |
-| 损失函数      | Softmax交叉熵                                                |
-| 输出          | 概率                                                         |
-| 损失          | 1.8290355                                                    |
-| 速度          | 325毫秒/步（8卡）                                            |
-| 总时长        | 20.3小时                                                     |
-| 微调检查点    | 195.9M（.ckpt文件）                                          |
-| 脚本          | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/resnetv2) |
 
 # 随机情况说明
 

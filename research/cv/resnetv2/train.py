@@ -27,14 +27,13 @@ from mindspore.common.tensor import Tensor
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 
 from src.lr_generator import get_lr
-from src.CrossEntropySmooth import CrossEntropySmooth
 
 
 parser = argparse.ArgumentParser(description='Image classification.')
 parser.add_argument('--net', type=str, default='resnetv2_50',
                     help='Resnetv2 Model, resnetv2_50, resnetv2_101, resnetv2_152')
 parser.add_argument('--dataset', type=str, default='cifar10',
-                    help='Dataset, cifar10, imagenet2012')
+                    help='Dataset, cifar10, cifar100')
 parser.add_argument('--device_target', type=str, default="Ascend", choices=['Ascend', 'GPU'],
                     help='device where the code will be implemented (default: Ascend)')
 parser.add_argument('--device_num', type=int, default=1, help='Device num.')
@@ -57,8 +56,6 @@ if args_opt.dataset == "cifar10":
     from src.dataset import create_dataset1 as create_dataset
 elif args_opt.dataset == "cifar100":
     from src.dataset import create_dataset2 as create_dataset
-elif args_opt.dataset == 'imagenet2012':
-    from src.dataset import create_dataset3 as create_dataset
 
 # import config
 if args_opt.net == "resnetv2_50" or args_opt.net == "resnetv2_101" or args_opt.net == "resnetv2_152":
@@ -66,8 +63,6 @@ if args_opt.net == "resnetv2_50" or args_opt.net == "resnetv2_101" or args_opt.n
         from src.config import config1 as config
     elif args_opt.dataset == 'cifar100':
         from src.config import config2 as config
-    elif args_opt.dataset == 'imagenet2012':
-        from src.config import config3 as config
 
 set_seed(1)
 
@@ -117,13 +112,7 @@ if __name__ == '__main__':
     lr = Tensor(lr)
 
     # define loss, opt, model
-    if args_opt.dataset == "imagenet2012":
-        if not config.use_label_smooth:
-            config.label_smooth_factor = 0.0
-        loss = CrossEntropySmooth(sparse=True, reduction="mean",
-                                  smooth_factor=config.label_smooth_factor, num_classes=config.class_num)
-    else:
-        loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+    loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
     loss_scale = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
     opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), lr, config.momentum,
                    config.weight_decay, config.loss_scale)
