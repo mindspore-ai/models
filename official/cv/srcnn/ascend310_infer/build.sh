@@ -13,31 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
-if [ $# -lt 3 ]
-then
-    echo "Usage: bash run_eval_gpu.sh [DEVICE_ID] [DATASET_PATH] [CHECKPOINT_PATH]"
-exit 1
+if [ -d out ]; then
+    rm -rf out
 fi
 
-# check checkpoint file
-if [ ! -f $3 ]
-then
-    echo "error: CHECKPOINT_PATH=$3 is not a file"    
-exit 1
+
+if [ -f "Makefile" ]; then
+  make clean
 fi
 
-BASEPATH=$(cd "`dirname $0`" || exit; pwd)
-export PYTHONPATH=${BASEPATH}:$PYTHONPATH
-
-if [ -d "./eval" ];
-then
-    rm -rf ./eval
-fi
-mkdir ./eval
-
-export CUDA_VISIBLE_DEVICES="$1"
-
-python ${BASEPATH}/../eval.py \
-        --data_path=$2 \
-        --checkpoint_path=$3 > eval/eval.log 2>&1 &
+mkdir out
+cd out
+cmake .. -DMINDSPORE_PATH="`pip show mindspore-ascend | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
+make
