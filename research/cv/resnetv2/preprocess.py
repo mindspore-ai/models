@@ -18,7 +18,7 @@ import argparse
 import numpy as np
 
 parser = argparse.ArgumentParser(description='preprocess')
-parser.add_argument('--dataset', type=str, default='cifar10', help='Dataset, cifar10, imagenet2012')
+parser.add_argument('--dataset', type=str, default='cifar10', help='Dataset, cifar10')
 parser.add_argument('--dataset_path', type=str, default="../cifar-10/cifar-10-verify-bin",
                     help='Dataset path.')
 parser.add_argument('--output_path', type=str, default="./preprocess_Result",

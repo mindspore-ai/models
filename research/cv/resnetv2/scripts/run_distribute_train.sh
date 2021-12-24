@@ -16,7 +16,7 @@
 
 if [ $# != 4 ]
 then
-  echo "Usage: bash run_distribute_train.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|imagenet2012] [RANK_TABLE_FILE] [DATASET_PATH]"
+  echo "Usage: bash run_distribute_train.sh [resnetv2_50|resnetv2_101|resnetv2_152] [cifar10|cifar100] [RANK_TABLE_FILE] [DATASET_PATH]"
   exit 1
 fi
 
@@ -26,9 +26,9 @@ then
   exit 1
 fi
 
-if [ $2 != "cifar10" ] && [ $2 != "imagenet2012" ]
+if [ $2 != "cifar10" ] && [ $2 != "cifar100" ]
 then 
-    echo "error: the selected dataset is neither cifar10 nor imagenet2012"
+    echo "error: the selected dataset is neither cifar10 nor cifar100"
     exit 1
 fi
 

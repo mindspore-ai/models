@@ -20,12 +20,11 @@ from mindspore.common import set_seed
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from src.CrossEntropySmooth import CrossEntropySmooth
 
 parser = argparse.ArgumentParser(description='Image classification')
 parser.add_argument('--net', type=str, default='resnetv2_50',
                     help='Resnetv2 Model, resnetv2_50, resnetv2_101, resnetv2_152')
-parser.add_argument('--dataset', type=str, default='cifar10', help='Dataset, cifar10, imagenet2012')
+parser.add_argument('--dataset', type=str, default='cifar10', help='Dataset, cifar10, cifar100')
 parser.add_argument('--device_target', type=str, default="Ascend", choices=['Ascend', 'GPU'],
                     help='device where the code will be implemented (default: Ascend)')
 parser.add_argument('--device_num', type=int, default=1, help='Device num.')
@@ -48,8 +47,6 @@ if args_opt.dataset == "cifar10":
     from src.dataset import create_dataset1 as create_dataset
 elif args_opt.dataset == "cifar100":
     from src.dataset import create_dataset2 as create_dataset
-elif args_opt.dataset == 'imagenet2012':
-    from src.dataset import create_dataset3 as create_dataset
 
 # import config
 if args_opt.net == "resnetv2_50" or args_opt.net == "resnetv2_101" or args_opt.net == "resnetv2_152":
@@ -57,8 +54,6 @@ if args_opt.net == "resnetv2_50" or args_opt.net == "resnetv2_101" or args_opt.n
         from src.config import config1 as config
     elif args_opt.dataset == 'cifar100':
         from src.config import config2 as config
-    elif args_opt.dataset == 'imagenet2012':
-        from src.config import config3 as config
 
 set_seed(1)
 
@@ -89,13 +84,7 @@ if __name__ == '__main__':
     net.set_train(False)
 
     # define loss, model
-    if args_opt.dataset == "imagenet2012":
-        if not config.use_label_smooth:
-            config.label_smooth_factor = 0.0
-        loss = CrossEntropySmooth(sparse=True, reduction='mean',
-                                  smooth_factor=config.label_smooth_factor, num_classes=config.class_num)
-    else:
-        loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+    loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
 
     # define model
     model = Model(net, loss_fn=loss, metrics={'top_1_accuracy', 'top_5_accuracy'})

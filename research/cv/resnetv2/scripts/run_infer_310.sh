@@ -28,10 +28,10 @@ get_real_path(){
     fi
 }
 model=$(get_real_path $1)
-if [ ${2,,} == 'cifar10' ] || [ ${2,,} == 'cifar100' ] || [ ${2,,} == 'imagenet2012' ]; then
+if [ ${2,,} == 'cifar10' ] || [ ${2,,} == 'cifar100' ]; then
   dataset=$2
 else
-  echo "dataset must choose from [cifar10, cifar100, imagenet2012]"
+  echo "dataset must choose from [cifar10, cifar100]"
   exit 1
 fi
 
@@ -95,9 +95,6 @@ function cal_acc()
 {
     if [ "${dataset}" == "cifar10" ] || [ "${dataset}" == "cifar100" ]; then
         python ../postprocess.py --dataset=$dataset --label_path=./preprocess_Result/label.npy --result_path=result_Files &> acc.log
-    else
-        python ../create_imagenet2012_label.py  --img_path=$data_path
-        python ../postprocess.py --dataset=$dataset --result_path=./result_Files --label_path=./imagenet_label.json  &> acc.log
     fi
 }
 

@@ -56,26 +56,3 @@ config2 = ed({
     "lr_end": 0.0000000005,
     "lr_max": 0.1,
 })
-
-# config for ResNetv2, imagenet2012
-config3 = ed({
-    "class_num": 1001,
-    "batch_size": 64,
-    "loss_scale": 1024,
-    "momentum": 0.9,
-    "weight_decay": 1e-4,
-    "epoch_size": 90,
-    "pretrain_epoch_size": 0,
-    "save_checkpoint": True,
-    "save_checkpoint_epochs": 5,
-    "keep_checkpoint_max": 10,
-    "save_checkpoint_path": "./checkpoint",
-    "low_memory": True,
-    "warmup_epochs": 0,
-    "use_label_smooth": True,
-    "label_smooth_factor": 0.1,
-    "lr_decay_mode": "cosine",
-    "lr_init": 0.05,
-    "lr_end": 0.0000001,
-    "lr_max": 0.05,
-})

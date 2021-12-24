@@ -52,7 +52,7 @@ using mindspore::dataset::Execute;
 
 DEFINE_string(mindir_path, "", "mindir path");
 DEFINE_string(dataset_path, ".", "dataset path");
-DEFINE_string(dataset, "imagenet2012", "dataset");
+DEFINE_string(dataset, "cifar10", "dataset");
 DEFINE_int32(device_id, 0, "device id");
 
 int main(int argc, char **argv) {
@@ -102,9 +102,6 @@ int main(int argc, char **argv) {
         std::cout << "Start predict input files:" << all_files[i] <<std::endl;
 
         MSTensor image = ReadFileToTensor(all_files[i]);
-        if (FLAGS_dataset == "imagenet2012") {
-            SingleOp(image, &image);
-        }
 
         inputs.emplace_back(modelInputs[0].Name(), modelInputs[0].DataType(), modelInputs[0].Shape(),
                             image.Data().get(), image.DataSize());
