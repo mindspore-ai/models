@@ -84,15 +84,16 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
 
   ```python
   # 单卡训练
-  bash ./scripts/run_standalone_train.sh 0
+  cd scripts/
+  bash run_standalone_train.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10|imagenet]
 
   # 分布式训练
-  bash ./scripts/run_distribute_train.sh /{path}/*.json
+  cd scripts/
+  bash run_distribute_train.sh [RANK_TABLE_FILE] [cifar10|imagenet] [TRAIN_DATA_DIR]
 
   # 评估
-  python eval.py > eval.log 2>&1 &
-  OR
-  bash ./script/run_eval.sh
+  cd scripts/
+  bash run_train.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
   ```
 
   进行并行训练时, 需要提前创建JSON格式的hccl配置文件 [RANK_TABLE_FILE]。
@@ -108,9 +109,9 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
   python train.py  \
   --config_path=./config/imagenet_config_gpu.yaml \
   --dataset_name=imagenet --train_data_dir=../dataset/imagenet_original/train --device_target=GPU
-  OR
-  cd scripts
-  bash run_distribute_train_gpu.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10 | imagenet]
+  # OR
+  cd scripts/
+  bash run_standalone_train_gpu.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10|imagenet]
 
   # GPU多卡训练示例
   export RANK_SIZE=8
@@ -120,14 +121,15 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
   --dataset_name=imagenet \
   --train_data_dir=../dataset/imagenet_original/train \
   --device_target=GPU
-  OR
-  bash scripts/run_distribute_train_gpu.sh [RANK_SIZE] [TRAIN_DATA_DIR] [cifar10 | imagenet]
+  # OR
+  cd scripts/
+  bash run_distribute_train_gpu.sh [RANK_SIZE] [TRAIN_DATA_DIR] [cifar10|imagenet]
 
   # GPU评估示例
   python eval.py -device_target=GPU --val_data_dir=../dataset/imagenet_original/val --dataset_name=imagenet --config_path=./config/imagenet_config_gpu.yaml \
   --checkpoint_path=$PATH2
-  OR
-  bash scripts/run_train_gpu.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
+  # OR
+  bash run_eval_gpu.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
   ```
 
 - 在ModelArts上运行
@@ -272,7 +274,8 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
 - 在Ascend资源上运行：
 
   ```python
-  bash ./scripts/run_standalone_train.sh [DEVICE_ID]
+  cd scripts/
+  bash run_standalone_train.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10|imagenet]
   ```
 
   上述的命令将运行在后台中，可以通过 `train.log` 文件查看运行结果.
@@ -297,7 +300,7 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
 - 在GPU资源上运行：
 
   ```python
-  cd scripts
+  cd scripts/
   bash run_standalone_train_gpu.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10|imagenet]
   ```
 
@@ -320,7 +323,8 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
 - 在CPU资源上运行：
 
   ```python
-  bash scripts/run_train_cpu.sh [TRAIN_DATA_DIR] [cifar10|imagenet]
+  cd scripts/
+  bash run_train_cpu.sh [TRAIN_DATA_DIR] [cifar10|imagenet]
   ```
 
 ### [分布式训练](#目录)
@@ -328,7 +332,8 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
 - 在Ascend资源上运行：
 
   ```python
-  bash scripts/run_distribute_train.sh [RANK_TABLE_FILE]
+  cd scripts/
+  bash run_distribute_train.sh [RANK_TABLE_FILE] [cifar10|imagenet] [TRAIN_DATA_DIR]
   ```
 
   上述的脚本命令将在后台中进行分布式训练，可以通过`distribute_train/nohup.out`文件查看运行结果. 训练的损失值将以如下的形式展示:
@@ -347,7 +352,8 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
 - 在GPU资源上运行：
 
   ```python
-  bash scripts/run_distribute_train_gpu.sh [RANK_SIZE] [TRAIN_DATA_DIR] [cifar10|imagenet]
+  cd scripts/
+  bash run_standalone_train_gpu.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10|imagenet]
   ```
 
   上述的脚本命令将在后台中进行分布式训练，可以通过`distribute_train_gpu/nohup.out`文件查看运行结果. 训练的损失值将以如下的形式展示:
@@ -372,9 +378,9 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
   在运行如下命令前,请确认用于评估的checkpoint文件的路径.checkpoint文件须包含在tinydarknet文件夹内.请将checkpoint路径设置为相对于 eval.py文件 的路径,例如:"./ckpts/train_tinydarknet.ckpt"(ckpts 与 eval.py 同级).
 
   ```python
-  python eval.py > eval.log 2>&1 &  
-  OR
-  bash scripts/run_eval.sh
+  python eval.py  --val_data_dir=VAL_DATA_PATH --dataset_name=cifar10|imagenet --config_path=CONFIG_FILE --checkpoint_path=CHECKPOINT_PATH
+  # OR
+  bash run_eval.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
   ```
 
   上述的python命令将运行在后台中，可以通过"eval.log"文件查看结果. 测试数据集的准确率将如下面所列:
@@ -396,7 +402,7 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
   在运行如下命令前,请确认用于评估的checkpoint文件的路径.checkpoint文件须包含在tinydarknet文件夹内.请将checkpoint路径设置为相对于 eval.py文件 的路径,例如:"./ckpts/train_tinydarknet.ckpt"(ckpts 与 eval.py 同级).
 
   ```python
-  bash scripts/run_train_gpu.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
+  bash run_eval_gpu.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
   ```
 
   上述的python命令将运行在后台中，可以通过"eval.log"文件查看结果. 测试数据集的准确率将如下面所列:
@@ -418,7 +424,7 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
   在运行如下命令前,请确认用于评估的checkpoint文件的路径.checkpoint文件须包含在tinydarknet文件夹内.请将checkpoint路径设置为相对于 eval.py文件 的路径,例如:"./ckpts/train_tinydarknet.ckpt"(ckpts 与 eval.py 同级).
 
   ```python
-  bash scripts/run_eval_cpu.sh [VAL_DATA_DIR] [imagenet|cifar10] [CHECKPOINT_PATH]
+  bash run_eval_cpu.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
   ```
 
   可以通过"eval.log"文件查看结果. 测试数据集的准确率将如下面所列:
@@ -435,7 +441,7 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
 - 在本地导出
 
 ```shell
-python export.py --dataset [DATASET] --file_name [FILE_NAME] --file_format [EXPORT_FORMAT]
+python export.py --dataset_name [DATASET] --file_name [FILE_NAME] --file_format [EXPORT_FORMAT]
 ```
 
 - 在ModelArts上导出
@@ -496,34 +502,34 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_PATH] [DVPP] [DEVICE_ID]
 
 #### Tinydarknet on ImageNet 2012
 
-| 参数                       | Ascend                                                      | GPU                                                 |
-| -------------------------- | ------------------------------------------------------------| ----------------------------------------------------|
-| 模型版本                   | V1                                                          | V1                                                  |
-| 资源                       | Ascend 910；CPU 2.60GHz，56cores；内存 314G；系统 Euler2.8  | PCIE V100-32G                                       |
-| 上传日期                   | 2020/12/22                                                  | 2021/07/15                                          |
-| MindSpore版本              | 1.1.0                                                       | 1.3.0                                               |
-| 数据集                     | 1200k张图片                                                 | 1200k张图片                                         |
-| 训练参数                   | epoch=500, steps=1251, batch_size=128, lr=0.1               | epoch=500, steps=1251, batch_size = 128, lr=0.005   |
-| 优化器                     | Momentum                                                    | Momentum                                            |
-| 损失函数                   | Softmax Cross Entropy                                       | Softmax Cross Entropy                               |
-| 速度                       | 8卡: 104 ms/step                                            | 8卡: 255 ms/step                                    |
-| 总时间                     | 8卡: 17.8小时                                               | 8卡: 46.9小时                                       |
-| 参数(M)                    | 4.0;                                                        | 4.0;                                              |
+| 参数                       | Ascend                                                      | GPU                                                 |                       CPU                        |
+| -------------------------- | ------------------------------------------------------------| ----------------------------------------------------|------------------------------------------------|
+| 模型版本                   | V1                                                          | V1                                                  |                       V1                      |
+| 资源                       | Ascend 910；CPU 2.60GHz，56cores；内存 314G；系统 Euler2.8  | PCIE V100-32G                                       |                     CPU 72cores, 内存 503G               |
+| 上传日期                   | 2020/12/22                                                  | 2021/07/15                                          |                        2021/12/22                   |
+| MindSpore版本              | 1.1.0                                                       | 1.3.0                                               |                        1.5.0                 |
+| 数据集                     | 1200k张图片                                                 | 1200k张图片                                         |                       1200k图片                        |
+| 训练参数                   | epoch=500, steps=1251, batch_size=128, lr=0.1               | epoch=500, steps=1251, batch_size = 128, lr=0.005   |            epoch=500, steps=10009, batch_size=128, lr=0.1                |
+| 优化器                     | Momentum                                                    | Momentum                                            |                      Momentum                   |
+| 损失函数                   | Softmax Cross Entropy                                       | Softmax Cross Entropy                               |                   Softmax Cross Entropy                  |
+| 速度                       | 8卡: 104 ms/step                                            | 8卡: 255 ms/step                                    |                          单卡：11081 ms/step                     |
+| 总时间                     | 8卡: 17.8小时                                               | 8卡: 46.9小时                                       |                             > 200小时                    |
+| 参数(M)                    | 4.0;                                                        | 4.0;                                              |                             4.0;                       |
 | 脚本                       | [Tiny-Darknet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/tinydarknet)
 
 ### [评估性能](#目录)
 
-| 参数                | Ascend                            | GPU                               |
-| ------------------- | ----------------------------------| ----------------------------------|
-| 模型版本            | V1                                | V1                                |
-| 资源                |  Ascend 910；系统 Euler2.8        | NV SMX2 V100-32G                  |
-| 上传日期            | 2020/12/22                        | 2021/7/15                         |
-| MindSpore版本       | 1.1.0                             | 1.3.0                             |
-| 数据集              | 200k张图片                        | 200k张图片                        |
-| batch_size          | 128                               | 128                               |
-| 输出                | 分类概率                          | 分类概率                          |
-| 准确率              | 8卡 Top-1: 58.7%; Top-5: 81.7%    | 8卡 Top-1: 58.9%; Top-5: 81.7%    |
-| 推理模型            | 11.6M (.ckpt文件)                 | 10.06M (.ckpt文件)                |
+| 参数                | Ascend                            | GPU                               |                  CPU            |
+| ------------------- | ----------------------------------| ----------------------------------|--------------------------------|
+| 模型版本            | V1                                | V1                                |                                  |
+| 资源                |  Ascend 910；系统 Euler2.8        | NV SMX2 V100-32G                  |       CPU 72cores, 内存 503G      |
+| 上传日期            | 2020/12/22                        | 2021/7/15                         |             2020/12/22           |
+| MindSpore版本       | 1.1.0                             | 1.3.0                             |             1.5.0               |
+| 数据集              | 200k张图片                        | 200k张图片                        |              200k张图片             |
+| batch_size          | 128                               | 128                               |            128                  |
+| 输出                | 分类概率                          | 分类概率                          |               分类概率              |
+| 准确率              | 8卡 Top-1: 58.7%; Top-5: 81.7%    | 8卡 Top-1: 58.9%; Top-5: 81.7%    |   单卡　Top-1: 58.7%; Top-5:81.5  |
+| 推理模型            | 11.6M (.ckpt文件)                 | 10.06M (.ckpt文件)                |             11.6M (.ckpt文件)      |
 
 ### [推理性能](#目录)
 

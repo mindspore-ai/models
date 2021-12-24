@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 3 ]; then
-  echo "Usage: sh run_distribute_train_gpu.sh [RANK_SIZE] [TRAIN_DATA_DIR] [cifar10|imagenet]"
+  echo "Usage: bash run_distribute_train_gpu.sh [RANK_SIZE] [TRAIN_DATA_DIR] [cifar10|imagenet]"
   exit 1
 fi
 
@@ -52,9 +52,9 @@ if [ -d "distribute_train_gpu" ]; then
 fi
 
 mkdir ./distribute_train_gpu
-cp ./*.py ./distribute_train_gpu
-cp -r ./config ./distribute_train_gpu
-cp -r ./src ./distribute_train_gpu
+cp ../*.py ./distribute_train_gpu
+cp -r ../config ./distribute_train_gpu
+cp -r ../src ./distribute_train_gpu
 cd ./distribute_train_gpu || exit
 
 if [ $3 == 'imagenet' ]; then
@@ -68,8 +68,8 @@ fi
 
 mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
 nohup python train.py  \
-  --config_path=$CONFIG_FILE \
-  --dataset_name=$dataset_type \
-  --train_data_dir=$TRAIN_DATA_DIR \
-  --device_target=GPU > log.txt 2>&1 &
+    --config_path=$CONFIG_FILE \
+    --dataset_name=$dataset_type \
+    --train_data_dir=$TRAIN_DATA_DIR \
+    --device_target=GPU > log.txt 2>&1 &
 cd ..
