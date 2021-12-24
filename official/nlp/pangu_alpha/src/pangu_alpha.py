@@ -37,7 +37,7 @@ class EmbeddingLayer(nn.Cell):
         self.word_embedding = VocabEmbedding(vocab_size=config.vocab_size,
                                              embedding_size=config.hidden_size,
                                              param_init=initializer("normal", [config.vocab_size, config.hidden_size],
-                                                                    dtype=config.param_init_type),
+                                                                    dtype=mstype.float32),
                                              parallel_config=config.parallel_config.embedding_dp_mp_config)
         copied_parallel_config = copy.deepcopy(config.parallel_config)
         copied_parallel_config.vocab_emb_dp = True
@@ -45,7 +45,7 @@ class EmbeddingLayer(nn.Cell):
                                                  embedding_size=config.hidden_size,
                                                  param_init=initializer("normal",
                                                                         [config.seq_length, config.hidden_size],
-                                                                        dtype=config.param_init_type),
+                                                                        dtype=mstype.float32),
                                                  parallel_config=copied_parallel_config.embedding_dp_mp_config)
         self.add = P.Add().shard(
             ((config.parallel_config.data_parallel, 1, 1), (config.parallel_config.data_parallel, 1, 1)))
@@ -262,7 +262,7 @@ class PanguAlpha_Model(Cell):
                                                   embedding_size=config.hidden_size,
                                                   param_init=initializer("normal",
                                                                          [config.seq_length, config.hidden_size],
-                                                                         dtype=config.param_init_type),
+                                                                         dtype=mstype.float32),
                                                   parallel_config=copied_parallel_config.embedding_dp_mp_config)
         self.top_query_embedding.pipeline_stage = config.parallel_config.pipeline_stage - 1
         if config.parallel_config.pipeline_stage > 1:
