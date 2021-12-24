@@ -15,8 +15,6 @@
 """srcnn training"""
 
 import os
-import argparse
-import ast
 
 import mindspore as ms
 import mindspore.nn as nn
@@ -26,10 +24,14 @@ from mindspore.train.model import Model
 from mindspore.train.callback import TimeMonitor, LossMonitor, CheckpointConfig, ModelCheckpoint
 from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.context import ParallelMode
+from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
-from src.config import srcnn_cfg as config
 from src.dataset import create_train_dataset
 from src.srcnn import SRCNN
+
+from src.model_utils.config import config
+from src.model_utils.moxing_adapter import sync_data
+
 
 set_seed(1)
 
@@ -42,36 +44,39 @@ def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
                 del origin_dict[key]
                 break
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="srcnn training")
-    parser.add_argument('--dataset_path', type=str, default='', help='Dataset path')
-    parser.add_argument('--device_num', type=int, default=1, help='Device num.')
-    parser.add_argument('--device_target', type=str, default='GPU', choices=("GPU"),
-                        help="Device target, support GPU.")
-    parser.add_argument('--pre_trained', type=str, default='', help='model_path, local pretrained model to load')
-    parser.add_argument("--run_distribute", type=ast.literal_eval, default=False,
-                        help="Run distribute, default: false.")
-    parser.add_argument("--filter_weight", type=ast.literal_eval, default=False,
-                        help="Filter head weight parameters, default is False.")
-    args, _ = parser.parse_known_args()
-
-
-    if args.device_target == "GPU":
+def run_train():
+    cfg = config
+    data_path = cfg.data_path
+    pretrained_ckpt_path = cfg.pre_trained_path
+    if cfg.enable_modelarts == "True":
+        sync_data(cfg.data_url, data_path)
+        if cfg.pre_trained_path:
+            sync_data(cfg.pre_trained_path, pretrained_ckpt_path)
+    data_path += "/srcnn.mindrecord00"
+    output_path = cfg.output_path
+    if cfg.device_target == "GPU":
+        if cfg.run_distribute:
+            init()
         context.set_context(mode=context.GRAPH_MODE,
-                            device_target=args.device_target,
+                            device_target=cfg.device_target,
                             save_graphs=False)
+    elif cfg.device_target == "Ascend":
+        context.set_context(mode=context.GRAPH_MODE,
+                            device_target=cfg.device_target,
+                            device_id=int(os.environ["DEVICE_ID"]),
+                            save_graphs=False)
+        if cfg.run_distribute:
+            init()
     else:
         raise ValueError("Unsupported device target.")
 
     rank = 0
     device_num = 1
-    if args.run_distribute:
-        init()
+    if cfg.run_distribute:
         rank = get_rank()
         device_num = get_group_size()
         context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL)
-
-    train_dataset = create_train_dataset(args.dataset_path, batch_size=config.batch_size,
+    train_dataset = create_train_dataset(data_path, batch_size=cfg.batch_size,
                                          shard_id=rank, num_shard=device_num)
 
     step_size = train_dataset.get_dataset_size()
@@ -80,14 +85,14 @@ if __name__ == '__main__':
     net = SRCNN()
 
     # init weight
-    if args.pre_trained:
-        param_dict = load_checkpoint(args.pre_trained)
-        if args.filter_weight:
+    if cfg.pre_trained_path:
+        param_dict = load_checkpoint(pretrained_ckpt_path)
+        if cfg.filter_weight:
             filter_list = [x.name for x in net.end_point.get_parameters()]
             filter_checkpoint_parameter_by_list(param_dict, filter_list)
         load_param_into_net(net, param_dict)
 
-    lr = Tensor(config.lr, ms.float32)
+    lr = Tensor(float(cfg.lr), ms.float32)
 
     opt = nn.Adam(params=net.trainable_params(), learning_rate=lr, eps=1e-07)
     loss = nn.MSELoss(reduction='mean')
@@ -95,11 +100,16 @@ if __name__ == '__main__':
 
     # define callbacks
     callbacks = [LossMonitor(), TimeMonitor(data_size=step_size)]
-    if config.save_checkpoint and rank == 0:
+    if cfg.save_checkpoint and rank == 0:
         config_ck = CheckpointConfig(save_checkpoint_steps=step_size,
-                                     keep_checkpoint_max=config.keep_checkpoint_max)
-        save_ckpt_path = os.path.join(config.save_checkpoint_path, 'ckpt_' + str(rank) + '/')
+                                     keep_checkpoint_max=cfg.keep_checkpoint_max)
+        save_ckpt_path = os.path.join(output_path, 'ckpt_' + str(rank) + '/')
         ckpt_cb = ModelCheckpoint(prefix="srcnn", directory=save_ckpt_path, config=config_ck)
         callbacks.append(ckpt_cb)
 
-    model.train(config.epoch_size, train_dataset, callbacks=callbacks)
+    model.train(cfg.epoch_size, train_dataset, callbacks=callbacks)
+    if cfg.enable_modelarts == "True":
+        sync_data(output_path, cfg.train_url)
+
+if __name__ == '__main__':
+    run_train()

@@ -19,13 +19,12 @@ import PIL.Image as pil_image
 
 import mindspore.dataset as ds
 
-from src.config import srcnn_cfg as config
 from src.utils import convert_rgb_to_y
 
 class EvalDataset:
-    def __init__(self, images_dir):
+    def __init__(self, images_dir, eval_scale):
         self.images_dir = images_dir
-        scale = config.scale
+        scale = eval_scale
         self.lr_group = []
         self.hr_group = []
         for image_path in sorted(glob.glob('{}/*'.format(images_dir))):
@@ -49,14 +48,14 @@ class EvalDataset:
     def __getitem__(self, idx):
         return np.expand_dims(self.lr_group[idx] / 255., 0), np.expand_dims(self.hr_group[idx] / 255., 0)
 
-def create_train_dataset(mindrecord_file, batch_size=1, shard_id=0, num_shard=1, num_parallel_workers=4):
+def create_train_dataset(mindrecord_file, batch_size=1, shard_id=0, num_shard=1, num_parallel_workers=8):
     data_set = ds.MindDataset(mindrecord_file, columns_list=["lr", "hr"], num_shards=num_shard,
                               shard_id=shard_id, num_parallel_workers=num_parallel_workers, shuffle=True)
     data_set = data_set.batch(batch_size, drop_remainder=True)
     return data_set
 
-def create_eval_dataset(images_dir, batch_size=1):
-    dataset = EvalDataset(images_dir)
+def create_eval_dataset(images_dir, scale, batch_size=1):
+    dataset = EvalDataset(images_dir, scale)
     data_set = ds.GeneratorDataset(dataset, ["lr", "hr"], shuffle=False)
     data_set = data_set.batch(batch_size, drop_remainder=True)
     return data_set
