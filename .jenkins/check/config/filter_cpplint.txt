@@ -1,6 +1,7 @@
 # Overall
 "models/"                                                                                       "build/header_guard"
 "models/"                                                                                       "build/c++11"
+"models/"                                                                                       "runtime/references"
 
 # Modelzoo
 "models/research/cv/FaceRecognition/infer/mxbase/facerecognition/FaceRecognition.h"  "runtime/references"
