@@ -15,20 +15,8 @@
 """Functions of cells"""
 import mindspore.nn as nn
 from mindspore import dtype as mstype
-from mindspore.ops import functional as F
 
 from src.args import args
-
-
-class OutputTo16(nn.Cell):
-    "Wrap cell for amp. Cast network output back to float16"
-
-    def __init__(self, op):
-        super(OutputTo16, self).__init__(auto_prefix=False)
-        self._op = op
-
-    def construct(self, x):
-        return F.cast(self._op(x), mstype.float16)
 
 
 def do_keep_fp32(network, cell_types):
@@ -40,11 +28,18 @@ def do_keep_fp32(network, cell_types):
 
 def cast_amp(net):
     """cast network amp_level"""
-    if args.amp_level == "O2":
+    if args.amp_level == "O1":
         print(f"=> using amp_level {args.amp_level}\n"
               f"=> change {args.arch} to fp16")
         net.to_float(mstype.float16)
         cell_types = (nn.GELU, nn.Softmax, nn.Conv2d, nn.Conv1d, nn.BatchNorm2d, nn.LayerNorm)
+        print(f"=> cast {cell_types} to fp32 back")
+        do_keep_fp32(net, cell_types)
+    elif args.amp_level == "O2":
+        print(f"=> using amp_level {args.amp_level}\n"
+              f"=> change {args.arch} to fp16")
+        net.to_float(mstype.float16)
+        cell_types = (nn.BatchNorm2d, nn.LayerNorm)
         print(f"=> cast {cell_types} to fp32 back")
         do_keep_fp32(net, cell_types)
     elif args.amp_level == "O3":
