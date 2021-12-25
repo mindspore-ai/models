@@ -44,8 +44,8 @@ def load_mnist(data_dir, usage='train'):
 
 class NoisySampler:
     """Noisy Sampler"""
-    def __init__(self, cnt):
-        self.cnt = cnt
+    def __init__(self, cnt=None):
+        self.cnt = cnt if cnt is not None else {}
 
     def add(self, img):
         for x in np.ndarray.flatten(img):
