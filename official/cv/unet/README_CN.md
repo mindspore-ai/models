@@ -470,9 +470,11 @@ bash scripts/run_distribute_train_gpu.sh [RANKSIZE] [DATASET] [CONFIG_PATH]
 | 损失 | 0.22070312                                                   | 0.21425568                                         |
 | 速度 | 1卡：267毫秒/步；8卡：280毫秒/步 | 1卡：423毫秒/步；8卡：128毫秒/步 |
 | 总时长 | 1卡：2.67分钟；8卡：1.40分钟 | 1卡：5.64分钟；8卡：3.41分钟 |
+| 精度 | IOU 90% | IOU 90%  |
 | 参数(M)  | 93M                                                       | 93M                                                    |
 | 微调检查点 | 355.11M (.ckpt文件)                                         | 355.11M (.ckpt文件)                        |
-| 脚本                    | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) |
+| 配置文件 | unet_medical_config.yaml | unet_medical_gpu_config.yaml                                 |
+| 脚本| [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) |
 
 | 参数 | Ascend | GPU |
 | ----- | ------ | ----- |
@@ -489,8 +491,10 @@ bash scripts/run_distribute_train_gpu.sh [RANKSIZE] [DATASET] [CONFIG_PATH]
 | 损失 | <0.1 | <0.1 |
 | 速度 | 1卡：150~200 fps | 1卡：230~280 fps, 8卡：(170~210)*8 fps|
 | 总时长 | 1卡: 10.8分钟 | 1卡: 8分钟 |
+| 精度 | IOU 93% | IOU 92%   |
 | 参数(M)  | 27M | 27M |
 | 微调检查点 | 103.4M(.ckpt文件) | 103.4M(.ckpt文件) |
+| 配置文件 | unet_nested_cell_config.yaml | unet_nested_cell_config.yaml|
 | 脚本 | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) |
 
 ### 用法

@@ -24,8 +24,6 @@
         - [训练后量化推理](#训练后量化推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
-        - [评估性能](#评估性能)
-        - [推理性能](#推理性能)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
 
@@ -439,7 +437,8 @@ ModelArts导出mindir
 
 ```shell
 # Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [DEVICE_ID] [CONFIG_PATH]
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [CONFIG_PATH] [DEVICE_ID]
+
 ```
 
 - `DVPP` 为必填项，需要在["DVPP", "CPU"]选择，大小写均可。需要注意的是ssd_vgg16执行推理的图片尺寸为[300, 300]，由于DVPP硬件限制宽为16整除，高为2整除，因此，这个网络需要通过CPU算子对图像进行前处理。
@@ -513,36 +512,77 @@ mAP: 0.23657619676441116
 
 ## 性能
 
-### 评估性能
-
-| 参数                  | Ascend                                                     | GPU                       |
-| -------------------------- | -------------------------------------------------------------| -------------------------------------------------------------|
-| 模型版本 | SSD V1 | SSD V1 |
-| 资源 | Ascend 910；CPU 2.60GHz，192核；内存 755GB；系统 Euler2.8 | NV SMX2 V100-16G |
-| 上传日期 | 2021-07-05  | 2020-09-24 |
-| MindSpore版本          | 1.3.0                                                  | 1.0.0                                                        |
-| 数据集                   | COCO2017                                                     | COCO2017                                                     |
-| 训练参数    | epoch = 500,  batch_size = 32                                | epoch = 800,  batch_size = 32                                |
-| 优化器               | Momentum                                                     | Momentum                                                     |
-| 损失函数 | Sigmoid交叉熵，SmoothL1Loss | Sigmoid交叉熵，SmoothL1Loss |
-| 速度 | 8卡：90毫秒/步 | 8卡：121毫秒/步 |
-| 总时长 | 8卡：4.81小时 | 8卡：12.31小时 |
-| 参数(M) | 34 | 34 |
-|脚本  | https://gitee.com/mindspore/models/tree/master/official/cv/ssd | https://gitee.com/mindspore/models/tree/master/official/cv/ssd |
-
-### 推理性能
+| 参数          | Ascend                      | GPU                         |
+| ------------------- | --------------------------- | --------------------------- |
+| 网络       | SSD MobileNetV2             | SSD MobileNetV2             |
+| 资源            | Ascend 910; OS Euler2.8     | GPU(Tesla V100 PCIE)，CPU 2.1GHz 64 cores，Memory 128G                         |
+| 上传日期       | 07/05/2020 (month/day/year) | 09/24/2020 (month/day/year) |
+| 昇思版本   | 1.3.0                       | 1.3.0                       |
+| 数据集             | COCO2017                    | COCO2017                    |
+| 训练参数 | epoch = 500,  batch_size = 32   | epoch = 800,  batch_size = 24(8ps)/32(1ps) |
+| 优化器           | Momentum                     | Momentum                   |
+| 损失函数       | Sigmoid Cross Entropy,SmoothL1Loss  | Sigmoid Cross Entropy,SmoothL1Loss |
+| 性能               | 8pcs: 90ms/step             | 8pcs: 121ms/step            |
+| 训练耗时          | 8pcs: 4.81hours             | 8pcs: 12.31hours            |
+| 推理输出             | mAP                         | mAP                         |
+| 评价指标            | IoU=0.50: 22%               | IoU=0.50: 22%             |
+| 推理模型大小 | 34M(.ckpt file)             | 34M(.ckpt file)             |
+| 参数文件           | ssd300_config.yaml          |ssd300_config_gpu.yaml       |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
 
 | 参数          | Ascend                      | GPU                         |
-| ------------------- | ----------------------------| ----------------------------|
-| 模型版本       | SSD V1                      | SSD V1                      |
-| 资源           | Ascend 910；系统 Euler2.8                   | GPU                         |
-| 上传日期  | 2021-07-05  | 2020-09-24 |
-| MindSpore版本    | 1.3.0                 | 1.0.0                       |
-| 数据集         | COCO2017                    | COCO2017                    |
-| batch_size          | 1                           | 1                           |
-| 输出 | mAP | mAP |
-| 准确率 | IoU=0.50: 23.8%             | IoU=0.50: 22.4%             |
-| 推理模型   | 34M（.ckpt文件）            | 34M（.ckpt文件）            |
+| ------------------- | --------------------------- | --------------------------- |
+| 网络       | SSD-MobileNetV1-FPN         | SSD-MobileNetV1-FPN         |
+| 资源            | Ascend 910; OS Euler2.8     | GPU(Tesla V100 PCIE)，CPU 2.1GHz 64 cores，Memory 128G                         |
+| 上传日期       | 11/14/2020 (month/day/year) | 07/23/2021 (month/day/year) |
+| 昇思版本   | 1.3.0                       | 1.3.0                       |
+| 数据集             | COCO2017                    | COCO2017                    |
+| 训练参数 | epoch = 60,  batch_size = 32   | epoch = 60,  batch_size = 16 |
+| 优化器           | Momentum                     | Momentum                   |
+| 损失函数       | Sigmoid Cross Entropy,SmoothL1Loss  | Sigmoid Cross Entropy,SmoothL1Loss |
+| 性能               | 8pcs: 408 ms/step             | 8pcs: 640 ms/step            |
+| 训练耗时          | 8pcs: 4.5 hours             | 8pcs: 9.7 hours            |
+| 推理输出             | mAP                         | mAP                         |
+| 评价指标            | IoU=0.50: 29.1 %             | IoU=0.50: 29.1 %             |
+| 推理模型大小 | 96M(.ckpt file)             | 96M(.ckpt file)             |
+| 参数文件           | ssd_mobilenet_v1_fpn_config.yaml  |ssd_mobilenet_v1_fpn_config_gpu.yaml       |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+
+| 参数          | Ascend                      | GPU                         |
+| ------------------- | --------------------------- | --------------------------- |
+| 网络       | SSD-Resnet50-FPN             | SSD-Resnet50-FPN             |
+| 资源            | Ascend 910; OS Euler2.8     | GPU(Tesla V100 PCIE)，CPU 2.1GHz 64 cores，Memory 128G                         |
+| 上传日期       | 03/10/2021 (month/day/year) | 07/23/2021 (month/day/year) |
+| 昇思版本   | 1.3.0                       | 1.3.0                       |
+| 数据集             | COCO2017                    | COCO2017                    |
+| 训练参数 | epoch = 60,  batch_size = 32   | epoch = 60,  batch_size = 16 |
+| 优化器           | Momentum                     | Momentum                   |
+| 损失函数       | Sigmoid Cross Entropy,SmoothL1Loss  | Sigmoid Cross Entropy,SmoothL1Loss |
+| 性能               | 8pcs: 345 ms/step             | 8pcs: 877 ms/step            |
+| 训练耗时          | 8pcs: 4.1 hours             | 8pcs: 12 hours            |
+| 推理输出             | mAP                         | mAP                         |
+| 评价指标            | IoU=0.50: 34.3%            | IoU=0.50: 34.3 %           |
+| 推理模型大小 | 255M(.ckpt file)             | 255M(.ckpt file)             |
+| 参数文件           | ssd_resnet50_fpn_config.yaml | ssd_resnet50_fpn_config_gpu.yaml       |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+
+| 参数          | Ascend                      | GPU                         |
+| ------------------- | --------------------------- | --------------------------- |
+| 网络       | SSD VGG16                   | SSD VGG16                   |
+| 资源            | Ascend 910; OS Euler2.8     | GPU(Tesla V100 PCIE)，CPU 2.1GHz 64 cores，Memory 128G                         |
+| 上传日期       | 03/27/2021 (month/day/year) | 07/23/2021 (month/day/year) |
+| 昇思版本   | 1.3.0                       | 1.3.0                       |
+| 数据集             | COCO2017                    | COCO2017                    |
+| 训练参数 | epoch = 150,  batch_size = 32   | epoch = 150,  batch_size = 32 |
+| 优化器           | Momentum                     | Momentum                   |
+| 损失函数       | Sigmoid Cross Entropy,SmoothL1Loss  | Sigmoid Cross Entropy,SmoothL1Loss |
+| 性能               | 8pcs: 117 ms/step             | 8pcs: 403 ms/step            |
+| 训练耗时          | 8pcs: 4.81hours             | 8pcs: 16.8 hours            |
+| 推理输出             | mAP                         | mAP                         |
+| 评价指标            | IoU=0.50: 23.2%               | IoU=0.50: 23.2%             |
+| 推理模型大小 | 186M(.ckpt file)             | 186M(.ckpt file)             |
+| 参数文件           | ssd_vgg16_config.yaml      | ssd_vgg16_config_gpu.yaml      |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
 
 # 随机情况说明
 
