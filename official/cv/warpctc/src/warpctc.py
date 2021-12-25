@@ -34,7 +34,7 @@ class StackedRNN(nn.Cell):
         num_layer(int): the number of layer of LSTM.
      """
 
-    def __init__(self, input_size, hidden_size=512, num_layer=2):
+    def __init__(self, input_size, hidden_size=512, num_layer=2, batch_size=64):
         super(StackedRNN, self).__init__()
         self.batch_size = batch_size
         self.input_size = input_size
@@ -42,7 +42,7 @@ class StackedRNN(nn.Cell):
         self.reshape = P.Reshape()
         self.cast = P.Cast()
 
-        self.lstm = nn.LSTM(input_size, hidden_size, num_layers=2)
+        self.lstm = nn.LSTM(input_size, hidden_size, num_layers=num_layer)
 
         self.fc_weight = np.random.random((self.num_classes, hidden_size)).astype(np.float32)
         self.fc_bias = np.random.random(self.num_classes).astype(np.float32)
