@@ -43,7 +43,7 @@ activation: "Softmax"
 
 # Image classification trian. train_parse_args():return train_args
 dataset_path: "/cache/data"
-pretrain_ckpt: "./mobilenetv2-200_625.ckpt"
+pretrain_ckpt: ""
 freeze_layer: ""
 filter_head: False
 enable_cache: False

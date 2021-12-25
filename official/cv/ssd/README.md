@@ -26,8 +26,6 @@
         - [Post Training Quantization](#post-training-quantization)
     - [Model Description](#model-description)
         - [Performance](#performance)
-            - [Evaluation Performance](#evaluation-performance)
-            - [Inference Performance](#inference-performance)
     - [Description of Random Situation](#description-of-random-situation)
     - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -517,7 +515,7 @@ Current batch size can only be set to 1. The precision calculation process needs
 
 ```shell
 # Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [CONFIG_PATH] [DEVICE_ID]
 ```
 
 - `DVPP` is mandatory, and must choose from ["DVPP", "CPU"], it's case-insensitive. Note that the image shape of ssd_vgg16 inference is [300, 300], The DVPP hardware restricts width 16-alignment and height even-alignment. Therefore, the network needs to use the CPU operator to process images.
@@ -592,36 +590,77 @@ mAP: 0.23657619676441116
 
 ### [Performance](#contents)
 
-#### Evaluation Performance
+| Parameters          | Ascend                      | GPU                         |
+| ------------------- | --------------------------- | --------------------------- |
+| Model Version       | SSD MobileNetV2             | SSD MobileNetV2             |
+| Resource            | Ascend 910; OS Euler2.8     | GPU(Tesla V100 PCIE)，CPU 2.1GHz 64 cores，Memory 128G                         |
+| Uploaded Date       | 07/05/2020 (month/day/year) | 09/24/2020 (month/day/year) |
+| MindSpore Version   | 1.3.0                       | 1.3.0                       |
+| Dataset             | COCO2017                    | COCO2017                    |
+| Training Parameters | epoch = 500,  batch_size = 32   | epoch = 800,  batch_size = 24(8ps)/32(1ps) |
+| Optimizer           | Momentum                     | Momentum                   |
+| Loss Function       | Sigmoid Cross Entropy,SmoothL1Loss  | Sigmoid Cross Entropy,SmoothL1Loss |
+| Speed               | 8pcs: 90ms/step             | 8pcs: 121ms/step            |
+| Total time          | 8pcs: 4.81hours             | 8pcs: 12.31hours            |
+| outputs             | mAP                         | mAP                         |
+| Accuracy            | IoU=0.50: 22%               | IoU=0.50: 22%             |
+| Model for inference | 34M(.ckpt file)             | 34M(.ckpt file)             |
+| configuration           | ssd300_config.yaml          |ssd300_config_gpu.yaml       |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
 
-| Parameters          | Ascend                                                                        | GPU                                                                           | Ascend                                                                        | GPU                                                                        |
-| ------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |----------------------------------------------------------------------------- |
-| Model Version       | SSD V1                                                                        | SSD V1                                                                        | SSD-Mobilenet-V1-Fpn                                                          |SSD-Mobilenet-V1-Fpn                                                          |
-| Resource            | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8                               | NV SMX2 V100-16G                                                              | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8            |NV SMX2 V100-32G                                                         |
-| uploaded Date       | 07/05/2021 (month/day/year)                                                   | 09/24/2020 (month/day/year)                                                   | 01/13/2021 (month/day/year)                                                   |07/20/2021 (month/day/year)                                                   |
-| MindSpore Version   | 1.3.0                                                                         | 1.0.0                                                                         | 1.1.0                                                                         |1.3.0                                                                         |
-| Dataset             | COCO2017                                                                      | COCO2017                                                                      | COCO2017                                                                      |COCO2017                                                                      |
-| Training Parameters | epoch = 500,  batch_size = 32                                                 | epoch = 800,  batch_size = 32                                                 | epoch = 60,  batch_size = 32                                                  | epoch = 60,  batch_size = 16                                                  |
-| Optimizer           | Momentum                                                                      | Momentum                                                                      | Momentum                                                                      |Momentum                                                                      |
-| Loss Function       | Sigmoid Cross Entropy,SmoothL1Loss                                            | Sigmoid Cross Entropy,SmoothL1Loss                                            | Sigmoid Cross Entropy,SmoothL1Loss                                            |Sigmoid Cross Entropy,SmoothL1Loss                                            |
-| Speed               | 8pcs: 90ms/step                                                               | 8pcs: 121ms/step                                                              | 8pcs: 547ms/step                                                              |1pcs: 547ms/step                                                              |
-| Total time          | 8pcs: 4.81hours                                                               | 8pcs: 12.31hours                                                              | 8pcs: 4.22hours                                                               |1pcs: 4.22hours                                                               |
-| Parameters (M)      | 34                                                                            | 34                                                                            | 48M                                                                           |97M                                                                           |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |<https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| Parameters          | Ascend                      | GPU                         |
+| ------------------- | --------------------------- | --------------------------- |
+| Model Version       | SSD-MobileNetV1-FPN         | SSD-MobileNetV1-FPN         |
+| Resource            | Ascend 910; OS Euler2.8     | GPU(Tesla V100 PCIE)，CPU 2.1GHz 64 cores，Memory 128G                         |
+| Uploaded Date       | 11/14/2020 (month/day/year) | 07/23/2021 (month/day/year) |
+| MindSpore Version   | 1.3.0                       | 1.3.0                       |
+| Dataset             | COCO2017                    | COCO2017                    |
+| Training Parameters | epoch = 60,  batch_size = 32   | epoch = 60,  batch_size = 16 |
+| Optimizer           | Momentum                     | Momentum                   |
+| Loss Function       | Sigmoid Cross Entropy,SmoothL1Loss  | Sigmoid Cross Entropy,SmoothL1Loss |
+| Speed               | 8pcs: 408 ms/step             | 8pcs: 640 ms/step            |
+| Total time          | 8pcs: 4.5 hours             | 8pcs: 9.7 hours            |
+| outputs             | mAP                         | mAP                         |
+| Accuracy            | IoU=0.50: 29.1 %             | IoU=0.50: 29.1 %             |
+| Model for inference | 96M(.ckpt file)             | 96M(.ckpt file)             |
+| configuration           | ssd_mobilenet_v1_fpn_config.yaml  |ssd_mobilenet_v1_fpn_config_gpu.yaml       |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
 
-#### Inference Performance
+| Parameters          | Ascend                      | GPU                         |
+| ------------------- | --------------------------- | --------------------------- |
+| Model Version       | SSD-Resnet50-FPN             | SSD-Resnet50-FPN             |
+| Resource            | Ascend 910; OS Euler2.8     | GPU(Tesla V100 PCIE)，CPU 2.1GHz 64 cores，Memory 128G                         |
+| Uploaded Date       | 03/10/2021 (month/day/year) | 07/23/2021 (month/day/year) |
+| MindSpore Version   | 1.3.0                       | 1.3.0                       |
+| Dataset             | COCO2017                    | COCO2017                    |
+| Training Parameters | epoch = 60,  batch_size = 32   | epoch = 60,  batch_size = 16 |
+| Optimizer           | Momentum                     | Momentum                   |
+| Loss Function       | Sigmoid Cross Entropy,SmoothL1Loss  | Sigmoid Cross Entropy,SmoothL1Loss |
+| Speed               | 8pcs: 345 ms/step             | 8pcs: 877 ms/step            |
+| Total time          | 8pcs: 4.1 hours             | 8pcs: 12 hours            |
+| outputs             | mAP                         | mAP                         |
+| Accuracy            | IoU=0.50: 34.3%            | IoU=0.50: 34.3 %           |
+| Model for inference | 255M(.ckpt file)             | 255M(.ckpt file)             |
+| configuration           | ssd_resnet50_fpn_config.yaml | ssd_resnet50_fpn_config_gpu.yaml       |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
 
-| Parameters          | Ascend                      | GPU                         | Ascend                      | GPU                      |
-| ------------------- | --------------------------- | --------------------------- | --------------------------- |--------------------------- |
-| Model Version       | SSD V1                      | SSD V1                      | SSD-Mobilenet-V1-Fpn        | SSD-Mobilenet-V1-Fpn        |
-| Resource            | Ascend 910; OS Euler2.8                  | GPU                         |Ascend 910; OS Euler2.8                  | NV SMX2 V100-32G                  |
-| Uploaded Date       | 07/05/2020 (month/day/year) | 09/24/2020 (month/day/year) | 09/24/2020 (month/day/year) | 07/20/2021 (month/day/year) |
-| MindSpore Version   | 1.3.0                       | 1.0.0                       | 1.1.0                       | 1.3.0                       |
-| Dataset             | COCO2017                    | COCO2017                    | COCO2017                    | COCO2017                    |
-| batch_size          | 1                           | 1                           | 1                           | 1                           |
-| outputs             | mAP                         | mAP                         | mAP                         | mAP                         |
-| Accuracy            | IoU=0.50: 23.8%             | IoU=0.50: 22.4%             | Iout=0.50: 30%              | Iout=0.50: 30%              |
-| Model for inference | 34M(.ckpt file)             | 34M(.ckpt file)             | 48M(.ckpt file)             | 97M(.ckpt file)             |
+| Parameters          | Ascend                      | GPU                         |
+| ------------------- | --------------------------- | --------------------------- |
+| Model Version       | SSD VGG16                   | SSD VGG16                   |
+| Resource            | Ascend 910; OS Euler2.8     | GPU(Tesla V100 PCIE)，CPU 2.1GHz 64 cores，Memory 128G                         |
+| Uploaded Date       | 03/27/2021 (month/day/year) | 07/23/2021 (month/day/year) |
+| MindSpore Version   | 1.3.0                       | 1.3.0                       |
+| Dataset             | COCO2017                    | COCO2017                    |
+| Training Parameters | epoch = 150,  batch_size = 32   | epoch = 150,  batch_size = 32 |
+| Optimizer           | Momentum                     | Momentum                   |
+| Loss Function       | Sigmoid Cross Entropy,SmoothL1Loss  | Sigmoid Cross Entropy,SmoothL1Loss |
+| Speed               | 8pcs: 117 ms/step             | 8pcs: 403 ms/step            |
+| Total time          | 8pcs: 4.81hours             | 8pcs: 16.8 hours            |
+| outputs             | mAP                         | mAP                         |
+| Accuracy            | IoU=0.50: 23.2%               | IoU=0.50: 23.2%             |
+| Model for inference | 186M(.ckpt file)             | 186M(.ckpt file)             |
+| configuration           | ssd_vgg16_config.yaml      | ssd_vgg16_config_gpu.yaml      |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
 
 ## [Description of Random Situation](#contents)
 

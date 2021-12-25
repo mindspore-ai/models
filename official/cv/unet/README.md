@@ -471,8 +471,10 @@ The above python command will run in the background. You can view the results th
 | Loss                       | 0.22070312                                                   | 0.21425568                                                   |
 | Speed                      | 1pc: 267 ms/step;                                            | 1pc: 423 ms/step;                                            |
 | Total time                 | 1pc: 2.67 mins;                                              | 1pc: 5.64 mins;                                              |
+| Accuracy                   | IOU 90%                                                      | IOU 90%                                                     |
 | Parameters (M)             | 93M                                                          | 93M                                                          |
 | Checkpoint for Fine tuning | 355.11M (.ckpt file)                                         | 355.11M (.ckpt file)                                         |
+| configuration              | unet_medical_config.yaml                                     | unet_medical_gpu_config.yaml                                 |
 | Scripts                    | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/unet) | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/unet) |
 
 | Parameters | Ascend | GPU |
@@ -489,9 +491,11 @@ The above python command will run in the background. You can view the results th
 | probability | cross valid dice coeff is 0.966, cross valid IOU is 0.936 | cross valid dice coeff is 0.976,cross valid IOU is 0.955 |
 | Loss | <0.1 | <0.1 |
 | Speed | 1pc: 150~200 fps | 1pc：230~280 fps, 8pc：(170~210)*8 fps |
+| Accuracy | IOU 93% | IOU 92%   |
 | Total time | 1pc: 10.8min | 1pc：8min |
 | Parameters (M)  | 27M | 27M |
 | Checkpoint for Fine tuning | 103.4M(.ckpt file) | 103.4M(.ckpt file) |
+| configuration | unet_nested_cell_config.yaml | unet_nested_cell_config.yaml|
 | Scripts | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/unet) | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/unet) |
 
 ## [How to use](#contents)
