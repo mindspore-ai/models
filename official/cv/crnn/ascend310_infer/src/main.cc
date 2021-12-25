@@ -71,8 +71,8 @@ int main(int argc, char **argv) {
   auto ascend310_info = std::make_shared<mindspore::Ascend310DeviceInfo>();
   ascend310_info->SetDeviceID(FLAGS_device_id);
   ascend310_info->SetInsertOpConfigPath({FLAGS_aipp_path});
-  ascend310->SetPrecisionMode("allow_fp32_to_fp16");
-  ascend310->SetOpSelectImplMode("high_precision");
+  ascend310_info->SetPrecisionMode("allow_fp32_to_fp16");
+  ascend310_info->SetOpSelectImplMode("high_precision");
   context->MutableDeviceInfo().push_back(ascend310_info);
 
   Graph graph;

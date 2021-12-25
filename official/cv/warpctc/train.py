@@ -136,7 +136,7 @@ def train():
     loss = CTCLoss(max_sequence_length=config.captcha_width,
                    max_label_length=max_captcha_digits,
                    batch_size=config.batch_size)
-    net = StackedRNN(input_size=input_size, hidden_size=config.hidden_size)
+    net = StackedRNN(input_size=input_size, hidden_size=config.hidden_size, batch_size=config.batch_size)
     opt = nn.SGD(params=net.trainable_params(), learning_rate=lr, momentum=config.momentum)
 
     net = WithLossCell(net, loss)
