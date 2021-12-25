@@ -1,0 +1,5 @@
+numpy
+pillow
+opencv-python
+pycocotools
+tqdm==4.62.3
