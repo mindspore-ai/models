@@ -17,6 +17,8 @@
     - [Dataset Preparation](#dataset-preparation)
     - [Training Process](#training-process)
     - [Evaluation Process](#evaluation-process)
+        - [Evaluation](#evaluation)
+        - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
@@ -208,6 +210,7 @@ bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_P
     ├─run_distribute_train_ascend.sh
     ├─run_distribute_train_ascend_multi_machines.sh
     ├─run_eval.sh
+    ├─run_eval_onnx.sh                                      // bash script for ONNX evaluation
     ├─run_infer_310.sh
     └─run_standalone_train.sh
   ├─src
@@ -230,6 +233,7 @@ bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_P
   ├─default_config_large_gpu.yaml
   ├─create_data.py
   ├─eval.py
+  ├─eval.py                                                 // script for ONNX evaluation
   ├─export.py
   ├─mindspore_hub_conf.py
   ├─postprocess.py
@@ -380,6 +384,34 @@ Parameters for learning rate:
     ```bash
     perl multi-bleu.perl REF_DATA.forbleu < EVAL_OUTPUT.forbleu
     ```
+
+### [ONNX Evaluation](#contents)
+
+- Export your model to ONNX:
+
+  ```bash
+  python export.py --device_target GPU --config default_config.yaml --model_file /path/to/transformer.ckpt --file_name /path/to/transformer.onnx --file_format ONNX
+  ```
+
+- Run ONNX evaluation:
+
+  ```bash
+  bash run_eval_onnx.sh <ONNX_MODEL> <MINDRECORD_DATA> [<CONFIG_PATH>] [<DEVICE_TARGET>] [<DEVICE_ID>]
+  ```
+
+- Run `process_output.sh` to process the output token ids to get the real translation results.
+
+  ```bash
+  bash scripts/process_output.sh REF_DATA EVAL_OUTPUT VOCAB_FILE
+  ```
+
+  You will get two files, REF_DATA.forbleu and EVAL_OUTPUT.forbleu, for BLEU score calculation.
+
+- Calculate BLEU score, you may use this [perl script](https://github.com/moses-smt/mosesdecoder/blob/master/scripts/generic/multi-bleu.perl) and run following command to get the BLEU score.
+
+  ```bash
+  perl multi-bleu.perl REF_DATA.forbleu < EVAL_OUTPUT.forbleu
+  ```
 
 ## Inference Process
 
