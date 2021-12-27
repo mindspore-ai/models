@@ -84,8 +84,7 @@ def run_train():
     loss_cb = LossMonitor()
     time_cb = TimeMonitor()
     if cfg.cell == "lstm" and cfg.device_target == "GPU":
-        model = Model(network, loss_fn=loss, optimizer=opt, metrics={'acc': Accuracy()}, amp_level="O3",
-                      loss_scale_manager=loss_scale)
+        model = Model(network, loss_fn=loss, optimizer=opt, metrics={'acc': Accuracy()}, loss_scale_manager=loss_scale)
     else:
         model = Model(network, loss_fn=loss, optimizer=opt, metrics={'acc': Accuracy()}, amp_level="O3")
 
