@@ -93,7 +93,7 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
 
   # 评估
   cd scripts/
-  bash run_train.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
+  bash run_eval.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
   ```
 
   进行并行训练时, 需要提前创建JSON格式的hccl配置文件 [RANK_TABLE_FILE]。

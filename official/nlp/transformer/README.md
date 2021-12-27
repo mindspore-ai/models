@@ -420,10 +420,10 @@ Inference result is saved in current path, 'output_file' will generate in path s
 | uploaded Date              | 07/05/2021 (month/day/year)                | 12/21/2021 (month/day/year)     |
 | MindSpore Version          | 1.3.0                                      | 1.5.0                           |
 | Dataset                    | WMT Englis-German                          | WMT Englis-German               |
-| Training Parameters        | epoch=52, batch_size=96                    | epoch=52, batch_size=96         |
+| Training Parameters        | epoch=52, batch_size=96                    | epoch=52, batch_size=32         |
 | Optimizer                  | Adam                                       | Adam                            |
 | Loss Function              | Softmax Cross Entropy                      | Softmax Cross Entropy           |
-| BLEU Score                 | 28.7                                       | 29.1                            |
+| BLEU Score                 | 28.7                                       | 24.4                            |
 | Speed                      | 400ms/step (8pcs)                          | 337 ms/step (8pcs)              |
 | Loss                       | 2.8                                        | 2.9                             |
 | Params (M)                 | 213.7                                      | 213.7                           |
@@ -440,7 +440,7 @@ Inference result is saved in current path, 'output_file' will generate in path s
 | Dataset             | WMT newstest2014            | WMT newstest2014            |
 | batch_size          | 1                           | 1                           |
 | outputs             | BLEU score                  | BLEU score                  |
-| Accuracy            | BLEU=28.7                   | BLEU=29.1                   |
+| Accuracy            | BLEU=28.7                   | BLEU=24.4                   |
 
 ## [Description of Random Situation](#contents)
 

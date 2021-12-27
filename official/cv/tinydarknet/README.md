@@ -85,7 +85,7 @@ After installing MindSpore via the official website, you can start training and 
 
   # evaluation
   cd scripts/
-  bash run_train.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
+  bash run_eval.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]
   ```
 
   For distributed training, a hccl configuration file [RANK_TABLE_FILE] with JSON format needs to be created in advance.
