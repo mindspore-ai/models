@@ -28,7 +28,7 @@ nonlinearity: GELU
 
 
 # ===== Network training config ===== #
-amp_level: O2
+amp_level: O1
 keep_bn_fp32: True
 beta: [ 0.9, 0.999 ]
 clip_global_norm_value: 5.
