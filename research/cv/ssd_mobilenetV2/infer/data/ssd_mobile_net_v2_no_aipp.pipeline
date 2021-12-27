@@ -1,0 +1,40 @@
+{
+        "ssd_mobile_net_v2_coco": {
+        "stream_config":{
+            "deviceId":"0"
+        },
+                "appsrc0": {
+                        "factory": "appsrc",
+                        "next": "mxpi_tensorinfer0"
+                },
+                "appsink0": {
+                        "factory": "appsink"
+                },
+        "mxpi_tensorinfer0":{
+            "props":{
+                "dataSource":"appsrc0",
+                "modelPath":"../../data/models/ssd-mobilenet-v2.om"
+            },
+            "factory": "mxpi_tensorinfer",
+            "next": "mxpi_objectpostprocessor0"
+        },
+        "mxpi_objectpostprocessor0":{
+            "props": {
+                "dataSource": "mxpi_tensorinfer0",
+                "postProcessConfigPath": "../../data/config.cfg",
+                "postProcessLibPath": "../mxpi/build/libssd_mobile_net_v2_processor.so",
+                                "labelPath": "../../data/coco_ssd_mobile_net_v2.name"
+            },
+            "factory": "mxpi_objectpostprocessor",
+            "next": "mxpi_dataserialize0"
+
+        },
+                "mxpi_dataserialize0": {
+                        "props": {
+                                "outputDataKeys": "mxpi_objectpostprocessor0"
+                        },
+                        "factory": "mxpi_dataserialize",
+                        "next": "appsink0"
+                }
+        }
+}
