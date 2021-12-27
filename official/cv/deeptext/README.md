@@ -11,6 +11,7 @@
     - [Training Process](#training-process)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
+        - [ONNX Evaluation](#onnx-evaluation)
 - [Model Description](#model-description)
     - [Performance](#performance)  
         - [Training Performance](#evaluation-performance)
@@ -79,7 +80,7 @@ Here we used 4 datasets for training, and 1 datasets for Evaluation.
     ├─run_infer_310.sh                  # shell script for 310 inference
     ├─run_eval_gpu.sh                   # launch evaluation with GPU platform
     └─run_eval_ascend.sh                # launch evaluating with ascend platform
-
+    └─run_eval_onnx.sh                  # launch evaluation for ONNX model
   ├─src
     ├─DeepText
       ├─__init__.py                     # package init file
@@ -99,6 +100,7 @@ Here we used 4 datasets for training, and 1 datasets for Evaluation.
     └─utils.py                        # some functions which is commonly used
   ├─default_config.yaml               # configurations
   ├─eval.py                           # eval net
+  ├─eval_onnx.py                      # eval ONNX model
   ├─export.py                         # export checkpoint, surpport .onnx, .air, .mindir convert
   ├─postprogress.py                   # post process for 310 inference
   └─train.py                          # train net
@@ -338,6 +340,24 @@ Inference result is saved in current path, you can find result like this in acc.
 
 class 1 precision is 84.24%, recall is 87.40%, F1 is 85.79%
 ```
+
+### [ONNX Evaluation](#contents)
+
+- Export your model to ONNX:
+
+  ```shell
+  python export.py --device_target GPU --ckpt_file /path/to/deeptext.ckpt --export_device_target GPU --file_name deeptext --file_format ONNX --export_batch_size 2
+  ```
+
+- Run ONNX evaluation script:
+
+  ```shell
+  bash scripts/run_eval_onnx.sh [IMGS_PATH] [ANNOS_PATH] [ONNX_MODEL] [MINDRECORD_DIR] [<DEVICE_TARGET>]
+  ```
+
+  The results of evaluation will be saved in log file and have the following form:
+
+  > class 1 precision is 84.04%, recall is 87.51%,F1 is 85.74%
 
 # [Model description](#contents)
 
