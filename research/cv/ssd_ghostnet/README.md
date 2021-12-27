@@ -106,8 +106,14 @@ python train.py
 # distributed training on Ascend
 bash run_distribute_train_ghostnet.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [RANK_TABLE_FILE]
 
+# distributed training on GPU
+bash run_distribute_train_gpu.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [CONFIG_PATH] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
+
 # run eval on Ascend
 python eval.py --device_id 0 --dataset coco --checkpoint_file_path LOG4/ssd-500_458.ckpt
+
+# run eval on GPU
+python eval.py --device_id 0 --dataset coco --checkpoint_path LOG4/ssd-500_458.ckpt --device_target="GPU"
 ```
 
 If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training and evaluation as follows:
@@ -366,5 +372,5 @@ mAP: 0.24270569394180577
 | Dataset             | COCO2017                    |
 | batch_size          | 1                           |
 | outputs             | mAP                         |
-| Accuracy            | IoU=0.50: 24.2%             |
+| Accuracy            | IoU=0.50: 24.1%             |
 | Model for inference | 52.5M(.ckpt file)           |
