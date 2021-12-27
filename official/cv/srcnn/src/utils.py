@@ -35,3 +35,6 @@ def convert_ycbcr_to_rgb(img):
         b = 298.082 * img[:, :, 0] / 256. + 516.412 * img[:, :, 1] / 256. - 276.836
         return np.array([r, g, b]).transpose([1, 2, 0])
     raise Exception('Unknown Type', type(img))
+
+def calc_psnr(img1, img2):
+    return 10. * np.log10(1. / np.mean((img1 - img2) ** 2))

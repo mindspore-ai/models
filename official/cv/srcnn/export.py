@@ -1,4 +1,3 @@
-#!/bin/bash
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,31 +12,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+"""srcnn training"""
 
-if [ $# -lt 3 ]
-then
-    echo "Usage: bash run_eval_gpu.sh [DEVICE_ID] [DATASET_PATH] [CHECKPOINT_PATH]"
-exit 1
-fi
+import numpy as np
+from mindspore import Tensor, export
+from mindspore.train.serialization import load_checkpoint
 
-# check checkpoint file
-if [ ! -f $3 ]
-then
-    echo "error: CHECKPOINT_PATH=$3 is not a file"    
-exit 1
-fi
+from src.srcnn import SRCNN
 
-BASEPATH=$(cd "`dirname $0`" || exit; pwd)
-export PYTHONPATH=${BASEPATH}:$PYTHONPATH
+from src.model_utils.config import config
 
-if [ -d "./eval" ];
-then
-    rm -rf ./eval
-fi
-mkdir ./eval
+def run_export():
+    cfg = config
+    srcnn = SRCNN()
+    # load the parameter into net
+    load_checkpoint(cfg.checkpoint_path, net=srcnn)
+    input_size = np.random.uniform(0.0, 1.0, size=[1, 1, cfg.image_width, cfg.image_height]).astype(np.float32)
+    export(srcnn, Tensor(input_size), file_name='srcnn', file_format=cfg.file_format)
 
-export CUDA_VISIBLE_DEVICES="$1"
-
-python ${BASEPATH}/../eval.py \
-        --data_path=$2 \
-        --checkpoint_path=$3 > eval/eval.log 2>&1 &
+if __name__ == '__main__':
+    run_export()

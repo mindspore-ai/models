@@ -14,32 +14,30 @@
 # ============================================================================
 """Create Dataset."""
 import os
-import argparse
 import glob
+
 import numpy as np
 import PIL.Image as pil_image
 from PIL import ImageFile
-
+from utils import convert_rgb_to_y
 from mindspore.mindrecord import FileWriter
 
-from src.config import srcnn_cfg as config
-from src.utils import convert_rgb_to_y
+from model_utils.config import config
+
+
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-parser = argparse.ArgumentParser(description='Generate dataset file.')
-parser.add_argument("--src_folder", type=str, required=True, help="Raw data folder.")
-parser.add_argument("--output_folder", type=str, required=True, help="Dataset output path.")
-
 if __name__ == '__main__':
-    args, _ = parser.parse_known_args()
-    if not os.path.exists(args.output_folder):
-        os.makedirs(args.output_folder)
+    cfg = config
+    if not os.path.exists(cfg.output_folder):
+        os.makedirs(cfg.output_folder)
     prefix = "srcnn.mindrecord"
     file_num = 32
-    patch_size = config.patch_size
-    stride = config.stride
-    scale = config.scale
-    mindrecord_path = os.path.join(args.output_folder, prefix)
+    patch_size = cfg.patch_size
+    stride = cfg.stride
+    scale = cfg.scale
+    mindrecord_path = os.path.join(cfg.output_folder, prefix)
     writer = FileWriter(mindrecord_path, file_num)
 
     srcnn_json = {
@@ -48,9 +46,9 @@ if __name__ == '__main__':
     }
     writer.add_schema(srcnn_json, "srcnn_json")
     image_list = []
-    file_list = sorted(os.listdir(args.src_folder))
+    file_list = sorted(os.listdir(cfg.src_folder))
     for file_name in file_list:
-        path = os.path.join(args.src_folder, file_name)
+        path = os.path.join(cfg.src_folder, file_name)
         if os.path.isfile(path):
             image_list.append(path)
         else:

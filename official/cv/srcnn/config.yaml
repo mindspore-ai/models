@@ -1,0 +1,56 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: "False"
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for train
+data_path: "/cache/data/"
+output_path: "/cache/train/"
+pre_trained_path: '' 
+pretrained_ckpt_path: '/cache/pretrained_ckpt/pretrained.ckpt'
+checkpoint_path: '/cache/checkpoint_path.ckpt'
+enable_profiling: False
+device_target: Ascend
+test_pic: ''
+
+# Path for create_dataset
+src_folder: ''
+output_folder: ''
+# Path for 310
+image_path: ''
+image_width: 512
+image_height: 512
+predict_path: ''
+result_path: ''
+
+# ==============================================================================
+# options
+device_num: 1
+lr: 0.0001
+patch_size: 33
+batch_size: 16
+epoch_size: 20
+save_checkpoint: True
+keep_checkpoint_max: 20
+run_distribute: False
+filter_weight: False
+scale: 2
+stride: 99
+
+# export option
+ckpt_file: ""
+file_name: "srcnn"
+file_format: "MINDIR"
+#batch_size: 1
+
+---
+
+# Help description for each configuration
+enable_modelarts: "Whether training on modelarts, default: False"
+data_url: "Url for modelarts"
+train_url: "Url for modelarts"
+data_path: "The location of the input data."
+output_path: "The location of the output file."
+device_target: 'Device target, support GPU and Ascend.'
+enable_profiling: 'Whether enable profiling while training, default: False'

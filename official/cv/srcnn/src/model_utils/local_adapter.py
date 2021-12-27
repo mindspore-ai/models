@@ -1,4 +1,3 @@
-#!/bin/bash
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,30 +13,24 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -lt 3 ]
-then
-    echo "Usage: bash run_eval_gpu.sh [DEVICE_ID] [DATASET_PATH] [CHECKPOINT_PATH]"
-exit 1
-fi
+"""Local adapter"""
 
-# check checkpoint file
-if [ ! -f $3 ]
-then
-    echo "error: CHECKPOINT_PATH=$3 is not a file"    
-exit 1
-fi
+import os
 
-BASEPATH=$(cd "`dirname $0`" || exit; pwd)
-export PYTHONPATH=${BASEPATH}:$PYTHONPATH
+def get_device_id():
+    device_id = os.getenv('DEVICE_ID', '0')
+    return int(device_id)
 
-if [ -d "./eval" ];
-then
-    rm -rf ./eval
-fi
-mkdir ./eval
 
-export CUDA_VISIBLE_DEVICES="$1"
+def get_device_num():
+    device_num = os.getenv('RANK_SIZE', '1')
+    return int(device_num)
 
-python ${BASEPATH}/../eval.py \
-        --data_path=$2 \
-        --checkpoint_path=$3 > eval/eval.log 2>&1 &
+
+def get_rank_id():
+    global_rank_id = os.getenv('RANK_ID', '0')
+    return int(global_rank_id)
+
+
+def get_job_id():
+    return "Local Job"
