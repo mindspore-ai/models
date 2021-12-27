@@ -28,7 +28,7 @@ from mindspore.parallel import set_algo_parameters
 from mindspore.parallel._cost_model_context import _set_multi_subgraphs
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_distributed_checkpoint
-from mindspore.parallel.nn.transformer import TransformerOpParallelConfig
+from mindspore.nn.transformer.transformer import TransformerOpParallelConfig
 from src.pangu_alpha import EvalNet, PanguAlphaModel
 from src.pangu_alpha_config import set_parse, PanguAlphaConfig
 from src.utils import get_args

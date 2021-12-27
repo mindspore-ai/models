@@ -23,10 +23,10 @@ from mindspore import Tensor, Parameter
 from mindspore.ops import operations as P
 from mindspore.ops import functional as F
 from mindspore.nn import Cell
-from mindspore.parallel.nn.transformer import VocabEmbedding, TransformerEncoder, TransformerEncoderLayer, \
+from mindspore.nn.transformer.transformer import VocabEmbedding, TransformerEncoder, TransformerEncoderLayer, \
     AttentionMask
-from mindspore.parallel.nn import MoEConfig
-from mindspore.parallel.nn.layers import _LayerNorm, _Dropout
+from mindspore.nn.transformer import MoEConfig
+from mindspore.nn.transformer.layers import _LayerNorm, _Dropout
 
 
 class EmbeddingLayer(nn.Cell):
