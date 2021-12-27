@@ -33,7 +33,7 @@ import mindspore.common.dtype as mstype
 from mindspore.parallel import set_algo_parameters
 from mindspore.parallel._cost_model_context import _set_multi_subgraphs
 from mindspore.nn.wrap.cell_wrapper import PipelineCell, _VirtualDatasetCell, MicroBatchInterleaved
-from mindspore.parallel.nn import TransformerOpParallelConfig, CrossEntropyLoss
+from mindspore.nn.transformer import TransformerOpParallelConfig, CrossEntropyLoss
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.serialization import load_distributed_checkpoint, load_checkpoint, load_param_into_net
 
