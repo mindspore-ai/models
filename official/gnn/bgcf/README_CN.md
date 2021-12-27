@@ -430,3 +430,7 @@ BGCF模型中有很多的dropout操作，如果想关闭dropout，可以在 ./de
 ## ModelZoo主页
 
 请浏览官网[主页](https://gitee.com/mindspore/models)。
+
+## 注意
+
+- PyNative模式下，在Ascend硬件上，Gather算子，UnsortedSegmentSum算子对于输入的indices值小于0或者大于最大shape的值，会出现未知错误。因此在该网络中，如果输入数据中取值有负数，会导致网络执行失败。

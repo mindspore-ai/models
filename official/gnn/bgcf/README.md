@@ -408,3 +408,7 @@ BGCF model contains lots of dropout operations, if you want to disable dropout, 
 ## [ModelZoo Homepage](#contents)
 
 Please check the official [homepage](http://gitee.com/mindspore/models).
+
+## Note
+
+- In PyNative mode, on Ascend hardware, the Gather operator and UnsortedSegmentSum operator will cause unknown errors for the input indices value less than 0 or greater than the maximum shape value. Therefore, in this network, if the input data has a negative value, it will cause the network execution to fail.
