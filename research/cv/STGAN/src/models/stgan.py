@@ -151,17 +151,15 @@ class STGANModel(BaseModel):
                 self.train_G(self.real_x, self.label_org, self.label_trg, attr_diff)
             # saving losses
             if (self.current_iteration / 5) % self.args.print_freq == 0:
-                with open(os.path.join(self.train_log_path, 'loss.log'),
-                          'a+') as f:
-                    f.write('Iter: %s\n' % self.current_iteration)
-                    f.write(
-                        'loss D: %s, loss D_real: %s, loss D_fake: %s, loss D_gp: %s, loss D_adv: %s, loss D_cls: %s \n'
-                        % (loss_D, loss_real_D, loss_fake_D, loss_gp_D,
-                           loss_adv_D, loss_cls_D))
-                    f.write(
-                        'loss G: %s, loss G_rec: %s, loss G_fake: %s, loss G_adv: %s, loss G_cls: %s \n\n'
-                        % (loss_G, loss_rec_G, loss_fake_G, loss_adv_G,
-                           loss_cls_G))
+                print('Iter: %s\n' % self.current_iteration)
+                print(
+                    'loss D: %s, loss D_real: %s, loss D_fake: %s, loss D_gp: %s, loss D_adv: %s, loss D_cls: %s \n'
+                    % (loss_D, loss_real_D, loss_fake_D, loss_gp_D,
+                       loss_adv_D, loss_cls_D))
+                print(
+                    'loss G: %s, loss G_rec: %s, loss G_fake: %s, loss G_adv: %s, loss G_cls: %s \n\n'
+                    % (loss_G, loss_rec_G, loss_fake_G, loss_adv_G,
+                       loss_cls_G))
 
     def eval(self, data_loader):
         """ Eval function of STGAN

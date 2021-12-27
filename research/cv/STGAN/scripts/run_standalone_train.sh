@@ -17,7 +17,7 @@
 
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_standalone_train.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID]"
+    echo "Usage: bash run_standalone_train.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID]"
 exit 1
 fi
 

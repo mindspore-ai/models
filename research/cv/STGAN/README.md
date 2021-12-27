@@ -69,22 +69,22 @@ After installing MindSpore via the official website, you can start training and 
 
     ```python
     # train STGAN
-    sh scripts/run_standalone_train.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID]
+    bash scripts/run_standalone_train.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID]
     # distributed training
-    sh scripts/run_distribute_train.sh [RANK_TABLE_FILE] [EXPERIMENT_NAME] [DATA_PATH]
+    bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [EXPERIMENT_NAME] [DATA_PATH]
     # evaluate STGAN
-    sh scripts/run_eval.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID] [CHECKPOINT_PATH]
+    bash scripts/run_eval.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID] [CHECKPOINT_PATH]
     ```
 
 - running on GPU
 
     ```python
     # train STGAN
-    sh scripts/run_standalone_train_gpu.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID]
+    bash scripts/run_standalone_train_gpu.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID]
     # distributed training
-    sh scripts/run_distribute_train_gpu.sh [EXPERIMENT_NAME] [DATA_PATH]
+    bash scripts/run_distribute_train_gpu.sh [EXPERIMENT_NAME] [DATA_PATH]
     # evaluate STGAN, if you want to evaluate distributed training result, you should enter ./train_parallel
-    sh scripts/run_eval_gpu.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID] [CHECKPOINT_PATH]
+    bash scripts/run_eval_gpu.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID] [CHECKPOINT_PATH]
     ```
 
 ## [Script Description](#contents)
@@ -143,9 +143,9 @@ Major parameters in train.py and utils/args.py as follows:
   ```bash
   python train.py --dataroot ./dataset --experiment_name 128 > log 2>&1 &
   # or run the script
-  sh scripts/run_standalone_train.sh ./dataset 128 0
+  bash scripts/run_standalone_train.sh ./dataset 128 0
   # distributed training
-  sh scripts/run_distribute_train.sh ./config/rank_table_8pcs.json 128 /data/dataset
+  bash scripts/run_distribute_train.sh ./config/rank_table_8pcs.json 128 /data/dataset
   ```
 
 - running on GPU
@@ -153,9 +153,9 @@ Major parameters in train.py and utils/args.py as follows:
   ```bash
   python train.py --dataroot ./dataset --experiment_name 128 --platform="GPU" > log 2>&1 &
   # or run the script
-  sh scripts/run_standalone_train_gpu.sh ./dataset 128 0
+  bash scripts/run_standalone_train_gpu.sh ./dataset 128 0
   # distributed training
-  sh scripts/run_distribute_train_gpu.sh 128 /data/dataset
+  bash scripts/run_distribute_train_gpu.sh 128 /data/dataset
   ```
 
   After training, the loss value will be achieved as follows:
@@ -183,7 +183,7 @@ Before running the command below, please check the checkpoint path used for eval
   ```bash
   python eval.py --dataroot ./dataset --experiment_name 128 > eval_log.txt 2>&1 &
   # or run the script
-  sh scripts/run_eval.sh ./dataset 128 0 ./ckpt/generator.ckpt
+  bash scripts/run_eval.sh ./dataset 128 0 ./ckpt/generator.ckpt
   ```
 
 - running on GPU
@@ -191,7 +191,7 @@ Before running the command below, please check the checkpoint path used for eval
   ```bash
   python eval.py --dataroot ./dataset --experiment_name 128 --platform="GPU" > eval_log.txt 2>&1 &
   # or run the script (if you want to evaluate distributed training result, you should enter ./train_parallel, then run the script)
-  sh scripts/run_eval_gpu.sh ./dataset 128 0 ./ckpt/generator.ckpt
+  bash scripts/run_eval_gpu.sh ./dataset 128 0 ./ckpt/generator.ckpt
   ```
 
   You can view the results in the output directory, which contains a batch of result sample images.

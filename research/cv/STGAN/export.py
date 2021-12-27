@@ -14,14 +14,13 @@
 # ============================================================================
 """ Model Export """
 import numpy as np
-from mindspore import context, Tensor
+from mindspore import Tensor
 from mindspore.train.serialization import export
 from src.models import STGANModel
 from src.utils import get_args
 
 if __name__ == '__main__':
     args = get_args("test")
-    context.set_context(mode=context.GRAPH_MODE, device_id=args.device_id)
     model = STGANModel(args)
     input_shp = [1, 3, 128, 128]
     input_shp_2 = [1, 4]
