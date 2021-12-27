@@ -1,4 +1,3 @@
-#!/bin/bash
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,30 +13,15 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -lt 3 ]
-then
-    echo "Usage: bash run_eval_gpu.sh [DEVICE_ID] [DATASET_PATH] [CHECKPOINT_PATH]"
-exit 1
-fi
+"""Device adapter for ModelArts"""
 
-# check checkpoint file
-if [ ! -f $3 ]
-then
-    echo "error: CHECKPOINT_PATH=$3 is not a file"    
-exit 1
-fi
+from .config import config
 
-BASEPATH=$(cd "`dirname $0`" || exit; pwd)
-export PYTHONPATH=${BASEPATH}:$PYTHONPATH
+if config.enable_modelarts:
+    from .moxing_adapter import get_device_id, get_device_num, get_rank_id, get_job_id
+else:
+    from .local_adapter import get_device_id, get_device_num, get_rank_id, get_job_id
 
-if [ -d "./eval" ];
-then
-    rm -rf ./eval
-fi
-mkdir ./eval
-
-export CUDA_VISIBLE_DEVICES="$1"
-
-python ${BASEPATH}/../eval.py \
-        --data_path=$2 \
-        --checkpoint_path=$3 > eval/eval.log 2>&1 &
+__all__ = [
+    "get_device_id", "get_device_num", "get_rank_id", "get_job_id"
+]

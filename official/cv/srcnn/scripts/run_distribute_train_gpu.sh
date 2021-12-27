@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -lt 3 ]
+if [ $# -lt 4 ]
 then
-    echo "Usage: sh run_distribute_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [PRE_TRAINED](optional)"
+    echo "Usage: bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATA_PATH] [OUTPUT_PATH] [PRE_TRAINED](optional)"
 exit 1
 fi
 
@@ -40,29 +40,33 @@ cd train_parallel || exit
 
 export CUDA_VISIBLE_DEVICES="$2"
 
-if [ -f $4 ]  # pre_trained ckpt
+if [ $# -eq 5 ]  # pre_trained_path ckpt
 then 
     if [ $1 -gt 1 ]
     then
         mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
-            python3 ${BASEPATH}/../train.py \
-                    --dataset_path=$3 \
+            python ${BASEPATH}/../train.py \
+                    --data_path=$3 \
                     --run_distribute=True \
-                    --pre_trained=$4 > log.txt 2>&1 &
+                    --output_path=$4 \
+                    --pre_trained_path=$5 > log.txt 2>&1 &
     else
-        python3 ${BASEPATH}/../train.py \
-                --dataset_path=$3 \
-                --pre_trained=$4 > log.txt 2>&1 &
+        python ${BASEPATH}/../train.py \
+                --data_path=$3 \
+                --output_path=$4 \
+                --pre_trained_path=$5 > log.txt 2>&1 &
     fi
 else
     if [ $1 -gt 1 ]
     then
         mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
-            python3 ${BASEPATH}/../train.py \
+            python ${BASEPATH}/../train.py \
                     --run_distribute=True \
-                    --dataset_path=$3 > log.txt 2>&1 &
+                    --data_path=$3 \
+                    --output_path=$4 > log.txt 2>&1 &
     else
-        python3 ${BASEPATH}/../train.py \
-                --dataset_path=$3 > log.txt 2>&1 &
+        python ${BASEPATH}/../train.py \
+                --data_path=$3 \
+                --output_path=$4 > log.txt 2>&1 &
     fi
 fi
