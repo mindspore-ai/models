@@ -33,6 +33,7 @@ python ${PROJECT_DIR}/../run_ner.py  \
     --do_eval="false" \
     --assessment_method="BF1" \
     --use_crf="false" \
+    --with_lstm="false" \
     --device_id=0 \
     --epoch_num=5 \
     --train_data_shuffle="true" \

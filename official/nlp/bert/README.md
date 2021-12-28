@@ -349,7 +349,7 @@ options:
 
 ```text
 usage: run_ner.py   [--device_target DEVICE_TARGET] [--do_train DO_TRAIN] [----do_eval DO_EVAL]
-                    [--assessment_method ASSESSMENT_METHOD] [--use_crf USE_CRF]
+                    [--assessment_method ASSESSMENT_METHOD] [--use_crf USE_CRF] [--with_lstm WITH_LSTM]
                     [--device_id N] [--epoch_num N] [--vocab_file_path VOCAB_FILE_PATH]
                     [--label2id_file_path LABEL2ID_FILE_PATH]
                     [--train_data_shuffle TRAIN_DATA_SHUFFLE]
@@ -365,6 +365,7 @@ options:
     --do_eval                         whether to run eval on dev set: true | false
     --assessment_method               assessment method to do evaluation: f1 | clue_benchmark
     --use_crf                         whether to use crf to calculate loss: true | false
+    --with_lstm                       Whether to use LSTM subnet after the Bert network: true | false
     --device_id                       device id to run task
     --epoch_num                       total number of training epochs to perform
     --train_data_shuffle              Enable train data shuffle, default is true

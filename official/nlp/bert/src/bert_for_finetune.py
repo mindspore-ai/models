@@ -301,10 +301,11 @@ class BertNER(nn.Cell):
     Train interface for sequence labeling finetuning task.
     """
 
-    def __init__(self, config, batch_size, is_training, num_labels=11, use_crf=False,
+    def __init__(self, config, batch_size, is_training, num_labels=11, use_crf=False, with_lstm=False,
                  tag_to_index=None, dropout_prob=0.0, use_one_hot_embeddings=False):
         super(BertNER, self).__init__()
-        self.bert = BertNERModel(config, is_training, num_labels, use_crf, dropout_prob, use_one_hot_embeddings)
+        self.bert = BertNERModel(config, is_training, num_labels, use_crf, with_lstm, dropout_prob,
+                                 use_one_hot_embeddings)
         if use_crf:
             if not tag_to_index:
                 raise Exception("The dict for tag-index mapping should be provided for CRF.")
