@@ -67,7 +67,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - Docker base image
-    - [Ascend Hub](ascend.huawei.com/ascendhub/#/home)
+    - [Ascend Hub](https://ascend.huawei.com/ascendhub/#/home)
 - For more information, please check the resources below:
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
@@ -141,7 +141,7 @@ pip install mmcv=0.2.14
 
    ```shell
    # inference
-   bash run_infer_310.sh [AIR_PATH] [DATA_PATH] [ANN_FILE_PATH]
+   bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
    ```
 
    Note:
@@ -229,9 +229,9 @@ bash run_eval.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [DATA_PATH]
     # (5) Set the code directory to "/path/maskrcnn" on the website UI interface.
     # (6) Set the startup file to "train.py" on the website UI interface.
     # (7) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
-    # (8) Create your job.
+    # (8) Create your job.[AIR_PATH] [DATA_PATH] [ANN_FILE_PATH]
     #
-    # Train 1p with Ascend
+    # Train 1p with Ascend[AIR_PATH] [DATA_PATH] [ANN_FILE_PATH]
     # (1) Perform a or b.
     #       a. Set "enable_modelarts=True" on default_config.yaml file.
     #          Set "need_modelarts_dataset_unzip=True" on default_config.yaml file.
@@ -387,7 +387,7 @@ Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_PATH] [DATA_PA
 Usage: bash run_distribute_train_gpu.sh [PRETRAINED_MODEL] [DATA_PATH]
 
 # standalone training
-Usage: bash run_standalone_train.sh [PRETRAINED_MODEL]
+Usage: bash run_standalone_train.sh [PRETRAINED_MODEL] [DATA_PATH]
 ```
 
 ### [Parameters Configuration](#contents)
@@ -547,7 +547,7 @@ Usage: bash run_standalone_train.sh [PRETRAINED_MODEL]
 
 ```bash
 # standalone training
-bash run_standalone_train.sh [PRETRAINED_MODEL]
+bash run_standalone_train.sh [PRETRAINED_MODEL] [DATA_PATH]
 ```
 
 ### [Distributed Training Ascend](#content)

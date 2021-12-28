@@ -49,8 +49,8 @@ Transformer具体包括六个编码模块和六个解码模块。每个编码模
 
 ## 环境要求
 
-- 硬件（Ascend处理器/CPU处理器）
-    - 使用Ascend/GPu处理器准备硬件环境。
+- 硬件（Ascend处理器/GPU处理器）
+    - 使用Ascend/GPU处理器准备硬件环境。
 - 框架
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - 如需查看详情，请参见如下资源：
@@ -423,10 +423,10 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 | 上传日期                    | 2021-07-05                        | 2021-12-21                      |
 | MindSpore版本               | 1.3.0                            | 1.5.0                           |
 | 数据集                      | WMT英-德翻译数据集                  | WMT英-德翻译数据集                |
-| 训练参数                     | epoch=52, batch_size=96          | epoch=52, batch_size=96         |
+| 训练参数                     | epoch=52, batch_size=96          | epoch=52, batch_size=32         |
 | 优化器                      | Adam                              | Adam                            |
 | 损失函数                     | Softmax Cross Entropy            | Softmax Cross Entropy           |
-| BLEU分数                    | 28.7                              | 29.1                           |
+| BLEU分数                    | 28.7                              | 24.4                           |
 | 速度                        | 400毫秒/步(8卡)                    | 337 ms/step(8卡)                |
 | 损失                        | 2.8                               | 2.9                            |
 | 参数 (M)                    | 213.7                             | 213.7                          |
@@ -443,7 +443,7 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 | 数据集             | WMT newstest2014            | WMT newstest2014            |
 | batch_size          | 1                           | 1                           |
 | 输出             | BLEU score                  | BLEU score                  |
-| 准确率            | BLEU=28.7                   | BLEU=29.1                   |
+| 准确率            | BLEU=28.7                   | BLEU=24.4                   |
 
 ## 随机情况说明
 
