@@ -14,9 +14,14 @@
     - [训练过程](#训练过程)
         - [单卡训练](#单卡训练)
         - [分布式训练](#分布式训练)
+    - [评估过程](#评估过程)
+    - [导出过程](#导出过程)
+    - [推理过程](#推理过程)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [训练性能](#训练性能)
+        - [评估描述](#评估描述)
+        - [推理描述](#推理描述)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
 
@@ -73,6 +78,10 @@ bash scripts/run_distribute_train_ascend.sh [DEVICE_NUM] [BATCH_SIZE] [MAX_STEPS
 # 运行评估示例
 bash scripts/run_eval.sh [DEVICE_ID] [DEVICE_TARGET] [EVAL_CHECKPOINT] [EVAL_LOG_FILE]
 # example: bash scripts/run_eval.sh 0 Ascend ./checkpoints/rotate-standalone-ascend/rotate.ckpt eval-standalone-ascend.log
+
+# 运行推理示例
+bash run_infer_310.sh [MINDIR_HEAD_PATH] [MINDIR_TAIL_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+# example: bash run_infer_310.sh ../rotate-head.mindir ../rotate-tail.mindir ../Data/wn18rr/ y 0
 ```
 
 在裸机环境（本地有Ascend 910 AI 处理器）进行分布式训练时，需要配置当前多卡环境的组网信息文件。
@@ -102,11 +111,13 @@ bash scripts/run_eval.sh [DEVICE_ID] [DEVICE_TARGET] [EVAL_CHECKPOINT] [EVAL_LOG
 ```bash
 .
 └─rotate
-  ├─README.md
+  ├─README.md                              # 模型所有相关说明
+  ├─ascend310_infer                        # 实现310推理源代码
   ├─scripts
         ├─run_distribute_train_gpu.sh      # GPU分布式训练shell脚本
         ├─run_distribute_train_ascend.sh   # Ascend分布式训练shell脚本
         ├─run_eval.sh                      # 评估测试shell脚本
+        ├─run_infer_310.sh                 # Ascend推理shell脚本
         └─run_standalone_train.sh          # 单卡训练shell脚本
   ├─src
     ├─dataset.py                    # 创建数据集
@@ -114,6 +125,8 @@ bash scripts/run_eval.sh [DEVICE_ID] [DEVICE_TARGET] [EVAL_CHECKPOINT] [EVAL_LOG
   ├─eval.py                         # 评估脚本
   ├─export.py                       # 将checkpoint文件导出到mindir
   ├─requirements.txt                # 模型依赖包列表
+  ├─postprocess.py                  # 310推理后处理脚本
+  ├─preprocess.py                   # 310推理前处理脚本
   └─train.py                        # 训练脚本
 ```
 
@@ -208,7 +221,7 @@ bash scripts/run_eval.sh [DEVICE_ID] [DEVICE_TARGET] [EVAL_CHECKPOINT] [EVAL_LOG
 
   上述shell脚本将在后台运行分布训练。您可以通过ms_log/output-distribute-gpu.log文件查看结果。
 
-## 评估过程
+## [评估过程](#目录)
 
 - Ascend环境评估WN18RR数据集
 
@@ -244,13 +257,31 @@ bash scripts/run_eval.sh [DEVICE_ID] [DEVICE_TARGET] [EVAL_CHECKPOINT] [EVAL_LOG
   {'MRR': 0.4760354072358681, 'MR': 3325.9582003828973, 'HITS@1': 0.42756860242501593, 'HITS@3': 0.49505424377791957, 'HITS@10': 0.5724313975749841}
   ```
 
-## 导出过程
+## [导出过程](#目录)
 
 ```shell
 python export.py --eval_checkpoint [EVAL_CHECKPOINT] --file_format [FILE_FORMAT]
 ```
 
 参数eval_checkpoint为必填项，EXPORT_FORMAT 必须在 ["AIR", "MINDIR"]中选择。
+
+## [推理过程](#目录)
+
+在进行完上述导出模型过程之后，我们可以进行推理过程。请注意AIR模型只能在昇腾910环境上导出，MINDIR可以在任意环境上导出。本模型默认MINDIR格式，batch_size在推理时默认为1，在执行推理过程之前需要手动修改default_config.yaml中的test_batch_size为1。
+
+- 在昇腾310上使用wn18rr数据集进行推理
+
+  先进入到scripts目录下，然后执行下述命令即可进行推理：
+
+  ```bash
+  bash run_infer_310.sh ../rotate-head.mindir ../rotate-tail.mindir ../Data/wn18rr/ y 0
+  ```
+
+  完成上述命令后，即可在scripts下的eval.log中找到类似以下的结果：
+
+  ```bash
+  {'MRR': 0.4752237112953095, 'MR': 3239.202456924059, 'HITS@1': 0.4262922782386726,  'HITS@3': 0.49553286534779833, 'HITS@10': 0.5753031269942566}
+  ```
 
 # [模型描述](#目录)
 
@@ -267,15 +298,43 @@ python export.py --eval_checkpoint [EVAL_CHECKPOINT] --file_format [FILE_FORMAT]
 | 训练参数      | batch_size=512, negative_sample_size=1024, hidden_dim=500, gamma=6.0, alpha=0.5, lr=0.00005, max_steps=80000 | batch_size=512, negative_sample_size=1024, hidden_dim=500, gamma=6.0, alpha=0.5, lr=0.00005, max_steps=70000 |
 | 优化器        | Adam                                                         | Adam                                                         |
 | 损失函数      | 自对抗负采样Self-adversarial Negative Sampling Loss Function | 自对抗负采样Self-adversarial Negative Sampling Loss Function |
-| 微调检查点    | 156M (.ckpt文件)                                             | 156M (.ckpt文件)                                             |
 | 速度          | 单卡：141ms/step；8卡：24ms/step                             | 单卡：284ms/step；8卡：90ms/step                             |
 | 总时长        | 单卡：294min；8卡：38min                                     | 单卡：360min；8卡：107min                                    |
-| 输出          | MRR, MR, HITS@1, HITS@3, HITS@10                             | MRR, MR, HITS@1, HITS@3, HITS@10                             |
-| MRR           | 单卡：0.475194；8卡：0.475609                                | 单卡：0.476046；8卡：0.476035                                |
-| MR            | 单卡：3239.53；8卡：3240.68                                  | 单卡：3327.17；8卡：3325.95                                  |
-| HITS@1        | 单卡：0.426132；8卡：0.426292                                | 单卡：0.428206；8卡：0.427568                                |
-| HITS@3        | 单卡：0.495213；8卡：0.494894                                | 单卡：0.494097；8卡：0.495054                                |
-| HITS@10       | 单卡：0.575462；8卡：0.574984                                | 单卡：0.572112；8卡：0.572431                                |
+| 微调检查点    | 156M (.ckpt文件)                                             | 156M (.ckpt文件)                                             |
+
+### [评估描述](#目录)
+
+| 参数          | Ascend                      | GPU                   |
+| ------------------- | ------------------- | ------------------- |
+| 模型版本       | RotatE            | RotatE     |
+| 资源            | Ascend 910, 系统 Euler2.8 | Tesla V100-SXM2-32GB |
+| 上传日期       | 2021-12-17 | 2021-12-17 |
+| MindSpore版本   | 1.5.0                 | 1.5.0           |
+| 数据集             | wn18rr                  | wn18rr            |
+| 输出             | score | score |
+| MRR           | 单卡：0.475194；8卡：0.475609                            | 单卡：0.476046；8卡：0.476035 |
+| MR            | 单卡：3239.53；8卡：3240.68                              | 单卡：3327.17；8卡：3325.95 |
+| HITS@1        | 单卡：0.426132；8卡：0.426292                            | 单卡：0.428206；8卡：0.427568 |
+| HITS@3        | 单卡：0.495213；8卡：0.494894                            | 单卡：0.494097；8卡：0.495054 |
+| HITS@10       | 单卡：0.575462；8卡：0.574984                            | 单卡：0.572112；8卡：0.572431 |
+| 推理模型 | 156M (.ckpt文件)          | 156M (.ckpt文件) |
+
+### [推理描述](#目录)
+
+| 参数          | Ascend                    |
+| ------------- | ------------------------- |
+| 模型版本      | RotatE                    |
+| 资源          | Ascend 310, 系统 Euler2.8 |
+| 上传日期      | 2021-12-17                |
+| MindSpore版本 | 1.5.0                     |
+| 数据集        | wn18rr                    |
+| 输出          | score                     |
+| MRR           | 单卡: 0.475223            |
+| MR            | 单卡: 3239.20             |
+| HITS@1        | 单卡: 0.426292            |
+| HITS@3        | 单卡: 0.495532            |
+| HITS@10       | 单卡: 0.515303            |
+| 推理模型      | 156M (.ckpt文件)          |
 
 # [随机情况说明](#目录)
 
