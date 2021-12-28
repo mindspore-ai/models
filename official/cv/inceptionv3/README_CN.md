@@ -284,12 +284,7 @@ train.py和config.py中主要参数如下：
 
 - Ascend：
 
-```yaml
-ds_type:imagenet
-or
-ds_type:cifar10
-以训练cifar10为例,ds_type参数设置为cifar10
-````
+修改用到的yaml文件，默认为**default_config.yaml**文件，训练cifar10数据集时，**ds_type: cifar10**，训练imagenet数据集时，**ds_type: imagenet**．
 
 ```shell
 # 分布式训练示例(8卡)
@@ -301,8 +296,9 @@ bash scripts/run_standalone_train.sh [DEVICE_ID] [DATA_PATH] [CKPT_PATH]
 # example: bash scripts/run_standalone_train.sh 0 /home/DataSet/cifar10/ ./ckpt/
 ```
 
-> 注：RANK_TABLE_FILE可参考[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html)。device_ip可以通过[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)获取
-> 这是关于device_num和处理器总数的处理器核绑定操作。如不需要，请删除scripts/run_distribute_train.sh中的taskset操作。
+> 1. RANK_TABLE_FILE可参考[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成。
+>
+> 2. 如不需要关于device_num和处理器总数的处理器核绑定操作，请删除scripts/run_distribute_train.sh中的taskset操作。
 
 ### 启动
 
@@ -323,12 +319,12 @@ bash scripts/run_standalone_train.sh [DEVICE_ID] [DATA_PATH] [CKPT_PATH]
       # example: bash scripts/run_standalone_train.sh 0 /home/DataSet/cifar10/ ./ckpt/
 
       CPU:
-      bash script/run_standalone_train_cpu.sh DATA_PATH
+      bash script/run_standalone_train_cpu.sh DATA_PATH ./ckpt
 ```
 
 ### 结果
 
-训练结果保存在示例路径。检查点默认保存在`checkpoint`，训练日志会重定向到`./log.txt`，如下：
+训练结果保存在示例路径。checkpoint默认保存在`ckpt`路径下，训练日志会重定向到`./log.txt`，如下：
 
 #### Ascend
 
@@ -367,7 +363,7 @@ epoch time: 6358482.104 ms, per step time: 16303.800 ms
 - CPU:
 
 ```python
-    bash scripts/run_eval_cpu.sh DATA_PATH PATH_CHECKPOINT
+    bash run_eval_cpu.sh DATA_PATH PATH_CHECKPOINT
 ```
 
 ### 启动
@@ -380,7 +376,7 @@ epoch time: 6358482.104 ms, per step time: 16303.800 ms
 
   shell:
       Ascend: bash run_eval.sh [DEVICE_ID] [DATA_DIR] [PATH_CHECKPOINT]
-      CPU: bash scripts/run_eval_cpu.sh DATA_PATH PATH_CHECKPOINT
+      CPU: bash run_eval_cpu.sh DATA_PATH PATH_CHECKPOINT
 ```
 
 > 训练过程中可以生成检查点。
@@ -409,7 +405,7 @@ python export.py --config_path [CONFIG_FILE] --ckpt_file [CKPT_PATH] --device_ta
 
 ```shell
 # Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_FILE] [DEVICE_ID]
 ```
 
 -注意：310推理使用ImageNet数据集. 图片的标签是将所在文件夹排序后获得的从0开始的编号
