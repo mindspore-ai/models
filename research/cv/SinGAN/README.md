@@ -100,6 +100,7 @@ A single natural image, for example, 'thunder.jpg'
     ├─ manipulate.py        # SinGAN generate images define
     └─ model.py             # SinGAN networks define
   ├─ train.py               # SinGAN training
+  ├─ train_modelarts.py     # SinGAN training on modelarts
   ├─ eval.py                # SinGAN evaluation
   ├─ export.py              # SinGAN export
   ├─ postprocess.py         # Ascend-310 inference postprocess
@@ -210,7 +211,7 @@ Ascend310 inference result will be stored in the postprocess_Result path. Under 
 | Model Version              | SinGAN                                                     |
 | Resource                   | CentOs 8.2; Ascend 910; CPU 2.60GHz, 192cores; Memory 755G |
 | uploaded Date              | 12/14/2021 (month/day/year)                                |
-| MindSpore Version          | 1.5.0                                                      |
+| MindSpore Version          | 1.3.0                                                      |
 | Dataset                    | A single nature image                                      |
 | Training Parameters        | epoch=2000,  batch_size = 1, learning rate=0.0005          |
 | Optimizer                  | Adam                                                       |
@@ -219,7 +220,7 @@ Ascend310 inference result will be stored in the postprocess_Result path. Under 
 | Loss                       | scale 8: d_loss = -0.0204 , g_loss = 0.1911                |
 | Speed                      | scale 8:  0.058ms per step                                 |
 | Total time                 | 1pc(Ascend): 52.9 mins                                     |
-| Checkpoint for Fine tuning | scale 1~4: 119KB; scale 5~8: 453KB                         |
+| Checkpoint for Fine tuning | scale 1\~4: 119KB; scale 5\~8: 453KB                       |
 
 # [Description of Random Situation](#contents)
 
