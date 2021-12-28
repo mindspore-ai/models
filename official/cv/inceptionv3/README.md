@@ -205,7 +205,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 └─Inception-v3
   ├─README_CN.md
   ├─README.md
-  ├─ascend310_infer                           # application for 310 inference'
+  ├─ascend310_infer                           # application for 310 inference
   ├─infer
   ├─modelarts
   ├─scripts
@@ -278,12 +278,7 @@ You can start training using python or shell scripts. The usage of shell scripts
 
 - Ascend:
 
-```yaml
-ds_type:imagenet
-or
-ds_type:cifar10
-Take training cifar10 as an example, the ds_type parameter is set to cifar10
-```
+please modify your *.yaml file(default **default_config.yaml**), **ds_type: cifar10** when using cifar10 dataset, **ds_type: imagenet** when using imagenet dataset.
 
 ```shell
 # distribute training(8p)
@@ -302,9 +297,9 @@ bash scripts/run_standalone_train.sh [DEVICE_ID] [DATA_PATH] [CKPT_PATH]
 bash scripts/run_standalone_train_cpu.sh DATA_PATH
 ```
 
-> Notes: RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_ascend.html), and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV3, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
+> 1. RANK_TABLE_FILE can refer to [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV3, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 >
-> This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
+> 2. This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 
 ### Launch
 
@@ -324,12 +319,12 @@ bash scripts/run_standalone_train_cpu.sh DATA_PATH
       # example: bash scripts/run_standalone_train.sh 0 /home/DataSet/cifar10/ ./ckpt/
 
       CPU:
-      bash script/run_standalone_train_cpu.sh DATA_PATH
+      bash script/run_standalone_train_cpu.sh DATA_PATH ./ckpt
 ```
 
 ### Result
 
-Training result will be stored in the example path. Checkpoints will be stored at `. /checkpoint` by default, and training log  will be redirected to `./log.txt` like followings.
+Training result will be stored in the example path. Checkpoints will be stored at `./ckpt` by default, and training log  will be redirected to `./log.txt` like followings.
 
 #### Ascend
 
@@ -368,7 +363,7 @@ You can start training using python or shell scripts. The usage of shell scripts
 - CPU:
 
 ```shell
-    bash scripts/run_eval_cpu.sh DATA_PATH PATH_CHECKPOINT
+    bash run_eval_cpu.sh DATA_PATH PATH_CHECKPOINT
 ```
 
 ### Launch
@@ -381,7 +376,7 @@ You can start training using python or shell scripts. The usage of shell scripts
 
   shell:
       Ascend: bash scripts/run_eval.sh DEVICE_ID DATA_PATH PATH_CHECKPOINT
-      CPU: bash scripts/run_eval_cpu.sh DATA_PATH PATH_CHECKPOINT
+      CPU: bash run_eval_cpu.sh DATA_PATH PATH_CHECKPOINT
 ```
 
 > checkpoint can be produced in training process.
@@ -410,7 +405,7 @@ Before performing inference, the model file must be exported by export script on
 
 ```shell
 # Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_FILE] [DEVICE_ID]
 ```
 
 -NOTE: Ascend310 inference use Imagenet dataset . The label of the image is the number of folder which is started from 0 after sorting.
