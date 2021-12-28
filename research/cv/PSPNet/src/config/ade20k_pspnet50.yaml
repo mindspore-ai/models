@@ -1,0 +1,47 @@
+DATA:
+  data_root: ./data/ADE/
+  train_list: ./data/ADE/training_list.txt
+  val_list: ./data/ADE/val_list.txt  #   test_list: dataset/ade20k/list/validation.txt
+  classes: 150
+  prefix: ADE
+  save_dir: ./checkpoints/
+  backbone: resnet50
+  pretrain_path: ./data/resnet_deepbase.ckpt
+  ckpt: ./checkpoints/ade/ADE_1-100_2527.ckpt
+
+TRAIN:
+  arch: psp
+  feature_size: 60
+  train_h: 473
+  train_w: 473
+  scale_min: 0.5  # minimum random scale
+  scale_max: 2.0  # maximum random scale
+  rotate_min: -10  # minimum random rotate
+  rotate_max: 10  # maximum random rotate
+  zoom_factor: 8  # zoom factor for final prediction during training, be in [1, 2, 4, 8]
+  ignore_label: 255
+  aux_weight: 0.4
+  data_name: ade
+  batch_size: 8  # batch size for training
+  batch_size_val: 8  # batch size for validation during training
+  base_lr: 0.005
+  epochs: 100
+  start_epoch: 0
+  power: 0.9
+  momentum: 0.9
+  weight_decay: 0.0001
+
+
+TEST:
+  test_list: ./dataset/ade20k/list/validation.txt
+  split: val  # split in [train, val and test]
+  base_size: 512  # based size for scaling
+  test_h: 473
+  test_w: 473
+  scales: [1.0]  # evaluation scales, ms as [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
+  index_start: 0  # evaluation start index in list
+  index_step: 0  # evaluation step index in list, 0 means to end
+  result_path: ./result/ade/
+  color_txt: ./src/config/ade20k/ade20k_colors.txt
+  name_txt: ./src/config/ade20k/ade20k_names.txt
+
