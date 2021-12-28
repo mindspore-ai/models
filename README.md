@@ -153,6 +153,10 @@ For more information about `MindSpore` framework, please refer to [FAQ](https://
 
   **A**: Please check the version of MindSpore and the branch you fetch the modelzoo scripts. Some model scripits in latest branch will use new interface in the latest version of MindSpore.
 
+- **Q: What is Some *RANK_TBAL_FILE* which mentioned in many models?**
+
+  **A**: *RANK_TABLE_FILE* is the config file of cluster on Ascend while running distributed training. For more information, you could refer to the generator [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) and [Parallel Distributed Training Example](https://mindspore.cn/docs/programming_guide/en/r1.5/distributed_training_ascend.html#configuring-distributed-environment-variables)
+
 - **Q: How to run the scripts on Windows system?**
 
   **A**: Most the start-up scripts are written in `bash`, but we usually can't run bash directly on Windows. You can try start python directly without bash scripts. If you really need the start-up bash scripts, we suggest you the following method to get a bash environment on Windows:

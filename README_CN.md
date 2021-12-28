@@ -153,6 +153,10 @@ MindSpore已获得Apache 2.0许可，请参见LICENSE文件。
 
   **A**: 优先检查一下获取网络脚本的分支，与所使用的MindSpore版本是否一致，部分新分支中的模型脚本会使用一些新版本MindSpore才支持的接口，从而在使用老版本MindSpore时会发生报错.
 
+- **Q: 一些模型描述中提到的*RANK_TABLE_FILE*文件，是什么？**
+
+  **A**: *RANK_TABLE_FILE*是一个Ascend环境上用于指定分布式集群信息的文件，更多信息可以参考生成工具[hccl_toos](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)和[分布式并行训练教程](https://mindspore.cn/docs/programming_guide/zh-CN/r1.5/distributed_training_ascend.html#id4)
+
 - **Q: 在windows环境上要怎么运行网络脚本？**
 
   **A**: 多数模型都是使用bash作为启动脚本，在Windows环境上无法直接使用bash命令，你可以考虑直接运行python命令而不是bash启动脚本 ，如果你确实想需要使用bash脚本，你可以考虑使用以下几种方法来运行模型：
