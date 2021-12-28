@@ -63,8 +63,9 @@ export_batch_size: 1
 input_size: 513
 ckpt_file: ""
 file_name: "deeplabv3"
-file_format: "AIR"
+file_format: "MINDIR"
 export_model: "deeplab_v3_s8"
+result_path: ""
 
 ---
 
