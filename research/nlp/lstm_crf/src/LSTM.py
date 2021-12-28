@@ -25,13 +25,6 @@ STACK_LSTM_DEVICE = ["CPU"]
 
 
 # Initialize short-term memory (h) and long-term memory (c) to 0
-def lstm_default_state(batch_size, hidden_size, num_layers, bidirectional):
-    """init default input."""
-    num_directions = 2 if bidirectional else 1
-    h = Tensor(np.zeros((num_layers * num_directions, batch_size, hidden_size)).astype(np.float32))
-    c = Tensor(np.zeros((num_layers * num_directions, batch_size, hidden_size)).astype(np.float32))
-    return h, c
-
 def stack_lstm_default_state(batch_size, hidden_size, num_layers, bidirectional):
     """init default input."""
     num_directions = 2 if bidirectional else 1
