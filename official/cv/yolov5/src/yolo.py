@@ -148,7 +148,6 @@ class DetectionBlock(nn.Cell):
         self.concat = ops.Concat(axis=-1)
         self.pow = ops.Pow()
         self.transpose = ops.Transpose()
-        self.cast = ops.Cast()
         self.exp = ops.Exp()
         self.conf_training = is_training
 
@@ -182,7 +181,7 @@ class DetectionBlock(nn.Cell):
         # gridsize1 is x
         # gridsize0 is y
         box_xy = (self.scale_x_y * self.sigmoid(box_xy) - self.offset_x_y + grid) / \
-                 self.cast(ops.tuple_to_array((grid_size[1], grid_size[0])), ms.float32)
+                 ops.cast(ops.tuple_to_array((grid_size[1], grid_size[0])), ms.float32)
         # box_wh is w->h
         box_wh = self.exp(box_wh) * self.anchors / input_shape
 
@@ -258,7 +257,6 @@ class YoloLossBlock(nn.Cell):
         self.class_loss = ClassLoss()
 
         self.reduce_sum = ops.ReduceSum()
-        self.cast = ops.Cast()
         self.select = ops.Select()
         self.equal = ops.Equal()
         self.reshape = ops.Reshape()
@@ -281,7 +279,7 @@ class YoloLossBlock(nn.Cell):
         true_boxes = y_true[:, :, :, :, :4]
 
         grid_shape = prediction.shape[1:3]
-        grid_shape = self.cast(self.tuple_to_array(grid_shape[::-1]), ms.float32)
+        grid_shape = ops.cast(self.tuple_to_array(grid_shape[::-1]), ms.float32)
 
         pred_boxes = self.concat((pred_xy, pred_wh))
         true_wh = y_true[:, :, :, :, 2:4]
@@ -304,7 +302,7 @@ class YoloLossBlock(nn.Cell):
 
         # ignore_mask IOU too small
         ignore_mask = best_iou < self.ignore_threshold
-        ignore_mask = self.cast(ignore_mask, ms.float32)
+        ignore_mask = ops.cast(ignore_mask, ms.float32)
         ignore_mask = self.expand_dims(ignore_mask, -1)
         # ignore_mask backpro will cause a lot maximunGrad and minimumGrad time consume.
         # so we turn off its gradient
@@ -387,11 +385,10 @@ class YoloWithLossCell(nn.Cell):
         self.loss_me = YoloLossBlock('m', self.config)
         self.loss_small = YoloLossBlock('s', self.config)
         self.tenser_to_array = ops.TupleToArray()
-        self.cast = ops.Cast()
 
     def construct(self, x, y_true_0, y_true_1, y_true_2, gt_0, gt_1, gt_2, input_shape):
         input_shape = x.shape[2:4]
-        input_shape = self.cast(self.tenser_to_array(input_shape) * 2, ms.float32)
+        input_shape = ops.cast(self.tenser_to_array(input_shape) * 2, ms.float32)
 
         yolo_out = self.yolo_network(x, input_shape)
         loss_l = self.loss_big(*yolo_out[0], y_true_0, gt_0, input_shape)
@@ -404,7 +401,6 @@ class GIou(nn.Cell):
     """Calculating giou"""
     def __init__(self):
         super(GIou, self).__init__()
-        self.cast = ops.Cast()
         self.reshape = ops.Reshape()
         self.min = ops.Minimum()
         self.max = ops.Maximum()
@@ -430,9 +426,9 @@ class GIou(nn.Cell):
         union = box_p_area + box_gt_area - intersection
         union = union + self.eps
         c_area = c_area + self.eps
-        iou = self.div(self.cast(intersection, ms.float32), self.cast(union, ms.float32))
+        iou = self.div(ops.cast(intersection, ms.float32), ops.cast(union, ms.float32))
         res_mid0 = c_area - union
-        res_mid1 = self.div(self.cast(res_mid0, ms.float32), self.cast(c_area, ms.float32))
+        res_mid1 = self.div(ops.cast(res_mid0, ms.float32), ops.cast(c_area, ms.float32))
         giou = iou - res_mid1
         giou = ops.clip_by_value(giou, -1.0, 1.0)
         return giou
