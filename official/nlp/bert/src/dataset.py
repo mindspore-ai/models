@@ -39,7 +39,7 @@ class BucketDatasetGenerator:
         self.bucket_list = bucket_list
         self.data_bucket = {bucket: [] for bucket in bucket_list}
         bucket_size = len(bucket_list)
-        self.random_list = np.random.binomial(n=(bucket_size - 1), p=0.5, size=self.__len__())
+        self.random_list = np.random.binomial(n=(bucket_size - 1), p=0.55, size=self.__len__())
         self.random_list = (self.random_list + 2) % bucket_size
         self.random_list = [bucket_list[i] for i in self.random_list]
         self.iter = 0

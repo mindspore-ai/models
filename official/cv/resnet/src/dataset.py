@@ -118,22 +118,21 @@ def create_dataset2(dataset_path, do_train, batch_size=32, train_image_size=224,
     if do_train:
         trans = [
             C.RandomCropDecodeResize(train_image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
-            C.RandomHorizontalFlip(prob=0.5),
-            C.Normalize(mean=mean, std=std),
-            C.HWC2CHW()
+            C.RandomHorizontalFlip(prob=0.5)
         ]
     else:
         trans = [
             C.Decode(),
             C.Resize(256),
-            C.CenterCrop(eval_image_size),
-            C.Normalize(mean=mean, std=std),
-            C.HWC2CHW()
+            C.CenterCrop(eval_image_size)
         ]
+    trans_norm = [C.Normalize(mean=mean, std=std), C.HWC2CHW()]
 
     type_cast_op = C2.TypeCast(mstype.int32)
 
     data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=get_num_parallel_workers(12))
+    data_set = data_set.map(operations=trans_norm, input_columns="image",
+                            num_parallel_workers=get_num_parallel_workers(12))
     # only enable cache for eval
     if do_train:
         enable_cache = False
