@@ -14,8 +14,6 @@
 # ============================================================================
 """ STGAN TRAIN"""
 import time
-import tqdm
-
 from mindspore.common import set_seed
 
 from src.models import STGANModel
@@ -45,9 +43,9 @@ def train():
     model = STGANModel(args)
     it_count = 0
 
-    for _ in tqdm.trange(args.n_epochs, desc='Epoch Loop', unit='epoch'):
+    for epoch in range(args.n_epochs):
         start_epoch_time = time.time()
-        for _ in tqdm.trange(iter_per_epoch, desc='Step Loop', unit='step'):
+        for _ in range(iter_per_epoch):
             if model.current_iteration > it_count:
                 it_count += 1
                 continue
@@ -66,14 +64,14 @@ def train():
                     model.eval(data_loader)
 
             except KeyboardInterrupt:
-                logger.info('You have entered CTRL+C.. Wait to finalize')
+                print('You have entered CTRL+C.. Wait to finalize')
                 model.save_networks()
 
             it_count += 1
             model.current_iteration = it_count
         if args.rank == 0:
-            with open('performance.log', "a") as f:
-                f.write('average speed: {}ms/step\n'.format((time.time() - start_epoch_time)*1000/iter_per_epoch))
+            print('epoch: {}, average speed: {}ms/step'.format(
+                epoch, (time.time() - start_epoch_time) * 1000 / iter_per_epoch))
     model.save_networks()
     print('\n\n=============== finish training ===============\n\n')
 

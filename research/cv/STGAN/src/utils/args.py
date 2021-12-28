@@ -13,7 +13,6 @@
 # limitations under the License.
 # ============================================================================
 """arguments"""
-import os
 import argparse
 import ast
 import datetime
@@ -266,19 +265,7 @@ def get_args(phase):
         assert args.experiment_name != default_experiment_name, "--experiment_name should be assigned in test mode"
     if args.continue_train:
         assert args.experiment_name != default_experiment_name, "--experiment_name should be assigned in continue"
-    if args.device_num > 1 and args.platform == "Ascend":
-        context.set_context(mode=context.GRAPH_MODE,
-                            device_target=args.platform,
-                            save_graphs=args.save_graphs,
-                            device_id=int(os.environ["DEVICE_ID"]))
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(
-            parallel_mode=ParallelMode.DATA_PARALLEL,
-            gradients_mean=True,
-            device_num=args.device_num)
-        init()
-        args.rank = int(os.environ["DEVICE_ID"])
-    elif args.device_num > 1 and args.platform == "GPU":
+    if args.device_num > 1:
         init()
         context.reset_auto_parallel_context()
         args.rank = get_rank()

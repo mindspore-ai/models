@@ -61,9 +61,12 @@ class BaseModel(ABC):
                       'w') as f:
                 f.write(json.dumps(vars(self.args)))
             if self.current_iteration == -1:
-                with open(os.path.join(self.config_save_path, 'latest.conf'),
-                          'r') as f:
-                    self.current_iteration = int(f.read())
+                if os.path.exists(os.path.join(self.config_save_path, 'latest.conf')):
+                    with open(os.path.join(self.config_save_path, 'latest.conf'),
+                              'r') as f:
+                        self.current_iteration = int(f.read())
+                else:
+                    self.current_iteration = 0
 
         # sample save path
         if self.isTrain:

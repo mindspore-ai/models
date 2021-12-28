@@ -17,7 +17,7 @@
 
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_distribute_train.sh [RANK_TABLE_FILE] [EXPERIMENT_NAME] [DATA_PATH]"
+    echo "Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [EXPERIMENT_NAME] [DATA_PATH]"
 exit 1
 fi
 

@@ -17,7 +17,7 @@
 
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_eval.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID] [CHECKPOINT_PATH]"
+    echo "Usage: bash run_eval.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID] [CHECKPOINT_PATH]"
 exit 1
 fi
 
