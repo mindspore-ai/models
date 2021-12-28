@@ -1,0 +1,63 @@
+{
+    "im_maskrcnn": {
+        "stream_config": {
+            "deviceId": "0"
+        },
+        "appsrc0": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_imagedecoder0"
+        },
+        "mxpi_imagedecoder0": {
+            "factory": "mxpi_imagedecoder",
+            "next": "mxpi_imageresize0"
+        },
+        "mxpi_imageresize0": {
+            "props": {
+                "parentName": "mxpi_imagedecoder0",
+                "resizeHeight": "768",
+                "resizeWidth": "1280",
+                "resizeType": "Resizer_KeepAspectRatio_Fit"
+            },
+            "factory": "mxpi_imageresize",
+            "next": "mxpi_tensorinfer0:0"
+        },
+        "appsrc1": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_tensorinfer0:1"
+        },
+        "mxpi_tensorinfer0": {
+            "props": {
+                "dataSource": "mxpi_imageresize0,appsrc1",
+                "modelPath": "../data/model/maskrcnn_mobilenetv1_dvpp.om"
+            },
+            "factory": "mxpi_tensorinfer",
+            "next": "mxpi_objectpostprocessor0"
+        },
+        "mxpi_objectpostprocessor0": {
+            "props": {
+                "dataSource": "mxpi_tensorinfer0",
+                "postProcessConfigPath": "../data/config/maskrcnn_coco2017.cfg",
+                "labelPath": "../data/config/coco2017_to_labels.names",
+                "postProcessLibPath": "libmaskrcnnmindsporepost.so"
+            },
+            "factory": "mxpi_objectpostprocessor",
+            "next": "mxpi_dataserialize0"
+        },
+        "mxpi_dataserialize0": {
+            "props": {
+                "outputDataKeys": "mxpi_objectpostprocessor0"
+            },
+            "factory": "mxpi_dataserialize",
+            "next": "appsink0"
+        },
+        "appsink0": {
+            "factory": "appsink"
+        }
+    }
+}

@@ -24,6 +24,11 @@
 
 "models/research/cv/vehiclenet/infer/mxbase/src/Vehiclenet.h"  "runtime/references"
 
+"models/official/cv/maskrcnn_mobilenetv1/infer/mxbase/src/PostProcess/MaskRcnnMindsporePost.h" "runtime/references"
+"models/official/cv/maskrcnn_mobilenetv1/infer/mxbase/src/MaskRCNN.h" "runtime/references"
+"models/official/cv/maskrcnn_mobilenetv1/infer/mxbase/src/PostProcess/MaskRcnnMindsporePost.cpp" "runtime/references"
+"models/official/cv/maskrcnn_mobilenetv1/infer/mxbase/src/MaskRCNN.cpp" "runtime/references"
+
 "models/official/cv/Deepsort/infer/mxbase/src/main.cpp" "runtime/references"
 "models/official/cv/Deepsort/infer/mxbase/src/Deepsort.h" "runtime/references"
 "models/official/cv/densenet/infer/mxbase/Densenet121.h" "runtime/references"
