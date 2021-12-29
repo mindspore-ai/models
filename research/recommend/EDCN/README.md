@@ -290,6 +290,10 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 
 Inference result is saved in current path, you can find result in acc.log file.
 
+```bash
+auc: 0.6288036416334053
+```
+
 # [Model Description](#contents)
 
 ## [Performance](#contents)

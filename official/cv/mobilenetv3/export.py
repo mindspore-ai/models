@@ -20,12 +20,15 @@ import numpy as np
 from mindspore import context, Tensor, load_checkpoint, load_param_into_net, export
 from src.config import config_gpu
 from src.config import config_cpu
+from src.config import config_ascend
 from src.mobilenetV3 import mobilenet_v3_large
 
 
 parser = argparse.ArgumentParser(description='Image classification')
 parser.add_argument('--checkpoint_path', type=str, required=True, help='Checkpoint file path')
 parser.add_argument('--device_target', type=str, default="GPU", help='run device_target')
+parser.add_argument('--file_name', type=str, default="mobilenetv3", help='file name')
+parser.add_argument('--file_format', type=str, default="MINDIR", help='file format')
 args_opt = parser.parse_args()
 
 if __name__ == '__main__':
@@ -36,6 +39,9 @@ if __name__ == '__main__':
     elif args_opt.device_target == "CPU":
         cfg = config_cpu
         context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
+    elif args_opt.device_target == "Ascend":
+        cfg = config_ascend
+        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
     else:
         raise ValueError("Unsupported device_target.")
 
@@ -45,4 +51,4 @@ if __name__ == '__main__':
     load_param_into_net(net, param_dict)
     input_shp = [1, 3, cfg.image_height, cfg.image_width]
     input_array = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp).astype(np.float32))
-    export(net, input_array, file_name=cfg.export_file, file_format=cfg.export_format)
+    export(net, input_array, file_name=args_opt.file_name, file_format=args_opt.file_format)
