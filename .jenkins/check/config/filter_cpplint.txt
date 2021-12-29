@@ -98,6 +98,10 @@
 
 "models/research/cv/fairmot/infer/mxbase/src/Fairmot.h" "runtime/references"
 
+"models/official/cv/psenet/infer/mxbase/src/main.cpp"  "runtime/references"
+"models/official/cv/psenet/infer/mxbase/src/PsenetDetection.h"  "runtime/references"
+"models/official/cv/psenet/infer/mxbase/src/PsenetDetection.cpp"  "runtime/references"
+
 "models/research/cv/textfusenet/infer/mxbase/src/Textfusenet.h" "runtime/references"
 "models/research/cv/textfusenet/infer/mxbase/src/Textfusenet.cpp" "runtime/references"
 "models/research/cv/textfusenet/infer/mxbase/src/PostProcess/TextfusenetMindsporePost.h" "runtime/references"
