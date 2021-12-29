@@ -56,3 +56,23 @@ config_cpu = ed({
     "export_format": "MINDIR",
     "export_file": "mobilenetv3"
 })
+
+config_ascend = ed({
+    "num_classes": 1000,
+    "image_height": 224,
+    "image_width": 224,
+    "batch_size": 150,
+    "epoch_size": 370,
+    "warmup_epochs": 4,
+    "lr": 1.54,
+    "momentum": 0.9,
+    "weight_decay": 4e-5,
+    "label_smooth": 0.1,
+    "loss_scale": 1024,
+    "save_checkpoint": True,
+    "save_checkpoint_epochs": 1,
+    "keep_checkpoint_max": 500,
+    "save_checkpoint_path": "./checkpoint",
+    "export_format": "MINDIR",
+    "export_file": "mobilenetv3"
+})
