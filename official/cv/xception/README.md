@@ -137,7 +137,7 @@ Major parameters in train.py and config.py are:
 ```python
 Major parameters in train.py and config.py are:
 'num_classes': 1000                # dataset class numbers
-'batch_size': 64                  # input batchsize
+'batch_size': 64                   # input batchsize
 'loss_scale': 1024                 # loss scale
 'momentum': 0.9                    # momentum
 'weight_decay': 1e-4               # weight decay
@@ -147,7 +147,7 @@ Major parameters in train.py and config.py are:
 'keep_checkpoint_max': 5           # max numbers to keep checkpoints
 'save_checkpoint_path': "./gpu-ckpt"       # save checkpoint path
 'warmup_epochs': 1                 # warmup epoch numbers
-'lr_decay_mode': "linear"           # lr decay mode
+'lr_decay_mode': "linear"          # lr decay mode
 'use_label_smooth': True           # use label smooth
 'finish_epoch': 0                  # finished epochs numbers
 'label_smooth_factor': 0.1         # label smoothing factor
@@ -201,9 +201,9 @@ bash run_infer_310.sh MINDIR_PATH DATA_PATH LABEL_FILE DEVICE_ID
 # training example
   python:
       Ascend:
-      python train.py --device_target Ascend --dataset_path /dataset/train
+      python train.py --device_target Ascend --train_data_dir /dataset/train
       GPU:
-      python train.py --device_target GPU --dataset_path /dataset/train
+      python train.py --device_target GPU --train_data_dir /dataset/train
 
   shell:
       Ascend:
@@ -290,8 +290,8 @@ bash scripts/run_eval_gpu.sh DEVICE_ID DATA_DIR PATH_CHECKPOINT
 ```shell
 # eval example
   python:
-      Ascend: python eval.py --device_target Ascend --checkpoint_path PATH_CHECKPOINT --dataset_path DATA_DIR
-      GPU: python eval.py --device_target GPU --checkpoint_path PATH_CHECKPOINT --dataset_path DATA_DIR
+      Ascend: python eval.py --device_target Ascend --checkpoint_path PATH_CHECKPOINT --test_data_dir DATA_DIR
+      GPU: python eval.py --device_target GPU --checkpoint_path PATH_CHECKPOINT --test_data_dir DATA_DIR
 
   shell:
       Ascend: bash scripts/run_eval.sh DEVICE_ID DATA_DIR PATH_CHECKPOINT
@@ -383,7 +383,7 @@ result: {'Loss': 1.7846775874590903, 'Top_1_Acc': 0.798735595390525, 'Top_5_Acc'
 ### Inference
 
 Before performing inference, we need to export model first. Air model can only be exported in Ascend 910 environment, mindir model can be exported in any environment.
-Current batch_ size can only be set to 1.
+Current batch_size can only be set to 1.
 
 ```shell
 # Ascend310 inference
