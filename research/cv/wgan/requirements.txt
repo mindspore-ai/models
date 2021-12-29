@@ -1,3 +1,2 @@
-mindspore
-numpy
 Pillow
+lmdb
