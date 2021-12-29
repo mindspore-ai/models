@@ -197,7 +197,7 @@ Top5 acc:  0.92174
 
 | 参数                       | Ascend 910                    |
 | -------------------------- | ----------------------------- |
-| 模型                       | ResetNetV2-50-FRN             |
+| 模型                       | ProxylessNas-Mobile           |
 | 资源                       | Ascend 910                    |
 | 上传日期                   | 10/23/2021 (month/day/year)   |
 | MindSpore版本              | 1.3.0                         |
