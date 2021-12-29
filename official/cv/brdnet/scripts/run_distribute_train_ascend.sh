@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 8 ]; then
-  echo "Usage: sh run_distribute_train.sh [train_code_path] [train_data]" \
+  echo "Usage: bash run_distribute_train_ascend.sh [train_code_path] [train_data]" \
        "[batch_size] [sigma] [channel] [epoch] [lr] [rank_table_file_path]"
   exit 1
 fi
@@ -73,7 +73,7 @@ do
     fi
     mkdir ${train_code_path}device${DEVICE_ID}
     cd ${train_code_path}device${DEVICE_ID} || exit
-    nohup python ${train_code_path}train.py --is_distributed=1 \
+    nohup python ${train_code_path}train.py --device_target=Ascend --is_distributed=1 \
     --train_data=${train_data} \
     --batch_size=$3 \
     --sigma=$4 \
