@@ -168,6 +168,7 @@ def export(net, device_id, ckpt_file, file_format="AIR", batch_size=1):
     input_shp = [batch_size, 3] + config.img_shape
     input_array = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp),
                          mindspore.float32)
+    ckpt_file = CACHE_TRAIN_OUT_URL + '/ssdresnet50'
     export_model(net, input_array, file_name=ckpt_file, file_format=file_format)
     print(f"export {ckpt_file} to {file_format} success.")
 
@@ -177,7 +178,7 @@ def export_air(net, args):
     ckpt = get_last_ckpt()
     if not ckpt:
         return
-    export(net, args.device_id, ckpt, CACHE_TRAIN_OUT_URL + "ssd_resnet50", "AIR")
+    export(net, args.device_id, ckpt, "AIR")
 
 
 def ssd_model_build(args_opt):
