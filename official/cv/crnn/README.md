@@ -200,10 +200,10 @@ Usage: bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH]
 
 Parameters for both training and evaluation can be set in default_config.yaml.
 
-```shell
-max_text_length": 23,                     # max number of digits in each
-"image_width": 100,                        # width of text images
-"image_height": 32,                        # height of text images
+```yaml
+"max_text_length": 23,                       # max number of digits in each
+"image_width": 100,                          # width of text images
+"image_height": 32,                          # height of text images
 "batch_size": 64,                            # batch size of input tensor
 "epoch_size": 10,                            # only valid for taining, which is always 1
 "hidden_size": 256,                          # hidden size in LSTM layers
@@ -219,6 +219,14 @@ max_text_length": 23,                     # max number of digits in each
 "num_step": 24,                              # num step for LSTM layer
 "use_dropout": True,                         # whether use dropout
 "blank": 36                                  # add blank for classification
+"train_dataset_path": ""                     # the path for train dataset
+"train_eval_dataset": "svt"                  # dastaset name, choices [synth, ic03, ic13, svt, iiit5k]
+"train_eval_dataset_path": ""                # the path for eval dataset
+"run_eval": False                            # Run evaluation when training, default is False.
+"eval_all_saved_ckpts": False                # Load all checkpoint for eval, default is False.
+"save_best_ckpt": True                       # Save best checkpoint when run_eval is True, default is True.
+"eval_start_epoch": 5                        # Evaluation start epoch when run_eval is True, default is 5.
+"eval_interval": 1                           # Evaluation interval when run_eval is True, default is 5.
 ```
 
 ### [Dataset Preparation](#contents)
