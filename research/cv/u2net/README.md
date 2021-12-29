@@ -9,7 +9,9 @@
     - [Script and Sample Code](#script-and-sample-code)
     - [Script Parameters](#script-parameters)
     - [Run On Modelarts](#run-on-modelarts)
+    - [Model Export](#model-export)
     - [Training Process](#training-process)
+    - [Ascend310 Inference Process](#ascend310-inference-process)
 - [Model Description](#model-description)
     - [Performance](#performance)
     - [Training Performance](#training-performance)
@@ -54,7 +56,8 @@ To train U<sup>2</sup>-Net, We use the dataset [DUTS-TR](http://saliencydetectio
 ```shell
 U-2-Net
  ├─  README.md # descriptions about U-2-Net
- ├─  scripts  
+ ├─  scripts
+     ├─ run_infer_310.sh        # 310 inference
      └─ run_distribute_train.sh # launch Ascend training (8 Ascend)
  ├─ assets # save pics for README.MD
  ├─ ckpts  # save ckpt  
@@ -65,7 +68,11 @@ U-2-Net
  ├─  train_modelarts.py  # train script for online train
  ├─  test.py  # generate detection images
  ├─  eval.py  # eval script
- └─  train.py # train script
+ ├─  train.py # train script
+ ├─  ascend310_infer # 310 main
+ ├─  export.py
+ ├─  preprocess.py
+ └─  postprocess.py
 ```
 
 ## [Script Parameters](#contents)
@@ -166,6 +173,30 @@ bash run_distribute_train.sh [/path/to/content] [/path/to/label] [/path/to/RANK_
 
 1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it
    by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+## [Model Export](#contents)
+
+```bash
+python export.py --ckpt_dir [/path/to/ckpt_file]
+```
+
+## [Ascend310 Inference Process](#contents)
+
+### Export MINDIR file
+
+```bash
+python  export.py --ckpt_file [/path/to/ckpt_file]
+```
+
+### Ascend310 Inference
+
+- Run `run_infer_310.sh` for Ascend310 inference.
+
+```bash
+# infer
+bash run_infer_310.sh [MINDIR_PATH] [CONTENT_PATH] [LABEL_PATH] [DEVICE_ID]
+```
+
+Semantically segmented pictures will be stored in the postprocess_Result path and the evaluation result will be stored in evaluation.log.
 
 # [Model Description](#contents)
 
@@ -191,7 +222,7 @@ bash run_distribute_train.sh [/path/to/content] [/path/to/label] [/path/to/RANK_
 
 | Parameters        | single Ascend                                    |
 | ----------------- | ------------------------------------------------ |
-| Model Version     | v1                                               |
+| Model Version     | U-2-Net                                          |
 | Resource          | Red Hat 8.3.1; Ascend 910; CPU 2.60GHz; 192cores |
 | MindSpore Version | 1.3.0                                            |
 | Dataset           | content images                                   |
@@ -203,7 +234,7 @@ bash run_distribute_train.sh [/path/to/content] [/path/to/label] [/path/to/RANK_
 
 | Parameters        | single Ascend                                    |
 | ----------------- | ------------------------------------------------ |
-| Model Version     | v1                                               |
+| Model Version     | U-2-Net                                          |
 | Resource          | Red Hat 8.3.1; Ascend 910; CPU 2.60GHz; 192cores |
 | MindSpore Version | 1.3.0                                            |
 | Dataset           | DUTS-TE                                          |

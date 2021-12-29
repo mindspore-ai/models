@@ -75,7 +75,7 @@ if __name__ == '__main__':
             pred = np.array(Image.open(pred_path), dtype='float32')
 
             pic_name = content_list[i].replace(".jpg", "").replace(".png", "").replace(".JPEG", "")
-            print("%d / %d ,  %s \n" % (i, len(content_list), pic_name))
+            print("%d / %d ,  %s \n" % (i+1, len(content_list), pic_name))
             label_path = os.path.join(label_directory, pic_name) + ".png"
             label = np.array(Image.open(label_path), dtype='float32')
             if len(label.shape) > 2:

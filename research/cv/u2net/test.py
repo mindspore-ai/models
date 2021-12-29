@@ -82,7 +82,7 @@ if __name__ == '__main__':
         return img
 
 
-    def crop_and_resize(img_path, im_type, size=320):
+    def resize_im(img_path, size=320):
         """crop and resize tensors"""
         img = np.array(Image.open(img_path), dtype='float32')
         img = img / 255
@@ -105,7 +105,7 @@ if __name__ == '__main__':
     start_time = time.time()
     for j in range(0, len(content_list)):
         pic_path = os.path.join(local_dataset_dir, content_list[j])
-        content_pic = crop_and_resize(pic_path, im_type="content", size=320)
+        content_pic = resize_im(pic_path, size=320)
         image = net(Tensor(content_pic))
         content_name = content_list[j].replace(".jpg", "")
         content_name = content_name.replace(".png", "")
