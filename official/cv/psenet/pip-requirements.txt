@@ -1,0 +1,6 @@
+numpy
+opencv-python
+pillow
+pyyaml
+Polygon3==3.0.9.1
+pyclipper==1.3.0
