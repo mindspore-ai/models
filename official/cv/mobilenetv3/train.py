@@ -49,7 +49,7 @@ parser = argparse.ArgumentParser(description='Image classification')
 parser.add_argument('--dataset_path', type=str, default=None, help='Dataset path')
 parser.add_argument('--pre_trained', type=str, default=None, help='Pretrained checkpoint path')
 parser.add_argument('--device_target', type=str, default="GPU", help='run device_target')
-parser.add_argument('--run_distribute', type=ast.literal_eval, default=True, help='Run distribute')
+parser.add_argument('--run_distribute', type=ast.literal_eval, default=False, help='Run distribute')
 args_opt = parser.parse_args()
 
 if args_opt.device_target == "GPU":
