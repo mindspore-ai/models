@@ -36,8 +36,10 @@ config.rank_size = get_device_num()
 
 set_seed(1)
 
+
 def modelarts_pre_process():
     pass
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_deepfm():
@@ -72,7 +74,7 @@ def train_deepfm():
             context.set_context(mode=context.GRAPH_MODE, enable_graph_kernel=True, device_target=config.device_target)
             context.set_context(graph_kernel_flags="--enable_cluster_ops=MatMul")
         else:
-            context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+            context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, enable_graph_kernel=True)
         config.rank_size = None
         rank_id = None
 
@@ -121,6 +123,7 @@ def train_deepfm():
                                      eval_file_path=config.eval_file_name)
         callback_list.append(eval_callback)
     model.train(config.train_epochs, ds_train, callbacks=callback_list)
+
 
 if __name__ == '__main__':
     train_deepfm()
