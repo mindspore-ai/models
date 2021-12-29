@@ -20,9 +20,9 @@ then
 exit 1
 fi
 
-export DEVICE_ID=$1
+export CUDA_VISIBLE_DEVICES=$1
 PROJECT_DIR=$(cd ./"`dirname $0`" || exit; pwd)
-train_path=train_standalone${DEVICE_ID}
+train_path=train_standalone${CUDA_VISIBLE_DEVICES}
 
 if [ -d ${train_path} ]; then
   rm -rf ${train_path}
@@ -32,7 +32,7 @@ cp -r ./src ${train_path}
 cp ./train.py ${train_path}
 cp ./*.yaml ${train_path}
 
-echo "start training for device $DEVICE_ID"
+echo "start training for device $CUDA_VISIBLE_DEVICES"
 
 cd ${train_path}|| exit
 
