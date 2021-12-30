@@ -221,7 +221,7 @@ def run_train():
 
     # define callbacks
     time_cb = TimeMonitor(data_size=batch_num)
-    loss_cb = LossMonitor(per_print_times=batch_num)
+    loss_cb = LossMonitor()
     callbacks = [time_cb, loss_cb]
     if config.rank_save_ckpt_flag:
         ckpt_config = CheckpointConfig(save_checkpoint_steps=config.ckpt_interval * config.steps_per_epoch,
