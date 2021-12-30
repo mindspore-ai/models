@@ -91,7 +91,7 @@ def create_dataset(dataset_path, batch_size=1, num_shards=1, shard_id=0, device_
         vc.Rescale(1.0 / 255.0, 0.0),
         vc.Normalize([0.9010, 0.9049, 0.9025], std=[0.1521, 0.1347, 0.1458]),
         vc.Resize((m.ceil(config.captcha_height / 16) * 16, config.captcha_width)),
-        c.TypeCast(mstype.float16)
+        c.TypeCast(mstype.float32)
     ]
     image_trans_gpu = [
         vc.Rescale(1.0 / 255.0, 0.0),
