@@ -39,7 +39,7 @@ from src.dataset import data_to_mindrecord_byte_image, create_fasterrcnn_dataset
 from src.lr_schedule import dynamic_lr
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
-from src.model_utils.device_adapter import get_device_id, get_device_num, get_rank_id
+from src.model_utils.device_adapter import get_device_id
 
 
 def train_fasterrcnn_():
@@ -210,21 +210,12 @@ if __name__ == '__main__':
     if config.device_target == "GPU":
         context.set_context(enable_graph_kernel=True)
     if config.run_distribute:
-        if config.device_target == "Ascend":
-            rank = get_rank_id()
-            device_num = get_device_num()
-            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
-            init()
-            summary_dir += "thread_num_" + str(rank) + "/"
-        else:
-            init("nccl")
-            context.reset_auto_parallel_context()
-            rank = get_rank()
-            device_num = get_group_size()
-            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
-            summary_dir += "thread_num_" + str(rank) + "/"
+        init()
+        rank = get_rank()
+        device_num = get_group_size()
+        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                          gradients_mean=True)
+        summary_dir += "thread_num_" + str(rank) + "/"
     else:
         rank = 0
         device_num = 1
