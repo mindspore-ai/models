@@ -168,9 +168,8 @@ def run_train():
                                    neg_gnew_neighs)
 
             if iter_num == num_iter:
-                print('Epoch', '%03d' % _epoch, 'iter', '%02d' % iter_num,
-                      'loss',
-                      '{}, cost:{:.4f}'.format(train_loss, time.time() - epoch_start))
+                print('Epoch: {}, iter: {}, loss: {}, epoch time: {:.4f}, per step time: {:.4f}'.format(
+                    _epoch, iter_num, train_loss, time.time() - epoch_start, (time.time()-epoch_start) / num_iter))
             iter_num += 1
 
         if _epoch % config.eval_interval == 0:
