@@ -1,0 +1,63 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+
+# Url for modelarts
+data_url: "/data/bucket-4609/dataset/pvnet/data2mindrecord/"
+train_url: "/data/bucket-4609/dataset/pvnet/trained/new"
+group_size: 1
+rank: 0
+device_target: "Ascend"
+distribute: False
+
+# ==============================================================================
+# training option# options
+cls_name: "cat"
+vote_num: 9
+workers_num: 16
+batch_size: 16
+epoch_size: 200
+learning_rate: 0.0005
+learning_rate_decay_epoch: 20
+learning_rate_decay_rate: 0.5
+pretrained_path: "./resnet18-5c106cde.ckpt"
+
+loss_scale_value: 1024
+scale_factor: 2
+scale_window: 1000
+
+# dataset options
+dataset_name: "LINEMOD"
+dataset_dir: "/data/bucket-4609/dataset/pvnet/data/"
+origin_dataset_name: "LINEMOD_ORIG"
+img_width: 640
+img_height: 480
+
+# eval or export option
+ckpt_file: "/data/bucket-4609/dataset/train_cat-199_618.ckpt"
+eval_dataset: "/data/bucket-4609/dataset/pvnet/data/"
+result_path: "./result_Files"
+file_name: "pvnet"
+file_format: "MINDIR"
+keep_checkpoint_max: 10
+
+# augment option
+img_crop_size_width: 480
+img_crop_size_height: 360
+rotation: True
+rot_ang_min: -30  # rotate angle range
+rot_ang_max: 30   # rotate angle range
+crop: True
+resize_ratio_min: 0.8  # resize ration range
+resize_ratio_max: 1.2  # resize ration range
+overlap_ratio: 0.8
+brightness: 0.1
+contrast: 0.1
+saturation: 0.05
+hue: 0.05
+
+
+---
+
+# Help description for each configuration
+data_url: "data url for modelarts"
+train_url: "train url for modelarts"
+device_target: 'Target device type, only support Ascend'
