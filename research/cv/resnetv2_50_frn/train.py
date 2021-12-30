@@ -52,16 +52,8 @@ def prepare_env():
     if config.is_distributed:
         init()
 
-        if config.enable_modelarts:
-            device_id = get_rank()
-            config.group_size = get_group_size()
-        else:
-            if config.device_target == 'Ascend':
-                device_id = int(os.getenv('DEVICE_ID', default='0'))
-                config.group_size = int(os.getenv('DEVICE_NUM', default='1'))
-            else:
-                device_id = get_rank()
-                config.group_size = get_group_size()
+        device_id = get_rank()
+        config.group_size = get_group_size()
 
         context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
                                           device_num=config.group_size,

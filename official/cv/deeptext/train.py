@@ -107,13 +107,9 @@ def run_train():
         context.set_context(enable_graph_kernel=True)
     if config.run_distribute:
         init()
-        if device_type == "Ascend":
-            rank = get_rank_id()
-            device_num = get_device_num()
-        else:
-            context.reset_auto_parallel_context()
-            rank = get_rank()
-            device_num = get_group_size()
+        context.reset_auto_parallel_context()
+        rank = get_rank()
+        device_num = get_group_size()
         context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
                                           gradients_mean=True)
     else:

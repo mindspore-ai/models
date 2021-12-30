@@ -157,13 +157,7 @@ def inception_v4_train():
         context.set_context(enable_graph_kernel=False)
 
     if device_num > 1:
-        if config.platform == "Ascend":
-            init(backend_name='hccl')
-        elif config.platform == "GPU":
-            init()
-        else:
-            raise ValueError("Unsupported device target.")
-
+        init()
         config.rank = get_rank()
         config.group_size = get_group_size()
         context.set_auto_parallel_context(device_num=device_num,

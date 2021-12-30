@@ -181,7 +181,7 @@ args.rank = args.device_id
 # init distributed
 if args.is_distributed:
     if args.device_target == "Ascend":
-        init()
+        init("hccl")
     else:
         init("nccl")
     args.group_size = get_group_size()
