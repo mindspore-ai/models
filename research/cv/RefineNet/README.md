@@ -23,6 +23,10 @@
             - [Ascend处理器环境运行](#ascend处理器环境运行-1)
         - [结果](#结果-1)
             - [训练准确率](#训练准确率)
+    - [Mindir推理](#Mindir推理)
+        - [导出模型](#导出模型)
+        - [在Ascend310执行推理](#在Ascend310执行推理)
+        - [结果](#结果)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -346,6 +350,35 @@ cd ..
 | **网络** | mIOU |论文中的mIOU |
 | :----------: | :-----: | :-------------: |
 | refinenet | 80.3 | 80.3    |
+
+## Mindir推理
+
+### [导出模型](#contents)
+
+```shell
+python export.py --checkpoint [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+- 参数`checkpoint`为必填项。
+- `file_format` 必须在 ["AIR", "MINDIR"]中选择。
+
+### 在Ascend310执行推理
+
+在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用mindir模型执行推理的示例。
+目前仅支持batch_size为1的推理。
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_ID]
+```
+
+- `DATA_ROOT` 表示进入模型推理数据集的根目录。
+- `DATA_LIST` 表示进入模型推理数据集的文件列表。
+- `DEVICE_ID` 可选，默认值为0。
+
+### 结果
+
+推理结果保存在脚本执行的当前路径，你可以在acc.log中看到以下精度计算结果。
 
 # 模型描述
 

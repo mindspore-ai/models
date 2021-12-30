@@ -25,7 +25,7 @@ from src.model.classifier import Classifier
 
 parser = argparse.ArgumentParser(description='meta-baseline')
 parser.add_argument('--device_id', type=int, default=0, help='Device id.')
-parser.add_argument("--batch_size", type=int, default=128, help="batch size")
+parser.add_argument("--batch_size", type=int, default=320, help="batch size")
 parser.add_argument('--n_classes', type=int, default=64)
 parser.add_argument('--ckpt_file', type=str, required=True, help='Checkpoint file path.')
 parser.add_argument('--file_name', type=str, default='meta_baseline', help='Output file name.')
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     assert args.ckpt_file is not None, "args.ckpt_file is None."
     param_dict = load_checkpoint(args.ckpt_file)
     load_param_into_net(network, param_dict)
-
+    network.set_train(mode=False)
     img = Tensor(np.ones([args.batch_size, 3, 84, 84]), mstype.float32)
 
-    export(network, img, file_name=args.file_name, file_format=args.file_format)
+    export(network.encoder, img, file_name=args.file_name, file_format=args.file_format)
