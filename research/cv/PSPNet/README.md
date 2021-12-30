@@ -13,8 +13,13 @@
         - [Training Results](#training-results)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
-        - [Evaluation Result](#evaluation-result)
+        - [Evaluation Result](#evaluation-resul)
+    - [Export MindIR](#export-mindir)
+    - [310 infer](#310-inference)
 - [Model Description](#model-description)
+    - [Performance](#performance)
+        - [Evaluation Performance](#evaluation-performance)
+    - [Inference Performance](#inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -52,6 +57,7 @@ The pyramid pooling module fuses features under four different pyramid scales.Fo
 ```python
 .
 └─PSPNet
+├── ascend310_infer
 ├── eval.py                                    # Evaluation python file for ADE20K/VOC2012
 ├── export.py                                  # export mindir
 ├── README.md                                  # descriptions about PSPnet
@@ -74,8 +80,9 @@ The pyramid pooling module fuses features under four different pyramid scales.Fo
 │       └── p_util.py                          # some functions
 │
 ├── scripts
-│   ├── run_distribute_train_ascend.sh              # multi cards distributed training in ascend
-│   ├── run_train1p_ascend.sh              # multi cards distributed training in ascend
+│   ├── run_distribute_train_ascend.sh         # multi cards distributed training in ascend
+│   ├── run_train1p_ascend.sh                  # 1P training in ascend
+│   ├── run_infer_310.sh                       # 310 infer
 │   └── run_eval.sh                            # validation script
 └── train.py                                         # The training python file for ADE20K/VOC2012
 ```
@@ -160,12 +167,28 @@ Check the checkpoint path in config/ade20k_pspnet50.yaml and config/voc2012_pspn
 
 ### Evaluation Result
 
-The results at eval/log were as follows:
+The results at eval.log were as follows:
 
 ```bash
 ADE20K:mIoU/mAcc/allAcc 0.4164/0.5319/0.7996.
 VOC2012:mIoU/mAcc/allAcc 0.7380/0.8229/0.9293.
 ````
+
+## [Export MindIR](#contents)
+
+```shell
+python export.py --yaml_path [YAML_PTAH] --ckpt_file [CKPT_PATH]
+```
+
+The ckpt_file parameter is required,
+
+## 310 infer
+
+- Note: Before executing 310 infer, create the MINDIR/AIR model using "python export.py --ckpt_file [The path of the CKPT for exporting] --config [The yaml file]".
+
+```shell
+    bash run_infer_310.sh [MINDIR PTAH [YAML PTAH] [DATA PATH] [DEVICE ID]
+```
 
 # [Model Description](#Content)
 
@@ -185,6 +208,18 @@ VOC2012:mIoU/mAcc/allAcc 0.7380/0.8229/0.9293.
 |total time             |6h10m34s(1pcs)    |
 |Script URL             |https://gitee.com/mindspore/models/tree/master/research/cv/PSPNet|
 |Random number seed     |set_seed = 1234     |
+
+## Inference Performance
+
+| Parameters          | Ascend                      |
+| ------------------- | --------------------------- |
+| Model Version       | PSPNet                |
+| Resource            | Ascend 310; OS Euler2.8                   |
+| Uploaded Date       | 12/22/2021 (month/day/year) |
+| MindSpore Version   | 1.5.0                 |
+| Dataset             | voc2012/ade20k    |
+| outputs             | Miou/Acc                 |
+| Accuracy            | 0.4164/0.7996.(ade20k) 0.7380/0.9293(voc2012) |
 
 # [Description of Random Situation](#Content)
 
