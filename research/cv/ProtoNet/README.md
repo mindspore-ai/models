@@ -157,6 +157,38 @@ Test Acc in Ascend: 0.9954400658607483  Loss: 0.02102319709956646
 Test Acc in GPU: 0.996999979019165  Loss: 0.013885765336453915
 ```
 
+## [Inference Process](#contents)
+
+### [Export MindIR](#contents)
+
+```shell
+python export.py --ckpt_file [CKPT_PATH] --file_format [FILE_FORMAT]
+```
+
+The ckpt_file parameter is required,
+`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+
+### [Infer on Ascend310](#contents)
+
+Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` specifies path of used "MINDIR" OR "AIR" model.
+- `DATASET_PATH` specifies path of omniglot datasets  
+- `DEVICE_ID` is optional, default value is 0.
+
+### [Result](#contents)
+
+Inference result is saved in current path, you can find result like this in acc.log file.
+
+```bash
+'acc': 0.9956
+```
+
 # [Model Description](#contents)
 
 ## [Performance](#contents)
