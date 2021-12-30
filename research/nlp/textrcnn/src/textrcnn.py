@@ -48,7 +48,7 @@ class textrcnn(nn.Cell):
         if cell == "lstm":
             if self.gpu_flag:
                 self.lstm = nn.LSTM(self.embed_size, self.num_hiddens)
-                self.lstm.to_float(mstype.float16)
+                self.lstm.to_float(mstype.float32)
             else:
                 self.lstm = P.DynamicRNN(forget_bias=0.0)
                 self.w1_fw = Parameter(
@@ -216,5 +216,5 @@ class textrcnn(nn.Cell):
         output_dense = self.tanh(output_dense)  # sl*bs, num_hidden
         output = self.reshape(output_dense, (F.shape(x)[0], self.batch_size, self.num_hiddens))  # sl, bs, num_hidden
         output = self.reduce_max(output, 0)  # bs, num_hidden
-        outputs = self.cast(self.mydense(output), mstype.float16)  # bs, num_classes
+        outputs = self.cast(self.mydense(output), mstype.float32)  # bs, num_classes
         return outputs
