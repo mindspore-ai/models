@@ -16,6 +16,8 @@
         - [分布式训练](#分布式训练)
     - [评估过程](#评估过程)
         - [评估](#评估)
+            - [910评估](#910评估)
+            - [310评估·](#310评估)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [训练性能](#训练性能)
@@ -91,9 +93,12 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
         ├── cv
             ├── siamRPN
                 ├── README_CN.md           // googlenet相关说明
-                ├── ascend310_infer        // 实现310推理源代码
+                ├── ascend_310_infer        // 实现310推理源代码
                 ├── scripts
                 │    ├──run.sh              // 训练脚本
+                |    |──run_distribute_train.sh //本地多卡训练脚本
+                |    |──run_eval.sh         //910评估脚本
+                |    |──run_infer_310.sh    //310推理评估脚本
                 ├── src
                 │    ├──data_loader.py      // 数据集加载处理脚本
                 │    ├──net.py              //  siamRPN架构
@@ -184,6 +189,8 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 
 ### 评估
 
+#### 910评估
+
 - 评估过程如下，需要vot数据集对应video的图片放于对应文件夹的color文件夹下，标签groundtruth.txt放于该目录下。
 
 ```bash
@@ -195,6 +202,21 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 
 ```bash
 {... "all_videos": {"accuracy": 0.5809545709441025, "robustness": 0.33422978326730364, "eao": 0.3102655908013835}}
+```
+
+#### 310评估
+
+- 评估过程如下，需要vot数据集对应video的图片放于对应文件夹的color文件夹下，标签groundtruth.txt放于该目录下，并到script目录。
+
+```bash
+# 使用数据集
+  bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATA_NAME] [DEVICE_ID]
+```
+
+查看评估结果命令如下：
+
+```bash
+cat acc.log
 ```
 
 # 模型描述
@@ -210,7 +232,7 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 | 上传日期              | 2021-07-22                                           |
 | MindSpore版本        | 1.2.0-alpha                                     |
 | 数据集                |VID-youtube-bb                                     |
-| 训练参数  |epoch=50, steps=1147, batch_size = 32 |
+| 训练参数  |epoch=50, steps=1471, batch_size = 32 |
 | 优化器                  | SGD                                                        |
 | 损失函数 | 自定义损失函数 |
 | 输出              | 目标框                                                |

@@ -21,6 +21,7 @@ from mindspore.ops import composite as C
 from mindspore.parallel._utils import _get_device_num, _get_parallel_mode, _get_gradients_mean
 from mindspore.context import ParallelMode
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
+from config import config
 
 class SiameseRPN(nn.Cell):
     """
@@ -34,7 +35,7 @@ class SiameseRPN(nn.Cell):
         Returns:
             coutputs tensor, routputs tensor.
         """
-    def __init__(self, groups=1, k=5, s=4, is_train=False, is_trackinit=False, is_track=False):
+    def __init__(self, groups=1, k=5, s=4, is_train=False, is_trackinit=False, is_track=False, is_310infer=False):
         super(SiameseRPN, self).__init__()
         self.groups = groups
         self.k = k
@@ -42,6 +43,7 @@ class SiameseRPN(nn.Cell):
         self.is_train = is_train
         self.is_trackinit = is_trackinit
         self.is_track = is_track
+        self.is_310infer = is_310infer
         self.expand_dims = ops.ExpandDims()
         self.featureExtract = nn.SequentialCell(
             [nn.Conv2d(3, 96, kernel_size=11, stride=2, pad_mode='valid', has_bias=True),
@@ -148,6 +150,37 @@ class SiameseRPN(nn.Cell):
                 self.reshape(routputs, (-1, 4, 1445)), (0, 2, 1))
             pred_score = self.softmax(pred_score)[0, :, 1]
             out1, out2 = pred_score, pred_regression
+        elif self.is_310infer is True:
+            template_feature = self.featureExtract(template)
+            detection_feature = self.featureExtract(detection)
+
+            ckernal = self.conv1(template_feature)
+            ckernal = self.reshape(ckernal.view(self.groups, 2 * self.k, 256, 4, 4), (-1, 256, 4, 4))
+            cinput = self.reshape(self.conv3(detection_feature), (1, -1, 20, 20))
+
+            rkernal = self.conv2(template_feature)
+            rkernal = self.reshape(rkernal.view(self.groups, 4 * self.k, 256, 4, 4), (-1, 256, 4, 4))
+            rinput = self.reshape(self.conv4(detection_feature), (1, -1, 20, 20))
+            c_features = self.op_split_input(cinput)
+            c_weights = self.op_split_krenal(ckernal)
+            r_features = self.op_split_input(rinput)
+            r_weights = self.op_split_krenal(rkernal)
+            coutputs = ()
+            routputs = ()
+            for i in range(self.groups):
+                coutputs = coutputs + (self.conv2d_cout(c_features[i], c_weights[i]),)
+                routputs = routputs + (self.conv2d_rout(r_features[i], r_weights[i]),)
+            coutputs = self.op_concat(coutputs)
+            routputs = self.op_concat(routputs)
+            coutputs = self.reshape(coutputs, (self.groups, 2*config.anchor_num, config.score_size, config.score_size))
+            routputs = self.reshape(routputs, (self.groups, 4*config.anchor_num, config.score_size, config.score_size))
+            routputs = self.regress_adjust(routputs)
+            coutputs = self.transpose(
+                self.reshape(coutputs, (-1, 2, config.anchor_num * config.score_size* config.score_size)), (0, 2, 1))
+            routputs = self.transpose(
+                self.reshape(routputs, (-1, 4, config.anchor_num * config.score_size* config.score_size)),
+                (0, 2, 1))
+            out1, out2 = coutputs, routputs
         else:
             out1, out2 = template, detection
         return out1, out2
