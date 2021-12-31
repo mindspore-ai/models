@@ -29,7 +29,7 @@ get_real_path(){
 export DATA_PATH=$(get_real_path $1) # dataset path
 export TRAIN_CLASS=$2 # train class, propose 20
 export EPOCHS=$3 # num of epochs
-export DEVICE_NUM=$4 # device_num
+export RANK_SIZE=$4 # device_num
 
 if [ ! -d $DATA_PATH ]
 then
@@ -40,7 +40,7 @@ fi
 rm -rf distribute_output
 mkdir distribute_output
 
-mpirun --allow-run-as-root -n $DEVICE_NUM --output-filename log_output --merge-stderr-to-stdout \
+mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
   python ../train.py --dataset_root=$DATA_PATH \
                 --device_target="GPU" \
                 --classes_per_it_tr=$TRAIN_CLASS \

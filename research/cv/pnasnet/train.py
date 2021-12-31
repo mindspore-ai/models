@@ -118,12 +118,10 @@ def train():
     else:
         dataset_train_path = os.path.join(dataset_path, 'train')
 
-    drop_remainder = config.drop_remainder
-
     train_dataset = create_dataset(dataset_train_path, True, config.rank, config.group_size,
                                    num_parallel_workers=config.work_nums,
                                    batch_size=config.train_batch_size,
-                                   drop_remainder=drop_remainder, shuffle=True,
+                                   drop_remainder=True, shuffle=True,
                                    cutout=config.cutout, cutout_length=config.cutout_length)
     train_batches_per_epoch = train_dataset.get_dataset_size()
 

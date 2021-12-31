@@ -39,8 +39,6 @@ cutout_length: 56
 # Dataset config
 train_batch_size: 32
 val_batch_size: 125
-# True for GPU, False for Ascend
-drop_remainder: False
 
 #learning rate config
 lr_init: 0.32
