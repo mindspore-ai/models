@@ -161,7 +161,6 @@ anno_path: ''
 backbone: 'resnet_v1.5_50'
 
 # eval.py FasterRcnn evaluation
-ann_file: '/cache/data/annotations/instances_val2017.json'
 checkpoint_path: "/cache/train/fasterrcnn/faster_rcnn-12_7393.ckpt"
 
 # export.py fasterrcnn_export
@@ -170,7 +169,6 @@ file_format: "MINDIR"
 ckpt_file: "/cache/train/fasterrcnn/faster_rcnn-12_7393.ckpt"
 
 # postprocess ("./src/config_50.yaml")
-#ann_file: ''
 result_path: ''
 
 ---
@@ -199,7 +197,6 @@ device_id: 'Device id, default is 0.'
 device_num: 'Use device nums, default is 1.'
 rank_id: 'Rank id, default is 0.'
 file_format: 'file format'
-ann_file: "Ann file, default is val.json."
 checkpoint_path: "Checkpoint file path."
 ckpt_file: 'fasterrcnn ckpt file.'
 result_path: "result file path."
