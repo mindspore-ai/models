@@ -23,10 +23,12 @@ import numpy as np
 from mindspore import context
 import mindspore.common.dtype as mstype
 from mindspore.common.tensor import Tensor
+from mindspore.nn.transformer.loss import CrossEntropyLoss
+from mindspore.nn.transformer.transformer import TransformerOpParallelConfig
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.inference import generate
 from src.dataset import create_dataset
-from src.gpt import GPT, EvalNet, GPTWithLoss, CrossEntropyLoss
+from src.gpt import GPT, EvalNet, GPTWithLoss
 from src.utils import GPTConfig
 
 context.set_context(mode=context.GRAPH_MODE)
@@ -51,8 +53,9 @@ def get_ppl(model, dataset):
     for data in dataset:
         data = data[0].asnumpy()
         input_ids = data
+        input_mask = (data != 0).astype(np.float32)
 
-        logits = model(Tensor(input_ids, mstype.int32)).asnumpy()
+        logits = model(Tensor(input_ids, mstype.int32), Tensor(input_mask, mstype.float32)).asnumpy()
         PPL.append(logits * len(data))
         tokens += len(data)
 
@@ -74,12 +77,10 @@ def get_acc(model, dataset):
             input_mask[i][idx-1] = 0
             data[i][idx-1] = 0
 
-        length = np.sum(data != 50256, 1)
-        input_ids = data
-        logits = model(Tensor(input_ids, mstype.int32)).asnumpy()
+        logits = model(Tensor(data, mstype.int32), Tensor(input_mask, mstype.float32)).asnumpy()
         logits = logits.reshape(len(length), -1)
 
-        predicted_label = np.zeros(length.shape)
+        predicted_label = np.zeros(len(length))
         for i, idx in enumerate(length):
             predicted_label[i] = logits[i][idx-2]
 
@@ -109,7 +110,7 @@ def run_eval():
         raise ValueError("{} is not supported now".format(metrics))
 
 
-    config = GPTConfig(batch_size=16,
+    config = GPTConfig(batch_size=1,
                        seq_length=1024,
                        vocab_size=50257,
                        embedding_size=1024,
@@ -129,8 +130,9 @@ def run_eval():
     elif metrics == "acc":
         gpt_eval = EvalNet(gpt, generate=False)
     else:
-        loss = CrossEntropyLoss(config)
-        gpt_eval = GPTWithLoss(gpt, loss)
+        parallel_config = TransformerOpParallelConfig()
+        loss = CrossEntropyLoss(parallel_config.dp_mp_config)
+        gpt_eval = GPTWithLoss(gpt, loss, eos_token=0)
 
     gpt_eval.set_train(False)
     load_param_into_net(gpt_eval, ckpt_dict)
