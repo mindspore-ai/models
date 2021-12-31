@@ -206,7 +206,7 @@ bash wmt14_en_fr.sh
 
   ```bash
   # grep "accuracy:"
-  BLEU scores is :12.9
+  BLEU scores is :12.1
   ```
 
 # 模型描述
@@ -243,7 +243,7 @@ bash wmt14_en_fr.sh
 | 数据集        | WMT14          |
 | batch_size    | 128            |
 | 输出          | BLEU           |
-| 准确性        | 8卡: BLEU=12.9 |
+| 准确性        | 8卡: BLEU=12.1 |
 
 # 随机情况说明
 

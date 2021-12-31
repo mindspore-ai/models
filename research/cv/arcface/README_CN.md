@@ -39,6 +39,11 @@
 
 训练集：5,822,653张图片，85742个类
 
+```python
+#将rec数据格式转换成jpg
+python src/rec2jpg_dataset.py --include rec/dataset/path --output output/path
+```
+
 # 环境要求
 
 - 硬件：昇腾处理器（Ascend）
@@ -59,7 +64,7 @@
 sh scripts/run_distribute_train.sh rank_size /path/dataset
 
 # 单机训练运行示例
-sh scripts/run_standalone_train.sh /path/dataset
+sh scripts/run_standalone_train.sh /path/dataset device_id
 
 # 运行评估示例
 sh scripts/run_eval.sh /path/evalset /path/ckpt
@@ -90,6 +95,7 @@ sh scripts/run_eval.sh /path/evalset /path/ckpt
   ├── loss.py                         //损失函数
   ├── dataset.py                      // 创建数据集
   ├── iresnet.py                      // ResNet架构
+  ├── rec2jpg_dataset.py                  // 将rec数据格式转换成jpg
  ├── val.py                            // 测试脚本
  ├── train.py                          // 训练脚本
  ├── export.py
