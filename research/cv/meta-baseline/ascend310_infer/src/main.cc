@@ -28,37 +28,23 @@
 #include "include/api/context.h"
 #include "include/api/types.h"
 #include "include/api/serialization.h"
-#include "include/dataset/vision_ascend.h"
 #include "include/dataset/execute.h"
 #include "include/dataset/vision.h"
-#include "include/dataset/vision_lite.h"
-
 #include "inc/utils.h"
 
 using mindspore::Context;
 using mindspore::Serialization;
 using mindspore::Model;
 using mindspore::Status;
+using mindspore::MSTensor;
+using mindspore::dataset::Execute;
 using mindspore::ModelType;
 using mindspore::GraphCell;
 using mindspore::kSuccess;
-using mindspore::MSTensor;
-using mindspore::dataset::Execute;
-using mindspore::dataset::TensorTransform;
-using mindspore::dataset::vision::Resize;
-using mindspore::dataset::vision::HWC2CHW;
-using mindspore::dataset::vision::Normalize;
-using mindspore::dataset::vision::Decode;
-using mindspore::dataset::vision::Rescale;
-using mindspore::dataset::vision::RGB2GRAY;
 
 DEFINE_string(mindir_path, "", "mindir path");
-DEFINE_string(dataset_path, ".", "dataset path");
+DEFINE_string(input0_path, ".", "input0 path");
 DEFINE_int32(device_id, 0, "device id");
-DEFINE_string(aipp_path, "", "aipp path");
-DEFINE_string(cpu_dvpp, "", "cpu or dvpp process");
-DEFINE_int32(image_height, 32, "image height");
-DEFINE_int32(image_width, 32, "image width");
 
 int main(int argc, char **argv) {
   gflags::ParseCommandLineFlags(&argc, &argv, true);
@@ -70,18 +56,9 @@ int main(int argc, char **argv) {
   auto context = std::make_shared<Context>();
   auto ascend310 = std::make_shared<mindspore::Ascend310DeviceInfo>();
   ascend310->SetDeviceID(FLAGS_device_id);
-  ascend310->SetBufferOptimizeMode("off_optimize");
   context->MutableDeviceInfo().push_back(ascend310);
   mindspore::Graph graph;
   Serialization::Load(FLAGS_mindir_path, ModelType::kMindIR, &graph);
-  if (FLAGS_cpu_dvpp == "DVPP") {
-    if (RealPath(FLAGS_aipp_path).empty()) {
-      std::cout << "Invalid aipp path" << std::endl;
-      return 1;
-    } else {
-      ascend310->SetInsertOpConfigPath(FLAGS_aipp_path);
-    }
-  }
 
   Model model;
   Status ret = model.Build(GraphCell(graph), context);
@@ -90,9 +67,20 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  auto all_files = GetAllFiles(FLAGS_dataset_path);
+  std::vector<MSTensor> model_inputs = model.GetInputs();
+  if (model_inputs.empty()) {
+    std::cout << "Invalid model, inputs is empty." << std::endl;
+    return 1;
+  }
+
+  auto input0_files = GetAllFiles(FLAGS_input0_path);
+  if (input0_files.empty()) {
+    std::cout << "ERROR: input data empty." << std::endl;
+    return 1;
+  }
+
   std::map<double, double> costTime_map;
-  size_t size = all_files.size();
+  size_t size = input0_files.size();
 
   for (size_t i = 0; i < size; ++i) {
     struct timeval start = {0};
@@ -101,44 +89,23 @@ int main(int argc, char **argv) {
     double endTimeMs;
     std::vector<MSTensor> inputs;
     std::vector<MSTensor> outputs;
-    std::cout << "Start predict input files:" << all_files[i] << std::endl;
-    if (FLAGS_cpu_dvpp == "DVPP") {
-      std::shared_ptr<TensorTransform> decode(new Decode());
-      auto resizeShape = {FLAGS_image_height, FLAGS_image_width};
-      std::shared_ptr<TensorTransform> resize(new Resize(resizeShape));
-      Execute composeDecode({decode, resize});
-      auto imgDvpp = std::make_shared<MSTensor>();
-      composeDecode(ReadFileToTensor(all_files[i]), imgDvpp.get());
-      inputs.emplace_back(imgDvpp->Name(), imgDvpp->DataType(), imgDvpp->Shape(),
-                        imgDvpp->Data().get(), imgDvpp->DataSize());
-    } else {
-      auto decode = Decode();
-      auto hwc2chw = HWC2CHW();
-      auto togray = RGB2GRAY();
-      auto rescale_op1 = Rescale(1/255.0, 0.0);
-      auto rescale_op2 = Rescale(1/ 0.3081, -1 * 0.1307 / 0.3081);
-      auto resizeShape = {FLAGS_image_height, FLAGS_image_width};
-      auto resize = Resize(resizeShape);
-      Execute composeDecode({decode, togray, resize, rescale_op1, rescale_op2, hwc2chw});
-      auto img = MSTensor();
-      auto image = ReadFileToTensor(all_files[i]);
-      composeDecode(image, &img);
-      std::vector<MSTensor> model_inputs = model.GetInputs();
-      inputs.emplace_back(model_inputs[0].Name(), model_inputs[0].DataType(), model_inputs[0].Shape(),
-                       img.Data().get(), img.DataSize());
-    }
+    std::cout << "Start predict input files:" << input0_files[i] << std::endl;
+
+    auto input0 = ReadFileToTensor(input0_files[i]);
+    inputs.emplace_back(model_inputs[0].Name(), model_inputs[0].DataType(), model_inputs[0].Shape(),
+                        input0.Data().get(), input0.DataSize());
 
     gettimeofday(&start, nullptr);
     ret = model.Predict(inputs, &outputs);
     gettimeofday(&end, nullptr);
     if (ret != kSuccess) {
-      std::cout << "Predict " << all_files[i] << " failed." << std::endl;
+      std::cout << "Predict " << input0_files[i] << " failed." << std::endl;
       return 1;
     }
     startTimeMs = (1.0 * start.tv_sec * 1000000 + start.tv_usec) / 1000;
     endTimeMs = (1.0 * end.tv_sec * 1000000 + end.tv_usec) / 1000;
     costTime_map.insert(std::pair<double, double>(startTimeMs, endTimeMs));
-    WriteResult(all_files[i], outputs);
+    WriteResult(input0_files[i], outputs);
   }
   double average = 0.0;
   int inferCount = 0;
