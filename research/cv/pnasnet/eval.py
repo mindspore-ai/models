@@ -72,10 +72,9 @@ if __name__ == '__main__':
     else:
         dataset_val_path = os.path.join(dataset_path, 'val')
 
-    drop_remainder = config.drop_remainder
     dataset = create_dataset(dataset_val_path, do_train=False, rank=device_id,
                              group_size=1, batch_size=config.val_batch_size,
-                             drop_remainder=drop_remainder, shuffle=False)
+                             drop_remainder=False, shuffle=False)
 
     loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
 

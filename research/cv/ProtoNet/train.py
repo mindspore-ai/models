@@ -24,6 +24,7 @@ from mindspore import dataset as ds
 import mindspore.context as context
 from mindspore.communication.management import init, get_rank
 from mindspore.context import ParallelMode
+from mindspore.common import set_seed
 from src.EvalCallBack import EvalCallBack
 from src.protonet import WithLossCell
 from src.PrototypicalLoss import PrototypicalLoss
@@ -33,7 +34,7 @@ from model_init import init_dataloader
 
 local_data_url = './cache/data'
 local_train_url = './cache/out'
-
+set_seed(1)
 
 def train(opt, tr_dataloader, net, loss_fn, eval_loss_fn, optim, path, rank_id, val_dataloader=None):
     '''
@@ -68,17 +69,15 @@ def main():
     global local_train_url
 
     options = get_parser().parse_args()
-    device_num = int(os.environ.get("DEVICE_NUM", 1))
-
-    if options.device_target == "GPU":
-        rank_id = get_rank()
-
+    device_num = int(os.environ.get("RANK_SIZE", "1"))
+    rank_id = 0
     if options.run_offline:
         if device_num > 1:
             init()
             context.reset_auto_parallel_context()
             context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
+            rank_id = get_rank()
 
         if options.device_target == "Ascend":
             context.set_context(device_id=options.device_id)
@@ -105,6 +104,7 @@ def main():
             context.reset_auto_parallel_context()
             context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
+            rank_id = get_rank()
             local_data_url = os.path.join(local_data_url, str(device_id))
             local_train_url = os.path.join(local_train_url, str(device_id))
 
