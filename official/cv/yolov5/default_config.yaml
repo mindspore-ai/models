@@ -4,6 +4,7 @@ enable_modelarts: False
 data_url: ""
 train_url: ""
 checkpoint_url: ""
+outputs_url: ""
 # Path for local
 data_path: "/cache/data"
 output_path: "/cache/train"
@@ -21,6 +22,8 @@ pretrained_backbone: ""
 resume_yolov5: ""
 pretrained_checkpoint: ""
 output_dir: "./output"
+train_img_dir: "train2017"
+train_json_file: "annotations/instances_train2017.json"
 
 lr_scheduler: "cosine_annealing"
 lr: 0.013
@@ -44,6 +47,7 @@ rank: 0
 group_size: 1
 need_profiler: 0
 resize_rate: 10
+filter_weight: False
 
 # Eval options
 pretrained: ""
@@ -74,6 +78,9 @@ jitter: 0.3
 
 num_classes: 80
 max_box: 150
+checkpoint_filter_list: ['feature_map.back_block1.conv.weight', 'feature_map.back_block1.conv.bias',
+                         'feature_map.back_block2.conv.weight', 'feature_map.back_block2.conv.bias',
+                         'feature_map.back_block3.conv.weight', 'feature_map.back_block3.conv.bias']
 
 # h->w
 anchor_scales: [[12, 16],
