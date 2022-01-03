@@ -43,6 +43,7 @@ set_seed(1)
 
 class BuildTrainNetwork(nn.Cell):
     """build training network"""
+
     def __init__(self, network, criterion):
         super(BuildTrainNetwork, self).__init__()
         self.network = network
@@ -53,8 +54,10 @@ class BuildTrainNetwork(nn.Cell):
         loss = self.criterion(output, label)
         return loss
 
+
 class ProgressMonitor(Callback):
     """monitor loss and time"""
+
     def __init__(self, args):
         super(ProgressMonitor, self).__init__()
         self.me_epoch_start_time = 0
@@ -74,7 +77,8 @@ class ProgressMonitor(Callback):
 
         real_epoch = me_step // self.args.steps_per_epoch
         time_used = time.time() - self.me_epoch_start_time
-        fps_mean = self.args.per_batch_size * (me_step-self.me_epoch_start_step_num) * self.args.group_size / time_used
+        fps_mean = self.args.per_batch_size * (
+            me_step - self.me_epoch_start_step_num) * self.args.group_size / time_used
         self.args.logger.info('epoch[{}], iter[{}], loss:{}, mean_fps:{:.2f}'
                               'imgs/sec'.format(real_epoch, me_step, cb_params.net_outputs, fps_mean))
 
@@ -90,7 +94,6 @@ class ProgressMonitor(Callback):
                 self.ckpt_history.append(ckpt)
                 self.args.logger.info('epoch[{}], iter[{}], loss:{}, ckpt:{},'
                                       'ckpt_fn:{}'.format(real_epoch, me_step, cb_params.net_outputs, ckpt, ckpt_fn))
-
 
         self.me_epoch_start_step_num = me_step
         self.me_epoch_start_time = time.time()
@@ -108,7 +111,7 @@ class ProgressMonitor(Callback):
 def set_parameters():
     """parameters"""
     context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True,
-                        device_target=config.device_target, save_graphs=False)
+                        device_target=config.device_target, save_graphs=False, device_id=int(os.getenv('DEVICE_ID')))
     # init distributed
     if config.run_distribute:
         init()
@@ -132,19 +135,21 @@ def set_parameters():
     # logger
     config.outputs_dir = os.path.join(config.output_path,
                                       datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
+    if not os.path.exists(config.outputs_dir):
+        os.makedirs(config.outputs_dir)
     config.logger = get_logger(config.outputs_dir, config.rank)
     return config
+
 
 def set_graph_kernel_context(device_target):
     if device_target == "GPU":
         context.set_context(enable_graph_kernel=True)
 
+
 @moxing_wrapper()
 def train():
     """training process"""
     set_parameters()
-    if os.getenv('DEVICE_ID', "not_set").isdigit():
-        context.set_context(device_id=int(os.getenv('DEVICE_ID')))
     set_graph_kernel_context(config.device_target)
 
     # init distributed
@@ -177,7 +182,6 @@ def train():
                    weight_decay=config.weight_decay,
                    loss_scale=config.loss_scale)
 
-
     # loss
     if not config.label_smooth:
         config.label_smooth_factor = 0.0
@@ -197,25 +201,31 @@ def train():
     if config.rank_save_ckpt_flag:
         ckpt_config = CheckpointConfig(save_checkpoint_steps=config.ckpt_interval * config.steps_per_epoch,
                                        keep_checkpoint_max=config.ckpt_save_max)
+        print("*****************config.rank:" + str(config.rank))
         save_ckpt_path = os.path.join(config.outputs_dir, 'ckpt_' + str(config.rank) + '/')
+        print("*****************create save ckpt path:" + str(save_ckpt_path))
         ckpt_cb = ModelCheckpoint(config=ckpt_config,
                                   directory=save_ckpt_path,
                                   prefix='{}'.format(config.rank))
         callbacks.append(ckpt_cb)
-
     model.train(config.max_epoch, de_dataset, callbacks=callbacks, dataset_sink_mode=True)
 
+
 def freeze_model():
+    # 冻结模型
     # 找到ckpt文件
-    print("outputs_dir:" + config.outputs_dir)
-    config.output_path = "/cache/train1"
-    for curDir, dirs, files in os.walk(config.outputs_dir):
-        print(dirs)
-        for file in files:
-            if file.endswith('.ckpt'):
-                config.checkpoint_file_path = os.path.join(curDir, file)
-                print("get_config.checkpoint_file_path:", config.checkpoint_file_path)
-                run_export()
+    if config.rank == 0:
+        import moxing as mox
+        ckpt_output_path = os.path.join(config.outputs_dir, 'ckpt_' + str(0) + '/')
+        print("*****************ckpt_output_path:" + ckpt_output_path)
+        ckpt_list = [os.path.join(ckpt_output_path, i) for i in os.listdir(ckpt_output_path) if i.endswith('.ckpt')]
+        # export do not preprocess again
+        config.file_name = os.path.join(config.output_path, config.file_name)
+        config.checkpoint_file_path = sorted(ckpt_list)[-1]
+        # avoid sync data
+        config.enable_modelarts = False
+        run_export()
+        mox.file.copy_parallel(config.output_path, config.train_url)
 
 
 def main():
