@@ -266,15 +266,15 @@ Inference result is saved in current path, you can find result like this in acc.
 | Model Version              | Fat-DeepFFM                                                      |
 | Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8                |
 | uploaded Date              | 09/15/2020 (month/day/year)                                 |
-| MindSpore Version          | 1.2.0                                                 |
+| MindSpore Version          | 1.3.0                                                 |
 | Dataset                    | Criteo                                                       |
 | Training Parameters        | epoch=30, batch_size=1000, lr=1e-4                          |
 | Optimizer                  | Adam                                                        |
 | Loss Function              | Sigmoid Cross Entropy With Logits                           |
-| outputs                    | AUC                                                    |
+| outputs                    | AUC 8pc: 80.90%                                             |
 | Loss                       | 0.45                                                        |
-| Speed                      | 1pc: 8.16 ms/step;                                          |
-| Total time                 | 1pc: 4 hours;                                               |
+| Speed                      | 8pc: 78.09 ms/step;                                          |
+| Total time                 | 8pc: 4.5 hours;                                               |
 | Parameters (M)             | 560.34                                                        |
 | Checkpoint for Fine tuning | 87.65M (.ckpt file)                                           |
 | Scripts                    | [deepfm script](https://gitee.com/mindspore/mindspore/tree/r1.3/model_zoo/research/recommend/Fat-DeepFFM) |
@@ -286,7 +286,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Model Version       | DeepFM                      |
 | Resource            | Ascend 910; OS Euler2.8     |
 | Uploaded Date       | 06/20/2021 (month/day/year) |
-| MindSpore Version   | 1.2.0                       |
+| MindSpore Version   | 1.3.0                       |
 | Dataset             | Criteo                      |
 | batch_size          | 1000                        |
 | outputs             | AUC                         |
