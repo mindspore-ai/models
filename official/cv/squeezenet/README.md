@@ -106,7 +106,7 @@ After installing MindSpore via the official website, you can start training and 
   Usage: bash scripts/run_distribute_train_gpu.sh [squeezenet|squeezenet_residual] [cifar10|imagenet] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
 
   # standalone training
-  Usage: bash scripts/run_standalone_train.sh [squeezenet|squeezenet_residual] [cifar10|imagenet] [DEVICE_ID] [DATA_PATH] [PRETRAINED_CKPT_PATH](optional)
+  Usage: bash scripts/run_standalone_train_gpu.sh [squeezenet|squeezenet_residual] [cifar10|imagenet] [DEVICE_ID] [DATA_PATH] [PRETRAINED_CKPT_PATH](optional)
 
   # run evaluation example
   Usage: bash scripts/run_eval_gpu.sh [squeezenet|squeezenet_residual] [cifar10|imagenet] [DEVICE_ID] [DATASET_PATH] [CHECKPOINT_PATH]
@@ -588,7 +588,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Dataset             | CIFAR-10                    | CIFAR-10 |
 | batch_size          | 32                          | 1pc:32; 8pcs:4 |
 | outputs             | probability                 | probability |
-| Accuracy            | 1pc: 89.0%;  8pcs: 84.4%    | 1pc: 89.0%; 8pcs: 88.8%|
+| Accuracy            | 1pc: 89.0%;  8pcs: 82%    | 1pc: 89.0%; 8pcs: 88%|
 
 #### SqueezeNet on ImageNet
 
@@ -601,7 +601,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Dataset             | ImageNet                    | ImageNet |
 | batch_size          | 32                          |  32 |
 | outputs             | probability                 | probability |
-| Accuracy            | 8pcs: 58.5%(TOP1), 81.1%(TOP5)       | 8pcs: 58.5%(TOP1), 80.7%(TOP5) |
+| Accuracy            | 8pcs: 57.5%(TOP1), 81.1%(TOP5)       | 8pcs: 57.5%(TOP1), 80.7%(TOP5) |
 
 #### SqueezeNet_Residual on CIFAR-10
 
@@ -614,7 +614,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Dataset             | CIFAR-10                    | CIFAR-10                    |
 | batch_size          | 32                          | 1pc:32; 8pcs:4 |
 | outputs             | probability                 | probability                 |
-| Accuracy            | 1pc: 90.8%;  8pcs: 87.4%    | 1pc: 90.7%; 8pcs: 90.5% |
+| Accuracy            | 1pc: 90.8%;  8pcs: 86.43%   | 1pc: 90.7%; 8pcs: 90.5% |
 
 #### SqueezeNet_Residual on ImageNet
 
@@ -627,7 +627,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Dataset             | ImageNet                    | ImageNet                   |
 | batch_size          | 32                          | 32 |
 | outputs             | probability                 | probability |
-| Accuracy            | 8pcs: 60.9%(TOP1), 82.6%(TOP5)       | 8pcs: 60.2%(TOP1), 82.3%(TOP5)|
+| Accuracy            | 8pcs: 60.4%(TOP1), 82.5%(TOP5)       | 8pcs: 60.2%(TOP1), 82.3%(TOP5)|
 
 ### 310 Inference Performance
 
