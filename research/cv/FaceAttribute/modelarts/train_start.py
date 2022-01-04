@@ -302,7 +302,6 @@ def run_train():
     # mixed precision training
     criterion.add_flags_recursive(fp32=True)
     train_net = TrainOneStepCell(train_net, opt, sens=config.loss_scale)
-    context.reset_auto_parallel_context()
 
     if config.local_rank == 0:
         ckpt_max_num = config.max_epoch
