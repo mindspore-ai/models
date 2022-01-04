@@ -59,16 +59,31 @@ python src/rec2jpg_dataset.py --include rec/dataset/path --output output/path
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
-```python
-# 分布式训练运行示例
-sh scripts/run_distribute_train.sh rank_size /path/dataset
+- Ascend处理器环境运行
 
-# 单机训练运行示例
-sh scripts/run_standalone_train.sh /path/dataset device_id
+  ```python
+  # 分布式训练运行示例
+  bash scripts/run_distribute_train.sh rank_size /path/dataset
 
-# 运行评估示例
-sh scripts/run_eval.sh /path/evalset /path/ckpt
-```
+  # 单机训练运行示例
+  bash scripts/run_standalone_train.sh /path/dataset device_id
+
+  # 运行评估示例
+  bash scripts/run_eval.sh /path/evalset /path/ckpt
+  ```
+
+- GPU处理器环境运行
+
+  ```python
+  # 分布式训练运行示例
+  bash scripts/run_distribute_train_gpu.sh  /path/dataset rank_size
+
+  # 单机训练运行示例
+  bash scripts/run_standalone_train_gpu.sh /path/dataset
+
+  # 运行评估示例
+  bash scripts/run_eval_gpu.sh /path/evalset /path/ckpt
+  ```
 
 ## 脚本说明
 
@@ -124,23 +139,45 @@ train.py和val.py中主要参数如下：
 
 ### 分布式训练
 
-```shell
-bash scripts/run_distribute_train.sh rank_size /path/dataset
-```
+- Ascend处理器环境运行
 
-上述shell脚本将在后台运行分布训练。可以通过`device[X]/train.log`文件查看结果。
-采用以下方式达到损失值：
+  ```bash
+  bash scripts/run_distribute_train.sh rank_size /path/dataset
+  ```
 
-```log
-epoch: 2 step: 11372, loss is 12.807039
-epoch time: 1104549.619 ms, per step time: 97.129 ms
-epoch: 3 step: 11372, loss is 9.13787
-...
-epoch: 21 step: 11372, loss is 1.5028578
-epoch time: 1104673.362 ms, per step time: 97.140 ms
-epoch: 22 step: 11372, loss is 0.8846929
-epoch time: 1104929.793 ms, per step time: 97.162 ms
-```
+  上述shell脚本将在后台运行分布训练。可以通过`device[X]/train.log`文件查看结果。
+  采用以下方式达到损失值：
+
+  ```log
+  epoch: 2 step: 11372, loss is 12.807039
+  epoch time: 1104549.619 ms, per step time: 97.129 ms
+  epoch: 3 step: 11372, loss is 9.13787
+  ...
+  epoch: 21 step: 11372, loss is 1.5028578
+  epoch time: 1104673.362 ms, per step time: 97.140 ms
+  epoch: 22 step: 11372, loss is 0.8846929
+  epoch time: 1104929.793 ms, per step time: 97.162 ms
+  ```
+
+- GPU处理器环境运行
+
+  ```bash
+  bash scripts/run_distribute_train_gpu.sh /path/dataset rank_size
+  ```
+
+  上述shell脚本将在后台运行分布训练。可以通过`train_parallel/train.log`文件查看结果。
+  采用以下方式达到损失值：
+
+  ```log
+  epoch: 2 step: 11372, loss is 10.572094
+  epoch time: 1104549.619 ms, per step time: 991.390 ms
+  epoch: 3 step: 11372, loss is 7.442794
+  ...
+  epoch: 21 step: 11372, loss is 0.8472798
+  epoch time: 1104673.362 ms, per step time: 989.479 ms
+  epoch: 22 step: 11372, loss is 0.5226351
+  epoch time: 1104929.793 ms, per step time: 989.548 ms
+  ```
 
 ## 评估过程
 
@@ -190,6 +227,50 @@ epoch time: 1104929.793 ms, per step time: 97.162 ms
   +-----------+-------+-------+--------+-------+-------+-------+
   ```
 
+- 在GPU环境运行时评估lfw、cfp_fp、agedb_30、calfw、cplfw数据集
+
+  在运行以下命令之前，请检查用于评估的检查点路径。请将检查点路径设置为绝对全路径，例如“username/arcface/arcface-11372-1.ckpt”。
+
+  ```bash
+  bash scripts/run_eval_gpu.sh /path/evalset /path/ckpt
+  ```
+
+  上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
+
+  ```bash
+  [lfw]Accuracy-Flip: 0.99767+-0.00271
+  [cfp_fp]Accuracy-Flip: 0.98414+-0.00659
+  [agedb_30]Accuracy-Flip: 0.98033+-0.00878
+  [calfw]Accuracy-Flip: 0.95983+-0.01141
+  [cplfw]Accuracy-Flip: 0.92817+-0.01279
+  ```
+
+- 在GPU环境运行时评估IJB-B、IJB-C数据集
+
+  在运行以下命令之前，请检查用于评估的检查点路径。请将检查点路径设置为绝对全路径，例如“username/arcface/arcface-11372-1.ckpt”。
+
+  同时，情确保传入的评估数据集路径为“IJB_release/IJBB/”或“IJB_release/IJBC/”。
+
+  ```bash
+  bash scripts/run_eval_ijbc_gpu.sh /path/evalset /path/ckpt
+  ```
+
+  上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
+
+  ```bash
+  +-----------+-------+-------+--------+-------+-------+-------+
+  |  Methods  | 1e-06 | 1e-05 | 0.0001 | 0.001 |  0.01 |  0.1  |
+  +-----------+-------+-------+--------+-------+-------+-------+
+  | ijbb-IJBB | 42.46 | 89.76 | 94.81  | 96.58 | 97.73 | 98.78 |
+  +-----------+-------+-------+--------+-------+-------+-------+
+
+  +-----------+-------+-------+--------+-------+-------+-------+
+  |  Methods  | 1e-06 | 1e-05 | 0.0001 | 0.001 |  0.01 |  0.1  |
+  +-----------+-------+-------+--------+-------+-------+-------+
+  | ijbc-IJBC | 86.67 | 94.35 | 96.19  | 97.55 | 98.38 | 99.10 |
+  +-----------+-------+-------+--------+-------+-------+-------+
+  ```
+
 ## 导出mindir模型
 
 ```python
@@ -221,35 +302,35 @@ bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TAR
 
 ### 训练性能
 
-| 参数          | Arcface                                                      |
-| ------------- | ------------------------------------------------------------ |
-| 模型版本      | arcface                                                      |
-| 资源          | Ascend 910； CPU： 2.60GHz，192内核；内存，755G              |
-| 上传日期      | 2021-05-30                                                   |
-| MindSpore版本 | 1.2.0-c77-python3.7-aarch64                                  |
-| 数据集        | MS1MV2                                                       |
-| 训练参数      | lr=0.08; gamma=0.1                                           |
-| 优化器        | SGD                                                          |
-| 损失函数      | Arcface                                                      |
-| 输出          | 概率                                                         |
-| 损失          | 0.6                                                          |
-| 速度          | 1卡：108毫秒/步；8卡：97毫秒/步                              |
-| 总时间        | 1卡：65小时；8卡：8.5小时                                    |
-| 参数(M)       | 85.2                                                         |
-| 微调检查点    | 1249M （.ckpt file）                                         |
-| 脚本          | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/cv/arcface) |
+| 参数          | Arcface                                                      | GPU
+| ------------- | ------------------------------------------------------------ | ------------------------------------------- |
+| 模型版本      | arcface                                                        | arcface                                   |
+| 资源          | Ascend 910； CPU： 2.60GHz，192内核；内存，755G                   | GeForce RTX 3090； CPU： 2.90GHz，64内核；内存，755G                                           |
+| 上传日期      | 2021-05-30                                                     | 2021-11-12                               |
+| MindSpore版本 | 1.2.0-c77-python3.7-aarch64                                   | 1.5.0                                     |
+| 数据集        | MS1MV2                                                        | MS1MV2                                       |
+| 训练参数      | lr=0.08; gamma=0.1                                             | lr=0.08; gamma=0.1                           |
+| 优化器        | SGD                                                           | SGD                                          |
+| 损失函数      | Arcface                                                      | Arcface                                        |
+| 输出          | 概率                                                         | 概率                                             |
+| 损失          | 0.6                                                          | 0.7                                          |
+| 速度          | 1卡：108毫秒/步；8卡：97毫秒/步                              | 8卡：990毫秒/步                                      |
+| 总时间        | 1卡：65小时；8卡：8.5小时                                    | 8卡：75小时                                        |
+| 参数(M)       | 85.2                                                         | 85.2                                         |
+| 微调检查点    | 1249M （.ckpt file）                                         | 1249M （.ckpt file）                            |
+| 脚本          | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/cv/arcface) | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/cv/arcface) |
 
 ### 评估性能
 
-| 参数          | Arcface                  |
-| ------------- | ------------------------ |
-| 模型版本      | arcface                  |
-| 资源          | Ascend 910               |
-| 上传日期      | 2021/05/30               |
-| MindSpore版本 | 1.2.0-c77-python3.7-aarch64            |
-| 数据集        | IJBC、IJBB、lfw、cfp_fp、agedb_30、calfw、cplfw |
-| 输出          | 概率                     |
-| 准确性        | lfw:0.998   cfp_fp:0.98   agedb_30:0.981   calfw:0.961   cplfw:0.926   IJB-B:0.943   IJB-C:0.958 |
+| 参数          | Ascend                  | GPU                         |
+| ------------- | ------------------------ | -------------------------  |
+| 模型版本      | arcface                  | arcface                   |
+| 资源          | Ascend 910               | GeForce RTX 3090                 |
+| 上传日期      | 2021/05/30               | 2021/11/12            |
+| MindSpore版本 | 1.2.0-c77-python3.7-aarch64            |  1.5.0      |
+| 数据集        | IJBC、IJBB、lfw、cfp_fp、agedb_30、calfw、cplfw | IJBC、IJBB、lfw、cfp_fp、agedb_30、calfw、cplfw |
+| 输出          | 概率                     | 概率                     |
+| 准确性        | lfw:0.998   cfp_fp:0.98   agedb_30:0.981   calfw:0.961   cplfw:0.926   IJB-B:0.943   IJB-C:0.958 | lfw:0.998   cfp_fp:0.984   agedb_30:0.9803   calfw:0.9598   cplfw:0.928   IJB-B:0.943   IJB-C:0.958 |
 
 # 随机情况说明
 
