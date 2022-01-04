@@ -16,7 +16,7 @@
 
 if [ $# -lt 1 ]
 then
-  echo "Usage: sh run_standalone_train_gpu.sh [TRAIN_LABEL_FILE] [PRETRAINED_BACKBONE](optional)"
+  echo "Usage: bash run_standalone_train_gpu.sh [TRAIN_LABEL_FILE] [PRETRAINED_BACKBONE](optional)"
   exit 1
 fi
 
