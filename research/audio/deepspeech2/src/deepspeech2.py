@@ -136,7 +136,7 @@ class BatchRNN(nn.Cell):
             layers.append(
                 nn.LSTM(input_size=input_size_list[i], hidden_size=hidden_size, bidirectional=bidirectional,
                         has_bias=self.has_bias))
-        self.lstms = layers
+        self.lstms = nn.CellList(layers)
 
         if batch_norm:
             batch_norm_layer = []
