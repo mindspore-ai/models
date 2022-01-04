@@ -386,7 +386,7 @@ The `res` folder is generated in the upper-level directory. For details about th
 | outputs                    | probability                                                 |
 | Loss                       | 0.35                                                        |
 | Parameters                 | batch_size = 4                                              |
-| Speed                      | 1pc: 444 ms/step(fps: 9.0);  8pcs: 446 ms/step(fps: 71)     |
+| Speed                      | 1pc: 444 ms/step(fps: 9.0);  8pcs: 465 ms/step(fps: 68.8)     |
 | Total time                 | 1pc: 75.48 h;  8pcs: 7.11 h                                 |
 | Parameters (M)             | 27.36                                                       |
 | Checkpoint for Fine tuning | 109.44M (.ckpt file)                                        |
