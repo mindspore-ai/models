@@ -55,8 +55,8 @@ Here we used 6 datasets for training, and 1 datasets for Evaluation.
 
 # [Environment Requirements](#contents)
 
-- Hardware（Ascend）
-    - Prepare hardware environment with Ascend processor.
+- Hardware（Ascend/GPU）
+    - Prepare hardware environment with Ascend/GPU processor.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
@@ -68,9 +68,9 @@ Here we used 6 datasets for training, and 1 datasets for Evaluation.
 ## [Script and sample code](#contents)
 
 ```shell
-└─ctpn
+└─ ctpn
   ├── README.md                             # network readme
-  ├──ascend310_infer                        #application for 310 inference
+  ├── ascend310_infer                        #application for 310 inference
   ├── eval.py                               # eval net
   ├── scripts
   │   ├── eval_res.sh                       # calculate precision and recall
@@ -92,10 +92,10 @@ Here we used 6 datasets for training, and 1 datasets for Evaluation.
   │   │   ├── rpn.py                        # region-proposal network
   │   │   └── vgg16.py                      # backbone
   │   ├── model_utils
-  │   │   ├──config.py             // Parameter config
-  │   │   ├──moxing_adapter.py     // modelarts device configuration
-  │   │   ├──device_adapter.py     // Device Config
-  │   │   ├──local_adapter.py      // local device config
+  │   │   ├── config.py             // Parameter config
+  │   │   ├── moxing_adapter.py     // modelarts device configuration
+  │   │   ├── device_adapter.py     // Device Config
+  │   │   ├── local_adapter.py      // local device config
   │   ├── convert_icdar2015.py              # convert icdar2015 dataset label
   │   ├── convert_svt.py                    # convert svt label
   │   ├── create_dataset.py                 # create mindrecord dataset
@@ -112,10 +112,11 @@ Here we used 6 datasets for training, and 1 datasets for Evaluation.
   │       ├── detector.py                   # detect box
   │       ├── get_successions.py            # get succession proposal
   │       └── utils.py                      # some functions which is commonly used
-  ├──postprogress.py                        # post process for 310 inference
-  ├──export.py                              # script to export AIR,MINDIR model
-  └── train.py                              # train net
-  ├── default_config.yaml                   #  config file
+  ├── postprogress.py                        # post process for 310 inference
+  ├── export.py                              # script to export AIR,MINDIR model
+  ├── requirements.txt                       # requirements file
+  ├── train.py                               # train net
+  └── default_config.yaml                    # config file
 
 ```
 
