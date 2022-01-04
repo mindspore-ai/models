@@ -15,6 +15,8 @@
 """Train Retinaface_resnet50."""
 from __future__ import print_function
 import math
+import ast
+import argparse
 import mindspore
 
 from mindspore import context
@@ -30,19 +32,17 @@ from src.loss import MultiBoxLoss
 from src.dataset import create_dataset
 from src.lr_schedule import adjust_learning_rate
 
-def train(cfg):
+def train(cfg, args):
 
     context.set_context(mode=context.GRAPH_MODE, device_target='GPU', save_graphs=False)
     if context.get_context("device_target") == "GPU":
         # Enable graph kernel
         context.set_context(enable_graph_kernel=True, graph_kernel_flags="--enable_parallel_fusion")
-    if cfg['ngpu'] > 1:
+    if args.is_distributed:
         init("nccl")
         context.set_auto_parallel_context(device_num=get_group_size(), parallel_mode=ParallelMode.DATA_PARALLEL,
                                           gradients_mean=True)
         cfg['ckpt_path'] = cfg['ckpt_path'] + "ckpt_" + str(get_rank()) + "/"
-    else:
-        raise ValueError('cfg_num_gpu <= 1')
 
     batch_size = cfg['batch_size']
     max_epoch = cfg['epoch']
@@ -56,7 +56,8 @@ def train(cfg):
     negative_ratio = 7
     stepvalues = (cfg['decay1'], cfg['decay2'])
 
-    ds_train = create_dataset(training_dataset, cfg, batch_size, multiprocessing=True, num_worker=cfg['num_workers'])
+    ds_train = create_dataset(training_dataset, cfg, batch_size, multiprocessing=True, num_worker=cfg['num_workers'],
+                              is_distribute=args.is_distributed)
     print('dataset size is : \n', ds_train.get_dataset_size())
 
     steps_per_epoch = math.ceil(ds_train.get_dataset_size())
@@ -110,9 +111,13 @@ def train(cfg):
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser('MindSpore RetinaFace training')
+    parser.add_argument("--is_distributed", type=ast.literal_eval, default=False,
+                        help="If set it true, run distribute, default is False.")
+    arg = parser.parse_args()
 
     config = cfg_res50
     mindspore.common.seed.set_seed(config['seed'])
     print('train config:\n', config)
 
-    train(cfg=config)
+    train(cfg=config, args=arg)
