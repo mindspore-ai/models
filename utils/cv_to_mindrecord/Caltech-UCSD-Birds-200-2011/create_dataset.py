@@ -18,7 +18,7 @@ import mindspore.dataset as ds
 def create_dataset(data_file):
     """create MindDataset"""
     num_readers = 4
-    data_set = ds.MindDataset(dataset_file=data_file,
+    data_set = ds.MindDataset(data_file,
                               num_parallel_workers=num_readers,
                               shuffle=True)
     index = 0
