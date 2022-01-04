@@ -1,0 +1,38 @@
+{
+    "segmentation": {
+        "stream_config": {
+            "deviceId": "0"
+        },
+        "appsrc0": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_tensorinfer0"
+        },
+        "mxpi_tensorinfer0": {
+            "props": {
+                "dataSource": "appsrc0",
+                "modelPath": "../data/model/hrnetw48seg.om",
+                "waitingTime": "2000",
+                "outputDeviceId": "-1"
+            },
+            "factory": "mxpi_tensorinfer",
+            "next": "mxpi_dataserialize0"
+        },
+        "mxpi_dataserialize0": {
+            "props": {
+                "outputDataKeys": "mxpi_tensorinfer0"
+            },
+            "factory": "mxpi_dataserialize",
+            "next": "appsink0"
+        },
+        "appsink0": {
+            "props": {
+                "blocksize": "4096000"
+            },
+            "factory": "appsink"
+        }
+    }
+}
+
