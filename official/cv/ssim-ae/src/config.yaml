@@ -1,0 +1,21 @@
+grayscale: false
+do_aug: true
+data_augment:
+  augment_num: 10000
+  im_resize: 266
+  crop_size: 256
+  rotate_angle: 0
+  p_horizontal_flip: 0.
+  p_vertical_flip: 0.
+z_dim: 500
+epochs: 300
+batch_size: 128
+lr: 3.0e-4
+decay: 1.0e-5
+flc: 32
+stride: 32
+ssim_threshold: 0.5
+percent: 98
+checkpoint_path: "./checkpoints/texture1/model.ckpt"
+checkpoint_url: "s3://ssim-test/Codes/checkpoints/texture1/model.ckpt"
+ckpt_file: "/cache/user-job-dir/ssim-ae/model.ckpt"
