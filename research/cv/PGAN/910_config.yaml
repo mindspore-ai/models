@@ -31,7 +31,7 @@ alpha_size_jumps: [32, 32, 32, 32, 32, 32]
 # optimizer and lr related
 lr: 0.001
 # loss related
-loss_scale_value: 12
+loss_scale_value: 20
 scale_factor: 10
 scale_window: 1000
 # export option
