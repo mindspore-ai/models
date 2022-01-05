@@ -20,8 +20,7 @@ then
 exit 1
 else
 
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 export DATASET_NAME=$1
 export SIMCLR_MODEL_PATH=$2
 export TRAIN_DATASET_PATH=$3

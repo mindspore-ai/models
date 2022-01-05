@@ -15,8 +15,7 @@
 # ============================================================================
 
 execute_path=$(pwd)
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 export RANK_SIZE=1
 export MODE=13B # or 2.6B
 export PARAM_INIT_TYPE=fp16

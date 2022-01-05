@@ -17,8 +17,7 @@
 #bash run_parameter_server_train_standalone.sh EPOCHS DEVICE_TARGET DATASET SERVER_NUM SCHED_HOST
 #                                              SCHED_PORT DEVICE_ID VOCAB_CACHE_SIZE SPARSE
 execute_path=$(pwd)
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 export EPOCH_SIZE=$1
 export DEVICE_TARGET=$2
 export DATASET=$3

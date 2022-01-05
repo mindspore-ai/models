@@ -15,8 +15,7 @@
 # ============================================================================
 
 # an simple tutorial as follows, more parameters can be setting
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 DATA_PATH=$1
 CKPT_PATH=$2
 export OMP_NUM_THREADS=1

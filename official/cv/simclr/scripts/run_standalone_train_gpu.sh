@@ -19,8 +19,7 @@ then
     echo "Usage: sh run_standalone_train_gpu.sh [cifar10] [TRAIN_DATASET_PATH] [DEVICE_ID]"
 else
 
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 export DATASET_NAME=$1
 export TRAIN_DATASET_PATH=$2
 export DEVICE_ID=$3

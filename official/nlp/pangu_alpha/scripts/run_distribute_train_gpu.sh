@@ -21,8 +21,7 @@ echo "for example: bash run_distributed_train_gpu.sh 16 hostfile_16p /mass_datas
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 RANK_SIZE=$1
 HOSTFILE=$2
 DATASET=$3

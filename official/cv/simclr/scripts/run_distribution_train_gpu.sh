@@ -30,8 +30,7 @@ get_real_path(){
 
 # Parameters.
 ulimit -u unlimited
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 export DATASET_NAME=$1
 export DEVICE_NUM=$2
 export TRAIN_DATASET_PATH=$(get_real_path $3)

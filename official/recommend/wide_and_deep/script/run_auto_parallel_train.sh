@@ -16,8 +16,7 @@
 
 # bash run_multinpu_train.sh
 execute_path=$(pwd)
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 export RANK_SIZE=$1
 export EPOCH_SIZE=$2
 export DATASET=$3

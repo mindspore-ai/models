@@ -21,8 +21,7 @@ echo "It is better to use the absolute path."
 echo "=============================================================================================================="
 execute_path=$(pwd)
 echo ${execute_path}
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 echo ${self_path}
 
 export RANK_TABLE_FILE=$1
