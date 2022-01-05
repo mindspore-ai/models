@@ -86,6 +86,11 @@ def network_init(args):
                         device_target=args.device_target, save_graphs=False, device_id=devid)
     set_graph_kernel_context()
 
+    # In PYNATIVE_MODE, since the default memory pool available size on ascend is 30GB, which does not meet the requirements and needs to be adjusted larger
+    # Set mempool block size for improving memory utilization, which will not take effect in GRAPH_MODE
+    if context.get_context("mode") == context.PYNATIVE_MODE and context.get_context("device_target") == "Ascend":
+        context.set_context(mempool_block_size="31GB", max_device_memory="31GB")
+
     profiler = None
     if args.need_profiler:
         from mindspore.profiler import Profiler
