@@ -13,6 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-export DEVICE_ID=$1
-
-python eval.py > eval_log$1.txt 2>&1 &
+CKPT_PATH=$1
+export DEVICE_ID=$2
+python eval.py --checkpoint_path $CKPT_PATH > eval_log$2.txt 2>&1 &
