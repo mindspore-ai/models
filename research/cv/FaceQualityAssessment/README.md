@@ -129,21 +129,21 @@ The entire code structure is as following:
     Ascend
 
     cd ./scripts
-    sh run_standalone_train.sh [TRAIN_LABEL_FILE] [USE_DEVICE_ID]
+    bash run_standalone_train.sh [TRAIN_LABEL_FILE] [USE_DEVICE_ID]
     ```
 
     ```bash
     GPU
 
     cd ./scripts
-    sh run_standalone_train_gpu.sh [TRAIN_LABEL_FILE]
+    bash run_standalone_train_gpu.sh [TRAIN_LABEL_FILE]
     ```
 
     ```bash
     CPU
 
     cd ./scripts
-    sh run_standalone_train_cpu.sh [TRAIN_LABEL_FILE]
+    bash run_standalone_train_cpu.sh [TRAIN_LABEL_FILE]
     ```
 
     or (fine-tune)
@@ -152,28 +152,28 @@ The entire code structure is as following:
     Ascend
 
     cd ./scripts
-    sh run_standalone_train.sh [TRAIN_LABEL_FILE] [USE_DEVICE_ID] [PRETRAINED_BACKBONE]
+    bash run_standalone_train.sh [TRAIN_LABEL_FILE] [USE_DEVICE_ID] [PRETRAINED_BACKBONE]
     ```
 
     ```bash
     GPU
 
     cd ./scripts
-    sh run_standalone_train_gpu.sh [TRAIN_LABEL_FILE] [PRETRAINED_BACKBONE]
+    bash run_standalone_train_gpu.sh [TRAIN_LABEL_FILE] [PRETRAINED_BACKBONE]
     ```
 
     ```bash
     CPU
 
     cd ./scripts
-    sh run_standalone_train_cpu.sh [TRAIN_LABEL_FILE] [PRETRAINED_BACKBONE]
+    bash run_standalone_train_cpu.sh [TRAIN_LABEL_FILE] [PRETRAINED_BACKBONE]
     ```
 
     for example, on Ascend:
 
     ```bash
     cd ./scripts
-    sh run_standalone_train.sh /home/train.txt 0 /home/a.ckpt
+    bash run_standalone_train.sh /home/train.txt 0 /home/a.ckpt
     ```
 
 - Distribute mode (recommended)
@@ -182,14 +182,14 @@ The entire code structure is as following:
     Ascend
 
     cd ./scripts
-    sh run_distribute_train.sh [TRAIN_LABEL_FILE] [RANK_TABLE]
+    bash run_distribute_train.sh [TRAIN_LABEL_FILE] [RANK_TABLE]
     ```
 
     ```bash
     GPU
 
     cd ./scripts
-    sh run_distribute_train_gpu.sh [DEVICE_NUM] [VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [TRAIN_LABEL_FILE]
+    bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [TRAIN_LABEL_FILE]
     ```
 
     or (fine-tune)
@@ -198,21 +198,21 @@ The entire code structure is as following:
     Ascend
 
     cd ./scripts
-    sh run_distribute_train.sh [TRAIN_LABEL_FILE] [RANK_TABLE] [PRETRAINED_BACKBONE]
+    bash run_distribute_train.sh [TRAIN_LABEL_FILE] [RANK_TABLE] [PRETRAINED_BACKBONE]
     ```
 
     ```bash
     GPU
 
     cd ./scripts
-    sh run_distribute_train_gpu.sh [DEVICE_NUM] [VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [TRAIN_LABEL_FILE] [PRETRAINED_BACKBONE]
+    bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [TRAIN_LABEL_FILE] [PRETRAINED_BACKBONE]
     ```
 
     for example, on Ascend:
 
     ```bash
     cd ./scripts
-    sh run_distribute_train.sh /home/train.txt ./rank_table_8p.json /home/a.ckpt
+    bash run_distribute_train.sh /home/train.txt ./rank_table_8p.json /home/a.ckpt
     ```
 
 You will get the loss value of each step as following in "./output/[TIME]/[TIME].log" or "./scripts/device0/train.log":
