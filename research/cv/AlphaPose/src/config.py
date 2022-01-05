@@ -80,16 +80,19 @@ config.TRAIN = edict()
 config.TRAIN.SHUFFLE = True
 config.TRAIN.BATCH_SIZE = 64
 config.TRAIN.BEGIN_EPOCH = 0
-config.TRAIN.END_EPOCH = 140
+config.TRAIN.END_EPOCH = 270
 config.TRAIN.LR = 0.001
 config.TRAIN.LR_FACTOR = 0.1
 config.TRAIN.LR_STEP = [90, 120]
 config.TRAIN.NUM_PARALLEL_WORKERS = 8
 config.TRAIN.SAVE_CKPT = True
+config.TRAIN.nClasses = 17
 config.TRAIN.CKPT_PATH = "/CKPT_PATH/"
 # valid
 config.TEST = edict()
-config.TEST.BATCH_SIZE = 1  # 原先是32
+config.TEST.device_target = "Ascend"
+config.TEST.device_id = 7
+config.TEST.BATCH_SIZE = 32
 config.TEST.FLIP_TEST = True
 config.TEST.POST_PROCESS = True
 config.TEST.SHIFT_HEATMAP = True
@@ -98,6 +101,16 @@ config.TEST.NUM_PARALLEL_WORKERS = 2
 config.TEST.MODEL_FILE = "FastPose.ckpt"
 config.TEST.COCO_BBOX_FILE = '/COCO_BBOX_FILE/COCO_val2017_detections_AP_H_56_person.json'
 config.TEST.OUTPUT_DIR = 'results/'
+
+# demo
+config.detect_image = "demo.jpg"
+config.yolo_image_size = [416, 416]
+config.yolo_ckpt = "yolov3.ckpt"
+config.fast_pose_ckpt = "FastPose.ckpt"
+# confidence under ignore_threshold means no object when training
+config.yolo_threshold = 0.1
+config.save_bbox_image = True
+config.result_path = "demo_result/"
 
 # nms
 config.TEST.OKS_THRE = 0.9

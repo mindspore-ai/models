@@ -30,6 +30,7 @@ export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 cd ../
 export DEVICE_ID=$2
 export RANK_ID=$2
+export RANK_SIZE=1
 env > env0.log
 python3 train.py --dataset_path $1 --isModelArts False  --distribute False --device_id $2 --pre_ckpt_path $3 > train.log 2>&1
 

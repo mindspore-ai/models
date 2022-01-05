@@ -90,7 +90,7 @@ AlphaPose的总体网络架构如下：
 用法：bash run_standalone_train.sh --device_id 0
 
 # 运行评估示例
-用法：bash run_eval.sh
+用法：bash scripts/run_eval.sh checkpoint_path device_id
 
 # 运行demo
 用法：bash run_demo.sh
@@ -213,7 +213,7 @@ config.yolo_threshold = 0.1                                      # bbox阈值
 用法：bash run_standalone_train.sh --device_id 0
 
 # 运行评估示例
-用法：bash run_eval.sh
+用法：bash scripts/run_eval.sh checkpoint_path device_id
 ```
 
 ### 结果
@@ -243,7 +243,7 @@ epoch:270 step:292, loss is 0.0002532
 
 ```bash
 # 评估
-bash eval.sh
+bash scripts/run_eval.sh checkpoint_path device_id
 ```
 
 ### 结果
