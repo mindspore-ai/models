@@ -16,7 +16,7 @@
 
 if [ $# -lt 3 ]
 then
-  echo "Usage: sh run_distribute_train_gpu.sh [DEVICE_NUM] [VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [TRAIN_LABEL_FILE]
+  echo "Usage: bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [TRAIN_LABEL_FILE]
         [PRETRAINED_BACKBONE](optional)"
   exit 1
 fi
