@@ -209,12 +209,13 @@ python infer.py \
 ### 导出MindIR
 
 ```shell
-python export.py --checkpoint_id [ID] --device_target [DEVICE] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --config_path [CONFIG_PATH] --checkpoint_path [CKPT_PATH] --device_target [DEVICE] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
 ```
 
-参数checkpoint_id为必填项，
-`DEVICE` 须在['Ascend', 'CPU']中选择。
-`FILE_FORMAT` 须在设置为"MINDIR"。
+- `CKPT_PATH` 为必填项。
+- `CONFIG_PATH` 即数据集的`config.json`文件, 包含数据和训练参数配置。
+- `DEVICE` 可选项为 ['Ascend', 'GPU']。
+- `FILE_FORMAT` 可选项为 ['MINDIR', 'AIR']。
 
 ### 在Ascend310执行推理
 

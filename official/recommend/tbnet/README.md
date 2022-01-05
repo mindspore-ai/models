@@ -207,13 +207,13 @@ python infer.py \
 ### [Export MindIR](#contents)
 
 ```shell
-python export.py --checkpoint_id [ID] --device_target [DEVICE] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --config_path [CONFIG_PATH] --checkpoint_path [CKPT_PATH] --device_target [DEVICE] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
 ```
 
-The ckpt_file parameter is required,
-`ID` should be an integer within range
-`DEVICE` should be in ['Ascend', 'GPU']
-`FILE_FORMAT` should be in "MINDIR"
+- `CKPT_PATH` parameter is required.
+- `CONFIG_PATH` is `config.json` file, data and training parameter configuration.
+- `DEVICE` should be in ['Ascend', 'GPU'].
+- `FILE_FORMAT` should be in ['MINDIR', 'AIR'].
 
 ### [Infer on Ascend310](#contents)
 
@@ -225,7 +225,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 ```
 
 - `MINDIR_PATH` specifies path of used "MINDIR" model.
-- `DATA_PATH` specifies path of test.csv
+- `DATA_PATH` specifies path of test.csv.
 - `DEVICE_ID` is optional, default value is 0.
 
 ### [Result](#contents)
