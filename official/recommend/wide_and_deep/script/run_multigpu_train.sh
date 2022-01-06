@@ -15,8 +15,7 @@
 # ============================================================================
 
 # bash run_multigpu_train.sh RANK_SIZE EPOCH_SIZE DATASET
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 RANK_SIZE=$1
 EPOCH_SIZE=$2
 DATASET=$3

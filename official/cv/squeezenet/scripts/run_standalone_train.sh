@@ -65,7 +65,7 @@ export DEVICE_ID=$3
 export RANK_ID=0
 export RANK_SIZE=1
 
-BASE_PATH=$(dirname "$(dirname "$(readlink -f $0)")")
+BASE_PATH=$(dirname "$(cd "$(dirname "$0")" || exit; pwd)")
 CONFIG_FILE="${BASE_PATH}/squeezenet_cifar10_config.yaml"
 
 if [ $1 == "squeezenet" ] && [ $2 == "cifar10" ]; then

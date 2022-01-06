@@ -15,8 +15,7 @@
 # ============================================================================
 
 # bash run_standalone_train_for_gpu.sh EPOCH_SIZE DATASET
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 EPOCH_SIZE=$1
 DATASET=$2
 

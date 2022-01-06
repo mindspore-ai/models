@@ -16,8 +16,7 @@
 
 execute_path=$(pwd)
 echo ${execute_path}
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 echo ${self_path}
 
 export RANK_SIZE=$1

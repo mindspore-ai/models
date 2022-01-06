@@ -19,8 +19,7 @@
 #                                           SCHED_HOST SCHED_PORT ROLE RANK_TABLE_FILE
 #                                           VOCAB_CACHE_SIZE SPARSE
 execute_path=$(pwd)
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 export RANK_SIZE=$1
 export EPOCH_SIZE=$2
 export DEVICE_TARGET=$3

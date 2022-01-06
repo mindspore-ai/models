@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-BASE_PATH=$(dirname "$(dirname "$(readlink -f $0)")")
+BASE_PATH=$(dirname "$(cd "$(dirname "$0")" || exit; pwd)")
 dataset_type='MR'
 CONFIG_FILE="${BASE_PATH}/mr_config_cpu.yaml"
 python eval.py --checkpoint_file_path="$1" --dataset=$dataset_type --config_path=$CONFIG_FILE > eval.log 2>&1 &

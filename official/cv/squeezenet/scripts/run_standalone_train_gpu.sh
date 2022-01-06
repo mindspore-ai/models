@@ -67,7 +67,7 @@ fi
 
 ulimit -u unlimited
 export CUDA_VISIBLE_DEVICES=$3
-BASE_PATH=$(dirname "$(dirname "$(readlink -f $0)")")
+BASE_PATH=$(dirname "$(cd "$(dirname "$0")" || exit; pwd)")
 CONFIG_FILE="${BASE_PATH}/squeezenet_cifar10_config.yaml"
 if [ $1 == "squeezenet" ] && [ $2 == "cifar10" ]; then
     CONFIG_FILE="${BASE_PATH}/squeezenet_cifar10_config.yaml"

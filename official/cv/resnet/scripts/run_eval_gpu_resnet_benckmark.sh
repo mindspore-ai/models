@@ -31,8 +31,7 @@ get_real_path(){
 }
 
 DATAPATH=$(get_real_path $1)
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 if [ $# == 3 ]
 then
     python ${self_path}/../gpu_resnet_benchmark.py --data_path=$DATAPATH --eval=True --checkpoint_file_path=$2 --config_path=$3

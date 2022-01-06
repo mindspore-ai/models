@@ -15,8 +15,7 @@
 # ============================================================================
 
 # an simple tutorial as follows, more parameters can be setting
-script_self=$(readlink -f "$0")
-self_path=$(dirname "${script_self}")
+self_path=$(cd "$(dirname "$0")" || exit; pwd)
 DATA_PATH=$1
 CKPT_PATH=$2
 python -s ${self_path}/../eval.py --data_path=$DATA_PATH --device_target="Ascend" --ckpt_path=$CKPT_PATH > log_eval.txt 2>&1 &

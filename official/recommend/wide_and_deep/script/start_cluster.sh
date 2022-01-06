@@ -16,8 +16,7 @@
 
 execute_path=$(pwd)
 echo ${execute_path}
-script_self=$(readlink -f "$0")
-SCRIPTPATH=$(dirname "${script_self}")
+SCRIPTPATH=$(cd "$(dirname "$0")" || exit; pwd)
 echo ${SCRIPTPATH}
 # shellcheck source=/dev/null
 source $SCRIPTPATH/common.sh
