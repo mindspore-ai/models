@@ -21,7 +21,7 @@
     - [Description of Random Situation](#description-of-random-situation)
     - [ModelZoo Homepage](#modelzoo-homepage)
 
-## [LeNet Description](#contents)
+## [LeNet_Quant Description](#contents)
 
 LeNet was proposed in 1998, a typical convolutional neural network. It was used for digit recognition and got big success.
 
@@ -71,17 +71,17 @@ Dataset used: [MNIST](<http://yann.lecun.com/exdb/mnist/>)
 After installing MindSpore via the official website, you can start training and evaluation as follows:
 
 ```python
-# enter ../lenet directory and train lenet network,then a '.ckpt' file will be generated.
+# enter ../lenet/scripts/ directory and train lenet network,then a '.ckpt' file will be generated.
 bash run_standalone_train_ascend.sh [DATA_PATH] [CKPT_PATH]
 # example: bash run_standalone_train_ascend.sh /home/DataSet/MNIST/ ./ckpt/
 
 # enter lenet_quant dir, train lenet_quant
-python train.py --device_target=Ascend --data_path=[DATA_PATH] --ckpt_path=[CKPT_PATH] --dataset_sink_mode=True
-# example: python train.py --device_target=Ascend --data_path=/home/DataSet/MNIST/ --ckpt_path=/home/model/lenet/checkpoint_lenet-10_1875.ckpt --dataset_sink_mode=True
+python train_quant_.py --device_target=Ascend --data_path=[DATA_PATH] --ckpt_path=[CKPT_PATH]
+# example: python train_quant.py --device_target=Ascend --data_path=/home/DataSet/MNIST/ --ckpt_path=/home/model/lenet/checkpoint_lenet-10_1875.ckpt
 
 #evaluate LeNet-Quant
-python eval.py --device_target=Ascend --data_path=[DATA_PATH] --ckpt_path=[CKPT_PATH] --dataset_sink_mode=True
-# example: python eval.py --device_target=Ascend --data_path=/home/DataSet/MNIST/ --ckpt_path=/home/model/lenet_quant/checkpoint_lenet-10_937.ckpt --dataset_sink_mode=True
+python eval_quant.py --device_target=Ascend --data_path=[DATA_PATH] --ckpt_path=[CKPT_PATH]
+# example: python eval_quant.py --device_target=Ascend --data_path=/home/DataSet/MNIST/ --ckpt_path=/home/model/lenet_quant/checkpoint_lenet-10_937.ckpt
 ```
 
 ## [Script Description](#contents)
@@ -90,9 +90,11 @@ python eval.py --device_target=Ascend --data_path=[DATA_PATH] --ckpt_path=[CKPT_
 
 ```lenet_quant
 ├── model_zoo
-    ├── README.md                        // descriptions about all the models
+    ├── README.md                        // descriptions about the model
+    ├── README_CN.md                     // descriptions about the model
     ├── lenet_quant
         ├── README.md                    // descriptions about LeNet-Quant
+        ├── README_CN.md                 // descriptions about LeNet-Quant
         ├── ascend310_infer              // application for 310 inference
         ├── scripts
             ├── run_infer_310.sh         // shell script for 310 inference
@@ -103,16 +105,18 @@ python eval.py --device_target=Ascend --data_path=[DATA_PATH] --ckpt_path=[CKPT_
         │   ├── lenet_quant.py           // manual constructed quantitative network model of LeNet-Quant
         │   ├── loss_monitor.py          //monitor of network's loss and other data
         ├── requirements.txt             // package needed
-        ├── train.py               // training LeNet-Quant network with device Ascend
-        ├── eval.py                // evaluating LeNet-Quant network with device Ascend
-        ├── export_bin_file.py     // export bin file of MNIST for 310 inference
-        ├── postprocess.py         // post process for 310 inference
+        ├── train_quant.py               // training LeNet-Quant network with device Ascend
+        ├── eval_quant.py                // evaluating LeNet-Quant network with device Ascend
+        ├── export.py                    // export model of AIR OR MINDIR
+        ├── export_bin_file.py           // export bin file of MNIST for 310 inference
+        ├── mindspore_hub_conf.py.py     // mindspore Hub interface
+        ├── postprocess.py               // post process for 310 inference
 ```
 
 ## [Script Parameters](#contents)
 
 ```python
-Major parameters in train.py and config.py as follows:
+Major parameters in train_quant.py and config.py as follows:
 
 --data_path: The absolute full path to the train and evaluation datasets.
 --epoch_size: Total training epochs.
@@ -131,7 +135,7 @@ Major parameters in train.py and config.py as follows:
 ### Training
 
 ```bash
-python train.py --device_target=Ascend --dataset_path=/home/datasets/MNIST --dataset_sink_mode=True > log.txt 2>&1 &
+python train_quant.py --device_target=Ascend --data_path=/home/datasets/MNIST --ckpt_path=../lenet/scripts/ckpt/checkpoint_lenet-10_1875.ckpt > log.txt 2>&1 &
 ```
 
 After training, the loss value will be achieved as follows:
@@ -156,7 +160,7 @@ The model checkpoint will be saved in the current directory.
 Before running the command below, please check the checkpoint path used for evaluation.
 
 ```bash
-python eval.py --data_path Data --ckpt_path ckpt/checkpoint_lenet-1_937.ckpt > log.txt 2>&1 &
+python eval_quant.py --data_path /home/datasets/MNIST --ckpt_path ./checkpoint_lenet-10_937.ckpt > log.txt 2>&1 &
 ```
 
 You can view the results through the file "log.txt". The accuracy of the test dataset will be as follows:

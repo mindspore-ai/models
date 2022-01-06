@@ -380,6 +380,7 @@ class DetectEval(COCOeval):
                 if precision_ng:
                     # origin image path
                     im_path = os.path.join(im_path_dir, img_info[0]['file_name'])
+                    assert os.path.exists(im_path), "{} not exist, please check image directory".format(im_path)
                     # output image path
                     im_path_out_dir = os.path.join(eval_result_path, 'precision_ng_images')
                     if not os.path.exists(im_path_out_dir):
