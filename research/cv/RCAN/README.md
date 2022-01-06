@@ -45,6 +45,7 @@
 - 基准数据集可下载如下：[Set5](http://people.rennes.inria.fr/Aline.Roumy/results/SR_BMVC12.html)、[Set14](https://deepai.org/dataset/set14-super-resolution)、[B100](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/bsds/)、[Urban100](http://vllab.ucmerced.edu/wlai24/LapSRN/)。
 - 数据格式：png文件
  - 注：数据将在src/data/DIV2K.py中处理。
+ - 注：dir_data中需要指定数据集所在位置的上一层目录。
 
 ```bash
 DIV2K
@@ -124,7 +125,7 @@ DIV2K
 ├── model_zoo
     ├── README.md                                 // 所有模型相关说明
     ├── RCAN
-        ├── scripts
+        ├── script
         │   ├── run_distribute_train.sh           // Ascend分布式训练shell脚本
         │   ├── run_eval.sh                       // eval验证shell脚本
         │   ├── run_ascend_standalone.sh          // Ascend训练shell脚本
@@ -215,7 +216,7 @@ DIV2K
 - 四倍超分task_id 2
 
 ```bash
-sh scripts/run_ascend_distribute.sh [TRAIN_DATA_DIR]
+bash script/run_ascend_distribute.sh [TRAIN_DATA_DIR]
 ```
 
 - 分布式训练
@@ -224,7 +225,7 @@ sh scripts/run_ascend_distribute.sh [TRAIN_DATA_DIR]
 - 四倍超分task_id 2
 
 ```bash
-sh scripts/run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
+bash script/run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
 ```
 
 - 分布式训练需要提前创建JSON格式的HCCL配置文件。具体操作，参见：<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
@@ -236,7 +237,7 @@ sh scripts/run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
 - 评估过程如下，需要指定数据集类型为“Set5”或“B100”。
 
 ```bash
-sh scripts/eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]
+bash script/eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]
 ```
 
 - 上述python命令在后台运行，可通过`eval.log`文件查看结果。
@@ -246,7 +247,7 @@ sh scripts/eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]
 - 评估过程如下，需要指定数据集类型为“Set5”或“B100”。
 
 ```bash
-sh run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATASET_TYPE] [SCALE] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATASET_TYPE] [SCALE] [DEVICE_ID]
 ```
 
 - MINDIR_PATH mindir模型文件路径
