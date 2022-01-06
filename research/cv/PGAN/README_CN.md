@@ -168,7 +168,7 @@ CelebFaces Attributes Dataset (CelebA) 是一个大规模的人脸属性数据�
 | 上传日期                   | 09/31/2021 (month/day/year)                                 |
 | MindSpore版本              | 1.3.0                                                       |
 | 数据集                     | CelebA                                                      |
-| 训练参数                   | batch_size=128, lr=0.001                                   |
+| 训练参数                   | batch_size=16, lr=0.001                                   |
 | 优化器                     | Adam                                                        |
 | 生成器输出                 | image                                                       |
 | 速度                       |8p:9h26m54S; 1p:76h23m39s; 1.1s/step                                |
