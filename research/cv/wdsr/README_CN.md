@@ -271,8 +271,10 @@ FILE_FORMAT 可选 ['MINDIR', 'AIR', 'ONNX'], 默认['MINDIR']。
 | 损失函数      | L1                                                           |
 | 输出          | 超分辨率图片                                                 |
 | 损失          | 3.5                                                          |
-| 速度          | 8卡：约130毫秒/步                                            |
-| 总时长        | 8卡：0.5小时                                                   |
+| 速度          | 1卡：约115毫秒/步                                            |
+|              | 8卡：约130毫秒/步                                            |
+| 总时长        | 1卡：4小时                                                   |
+|              | 8卡：0.5小时                                                   |
 | 微调检查点    | 35 MB(.ckpt文件)                                        |
 | 脚本          | [WDSR](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/research/cv/wdsr) |
 
@@ -286,7 +288,8 @@ FILE_FORMAT 可选 ['MINDIR', 'AIR', 'ONNX'], 默认['MINDIR']。
 | 数据集        | DIV2K                                                       |
 | batch_size    | 1                                                           |
 | 输出          | 超分辨率图片                                                |
-| PSNR          | DIV2K 34.7780                                               |
+| PSNR          | 1p DIV2K 34.77                                               |
+|               | 8p DIV2K 33.59                                               |
 
 # 随机情况说明
 
