@@ -109,12 +109,18 @@ def read_dataset(img_path, annotation):
     return img, target
 
 
-def create_dataset(data_dir, cfg, batch_size=32, repeat_num=1, shuffle=True, multiprocessing=True, num_worker=4):
+def create_dataset(data_dir, cfg, batch_size=32, repeat_num=1, shuffle=True, multiprocessing=True, num_worker=4,
+                   is_distribute=False):
     dataset = WiderFace(data_dir)
 
-    init("nccl")
-    rank_id = get_rank()
-    device_num = get_group_size()
+    if is_distribute:
+        init()
+        rank_id = get_rank()
+        device_num = get_group_size()
+    else:
+        rank_id = 0
+        device_num = 1
+
     if device_num == 1:
         de_dataset = de.GeneratorDataset(dataset, ["image", "annotation"],
                                          shuffle=shuffle,
