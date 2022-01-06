@@ -28,7 +28,6 @@ from mindspore.train.loss_scale_manager import FixedLossScaleManager
 # should find /src
 
 from src.lr_generator import get_lr
-from src.CrossEntropySmooth import CrossEntropySmooth
 
 parser = argparse.ArgumentParser('mindspore resnetv2 training')
 
