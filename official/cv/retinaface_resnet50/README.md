@@ -230,25 +230,41 @@ Parameters for both training and evaluation can be set in config.py
 
 ## [Performance](#contents)
 
-### Evaluation Performance
+### Training Performance
 
-| Parameters                 | GPU                                                          |
-| -------------------------- | -------------------------------------------------------------|
-| Model Version              | RetinaFace + Resnet50                                        |
-| Resource                   | NV SMX2 V100-16G                                             |
-| uploaded Date              | 10/16/2020 (month/day/year)                                  |
-| MindSpore Version          | 1.0.0                                                        |
-| Dataset                    | WIDERFACE                                                    |
-| Training Parameters        | epoch=100, steps=402, batch_size=8, lr=0.01                  |
-| Optimizer                  | SGD                                                          |
-| Loss Function              | MultiBoxLoss + Softmax Cross Entropy                         |
-| outputs                    | bounding box + confidence + landmark                         |
-| Loss                       | 1.200                                                        |
-| Speed                      | 4pcs: 560 ms/step                                            |
-| Total time                 | 4pcs: 6.4 hours                                              |
-| Parameters (M)             | 27.29M                                                       |
-| Checkpoint for Fine tuning | 336.3M (.ckpt file)                                          |
+| Parameters                 | GPU                                                           |
+| -------------------------- | --------------------------------------------------------------|
+| Model Version              | RetinaFace + Resnet50                                         |
+| Resource                   | NV SMX2 V100-16G                                              |
+| uploaded Date              | 01/04/2022 (month/day/year)                                   |
+| MindSpore Version          | 1.6.0                                                         |
+| Dataset                    | WIDERFACE                                                     |
+| Training Parameters        | epoch=100, steps=402, batch_size=8, lr=0.01                   |
+| Optimizer                  | SGD                                                           |
+| Loss Function              | MultiBoxLoss + Softmax Cross Entropy                          |
+| outputs                    | bounding box + confidence + landmark                          |
+| Loss                       | 1.200                                                         |
+| Speed                      | 4pcs: 560 ms/step                                             |
+| Total time                 | 4pcs: 6.4 hours                                               |
+| Parameters (M)             | 27.29M                                                        |
+| Checkpoint for Fine tuning | 336.3M (.ckpt file)                                           |
 | Scripts                    | [retinaface script](https://gitee.com/mindspore/models/tree/master/official/cv/retinaface_resnet50) |
+
+### Inference Performance
+
+| Parameters          | GPU                         |
+| ------------------- | --------------------------- |
+| Model Version       | RetinaFace + Resnet50       |
+| Resource            | NV SMX2 V100-16G            |
+| Uploaded Date       | 01/04/2022 (month/day/year) |
+| MindSpore Version   | 1.6.0                       |
+| Dataset             | WIDERFACE                   |
+| batch_size          | 1                           |
+| outputs             | bounding box + confidence + landmark |
+| Accuracy            | 4pcs:                       |
+|                     | Easy   Val AP : 0.9422      |
+|                     | Medium Val AP : 0.9325      |
+|                     | Hard   Val AP : 0.8900      |
 
 ## [How to use](#contents)
 
