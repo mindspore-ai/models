@@ -131,8 +131,8 @@ def ssd_bboxes_encode(boxes):
     default_boxes_t = default_boxes[index]
     bboxes_t[:, :2] = (bboxes_t[:, :2] - default_boxes_t[:, :2]) / \
         (default_boxes_t[:, 2:] * config.prior_scaling[0])
-    bboxes_t[:, 2:4] = np.log(
-        bboxes_t[:, 2:4] / default_boxes_t[:, 2:4]) / config.prior_scaling[1]
+    tmp = np.maximum(bboxes_t[:, 2:4] / default_boxes_t[:, 2:4], 0.000001)
+    bboxes_t[:, 2:4] = np.log(tmp) / config.prior_scaling[1]
     bboxes[index] = bboxes_t
 
     num_match = np.array([len(np.nonzero(t_label)[0])], dtype=np.int32)
