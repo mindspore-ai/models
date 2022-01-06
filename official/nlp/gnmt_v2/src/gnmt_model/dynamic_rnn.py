@@ -68,7 +68,7 @@ class DynamicRNNCell(nn.Cell):
                                 num_layers=1,
                                 has_bias=True,
                                 batch_first=False,
-                                dropout=0,
+                                dropout=0.0,
                                 bidirectional=False)
 
     def construct(self, x, init_h=None, init_c=None):
