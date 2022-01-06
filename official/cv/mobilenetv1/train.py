@@ -99,6 +99,21 @@ def modelarts_pre_process():
         config.dataset_path = os.path.join(config.data_path, config.modelarts_dataset_unzip_name)
     config.save_checkpoint_path = config.output_path
 
+def init_weigth(net):
+    # init weight
+    if config.pre_trained:
+        param_dict = load_checkpoint(config.pre_trained)
+        load_param_into_net(net, param_dict)
+    else:
+        for _, cell in net.cells_and_names():
+            if isinstance(cell, nn.Conv2d):
+                cell.weight.set_data(weight_init.initializer(weight_init.XavierUniform(),
+                                                             cell.weight.shape,
+                                                             cell.weight.dtype))
+            if isinstance(cell, nn.Dense):
+                cell.weight.set_data(weight_init.initializer(weight_init.TruncatedNormal(),
+                                                             cell.weight.shape,
+                                                             cell.weight.dtype))
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_mobilenetv1():
@@ -110,6 +125,10 @@ def train_mobilenetv1():
 
     # init context
     context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
+
+    # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
+    context.set_context(mempool_block_size="31GB")
+
     if config.parameter_server:
         context.set_ps_context(enable_ps=True)
     device_id = int(os.getenv('DEVICE_ID', '0'))
@@ -137,20 +156,7 @@ def train_mobilenetv1():
     if config.parameter_server:
         net.set_param_ps()
 
-    # init weight
-    if config.pre_trained:
-        param_dict = load_checkpoint(config.pre_trained)
-        load_param_into_net(net, param_dict)
-    else:
-        for _, cell in net.cells_and_names():
-            if isinstance(cell, nn.Conv2d):
-                cell.weight.set_data(weight_init.initializer(weight_init.XavierUniform(),
-                                                             cell.weight.shape,
-                                                             cell.weight.dtype))
-            if isinstance(cell, nn.Dense):
-                cell.weight.set_data(weight_init.initializer(weight_init.TruncatedNormal(),
-                                                             cell.weight.shape,
-                                                             cell.weight.dtype))
+    init_weigth(net)
 
     # init lr
     lr = get_lr(lr_init=config.lr_init, lr_end=config.lr_end, lr_max=config.lr_max,

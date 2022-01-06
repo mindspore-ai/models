@@ -121,6 +121,9 @@ def run_transformer_train():
         context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
     context.set_context(reserve_class_name_in_scope=False)
 
+    # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
+    context.set_context(mempool_block_size="31GB")
+
     if config.device_target == "GPU":
         # Enable graph kernel
         context.set_context(enable_graph_kernel=True, graph_kernel_flags="--enable_parallel_fusion")
