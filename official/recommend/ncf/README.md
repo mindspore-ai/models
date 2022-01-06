@@ -100,8 +100,8 @@ bash scripts/run_train.sh
 # run training example on GPU
 bash scripts/run_train_gpu.sh
 
-# run distributed training example
-bash scripts/run_train.sh rank_table.json
+# run training distribute example on Ascend
+bash scripts/run_distribute_train.sh /path/hccl.json /path/MovieLens
 
 # run evaluation example on Ascend
 bash run_eval.sh
@@ -215,7 +215,10 @@ Parameters for both training and evaluation can be set in config.py.
 - on Ascend
 
   ```python
+  # train single
   bash scripts/run_train.sh
+  # train distribute
+  bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH]
   ```
 
 - on GPU
