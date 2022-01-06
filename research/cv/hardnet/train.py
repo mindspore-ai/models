@@ -23,6 +23,7 @@ from mindspore import context
 from mindspore import Tensor
 from mindspore.context import ParallelMode
 from mindspore.train.model import Model
+from mindspore.common import set_seed
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -53,7 +54,7 @@ args = parser.parse_args()
 
 if args.isModelArts:
     import moxing as mox
-
+set_seed(5)
 if __name__ == '__main__':
     target = args.device_target
     context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
