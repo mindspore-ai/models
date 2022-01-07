@@ -53,7 +53,8 @@ def run_train():
 
     device_id = get_device_id()
     context.set_context(device_id=device_id)
-
+    if cfg.device_target == "GPU":
+        context.set_context(enable_graph_kernel=True)
     if cfg.preprocess == 'true':
         print("============== Starting Data Pre-processing ==============")
         if os.path.exists(cfg.preprocess_path):
@@ -84,7 +85,8 @@ def run_train():
     loss_cb = LossMonitor()
     time_cb = TimeMonitor()
     if cfg.cell == "lstm" and cfg.device_target == "GPU":
-        model = Model(network, loss_fn=loss, optimizer=opt, metrics={'acc': Accuracy()}, loss_scale_manager=loss_scale)
+        model = Model(network, loss_fn=loss, optimizer=opt, metrics={'acc': Accuracy()}, amp_level="O3",
+                      loss_scale_manager=loss_scale)
     else:
         model = Model(network, loss_fn=loss, optimizer=opt, metrics={'acc': Accuracy()}, amp_level="O3")
 
