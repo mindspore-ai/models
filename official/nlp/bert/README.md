@@ -63,7 +63,7 @@ The backbone structure of BERT is transformer. For BERT_base, the transformer co
         - python -m wikiextractor.WikiExtractor -o <output file path> -b <output file size> <Wikipedia dump file>
     - Extracted text data from `WikiExtractor` cannot be trained directly, you have to preprocess the data and convert the dataset to TFRecord format. Please refer to create_pretraining_data.py file in [BERT](https://github.com/google-research/bert) repository and download vocab.txt here, if AttributeError: module 'tokenization' has no attribute 'FullTokenizer' occur, please install bert-tensorflow.
 - Create fine-tune dataset
-    - Download dataset for fine-tuning and evaluation such as [CLUENER](https://github.com/CLUEbenchmark/CLUENER2020), [TNEWS](https://github.com/CLUEbenchmark/CLUE), [SQuAD v1.1 train dataset](https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json), [SQuAD v1.1 eval dataset](https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json), etc.
+    - Download dataset for fine-tuning and evaluation such as [CLUENER](https://github.com/CLUEbenchmark/CLUENER2020), [TNEWS](https://github.com/CLUEbenchmark/CLUE), [ChineseNER](https://github.com/zjy-ucas/ChineseNER), [SQuAD v1.1 train dataset](https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json), [SQuAD v1.1 eval dataset](https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json), etc.
     - We haven't provide the scripts to create tfrecord yet, while converting dataset files from JSON format to TFRECORD format, please refer to run_classifier.py or run_squad.py file in [BERT](https://github.com/google-research/bert) repository or the CLUE official repository [CLUE](https://github.com/CLUEbenchmark/CLUE/blob/master/baselines/models/bert/run_classifier.py) and [CLUENER](https://github.com/CLUEbenchmark/CLUENER2020/tree/master/tf_version)
 
 # [Environment Requirements](#contents)
@@ -639,6 +639,32 @@ If you choose F1 as assessment method, the result will be as follows:
 Precision 0.868245
 Recall 0.865611
 F1 0.866926
+```
+
+#### evaluation on chineseNer dataset when running on Ascend
+
+Before running the command below, please check the load pretrain checkpoint path has been set. Please set the checkpoint path to be the absolute full path, e.g:
+
+--label_file_path="/data/chineseNer/label_file" \
+
+--load_pretrain_checkpoint_path="/data/scripts/checkpoint_bert-20000_1.ckpt" \
+
+--train_data_file_path="/data/chineseNer/train.tf_record" \
+
+--eval_data_file_path="/data/chineseNer/dev.tf_record" \
+
+--schema_file_path="/data/chineseNer/dataset.json"
+
+```bash
+bash scripts/run_ner.sh
+```
+
+The command above will run in the background, you can view training logs in ner_log.txt.
+
+If you choose F1 as assessment method, the result will be as follows:
+
+```text
+F1 0.986526
 ```
 
 #### evaluation on msra dataset when running on Ascend

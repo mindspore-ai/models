@@ -65,7 +65,7 @@ BERT的主干结构为Transformer。对于BERT_base，Transformer包含12个编�
         - python -m wikiextractor.WikiExtractor -o <output file path> -b <output file size> <Wikipedia dump file>
     - `WikiExtarctor`提取出来的原始文本并不能直接使用，还需要将数据集预处理并转换为TFRecord格式。详见[BERT](https://github.com/google-research/bert)代码仓中的create_pretraining_data.py文件，同时下载对应的vocab.txt文件, 如果出现AttributeError: module 'tokenization' has no attribute 'FullTokenizer’，请安装bert-tensorflow。
 - 生成下游任务数据集
-    - 下载数据集进行微调和评估，如[CLUENER](https://github.com/CLUEbenchmark/CLUENER2020)、[TNEWS](https://github.com/CLUEbenchmark/CLUE)、[SQuAD v1.1训练集](https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json)、[SQuAD v1.1验证集](https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json)等。
+    - 下载数据集进行微调和评估，如[CLUENER](https://github.com/CLUEbenchmark/CLUENER2020)、[TNEWS](https://github.com/CLUEbenchmark/CLUE)、[ChineseNER](https://github.com/zjy-ucas/ChineseNER)、[SQuAD v1.1训练集](https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json)、[SQuAD v1.1验证集](https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json)等。
     - 将数据集文件从JSON格式转换为TFRecord格式。详见[BERT](https://github.com/google-research/bert)代码仓中的run_classifier.py或run_squad.py文件。
 
 # 环境要求
@@ -610,6 +610,32 @@ bash scripts/run_ner.sh
 Precision 0.868245
 Recall 0.865611
 F1 0.866926
+```
+
+#### Ascend处理器上运行后评估chineseNer数据集
+
+运行以下命令前，确保已设置加载与训练检查点路径。请将检查点路径设置为绝对全路径，例如，
+
+--label_file_path="/data/finetune/chineseNer/label_file" \
+
+--load_pretrain_checkpoint_path="/data/scripts/checkpoint_bert-20000_1.ckpt" \
+
+--train_data_file_path="/data/chineseNer/train.tf_record" \
+
+--eval_data_file_path="/data/chineseNer/dev.tf_record" \
+
+--schema_file_path="/data/chineseNer/dataset.json"
+
+```bash
+bash scripts/run_ner.sh
+```
+
+以上命令后台运行，您可以在ner_log.txt中查看训练日志。
+
+如您选择F1作为评估方法，可得到如下结果：
+
+```text
+F1 0.986526
 ```
 
 #### Ascend处理器上运行后评估msra数据集

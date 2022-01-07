@@ -25,7 +25,7 @@
 
 <!-- /TOC -->
 
-## LeNet描述
+## LeNet_Quant描述
 
 LeNet是1998年提出的一种典型的卷积神经网络。它被用于数字识别并取得了巨大的成功。
 
@@ -75,17 +75,17 @@ LeNet非常简单，包含5层，由2个卷积层和3个全连接层组成。
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
 ```python
-# 进入../lenet目录，训练lenet网络，生成'.ckpt'文件作为lenet-quant预训练文件
+# 进入../lenet/scripts目录，训练lenet网络，生成'.ckpt'文件作为lenet-quant预训练文件
 bash run_standalone_train_ascend.sh [DATA_PATH] [CKPT_PATH]
 # example: bash run_standalone_train_ascend.sh /home/DataSet/MNIST/ ./ckpt/
 
 # 进入lenet-quant目录，训练lenet-quant
-python train.py --device_target=Ascend --data_path=[DATA_PATH] --ckpt_path=[CKPT_PATH] --dataset_sink_mode=True
-# example: python train.py --device_target=Ascend --data_path=/home/DataSet/MNIST/ --ckpt_path=/home/model/lenet/checkpoint_lenet-10_1875.ckpt --dataset_sink_mode=True
+python train_quant.py --device_target=Ascend --data_path=[DATA_PATH] --ckpt_path=[CKPT_PATH]
+# example: python train_quant.py --device_target=Ascend --data_path=/home/DataSet/MNIST/ --ckpt_path=/home/model/lenet/checkpoint_lenet-10_1875.ckpt
 
 # 评估lenet-quant
-python eval.py --device_target=Ascend --data_path=[DATA_PATH] --ckpt_path=[CKPT_PATH] --dataset_sink_mode=True
-# example: python eval.py --device_target=Ascend --data_path=/home/DataSet/MNIST/ --ckpt_path=/home/model/lenet_quant/checkpoint_lenet-10_937.ckpt --dataset_sink_mode=True
+python eval_quant.py --device_target=Ascend --data_path=[DATA_PATH] --ckpt_path=[CKPT_PATH]
+# example: python eval_quant.py --device_target=Ascend --data_path=/home/DataSet/MNIST/ --ckpt_path=/home/model/lenet_quant/checkpoint_lenet-10_937.ckpt
 ```
 
 ## 脚本说明
@@ -94,9 +94,11 @@ python eval.py --device_target=Ascend --data_path=[DATA_PATH] --ckpt_path=[CKPT_
 
 ```lenet_quant
 ├── model_zoo
-    ├── README.md                        // 所有型号的描述
+    ├── README.md                        // 模型描述
+    ├── README_CN.md                     // 模型描述
     ├── lenet_quant
         ├── README.md                    // LeNet-Quant描述
+        ├── README_CN.md                 // LeNet-Quant描述
         ├── ascend310_infer              //实现310推理源代码
         ├── scripts
             ├── run_infer_310.sh         // Ascend推理shell脚本
@@ -107,16 +109,18 @@ python eval.py --device_target=Ascend --data_path=[DATA_PATH] --ckpt_path=[CKPT_
         │   ├── lenet_quant.py           // 手动构建的LeNet-Quant定量网络模型
         │   ├── loss_monitor.py          // 监控网络损失和其他数据
         ├── requirements.txt             // 需要的包
-        ├── train.py               // 使用Ascend训练LeNet-Quant网络
-        ├── eval.py                // 使用Ascend评估LeNet-Quant网络
-        ├── export_bin_file.py     // 导出MNIST数据集的bin文件用于310推理
-        ├── postprocess.py         // 310推理后处理脚本
+        ├── train_quant.py               // 使用Ascend训练LeNet-Quant网络
+        ├── eval_quant.py                // 使用Ascend评估LeNet-Quant网络
+        ├── mindspore_hub_conf.py        // mindspore Hub 接口
+        ├── export_bin_file.py           // 导出MNIST数据集的bin文件用于310推理
+        ├── export.py                    // 导出 AIR,MINDIR模型的脚本
+        ├── postprocess.py               // 310推理后处理脚本
 ```
 
 ### 脚本参数
 
 ```python
-train.py和config.py中主要参数如下：
+train_quant.py和config.py中主要参数如下：
 
 --data_path：到训练和评估数据集的绝对全路径
 --epoch_size：训练轮次数
@@ -133,7 +137,7 @@ train.py和config.py中主要参数如下：
 #### 训练
 
 ```bash
-python train.py --device_target=Ascend --dataset_path=/home/datasets/MNIST --dataset_sink_mode=True > log.txt 2>&1 &
+python train_quant.py --device_target=Ascend --data_path=/home/datasets/MNIST --ckpt_path=../lenet/scripts/ckpt/checkpoint_lenet-10_1875.ckpt > log.txt 2>&1 &
 ```
 
 训练结束，损失值如下：
@@ -158,7 +162,7 @@ Epoch:[ 3/ 10], step:[ 937/ 937], loss:[0.0017], avg loss:[0.0017], time:[3085.3
 在运行以下命令之前，请检查用于评估的检查点路径。
 
 ```bash
-python eval.py --data_path Data --ckpt_path ckpt/checkpoint_lenet-1_937.ckpt > log.txt 2>&1 &
+python eval_quant.py --data_path /home/datasets/MNIST --ckpt_path ./checkpoint_lenet-10_937.ckpt > log.txt 2>&1 &
 ```
 
 您可以通过log.txt文件查看结果。测试数据集的准确性如下：
