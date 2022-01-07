@@ -89,7 +89,7 @@ def _get_rank_info():
     get rank size and rank id
     """
 
-    rank_size = int(os.environ.get("RANK_SIZE"))
+    rank_size = int(os.environ.get("RANK_SIZE", 1))
 
     if rank_size > 1:
         rank_size = int(os.environ.get("RANK_SIZE"))

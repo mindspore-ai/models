@@ -107,7 +107,7 @@ if __name__ == "__main__":
             print("Only attribute mode is supported in this dataset.")
             sys.exit(0)
     # Note: Must set "drop_remainder = True" in parallel mode.
-    custom_data = custom_data.batch(batch_size, drop_remainder=True)
+    custom_data = custom_data.batch(args.batch_size, drop_remainder=True)
 
     # Build network
     net = backbone_cfg(args)
@@ -138,26 +138,26 @@ if __name__ == "__main__":
 
         if args.device_target == "Ascend":
             model.train(
-                epoch_size,
+                args.epoch_size,
                 train_dataset=custom_data,
                 callbacks=[loss_cb, ckpt_callback],
                 dataset_sink_mode=True
             )
         elif args.device_target == "GPU":
-            model.train(epoch_size, train_dataset=custom_data, callbacks=[loss_cb], dataset_sink_mode=False)
+            model.train(args.epoch_size, train_dataset=custom_data, callbacks=[loss_cb], dataset_sink_mode=False)
             ckpt_file_name = save_ckpt + f'/train_{rank_id}.ckpt'
             save_checkpoint(net, ckpt_file_name)
 
         end = time.time()
 
-        t3 = 1000 * (end - t1) / (88 * epoch_size)
+        t3 = 1000 * (end - t1) / (88 * args.epoch_size)
         print('total time:', end - start)
         print('speed_8p = %.3f ms/step'%t3)
         now = time.localtime()
         nowt = time.strftime("%Y-%m-%d-%H:%M:%S", now)
         print(nowt)
     else:
-        for i in range(epoch_size):
+        for i in range(args.epoch_size):
             t1 = time.time()
             model.train(1, train_dataset=custom_data, callbacks=LossMonitor(interval_step), dataset_sink_mode=True)
             t2 = time.time()
