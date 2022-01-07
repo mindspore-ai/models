@@ -239,25 +239,41 @@ RetinaFace使用ResNet50骨干提取图像特征进行检测。从ModelZoo获取
 
 ## 性能
 
+### 训练性能
+
+| 参数                 | GPU                                                           |
+| -------------------------- | --------------------------------------------------------------|
+| 模型版本                     | RetinaFace + Resnet50                                         |
+| 资源                        | NV SMX2 V100-16G                                              |
+| 上传日期              | 01/04/2022 (月/日/年)                                   |
+| MindSpore版本          | 1.6.0                                                         |
+| 数据集                    | WIDERFACE                                                     |
+| 训练参数        | epoch=100, steps=402, batch_size=8, lr=0.01                   |
+| 优化器                  | SGD                                                           |
+| 损失函数              | MultiBoxLoss + Softmax交叉熵                          |
+| 输出                    | 边界框 + 置信度 + 地标                          |
+| 损失                       | 1.200                                                         |
+| 速度                      | 4卡: 560 毫秒/步                                             |
+| 总时长                 | 4卡: 6.4 小时                                               |
+| 参数 (M)             | 27.29M                                                        |
+| 调优检查点 | 336.3M (.ckpt 文件)                                           |
+| 脚本                    | [retinaface script](https://gitee.com/mindspore/models/tree/master/official/cv/retinaface_resnet50) |
+
 ### 评估性能
 
-| 参数 | GPU                                                          |
-| -------------------------- | -------------------------------------------------------------|
-| 模型版本 | RetinaFace + Resnet50                                        |
-| 资源 | NV SMX2 V100-16G                                             |
-| 上传日期 | 2020-10-16 |
-| MindSpore版本 | 1.0.0 |
-| 数据集 | WIDERFACE                                                    |
-| 训练参数 | epoch=100, steps=536, batch_size=8, lr=0.001              |
-| 优化器 | SGD |
-| 损失函数 | MultiBoxLoss + Softmax交叉熵 |
-| 输出 |边界框 + 置信度 + 地标 |
-| 损失 | 1.200           |
-| 速度 | 3卡：550毫秒/步                                            |
-| 总时长 | 3卡：8.2小时 |
-| 参数 (M) | 27.29M            |
-| 调优检查点 | 336.3M （.ckpt 文件） |
-| 脚本                    | [RetinaFace脚本](https://gitee.com/mindspore/models/tree/master/official/cv/retinaface_resnet50) |
+| 参数          | GPU                         |
+| ------------------- | --------------------------- |
+| 模型版本       | RetinaFace + Resnet50       |
+| 资源            | NV SMX2 V100-16G            |
+| 上传日期       | 01/04/2022 (月/日/年) |
+| MindSpore版本   | 1.6.0                       |
+| 数据集             | WIDERFACE                   |
+| batch_size          | 1                           |
+| 输出             | 边界框 + 置信度 + 地标 |
+| 准确性            | 4卡:                       |
+|                     | Easy   Val AP : 0.9422      |
+|                     | Medium Val AP : 0.9325      |
+|                     | Hard   Val AP : 0.8900      |
 
 ## 用法
 
