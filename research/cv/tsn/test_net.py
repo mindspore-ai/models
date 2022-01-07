@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -37,7 +37,6 @@ parser.add_argument('--dataset', type=str, default="ucf101", choices=['ucf101', 
 parser.add_argument('--modality', type=str, default="RGB", choices=['RGB', 'Flow', 'RGBDiff'])
 parser.add_argument('--test_list', type=str, default="")
 parser.add_argument('--dataset_path', type=str, default="")
-parser.add_argument('--device_id', type=int, default=7)
 parser.add_argument('--arch', type=str, default="BNInception")
 parser.add_argument('--save_scores', type=str, default="score_warmup")
 parser.add_argument('--test_segments', type=int, default=25)
@@ -46,12 +45,15 @@ parser.add_argument('--input_size', type=int, default=224)
 parser.add_argument('--crop_fusion_type', type=str, default='avg',
                     choices=['avg', 'max', 'topk'])
 parser.add_argument('--dropout', type=float, default=0.3)
-parser.add_argument('--workers', default=16, type=int, help='number of data loading workers')
+parser.add_argument('--workers', default=4, type=int, help='number of data loading workers')
 parser.add_argument('--flow_prefix', type=str, default='flow_')
+parser.add_argument('--device_id', default=0, type=int)
+parser.add_argument('--platform', type=str, default='Ascend', choices=['Ascend', 'GPU'],
+                    help='Running platform, only support Ascend now. Default is GPU.')
 
 
 args = parser.parse_args()
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=args.device_id)
+context.set_context(mode=context.GRAPH_MODE, device_target=args.platform, device_id=args.device_id)
 
 test_start = datetime.datetime.now()
 
@@ -95,9 +97,10 @@ transform.append(ToTorchFormatTensor(div=args.arch != 'BNInception'))
 transform.append(GroupNormalize(input_mean, input_std))
 
 image_tmpl = "img_{:05d}.jpg" if args.modality in ["RGB", "RGBDiff"] else args.flow_prefix+"{}_{:05d}.jpg"
-data_loader = create_dataset(root_path=args.dataset_path, list_file=args.test_list,\
-         batch_size=1, num_segments=args.test_segments, new_length=data_length,\
-              modality=args.modality, image_tmpl=image_tmpl, transform=transform, test_mode=2, run_distribute=False)
+data_loader = create_dataset(root_path=args.dataset_path, list_file=args.test_list,
+                             batch_size=1, num_segments=args.test_segments, new_length=data_length,
+                             modality=args.modality, image_tmpl=image_tmpl, transform=transform,
+                             worker=args.workers, test_mode=2, run_distribute=False)
 
 total_num = data_loader.get_dataset_size()
 
