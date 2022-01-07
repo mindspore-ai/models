@@ -86,14 +86,14 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='gru_dataset')
     parser.add_argument("--dataset_path", type=str, default="", help="Dataset path, default: f`sns.")
     args = parser.parse_args()
-    dataset_path = args.dataset_path
+    dataset_path = args.dataset_path.strip()
     src_file_list = ["train.de", "test.de", "val.de"]
     dst_file_list = ["train.en", "test.en", "val.en"]
     for file in src_file_list:
-        file_path = os.path.join(dataset_path, file)
+        file_path = os.path.join(dataset_path, file.strip())
         create_tokenized_sentences(file_path, "english")
     for file in dst_file_list:
-        file_path = os.path.join(dataset_path, file)
+        file_path = os.path.join(dataset_path, file.strip())
         create_tokenized_sentences(file_path, "german")
     src_all_file = "all.de.tok"
     dst_all_file = "all.en.tok"
