@@ -38,8 +38,8 @@ from mindspore.nn.metrics import Accuracy
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.common import set_seed
 
-set_seed(1234)
-de.config.set_seed(2345)
+set_seed(100)
+de.config.set_seed(100)
 
 def modelarts_pre_process():
     pass
@@ -60,14 +60,6 @@ def train_alexnet():
         context.set_context(graph_kernel_flags="--enable_cluster_ops=MatMul")
 
     device_num = get_device_num()
-    if config.dataset_name == "cifar10":
-        if device_num > 1:
-            config.learning_rate = config.learning_rate * device_num
-            config.epoch_size = config.epoch_size * 2
-    elif config.dataset_name == "imagenet":
-        pass
-    else:
-        raise ValueError("Unsupported dataset.")
 
     if device_num > 1:
         context.reset_auto_parallel_context()
