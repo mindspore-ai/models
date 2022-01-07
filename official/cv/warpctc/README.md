@@ -174,36 +174,44 @@ The dataset is self-generated using a third-party library called [captcha](https
 ```shell
 .
 └──warpctc
-  ├── README.md                         # descriptions of warpctc
-  ├── README_CN.md                      # chinese descriptions of warpctc
   ├── ascend310_infer                   # application for 310 inference
-  ├── script
-    ├── run_distribute_train.sh         # launch distributed training in Ascend(8 pcs)
-    ├── run_distribute_train_for_gpu.sh # launch distributed training in GPU
-    ├── run_eval.sh                     # launch evaluation
-    ├── run_infer_310.sh                # launch 310infer
-    ├── run_process_data.sh             # launch dataset generation
-    └── run_standalone_train.sh         # launch standalone training(1 pcs)
-  ├── src
-    ├── model_utils
-      ├── config.py                     # parsing parameter configuration file of "*.yaml"
-      ├── devcie_adapter.py             # local or ModelArts training
-      ├── local_adapter.py              # get related environment variables in local training
-      └── moxing_adapter.py             # get related environment variables in ModelArts training
-    ├── dataset.py                      # data preprocessing
-    ├── loss.py                         # ctcloss definition
-    ├── lr_generator.py                 # generate learning rate for each step
-    ├── metric.py                       # accuracy metric for warpctc network
-    ├── warpctc.py                      # warpctc network definition
-    └── warpctc_for_train.py            # warpctc network with grad, loss and gradient clip
+  │   ├── build.sh                      # build 310 inference scripts
+  │   ├── CMakeLists.txt                # cmakelist for build
+  │   ├── inc
+  │   │   └── utils.h                   # header file of 310 inference
+  │   └── src
+  │       ├── main.cc                   # main 310 inference process
+  │       └── utils.cc                  # util functions for 310 inference
   ├── default_config.yaml               # parameter configuration
+  ├── eval.py                           # eval net
   ├── export.py                         # inference
   ├── mindspore_hub_conf.py             # mindspore hub interface
-  ├── eval.py                           # eval net
-  ├── process_data.py                   # dataset generation script
   ├── postprocess.py                    # 310infer postprocess script
   ├── preprocess.py                     # 310infer preprocess script
-  └── train.py                          # train net
+  ├── process_data.py                   # dataset generation script
+  ├── README_CN.md                      # chinese descriptions of warpctc
+  ├── README.md                         # descriptions of warpctc
+  ├── requirements.txt                  # pip requirements
+  ├── scripts
+  │    ├── run_distribute_train_for_gpu.sh # launch distributed training in GPU
+  │    ├── run_distribute_train.sh         # launch distributed training in Ascend(8 pcs)
+  │    ├── run_eval.sh                     # launch evaluation
+  │    ├── run_infer_310.sh                # launch 310infer
+  │    ├── run_process_data.sh             # launch dataset generation
+  │    └── run_standalone_train.sh         # launch standalone training(1 pcs)
+  ├── src
+  │    ├── dataset.py                      # data preprocessing
+  │    ├── loss.py                         # ctcloss definition
+  │    ├── lr_schedule.py                  # generate learning rate for each step
+  │    ├── metric.py                       # accuracy metric for warpctc network
+  │    ├── model_utils
+  │    │   ├── config.py                   # parsing parameter configuration file of "*.yaml"
+  │    │   ├── devcie_adapter.py           # local or ModelArts training
+  │    │   ├── local_adapter.py            # get related environment variables in local training
+  │    │   └── moxing_adapter.py           # get related environment variables in ModelArts training
+  │    ├── warpctc_for_train.py            # warpctc network with grad, loss and gradient clip
+  │    └── warpctc.py                      # warpctc network definition
+  └── train.py                             # train net
 ```
 
 ### [Script Parameters](#contents)
