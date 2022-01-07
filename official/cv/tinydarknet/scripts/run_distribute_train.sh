@@ -14,31 +14,38 @@
 # limitations under the License.
 # ============================================================================
 
-echo "$1 $2"
+echo "$1 $2 $3"
 
-if [ $# != 1 ] && [ $# != 2 ]
+if [ $# != 3 ]
 then
-    echo "Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [cifar10|imagenet]"
+    echo "Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [cifar10|imagenet] [TRAIN_DATA_DIR]"
 exit 1
 fi
 
 if [ ! -f $1 ]
 then
-    echo "error:RANK_TABLE_FILE=$1 is not a file"
-exit 1
-fi
-
-dataset_type='imagenet'
-if [ $# == 2 ]
-then
-    if [ $2 != "cifar10" ] && [ $2 != "imagenet" ]
-    then
-        echo "error: the selected dataset is neither cifar10 nor imagenet"
+    echo "error: RANK_TABLE_FILE=$1 is not a file"
     exit 1
-    fi
-    dataset_type=$2
 fi
 
+PROJECT_DIR=$(cd ./"`dirname $0`" || exit; pwd)
+if [ $2 == 'imagenet' ]; then
+    CONFIG_FILE="$PROJECT_DIR/../config/imagenet_config.yaml"
+    dataset_type='imagenet'
+elif [ $2 == 'cifar10' ]; then
+    CONFIG_FILE="$PROJECT_DIR/../config/cifar10_config.yaml"
+    dataset_type='cifar10'
+else
+    echo "error: the selected dataset is neither cifar10 nor imagenet"
+    exit 1
+fi
+
+if [ ! -d $3 ]
+then
+    echo "error: TRAIN_DATA_DIR=$3 is not a dir"
+    exit 1
+fi
+data_path=$3
 
 ulimit -u unlimited
 export DEVICE_NUM=8
@@ -61,6 +68,7 @@ do
     echo "start training for rank $RANK_ID, device $DEVICE_ID, $dataset_type"
     cd ./train_parallel$i || exit
     env > env.log
-    python train.py --dataset_name=$dataset_type > log 2>&1 &
+    python train.py --dataset_name=$dataset_type --train_data_dir=$data_path \
+        --config_path=$CONFIG_FILE > log 2>&1 &
     cd ..
 done
