@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -89,7 +89,7 @@ def _get_rank_info():
     get rank size and rank id
     """
 
-    rank_size = int(os.environ.get("RANK_SIZE"))
+    rank_size = int(os.environ.get("RANK_SIZE", 1))
 
     if rank_size > 1:
         rank_size = int(os.environ.get("RANK_SIZE"))
