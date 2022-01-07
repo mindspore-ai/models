@@ -18,7 +18,7 @@ echo "$1 $2 $3"
 
 if [ $# != 2 ] && [ $# != 3 ]
 then
-    echo "Usage: bash run_distribute_train.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10|imagenet]"
+    echo "Usage: bash run_standalone_train.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10|imagenet]"
 exit 1
 fi
 
@@ -36,15 +36,16 @@ exit 1
 fi
 train_data_dir=$2
 
-dataset_type='imagenet'
-if [ $# == 3 ]
-then
-    if [ $3 != "cifar10" ] && [ $3 != "imagenet" ]
-    then
-        echo "error: the selected dataset is neither cifar10 nor imagenet"
+PROJECT_DIR=$(cd ./"`dirname $0`" || exit; pwd)
+if [ $3 == 'imagenet' ]; then
+    CONFIG_FILE="$PROJECT_DIR/../config/imagenet_config.yaml"
+    dataset_type='imagenet'
+elif [ $3 == 'cifar10' ]; then
+    CONFIG_FILE="$PROJECT_DIR/../config/cifar10_config.yaml"
+    dataset_type='cifar10'
+else
+    echo "error: the selected dataset is neither cifar10 nor imagenet"
     exit 1
-    fi
-    dataset_type=$3
 fi
 
 export DEVICE_ID=$1
@@ -58,4 +59,5 @@ cp ../train.py ./train_single
 cp -r ../config ./train_single
 echo "start training for rank $RANK_ID, device $DEVICE_ID, $dataset_type"
 cd ./train_single || exit
-python ./train.py --dataset_name=$dataset_type --train_data_dir=$train_data_dir> ./train.log 2>&1 &
+python ./train.py --dataset_name=$dataset_type --train_data_dir=$train_data_dir \
+    --config_path=$CONFIG_FILE > ./train.log 2>&1 &

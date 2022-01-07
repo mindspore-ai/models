@@ -18,7 +18,7 @@ echo "$1 $2 $3"
 
 if [ $# != 2 ] && [ $# != 3 ]
 then
-    echo "Usage: bash run_distribute_train_gpu.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10|imagenet]"
+    echo "Usage: bash run_standalone_train_gpu.sh [DEVICE_ID] [TRAIN_DATA_DIR] [cifar10|imagenet]"
 exit 1
 fi
 
@@ -49,12 +49,12 @@ then
 fi
 
 if [ $3 == 'imagenet' ]; then
-  CONFIG_FILE="$PROJECT_DIR/../config/imagenet_config_gpu.yaml"
+    CONFIG_FILE="$PROJECT_DIR/../config/imagenet_config_gpu.yaml"
 elif [ $3 == 'cifar10' ]; then
-  CONFIG_FILE="$PROJECT_DIR/../config/cifar10_config_gpu.yaml"
+    CONFIG_FILE="$PROJECT_DIR/../config/cifar10_config_gpu.yaml"
 else
-  echo "error: the selected dataset is neither cifar10 nor imagenet"
-exit 1
+    echo "error: the selected dataset is neither cifar10 nor imagenet"
+    exit 1
 fi
 
 export DEVICE_ID=$1
@@ -69,5 +69,5 @@ cp -r ../config ./train_single_gpu
 echo "start training for rank $RANK_ID, device $DEVICE_ID, $dataset_type"
 cd ./train_single_gpu || exit
 python ./train.py --config_path=$CONFIG_FILE \
---dataset_name=$dataset_type --train_data_dir=$train_data_dir --device_target=GPU> ./train.log 2>&1 &
+    --dataset_name=$dataset_type --train_data_dir=$train_data_dir --device_target=GPU> ./train.log 2>&1 &
 

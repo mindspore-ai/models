@@ -14,9 +14,43 @@
 # limitations under the License.
 # ============================================================================
 
-abs_path=$(readlink -f "$0")
-cur_path=$(dirname $abs_path)
-cd $cur_path
+if [ $# != 3 ]
+then
+  echo "Usage: bash run_eval.sh [VAL_DATA_DIR] [cifar10|imagenet] [checkpoint_path]"
+exit 1
+fi
+
+get_real_path(){
+  if [ "${1:0:1}" == "/" ]; then
+    echo "$1"
+  else
+    echo "$(realpath -m $PWD/$1)"
+  fi
+}
+
+PATH1=$(get_real_path $1)
+if [ ! -d $PATH1 ]
+then
+  echo "error: VAL_DATA_DIR=$PATH1 is not a directory"
+exit 1
+fi
+
+PATH2=$(get_real_path $3)
+if [ ! -f $PATH2 ]
+then
+    echo "error: CHECKPOINT_PATH=$PATH2 is not a file"
+exit 1
+fi
+
+BASE_PATH=$(dirname "$(cd "$(dirname "$0")" || exit; pwd)")
+if [ $2 == 'imagenet' ]; then
+  CONFIG_FILE="${BASE_PATH}/config/imagenet_config.yaml"
+elif [ $2 == 'cifar10' ]; then
+  CONFIG_FILE="${BASE_PATH}/config/cifar10_config.yaml"
+else
+  echo "error: the selected dataset is neither cifar10 nor imagenet"
+exit 1
+fi
 
 rm -rf ./eval
 mkdir ./eval
@@ -24,6 +58,7 @@ cp -r ../src ./eval
 cp ../eval.py ./eval
 cp -r ../config ./eval
 cd ./eval || exit
-env >env.log
-python ./eval.py > ./eval.log 2>&1 &
+env > env.log
+python ./eval.py  --val_data_dir=$PATH1 --dataset_name=$2 --config_path=$CONFIG_FILE \
+    --checkpoint_path=$PATH2 > ./eval.log 2>&1 &
 cd ..

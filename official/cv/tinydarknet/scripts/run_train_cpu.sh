@@ -16,7 +16,7 @@
 
 if [ $# != 1 ] && [ $# != 2 ]
 then
-  echo "Usage bash scripts/run_train_cpu.sh [TRAIN_DATA_DIR] [cifar10|imagenet]"
+  echo "Usage bash run_train_cpu.sh [TRAIN_DATA_DIR] [cifar10|imagenet]"
 exit 1
 fi
 
@@ -35,7 +35,7 @@ then
 exit 1
 fi
 
-BASE_PATH=$(dirname "$(dirname "$(readlink -f $0)")")
+BASE_PATH=$(dirname "$(cd "$(dirname "$0")" || exit; pwd)")
 if [ $2 == 'imagenet' ]; then
   CONFIG_FILE="${BASE_PATH}/config/imagenet_config.yaml"
 elif [ $2 == 'cifar10' ]; then
@@ -47,11 +47,12 @@ fi
 
 rm -rf ./train_cpu
 mkdir ./train_cpu
-cp ./train.py ./train_cpu
-cp -r ./src ./train_cpu
-cp -r ./config ./train_cpu
+cp ../train.py ./train_cpu
+cp -r ../src ./train_cpu
+cp -r ../config ./train_cpu
 echo "start training for device CPU"
 cd ./train_cpu || exit
 env > env.log
-python train.py --device_target=CPU --train_data_dir=$PATH1 --dataset_name=$2 --config_path=$CONFIG_FILE> ./train.log 2>&1 &
+python train.py --device_target=CPU --train_data_dir=$PATH1 --dataset_name=$2 \
+    --config_path=$CONFIG_FILE> ./train.log 2>&1 &
 cd ..
