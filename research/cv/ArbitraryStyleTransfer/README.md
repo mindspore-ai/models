@@ -37,18 +37,29 @@ The style prediction network P predicts an embedding vector S from an input styl
 To train Style Transfer Networks, Two datasets are used:
 
 - content dataset: [MS COCO](http://images.cocodataset.org/zips/train2014.zip)
-
-- style dataset:  [Painter by Number dataset (PBN)](https://www.kaggle.com/c/painter-by-numbers) and [Describable Textures Dataset (DTD)](https://www.robots.ox.ac.uk/~vgg/data/dtd/).
+- style dataset:  [Painter by Number dataset (PBN)](https://www.kaggle.com/c/painter-by-numbers) and [Describable Textures Dataset (DTD)](https://www.robots.ox.ac.uk/~vgg/data/dtd/)
   [PBN training](https://github.com/zo7/painter-by-numbers/releases/download/data-v1.0/train.tgz)
   [PBN testing](https://github.com/zo7/painter-by-numbers/releases/download/data-v1.0/test.tgz)
   [DTD dataset](https://www.robots.ox.ac.uk/~vgg/data/dtd/download/dtd-r1.0.1.tar.gz)
 
+Train dataset：
+
+- content dataset: [MS COCO](http://images.cocodataset.org/zips/train2014.zip)
+- style dataset [PBN training](https://github.com/zo7/painter-by-numbers/releases/download/data-v1.0/train.tgz) [DTD dataset](https://www.robots.ox.ac.uk/~vgg/data/dtd/download/dtd-r1.0.1.tar.gz), place the images in both datasets in the same folder
+
+Test dataset:
+
+- content dataset: arbitrarily collect images by yourself or Select some images from MS COCO as the data set.
+- style dataset: arbitrarily collect style images or [PBN testing](https://github.com/zo7/painter-by-numbers/releases/download/data-v1.0/test.tgz)
+
 # [Pretrained model](#contents)
 
 The process of training Style Transfer Networks needs a pretrained VGG16 and  Inception-v3.
-[VGG16 pretrained model and Inception-v3 pretrained model](<https://download.mindspore.cn/model_zoo/>)
+[VGG16 pretrained model](https://download.mindspore.cn/model_zoo/r1.2/vgg16_ascend_v120_imagenet2012_official_cv_bs32_acc73/) and [Inception-v3 pretrained model](https://download.mindspore.cn/model_zoo/r1.2/inceptionv3_ascend_v120_imagenet2012_official_cv_bs128_acc78/)
 
-After downloading the pre-training model, please place it in folder '../pretrained_model'.
+Modify the name of ckpt to inceptionv3.ckpt and vgg16.ckpt
+
+After downloading the pre-training model, please place it in folder './pretrained_model'.
 
 # [Environment Requirements](#contents)
 
@@ -101,11 +112,13 @@ style transfer
 ### [Training Script Parameters](#contents)
 
 ```shell
-# distributed training
-bash ./scripts/run_distribution_ascend.sh [RANK_TABLE_FILE] [PLATFORM] [CONTENT_PATH] [STYLE_PATH] [CKPT_PATH]
+# distributed Ascend training
+bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PLATFORM] [CONTENT_PATH] [STYLE_PATH] [CKPT_PATH]
+# distributed GPU training
+bash ./scripts/run_distribute_train_gpu.sh [CONTENT_PATH] [STYLE_PATH] [CKPT_PATH]
 
-# standalone training
-bash ./scripts/run_train.sh [PLATFORM] [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [CKPT_PATH]
+# standalone Ascend\GPU training
+bash ./scripts/run_standalone_train.sh [PLATFORM] [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [CKPT_PATH]
 ```
 
 ### [Training Result](#content)
@@ -118,7 +131,7 @@ Training result will be stored in './src/ckpt'. You can find checkpoint file.
 
 ```bash
 # evaling
-bash ./scripts/run_eval.sh [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [INCEPTION_CKPT] [CKPT_PATH]
+bash ./scripts/run_eval.sh [PLATFORM] [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [INCEPTION_CKPT] [CKPT_PATH]
 ```
 
 ### [Evaluation result](#content)
@@ -131,30 +144,31 @@ Evaluation result will be stored in the output. Under this, you can find style t
 
 ### Training Performance
 
-| Parameters                 |                                                       |
-| -------------------------- | ----------------------------------------------------- |
-| Model Version              | v1                                                    |
-| Resource                   | Ascend                |
-| MindSpore Version          | 1.3.0                                                 |
-| Dataset                    | content: MS COCO. style: PBN training and DTD dataset |
-| Training Parameters        | epoch=100,  batch_size = 16                           |
-| Optimizer                  | Adam                                                  |
-| Loss Function              | content loss and  style loss                          |
-| outputs                    | style transfer pictures                               |
-| Speed                      | 1 Ascend: 392ms/step; 8 Ascend: 303ms/step                        |
-| Total time                 | 1 Ascend: 56h20m21s; 8 Ascend: 6h15m40s                |
-| Checkpoint for Fine tuning | 71.27M (.ckpt file)                                   |
+| Parameters                 |                                                              |
+| -------------------------- | ------------------------------------------------------------ |
+| Model Version              | v1                                                           |
+| Resource                   | Ascend / GPU(Tesla V100-PCIE 32G)；CPU：2.60GHz 52cores ；RAM：754G |
+| MindSpore Version          | 1.3.0                                                        |
+| Dataset                    | content: MS COCO. style: PBN training and DTD dataset        |
+| Training Parameters        | epoch=100,  batch_size = 16                                  |
+| Optimizer                  | Adam                                                         |
+| Loss Function              | content loss and  style loss                                 |
+| outputs                    | style transfer pictures                                      |
+| Speed                      | 1 Ascend: 392ms/step; 8 Ascend: 303ms/step; 1 GPU: 560ms/step; 8 GPU：582ms/step |
+| Total time                 | 1 Ascend: 56h20m21s; 8 Ascend: 6h15m40s; 8 GPU:11h30m        |
+| Checkpoint for Fine tuning | 71.27M (.ckpt file)                                          |
 
 ### Evaluation Performance
 
-| Parameters        | single Ascend                                       |
-| ----------------- | ------------------------------------------------ |
-| Model Version     | v1                                               |
-| Resource          | Ascend;                                           |
-| MindSpore Version | 1.3.0                                            |
-| Dataset           | content: MS COCO. style: PBN testing             |
-| batch_size        | 1                                                |
-| outputs           | style transfer pictures                          |
+| Parameters        | single Ascend / GPU                  |
+| ----------------- | ------------------------------------ |
+| Model Version     | v1                                   |
+| Resource          | Ascend;                              |
+| MindSpore Version | 1.3.0                                |
+| Dataset           | content: MS COCO. style: PBN testing |
+| batch_size        | 1                                    |
+| Speed             | GPU: 342ms/step;                     |
+| outputs           | style transfer pictures              |
 
 # [Example](#contents)
 

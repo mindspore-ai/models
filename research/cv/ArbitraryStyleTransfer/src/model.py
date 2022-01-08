@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ def get_model(args):
     """
         This class implements the arbitrary style transfer model.
     """
-    net = style_transfer_model(style_dim=args.style_dim)
+    net = style_transfer_model(args, style_dim=args.style_dim)
     init_weights(net, args.init_type, args.init_gain)
     return net
 
@@ -43,10 +43,10 @@ class style_transfer_model(nn.Cell):
             Tensor, stylied image.
     """
 
-    def __init__(self, style_dim=100):
+    def __init__(self, args, style_dim=100):
         super(style_transfer_model, self).__init__()
-        self.style_prediction_network = networks.style_prediction_network(style_dim=style_dim)
-        self.style_transfer_network = networks.style_transfer_network(style_dim=style_dim)
+        self.style_prediction_network = networks.style_prediction_network(args, style_dim=style_dim)
+        self.style_transfer_network = networks.style_transfer_network(args, style_dim=style_dim)
 
     def construct(self, content_img, style_feat):
         """construct"""

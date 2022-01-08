@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,37 +25,49 @@ from mindspore.common import set_seed
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.loss import MeanShift
 from src.inceptionv3 import inceptionv3
-from src.model import style_transfer_model
+from src.model import get_model
 from src.testdataset import create_testdataset
 
 set_seed(1)
-parser = argparse.ArgumentParser(description="style transfer train")
-# data loader
-parser.add_argument("--content_path", type=str, default='./dataset/test/content')
-parser.add_argument("--style_path", type=str, default='./dataset/test/style')
-parser.add_argument("--inception_ckpt", type=str, default='./pretrained_model/inceptionv3.ckpt')
-parser.add_argument("--style_dim", type=int, default=100,
-                    help="Style vector dimension. default: 100")
-parser.add_argument("--reshape_size", type=int, default=257,
-                    help="Image size of high resolution image. default: 257")
-parser.add_argument("--crop_size", type=int, default=256,
-                    help="Image size of high resolution image. default: 256")
-parser.add_argument("--batchsize", default=1, type=int, help="Batch size for training")
-parser.add_argument("--ckpt_path", type=str, default='./ckpt/style_transfer_model_0100.ckpt')
-parser.add_argument("--device_id", type=int, default=0, help="device id, default: 0.")
 
-def test():
+
+def get_args():
+    """get args"""
+    parser = argparse.ArgumentParser(description="style transfer train")
+    # data loader
+    parser.add_argument("--content_path", type=str, default='./dataset/test/content')
+    parser.add_argument("--style_path", type=str, default='./dataset/test/style')
+    parser.add_argument("--inception_ckpt", type=str, default='./pretrained_model/inceptionv3.ckpt')
+    parser.add_argument("--style_dim", type=int, default=100,
+                        help="Style vector dimension. default: 100")
+    parser.add_argument("--reshape_size", type=int, default=257,
+                        help="Image size of high resolution image. default: 257")
+    parser.add_argument("--crop_size", type=int, default=256,
+                        help="Image size of high resolution image. default: 256")
+    parser.add_argument('--init_type', type=str, default='normal', choices=("normal", "xavier"), \
+                        help='network initialization, default is normal.')
+    parser.add_argument('--init_gain', type=float, default=0.02, \
+                        help='scaling factor for normal, xavier and orthogonal, default is 0.02.')
+
+    parser.add_argument('--platform', type=str, default='Ascend', help='Ascend or GPU')
+    parser.add_argument("--batchsize", default=1, type=int, help="Batch size for training")
+    parser.add_argument("--ckpt_path", type=str, default='./ckpt/style_transfer_model_0100.ckpt')
+    parser.add_argument("--device_id", type=int, default=0, help="device id, default: 0.")
+    return parser.parse_args()
+
+
+def test(opts):
     """test"""
     # data loader
-    test_ds = create_testdataset(args)
+    test_ds = create_testdataset(opts)
     test_data_loader = test_ds.create_dict_iterator()
     # model loader
-    inception = inceptionv3(args.inception_ckpt)
+    inception = inceptionv3(opts.inception_ckpt)
     meanshift = MeanShift()
     for p in meanshift.get_parameters():
         p.requires_grad = False
-    transfer_net = style_transfer_model(style_dim=args.style_dim)
-    params = load_checkpoint(args.ckpt_path)
+    transfer_net = get_model(opts)
+    params = load_checkpoint(opts.ckpt_path)
     load_param_into_net(transfer_net, params)
 
     op_reduce_dim = ops.ReduceSum(keep_dims=False)
@@ -93,18 +105,19 @@ def test():
     step_time = time_elapsed / count
     print('per step needs time:{:.0f}ms'.format(step_time * 1000))
 
-def interpolation_test():
+
+def interpolation_test(opts):
     """interpolation"""
     # data loader
-    test_ds = create_testdataset(args)
+    test_ds = create_testdataset(opts)
     test_data_loader = test_ds.create_dict_iterator()
     # model loader
-    inception = inceptionv3(args.inception_ckpt)
+    inception = inceptionv3(opts.inception_ckpt)
     meanshift = MeanShift()
     for p in meanshift.get_parameters():
         p.requires_grad = False
-    transfer_net = style_transfer_model(style_dim=args.style_dim)
-    params = load_checkpoint(args.ckpt_path)
+    transfer_net = get_model(opts)
+    params = load_checkpoint(opts.ckpt_path)
     load_param_into_net(transfer_net, params)
 
     op_reduce_dim = ops.ReduceSum(keep_dims=False)
@@ -148,8 +161,11 @@ def interpolation_test():
     step_time = time_elapsed / count
     print('per step needs time:{:.0f}ms'.format(step_time * 1000))
 
+
 if __name__ == '__main__':
-    args = parser.parse_args()
+    args = get_args()
+    print('start')
     context.set_context(mode=context.GRAPH_MODE, device_id=args.device_id, save_graphs=False)
-    test()
-    interpolation_test()
+    test(args)
+    interpolation_test(args)
+    print('finish')
