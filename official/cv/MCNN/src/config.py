@@ -19,12 +19,11 @@ network config setting, will be used in train.py
 from easydict import EasyDict as edict
 
 crowd_cfg = edict({
-    'lr': 0.000028,# 0.00001 if device_num == 1； 0.00003 device_num=8
+    'lr': 0.000028, # 0.00001 if device_num == 1; 0.00003 device_num=8
     'momentum': 0.0,
     'epoch_size': 800,
     'batch_size': 1,
     'buffer_size': 1000,
     'save_checkpoint_steps': 1,
-    'keep_checkpoint_max': 10,
-    'air_name': "mcnn",
+    'keep_checkpoint_max': 10
 })

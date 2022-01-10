@@ -18,13 +18,14 @@ import argparse
 import numpy as np
 import mindspore
 from mindspore import Tensor, context, load_checkpoint, load_param_into_net, export
-from src.config import crowd_cfg as cfg
 from src.mcnn import MCNN
 
 parser = argparse.ArgumentParser(description='MindSpore MNIST Example')
 parser.add_argument("--device_id", type=int, default=4, help="Device id")
 parser.add_argument("--batch_size", type=int, default=1, help="batch size")
 parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
+parser.add_argument("--image_height", type=int, required=True, help="Image height.")
+parser.add_argument("--image_width", type=int, required=True, help="Image width.")
 parser.add_argument("--file_name", type=str, default="mcnn", help="output file name.")
 parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="AIR", help="file format")
 parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"], default="Ascend",
@@ -44,5 +45,5 @@ if __name__ == "__main__":
     load_param_into_net(network, param_dict)
 
     # export network
-    inputs = Tensor(np.ones([args.batch_size, 1, cfg.image_height, cfg.image_width]), mindspore.float32)
+    inputs = Tensor(np.ones([args.batch_size, 1, args.image_height, args.image_width]), mindspore.float32)
     export(network, inputs, file_name=args.file_name, file_format=args.file_format)
