@@ -18,7 +18,6 @@ import numpy as np
 from mindspore import Tensor, nn, Parameter
 from mindspore.ops import operations as P
 from mindspore.common import dtype as mstype
-# from mindspore import nn as nn
 from .LSTM import Lstm
 
 
@@ -71,7 +70,7 @@ class Lstm_CRF(nn.Cell):
                          hidden_size,
                          out_size=self.out_size,
                          weight=weight,
-                         num_layers=1,
+                         num_layers=num_layers,
                          batch_size=batch_size,
                          dropout=dropout,
                          bidirectional=bidirectional)
@@ -168,11 +167,11 @@ class Lstm_CRF(nn.Cell):
         score = max_score + score
         return score
 
-    def construct(self, inputs, label):
+    def construct(self, feature, label):
         """
         Get the emission scores from the BiLSTM
         """
-        emission = self.lstm(inputs)
+        emission = self.lstm(feature)
         emission = self.transpose(emission, (1, 0, 2))
         if self.is_training:
             forward_score = self._normalization_factor(emission)

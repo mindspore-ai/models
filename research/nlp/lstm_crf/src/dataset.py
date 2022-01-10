@@ -18,7 +18,6 @@ Data operations, will be used in train.py and eval.py
 import numpy as np
 import mindspore.dataset as ds
 
-
 def get_data_set(word_index, tag_index, batch_size):
     """get the data for train and eval"""
     def generator_func():
@@ -29,6 +28,5 @@ def get_data_set(word_index, tag_index, batch_size):
     data_set = ds.GeneratorDataset(generator_func, ["feature", "label"])
     data_set = data_set.shuffle(buffer_size=data_set.get_dataset_size())
     data_set = data_set.batch(batch_size=batch_size, drop_remainder=True)
-    data_set = data_set.repeat(count=1)
 
     return data_set

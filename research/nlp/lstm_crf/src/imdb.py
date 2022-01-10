@@ -29,13 +29,6 @@ def modelarts_pre_process():
     config.ckpt_path = os.path.join(config.output_path, config.ckpt_path)
 
 
-def is_number(num):
-    num = num.replace(".", "")
-    num = num.replace(",", "")
-    num = num.replace(":", "")
-    return num.isdigit()
-
-
 class MyIOError(Exception):
     def __init__(self, filename):
         # custom error message
@@ -94,7 +87,7 @@ class ImdbParser():
                     if line != '\n':
                         word, _, tag = line.strip('\n').split()
                         word = word.lower()
-                        if is_number(word):
+                        if word.isdigit():
                             word = NUM
                         word_list.append(word)
                         tag_list.append(tag)
