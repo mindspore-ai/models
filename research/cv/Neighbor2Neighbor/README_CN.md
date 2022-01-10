@@ -33,7 +33,7 @@
 
 ​    在 RGB 域合成数据上，对于 Gaussian 和 Poisson 噪声，每种噪声分别尝试了固定噪声水平和动态噪声水平两种情况。结果表明，在多个测试集上，本方法在性能上比使用配对数据训练的方法（N2C）低 0.3dB 左右，超越了现有的自监督降噪方法。在动态噪声水平的场景下，本方法显著超越其他自监督方法，甚至与自监督 + 后处理的 Laine19 不相上下，这更进一步说明了本方法的有效性。
 
-[论文](https://arxiv.org/abs/2004.08790)：Huang T , Li S , Jia X , et al. Neighbor2Neighbor: Self-Supervised Denoising from Single Noisy Images[J]. 2021.
+[论文](https://arxiv.org/abs/2101.02824)：Huang T , Li S , Jia X , et al. Neighbor2Neighbor: Self-Supervised Denoising from Single Noisy Images[J]. 2021.
 
 ## 模型结构
 
