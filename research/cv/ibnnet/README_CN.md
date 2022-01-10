@@ -62,7 +62,7 @@
 sh scripts/run_distribute_train.sh /path/dataset /path/evalset pretrained_model.ckpt rank_size
 
 # 单机训练运行示例
-sh scripts/run_standalone_train.sh /path/dataset /path/evalset pretrained_model.ckpt
+sh scripts/run_standalone_train.sh /path/dataset /path/evalset pretrained_model.ckpt device_id
 
 # 运行评估示例
 sh scripts/run_eval.sh
@@ -124,7 +124,7 @@ pth预训练模型文件获取路径如下：[预训练模型](https://github.co
 - 在Ascend环境训练
 
 ```shell
-sh scripts/run_standalone_train.sh /path/dataset /path/evalset pretrained_model.ckpt
+sh scripts/run_standalone_train.sh /path/dataset /path/evalset pretrained_model.ckpt device_id
 ```
 
 - 在GPU环境训练

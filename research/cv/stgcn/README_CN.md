@@ -63,7 +63,7 @@ BJER4
   python train.py --train_url="" --data_url="" --run_distribute=False --run_modelarts=False --graph_conv_type="chebgcn" --n_pred=9
 
   # 多卡训练
-  bash scripts/run_distribute_train.sh train_code_path data_path n_pred graph_conv_type
+  bash scripts/run_distribute_train.sh train_code_path data_path n_pred graph_conv_type rank_table
   ```
 
 # [脚本介绍](#contents)
@@ -131,7 +131,7 @@ BJER4
   #1P训练
   python train.py --train_url="" --data_url="" --run_distribute=False --run_modelarts=True --graph_conv_type="chebgcn" --n_pred=9
   #8P训练
-  bash scripts/run_distribute_train.sh train_code_path data_path n_pred graph_conv_type
+  bash scripts/run_distribute_train.sh train_code_path data_path n_pred graph_conv_type rank_table
   ```
 
   8P训练时需要将RANK_TABLE_FILE放在scripts文件夹中，RANK_TABLE_FILE[生成方法](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)
