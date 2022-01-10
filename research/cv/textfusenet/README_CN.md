@@ -349,7 +349,7 @@ sh run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL]
 
 - Notes
 
-1. 运行分布式任务时要用到由RANK_TABLE_FILE指定的hccl.json文件。您可使用[hccl_tools](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/utils/hccl_tools)生成该文件。
+1. 运行分布式任务时要用到由RANK_TABLE_FILE指定的hccl.json文件。您可使用[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成该文件。
 2. PRETRAINED_MODEL应该是训练好的ResNet101检查点。如果此参数未设置，网络将从头开始训练。如果想要加载训练好的TextFuseNet检查点，需要对train.py作如下修改：
 
 ```python

@@ -47,7 +47,7 @@ Dataset used:
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需获取更多信息，请查看如下链接：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorial/training/zh-CN/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
 # [快速开始](#contents)

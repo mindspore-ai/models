@@ -108,7 +108,7 @@ python data2mindrecord.py --device_id=[DEVICE_ID] \
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
 
 # [Script Description](#Content)

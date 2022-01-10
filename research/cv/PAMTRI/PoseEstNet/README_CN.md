@@ -303,7 +303,7 @@ python3.7 export.py --cfg config.yaml --ckpt_path CKPT_PATH
 | 总时长                | 8卡：40分钟 |
 | 微调检查点 | 335M (.ckpt文件)                                         |
 | 推理模型        | 113M (.mindir文件)                     |
-| 脚本                    | [PoseEstNet脚本](https://gitee.com/kqzhang/models/tree/master/research/cv/PAMTRI/PoseEstNet) |
+| 脚本                    | [PoseEstNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/PoseEstNet) |
 
 ### 推理性能
 
