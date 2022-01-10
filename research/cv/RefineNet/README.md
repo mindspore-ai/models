@@ -95,8 +95,8 @@ Pascal VOC数据集和语义边界数据集（Semantic Boundaries Dataset，SBD�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorial/training/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 - 安装requirements.txt中的python包。
 - 生成config json文件用于8卡训练。
 
@@ -400,7 +400,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_ID]
 | 损失 | 0.027490407 |
 | 性能 | 54294.528ms（八卡） 298406.836ms（单卡）|  
 | 微调检查点 | 901M（.ckpt文件） |
-| 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/refinenet) |
+| 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/RefineNet) |
 
 # 随机情况说明
 

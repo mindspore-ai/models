@@ -337,7 +337,7 @@ python export.py --root /path/dataset --ckpt_path /path/ckpt --segmentaware --he
 | 总时长                 | 8卡：2小时50分钟(segment)  2小时50分钟(heatmap)                       |
 | 微调检查点 | 118M (.ckpt文件)                                         |
 | 推理模型        | 40M (.mindir文件)                     |
-| 脚本                    | [MultiTaskNet脚本](https://gitee.com/mindspore/models/tree/master/research/PAMTRI/MultiTaskNet) |
+| 脚本                    | [MultiTaskNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/MultiTaskNet) |
 
 ### 推理性能
 
