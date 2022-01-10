@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ from mindspore.parallel import set_algo_parameters
 from src.cpm import CPMModel
 from src.cpm_train import VirtualDatasetOneInputCell
 from src.cpm_loss import Cross_entropy
-from eval import create_ckpt_file_list
+from src.create_ckpt_file_lists import create_ckpt_file_list
 
 from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper

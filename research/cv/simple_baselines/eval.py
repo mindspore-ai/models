@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -42,8 +42,8 @@ device_id = int(os.getenv('DEVICE_ID'))
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Evaluate')
-    parser.add_argument('--data_url', required=True, default=None, help='Location of data.')
-    parser.add_argument('--train_url', required=True, default=None, help='Location of evaluate outputs.')
+    parser.add_argument('--data_url', required=False, default=None, help='Location of data.')
+    parser.add_argument('--train_url', required=False, default=None, help='Location of evaluate outputs.')
     args = parser.parse_args()
     return args
 
