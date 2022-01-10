@@ -17,7 +17,7 @@
 
 from enum import Enum
 import mindspore.common.dtype as mstype
-import mindspore.dataset.engine.datasets as de
+import mindspore.dataset as de
 import mindspore.dataset.transforms.c_transforms as C
 
 
