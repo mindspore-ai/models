@@ -118,6 +118,7 @@ def main():
     load_param_into_net(model, load_checkpoint(ckpt_name))
 
     valid_dataset, _ = keypoint_dataset(
+        config=config,
         train_mode=False,
         num_parallel_workers=config.TEST.NUM_PARALLEL_WORKERS,
     )

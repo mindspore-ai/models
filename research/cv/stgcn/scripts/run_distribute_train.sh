@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 4 ]; then
-  echo "Usage: sh run_distribute_train.sh [train_code_path][data_path][n_pred][graph_conv_type]"
+  echo "Usage: sh run_distribute_train.sh [train_code_path][data_path][n_pred][graph_conv_type] [rank_table]"
   exit 1
 fi
 
@@ -54,10 +54,10 @@ exit 1
 fi
 
 
-
+RANKTABLE=$(get_real_path $5)
 ulimit -c unlimited
 export SLOG_PRINT_TO_STDOUT=0
-export RANK_TABLE_FILE=${train_code_path}/scripts/hccl_8p_01234567_127.0.0.1.json
+export RANK_TABLE_FILE=${RANKTABLE}
 export RANK_SIZE=8
 export RANK_START_ID=0
 export n_pred=$3
