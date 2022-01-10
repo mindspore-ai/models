@@ -24,7 +24,7 @@ from src.model_utils.config import config
 from src.dataset import get_data_set
 from src.LSTM_CRF import Lstm_CRF
 from src.imdb import ImdbParser
-import mindspore
+
 from mindspore import Tensor, Model, context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
@@ -43,6 +43,7 @@ def eval_lstm_crf():
         device_target=config.device_target
         )
 
+    embeddings_size = config.embed_size
     parser = ImdbParser(config.data_CoNLL_path,
                         config.glove_path,
                         config.data_CoNLL_path,
@@ -50,15 +51,23 @@ def eval_lstm_crf():
                         )
     embeddings, sequence_length, _, _, sequence_index, sequence_tag_index, tags_to_index_map \
         = parser.get_datas_embeddings(seg=['test'], build_data=False)
-    embeddings_table = Tensor(embeddings, mindspore.float32)
+    embeddings_table = embeddings.astype(np.float32)
+
+    # DynamicRNN in this network on Ascend platform only support the condition that the shape of input_size
+    # and hiddle_size is multiples of 16, this problem will be solved later.
+    if config.device_target == 'Ascend':
+        pad_num = int(np.ceil(config.embed_size / 16) * 16 - config.embed_size)
+        if pad_num > 0:
+            embeddings_table = np.pad(embeddings_table, [(0, 0), (0, pad_num)], 'constant')
+        embeddings_size = int(np.ceil(config.embed_size / 16) * 16)
     ds_test = get_data_set(sequence_index, sequence_tag_index, config.batch_size)
 
     network = Lstm_CRF(vocab_size=embeddings.shape[0],
                        tag_to_index=tags_to_index_map,
-                       embedding_size=config.embed_size,
+                       embedding_size=embeddings_size,
                        hidden_size=config.num_hiddens,
                        num_layers=config.num_layers,
-                       weight=embeddings_table,
+                       weight=Tensor(embeddings_table),
                        bidirectional=config.bidirectional,
                        batch_size=config.batch_size,
                        seq_length=sequence_length,

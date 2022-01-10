@@ -24,7 +24,6 @@ from src.model_utils.config import config
 from src.model_utils.device_adapter import get_device_id
 from src.imdb import ImdbParser
 
-import mindspore
 from mindspore import Tensor, context
 from mindspore import export, load_checkpoint, load_param_into_net
 
@@ -40,6 +39,7 @@ def export_lstm_crf():
         enable_graph_kernel=False,
         device_id=get_device_id())
 
+    embeddings_size = config.embed_size
     parser = ImdbParser(config.data_CoNLL_path,
                         config.glove_path,
                         config.data_CoNLL_path,
@@ -47,15 +47,22 @@ def export_lstm_crf():
 
     embeddings, sequence_length, _, _, _, _, tags_to_index_map \
         = parser.get_datas_embeddings(seg=['test'], build_data=False)
+    embeddings_table = embeddings.astype(np.float32)
 
-    embeddings_table = Tensor(embeddings, mindspore.float32)
+    # DynamicRNN in this network on Ascend platform only support the condition that the shape of input_size
+    # and hiddle_size is multiples of 16, this problem will be solved later.
+    if config.device_target == 'Ascend':
+        pad_num = int(np.ceil(config.embed_size / 16) * 16 - config.embed_size)
+        if pad_num > 0:
+            embeddings_table = np.pad(embeddings_table, [(0, 0), (0, pad_num)], 'constant')
+        embeddings_size = int(np.ceil(config.embed_size / 16) * 16)
 
     network = Lstm_CRF(vocab_size=embeddings_table.shape[0],
                        tag_to_index=tags_to_index_map,
-                       embedding_size=config.embed_size,
+                       embedding_size=embeddings_size,
                        hidden_size=config.num_hiddens,
                        num_layers=config.num_layers,
-                       weight=embeddings_table,
+                       weight=Tensor(embeddings_table),
                        bidirectional=config.bidirectional,
                        batch_size=config.batch_size,
                        seq_length=sequence_length,

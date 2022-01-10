@@ -27,7 +27,6 @@ from src.dataset import get_data_set
 from src.imdb import ImdbParser
 from src.LSTM_CRF import Lstm_CRF
 
-import mindspore
 from mindspore.common import set_seed
 from mindspore.nn.optim import AdamWeightDecay
 from mindspore import Tensor, Model, context
@@ -36,7 +35,6 @@ from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMoni
 from mindspore.train.serialization import load_param_into_net, load_checkpoint
 
 set_seed(1000)
-
 
 def modelarts_pre_process():
     config.ckpt_path = os.path.join(config.output_path, config.ckpt_path)
@@ -131,20 +129,27 @@ def train_lstm_crf():
     if config.build_data:
         parser.build_datas(seg='train', build_data=config.build_data)
         return
-
+    embeddings_size = config.embed_size
     embeddings, sequence_length, _, _, sequence_index, sequence_tag_index, tags_to_index_map \
         = parser.get_datas_embeddings(seg=['train'], build_data=config.build_data)
 
-    embeddings_table = Tensor(embeddings, mindspore.float32)
-
+    # DynamicRNN in this network on Ascend platform only support the condition that the shape of input_size
+    # and hiddle_size is multiples of 16, this problem will be solved later.
+    embeddings_table = embeddings.astype(np.float32)
+    if config.device_target == 'Ascend':
+        pad_num = int(np.ceil(config.embed_size / 16) * 16 - config.embed_size)
+        if pad_num > 0:
+            embeddings_table = np.pad(embeddings_table, [(0, 0), (0, pad_num)], 'constant')
+        embeddings_size = int(np.ceil(config.embed_size / 16) * 16)
     ds_train = get_data_set(sequence_index, sequence_tag_index, config.batch_size)
 
+    # create lstm_crf network
     network = Lstm_CRF(vocab_size=embeddings_table.shape[0],
                        tag_to_index=tags_to_index_map,
-                       embedding_size=config.embed_size,
+                       embedding_size=embeddings_size,
                        hidden_size=config.num_hiddens,
                        num_layers=config.num_layers,
-                       weight=embeddings_table,
+                       weight=Tensor(embeddings_table),
                        bidirectional=config.bidirectional,
                        batch_size=config.batch_size,
                        seq_length=sequence_length,

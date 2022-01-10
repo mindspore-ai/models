@@ -111,10 +111,10 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 | uploaded Date              | 12/28/2021 (month/day/year)| 12/28/2021 (month/day/year)|
 | MindSpore Version          | 1.6.0                      | 1.6.0                      |
 | Dataset                    | CoNLL2000                  | CoNLL2000                  |
-| Training Parameters        | epoch=15, batch_size=20    | epoch=15, batch_size=20    |
+| Training Parameters        | epoch=20, batch_size=20    | epoch=20, batch_size=20    |
 | Optimizer                  | AdamWeightDecay            |AdamWeightDecay             |
 | Loss Function              | CRF LOSS                   | CRF LOSS                   |
-| Checkpoint for inference   | 36.7M (.ckpt file)         | 36.7M (.ckpt file)         |
+| Checkpoint for inference   | 64.9M (.ckpt file)         | 64.9M (.ckpt file)         |
 | Scripts                    | [lstm script](https://gitee.com/mindspore/models/tree/master/research/nlp/lstm_crf) | [lstm script](https://gitee.com/mindspore/models/tree/master/research/nlp/lstm_crf) |
 
 ### Evaluation Performance
@@ -126,7 +126,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 | MindSpore Version   | 1.6.0                        | 1.6.0                        |
 | Dataset             | CoNLL2000                    | CoNLL2000                    |
 | batch_size          | 20                           | 20                           |
-| F1                  | 92.05%                       | 92.4%                        |
+| F1                  | 93.48%                       | 93.13%                       |
 
 # [Description of Random Situation](#contents)
 

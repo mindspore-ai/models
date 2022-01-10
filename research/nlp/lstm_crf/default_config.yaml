@@ -16,11 +16,11 @@ ckpt_save_path: '../ckpt_lstm_crf'
 
 # ==============================================================================
 # LSTM_CRF CONFIG
-num_epochs: 15
+num_epochs: 20
 batch_size: 20
 embed_size: 300
 num_hiddens: 320
-num_layers: 320
+num_layers: 2
 bidirectional: True
 keep_checkpoint_max: 20
 dropout: 0.5
@@ -43,8 +43,8 @@ AdamWeightDecay:
 
 # MindSpore LSTM_CRF Example - train.py
 preprocess: 'false'
-data_CoNLL_path: "./data/CoNLL2000"
-glove_path: "./data/glove"
+data_CoNLL_path: "../data/CoNLL2000"
+glove_path: "../data/glove"
 preprocess_path: "/preprocess"
 ckpt_path: 'lstm_crf-15_446.ckpt'
 pre_trained: '' # None
@@ -83,6 +83,6 @@ device_num: 'Use device nums, default is 1.'
 enable_graph_kernel: 'Accelerate by graph kernel, default is true.'
 
 ---
-device_target: ['Ascend', 'GPU', 'CPU']
+device_target: ['Ascend', 'CPU']
 enable_graph_kernel: ['true', 'false']
 file_format: ['AIR', 'MINDIR']
