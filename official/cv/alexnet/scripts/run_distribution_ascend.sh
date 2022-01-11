@@ -31,7 +31,7 @@ if [ $# -ge 1 ]; then
   if [ $2 == 'imagenet' ]; then
     CONFIG_FILE="${BASE_PATH}/../config_imagenet.yaml"
   elif [ $2 == 'cifar10' ]; then
-    CONFIG_FILE="${BASE_PATH}/../default_config.yaml"
+    CONFIG_FILE="${BASE_PATH}/../cifar10_distribute.yaml"
   else
     echo "Unrecognized parameter"
     exit 1
