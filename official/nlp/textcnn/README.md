@@ -408,7 +408,7 @@ Inference result is saved in current path, you can find result in acc.log file.
 | Resource            |Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8    | Nvidia V100 SXM2; CPU 1.526GHz; 72cores; Memory 42G; OS Ubuntu16 |
 | uploaded Date       | 12/16/2020 (month/day/year)                           | 12/16/2021 (month/day/year)                    |
 | MindSpore Version   | 1.5.0                                                 | 1.5.0                                          |
-| Dataset             | SUBJ                                                  | SST2                                           |
+| Dataset             | SUBJ                                                  | SUBJ                                           |
 | Training Parameters | epoch=4, steps=149, batch_size=64                     | epoch=4, steps=149, batch_size=64              |
 | Optimizer           | Adam                                                  | Adam                                           |
 | Loss Function       | Softmax Cross Entropy                                 | Softmax Cross Entropy                          |
@@ -425,7 +425,7 @@ Inference result is saved in current path, you can find result in acc.log file.
 | Resource            |Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | Nvidia V100 SXM2; CPU 1.526GHz; 72cores; Memory 42G; OS Ubuntu16 |
 | Uploaded Date       | 12/16/2021 (month/day/year)                    | 12/16/2021 (month/day/year)                  |
 | MindSpore Version   | 1.5.0                                          | 1.5.0                                        |
-| Dataset             | SST2                                           | SST2                                         |
+| Dataset             | SUBJ                                           | SUBJ                                         |
 | batch_size          | 64                                             | 64                                           |
 | outputs             | accuracy                                       | accuracy                                     |
 | Accuracy            | 0.9052                                         | 0.8927                                       |
