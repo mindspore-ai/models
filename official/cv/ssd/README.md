@@ -50,7 +50,7 @@ We present four different base architecture.
 
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 
-Dataset used: [COCO2017](<http://images.cocodataset.org/>)
+Dataset used: [COCO2017](<https://cocodataset.org/#download>)
 
 - Dataset size：19G
     - Train：18G，118000 images  
@@ -236,11 +236,6 @@ Then you can run everything just like on ascend.
       ├─ __init__.py                      ## init file
       ├─ anchor_generator.py              ## anchor generator
       ├─ box_util.py                      ## bbox utils
-      ├─ config.py                        ## total config
-      ├─ config_ssd_mobilenet_v1_fpn.py   ## configuration for feature extraction network uses mobilenet-v1 with fpn
-      ├─ config_ssd_resnet50_fpn.py       ## configuration for feature extraction network uses resnet50 with fpn
-      ├─ config_ssd_vgg16.py              ## configuration for backbone of vgg16
-      ├─ config_ssd300.py                 ## configuration for backbone of mobilenet-v2
       ├─ dataset.py                       ## create dataset and process dataset
       ├─ eval_callback.py                 ## eval callback function definition
       ├─ eval_utils.py                    ## eval utils
@@ -276,7 +271,7 @@ Then you can run everything just like on ascend.
 ### [Script Parameters](#contents)
 
   ```shell
-  Major parameters in train.py and config.py as follows:
+  Major parameters in the yaml config file as follows:
 
     "device_num": 1                                  # Use device nums
     "lr": 0.05                                       # Learning rate init value
@@ -295,7 +290,7 @@ Then you can run everything just like on ascend.
     "eval_interval": 1                               # valuation interval when run_eval is True
 
     "class_num": 81                                  # Dataset class number
-    "image_shape": [300, 300]                        # Image height and width used as input to the model
+    "img_shape": [300, 300]                        # Image height and width used as input to the model
     "mindrecord_dir": "/data/MindRecord_COCO"        # MindRecord path
     "coco_root": "/data/coco2017"                    # COCO2017 dataset path
     "voc_root": "/data/voc_dataset"                  # VOC original dataset path

@@ -48,7 +48,7 @@ SSD方法基于前向卷积网络，该网络产生固定大小的边界框集�
 
 # 数据集
 
-使用的数据集： [COCO2017](<http://images.cocodataset.org/>)
+使用的数据集： [COCO2017](<https://cocodataset.org/#download>)
 
 - 数据集大小：19 GB
     - 训练集：18 GB，118000张图像
@@ -75,7 +75,7 @@ SSD方法基于前向卷积网络，该网络产生固定大小的边界框集�
 
         ```
 
-        并在`config.py`中更改COCO_ROOT和其他您需要的设置。目录结构如下：
+        并在yaml文件中更改COCO_ROOT和其他您需要的设置。目录结构如下：
 
         ```text
         .
@@ -186,11 +186,6 @@ bash run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID] [CONFIG_PATH]
       ├─ __init__.py                      ## 初始化文件
       ├─ anchor_generator.py              ## 锚点生成器
       ├─ box_util.py                      ## bbox工具
-      ├─ config.py                        ## 总配置
-      ├─ config_ssd_mobilenet_v1_fpn.py   ## 特征提取网络使用mobilenet-v1 with fpn配置
-      ├─ config_ssd_resnet50_fpn.py       ## 特征提取网络使用resnet50 with fpn 配置
-      ├─ config_ssd_vgg16.py              ## 特征提取网络使用vgg16 配置
-      ├─ config_ssd300.py                 ## 特征提取网络使用mobilenet-v2 配置
       ├─ dataset.py                       ## 创建并处理数据集
       ├─ eval_callback.py                 ## eval回调方法定义
       ├─ eval_utils.py                    ## eval工具
@@ -226,7 +221,7 @@ bash run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID] [CONFIG_PATH]
 ## 脚本参数
 
   ```text
-  train.py和config.py中主要参数如下：
+  yaml文件中中主要参数如下：
 
     "device_num": 1                            # 使用设备数量
     "lr": 0.05                                 # 学习率初始值
@@ -239,7 +234,7 @@ bash run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID] [CONFIG_PATH]
     "loss_scale": 1024                         # 损失放大
 
     "class_num": 81                            # 数据集类数
-    "image_shape": [300, 300]                  # 作为模型输入的图像高和宽
+    "img_shape": [300, 300]                  # 作为模型输入的图像高和宽
     "mindrecord_dir": "/data/MindRecord_COCO"  # MindRecord路径
     "coco_root": "/data/coco2017"              # COCO2017数据集路径
     "voc_root": ""                             # VOC原始数据集路径
