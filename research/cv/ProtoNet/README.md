@@ -29,12 +29,9 @@ Proto-Net contains 2 parts named Encoder and Relation. The former one has 4 conv
 
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 
-The dataset omniglot can be obtained from (<https://github.com/orobix/Prototypical-Networks-for-Few-shot-Learning-PyTorch/blob/master/>). You can obtain the dataset after running the scripts.
+Download dataset: [train](https://github.com/brendenlake/omniglot/raw/master/python/images_background.zip), [evaluation](https://github.com/brendenlake/omniglot/raw/master/python/images_evaluation.zip)
 
-```bash
-cd src
-python train.py
-```
+Download split txt: [link](https://github.com/jakesnell/prototypical-networks/tree/master/data/omniglot/splits/vinyals)
 
 - Dataset size 4.02M，32462 28*28 in 1622 classes
     - Train 1,200 classes  
