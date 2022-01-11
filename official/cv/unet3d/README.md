@@ -12,11 +12,14 @@
     - [Training Process](#training-process)
         - [Training](#training)
             - [Training on Ascend](#training-on-ascend)
+            - [Training on GPU](#training-on-gpu)
         - [Distributed Training](#distributed-training)
             - [Distributed training on Ascend](#distributed-training-on-ascend)
+            - [Distributed training on GPU](#distributed-training-on-gpu)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
             - [Evaluating on Ascend](#training-on-ascend)
+            - [Evaluating on GPU](#training-on-gpu)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
@@ -221,6 +224,22 @@ Parameters for both training and evaluation can be set in config.py
 
 ### Training
 
+#### Training on GPU
+
+```shell
+# enter scripts directory
+cd scripts
+# fp32
+bash ./run_standalone_train_gpu_fp32.sh /path_prefix/LUNA16/train
+# fp16
+bash ./run_standalone_train_gpu_fp16.sh /path_prefix/LUNA16/train
+
+```
+
+The python command above will run in the background, you can view the results through the file `train.log`.
+
+After training, you'll get some checkpoint files under the train_fp[32|16]/output/ckpt_0/ folder by default.
+
 #### Training on Ascend
 
 ```shell
@@ -246,6 +265,22 @@ epoch time: 1180467.795 ms, per step time: 1380.664 ms
 ```
 
 ### Distributed Training
+
+#### Distributed training on GPU(8P)
+
+```shell
+# enter scripts directory
+cd scripts
+# fp32
+bash ./run_distribute_train_gpu_fp32.sh /path_prefix/LUNA16/train
+# fp16
+bash ./run_distribute_train_gpu_fp16.sh /path_prefix/LUNA16/train
+
+```
+
+The above shell script will run distribute training in the background. You can view the results through the file `/train_parallel_fp[32|16]/train.log`.
+
+After training, you'll get some checkpoint files under the `train_parallel_fp[32|16]/output/ckpt_[X]/` folder by default.
 
 #### Distributed training on Ascend
 
@@ -280,6 +315,22 @@ epoch time: 140476.520 ms, per step time: 1312.865 ms
 ## [Evaluation Process](#contents)
 
 ### Evaluation
+
+#### Evaluating on GPU
+
+```shell
+# enter scripts directory
+cd ./script
+# fp32, 1gpu
+bash ./run_standalone_eval_gpu_fp32.sh /path_prefix/LUNA16/val /path_prefix/train_fp32/output/ckpt_0/Unet3d-10_877.ckpt
+# fp16, 1gpu
+bash ./run_standalone_eval_gpu_fp16.sh /path_prefix/LUNA16/val /path_prefix/train_fp16/output/ckpt_0/Unet3d-10_877.ckpt
+# fp32, 8gpu
+bash ./run_standalone_eval_gpu_fp32.sh /path_prefix/LUNA16/val /path_prefix/train_parallel_fp32/output/ckpt_0/Unet3d-10_110.ckpt
+# fp16, 8gpu
+bash ./run_standalone_eval_gpu_fp16.sh /path_prefix/LUNA16/val /path_prefix/train_parallel_fp16/output/ckpt_0/Unet3d-10_110.ckpt
+
+```
 
 #### Evaluating on Ascend
 
@@ -341,33 +392,33 @@ eval average dice is 0.9502010010453671
 
 #### Evaluation Performance
 
-| Parameters          | Ascend                                                    |
-| ------------------- | --------------------------------------------------------- |
-| Model Version       | Unet3D                                                    |
-| Resource            |  Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 |
-| uploaded Date       | 03/18/2021 (month/day/year)                               |
-| MindSpore Version   | 1.2.0                                                     |
-| Dataset             | LUNA16                                                    |
-| Training Parameters | epoch = 10,  batch_size = 1                               |
-| Optimizer           | Adam                                                      |
-| Loss Function       | SoftmaxCrossEntropyWithLogits                             |
-| Speed               | 8pcs: 1795ms/step                                         |
-| Total time          | 8pcs: 0.62hours                                           |
-| Parameters (M)      | 34                                                        |
+| Parameters          | Ascend                                                    |     GPU                                              |
+| ------------------- | --------------------------------------------------------- | ---------------------------------------------------- |
+| Model Version       | Unet3D                                                    | Unet3D                                               |
+| Resource            |  Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | Nvidia V100 SXM2; CPU 1.526GHz; 72cores; Memory 42G; OS Ubuntu16|
+| uploaded Date       | 03/18/2021 (month/day/year)                               | 05/21/2021(month/day/year)                           |
+| MindSpore Version   | 1.2.0                                                     | 1.2.0                                                |
+| Dataset             | LUNA16                                                    | LUNA16                                               |
+| Training Parameters | epoch = 10,  batch_size = 1                               | epoch = 10,  batch_size = 1                          |
+| Optimizer           | Adam                                                      | Adam                                                 |
+| Loss Function       | SoftmaxCrossEntropyWithLogits                             | SoftmaxCrossEntropyWithLogits                        |
+| Speed               | 8pcs: 1795ms/step                                         | 8pcs: 1883ms/step                                    |
+| Total time          | 8pcs: 0.62hours                                           | 8pcs: 0.66hours                                      |
+| Parameters (M)      | 34                                                        | 34                                                   |
 | Scripts             | [unet3d script](https://gitee.com/mindspore/models/tree/master/official/cv/unet3d) |
 
 #### Inference Performance
 
-| Parameters          | Ascend                      | Ascend310
-| ------------------- | --------------------------- | --------------------------- |
-| Model Version       | Unet3D                      | Unet3D                      |
-| Resource            | Ascend 910; OS Euler2.8     | Ascend 310; OS Euler2.8     |
-| Uploaded Date       | 03/18/2021 (month/day/year) | 12/15/2021 (month/day/year) |
-| MindSpore Version   | 1.2.0                       | 1.5.0                       |
-| Dataset             | LUNA16                      | LUNA16                      |
-| batch_size          | 1                           | 1                           |
-| Dice                | dice = 0.9502               | dice = 0.9502               |
-| Model for inference | 56M(.ckpt file)             | 56M(.ckpt file)             |
+| Parameters          | Ascend                      | GPU                         | Ascend310                   |
+| ------------------- | --------------------------- | --------------------------- | --------------------------- |
+| Model Version       | Unet3D                      | Unet3D                      | Unet3D                      |
+| Resource            | Ascend 910; OS Euler2.8     | Nvidia V100 SXM2; OS Ubuntu16| Ascend 310; OS Euler2.8    |
+| Uploaded Date       | 03/18/2021 (month/day/year) | 05/21/2021 (month/day/year) | 12/15/2021 (month/day/year) |
+| MindSpore Version   | 1.2.0                       | 1.2.0                       | 1.5.0                       |
+| Dataset             | LUNA16                      | LUNA16                      | LUNA16                      |
+| batch_size          | 1                           | 1                           | 1                           |
+| Dice                | dice = 0.93                 | dice = 0.93                 | dice = 0.93                 |
+| Model for inference | 56M(.ckpt file)             | 56M(.ckpt file)             | 56M(.ckpt file)             |
 
 # [Description of Random Situation](#contents)
 
