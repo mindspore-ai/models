@@ -19,8 +19,7 @@ import os
 import math
 import numpy as np
 import mindspore.common.dtype as mstype
-import mindspore.dataset.engine.datasets as de
-import mindspore.dataset as dataset
+import mindspore.dataset as de
 import mindspore.dataset.transforms.c_transforms as C
 from mindspore import log as logger
 
@@ -87,19 +86,19 @@ def create_albert_dataset(device_num=1, rank=0, do_shuffle="true", data_dir=None
     for file_name in files:
         if "tfrecord" in file_name:
             data_files.append(os.path.join(data_dir, file_name))
-    data_set = dataset.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
-                                       columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
-                                                     "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
-                                       shuffle=dataset.Shuffle.FILES if do_shuffle == "true" else False,
-                                       num_shards=device_num, shard_id=rank, shard_equal_rows=True)
+    data_set = de.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
+                                  columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
+                                                "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
+                                  shuffle=de.Shuffle.FILES if do_shuffle == "true" else False,
+                                  num_shards=device_num, shard_id=rank, shard_equal_rows=True)
     if bucket_list:
         bucket_dataset = BucketDatasetGenerator(data_set, batch_size, bucket_list=bucket_list)
-        data_set = dataset.GeneratorDataset(bucket_dataset,
-                                            column_names=["input_ids", "input_mask", "segment_ids",
-                                                          "next_sentence_labels",
-                                                          "masked_lm_positions", "masked_lm_ids", "masked_lm_weights",
-                                                          "sentence_flag"],
-                                            shuffle=False)
+        data_set = de.GeneratorDataset(bucket_dataset,
+                                       column_names=["input_ids", "input_mask", "segment_ids",
+                                                     "next_sentence_labels",
+                                                     "masked_lm_positions", "masked_lm_ids", "masked_lm_weights",
+                                                     "sentence_flag"],
+                                       shuffle=False)
     else:
         data_set = data_set.batch(batch_size, drop_remainder=True)
     ori_dataset_size = data_set.get_dataset_size()
@@ -122,9 +121,9 @@ def create_classification_dataset(batch_size=1, repeat_count=1, assessment_metho
                                   rank_size=1, rank_id=0):
     """create finetune or evaluation dataset"""
     type_cast_op = C.TypeCast(mstype.int32)
-    ds = dataset.MindDataset([data_file_path],
-                             columns_list=["input_ids", "input_mask", "segment_ids", "label_ids"], shuffle=do_shuffle,
-                             num_shards=rank_size, shard_id=rank_id)
+    ds = de.MindDataset([data_file_path],
+                        columns_list=["input_ids", "input_mask", "segment_ids", "label_ids"], shuffle=do_shuffle,
+                        num_shards=rank_size, shard_id=rank_id)
     if assessment_method == "Spearman_correlation":
         type_cast_op_float = C.TypeCast(mstype.float32)
         ds = ds.map(operations=type_cast_op_float, input_columns="label_ids")
@@ -158,10 +157,10 @@ def create_squad_dataset(batch_size=1, repeat_count=1, data_file_path=None, sche
     if is_training:
         print("data_file_path: ", data_file_path)
         print("rank_id: ", rank_id)
-        ds = dataset.MindDataset([data_file_path],
-                                 columns_list=["input_ids", "input_mask", "segment_ids", "start_positions",
-                                               "end_positions", "unique_ids", "is_impossible"],
-                                 shuffle=do_shuffle, num_shards=rank_size, shard_id=rank_id)
+        ds = de.MindDataset([data_file_path],
+                            columns_list=["input_ids", "input_mask", "segment_ids", "start_positions",
+                                          "end_positions", "unique_ids", "is_impossible"],
+                            shuffle=do_shuffle, num_shards=rank_size, shard_id=rank_id)
         ds = ds.map(operations=type_cast_op, input_columns="start_positions")
         ds = ds.map(operations=type_cast_op, input_columns="end_positions")
     else:
@@ -188,10 +187,10 @@ def create_eval_dataset(batchsize=32, device_num=1, rank=0, data_dir=None, schem
                 data_files.append(os.path.join(data_dir, file_name))
     else:
         data_files.append(data_dir)
-    data_set = dataset.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
-                                       columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
-                                                     "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
-                                       shard_equal_rows=True)
+    data_set = de.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
+                                  columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
+                                                "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
+                                  shard_equal_rows=True)
     ori_dataset_size = data_set.get_dataset_size()
     print("origin eval size: ", ori_dataset_size)
     dtypes = data_set.output_types()
@@ -208,16 +207,16 @@ def create_eval_dataset(batchsize=32, device_num=1, rank=0, data_dir=None, schem
                 "masked_lm_ids": np.zeros(shapes[5], dtypes[5]),
                 "masked_lm_weights": np.zeros(shapes[6], dtypes[6])}
         padded_samples = [item for x in range(padded_num)]
-        padded_ds = dataset.PaddedDataset(padded_samples)
+        padded_ds = de.PaddedDataset(padded_samples)
         eval_ds = data_set + padded_ds
-        sampler = dataset.DistributedSampler(num_shards=device_num, shard_id=rank, shuffle=False)
+        sampler = de.DistributedSampler(num_shards=device_num, shard_id=rank, shuffle=False)
         eval_ds.use_sampler(sampler)
     else:
-        eval_ds = dataset.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
-                                          columns_list=["input_ids", "input_mask", "segment_ids",
-                                                        "next_sentence_labels",
-                                                        "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
-                                          num_shards=device_num, shard_id=rank, shard_equal_rows=True)
+        eval_ds = de.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
+                                     columns_list=["input_ids", "input_mask", "segment_ids",
+                                                   "next_sentence_labels",
+                                                   "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
+                                     num_shards=device_num, shard_id=rank, shard_equal_rows=True)
 
     type_cast_op = C.TypeCast(mstype.int32)
     eval_ds = eval_ds.map(input_columns="masked_lm_ids", operations=type_cast_op)
