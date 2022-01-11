@@ -1,0 +1,35 @@
+general:
+    backend: mindspore
+
+pipeline: [eval]
+
+eval:
+    pipe_step:
+        type: TrainPipeStep
+        models_folder: ~
+
+    dataset:
+        type: Imagenet
+        common:
+            data_path: "/cache/datasets/ILSVRC/Data/CLS-LOC"
+            batch_size: 128
+
+    trainer:
+        with_train: False
+        type: Trainer
+        epochs: 120
+        optimizer:
+            type: SGD
+            params:
+                lr: 0.001
+                momentum: 0.9
+                weight_decay: 0.0001
+        lr_scheduler:
+            type: CosineAnnealingLR
+            by_epoch: True
+            params:
+                T_max: 120
+        loss:
+            type: CrossEntropyLoss
+            params:
+                sparse: True
