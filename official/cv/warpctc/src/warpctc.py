@@ -17,9 +17,7 @@
 import numpy as np
 import mindspore.nn as nn
 from mindspore import Tensor
-from mindspore.common import dtype as mstype
 from mindspore.ops import operations as P
-from mindspore.ops import functional as F
 
 
 class StackedRNN(nn.Cell):
@@ -50,17 +48,11 @@ class StackedRNN(nn.Cell):
         self.fc = nn.Dense(in_channels=hidden_size, out_channels=self.num_classes, weight_init=Tensor(self.fc_weight),
                            bias_init=Tensor(self.fc_bias))
 
-        self.fc.to_float(mstype.float32)
-        self.expand_dims = P.ExpandDims()
-        self.concat = P.Concat()
         self.transpose = P.Transpose()
 
     def construct(self, x):
         x = self.transpose(x, (3, 0, 2, 1))
         x = self.reshape(x, (-1, self.batch_size, self.input_size))
         output, _ = self.lstm(x)
-        res = ()
-        for i in range(F.shape(x)[0]):
-            res += (self.expand_dims(self.fc(output[i]), 0),)
-        res = self.concat(res)
+        res = self.fc(output)
         return res

@@ -62,12 +62,6 @@ class _CaptchaDataset:
         return image, label
 
 
-def transpose_hwc2whc(image):
-    """transpose image from HWC to WHC"""
-    image = np.transpose(image, (1, 0, 2))
-    return image
-
-
 def create_dataset(dataset_path, batch_size=1, num_shards=1, shard_id=0, device_target='Ascend',
                    num_parallel_workers=8):
     """
@@ -87,13 +81,8 @@ def create_dataset(dataset_path, batch_size=1, num_shards=1, shard_id=0, device_
         num_parallel_workers = cores
     dataset = _CaptchaDataset(dataset_path, config.max_captcha_digits, device_target)
     data_set = ds.GeneratorDataset(dataset, ["image", "label"], shuffle=True, num_shards=num_shards, shard_id=shard_id)
+
     image_trans = [
-        vc.Rescale(1.0 / 255.0, 0.0),
-        vc.Normalize([0.9010, 0.9049, 0.9025], std=[0.1521, 0.1347, 0.1458]),
-        vc.Resize((m.ceil(config.captcha_height / 16) * 16, config.captcha_width)),
-        c.TypeCast(mstype.float32)
-    ]
-    image_trans_gpu = [
         vc.Rescale(1.0 / 255.0, 0.0),
         vc.Normalize([0.9010, 0.9049, 0.9025], std=[0.1521, 0.1347, 0.1458]),
         vc.Resize((m.ceil(config.captcha_height / 16) * 16, config.captcha_width)),
@@ -102,14 +91,8 @@ def create_dataset(dataset_path, batch_size=1, num_shards=1, shard_id=0, device_
     label_trans = [
         c.TypeCast(mstype.int32)
     ]
-    if device_target == 'Ascend':
-        data_set = data_set.map(operations=image_trans, input_columns=["image"],
-                                num_parallel_workers=num_parallel_workers)
-        data_set = data_set.map(operations=transpose_hwc2whc, input_columns=["image"],
-                                num_parallel_workers=num_parallel_workers)
-    else:
-        data_set = data_set.map(operations=image_trans_gpu, input_columns=["image"],
-                                num_parallel_workers=num_parallel_workers)
+    data_set = data_set.map(operations=image_trans, input_columns=["image"],
+                            num_parallel_workers=num_parallel_workers)
     data_set = data_set.map(operations=label_trans, input_columns=["label"],
                             num_parallel_workers=num_parallel_workers)
 
