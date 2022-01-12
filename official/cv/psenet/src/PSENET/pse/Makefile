@@ -17,10 +17,7 @@ mindspore_home = ../../../
 CXXFLAGS = -I include -I ${mindspore_home} -std=c++11 -O3
 CXX_SOURCES = adaptor.cpp
 opencv_home = ${OPENCV_HOME}
-OPENCV = -I$(opencv_home)/include -L$(opencv_home)/lib64 -lopencv_superres -lopencv_ml -lopencv_objdetect \
--lopencv_highgui -lopencv_dnn -lopencv_stitching -lopencv_videostab -lopencv_calib3d -lopencv_videoio \
--lopencv_features2d -lopencv_photo -lopencv_flann -lopencv_shape -lopencv_video -lopencv_imgcodecs -lopencv_imgproc \
--lopencv_core
+OPENCV = -I$(opencv_home)/include/opencv4 -I$(opencv_home)/include -L$(opencv_home)/lib -L$(opencv_home)/lib64 -lopencv_imgproc -lopencv_core
 PYBIND11 = `python -m pybind11 --includes`
 
 LIB_SO = adaptor.so
