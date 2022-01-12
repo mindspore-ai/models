@@ -1,0 +1,59 @@
+From d4cef68e789363498e4035b7ca47e64f3ebef6b6 Mon Sep 17 00:00:00 2001
+From: yiguangzheng <78542727@qq.com>
+Date: Fri, 5 Nov 2021 12:55:06 +0800
+Subject: [PATCH 1/2] fix lib
+
+---
+ .../andres/graph/multicut-lifted/greedy-additive.hxx       | 7 +++++++
+ lib/multicut_cython/solve_nl_lmp.hxx                       | 3 +++
+ lib/nms_cython/include/nms_scoremap.hxx                    | 2 ++
+ 3 files changed, 12 insertions(+)
+
+diff --git a/lib/multicut_cython/include/andres/graph/multicut-lifted/greedy-additive.hxx b/lib/multicut_cython/include/andres/graph/multicut-lifted/greedy-additive.hxx
+index 03df92b..3efbda1 100755
+--- a/lib/multicut_cython/include/andres/graph/multicut-lifted/greedy-additive.hxx
++++ b/lib/multicut_cython/include/andres/graph/multicut-lifted/greedy-additive.hxx
+@@ -8,6 +8,13 @@
+ #include <algorithm>
+ #include <map>
+ #include <queue>
++/*
++GCC 11 started to explicitly require including <limits>, <memory>, <utility>, <thread> 
++according to https://www.gnu.org/software/gcc/gcc-11/porting_to.html#header-dep-changes
++
++https://stackoverflow.com/questions/4798936/numeric-limits-was-not-declared-in-this-scope-no-matching-function-for-call-t
++*/
++#include <limits>
+ 
+ #include "andres/partition.hxx"
+ 
+diff --git a/lib/multicut_cython/solve_nl_lmp.hxx b/lib/multicut_cython/solve_nl_lmp.hxx
+index 4113d89..2b18aaa 100644
+--- a/lib/multicut_cython/solve_nl_lmp.hxx
++++ b/lib/multicut_cython/solve_nl_lmp.hxx
+@@ -9,6 +9,9 @@
+ 
+ #include <iostream>
+ 
++#include <array>
++
++
+ using namespace std;
+ 
+ template <typename T> 
+diff --git a/lib/nms_cython/include/nms_scoremap.hxx b/lib/nms_cython/include/nms_scoremap.hxx
+index f0bdb67..1128728 100755
+--- a/lib/nms_cython/include/nms_scoremap.hxx
++++ b/lib/nms_cython/include/nms_scoremap.hxx
+@@ -8,6 +8,8 @@
+ 
+ #include <iostream>
+ 
++#include <array>
++
+ // namespace bp = boost::python;
+ 
+ using namespace std;
+-- 
+2.32.0.windows.1
+
