@@ -1,8 +1,10 @@
-# 1. 内容
+# 内容
 
 <!-- TOC -->
 
-- [Retinanet 描述](#retinanet描述)
+[View English](./README.md)
+
+- [Retinanet描述](#retinanet描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [环境要求](#环境要求)
@@ -17,9 +19,6 @@
         - [用法](#用-法)
         - [运行](#运-行)
         - [结果](#结-果)
-    - [模型导出](#模型导出)
-        - [用法](#具体用法)
-        - [运行](#运行命令)
     - [推理过程](#推理过程)
         - [用法](#用途)
         - [运行](#运行方式)
@@ -27,7 +26,7 @@
     - [模型说明](#模型说明)
         - [性能](#性能)
             - [训练性能](#训练性能)
-            - [推理性能](#推理性能)
+            - [评估性能](#评估性能)
 - [随机情况的描述](#随机情况的描述)
 - [ModelZoo 主页](#modelzoo-主页)
 
@@ -50,7 +49,7 @@ Retinanet的整体网络架构如下所示：
 
 数据集可参考文献.
 
-MSCOCO2017
+[COCO2017](https://cocodataset.org/#download)
 
 - 数据集大小: 19.3G, 123287张80类彩色图像
 
@@ -60,7 +59,7 @@ MSCOCO2017
 
 - 数据格式:RGB图像.
 
-    - 注意：数据将在src/dataset.py 中被处理
+> 注意：数据将在src/dataset.py 中被处理。
 
 ## [环境要求](#content)
 
@@ -71,7 +70,6 @@ MSCOCO2017
 - 想要获取更多信息，请检查以下资源：
     - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
-
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
 
     ```python
@@ -182,11 +180,15 @@ MSCOCO2017
   ├─ascend310_infer                           # 实现310推理源代码
   ├─scripts
     ├─run_single_train.sh                     # 使用Ascend环境单卡训练
+    ├─run_single_train_gpu.sh
     ├─run_distribute_train.sh                 # 使用Ascend环境八卡并行训练
+    ├─run_distribute_train_gpu.sh
     ├─run_eval.sh                             # 使用Ascend环境运行推理脚本
+    ├─run_eval_gpu.sh
   ├─src
     ├─backbone.py                             # 网络模型定义
     ├─bottleneck.py                           # 网络颈部定义
+    ├─config.py                               # 参数配置
     ├─dataset.py                              # 数据预处理
     ├─retinahead.py                           # 网络预测头部定义
     ├─init_params.py                          # 参数初始化
@@ -207,7 +209,7 @@ MSCOCO2017
 
 ### [脚本参数](#content)
 
-```python
+```text
 在train.py和default_config.yaml脚本中使用到的主要参数是:
 "img_shape": [600, 600],                                                                        # 图像尺寸
 "num_retinanet_boxes": 67995,                                                                   # 设置的先验框总数
@@ -276,52 +278,65 @@ MSCOCO2017
 
 - Ascend:
 
-```训练
-# 八卡并行训练示例：
+```shell
+# data和存储mindrecord文件的路径在default_config.yaml里设置
 
-创建 RANK_TABLE_FILE
-bash run_distribute_train.sh DEVICE_NUM EPOCH_SIZE LR DATASET RANK_TABLE_FILE PRE_TRAINED(optional) PRE_TRAINED_EPOCH_SIZE(optional)
+# 训练以前， 请运行：
+python train.py --only_create_dataset=True --run_platform="Ascend"
+
+# 八卡并行训练示例：
+# 创建RANK_TABLE_FILE
+bash run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [RANK_TABLE_FILE] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
 
 # 单卡训练示例：
-
-bash run_distribute_train.sh DEVICE_ID EPOCH_SIZE LR DATASET PRE_TRAINED(optional) PRE_TRAINED_EPOCH_SIZE(optional)
-
+bash run_single_train.sh [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
 ```
 
-> 注意:
+> 注意: RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
-  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+- GPU
+
+```shell
+# data和存储mindrecord文件的路径在default_config.yaml里设置
+
+# 训练以前， 请运行：
+python train.py --only_create_dataset=True --run_platform="GPU"
+
+# 八卡并行训练示例：
+bash run_distribute_train_gpu.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
+
+# 单卡训练示例：
+bash run_single_train_gpu.sh [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
+```
 
 #### 运行
 
-``` 运行
-# 训练示例
+- Ascend
 
-  python:
-    data和存储mindrecord文件的路径在config里设置
+```shell
+# 八卡并行训练示例(在scripts目录下运行)：
+bash run_distribute_train.sh 8 500 0.1 coco scripts/rank_table_8pcs.json /dataset/retinanet-322_458.ckpt 322
 
-      # 单卡训练示例：
+# 单卡训练示例(在scripts目录下运行)：
+bash run_single_train.sh 0 500 0.1 coco /dataset/retinanet-322_458.ckpt 322
+```
 
-      python train.py
-  shell:
-      Ascend:
+- GPU
 
-      # 八卡并行训练示例(在retinanet目录下运行)：
+```shell
+# 八卡并行训练示例(在scripts目录下运行)：
+bash run_distribute_train_gpu.sh 8 400 0.025 coco /dataset/retinanet-322_1221.ckpt 322
 
-      bash scripts/run_distribute_train.sh 8 500 0.1 coco RANK_TABLE_FILE(创建的RANK_TABLE_FILE的地址) PRE_TRAINED(预训练checkpoint地址) PRE_TRAINED_EPOCH_SIZE（预训练EPOCH大小）
-      例如：bash scripts/run_distribute_train.sh 8 500 0.1 coco scripts/rank_table_8pcs.json /dataset/retinanet-322_458.ckpt 322
-
-      # 单卡训练示例(在retinanet目录下运行)：
-
-      bash scripts/run_single_train.sh 0 500 0.1 coco /dataset/retinanet-322_458.ckpt 322
-
+# 单卡训练示例(在scripts目录下运行)：
+bash run_single_train_gpu.sh 0 400 0.025 coco /dataset/retinanet-322_1221.ckpt 322
 ```
 
 #### 结果
 
-训练结果将存储在示例路径中。checkpoint将存储在 `./model` 路径下，训练日志将被记录到 `./log.txt` 中，训练日志部分示例如下：
+路径在default_config.yaml里设置。checkpoint将存储在 `./model` 路径下，
+训练日志将被记录到 `./train.log` 中，训练日志部分示例如下：
 
-``` 训练日志
+```text
 epoch: 397 step: 458, loss is 0.6153226
 lr:[0.000598]
 epoch time: 313364.642 ms, per step time: 684.202 ms
@@ -338,33 +353,43 @@ epoch time: 314138.455 ms, per step time: 685.892 ms
 
 ### [评估过程](#content)
 
-#### 用 法
+#### 用法
 
 您可以使用python或shell脚本进行训练。shell脚本的用法如下:
 
-```eval
-bash scripts/run_eval.sh [DATASET] [DEVICE_ID]
+- Ascend
+
+```shell
+bash run_eval.sh [DATASET] [DEVICE_ID]
 ```
 
-#### 运 行
+- GPU
 
-```eval运行
-# 验证示例
-
-  python:
-      Ascend: python eval.py
-  checkpoint 的路径在config里设置
-  shell:
-      Ascend: bash scripts/run_eval.sh coco 0
+```shell
+bash run_eval_gpu.sh [DATASET] [DEVICE_ID] [CHECKPOINT_PATH]
 ```
 
-> checkpoint 可以在训练过程中产生.
+#### 运行
 
-#### 结 果
+- Ascend:
+
+```shell
+bash run_eval.sh coco 0
+```
+
+- GPU
+
+```shell
+bash run_eval_gpu.sh coco 0 LOG/model/retinanet-500_610.ckpt
+```
+
+> checkpoint可以在训练过程中产生.
+
+#### 结果
 
 计算结果将存储在示例路径中，您可以在 `eval.log` 查看.
 
-``` mAP
+```text
  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.371
  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.517
  Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.408
@@ -390,14 +415,14 @@ mAP: 0.3710347196613514
 导出模型前要修改default_config.yaml文件中的checkpoint_path配置项，值为checkpoint的路径。
 
 ```shell
-python export.py --file_name [RUN_PLATFORM] --file_format[EXPORT_FORMAT] --checkpoint_path [CHECKPOINT PATH]
+python export.py --file_name [device_target] --file_format[EXPORT_FORMAT] --checkpoint_path [CHECKPOINT PATH]
 ```
 
 `EXPORT_FORMAT` 可选 ["AIR", "MINDIR"]
 
 #### 运行命令
 
-```运行
+```shell
 python export.py
 ```
 
@@ -415,15 +440,15 @@ sh run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
 
 #### 运行方式
 
-```运行
+```shell
 bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 ```
 
 #### 运行结果
 
-推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
+推理的结果保存在当前目录下，在`acc.log`日志文件中可以找到类似以下的结果。
 
-```mAP
+```text
  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.369
  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.520
  Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.404
@@ -446,38 +471,38 @@ mAP: 0.36858371862143824
 
 #### 训练性能
 
-| 参数                        | Ascend                                |
-| -------------------------- | ------------------------------------- |
-| 模型名称                    | Retinanet                             |
-| 运行环境                    | 华为云 Modelarts                      |
-| 上传时间                    | 10/03/2021                           |
-| MindSpore 版本             | 1.0.1                                 |
-| 数据集                      | 123287 张图片                          |
-| Batch_size                 | 32                                   |
-| 训练参数                    | default_config.yaml                   |
-| 优化器                      | Momentum                              |
-| 损失函数                    | Focal loss                            |
-| 最终损失                    | 0.43                               |
-| 精确度 (8p)                 | mAP[0.3710]            |
-| 训练总时间 (8p)             | 34h50m20s                        |
+| 参数                        | Ascend                           | GPU(1pcs)            | GPU(8pcs)            |
+| -------------------------- | -------------------------------- | -------------------- | -------------------- |
+| 模型名称                    | Retinanet                         | Retinanet-resnet-101 | Retinanet-resnet-101 |
+| 运行环境                    | 华为云 Modelarts                   | Ubuntu 18.04.6, 1pcs Tesla V100-PCIE 32G, CPU 2.90GHz, 64cores, RAM 252GB | Ubuntu 18.04.6, 8pcs Tesla V100-PCIE 32G, CPU 2.90GHz, 64cores, RAM 252GB |
+| 上传时间                    | 10/03/2021                        | 27/12/2021           | 27/12/2021           |
+| MindSpore 版本             | 1.0.1                             | 1.6.0                | 1.6.0                |
+| 数据集                      | 118287 张图片                      | 118287 张图片         | 118287 张图片        |
+| 训练参数                    | batch_size=32                     | batch_size=16, epochs=400, lr=0.025 | batch_size=12, epochs=400, lr=0.025 |
+| 其他训练参数                 | src/config.py                     | default_config.yaml  | default_config.yaml        |
+| 优化器                      | Momentum                          | Momentum             | Momentum             |
+| 损失函数                    | Focal loss                        | Focal loss           | Focal loss           |
+| 最终损失                    | 0.43                              | 0.49                 | 0.49 |
+| 速度                       |                                   | 696 毫秒/步           | 881 毫秒/步 |
+| 训练总时间 (8p)             | 34h50m20s                         | 708h                 | 120h |
 | 脚本                       | [Retianet script](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet101) |
 
-#### 推理性能
+#### 评估性能
 
-| 参数                 | Ascend                      |
-| ------------------- | :-------------------------- |
-| 模型名称             | Retinanet                    |
-| 运行环境             | 华为云 Modelarts             |
-| 上传时间             | 10/03/2021                 |
-| MindSpore 版本      | 1.0.1                        |
-| 数据集              | 5k 张图片                   |
-| Batch_size          | 1                          |
-| 精确度              | mAP[0.3710]                  |
-| 总时间              | 10m50s      |
+| 参数                | Ascend        | GPU       |
+| ------------------- |:--------------| -------- |
+| 模型名称             | Retinanet     | Retinanet-resnet-101  |
+| 运行环境             | 华为云 Modelarts | Ubuntu 18.04.6, Tesla V100-PCIE 32G, CPU 2.90GHz, 64cores, RAM 252GB |
+| 上传时间             | 10/03/2021    | 27/12/2021 |
+| MindSpore 版本       | 1.0.1         | 1.6.0 |
+| 数据集               | 5k 张图片        | 5k images |
+| Batch_size          | 1             | 1         |
+| 精确度              | mAP[0.3710]   | mAP[0.3687] |
+| 总时间              | 10m 50s       | 10 min |
 
 # [随机情况的描述](#内容)
 
-在 `dataset.py` 脚本中, 我们在 `create_dataset` 函数中设置了随机种子. 我们在 `train.py` 脚本中也设置了随机种子.
+在 `train.py` 脚本中设置了随机种子.
 
 # [ModelZoo 主页](#内容)
 
@@ -487,4 +512,5 @@ mAP: 0.36858371862143824
 
 优先参考[ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ)来查找一些常见的公共问题。
 
-- **Q: 使用PYNATIVE_MODE发生内存溢出怎么办？** **A**：内存溢出通常是因为PYNATIVE_MODE需要更多的内存， 将batch size设置为16降低内存消耗，可进行网络训练。
+- **Q: 使用PYNATIVE_MODE发生内存溢出怎么办？**
+- **A**：内存溢出通常是因为PYNATIVE_MODE需要更多的内存， 将batch size设置为16降低内存消耗，可进行网络训练。

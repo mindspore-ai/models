@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,23 +14,37 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]
+if [ $# != 2 ] && [ $# != 3 ]
 then
-    echo "Usage: sh run_eval.sh [DATASET] [DEVICE_ID]"
+    echo "Usage: sh run_eval_gpu.sh [DATASET] [DEVICE_ID] [CHECKPOINT_PATH](optional)"
 exit 1
 fi
 
 DATASET=$1
 echo $DATASET
 
-
 export DEVICE_NUM=1
 export DEVICE_ID=$2
 export RANK_SIZE=$DEVICE_NUM
 export RANK_ID=0
 
-BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
-cd $BASE_PATH/../ || exit
+get_real_path() {
+  if [ "${1:0:1}" == "/" ]; then
+    echo "$1"
+  else
+    echo "$(realpath -m $PWD/$1)"
+  fi
+}
+
+if [ $# == 3 ]
+then
+    CHECKPOINT_PATH=$(get_real_path $3)
+    if [ ! -f $CHECKPOINT_PATH ]
+    then
+        echo "error: CHECKPOINT_PATH=$CHECKPOINT_PATH is not a file"
+    exit 1
+    fi
+fi
 
 if [ -d "eval$2" ];
 then
@@ -38,14 +52,29 @@ then
 fi
 
 mkdir ./eval$2
-cp ./*.py ./eval$2
-cp ./*.yaml ./eval$2
-cp -r ./src ./eval$2
+cp ../*.py ./eval$2
+cp ../*.yaml ./eval$2
+cp -r ../src ./eval$2
 cd ./eval$2 || exit
-env > env.log
+
 echo "start inferring for device $DEVICE_ID"
-python eval.py \
-    --run_platform="Ascend" \
-    --dataset=$DATASET \
-    --device_id=$2 > log.txt 2>&1 &
+env > env.log
+
+if [ $# == 2 ]
+then
+  python eval.py \
+      --run_platform="GPU" \
+      --dataset=$DATASET \
+      --device_id=$2 > eval_log.txt 2>&1 &
+fi
+
+if [ $# == 3 ]
+then
+  python eval.py \
+      --run_platform="GPU" \
+      --dataset=$DATASET \
+      --checkpoint_path=$CHECKPOINT_PATH \
+      --device_id=$2 > eval_log.txt 2>&1 &
+fi
+
 cd ..

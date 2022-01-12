@@ -215,10 +215,13 @@ def create_voc_label(is_training):
             if not is_training:
                 o_width = abs(x_max - x_min)
                 o_height = abs(y_max - y_min)
-                ann = {'area': o_width * o_height, 'iscrowd': 0, 'image_id': \
-                    img_id, 'bbox': [x_min, y_min, o_width, o_height], \
-                       'category_id': cls_map[cls_name], 'id': bnd_id, \
-                       'ignore': 0, \
+                ann = {'area': o_width * o_height,
+                       'iscrowd': 0,
+                       'image_id': img_id,
+                       'bbox': [x_min, y_min, o_width, o_height],
+                       'category_id': cls_map[cls_name],
+                       'id': bnd_id,
+                       'ignore': 0,
                        'segmentation': []}
                 json_dict['annotations'].append(ann)
                 bnd_id = bnd_id + 1
@@ -390,8 +393,8 @@ def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="reti
 
 
 def create_retinanet_dataset(mindrecord_file, batch_size, repeat_num, device_num=1, rank=0,
-                             is_training=True, num_parallel_workers=64):
-    """Creatr retinanet dataset with MindDataset."""
+                             is_training=True, num_parallel_workers=8):
+    """Create retinanet dataset with MindDataset."""
     ds = de.MindDataset(mindrecord_file, columns_list=["img_id", "image", "annotation"], num_shards=device_num,
                         shard_id=rank, num_parallel_workers=num_parallel_workers, shuffle=is_training)
     decode = C.Decode()
@@ -427,6 +430,8 @@ def create_mindrecord(dataset="coco", prefix="retinanet.mindrecord", is_training
 
     mindrecord_dir = config.mindrecord_dir
     mindrecord_file = os.path.join(mindrecord_dir, prefix + "0")
+    if dataset == "voc":
+        config.coco_root = config.voc_root
     if not os.path.exists(mindrecord_file):
         if not os.path.isdir(mindrecord_dir):
             os.makedirs(mindrecord_dir)
@@ -438,12 +443,12 @@ def create_mindrecord(dataset="coco", prefix="retinanet.mindrecord", is_training
             else:
                 print("coco_root not exits.")
         elif dataset == "voc":
-            if os.path.isdir(config.voc_dir):
+            if os.path.isdir(config.voc_dir) and os.path.isdir(config.voc_root):
                 print("Create Mindrecord.")
                 voc_data_to_mindrecord(mindrecord_dir, is_training, prefix)
                 print("Create Mindrecord Done, at {}".format(mindrecord_dir))
             else:
-                print("voc_dir not exits.")
+                print("voc_root or voc_dir not exits.")
         else:
             if os.path.isdir(config.image_dir) and os.path.exists(config.anno_path):
                 print("Create Mindrecord.")
@@ -451,4 +456,7 @@ def create_mindrecord(dataset="coco", prefix="retinanet.mindrecord", is_training
                 print("Create Mindrecord Done, at {}".format(mindrecord_dir))
             else:
                 print("image_dir or anno_path not exits.")
+    else:
+        print("Mindrecord file exists.")
+
     return mindrecord_file
