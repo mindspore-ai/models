@@ -80,8 +80,9 @@ python psenet_model_torch2mindspore.py --torch_file=/path_to_model/resnet50-19c8
 # install pybind11
 pip install pybind11
 
-# install opencv3.4.9
+# install opencv3.4.9 or opencv4.5.3
 wget https://github.com/opencv/opencv/archive/3.4.9.zip
+# or wget https://github.com/opencv/opencv/archive/4.5.3.zip
 unzip 3.4.9.zip
 cd opencv-3.4.9
 mkdir build
