@@ -135,6 +135,8 @@ def main():
             device_num = 1
             context.set_context(device_id=get_device_id())
 
+        # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
+        context.set_context(mempool_block_size="31GB")
     else:
         raise ValueError("Unsupported platform.")
 

@@ -109,6 +109,9 @@ if __name__ == '__main__':
         context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.platform, save_graphs=False)
         print('mode = GRAPH_MODE')
 
+    # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
+    context.set_context(mempool_block_size="25GB")
+
     # init distributed
     if args_opt.is_distributed:
         init()
