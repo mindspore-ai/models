@@ -230,7 +230,7 @@ accuracy _ CUB _ att = 0.58984
 
 ## FAQ
 
-优先参考[ModelZoo FAQ](https://gitee.com/mindspore/mindspore/tree/master/model_zoo#FAQ)来查找一些常见的公共问题。
+优先参考[ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ)来查找一些常见的公共问题。
 
 - **Q**：使用PYNATIVE_MODE发生内存溢出。
 

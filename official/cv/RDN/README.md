@@ -321,4 +321,4 @@ bash scripts/eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE] [DEVICE_TA
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

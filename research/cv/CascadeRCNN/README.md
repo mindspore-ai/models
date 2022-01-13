@@ -221,4 +221,4 @@ bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH]
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+ 请浏览官网[主页](https://gitee.com/mindspore/models)。

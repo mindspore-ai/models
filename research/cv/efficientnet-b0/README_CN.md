@@ -223,4 +223,4 @@ accuracy:0.767
 
 # ModelZoo
 
-请核对官方 [主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请核对官方 [主页](https://gitee.com/mindspore/models)。

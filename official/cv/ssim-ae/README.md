@@ -493,7 +493,7 @@ python export.py --ckpt_path [CKPT_PATH] --file_name [NAME]
 | 精度          | AUC 单卡：0.939；八卡：0.928(均为Model_Arts)                 |
 | 参数(M)       | 1M                                                           |
 | 微调检查点    | 12.2M (.ckpt文件)                                            |
-| 脚本          | [ssim-ae脚本](https://gitee.com/mindspore/models/tree/master/research/cv/ssim-ae) |
+| 脚本          | [ssim-ae脚本](https://gitee.com/mindspore/models/tree/master/official/cv/ssim-ae) |
 
 #### MVTec AD(metal_nut)图像上的SSIM-AE
 
@@ -515,7 +515,7 @@ python export.py --ckpt_path [CKPT_PATH] --file_name [NAME]
 | 精度(nok)     | 单卡：0.939；八卡：0.928(均为Model_Arts)                     |
 | 参数(M)       | 2.59M                                                        |
 | 微调检查点    | 31.15M (.ckpt文件)                                           |
-| 脚本          | [ssim-ae脚本](https://gitee.com/mindspore/models/tree/master/research/cv/ssim-ae) |
+| 脚本          | [ssim-ae脚本](https://gitee.com/mindspore/models/tree/master/official/cv/ssim-ae) |
 
 ### 推理性能
 

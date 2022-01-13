@@ -317,4 +317,4 @@ cat acc.log
 
 # [ModelZoo 主页](#contents)
 
- 请查看官方网站 [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ 请查看官方网站 [homepage](https://gitee.com/mindspore/models).

@@ -355,5 +355,5 @@ config.py can set a random seed to avoid randomness in the training process.
 
 ## [ModelZoo Homepage](#contents)
 
-Please visit the official website [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please visit the official website [homepage](https://gitee.com/mindspore/models).
 

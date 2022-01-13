@@ -703,4 +703,4 @@ In run_pretrain.py, we set a random seed to make sure that each node has the sam
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).
