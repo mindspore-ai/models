@@ -331,6 +331,8 @@ optional arguments:
                         Fix training shape. Default: ""
   --resize_rate RESIZE_RATE
                         Resize rate for multi-scale training. Default: 10
+  --transfer_train TRANSFER_TRAIN
+                        Transfer training on other dataset, if set it True set filter_weight True. Default: False
 ```
 
 ## [Training Process](#contents)
@@ -414,9 +416,12 @@ The above shell script will run distribute training in the background. You can v
 You can train your own model based on either pretrained classification model or pretrained detection model. You can perform transfer training by following steps.
 
 1. Convert your own dataset to COCO style. Otherwise you have to add your own data preprocess code.
-2. Change config.py according to your own dataset, especially the `num_classes`.
-3. Set argument `filter_weight` to `True` and `pretrained_checkpoint` to pretrained checkpoint while calling `train.py`, this will filter the final detection box weight from the pretrained model.
-4. Build your own bash scripts using new config and arguments for further convenient.
+2. Change `default_config.yaml`:
+   1) Set argument `labels` according to your own dataset.
+   2) Set argument `transfer_train` to `True`, start to transfer training on other dataset.
+   3) `pretrained_checkpoint` is the path of pretrained checkpoint, it will download pretrained checkpoint automatically if not set it.
+   4) Set argument `run_eval` to `True` if you want get eval dataset mAP when training.
+3. Build your own bash scripts using new config and arguments for further convenient.
 
 ## [Evaluation Process](#contents)
 
