@@ -140,4 +140,4 @@ python postprocess.py --result_path=./infer/XXX/result
 
 # ModelZoo Homepage
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ Please check the official [homepage](https://gitee.com/mindspore/models).

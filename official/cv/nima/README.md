@@ -338,4 +338,4 @@ SRCC: 0.6571463000995645.
 
 # ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)
+请浏览官网[主页](https://gitee.com/mindspore/models)

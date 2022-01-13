@@ -185,4 +185,4 @@ result: {'Loss': 1.7236452958522699, 'Top_1_Acc': 0.8045072115384615, 'Top_5_Acc
 
 # ModelZoo
 
-请核对官方 [主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请核对官方 [主页](https://gitee.com/mindspore/models)。

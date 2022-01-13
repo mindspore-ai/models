@@ -285,5 +285,5 @@ dataset.py中设置了“ImageNet”函数内的种子，同时还使用了train
 
 # ModelZoo主页
 
-请浏览官网[主页](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。
 
