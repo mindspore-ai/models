@@ -137,7 +137,7 @@ def create_labels(c_org, c_dim=5, selected_attrs=None):
             c_trg[:, i] = (c_trg[:, i] == 0)
         c_trg_list.append(c_trg)
 
-    c_trg_list = Tensor(c_trg_list, mstype.float16)
+    c_trg_list = Tensor(c_trg_list, mstype.float32)
     return c_trg_list
 
 def denorm(x):

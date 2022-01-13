@@ -149,8 +149,8 @@ def get_loader(data_root, attr_path, selected_attrs, crop_size=178, image_size=1
     transform = [py_vision.ToPIL()]
     if mode == 'train':
         transform.append(py_vision.RandomHorizontalFlip())
-    transform.append(py_vision.CenterCrop(crop_size))
-    transform.append(py_vision.Resize(image_size))
+        transform.append(py_vision.CenterCrop(crop_size))
+    transform.append(py_vision.Resize([image_size, image_size]))
     transform.append(py_vision.ToTensor())
     transform.append(py_vision.Normalize(mean=mean, std=std))
     transform = py_transforms.Compose(transform)
@@ -163,8 +163,8 @@ def get_loader(data_root, attr_path, selected_attrs, crop_size=178, image_size=1
     return dataset
 
 
-def dataloader(img_path, attr_path, selected_attr, dataset, mode='train',
-               batch_size=1, device_num=1, rank=0, shuffle=True):
+def dataloader(img_path, attr_path, selected_attr, dataset, mode,
+               batch_size, device_num, rank=0, shuffle=True):
     """Get dataloader"""
     assert dataset in ['CelebA', 'RaFD']
 
