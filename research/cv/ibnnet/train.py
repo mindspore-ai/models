@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -132,8 +132,8 @@ if __name__ == "__main__":
     config_ck = CheckpointConfig(
         save_checkpoint_steps=step, keep_checkpoint_max=cfg.keep_checkpoint_max)
 
-    ckpoint_cb = ModelCheckpoint(prefix="ResNet50_" + str(device_id), config=config_ck,
-                                 directory='.')
+    ckpoint_cb = ModelCheckpoint(prefix="IBNNET_" + str(device_id), config=config_ck,
+                                 directory='./ckpt')
     time_cb = TimeMonitor(data_size=train_dataset.get_dataset_size())
     loss_cb = LossMonitor()
     epoch_per_eval = {"epoch": [], "acc": []}
