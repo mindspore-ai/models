@@ -27,7 +27,6 @@ from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.nn.optim.adam import Adam
 import numpy as np
 from src.lr_generator import get_lr
-from src.CrossEntropySmooth import CrossEntropySmooth
 from src.resnetv2 import PreActResNet152 as resnetv2
 from src.dataset import create_dataset1 as create_dataset
 from src.config import config1 as config
