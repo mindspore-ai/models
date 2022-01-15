@@ -14,32 +14,30 @@
 # ============================================================================
 """train process"""
 
-import os
-import random
 import argparse
 import ast
+import os
+import random
 
 import numpy as np
-
-from mindspore import nn
-from mindspore import context
 from mindspore import FixedLossScaleManager
 from mindspore import Model
+from mindspore import context
 from mindspore import dataset as ds
+from mindspore import nn
+from mindspore.communication.management import init, get_rank
 from mindspore.context import ParallelMode
 from mindspore.train.callback import LossMonitor, ModelCheckpoint, CheckpointConfig, TimeMonitor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.communication.management import init
 
 import src.config as config
+from src.blocks import U2NET
 from src.data_loader import create_dataset
 from src.loss import total_loss
-from src.blocks import U2NET
 
 random.seed(1)
 np.random.seed(1)
 ds.config.set_seed(1)
-context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--content_path", type=str, help='content_path, default: None')
@@ -49,7 +47,8 @@ parser.add_argument("--ckpt_name", default='u2net', type=str, help='prefix of ck
 parser.add_argument("--loss_scale", type=int, default=8192)
 parser.add_argument("--run_distribute", type=ast.literal_eval, default=False, help="Run distribute, default: false.")
 parser.add_argument('--pre_trained', default='', type=str, help='model_path, local pretrained model to load')
-
+parser.add_argument('--device_target', type=str, default="Ascend", choices=("Ascend", "GPU"),
+                    help="Device target, support GPU and CPU.")
 # additional params for online training
 parser.add_argument("--run_online", type=int, default=0, help='whether train online, default: false')
 parser.add_argument("--data_url", type=str, help='path to data on obs, default: None')
@@ -59,9 +58,34 @@ parser.add_argument("--is_load_pre", type=int, default=0, help="whether use pret
 args = parser.parse_args()
 
 if __name__ == '__main__':
-    device_id = int(os.getenv('DEVICE_ID'))
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
+
+
+    if args.run_distribute:
+        init()
+        if args.device_target == "Ascend":
+            cfg = config.run_distribute_cfg
+            device_id = int(os.getenv('DEVICE_ID'))
+        else:
+            cfg = config.run_distribute_cfg_GPU
+            device_id = get_rank()
+            args.ckpt_path = os.path.join(args.ckpt_path, str(device_id))
+        device_num = int(os.getenv('RANK_SIZE'))
+        context.set_context(device_id=device_id)
+        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
+                                          gradients_mean=True,
+                                          device_num=device_num)
+
+    else:
+        if args.device_target == "Ascend":
+            cfg = config.single_cfg
+            device_id = int(os.getenv('DEVICE_ID'))
+        else:
+            cfg = config.single_cfg_GPU
+
     if args.run_online:
         import moxing as mox
+
         mox.file.copy_parallel(args.data_url, "/cache/dataset")
         content_path = "/cache/dataset/DUTS/DUTS-TR/DUTS-TR-Image/"
         label_path = "/cache/dataset/DUTS/DUTS-TR/DUTS-TR-Mask/"
@@ -76,17 +100,6 @@ if __name__ == '__main__':
         content_path = args.content_path
         label_path = args.label_path
 
-    if args.run_distribute:
-        cfg = config.run_distribute_cfg
-
-        device_num = int(os.getenv('RANK_SIZE'))
-        context.set_context(device_id=device_id)
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True,
-                                          device_num=device_num)
-        init()
-    else:
-        cfg = config.single_cfg
 
     args.lr = cfg.lr
     args.batch_size = cfg.batch_size

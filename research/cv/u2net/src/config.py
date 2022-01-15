@@ -18,8 +18,8 @@ from easydict import EasyDict as edict
 single_cfg = edict({
     "lr": 1e-3,
     "batch_size": 12,
-    "max_epoch": 700,
-    "keep_checkpoint_max": 10,
+    "max_epoch": 1000,
+    "keep_checkpoint_max": 3,
     "weight_decay": 0,
     "eps": 1e-8,
 })
@@ -27,7 +27,23 @@ run_distribute_cfg = edict({
     "lr": 4e-3,
     "batch_size": 16,
     "max_epoch": 1500,
-    "keep_checkpoint_max": 10,
+    "keep_checkpoint_max": 3,
+    "weight_decay": 0,
+    "eps": 1e-8,
+})
+single_cfg_GPU = edict({
+    "lr": 1e-3,
+    "batch_size": 12,
+    "max_epoch": 1200,
+    "keep_checkpoint_max": 3,
+    "weight_decay": 0,
+    "eps": 1e-8,
+})
+run_distribute_cfg_GPU = edict({
+    "lr": 4e-3,
+    "batch_size": 16,
+    "max_epoch": 2150,
+    "keep_checkpoint_max": 3,
     "weight_decay": 0,
     "eps": 1e-8,
 })

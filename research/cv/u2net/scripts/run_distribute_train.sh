@@ -20,8 +20,8 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run.sh DATA_PATH RANK_SIZE"
-echo "For example: bash run.sh /path/dataset 8"
+echo "bash run.sh CONTENT_PATH LABEL_PATH RANK_TABLE_FILE"
+echo "For example: bash run_distribute_train.sh /path/to/content /path/to/label"
 echo "It is better to use the absolute path."
 echo "=============================================================================================================="
 
