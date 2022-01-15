@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -gt 5 ]]; then
-    echo "Usage: bash run_eval.sh [FC][NATT][DATASET_DIR][CHECKPOINT_PATH][DEVICE_ID]"
+if [ $# != 4 ]; then
+    echo "Usage:
+          bash run_eval.sh [DEVICE] [CONFIG] [CHECKPOINT_PATH] [DATASET_DIR]
+         "
 exit 1
 fi
 
@@ -29,7 +31,25 @@ get_real_path(){
     echo "$(realpath -m $PWD/$1)"
   fi
 }
-DATASET_DIR=$(get_real_path $3)
+
+BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
+
+DEVICE=$1
+CONFIG=$(get_real_path $2)
+CHECKPOINT_PATH=$(get_real_path $3)
+DATASET_DIR=$(get_real_path $4)
+
+if [ ! -f $CONFIG ]
+then
+    echo "error: config=$CONFIG is not a file."
+exit 1
+fi
+
+if [ ! -f $CHECKPOINT_PATH ]
+then
+    echo "error: config=$CHECKPOINT_PATH is not a file."
+exit 1
+fi
 
 if [ ! -d $DATASET_DIR ]
 then
@@ -37,6 +57,16 @@ then
 exit 1
 fi
 
-cd "$(dirname $PWD)" || exit
+echo "CONFIG: $CONFIG"
+echo "CHECKPOINT: $CHECKPOINT_PATH"
+echo "DATASET_DIR: $DATASET_DIR"
+echo
 
-python eval.py --fc $1 --natt $2 --data-dir $DATASET_DIR --ckpt $4 --device-id $5
+if [ -d "$BASE_PATH/../eval" ];
+then
+    rm -rf $BASE_PATH/../eval
+fi
+mkdir $BASE_PATH/../eval
+cd $BASE_PATH/../eval || exit
+
+python $BASE_PATH/../eval.py  --device $DEVICE --config_path $CONFIG --ckpt $CHECKPOINT_PATH --data_dir $DATASET_DIR --result_dir . &> eval.log &

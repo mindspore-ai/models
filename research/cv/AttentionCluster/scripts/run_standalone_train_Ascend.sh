@@ -14,11 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 3 ]; then
-  echo "Usage: 
-        bash make_dataset.sh [DEVICE] [DATASET_DIR] [RESULT_DIR]
-       "
-  exit 1
+if [[ $# -gt 6 ]]; then
+    echo "Usage: bash run_standalone_train.sh [FC][NATT][EPOCHS][DATASET_DIR][RESULT_DIR][DEVICE_ID]"
+exit 1
 fi
 
 get_real_path(){
@@ -31,7 +29,7 @@ get_real_path(){
     echo "$(realpath -m $PWD/$1)"
   fi
 }
-DATASET_DIR=$(get_real_path $2)
+DATASET_DIR=$(get_real_path $4)
 
 if [ ! -d $DATASET_DIR ]
 then
@@ -39,4 +37,13 @@ then
 exit 1
 fi
 
-python make_dataset.py --device $1 --data_dir $DATASET_DIR --result_dir $3
+BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
+
+if [ -d "$BASE_PATH/../train" ];
+then
+    rm -rf $BASE_PATH/../train
+fi
+mkdir $BASE_PATH/../train
+cd $BASE_PATH/../train || exit
+
+python $BASE_PATH/../train.py --fc $1 --natt $2 --epochs $3 --data_dir $DATASET_DIR --result_dir $5 --device_id $6 --device Ascend &> train.log &

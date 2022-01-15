@@ -1,0 +1,18 @@
+device: ''
+device_id: 0
+seed: 1
+
+distributed: False
+profile: False
+
+batch_size: 64
+epochs: 200
+natt: 8
+lr: 0.0005
+weight_decay: 0.0001
+fc: 2
+
+summary_dir: './summary'
+data_dir: ''
+result_dir: ''
+ckpt: ''
