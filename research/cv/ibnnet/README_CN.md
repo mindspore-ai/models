@@ -60,13 +60,13 @@
 
 ```python
 # 分布式训练运行示例
-sh scripts/run_distribute_train.sh /path/dataset /path/evalset pretrained_model.ckpt rank_size
+bash scripts/run_distribute_train.sh /path/dataset /path/evalset pretrained_model.ckpt rank_size
 
 # 单机训练运行示例
-sh scripts/run_standalone_train.sh /path/dataset /path/evalset pretrained_model.ckpt device_id
+bash scripts/run_standalone_train.sh /path/dataset /path/evalset pretrained_model.ckpt device_id
 
 # 运行评估示例
-sh scripts/run_eval.sh
+bash scripts/run_eval.sh
 ```
 
 ## 脚本说明
@@ -135,13 +135,13 @@ pth预训练模型文件获取路径如下：[预训练模型](https://github.co
 - 在Ascend环境训练
 
 ```shell
-sh scripts/run_standalone_train.sh /path/dataset /path/evalset pretrained_model.ckpt device_id
+bash scripts/run_standalone_train.sh /path/dataset /path/evalset pretrained_model.ckpt device_id
 ```
 
 - 在GPU环境训练
 
 ```shell
-sh scripts/run_standalone_train_gpu.sh /path/dataset /path/evalset pretrained_model.ckpt
+bash scripts/run_standalone_train_gpu.sh /path/dataset /path/evalset pretrained_model.ckpt
 ```
 
 ### 分布式训练
@@ -149,7 +149,7 @@ sh scripts/run_standalone_train_gpu.sh /path/dataset /path/evalset pretrained_mo
 - 在Ascend环境训练
 
 ```shell
-sh scripts/run_distribute_train.sh /path/dataset /path/evalset pretrained_model.ckpt rank_size
+bash scripts/run_distribute_train.sh /path/dataset /path/evalset pretrained_model.ckpt rank_size
 ```
 
 上述shell脚本将在后台运行分布训练。可以通过`device[X]/test_*.log`文件查看结果。
@@ -171,7 +171,7 @@ epoch time: 331689.239 ms, per step time: 132.570 ms
 - 在GPU环境训练
 
 ```shell
-sh scripts/run_distribute_train_gpu.sh /path/dataset /path/evalset pretrained_model.ckpt rank_size
+bash scripts/run_distribute_train_gpu.sh /path/dataset /path/evalset pretrained_model.ckpt rank_size
 ```
 
 ## 评估过程
@@ -181,7 +181,7 @@ sh scripts/run_distribute_train_gpu.sh /path/dataset /path/evalset pretrained_mo
 - 在Ascend环境运行时评估ImageNet数据集
 
 ```bash
-sh scripts/run_eval.sh path/evalset path/ckpt
+bash scripts/run_eval.sh path/evalset path/ckpt
 ```
 
 上述命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
@@ -193,7 +193,7 @@ sh scripts/run_eval.sh path/evalset path/ckpt
 - 在GPU环境运行时评估ImageNet数据集
 
 ```bash
-sh scripts/run_eval_gpu.sh path/evalset path/ckpt
+bash scripts/run_eval_gpu.sh path/evalset path/ckpt
 ```
 
 上述命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：

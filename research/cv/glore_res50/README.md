@@ -81,13 +81,13 @@ glore_res的总体网络架构如下：
 
 ```text
 # 分布式训练
-用法：sh run_distribute_train.sh [DATA_PATH] [DEVICE_NUM]
+用法：bash run_distribute_train.sh [DATA_PATH] [DEVICE_NUM]
 
 # 单机训练
-用法：sh run_standalone_train.sh [DATA_PATH] [DEVICE_ID]
+用法：bash run_standalone_train.sh [DATA_PATH] [DEVICE_ID]
 
 # 运行评估示例
-用法：sh run_eval.sh [DATA_PATH] [DEVICE_ID] [CKPT_PATH]
+用法：bash run_eval.sh [DATA_PATH] [DEVICE_ID] [CKPT_PATH]
 ```
 
 # 脚本说明
@@ -153,10 +153,10 @@ glore_res的总体网络架构如下：
 
 ```text
 # 分布式训练
-用法：sh run_distribute_train.sh [DATA_PATH] [DEVICE_NUM]
+用法：bash run_distribute_train.sh [DATA_PATH] [DEVICE_NUM]
 
 # 单机训练
-用法：sh run_standalone_train.sh [DATA_PATH] [DEVICE_ID]
+用法：bash run_standalone_train.sh [DATA_PATH] [DEVICE_ID]
 
 ```
 
@@ -186,12 +186,12 @@ epoch:5 step:1251, loss is 3.5204496
 
 ```bash
 # 评估
-用法：sh run_eval.sh [DATA_PATH] [DEVICE_ID] [CKPT_PATH]
+用法：bash run_eval.sh [DATA_PATH] [DEVICE_ID] [CKPT_PATH]
 ```
 
 ```bash
 # 评估示例
-sh run_eval.sh ~/dataset/imagenet 0 ~/ckpt/glore_res50_120-1251.ckpt
+bash run_eval.sh ~/dataset/imagenet 0 ~/ckpt/glore_res50_120-1251.ckpt
 ```
 
 ### 结果
