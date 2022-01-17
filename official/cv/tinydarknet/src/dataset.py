@@ -15,13 +15,17 @@
 """
 Data operations, will be used in train.py and eval.py
 """
+import multiprocessing
 import os
 
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
 import mindspore.dataset.transforms.c_transforms as C
 import mindspore.dataset.vision.c_transforms as vision
+
+from mindspore.communication.management import init, get_rank
 from src.model_utils.config import config as imagenet_cfg
+
 
 def create_dataset_cifar(dataset_path,
                          do_train,
@@ -142,8 +146,16 @@ def create_dataset_imagenet(dataset_path, repeat_num=1, training=True,
 
     transform_label = [C.TypeCast(mstype.int32)]
 
-    data_set = data_set.map(input_columns="image", num_parallel_workers=8, operations=transform_img)
-    data_set = data_set.map(input_columns="label", num_parallel_workers=8, operations=transform_label)
+    cores = multiprocessing.cpu_count()
+    if device_num == 1:
+        num_parallel_workers = min(24, cores)
+    else:
+        num_parallel_workers = int(cores / device_num)
+
+    data_set = data_set.map(input_columns="image", num_parallel_workers=num_parallel_workers,
+                            operations=transform_img)
+    data_set = data_set.map(input_columns="label", num_parallel_workers=num_parallel_workers,
+                            operations=transform_label)
 
     # apply batch operations
     data_set = data_set.batch(imagenet_cfg.batch_size, drop_remainder=True)
@@ -161,11 +173,9 @@ def _get_rank_info():
     rank_size = int(os.environ.get("RANK_SIZE", 1))
 
     if rank_size > 1:
-        from mindspore.communication.management import init, get_rank, get_group_size
         init()
-        rank_size = get_group_size()
         rank_id = get_rank()
     else:
-        rank_size = rank_id = None
+        rank_id = int(os.environ.get("RANK_ID", 0))
 
     return rank_size, rank_id
