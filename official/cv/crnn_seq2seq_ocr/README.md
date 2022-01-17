@@ -52,6 +52,12 @@ For training and evaluation, we use the French Street Name Signs (FSNS) released
 ## [Quick Start](#contents)
 
 - After the dataset is prepared, you may start running the training or the evaluation scripts as follows:
+
+    - Preprocess FSNS dataset
+        - 1.download FSNS dataset from [here](https://rrc.cvc.uab.es/?ch=6&com=downloads)
+        - 2.Use tf2file_v3.py transform to intermediate dataset.
+        - 3.Use create_mindrecord_files.py to convert the intermediate data set to the mindrecord dataset.
+
     - Running on Ascend
 
     ```shell
