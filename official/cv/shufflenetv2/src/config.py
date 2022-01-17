@@ -31,7 +31,7 @@ config_gpu = edict({
 
     ### Dataset Config
     'train_batch_size': 128,
-    'val_batch_size': 125,
+    'val_batch_size': 128,
 
     'num_classes': 1000,
 
@@ -47,7 +47,7 @@ config_gpu = edict({
     'loss_scale': 1,
 
     ### Cutout Config
-    'cutout': True,
+    'cutout': False,
     'cutout_length': 56,
 
 })

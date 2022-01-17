@@ -51,7 +51,7 @@ if __name__ == '__main__':
     parser.add_argument('--use_pynative_mode', type=ast.literal_eval, default=False,
                         help='whether to use pynative mode for device(Default: False)')
     parser.add_argument('--normalize', type=ast.literal_eval, default=True,
-                        help='whether to normalize the dataset(Default: False)')
+                        help='whether to normalize the dataset(Default: True)')
 
     parser.add_argument('--enable_tobgr', type=ast.literal_eval, default=False,
                         help='whether to use the toBGR()(Default: False)')
@@ -131,7 +131,8 @@ if __name__ == '__main__':
     dataset = create_dataset(dataset_val_path, do_train=False, rank=device_id,
                              group_size=1, batch_size=config.val_batch_size,
                              drop_remainder=drop_remainder, shuffle=False,
-                             normalize=args_opt.normalize)
+                             normalize=args_opt.normalize,
+                             enable_tobgr=args_opt.enable_tobgr)
     if not args_opt.use_nn_default_loss:
         loss = CrossEntropySmooth(sparse=True, reduction="mean",
                                   smooth_factor=config.label_smooth_factor, num_classes=config.num_classes)
