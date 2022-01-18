@@ -30,5 +30,5 @@ cp -r ../*.py ./eval
 cd ./eval || exit
 
 env > env.log
-python ./eval.py --generator_path=$CKPT --test_LR_path=$EVALLRPATH --device_id $DEVICE_ID\
+python -u ./eval.py --generator_path=$CKPT --test_LR_path=$EVALLRPATH --device_id $DEVICE_ID\
                  --test_GT_path=$EVALGTPATH &> log &

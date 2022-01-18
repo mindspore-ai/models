@@ -45,7 +45,7 @@ do
         env > env.log
         if [ $# == 8 ]
         then
-                python train.py --run_distribute=$DISTRIBUTE --device_num=$RANK_SIZE \
+                python -u train.py --run_distribute=$DISTRIBUTE --device_num=$RANK_SIZE \
                                 --device_id=$DEVICE_ID --train_LR_path=$LRPATH --train_GT_path=$GTPATH --vgg_ckpt=$VGGCKPT \
                                 --val_LR_path=$VLRPATH --val_GT_path=$VGTPATH &> log &
         fi

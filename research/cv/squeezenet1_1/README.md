@@ -78,13 +78,13 @@ After installing MindSpore via the official website, you can start training and 
 
   ```bash
   # distributed training
-  Usage: sh scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
+  Usage: bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
 
   # standalone training
-  Usage: sh scripts/run_standalone_train.sh [DEVICE_ID] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
+  Usage: bash scripts/run_standalone_train.sh [DEVICE_ID] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
 
   # run evaluation example
-  Usage: sh scripts/run_eval.sh [DEVICE_ID] [DATASET_PATH] [CHECKPOINT_PATH]
+  Usage: bash scripts/run_eval.sh [DEVICE_ID] [DATASET_PATH] [CHECKPOINT_PATH]
   ```
 
 # [Script Description](#contents)
@@ -152,15 +152,15 @@ For more configuration details, please refer the script `config.py`.
 
   ```shell
   # distributed training
-  Usage: sh scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
+  Usage: bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
 
   # standalone training
-  Usage: sh scripts/run_standalone_train.sh [DEVICE_ID] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
+  Usage: bash scripts/run_standalone_train.sh [DEVICE_ID] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)
   ```
 
 ```shell
 # standalone training example
-sh scripts/run_standalone_train.sh 0 /data/imagenet/train
+bash scripts/run_standalone_train.sh 0 /data/imagenet/train
 ```
 
 checkpoint can be produced in training process and be saved in the folder ./train/ckpt_squeezenet.
@@ -193,12 +193,12 @@ epoch: 5 step 5004, loss is 4.6776300875
 
 ```shell
 # evaluation
-Usage: sh scripts/run_eval.sh [DEVICE_ID] [DATASET_PATH] [CHECKPOINT_PATH]
+Usage: bash scripts/run_eval.sh [DEVICE_ID] [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 ```shell
 # evaluation example
-sh scripts/run_eval.sh 0 /data/imagenet/val ./train/ckpt_squeezenet/squeezenet_imagenet-200_40036.ckpt
+bash scripts/run_eval.sh 0 /data/imagenet/val ./train/ckpt_squeezenet/squeezenet_imagenet-200_40036.ckpt
 ```
 
 ### Result

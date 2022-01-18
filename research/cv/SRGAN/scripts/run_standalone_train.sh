@@ -39,7 +39,7 @@ echo "start training"
 env > env.log
 if [ $# == 6 ]
 then
-        python train.py --device_id=$DEVICE_ID \
+        python -u  train.py --device_id=$DEVICE_ID \
         --train_LR_path=$LRPATH --train_GT_path=$GTPATH --vgg_ckpt=$VGGCKPT \
         --val_LR_path=$VLRPATH --val_GT_path=$VGTPATH  > log 2>&1 &
 echo "1"

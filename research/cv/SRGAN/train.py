@@ -27,6 +27,7 @@ from mindspore import context
 from mindspore import load_checkpoint, save_checkpoint, load_param_into_net
 from mindspore.context import ParallelMode
 import mindspore.ops as ops
+from mindspore.common import set_seed
 from src.model.generator import get_generator
 from src.model.discriminator import get_discriminator
 from src.dataset.traindataset import create_traindataset
@@ -38,6 +39,7 @@ from src.trainonestep.train_gan import TrainOneStepD
 from src.trainonestep.train_gan import TrainOnestepG
 
 
+set_seed(123)
 parser = argparse.ArgumentParser(description="SRGAN train")
 parser.add_argument("--train_LR_path", type=str, default='/data/DIV2K/LR')
 parser.add_argument("--train_GT_path", type=str, default='/data/DIV2K/HR')

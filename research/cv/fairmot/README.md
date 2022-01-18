@@ -91,10 +91,10 @@ To train the model, run the shell script `scripts/train_standalone.sh` with the 
 
 ```shell
 # standalone training
-sh scripts/run_standalone_train.sh [device_id]
+bash scripts/run_standalone_train.sh [device_id]
 
 # distributed training
-sh scripts/run_distribute_train.sh [device_num]
+bash scripts/run_distribute_train.sh [device_num]
 ```
 
 To validate the model, change the settings in `src/opts.py` to the path of the model you want to validate. For example:
@@ -107,7 +107,7 @@ self.parser.add_argument('--load_model', default='XXX.ckpt',
 Then, run the shell script `scripts/run_eval.sh` with the format below:
 
 ```shell
-sh scripts/run_eval.sh [device_id]
+bash scripts/run_eval.sh [device_id]
 ```
 
 # [Script Description](#contents)
@@ -165,13 +165,13 @@ The structure of the files in this repository is shown below.
 Run `scripts/run_standalone_train.sh` to train the model standalone. The usage of the script is:
 
 ```shell
-sh scripts/run_standalone_train.sh DEVICE_ID DATA_CFG LOAD_PRE_MODEL
+bash scripts/run_standalone_train.sh DEVICE_ID DATA_CFG LOAD_PRE_MODEL
 ```
 
 For example, you can run the shell command below to launch the training procedure.
 
 ```shell
-sh run_standalone_train.sh 0 ./dataset/ ./dla34.ckpt
+bash run_standalone_train.sh 0 ./dataset/ ./dla34.ckpt
 ```
 
 The model checkpoint will be saved into `./ckpt`.
@@ -183,13 +183,13 @@ The model checkpoint will be saved into `./ckpt`.
 Run `scripts/run_distribute_train.sh` to train the model distributed. The usage of the script is:
 
 ```shell
-sh run_distribute.sh RANK_SIZE DATA_CFG LOAD_PRE_MODEL
+bash run_distribute.sh RANK_SIZE DATA_CFG LOAD_PRE_MODEL
 ```
 
 For example, you can run the shell command below to launch the distributed training procedure.
 
 ```shell
-sh run_distribute.sh 8 ./data.json ./dla34.ckpt
+bash run_distribute.sh 8 ./data.json ./dla34.ckpt
 ```
 
 The above shell script will run distribute training in the background. You can view the results through the file `train_parallel[X]/tran[X].log` as follows:
@@ -205,13 +205,13 @@ The evaluation data set was [MOT20](https://motchallenge.net/data/MOT20/)
 Run `scripts/run_eval.sh` to evaluate the model with one Ascend processor. The usage of the script is:
 
 ```shell
-sh run_eval.sh DEVICE_ID LOAD_MODEL
+bash run_eval.sh DEVICE_ID LOAD_MODEL
 ```
 
 For example, you can run the shell command below to launch the validation procedure.
 
 ```shell
-sh run_eval.sh 0 ./dla34.ckpt
+bash run_eval.sh 0 ./dla34.ckpt
 ```
 
 The tracing results can be viewed in `/MOT20/distribute_dla34_conv`.

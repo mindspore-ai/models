@@ -19,6 +19,7 @@ import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore import context
 from mindspore.context import ParallelMode
+import mindspore.ops.functional as F
 from mindspore.parallel._auto_parallel_context import auto_parallel_context
 from mindspore.communication.management import get_group_size
 
@@ -59,6 +60,5 @@ class TrainOnestepPSNR(nn.Cell):
         if self.reducer_flag:
             # apply grad reducer on grads
             grads = self.grad_reducer(grads)
-        self.optimizer(grads)
-        return psnr_loss
+        return F.depend(psnr_loss, self.optimizer(grads))
     

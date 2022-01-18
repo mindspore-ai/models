@@ -125,8 +125,8 @@ def create_traindataset(batchsize, LR_path, GT_path):
                                          python_multiprocessing=True,
                                          num_parallel_workers=min(12, num_parallel_workers)
                                          )
-        dataloader = dataloaderS.batch(batchsize, drop_remainder=True,
-                                       num_parallel_workers=min(8, num_parallel_workers))
+        dataloader = dataloader.batch(batchsize, drop_remainder=True,
+                                      num_parallel_workers=min(8, num_parallel_workers))
     else:
         dataset = mydata(LR_path, GT_path, in_memory=True)
         dataloader = ds.GeneratorDataset(dataset, column_names=['LR', 'HR'], shuffle=True,
