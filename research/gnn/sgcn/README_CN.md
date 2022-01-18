@@ -71,7 +71,7 @@ SGCN根据正负连接分别包含三个图卷积层。每一层都以相应的�
 
 ```shell
 # 单卡训练
-bash ./scripts/run_standalone_train.sh [DEVICE_ID]
+bash ./scripts/run_standalone_train.sh [DEVICE_ID] [dataset]
 
 # Ascend多卡训练
 bash ./scripts/run_distributed_train.sh [RANK_TABLE] [RANK_SIZE] [DEVICE_START] [DATA_PATH] [DISTRIBUTED]
@@ -81,7 +81,7 @@ bash ./scripts/run_distributed_train.sh [RANK_TABLE] [RANK_SIZE] [DEVICE_START] 
 
 ```shell
 # 单卡训练
-bash ./scripts/run_standalone_train.sh 0
+bash ./scripts/run_standalone_train.sh 0 ./input/bitcoin_otc.csv
 
 # Ascend多卡训练（8P）
 bash ./scripts/run_distributed_train.sh ./rank_table_8pcs.json 8 0 ./input/bitcoin_otc.csv True
@@ -91,14 +91,14 @@ bash ./scripts/run_distributed_train.sh ./rank_table_8pcs.json 8 0 ./input/bitco
 
 ```shell
 # 评估
-bash ./scripts/run_eval.sh [checkpoint_auc] [checkpoint_f1]
+bash ./scripts/run_eval.sh [checkpoint_auc] [checkpoint_f1] [dataset]
 ```
 
 示例：
 
 ```shell
 # 评估
-bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt
+bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt ./input/bitcoin_otc.csv
 ```
 
 ## 脚本说明
@@ -107,38 +107,29 @@ bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt
 
 ```text
 .
-└── sgcn
-    └── ascend310_infer
-        ├── build.sh
-        ├── CMakeLists.txt
-        ├── inc
-        │   └── utils.h
-        └── src
-            ├── main.cc
-            └── utils.cc
-    ├── eval.py                                 # 评估
-    ├── export.py                               # 模型导出
-    ├── postprocess.py                          # 后处理
-    ├── preprocess.py                           # 预处理
-    ├── README_CN.md                            # 中文指南
-    ├── README.md
-    ├── requirements.txt                        # 依赖包
-    └── scripts
-        ├── run_distributed_train_gpu.sh
-        ├── run_distributed_train.sh            # 多卡训练脚本
-        ├── run_eval_gpu.sh
-        ├── run_eval.sh                         # 评估运行脚本
-        ├── run_export.sh                       # 模型导出运行脚本
-        ├── run_infer_310.sh                    # Ascend310推理脚本
-        ├── run_standalone_train_gpu.sh
-        └── run_standalone_train.sh             # 单卡训练脚本
-    └── src
-        ├── metrics.py                          # 计算损失和反向传播
-        ├── ms_utils.py                         # 功能函数定义
-        ├── param_parser.py                     # 参数配置
-        ├── sgcn.py                             # SGCN骨干
-        └── signedsageconvolution.py            # 定义图卷积层
-    └── train.py                                # 训练
+└─sgcn
+  ├─README_CN.md                  # 中文指南
+  |
+  ├─scripts
+  | ├─run_export.sh               # 模型导出运行脚本
+  | ├─run_eval.sh                 # 评估运行脚本
+  | ├─run_distributed_train.sh    # 多卡训练脚本
+  | ├─run_infer_310.sh            # Ascend310推理脚本
+  | └─run_standalone_train.sh     # 单卡训练脚本
+  |
+  ├─src
+  | ├─param_parser.py               # 参数配置
+  | ├─ms_utils.py                   # 功能函数定义
+  | ├─sgcn.py                       # SGCN骨干
+  | ├─signedsageconvolution.py      # 定义图卷积层
+  | └─metrics.py                    # 计算损失和反向传播
+  |
+  ├─requirements.txt                # 依赖包
+  ├─train.py                        # 训练
+  ├─eval.py                         # 评估
+  ├─preprocess.py                   # 预处理
+  ├─postprocess.py                  # 后处理
+  └─export.py                       # 模型导出
 ```
 
 ### 脚本参数
@@ -161,7 +152,7 @@ bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt
 
 ```shell
 # 单卡训练
-bash ./scripts/run_standalone_train.sh 0
+bash ./scripts/run_standalone_train.sh 0 ./input/bitcoin_otc.csv
 
 # Ascend多卡训练（8P）
 bash ./scripts/run_distributed_train.sh ./rank_table_8pcs.json 8 0 ./input/bitcoin_otc.csv True
@@ -208,7 +199,7 @@ Training fished! The best AUC and F1-Score is: 0.8689866859770485 0.942584375420
 
 ```shell
 # 评估
-bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt
+bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt ./input/bitcoin_otc.csv
 ```
 
 #### 结果
@@ -230,7 +221,7 @@ F1-Score: 0.930903
 
 ```shell
 # MINDIR模型导出
-bash ./scripts/run_export.sh 0
+bash ./scripts/run_export.sh 0 ./input/bitcoin_otc.csv
 ```
 
 #### 结果
