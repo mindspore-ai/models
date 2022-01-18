@@ -339,6 +339,8 @@ train.py中主要参数如下：
                         恢复训练形状。 默认值：""
   --resize_rate RESIZE_RATE
                         多尺度训练的缩放速率。 默认值：10
+  --transfer_train TRANSFER_TRAIN
+                        是否在其他数据集上进行迁移学习, 如果设置True filter_weight功能也开启。 默认值：False
 ```
 
 ## [训练过程](#目录)
@@ -422,9 +424,12 @@ bash run_distribute_train.sh dataset/coco2017 cspdarknet53_backbone.ckpt rank_ta
 可以基于预训练分类或检测模型来训练自己的模型。 按照以下步骤进行迁移学习。
 
 1. 将数据集转换为COCO样式。 否则，必须添加自己的数据预处理代码。
-2. 根据自己的数据集设置config.py，特别是`num_classes`。
-3. 在调用`train.py`时，将参数`filter_weight`设置为`True`，`pretrained_checkpoint`设置为预训练检查点，这样将从预训练模型中筛选出最终的检测框权重。
-4. 使用新的配置和参数构建自己的bash脚本。
+2. 修改 `default_config.yaml` 文件:
+   1) 根据适配的数据集修改`labels`。
+   2) 修改`transfer_train` 为 `True` 开启迁移学习功能。
+   3) `pretrained_checkpoint` 用于指定加载的预训练权重，如果没有设置将会自动下载在coco数据集上预训练的权重。
+   4) 修改`run_eval` 为 `True` 开启训练中验证集评估的功能。
+3. 使用新的配置和参数构建自己的bash脚本。
 
 ## [评估过程](#目录)
 

@@ -123,4 +123,13 @@ def get_config():
     final_config = merge(args, default)
     return Config(final_config)
 
+def convert_training_shape(args_training_shape):
+    training_shape = [int(args_training_shape), int(args_training_shape)]
+    return training_shape
+
 config = get_config()
+config.num_classes = len(config.labels)
+config.out_channel = 3 * (config.num_classes + 5)
+
+if config.training_shape:
+    config.multi_scale = [convert_training_shape(config.training_shape)]

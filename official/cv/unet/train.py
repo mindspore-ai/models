@@ -100,9 +100,7 @@ def train_net(cross_valid_ind=1,
     train_data_size = train_dataset.get_dataset_size()
     print("dataset length is:", train_data_size)
     ckpt_save_dir = os.path.join(config.output_path, config.checkpoint_path)
-    save_ck_steps = train_data_size
-    if config.device_target == "GPU":
-        save_ck_steps = train_data_size * epochs
+    save_ck_steps = train_data_size * epochs
     ckpt_config = CheckpointConfig(save_checkpoint_steps=save_ck_steps,
                                    keep_checkpoint_max=config.keep_checkpoint_max)
     ckpoint_cb = ModelCheckpoint(prefix='ckpt_{}_adam'.format(config.model_name),

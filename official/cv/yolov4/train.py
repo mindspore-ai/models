@@ -26,8 +26,6 @@ from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.callback import ModelCheckpoint, RunContext
 from mindspore.train.callback import CheckpointConfig
 import mindspore as ms
-from mindspore import amp
-from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.common import set_seed
 from mindspore.profiler.profiling import Profiler
 
@@ -37,7 +35,6 @@ from src.util import AverageMeter, get_param_groups
 from src.lr_scheduler import get_lr
 from src.yolo_dataset import create_yolo_dataset
 from src.initializer import default_recurisive_init, load_yolov4_params
-from src.util import keep_loss_fp32
 from src.eval_utils import apply_eval, EvalCallBack
 
 from model_utils.config import config
@@ -68,12 +65,12 @@ def set_default():
 
     # init distributed
     if config.is_distributed:
-        if config.device_target == "Ascend":
-            init()
-        else:
-            init("nccl")
+        init()
         config.rank = get_rank()
         config.group_size = get_group_size()
+    else:
+        config.rank = 0
+        config.group_size = 1
 
     # select for master rank save ckpt or all rank save, compatible for model parallel
     config.rank_save_ckpt_flag = 0
@@ -90,11 +87,6 @@ def set_default():
     config.logger.save_args(config)
 
     return profiler
-
-
-def convert_training_shape(args_training_shape):
-    training_shape = [int(args_training_shape), int(args_training_shape)]
-    return training_shape
 
 
 class InternalCallbackParam(dict):
@@ -179,17 +171,8 @@ def get_network(net, cfg, learning_rate):
                    momentum=cfg.momentum,
                    weight_decay=cfg.weight_decay,
                    loss_scale=cfg.loss_scale)
-    is_gpu = context.get_context("device_target") == "GPU"
-    if is_gpu:
-        loss_scale_value = 1.0
-        loss_scale = FixedLossScaleManager(loss_scale_value, drop_overflow_update=False)
-        net = amp.build_train_network(net, optimizer=opt, loss_scale_manager=loss_scale,
-                                      level="O2", keep_batchnorm_fp32=False)
-        keep_loss_fp32(net)
-    else:
-        net = TrainingWrapper(net, opt)
-        net.set_train()
-
+    net = TrainingWrapper(net, opt)
+    net.set_train()
     return net
 
 
@@ -214,9 +197,6 @@ def run_train():
 
     network = YoloWithLossCell(network)
     config.logger.info('finish get network')
-
-    if config.training_shape:
-        config.multi_scale = [convert_training_shape(config.training_shape)]
 
     ds, data_size = create_yolo_dataset(image_dir=config.data_root, anno_path=config.annFile, is_training=True,
                                         batch_size=config.per_batch_size, max_epoch=config.max_epoch,

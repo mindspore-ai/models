@@ -47,6 +47,7 @@ save_best_ckpt: True
 eval_start_epoch: 200
 eval_interval: 1
 ann_file: ""
+transfer_train: False
 
 # Eval options
 pretrained: ""
@@ -110,8 +111,6 @@ anchor_scales: [[12, 16],
                 [192, 243],
                 [459, 401]]
 
-num_classes: 80
-out_channel: 255 # 3 * (num_classes + 5)
 test_img_shape: [608, 608]
 labels: ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
         'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat',
@@ -141,6 +140,7 @@ pretrained_backbone: "The ckpt file of CspDarkNet53."
 resume_yolov4: "The ckpt file of YOLOv4, which used to fine tune."
 pretrained_checkpoint: "The ckpt file of YoloV4CspDarkNet53."
 filter_weight: "Filter the last weight parameters"
+transfer_train: "If set it True, transfer training on other dataset, and set filter_weight True"
 lr_scheduler: "Learning rate scheduler, options: exponential, cosine_annealing."
 lr: "Learning rate."
 lr_epochs: "Epoch of changing of lr changing, split with ','."

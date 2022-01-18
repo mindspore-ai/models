@@ -187,3 +187,46 @@ def keep_loss_fp32(network):
     for _, cell in network.cells_and_names():
         if isinstance(cell, (YoloLossBlock,)):
             cell.to_float(mstype.float32)
+
+def calculate_md5(fpath: str, chunk_size: int = 1024 * 1024) -> str:
+    """Calculate md5 of a file."""
+    import hashlib
+    md5 = hashlib.md5()
+    with open(fpath, "rb") as f:
+        for chunk in iter(lambda: f.read(chunk_size), b""):
+            md5.update(chunk)
+    return md5.hexdigest()
+
+def download_pretrain_ckpt(cfg):
+    """Download pretrained checkpoint of YOLOv4."""
+    import os
+    import time
+    import urllib.request
+    url = "https://download.mindspore.cn/model_zoo/r1.3/yolov4_ascend_v130_coco2017_official_cv_bs8_acc44/" \
+          "yolov4_ascend_v130_coco2017_official_cv_bs8_acc44.ckpt"
+    md5 = "c67a83d402029e49142a27b346812e22"
+    cfg.logger.info('== Downloading ' + url)
+    data = urllib.request.urlopen(url)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, "../yolov4_coco2017.ckpt")
+    if os.path.exists(file_path) and calculate_md5(file_path) == md5:
+        return file_path
+    if cfg.rank == 0:
+        with open(file_path, 'wb') as f:
+            f.write(data.read())
+    else:
+        time_count = 0
+        # Judge whether the file exists and exit after 3 minutes.
+        while not os.path.exists(file_path) or time_count < 60 * 3:
+            time.sleep(1)
+            time_count += 1
+    if not os.path.exists(file_path):
+        cfg.logger.error('Downloading pretrained checkpoint failed, please download it from {}, '
+                         'and set pretrained_checkpoint path.'.format(url))
+        return None
+    if calculate_md5(file_path) != md5:
+        cfg.logger.error('Downloading pretrained checkpoint failed, please download it from {}, '
+                         'and set pretrained_checkpoint path.'.format(url))
+        os.remove(file_path)
+        return None
+    return file_path
