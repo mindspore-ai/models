@@ -10,9 +10,11 @@ include_directories(${MINDSPORE_PATH}/include)
 include_directories(${PROJECT_SRC_ROOT})
 include_directories(${OpenCV_INCLUDE_DIRS})
 message(${OpenCV_INCLUDE_DIRS})
-message(${OpenCV_LIBS})
 find_library(MS_LIB libmindspore.so ${MINDSPORE_PATH}/lib)
 file(GLOB_RECURSE MD_LIB ${MINDSPORE_PATH}/_c_dataengine*)
+file(GLOB_RECURSE OpenCV_LIBS ${MINDSPORE_PATH}/lib/libopencv_*)
+
+message(${OpenCV_LIBS})
 
 add_executable(main src/main.cc src/utils.cc)
 target_link_libraries(main ${OpenCV_LIBS} ${MS_LIB} ${MD_LIB} gflags)
