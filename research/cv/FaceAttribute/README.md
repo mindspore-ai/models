@@ -48,7 +48,26 @@ mask:
     1: without mask
 ```
 
-We use about 91K face images as training dataset and 11K as evaluating dataset in this example, and you can also use your own datasets or open source datasets (e.g. FairFace and RWMFD)
+We use about 91K face images as training dataset and 11K as evaluating dataset in this example(e.g. FairFace and RWMFD)
+
+- step 1: Download [FairFace](https://github.com/joojs/fairface) and [RWMFD](https://github.com/X-zhangyang/Real-World-Masked-Face-Dataset) dataset
+
+- step 2: Preprocess dataset
+
+    ```shell
+    2.1. Download the FairFace and RWMFD datasets respectively, and put the downloaded zip file in the directory where the description file is located.
+    2.2. Unzip package RWMFD in place, get folder 'Real-World-Masked-Face-Dataset-master' after unzipping, enter this folder, unzip package 'RMFD_part_2', and get folder 'RWMFD_part_2_pro'.
+    2.3. Unzip the fairface package in place to get the 'train' and 'val' folders
+    2.4. Convert the dataset to txt file，execute the following scripts in sequence:
+            python src/far_process_fairface.py
+            python src/far_process_RWMF.py
+            python src/far_merge_RWMF_fairface.py
+    2.5. Convert the dataset to mindrecord:
+            python src/data_to_mindrecord_train.py
+            python src/data_to_mindrecord_eval.py
+    ```
+
+You can also use your own datasets or other open source datasets or other open source datasets
 
 - step 1: The dataset should be saved in a txt file, which contain the following contents:
 
