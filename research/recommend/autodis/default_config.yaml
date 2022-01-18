@@ -67,6 +67,14 @@ TrainConfig:
     eval_callback: True
     loss_callback: True
 
+# src/preprocess_data.py "Recommendation dataset"
+# data_path: "./recommendation_dataset/"
+dense_dim: 13
+slot_dim: 26
+threshold: 100
+train_line_count: 45840617
+skip_id_convert: 0
+
 ---
 # Help description for each configuration
 # Parameters that been used on ModelArts
