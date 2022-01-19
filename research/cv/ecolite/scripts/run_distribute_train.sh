@@ -56,5 +56,5 @@ do
     export DEVICE_ID=${i}
     export RANK_ID=${i}
     echo "start distributed training for rank $RANK_ID, device $DEVICE_ID"
-    python3 -u train.py --dataset ${dataset_name} --modality RGB --train_list ${train_path} --val_list ${val_path} --arch ${netType} --num_segments ${num_segments}  --lr ${learning_rate} --num_saturate 5 --epochs 60 --batch-size ${batch_size} --dropout ${dropout} --consensus_type identity --rgb_prefix img_  --no_partialbn True --nesterov True --run_distribute=True --resume ${resume} --device_id ${DEVICE_ID} &>./scripts/$nowtime/'train$i.log &
+    python3 -u train.py --dataset ${dataset_name} --modality RGB --train_list ${train_path} --val_list ${val_path} --arch ${netType} --num_segments ${num_segments}  --lr ${learning_rate} --num_saturate 5 --epochs 60 --batch-size ${batch_size} --dropout ${dropout} --consensus_type identity --rgb_prefix img_  --no_partialbn True --nesterov True --run_distribute=True --resume ${resume} --device_id ${DEVICE_ID} &>./scripts/$nowtime/train$i.log &
 done
