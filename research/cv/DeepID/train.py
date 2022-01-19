@@ -32,7 +32,7 @@ from src.report import Reporter
 parser = argparse.ArgumentParser(description='DeepID')
 
 parser.add_argument('--data_url', type=str, default='./data/', help='Dataset path')
-parser.add_argument('--train_url', type=str, default=None, help='Train output path')
+parser.add_argument('--train_url', type=str, default='./data/', help='Train output path')
 parser.add_argument('--epochs', type=int, default=200, help='number of epochs')
 parser.add_argument('--input_dim', type=int, default=3, help='image dim')
 parser.add_argument('--num_class', type=int, default=1283, help='number of classes')
@@ -41,7 +41,7 @@ parser.add_argument('--batch_size', type=int, default=2048, help='batch size')
 parser.add_argument("--ckpt_path", type=str, default='./ckpt_path_11/', help="Checkpoint saving path.")
 parser.add_argument("--run_distribute", type=int, default=0, help="Run distribute, default: 0.")
 parser.add_argument("--device_id", type=int, default=0, help="device id, default: 0.")
-parser.add_argument("--device_target", type=str, default='Ascend', help="device target")
+parser.add_argument("--device_target", type=str, default='GPU', help="device target")
 parser.add_argument("--device_num", type=int, default=1, help="number of device, default: 1.")
 parser.add_argument("--rank_id", type=int, default=0, help="Rank id, default: 0.")
 parser.add_argument('--modelarts', type=ast.literal_eval, default=False, help='Dataset path')
@@ -92,6 +92,7 @@ if __name__ == '__main__':
         context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target,
                             device_id=args_opt.device_id, save_graphs=False)
         dataset_path = args_opt.data_url
+        rank = 0
         if args_opt.run_distribute:
             if os.getenv("DEVICE_ID", "not_set").isdigit():
                 context.set_context(device_id=int(os.getenv("DEVICE_ID")))
@@ -130,6 +131,7 @@ if __name__ == '__main__':
 
     epoch_iter = int(train_datalength / args_opt.batch_size)
     num_iters = int(epoch_iter * args_opt.epochs / args_opt.device_num)
+    epoch_iter = int(epoch_iter / args_opt.device_num)
     start = time()
     reporter = Reporter(num_iters)
     best_acc = 0
@@ -159,9 +161,8 @@ if __name__ == '__main__':
             aver_acc = valid_acc / val_iter
             print('Average Acc in Valid dataset: ', aver_acc*100, '%')
             if aver_acc >= best_acc:
-                best_acc = aver_acc
-                save_checkpoint(deepid, args_opt.ckpt_path+'ckpt_deepid_best.ckpt')
-
-    save_checkpoint(deepid, args_opt.ckpt_path+'ckpt_deepid_final.ckpt')
-    if args_opt.run_modelarts:
+                if rank == 0:
+                    best_acc = aver_acc
+                    save_checkpoint(deepid, args_opt.ckpt_path+"ckpt_deepid_best_{}.ckpt".format(rank))
+    if args_opt.modelarts:
         mox.file.copy_parallel(save_checkpoint_path, args_opt.train_url)

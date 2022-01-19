@@ -80,8 +80,12 @@ python split.py
   ├─ scripts
     ├─ run_standalone_train_ascend.sh // Train standalone
     ├─ run_distribute_train_ascend.sh // Train distribute
-    └─ run_eval_ascend.sh             // Evaluation
-    └─ run_infer_310.sh               // 310 inference
+    ├─ run_eval_ascend.sh             // Evaluation
+    ├─ run_infer_310.sh               // 310 inference
+    ├─ eval_ascend.sh             // Evaluation
+    ├─ run_standalone_train_gpu.sh // Train standalone
+    ├─ run_distribute_train_gpu.sh // Train distribute
+    └─ eval_gpu.sh             // Evaluation
   ├─src
     ├─ dataset.py                     // Prepare dataset
     ├─ loss.py                        // Loss function
@@ -120,16 +124,31 @@ After installing MindSpore, follow these steps:
 
 ## [Training Process](#Contents)
 
-```shell
+Train on Ascend
 
+```shell
 # train standalone
-sh run_standalone_train_ascend.sh [DEVICE_NUM] [DEVICE_ID]
+bash run_standalone_train_ascend.sh [DEVICE_NUM] [DEVICE_ID]
 
 # train distribute
-sh run_distribute_train.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE]
+bash run_distribute_train.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE]
+```
+
+Train on GPU
+
+```shell
+# train standalone
+bash run_standalone_train_gpu.sh [DEVICE_ID] [DATA_DIR]
+for example: bash run_standalone_train_gpu.sh 0 ./data
+
+# train distribute
+bash run_distribute_train_gpu.sh [DEVICE_NUM] [CUDA_VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [DATA_DIR]
+for example: bash run_distribute_train_gpu.sh 8 0,1,2,3,4,5,6,7 /home/DeepID/data
 ```
 
 ## [Prediction Process](#Contents)
+
+Eval on Ascend
 
 ```shell
 # Evaluation on Ascend
@@ -155,6 +174,15 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 - `DATA_PATH` Directionary of dataset
 - `DEVICE_ID` Optional, default 0
 
+=======
+Eval on GPU
+
+```shell
+# Evaluation on GPU
+bash eval_gpu.sh [DEVICE_ID] [CHECKPOINTPATH] [DATA_DIR] [MODE(valid,test)]
+for example: bash eval_gpu.sh 0 /home/DeepID.ckpt /home/DeepID/data valid
+```
+
 # [Result](#Contents)
 
 The evaluation results will be saved in the sample path in a log file named "log_eval.txt". You can find results similar to the following in the log.
@@ -169,32 +197,32 @@ Valid dataset accuracy: 0.9683
 
 ### Training Performance
 
-| Parameters                 | Ascend 910                                                  |
-| -------------------------- | ----------------------------------------------------------- |
-| Model Version              | DeepID                                                      |
-| Resource                   | Ascend                                                      |
-| uploaded Date              | 11/04/2021 (month/day/year)                                 |
-| MindSpore Version          | 1.3.1                                                       |
-| Dataset                    | Youtube Face                                                |
-| Training Parameters        | epochs=200, batch_size=1024, lr=0.0001                      |
-| Optimizer                  | Adam                                                        |
-| outputs                    | Accuracy = 99.18%                                           |
-| Speed                      | 1pc: 900 ms/step;                                           |
-| Total time                 | 1pc: 3h6s;                                                  |
-| Parameters (M)             | 4.56  M                                                     |
-| Checkpoint for Fine tuning | 2.03  M (.ckpt file)                                        |
+| Parameters                 | Ascend 910                                                  |GPU|
+| -------------------------- | ----------------------------------------------------------- |---|
+| Model Version              | DeepID                                                      |DeepID|
+| Resource                   | Ascend                                                      |GPU|
+| uploaded Date              | 11/04/2021 (month/day/year)                                 |11/18/2021|
+| MindSpore Version          | 1.3.1                                                       |1.5.0|
+| Dataset                    | Youtube Face                                                |Youtube Face|
+| Training Parameters        | epochs=200, batch_size=1024, lr=0.0001                      |epochs=200, batch_size=2048, lr=0.0001|
+| Optimizer                  | Adam                                                        |Adam|
+| outputs                    | Accuracy = 99.18%                                           |Accuracy = 99.24%|
+| Speed                      | 1pc: 900 ms/step;                                           |1pc: 1250 ms/step 8pc:290 ms/step|
+| Total time                 | 1pc: 3h6s;                                                  |1pc: 4:44:52 8pc:0:50:23|
+| Parameters (M)             | 4.56  M                                                     |4.56  M   |
+| Checkpoint for Fine tuning | 2.03  M (.ckpt file)                                        |2.03  M (.ckpt file)   |
 
 ### Inference Performance
 
-| Parameters          | Ascend 910                      |
-| ------------------- | ---------------------------     |
-| Model Version       | DeepID                          |
-| Resource            | Ascend                          |
-| Uploaded Date       | 11/04/2021 (month/day/year)     |
-| MindSpore Version   | 1.3.1                           |
-| Dataset             | Youtube Face                    |
-| batch_size          | 512                             |
-| outputs             | Accuracy = 96.83%               |
+| Parameters          | Ascend 910                      |GPU|
+| ------------------- | ---------------------------     |---|
+| Model Version       | DeepID                          |DeepID|
+| Resource            | Ascend                          |GPU|
+| Uploaded Date       | 11/04/2021 (month/day/year)     |11/18/2021|
+| MindSpore Version   | 1.3.1                           |1.5.0|
+| Dataset             | Youtube Face                    |Youtube Face|
+| batch_size          | 512                             |256|
+| outputs             | Accuracy = 96.83%               |Accuracy = 95.05%|
 
 | Parameters          | Ascend 310                      |
 | ------------------- | ---------------------------     |
