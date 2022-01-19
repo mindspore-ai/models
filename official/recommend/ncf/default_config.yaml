@@ -21,6 +21,7 @@ num_neg: 4
 layers: [64, 32, 16]
 num_factors: 16
 checkpoint_path: "./checkpoint/"
+num_parallel_workers: 1
 
 # Eval options
 eval_file_name: "eval.log"
@@ -60,3 +61,4 @@ eval_file_name: "Eval output file."
 checkpoint_file_path: "The location of the checkpoint file."
 pre_result_path: "saving dataset to numpy format path."
 post_result_path: "inference result path."
+num_parallel_workers: "Number of parallel workers for dataset."

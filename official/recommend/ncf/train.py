@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -67,7 +67,8 @@ def run_train():
 
     ds_train, num_train_users, num_train_items = create_dataset(test_train=True, data_dir=config.data_path,
                                                                 dataset=config.dataset, train_epochs=1,
-                                                                batch_size=config.batch_size, num_neg=config.num_neg)
+                                                                batch_size=config.batch_size, num_neg=config.num_neg,
+                                                                num_parallel_workers=config.num_parallel_workers)
     print("ds_train.size: {}".format(ds_train.get_dataset_size()))
 
     ncf_net = NCFModel(num_users=num_train_users,
