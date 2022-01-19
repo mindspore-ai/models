@@ -45,7 +45,7 @@ ECO-Lite模型，发表于ECCV 2018，ECO: Efficient Convolutional Network for O
 
 - 数据集大小：共101 类，大小为(320, 240)
 
-- 训练集：官方数据集[划分地址](https://www.crcv.ucf.edu/wpcontent/uploads/2019/03/UCF101TrainTestSplits-RecognitionTask.zip)
+- 训练集：官方数据集[划分地址](https://www.crcv.ucf.edu/wp-content/uploads/2019/03/UCF101TrainTestSplits-RecognitionTask.zip)
 
 - 测试集：同上
 
