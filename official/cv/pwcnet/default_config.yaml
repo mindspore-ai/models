@@ -1,0 +1,53 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+eval_url: ""
+checkpoint_url: ""
+# Path for local
+data_path: "/cache/data/"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+device_target: 'Ascend'
+need_modelarts_dataset_unzip: False
+modelarts_dataset_unzip_name: ""
+
+# ==============================================================================
+# options
+task: 'PWCNet'
+
+# dataset related
+batch_size: 4 
+training_augmentations: True
+
+num_parallel_workers: 4 
+train_label_file: ./data/MPI-Sintel/
+eval_dir: ./data/FlyingChairs/
+
+# network structure related
+steps_per_epoch: 0
+loss_scale: 1024
+
+# optimizer related
+lr: 0.0001
+lr_epochs: '4,6,8'
+lr_gamma: 0.5
+max_epoch: 10
+warmup_epochs: 0
+pretrained: ""
+model_url: ''
+
+# logging related
+log_interval: 20
+ckpt_path: './output'
+ckpt_interval: 5500
+
+# train option
+is_distributed: 0
+
+# eval option
+eval_dir: ''
+val_batch_size: 1 
+valid_augmentations: False
+
