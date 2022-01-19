@@ -31,10 +31,10 @@ if __name__ == '__main__':
             with open(mat_path, 'r') as f:
                 readers = list(csv.reader(f))
                 for img_name in os.listdir(jpg_path):
-                    if not  img_name.endswith('.jpg'):
+                    if not img_name.endswith('.jpg'):
                         continue
                     image_num = int(img_name.replace('.jpg', ''))
-                    row = readers[img_name]
+                    row = readers[image_num]
                     txt.write('./' + row[0] + ' ')
 
                     if row[1] == '0-2':
