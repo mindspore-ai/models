@@ -18,7 +18,6 @@ include_background: True
 run_eval: False
 run_distribute: False
 dataset: "Cell_nuclei"
-python_multiprocessing: True
 crop: None
 image_size : [96, 96]
 lr: 0.0003
@@ -62,7 +61,6 @@ file_format: "MINDIR"
 # Help description for each configuration
 enable_modelarts: "Whether training on modelarts, default: False"
 data_url: "Dataset url for obs"
-python_multiprocessing: "Whether use python_multiprocessing to create dataset, default is True"
 train_url: "Training output url for obs"
 checkpoint_url: "The location of checkpoint for obs"
 data_path: "Dataset path for local"
