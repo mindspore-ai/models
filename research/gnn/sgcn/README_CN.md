@@ -71,7 +71,7 @@ SGCN根据正负连接分别包含三个图卷积层。每一层都以相应的�
 
 ```shell
 # 单卡训练
-bash ./scripts/run_standalone_train.sh [DEVICE_ID]
+bash ./scripts/run_standalone_train.sh [DEVICE_ID] [dataset]
 
 # Ascend多卡训练
 bash ./scripts/run_distributed_train.sh [RANK_TABLE] [RANK_SIZE] [DEVICE_START] [DATA_PATH] [DISTRIBUTED]
@@ -81,7 +81,7 @@ bash ./scripts/run_distributed_train.sh [RANK_TABLE] [RANK_SIZE] [DEVICE_START] 
 
 ```shell
 # 单卡训练
-bash ./scripts/run_standalone_train.sh 0
+bash ./scripts/run_standalone_train.sh 0 ./input/bitcoin_otc.csv
 
 # Ascend多卡训练（8P）
 bash ./scripts/run_distributed_train.sh ./rank_table_8pcs.json 8 0 ./input/bitcoin_otc.csv True
@@ -91,14 +91,14 @@ bash ./scripts/run_distributed_train.sh ./rank_table_8pcs.json 8 0 ./input/bitco
 
 ```shell
 # 评估
-bash ./scripts/run_eval.sh [checkpoint_auc] [checkpoint_f1]
+bash ./scripts/run_eval.sh [checkpoint_auc] [checkpoint_f1] [dataset]
 ```
 
 示例：
 
 ```shell
 # 评估
-bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt
+bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt ./input/bitcoin_otc.csv
 ```
 
 ## 脚本说明
@@ -152,7 +152,7 @@ bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt
 
 ```shell
 # 单卡训练
-bash ./scripts/run_standalone_train.sh 0
+bash ./scripts/run_standalone_train.sh 0 ./input/bitcoin_otc.csv
 
 # Ascend多卡训练（8P）
 bash ./scripts/run_distributed_train.sh ./rank_table_8pcs.json 8 0 ./input/bitcoin_otc.csv True
@@ -199,7 +199,7 @@ Training fished! The best AUC and F1-Score is: 0.8689866859770485 0.942584375420
 
 ```shell
 # 评估
-bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt
+bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt ./input/bitcoin_otc.csv
 ```
 
 #### 结果
@@ -221,7 +221,7 @@ F1-Score: 0.930903
 
 ```shell
 # MINDIR模型导出
-bash ./scripts/run_export.sh 0
+bash ./scripts/run_export.sh 0 ./input/bitcoin_otc.csv
 ```
 
 #### 结果
