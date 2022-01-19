@@ -1,0 +1,87 @@
+# make datasets
+generate_data:
+  path_mt_human: /cache/human_matting # downloaded data path, absolute path
+  path_save: /cache/datasets # datasets save path, absolute path
+  path_debug: /cache/datasets_debug # debug datasets save path, absolute path
+
+  proportion: '6:2:2' # division proportion of train , eval and test datasets
+  debug_pic_nums: 400 # the nums of debug datasets
+  copy_pic: True # create dir,  and copy images from download data
+  generate_mask: True # generate mask images
+  generate_txt: True # generate txt file for train, eval and test data
+  generate_trimap: True # generate trimap images
+  ksize: 10 # kernel size
+  fixed_ksize: True # fix or disturb the kernel size of generating trimap
+  generate_alpha: True # generate alpha images
+  generate_debug: True # generate debug datasets
+  generate_mean_std: True # generate train and eval datasets mean and std.
+
+  list_error_files: ['/cache/human_matting/matting/1803201916/._matting_00000000',
+                     '/cache/human_matting/clip_img/1803241125/clip_00000000/._1803241125-00000005.jpg']
+
+# train config
+seed: 9527
+rank: 0
+group_size: 8
+device_target: 'Ascend'
+saveIRFlag: False # save IR graph
+ckpt_version: ckpt_s2 # ckpt save version
+
+pre_train_t_net: # T-Net config
+  rank: 0
+  group_size: 8
+  finetuning: True
+  nThreads: 4
+  train_batch: 8
+  patch_size: 320
+  lr: 1e-3
+  nEpochs: 1000
+  save_epoch: 1 # save ckpt file per epoch
+  keep_checkpoint_max: '10' # maximum number of checkpoint files can be saved. support 'all', '0', '1', '2', ...
+  train_phase: pre_train_t_net # current train stage
+
+pre_train_m_net: # M-Net config
+  rank: 0
+  group_size: 8
+  finetuning: True
+  nThreads: 1
+  train_batch: 8
+  patch_size: 320
+  lr: 1e-4
+  nEpochs: 200
+  save_epoch: 1
+  keep_checkpoint_max: '10'
+  train_phase: pre_train_m_net
+
+end_to_end: # End-to-End config
+  rank: 0
+  group_size: 8
+  finetuning: True
+  nThreads: 1
+  train_batch: 8
+  patch_size: 320
+  lr: 1e-4
+  nEpochs: 200
+  save_epoch: 1
+  keep_checkpoint_max: '10'
+  train_phase: end_to_end
+
+# test config
+test:
+  device_target: 'Ascend'
+  model: /cache/output/distribute/ckpt_s2/end_to_end/semantic_hm_best.ckpt
+  test_pic_path: /cache/datasets
+  output_path: /cache/output/distribute/test_result
+  size: 320
+
+# inference config
+infer:
+  file_test_list: /cache/datasets/test/test.txt # absolute path
+  size: 320
+
+# export config
+export:
+  ckpt_file: /cache/output/distribute/ckpt_s2/end_to_end/semantic_hm_best.ckpt
+  file_name: shm_export
+  file_format: 'MINDIR'
+  device_target: 'Ascend'
