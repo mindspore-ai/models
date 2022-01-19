@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -gt 1 ]]; then
-    echo "Usage: bash ./scripts/run_export.sh [DEVICE_ID]"
+if [[ $# -gt 2 ]]; then
+    echo "Usage: bash ./scripts/run_export.sh [DEVICE_ID] [DATASET]"
 exit 1
 fi
 
@@ -23,4 +23,4 @@ if [ ! -d "logs" ]; then
         mkdir logs
 fi
 
-nohup python -u export.py --device_id=$1 > logs/export.log 2>&1 &
+nohup python -u export.py --device_id=$1 --edge_path=$2 --features-path=$2 > logs/export.log 2>&1 &

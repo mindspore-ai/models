@@ -297,7 +297,7 @@ epoch: 10 step: 1487, loss is 0.935484
 epoch time: 656751.908 ms, per step time: 441.662 ms
 ```
 
-- distributed training (Ascend 910 * 2), batch_size = 16 (batch_size = 8 per device)
+- distributed training (Ascend 910 * 8), batch_size = 16 (batch_size = 2 per device)
 
 ```bash
 Using Poly LR Scheduler!
@@ -377,7 +377,8 @@ Auto-DeepLab S
 
 Note: In the paper, Itr-0.5M, 1M & 1.5M are correspondent to Epoch 1344, 2688, 4032, due to batch size = 8.
 In order to reach such mIOU in paper, you should fine-tune Batch-Normalization parameters, which means batch size should
-be 16 or larger. Simply, we set batch size = 16 and Epoch 1300, 2700, 4000 correspondent to Itr-0.5M, 1M & 1.5M in paper.
+be 16 or larger. Simply, we set batch size = 16 and Epoch 1300, 2700, 4000 correspondent to Itr-0.5M, 1M & 1.5M in paper,
+and the best bn_momentum corresponding to different epochs are shown below.
 
 ### Distributed Training Performance
 
@@ -387,7 +388,7 @@ be 16 or larger. Simply, we set batch size = 16 and Epoch 1300, 2700, 4000 corre
 | uploaded Date              | 11/11/2021 (month/day/year)                                 |
 | MindSpore Version          | 1.3.0                                                       |
 | Dataset                    | Cityscapes (cropped 769*769)                                |
-| Training Parameters        | epoch=(1300, 2700, 4000), batch_size = 16, lr=0.05, bn_momentum=0.995                   |
+| Training Parameters        | epoch=(1300, 2700, 4000), batch_size = 16, lr=0.05, bn_momentum=(0.995, 0.9, 0.99)  |
 | Optimizer                  | Momentum                                                    |
 | Loss Function              | Cross Entropy with Online Hard Example Mining               |
 | outputs                    | probability                                                 |

@@ -79,7 +79,7 @@ After preparing the dataset you can start training and evaluation as follows：
 
 ```shell
 # standalone training
-bash ./scripts/run_standalone_train.sh [DEVICE_ID]
+bash ./scripts/run_standalone_train.sh [DEVICE_ID] [dataset]
 
 # distributed training
 bash ./scripts/run_distributed_train.sh [RANK_TABLE] [RANK_SIZE] [DEVICE_START] [DATA_PATH] [DISTRIBUTED]
@@ -89,7 +89,7 @@ Example：
 
 ```shell
 # standalone training
-bash ./scripts/run_standalone_train.sh 0
+bash ./scripts/run_standalone_train.sh 0 ./input/bitcoin_otc.csv
 
 # distributed training (8p)
 bash ./scripts/run_distributed_train.sh ./rank_table_8pcs.json 8 0 ./input/bitcoin_otc.csv True
@@ -99,14 +99,14 @@ bash ./scripts/run_distributed_train.sh ./rank_table_8pcs.json 8 0 ./input/bitco
 
 ```shell
 # evaluate
-bash ./scripts/run_eval.sh [checkpoint_auc] [checkpoint_f1]
+bash ./scripts/run_eval.sh [checkpoint_auc] [checkpoint_f1] [dataset]
 ```
 
 Example：
 
 ```shell
 # evaluate
-bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt
+bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt ./input/bitcoin_otc.csv
 ```
 
 ### [Running on GPU](#contents)
@@ -213,7 +213,7 @@ For more parameter information refer to the contents of `param_parser.py`
 
 ```shell
 # standalone training
-bash ./scripts/run_standalone_train.sh 0
+bash ./scripts/run_standalone_train.sh 0 ./input/bitcoin_otc.csv
 
 # distribute trainng
 bash ./scripts/run_distributed_train.sh ./rank_table_8pcs.json 8 0 ./input/bitcoin_otc.csv True
@@ -304,7 +304,7 @@ Training fished! The best AUC and F1-Score is: 0.8725269948824887 0.938888158759
 #### Ascend
 
 ```shell
-bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt
+bash ./scripts/run_eval.sh sgcn_otc_auc.ckpt sgcn_otc_f1.ckpt ./input/bitcoin_otc.csv
 ```
 
 Result:
@@ -348,7 +348,7 @@ If you want to infer the network on Ascend 310, you should convert the model to 
 #### Ascend
 
 ```shell
-bash ./scripts/run_export.sh 0
+bash ./scripts/run_export.sh 0 ./input/bitcoin_otc.csv
 ```
 
 Result:
