@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -gt 2 ]]; then
-    echo "Usage: bash ./scripts/run_eval.sh [checkpoint_auc] [checkpoint_f1]"
+if [[ $# -gt 3 ]]; then
+    echo "Usage: bash ./scripts/run_eval.sh [checkpoint_auc] [checkpoint_f1] [dataset]"
 exit 1
 fi
 
@@ -23,4 +23,4 @@ if [ ! -d "logs" ]; then
         mkdir logs
 fi
 
-nohup python -u eval.py --checkpoint_auc=sgcn_otc_auc.ckpt --checkpoint_f1=sgcn_otc_f1.ckpt > logs/eval.log 2>&1 &
+nohup python -u eval.py --checkpoint_auc=$1 --checkpoint_f1=$2 --edge_path=$3 --features-path=$3 > logs/eval.log 2>&1 &

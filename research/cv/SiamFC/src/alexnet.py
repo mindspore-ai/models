@@ -118,7 +118,7 @@ class SiameseAlexNet(nn.Cell):
             score_map = n_p.transpose(score_map, (1, 0, 2, 3))
             score_map = score_map*1e-3+self.corr_bias
             score = self.loss(score_map, self.train_gt)/8
-        elif x.shape.as_list()[0] == 1:
+        elif x.shape[0] == 1:
             exemplar = x
             instance = y
             if exemplar.size is not None and instance.size == 1:
