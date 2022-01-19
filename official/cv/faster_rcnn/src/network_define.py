@@ -39,7 +39,7 @@ class LossCallBack(Callback):
         per_print_times (int): Print loss every times. Default: 1.
     """
 
-    def __init__(self, per_print_times=1, rank_id=0):
+    def __init__(self, per_print_times=1, rank_id=0, lr=None):
         super(LossCallBack, self).__init__()
         if not isinstance(per_print_times, int) or per_print_times < 0:
             raise ValueError("print_step must be int and >= 0.")
@@ -47,6 +47,7 @@ class LossCallBack(Callback):
         self.count = 0
         self.loss_sum = 0
         self.rank_id = rank_id
+        self.lr = lr
 
         global time_stamp_init, time_stamp_first
         if not time_stamp_init:
@@ -67,9 +68,9 @@ class LossCallBack(Callback):
             total_loss = self.loss_sum / self.count
 
             loss_file = open("./loss_{}.log".format(self.rank_id), "a+")
-            loss_file.write("%lu s | epoch: %s step: %s total_loss: %.5f" %
+            loss_file.write("%lu s | epoch: %s step: %s total_loss: %.5f  lr: %.6f" %
                             (time_stamp_current - time_stamp_first, cb_params.cur_epoch_num, cur_step_in_epoch,
-                             total_loss))
+                             total_loss, self.lr[cb_params.cur_step_num - 1]))
             loss_file.write("\n")
             loss_file.close()
 
@@ -79,6 +80,7 @@ class LossCallBack(Callback):
 
 class LossNet(nn.Cell):
     """FasterRcnn loss method"""
+
     def construct(self, x1, x2, x3, x4, x5, x6):
         return x1 + x2
 
@@ -91,6 +93,7 @@ class WithLossCell(nn.Cell):
         backbone (Cell): The target network to wrap.
         loss_fn (Cell): The loss function used to compute loss.
     """
+
     def __init__(self, backbone, loss_fn):
         super(WithLossCell, self).__init__(auto_prefix=False)
         self._backbone = backbone
@@ -126,6 +129,7 @@ class TrainOneStepCell(nn.Cell):
         mean (bool): Allreduce method. Default value is False.
         degree (int): Device number. Default value is None.
     """
+
     def __init__(self, network, optimizer, sens=1.0, reduce_flag=False, mean=True, degree=None):
         super(TrainOneStepCell, self).__init__(auto_prefix=False)
         self.network = network

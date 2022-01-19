@@ -99,29 +99,29 @@ class BboxAssignSample(nn.Cell):
         self.check_anchor_two = Tensor(np.full((self.num_bboxes, 4), -2, dtype=self.dtype))
 
     def construct(self, gt_bboxes_i, gt_labels_i, valid_mask, bboxes, gt_valids):
-        gt_bboxes_i = self.select(self.cast(self.tile(self.reshape(self.cast(gt_valids, ms.int32), \
-                                  (self.num_gts, 1)), (1, 4)), ms.bool_), gt_bboxes_i, self.check_gt_one)
-        bboxes = self.select(self.cast(self.tile(self.reshape(self.cast(valid_mask, ms.int32), \
-                             (self.num_bboxes, 1)), (1, 4)), ms.bool_), bboxes, self.check_anchor_two)
-
+        gt_bboxes_i = self.select(self.cast(self.tile(self.reshape(self.cast(gt_valids, ms.int32),
+                                                                   (self.num_gts, 1)), (1, 4)), ms.bool_), gt_bboxes_i,
+                                  self.check_gt_one)
+        bboxes = self.select(self.cast(self.tile(self.reshape(self.cast(valid_mask, ms.int32),
+                                                              (self.num_bboxes, 1)), (1, 4)), ms.bool_), bboxes,
+                             self.check_anchor_two)
         overlaps = self.iou(bboxes, gt_bboxes_i)
-
         max_overlaps_w_gt_index, max_overlaps_w_gt = self.max_gt(overlaps)
         _, max_overlaps_w_ac = self.max_anchor(overlaps)
 
-        neg_sample_iou_mask = self.logicaland(self.greaterequal(max_overlaps_w_gt, self.zero_thr), \
+        neg_sample_iou_mask = self.logicaland(self.greaterequal(max_overlaps_w_gt, self.zero_thr),
                                               self.less(max_overlaps_w_gt, self.neg_iou_thr))
         assigned_gt_inds2 = self.select(neg_sample_iou_mask, self.assigned_gt_zeros, self.assigned_gt_inds)
 
         pos_sample_iou_mask = self.greaterequal(max_overlaps_w_gt, self.pos_iou_thr)
-        assigned_gt_inds3 = self.select(pos_sample_iou_mask, \
+        assigned_gt_inds3 = self.select(pos_sample_iou_mask,
                                         max_overlaps_w_gt_index + self.assigned_gt_ones, assigned_gt_inds2)
         assigned_gt_inds4 = assigned_gt_inds3
         for j in range(self.num_gts):
-            max_overlaps_w_ac_j = max_overlaps_w_ac[j:j+1:1]
-            overlaps_w_gt_j = self.squeeze(overlaps[j:j+1:1, ::])
+            max_overlaps_w_ac_j = max_overlaps_w_ac[j:j + 1:1]
+            overlaps_w_gt_j = self.squeeze(overlaps[j:j + 1:1, ::])
 
-            pos_mask_j = self.logicaland(self.greaterequal(max_overlaps_w_ac_j, self.min_pos_iou), \
+            pos_mask_j = self.logicaland(self.greaterequal(max_overlaps_w_ac_j, self.min_pos_iou),
                                          self.equal(overlaps_w_gt_j, max_overlaps_w_ac_j))
 
             assigned_gt_inds4 = self.select(pos_mask_j, self.assigned_gt_ones + j, assigned_gt_inds4)

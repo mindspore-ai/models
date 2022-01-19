@@ -83,7 +83,7 @@ def apply_eval(net, config, dataset_path, ckpt_path, anno_path):
     print("\n========================================\n")
     print("total images num: ", total)
     print("Processing, please wait a moment.")
-    max_num = 128
+    max_num = config.num_gts
     for data in ds.create_dict_iterator(num_epochs=1):
         eval_iter = eval_iter + 1
 

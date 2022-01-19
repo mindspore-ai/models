@@ -15,15 +15,18 @@
 """lr generator for fasterrcnn"""
 import math
 
+
 def linear_warmup_learning_rate(current_step, warmup_steps, base_lr, init_lr):
     lr_inc = (float(base_lr) - float(init_lr)) / float(warmup_steps)
     learning_rate = float(init_lr) + lr_inc * current_step
     return learning_rate
 
+
 def a_cosine_learning_rate(current_step, base_lr, warmup_steps, decay_steps):
     base = float(current_step - warmup_steps) / float(decay_steps)
     learning_rate = (1 + math.cos(base * math.pi)) / 2 * base_lr
     return learning_rate
+
 
 def dynamic_lr(config, steps_per_epoch):
     """dynamic learning rate generator"""
@@ -36,5 +39,21 @@ def dynamic_lr(config, steps_per_epoch):
             lr.append(linear_warmup_learning_rate(i, warmup_steps, base_lr, base_lr * config.warmup_ratio))
         else:
             lr.append(a_cosine_learning_rate(i, base_lr, warmup_steps, total_steps))
+
+    return lr
+
+
+def multistep_lr(config, dataset_size):
+    learning_rate = float(config.base_lr)
+    milestones_index = 0
+    lr = []
+    for epoch in range(config.epoch_size):
+        if milestones_index < len(config.milestones):
+            if epoch == config.milestones[milestones_index]:
+                learning_rate = learning_rate * 0.1
+                milestones_index += 1
+
+        for _ in range(dataset_size):
+            lr.append(learning_rate)
 
     return lr

@@ -24,12 +24,13 @@ from mindspore.common.parameter import Parameter
 
 class DenseNoTranpose(nn.Cell):
     """Dense method"""
+
     def __init__(self, input_channels, output_channels, weight_init):
         super(DenseNoTranpose, self).__init__()
         self.weight = Parameter(ms.common.initializer.initializer(weight_init, \
-            [input_channels, output_channels], ms.float32))
+                                                                  [input_channels, output_channels], ms.float32))
         self.bias = Parameter(ms.common.initializer.initializer("zeros", \
-            [output_channels], ms.float32))
+                                                                [output_channels], ms.float32))
 
         self.matmul = ops.MatMul(transpose_b=False)
         self.bias_add = ops.BiasAdd()
@@ -65,6 +66,7 @@ class Rcnn(nn.Cell):
         Rcnn(config=config, representation_size = 1024, batch_size=2, num_classes = 81, \
              target_means=(0., 0., 0., 0.), target_stds=(0.1, 0.1, 0.2, 0.2))
     """
+
     def __init__(self,
                  config,
                  representation_size,
@@ -83,25 +85,27 @@ class Rcnn(nn.Cell):
         self.target_means = target_means
         self.target_stds = target_stds
         self.num_classes = num_classes
+        self.num_classes_fronted = num_classes - 1
         self.in_channels = cfg.rcnn_in_channels
         self.train_batch_size = batch_size
         self.test_batch_size = cfg.test_batch_size
 
         shape_0 = (self.rcnn_fc_out_channels, representation_size)
         weights_0 = ms.common.initializer.initializer("XavierUniform", shape=shape_0[::-1], \
-            dtype=self.ms_type).to_tensor()
+                                                      dtype=self.ms_type).to_tensor()
         shape_1 = (self.rcnn_fc_out_channels, self.rcnn_fc_out_channels)
         weights_1 = ms.common.initializer.initializer("XavierUniform", shape=shape_1[::-1], \
-            dtype=self.ms_type).to_tensor()
+                                                      dtype=self.ms_type).to_tensor()
         self.shared_fc_0 = DenseNoTranpose(representation_size, self.rcnn_fc_out_channels, weights_0)
         self.shared_fc_1 = DenseNoTranpose(self.rcnn_fc_out_channels, self.rcnn_fc_out_channels, weights_1)
 
-        cls_weight = ms.common.initializer.initializer('Normal', \
-            shape=[num_classes, self.rcnn_fc_out_channels][::-1], dtype=self.ms_type).to_tensor()
-        reg_weight = ms.common.initializer.initializer('Normal', \
-            shape=[num_classes * 4, self.rcnn_fc_out_channels][::-1], dtype=self.ms_type).to_tensor()
+        cls_weight = ms.common.initializer.initializer('Normal', shape=[num_classes, self.rcnn_fc_out_channels][::-1],
+                                                       dtype=self.ms_type).to_tensor()
+        reg_weight = ms.common.initializer.initializer('Normal', shape=[self.num_classes_fronted * 4,
+                                                                        self.rcnn_fc_out_channels][::-1],
+                                                       dtype=self.ms_type).to_tensor()
         self.cls_scores = DenseNoTranpose(self.rcnn_fc_out_channels, num_classes, cls_weight)
-        self.reg_scores = DenseNoTranpose(self.rcnn_fc_out_channels, num_classes * 4, reg_weight)
+        self.reg_scores = DenseNoTranpose(self.rcnn_fc_out_channels, self.num_classes_fronted * 4, reg_weight)
 
         self.flatten = ops.Flatten()
         self.relu = ops.ReLU()
@@ -125,8 +129,7 @@ class Rcnn(nn.Cell):
 
         self.num_bboxes = (cfg.num_expected_pos_stage2 + cfg.num_expected_neg_stage2) * batch_size
 
-        rmv_first = np.ones((self.num_bboxes, self.num_classes))
-        rmv_first[:, 0] = np.zeros((self.num_bboxes,))
+        rmv_first = np.ones((self.num_bboxes, self.num_classes_fronted))
         self.rmv_first_tensor = Tensor(rmv_first.astype(self.dtype))
 
         self.num_bboxes_test = cfg.rpn_max_num * cfg.test_batch_size
@@ -146,7 +149,7 @@ class Rcnn(nn.Cell):
         if self.training:
             bbox_weights = self.cast(self.logicaland(self.greater(labels, 0), mask), ms.int32) * labels
             labels = self.onehot(labels, self.num_classes, self.on_value, self.off_value)
-            bbox_targets = self.tile(self.expandims(bbox_targets, 1), (1, self.num_classes, 1))
+            bbox_targets = self.tile(self.expandims(bbox_targets, 1), (1, self.num_classes_fronted, 1))
 
             loss, loss_cls, loss_reg, loss_print = self.loss(x_cls, x_reg, bbox_targets, bbox_weights, labels, mask)
             out = (loss, loss_cls, loss_reg, loss_print)
@@ -166,13 +169,13 @@ class Rcnn(nn.Cell):
 
         bbox_weights = self.cast(self.onehot(bbox_weights, self.num_classes, self.on_value, self.off_value),
                                  self.ms_type)
-        bbox_weights = bbox_weights * self.rmv_first_tensor
+        bbox_weights = bbox_weights[:, 1:] * self.rmv_first_tensor
 
         pos_bbox_pred = self.reshape(bbox_pred, (self.num_bboxes, -1, 4))
         loss_reg = self.loss_bbox(pos_bbox_pred, bbox_targets)
         loss_reg = self.sum_loss(loss_reg, (2,))
         loss_reg = loss_reg * bbox_weights
-        loss_reg = loss_reg / self.sum_loss(weights, (0,))
+        loss_reg = loss_reg / (self.sum_loss(weights, (0,)) + 1)
         loss_reg = self.sum_loss(loss_reg, (0, 1))
 
         loss = self.rcnn_loss_cls_weight * loss_cls + self.rcnn_loss_reg_weight * loss_reg

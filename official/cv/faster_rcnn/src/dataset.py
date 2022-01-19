@@ -74,6 +74,7 @@ def bbox_overlaps(bboxes1, bboxes2, mode='iou'):
 
 class PhotoMetricDistortion:
     """Photo Metric Distortion"""
+
     def __init__(self,
                  brightness_delta=32,
                  contrast_range=(0.5, 1.5),
@@ -135,6 +136,7 @@ class PhotoMetricDistortion:
 
 class Expand:
     """expand image"""
+
     def __init__(self, mean=(0, 0, 0), to_rgb=True, ratio_range=(1, 4)):
         if to_rgb:
             self.mean = mean[::-1]
@@ -178,7 +180,7 @@ def rescale_column(img, img_shape, gt_bboxes, gt_label, gt_num, config):
     img_data, scale_factor = rescale_with_tuple(img, (config.img_width, config.img_height))
     if img_data.shape[0] > config.img_height:
         img_data, scale_factor2 = rescale_with_tuple(img_data, (config.img_height, config.img_height))
-        scale_factor = scale_factor*scale_factor2
+        scale_factor = scale_factor * scale_factor2
 
     gt_bboxes = gt_bboxes * scale_factor
     gt_bboxes[:, 0::2] = np.clip(gt_bboxes[:, 0::2], 0, img_data.shape[1] - 1)
@@ -194,14 +196,15 @@ def rescale_column(img, img_shape, gt_bboxes, gt_label, gt_num, config):
     img_shape = (config.img_height, config.img_width, 1.0)
     img_shape = np.asarray(img_shape, dtype=np.float32)
 
-    return  (pad_img_data, img_shape, gt_bboxes, gt_label, gt_num)
+    return (pad_img_data, img_shape, gt_bboxes, gt_label, gt_num)
+
 
 def rescale_column_test(img, img_shape, gt_bboxes, gt_label, gt_num, config):
     """rescale operation for image of eval"""
     img_data, scale_factor = rescale_with_tuple(img, (config.img_width, config.img_height))
     if img_data.shape[0] > config.img_height:
         img_data, scale_factor2 = rescale_with_tuple(img_data, (config.img_height, config.img_height))
-        scale_factor = scale_factor*scale_factor2
+        scale_factor = scale_factor * scale_factor2
 
     pad_h = config.img_height - img_data.shape[0]
     pad_w = config.img_width - img_data.shape[1]
@@ -213,7 +216,7 @@ def rescale_column_test(img, img_shape, gt_bboxes, gt_label, gt_num, config):
     img_shape = np.append(img_shape, (scale_factor, scale_factor))
     img_shape = np.asarray(img_shape, dtype=np.float32)
 
-    return  (pad_img_data, img_shape, gt_bboxes, gt_label, gt_num)
+    return (pad_img_data, img_shape, gt_bboxes, gt_label, gt_num)
 
 
 def resize_column(img, img_shape, gt_bboxes, gt_label, gt_num, config):
@@ -326,6 +329,7 @@ def expand_column(img, img_shape, gt_bboxes, gt_label, gt_num):
 
 def preprocess_fn(image, box, is_training, config):
     """Preprocess function for dataset."""
+
     def _infer_data(image_bgr, image_shape, gt_box_new, gt_label_new, gt_iscrowd_new_revert):
         image_shape = image_shape[:2]
         input_data = image_bgr, image_shape, gt_box_new, gt_label_new, gt_iscrowd_new_revert
@@ -341,6 +345,9 @@ def preprocess_fn(image, box, is_training, config):
 
     def _data_aug(image, box, is_training):
         """Data augmentation function."""
+        pad_max_number = config.num_gts
+        if pad_max_number < box.shape[0]:
+            box = box[:pad_max_number, :]
         image_bgr = image.copy()
         image_bgr[:, :, 0] = image[:, :, 2]
         image_bgr[:, :, 1] = image[:, :, 1]
@@ -350,7 +357,6 @@ def preprocess_fn(image, box, is_training, config):
         gt_label = box[:, 4]
         gt_iscrowd = box[:, 5]
 
-        pad_max_number = 128
         gt_box_new = np.pad(gt_box, ((0, pad_max_number - box.shape[0]), (0, 0)), mode="constant", constant_values=0)
         gt_label_new = np.pad(gt_label, ((0, pad_max_number - box.shape[0])), mode="constant", constant_values=-1)
         gt_iscrowd_new = np.pad(gt_iscrowd, ((0, pad_max_number - box.shape[0])), mode="constant", constant_values=1)
@@ -395,7 +401,10 @@ def create_coco_label(is_training, config):
         train_cls_dict[cls] = i
 
     anno_json = os.path.join(coco_root, config.instance_set.format(data_type))
-
+    if hasattr(config, 'train_set') and is_training:
+        anno_json = os.path.join(coco_root, config.train_set)
+    if hasattr(config, 'val_set') and not is_training:
+        anno_json = os.path.join(coco_root, config.val_set)
     coco = COCO(anno_json)
     classs_dict = {}
     cat_ids = coco.loadCats(coco.getCatIds())
@@ -479,6 +488,7 @@ def parse_json_annos_from_txt(anno_file, config):
 
 def create_train_data_from_txt(image_dir, anno_path):
     """Filter valid image file, which both in image_dir and anno_path."""
+
     def anno_parser(annos_str):
         """Parse annotation from string to list."""
         annos = []
@@ -489,6 +499,7 @@ def create_train_data_from_txt(image_dir, anno_path):
             iscrowd = int(anno[5])
             annos.append([xmin, ymin, xmax, ymax, cls_id, iscrowd])
         return annos
+
     image_files = []
     image_anno_dict = {}
     if not os.path.isdir(image_dir):

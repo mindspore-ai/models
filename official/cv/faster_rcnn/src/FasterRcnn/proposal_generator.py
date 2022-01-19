@@ -176,7 +176,8 @@ class Proposal(nn.Cell):
 
             proposals_decode = self.decode(anchors_sorted, bboxes_sorted)
 
-            proposals_decode = self.concat_axis1((proposals_decode, self.reshape(scores_sorted, self.topK_shape[idx])))
+            scores_sorted = self.reshape(scores_sorted, self.topK_shape[idx])
+            proposals_decode = self.concat_axis1((proposals_decode, scores_sorted))
             proposals, _, mask_valid = self.nms(proposals_decode)
 
             mlvl_proposals = mlvl_proposals + (proposals,)

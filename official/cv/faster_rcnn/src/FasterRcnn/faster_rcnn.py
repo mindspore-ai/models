@@ -363,7 +363,7 @@ class Faster_Rcnn(nn.Cell):
         scores = self.softmax(cls_logits)
 
         boxes_all = ()
-        for i in range(self.num_classes):
+        for i in range(self.num_classes - 1):
             k = i * 4
             reg_logits_i = self.squeeze(reg_logits[::, k:k+4:1])
             out_boxes_i = self.decode(rois, reg_logits_i)
@@ -379,7 +379,7 @@ class Faster_Rcnn(nn.Cell):
             scale_h = scale[2]
             scale_w = scale[3]
             boxes_tuple = ()
-            for j in range(self.num_classes):
+            for j in range(self.num_classes - 1):
                 boxes_tmp = self.split(boxes_all[j])
                 out_boxes_h = boxes_tmp[i] / scale_h
                 out_boxes_w = boxes_tmp[i] / scale_w
@@ -408,7 +408,7 @@ class Faster_Rcnn(nn.Cell):
             for j in range(self.num_classes - 1):
                 k = j + 1
                 _cls_scores = scores[::, k:k + 1:1]
-                _bboxes = self.squeeze(bboxes[k])
+                _bboxes = self.squeeze(bboxes[j])
                 _mask_o = self.reshape(masks, (self.rpn_max_num, 1))
 
                 cls_mask = self.greater(_cls_scores, self.test_score_thresh)
