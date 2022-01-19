@@ -245,8 +245,7 @@ def preprocess_img_mask(img, mask, num_classes, img_size, augment=False, eval_re
     return img, mask
 
 def create_multi_class_dataset(data_dir, img_size, repeat, batch_size, num_classes=2, is_train=False, augment=False,
-                               eval_resize=False, split=0.8, rank=0, group_size=1, python_multiprocessing=True,
-                               num_parallel_workers=8, shuffle=True):
+                               eval_resize=False, split=0.8, rank=0, group_size=1, shuffle=True):
     """
     Get generator dataset for multi-class dataset.
     """
@@ -256,8 +255,6 @@ def create_multi_class_dataset(data_dir, img_size, repeat, batch_size, num_class
     compose_map_func = (lambda image, mask: preprocess_img_mask(image, mask, num_classes, tuple(img_size),
                                                                 augment and is_train, eval_resize))
     dataset = dataset.map(operations=compose_map_func, input_columns=mc_dataset.column_names,
-                          output_columns=mc_dataset.column_names, column_order=mc_dataset.column_names,
-                          python_multiprocessing=python_multiprocessing,
-                          num_parallel_workers=num_parallel_workers)
+                          output_columns=mc_dataset.column_names, column_order=mc_dataset.column_names)
     dataset = dataset.batch(batch_size, drop_remainder=is_train)
     return dataset

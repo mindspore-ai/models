@@ -80,15 +80,12 @@ def train_net(cross_valid_ind=1,
         per_print_times = 0
         repeat = config.repeat if hasattr(config, "repeat") else 1
         split = config.split if hasattr(config, "split") else 0.8
-        python_multiprocessing = config.python_multiprocessing if hasattr(config, "python_multiprocessing") else True
         train_dataset = create_multi_class_dataset(data_dir, config.image_size, repeat, batch_size,
                                                    num_classes=config.num_classes, is_train=True, augment=True,
-                                                   split=split, rank=rank, group_size=group_size, shuffle=True,
-                                                   python_multiprocessing=python_multiprocessing)
+                                                   split=split, rank=rank, group_size=group_size, shuffle=True)
         valid_dataset = create_multi_class_dataset(data_dir, config.image_size, 1, 1,
                                                    num_classes=config.num_classes, is_train=False,
-                                                   eval_resize=config.eval_resize, split=split,
-                                                   python_multiprocessing=False, shuffle=False)
+                                                   eval_resize=config.eval_resize, split=split, shuffle=False)
     else:
         repeat = config.repeat
         dataset_sink_mode = False

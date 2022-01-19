@@ -45,8 +45,7 @@ def test_net(data_dir,
         split = config.split if hasattr(config, "split") else 0.8
         valid_dataset = create_multi_class_dataset(data_dir, config.image_size, 1, 1,
                                                    num_classes=config.num_classes, is_train=False,
-                                                   eval_resize=config.eval_resize, split=split,
-                                                   python_multiprocessing=False, shuffle=False)
+                                                   eval_resize=config.eval_resize, split=split, shuffle=False)
     else:
         _, valid_dataset = create_dataset(data_dir, 1, 1, False, cross_valid_ind, False,
                                           do_crop=config.crop, img_size=config.image_size)
