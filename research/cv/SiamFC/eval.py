@@ -49,6 +49,6 @@ if __name__ == '__main__':
     for key in score:
         mydic.append(prec_score[key])
     ss = '-prec_score:%.3f -succ_score:%.3f -succ_rate:%.3f' % (float(mydic[1]),
-                                                                float(mydict[0]),
+                                                                float(mydic[0]),
                                                                 float(mydic[2]))
     print(ss)
