@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -557,7 +557,7 @@ def parse_eval_batch_size(eval_batch_size):
 
 
 def create_dataset(test_train=True, data_dir='./dataset/', dataset='ml-1m', train_epochs=14, batch_size=256,
-                   eval_batch_size=160000, num_neg=4, rank_id=None, rank_size=None):
+                   eval_batch_size=160000, num_neg=4, rank_id=None, rank_size=None, num_parallel_workers=1):
     """
     Create NCF dataset.
     """
@@ -585,7 +585,8 @@ def create_dataset(test_train=True, data_dir='./dataset/', dataset='ml-1m', trai
                                             movielens.ITEM_COLUMN,
                                             "labels",
                                             rconst.VALID_POINT_MASK],
-                              sampler=sampler)
+                              sampler=sampler,
+                              num_parallel_workers=num_parallel_workers)
 
     else:
         eval_batch_size = parse_eval_batch_size(eval_batch_size=eval_batch_size)
@@ -598,7 +599,8 @@ def create_dataset(test_train=True, data_dir='./dataset/', dataset='ml-1m', trai
                               column_names=[movielens.USER_COLUMN,
                                             movielens.ITEM_COLUMN,
                                             rconst.DUPLICATE_MASK],
-                              sampler=sampler)
+                              sampler=sampler,
+                              num_parallel_workers=num_parallel_workers)
 
     repeat_count = train_epochs if test_train else train_epochs + 1
     ds = ds.repeat(repeat_count)

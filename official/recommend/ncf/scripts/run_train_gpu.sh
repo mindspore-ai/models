@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,4 +20,13 @@ echo "for example: bash scripts/run_train_gpu.sh /dataset_path /ncf.ckpt 0"
 data_path=$1
 ckpt_file=$2
 export CUDA_VISIBLE_DEVICES=$3
-python ./train.py --data_path $data_path --dataset 'ml-1m'  --train_epochs 25 --batch_size 256 --output_path './output/' --checkpoint_path $ckpt_file  --device_target=GPU --device_id=0
+python ./train.py \
+    --data_path $data_path \
+    --dataset 'ml-1m' \
+    --train_epochs 25 \
+    --batch_size 256 \
+    --output_path './output/' \
+    --checkpoint_path $ckpt_file  \
+    --device_target=GPU \
+    --device_id=0 \
+    --num_parallel_workers=2
