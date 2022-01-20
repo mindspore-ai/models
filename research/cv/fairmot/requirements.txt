@@ -10,3 +10,5 @@ lap
 openpyxl
 Pillow
 tensorboardX
+cython-bbox
+sympy

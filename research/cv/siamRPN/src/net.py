@@ -21,7 +21,7 @@ from mindspore.ops import composite as C
 from mindspore.parallel._utils import _get_device_num, _get_parallel_mode, _get_gradients_mean
 from mindspore.context import ParallelMode
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
-from config import config
+from src.config import config
 
 class SiameseRPN(nn.Cell):
     """

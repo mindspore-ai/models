@@ -91,7 +91,7 @@ def test(model_path, data_path, save_name):
         gt = boxes.copy()
         gt[:][2] = gt[:][0] + gt[:][2]
         gt[:][3] = gt[:][1] + gt[:][3]
-        frames = [os.path.join(video_path, 'color', x) for x in np.sort(os.listdir(os.path.join(video_path, '/color')))]
+        frames = [os.path.join(video_path, 'color', x) for x in np.sort(os.listdir(os.path.join(video_path, 'color')))]
         frames = [x for x in frames if '.jpg' in x]
         tic = time.perf_counter()
         template_idx = 0

@@ -107,7 +107,7 @@ self.parser.add_argument('--load_model', default='XXX.ckpt',
 Then, run the shell script `scripts/run_eval.sh` with the format below:
 
 ```shell
-bash scripts/run_eval.sh [device_id]
+bash scripts/run_eval.sh [device_id] [ckpt_path] [dataset_path]
 ```
 
 # [Script Description](#contents)
@@ -205,13 +205,13 @@ The evaluation data set was [MOT20](https://motchallenge.net/data/MOT20/)
 Run `scripts/run_eval.sh` to evaluate the model with one Ascend processor. The usage of the script is:
 
 ```shell
-bash run_eval.sh DEVICE_ID LOAD_MODEL
+bash run_eval.sh DEVICE_ID LOAD_MODEL DATA_PATH
 ```
 
 For example, you can run the shell command below to launch the validation procedure.
 
 ```shell
-bash run_eval.sh 0 ./dla34.ckpt
+bash run_eval.sh 0 ./dla34.ckpt data_path
 ```
 
 The tracing results can be viewed in `/MOT20/distribute_dla34_conv`.
