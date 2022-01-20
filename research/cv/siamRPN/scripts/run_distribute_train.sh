@@ -26,8 +26,9 @@ get_real_path(){
     echo "$(realpath -m $PWD/$1)"
   fi
 }
-RANK_SIZE=8
-RANK_TABLE=$(get_real_path $1)
+DATA_PATH=$1
+export RANK_SIZE=8
+RANK_TABLE=$(get_real_path $2)
 
 EXEC_PATH=$(pwd)
 echo "$EXEC_PATH"
@@ -46,7 +47,7 @@ do
     export RANK_ID=$i
     echo "start training for device $i"
     env > env$i.log
-    python3 train.py  --is_parallel=True &> log &
+    python3 train.py  --train_url $DATA_PATH --is_parallel=True &> log &
     cd ../
 done
 echo "finish"

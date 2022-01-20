@@ -72,7 +72,7 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 
   ```python
   # 运行训练示例
-  bash scripts/run.sh 0 1
+  bash scripts/run.sh DATA_PATH DEVICE_ID
 
   # 运行分布式训练示例
   bash scripts/run_distribute_train.sh /path/dataset /path/rank_table

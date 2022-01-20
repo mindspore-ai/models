@@ -14,6 +14,7 @@
 # ============================================================================
 """ train """
 import os
+import ast
 import random
 import time
 import sys
@@ -36,9 +37,9 @@ sys.path.append('../')
 
 parser = argparse.ArgumentParser(description='Mindspore SiameseRPN Training')
 
-parser.add_argument('--is_parallel', default=False, type=bool, help='whether parallel or not parallel')
+parser.add_argument('--is_parallel', default=False, type=ast.literal_eval, help='whether parallel or not parallel')
 
-parser.add_argument('--is_cloudtrain', default=False, type=bool, help='whether cloud or not')
+parser.add_argument('--is_cloudtrain', default=False, type=ast.literal_eval, help='whether cloud or not')
 
 parser.add_argument('--train_url', default=None, help='Location of training outputs.')
 
@@ -178,9 +179,6 @@ def adjust_learning_rate(start_lr, end_lr, total_epochs, steps_pre_epoch):
 if __name__ == '__main__':
     Args = parser.parse_args()
     context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
-    if not Args.is_parallel:
-        device_id = Args.device_id
-        context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target="Ascend")
     if Args.is_cloudtrain:
         import moxing as mox
         device_id = int(os.getenv('DEVICE_ID') if os.getenv('DEVICE_ID') is not None else 0)
@@ -200,16 +198,19 @@ if __name__ == '__main__':
             os.system(tar_command1)
             local_data_path = local_data_path + '/train/ytb_vid_filter'
         config.train_path = local_data_path
-    elif Args.is_parallel:
-        config.train_path = os.getenv('DATA_PATH')
-    if Args.is_parallel:
-        device_id = int(os.getenv('DEVICE_ID'))
-        device_num = int(os.getenv('RANK_SIZE'))
-        if device_num > 1:
+    else:
+        config.train_path = Args.train_url
+        if Args.is_parallel:
+            device_id = int(os.getenv('DEVICE_ID'))
+            device_num = int(os.getenv('RANK_SIZE'))
+            if device_num > 1:
+                context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target="Ascend")
+                context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                                  parameter_broadcast=True, gradients_mean=True)
+                init()
+        else:
+            device_id = Args.device_id
             context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target="Ascend")
-            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              parameter_broadcast=True, gradients_mean=True)
-            init()
     main(Args)
     if Args.is_cloudtrain:
         mox.file.copy_parallel(src_url=local_data_path + '/ckpt', dst_url=Args.train_url + '/ckpt')

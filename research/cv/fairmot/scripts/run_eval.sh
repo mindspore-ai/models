@@ -16,11 +16,12 @@
 echo "========================================================================"
 echo "Please run the script as: "
 echo "bash run_eval.sh DEVICE_ID LOAD_MODEL(options)"
-echo "For example: bash run_eval.sh 0 ./dla34.ckpt"
+echo "For example: bash run_eval.sh 0 ./dla34.ckpt data_dir"
 echo "It is better to use the absolute path."
 echo "========================================================================"
 export DEVICE_ID=$1
 export LOAD_MODEL=$2
+DATASET=$3
 echo "start training for device $DEVICE_ID"
-python -u ../fairmot_eval.py  --id=$DEVICE_ID --load_model=$LOAD_MODEL > eval_$DEVICE_ID.txt 2>&1 &
+python -u ../fairmot_eval.py  --id=$DEVICE_ID --load_model=$LOAD_MODEL --data_dir $DATASET > eval_$DEVICE_ID.txt 2>&1 &
 echo "finish"
