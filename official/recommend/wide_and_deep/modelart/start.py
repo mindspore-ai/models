@@ -132,7 +132,7 @@ def freeze_model():
 def main():
     """main function"""
     train_wide_and_deep()
-    os.system("chmod -R 777 /cache/train")
+    os.system("chmod -R 750 /cache/train")
     freeze_model()
 
 

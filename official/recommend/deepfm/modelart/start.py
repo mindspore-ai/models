@@ -169,7 +169,7 @@ def freeze_model():
 
 def main():
     train_deepfm()
-    os.system("chmod -R 777 /cache/train")
+    os.system("chmod -R 750 /cache/train")
     freeze_model()
 
 
