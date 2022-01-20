@@ -14,10 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 3 || $# -gt 4 ]]; then
-    echo "Usage: bash run_infer_310.sh  [MINDIR_PATH][DATASET_PATH][NEED_PREPROCESS] [DEVICE_ID]
-    DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero.
-    NEED_PREPROCESS means weather need preprocess or not, it's value is 'y' or 'n'."
+if [[ $# -lt 4 || $# -gt 5 ]]; then
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [CONFIG_PATH] [SSIM_THRESHOLD] [L1_THRESHOLD] [DEVICE_ID]
+    DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero."
 exit 1
 fi
 
@@ -30,25 +29,23 @@ get_real_path(){
 }
 
 model=$(get_real_path $1)
-data_path=$(get_real_path $2)
-
-if [ "$3" == "y" ] || [ "$3" == "n" ];then
-    need_preprocess=$3
-else
-  echo "weather need preprocess or not, it's value must be in [y, n]"
-  exit 1
-fi
+config_path=$(get_real_path $2)
+BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
+need_preprocess="n"
+ssim_threshold=$3
+l1_threshold=$4
 
 device_id=0
-if [ $# == 4 ]; then
-    device_id=$4
+if [ $# == 5 ]; then
+    device_id=$5
 fi
 
 
 echo "mindir name: "$model
-echo "dataset path: "$data_path
-echo "need preprocess or not: "$need_preprocess
+echo "config path: "$config_path
 echo "device id: "$device_id
+echo "ssim threshold: "$ssim_threshold
+echo "l1 threshold: "$l1_threshold
 
 export ASCEND_HOME=/usr/local/Ascend/
 if [ -d ${ASCEND_HOME}/ascend-toolkit ]; then
@@ -64,22 +61,19 @@ else
     export ASCEND_OPP_PATH=$ASCEND_HOME/opp
 fi
 
-
 function preprocess_data()
 {
-
-    if [ -d preprocess_Result ]; then
-        rm -rf ./preprocess_Result
+    cd $BASE_PATH/.. || exit
+    if [ -d ./preprocess_result ]; then
+        rm -rf ./preprocess_result
     fi
-
-    mkdir preprocess_Result
-    python ../preprocess.py --data_path=$data_path --result_path=./preprocess_Result/ &> pre.log
+    python $BASE_PATH/../preprocess.py --config_path=$config_path  &> pre.log
 }
 
 
 function compile_app()
 {
-    cd ../ascend310_infer || exit
+    cd $BASE_PATH/../ascend310_infer || exit
     if [ -f "Makefile" ]; then
         make clean
     fi
@@ -95,25 +89,22 @@ function compile_app()
 
 function infer()
 {
-    if [ -d result_Files ]; then
-        rm -rf ./result_Files
+    cd $BASE_PATH/.. || exit
+    if [ -d ./postprocess_result ]; then
+        rm -rf ./postprocess_result
     fi
-     if [ -d time_Result ]; then
-        rm -rf ./time_Result
-    fi
-    mkdir result_Files
-    mkdir time_Result
-    ../ascend310_infer/out/main --mindir_path=$model --dataset_path=./preprocess_Result/ --device_id=$device_id --need_preprocess=$need_preprocess &> infer.log
+    mkdir ./postprocess_result
+    ./ascend310_infer/out/main --mindir_path=$model --dataset_path=./preprocess_result --device_id=$device_id --need_preprocess=$need_preprocess &> infer.log
 }
 
 function cal_acc()
 {
+    cd $BASE_PATH/.. || exit
     if [ -d save_img ]; then
         rm -rf ./save_img
     fi
-
     mkdir save_img
-    python ../postprocess.py --result_path=./result_Files/ --gt_path=$data_path --save_path=./save_img/ &> acc.log
+    python postprocess.py --config_path=$config_path --ssim_threshold=$ssim_threshold --l1_threshold=$l1_threshold --save_dir=save_img &> acc.log
 }
 
 preprocess_data
@@ -122,17 +113,18 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-
 compile_app
 if [ $? -ne 0 ]; then
     echo "compile app code failed"
     exit 1
 fi
+
 infer
 if [ $? -ne 0 ]; then
     echo " execute inference failed"
     exit 1
 fi
+
 cal_acc
 if [ $? -ne 0 ]; then
     echo "calculate accuracy failed"

@@ -13,27 +13,36 @@
 # limitations under the License.
 # ============================================================================
 
-import argparse
 import numpy as np
-from mindspore import Tensor, export, load_checkpoint
-import mindspore as ms
-from model_utils.options import Options_310
+from mindspore import context, Tensor
+from mindspore import load_checkpoint, export
+
+from model_utils.device_adapter import get_device_id
+from model_utils.config import config as cfg
 from src.network import AutoEncoder
 
-parser = argparse.ArgumentParser('export')
-parser.add_argument('--ckpt_path', type=str, default='./ssim_autocoder.ckpt', help='ckpt data dir')
-parser.add_argument('--file_name', type=str, default='AESSIM', help='mindir file name')
-args = parser.parse_args()
-cfg = Options_310().opt
+context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target, device_id=get_device_id())
+
+def get_network():
+    auto_encoder = AutoEncoder(cfg)
+    if cfg.model_arts:
+        import moxing as mox
+        mox.file.copy_parallel(src_url=cfg.checkpoint_url, dst_url=cfg.cache_ckpt_file)
+        ckpt_path = cfg.cache_ckpt_file
+    else:
+        ckpt_path = cfg.checkpoint_path
+
+    load_checkpoint(ckpt_path, net=auto_encoder)
+    auto_encoder.set_train(False)
+    return auto_encoder
 
 def model_export():
-    net = AutoEncoder(cfg)
-    load_checkpoint(args.ckpt_path, net=net)
-    net.set_train(False)
-    channel = 1 if cfg["grayscale"] else 3
-    input_size = cfg["data_augment"]["crop_size"]
-    input_data = Tensor(np.ones([1, channel, input_size, input_size]), ms.float32)
-    export(net, input_data, file_name=args.file_name, file_format="MINDIR")
+    auto_encoder = get_network()
+    channel = 1 if cfg.grayscale else 3
+    input_size = cfg.crop_size
+    batch_size = ((cfg.mask_size - cfg.crop_size) // cfg.stride + 1) ** 2
+    input_data = Tensor(np.ones([batch_size, channel, input_size, input_size], np.float32))
+    export(auto_encoder, input_data, file_name=f"SSIM-AE-{cfg.dataset}", file_format="MINDIR")
 
 
 if __name__ == '__main__':

@@ -47,7 +47,7 @@ std::vector<std::string> GetAllFiles(std::string_view dirName) {
 }
 
 int WriteResult(const std::string& imageFile, const std::vector<MSTensor> &outputs) {
-  std::string homePath = "./result_Files";
+  std::string homePath = "./postprocess_result";
   for (size_t i = 0; i < outputs.size(); ++i) {
     size_t outputSize;
     std::shared_ptr<const void> netOutput;
