@@ -27,7 +27,7 @@ allreduce_post_accumulation: 'true'
 save_checkpoint_path: ''
 load_checkpoint_path: ''
 save_checkpoint_steps: 10000
-train_steps: -1
+train_steps: 17000
 save_checkpoint_num: 1
 data_dir: ''
 schema_dir: ''
@@ -153,8 +153,8 @@ large_boost_net_cfg:
     num_attention_heads: 16
     intermediate_size: 4096
     hidden_act: "fast_gelu"
-    hidden_dropout_prob: 0.1
-    attention_probs_dropout_prob: 0.1
+    hidden_dropout_prob: 0.0
+    attention_probs_dropout_prob: 0.0
     max_position_embeddings: 512
     type_vocab_size: 2
     initializer_range: 0.02
