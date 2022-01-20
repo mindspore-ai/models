@@ -87,7 +87,10 @@ int main(int argc, char **argv) {
 
   Model model;
   std::vector<MSTensor> model_inputs;
-  load_model(&model, &model_inputs, FLAGS_mindir_path, FLAGS_device_id);
+  if (load_model(&model, &model_inputs, FLAGS_mindir_path, FLAGS_device_id) != 0) {
+    std::cout << "Failed to load model." << std::endl;
+    return 1;
+  }
 
   std::map<double, double> costTime_map;
   struct timeval start = {0};
@@ -101,8 +104,7 @@ int main(int argc, char **argv) {
       std::cout << "ERROR: no input data." << std::endl;
       return 1;
     }
-    size_t size = input0_files.size();
-    for (size_t i = 0; i < size; ++i) {
+    for (size_t i = 0; i < input0_files.size(); ++i) {
       std::vector<MSTensor> inputs;
       std::vector<MSTensor> outputs;
       std::cout << "Start predict input files:" << input0_files[i] <<std::endl;
@@ -132,8 +134,7 @@ int main(int argc, char **argv) {
       std::cout << "ERROR: no input data." << std::endl;
       return 1;
     }
-    size_t size = input0_files.size();
-    for (size_t i = 0; i < size; ++i) {
+    for (size_t i = 0; i < input0_files.size(); ++i) {
       for (size_t j = 0; j < input0_files[i].size(); ++j) {
         std::vector<MSTensor> inputs;
         std::vector<MSTensor> outputs;
@@ -171,9 +172,7 @@ int main(int argc, char **argv) {
   int inferCount = 0;
 
   for (auto iter = costTime_map.begin(); iter != costTime_map.end(); iter++) {
-    double diff = 0.0;
-    diff = iter->second - iter->first;
-    average += diff;
+    average += (iter->second - iter->first);
     inferCount++;
   }
   average = average / inferCount;
