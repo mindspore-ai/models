@@ -322,5 +322,5 @@ if __name__ == "__main__":
 
     print('==========end training===============')
     print('==========start exporting============')
-    os.system("chmod -R 777 /cache/train")
+    os.system("chmod -R 750 /cache/train")
     freeze_model()
