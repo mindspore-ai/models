@@ -38,24 +38,20 @@ from src.trainonestep.train_psnr import TrainOnestepPSNR
 from src.trainonestep.train_gan import TrainOneStepD
 from src.trainonestep.train_gan import TrainOnestepG
 
-
-set_seed(123)
 parser = argparse.ArgumentParser(description="SRGAN train")
-parser.add_argument("--train_LR_path", type=str, default='/data/DIV2K/LR')
+parser.add_argument("--train_LR_path", type=str, default='/data/DIV2K/LR/X4')
 parser.add_argument("--train_GT_path", type=str, default='/data/DIV2K/HR')
 parser.add_argument("--val_LR_path", type=str, default='/data/Set5/LR')
 parser.add_argument("--val_GT_path", type=str, default='/data/Set5/HR')
-parser.add_argument("--vgg_ckpt", type=str, default='/data/pre-models/vgg19/vgg19.ckpt')
+parser.add_argument("--vgg_ckpt", type=str, default='./vgg19.ckpt')
 parser.add_argument('--upscale_factor', default=4, type=int, choices=[2, 4, 8],
                     help='super resolution upscale factor')
 parser.add_argument("--image_size", type=int, default=96,
                     help="Image size of high resolution image. (default: 96)")
 parser.add_argument("--train_batch_size", default=16, type=int,
-                    metavar="N",
-                    help="batch size for training")
+                    metavar="N", help="batch size for training")
 parser.add_argument("--val_batch_size", default=1, type=int,
-                    metavar="N",
-                    help="batch size for tesing")
+                    metavar="N", help="batch size for tesing")
 parser.add_argument("--psnr_epochs", default=2000, type=int, metavar="N",
                     help="Number of total psnr epochs to run. (default: 2000)")
 parser.add_argument("--start_psnr_epoch", default=0, type=int, metavar='N',
@@ -67,19 +63,20 @@ parser.add_argument("--start_gan_epoch", default=0, type=int, metavar='N',
 parser.add_argument('--init_type', type=str, default='normal', choices=("normal", "xavier"), \
                     help='network initialization, default is normal.')
 parser.add_argument("--scale", type=int, default=4)
+parser.add_argument('--platform', type=str, default='Ascend', choices=('Ascend', 'GPU', 'CPU'))
 # distribute
 parser.add_argument("--run_distribute", type=int, default=0, help="Run distribute, default: false.")
-parser.add_argument("--device_id", type=int, default=0, help="device id, default: 0.")
 parser.add_argument("--device_num", type=int, default=1, help="number of device, default: 0.")
-parser.add_argument("--rank_id", type=int, default=0, help="Rank id, default: 0.")
-
+set_seed(2021)
 if __name__ == '__main__':
     args = parser.parse_args()
-    context.set_context(mode=context.GRAPH_MODE, device_id=args.device_id, save_graphs=False)
-    #distribute
-    if args.run_distribute:
+    context.set_context(mode=context.GRAPH_MODE, save_graphs=False)
+    context.set_context(device_target=args.platform)
+
+    if args.run_distribute == 1:
         print("distribute")
-        context.set_context(device_id=int(os.getenv("DEVICE_ID")))
+        if args.platform == 'Ascend':
+            context.set_context(device_id=int(os.getenv("DEVICE_ID")))
         device_num = args.device_num
         context.reset_auto_parallel_context()
         context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
@@ -87,9 +84,16 @@ if __name__ == '__main__':
         init()
 
         rank = get_rank()
+
+    if args.run_distribute == 0:
+        if args.platform == 'GPU':
+            rank = 0
+            if os.getenv("DEVICE_ID", "not_set").isdigit():
+                context.set_context(device_id=int(os.getenv("DEVICE_ID")))
+
     # for srresnet
     # create dataset
-    train_ds = create_traindataset(args.train_batch_size, args.train_LR_path, args.train_GT_path)
+    train_ds = create_traindataset(args.train_batch_size, args.train_LR_path, args.train_GT_path, rank, args.device_num)
     test_ds = create_testdataset(args.val_batch_size, args.val_LR_path, args.val_GT_path)
     train_data_loader = train_ds.create_dict_iterator()
     test_data_loader = test_ds.create_dict_iterator()
@@ -167,24 +171,26 @@ if __name__ == '__main__':
             if args.run_distribute == 0:
                 save_checkpoint(train_psnr, "./ckpt/best.ckpt")
             else:
-                if args.device_id == 0:
+                if rank == 0:
                     save_checkpoint(train_psnr, "./ckpt/best.ckpt")
-
         if (epoch+1)%200 == 0:
             if args.run_distribute == 0:
                 save_checkpoint(train_psnr, './ckpt/pre_trained_model_%03d.ckpt'%(epoch+1))
             else:
-                if args.device_id == 0:
+                if rank == 0:
                     save_checkpoint(train_psnr, './ckpt/pre_trained_model_%03d.ckpt'%(epoch+1))
 
         print("{:d}/2000 epoch finished".format(epoch+1))
     # for srgan
     generator = get_generator(4, 0.02)
     discriminator = get_discriminator(96, 0.02)
-    if args.run_distribute == 0:
+    if args.platform == "Ascend":
+        if args.run_distribute == 0:
+            ckpt = "./ckpt/best.ckpt"
+        else:
+            ckpt = '../train_parallel0/ckpt/best.ckpt'
+    if args.platform == "GPU":
         ckpt = "./ckpt/best.ckpt"
-    else:
-        ckpt = '../train_parallel0/ckpt/best.ckpt'
     params = load_checkpoint(ckpt)
     load_param_into_net(generator, params)
     discriminator_loss = DiscriminatorLoss(discriminator, generator)
@@ -219,7 +225,7 @@ if __name__ == '__main__':
                 save_checkpoint(train_generator, './ckpt/G_model_%03d.ckpt'%(epoch+1))
                 save_checkpoint(train_discriminator, './ckpt/D_model_%03d.ckpt'%(epoch+1))
             else:
-                if args.device_id == 0:
+                if rank == 0:
                     save_checkpoint(train_generator, './ckpt/G_model_%03d.ckpt'%(epoch+1))
                     save_checkpoint(train_discriminator, './ckpt/D_model_%03d.ckpt'%(epoch+1))
         print(" {:d}/1000 epoch finished".format(epoch+1))

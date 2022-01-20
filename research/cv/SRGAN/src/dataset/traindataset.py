@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ from PIL import Image
 import mindspore.dataset as ds
 from mindspore import context
 from mindspore.context import ParallelMode
-
 class mydata:
     """Import dataset"""
     def __init__(self, LR_path, GT_path, in_memory=True):
@@ -109,16 +108,14 @@ class MySampler():
         """length"""
         return self.samples_per_rank
 
-def create_traindataset(batchsize, LR_path, GT_path):
+def create_traindataset(batchsize, LR_path, GT_path, rank_id=0, device_num=1):
     """"create SRGAN dataset"""
 
-    device_num = int(os.getenv("RANK_SIZE", "1"))
-    rank_id = int(os.getenv("RANK_ID", "0"))
     cores = multiprocessing.cpu_count()
     num_parallel_workers = int(cores / device_num)
     parallel_mode = context.get_auto_parallel_context("parallel_mode")
     if parallel_mode in [ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL]:
-        dataset = mydata(LR_path, GT_path, in_memory=True)
+        dataset = mydata(LR_path, GT_path, in_memory=False)
         sampler = MySampler(dataset, local_rank=rank_id, world_size=device_num)
         dataloader = ds.GeneratorDataset(dataset, column_names=['LR', 'HR'], shuffle=True,
                                          num_shards=device_num, shard_id=rank_id, sampler=sampler,
@@ -128,7 +125,7 @@ def create_traindataset(batchsize, LR_path, GT_path):
         dataloader = dataloader.batch(batchsize, drop_remainder=True,
                                       num_parallel_workers=min(8, num_parallel_workers))
     else:
-        dataset = mydata(LR_path, GT_path, in_memory=True)
+        dataset = mydata(LR_path, GT_path, in_memory=False)
         dataloader = ds.GeneratorDataset(dataset, column_names=['LR', 'HR'], shuffle=True,
                                          python_multiprocessing=True,
                                          num_parallel_workers=min(12, num_parallel_workers))
