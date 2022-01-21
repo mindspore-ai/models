@@ -17,10 +17,8 @@
 #ifndef MSNETWORK_H
 #define MSNETWORK_H
 
-#include <context.h>
-#include <lite_session.h>
+#include <types.h>
 #include <model.h>
-#include <errorcode.h>
 #include <cstdio>
 #include <algorithm>
 #include <fstream>
@@ -38,23 +36,18 @@ struct ImgDims {
   int height = 0;
 };
 
-/*struct SessIterm {
-    std::shared_ptr<mindspore::session::LiteSession> sess = nullptr;
-};*/
-
 class MSNetWork {
  public:
   MSNetWork();
 
   ~MSNetWork();
 
-  void CreateSessionMS(char *modelBuffer, size_t bufferLen, mindspore::lite::Context *ctx);
+  bool BuildModel(char *modelBuffer, size_t bufferLen, std::shared_ptr<mindspore::Context> ctx);
 
-  void ReleaseNets(void);
+  std::shared_ptr<mindspore::Model> model() const { return model_; }
 
-  mindspore::session::LiteSession *session() const { return session_; }
+  void ReleaseNets(void) {}
  private:
-  mindspore::session::LiteSession *session_;
-  mindspore::lite::Model *model_;
+  std::shared_ptr<mindspore::Model> model_;
 };
 #endif

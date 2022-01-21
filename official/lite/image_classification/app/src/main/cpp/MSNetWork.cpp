@@ -22,41 +22,17 @@
 
 #define MS_PRINT(format, ...) __android_log_print(ANDROID_LOG_INFO, "MSJNI", format, ##__VA_ARGS__)
 
-MSNetWork::MSNetWork(void) : session_(nullptr), model_(nullptr) {}
+MSNetWork::MSNetWork(void) : model_(nullptr) {}
 
 MSNetWork::~MSNetWork(void) {}
 
-void MSNetWork::CreateSessionMS(char *modelBuffer, size_t bufferLen, mindspore::lite::Context *ctx) {
-  session_ = mindspore::session::LiteSession::CreateSession(ctx);
-  if (session_ == nullptr) {
-    MS_PRINT("Create Session failed.");
-    return;
-  }
-
-  // Compile model.
-  model_ = mindspore::lite::Model::Import(modelBuffer, bufferLen);
+bool MSNetWork::BuildModel(char *modelBuffer, size_t bufferLen,
+                           std::shared_ptr<mindspore::Context> ctx) {
+  model_ = std::make_shared<mindspore::Model>();
   if (model_ == nullptr) {
-    ReleaseNets();
-    MS_PRINT("Import model failed.");
-    return;
+    MS_PRINT("MindSpore build model failed!.");
+    return false;
   }
-
-  int ret = session_->CompileGraph(model_);
-  if (ret != mindspore::lite::RET_OK) {
-    ReleaseNets();
-    MS_PRINT("CompileGraph failed.");
-    return;
-  }
-}
-
-void MSNetWork::ReleaseNets(void) {
-  if (model_ != nullptr) {
-    model_->Free();
-    delete model_;
-    model_ = nullptr;
-  }
-  if (session_ != nullptr) {
-    delete session_;
-    session_ = nullptr;
-  }
+  auto ret = model_->Build(modelBuffer, bufferLen, mindspore::ModelType::kMindIR, ctx);
+  return ret.IsOk();
 }
