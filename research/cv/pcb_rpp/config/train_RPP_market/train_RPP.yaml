@@ -1,0 +1,74 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+run_distribute: False
+enable_profiling: False
+dataset_path: "/cache/dataset/"
+output_path: "/cache/output/"
+load_path: "/cache/load_checkpoint/"
+device_target: "Ascend"
+log_save_path: "./log/RPP/market/train"
+checkpoint_save_path: "./checkpoint/RPP/market/train"
+checkpoint_file_path: "/cache/load_checkpoint/PCB-20_202.ckpt"
+
+#=========================================================================
+#dataset setting
+mindrecord_dir: "./MindRecord"
+dataset_name: "market"
+batch_size: 64
+num_parallel_workers: 4
+device_num: 1
+
+#model setting
+model_name: "RPP"
+
+#optimizer setting
+learning_rate: 0.01
+lr_mult: 1.0
+decay_rate: 0.5
+momentum: 0.9
+weight_decay: 5e-4
+nesterov: True
+frozen: False
+loss_scale: 1.0
+
+#training setting
+mode_name: "GRAPH"
+sink_mode: True
+seed: 37
+epoch_size: 45
+step_size: 15
+warmup: False
+lr_mode: "constant"
+
+
+#checkpoint callbacks setting
+save_checkpoint: True
+save_checkpoint_epochs: 45
+keep_checkpoint_max: 15
+
+#EvalCallBack setting
+run_eval: False
+eval_interval: 15
+eval_start_epoch: 60
+
+use_G_feature: True
+
+#Export setting
+device_id: 0 
+image_height: 384
+image_width: 128
+file_name: ""
+file_format: "MINDIR"
+
+#preprocess setting
+preprocess_result_path: "./preprocess_Result"  
+
+#postprocessing setting
+query_prediction_path: "./query_result_files"
+gallery_prediction_path: "./gallery_result_files"
