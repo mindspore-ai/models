@@ -17,15 +17,14 @@
 python export.py
 """
 import os
-import numpy as np
 
-from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
+import mindspore as ms
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 
-context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target)
 if config.device_target != "GPU":
-    context.set_context(device_id=config.device_id)
+    ms.set_context(device_id=config.device_id)
 
 def modelarts_pre_process():
     '''modelarts pre process function.'''
@@ -53,11 +52,11 @@ def run_export():
 
     assert config.checkpoint_file_path is not None, "checkpoint_path is None."
 
-    param_dict = load_checkpoint(config.checkpoint_file_path)
-    load_param_into_net(net, param_dict)
+    param_dict = ms.load_checkpoint(config.checkpoint_file_path)
+    ms.load_param_into_net(net, param_dict)
 
-    input_arr = Tensor(np.zeros([config.batch_size, 3, config.height, config.width], np.float32))
-    export(net, input_arr, file_name=config.file_name, file_format=config.file_format)
+    input_arr = ms.numpy.zeros([config.batch_size, 3, config.height, config.width], ms.float32)
+    ms.export(net, input_arr, file_name=config.file_name, file_format=config.file_format)
 
 
 if __name__ == '__main__':

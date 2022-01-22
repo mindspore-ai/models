@@ -19,7 +19,7 @@ import os
 import numpy as np
 import moxing as mox
 
-from mindspore import context
+import mindspore as ms
 from mindspore import Tensor
 from mindspore.nn.optim import Momentum, thor, LARS
 from mindspore.train.model import Model
@@ -28,12 +28,10 @@ from mindspore.train.train_thor import ConvertModelUtils
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
-from mindspore.train.serialization import export, load_checkpoint, load_param_into_net
 from mindspore.communication.management import init, get_rank
 from mindspore.common import set_seed
 from mindspore.parallel import set_algo_parameters
 import mindspore.nn as nn
-import mindspore.common.initializer as weight_init
 import mindspore.log as logger
 
 from modelarts.ResNet152.config import config
@@ -127,8 +125,8 @@ def apply_eval(eval_param):
 
 def set_graph_kernel_context(run_platform, net_name):
     if run_platform == "GPU" and net_name == "resnet101":
-        context.set_context(enable_graph_kernel=True)
-        context.set_context(graph_kernel_flags="--enable_parallel_fusion --enable_expand_ops=Conv2D")
+        ms.set_context(enable_graph_kernel=True)
+        ms.set_context(graph_kernel_flags="--enable_parallel_fusion --enable_expand_ops=Conv2D")
 
 
 def set_parameter():
@@ -143,37 +141,37 @@ def set_parameter():
     if config.mode_name == 'GRAPH':
         if target == "Ascend":
             rank_save_graphs_path = os.path.join(config.save_graphs_path, "soma", str(os.getenv('DEVICE_ID')))
-            context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=config.save_graphs,
-                                save_graphs_path=rank_save_graphs_path)
+            ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=config.save_graphs,
+                           save_graphs_path=rank_save_graphs_path)
         else:
-            context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=config.save_graphs)
+            ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=config.save_graphs)
         set_graph_kernel_context(target, config.net_name)
     else:
-        context.set_context(mode=context.PYNATIVE_MODE, device_target=target, save_graphs=False)
+        ms.set_context(mode=ms.PYNATIVE_MODE, device_target=target, save_graphs=False)
 
     if config.parameter_server:
-        context.set_ps_context(enable_ps=True)
+        ms.set_ps_context(enable_ps=True)
     if config.run_distribute:
         if target == "Ascend":
             device_id = int(os.getenv('DEVICE_ID'))
-            context.set_context(device_id=device_id)
-            context.set_auto_parallel_context(device_num=config.device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
+            ms.set_context(device_id=device_id)
+            ms.set_auto_parallel_context(device_num=config.device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                         gradients_mean=True)
             set_algo_parameters(elementwise_op_strategy_follow=True)
             if config.net_name == "resnet50" or config.net_name == "se-resnet50":
                 if config.boost_mode not in ["O1", "O2"]:
-                    context.set_auto_parallel_context(all_reduce_fusion_config=config.all_reduce_fusion_config)
+                    ms.set_auto_parallel_context(all_reduce_fusion_config=config.all_reduce_fusion_config)
             elif config.net_name in ["resnet101", "resnet152"]:
-                context.set_auto_parallel_context(all_reduce_fusion_config=config.all_reduce_fusion_config)
+                ms.set_auto_parallel_context(all_reduce_fusion_config=config.all_reduce_fusion_config)
             init()
         # GPU target
         else:
             init()
-            context.set_auto_parallel_context(device_num=get_device_num(),
-                                              parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
+            ms.set_auto_parallel_context(device_num=get_device_num(),
+                                         parallel_mode=ParallelMode.DATA_PARALLEL,
+                                         gradients_mean=True)
             if config.net_name == "resnet50":
-                context.set_auto_parallel_context(all_reduce_fusion_config=config.all_reduce_fusion_config)
+                ms.set_auto_parallel_context(all_reduce_fusion_config=config.all_reduce_fusion_config)
 
 
 def load_pre_trained_checkpoint():
@@ -196,9 +194,9 @@ def load_pre_trained_checkpoint():
                 print(f"time stamp {time_stamp.strftime('%Y.%m.%d-%H:%M:%S')}"
                       f" pre trained ckpt model {ckpt_files[0]} loading",
                       flush=True)
-                param_dict = load_checkpoint(ckpt_files[0])
+                param_dict = ms.load_checkpoint(ckpt_files[0])
         elif os.path.isfile(config.pre_trained):
-            param_dict = load_checkpoint(config.pre_trained)
+            param_dict = ms.load_checkpoint(config.pre_trained)
         else:
             print(f"Invalid pre_trained {config.pre_trained} parameter.")
     return param_dict
@@ -218,14 +216,14 @@ def init_weight(net, param_dict):
             if config.filter_weight:
                 filter_list = [x.name for x in net.end_point.get_parameters()]
                 filter_checkpoint_parameter_by_list(param_dict, filter_list)
-            load_param_into_net(net, param_dict)
+            ms.load_param_into_net(net, param_dict)
     else:
         for _, cell in net.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 if config.conv_init == "XavierUniform":
-                    cell.weight.set_data(weight_init.initializer(weight_init.XavierUniform(),
-                                                                 cell.weight.shape,
-                                                                 cell.weight.dtype))
+                    cell.weight.set_data(ms.common.initializer.initializer(ms.common.initializer.XavierUniform(),
+                                                                           cell.weight.shape,
+                                                                           cell.weight.dtype))
                 elif config.conv_init == "TruncatedNormal":
                     weight = conv_variance_scaling_initializer(cell.in_channels,
                                                                cell.out_channels,
@@ -233,9 +231,9 @@ def init_weight(net, param_dict):
                     cell.weight.set_data(weight)
             if isinstance(cell, nn.Dense):
                 if config.dense_init == "TruncatedNormal":
-                    cell.weight.set_data(weight_init.initializer(weight_init.TruncatedNormal(),
-                                                                 cell.weight.shape,
-                                                                 cell.weight.dtype))
+                    cell.weight.set_data(ms.common.initializer.initializer(ms.common.initializer.TruncatedNormal(),
+                                                                           cell.weight.shape,
+                                                                           cell.weight.dtype))
                 elif config.dense_init == "RandomNormal":
                     in_channel = cell.in_channels
                     out_channel = cell.out_channels
@@ -332,14 +330,14 @@ def _export_air(ckpt_dir):
     if not ckpt_file:
         return
     net = resnet(config.class_num)
-    param_dict = load_checkpoint(ckpt_file)
-    load_param_into_net(net, param_dict)
+    param_dict = ms.load_checkpoint(ckpt_file)
+    ms.load_param_into_net(net, param_dict)
 
-    input_arr = Tensor(np.zeros([1, 3, 304, 304],
-                                np.float32))
+    input_arr = ms.numpy.zeros([1, 3, 304, 304], ms.float32)
     print("Start export air.")
-    export(net, input_arr, file_name=config.file_name,
-           file_format="AIR")
+
+    ms.export(net, input_arr, file_name=config.file_name, file_format="AIR")
+
     file_name = config.file_name + ".air"
     mox.file.copy(file_name, os.path.join(config.output_path, file_name))
     print("Export success.")

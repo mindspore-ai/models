@@ -14,11 +14,10 @@
 # ============================================================================
 """evaluation metric."""
 
+import mindspore as ms
 from mindspore.communication.management import GlobalComm
-from mindspore.ops import operations as P
+import mindspore.ops as ops
 import mindspore.nn as nn
-import mindspore.common.dtype as mstype
-
 
 class ClassifyCorrectCell(nn.Cell):
     r"""
@@ -45,18 +44,18 @@ class ClassifyCorrectCell(nn.Cell):
     def __init__(self, network):
         super(ClassifyCorrectCell, self).__init__(auto_prefix=False)
         self._network = network
-        self.argmax = P.Argmax()
-        self.equal = P.Equal()
-        self.cast = P.Cast()
-        self.reduce_sum = P.ReduceSum()
-        self.allreduce = P.AllReduce(P.ReduceOp.SUM, GlobalComm.WORLD_COMM_GROUP)
+        self.argmax = ops.Argmax()
+        self.equal = ops.Equal()
+        self.cast = ops.Cast()
+        self.reduce_sum = ops.ReduceSum()
+        self.allreduce = ops.AllReduce(ops.ReduceOp.SUM, GlobalComm.WORLD_COMM_GROUP)
 
     def construct(self, data, label):
         outputs = self._network(data)
         y_pred = self.argmax(outputs)
-        y_pred = self.cast(y_pred, mstype.int32)
+        y_pred = self.cast(y_pred, ms.int32)
         y_correct = self.equal(y_pred, label)
-        y_correct = self.cast(y_correct, mstype.float32)
+        y_correct = self.cast(y_correct, ms.float32)
         y_correct = self.reduce_sum(y_correct)
         total_correct = self.allreduce(y_correct)
         return (total_correct,)
