@@ -14,20 +14,23 @@ enable_profiling: False
 # ======================================================================================
 # common options
 num_classes: 1000 
+label_smooth_factor: 0.1
 device_id: 0
 rank: 0
 group_size: 1
 
 # ======================================================================================
 # Training options
-epoch_size: 600  
-keep_checkpoint_max: 50
-save_ckpt_path: "./"
+epoch_size: 600
+keep_checkpoint_max: 5
 save_checkpoint_epochs: 1
 save_checkpoint: True
+checkpoint_path: "./checkpoint"
+
 amp_level: "O3"
 is_distributed: False
 dataset_path: "../imagenet"
+
 resume: ""
 resume_epoch: 1
 random_seed: 1
@@ -43,6 +46,7 @@ val_batch_size: 125
 #learning rate config
 lr_init: 0.32
 lr_decay_rate: 0.97
+# 2.2 for GPU, 2.4 for Ascend
 num_epoch_per_decay: 2.4
 drop_path_prob: 0.5
 

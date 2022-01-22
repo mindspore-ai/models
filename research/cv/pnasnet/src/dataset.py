@@ -43,7 +43,7 @@ def create_dataset(dataset_path, do_train, rank, group_size,
     Returns:
         dataset
     """
-    if group_size == 1  or not do_train:
+    if group_size == 1 or not do_train:
         data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers,
                                          shuffle=shuffle)
         print(dataset_path)

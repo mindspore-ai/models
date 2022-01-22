@@ -18,29 +18,28 @@ from collections import OrderedDict
 import numpy as np
 
 import mindspore.nn as nn
-import mindspore.ops.operations as P
+import mindspore.ops as ops
+import mindspore.common.dtype as mstype
 
 from mindspore import Tensor
 from mindspore.nn.loss.loss import LossBase
-
-import mindspore.common.dtype as mstype
 
 class MaxPool(nn.Cell):
     """
     MaxPool: MaxPool2d with zero padding.
     """
-    def __init__(self, kernel_size, stride=1, padding=1, zero_pad=False):
+    def __init__(self, kernel_size, stride=1, zero_pad=False):
         super(MaxPool, self).__init__()
-        self.zero_pad = zero_pad
-        self.zero_pad_op = nn.Pad(((0, 0), (0, 0), (1, 0), (1, 0)))
+        self.pad = zero_pad
+        if self.pad:
+            self.zero_pad = nn.Pad(paddings=((0, 0), (0, 0), (1, 0), (1, 0)))
         self.pool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride, pad_mode='same')
 
     def construct(self, x):
-        """ construct network """
-        if self.zero_pad:
-            x = self.zero_pad_op(x)
+        if self.pad:
+            x = self.zero_pad(x)
         x = self.pool(x)
-        if self.zero_pad:
+        if self.pad:
             x = x[:, :, 1:, 1:]
         return x
 
@@ -76,8 +75,9 @@ class BranchSeparables(nn.Cell):
         padding = kernel_size // 2
         middle_channels = out_channels if stem_cell else in_channels
 
-        self.zero_pad = zero_pad
-        self.zero_pad_op = nn.Pad(((0, 0), (0, 0), (1, 0), (1, 0)))
+        self.pad = zero_pad
+        if self.pad:
+            self.zero_pad = nn.Pad(paddings=((0, 0), (0, 0), (1, 0), (1, 0)))
 
         self.relu_1 = nn.ReLU()
         self.separable_1 = SeparableConv2d(in_channels, middle_channels,
@@ -94,10 +94,10 @@ class BranchSeparables(nn.Cell):
     def construct(self, x):
         """ construct network """
         x = self.relu_1(x)
-        if self.zero_pad:
-            x = self.zero_pad_op(x)
+        if self.pad:
+            x = self.zero_pad(x)
         x = self.separable_1(x)
-        if self.zero_pad:
+        if self.pad:
             x = x[:, :, 1:, 1:]
         x = self.bn_sep_1(x)
         x = self.relu_2(x)
@@ -147,8 +147,7 @@ class FactorizedReduction(nn.Cell):
         )
         self.path_2.append(
             nn.Conv2d(in_channels=in_channels, out_channels=out_channels // 2 + int(out_channels % 2),
-                      kernel_size=1, stride=1,
-                      pad_mode='pad', has_bias=False)
+                      kernel_size=1, stride=1, pad_mode='pad', has_bias=False)
         )
 
         self.final_path_bn = nn.BatchNorm2d(num_features=out_channels, eps=0.001, momentum=0.9)
@@ -163,7 +162,7 @@ class FactorizedReduction(nn.Cell):
         x_path2 = self.path_2[1](x_path2)
         x_path2 = self.path_2[2](x_path2)
 
-        out = self.final_path_bn(P.Concat(1)((x_path1, x_path2)))
+        out = self.final_path_bn(ops.Concat(1)((x_path1, x_path2)))
         return out
 
 class CellBase(nn.Cell):
@@ -197,7 +196,7 @@ class CellBase(nn.Cell):
             x_comb_iter_4_right = x_right
         x_comb_iter_4 = x_comb_iter_4_left + x_comb_iter_4_right
 
-        x_out = P.Concat(1)((x_comb_iter_0, x_comb_iter_1, x_comb_iter_2, x_comb_iter_3, x_comb_iter_4))
+        x_out = ops.Concat(1)((x_comb_iter_0, x_comb_iter_1, x_comb_iter_2, x_comb_iter_3, x_comb_iter_4))
 
         return x_out
 
@@ -262,7 +261,6 @@ class Cell(CellBase):
         stride = 2 if is_reduction else 1
 
         self.match_prev_layer_dimensions = match_prev_layer_dimensions
-
         if match_prev_layer_dimensions:
             self.conv_prev_1x1 = FactorizedReduction(in_channels_left, out_channels_left)
         else:
@@ -324,7 +322,7 @@ class AuxLogits(nn.Cell):
         self.bn_1 = nn.BatchNorm2d(768)
         self.flatten = nn.Flatten()
         if name == 'large':
-            self.fc = nn.Dense(6912, out_channels)
+            self.fc = nn.Dense(6912, out_channels)  # large: 6912, mobile:768
         else:
             self.fc = nn.Dense(768, out_channels)
 
@@ -349,9 +347,9 @@ class PNASNet5_Mobile(nn.Cell):
         Chenxi Liu et al. Progressive Neural Architecture SearchLearning Transferable Architectures.
                           ECCV 2018.
     Args:
-        num_classes: The number of classes.
-        enable_aux_logits: whether to enable aux_logits. True for training, False(default) for evaluation.
-        enable_dropout: whether to enable dropout. True for training. False(default) for evaluation.
+        num_classes(int): The number of classes.
+        enable_aux_logits(bool): whether to enable aux_logits. True for training, False(default) for evaluation.
+        enable_dropout(bool): whether to enable dropout. True for training. False(default) for evaluation.
     Returns:
         Tensor, Tensor: the logits, aux_logits when enable_aux_logits is True.
         Tensor: the logits when enable_aux_logits is False.
@@ -360,7 +358,6 @@ class PNASNet5_Mobile(nn.Cell):
     def __init__(self, num_classes=1000, enable_aux_logits=False, enable_dropout=False):
         super(PNASNet5_Mobile, self).__init__()
         self.num_classes = num_classes
-
         self.enable_aux_logits = enable_aux_logits
         self.enable_dropout = enable_dropout
 
@@ -480,7 +477,7 @@ class PNASNet5_Mobile(nn.Cell):
 
         y = self.avg_pool(y)
 
-        y = P.Reshape()(y, (P.Shape()(y)[0], -1,))
+        y = ops.Reshape()(y, (ops.Shape()(y)[0], -1,))
 
         if self.enable_dropout:
             y = self.dropout(y)
@@ -488,15 +485,14 @@ class PNASNet5_Mobile(nn.Cell):
         y = self.last_linear(y)
         return y
 
-    def construct(self, input_data):
+    def construct(self, x):
         """ construct network """
-        y, y_aux_logits = self.features(input_data)
+        y, y_aux_logits = self.features(x)
 
         y = self.logits(y)
 
         if self.enable_aux_logits:
             return y, y_aux_logits
-
         return y
 
 class CrossEntropy(LossBase):
@@ -506,33 +502,40 @@ class CrossEntropy(LossBase):
     def __init__(self, smooth_factor=0, num_classes=1000, factor=0.4):
         super(CrossEntropy, self).__init__()
         self.factor = factor
+        self.onehot = ops.OneHot()
+        self.on_value = Tensor(1.0 - smooth_factor, mstype.float32)
+        self.off_value = Tensor(1.0 * smooth_factor / (num_classes - 1), mstype.float32)
+        self.ce = nn.SoftmaxCrossEntropyWithLogits()
+        self.mean = ops.ReduceMean(False)
 
-        self.ce = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-
-    def construct(self, logits, logits_aux, label):
-        """ construct network """
-        loss_logit = self.ce(logits, label)
-        loss_aux = self.ce(logits_aux, label)
+    def construct(self, logit, aux, label):
+        one_hot_label = self.onehot(label, ops.Shape()(logit)[1], self.on_value, self.off_value)
+        loss_logit = self.ce(logit, one_hot_label)
+        loss_logit = self.mean(loss_logit, 0)
+        one_hot_label_aux = self.onehot(label, ops.Shape()(aux)[1], self.on_value, self.off_value)
+        loss_aux = self.ce(aux, one_hot_label_aux)
+        loss_aux = self.mean(loss_aux, 0)
 
         return loss_logit + self.factor*loss_aux
 
 class PNASNet5_Mobile_WithLoss(nn.Cell):
     """
-    Provide pnasnet-mobile training loss through network.
+    Provide  pnasnet-mobile training loss through network.
     Args:
-        num_classes: The number of classes.
+        config(dict): the config of pnasnet-mobile.
     Returns:
         Tensor: the loss of the network.
     """
-    def __init__(self, num_classes):
+    def __init__(self, config):
         super(PNASNet5_Mobile_WithLoss, self).__init__()
-        self.network = PNASNet5_Mobile(num_classes=num_classes, enable_aux_logits=True, enable_dropout=True)
-        self.loss = CrossEntropy()
-        self.cast = P.Cast()
+        self.network = PNASNet5_Mobile(num_classes=config.num_classes, enable_aux_logits=True, enable_dropout=True)
+        self.loss = CrossEntropy(smooth_factor=0, num_classes=config.num_classes, factor=config.aux_factor)
+        if config.device_target == 'GPU':
+            self.loss = CrossEntropy(smooth_factor=config.label_smooth_factor,
+                                     num_classes=config.num_classes, factor=config.aux_factor)
+        self.cast = ops.Cast()
 
     def construct(self, data, label):
-        """ construct network """
         logits, logits_aux = self.network(data)
-
         total_loss = self.loss(logits, logits_aux, label)
         return self.cast(total_loss, mstype.float32)

@@ -34,11 +34,33 @@ from src.lr_generator import get_lr
 
 from src.model_utils.config import config
 
-def prepare_env():
+def get_rank_info():
     """
-    prepare_env: set the context and config
+    get rank id and rank size
     """
-    print('epoch_size = ', config.epoch_size, ' num_classes = ', config.num_classes)
+    if config.is_distributed:
+        init()
+        if config.enable_modelarts or config.device_target != 'Ascend':
+            device_id = get_rank()
+            group_size = get_group_size()
+        else:
+            device_id = int(os.getenv('DEVICE_ID', default='0'))
+            group_size = int(os.getenv('DEVICE_NUM', default='1'))
+
+        parallel_mode = ParallelMode.DATA_PARALLEL
+        context.set_auto_parallel_context(parallel_mode=parallel_mode, device_num=group_size,
+                                          gradients_mean=True)
+    else:
+        device_id = config.device_id
+        group_size = 1
+        context.set_context(device_id=device_id)
+    return device_id, group_size
+
+def train():
+    """
+    train: for model trainning
+    """
+    start_time = time.time()
 
     set_seed(config.random_seed)
 
@@ -48,47 +70,9 @@ def prepare_env():
         context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False)
 
     # init distributed
-    if config.is_distributed:
-        init()
+    config.rank, config.group_size = get_rank_info()
 
-        if config.enable_modelarts:
-            device_id = get_rank()
-            config.group_size = get_group_size()
-        else:
-            if config.device_target == 'Ascend':
-                device_id = int(os.getenv('DEVICE_ID', default='0'))
-                config.group_size = int(os.getenv('DEVICE_NUM', default='1'))
-            else:
-                device_id = get_rank()
-                config.group_size = get_group_size()
-
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          device_num=config.group_size,
-                                          gradients_mean=True)
-    else:
-        device_id = config.device_id
-        config.group_size = 1
-        context.set_context(device_id=device_id)
-    rank_id = device_id
-
-    config.rank = rank_id
-    config.device_id = device_id
-
-    print('rank_id = ', rank_id, ' group_size = ', config.group_size)
-
-    print("cutout = ", config.cutout, " cutout_length = ", config.cutout_length)
-    print("epoch_size = ", config.epoch_size, " train_batch_size = ", config.train_batch_size,
-          " lr_init = ", config.lr_init, " weight_decay = ", config.weight_decay)
-
-def train():
-    """
-    train: for model trainning
-    """
-    start_time = time.time()
-
-    device_id = config.device_id
     resume = config.resume
-
     if config.enable_modelarts:
         # download dataset from obs to cache
         import moxing
@@ -108,9 +92,7 @@ def train():
         save_checkpoint_path = '/cache/train_output/' + str(device_id) + '/'
     else:
         dataset_path = config.dataset_path
-        save_checkpoint_path = os.path.join(config.save_ckpt_path, 'ckpt_' + str(config.rank) + '/')
-
-    log_filename = os.path.join(save_checkpoint_path, 'log_' + str(device_id) + '.txt')
+        save_checkpoint_path = os.path.join(config.checkpoint_path, 'ckpt_' + str(config.rank) + '/')
 
     # dataloader
     if dataset_path.find('/train') > 0:
@@ -126,7 +108,7 @@ def train():
     train_batches_per_epoch = train_dataset.get_dataset_size()
 
     # network
-    net_with_loss = PNASNet5_Mobile_WithLoss(num_classes=config.num_classes)
+    net_with_loss = PNASNet5_Mobile_WithLoss(config)
     if resume != '':
         ckpt = load_checkpoint(resume)
         load_param_into_net(net_with_loss, ckpt)
@@ -138,6 +120,7 @@ def train():
     lr = get_lr(lr_init=config.lr_init, lr_decay_rate=config.lr_decay_rate,
                 num_epoch_per_decay=config.num_epoch_per_decay, total_epochs=epoch_size,
                 steps_per_epoch=train_batches_per_epoch, is_stair=True)
+    # resume training
     if resume:
         resume_epoch = config.resume_epoch
         lr = lr[train_batches_per_epoch * resume_epoch:]
@@ -166,13 +149,14 @@ def train():
     print("============== Starting Training ==============")
     loss_cb = LossMonitor(per_print_times=train_batches_per_epoch)
     time_cb = TimeMonitor(data_size=train_batches_per_epoch)
+    callbacks = [loss_cb, time_cb]
 
-    config_ck = CheckpointConfig(save_checkpoint_steps=train_batches_per_epoch,
-                                 keep_checkpoint_max=config.keep_checkpoint_max)
-    ckpoint_cb = ModelCheckpoint(prefix=f"pnasnet-mobile-rank{config.rank}",
-                                 directory=save_checkpoint_path, config=config_ck)
-
-    callbacks = [loss_cb, time_cb, ckpoint_cb]
+    if config.save_checkpoint:
+        config_ck = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_epochs*train_batches_per_epoch,
+                                     keep_checkpoint_max=config.keep_checkpoint_max)
+        ckpoint_cb = ModelCheckpoint(prefix=f"pnasnet-mobile-rank{config.rank}",
+                                     directory=save_checkpoint_path, config=config_ck)
+        callbacks += [ckpoint_cb]
 
     try:
         model.train(epoch_size, train_dataset, callbacks=callbacks, dataset_sink_mode=True)
@@ -182,25 +166,10 @@ def train():
         print("============== Train Success ==================")
 
     print("data_url   = ", config.data_url)
-    print("cutout = ", config.cutout, " cutout_length = ", config.cutout_length)
-    print("epoch_size = ", epoch_size, " train_batch_size = ", config.train_batch_size,
-          " lr_init = ", config.lr_init, " weight_decay = ", config.weight_decay)
-
     print("time: ", (time.time() - start_time) / 3600, " hours")
 
-    fp = open(log_filename, 'at+')
-
-    print("data_url   = ", config.data_url, file=fp)
-    print("cutout = ", config.cutout, " cutout_length = ", config.cutout_length, file=fp)
-    print("epoch_size = ", epoch_size, " train_batch_size = ", config.train_batch_size,
-          " lr_init = ", config.lr_init, " weight_decay = ", config.weight_decay, file=fp)
-
-    print("time: ", (time.time() - start_time) / 3600, file=fp)
-    fp.close()
+    if config.enable_modelarts and os.path.exists('/cache/train_output'):
+        moxing.file.copy_parallel(src_url='/cache/train_output', dst_url=config.train_url)
 
 if __name__ == '__main__':
-    prepare_env()
     train()
-    if config.enable_modelarts:
-        if os.path.exists('/cache/train_output'):
-            moxing.file.copy_parallel(src_url='/cache/train_output', dst_url=config.train_url)

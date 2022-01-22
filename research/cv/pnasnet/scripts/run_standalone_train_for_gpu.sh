@@ -41,5 +41,4 @@ fi
 
 DEVICE_ID=$1
 DATASET_PATH=$2
-CUDA_VISIBLE_DEVICES=$DEVICE_ID python ../train.py --device_target='GPU' --device_id=$DEVICE_ID --dataset_path=$DATASET_PATH > train.log 2>&1 &
-
+CUDA_VISIBLE_DEVICES=$DEVICE_ID python ../train.py --device_target='GPU' --num_epoch_per_decay 2.2 --dataset_path $DATASET_PATH > train.log 2>&1 &

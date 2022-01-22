@@ -27,12 +27,10 @@ from src.dataset import create_dataset
 from src.pnasnet_mobile import PNASNet5_Mobile
 
 from src.model_utils.config import config
+from src.CrossEntropySmooth import CrossEntropySmooth
 
 if __name__ == '__main__':
     start_time = time.time()
-
-    print('num_classes = ', config.num_classes)
-
     device_id = config.device_id
     print('device_id = ', device_id)
 
@@ -77,6 +75,8 @@ if __name__ == '__main__':
                              drop_remainder=False, shuffle=False)
 
     loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+    if config.device_target == 'GPU':
+        loss = CrossEntropySmooth(smooth_factor=config.label_smooth_factor, num_classes=config.num_classes)
 
     net = PNASNet5_Mobile(num_classes=config.num_classes)
     eval_metrics = {'Loss': nn.Loss(),
@@ -112,7 +112,6 @@ if __name__ == '__main__':
                     file_list.append(os.path.join(root, file))
 
         file_count = 0
-
         best_top1_acc = 0.0
         best_top1_acc_checkpoint = ''
 
