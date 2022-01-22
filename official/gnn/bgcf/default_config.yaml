@@ -17,7 +17,7 @@ modelarts_dataset_unzip_name: "amazon_beauty"
 dataset: "Beauty"
 datapath: "./scripts/data_mr"
 Ks: [5, 10, 20, 100]
-workers: 8
+workers: 16
 ckptpath: "../ckpts"
 epsilon: 0.00000001 # 1e-8
 learning_rate: 0.001 # 1e-3
