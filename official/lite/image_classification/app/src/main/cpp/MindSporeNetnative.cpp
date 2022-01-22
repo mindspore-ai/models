@@ -220,43 +220,43 @@ char *CreateLocalModelBuffer(JNIEnv *env, jobject modelBuffer) {
  * @return
  */
 std::string ProcessRunnetResult(const int RET_CATEGORY_SUM, const char *const labels_name_map[],
-                                std::unordered_map<std::string, mindspore::tensor::MSTensor *> msOutputs) {
+                                std::unordered_map<std::string, mindspore::MSTensor> msOutputs) {
   // Get the branch of the model output.
   // Use iterators to get map elements.
-  std::unordered_map<std::string, mindspore::tensor::MSTensor *>::iterator iter;
+  std::unordered_map<std::string, mindspore::MSTensor>::iterator iter;
   iter = msOutputs.begin();
 
   // The mobilenetv2.ms model output just one branch.
   auto outputTensor = iter->second;
 
-  int tensorNum = outputTensor->ElementsNum();
+  int tensorNum = outputTensor.ElementNum();
   MS_PRINT("Number of tensor elements:%d", tensorNum);
 
   // Get a pointer to the first score.
-  float *temp_scores = static_cast<float *>(outputTensor->MutableData());
+  float *temp_scores = static_cast<float *>(outputTensor.MutableData());
   float scores[RET_CATEGORY_SUM];
   for (int i = 0; i < RET_CATEGORY_SUM; ++i) {
-      scores[i] = temp_scores[i];
+    scores[i] = temp_scores[i];
   }
 
   const float unifiedThre = 0.5;
   const float probMax = 1.0;
   for (size_t i = 0; i < RET_CATEGORY_SUM; ++i) {
-      float threshold = g_thres_map[i];
-      float tmpProb = scores[i];
-      if (tmpProb < threshold) {
-          tmpProb = tmpProb / threshold * unifiedThre;
-      } else {
-          tmpProb = (tmpProb - threshold) / (probMax - threshold) * unifiedThre + unifiedThre;
-      }
-      scores[i] = tmpProb;
+    float threshold = g_thres_map[i];
+    float tmpProb = scores[i];
+    if (tmpProb < threshold) {
+      tmpProb = tmpProb / threshold * unifiedThre;
+    } else {
+      tmpProb = (tmpProb - threshold) / (probMax - threshold) * unifiedThre + unifiedThre;
     }
+    scores[i] = tmpProb;
+  }
 
-    for (int i = 0; i < RET_CATEGORY_SUM; ++i) {
-        if (scores[i] > 0.5) {
-            MS_PRINT("MindSpore scores[%d] : [%f]", i, scores[i]);
-        }
+  for (int i = 0; i < RET_CATEGORY_SUM; ++i) {
+    if (scores[i] > 0.5) {
+      MS_PRINT("MindSpore scores[%d] : [%f]", i, scores[i]);
     }
+  }
 
   // Score for each category.
   // Converted to text information that needs to be displayed in the APP.
@@ -282,9 +282,9 @@ bool BitmapToLiteMat(JNIEnv *env, const jobject &srcBitmap, LiteMat *lite_mat) {
     return false;
   }
   AndroidBitmap_lockPixels(env, srcBitmap, &pixels);
-  if (info.stride == info.width*4) {
+  if (info.stride == info.width * 4) {
     ret = InitFromPixel(reinterpret_cast<const unsigned char *>(pixels),
-               LPixelType::RGBA2RGB, LDataType::UINT8,
+                        LPixelType::RGBA2RGB, LDataType::UINT8,
                         info.width, info.height, lite_mat_bgr);
     if (!ret) {
       MS_PRINT("Init From RGBA error");
@@ -299,7 +299,7 @@ bool BitmapToLiteMat(JNIEnv *env, const jobject &srcBitmap, LiteMat *lite_mat) {
       data += info.stride;
     }
     ret = InitFromPixel(reinterpret_cast<const unsigned char *>(pixels_ptr),
-               LPixelType::RGBA2RGB, LDataType::UINT8,
+                        LPixelType::RGBA2RGB, LDataType::UINT8,
                         info.width, info.height, lite_mat_bgr);
     if (!ret) {
       MS_PRINT("Init From RGBA error");
@@ -368,24 +368,26 @@ Java_com_mindspore_classification_gallery_classify_TrackingMobile_loadModel(JNIE
   MSNetWork *labelNet = new MSNetWork;
   *labelEnv = labelNet;
 
-  mindspore::lite::Context *context = new mindspore::lite::Context;
-  context->thread_num_ = num_thread;
-  context->device_list_[0].device_info_.cpu_device_info_.cpu_bind_mode_ = mindspore::lite::NO_BIND;
-  context->device_list_[0].device_info_.cpu_device_info_.enable_float16_ = false;
-  context->device_list_[0].device_type_ = mindspore::lite::DT_CPU;
-
-  labelNet->CreateSessionMS(modelBuffer, bufferLen, context);
-  delete context;
-
-  if (labelNet->session() == nullptr) {
-    MS_PRINT("MindSpore create session failed!.");
+  auto context = std::make_shared<mindspore::Context>();
+  if (context == nullptr) {
+    MS_PRINT("context create failed!");
     delete labelNet;
     delete labelEnv;
     return (jlong) nullptr;
   }
 
-  if (model_buffer != nullptr) {
-    env->DeleteLocalRef(model_buffer);
+  context->SetThreadNum(num_thread);
+  context->SetThreadAffinity(0);
+  auto &device_list = context->MutableDeviceInfo();
+  auto cpuDeviceInfo = std::make_shared<mindspore::CPUDeviceInfo>();
+  cpuDeviceInfo->SetEnableFP16(false);
+  device_list.push_back(cpuDeviceInfo);
+
+  if (!labelNet->BuildModel(modelBuffer, bufferLen, context)) {
+    MS_PRINT("MindSpore Build model failed!.");
+    delete labelNet;
+    delete labelEnv;
+    return (jlong) nullptr;
   }
 
   return (jlong) labelEnv;
@@ -423,15 +425,15 @@ Java_com_mindspore_classification_gallery_classify_TrackingMobile_runNet(JNIEnv 
   }
   MSNetWork *labelNet = static_cast<MSNetWork *>(*labelEnv);
 
-  auto mSession = labelNet->session();
-  if (mSession == nullptr) {
+  auto mModel = labelNet->model();
+  if (mModel == nullptr) {
     MS_PRINT("MindSpore error, Session is a nullptr.");
     return NULL;
   }
   MS_PRINT("MindSpore get session.");
 
-  auto msInputs = mSession->GetInputs();
-  if (msInputs.size() == 0) {
+  auto msInputs = mModel->GetInputs();
+  if (msInputs.empty()) {
     MS_PRINT("MindSpore error, msInputs.size() equals 0.");
     return NULL;
   }
@@ -439,13 +441,13 @@ Java_com_mindspore_classification_gallery_classify_TrackingMobile_runNet(JNIEnv 
 
   float *dataHWC = reinterpret_cast<float *>(lite_norm_mat_cut.data_ptr_);
   // Copy dataHWC to the model input tensor.
-  memcpy(inTensor->MutableData(), dataHWC,
+  memcpy(inTensor.MutableData(), dataHWC,
          inputDims.channel * inputDims.width * inputDims.height * sizeof(float));
-
+  std::vector<mindspore::MSTensor> outputs;
   // After the model and image tensor data is loaded, run inference.
-  auto status = mSession->RunGraph();
+  auto status = mModel->Predict(msInputs, &outputs);
 
-  if (status != mindspore::lite::RET_OK) {
+  if (!status.IsOk()) {
     MS_PRINT("MindSpore run net error.");
     return NULL;
   }
@@ -454,11 +456,11 @@ Java_com_mindspore_classification_gallery_classify_TrackingMobile_runNet(JNIEnv 
    * Get the MindSpore inference results.
    * Return the map of output node name and MindSpore Lite MSTensor.
    */
-  auto names = mSession->GetOutputTensorNames();
-  std::unordered_map<std::string, mindspore::tensor::MSTensor *> msOutputs;
+  auto names = mModel->GetOutputTensorNames();
+  std::unordered_map<std::string, mindspore::MSTensor> msOutputs;
   for (const auto &name : names) {
-    auto temp_dat = mSession->GetOutputByTensorName(name);
-    msOutputs.insert(std::pair<std::string, mindspore::tensor::MSTensor *> {name, temp_dat});
+    auto temp_dat = mModel->GetOutputByTensorName(name);
+    msOutputs.insert(std::pair<std::string, mindspore::MSTensor>{name, temp_dat});
   }
 
   std::string resultStr = ProcessRunnetResult(::RET_CATEGORY_SUM,

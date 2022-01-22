@@ -4,9 +4,9 @@
  * The libraries can be downloaded manually.
  */
 def targetMindSporeInclude = "src/main/cpp/"
-def mindsporeLite_Version = "1.5.0-rc1"
-def modle_Version = "1.5"
-def mindsporeLite_android_Version = "mindspore-lite-1.5.0-android-aarch64"
+def mindsporeLite_Version = "1.6.0"
+def modle_Version = "1.6"
+def mindsporeLite_android_Version = "mindspore-lite-1.6.0-android-aarch64"
 
 def targetModelFile = "src/main/assets/model/mobilenetv2.ms"
 def mindSporeLibrary_arm64 = "src/main/cpp/${mindsporeLite_android_Version}.tar.gz"

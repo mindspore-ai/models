@@ -16,23 +16,28 @@
 package com.mindspore.imagesegmentation.help;
 
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.util.Log;
 
 import androidx.core.graphics.ColorUtils;
 
-import com.mindspore.lite.LiteSession;
-import com.mindspore.lite.MSTensor;
-import com.mindspore.lite.Model;
-import com.mindspore.lite.config.CpuBindMode;
-import com.mindspore.lite.config.DeviceType;
-import com.mindspore.lite.config.MSConfig;
+import com.mindspore.MSTensor;
+import com.mindspore.Model;
+import com.mindspore.config.CpuBindMode;
+import com.mindspore.config.DeviceType;
+import com.mindspore.config.MSContext;
+import com.mindspore.config.ModelType;
 
+
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 public class TrackingMobile {
     private static final String TAG = "TrackingMobile";
@@ -51,8 +56,6 @@ public class TrackingMobile {
 
     private final Context mContext;
 
-    private MSConfig msConfig;
-    private LiteSession session;
     private Model model;
 
     public TrackingMobile(Context context) {
@@ -60,45 +63,70 @@ public class TrackingMobile {
         init();
     }
 
+    private MappedByteBuffer loadModel(Context context, String modelName) {
+        FileInputStream fis = null;
+        AssetFileDescriptor fileDescriptor = null;
+
+        try {
+            fileDescriptor = context.getAssets().openFd(modelName);
+            fis = new FileInputStream(fileDescriptor.getFileDescriptor());
+            FileChannel fileChannel = fis.getChannel();
+            long startOffset = fileDescriptor.getStartOffset();
+            long declaredLen = fileDescriptor.getDeclaredLength();
+            return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLen);
+        } catch (IOException var24) {
+            Log.e("MS_LITE", "Load model failed");
+        } finally {
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException var23) {
+                    Log.e("MS_LITE", "Close file failed");
+                }
+            }
+
+            if (fileDescriptor != null) {
+                try {
+                    fileDescriptor.close();
+                } catch (IOException var22) {
+                    Log.e("MS_LITE", "Close fileDescriptor failed");
+                }
+            }
+
+        }
+
+        return null;
+    }
+
     public void init() {
         // Load the .ms model.
         model = new Model();
-        if (!model.loadModel(mContext, IMAGESEGMENTATIONMODEL)) {
-            Log.e(TAG, "Load Model failed");
-            return;
-        }
 
         // Create and init config.
-        msConfig = new MSConfig();
-        if (!msConfig.init(DeviceType.DT_CPU, 2, CpuBindMode.MID_CPU)) {
+        MSContext context = new MSContext();
+        if (!context.init(2, CpuBindMode.MID_CPU, false)) {
             Log.e(TAG, "Init context failed");
             return;
         }
-
+        if (!context.addDeviceInfo(DeviceType.DT_CPU, false, 0)) {
+            Log.e(TAG, "Add device info failed");
+            return;
+        }
+        MappedByteBuffer modelBuffer = loadModel(mContext, IMAGESEGMENTATIONMODEL);
+        if(modelBuffer == null) {
+            Log.e(TAG, "Load model failed");
+            return;
+        }
         // Create the MindSpore lite session.
-        session = new LiteSession();
-        if (!session.init(msConfig)) {
-            Log.e(TAG, "Create session failed");
-            msConfig.free();
-            return;
+        boolean ret = model.build(modelBuffer, ModelType.MT_MINDIR,context);
+        if(!ret) {
+            Log.e(TAG, "Build model failed");
         }
-        msConfig.free();
-
-        // Complie graph.
-        if (!session.compileGraph(model)) {
-            Log.e(TAG, "Compile graph failed");
-            model.freeBuffer();
-            return;
-        }
-
-        // Note: when use model.freeBuffer(), the model can not be complie graph again.
-        model.freeBuffer();
-
     }
 
     public ModelTrackingResult execute(Bitmap bitmap) {
         // Set input tensor values.
-        List<MSTensor> inputs = session.getInputs();
+        List<MSTensor> inputs = model.getInputs();
         if (inputs.size() != 1) {
             Log.e(TAG, "inputs.size() != 1");
             return null;
@@ -114,18 +142,16 @@ public class TrackingMobile {
         inTensor.setData(contentArray);
 
         // Run graph to infer results.
-        if (!session.runGraph()) {
+        if (!model.predict()) {
             Log.e(TAG, "Run graph failed");
             return null;
         }
 
         // Get output tensor values.
-        List<String> tensorNames = session.getOutputTensorNames();
-        Map<String, MSTensor> outputs = session.getOutputMapByTensor();
-        for (String tensorName : tensorNames) {
-            MSTensor output = outputs.get(tensorName);
+        List<MSTensor> outputs = model.getOutputs();
+        for (MSTensor output : outputs) {
             if (output == null) {
-                Log.e(TAG, "Can not find output " + tensorName);
+                Log.e(TAG, "Output is null");
                 return null;
             }
             float[] results = output.getFloatData();
@@ -203,7 +229,6 @@ public class TrackingMobile {
 
     // Note: we must release the memory at the end, otherwise it will cause the memory leak.
     public void free() {
-        session.free();
         model.free();
     }
 
