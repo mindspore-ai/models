@@ -19,7 +19,7 @@ import os
 import mindspore
 import mindspore.nn as nn
 from mindspore import context, Tensor
-from mindspore.communication.management import init, get_rank
+from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, LossMonitor, TimeMonitor, Callback
 from mindspore.train import Model
 from mindspore.context import ParallelMode
@@ -65,11 +65,12 @@ def modelarts_process():
         config.coco_root = os.path.join(config.coco_root, config.modelarts_dataset_unzip_name)
         print(os.listdir(os.path.join(config.data_path, config.modelarts_dataset_unzip_name)))
 
+
 @moxing_wrapper(pre_process=modelarts_process)
 def train_retinanet_resnet152():
     """ train_retinanet_resnet152 """
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.run_platform)
     if config.run_platform == "Ascend":
-        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
         if config.distribute:
             if os.getenv("DEVICE_ID", "not_set").isdigit():
                 context.set_context(device_id=int(os.getenv("DEVICE_ID")))
@@ -83,6 +84,15 @@ def train_retinanet_resnet152():
             device_num = 1
             context.set_context(device_id=get_device_id())
 
+    elif config.run_platform == "GPU":
+        rank = config.device_id
+        device_num = config.device_num
+        if config.distribute:
+            init()
+            rank = get_rank()
+            device_num = get_group_size()
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
+                                              device_num=device_num)
     else:
         raise ValueError("Unsupported platform.")
 
@@ -102,7 +112,7 @@ def train_retinanet_resnet152():
         backbone = resnet152(config.num_classes)
         retinanet = retinahead(backbone, config)
         net = retinanetWithLossCell(retinanet, config)
-        net.to_float(mindspore.float16)
+        net.to_float(mindspore.float32)
         init_net_param(net)
 
         if config.pre_trained:
@@ -136,6 +146,7 @@ def train_retinanet_resnet152():
         else:
             cb += [ckpt_cb]
             model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
+
 
 if __name__ == '__main__':
     train_retinanet_resnet152()

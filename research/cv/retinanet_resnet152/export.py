@@ -28,6 +28,7 @@ from src.backbone import resnet152
 def modelarts_process():
     pass
 
+
 @moxing_wrapper(pre_process=modelarts_process)
 def export_retinanet_resnet152():
     """ export_retinanet_resnet152 """
@@ -43,6 +44,7 @@ def export_retinanet_resnet152():
     shape = [config.batch_size, 3] + config.img_shape
     input_data = Tensor(np.zeros(shape), mstype.float32)
     export(net, input_data, file_name=config.file_name, file_format=config.file_format)
+
 
 if __name__ == '__main__':
     export_retinanet_resnet152()

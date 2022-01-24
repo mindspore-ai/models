@@ -2,6 +2,8 @@
 
 <!-- TOC -->
 
+[View English](./README.md)
+
 - [Retinanet 描述](#retinanet描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
@@ -48,19 +50,14 @@ Retinanet的整体网络架构如下所示：
 
 ## [数据集](#content)
 
-数据集可参考文献.
-
-MSCOCO2017
+数据集可参考文献. [COCO2017](https://cocodataset.org/#download)
 
 - 数据集大小: 19.3G, 123287张80类彩色图像
-
     - 训练:19.3G, 118287张图片
-
     - 测试:1814.3M, 5000张图片
+- 数据格式:RGB图像
 
-- 数据格式:RGB图像.
-
-    - 注意：数据将在src/dataset.py 中被处理
+>注意：数据将在src/dataset.py 中被处理
 
 ## [环境要求](#content)
 
@@ -175,7 +172,7 @@ MSCOCO2017
 
 ### [脚本和示例代码](#content)
 
-```shell
+```text
 .
 └─Retinanet_resnet152
   ├─README.md
@@ -201,12 +198,11 @@ MSCOCO2017
   ├─default_config.yaml                       # 参数配置
   ├─train.py                                  # 网络训练脚本
   └─eval.py                                   # 网络推理脚本
-
 ```
 
 ### [脚本参数](#content)
 
-```python
+```text
 在train.py和default_config.yaml脚本中使用到的主要参数是:
 "img_shape": [640, 640],                                                                        # 图像尺寸
 "num_retinanet_boxes": 76725,                                                                   # 设置的先验框总数
@@ -275,52 +271,65 @@ MSCOCO2017
 
 - Ascend:
 
-```训练
-# 八卡并行训练示例：
+```bash
+# data和存储mindrecord文件的路径在default_config.yaml里设置
 
-创建 RANK_TABLE_FILE
+# 训练以前， 请运行：
+python train.py --only_create_dataset=True --run_platform="Ascend"
+
+# 八卡并行训练示例：
+# 创建 RANK_TABLE_FILE
 bash run_distribute_train.sh DEVICE_NUM EPOCH_SIZE LR DATASET RANK_TABLE_FILE PRE_TRAINED(optional) PRE_TRAINED_EPOCH_SIZE(optional)
 
 # 单卡训练示例：
-
 bash run_distribute_train.sh DEVICE_ID EPOCH_SIZE LR DATASET PRE_TRAINED(optional) PRE_TRAINED_EPOCH_SIZE(optional)
-
 ```
 
-> 注意:
+> 注意: RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html),
+> 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
-  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+- GPU:
+
+```bash
+# data和存储mindrecord文件的路径在default_config.yaml里设置
+
+# 训练以前， 请运行：
+python train.py --only_create_dataset=True --run_platform="GPU"
+
+# 八卡并行训练示例：
+bash run_distribute_train_gpu.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
+
+# 单卡训练示例：
+bash run_single_train_gpu.sh [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
+```
 
 #### 运行
 
-``` 运行
-# 训练示例
+- Ascend
 
-  python:
-    data和存储mindrecord文件的路径在config里设置
+```bash
+# 八卡并行训练示例(在retinanet目录下运行)：
+bash scripts/run_distribute_train.sh 8 500 0.1 coco scripts/rank_table_8pcs.json /dataset/retinanet-322_458.ckpt 322
 
-      # 单卡训练示例：
+# 单卡训练示例(在retinanet目录下运行)：
+bash scripts/run_single_train.sh 0 500 0.1 coco /dataset/retinanet-322_458.ckpt 322
+```
 
-      python train.py
-  shell:
-      Ascend:
+- GPU
 
-      # 八卡并行训练示例(在retinanet目录下运行)：
+```bash
+# 八卡并行训练示例(在retinanet目录下运行)：
+bash run_distribute_train_gpu.sh 8 500 0.1 coco /dataset/retinanet-322_458.ckpt 322
 
-      bash scripts/run_distribute_train.sh 8 500 0.1 coco RANK_TABLE_FILE(创建的RANK_TABLE_FILE的地址) PRE_TRAINED(预训练checkpoint地址) PRE_TRAINED_EPOCH_SIZE（预训练EPOCH大小）
-      例如：bash scripts/run_distribute_train.sh 8 500 0.1 coco scripts/rank_table_8pcs.json /dataset/retinanet-322_458.ckpt 322
-
-      # 单卡训练示例(在retinanet目录下运行)：
-
-      bash scripts/run_single_train.sh 0 500 0.1 coco /dataset/retinanet-322_458.ckpt 322
-
+# 单卡训练示例(在retinanet目录下运行)：
+bash run_single_train_gpu.sh 0 500 0.1 coco /dataset/retinanet-322_458.ckpt 322
 ```
 
 #### 结果
 
-训练结果将存储在示例路径中。checkpoint将存储在 `./model` 路径下，训练日志将被记录到 `./log.txt` 中，训练日志部分示例如下：
+路径在`default_config.yaml`里设置。checkpoint将存储在 `./model` 路径下，训练日志将被记录到 `./train.log` 中，训练日志部分示例如下：
 
-``` 训练日志
+```text
 epoch: 117 step: 916, loss is 0.8391866
 lr:[0.025187]
 epoch time: 444315.944 ms, per step time: 485.061 ms
@@ -337,33 +346,43 @@ epoch time: 444237.851 ms, per step time: 484.976 ms
 
 ### [评估过程](#content)
 
-#### 用 法
+#### 用法
 
 您可以使用python或shell脚本进行训练。shell脚本的用法如下:
 
-```eval
+- Ascend
+
+```bash
 bash scripts/run_eval.sh [DATASET] [DEVICE_ID]
 ```
 
-#### 运 行
+- GPU
 
-```eval运行
-# 验证示例
+```bash
+bash run_eval_gpu.sh [DATASET] [DEVICE_ID] [CHECKPOINT_PATH]
+```
 
-  python:
-      Ascend: python eval.py
-  checkpoint 的路径在config里设置
-  shell:
-      Ascend: bash scripts/run_eval.sh coco 0
+#### 运行
+
+- Ascend
+
+```bash
+bash scripts/run_eval.sh coco 0
+```
+
+- GPU
+
+```bash
+bash run_eval_gpu.sh coco 0 LOG/model/retinanet-500_610.ckpt
 ```
 
 > checkpoint 可以在训练过程中产生.
 
-#### 结 果
+#### 结果
 
 计算结果将存储在示例路径中，您可以在 `eval.log` 查看.
 
-``` mAP
+```text
  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.357
  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.503
  Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.400
@@ -386,7 +405,7 @@ mAP: 0.3571988469737286
 
 #### 用途
 
-导出模型前要修改default_config.yaml文件中的checkpoint_path配置项，值为checkpoint的路径。
+导出模型前要修改`default_config.yaml`文件中的checkpoint_path配置项，值为checkpoint的路径。
 
 ```shell
 python export.py --file_name [RUN_PLATFORM] --file_format[EXPORT_FORMAT] --checkpoint_path [CHECKPOINT PATH]
@@ -396,13 +415,13 @@ python export.py --file_name [RUN_PLATFORM] --file_format[EXPORT_FORMAT] --check
 
 #### 运行方式
 
-```运行
+```python
 python export.py
 ```
 
 ### [推理过程](#content)
 
-#### 用 途
+#### 用途
 
 在推理之前需要在昇腾910环境上完成模型的导出。推理时要将iscrowd为true的图片排除掉。在ascend310_infer目录下保存了去排除后的图片id。
 还需要修改default_config.yaml文件中的coco_root、val_data_type、instances_set配置项，值分别取coco数据集的目录，推理所用数据集的目录名称，推理完成后计算精度用的annotation文件，instances_set是用val_data_type拼接起来的，要保证文件正确并且存在。
@@ -414,7 +433,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
 
 #### 运行命令
 
-```运行
+```shell
 bash run_infer_310.sh  [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 ```
 
@@ -422,7 +441,7 @@ bash run_infer_310.sh  [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 
 推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
 
-```mAP
+```text
  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.356
  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.499
  Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.396
@@ -444,34 +463,34 @@ mAP: 0.35625723922139957
 
 #### 训练性能
 
-| 参数                        | Ascend                                |
-| -------------------------- | ------------------------------------- |
-| 模型名称                    | Retinanet                             |
-| 运行环境                    | 华为云 Modelarts                      |
-| 上传时间                    | 10/03/2021                           |
-| MindSpore 版本             | 1.0.1                                 |
-| 数据集                      | 123287 张图片                          |
-| Batch_size                 | 16                                   |
-| 训练参数                    | default_config.yaml                   |
-| 优化器                      | Momentum                              |
-| 损失函数                    | Focal loss                            |
-| 最终损失                    | 0.69                               |
-| 精确度 (8p)                 | mAP[0.3571]            |
-| 训练总时间 (8p)             | 41h32m20s                        |
+| 参数                        | Ascend (8pcs)        | GPU Tesla V100 (1 pcs)  | GPU Tesla V100 (8 pcs) |
+| -------------------------- | --------------------- | ---- | ---- |
+| 模型名称                    | Retinanet-resnet-152  | Retinanet-resnet-152 | Retinanet-resnet-152 |
+| 运行环境                    | 华为云 Modelarts       | Ubuntu 18.04.6, Tesla V100, CPU 2.7 GHz, 56 cores, RAM 504 GB | Ubuntu 18.04.6, Tesla V100 (8 pcs), CPU 2.7 GHz, 56 cores, RAM 504 GB |
+| 上传时间                    | 10/03/2021            | 27/12/2021 | 27/12/2021 |
+| MindSpore 版本             | 1.0.1                  | 1.6.0 | 1.6.0 |
+| 数据集                      | 123287 张图片          | 123287 张图片 | 123287 张图片 |
+| 训练参数                    | 16                    | batch_size=12, epochs=180, lr=0.1, steps_per_epoch=1221 | batch_size=12*8, epochs=180, lr=0.1, steps_per_epoch=1221 |
+| 其他训练参数                 | default_config.yaml   | default_config.yaml | default_config.yaml |
+| 优化器                      | Momentum              | Momentum | Momentum |
+| 损失函数                    | Focal loss            | Focal loss | Focal loss |
+| 最终损失                    | 0.69                 | 0.84 | 0.84 |
+| 速度 (8p)                  |                      | 860 毫秒/步 | 1205 毫秒/步 |
+| 训练总时间 (8p)             | 41h32m20s             | 440小时 | 72小时 |
 | 脚本                       | [Retianet script](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet152) |
 
 #### 推理性能
 
-| 参数                 | Ascend                      |
-| ------------------- | :-------------------------- |
-| 模型名称             | Retinanet                    |
-| 运行环境             | 华为云 Modelarts             |
-| 上传时间             | 10/03/2021                 |
-| MindSpore 版本      | 1.0.1                        |
-| 数据集              | 5k 张图片                   |
-| Batch_size          | 1                          |
-| 精确度              | mAP[0.3571]                  |
-| 总时间              | 12m3s       |
+| 参数                 | Ascend                      | GPU |
+| ------------------- | :-------------------------- | --- |
+| 模型名称             | Retinanet-resnet-152        | Retinanet-resnet-152 |
+| 运行环境             | 华为云 Modelarts             | Ubuntu 18.04.6, Tesla V100, CPU 2.7 GHz, 56 cores, RAM 504 GB |
+| 上传时间             | 10/03/2021                 | 27/12/2021 |
+| MindSpore 版本      | 1.0.1                        | 1.6.0 |
+| 数据集              | 5k 张图片                   | 5k 张图片 |
+| Batch_size          | 1                          | 1 |
+| 精确度              | mAP[0.3571]                |  |
+| 总时间              | 12m3s       | 12m |
 
 # [随机情况的描述](#内容)
 

@@ -30,9 +30,11 @@ def get_pred(result_path, img_id):
     scores = np.fromfile(scores_file, dtype=np.float32).reshape(76725, config.num_classes)
     return boxes, scores
 
+
 def get_img_size(file_name):
     img = Image.open(file_name)
     return img.size
+
 
 def get_img_id(img_id_file):
     f = open(img_id_file)
@@ -43,6 +45,7 @@ def get_img_id(img_id_file):
         ids.append(int(line))
 
     return ids
+
 
 def cal_acc(result_path, img_path, img_id_file):
     """Calculate acc"""
@@ -65,6 +68,7 @@ def cal_acc(result_path, img_path, img_id_file):
 
     mAP = metrics(pred_data)
     print(f"mAP: {mAP}")
+
 
 if __name__ == '__main__':
     cal_acc(config.result_path, config.img_path, config.img_id_file)

@@ -49,8 +49,8 @@ gamma: 2.0
 alpha: 0.75
 
 # `mindrecord_dir` and `coco_root` are better to use absolute path.
-mindrecord_dir: "/cache/train/MindRecord_COCO"
-coco_root: "/cache/data"
+mindrecord_dir: "/data/Datasets/COCO2017/MindRecord_COCO"
+coco_root: "/data/Datasets/COCO2017"
 train_data_type: "train2017"
 val_data_type: "val2017"
 instances_set: "annotations/instances_{}.json"
@@ -78,7 +78,7 @@ voc_dir: ""
 image_dir: ""
 anno_path: ""
 save_checkpoint: True
-keep_checkpoint_max: 30
+keep_checkpoint_max: 50
 save_checkpoint_path: "./model"
 finish_epoch: 0
 checkpoint_path: "/cache/train/model/retinanet-10_916.ckpt"
@@ -91,7 +91,7 @@ device_num: 1
 lr: 0.1
 mode: "sink"
 dataset: "coco"
-epoch_size: 500
+epoch_size: 180
 batch_size: 16
 pre_trained: ''
 pre_trained_epoch_size: 0
@@ -126,7 +126,7 @@ pre_trained_epoch_size: 'Pretrained epoch size.'
 save_checkpoint_epochs: 'Save checkpoint epochs, default is 1.'
 loss_scale: 'Loss scale, default is 1024.'
 filter_weight: 'Filter weight parameters, default is False.'
-run_platform: 'Run platform, only support Ascend in training and export, only support Ascend and GPU in evaling.'
+run_platform: 'Run platform, only support Ascend and GPU.'
 file_format: 'file format'
 file_name: 'output file name.'
 result_path: 'result file path.'
@@ -139,5 +139,5 @@ train_url: 'Training output url for obs'
 data_path: 'Dataset path for local'
 
 ---
-run_platform: ['Ascend']
+run_platform: ['Ascend', 'GPU']
 file_format: ["AIR", "MINDIR"]
