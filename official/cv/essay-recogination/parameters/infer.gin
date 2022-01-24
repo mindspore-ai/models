@@ -1,0 +1,76 @@
+port = 12345
+manualSeed = 1111
+dist = 'DP'
+
+n_channels = 3
+o_classes = 3464
+#o_classes = 4193
+
+GradCheck = 0
+# Parameters for eval (eval.py):
+# ==============================================================================
+load_model.continue_model = 'model_ckpt/origaminet.ckpt'
+
+# Parameters for get_images (ds_load.py):
+# ==============================================================================
+get_images.max_w = 720
+get_images.max_h = 1440
+get_images.nch = %n_channels
+
+# Parameters for SameTrCollate (ds_load.py):
+# ==============================================================================
+SameTrCollate.prjAug = True
+SameTrCollate.prjVal = 125
+
+
+# Parameters for OrigamiNet (cnv_model.py):
+# ==============================================================================
+OrigamiNet.n_channels = %n_channels
+OrigamiNet.o_classes  = %o_classes
+OrigamiNet.fup = 33
+OrigamiNet.GradCheck = %GradCheck
+
+OrigamiNet.nlyrs = 8
+OrigamiNet.wmul = 1.0
+
+OrigamiNet.lszs = {0:  128,
+            2:  256,
+            4:  512,
+            7: 256  }
+
+##resize structure##
+MaxPool2d.kernel_size = (2,2)
+MaxPool2d.stride = (2, 2)
+
+#Upsample.mode = 'bilinear'
+#Upsample.align_corners = True
+#s1/Upsample.size = (450,8)
+#s2/Upsample.size = (1100,8)
+
+OrigamiNet.lreszs = {
+                  0: @MaxPool2d(),
+                  2: @MaxPool2d(),
+                  4: @MaxPool2d(),
+
+                  6: @MaxPool2d(),
+                  #8: @PadPool(),
+                  
+                  #10: @s1/Upsample(),
+                  #11: @s2/Upsample()
+            }
+
+# Parameters for pCnv (cnv_model.py):
+# ==============================================================================
+pCnv.use_batch_statistics=True
+
+# Parameters for dsCnv (cnv_model.py):
+# ==============================================================================
+dsCnv.use_batch_statistics=True
+
+# Parameters for InitBlock (cnv_model.py):
+# ==============================================================================
+InitBlock.n_channels = %n_channels
+
+# Parameters for GateBlock (cnv_model.py):
+# ==============================================================================
+GateBlock.GradCheck = %GradCheck
