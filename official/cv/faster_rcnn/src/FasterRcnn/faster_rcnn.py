@@ -16,10 +16,11 @@
 
 import numpy as np
 import mindspore.nn as nn
+import mindspore.common.dtype as mstype
 from mindspore import context
 from mindspore.ops import operations as P
 from mindspore.common.tensor import Tensor
-import mindspore.common.dtype as mstype
+from mindspore.ops.primitive import constexpr
 from mindspore.ops import functional as F
 from .bbox_assign_sample_stage2 import BboxAssignSampleForRcnn
 from .fpn_neck import FeatPyramidNeck
@@ -58,6 +59,7 @@ class Faster_Rcnn(nn.Cell):
     Examples:
         net = Faster_Rcnn()
     """
+
     def __init__(self, config):
         super(Faster_Rcnn, self).__init__()
         self.dtype = np.float32
@@ -99,7 +101,7 @@ class Faster_Rcnn(nn.Cell):
 
         # Fpn
         self.fpn_neck = FeatPyramidNeck(config.fpn_in_channels, \
-        config.fpn_out_channels, config.fpn_num_outs)
+                                        config.fpn_out_channels, config.fpn_num_outs)
 
         # Rpn and rpn loss
         self.gt_labels_stage1 = Tensor(np.ones((self.train_batch_size, config.num_gts)).astype(np.uint8))
@@ -204,7 +206,7 @@ class Faster_Rcnn(nn.Cell):
         self.split = P.Split(axis=0, output_num=self.test_batch_size)
         self.split_shape = P.Split(axis=0, output_num=4)
         self.split_scores = P.Split(axis=1, output_num=self.num_classes)
-        self.split_cls = P.Split(axis=0, output_num=self.num_classes-1)
+        self.split_cls = P.Split(axis=0, output_num=self.num_classes - 1)
         self.tile = P.Tile()
         self.gather = P.GatherNd()
 
@@ -363,7 +365,7 @@ class Faster_Rcnn(nn.Cell):
         boxes_all = ()
         for i in range(self.num_classes):
             k = i * 4
-            reg_logits_i = self.squeeze(reg_logits[::, k:k+4:1])
+            reg_logits_i = self.squeeze(reg_logits[::, k:k + 4:1])
             out_boxes_i = self.decode(rois, reg_logits_i)
             boxes_all += (out_boxes_i,)
 
@@ -487,12 +489,21 @@ class Faster_Rcnn(nn.Cell):
 
         return multi_level_anchors
 
+
+@constexpr
+def generator_img_meta(n):
+    img_metas = Tensor(np.random.uniform(0.0, 1.0, size=[n, 4]), mstype.float32)
+    return img_metas
+
+
 class FasterRcnn_Infer(nn.Cell):
     def __init__(self, config):
         super(FasterRcnn_Infer, self).__init__()
         self.network = Faster_Rcnn(config)
         self.network.set_train(False)
 
-    def construct(self, img_data, img_metas):
+    def construct(self, img_data):
+        n, _, _, _ = F.shape(img_data)
+        img_metas = generator_img_meta(n)
         output = self.network(img_data, img_metas, None, None, None)
         return output
