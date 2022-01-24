@@ -1,0 +1,87 @@
+port = 12345
+manualSeed = 1112
+dist = 'DP'
+
+n_channels = 3
+o_classes = 3464
+
+GradCheck = 0
+
+# Parameters for get_images (ds_load.py):
+# ==============================================================================
+get_images.max_w = 720
+get_images.max_h = 1440
+get_images.nch = %n_channels
+
+# Parameters for SameTrCollate (ds_load.py):
+# ==============================================================================
+SameTrCollate.prjAug = True
+SameTrCollate.prjVal = 125
+
+# Parameters for train (train.py):
+# ==============================================================================
+
+train.AMP = False
+train.WdB = False
+
+train.train_data_list = 'parameters/train.gc'
+train.train_data_path = 'data_set/train'
+train.test_data_list  = ''
+train.test_data_path  = ''
+
+train.train_batch_size = 1
+train.val_batch_size   = 1
+train.lr = 0.01
+train.save_model_path = './saved_models_finetune/'
+train.model_prefix = "model_finetune_"
+#train.continue_model = ''
+train.continue_model = 'model_ckpt/origaminet.ckpt'
+train.valInterval = 100
+
+
+# Parameters for OrigamiNet (cnv_model.py):
+# ==============================================================================
+OrigamiNet.n_channels = %n_channels
+OrigamiNet.o_classes  = %o_classes
+OrigamiNet.fup = 33
+#OrigamiNet.GradCheck = %GradCheck
+OrigamiNet.GradCheck = 0
+
+OrigamiNet.nlyrs = 8
+OrigamiNet.wmul = 1.0
+
+OrigamiNet.lszs = {0:  128,
+            2:  256,
+            4:  512,
+            7: 256  }
+
+##resize structure##
+MaxPool2d.kernel_size = (2,2)
+MaxPool2d.stride = (2, 2)
+
+OrigamiNet.lreszs = {
+                  0: @MaxPool2d(),
+                  2: @MaxPool2d(),
+                  4: @MaxPool2d(),
+
+                  6: @MaxPool2d(),
+                  #8: @MaxPool2d()
+
+
+            }
+
+# Parameters for pCnv (cnv_model.py):
+# ==============================================================================
+pCnv.use_batch_statistics=False
+
+# Parameters for dsCnv (cnv_model.py):
+# ==============================================================================
+dsCnv.use_batch_statistics=False
+
+# Parameters for InitBlock (cnv_model.py):
+# ==============================================================================
+InitBlock.n_channels = %n_channels
+
+# Parameters for GateBlock (cnv_model.py):
+# ==============================================================================
+GateBlock.GradCheck = %GradCheck
