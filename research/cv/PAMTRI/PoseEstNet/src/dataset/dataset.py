@@ -14,6 +14,9 @@
 # ============================================================================
 """dataset"""
 import os
+import copy
+import json
+from pathlib import Path
 import mindspore.dataset as ds
 import mindspore.dataset.vision.py_transforms as py_vision
 from mindspore.dataset.transforms.py_transforms import Compose
@@ -53,6 +56,27 @@ def create_dataset(cfg, data_dir, is_train=True):
         return dataset
 
     return data, dataset
+
+def get_label(cfg, data_dir):
+    """
+    get label
+    """
+    lable_path = os.path.join(data_dir, 'annot/image_test.json')
+
+    if not os.path.isfile(lable_path):
+        os.mknod(lable_path)
+        data = VeRiDataset(cfg, data_dir, False).db
+
+        label = {}
+        for i in range(data.__len__()):
+            out = copy.deepcopy(data[i])
+            label['{}'.format(i)] = out['image']
+
+        label_json_path = Path(lable_path)
+        with label_json_path.open('w') as dst_file:
+            json.dump(label, dst_file)
+
+    return lable_path
 
 def _get_rank_info():
     """

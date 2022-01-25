@@ -61,11 +61,9 @@
         ├── annot
         |   ├── label_test.csv
         |   ├── label_train.csv
-        |   ├── image_train.json
-        |   ├── image_test.json
     ```
 
-其中[data/annot](data/annot)中内容已提供
+其中[data/annot](data/annot)中内容可以通过此链接获得[点击获取](https://github.com/NVlabs/PAMTRI/tree/master/PoseEstNet/data/veri/annot)
 
 # 环境要求
 
