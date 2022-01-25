@@ -47,8 +47,9 @@ def export_fasterrcnn():
         net.to_float(mstype.float16)
 
     img = Tensor(np.zeros([config.test_batch_size, 3, config.img_height, config.img_width]), mstype.float32)
+    img_metas = Tensor(np.random.uniform(0.0, 1.0, size=[config.test_batch_size, 4]), mstype.float32)
 
-    export(net, img, file_name=config.file_name, file_format=config.file_format)
+    export(net, img, img_metas, file_name=config.file_name, file_format=config.file_format)
 
 if __name__ == '__main__':
     export_fasterrcnn()
