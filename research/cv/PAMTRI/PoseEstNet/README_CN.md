@@ -61,11 +61,9 @@
         ├── annot
         |   ├── label_test.csv
         |   ├── label_train.csv
-        |   ├── image_train.json
-        |   ├── image_test.json
     ```
 
-其中[data/annot](data/annot)中内容已提供
+其中[data/annot](data/annot)中内容可以通过此链接获得[点击获取](https://github.com/NVlabs/PAMTRI/tree/master/PoseEstNet/data/veri/annot)
 
 # 环境要求
 
@@ -303,7 +301,7 @@ python3.7 export.py --cfg config.yaml --ckpt_path CKPT_PATH
 | 总时长                | 8卡：40分钟 |
 | 微调检查点 | 335M (.ckpt文件)                                         |
 | 推理模型        | 113M (.mindir文件)                     |
-| 脚本                    | [PoseEstNet脚本](https://gitee.com/kqzhang/models/tree/master/research/cv/PAMTRI/PoseEstNet) |
+| 脚本                    | [PoseEstNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/PoseEstNet) |
 
 ### 推理性能
 
