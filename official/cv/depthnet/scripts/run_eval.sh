@@ -16,10 +16,12 @@
 
 echo "Please run the script as: "
 echo "bash run_eval.sh DATASET_PATH"
-echo "for example: bash run_eval.sh ~/DepthNet_dataset"
+echo "for example: bash run_eval.sh ~/DepthNet_dataset ~/Model/Ckpt/FinalCoarseNet.ckpt ~/Model/Ckpt/FinalFineNet.ckpt"
 echo "After running the script, the network runs in the background, The log will be generated in eval.log"
 
 export DATASET_PATH=$1
+export COARSENET_MODEL_PATH=$2
+export FINENET_MODEL_PATH=$3
 
 cd ..
-python eval.py --test_data $DATASET_PATH > eval.log 2>&1 &
+python eval.py --test_data $DATASET_PATH --coarse_ckpt_model $COARSENET_MODEL_PATH --fine_ckpt_model $FINENET_MODEL_PATH > eval.log 2>&1 &

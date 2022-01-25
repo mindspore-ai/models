@@ -29,11 +29,15 @@ from src.data_loader import create_test_dataset
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='MindSpore Depth Estimation Demo')
     parser.add_argument('--test_data', type=str, default='./DepthNet_dataset', help='train data path')
+    parser.add_argument('--coarse_ckpt_model', type=str, default='./Model/Ckpt/FinalCoarseNet.ckpt',
+                        help='coarse model ckpt path')
+    parser.add_argument('--fine_ckpt_model', type=str, default='./Model/Ckpt/FinalFineNet.ckpt',
+                        help='fine model ckpt path')
     args = parser.parse_args()
 
     test_data_dir = os.path.join(args.test_data, "Test")
-    coarse_ckpt_model = "./Model/Ckpt/FinalCoarseNet.ckpt"
-    fine_ckpt_model = "./Model/Ckpt/FinalFineNet.ckpt"
+    coarse_ckpt_model = args.coarse_ckpt_model
+    fine_ckpt_model = args.fine_ckpt_model
     test_dataset = create_test_dataset(test_data_dir, batch_size=1)
 
     coarse_net = CoarseNet()
