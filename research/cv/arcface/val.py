@@ -293,19 +293,20 @@ def main():
     parser = argparse.ArgumentParser(description='do verification')
     # general
     parser.add_argument(
-        '--eval_url', default='/opt_data/zjc/arcface/', help='')
+        '--eval_url', default='/data/arcface/', help='')
     parser.add_argument('--device_id', default=0, type=int, help='device id')
     parser.add_argument('--target',
                         default='lfw,cfp_fp,agedb_30',
                         help='test targets.')
     parser.add_argument(
         '--ckpt_url', default="/cache/ArcFace--25_11372.ckpt", type=str, help='ckpt path')
-    parser.add_argument('--gpu', default=0, type=int, help='gpu id')
+    parser.add_argument('--device_target', default="Ascend", type=str, help='device target')
     parser.add_argument('--batch-size', default=64, type=int, help='')
     parser.add_argument('--max', default='', type=str, help='')
     parser.add_argument('--nfolds', default=10, type=int, help='')
     args = parser.parse_args()
-    context.set_context(device_id=args.device_id, mode=context.GRAPH_MODE)
+    context.set_context(device_id=args.device_id, mode=context.GRAPH_MODE,
+                        device_target=args.device_target)
     image_size = [112, 112]
     time0 = datetime.datetime.now()
     model = iresnet100()

@@ -18,7 +18,7 @@ python train.py
 import argparse
 import os
 import numpy as np
-
+import mindspore
 import mindspore.nn as nn
 from mindspore import context, Tensor
 import mindspore.ops as ops
@@ -32,8 +32,8 @@ from mindspore.parallel import set_algo_parameters
 from src.dataset import create_dataset
 from src.iresnet import iresnet100
 from src.loss import PartialFC
-
-parser = argparse.ArgumentParser(description='PyTorch ImageNet Training')
+mindspore.common.set_seed(1024)
+parser = argparse.ArgumentParser(description='Training')
 
 # Datasets
 parser.add_argument('--train_url', default='.', type=str,
