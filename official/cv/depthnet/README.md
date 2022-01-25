@@ -96,6 +96,7 @@
   ```bash
   # 开始训练
 
+  # 单P训练环境使用命令：
   ###bash脚本命令
   cd scripts
   bash run_standalone_train_ascend.sh [DATASET_PATH] [DEVICE_ID]
@@ -106,10 +107,11 @@
   # 模型评估测试，使用.ckpt模型
   ## bash脚本命令
   cd scripts
-  bash run_eval.sh [DATASET_PATH]
-  例如：bash run_eval.sh ~/mindspore_dataset/NYU
+  bash run_eval.sh [DATASET_PATH] [COARSENET_MODEL_PATH] [FINENET_MODEL_PATH]
+  例如：bash run_eval.sh ~/mindspore_dataset/NYU ~/Model/Ckpt/FinalCoarseNet.ckpt ~/Model/Ckpt/FinalFineNet.ckpt
+
   ## 或者用python命令
-  python eval.py --test_data ~/mindspore_dataset/NYU > eval.log 2>&1 &
+  python eval.py --test_data ~/mindspore_dataset/NYU --coarse_ckpt_model ~/Model/Ckpt/FinalCoarseNet.ckpt --fine_ckpt_model ~/Model/Ckpt/FinalFineNet.ckpt> eval.log 2>&1 &
 
   # coarse网络.ckpt模型转换为.mindir和.air格式
   ## bash脚本命令
@@ -128,6 +130,20 @@
   # 模型推理
   cd scripts
   bash run_infer_310.sh ../Model/MindIR/FinalCoarseNet.mindir ../Model/MindIR/FinalFineNet.mindir ../NYU/Test/ 0
+
+  # 8P分布式环境训练：
+  ###bash脚本命令
+  cd scripts
+  bash run_distributed_train_ascend.sh [DATASET_PATH] [RANK_TABLE_FILE]
+  例如：bash run_standalone_train_ascend.sh ~/mindspore_dataset/NYU ~/rank_table_8pcs.json
+
+  # 模型评估测试，使用.ckpt模型
+  ## bash脚本命令
+  cd scripts
+  bash run_eval.sh [DATASET_PATH] [COARSENET_MODEL_PATH] [FINENET_MODEL_PATH]
+  例如：bash run_eval.sh ~/mindspore_dataset/NYU ~/Model/Ckpt/FinalCoarseNet_rank0.ckpt ~/Model/Ckpt/FinalFineNet_rank0.ckpt
+  ## 或者用python命令
+  python eval.py --test_data ~/mindspore_dataset/NYU --coarse_ckpt_model ~/Model/Ckpt/FinalCoarseNet_rank0.ckpt --fine_ckpt_model ~/Model/Ckpt/FinalFineNet_rank0.ckpt > eval.log 2>&1 &
   ```
 
 # 脚本说明
@@ -150,6 +166,7 @@
             ├── run_export_fine_model.sh    // 导出fine模型脚本
             ├── run_infer_310.sh            // 模型推理脚本
             ├── run_standalone_train_ascend.sh  // 运行单卡训练脚本
+            ├── run_distributed_train_ascend.sh  // 8P环境分布式训练脚本
         ├── src
              ├── data_loader.py           // 读取数据
              ├── loss.py                  // 定义损失函数以及评估指标
@@ -304,3 +321,4 @@ train.py中设置了随机种子。
 # ModelZoo主页
 
  请浏览官网[主页](https://gitee.com/mindspore/models)。
+
