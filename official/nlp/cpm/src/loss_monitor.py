@@ -119,4 +119,5 @@ class TimeCallBack(Callback):
             logger.error("data_size must be positive int.")
             return
 
-        print("epoch time: {:5.3f} ms".format(epoch_seconds), flush=True)
+        print("epoch time: {:5.3f} ms, per step time: {:.4f} ms".format(epoch_seconds, epoch_seconds / step_size),
+              flush=True)

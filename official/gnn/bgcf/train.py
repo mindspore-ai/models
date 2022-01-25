@@ -104,7 +104,7 @@ def run_train():
     if config.device_target == "GPU":
         context.set_context(enable_graph_kernel=True)
 
-    train_graph, _, sampled_graph_list = load_graph(config.datapath)
+    train_graph, _, sampled_graph_list = load_graph(config.datapath, config.workers)
     train_ds = create_dataset(train_graph, sampled_graph_list, config.workers, batch_size=config.batch_pairs,
                               num_samples=config.raw_neighs, num_bgcn_neigh=config.gnew_neighs, num_neg=config.num_neg)
 

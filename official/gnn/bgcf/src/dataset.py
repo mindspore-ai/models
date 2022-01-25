@@ -158,18 +158,18 @@ class TestGraphDataset():
         return i_neighs, i_gnew_neighs
 
 
-def load_graph(data_path):
+def load_graph(data_path, num_workers=8):
     """Load train graph, test graph and sampled graph"""
     train_graph = ds.GraphData(
-        data_path + "/train_mr", num_parallel_workers=8)
+        data_path + "/train_mr", num_parallel_workers=num_workers)
 
     test_graph = ds.GraphData(
-        data_path + "/test_mr", num_parallel_workers=8)
+        data_path + "/test_mr", num_parallel_workers=num_workers)
 
     sampled_graph_list = []
     for i in range(0, 5):
         sampled_graph = ds.GraphData(
-            data_path + "/sampled" + str(i) + "_mr", num_parallel_workers=8)
+            data_path + "/sampled" + str(i) + "_mr", num_parallel_workers=num_workers)
         sampled_graph_list.append(sampled_graph)
 
     return train_graph, test_graph, sampled_graph_list
