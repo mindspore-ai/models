@@ -37,12 +37,7 @@ YOLOv4 choose CSPDarknet53 backbone, SPP additional module, PANet path-aggregati
 
 # [Pretrain Model](#contents)
 
-YOLOv4 needs a CSPDarknet53 backbone to extract image features for detection. You could get CSPDarknet53 train script from our modelzoo and modify the backbone structure according to CSPDarknet53 in ```./src.cspdarknet53```, Final train it on imagenet2012 to get CSPDarknet53 pretrain model.
-Steps:
-
-1. Get resnet50 train script from our modelzoo.
-2. Modify the network architecture according to CSPDarknet53 in ```./src.cspdarknet53```
-3. Train CSPDarknet53 on imagenet2012.
+YOLOv4 needs a CSPDarknet53 backbone to extract image features for detection. The pretrained checkpoint trained with ImageNet2012 can be downloaded at [hear](https://download.mindspore.cn/model_zoo/r1.2/cspdarknet53_ascend_v120_imagenet2012_official_cv_bs64_top1acc7854_top5acc9428/cspdarknet53_ascend_v120_imagenet2012_official_cv_bs64_top1acc7854_top5acc9428.ckpt).
 
 # [Dataset](#contents)
 
