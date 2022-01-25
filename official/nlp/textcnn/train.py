@@ -25,6 +25,7 @@ from mindspore import context
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore.common import set_seed
 
 from model_utils.moxing_adapter import moxing_wrapper
 from model_utils.device_adapter import get_device_id, get_rank_id
@@ -33,6 +34,7 @@ from src.textcnn import TextCNN
 from src.textcnn import SoftmaxCrossEntropyExpand
 from src.dataset import MovieReview, SST2, Subjectivity
 
+set_seed(1)
 
 def modelarts_pre_process():
     config.checkpoint_path = os.path.join(config.output_path, str(get_rank_id()), config.checkpoint_path)
@@ -48,6 +50,8 @@ def train_net():
         instance = MovieReview(root_dir=config.data_path, maxlen=config.word_len, split=0.9)
     elif config.dataset == 'SUBJ':
         instance = Subjectivity(root_dir=config.data_path, maxlen=config.word_len, split=0.9)
+        if config.device_target == "GPU":
+            context.set_context(enable_graph_kernel=True)
     elif config.dataset == 'SST2':
         instance = SST2(root_dir=config.data_path, maxlen=config.word_len, split=0.9)
 
