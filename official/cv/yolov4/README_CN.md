@@ -45,12 +45,7 @@ Bochkovskiy A, Wang C Y, Liao H Y M. YOLOv4: Optimal Speed and Accuracy of Objec
 
 # [预训练模型](#目录)
 
-YOLOv4需要CSPDarknet53主干来提取图像特征进行检测。 您可以从我们的ModelZoo中获取CSPDarknet53训练脚本，并根据```./src.cspdarknet53```中的CSPDarknet53修改主干结构，最后在imagenet2012上训练它，以获得CSPDarknet53预训练模型。
-步骤：
-
-1. 从ModelZoo获取resnet50训练脚本。
-2. 根据```./src.cspdarknet53``中的CSPDarknet53修改网络架构。
-3. 在imagenet2012上训练CSPDarknet53。
+YOLOv4需要CSPDarknet53主干来提取图像特征进行检测。 您可以从[这里](https://download.mindspore.cn/model_zoo/r1.2/cspdarknet53_ascend_v120_imagenet2012_official_cv_bs64_top1acc7854_top5acc9428/cspdarknet53_ascend_v120_imagenet2012_official_cv_bs64_top1acc7854_top5acc9428.ckpt)获取到在ImageNet2012上训练的预训练模型。
 
 # [数据集](#目录)
 
