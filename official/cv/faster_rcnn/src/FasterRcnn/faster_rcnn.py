@@ -20,7 +20,6 @@ import mindspore.common.dtype as mstype
 from mindspore import context
 from mindspore.ops import operations as P
 from mindspore.common.tensor import Tensor
-from mindspore.ops.primitive import constexpr
 from mindspore.ops import functional as F
 from .bbox_assign_sample_stage2 import BboxAssignSampleForRcnn
 from .fpn_neck import FeatPyramidNeck
@@ -490,20 +489,12 @@ class Faster_Rcnn(nn.Cell):
         return multi_level_anchors
 
 
-@constexpr
-def generator_img_meta(n):
-    img_metas = Tensor(np.random.uniform(0.0, 1.0, size=[n, 4]), mstype.float32)
-    return img_metas
-
-
 class FasterRcnn_Infer(nn.Cell):
     def __init__(self, config):
         super(FasterRcnn_Infer, self).__init__()
         self.network = Faster_Rcnn(config)
         self.network.set_train(False)
 
-    def construct(self, img_data):
-        n, _, _, _ = F.shape(img_data)
-        img_metas = generator_img_meta(n)
+    def construct(self, img_data, img_metas):
         output = self.network(img_data, img_metas, None, None, None)
         return output
