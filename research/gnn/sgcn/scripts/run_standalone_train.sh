@@ -23,4 +23,4 @@ if [ ! -d "logs" ]; then
         mkdir logs
 fi
 
-nohup python -u train.py --device_id=$1 --edge_path=$2 --features-path=$2 > logs/train.log 2>&1 &
+nohup python -u train.py --device_id=$1 --edge-path=$2 --features-path=$2 > logs/train.log 2>&1 &
