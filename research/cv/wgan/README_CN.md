@@ -15,6 +15,7 @@
         - [单机训练](#单机训练)
     - [推理过程](#推理过程)
         - [推理](#推理)
+        - [ONNX Evaluation](#onnx-evaluation)
     - [Ascend310推理过程](#ascend310推理过程)
         - [导出MindIR](#导出mindir)
         - [在Ascend310执行推理](#在ascend310执行推理)
@@ -94,6 +95,7 @@ WGAN网络包含两部分，生成器网络和判别器网络。判别器网络�
         ├── scripts
         │   ├── run_train.sh          // 单机到Ascend处理器的shell脚本
         │   ├── run_eval.sh              // Ascend评估的shell脚本
+        │   ├── run_eval_onnx.sh         // shell script for ONNX evaluation
         ├── src
         │   ├── dataset.py             // 创建数据集及数据预处理
         │   ├── dcgan_model.py            // WGAN架构,标准的DCGAN架构
@@ -102,6 +104,7 @@ WGAN网络包含两部分，生成器网络和判别器网络。判别器网络�
         │   ├── cell.py               // 模型单步训练文件
         ├── train.py               // 训练脚本
         ├── eval.py               // 评估脚本
+        ├── eval_onnx.py            // ONNX evaluation script
         ├── export.py               // 将checkpoint文件导出到mindir下
 ```
 
@@ -199,6 +202,22 @@ WGAN网络包含两部分，生成器网络和判别器网络。判别器网络�
   ```
 
   上述python命令将在后台运行，您可以通过eval/eval.log文件查看日志信息，在输出图片的路径下查看生成的图片。
+
+### ONNX Evaluation
+
+- Export your model to ONNX:
+
+  ```bash
+  python export.py --ckpt_file /path/to/wgan_generator.ckpt --file_name /path/to/wgan_generator --file_format ONNX --config generator_config.json --nimages 1
+  ```
+
+- Run ONNX evaluation from wgan directory:
+
+  ```bash
+  bash scripts/run_eval_onnx.sh <ONNX_MODEL_PATH> [DEVICE_TARGET] [N_IMAGES] [OUTPUT_DIR] [CONFIG]
+  ```
+
+  Resulting png files will be saved in the output directory.
 
 ## Ascend310推理过程
 

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,7 +54,9 @@ if __name__ == "__main__":
     load_param_into_net(netG, load_checkpoint(args_opt.ckpt_file))
 
     # initialize noise
-    fixed_noise = Tensor(np.random.normal(size=[args_opt.nimages, nz, 1, 1]), dtype=mstype.float32)
+    randgen = np.random.RandomState(args_opt.input_seed)
+    input_array = randgen.normal(size=[args_opt.nimages, nz, 1, 1])
+    fixed_noise = Tensor(input_array, dtype=mstype.float32)
 
     fake = netG(fixed_noise)
     mul = ops.Mul()
