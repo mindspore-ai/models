@@ -288,7 +288,7 @@ def compute_emb_dim(config):
     compute_emb_dim
     """
     with open(
-            os.path.join(config.data_path + 'dataformat/',
+            os.path.join(config.data_path, 'dataformat',
                          "input_shape_dict.pkl"), "rb") as file_in:
         input_shape_dict = pickle.load(file_in)
     input_field_size = {}
@@ -322,12 +322,12 @@ def create_dataset(data_dir,
     create_dataset
     """
     if is_tf_dataset:
-        with open(os.path.join(data_dir + 'dataformat/', "schema_dict.pkl"),
+        with open(os.path.join(data_dir, 'dataformat', "schema_dict.pkl"),
                   "rb") as file_in:
-            print(os.path.join(data_dir + 'dataformat/', "schema_dict.pkl"))
+            print(os.path.join(data_dir, 'dataformat', "schema_dict.pkl"))
             schema_dict = pickle.load(file_in)
         with open(
-                os.path.join(data_dir + 'dataformat/', "input_shape_dict.pkl"),
+                os.path.join(data_dir, 'dataformat', "input_shape_dict.pkl"),
                 "rb") as file_in:
             input_shape_dict = pickle.load(file_in)
         return _get_tf_dataset(data_dir,
