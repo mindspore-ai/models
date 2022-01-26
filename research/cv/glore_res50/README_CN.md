@@ -66,7 +66,8 @@ glore_res的总体网络架构如下：
 
 # 环境要求
 
-- 硬件(Ascend)
+- 硬件(Ascend/GPU)
+    - 准备Ascend或GPU处理器搭建硬件环境。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
