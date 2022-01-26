@@ -13,6 +13,7 @@ enable_profiling: False
 
 ckpt_path: "/cache/data"
 ckpt_file: "/cache/data/checkpoint_alexnet-30_1562.ckpt"
+num_parallel_workers: 8
 # ==============================================================================
 # Training options
 num_classes: 1000

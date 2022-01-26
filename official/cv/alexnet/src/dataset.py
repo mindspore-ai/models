@@ -25,7 +25,8 @@ from mindspore.common import dtype as mstype
 from mindspore.communication.management import get_rank, get_group_size
 
 
-def create_dataset_cifar10(cfg, data_path, batch_size=32, repeat_size=1, status="train", target="Ascend"):
+def create_dataset_cifar10(cfg, data_path, num_parallel_workers=8, batch_size=32,
+                           repeat_size=1, status="train", target="Ascend"):
     """
     create dataset for train or test
     """
@@ -36,8 +37,8 @@ def create_dataset_cifar10(cfg, data_path, batch_size=32, repeat_size=1, status=
     if target != "Ascend" or device_num == 1:
         cifar_ds = ds.Cifar10Dataset(data_path)
     else:
-        cifar_ds = ds.Cifar10Dataset(data_path, num_parallel_workers=8, shuffle=True,
-                                     num_shards=device_num, shard_id=rank_id)
+        cifar_ds = ds.Cifar10Dataset(data_path, num_parallel_workers=num_parallel_workers,
+                                     shuffle=True, num_shards=device_num, shard_id=rank_id)
     rescale = 1.0 / 255.0
     shift = 0.0
     # cfg = alexnet_cifar10_cfg
@@ -50,14 +51,21 @@ def create_dataset_cifar10(cfg, data_path, batch_size=32, repeat_size=1, status=
         random_horizontal_op = CV.RandomHorizontalFlip()
     channel_swap_op = CV.HWC2CHW()
     typecast_op = C.TypeCast(mstype.int32)
-    cifar_ds = cifar_ds.map(input_columns="label", operations=typecast_op, num_parallel_workers=8)
+    cifar_ds = cifar_ds.map(input_columns="label", operations=typecast_op,
+                            num_parallel_workers=num_parallel_workers)
     if status == "train":
-        cifar_ds = cifar_ds.map(input_columns="image", operations=random_crop_op, num_parallel_workers=8)
-        cifar_ds = cifar_ds.map(input_columns="image", operations=random_horizontal_op, num_parallel_workers=8)
-    cifar_ds = cifar_ds.map(input_columns="image", operations=resize_op, num_parallel_workers=8)
-    cifar_ds = cifar_ds.map(input_columns="image", operations=rescale_op, num_parallel_workers=8)
-    cifar_ds = cifar_ds.map(input_columns="image", operations=normalize_op, num_parallel_workers=8)
-    cifar_ds = cifar_ds.map(input_columns="image", operations=channel_swap_op, num_parallel_workers=8)
+        cifar_ds = cifar_ds.map(input_columns="image", operations=random_crop_op,
+                                num_parallel_workers=num_parallel_workers)
+        cifar_ds = cifar_ds.map(input_columns="image", operations=random_horizontal_op,
+                                num_parallel_workers=num_parallel_workers)
+    cifar_ds = cifar_ds.map(input_columns="image", operations=resize_op,
+                            num_parallel_workers=num_parallel_workers)
+    cifar_ds = cifar_ds.map(input_columns="image", operations=rescale_op,
+                            num_parallel_workers=num_parallel_workers)
+    cifar_ds = cifar_ds.map(input_columns="image", operations=normalize_op,
+                            num_parallel_workers=num_parallel_workers)
+    cifar_ds = cifar_ds.map(input_columns="image", operations=channel_swap_op,
+                            num_parallel_workers=num_parallel_workers)
 
     cifar_ds = cifar_ds.shuffle(buffer_size=cfg.buffer_size)
     cifar_ds = cifar_ds.batch(batch_size, drop_remainder=True)
@@ -65,8 +73,9 @@ def create_dataset_cifar10(cfg, data_path, batch_size=32, repeat_size=1, status=
     return cifar_ds
 
 
-def create_dataset_imagenet(cfg, dataset_path, batch_size=32, repeat_num=1, training=True,
-                            num_parallel_workers=None, shuffle=None, sampler=None, class_indexing=None):
+def create_dataset_imagenet(cfg, dataset_path, num_parallel_workers=16, batch_size=32,
+                            repeat_num=1, training=True, shuffle=None, sampler=None,
+                            class_indexing=None):
     """
     create a train or eval imagenet2012 dataset for resnet50
 
@@ -84,14 +93,13 @@ def create_dataset_imagenet(cfg, dataset_path, batch_size=32, repeat_num=1, trai
     device_num, rank_id = _get_rank_info()
     # cfg = alexnet_imagenet_cfg
 
-    num_parallel_workers = 16
     if device_num == 1:
         num_parallel_workers = 96
         if num_parallel_workers > cpu_count():
             num_parallel_workers = cpu_count()
     else:
         ds.config.set_numa_enable(True)
-    data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=4,
+    data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers,
                                      shuffle=shuffle, sampler=sampler, class_indexing=class_indexing,
                                      num_shards=device_num, shard_id=rank_id)
 

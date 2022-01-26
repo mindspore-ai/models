@@ -38,10 +38,10 @@ def modelarts_process():
 @moxing_wrapper(pre_process=modelarts_process)
 def eval_alexnet():
     print("============== Starting Testing ==============")
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False)
     device_num = get_device_num()
+
     if device_num > 1:
-        # context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
-        context.set_context(mode=context.GRAPH_MODE, device_target='Davinci', save_graphs=False)
         if config.device_target == "Ascend":
             context.set_context(device_id=get_device_id())
             init()
@@ -52,8 +52,10 @@ def eval_alexnet():
         network = AlexNet(config.num_classes, phase='test')
         loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
         opt = nn.Momentum(network.trainable_params(), config.learning_rate, config.momentum)
-        ds_eval = create_dataset_cifar10(config, config.data_path, config.batch_size, status="test", \
-            target=config.device_target)
+        ds_eval = create_dataset_cifar10(cfg=config, data_path=config.data_path,
+                                         num_parallel_workers=config.num_parallel_workers,
+                                         batch_size=config.batch_size, status="test",
+                                         target=config.device_target)
         param_dict = load_checkpoint(config.ckpt_path)
         print("load checkpoint from [{}].".format(config.ckpt_path))
         load_param_into_net(network, param_dict)
@@ -63,7 +65,9 @@ def eval_alexnet():
     elif config.dataset_name == 'imagenet':
         network = AlexNet(config.num_classes, phase='test', off_load=True)
         loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
-        ds_eval = create_dataset_imagenet(config, config.data_path, config.batch_size, training=False)
+        ds_eval = create_dataset_imagenet(cfg=config, dataset_path=config.data_path,
+                                          num_parallel_workers=config.num_parallel_workers,
+                                          batch_size=config.batch_size, training=False)
         param_dict = load_checkpoint(config.ckpt_path)
         print("load checkpoint from [{}].".format(config.ckpt_path))
         load_param_into_net(network, param_dict)
