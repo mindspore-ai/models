@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,7 +35,8 @@ def run_export():
     param_dict = ms.load_checkpoint(config.ckpt_file)
     ms.load_param_into_net(network, param_dict)
 
-    input_data = ms.numpy.zeros([config.batch_size, 12, *config.testing_shape], ms.float32)
+    ts = config.testing_shape[0] // 2
+    input_data = ms.numpy.zeros([config.batch_size, 12, ts, ts], ms.float32)
 
     ms.export(network, input_data, file_name=config.file_name, file_format=config.file_format)
     print('==========success export===============')
