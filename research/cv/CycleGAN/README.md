@@ -9,12 +9,13 @@
     - [Script Parameters](#script-parameters)
     - [Training](#training-process)
     - [Evaluation](#evaluation-process)
+    - [ONNX evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend)
         - [Result](#result)
 - [Model Description](#model-description)
-    - [Performance](#performance)  
+    - [Performance](#performance)
         - [Training Performance](#evaluation-performance)
         - [Evaluation Performance](#evaluation-performance)
 - [ModelZoo Homepage](#modelzoo-homepage)
@@ -67,6 +68,7 @@ The entire code structure is as following:
   └─ run_train_distributed_gpu.sh       # launch gpu training(8 pcs)
   └─ run_eval_ascend.sh                 # launch ascend eval
   └─ run_eval_gpu.sh                    # launch gpu eval
+  └─ run_eval_onnx.sh                   # launch ONNX eval
   └─ run_infer_310.sh                   # launch 310 infer
 ├─ imgs
   └─ objects-transfiguration.jpg        # CycleGAN Imgs
@@ -155,6 +157,24 @@ sh ./scripts/run_train_distributed_gpu.sh
 
 ```bash
 python eval.py --platform [PLATFORM] --dataroot [DATA_PATH] --G_A_ckpt [G_A_CKPT] --G_B_ckpt [G_B_CKPT]
+```
+
+**Note: You will get the result as following in "./outputs_dir/predict".**
+
+## [ONNX evaluation](#contents)
+
+First, export your models:
+
+```bash
+python export.py --platform GPU --model ResNet --G_A_ckpt /path/to/GA.ckpt --G_B_ckpt /path/to/GB.ckpt --export_file_name /path/to/<prefix> --export_file_format ONNX
+```
+
+You will get two `.onnx` files: `/path/to/<prefix>_AtoB.onnx` and `/path/to/<prefix>_BtoA.onnx`
+
+Next, run ONNX eval with the same `export_file_name` as in export:
+
+```bash
+python eval_onnx.py --platform [PLATFORM] --dataroot [DATA_PATH] --export_file_name /path/to/<prefix>
 ```
 
 **Note: You will get the result as following in "./outputs_dir/predict".**

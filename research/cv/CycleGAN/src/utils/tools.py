@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 import random
 import numpy as np
 from PIL import Image
+import mindspore.nn as nn
 from mindspore import Tensor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
@@ -81,9 +82,10 @@ def save_image(img, img_path):
         image_path (str): the path of the image.
     """
     if isinstance(img, Tensor):
-        img = decode_image(img)
+        img = img.asnumpy()
     elif not isinstance(img, np.ndarray):
         raise ValueError("img should be Tensor or numpy array, but get {}".format(type(img)))
+    img = decode_image(img)
     img_pil = Image.fromarray(img)
     img_pil.save(img_path)
 
@@ -92,7 +94,7 @@ def decode_image(img):
     """Decode a [1, C, H, W] Tensor to image numpy array."""
     mean = 0.5 * 255
     std = 0.5 * 255
-    return (img.asnumpy()[0] * std + mean).astype(np.uint8).transpose((1, 2, 0))
+    return (img[0] * std + mean).astype(np.uint8).transpose((1, 2, 0))
 
 
 def get_lr(args):
@@ -126,3 +128,12 @@ def load_ckpt(args, G_A, G_B, D_A=None, D_B=None):
     if D_B is not None and args.D_B_ckpt is not None:
         param_DB = load_checkpoint(args.D_B_ckpt)
         load_param_into_net(D_B, param_DB)
+
+
+def enable_batch_statistics(net):
+    """Enable batch statistics in all BatchNorms"""
+    if isinstance(net, nn.BatchNorm2d):
+        net.use_batch_statistics = True
+    else:
+        for cell in net.cells():
+            enable_batch_statistics(cell)
