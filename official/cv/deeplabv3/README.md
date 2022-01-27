@@ -23,6 +23,7 @@
     - [Evaluation Process](#evaluation-process)
         - [Usage](#usage-1)
             - [Running on Ascend](#running-on-ascend-2)
+            - [Running ONNX evaluation](#running-onnx-evaluation)
         - [Result](#result-1)
             - [Training accuracy](#training-accuracy)
     - [Export MindIR](#export-mindir)
@@ -481,6 +482,7 @@ bash run_eval_s8_multiscale_flip.sh
     ├── run_eval_s8.sh                            # launch ascend evaluation in s8 structure
     ├── run_eval_s8_multiscale.sh                 # launch ascend evaluation with multiscale in s8 structure
     ├── run_eval_s8_multiscale_filp.sh            # launch ascend evaluation with multiscale and filp in s8 structure
+    ├── run_eval_onnx.sh                          # launch onnx evaluation with multiscale and flip
     ├── run_standalone_train.sh                   # launch ascend standalone training(1 pc)
     ├── run_standalone_train_cpu.sh               # launch CPU standalone training
   ├── src
@@ -788,6 +790,36 @@ python ${train_code_path}/eval.py --data_root=/PATH/TO/DATA  \
                     --ckpt_path=/PATH/TO/PRETRAIN_MODEL >${eval_path}/eval_log 2>&1 &
 ```
 
+#### Running ONNX evaluation
+
+First, export your model:
+
+```shell
+python export.py \
+  --freeze_bn False \
+  --export_model [deeplab_v3_s16 or deeplab_v3_s8] \
+  --ckpt_file /path/to/checkpoint.ckpt \
+  --device_target GPU \
+  --file_name /path/to/exported.onnx \
+  --export_batch_size [batch size]
+  --file_format ONNX
+```
+
+Next, run evaluation:
+
+```shell
+python eval_onnx.py \
+  --file_name /path/to/exported.onnx
+  --data_root /path/to/VOC2012/
+  --data_lst /path/to/VOC2012/voc_val_lst.txt \
+  --device_target GPU \
+  --batch_size [batch size]
+
+or
+
+bash run_eval_onnx.sh [DATA_ROOT] [DATA_LST] [FILE_NAME]
+```
+
 ### Result
 
 Our result were obtained by running the applicable training script. To achieve the same results, follow the steps in the Quick Start Guide.
@@ -808,7 +840,7 @@ Note: There OS is output stride, and MS is multiscale.
 Currently, batchsize can only set to 1.
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --freeze_bn True
 ```
 
 The ckpt_file parameter is required,
@@ -888,7 +920,7 @@ mean Iou 0.7854572371350974
 | Loss Function              | Softmax Cross Entropy                                  |
 | Outputs                    | probability                                       |
 | Loss                       | 0.0065883575                                       |
-| Speed                      | 60 fps（1pc, s16）<br> 480 fps（8pcs, s16） <br> 244 fps (8pcs, s8)      |  
+| Speed                      | 60 fps（1pc, s16）<br> 480 fps（8pcs, s16） <br> 244 fps (8pcs, s8)      |
 | Total time                 | 8pcs: 706 mins                     |
 | Parameters (M)             | 58.2                                       |
 | Checkpoint for Fine tuning | 443M (.ckpt file)                       |

@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,14 +29,6 @@ from src.nets import net_factory
 from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper
 from model_utils.device_adapter import get_device_id, get_device_num, get_rank_id
-
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False,
-                    device_id=get_device_id())
-
-
-#     parser.add_argument('--scales', type=float, action='append', help='scales of evaluation')
-#     parser.add_argument('--flip', action='store_true', help='perform left-right flip')
-
 
 
 def cal_hist(a, b, n):
@@ -194,6 +186,9 @@ def modelarts_pre_process():
 def net_eval():
     config.scales = config.scales_list[config.scales_type]
     args = config
+
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, save_graphs=False,
+                        device_id=get_device_id())
 
     # data list
     with open(args.data_lst) as f:
