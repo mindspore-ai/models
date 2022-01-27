@@ -18,7 +18,6 @@
 import os
 import argparse
 import ast
-import mindspore
 import mindspore.nn as nn
 from mindspore import context, Tensor
 from mindspore.communication.management import init, get_rank
@@ -115,7 +114,6 @@ def main():
         backbone = resnet152(config.num_classes)
         retinanet = retinahead(backbone, config)
         net = retinanetWithLossCell(retinanet, config)
-        net.to_float(mindspore.float16)
         init_net_param(net)
 
         if args_opt.pre_trained:

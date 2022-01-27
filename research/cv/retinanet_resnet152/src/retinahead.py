@@ -186,9 +186,14 @@ class retinanetWithLossCell(nn.Cell):
         self.class_loss = SigmoidFocalClassificationLoss(config.gamma, config.alpha)
         self.loc_loss = nn.SmoothL1Loss()
 
+        self.network.to_float(mstype.float16)
+
     def construct(self, x, gt_loc, gt_label, num_matched_boxes):
         """construct"""
         pred_loc, pred_label = self.network(x)
+        pred_loc = self.cast(pred_loc, mstype.float32)
+        pred_label = self.cast(pred_label, mstype.float32)
+
         mask = F.cast(self.less(0, gt_label), mstype.float32)
         num_matched_boxes = self.reduce_sum(F.cast(num_matched_boxes, mstype.float32))
 
