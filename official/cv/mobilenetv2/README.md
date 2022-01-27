@@ -17,11 +17,15 @@
         - [Usage](#usage-1)
         - [Launch](#launch-1)
         - [Result](#result-1)
+    - [ONNX export and evaluation process](#onnx-export-and-evaluation-process)
+        - [Export](#export)
+        - [Evaluation](#evaluation)
+        - [Result](#result-2)
     - [Training with dataset on NFS](#training-with-dataset-on-nfs)
     - [Inference process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
-        - [result](#result-2)
+        - [result](#result-3)
 - [Model description](#model-description)
     - [Performance](#performance)
         - [Training Performance](#training-performance)
@@ -354,6 +358,38 @@ Inference result will be stored in the example path, you can find result like th
 
 ```log
 result: {'acc': 0.71976314102564111} ckpt=./ckpt_0/mobilenet-200_625.ckpt
+```
+
+## [ONNX export and evaluation process](#contents)
+
+### Export
+
+```shell
+# export example
+  python:
+      python export.py --platform [PLATFORM] --ckpt_file ./ckpt_0/mobilenetv2_15.ckpt --file_format ONNX --file_name /path/to/exported.onnx
+
+  shell:
+      bash run_export.sh [PLATFORM] ./ckpt_0/mobilenetv2_15.ckpt ONNX /path/to/exported.onnx
+```
+
+### Evaluation
+
+```shell
+# eval example
+  python:
+      python eval_onnx.py --platform [PLATFORM] --dataset_path [VAL_DATASET_PATH] --file_name /path/to/exported.onnx
+
+  shell:
+      bash run_eval_onnx.sh [PLATFORM] [VAL_DATASET_PATH] /path/to/exported.onnx
+```
+
+### Result
+
+Inference result will be stored in the example path, you can find result like the following in `eval_onnx.log`.
+
+```log
+accuracy: 0.7199
 ```
 
 ## [Training with dataset on NFS](#contents)
