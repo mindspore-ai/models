@@ -21,7 +21,7 @@ fi
 
 ulimit -u unlimited
 export DEVICE_NUM=$2
-export RANK_SIZE=$3
+export RANK_SIZE=$2
 RANK_TABLE_FILE=$(realpath $1)
 export RANK_TABLE_FILE
 echo "RANK_TABLE_FILE=${RANK_TABLE_FILE}"
