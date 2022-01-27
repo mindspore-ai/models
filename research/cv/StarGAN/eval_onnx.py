@@ -12,29 +12,35 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""Evaluation for StarGAN"""
+"""ONNX evaluation for StarGAN"""
 import os
 import numpy as np
+import onnxruntime as ort
 from PIL import Image
 
-from mindspore import context
-from mindspore import Tensor
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.common import dtype as mstype
-import mindspore.ops as ops
-
-from src.utils import create_labels, denorm, get_network
+from src.utils import create_labels, denorm
 from src.config import get_config
 from src.dataset import dataloader
 
 
-if __name__ == "__main__":
+def create_session(checkpoint_path, target_device):
+    """Load ONNX model and create ORT session"""
+    if target_device == 'GPU':
+        providers = ['CUDAExecutionProvider']
+    elif target_device == 'CPU':
+        providers = ['CPUExecutionProvider']
+    else:
+        raise ValueError(f"Unsupported target device '{target_device}'. Expected one of: 'CPU', 'GPU'")
+    session = ort.InferenceSession(checkpoint_path, providers=providers)
+    input_names = [x.name for x in session.get_inputs()]
+    return session, input_names
+
+
+def main():
+    """ONNX evaluation"""
     config = get_config()
-    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=config.device_id)
-    G, _ = get_network(config)
-    para_g = load_checkpoint(config.gen_checkpoint_path)
-    load_param_into_net(G, para_g)
-    G.set_train(False)
+    generator, (image_input_name, domain_input_name) = create_session(config.export_file_name, config.device_target)
+
     if not os.path.exists(config.result_dir):
         os.mkdir(config.result_dir)
     # Define Dataset
@@ -51,31 +57,33 @@ if __name__ == "__main__":
                                  mode=config.mode,
                                  shuffle=False)
 
-    op = ops.Concat(axis=3)
-    ds = dataset.create_dict_iterator()
+    ds = dataset.create_dict_iterator(output_numpy=True)
     print(length)
     print('Start Evaluating!')
     for i, data in enumerate(ds):
-        result_list = ()
-        img_real = denorm(data['image'].asnumpy())
-        x_real = Tensor(data['image'], mstype.float32)
-        result_list += (x_real,)
-        c_trg_list = create_labels(data['attr'].asnumpy(), selected_attrs=config.selected_attrs)
-        c_trg_list = Tensor(c_trg_list, mstype.float32)
-        x_fake_list = []
+        x_real = data['image'].astype(np.float32)
+        result_list = [x_real]
+        c_trg_list = create_labels(data['attr'], selected_attrs=config.selected_attrs)
+        c_trg_list = c_trg_list.asnumpy().astype(np.float32)
 
         for c_trg in c_trg_list:
+            inputs = {
+                image_input_name: x_real,
+                domain_input_name: c_trg,
+            }
+            [x_fake] = generator.run(None, inputs)
 
-            x_fake = G(x_real, c_trg)
-            x = Tensor(x_fake.asnumpy().copy())
+            result_list.append(x_fake)
 
-            result_list += (x,)
+        x_fake_list = np.concatenate(result_list, axis=3)
 
-        x_fake_list = op(result_list)
-
-        result = denorm(x_fake_list.asnumpy())
+        result = denorm(x_fake_list)
         result = np.reshape(result, (-1, 768, 3))
 
         im = Image.fromarray(np.uint8(result))
-        im.save(config.result_dir + '/test_{}.jpg'.format(i))
-        print('Successful save image in ' + config.result_dir + '/test_{}.jpg'.format(i))
+        im.save(config.result_dir + f'/test_{i}.jpg')
+        print('Successful save image in ' + config.result_dir + f'/test_{i}.jpg')
+
+
+if __name__ == '__main__':
+    main()

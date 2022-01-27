@@ -8,8 +8,9 @@
     - [Training Process](#training-process)
     - [Prediction Process](#prediction-process)
     - [Ascend 310 Infer](#export-mindir)
+    - [ONNX prediction Process](#onnx-prediction-process)
 - [Model Description](#model-description)
-    - [Performance](#performance)  
+    - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
         - [Inference Performance](#evaluation-performance)
 - [Description of Random Situation](#description-of-random-situation)
@@ -71,8 +72,10 @@ The dataset can be employed as the training and test sets for the following comp
       ├─ run_distribute_train.sh           # launch distributed training(8p) in ascend
       ├─ run_standalone_train_ascend.sh    # launch standalone training(1p) in ascend
       ├─ eval_ascend.sh                    # launch evaluating in ascend
+      ├─ eval_onnx.sh                      # launch evaluation for ONNX model
       └─ run_infer_310.sh                  # shell script for 310 inference
     ├─ eval.py                             # translate attritubes from original images
+    ├─ eval_onnx.py                        # translate attritubes from original images using ONNX model
     ├─ train.py                            # train script
     ├─ export.py                           # export mindir script
     ├─ preprocess.py                       # convert images and labels to bin
@@ -95,12 +98,13 @@ python eval.py
 ```
 
 **Note: the result will saved at `./results/`.**
-## [Ascen 310 infer](#contents)
+
+## [Ascend 310 infer](#contents)
 
 ### [Export MindIR]
 
 ```bash
-python export.py
+python export.py --batch_size [BATCH_SIZE] --device_target GPU --gen_checkpoint_path /path/to/model.ckpt --file_format ONNX --export_file_name [FILE_NAME]
 ```
 
 **Note: The file_name parameter is the prefix, the final file will as StarGAN_G.[FILE_FORMAT].**
@@ -114,6 +118,24 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 - `MINDIR_PATH` Directionary of MINDIR
 - `DATA_PATH` Directionary of dataset
 - `DEVICE_ID` Optional, default 0
+
+## [ONNX prediction Process](#contents)
+
+- Export your model to ONNX:
+
+  ```bash
+  python export.py --device_target GPU --gen_checkpoint_path /path/to/model.ckpt --file_format ONNX
+  ```
+
+- Run the script for ONNX evaluation:
+
+  ```bash
+  python eval_onnx.py --mode test --device_target GPU --export_file_name [ONNX_FILE_PATH]
+  or
+  bash scripts/run_eval_onnx.sh [ONNX_FILE_PATH]
+  ```
+
+**Note: the result will saved at `./results/`.**
 
 # [Model Description](#contents)
 

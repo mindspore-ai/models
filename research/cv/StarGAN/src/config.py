@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ def get_config():
 
     # Test configuration.
     parser.add_argument('--test_iters', type=int, default=200000, help='test model from this step')
+    parser.add_argument('--gen_checkpoint_path', type=str, help='Path to generator checkpoint for eval and export')
 
     # Train Device.
     parser.add_argument('--num_workers', type=int, default=8)
@@ -83,7 +84,8 @@ def get_config():
     # export
     parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='MINDIR', \
                         help='file format')
-
+    parser.add_argument('--export_file_name', type=str, default='StarGAN_Generator.onnx', \
+                        help='export file name')
 
     config = parser.parse_args()
 
