@@ -150,7 +150,7 @@ def create_dataset_imagenet(dataset_path,
                             input_columns="label")
     data_set = data_set.map(operations=trans,
                             input_columns="image",
-                            num_parallel_workers=get_num_parallel_workers(10))
+                            num_parallel_workers=get_num_parallel_workers(16))
 
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
