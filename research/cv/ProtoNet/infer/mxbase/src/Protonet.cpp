@@ -133,7 +133,7 @@ APP_ERROR Protonet::Inference(const std::vector<MxBase::TensorBase> &inputs,
 }
 
 
-APP_ERROR  Protonet::WriteResult(const std::string &imageFile, std::vector<MxBase::TensorBase> *outputs) {
+APP_ERROR  Protonet::WriteResult(const std::string& imageFile, std::vector<MxBase::TensorBase> &outputs) {
     std::string infer_result_path;
     infer_result_path = "./result/";
     for (size_t i = 0; i < outputs.size(); ++i) {
@@ -145,9 +145,9 @@ APP_ERROR  Protonet::WriteResult(const std::string &imageFile, std::vector<MxBas
         void *netOutput = outputs[i].GetBuffer();
         std::vector<uint32_t> out_shape = outputs[i].GetShape();
         std::string outFileName = infer_result_path + "/" + imageFile;
-        FILE *outputFile_ = fopen(outFileName.c_str(), "wb");
-        fwrite(netOutput, out_shape[0]*out_shape[1], sizeof(float), outputFile_);
-        fclose(outputFile_);
+        FILE *outputFile = fopen(outFileName.c_str(), "wb");
+        fwrite(netOutput, out_shape[0]*out_shape[1], sizeof(float), outputFile);
+        fclose(outputFile);
         outputFile = nullptr;
     }
     return APP_ERR_OK;

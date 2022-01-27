@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +11,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ============================================================================
 
-rm -rf ../data/input/data_preprocess_Result
-rm -rf ../data/input/label_classes_preprocess_Result
-mkdir -p ../data/input/data_preprocess_Result
-mkdir -p ../data/input/label_classes_preprocess_Result
+"""Device adapter for ModelArts"""
 
-python ../../preprocess.py --dataset_path=../data/input/dataset --data_output_path=../data/input/data_preprocess_Result --label_classses_output_path=../data/input/label_classes_preprocess_Result
+from .config import config
+
+if config.enable_modelarts:
+    from .moxing_adapter import get_device_id, get_device_num, get_rank_id, get_job_id
+else:
+    from .local_adapter import get_device_id, get_device_num, get_rank_id, get_job_id
+
+__all__ = [
+    "get_device_id", "get_device_num", "get_rank_id", "get_job_id"
+]

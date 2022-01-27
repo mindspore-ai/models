@@ -43,7 +43,7 @@ class Protonet {
  protected:
     APP_ERROR ReadTensorFromFile(const std::string &file, uint32_t *data, uint32_t size);
     APP_ERROR ReadInputTensor(const std::string &fileName, std::vector<MxBase::TensorBase> *inputs);
-    APP_ERROR WriteResult(const std::string &imageFile, std::vector<MxBase::TensorBase> *outputs);
+    APP_ERROR WriteResult(const std::string &imageFile, std::vector<MxBase::TensorBase> &outputs);
 
 
  private:
