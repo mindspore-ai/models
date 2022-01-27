@@ -1,5 +1,3 @@
-#!/bin/bash
-
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,10 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+# ============================================================================
 
-rm -rf ../data/input/data_preprocess_Result
-rm -rf ../data/input/label_classes_preprocess_Result
-mkdir -p ../data/input/data_preprocess_Result
-mkdir -p ../data/input/label_classes_preprocess_Result
+"""Local adapter"""
 
-python ../../preprocess.py --dataset_path=../data/input/dataset --data_output_path=../data/input/data_preprocess_Result --label_classses_output_path=../data/input/label_classes_preprocess_Result
+import os
+
+def get_device_id():
+    device_id = os.getenv('DEVICE_ID', '0')
+    return int(device_id)
+
+
+def get_device_num():
+    device_num = os.getenv('RANK_SIZE', '1')
+    return int(device_num)
+
+
+def get_rank_id():
+    global_rank_id = os.getenv('RANK_ID', '0')
+    return int(global_rank_id)
+
+
+def get_job_id():
+    return "Local Job"

@@ -1,5 +1,5 @@
 '''
-The boot script to train model
+train protonet model on modelarts
 '''
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
@@ -18,12 +18,19 @@ The boot script to train model
 
 import os
 import argparse
-import sys
 import time
 import datetime
 import numpy as np
 import moxing as mox
 
+
+
+from src.model_utils.device_adapter import get_device_id, get_device_num, get_rank_id, get_job_id
+from src.protonet import ProtoNet
+from src.PrototypicalLoss import PrototypicalLoss
+from src.protonet import WithLossCell
+from src.EvalCallBack import EvalCallBack
+from model_init import init_dataloader
 
 import mindspore.nn as nn
 from mindspore.communication.management import init
@@ -37,15 +44,6 @@ from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMoni
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.common import set_seed
 
-from src.protonet import ProtoNet
-from src.PrototypicalLoss import PrototypicalLoss
-from src.protonet import WithLossCell
-from src.EvalCallBack import EvalCallBack
-
-from model_init import init_dataloader
-
-
-sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../'))
 
 parser = argparse.ArgumentParser(description='Image classification')
 parser.add_argument("--enable_modelarts", type=bool, default=True, help="")
@@ -119,7 +117,7 @@ def sync_data(from_path, to_path):
     _global_sync_count += 1
 
     # Each server contains 8 devices as most.
-    if os.getenv('DEVICE_ID', '0') % min(os.getenv('RANK_SIZE', '1'), 8) == 0 and not os.path.exists(sync_lock):
+    if get_device_id() % min(get_device_num(), 8) == 0 and not os.path.exists(sync_lock):
         print("from path: ", from_path)
         print("to path: ", to_path)
         mox.file.copy_parallel(from_path, to_path)
@@ -156,11 +154,13 @@ def wrapped_func(config_name):
 
 def train_protonet_model():
     '''
-    train model
+    train protonet model
     '''
     print(config)
-    print('device id:', os.getenv('DEVICE_ID', '0'))
-    print('device num:', os.getenv('RANK_SIZE', '1'))
+    print('device id:', get_device_id())
+    print('device num:', get_device_num())
+    print('rank id:', get_rank_id())
+    print('job id:', get_job_id())
 
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
     context.set_context(save_graphs=False)
@@ -170,17 +170,16 @@ def train_protonet_model():
         context.set_context(enable_graph_kernel=True)
         context.set_context(graph_kernel_flags="--enable_cluster_ops=MatMul")
 
-    device_num = os.getenv('RANK_SIZE', '1')
+    device_num = get_device_num()
     if device_num > 1:
         if device_target == "Ascend":
             init()
         elif device_target == "GPU":
             init()
         context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(device_num=device_num,
-                                          parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
-    context.set_context(device_id=os.getenv('DEVICE_ID', '0'))
+        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                          radients_mean=True)
+    context.set_context(device_id=get_device_id())
 
     tr_dataloader = init_dataloader(config, 'train', config.data_path)
     val_dataloader = init_dataloader(config, 'val', config.data_path)

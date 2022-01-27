@@ -1,143 +1,279 @@
-# Description
+# 目录
 
-This README file is to show how to inference Protonet by mxBase and mindX-SDK
+- [源码介绍](#源码介绍)
+- [准备推理数据](#准备推理数据)
+- [模型转换](#模型转换)
+- [mxBase推理](#mxbase推理)
+- [MindX SDK推理](#mindx-sdk推理)
 
-# Environment Preparation
+## 源码介绍
 
-- (ALL Required) You should put `infer` folder into **Server Environment**  not must in subfolder of mxVision.
-- (Convert Required) You must configure the environment variables correctly like [here](https://support.huaweicloud.com/atctool-cann503alpha1infer/atlasatc_16_0004.html), if you use docker you may skip this step.
-- (mxBase mindX-SDK Required) You must config the environment parameter. for example:
+```tex
+/home/HwHiAiUser/protonet_for_mindspore_{version}_code
+├── infer              # MindX高性能预训练模型新增
+│   └── README.md
+│   ├── convert
+│   │   ├── convert.sh       # 转换om模型脚本
+│   │   └── dataprocess.sh   # 数据预处理脚本(将图片处理为bin文件，需要使用Mindspore函数库)
+│   ├── data                # 模型数据集、模型配置文件、模型文件
+│   │   ├── input
+│   │   │      ├── dataset         # 数据集
+│   │   │      │     ├── data      # 数据集内容
+│   │   │      │     ├── omniglot
+│   │   │      │     ├── raw
+│   │   │      │     └── splits    # 该文件夹内容包含对数据集的说明，由此区分训练集、验证集、测试集
+│   │   │      └── ...
+│   │   └── config
+│   │       └── protonet.pipeline
+│   ├── mxbase           # 基于mxbase推理
+│   │   ├── src
+│   │   │   ├── Protonet.cpp
+│   │   │   ├── Protonet.h
+│   │   │   └── main.cpp
+│   │   ├── CMakeLists.txt
+│   │   └── build.sh
+│   └── sdk           # 基于sdk.run包推理
+│   │   ├── main.py
+│   │   └── run.sh
+│   └── docker_start_infer.sh     # 启动容器脚本
+```
 
-    ```bash
-    export MX_SDK_HOME="/home/data/xj_mindx/mxVision"
-    export ASCEND_HOME=/usr/local/Ascend
-    export ASCEND_VERSION=nnrt/latest
-    export ARCH_PATTERN=.
-    export MXSDK_OPENSOURCE_DIR=/home/data/xj_mindx/mxVision/opensource
-    export LD_LIBRARY_PATH="${MX_SDK_HOME}/lib/plugins:${MX_SDK_HOME}/opensource/lib64:${MX_SDK_HOME}/lib:${MX_SDK_HOME}/lib/modelpostprocessors:${MX_SDK_HOME}/opensource/lib:/usr/local/Ascend/nnae/latest/fwkacllib/lib64:${LD_LIBRARY_PATH}"
-    export ASCEND_OPP_PATH="/usr/local/Ascend/nnae/latest/opp"
-    export ASCEND_AICPU_PATH="/usr/local/Ascend/nnae/latest"
+## 准备推理数据
+
+准备模型转换和模型推理所需目录及数据。
+
+1. 下载源码包。
+
+2. 将源码上传至推理服务器任意目录并解压（如：“/home/HwHiAiUser“）。
+
+3. 准备数据。
+
+    （_准备用于推理的图片、数据集、模型文件、代码等，放在同一数据路径中，如：“/home/HwHiAiUser“。_）
+
+    由于后续推理均在容器中进行，因此需要把用于推理的图片、数据集、模型文件、代码等均放在同一数据路径中，后续示例将以“/home/HwHiAiUser“为例。
+
+    ```
+    ..
+    ├── infer            # MindX高性能预训练模型新增
+    │   └── README.md
+    │   ├── convert
+    │   │   ├──dataprocess.sh  # 数据预处理脚本
+    │   │   └──convert.sh     # 转换om模型脚本
+    │   ├── data     # 模型数据集、模型配置文件、模型文件
+    │   │   ├── input
+    │   │   ├── model       # air、om模型文件
+    │   │   └── config      # 推理所需的配置文件
+    │   ├── mxbase
+    │   └── sdk
+    │   └──docker_start_infer.sh     # 启动容器脚本
     ```
 
-# Model Convert
+    AIR模型可通过“模型训练”后转换生成或通过“下载模型”获取。
 
-we offer a bash file `convert.sh`  that can help you to easy convert model from AIR to OM, it was placed in `convert` . for example:
+    将Omniglot数据集放到“infer/data/input”目录下
 
-```bash
-bash convert.sh
-```
+4. 启动容器。
 
-If you want to see the help message of the bash file, you can use:
+    进入“infer“目录，执行以下命令，启动容器。
 
-```bash
-bash convert.sh --help
-```
+    **bash docker\_start\_infer.sh** _docker\_image:tag_ _model\_dir_
 
-You will see the help and the default setting of the args.
+    **表 2**  参数说明
 
-# Input image
+    <a name="table8122633182517"></a>
+    <table><thead align="left"><tr id="row16122113320259"><th class="cellrowborder" valign="top" width="40%" id="mcps1.2.3.1.1"><p id="p16122163382512"><a name="p16122163382512"></a><a name="p16122163382512"></a>参数</p>
+    </th>
+    <th class="cellrowborder" valign="top" width="60%" id="mcps1.2.3.1.2"><p id="p8122103342518"><a name="p8122103342518"></a><a name="p8122103342518"></a>说明</p>
+    </th>
+    </tr>
+    </thead>
+    <tbody><tr id="row11225332251"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p712210339252"><a name="p712210339252"></a><a name="p712210339252"></a><em id="i121225338257"><a name="i121225338257"></a><a name="i121225338257"></a>docker_image</em></p>
+    </td>
+    <td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p0122733152514"><a name="p0122733152514"></a><a name="p0122733152514"></a>推理镜像名称，根据实际写入。</p>
+    </td>
+    </tr>
+    <tr id="row052611279127"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p2526192714127"><a name="p2526192714127"></a><a name="p2526192714127"></a><em id="i12120733191212"><a name="i12120733191212"></a><a name="i12120733191212"></a>tag</em></p>
+    </td>
+    <td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p16526142731219"><a name="p16526142731219"></a><a name="p16526142731219"></a>镜像tag，请根据实际配置，如：21.0.2。</p>
+    </td>
+    </tr>
+    <tr id="row5835194195611"><td class="cellrowborder" valign="top" width="40%" headers="mcps1.2.3.1.1 "><p id="p59018537424"><a name="p59018537424"></a><a name="p59018537424"></a>model_dir</p>
+    </td>
+    <td class="cellrowborder" valign="top" width="60%" headers="mcps1.2.3.1.2 "><p id="p1390135374214"><a name="p1390135374214"></a><a name="p1390135374214"></a>推理代码路径。</p>
+    </td>
+    </tr>
+    </tbody>
+    </table>
 
-You must put the **Omniglot Dataset** into `infer/input/dataset` folder.and put the dataset after processed into `data/input`.
+    启动容器时会将推理芯片和数据路径挂载到容器中。可根据需要通过修改**docker\_start\_infer.sh**的device来指定挂载的推理芯片。
 
-e.g. **Original**
+    ```
+    docker run -it \
+      --device=/dev/davinci0 \         # 可根据需要修改挂载的npu设备
+      --device=/dev/davinci_manager \
+      --device=/dev/devmm_svm \
+      --device=/dev/hisi_hdc \
+      -v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
+      -v ${data_path}:${data_path} \
+      ${docker_image} \
+      /bin/bash
+    ```
 
-```shell
-└─dataset
-    ├─raw
-    ├─spilts
-    │     vinyals
-    │         test.txt
-    │         train.txt
-    │         val.txt
-    │         trainval.txt
-    └─data
-           Alphabet_of_the_Magi
-           Angelic
-```
+    > ![输入图片说明](https://images.gitee.com/uploads/images/2021/0926/181445_0077d606_8725359.gif "icon-note.gif") **说明：**
+    > MindX SDK开发套件（mxManufacture）已安装在基础镜像中，安装路径：“/usr/local/sdk\_home“。
 
-**Procession:** we offer a bash file (`convert/dataprocess.sh`) to process the dataset:
+## 模型转换
 
-```bash
-bash dataprocess.sh
-```
+在容器内进行模型转换。
 
-e.g. **Processed**
+1. 准备模型文件。
 
-```shell
-└─data
-    ├─dataset
-    ├─data_preprocess_Result
-    │     data_1.bin
-    │     data_2.bin
-    |         ···
-    │     data_100.bin
-    └─label_classes_preprocess_Result
-          label_1.bin
-          label_1.bin
-              ···
-          label_100.bin
-          classes_1.bin
-          classes_2.bin
-              ···
-          classes_100.bin
+2. 模型转换。
 
-```
+    进入“infer/convert“目录进行模型转换，转换详细信息可查看转换脚本，**在convert.sh**脚本文件中，配置相关参数。
 
-# Infer by mxBase
+    ```
+    air_path=$1
+    om_path=$2
+    /usr/local/Ascend/atc/bin/atc \
+      --model=${air_path} \                     # 待转换的air模型
+      --framework=1 \                           # 1代表MindSpore。
+      --output=${om_path} \                     # 转换后输出的om模型。
+      --input_shape="input:100,1,28,28" \       # 输入数据的shape。input取值根据实际使用场景确定。
+      --soc_version=Ascend310 \                 # 模型转换时指定芯片版本
+    exit 0
+    ```
 
-You should put OM file into `data/model`, then you need build the project by `build.sh`, for example:
+    模型转换命令如下（在infer/data/目录下创建model目录）。
 
-```bash
-cd mxbase
-bash build.sh
-```
+    **bash convert.sh** _air\_path_ _om\_path_
 
-if success, you should see a new file named `protonet`, then you can use command to infer:
+    air\_path：AIR文件路径
 
-```bash
-./protonet
-```
+    om\_path：生成om文件路径，转换脚本会在此基础上添加om后缀。
 
-Inference result will store in folder `result`.
+    示例：
 
-# Infer by mindX-SDK
+    bash convert.sh ./protonet.air ../data/model/
 
-if you want to infer by mindx-SDK, you should enter the folder `infer/sdk` and then use the shell command:
+3. 数据预处理,处理后的数据集放在infer/data/input/目录下。
 
-```bash
-bash run.sh ../data/config/protonet.pipeline ../data/input/data_preprocess_Result/ ../data/input/label_classes_preprocess_Result
-```
+    ```
+    cd infer/convert
+    bash dataprocess.sh
+    ```
 
-you will acquire the inference result in folder `result`.
+## mxBase推理
 
-# Calculate Inference Precision
+在容器内用mxBase进行推理。
 
-We offer a python file to calculate the precision.
+1. 配置相关环境变量
 
-```bash
-python postprocess.py --result_path=./infer/XXX/result
-                      --label_classes_path=./infer/data/input/label_classes_preprocess_Result
-```
+    ```bash
+          export ASCEND_VERSION=nnrt/latest
+          export ARCH_PATTERN=.
+          export MXSDK_OPENSOURCE_DIR=${MX_SDK_HOME}/opensource
+          export LD_LIBRARY_PATH="${MX_SDK_HOME}/lib/plugins:${MX_SDK_HOME}/opensource/lib64:${MX_SDK_HOME}/lib:${MX_SDK_HOME}/lib/modelpostprocessors:${MX_SDK_HOME}/opensource/lib:${LD_LIBRARY_PATH}"
+    ```
 
-**note:**
+2. 修改配置文件。
+3. 编译工程。
 
-- XXX can be `mxbase` or `sdk`
-- `--label_classes_path` is the label and class data after preprocessed.
+    ```
+    cd mxbase
+    bash build.sh
+    ```
 
-# Self-Inspection Report
+4. 运行推理服务。
 
-- We have obtained the following result through mindX-SDK and mxBase inference:
-    || Accuracy|||  |   |
-    |:----:| :----:|:----:|:----:| :----: | :----: |
-    |mindX-SDK| 0.9943  |
-    |mxBase| 0.9943  |
+    ```
+    ./protonet
+    ```
 
-- The model precision in train:
+5. 观察结果，结果会保存在result目录中。
 
-    | | Accuracy  |   |
-    | :----: | :----: | :----: |
-    | Train | 0.9954  |
+## MindX SDK推理
 
-# ModelZoo Homepage
+1. 修改配置文件。
+    可根据实际情况修改pipeline文件。
 
- Please check the official [homepage](https://gitee.com/mindspore/models).
+    ```
+      cd infer/sdk
+      vim ../data/config/protonet.pipeline
+      ```
+
+      以protonet.pipeline文件为例，作简要说明。
+
+    ```
+
+    {
+    "protonet": {
+        "stream_config": {
+                "deviceId": "0"
+        },
+        "appsrc0": {
+            "props": {
+                    "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "tensorinfer0"
+        },
+        "tensorinfer0": {
+            "props": {
+            "modelPath": "../data/model/protonet.om",
+            "dataSource": "appsrc0",
+            "waitingTime": "2000",
+            "outputDeviceId": "-1"
+            },
+            "factory": "mxpi_tensorinfer",
+            "next": "dataserialize"
+        },
+        "dataserialize": {
+            "props": {
+                "outputDataKeys": "tensorinfer0"
+            },
+            "factory": "mxpi_dataserialize",
+            "next": "appsink0"
+        },
+        "appsink0": {
+            "props": {
+                "blocksize": "4096000"
+            },
+            "factory": "appsink"
+        }
+    }
+    }
+      ```
+
+2. 模型推理。
+
+    1. 执行推理
+
+    ```
+    cd sdk
+    bash run.sh ../data/config/protonet.pipeline \               # pipeline文件路径
+                ../data/input/data_preprocess_Result/ \          # 预处理数据集
+                > infer_result.txt                               # 保存推理结果
+    ```
+
+    2. 查看推理结果及性能。
+
+    ```
+    cat infer_result.txt
+    ```
+
+3. 执行精度测试。
+
+    ```
+
+    python postprocess.py --result_path=./infer/sdk/result \
+                        --label_classes_path=./infer/data/input/label_classes_preprocess_Result \
+                          > infer/sdk/infer_accuracy.txt
+    ```
+
+4. 查看精度结果。
+
+    ```
+    cd sdk
+    cat infer_accuracy.txt
+    ```
