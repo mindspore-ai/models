@@ -20,7 +20,7 @@ from pathlib import Path
 import numpy as np
 from src.dataset.veri import VeRiDataset
 from src.config import cfg, update_config
-from src.dataset import flip_back, get_final_preds
+from src.dataset import flip_back, get_final_preds, get_label
 
 parser = argparse.ArgumentParser(description='postprocess')
 
@@ -71,7 +71,7 @@ if __name__ == '__main__':
     with label_json_path.open('r') as dst_file:
         all_labels = json.load(dst_file)
 
-    json_path = args.data_dir + '/annot/image_test.json'
+    json_path = get_label(cfg, args.data_dir)
     dst_json_path = Path(json_path)
     with dst_json_path.open('r') as dst_file:
         allImage = json.load(dst_file)
