@@ -54,4 +54,5 @@ models/research/cvtmodel/resnet_ipl/src/resnest101e.py:__init__
 models/research/cvtmodel/resnet_ipl/src/resnet26t.py:__init__
 models/research/cvtmodel/resnet_ipl/src/resnet101d.py:__init__
 models/research/cvtmodel/resnet_ipl/src/resnetrs50.py:__init__
+models/official/cv/lpcnet/ascend310_infer/src/main.cc:main
 

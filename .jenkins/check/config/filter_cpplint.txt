@@ -124,3 +124,6 @@
 "models/official/cv/googlenet/infer/mxbase/src/main.cpp"                    "runtime/references"
 "models/official/cv/retinanet/infer/mxbase/retinanetDetection/RetinanetDetection.h"     "runtime/references"
 "models/official/cv/retinanet/infer/mxbase/retinanetDetection/RetinanetDetection.cpp"   "runtime/references"
+
+"models/official/cv/lpcnet/ascend310_infer/inc/lpcnet.h" "runtime/int"
+"models/official/cv/lpcnet/ascend310_infer/src/main.cc" "build/include_subdir"
