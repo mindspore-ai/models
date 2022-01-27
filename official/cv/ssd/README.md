@@ -19,6 +19,7 @@
         - [Evaluation Process](#evaluation-process)
             - [Evaluation on Ascend](#evaluation-on-ascend)
             - [Evaluation on GPU](#evaluation-on-gpu)
+            - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
@@ -53,7 +54,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 Dataset used: [COCO2017](<https://cocodataset.org/#download>)
 
 - Dataset size：19G
-    - Train：18G，118000 images  
+    - Train：18G，118000 images
     - Val：1G，5000 images
     - Annotations：241M，instances，captions，person_keypoints etc
 - Data format：image and json files
@@ -230,6 +231,7 @@ Then you can run everything just like on ascend.
       ├─ run_distribute_train.sh      ## shell script for distributed on ascend
       ├─ run_distribute_train_gpu.sh  ## shell script for distributed on gpu
       ├─ run_eval.sh                  ## shell script for eval on ascend
+      ├─ run_eval_onnx.sh             ## shell script for onnx model evaluation
       ├─ run_eval_gpu.sh              ## shell script for eval on gpu
       └─ run_infer_310.sh             ## shell script for 310 inference
     ├─ src
@@ -262,6 +264,7 @@ Then you can run everything just like on ascend.
         ├─ ssd300_config_gpu.yaml ## GPU parameter configuration
     ├─ Dockerfile                         ## docker file
     ├─ eval.py                            ## eval scripts
+    ├─ eval_onnx.py                       ## eval onnx model
     ├─ export.py                          ## export mindir script
     ├─ postprocess.py                     ## post-processing script for 310 inference
     ├─ train.py                           ## train scripts
@@ -466,6 +469,38 @@ Average Recall    (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.686
 mAP: 0.2244936111705981
 ```
 
+#### ONNX Evaluation
+
+- Export your model to ONNX:
+
+  ```bash
+  python export.py --checkpoint_file_path /path/to/ssd.ckpt --file_name /path/to/ssd.onnx --file_format ONNX --config_path config/ssd300_config_gpu.yaml --batch_size 1
+  ```
+
+- Run ONNX evaluation from ssd directory:
+
+  ```bash
+  bash scripts/run_eval_onnx.sh <DATA_DIR> <COCO_SUBDIR> <ONNX_MODEL_PATH> [<INSTANCES_SET>] [<DEVICE_TARGET>] [<CONFIG_PATH>]
+  ```
+
+  Results will be saved in eval.log and have the following form:
+
+  ```log
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.239
+  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.398
+  Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.242
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.035
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.198
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.436
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.251
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.388
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.423
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.117
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.435
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.688
+  mAP: 0.23850595066045968
+  ```
+
 ## Inference Process
 
 ### [Export MindIR](#contents)
@@ -663,4 +698,4 @@ In dataset.py, we set the seed inside “create_dataset" function. We also use r
 
 ## [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/models).  
+ Please check the official [homepage](https://gitee.com/mindspore/models).

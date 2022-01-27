@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,27 +17,41 @@
 import json
 import numpy as np
 from mindspore import Tensor
+from pycocotools.coco import COCO
+from pycocotools.cocoeval import COCOeval
+
 from src.model_utils.config import config
+
 
 def apply_eval(eval_param_dict):
     net = eval_param_dict["net"]
     net.set_train(False)
     ds = eval_param_dict["dataset"]
     anno_json = eval_param_dict["anno_json"]
-    pred_data = []
+    coco_metrics = COCOMetrics(anno_json=anno_json,
+                               classes=config.classes,
+                               num_classes=config.num_classes,
+                               max_boxes=config.max_boxes,
+                               nms_threshold=config.nms_threshold,
+                               min_score=config.min_score)
     for data in ds.create_dict_iterator(output_numpy=True, num_epochs=1):
         img_id = data['img_id']
         img_np = data['image']
         image_shape = data['image_shape']
 
         output = net(Tensor(img_np))
+
         for batch_idx in range(img_np.shape[0]):
-            pred_data.append({"boxes": output[0].asnumpy()[batch_idx],
-                              "box_scores": output[1].asnumpy()[batch_idx],
-                              "img_id": int(np.squeeze(img_id[batch_idx])),
-                              "image_shape": image_shape[batch_idx]})
-    mAP = metrics(pred_data, anno_json)
-    return mAP
+            pred_batch = {
+                "boxes": output[0].asnumpy()[batch_idx],
+                "box_scores": output[1].asnumpy()[batch_idx],
+                "img_id": int(np.squeeze(img_id[batch_idx])),
+                "image_shape": image_shape[batch_idx]
+            }
+            coco_metrics.update(pred_batch)
+    eval_metrics = coco_metrics.get_metrics()
+    return eval_metrics
+
 
 def apply_nms(all_boxes, all_scores, thres, max_boxes):
     """Apply NMS to bboxes."""
@@ -74,51 +88,49 @@ def apply_nms(all_boxes, all_scores, thres, max_boxes):
     return keep
 
 
-def metrics(pred_data, anno_json):
+class COCOMetrics:
     """Calculate mAP of predicted bboxes."""
-    from pycocotools.coco import COCO
-    from pycocotools.cocoeval import COCOeval
-    num_classes = config.num_classes
 
-    #Classes need to train or test.
-    val_cls = config.classes
-    val_cls_dict = {}
-    for i, cls in enumerate(val_cls):
-        val_cls_dict[i] = cls
-    coco_gt = COCO(anno_json)
-    classs_dict = {}
-    cat_ids = coco_gt.loadCats(coco_gt.getCatIds())
-    for cat in cat_ids:
-        classs_dict[cat["name"]] = cat["id"]
+    def __init__(self, anno_json, classes, num_classes, min_score, nms_threshold, max_boxes):
+        self.num_classes = num_classes
+        self.classes = classes
+        self.min_score = min_score
+        self.nms_threshold = nms_threshold
+        self.max_boxes = max_boxes
 
-    predictions = []
-    img_ids = []
+        self.val_cls_dict = {i: cls for i, cls in enumerate(classes)}
+        self.coco_gt = COCO(anno_json)
+        cat_ids = self.coco_gt.loadCats(self.coco_gt.getCatIds())
+        self.class_dict = {cat['name']: cat['id'] for cat in cat_ids}
 
-    for sample in pred_data:
-        pred_boxes = sample['boxes']
-        box_scores = sample['box_scores']
-        img_id = sample['img_id']
-        h, w = sample['image_shape']
+        self.predictions = []
+        self.img_ids = []
+
+    def update(self, batch):
+        pred_boxes = batch['boxes']
+        box_scores = batch['box_scores']
+        img_id = batch['img_id']
+        h, w = batch['image_shape']
 
         final_boxes = []
         final_label = []
         final_score = []
-        img_ids.append(img_id)
+        self.img_ids.append(img_id)
 
-        for c in range(1, num_classes):
+        for c in range(1, self.num_classes):
             class_box_scores = box_scores[:, c]
-            score_mask = class_box_scores > config.min_score
+            score_mask = class_box_scores > self.min_score
             class_box_scores = class_box_scores[score_mask]
             class_boxes = pred_boxes[score_mask] * [h, w, h, w]
 
             if score_mask.any():
-                nms_index = apply_nms(class_boxes, class_box_scores, config.nms_threshold, config.max_boxes)
+                nms_index = apply_nms(class_boxes, class_box_scores, self.nms_threshold, self.max_boxes)
                 class_boxes = class_boxes[nms_index]
                 class_box_scores = class_box_scores[nms_index]
 
                 final_boxes += class_boxes.tolist()
                 final_score += class_box_scores.tolist()
-                final_label += [classs_dict[val_cls_dict[c]]] * len(class_box_scores)
+                final_label += [self.class_dict[self.val_cls_dict[c]]] * len(class_box_scores)
 
         for loc, label, score in zip(final_boxes, final_label, final_score):
             res = {}
@@ -126,14 +138,16 @@ def metrics(pred_data, anno_json):
             res['bbox'] = [loc[1], loc[0], loc[3] - loc[1], loc[2] - loc[0]]
             res['score'] = score
             res['category_id'] = label
-            predictions.append(res)
-    with open('predictions.json', 'w') as f:
-        json.dump(predictions, f)
+            self.predictions.append(res)
 
-    coco_dt = coco_gt.loadRes('predictions.json')
-    E = COCOeval(coco_gt, coco_dt, iouType='bbox')
-    E.params.imgIds = img_ids
-    E.evaluate()
-    E.accumulate()
-    E.summarize()
-    return E.stats[0]
+    def get_metrics(self):
+        with open('predictions.json', 'w') as f:
+            json.dump(self.predictions, f)
+
+        coco_dt = self.coco_gt.loadRes('predictions.json')
+        E = COCOeval(self.coco_gt, coco_dt, iouType='bbox')
+        E.params.imgIds = self.img_ids
+        E.evaluate()
+        E.accumulate()
+        E.summarize()
+        return E.stats[0]

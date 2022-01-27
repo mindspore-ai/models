@@ -4,4 +4,5 @@ xml-python
 Pillow
 numpy
 pyyaml
+onnxruntime-gpu
 

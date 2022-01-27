@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -365,8 +365,7 @@ def voc_data_to_mindrecord(mindrecord_dir, is_training, prefix="ssd.mindrecord",
 
 def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="ssd.mindrecord", file_num=8):
     """Create MindRecord file."""
-    mindrecord_dir = config.mindrecord_dir
-    mindrecord_path = os.path.join(mindrecord_dir, prefix)
+    mindrecord_path = os.path.join(config.data_path, config.mindrecord_dir, prefix)
     writer = FileWriter(mindrecord_path, file_num)
     if dataset == "coco":
         images, image_path_dict, image_anno_dict = create_coco_label(is_training)
