@@ -19,6 +19,8 @@ import mindspore as ms
 import mindspore.ops as ops
 import mindspore.nn as nn
 from mindspore import context
+from mindspore.ops import functional as F
+from mindspore.ops.primitive import constexpr
 from mindspore.common.tensor import Tensor
 from src.model_utils.config import config as default_cfg
 from .bbox_assign_sample_stage2 import BboxAssignSampleForRcnn
@@ -487,12 +489,35 @@ class Faster_Rcnn(nn.Cell):
 
         return multi_level_anchors
 
+
+@constexpr
+def generator_img_meta(n, ori_h, ori_w, in_h, in_w):
+    img_metas = []
+    for _ in range(n):
+        height_scale = in_h * 1.0 / ori_h
+        width_scale = in_w * 1.0 / ori_w
+        resize_scale = width_scale if width_scale < height_scale else height_scale
+        img_metas.append([ori_h, ori_w, resize_scale, resize_scale])
+
+    img_metas = Tensor(np.array(img_metas), ms.float32)
+    return img_metas
+
+
 class FasterRcnn_Infer(nn.Cell):
     def __init__(self, config):
         super(FasterRcnn_Infer, self).__init__()
+        if not config.restore_bbox:
+            if config.ori_h is None or config.ori_w is None:
+                raise ValueError("When restore_bbox is False, ori_h and ori_w cannot be None.")
+        self.restore_bbox = config.restore_bbox
+        self.ori_h = config.ori_h
+        self.ori_w = config.ori_w
         self.network = Faster_Rcnn(config)
         self.network.set_train(False)
 
-    def construct(self, img_data, img_metas):
+    def construct(self, img_data, img_metas=None):
+        if not self.restore_bbox:
+            n, _, in_h, in_w = F.shape(img_data)
+            img_metas = generator_img_meta(n, self.ori_h, self.ori_w, in_h, in_w)
         output = self.network(img_data, img_metas, None, None, None)
         return output

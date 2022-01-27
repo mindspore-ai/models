@@ -35,6 +35,8 @@ anno_path=$(get_real_path $3)
 device_id=0
 image_width=1280
 image_height=768
+# If restore_bbox is set to False during export.py, it should be also set to false here (only support true or false and case sensitive).
+restore_bbox=true
 
 if [ $# -eq 4 ]; then
     device_id=$4
@@ -57,6 +59,7 @@ echo "anno_path: " $anno_path
 echo "device id: "$device_id
 echo "image_width: "$image_width
 echo "image_height: "$image_height
+echo "restore_bbox: "$restore_bbox
 
 export ASCEND_HOME=/usr/local/Ascend/
 if [ -d ${ASCEND_HOME}/ascend-toolkit ]; then
@@ -89,7 +92,7 @@ function infer()
     fi
     mkdir result_Files
     mkdir time_Result
-    ../ascend310_infer/out/main --mindir_path=$model --dataset_path=$data_path --device_id=$device_id --IMAGEWIDTH=$image_width --IMAGEHEIGHT=$image_height &> infer.log
+    ../ascend310_infer/out/main --mindir_path=$model --dataset_path=$data_path --device_id=$device_id --IMAGEWIDTH=$image_width --IMAGEHEIGHT=$image_height  --RESTOREBBOX=$restore_bbox &> infer.log
 }
 
 function cal_acc()
