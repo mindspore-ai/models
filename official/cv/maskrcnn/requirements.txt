@@ -2,6 +2,7 @@ Cython
 pycocotools
 mmcv==0.2.14
 numpy
+onnxruntime-gpu
 opencv-python
 mmcv
 pycocotools

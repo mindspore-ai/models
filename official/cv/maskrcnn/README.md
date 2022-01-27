@@ -18,8 +18,9 @@
         - [Distributed Training GPU](#distributed-training-gpu)
         - [Training Result](#training-result)
     - [Evaluation Process](#evaluation-process)
-        - [Evaluation Ascend](#evaluation-ascend)
-        - [Evaluation GPU](#evaluation-gpu)
+        - [Ascend Evaluation](#ascend-evaluation)
+        - [GPU Evaluation](#gpu-evaluation)
+        - [ONNX Evaluation](#onnx-evaluation)
         - [Evaluation result](#evaluation-result)
     - [Model Export](#model-export)
     - [Inference Process](#inference-process)
@@ -28,8 +29,7 @@
     - [Post Training Quantization](#post-training-quantization)
 - [Model Description](#model-description)
     - [Performance](#performance)
-        - [Evaluation Performance Ascend](#evaluation-performance-ascend)
-        - [Evaluation Performance GPU](#evaluation-performance-gpu)
+        - [Evaluation Performance](#evaluation-performance)
         - [Inference Performance](#inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
@@ -336,13 +336,14 @@ bash run_eval.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [DATA_PATH]
 .
 └─MaskRcnn
   ├─README.md                             # README
-  ├─ascend310_infer                       #application for 310 inference
+  ├─ascend310_infer                       # application for 310 inference
   ├─scripts                               # shell script
     ├─run_standalone_train.sh             # training in standalone mode on ascend(1pcs)
     ├─run_distribute_train.sh             # training in parallel mode on ascend(8 pcs)
     ├─run_distribute_train_gpu.sh         # training in parallel mode on gpu(8 pcs)
-    ├─run_infer_310.sh                    #shell script for 310 inference
-    └─run_eval.sh                         # evaluation
+    ├─run_infer_310.sh                    # shell script for 310 inference
+    ├─run_eval.sh                         # evaluation
+    └─run_eval_onnx.sh                    # ONNX evaluation
   ├─src
     ├─maskrcnn
       ├─__init__.py
@@ -369,9 +370,10 @@ bash run_eval.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [DATA_PATH]
       └─moxing_adapter.py                 # Parameter processing
   ├─default_config.yaml                   # Training parameter profile
   ├─mindspore_hub_conf.py                 # mindspore hub interface
-  ├─export.py                             #script to export AIR,MINDIR,ONNX model
+  ├─export.py                             # script to export AIR,MINDIR,ONNX model
   ├─eval.py                               # evaluation scripts
-  ├─postprogress.py                       #post process for 310 inference
+  ├─eval_onnx.py                          # ONNX evaluation script
+  ├─postprogress.py                       # post process for 310 inference
   └─train.py                              # training scripts
 ```
 
@@ -615,7 +617,7 @@ epoch: 12 step: 7393 ,rpn_loss: 0.00547, rcnn_loss: 0.39258, rpn_cls_loss: 0.002
 
 ## [Evaluation Process](#contents)
 
-### [Evaluation Ascend](#content)
+### [Ascend Evaluation](#content)
 
 - Set device_target: "Ascend" in default_config.yaml for evaluation on Ascend.
 
@@ -629,7 +631,7 @@ bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH]
 >
 > Images size in dataset should be equal to the annotation size in VALIDATION_ANN_FILE_JSON, otherwise the evaluation result cannot be displayed properly.
 
-### [Evaluation GPU](#content)
+### [GPU Evaluation](#content)
 
 - Set device_target: "GPU" in default_config.yaml for evaluation on GPU.
 
@@ -639,6 +641,22 @@ bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH]
 ```
 
 >Result will be in eval/log_eval.txt.
+
+### [ONNX Evaluation](#content)
+
+- Export your model to ONNX:
+
+  ```bash
+  python export.py --device_target GPU --ckpt_file_local /path/to/model.ckpt --file_name /path/to/exported.onnx --file_format ONNX
+  ```
+
+- Run ONNX evaluation from maskrcnn directory:
+
+  ```bash
+  bash scripts/run_eval_onnx.sh [CHECKPOINT_PATH] [DATA_PATH]
+  ```
+
+> Result will be in eval/log_eval_onnx.txt
 
 ### [Evaluation result](#content)
 
@@ -682,7 +700,7 @@ Accumulating evaluation results...
 python export.py --config_path [CONFIG_FILE] --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format[EXPORT_FORMAT]
 ```
 
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+`EXPORT_FORMAT` should be in ["AIR", "MINDIR", "ONNX"]
 
 ## Inference Process
 

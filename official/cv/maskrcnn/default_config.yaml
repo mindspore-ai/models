@@ -168,12 +168,12 @@ coco_classes: ['background', 'person', 'bicycle', 'car', 'motorcycle', 'airplane
                      'teddy bear', 'hair drier', 'toothbrush']
 num_classes: 81
 
-only_create_dataset: False 
-run_distribute: False 
-do_train: True      
-do_eval: False  
+only_create_dataset: False
+run_distribute: False
+do_train: True
+do_eval: False
 dataset: "coco"
-device_id: 0 
+device_id: 0
 device_num: 1
 rank_id: 0
 
@@ -182,6 +182,7 @@ file_name: "maskrcnn"
 file_format: "MINDIR"
 ckpt_file: '/cache/data/cocodataset/ckpt_maskrcnn/mask_rcnn-12_7393.ckpt'
 ckpt_file_local: './maskrcnn/scripts/train_parallel0/ckpt_0/mask_rcnn-12_7393.ckpt'
+export_input_type: float32
 
 # other
 learning_rate: 0.002
@@ -204,7 +205,7 @@ data_path: 'Dataset path for local'
 output_path: 'Training output path for local'
 ann_file: 'Ann file, default is val.json.'
 
-device_target: 'Target device type' 
+device_target: 'Target device type'
 enable_profiling: 'Whether enable profiling while training, default: False'
 only_create_dataset: 'If set it true, only create Mindrecord, default is false.'
 run_distribute: 'Run distribute, default is false.'
@@ -215,10 +216,11 @@ pre_trained: 'Pretrain file path.'
 device_id: 'Device id, default is 0.'
 device_num: 'Use device nums, default is 1.'
 rank_id: 'Rank id, default is 0.'
-file_format: 'file format' 
+file_format: 'file format'
 img_path: "image file path."
 result_path: "result file path."
 
 ---
 device_target: ['Ascend', 'GPU', 'CPU']
 file_format: ["AIR", "ONNX", "MINDIR"]
+export_input_type: ["float16", "float32"]

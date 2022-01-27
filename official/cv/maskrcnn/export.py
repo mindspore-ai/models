@@ -46,8 +46,8 @@ def export_maskrcnn():
     load_param_into_net(net, param_dict_new)
     net.set_train(False)
 
-    img = Tensor(np.zeros([config.batch_size, 3, config.img_height, config.img_width], np.float16))
-    img_metas = Tensor(np.zeros([config.batch_size, 4], np.float16))
+    img = Tensor(np.zeros([config.batch_size, 3, config.img_height, config.img_width], config.export_input_type))
+    img_metas = Tensor(np.zeros([config.batch_size, 4], config.export_input_type))
 
     input_data = [img, img_metas]
     export(net, *input_data, file_name=config.file_name, file_format=config.file_format)
