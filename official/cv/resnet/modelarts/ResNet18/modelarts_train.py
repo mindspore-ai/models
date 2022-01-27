@@ -17,10 +17,8 @@ import os
 import argparse
 import ast
 import moxing as mox
-import numpy as np
 
-from mindspore import context
-from mindspore import export
+import mindspore as ms
 from mindspore import Tensor
 from mindspore.nn.optim import Momentum, thor
 from mindspore.train.model import Model
@@ -29,12 +27,10 @@ from mindspore.train.train_thor import ConvertModelUtils
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.common import set_seed
 from mindspore.parallel import set_algo_parameters
 import mindspore.nn as nn
-import mindspore.common.initializer as weight_init
 import mindspore.log as logger
 from src.lr_generator import get_lr, warmup_cosine_annealing_lr, get_resnet34_lr
 from src.CrossEntropySmooth import CrossEntropySmooth
@@ -156,8 +152,8 @@ def apply_eval(eval_param):
 
 def set_graph_kernel_context(run_platform, net_name):
     if run_platform == "GPU" and net_name == "resnet101":
-        context.set_context(enable_graph_kernel=True,
-                            graph_kernel_flags="--enable_parallel_fusion")
+        ms.set_context(enable_graph_kernel=True,
+                       graph_kernel_flags="--enable_parallel_fusion")
 
 
 def _get_last_ckpt(ckpt_dir):
@@ -175,13 +171,12 @@ def _export_air(ckpt_dir):
     if not ckpt_file:
         return
     net = resnet(config.class_num)
-    param_dict = load_checkpoint(ckpt_file)
-    load_param_into_net(net, param_dict)
+    param_dict = ms.load_checkpoint(ckpt_file)
+    ms.load_param_into_net(net, param_dict)
 
-    input_arr = Tensor(np.zeros([1, 3, 304, 304],
-                                np.float32))
-    export(net, input_arr, file_name="resnet",
-           file_format="AIR")
+    input_arr = ms.numpy.zeros([1, 3, 304, 304], ms.float32)
+
+    ms.export(net, input_arr, file_name="resnet", file_format="AIR")
 
 
 def set_config():
@@ -191,61 +186,61 @@ def set_config():
 
 def init_context(target):
     if args_opt.mode == 'GRAPH':
-        context.set_context(mode=context.GRAPH_MODE, device_target=target,
-                            save_graphs=False)
+        ms.set_context(mode=ms.GRAPH_MODE, device_target=target,
+                       save_graphs=False)
         set_graph_kernel_context(target, args_opt.net)
     else:
-        context.set_context(mode=context.PYNATIVE_MODE, device_target=target,
-                            save_graphs=False)
+        ms.set_context(mode=ms.PYNATIVE_MODE, device_target=target,
+                       save_graphs=False)
     if args_opt.parameter_server:
-        context.set_ps_context(enable_ps=True)
+        ms.set_ps_context(enable_ps=True)
     if args_opt.run_distribute:
         if target == "Ascend":
             device_id = int(os.getenv('DEVICE_ID'))
-            context.set_context(device_id=device_id)
-            context.set_auto_parallel_context(
+            ms.set_context(device_id=device_id)
+            ms.set_auto_parallel_context(
                 device_num=args_opt.device_num,
                 parallel_mode=ParallelMode.DATA_PARALLEL,
                 gradients_mean=True)
             set_algo_parameters(elementwise_op_strategy_follow=True)
             if args_opt.net == "resnet50" or args_opt.net == "se-resnet50":
-                context.set_auto_parallel_context(
+                ms.set_auto_parallel_context(
                     all_reduce_fusion_config=[85, 160])
             elif args_opt.net == "resnet101":
-                context.set_auto_parallel_context(
+                ms.set_auto_parallel_context(
                     all_reduce_fusion_config=[80, 210, 313])
             init()
         # GPU target
         else:
             init()
-            context.set_auto_parallel_context(
+            ms.set_auto_parallel_context(
                 device_num=get_group_size(),
                 parallel_mode=ParallelMode.DATA_PARALLEL,
                 gradients_mean=True)
             if args_opt.net == "resnet50":
-                context.set_auto_parallel_context(
+                ms.set_auto_parallel_context(
                     all_reduce_fusion_config=[85, 160])
 
 
 def init_weight(net):
     if os.path.exists(args_opt.pre_trained):
-        param_dict = load_checkpoint(args_opt.pre_trained)
+        param_dict = ms.load_checkpoint(args_opt.pre_trained)
         if args_opt.filter_weight:
             filter_list = [x.name for x in net.end_point.get_parameters()]
             filter_checkpoint_parameter_by_list(param_dict, filter_list)
-        load_param_into_net(net, param_dict)
+        ms.load_param_into_net(net, param_dict)
     else:
         for _, cell in net.cells_and_names():
             if isinstance(cell, nn.Conv2d):
                 cell.weight.set_data(
-                    weight_init.initializer(weight_init.XavierUniform(),
-                                            cell.weight.shape,
-                                            cell.weight.dtype))
+                    ms.common.initializer.initializer(ms.common.initializer.XavierUniform(),
+                                                      cell.weight.shape,
+                                                      cell.weight.dtype))
             if isinstance(cell, nn.Dense):
                 cell.weight.set_data(
-                    weight_init.initializer(weight_init.TruncatedNormal(),
-                                            cell.weight.shape,
-                                            cell.weight.dtype))
+                    ms.common.initializer.initializer(ms.common.initializer.TruncatedNormal(),
+                                                      cell.weight.shape,
+                                                      cell.weight.dtype))
 
 
 def init_lr(step_size):

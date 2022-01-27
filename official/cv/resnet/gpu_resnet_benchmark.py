@@ -16,7 +16,7 @@
 import os
 import time
 import numpy as np
-from mindspore import context
+import mindspore as ms
 from mindspore import Tensor
 from mindspore.nn.optim.momentum import Momentum
 from mindspore.train.model import Model
@@ -24,12 +24,9 @@ from mindspore.context import ParallelMode
 from mindspore.train.callback import Callback, ModelCheckpoint, CheckpointConfig
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.common import set_seed
 import mindspore.nn as nn
-import mindspore.common.initializer as weight_init
 import mindspore.dataset as ds
-import mindspore.dataset.vision.c_transforms as C
 from src.resnet_gpu_benchmark import resnet50 as resnet
 from src.CrossEntropySmooth import CrossEntropySmooth
 from src.momentum import Momentum as MomentumWeightDecay
@@ -63,7 +60,7 @@ class MyTimeMonitor(Callback):
         cur_epoch_num = int(cb_params.cur_epoch_num / (self.data_size / self.size) +1)
         cur_step_in_epoch = int(self.size * (cb_params.cur_epoch_num % (self.data_size / self.size)))
         total_epochs = int((cb_params.epoch_num - 1) / (self.data_size / self.size) + 1)
-        if self.mode == context.PYNATIVE_MODE:
+        if self.mode == ms.PYNATIVE_MODE:
             cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
             cur_epoch_num = cb_params.cur_epoch_num
             total_epochs = cb_params.epoch_num
@@ -99,28 +96,28 @@ def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32, target="
     std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
 
     # define map operations
-    normalize_op = C.Normalize(mean=mean, std=std)
+    normalize_op = ds.vision.c_transforms.Normalize(mean=mean, std=std)
     if dtype == "fp16":
         if config.eval:
             x_dtype = "float32"
         else:
             x_dtype = "float16"
-        normalize_op = C.NormalizePad(mean=mean, std=std, dtype=x_dtype)
+        normalize_op = ds.vision.c_transforms.NormalizePad(mean=mean, std=std, dtype=x_dtype)
     if do_train:
         trans = [
-            C.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
-            C.RandomHorizontalFlip(prob=0.5),
+            ds.vision.c_transforms.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
+            ds.vision.c_transforms.RandomHorizontalFlip(prob=0.5),
             normalize_op,
         ]
     else:
         trans = [
-            C.Decode(),
-            C.Resize(256),
-            C.CenterCrop(image_size),
+            ds.vision.c_transforms.Decode(),
+            ds.vision.c_transforms.Resize(256),
+            ds.vision.c_transforms.CenterCrop(image_size),
             normalize_op,
         ]
     if dtype == "fp32":
-        trans.append(C.HWC2CHW())
+        trans.append(ds.vision.c_transforms.HWC2CHW())
     data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=map_num_parallel_worker)
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True, num_parallel_workers=batch_num_parallel_worker)
@@ -158,18 +155,18 @@ def train():
     device_num = 1
     # init context
     if config.mode_name == "GRAPH":
-        mode = context.GRAPH_MODE
+        mode = ms.GRAPH_MODE
         all_reduce_fusion_config = [85, 160]
     else:
-        mode = context.PYNATIVE_MODE
+        mode = ms.PYNATIVE_MODE
         all_reduce_fusion_config = [30, 90, 160]
-    context.set_context(mode=mode, device_target=dev, save_graphs=False)
+    ms.set_context(mode=mode, device_target=dev, save_graphs=False)
     ckpt_save_dir = os.path.join(config.output_path, config.checkpoint_path)
     if config.run_distribute:
         init()
         device_num = get_group_size()
-        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True, all_reduce_fusion_config=all_reduce_fusion_config)
+        ms.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                     gradients_mean=True, all_reduce_fusion_config=all_reduce_fusion_config)
         ckpt_save_dir = ckpt_save_dir + "ckpt_" + str(get_rank()) + "/"
 
     # create dataset
@@ -186,13 +183,13 @@ def train():
     # init weight
     for _, cell in net.cells_and_names():
         if isinstance(cell, nn.Conv2d):
-            cell.weight.set_data(weight_init.initializer(weight_init.XavierUniform(),
-                                                         cell.weight.shape,
-                                                         cell.weight.dtype))
+            cell.weight.set_data(ms.common.initializer.initializer(ms.common.initializer.XavierUniform(),
+                                                                   cell.weight.shape,
+                                                                   cell.weight.dtype))
         if isinstance(cell, nn.Dense):
-            cell.weight.set_data(weight_init.initializer(weight_init.TruncatedNormal(),
-                                                         cell.weight.shape,
-                                                         cell.weight.dtype))
+            cell.weight.set_data(ms.common.initializer.initializer(ms.common.initializer.TruncatedNormal(),
+                                                                   cell.weight.shape,
+                                                                   cell.weight.dtype))
 
     # init lr
     lr = get_liner_lr(lr_init=0, lr_end=0, lr_max=0.8, warmup_epochs=0, total_epochs=epoch_size,
@@ -215,14 +212,14 @@ def train():
     model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'})
     # Mixed precision
     if compute_type == "fp16":
-        if mode == context.PYNATIVE_MODE:
+        if mode == ms.PYNATIVE_MODE:
             opt = MomentumWeightDecay(filter(lambda x: x.requires_grad, net.get_parameters()), lr, 0.9, 1e-4, 1024)
         else:
             opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), lr, 0.9, 1e-4, 1024)
         model = Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale, metrics={'acc'},
                       amp_level="O2", keep_batchnorm_fp32=False)
     # define callbacks
-    if mode == context.PYNATIVE_MODE:
+    if mode == ms.PYNATIVE_MODE:
         print_per_steps = 1
     time_cb = MyTimeMonitor(total_batch, print_per_steps, step_size, mode)
     cb = [time_cb]
@@ -232,7 +229,7 @@ def train():
         cb += [ckpt_cb]
     # train model
     print("========START RESNET50 GPU BENCHMARK========")
-    if mode == context.GRAPH_MODE:
+    if mode == ms.GRAPH_MODE:
         model.train(int(epoch_size * step_size / print_per_steps), dataset, callbacks=cb, sink_size=print_per_steps)
     else:
         model.train(epoch_size, dataset, callbacks=cb)
@@ -246,18 +243,18 @@ def eval_():
     total_batch = int(config.batch_size)
     # init context
     if config.mode_name == "GRAPH":
-        mode = context.GRAPH_MODE
+        mode = ms.GRAPH_MODE
     else:
-        mode = context.PYNATIVE_MODE
-    context.set_context(mode=mode, device_target=dev, save_graphs=False)
+        mode = ms.PYNATIVE_MODE
+    ms.set_context(mode=mode, device_target=dev, save_graphs=False)
     # create dataset
     dataset = create_dataset(dataset_path=config.data_path, do_train=False, repeat_num=1,
                              batch_size=total_batch, target=dev, dtype=compute_type)
     # define net
     net = resnet(class_num=1001, dtype=compute_type)
     # load checkpoint
-    param_dict = load_checkpoint(ckpt_dir)
-    load_param_into_net(net, param_dict)
+    param_dict = ms.load_checkpoint(ckpt_dir)
+    ms.load_param_into_net(net, param_dict)
     net.set_train(False)
     # define loss, model
     loss = CrossEntropySmooth(sparse=True, reduction='mean', smooth_factor=0.1, num_classes=1001)

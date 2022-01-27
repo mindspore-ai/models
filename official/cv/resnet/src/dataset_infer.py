@@ -17,10 +17,8 @@ create train or eval dataset.
 """
 import os
 import numpy as np
-import mindspore.common.dtype as mstype
+import mindspore as ms
 import mindspore.dataset as ds
-import mindspore.dataset.vision.c_transforms as C
-import mindspore.dataset.transforms.c_transforms as C2
 from mindspore.communication.management import init, get_rank, get_group_size
 from src.model_utils.config import config
 
@@ -132,21 +130,21 @@ def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32, target="
     # define map operations
     if do_train:
         trans = [
-            C.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
-            C.RandomHorizontalFlip(prob=0.5),
-            C.Normalize(mean=mean, std=std),
-            C.HWC2CHW()
+            ds.vision.c_transforms.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
+            ds.vision.c_transforms.RandomHorizontalFlip(prob=0.5),
+            ds.vision.c_transforms.Normalize(mean=mean, std=std),
+            ds.vision.c_transforms.HWC2CHW()
         ]
     else:
         trans = [
-            C.Decode(),
-            C.Resize(256),
-            C.CenterCrop(image_size),
-            C.Normalize(mean=mean, std=std),
-            C.HWC2CHW()
+            ds.vision.c_transforms.Decode(),
+            ds.vision.c_transforms.Resize(256),
+            ds.vision.c_transforms.CenterCrop(image_size),
+            ds.vision.c_transforms.Normalize(mean=mean, std=std),
+            ds.vision.c_transforms.HWC2CHW()
         ]
 
-    type_cast_op = C2.TypeCast(mstype.int32)
+    type_cast_op = ds.transforms.c_transforms.TypeCast(ms.int32)
 
     data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=8)
     data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=8)
@@ -204,21 +202,21 @@ def create_dataset2(dataset_path, do_train, repeat_num=1, batch_size=32, target=
     # define map operations
     if do_train:
         trans = [
-            C.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
-            C.RandomHorizontalFlip(rank_id / (rank_id + 1)),
-            C.Normalize(mean=mean, std=std),
-            C.HWC2CHW()
+            ds.vision.c_transforms.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
+            ds.vision.c_transforms.RandomHorizontalFlip(rank_id / (rank_id + 1)),
+            ds.vision.c_transforms.Normalize(mean=mean, std=std),
+            ds.vision.c_transforms.HWC2CHW()
         ]
     else:
         trans = [
-            C.Decode(),
-            C.Resize(256),
-            C.CenterCrop(image_size),
-            C.Normalize(mean=mean, std=std),
-            C.HWC2CHW()
+            ds.vision.c_transforms.Decode(),
+            ds.vision.c_transforms.Resize(256),
+            ds.vision.c_transforms.CenterCrop(image_size),
+            ds.vision.c_transforms.Normalize(mean=mean, std=std),
+            ds.vision.c_transforms.HWC2CHW()
         ]
 
-    type_cast_op = C2.TypeCast(mstype.int32)
+    type_cast_op = ds.transforms.c_transforms.TypeCast(ms.int32)
 
     data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=8)
     data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=8)
@@ -273,21 +271,21 @@ def create_dataset3(dataset_path, do_train, repeat_num=1, batch_size=32, target=
     # define map operations
     if do_train:
         trans = [
-            C.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
-            C.RandomHorizontalFlip(prob=0.5),
-            C.Normalize(mean=mean, std=std),
-            C.HWC2CHW()
+            ds.vision.c_transforms.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
+            ds.vision.c_transforms.RandomHorizontalFlip(prob=0.5),
+            ds.vision.c_transforms.Normalize(mean=mean, std=std),
+            ds.vision.c_transforms.HWC2CHW()
         ]
     else:
         trans = [
-            C.Decode(),
-            C.Resize(292),
-            C.CenterCrop(256),
-            C.Normalize(mean=mean, std=std),
-            C.HWC2CHW()
+            ds.vision.c_transforms.Decode(),
+            ds.vision.c_transforms.Resize(292),
+            ds.vision.c_transforms.CenterCrop(256),
+            ds.vision.c_transforms.Normalize(mean=mean, std=std),
+            ds.vision.c_transforms.HWC2CHW()
         ]
 
-    type_cast_op = C2.TypeCast(mstype.int32)
+    type_cast_op = ds.transforms.c_transforms.TypeCast(ms.int32)
     data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=12)
     data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=12)
     if do_train:

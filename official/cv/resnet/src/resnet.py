@@ -17,9 +17,8 @@ import math
 import numpy as np
 from scipy.stats import truncnorm
 import mindspore.nn as nn
+import mindspore.ops as ops
 import mindspore.common.dtype as mstype
-from mindspore.ops import operations as P
-from mindspore.ops import functional as F
 from mindspore.common.tensor import Tensor
 from src.model_utils.config import config
 
@@ -221,11 +220,11 @@ class ResidualBlock(nn.Cell):
         if config.optimizer == "Thor" or config.net_name == "resnet152":
             self.bn3 = _bn_last(out_channel)
         if self.se_block:
-            self.se_global_pool = P.ReduceMean(keep_dims=False)
+            self.se_global_pool = ops.ReduceMean(keep_dims=False)
             self.se_dense_0 = _fc(out_channel, int(out_channel / 4), use_se=self.use_se)
             self.se_dense_1 = _fc(int(out_channel / 4), out_channel, use_se=self.use_se)
             self.se_sigmoid = nn.Sigmoid()
-            self.se_mul = P.Mul()
+            self.se_mul = ops.Mul()
         self.relu = nn.ReLU()
 
         self.down_sample = False
@@ -268,7 +267,7 @@ class ResidualBlock(nn.Cell):
             out = self.relu(out)
             out = self.se_dense_1(out)
             out = self.se_sigmoid(out)
-            out = F.reshape(out, F.shape(out) + (1, 1))
+            out = ops.reshape(out, ops.shape(out) + (1, 1))
             out = self.se_mul(out, out_se)
 
         if self.down_sample:
@@ -398,7 +397,7 @@ class ResNet(nn.Cell):
         else:
             self.conv1 = _conv7x7(3, 64, stride=2, res_base=self.res_base)
         self.bn1 = _bn(64, self.res_base)
-        self.relu = P.ReLU()
+        self.relu = ops.ReLU()
 
         if self.res_base:
             self.pad = nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)))
@@ -433,7 +432,7 @@ class ResNet(nn.Cell):
                                        use_se=self.use_se,
                                        se_block=self.se_block)
 
-        self.mean = P.ReduceMean(keep_dims=True)
+        self.mean = ops.ReduceMean(keep_dims=True)
         self.flatten = nn.Flatten()
         self.end_point = _fc(out_channels[3], num_classes, use_se=self.use_se)
 

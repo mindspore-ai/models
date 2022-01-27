@@ -14,11 +14,10 @@
 # ============================================================================
 """eval resnet."""
 import os
-from mindspore import context
+import mindspore as ms
 from mindspore.common import set_seed
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 from mindspore.train.model import Model
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.CrossEntropySmooth import CrossEntropySmooth
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
@@ -51,10 +50,10 @@ def eval_net():
     target = config.device_target
 
     # init context
-    context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=False)
     if target == "Ascend":
         device_id = int(os.getenv('DEVICE_ID'))
-        context.set_context(device_id=device_id)
+        ms.set_context(device_id=device_id)
 
     # create dataset
     dataset = create_dataset(dataset_path=config.data_path, do_train=False, batch_size=config.batch_size,
@@ -65,8 +64,8 @@ def eval_net():
     net = resnet(class_num=config.class_num)
 
     # load checkpoint
-    param_dict = load_checkpoint(config.checkpoint_file_path)
-    load_param_into_net(net, param_dict)
+    param_dict = ms.load_checkpoint(config.checkpoint_file_path)
+    ms.load_param_into_net(net, param_dict)
     net.set_train(False)
 
     # define loss, model

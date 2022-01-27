@@ -13,20 +13,20 @@
 # limitations under the License.
 # ============================================================================
 """momentum"""
-from mindspore.ops import functional as F, composite as C, operations as P
+import mindspore as ms
+import mindspore.ops as ops
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
-import mindspore.common.dtype as mstype
 from mindspore._checkparam import Validator
 from mindspore.nn.optim.optimizer import Optimizer
 
-_momentum_opt = C.MultitypeFuncGraph("momentum_opt")
+_momentum_opt = ops.MultitypeFuncGraph("momentum_opt")
 
 
 @_momentum_opt.register("Function", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor")
 def _tensor_run_opt_ext(opt, weight_decay, scale, momentum, learning_rate, gradient, weight, moment):
     """Apply momentum optimizer to the weight parameter using Tensor."""
-    success = F.depend(True, opt(weight_decay, scale, weight, moment, learning_rate, gradient, momentum))
+    success = ops.depend(True, opt(weight_decay, scale, weight, moment, learning_rate, gradient, momentum))
     return success
 
 
@@ -125,28 +125,28 @@ class Momentum(Optimizer):
         Validator.check_value_type("momentum", momentum, [float], self.cls_name)
         if isinstance(momentum, float) and momentum < 0.0:
             raise ValueError("momentum should be at least 0.0, but got momentum {}".format(momentum))
-        self.momentum = Parameter(Tensor(momentum, mstype.float32), name="momentum")
+        self.momentum = Parameter(Tensor(momentum, ms.float32), name="momentum")
         self.params = self.parameters
         self.use_nesterov = Validator.check_bool(use_nesterov)
         self.moments = self.params.clone(prefix="moments", init='zeros')
-        self.hyper_map = C.HyperMap()
+        self.hyper_map = ops.HyperMap()
         # Use FusedWeightScaleApplyMomentum to avoid extra kernel launch.
-        self.opt = P.FusedWeightScaleApplyMomentum()
+        self.opt = ops.FusedWeightScaleApplyMomentum()
 
     def construct(self, gradients):
         params = self.params
         moments = self.moments
-        weight_decay = Tensor(0.0, mstype.float32)
-        scale = Tensor(1.0, mstype.float32)
+        weight_decay = Tensor(0.0, ms.float32)
+        scale = Tensor(1.0, ms.float32)
         if self.exec_weight_decay:
             weight_decay = self.weight_decay_tensor
         if self.need_scale:
             scale = self.reciprocal_scale
         lr = self.get_lr()
         if self.is_group_lr:
-            success = self.hyper_map(F.partial(_momentum_opt, self.opt, weight_decay, scale, self.momentum),
+            success = self.hyper_map(ops.partial(_momentum_opt, self.opt, weight_decay, scale, self.momentum),
                                      lr, gradients, params, moments)
         else:
-            success = self.hyper_map(F.partial(_momentum_opt, self.opt, weight_decay, scale, self.momentum, lr),
+            success = self.hyper_map(ops.partial(_momentum_opt, self.opt, weight_decay, scale, self.momentum, lr),
                                      gradients, params, moments)
         return success

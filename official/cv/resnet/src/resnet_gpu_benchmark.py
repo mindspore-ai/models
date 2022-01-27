@@ -16,7 +16,6 @@
 import numpy as np
 from scipy.stats import truncnorm
 import mindspore.nn as nn
-import mindspore.common.dtype as mstype
 from mindspore.ops import operations as P
 from mindspore.common.tensor import Tensor
 
@@ -35,7 +34,7 @@ def _conv_variance_scaling_initializer(in_channel, out_channel, kernel_size):
     mu, sigma = 0, stddev
     weight = truncnorm(-2, 2, loc=mu, scale=sigma).rvs(out_channel * in_channel * kernel_size * kernel_size)
     weight = np.reshape(weight, (out_channel, kernel_size, kernel_size, in_channel))
-    return Tensor(weight, dtype=mstype.float32)
+    return Tensor(weight, dtype=ms.float32)
 
 def _weight_variable(shape, factor=0.01):
     init_value = np.random.randn(*shape).astype(np.float32) * factor
