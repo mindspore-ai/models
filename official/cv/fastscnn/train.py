@@ -194,7 +194,7 @@ def train():
                                   prefix='rank_'+str(args.rank))
         callbacks.append(ckpt_cb)
 
-    if args.eval_while_train:
+    if args.eval_while_train and args.rank == 0:
 
         val_dataset, _ = create_CitySegmentation(args, data_path=args.dataset, \
                                        split='val', mode='val', transform=input_transform, \
