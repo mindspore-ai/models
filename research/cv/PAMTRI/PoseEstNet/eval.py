@@ -24,7 +24,7 @@ from pathlib import Path
 from mindspore import context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.model import get_pose_net
-from src.dataset import create_dataset
+from src.dataset import create_dataset, get_label
 from src.utils.function import validate
 from src.config import cfg, update_config
 
@@ -47,14 +47,14 @@ if __name__ == '__main__':
 
     data, dataset = create_dataset(cfg, args.data_dir, is_train=False)
 
-    json_path = os.path.join(args.data_dir, 'annot/image_test.json')
+    json_path = get_label(cfg, args.data_dir)
     dst_json_path = Path(json_path)
     with dst_json_path.open('r') as dst_file:
         allImage = json.load(dst_file)
 
     ckpt_path = args.ckpt_path
 
-    #define net
+    # define net
     network = get_pose_net(cfg)
     param_dict = load_checkpoint(ckpt_path)
     load_param_into_net(network, param_dict)
