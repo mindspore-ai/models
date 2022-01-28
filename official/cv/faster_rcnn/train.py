@@ -21,13 +21,12 @@ from pprint import pprint
 
 import numpy as np
 
-import mindspore.common.dtype as mstype
-from mindspore import context, Tensor, Parameter
+import mindspore as ms
+from mindspore import Tensor, Parameter
 from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
 from mindspore.train import Model
 from mindspore.context import ParallelMode
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.nn import SGD
 from mindspore.common import set_seed
 
@@ -112,7 +111,7 @@ def train_fasterrcnn():
     load_path = config.pre_trained
     if load_path != "":
         print(f"\n[{rank}]", "===> Loading from checkpoint:", load_path)
-        param_dict = load_checkpoint(load_path)
+        param_dict = ms.load_checkpoint(load_path)
 
         key_mapping = {'down_sample_layer.1.beta': 'bn_down_sample.beta',
                        'down_sample_layer.1.gamma': 'bn_down_sample.gamma',
@@ -138,17 +137,17 @@ def train_fasterrcnn():
         for key, value in param_dict.items():
             tensor = value.asnumpy().astype(np.float32)
             param_dict[key] = Parameter(tensor, key)
-        load_param_into_net(net, param_dict)
+        ms.load_param_into_net(net, param_dict)
     print(f"[{rank}]", "\tDone!\n")
 
-    device_type = "Ascend" if context.get_context("device_target") == "Ascend" else "Others"
+    device_type = "Ascend" if ms.get_context("device_target") == "Ascend" else "Others"
     print(f"\n[{rank}]", "===> Device type:", device_type, "\n")
     if device_type == "Ascend":
-        net.to_float(mstype.float16)
+        net.to_float(ms.float16)
 
     print(f"\n[{rank}]", "===> Creating loss, lr and opt objects...")
     loss = LossNet()
-    lr = Tensor(dynamic_lr(config, dataset_size), mstype.float32)
+    lr = Tensor(dynamic_lr(config, dataset_size), ms.float32)
 
     opt = SGD(params=net.trainable_params(), learning_rate=lr, momentum=config.momentum,
               weight_decay=config.weight_decay, loss_scale=config.loss_scale)
@@ -202,19 +201,19 @@ def train_fasterrcnn():
 
 if __name__ == '__main__':
     set_seed(1)
-    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
 
     local_path = '/'.join(os.path.realpath(__file__).split('/')[:-1])
     summary_dir = local_path + "/train/summary/"
 
     if config.device_target == "GPU":
-        context.set_context(enable_graph_kernel=True)
+        ms.set_context(enable_graph_kernel=True)
     if config.run_distribute:
         init()
         rank = get_rank()
         device_num = get_group_size()
-        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
+        ms.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                     gradients_mean=True)
         summary_dir += "thread_num_" + str(rank) + "/"
     else:
         rank = 0

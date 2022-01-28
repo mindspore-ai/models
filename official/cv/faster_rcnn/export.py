@@ -15,16 +15,16 @@
 """export checkpoint file into air, onnx, mindir models"""
 import numpy as np
 
-import mindspore.common.dtype as mstype
-from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
+import mindspore as ms
+from mindspore import Tensor
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id
 from src.FasterRcnn.faster_rcnn import FasterRcnn_Infer
 
-context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target)
 if config.device_target == "Ascend":
-    context.set_context(device_id=get_device_id())
+    ms.set_context(device_id=get_device_id())
 
 def modelarts_pre_process():
     pass
@@ -34,22 +34,22 @@ def export_fasterrcnn():
     """ export_fasterrcnn """
     net = FasterRcnn_Infer(config=config)
 
-    param_dict = load_checkpoint(config.ckpt_file)
+    param_dict = ms.load_checkpoint(config.ckpt_file)
 
     param_dict_new = {}
     for key, value in param_dict.items():
         param_dict_new["network." + key] = value
 
-    load_param_into_net(net, param_dict_new)
+    ms.load_param_into_net(net, param_dict_new)
 
-    device_type = "Ascend" if context.get_context("device_target") == "Ascend" else "Others"
+    device_type = "Ascend" if ms.get_context("device_target") == "Ascend" else "Others"
     if device_type == "Ascend":
-        net.to_float(mstype.float16)
+        net.to_float(ms.float16)
 
-    img = Tensor(np.zeros([config.test_batch_size, 3, config.img_height, config.img_width]), mstype.float32)
-    img_metas = Tensor(np.random.uniform(0.0, 1.0, size=[config.test_batch_size, 4]), mstype.float32)
+    img = Tensor(np.zeros([config.test_batch_size, 3, config.img_height, config.img_width]), ms.float32)
+    img_metas = Tensor(np.random.uniform(0.0, 1.0, size=[config.test_batch_size, 4]), ms.float32)
 
-    export(net, img, img_metas, file_name=config.file_name, file_format=config.file_format)
+    ms.export(net, img, img_metas, file_name=config.file_name, file_format=config.file_format)
 
 if __name__ == '__main__':
     export_fasterrcnn()

@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+ # Copyright 2020-2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,10 +16,8 @@
 
 import time
 import numpy as np
+import mindspore.ops as ops
 import mindspore.nn as nn
-from mindspore.common.tensor import Tensor
-from mindspore.ops import composite as C
-from mindspore.ops import functional as F
 from mindspore import ParameterTuple
 from mindspore.train.callback import Callback
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
@@ -134,9 +132,9 @@ class TrainOneStepCell(nn.Cell):
         self.network.set_grad()
         self.weights = ParameterTuple(network.trainable_params())
         self.optimizer = optimizer
-        self.grad = C.GradOperation(get_by_list=True,
-                                    sens_param=True)
-        self.sens = Tensor((np.ones((1,)) * sens).astype(np.float32))
+        self.grad = ops.GradOperation(get_by_list=True,
+                                      sens_param=True)
+        self.sens = ms.numpy.ones((1,) * sens).astype(np.float32)
         self.reduce_flag = reduce_flag
         if reduce_flag:
             self.grad_reducer = DistributedGradReducer(optimizer.parameters, mean, degree)
@@ -148,4 +146,4 @@ class TrainOneStepCell(nn.Cell):
         if self.reduce_flag:
             grads = self.grad_reducer(grads)
 
-        return F.depend(loss, self.optimizer(grads))
+        return ops.depend(loss, self.optimizer(grads))

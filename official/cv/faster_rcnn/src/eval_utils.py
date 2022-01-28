@@ -20,10 +20,8 @@ from collections import defaultdict
 import numpy as np
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
-import mindspore.common.dtype as mstype
-from mindspore import context
 
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+import mindspore as ms
 from mindspore.common import Parameter
 from src.dataset import data_to_mindrecord_byte_image, create_fasterrcnn_dataset, parse_json_annos_from_txt
 from src.util import bbox2result_1image, results2json
@@ -57,17 +55,17 @@ def apply_eval(net, config, dataset_path, ckpt_path, anno_path):
         raise RuntimeError("CheckPoint file {} is not valid.".format(ckpt_path))
     ds = create_fasterrcnn_dataset(config, dataset_path, batch_size=config.test_batch_size, is_training=False)
 
-    param_dict = load_checkpoint(ckpt_path)
+    param_dict = ms.load_checkpoint(ckpt_path)
     if config.device_target == "GPU":
         for key, value in param_dict.items():
             tensor = value.asnumpy().astype(np.float32)
             param_dict[key] = Parameter(tensor, key)
-    load_param_into_net(net, param_dict)
+    ms.load_param_into_net(net, param_dict)
 
     net.set_train(False)
-    device_type = "Ascend" if context.get_context("device_target") == "Ascend" else "Others"
+    device_type = "Ascend" if ms.get_context("device_target") == "Ascend" else "Others"
     if device_type == "Ascend":
-        net.to_float(mstype.float16)
+        net.to_float(ms.float16)
 
     eval_iter = 0
     total = ds.get_dataset_size()

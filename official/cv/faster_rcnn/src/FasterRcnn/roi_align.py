@@ -15,10 +15,9 @@
 """FasterRcnn ROIAlign module."""
 
 import numpy as np
+import mindspore as ms
+import mindspore.ops as ops
 import mindspore.nn as nn
-import mindspore.common.dtype as mstype
-from mindspore.ops import operations as P
-from mindspore.ops import composite as C
 from mindspore.nn import layer as L
 from mindspore.common.tensor import Tensor
 
@@ -42,8 +41,8 @@ class ROIAlign(nn.Cell):
         self.out_size = (out_size_h, out_size_w)
         self.spatial_scale = float(spatial_scale)
         self.sample_num = int(sample_num)
-        self.align_op = P.ROIAlign(self.out_size[0], self.out_size[1],
-                                   self.spatial_scale, self.sample_num)
+        self.align_op = ops.ROIAlign(self.out_size[0], self.out_size[1],
+                                     self.spatial_scale, self.sample_num)
 
     def construct(self, features, rois):
         return self.align_op(features, rois)
@@ -89,18 +88,18 @@ class SingleRoIExtractor(nn.Cell):
         self.roi_layers = self.build_roi_layers(self.featmap_strides)
         self.roi_layers = L.CellList(self.roi_layers)
 
-        self.sqrt = P.Sqrt()
-        self.log = P.Log()
+        self.sqrt = ops.Sqrt()
+        self.log = ops.Log()
         self.finest_scale_ = finest_scale
-        self.clamp = C.clip_by_value
+        self.clamp = ops.clip_by_value
 
-        self.cast = P.Cast()
-        self.equal = P.Equal()
-        self.select = P.Select()
+        self.cast = ops.Cast()
+        self.equal = ops.Equal()
+        self.select = ops.Select()
 
         _mode_16 = False
         self.dtype = np.float16 if _mode_16 else np.float32
-        self.ms_dtype = mstype.float16 if _mode_16 else mstype.float32
+        self.ms_dtype = ms.float16 if _mode_16 else ms.float32
         self.set_train_local(cfg, training=True)
 
     def set_train_local(self, config, training=True):
@@ -158,8 +157,8 @@ class SingleRoIExtractor(nn.Cell):
              self.sqrt(rois[::, 4:5:1] - rois[::, 2:3:1] + self.ones)
 
         target_lvls = self.log2(scale / self.finest_scale + self.epslion)
-        target_lvls = P.Floor()(target_lvls)
-        target_lvls = self.cast(target_lvls, mstype.int32)
+        target_lvls = ops.Floor()(target_lvls)
+        target_lvls = self.cast(target_lvls, ms.int32)
         target_lvls = self.clamp(target_lvls, self.zeros, self.max_levels)
 
         return target_lvls
@@ -169,11 +168,11 @@ class SingleRoIExtractor(nn.Cell):
         res = self.res_
         target_lvls = self._c_map_roi_levels(rois)
         for i in range(self.num_levels):
-            mask = self.equal(target_lvls, P.ScalarToArray()(i))
-            mask = P.Reshape()(mask, (-1, 1, 1, 1))
+            mask = self.equal(target_lvls, ops.ScalarToArray()(i))
+            mask = ops.Reshape()(mask, (-1, 1, 1, 1))
             roi_feats_t = self.roi_layers[i](feats[i], rois)
-            mask = self.cast(P.Tile()(self.cast(mask, mstype.int32),\
-                                      (1, 256, self.out_size, self.out_size)), mstype.bool_)
+            mask = self.cast(ops.Tile()(self.cast(mask, ms.int32),\
+                                      (1, 256, self.out_size, self.out_size)), ms.bool_)
             res = self.select(mask, roi_feats_t, res)
 
         return res

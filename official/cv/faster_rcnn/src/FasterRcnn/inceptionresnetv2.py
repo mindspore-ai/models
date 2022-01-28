@@ -14,8 +14,8 @@
 # ============================================================================
 """Inception Resnet V2 backbone."""
 
+import mindspore.ops as ops
 import mindspore.nn as nn
-import mindspore.ops.operations as P
 
 class BasicConv2d(nn.Cell):
 
@@ -60,7 +60,7 @@ class Mixed_5b(nn.Cell):
         x1 = self.branch1(x)
         x2 = self.branch2(x)
         x3 = self.branch3(x)
-        out = P.Concat(1)((x0, x1, x2, x3))
+        out = ops.Concat(1)((x0, x1, x2, x3))
         return out
 
 
@@ -92,7 +92,7 @@ class Block35(nn.Cell):
         x0 = self.branch0(x)
         x1 = self.branch1(x)
         x2 = self.branch2(x)
-        out = P.Concat(1)((x0, x1, x2))
+        out = ops.Concat(1)((x0, x1, x2))
         out = self.conv2d(out)
         out = out * self.scale + x
         out = self.relu(out)
@@ -118,7 +118,7 @@ class Mixed_6a(nn.Cell):
         x0 = self.branch0(x)
         x1 = self.branch1(x)
         x2 = self.branch2(x)
-        out = P.Concat(1)((x0, x1, x2))
+        out = ops.Concat(1)((x0, x1, x2))
         return out
 
 
@@ -144,7 +144,7 @@ class Block17(nn.Cell):
     def construct(self, x):
         x0 = self.branch0(x)
         x1 = self.branch1(x)
-        out = P.Concat(1)((x0, x1))
+        out = ops.Concat(1)((x0, x1))
         out = self.conv2d(out)
         out = out * self.scale + x
         out = self.relu(out)
@@ -179,7 +179,7 @@ class Mixed_7a(nn.Cell):
         x1 = self.branch1(x)
         x2 = self.branch2(x)
         x3 = self.branch3(x)
-        out = P.Concat(1)((x0, x1, x2, x3))
+        out = ops.Concat(1)((x0, x1, x2, x3))
         return out
 
 
@@ -207,7 +207,7 @@ class Block8(nn.Cell):
     def construct(self, x):
         x0 = self.branch0(x)
         x1 = self.branch1(x)
-        out = P.Concat(1)((x0, x1))
+        out = ops.Concat(1)((x0, x1))
         out = self.conv2d(out)
         out = out * self.scale + x
         if not self.noReLU:
@@ -318,7 +318,7 @@ class InceptionResNetV2(nn.Cell):
 
     # def logits(self, features):
         # x = self.avgpool_1a(features)
-        # x = P.Reshape()(x, (P.Shape()(x)[0], -1,))
+        # x = ops.Reshape()(x, (ops.Shape()(x)[0], -1,))
         # x = self.last_linear(x)
         # return x
 

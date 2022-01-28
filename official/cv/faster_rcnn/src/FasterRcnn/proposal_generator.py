@@ -15,9 +15,9 @@
 """FasterRcnn proposal generator."""
 
 import numpy as np
+import mindspore as ms
+import mindspore.ops as ops
 import mindspore.nn as nn
-import mindspore.common.dtype as mstype
-from mindspore.ops import operations as P
 from mindspore import Tensor
 
 
@@ -58,11 +58,11 @@ class Proposal(nn.Cell):
 
         if self.use_sigmoid_cls:
             self.cls_out_channels = num_classes - 1
-            self.activation = P.Sigmoid()
+            self.activation = ops.Sigmoid()
             self.reshape_shape = (-1, 1)
         else:
             self.cls_out_channels = num_classes
-            self.activation = P.Softmax(axis=1)
+            self.activation = ops.Softmax(axis=1)
             self.reshape_shape = (-1, 2)
 
         if self.cls_out_channels <= 0:
@@ -77,33 +77,33 @@ class Proposal(nn.Cell):
         self.num_levels = cfg.fpn_num_outs
 
         # Op Define
-        self.squeeze = P.Squeeze()
-        self.reshape = P.Reshape()
-        self.cast = P.Cast()
+        self.squeeze = ops.Squeeze()
+        self.reshape = ops.Reshape()
+        self.cast = ops.Cast()
 
         self.feature_shapes = cfg.feature_shapes
 
         self.transpose_shape = (1, 2, 0)
 
-        self.decode = P.BoundingBoxDecode(max_shape=(cfg.img_height, cfg.img_width), \
+        self.decode = ops.BoundingBoxDecode(max_shape=(cfg.img_height, cfg.img_width), \
                                           means=self.target_means, \
                                           stds=self.target_stds)
 
-        self.nms = P.NMSWithMask(self.nms_thr)
-        self.concat_axis0 = P.Concat(axis=0)
-        self.concat_axis1 = P.Concat(axis=1)
-        self.split = P.Split(axis=1, output_num=5)
-        self.min = P.Minimum()
-        self.gatherND = P.GatherNd()
-        self.slice = P.Slice()
-        self.select = P.Select()
-        self.greater = P.Greater()
-        self.transpose = P.Transpose()
-        self.tile = P.Tile()
+        self.nms = ops.NMSWithMask(self.nms_thr)
+        self.concat_axis0 = ops.Concat(axis=0)
+        self.concat_axis1 = ops.Concat(axis=1)
+        self.split = ops.Split(axis=1, output_num=5)
+        self.min = ops.Minimum()
+        self.gatherND = ops.GatherNd()
+        self.slice = ops.Slice()
+        self.select = ops.Select()
+        self.greater = ops.Greater()
+        self.transpose = ops.Transpose()
+        self.tile = ops.Tile()
         self.set_train_local(config, training=True)
 
         self.dtype = np.float32
-        self.ms_type = mstype.float32
+        self.ms_type = ms.float32
 
         self.multi_10 = Tensor(10.0, self.ms_type)
 
@@ -129,7 +129,7 @@ class Proposal(nn.Cell):
             self.topK_stage1 += (k_num,)
             self.topK_shape += ((k_num, 1),)
 
-        self.topKv2 = P.TopK(sorted=True)
+        self.topKv2 = ops.TopK(sorted=True)
         self.topK_shape_stage2 = (self.max_num, 1)
         self.min_float_num = -65500.0
         self.topK_mask = Tensor(self.min_float_num * np.ones(total_max_topk_input, np.float32))
