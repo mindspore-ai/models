@@ -519,6 +519,9 @@ bash run_eval.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [DATA_PATH]
                  'refrigerator', 'book', 'clock', 'vase', 'scissors',
                  'teddy bear', 'hair drier', 'toothbrush'),
 "num_classes":81
+
+# 导出模型
+"export_input_type": float16               # 网络输入的数据类型，转成ONNX需要适配修改为float32
 ```
 
 ## 训练过程

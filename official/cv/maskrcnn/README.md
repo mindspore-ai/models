@@ -537,6 +537,9 @@ Usage: bash run_standalone_train.sh [PRETRAINED_MODEL] [DATA_PATH]
                  'refrigerator', 'book', 'clock', 'vase', 'scissors',
                  'teddy bear', 'hair drier', 'toothbrush'),
 "num_classes": 81
+
+# export
+"export_input_type": float16         # dtype of input data, need to change to float32 when export to ONNX
 ```
 
 ## [Training Process](#contents)
