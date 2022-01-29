@@ -1,0 +1,70 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+isModelArts: false
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+run_distribute: true
+enable_profiling: False
+data_path: "/cache/data"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path/"
+device_target: "GPU"
+checkpoint_path: "./checkpoint/"
+
+# ==============================================================================
+# Training options
+batch_size: 32
+class_num: 1000
+epoch_size: 150
+keep_checkpoint_max: 10
+loss_scale: 1024
+lr_decay_mode: poly
+lr_end: 0
+lr_init: 0.1
+lr_max: 0.4
+momentum: 0.08
+pretrain_epoch_size: 0
+use_glore: true
+use_label_smooth: false
+save_checkpoint: true
+save_checkpoint_epochs: 5
+save_checkpoint_path: ./
+warmup_epochs: 0
+weight_decay: 0.0002
+net: "resnet101"
+cast_fp16: true
+
+device_target: "GPU"
+device_id: 0
+device_num: 8
+data_url: ""
+eval_data_url: ""
+pretrained_ckpt: ""
+parameter_server: ""
+
+
+# Export options
+device_id: 0
+file_name: "resnet200"
+file_format: "MINDIR"
+ckpt_url: ""
+
+# Image options
+image_size: 224
+
+---
+# Help description for each configuration
+isModelArts: "Whether training on modelarts, default: False"
+data_url: "Dataset url for obs"
+checkpoint_url: "The location of checkpoint for obs"
+data_path: "Dataset path for local"
+output_path: "Training output path for local"
+load_path: "The location of checkpoint for obs"
+device_target: "Target device type, available: [Ascend, GPU, CPU]"
+enable_profiling: "Whether enable profiling while training, default: False"
+num_classes: "Class for dataset"
+batch_size: "Batch size for training and evaluation"
+epoch_size: "Total training epochs."
+checkpoint_path: "The location of the checkpoint file."
