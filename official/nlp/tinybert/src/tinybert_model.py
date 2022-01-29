@@ -950,6 +950,7 @@ class BertModelNER(nn.Cell):
         self.reshape = P.Reshape()
         self.shape = (-1, config.hidden_size)
         self.origin_shape = (-1, config.seq_length, self.num_labels)
+        self.phase_type = phase_type
 
     def construct(self, input_ids, input_mask, token_type_id):
         """Return the final logits as the results of log_softmax."""
