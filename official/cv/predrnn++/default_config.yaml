@@ -1,9 +1,3 @@
-# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unlesee you know exactly what you are doing)
-enable_modelarts: False
-# url for modelarts
-data_url: ""
-train_url: ""
-checkpoint_url: ""
 # path for local
 data_path: "/cache/data"
 output_path: "/cache/train"
@@ -19,6 +13,9 @@ model_version: ""
 
 # ======================================================================================
 # Training and eval options
+train_mindrecord: ""
+test_mindrecord: ""
+pretrained_model: ""
 save_dir: "./"
 model_name: "predrnn_pp"
 input_length: 10

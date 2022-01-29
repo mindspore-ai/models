@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import argparse
+
 import cv2
 import numpy as np
 from skimage.metrics import structural_similarity
@@ -25,17 +26,17 @@ from data_provider.mnist_to_mindrecord import create_mnist_dataset
 from nets.predrnn_pp import PreRNN
 from utils import metrics
 from utils import preprocess
-from utils import config
+from utils.config import config
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--test_mindrecord', type=str, default='', help='test data paths.')
-    parser.add_argument('--pretrained_model', type=str, default=None, \
-        help='file of a pretrained model to initialize from.')
+    parser.add_argument('--test_mindrecord', type=str, default='')
+    parser.add_argument('--device_id', type=int, default=0)
+    parser.add_argument('--pretrained_model', type=str, default='')
     args_opt = parser.parse_args()
 
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=config.device_id)
+    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=args_opt.device_id)
     device_num = config.device_num
     rank = 0
 

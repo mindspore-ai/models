@@ -14,22 +14,17 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]; then
-  echo "Usage: bash scripts/run_eval.sh [DATASET_PATH] [CHECKPOINT_MODEL]"
+if [ $# != 3 ]; then
+  echo "Usage: bash scripts/run_eval.sh [DATASET_PATH] [DEVICE_ID] [PRETRAINED_MODEL]"
   exit 1
 fi
 
-export DEVICE_ID=0
 run_ascend() {
   ulimit -u unlimited
-  export DEVICE_NUM=1
-  export RANK_ID=0
-  export RANK_SIZE=1
-
-  echo "start evaluation for device $DEVICE_ID"
+  echo "start evaluation for device $2"
   env >env.log
-  python eval.py --test_mindrecord=$1 --checkpoint_model=$2 > log.txt 2>&1 &
+  python eval.py --test_mindrecord=$1 --device_id=2 --pretrained_model=$3 > log.txt 2>&1 &
   cd ..
 }
 
-run_ascend $1
+run_ascend $1 $2 $3
