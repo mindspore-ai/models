@@ -14,22 +14,17 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 1 ]; then
-  echo "Usage: bash scripts/run_standalone_train.sh [DATASET_PATH]"
+if [ $# != 2 ]; then
+  echo "Usage: bash scripts/run_standalone_train.sh [DATASET_PATH] [DEVICE_ID]"
   exit 1
 fi
 
-export DEVICE_ID=0
 run_ascend() {
   ulimit -u unlimited
-  export DEVICE_NUM=1
-  export RANK_ID=0
-  export RANK_SIZE=1
-
-  echo "start training for device $DEVICE_ID"
+  echo "start training for device $2"
   env >env.log
-  python train.py --train_mindrecord=$1 > log.txt 2>&1 &
+  python train.py --train_mindrecord=$1 --device_id=$2 > log.txt 2>&1 &
   cd ..
 }
 
-run_ascend $1
+run_ascend $1 $2

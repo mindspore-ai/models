@@ -45,10 +45,10 @@ We use the moving mnist dataset (http://www.cs.toronto.edu/~nitish/unsupervised_
 
 ### [Dataset Prepare](#content)
 
-The moving mnist dataset from the official website contains 3 files: train/valid/test.npz. Use generate_mindrecord.py to convert dataset to mindrecord format:
+The moving mnist dataset from the official website contains 3 files: train/valid/test.npz. Use generate_mindrecord.py to convert dataset to mindrecord format, DATASET_PATH is the path of the moving mnist dataset folder:
 
 ```shell
-    $ python generate_mindrecord.py
+    $ python generate_mindrecord.py --dataset_path=[DATASET_PATH]
 ```
 
 ## [Environment Requirements](#contents)
@@ -69,7 +69,7 @@ The moving mnist dataset from the official website contains 3 files: train/valid
 
     ```bash
     # standalone training example in Ascend
-    $ bash scripts/run_standalone_train.sh [DATASET_NAME]
+    $ bash scripts/run_standalone_train.sh [DATASET_PATH] [DEVICE_ID]
     ```
 
 ## [Script Description](#contents)
@@ -110,7 +110,7 @@ Predrnn++
 
 ```shell
 # distributed training in Ascend or GPU
-Usage: bash scripts/run_standalone_train.sh [DATASET_PATH]
+Usage: bash scripts/run_standalone_train.sh [DATASET_PATH] [DEVICE_ID]
 
 #### Parameters Configuration
 
@@ -118,6 +118,9 @@ Parameters for both training and evaluation can be set in default_config.yaml.
 
 ```yaml
 
+train_mindrecord: ""                            # path to train dataset
+test_mindrecord: ""                             # path to test dataset
+pretrained_model: ""                            # path to pretrained model
 save_dir: "./"                                  # path to save model checkpoint
 model_name: "predrnn_pp"                        # model name
 input_length: 10                                # length of input sequence
@@ -150,7 +153,7 @@ device_id: 0                                    # id of NPU used
 
 ``` bash
 
-bash scripts/run_standalone_train.sh [DATASET_PATH]
+bash scripts/run_standalone_train.sh [DATASET_PATH] [DEVICE_ID]
 
 ```
 
@@ -162,7 +165,7 @@ bash scripts/run_standalone_train.sh [DATASET_PATH]
 
 ``` bash
 
-bash scripts/run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
+bash scripts/run_eval.sh [DATASET_PATH] [DEVICE_ID] [CHECKPOINT_PATH]
 
 ```
 

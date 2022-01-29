@@ -24,10 +24,11 @@ from utils.config import config
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--train_mindrecord', type=str, default='', help='train data paths.')
+    parser.add_argument('--train_mindrecord', type=str, default='')
+    parser.add_argument('--device_id', type=int, default=0)
     args_opt = parser.parse_args()
 
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=config.device_id)
+    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=args_opt.device_id)
     device_num = config.device_num
     rank = 0
 
