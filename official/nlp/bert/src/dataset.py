@@ -92,14 +92,16 @@ class BucketDatasetGenerator:
         remaining_data = []
         for value in self.data_bucket.values():
             remaining_data += list(value)
-        if remaining_data_offset > len(remaining_data):
+        if remaining_data_offset > len(remaining_data) or self.iter >= self.__len__():
             self._init_variables()
             raise StopIteration
         self.remaining_data_size += 1
         remaining_data = remaining_data[remaining_data_offset - self.batch_size : remaining_data_offset]
+        self.iter += 1
         return self._package_data(remaining_data, self.bucket_list[-1])
 
     def __iter__(self):
+        self.iter = 0
         self.iterator = self.dataset.create_tuple_iterator(output_numpy=True)
         return self
 
