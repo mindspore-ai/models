@@ -1,0 +1,120 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+
+# hyperparameters of training
+momentum: 0.9
+decay: 0.0001
+lr: 0.01
+epochs: 30
+batch_size: 4
+
+# other
+num_classes: 1
+k_max: 250
+img_size: [1088, 608]
+track_buffer: 30
+keep_checkpoint_max: 6
+
+# model initialization parameters
+backbone_input_shape: [32, 64, 128, 256, 512]
+backbone_shape: [64, 128, 256, 512, 1024]
+backbone_layers: [1, 2, 8, 8, 4]
+out_channel: 24  # 3 * (num_classes + 5)
+embedding_dim: 512
+
+# evaluation thresholds
+iou_thres: 0.50
+conf_thres: 0.55
+nms_thres: 0.45
+min_box_area: 200
+
+# h -> w
+anchor_scales: [
+      [8, 24],
+      [11, 34],
+      [16, 48],
+      [23, 68],
+      [32, 96],
+      [45, 135],
+      [64, 192],
+      [90, 271],
+      [128, 384],
+      [180, 540],
+      [256, 640],
+      [512, 640],
+]
+
+
+# data configs
+col_names_train: [
+    'imgs',
+    'tconf_s',
+    'tbox_s',
+    'tid_s',
+    'tconf_m',
+    'tbox_m',
+    'tid_m',
+    'tconf_b',
+    'tbox_b',
+    'tid_b',
+    'emb_indices_s',
+    'emb_indices_m',
+    'emb_indices_b',
+]
+
+col_names_val: [
+    'imgs',
+    'targets',
+    'lens',
+]
+
+
+# other
+is_distributed: False
+dataset_root: '/path/to/datasets/root/folder/'
+device_target: 'GPU'
+device_id: 0
+device_start: 0
+ckpt_url: '/path/to/checkpoint'
+logs_dir: './logs'
+input_video: '/path/to/input/video'
+output_format: 'video'
+output_root: './results'
+save_images: False
+save_videos: False
+
+---
+# Config description for each option
+momentum: 'Momentum for SGD optimizer.'
+decay: 'Weight_decay for SGD optimizer.'
+lr: 'Init learning rate.'
+epochs: 'Number of epochs to train.'
+batch_size: 'Batch size per one device'
+num_classes: 'Number of object classes.'
+k_max: 'Max predictions per one map (made for optimization of FC layer embedding computation).'
+img_size: 'Size of input images.'
+track_buffer: 'Tracking buffer.'
+keep_checkpoint_max: 'Keep saved last N checkpoints.'
+backbone_input_shape: 'Input filters of backbone layers.'
+backbone_shape: 'Input filters of backbone layers.'
+backbone_layers: 'Output filters of backbone layers.'
+out_channel: 'Number of channels for detection.'
+embedding_dim: 'Number of channels for embeddings.'
+iou_thres: 'IOU thresholds.'
+conf_thres: 'Confidence threshold.'
+nms_thres: 'Threshold for Non-max suppression.'
+min_box_area: 'Filter out tiny boxes.'
+anchor_scales: '12 predefined anchor boxes. Different 4 per each of 3 feature maps.'
+col_names_train: 'Names of columns for training GeneratorDataset.'
+col_names_val: 'Names of columns for validation GeneratorDataset.'
+is_distributed: 'Distribute training or not.'
+dataset_root: 'Path to datasets root folder.'
+device_target: 'Device GPU or any.'
+device_id: 'Device id of target device.'
+device_start: 'Start device id.'
+ckpt_url: 'Location of checkpoint.'
+logs_dir: 'Dir to save logs and ckpt.'
+input_video: 'Path to the input video.'
+output_format: 'Expected output format.'
+output_root: 'Expected output root path.'
+save_images: 'Save tracking results (image).'
+save_videos: 'Save tracking results (video).'
