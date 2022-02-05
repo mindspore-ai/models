@@ -24,6 +24,7 @@ import mindspore.numpy as mnp
 import mindspore.ops as ops
 from mindspore.ops import operations as P
 from mindspore.train.serialization import load_param_into_net, load_checkpoint
+from mindspore.communication.management import get_rank, get_group_size, init
 from mindspore import context
 from src.iouEval import iouEval_1
 from src.util import getCityLossWeight, getBool, seed_seed
@@ -122,7 +123,8 @@ def evalNetwork(network, eval_dataloader, ckptPath, encode_1, num_class=20, weig
         load_param_into_net(network, param_dict)
 
     mean_iou, mean_loss, iou_class = IOU_1(network, eval_dataloader, num_class, encode_1)
-    with open(ckptPath + ".metric.txt", "w") as file:
+    os.path.splitext(ckptPath)
+    with open(os.path.splitext(ckptPath)[0] + "_metric.txt", "w") as file:
         print("model path", ckptPath, file=file)
         print("mean_iou", mean_iou, file=file)
         print("mean_loss", mean_loss, file=file)
@@ -145,6 +147,7 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument('--data_path', type=str)
     parser.add_argument('--run_distribute', type=str)
+    parser.add_argument('--device_target', default="Ascend", type=str)
     parser.add_argument('--encode', type=str)
     parser.add_argument('--model_root_path', type=str)
     parser.add_argument('--device_id', type=int)
@@ -158,8 +161,7 @@ if __name__ == "__main__":
 
     seed_seed()
     context.set_context(mode=context.GRAPH_MODE)
-    context.set_context(device_target="Ascend")
-    context.set_context(device_id=device_id)
+    context.set_context(device_target=config.device_target)
     context.set_context(save_graphs=False)
 
     eval_dataloader_1 = getCityScapesDataLoader_GeneratorDataset(CityScapesRoot, "val", 6, \
@@ -174,6 +176,9 @@ if __name__ == "__main__":
             train=False)
 
     if not run_distribute:
+        rank_id = 0
+        rank_size = 1
+        context.set_context(device_id=device_id)
         if os.path.isdir(model_root_path):
             paths = listCKPTPath(model_root_path, encode_)
             for path in paths:
@@ -181,11 +186,12 @@ if __name__ == "__main__":
         else:
             evalNetwork(network_1, eval_dataloader_1, model_root_path, encode_)
     else:
-        rank_id = int(os.environ["RANK_ID"])
-        rank_size = int(os.environ["RANK_SIZE"])
+        init()
+        rank_id = get_rank()
+        rank_size = get_group_size()
         ckpt_files_path = listCKPTPath(model_root_path, encode_)
         n = math.ceil(len(ckpt_files_path) / rank_size)
         ckpt_files_path = ckpt_files_path[rank_id*n : rank_id*n + n]
-
         for path in ckpt_files_path:
             evalNetwork(network_1, eval_dataloader_1, path, encode_)
+        

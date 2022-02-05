@@ -17,7 +17,6 @@ import random
 from io import BytesIO
 import numpy as np
 from PIL import Image, ImageFilter
-from torchvision.transforms import Resize
 import mindspore.dataset as ds
 
 EXTENSIONS = ['.jpg', '.png']
@@ -91,28 +90,30 @@ class MyCoTransform:
                 box = (x, y, x+w, y+h)
                 image = image.crop(box)
                 target = target.crop(box)
-
-            image = Resize(height, Image.BILINEAR)(image)
-            target = Resize(height, Image.NEAREST)(target)
+            img_h, img_w = image.size
+            image = image.resize((height * img_h // img_w, height), Image.BILINEAR)
+            target = target.resize((height * img_h // img_w, height), Image.NEAREST)
 
             # Random hflip
             if random.random() < 0.5:
                 image = image.transpose(Image.FLIP_LEFT_RIGHT)
                 target = target.transpose(Image.FLIP_LEFT_RIGHT)
         else:
-            image = Resize(height, Image.BILINEAR)(image)
-            target = Resize(height, Image.NEAREST)(target)
+            img_h, img_w = image.size
+            image = image.resize((height * img_h // img_w, height), Image.BILINEAR)
+            target = target.resize((height * img_h // img_w, height), Image.NEAREST)
 
         image = np.array(image).astype(np.float32) / 255
         image = image.transpose(2, 0, 1)
 
-        target = Resize(int(height/8), Image.NEAREST)(target) if self.enc else target
+        target = target.resize((target.size[0] // 8, target.size[1] // 8), Image.NEAREST) if self.enc else target
         target = np.array(target).astype(np.uint32)
         target[target == 255] = 19
         return image, target
 
     def process_one_infer(self, image, height):
-        image = Resize(height, Image.BILINEAR)(image)
+        img_h, img_w = image.size
+        image = image.resize((height * img_h // img_w, height), Image.BILINEAR)
         image = np.array(image).astype(np.float32) / 255
         image = image.transpose(2, 0, 1)
         return image
@@ -204,16 +205,16 @@ def getCityScapesDataLoader_mindrecordDataset(stage, data_path, batch_size, enc,
     shuffle, aug, rank_id=0, global_size=1, repeat=1):
 
     dataloader = ds.MindDataset(data_path, columns_list=["data", "label"], \
-        num_parallel_workers=8, shuffle=shuffle, shard_id=rank_id, num_shards=global_size)
+        num_parallel_workers=4, shuffle=shuffle, shard_id=rank_id, num_shards=global_size)
     transform = MyCoTransform(stage, enc, aug, height, if_from_mindrecord=True)
     dataloader = dataloader.map(operations=transform, \
         input_columns=["data", "label"], output_columns=["data", "label"], \
-        num_parallel_workers=8, python_multiprocessing=True)
+        num_parallel_workers=12, python_multiprocessing=True)
 
     if shuffle:
         dataloader = dataloader.shuffle(batch_size*10)
 
-    dataloader = dataloader.batch(batch_size, drop_remainder=False)
+    dataloader = dataloader.batch(batch_size, drop_remainder=True)
     if repeat > 1:
         dataloader = dataloader.repeat(repeat)
     return dataloader

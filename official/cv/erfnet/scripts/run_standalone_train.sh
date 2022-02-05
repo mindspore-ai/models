@@ -14,76 +14,90 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]
+if [ $# != 3 ]
 then
-  echo "Usage: bash scripts/run_standalone_train.sh /path/to/cityscapes DEVICE_ID"
-  echo "Example: bash scripts/run_standalone_train.sh /home/name/cityscapes 0"
+  echo "Usage: bash scripts/run_standalone_train.sh DEVICE_TARTGET DATASET_PATH DEVICE_ID"
+  echo "Example: bash scripts/run_standalone_train.sh [Ascend/GPU] /home/name/cityscapes 0"
   exit 1
 fi
 
-if [ ! -d $1 ]
+echo "DEVICE_TARTGET: $1"
+echo "CITYSCAPES DATASET PATH: $2"
+echo "DEVICE_ID: $3"
+
+DEVICE_TARTGET=$1
+DATASET_PATH=$2
+export RANK_SIZE=1
+export DEVICE_ID=$3
+BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
+
+if [ ! -d $DATASET_PATH ]
 then 
     echo "error: DATASET_PATH=$1 is not a directory"
 exit 1
 fi
 
-echo "CityScapes dataset path: $1"
-echo "DEVICE_ID: $2"
+cd $BASE_PATH/../
 
-ps -aux | grep "python -u ../train.py" | awk '{print $2}' | xargs kill -9
+if [ -d "standalone_train" ]
+then
+    echo "delete old logs!"
+    rm -rf standalone_train
+fi
 
-mkdir ./log_single_device
-cd ./log_single_device
-
-cityscapes_path=$1
-export RANK_SIZE=1
-export DEVICE_ID=$2
+mkdir standalone_train
+cd standalone_train
 
 python -u ../train.py \
-    --lr 5e-4 \
-    --repeat 1 \
-    --run_distribute false \
-    --save_path './' \
-    --mindrecord_train_data "../data/train.mindrecord" \
-    --stage 1 \
-    --ckpt_path "" \
+    --device_target=$DEVICE_TARTGET \
+    --lr=5e-4 \
+    --repeat=1 \
+    --run_distribute=false \
+    --save_path='./checkpoint' \
+    --mindrecord_train_data="../data/train.mindrecord" \
+    --stage=1 \
+    --ckpt_path="" \
     > log_stage1.txt 2>&1
 
 python -u ../train.py \
-    --lr 5e-4 \
-    --repeat 1 \
-    --run_distribute false \
-    --save_path './' \
-    --mindrecord_train_data "../data/train.mindrecord" \
-    --stage 2 \
-    --ckpt_path "./Encoder-65_496.ckpt" \
+    --device_target=$DEVICE_TARTGET \
+    --lr=5e-4 \
+    --repeat=1 \
+    --run_distribute=false \
+    --save_path='./checkpoint' \
+    --mindrecord_train_data="../data/train.mindrecord" \
+    --stage=2 \
+    --ckpt_path="./checkpoint/Encoder_stage1.ckpt" \
     > log_stage2.txt 2>&1
 
 python -u ../train.py \
-    --lr 5e-4 \
-    --repeat 1 \
-    --run_distribute false \
-    --save_path './' \
-    --mindrecord_train_data "../data/train.mindrecord" \
-    --stage 3 \
-    --ckpt_path "./Encoder_1-85_496.ckpt" \
+    --device_target=$DEVICE_TARTGET \
+    --lr=5e-4 \
+    --repeat=1 \
+    --run_distribute=false \
+    --save_path='./checkpoint' \
+    --mindrecord_train_data="../data/train.mindrecord" \
+    --stage=3 \
+    --ckpt_path="./checkpoint/Encoder_stage2.ckpt" \
     > log_stage3.txt 2>&1
 
 python -u ../train.py \
-    --lr 5e-4 \
-    --repeat 1 \
-    --run_distribute false \
-    --save_path './' \
-    --mindrecord_train_data "../data/train.mindrecord" \
-    --stage 4 \
-    --ckpt_path "./ERFNet-65_496.ckpt" \
+    --device_target=$DEVICE_TARTGET \
+    --lr=5e-4 \
+    --repeat=1 \
+    --run_distribute=false \
+    --save_path='./checkpoint' \
+    --mindrecord_train_data="../data/train.mindrecord" \
+    --stage=4 \
+    --ckpt_path="./checkpoint/ERFNet_stage3.ckpt" \
     > log_stage4.txt 2>&1
 
 python -u ../eval.py \
-  --data_path ${cityscapes_path} \
-  --run_distribute false \
-  --encode false \
-  --model_root_path './' \
-  --device_id ${DEVICE_ID} \
-  > log_eval.txt 2>&1 &
+    --device_target=$DEVICE_TARTGET \
+    --data_path=$DATASET_PATH \
+    --run_distribute=false \
+    --encode=false \
+    --model_root_path="./checkpoint" \
+    --device_id=$DEVICE_ID \
+    > log_eval.txt 2>&1 &
 

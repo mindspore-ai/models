@@ -57,10 +57,12 @@ if __name__ == "__main__":
     parser.add_argument('--data_path', type=str)
     parser.add_argument('--model_path', type=str)
     parser.add_argument('--output_path', type=str)
+    parser.add_argument('--device_target', default="Ascend", type=str)
     parser.add_argument('--device_id', type=int)
 
     config = parser.parse_args()
     model_path = config.model_path
+    device_target = config.device_target
     device_id = config.device_id
     data_path = config.data_path
     output_path = config.output_path
@@ -70,7 +72,7 @@ if __name__ == "__main__":
 
     seed_seed()
     context.set_context(mode=context.GRAPH_MODE)
-    context.set_context(device_target="Ascend")
+    context.set_context(device_target=device_target)
     context.set_context(device_id=device_id)
     context.set_context(save_graphs=False)
     dataloader = getInferDataLoader_fromfile(data_path, 32, 512)

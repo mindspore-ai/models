@@ -22,11 +22,12 @@ from mindspore import numpy as mnp
 from mindspore import ops as mops
 from mindspore.ops import operations as P
 from mindspore.train.callback import Callback
-from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
-from mindspore.train.serialization import _update_param, load_checkpoint
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor
+from mindspore.train.serialization import _update_param, load_checkpoint, save_checkpoint
 from mindspore.context import ParallelMode
 from mindspore import context
 from mindspore.communication.management import get_rank, get_group_size, init
+from mindspore.common import set_seed
 from src.util import getCityLossWeight
 from src.config import ms_train_data, repeat, save_path, ckpt_path, stage
 from src.config import TrainConfig_1, TrainConfig_2, TrainConfig_3, TrainConfig_4
@@ -34,6 +35,7 @@ from src.config import weight_init, run_distribute, num_class
 from src.model import ERFNet, Encoder_pred
 from src.dataset import getCityScapesDataLoader_mindrecordDataset
 
+set_seed(1)
 # Pytorch NLLLoss + log_softmax
 class SoftmaxCrossEntropyLoss(mnn.Cell):
     def __init__(self, num_cls, weight):
@@ -125,7 +127,7 @@ def attach(erfnet, encoder_pretrain):
     erfnet_par = erfnet.parameters_dict()
     for name, param_old in encoder_trained_par.items():
         if name.startswith("encoder"):
-            _update_param(erfnet_par[name], param_old)
+            erfnet_par[name].set_data(param_old)
 
 def copy_param(net_new, net):
     print("copy param.")
@@ -165,32 +167,34 @@ def train(ckpt_path_, trainConfig_, rank_id, rank_size, stage_):
 
     loss_scale_manager = DynamicLossScaleManager()
     wrapper = Model(network, loss, opt, loss_scale_manager=loss_scale_manager, \
-        keep_batchnorm_fp32=True)
-
+        keep_batchnorm_fp32=True, amp_level="O0")
     if rank_id == 0:
         config_ck = CheckpointConfig(save_checkpoint_steps= \
                                     trainConfig_.epoch_num_save * dataloader.get_dataset_size(), \
-                                    keep_checkpoint_max=9999)
+                                    keep_checkpoint_max=5)
         saveModel_cb = ModelCheckpoint(prefix=save_prefix, directory= \
             save_path, config=config_ck)
-        call_backs = [saveModel_cb, LossMonitor_mine(1, trainConfig_.lr.asnumpy())]
+        time_cb = TimeMonitor()
+        call_backs = [time_cb, saveModel_cb, LossMonitor_mine(1, trainConfig_.lr.asnumpy())]
     else:
         call_backs = [LossMonitor_mine(1, trainConfig_.lr.asnumpy())]
 
     print("============== Starting {} Training ==============".format(save_prefix))
     wrapper.train(trainConfig_.epoch, dataloader, callbacks=call_backs, dataset_sink_mode=True)
+    save_checkpoint(network, os.path.join(save_path, f"{save_prefix}_stage{stage_}.ckpt"))
     return network
 
 if __name__ == "__main__":
     rank_id_ = 0
     rank_size_ = 1
     if run_distribute:
-        context.set_auto_parallel_context(parameter_broadcast=True)
-        context.set_auto_parallel_context(parallel_mode=\
-            ParallelMode.DATA_PARALLEL, gradients_mean=True)
         init()
+        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
         rank_id_ = get_rank()
         rank_size_ = get_group_size()
+    else:
+        # for single device: ascend/gpu
+        context.set_context(device_id=int(os.environ["DEVICE_ID"]))
 
     trainConfig = {
         1: TrainConfig_1(),

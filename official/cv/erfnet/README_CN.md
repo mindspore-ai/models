@@ -58,29 +58,47 @@ Ascend
 
 [**The Cityscapes dataset**](https://www.cityscapes-dataset.com/):
 
-在官网直接下载的标签文件, 像素被分为30多类, 在训练时我们需要将其归纳到20类, 所以对其需要进行处理. 为了方便可以直接下载已经处理好的数据.
+在官网直接下载的标签文件, 像素被分为30多类, 在训练时我们需要将其归纳到20类, 所以对其需要进行处理.
 
-链接：https://pan.baidu.com/s/1jH9GUDX4grcEoDNLsWPKGw. 提取码：aChQ.
+## 处理数据集
 
-下载后可以得到以下目录:
+在官网上下载数据集：gtFine_trainvaltest.zip (241MB) [md5]、gtCoarse.zip (1.3GB) [md5]、gtCoarse.zip (1.3GB) [md5]
 
-```sh
-└── cityscapes
-    ├── gtFine .................................. ground truth
-    └── leftImg8bit ............................. 训练集&测试集&验证集
+Cityscapes数据集提供了34种分类（默认为19种分类），如果想要任意分类，需要使用自带的[**工具**](https://github.com/mcordts/cityscapesScripts)。cityscapesscripts需要和gtCoarse、gtFine、leftImg8bit在同一目录下。
+
+cityscapesscripts/helpers/labels.py：这个python文件工具作用是映射我们所需训练的物体到一个具体颜色数值。最多可分34类，若增减其中需要分割物体可用此工具。label字典中trainID这一列，凡是255的表示均没有加入训练分类。修改trainID和不感兴趣的ignoreInEval改为True。
+
+cityscapesscripts/preparation/creatTrainldLabellmgs.py：当用上一个工具定义好训练集识别物体数量后，需要用这个文件重新生成训练集。
+
+## 处理好的数据集
+
+为了方便可以直接下载已经处理好的数据, 链接：https://pan.baidu.com/s/1jH9GUDX4grcEoDNLsWPKGw. 提取码：aChQ.
+
+涉及的文件目录如下:
+
+```path
+├── gtFine.zip
+├── leftImg8bit
+│   ├── test
+│   ├── train
+│   └── val
 ```
 
-键入
+## 生成训练数据的mindrecord文件
 
-```sh
-python build_mrdata.py \
+运行脚本：
+
+```shell
+python src/build_mrdata.py \
 --dataset_path /path/to/cityscapes/ \
 --subset train \
 --output_name train.mindrecord
 ```
 
 脚本会在/path/to/cityscapes/数据集根目录下，找到训练集，在output_name指出的路径下生成mindrecord文件，
-然后再把mindrecord文件移动到项目根目录下的data文件夹下，来让脚本中的相对路径能够寻找到
+然后再把mindrecord文件（train.mindrecord、train.mindrecord.db）移动到项目根目录下的data文件夹下，来让脚本中的相对路径能够寻找到
+
+- 测试或验证数据集没有使用mindrecord文件，而是通过src/dataset.py中的cityscapes函数读取
 
 # 脚本说明
 
@@ -99,6 +117,8 @@ python build_mrdata.py \
 ├── requirements.txt                          // python环境依赖
 ├── scripts
 │   ├── run_infer_310.sh                          // 310推理脚本
+│   ├── run_eval.sh                               // 推理脚本
+│   ├── run_distribute_train_gpu.sh               // gpu多卡训练脚本
 │   ├── run_distribute_train.sh                   // 多卡训练脚本
 │   └── run_standalone_train.sh                   // 单卡训练脚本
 ├── src
@@ -120,60 +140,73 @@ python build_mrdata.py \
 
 ## 单卡训练
 
-如果你要使用单卡进行训练，进入项目根目录，键入
+如果你要使用单卡进行训练，进入项目根目录
 
-```py
-nohup bash scripts/run_standalone_train.sh /home/name/cityscapes 0 &
-```
+- Ascend处理器环境运行
+
+  ```shell
+  # 训练示例
+  nohup bash scripts/run_standalone_train.sh Ascend /home/name/cityscapes 0 &
+  ```
+
+- GPU处理器环境运行
+
+  ```shell
+  # 训练示例
+  nohup bash scripts/run_standalone_train.sh GPU /home/name/cityscapes 0 &
+  ```
+
+在项目根目录下会生成standalone_train文件夹，./standalone_train/log_stage*.txt即为程序log文件
 
 其中/home/name/cityscapes指数据集的位置，其后的0指定device_id.
 
-在项目根目录下会生成log_single_device文件夹，./log_single_device/log_stage*.txt即为程序log文件，键入
-
-```sh
-tail -f log_single_device/log_stage*.txt
-```
-
-显示训练状态。
-
 ## 多卡训练
 
-例如，你要使用4卡进行训练，进入项目根目录，键入
+例如，你要使用4卡进行训练，进入项目根目录
 
-```py
-nohup bash scripts/run_distribute_train.sh /home/name/cityscapes 4 0,1,2,3 /home/name/rank_table_4pcs.json &
-```
+- Ascend处理器环境运行
 
-其中/home/name/cityscapes指数据集的位置，其后的4指rank_size, 再后的0,1,2,3制定了设备的编号, /home/name/rank_table_4pcs.json指并行训练配置文件的位置。其他数目的设备并行训练也类似。
+  ```shell
+  # 训练示例
+  nohup bash scripts/run_distribute_train.sh /home/name/cityscapes 4 0,1,2,3 /home/name/rank_table_4pcs.json &
+  ```
 
-在项目根目录下会生成log文件夹，./log/log0/log.txt即为程序log文件，键入
+在项目根目录下会生成distribute_train文件夹，./distribute_train/log0/log.txt即为程序log文件
 
-```sh
-tail -f log/log0/log.txt
-```
+- GPU处理器环境运行
 
-显示训练状态。
+  ```shell
+  # 训练示例
+  nohup bash scripts/run_distribute_train_gpu.sh /home/name/cityscapes 4 0,1,2,3 &
+  ```
+
+在项目根目录下会生成distribute_train_gpu文件夹，./distribute_train_gpu/log_stage*.txt即为程序log文件
+
+其中/home/name/cityscapes指数据集的位置，其后的4指rank_size, 再后的0,1,2,3制定了设备的编号，/home/name/rank_table_4pcs.json指并行训练配置文件的位置。其他数目的设备并行训练也类似。
 
 # 验证
 
-训练之后，脚本会调用验证代码，对不同的ckpt文件，会加上后缀.metrics.txt，其中包含测试精度。
+训练之后，需要调用验证脚本，对不同的ckpt文件，会加上后缀_metrics.txt，其中包含测试精度。
 
-## 验证单个ckpt
+## 验证ckpt
 
-键入
+- Ascend处理器环境运行
 
-```sh
-python eval.py \
-    --data_path /path/cityscapes \
-    --run_distribute false \
-    --encode false \
-    --model_root_path /path/ERFNet/ERFNet.ckpt \
-    --device_id 1
-```
+  ```shell
+  # 验证示例
+  nohup bash scripts/run_eval.sh Ascend /home/name/cityscapes distribute_train/checkpoint 0 &
+  ```
 
-data_path为数据集根目录，model_root_path为ckpt文件路径。
+- GPU处理器环境运行
 
-验证完毕后，会在ckpt文件同目录下生成后缀metrics.txt文件，其中包含测试点数。
+  ```shell
+  # 验证示例
+  nohup bash scripts/run_eval.sh GPU /home/name/cityscapes distribute_train_gpu/checkpoint 0 &
+  ```
+
+/home/name/cityscapes为数据集根目录，distribute_train/checkpoint为ckpt文件路径，其后的0指定device_id.。
+
+验证完毕后，会在ckpt文件同目录下生成后缀_metrics.txt文件，其中包含测试点数。
 
 ```txt
 mean_iou 0.7090318296884867
@@ -187,15 +220,28 @@ iou_class tensor([0.9742, 0.8046, 0.9048, 0.4574, 0.5067, 0.6105, 0.6239, 0.7221
 
 ## 使用ckpt文件推理
 
-键入
+- Ascend处理器环境运行
 
-```sh
-python src/infer.py \
+  ```shell
+  # 推理示例
+  python src/infer.py \
   --data_path /path/to/imgs \
   --model_path /path/to/ERFNet.ckpt /
   --output_path /output/path \
   --device_id 3
-```
+  ```
+
+- GPU处理器环境运行
+
+  ```shell
+  # 推理示例
+  python src/infer.py \
+  --data_path /path/to/imgs \
+  --model_path /path/to/ERFNet.ckpt /
+  --output_path /output/path \
+  --device_target='GPU'
+  --device_id 3
+  ```
 
 脚本会读取/path/to/imgs下的图片，使用/path/to/ERFNet.ckpt模型进行推理，得到的可视化结果输出到/output/path下。
 
@@ -203,13 +249,21 @@ python src/infer.py \
 
 需要处理训练好的ckpt文件, 得到能在310上直接推理的mindir模型文件:
 
-```sh
-python export.py --model_path /path/to/net.ckpt
-```
+- Ascend处理器环境运行
+
+  ```shell
+  python export.py --model_path=/path/to/net.ckpt
+  ```
+
+- GPU处理器环境运行
+
+  ```shell
+  python export.py --model_path=/path/to/net.ckpt --device_target='GPU'
+  ```
 
 会在当前目录下得到ERFNet.mindir文件, 之后进入ascend310_infer文件夹,
 
-```sh
+```shell
 cd ascend310_infer
 bash scripts/run_infer_310.sh /path/to/net.mindir /path/to/images /path/to/result  /path/to/label 0
 ```
@@ -217,7 +271,7 @@ bash scripts/run_infer_310.sh /path/to/net.mindir /path/to/images /path/to/resul
 其中/path/to/images指验证集的图片, 由于原始数据集的路径cityscapes/leftImg8bit/val/的图片根据拍摄的城市进行了分类, 需要先将其归到一个文件夹下才能供推理.
 例如
 
-```sh
+```shell
 cp /path/to/cityscapes/leftImg8bit/val/frankfurt/* /path/to/images/
 cp /path/to/cityscapes/leftImg8bit/val/lindau/* /path/to/images/
 cp /path/to/cityscapes/leftImg8bit/val/munster/* /path/to/images/
