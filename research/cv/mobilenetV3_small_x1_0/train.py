@@ -30,17 +30,27 @@ from mindspore.communication.management import init, get_rank, get_group_size
 
 from src.dataset import create_dataset
 from src.lr_generator import get_lr
-from src.config import config
+from src.config import config_ascend, config_gpu
 from src.loss import CrossEntropyWithLabelSmooth
 from src.monitor import Monitor
 from src.mobilenetv3 import mobilenet_v3_small
 from argparser import arg_parser
 
 
+def get_loss(label_smooth, num_classes):
+    if label_smooth > 0:
+        loss = CrossEntropyWithLabelSmooth(
+            smooth_factor=label_smooth, num_classes=num_classes)
+    else:
+        loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+    return loss
+
 def main(args_opt):
     set_seed(1)
     context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, save_graphs=False)
     device_num = int(os.getenv('RANK_SIZE', '1'))
+
+    config = config_ascend if args_opt.device_target == 'Ascend' else config_gpu
 
     # init distributed
     if args_opt.run_modelarts:
@@ -54,6 +64,11 @@ def main(args_opt):
             context.set_auto_parallel_context(device_num=device_num, parallel_mode='data_parallel', gradients_mean=True)
             local_data_url = os.path.join(local_data_url, str(device_id))
         mox.file.copy_parallel(args_opt.data_url, local_data_url)
+        # define dataset
+        dataset = create_dataset(dataset_path=local_data_url,
+                                 do_train=True,
+                                 batch_size=config.batch_size,
+                                 device_num=device_num, rank=device_id)
     else:
         if args_opt.run_distribute:
             if args_opt.device_target == 'Ascend':
@@ -75,26 +90,17 @@ def main(args_opt):
             device_id = int(args_opt.device_id)
             context.set_context(device_id=device_id)
             device_num = 1
-    # define net
-    net = mobilenet_v3_small(num_classes=config.num_classes, multiplier=1.)
-    # define loss
-    if config.label_smooth > 0:
-        loss = CrossEntropyWithLabelSmooth(
-            smooth_factor=config.label_smooth, num_classes=config.num_classes)
-    else:
-        loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-    # define dataset
-    if args_opt.run_modelarts:
-        dataset = create_dataset(dataset_path=local_data_url,
-                                 do_train=True,
-                                 batch_size=config.batch_size,
-                                 device_num=device_num, rank=device_id)
-    else:
+        # define dataset
         dataset = create_dataset(dataset_path=args_opt.dataset_path,
                                  do_train=True,
                                  batch_size=config.batch_size,
                                  device_num=device_num, rank=device_id)
     step_size = dataset.get_dataset_size()
+    # define net
+    net = mobilenet_v3_small(num_classes=config.num_classes, multiplier=1.)
+    # define loss
+    loss = get_loss(config.label_smooth, config.num_classes)
+
     # resume
     if args_opt.pre_trained:
         param_dict = load_checkpoint(args_opt.pre_trained)
@@ -119,16 +125,16 @@ def main(args_opt):
     if config.save_checkpoint:
         config_ck = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_epochs * step_size,
                                      keep_checkpoint_max=config.keep_checkpoint_max)
+        save_ckpt_path = None
         if device_num == 1 or device_id == 0:
-            if args_opt.run_modelarts:
-                save_ckpt_path = local_train_url
-            else:
-                save_ckpt_path = os.path.join(config.save_checkpoint_path, 'model_' + str(device_id) + '/')
+            save_ckpt_path = local_train_url if args_opt.run_modelarts else \
+                os.path.join(config.save_checkpoint_path, 'model_' + str(device_id) + '/')
         if args_opt.device_target == "GPU" and args_opt.run_distribute:
             save_ckpt_path = os.path.join(config.save_checkpoint_path, "ckpt_" + str(device_id) + "/")
 
-        ckpt_cb = ModelCheckpoint(prefix="mobilenetV3", directory=save_ckpt_path, config=config_ck)
-        cb += [ckpt_cb]
+        if save_ckpt_path is not None:
+            ckpt_cb = ModelCheckpoint(prefix="mobilenetV3", directory=save_ckpt_path, config=config_ck)
+            cb += [ckpt_cb]
     # begin train
     model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
     if args_opt.run_modelarts and config.save_checkpoint and (device_num == 1 or device_id == 0):
