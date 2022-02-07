@@ -118,7 +118,7 @@ def get_lr_scheduler(configs):
     if configs.lr_scheduler == 'exponential':
         lr_scheduler = MultiStepLR(configs.lr, configs.lr_epochs, configs.lr_gamma
                                    , configs.steps_per_epoch, configs.max_epoch, warmup_epochs=configs.warmup_epochs)
-    elif config.lr_scheduler == 'cosine_annealing':
+    elif configs.lr_scheduler == 'cosine_annealing':
         lr_scheduler = CosineAnnealingLR(configs.lr, configs.T_max, configs.steps_per_epoch, configs.max_epoch,
                                          warmup_epochs=configs.warmup_epochs, eta_min=configs.eta_min)
     else:
