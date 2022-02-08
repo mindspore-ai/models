@@ -204,8 +204,6 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
 
 - 在 ModelArts 进行导出 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
 
-1. 使用voc val数据集评估多尺度和翻转s8。评估步骤如下：
-
     ```python
     # (1) 执行 a 或者 b.
     #       a. 在 base_config.yaml 文件中设置 "enable_modelarts=True"
