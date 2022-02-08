@@ -1,0 +1,9 @@
+Cython
+pycocotools
+mmcv==0.2.14
+numpy
+opencv-python
+pycocotools
+motmetrics
+opencv-python
+Pillow
