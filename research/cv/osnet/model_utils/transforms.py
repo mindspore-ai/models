@@ -17,7 +17,7 @@
 
 import math
 import random
-from mindspore.dataset.vision.c_transforms import(Resize, Rescale, Normalize, HWC2CHW, RandomHorizontalFlip)
+from mindspore.dataset.vision.c_transforms import Resize, Rescale, Normalize, HWC2CHW, RandomHorizontalFlip
 from mindspore.dataset.transforms.c_transforms import Compose
 
 

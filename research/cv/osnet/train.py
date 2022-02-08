@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License Version 2.0(the "License");
 # you may not use this file except in compliance with the License.
@@ -27,8 +27,8 @@ import mindspore.ops as ops
 from mindspore.common import set_seed
 from mindspore import Tensor, Model, context
 from mindspore import load_checkpoint, load_param_into_net
-from mindspore.train.callback import (ModelCheckpoint, CheckpointConfig, LossMonitor,
-                                      TimeMonitor, SummaryCollector)
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor,\
+                                      TimeMonitor, SummaryCollector
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.communication.management import init, get_rank
 
@@ -39,7 +39,7 @@ from src.lr_generator import step_lr, multi_step_lr
 from src.cross_entropy_loss import CrossEntropyLoss
 from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper
-from model_utils.device_adapter import get_device_id, get_device_num, get_rank_id
+from model_utils.device_adapter import get_device_id, get_device_num
 
 
 set_seed(1)
@@ -52,6 +52,10 @@ class LossCallBack(LossMonitor):
     def __init__(self, has_trained_epoch=0):
         super(LossCallBack, self).__init__()
         self.has_trained_epoch = has_trained_epoch
+
+    def begin(self, run_context):
+        cb_params = run_context.original_args()
+        cb_params.init_time = time.time()
 
     def step_end(self, run_context):
         '''check loss at the end of each step.'''
@@ -73,6 +77,11 @@ class LossCallBack(LossMonitor):
         if self._per_print_times != 0 and cb_params.cur_step_num % self._per_print_times == 0:
             print("epoch: %s step: %s, loss is %s" % (cb_params.cur_epoch_num + int(self.has_trained_epoch),
                                                       cur_step_in_epoch, loss), flush=True)
+
+    def end(self, run_context):
+        cb_params = run_context.original_args()
+        end_time = time.time()
+        print("total_time:", (end_time-cb_params.init_time)*1000, "ms")
 
 
 def init_lr(num_batches):
@@ -96,7 +105,7 @@ def check_isfile(fpath):
 
 
 def load_from_checkpoint(net):
-    '''load parameters when resuming from a checkpoint for training.'''
+    '''load parameters when resuming from a checkpoints for training.'''
     param_dict = load_checkpoint(config.checkpoint_file_path)
     if param_dict:
         if param_dict.get("epoch_num") and param_dict.get("step_num"):
@@ -114,7 +123,7 @@ def set_save_ckpt_dir():
     """set save ckpt dir"""
     ckpt_save_dir = os.path.join(config.output_path, config.checkpoint_path, config.source)
     if config.enable_modelarts and config.run_distribute:
-        ckpt_save_dir = ckpt_save_dir + "ckpt_" + str(get_rank_id()) + "/"
+        ckpt_save_dir = ckpt_save_dir + "ckpt_" + str(get_rank()) + "/"
     else:
         if config.run_distribute:
             ckpt_save_dir = ckpt_save_dir + "ckpt_" + str(get_rank()) + "/"
@@ -155,7 +164,7 @@ def modelarts_pre_process():
         sync_lock = "/tmp/unzip_sync.lock"
 
         # Each server contains 8 devices as most.
-        if get_device_id() % min(get_device_num(), 8) == 0 and not os.path.exists(sync_lock):
+        if get_rank() % min(get_device_num(), 8) == 0 and not os.path.exists(sync_lock):
             print("Zip file path: ", zip_file_1)
             print("Unzip file save dir: ", save_dir_1)
             unzip(zip_file_1, save_dir_1)
@@ -170,7 +179,7 @@ def modelarts_pre_process():
                 break
             time.sleep(1)
 
-        print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
+        print("Device: {}, Finish sync unzip data from {} to {}.".format(get_rank(), zip_file_1, save_dir_1))
 
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
@@ -178,6 +187,16 @@ def train_net():
     """train net"""
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
     device_num = get_device_num()
+    if config.device_target == "GPU":
+        context.set_context(enable_graph_kernel=True)
+        if device_num > 1:
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(device_num=device_num, parallel_mode='data_parallel',
+                                              gradients_mean=True)
+            init()
+            rank_id = get_rank()
+        else:
+            rank_id = 0
     if config.device_target == "Ascend":
         device_id = get_device_id()
         context.set_context(device_id=device_id)
@@ -186,6 +205,9 @@ def train_net():
             context.set_auto_parallel_context(device_num=device_num, parallel_mode='data_parallel',
                                               gradients_mean=True)
             init()
+            rank_id = get_rank()
+        else:
+            rank_id = 0
 
 
     num_classes, dataset1 = dataset_creator(root=config.data_path, height=config.height, width=config.width,
@@ -202,6 +224,7 @@ def train_net():
                                             cuhk03_classic_split=config.cuhk03_classic_split, mode='train')
     num_batches = dataset1.get_dataset_size()
 
+
     if config.checkpoint_file_path and check_isfile(config.checkpoint_file_path):
         fpath = osp.abspath(osp.expanduser(config.checkpoint_file_path))
         if not osp.exists(fpath):
@@ -216,7 +239,8 @@ def train_net():
     crit = CrossEntropyLoss(num_classes=num_classes, label_smooth=config.label_smooth)
     lr = init_lr(num_batches=num_batches)
     loss_scale = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
-    summary_collector = SummaryCollector(summary_dir='./summary_dir', collect_freq=1)
+    if config.LogSummary:
+        summary_collector = SummaryCollector(summary_dir='./summary_dir', collect_freq=1)
     time_cb = TimeMonitor(data_size=num_batches)
 
 
@@ -228,7 +252,10 @@ def train_net():
         model1 = Model(network=net, optimizer=opt1, loss_fn=crit, amp_level="O3",
                        loss_scale_manager=loss_scale)
         loss_cb1 = LossCallBack(has_trained_epoch=0)
-        cb1 = [time_cb, loss_cb1, summary_collector]
+        if config.LogSummary:
+            cb1 = [time_cb, loss_cb1, summary_collector]
+        else:
+            cb1 = [time_cb, loss_cb1]
         model1.train(config.fixbase_epoch, dataset1, cb1, dataset_sink_mode=True)
 
     loss_cb2 = LossCallBack(config.start_epoch)
@@ -238,9 +265,13 @@ def train_net():
                    weight_decay=config.weight_decay, loss_scale=config.loss_scale)
     model2 = Model(network=net, optimizer=opt2, loss_fn=crit, amp_level="O3",
                    loss_scale_manager=loss_scale)
-    cb2 = [time_cb, loss_cb2, summary_collector]
+    if config.LogSummary:
+        cb2 = [time_cb, loss_cb2, summary_collector]
+    else:
+        cb2 = [time_cb, loss_cb2]
+
     if config.save_checkpoint:
-        if not config.run_distribute or (config.run_distribute and get_device_id() % 8 == 0):
+        if not config.run_distribute or (config.run_distribute and rank_id % 8 == 0):
             ckpt_append_info = [{"epoch_num": config.start_epoch, "step_num": config.start_epoch}]
             config_ck = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_epochs * num_batches,
                                          keep_checkpoint_max=10, append_info=ckpt_append_info)

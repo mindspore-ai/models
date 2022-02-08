@@ -24,7 +24,7 @@ from mindspore import Tensor, load_checkpoint, load_param_into_net, export, cont
 
 
 from src.osnet import create_osnet
-from src.datasets_define import (Market1501, DukeMTMCreID, MSMT17, CUHK03)
+from src.datasets_define import Market1501, DukeMTMCreID, MSMT17, CUHK03
 from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper
 from model_utils.device_adapter import get_device_id
