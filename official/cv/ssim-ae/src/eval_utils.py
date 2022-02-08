@@ -175,7 +175,7 @@ class EvalCallBack(Callback):
             if os.path.exists(os.path.join(self.best_ckpt_path, "best.ckpt")):
                 os.remove(os.path.join(self.best_ckpt_path, "best.ckpt"))
 
-            os.mkdir(self.best_ckpt_path)
+            os.makedirs(self.best_ckpt_path, exist_ok=True)
             save_checkpoint(cb_params.train_network, os.path.join(self.best_ckpt_path, "best.ckpt"))
 
             print("update best result: {} in the {} th epoch".format(self.best_res, self.best_epoch), flush=True)
