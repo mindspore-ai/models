@@ -40,6 +40,7 @@ img_suffix: ".png"
 mask_suffix: ".png" # like "_mask"
 percent: 98.
 run_eval: False
+start_epoch: 100
 eval_epochs: [100, 150, 180, 185, 190, 195, 200]
 interval: 1000
 checkpoint_path: "./checkpoint/ssim_autocoder_none-200_78.ckpt"
