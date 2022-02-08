@@ -198,7 +198,7 @@ def train():
             else:
                 param_dict_new[key] = values
         load_param_into_net(network, param_dict_new)
-        config.logger.info('load model %s success', str(config.train_predtrained))
+        config.logger.info('load model %s success', str(config.train_pretrained))
 
     # lr scheduler
     lr_scheduler = get_lr_scheduler(config)
