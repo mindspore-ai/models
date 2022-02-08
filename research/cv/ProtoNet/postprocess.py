@@ -8,7 +8,7 @@ from loss_for_infer import calculate_loss
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--result_path', default=None, help='Location of result.')
-parser.add_argument('--label_classses_path', default=None, help='Location of label and classes.')
+parser.add_argument('--label_classes_path', default=None, help='Location of label and classes.')
 parser.add_argument('--classes_per_it_val', type=int,
                     help='number of random classes per episode for validation, default=5', default=5)
 parser.add_argument('--num_support_val', type=int,
@@ -28,8 +28,8 @@ def get_result(options):
         num = result_file_name.split('_')[1]
 
         result_file_path = options.result_path + os.sep + result_file_name
-        label_file_path = options.label_classses_path + os.sep + 'label_' + str(num)
-        classes_file_path = options.label_classses_path + os.sep + 'classes_' + str(num)
+        label_file_path = options.label_classes_path + os.sep + 'label_' + str(num)
+        classes_file_path = options.label_classes_path + os.sep + 'classes_' + str(num)
 
         output = np.fromfile(result_file_path, dtype=np.float32)
         label = np.fromfile(label_file_path, dtype=np.int32)
