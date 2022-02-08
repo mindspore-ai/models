@@ -41,14 +41,14 @@ def run_eval(cfg, checkpoint_path, dataset_name, data_dir, num_parallel_workers,
     session, input_name = create_session(checkpoint_path, target_device)
 
     if dataset_name == 'cifar10':
-        dataset = create_dataset_cifar10(cfg, data_dir, num_parallel_workers, batch_size,
-                                         status="test", target=target_device)
+        dataset = create_dataset_cifar10(cfg, data_dir, batch_size, status="test", target=target_device,
+                                         num_parallel_workers=num_parallel_workers)
         metrics = {
             'accuracy': nn.Accuracy(),
         }
     elif dataset_name == 'imagenet':
-        dataset = create_dataset_imagenet(cfg, data_dir, num_parallel_workers, batch_size,
-                                          training=False)
+        dataset = create_dataset_imagenet(cfg, data_dir, batch_size, training=False,
+                                          num_parallel_workers=num_parallel_workers)
         metrics = {
             'top-1 accuracy': nn.Top1CategoricalAccuracy(),
             'top-5 accuracy': nn.Top5CategoricalAccuracy(),

@@ -25,8 +25,8 @@ from mindspore.common import dtype as mstype
 from mindspore.communication.management import get_rank, get_group_size
 
 
-def create_dataset_cifar10(cfg, data_path, num_parallel_workers=8, batch_size=32,
-                           repeat_size=1, status="train", target="Ascend"):
+def create_dataset_cifar10(cfg, data_path, batch_size=32, repeat_size=1, status="train", target="Ascend",
+                           num_parallel_workers=8):
     """
     create dataset for train or test
     """
@@ -73,9 +73,8 @@ def create_dataset_cifar10(cfg, data_path, num_parallel_workers=8, batch_size=32
     return cifar_ds
 
 
-def create_dataset_imagenet(cfg, dataset_path, num_parallel_workers=16, batch_size=32,
-                            repeat_num=1, training=True, shuffle=None, sampler=None,
-                            class_indexing=None):
+def create_dataset_imagenet(cfg, dataset_path, batch_size=32, repeat_num=1, training=True,
+                            num_parallel_workers=16, shuffle=None, sampler=None, class_indexing=None):
     """
     create a train or eval imagenet2012 dataset for resnet50
 
@@ -99,7 +98,7 @@ def create_dataset_imagenet(cfg, dataset_path, num_parallel_workers=16, batch_si
             num_parallel_workers = cpu_count()
     else:
         ds.config.set_numa_enable(True)
-    data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers,
+    data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=4,
                                      shuffle=shuffle, sampler=sampler, class_indexing=class_indexing,
                                      num_shards=device_num, shard_id=rank_id)
 
