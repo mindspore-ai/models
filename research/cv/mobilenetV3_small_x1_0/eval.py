@@ -23,7 +23,7 @@ from mindspore.train.model import Model
 from mindspore.common import set_seed
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.dataset import create_dataset
-from src.config import config
+from src.config import config_ascend, config_gpu
 from src.loss import CrossEntropyWithLabelSmooth
 from src.mobilenetv3 import mobilenet_v3_small
 from argparser import arg_parser
@@ -32,6 +32,8 @@ from argparser import arg_parser
 if __name__ == '__main__':
     set_seed(1)
     args_opt = arg_parser()
+
+    config = config_ascend if args_opt.device_target == "Ascend" else config_gpu
 
     if args_opt.run_modelarts:
         import moxing as mox
