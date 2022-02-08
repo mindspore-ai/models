@@ -89,7 +89,7 @@ int main(int argc, char **argv) {
 
   auto decode = Decode();
   auto swapredblue = SwapRedBlue();
-  auto resize = Resize({128, 128});
+  auto resize = Resize({256, 256});
   auto normalize = Normalize({127.5, 127.5, 127.5}, {127.5, 127.5, 127.5});
   auto hwc2chw = HWC2CHW();
   Execute preprocess({decode, swapredblue, resize, normalize, hwc2chw});
@@ -141,7 +141,7 @@ int main(int argc, char **argv) {
   std::stringstream timeCost;
   timeCost << "NN inference cost average time: "<< average << " ms of infer_count " << infer_cnt << std::endl;
   std::cout << "NN inference cost average time: "<< average << "ms of infer_count " << infer_cnt << std::endl;
-  std::string file_name = "./time_Result" + std::string("/test_perform_static.txt");
+  std::string file_name = std::string("test_perform_static.txt");
   std::ofstream file_stream(file_name.c_str(), std::ios::trunc);
   file_stream << timeCost.str();
   file_stream.close();
