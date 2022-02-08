@@ -14,6 +14,7 @@
 # ============================================================================
 
 import os
+from decimal import Decimal
 import numpy as np
 import cv2
 from mindspore import nn
@@ -29,6 +30,7 @@ def calculate_TP_TN_FP_FN_pixel(ground_truth, predicted_mask):
     FP = np.sum(np.multiply((ground_truth != predicted_mask), predicted_mask == 1))
     FN = np.sum(np.multiply((ground_truth != predicted_mask), predicted_mask == 0))
     return TP, TN, FP, FN
+
 
 def calculate_TP_TN_FP_FN_image(ground_truth, predicted_mask):
     """Calculate image level confusion matrix, return TP, TN, FP, FN."""
@@ -47,6 +49,11 @@ def calculate_TP_TN_FP_FN_image(ground_truth, predicted_mask):
         else:
             FP = 1
     return TP, TN, FP, FN
+
+
+def round_acc(acc):
+    acc_around = Decimal(acc).quantize(Decimal("0.001"), rounding="ROUND_HALF_UP")
+    return acc_around
 
 
 def cal_metric(pred_list, gt_list, image_level=True):
@@ -76,7 +83,8 @@ def cal_metric(pred_list, gt_list, image_level=True):
         ACC_1 += (TP + TN)
         ACC_2 += (TP + TN + FP + FN)
     if image_level:
-        print("ok: {}, nok: {}, avg: {}".format(OK_1 / OK_2, NOK_1 / NOK_2, ACC_1 / ACC_2))
+        print("ok: {}, nok: {}, avg: {}".format(round_acc(OK_1 / OK_2), round_acc(NOK_1 / NOK_2),
+                                                round_acc(ACC_1 / ACC_2)))
         return ACC_1 / ACC_2
     y_pred = np.array(preds).flatten()
     y = np.array(gts).flatten()
@@ -85,7 +93,8 @@ def cal_metric(pred_list, gt_list, image_level=True):
     metric.update(y_pred, y)
     fpr, tpr, _ = metric.eval()
     auc = nn.auc(fpr, tpr)
-    print("AUC: {}, ok: {}, nok: {}, avg: {}".format(auc, OK_1 / OK_2, NOK_1 / NOK_2, ACC_1 / ACC_2))
+    print("AUC: {}, ok: {}, nok: {}, avg: {}".format(round_acc(auc), round_acc(OK_1 / OK_2),
+                                                     round_acc(NOK_1 / NOK_2), round_acc(ACC_1 / ACC_2)))
     return auc
 
 
@@ -107,6 +116,7 @@ def apply_eval(cfg):
         gt_list.append(gt_path)
     auc = cal_metric(pred_list, gt_list, cfg.image_level)
     return auc
+
 
 class EvalCallBack(Callback):
     """
@@ -143,7 +153,8 @@ class EvalCallBack(Callback):
         cb_params = run_context.original_args()
         current_epoch = cb_params.cur_epoch_num
         res = 0
-        if current_epoch % self.config.interval == 0 or current_epoch in self.config.eval_epochs:
+        if current_epoch > self.config.start_epoch and \
+                (current_epoch % self.config.interval == 0 or current_epoch in self.config.eval_epochs):
             ori_save_dir = self.config.save_dir
             self.config.save_dir = os.path.join(self.config.save_dir, str(current_epoch))
             if not os.path.exists(self.config.save_dir):
