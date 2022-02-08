@@ -34,7 +34,7 @@ from mindspore import export
 
 from src.dataset import create_dataset
 from src.lr_generator import get_lr
-from src.config import config
+from src.config import config_ascend as config
 from src.loss import CrossEntropyWithLabelSmooth
 from src.monitor import Monitor
 from src.mobilenetv3 import mobilenet_v3_small

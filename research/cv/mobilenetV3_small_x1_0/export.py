@@ -19,7 +19,7 @@ mobilenetv3_small export.
 import argparse
 import numpy as np
 from mindspore import context, Tensor, load_checkpoint, load_param_into_net, export
-from src.config import config
+from src.config import config_ascend as config
 from src.mobilenetv3 import mobilenet_v3_small
 
 
