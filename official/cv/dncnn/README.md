@@ -1,25 +1,40 @@
+# 目录
 
-### 目录
+- [目录](#目录)
+    - [DnCNN描述](#DnCNN描述)
+    - [模型架构](#模型架构)
+    - [数据集](#数据集)
+    - [环境要求](#环境要求)
+    - [快速入门](#快速入门)
+    - [脚本说明](#脚本说明)
+    - [训练过程](#训练过程)
+        - [训练参数](#训练参数)
+        - [默认训练参数](#默认训练参数)
+        - [训练](#训练)
+    - [评估过程](#评估过程)
+    - [模型描述](#模型描述)
+        - [训练准确率结果](#训练准确率结果)
+        - [训练性能结果](#训练性能结果)
 
-[TOC]
+<!-- /TOC -->
 
-### DnCNN描述
+## DnCNN描述
 
 DnCNN是一个使用FCN处理图像降噪任务的模型， 本项目是图像去躁模型DnCNN在mindspore上的复现。
 论文\: Zhang, K., Zuo, W., Chen, Y., Meng, D., & Zhang, L. (2017). Beyond a gaussian denoiser: Residual learning of deep cnn for image denoising. IEEE transactions on image processing, 26(7), 3142-3155.
 
-### 模型结构
+## 模型结构
 
 网络由N层convolution block组成。其中第一层是conv加reLU，中间n-2层是conv+BN+ReLU，最后一层是单独的conv
 
-### 数据集
+## 数据集
 
 训练集DnCNN-S、DnCNN-B使用BSD500中的400张图片
 DnCNN-3使用BSD500中的200张图片和T91中的91张图片
 
 测试集包括BDS68，Set5， Set14， clasic5， live1等
 
-### 环境要求
+## 环境要求
 
 mindspore=1.1
 skimage=0.18.1
@@ -28,7 +43,7 @@ PIL
 opencv
 argparse
 
-### 快速入门
+## 快速入门
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
@@ -44,7 +59,7 @@ python eval.py --dataset_path=/path/to/test/data --ckpt_path=./ckpt/DnCNN-S-50_1
 bash ./scripts/run_eval_gpu.sh /path/to/test/data ./ckpt/DnCNN-S-50_1800.ckpt DnCNN-S 25 denoise
 ```
 
-### 脚本说明
+## 脚本说明
 
 ├── readme.md
 ├── scripts
@@ -57,11 +72,11 @@ bash ./scripts/run_eval_gpu.sh /path/to/test/data ./ckpt/DnCNN-S-50_1800.ckpt Dn
 ├── export.py //导出模型
 └── train.py  //训练脚本
 
-### 训练过程
+## 训练过程
 
 可通过`train.py`脚本中的参数修改训练行为。`train.py`脚本中的参数如下：
 
-#### 训练参数
+### 训练参数
 
 --dataset_path 训练数据路径
 --model_type 模型类型 = ['DnCNN-S', 'DnCNN-B', 'DnCNN-3']
@@ -71,7 +86,7 @@ bash ./scripts/run_eval_gpu.sh /path/to/test/data ./ckpt/DnCNN-S-50_1800.ckpt Dn
 --lr 学习率
 --epoch_num 轮次数
 
-#### 默认训练参数
+### 默认训练参数
 
 optimizer=adam
 learning rate=0.001
@@ -79,7 +94,7 @@ batch_size=128
 weight_decay=0.0001
 epoch=50
 
-#### 训练
+### 训练
 
 只有DnCNN-S 需要指定noise_level
 
@@ -91,7 +106,7 @@ python train.py --dataset_path=/path/to/training/data --model_type=DnCNN-3 --ckp
 
 在ckpt文件夹下保存检查点
 
-### 评估过程
+## 评估过程
 
 评估需要通过命令行提供以下参数：
 --dataset_path 数据路径
@@ -106,9 +121,9 @@ ex:
 python eval.py --dataset_path=/path/to/test/data --ckpt_path=./ckpt/DnCNN-B-50_3000.ckpt --model_type=DnCNN-B --noise_level=50 --noise_type=denoise
 ```
 
-### 模型描述
+## 模型描述
 
-#### 训练准确率结果
+### 训练准确率结果
 
 | 参数          | GPU                                                      |
 | ------------- | -------------------------------------------------------- |
@@ -120,7 +135,7 @@ python eval.py --dataset_path=/path/to/test/data --ckpt_path=./ckpt/DnCNN-B-50_3
 | 输出          | noise残差                                                |
 | 性能          | 在BSD68测试，PSNR=32.92(σ=15)， 31.73(σ=25)，30.59(σ=50) |
 
-#### 训练性能结果
+### 训练性能结果
 
 | 参数          | GPU                                |
 | ------------- | ---------------------------------- |
