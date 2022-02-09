@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,11 +46,20 @@ def train_dlrm():
     if config.rank_size > 1:
         if config.device_target == 'Ascend':
             device_id = int(os.getenv('DEVICE_ID'))
+            rank_id = int(os.environ.get('RANK_ID'))
             context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=device_id)
             context.reset_auto_parallel_context()
             context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
             init()
-            rank_id = int(os.environ.get('RANK_ID'))
+        elif config.device_target == "GPU":
+            device_num = int(os.getenv("RANK_SIZE"))
+            context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False)
+            init("nccl")
+            context.reset_auto_parallel_context()
+            rank_id = get_rank()
+            context.set_auto_parallel_context(device_num=device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
         else:
             print("Unsupported device_target", config.device_targe)
 
@@ -75,7 +84,8 @@ def train_dlrm():
     )
 
 
-    steps_size = ds_train.get_batch_size()
+    steps_size = ds_train.get_dataset_size()
+    print(steps_size)
 
     if config.convert_dtype:
         config.convert_dtype = config.device_target != 'CPU'
@@ -93,12 +103,9 @@ def train_dlrm():
         if config.rank_size:
             config.ckpt_file_name_prefix = config.ckpt_file_name_prefix + str(get_rank())
             config.ckpt_path = os.path.join(config.ckpt_path, 'ckpt_' + str(get_rank()) + '/')
-        if config.device_target != "Ascend":
-            config_ck = CheckpointConfig(save_checkpoint_steps=steps_size,
-                                         keep_checkpoint_max=config.keep_checkpoint_max)
-        else:
-            config_ck = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_steps,
-                                         keep_checkpoint_max=config.keep_checkpoint_max)
+
+        config_ck = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_steps,
+                                     keep_checkpoint_max=config.keep_checkpoint_max)
         ckpt_cb = ModelCheckpoint(prefix=config.ckpt_file_name_prefix,
                                   directory=config.ckpt_path,
                                   config=config_ck)
@@ -111,8 +118,13 @@ def train_dlrm():
                                  line_per_sample=1)
         eval_callback = EvalCallBack(model, ds_eval, acc_metric, eval_file_path=config.eval_file_name)
         callback_list.append(eval_callback)
-
-    model.train(config.train_epochs, ds_train, callbacks=callback_list)
-
+    if config.device_target == 'GPU':
+        model.train(config.train_epochs,
+                    ds_train,
+                    callbacks=callback_list,
+                    sink_size=steps_size,
+                    dataset_sink_mode=False)
+    else:
+        model.train(config.train_epochs, ds_train, callbacks=callback_list)
 if __name__ == '__main__':
     train_dlrm()

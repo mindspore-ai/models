@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,24 +14,27 @@
 # limitations under the License.
 # ============================================================================
 echo "Please run the script as: "
-echo "bash scripts/run_eval.sh DEVICE_ID DEVICE_TARGET DATASET_PATH CHECKPOINT_PATH"
-echo "for example: bash scripts/run_eval.sh 0 Ascend /dataset_path /checkpoint_path"
-echo "After running the script, the network runs in the background, The log will be generated in ms_log/eval_output.log"
+echo "bash scripts/run_eval_gpu.sh DEVICE_ID DEVICE_TARGET DATASET_PATH CHECKPOINT_PATH"
+echo "for example: bash scripts/run_eval_gpu.sh 0 GPU /dataset_path /checkpoint_path"
+echo "After running the script, the network runs in the background, The log will be generated in eval_output.log"
 
-export DEVICE_ID=$1
+if [ $# -lt 4 ]; then
+  echo "Usage: bash scripts/run_eval_gpu.sh DEVICE_ID DEVICE_TARGET DATASET_PATH CHECKPOINT_PATH"
+  exit 1
+fi
+
+export CUDA_VISIBLE_DEVICES=$1
 DEVICE_TARGET=$2
 DATA_URL=$3
 CHECKPOINT_PATH=$4
 
-mkdir -p ms_log
-
-if [ ! -d "${CHECKPOINT_PATH}" ] || [ ! -d "${DATA_URL}" ]; then
+if [ ! -f "${CHECKPOINT_PATH}" ] || [ ! -d "${DATA_URL}" ]; then
   echo "File or path not exists"
   exit 1
 fi
 
-
 python -u eval.py \
+    --config_path=gpu_config.yaml \
     --dataset_path=$DATA_URL \
     --checkpoint_path=$CHECKPOINT_PATH \
-    --device_target=$DEVICE_TARGET > ms_log/eval_output.log 2>&1 &
+    --device_target=$DEVICE_TARGET > eval_output.log 2>&1 &

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -156,8 +156,8 @@ def random_split_trans2mindrecord(input_file_path, output_file_path, recommendat
     wts_list = []
     label_list = []
 
-    writer_train = FileWriter(os.path.join(output_file_path, "train_input_part.mindrecord"), 21)
-    writer_test = FileWriter(os.path.join(output_file_path, "test_input_part.mindrecord"), 3)
+    writer_train = FileWriter(os.path.join(output_file_path, "train_input_part.mindrecord"), 210) #21
+    writer_test = FileWriter(os.path.join(output_file_path, "test_input_part.mindrecord"), 30) #3
 
     schema = {"label": {"type": "float32", "shape": [-1]}, "feat_vals": {"type": "float32", "shape": [-1]},
               "feat_ids": {"type": "int32", "shape": [-1]}}
