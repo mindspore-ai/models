@@ -8,6 +8,7 @@
 - [BERT概述](#bert概述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
+- [预训练模型](#预训练模型)
 - [环境要求](#环境要求)
 - [快速入门](#快速入门)
     - [脚本说明](#脚本说明)
@@ -27,6 +28,7 @@
         - [用法](#用法-1)
             - [Ascend处理器上运行后评估cola数据集](#ascend处理器上运行后评估cola数据集)
             - [Ascend处理器上运行后评估cluener数据集](#ascend处理器上运行后评估cluener数据集)
+            - [Ascend处理器上运行后评估chineseNer数据集](#ascend处理器上运行后评估chinesener数据集)
             - [Ascend处理器上运行后评估msra数据集](#ascend处理器上运行后评估msra数据集)
             - [Ascend处理器上运行后评估squad v1.1数据集](#ascend处理器上运行后评估squad-v11数据集)
     - [导出mindir模型](#导出mindir模型)
@@ -63,10 +65,19 @@ BERT的主干结构为Transformer。对于BERT_base，Transformer包含12个编�
     - 使用[WikiExtractor](https://github.com/attardi/wikiextractor)提取和整理数据集中的文本，使用步骤如下：
         - pip install wikiextractor
         - python -m wikiextractor.WikiExtractor -o <output file path> -b <output file size> <Wikipedia dump file>
-    - `WikiExtarctor`提取出来的原始文本并不能直接使用，还需要将数据集预处理并转换为TFRecord格式。详见[BERT](https://github.com/google-research/bert)代码仓中的create_pretraining_data.py文件，同时下载对应的vocab.txt文件, 如果出现AttributeError: module 'tokenization' has no attribute 'FullTokenizer’，请安装bert-tensorflow。
+    - `WikiExtarctor`提取出来的原始文本并不能直接使用，还需要将数据集预处理并转换为TFRecord格式。详见[BERT](https://github.com/google-research/bert#pre-training-with-bert)代码仓中的create_pretraining_data.py文件，同时下载对应的vocab.txt文件, 如果出现AttributeError: module 'tokenization' has no attribute 'FullTokenizer’，请安装bert-tensorflow。
 - 生成下游任务数据集
-    - 下载数据集进行微调和评估，如[CLUENER](https://github.com/CLUEbenchmark/CLUENER2020)、[TNEWS](https://github.com/CLUEbenchmark/CLUE)、[ChineseNER](https://github.com/zjy-ucas/ChineseNER)、[SQuAD v1.1训练集](https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json)、[SQuAD v1.1验证集](https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json)等。
+    - 下载数据集进行微调和评估，如中文实体识别任务[CLUENER](https://github.com/CLUEbenchmark/CLUENER2020)、中文文本分类任务[TNEWS](https://github.com/CLUEbenchmark/CLUE)、中文实体识别任务[ChineseNER](https://github.com/zjy-ucas/ChineseNER)、英文问答任务[SQuAD v1.1训练集](https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json)、[SQuAD v1.1验证集](https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json)、英文分类任务集合[GLUE](https://gluebenchmark.com/tasks)等。
     - 将数据集文件从JSON格式转换为TFRecord格式。详见[BERT](https://github.com/google-research/bert)代码仓中的run_classifier.py或run_squad.py文件。
+
+# 预训练模型
+
+我们提供了一些预训练权重以供使用
+
+- [Bert-base-zh](https://download.mindspore.cn/model_zoo/r1.3/bert_base_ascend_v130_zhwiki_official_nlp_bs256_acc91.72_recall95.06_F1score93.36/), 在128句长的中文wiki数据集上进行了训练
+- [Bert-base-en](https://download.mindspore.cn/model_zoo/r1.3/bert_base_ascend_v130_en-wiki_official_nlp_bs256_loss1.50/), 在128句长的英文wiki数据集上进行了训练
+- [Bert-large-zh](https://download.mindspore.cn/model_zoo/r1.3/bert_large_ascend_v130_zhwiki_official_nlp_bs3072_loss0.8/), 在128句长的中文wiki数据集上进行了训练
+- [Bert-large-en](https://download.mindspore.cn/model_zoo/r1.3/bert_large_ascend_v130_enwiki_official_nlp_bs768_loss1.1/), 在512句长的英文wiki数据集上进行了训练
 
 # 环境要求
 
@@ -865,3 +876,7 @@ run_pretrain.py中设置了随机种子，确保分布式训练中每个节点�
 - **Q: 运行过程中报错Gather算子错误是什么问题？**
 
   **A**： Bert模型中的使用Gather算子完成embedding操作，操作会根据输入数据的值来映射字典表，字典表的大小由配置文件中的`vocab_size`来决定，当实际使用的数据集编码时使用的字典表大小超过配置的大小时，操作gather算子时就会发出越界访问的错误，从而Gather算子会报错中止程序。
+
+- **Q: 修改了yaml文件中的配置，为什么没有效果？**
+
+  **A**：实际运行的参数，由`yaml`文件和`命令行参数`共同控制，使用`ascend_dsitributed_launcher`的情况下，也会受`ini`配置文件的影响。起作用的优先级是**bash参数 > ini文件参数 > yaml文件参数**。
