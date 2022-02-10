@@ -292,17 +292,17 @@ top1_correct=8888, total=10202, acc=87.12%
 ### Evaluation Performance
 
 | Parameters                 | Ascend                                                      |
-| -------------------------- | ------------------------------------------------------------|
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8             |
+| -------------------------- |-------------------------------------------------------------|
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 |
 | uploaded Date              | 01/15/2021 (month/day/year)                                 |
-| MindSpore Version          | 1.1                                                  |
-| Dataset                    | FSNS                                                   |
-| Training Parameters        | epoch=1, steps=104,477, batch_size = 20, lr=1e-07             |
-| Optimizer                  | Adam                                                    |
+| MindSpore Version          | 1.1                                                         |
+| Dataset                    | FSNS                                                        |
+| Training Parameters        | epoch=5, steps=104,477, batch_size = 40, lr=5e-4            |
+| Optimizer                  | Adam                                                        |
 | Loss Function              | Softmax Cross Entropy                                       |
-| outputs                    | top 1 accuracy                                                 |
-| Overall accuracy                       | 91.72%                                              |
-| Speed                      | 583 ms/step                                                  |
+| outputs                    | top 1 accuracy                                              |
+| Overall accuracy                       | 91.72%                                                      |
+| Speed                      | 583 ms/step                                                 |
 | Total time                 | 17 hours                                                    |
 
 # [Description of Random Situation](#contents)

@@ -28,7 +28,7 @@ mindrecord_dir: ""
 # training options
 dataset_name: "fsns"
 batch_size: 8
-epoch_size: 1
+epoch_size: 5
 pretrain_epoch_size: 0
 save_checkpoint: True
 save_checkpoint_steps: 2500
