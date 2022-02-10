@@ -6,6 +6,7 @@
 - [BERT Description](#bert-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
+- [Pretrained models](#pretrained-models)
 - [Environment Requirements](#environment-requirements)
 - [Quick Start](#quick-start)
 - [Script Description](#script-description)
@@ -27,6 +28,7 @@
         - [Evaluation](#evaluation)
             - [evaluation on cola dataset when running on Ascend](#evaluation-on-cola-dataset-when-running-on-ascend)
             - [evaluation on cluener dataset when running on Ascend](#evaluation-on-cluener-dataset-when-running-on-ascend)
+            - [evaluation on chineseNer dataset when running on Ascend](#evaluation-on-chinesener-dataset-when-running-on-ascend)
             - [evaluation on msra dataset when running on Ascend](#evaluation-on-msra-dataset-when-running-on-ascend)
             - [evaluation on squad v1.1 dataset when running on Ascend](#evaluation-on-squad-v11-dataset-when-running-on-ascend)
         - [Export MindIR](#export-mindir)
@@ -61,10 +63,19 @@ The backbone structure of BERT is transformer. For BERT_base, the transformer co
     - Extract and refine texts in the dataset with [WikiExtractor](https://github.com/attardi/wikiextractor). The commands are as follows:
         - pip install wikiextractor
         - python -m wikiextractor.WikiExtractor -o <output file path> -b <output file size> <Wikipedia dump file>
-    - Extracted text data from `WikiExtractor` cannot be trained directly, you have to preprocess the data and convert the dataset to TFRecord format. Please refer to create_pretraining_data.py file in [BERT](https://github.com/google-research/bert) repository and download vocab.txt here, if AttributeError: module 'tokenization' has no attribute 'FullTokenizer' occur, please install bert-tensorflow.
+    - Extracted text data from `WikiExtractor` cannot be trained directly, you have to preprocess the data and convert the dataset to TFRecord format. Please refer to create_pretraining_data.py file in [BERT](https://github.com/google-research/bert#pre-training-with-bert) repository and download vocab.txt here, if AttributeError: module 'tokenization' has no attribute 'FullTokenizer' occur, please install bert-tensorflow.
 - Create fine-tune dataset
-    - Download dataset for fine-tuning and evaluation such as [CLUENER](https://github.com/CLUEbenchmark/CLUENER2020), [TNEWS](https://github.com/CLUEbenchmark/CLUE), [ChineseNER](https://github.com/zjy-ucas/ChineseNER), [SQuAD v1.1 train dataset](https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json), [SQuAD v1.1 eval dataset](https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json), etc.
+    - Download dataset for fine-tuning and evaluation such as Chinese Named Entity Recognition[CLUENER](https://github.com/CLUEbenchmark/CLUENER2020), Chinese sentences classification[TNEWS](https://github.com/CLUEbenchmark/CLUE), Chinese Named Entity Recognition[ChineseNER](https://github.com/zjy-ucas/ChineseNER), English question and answering[SQuAD v1.1 train dataset](https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json), [SQuAD v1.1 eval dataset](https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json), package of English sentences classification[GLUE](https://gluebenchmark.com/tasks).
     - We haven't provide the scripts to create tfrecord yet, while converting dataset files from JSON format to TFRECORD format, please refer to run_classifier.py or run_squad.py file in [BERT](https://github.com/google-research/bert) repository or the CLUE official repository [CLUE](https://github.com/CLUEbenchmark/CLUE/blob/master/baselines/models/bert/run_classifier.py) and [CLUENER](https://github.com/CLUEbenchmark/CLUENER2020/tree/master/tf_version)
+
+# [Pretrained models](#contents)
+
+We have provided several kinds of pretrained checkpoint.
+
+- [Bert-base-zh](https://download.mindspore.cn/model_zoo/r1.3/bert_base_ascend_v130_zhwiki_official_nlp_bs256_acc91.72_recall95.06_F1score93.36/), trained on zh-wiki datasets with 128 length.
+- [Bert-base-en](https://download.mindspore.cn/model_zoo/r1.3/bert_base_ascend_v130_en-wiki_official_nlp_bs256_loss1.50/), trained on en-wiki datasets with 128 length.
+- [Bert-large-zh](https://download.mindspore.cn/model_zoo/r1.3/bert_large_ascend_v130_zhwiki_official_nlp_bs3072_loss0.8/), trained on zh-wiki datasets with 128 length.
+- [Bert-large-en](https://download.mindspore.cn/model_zoo/r1.3/bert_large_ascend_v130_enwiki_official_nlp_bs768_loss1.1/), tarined on en-wiki datasets with 512 length.
 
 # [Environment Requirements](#contents)
 
@@ -892,3 +903,7 @@ Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some com
 - **Q: Why the training process failed with error about operator `Gather`?**
 
   **A**: Bert use operator `Gather` for embedding. The size of vocab is configured by `vocab_size` in yaml config file. If the vocab used to construct the dataset is larger than config, the operator will failed for the violation access.
+
+- **Q: Why the modification in yaml config file doesn't take effect?**
+
+  **A**: Configuration is defined by both `yaml` file and `command line arguments`, additionally with the `ini` file if you are using `ascend_distributed_launcher`. The priority of these configuration is **command line arguments > ini file > yaml file**.
