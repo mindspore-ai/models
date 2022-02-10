@@ -1,0 +1,53 @@
+# ==============================================================================
+# Hyper-parameters
+n_color: 3
+device_target: "Ascend"
+
+# Dataset settings
+train_path: "data/DUTS-TR"
+test_path: "data"
+
+# Training settings
+train_online: False
+online_train_path: ""
+online_pretrained_path: ""
+train_url: ""
+is_distributed: False
+base_model: "vgg" # ['resnet','vgg']
+pretrained_url: "pretrained"
+vgg: "pretrained/vgg_pretrained.ckpt"
+resnet: "pretrained/resnet_pretrained.ckpt"
+epoch: 30
+batch_size: 1
+num_thread: 4
+save_fold: "EGNet"
+train_save_name: "nnet"
+epoch_save: 1
+epoch_show: 1
+pre_trained: ""
+start_epoch: 1
+n_ave_grad: 10
+show_every: 10
+save_tmp: 200
+loss_scale: 1
+
+# Testing settings
+eval_online: False
+online_eval_path: ""
+online_ckpt_path: ""
+model: "EGNet/run-nnet/models/final_vgg_bone.ckpt"
+test_fold: "result"
+test_save_name: "EGNet_"
+test_mode: 1
+sal_mode: "t" # ['e','t','d','h','p','s']
+test_batch_size: 1
+
+# Misc
+mode: "train" # ['train','test']
+visdom: False
+
+# Export settings
+file_name: "EGNet"
+file_format: "MINDIR"
+ckpt_file: ""
+
