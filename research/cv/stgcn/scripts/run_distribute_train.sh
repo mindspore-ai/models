@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 4 ]; then
+if [ $# != 5 ]; then
   echo "Usage: sh run_distribute_train.sh [train_code_path][data_path][n_pred][graph_conv_type] [rank_table]"
   exit 1
 fi
