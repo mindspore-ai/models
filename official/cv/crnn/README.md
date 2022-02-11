@@ -19,6 +19,7 @@
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
         - [Evaluation while training](#evaluation-while-training)
+        - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
@@ -159,6 +160,7 @@ crnn
 │   ├── run_distribute_train.sh                 # Launch distributed training in Ascend or GPU(8 pcs)
 │   ├── run_eval.sh                             # Launch evaluation in Ascend or GPU
 │   └── run_standalone_train.sh                 # Launch standalone training in Ascend or GPU(1 pcs)
+│   └── run_eval_onnx.sh                        # Eval ONNX model
 ├── src
 │   ├── model_utils
 │       ├── config.py                           # Parameter config
@@ -168,7 +170,7 @@ crnn
 │   ├── crnn.py                                 # crnn network definition
 │   ├── crnn_for_train.py                       # crnn network with grad, loss and gradient clip
 │   ├── dataset.py                              # Data preprocessing for training and evaluation
-│   ├── eval_callback.py  
+│   ├── eval_callback.py
 │   ├── ic03_dataset.py                         # Data preprocessing for IC03
 │   ├── ic13_dataset.py                         # Data preprocessing for IC13
 │   ├── iiit5k_dataset.py                       # Data preprocessing for IIIT5K
@@ -177,6 +179,7 @@ crnn
 │   └── svt_dataset.py                          # Data preprocessing for SVT
 └── train.py                                    # Training script
 ├── eval.py                                     # Evaluation Script
+├── eval_onnx.py                                # Evaluation Script for ONNX model
 ├── default_config.yaml                         # config file
 
 ```
@@ -340,6 +343,27 @@ result: {'CRNNAccuracy': (0.806)}
 ### Evaluation while training
 
 You can add `run_eval` to start shell and set it True.You need also add `eval_dataset` to select which dataset to eval, and add eval_dataset_path to start shell if you want evaluation while training. And you can set argument option: `save_best_ckpt`, `eval_start_epoch`, `eval_interval` when `run_eval` is True.
+
+### [ONNX Evaluation](#contents)
+
+- Export your model to ONNX:
+
+  ```shell
+  python export.py --device_target GPU --ckpt_file /path/to/deeptext.ckpt --file_name crnn.onnx --file_format ONNX --model_version V2
+  ```
+
+- Run ONNX evaluation script:
+
+  ```shell
+  bash scripts/run_eval_onnx.sh [DATASET_NAME] [DATASET_PATH] [ONNX_MODEL] [DEVICE_TARGET]
+  ```
+
+  The results of evaluation will be saved in log.txt file and have the following form:
+
+  ```text
+  correct num:  2392 , total num:  3000
+  result: 0.7973333333333333
+  ```
 
 ## [Inference Process](#contents)
 
