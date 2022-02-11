@@ -16,7 +16,14 @@
 
 |  领域 | 子领域  | 网络   | Ascend | GPU | CPU |
 |:----  |:-------  |:----   |:----:    |:----: |:----: |
-|计算机视觉（CV） | 图像分类（Image Classification）  | [AlexNet](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet)   |  ✅ |  ✅ |  |
+| 音频（Audio) | 音频合成（Speech Synthesis) | [LPCNet](https://gitee.com/mindspore/models/tree/master/official/audio/lpcnet) | ✅ |   |   |
+| 音频（Audio) | 音频合成（Speech Synthesis) | [MelGAN](https://gitee.com/mindspore/models/tree/master/official/audio/melgan) | ✅ |   |   |
+| 音频（Audio) | 音频合成（Speech Synthesis) | [Tacotron2](https://gitee.com/mindspore/models/tree/master/official/audio/tacotron2) | ✅ |   |   |
+| 计算机视觉（CV） | 点云模型（Point Cloud Model） | [OctSqueeze](https://gitee.com/mindspore/models/tree/master/official/cv/octsqueeze) | ✅ |   |   |
+| 计算机视觉（CV） | 光流估计（Optical Flow Estimation） | [PWCNet](https://gitee.com/mindspore/models/tree/master/official/cv/pwcnet) | ✅ |   |   |
+| 计算机视觉（CV） | 目标跟踪（Object Tracking） | [Deepsort](https://gitee.com/mindspore/models/tree/master/official/cv/Deepsort) | ✅ |   |   |
+| 计算机视觉（CV） | 目标跟踪（Object Tracking） | [ADNet](https://gitee.com/mindspore/models/tree/master/official/cv/ADNet) | ✅ |   |   |
+| 计算机视觉（CV） | 图像分类（Image Classification） | [AlexNet](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet)   |  ✅ |  ✅ |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [CNN](https://gitee.com/mindspore/models/tree/master/official/cv/cnn_direction_model)  |  ✅ |   |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [DenseNet100](https://gitee.com/mindspore/models/tree/master/official/cv/densenet) |   |   | ✅ |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [DenseNet121](https://gitee.com/mindspore/models/tree/master/official/cv/densenet) |  ✅ |   |  |
@@ -31,25 +38,32 @@
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [MobileNetV2](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv2)        |  ✅ |  ✅ | ✅ |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [MobileNetV2（量化）](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv2_quant)        |  ✅ |  ✅ |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [MobileNetV3](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv3)        |   |  ✅ |  |
-| 计算机视觉（CV）  | 图像分类（Image Classification）  | [NASNet](https://gitee.com/mindspore/models/tree/master/official/cv/nasnet) |   |  ✅ |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [NASNet](https://gitee.com/mindspore/models/tree/master/official/cv/nasnet) | ✅ |  ✅ |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-18](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)   |  ✅ |   |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-34](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)   |  ✅ |   |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)   |  ✅ |  ✅ | ✅ |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-50（量化）](https://gitee.com/mindspore/models/tree/master/official/cv/resnet50_quant)   |  ✅ |   |  |
 |计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-101](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)        |  ✅ | ✅ |  |
+|计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-152](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)        |  ✅ |   |  |
 |计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNeXt50](https://gitee.com/mindspore/models/tree/master/official/cv/resnext)    |  ✅ | ✅ |  |
+|计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNeXt101](https://gitee.com/mindspore/models/tree/master/official/cv/resnext)    |  ✅ |   |  |
 |计算机视觉（CV）  | 图像分类（Image Classification）  | [SE-ResNet50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)       |  ✅ |  |  |
+|计算机视觉（CV）  | 图像分类（Image Classification）  | [SE-ResNext50](https://gitee.com/mindspore/models/tree/master/official/cv/SE_ResNeXt50)       |  ✅ |  |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [ShuffleNetV1](https://gitee.com/mindspore/models/tree/master/official/cv/shufflenetv1)        |  ✅ |   |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [ShuffleNetV2](https://gitee.com/mindspore/models/tree/master/official/cv/shufflenetv2) |   |  ✅ |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  |[SqueezeNet](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) |  ✅ |   |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [Tiny-DarkNet](https://gitee.com/mindspore/models/tree/master/official/cv/tinydarknet)  |  ✅ |   |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [VGG16](https://gitee.com/mindspore/models/tree/master/official/cv/vgg16)  |  ✅ |  ✅ |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [Xception](https://gitee.com/mindspore/models/tree/master/official/cv/xception) |  ✅ |   |  |
+| 计算机视觉（CV）  | 图像分类（Image Classification） | [CspDarkNet53](https://gitee.com/mindspore/models/tree/master/official/cv/cspdarknet53) | ✅ |   |   |
+| 计算机视觉（CV）  | 图像分类（Image Classification） | [ErfNet](https://gitee.com/mindspore/models/tree/master/official/cv/erfnet) | ✅ |   |   |
+| 计算机视觉（CV）  | 图像分类（Image Classification） | [SimCLR](https://gitee.com/mindspore/models/tree/master/official/cv/simclr) | ✅ |   |   |
+| 计算机视觉（CV）  | 图像分类（Image Classification） | [Vit](https://gitee.com/mindspore/models/tree/master/official/cv/vit) | ✅ |   |   |
 | 计算机视觉（CV） | 目标检测（Object Detection）  | [CenterFace](https://gitee.com/mindspore/models/tree/master/official/cv/centerface)     |  ✅ |   |  |
 | 计算机视觉（CV） | 目标检测（Object Detection）  | [CTPN](https://gitee.com/mindspore/models/tree/master/official/cv/ctpn)     |  ✅ |   |  |
 | 计算机视觉（CV）  | 目标检测（Object Detection）  | [Faster R-CNN](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn)  |  ✅ |  ✅ |  |
 | 计算机视觉（CV）  | 目标检测（Object Detection）  | [Mask R-CNN](https://gitee.com/mindspore/models/tree/master/official/cv/maskrcnn)  |  ✅ |   |  |
 | 计算机视觉（CV） | 目标检测（Object Detection）  |[Mask R-CNN (MobileNetV1)](https://gitee.com/mindspore/models/tree/master/official/cv/maskrcnn_mobilenetv1)         |  ✅ |   |  |
-| 计算机视觉（CV） | 目标检测（Object Detection）  | [RetinaFace-ResNet50](https://gitee.com/mindspore/models/tree/master/official/cv/retinaface_resnet50)   |   |  ✅ |  |
 | 计算机视觉（CV）  | 目标检测（Object Detection）  | [SSD](https://gitee.com/mindspore/models/tree/master/official/cv/ssd)                   |  ✅ | ✅ | ✅ |
 | 计算机视觉（CV）  | 目标检测（Object Detection）  | [SSD-MobileNetV1-FPN](https://gitee.com/mindspore/models/tree/master/official/cv/ssd)         |  ✅ |   |  |
 | 计算机视觉（CV）  | 目标检测（Object Detection）  | [SSD-Resnet50-FPN](https://gitee.com/mindspore/models/tree/master/official/cv/ssd)                   |  ✅ |  |  |
@@ -59,16 +73,40 @@
 | 计算机视觉（CV）  | 目标检测（Object Detection）  | [YOLOv3-DarkNet53](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53)   |  ✅ |  ✅ |  |
 | 计算机视觉（CV）  | 目标检测（Object Detection）  | [YOLOv3-DarkNet53（量化）](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53_quant)   |  ✅ |   |  |
 | 计算机视觉（CV） | 目标检测（Object Detection）  |[YOLOv4](https://gitee.com/mindspore/models/tree/master/official/cv/yolov4)         |  ✅ |   |  |
+| 计算机视觉（CV） | 目标检测（Object Detection）  |[YOLOv5](https://gitee.com/mindspore/models/tree/master/official/cv/yolov5) | ✅ |   |   |
+| 计算机视觉（CV） | 目标检测（Object Detection）  |[RetinaNet](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) | ✅ |   |   |
 | 计算机视觉（CV） | 文本检测（Text Detection）  | [DeepText](https://gitee.com/mindspore/models/tree/master/official/cv/deeptext)                |  ✅ |   |  |
 | 计算机视觉（CV） | 文本检测（Text Detection）  | [PSENet](https://gitee.com/mindspore/models/tree/master/official/cv/psenet)                |  ✅ |   |  |
 | 计算机视觉（CV） | 文本识别（Text Recognition）  | [CNN+CTC](https://gitee.com/mindspore/models/tree/master/official/cv/cnnctc)                |  ✅ |   |  |
 | 计算机视觉（CV） | 语义分割（Semantic Segmentation）  | [DeepLabV3](https://gitee.com/mindspore/models/tree/master/official/cv/deeplabv3)   |  ✅ |   | ✅ |
+| 计算机视觉（CV） | 语义分割（Semantic Segmentation）  | [DeepLabV3+](https://gitee.com/mindspore/models/tree/master/official/cv/deeplabv3plus)   |  ✅ |   |   |
 | 计算机视觉（CV） | 语义分割（Semantic Segmentation）  | [U-Net2D (Medical)](https://gitee.com/mindspore/models/tree/master/official/cv/unet)   |  ✅ |   |  |
 | 计算机视觉（CV） | 语义分割（Semantic Segmentation）  | [U-Net3D (Medical)](https://gitee.com/mindspore/models/tree/master/official/cv/unet3d)   |  ✅ |   |  |
 | 计算机视觉（CV） | 语义分割（Semantic Segmentation）  | [U-Net++](https://gitee.com/mindspore/models/tree/master/official/cv/unet)                |  ✅ |   |  |
+| 计算机视觉（CV） | 语义分割（Semantic Segmentation）  | [Fast-SCNN](https://gitee.com/mindspore/models/tree/master/official/cv/fasterscnn)                |  ✅ |   |  |
+| 计算机视觉（CV） | 语义分割（Semantic Segmentation）  | [FCN8s](https://gitee.com/mindspore/models/tree/master/official/cv/FCN8s)  | ✅ |   |   |
 | 计算机视觉（CV） | 关键点检测（Keypoint Detection）  |[OpenPose](https://gitee.com/mindspore/models/tree/master/official/cv/openpose)                |  ✅ |   |  |
 | 计算机视觉（CV） | 关键点检测（Keypoint Detection）  |[SimplePoseNet](https://gitee.com/mindspore/models/tree/master/official/cv/simple_pose)                |  ✅ |   |  |
-| 计算机视觉（CV） | 光学字符识别（Optical Character Recognition）  |[CRNN](https://gitee.com/mindspore/models/tree/master/official/cv/crnn)                |  ✅ |   |  |
+| 计算机视觉（CV） | 文本检测（Scene Text Detection）  | [East](https://gitee.com/mindspore/models/tree/master/official/cv/east) | ✅ |   |   |
+| 计算机视觉（CV） | 文本检测（Scene Text Detection）  | [PSENet](https://gitee.com/mindspore/models/tree/master/official/cv/psenet) | ✅ |   |   |
+| 计算机视觉（CV） | 文本识别（Scene Text Recognition）  |[CRNN](https://gitee.com/mindspore/models/tree/master/official/cv/crnn) |  ✅ |   |  |
+| 计算机视觉（CV） | 文本识别（Scene Text Recognition）  |[CNN+CTC](https://gitee.com/mindspore/models/tree/master/official/cv/cnnctc) |  ✅ |   |  |
+| 计算机视觉（CV） | 文本识别（Scene Text Recognition）  |[CRNN-Seq2Seq-OCR](https://gitee.com/mindspore/models/tree/master/official/cv/crnn_seq2seq_ocr) | ✅ |   |   |
+| 计算机视觉（CV） | 文本识别（Scene Text Recognition）  |[WarpCTC](https://gitee.com/mindspore/models/tree/master/official/cv/warpctc) | ✅ |   |   |
+| 计算机视觉（CV） | 缺陷检测（Defect Detection）  |[ssim-ae](https://gitee.com/mindspore/models/tree/master/official/cv/ssim-ae) | ✅ |   |   |
+| 计算机视觉（CV） | 人脸检测（Face Detection）  | [RetinaFace-ResNet50](https://gitee.com/mindspore/models/tree/master/official/cv/retinaface_resnet50) | ✅ | ✅ |  |
+| 计算机视觉（CV） | 人脸检测（Face Detection）  | [CenterFace](https://gitee.com/mindspore/models/tree/master/official/cv/centerface) | ✅ |   |   |
+| 计算机视觉（CV） | 人脸检测（Face Detection） | [SphereFace](https://gitee.com/mindspore/models/tree/master/official/cv/sphereface) | ✅ |   |   |
+| 计算机视觉（CV） | 人群计数（Crowd Counting） | [MCNN](https://gitee.com/mindspore/models/tree/master/official/cv/MCNN) | ✅ |   |   |
+| 计算机视觉（CV） | 深度估计（Depth Estimation） | [DepthNet](https://gitee.com/mindspore/models/tree/master/official/cv/depthnet) | ✅ |   |   |
+| 计算机视觉（CV） | 相机重定位（Camera Relocalization） | [PoseNet](https://gitee.com/mindspore/models/tree/master/official/cv/posenet) | ✅ |   |   |
+| 计算机视觉（CV） | 图像抠图（Image Matting） | [Semantic Human Matting](https://gitee.com/mindspore/models/tree/master/official/cv/semantic_human_matting) | ✅ |   |   |
+| 计算机视觉（CV） | 视频分类（Video Classification） | [C3D](https://gitee.com/mindspore/models/tree/master/official/cv/c3d) | ✅ |   |   |
+| 计算机视觉（CV） | 图像超分（Image Super-Resolution） | [SRCNN](https://gitee.com/mindspore/models/tree/master/official/cv/srcnn) | ✅ |   |   |
+| 计算机视觉（CV） | 图像去噪（Image Denoising） | [BRDNet](https://gitee.com/mindspore/models/tree/master/official/cv/brdnet) | ✅ |   |   |
+| 计算机视觉（CV） | 图像去噪（Image Denoising） | [DnCNN](https://gitee.com/mindspore/models/tree/master/official/cv/dncnn) | ✅ |   |   |
+| 计算机视觉（CV） | 图像去噪（Image Denoising） | [Learning-to-See-in-the-Dark](https://gitee.com/mindspore/models/tree/master/official/cv/LearningToSeeInTheDark) | ✅ |   |   |
+| 计算机视觉（CV） | 图像质量评估（Image Quality Assessment） | [NIMA](https://gitee.com/mindspore/models/tree/master/official/cv/nima) | ✅ |   |   |
 | 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [BERT](https://gitee.com/mindspore/models/tree/master/official/nlp/bert)  |  ✅ |  ✅ |  |
 | 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [FastText](https://gitee.com/mindspore/models/tree/master/official/nlp/fasttext)    |  ✅ |   |  |
 | 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [GNMT v2](https://gitee.com/mindspore/models/tree/master/official/nlp/gnmt_v2)    |  ✅ |   |  |
@@ -78,6 +116,13 @@
 | 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [Transformer](https://gitee.com/mindspore/models/tree/master/official/nlp/transformer)  |  ✅ |  ✅ |  |
 | 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [TinyBERT](https://gitee.com/mindspore/models/tree/master/official/nlp/tinybert)   |  ✅ |  ✅ |  |
 | 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [TextCNN](https://gitee.com/mindspore/models/tree/master/official/nlp/textcnn)            |  ✅ |   |  |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [CPM](https://gitee.com/mindspore/models/tree/master/official/nlp/cpm)            | ✅ |   |   |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [ERNIE](https://gitee.com/mindspore/models/tree/master/official/nlp/ernie)            | ✅ |   |   |
+| 自然语言处理（NLP） | 自然语言理解（Natural Language Understanding）  | [GPT-3](https://gitee.com/mindspore/models/tree/master/official/nlp/gpt)            | ✅ |   |   |
+| 自然语言处理（NLP） | 情感分析（Emotion Classification) | [EmoTect](https://gitee.com/mindspore/models/tree/master/official/nlp/emotect)                | ✅ |   |   |
+| 自然语言处理（NLP） | 情感分析（Emotion Classification) | [LSTM](https://gitee.com/mindspore/models/tree/master/official/nlp/lstm)                | ✅ |   |   |
+| 自然语言处理（NLP） | 对话系统（Dialogue Generation) | [DGU](https://gitee.com/mindspore/models/tree/master/official/nlp/dgu)                | ✅ |   |   |
+| 自然语言处理（NLP） | 对话系统（Dialogue Generation) | [DuConv](https://gitee.com/mindspore/models/tree/master/official/nlp/duconv)                | ✅ |   |   |
 | 推荐（Recommender） | 推荐系统、点击率预估（Recommender System, CTR prediction）  | [DeepFM](https://gitee.com/mindspore/models/tree/master/official/recommend/deepfm)    |  ✅ |  ✅ | ✅ |
 | 推荐（Recommender） | 推荐系统、搜索、排序（Recommender System, Search, Ranking）  | [Wide&Deep](https://gitee.com/mindspore/models/tree/master/official/recommend/wide_and_deep)      |  ✅ |  ✅ |  |
 | 推荐（Recommender） | 推荐系统（Recommender System）  | [NAML](https://gitee.com/mindspore/models/tree/master/official/recommend/naml)             |  ✅ |   |  |
