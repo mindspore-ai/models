@@ -14,9 +14,6 @@
 # limitations under the License.
 # ============================================================================
 
-"""
-build dataset
-"""
 
 if [ $# -ne 1 ]
 then
@@ -67,7 +64,7 @@ do
 
     # step 1: build candidate set from session data for negative training cases and predicting candidates
     if [ "${DATA_TYPE[$i]}"x = "train"x ]; then
-        python src/utils/build_candidate_set_from_corpus.py ${corpus_file} ${candidate_set_file}
+        python3 src/utils/build_candidate_set_from_corpus.py ${corpus_file} ${candidate_set_file}
     fi
 
     # step 2: firstly have to convert session data to sample data
@@ -76,16 +73,16 @@ do
         FOR_PREDICT=1
         CANDIDATE_NUM=10
     else
-        python src/utils/convert_session_to_sample.py ${corpus_file} ${sample_file}
+        python3 src/utils/convert_session_to_sample.py ${corpus_file} ${sample_file}
     fi
     # step 3: construct candidate for sample data
-    python src/utils/construct_candidate.py ${sample_file} ${candidate_set_file} ${candidate_file} ${CANDIDATE_NUM}
+    python3 src/utils/construct_candidate.py ${sample_file} ${candidate_set_file} ${candidate_file} ${CANDIDATE_NUM}
 
     # step 4: convert sample data with candidates to text data required by the model
-    python src/utils/convert_conversation_corpus_to_model_text.py ${candidate_file} ${text_file} ${USE_KNOWLEDGE} ${TOPIC_GENERALIZATION} ${FOR_PREDICT}
+    python3 src/utils/convert_conversation_corpus_to_model_text.py ${candidate_file} ${text_file} ${USE_KNOWLEDGE} ${TOPIC_GENERALIZATION} ${FOR_PREDICT}
 
     # step 5: build dict from the training data, here we build character dict for model
     if [ "${DATA_TYPE[$i]}"x = "train"x ]; then
-        python src/utils/build_dict.py ${text_file} ${DICT_NAME}
+        python3 src/utils/build_dict.py ${text_file} ${DICT_NAME}
     fi
 done
