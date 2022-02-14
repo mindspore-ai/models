@@ -19,7 +19,7 @@ from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMoni
 
 from data_provider.mnist_to_mindrecord import create_mnist_dataset
 from nets.predrnn_pp import PreRNN, NetWithLossCell
-from utils.config import config
+from config import config
 
 if __name__ == '__main__':
 

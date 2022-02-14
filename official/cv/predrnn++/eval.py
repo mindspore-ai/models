@@ -23,10 +23,10 @@ from mindspore import Tensor, context
 from mindspore import load_checkpoint, load_param_into_net
 
 from data_provider.mnist_to_mindrecord import create_mnist_dataset
+from data_provider import preprocess
 from nets.predrnn_pp import PreRNN
-from utils import metrics
-from utils import preprocess
-from utils.config import config
+from config import config
+import metrics
 
 if __name__ == '__main__':
 

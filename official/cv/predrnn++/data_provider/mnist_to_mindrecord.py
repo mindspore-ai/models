@@ -17,7 +17,7 @@ import numpy as np
 import mindspore.dataset as ds
 from mindspore.mindrecord import FileWriter
 from data_provider import mnist
-from utils import preprocess
+from data_provider import preprocess
 
 class MnistToRecord:
     def __init__(self, input_param):
