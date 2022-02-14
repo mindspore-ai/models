@@ -3,7 +3,7 @@
 <!-- TOC -->
 
 - [目录](#目录)
-- [PDarts描述](#PDarts描述)
+- [PDarts描述](#pdarts描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [特性](#特性)
@@ -15,12 +15,10 @@
     - [脚本参数](#脚本参数)
     - [训练过程](#训练过程)
         - [训练](#训练)
-        - [分布式训练](#分布式训练)
-    - [评估过程](#评估过程)
         - [评估](#评估)
     - [推理过程](#推理过程)
-        - [导出MindIR](#导出MindIR)
-        - [在Ascend310执行推理](#在Ascend310执行推理)
+        - [导出MindIR](#导出mindir)
+        - [在Ascend310执行推理](#在ascend310执行推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [训练准确率结果](#训练准确率结果)
@@ -59,17 +57,16 @@
 
 ## 混合精度
 
-采用[混合精度](https://www.mindspore.cn/tutorial/training/zh-CN/master/advanced_use/enable_mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
+采用[混合精度](https://www.mindspore.cn/docs/programming_guide/zh-CN/r1.6/enable_mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
 
 # 环境要求
 
 - 硬件（Ascend910）
-- 准备Ascend AI处理器搭建硬件环境。如需试用昇腾处理器，请发送[申请表](https://obs-9be7.obs.cn-east-2.myhuaweicloud.com/file/other/Ascend%20Model%20Zoo%E4%BD%93%E9%AA%8C%E8%B5%84%E6%BA%90%E7%94%B3%E8%AF%B7%E8%A1%A8.docx)至ascend@huawei.com，审核通过即可获得资源。
 - 框架
 - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-- [MindSpore教程](https://www.mindspore.cn/tutorial/training/zh-CN/master/index.html)
-- [MindSpore Python API](https://www.mindspore.cn/doc/api_python/zh-CN/master/index.html)
+- [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+- [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
 # 快速入门
 

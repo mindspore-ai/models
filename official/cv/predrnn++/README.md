@@ -1,7 +1,7 @@
 # Contents
 
 - [Contents](#contents)
-    - [Predrnn++ Description](#Predrnn++-description)
+    - [Predrnn++ Description](#predrnn-description)
     - [Model Architecture](#model-architecture)
     - [Dataset](#dataset)
         - [Dataset Prepare](#dataset-prepare)
@@ -11,8 +11,6 @@
         - [Script and Sample Code](#script-and-sample-code)
         - [Script Parameters](#script-parameters)
             - [Training Script Parameters](#training-script-parameters)
-            - [Parameters Configuration](#parameters-configuration)
-        - [Dataset Preparation](#dataset-preparation)
     - [Training Process](#training-process)
         - [Training](#training)
     - [Evaluation Process](#evaluation-process)
@@ -21,7 +19,6 @@
         - [Performance](#performance)
             - [Training Performance](#training-performance)
             - [Evaluation Performance](#evaluation-performance)
-    - [Description of MindSpore Version](#description-of-mindspore-version)
     - [ModelZoo Homepage](#modelzoo-homepage)
 
 ## [Predrnn++ Description](#contents)
@@ -204,7 +201,7 @@ mse per seq: 478.58854093653633
 | Speed                      | 983ms/step(1pcs)                                  |
 | Total time                 | 22h                                               |
 | Checkpoint for Fine tuning | 177.27M (.ckpt file)                              |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/Predrnn++) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/predrnn++) |
 
 #### [Evaluation Performance](#contents)
 

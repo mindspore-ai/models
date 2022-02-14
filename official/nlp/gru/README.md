@@ -2,9 +2,11 @@
 <!-- TOC -->
 
 - [GRU](#gru)
+    - [Paper](#paper)
 - [Model Structure](#model-structure)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
+    - [Requirements](#requirements)
 - [Quick Start](#quick-start)
 - [Script Description](#script-description)
     - [Dataset Preparation](#dataset-preparation)
@@ -12,7 +14,9 @@
     - [Training Process](#training-process)
     - [Inference Process](#inference-process)
     - [Export MindIR](#export-mindir)
-    - [Inference Process](#inference-process)
+    - [Inference Process](#inference-process-1)
+        - [Usage](#usage)
+        - [result](#result)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Training Performance](#training-performance)
@@ -29,7 +33,7 @@ GRU(Gate Recurrent Unit) is a kind of recurrent neural network algorithm, just l
 
 ## Paper
 
-1.[Paper](https://arxiv.org/pdf/1607.01759.pdf): "Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation", 2014, Kyunghyun Cho, Bart van Merrienboer, Caglar Gulcehre, Dzmitry Bahdanau, Fethi Bougares, Holger Schwenk, Yoshua Bengio
+1.[Paper](https://arxiv.org/abs/1406.1078): "Learning Phrase Representations using RNN Encoder-Decoder for Statistical Machine Translation", 2014, Kyunghyun Cho, Bart van Merrienboer, Caglar Gulcehre, Dzmitry Bahdanau, Fethi Bougares, Holger Schwenk, Yoshua Bengio
 
 2.[Paper](https://arxiv.org/pdf/1409.3215.pdf): "Sequence to Sequence Learning with Neural Networks", 2014, Ilya Sutskever, Oriol Vinyals, Quoc V. Le
 
