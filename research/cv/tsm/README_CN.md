@@ -38,7 +38,7 @@
 
 TSM(Temporal Shift Module)网络在线视频流的爆炸式增长对有效提取时空信息进行视频理解提出了挑战。传统的二维神经网络计算成本低，但不能捕捉长期的时间关系;基于3D CNN的方法可以获得较好的性能，但计算量大，因此部署成本较高。在TSM中，我们提出了一种通用而有效的时间转移模块(TSM)，它具有高效率和高性能。具体来说，它可以达到3D CNN的性能，但保持2d复杂度。TSM的核心思想是将部分信道沿时间维进行移位，便于相邻帧之间的信息交换。在以时间建模为核心的SomethingSomething-v1数据集上，更少的FLOPs (每秒浮点运算次数)，获得了比i3d系列和eco系列更好的结果。在P100 GPU上测量，与I3D相比，在单一模型在8×较低的延迟和12×较高的吞吐量下，提高了1.8%精度。在本论文提交时，TSM网络在V1和V2排行榜上都排名第一。
 
-[论文](https://arxiv.org/abs/1811.08383v1)：Lin, Ji, Chuang Gan and Song Han. “TSM: Temporal Shift Module for Efficient Video Understanding.” 2019 IEEE/CVF International Conference on Computer Vision (ICCV) (2019): 7082-7092.
+[论文](https://arxiv.org/abs/1811.08383v1)：Lin, Ji, Chuang Gan and Song  Han. “TSM: Temporal Shift Module for Efficient Video Understanding.” 2019 IEEE/CVF International Conference on Computer Vision (ICCV) (2019): 7082-7092.
 
 # 模型架构
 
@@ -46,7 +46,7 @@ TSM应用了一种通用而有效的时间转移模块。  时间转移模块将
 
 # 数据集
 
-使用的数据集：[SomethingSometing-v2](<https://20bn.com/datasets/something-something/v2>)
+使用的数据集：[SomethingSometing-v2](https://developer.qualcomm.com/software/ai-datasets/something-something)
 
 - 数据集大小：19.5G，共174个类、220,847段视频
     - 训练集：16G，共168,913段视频
@@ -371,6 +371,7 @@ bash scripts/run_export.sh [checkpoint_path] [checkpoint_name]
   LABEL_FILE: 标签路径
   DEVICE_ID: 硬件路径
   tsm_sthv2_config_2bin.yaml: data_path:"真实路径"
+
 # 模型描述
 
 ## 性能
