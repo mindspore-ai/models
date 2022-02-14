@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ class Config:
     """
     Configuration namespace. Convert dictionary to members.
     """
+
     def __init__(self, cfg_dict):
         for k, v in cfg_dict.items():
             if isinstance(v, (list, tuple)):
@@ -91,7 +92,8 @@ def parse_yaml(yaml_path):
             elif len(cfgs) == 3:
                 cfg, cfg_helper, cfg_choices = cfgs
             else:
-                raise ValueError("At most 3 docs (config, description for help, choices) are supported in config yaml")
+                raise ValueError(
+                    "At most 3 docs (config, description for help, choices) are supported in config yaml")
             print(cfg_helper)
         except:
             raise ValueError("Failed to parse yaml")
@@ -119,6 +121,10 @@ def extra_operations(cfg):
     Args:
         cfg: Object after instantiation of class 'Config'.
     """
+    if cfg.device_target == 'GPU':
+        cfg.DataConfig.batch_size = cfg.GPUConfig.batch_size
+        cfg.TrainConfig.learning_rate = cfg.GPUConfig.learning_rate
+        cfg.TrainConfig.train_epochs = cfg.GPUConfig.train_epochs
     cfg.ModelConfig.batch_size = cfg.DataConfig.batch_size
     cfg.ModelConfig.data_field_size = cfg.DataConfig.data_field_size
     cfg.ModelConfig.data_vocab_size = cfg.DataConfig.data_vocab_size

@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the License);
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,10 @@
 """
 Defined callback for DeepFM.
 """
+import os
 import time
 from mindspore.train.callback import Callback
+from mindspore.train.serialization import save_checkpoint
 
 
 def add_write(file_path, out_str):
@@ -31,21 +33,38 @@ class EvalCallBack(Callback):
     Note
         If per_print_times is 0 do not print loss.
     """
-    def __init__(self, model, eval_dataset, auc_metric, eval_file_path):
+
+    def __init__(self, model, eval_dataset, auc_metric, is_save_checkpoint,
+                 ckpt_path, ckpt_file_name_prefix, rank_id, eval_file_path):
         super(EvalCallBack, self).__init__()
         self.model = model
         self.eval_dataset = eval_dataset
         self.aucMetric = auc_metric
         self.aucMetric.clear()
+        self.is_save_checkpoint = is_save_checkpoint
+        self.ckpt_path = ckpt_path
+        self.ckpt_file_name_prefix = ckpt_file_name_prefix
+        self.rank_id = rank_id
         self.eval_file_path = eval_file_path
+        self.max_auc = 0
 
     def epoch_end(self, run_context):
         start_time = time.time()
         out = self.model.eval(self.eval_dataset)
+        if self.is_save_checkpoint:
+            auc = out["auc"]
+            if auc > self.max_auc:
+                self.max_auc = auc
+                cb_params = run_context.original_args()
+                ckpt_file_name = 'best.ckpt'
+                if not os.path.exists(self.ckpt_path):
+                    os.makedirs(self.ckpt_path)
+                save_path = os.path.join(self.ckpt_path, ckpt_file_name)
+                save_checkpoint(cb_params.train_network, save_path)
         eval_time = int(time.time() - start_time)
         time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        out_str = "{} EvalCallBack metric{}; eval_time{}s".format(
-            time_str, out.values(), eval_time)
+        out_str = "{} EvalCallBack metric{}; eval_time{}s; the best auc is {}".format(
+            time_str, out.values(), eval_time, self.max_auc)
         print(out_str)
         add_write(self.eval_file_path, out_str)
 
@@ -60,6 +79,7 @@ class LossCallBack(Callback):
         loss_file_path (str) The file absolute path, to save as loss_file;
         per_print_times (int) Print loss every times. Default 1.
     """
+
     def __init__(self, loss_file_path, per_print_times=1):
         super(LossCallBack, self).__init__()
         if not isinstance(per_print_times, int) or per_print_times < 0:
@@ -71,7 +91,8 @@ class LossCallBack(Callback):
         """Monitor the loss in training."""
         cb_params = run_context.original_args()
         loss = cb_params.net_outputs.asnumpy()
-        cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
+        cur_step_in_epoch = (cb_params.cur_step_num -
+                             1) % cb_params.batch_num + 1
         cur_num = cb_params.cur_step_num
         if self._per_print_times != 0 and cur_num % self._per_print_times == 0:
             with open(self.loss_file_path, "a+") as loss_file:
@@ -88,6 +109,7 @@ class TimeMonitor(Callback):
     Args
         data_size (int) step size of an epoch.
     """
+
     def __init__(self, data_size):
         super(TimeMonitor, self).__init__()
         self.data_size = data_size

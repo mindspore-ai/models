@@ -63,10 +63,14 @@ After installing MindSpore via the official website, you can start training and 
   tar -zxvf dac.tar.gz
 
   #preprocess dataset
-  python -m src.preprocess_data  --data_path=./data/ --dense_dim=13 --slot_dim=26 --threshold=100 --train_line_count=45840617 --skip_id_convert=0
+  python -m src.preprocess_data  --data_path=./data/ --dense_dim=13 --slot_dim=26 --threshold=100 --train_line_count=45840617 --skip_id_convert=0 --device_target=Ascend
+
+  OR
+
+  python -m src.preprocess_data  --data_path=./data/ --dense_dim=13 --slot_dim=26 --threshold=100 --train_line_count=45840617 --skip_id_convert=0 --device_target=GPU
   '''
 
-- running on Ascend
+- running on Ascend or GPU
 
   ```python
   # run training example
@@ -77,6 +81,10 @@ After installing MindSpore via the official website, you can start training and 
     --loss_file_name='loss.log' \
     --device_target=Ascend \
     --do_eval=True > ms_log/output.log 2>&1 &
+  OR
+  bash scripts/run_standalone_train.sh 0 Ascend ../criteo_dac/mindrecord
+  OR
+  bash scripts/run_standalone_train.sh 0 GPU ../criteo_dac/mindrecord
 
   # run evaluation example
   python eval.py \
@@ -85,6 +93,9 @@ After installing MindSpore via the official website, you can start training and 
     --device_target=Ascend > ms_log/eval_output.log 2>&1 &
   OR
   bash scripts/run_eval.sh 0 Ascend /test_data_dir /checkpoint_path/autodis.ckpt
+  OR
+  bash scripts/run_eval.sh 0 GPU /test_data_dir /checkpoint_path/autodis.ckpt
+
   ```
 
   For distributed training, a hccl configuration file with JSON format needs to be created in advance.
@@ -159,7 +170,8 @@ After installing MindSpore via the official website, you can start training and 
     ├─__init__.py                     # python init file
     ├─callback.py                     # define callback function
     ├─autodis.py                      # AutoDis network
-    └─dataset.py                      # create dataset for AutoDis
+    ├─dataset.py                      # create dataset for AutoDis
+    └─preprocess_data.py              # convert the dataset to mindrecord format
   ├─default_config.yaml               # parameter configuration
   ├─eval.py                           # eval script
   ├─export.py                         # export checkpoint file into air/mindir
@@ -196,15 +208,23 @@ Parameters for both training and evaluation can be set in `default_config.yaml`
 
 ### Training
 
-- running on Ascend
+- running on Ascend or GPU
 
-  ```python
+  ```bash
   python train.py \
     --train_data_dir='dataset/train' \
     --ckpt_path='./checkpoint' \
     --eval_file_name='auc.log' \
     --loss_file_name='loss.log' \
     --device_target=Ascend \
+    --do_eval=True > ms_log/output.log 2>&1 &
+  OR
+  python train.py \
+    --train_data_dir='dataset/train' \
+    --ckpt_path='./checkpoint' \
+    --eval_file_name='auc.log' \
+    --loss_file_name='loss.log' \
+    --device_target=GPU \
     --do_eval=True > ms_log/output.log 2>&1 &
   ```
 
@@ -224,7 +244,7 @@ Parameters for both training and evaluation can be set in `default_config.yaml`
 
 ### Evaluation
 
-- evaluation on dataset when running on Ascend
+- evaluation on dataset when running on Ascend or GPU
 
   Before running the command below, please check the checkpoint path used for evaluation.
 
@@ -235,6 +255,8 @@ Parameters for both training and evaluation can be set in `default_config.yaml`
     --device_target=Ascend > ms_log/eval_output.log 2>&1 &
   OR
   bash scripts/run_eval.sh 0 Ascend /test_data_dir /checkpoint_path/autodis.ckpt
+  OR
+  bash scripts/run_eval.sh 0 GPU /test_data_dir /checkpoint_path/autodis.ckpt
   ```
 
   The above python command will run in the background. You can view the results through the file "eval_output.log". The accuracy is saved in auc.log file.
@@ -301,37 +323,37 @@ Inference result is saved in current path, you can find result in acc.log file.
 
 ### Training Performance
 
-| Parameters                 | Ascend                                                      |
-| -------------------------- | ----------------------------------------------------------- |
-| Model Version              | AutoDis                                                      |
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G              |
-| uploaded Date              | 12/12/2020 (month/day/year)                                 |
-| MindSpore Version          | 1.1.0                                                 |
-| Dataset                    | [1]                                                         |
-| Training Parameters        | epoch=15, batch_size=1000, lr=1e-5                          |
-| Optimizer                  | Adam                                                        |
-| Loss Function              | Sigmoid Cross Entropy With Logits                           |
-| outputs                    | Accuracy                                                    |
-| Loss                       | 0.42                                                        |
-| Speed                      | 1pc: 8.16 ms/step;                                          |
-| Total time                 | 1pc: 90 mins;                                               |
-| Parameters (M)             | 16.5                                                        |
-| Checkpoint for Fine tuning | 191M (.ckpt file)                                           |
-| Scripts                    | [AutoDis script](https://gitee.com/mindspore/models/tree/master/research/recommend/autodis) |
+| Parameters                 | Ascend                                                       | GPU                                                          |
+| -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Model Version              | AutoDis                                                      | AutoDis                                                      |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G               | V100(32G); CPU 8 cores 64G                                       |
+| uploaded Date              | 12/12/2020 (month/day/year)                                  | 2/13/2022 (month/day/year)                                   |
+| MindSpore Version          | 1.1.0                                                        | 1.6.0                                                        |
+| Dataset                    | [Criteo](http://go.criteo.net/criteo-research-kaggle-display-advertising-challenge-dataset.tar.gz) | [Criteo](http://go.criteo.net/criteo-research-kaggle-display-advertising-challenge-dataset.tar.gz) |
+| Training Parameters        | epoch=15, batch_size=1000, lr=1e-5                           | epoch=15, batch_size=16384, lr=0.0003                        |
+| Optimizer                  | Adam                                                         | Adam                                                         |
+| Loss Function              | Sigmoid Cross Entropy With Logits                            | Sigmoid Cross Entropy With Logits                            |
+| outputs                    | Accuracy                                                     | Accuracy                                                     |
+| Loss                       | 0.42                                                         | 0.41905                                                      |
+| Speed                      | 1pc: 8.16 ms/step;                                           | 1pc: 60.8 ms/step;                                           |
+| Total time                 | 1pc: 90 mins;                                                | 1pc: 41mins;                                                 |
+| Parameters (M)             | 16.5                                                         | 16.5                                                         |
+| Checkpoint for Fine tuning | 191M (.ckpt file)                                            | 191M (.ckpt file)                                            |
+| Scripts                    | [AutoDis script](https://gitee.com/mindspore/models/tree/master/research/recommend/autodis) | [AutoDis script](https://gitee.com/mindspore/models/tree/master/research/recommend/autodis) |
 
 ### Inference Performance
 
-| Parameters          | Ascend                      |
-| ------------------- | --------------------------- |
-| Model Version       | AutoDis                      |
-| Resource            | Ascend 910                  |
-| Uploaded Date       | 12/12/2020 (month/day/year) |
-| MindSpore Version   | 1.1.0                       |
-| Dataset             | [1]                         |
-| batch_size          | 1000                        |
-| outputs             | accuracy                    |
-| AUC            | 1pc: 0.8112;                |
-| Model for inference | 191M (.ckpt file)           |
+| Parameters          | Ascend                      | GPU                         |
+| ------------------- | --------------------------- | --------------------------- |
+| Model Version       | AutoDis                     |AutoDis                      |
+| Resource            | Ascend 910                  |V100                         |
+| Uploaded Date       | 12/12/2020 (month/day/year) |2/13/2022 (month/day/year)   |
+| MindSpore Version   | 1.1.0                       |1.6.0                        |
+| Dataset             | [Criteo](http://go.criteo.net/criteo-research-kaggle-display-advertising-challenge-dataset.tar.gz) |[Criteo](http://go.criteo.net/criteo-research-kaggle-display-advertising-challenge-dataset.tar.gz)                          |
+| batch_size          | 1000                        |16384                        |
+| outputs             | accuracy                    |accuracy                     |
+| AUC            | 1pc: 0.8112;                     |1pc: 0.8096                  |
+| Model for inference | 191M (.ckpt file)           |191M (.ckpt file)            |
 
 # [Description of Random Situation](#contents)
 
