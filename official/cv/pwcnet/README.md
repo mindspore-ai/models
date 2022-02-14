@@ -1,14 +1,20 @@
 # Contents
 
-- [PWCnet Description](#PWCnet-description)
+- [Contents](#contents)
+- [PWCnet Description](#pwcnet-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
+- [pretrained](#pretrained)
 - [Environment Requirements](#environment-requirements)
 - [Script Description](#script-description)
     - [Script and Sample Code](#script-and-sample-code)
     - [Running Example](#running-example)
+        - [Train](#train)
+        - [Evaluation](#evaluation)
 - [Model Description](#model-description)
     - [Performance](#performance)
+        - [Training Performance](#training-performance)
+        - [Evaluation Performance](#evaluation-performance)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 # [PWCnet Description](#contents)
@@ -95,8 +101,8 @@ bash scripts/run_ckpt_convert.sh [PYTORCH_FILE_PATH] [MINDSPORE_FILE_PATH]
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below:
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorial/training/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/doc/api_python/en/master/index.html)
+    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
 
 # [Script Description](#contents)
 
@@ -230,4 +236,4 @@ EPE: 6.9049
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).
