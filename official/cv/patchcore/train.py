@@ -52,6 +52,7 @@ if args.isModelArts:
     import moxing as mox
 
 if __name__ == '__main__':
+    current_path = os.path.abspath(os.path.dirname(__file__))
     context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', save_graphs=False)
     if args.isModelArts:
         device_id = int(os.getenv('DEVICE_ID'))
@@ -69,7 +70,7 @@ if __name__ == '__main__':
         embedding_dir_path, _ = prep_dirs(prep_path, args.category)
     else:
         train_dataset, _, _, _ = createDataset(args.dataset_path, args.category)
-        embedding_dir_path, _ = prep_dirs('./', args.category)
+        embedding_dir_path, _ = prep_dirs(current_path, args.category)
 
     # network
     network = wide_resnet50_2()

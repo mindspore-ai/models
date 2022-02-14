@@ -43,6 +43,7 @@ parser.add_argument('--pre_ckpt_path', type=str, required=True, help='Pretrain c
 args = parser.parse_args()
 
 if __name__ == '__main__':
+    current_path = os.path.abspath(os.path.dirname(__file__))
     context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=args.device_id)
 
     # dataset
@@ -55,7 +56,7 @@ if __name__ == '__main__':
     data_iter = test_dataset.create_dict_iterator()
     step_size = test_dataset.get_dataset_size()
 
-    embedding_dir_path, sample_path = prep_dirs('./', args.category)
+    embedding_dir_path, sample_path = prep_dirs(current_path, args.category)
     index = faiss.read_index(os.path.join(embedding_dir_path, 'index.faiss'))
 
     # network
