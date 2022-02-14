@@ -220,8 +220,6 @@ After installing MindSpore via the official website, you can start training and 
 
 - Export on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start evaluating as follows)
 
-1. Export s8 multiscale and flip with voc val dataset on modelarts, evaluating steps are as follows:
-
     ```python
     # (1) Perform a or b.
     #       a. Set "enable_modelarts=True" on base_config.yaml file.
