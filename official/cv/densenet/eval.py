@@ -25,7 +25,7 @@ import numpy as np
 from mindspore import context
 import mindspore.nn as nn
 from mindspore import Tensor
-from mindspore.communication.management import init, get_group_size, release
+from mindspore.communication.management import init, get_group_size, get_rank, release
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.ops import operations as P
 from mindspore.ops import functional as F
@@ -33,7 +33,7 @@ from mindspore.common import dtype as mstype
 from src.utils.logging import get_logger
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.config import config
-from src.model_utils.device_adapter import get_device_id, get_rank_id
+from src.model_utils.device_adapter import get_device_id
 
 
 class ParameterReduce(nn.Cell):
@@ -115,7 +115,7 @@ def test():
     # init distributed
     if config.is_distributed:
         init()
-        config.rank = get_rank_id()
+        config.rank = get_rank()
         config.group_size = get_group_size()
 
     config.outputs_dir = os.path.join(config.log_path, datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))

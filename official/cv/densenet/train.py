@@ -19,7 +19,7 @@ import datetime
 import mindspore.nn as nn
 from mindspore import Tensor
 from mindspore.nn.optim import Momentum
-from mindspore.communication.management import init, get_group_size
+from mindspore.communication.management import init, get_group_size, get_rank
 from mindspore.train.callback import ModelCheckpoint
 from mindspore.train.callback import CheckpointConfig, Callback
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -34,7 +34,7 @@ from src.lr_scheduler import MultiStepLR, CosineAnnealingLR
 from src.utils.logging import get_logger
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.config import config
-from src.model_utils.device_adapter import get_device_id, get_rank_id
+from src.model_utils.device_adapter import get_device_id
 
 set_seed(1)
 
@@ -140,7 +140,7 @@ def train():
     # init distributed
     if config.is_distributed:
         init()
-        config.rank = get_rank_id()
+        config.rank = get_rank()
         config.group_size = get_group_size()
 
     if config.is_dynamic_loss_scale == 1:
