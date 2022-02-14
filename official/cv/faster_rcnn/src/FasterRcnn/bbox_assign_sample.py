@@ -15,10 +15,10 @@
 """FasterRcnn positive and negative sample screening for RPN."""
 
 import numpy as np
+import mindspore as ms
 import mindspore.nn as nn
-from mindspore.ops import operations as P
+import mindspore.ops as ops
 from mindspore.common.tensor import Tensor
-import mindspore.common.dtype as mstype
 
 
 class BboxAssignSample(nn.Cell):
@@ -46,7 +46,7 @@ class BboxAssignSample(nn.Cell):
         super(BboxAssignSample, self).__init__()
         cfg = config
         self.dtype = np.float32
-        self.ms_type = mstype.float32
+        self.ms_type = ms.float32
         self.batch_size = batch_size
 
         self.neg_iou_thr = Tensor(cfg.neg_iou_thr, self.ms_type)
@@ -63,29 +63,29 @@ class BboxAssignSample(nn.Cell):
         if self.add_gt_as_proposals:
             self.label_inds = Tensor(np.arange(1, self.num_gts + 1))
 
-        self.concat = P.Concat(axis=0)
-        self.max_gt = P.ArgMaxWithValue(axis=0)
-        self.max_anchor = P.ArgMaxWithValue(axis=1)
-        self.sum_inds = P.ReduceSum()
-        self.iou = P.IOU()
-        self.greaterequal = P.GreaterEqual()
-        self.greater = P.Greater()
-        self.select = P.Select()
-        self.gatherND = P.GatherNd()
-        self.squeeze = P.Squeeze()
-        self.cast = P.Cast()
-        self.logicaland = P.LogicalAnd()
-        self.less = P.Less()
-        self.random_choice_with_mask_pos = P.RandomChoiceWithMask(self.num_expected_pos)
-        self.random_choice_with_mask_neg = P.RandomChoiceWithMask(self.num_expected_neg)
-        self.reshape = P.Reshape()
-        self.equal = P.Equal()
-        self.bounding_box_encode = P.BoundingBoxEncode(means=(0.0, 0.0, 0.0, 0.0), stds=(1.0, 1.0, 1.0, 1.0))
-        self.scatterNdUpdate = P.ScatterNdUpdate()
-        self.scatterNd = P.ScatterNd()
-        self.logicalnot = P.LogicalNot()
-        self.tile = P.Tile()
-        self.zeros_like = P.ZerosLike()
+        self.concat = ops.Concat(axis=0)
+        self.max_gt = ops.ArgMaxWithValue(axis=0)
+        self.max_anchor = ops.ArgMaxWithValue(axis=1)
+        self.sum_inds = ops.ReduceSum()
+        self.iou = ops.IOU()
+        self.greaterequal = ops.GreaterEqual()
+        self.greater = ops.Greater()
+        self.select = ops.Select()
+        self.gatherND = ops.GatherNd()
+        self.squeeze = ops.Squeeze()
+        self.cast = ops.Cast()
+        self.logicaland = ops.LogicalAnd()
+        self.less = ops.Less()
+        self.random_choice_with_mask_pos = ops.RandomChoiceWithMask(self.num_expected_pos)
+        self.random_choice_with_mask_neg = ops.RandomChoiceWithMask(self.num_expected_neg)
+        self.reshape = ops.Reshape()
+        self.equal = ops.Equal()
+        self.bounding_box_encode = ops.BoundingBoxEncode(means=(0.0, 0.0, 0.0, 0.0), stds=(1.0, 1.0, 1.0, 1.0))
+        self.scatterNdUpdate = ops.ScatterNdUpdate()
+        self.scatterNd = ops.ScatterNd()
+        self.logicalnot = ops.LogicalNot()
+        self.tile = ops.Tile()
+        self.zeros_like = ops.ZerosLike()
 
         self.assigned_gt_inds = Tensor(np.full(num_bboxes, -1, dtype=np.int32))
         self.assigned_gt_zeros = Tensor(np.array(np.zeros(num_bboxes), dtype=np.int32))
@@ -99,10 +99,10 @@ class BboxAssignSample(nn.Cell):
         self.check_anchor_two = Tensor(np.full((self.num_bboxes, 4), -2, dtype=self.dtype))
 
     def construct(self, gt_bboxes_i, gt_labels_i, valid_mask, bboxes, gt_valids):
-        gt_bboxes_i = self.select(self.cast(self.tile(self.reshape(self.cast(gt_valids, mstype.int32), \
-                                  (self.num_gts, 1)), (1, 4)), mstype.bool_), gt_bboxes_i, self.check_gt_one)
-        bboxes = self.select(self.cast(self.tile(self.reshape(self.cast(valid_mask, mstype.int32), \
-                             (self.num_bboxes, 1)), (1, 4)), mstype.bool_), bboxes, self.check_anchor_two)
+        gt_bboxes_i = self.select(self.cast(self.tile(self.reshape(self.cast(gt_valids, ms.int32), \
+                                  (self.num_gts, 1)), (1, 4)), ms.bool_), gt_bboxes_i, self.check_gt_one)
+        bboxes = self.select(self.cast(self.tile(self.reshape(self.cast(valid_mask, ms.int32), \
+                             (self.num_bboxes, 1)), (1, 4)), ms.bool_), bboxes, self.check_anchor_two)
 
         overlaps = self.iou(bboxes, gt_bboxes_i)
 
@@ -133,10 +133,10 @@ class BboxAssignSample(nn.Cell):
         pos_check_valid = self.cast(self.greater(assigned_gt_inds5, 0), self.ms_type)
         pos_check_valid = self.sum_inds(pos_check_valid, -1)
         valid_pos_index = self.less(self.range_pos_size, pos_check_valid)
-        pos_index = pos_index * self.reshape(self.cast(valid_pos_index, mstype.int32), (self.num_expected_pos, 1))
+        pos_index = pos_index * self.reshape(self.cast(valid_pos_index, ms.int32), (self.num_expected_pos, 1))
 
         pos_assigned_gt_index = self.gatherND(assigned_gt_inds5, pos_index) - self.assigned_pos_ones
-        pos_assigned_gt_index = pos_assigned_gt_index * self.cast(valid_pos_index, mstype.int32)
+        pos_assigned_gt_index = pos_assigned_gt_index * self.cast(valid_pos_index, ms.int32)
         pos_assigned_gt_index = self.reshape(pos_assigned_gt_index, (self.num_expected_pos, 1))
 
         neg_index, valid_neg_index = self.random_choice_with_mask_neg(self.equal(assigned_gt_inds5, 0))
@@ -152,8 +152,8 @@ class BboxAssignSample(nn.Cell):
 
         pos_bbox_targets_ = self.bounding_box_encode(pos_bboxes_, pos_gt_bboxes_)
 
-        valid_pos_index = self.cast(valid_pos_index, mstype.int32)
-        valid_neg_index = self.cast(valid_neg_index, mstype.int32)
+        valid_pos_index = self.cast(valid_pos_index, ms.int32)
+        valid_neg_index = self.cast(valid_neg_index, ms.int32)
         bbox_targets_total = self.scatterNd(pos_index, pos_bbox_targets_, (self.num_bboxes, 4))
         bbox_weights_total = self.scatterNd(pos_index, valid_pos_index, (self.num_bboxes,))
         labels_total = self.scatterNd(pos_index, pos_gt_labels, (self.num_bboxes,))
@@ -161,5 +161,5 @@ class BboxAssignSample(nn.Cell):
         total_valid_index = self.concat((valid_pos_index, valid_neg_index))
         label_weights_total = self.scatterNd(total_index, total_valid_index, (self.num_bboxes,))
 
-        return bbox_targets_total, self.cast(bbox_weights_total, mstype.bool_), \
-               labels_total, self.cast(label_weights_total, mstype.bool_)
+        return bbox_targets_total, self.cast(bbox_weights_total, ms.bool_), \
+               labels_total, self.cast(label_weights_total, ms.bool_)

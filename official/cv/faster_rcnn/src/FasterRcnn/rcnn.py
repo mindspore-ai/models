@@ -15,31 +15,31 @@
 """FasterRcnn Rcnn network."""
 
 import numpy as np
-import mindspore.common.dtype as mstype
+import mindspore as ms
+import mindspore.ops as ops
 import mindspore.nn as nn
-from mindspore.ops import operations as P
 from mindspore.common.tensor import Tensor
-from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
-from mindspore import context
 
 
 class DenseNoTranpose(nn.Cell):
     """Dense method"""
     def __init__(self, input_channels, output_channels, weight_init):
         super(DenseNoTranpose, self).__init__()
-        self.weight = Parameter(initializer(weight_init, [input_channels, output_channels], mstype.float32))
-        self.bias = Parameter(initializer("zeros", [output_channels], mstype.float32))
+        self.weight = Parameter(ms.common.initializer.initializer(weight_init, \
+            [input_channels, output_channels], ms.float32))
+        self.bias = Parameter(ms.common.initializer.initializer("zeros", \
+            [output_channels], ms.float32))
 
-        self.matmul = P.MatMul(transpose_b=False)
-        self.bias_add = P.BiasAdd()
-        self.cast = P.Cast()
-        self.device_type = "Ascend" if context.get_context("device_target") == "Ascend" else "Others"
+        self.matmul = ops.MatMul(transpose_b=False)
+        self.bias_add = ops.BiasAdd()
+        self.cast = ops.Cast()
+        self.device_type = "Ascend" if ms.get_context("device_target") == "Ascend" else "Others"
 
     def construct(self, x):
         if self.device_type == "Ascend":
-            x = self.cast(x, mstype.float16)
-            weight = self.cast(self.weight, mstype.float16)
+            x = self.cast(x, ms.float16)
+            weight = self.cast(self.weight, ms.float16)
             output = self.bias_add(self.matmul(x, weight), self.bias)
         else:
             output = self.bias_add(self.matmul(x, self.weight), self.bias)
@@ -76,7 +76,7 @@ class Rcnn(nn.Cell):
         super(Rcnn, self).__init__()
         cfg = config
         self.dtype = np.float32
-        self.ms_type = mstype.float32
+        self.ms_type = ms.float32
         self.rcnn_loss_cls_weight = Tensor(np.array(cfg.rcnn_loss_cls_weight).astype(self.dtype))
         self.rcnn_loss_reg_weight = Tensor(np.array(cfg.rcnn_loss_reg_weight).astype(self.dtype))
         self.rcnn_fc_out_channels = cfg.rcnn_fc_out_channels
@@ -88,37 +88,39 @@ class Rcnn(nn.Cell):
         self.test_batch_size = cfg.test_batch_size
 
         shape_0 = (self.rcnn_fc_out_channels, representation_size)
-        weights_0 = initializer("XavierUniform", shape=shape_0[::-1], dtype=self.ms_type).to_tensor()
+        weights_0 = ms.common.initializer.initializer("XavierUniform", shape=shape_0[::-1], \
+            dtype=self.ms_type).to_tensor()
         shape_1 = (self.rcnn_fc_out_channels, self.rcnn_fc_out_channels)
-        weights_1 = initializer("XavierUniform", shape=shape_1[::-1], dtype=self.ms_type).to_tensor()
+        weights_1 = ms.common.initializer.initializer("XavierUniform", shape=shape_1[::-1], \
+            dtype=self.ms_type).to_tensor()
         self.shared_fc_0 = DenseNoTranpose(representation_size, self.rcnn_fc_out_channels, weights_0)
         self.shared_fc_1 = DenseNoTranpose(self.rcnn_fc_out_channels, self.rcnn_fc_out_channels, weights_1)
 
-        cls_weight = initializer('Normal', shape=[num_classes, self.rcnn_fc_out_channels][::-1],
-                                 dtype=self.ms_type).to_tensor()
-        reg_weight = initializer('Normal', shape=[num_classes * 4, self.rcnn_fc_out_channels][::-1],
-                                 dtype=self.ms_type).to_tensor()
+        cls_weight = ms.common.initializer.initializer('Normal', \
+            shape=[num_classes, self.rcnn_fc_out_channels][::-1], dtype=self.ms_type).to_tensor()
+        reg_weight = ms.common.initializer.initializer('Normal', \
+            shape=[num_classes * 4, self.rcnn_fc_out_channels][::-1], dtype=self.ms_type).to_tensor()
         self.cls_scores = DenseNoTranpose(self.rcnn_fc_out_channels, num_classes, cls_weight)
         self.reg_scores = DenseNoTranpose(self.rcnn_fc_out_channels, num_classes * 4, reg_weight)
 
-        self.flatten = P.Flatten()
-        self.relu = P.ReLU()
-        self.logicaland = P.LogicalAnd()
-        self.loss_cls = P.SoftmaxCrossEntropyWithLogits()
-        self.loss_bbox = P.SmoothL1Loss(beta=1.0)
-        self.reshape = P.Reshape()
-        self.onehot = P.OneHot()
-        self.greater = P.Greater()
-        self.cast = P.Cast()
-        self.sum_loss = P.ReduceSum()
-        self.tile = P.Tile()
-        self.expandims = P.ExpandDims()
+        self.flatten = ops.Flatten()
+        self.relu = ops.ReLU()
+        self.logicaland = ops.LogicalAnd()
+        self.loss_cls = ops.SoftmaxCrossEntropyWithLogits()
+        self.loss_bbox = ops.SmoothL1Loss(beta=1.0)
+        self.reshape = ops.Reshape()
+        self.onehot = ops.OneHot()
+        self.greater = ops.Greater()
+        self.cast = ops.Cast()
+        self.sum_loss = ops.ReduceSum()
+        self.tile = ops.Tile()
+        self.expandims = ops.ExpandDims()
 
-        self.gather = P.GatherNd()
-        self.argmax = P.ArgMaxWithValue(axis=1)
+        self.gather = ops.GatherNd()
+        self.argmax = ops.ArgMaxWithValue(axis=1)
 
-        self.on_value = Tensor(1.0, mstype.float32)
-        self.off_value = Tensor(0.0, mstype.float32)
+        self.on_value = Tensor(1.0, ms.float32)
+        self.off_value = Tensor(0.0, ms.float32)
         self.value = Tensor(1.0, self.ms_type)
 
         self.num_bboxes = (cfg.num_expected_pos_stage2 + cfg.num_expected_neg_stage2) * batch_size
@@ -142,7 +144,7 @@ class Rcnn(nn.Cell):
         x_reg = self.reg_scores(x)
 
         if self.training:
-            bbox_weights = self.cast(self.logicaland(self.greater(labels, 0), mask), mstype.int32) * labels
+            bbox_weights = self.cast(self.logicaland(self.greater(labels, 0), mask), ms.int32) * labels
             labels = self.onehot(labels, self.num_classes, self.on_value, self.off_value)
             bbox_targets = self.tile(self.expandims(bbox_targets, 1), (1, self.num_classes, 1))
 

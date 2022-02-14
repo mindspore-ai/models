@@ -15,10 +15,9 @@
 """
 convert pretrain model to faster_rcnn backbone pretrain model
 """
-from mindspore.train.serialization import load_checkpoint, save_checkpoint
+import mindspore as ms
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
-import mindspore.common.dtype as mstype
 from model_utils.config import config
 
 
@@ -33,7 +32,7 @@ def load_weights(model_path, use_fp16_weight):
     Returns:
         parameter list(list): pretrain model weight list.
     """
-    ms_ckpt = load_checkpoint(model_path)
+    ms_ckpt = ms.load_checkpoint(model_path)
     weights = {}
     for msname in ms_ckpt:
         if msname.startswith("layer") or msname.startswith("conv1") or msname.startswith("bn"):
@@ -46,9 +45,9 @@ def load_weights(model_path, use_fp16_weight):
             param_name = param_name.replace("down_sample_layer.1", "bn_down_sample")
         weights[param_name] = ms_ckpt[msname].data.asnumpy()
     if use_fp16_weight:
-        dtype = mstype.float16
+        dtype = ms.float16
     else:
-        dtype = mstype.float32
+        dtype = ms.float32
     parameter_dict = {}
     for name in weights:
         parameter_dict[name] = Parameter(Tensor(weights[name], dtype), name=name)
@@ -59,4 +58,4 @@ def load_weights(model_path, use_fp16_weight):
 
 if __name__ == "__main__":
     parameter_list = load_weights(config.ckpt_file, use_fp16_weight=False)
-    save_checkpoint(parameter_list, "backbone.ckpt")
+    ms.save_checkpoint(parameter_list, "backbone.ckpt")

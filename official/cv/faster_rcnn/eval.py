@@ -20,9 +20,6 @@ from collections import defaultdict
 
 import numpy as np
 from pycocotools.coco import COCO
-import mindspore.common.dtype as mstype
-from mindspore import context
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.common import set_seed, Parameter
 
 from src.dataset import data_to_mindrecord_byte_image, create_fasterrcnn_dataset, parse_json_annos_from_txt
@@ -39,7 +36,7 @@ def fasterrcnn_eval(dataset_path, ckpt_path, anno_path):
         raise RuntimeError("CheckPoint file {} is not valid.".format(ckpt_path))
     ds = create_fasterrcnn_dataset(config, dataset_path, batch_size=config.test_batch_size, is_training=False)
     net = Faster_Rcnn(config)
-    param_dict = load_checkpoint(ckpt_path)
+    param_dict = ms.load_checkpoint(ckpt_path)
 
     # in previous version of code there was a typo in layer name 'fpn_neck': it was 'fpn_ncek'
     # in order to make backward compatibility with checkpoints created with that typo
@@ -54,12 +51,12 @@ def fasterrcnn_eval(dataset_path, ckpt_path, anno_path):
         for key, value in param_dict.items():
             tensor = value.asnumpy().astype(np.float32)
             param_dict[key] = Parameter(tensor, key)
-    load_param_into_net(net, param_dict)
+    ms.load_param_into_net(net, param_dict)
 
     net.set_train(False)
-    device_type = "Ascend" if context.get_context("device_target") == "Ascend" else "Others"
+    device_type = "Ascend" if ms.get_context("device_target") == "Ascend" else "Others"
     if device_type == "Ascend":
-        net.to_float(mstype.float16)
+        net.to_float(ms.float16)
 
     eval_iter = 0
     total = ds.get_dataset_size()
@@ -193,6 +190,6 @@ def eval_fasterrcnn():
 
 if __name__ == '__main__':
     set_seed(1)
-    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
 
     eval_fasterrcnn()

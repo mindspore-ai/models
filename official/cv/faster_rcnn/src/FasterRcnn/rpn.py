@@ -14,12 +14,10 @@
 # ============================================================================
 """RPN for fasterRCNN"""
 import numpy as np
+import mindspore as ms
+import mindspore.ops as ops
 import mindspore.nn as nn
-import mindspore.common.dtype as mstype
-from mindspore import context, Tensor
-from mindspore.ops import operations as P
-from mindspore.ops import functional as F
-from mindspore.common.initializer import initializer
+from mindspore import Tensor
 from .bbox_assign_sample import BboxAssignSample
 
 
@@ -101,8 +99,8 @@ class RPN(nn.Cell):
         super(RPN, self).__init__()
         cfg_rpn = config
         self.dtype = np.float32
-        self.ms_type = mstype.float32
-        self.device_type = "Ascend" if context.get_context("device_target") == "Ascend" else "Others"
+        self.ms_type = ms.float32
+        self.device_type = "Ascend" if ms.get_context("device_target") == "Ascend" else "Others"
         self.num_bboxes = cfg_rpn.num_bboxes
         self.slice_index = ()
         self.feature_anchor_shape = ()
@@ -117,16 +115,16 @@ class RPN(nn.Cell):
         self.batch_size = batch_size
         self.test_batch_size = cfg_rpn.test_batch_size
         self.num_layers = 5
-        self.real_ratio = Tensor(np.ones((1, 1)).astype(self.dtype))
+        self.real_ratio = ms.numpy.ones((1, 1), self.dtype)
 
         self.rpn_convs_list = nn.layer.CellList(self._make_rpn_layer(self.num_layers, in_channels, feat_channels,
                                                                      num_anchors, cls_out_channels))
 
-        self.transpose = P.Transpose()
-        self.reshape = P.Reshape()
-        self.concat = P.Concat(axis=0)
-        self.fill = P.Fill()
-        self.placeh1 = Tensor(np.ones((1,)).astype(self.dtype))
+        self.transpose = ops.Transpose()
+        self.reshape = ops.Reshape()
+        self.concat = ops.Concat(axis=0)
+        self.fill = ops.Fill()
+        self.placeh1 = ms.numpy.ones((1,), self.dtype)
 
         self.trans_shape = (0, 2, 3, 1)
 
@@ -137,17 +135,17 @@ class RPN(nn.Cell):
         self.num_expected_total = Tensor(np.array(cfg_rpn.num_expected_neg * self.batch_size).astype(self.dtype))
         self.num_bboxes = cfg_rpn.num_bboxes
         self.get_targets = BboxAssignSample(cfg_rpn, self.batch_size, self.num_bboxes, False)
-        self.CheckValid = P.CheckValid()
-        self.sum_loss = P.ReduceSum()
-        self.loss_cls = P.SigmoidCrossEntropyWithLogits()
-        self.loss_bbox = P.SmoothL1Loss(beta=1.0/9.0)
-        self.squeeze = P.Squeeze()
-        self.cast = P.Cast()
-        self.tile = P.Tile()
-        self.zeros_like = P.ZerosLike()
-        self.loss = Tensor(np.zeros((1,)).astype(self.dtype))
-        self.clsloss = Tensor(np.zeros((1,)).astype(self.dtype))
-        self.regloss = Tensor(np.zeros((1,)).astype(self.dtype))
+        self.CheckValid = ops.CheckValid()
+        self.sum_loss = ops.ReduceSum()
+        self.loss_cls = ops.SigmoidCrossEntropyWithLogits()
+        self.loss_bbox = ops.SmoothL1Loss(beta=1.0/9.0)
+        self.squeeze = ops.Squeeze()
+        self.cast = ops.Cast()
+        self.tile = ops.Tile()
+        self.zeros_like = ops.ZerosLike()
+        self.loss = ms.numpy.zeros((1,), self.dtype)
+        self.clsloss = ms.numpy.zeros((1,), self.dtype)
+        self.regloss = ms.numpy.zeros((1,), self.dtype)
 
     def _make_rpn_layer(self, num_layers, in_channels, feat_channels, num_anchors, cls_out_channels):
         """
@@ -167,25 +165,25 @@ class RPN(nn.Cell):
 
         shp_weight_conv = (feat_channels, in_channels, 3, 3)
         shp_bias_conv = (feat_channels,)
-        weight_conv = initializer('Normal', shape=shp_weight_conv, dtype=self.ms_type).to_tensor()
-        bias_conv = initializer(0, shape=shp_bias_conv, dtype=self.ms_type).to_tensor()
+        weight_conv = ms.common.initializer.initializer('Normal', shape=shp_weight_conv, dtype=self.ms_type).to_tensor()
+        bias_conv = ms.common.initializer.initializer(0, shape=shp_bias_conv, dtype=self.ms_type).to_tensor()
 
         shp_weight_cls = (num_anchors * cls_out_channels, feat_channels, 1, 1)
         shp_bias_cls = (num_anchors * cls_out_channels,)
-        weight_cls = initializer('Normal', shape=shp_weight_cls, dtype=self.ms_type).to_tensor()
-        bias_cls = initializer(0, shape=shp_bias_cls, dtype=self.ms_type).to_tensor()
+        weight_cls = ms.common.initializer.initializer('Normal', shape=shp_weight_cls, dtype=self.ms_type).to_tensor()
+        bias_cls = ms.common.initializer.initializer(0, shape=shp_bias_cls, dtype=self.ms_type).to_tensor()
 
         shp_weight_reg = (num_anchors * 4, feat_channels, 1, 1)
         shp_bias_reg = (num_anchors * 4,)
-        weight_reg = initializer('Normal', shape=shp_weight_reg, dtype=self.ms_type).to_tensor()
-        bias_reg = initializer(0, shape=shp_bias_reg, dtype=self.ms_type).to_tensor()
+        weight_reg = ms.common.initializer.initializer('Normal', shape=shp_weight_reg, dtype=self.ms_type).to_tensor()
+        bias_reg = ms.common.initializer.initializer(0, shape=shp_bias_reg, dtype=self.ms_type).to_tensor()
 
         for i in range(num_layers):
             rpn_reg_cls_block = RpnRegClsBlock(in_channels, feat_channels, num_anchors, cls_out_channels, \
                                             weight_conv, bias_conv, weight_cls, \
                                             bias_cls, weight_reg, bias_reg)
             if self.device_type == "Ascend":
-                rpn_reg_cls_block.to_float(mstype.float16)
+                rpn_reg_cls_block.to_float(ms.float16)
             rpn_layer.append(rpn_reg_cls_block)
 
         for i in range(1, num_layers):
@@ -237,7 +235,7 @@ class RPN(nn.Cell):
 
                 for j in range(self.num_layers):
                     res = self.cast(self.CheckValid(anchor_list[j], self.squeeze(img_metas[i:i + 1:1, ::])),
-                                    mstype.int32)
+                                    ms.int32)
                     multi_level_flags = multi_level_flags + (res,)
                     anchor_list_tuple = anchor_list_tuple + (anchor_list[j],)
 
@@ -251,7 +249,7 @@ class RPN(nn.Cell):
                 bbox_target, bbox_weight, label, label_weight = self.get_targets(gt_bboxes_i,
                                                                                  gt_labels_i,
                                                                                  self.cast(valid_flag_list,
-                                                                                           mstype.bool_),
+                                                                                           ms.bool_),
                                                                                  anchor_using_list, gt_valids_i)
 
                 bbox_target = self.cast(bbox_target, self.ms_type)
@@ -286,10 +284,10 @@ class RPN(nn.Cell):
                 label_weight_with_batchsize = self.concat(label_weight_using)
 
                 # stop
-                bbox_target_ = F.stop_gradient(bbox_target_with_batchsize)
-                bbox_weight_ = F.stop_gradient(bbox_weight_with_batchsize)
-                label_ = F.stop_gradient(label_with_batchsize)
-                label_weight_ = F.stop_gradient(label_weight_with_batchsize)
+                bbox_target_ = ops.stop_gradient(bbox_target_with_batchsize)
+                bbox_weight_ = ops.stop_gradient(bbox_weight_with_batchsize)
+                label_ = ops.stop_gradient(label_with_batchsize)
+                label_weight_ = ops.stop_gradient(label_weight_with_batchsize)
 
                 cls_score_i = self.cast(rpn_cls_score[i], self.ms_type)
                 reg_score_i = self.cast(rpn_bbox_pred[i], self.ms_type)

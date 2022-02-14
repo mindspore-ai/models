@@ -15,9 +15,9 @@
 """FasterRcnn tpositive and negative sample screening for Rcnn."""
 
 import numpy as np
+import mindspore as ms
 import mindspore.nn as nn
-import mindspore.common.dtype as mstype
-from mindspore.ops import operations as P
+import mindspore.ops as ops
 from mindspore.common.tensor import Tensor
 
 
@@ -46,7 +46,7 @@ class BboxAssignSampleForRcnn(nn.Cell):
         super(BboxAssignSampleForRcnn, self).__init__()
         cfg = config
         self.dtype = np.float32
-        self.ms_type = mstype.float32
+        self.ms_type = ms.float32
         self.batch_size = batch_size
         self.neg_iou_thr = cfg.neg_iou_thr_stage2
         self.pos_iou_thr = cfg.pos_iou_thr_stage2
@@ -61,27 +61,27 @@ class BboxAssignSampleForRcnn(nn.Cell):
         self.label_inds = Tensor(np.arange(1, self.num_gts + 1).astype(np.int32))
         self.add_gt_as_proposals_valid = Tensor(np.full(self.num_gts, self.add_gt_as_proposals, dtype=np.int32))
 
-        self.concat = P.Concat(axis=0)
-        self.max_gt = P.ArgMaxWithValue(axis=0)
-        self.max_anchor = P.ArgMaxWithValue(axis=1)
-        self.sum_inds = P.ReduceSum()
-        self.iou = P.IOU()
-        self.greaterequal = P.GreaterEqual()
-        self.greater = P.Greater()
-        self.select = P.Select()
-        self.gatherND = P.GatherNd()
-        self.squeeze = P.Squeeze()
-        self.cast = P.Cast()
-        self.logicaland = P.LogicalAnd()
-        self.less = P.Less()
-        self.random_choice_with_mask_pos = P.RandomChoiceWithMask(self.num_expected_pos)
-        self.random_choice_with_mask_neg = P.RandomChoiceWithMask(self.num_expected_neg)
-        self.reshape = P.Reshape()
-        self.equal = P.Equal()
-        self.bounding_box_encode = P.BoundingBoxEncode(means=(0.0, 0.0, 0.0, 0.0), stds=(0.1, 0.1, 0.2, 0.2))
-        self.concat_axis1 = P.Concat(axis=1)
-        self.logicalnot = P.LogicalNot()
-        self.tile = P.Tile()
+        self.concat = ops.Concat(axis=0)
+        self.max_gt = ops.ArgMaxWithValue(axis=0)
+        self.max_anchor = ops.ArgMaxWithValue(axis=1)
+        self.sum_inds = ops.ReduceSum()
+        self.iou = ops.IOU()
+        self.greaterequal = ops.GreaterEqual()
+        self.greater = ops.Greater()
+        self.select = ops.Select()
+        self.gatherND = ops.GatherNd()
+        self.squeeze = ops.Squeeze()
+        self.cast = ops.Cast()
+        self.logicaland = ops.LogicalAnd()
+        self.less = ops.Less()
+        self.random_choice_with_mask_pos = ops.RandomChoiceWithMask(self.num_expected_pos)
+        self.random_choice_with_mask_neg = ops.RandomChoiceWithMask(self.num_expected_neg)
+        self.reshape = ops.Reshape()
+        self.equal = ops.Equal()
+        self.bounding_box_encode = ops.BoundingBoxEncode(means=(0.0, 0.0, 0.0, 0.0), stds=(0.1, 0.1, 0.2, 0.2))
+        self.concat_axis1 = ops.Concat(axis=1)
+        self.logicalnot = ops.LogicalNot()
+        self.tile = ops.Tile()
 
         # Check
         self.check_gt_one = Tensor(np.full((self.num_gts, 4), -1, dtype=self.dtype))
@@ -109,11 +109,11 @@ class BboxAssignSampleForRcnn(nn.Cell):
         self.scalar_min_pos_iou = Tensor(self.min_pos_iou, dtype=self.ms_type)
 
     def construct(self, gt_bboxes_i, gt_labels_i, valid_mask, bboxes, gt_valids):
-        gt_bboxes_i = self.select(self.cast(self.tile(self.reshape(self.cast(gt_valids, mstype.int32), \
-                                  (self.num_gts, 1)), (1, 4)), mstype.bool_), \
+        gt_bboxes_i = self.select(self.cast(self.tile(self.reshape(self.cast(gt_valids, ms.int32), \
+                                  (self.num_gts, 1)), (1, 4)), ms.bool_), \
                                   gt_bboxes_i, self.check_gt_one)
-        bboxes = self.select(self.cast(self.tile(self.reshape(self.cast(valid_mask, mstype.int32), \
-                             (self.num_bboxes, 1)), (1, 4)), mstype.bool_), \
+        bboxes = self.select(self.cast(self.tile(self.reshape(self.cast(valid_mask, ms.int32), \
+                             (self.num_bboxes, 1)), (1, 4)), ms.bool_), \
                              bboxes, self.check_anchor_two)
 
         overlaps = self.iou(bboxes, gt_bboxes_i)
@@ -153,10 +153,10 @@ class BboxAssignSampleForRcnn(nn.Cell):
         pos_check_valid = self.cast(self.greater(assigned_gt_inds5, 0), self.ms_type)
         pos_check_valid = self.sum_inds(pos_check_valid, -1)
         valid_pos_index = self.less(self.range_pos_size, pos_check_valid)
-        pos_index = pos_index * self.reshape(self.cast(valid_pos_index, mstype.int32), (self.num_expected_pos, 1))
+        pos_index = pos_index * self.reshape(self.cast(valid_pos_index, ms.int32), (self.num_expected_pos, 1))
 
         num_pos = self.sum_inds(self.cast(self.logicalnot(valid_pos_index), self.ms_type), -1)
-        valid_pos_index = self.cast(valid_pos_index, mstype.int32)
+        valid_pos_index = self.cast(valid_pos_index, ms.int32)
         pos_index = self.reshape(pos_index, self.reshape_shape_pos)
         valid_pos_index = self.reshape(valid_pos_index, self.reshape_shape_pos)
         pos_index = pos_index * valid_pos_index
@@ -174,7 +174,7 @@ class BboxAssignSampleForRcnn(nn.Cell):
         valid_neg_index = self.logicaland(self.concat((self.check_neg_mask, unvalid_pos_index)), valid_neg_index)
         neg_index = self.reshape(neg_index, self.reshape_shape_neg)
 
-        valid_neg_index = self.cast(valid_neg_index, mstype.int32)
+        valid_neg_index = self.cast(valid_neg_index, ms.int32)
         valid_neg_index = self.reshape(valid_neg_index, self.reshape_shape_neg)
         neg_index = neg_index * valid_neg_index
 

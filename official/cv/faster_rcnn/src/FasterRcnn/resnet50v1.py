@@ -15,10 +15,9 @@
 """Resnet50v1.0 backbone."""
 
 import numpy as np
+import mindspore.ops as ops
 import mindspore.nn as nn
-from mindspore.ops import operations as P
 from mindspore.common.tensor import Tensor
-from mindspore.ops import functional as F
 
 
 def weight_init_ones(shape):
@@ -82,8 +81,8 @@ class ResNetFea(nn.Cell):
         bn_training = False
         self.conv1 = _conv(3, 64, kernel_size=7, stride=2, padding=3, pad_mode='pad')
         self.bn1 = _BatchNorm2dInit(64, affine=bn_training, use_batch_statistics=bn_training)
-        self.relu = P.ReLU()
-        self.maxpool = P.MaxPool(kernel_size=3, strides=2, pad_mode="SAME")
+        self.relu = ops.ReLU()
+        self.maxpool = ops.MaxPool(kernel_size=3, strides=2, pad_mode="SAME")
         self.weights_update = weights_update
 
         if not self.weights_update:
@@ -156,7 +155,7 @@ class ResNetFea(nn.Cell):
         c2 = self.layer1(c1)
         identity = c2
         if not self.weights_update:
-            identity = F.stop_gradient(c2)
+            identity = ops.stop_gradient(c2)
         c3 = self.layer2(identity)
         c4 = self.layer3(c3)
         c5 = self.layer4(c4)
@@ -219,7 +218,7 @@ class ResidualBlockUsing_V1(nn.Cell):
             self.conv2.weight.requires_grad = False
             self.conv3.weight.requires_grad = False
 
-        self.relu = P.ReLU()
+        self.relu = ops.ReLU()
         self.downsample = down_sample
         if self.downsample:
             self.conv_down_sample = _conv(in_channels, out_channels, kernel_size=1, stride=stride, padding=0)
@@ -229,7 +228,7 @@ class ResidualBlockUsing_V1(nn.Cell):
                 self.bn_down_sample = self.bn_down_sample.set_train()
             if not weights_update:
                 self.conv_down_sample.weight.requires_grad = False
-        self.add = P.Add()
+        self.add = ops.Add()
 
     def construct(self, x):
         """
