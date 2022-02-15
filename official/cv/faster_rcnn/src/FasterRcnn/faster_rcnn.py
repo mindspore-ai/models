@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import mindspore.ops as ops
 import mindspore.nn as nn
 from mindspore import context
 from mindspore.common.tensor import Tensor
+from src.model_utils.config import config as default_cfg
 from .bbox_assign_sample_stage2 import BboxAssignSampleForRcnn
 from .fpn_neck import FeatPyramidNeck
 from .proposal_generator import Proposal
@@ -27,7 +28,7 @@ from .rcnn import Rcnn
 from .rpn import RPN
 from .roi_align import SingleRoIExtractor
 from .anchor_generator import AnchorGenerator
-from ..model_utils.config import config as default_cfg
+
 
 if default_cfg.backbone in ("resnet_v1.5_50", "resnet_v1_101", "resnet_v1_152"):
     from .resnet import ResNetFea, ResidualBlockUsing

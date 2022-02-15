@@ -14,8 +14,9 @@
     - [Evaluation Process](#evaluation-process)
         - [Evaluation Usage](#usage)
         - [Evaluation Result](#result)
+        - [ONNX Evaluation](#onnx-evaluation)
 - [Model Description](#model-description)
-    - [Performance](#performance)  
+    - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
         - [Inference Performance](#inference-performance)
 - [ModelZoo Homepage](#modelzoo-homepage)
@@ -39,7 +40,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 Dataset used: [COCO2017](<https://cocodataset.org/>)
 
 - Dataset size：19G
-    - Train：18G，118000 images  
+    - Train：18G，118000 images
     - Val：1G，5000 images
     - Annotations：241M，instances，captions，person_keypoints etc
 - Data format：image and json files
@@ -301,6 +302,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
     ├─run_infer_310.sh                // shell script for 310 inference
     └─run_eval_ascend.sh              // shell script for eval on ascend
     └─run_eval_gpu.sh                 // shell script for eval on GPU
+    └─run_eval_onnx.sh                // shell script for ONNX model evaluation
   ├─src
     ├─FasterRcnn
       ├─__init__.py                   // init file
@@ -330,6 +332,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
   ├─default_config_152.yaml           // config for ResNet152
   ├─export.py                         // script to export AIR,MINDIR,ONNX model
   ├─eval.py                           // eval script
+  ├─eval_onnx.py                      // ONNX evaluation script
   ├─postprocess.py                    // post process for 310 inference
   ├─requirements.txt                  // requirements file
   └─train.py                          // train scripts
@@ -500,6 +503,37 @@ Inference result is saved in current path, you can find result like this in acc.
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.622
 ```
 
+### ONNX Evaluation
+
+- Export your model to ONNX:
+
+  ```shell
+  python export.py --config_path default_config.yaml --ckpt_file path/to/fasterrcnn.ckpt --device_target GPU --file_format ONNX --file_name fasterrcnn
+  ```
+
+- Run the script for ONNX evaluation:
+
+  ```shell
+  bash scripts/run_eval_onnx.sh [ANNO_PATH] [ONNX_MODEL] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR]"
+  ```
+
+  The result will be saved in log file and have the following form:
+
+  ```shell
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.388
+  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.619
+  Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.420
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.249
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.424
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.503
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.316
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.501
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.528
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.370
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.565
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.657
+  ```
+
 # Model Description
 
 ## Performance
@@ -583,6 +617,6 @@ Inference result is saved in current path, you can find result like this in acc.
 | Accuracy            | IoU=0.50: 64.4%             |
 | Model for inference | 250M (.ckpt file)           |
 
-# [ModelZoo Homepage](#contents)  
+# [ModelZoo Homepage](#contents)
 
  Please check the official [homepage](https://gitee.com/mindspore/models).
