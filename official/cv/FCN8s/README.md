@@ -197,11 +197,15 @@ ckpt_file: /home/FCN8s/ckpt/FCN8s_1-133_300.ckpt
 
 - build mindrecord training data
 
+下载得到的benchmark.tgz和VOCtrainval_11-May-2012.tar文件解压后放在/path_to_data/fcn8s_data目录下
+
   ```python
+  python src/data/get_dataset_list.py --data_dir=/path_to_data/fcn8s_data
+
   bash build_data.sh
   or
-  python src/data/build_seg_data.py  --data_root=/home/sun/data/Mindspore/benchmark_RELEASE/dataset  \
-                                     --data_lst=/home/sun/data/Mindspore/benchmark_RELEASE/dataset/trainaug.txt  \
+  python src/data/build_seg_data.py  --data_root=/path_to_data/fcn8s_data/benchmark_RELEASE/dataset  \
+                                     --data_lst=/path_to_data/fcn8s_data/vocaug_train_lst.txt  \
                                      --dst_path=dataset/MINDRECORED_NAME.mindrecord  \
                                      --num_shards=1  \
                                      --shuffle=True
