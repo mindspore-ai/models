@@ -51,7 +51,7 @@
 └─dataset
     ├─train                 # 训练数据集
     └─val                   # 评估数据集
-```
+ ```
 
 # [特性](#目录)
 
@@ -154,7 +154,6 @@
     # ===== Hardware setup ===== #
     num_parallel_workers: 16                # 数据预处理线程数
     device_target: Ascend                   # 硬件选择
-
     # ===== Model config ===== #
     input_size: 192                         # 训练图像大小
     test_input_size: 256                    # 测试图像大小
@@ -182,7 +181,7 @@
 
   # 使用python启动单卡运行评估示例
   python eval.py --device_id 0 --device_target Ascend --config ./src/configs/dm_nfnet_f0.yaml
-  --pretrained ./ckpt_0/dm_nfnet_f0.ckpt  --inference True > ./eval.log 2>&1 &
+  --pretrained ./ckpt_0/dm_nfnet_f0.ckpt > ./eval.log 2>&1 &
 
   # 使用脚本启动单卡运行评估示例
   bash ./scripts/run_eval_ascend.sh [DEVICE_ID] [CONFIG_PATH] [CHECKPOINT_PATH]
@@ -211,7 +210,7 @@
 
   # 使用python启动单卡运行评估示例
   python eval.py --device_id 0 --device_target GPU --config ./src/configs/dm_nfnet_f0.yaml \
-  --pretrained ./ckpt_0/dm_nfnet_f0.ckpt  --inference True > ./eval.log 2>&1 &
+  --pretrained ./ckpt_0/dm_nfnet_f0.ckpt > ./eval.log 2>&1 &
 
   # 使用脚本启动单卡运行评估示例
   bash ./scripts/run_eval_gpu.sh [DEVICE_ID] [CONFIG_PATH] [CHECKPOINT_PATH]
@@ -222,7 +221,7 @@
 ### 导出
 
   ```shell
-  python export.py --pretrained [CKPT_FILE] --config [CONFIG_PATH] --device_target [DEVICE_TARGET] --inference True
+  python export.py --pretrained [CKPT_FILE] --config [CONFIG_PATH] --device_target [DEVICE_TARGET]
   ```
 
 导出的模型会以模型的结构名字命名并且保存在当前目录下
