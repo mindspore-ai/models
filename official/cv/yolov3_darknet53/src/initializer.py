@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,7 @@
 import math
 from functools import reduce
 import numpy as np
-from mindspore.common import initializer as init
-from mindspore.common.initializer import Initializer as MeInitializer
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+import mindspore as ms
 import mindspore.nn as nn
 from .util import load_backbone
 
@@ -101,7 +99,7 @@ def kaiming_uniform_(arr, a=0, mode='fan_in', nonlinearity='leaky_relu'):
     Also known as He initialization.
 
     Args:
-        tensor: an n-dimensional `Tensor`
+        arr: an n-dimensional `Tensor`
         a: the negative slope of the rectifier used after this layer (only
         used with ``'leaky_relu'``)
         mode: either ``'fan_in'`` (default) or ``'fan_out'``. Choosing ``'fan_in'``
@@ -139,7 +137,7 @@ def _calculate_fan_in_and_fan_out(arr):
     return fan_in, fan_out
 
 
-class KaimingUniform(MeInitializer):
+class KaimingUniform(ms.common.initializer.Initializer):
     """Kaiming uniform initializer."""
     def __init__(self, a=0, mode='fan_in', nonlinearity='leaky_relu'):
         super(KaimingUniform, self).__init__()
@@ -156,27 +154,24 @@ def default_recurisive_init(custom_cell):
     """Initialize parameter."""
     for _, cell in custom_cell.cells_and_names():
         if isinstance(cell, nn.Conv2d):
-            cell.weight.set_data(init.initializer(KaimingUniform(a=math.sqrt(5)),
-                                                  cell.weight.shape,
-                                                  cell.weight.dtype))
+            cell.weight.set_data(ms.common.initializer.initializer(KaimingUniform(a=math.sqrt(5)),
+                                                                   cell.weight.shape, cell.weight.dtype))
             if cell.bias is not None:
                 fan_in, _ = _calculate_fan_in_and_fan_out(cell.weight)
                 bound = 1 / math.sqrt(fan_in)
-                cell.bias.set_data(init.initializer(init.Uniform(bound),
-                                                    cell.bias.shape,
-                                                    cell.bias.dtype))
+                cell.bias.set_data(ms.common.initializer.initializer(ms.common.initializer.Uniform(bound),
+                                                                     cell.bias.shape, cell.bias.dtype))
         elif isinstance(cell, nn.Dense):
-            cell.weight.set_data(init.initializer(KaimingUniform(a=math.sqrt(5)),
-                                                  cell.weight.shape,
-                                                  cell.weight.dtype))
+            cell.weight.set_data(ms.common.initializer.initializer(KaimingUniform(a=math.sqrt(5)),
+                                                                   cell.weight.shape, cell.weight.dtype))
             if cell.bias is not None:
                 fan_in, _ = _calculate_fan_in_and_fan_out(cell.weight)
                 bound = 1 / math.sqrt(fan_in)
-                cell.bias.set_data(init.initializer(init.Uniform(bound),
-                                                    cell.bias.shape,
-                                                    cell.bias.dtype))
+                cell.bias.set_data(ms.common.initializer.initializer(ms.common.initializer.Uniform(bound),
+                                                                     cell.bias.shape, cell.bias.dtype))
         elif isinstance(cell, (nn.BatchNorm2d, nn.BatchNorm1d)):
             pass
+
 
 def load_yolov3_params(args, network):
     """Load yolov3 darknet parameter from checkpoint."""
@@ -187,7 +182,7 @@ def load_yolov3_params(args, network):
         args.logger.info('Not load pre-trained backbone, please be careful')
 
     if args.resume_yolov3:
-        param_dict = load_checkpoint(args.resume_yolov3)
+        param_dict = ms.load_checkpoint(args.resume_yolov3)
         param_dict_new = {}
         for key, values in param_dict.items():
             if key.startswith('moments.'):
@@ -200,5 +195,5 @@ def load_yolov3_params(args, network):
                 args.logger.info('in resume {}'.format(key))
 
         args.logger.info('resume finished')
-        load_param_into_net(network, param_dict_new)
+        ms.load_param_into_net(network, param_dict_new)
         args.logger.info('load_model {} success'.format(args.resume_yolov3))

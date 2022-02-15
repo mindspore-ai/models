@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
 """Convert weight to mindspore ckpt."""
 import os
 import numpy as np
-from mindspore.train.serialization import save_checkpoint
-from mindspore import Tensor
+import mindspore as ms
 
 from src.yolo import YOLOV3DarkNet53
 from model_utils.config import config
@@ -62,13 +61,14 @@ def convert(weights_file, output_file):
         index += weight.size
 
         param_list.append({'name': weight.name, 'type': weight.dtype, 'shape': weight.shape,
-                           'data': Tensor(weight_data)})
-        param_list.append({'name': mean.name, 'type': mean.dtype, 'shape': mean.shape, 'data': Tensor(mean_data)})
-        param_list.append({'name': var.name, 'type': var.dtype, 'shape': var.shape, 'data': Tensor(var_data)})
-        param_list.append({'name': gamma.name, 'type': gamma.dtype, 'shape': gamma.shape, 'data': Tensor(gamma_data)})
-        param_list.append({'name': beta.name, 'type': beta.dtype, 'shape': beta.shape, 'data': Tensor(beta_data)})
+                           'data': ms.Tensor(weight_data)})
+        param_list.append({'name': mean.name, 'type': mean.dtype, 'shape': mean.shape, 'data': ms.Tensor(mean_data)})
+        param_list.append({'name': var.name, 'type': var.dtype, 'shape': var.shape, 'data': ms.Tensor(var_data)})
+        param_list.append({'name': gamma.name, 'type': gamma.dtype, 'shape': gamma.shape,
+                           'data': ms.Tensor(gamma_data)})
+        param_list.append({'name': beta.name, 'type': beta.dtype, 'shape': beta.shape, 'data': ms.Tensor(beta_data)})
 
-    save_checkpoint(param_list, output_file)
+    ms.save_checkpoint(param_list, output_file)
 
 
 if __name__ == "__main__":

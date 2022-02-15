@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,8 +20,7 @@ import cv2
 from PIL import Image
 import numpy as np
 from pycocotools.coco import COCO
-import mindspore.dataset as de
-import mindspore.dataset.vision.c_transforms as CV
+import mindspore.dataset as ds
 
 from src.distributed_sampler import DistributedSampler
 from src.transforms import reshape_fn, MultiScaleTrans
@@ -143,7 +142,7 @@ class COCOYoloDataset:
         return [x_min, y_min, x_min+w, y_min+h]
 
 
-def create_yolo_dataset(image_dir, anno_path, batch_size, max_epoch, device_num, rank,
+def create_yolo_dataset(image_dir, anno_path, batch_size, device_num, rank,
                         config=None, is_training=True, shuffle=True):
     """Create dataset for YOLOV3."""
     cv2.setNumThreads(0)
@@ -157,7 +156,7 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, max_epoch, device_num,
 
     yolo_dataset = COCOYoloDataset(root=image_dir, ann_file=anno_path, filter_crowd_anno=filter_crowd,
                                    remove_images_without_annotations=remove_empty_anno, is_training=is_training)
-    hwc_to_chw = CV.HWC2CHW()
+    hwc_to_chw = ds.vision.c_transforms.HWC2CHW()
 
     config.dataset_size = len(yolo_dataset)
     cores = multiprocessing.cpu_count()
@@ -168,26 +167,24 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, max_epoch, device_num,
         dataset_column_names = ["image", "annotation", "bbox1", "bbox2", "bbox3",
                                 "gt_box1", "gt_box2", "gt_box3"]
         if device_num != 8:
-            ds = de.GeneratorDataset(yolo_dataset, column_names=dataset_column_names,
-                                     sampler=distributed_sampler)
-            ds = ds.map(operations=CV.Decode(), input_columns=["image"])
-            ds = ds.batch(batch_size, per_batch_map=multi_scale_trans, input_columns=dataset_column_names,
-                          num_parallel_workers=min(32, num_parallel_workers), drop_remainder=True)
+            dataset = ds.GeneratorDataset(yolo_dataset, column_names=dataset_column_names, sampler=distributed_sampler)
+            dataset = dataset.map(operations=ds.vision.c_transforms.Decode(), input_columns=["image"])
+            dataset = dataset.batch(batch_size, per_batch_map=multi_scale_trans, input_columns=dataset_column_names,
+                                    num_parallel_workers=min(32, num_parallel_workers), drop_remainder=True)
         else:
-            ds = de.GeneratorDataset(yolo_dataset, column_names=dataset_column_names, sampler=distributed_sampler)
-            ds = ds.map(operations=CV.Decode(), input_columns=["image"])
-            ds = ds.batch(batch_size, per_batch_map=multi_scale_trans, input_columns=dataset_column_names,
-                          num_parallel_workers=min(8, num_parallel_workers), drop_remainder=True)
+            dataset = ds.GeneratorDataset(yolo_dataset, column_names=dataset_column_names, sampler=distributed_sampler)
+            dataset = dataset.map(operations=ds.vision.c_transforms.Decode(), input_columns=["image"])
+            dataset = dataset.batch(batch_size, per_batch_map=multi_scale_trans, input_columns=dataset_column_names,
+                                    num_parallel_workers=min(8, num_parallel_workers), drop_remainder=True)
     else:
-        ds = de.GeneratorDataset(yolo_dataset, column_names=["image", "img_id"],
-                                 sampler=distributed_sampler)
-        compose_map_func = (lambda image, img_id: reshape_fn(image, img_id, config))
-        ds = ds.map(operations=compose_map_func, input_columns=["image", "img_id"],
-                    output_columns=["image", "image_shape", "img_id"],
-                    column_order=["image", "image_shape", "img_id"],
-                    num_parallel_workers=8)
-        ds = ds.map(operations=hwc_to_chw, input_columns=["image"], num_parallel_workers=8)
-        ds = ds.batch(batch_size, drop_remainder=True)
-    ds = ds.repeat(max_epoch)
+        dataset = ds.GeneratorDataset(yolo_dataset, column_names=["image", "img_id"], sampler=distributed_sampler)
 
-    return ds, len(yolo_dataset)
+        compose_map_func = (lambda image, img_id: reshape_fn(image, img_id, config))
+        dataset = dataset.map(operations=compose_map_func, input_columns=["image", "img_id"],
+                              output_columns=["image", "image_shape", "img_id"],
+                              column_order=["image", "image_shape", "img_id"],
+                              num_parallel_workers=8)
+        dataset = dataset.map(operations=hwc_to_chw, input_columns=["image"], num_parallel_workers=8)
+        dataset = dataset.batch(batch_size, drop_remainder=True)
+
+    return dataset
