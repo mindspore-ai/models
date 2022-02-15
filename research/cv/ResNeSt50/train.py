@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,11 +19,11 @@ import time
 import datetime
 import ast
 import argparse
-
+import numpy as np
 from mindspore import Tensor, context, nn
 from mindspore.context import ParallelMode
 from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.train.callback import ModelCheckpoint
+from mindspore.train.callback import ModelCheckpoint, LossMonitor
 from mindspore.train.callback import CheckpointConfig, Callback, TimeMonitor
 from mindspore.train.model import Model
 from mindspore.train.loss_scale_manager import DynamicLossScaleManager, FixedLossScaleManager
@@ -103,7 +103,7 @@ def Parse(arguments=None):
                         help='device where the code will be implemented (default: Ascend)')
     parser.add_argument('--resume', type=bool, default=False,
                         help='whether to resume the pretrained model')
-    parser.add_argument('--resume_path', type=str, default="/home/lidongsheng/ckpt/resnest-30_2502.ckpt",
+    parser.add_argument('--pretrained_ckpt_path', type=str, default="/home/lidongsheng/ckpt/resnest-30_2502.ckpt",
                         help='put the path to resuming file if needed')
     # training parameters
     parser.add_argument('--run_distribute', type=bool, default=False, help='Run distribute')
@@ -115,23 +115,55 @@ def Parse(arguments=None):
                         help="Evaluation interval when run_eval is True, default is 10.")
     parser.add_argument("--eval_start_epoch", type=int, default=1,
                         help="Evaluation start epoch when run_eval is True, default is 120.")
+    parser.add_argument("--device_num", type=int, default=1)
     # modelarts
     parser.add_argument('--is_model_arts', type=ast.literal_eval, default=False)
     parser.add_argument('--data_url', type=str)
     parser.add_argument('--train_url', type=str)
+
     arguments = parser.parse_args()
 
     return arguments
 
 set_seed(1)
 
+class LossCallBack(LossMonitor):
+    """
+    Monitor the loss in training.
+    If the loss in NAN or INF terminating training.
+    """
+
+    def __init__(self, has_trained_epoch=0):
+        super(LossCallBack, self).__init__()
+        self.has_trained_epoch = has_trained_epoch
+
+    def step_end(self, run_context):
+        cb_params = run_context.original_args()
+        loss1 = cb_params.net_outputs
+
+        if isinstance(loss1, (tuple, list)):
+            if isinstance(loss1[0], Tensor) and isinstance(loss1[0].asnumpy(), np.ndarray):
+                loss1 = loss1[0]
+
+        if isinstance(loss1, Tensor) and isinstance(loss1.asnumpy(), np.ndarray):
+            loss1 = np.mean(loss1.asnumpy())
+
+        cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
+
+        if isinstance(loss1, float) and (np.isnan(loss1) or np.isinf(loss1)):
+            raise ValueError("epoch: {} step: {}. Invalid loss, terminating training.".format(
+                cb_params.cur_epoch_num, cur_step_in_epoch))
+        if self._per_print_times != 0 and cb_params.cur_step_num % self._per_print_times == 0:
+            print("epoch: %s step: %s, loss is %s" % (cb_params.cur_epoch_num + int(self.has_trained_epoch),
+                                                      cur_step_in_epoch, loss1), flush=True)
 if __name__ == "__main__":
     print("================Start training================")
 
     args = Parse()
     target = args.device_target
-    context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
-
+    context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=True)
+    context.set_context(enable_graph_kernel=True)
+    config.lr = config.lr*args.device_num
     if args.run_distribute:
         if target == "Ascend":
             device_id = int(os.getenv('DEVICE_ID'))
@@ -149,7 +181,7 @@ if __name__ == "__main__":
             init()
             config.rank = get_rank()
             config.group_size = get_group_size()
-            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+            context.set_auto_parallel_context(device_num=args.device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
     else:
         try:
@@ -162,6 +194,7 @@ if __name__ == "__main__":
             config.group_size = 1
 
     # dataset
+
     if args.is_model_arts:
         import moxing as mox
         train_dataset_path = '/cache/dataset/'
@@ -179,6 +212,7 @@ if __name__ == "__main__":
                            batch_size=config.batch_size, num_parallel_workers=config.num_workers)
     config.steps_per_epoch = dataset.get_dataset_size()
 
+
     # net
     model_kwargs = {}
     if config.final_drop > 0.0:
@@ -190,9 +224,9 @@ if __name__ == "__main__":
     if args.resume:
         if args.is_model_arts:
             pretrained_ckpt_path = "/cache/pretrained/resnest50-270_2502.ckpt"
-            mox.file.copy_parallel(args.resume_path, pretrained_ckpt_path)
+            mox.file.copy_parallel(args.pretrained_ckpt_path, pretrained_ckpt_path)
         else:
-            pretrained_ckpt_path = args.resume_path
+            pretrained_ckpt_path = args.pretrained_ckpt_path
         net = get_network(config.net_name, args.resume, pretrained_ckpt_path, **model_kwargs)
     else:
         net = get_network(config.net_name, **model_kwargs)
@@ -229,23 +263,28 @@ if __name__ == "__main__":
     time_cb = TimeMonitor(data_size=config.steps_per_epoch)
     callbacks.append(time_cb)
 
+    if target == "GPU":
+        loss_cb = LossCallBack(0)
+        callbacks.append(loss_cb)
+
     # eval
     if args.run_eval:
-        if config.root is None or not os.path.isdir(config.root):
-            raise ValueError("{} is not a existing path.".format(config.root))
-        eval_dataset = ImageNet(config.root, mode="val",
-                                img_size=config.base_size, crop_size=config.crop_size,
-                                rank=config.rank, group_size=config.group_size, epoch=1,
-                                batch_size=config.batch_size, num_parallel_workers=config.num_workers)
-        val_step_size = eval_dataset.get_dataset_size()
-        eval_param_dict = {"model": model, "dataset": eval_dataset, "metrics_name": "acc"}
-        eval_callback = EvalCallBack(apply_eval,
-                                     eval_param_dict,
-                                     interval=args.eval_interval,
-                                     eval_start_epoch=args.eval_start_epoch,
-                                     metrics_name="acc"
-                                     )
-        callbacks.append(eval_callback)
+        if args.device_target == "Ascend":
+            if config.root is None or not os.path.isdir(config.root):
+                raise ValueError("{} is not a existing path.".format(config.root))
+            eval_dataset = ImageNet(config.root, mode="val",
+                                    img_size=config.base_size, crop_size=config.crop_size,
+                                    rank=config.rank, group_size=config.group_size, epoch=1,
+                                    batch_size=config.batch_size, num_parallel_workers=config.num_workers)
+            val_step_size = eval_dataset.get_dataset_size()
+            eval_param_dict = {"model": model, "dataset": eval_dataset, "metrics_name": "acc"}
+            eval_callback = EvalCallBack(apply_eval,
+                                         eval_param_dict,
+                                         interval=args.eval_interval,
+                                         eval_start_epoch=args.eval_start_epoch,
+                                         metrics_name="acc"
+                                         )
+            callbacks.append(eval_callback)
 
     if args.save_ckpt and config.rank == 0:
         ckpt_config = CheckpointConfig(save_checkpoint_steps=config.steps_per_epoch,

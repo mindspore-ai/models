@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,13 +25,11 @@ conv_weight_init = 'HeUniform'
 class GroupConv(nn.Cell):
     """
     group convolution operation.
-
     Args:
         in_channels (int): Input channels of feature map.
         out_channels (int): Output channels of feature map.
         kernel_size (int): Size of convolution kernel.
         stride (int): Stride size for the group convolution layer.
-
     Returns:
         tensor, output tensor.
     """
@@ -41,18 +39,28 @@ class GroupConv(nn.Cell):
         assert in_channels % group == 0 and out_channels % group == 0
         self.group = group
         self.convs = nn.CellList()
+
         self.op_split = P.Split(axis=1, output_num=self.group)
         self.op_concat = P.Concat(axis=1)
         self.cast = P.Cast()
+
         for _ in range(group):
             self.convs.append(nn.Conv2d(in_channels//group, out_channels//group,
                                         kernel_size=kernel_size, stride=stride, has_bias=has_bias,
                                         padding=padding, pad_mode=pad_mode, group=1, weight_init=conv_weight_init))
 
+
     def construct(self, x):
-        features = self.op_split(x)
+
+        if self.group > 1:
+            features = (x[:, 0:(x.shape[1] // 2), :, :], x[:, (x.shape[1] // 2):, :, :])
+        else:
+            features = (x,)
         outputs = ()
+
         for i in range(self.group):
+            if len(features[i].shape) < 4:
+                print("error")
             outputs = outputs + (self.convs[i](self.cast(features[i], mstype.float32)),)
         out = self.op_concat(outputs)
         return out
@@ -83,7 +91,9 @@ class SplAtConv2d(nn.Cell):
         self.rsoftmax = rSoftMax(radix, groups)
         self.reshape = P.Reshape()
         self.split = P.Split(axis=1, output_num=self.radix)
+        self.split1 = P.Split(axis=1, output_num=2)
         self.sum = P.AddN()
+        self.cast = P.Cast()
 
     def construct(self, x):
         """Split attention construct"""
@@ -92,11 +102,14 @@ class SplAtConv2d(nn.Cell):
             x = self.bn0(x)
         x = self.relu(x)
         batch = x.shape[0]
-        splited = self.split(x)
+        splited = ()
         if self.radix > 1:
+            if self.radix != 2:
+                print("error")
             outputs = ()
+            splited = (x[:, 0: (x.shape[1]// 2), :, :], x[:, (x.shape[1]// 2):, :, :])
             for i in range(self.radix):
-                outputs = outputs + (splited[i],)
+                outputs = outputs + (self.cast(splited[i], mstype.float32),)
             gap = self.sum(outputs)
         else:
             gap = x
@@ -111,7 +124,10 @@ class SplAtConv2d(nn.Cell):
         atten = self.fc2(gap)
         atten = self.rsoftmax(atten)
         atten = self.reshape(atten, (batch, -1, 1, 1))
-        attens = self.split(atten)
+        if self.radix > 1:
+            attens = (atten[:, 0:(atten.shape[1]//2), :, :], atten[:, (atten.shape[1]//2):, :, :])
+        else:
+            attens = (atten,)
 
         if self.radix > 1:
             outputs = ()
