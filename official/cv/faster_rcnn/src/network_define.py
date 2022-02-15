@@ -15,10 +15,10 @@
 """FasterRcnn training network wrapper."""
 
 import time
-import numpy as np
+import mindspore.common.dtype as mstype
 import mindspore.ops as ops
 import mindspore.nn as nn
-from mindspore import ParameterTuple
+from mindspore import ParameterTuple, Tensor
 from mindspore.train.callback import Callback
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
 
@@ -134,7 +134,7 @@ class TrainOneStepCell(nn.Cell):
         self.optimizer = optimizer
         self.grad = ops.GradOperation(get_by_list=True,
                                       sens_param=True)
-        self.sens = ms.numpy.ones((1,) * sens).astype(np.float32)
+        self.sens = Tensor([sens,], mstype.float32)
         self.reduce_flag = reduce_flag
         if reduce_flag:
             self.grad_reducer = DistributedGradReducer(optimizer.parameters, mean, degree)
