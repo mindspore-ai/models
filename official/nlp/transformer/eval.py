@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,23 +17,21 @@
 import os
 import numpy as np
 
+import mindspore as ms
 import mindspore.nn as nn
-import mindspore.common.dtype as mstype
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
 from mindspore.train.model import Model
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 import mindspore.dataset as ds
 import mindspore.dataset.transforms.c_transforms as deC
-from mindspore import context
 
 from src.transformer_model import TransformerModel
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id
 
-config.dtype = mstype.float32
-config.compute_type = mstype.float16
+config.dtype = ms.float32
+config.compute_type = ms.float16
 config.batch_size = config.batch_size_ev
 config.hidden_dropout_prob = config.hidden_dropout_prob_ev
 config.attention_probs_dropout_prob = config.attention_probs_dropout_prob_ev
@@ -47,7 +45,7 @@ def load_test_data(batch_size=1, data_file=None):
                                             "target_sos_ids", "target_sos_mask",
                                             "target_eos_ids", "target_eos_mask"],
                               shuffle=False)
-    type_cast_op = deC.TypeCast(mstype.int32)
+    type_cast_op = deC.TypeCast(ms.int32)
     data_set = data_set.map(operations=type_cast_op, input_columns="source_eos_ids")
     data_set = data_set.map(operations=type_cast_op, input_columns="source_eos_mask")
     data_set = data_set.map(operations=type_cast_op, input_columns="target_sos_ids")
@@ -83,7 +81,7 @@ def load_weights(model_path):
         ms_ckpt = np.load(model_path)
         is_npz = True
     else:
-        ms_ckpt = load_checkpoint(model_path)
+        ms_ckpt = ms.load_checkpoint(model_path)
         is_npz = False
 
     weights = {}
@@ -113,14 +111,14 @@ def run_transformer_eval():
     """
     Transformer evaluation.
     """
-    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, reserve_class_name_in_scope=False,
-                        device_id=get_device_id())
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, reserve_class_name_in_scope=False,
+                   device_id=get_device_id())
 
     dataset = load_test_data(batch_size=config.batch_size, data_file=config.data_file)
     tfm_model = TransformerModel(config=config, is_training=False, use_one_hot_embeddings=False)
 
     parameter_dict = load_weights(config.model_file)
-    load_param_into_net(tfm_model, parameter_dict)
+    ms.load_param_into_net(tfm_model, parameter_dict)
 
     tfm_infer = TransformerInferCell(tfm_model)
     model = Model(tfm_infer)
@@ -131,8 +129,8 @@ def run_transformer_eval():
     for batch in dataset.create_dict_iterator(output_numpy=True, num_epochs=1):
         source_sents.append(batch["source_eos_ids"])
         target_sents.append(batch["target_eos_ids"])
-        source_ids = Tensor(batch["source_eos_ids"], mstype.int32)
-        source_mask = Tensor(batch["source_eos_mask"], mstype.int32)
+        source_ids = Tensor(batch["source_eos_ids"], ms.int32)
+        source_mask = Tensor(batch["source_eos_mask"], ms.int32)
         predicted_ids = model.predict(source_ids, source_mask)
         predictions.append(predicted_ids.asnumpy())
 

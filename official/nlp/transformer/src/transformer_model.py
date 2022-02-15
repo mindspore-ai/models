@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+ # Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@
 import math
 import copy
 import numpy as np
-import mindspore.common.dtype as mstype
+import mindspore as ms
+import mindspore.ops as ops
 import mindspore.nn as nn
-import mindspore.ops.functional as F
-from mindspore.ops import operations as P
 from mindspore.common.tensor import Tensor
 from mindspore.common.parameter import Parameter
 from mindspore.ops.primitive import constexpr
@@ -54,8 +53,8 @@ class TransformerConfig:
         beam_width (int): beam width setting. Default: 4
         max_decode_length (int): max decode length in evaluation. Default: 80
         length_penalty_weight (float): normalize scores of translations according to their length. Default: 1.0
-        dtype (:class:`mindspore.dtype`): Data type of the input. Default: mstype.float32.
-        compute_type (:class:`mindspore.dtype`): Compute type in Transformer. Default: mstype.float32.
+        dtype (:class:`mindspore.dtype`): Data type of the input. Default: ms.float32.
+        compute_type (:class:`mindspore.dtype`): Compute type in Transformer. Default: ms.float32.
     """
     def __init__(self,
                  batch_size,
@@ -74,8 +73,8 @@ class TransformerConfig:
                  beam_width=4,
                  max_decode_length=80,
                  length_penalty_weight=1.0,
-                 dtype=mstype.float32,
-                 compute_type=mstype.float32):
+                 dtype=ms.float32,
+                 compute_type=ms.float32):
         self.batch_size = batch_size
         self.seq_length = seq_length
         self.vocab_size = vocab_size
@@ -116,15 +115,15 @@ class EmbeddingLookup(nn.Cell):
         self.embedding_size = embedding_size
         self.use_one_hot_embeddings = use_one_hot_embeddings
         self.embedding_table = Parameter(normal_weight([vocab_size, embedding_size], embedding_size))
-        self.expand = P.ExpandDims()
+        self.expand = ops.ExpandDims()
         self.shape_flat = (-1,)
-        self.gather = P.Gather()
-        self.one_hot = P.OneHot()
-        self.on_value = Tensor(1.0, mstype.float32)
-        self.off_value = Tensor(0.0, mstype.float32)
-        self.array_mul = P.MatMul()
-        self.reshape = P.Reshape()
-        self.shape = P.Shape()
+        self.gather = ops.Gather()
+        self.one_hot = ops.OneHot()
+        self.on_value = Tensor(1.0, ms.float32)
+        self.off_value = Tensor(0.0, ms.float32)
+        self.array_mul = ops.MatMul()
+        self.reshape = ops.Reshape()
+        self.shape = ops.Shape()
 
     def construct(self, input_ids):
         """Get a embeddings lookup table with a fixed dictionary and size."""
@@ -186,15 +185,15 @@ class EmbeddingPostprocessor(nn.Cell):
                  max_position_embeddings=128,
                  dropout_prob=0.1):
         super(EmbeddingPostprocessor, self).__init__()
-        self.scores_mul = Tensor([math.sqrt(float(embedding_size))], dtype=mstype.float32)
-        self.multiply = P.Mul()
-        self.add = P.Add()
-        self.dropout = nn.Dropout(1 - dropout_prob, dtype=mstype.float32)
+        self.scores_mul = Tensor([math.sqrt(float(embedding_size))], dtype=ms.float32)
+        self.multiply = ops.Mul()
+        self.add = ops.Add()
+        self.dropout = nn.Dropout(1 - dropout_prob, dtype=ms.float32)
         self.use_dropout = dropout_prob > 0
-        self.expand_dims = P.ExpandDims()
+        self.expand_dims = ops.ExpandDims()
         self.position_embedding_table = Tensor(position_encoding(max_position_embeddings, embedding_size),
-                                               mstype.float32)
-        self.shape = P.Shape()
+                                               ms.float32)
+        self.shape = ops.Shape()
 
     def construct(self, word_embeddings):
         """Postprocessors apply positional embeddings to word embeddings."""
@@ -217,9 +216,9 @@ class CastWrapper(nn.Cell):
     """
     Cast wrapper.
     """
-    def __init__(self, src_type=mstype.float32, dst_type=mstype.float32):
+    def __init__(self, src_type=ms.float32, dst_type=ms.float32):
         super(CastWrapper, self).__init__()
-        self.cast = P.Cast()
+        self.cast = ops.Cast()
         self.dst_type = dst_type
 
     def construct(self, x):
@@ -234,11 +233,11 @@ class LayerPreprocess(nn.Cell):
                  in_channels=None):
         super(LayerPreprocess, self).__init__()
         self.layernorm = nn.LayerNorm((in_channels,))
-        self.cast = P.Cast()
-        self.get_dtype = P.DType()
+        self.cast = ops.Cast()
+        self.get_dtype = ops.DType()
 
     def construct(self, input_tensor):
-        output = self.cast(input_tensor, mstype.float32)
+        output = self.cast(input_tensor, ms.float32)
         output = self.layernorm(output)
         output = self.cast(output, self.get_dtype(input_tensor))
         return output
@@ -251,7 +250,7 @@ class LayerPostprocess(nn.Cell):
     def __init__(self,
                  dropout_prob=0.1):
         super(LayerPostprocess, self).__init__()
-        self.add = P.Add()
+        self.add = ops.Add()
         self.dropout = nn.Dropout(1 - dropout_prob)
         self.use_dropout = dropout_prob > 0
 
@@ -285,7 +284,7 @@ class MultiheadAttention(nn.Cell):
         initializer_range (float): Initialization value of TruncatedNormal. Default: 0.02.
         do_return_2d_tensor (bool): True for return 2d tensor. False for return 3d
                              tensor. Default: False.
-        compute_type (:class:`mindspore.dtype`): Compute type in MultiheadAttention. Default: mstype.float32.
+        compute_type (:class:`mindspore.dtype`): Compute type in MultiheadAttention. Default: ms.float32.
     """
     def __init__(self,
                  batch_size,
@@ -303,7 +302,7 @@ class MultiheadAttention(nn.Cell):
                  use_one_hot_embeddings=False,
                  initializer_range=0.02,
                  do_return_2d_tensor=True,
-                 compute_type=mstype.float32):
+                 compute_type=ms.float32):
         super(MultiheadAttention, self).__init__()
         self.batch_size = batch_size
         self.num_attention_heads = num_attention_heads
@@ -315,7 +314,7 @@ class MultiheadAttention(nn.Cell):
         self.do_return_2d_tensor = do_return_2d_tensor
 
         self.scores_mul = Tensor([1.0 / math.sqrt(float(self.size_per_head))], dtype=compute_type)
-        self.reshape = P.Reshape()
+        self.reshape = ops.Reshape()
         self.shape_from_2d = (-1, from_tensor_width)
         self.shape_to_2d = (-1, to_tensor_width)
         units = num_attention_heads * size_per_head
@@ -340,29 +339,29 @@ class MultiheadAttention(nn.Cell):
                                   has_bias=False,
                                   weight_init=weight_variable([out_tensor_width, units])).to_float(compute_type)
 
-        self.matmul_trans_b = P.BatchMatMul(transpose_b=True)
-        self.multiply = P.Mul()
-        self.transpose = P.Transpose()
+        self.matmul_trans_b = ops.BatchMatMul(transpose_b=True)
+        self.multiply = ops.Mul()
+        self.transpose = ops.Transpose()
         self.trans_shape = (0, 2, 1, 3)
         self.trans_shape_relative = (2, 0, 1, 3)
         self.trans_shape_position = (1, 2, 0, 3)
         self.multiply_data = Tensor([-10000.0,], dtype=compute_type)
         self.batch_num = batch_size * num_attention_heads
-        self.matmul = P.BatchMatMul()
+        self.matmul = ops.BatchMatMul()
 
         self.softmax = nn.Softmax()
         self.dropout = nn.Dropout(1 - attention_probs_dropout_prob)
         self.use_dropout = attention_probs_dropout_prob > 0
 
         if self.has_attention_mask:
-            self.expand_dims = P.ExpandDims()
-            self.sub = P.Sub()
-            self.add = P.Add()
-            self.cast = P.Cast()
-            self.get_dtype = P.DType()
+            self.expand_dims = ops.ExpandDims()
+            self.sub = ops.Sub()
+            self.add = ops.Add()
+            self.cast = ops.Cast()
+            self.get_dtype = ops.DType()
 
         self.cast_compute_type = CastWrapper(dst_type=compute_type)
-        self.softmax_cast = P.Cast()
+        self.softmax_cast = ops.Cast()
 
     def construct(self, from_tensor, to_tensor, seq_length, enc_seq_length, attention_mask=None):
         """Apply multihead attention."""
@@ -394,12 +393,12 @@ class MultiheadAttention(nn.Cell):
 
         if self.has_attention_mask:
             attention_mask = self.expand_dims(attention_mask, 1)
-            multiply_out = self.sub(self.cast(F.tuple_to_array((1.0,)), self.get_dtype(attention_scores)),
+            multiply_out = self.sub(self.cast(ops.tuple_to_array((1.0,)), self.get_dtype(attention_scores)),
                                     self.cast(attention_mask, self.get_dtype(attention_scores)))
             adder = self.multiply(multiply_out, self.multiply_data)
             attention_scores = self.add(adder, attention_scores)
 
-        attention_scores = self.softmax_cast(attention_scores, mstype.float32)
+        attention_scores = self.softmax_cast(attention_scores, ms.float32)
         attention_probs = self.softmax(attention_scores)
         attention_probs = self.softmax_cast(attention_probs, self.get_dtype(key_layer))
         if self.use_dropout:
@@ -432,7 +431,7 @@ class SelfAttention(nn.Cell):
         hidden_dropout_prob (float): The dropout probability for hidden outputs. Default: 0.1.
         has_attention_mask (bool): Specifies whether has attention mask. Default: True.
         is_encdec_att (bool): Specifies whether query sequence and memory sequence are different. Default: False.
-        compute_type (:class:`mindspore.dtype`): Compute type in MultiheadAttention. Default: mstype.float32.
+        compute_type (:class:`mindspore.dtype`): Compute type in MultiheadAttention. Default: ms.float32.
     """
     def __init__(self,
                  batch_size,
@@ -444,7 +443,7 @@ class SelfAttention(nn.Cell):
                  hidden_dropout_prob=0.1,
                  has_attention_mask=True,
                  is_encdec_att=False,
-                 compute_type=mstype.float32):
+                 compute_type=ms.float32):
         super(SelfAttention, self).__init__()
         if hidden_size % num_attention_heads != 0:
             raise ValueError("The hidden size (%d) is not a multiple of the number "
@@ -469,7 +468,7 @@ class SelfAttention(nn.Cell):
         self.preprocess = LayerPreprocess(in_channels=hidden_size)
         self.postprocess = LayerPostprocess(dropout_prob=hidden_dropout_prob)
 
-        self.reshape = P.Reshape()
+        self.reshape = ops.Reshape()
         self.shape = (-1, hidden_size)
     def construct(self, input_tensor, memory_tensor, attention_mask, seq_length, enc_seq_length):
         """Apply self-attention."""
@@ -497,7 +496,7 @@ class FeedForward(nn.Cell):
         hidden_act (str): name of the activation function. Default: relu
         initializer_range (float): Initialization value of TruncatedNormal. Default: 0.02.
         hidden_dropout_prob (float): The dropout probability for hidden outputs. Default: 0.1.
-        compute_type (:class:`mindspore.dtype`): Compute type in FeedForward. Default: mstype.float32.
+        compute_type (:class:`mindspore.dtype`): Compute type in FeedForward. Default: ms.float32.
     """
     def __init__(self,
                  in_channels,
@@ -506,7 +505,7 @@ class FeedForward(nn.Cell):
                  hidden_act="relu",
                  initializer_range=0.02,
                  hidden_dropout_prob=0.1,
-                 compute_type=mstype.float32):
+                 compute_type=ms.float32):
         super(FeedForward, self).__init__()
 
         self.conv1 = nn.Dense(in_channels,
@@ -520,7 +519,7 @@ class FeedForward(nn.Cell):
         self.preprocess = LayerPreprocess(in_channels=in_channels)
         self.postprocess = LayerPostprocess(dropout_prob=hidden_dropout_prob)
 
-        self.reshape = P.Reshape()
+        self.reshape = ops.Reshape()
         self.shape = (-1, in_channels)
         self.dropout = nn.Dropout(1 - hidden_dropout_prob)
         self.use_dropout = hidden_dropout_prob > 0
@@ -552,7 +551,7 @@ class EncoderCell(nn.Cell):
         initializer_range (float): Initialization value of TruncatedNormal. Default: 0.1.
         hidden_dropout_prob (float): The dropout probability for hidden outputs. Default: 0.1.
         hidden_act (str): Activation function. Default: "relu".
-        compute_type (:class:`mindspore.dtype`): Compute type in attention. Default: mstype.float32.
+        compute_type (:class:`mindspore.dtype`): Compute type in attention. Default: ms.float32.
     """
     def __init__(self,
                  batch_size,
@@ -564,7 +563,7 @@ class EncoderCell(nn.Cell):
                  initializer_range=0.02,
                  hidden_dropout_prob=0.1,
                  hidden_act="relu",
-                 compute_type=mstype.float32):
+                 compute_type=ms.float32):
         super(EncoderCell, self).__init__()
         self.attention = SelfAttention(
             batch_size=batch_size,
@@ -610,7 +609,7 @@ class TransformerEncoder(nn.Cell):
         initializer_range (float): Initialization value of TruncatedNormal. Default: 0.02.
         hidden_dropout_prob (float): The dropout probability for hidden outputs. Default: 0.1..
         hidden_act (str): Activation function used in the encoder cells. Default: "gelu".
-        compute_type (:class:`mindspore.dtype`): Compute type. Default: mstype.float32.
+        compute_type (:class:`mindspore.dtype`): Compute type. Default: ms.float32.
     """
     def __init__(self,
                  batch_size,
@@ -623,7 +622,7 @@ class TransformerEncoder(nn.Cell):
                  initializer_range=0.02,
                  hidden_dropout_prob=0.1,
                  hidden_act="relu",
-                 compute_type=mstype.float32):
+                 compute_type=ms.float32):
         super(TransformerEncoder, self).__init__()
         self.num_hidden_layers = num_hidden_layers
         self.batch_size = batch_size
@@ -646,7 +645,7 @@ class TransformerEncoder(nn.Cell):
 
         self.layer_preprocess = LayerPreprocess(in_channels=hidden_size)
 
-        self.reshape = P.Reshape()
+        self.reshape = ops.Reshape()
         self.shape = (-1, hidden_size)
 
     def construct(self, input_tensor, attention_mask, seq_length):
@@ -680,7 +679,7 @@ class DecoderCell(nn.Cell):
         initializer_range (float): Initialization value of TruncatedNormal. Default: 0.02.
         hidden_dropout_prob (float): The dropout probability for hidden outputs. Default: 0.1.
         hidden_act (str): Activation function. Default: "relu".
-        compute_type (:class:`mindspore.dtype`): Compute type in attention. Default: mstype.float32.
+        compute_type (:class:`mindspore.dtype`): Compute type in attention. Default: ms.float32.
     """
     def __init__(self,
                  batch_size,
@@ -692,7 +691,7 @@ class DecoderCell(nn.Cell):
                  initializer_range=0.02,
                  hidden_dropout_prob=0.1,
                  hidden_act="relu",
-                 compute_type=mstype.float32):
+                 compute_type=ms.float32):
         super(DecoderCell, self).__init__()
         self.self_attention = SelfAttention(
             batch_size=batch_size,
@@ -752,7 +751,7 @@ class TransformerDecoder(nn.Cell):
         initializer_range (float): Initialization value of TruncatedNormal. Default: 0.02.
         hidden_dropout_prob (float): The dropout probability for hidden outputs. Default: 0.1.
         hidden_act (str): Activation function used in the encoder cells. Default: "gelu".
-        compute_type (:class:`mindspore.dtype`): Compute type. Default: mstype.float32.
+        compute_type (:class:`mindspore.dtype`): Compute type. Default: ms.float32.
     """
     def __init__(self,
                  batch_size,
@@ -765,7 +764,7 @@ class TransformerDecoder(nn.Cell):
                  initializer_range=0.02,
                  hidden_dropout_prob=0.1,
                  hidden_act="relu",
-                 compute_type=mstype.float32):
+                 compute_type=ms.float32):
         super(TransformerDecoder, self).__init__()
         self.num_hidden_layers = num_hidden_layers
 
@@ -786,7 +785,7 @@ class TransformerDecoder(nn.Cell):
 
         self.layer_preprocess = LayerPreprocess(in_channels=hidden_size)
 
-        self.reshape = P.Reshape()
+        self.reshape = ops.Reshape()
         self.shape = (-1, hidden_size)
         self.hidden_size = hidden_size
         self.batch_size = batch_size
@@ -815,10 +814,10 @@ class CreateAttentionMaskFromInputMask(nn.Cell):
     """
     def __init__(self):
         super(CreateAttentionMaskFromInputMask, self).__init__()
-        self.cast = P.Cast()
-        self.reshape = P.Reshape()
-        self.shape = P.Shape()
-        self.batch_matmul = P.BatchMatMul()
+        self.cast = ops.Cast()
+        self.reshape = ops.Reshape()
+        self.shape = ops.Shape()
+        self.batch_matmul = ops.BatchMatMul()
 
     def construct(self, input_mask):
         """Create attention mask according to input mask."""
@@ -826,7 +825,7 @@ class CreateAttentionMaskFromInputMask(nn.Cell):
         shape_right = (input_shape[0], 1, input_shape[1])
         shape_left = input_shape + (1,)
 
-        input_mask = self.cast(input_mask, mstype.float32)
+        input_mask = self.cast(input_mask, ms.float32)
         mask_left = self.reshape(input_mask, shape_left)
         mask_right = self.reshape(input_mask, shape_right)
         attention_mask = self.batch_matmul(mask_left, mask_right)
@@ -842,24 +841,24 @@ class PredLogProbs(nn.Cell):
         batch_size (int): Batch size.
         seq_length (int): Length of input sequence.
         width (int): Hidden size.
-        compute_type (:class:`mindspore.dtype`): Compute type. Default: mstype.float32.
-        dtype (:class:`mindspore.dtype`): Compute type to compute log_softmax. Default: mstype.float32.
+        compute_type (:class:`mindspore.dtype`): Compute type. Default: ms.float32.
+        dtype (:class:`mindspore.dtype`): Compute type to compute log_softmax. Default: ms.float32.
     """
     def __init__(self,
                  batch_size,
                  width,
-                 compute_type=mstype.float32,
-                 dtype=mstype.float32):
+                 compute_type=ms.float32,
+                 dtype=ms.float32):
         super(PredLogProbs, self).__init__()
         self.batch_size = batch_size
         self.width = width
         self.compute_type = compute_type
         self.dtype = dtype
 
-        self.reshape = P.Reshape()
-        self.matmul = P.MatMul(transpose_b=True)
+        self.reshape = ops.Reshape()
+        self.matmul = ops.MatMul(transpose_b=True)
         self.log_softmax = nn.LogSoftmax(axis=-1)
-        self.cast = P.Cast()
+        self.cast = ops.Cast()
 
     def construct(self,
                   input_tensor,
@@ -897,7 +896,7 @@ class TransformerDecoderStep(nn.Cell):
         initializer_range (float): Initialization value of TruncatedNormal. Default: 0.02.
         hidden_dropout_prob (float): The dropout probability for hidden outputs. Default: 0.1.
         hidden_act (str): Activation function used in the encoder cells. Default: "gelu".
-        compute_type (:class:`mindspore.dtype`): Compute type. Default: mstype.float32.
+        compute_type (:class:`mindspore.dtype`): Compute type. Default: ms.float32.
         embedding_lookup (:class:`EmbeddingLookup`): Embedding lookup module.
         embedding_processor (:class:`EmbeddingPostprocessor`) Embedding postprocessor module.
         projection (:class:`PredLogProbs`): PredLogProbs module
@@ -914,7 +913,7 @@ class TransformerDecoderStep(nn.Cell):
                  initializer_range=0.02,
                  hidden_dropout_prob=0.3,
                  hidden_act="relu",
-                 compute_type=mstype.float32,
+                 compute_type=ms.float32,
                  embedding_lookup=None,
                  embedding_processor=None,
                  projection=None):
@@ -938,15 +937,15 @@ class TransformerDecoderStep(nn.Cell):
             hidden_act=hidden_act,
             compute_type=compute_type)
 
-        self.ones_like = P.OnesLike()
-        self.shape = P.Shape()
+        self.ones_like = ops.OnesLike()
+        self.shape = ops.Shape()
 
         self._create_attention_mask_from_input_mask = CreateAttentionMaskFromInputMask()
-        self.expand = P.ExpandDims()
-        self.multiply = P.Mul()
+        self.expand = ops.ExpandDims()
+        self.multiply = ops.Mul()
 
         ones = np.ones(shape=(max_decode_length, max_decode_length))
-        self.future_mask = Tensor(np.tril(ones), dtype=mstype.float32)
+        self.future_mask = Tensor(np.tril(ones), dtype=ms.float32)
 
         self.cast_compute_type = CastWrapper(dst_type=compute_type)
 
@@ -986,7 +985,7 @@ class TransformerDecoderStep(nn.Cell):
 @constexpr
 def convert_np_to_tensor_encoder(seq_length):
     ones = np.ones(shape=(seq_length, seq_length))
-    return Tensor(np.tril(ones), dtype=mstype.float32)
+    return Tensor(np.tril(ones), dtype=ms.float32)
 
 
 class TransformerModel(nn.Cell):
@@ -1100,14 +1099,14 @@ class TransformerModel(nn.Cell):
             self.tfm_decoder.add_flags(loop_can_unroll=True)
             self.tile_beam = TileBeam(beam_width=self.beam_width)
             ones = np.ones(shape=(self.batch_size, self.max_decode_length))
-            self.encdec_mask = Tensor(ones, mstype.float32)
+            self.encdec_mask = Tensor(ones, ms.float32)
 
-        self.cast = P.Cast()
+        self.cast = ops.Cast()
         self.dtype = config.dtype
         self.cast_compute_type = CastWrapper(dst_type=config.compute_type)
-        self.expand = P.ExpandDims()
-        self.multiply = P.Mul()
-        self.shape = P.Shape()
+        self.expand = ops.ExpandDims()
+        self.multiply = ops.Mul()
+        self.shape = ops.Shape()
 
         self._create_attention_mask_from_input_mask = CreateAttentionMaskFromInputMask()
 

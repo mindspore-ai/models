@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 import os
 
-import mindspore.common.dtype as mstype
+import mindspore as ms
 import onnxruntime as ort
 
 from eval import load_test_data
@@ -79,8 +79,8 @@ def run_transformer_eval():
 
 def main():
     """Main function"""
-    config.dtype = mstype.float32
-    config.compute_type = mstype.float16
+    config.dtype = ms.float32
+    config.compute_type = ms.float16
     config.batch_size = config.batch_size_ev
     config.hidden_dropout_prob = config.hidden_dropout_prob_ev
     config.attention_probs_dropout_prob = config.attention_probs_dropout_prob_ev
