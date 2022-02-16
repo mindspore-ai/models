@@ -6,30 +6,30 @@ import scipy.io
 from PIL import Image
 
 parser = argparse.ArgumentParser('dataset list generator')
-parser.add_argument("--data_dir", type=str, default='./', help='where dataset stored.')
+parser.add_argument("--data_root", type=str, default='./', help='where dataset stored.')
 
 args, _ = parser.parse_known_args()
 
-data_dir = args.data_dir
-print("Data dir is:", data_dir)
+data_root = args.data_root
+print("Data dir is:", data_root)
 
 #
-VOC_IMG_DIR = os.path.join(data_dir, 'VOCdevkit/VOC2012/JPEGImages')
-VOC_ANNO_DIR = os.path.join(data_dir, 'VOCdevkit/VOC2012/SegmentationClass')
-VOC_ANNO_GRAY_DIR = os.path.join(data_dir, 'VOCdevkit/VOC2012/SegmentationClassGray')
-VOC_TRAIN_TXT = os.path.join(data_dir, 'VOCdevkit/VOC2012/ImageSets/Segmentation/train.txt')
-VOC_VAL_TXT = os.path.join(data_dir, 'VOCdevkit/VOC2012/ImageSets/Segmentation/val.txt')
+VOC_IMG_DIR = os.path.join(data_root, 'VOCdevkit/VOC2012/JPEGImages')
+VOC_ANNO_DIR = os.path.join(data_root, 'VOCdevkit/VOC2012/SegmentationClass')
+VOC_ANNO_GRAY_DIR = os.path.join(data_root, 'VOCdevkit/VOC2012/SegmentationClassGray')
+VOC_TRAIN_TXT = os.path.join(data_root, 'VOCdevkit/VOC2012/ImageSets/Segmentation/train.txt')
+VOC_VAL_TXT = os.path.join(data_root, 'VOCdevkit/VOC2012/ImageSets/Segmentation/val.txt')
 
-SBD_ANNO_DIR = os.path.join(data_dir, 'benchmark_RELEASE/dataset/cls')
-SBD_IMG_DIR = os.path.join(data_dir, 'benchmark_RELEASE/dataset/img')
-SBD_ANNO_PNG_DIR = os.path.join(data_dir, 'benchmark_RELEASE/dataset/cls_png')
-SBD_ANNO_GRAY_DIR = os.path.join(data_dir, 'benchmark_RELEASE/dataset/cls_png_gray')
-SBD_TRAIN_TXT = os.path.join(data_dir, 'benchmark_RELEASE/dataset/train.txt')
-SBD_VAL_TXT = os.path.join(data_dir, 'benchmark_RELEASE/dataset/val.txt')
+SBD_ANNO_DIR = os.path.join(data_root, 'benchmark_RELEASE/dataset/cls')
+SBD_IMG_DIR = os.path.join(data_root, 'benchmark_RELEASE/dataset/img')
+SBD_ANNO_PNG_DIR = os.path.join(data_root, 'benchmark_RELEASE/dataset/cls_png')
+SBD_ANNO_GRAY_DIR = os.path.join(data_root, 'benchmark_RELEASE/dataset/cls_png_gray')
+SBD_TRAIN_TXT = os.path.join(data_root, 'benchmark_RELEASE/dataset/train.txt')
+SBD_VAL_TXT = os.path.join(data_root, 'benchmark_RELEASE/dataset/val.txt')
 
-VOC_TRAIN_LST_TXT = os.path.join(data_dir, 'voc_train_lst.txt')
-VOC_VAL_LST_TXT = os.path.join(data_dir, 'voc_val_lst.txt')
-VOC_AUG_TRAIN_LST_TXT = os.path.join(data_dir, 'vocaug_train_lst.txt')
+VOC_TRAIN_LST_TXT = os.path.join(data_root, 'voc_train_lst.txt')
+VOC_VAL_LST_TXT = os.path.join(data_root, 'voc_val_lst.txt')
+VOC_AUG_TRAIN_LST_TXT = os.path.join(data_root, 'vocaug_train_lst.txt')
 
 
 def __get_data_list(data_list_file):
