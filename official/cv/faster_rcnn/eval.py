@@ -20,6 +20,7 @@ from collections import defaultdict
 
 import numpy as np
 from pycocotools.coco import COCO
+import mindspore as ms
 from mindspore.common import set_seed, Parameter
 
 from src.dataset import data_to_mindrecord_byte_image, create_fasterrcnn_dataset, parse_json_annos_from_txt
