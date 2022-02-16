@@ -103,9 +103,9 @@ def evaluate(cfg, preds, output_dir, all_boxes, img_id, ann_path):
         })
 
     # rescoring and oks nms
-    num_joints = cfg.MODEL.NUM_JOINTS
-    in_vis_thre = cfg.TEST.IN_VIS_THRE
-    oks_thre = cfg.TEST.OKS_THRE
+    num_joints = cfg.MODEL_NUM_JOINTS
+    in_vis_thre = cfg.TEST_IN_VIS_THRE
+    oks_thre = cfg.TEST_OKS_THRE
     oks_nmsed_kpts = {}
     for img, items in img_kpts_dict.items():
         for item in items:
@@ -126,10 +126,10 @@ def evaluate(cfg, preds, output_dir, all_boxes, img_id, ann_path):
             oks_nmsed_kpts[img] = [items[kep] for kep in keep]
 
     # evaluate and save
-    image_set = cfg.DATASET.TEST_SET
+    image_set = cfg.DATASET_TEST_SET
     _write_coco_keypoint_results(oks_nmsed_kpts, num_joints, res_file)
     if 'test' not in image_set and has_coco:
-        ann_path = ann_path if ann_path else os.path.join(cfg.DATASET.ROOT, 'annotations',
+        ann_path = ann_path if ann_path else os.path.join(cfg.DATASET_ROOT, 'annotations',
                                                           'person_keypoints_' + image_set + '.json')
         info_str = _do_python_keypoint_eval(res_file, output_dir, ann_path)
         name_value = OrderedDict(info_str)

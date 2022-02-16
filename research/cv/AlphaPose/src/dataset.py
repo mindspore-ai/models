@@ -30,7 +30,7 @@ import mindspore.dataset.vision.c_transforms as C
 from src.utils.transforms import fliplr_joints, get_affine_transform, affine_transform
 from src.config import config
 
-ds.config.set_seed(config.GENERAL.DATASET_SEED) # Set Random Seed
+ds.config.set_seed(config.DATASET_SEED) # Set Random Seed
 flip_pairs = [[1, 2], [3, 4], [5, 6], [7, 8],
               [9, 10], [11, 12], [13, 14], [15, 16]]
 
@@ -39,17 +39,17 @@ class CocoDatasetGenerator:
     About the specific operations of coco2017 data set processing
     '''
     def __init__(self, cfg, is_train=False):
-        self.image_thre = cfg.TEST.IMAGE_THRE
-        self.image_size = np.array(cfg.MODEL.IMAGE_SIZE, dtype=np.int32)
-        self.image_width = cfg.MODEL.IMAGE_SIZE[0]
-        self.image_height = cfg.MODEL.IMAGE_SIZE[1]
+        self.image_thre = cfg.TEST_IMAGE_THRE
+        self.image_size = np.array(cfg.MODEL_IMAGE_SIZE, dtype=np.int32)
+        self.image_width = cfg.MODEL_IMAGE_SIZE[0]
+        self.image_height = cfg.MODEL_IMAGE_SIZE[1]
         self.aspect_ratio = self.image_width * 1.0 / self.image_height
-        self.heatmap_size = np.array(cfg.NETWORK.HEATMAP_SIZE, dtype=np.int32)
-        self.sigma = cfg.NETWORK.SIGMA
-        self.target_type = cfg.NETWORK.TARGET_TYPE
-        self.scale_factor = cfg.DATASET.SCALE_FACTOR
-        self.rotation_factor = cfg.DATASET.ROT_FACTOR
-        self.flip = cfg.DATASET.FLIP
+        self.heatmap_size = np.array(cfg.NETWORK_HEATMAP_SIZE, dtype=np.int32)
+        self.sigma = cfg.NETWORK_SIGMA
+        self.target_type = cfg.NETWORK_TARGET_TYPE
+        self.scale_factor = cfg.DATASET_SCALE_FACTOR
+        self.rotation_factor = cfg.DATASET_ROT_FACTOR
+        self.flip = cfg.DATASET_FLIP
         self.db = []
         self.is_train = is_train
         self.flip_pairs = [[1, 2], [3, 4], [5, 6], [7, 8],
@@ -310,34 +310,34 @@ def CreateDatasetCoco(rank=0,
     '''
     CreateDatasetCoco
     '''
-    per_batch_size = config.TRAIN.BATCH_SIZE if train_mode else config.TEST.BATCH_SIZE
+    per_batch_size = config.TRAIN_BATCH_SIZE if train_mode else config.TEST_BATCH_SIZE
 
     image_path = ''
     ann_file = ''
     bbox_file = ''
-    if config.MODELARTS.IS_MODEL_ARTS:
-        image_path = config.MODELARTS.CACHE_INPUT
-        ann_file = config.MODELARTS.CACHE_INPUT
-        bbox_file = config.MODELARTS.CACHE_INPUT
+    if config.MODELARTS_IS_MODEL_ARTS:
+        image_path = config.MODELARTS_CACHE_INPUT
+        ann_file = config.MODELARTS_CACHE_INPUT
+        bbox_file = config.MODELARTS_CACHE_INPUT
     else:
-        image_path = config.DATASET.ROOT
-        ann_file = config.DATASET.ROOT
-        bbox_file = config.DATASET.ROOT
+        image_path = config.DATASET_ROOT
+        ann_file = config.DATASET_ROOT
+        bbox_file = config.DATASET_ROOT
 
     if train_mode:
-        image_path = image_path + config.DATASET.TRAIN_SET
-        ann_file = ann_file + config.DATASET.TRAIN_JSON
+        image_path = os.path.join(image_path, config.DATASET_TRAIN_SET)
+        ann_file = os.path.join(ann_file, config.DATASET_TRAIN_JSON)
     else:
-        image_path = image_path + config.DATASET.TEST_SET
-        ann_file = ann_file + config.DATASET.TEST_JSON
-    bbox_file = bbox_file + config.TEST.COCO_BBOX_FILE
+        image_path = os.path.join(image_path, config.DATASET_TEST_SET)
+        ann_file = os.path.join(ann_file, config.DATASET_TEST_JSON)
+    bbox_file = os.path.join(bbox_file, config.TEST_COCO_BBOX_FILE)
 
     print('loading dataset from {}'.format(image_path))
 
     shuffle = shuffle if shuffle is not None else train_mode
     dataset_generator = CocoDatasetGenerator(config, is_train=train_mode)
 
-    if not train_mode and config.TEST.USE_GT_BBOX:
+    if not train_mode and config.TEST_USE_GT_BBOX:
         print('loading bbox file from {}'.format(bbox_file))
         dataset_generator.load_detect_dataset(image_path, ann_file, bbox_file)
     else:

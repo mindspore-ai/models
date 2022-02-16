@@ -12,127 +12,116 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-'''
-config
-'''
-from easydict import EasyDict as edict
+"""Parse arguments"""
 
-config = edict()
+import os
+import ast
+import argparse
+from pprint import pformat
+import yaml
 
-# general
-config.GENERAL = edict()
-config.GENERAL.VERSION = 'commit'
-config.GENERAL.TRAIN_SEED = 1
-config.GENERAL.EVAL_SEED = 1
-config.GENERAL.DATASET_SEED = 1
-config.GENERAL.RUN_DISTRIBUTE = True
+class Config:
+    """
+    Configuration namespace. Convert dictionary to members.
+    """
+    def __init__(self, cfg_dict):
+        for k, v in cfg_dict.items():
+            if isinstance(v, (list, tuple)):
+                setattr(self, k, [Config(x) if isinstance(x, dict) else x for x in v])
+            else:
+                setattr(self, k, Config(v) if isinstance(v, dict) else v)
 
-# model arts
-config.MODELARTS = edict()
-config.MODELARTS.IS_MODEL_ARTS = False
-config.MODELARTS.CACHE_INPUT = '/cache/data_tzh/'
-config.MODELARTS.CACHE_OUTPUT = '/cache/train_out/'
+    def __str__(self):
+        return pformat(self.__dict__)
 
-# model 网络参数
-config.MODEL = edict()
-config.MODEL.IS_TRAINED = False  # 初始是True
-config.MODEL.INIT_WEIGHTS = True
-config.MODEL.PRETRAINED = 'resnet50.ckpt'
-config.MODEL.NUM_JOINTS = 17
-config.MODEL.IMAGE_SIZE = [192, 256]  # 输入图像大小
-#config.MODEL.IMAGE_SIZE = [256,320]
+    def __repr__(self):
+        return self.__str__()
 
-# network
-config.NETWORK = edict()
-config.NETWORK.NUM_LAYERS = 50
-config.NETWORK.DECONV_WITH_BIAS = False
-config.NETWORK.NUM_DECONV_LAYERS = 3
-config.NETWORK.NUM_DECONV_FILTERS = [256, 256, 256]
-config.NETWORK.NUM_DECONV_KERNELS = [4, 4, 4]
-config.NETWORK.FINAL_CONV_KERNEL = 1
-config.NETWORK.REVERSE = True
 
-config.NETWORK.TARGET_TYPE = 'gaussian'
-config.NETWORK.HEATMAP_SIZE = [48, 64]
-#config.NETWORK.HEATMAP_SIZE = [64, 80]
-config.NETWORK.SIGMA = 2
+def parse_cli_to_yaml(parser, cfg, helper=None, choices=None, cfg_path="default_config.yaml"):
+    """
+    Parse command line arguments to the configuration according to the default yaml.
 
-# loss
-config.LOSS = edict()
-config.LOSS.USE_TARGET_WEIGHT = True
+    Args:
+        parser: Parent parser.
+        cfg: Base configuration.
+        helper: Helper description.
+        cfg_path: Path to the default yaml config.
+    """
+    parser = argparse.ArgumentParser(description="[REPLACE THIS at config.py]",
+                                     parents=[parser])
+    helper = {} if helper is None else helper
+    choices = {} if choices is None else choices
+    for item in cfg:
+        if not isinstance(cfg[item], list) and not isinstance(cfg[item], dict):
+            help_description = helper[item] if item in helper else "Please reference to {}".format(cfg_path)
+            choice = choices[item] if item in choices else None
+            if isinstance(cfg[item], bool):
+                parser.add_argument("--" + item, type=ast.literal_eval, default=cfg[item], choices=choice,
+                                    help=help_description)
+            else:
+                parser.add_argument("--" + item, type=type(cfg[item]), default=cfg[item], choices=choice,
+                                    help=help_description)
+    args = parser.parse_args()
+    return args
 
-# dataset
-config.DATASET = edict()
-config.DATASET.TYPE = 'COCO'
-config.DATASET.ROOT = '/COCO2017/'
-config.DATASET.TRAIN_SET = 'images'
-config.DATASET.TRAIN_JSON = 'annotations/person_keypoints_train2017.json'
-config.DATASET.TEST_SET = 'images'
-config.DATASET.TEST_JSON = 'annotations/person_keypoints_val2017.json'
 
-# training data augmentation
-config.DATASET.FLIP = True
-config.DATASET.SCALE_FACTOR = 0.3
-config.DATASET.ROT_FACTOR = 40
+def parse_yaml(yaml_path):
+    """
+    Parse the yaml config file.
 
-# train
-config.TRAIN = edict()
-config.TRAIN.SHUFFLE = True
-config.TRAIN.BATCH_SIZE = 64
-config.TRAIN.BEGIN_EPOCH = 0
-config.TRAIN.END_EPOCH = 270
-config.TRAIN.LR = 0.001
-config.TRAIN.LR_FACTOR = 0.1
-config.TRAIN.LR_STEP = [90, 120]
-config.TRAIN.NUM_PARALLEL_WORKERS = 8
-config.TRAIN.SAVE_CKPT = True
-config.TRAIN.nClasses = 17
-config.TRAIN.CKPT_PATH = "/CKPT_PATH/"
-# valid
-config.TEST = edict()
-config.TEST.device_target = "Ascend"
-config.TEST.device_id = 7
-config.TEST.BATCH_SIZE = 32
-config.TEST.FLIP_TEST = True
-config.TEST.POST_PROCESS = True
-config.TEST.SHIFT_HEATMAP = True
-config.TEST.USE_GT_BBOX = False
-config.TEST.NUM_PARALLEL_WORKERS = 2
-config.TEST.MODEL_FILE = "FastPose.ckpt"
-config.TEST.COCO_BBOX_FILE = '/COCO_BBOX_FILE/COCO_val2017_detections_AP_H_56_person.json'
-config.TEST.OUTPUT_DIR = 'results/'
+    Args:
+        yaml_path: Path to the yaml config.
+    """
+    with open(yaml_path, 'r') as fin:
+        try:
+            cfgs = yaml.load_all(fin.read(), Loader=yaml.FullLoader)
+            cfgs = [x for x in cfgs]
+            if len(cfgs) == 1:
+                cfg_helper = {}
+                cfg = cfgs[0]
+                cfg_choices = {}
+            elif len(cfgs) == 2:
+                cfg, cfg_helper = cfgs
+                cfg_choices = {}
+            elif len(cfgs) == 3:
+                cfg, cfg_helper, cfg_choices = cfgs
+            else:
+                raise ValueError("At most 3 docs (config, description for help, choices) are supported in config yaml")
+            print(cfg_helper)
+        except:
+            raise ValueError("Failed to parse yaml")
+    return cfg, cfg_helper, cfg_choices
 
-# demo
-config.detect_image = "demo.jpg"
-config.yolo_image_size = [416, 416]
-config.yolo_ckpt = "yolov3.ckpt"
-config.fast_pose_ckpt = "FastPose.ckpt"
-# confidence under ignore_threshold means no object when training
-config.yolo_threshold = 0.1
-config.save_bbox_image = True
-config.result_path = "demo_result/"
 
-# nms
-config.TEST.OKS_THRE = 0.9
-config.TEST.IN_VIS_THRE = 0.2
-config.TEST.BBOX_THRE = 1.0
-config.TEST.IMAGE_THRE = 0.0
-config.TEST.NMS_THRE = 1.0
+def merge(args, cfg):
+    """
+    Merge the base config from yaml file and command line arguments.
 
-# 310 infer-related
-config.INFER = edict()
-config.INFER.PRE_RESULT_PATH = './preprocess_Result'
-config.INFER.POST_RESULT_PATH = './result_Files'
+    Args:
+        args: Command line arguments.
+        cfg: Base configuration.
+    """
+    args_var = vars(args)
+    for item in args_var:
+        cfg[item] = args_var[item]
+    return cfg
 
-# Help description for each configuration
-config.enable_modelarts = "Whether training on modelarts, default: False"
-config.data_url = "Url for modelarts"
-config.train_url = "Url for modelarts"
-config.data_path = "The location of the input data."
-config.output_path = "The location of the output file."
-config.device_target = "Running platform, choose from Ascend, GPU or CPU, and default is Ascend."
-config.enable_profiling = 'Whether enable profiling while training, default: False'
-# Parameters that can be modified at the terminal
-config.ckpt_save_dir = "ckpt path to save"
-config.batch_size = "training batch size"
-config.run_distribute = "Run distribute, default is false."
+
+def get_config():
+    """
+    Get Config according to the yaml file and cli arguments.
+    """
+    parser = argparse.ArgumentParser(description="default name", add_help=False)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parser.add_argument("--config_path", type=str, default=os.path.join(current_dir, "../default_config.yaml"),
+                        help="Config file path")
+    path_args, _ = parser.parse_known_args()
+    default, helper, choices = parse_yaml(path_args.config_path)
+    args = parse_cli_to_yaml(parser=parser, cfg=default, helper=helper, choices=choices, cfg_path=path_args.config_path)
+    default = Config(merge(args, default))
+
+    return default
+
+
+config = get_config()

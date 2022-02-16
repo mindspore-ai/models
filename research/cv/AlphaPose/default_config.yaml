@@ -1,0 +1,110 @@
+# general
+DEVICE_ID: 0
+DEVICE_TARGET: ''
+VERSION: 'commit'
+TRAIN_SEED: 1
+EVAL_SEED: 1
+DATASET_SEED: 1
+RUN_DISTRIBUTE: False
+SUMMARY_DIR: './summary'
+
+# modelarts
+MODELARTS_IS_MODEL_ARTS: False
+MODELARTS_DATA_URL: ''
+MODELARTS_TRAIN_URL: ''
+MODELARTS_CACHE_INPUT: '/cache/data_tzh/'
+MODELARTS_CACHE_OUTPUT: '/cache/train_out/'
+
+# model network parameters
+MODEL_IS_TRAINED: False  # Initially True
+MODEL_INIT_WEIGHTS: True
+MODEL_PRETRAINED: 'resnet50.ckpt'
+MODEL_NUM_JOINTS: 17
+MODEL_IMAGE_SIZE: [192, 256]  # input image size
+
+# network
+NETWORK_NUM_LAYERS: 50
+NETWORK_DECONV_WITH_BIAS: False
+NETWORK_NUM_DECONV_LAYERS: 3
+NETWORK_NUM_DECONV_FILTERS: [256, 256, 256]
+NETWORK_NUM_DECONV_KERNELS: [4, 4, 4]
+NETWORK_FINAL_CONV_KERNEL: 1
+NETWORK_REVERSE: True
+
+NETWORK_TARGET_TYPE: 'gaussian'
+NETWORK_HEATMAP_SIZE: [48, 64]
+NETWORK_SIGMA: 2
+
+# loss
+LOSS_USE_TARGET_WEIGHT: True
+
+# dataset
+DATASET_TYPE: 'COCO'
+DATASET_ROOT: ''
+DATASET_TRAIN_SET: 'train2017'
+DATASET_TRAIN_JSON: 'annotations/person_keypoints_train2017.json'
+DATASET_TEST_SET: 'val2017'
+DATASET_TEST_JSON: 'annotations/person_keypoints_val2017.json'
+
+# training data augmentation
+DATASET_FLIP: True
+DATASET_SCALE_FACTOR: 0.3
+DATASET_ROT_FACTOR: 40
+
+# train
+TRAIN_SHUFFLE: True
+TRAIN_BATCH_SIZE: 128  # 128 in original paper
+TRAIN_BEGIN_EPOCH: 0
+TRAIN_END_EPOCH: 270  # 140 in original paper
+TRAIN_LR: 0.001
+TRAIN_LR_FACTOR: 0.1
+TRAIN_LR_STEP: [170, 200]
+TRAIN_NUM_PARALLEL_WORKERS: 6
+TRAIN_SAVE_CKPT: True
+TRAIN_nClasses: 17
+TRAIN_CKPT_PATH: "./"
+
+# valid
+TEST_device_target: "Ascend"
+TEST_device_id: 0
+TEST_BATCH_SIZE: 32
+TEST_FLIP_TEST: True
+TEST_POST_PROCESS: True
+TEST_SHIFT_HEATMAP: True
+TEST_USE_GT_BBOX: False
+TEST_NUM_PARALLEL_WORKERS: 2
+TEST_MODEL_FILE: "FastPose.ckpt"
+TEST_COCO_BBOX_FILE: '/COCO_BBOX_FILE/COCO_val2017_detections_AP_H_56_person.json'
+TEST_OUTPUT_DIR: 'results/'
+
+# export
+file_name: 'simple_baselines'
+ckpt_url: 'FastPose.ckpt'
+file_format: 'MINDIR'
+device_target: 'CPU'
+device_id: 0
+
+# demo
+detect_image: "demo.jpg"
+yolo_image_size: [416, 416]
+yolo_ckpt: "yolov3.ckpt"
+fast_pose_ckpt: "FastPose.ckpt"
+
+# eval
+checkpoint_path: ''
+
+# confidence under ignore_threshold means no object when training
+yolo_threshold: 0.1
+save_bbox_image: True
+result_path: "demo_result/"
+
+# nms
+TEST_OKS_THRE: 0.9
+TEST_IN_VIS_THRE: 0.2
+TEST_BBOX_THRE: 1.0
+TEST_IMAGE_THRE: 0.0
+TEST_NMS_THRE: 1.0
+
+# 310 infer-related
+INFER_PRE_RESULT_PATH: '_/preprocess_Result'
+INFER_POST_RESULT_PATH: '_/result_Files'

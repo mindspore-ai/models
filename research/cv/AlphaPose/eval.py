@@ -17,7 +17,6 @@ This file evaluates the model used.
 '''
 from __future__ import division
 
-import argparse
 import os
 import time
 import numpy as np
@@ -34,25 +33,20 @@ from src.utils.coco import evaluate
 from src.utils.transforms import flip_back
 from src.utils.inference import get_final_preds
 
-if config.MODELARTS.IS_MODEL_ARTS:
+if config.MODELARTS_IS_MODEL_ARTS:
     import moxing as mox
 
-set_seed(config.GENERAL.EVAL_SEED)
-device_id = int(os.getenv('DEVICE_ID'))
+set_seed(config.EVAL_SEED)
+device_id = int(os.getenv('DEVICE_ID', '0'))
 
-def parse_args():
-    parser = argparse.ArgumentParser(description='Evaluate')
-    parser.add_argument('--checkpoint_path', type=str, default=None, help='Checkpoint file path')
-    args = parser.parse_args()
-    return args
 
 def validate(cfg, val_dataset, model, output_dir, ann_path):
     '''
     validate
     '''
     model.set_train(False)
-    num_samples = val_dataset.get_dataset_size() * cfg.TEST.BATCH_SIZE
-    all_preds = np.zeros((num_samples, cfg.MODEL.NUM_JOINTS, 3),
+    num_samples = val_dataset.get_dataset_size() * cfg.TEST_BATCH_SIZE
+    all_preds = np.zeros((num_samples, cfg.MODEL_NUM_JOINTS, 3),
                          dtype=np.float32)
     all_boxes = np.zeros((num_samples, 2))
     image_id = []
@@ -62,12 +56,12 @@ def validate(cfg, val_dataset, model, output_dir, ann_path):
     for item in val_dataset.create_dict_iterator():
         inputs = item['image'].asnumpy()
         output = model(Tensor(inputs, float32)).asnumpy()
-        if cfg.TEST.FLIP_TEST:
+        if cfg.TEST_FLIP_TEST:
             inputs_flipped = Tensor(inputs[:, :, :, ::-1], float32)
             output_flipped = model(inputs_flipped)
             output_flipped = flip_back(output_flipped.asnumpy(), flip_pairs)
 
-            if cfg.TEST.SHIFT_HEATMAP:
+            if cfg.TEST_SHIFT_HEATMAP:
                 output_flipped[:, :, :, 1:] = \
                     output_flipped.copy()[:, :, :, 0:-1]
 
@@ -98,25 +92,25 @@ def validate(cfg, val_dataset, model, output_dir, ann_path):
 
 
 def main():
-    args = parse_args()
     context.set_context(mode=context.GRAPH_MODE,
-                        device_target=config.TEST.device_target,
-                        device_id=config.TEST.device_id)
+                        device_target=config.TEST_device_target,
+                        device_id=config.TEST_device_id)
 
-    if config.MODELARTS.IS_MODEL_ARTS:
-        mox.file.copy_parallel(src_url=args.data_url, dst_url=config.MODELARTS.CACHE_INPUT)
+    if config.MODELARTS_IS_MODEL_ARTS:
+        mox.file.copy_parallel(src_url=config.MODELARTS_DATA_URL,
+                               dst_url=config.MODELARTS_CACHE_INPUT)
 
     model = createModel()
 
-    if config.MODELARTS.IS_MODEL_ARTS:
-        ckpt_name = config.MODELARTS.CACHE_INPUT
+    if config.MODELARTS_IS_MODEL_ARTS:
+        ckpt_name = config.MODELARTS_CACHE_INPUT
     else:
-        ckpt_name = config.DATASET.ROOT
-    ckpt_name = ckpt_name + config.TEST.MODEL_FILE
+        ckpt_name = ''
+    ckpt_name = ckpt_name + config.TEST_MODEL_FILE
 
-    if args.checkpoint_path is not None:
-        param_dict = load_checkpoint(args.checkpoint_path)
-        print("load checkpoint from [{}].".format(args.checkpoint_path))
+    if config.checkpoint_path != '':
+        param_dict = load_checkpoint(config.checkpoint_path)
+        print("load checkpoint from [{}].".format(config.checkpoint_path))
     else:
         param_dict = load_checkpoint(ckpt_name)
         print("load checkpoint from [{}].".format(ckpt_name))
@@ -125,25 +119,26 @@ def main():
 
     valid_dataset = CreateDatasetCoco(
         train_mode=False,
-        num_parallel_workers=config.TEST.NUM_PARALLEL_WORKERS,
+        num_parallel_workers=config.TEST_NUM_PARALLEL_WORKERS,
     )
 
     ckpt_name = ckpt_name.split('/')
     ckpt_name = ckpt_name[len(ckpt_name) - 1]
     ckpt_name = ckpt_name.split('.')[0]
 
-    if config.MODELARTS.IS_MODEL_ARTS:
-        output_dir = config.MODELARTS.CACHE_OUTPUT
-        ann_path = config.MODELARTS.CACHE_INPUT
+    if config.MODELARTS_IS_MODEL_ARTS:
+        output_dir = config.MODELARTS_CACHE_OUTPUT
+        ann_path = config.MODELARTS_CACHE_INPUT
     else:
-        output_dir = config.TEST.OUTPUT_DIR
-        ann_path = config.DATASET.ROOT
+        output_dir = config.TEST_OUTPUT_DIR
+        ann_path = config.DATASET_ROOT
     output_dir = output_dir + ckpt_name
-    ann_path = ann_path + config.DATASET.TEST_JSON
+    ann_path = os.path.join(ann_path, config.DATASET_TEST_JSON)
     validate(config, valid_dataset, model, output_dir, ann_path)
 
-    if config.MODELARTS.IS_MODEL_ARTS:
-        mox.file.copy_parallel(src_url=config.MODELARTS.CACHE_OUTPUT, dst_url=args.train_url)
+    if config.MODELARTS_IS_MODEL_ARTS:
+        mox.file.copy_parallel(src_url=config.MODELARTS_CACHE_OUTPUT,
+                               dst_url=config.MODELARTS_TRAIN_URL)
 
 if __name__ == '__main__':
     main()

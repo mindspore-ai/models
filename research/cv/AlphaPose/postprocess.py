@@ -58,11 +58,11 @@ def get_acc(cfg, result_path, npy_path):
     for i in range(num_samples):
         f1 = os.path.join(result_path, str(i)+"_0.bin")
         output = np.fromfile(f1, np.float32).reshape(out_shape)
-        if cfg.TEST.FLIP_TEST:
+        if cfg.TEST_FLIP_TEST:
             f2 = os.path.join(result_path, "flipped"+str(i)+"_0.bin")
             output_flipped = np.fromfile(f2, np.float32).reshape(out_shape)
             output_flipped = flip_back(output_flipped, flip_pairs)
-            if cfg.TEST.SHIFT_HEATMAP:
+            if cfg.TEST_SHIFT_HEATMAP:
                 output_flipped[:, :, :, 1:] = \
                     output_flipped.copy()[:, :, :, 0:-1]
 
@@ -83,7 +83,7 @@ def get_acc(cfg, result_path, npy_path):
         idx += num_images
 
     output_dir = "result/"
-    ann_path = config.DATASET.ROOT + config.DATASET.TEST_JSON
+    ann_path = config.DATASET_ROOT + config.DATASET_TEST_JSON
     _, perf_indicator = evaluate(cfg, all_preds[:idx], output_dir, all_boxes[:idx], image_id, ann_path)
     print("AP:", perf_indicator)
     return perf_indicator
