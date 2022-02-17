@@ -23,7 +23,7 @@ run_ascend() {
   ulimit -u unlimited
   echo "start evaluation for device $2"
   env >env.log
-  python eval.py --test_mindrecord=$1 --device_id=2 --pretrained_model=$3 > log.txt 2>&1 &
+  python eval.py --test_mindrecord=$1 --device_id=$2 --pretrained_model=$3 > log_eval.txt 2>&1 &
   cd ..
 }
 

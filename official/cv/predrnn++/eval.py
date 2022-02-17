@@ -125,7 +125,7 @@ if __name__ == '__main__':
     fmae = np.asarray(fmae, dtype=np.float32)/batch_id
     sharp = np.asarray(sharp, dtype=np.float32)/(config.batch_size*batch_id)
 
-    print('mse per seq: ' + str(avg_mse))
+    print('mse per frame: ' + str(avg_mse/config.input_length))
     for i in range(config.seq_length - config.input_length):
         print(img_mse[i] / (batch_id*config.batch_size))
 
