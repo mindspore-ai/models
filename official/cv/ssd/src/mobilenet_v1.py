@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # ============================================================================
 
 import mindspore.nn as nn
-from mindspore.ops import operations as P
+import mindspore.ops as ops
 
 def conv_bn_relu(in_channel, out_channel, kernel_size, stride, depthwise, activation='relu6'):
     output = []
@@ -83,7 +83,7 @@ class MobileNetV1(nn.Cell):
                 features = features + (output,)
             return features
         output = self.network(x)
-        output = P.ReduceMean()(output, (2, 3))
+        output = ops.ReduceMean()(output, (2, 3))
         output = self.fc(output)
         return output
 

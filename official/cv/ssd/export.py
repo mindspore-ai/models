@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,17 +16,16 @@
 import os
 import numpy as np
 
-import mindspore
-from mindspore import context, Tensor
-from mindspore.train.serialization import load_checkpoint, load_param_into_net, export
+import mindspore as ms
+from mindspore import Tensor
 from src.ssd import SSD300, SsdInferWithDecoder, ssd_mobilenet_v2, ssd_mobilenet_v1_fpn, ssd_resnet50_fpn, ssd_vgg16
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.box_utils import default_boxes
 
-context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target)
 if config.device_target == "Ascend":
-    context.set_context(device_id=config.device_id)
+    ms.set_context(device_id=config.device_id)
 
 def modelarts_pre_process():
     '''modelarts pre process function.'''
@@ -55,14 +54,14 @@ def run_export():
 
     net = SsdInferWithDecoder(net, Tensor(default_boxes), config)
 
-    param_dict = load_checkpoint(config.checkpoint_file_path)
+    param_dict = ms.load_checkpoint(config.checkpoint_file_path)
     net.init_parameters_data()
-    load_param_into_net(net, param_dict)
+    ms.load_param_into_net(net, param_dict)
     net.set_train(False)
 
     input_shp = [config.batch_size, 3] + config.img_shape
-    input_array = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp), mindspore.float32)
-    export(net, input_array, file_name=config.file_name, file_format=config.file_format)
+    input_array = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp), ms.float32)
+    ms.export(net, input_array, file_name=config.file_name, file_format=config.file_format)
 
 if __name__ == '__main__':
     run_export()

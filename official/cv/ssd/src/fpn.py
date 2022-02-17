@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +13,8 @@
 # limitations under the License.
 # ============================================================================
 
+import mindspore.ops as ops
 import mindspore.nn as nn
-from mindspore.ops import operations as P
-from mindspore.ops import functional as F
 from .mobilenet_v1 import conv_bn_relu, MobileNetV1
 from .resnet import resnet50
 
@@ -47,7 +46,7 @@ class FpnTopDown(nn.Cell):
         for i in range(len(inputs) - 1):
             top = len(inputs) - i - 1
             down = top - 1
-            size = F.shape(inputs[down])
+            size = ops.shape(inputs[down])
             top_down = P.ResizeBilinear((size[2], size[3]))(features[-1])
             top_down = top_down + image_features[down]
             features = features + (top_down,)
