@@ -23,15 +23,13 @@ echo "==========================================================================
 
 if [ $# != 3 ] && [ $# != 5 ]
 then
-    echo "Usage: sh scripts/run_single_train.sh [DEVICE_ID] [MINDRECORD_DIR] \
+    echo "Usage: sh scripts/run_single_train_GPU.sh [DEVICE_ID] [MINDRECORD_DIR] \
 [CONFIG_PATH] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)"
     exit 1
 fi
 
-# Before start single train, first create mindrecord files.
-# BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
-# cd $BASE_PATH/../ || exit
-# python train.py --only_create_dataset=True
+core_num=`cat /proc/cpuinfo |grep "processor"|wc -l`
+process_cores=$core_num
 
 echo "After running the script, the network runs in the background. The log will be generated in LOGx/log.txt"
 
@@ -54,6 +52,7 @@ then
     python train.py  \
     --distribute=False  \
     --config_path=$CONFIG_PATH \
+    --workers=$process_cores  \
     --mindrecord_dir=$MINDRECORD_DIR  > log.txt 2>&1 &
 fi
 
@@ -63,6 +62,7 @@ then
     --distribute=False  \
     --mindrecord_dir=$MINDRECORD_DIR \
     --config_path=$CONFIG_PATH \
+    --workers=$process_cores  \
     --pre_trained=$PRE_TRAINED \
     --pre_trained_epoch_size=$PRE_TRAINED_EPOCH_SIZE > log.txt 2>&1 &
 fi

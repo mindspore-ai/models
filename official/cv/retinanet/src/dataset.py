@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -387,8 +387,8 @@ def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="reti
     writer.commit()
 
 
-def create_retinanet_dataset(mindrecord_file, batch_size, device_num=1, rank=0,
-                             is_training=True, num_parallel_workers=24):
+def create_retinanet_dataset(mindrecord_file, batch_size, repeat_num, device_num=1, rank=0,
+                             is_training=True, num_parallel_workers=8):
     """Creatr retinanet dataset with MindDataset."""
     ds = de.MindDataset(mindrecord_file, columns_list=["img_id", "image", "annotation"], num_shards=device_num,
                         shard_id=rank, num_parallel_workers=num_parallel_workers, shuffle=is_training)
