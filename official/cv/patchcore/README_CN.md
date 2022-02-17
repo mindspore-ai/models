@@ -140,6 +140,7 @@ PatchCore使用预训练的WideResNet50作为Encoder, 并去除layer3之后的�
       │   ├── run_310_infer.sh         // 推理脚本
       │   ├── run_eval.sh              // 评估脚本
       │   └── run_train.sh             // 训练脚本
+      |   └── run_all_mvtec.sh         // 训练所有的Mvtec数据集
       ├── src
       │   ├── dataset.py               // 数据集加载
       │   ├── model.py                 // 模型加载
@@ -180,14 +181,20 @@ python src/pthtockpt.py --pth_path /path/wide_resnet50_2-95faca4d.pth
 - Ascend处理器环境运行
 
   ```bash
-  python train.py --dataset_path ../data/ --device_id 0 --pre_ckpt_path ../pretrain/PatchCore_pretrain.ckpt --category screw > train.log 2>&1 &
+  python train.py --dataset_path ../data/ --pre_ckpt_path ../pretrain/PatchCore_pretrain.ckpt --category screw --device_id 0 > train.log 2>&1 &
   或
-  bash run_train.sh [dataset_path] [device_id] [pre_ckpt_path] [category]
+  bash run_train.sh [dataset_path] [pre_ckpt_path] [category] [device_id]
   ```
 
   上述python命令将在后台运行，您可以通过train.log文件查看结果。
 
   训练结束后，您可在生成的相应类别embeddings目录下找到faiss.index文件，该文件在评估或推理阶段使用，不需要移动。在相应类别的sample目录下可找到异常图文件。
+
+  对于Mvtec数据集，可以通过执行以下命令，进行Mvtec中全部类别数据的训练与推理。
+
+  ```bash
+  bash run_all_mvtec.sh [dataset_path] [pre_ckpt_path] [device_id]
+  ```
 
 ## 评估过程
 
