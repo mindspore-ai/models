@@ -23,6 +23,7 @@
                 - [Run vgg16 on GPU](#run-vgg16-on-gpu)
         - [Evaluation Process](#evaluation-process)
             - [Evaluation](#evaluation-1)
+            - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
@@ -292,6 +293,7 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=
         │   ├── run_distribute_train_gpu.sh       // shell script for distributed training on GPU
         │   ├── run_eval.sh                       // shell script for eval on Ascend
         │   ├── run_infer_310.sh                  // shell script for infer on Ascend 310
+        │   ├── run_onnx_eval.sh                  // shell script for ONNX eval
         ├── src
         │   ├── utils
         │   │   ├── logging.py                    // logging format setting
@@ -306,6 +308,7 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=
         │   ├──vgg.py                             // vgg architecture
         ├── train.py                              // training script
         ├── eval.py                               // evaluation script
+        ├── eval_onnx.py                          // ONNX evaluation script
         ├── postprocess.py                        // postprocess script
         ├── preprocess.py                         // preprocess script
         ├── mindspore_hub_conf.py                 // mindspore_hub_conf script
@@ -503,6 +506,40 @@ after allreduce eval: top1_correct=36636, tot=50000, acc=73.27%
 after allreduce eval: top5_correct=45582, tot=50000, acc=91.16%
 ```
 
+#### ONNX Evaluation
+
+- Export your model to ONNX
+
+```bash
+# when using cifar10 dataset
+python export.py --config_path cifar10_config.yaml --ckpt_file /path/to/checkpoint.ckpt --file_name /path/to/exported.onnx --file_format ONNX --device_target CPU
+
+# when using imagenet2012 dataset
+python export.py --config_path imagenet2012_config.yaml --ckpt_file /path/to/checkpoint.ckpt --file_name /path/to/exported.onnx --file_format ONNX --device_target CPU
+```
+
+- Run ONNX evaluation. Specify dataset type as "cifar10" or "imagenet2012"
+
+```bash
+# when using cifar10 dataset
+python eval_onnx.py --config_path cifar10_config.yaml --file_name /path/to/vgg16_cifar.onnx --data_dir /path/to/cifar10-bin --device_target GPU > output.eval_onnx.log 2>&1 &
+
+# when using imagenet2012 dataset
+python eval_onnx.py --config_path imagenet2012_config.yaml --file_name /path/to/vgg16_imagenet.onnx --data_dir /path/to/imagenet2012/validation --device_target GPU > output.eval_onnx.log 2>&1 &
+```
+
+- The above python command will run in the background, you can view the results through the file `output.eval_onnx.log`. You will get the accuracy as following:
+
+```bash
+# when using cifar10 dataset
+# grep "accuracy" output.eval_onnx.log
+accuracy: 0.9894
+
+# when using the imagenet2012 dataset
+top-1 accuracy: 0.7332
+top-5 accuracy: 0.9149
+```
+
 ## Inference Process
 
 ### [Export MindIR](#contents)
@@ -525,7 +562,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 ```
 
 - `DATASET_NAME` can choose from ['cifar10', 'imagenet2012'].
-- `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n', if you choose y, the cifar10 dataset will be processed in bin format, the imagenet2012 dataset will generate label json file.  
+- `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n', if you choose y, the cifar10 dataset will be processed in bin format, the imagenet2012 dataset will generate label json file.
 - `DEVICE_ID` is optional, default value is 0.
 
 ### result
@@ -610,6 +647,6 @@ Inference result is saved in current path, you can find result like this in acc.
 
 In dataset.py, we set the seed inside “create_dataset" function. We also use random seed in train.py.
 
-## [ModelZoo Homepage](#contents)  
+## [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/models).  
+Please check the official [homepage](https://gitee.com/mindspore/models).
