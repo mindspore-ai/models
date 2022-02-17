@@ -90,8 +90,8 @@ The following table gives a description of the tested environment, scripts and M
 To obtain the pangu_alpha's script, you need `git` to clone the mindspore's code as followings:
 
 ```bash
-git clone https://gitee.com/mindspore/mindspore.git -b master
-cd mindspore/model_zoo/official/nlp/pangu_alpha
+git clone https://gitee.com/mindspore/models.git -b master
+cd models/official/nlp/pangu_alpha
 ```
 
 For requirements, please refer to [Requirements](#requirements) to install the dependency.
@@ -134,7 +134,7 @@ The vocab size of `vocab.vocab` is 40000, and the `eod id` is 6.
 
 ### Training on Ascend
 
-Currently the scripts provide three default configures : `2.6B` `13B` and `200B`. The following command will start training `2.6B` model on 8 **Ascend cards**.
+Currently the scripts provide four default configures : `1.3B`  `2.6B` `13B` and `200B`. The following command will start training `2.6B` model on 8 **Ascend cards**.
 
 ```bash
 
@@ -195,11 +195,11 @@ bash scripts/run_distributed_train_gpu.sh RANK_SIZE HOSTFILE DATASET PER_BATCH M
 - HOSTFILE:  It's a text file describes the host ip and its devices. Please see our [tutorial](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_gpu.html) or [OpenMPI](https://www.open-mpi.org/) for more details.
 - DATASET: The path to the mindrecord files's parent directory . For example: `/home/work/mindrecord/`.
 - PER_BATCH: The batch size for each data parallel-way.
-- MODE: Can be `2.6B`, `13B` and `200B`.
+- MODE: Can be `1.3B` `2.6B`, `13B` and `200B`.
 
 ### Training in heterogeneous with MoE
 
-Currently the scripts provide three default configures : `2.6B` `13B` and `200B`. Currently, only support device target Ascend.
+Currently the scripts provide four default configures : `1.3B` `2.6B` `13B` and `200B`. Currently, only support device target Ascend.
 
 ```bash
 

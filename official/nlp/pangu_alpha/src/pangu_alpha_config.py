@@ -77,67 +77,110 @@ class PanguAlphaConfig:
         return info
 
 
-def set_parse(args_opt):
+def set_parse_200B(args_opt):
     r"""
-       Set config according to the mode
+        Set config for 200B mode
     """
-    if args_opt.mode == "200B":
-        args_opt.embedding_size = 16384
-        args_opt.num_layers = 64
-        args_opt.num_heads = 128
+    args_opt.embedding_size = 16384
+    args_opt.num_layers = 64
+    args_opt.num_heads = 128
+    if args_opt.per_batch_size == 0:
+        args_opt.per_batch_size = 1
+    args_opt.word_emb_dp = 0
+    if args_opt.run_type == "train":
+        args_opt.start_lr = 6e-5
+        args_opt.end_lr = 6e-6
+        args_opt.stage_num = 16
+        args_opt.micro_size = 32
+        args_opt.op_level_model_parallel_num = 16
+        if args_opt.optimizer_shard == 1:
+            args_opt.op_level_model_parallel_num = 8
+    elif args_opt.run_type == "predict":
+        args_opt.stage_num = 4
+        args_opt.micro_size = 1
+        args_opt.op_level_model_parallel_num = 16
+        if args_opt.optimizer_shard == 1:
+            args_opt.op_level_model_parallel_num = 8
+
+
+def set_parse_13B(args_opt):
+    r"""
+        Set config for 13B mode
+    """
+    args_opt.embedding_size = 5120
+    args_opt.num_layers = 40
+    args_opt.num_heads = 40
+    args_opt.word_emb_dp = 1
+    args_opt.op_level_model_parallel_num = 8
+    if args_opt.run_type == "train":
+        args_opt.start_lr = 5e-5
+        args_opt.end_lr = 1e-6
+        args_opt.optimizer_shard = 1
+        args_opt.full_batch = args_opt.opt_offload
+        if args_opt.per_batch_size == 0:
+            args_opt.per_batch_size = 8
+        if args_opt.stage_num > 1:
+            args_opt.word_emb_dp = 0
+    elif args_opt.run_type == "predict":
+        args_opt.stage_num = 1
+        args_opt.micro_size = 1
         if args_opt.per_batch_size == 0:
             args_opt.per_batch_size = 1
-        args_opt.word_emb_dp = 0
-        if args_opt.run_type == "train":
-            args_opt.start_lr = 6e-5
-            args_opt.end_lr = 6e-6
-            args_opt.stage_num = 16
-            args_opt.micro_size = 32
-            args_opt.op_level_model_parallel_num = 16
-            if args_opt.optimizer_shard == 1:
-                args_opt.op_level_model_parallel_num = 8
-        elif args_opt.run_type == "predict":
-            args_opt.stage_num = 4
-            args_opt.micro_size = 1
-            args_opt.op_level_model_parallel_num = 16
-            if args_opt.optimizer_shard == 1:
-                args_opt.op_level_model_parallel_num = 8
-    elif args_opt.mode == "13B":
-        args_opt.embedding_size = 5120
-        args_opt.num_layers = 40
-        args_opt.num_heads = 40
-        args_opt.word_emb_dp = 1
-        args_opt.op_level_model_parallel_num = 8
-        if args_opt.run_type == "train":
-            args_opt.start_lr = 5e-5
-            args_opt.end_lr = 1e-6
-            args_opt.optimizer_shard = 1
-            args_opt.full_batch = args_opt.opt_offload
-            if args_opt.per_batch_size == 0:
-                args_opt.per_batch_size = 8
-            if args_opt.stage_num > 1:
-                args_opt.word_emb_dp = 0
-        elif args_opt.run_type == "predict":
-            args_opt.stage_num = 1
-            args_opt.micro_size = 1
-            if args_opt.per_batch_size == 0:
-                args_opt.per_batch_size = 1
-    elif args_opt.mode == "2.6B":
-        args_opt.embedding_size = 2560
-        args_opt.num_layers = 32
-        args_opt.num_heads = 32
-        args_opt.op_level_model_parallel_num = 8
-        if args_opt.run_type == "train":
-            args_opt.start_lr = 1e-4
-            args_opt.end_lr = 1e-6
-            args_opt.optimizer_shard = 1
-            args_opt.full_batch = args_opt.opt_offload
-            if args_opt.per_batch_size == 0:
-                args_opt.per_batch_size = 16
-            if args_opt.stage_num > 1:
-                args_opt.word_emb_dp = 0
-        elif args_opt.run_type == "predict":
-            args_opt.stage_num = 1
-            args_opt.micro_size = 1
-            if args_opt.per_batch_size == 0:
-                args_opt.per_batch_size = 1
+
+
+def set_parse_2_6B(args_opt):
+    r"""
+        Set config for 2.6B mode
+    """
+    args_opt.embedding_size = 2560
+    args_opt.num_layers = 32
+    args_opt.num_heads = 32
+    args_opt.op_level_model_parallel_num = 8
+    if args_opt.run_type == "train":
+        args_opt.start_lr = 1e-4
+        args_opt.end_lr = 1e-6
+        args_opt.optimizer_shard = 1
+        args_opt.full_batch = args_opt.opt_offload
+        if args_opt.per_batch_size == 0:
+            args_opt.per_batch_size = 16
+        if args_opt.stage_num > 1:
+            args_opt.word_emb_dp = 0
+    elif args_opt.run_type == "predict":
+        args_opt.stage_num = 1
+        args_opt.micro_size = 1
+        if args_opt.per_batch_size == 0:
+            args_opt.per_batch_size = 1
+
+
+def set_parse_1_3B(args_opt):
+    r"""
+        Set config for 1.3B mode
+    """
+    args_opt.embedding_size = 2560
+    args_opt.num_layers = 16
+    args_opt.num_heads = 32
+    args_opt.op_level_model_parallel_num = 8
+    if args_opt.run_type == "train":
+        args_opt.start_lr = 1e-4
+        args_opt.end_lr = 1e-6
+        args_opt.optimizer_shard = 1
+        args_opt.full_batch = args_opt.opt_offload
+        if args_opt.per_batch_size == 0:
+            args_opt.per_batch_size = 16
+        if args_opt.stage_num > 1:
+            args_opt.word_emb_dp = 0
+    elif args_opt.run_type == "predict":
+        args_opt.stage_num = 1
+        args_opt.micro_size = 1
+        if args_opt.per_batch_size == 0:
+            args_opt.per_batch_size = 1
+
+
+def set_parse(args_opt):
+    r"""
+        Set config according to the mode
+    """
+    parse_fn_dict = {"200B": set_parse_200B, "13B": set_parse_13B, "2.6B": set_parse_2_6B, "1.3B": set_parse_1_3B}
+    if args_opt.mode not in parse_fn_dict.keys():
+        raise ValueError("Invalid mode: {}. Optional mode: 200B, 13B, 2.6B and 1.3B".format(args_opt.mode))
+    parse_fn_dict[args_opt.mode](args_opt)
