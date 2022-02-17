@@ -1,0 +1,41 @@
+# Architecture
+arch: effnetv2_s
+
+# ===== Dataset ===== #
+data_url: /imagenet
+set: ImageNetFinetune
+num_classes: 1000
+interpolation: bilinear
+
+# ===== Learning Rate Policy ======== #
+eps: 0.001
+optimizer: rmsprop
+base_lr: 0.0005
+warmup_lr: 0.
+min_lr: 0.
+lr_scheduler: constant_lr
+lr_gamma: 0.97
+warmup_length: 1
+
+# ===== Network training config ===== #
+amp_level: O0
+keep_bn_fp32: True
+beta: [ 0.9, 0.999 ]
+clip_global_norm: True
+clip_global_norm_value: 5
+is_dynamic_loss_scale: True
+epochs: 15
+label_smoothing: 0.1
+weight_decay: 0.00001
+decay: 0.9
+momentum: 0.9
+batch_size: 32
+
+# ===== Hardware setup ===== #
+num_parallel_workers: 16
+
+# ===== Model config ===== #
+drop_path_rate: 0.2
+drop_out_rate: 0.000001
+image_size: 384
+pretrained: ./efficientnets_imagenet22k.ckpt
