@@ -1,0 +1,76 @@
+{
+    "PoseEstNet0":{
+        "stream_config":{
+            "deviceId":"0"
+        },
+        "appsrc0":{
+            "next":"mxpi_tensorinfer0",
+            "factory":"appsrc",
+            "props":{
+                "blocksize":"786432"
+            }
+        },
+        "mxpi_tensorinfer0":{
+            "props": {
+                "dataSource": "appsrc0",
+                "modelPath": "../models/PoseEstNet_tuiple_cfg.om",
+                "waitingTime": "2000",
+                "outputDeviceId": "-1"
+            },
+            "next":"mxpi_dataserialize0",
+            "factory":"mxpi_tensorinfer"
+        },
+        "mxpi_dataserialize0": {
+            "props": {
+                "outputDataKeys": "mxpi_tensorinfer0"
+            },
+            "factory": "mxpi_dataserialize",
+            "next": "appsink0"
+        },
+        "appsink0":{
+            "factory":"appsink",
+            "props":{
+                "blocksize":"589824"
+            }
+        }
+    },
+    "MultiTaskNet0":{
+        "stream_config":{
+            "deviceId":"0"
+        },
+        "appsrc0":{
+            "next":"mxpi_tensorinfer0:0",
+            "factory":"appsrc",
+            "props":{
+                "blocksize":"3407872"
+            }
+        },
+        "appsrc1":{
+            "next":"mxpi_tensorinfer0:1",
+            "factory":"appsrc",
+            "props":{
+                "blocksize":"432"
+            }
+        },
+        "mxpi_tensorinfer0":{
+            "props": {
+                "dataSource": "appsrc0, appsrc1",
+                "modelPath": "../models/MultiTask-3_1141_C39_BS1.om",
+                "waitingTime": "2000",
+                "outputDeviceId": "-1"
+            },
+            "next":"mxpi_dataserialize0",
+            "factory":"mxpi_tensorinfer"
+        },
+        "mxpi_dataserialize0": {
+            "props": {
+                "outputDataKeys": "mxpi_tensorinfer0"
+            },
+            "factory": "mxpi_dataserialize",
+            "next": "appsink0"
+        },
+        "appsink0":{
+            "factory":"appsink"
+        }
+    }
+}
