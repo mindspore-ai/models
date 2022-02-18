@@ -18,8 +18,9 @@
             - [Distributed training on GPU](#distributed-training-on-gpu)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
-            - [Evaluating on Ascend](#training-on-ascend)
+            - [Evaluating on Ascend](#evaluating-on-ascend)
             - [Evaluating on GPU](#training-on-gpu)
+        - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
@@ -28,7 +29,7 @@
         - [Performance](#performance)
             - [Evaluation Performance](#evaluation-performance)
             - [Inference Performance](#inference-performance)
-    - [Description of Random Situation](#description-of-random-situation)
+- [Description of Random Situation](#description-of-random-situation)
     - [ModelZoo Homepage](#modelzoo-homepage)
 
 ## [Unet Description](#contents)
@@ -83,7 +84,7 @@ After installing MindSpore via the official website, you can start training and 
 ```shell
 
 Convert dataset into mifti format.
-python ./src/convert_nifti.py --input_path=/path/to/input_image/ --output_path=/path/to/output_image/
+python ./src/convert_nifti.py --data_path=/path/to/input_image/ --output_path=/path/to/output_image/
 
 ```
 
@@ -162,34 +163,36 @@ If you want to run in modelarts, please check the official documentation of [mod
 
 .
 └─unet3d
-  ├── README.md                       // descriptions about Unet3D
+  ├── README.md                                 // descriptions about Unet3D
   ├── scripts
-  │   ├──run_distribute_train.sh       // shell script for distributed on Ascend
-  │   ├──run_standalone_train.sh      // shell script for standalone on Ascend
-  │   ├──run_standalone_eval.sh       // shell script for evaluation on Ascend
+  │   ├──run_distribute_train.sh                // shell script for distributed on Ascend
+  │   ├──run_standalone_train.sh                // shell script for standalone on Ascend
+  │   ├──run_standalone_eval.sh                 // shell script for evaluation on Ascend
   │   ├──run_distribute_train_gpu_fp32.sh       // shell script for distributed on GPU fp32
   │   ├──run_distribute_train_gpu_fp16.sh       // shell script for distributed on GPU fp16
   │   ├──run_standalone_train_gpu_fp32.sh       // shell script for standalone on GPU fp32
   │   ├──run_standalone_train_gpu_fp16.sh       // shell script for standalone on GPU fp16
   │   ├──run_standalone_eval_gpu_fp32.sh        // shell script for evaluation on GPU fp32
   │   ├──run_standalone_eval_gpu_fp16.sh        // shell script for evaluation on GPU fp16
+  │   ├──run_eval_onnx.sh                       // shell script for ONNX evaluation
   ├── src
-  │   ├──dataset.py                   // creating dataset
-  │   ├──lr_schedule.py               // learning rate scheduler
-  │   ├──transform.py                 // handle dataset
-  │   ├──convert_nifti.py             // convert dataset
-  │   ├──loss.py                      // loss
-  │   ├──utils.py                     // General components (callback function)
-  │   ├──unet3d_model.py              // Unet3D model
-  │   ├──unet3d_parts.py              // Unet3D part
+  │   ├──dataset.py                             // creating dataset
+  │   ├──lr_schedule.py                         // learning rate scheduler
+  │   ├──transform.py                           // handle dataset
+  │   ├──convert_nifti.py                       // convert dataset
+  │   ├──loss.py                                // loss
+  │   ├──utils.py                               // General components (callback function)
+  │   ├──unet3d_model.py                        // Unet3D model
+  │   ├──unet3d_parts.py                        // Unet3D part
           ├── model_utils
-          │   ├──config.py                    // parameter configuration
-          │   ├──device_adapter.py            // device adapter
-          │   ├──local_adapter.py             // local adapter
-          │   ├──moxing_adapter.py            // moxing adapter
-  ├── default_config.yaml             // parameter configuration
-  ├── train.py                        // training script
-  ├── eval.py                         // evaluation script
+          │   ├──config.py                      // parameter configuration
+          │   ├──device_adapter.py              // device adapter
+          │   ├──local_adapter.py               // local adapter
+          │   ├──moxing_adapter.py              // moxing adapter
+  ├── default_config.yaml                       // parameter configuration
+  ├── train.py                                  // training script
+  ├── eval.py                                   // evaluation script
+  ├── eval_onnx.py                              // ONNX evaluation script
 
 ```
 
@@ -351,6 +354,26 @@ The above python command will run in the background. You can view the results th
 eval average dice is 0.9502010010453671
 
 ```
+
+### ONNX Evaluation
+
+- Export your model to ONNX
+
+  ```shell
+  python export.py --ckpt_file /path/to/checkpoint.ckpt --file_name /path/to/exported.onnx --file_format ONNX --device_target GPU
+  ```
+
+- Run ONNX evaluation
+
+  ```shell
+  python eval_onnx.py --file_name /path/to/exported.onnx --data_path /path/to/data/ --device_target GPU > output.eval_onnx.log 2>&1 &
+  ```
+
+- The above python command will run in the background, you can view the results through the file output.eval_onnx.log. You will get the accuracy as following:
+
+  ```log
+  average dice: 0.9646
+  ```
 
 ## Inference Process
 

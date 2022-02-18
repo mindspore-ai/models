@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,8 +22,10 @@ from src.unet3d_model import UNet3d, UNet3d_
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 
-device_id = int(os.getenv('DEVICE_ID'))
-context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False, device_id=device_id)
+context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False)
+if config.device_target == 'Ascend':
+    device_id = int(os.getenv('DEVICE_ID'))
+    context.set_context(device_id=device_id)
 
 @moxing_wrapper()
 def export_model(ckpt_path):
