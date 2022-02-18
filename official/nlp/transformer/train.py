@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,18 +18,16 @@ import os
 import time
 
 from easydict import EasyDict as edict
-import mindspore.common.dtype as mstype
+import mindspore as ms
 from mindspore.common.tensor import Tensor
 from mindspore.nn.optim import Adam
 from mindspore.train.model import Model
 from mindspore.train.loss_scale_manager import DynamicLossScaleManager
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint
 from mindspore.train.callback import Callback, TimeMonitor
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 import mindspore.communication.management as D
 from mindspore.communication.management import get_rank
 from mindspore.context import ParallelMode
-from mindspore import context
 from mindspore.common import set_seed
 
 from src.transformer_for_train import TransformerTrainOneStepCell, TransformerNetworkWithLoss, \
@@ -51,8 +49,8 @@ def get_ms_timestamp():
 time_stamp_init = False
 time_stamp_first = 0
 
-config.dtype = mstype.float32
-config.compute_type = mstype.float16
+config.dtype = ms.float32
+config.compute_type = ms.float16
 config.lr_schedule = edict({
     'learning_rate': 2.0,
     'warmup_steps': 8000,
@@ -116,17 +114,17 @@ def run_transformer_train():
     Transformer training.
     """
     if config.device_target == "Ascend":
-        context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
+        ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
     else:
-        context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
-    context.set_context(reserve_class_name_in_scope=False)
+        ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target)
+    ms.set_context(reserve_class_name_in_scope=False)
 
     # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
-    context.set_context(mempool_block_size="31GB")
+    ms.set_context(mempool_block_size="31GB")
 
     if config.device_target == "GPU":
         # Enable graph kernel
-        context.set_context(enable_graph_kernel=True, graph_kernel_flags="--enable_parallel_fusion")
+        ms.set_context(enable_graph_kernel=True, graph_kernel_flags="--enable_parallel_fusion")
     if config.distribute == "true":
         if config.device_target == "Ascend":
             device_num = config.device_num
@@ -136,9 +134,9 @@ def run_transformer_train():
             device_num = D.get_group_size()
             rank = get_rank()
             config.device_id = rank
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
-                                          device_num=device_num)
+        ms.reset_auto_parallel_context()
+        ms.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
+                                     device_num=device_num)
         rank_id = config.device_id % device_num
         save_ckpt_path = os.path.join(config.save_checkpoint_path, 'ckpt_' + str(get_rank()) + '/')
     else:
@@ -155,8 +153,8 @@ def run_transformer_train():
     netwithloss = TransformerNetworkWithLoss(config, True)
 
     if config.checkpoint_path:
-        parameter_dict = load_checkpoint(config.checkpoint_path)
-        load_param_into_net(netwithloss, parameter_dict)
+        parameter_dict = ms.load_checkpoint(config.checkpoint_path)
+        ms.load_param_into_net(netwithloss, parameter_dict)
 
     hidden_size = config.hidden_size
     learning_rate = config.lr_schedule.learning_rate if config.device_target == "Ascend" else 1.0
@@ -166,7 +164,7 @@ def run_transformer_train():
                                   warmup_steps=config.lr_schedule.warmup_steps,
                                   hidden_size=hidden_size,
                                   start_decay_step=config.lr_schedule.start_decay_step,
-                                  min_lr=config.lr_schedule.min_lr), mstype.float32)
+                                  min_lr=config.lr_schedule.min_lr), ms.float32)
 
     if config.device_target == "GPU" and config.transformer_network == "large":
         optimizer = Adam(netwithloss.trainable_params(), lr, beta2=config.optimizer_adam_beta2)

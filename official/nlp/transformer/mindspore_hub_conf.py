@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ Transformer hub interface for transformer large
 '''
 from src.transformer_model import TransformerModel
 from src.transformer_model import TransformerConfig
-import mindspore.common.dtype as mstype
+import mindspore as ms
 transformer_net_cfg_large = TransformerConfig(
     batch_size=96,
     seq_length=128,
@@ -32,8 +32,8 @@ transformer_net_cfg_large = TransformerConfig(
     max_position_embeddings=128,
     initializer_range=0.02,
     label_smoothing=0.1,
-    dtype=mstype.float32,
-    compute_type=mstype.float16
+    dtype=ms.float32,
+    compute_type=ms.float16
 )
 def create_network(name, *args, **kwargs):
     '''

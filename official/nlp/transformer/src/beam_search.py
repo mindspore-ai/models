@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 """Transformer beam search module."""
 
 import numpy as np
-import mindspore.common.dtype as mstype
+import mindspore as ms
+import mindspore.ops as ops
 import mindspore.nn as nn
-from mindspore.ops import operations as P
 from mindspore.common.tensor import Tensor
 
 INF = 1. * 1e9
@@ -28,22 +28,22 @@ class LengthPenalty(nn.Cell):
 
     Args:
         weight (float): Weight of length penalty. Default: 1.0.
-        compute_type (:class:`mindspore.dtype`): Compute type in Transformer. Default: mstype.float32.
+        compute_type (:class:`mindspore.dtype`): Compute type in Transformer. Default: ms.float32.
     """
     def __init__(self,
                  weight=1.0,
-                 compute_type=mstype.float32):
+                 compute_type=ms.float32):
         super(LengthPenalty, self).__init__()
         self.weight = weight
-        self.add = P.Add()
-        self.pow = P.Pow()
-        self.div = P.RealDiv()
-        self.cast = P.Cast()
-        self.five = Tensor(5.0, mstype.float32)
-        self.six = Tensor(6.0, mstype.float32)
+        self.add = ops.Add()
+        self.pow = ops.Pow()
+        self.div = ops.RealDiv()
+        self.cast = ops.Cast()
+        self.five = Tensor(5.0, ms.float32)
+        self.six = Tensor(6.0, ms.float32)
 
     def construct(self, length_tensor):
-        length_tensor = self.cast(length_tensor, mstype.float32)
+        length_tensor = self.cast(length_tensor, ms.float32)
         output = self.add(length_tensor, self.five)
         output = self.div(output, self.six)
         output = self.pow(output, self.weight)
@@ -56,17 +56,17 @@ class TileBeam(nn.Cell):
 
     Args:
         beam_width (int): beam width setting. Default: 4.
-        compute_type (:class:`mindspore.dtype`): Compute type in Transformer. Default: mstype.float32.
+        compute_type (:class:`mindspore.dtype`): Compute type in Transformer. Default: ms.float32.
     """
     def __init__(self,
                  beam_width,
-                 compute_type=mstype.float32):
+                 compute_type=ms.float32):
         super(TileBeam, self).__init__()
         self.beam_width = beam_width
-        self.expand = P.ExpandDims()
-        self.tile = P.Tile()
-        self.reshape = P.Reshape()
-        self.shape = P.Shape()
+        self.expand = ops.ExpandDims()
+        self.tile = ops.Tile()
+        self.reshape = ops.Reshape()
+        self.shape = ops.Shape()
 
     def construct(self, input_tensor):
         """
@@ -89,15 +89,15 @@ class Mod(nn.Cell):
     Mod function.
 
     Args:
-        compute_type (:class:`mindspore.dtype`): Compute type in Transformer. Default: mstype.float32.
+        compute_type (:class:`mindspore.dtype`): Compute type in Transformer. Default: ms.float32.
     """
     def __init__(self,
-                 compute_type=mstype.float32):
+                 compute_type=ms.float32):
         super(Mod, self).__init__()
         self.compute_type = compute_type
-        self.floor_div = P.FloorDiv()
-        self.sub = P.Sub()
-        self.multiply = P.Mul()
+        self.floor_div = ops.FloorDiv()
+        self.sub = ops.Sub()
+        self.multiply = ops.Mul()
 
     def construct(self, input_x, input_y):
         x = self.floor_div(input_x, input_y)
@@ -120,7 +120,7 @@ class BeamSearchDecoder(nn.Cell):
         max_decode_length (int): max decode length. Default: 128.
         sos_id (int): Id of sequence start token. Default: 1.
         eos_id (int): Id of sequence end token. Default: 2.
-        compute_type (:class:`mindspore.dtype`): Compute type in Transformer. Default: mstype.float32.
+        compute_type (:class:`mindspore.dtype`): Compute type in Transformer. Default: ms.float32.
     """
     def __init__(self,
                  batch_size,
@@ -132,7 +132,7 @@ class BeamSearchDecoder(nn.Cell):
                  max_decode_length=128,
                  sos_id=1,
                  eos_id=2,
-                 compute_type=mstype.float32):
+                 compute_type=ms.float32):
         super(BeamSearchDecoder, self).__init__(auto_prefix=False)
         self.seq_length = seq_length
         self.batch_size = batch_size
@@ -142,46 +142,46 @@ class BeamSearchDecoder(nn.Cell):
         self.max_decode_length = max_decode_length
         self.decoder = decoder
 
-        self.add = P.Add()
-        self.expand = P.ExpandDims()
-        self.reshape = P.Reshape()
+        self.add = ops.Add()
+        self.expand = ops.ExpandDims()
+        self.reshape = ops.Reshape()
         self.shape_flat = (-1,)
-        self.shape = P.Shape()
+        self.shape = ops.Shape()
 
-        self.zero_tensor = Tensor(np.zeros([batch_size, beam_width]), mstype.float32)
-        self.ninf_tensor = Tensor(np.full([batch_size, beam_width], -INF), mstype.float32)
+        self.zero_tensor = Tensor(np.zeros([batch_size, beam_width]), ms.float32)
+        self.ninf_tensor = Tensor(np.full([batch_size, beam_width], -INF), ms.float32)
 
-        self.select = P.Select()
+        self.select = ops.Select()
         self.flat_shape = (batch_size, beam_width * vocab_size)
-        self.topk = P.TopK(sorted=True)
-        self.floor_div = P.FloorDiv()
-        self.vocab_size_tensor = Tensor(self.vocab_size, mstype.int32)
-        self.real_div = P.RealDiv()
+        self.topk = ops.TopK(sorted=True)
+        self.floor_div = ops.FloorDiv()
+        self.vocab_size_tensor = Tensor(self.vocab_size, ms.int32)
+        self.real_div = ops.RealDiv()
         self.mod = Mod()
-        self.equal = P.Equal()
-        self.eos_ids = Tensor(np.full([batch_size, beam_width], eos_id), mstype.int32)
+        self.equal = ops.Equal()
+        self.eos_ids = Tensor(np.full([batch_size, beam_width], eos_id), ms.int32)
 
         beam_ids = np.tile(np.arange(beam_width).reshape((1, beam_width)), [batch_size, 1])
-        self.beam_ids = Tensor(beam_ids, mstype.int32)
+        self.beam_ids = Tensor(beam_ids, ms.int32)
         batch_ids = np.arange(batch_size*beam_width).reshape((batch_size, beam_width)) // beam_width
-        self.batch_ids = Tensor(batch_ids, mstype.int32)
-        self.concat = P.Concat(axis=-1)
-        self.gather_nd = P.GatherNd()
+        self.batch_ids = Tensor(batch_ids, ms.int32)
+        self.concat = ops.Concat(axis=-1)
+        self.gather_nd = ops.GatherNd()
 
-        self.greater_equal = P.GreaterEqual()
-        self.sub = P.Sub()
-        self.cast = P.Cast()
-        self.zeroslike = P.ZerosLike()
+        self.greater_equal = ops.GreaterEqual()
+        self.sub = ops.Sub()
+        self.cast = ops.Cast()
+        self.zeroslike = ops.ZerosLike()
 
         # init inputs and states
-        self.start_ids = Tensor(np.full([batch_size * beam_width, 1], sos_id), mstype.int32)
-        self.init_seq = Tensor(np.full([batch_size, beam_width, 1], sos_id), mstype.int32)
+        self.start_ids = Tensor(np.full([batch_size * beam_width, 1], sos_id), ms.int32)
+        self.init_seq = Tensor(np.full([batch_size, beam_width, 1], sos_id), ms.int32)
         init_scores = np.tile(np.array([[0.] + [-INF]*(beam_width-1)]), [batch_size, 1])
-        self.init_scores = Tensor(init_scores, mstype.float32)
+        self.init_scores = Tensor(init_scores, ms.float32)
         self.init_finished = Tensor(np.zeros([batch_size, beam_width], dtype=np.bool))
         self.init_length = Tensor(np.zeros([batch_size, beam_width], dtype=np.int32))
         self.length_penalty = LengthPenalty(weight=length_penalty_weight)
-        self.one = Tensor(1, mstype.int32)
+        self.one = Tensor(1, ms.int32)
 
     def one_step(self, cur_input_ids, enc_states, enc_attention_mask, state_log_probs,
                  state_seq, state_finished, state_length):
@@ -207,7 +207,7 @@ class BeamSearchDecoder(nn.Cell):
         beam_indices = self.zeroslike(topk_indices)
         for _ in range(self.beam_width - 1):
             temp = self.sub(temp, self.vocab_size_tensor)
-            res = self.cast(self.greater_equal(temp, 0), mstype.int32)
+            res = self.cast(self.greater_equal(temp, 0), ms.int32)
             beam_indices = beam_indices + res
         word_indices = topk_indices - beam_indices * self.vocab_size_tensor
         #======================================================================

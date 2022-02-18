@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
 # ============================================================================
 """Data operations, will be used in train.py."""
 
-import mindspore.common.dtype as mstype
+import mindspore as ms
 import mindspore.dataset as de
-import mindspore.dataset.transforms.c_transforms as deC
 from .model_utils.config import config
 
 de.config.set_seed(1)
@@ -30,7 +29,7 @@ def create_transformer_dataset(rank_size=1, rank_id=0, do_shuffle="true", datase
                                           "target_sos_ids", "target_sos_mask",
                                           "target_eos_ids", "target_eos_mask"],
                             shuffle=(do_shuffle == "true"), num_shards=rank_size, shard_id=rank_id)
-        type_cast_op = deC.TypeCast(mstype.int32)
+        type_cast_op = de.transforms.c_transforms.TypeCast(ms.int32)
         ds = ds.map(operations=type_cast_op, input_columns="source_eos_ids")
         ds = ds.map(operations=type_cast_op, input_columns="source_eos_mask")
         ds = ds.map(operations=type_cast_op, input_columns="target_sos_ids")
