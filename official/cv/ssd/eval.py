@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 """Evaluation for SSD"""
 
 import os
-from mindspore import context, Tensor
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+import mindspore as ms
+from mindspore import Tensor
 from src.ssd import SSD300, SsdInferWithDecoder, ssd_mobilenet_v2, ssd_mobilenet_v1_fpn, ssd_resnet50_fpn, ssd_vgg16
 from src.dataset import create_ssd_dataset, create_mindrecord
 from src.eval_utils import apply_eval
@@ -43,9 +43,9 @@ def ssd_eval(dataset_path, ckpt_path, anno_json):
     net = SsdInferWithDecoder(net, Tensor(default_boxes), config)
 
     print("Load Checkpoint!")
-    param_dict = load_checkpoint(ckpt_path)
+    param_dict = ms.load_checkpoint(ckpt_path)
     net.init_parameters_data()
-    load_param_into_net(net, param_dict)
+    ms.load_param_into_net(net, param_dict)
 
     net.set_train(False)
     total = ds.get_dataset_size() * batch_size
@@ -75,7 +75,7 @@ def eval_net():
     else:
         raise ValueError('SSD eval only support dataset mode is coco and voc!')
 
-    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=config.device_id)
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, device_id=config.device_id)
 
     mindrecord_file = create_mindrecord(config.dataset, "ssd_eval.mindrecord", False)
 

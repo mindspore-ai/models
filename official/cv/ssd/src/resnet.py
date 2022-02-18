@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # ============================================================================
 """ResNet."""
 import mindspore.nn as nn
-from mindspore.ops import operations as P
+import mindspore.ops as ops
 
 
 def _conv3x3(in_channel, out_channel, stride=1):
@@ -80,7 +80,7 @@ class ResidualBlock(nn.Cell):
 
         if self.down_sample:
             self.down_sample_layer = nn.SequentialCell([_conv1x1(in_channel, out_channel, stride), _bn(out_channel)])
-        self.add = P.Add()
+        self.add = ops.Add()
 
     def construct(self, x):
         identity = x
@@ -138,7 +138,7 @@ class ResNet(nn.Cell):
             raise ValueError("the length of layer_num, in_channels, out_channels list must be 4!")
         self.conv1 = _conv7x7(3, 64, stride=2)
         self.bn1 = _bn(64)
-        self.relu = P.ReLU()
+        self.relu = ops.ReLU()
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")
         self.layer1 = self._make_layer(block,
                                        layer_nums[0],

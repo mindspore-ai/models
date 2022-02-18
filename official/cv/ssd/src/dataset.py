@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import numpy as np
 import cv2
 
 import mindspore.dataset as de
-import mindspore.dataset.vision.c_transforms as C
 from mindspore.mindrecord import FileWriter
 from src.model_utils.config import config
 from .box_utils import jaccard_numpy, ssd_bboxes_encode
@@ -400,12 +399,12 @@ def create_ssd_dataset(mindrecord_file, batch_size=32, device_num=1, rank=0,
         num_parallel_workers = cores
     ds = de.MindDataset(mindrecord_file, columns_list=["img_id", "image", "annotation"], num_shards=device_num,
                         shard_id=rank, num_parallel_workers=num_parallel_workers, shuffle=is_training)
-    decode = C.Decode()
+    decode = de.vision.c_transforms.Decode()
     ds = ds.map(operations=decode, input_columns=["image"])
-    change_swap_op = C.HWC2CHW()
-    normalize_op = C.Normalize(mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
-                               std=[0.229 * 255, 0.224 * 255, 0.225 * 255])
-    color_adjust_op = C.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4)
+    change_swap_op = de.vision.c_transforms.HWC2CHW()
+    normalize_op = de.vision.c_transforms.Normalize(mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
+                                                    std=[0.229 * 255, 0.224 * 255, 0.225 * 255])
+    color_adjust_op = de.vision.c_transforms.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4)
     compose_map_func = (lambda img_id, image, annotation: preprocess_fn(img_id, image, annotation, is_training))
     if is_training:
         output_columns = ["image", "box", "label", "num_match"]

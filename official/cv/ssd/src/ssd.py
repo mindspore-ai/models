@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,16 +15,13 @@
 
 """SSD net based MobilenetV2."""
 
-import mindspore.common.dtype as mstype
 import mindspore as ms
 import mindspore.nn as nn
-from mindspore import context, Tensor
+from mindspore import Tensor
 from mindspore.context import ParallelMode
 from mindspore.parallel._auto_parallel_context import auto_parallel_context
 from mindspore.communication.management import get_group_size
-from mindspore.ops import operations as P
-from mindspore.ops import functional as F
-from mindspore.ops import composite as C
+import mindspore.ops as ops
 from .fpn import mobilenet_v1_fpn, resnet50_fpn
 from .vgg16 import vgg16
 
@@ -133,7 +130,7 @@ class InvertedResidual(nn.Cell):
             _bn(oup),
         ])
         self.conv = nn.SequentialCell(layers)
-        self.cast = P.Cast()
+        self.cast = ops.Cast()
         self.last_relu = last_relu
         self.relu = nn.ReLU6()
 
@@ -160,16 +157,16 @@ class FlattenConcat(nn.Cell):
     def __init__(self, config):
         super(FlattenConcat, self).__init__()
         self.num_ssd_boxes = config.num_ssd_boxes
-        self.concat = P.Concat(axis=1)
-        self.transpose = P.Transpose()
+        self.concat = ops.Concat(axis=1)
+        self.transpose = ops.Transpose()
     def construct(self, inputs):
         output = ()
-        batch_size = F.shape(inputs[0])[0]
+        batch_size = ops.shape(inputs[0])[0]
         for x in inputs:
             x = self.transpose(x, (0, 2, 3, 1))
-            output += (F.reshape(x, (batch_size, -1)),)
+            output += (ops.reshape(x, (batch_size, -1)),)
         res = self.concat(output)
-        return F.reshape(res, (batch_size, self.num_ssd_boxes, -1))
+        return ops.reshape(res, (batch_size, self.num_ssd_boxes, -1))
 
 
 class MultiBox(nn.Cell):
@@ -323,7 +320,7 @@ class SSD300(nn.Cell):
         self.multi_box = MultiBox(config)
         self.is_training = is_training
         if not is_training:
-            self.activation = P.Sigmoid()
+            self.activation = ops.Sigmoid()
 
     def construct(self, x):
         layer_out_13, output = self.backbone(x)
@@ -335,8 +332,8 @@ class SSD300(nn.Cell):
         pred_loc, pred_label = self.multi_box(multi_feature)
         if not self.is_training:
             pred_label = self.activation(pred_label)
-        pred_loc = F.cast(pred_loc, mstype.float32)
-        pred_label = F.cast(pred_label, mstype.float32)
+        pred_loc = ops.cast(pred_loc, ms.float32)
+        pred_label = ops.cast(pred_label, ms.float32)
         return pred_loc, pred_label
 
 
@@ -358,7 +355,7 @@ class SsdMobilenetV1Fpn(nn.Cell):
     def __init__(self, config):
         super(SsdMobilenetV1Fpn, self).__init__()
         self.multi_box = WeightSharedMultiBox(config)
-        self.activation = P.Sigmoid()
+        self.activation = ops.Sigmoid()
         self.feature_extractor = mobilenet_v1_fpn(config)
 
     def construct(self, x):
@@ -366,8 +363,8 @@ class SsdMobilenetV1Fpn(nn.Cell):
         pred_loc, pred_label = self.multi_box(features)
         if not self.training:
             pred_label = self.activation(pred_label)
-        pred_loc = F.cast(pred_loc, mstype.float32)
-        pred_label = F.cast(pred_label, mstype.float32)
+        pred_loc = ops.cast(pred_loc, ms.float32)
+        pred_label = ops.cast(pred_label, ms.float32)
         return pred_loc, pred_label
 
 class SsdResNet50Fpn(nn.Cell):
@@ -387,7 +384,7 @@ class SsdResNet50Fpn(nn.Cell):
     def __init__(self, config):
         super(SsdResNet50Fpn, self).__init__()
         self.multi_box = WeightSharedMultiBox(config)
-        self.activation = P.Sigmoid()
+        self.activation = ops.Sigmoid()
         self.feature_extractor = resnet50_fpn()
 
     def construct(self, x):
@@ -395,8 +392,8 @@ class SsdResNet50Fpn(nn.Cell):
         pred_loc, pred_label = self.multi_box(features)
         if not self.training:
             pred_label = self.activation(pred_label)
-        pred_loc = F.cast(pred_loc, mstype.float32)
-        pred_label = F.cast(pred_label, mstype.float32)
+        pred_loc = ops.cast(pred_loc, ms.float32)
+        pred_label = ops.cast(pred_label, ms.float32)
         return pred_loc, pred_label
 
 
@@ -413,20 +410,20 @@ class SigmoidFocalClassificationLoss(nn.Cell):
     """
     def __init__(self, gamma=2.0, alpha=0.25):
         super(SigmoidFocalClassificationLoss, self).__init__()
-        self.sigmiod_cross_entropy = P.SigmoidCrossEntropyWithLogits()
-        self.sigmoid = P.Sigmoid()
-        self.pow = P.Pow()
-        self.onehot = P.OneHot()
-        self.on_value = Tensor(1.0, mstype.float32)
-        self.off_value = Tensor(0.0, mstype.float32)
+        self.sigmiod_cross_entropy = ops.SigmoidCrossEntropyWithLogits()
+        self.sigmoid = ops.Sigmoid()
+        self.pow = ops.Pow()
+        self.onehot = ops.OneHot()
+        self.on_value = Tensor(1.0, ms.float32)
+        self.off_value = Tensor(0.0, ms.float32)
         self.gamma = gamma
         self.alpha = alpha
 
     def construct(self, logits, label):
-        label = self.onehot(label, F.shape(logits)[-1], self.on_value, self.off_value)
+        label = self.onehot(label, ops.shape(logits)[-1], self.on_value, self.off_value)
         sigmiod_cross_entropy = self.sigmiod_cross_entropy(logits, label)
         sigmoid = self.sigmoid(logits)
-        label = F.cast(label, mstype.float32)
+        label = ops.cast(label, ms.float32)
         p_t = label * sigmoid + (1 - label) * (1 - sigmoid)
         modulating_factor = self.pow(1 - p_t, self.gamma)
         alpha_weight_factor = label * self.alpha + (1 - label) * (1 - self.alpha)
@@ -448,17 +445,17 @@ class SSDWithLossCell(nn.Cell):
     def __init__(self, network, config):
         super(SSDWithLossCell, self).__init__()
         self.network = network
-        self.less = P.Less()
-        self.tile = P.Tile()
-        self.reduce_sum = P.ReduceSum()
-        self.expand_dims = P.ExpandDims()
+        self.less = ops.Less()
+        self.tile = ops.Tile()
+        self.reduce_sum = ops.ReduceSum()
+        self.expand_dims = ops.ExpandDims()
         self.class_loss = SigmoidFocalClassificationLoss(config.gamma, config.alpha)
         self.loc_loss = nn.SmoothL1Loss()
 
     def construct(self, x, gt_loc, gt_label, num_matched_boxes):
         pred_loc, pred_label = self.network(x)
-        mask = F.cast(self.less(0, gt_label), mstype.float32)
-        num_matched_boxes = self.reduce_sum(F.cast(num_matched_boxes, mstype.float32))
+        mask = ops.cast(self.less(0, gt_label), ms.float32)
+        num_matched_boxes = self.reduce_sum(ops.cast(num_matched_boxes, ms.float32))
 
         # Localization Loss
         mask_loc = self.tile(self.expand_dims(mask, -1), (1, 1, 4))
@@ -472,10 +469,10 @@ class SSDWithLossCell(nn.Cell):
         return self.reduce_sum((loss_cls + loss_loc) / num_matched_boxes)
 
 
-grad_scale = C.MultitypeFuncGraph("grad_scale")
+grad_scale = ops.MultitypeFuncGraph("grad_scale")
 @grad_scale.register("Tensor", "Tensor")
 def tensor_grad_scale(scale, grad):
-    return grad * P.Reciprocal()(scale)
+    return grad * ops.Reciprocal()(scale)
 
 
 class TrainingWrapper(nn.Cell):
@@ -497,34 +494,34 @@ class TrainingWrapper(nn.Cell):
         self.network.set_grad()
         self.weights = ms.ParameterTuple(network.trainable_params())
         self.optimizer = optimizer
-        self.grad = C.GradOperation(get_by_list=True, sens_param=True)
+        self.grad = ops.GradOperation(get_by_list=True, sens_param=True)
         self.sens = sens
         self.reducer_flag = False
         self.grad_reducer = None
         self.use_global_norm = use_global_norm
-        self.parallel_mode = context.get_auto_parallel_context("parallel_mode")
+        self.parallel_mode = ms.get_auto_parallel_context("parallel_mode")
         if self.parallel_mode in [ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL]:
             self.reducer_flag = True
         if self.reducer_flag:
-            mean = context.get_auto_parallel_context("gradients_mean")
+            mean = ms.get_auto_parallel_context("gradients_mean")
             if auto_parallel_context().get_device_num_is_set():
-                degree = context.get_auto_parallel_context("device_num")
+                degree = ms.get_auto_parallel_context("device_num")
             else:
                 degree = get_group_size()
             self.grad_reducer = nn.DistributedGradReducer(optimizer.parameters, mean, degree)
-        self.hyper_map = C.HyperMap()
+        self.hyper_map = ops.HyperMap()
 
     def construct(self, *args):
         weights = self.weights
         loss = self.network(*args)
-        sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
+        sens = ops.Fill()(ops.DType()(loss), ops.Shape()(loss), self.sens)
         grads = self.grad(self.network, weights)(*args, sens)
         if self.reducer_flag:
             # apply grad reducer on grads
             grads = self.grad_reducer(grads)
         if self.use_global_norm:
-            grads = self.hyper_map(F.partial(grad_scale, F.scalar_to_array(self.sens)), grads)
-            grads = C.clip_by_global_norm(grads)
+            grads = self.hyper_map(ops.partial(grad_scale, ops.scalar_to_array(self.sens)), grads)
+            grads = ops.clip_by_global_norm(grads)
         self.optimizer(grads)
         return loss
 
@@ -623,13 +620,13 @@ class SsdInferWithDecoder(nn.Cell):
         default_bbox_xy = self.default_boxes[..., :2]
         default_bbox_wh = self.default_boxes[..., 2:]
         pred_xy = pred_loc[..., :2] * self.prior_scaling_xy * default_bbox_wh + default_bbox_xy
-        pred_wh = P.Exp()(pred_loc[..., 2:] * self.prior_scaling_wh) * default_bbox_wh
+        pred_wh = ops.Exp()(pred_loc[..., 2:] * self.prior_scaling_wh) * default_bbox_wh
 
         pred_xy_0 = pred_xy - pred_wh / 2.0
         pred_xy_1 = pred_xy + pred_wh / 2.0
-        pred_xy = P.Concat(-1)((pred_xy_0, pred_xy_1))
-        pred_xy = P.Maximum()(pred_xy, 0)
-        pred_xy = P.Minimum()(pred_xy, 1)
+        pred_xy = ops.Concat(-1)((pred_xy_0, pred_xy_1))
+        pred_xy = ops.Maximum()(pred_xy, 0)
+        pred_xy = ops.Minimum()(pred_xy, 1)
         return pred_xy, pred_label
 
 
@@ -673,7 +670,7 @@ class SSD300VGG16(nn.Cell):
         # boxes
         self.multi_box = MultiBox(config)
         if not self.training:
-            self.activation = P.Sigmoid()
+            self.activation = ops.Sigmoid()
 
     def construct(self, x):
         # VGG16 backbone: block1~5
@@ -709,8 +706,8 @@ class SSD300VGG16(nn.Cell):
         pred_loc, pred_label = self.multi_box(multi_feature)
         if not self.training:
             pred_label = self.activation(pred_label)
-        pred_loc = F.cast(pred_loc, mstype.float32)
-        pred_label = F.cast(pred_label, mstype.float32)
+        pred_loc = ops.cast(pred_loc, ms.float32)
+        pred_label = ops.cast(pred_label, ms.float32)
         return pred_loc, pred_label
 
 

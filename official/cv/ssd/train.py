@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 """Train SSD and get checkpoint files."""
 
 import os
+import mindspore as ms
 import mindspore.nn as nn
-from mindspore import context, Tensor
+from mindspore import Tensor
 from mindspore.communication.management import init, get_rank
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, LossMonitor, TimeMonitor
 from mindspore.train import Model
 from mindspore.context import ParallelMode
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.common import set_seed, dtype
 from src.ssd import SSD300, SsdInferWithDecoder, SSDWithLossCell, TrainingWrapper, ssd_mobilenet_v2,\
     ssd_mobilenet_v1_fpn, ssd_resnet50_fpn, ssd_vgg16
@@ -49,31 +49,31 @@ def ssd_model_build():
         ssd = ssd_mobilenet_v1_fpn(config=config)
         init_net_param(ssd)
         if config.feature_extractor_base_param != "":
-            param_dict = load_checkpoint(config.feature_extractor_base_param)
+            param_dict = ms.load_checkpoint(config.feature_extractor_base_param)
             for x in list(param_dict.keys()):
                 param_dict["network.feature_extractor.mobilenet_v1." + x] = param_dict[x]
                 del param_dict[x]
-            load_param_into_net(ssd.feature_extractor.mobilenet_v1.network, param_dict)
+            ms.load_param_into_net(ssd.feature_extractor.mobilenet_v1.network, param_dict)
     elif config.model_name == "ssd_resnet50_fpn":
         ssd = ssd_resnet50_fpn(config=config)
         init_net_param(ssd)
         if config.feature_extractor_base_param != "":
-            param_dict = load_checkpoint(config.feature_extractor_base_param)
+            param_dict = ms.load_checkpoint(config.feature_extractor_base_param)
             for x in list(param_dict.keys()):
                 param_dict["network.feature_extractor.resnet." + x] = param_dict[x]
                 del param_dict[x]
-            load_param_into_net(ssd.feature_extractor.resnet, param_dict)
+            ms.load_param_into_net(ssd.feature_extractor.resnet, param_dict)
     elif config.model_name == "ssd_vgg16":
         ssd = ssd_vgg16(config=config)
         init_net_param(ssd)
         if config.feature_extractor_base_param != "":
-            param_dict = load_checkpoint(config.feature_extractor_base_param)
+            param_dict = ms.load_checkpoint(config.feature_extractor_base_param)
             from src.vgg16 import ssd_vgg_key_mapper
             for k in ssd_vgg_key_mapper:
                 v = ssd_vgg_key_mapper[k]
                 param_dict["network.backbone." + v + ".weight"] = param_dict[k + ".weight"]
                 del param_dict[k + ".weight"]
-            load_param_into_net(ssd.backbone, param_dict)
+            ms.load_param_into_net(ssd.backbone, param_dict)
     else:
         raise ValueError(f'config.model: {config.model_name} is not supported')
     return ssd
@@ -81,8 +81,8 @@ def ssd_model_build():
 def set_graph_kernel_context(device_target, model):
     if device_target == "GPU" and model == "ssd300":
         # Enable graph kernel for default model ssd300 on GPU back-end.
-        context.set_context(enable_graph_kernel=True,
-                            graph_kernel_flags="--enable_parallel_fusion --enable_expand_ops=Conv2D")
+        ms.set_context(enable_graph_kernel=True,
+                       graph_kernel_flags="--enable_parallel_fusion --enable_expand_ops=Conv2D")
 
 @moxing_wrapper()
 def train_net():
@@ -98,22 +98,22 @@ def train_net():
     loss_scale = float(config.loss_scale)
     if config.device_target == "CPU":
         loss_scale = 1.0
-        context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
+        ms.set_context(mode=ms.GRAPH_MODE, device_target="CPU")
     else:
-        context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=config.device_id)
+        ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, device_id=config.device_id)
         set_graph_kernel_context(config.device_target, config.model_name)
         if config.run_distribute:
             device_num = config.device_num
-            context.reset_auto_parallel_context()
-            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
-                                              device_num=device_num)
+            ms.reset_auto_parallel_context()
+            ms.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
+                                         device_num=device_num)
             init()
             if config.all_reduce_fusion_config:
-                context.set_auto_parallel_context(all_reduce_fusion_config=config.all_reduce_fusion_config)
+                ms.set_auto_parallel_context(all_reduce_fusion_config=config.all_reduce_fusion_config)
             rank = get_rank()
 
     # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
-    context.set_context(mempool_block_size="31GB")
+    ms.set_context(mempool_block_size="31GB")
 
     mindrecord_file = create_mindrecord(config.dataset, "ssd.mindrecord", True)
 
@@ -138,10 +138,10 @@ def train_net():
     ckpoint_cb = ModelCheckpoint(prefix="ssd", directory=ckpt_save_dir, config=ckpt_config)
 
     if config.pre_trained:
-        param_dict = load_checkpoint(config.pre_trained)
+        param_dict = ms.load_checkpoint(config.pre_trained)
         if config.filter_weight:
             filter_checkpoint_parameter_by_list(param_dict, config.checkpoint_filter_list)
-        load_param_into_net(net, param_dict, True)
+        ms.load_param_into_net(net, param_dict, True)
 
     lr = Tensor(get_lr(global_step=config.pre_trained_epoch_size * dataset_size,
                        lr_init=config.lr_init, lr_end=config.lr_end_rate * config.lr, lr_max=config.lr,
