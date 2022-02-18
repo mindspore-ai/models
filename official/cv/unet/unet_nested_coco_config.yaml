@@ -19,7 +19,8 @@ run_eval: False
 run_distribute: False
 dataset: 'COCO'
 split : 1.0
-image_size : [256, 192]
+image_size: [256, 192]
+train_augment: True
 lr: 0.0002
 epochs: 400
 repeat: 1
@@ -99,3 +100,4 @@ checkpoint_file_path: "The location of the checkpoint file."
 include_background: "Computing background or not."
 show_eval: "Show eval result."
 color: "set color to draw eval result."
+train_augment: "Whether apply data augment when training."

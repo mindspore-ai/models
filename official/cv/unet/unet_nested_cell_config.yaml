@@ -19,7 +19,8 @@ run_eval: False
 run_distribute: False
 dataset: "Cell_nuclei"
 crop: None
-image_size : [96, 96]
+image_size: [96, 96]
+train_augment: False
 lr: 0.0003
 epochs: 200
 repeat: 10
@@ -75,3 +76,4 @@ weight_decay: "Weight decay."
 keep_checkpoint_max: "keep the last keep_checkpoint_max checkpoint"
 checkpoint_path: "The location of the checkpoint file."
 checkpoint_file_path: "The location of the checkpoint file."
+train_augment: "Whether apply data augment when training."

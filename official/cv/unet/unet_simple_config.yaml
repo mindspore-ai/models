@@ -18,7 +18,8 @@ include_background: True
 run_eval: False
 run_distribute: False
 crop: None
-image_size : [576, 576]
+image_size: [576, 576]
+train_augment: True
 lr: 0.0001
 epochs: 400
 repeat: 400
@@ -69,4 +70,4 @@ weight_decay: "Weight decay."
 keep_checkpoint_max: "keep the last keep_checkpoint_max checkpoint"
 checkpoint_path: "The location of the checkpoint file."
 checkpoint_file_path: "The location of the checkpoint file."
-
+train_augment: "Whether apply data augment when training."

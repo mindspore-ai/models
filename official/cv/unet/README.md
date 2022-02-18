@@ -302,7 +302,7 @@ Parameters for both training and evaluation can be set in *.yaml
   'save_best_ckpt': True              # Save best checkpoint when run_eval is True
   'eval_start_epoch': 0               # Evaluation start epoch when run_eval is True
   'eval_interval': 1                  # valuation interval when run_eval is True
-
+  'train_augment': True               # Whether apply data augment when training.
   ```
 
 - config for Unet++, cell nuclei dataset
@@ -335,6 +335,7 @@ Parameters for both training and evaluation can be set in *.yaml
   'save_best_ckpt': True              # Save best checkpoint when run_eval is True
   'eval_start_epoch': 0               # Evaluation start epoch when run_eval is True
   'eval_interval': 1                  # valuation interval when run_eval is True
+  'train_augment': False              # Whether apply data augment when training. Apply augment may lead to accuracy fluctuation.
   ```
 
 *Note: total steps pre epoch is floor(epochs / repeat), because unet dataset usually is small, we repeat the dataset to avoid drop too many images when add batch size.*
