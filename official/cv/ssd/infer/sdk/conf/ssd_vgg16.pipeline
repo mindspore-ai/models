@@ -23,7 +23,7 @@
                 "dataSource": "mxpi_tensorinfer0",
                 "postProcessConfigPath": "../conf/ssd_vgg16_ms_on_coco_postprocess.cfg",
                 "labelPath": "../../coco.names",
-                "postProcessLibPath": "/usr/local/sdk_home/mxManufacture/lib/modelpostprocessors/libSsdMobilenetFpn_MindsporePost.so"
+                "postProcessLibPath": "libSsdMobilenetFpn_MindsporePost.so"
             },
             "factory": "mxpi_objectpostprocessor",
             "next": "mxpi_dataserialize0"
