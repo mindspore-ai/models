@@ -20,6 +20,7 @@ import time
 import datetime
 from collections import defaultdict
 import json
+import glob
 import numpy as np
 
 from mindspore import context
@@ -39,8 +40,10 @@ from model_utils.device_adapter import get_device_id, get_device_num
 devid = int(os.getenv('DEVICE_ID'))
 context.set_context(mode=context.GRAPH_MODE, device_target="Davinci", save_graphs=False, device_id=devid)
 
-config.data_root = os.path.join(config.data_dir, 'test2017')
+
+config.data_root = glob.glob(os.path.join(config.data_dir, 'test*'))[0]
 config.nms_thresh = config.test_nms_thresh
+
 
 class DetectionEngine():
     """Detection engine"""
@@ -318,7 +321,7 @@ def run_test():
 
     data_root = config.data_root
 
-    data_txt = os.path.join(config.data_dir, 'testdev2017.txt')
+    data_txt = glob.glob(os.path.join(config.data_dir, 'testdev*.txt'))
     ds, data_size = create_yolo_datasetv2(data_root, data_txt=data_txt, batch_size=config.per_batch_size,
                                           max_epoch=1, device_num=config.group_size, rank=config.rank, shuffle=False,
                                           default_config=config)
