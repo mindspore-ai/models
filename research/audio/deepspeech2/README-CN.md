@@ -178,8 +178,8 @@ checkpoint相关参数
     --device_target              运行代码的设备："GPU" | “CPU”，默认为"GPU"
 ```
 
-在训练之前，应该处理数据集，使用[SeanNaren](https://github.com/SeanNaren/deepspeech.pytorch)中的脚本来处理数据。
-[SeanNaren](https://github.com/SeanNaren/deepspeech.pytorch)中的脚本文件将自动下载数据集并进行处理。
+在训练之前，应该处理数据集，使用[SeanNaren](https://github.com/SeanNaren/deepspeech.pytorch/tree/V2.1)中的脚本来处理数据。
+[SeanNaren](https://github.com/SeanNaren/deepspeech.pytorch/tree/V2.1)中的脚本文件将自动下载数据集并进行处理。
 流程结束后，数据目录结构如下：
 
 ```path
@@ -233,7 +233,7 @@ bash ./scripts/run_distribute_train_gpu.sh
 
 ```
 
-进行模型评估需要注意的是：目前在运行脚本之前只支持greedy decoder，可以从[SeanNaren](https://github.com/SeanNaren/deepspeech.pytorch)下载解码器并将
+进行模型评估需要注意的是：目前在运行脚本之前只支持greedy decoder，可以从[SeanNaren](https://github.com/SeanNaren/deepspeech.pytorch/tree/V2.1)下载解码器并将
 deepspeech_pytorch文件放入deepspeech2目录， 之后文件目录将显示为[Script and Sample Code]
 
 ```shell
