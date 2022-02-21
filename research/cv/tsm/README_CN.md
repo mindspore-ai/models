@@ -34,19 +34,19 @@
 
 <!-- /TOC -->
 
-# TSM描述
+## TSM描述
 
 TSM(Temporal Shift Module)网络在线视频流的爆炸式增长对有效提取时空信息进行视频理解提出了挑战。传统的二维神经网络计算成本低，但不能捕捉长期的时间关系;基于3D CNN的方法可以获得较好的性能，但计算量大，因此部署成本较高。在TSM中，我们提出了一种通用而有效的时间转移模块(TSM)，它具有高效率和高性能。具体来说，它可以达到3D CNN的性能，但保持2d复杂度。TSM的核心思想是将部分信道沿时间维进行移位，便于相邻帧之间的信息交换。在以时间建模为核心的SomethingSomething-v1数据集上，更少的FLOPs (每秒浮点运算次数)，获得了比i3d系列和eco系列更好的结果。在P100 GPU上测量，与I3D相比，在单一模型在8×较低的延迟和12×较高的吞吐量下，提高了1.8%精度。在本论文提交时，TSM网络在V1和V2排行榜上都排名第一。
 
 [论文](https://arxiv.org/abs/1811.08383v1)：Lin, Ji, Chuang Gan and Song Han. “TSM: Temporal Shift Module for Efficient Video Understanding.” 2019 IEEE/CVF International Conference on Computer Vision (ICCV) (2019): 7082-7092.
 
-# 模型架构
+## 模型架构
 
 TSM应用了一种通用而有效的时间转移模块。  时间转移模块将多张连续图像卷积后的通道互相交换，以达到交换视频时域信息的目的。
 
-# 数据集
+## 数据集
 
-使用的数据集：[SomethingSometing-v2](<https://20bn.com/datasets/something-something/v2>)
+使用的数据集：[SomethingSometing-v2](https://developer.qualcomm.com/software/ai-datasets/something-something)
 
 - 数据集大小：19.5G，共174个类、220,847段视频
     - 训练集：16G，共168,913段视频
@@ -55,14 +55,14 @@ TSM应用了一种通用而有效的时间转移模块。  时间转移模块将
     - 注：数据将在src/tools/gen_label_sthv2.py中生成类标签。
     - 注：数据将在src/tools/vid2img_sthv2.py中解析成jpg格式图像。
 
-# 特性
+## 特性
 
-## 混合精度
+### 混合精度
 
 采用[混合精度](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/enable_mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
 以FP16算子为例，如果输入数据类型为FP32，MindSpore后台会自动降低精度来处理数据。用户可打开INFO日志，搜索“reduce precision”查看精度降低的算子。
 
-# 环境要求
+## 环境要求
 
 - 硬件（Ascend/GPU）
     - 使用Ascend/GPU处理器来搭建硬件环境。
@@ -72,7 +72,7 @@ TSM应用了一种通用而有效的时间转移模块。  时间转移模块将
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
-# 快速入门
+## 快速入门
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
@@ -189,9 +189,9 @@ TSM应用了一种通用而有效的时间转移模块。  时间转移模块将
       # (8) 创建训练作业
       ```
 
-# 脚本说明
+## 脚本说明
 
-## 脚本及样例代码
+### 脚本及样例代码
 
 ```bash
 
@@ -238,9 +238,9 @@ TSM应用了一种通用而有效的时间转移模块。  时间转移模块将
     └── train.py    //训练模型
 ```
 
-## 训练过程
+### 训练过程
 
-### 训练
+#### 训练
 
 - Ascend处理器环境运行
 
@@ -272,7 +272,7 @@ TSM应用了一种通用而有效的时间转移模块。  时间转移模块将
 
   训练结束后，您可在默认`./checkpoint`脚本文件夹下找到检查点文件。
 
-### 分布式训练
+#### 分布式训练
 
 - Ascend处理器环境运行
 
@@ -303,9 +303,9 @@ TSM应用了一种通用而有效的时间转移模块。  时间转移模块将
   同时将tsm_sthv2_config_gpu.yaml中data_path改为数据集所在位置，load_path改为预训练参数所在位置。
   上述shell脚本将在后台运行分布训练。您可以通过train/log.txt文件查看结果。
 
-## 评估过程
+### 评估过程
 
-### 评估
+#### 评估
 
 - 在Ascend环境运行时评估
 
@@ -339,24 +339,23 @@ TSM应用了一种通用而有效的时间转移模块。  时间转移模块将
   result: {'top_5_accuracy': 0.8517441860465116, 'top_1_accuracy': 0.5833333333333334}
   ```
 
-## 导出过程
+### 导出过程
 
-### 导出
+#### 导出
 
 ```shell
 bash scripts/run_export.sh [checkpoint_path] [checkpoint_name]
 ```
 
-## 推理过程
+### 推理过程
 
-### 推理
+#### 推理
 
-在还行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
+在进行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
 
 - 在昇腾310上使用SomethingSometing-v2数据集进行推理
 
   在执行下面的命令之前，我们需要先修生成推理的bin文件
-
   推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
 
   ```shell
@@ -372,13 +371,14 @@ bash scripts/run_export.sh [checkpoint_path] [checkpoint_name]
   LABEL_FILE: 标签路径
   DEVICE_ID: 硬件路径
   tsm_sthv2_config_2bin.yaml: data_path:"真实路径"
-# 模型描述
 
-## 性能
+## 模型描述
 
-### 训练性能
+### 性能
 
-#### SomethingSometing-v2上训练TSM
+#### 训练性能
+
+##### SomethingSometing-v2上训练TSM
 
 | 参数                 | Ascend                                                      | GPU                    |
 | -------------------------- | ----------------------------------------------------------- | ---------------------- |
@@ -396,11 +396,11 @@ bash scripts/run_export.sh [checkpoint_path] [checkpoint_name]
 | 总时长                 | 单卡：/;  8卡：31h18min4s                        | 单卡：/;  8卡：35h43min16s      |
 | 微调检查点 | 275.85M (.ckpt文件)                                         | 275.85M (.ckpt文件)    |
 | 推理模型        |  96.99M(.air文件)                     |      |
-| 脚本                    | [TSM脚本](https://gitee.com/li-jianwei123/models) | [TSM脚本](https://gitee.com/li-jianwei123/models) |
+| 脚本                    | [TSM脚本](https://gitee.com/mindspore/models/tree/r1.3/research/cv/tsm) | [TSM脚本](https://gitee.com/mindspore/models/tree/r1.3/research/cv/tsm) |
 
-### 评估性能
+#### 评估性能
 
-#### SomethingSometing-v2上评估TSM
+##### SomethingSometing-v2上评估TSM
 
 | 参数          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -414,10 +414,10 @@ bash scripts/run_export.sh [checkpoint_path] [checkpoint_name]
 | 准确性            | 单卡: /;  8卡：58.65%   | 单卡：/; 8卡：58.63%      |
 | 推理模型 | 161.76M (.om文件)         |  |
 
-# 随机情况说明
+## 随机情况说明
 
 在dataset.py中，我们设置了“create_dataset”函数内的种子，同时还使用了train.py中的随机种子。
 
-# ModelZoo主页  
+## ModelZoo主页  
 
  请浏览官网[主页](https://gitee.com/mindspore/models)。
