@@ -238,7 +238,7 @@ bash ./scripts/run_distribute_train_gpu.sh
 ```
 
 The following script is used to evaluate the model. Note we only support greedy decoder now and before run the script,
-you should download the decoder code from [SeanNaren](https://github.com/SeanNaren/deepspeech.pytorch) and place
+you should download the decoder code from [SeanNaren](https://github.com/SeanNaren/deepspeech.pytorch/tree/V2.1) and place
 deepspeech_pytorch into deepspeech2 directory. After that, the file directory will be displayed as that in [Script and Sample Code]
 
 ```shell
