@@ -70,8 +70,8 @@ bash run_distribute_train_gpu.sh xxx/dateset [RANK_SIZE]
 ```bash
 # run evaluation on Ascend by python command
 python eval.py \
-    --data_dir=xxx/dataset \
-    --eval_shape=640 > log.txt 2>&1 &
+    --data_dir=xxx/dataset \
+    --eval_shape=640 > log.txt 2>&1 &
 
 # run evaluation on GPU by python command
 python eval.py \
@@ -250,9 +250,9 @@ Before running the command below, please check the checkpoint path used for eval
 ```python
 # run evaluation by python command
 python eval.py \
-    --data_dir=xxx/dataset \
-    --pretrained=xxx/yolov5.ckpt \
-    --eval_shape=640 > log.txt 2>&1 &
+    --data_dir=xxx/dataset \
+    --pretrained=xxx/yolov5.ckpt \
+    --eval_shape=640 > log.txt 2>&1 &
 OR
 # run evaluation by shell script
 bash run_eval.sh xxx/dataset xxx/yolov5.ckpt

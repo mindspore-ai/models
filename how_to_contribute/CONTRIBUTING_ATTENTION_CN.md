@@ -60,17 +60,17 @@ model_zoo
 │       ├── eval.py                             # 精度验证脚本
 │       ├── export.py                           # 推理模型导出脚本
 │       ├── scripts                             # 脚本文件
-│       │   ├── run_distributed_train.sh        # 分布式训练脚本
-│       │   ├── run_eval.sh                     # 验证脚本
-│       │   └── run_standalone_train.sh         # 单机训练脚本
+│       │   ├── run_distributed_train.sh        # 分布式训练脚本
+│       │   ├── run_eval.sh                     # 验证脚本
+│       │   └── run_standalone_train.sh         # 单机训练脚本
 │       ├── src                                 # 模型定义源码目录
-│       │   ├── XXXNet.py                       # 模型结构定义
-│       │   ├── callback.py                     # 回调函数定义
-│       │   ├── config.py                       # 模型配置参数文件
-│       │   └── dataset.py                      # 数据集处理定义
+│       │   ├── XXXNet.py                       # 模型结构定义
+│       │   ├── callback.py                     # 回调函数定义
+│       │   ├── config.py                       # 模型配置参数文件
+│       │   └── dataset.py                      # 数据集处理定义
 │       ├── ascend_infer                        # （可选）用于在Ascend推理设备上进行离线推理的脚本
 │       ├── third_party                         # （可选）第三方代码
-│       │   └── XXXrepo                         # （可选）完整克隆自第三方仓库的代码
+│       │   └── XXXrepo                         # （可选）完整克隆自第三方仓库的代码
 │       └── train.py                            # 训练脚本
 ├── research                                    # 非官方研究脚本
 ├── community                                   # 合作方脚本链接

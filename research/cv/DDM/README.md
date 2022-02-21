@@ -59,19 +59,19 @@ The synthetic dataset:
 DDM/
 ├── config.py # Hyper-parameters
 ├── dataset # Dataloader folder
-│   ├── base_dataset.py # basic dataset setting
-│   ├── cityscapes_list # folder contains image list and class information
-│   │   ├── info_16.json # 16 class information
-│   │   ├── info.json # 19 class information
-│   │   ├── label.txt # the label list of val dataset
-│   │   ├── train_round0.txt # train images for round0
-│   │   ├── train.txt # train images
-│   │   └── val.txt # val image list of val dataset
-│   ├── cityscapes.py # dataloader of cityscapes
-│   └── __init__.py # data init
+│   ├── base_dataset.py # basic dataset setting
+│   ├── cityscapes_list # folder contains image list and class information
+│   │   ├── info_16.json # 16 class information
+│   │   ├── info.json # 19 class information
+│   │   ├── label.txt # the label list of val dataset
+│   │   ├── train_round0.txt # train images for round0
+│   │   ├── train.txt # train images
+│   │   └── val.txt # val image list of val dataset
+│   ├── cityscapes.py # dataloader of cityscapes
+│   └── __init__.py # data init
 ├── net
-│   ├── deeplabv2_mindspore.py # architecture of deeplabv2
-│   └── __init__.py # net init
+│   ├── deeplabv2_mindspore.py # architecture of deeplabv2
+│   └── __init__.py # net init
 ├── eval.py # the test script
 └── utils
     ├── func.py # some functions

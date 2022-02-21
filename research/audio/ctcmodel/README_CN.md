@@ -76,24 +76,24 @@ pip install -r requirements.txt
 ```path
 CTCModel
 ├── scripts
-│   ├── eval.sh                        #评估脚本
-│   ├── preprocess_data.sh             #预处理数据脚本
-│   ├── train_alone.sh                 #单卡训练脚本
-│   └── train_distributed.sh           #分布式训练脚本
+│   ├── eval.sh                        #评估脚本
+│   ├── preprocess_data.sh             #预处理数据脚本
+│   ├── train_alone.sh                 #单卡训练脚本
+│   └── train_distributed.sh           #分布式训练脚本
 ├── src
-│   ├── dataset.py                     #加载数据
-│   ├── eval_callback.py               #边训练边测试
-│   ├── loss.py                        #自定义损失函数
-│   ├── metric.py                      #自定义指标
-│   ├── model_for_eval.py              #自定义评价网络
-│   ├── model_for_train.py             #自定义训练网络
-│   ├── model.py                       #模型骨干文件
-│   └── model_utils
-│       ├── config.py                 #解析配置文件
-│       ├── device_adapter.py         #区分本地/modelarts文件
-│       ├── __init__.py
-│       ├── local_adapter.py           #本地训练获取设备信息
-│       └── moxing_adapter.py          #model arts配置，交换文件
+│   ├── dataset.py                     #加载数据
+│   ├── eval_callback.py               #边训练边测试
+│   ├── loss.py                        #自定义损失函数
+│   ├── metric.py                      #自定义指标
+│   ├── model_for_eval.py              #自定义评价网络
+│   ├── model_for_train.py             #自定义训练网络
+│   ├── model.py                       #模型骨干文件
+│   └── model_utils
+│       ├── config.py                 #解析配置文件
+│       ├── device_adapter.py         #区分本地/modelarts文件
+│       ├── __init__.py
+│       ├── local_adapter.py           #本地训练获取设备信息
+│       └── moxing_adapter.py          #model arts配置，交换文件
 ├── default_config.yaml                 #参数配置文件
 ├── eval.py                             #评估网络
 ├── export.py                           #导出MINDIR格式

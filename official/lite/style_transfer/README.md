@@ -76,24 +76,24 @@
 ```text
 
 ├── app
-│   ├── build.gradle # 其他Android配置文件
-│   ├── download.gradle # APP构建时由gradle自动从HuaWei Server下载依赖的库文件及模型文件
-│   ├── proguard-rules.pro
-│   └── src
-│       ├── main
-│       │   ├── AndroidManifest.xml # Android配置文件
-│       │   ├── java # java层应用代码
-│       │   │   └── com
-│       │   │       └── mindspore
-│       │   │           └── posenetdemo # 图像处理及推理流程实现
-│       │   │               ├── CameraDataDealListener.java
-│       │   │               ├── ImageUtils.java
-│       │   │               ├── MainActivity.java
-│       │   │               ├── PoseNetFragment.java
-│       │   │               ├── Posenet.java #
-│       │   │               └── TestActivity.java
-│       │   └── res # 存放Android相关的资源文件
-│       └── test
+│   ├── build.gradle # 其他Android配置文件
+│   ├── download.gradle # APP构建时由gradle自动从HuaWei Server下载依赖的库文件及模型文件
+│   ├── proguard-rules.pro
+│   └── src
+│       ├── main
+│       │   ├── AndroidManifest.xml # Android配置文件
+│       │   ├── java # java层应用代码
+│       │   │   └── com
+│       │   │       └── mindspore
+│       │   │           └── posenetdemo # 图像处理及推理流程实现
+│       │   │               ├── CameraDataDealListener.java
+│       │   │               ├── ImageUtils.java
+│       │   │               ├── MainActivity.java
+│       │   │               ├── PoseNetFragment.java
+│       │   │               ├── Posenet.java #
+│       │   │               └── TestActivity.java
+│       │   └── res # 存放Android相关的资源文件
+│       └── test
 └── ...
 
 ```

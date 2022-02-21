@@ -32,7 +32,7 @@ uint32_t tensorDim5[] = {4, 1344};
 /**
  * initial dvppWrapper and model with parameters
  * @param initParam initialization parameters
- * @result status code of whether initialization is successful
+ * @result status code of whether initialization is successful
  */
 APP_ERROR FaceDetection::Init(const InitParam &initParam) {
     deviceId_ = initParam.deviceId;
@@ -57,7 +57,7 @@ APP_ERROR FaceDetection::Init(const InitParam &initParam) {
 
 /**
  * deinitialize model
- * @result status code of whether deinitialization is successful
+ * @result status code of whether deinitialization is successful
  */
 APP_ERROR FaceDetection::DeInit() {
     model_->DeInit();
@@ -70,7 +70,7 @@ APP_ERROR FaceDetection::DeInit() {
  * @param imageName the name of the image to get
  * @param imageMat the Mat object that stores image
  * @param imgDr the path of imges
- * @result status code of whether read is successful
+ * @result status code of whether read is successful
  */
 APP_ERROR FaceDetection::ReadImage(const std::string &imageName, cv::Mat* imageMat, const std::string &imgDr) {
     std::string imgPath = imgDr + "/" + imageName + ".jpg";
@@ -83,7 +83,7 @@ APP_ERROR FaceDetection::ReadImage(const std::string &imageName, cv::Mat* imageM
  * get inferred results
  * @param inputs tensors that store information of image
  * @param outputs tensors that store inferred results
- * @result status code of whether inference is successful
+ * @result status code of whether inference is successful
  */
 APP_ERROR FaceDetection::Inference(const std::vector<MxBase::TensorBase> &inputs,
                                    std::vector<MxBase::TensorBase>* outputs) {
@@ -120,7 +120,7 @@ APP_ERROR FaceDetection::Inference(const std::vector<MxBase::TensorBase> &inputs
  * put the results of inference into bin file
  * @param outputs tensors that store inferred results
  * @param resultPathName the name of the file used to store the results
- * @result status code of whether writing is successful
+ * @result status code of whether writing is successful
  */
 APP_ERROR FaceDetection::WriteResult2Bin(size_t index, MxBase::TensorBase output, std::string resultPathName) {
     FILE *fw = fopen(resultPathName.c_str(), "wb");
@@ -164,7 +164,7 @@ APP_ERROR FaceDetection::WriteResult2Bin(size_t index, MxBase::TensorBase output
  * @param outputs tensors that store inferred results
  * @param imgName the image name used to name the folder
  * @param mxbaseResultPath the path where the results are stored
- * @result status code of whether writing is successful
+ * @result status code of whether writing is successful
  */
 APP_ERROR FaceDetection::WriteResult(std::vector<MxBase::TensorBase> outputs, \
                                     const std::string &imgName, \
@@ -205,7 +205,7 @@ APP_ERROR FaceDetection::WriteResult(std::vector<MxBase::TensorBase> outputs, \
 /**
  * resize and pad the image to the target size
  * @param imageMat images waiting to be resized and padded
- * @result status code of whether resize and padding is successful
+ * @result status code of whether resize and padding is successful
  */
 APP_ERROR FaceDetection::ResizeAndPadding(cv::Mat* imageMat) {
     int net_w = NET_WIDTH;
@@ -254,7 +254,7 @@ APP_ERROR FaceDetection::ResizeAndPadding(cv::Mat* imageMat) {
  * convert HWC format to CHW format
  * @param imageMat images waiting for convert format
  * @param imageArray the array that stores image data in CHW format
- * @result status code of whether format conversion is successful
+ * @result status code of whether format conversion is successful
  */
 APP_ERROR FaceDetection::hwc_to_chw(const cv::Mat &imageMat, float (&imageArray)[CHANNEL][NET_HEIGHT][NET_WIDTH]) {
     // HWC->CHW
@@ -273,7 +273,7 @@ APP_ERROR FaceDetection::hwc_to_chw(const cv::Mat &imageMat, float (&imageArray)
  * normalize the image data
  * @param imageArray the array that stores image data before normalize
  * @param imageArrayNormal the array that stores image data after normalize
- * @result status code of whether format normalization is successful
+ * @result status code of whether format normalization is successful
  */
 APP_ERROR FaceDetection::NormalizeImage(float (&imageArray)[CHANNEL][NET_HEIGHT][NET_WIDTH], \
                                         float (&imageArrayNormal)[CHANNEL][NET_HEIGHT][NET_WIDTH]) {
@@ -291,7 +291,7 @@ APP_ERROR FaceDetection::NormalizeImage(float (&imageArray)[CHANNEL][NET_HEIGHT]
  * transfer data from array into the tensor
  * @param imageArray the array that stores image data
  * @param tensorBase the tensor that stores image data
- * @result status code of whether format normalization is successful
+ * @result status code of whether format normalization is successful
  */
 APP_ERROR FaceDetection::ArrayToTensorBase(float (&imageArray)[CHANNEL][NET_HEIGHT][NET_WIDTH], \
                                            MxBase::TensorBase* tensorBase) {

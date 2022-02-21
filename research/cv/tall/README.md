@@ -143,26 +143,26 @@ bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
 ```shell script
 .tall
 ├── ascend310_infer
-│   ├── build.sh                            # build ascend310 infer script
-│   ├── CMakeLists.txt                      # cmake configuration
-│   ├── inc
-│   │   └── utils.h                         # utils.cc's head file
-│   └── src
-│       ├── main.cc                         # ascend310 infer script
-│       └── utils.cc                        # ascend310 infer common utils
+│   ├── build.sh                            # build ascend310 infer script
+│   ├── CMakeLists.txt                      # cmake configuration
+│   ├── inc
+│   │   └── utils.h                         # utils.cc's head file
+│   └── src
+│       ├── main.cc                         # ascend310 infer script
+│       └── utils.cc                        # ascend310 infer common utils
 ├── eval.py                                 # Test set accuracy evaluation, called by run_eval.sh
 ├── export.py                               # Export mindspore models to other formats
 ├── README.md
 ├── scripts
-│   ├── run_310_infer.sh                    # Ascend310 evaluation script
-│   ├── run_distribute_train.sh             # Distributed training script
-│   ├── run_eval.sh                         # Evaluation script
-│   └── run_standalone_train.sh             # Training script
+│   ├── run_310_infer.sh                    # Ascend310 evaluation script
+│   ├── run_distribute_train.sh             # Distributed training script
+│   ├── run_eval.sh                         # Evaluation script
+│   └── run_standalone_train.sh             # Training script
 ├── src
-│   ├── config.py                           # Model configuration file
-│   ├── ctrl.py                             # CTRL model building
-│   ├── dataset.py                          # Dataset loading
-│   └── utils.py                            # common utils
+│   ├── config.py                           # Model configuration file
+│   ├── ctrl.py                             # CTRL model building
+│   ├── dataset.py                          # Dataset loading
+│   └── utils.py                            # common utils
 ├── train.py                                # Model training code
 ├── get_310_eval_dataset.py                 # Get ascend310 evaluation dataset
 └── postprocess.py                          # Ascend310 evaluation postprocess

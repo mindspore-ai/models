@@ -62,28 +62,28 @@ The pyramid pooling module fuses features under four different pyramid scales.Fo
 ├── export.py                                  # export mindir
 ├── README.md                                  # descriptions about PSPnet
 ├── src                                        # PSPNet
-│   ├── config                           # the training config file
-│   │   ├── ade20k_pspnet50.yaml
-│   │   └── voc2012_pspnet50.yaml
-│   ├── dataset                          # data processing
-│   │   ├── dataset.py
-│   │   └── transform.py
-│   ├── model                            # models for training and test
-│   │   ├── PSPNet.py
-│   │   ├── resnet.py
-│   │   └── cell.py                # loss function
-│   └── utils
-│       ├── functions_args.py                  # test helper
-│       ├── lr.py                              # learning rate
-│       ├── metric_and_evalcallback.py         # evalcallback
-│       ├── aux_loss.py                        # loss function helper
-│       └── p_util.py                          # some functions
+│   ├── config                           # the training config file
+│   │   ├── ade20k_pspnet50.yaml
+│   │   └── voc2012_pspnet50.yaml
+│   ├── dataset                          # data processing
+│   │   ├── dataset.py
+│   │   └── transform.py
+│   ├── model                            # models for training and test
+│   │   ├── PSPNet.py
+│   │   ├── resnet.py
+│   │   └── cell.py                # loss function
+│   └── utils
+│       ├── functions_args.py                  # test helper
+│       ├── lr.py                              # learning rate
+│       ├── metric_and_evalcallback.py         # evalcallback
+│       ├── aux_loss.py                        # loss function helper
+│       └── p_util.py                          # some functions
 │
 ├── scripts
-│   ├── run_distribute_train_ascend.sh         # multi cards distributed training in ascend
-│   ├── run_train1p_ascend.sh                  # 1P training in ascend
-│   ├── run_infer_310.sh                       # 310 infer
-│   └── run_eval.sh                            # validation script
+│   ├── run_distribute_train_ascend.sh         # multi cards distributed training in ascend
+│   ├── run_train1p_ascend.sh                  # 1P training in ascend
+│   ├── run_infer_310.sh                       # 310 infer
+│   └── run_eval.sh                            # validation script
 └── train.py                                         # The training python file for ADE20K/VOC2012
 ```
 

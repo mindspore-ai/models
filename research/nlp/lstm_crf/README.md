@@ -75,28 +75,28 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 ```shell
 .
 ├── lstm_crf
-    ├── README.md               # descriptions about LSTM
-    ├── script
-    │   ├── run_bulid_data.sh   # shell script for create data
-    │   ├── run_eval_ascend.sh  # shell script for evaluation on Ascend
-    │   ├── run_eval_cpu.sh     # shell script for evaluation on CPU
-    │   ├── run_train_ascend.sh # shell script for training on Ascend
-    │   ├── run_train_cpu.sh    # shell script for training on CPU
-    ├── src
-    │   ├── lstm.py             # lstm model
-    │   ├── lstm_crf.py         # lstm_crf model
-    │   ├── dataset.py          # dataset preprocess
-    │   ├── imdb.py             # imdb dataset read script
-    │   ├── util.py             # utils script
+    ├── README.md               # descriptions about LSTM
+    ├── script
+    │   ├── run_bulid_data.sh   # shell script for create data
+    │   ├── run_eval_ascend.sh  # shell script for evaluation on Ascend
+    │   ├── run_eval_cpu.sh     # shell script for evaluation on CPU
+    │   ├── run_train_ascend.sh # shell script for training on Ascend
+    │   ├── run_train_cpu.sh    # shell script for training on CPU
+    ├── src
+    │   ├── lstm.py             # lstm model
+    │   ├── lstm_crf.py         # lstm_crf model
+    │   ├── dataset.py          # dataset preprocess
+    │   ├── imdb.py             # imdb dataset read script
+    │   ├── util.py             # utils script
     │   └─model_utils
     │     ├── config.py               # Processing configuration parameters
     │     ├── device_adapter.py       # Get cloud ID
     │     ├── local_adapter.py        # Get local ID
     │     ├── moxing_adapter.py       # Parameter processing
     ├── default_config.yaml           # Training parameter profile(cpu/ascend)
-    ├── eval.py                 # evaluation script on CPU and Ascend
-    └── train.py                # training script on CPU and Ascend
-    └── export.py                # export script on CPU and Ascend
+    ├── eval.py                 # evaluation script on CPU and Ascend
+    └── train.py                # training script on CPU and Ascend
+    └── export.py                # export script on CPU and Ascend
 ```
 
 # [Model Description](#contents)

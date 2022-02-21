@@ -1,22 +1,27 @@
 # Contents
 
-- [ICNet Description](#ICNet-description)
-- [Model Architecture](#ICNet-Architeture)
-- [Dataset](#ICNet-Dataset)
-- [Environmental Requirements](#Environmental)
-- [Script Description](#script-description)
+- [Contents](#contents)
+- [ICNet Description](#icnet-description)
+- [Model Architecture](#model-architecture)
+- [Dataset](#dataset)
+- [Environmental requirements](#environmental-requirements)
+- [Scription Description](#scription-description)
     - [Script and Sample Code](#script-and-sample-code)
     - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-        - [Prepare Dataset](#prepare-dataset)
-        - [Pre-training](#pre-training)
+        - [Model](#model)
+        - [Optimizer](#optimizer)
         - [Training](#training)
-        - [Training Results](#training-results)
+    - [Training Process](#training-process)
+        - [Prepare Datast](#prepare-datast)
+        - [Pre-training](#pre-training)
+        - [Training](#training-1)
+        - [Training Result](#training-result)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
         - [Evaluation Result](#evaluation-result)
-    - [310 infer](#310-inference)
 - [Model Description](#model-description)
+    - [Performance](#performance)
+        - [Distributed Training Performance](#distributed-training-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -54,47 +59,47 @@ It contains 5,000 finely annotated images split into training, validation and te
 .
 └─ICNet
     ├── ascend310_infer
-    │   ├── build.sh
-    │   ├── CMakeLists.txt
-    │   ├── inc
-    │   │   └── utils.h
-    │   └── src
-    │       ├── main.cc
-    │       └── utils.cc
+    │   ├── build.sh
+    │   ├── CMakeLists.txt
+    │   ├── inc
+    │   │   └── utils.h
+    │   └── src
+    │       ├── main.cc
+    │       └── utils.cc
     ├── eval.py                                    # validation
     ├── export.py                                  # export mindir
     ├── postprocess.py                             # 310 infer calculate accuracy
     ├── README.md                                  # descriptions about ICNet
     ├── Res50V1_PRE                                # scripts for pretrain
-    │   ├── scripts
-    │   │   └── run_distribute_train.sh
-    │   ├── src
-    │   │   ├── config.py
-    │   │   ├── CrossEntropySmooth.py
-    │   │   ├── dataset.py
-    │   │   ├── lr_generator.py
-    │   │   └── resnet50_v1.py
-    │   └── train.py
+    │   ├── scripts
+    │   │   └── run_distribute_train.sh
+    │   ├── src
+    │   │   ├── config.py
+    │   │   ├── CrossEntropySmooth.py
+    │   │   ├── dataset.py
+    │   │   ├── lr_generator.py
+    │   │   └── resnet50_v1.py
+    │   └── train.py
     ├── scripts
-    │   ├── run_distribute_train8p.sh              # multi cards distributed training in ascend
-    │   ├── run_eval.sh                            # validation script
-    │   └── run_infer_310.sh                       # 310 infer script
+    │   ├── run_distribute_train8p.sh              # multi cards distributed training in ascend
+    │   ├── run_eval.sh                            # validation script
+    │   └── run_infer_310.sh                       # 310 infer script
     ├── src
-    │   ├── cityscapes_mindrecord.py               # create mindrecord dataset
-    │   ├── __init__.py
-    │   ├── logger.py                              # logger
-    │   ├── losses.py                              # used losses
-    │   ├── loss.py                                # loss
-    │   ├── lr_scheduler.py                        # lr
-    │   ├── metric.py                              # metric
-    │   ├── models
-    │   │   ├── icnet_1p.py                        # net single card
-    │   │   ├── icnet_dc.py                        # net multi cards
-    │   │   ├── icnet.py                           # validation card
-    │   │   └── resnet50_v1.py                     # backbone
-    │   ├── model_utils
-    │   │   └── icnet.yaml                         # config
-    │   └── visualize.py                           # inference visualization
+    │   ├── cityscapes_mindrecord.py               # create mindrecord dataset
+    │   ├── __init__.py
+    │   ├── logger.py                              # logger
+    │   ├── losses.py                              # used losses
+    │   ├── loss.py                                # loss
+    │   ├── lr_scheduler.py                        # lr
+    │   ├── metric.py                              # metric
+    │   ├── models
+    │   │   ├── icnet_1p.py                        # net single card
+    │   │   ├── icnet_dc.py                        # net multi cards
+    │   │   ├── icnet.py                           # validation card
+    │   │   └── resnet50_v1.py                     # backbone
+    │   ├── model_utils
+    │   │   └── icnet.yaml                         # config
+    │   └── visualize.py                           # inference visualization
     └── train.py                                   # train
 ```
 
@@ -150,6 +155,7 @@ keep_checkpoint_max: 10
 ### Pre-training
 
 The folder Res50V1_PRE contains the scripts for pre-training and its dataset is [image net](https://image-net.org/). More details in [GENet_Res50](https://gitee.com/mindspore/models/tree/master/research/cv/GENet_Res50)
+
 - Usage:
 
 ```shell

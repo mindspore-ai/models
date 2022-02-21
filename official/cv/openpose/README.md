@@ -118,10 +118,10 @@ After installing MindSpore via the official website, you can start training and 
     │   ├──run_eval_ascend.sh            // shell script for evaluation on Ascend
     ├── src
     │   ├── model_utils
-    │       ├── config.py                           # Parameter config
-    │       ├── moxing_adapter.py                   # modelarts device configuration
-    │       └── device_adapter.py                   # Device Config
-    │       └── local_adapter.py                    # local device config
+    │       ├── config.py                           # Parameter config
+    │       ├── moxing_adapter.py                   # modelarts device configuration
+    │       └── device_adapter.py                   # Device Config
+    │       └── local_adapter.py                    # local device config
     │   ├──openposenet.py                // Openpose architecture
     │   ├──loss.py                       // Loss function
     │   ├──dataset.py                    // Data preprocessing
