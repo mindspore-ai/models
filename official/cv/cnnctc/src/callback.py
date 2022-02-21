@@ -61,12 +61,8 @@ class LossCallBack(Callback):
 
         if self._per_print_times != 0 and cur_num % self._per_print_times == 0:
             loss_file = open("./loss.log", "a+")
-            loss_file.write("epoch: %s step: %s , loss is %s, average time per step is %s" % (
+            loss_file.write("epoch: %d step: %d , loss is %s" % (
                 cb_params.cur_epoch_num, cur_step_in_epoch,
-                self.loss_avg.avg, self.timer.avg))
+                self.loss_avg.avg))
             loss_file.write("\n")
             loss_file.close()
-
-            print("epoch: %s step: %s , loss is %s, average time per step is %s" % (
-                cb_params.cur_epoch_num, cur_step_in_epoch,
-                self.loss_avg.avg, self.timer.avg))
