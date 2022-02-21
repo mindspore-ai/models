@@ -71,19 +71,19 @@ python eval.sh --problem [PROBLEM] --device [DEVICE]
 
 ```shell
 ├── data
-│   ├── data.py                     #根据方程生成数据
-│   ├── dataset.py                  #生成数据集
-│   └── __init__.py
+│   ├── data.py                     #根据方程生成数据
+│   ├── dataset.py                  #生成数据集
+│   └── __init__.py
 ├── eval.py                         #测试函数
 ├── README_CN.md
 ├── requirement.txt
 ├── scripts
-│   ├── run_standalone_eval_gpu.sh  #测试执行脚本
-│   └── run_standalone_train_gpu.sh #训练执行脚本
+│   ├── run_standalone_eval_gpu.sh  #测试执行脚本
+│   └── run_standalone_train_gpu.sh #训练执行脚本
 ├── src
-│   ├── callback.py
-│   ├── __init__.py
-│   └── model.py                    #网络模型
+│   ├── callback.py
+│   ├── __init__.py
+│   └── model.py                    #网络模型
 └── train.py                        #训练代码
 ```
 

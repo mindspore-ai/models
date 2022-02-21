@@ -204,33 +204,33 @@
     ├── ascend310_infer                                      # 310推理源代码
     ├── model_utils                                          # model_utils工具包
     ├── scripts
-    │   ├── download_gldv2.sh                                # 下载 Google Landmarks Dataset v2 的shell脚本
-    │   ├── download_oxf.sh                                  # 下载 Oxford5k 的shell脚本
-    │   ├── download_paris.sh                                # 下载 Paris6k 的shell脚本
-    │   ├── download_pretrained.sh                           # 下载预训练权重的shell脚本
-    │   ├── run_8p_train.sh                                  # 分布式训练的shell脚本
-    │   ├── run_eval_match_images.sh                         # 图像匹配评估的shell脚本
-    │   ├── run_eval_retrieval_images.sh                     # 图像检索评估的shell脚本
-    │   ├── run_infer_310_match_images.sh                    # 310推理图像匹配的shell脚本
-    │   └── run_infer_310_retrieval_images.sh                # 310推理图像检索的shell脚本
+    │   ├── download_gldv2.sh                                # 下载 Google Landmarks Dataset v2 的shell脚本
+    │   ├── download_oxf.sh                                  # 下载 Oxford5k 的shell脚本
+    │   ├── download_paris.sh                                # 下载 Paris6k 的shell脚本
+    │   ├── download_pretrained.sh                           # 下载预训练权重的shell脚本
+    │   ├── run_8p_train.sh                                  # 分布式训练的shell脚本
+    │   ├── run_eval_match_images.sh                         # 图像匹配评估的shell脚本
+    │   ├── run_eval_retrieval_images.sh                     # 图像检索评估的shell脚本
+    │   ├── run_infer_310_match_images.sh                    # 310推理图像匹配的shell脚本
+    │   └── run_infer_310_retrieval_images.sh                # 310推理图像检索的shell脚本
     ├── src
-    │   ├── __init__.py                                      # 初始化文件
-    │   ├── box_list_np.py                                   # 边界框定义
-    │   ├── box_list_ops_np.py                               # 边界框操作定义
-    │   ├── build_feature_dataset.py                         # 创建特征数据库
-    │   ├── build_image_dataset.py                           # 创建训练数据集
-    │   ├── convert_h5_to_weight.py                          # 转换h5权重文件为ckpt权重
-    │   ├── data_augmentation_parallel.py                    # 训练数据预处理和加载
-    │   ├── dataset.py                                       # 读取查询集、索引集和gt
-    │   ├── delf_config.py                                   # 图像金字塔配置
-    │   ├── delf_model.py                                    # delf网络定义
-    │   ├── extract_feature.py                               # 提取图像特征
-    │   ├── extract_utils_np.py                              # 提取图像特征工具（pca降维）
-    │   ├── feature_io.py                                    # 读写图像特征
-    │   ├── preprocess.py                                    # 310推理预处理脚本
-    │   ├── postprocess.py                                   # 310推理后处理脚本
-    │   ├── match_images.py                                  # 图像特征匹配
-    │   └── perform_retrieval.py                             # 图像检索
+    │   ├── __init__.py                                      # 初始化文件
+    │   ├── box_list_np.py                                   # 边界框定义
+    │   ├── box_list_ops_np.py                               # 边界框操作定义
+    │   ├── build_feature_dataset.py                         # 创建特征数据库
+    │   ├── build_image_dataset.py                           # 创建训练数据集
+    │   ├── convert_h5_to_weight.py                          # 转换h5权重文件为ckpt权重
+    │   ├── data_augmentation_parallel.py                    # 训练数据预处理和加载
+    │   ├── dataset.py                                       # 读取查询集、索引集和gt
+    │   ├── delf_config.py                                   # 图像金字塔配置
+    │   ├── delf_model.py                                    # delf网络定义
+    │   ├── extract_feature.py                               # 提取图像特征
+    │   ├── extract_utils_np.py                              # 提取图像特征工具（pca降维）
+    │   ├── feature_io.py                                    # 读写图像特征
+    │   ├── preprocess.py                                    # 310推理预处理脚本
+    │   ├── postprocess.py                                   # 310推理后处理脚本
+    │   ├── match_images.py                                  # 图像特征匹配
+    │   └── perform_retrieval.py                             # 图像检索
     ├── list_images.txt                                      # 图像匹配配置文件
     ├── train.py                                             # 训练脚本
     ├── delf_config.yaml                                     # 训练配置文件
@@ -282,32 +282,32 @@ bash scripts/download_gldv2.sh 500 [DATASET_PATH] [NEED_ROMOVE_TAR]
 .
 └─ gldv2
     ├── train
-    │   ├── 0                                                # 图片存放的文件夹，共15个
-    │   ├── 1
-    │   ├── ...
-    │   ├── f
-    │   ├── md5.images_000.txt                               # md5校验文件，共500个
-    │   ├── md5.images_001.txt
-    │   ├── ...
-    │   ├── md5.images_499.txt
-    │   ├── images_000.tar                                   # 图像压缩包，共500个
-    │   ├── images_001.tar
-    │   ├── ...
-    │   ├── images_499.tar
-    │   ├── train_attribution.csv                            # 保存图像标签属性等信息的文件
-    │   ├── train_clean.csv
-    │   ├── train.csv
-    │   └── train_label_to_category.csv
+    │   ├── 0                                                # 图片存放的文件夹，共15个
+    │   ├── 1
+    │   ├── ...
+    │   ├── f
+    │   ├── md5.images_000.txt                               # md5校验文件，共500个
+    │   ├── md5.images_001.txt
+    │   ├── ...
+    │   ├── md5.images_499.txt
+    │   ├── images_000.tar                                   # 图像压缩包，共500个
+    │   ├── images_001.tar
+    │   ├── ...
+    │   ├── images_499.tar
+    │   ├── train_attribution.csv                            # 保存图像标签属性等信息的文件
+    │   ├── train_clean.csv
+    │   ├── train.csv
+    │   └── train_label_to_category.csv
     ├── mindrecord
-    │   ├── relabeling.csv                                   # 图像标签文件
-    │   ├── train.mindrecord000                              # mindrecord文件，，共128x2个
-    │   ├── train.mindrecord000.db
-    │   ├── train.mindrecord001
-    │   ├── train.mindrecord001.db
-    │   ├── ...
-    │   ├── ...
-    │   ├── train.mindrecord127
-    │   └── train.mindrecord127.db
+    │   ├── relabeling.csv                                   # 图像标签文件
+    │   ├── train.mindrecord000                              # mindrecord文件，，共128x2个
+    │   ├── train.mindrecord000.db
+    │   ├── train.mindrecord001
+    │   ├── train.mindrecord001.db
+    │   ├── ...
+    │   ├── ...
+    │   ├── train.mindrecord127
+    │   └── train.mindrecord127.db
 ```
 
 ​ 使用以下命令可以下载Oxford5k和Paris6k的数据集：

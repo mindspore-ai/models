@@ -73,24 +73,24 @@ The style transfer sample application on the Android device uses the Android Cam
 ```text
 
 ├── app
-│   ├── build.gradle # Other Android configuration file.
-│   ├── download.gradle # During app building, the .gradle file automatically downloads the dependent library files and model files from the Huawei server.
-│   ├── proguard-rules.pro
-│   └── src
-│       ├── main
-│       │   ├── AndroidManifest.xml # Android configuration file.
-│       │   ├── java # Application code at the Java layer.
-│       │   │   └── com
-│       │   │       └── mindspore
-│       │   │           └── posenetdemo # Image processing and inference process implementation
-│       │   │               ├── CameraDataDealListener.java
-│       │   │               ├── ImageUtils.java
-│       │   │               ├── MainActivity.java
-│       │   │               ├── PoseNetFragment.java
-│       │   │               ├── Posenet.java #
-│       │   │               └── TestActivity.java
-│       │   └── res # Resource files related to Android.
-│       └── test
+│   ├── build.gradle # Other Android configuration file.
+│   ├── download.gradle # During app building, the .gradle file automatically downloads the dependent library files and model files from the Huawei server.
+│   ├── proguard-rules.pro
+│   └── src
+│       ├── main
+│       │   ├── AndroidManifest.xml # Android configuration file.
+│       │   ├── java # Application code at the Java layer.
+│       │   │   └── com
+│       │   │       └── mindspore
+│       │   │           └── posenetdemo # Image processing and inference process implementation
+│       │   │               ├── CameraDataDealListener.java
+│       │   │               ├── ImageUtils.java
+│       │   │               ├── MainActivity.java
+│       │   │               ├── PoseNetFragment.java
+│       │   │               ├── Posenet.java #
+│       │   │               └── TestActivity.java
+│       │   └── res # Resource files related to Android.
+│       └── test
 └── ...
 
 ```

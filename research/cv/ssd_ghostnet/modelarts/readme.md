@@ -38,13 +38,13 @@ filter_weight|False|Boolean|False|Filter head weight parameters，迁移学习�
 ```json
 训练输出目录 V000X
 ├── ckpt_0
-│   ├── ssd-2_4.ckpt
-│   ├── ssd-3_4.ckpt
-│   └── ssd-graph.meta
+│   ├── ssd-2_4.ckpt
+│   ├── ssd-3_4.ckpt
+│   └── ssd-graph.meta
 ├── kernel_meta
-│   ├── ApplyMomentum_13796921261177776697_0.info
-│   ├── AddN_4688903218960634315_0.json
-│   ├── ...
+│   ├── ApplyMomentum_13796921261177776697_0.info
+│   ├── AddN_4688903218960634315_0.json
+│   ├── ...
 ```
 
 ## 3.迁移学习指导

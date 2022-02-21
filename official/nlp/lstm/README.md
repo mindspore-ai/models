@@ -197,20 +197,20 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 ```shell
 .
 ├── lstm
-    ├── README.md               # descriptions about LSTM
-    ├── script
-    │   ├── run_eval_gpu.sh     # shell script for evaluation on GPU
-    │   ├── run_eval_ascend.sh  # shell script for evaluation on Ascend
-    │   ├── run_eval_cpu.sh     # shell script for evaluation on CPU
-    │   ├── run_train_gpu.sh    # shell script for training on GPU
-    │   ├── run_train_ascend.sh # shell script for training on Ascend
-    │   ├── run_train_cpu.sh    # shell script for training on CPU
-    │   └── run_infer_310.sh    # shell script for infer310
-    ├── src
-    │   ├── lstm.py             # Sentiment model
-    │   ├── dataset.py          # dataset preprocess
-    │   ├── imdb.py             # imdb dataset read script
-    │   ├── lr_schedule.py      # dynamic_lr script
+    ├── README.md               # descriptions about LSTM
+    ├── script
+    │   ├── run_eval_gpu.sh     # shell script for evaluation on GPU
+    │   ├── run_eval_ascend.sh  # shell script for evaluation on Ascend
+    │   ├── run_eval_cpu.sh     # shell script for evaluation on CPU
+    │   ├── run_train_gpu.sh    # shell script for training on GPU
+    │   ├── run_train_ascend.sh # shell script for training on Ascend
+    │   ├── run_train_cpu.sh    # shell script for training on CPU
+    │   └── run_infer_310.sh    # shell script for infer310
+    ├── src
+    │   ├── lstm.py             # Sentiment model
+    │   ├── dataset.py          # dataset preprocess
+    │   ├── imdb.py             # imdb dataset read script
+    │   ├── lr_schedule.py      # dynamic_lr script
     │   └─model_utils
     │     ├── config.py               # Processing configuration parameters
     │     ├── device_adapter.py       # Get cloud ID
@@ -219,8 +219,8 @@ Note that you can run the scripts based on the dataset mentioned in original pap
     ├── default_config.yaml           # Training parameter profile(cpu/gpu)
     ├── config_ascend.yaml            # Training parameter profile(ascend)
     ├── config_ascend_8p.yaml         # Training parameter profile(ascend_8p)
-    ├── eval.py                 # evaluation script on GPU, CPU and Ascend
-    └── train.py                # training script on GPU, CPU and Ascend
+    ├── eval.py                 # evaluation script on GPU, CPU and Ascend
+    └── train.py                # training script on GPU, CPU and Ascend
 ```
 
 ## [Script Parameters](#contents)

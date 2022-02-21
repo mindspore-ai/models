@@ -202,39 +202,39 @@ TSM应用了一种通用而有效的时间转移模块。  时间转移模块将
     ├── export.py   //将checkpoint文件导出到air/mindir
     ├── README_CN.md    //TSM相关说明
     ├── scripts
-    │   ├── run_train_ascend.sh   //ascend训练脚本
-    │   ├── run_eval.sh   //评估脚本
-    │   ├── run_export.sh   //导出脚本
-    │   ├── run_infer_310.sh   //310推理脚本
-    │   └── run_train_gpu.sh    //GPU训练脚本
+    │   ├── run_train_ascend.sh   //ascend训练脚本
+    │   ├── run_eval.sh   //评估脚本
+    │   ├── run_export.sh   //导出脚本
+    │   ├── run_infer_310.sh   //310推理脚本
+    │   └── run_train_gpu.sh    //GPU训练脚本
     ├── src
-    │   ├── config
-    │   │   ├── tsm_sthv2_config_gpu.yaml   //GPU训练配置文件
-    │   │   ├── tsm_sthv2_config_2bin.yaml   //数据集转bin
-    │   │   └── tsm_sthv2_config_ascend.yaml   //ascend训练配置文件
-    │   ├── model
-    │   │   ├── cross_entropy_smooth.py   //交叉熵
-    │   │   ├── net.py    //网络结构
-    │   │   └── resnet.py   //基本网络
-    │   ├── model_utils
-    │   │   ├── config.py   //获取配置信息
-    │   │   ├── device_adapter.py   //获取硬件信息
-    │   │   ├── local_adapter.py    //线下硬件信息
-    │   │   └── moxing_adapter.py   //云上硬件信息
-    │   ├── tools
-    │   │   ├── gen_label_sthv2.py    //生成sthv2数据集标签
-    │   │   └── vid2img_sthv2.py    //sthv2数据集解码
-    │   ├── ascend310_infer
-    │   └── utils
-    │       ├── consensus.py    //图像矩阵拼接
-    │       ├── dataset_config.py   //数据集配置
-    │       ├── dataset.py    //数据集加载
-    │       ├── distributed_sampler.py    //数据集分配
-    │       ├── hccl_tools.py   //多卡训练协同
-    │       ├── lr_generator.py   //学习率生成
-    │       ├── non_local.py    //网络结构生成
-    │       ├── temporal_shift.py   //通道交换模块
-    │       └── transforms.py   //图像预处理
+    │   ├── config
+    │   │   ├── tsm_sthv2_config_gpu.yaml   //GPU训练配置文件
+    │   │   ├── tsm_sthv2_config_2bin.yaml   //数据集转bin
+    │   │   └── tsm_sthv2_config_ascend.yaml   //ascend训练配置文件
+    │   ├── model
+    │   │   ├── cross_entropy_smooth.py   //交叉熵
+    │   │   ├── net.py    //网络结构
+    │   │   └── resnet.py   //基本网络
+    │   ├── model_utils
+    │   │   ├── config.py   //获取配置信息
+    │   │   ├── device_adapter.py   //获取硬件信息
+    │   │   ├── local_adapter.py    //线下硬件信息
+    │   │   └── moxing_adapter.py   //云上硬件信息
+    │   ├── tools
+    │   │   ├── gen_label_sthv2.py    //生成sthv2数据集标签
+    │   │   └── vid2img_sthv2.py    //sthv2数据集解码
+    │   ├── ascend310_infer
+    │   └── utils
+    │       ├── consensus.py    //图像矩阵拼接
+    │       ├── dataset_config.py   //数据集配置
+    │       ├── dataset.py    //数据集加载
+    │       ├── distributed_sampler.py    //数据集分配
+    │       ├── hccl_tools.py   //多卡训练协同
+    │       ├── lr_generator.py   //学习率生成
+    │       ├── non_local.py    //网络结构生成
+    │       ├── temporal_shift.py   //通道交换模块
+    │       └── transforms.py   //图像预处理
     └── train.py    //训练模型
 ```
 

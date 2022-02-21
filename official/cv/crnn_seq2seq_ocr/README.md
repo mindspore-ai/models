@@ -134,25 +134,25 @@ For training and evaluation, we use the French Street Name Signs (FSNS) released
 crnn-seq2seq-ocr
 ├── README.md                                   # Descriptions about CRNN-Seq2Seq-OCR
 ├── scripts
-│   ├── run_distribute_train.sh                 # Launch distributed training on Ascend(8 pcs)
-│   ├── run_eval_ascend.sh                      # Launch Ascend evaluation
-│   └── run_standalone_train.sh                 # Launch standalone training on Ascend(1 pcs)
+│   ├── run_distribute_train.sh                 # Launch distributed training on Ascend(8 pcs)
+│   ├── run_eval_ascend.sh                      # Launch Ascend evaluation
+│   └── run_standalone_train.sh                 # Launch standalone training on Ascend(1 pcs)
 ├── src
-|   |── scripts
-│   |   ├── config.py                           # parsing parameter configuration file of "*.yaml"
-│   |   ├── device_adapter.py                   # local or ModelArts training
-│   |   ├── local_adapter.py                    # get related environment variables in local training
-│   |   └── moxing_adapter.py                   # get related environment variables in ModelArts training
-│   ├── attention_ocr.py                        # CRNN-Seq2Seq-OCR training wrapper
-│   ├── cnn.py                                  # VGG network
-│   ├── create_mindrecord_files.py              # Create mindrecord files from images and ground truth
-│   ├── dataset.py                              # Data preprocessing for training and evaluation
-│   ├── gru.py                                  # GRU cell wrapper
-│   ├── logger.py                               # Logger configuration
-│   ├── lstm.py                                 # LSTM cell wrapper
-│   ├── seq2seq.py                              # CRNN-Seq2Seq-OCR model structure
-│   └── utils.py                                # Utility functions for training and data pre-processing
-│   ├── weight_init.py                          # weight initialization of LSTM and GRU
+|   |── scripts
+│   |   ├── config.py                           # parsing parameter configuration file of "*.yaml"
+│   |   ├── device_adapter.py                   # local or ModelArts training
+│   |   ├── local_adapter.py                    # get related environment variables in local training
+│   |   └── moxing_adapter.py                   # get related environment variables in ModelArts training
+│   ├── attention_ocr.py                        # CRNN-Seq2Seq-OCR training wrapper
+│   ├── cnn.py                                  # VGG network
+│   ├── create_mindrecord_files.py              # Create mindrecord files from images and ground truth
+│   ├── dataset.py                              # Data preprocessing for training and evaluation
+│   ├── gru.py                                  # GRU cell wrapper
+│   ├── logger.py                               # Logger configuration
+│   ├── lstm.py                                 # LSTM cell wrapper
+│   ├── seq2seq.py                              # CRNN-Seq2Seq-OCR model structure
+│   └── utils.py                                # Utility functions for training and data pre-processing
+│   ├── weight_init.py                          # weight initialization of LSTM and GRU
 ├── eval.py                                     # Evaluation Script
 ├── general_chars.txt                           # general chars
 └── train.py                                    # Training script

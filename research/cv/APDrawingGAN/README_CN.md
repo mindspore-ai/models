@@ -277,21 +277,21 @@ auxiliary.ckpt文件获取：从 https://cg.cs.tsinghua.edu.cn/people/~Yongjin/A
                 [--run_distribute BOOLEAN] [--device_id DEVICE_ID]
 
   选项：
-    --dataroot                        图片数据路径
+    --dataroot                        图片数据路径
     --mindrecord_dir                  数据下沉的数据文件
-    --lm_dir                          脸部特征点路径
-    --bg_dir                          背景图片路径
-    --auxiliary_dir                   预训练模型的保存路径
-    --ckpt_dir                        训练模型的保存路径
+    --lm_dir                          脸部特征点路径
+    --bg_dir                          背景图片路径
+    --auxiliary_dir                   预训练模型的保存路径
+    --ckpt_dir                        训练模型的保存路径
     --batch_size                      批大小
     --device_id                       device_id
-    --use_local                       使用局部生成器
-    --discriminator_local             使用局部鉴别器
-    --niter                           训练的epoch数
-    --save_epoch_freq                 保存的频率
+    --use_local                       使用局部生成器
+    --discriminator_local             使用局部鉴别器
+    --niter                           训练的epoch数
+    --save_epoch_freq                 保存的频率
     --no_flip                         不翻转图像
-    --no_dropout                      不使用dropout
-    --isTrain                         训练
+    --no_dropout                      不使用dropout
+    --isTrain                         训练
     --run_distribute                  多卡并行训练
     --num_parallel_workers            并行工作数量
   ```

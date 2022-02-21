@@ -25,7 +25,7 @@ def lambada_detokenizer(string):
     string = re.sub(r" '", "-SQ-", string)
     string = re.sub("-DQ-", '"', string)
     string = re.sub("-SQ-", "'", string)
-    string = re.sub(r"([,?!.]['\"])(\w)", "\g<1> \g<2>", string)
+    string = re.sub(r"([,?!.]['\"])(\w)", r"\g<1> \g<2>", string)
     # contractions
     string = string.replace("s '", "s'")
     string = re.sub(r"/' [0-9]/", r"/'[0-9]/", string)
@@ -75,26 +75,26 @@ def lambada_detokenizer(string):
     # sensitive word process
     string = string.replace("f ** k", "fuck")
     string = string.replace("f ** king", "fucking")
-    string = string.replace("f ** ked", "fucked")
-    string = string.replace("c ** k", "cock")
-    string = string.replace("br ** sts", "breasts")
-    string = string.replace("n ** ples", "nipples")
-    string = string.replace("ni ** les", "nipples")
-    string = string.replace("a ** hole", "asshole")
-    string = string.replace("ass ** le", "asshole")
-    string = string.replace("p ** sy", "pussy")
-    string = string.replace("pu ** y", "pussy")
-    string = string.replace("na ** d", "naked")
-    string = string.replace("nak * d", "naked")
-    string = string.replace("cli ** x", "climax")
-    string = string.replace("h * ps", "hips")
-    string = string.replace("c * ck", "cock")
-    string = string.replace("coc ** ne", "cocaine")
+    string = string.replace("f ** ked", "fucked")
+    string = string.replace("c ** k", "cock")
+    string = string.replace("br ** sts", "breasts")
+    string = string.replace("n ** ples", "nipples")
+    string = string.replace("ni ** les", "nipples")
+    string = string.replace("a ** hole", "asshole")
+    string = string.replace("ass ** le", "asshole")
+    string = string.replace("p ** sy", "pussy")
+    string = string.replace("pu ** y", "pussy")
+    string = string.replace("na ** d", "naked")
+    string = string.replace("nak * d", "naked")
+    string = string.replace("cli ** x", "climax")
+    string = string.replace("h * ps", "hips")
+    string = string.replace("c * ck", "cock")
+    string = string.replace("coc ** ne", "cocaine")
     string = string.replace("*", "")
 
-    string = re.sub("    "," ",string)
-    string = re.sub("   "," ",string)
-    string = re.sub("  "," ",string)
+    string = re.sub("    ", " ", string)
+    string = re.sub("   ", " ", string)
+    string = re.sub("  ", " ", string)
 
     return string
 
@@ -131,6 +131,7 @@ def get_gold_answer_id(gold_answer, candidate_answer_list):
         if gold_answer == candidate:
             return id_
         id_ += 1
+    return None
 
 
 def get_passage_string(passage_string, candidate_answer, final_sentence, gold_answer_id):
@@ -157,7 +158,6 @@ def get_passage_string(passage_string, candidate_answer, final_sentence, gold_an
 
 def cbt_dataset_preprocess(input_file, output_file):
     passages = []
-    candidate_passage_list = []
     passage_string = ""
     count = 0
     with open(input_file, 'r', encoding='utf-8') as f:
@@ -185,7 +185,6 @@ def cbt_dataset_preprocess(input_file, output_file):
                     passage_string = passage_string + " " + string
             else:
                 passages.append(candidate_passage)
-                candidate_passage_list = []
                 passage_string = ""
 
     print('read {} file finished!\n total count = {}'.format(input_file, count))
@@ -245,7 +244,7 @@ def wikitext_dataset_preprocess(input_file, output_file):
         for line in f:
             line = line.strip()
             if line:
-                if line.startswith('=') and line.endswith('=') and len(passage) != 0:
+                if line.startswith('=') and line.endswith('=') and passage:
                     dataset_test.append(passage)
                     count += 1
                     passage = []
@@ -275,8 +274,8 @@ def ptb_detokenizer(string):
     string = string.replace(" N ", "1 ")
     string = string.replace("$ 1", "$1")
     string = string.replace("# 1", "#1")
-    string = string.replace("\/abc", "")
-    string = string.replace("\/ua", "")
+    string = string.replace(r"\/abc", "")
+    string = string.replace(r"\/ua", "")
 
     string = string.replace("s '", "s'")
     string = re.sub(r"/' [0-9]/", r"/'[0-9]/", string)
@@ -392,7 +391,7 @@ def onebw_dataset_preprocess(condition, input_file, output_file):
                 if line:
                     line = onebw_detokenizer(line)
                     length = test_length(line)
-                    if length > 10 and length < 60:
+                    if 10 < length < 60:
                         sentences.append(line)
                         count += 1
         print('read finished! count = ', count)
@@ -466,7 +465,7 @@ def wmt14_en_fr_preprocess(input_file, output_file):
         line_id = 0
         for en, fr in zip(english, french):
             line_id += 1
-            if (en[:7] == '<seg id'):
+            if en[:7] == '<seg id':
                 print("=" * 20, "\n", line_id, "\n", "=" * 20)
                 en_start = en.find('>', 0)
                 en_end = en.find('</seg>', 0)

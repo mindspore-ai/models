@@ -116,26 +116,26 @@ For convenience, you can rename it as `resnet50.ckpt` and save it directly under
 ```text
 MVD
 ├── scripts
-│   ├── run_eval_regdb_ascend.sh                  # Inference: RegDB dataset (infrared to visible) or (visible to infrared) on Ascend
-│   ├── run_eval_regdb_gpu.sh                     # Inference: RegDB dataset  (infrared to visible) or (visible to infrared)  on GPU
-│   ├── run_eval_sysu_ascend.sh                   # Inference: SYSU-MM01 dataset (all or indoor) search on Ascend
-│   ├── run_eval_sysu_gpu.sh                      # Inference: SYSU-MM01 dataset (all or indoor) search on GPU
-│   ├── run_standalone_train_regdb_ascend.sh      # Training: RegDB dataset  (infrared to visible) or (visible to infrared)  on Ascend
-│   ├── run_standalone_train_regdb_gpu.sh         # Training: RegDB dataset  (infrared to visible) or (visible to infrared)  on GPU
-│   ├── run_standalone_train_sysu_ascend.sh       # Training: SYSU-MM01 dataset (all or indoor) search on Ascend
-│   ├── run_standalone_train_sysu_gpu.sh          # Training: SYSU-MM01 dataset (all or indoor) search on GPU
+│   ├── run_eval_regdb_ascend.sh                  # Inference: RegDB dataset (infrared to visible) or (visible to infrared) on Ascend
+│   ├── run_eval_regdb_gpu.sh                     # Inference: RegDB dataset  (infrared to visible) or (visible to infrared)  on GPU
+│   ├── run_eval_sysu_ascend.sh                   # Inference: SYSU-MM01 dataset (all or indoor) search on Ascend
+│   ├── run_eval_sysu_gpu.sh                      # Inference: SYSU-MM01 dataset (all or indoor) search on GPU
+│   ├── run_standalone_train_regdb_ascend.sh      # Training: RegDB dataset  (infrared to visible) or (visible to infrared)  on Ascend
+│   ├── run_standalone_train_regdb_gpu.sh         # Training: RegDB dataset  (infrared to visible) or (visible to infrared)  on GPU
+│   ├── run_standalone_train_sysu_ascend.sh       # Training: SYSU-MM01 dataset (all or indoor) search on Ascend
+│   ├── run_standalone_train_sysu_gpu.sh          # Training: SYSU-MM01 dataset (all or indoor) search on GPU
 ├── src
-│   ├── dataset.py                                    # class and functions for Mindspore dataset
-│   ├── evalfunc.py                                   # for evaluation functions
-│   ├── loss.py                                       # loss functions
-│   ├── models                                        # network architecture
-│   │   ├── mvd.py                                    # main model
-│   │   ├── resnet.py
-│   │   ├── trainingcell.py                           # combine loss function, optimizer with network architecture
-│   │   └── vib.py                                    # variational information bottleneck
-│   └── utils.py
+│   ├── dataset.py                                    # class and functions for Mindspore dataset
+│   ├── evalfunc.py                                   # for evaluation functions
+│   ├── loss.py                                       # loss functions
+│   ├── models                                        # network architecture
+│   │   ├── mvd.py                                    # main model
+│   │   ├── resnet.py
+│   │   ├── trainingcell.py                           # combine loss function, optimizer with network architecture
+│   │   └── vib.py                                    # variational information bottleneck
+│   └── utils.py
 ├── third_party
-│   └── pre_process_sysu.py                           # preprocess SYSU-MM01 dataset to generate .npy format files
+│   └── pre_process_sysu.py                           # preprocess SYSU-MM01 dataset to generate .npy format files
 ├── train.py
 ├── eval.py
 ├── requirements.txt

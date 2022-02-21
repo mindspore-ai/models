@@ -2,7 +2,7 @@
 
 [View English](./README.md)
 
-- [目录](#目录)
+- [Contents](#contents)
 - [MelGAN描述](#melgan描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
@@ -26,9 +26,6 @@
     - [性能](#性能)
         - [评估性能](#评估性能)
         - [推理性能](#推理性能)
-    - [使用流程](#使用流程)
-        - [推理](#推理)
-        - [继续训练预训练模型](#继续训练预训练模型)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
 
@@ -271,7 +268,7 @@ MelGAN模型是非自回归全卷积模型。它的参数比同类模型少得�
 
   在运行以下命令之前，请检查用于评估的检查点路径。请将检查点路径设置为绝对全路径，例如“/username/melgan/saved_model/melgan_20-215_176000.ckpt”。
 
-  ```python 
+  ```python
   bash run_eval_asecnd.sh DEVICE_ID PATH_CHECKPOINT
   ```
 

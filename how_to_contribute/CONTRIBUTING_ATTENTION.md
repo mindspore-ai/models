@@ -58,17 +58,17 @@ model_zoo
 │       ├── eval.py                             # Accuracy verification script
 │       ├── export.py                           # Inference model export script
 │       ├── scripts                             # script file
-│       │   ├── run_distributed_train.sh        # Distributed training script
-│       │   ├── run_eval.sh                     # Verify the script
-│       │   └── run_standalone_train.sh         # Single machine training script
+│       │   ├── run_distributed_train.sh        # Distributed training script
+│       │   ├── run_eval.sh                     # Verify the script
+│       │   └── run_standalone_train.sh         # Single machine training script
 │       ├── src                                 # Model definition source directory
-│       │   ├── XXXNet.py                       # Definition of model structure
-│       │   ├── callback.py                     # Callback function definition
-│       │   ├── config.py                       # Model configuration parameter file
-│       │   └── dataset.py                      # Data set processing definition
+│       │   ├── XXXNet.py                       # Definition of model structure
+│       │   ├── callback.py                     # Callback function definition
+│       │   ├── config.py                       # Model configuration parameter file
+│       │   └── dataset.py                      # Data set processing definition
 │       ├── ascend_infer                        # (Optional) Scripts for offline reasoning on Ascend reasoning devices
 │       ├── third_party                         # (Optional) Third-party code
-│       │   └── XXXrepo                         # (Optional) Complete code cloned from a third-party repository
+│       │   └── XXXrepo                         # (Optional) Complete code cloned from a third-party repository
 │       └── train.py                            # Training script
 ├── research                                    # Unofficial research script
 ├── community                                   # Partner script links

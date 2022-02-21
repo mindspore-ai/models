@@ -52,57 +52,57 @@ WDSR网络主要由几个基本模块（包括卷积层和池化层）组成。�
   ```shell
   DIV2K
   ├── DIV2K_test_LR_bicubic
-  │   ├── X2
-  │   │   ├── 0901x2.png
+  │   ├── X2
+  │   │   ├── 0901x2.png
   │   │   ├─ ...
-  │   │   └── 1000x2.png
-  │   ├── X3
-  │   │   ├── 0901x3.png
+  │   │   └── 1000x2.png
+  │   ├── X3
+  │   │   ├── 0901x3.png
   │   │   ├─ ...
-  │   │   └── 1000x3.png
-  │   └── X4
-  │       ├── 0901x4.png
+  │   │   └── 1000x3.png
+  │   └── X4
+  │       ├── 0901x4.png
   │        ├─ ...
-  │       └── 1000x4.png
+  │       └── 1000x4.png
   ├── DIV2K_test_LR_unknown
-  │   ├── X2
-  │   │   ├── 0901x2.png
+  │   ├── X2
+  │   │   ├── 0901x2.png
   │   │   ├─ ...
-  │   │   └── 1000x2.png
-  │   ├── X3
-  │   │   ├── 0901x3.png
+  │   │   └── 1000x2.png
+  │   ├── X3
+  │   │   ├── 0901x3.png
   │   │   ├─ ...
-  │   │   └── 1000x3.png
-  │   └── X4
-  │       ├── 0901x4.png
+  │   │   └── 1000x3.png
+  │   └── X4
+  │       ├── 0901x4.png
   │       ├─ ...
-  │       └── 1000x4.png
+  │       └── 1000x4.png
   ├── DIV2K_train_HR
-  │   ├── 0001.png
+  │   ├── 0001.png
   │   ├─ ...
-  │   └── 0900.png
+  │   └── 0900.png
   ├── DIV2K_train_LR_bicubic
-  │   ├── X2
-  │   │   ├── 0001x2.png
+  │   ├── X2
+  │   │   ├── 0001x2.png
   │   │   ├─ ...
-  │   │   └── 0900x2.png
-  │   ├── X3
-  │   │   ├── 0001x3.png
+  │   │   └── 0900x2.png
+  │   ├── X3
+  │   │   ├── 0001x3.png
   │   │   ├─ ...
-  │   │   └── 0900x3.png
-  │   └── X4
-  │       ├── 0001x4.png
+  │   │   └── 0900x3.png
+  │   └── X4
+  │       ├── 0001x4.png
   │       ├─ ...
-  │       └── 0900x4.png
+  │       └── 0900x4.png
   └── DIV2K_train_LR_unknown
       ├── X2
-      │   ├── 0001x2.png
+      │   ├── 0001x2.png
       │   ├─ ...
-      │   └── 0900x2.png
+      │   └── 0900x2.png
       ├── X3
-      │   ├── 0001x3.png
+      │   ├── 0001x3.png
       │   ├─ ...
-      │   └── 0900x3.png
+      │   └── 0900x3.png
       └── X4
           ├── 0001x4.png
           ├─ ...
@@ -152,21 +152,21 @@ bash run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]
 WDSR
    ├── README_CN.md                           //自述文件
    ├── script
-   │        ├── run_ascend_distribute.sh      //Ascend分布式训练shell脚本
-   │        ├── run_ascend_standalone.sh      //Ascend单卡训练shell脚本
-   │        ├── run_gpu_distribute.sh         //GPU分布式训练shell脚本
-   │        ├── run_gpu_standalone.sh         //GPU单卡训练shell脚本
-   │        └── run_eval.sh                   //eval验证shell脚本
+   │        ├── run_ascend_distribute.sh      //Ascend分布式训练shell脚本
+   │        ├── run_ascend_standalone.sh      //Ascend单卡训练shell脚本
+   │        ├── run_gpu_distribute.sh         //GPU分布式训练shell脚本
+   │        ├── run_gpu_standalone.sh         //GPU单卡训练shell脚本
+   │        └── run_eval.sh                   //eval验证shell脚本
    ├── src
-   │     ├── args.py                          //超参数
-   │     ├── common.py                        //公共网络模块
-   │     ├── data
-   │     │      ├── common.py                 //公共数据集
-   │     │      ├── div2k.py                  //div2k数据集
-   │     │      └── srdata.py                 //所有数据集
-   │     ├── metrics.py                       //PSNR和SSIM计算器
-   │     ├── model.py                         //WDSR网络
-   │     └── utils.py                         //辅助函数
+   │     ├── args.py                          //超参数
+   │     ├── common.py                        //公共网络模块
+   │     ├── data
+   │     │      ├── common.py                 //公共数据集
+   │     │      ├── div2k.py                  //div2k数据集
+   │     │      └── srdata.py                 //所有数据集
+   │     ├── metrics.py                       //PSNR和SSIM计算器
+   │     ├── model.py                         //WDSR网络
+   │     └── utils.py                         //辅助函数
    ├── train.py                               //训练脚本
    ├── eval.py                                //评估脚本
    └── export.py

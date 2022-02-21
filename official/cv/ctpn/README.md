@@ -73,45 +73,45 @@ Here we used 6 datasets for training, and 1 datasets for Evaluation.
   ├── ascend310_infer                        #application for 310 inference
   ├── eval.py                               # eval net
   ├── scripts
-  │   ├── eval_res.sh                       # calculate precision and recall
-  │   ├── run_distribute_train_ascend.sh    # launch distributed training with ascend platform(8p)
-  │   ├── run_distribute_train_gpu.sh       # launch distributed training with gpu platform(8p)
-  │   ├── run_eval_ascend.sh                # launch evaluating with ascend platform
-  │   ├── run_eval_gpu.sh                   # launch evaluating with gpu platform
+  │   ├── eval_res.sh                       # calculate precision and recall
+  │   ├── run_distribute_train_ascend.sh    # launch distributed training with ascend platform(8p)
+  │   ├── run_distribute_train_gpu.sh       # launch distributed training with gpu platform(8p)
+  │   ├── run_eval_ascend.sh                # launch evaluating with ascend platform
+  │   ├── run_eval_gpu.sh                   # launch evaluating with gpu platform
   │   ├── run_infer_310.sh                  # shell script for 310 inference
   │   ├── run_standalone_train_gpu.sh       # launch standalone training with gpu platform(1p)
-  │   └── run_standalone_train_ascend.sh    # launch standalone training with ascend platform(1p)
+  │   └── run_standalone_train_ascend.sh    # launch standalone training with ascend platform(1p)
   ├── src
-  │   ├── CTPN
-  │   │   ├── BoundingBoxDecode.py          # bounding box decode
-  │   │   ├── BoundingBoxEncode.py          # bounding box encode
-  │   │   ├── __init__.py                   # package init file
-  │   │   ├── anchor_generator.py           # anchor generator
-  │   │   ├── bbox_assign_sample.py         # proposal layer
-  │   │   ├── proposal_generator.py         # proposla generator
-  │   │   ├── rpn.py                        # region-proposal network
-  │   │   └── vgg16.py                      # backbone
+  │   ├── CTPN
+  │   │   ├── BoundingBoxDecode.py          # bounding box decode
+  │   │   ├── BoundingBoxEncode.py          # bounding box encode
+  │   │   ├── __init__.py                   # package init file
+  │   │   ├── anchor_generator.py           # anchor generator
+  │   │   ├── bbox_assign_sample.py         # proposal layer
+  │   │   ├── proposal_generator.py         # proposla generator
+  │   │   ├── rpn.py                        # region-proposal network
+  │   │   └── vgg16.py                      # backbone
   │   ├── model_utils
   │   │   ├── config.py             // Parameter config
   │   │   ├── moxing_adapter.py     // modelarts device configuration
   │   │   ├── device_adapter.py     // Device Config
   │   │   ├── local_adapter.py      // local device config
-  │   ├── convert_icdar2015.py              # convert icdar2015 dataset label
-  │   ├── convert_svt.py                    # convert svt label
-  │   ├── create_dataset.py                 # create mindrecord dataset
-  │   ├── ctpn.py                           # ctpn network definition
-  │   ├── dataset.py                        # data proprocessing
-  │   ├── eval_callback.py                  # evaluation callback while training
-  │   ├── eval_utils.py                     # evaluation function
-  │   ├── lr_schedule.py                    # learning rate scheduler
-  │   ├── weight_init.py                    # lstm initialization
-  │   ├── network_define.py                 # network definition
-  │   └── text_connector
-  │       ├── __init__.py                   # package init file
-  │       ├── connect_text_lines.py         # connect text lines
-  │       ├── detector.py                   # detect box
-  │       ├── get_successions.py            # get succession proposal
-  │       └── utils.py                      # some functions which is commonly used
+  │   ├── convert_icdar2015.py              # convert icdar2015 dataset label
+  │   ├── convert_svt.py                    # convert svt label
+  │   ├── create_dataset.py                 # create mindrecord dataset
+  │   ├── ctpn.py                           # ctpn network definition
+  │   ├── dataset.py                        # data proprocessing
+  │   ├── eval_callback.py                  # evaluation callback while training
+  │   ├── eval_utils.py                     # evaluation function
+  │   ├── lr_schedule.py                    # learning rate scheduler
+  │   ├── weight_init.py                    # lstm initialization
+  │   ├── network_define.py                 # network definition
+  │   └── text_connector
+  │       ├── __init__.py                   # package init file
+  │       ├── connect_text_lines.py         # connect text lines
+  │       ├── detector.py                   # detect box
+  │       ├── get_successions.py            # get succession proposal
+  │       └── utils.py                      # some functions which is commonly used
   ├── postprogress.py                        # post process for 310 inference
   ├── export.py                              # script to export AIR,MINDIR model
   ├── requirements.txt                       # requirements file
@@ -231,7 +231,7 @@ imagenet_cfg = edict({
 
 Then you can train it with ImageNet2012.
 > Notes:
-> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
+> RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 >
 > This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 >
