@@ -13,10 +13,12 @@
     - [Configuration File](#configuration-file)
     - [Training Process](#training-process)
     - [Inference Process](#inference-process)
+    - [Inference Process](#inference-process)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Training Performance](#training-performance)
         - [Inference Performance](#inference-performance)
+        - [ONNX Export and Evaluation](#onnx-export-and-evaluation)
 - [Random Situation Description](#random-situation-description)
 - [Others](#others)
 - [ModelZoo HomePage](#modelzoo-homepage)
@@ -188,7 +190,7 @@ The GNMT network script and code result are as follows:
   │   ├──local_adapter.py                    // Local adapter
   │   ├──moxing_adapter.py                   // Moxing adapter for ModelArts
   ├── src
-  │   ├──__init__.py                         // User interface.  
+  │   ├──__init__.py                         // User interface.
   │   ├──dataset
   │      ├──__init__.py                      // User interface.
   │      ├──base.py                          // Base class of data loader.
@@ -222,7 +224,8 @@ The GNMT network script and code result are as follows:
   │      ├──optimizer.py                     // Optimizer.
   ├── scripts
   │   ├──run_distributed_train_ascend.sh     // Shell script for distributed train on ascend.
-  │   ├──run_distributed_train_gpu.sh        // Shell script for distributed train on GPU.  
+  │   ├──run_distributed_train_gpu.sh        // Shell script for distributed train on GPU.
+  │   ├──run_onnx_eval_gpu.sh                // Shell script for ONNX eval on GPU.
   │   ├──run_standalone_eval_ascend.sh       // Shell script for standalone eval on ascend.
   │   ├──run_standalone_eval_gpu.sh          // Shell script for standalone eval on GPU.
   │   ├──run_standalone_train_ascend.sh      // Shell script for standalone eval on ascend.
@@ -233,6 +236,7 @@ The GNMT network script and code result are as follows:
   ├── default_test_config_gpu.yaml           // Configurations for eval on GPU.
   ├── create_dataset.py                      // Dataset preparation.
   ├── eval.py                                // Infer API entry.
+  ├── eval_onnx.py                           // ONNX infer API entry.
   ├── export.py                              // Export checkpoint file into air models.
   ├── mindspore_hub_conf.py                  // Hub config.
   ├── pip-requirements.txt                   // Requirements of third party package for modelarts.
@@ -373,6 +377,25 @@ For more configuration details, please refer the script `./default_config.yaml` 
 
     The `TEST_DATASET` is the address of inference dataset, and `EXISTED_CKPT_PATH` is the path of the model file generated during training process.
     The `VOCAB_ADDR` is the vocabulary address, `BPE_CODE_ADDR` is the bpe code address and the `TEST_TARGET` are the path of answers.
+
+## ONNX Export and Evaluation
+
+- Export your model to ONNX:
+
+  ```bash
+  python export.py --config_path default_test_config_gpu.yaml --existed_ckpt /path/to/checkpoint.ckpt --file_name /path/to/exported.onnx --file_format ONNX
+  ```
+
+- Run ONNX evaluation:
+
+  ```bash
+  python eval_onnx.py --config_path default_test_config_gpu.yaml --test_dataset /path/to/newstest2014.en.mindrecord --file_name /path/to/exported.onnx --vocab /path/to/vocab.bpe.32000 --bpe_codes /path/to/bpe.32000 --test_tgt /path/to/newstest2014.de
+
+  # or
+
+  cd scripts
+  bash run_onnx_eval_gpu.sh /path/to/newstest2014.en.mindrecord /path/to/exported.onnx /path/to/vocab.bpe.32000 /path/to/bpe.32000 /path/to/newstest2014.de
+  ```
 
 # [Model Description](#contents)
 
