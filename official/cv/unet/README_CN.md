@@ -305,6 +305,7 @@ bash scripts/docker_start.sh unet:20.1.0 [DATA_DIR] [MODEL_DIR]
   'show_eval': False                  # 是否将推理结果进行绘制
   'eval_activate': softmax            # 选择输出的后处理方法，必须为sofmax或者argmax
   'resume_ckpt': './',                # 预训练模型路径
+  'train_augment': False              # 是否在训练时应用数据增强
   ```
 
 - Unet++配置, cell nuclei数据集
@@ -333,6 +334,7 @@ bash scripts/docker_start.sh unet:20.1.0 [DATA_DIR] [MODEL_DIR]
   'show_eval': False                  # 是否将推理结果进行绘制
   'eval_activate': softmax            # 选择输出的后处理方法，必须为sofmax或者argmax
   'filter_weight': ['final1.weight', 'final2.weight', 'final3.weight', 'final4.weight']  # 迁移学习过滤参数名
+  'train_augment': False              # 是否在训练时应用数据增强， cell nuclei数据集使用数据增强可能导致精度波动
   ```
 
 注意: 实际运行时的每epoch的step数为 floor(epochs / repeat)。这是因为unet的数据集一般都比较小，每一遍epoch重复数据集用来避免在加batch时丢掉过多的图片。

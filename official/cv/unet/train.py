@@ -81,8 +81,9 @@ def train_net(cross_valid_ind=1,
         repeat = config.repeat if hasattr(config, "repeat") else 1
         split = config.split if hasattr(config, "split") else 0.8
         train_dataset = create_multi_class_dataset(data_dir, config.image_size, repeat, batch_size,
-                                                   num_classes=config.num_classes, is_train=True, augment=True,
-                                                   split=split, rank=rank, group_size=group_size, shuffle=True)
+                                                   num_classes=config.num_classes, is_train=True,
+                                                   augment=config.train_augment, split=split,
+                                                   rank=rank, group_size=group_size, shuffle=True)
         valid_dataset = create_multi_class_dataset(data_dir, config.image_size, 1, 1,
                                                    num_classes=config.num_classes, is_train=False,
                                                    eval_resize=config.eval_resize, split=split, shuffle=False)
