@@ -26,11 +26,16 @@ from src.lr_schedule import get_lr
 from src.lstm import SentimentNet
 
 from mindspore import Tensor, nn, Model, context
+from mindspore.common import set_seed
 from mindspore.nn import Accuracy
 from mindspore.train.callback import LossMonitor, CheckpointConfig, ModelCheckpoint, TimeMonitor
 from mindspore.train.serialization import load_param_into_net, load_checkpoint
 from mindspore.communication.management import init, get_rank
 from mindspore.context import ParallelMode
+
+
+set_seed(1)
+
 
 def modelarts_pre_process():
     config.ckpt_path = os.path.join(config.output_path, config.ckpt_path)

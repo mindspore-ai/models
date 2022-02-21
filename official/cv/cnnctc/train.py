@@ -23,7 +23,7 @@ from mindspore import Tensor
 from mindspore.common import set_seed
 from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.dataset import GeneratorDataset
-from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.callback import LossCallBack
@@ -122,23 +122,26 @@ def train():
         net.set_train(True)
         model = Model(net)
 
-    callback = LossCallBack()
+    loss_cb = LossCallBack()
+    time_cb = TimeMonitor(data_size=dataset_size)
     config_ck = CheckpointConfig(save_checkpoint_steps=config.SAVE_CKPT_PER_N_STEP,
                                  keep_checkpoint_max=config.KEEP_CKPT_MAX_NUM)
     ckpoint_cb = ModelCheckpoint(prefix="CNNCTC", config=config_ck, directory=ckpt_save_dir)
+    callbacks = [loss_cb, time_cb, ckpoint_cb]
 
     if config.run_distribute:
         if device_id == 0:
             model.train(config.TRAIN_EPOCHS,
                         ds,
-                        callbacks=[callback, ckpoint_cb],
+                        callbacks=callbacks,
                         dataset_sink_mode=False)
         else:
-            model.train(config.TRAIN_EPOCHS, ds, callbacks=[callback], dataset_sink_mode=False)
+            callbacks.remove(ckpoint_cb)
+            model.train(config.TRAIN_EPOCHS, ds, callbacks=callbacks, dataset_sink_mode=False)
     else:
         model.train(config.TRAIN_EPOCHS,
                     ds,
-                    callbacks=[callback, ckpoint_cb],
+                    callbacks=callbacks,
                     dataset_sink_mode=False)
 
 
