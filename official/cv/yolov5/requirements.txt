@@ -2,3 +2,4 @@ numpy
 pillow
 opencv-python
 pycocotools
+onnxruntime-gpu

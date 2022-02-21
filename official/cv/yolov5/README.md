@@ -1,5 +1,6 @@
-# Inference ProcessContents
+# Contents
 
+- [Contents](#contents)
 - [YOLOv5 Description](#YOLOv5-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
@@ -12,6 +13,7 @@
         - [Distributed Training](#distributed-training)  
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
+        - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
@@ -99,6 +101,7 @@ bash run_eval.sh xxx/dataset xxx/yolov5.ckpt
         │   ├──run_distribute_train_gpu.sh     // launch distributed training(8p) in GPU
         │   ├──run_standalone_train.sh         // launch 1p training in ascend
         │   ├──run_eval.sh                     // shell script for evaluation
+        │   ├──run_eval_onnx.sh                // shell script for onnx evaluation
         │   ├──rank_table_8pcs.json            // the example of rank table settings for 8p training
         ├──model_utils
         │   ├──config.py                       // getting config parameters
@@ -119,6 +122,7 @@ bash run_eval.sh xxx/dataset xxx/yolov5.ckpt
         ├── default_config.yaml                // parameter configuration
         ├── train.py                           // training script
         ├── eval.py                            // evaluation script
+        ├── eval_onnx.py                       // ONNX evaluation script
         ├── export.py                          // export script
 ```
 
@@ -273,6 +277,38 @@ Average Recall (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.619
 Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
 2020-12-21 17:16:40,322:INFO:testing cost time 0.35h
 ```
+
+## [ONNX Evaluation](#contents)
+
+- Export your model to ONNX:  
+
+  ```shell
+  python export.py --ckpt_file /path/to/yolov5.ckpt --file_name /path/to/yolov5.onnx --file_format ONNX
+  ```
+
+- Run ONNX evaluation from yolov5 directory:
+
+  ```shell
+  bash scripts/run_eval_onnx.sh <DATA_DIR> <ONNX_MODEL_PATH> [<DEVICE_TARGET>]
+  ```
+
+- You can view the results through the file eval.log. The mAP of the validation dataset will be as follows:
+
+  ```text
+  =============coco eval result=========
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.366
+  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.569
+  Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.397
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.213
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.415
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.474
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.299
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.501
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.557
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.399
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.611
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
+  ```
 
 ## Inference Process
 
