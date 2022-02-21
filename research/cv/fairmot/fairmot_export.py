@@ -17,7 +17,8 @@ import numpy as np
 from mindspore import context, Tensor, export
 from mindspore import dtype as mstype
 from mindspore.train.serialization import load_checkpoint
-from src.opts import Opts
+
+from src.config import Opts
 from src.backbone_dla_conv import DLASegConv
 from src.infer_net import InferNet
 from src.fairmot_pose import WithNetCell
@@ -45,5 +46,5 @@ def fairmot_export(opt):
 
 
 if __name__ == '__main__':
-    opt_ = Opts().init()
+    opt_ = Opts().get_config()
     fairmot_export(opt_)

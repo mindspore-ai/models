@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 4 ]; then
+if [ $# != 2 ]; then
   echo "Usage: 
-        bash run_eval.sh [device] [config] [load_ckpt] [dataset_dir]
+        bash run_standalone_train_gpu.sh [config_file] [pretrained_model]
        " 
   exit 1
 fi
@@ -30,14 +30,11 @@ get_real_path() {
 
 BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
 
-CONFIG=$(get_real_path $2)
+CONFIG=$(get_real_path $1)
 echo "CONFIG: "$CONFIG
 
-LOAD_MODEL=$(get_real_path $3)
-echo "PRETRAINED_MODEL: "$LOAD_MODEL
-
-DATASET_DIR=$(get_real_path $4)
-echo "DATASET_DIR: "$DATASET_DIR
+LOAD_PRE_MODEL=$(get_real_path $2)
+echo "PRETRAINED_MODEL: "$LOAD_PRE_MODEL
 
 if [ ! -f $CONFIG ]
 then
@@ -45,28 +42,23 @@ then
 exit 1
 fi
 
-if [ ! -f $LOAD_MODEL ]
+if [ ! -f $LOAD_PRE_MODEL ]
 then
-    echo "error: ckpt=$LOAD_MODEL is not a file."
+    echo "error: pretrained_model=$LOAD_PRE_MODEL is not a file."
 exit 1
 fi
 
-if [ ! -d $DATASET_DIR ]
+if [ -d "$BASE_PATH/../train" ];
 then
-    echo "error: dataset=$DATASET_DIR is not a directory."
-exit 1
+    rm -rf $BASE_PATH/../train
 fi
-
-if [ -d "$BASE_PATH/../eval" ];
-then
-    rm -rf $BASE_PATH/../eval
-fi
-mkdir $BASE_PATH/../eval
-cd $BASE_PATH/../eval || exit
+mkdir $BASE_PATH/../train
+cd $BASE_PATH/../train || exit
 
 export PYTHONPATH=${BASE_PATH}:$PYTHONPATH
 
-echo "start eval on device $1"
+echo "start training on single GPU"
 env > env.log
 echo
-python -u $BASE_PATH/../eval.py  --device $1 --load_model $LOAD_MODEL --data_dir $DATASET_DIR &> eval.log &
+python -u ${BASE_PATH}/../train.py --device GPU --config_path $CONFIG \
+  --load_pre_model ${LOAD_PRE_MODEL} &> train.log &

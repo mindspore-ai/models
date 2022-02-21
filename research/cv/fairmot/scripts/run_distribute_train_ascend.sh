@@ -16,8 +16,8 @@
 
 echo "========================================================================"
 echo "Please run the script as: "
-echo "bash run_distribute.sh RANK_SIZE DATA_CFG(options) LOAD_PRE_MODEL(options)"
-echo "For example: bash run_distribute.sh 8 ./data.json ./dla34.ckpt"
+echo "bash run_distribute_train_ascend.sh RANK_SIZE DATA_CFG(options) LOAD_PRE_MODEL(options)"
+echo "For example: bash run_distribute_train_ascend.sh 8 ./data.json ./dla34.ckpt"
 echo "It is better to use the absolute path."
 echo "========================================================================"
 set -e
@@ -59,7 +59,8 @@ do
     cd src
     mkdir utils
     cd ../../../
-    cp ./fairmot_train.py ./distribute_train/device$i
+    cp ./default_config.yaml ./distribute_train/device$i
+    cp ./train.py ./distribute_train/device$i
     cp ./src/*.py ./distribute_train/device$i/src
     cp ./src/utils/*.py ./distribute_train/device$i/src/utils
     cd ./distribute_train/device$i
@@ -69,9 +70,9 @@ do
     env > env$i.log
     if [ -f ${DATA_CFG} ]
     then
-        python fairmot_train.py --run_distribute True --data_cfg ${DATA_CFG} --load_pre_model ${LOAD_PRE_MODEL} --is_modelarts False > train$i.log 2>&1 &
+        python train.py --device Ascend --run_distribute True --data_cfg ${DATA_CFG} --load_pre_model ${LOAD_PRE_MODEL} --is_modelarts False > train$i.log 2>&1 &
     else
-        python fairmot_train.py --run_distribute True --is_modelarts False > train$i.log 2>&1 &
+        python train.py --device Ascend --run_distribute True --is_modelarts False > train$i.log 2>&1 &
     fi
     echo "$i finish"
     cd ../

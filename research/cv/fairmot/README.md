@@ -7,6 +7,7 @@
     - [Mixed Precision](#mixed-precision)
 - [Environment Requirements](#environment-requirements)
 - [Quick Start](#quick-start)
+    - [Requirements Installation](#requirements-installation)
     - [Dataset Preparation](#dataset-preparation)
     - [Model Checkpoints](#model-checkpoints)
     - [Running](#running)
@@ -26,7 +27,7 @@
 
 There has been remarkable progress on object detection and re-identification in recent years which are the core components for multi-object tracking. However, little attention has been focused on accomplishing the two tasks in a single network to improve the inference speed. The initial attempts along this path ended up with degraded results mainly because the re-identification branch is not appropriately learned. In this work, we study the essential reasons behind the failure, and accordingly present a simple baseline to addresses the problems. It remarkably outperforms the state-of-the-arts on the MOT challenge datasets at 30 FPS. This baseline could inspire and help evaluate new ideas in this field. More detail about this model can be found in:
 
-Zhang Y ,  Wang C ,  Wang X , et al. FairMOT: On the Fairness of Detection and Re-Identification in Multiple Object Tracking[J].  2020.
+[Paper](https://arxiv.org/abs/2004.01888): Zhang Y, Wang C, Wang X, et al. FairMOT: On the Fairness of Detection and Re-Identification in Multiple Object Tracking. 2020.
 
 This repository contains a Mindspore implementation of FairMot based upon original Pytorch implementation (<https://github.com/ifzhang/FairMOT>). The training and validating scripts are also included, and the evaluation results are shown in the [Performance](#performance) section.
 
@@ -34,7 +35,7 @@ This repository contains a Mindspore implementation of FairMot based upon origin
 
 The overall network architecture of FairMOT is shown below:
 
-[Link](https://arxiv.org/pdf/1804.06208.pdf)
+[Link](https://arxiv.org/abs/2004.01888)
 
 # [Dataset](#contents)
 
@@ -53,8 +54,8 @@ The [mixed precision](https://www.mindspore.cn/docs/programming_guide/en/master/
 To run the python scripts in the repository, you need to prepare the environment as follow:
 
 - Python and dependencies
-    - opencv-python 4.5.1.48
     - Cython 0.29.23
+    - opencv-python 4.5.1.4
     - cython-bbox 0.1.3
     - sympy 1.7.1
     - yacs
@@ -75,39 +76,61 @@ To run the python scripts in the repository, you need to prepare the environment
 
 # [Quick Start](#contents)
 
+## [Requirements Installation](#contents)
+
+Some packages in `requirements.txt` need Cython package to be installed first. For this reason, you should use the following commands to install dependencies:
+
+```shell
+pip install Cython && pip install -r requirements.txt
+```
+
 ## [Dataset Preparation](#contents)
 
 FairMot model uses mix dataset to train and validate in this repository. We use the training data as [JDE](https://github.com/Zhongdao/Towards-Realtime-MOT) in this part and we call it "MIX". Please refer to their [DATA ZOO](https://github.com/Zhongdao/Towards-Realtime-MOT/blob/master/DATASET_ZOO.md) to download and prepare all the training data including Caltech Pedestrian, CityPersons, CUHK-SYSU, PRW, ETHZ, MOT17 and MOT16.
 
+**Configure path to dataset root** in `data/data.json` file.
+
 ## [Model Checkpoints](#contents)
 
-Before you start your training process, you need to obtain mindspore pretrained models.
-The FairMOT model (DLA-34 backbone_conv) can be downloaded here:
-[dla34-ba72cf86.pth](http://dl.yf.io/dla/models/imagenet/dla34-ba72cf86.pth)
+Baseline FairMOT model (DLA-34 backbone) is pretrained on the CrowdHuman for 60 epochs with the self-supervised learning approach before training on the MIX dataset for 30 epochs.
+
+The baseline model can be downloaded here: crowdhuman_dla34.pth [[Google]](https://drive.google.com/file/d/1SFOhg_vos_xSYHLMTDGFVZBYjo8cr2fG/view?usp=sharing) [[Baidu, code: ggzx ]](https://pan.baidu.com/s/1JZMCVDyQnQCa5veO73YaMw).
+
+Then you need to convert this model from `pth` to `ckpt` using script `src/utils/pth2ckpt.py`:
+
+```shell
+# in root fairmot directory
+python src/utils/pth2ckpt.py
+```
+
+Install the `torch` package using the following command to run model convert scripts:
+
+```shell
+pip install torch
+```
 
 ## [Running](#contents)
 
-To train the model, run the shell script `scripts/train_standalone.sh` with the format below:
+To train the model, run the shell script `scripts/run_standalone_train_ascend.sh` or `scripts/run_standalone_train_gpu.sh` with the format below:
 
 ```shell
-# standalone training
-bash scripts/run_standalone_train.sh [device_id]
+# standalone training on Ascend
+bash scripts/run_standalone_train_ascend.sh DEVICE_ID DATA_CFG(options) LOAD_PRE_MODEL(options)
 
-# distributed training
-bash scripts/run_distribute_train.sh [device_num]
+# standalone training on GPU
+bash scripts/run_standalone_train_gpu.sh [config_file] [pretrained_model]
+
+# distributed training on Ascend
+bash scripts/run_distribute_train_ascend.sh RANK_SIZE DATA_CFG(options) LOAD_PRE_MODEL(options)
+
+# distributed training on GPU
+bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [config_file] [pretrained_model]
 ```
 
-To validate the model, change the settings in `src/opts.py` to the path of the model you want to validate. For example:
-
-```python
-self.parser.add_argument('--load_model', default='XXX.ckpt',
-                            help='path to pretrained model')
-```
-
-Then, run the shell script `scripts/run_eval.sh` with the format below:
+To validate the model, run the shell script `scripts/run_eval.sh` with the format below:
 
 ```shell
-bash scripts/run_eval.sh [device_id] [ckpt_path] [dataset_path]
+bash scripts/run_eval.sh [device] [config] [load_ckpt] [dataset_dir]
 ```
 
 # [Script Description](#contents)
@@ -117,11 +140,13 @@ bash scripts/run_eval.sh [device_id] [ckpt_path] [dataset_path]
 The structure of the files in this repository is shown below.
 
 ```text
-└─mindspore-fairmot
+└─fairmot
  ├─scripts
- │ ├─run_eval.sh                  // launch ascend standalone evaluation
- │ ├─run_distribute_train.sh      // launch ascend distributed training
- │ └─run_standalone_train.sh      // launch ascend standalone training
+ │ ├─run_eval.sh                    // launch ascend standalone evaluation
+ │ ├─run_distribute_train_ascend.sh // launch ascend distributed training
+ | ├─run_distribute_train_gpu.sh    // launch gpu distributed training
+ │ ├─run_standalone_train_ascend.sh // launch ascend standalone training
+ │ └─run_standalone_train_gpu.sh    // launch gpu standalone training
  ├─src
  │ ├─tracker
  │ │ ├─basetrack.py               // basic tracker
@@ -145,14 +170,16 @@ The structure of the files in this repository is shown below.
  │ │ └─tools.py                   // image processing tool
  │ ├─fairmot_poase.py             // WithLossCell
  │ ├─losses.py                    // loss
- │ ├─opts.py                      // total config
+ │ ├─config.py                    // total config
  │ ├─util.py                      // routine operation
  │ ├─infer_net.py                 // infer net
  │ └─backbone_dla_conv.py         // dla34_conv net
- ├─fairmot_eval.py                // eval fairmot
+ ├─eval.py                        // eval fairmot
  ├─fairmot_run.py                 // run fairmot
- ├─fairmot_train.py               // train fairmot
+ ├─train.py                       // train fairmot
  ├─fairmot_export.py              // export fairmot
+ ├─requirements.txt               // pip requirements
+ ├─default_config.yaml            // default model configuration
  └─README.md                      // descriptions about this repository
 ```
 
@@ -160,61 +187,83 @@ The structure of the files in this repository is shown below.
 
 ### [Training](#contents)
 
+Run `scripts/run_standalone_train_<device>.sh` to train the model standalone. The usage of the script is:
+
 #### Running on Ascend
 
-Run `scripts/run_standalone_train.sh` to train the model standalone. The usage of the script is:
-
 ```shell
-bash scripts/run_standalone_train.sh DEVICE_ID DATA_CFG LOAD_PRE_MODEL
+bash scripts/run_standalone_train_ascend.sh DEVICE_ID DATA_CFG LOAD_PRE_MODEL
 ```
 
 For example, you can run the shell command below to launch the training procedure.
 
 ```shell
-bash run_standalone_train.sh 0 ./dataset/ ./dla34.ckpt
+bash scripts/run_standalone_train_ascend.sh 0 ./dataset/ ./crowdhuman_dla34_ms.ckpt
 ```
 
-The model checkpoint will be saved into `./ckpt`.
+#### Running on GPU
+
+```shell
+bash scripts/run_standalone_train_gpu.sh [config_file] [pretrained_model]
+```
+
+For example, you can run the shell command below to launch the training procedure:
+
+```shell
+bash scripts/run_standalone_train_gpu.sh ./default_config.yaml ./crowdhuman_dla34_ms.ckpt
+```
+
+The model checkpoint will be saved into `./train/ckpt`.
 
 ### [Distributed Training](#contents)
 
+Run `scripts/run_distribute_train_<device>.sh` to train the model distributed. The usage of the script is:
+
 #### Running on Ascend
 
-Run `scripts/run_distribute_train.sh` to train the model distributed. The usage of the script is:
-
 ```shell
-bash run_distribute.sh RANK_SIZE DATA_CFG LOAD_PRE_MODEL
+bash scripts/run_distribute_train_ascend.sh RANK_SIZE DATA_CFG LOAD_PRE_MODEL
 ```
 
 For example, you can run the shell command below to launch the distributed training procedure.
 
 ```shell
-bash run_distribute.sh 8 ./data.json ./dla34.ckpt
+bash scripts/run_distribute_train_ascend.sh 8 ./data.json ./crowdhuman_dla34_ms.ckpt
 ```
 
-The above shell script will run distribute training in the background. You can view the results through the file `train_parallel[X]/tran[X].log` as follows:
+#### Running on GPU
 
-The model checkpoint will be saved into `train_parallel[X]/ckpt`.
+```shell
+bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [config_file] [pretrained_model]
+```
+
+For example, you can run the shell command below to launch the distributed training procedure:
+
+```shell
+bash scripts/run_distribute_train_gpu.sh 8 0,1,2,3,4,5,6,7 ./default_config.yaml ./crowdhuman_dla34_ms.ckpt
+```
+
+The above shell script will run distribute training in the background. You can view the results through the file `train/tran.log`.
+
+The model checkpoint will be saved into `train/ckpt`.
 
 ## [Evaluation Process](#contents)
 
 The evaluation data set was [MOT20](https://motchallenge.net/data/MOT20/)
 
-### Running on Ascend
-
-Run `scripts/run_eval.sh` to evaluate the model with one Ascend processor. The usage of the script is:
+Run `scripts/run_eval.sh` to evaluate the model. The usage of the script is:
 
 ```shell
-bash run_eval.sh DEVICE_ID LOAD_MODEL DATA_PATH
+bash scripts/run_eval.sh [device] [config] [load_ckpt] [dataset_dir]
 ```
 
 For example, you can run the shell command below to launch the validation procedure.
 
 ```shell
-bash run_eval.sh 0 ./dla34.ckpt data_path
+bash scripts/run_eval.sh GPU ./default_config.yaml ./fairmot-30.ckpt data_path
 ```
 
-The tracing results can be viewed in `/MOT20/distribute_dla34_conv`.
+The eval results can be viewed in `eval/eval.log`.
 
 # [Model Description](#contents)
 
@@ -224,19 +273,19 @@ The tracing results can be viewed in `/MOT20/distribute_dla34_conv`.
 
 #### Performance parameters
 
-| Parameters          | Standalone                  | Distributed                 |
-| ------------------- | --------------------------- | --------------------------- |
-| Model Version       | FairMotNet                  | FairMotNet                  |
-| Resource            | Ascend 910                  | 8 Ascend 910 cards          |
-| Uploaded Date       | 25/06/2021 (month/day/year) | 25/06/2021 (month/day/year) |
-| MindSpore Version   | 1.2.0                       | 1.2.0                       |
-| Training Dataset    | MIX                         | MIX                         |
-| Evaluation Dataset  | MOT20                       | MOT20                       |
-| Training Parameters | epoch=30, batch_size=4      | epoch=30, batch_size=4      |
-| Optimizer           | Adam                        | Adam                        |
-| Loss Function       | FocalLoss,RegLoss           | FocalLoss,RegLoss           |
-| Train Performance   | MOTA:43.8% Prcn:90.9%       | MOTA:42.5% Prcn:91.9%%       |
-| Speed               | 1pc: 380.528 ms/step        | 8pc: 700.371 ms/step        |
+| Parameters          | Ascend Standalone           | Ascend Distributed          | GPU Distributed             |
+| ------------------- | --------------------------- | --------------------------- | --------------------------- |
+| Model Version       | FairMotNet                  | FairMotNet                  | FairMotNet                  |
+| Resource            | Ascend 910                  | 8 Ascend 910 cards          | 8x RTX 3090 24GB            |
+| Uploaded Date       | 25/06/2021 (day/month/year) | 25/06/2021 (day/month/year) | 21/02/2021 (day/month/year) |
+| MindSpore Version   | 1.2.0                       | 1.2.0                       | 1.5.0                       |
+| Training Dataset    | MIX                         | MIX                         | MIX                         |
+| Evaluation Dataset  | MOT20                       | MOT20                       | MOT20                       |
+| Training Parameters | epoch=30, batch_size=4      | epoch=30, batch_size=4      | epoch=30, batch_size=12     |
+| Optimizer           | Adam                        | Adam                        | Adam                        |
+| Loss Function       | FocalLoss,RegLoss           | FocalLoss,RegLoss           | FocalLoss,RegLoss           |
+| Train Performance   | MOTA:43.8% Prcn:90.9%       | MOTA:42.5% Prcn:91.9%%      | MOTA: 41.2%, Prcn: 90.5%    |
+| Speed               | 1pc: 380.528 ms/step        | 8pc: 700.371 ms/step        | 8p: 1047 ms/step            |
 
 # [Description of Random Situation](#contents)
 

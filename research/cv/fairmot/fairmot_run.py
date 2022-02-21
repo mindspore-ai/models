@@ -15,15 +15,17 @@
 """run fairmot."""
 import os
 import os.path as osp
+
+from mindspore.train.serialization import load_checkpoint
+
 from src.backbone_dla_conv import DLASegConv
-from src.opts import Opts
+from src.config import Opts
 from src.infer_net import InferNet
 from src.fairmot_pose import WithNetCell
 from src.tracking_utils.utils import mkdir_if_missing
 from src.tracking_utils.log import logger
 import src.utils.jde as datasets
-import fairmot_eval
-from mindspore.train.serialization import load_checkpoint
+from eval import eval_seq
 
 
 def export(opt):
@@ -46,8 +48,8 @@ def export(opt):
     infer_net = InferNet()
     net = WithNetCell(backbone_net, infer_net)
     net.set_train(False)
-    fairmot_eval.eval_seq(opt, net, dataloader, 'mot', result_filename,
-                          save_dir=frame_dir, show_image=False, frame_rate=frame_rate)
+    eval_seq(opt, net, dataloader, 'mot', result_filename,
+             save_dir=frame_dir, show_image=False, frame_rate=frame_rate)
     if opt.output_format == 'video':
         output_video_path = osp.join(result_root, 'MOT16-03-results.mp4')
         cmd_str = 'ffmpeg -f image2 -i {}/%05d.jpg -b 5000k -c:v mpeg4 {}' \
@@ -57,5 +59,5 @@ def export(opt):
 
 
 if __name__ == '__main__':
-    opts = Opts().init()
+    opts = Opts().get_config()
     export(opts)

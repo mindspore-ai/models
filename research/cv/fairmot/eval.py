@@ -16,9 +16,17 @@
 import os
 import os.path as osp
 import logging
+
+from mindspore import Tensor, context
+from mindspore import dtype as mstype
+from mindspore.train.serialization import load_checkpoint
+import cv2
+import motmetrics as mm
+import numpy as np
+
 from src.backbone_dla_conv import DLASegConv
 from src.infer_net import InferNet
-from src.opts import Opts
+from src.config import Opts
 from src.fairmot_pose import WithNetCell
 from src.tracking_utils import visualization as vis
 from src.tracker.multitracker import JDETracker
@@ -27,12 +35,6 @@ from src.tracking_utils.utils import mkdir_if_missing
 from src.tracking_utils.evaluation import Evaluator
 from src.tracking_utils.timer import Timer
 import src.utils.jde as datasets
-from mindspore import Tensor, context
-from mindspore import dtype as mstype
-from mindspore.train.serialization import load_checkpoint
-import cv2
-import motmetrics as mm
-import numpy as np
 
 
 def write_results(filename, results, data_type):
@@ -117,7 +119,6 @@ def main(opt, data_root, seqs=None, exp_name='MOT17_test_public_dla34',
     accs = []
     n_frame = 0
     timer_avgs, timer_calls = [], []
-    # eval=eval_seq(opt, data_type, show_image=True)
     backbone_net = DLASegConv(opt.heads,
                               down_ratio=4,
                               final_kernel=1,
@@ -168,11 +169,10 @@ def main(opt, data_root, seqs=None, exp_name='MOT17_test_public_dla34',
 
 
 if __name__ == '__main__':
-    opts = Opts().init()
+    opts = Opts().get_config()
     context.set_context(
         mode=context.GRAPH_MODE,
-        # mode=context.PYNATIVE_MODE,
-        device_target="Ascend",
+        device_target=opts.device,
         device_id=opts.id,
         save_graphs=False)
     seqs_str = '''MOT20-01

@@ -22,7 +22,6 @@ import mindspore.ops as ops
 import mindspore as ms
 from mindspore.common.tensor import Tensor
 from mindspore.common.parameter import Parameter
-from mindspore.common import dtype as mstype
 from src.util import Sigmoid, TransposeGatherFeature
 
 
@@ -55,8 +54,8 @@ class FocalLoss(nn.Cell):
 
     def construct(self, out, target):
         """focal loss"""
-        pos_inds = self.cast(self.equal(target, 1.0), mstype.float32)
-        neg_inds = self.cast(self.less(target, 1.0), mstype.float32)
+        pos_inds = self.cast(self.equal(target, 1.0), ms.float32)
+        neg_inds = self.cast(self.less(target, 1.0), ms.float32)
         neg_weights = self.pow(1 - target, self.beta)
 
         pos_loss = self.log(out) * self.pow(1 - out, self.alpha) * pos_inds
@@ -99,7 +98,7 @@ class RegLoss(nn.Cell):
     def construct(self, output, mask, ind, target):
         """Warpper for regression loss."""
         pred = self.gather_feature(output, ind)
-        mask = self.cast(mask, mstype.float32)
+        mask = self.cast(mask, ms.float32)
         num = self.reduce_sum(mask, ())
         mask = self.expand_dims(mask, 2)
         target = target * mask
@@ -132,32 +131,31 @@ class CenterNetMultiPoseLossCell(nn.Cell):
         self.off_weight = opt.off_weight  # off_weight = 1 : loss weight for keypoint local offsets
         self.reg_offset = opt.reg_offset  # reg_offset = True : regress local offset
 
-        # self.reg_ind = self.hm_hp_ind + 1 if self.reg_offset else self.hm_hp_ind
+        self.scalar_summary = ops.ScalarSummary()  # store losses scalars
+
         self.reg_ind = "reg" if self.reg_offset else "wh"
 
         # define id
         self.emb_dim = opt.reid_dim  # dataset.reid_dim = 128
         self.nID = opt.nID  # nId = 14455
-        self.classifier = nn.Dense(self.emb_dim, self.nID).to_float(mstype.float16)
+        self.classifier = nn.Dense(self.emb_dim, self.nID).to_float(ms.float16)
         self.IDLoss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
         self.emb_scale = math.sqrt(2) * math.log(self.nID - 1)  # fix np
-        self.s_det = Parameter(Tensor(-1.85 * np.ones(1), mstype.float32))
-        self.s_id = Parameter(Tensor(-1.05 * np.ones(1), mstype.float32))
-        # self.s_id = Tensor(-1.05 * self.ones(1, mindspore.float32))
+        self.s_det = Parameter(Tensor(-1.85 * np.ones(1), ms.float32))
+        self.s_id = Parameter(Tensor(-1.05 * np.ones(1), ms.float32))
 
         self.normalize = ops.L2Normalize(axis=1)
         self.greater = ops.Greater()
         self.expand_dims = ops.ExpandDims()
         self.tile = ops.Tile()
         self.multiples_1 = (1, 1, 128)
-        # self.multiples_2 = (1, 1, 14455)
         self.select = ops.Select()
         self.zeros = ops.Zeros()
         self.exp = ops.Exp()
         self.squeeze = ops.Squeeze(0)
         self.TransposeGatherFeature = TransposeGatherFeature()
         self.reshape = ops.Reshape()
-        self.reshape_mul = opt.batch_size * 500
+        self.reshape_mul = opt.batch_size * opt.K
         self.cast = ops.Cast()
         self.sigmoid = Sigmoid()
 
@@ -167,10 +165,10 @@ class CenterNetMultiPoseLossCell(nn.Cell):
         output_hm = self.sigmoid(output_hm)
 
         hm_loss = self.crit(output_hm, hm)
+        self.scalar_summary("hm_loss", hm_loss)
 
         output_id = feature["feature_id"]  # SoftmaxCrossEntropyWithLogits()
         id_head = self.TransposeGatherFeature(output_id, ind)  # id_head=[1,500,128]
-        # print(id_head.shape)
 
         # id_head = id_head[reg_mask > 0]
         cond = self.greater(reg_mask, 0)  # cond=[1,500]
@@ -178,35 +176,34 @@ class CenterNetMultiPoseLossCell(nn.Cell):
         expand_output = self.expand_dims(cond_cast, 2)
         tile_out = self.tile(expand_output, self.multiples_1)
         tile_cast = self.cast(tile_out, ms.bool_)
-        fill_zero = self.zeros(id_head.shape, mstype.float32)  # fill_zero=[1,500,128]
+        fill_zero = self.zeros(id_head.shape, ms.float32)  # fill_zero=[1,500,128]
         id_head = self.select(tile_cast, id_head, fill_zero)  # id_head=[1,500,128]
 
         id_head = self.emb_scale * self.normalize(id_head)  # id_head=[1,500,128]
         # id_head = self.emb_scale * ops.L2Normalize(id_head)
 
-        zero_input = self.zeros(ids.shape, mstype.int32)
-        id_target = self.select(cond, ids, zero_input)  # id_target=[1,500]
-        id_target_out = self.reshape(id_target, (self.reshape_mul,))
-        # expand_output = self.expand_dims(id_target, 2)
-        # tile_out = self.tile(expand_output, self.multiples_2)
+        zero_input = self.zeros(ids.shape, ms.int32)
+        id_target = self.select(self.greater(ids, 0), ids, zero_input)  # id_target=[1,500]
 
-        c_out = self.reshape(id_head, (self.reshape_mul, 128))
-        c_out = self.cast(c_out, mstype.float16)
+        c_out = self.cast(id_head, ms.float16)
         id_output = self.classifier(c_out)  # id_output=[1,500,14455]
         id_output = self.cast(id_output, ms.float32)
-        # id_output = self.squeeze(id_output)                                    # id_output=[500,14455]
-        # id_target = self.squeeze(tile_out)                                     # id_target=[500,14455]
-        id_loss = self.IDLoss(id_output, id_target_out)
+
+        id_loss = self.IDLoss(id_output, id_target)
+        self.scalar_summary("id_loss", id_loss)
 
         output_wh = feature["wh"]  # Regl1Loss
         wh_loss = self.crit_reg(output_wh, reg_mask, ind, wh)
+        self.scalar_summary("wh_loss", wh_loss)
 
         off_loss = 0
         if self.reg_offset and self.off_weight > 0:  # Regl1Loss
             output_reg = feature[self.reg_ind]
             off_loss = self.crit_reg(output_reg, reg_mask, ind, reg)
+        self.scalar_summary("off_loss", off_loss)
 
         det_loss = self.hm_weight * hm_loss + self.wh_weight * wh_loss + self.off_weight * off_loss
+        self.scalar_summary("det_loss", det_loss)
         loss = self.exp(-self.s_det) * det_loss + self.exp(-self.s_id) * id_loss + (self.s_det + self.s_id)
         loss *= 0.5
 

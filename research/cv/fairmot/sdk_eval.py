@@ -16,7 +16,7 @@
 import os
 import os.path as osp
 import logging
-from src.opts import Opts
+from src.config import Opts
 from src.tracking_utils import visualization as vis
 from src.tracker.multitracker_sdk import JDETracker
 from src.tracking_utils.log import logger
@@ -160,7 +160,7 @@ def main(opt, data_root, result_path, seqs=('MOT17-01-SDP',), save_images=True, 
 
 
 if __name__ == '__main__':
-    opts = Opts().init()
+    opts = Opts().get_config()
     seqs_str = '''  MOT20-01
                     MOT20-02
                     MOT20-03

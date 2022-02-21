@@ -15,17 +15,22 @@
 """train fairmot."""
 import json
 import os
+from pprint import pprint
+
 from mindspore import context
 from mindspore import Tensor
 from mindspore import dtype as mstype
 from mindspore import Model
 import mindspore.nn as nn
 import mindspore.dataset as ds
+from mindspore.common import set_seed
 from mindspore.context import ParallelMode
 from mindspore.train.callback import TimeMonitor, ModelCheckpoint, CheckpointConfig
-from mindspore.communication.management import init
+from mindspore.train.callback import SummaryCollector
+from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from src.opts import Opts
+
+from src.config import Opts
 from src.losses import CenterNetMultiPoseLossCell
 from src.backbone_dla_conv import DLASegConv
 from src.fairmot_pose import WithLossCell
@@ -34,18 +39,31 @@ from src.utils.jde import JointDataset
 from src.utils.callback import LossCallback
 
 
-def train(opt):
-    """train fairmot."""
+def setup_context(opt):
+    device_id = int(opt.id)
+    device_num = int(os.getenv('RANK_SIZE', '1'))
+    rank = int(os.getenv('RANK_ID', '0'))
+
+    context.set_context(mode=context.GRAPH_MODE,
+                        device_target=opt.device,
+                        device_id=device_id,
+                        save_graphs=False)
+
     local_data_path = '/cache/data'
+    if opt.run_distribute:
+        load_path = opt.load_pre_model
+
+        init()
+        device_num = get_group_size()
+        rank = get_rank()
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(device_num=device_num,
+                                          parallel_mode=ParallelMode.DATA_PARALLEL,
+                                          gradients_mean=True,
+                                          parameter_broadcast=True)
+
     if opt.is_modelarts:
         import moxing as mox
-        device_id = int(os.getenv('DEVICE_ID'))
-        device_num = int(os.getenv('RANK_SIZE'))
-        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False, max_call_depth=10000)
-        context.set_context(device_id=device_id)
-        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
-        init()
         local_data_path = os.path.join(local_data_path, str(device_id))
         opt.data_cfg = os.path.join(local_data_path, 'data_half.json')
         output_path = opt.train_url
@@ -62,26 +80,22 @@ def train(opt):
         # data download
         print('Download data.')
         mox.file.copy_parallel(src_url=opt.data_url, dst_url=local_data_path)
-    elif opt.run_distribute:
-        load_path = opt.load_pre_model
-        device_id = int(os.getenv('DEVICE_ID'))
-        device_num = int(os.getenv('RANK_SIZE'))
-        context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False)
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True,
-                                          device_num=device_num,
-                                          parameter_broadcast=True
-                                          )
-        init()
+
     else:
         load_path = opt.load_pre_model
-        device_id = opt.id
-        context.set_context(
-            mode=context.GRAPH_MODE,
-            # mode=context.PYNATIVE_MODE,
-            device_target="Ascend",
-            save_graphs=False,
-            device_id=device_id)
+
+    return load_path, local_data_path, device_num, device_id, rank
+
+
+def train(opt):
+    """train fairmot."""
+    summary_dir = './summary'
+
+    if opt.device not in ["GPU", "Ascend"]:
+        raise ValueError("Currently support only GPU or Ascend training")
+
+    load_path, local_data_path, device_num, device_id, rank = setup_context(opt)
+
     f = open(opt.data_cfg)
     data_config = json.load(f)
     train_set_paths = data_config['train']
@@ -90,15 +104,28 @@ def train(opt):
     if opt.is_modelarts:
         dataset_root = local_data_path
     dataset = JointDataset(opt, dataset_root, train_set_paths, (1088, 608), augment=True)
+
     opt = Opts().update_dataset_info_and_set_heads(opt, dataset)
+
+    if rank == 0:
+        print("\n===> Configuration:")
+        pprint(opt)
+        print("\nCheck the above configuration\n\n")
+
     if opt.is_modelarts or opt.run_distribute:
         Ms_dataset = ds.GeneratorDataset(dataset, ['input', 'hm', 'reg_mask', 'ind', 'wh', 'reg', 'ids'],
-                                         shuffle=True, num_parallel_workers=8,
-                                         num_shards=device_num, shard_id=device_id)
+                                         shuffle=True, num_parallel_workers=opt.workers,
+                                         num_shards=device_num, shard_id=device_id,
+                                         max_rowsize=8,
+                                        )
     else:
         Ms_dataset = ds.GeneratorDataset(dataset, ['input', 'hm', 'reg_mask', 'ind', 'wh', 'reg', 'ids'],
-                                         shuffle=True)
+                                         shuffle=True, num_parallel_workers=opt.workers,
+                                         max_rowsize=8,
+                                        )
+
     Ms_dataset = Ms_dataset.batch(batch_size=opt.batch_size, drop_remainder=True)
+
     batch_dataset_size = Ms_dataset.get_dataset_size()
     net = DLASegConv(opt.heads,
                      down_ratio=4,
@@ -116,23 +143,28 @@ def train(opt):
     fairmot_net = nn.TrainOneStepCell(net_with_loss, optimizer)
 
     # define callback
+    summary_cb = SummaryCollector(summary_dir, collect_freq=1)
     loss_cb = LossCallback(opt.batch_size)
     time_cb = TimeMonitor()
     config_ckpt = CheckpointConfig(saved_network=net)
     if opt.is_modelarts:
         ckpoint_cb = ModelCheckpoint(prefix='Fairmot_{}'.format(device_id), directory=local_data_path + '/output/ckpt',
                                      config=config_ckpt)
+    elif opt.run_distribute:
+        ckpoint_cb = ModelCheckpoint(prefix='Fairmot_{}'.format(device_id), directory='./ckpt_{}'.format(rank),
+                                     config=config_ckpt)
     else:
         ckpoint_cb = ModelCheckpoint(prefix='Fairmot_{}'.format(device_id), directory='./ckpt/', config=config_ckpt)
-    callbacks = [loss_cb, ckpoint_cb, time_cb]
+    callbacks = [loss_cb, ckpoint_cb, time_cb, summary_cb]
 
     # train
     model = Model(fairmot_net)
-    model.train(opt.num_epochs, Ms_dataset, callbacks=callbacks)
+    model.train(opt.num_epochs, Ms_dataset, callbacks=callbacks, dataset_sink_mode=True)
     if opt.is_modelarts:
-        mox.file.copy_parallel(local_data_path + "/output", output_path)
+        mox.file.copy_parallel(local_data_path + "/output", opt.train_url)
 
 
 if __name__ == '__main__':
-    opt_ = Opts().parse()
-    train(opt_)
+    set_seed(1)
+    config = Opts().get_config()
+    train(config)

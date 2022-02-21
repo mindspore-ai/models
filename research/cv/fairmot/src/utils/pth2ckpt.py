@@ -22,76 +22,90 @@ from mindspore.train.serialization import save_checkpoint
 
 def pth2ckpt(path='fairmot_dla34.pth'):
     """pth to ckpt """
-    par_dict = torch.load(path, map_location='cpu')
+    par_dict = torch.load(path, map_location='cpu')['state_dict']
     new_params_list = []
     for name in par_dict:
         param_dict = {}
         parameter = par_dict[name]
-        name = 'base.' + name
-        name = name.replace('level0', 'level0.0', 1)
-        name = name.replace('level1', 'level1.0', 1)
-        name = name.replace('hm', 'hm_fc', 1)
-        name = name.replace('id.0', 'id_fc.0', 1)
-        name = name.replace('id.2', 'id_fc.2', 1)
-        name = name.replace('reg', 'reg_fc', 1)
-        name = name.replace('wh', 'wh_fc', 1)
-        name = name.replace('bn.running_mean', 'bn.moving_mean', 1)
-        name = name.replace('bn.running_var', 'bn.moving_variance', 1)
-        if name.endswith('.0.weight'):
-            name = name[:name.rfind('0.weight')]
-            name = name + 'conv.weight'
-        if name.endswith('.1.weight'):
-            name = name[:name.rfind('1.weight')]
-            name = name + 'batchnorm.gamma'
-        if name.endswith('.1.bias'):
-            name = name[:name.rfind('1.bias')]
-            name = name + 'batchnorm.beta'
-        if name.endswith('.1.running_mean'):
-            name = name[:name.rfind('1.running_mean')]
-            name = name + 'batchnorm.moving_mean'
-        if name.endswith('.1.running_var'):
-            name = name[:name.rfind('1.running_var')]
-            name = name + 'batchnorm.moving_variance'
-        if name.endswith('conv1.weight'):
-            name = name[:name.rfind('conv1.weight')]
-            name = name + 'conv_bn_act.conv.weight'
-        if name.endswith('bn1.weight'):
-            name = name[:name.rfind('bn1.weight')]
-            name = name + 'conv_bn_act.batchnorm.gamma'
-        if name.endswith('bn1.bias'):
-            name = name[:name.rfind('bn1.bias')]
-            name = name + 'conv_bn_act.batchnorm.beta'
-        if name.endswith('bn1.running_mean'):
-            name = name[:name.rfind('bn1.running_mean')]
-            name = name + 'conv_bn_act.batchnorm.moving_mean'
-        if name.endswith('bn1.running_var'):
-            name = name[:name.rfind('bn1.running_var')]
-            name = name + 'conv_bn_act.batchnorm.moving_variance'
-        if name.endswith('conv2.weight'):
-            name = name[:name.rfind('conv2.weight')]
-            name = name + 'conv_bn.conv.weight'
-        if name.endswith('bn2.weight'):
-            name = name[:name.rfind('bn2.weight')]
-            name = name + 'conv_bn.batchnorm.gamma'
-        if name.endswith('bn2.bias'):
-            name = name[:name.rfind('bn2.bias')]
-            name = name + 'conv_bn.batchnorm.beta'
-        if name.endswith('bn2.running_mean'):
-            name = name[:name.rfind('bn2.running_mean')]
-            name = name + 'conv_bn.batchnorm.moving_mean'
-        if name.endswith('bn2.running_var'):
-            name = name[:name.rfind('bn2.running_var')]
-            name = name + 'conv_bn.batchnorm.moving_variance'
-        if name.endswith('bn.weight'):
-            name = name[:name.rfind('bn.weight')]
-            name = name + 'bn.gamma'
-        if name.endswith('bn.bias'):
-            name = name[:name.rfind('bn.bias')]
-            name = name + 'bn.beta'
-        param_dict['name'] = name
+        new_name = name
+        new_name = new_name.replace('level0', 'level0.0', 1)
+        new_name = new_name.replace('level1', 'level1.0', 1)
+        new_name = new_name.replace('hm', 'hm_fc', 1)
+        new_name = new_name.replace('ida_0', 'ida_nfs.0', 1)
+        new_name = new_name.replace('ida_1', 'ida_nfs.1', 1)
+        new_name = new_name.replace('ida_2', 'ida_nfs.2', 1)
+        new_name = new_name.replace('proj_1', 'proj.0', 1)
+        new_name = new_name.replace('proj_2', 'proj.1', 1)
+        new_name = new_name.replace('proj_3', 'proj.2', 1)
+        new_name = new_name.replace('up_1', 'up.0', 1)
+        new_name = new_name.replace('up_2', 'up.1', 1)
+        new_name = new_name.replace('up_3', 'up.2', 1)
+        new_name = new_name.replace('node_1', 'node.0', 1)
+        new_name = new_name.replace('node_2', 'node.1', 1)
+        new_name = new_name.replace('node_3', 'node.2', 1)
+        new_name = new_name.replace('id.0', 'id_fc.0', 1)
+        new_name = new_name.replace('id.2', 'id_fc.2', 1)
+        new_name = new_name.replace('reg', 'reg_fc', 1)
+        new_name = new_name.replace('wh', 'wh_fc', 1)
+        new_name = new_name.replace('bn.running_mean', 'bn.moving_mean', 1)
+        new_name = new_name.replace('bn.running_var', 'bn.moving_variance', 1)
+        if new_name.startswith('base'):
+            if new_name.endswith('.0.weight'):
+                new_name = new_name[:new_name.rfind('0.weight')]
+                new_name = new_name + 'conv.weight'
+            if new_name.endswith('.1.weight'):
+                new_name = new_name[:new_name.rfind('1.weight')]
+                new_name = new_name + 'batchnorm.gamma'
+            if new_name.endswith('.1.bias'):
+                new_name = new_name[:new_name.rfind('1.bias')]
+                new_name = new_name + 'batchnorm.beta'
+            if new_name.endswith('.1.running_mean'):
+                new_name = new_name[:new_name.rfind('1.running_mean')]
+                new_name = new_name + 'batchnorm.moving_mean'
+            if new_name.endswith('.1.running_var'):
+                new_name = new_name[:new_name.rfind('1.running_var')]
+                new_name = new_name + 'batchnorm.moving_variance'
+            if new_name.endswith('conv1.weight'):
+                new_name = new_name[:new_name.rfind('conv1.weight')]
+                new_name = new_name + 'conv_bn_act.conv.weight'
+            if new_name.endswith('bn1.weight'):
+                new_name = new_name[:new_name.rfind('bn1.weight')]
+                new_name = new_name + 'conv_bn_act.batchnorm.gamma'
+            if new_name.endswith('bn1.bias'):
+                new_name = new_name[:new_name.rfind('bn1.bias')]
+                new_name = new_name + 'conv_bn_act.batchnorm.beta'
+            if new_name.endswith('bn1.running_mean'):
+                new_name = new_name[:new_name.rfind('bn1.running_mean')]
+                new_name = new_name + 'conv_bn_act.batchnorm.moving_mean'
+            if new_name.endswith('bn1.running_var'):
+                new_name = new_name[:new_name.rfind('bn1.running_var')]
+                new_name = new_name + 'conv_bn_act.batchnorm.moving_variance'
+            if new_name.endswith('conv2.weight'):
+                new_name = new_name[:new_name.rfind('conv2.weight')]
+                new_name = new_name + 'conv_bn.conv.weight'
+            if new_name.endswith('bn2.weight'):
+                new_name = new_name[:new_name.rfind('bn2.weight')]
+                new_name = new_name + 'conv_bn.batchnorm.gamma'
+            if new_name.endswith('bn2.bias'):
+                new_name = new_name[:new_name.rfind('bn2.bias')]
+                new_name = new_name + 'conv_bn.batchnorm.beta'
+            if new_name.endswith('bn2.running_mean'):
+                new_name = new_name[:new_name.rfind('bn2.running_mean')]
+                new_name = new_name + 'conv_bn.batchnorm.moving_mean'
+            if new_name.endswith('bn2.running_var'):
+                new_name = new_name[:new_name.rfind('bn2.running_var')]
+                new_name = new_name + 'conv_bn.batchnorm.moving_variance'
+            new_name = new_name.replace('bn.weight', 'bn.gamma', 1)
+            new_name = new_name.replace('bn.bias', 'bn.beta', 1)
+        new_name = new_name.replace('actf.0.weight', 'actf.0.gamma', 1)
+        new_name = new_name.replace('actf.0.bias', 'actf.0.beta', 1)
+        new_name = new_name.replace('actf.0.running_mean', 'actf.0.moving_mean', 1)
+        new_name = new_name.replace('actf.0.running_var', 'actf.0.moving_variance', 1)
+        param_dict['name'] = new_name
         param_dict['data'] = Tensor(parameter.numpy())
         new_params_list.append(param_dict)
+        print(f"{name}\t -> \t{new_name}")
     save_checkpoint(new_params_list, '{}_ms.ckpt'.format(path[:path.rfind('.pth')]))
 
 
-pth2ckpt('dla34-ba72cf86.pth')
+pth2ckpt('crowdhuman_dla34.pth')
