@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -85,6 +85,7 @@ def TestDataLoader(img_size, data_path, dataset):
     testA = ds.GeneratorDataset(testA_generator, ["image_A", "image_B"], shuffle=False, num_parallel_workers=12)
 
     testA = testA.map(operations=test_transform, input_columns=["image_A"])
+    testA = testA.map(operations=test_transform, input_columns=["image_B"])
     testA_loader = testA.batch(batch_size=1).repeat(1)
     return testA_loader
 

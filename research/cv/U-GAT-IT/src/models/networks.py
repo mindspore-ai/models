@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@ import mindspore.ops as ops
 from mindspore import nn, Parameter, Tensor
 from mindspore import dtype as mstype
 
+from src.modelarts_utils.config import config
+
+
 class UpSample(nn.Cell):
     def __init__(self, scale_factor, img_size):
         super(UpSample, self).__init__()
@@ -31,18 +34,28 @@ class UpSample(nn.Cell):
         return self.upsample(x)
 
 class Dense(nn.Cell):
-    """dense layer of float16"""
-    def __init__(self, in_channels, out_channels, weight_init='uniform', has_bias=False):
+    """dense layer of float16 or float32"""
+    def __init__(self, in_channels, out_channels, weight_init='uniform', has_bias=False, target_device='Ascend'):
         super(Dense, self).__init__()
-        self.dense = nn.Dense(in_channels=in_channels,
-                              out_channels=out_channels,
-                              weight_init=weight_init,
-                              has_bias=has_bias).to_float(mstype.float16)
+        self.target_device = target_device
+        if self.target_device == 'Ascend':
+            self.dense = nn.Dense(in_channels=in_channels,
+                                  out_channels=out_channels,
+                                  weight_init=weight_init,
+                                  has_bias=has_bias).to_float(mstype.float16)
+        else:
+            self.dense = nn.Dense(in_channels=in_channels,
+                                  out_channels=out_channels,
+                                  weight_init=weight_init,
+                                  has_bias=has_bias)
 
     def construct(self, x):
-        x = ops.cast(x, mstype.float16)
-        out = self.dense(x)
-        out = ops.cast(out, mstype.float32)
+        if self.target_device == 'Ascend':
+            x = ops.cast(x, mstype.float16)
+            out = self.dense(x)
+            out = ops.cast(out, mstype.float32)
+        else:
+            out = self.dense(x)
         return out
 
 class ResnetGenerator(nn.Cell):
@@ -88,11 +101,13 @@ class ResnetGenerator(nn.Cell):
         self.gap_fc = Dense(in_channels=ngf * mult,
                             out_channels=1,
                             weight_init='uniform',
-                            has_bias=False)
+                            has_bias=False,
+                            target_device=config.device_target)
         self.gmp_fc = Dense(in_channels=ngf * mult,
                             out_channels=1,
                             weight_init='uniform',
-                            has_bias=False)
+                            has_bias=False,
+                            target_device=config.device_target)
 
         self.conv1x1 = nn.Conv2d(ngf * mult * 2, ngf * mult, kernel_size=1,
                                  stride=1, has_bias=True, bias_init='uniform')
@@ -104,32 +119,38 @@ class ResnetGenerator(nn.Cell):
             FC = [Dense(in_channels=ngf * mult,
                         out_channels=ngf * mult,
                         weight_init='uniform',
-                        has_bias=False),
+                        has_bias=False,
+                        target_device=config.device_target),
                   nn.ReLU(),
                   Dense(in_channels=ngf * mult,
                         out_channels=ngf * mult,
                         weight_init='uniform',
-                        has_bias=False),
+                        has_bias=False,
+                        target_device=config.device_target),
                   nn.ReLU()]
         else:
             FC = [Dense(in_channels=img_size // mult * img_size // mult * ngf * mult,
                         out_channels=ngf * mult,
                         weight_init='uniform',
-                        has_bias=False),
+                        has_bias=False,
+                        target_device=config.device_target),
                   nn.ReLU(),
                   Dense(in_channels=ngf * mult,
                         out_channels=ngf * mult,
                         weight_init='uniform',
-                        has_bias=False),
+                        has_bias=False,
+                        target_device=config.device_target),
                   nn.ReLU()]
         self.gamma = Dense(in_channels=ngf * mult,
                            out_channels=ngf * mult,
                            weight_init='uniform',
-                           has_bias=False)
+                           has_bias=False,
+                           target_device=config.device_target)
         self.beta = Dense(in_channels=ngf * mult,
                           out_channels=ngf * mult,
                           weight_init='uniform',
-                          has_bias=False)
+                          has_bias=False,
+                          target_device=config.device_target)
 
         # Up-Sampling Bottleneck
         for i in range(n_blocks):
@@ -322,8 +343,8 @@ class Discriminator(nn.Cell):
 
         # Class Activation Map
         mult = 2 ** (n_layers - 2)
-        self.gap_fc = Dense(ndf * mult, 1, has_bias=False)
-        self.gmp_fc = Dense(ndf * mult, 1, has_bias=False)
+        self.gap_fc = Dense(ndf * mult, 1, has_bias=False, target_device=config.device_target)
+        self.gmp_fc = Dense(ndf * mult, 1, has_bias=False, target_device=config.device_target)
 
         self.conv1x1 = nn.Conv2d(ndf * mult * 2, ndf * mult, kernel_size=1,
                                  stride=1, has_bias=True, bias_init='uniform')
