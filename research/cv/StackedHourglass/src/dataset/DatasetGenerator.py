@@ -110,9 +110,9 @@ class DatasetGenerator:
         aug_scale = np.random.random() * (1.25 - 0.75) + 0.75
         scale *= aug_scale
 
-        mat_mask = src.utils.img.get_transform(center, scale, (self.output_res, self.output_res), aug_rot)[:2]
+        mat_mask = src.utils.img.get_transform(center, scale, (self.output_res, self.output_res), rot=aug_rot)[:2]
 
-        mat = src.utils.img.get_transform(center, scale, (self.input_res, self.input_res), aug_rot)[:2]
+        mat = src.utils.img.get_transform(center, scale, (self.input_res, self.input_res), rot=aug_rot)[:2]
         inp = cv2.warpAffine(cropped, mat, (self.input_res, self.input_res)).astype(np.float32) / 255
         keypoints[:, :, 0:2] = src.utils.img.kpt_affine(keypoints[:, :, 0:2], mat_mask)
         if np.random.randint(2) == 0:
