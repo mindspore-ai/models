@@ -179,8 +179,8 @@ config for checkpoint.
 
 # [Training and Eval process](#contents)
 
-Before training, the dataset should be processed. We use the scripts provided by [SeanNaren](https://github.com/SeanNaren/deepspeech.pytorch) to process the dataset.
-This script in [SeanNaren](https://github.com/SeanNaren/deepspeech.pytorch) will automatically download the dataset and process it. After the process, the
+Before training, the dataset should be processed. We use the scripts provided by [SeanNaren](https://github.com/SeanNaren/deepspeech.pytorch/tree/V2.1) to process the dataset.
+This script in [SeanNaren](https://github.com/SeanNaren/deepspeech.pytorch/tree/V2.1) will automatically download the dataset and process it. After the process, the
 dataset directory structure is as follows:
 
 ```path
@@ -237,7 +237,7 @@ bash ./scripts/run_distribute_train_gpu.sh
 ```
 
 The following script is used to evaluate the model. Note we only support greedy decoder now and before run the script,
-you should download the decoder code from [SeanNaren](https://github.com/SeanNaren/deepspeech.pytorch) and place
+you should download the decoder code from [SeanNaren](https://github.com/SeanNaren/deepspeech.pytorch/tree/V2.1) and place
 deepspeech_pytorch into deepspeech2 directory. After that, the file directory will be displayed as that in [Script and Sample Code]
 
 ```shell
