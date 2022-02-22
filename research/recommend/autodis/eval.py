@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ def run_eval():
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=device_id)
     ds_eval = create_dataset(config.test_data_dir, train_mode=False,
                              epochs=1, batch_size=train_config.batch_size,
+                             line_per_sample=train_config.batch_size,
                              data_type=DataType(data_config.data_format))
     model_builder = ModelBuilder(model_config, train_config)
     train_net, eval_net = model_builder.get_train_eval_net()

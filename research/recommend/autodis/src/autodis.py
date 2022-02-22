@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,15 +29,19 @@ from mindspore.common.initializer import Uniform, initializer, Normal
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 
 from .callback import EvalCallBack, LossCallBack
+from .model_utils.config import config as Config
 
 
 np_type = np.float32
 ms_type = mstype.float32
 ms_type_16 = mstype.float16
 
+device_target = Config.device_target
+
 
 class AUCMetric(Metric):
     """AUC metric for AutoDis model."""
+
     def __init__(self):
         super(AUCMetric, self).__init__()
         self.pred_probs = []
@@ -75,13 +79,15 @@ def init_method(method, shape, name, max_val=0.01):
         Parameter.
     """
     if method in ['random', 'uniform']:
-        params = Parameter(initializer(Uniform(max_val), shape, ms_type), name=name)
+        params = Parameter(initializer(
+            Uniform(max_val), shape, ms_type), name=name)
     elif method == "one":
         params = Parameter(initializer("ones", shape, ms_type), name=name)
     elif method == 'zero':
         params = Parameter(initializer("zeros", shape, ms_type), name=name)
     elif method == "normal":
-        params = Parameter(initializer(Normal(max_val), shape, ms_type), name=name)
+        params = Parameter(initializer(
+            Normal(max_val), shape, ms_type), name=name)
     return params
 
 
@@ -101,13 +107,17 @@ def init_var_dict(init_args, values):
     for key, shape, init_flag, data_type in values:
         if key not in var_map.keys():
             if init_flag in ['random', 'uniform']:
-                var_map[key] = Parameter(initializer(Uniform(_max_val), shape, data_type), name=key)
+                var_map[key] = Parameter(initializer(
+                    Uniform(_max_val), shape, data_type), name=key)
             elif init_flag == "one":
-                var_map[key] = Parameter(initializer("ones", shape, data_type), name=key)
+                var_map[key] = Parameter(initializer(
+                    "ones", shape, data_type), name=key)
             elif init_flag == "zero":
-                var_map[key] = Parameter(initializer("zeros", shape, data_type), name=key)
+                var_map[key] = Parameter(initializer(
+                    "zeros", shape, data_type), name=key)
             elif init_flag == 'normal':
-                var_map[key] = Parameter(initializer(Normal(_max_val), shape, data_type), name=key)
+                var_map[key] = Parameter(initializer(
+                    Normal(_max_val), shape, data_type), name=key)
     return var_map
 
 
@@ -123,15 +133,20 @@ class DenseLayer(nn.Cell):
         keep_prob (float): Dropout Layer keep_prob_rate;
         scale_coef (float): input scale coefficient;
     """
+
     def __init__(self, input_dim, output_dim, weight_bias_init, act_str, keep_prob=0.9, scale_coef=1.0):
         super(DenseLayer, self).__init__()
         weight_init, bias_init = weight_bias_init
-        self.weight = init_method(weight_init, [input_dim, output_dim], name="weight")
+        self.weight = init_method(
+            weight_init, [input_dim, output_dim], name="weight")
         self.bias = init_method(bias_init, [output_dim], name="bias")
         self.act_func = self._init_activation(act_str)
         self.matmul = P.MatMul(transpose_b=False)
         self.bias_add = P.BiasAdd()
-        self.cast = P.Cast()
+        if device_target == 'Ascend':
+            self.cast = P.Cast()
+        else:
+            self.cast = None
         self.dropout = Dropout(keep_prob=keep_prob)
         self.mul = P.Mul()
         self.realDiv = P.RealDiv()
@@ -153,10 +168,14 @@ class DenseLayer(nn.Cell):
         if self.training:
             x = self.dropout(x)
         x = self.mul(x, self.scale_coef)
-        x = self.cast(x, mstype.float16)
-        weight = self.cast(self.weight, mstype.float16)
+        if self.cast is not None:
+            x = self.cast(x, mstype.float16)
+            weight = self.cast(self.weight, mstype.float16)
+        else:
+            weight = self.weight
         wx = self.matmul(x, weight)
-        wx = self.cast(wx, mstype.float32)
+        if self.cast is not None:
+            wx = self.cast(wx, mstype.float32)
         wx = self.realDiv(wx, self.scale_coef)
         output = self.bias_add(wx, self.bias)
         return output
@@ -178,6 +197,7 @@ class AutoDisModel(nn.Cell):
                             (list[str], weight_bias_init=['random', 'zero'])
         keep_prob (float): if dropout_flag is True, keep_prob rate to keep connect; (float, keep_prob=0.8)
     """
+
     def __init__(self, config):
         super(AutoDisModel, self).__init__()
 
@@ -193,10 +213,13 @@ class AutoDisModel(nn.Cell):
         self.split_index = config.split_index
         self.temperature = config.temperature
         init_acts = [('W_l2', [self.vocab_size, 1], 'normal', ms_type),
-                     ('V_l2', [self.vocab_size, self.emb_dim], 'normal', ms_type),
+                     ('V_l2', [self.vocab_size, self.emb_dim],
+                      'normal', ms_type),
                      ('b', [1], 'normal', ms_type),
-                     ('logits', [self.split_index, self.hash_size], 'random', ms_type),
-                     ('autodis_embedding', [self.split_index, self.hash_size, self.emb_dim], 'random', ms_type_16)]
+                     ('logits', [self.split_index, self.hash_size],
+                      'random', ms_type),
+                     ('autodis_embedding', [self.split_index, self.hash_size, self.emb_dim], 'random',
+                      ms_type_16 if device_target == 'Ascend' else ms_type)]
         var_map = init_var_dict(self.init_args, init_acts)
         self.fm_w = var_map["W_l2"]
         self.fm_b = var_map["b"]
@@ -205,7 +228,8 @@ class AutoDisModel(nn.Cell):
         self.autodis_embedding = var_map["autodis_embedding"]
         # Deep Layers
         self.deep_input_dims = self.field_size * self.emb_dim + 1
-        self.all_dim_list = [self.deep_input_dims] + self.deep_layer_dims_list + [1]
+        self.all_dim_list = [self.deep_input_dims] + \
+            self.deep_layer_dims_list + [1]
         self.dense_layer_1 = DenseLayer(self.all_dim_list[0], self.all_dim_list[1],
                                         self.weight_bias_init, self.deep_layer_act, self.keep_prob)
         self.dense_layer_2 = DenseLayer(self.all_dim_list[1], self.all_dim_list[2],
@@ -223,7 +247,10 @@ class AutoDisModel(nn.Cell):
         self.Shape = P.Shape()
         self.Tile = P.Tile()
         self.Concat = P.Concat(axis=1)
-        self.Cast = P.Cast()
+        if device_target == 'Ascend':
+            self.Cast = P.Cast()
+        else:
+            self.Cast = None
 
         # AutoDis
         self.Slice = P.Slice()
@@ -231,6 +258,7 @@ class AutoDisModel(nn.Cell):
         self.ExpandDims = P.ExpandDims()
         self.Transpose = P.Transpose()
         self.SoftMax = P.Softmax()
+
     def construct(self, id_hldr, wt_hldr):
         """
         Args:
@@ -255,10 +283,12 @@ class AutoDisModel(nn.Cell):
         h_logits = self.Transpose(h_logits, (1, 0, 2))
         logits_score = self.Mul(con_wt_hldr, h_logits)
         logits_norm_score = self.SoftMax(logits_score / self.temperature)
-        logits_norm_score = self.Cast(logits_norm_score, mstype.float16)
+        if self.Cast is not None:
+            logits_norm_score = self.Cast(logits_norm_score, mstype.float16)
         autodis_emb = self.BatchMatMul(logits_norm_score, self.autodis_embedding)
         autodis_emb = self.Transpose(autodis_emb, (1, 0, 2))
-        autodis_emb = self.Cast(autodis_emb, mstype.float32)
+        if self.Cast is not None:
+            autodis_emb = self.Cast(autodis_emb, mstype.float32)
 
         dis_fm_id_embs = self.Gatherv2(self.embedding_table, dis_id_hldr, 0)
         dis_mask = self.Reshape(dis_wt_hldr, (self.batch_size, self.field_size - self.split_index, 1))
@@ -288,6 +318,7 @@ class NetWithLossClass(nn.Cell):
     """
     NetWithLossClass definition.
     """
+
     def __init__(self, network, l2_coef=1e-6):
         super(NetWithLossClass, self).__init__(auto_prefix=False)
         self.loss = P.SigmoidCrossEntropyWithLogits()
@@ -301,7 +332,8 @@ class NetWithLossClass(nn.Cell):
         """
         Construct NetWithLossClass
         """
-        predict, fm_id_weight, fm_id_embs, logits, autodis_embedding = self.network(batch_ids, batch_wts)
+        predict, fm_id_weight, fm_id_embs, logits, autodis_embedding = self.network(
+            batch_ids, batch_wts)
         log_loss = self.loss(predict, label)
         mean_log_loss = self.ReduceMean_false(log_loss)
         l2_loss_w = self.ReduceSum_false(self.Square(fm_id_weight))
@@ -317,6 +349,7 @@ class TrainStepWrap(nn.Cell):
     """
     TrainStepWrap definition
     """
+
     def __init__(self, network, lr=5e-8, eps=1e-8, loss_scale=1000.0):
         super(TrainStepWrap, self).__init__(auto_prefix=False)
         self.network = network
@@ -331,7 +364,7 @@ class TrainStepWrap(nn.Cell):
     def construct(self, batch_ids, batch_wts, label):
         weights = self.weights
         loss = self.network(batch_ids, batch_wts, label)
-        sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens) #
+        sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
         grads = self.grad(self.network, weights)(batch_ids, batch_wts, label, sens)
         return F.depend(loss, self.optimizer(grads))
 
@@ -340,6 +373,7 @@ class PredictWithSigmoid(nn.Cell):
     """
     Eval model with sigmoid.
     """
+
     def __init__(self, network):
         super(PredictWithSigmoid, self).__init__(auto_prefix=False)
         self.network = network
@@ -360,6 +394,7 @@ class ModelBuilder:
         model_config (ModelConfig): Model configuration.
         train_config (TrainConfig): Train configuration.
     """
+
     def __init__(self, model_config, train_config):
         self.model_config = model_config
         self.train_config = train_config
@@ -383,7 +418,7 @@ class ModelBuilder:
         if self.train_config.eval_callback:
             if model is None:
                 raise RuntimeError("train_config.eval_callback is {}; get_callback_list() args model is {}".format(
-                                        self.train_config.eval_callback, model))
+                    self.train_config.eval_callback, model))
             if eval_dataset is None:
                 raise RuntimeError("train_config.eval_callback is {}; get_callback_list() "
                                    "args eval_dataset is {}".format(self.train_config.eval_callback, eval_dataset))

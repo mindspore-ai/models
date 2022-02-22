@@ -62,10 +62,14 @@ TrainConfig:
     train_epochs: 15
     save_checkpoint: True
     ckpt_file_name_prefix: "autodis"
-    save_checkpoint_steps: 1
-    keep_checkpoint_max: 15
+    keep_checkpoint_max: 5
     eval_callback: True
     loss_callback: True
+# bs , lr and train_epochs only on GPU
+GPUConfig:
+    batch_size: 16384
+    learning_rate: 0.0003
+    train_epochs: 15
 
 # src/preprocess_data.py "Recommendation dataset"
 # data_path: "./recommendation_dataset/"
@@ -98,6 +102,6 @@ file_name: "Output file name."
 file_format: "Output file format, you can choose from AIR or MINDIR, default is AIR"
 ---
 #Choices
-device_target: ["Ascend"]
+device_target: ["Ascend", "GPU"]
 do_eval: ["True", "False"]
 file_format: ["AIR", "MINDIR"]

@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -87,8 +87,8 @@ class H5Dataset():
                     np.random.shuffle(parts)
             for i, p in enumerate(parts):
                 yield os.path.join(self._hdf_data_dir, f'{self._file_prefix}_input_part_{str(p)}.h5'), \
-                      os.path.join(self._hdf_data_dir, f'{self._file_prefix}_output_part_{str(p)}.h5'), \
-                      i + 1 == len(parts)
+                    os.path.join(self._hdf_data_dir, f'{self._file_prefix}_output_part_{str(p)}.h5'), \
+                    i + 1 == len(parts)
 
     def _generator(self, X, y, batch_size, shuffle=True):
         """
@@ -142,8 +142,8 @@ class H5Dataset():
                 X_id = X[:, 0:self.max_length]
                 X_va = X[:, self.max_length:]
                 yield np.array(X_id.astype(dtype=np.int32)), \
-                      np.array(X_va.astype(dtype=np.float32)), \
-                      np.array(y.astype(dtype=np.float32))
+                    np.array(X_va.astype(dtype=np.float32)), \
+                    np.array(y.astype(dtype=np.float32))
 
 
 def _get_h5_dataset(directory, train_mode=True, epochs=1, batch_size=1000):
@@ -207,7 +207,8 @@ def _get_mindrecord_dataset(directory, train_mode=True, epochs=1, batch_size=100
         data_set = ds.MindDataset(os.path.join(directory, file_prefix_name + file_suffix_name),
                                   columns_list=['feat_ids', 'feat_vals', 'label'],
                                   shuffle=shuffle, num_parallel_workers=8)
-    data_set = data_set.batch(int(batch_size / line_per_sample), drop_remainder=True)
+    data_set = data_set.batch(
+        int(batch_size / line_per_sample), drop_remainder=True)
     data_set = data_set.map(operations=(lambda x, y, z: (np.array(x).flatten().reshape(batch_size, 39),
                                                          np.array(y).flatten().reshape(batch_size, 39),
                                                          np.array(z).flatten().reshape(batch_size, 1))),
@@ -254,7 +255,8 @@ def _get_tf_dataset(directory, train_mode=True, epochs=1, batch_size=1000,
     else:
         data_set = ds.TFRecordDataset(dataset_files=dataset_files, shuffle=shuffle,
                                       schema=schema, num_parallel_workers=8)
-    data_set = data_set.batch(int(batch_size / line_per_sample), drop_remainder=True)
+    data_set = data_set.batch(
+        int(batch_size / line_per_sample), drop_remainder=True)
     data_set = data_set.map(operations=(lambda x, y, z: (
         np.array(x).flatten().reshape(batch_size, 39),
         np.array(y).flatten().reshape(batch_size, 39),

@@ -18,7 +18,8 @@ import pickle
 import collections
 import numpy as np
 from mindspore.mindrecord import FileWriter
-from model_utils.config import config
+from model_utils.config import config, train_config
+
 
 class StatsDict():
     """preprocessed data"""
@@ -86,8 +87,10 @@ class StatsDict():
             self.val_min_dict = pickle.load(file_wrt)
         with open(os.path.join(dict_path, "{}cat_count_dict.pkl".format(prefix)), "rb") as file_wrt:
             self.cat_count_dict = pickle.load(file_wrt)
-        print("val_max_dict.items()[:50]:{}".format(list(self.val_max_dict.items())))
-        print("val_min_dict.items()[:50]:{}".format(list(self.val_min_dict.items())))
+        print("val_max_dict.items()[:50]:{}".format(
+            list(self.val_max_dict.items())))
+        print("val_min_dict.items()[:50]:{}".format(
+            list(self.val_min_dict.items())))
 
     def get_cat2id(self, threshold=100):
         for key, cat_count_d in self.cat_count_dict.items():
@@ -95,7 +98,8 @@ class StatsDict():
             for cat_str, _ in new_cat_count_d.items():
                 self.cat2id_dict[key + "_" + cat_str] = len(self.cat2id_dict)
         print("cat2id_dict.size:{}".format(len(self.cat2id_dict)))
-        print("cat2id.dict.items()[:50]:{}".format(list(self.cat2id_dict.items())[:50]))
+        print("cat2id.dict.items()[:50]:{}".format(
+            list(self.cat2id_dict.items())[:50]))
 
     def map_cat2id(self, values, cats):
         """Cat to id"""
@@ -164,7 +168,7 @@ def statsdata(file_path, dict_output_path, recommendation_dataset_stats_dict, de
 
 
 def random_split_trans2mindrecord(input_file_path, output_file_path, recommendation_dataset_stats_dict,
-                                  part_rows=2000000, line_per_sample=1000, train_line_count=None,
+                                  part_rows=10, line_per_sample=1000, train_line_count=None,
                                   test_size=0.1, seed=2020, dense_dim=13, slot_dim=26):
     """Random split data and save mindrecord"""
     if train_line_count is None:
@@ -274,6 +278,6 @@ if __name__ == '__main__':
     in_file_path = data_path + "origin_data/train.txt"
     output_path = data_path + "mindrecord/"
     mkdir_path(output_path)
-    random_split_trans2mindrecord(in_file_path, output_path, stats, part_rows=2000000,
-                                  train_line_count=config.train_line_count, line_per_sample=1000,
+    random_split_trans2mindrecord(in_file_path, output_path, stats, part_rows=10,
+                                  train_line_count=config.train_line_count, line_per_sample=train_config.batch_size,
                                   test_size=0.1, seed=2020, dense_dim=config.dense_dim, slot_dim=config.slot_dim)
