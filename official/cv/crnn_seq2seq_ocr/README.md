@@ -37,7 +37,13 @@ CRNN-Seq2Seq-OCR applies a vgg structure to extract features from processed imag
 
 ## [Dataset](#content)
 
-For training and evaluation, we use the French Street Name Signs (FSNS) released by Google as the training data, which contains approximately 1 million training images and their corresponding ground truth words.
+For training and evaluation, we use the French Street Name Signs (FSNS) released by Google as the training data, which contains approximately 1 million training images and their corresponding ground truth words. Note that these datasets are very large.
+
+- Dataset size：~200GB，~1M 150*600 colored images with a label indicating the text within the image.
+    - Train：200GB，1M, images
+    - Test：4GB，24,404 images
+- Data format：binary files
+    - Note：Data will be processed in dataset.py
 
 ## [Environment Requirements](#contents)
 
@@ -54,9 +60,60 @@ For training and evaluation, we use the French Street Name Signs (FSNS) released
 - After the dataset is prepared, you may start running the training or the evaluation scripts as follows:
 
     - Preprocess FSNS dataset
-        - 1.download FSNS dataset from [here](https://rrc.cvc.uab.es/?ch=6&com=downloads)
-        - 2.Use tf2file_v3.py transform to intermediate dataset.
+        - 1.download FSNS dataset from the following list by "wget".
+
+              https://download.tensorflow.org/data/fsns-20160927/test/test-00000-of-00064
+              ...
+              https://download.tensorflow.org/data/fsns-20160927/test/test-00063-of-00064
+              https://download.tensorflow.org/data/fsns-20160927/train/train-00000-of-00512
+              ...
+              https://download.tensorflow.org/data/fsns-20160927/train/train-00511-of-00512
+              the dir structure of dataset is as follows:
+
+              tfrecord
+              ├── test
+                 ├── test-00000-of-00064
+                 ├── ...
+                 └── test-00063-of-00064
+              ├── train
+                 ├── train-00000-of-00512
+                 ├── ...
+                 ├── train-00511-of-00512
+        - 2.Use tf2file_v3.py transform to intermediate dataset (from tfrecord files to original files).
+            - set some parameters in tf2file_v3.py
+
+              ```shell
+              phase: "train" or "test"
+              save_img_dir
+              save_annot_dir
+              tfrecord_dir: "tfrecord/train" or "tfrecord/test"
+              ```
+
+            - python tf2file_v3.py
+                after running this command, the dir structure of intermediate dataset is as follows:
+
+                ```shell
+                data
+                ├── test
+                   ├── *.png
+                ├── test.txt
+                ├── train
+                   ├── *.png
+                ├── train.txt
+                ```
+
         - 3.Use create_mindrecord_files.py to convert the intermediate data set to the mindrecord dataset.
+            - set some parameters in default_config.yaml
+
+              ```shell
+              mindrecord_dir
+              data_root: "data/train"
+              annotation_file: "data/train.txt"
+              val_data_root: "data/test"
+              val_annotation_file: "data/test.txt"
+              ```
+
+            - python create_mindrecord_files.py
 
     - Running on Ascend
 

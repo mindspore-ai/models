@@ -14,19 +14,47 @@
 # ============================================================================
 """Create FSNS MindRecord files."""
 
+import codecs
+import logging
 import os
 import numpy as np
 
 from mindspore.mindrecord import FileWriter
+from model_utils.config import config
 
-from src.model_utils.config import config
-from utils import initialize_vocabulary
+def initialize_vocabulary(vocabulary_path):
+    """
+    initialize vocabulary from file.
+    assume the vocabulary is stored one-item-per-line
+    """
+    characters_class = 9999
 
+    if os.path.exists(vocabulary_path):
+        rev_vocab = []
+        with codecs.open(vocabulary_path, 'r', encoding='utf-8') as voc_file:
+            rev_vocab = [line.strip() for line in voc_file]
+
+        vocab = {x: y for (y, x) in enumerate(rev_vocab)}
+
+        reserved_char_size = characters_class - len(rev_vocab)
+        if reserved_char_size < 0:
+            raise ValueError("Number of characters in vocabulary is equal or larger than config.characters_class")
+
+        for _ in range(reserved_char_size):
+            rev_vocab.append('')
+
+        # put space at the last position
+        vocab[' '] = len(rev_vocab)
+        rev_vocab.append(' ')
+        logging.info("Initializing vocabulary ends: %s", vocabulary_path)
+        return vocab, rev_vocab
+
+    raise ValueError("Initializing vocabulary ends: %s" % vocabulary_path)
 
 def serialize_annotation(img_path, lex, vocab):
 
-    go_id = config.characters_dictionary.get("go_id")
-    eos_id = config.characters_dictionary.get("eos_id")
+    go_id = config.characters_dictionary.go_id
+    eos_id = config.characters_dictionary.eos_id
 
     word = [go_id]
     for special_label in config.labels_not_use:
@@ -85,7 +113,10 @@ def fsns_train_data_to_mindrecord(mindrecord_dir, prefix="data_ocr.mindrecord", 
     anno_file_dirs = [config.annotation_file]
     images, image_path_dict, image_anno_dict = create_fsns_label(image_dir=config.data_root,
                                                                  anno_file_dirs=anno_file_dirs)
-    vocab, _ = initialize_vocabulary(config.vocab_path)
+
+    current_file_dir = os.path.dirname(os.path.realpath(__file__))
+    vocab_path = os.path.dirname(current_file_dir) + "/" + config.vocab_path
+    vocab, _ = initialize_vocabulary(vocab_path)
 
     data_schema = {"image": {"type": "bytes"},
                    "label": {"type": "int32", "shape": [-1]},
@@ -128,7 +159,7 @@ def fsns_train_data_to_mindrecord(mindrecord_dir, prefix="data_ocr.mindrecord", 
         decoder_input = (np.array(label).T).astype(np.int32)
         target_weight = (np.array(target_weight).T).astype(np.int32)
 
-        if not len(decoder_input) == len(target_weight):
+        if len(decoder_input) != len(target_weight):
             continue
 
         target = [decoder_input[i + 1] for i in range(len(decoder_input) - 1)]
@@ -154,7 +185,10 @@ def fsns_val_data_to_mindrecord(mindrecord_dir, prefix="data_ocr.mindrecord", fi
     anno_file_dirs = [config.val_annotation_file]
     images, image_path_dict, image_anno_dict = create_fsns_label(image_dir=config.val_data_root,
                                                                  anno_file_dirs=anno_file_dirs)
-    vocab, _ = initialize_vocabulary(config.vocab_path)
+
+    current_file_dir = os.path.dirname(os.path.realpath(__file__))
+    vocab_path = os.path.dirname(current_file_dir) + "/" + config.vocab_path
+    vocab, _ = initialize_vocabulary(vocab_path)
 
     data_schema = {"image": {"type": "bytes"},
                    "decoder_input": {"type": "int32", "shape": [-1]},
