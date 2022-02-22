@@ -168,7 +168,7 @@ Check the `eval/log.txt` and you will get outputs as following:
 
 ```shell
 
-mse per seq: 478.58854093653633
+mse per frame: 47.858854093653633
     20.98119093135079
     27.252088156613436
     33.403171304712956
@@ -198,7 +198,7 @@ mse per seq: 478.58854093653633
 | Optimizer                  | Adam                                              |
 | Loss Function              | L2Loss                                            |
 | Loss                       | 165.70367431640625                                |
-| Speed                      | 983ms/step(1pcs)                                  |
+| Speed                      | 988ms/step(1pcs)                                  |
 | Total time                 | 22h                                               |
 | Checkpoint for Fine tuning | 177.27M (.ckpt file)                              |
 | Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/predrnn++) |
