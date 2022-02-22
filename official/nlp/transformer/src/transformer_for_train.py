@@ -48,12 +48,12 @@ def _clip_grad(clip_type, clip_value, grad):
     """
     if clip_type not in (0, 1):
         return grad
-    dt = F.dtype(grad)
+    dt = ops.dtype(grad)
     if clip_type == 0:
-        new_grad = ops.clip_by_value(grad, F.cast(F.tuple_to_array((-clip_value,)), dt),
-                                     F.cast(F.tuple_to_array((clip_value,)), dt))
+        new_grad = ops.clip_by_value(grad, ops.cast(ops.tuple_to_array((-clip_value,)), dt),
+                                     ops.cast(ops.tuple_to_array((clip_value,)), dt))
     else:
-        new_grad = nn.ClipByNorm()(grad, F.cast(F.tuple_to_array((clip_value,)), dt))
+        new_grad = nn.ClipByNorm()(grad, ops.cast(ops.tuple_to_array((clip_value,)), dt))
     return new_grad
 
 
@@ -92,7 +92,7 @@ class TransformerTrainingLoss(nn.Cell):
         per_example_loss = self.neg(self.reduce_sum(prediction_scores * one_hot_labels, self.last_idx))
         numerator = self.reduce_sum(label_weights * per_example_loss, ())
         denominator = self.reduce_sum(label_weights, ()) + \
-                      self.cast(F.tuple_to_array((1e-5,)), ms.float32)
+                      self.cast(ops.tuple_to_array((1e-5,)), ms.float32)
         loss = numerator / denominator
         return loss
 
@@ -179,9 +179,9 @@ class TransformerTrainOneStepCell(nn.TrainOneStepCell):
                                                  target_mask,
                                                  label_ids,
                                                  label_weights,
-                                                 self.cast(F.tuple_to_array((self.sens,)),
+                                                 self.cast(ops.tuple_to_array((self.sens,)),
                                                            ms.float32))
-        grads = self.hyper_map(F.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
+        grads = self.hyper_map(ops.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
         # apply grad reducer on grads
         grads = self.grad_reducer(grads)
         self.optimizer(grads)
@@ -194,7 +194,7 @@ reciprocal = ops.Reciprocal()
 
 @grad_scale.register("Tensor", "Tensor")
 def tensor_grad_scale(scale, grad):
-    return grad * F.cast(reciprocal(scale), F.dtype(grad))
+    return grad * ops.cast(reciprocal(scale), ops.dtype(grad))
 
 _grad_overflow = ops.MultitypeFuncGraph("_grad_overflow")
 grad_overflow = ops.FloatStatus()
@@ -267,8 +267,8 @@ class TransformerTrainOneStepWithLossScaleCell(nn.TrainOneStepWithLossScaleCell)
 
         # apply grad reducer on grads
         grads = self.grad_reducer(grads)
-        grads = self.hyper_map(F.partial(grad_scale, scaling_sens * self.degree), grads)
-        grads = self.hyper_map(F.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
+        grads = self.hyper_map(ops.partial(grad_scale, scaling_sens * self.degree), grads)
+        grads = self.hyper_map(ops.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
 
         cond = self.get_overflow_status(status, grads)
         overflow = cond
@@ -292,14 +292,14 @@ update_accu_grads = ops.MultitypeFuncGraph("update_accu_grads")
 @update_accu_grads.register("Tensor", "Tensor")
 def _update_accu_grads(accu_grad, grad):
     succ = True
-    return F.depend(succ, F.assign(accu_grad, cast(grad, ms.float32)))
+    return ops.depend(succ, ops.assign(accu_grad, cast(grad, ms.float32)))
 
 accumulate_accu_grads = ops.MultitypeFuncGraph("accumulate_accu_grads")
 
 @accumulate_accu_grads.register("Tensor", "Tensor")
 def _accumulate_accu_grads(accu_grad, grad):
     succ = True
-    return F.depend(succ, F.assign_add(accu_grad, cast(grad, ms.float32)))
+    return ops.depend(succ, ops.assign_add(accu_grad, cast(grad, ms.float32)))
 
 
 zeroslike = ops.ZerosLike()
@@ -309,7 +309,7 @@ reset_accu_grads = ops.MultitypeFuncGraph("reset_accu_grads")
 @reset_accu_grads.register("Tensor")
 def _reset_accu_grads(accu_grad):
     succ = True
-    return F.depend(succ, F.assign(accu_grad, zeroslike(accu_grad)))
+    return ops.depend(succ, ops.assign(accu_grad, zeroslike(accu_grad)))
 
 
 class TransformerTrainAccumulationAllReducePostWithLossScaleCell(nn.Cell):
@@ -352,13 +352,13 @@ class TransformerTrainAccumulationAllReducePostWithLossScaleCell(nn.Cell):
         self.parallel_mode = ms.get_auto_parallel_context("parallel_mode")
         if self.parallel_mode in [ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL]:
             self.reducer_flag = True
-        self.grad_reducer = F.identity
+        self.grad_reducer = ops.identity
         self.degree = 1
         if self.reducer_flag:
             self.degree = get_group_size()
             self.grad_reducer = DistributedGradReducer(optimizer.parameters, False, self.degree)
         self.is_distributed = (self.parallel_mode != ParallelMode.STAND_ALONE)
-        self.overflow_reducer = F.identity
+        self.overflow_reducer = ops.identity
         if self.is_distributed:
             self.overflow_reducer = ops.AllReduce()
         self.cast = ops.Cast()
@@ -407,9 +407,9 @@ class TransformerTrainAccumulationAllReducePostWithLossScaleCell(nn.Cell):
             scaling_sens = sens
         # alloc status and clear should be right before gradoperation
         init = self.alloc_status()
-        init = F.depend(init, loss)
+        init = ops.depend(init, loss)
         clear_status = self.clear_status(init)
-        scaling_sens = F.depend(scaling_sens, clear_status)
+        scaling_sens = ops.depend(scaling_sens, clear_status)
         # update accumulation parameters
         is_accu_step = self.not_equal(self.local_step, self.accumulation_steps)
         self.local_step = self.select(is_accu_step, self.local_step + self.one, self.one)
@@ -427,11 +427,11 @@ class TransformerTrainAccumulationAllReducePostWithLossScaleCell(nn.Cell):
                                                            ms.float32))
 
         accu_succ = self.hyper_map(accumulate_accu_grads, self.accu_grads, grads)
-        mean_loss = F.depend(mean_loss, accu_succ)
+        mean_loss = ops.depend(mean_loss, accu_succ)
 
-        init = F.depend(init, mean_loss)
+        init = ops.depend(init, mean_loss)
         get_status = self.get_status(init)
-        init = F.depend(init, get_status)
+        init = ops.depend(init, get_status)
         flag_sum = self.reduce_sum(init, (0,))
         overflow = self.less_equal(self.base, flag_sum)
         overflow = self.logical_or(self.not_equal(self.accu_overflow, self.zero), overflow)
@@ -442,16 +442,16 @@ class TransformerTrainAccumulationAllReducePostWithLossScaleCell(nn.Cell):
             # apply grad reducer on grads
             grads = self.grad_reducer(self.accu_grads)
             scaling = scaling_sens * self.degree * self.accumulation_steps
-            grads = self.hyper_map(F.partial(grad_scale, scaling), grads)
+            grads = self.hyper_map(ops.partial(grad_scale, scaling), grads)
             if self.enable_global_norm:
                 grads = ops.clip_by_global_norm(grads, 1.0, None)
             else:
-                grads = self.hyper_map(F.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
-            accu_overflow = F.depend(accu_overflow, grads)
+                grads = self.hyper_map(ops.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
+            accu_overflow = ops.depend(accu_overflow, grads)
             accu_overflow = self.overflow_reducer(accu_overflow)
             overflow = self.less_equal(self.base, accu_overflow)
             accu_succ = self.hyper_map(reset_accu_grads, self.accu_grads)
-            overflow = F.depend(overflow, accu_succ)
+            overflow = ops.depend(overflow, accu_succ)
             overflow = self.reshape(overflow, (()))
             if sens is None:
                 overflow = self.loss_scaling_manager(self.loss_scale, overflow)
