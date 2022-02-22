@@ -47,7 +47,7 @@ class FpnTopDown(nn.Cell):
             top = len(inputs) - i - 1
             down = top - 1
             size = ops.shape(inputs[down])
-            top_down = P.ResizeBilinear((size[2], size[3]))(features[-1])
+            top_down = ops.ResizeBilinear((size[2], size[3]))(features[-1])
             top_down = top_down + image_features[down]
             features = features + (top_down,)
 
