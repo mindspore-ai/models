@@ -110,6 +110,7 @@ class textrcnn(nn.Cell):
         self.text_rep_dense.to_float(mstype.float16)
         self.mydense.to_float(mstype.float16)
         self.output_dense.to_float(mstype.float16)
+        self.depend = P.Depend()
 
     def construct(self, x):
         """class construction"""
@@ -199,7 +200,8 @@ class textrcnn(nn.Cell):
 
             if self.gpu_flag:
                 output_fw, _ = self.lstm(x, (h1_fw_init, c1_fw_init))
-                output_bw, _ = self.lstm(x, (h1_bw_init, c1_bw_init))
+                y = self.depend(x, output_fw)
+                output_bw, _ = self.lstm(y, (h1_bw_init, c1_bw_init))
             else:
                 _, output_fw, _, _, _, _, _, _ = self.lstm(x, self.w1_fw, self.b1_fw, None, h1_fw_init, c1_fw_init)
                 _, output_bw, _, _, _, _, _, _ = self.lstm(x, self.w1_bw, self.b1_bw, None, h1_bw_init, c1_bw_init)
