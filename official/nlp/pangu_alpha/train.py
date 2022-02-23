@@ -102,7 +102,8 @@ def set_parallel_context(args_opt):
     context.set_auto_parallel_context(
         parallel_mode=ParallelMode.SEMI_AUTO_PARALLEL, gradients_mean=False,
         full_batch=bool(args_opt.full_batch), strategy_ckpt_load_file=args_opt.strategy_load_ckpt_path,
-        enable_parallel_optimizer=bool(args_opt.optimizer_shard), strategy_ckpt_save_file='strategy.ckpt')
+        enable_parallel_optimizer=bool(args_opt.optimizer_shard), strategy_ckpt_save_file='strategy.ckpt',
+        enable_alltoall=bool(args_opt.enable_alltoall))
     set_algo_parameters(elementwise_op_strategy_follow=True)
     _set_multi_subgraphs()
     return rank, device_num
@@ -386,7 +387,7 @@ def set_pipeline_parallel_context(args_opt):
         parallel_mode=ParallelMode.SEMI_AUTO_PARALLEL, gradients_mean=False,
         full_batch=bool(args_opt.full_batch), loss_repeated_mean=True,
         device_num=device_num, enable_parallel_optimizer=bool(args_opt.optimizer_shard),
-        pipeline_stages=args_opt.stage_num)
+        pipeline_stages=args_opt.stage_num, enable_alltoall=bool(args_opt.enable_alltoall))
     set_algo_parameters(elementwise_op_strategy_follow=True)
     _set_multi_subgraphs()
     return rank_id, device_num
@@ -505,6 +506,8 @@ if __name__ == "__main__":
     set_parse(opt)
     if opt.per_batch_size == 0:
         raise ValueError("The per_batch_size has not been configured.")
+    if bool(opt.enable_alltoall) is True and bool(opt.use_moe) is False:
+        raise ValueError("The alltoall communication is only effective when applying moe")
     if opt.stage_num > 1:
         if bool(opt.use_moe) or bool(opt.opt_offload):
             raise ValueError("Currently, moe and host device mode is not supported in pipeline parallel.")
