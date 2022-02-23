@@ -157,6 +157,7 @@ MVTec AD数据集
     decay: 1.0e-5
     flc: 32           # 第一层卷积的通道数
     stride: 32  
+    load_ckpt_path: "" # 加载checkpoint模型的路径, 指定路径即进行模型加载
 
     # 推理相关参数
     image_level: True     # 使用图像级别的推理结果还是像素级别的，图像级别的推理必须有`good`目录

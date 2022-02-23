@@ -37,7 +37,7 @@ DATA_PATH=$(get_real_path $1)
 CKPT_APTH=$(get_real_path $2)
 export DATA_PATH=$DATA_PATH
 
-arr=("bottle" "cable" "capsule" "capsule" "carpet" "grid" "hazelnut" "leather" "metal_nut" "pill" "screw" "tile" "toothbrush" "transistor" "wood" "zipper")
+arr=("bottle" "cable" "capsule" "carpet" "grid" "hazelnut" "leather" "metal_nut" "pill" "screw" "tile" "toothbrush" "transistor" "wood" "zipper")
 
 for value in "${arr[@]}"
 do

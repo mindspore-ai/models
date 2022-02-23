@@ -135,6 +135,8 @@ def parse(cfg):
         mox.file.copy_parallel(src_url=cfg.data_url, dst_url=dataset_path)
     else:
         dataset_path = cfg.dataset_path
+    model_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+    dataset_path = os.path.join(model_path, dataset_path)
     cfg.train_data_dir = os.path.join(dataset_path, "train")
     cfg.test_dir = os.path.join(dataset_path, "test")
     cfg.gt_dir = os.path.join(dataset_path, "ground_truth")

@@ -12,7 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
+import os
+import shutil
 from mindspore import context
 from mindspore import load_checkpoint
 
@@ -24,7 +25,9 @@ from src.utils import get_results
 
 context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target, device_id=get_device_id())
 
+
 def get_network():
+    current_path = os.path.abspath(os.path.dirname(__file__))
     auto_encoder = AutoEncoder(cfg)
     if cfg.model_arts:
         import moxing as mox
@@ -32,13 +35,15 @@ def get_network():
         ckpt_path = cfg.cache_ckpt_file
     else:
         ckpt_path = cfg.checkpoint_path
-
+    ckpt_path = os.path.join(current_path, ckpt_path)
     load_checkpoint(ckpt_path, net=auto_encoder)
     auto_encoder.set_train(False)
     return auto_encoder
 
 
 if __name__ == '__main__':
+    if os.path.exists(cfg.save_dir):
+        shutil.rmtree(cfg.save_dir, True)
     net = get_network()
     get_results(cfg, net)
     print("Generate results at", cfg.save_dir)

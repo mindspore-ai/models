@@ -30,6 +30,7 @@ lr: 2.0e-4
 decay: 1.0e-5
 flc: 32
 stride: 32
+load_ckpt_path: ""
 
 # evaluation params
 image_level: False
@@ -39,10 +40,10 @@ bg_mask: ""
 img_suffix: ".png"
 mask_suffix: ".png" # like "_mask"
 percent: 98.
-run_eval: False
-start_epoch: 100
+run_eval: True
+start_epoch: 160
 eval_epochs: [100, 150, 180, 185, 190, 195, 200]
-interval: 1000
+interval: 1
 checkpoint_path: "./checkpoint/ssim_autocoder_none-200_78.ckpt"
 save_dir: "./output"
 
@@ -75,3 +76,4 @@ percent: "For estimating threshold based on valid positive samples"
 run_eval: "Whether running evaluation when training"
 interval: "Evaluation interval"
 checkpoint_path: "Checkpoint path, If run_eval is True it will save the best ckpt, else the latest ckpt."
+load_ckpt_path: "Load checkpoint to network."
