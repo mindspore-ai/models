@@ -26,13 +26,13 @@ train_img_dir: "train2017"
 train_json_file: "annotations/instances_train2017.json"
 
 lr_scheduler: "cosine_annealing"
-lr: 0.013
+lr: 0.01
 lr_epochs: "220,250"
 lr_gamma: 0.1
 eta_min: 0.0
-T_max: 300
-max_epoch: 320
-warmup_epochs: 20
+T_max: 300         # please set 320 when run on 1p
+max_epoch: 300     # please set 320 when run on 1p
+warmup_epochs: 20  # please set 4 when run on 1p
 weight_decay: 0.0005
 momentum: 0.9
 loss_scale: 1024

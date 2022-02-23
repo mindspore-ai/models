@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]"
+    echo "Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]"
 exit 1
 fi
 
@@ -63,6 +63,5 @@ env > env.log
 echo "start inferring for device $DEVICE_ID"
 python eval.py \
     --data_dir=$DATASET_PATH \
-    --yolov5_version='yolov5s' \
     --pretrained=$CHECKPOINT_PATH > log.txt 2>&1 &
 cd ..
