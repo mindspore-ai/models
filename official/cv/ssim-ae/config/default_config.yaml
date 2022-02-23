@@ -1,0 +1,79 @@
+device_target: Ascend
+dataset: "none"
+dataset_path: ""
+aug_dir: ""
+distribute: False
+model_arts: False
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+cache_ckpt_file: "/cache/user-job-dir/ssim-ae/model.ckpt"
+
+grayscale: False
+do_aug: True
+online_aug: False
+
+# data_augment
+augment_num: 10000
+im_resize: 256
+crop_size: 128
+rotate_angle: 45.
+p_ratate: 0.3
+p_horizontal_flip: 0.3
+p_vertical_flip: 0.3
+
+# train param
+z_dim: 100
+epochs: 200
+batch_size: 128
+lr: 2.0e-4
+decay: 1.0e-5
+flc: 32
+stride: 32
+load_ckpt_path: ""
+
+# evaluation params
+image_level: False
+ssim_threshold: -1.0
+l1_threshold: -1.0
+bg_mask: ""
+img_suffix: ".png"
+mask_suffix: ".png" # like "_mask"
+percent: 98.
+run_eval: True
+start_epoch: 160
+eval_epochs: [100, 150, 180, 185, 190, 195, 200]
+interval: 1
+checkpoint_path: "./checkpoint/ssim_autocoder_none-200_78.ckpt"
+save_dir: "./output"
+
+---
+# Help description for each configuration
+device_target: "Target device type, available: [Ascend, GPU, CPU]"
+dataset_path: "Dataset path for local"
+aug_dir: "Augment path for local, default is {dataset_path}/train_patches"
+distribute: "Whether enable distribute training"
+model_arts: "Whether training on modelarts, default: False"
+data_url: "Dataset url for obs"
+train_url: "Training output url for obs"
+checkpoint_url: "The location of checkpoint for obs"
+cache_ckpt_file: "Checkpoint path in container."
+
+grayscale: "Whether convert grayscale image."
+do_aug: "Whether do augment when training."
+z_dim: "Dimension of the latent space vector"
+epochs: "Total training epochs"
+batch_size: "Batch size for training and evaluation"
+lr: "Learning rate when training."
+decay: "Weight decay in optimizer"
+flc: "Number of first hidden layer channels"
+stride: "Step length of the sliding window"
+ssim_threshold: "SSIM threshold for testing"
+l1_threshold: "L1 threshold for testing"
+bg_mask: "Background mask, B means black, W means white"
+mask_suffix: "Ground truth suffix"
+percent: "For estimating threshold based on valid positive samples"
+run_eval: "Whether running evaluation when training"
+interval: "Evaluation interval"
+checkpoint_path: "Checkpoint path, If run_eval is True it will save the best ckpt, else the latest ckpt."
+load_ckpt_path: "Load checkpoint to network."
