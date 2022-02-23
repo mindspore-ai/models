@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]"
+    echo "Usage: bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]"
 exit 1
 fi
 
@@ -72,12 +72,7 @@ do
     taskset -c $cmdopt python train.py \
         --data_dir=$DATASET_PATH \
         --is_distributed=1 \
-        --yolov5_version='yolov5s' \
         --lr=0.02 \
-        --T_max=300 \
-        --max_epoch=300 \
-        --warmup_epochs=20 \
-        --per_batch_size=16 \
-        --lr_scheduler=cosine_annealing  > log.txt 2>&1 &
+        --per_batch_size=16 > log.txt 2>&1 &
     cd ..
 done

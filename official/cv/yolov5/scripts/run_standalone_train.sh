@@ -16,7 +16,7 @@
 
 if [ $# != 1 ]
 then
-    echo "Usage: sh run_standalone_train.sh [DATASET_PATH]"
+    echo "Usage: bash run_standalone_train.sh [DATASET_PATH]"
 exit 1
 fi
 
@@ -57,13 +57,5 @@ cd ./train || exit
 echo "start training for device $DEVICE_ID"
 env > env.log
 
-python train.py \
-    --data_dir=$DATASET_PATH \
-    --is_distributed=0 \
-    --yolov5_version='yolov5s' \
-    --lr=0.01 \
-    --T_max=320 \
-    --max_epoch=320 \
-    --warmup_epochs=4 \
-    --lr_scheduler=cosine_annealing > log.txt 2>&1 &
+python train.py --data_dir=$DATASET_PATH > log.txt 2>&1 &
 cd ..

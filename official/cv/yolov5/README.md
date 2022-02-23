@@ -9,7 +9,7 @@
     - [Script Parameters](#script-parameters)
     - [Training Process](#training-process)
         - [Training](#training)
-        - [Distributed Training](#distributed-training)  
+        - [Distributed Training](#distributed-training)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
     - [Inference Process](#inference-process)
@@ -45,35 +45,32 @@ Note that you can run the scripts with **COCO2017 **or any other datasets with t
 After installing MindSpore via the official website, you can start training and evaluation as follows:
 
 ```bash
-#run training example(1p) on Ascend by python command
+#run training example(1p) on Ascend/GPU by python command
 python train.py \
+    --device_target="Ascend" \ # Ascend or GPU
     --data_dir=xxx/dataset \
     --is_distributed=0 \
     --yolov5_version='yolov5s' \
-    --lr=0.02 \
-    --max_epoch=300 \
-    --warmup_epochs=20 \
-    --per_batch_size=128 \
-    --lr_scheduler=cosine_annealing > log.txt 2>&1 &
+    --lr=0.01 \
+    --max_epoch=320 \
+    --warmup_epochs=4 > log.txt 2>&1 &
 ```
 
 ```bash
+# run 1p by shell script, please change `device_target` in config file to run on Ascend/GPU, and change `T_max`, `max_epoch`, `warmup_epochs` refer to contents of notes
+bash run_standalone_train.sh [DATASET_PATH]
+
 # For Ascend device, distributed training example(8p) by shell script
-bash run_distribute_train.sh xxx/dateset/ xxx/cspdarknet.ckpt rank_table_8pcs.json
+bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
 
 # For GPU device, distributed training example(8p) by shell script
-bash run_distribute_train_gpu.sh xxx/dateset [RANK_SIZE]
+bash run_distribute_train_gpu.sh [DATASET_PATH] [RANK_SIZE]
 ```
 
 ```bash
-# run evaluation on Ascend by python command
+# run evaluation on Ascend/GPU by python command
 python eval.py \
-    --data_dir=xxx/dataset \
-    --eval_shape=640 > log.txt 2>&1 &
-
-# run evaluation on GPU by python command
-python eval.py \
-    --device_target="GPU" \
+    --device_target="Ascend" \ # Ascend or GPU
     --data_dir=xxx/dataset \
     --yolov5_version='yolov5s' \
     --pretrained="***/*.ckpt" \
@@ -81,25 +78,28 @@ python eval.py \
 ```
 
 ```bash
-# run evaluation on Ascend by shell script
-bash run_eval.sh xxx/dataset xxx/yolov5.ckpt
+# run evaluation by shell script, please change `device_target` in config file to run on Ascend/GPU
+bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
 ```
+
+Note the default_config.yaml is the default parameters for yolov5s on 8p. The `batchsize` and `lr` are different on Ascend and GPU, see the settings in `scripts/run_distribute_train.sh` or `scripts/run_distribute_train_gpu.sh`.
 
 # [Script Description](#contents)
 
 ## [Script and Sample Code](#contents)
 
-```bash
+```text
 ├── model_zoo
     ├── README.md                              // descriptions about all the models
     ├── yolov5
         ├── README.md                          // descriptions about yolov5
         ├── scripts
+        │   ├──docker_start.sh                 // shell script for docker start
         │   ├──run_distribute_train.sh         // launch distributed training(8p) in ascend
         │   ├──run_distribute_train_gpu.sh     // launch distributed training(8p) in GPU
-        │   ├──run_standalone_train.sh         // launch 1p training in ascend
+        │   ├──run_standalone_train.sh         // launch 1p training
+        │   ├──run_infer_310.sh                // shell script for evaluation on 310
         │   ├──run_eval.sh                     // shell script for evaluation
-        │   ├──rank_table_8pcs.json            // the example of rank table settings for 8p training
         ├──model_utils
         │   ├──config.py                       // getting config parameters
         │   ├──device_adapter.py               // getting device info
@@ -116,7 +116,7 @@ bash run_eval.sh xxx/dataset xxx/yolov5.ckpt
         │   ├──util.py                         // util function
         │   ├──yolo.py                         // yolov5 network
         │   ├──yolo_dataset.py                 // create dataset for YOLOV5
-        ├── default_config.yaml                // parameter configuration
+        ├── default_config.yaml                // parameter configuration(yolov5s 8p)
         ├── train.py                           // training script
         ├── eval.py                            // evaluation script
         ├── export.py                          // export script
@@ -124,25 +124,24 @@ bash run_eval.sh xxx/dataset xxx/yolov5.ckpt
 
 ## [Script Parameters](#contents)
 
-```python
+```text
 Major parameters in train.py are:
 
 optional arguments:
 
   --device_target       device where the code will be implemented: "Ascend", default is "Ascend"
   --data_dir            Train dataset directory.
-  --per_batch_size      Batch size for Training. Default: 8.
-  --pretrained_backbone The ckpt file of CSPDarknet53. Default: "".
+  --per_batch_size      Batch size for Training. Default: 32(1p) 16(Ascend 8p) 32(GPU 8p).
   --resume_yolov5       The ckpt file of YOLOv5, which used to fine tune.Default: ""
   --lr_scheduler        Learning rate scheduler, options: exponential,cosine_annealing.
                         Default: cosine_annealing
-  --lr                  Learning rate. Default: 0.02
+  --lr                  Learning rate. Default: 0.01(1p) 0.02(Ascend 8p) 0.025(GPU 8p)
   --lr_epochs           Epoch of changing of lr changing, split with ",". Default: '220,250'
   --lr_gamma            Decrease lr by a factor of exponential lr_scheduler. Default: 0.1
   --eta_min             Eta_min in cosine_annealing scheduler. Default: 0.
-  --t_max               T-max in cosine_annealing scheduler. Default: 320
-  --max_epoch           Max epoch num to train the model. Default: 320
-  --warmup_epochs       Warmup epochs. Default: 20
+  --t_max               T-max in cosine_annealing scheduler. Default: 300(8p)
+  --max_epoch           Max epoch num to train the model. Default: 300(8p)
+  --warmup_epochs       Warmup epochs. Default: 20(8p)
   --weight_decay        Weight decay factor. Default: 0.0005
   --momentum            Momentum. Default: 0.9
   --loss_scale          Static loss scale. Default: 64
@@ -150,7 +149,7 @@ optional arguments:
   --label_smooth_factor Smooth strength of original one-hot. Default: 0.1
   --log_interval        Logging interval steps. Default: 100
   --ckpt_path           Checkpoint save location. Default: outputs/
-  --is_distributed      Distribute train or not, 1 for yes, 0 for no. Default: 1
+  --is_distributed      Distribute train or not, 1 for yes, 0 for no. Default: 0
   --rank                Local rank of distributed. Default: 0
   --group_size          World size of device. Default: 1
   --need_profiler       Whether use profiler. 0 for no, 1 for yes. Default: 0
@@ -166,16 +165,17 @@ optional arguments:
 
 For Ascend device, standalone training can be started like this:
 
-```python
+```shell
 #run training example(1p) by python command
 python train.py \
     --data_dir=xxx/dataset \
     --yolov5_version='yolov5s' \
     --is_distributed=0 \
-    --lr=0.02 \
-    --max_epoch=300 \
-    --warmup_epochs=20 \
-    --per_batch_size=128 \
+    --lr=0.01 \
+    --T_max=320
+    --max_epoch=320 \
+    --warmup_epochs=4 \
+    --per_batch_size=32 \
     --lr_scheduler=cosine_annealing > log.txt 2>&1 &
 ```
 
@@ -185,7 +185,7 @@ The python command above will run in the background, you can view the results th
 
 After training, you'll get some checkpoint files under the **outputs** folder by default. The loss value will be achieved as follows:
 
-```python
+```text
 # grep "loss:" log.txt
 2021-08-06 15:30:15,798:INFO:epoch[0], iter[600], loss:296.308071, fps:44.44 imgs/sec, lr:0.00010661844862625003
 2021-08-06 15:31:21,119:INFO:epoch[0], iter[700], loss:276.071959, fps:48.99 imgs/sec, lr:0.00012435863027349114
@@ -204,16 +204,19 @@ After training, you'll get some checkpoint files under the **outputs** folder by
 
 ### Distributed Training
 
-For Ascend device, distributed training example(8p) by shell script：
+Distributed training example(8p) by shell script:
 
 ```bash
 # For Ascend device, distributed training example(8p) by shell script
-bash run_distribute_train.sh xxx/dateset/ xxx/cspdarknet.ckpt rank_table_8pcs.json
+bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
+
+# For GPU device, distributed training example(8p) by shell script
+bash run_distribute_train_gpu.sh [DATASET_PATH] [RANK_SIZE]
 ```
 
-The above shell script will run distribute training in the background. You can view the results through the file train_parallel[X]/log.txt. The loss value will be achieved as follows:
+The above shell script will run distribute training in the background. You can view the results through the file train_parallel[X]/log.txt(Ascend) or distribute_train/nohup.out(GPU). The loss value will be achieved as follows:
 
-```bash
+```text
 # distribute training result(8p, dynamic shape)
 ...
 2021-08-05 16:01:34,116:INFO:epoch[0], iter[200], loss:415.453676, fps:580.07 imgs/sec, lr:0.0002742903889156878
@@ -243,20 +246,20 @@ The above shell script will run distribute training in the background. You can v
 
 Before running the command below, please check the checkpoint path used for evaluation. The file **yolov5.ckpt** used in the  follow script is the last saved checkpoint file, but we renamed it to "yolov5.ckpt".
 
-```python
+```shell
 # run evaluation by python command
 python eval.py \
-    --data_dir=xxx/dataset \
-    --pretrained=xxx/yolov5.ckpt \
-    --eval_shape=640 > log.txt 2>&1 &
+    --data_dir=xxx/dataset \
+    --pretrained=xxx/yolov5.ckpt \
+    --eval_shape=640 > log.txt 2>&1 &
 OR
 # run evaluation by shell script
-bash run_eval.sh xxx/dataset xxx/yolov5.ckpt
+bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
 The above python command will run in the background. You can view the results through the file "log.txt". The mAP of the test dataset will be as follows:
 
-```python
+```text
 # log.txt
 =============coco eval reulst=========
 Average Precision (AP) @[ IoU=0.50:0.95 | area= all | maxDets=100 ] = 0.369
@@ -304,7 +307,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DVPP] [DEVICE_ID]
 
 Inference result is saved in current path, you can find result like this in acc.log file.
 
-```bash
+```text
 Average Precision (AP) @[ IoU=0.50:0.95 | area= all | maxDets=100 ] = 0.369
 Average Precision (AP) @[ IoU=0.50 | area= all | maxDets=100 ] = 0.573
 Average Precision (AP) @[ IoU=0.75 | area= all | maxDets=100 ] = 0.395
