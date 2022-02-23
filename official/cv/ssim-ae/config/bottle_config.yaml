@@ -30,6 +30,7 @@ lr: 2.0e-4
 decay: 1.0e-5
 flc: 32
 stride: 32
+load_ckpt_path: ""
 
 # evaluation params
 image_level: True
@@ -39,11 +40,11 @@ bg_mask: "W"
 img_suffix: ".png"
 mask_suffix: "_mask.png"
 percent: 99.95
-run_eval: False
-start_epoch: 100
+run_eval: True
+start_epoch: 160
 eval_epochs: [1, 100, 150, 180, 185, 190, 195, 200]
-interval: 1000
-checkpoint_path: "./checkpoint/ssim_autocoder_bottle-200_78.ckpt"
+interval: 1
+checkpoint_path: "./train_bottle/checkpoint/best.ckpt"
 save_dir: "./bottle_output"
 
 ---

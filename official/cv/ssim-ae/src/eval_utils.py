@@ -153,7 +153,7 @@ class EvalCallBack(Callback):
         cb_params = run_context.original_args()
         current_epoch = cb_params.cur_epoch_num
         res = 0
-        if current_epoch > self.config.start_epoch and \
+        if current_epoch >= self.config.start_epoch and \
                 (current_epoch % self.config.interval == 0 or current_epoch in self.config.eval_epochs):
             ori_save_dir = self.config.save_dir
             self.config.save_dir = os.path.join(self.config.save_dir, str(current_epoch))
