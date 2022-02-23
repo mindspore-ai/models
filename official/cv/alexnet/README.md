@@ -316,6 +316,8 @@ Before running the command below, please check the checkpoint path used for eval
 
   # when using imagenet dataset
   python export.py --config_path config_imagenet.yaml --ckpt_file /path/to/checkpoint.ckpt --file_name /path/to/exported.onnx --file_format ONNX --device_target CPU
+
+  - `export_input_type' dtype of input data, need to change to uint8 when export to ONNX on imagenet2012.
   ```
 
 - Run ONNX evaluation. Specify dataset type as "cifar10" or "imagenet"

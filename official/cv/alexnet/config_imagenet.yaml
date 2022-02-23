@@ -45,6 +45,8 @@ save_checkpoint: True
 save_checkpoint_epochs: 2
 lr: 0.01
 
+#export
+export_input_type: float32  # dtype of input data, need to change to uint8 when export to ONNX on imagenet2012
 
 ---
 # Config description for each option
