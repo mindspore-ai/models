@@ -41,6 +41,7 @@ class PanguAlphaConfig:
                  enable_offload=False,
                  use_moe=False,
                  per_dp_dim_expert_num=4,
+                 per_token_num_experts_chosen=1,
                  parallel_config=None,
                  run_type='train',
                  softmax_compute_type=mstype.float16):
@@ -66,6 +67,7 @@ class PanguAlphaConfig:
         self.softmax_compute_type = softmax_compute_type
         self.use_moe = bool(use_moe)
         self.per_dp_dim_expert_num = per_dp_dim_expert_num
+        self.per_token_num_experts_chosen = per_token_num_experts_chosen
         self.run_type = run_type
 
     def __str__(self):

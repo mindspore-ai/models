@@ -108,6 +108,16 @@ def set_parallel_context(args_opt):
     _set_multi_subgraphs()
     return rank, device_num
 
+def set_optimizer(optimizer, opt_offload, group_params, learning_rate, config):
+    r"""Set optimizer"""
+    if optimizer == "lamb":
+        optimizer = nn.Lamb(group_params, learning_rate=learning_rate)
+    elif opt_offload:
+        optimizer = AdamWeightDecayOp(group_params, learning_rate=learning_rate, eps=1e-8, beta1=0.9, beta2=0.95,
+                                      param_init_type=config.param_init_type)
+    else:
+        optimizer = FP32StateAdamWeightDecay(group_params, learning_rate=learning_rate, eps=1e-8, beta1=0.9, beta2=0.95)
+    return optimizer
 
 def run_train(args_opt):
     r"""The main training process."""
@@ -155,6 +165,7 @@ def run_train(args_opt):
                               param_init_type=mstype.float32 if args_opt.param_init_type == 'fp32' else mstype.float16,
                               enable_offload=bool(args_opt.opt_offload), use_moe=bool(args_opt.use_moe),
                               per_dp_dim_expert_num=args_opt.per_dp_dim_expert_num,
+                              per_token_num_experts_chosen=args_opt.per_token_num_experts_chosen,
                               hidden_act='fast_gelu' if args_opt.device_target != "GPU" else 'gelu',
                               parallel_config=parallel_config)
     print("===config is: ", config, flush=True)
@@ -170,13 +181,8 @@ def run_train(args_opt):
                       warmup_steps=args_opt.warmup_step, decay_steps=200000)
     params = pangu_alpha_with_loss.trainable_params()
     group_params = set_weight_decay(params)
-    if args_opt.optimizer == "lamb":
-        optimizer = nn.Lamb(group_params, learning_rate=lr)
-    elif args_opt.opt_offload:
-        optimizer = AdamWeightDecayOp(group_params, learning_rate=lr, eps=1e-8, beta1=0.9, beta2=0.95,
-                                      param_init_type=config.param_init_type)
-    else:
-        optimizer = FP32StateAdamWeightDecay(group_params, learning_rate=lr, eps=1e-8, beta1=0.9, beta2=0.95)
+    optimizer = set_optimizer(args_opt.optimizer, args_opt.opt_offload, group_params=group_params,
+                              learning_rate=lr, config=config)
     epoch_num = args_opt.epoch_size
     # Dataset loading mindrecord files
     ds = create_dataset(config.batch_size * micro_batch_interleaved, data_path=cache_url, data_start_index=0,

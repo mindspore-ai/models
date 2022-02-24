@@ -238,7 +238,8 @@ class PanguAlpha_Model(Cell):
         self.embedding.pipeline_stage = 0
         self.num_layers = config.num_layers
         if config.use_moe:
-            moe_config = MoEConfig(expert_num=config.parallel_config.data_parallel * config.per_dp_dim_expert_num)
+            moe_config = MoEConfig(expert_num=config.parallel_config.data_parallel * config.per_dp_dim_expert_num,
+                                   capacity_factor=2.0, num_experts_chosen=config.per_token_num_experts_chosen)
         else:
             moe_config = MoEConfig(expert_num=1)
         # The shard setting of Transformer is set within the class StackedTransformer
