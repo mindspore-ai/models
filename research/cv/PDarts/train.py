@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,17 +35,18 @@ from mindspore.train.callback._loss_monitor import LossMonitor
 from mindspore.train import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.communication import init
+from mindspore.communication.management import get_rank
 from mindspore.train.model import ParallelMode
 
 import src.my_utils as my_utils
 import src.genotypes as genotypes
 from src.loss import SoftmaxCrossEntropyLoss
 from src.model import NetworkCIFAR as Network
-from src.dataset import create_cifar10_dataset, get_device_info
+from src.dataset import create_cifar10_dataset
 from src.call_backs import Val_Callback, Set_Attr_CallBack
 
 parser = argparse.ArgumentParser("cifar")
-parser.add_argument('--device_target', type=str, default="Ascend", choices=['Ascend'],
+parser.add_argument('--device_target', type=str, default="Ascend", choices=['Ascend', 'GPU'],
                     help='device where the code will be implemented (default: CPU)')
 parser.add_argument('--local_data_root', default='/cache/',
                     help='a directory used for transfer data between local path and OBS path')
@@ -98,12 +99,10 @@ def cosine_lr(base_lr, decay_steps, total_steps):
 
 
 def main():
-    device_id, device_num = get_device_info()
-    print(f'device_id:{device_id}')
-    print(f'device_num:{device_num}')
+    device_num = int(os.getenv('RANK_SIZE', '1'))
+    device_id = get_rank()
     context.set_context(mode=context.GRAPH_MODE,
                         device_target=args.device_target)
-    context.set_context(device_id=device_id)
     context.set_context(enable_graph_kernel=True)
     if device_num > 1:
         init()
@@ -142,10 +141,11 @@ def main():
 
     train_path = os.path.join(args.data_url, 'train')
     train_dataset = create_cifar10_dataset(
-        train_path, True, batch_size=args.batch_size, shuffle=True, cutout_length=args.cutout_length)
+        train_path, True, batch_size=args.batch_size, shuffle=True, cutout_length=args.cutout_length,
+        device_id=device_id, device_num=device_num)
     val_path = os.path.join(args.data_url, 'val')
     val_dataset = create_cifar10_dataset(
-        val_path, False, batch_size=128, shuffle=False)
+        val_path, False, batch_size=128, shuffle=False, device_id=device_id, device_num=device_num)
 
     # learning rate setting
     step_size = train_dataset.get_dataset_size()
@@ -180,14 +180,14 @@ def main():
 
     set_attr_cb = Set_Attr_CallBack(
         network, args.drop_path_prob, args.epochs, args.layers, args.batch_size)
-    if device_num == 1 or device_id == 0:
-        loss_cb = LossMonitor()
-        time_cb = TimeMonitor()
-        val_callback = Val_Callback(model, train_dataset, val_dataset, args.train_url,
-                                    prefix='PDarts', network=network, img_size=32, is_eval_train_dataset=True)
-        callbacks = [loss_cb, time_cb, val_callback, set_attr_cb]
-    else:
-        callbacks = [set_attr_cb]
+
+    loss_cb = LossMonitor()
+    time_cb = TimeMonitor()
+    val_callback = Val_Callback(model, train_dataset, val_dataset, args.train_url,
+                                prefix='PDarts', network=network, img_size=32,
+                                device_id=device_id, is_eval_train_dataset=True)
+    callbacks = [loss_cb, time_cb, val_callback, set_attr_cb]
+
     model.train(args.epochs, train_dataset,
                 callbacks=callbacks, dataset_sink_mode=True)
 

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,8 +13,6 @@
 # limitations under the License.
 # ============================================================================
 """Read train and eval data"""
-import os
-
 import mindspore.dataset as ds
 from mindspore.common import dtype as mstype
 import mindspore.dataset.transforms.c_transforms as C
@@ -24,12 +22,11 @@ from mindspore.dataset.vision.utils import Inter
 
 def create_cifar10_dataset(data_dir, training=True, repeat_num=1, num_parallel_workers=5,
                            resize_height=32, resize_width=32, batch_size=512,
-                           num_samples=None, shuffle=None, cutout_length=0):
+                           num_samples=None, shuffle=None, cutout_length=0, device_id=0, device_num=1):
     """Data operations."""
     ds.config.set_seed(1)
     ds.config.set_num_parallel_workers(num_parallel_workers)
 
-    device_id, device_num = get_device_info()
     if training:
         data_set = ds.Cifar10Dataset(data_dir, num_samples=num_samples,
                                      shuffle=shuffle, num_shards=device_num, shard_id=device_id)
@@ -71,9 +68,3 @@ def create_cifar10_dataset(data_dir, training=True, repeat_num=1, num_parallel_w
     data_set = data_set.batch(batch_size=batch_size, drop_remainder=True)
 
     return data_set
-
-
-def get_device_info():
-    device_id = int(os.getenv('DEVICE_ID'))
-    device_num = int(os.getenv('RANK_SIZE'))
-    return device_id, device_num
