@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 import numpy as np
 
 from mindspore import context, Tensor
-from mindspore.train.serialization import export, load_param_into_net
+from mindspore.train.serialization import export, load_checkpoint, load_param_into_net
 from src.config import get_config
-from src.utils import get_network, resume_model
+from src.utils import get_network
 
 
 if __name__ == '__main__':
@@ -26,18 +26,16 @@ if __name__ == '__main__':
     config = get_config()
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
 
-    G, D = get_network(config)
+    G, _ = get_network(config)
 
     # Use BatchNorm2d with batchsize=1, affine=False, training=True instead of InstanceNorm2d
     # Use real mean and varance rather than moving_men and moving_varance in BatchNorm2d
 
-    param_G, _ = resume_model(config, G, D)
+    G.set_train(False)
+    param_G = load_checkpoint(config.gen_checkpoint_path)
     load_param_into_net(G, param_G)
 
-    G.set_train(False)
-
-    input_array = Tensor(np.random.uniform(-1.0, 1.0, size=(1, 3, 128, 128)).astype(np.float32))
-    input_label = Tensor(np.random.uniform(-1.0, 1.0, size=(1, 5)).astype(np.float32))
+    input_array = Tensor(np.random.uniform(-1.0, 1.0, size=(config.batch_size, 3, 128, 128)).astype(np.float32))
+    input_label = Tensor(np.random.uniform(-1.0, 1.0, size=(config.batch_size, 5)).astype(np.float32))
     input_data = [input_array, input_label]
-    G_file = f"StarGAN_Generator"
-    export(G, *input_data, file_name=G_file, file_format=config.file_format)
+    export(G, *input_data, file_name=config.export_file_name, file_format=config.file_format)
