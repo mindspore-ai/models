@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -53,9 +53,9 @@ def run_export():
         context.set_context(device_id=config.device_id)
 
     if config.export_model == 'deeplab_v3_s16':
-        network = net_factory.nets_map['deeplab_v3_s16']('eval', config.num_classes, 16, True)
+        network = net_factory.nets_map['deeplab_v3_s16']('eval', config.num_classes, 16, config.freeze_bn)
     else:
-        network = net_factory.nets_map['deeplab_v3_s8']('eval', config.num_classes, 8, True)
+        network = net_factory.nets_map['deeplab_v3_s8']('eval', config.num_classes, 8, config.freeze_bn)
     network = BuildEvalNetwork(network, config.input_format)
     param_dict = load_checkpoint(config.ckpt_file)
 
