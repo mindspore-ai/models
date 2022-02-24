@@ -198,7 +198,7 @@ mse per frame: 47.858854093653633
 | Optimizer                  | Adam                                              |
 | Loss Function              | L2Loss                                            |
 | Loss                       | 165.70367431640625                                |
-| Speed                      | 988ms/step(1pcs)                                  |
+| Speed                      | 1000 ms/step(1pcs)                                |
 | Total time                 | 22h                                               |
 | Checkpoint for Fine tuning | 177.27M (.ckpt file)                              |
 | Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/predrnn++) |
