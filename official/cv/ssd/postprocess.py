@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import numpy as np
 from PIL import Image
 
 from src.model_utils.config import config
-from src.eval_utils import metrics
+from src.eval_utils import COCOMetrics
 
 batch_size = 1
 
@@ -42,7 +42,12 @@ def get_result(result_path, img_id_file_path):
             classs_dict[cat["id"]] = cat["name"]
 
     files = os.listdir(img_id_file_path)
-    pred_data = []
+    eval_metrics = COCOMetrics(anno_json=anno_json,
+                               classes=config.classes,
+                               num_classes=config.num_classes,
+                               max_boxes=config.max_boxes,
+                               nms_threshold=config.nms_threshold,
+                               min_score=config.min_score)
 
     for file in files:
         img_ids_name = file.split('.')[0]
@@ -70,13 +75,14 @@ def get_result(result_path, img_id_file_path):
         boxes = np.fromfile(result_path_0, dtype=np.float32).reshape(config.num_ssd_boxes, 4)
         box_scores = np.fromfile(result_path_1, dtype=np.float32).reshape(config.num_ssd_boxes, config.num_classes)
 
-        pred_data.append({
+        eval_metrics.update({
             "boxes": boxes,
             "box_scores": box_scores,
             "img_id": img_id,
             "image_shape": image_shape
         })
-    mAP = metrics(pred_data, anno_json)
+
+    mAP = eval_metrics.get_metrics()
     print(f" mAP:{mAP}")
 
 if __name__ == '__main__':
