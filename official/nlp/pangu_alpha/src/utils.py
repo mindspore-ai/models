@@ -371,7 +371,7 @@ def add_training_params(opt):
     opt.add_argument("--per_batch_size",
                      type=int,
                      default=0,
-                     help="The batch size for each data parallel way. default 6")
+                     help="The batch size for each data parallel way. default 0")
     opt.add_argument("--start_lr",
                      type=float,
                      default=5e-5,
@@ -482,7 +482,7 @@ def get_args(inference=False):
     parser.add_argument("--mode",
                         type=str,
                         default="2.6B",
-                        choices=["200B", "13B", "2.6B", "self_define"],
+                        choices=["200B", "13B", "2.6B", "1.3B", "self_define"],
                         help="The scale of the model parameters")
     parser.add_argument("--device_target",
                         type=str,
@@ -521,6 +521,10 @@ def get_args(inference=False):
                         type=int,
                         default=10,
                         help="The eval step in train and eval mode. Default 10.")
+    parser.add_argument("--enable_alltoall",
+                        type=int,
+                        default=0,
+                        help="Enable alltoall communication, only effective when applying moe. Default 0")
     add_training_params(parser)
     add_retrain_params(parser)
     if inference:

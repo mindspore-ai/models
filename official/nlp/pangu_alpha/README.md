@@ -12,7 +12,9 @@
     - [Training](#training)
         - [Training on Ascend](#training-on-ascend)
         - [Training on GPU](#training-on-gpu)
-        - [Training in heterogeneous with MoE](#training-in-heterogeneous-with-moe)
+        - [Training in MoE](#training-in-moe)
+            - [Training on heterogeneous](#training-on-heterogeneous)
+            - [Training on homogeneous](#training-on-homogeneous)
         - [Incremental Training](#incremental-training-1)
     - [Prediction](#prediction)
         - [Download Checkpoint](#download-checkpoint)
@@ -197,7 +199,9 @@ bash scripts/run_distributed_train_gpu.sh RANK_SIZE HOSTFILE DATASET PER_BATCH M
 - PER_BATCH: The batch size for each data parallel-way.
 - MODE: Can be `1.3B` `2.6B`, `13B` and `200B`.
 
-### Training in heterogeneous with MoE
+### Training in MoE
+
+#### Training on heterogeneous
 
 Currently the scripts provide four default configures : `1.3B` `2.6B` `13B` and `200B`. Currently, only support device target Ascend.
 
@@ -205,7 +209,7 @@ Currently the scripts provide four default configures : `1.3B` `2.6B` `13B` and 
 
 # run distributed training in example
 
-bash scripts/run_distribute_train_moe_host_device.sh DATASET RANK_TABLE RANK_SIZE TYPE MODE STAGE_NUM MICRO_SIZE PER_BATCH RANK_START LOCAL_DEVICE_NUM EXPERT_NUM_PER_EP
+bash scripts/run_distribute_train_moe_host_device.sh DATASET RANK_TABLE RANK_SIZE TYPE MODE STAGE_NUM MICRO_SIZE PER_BATCH RANK_START LOCAL_DEVICE_NUM EXPERT_NUM_PER_EP ENABLE_ALLTOALL
 
 ```
 
@@ -222,6 +226,7 @@ The above command involves some `args` described below:
 - RANK_START: The start of rank_id in current machines, it helps to set the rank_id for each machine in multi-machine scenario.
 - LOCAL_DEVICE_NUM: The device number of the local machine.
 - EXPERT_NUM_PER_EP: Expert nums in one data parallel dim.
+- ENABLE_ALLTOALL: Enable alltoall communication. default 0.
 
 The following command will launch the program to train 60B model using 8 NPU.
 Mode 2.6B only represents the model configuration is same with 2.6B model which is without MoE.
@@ -230,8 +235,22 @@ Training 60B model using 8 NPU in one server requires that the server has at lea
 ```bash
 # run distributed training example in one ascend machine
 
-bash run_distributed_train_moe_host_device.sh /path/dataset /path/hccl.json 8 fp32 2.6B 1 1 1 0 8 36
+bash run_distributed_train_moe_host_device.sh /path/dataset /path/hccl.json 8 fp32 2.6B 1 1 1 0 8 36 0
 ```
+
+#### Training on homogeneous
+
+You can also train on homogeneous with MoE.
+
+```bash
+
+# run distributed training in example
+
+bash scripts/run_distribute_train_moe.sh DATASET RANK_TABLE RANK_SIZE TYPE MODE STAGE_NUM MICRO_SIZE PER_BATCH RANK_START LOCAL_DEVICE_NUM EXPERT_NUM_PER_EP ENABLE_ALLTOALL
+
+```
+
+The meanings of each parameter are the same as those of `run_distributed_train_moe_host_device.sh`
 
 ### Incremental Training
 
