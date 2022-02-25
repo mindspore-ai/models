@@ -445,7 +445,7 @@ def run_train_pipeline(args_opt):
     print("[args_opt] is: ", args_opt, flush=True)
     lr = LearningRate(learning_rate=args_opt.start_lr, end_learning_rate=args_opt.end_lr,
                       warmup_steps=args_opt.warmup_step, decay_steps=args_opt.decay_steps)
-    params = pangu_alpha.infer_param_pipeline_stage()
+    params = pangu_alpha_with_loss.trainable_params()
     group_params = set_weight_decay(params)
     if args_opt.optimizer == "lamb":
         optimizer = nn.Lamb(group_params, learning_rate=lr)
