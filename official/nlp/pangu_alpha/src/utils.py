@@ -327,16 +327,13 @@ def add_training_params(opt):
                      default=1,
                      help="Pipeline micro_size, default is 1.")
     opt.add_argument("--eod_reset",
-                     type=int,
-                     default=1,
+                     type=int, default=1,
                      help="Enable eod mask, default is 1.")
     opt.add_argument("--warmup_step",
-                     type=int,
-                     default=2000,
+                     type=int, default=2000,
                      help="Warmup step, default is 2000.")
     opt.add_argument("--decay_steps",
-                     type=int,
-                     default=200000,
+                     type=int, default=200000,
                      help="Decay step, default is 200000.")
     opt.add_argument("--optimizer",
                      type=str,
@@ -352,6 +349,9 @@ def add_training_params(opt):
     opt.add_argument("--per_dp_dim_expert_num",
                      type=int, default=1,
                      help="Expert nums in one data parallel dim, only effective when applying moe, default is 1")
+    opt.add_argument("--per_token_num_experts_chosen",
+                     type=int, default=1,
+                     help="Expert nums chosen by each token, only effective when applying moe, default is 1")
     opt.add_argument("--eod_id",
                      type=int, default=6,
                      help="The id of end of document")
