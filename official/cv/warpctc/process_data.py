@@ -30,7 +30,7 @@ def _generate_captcha_per_process(path, total, start, end, img_width, img_height
         for _ in range(0, digits_length):
             integer = random.randint(0, 9)
             digits += str(integer)
-        captcha.write(digits, os.path.join(path, filename_head.format(i) + digits + '.png'))
+        captcha.write(digits, os.path.join(path, filename_head.format(i) + digits + '.jpg'))
 
 
 def generate_captcha(name, img_num, img_width, img_height, max_digits, process_num=16):

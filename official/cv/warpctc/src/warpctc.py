@@ -65,7 +65,7 @@ class StackedRNN(nn.Cell):
         self.cast = P.Cast()
 
     def construct(self, x):
-        x = self.transpose(x, (1, 0, 2, 3))
+        x = self.transpose(x, (2, 0, 1, 3))
         x = self.reshape(x, (-1, self.batch_size, self.input_size))
 
         w1 = self.cast(self.w1, mstype.float16)

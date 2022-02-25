@@ -14,6 +14,10 @@
 "models/official/cv/alexnet/infer/mxbase/src/Alexnet.h"   "runtime/references"
 "models/official/cv/alexnet/infer/mxbase/src/main.cpp"    "runtime/references"
 
+"models/official/cv/warpctc/infer/mxbase/warpCtcProcess/warpctc.h" "runtime/references"
+"models/official/cv/warpctc/infer/mxbase/warpCtcProcess/warpctc.cpp" "runtime/references"
+"models/official/cv/warpctc/infer/mxbase/main.cpp" "runtime/references"
+
 "models/official/cv/resnet/infer/se_ResNet50/mxbase/main.cpp"    "runtime/references"
 "models/official/cv/resnet/infer/se_ResNet50/mxbase/se_ResNet50.h"    "runtime/references"
 

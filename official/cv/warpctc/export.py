@@ -28,7 +28,6 @@ from src.model_utils.moxing_adapter import moxing_wrapper
 def modelarts_pre_process():
     '''modelarts pre process function.'''
     config.file_name = os.path.join(config.output_path, config.file_name)
-    config.ckpt_file = os.path.join(os.path.abspath(os.path.dirname(__file__)), config.ckpt_file)
 
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
@@ -44,10 +43,10 @@ def run_export():
     captcha_height = config.captcha_height
     batch_size = config.batch_size
     hidden_size = config.hidden_size
-    image = Tensor(np.zeros([batch_size, 3, captcha_height, captcha_width], np.float32))
+    image = Tensor(np.zeros([batch_size, captcha_height, captcha_width, 3], np.float32))
     if config.device_target == 'Ascend':
         net = StackedRNN(input_size=input_size, batch_size=batch_size, hidden_size=hidden_size)
-        image = Tensor(np.zeros([batch_size, 3, captcha_height, captcha_width], np.float16))
+        image = Tensor(np.zeros([batch_size, captcha_height, captcha_width, 3], np.float16))
     elif config.device_target == 'GPU':
         net = StackedRNNForGPU(input_size=input_size, batch_size=batch_size, hidden_size=hidden_size)
     else:
