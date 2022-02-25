@@ -7,3 +7,4 @@ pycocotools~=2.0.2
 matplotlib
 seaborn
 pandas
+onnxruntime-gpu
