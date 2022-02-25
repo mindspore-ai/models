@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,6 +64,14 @@ def get_args(phase):
         parser.add_argument('--ckpt_file', required=True, type=str, help='path to generator weights .ckpt file')
         parser.add_argument('--output_dir', required=True, type=str, help="path to output directory")
         parser.add_argument('--nimages', required=True, type=int, help="number of images to generate", default=1)
+        parser.add_argument('--input_seed', type=int, help="seed used for generation", default=None)
+
+    elif phase == 'eval_onnx':
+        parser.add_argument('--config', required=True, type=str, help='path to generator config .json file')
+        parser.add_argument('--file_name', required=True, type=str, help='path to ONNX model')
+        parser.add_argument('--output_dir', required=True, type=str, help="path to output directory")
+        parser.add_argument('--nimages', type=int, help="number of images to generate", default=1)
+        parser.add_argument('--input_seed', type=int, help="seed used for generation", default=None)
 
     elif phase == 'pre310':
         parser.add_argument('--config', required=True, type=str, help='path to generator config .json file')
