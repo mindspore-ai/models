@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,18 +20,18 @@ from mindspore import context, Tensor
 from mindspore.train.serialization import export
 from src.models.cycle_gan import get_generator
 from src.utils.args import get_args
-from src.utils.tools import load_ckpt
+from src.utils.tools import load_ckpt, enable_batch_statistics
 
 args = get_args("export")
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=args.device_id)
+context.set_context(mode=context.GRAPH_MODE, device_target=args.platform)
 
 if __name__ == '__main__':
     G_A = get_generator(args)
     G_B = get_generator(args)
-    # Use BatchNorm2d with batchsize=1, affine=False, training=True instead of InstanceNorm2d
-    # Use real mean and varance rather than moving_men and moving_varance in BatchNorm2d
-    G_A.set_train(True)
-    G_B.set_train(True)
+    # Use BatchNorm2d with batchsize=1, affine=False, use_batch_statistics=True instead of InstanceNorm2d
+    # Use real mean and variance rather than moving_mean and moving_varance in BatchNorm2d
+    enable_batch_statistics(G_A)
+    enable_batch_statistics(G_B)
     load_ckpt(args, G_A, G_B)
 
     input_shp = [args.export_batch_size, 3, args.image_size, args.image_size]
