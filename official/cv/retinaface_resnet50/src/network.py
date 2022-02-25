@@ -17,11 +17,10 @@ import math
 from functools import reduce
 import numpy as np
 
-import mindspore
+import mindspore as ms
 import mindspore.nn as nn
-from mindspore.ops import operations as P
-from mindspore.ops import composite as C
-from mindspore import context, Tensor
+import mindspore.ops as ops
+from mindspore import Tensor
 from mindspore.parallel._auto_parallel_context import auto_parallel_context
 from mindspore.communication.management import get_group_size
 
@@ -94,7 +93,7 @@ class ResidualBlock(nn.Cell):
         if self.down_sample:
             self.down_sample_layer = nn.SequentialCell([_conv1x1(in_channel, out_channel, stride),
                                                         _bn(out_channel)])
-        self.add = P.Add()
+        self.add = ops.Add()
 
     def construct(self, x):
         identity = x
@@ -133,10 +132,10 @@ class ResNet(nn.Cell):
 
         self.conv1 = _conv7x7(3, 64, stride=2)
         self.bn1 = _bn(64)
-        self.relu = P.ReLU()
+        self.relu = ops.ReLU()
 
 
-        self.pad = P.Pad(((0, 0), (0, 0), (1, 0), (1, 0)))
+        self.pad = ops.Pad(((0, 0), (0, 0), (1, 0), (1, 0)))
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="valid")
 
 
@@ -161,7 +160,7 @@ class ResNet(nn.Cell):
                                        out_channel=out_channels[3],
                                        stride=strides[3])
 
-        self.mean = P.ReduceMean(keep_dims=True)
+        self.mean = ops.ReduceMean(keep_dims=True)
         self.flatten = nn.Flatten()
         self.end_point = _fc(out_channels[3], num_classes)
 
@@ -302,7 +301,7 @@ class SSH(nn.Cell):
         self.conv7X7_3 = ConvBN(out_channel // 4, out_channel // 4, kernel_size=3, stride=1, padding=1, groups=1,
                                 norm_layer=norm_layer)
 
-        self.cat = P.Concat(axis=1)
+        self.cat = ops.Concat(axis=1)
         self.relu = nn.ReLU()
 
     def construct(self, x):
@@ -344,11 +343,11 @@ class FPN(nn.Cell):
         output2 = self.output2(input2)
         output3 = self.output3(input3)
 
-        up3 = P.ResizeNearestNeighbor([P.Shape()(output2)[2], P.Shape()(output2)[3]])(output3)
+        up3 = ops.ResizeNearestNeighbor([ops.Shape()(output2)[2], ops.Shape()(output2)[3]])(output3)
         output2 = up3 + output2
         output2 = self.merge2(output2)
 
-        up2 = P.ResizeNearestNeighbor([P.Shape()(output1)[2], P.Shape()(output1)[3]])(output2)
+        up2 = ops.ResizeNearestNeighbor([ops.Shape()(output1)[2], ops.Shape()(output1)[3]])(output2)
         output1 = up2 + output1
         output1 = self.merge1(output1)
 
@@ -364,13 +363,13 @@ class ClassHead(nn.Cell):
         self.conv1x1 = nn.Conv2d(inchannels, self.num_anchors * 2, kernel_size=(1, 1), stride=1, padding=0,
                                  has_bias=True, weight_init=kaiming_weight, bias_init=kaiming_bias)
 
-        self.permute = P.Transpose()
-        self.reshape = P.Reshape()
+        self.permute = ops.Transpose()
+        self.reshape = ops.Reshape()
 
     def construct(self, x):
         out = self.conv1x1(x)
         out = self.permute(out, (0, 2, 3, 1))
-        return self.reshape(out, (P.Shape()(out)[0], -1, 2))
+        return self.reshape(out, (ops.Shape()(out)[0], -1, 2))
 
 class BboxHead(nn.Cell):
     def __init__(self, inchannels=512, num_anchors=3):
@@ -381,13 +380,13 @@ class BboxHead(nn.Cell):
         self.conv1x1 = nn.Conv2d(inchannels, num_anchors * 4, kernel_size=(1, 1), stride=1, padding=0, has_bias=True,
                                  weight_init=kaiming_weight, bias_init=kaiming_bias)
 
-        self.permute = P.Transpose()
-        self.reshape = P.Reshape()
+        self.permute = ops.Transpose()
+        self.reshape = ops.Reshape()
 
     def construct(self, x):
         out = self.conv1x1(x)
         out = self.permute(out, (0, 2, 3, 1))
-        return self.reshape(out, (P.Shape()(out)[0], -1, 4))
+        return self.reshape(out, (ops.Shape()(out)[0], -1, 4))
 
 class LandmarkHead(nn.Cell):
     def __init__(self, inchannels=512, num_anchors=3):
@@ -398,13 +397,13 @@ class LandmarkHead(nn.Cell):
         self.conv1x1 = nn.Conv2d(inchannels, num_anchors * 10, kernel_size=(1, 1), stride=1, padding=0, has_bias=True,
                                  weight_init=kaiming_weight, bias_init=kaiming_bias)
 
-        self.permute = P.Transpose()
-        self.reshape = P.Reshape()
+        self.permute = ops.Transpose()
+        self.reshape = ops.Reshape()
 
     def construct(self, x):
         out = self.conv1x1(x)
         out = self.permute(out, (0, 2, 3, 1))
-        return self.reshape(out, (P.Shape()(out)[0], -1, 10))
+        return self.reshape(out, (ops.Shape()(out)[0], -1, 10))
 
 class RetinaFace(nn.Cell):
     def __init__(self, phase='train', backbone=None):
@@ -424,7 +423,7 @@ class RetinaFace(nn.Cell):
         self.BboxHead = self._make_bbox_head(fpn_num=3, inchannels=[256, 256, 256], anchor_num=[2, 2, 2])
         self.LandmarkHead = self._make_landmark_head(fpn_num=3, inchannels=[256, 256, 256], anchor_num=[2, 2, 2])
 
-        self.cat = P.Concat(axis=1)
+        self.cat = ops.Concat(axis=1)
 
     def _make_class_head(self, fpn_num, inchannels, anchor_num):
         classhead = nn.CellList()
@@ -474,7 +473,7 @@ class RetinaFace(nn.Cell):
         if self.phase == 'train':
             output = (bbox_regressions, classifications, ldm_regressions)
         else:
-            output = (bbox_regressions, P.Softmax(-1)(classifications), ldm_regressions)
+            output = (bbox_regressions, ops.Softmax(-1)(classifications), ldm_regressions)
 
         return output
 
@@ -497,20 +496,20 @@ class TrainingWrapper(nn.Cell):
     def __init__(self, network, optimizer, sens=1.0):
         super(TrainingWrapper, self).__init__(auto_prefix=False)
         self.network = network
-        self.weights = mindspore.ParameterTuple(network.trainable_params())
+        self.weights = ms.ParameterTuple(network.trainable_params())
         self.optimizer = optimizer
-        self.grad = C.GradOperation(get_by_list=True, sens_param=True)
+        self.grad = ops.GradOperation(get_by_list=True, sens_param=True)
         self.sens = sens
         self.reducer_flag = False
         self.grad_reducer = None
-        self.parallel_mode = context.get_auto_parallel_context("parallel_mode")
-        class_list = [mindspore.context.ParallelMode.DATA_PARALLEL, mindspore.context.ParallelMode.HYBRID_PARALLEL]
+        self.parallel_mode = ms.get_auto_parallel_context("parallel_mode")
+        class_list = [ms.ParallelMode.DATA_PARALLEL, ms.ParallelMode.HYBRID_PARALLEL]
         if self.parallel_mode in class_list:
             self.reducer_flag = True
         if self.reducer_flag:
-            mean = context.get_auto_parallel_context("gradients_mean")
+            mean = ms.get_auto_parallel_context("gradients_mean")
             if auto_parallel_context().get_device_num_is_set():
-                degree = context.get_auto_parallel_context("device_num")
+                degree = ms.get_auto_parallel_context("device_num")
             else:
                 degree = get_group_size()
             self.grad_reducer = nn.DistributedGradReducer(optimizer.parameters, mean, degree)
@@ -518,7 +517,7 @@ class TrainingWrapper(nn.Cell):
     def construct(self, *args):
         weights = self.weights
         loss = self.network(*args)
-        sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
+        sens = ops.Fill()(ops.DType()(loss), ops.Shape()(loss), self.sens)
         grads = self.grad(self.network, weights)(*args, sens)
         if self.reducer_flag:
             # apply grad reducer on grads

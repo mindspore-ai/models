@@ -14,27 +14,25 @@
 # ============================================================================
 """Loss."""
 import numpy as np
-import mindspore.common.dtype as mstype
 import mindspore as ms
 import mindspore.nn as nn
-from mindspore.ops import operations as P
-from mindspore.ops import functional as F
+import mindspore.ops as ops
 from mindspore import Tensor
 
 
 class SoftmaxCrossEntropyWithLogits(nn.Cell):
     def __init__(self):
         super(SoftmaxCrossEntropyWithLogits, self).__init__()
-        self.log_softmax = P.LogSoftmax()
-        self.neg = P.Neg()
-        self.one_hot = P.OneHot()
-        self.on_value = Tensor(1.0, mstype.float32)
-        self.off_value = Tensor(0.0, mstype.float32)
-        self.reduce_sum = P.ReduceSum()
+        self.log_softmax = ops.LogSoftmax()
+        self.neg = ops.Neg()
+        self.one_hot = ops.OneHot()
+        self.on_value = Tensor(1.0, ms.float32)
+        self.off_value = Tensor(0.0, ms.float32)
+        self.reduce_sum = ops.ReduceSum()
 
     def construct(self, logits, labels):
         prob = self.log_softmax(logits)
-        labels = self.one_hot(labels, F.shape(logits)[-1], self.on_value, self.off_value)
+        labels = self.one_hot(labels, ops.shape(logits)[-1], self.on_value, self.off_value)
 
         return self.neg(self.reduce_sum(prob * labels, 1))
 
@@ -45,30 +43,30 @@ class MultiBoxLoss(nn.Cell):
         self.num_classes = num_classes
         self.num_boxes = num_boxes
         self.neg_pre_positive = neg_pre_positive
-        self.notequal = P.NotEqual()
-        self.less = P.Less()
-        self.tile = P.Tile()
-        self.reduce_sum = P.ReduceSum()
-        self.reduce_mean = P.ReduceMean()
-        self.expand_dims = P.ExpandDims()
-        self.smooth_l1_loss = P.SmoothL1Loss()
+        self.notequal = ops.NotEqual()
+        self.less = ops.Less()
+        self.tile = ops.Tile()
+        self.reduce_sum = ops.ReduceSum()
+        self.reduce_mean = ops.ReduceMean()
+        self.expand_dims = ops.ExpandDims()
+        self.smooth_l1_loss = ops.SmoothL1Loss()
         self.cross_entropy = SoftmaxCrossEntropyWithLogits()
-        self.maximum = P.Maximum()
-        self.minimum = P.Minimum()
-        self.sort_descend = P.TopK(True)
-        self.sort = P.TopK(True)
-        self.gather = P.GatherNd()
-        self.max = P.ReduceMax()
-        self.log = P.Log()
-        self.exp = P.Exp()
-        self.concat = P.Concat(axis=1)
-        self.reduce_sum2 = P.ReduceSum(keep_dims=True)
+        self.maximum = ops.Maximum()
+        self.minimum = ops.Minimum()
+        self.sort_descend = ops.TopK(True)
+        self.sort = ops.TopK(True)
+        self.gather = ops.GatherNd()
+        self.max = ops.ReduceMax()
+        self.log = ops.Log()
+        self.exp = ops.Exp()
+        self.concat = ops.Concat(axis=1)
+        self.reduce_sum2 = ops.ReduceSum(keep_dims=True)
         self.idx = Tensor(np.reshape(np.arange(batch_size * num_boxes), (-1, 1)), ms.int32)
 
     def construct(self, loc_data, loc_t, conf_data, conf_t, landm_data, landm_t):
 
         # landm loss
-        mask_pos1 = F.cast(self.less(0.0, F.cast(conf_t, mstype.float32)), mstype.float32)
+        mask_pos1 = ops.cast(self.less(0.0, ops.cast(conf_t, ms.float32)), ms.float32)
 
         N1 = self.maximum(self.reduce_sum(mask_pos1), 1)
         mask_pos_idx1 = self.tile(self.expand_dims(mask_pos1, -1), (1, 1, 10))
@@ -76,8 +74,8 @@ class MultiBoxLoss(nn.Cell):
         loss_landm = loss_landm / N1
 
         # Localization Loss
-        mask_pos = F.cast(self.notequal(0, conf_t), mstype.float32)
-        conf_t = F.cast(mask_pos, mstype.int32)
+        mask_pos = ops.cast(self.notequal(0, conf_t), ms.float32)
+        conf_t = ops.cast(mask_pos, ms.int32)
 
         N = self.maximum(self.reduce_sum(mask_pos), 1)
         mask_pos_idx = self.tile(self.expand_dims(mask_pos, -1), (1, 1, 4))
@@ -85,32 +83,32 @@ class MultiBoxLoss(nn.Cell):
         loss_l = loss_l / N
 
         # Conf Loss
-        conf_t_shape = F.shape(conf_t)
-        conf_t = F.reshape(conf_t, (-1,))
-        indices = self.concat((self.idx, F.reshape(conf_t, (-1, 1))))
+        conf_t_shape = ops.shape(conf_t)
+        conf_t = ops.reshape(conf_t, (-1,))
+        indices = self.concat((self.idx, ops.reshape(conf_t, (-1, 1))))
 
-        batch_conf = F.reshape(conf_data, (-1, self.num_classes))
+        batch_conf = ops.reshape(conf_data, (-1, self.num_classes))
         x_max = self.max(batch_conf)
         loss_c = self.log(self.reduce_sum2(self.exp(batch_conf - x_max), 1)) + x_max
-        loss_c = loss_c - F.reshape(self.gather(batch_conf, indices), (-1, 1))
-        loss_c = F.reshape(loss_c, conf_t_shape)
+        loss_c = loss_c - ops.reshape(self.gather(batch_conf, indices), (-1, 1))
+        loss_c = ops.reshape(loss_c, conf_t_shape)
 
         # hard example mining
-        num_matched_boxes = F.reshape(self.reduce_sum(mask_pos, 1), (-1,))
-        neg_masked_cross_entropy = F.cast(loss_c * (1 - mask_pos), mstype.float32)
+        num_matched_boxes = ops.reshape(self.reduce_sum(mask_pos, 1), (-1,))
+        neg_masked_cross_entropy = ops.cast(loss_c * (1 - mask_pos), ms.float32)
 
         _, loss_idx = self.sort_descend(neg_masked_cross_entropy, self.num_boxes)
-        _, relative_position = self.sort(F.cast(loss_idx, mstype.float32), self.num_boxes)
-        relative_position = F.cast(relative_position, mstype.float32)
+        _, relative_position = self.sort(ops.cast(loss_idx, ms.float32), self.num_boxes)
+        relative_position = ops.cast(relative_position, ms.float32)
         relative_position = relative_position[:, ::-1]
-        relative_position = F.cast(relative_position, mstype.int32)
+        relative_position = ops.cast(relative_position, ms.int32)
 
         num_neg_boxes = self.minimum(num_matched_boxes * self.neg_pre_positive, self.num_boxes - 1)
         tile_num_neg_boxes = self.tile(self.expand_dims(num_neg_boxes, -1), (1, self.num_boxes))
-        top_k_neg_mask = F.cast(self.less(relative_position, tile_num_neg_boxes), mstype.float32)
+        top_k_neg_mask = ops.cast(self.less(relative_position, tile_num_neg_boxes), ms.float32)
 
         cross_entropy = self.cross_entropy(batch_conf, conf_t)
-        cross_entropy = F.reshape(cross_entropy, conf_t_shape)
+        cross_entropy = ops.reshape(cross_entropy, conf_t_shape)
 
         loss_c = self.reduce_sum(cross_entropy * self.minimum(mask_pos + top_k_neg_mask, 1))
 
