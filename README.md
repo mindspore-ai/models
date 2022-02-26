@@ -379,3 +379,7 @@ For more information about `MindSpore` framework, please refer to [FAQ](https://
     1. Use a virtual system or docker container with linux system. Then run the scripts in the virtual system or container.
     2. Use WSL, you could turn on the `Windows Subsystem for Linux` on Windows to obtain an linux system which could run the bash scripts.
     3. Use some bash tools on Windows, such as [cygwin](http://www.cygwin.com) and [git bash](https://gitforwindows.org).
+
+- **Q: How to resolve the compile error point to gflags when infer on ascend310 with errors such as *undefined reference to 'google::FlagRegisterer::FlagRegisterer'*?**
+
+  **A**: Please check the version of GCC and gflags. You can refer to [GCC](https://www.mindspore.cn/install) and [gflags](https://github.com/gflags/gflags/archive/v2.2.2.tar.gz) to install GCC and gflags. You need to ensure that the components used are ABI compatible, for more information, please refer to [_GLIBCXX_USE_CXX11_ABI](https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html).

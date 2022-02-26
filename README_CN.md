@@ -381,3 +381,7 @@ MindSpore已获得Apache 2.0许可，请参见LICENSE文件。
     2. 使用WSL，可以开启Windows的linux子系统来在Windows系统中运行linux，然后再WSL中运行脚本。
     3. 使用Windows Bash，需要获取一个可以直接在Windows上运行bash的环境，常见的选择是[cygwin](http://www.cygwin.com)或[git bash](https://gitforwindows.org)
     4. 跳过bash脚本，直接调用python程序。
+
+- **Q: 网络在310推理时出现编译失败，报错信息指向gflags，例如*undefined reference to 'google::FlagRegisterer::FlagRegisterer'*，该怎么处理?**
+
+  **A**: 优先检查一下环境GCC版本和gflags版本是否匹配，可以参考[官方链接](https://www.mindspore.cn/install)安装对应的GCC版本，[gflags](https://github.com/gflags/gflags/archive/v2.2.2.tar.gz)安装gflags。你需要保证所使用的组件之间是ABI兼容的，更多信息可以参考[_GLIBCXX_USE_CXX11_ABI](https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html)
