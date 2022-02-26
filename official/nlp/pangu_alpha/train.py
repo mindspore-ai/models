@@ -148,10 +148,12 @@ def run_train(args_opt):
         download_data(src_data_url=args_opt.eval_data_url, tgt_data_path=eval_cache_url, rank=rank)
     # Set model property
     model_parallel_num = args_opt.op_level_model_parallel_num
-    data_parallel_num = int(device_num / model_parallel_num)
+    expert_parallel_num = args_opt.expert_parallel_num
+    data_parallel_num = int(device_num / model_parallel_num / expert_parallel_num)
     batch_size = args_opt.per_batch_size * data_parallel_num
     micro_batch_interleaved = args_opt.micro_batch_interleaved
     parallel_config = TransformerOpParallelConfig(data_parallel=data_parallel_num, model_parallel=model_parallel_num,
+                                                  expert_parallel=expert_parallel_num,
                                                   pipeline_stage=args_opt.stage_num,
                                                   micro_batch_num=args_opt.micro_size,
                                                   optimizer_shard=bool(args_opt.optimizer_shard),
@@ -161,17 +163,19 @@ def run_train(args_opt):
                               hidden_size=args_opt.embedding_size, seq_length=args_opt.seq_length,
                               vocab_size=args_opt.vocab_size, num_layers=args_opt.num_layers,
                               ffn_hidden_size=args_opt.embedding_size * 4, eod_token=bool(args_opt.eod_reset),
-                              load_ckpt_path=args_opt.load_ckpt_path,
+                              load_ckpt_path=args_opt.load_ckpt_path, expert_num=args_opt.expert_num,
                               param_init_type=mstype.float32 if args_opt.param_init_type == 'fp32' else mstype.float16,
                               enable_offload=bool(args_opt.opt_offload), use_moe=bool(args_opt.use_moe),
-                              per_dp_dim_expert_num=args_opt.per_dp_dim_expert_num,
                               per_token_num_experts_chosen=args_opt.per_token_num_experts_chosen,
                               hidden_act='fast_gelu' if args_opt.device_target != "GPU" else 'gelu',
                               parallel_config=parallel_config)
     print("===config is: ", config, flush=True)
     # Define network
     pangu_alpha = PanguAlphaModel(config=config)
-    loss = CrossEntropyLoss(config.parallel_config.dp_mp_config)
+    if config.use_moe:
+        loss = CrossEntropyLoss(config.parallel_config.moe_parallel_config)
+    else:
+        loss = CrossEntropyLoss(config.parallel_config.dp_mp_config)
     pangu_alpha_with_loss_net = MicroBatchInterleaved(PanGUAlphaWithLoss(config, pangu_alpha, loss),
                                                       micro_batch_interleaved)
     pangu_alpha_with_loss = _VirtualDatasetCell(pangu_alpha_with_loss_net)

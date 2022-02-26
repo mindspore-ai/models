@@ -346,9 +346,9 @@ def add_training_params(opt):
     opt.add_argument("--use_moe",
                      type=int, default=0,
                      help="Use moe, default is 0")
-    opt.add_argument("--per_dp_dim_expert_num",
+    opt.add_argument("--expert_num",
                      type=int, default=1,
-                     help="Expert nums in one data parallel dim, only effective when applying moe, default is 1")
+                     help="Expert number, only effective when applying moe, Default is 1")
     opt.add_argument("--per_token_num_experts_chosen",
                      type=int, default=1,
                      help="Expert nums chosen by each token, only effective when applying moe, default is 1")
@@ -365,25 +365,23 @@ def add_training_params(opt):
                      default=1, type=int,
                      help="Import the full size of a batch for each card, default is 1")
     opt.add_argument("--optimizer_shard",
-                     type=int,
-                     default=1,
+                     type=int, default=1,
                      help="Enable optimizer parallel, default is 1")
     opt.add_argument("--per_batch_size",
-                     type=int,
-                     default=0,
+                     type=int, default=0,
                      help="The batch size for each data parallel way. default 0")
     opt.add_argument("--start_lr",
-                     type=float,
-                     default=5e-5,
+                     type=float, default=5e-5,
                      help="The start learning rate. default 5e-5")
     opt.add_argument("--end_lr",
-                     type=float,
-                     default=1e-6,
+                     type=float, default=1e-6,
                      help="The end learning rate. default 1e-6")
     opt.add_argument("--op_level_model_parallel_num",
-                     type=int,
-                     default=8,
+                     type=int, default=8,
                      help="The model parallel way. default 8")
+    opt.add_argument("--expert_parallel_num",
+                     type=int, default=1,
+                     help="The expert parallel way, only effective when applying moe. Default 1")
     opt.add_argument("--word_emb_dp",
                      type=int, default=1,
                      choices=[0, 1],
