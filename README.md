@@ -217,7 +217,6 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Computer Vision (CV) | Object Detection | [Res2net_fasterrcnn](https://gitee.com/mindspore/models/tree/r1.6/research/cv/res2net_faster_rcnn) | ✅ |   |   |
 | Computer Vision (CV) | Object Detection | [Res2net_yolov3](https://gitee.com/mindspore/models/tree/r1.6/research/cv/res2net_yolov3) | ✅ |   |   |
 | Computer Vision (CV) | Object Detection | [Retinanet_resnet101](https://gitee.com/mindspore/models/tree/r1.6/research/cv/retinanet_resnet101) | ✅ |   |   |
-| Computer Vision (CV) | Object Detection | [Retinanet_resnet152](https://gitee.com/mindspore/models/tree/r1.6/research/cv/retinanet_resnet152) | ✅ |   |   |
 | Computer Vision (CV) | Object Detection | [SSD_MobilenetV2_fpnlite](https://gitee.com/mindspore/models/tree/r1.6/research/cv/ssd_mobilenetV2_FPNlite) | ✅ |   |   |
 | Computer Vision (CV) | Object Detection | [ssd_mobilenet_v2](https://gitee.com/mindspore/models/tree/r1.6/research/cv/ssd_mobilenetV2) | ✅ |   |   |
 | Computer Vision (CV) | Object Detection | [ssd_resnet50](https://gitee.com/mindspore/models/tree/r1.6/research/cv/ssd_resnet50) | ✅ |   |   |
