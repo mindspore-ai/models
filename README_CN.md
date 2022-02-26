@@ -217,7 +217,6 @@
 | 计算机视觉（CV） | 目标检测（Object Detection） | [Res2net_fasterrcnn](https://gitee.com/mindspore/models/tree/master/research/cv/res2net_faster_rcnn) | ✅ |   |   |
 | 计算机视觉（CV） | 目标检测（Object Detection） | [Res2net_yolov3](https://gitee.com/mindspore/models/tree/master/research/cv/res2net_yolov3) | ✅ |   |   |
 | 计算机视觉（CV） | 目标检测（Object Detection） | [Retinanet_resnet101](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet101) | ✅ |   |   |
-| 计算机视觉（CV） | 目标检测（Object Detection） | [Retinanet_resnet152](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet152) | ✅ |   |   |
 | 计算机视觉（CV） | 目标检测（Object Detection） | [SSD_MobilenetV2_fpnlite](https://gitee.com/mindspore/models/tree/master/research/cv/ssd_mobilenetV2_FPNlite) | ✅ |   |   |
 | 计算机视觉（CV） | 目标检测（Object Detection） | [ssd_mobilenet_v2](https://gitee.com/mindspore/models/tree/master/research/cv/ssd_mobilenetV2) | ✅ |   |   |
 | 计算机视觉（CV） | 目标检测（Object Detection） | [ssd_resnet50](https://gitee.com/mindspore/models/tree/master/research/cv/ssd_resnet50) | ✅ |   |   |
