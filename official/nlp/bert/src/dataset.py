@@ -31,9 +31,10 @@ class BucketDatasetGenerator:
     Args:
         dataset (Dataset): The training dataset.
         batch_size (Int): The training batchsize.
-        bucket_list (List): List of different sentence lengths，such as [128, 256, 512]. Default: None.
+        bucket_list (List): List of different sentence lengths, such as [128, 256, 512]. Default: None.
+        valid_dataset_len (Int): Prevent communication failure at the end of the dataset. Default: 0.35.
     """
-    def __init__(self, dataset, batch_size, bucket_list=None):
+    def __init__(self, dataset, batch_size, bucket_list=None, valid_dataset_len=0.35):
         self.dataset = dataset
         self.batch_size = batch_size
         self.bucket_list = bucket_list
@@ -41,6 +42,8 @@ class BucketDatasetGenerator:
         self.random_list = np.random.binomial(n=(bucket_size - 1), p=0.55, size=self.__len__())
         self.random_list = (self.random_list + 2) % bucket_size
         self.random_list = [bucket_list[i] for i in self.random_list]
+        valid_dataset_len = int(valid_dataset_len * self.__len__())
+        self.random_list = self.random_list[:valid_dataset_len] + [bucket_list[-1]] * self.__len__()
         self._init_variables()
 
     def _init_variables(self):
