@@ -60,9 +60,9 @@ After installing MindSpore via the official website, you can start training and 
 
 # run training example
 
-bash scripts/run_train.sh [TASK_NAME] [DEVICE_TARGET] [TEACHER_MODEL_DIR] [STUDENT_MODEL_DIR] [DATA_DIR]
+bash scripts/run_train.sh [TASK_NAME] [DEVICE_TARGET] [TEACHER_MODEL_DIR] [STUDENT_MODEL_DIR] [DATA_DIR] [DEVICE_ID](optional)
 
-Before running the shell script, please set the `task_name`, `device_target`, `teacher_model_dir`, `student_model_dir` and `data_dir` in the run_train.sh file first.
+Before running the shell script, please set the `task_name`, `device_target`, `teacher_model_dir`, `student_model_dir`, `data_dir` and `device_id`(optional) in the run_train.sh file first.
 
 # run evaluation example
 
@@ -238,7 +238,7 @@ Before running the command below, please check `teacher_model_dir`, `student_mod
 python
     python train.py --task_name='sts-b' --device_target="GPU" --teacher_model_dir='/home/xxx/model_dir/' --student_model_dir='/home/xxx/model_dir/' --data_dir='/home/xxx/data_dir/'
 shell
-    bash scripts/run_train.sh [TASK_NAME] [DEVICE_TARGET] [TEACHER_MODEL_DIR] [STUDENT_MODEL_DIR] [DATA_DIR]
+    bash scripts/run_train.sh [TASK_NAME] [DEVICE_TARGET] [TEACHER_MODEL_DIR] [STUDENT_MODEL_DIR] [DATA_DIR] [DEVICE_ID](optional)
 
 ```
 
