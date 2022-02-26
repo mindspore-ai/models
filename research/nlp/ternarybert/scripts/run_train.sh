@@ -14,11 +14,12 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 5 ]
+if [[ $# != 5 && $# != 6 ]]
 then
     echo "============================================================================================================"
     echo "Please run the script as: "
-    echo "sh scripts/run_train.sh [TASK_NAME] [DEVICE_TARGET] [TEACHER_MODEL_DIR] [STUDENT_MODEL_DIR] [DATA_DIR]"
+    echo "sh scripts/run_train.sh [TASK_NAME] [DEVICE_TARGET] [TEACHER_MODEL_DIR] [STUDENT_MODEL_DIR] [DATA_DIR] [DEVICE_ID]"
+    echo "DEVICE_ID is optional, it can be set by command line argument DEVICE_ID , otherwise the value is zero"
     echo "============================================================================================================"
 exit 1
 fi
@@ -31,6 +32,18 @@ teacher_model_dir=$3
 student_model_dir=$4
 data_dir=$5
 
+if [ $# == 6 ]
+then
+device_id=$6
+else
+device_id=0
+fi
+
+if [ $device_target ==  "GPU" ]
+then
+    export CUDA_VISIBLE_DEVICES=$device_id
+fi
+
 mkdir -p ms_log
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 CUR_DIR=`pwd`
@@ -39,7 +52,7 @@ export GLOG_logtostderr=0
 python ${PROJECT_DIR}/../train.py \
     --task_name=$task_name \
     --device_target=$device_target \
-    --device_id=0 \
+    --device_id=$device_id \
     --teacher_model_dir=$teacher_model_dir \
     --student_model_dir=$student_model_dir \
     --data_dir=$data_dir> train_log.txt 2>&1 &
