@@ -29,7 +29,7 @@ class SSDInfer : public MxBaseInfer {
  public:
     SSDInfer(uint32_t device_id, std::string classes_path,
              std::string classes_idx_path, std::string save_dir, bool is_debug,
-             bool is_use_aipp, int model_width, int model_height,
+             int model_width, int model_height,
              std::string config_cfg_path, std::string label_path);
 
     bool AfterInit() override;
@@ -40,12 +40,6 @@ class SSDInfer : public MxBaseInfer {
     void SaveResult();
 
     void PostProcess(std::vector<MxBase::TensorBase> &output_tensor) override;
-
-    bool LoadImageToModelInOpenCv(const std::string &file,
-                                  MxBase::TensorBase *tensor, size_t image_id);
-
-    bool LoadImageToModelInDvpp(const std::string &file,
-                                MxBase::TensorBase *tensor, size_t image_id);
 
     bool LoadImageToModel(const std::string &file, MxBase::TensorBase *tensor,
                           size_t image_id) override;
@@ -75,7 +69,6 @@ class SSDInfer : public MxBaseInfer {
 
     // is bebug
     bool is_debug_;
-    bool is_use_aipp_;
 
     int model_width_;
     int model_height_;

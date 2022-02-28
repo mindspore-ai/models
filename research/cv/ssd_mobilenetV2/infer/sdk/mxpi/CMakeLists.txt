@@ -25,8 +25,6 @@ link_directories(${SDK_INSTALL_DIR}/opensource/lib/)
 add_compile_options(-std=c++11 -fPIC -fstack-protector-all -pie -Wno-deprecated-declarations)
 add_compile_options("-DPLUGIN_NAME=${PLUGIN_NAME}")
 
-add_definitions(-DENABLE_DVPP_INTERFACE -g)
-
 message("ASCEND_DIR:${ASCEND_DIR}.")
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 include_directories(${ASCEND_DIR}/include)

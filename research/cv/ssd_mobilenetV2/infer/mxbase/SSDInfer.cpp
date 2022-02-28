@@ -30,14 +30,13 @@ namespace mxbase_infer {
 
 SSDInfer::SSDInfer(uint32_t device_id, std::string classes_path,
                    std::string classes_idx_path, std::string save_dir,
-                   bool is_debug, bool is_use_aipp, int width, int height,
+                   bool is_debug, int width, int height,
                    std::string config_cfg_path, std::string label_path)
     : MxBaseInfer(device_id),
       classes_path_(classes_path),
       classes_idx_path_(classes_idx_path),
       save_dir_(save_dir),
       is_debug_(is_debug),
-      is_use_aipp_(is_use_aipp),
       model_width_(width),
       model_height_(height),
       config_cfg_path_(config_cfg_path),
@@ -163,9 +162,13 @@ void SSDInfer::PostProcess(std::vector<MxBase::TensorBase> &output_tensor) {
     if (is_debug_) SaveObjectInfo(object_infos);
 }
 
-bool SSDInfer::LoadImageToModelInOpenCv(const std::string &file,
+bool SSDInfer::LoadImageToModel(const std::string &file,
                                         MxBase::TensorBase *tensor,
                                         size_t image_id) {
+    m_file_path = file;
+    m_image_id = image_id;
+    images_ids.push_back(image_id);
+
     cv::Mat image = cv::imread(file);
     if (image.empty()) {
         LogError << "read image from " << file << "fail" << std::endl;
@@ -235,69 +238,6 @@ bool SSDInfer::LoadImageToModelInOpenCv(const std::string &file,
         data, false, std::vector<uint32_t>{shape.begin(), shape.end()},
         m_model_processor.GetInputDataType()[0]);
     return true;
-}
-
-bool SSDInfer::LoadImageToModelInDvpp(const std::string &file,
-                                      MxBase::TensorBase *tensor,
-                                      size_t image_id) {
-    MxBase::DvppDataInfo output = {};
-    APP_ERROR ret = m_dvppwarpper.DvppJpegDecode(file, output);
-    if (ret != APP_ERR_OK) {
-        LogError << "DvppJpegDecode error ret=" << ret << " " << file;
-        return false;
-    }
-
-    if (output.heightStride % 2 != 0) {
-        LogError << "heightStride % 2 != 0";
-        return false;
-    }
-
-    uint32_t model_width;
-    uint32_t model_height;
-    GetWidthAndHeightFromModel(&model_width, &model_height, 0);
-
-    // 告知postprocess它处理的图像信息
-    resize_info.heightOriginal = output.height;
-    resize_info.widthOriginal = output.width;
-    resize_info.heightResize = model_height;
-    resize_info.widthResize = model_width;
-
-    LogInfo << "LoadImageToModel " << output.width << " " << output.height
-            << " " << output.widthStride << " " << output.heightStride
-            << " format : " << output.format;
-
-    MxBase::ResizeConfig resize{};
-    resize.height = model_height_;
-    resize.width = model_width_;
-    MxBase::DvppDataInfo dvppDst = {};
-
-    ret = m_dvppwarpper.VpcResize(output, dvppDst, resize);
-    if (ret != APP_ERR_OK) {
-        LogError << "resize error";
-        return false;
-    }
-    MxBase::MemoryData memoryDst(
-        reinterpret_cast<void *>(dvppDst.data), dvppDst.dataSize,
-        MxBase::MemoryData::MemoryType::MEMORY_DVPP, m_deviceId);
-    LogInfo << "LoadImageToModel " << dvppDst.width << " " << dvppDst.height
-            << " " << dvppDst.widthStride << " " << dvppDst.heightStride;
-
-    std::vector<uint32_t> shape = {dvppDst.heightStride * 3 / 2,
-                                   dvppDst.widthStride};
-    *tensor =
-        MxBase::TensorBase(memoryDst, false, shape, MxBase::TENSOR_DTYPE_UINT8);
-    return true;
-}
-
-bool SSDInfer::LoadImageToModel(const std::string &file,
-                                MxBase::TensorBase *tensor, size_t image_id) {
-    m_file_path = file;
-    m_image_id = image_id;
-    images_ids.push_back(image_id);
-    if (is_use_aipp_)
-        return LoadImageToModelInDvpp(file, tensor, image_id);
-    else
-        return LoadImageToModelInOpenCv(file, tensor, image_id);
 }
 
 }  // namespace mxbase_infer

@@ -35,8 +35,8 @@ namespace {
 
 DEFINE_string(coco_path, "../../data/coco2017/", "coco data dir");
 DEFINE_string(classes_id_path, "../../data/classes_id.json", "classes id path");
-DEFINE_int32(width, 300, "width");
-DEFINE_int32(height, 300, "height");
+DEFINE_int32(width, 320, "width");
+DEFINE_int32(height, 320, "height");
 
 APP_ERROR ReadFile(const std::string &filePath,
                    std::vector<MxStream::MxstProtobufIn> *dataBufferVec,
@@ -59,7 +59,8 @@ APP_ERROR ReadFile(const std::string &filePath,
     cv::Mat out_image = cv::Mat(dsize, image.type());
     cv::resize(image, out_image, dsize);
     cv::cvtColor(out_image, out_image, static_cast<int>(cv::COLOR_BGR2RGB));
-    cv::Mat device_mat = cv::dnn::blobFromImage(out_image, 1.0 / 255.0);
+    static cv::Mat device_mat;
+    device_mat = cv::dnn::blobFromImage(out_image, 1.0 / 255.0);
     cv::Scalar means = {0.485, 0.456, 0.406};
     cv::Scalar stds = {0.229, 0.224, 0.225};
     size_t plane = device_mat.step1(1);
@@ -144,7 +145,7 @@ APP_ERROR init(int argc, char *argv[]) {
 
     APP_ERROR ret;
     std::string pipelineConfigPath =
-        "../../data/ssd_mobile_net_v2_no_aipp.pipeline";
+        "../../data/ssd_mobile_net_v2.pipeline";
     std::string pipelineConfig = ReadPipelineConfig(pipelineConfigPath);
     if (pipelineConfig == "") {
         return APP_ERR_COMM_INIT_FAIL;
