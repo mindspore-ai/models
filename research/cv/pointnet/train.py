@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,12 +40,12 @@ parser = argparse.ArgumentParser(description='MindSpore Pointnet Segmentation')
 parser.add_argument(
     '--batchSize', type=int, default=64, help='input batch size')
 parser.add_argument(
-    '--nepoch', type=int, default=25, help='number of epochs to train for')
+    '--nepoch', type=int, default=50, help='number of epochs to train for')
 parser.add_argument('--model', type=str, default='', help='model path')
 parser.add_argument('--device_id', type=int, default=5, help='device id')
 parser.add_argument('--learning_rate', type=float, default=0.0005, help='device id')
 parser.add_argument('--device_target', default='Ascend', help='device target')
-parser.add_argument('--data_url', type=str, default='/home/pointnet/shapenetcore_partanno_segmentation_benchmark_v0'
+parser.add_argument('--data_url', type=str, default='../shapenetcore_partanno_segmentation_benchmark_v0'
                     , help="dataset path")
 parser.add_argument('--train_url', type=str, default='./ckpts'
                     , help="ckpts path")
@@ -59,7 +59,7 @@ reshape = ops.Reshape()
 print(args)
 
 
-def train_model(_net_train, network, _dataset, _test_dataset, _num_classes):
+def train_model(_net_train, network, _dataset, _test_dataset, _num_classes, rank_id=0):
     """train_model"""
     print('loading data')
     print(time.strftime("%Y-%m-%d  %H:%M:%S", time.localtime()))
@@ -78,20 +78,10 @@ def train_model(_net_train, network, _dataset, _test_dataset, _num_classes):
             t_0 = time.time()
             points = data['data']
             label = data['label']
-            network.set_train(True)
-
-            pred = network(points)
-            pred = ops.Reshape()(pred, (-1, _num_classes))
-            pred_choice = ops.Argmax(axis=1, output_type=mindspore.int32)(pred)
-
-            pred_np = pred_choice.asnumpy()
-            target = ops.Reshape()(label, (-1, 1))[:, 0] - 1
-            target_np = target.asnumpy()
-            correct = np.equal(pred_np, target_np).sum()
             loss = _net_train(points, label)
-            print('Epoch : %d/%d  episode : %d/%d   Loss : %.4f  Accuracy : %f step_time: %.4f' %
+            print('Epoch : %d/%d  episode : %d/%d   Loss : %.4f  step_time: %.4f' %
                   (epoch, args.nepoch, batch_id, steps_per_epoch, np.mean(loss.asnumpy())
-                   , correct.item() / float(args.batchSize * 2500), (time.time() - t_0)))
+                   , (time.time() - t_0)))
             if batch_id % 9 == 0:
                 data = valid_data
                 points, label = data['point'], data['label']
@@ -110,7 +100,7 @@ def train_model(_net_train, network, _dataset, _test_dataset, _num_classes):
                 print('[%d: %d/%d] %s  loss: %f accuracy: %.4f  best_accuracy: %f' %
                       (epoch, batch_id, steps_per_epoch, blue('test'), np.mean(loss.asnumpy())
                        , accuracy, best_accuracy))
-                if accuracy > best_accuracy or accuracy > 0.93:
+                if rank_id == 0 and accuracy > best_accuracy:
                     save_time += 1
                     if accuracy > best_accuracy:
                         best_accuracy = accuracy
@@ -127,8 +117,8 @@ if __name__ == "__main__":
     local_data_url = args.data_url
     local_train_url = args.train_url
     device_num = int(os.getenv("RANK_SIZE", "1"))
-    shard_id = None
-    num_shards = None
+    shard_id = 0
+    num_shards = device_num
     if args.enable_modelarts:
         device_id = int(os.getenv("DEVICE_ID"))
         import moxing as mox
@@ -157,8 +147,10 @@ if __name__ == "__main__":
         mox.file.copy_parallel(src_url=args.data_url, dst_url=local_data_url)
     else:
         # run on the local server
-        context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
+        context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
         context.set_context(save_graphs=False)
+        if args.device_target == "GPU":
+            context.set_context(enable_graph_kernel=True)
         if device_num > 1:
 
             args.learning_rate = args.learning_rate * 2
@@ -166,9 +158,10 @@ if __name__ == "__main__":
             context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
             init()
+            shard_id = get_rank()
 
     if not os.path.exists(local_train_url):
-        os.makedirs(local_train_url)
+        os.makedirs(local_train_url, exist_ok=True)
 
     dataset_sink_mode = False
 
@@ -187,8 +180,8 @@ if __name__ == "__main__":
                                   , shuffle=True, num_shards=num_shards, shard_id=shard_id)
     dataset = dataset.batch(args.batchSize, drop_remainder=True)
 
-    test_dataset = ds.GeneratorDataset(test_dataset_generator, ["point", "label"], shuffle=True
-                                       , num_shards=num_shards, shard_id=shard_id)
+    test_dataset = ds.GeneratorDataset(test_dataset_generator, ["point", "label"], shuffle=False,
+                                       num_shards=1, shard_id=0)
     test_dataset = test_dataset.batch(args.batchSize, drop_remainder=True)
 
     num_classes = dataset_generator.num_seg_classes
@@ -207,4 +200,4 @@ if __name__ == "__main__":
     net_train = nn.TrainOneStepCell(net_with_loss, optim, sens=1024)
 
     train_model(_net_train=net_train, network=classifier, _dataset=dataset
-                , _test_dataset=test_dataset, _num_classes=num_classes)
+                , _test_dataset=test_dataset, _num_classes=num_classes, rank_id=shard_id)

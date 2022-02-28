@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import mindspore
 from mindspore import load_checkpoint, load_param_into_net, context
 import mindspore.dataset as ds
 import mindspore.ops as ops
-from mindspore.communication.management import init, get_rank
 from src.dataset import ShapeNetDataset
 from src.network import PointNetDenseCls
 from tqdm import tqdm
@@ -105,30 +104,14 @@ if __name__ == "__main__":
         context.set_context(save_graphs=False)
         if device_target == "Ascend":
             context.set_context(device_id=device_id)
-            if device_num > 1:
-                cfg.episode = int(cfg.episode / 2)
-                cfg.learning_rate = cfg.learning_rate * 2
-                context.reset_auto_parallel_context()
-                context.set_auto_parallel_context(device_num=device_num,
-                                                  parallel_mode=context.ParallelMode.DATA_PARALLEL, gradients_mean=True)
-                init()
-                local_data_url = os.path.join(local_data_url, str(device_id))
-                local_train_url = os.path.join(local_train_url, "_" + str(get_rank()))
         else:
             raise ValueError("Unsupported platform.")
         import moxing as mox
 
         mox.file.copy_parallel(src_url=args.data_url, dst_url=local_data_url)
     else:
-        context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
+        context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
         context.set_context(save_graphs=False)
-        if device_num > 1:
-            cfg.episode = int(cfg.episode / 2)
-            cfg.learning_rate = cfg.learning_rate * 2
-            context.reset_auto_parallel_context()
-            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
-            init()
 
     if not os.path.exists(local_train_url):
         os.makedirs(local_train_url)
@@ -138,7 +121,6 @@ if __name__ == "__main__":
     random.seed(args.manualSeed)
     mindspore.set_seed(args.manualSeed)
     dataset_sink_mode = False
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=args.device_id)
 
     dataset_generator = ShapeNetDataset(
         root=local_data_url,

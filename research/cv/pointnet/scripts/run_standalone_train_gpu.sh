@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,21 @@
 # limitations under the License.
 # ============================================================================
 
-# an simple tutorial as follows, more parameters can be setting
-# script_self=$(readlink -f "$0")
-# self_path=$(dirname "${script_self}")
+if [ $# -ne 3 ]
+then 
+    echo "Usage: bash scripts/run_standalone_train_gpu.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]"
+exit 1
+fi
 DATA_PATH=$1
-MODEL_PATH=$2
-python -s ../eval.py --data_path=$DATA_PATH --device_target="Ascend" --model_path=$MODEL_PATH > log_eval 2>&1 &
+CKPT_PATH=$2
+DEVICE_ID=$3
+
+export RANK_SIZE=1
+
+echo "======start training======"
+
+export CUDA_VISIBLE_DEVICES=$DEVICE_ID
+nohup python ./train.py \
+  --data_url=$DATA_PATH \
+  --device_target="GPU" \
+  --train_url=$CKPT_PATH > log_standalone_train_gpu 2>&1 &
