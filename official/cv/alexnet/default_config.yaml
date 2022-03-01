@@ -41,9 +41,6 @@ model_name: alexnet
 file_name: 'alexnet'
 file_format: 'MINDIR'
 
-#export
-export_input_type: float32  # dtype of input data, need to change to uint8 when export to ONNX on imagenet2012
-
 ---
 # Config description for each option
 enable_modelarts: 'Whether training on modelarts, default: False'

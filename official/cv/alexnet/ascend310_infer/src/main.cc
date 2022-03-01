@@ -142,10 +142,8 @@ int main(int argc, char **argv) {
         auto decode = Decode();
         auto resize = Resize({256, 256});
         auto centercrop = CenterCrop({224, 224});
-        auto normalize = Normalize({123.675, 116.28, 103.53}, {58.395, 57.12, 57.375});
-        auto hwc2chw = HWC2CHW();
 
-        Execute SingleOp({decode, resize, centercrop, normalize, hwc2chw});
+        Execute SingleOp({decode, resize, centercrop});
         auto imgDvpp = std::make_shared<MSTensor>();
         SingleOp(ReadFileToTensor(input0_files[i][j]), imgDvpp.get());
         inputs.emplace_back(model_inputs[0].Name(), model_inputs[0].DataType(), model_inputs[0].Shape(),
