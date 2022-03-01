@@ -22,6 +22,7 @@ from src.model_utils.moxing_adapter import moxing_wrapper
 from src.alexnet import AlexNet
 
 import numpy as np
+import mindspore as ms
 from mindspore import context, Tensor, load_checkpoint, load_param_into_net, export
 
 
@@ -39,15 +40,13 @@ def export_alexnet():
         net = AlexNet(num_classes=config.num_classes, off_load=True)
         param_dict = load_checkpoint(config.ckpt_file)
         load_param_into_net(net, param_dict)
-        input_arr = Tensor(np.zeros([config.batch_size, config.image_height, config.image_width, 3],
-                                    config.export_input_type))
+        input_arr = Tensor(np.zeros([config.batch_size, config.image_height, config.image_width, 3]), ms.uint8)
         export(net, input_arr, file_name=config.file_name, file_format=config.file_format)
     else:
         net = AlexNet(num_classes=config.num_classes)
         param_dict = load_checkpoint(config.ckpt_file)
         load_param_into_net(net, param_dict)
-        input_arr = Tensor(np.zeros([config.batch_size, 3, config.image_height, config.image_width],
-                                    config.export_input_type))
+        input_arr = Tensor(np.zeros([config.batch_size, 3, config.image_height, config.image_width]), ms.float32)
         export(net, input_arr, file_name=config.file_name, file_format=config.file_format)
 
 if __name__ == '__main__':
