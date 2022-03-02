@@ -108,7 +108,7 @@ def createDataset(dataset_path, category):
                              transform=data_transforms, gt_transform=gt_transforms, phase='test')
 
     train_dataset = ds.GeneratorDataset(train_data, column_names=['img', 'gt', 'label', 'idx'],
-                                        shuffle=True)
+                                        shuffle=False)
     test_dataset = ds.GeneratorDataset(test_data, column_names=['img', 'gt', 'label', 'idx'],
                                        shuffle=False)
 
