@@ -1,4 +1,4 @@
-# Copyright 2021-2022 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -100,7 +100,7 @@ def create_dataset_imagenet(dataset_dir, args, repeat_num=1, training=True):
             transform_img += [vision.RandomColorAdjust(args.color_jitter, args.color_jitter, args.color_jitter)]
         transform_img += [
             vision.ToTensor(),
-            vision.Normalize(mean=mean, std=std, is_hwc=False)]
+            vision.Normalize(mean=mean, std=std)]
         if args.re_prob > 0.:
             transform_img += [RandomErasing(args.re_prob, mode=args.re_mode, max_count=args.re_count)]
     else:
@@ -111,7 +111,7 @@ def create_dataset_imagenet(dataset_dir, args, repeat_num=1, training=True):
             Resize(int(args.image_size / args.crop_pct), interpolation="bicubic"),
             vision.CenterCrop(image_size),
             vision.ToTensor(),
-            vision.Normalize(mean=mean, std=std, is_hwc=False)
+            vision.Normalize(mean=mean, std=std)
         ]
 
     transform_label = C.TypeCast(mstype.int32)

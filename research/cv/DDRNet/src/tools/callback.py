@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,32 @@
 """callback function"""
 
 from mindspore.train.callback import Callback
+from mindspore.profiler import Profiler
 
 from src.args import args
+
+
+class StopAtStep(Callback):
+    """Profiler's function"""
+
+    def __init__(self, path, start_step, stop_step):
+        super(StopAtStep, self).__init__()
+        self.start_step = start_step
+        self.stop_step = stop_step
+        self.profiler = Profiler(output_path=path, start_profile=False)
+
+    def step_begin(self, run_context):
+        cb_params = run_context.original_args()
+        step_num = cb_params.cur_step_num
+        if step_num == self.start_step:
+            self.profiler.start()
+
+    def step_end(self, run_context):
+        cb_params = run_context.original_args()
+        step_num = cb_params.cur_step_num
+        if step_num == self.stop_step:
+            self.profiler.stop()
+            self.profiler.analyse()
 
 
 class EvaluateCallBack(Callback):
@@ -38,7 +62,7 @@ class EvaluateCallBack(Callback):
         """
         cb_params = run_context.original_args()
         cur_epoch_num = cb_params.cur_epoch_num
-        if self.epochs * 0.8 < cur_epoch_num:
+        if self.epochs * 0.75 <= cur_epoch_num and cur_epoch_num % 5 == 0:
             result = self.model.eval(self.eval_dataset)
             if result["acc"] > self.best_acc:
                 self.best_acc = result["acc"]
