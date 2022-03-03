@@ -254,6 +254,7 @@ Then you can run everything just like on ascend.
       │   ├── local_adapter.py            ## local adapter
       │   ├── moxing_adapter.py           ## moxing adapter
     ├─ config
+        ├─ ssd_mobilenet_v1_300_config_gpu.yaml ## parameter configuration
         ├─ ssd_mobilenet_v1_fpn_config.yaml ## parameter configuration
         ├─ ssd_resnet50_fpn_config.yaml ## parameter configuration
         ├─ ssd_vgg16_config.yaml ## parameter configuration
@@ -690,6 +691,24 @@ mAP: 0.23657619676441116
 | Accuracy            | IoU=0.50: 23.2%               | IoU=0.50: 23.2%             |
 | Model for inference | 186M(.ckpt file)             | 186M(.ckpt file)             |
 | configuration           | ssd_vgg16_config.yaml      | ssd_vgg16_config_gpu.yaml      |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+
+| Parameters          |                        GPU                         |
+| ------------------- | ------------------------------------------------------ |
+| Model Version       | SSD MobileNetV1          |
+| Resource            | GPU(Tesla V100 PCIE)，CPU 2.1GHz 64 cores，Memory 128G   |
+| Uploaded Date       | 03/03/2022 (month/day/year) |
+| MindSpore Version   | 1.5.0                     |
+| Dataset             | COCO2017                    |
+| Training Parameters | epoch = 500,  batch_size = 32  |
+| Optimizer           | Momentum                        |
+| Loss Function       | Sigmoid Cross Entropy,SmoothL1Loss    |
+| Speed               | 8pcs: 108 ms/step                     |
+| Total time          | 8pcs: 6.87hours                      |
+| outputs             | mAP                                          |
+| Accuracy            | IoU=0.50: 21.5%                       |
+| Model for inference | 88M(.ckpt file)                        |
+| configuration           | ssd_mobilenet_v1_300_config_gpu.yaml    |
 | Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
 
 ## [Description of Random Situation](#contents)

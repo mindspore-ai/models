@@ -25,7 +25,7 @@ from mindspore.train import Model
 from mindspore.context import ParallelMode
 from mindspore.common import set_seed, dtype
 from src.ssd import SSD300, SsdInferWithDecoder, SSDWithLossCell, TrainingWrapper, ssd_mobilenet_v2,\
-    ssd_mobilenet_v1_fpn, ssd_resnet50_fpn, ssd_vgg16
+    ssd_mobilenet_v1_fpn, ssd_mobilenet_v1, ssd_resnet50_fpn, ssd_vgg16
 from src.dataset import create_ssd_dataset, create_mindrecord
 from src.lr_schedule import get_lr
 from src.init_params import init_net_param, filter_checkpoint_parameter_by_list
@@ -47,6 +47,15 @@ def ssd_model_build():
                 param.requires_grad = False
     elif config.model_name == "ssd_mobilenet_v1_fpn":
         ssd = ssd_mobilenet_v1_fpn(config=config)
+        init_net_param(ssd)
+        if config.feature_extractor_base_param != "":
+            param_dict = ms.load_checkpoint(config.feature_extractor_base_param)
+            for x in list(param_dict.keys()):
+                param_dict["network.feature_extractor.mobilenet_v1." + x] = param_dict[x]
+                del param_dict[x]
+            ms.load_param_into_net(ssd.feature_extractor.mobilenet_v1.network, param_dict)
+    elif config.model_name == "ssd_mobilenet_v1":
+        ssd = ssd_mobilenet_v1(config=config)
         init_net_param(ssd)
         if config.feature_extractor_base_param != "":
             param_dict = ms.load_checkpoint(config.feature_extractor_base_param)
@@ -83,6 +92,10 @@ def set_graph_kernel_context(device_target, model):
         # Enable graph kernel for default model ssd300 on GPU back-end.
         ms.set_context(enable_graph_kernel=True,
                        graph_kernel_flags="--enable_parallel_fusion --enable_expand_ops=Conv2D")
+    if device_target == "GPU" and model == "ssd_mobilenet_v1":
+        # Enable graph kernel for default model ssd300 on GPU back-end.
+        ms.context.set_context(enable_graph_kernel=True,
+                               graph_kernel_flags="--enable_parallel_fusion --enable_expand_ops=Conv2D")
 
 @moxing_wrapper()
 def train_net():

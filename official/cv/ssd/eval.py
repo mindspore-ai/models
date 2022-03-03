@@ -18,7 +18,7 @@
 import os
 import mindspore as ms
 from mindspore import Tensor
-from src.ssd import SSD300, SsdInferWithDecoder, ssd_mobilenet_v2, ssd_mobilenet_v1_fpn, ssd_resnet50_fpn, ssd_vgg16
+from src.ssd import SSD300, SsdInferWithDecoder, ssd_mobilenet_v2, ssd_mobilenet_v1_fpn, ssd_mobilenet_v1, ssd_resnet50_fpn, ssd_vgg16
 from src.dataset import create_ssd_dataset, create_mindrecord
 from src.eval_utils import apply_eval
 from src.box_utils import default_boxes
@@ -38,6 +38,8 @@ def ssd_eval(dataset_path, ckpt_path, anno_json):
         net = ssd_mobilenet_v1_fpn(config=config)
     elif config.model_name == "ssd_resnet50_fpn":
         net = ssd_resnet50_fpn(config=config)
+    elif config.model_name == "ssd_mobilenet_v1":
+        net = ssd_mobilenet_v1(config=config)
     else:
         raise ValueError(f'config.model: {config.model_name} is not supported')
     net = SsdInferWithDecoder(net, Tensor(default_boxes), config)

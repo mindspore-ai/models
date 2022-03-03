@@ -24,6 +24,7 @@ from mindspore.communication.management import get_group_size
 import mindspore.ops as ops
 from .fpn import mobilenet_v1_fpn, resnet50_fpn
 from .vgg16 import vgg16
+from .mobilenet_v1 import mobilenet_v1_Feature
 
 
 def _make_divisible(v, divisor, min_value=None):
@@ -367,6 +368,56 @@ class SsdMobilenetV1Fpn(nn.Cell):
         pred_label = ops.cast(pred_label, ms.float32)
         return pred_loc, pred_label
 
+
+class SsdMobilenetV1Feature(nn.Cell):
+    """
+    SSD Network using mobilenetV1 with fpn to extract features
+
+    Args:
+        config (dict): The default config of SSD.
+        is_training (bool): Used for training, default is True.
+
+    Returns:
+        Tensor, localization predictions.
+        Tensor, class conf scores.
+
+    Examples:backbone
+         SsdMobilenetV1Feature(config, True).
+    """
+    def __init__(self, config, is_training=True):
+        super(SsdMobilenetV1Feature, self).__init__()
+        self.multi_box = MultiBox(config)
+        self.activation = ops.Sigmoid()
+        self.feature_extractor = mobilenet_v1_Feature(config)
+        in_channels = config.extras_in_channels
+        out_channels = config.extras_out_channels
+        strides = config.extras_strides
+        residual_list = []
+        for i in range(2, len(in_channels)):
+            residual = ConvBNReLU(in_channels[i], out_channels[i], stride=strides[i],
+                                  )
+            residual_list.append(residual)
+        self.multi_residual = nn.layer.CellList(residual_list)
+        self.multi_box = MultiBox(config)
+        self.is_training = is_training
+        if not is_training:
+            self.activation = ops.Sigmoid()
+
+    def construct(self, x):
+        feature, output = self.feature_extractor(x)
+        multi_feature = (feature, output)
+        feature = output
+        for residual in self.multi_residual:
+            feature = residual(feature)
+            multi_feature += (feature,)
+        pred_loc, pred_label = self.multi_box(multi_feature)
+        if not self.training:
+            pred_label = self.activation(pred_label)
+        pred_loc = ops.cast(pred_loc, ms.float32)
+        pred_label = ops.cast(pred_label, ms.float32)
+        return pred_loc, pred_label
+
+
 class SsdResNet50Fpn(nn.Cell):
     """
     SSD Network using ResNet50 with fpn to extract features
@@ -632,6 +683,9 @@ class SsdInferWithDecoder(nn.Cell):
 
 def ssd_mobilenet_v1_fpn(**kwargs):
     return SsdMobilenetV1Fpn(**kwargs)
+
+def ssd_mobilenet_v1(**kwargs):
+    return SsdMobilenetV1Feature(**kwargs)
 
 def ssd_resnet50_fpn(**kwargs):
     return SsdResNet50Fpn(**kwargs)
