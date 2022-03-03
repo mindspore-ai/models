@@ -22,7 +22,8 @@ def get_lr(lr_init, lr_decay_rate, num_epoch_per_decay, total_epochs, steps_per_
 
     Args:
        lr_init(float): init learning rate
-       lr_decay_rate (float):
+       lr_decay_rate (float): decay rate of learning rate
+       num_epoch_per_decay(int): number of epoch per decay
        total_epochs(int): total epoch of training
        steps_per_epoch(int): steps of one epoch
        is_stair(bool): If `True` decay the learning rate at discrete intervals
