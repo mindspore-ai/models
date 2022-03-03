@@ -16,14 +16,12 @@
 from __future__ import print_function
 import math
 import argparse
-import mindspore
+import mindspore as ms
 
-from mindspore import context
 from mindspore.context import ParallelMode
 from mindspore.train import Model
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 from src.config import cfg_res50
 from src.network import RetinaFace, RetinaFaceWithLossCell, TrainingWrapper, resnet50
@@ -33,14 +31,14 @@ from src.lr_schedule import adjust_learning_rate
 
 def train(cfg, args):
 
-    context.set_context(mode=context.GRAPH_MODE, device_target='GPU', save_graphs=False)
-    if context.get_context("device_target") == "GPU":
+    ms.set_context(mode=ms.GRAPH_MODE, device_target='GPU', save_graphs=False)
+    if ms.get_context("device_target") == "GPU":
         # Enable graph kernel
-        context.set_context(enable_graph_kernel=True, graph_kernel_flags="--enable_parallel_fusion")
+        ms.set_context(enable_graph_kernel=True, graph_kernel_flags="--enable_parallel_fusion")
     if args.is_distributed:
         init("nccl")
-        context.set_auto_parallel_context(device_num=get_group_size(), parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
+        ms.set_auto_parallel_context(device_num=get_group_size(), parallel_mode=ParallelMode.DATA_PARALLEL,
+                                     gradients_mean=True)
         cfg['ckpt_path'] = cfg['ckpt_path'] + "ckpt_" + str(get_rank()) + "/"
 
     batch_size = cfg['batch_size']
@@ -67,8 +65,8 @@ def train(cfg, args):
 
     if cfg['pretrain'] and cfg['resume_net'] is None:
         pretrained_res50 = cfg['pretrain_path']
-        param_dict_res50 = load_checkpoint(pretrained_res50)
-        load_param_into_net(backbone, param_dict_res50)
+        param_dict_res50 = ms.load_checkpoint(pretrained_res50)
+        ms.load_param_into_net(backbone, param_dict_res50)
         print('Load resnet50 from [{}] done.'.format(pretrained_res50))
 
     net = RetinaFace(phase='train', backbone=backbone)
@@ -76,8 +74,8 @@ def train(cfg, args):
 
     if cfg['resume_net'] is not None:
         pretrain_model_path = cfg['resume_net']
-        param_dict_retinaface = load_checkpoint(pretrain_model_path)
-        load_param_into_net(net, param_dict_retinaface)
+        param_dict_retinaface = ms.load_checkpoint(pretrain_model_path)
+        ms.load_param_into_net(net, param_dict_retinaface)
         print('Resume Model from [{}] Done.'.format(cfg['resume_net']))
 
     net = RetinaFaceWithLossCell(net, multibox_loss, cfg)
@@ -86,10 +84,10 @@ def train(cfg, args):
                               warmup_epoch=cfg['warmup_epoch'])
 
     if cfg['optim'] == 'momentum':
-        opt = mindspore.nn.Momentum(net.trainable_params(), lr, momentum)
+        opt = ms.nn.Momentum(net.trainable_params(), lr, momentum)
     elif cfg['optim'] == 'sgd':
-        opt = mindspore.nn.SGD(params=net.trainable_params(), learning_rate=lr, momentum=momentum,
-                               weight_decay=weight_decay, loss_scale=1)
+        opt = ms.nn.SGD(params=net.trainable_params(), learning_rate=lr, momentum=momentum,
+                        weight_decay=weight_decay, loss_scale=1)
     else:
         raise ValueError('optim is not define.')
 
@@ -115,7 +113,7 @@ if __name__ == '__main__':
     arg, _ = parser.parse_known_args()
 
     config = cfg_res50
-    mindspore.common.seed.set_seed(config['seed'])
+    ms.common.seed.set_seed(config['seed'])
     print('train config:\n', config)
 
     train(cfg=config, args=arg)

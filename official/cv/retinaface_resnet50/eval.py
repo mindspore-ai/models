@@ -20,9 +20,9 @@ import datetime
 import numpy as np
 import cv2
 
-from mindspore import Tensor, context
+import mindspore as ms
+from mindspore import Tensor
 from mindspore.common import set_seed
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 from src.config import cfg_res50
 from src.network import RetinaFace, resnet50
@@ -296,7 +296,7 @@ class DetectionEngine:
 
 
 def val():
-    context.set_context(mode=context.GRAPH_MODE, device_target='GPU', save_graphs=False)
+    ms.set_context(mode=ms.GRAPH_MODE, device_target='GPU', save_graphs=False)
 
     cfg = cfg_res50
 
@@ -307,10 +307,10 @@ def val():
 
     # load checkpoint
     assert cfg['val_model'] is not None, 'val_model is None.'
-    param_dict = load_checkpoint(cfg['val_model'])
+    param_dict = ms.load_checkpoint(cfg['val_model'])
     print('Load trained model done. {}'.format(cfg['val_model']))
     network.init_parameters_data()
-    load_param_into_net(network, param_dict)
+    ms.load_param_into_net(network, param_dict)
 
     # testing dataset
     testset_folder = cfg['val_dataset_folder']
