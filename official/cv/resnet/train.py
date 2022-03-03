@@ -144,7 +144,7 @@ def set_parameter():
         ms.set_context(mode=ms.PYNATIVE_MODE, device_target=target, save_graphs=False)
 
     if config.parameter_server:
-        context.set_ps_context(enable_ps=True)
+        ms.set_ps_context(enable_ps=True)
     if config.run_distribute:
         if target == "Ascend":
             device_id = int(os.getenv('DEVICE_ID'))
