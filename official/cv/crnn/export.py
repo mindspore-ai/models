@@ -35,7 +35,7 @@ def model_export():
         context.set_context(device_id=get_device_id())
 
     config.batch_size = 1
-    net = crnn(config)
+    net = crnn(config, full_precision=config.device_target != 'Ascend')
 
     load_checkpoint(config.ckpt_file, net=net)
     net.set_train(False)
