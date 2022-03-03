@@ -238,7 +238,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 | 总时长   |  132分钟 |
 | 参数(M)   | 60.19 |
 | 微调检查点 | 462M（.ckpt文件）  |
-| 脚本  | [链接](https://gitee.com/alreadyhad/mindspore/tree/master/model_zoo/research/cv/LearningToSeeInTheDark)  |
+| 脚本  | [链接](https://gitee.com/mindspore/models/tree/r1.6/research/cv/LearningToSeeInTheDark)  |
 
 # 随机情况说明
 
