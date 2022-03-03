@@ -15,6 +15,7 @@
 """ResNet."""
 import numpy as np
 from scipy.stats import truncnorm
+import mindspore as ms
 import mindspore.nn as nn
 from mindspore.ops import operations as P
 from mindspore.common.tensor import Tensor

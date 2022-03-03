@@ -55,7 +55,7 @@ def infer_net():
     target = config.device_target
 
     # init context
-    ms.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=False)
     if target == "Ascend":
         device_id = int(os.getenv('DEVICE_ID'))
         ms.set_context(device_id=device_id)
