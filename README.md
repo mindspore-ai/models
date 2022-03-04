@@ -95,7 +95,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Computer Vision (CV) | Scene Text Recognition |[CRNN-Seq2Seq-OCR](https://gitee.com/mindspore/models/tree/r1.6/official/cv/crnn_seq2seq_ocr) | ✅ |   |   |
 | Computer Vision (CV) | Scene Text Recognition |[WarpCTC](https://gitee.com/mindspore/models/tree/r1.6/official/cv/warpctc) | ✅ |   |   |
 | Computer Vision (CV) | Defect Detection |[ssim-ae](https://gitee.com/mindspore/models/tree/r1.6/official/cv/ssim-ae) | ✅ |   |   |
-| Computer Vision (CV) | Defect Detection |[PatchCore](https://gitee.com/mindspore/models/tree/r1.6/official/cv/patchcore) | ✅ |   |   |
+
 | Computer Vision (CV) | Face Detection | [RetinaFace-ResNet50](https://gitee.com/mindspore/models/tree/r1.6/official/cv/retinaface_resnet50)     | ✅ | ✅ |   |
 | Computer Vision (CV) | Face Detection | [CenterFace](https://gitee.com/mindspore/models/tree/r1.6/official/cv/centerface) | ✅ |   |   |
 | Computer Vision (CV) | Face Detection | [SphereFace](https://gitee.com/mindspore/models/tree/r1.6/official/cv/sphereface) | ✅ |   |   |
@@ -234,6 +234,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Computer Vision (CV) | Point Cloud Model |[PointNet](https://gitee.com/mindspore/models/tree/r1.6/research/cv/pointnet) | ✅ |   |   |
 | Computer Vision (CV) | Point Cloud Model |[PointNet++](https://gitee.com/mindspore/models/tree/r1.6/research/cv/pointnet2) | ✅ |   |   |
 | Computer Vision (CV) | Depth Estimation | [midas](https://gitee.com/mindspore/models/tree/r1.6/research/cv/midas) | ✅ |   |   |
+| Computer Vision (CV) | Defect Detection |[PatchCore](https://gitee.com/mindspore/models/tree/r1.6/research/cv/PatchCore) | ✅ |   |   |
 | Computer Vision (CV) | Sequential Image Classification | [TCN](https://gitee.com/mindspore/models/tree/r1.6/research/cv/TCN) | ✅ |   |   |
 | Computer Vision (CV) | Temporal Localization | [TALL](https://gitee.com/mindspore/models/tree/r1.6/research/cv/tall) | ✅ |   |   |
 | Computer Vision (CV) | Image Matting | [FCA-net](https://gitee.com/mindspore/models/tree/r1.6/research/cv/FCANet) | ✅ |   |   |
@@ -266,7 +267,6 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Computer Vision (CV) | Image Generation |[GAN](https://gitee.com/mindspore/models/tree/r1.6/research/cv/gan) | ✅ |   |   |
 | Computer Vision (CV) | Image Generation |[IPT](https://gitee.com/mindspore/models/tree/r1.6/research/cv/IPT) | ✅ |   |   |
 | Computer Vision (CV) | Image Generation |[pgan](https://gitee.com/mindspore/models/tree/r1.6/research/cv/PGAN) | ✅ |   |   |
-| Computer Vision (CV) | Image Generation |[Photo2Cartoon](https://gitee.com/mindspore/models/tree/r1.6/research/cv/U-GAT-IT) | ✅ |   |   |
 | Computer Vision (CV) | Image Generation |[Pix2Pix](https://gitee.com/mindspore/models/tree/r1.6/research/cv/Pix2Pix) | ✅ |   |   |
 | Computer Vision (CV) | Image Generation |[SinGAN](https://gitee.com/mindspore/models/tree/r1.6/research/cv/SinGAN) | ✅ |   |   |
 | Computer Vision (CV) | Image Generation |[StarGAN](https://gitee.com/mindspore/models/tree/r1.6/research/cv/StarGAN) | ✅ |   |   |
@@ -318,7 +318,6 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | GNN | Traffic Prediction | [TGCN](https://gitee.com/mindspore/models/tree/r1.6/research/cv/tgcn) | ✅ |   |   |
 | GNN | Social and Information Networks | [SGCN](https://gitee.com/mindspore/models/tree/r1.6/research/gnn/sgcn) | ✅ |   |   |
 | GNN | Graph Classification | [DGCN](https://gitee.com/mindspore/models/tree/r1.6/research/gnn/dgcn) | ✅ |   |   |
-| GNN | Graph Classification | [SDNE](https://gitee.com/mindspore/models/tree/r1.6/research/gnn/sdne) | ✅ |   |   |
 | High Performance Computing | Molecular Dynamics | [DeepPotentialH2O](https://gitee.com/mindspore/models/tree/r1.6/research/hpc/molecular_dynamics)   |  ✅ |    |   |
 | High Performance Computing | Ocean Model | [GOMO](https://gitee.com/mindspore/models/tree/r1.6/research/hpc/ocean_model)   |    |  ✅ |   |
 | Reinforcement Learning | Recommender System, CTR prediction | [MMOE](https://gitee.com/mindspore/models/tree/r1.6/research/recommend/mmoe) | ✅ |   |   |

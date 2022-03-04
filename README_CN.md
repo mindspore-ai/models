@@ -267,7 +267,6 @@
 | 计算机视觉（CV） | 图像生成（Image Generation） |[GAN](https://gitee.com/mindspore/models/tree/r1.6/research/cv/gan) | ✅ |   |   |
 | 计算机视觉（CV） | 图像生成（Image Generation） |[IPT](https://gitee.com/mindspore/models/tree/r1.6/research/cv/IPT) | ✅ |   |   |
 | 计算机视觉（CV） | 图像生成（Image Generation） |[pgan](https://gitee.com/mindspore/models/tree/r1.6/research/cv/PGAN) | ✅ |   |   |
-| 计算机视觉（CV） | 图像生成（Image Generation） |[Photo2Cartoon](https://gitee.com/mindspore/models/tree/r1.6/research/cv/U-GAT-IT) | ✅ |   |   |
 | 计算机视觉（CV） | 图像生成（Image Generation） |[Pix2Pix](https://gitee.com/mindspore/models/tree/r1.6/research/cv/Pix2Pix) | ✅ |   |   |
 | 计算机视觉（CV） | 图像生成（Image Generation） |[SinGAN](https://gitee.com/mindspore/models/tree/r1.6/research/cv/SinGAN) | ✅ |   |   |
 | 计算机视觉（CV） | 图像生成（Image Generation） |[StarGAN](https://gitee.com/mindspore/models/tree/r1.6/research/cv/StarGAN) | ✅ |   |   |
@@ -320,7 +319,6 @@
 | 图神经网络（GNN） | 交通预测（Traffic Prediction) | [TGCN](https://gitee.com/mindspore/models/tree/r1.6/research/cv/tgcn) | ✅ |   |   |
 | 图神经网络（GNN） | 社交信息网络（Social and Information Networks） | [SGCN](https://gitee.com/mindspore/models/tree/r1.6/research/gnn/sgcn) | ✅ |   |   |
 | 图神经网络（GNN） | 图结构数据分类（Graph Classification） | [DGCN](https://gitee.com/mindspore/models/tree/r1.6/research/gnn/dgcn) | ✅ |   |   |
-| 图神经网络（GNN） | 图结构数据分类（Graph Classification） | [SDNE](https://gitee.com/mindspore/models/tree/r1.6/research/gnn/sdne) | ✅ |   |   |
 |高性能计算（HPC） | 分子动力学（Molecular Dynamics）  |  [DeepPotentialH2O](https://gitee.com/mindspore/models/tree/r1.6/research/hpc/molecular_dynamics)   |  ✅ |   |  |
 |高性能计算（HPC） | 海洋模型（Ocean Model）  |  [GOMO](https://gitee.com/mindspore/models/tree/r1.6/research/hpc/ocean_model)   |   |  ✅ |  |
 
