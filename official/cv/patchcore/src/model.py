@@ -78,7 +78,7 @@ class ResNet(nn.Cell):
         self.conv1 = nn.Conv2d(3, self.inplanes, kernel_size=7, stride=2, padding=3, pad_mode='pad')
         self.bn1 = nn.BatchNorm2d(self.inplanes)
         self.relu = nn.ReLU()
-        self.pad = nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)))
+        self.pad = nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)), mode="REFLECT")
         self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="valid")
 
         self.layer1 = self._make_layer(block, 64, layers[0])
