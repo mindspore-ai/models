@@ -277,7 +277,7 @@ Total data: 50000, top1 accuracy: 0.73816, top5 accuracy: 0.9178.
 |总时长   |  39小时 |
 |参数(M)   | 5.18 |
 |  微调检查点 | 42.05M（.ckpt文件）  |
-| 脚本  | [链接](https://gitee.com/alreadyhad/mindspore/tree/master/model_zoo/research/cv/ghostnet)  |
+| 脚本  | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/ghostnet)  |
 
 # 随机情况说明
 
