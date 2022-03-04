@@ -56,6 +56,7 @@ DEFINE_string(dataset_path, ".", "dataset path");
 DEFINE_int32(device_id, 0, "device id");
 DEFINE_int32(IMAGEWIDTH, 1280, "image width");
 DEFINE_int32(IMAGEHEIGHT, 768, "image height");
+DEFINE_bool(RESTOREBBOX, true, "restore bbox");
 
 int PadImage(const MSTensor &input, MSTensor *output) {
     std::shared_ptr<TensorTransform> normalize(new Normalize({103.53, 116.28, 123.675},
@@ -119,6 +120,27 @@ int PadImage(const MSTensor &input, MSTensor *output) {
         }
     }
     return 0;
+}
+
+void statistic_results(const std::map<double, double> &costTime_map) {
+    double average = 0.0;
+    int inferCount = 0;
+
+    for (auto iter = costTime_map.begin(); iter != costTime_map.end(); iter++) {
+        double diff = 0.0;
+        diff = iter->second - iter->first;
+        average += diff;
+        inferCount++;
+    }
+    average = average / inferCount;
+    std::stringstream timeCost;
+    timeCost << "NN inference cost average time: "<< average << " ms of infer_count " << inferCount << std::endl;
+    std::cout << "NN inference cost average time: "<< average << "ms of infer_count " << inferCount << std::endl;
+
+    std::string fileName = "./time_Result" + std::string("/test_perform_static.txt");
+    std::ofstream fileStream(fileName.c_str(), std::ios::trunc);
+    fileStream << timeCost.str();
+    fileStream.close();
 }
 
 int main(int argc, char **argv) {
@@ -194,11 +216,13 @@ int main(int argc, char **argv) {
         imgInfo[3] = resizeScale;
 
         MSTensor imgMeta("imgMeta", DataType::kNumberTypeFloat32, {static_cast<int64_t>(4)}, imgInfo, 16);
-
+        bool restore_bbox = static_cast<bool>(FLAGS_RESTOREBBOX);
         inputs.emplace_back(model_inputs[0].Name(), model_inputs[0].DataType(), model_inputs[0].Shape(),
                             img.Data().get(), img.DataSize());
-        inputs.emplace_back(model_inputs[1].Name(), model_inputs[1].DataType(), model_inputs[1].Shape(),
-                            imgMeta.Data().get(), imgMeta.DataSize());
+        if (restore_bbox) {
+            inputs.emplace_back(model_inputs[1].Name(), model_inputs[1].DataType(), model_inputs[1].Shape(),
+                                imgMeta.Data().get(), imgMeta.DataSize());
+        }
 
         gettimeofday(&start, nullptr);
         ret = model.Predict(inputs, &outputs);
@@ -212,24 +236,7 @@ int main(int argc, char **argv) {
         costTime_map.insert(std::pair<double, double>(startTimeMs, endTimeMs));
         WriteResult(all_files[i], outputs);
     }
-    double average = 0.0;
-    int inferCount = 0;
-
-    for (auto iter = costTime_map.begin(); iter != costTime_map.end(); iter++) {
-        double diff = 0.0;
-        diff = iter->second - iter->first;
-        average += diff;
-        inferCount++;
-    }
-    average = average / inferCount;
-    std::stringstream timeCost;
-    timeCost << "NN inference cost average time: "<< average << " ms of infer_count " << inferCount << std::endl;
-    std::cout << "NN inference cost average time: "<< average << "ms of infer_count " << inferCount << std::endl;
-
-    std::string fileName = "./time_Result" + std::string("/test_perform_static.txt");
-    std::ofstream fileStream(fileName.c_str(), std::ios::trunc);
-    fileStream << timeCost.str();
-    fileStream.close();
+    statistic_results(costTime_map);
     costTime_map.clear();
     return 0;
 }

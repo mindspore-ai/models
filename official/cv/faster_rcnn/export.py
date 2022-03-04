@@ -26,12 +26,17 @@ ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target)
 if config.device_target == "Ascend":
     ms.set_context(device_id=get_device_id())
 
+
 def modelarts_pre_process():
     pass
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def export_fasterrcnn():
     """ export_fasterrcnn """
+    config.restore_bbox = True
+    config.ori_h = None
+    config.ori_w = None
     net = FasterRcnn_Infer(config=config)
 
     param_dict = ms.load_checkpoint(config.ckpt_file)
@@ -49,7 +54,14 @@ def export_fasterrcnn():
     img = Tensor(np.zeros([config.test_batch_size, 3, config.img_height, config.img_width]), ms.float32)
     img_metas = Tensor(np.random.uniform(0.0, 1.0, size=[config.test_batch_size, 4]), ms.float32)
 
-    ms.export(net, img, img_metas, file_name=config.file_name, file_format=config.file_format)
+    if not config.restore_bbox:
+        print("[WARNING] When parameter 'restore_bbox' set to False, "
+              "ascend310_infer of this project provided will not be available "
+              "and need to complete 310 infer function by yourself.")
+        ms.export(net, img, file_name=config.file_name, file_format=config.file_format)
+    else:
+        ms.export(net, img, img_metas, file_name=config.file_name, file_format=config.file_format)
+
 
 if __name__ == '__main__':
     export_fasterrcnn()
