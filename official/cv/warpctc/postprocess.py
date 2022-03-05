@@ -70,7 +70,7 @@ def get_result(result_path, label_path):
         label = label_dict[file]
         labels.append(label)
         resultPath = os.path.join(result_path, file)
-        output = np.fromfile(resultPath, dtype=np.float16).reshape((-1, batch_Size, 11))
+        output = np.fromfile(resultPath, dtype=np.float32).reshape((-1, batch_Size, 11))
         preds.append(get_prediction(output))
     acc = round(calcul_acc(preds, labels), 3)
     print("Total data: {}, accuracy: {}".format(len(labels), acc))
