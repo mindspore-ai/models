@@ -96,7 +96,7 @@ def create_dataset(dataset_path, do_train=True, repeat_num=1, batch_size=32,
             C.HWC2CHW(),
         ]
     dataset = dataset.map(operations=trans,
-                          input_columns='image', num_parallel_workers=8)
+                          input_columns='image', num_parallel_workers=1)
 
     type_cast_op = C2.TypeCast(mstype.int32)
     dataset = dataset.map(operations=type_cast_op,
