@@ -15,12 +15,12 @@
 # ============================================================================
 
 
-if [ $# != 5 ]
+if [ $# != 6 ]
 then
     echo "=============================================================================================================="
     echo "Please run the script as: "
-    echo "bash scripts/run_eval.sh [DATA_PATH] [LM_PATH] [BG_PATH] [RESULT_PATH] [MODEL_PATH]"
-    echo "for example: bash scripts/run_eval.sh test_dataset/data/test_single/ test_dataset/landmark/ALL test_dataset/mask/ALL test_result checkpoint/netG_300.ckpt"
+    echo "bash scripts/run_eval.sh [DATA_PATH] [LM_PATH] [BG_PATH] [RESULT_PATH] [MODEL_PATH] [DEVICE_TARGET]"
+    echo "for example: bash scripts/run_eval.sh test_dataset/data/test_single/ test_dataset/landmark/ALL test_dataset/mask/ALL test_result checkpoint/netG_300.ckpt GPU"
     echo "=============================================================================================================="
 exit 1
 fi
@@ -30,6 +30,7 @@ LM_PATH=$2
 BG_PATH=$3
 RESULT_PATH=$4
 MODEL_PATH=$5
+DEVICE_TARGET=$6
 
 
 get_real_path(){
@@ -42,6 +43,7 @@ get_real_path(){
 
 python eval.py  \
   --dataroot $DATA_PATH \
+  --device_target $DEVICE_TARGET \
   --lm_dir $LM_PATH\
   --bg_dir $BG_PATH\
   --results_dir $RESULT_PATH\

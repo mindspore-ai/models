@@ -24,7 +24,7 @@ class Options():
     """Options"""
     def __init__(self, description=None):
         self.parser = argparse.ArgumentParser(description="default name", add_help=False)
-        self.parser.add_argument("--device_target", type=str, default="Ascend")
+        self.parser.add_argument("--device_target", type=str, default="Ascend", help="GPU or Ascned")
         self.parser.add_argument("--dataroot", type=str, default='')
         self.parser.add_argument("--ckpt_dir", type=str, default='checkpoint')
         self.parser.add_argument("--auxiliary_dir", type=str, default='/data/model_weight/')
@@ -32,6 +32,8 @@ class Options():
         self.parser.add_argument('--lm_dir', type=str, default='dataset/landmark/ALL', help='path to facial landmarks')
         self.parser.add_argument('--bg_dir', type=str, default='dataset/mask/ALL', help='path to background masks')
         self.parser.add_argument('--device_id', type=int, default=0, help='device id')
+        self.parser.add_argument('--group_size', type=int, default=1, help='group size')
+        self.parser.add_argument('--rank', type=int, default=0, help='rank id')
         self.parser.add_argument('--use_local', action='store_true', help='use local part network')
         self.parser.add_argument('--no_flip', action='store_false')
         self.parser.add_argument('--save_epoch_freq', type=int, default=25,

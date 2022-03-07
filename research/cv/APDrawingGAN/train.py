@@ -31,29 +31,43 @@ from src.data import create_dataset
 
 set_seed(1)
 
-
 opt = Options().get_settings()
 context.set_context(mode=context.GRAPH_MODE, device_target=opt.device_target)
 
+
 def train():
     """train"""
-    if opt.run_distribute:
-        opt.device_num = int(os.getenv('RANK_SIZE', '1'))
-        init()
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, device_num=opt.device_num,
-                                          gradients_mean=True)
-        opt.rank = get_rank()
-        opt.group_size = get_group_size()
-        opt.ckpt_dir = os.path.join(opt.ckpt_dir, 'rank{}'.format(opt.rank))
-        all_dataset = create_dataset(opt)
-        dataset = all_dataset.batch(opt.batch_size, drop_remainder=True)
-    else:
-        opt.rank = 0
-        opt.group_size = 1
-        context.set_context(device_id=int(opt.device_id))
-        all_dataset = create_dataset(opt)
-        dataset = all_dataset.batch(opt.batch_size)
+    if opt.device_target == 'Ascend':
+        if opt.run_distribute:
+            opt.device_num = int(os.getenv('RANK_SIZE', '1'))
+            init()
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, device_num=get_group_size(),
+                                              gradients_mean=True)
+            opt.rank = get_rank()
+            opt.group_size = get_group_size()
+            opt.ckpt_dir = os.path.join(opt.ckpt_dir, 'rank{}'.format(opt.rank))
+            all_dataset = create_dataset(opt)
+            dataset = all_dataset.batch(opt.batch_size, drop_remainder=True)
+        else:
+            context.set_context(device_id=int(opt.device_id))
+            all_dataset = create_dataset(opt)
+            dataset = all_dataset.batch(opt.batch_size)
+    if opt.device_target == 'GPU':
+        if opt.run_distribute:
+            init("nccl")
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, device_num=get_group_size(),
+                                              gradients_mean=True)
+            opt.rank = get_rank()
+            opt.group_size = get_group_size()
+            opt.ckpt_dir = os.path.join(opt.ckpt_dir, 'rank{}'.format(opt.rank))
+            all_dataset = create_dataset(opt)
+            dataset = all_dataset.batch(opt.batch_size, drop_remainder=True)
+        else:
+            context.set_context(device_id=int(opt.device_id))
+            all_dataset = create_dataset(opt)
+            dataset = all_dataset.batch(opt.batch_size)
 
     ############################### network   ################################
     netG = Generator(opt)
@@ -82,12 +96,10 @@ def train():
     if not os.path.exists(opt.ckpt_dir):
         os.makedirs(opt.ckpt_dir)
 
-    iterator = dataset.create_dict_iterator()
-    print('\n\n=============== start training ===============\n\n')
     ############################## training ###################################
     for epoch in range(opt.epoch_count, opt.niter + opt.niter_decay + 1):
         start_epoch_time = time.time()
-        for data in iterator:
+        for data in dataset.create_dict_iterator():
             input_data = {}
             for d, v in data.items():
                 if d in ('A_paths', 'B_paths'):
@@ -121,22 +133,18 @@ def train():
             netD.set_index(center[0])
 
             Gout = myTrainOneStepCellForG(real_B, real_B_bg, real_B_eyel, real_B_eyer, real_B_nose, real_B_mouth,
-                                          real_B_hair,
-                                          real_A, real_A_bg, real_A_eyel, real_A_eyer, real_A_nose, real_A_mouth,
-                                          real_A_hair,
-                                          mask, mask2, dt1gt, dt2gt).view(-1)
+                                          real_B_hair, real_A, real_A_bg, real_A_eyel, real_A_eyer, real_A_nose,
+                                          real_A_mouth, real_A_hair, mask, mask2, dt1gt, dt2gt).view(-1)
             Gout = Gout.mean()
             Dout = myTrainOneStepCellForD(real_B, real_B_bg, real_B_eyel, real_B_eyer, real_B_nose, real_B_mouth,
-                                          real_B_hair,
-                                          real_A, real_A_bg, real_A_eyel, real_A_eyer, real_A_nose, real_A_mouth,
-                                          real_A_hair,
-                                          mask, mask2, dt1gt, dt2gt).view(-1)
+                                          real_B_hair, real_A, real_A_bg, real_A_eyel, real_A_eyer, real_A_nose,
+                                          real_A_mouth, real_A_hair, mask, mask2, dt1gt, dt2gt).view(-1)
             Dout = Dout.mean()
 
         if opt.rank == 0:
             print('epoch', epoch, 'DLoss', Dout, '  \tGLoss', Gout)
             print('epoch', epoch, 'use time:', time.time() - start_epoch_time, 's')
-            print('performance', (time.time() - start_epoch_time)*1000/all_dataset.get_dataset_size(), 'ms/step')
+            print('performance', (time.time() - start_epoch_time) * 1000 / all_dataset.get_dataset_size(), 'ms/step')
         if (epoch + 1) % opt.save_epoch_freq == 0 and opt.rank == 0:
             save_checkpoint(APDrawingGAN_modle, os.path.join(opt.ckpt_dir, f"ADPrawingGANP_modle_{epoch + 1}.ckpt"))
             save_checkpoint(netG, os.path.join(opt.ckpt_dir, f"netG_{epoch + 1}.ckpt"))
@@ -144,7 +152,7 @@ def train():
     if opt.isModelarts:
         from src.utils.tools import modelarts_result2obs
         modelarts_result2obs(opt)
-    print('\n\n=============== finish training ===============\n\n')
+
 
 if __name__ == '__main__':
     train()

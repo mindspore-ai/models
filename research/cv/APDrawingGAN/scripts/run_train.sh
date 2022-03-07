@@ -15,12 +15,12 @@
 # ============================================================================
 
 
-if [ $# != 8 ]
+if [ $# != 9 ]
 then
     echo "=============================================================================================================="
     echo "Please run the script as: "
-    echo "bash scripts/run_train.sh [DATA_PATH] [LM_PATH] [BG_PATH] [CKPT_PATH] [AUXILIARY_PATH] [DEVICE_ID] [NITER] [SAVA_EPOCH_FREQ]"
-    echo "for example: bash scripts/run_train.sh dataset/data/train dataset/landmark/ALL dataset/mask/ALL ckpt auxiliary/pretrain_APDGAN.ckpt 0 300 25"
+    echo "bash scripts/run_train.sh [DATA_PATH] [LM_PATH] [BG_PATH] [CKPT_PATH] [AUXILIARY_PATH] [DEVICE_ID] [NITER] [SAVA_EPOCH_FREQ] [DEVICE_TARGET]"
+    echo "for example: bash scripts/run_train.sh dataset/data/train dataset/landmark/ALL dataset/mask/ALL ckpt auxiliary/pretrain_APDGAN.ckpt 0 300 25 GPU"
     echo "=============================================================================================================="
 exit 1
 fi
@@ -33,10 +33,12 @@ AUXILIARY_PATH=$5
 DEVICE_ID=$6
 NITER=$7
 SAVA_EPOCH_FREQ=$8
+DEVICE_TARGET=$9
 
 ulimit -u unlimited
 python train.py  \
   --device_id=$DEVICE_ID \
+  --device_target=$DEVICE_TARGET \
   --dataroot=$DATA_PATH \
   --lm_dir=$LM_PATH\
   --bg_dir=$BG_PATH\

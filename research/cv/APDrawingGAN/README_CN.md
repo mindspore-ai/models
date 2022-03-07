@@ -97,29 +97,34 @@ auxiliary.ckpt文件获取：从 https://cg.cs.tsinghua.edu.cn/people/~Yongjin/A
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.6/index.html)
 
 # 快速入门
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
-- Ascend处理器环境运行
+- 运行
 
   ```bash
   # 运行训练示例
-  bash scripts/run_train.sh [DATA_PATH] [LM_PATH] [BG_PATH] [CKPT_PATH] [AUXILIARY_PATH] [DEVICE_ID] [EPOCH] [SAVA_EPOCH_FREQ]
+  bash scripts/run_train.sh [DATA_PATH] [LM_PATH] [BG_PATH] [CKPT_PATH] [AUXILIARY_PATH] [DEVICE_ID] [EPOCH] [SAVA_EPOCH_FREQ] [DEVICE_TARGET]
   # 例如：
-  bash scripts/run_train.sh dataset/data/train dataset/landmark/ALL dataset/mask/ALL checkpoint auxiliary/auxiliary.ckpt 0 300 25
+  bash scripts/run_train.sh dataset/data/train dataset/landmark/ALL dataset/mask/ALL checkpoint auxiliary/auxiliary.ckpt 0 300 25 GPU
 
-  # 运行分布式训练示例
+  # 运行分布式训练示例Ascend
   bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH] [LM_PATH] [BG_PATH] [CKPT_PATH] [AUXILIARY_PATH] [EPOCH] [SAVA_EPOCH_FREQ]
   # 例如：
   bash scripts/run_distribute_train.sh hccl_8p.json dataset/data/train dataset/landmark/ALL dataset/mask/ALL checkpoint auxiliary/auxiliary.ckpt 300 25
 
-  # 运行评估示例
-  bash scripts/run_eval.sh [DATA_PATH] [LM_PATH] [BG_PATH] [RESULT_PATH] [MODEL_PATH]
+  # 运行分布式训练示例GPU
+  bash scripts/run_train_distribute_GPU.sh [DATA_PATH] [LM_PATH] [BG_PATH] [CKPT_PATH] [AUXILIARY_PATH] [EPOCH] [SAVA_EPOCH_FREQ]
   # 例如：
-  bash scripts/run_eval.sh test_dataset/data/test_single/ test_dataset/landmark/ALL test_dataset/mask/ALL test_result checkpoint/netG_300.ckpt
+  bash scripts/run_train_distribute_GPU.sh /dataset/train/data /dataset/train/landmark/ALL dataset/train/mask/ALL checkpoint /auxiliary/pretrain_APDGAN.ckpt 300 25"
+
+  # 运行评估示例
+  bash scripts/run_eval.sh [DATA_PATH] [LM_PATH] [BG_PATH] [RESULT_PATH] [MODEL_PATH] [DEVICE_TARGET]
+  # 例如：
+  bash scripts/run_eval.sh test_dataset/data/test_single/ test_dataset/landmark/ALL test_dataset/mask/ALL test_result checkpoint/netG_300.ckpt GPU
   ```
 
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
@@ -251,20 +256,32 @@ auxiliary.ckpt文件获取：从 https://cg.cs.tsinghua.edu.cn/people/~Yongjin/A
 
 ### 训练
 
-- Ascend处理器环境运行
+- GPU处理器环境运行
 
   ```bash
-  bash scripts/run_train.sh dataset/data/train dataset/landmark/ALL dataset/mask/ALL checkpoint auxiliary/auxiliary.ckpt 0 300 25
+  bash scripts/run_train.sh dataset/data/train dataset/landmark/ALL dataset/mask/ALL checkpoint auxiliary/auxiliary.ckpt 0 300 25 GPU
   ```
 
   或
 
   ```bash
-  python train.py --device_id=0 --dataroot=dataset/data/train/ --lm_dir=dataset/landmark/ALL/ --bg_dir=dataset/mask/ALL/ --auxiliary_dir=auxiliary/auxiliary.ckpt --ckpt_dir=checkpoint --niter=300 --save_epoch_freq=25 --use_local --discriminator_local --no_flip --no_dropout  --pretrain --isTrain
+  python train.py --device_id=0 --device_target=GPU --dataroot=dataset/data/train/ --lm_dir=dataset/landmark/ALL/ --bg_dir=dataset/mask/ALL/ --auxiliary_dir=auxiliary/auxiliary.ckpt --ckpt_dir=checkpoint --niter=300 --save_epoch_freq=25 --use_local --discriminator_local --no_flip --no_dropout  --pretrain --isTrain
+  ```
+
+- Ascend处理器环境运行
+
+  ```bash
+  bash scripts/run_train.sh dataset/data/train dataset/landmark/ALL dataset/mask/ALL checkpoint auxiliary/auxiliary.ckpt 0 300 25 Ascend
+  ```
+
+  或
+
+  ```bash
+  python train.py --device_id=0 --device_target=Ascend --dataroot=dataset/data/train/ --lm_dir=dataset/landmark/ALL/ --bg_dir=dataset/mask/ALL/ --auxiliary_dir=auxiliary/auxiliary.ckpt --ckpt_dir=checkpoint --niter=300 --save_epoch_freq=25 --use_local --discriminator_local --no_flip --no_dropout  --pretrain --isTrain
   ```
 
   ```bash
-  用法：train.py [--dataroot DATAROOT] [--ckpt_dir CKPT_DIR]
+  用法：train.py [--dataroot DATAROOT] [--ckpt_dir CKPT_DIR][--device_target GPU]
                 [--auxiliary_dir AUXILIARY_DIR]
                 [--mindrecord_dir MINDRECORD_DIR] [--lm_dir LM_DIR]
                 [--bg_dir BG_DIR][--batch_size BATCH_SIZE]
@@ -277,21 +294,22 @@ auxiliary.ckpt文件获取：从 https://cg.cs.tsinghua.edu.cn/people/~Yongjin/A
                 [--run_distribute BOOLEAN] [--device_id DEVICE_ID]
 
   选项：
-    --dataroot                        图片数据路径
+    --dataroot                        图片数据路径
+    --device_target                   运行的处理器,根据需要进行修改
     --mindrecord_dir                  数据下沉的数据文件
-    --lm_dir                          脸部特征点路径
-    --bg_dir                          背景图片路径
-    --auxiliary_dir                   预训练模型的保存路径
-    --ckpt_dir                        训练模型的保存路径
+    --lm_dir                          脸部特征点路径
+    --bg_dir                          背景图片路径
+    --auxiliary_dir                   预训练模型的保存路径
+    --ckpt_dir                        训练模型的保存路径
     --batch_size                      批大小
     --device_id                       device_id
-    --use_local                       使用局部生成器
-    --discriminator_local             使用局部鉴别器
-    --niter                           训练的epoch数
-    --save_epoch_freq                 保存的频率
+    --use_local                       使用局部生成器
+    --discriminator_local             使用局部鉴别器
+    --niter                           训练的epoch数
+    --save_epoch_freq                 保存的频率
     --no_flip                         不翻转图像
-    --no_dropout                      不使用dropout
-    --isTrain                         训练
+    --no_dropout                      不使用dropout
+    --isTrain                         训练
     --run_distribute                  多卡并行训练
     --num_parallel_workers            并行工作数量
   ```
@@ -301,6 +319,12 @@ auxiliary.ckpt文件获取：从 https://cg.cs.tsinghua.edu.cn/people/~Yongjin/A
   训练结束后，您可在默认`./checkpoint/`脚本文件夹下找到检查点文件。
 
 ### 分布式训练
+
+- GPU处理器环境运行
+
+    ```bash
+    bash scripts/run_train_distribute_GPU.sh dataset/data/train dataset/landmark/ALL dataset/mask/ALL checkpoint auxiliary/pretrain_APDGAN.ckpt 300 25
+    ```
 
 - Ascend处理器环境运行
 
@@ -314,11 +338,12 @@ auxiliary.ckpt文件获取：从 https://cg.cs.tsinghua.edu.cn/people/~Yongjin/A
 
 ### 评估
 
-- 在Ascend处理器环境运行时评估dataset数据集
+- 评估dataset数据集
   运行评估脚本，对用户指定的测试数据集进行测试，测试数据集包括测试图片、测试图片的背景轮廓图片及测试图片的脸部特征点数据，最终会给每张测试图片生成对应的肖像画图片。在运行以下命令前，请检查各数据源的路径是否正确。
 
   ```bash
   python eval.py  --dataroot=test_dataset/data/test_single
+                  --device_target=GPU
                   --lm_dir=test_dataset/landmark/ALL
                   --bg_dir=test_dataset/mask/ALL
                   --results_dir=test_dataset/result
@@ -328,7 +353,7 @@ auxiliary.ckpt文件获取：从 https://cg.cs.tsinghua.edu.cn/people/~Yongjin/A
   或者，
 
   ```bash
-  bash scripts/run_eval.sh test_dataset/data/test_single test_dataset/landmark/ALL test_dataset/mask/ALL test_dataset/result checkpoint/netG_300.ckpt
+  bash scripts/run_eval.sh test_dataset/data/test_single test_dataset/landmark/ALL test_dataset/mask/ALL test_dataset/result checkpoint/netG_300.ckpt GPU
   ```
 
   上述python命令将在后台运行，您可以通过eval.log文件查看评估过程。测试数据生成的对应肖像画图片保存在指定的结果目录中，例如：上述指令指定的 test_dataset/result目录中。
@@ -372,35 +397,35 @@ auxiliary.ckpt文件获取：从 https://cg.cs.tsinghua.edu.cn/people/~Yongjin/A
 
 ### 训练性能
 
-| 参数                      | Ascend               |
-| --------------------------| ---------------------- |
-| 模型版本                  | APDrawingGAN           |
-| 资源                      | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 |
-| 上传日期                  | 2021-12-09      |
-| MindSpore版本             | 1.3.0              |
-| 数据集                    |          APDrawingDB     |
-| 训练参数                  | epoch=300, lr=0.0002, bata1=0.5             |
-| 优化器                    | Adam                                                    |
-| 损失函数                  | Distance transformer loss & L1 loss                                    |
-| 输出                      | 图片                                                         |
-| 损失                      |GANLoss,L1Loss,localLoss,DTLoss|
-| 速度                      | 单卡：357毫秒/步;  8卡：380毫秒/步                      |
-| 总时长                    | 单卡：750分钟;  8卡：120分钟                      |
-| 微调检查点                | 243.37MB (.ckpt文件)                             |
+| 参数                      | Ascend               |GPU               |
+| --------------------------| ---------------------- | ---------------------- |
+| 模型版本                  | APDrawingGAN           |APDrawingGAN           |
+| 资源                      | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 |GPU(Tesla V100-SXM2 32G)；CPU：3.0GHz 36cores ；RAM：0.5T|
+| 上传日期                  | 2021-12-09      |2022-03-07      |
+| MindSpore版本             | 1.3.0              |1.5.0              |
+| 数据集                    |          APDrawingDB     |APDrawingDB     |
+| 训练参数                  | epoch=300, lr=0.0002, bata1=0.5             |epoch=300, lr=0.0002, bata1=0.5             |
+| 优化器                    | Adam                                                    |Adam                   |
+| 损失函数                  | Distance transformer loss & L1 loss                                    |Distance transformer loss & L1 loss    |
+| 输出                      | 图片                                                         |图片  |
+| 损失                      |GANLoss,L1Loss,localLoss,DTLoss|GANLoss,L1Loss,localLoss,DTLoss|
+| 速度                      | 单卡：357毫秒/步;  8卡：380毫秒/步                      |单卡: 442毫秒/步;8卡：506毫秒/步|
+| 总时长                    | 单卡：750分钟;  8卡：120分钟                      |单卡：920分钟 ; 8卡：140分钟 |
+| 微调检查点                | 243.37MB (.ckpt文件)                             |273.43MB (.ckpt文件)|
 | 推理模型                  | 250.53M(.mindir) |
-| 脚本                      | [APDrawingGAN脚本](https://gitee.com/yang-mengYM/models/tree/APDrawingGAN/research/cv/APDrawingGAN) |
+| 脚本                      | [APDrawingGAN脚本](https://gitee.com/yang-mengYM/models_1/tree/master/research/cv/APDrawingGAN) |
 
 ### 评估性能
 
-| 参数          | Ascend                      |
-| ------------------- | --------------------------- |
-| 模型版本       | APDrawingGAN                |
-| 资源            |  Ascend 910；系统 Euler2.8                  |
-| 上传日期       | 2021-12-09 |
-| MindSpore 版本   | 1.3.0                       |
-| 数据集             | APDrawingDB |
-| batch_size          | 1                         |
-| 输出             | 图片      |
+| 参数          | Ascend                      |GPU       |
+| ------------------- | --------------------------- |--------------------------- |
+| 模型版本       | APDrawingGAN                |APDrawingGAN  |
+| 资源            |  Ascend 910；系统 Euler2.8                  |GPU(Tesla V100-SXM2 32G)；CPU：3.0GHz 36cores ；RAM：0.5T |
+| 上传日期       | 2021-12-09 |2022-03-07      |
+| MindSpore 版本   | 1.3.0                       |1.5.0|
+| 数据集             | APDrawingDB |APDrawingDB |
+| batch_size          | 1                         |1   |
+| 输出             | 图片      | 图片      |
 | 推理模型 | 250.53M(.mindir) |
 
 # 随机情况说明

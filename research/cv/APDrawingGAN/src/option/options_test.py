@@ -34,7 +34,7 @@ class TestOptions():
         self.parser.add_argument('--mindir_filename', type=str, default='infer_model')
         self.parser.add_argument('--config_path', type=str, default="config_eval_and_export.yaml")
         self.parser.add_argument('--device_id', type=int, default=0, help='device id')
-        self.parser.add_argument("--device_target", type=str, default="Ascend")
+        self.parser.add_argument("--device_target", type=str, default="Ascend", help="GPU or Ascned")
         self.parser.add_argument('--isExport', type=bool, default=False, help='modelarts')
 
         # ========================================modelarts=========================================================
