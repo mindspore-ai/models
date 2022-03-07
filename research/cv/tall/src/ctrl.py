@@ -17,7 +17,7 @@ import math
 
 import mindspore
 from mindspore import ops, nn
-from mindspore.common.initializer import HeUniform, Uniform, Zero, One, Constant
+from mindspore.common.initializer import HeUniform, Uniform
 
 
 class CTRL(nn.Cell):
@@ -33,29 +33,20 @@ class CTRL(nn.Cell):
         self.visual_dim = visual_dim
         self.sentence_embed_dim = sentence_embed_dim
 
-        self.zeros_init = Zero()
-        self.ones_init = One()
-        self.constant_init = Constant(value=2)
         self.v2s_fc = nn.Dense(visual_dim, semantic_dim, weight_init=self.weight_init,
                                bias_init=Uniform(scale=self.get_scale((semantic_dim, visual_dim))),
                                has_bias=True)
         self.s2s_fc = nn.Dense(sentence_embed_dim, semantic_dim, weight_init=self.weight_init,
                                bias_init=Uniform(scale=self.get_scale((semantic_dim, sentence_embed_dim))),
                                has_bias=True)
-        self.fc1 = nn.Conv2d(semantic_dim * 3, middle_layer_dim, kernel_size=1, stride=1,
-                             pad_mode='valid', weight_init=self.weight_init,
-                             bias_init=Uniform(scale=self.get_scale((middle_layer_dim, semantic_dim * 3, 1, 1))),
-                             has_bias=True)
-        self.fc2 = nn.Conv2d(middle_layer_dim, 3, kernel_size=1, stride=1, pad_mode='valid',
-                             weight_init=self.weight_init,
-                             bias_init=Uniform(scale=self.get_scale((3, middle_layer_dim, 1, 1))),
-                             has_bias=True)
+        self.fc1 = nn.Dense(semantic_dim * 3, semantic_dim)
+        self.fc2 = nn.Dense(semantic_dim, 3)
         self.fc_concat = nn.Dense(semantic_dim * 2, semantic_dim, weight_init=self.weight_init,
                                   bias_init=Uniform(scale=self.get_scale((semantic_dim, semantic_dim * 2))),
                                   has_bias=True)
 
-        self.norm = nn.Norm(axis=1, keep_dims=True)
-        self.bn = nn.BatchNorm1d(num_features=semantic_dim, use_batch_statistics=True)
+        self.bn1 = nn.BatchNorm1d(num_features=semantic_dim)
+        self.bn2 = nn.BatchNorm1d(num_features=semantic_dim)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(keep_prob=dropout_rate)
 
@@ -64,8 +55,6 @@ class CTRL(nn.Cell):
         self.concat = ops.Concat(axis=2)
         self.expand_dims = ops.ExpandDims()
         self.transpose = ops.Transpose()
-        self.squeeze = ops.Squeeze(0)
-        self.is_infer = False
 
     def get_scale(self, shape):
         '''Get uniform distribution initialization parameter scale'''
@@ -123,9 +112,10 @@ class CTRL(nn.Cell):
         batch_size, _ = visual_feature.shape
         transformed_clip = self.v2s_fc(visual_feature)
         transformed_sentence = self.s2s_fc(sentence_embed)
-
-        transformed_clip = self.bn(transformed_clip)
-        transformed_sentence = self.bn(transformed_sentence)
+        #print("transformed_sentence")
+        #print(transformed_sentence)
+        transformed_clip = self.bn1(transformed_clip)
+        transformed_sentence = self.bn2(transformed_sentence)
 
         multiples = (batch_size, 1)
         vv_f = self.tile(transformed_clip, multiples)
@@ -138,17 +128,12 @@ class CTRL(nn.Cell):
         cat_feature = self.concat((vv_f, ss_f))
         cat_feature = self.fc_concat(cat_feature)
         cross_modal_vec = self.concat((mul_feature, add_feature, cat_feature))
-
         cross_modal_vec = self.expand_dims(cross_modal_vec, 0)
-        perm = (0, 3, 1, 2)
-        out = self.transpose(cross_modal_vec, perm)
-
+        out = self.reshape(cross_modal_vec, (batch_size*batch_size, 3*1024))
         out = self.fc1(out)
         out = self.relu(out)
         out = self.fc2(out)
-        perm = (0, 2, 3, 1)
-        out = self.transpose(out, perm)
-        out = self.squeeze(out)
+        out = self.reshape(out, (batch_size, batch_size, 3))
 
         return out
 

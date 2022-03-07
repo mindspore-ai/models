@@ -1,43 +1,32 @@
 # Contents
 
 - [TALL](#tall)
-
 - [Dataset](#dataset)
-
 - [Environmental Requirements](#environmental-requirements)
-
 - [Quick Start](#quick-start)
-
 - [Script Description](#script-description)
     - [Script and Sample Code](#script-and-sample-code)
-
     - [Script Parameters](#script-parameters)
-
     - [Training Process](#training-process)
         - [Ascend Standalone training](#ascend-standalone-training)
 
         - [Ascend Distribute training](#ascend-distribute-training)
 
         - [Output](#output)
-
     - [Evaluation Process](#evaluation-process)
         - [Run](#Run)
 
         - [Output](#Output)
-
     - [Inference Process](#inference-process)
-    - [Export MindIR](#export-mindIR)
-
+    - [Export MindIR/AIR](#export-mindIR/AIR)
     - [Inference on Ascend310](#inference-on-ascend310)
-
+    - [Inference with SDK](#Inference-with-SDK)
 - [Model Description](#model-description)
 - [Performance](#performance)
      - [Training performance](#training-performance)
 
      - [Inference performance](#inference-performance)
-
 - [Description of Random Situation](#description-of-random-situation)
-
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 ## [TALL](#contents)
@@ -256,8 +245,6 @@ epoch: 2 step: 422, loss is 0.26855457
 epoch time: 76715.097 ms, per step time: 181.789 ms
 [...]
 Done.
-Save CTRL Model...
-Done.
 End.
 ```
 
@@ -273,7 +260,7 @@ bash scripts/run_eval.sh [CHECKPOINT_PATH] [EVAL_DATA_DIR] [DEVICE_ID]
 
 This script requires three parameters.
 
-- `CHECKPOINT_PATH`：The absolute path of the checkpoint file. The checkpoint file during training is saved by default in`./logs/datetime/latest.ckpt`
+- `CHECKPOINT_PATH`：The absolute path of the checkpoint file. The checkpoint file during training is saved by default in`./logs/datetime/best.ckpt`
 - `EVAL_DATA_DIR`：The dataset path, which is [data_path] above.
 - `DEVICE_ID`：Device id of Ascend.
 
@@ -285,7 +272,7 @@ Done.
 Get Dataset...
 Done.
 Get Model...
-loading /home/yuanyibo/mindspore/model_zoo/research/nlp/tall/logs/08-17_21-21/latest.ckpt...
+loading /home/yuanyibo/mindspore/model_zoo/research/nlp/tall/logs/08-17_21-21/best.ckpt...
 Done.
 Start eval...
 Test movie: s27-d50.avi....loading movie data
@@ -300,7 +287,7 @@ Test movie: s30-d41.avi....loading movie data
 
 ### [Inference Process](#contents)
 
-#### [Export MindIR](#contents)
+#### [Export MindIR/AIR](#contents)
 
 You can use the export.py script to export the model
 
@@ -323,6 +310,46 @@ This script requires three parameters.
 - `CHECKPOINT_PATH`：The absolute path of the mindir file.
 - `EVAL_DATA_DIR`：The dataset path, which is [data_path] above.
 - `DEVICE_ID`：Device id of Ascend310.
+
+#### [Inference with SDK](#contents)
+
+1.Convert the AIR model to the OM model ：execute the script air2om.sh to convert the OM.
+
+```bash
+bash infer/convert/air2om.sh [AIR_PATH] [OUTPUT_MODEL_NAME]
+```
+
+This script requires two parameters.
+
+- `AIR_PATH`：The absolute path of the air file.
+
+- `OUTPUT_MODEL_NAME`：The name of om file.
+
+2.Then write the absolute path of the om model to the corresponding location of sdk/config/tall.pipeline. In the following example, the location of the om model is [OM_PATH]
+
+```json
+"mxpi_tensorinfer0": {
+                "props": {
+                    "dataSource": "appsrc0",
+                    "modelPath": "[OM_PATH]",
+                    "waitingTime": "30000",
+                    "singleBatchInfer": "1"
+                },
+                "factory": "mxpi_tensorinfer",
+                "next": "appsink0"
+}
+```
+
+3.Run the run_sdk_infer.sh to inference on ascend310.
+
+```bash
+cd scripts
+bash run_sdk_infer.sh [EVAL_DATA_DIR]
+```
+
+This script requires one parameters.
+
+- `EVAL_DATA_DIR`：The dataset path, which is [data_path] above.
 
 ## [Model Description](#contents)
 
@@ -356,4 +383,3 @@ config.py can set a random seed to avoid randomness in the training process.
 ## [ModelZoo Homepage](#contents)
 
 Please visit the official website [homepage](https://gitee.com/mindspore/models).
-
