@@ -43,7 +43,7 @@ YOLOv3整体网络架构如下：
 
 # 数据集
 
-使用的数据集：[COCO 2017](<http://images.cocodataset.org/>)
+使用的数据集：[COCO 2017](<http://images.cocodataset.org/>)，标注使用未公开的人脸/人体标注数据，暂时不提供公开复现，仅提供预训练[checkpoint](https://download.mindspore.cn/model_zoo/r1.2/yolov3resnet18_ascend_v120_coco2017_official_cv_bs32_acc86/yolov3resnet18_ascend_v120_coco2017_official_cv_bs32_acc86.ckpt).
 
 - 数据集大小：19 GB
     - 训练集：18 GB，118000张图片  
