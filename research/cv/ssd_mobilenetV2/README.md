@@ -13,8 +13,10 @@
         - [Script Parameters](#script-parameters)
         - [Training Process](#training-process)
             - [Training on Ascend](#training-on-ascend)
+            - [Training on GPU](#training-on-gpu)
         - [Evaluation Process](#evaluation-process)
             - [Evaluation on Ascend](#evaluation-on-ascend)
+            - [Evaluation on GPU](#evaluation-on-gpu)
         - [Inference Process](#inference-process)
             - [Export MindIR](#export-mindir)
             - [Infer on Ascend](#infer-on-ascend)
@@ -132,6 +134,18 @@ bash scripts/run_eval.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
 
 # run inference on Ascend 310
 bash scripts/run_infer_310.sh [CHECKPOINT_PATH](MINDIR) [DATASET PATH] [ANNOTATIONS PATH] [DEVICE ID](OPTION)
+
+```
+
+- running on GPU
+
+```shell
+# distributed training on GPU
+bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [EPOCH_SIZE] [DATASET]  [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
+
+# run eval on GPU
+bash scripts/run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
+
 ```
 
 ## [Script Description](#contents)
@@ -141,12 +155,15 @@ bash scripts/run_infer_310.sh [CHECKPOINT_PATH](MINDIR) [DATASET PATH] [ANNOTATI
 ```shell
 .
 └─ cv
-  └─ ssd
+  └─ ssd_mobilenetV2
     ├─ README.md                      # descriptions about SSD
     ├─ scripts
+      ├─ run_distribute_train_gpu.sh      # shell script for distributed on gpu
       ├─ run_distribute_train.sh      # shell script for distributed on ascend
+      ├─ run_standalone_train_gpu.sh              # shell script for 1p on gpu
       ├─ run_1p_train.sh              # shell script for 1p on ascend
       ├─ run_eval.sh                  # shell script for eval on ascend
+      ├─ run_eval_gpu.sh                  # shell script for eval on gpu
       └─ run_infer_310.sh             # shell script for inference on ascend 310
     ├─ src
       ├─ __init__.py                  # init file
@@ -267,6 +284,72 @@ epoch: 2 step: 3664, loss is 2.1719098
 epoch time: 227088.618 ms, per step time: 61.978 ms
 ```
 
+#### Training on GPU
+
+- Distribute mode
+
+```shell
+    bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [EPOCH_SIZE] [DATASET] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
+    For example:
+    bash scripts/run_distribute_train_gpu.sh 4 500 coco
+
+```
+
+We need five or seven parameters for this scripts.
+
+- `DEVICE_NUM`: the device number for distributed train.
+- `EPOCH_NUM`: epoch num for distributed train.
+- `DATASET`：the dataset mode for distributed train.
+- `PRE_TRAINED :` the path of pretrained checkpoint file, it is better to use absolute path.
+- `PRE_TRAINED_EPOCH_SIZE :` the epoch num of pretrained.
+
+Training result will be stored in the current path, whose folder name begins with "LOG".  Under this, you can find checkpoint file together with result like the followings in log
+
+```shell
+epoch: 1 step: 916, loss is 2.1025786
+epoch: 1 step: 916, loss is 2.0669649
+epoch: 1 step: 916, loss is 2.1528106
+epoch: 1 step: 916, loss is 2.1548476
+epoch time: 359532.836 ms, per step time: 392.503 ms
+epoch time: 359540.271 ms, per step time: 392.511 ms
+epoch time: 359568.856 ms, per step time: 392.542 ms
+epoch time: 359726.085 ms, per step time: 392.714 ms
+...
+
+epoch: 500 step: 916, loss is 0.7354241
+epoch: 500 step: 916, loss is 0.77139974
+epoch: 500 step: 916, loss is 0.8008499
+epoch: 500 step: 916, loss is 0.8703647
+epoch time: 249946.352 ms, per step time: 272.867 ms
+epoch time: 249974.931 ms, per step time: 272.898 ms
+epoch time: 249994.302 ms, per step time: 272.920 ms
+epoch time: 250000.210 ms, per step time: 272.926 ms
+```
+
+- single mode
+
+```shell
+    bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [EPOCH_SIZE] [DATASET] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
+    For example:
+    bash scripts/run_standalone_train_gpu.sh 0 500 coco
+```
+
+We need five or seven parameters for this scripts.
+
+- `DEVICE_ID`: the device ID for train.
+- `EPOCH_NUM`: epoch num for distributed train.
+- `DATASET`：the dataset mode for distributed train.
+- `PRE_TRAINED :` the path of pretrained checkpoint file, it is better to use absolute path.
+- `PRE_TRAINED_EPOCH_SIZE :` the epoch num of pretrained.
+
+Training result will be stored in the current path, whose folder name begins with "LOG".  Under this, you can find checkpoint file together with result like the followings in log
+
+```shell
+epoch: 1 step: 3664, loss is 2.2511892
+epoch time: 560109.006 ms, per step time: 152.868 ms
+
+```
+
 ### [Evaluation Process](#contents)
 
 #### Evaluation on Ascend
@@ -302,6 +385,43 @@ Inference result will be stored in the example path, whose folder name begins wi
 ========================================
 
 mAP: 0.2527925497483538
+```
+
+#### Evaluation on GPU
+
+```shell
+bash scripts/run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
+For example:
+bash scripts/run_eval_gpu.sh coco path/to/checkpoint.pth 0
+```
+
+We need two parameters for this scripts.
+
+- `DATASET`：the dataset mode of evaluation dataset.
+- `CHECKPOINT_PATH`: the absolute path for checkpoint file.
+- `DEVICE_ID`: the device id for eval.
+
+> checkpoint can be produced in training process.
+
+Inference result will be stored in the example path, whose folder name begins with "eval". Under this, you can find result like the followings in log.
+
+```shell
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.258
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.424
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.264
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.045
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.229
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.462
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.266
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.413
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.446
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.136
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.468
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.715
+
+========================================
+
+mAP: 0.25840622348226616
 ```
 
 ### Inference Process
@@ -355,32 +475,32 @@ mAP:0.2522562031397977
 
 #### Evaluation Performance
 
-| Parameters          | Ascend  |  
-| ------------------- | ------------------- |
-| Model Version       | SSD mobielnetV2  |
-| Resource            | Ascend 910 ；CPU 2.60GHz，192cores；Memory，755G|
-| uploaded Date       | 03/12/2021 (month/day/year)                    |
-| MindSpore Version   | 1.1.1                                          |
-| Dataset             | COCO2017                                      |
-| Training Parameters | epoch = 500,  batch_size = 32                  |
-| Optimizer           | Momentum |
-| Loss Function       | Sigmoid Cross Entropy,SmoothL1Loss   |
-| Speed               | 8pcs: 80ms/step  |
-| Total time          | 8pcs: 4.67hours      |
+| Parameters          | Ascend  | GPU  |  
+| ------------------- | ------------------- | ------------------- |
+| Model Version       | SSD mobielnetV2  | SSD mobielnetV2  |
+| Resource            | Ascend 910 ；CPU 2.60GHz，192cores；Memory，755G| GeForce RTX 3090 ；CPU 2.90GHz，16cores；Memory，252G|
+| uploaded Date       | 03/12/2021 (month/day/year)                    | 26/1/2022 (month/day/year)                 |
+| MindSpore Version   | 1.1.1                                          | 1.5.0                                        |
+| Dataset             | COCO2017          | COCO2017          |
+| Training Parameters | epoch = 500,  batch_size = 32  | epoch = 500,  batch_size = 32  |
+| Optimizer           | Momentum | Momentum |
+| Loss Function       | Sigmoid Cross Entropy,SmoothL1Loss   | Sigmoid Cross Entropy,SmoothL1Loss   |
+| Speed               | 8pcs: 80ms/step  |4pcs: 332ms/step  |
+| Total time          | 8pcs: 4.67hours      | 4pcs: 21.9 hours      |
 | Scripts             | <https://gitee.com/mindspore/models/tree/master/research/cv/ssd_mobilenetV2> |
 
 #### Inference Performance
 
-| Parameters          | Ascend                      |
-| ------------------- | --------------------------- |
-| Model Version       | SSD mobilenetV2             |
-| Resource            | Ascend 910                  |
-| Uploaded Date       | 03/12/2021 (month/day/year) |
-| MindSpore Version   | 1.1.1                       |
-| Dataset             | COCO2017                    |
-| batch_size          | 1                           |
-| outputs             | mAP                         |
-| Accuracy            | IoU=0.50: 25.28%            |
+| Parameters          | Ascend                      | GPU                      |
+| ------------------- | --------------------------- | --------------------------- |
+| Model Version       | SSD mobilenetV2             | SSD mobilenetV2             |
+| Resource            | Ascend 910                  | GeForce RTX 3090            |
+| Uploaded Date       | 03/12/2021 (month/day/year) | 26/1/2022 (month/day/year) |
+| MindSpore Version   | 1.1.1                       | 1.5.0                       |
+| Dataset             | COCO2017                    | COCO2017 |
+| batch_size          | 1                           | 1 |
+| outputs             | mAP                         | mAP |
+| Accuracy            | IoU=0.50: 25.28%            | IoU=0.50: 25.8%            |
 
 ## [Description of Random Situation](#contents)
 

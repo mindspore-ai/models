@@ -18,7 +18,6 @@
 import os
 import argparse
 import ast
-import mindspore.common.dtype as mstype
 import mindspore.nn as nn
 from mindspore import context, Tensor
 from mindspore.communication.management import init, get_rank
@@ -26,7 +25,7 @@ from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, LossMoni
 from mindspore.train import Model
 from mindspore.context import ParallelMode
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.common import set_seed
+from mindspore.common import set_seed, dtype
 from src.ssd import SSD320, SSDWithLossCell, TrainingWrapper, ssd_mobilenet_v2
 from src.config import config
 from src.dataset import create_ssd_dataset, create_mindrecord
@@ -38,14 +37,17 @@ set_seed(1)
 def get_args():
     """get arguments"""
     parser = argparse.ArgumentParser(description="SSD training")
-    parser.add_argument("--run_platform", type=str, default="Ascend", choices=("Ascend"),
+    parser.add_argument("--run_platform", type=str, default="Ascend", choices=("Ascend", "GPU"),
                         help="run platform.")
     parser.add_argument("--only_create_dataset", type=ast.literal_eval, default=False,
                         help="If set it true, only create Mindrecord, default is False.")
     parser.add_argument("--distribute", type=ast.literal_eval, default=False,
                         help="Run distribute, default is False.")
+    parser.add_argument("--use_float16", type=ast.literal_eval, default=True,
+                        help="use float16 or not, default is False", choices=(True, False))
     parser.add_argument("--device_id", type=int, default=0, help="Device id, default is 0.")
     parser.add_argument("--device_num", type=int, default=1, help="Use device nums, default is 1.")
+    parser.add_argument("--num_workers", type=int, default=64, help="num_workers, default is 64.")
     parser.add_argument("--lr", type=float, default=0.05, help="Learning rate, default is 0.05.")
     parser.add_argument("--mode", type=str, default="sink", help="Run sink mode or not, default is sink.")
     parser.add_argument("--dataset", type=str, default="coco", help="Dataset, default is coco.")
@@ -118,16 +120,17 @@ def main():
 
     # When create MindDataset, using the fitst mindrecord file, such as ssd.mindrecord0.
     dataset = create_ssd_dataset(mindrecord_file, repeat_num=1, batch_size=args_opt.batch_size,
-                                 device_num=device_num, rank=rank)
+                                 device_num=device_num, rank=rank, num_parallel_workers=args_opt.num_workers)
 
     dataset_size = dataset.get_dataset_size()
     print("Create dataset done!")
 
     backbone = ssd_mobilenet_v2()
-    ssd = SSD320(backbone=backbone, config=config)
-    net = SSDWithLossCell(ssd, config)
-    net.to_float(mstype.float16)
 
+    ssd = SSD320(backbone=backbone, config=config)
+    if (hasattr(args_opt, 'use_float16') and args_opt.use_float16):
+        ssd.to_float(dtype.float16)
+    net = SSDWithLossCell(ssd, config)
     init_net_param(net)
 
     # checkpoint

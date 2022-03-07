@@ -76,8 +76,8 @@ def get_eval_args():
     parser.add_argument("--device_id", type=int, default=0, help="Device id, default is 0.")
     parser.add_argument("--dataset", type=str, default="coco", help="Dataset, default is coco.")
     parser.add_argument("--checkpoint_path", type=str, required=True, help="Checkpoint file path.")
-    parser.add_argument("--run_platform", type=str, default="Ascend", choices=("Ascend"),
-                        help="run platform, support Ascend.")
+    parser.add_argument("--run_platform", type=str, default="Ascend", choices=("Ascend", "GPU"),
+                        help="run platform, support Ascend, GPU.")
     parser.add_argument('--modelarts_mode', type=ast.literal_eval, default=False,
                         help='train on modelarts or not, default is False')
     parser.add_argument('--data_url', type=str, default=None, help='Dataset path')
