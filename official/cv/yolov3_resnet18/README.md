@@ -41,7 +41,7 @@ And we use ResNet18 as the backbone of YOLOv3_ResNet18. The architecture of ResN
 
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 
-Dataset used: [COCO2017](<http://images.cocodataset.org/>)
+Dataset used: [COCO2017](<http://images.cocodataset.org/>), labeling uses unpublished face, human body labeling data, temporarily does not provide public reproduction, only provides pre-training [checkpoint](https://download.mindspore.cn/model_zoo/r1.2/yolov3resnet18_ascend_v120_coco2017_official_cv_bs32_acc86/yolov3resnet18_ascend_v120_coco2017_official_cv_bs32_acc86.ckpt).
 
 - Dataset size：19G
     - Train：18G，118000 images  
