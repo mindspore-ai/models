@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,11 +16,10 @@
 ##############test textcnn example on movie review#################
 python eval.py
 """
+import mindspore as ms
 import mindspore.nn as nn
 from mindspore.nn.metrics import Accuracy
-from mindspore import context
 from mindspore.train.model import Model
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 from model_utils.moxing_adapter import moxing_wrapper
 from model_utils.device_adapter import get_device_id
@@ -38,9 +37,9 @@ def eval_net():
     elif config.dataset == 'SST2':
         instance = SST2(root_dir=config.data_path, maxlen=config.word_len, split=0.9)
     device_target = config.device_target
-    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target)
     if device_target == "Ascend":
-        context.set_context(device_id=get_device_id())
+        ms.set_context(device_id=get_device_id())
     dataset = instance.create_test_dataset(batch_size=config.batch_size)
     loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True)
     net = TextCNN(vocab_len=instance.get_dict_len(), word_len=config.word_len,
@@ -48,10 +47,10 @@ def eval_net():
     opt = nn.Adam(filter(lambda x: x.requires_grad, net.get_parameters()), learning_rate=0.001,
                   weight_decay=float(config.weight_decay))
 
-    param_dict = load_checkpoint(config.checkpoint_file_path)
+    param_dict = ms.load_checkpoint(config.checkpoint_file_path)
     print("load checkpoint from [{}].".format(config.checkpoint_file_path))
 
-    load_param_into_net(net, param_dict)
+    ms.load_param_into_net(net, param_dict)
     net.set_train(False)
     model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc': Accuracy()})
 

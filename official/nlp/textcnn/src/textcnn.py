@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
 # ============================================================================
 """TextCNN"""
 
+import mindspore.ops as ops
 import mindspore.nn as nn
-import mindspore.ops.operations as P
 from mindspore import Tensor
 from mindspore.nn.cell import Cell
-import mindspore.ops.functional as F
 import mindspore
 
 
@@ -54,21 +53,21 @@ class SoftmaxCrossEntropyExpand(Cell):
     """
     def __init__(self, sparse=False):
         super(SoftmaxCrossEntropyExpand, self).__init__()
-        self.exp = P.Exp()
-        self.reduce_sum = P.ReduceSum(keep_dims=True)
-        self.onehot = P.OneHot()
+        self.exp = ops.Exp()
+        self.reduce_sum = ops.ReduceSum(keep_dims=True)
+        self.onehot = ops.OneHot()
         self.on_value = Tensor(1.0, mindspore.float32)
         self.off_value = Tensor(0.0, mindspore.float32)
-        self.div = P.Div()
-        self.log = P.Log()
-        self.sum_cross_entropy = P.ReduceSum(keep_dims=False)
-        self.mul = P.Mul()
-        self.mul2 = P.Mul()
-        self.cast = P.Cast()
-        self.reduce_mean = P.ReduceMean(keep_dims=False)
+        self.div = ops.Div()
+        self.log = ops.Log()
+        self.sum_cross_entropy = ops.ReduceSum(keep_dims=False)
+        self.mul = ops.Mul()
+        self.mul2 = ops.Mul()
+        self.cast = ops.Cast()
+        self.reduce_mean = ops.ReduceMean(keep_dims=False)
         self.sparse = sparse
-        self.reduce_max = P.ReduceMax(keep_dims=True)
-        self.sub = P.Sub()
+        self.reduce_max = ops.ReduceMax(keep_dims=True)
+        self.sub = ops.Sub()
 
     def construct(self, logit, label):
         """
@@ -79,11 +78,11 @@ class SoftmaxCrossEntropyExpand(Cell):
         exp_sum = self.reduce_sum(exp, -1)
         softmax_result = self.div(exp, exp_sum)
         if self.sparse:
-            label = self.onehot(label, F.shape(logit)[1], self.on_value, self.off_value)
+            label = self.onehot(label, ops.shape(logit)[1], self.on_value, self.off_value)
 
         softmax_result_log = self.log(softmax_result)
         loss = self.sum_cross_entropy((self.mul(softmax_result_log, label)), -1)
-        loss = self.mul2(F.scalar_to_array(-1.0), loss)
+        loss = self.mul2(ops.scalar_to_array(-1.0), loss)
         loss = self.reduce_mean(loss, -1)
 
         return loss
@@ -103,19 +102,19 @@ class TextCNN(nn.Cell):
         self.word_len = word_len
         self.num_classes = num_classes
 
-        self.unsqueeze = P.ExpandDims()
+        self.unsqueeze = ops.ExpandDims()
         self.embedding = nn.Embedding(vocab_len, self.vec_length, embedding_table=embedding_table)
 
-        self.slice = P.Slice()
+        self.slice = ops.Slice()
         self.layer1 = self.make_layer(kernel_height=3)
         self.layer2 = self.make_layer(kernel_height=4)
         self.layer3 = self.make_layer(kernel_height=5)
 
-        self.concat = P.Concat(1)
+        self.concat = ops.Concat(1)
 
         self.fc = nn.Dense(96*3, self.num_classes)
         self.drop = nn.Dropout(keep_prob=0.5)
-        self.reducemax = P.ReduceMax(keep_dims=False)
+        self.reducemax = ops.ReduceMax(keep_dims=False)
 
     def make_layer(self, kernel_height):
         return nn.SequentialCell(
