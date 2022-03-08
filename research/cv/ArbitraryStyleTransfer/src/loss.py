@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,20 +24,20 @@ import src.vgg16 as vgg16
 from src.inceptionv3 import inceptionv3
 
 
-
 def calc_content_loss(input_x, target):
     """content loss"""
     mse_loss = nn.MSELoss(reduction='mean')
     return mse_loss(input_x, target)
 
 
-def calc_style_loss(input_x, target):
+def calc_style_loss(platform, input_x, target):
     """style loss"""
     mse_loss = nn.MSELoss(reduction='mean')
     op_matmul = ops.BatchMatMul(transpose_b=True)
     b, c, h, w = input_x.shape  # channel height width
-    input_x = input_x.astype(mstype.float16)
-    target = target.astype(mstype.float16)
+    if platform == 'Ascend':
+        input_x = input_x.astype(mstype.float16)
+        target = target.astype(mstype.float16)
     input_x = input_x.reshape(b, c, h * w)
     target = target.reshape(b, c, h * w)
     # Compute gram matrix
@@ -51,6 +51,7 @@ class StyleTransferLoss(nn.Cell):
     """Loss for Style Transfer Model"""
 
     def __init__(self, args, transfer_net, ckpt_path):
+        self.platform = args.platform
         super(StyleTransferLoss, self).__init__()
         self.content_layers = str.split(args.content_layers, ',')
         self.content_each_weight = [float(i) for i in str.split(args.content_each_weight, ',')]
@@ -98,7 +99,7 @@ class StyleTransferLoss(nn.Cell):
         for index, item in enumerate(self.content_layers):
             content_loss += self.content_each_weight[index] * calc_content_loss(sty_feat[item], c_feat[item])
         for index, item in enumerate(self.style_layers):
-            style_loss += self.style_each_weight[index] * calc_style_loss(sty_feat[item], s_feat[item])
+            style_loss += self.style_each_weight[index] * calc_style_loss(self.platform, sty_feat[item], s_feat[item])
 
         all_loss = content_loss + self.style_weight * style_loss
         return all_loss

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ from mindspore.common import initializer as init
 #########################################################################
 class InstanceNorm2d(nn.Cell):
     """myown InstanceNorm2d"""
+
     def __init__(self,
                  num_features,
                  eps=1e-5,
@@ -42,7 +43,6 @@ class InstanceNorm2d(nn.Cell):
         self.gamma = Parameter(init.initializer(gamma_init, num_features), name="gamma", requires_grad=affine)
         self.beta = Parameter(init.initializer(beta_init, num_features), name="beta", requires_grad=affine)
 
-
     def construct(self, x):
         """calculate InstanceNorm output"""
         mean = ops.ReduceMean(keep_dims=True)(x, (2, 3))
@@ -50,6 +50,7 @@ class InstanceNorm2d(nn.Cell):
         std = (var + self.eps) ** 0.5
         x = (x - mean) / std * self.gamma.reshape(1, -1, 1, 1) + self.beta.reshape(1, -1, 1, 1)
         return x
+
 
 class style_prediction_network(nn.Cell):
     """
@@ -61,9 +62,12 @@ class style_prediction_network(nn.Cell):
         Tensor, output tensor.
     """
 
-    def __init__(self, style_dim=100):
+    def __init__(self, args, style_dim=100):
         super(style_prediction_network, self).__init__()
-        self.fc = nn.Dense(768, style_dim).to_float(mstype.float16)
+        if args.platform == 'GPU':
+            self.fc = nn.Dense(768, style_dim)
+        elif args.platform == 'Ascend':
+            self.fc = nn.Dense(768, style_dim).to_float(mstype.float16)
         self.flatten = nn.Flatten()
 
     def construct(self, style_feat):
@@ -84,32 +88,32 @@ class style_transfer_network(nn.Cell):
             Tensor, the stylied image.
     """
 
-    def __init__(self, style_dim=100):
+    def __init__(self, args, style_dim=100):
         super(style_transfer_network, self).__init__()
         self.conv1 = ConvInRelu(3, 32, 9, stride=1)
         self.conv2 = ConvInRelu(32, 64, 3, stride=2)
         self.conv3 = ConvInRelu(64, 128, 3, stride=2)
-        self.res1 = ResidualBlockWithStyle(128, style_dim=style_dim)
-        self.res2 = ResidualBlockWithStyle(128, style_dim=style_dim)
-        self.res3 = ResidualBlockWithStyle(128, style_dim=style_dim)
-        self.res4 = ResidualBlockWithStyle(128, style_dim=style_dim)
-        self.res5 = ResidualBlockWithStyle(128, style_dim=style_dim)
-        self.upconv1 = UpsampleConvInReluWithStyle(128, 64, 3, stride=1, upsample=2, style_dim=style_dim)
-        self.upconv2 = UpsampleConvInReluWithStyle(64, 32, 3, stride=1, upsample=2, style_dim=style_dim)
-        self.upconv3 = UpsampleConvInReluWithStyle(32, 3, 9, stride=1, upsample=None, style_dim=style_dim,
+        self.res1 = ResidualBlockWithStyle(args, 128, style_dim=style_dim)
+        self.res2 = ResidualBlockWithStyle(args, 128, style_dim=style_dim)
+        self.res3 = ResidualBlockWithStyle(args, 128, style_dim=style_dim)
+        self.res4 = ResidualBlockWithStyle(args, 128, style_dim=style_dim)
+        self.res5 = ResidualBlockWithStyle(args, 128, style_dim=style_dim)
+        self.upconv1 = UpsampleConvInReluWithStyle(args, 128, 64, 3, stride=1, upsample=2, style_dim=style_dim)
+        self.upconv2 = UpsampleConvInReluWithStyle(args, 64, 32, 3, stride=1, upsample=2, style_dim=style_dim)
+        self.upconv3 = UpsampleConvInReluWithStyle(args, 32, 3, 9, stride=1, upsample=None, style_dim=style_dim,
                                                    activation=None)
 
         self.tanh = nn.Tanh()  # The original paper used the sigmoid function
 
-        self.res1 = self.res1.to_float(mstype.float16)
-        self.res2 = self.res2.to_float(mstype.float16)
-        self.res3 = self.res3.to_float(mstype.float16)
-        self.res4 = self.res4.to_float(mstype.float16)
-        self.res5 = self.res5.to_float(mstype.float16)
-        self.upconv1 = self.upconv1.to_float(mstype.float16)
-        self.upconv2 = self.upconv2.to_float(mstype.float16)
-        self.upconv3 = self.upconv3.to_float(mstype.float16)
-
+        if args.platform == 'Ascend':
+            self.res1 = self.res1.to_float(mstype.float16)
+            self.res2 = self.res2.to_float(mstype.float16)
+            self.res3 = self.res3.to_float(mstype.float16)
+            self.res4 = self.res4.to_float(mstype.float16)
+            self.res5 = self.res5.to_float(mstype.float16)
+            self.upconv1 = self.upconv1.to_float(mstype.float16)
+            self.upconv2 = self.upconv2.to_float(mstype.float16)
+            self.upconv3 = self.upconv3.to_float(mstype.float16)
 
     def construct(self, content, style_vector):
         """construct"""
@@ -173,7 +177,7 @@ class ResidualBlockWithStyle(nn.Cell):
             Tensor, output tensor.
         """
 
-    def __init__(self, channels, style_dim=100):
+    def __init__(self, args, channels, style_dim=100):
         super(ResidualBlockWithStyle, self).__init__()
         self.channels = channels
 
@@ -189,10 +193,14 @@ class ResidualBlockWithStyle(nn.Cell):
         self.pad = nn.Pad(paddings=paddings, mode=pad_mode)
 
         self.conv1 = nn.Conv2d(channels, channels, 3, stride=1, pad_mode='pad')
-        self.instancenorm1 = InstanceNorm2d(channels)
         self.relu1 = nn.ReLU()
         self.conv2 = nn.Conv2d(channels, channels, 3, stride=1, pad_mode='pad')
-        self.instancenorm2 = InstanceNorm2d(channels)
+        if args.platform == 'GPU':
+            self.instancenorm1 = nn.InstanceNorm2d(channels)
+            self.instancenorm2 = nn.InstanceNorm2d(channels)
+        elif args.platform == 'Ascend':
+            self.instancenorm1 = InstanceNorm2d(channels)
+            self.instancenorm2 = InstanceNorm2d(channels)
 
     def construct(self, x, style):
         """construct"""
@@ -244,18 +252,25 @@ class UpsampleConvInReluWithStyle(nn.Cell):
             Tensor, output tensor.
         """
 
-    def __init__(self, channels_in, channels_out, kernel_size, stride=1, upsample=2, style_dim=100, activation=nn.ReLU):
+    def __init__(self, args, channels_in, channels_out, kernel_size, stride=1, upsample=2, style_dim=100,
+                 activation=nn.ReLU):
         super(UpsampleConvInReluWithStyle, self).__init__()
         self.upsample = upsample
         if self.upsample:
-            self.upsample_layer = nn.ResizeBilinear().to_float(mstype.float16)
+            if args.platform == 'GPU':
+                self.upsample_layer = nn.ResizeBilinear()
+            elif args.platform == 'Ascend':
+                self.upsample_layer = nn.ResizeBilinear().to_float(mstype.float16)
 
-        pad_mode = "CONSTANT" #The original paper uses reflect, but the performance of reflect in mindspore r1.3 is too poor
+        pad_mode = "CONSTANT"  # The original paper uses reflect, but the performance of reflect in mindspore r1.3 is too poor
         padding = (kernel_size - 1) // 2
         paddings = ((0, 0), (0, 0), (padding, padding), (padding, padding))
         self.pad = nn.Pad(paddings=paddings, mode=pad_mode)
         self.conv = nn.Conv2d(channels_in, channels_out, kernel_size, stride, pad_mode='pad')
-        self.instancenorm = InstanceNorm2d(channels_out)
+        if args.platform == 'GPU':
+            self.instancenorm = nn.InstanceNorm2d(channels_out)
+        elif args.platform == 'Ascend':
+            self.instancenorm = InstanceNorm2d(channels_out)
         self.fc_beta = nn.Dense(style_dim, channels_out)
         self.fc_gamma = nn.Dense(style_dim, channels_out)
         if activation:

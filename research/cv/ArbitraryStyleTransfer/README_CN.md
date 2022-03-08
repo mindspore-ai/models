@@ -35,16 +35,27 @@
 为了训练风格迁移，使用了两个数据集:
 
 - 内容数据集: [MS COCO](http://images.cocodataset.org/zips/train2014.zip)（[ImageNet](http://images.cocodataset.org/zips/train2014.zip) 数据集是论文原始使用的数据集）
-
 - 风格数据集:  [Painter by Number dataset (PBN)](https://www.kaggle.com/c/painter-by-numbers) and [Describable Textures Dataset (DTD)](https://www.robots.ox.ac.uk/~vgg/data/dtd/).
   [PBN training](https://github.com/zo7/painter-by-numbers/releases/download/data-v1.0/train.tgz)
   [PBN testing](https://github.com/zo7/painter-by-numbers/releases/download/data-v1.0/test.tgz)
   [DTD dataset](https://www.robots.ox.ac.uk/~vgg/data/dtd/download/dtd-r1.0.1.tar.gz)
 
+训练数据集：
+
+- 内容数据集：[MS COCO](http://images.cocodataset.org/zips/train2014.zip)
+- 风格数据集：[PBN training](https://github.com/zo7/painter-by-numbers/releases/download/data-v1.0/train.tgz)和[DTD dataset](https://www.robots.ox.ac.uk/~vgg/data/dtd/download/dtd-r1.0.1.tar.gz),，将两个数据集的图片直接放到一个文件夹中
+
+测试数据集：
+
+- 内容数据集：任意的自己收集的图片或者从MS COCO中自己选一些图像
+- 风格数据集：任意的自己收集的风格化的图像或者[PBN testing](https://github.com/zo7/painter-by-numbers/releases/download/data-v1.0/test.tgz)
+
 # [预训练模型](#内容)
 
 Style Transfer Networks的训练过程需要预先训练的VGG16和Inception-v3
-[VGG16 pretrained model and Inception-v3 pretrained model](<https://download.mindspore.cn/model_zoo/>)
+[VGG16 pretrained model](https://download.mindspore.cn/model_zoo/r1.2/vgg16_ascend_v120_imagenet2012_official_cv_bs32_acc73/) 和 [Inception-v3 pretrained model](https://download.mindspore.cn/model_zoo/r1.2/inceptionv3_ascend_v120_imagenet2012_official_cv_bs128_acc78/)。
+
+将下载后的预训练模型重命名为inceptionv3.ckpt 和 vgg16.ckpt。
 
 下载完预训练模型后，请将其放在'../pretrained_model'文件夹中。
 
@@ -99,11 +110,13 @@ style transfer
 ### [训练脚本参数](#内容)
 
 ```shell
-# 分布式训练
-bash ./run_distribution_ascend.sh [RANK_TABLE_FILE] [PLATFORM] [CONTENT_PATH] [STYLE_PATH] [CKPT_PATH]
+# 分布式训练 Ascend
+bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PLATFORM] [CONTENT_PATH] [STYLE_PATH] [CKPT_PATH]
+# 分布式训练 GPU
+bash ./scripts/run_distribute_train_gpu.sh [CONTENT_PATH] [STYLE_PATH] [CKPT_PATH]
 
-# 单Ascend训练
-bash ./scripts/run_train.sh [PLATFORM] [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [CKPT_PATH]
+# 单Ascend/GPU训练
+bash ./scripts/run_standalone_train.sh [PLATFORM] [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [CKPT_PATH]
 ```
 
 ### [训练结果](#内容)
@@ -116,7 +129,7 @@ bash ./scripts/run_train.sh [PLATFORM] [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [
 
 ```bash
 # 评估
-bash ./scripts/run_eval.sh [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [INCEPTION_CKPT] [CKPT_PATH]
+bash ./scripts/run_eval.sh [PLATFORM] [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [INCEPTION_CKPT] [CKPT_PATH]
 ```
 
 ### [评估结果](#内容)
@@ -132,7 +145,7 @@ bash ./scripts/run_eval.sh [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [INCEPTION_CK
 | 参数             |                                                              |
 | ---------------- | ------------------------------------------------------------ |
 | 模型版本         | v1                                                           |
-| 环境             | Ascend              |
+| 环境             | Ascend / GPU(Tesla V100-PCIE 32G)；CPU：2.60GHz 52cores ；RAM：754G |
 | MindSpore 版本   | 1.3.0                                                        |
 | 数据集           | 内容数据集: MS COCO. 风格数据集: PBN training and DTD dataset |
 | 训练参数         | epoch=100,  batch_size = 16                                  |
@@ -140,21 +153,22 @@ bash ./scripts/run_eval.sh [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [INCEPTION_CK
 | 损失函数         | content loss and  style loss                                 |
 | 输出             | 风格迁移图片                                                 |
 | 精度             | 主观评价                                                     |
-| 性能             | 1 Ascend: 392ms/step; 8 Ascend: 303ms/step                               |
-| 总时间           | 1 Ascend: 56h20m21s; 8 Ascend: 6h15m40s                                   |
+| 性能             | 1 Ascend: 392ms/step; 8 Ascend: 303ms/step; 1 GPU: 560ms/step; 8 GPU：582ms/step |
+| 总时间           | 1 Ascend: 56h20m21s; 8 Ascend: 6h15m40s; 8 GPU:11h30m        |
 | 训练好的模型大小 | 71.27M (.ckpt file)                                          |
 | 脚本             |                                                              |
 
-### Evaluation Performance
+### 测试效果
 
-| 参数           | 单Ascend                                          |
-| -------------- | ------------------------------------------------ |
-| 模型版本       | v1                                               |
-| 环境           | Ascend                                            |
-| MindSpore 版本 | 1.3.0                                            |
-| 数据集         | 内容数据集: MS COCO. 风格数据集: PBN testing     |
-| batch_size     | 1                                                |
-| 输出           | 风格迁移图片                                     |
+| 参数           | 单Ascend / GPU                               |
+| -------------- | -------------------------------------------- |
+| 模型版本       | v1                                           |
+| 环境           | Ascend                                       |
+| MindSpore 版本 | 1.3.0                                        |
+| 数据集         | 内容数据集: MS COCO. 风格数据集: PBN testing |
+| batch_size     | 1                                            |
+| Speed          | GPU: 342ms/step;                             |
+| 输出           | 风格迁移图片                                 |
 
 # [样例](#内容)
 

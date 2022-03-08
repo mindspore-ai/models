@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 class BasicConv2d(nn.Cell):
     """BasicConv2d"""
+
     def __init__(self, in_channel, out_channel, kernel_size, stride=1, pad_mode='same', padding=0, has_bias=False):
         super(BasicConv2d, self).__init__()
         self.conv = nn.Conv2d(in_channel, out_channel, kernel_size=kernel_size, stride=stride,
@@ -37,6 +38,7 @@ class BasicConv2d(nn.Cell):
 
 class Inception_A(nn.Cell):
     """Inception_A"""
+
     def __init__(self, in_channels, pool_features, has_bias=False):
         super(Inception_A, self).__init__()
         self.concat = P.Concat(axis=1)
@@ -68,6 +70,7 @@ class Inception_A(nn.Cell):
 
 class Inception_B(nn.Cell):
     """Inception_B"""
+
     def __init__(self, in_channels, has_bias=False):
         super(Inception_B, self).__init__()
         self.concat = P.Concat(axis=1)
@@ -91,6 +94,7 @@ class Inception_B(nn.Cell):
 
 class Inception_C(nn.Cell):
     """Inception_C"""
+
     def __init__(self, in_channels, channels_7x7, has_bias=False):
         super(Inception_C, self).__init__()
         self.concat = P.Concat(axis=1)
@@ -124,6 +128,7 @@ class Inception_C(nn.Cell):
 
 class Inception_D(nn.Cell):
     """Inception_D"""
+
     def __init__(self, in_channels, has_bias=False):
         super(Inception_D, self).__init__()
         self.concat = P.Concat(axis=1)
@@ -150,6 +155,7 @@ class Inception_D(nn.Cell):
 
 class Inception_E(nn.Cell):
     """Inception_E"""
+
     def __init__(self, in_channels, has_bias=False):
         super(Inception_E, self).__init__()
         self.concat = P.Concat(axis=1)
@@ -182,6 +188,7 @@ class Inception_E(nn.Cell):
 
 class Logits(nn.Cell):
     """Logits"""
+
     def __init__(self, num_classes=10, dropout_keep_prob=0.8):
         super(Logits, self).__init__()
         self.avg_pool = nn.AvgPool2d(8, pad_mode='valid')
@@ -200,6 +207,7 @@ class Logits(nn.Cell):
 
 class AuxLogits(nn.Cell):
     """AuxLogits"""
+
     def __init__(self, in_channels, num_classes=10):
         super(AuxLogits, self).__init__()
         self.avg_pool = nn.AvgPool2d(5, stride=3, pad_mode='valid')
@@ -220,6 +228,7 @@ class AuxLogits(nn.Cell):
 
 class InceptionV3(nn.Cell):
     """InceptionV3"""
+
     def __init__(self, has_bias=False):
         super(InceptionV3, self).__init__()
         self.Conv2d_1a = BasicConv2d(3, 32, kernel_size=3, stride=2, pad_mode='valid', has_bias=has_bias)

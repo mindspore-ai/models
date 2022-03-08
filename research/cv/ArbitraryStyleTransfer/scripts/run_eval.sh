@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,37 +14,54 @@
 # limitations under the License.
 # ============================================================================
 
-
-if [ $# != 5 ]
+if [ $# != 6 ]
 then
     echo "=============================================================================================================="
     echo "Please run the script as: "
-    echo "bash ./scripts/run_eval.sh [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [INCEPTION_CKPT] [CKPT_PATH]"
-    echo "for example: bash scripts/run_eval.sh 0 /home/style_dataset/content_test/ /home/style_dataset/style_test/ /root/ArbitraryStyleTransfer3/pretrained_model/inceptionv3.ckpt /root/ArbitraryStyleTransfer_pr/train_parallel0/ckpt/style_transfer_model_0005.ckpt
+    echo "bash ./scripts/run_eval.sh [PLATFORM] [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [INCEPTION_CKPT] [CKPT_PATH]"
+    echo "for example: bash ./scripts/run_eval.sh GPU 0 ./dataset/test/content ./dataset/test/style ./pretrained_model/inceptionv3.ckpt ./ckpt/style_transfer_rank_00_model_0060.ckpt
 "
     echo "=============================================================================================================="
 exit 1
 fi
 
-export DEVICE_ID=$1
-export CONTENT_PATH=$2
-export STYLE_PATH=$3
-export INCEPTION_CKPT=$4
-export CKPT_PATH=$5
+export PLATFORM=$1
+export DEVICE_ID=$2
+export CONTENT_PATH=$3
+export STYLE_PATH=$4
+export INCEPTION_CKPT=$5
+export CKPT_PATH=$6
+
+if [ ! -d $3 ]
+then
+    echo "error: folder CONTENT_PATH=$3 does not exist"
+exit 1
+fi
+
+if [ ! -d $4 ]
+then
+    echo "error: folder STYLE_PATH=$4 does not exist"
+exit 1
+fi
+
+if [ ! -f $5 ]
+then
+    echo "error: file INCEPTION_CKPT=$5 does not exist"
+exit 1
+fi
+
+if [ ! -f $6 ]
+then
+    echo "error: file CKPT_PATH=$6 does not exist"
+exit 1
+fi
 
 
-get_real_path(){
-    if [ "${1:0:1}" == "/" ]; then
-        echo "$1"
-    else
-        echo "$(realpath -m $PWD/$1)"
-    fi
-}
-
-
-python eval.py \
+python -u eval.py \
+  --platform $PLATFORM \
   --device_id $DEVICE_ID \
   --content_path $CONTENT_PATH \
   --style_path $STYLE_PATH \
   --inception_ckpt $INCEPTION_CKPT \
   --ckpt_path $CKPT_PATH > eval_log 2>&1 &
+
