@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -88,10 +88,10 @@ def modelarts_pre_process():
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_export():
     '''run export.'''
-    context.set_context(mode=context.GRAPH_MODE, save_graphs=False, device_target="Ascend",
-                        reserve_class_name_in_scope=False)
-
     config = get_config(default_config)
+
+    context.set_context(mode=context.GRAPH_MODE, save_graphs=False, device_target=config.device_target,
+                        reserve_class_name_in_scope=False)
 
     tfm_model = GNMT(config=config,
                      is_training=False,
