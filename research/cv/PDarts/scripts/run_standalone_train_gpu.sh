@@ -16,12 +16,16 @@
 # an simple tutorial as follows, more parameters can be setting
 if [ $# != 2 ]
 then
-    echo "Usage: bash run_export.sh [CKPT_FILE_PATH] [FORMAT]"
+    echo "Usage: bash run_standalone_train_gpu.sh [CIFAR10_DATA_PATH] [OUTPUT_PATH]"
 exit 1
 fi
 
-CKPT_FILE_PATH=$1
-FORMAT=$2
+export RANK_SIZE=1
+BASEPATH=$(cd "`dirname $0`" || exit; pwd)
+export PYTHONPATH=${BASEPATH}:$PYTHONPATH
 
-python export.py --ckpt_file=$CKPT_FILE_PATH --file_format=$FORMAT
-               
+CIFAR10_DATA_PATH=$1
+OUTPUT_PATH=$2
+
+python ${BASEPATH}/../train.py --data_url $CIFAR10_DATA_PATH --train_url $OUTPUT_PATH --optimizer Momentum \
+                --load_weight None --no_top False --device_target=GPU --amp_level=O2

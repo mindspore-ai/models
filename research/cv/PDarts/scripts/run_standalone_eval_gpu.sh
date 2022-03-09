@@ -16,12 +16,11 @@
 # an simple tutorial as follows, more parameters can be setting
 if [ $# != 2 ]
 then
-    echo "Usage: bash run_export.sh [CKPT_FILE_PATH] [FORMAT]"
+    echo "Usage: bash run_standalone_eval_gpu.sh [VAL_DATA_PATH] [CKPT_FILE_PATH]"
 exit 1
 fi
 
-CKPT_FILE_PATH=$1
-FORMAT=$2
+VAL_DATA_PATH=$1
+CKPT_FILE_PATH=$2
 
-python export.py --ckpt_file=$CKPT_FILE_PATH --file_format=$FORMAT
-               
+python eval.py --val_path=$VAL_DATA_PATH --ckpt_file=$CKPT_FILE_PATH --device_target=GPU --amp_level=O0

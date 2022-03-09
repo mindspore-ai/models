@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ parser.add_argument("--train_batch_size", type=int,
 
 parser.add_argument("--ckpt_file", type=str, required=True,
                     help="Checkpoint file path.")
-parser.add_argument("--device_target", type=str, choices=["Ascend"], default="Ascend",
+parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU"], default="Ascend",
                     help="device target")
 parser.add_argument('--amp_level', type=str, default='O3', help='')
 args = parser.parse_args()
