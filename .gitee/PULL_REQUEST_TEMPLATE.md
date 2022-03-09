@@ -26,3 +26,19 @@ Fixes #
 **Special notes for your reviewers**:
 
 
+**CheckList**:
+
+- [ ] I have added correct copyrights for every code file.
+- [ ] I have removed all the redundant code and comments.
+- [ ] I have updated or added the `requirements.txt` for the third-party libraries you need.
+- [ ] I have made sure that I won't expose any personaly information such as local path with user name, local IP, etc.
+- [ ] I have commented my code, particularly in hard-to-understand areas. All the comments in code files are in English.
+- [ ] I have made corresponding changes to the documentation.
+- [ ] I have squashed all the commits into one.
+- [ ] I have checked the following usual mistakes:
+    - [ ] It is recommended to use `bash` instead of `sh`.
+    - [ ] Don't use `type=bool` in argparse.
+- [ ] If you are contributing a new model, please check:
+    - [ ] I have added at least one `README`
+    - [ ] The models implemented for the cloud could work offline on the local server as well.
+    - [ ] I have made sure the changes for new device target will not make differences on the original one.
