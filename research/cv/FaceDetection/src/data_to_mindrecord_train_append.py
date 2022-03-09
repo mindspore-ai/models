@@ -140,14 +140,10 @@ def convert_yolo_data_to_mindrecord():
     dataset_size = len(anno_files)
     assert dataset_size == len(image_files)
     logger.info("#size of dataset: {}".format(dataset_size))
-    data = []
-    for i in range(dataset_size):
-        data.append(get_data(image_files[i], anno_files[i]))
-
     print('Writing train data to mindrecord...')
-    if data is None:
-        raise ValueError("None needs writing to mindrecord.")
-    writer.write_raw_data(data)
+    for i in range(dataset_size):
+        row = get_data(image_files[i], anno_files[i])
+        writer.write_raw_data([row])
     writer.commit()
 
 

@@ -146,28 +146,24 @@ def convert_yolo_data_to_mindrecord():
     '''convert_yolo_data_to_mindrecord'''
 
     writer = FileWriter(mindrecord_file_name, mindrecord_num)
+    writer = FileWriter(mindrecord_file_name, mindrecord_num)
     yolo_json = {
         "image": {"type": "bytes"},
         "annotation": {"type": "float64", "shape": [-1, 6]},
         "image_name": {"type": "string"},
         "image_size": {"type": "int32", "shape": [-1, 2]}
         }
-
+    writer.add_schema(yolo_json, "yolo_json")
     print('Loading eval data...')
     image_files, anno_files, image_names = prepare_file_paths()
     dataset_size = len(anno_files)
     assert dataset_size == len(image_files)
     assert dataset_size == len(image_names)
     logger.info("#size of dataset: {}".format(dataset_size))
-    data = []
-    for i in range(dataset_size):
-        data.append(get_data(image_files[i], anno_files[i], image_names[i]))
-
     print('Writing eval data to mindrecord...')
-    writer.add_schema(yolo_json, "yolo_json")
-    if data is None:
-        raise ValueError("None needs writing to mindrecord.")
-    writer.write_raw_data(data)
+    for i in range(dataset_size):
+        row = get_data(image_files[i], anno_files[i], image_names[i])
+        writer.write_raw_data([row])
     writer.commit()
 
 
