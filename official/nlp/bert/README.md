@@ -73,7 +73,6 @@ The backbone structure of BERT is transformer. For BERT_base, the transformer co
 We have provided several kinds of pretrained checkpoint.
 
 - [Bert-base-zh](https://download.mindspore.cn/model_zoo/r1.3/bert_base_ascend_v130_zhwiki_official_nlp_bs256_acc91.72_recall95.06_F1score93.36/), trained on zh-wiki datasets with 128 length.
-- [Bert-base-en](https://download.mindspore.cn/model_zoo/r1.3/bert_base_ascend_v130_en-wiki_official_nlp_bs256_loss1.50/), trained on en-wiki datasets with 128 length.
 - [Bert-large-zh](https://download.mindspore.cn/model_zoo/r1.3/bert_large_ascend_v130_zhwiki_official_nlp_bs3072_loss0.8/), trained on zh-wiki datasets with 128 length.
 - [Bert-large-en](https://download.mindspore.cn/model_zoo/r1.3/bert_large_ascend_v130_enwiki_official_nlp_bs768_loss1.1/), tarined on en-wiki datasets with 512 length.
 
