@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,16 +18,17 @@ python export.py
 """
 import os
 import numpy as np
-from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
+import mindspore as ms
+from mindspore import Tensor
 
 from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper
 from src.textcnn import TextCNN
 from src.dataset import MovieReview, SST2, Subjectivity
 
-context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target)
 if config.device_target == "Ascend":
-    context.set_context(device_id=config.device_id)
+    ms.set_context(device_id=config.device_id)
 
 def modelarts_pre_process():
     '''modelarts pre process function.'''
@@ -48,11 +49,11 @@ def run_export():
     net = TextCNN(vocab_len=instance.get_dict_len(), word_len=config.word_len,
                   num_classes=config.num_classes, vec_length=config.vec_length)
 
-    param_dict = load_checkpoint(config.checkpoint_file_path)
-    load_param_into_net(net, param_dict)
+    param_dict = ms.load_checkpoint(config.checkpoint_file_path)
+    ms.load_param_into_net(net, param_dict)
 
     input_arr = Tensor(np.ones([config.batch_size, config.word_len], np.int32))
-    export(net, input_arr, file_name=config.file_name, file_format=config.file_format)
+    ms.export(net, input_arr, file_name=config.file_name, file_format=config.file_format)
 
 if __name__ == '__main__':
     run_export()

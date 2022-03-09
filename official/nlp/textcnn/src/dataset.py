@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,8 +23,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import mindspore.dataset as ds
-from mindspore import context
-
+import mindspore as ms
 
 
 class Generator():
@@ -129,7 +128,7 @@ class MovieReview(DataProcessor):
         self.maxlen = float("-inf")
         self.Pos = []
         self.Neg = []
-        if context.get_context("device_target") == "CPU":
+        if ms.get_context("device_target") == "CPU":
             encoding = "Latin1"
         else:
             encoding = None

@@ -1,5 +1,5 @@
 """
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,12 +24,11 @@ from model_utils.config import config
 from src.textcnn import TextCNN
 from src.textcnn import SoftmaxCrossEntropyExpand
 from src.dataset import MovieReview, SST2, Subjectivity
+import mindspore as ms
 import mindspore.nn as nn
 from mindspore.nn.metrics import Accuracy
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.train.model import Model
-from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
-import numpy as np
 
 sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)),
                              '../'))
@@ -76,14 +75,14 @@ def run_export():
     ckpt_models = list(
         sorted(glob.glob(os.path.join(load_checkpoint_path, '*.ckpt')),
                key=os.path.getctime))[-1]
-    param_dict = load_checkpoint(ckpt_models)
-    load_param_into_net(net, param_dict)
+    param_dict = ms.load_checkpoint(ckpt_models)
+    ms.load_param_into_net(net, param_dict)
 
-    input_arr = Tensor(np.ones([config.batch_size, config.word_len], np.int32))
-    export(net,
-           input_arr,
-           file_name=config.file_name,
-           file_format=config.file_format)
+    input_arr = ms.numpy.ones([config.batch_size, config.word_len], ms.int32)
+    ms.export(net,
+              input_arr,
+              file_name=config.file_name,
+              file_format=config.file_format)
 
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
@@ -93,9 +92,9 @@ def train_net():
     the function is adapted to Huawei Clouds Modelarts platform
     """
     # set context
-    context.set_context(mode=context.GRAPH_MODE,
-                        device_target=config.device_target)
-    context.set_context(device_id=get_device_id())
+    ms.set_context(mode=ms.GRAPH_MODE,
+                   device_target=config.device_target)
+    ms.set_context(device_id=get_device_id())
     if config.dataset == 'MR':
         instance = MovieReview(root_dir=config.data_path,
                                maxlen=config.word_len,
@@ -141,8 +140,8 @@ def train_net():
                   vec_length=config.vec_length)
     # Continue training if set pre_trained to be True
     if config.pre_trained:
-        param_dict = load_checkpoint(config.checkpoint_path)
-        load_param_into_net(net, param_dict)
+        param_dict = ms.load_checkpoint(config.checkpoint_path)
+        ms.load_param_into_net(net, param_dict)
 
     opt = nn.Adam(filter(lambda x: x.requires_grad, net.get_parameters()),
                   learning_rate=learning_rate,

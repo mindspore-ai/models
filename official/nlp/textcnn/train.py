@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,12 +19,11 @@ python train.py
 import os
 import math
 
+import mindspore as ms
 import mindspore.nn as nn
 from mindspore.nn.metrics import Accuracy
-from mindspore import context
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.train.model import Model
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.common import set_seed
 
 from model_utils.moxing_adapter import moxing_wrapper
@@ -44,14 +43,14 @@ def modelarts_pre_process():
 def train_net():
     '''train net'''
     # set context
-    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
-    context.set_context(device_id=get_device_id())
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target)
+    ms.set_context(device_id=get_device_id())
     if config.dataset == 'MR':
         instance = MovieReview(root_dir=config.data_path, maxlen=config.word_len, split=0.9)
     elif config.dataset == 'SUBJ':
         instance = Subjectivity(root_dir=config.data_path, maxlen=config.word_len, split=0.9)
         if config.device_target == "GPU":
-            context.set_context(enable_graph_kernel=True)
+            ms.set_context(enable_graph_kernel=True)
     elif config.dataset == 'SST2':
         instance = SST2(root_dir=config.data_path, maxlen=config.word_len, split=0.9)
 
@@ -71,8 +70,8 @@ def train_net():
                   num_classes=config.num_classes, vec_length=config.vec_length)
     # Continue training if set pre_trained to be True
     if config.pre_trained:
-        param_dict = load_checkpoint(config.checkpoint_path)
-        load_param_into_net(net, param_dict)
+        param_dict = ms.load_checkpoint(config.checkpoint_path)
+        ms.load_param_into_net(net, param_dict)
 
     opt = nn.Adam(filter(lambda x: x.requires_grad, net.get_parameters()), \
                   learning_rate=learning_rate, weight_decay=float(config.weight_decay))
