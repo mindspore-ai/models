@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
 # ============================================================================
 
 """shuffle"""
-
 import os
-import sys
 import random
 import tempfile
 
 
-def main(file, temporary=False):
+def shuffle(file, temporary=False):
     tf_os, tpath = tempfile.mkstemp()
     tf_os = tf_os
     tf = open(tpath, 'w')
@@ -51,7 +49,3 @@ def main(file, temporary=False):
     os.remove(tpath)
 
     return fd
-
-
-if __name__ == '__main__':
-    main(sys.argv[1])

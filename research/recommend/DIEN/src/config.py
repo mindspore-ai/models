@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,8 +44,10 @@ def parse_args():
     parser.add_argument('--run_distribute', type=ast.literal_eval, default=False, help='Run distribute')
 
     # train args
+    parser.add_argument('--epoch_size', type=int, default=3)
     parser.add_argument('--batch_size', type=int, default=128)
     parser.add_argument('--max_len', type=int, default=100)
+    parser.add_argument('--base_lr', type=float, default=0.001, help='Base learning rate')
 
     # device args
     parser.add_argument('--device_target', type=str, default='Ascend', help='Device target')

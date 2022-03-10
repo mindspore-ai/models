@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,12 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
-"""utils"""
-
+'''
+calculate AUC
+'''
 
 def calc_auc(raw_arr):
-    """clac_auc"""
+    '''
+    calculate AUC
+    :param raw_arr:
+    :return:
+    '''
+
     arr = sorted(raw_arr, key=lambda d: d[0], reverse=True)
     pos, neg = 0., 0.
     for record in arr:

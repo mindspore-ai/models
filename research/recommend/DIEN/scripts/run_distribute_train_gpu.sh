@@ -16,37 +16,27 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run.sh DATA_PATH RANK_SIZE"
-echo "For example: bash run.sh /path/dataset 8"
-echo "It is better to use the absolute path."
+echo "bash run.sh [DEVICE_NUM] [MINDRECORD_PATH] [DATA_PATH] [DATA_TYPE]"
+echo "For example: bash scripts/run_distribute_train_books_gpu.sh 8 ./dataset_mindrecord ./Books Books"
+echo "It is better to use the absolute path.After running the script, the network runs in the background,the log will be generated in ms_log/log_dien_distribute.log"
 echo "=============================================================================================================="
-set -e
-export RANK_TABLE_FILE=$1
-export RANK_SIZE=$2
+export DEVICE_NUM=$1
+MINDRECORD_PATH=$2
+DATA_PATH=$3
+DATA_TYPE=$4
 EXEC_PATH=$(pwd)
-
 echo "$EXEC_PATH"
-
+mkdir -p ms_log
+CUR_DIR=`pwd`
+export GLOG_log_dir=${CUR_DIR}/ms_log
+export GLOG_logtostderr=0
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
-
-for((i=0;i<${RANK_SIZE};i++))
-do
-    rm -rf Bookdevice$i
-    mkdir Bookdevice$i
-    cd ./Bookdevice$i
-    mkdir src
-    cd ../
-    cp ../*.py ./Bookdevice$i
-    cp -r ../ckpt ./Bookdevice$i
-    cp ../src/*.py ./Bookdevice$i/src
-    cp -r ../Books ./Bookdevice$i/Books
-    cp -r ../dataset_mindrecord ./Bookdevice$i/dataset_mindrecord
-    cd ./Bookdevice$i
-    export DEVICE_ID=$i
-    export RANK_ID=$i
-    echo "start training for device $i"
-    env > env$i.log
-    python train_eval.py --mindrecord_path=./dataset_mindrecord --dataset_type=Books --dataset_file_path=./Books --is_modelarts=False --run_distribute=True --train_test=train > output.log 2>&1 &
-    echo "$i finish"
-    cd ../
-done
+mpirun -n $DEVICE_NUM --output-filename log_output --merge-stderr-to-stdout --allow-run-as-root \
+python -u train.py \
+    --device_target=GPU \
+    --mindrecord_path=$MINDRECORD_PATH \
+    --dataset_type=$DATA_TYPE \
+    --dataset_file_path=$DATA_PATH \
+    --epoch_size=4 \
+    --base_lr=0.003 \
+    --run_distribute=True > ms_log/log_dien_distribute.log 2>&1 &

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,19 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+"""
+dataset of dien
+"""
 
-"""dataset_books"""
-
-import random
-import _pickle as pkl
 import os
+import random
 import gzip
+import _pickle as pkl
 import numpy as np
 
 import mindspore.dataset as ds
 from mindspore.mindrecord import FileWriter
 
-import src.shuffle as shuffle
+from .shuffle import shuffle as shuffle_func
 
 
 def unicode_to_utf8(d):
@@ -43,16 +44,14 @@ def fopen(filename, mode='r'):
 
 
 class DataIterator:
-    """data iterator"""
-
     def __init__(self, source,
                  uid_voc,
                  mid_voc,
                  cat_voc,
                  meta_path,
                  review_path,
-                 batch_size,
-                 maxlen,
+                 batch_size=128,
+                 maxlen=100,
                  skip_empty=False,
                  shuffle_each_epoch=False,
                  sort_by_length=True,
@@ -60,19 +59,19 @@ class DataIterator:
                  minlen=None):
         if shuffle_each_epoch:
             self.source_orig = source
-            self.source = shuffle.main(self.source_orig, temporary=True)
+            self.source = shuffle_func(self.source_orig, temporary=True)
         else:
             self.source = fopen(source, 'r')
         self.source_dicts = []
         for source_dict in [uid_voc, mid_voc, cat_voc]:
             self.source_dicts.append(load_dict(source_dict))
 
-        f_meta = open(meta_path, "r", encoding='utf-8')
         meta_map = {}
-        for line in f_meta:
-            arr = line.strip().split("\t")
-            if arr[0] not in meta_map:
-                meta_map[arr[0]] = arr[1]
+        with open(meta_path, "r", encoding='utf-8') as f_meta:
+            for line in f_meta:
+                arr = line.strip().split("\t")
+                if arr[0] not in meta_map:
+                    meta_map[arr[0]] = arr[1]
         self.meta_id_map = {}
         for key in meta_map:
             val = meta_map[key]
@@ -85,16 +84,14 @@ class DataIterator:
             else:
                 cat_idx = 0
             self.meta_id_map[mid_idx] = cat_idx
-
-        f_review = open(review_path, "r", encoding='utf-8')
         self.mid_list_for_random = []
-        for line in f_review:
-            arr = line.strip().split("\t")
-            tmp_idx = 0
-            if arr[1] in self.source_dicts[1]:
-                tmp_idx = self.source_dicts[1][arr[1]]
-            self.mid_list_for_random.append(tmp_idx)
-
+        with open(review_path, "r", encoding='utf-8') as f_review:
+            for line in f_review:
+                arr = line.strip().split("\t")
+                tmp_idx = 0
+                if arr[1] in self.source_dicts[1]:
+                    tmp_idx = self.source_dicts[1][arr[1]]
+                self.mid_list_for_random.append(tmp_idx)
         self.batch_size = batch_size
         self.maxlen = maxlen
         self.minlen = minlen
@@ -120,7 +117,7 @@ class DataIterator:
 
     def reset(self):
         if self.shuffle:
-            self.source = shuffle.main(self.source_orig, temporary=True)
+            self.source = shuffle_func(self.source_orig, temporary=True)
         else:
             self.source.seek(0)
 
@@ -138,8 +135,7 @@ class DataIterator:
             self.reset()
             raise StopIteration
         if not self.source_buffer:
-            for k_ in range(self.k):
-                k_ = k_
+            for _ in range(self.k):
                 ss = self.source.readline()
                 if ss == "":
                     break
@@ -191,17 +187,12 @@ class DataIterator:
             self.end_of_data = False
             self.reset()
             raise StopIteration
-
         source = []
         target = []
-
         self.__next_stop()
-
         try:
-
             # actual work here
             while True:
-
                 # read from source file and map to word index
                 try:
                     ss = self.source_buffer.pop()
@@ -227,7 +218,6 @@ class DataIterator:
                     break
         except IOError:
             self.end_of_data = True
-
         # all sentence pairs in maxibatch filtered out because of length
         if not source or not target:
             source, target = self.__next__()
@@ -309,46 +299,49 @@ def shape0(uids, mids, cats):
     return uids, mids, cats
 
 
-def prepare_data(p_input, target, maxlen=None, return_neg=False):
-    """prepare data"""
+def prepare_data(p_input, target, maxlen=None, return_neg=False, mode=""):
+    TRAIN_MODE = "train"
     uids, mids, cats, mid_his, cat_his, mid_mask, target, sl, noclk_mid_his, noclk_cat_his = pre_data(
         p_input, target, maxlen)
-    # pad all fields to a uniform specified length
-    uids, mids, cats = shape0(uids, mids, cats)
+    if mode == TRAIN_MODE:
+        uids, mids, cats = shape0(uids, mids, cats)
 
-    if mid_his.shape[0] != 128 or mid_his.shape[1] != 100:
-        mid_his = np.pad(mid_his, ((0, 128 - mid_his.shape[0]), (0, 100 - mid_his.shape[1])),
-                         constant_values=(0, 0))
-    if cat_his.shape[0] != 128 or cat_his.shape[1] != 100:
-        cat_his = np.pad(cat_his, ((0, 128 - cat_his.shape[0]), (0, 100 - cat_his.shape[1])),
-                         constant_values=(0, 0))
-    if mid_mask.shape[0] != 128 or mid_mask.shape[1] != 100:
-        mid_mask = np.pad(mid_mask, ((0, 128 - mid_mask.shape[0]), (0, 100 - mid_mask.shape[1])),
-                          constant_values=(0, 0))
-    if target.shape[0] != 128 or target.shape[1] != 2:
-        target = np.pad(target, ((0, 128 - target.shape[0]), (0, 2 - target.shape[1])), constant_values=(0, 0))
-    if sl.shape[0] != 128:
-        sl = np.pad(sl, (0, 128 - sl.shape[0]), constant_values=(0, 0))
-    if noclk_mid_his.shape[0] != 128 or noclk_mid_his.shape[1] != 100 or noclk_mid_his.shape[2] != 5:
-        noclk_mid_his = np.pad(noclk_mid_his,
-                               ((0, 128 - noclk_mid_his.shape[0]), (0, 100 - noclk_mid_his.shape[1]),
-                                (0, 5 - noclk_mid_his.shape[2])),
-                               constant_values=(0, 0))
-    if noclk_cat_his.shape[0] != 128 or noclk_cat_his.shape[1] != 100 or noclk_cat_his.shape[2] != 5:
-        noclk_cat_his = np.pad(noclk_cat_his,
-                               ((0, 128 - noclk_cat_his.shape[0]), (0, 100 - noclk_cat_his.shape[1]),
-                                (0, 5 - noclk_cat_his.shape[2])),
-                               constant_values=(0, 0))
+        if mid_his.shape[0] != 128 or mid_his.shape[1] != 100:
+            mid_his = np.pad(mid_his, ((0, 128 - mid_his.shape[0]), (0, 100 - mid_his.shape[1])),
+                             constant_values=(0, 0))
+        if cat_his.shape[0] != 128 or cat_his.shape[1] != 100:
+            cat_his = np.pad(cat_his, ((0, 128 - cat_his.shape[0]), (0, 100 - cat_his.shape[1])),
+                             constant_values=(0, 0))
+        if mid_mask.shape[0] != 128 or mid_mask.shape[1] != 100:
+            mid_mask = np.pad(mid_mask, ((0, 128 - mid_mask.shape[0]), (0, 100 - mid_mask.shape[1])),
+                              constant_values=(0, 0))
+        if target.shape[0] != 128 or target.shape[1] != 2:
+            target = np.pad(target, ((0, 128 - target.shape[0]), (0, 2 - target.shape[1])), constant_values=(0, 0))
+        if sl.shape[0] != 128:
+            sl = np.pad(sl, (0, 128 - sl.shape[0]), constant_values=(0, 0))
+        if noclk_mid_his.shape[0] != 128 or noclk_mid_his.shape[1] != 100 or noclk_mid_his.shape[2] != 5:
+            noclk_mid_his = np.pad(noclk_mid_his,
+                                   ((0, 128 - noclk_mid_his.shape[0]), (0, 100 - noclk_mid_his.shape[1]),
+                                    (0, 5 - noclk_mid_his.shape[2])),
+                                   constant_values=(0, 0))
+        if noclk_cat_his.shape[0] != 128 or noclk_cat_his.shape[1] != 100 or noclk_cat_his.shape[2] != 5:
+            noclk_cat_his = np.pad(noclk_cat_his,
+                                   ((0, 128 - noclk_cat_his.shape[0]), (0, 100 - noclk_cat_his.shape[1]),
+                                    (0, 5 - noclk_cat_his.shape[2])),
+                                   constant_values=(0, 0))
+        if return_neg:
+            return uids, mids, cats, mid_his, cat_his, mid_mask, target, sl, noclk_mid_his, noclk_cat_his
+        return uids, mids, cats, mid_his, cat_his, mid_mask, target, sl
     if return_neg:
         return uids, mids, cats, mid_his, cat_his, mid_mask, target, sl, noclk_mid_his, noclk_cat_his
     return uids, mids, cats, mid_his, cat_his, mid_mask, target, sl
 
 
-def create_mindrecord(train_data, maxlen, MINDRECORD_FILE):
-    """create_mindrecord"""
+def create_mindrecord(train_data, maxlen, MINDRECORD_FILE, mode=""):
     if os.path.exists(MINDRECORD_FILE):
         os.remove(MINDRECORD_FILE)
         os.remove(MINDRECORD_FILE + ".db")
+
     writer = FileWriter(file_name=MINDRECORD_FILE, shard_num=1)
     nlp_schema = {"mid_mask": {"type": "float32", "shape": [128, 100]},
                   "uids": {"type": "int32", "shape": [128]},
@@ -366,7 +359,8 @@ def create_mindrecord(train_data, maxlen, MINDRECORD_FILE):
     for src, tgt in train_data:
         uids, mids, cats, mid_his, cat_his, mid_mask, target, sl, noclk_mids, noclk_cats = prepare_data(src, tgt,
                                                                                                         maxlen,
-                                                                                                        return_neg=True)
+                                                                                                        return_neg=True,
+                                                                                                        mode=mode)
         uids = uids.astype(np.int32)
         mids = mids.astype(np.int32)
         cats = cats.astype(np.int32)
