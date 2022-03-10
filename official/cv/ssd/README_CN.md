@@ -202,6 +202,7 @@ bash run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID] [CONFIG_PATH]
       │   ├──local_adapter.py             ## 本地设备配置
       │   ├──moxing_adapter.py            ## modelarts设备配置
     ├─ config
+        ├─ ssd_mobilenet_v1_300_config_gpu.yaml ## 参数配置
         ├─ ssd_mobilenet_v1_fpn_config.yaml ## 参数配置
         ├─ ssd_resnet50_fpn_config.yaml ## 参数配置
         ├─ ssd_vgg16_config.yaml ## 参数配置
@@ -577,6 +578,24 @@ mAP: 0.23657619676441116
 | 评价指标            | IoU=0.50: 23.2%               | IoU=0.50: 23.2%             |
 | 推理模型大小 | 186M(.ckpt file)             | 186M(.ckpt file)             |
 | 参数文件           | ssd_vgg16_config.yaml      | ssd_vgg16_config_gpu.yaml      |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+
+| 参数           |                        GPU                         |
+| ------------------- | ------------------------------------------------------ |
+| 网络       | SSD MobileNetV1          |
+| 资源          | GPU(Tesla V100 PCIE)，CPU 2.1GHz 64 cores，Memory 128G   |
+| 上传日期       | 03/03/2022 (month/day/year) |
+| 昇思版本   | 1.5.0                     |
+| 数据集        | COCO2017                    |
+| 训练参数 | epoch = 500,  batch_size = 32  |
+| 优化器          | Momentum                        |
+| 损失函数      | Sigmoid Cross Entropy,SmoothL1Loss    |
+| 性能               | 8pcs: 108 ms/step                     |
+| 训练耗时          | 8pcs: 6.87hours                      |
+| 推理输出               | mAP                                          |
+| 评价指标            | IoU=0.50: 21.5%                       |
+| 推理模型大小 | 88M(.ckpt file)                |
+| 参数文件          | ssd_mobilenet_v1_300_config_gpu.yaml    |
 | 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
 
 # 随机情况说明

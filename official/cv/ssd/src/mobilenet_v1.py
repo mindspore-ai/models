@@ -87,5 +87,39 @@ class MobileNetV1(nn.Cell):
         output = self.fc(output)
         return output
 
+class FeatureSelector(nn.Cell):
+    """
+    Select specific layers from an entire feature list
+    """
+    def __init__(self, feature_idxes):
+        super(FeatureSelector, self).__init__()
+        self.feature_idxes = feature_idxes
+
+    def construct(self, feature_list):
+        selected = ()
+        for i in self.feature_idxes:
+            selected = selected + (feature_list[i],)
+        return selected
+
+class MobileNetV1Feature(nn.Cell):
+    """
+    MobileNetV1 with FPN as SSD backbone.
+    """
+    def __init__(self, config):
+        super(MobileNetV1Feature, self).__init__()
+        self.mobilenet_v1 = MobileNetV1(features_only=True)
+
+        self.selector = FeatureSelector([14, 26])
+
+        self.layer_indexs = [14, 26]
+
+    def construct(self, x):
+        features = self.mobilenet_v1(x)
+        features = self.selector(features)
+        return features
+
 def mobilenet_v1(class_num=1001):
     return MobileNetV1(class_num)
+
+def mobilenet_v1_Feature(config):
+    return MobileNetV1Feature(config)
