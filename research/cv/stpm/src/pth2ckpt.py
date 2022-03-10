@@ -15,6 +15,7 @@
 """
 python pth2ckpt.py
 """
+import argparse
 import torch
 from mindspore.train.serialization import save_checkpoint
 from mindspore import Tensor
@@ -50,22 +51,20 @@ param = {
 }
 
 
-def pytorch2mindspore():
+def pytorch2mindspore(pt_path):
     """
 
     Returns:
         object:
     """
-    par_dict = torch.load('your path',
-                          map_location='cpu')["state_dict"]
+    par_dict = torch.load(pt_path, map_location='cpu')
+
     new_params_list = []
 
     for name in par_dict:
-        print("======", name)
         param_dict = {}
         parameter = par_dict[name]
-        print(name)
-        name = 'model_t.' + name
+        print("key name: ", name)
         for fix in param:
             if name.endswith(fix):
                 name = name[:name.rfind(fix)]
@@ -75,7 +74,11 @@ def pytorch2mindspore():
         param_dict['data'] = Tensor(parameter.detach().numpy())
         new_params_list.append(param_dict)
 
-    save_checkpoint(new_params_list, 'STPM.ckpt')
+    save_checkpoint(new_params_list, 'STPM-99.ckpt')
 
 
-pytorch2mindspore()
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='train')
+    parser.add_argument('--pt_path', type=str, help="/path/resnet18-f37072fd.pth")
+    args = parser.parse_args()
+    pytorch2mindspore(args.pt_path)

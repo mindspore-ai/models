@@ -144,12 +144,14 @@ def _conv7x7(in_channel, out_channel, stride=1, use_se=False, res_base=False):
                      kernel_size=7, stride=stride, padding=0, pad_mode='same', weight_init=weight)
 
 
-def _bn(channel, res_base=False):
+def _bn(channel, res_base=False, use_batch_statistics=None):
     if res_base:
         return nn.BatchNorm2d(channel, eps=1e-5, momentum=0.1,
-                              gamma_init=1, beta_init=0, moving_mean_init=0, moving_var_init=1)
+                              gamma_init=1, beta_init=0, moving_mean_init=0, moving_var_init=1,
+                              use_batch_statistics=use_batch_statistics)
     return nn.BatchNorm2d(channel, eps=1e-4, momentum=0.9,
-                          gamma_init=1, beta_init=0, moving_mean_init=0, moving_var_init=1)
+                          gamma_init=1, beta_init=0, moving_mean_init=0, moving_var_init=1,
+                          use_batch_statistics=use_batch_statistics)
 
 
 def _bn_last(channel):
@@ -293,13 +295,14 @@ class ResidualBlockBase(nn.Cell):
                  stride=1,
                  use_se=False,
                  se_block=False,
-                 res_base=True):
+                 res_base=True,
+                 use_batch_statistics=None):
         super(ResidualBlockBase, self).__init__()
         self.res_base = res_base
         self.conv1 = _conv3x3(in_channel, out_channel, stride=stride, res_base=self.res_base)
-        self.bn1 = _bn(out_channel)
+        self.bn1 = _bn(out_channel, use_batch_statistics=use_batch_statistics)
         self.conv2 = _conv3x3(out_channel, out_channel, stride=1, res_base=self.res_base)
-        self.bn2 = _bn(out_channel)
+        self.bn2 = _bn(out_channel, use_batch_statistics=use_batch_statistics)
         self.relu = nn.ReLU()
 
         self.down_sample = False
@@ -310,7 +313,8 @@ class ResidualBlockBase(nn.Cell):
         if self.down_sample:
             self.down_sample_layer = nn.SequentialCell([_conv1x1(in_channel, out_channel, stride,
                                                                  use_se=use_se, res_base=self.res_base),
-                                                        _bn(out_channel, res_base)])
+                                                        _bn(out_channel, res_base,
+                                                            use_batch_statistics=use_batch_statistics)])
 
     def construct(self, x):
         '''construct'''
@@ -367,7 +371,8 @@ class ResNet(nn.Cell):
                  strides,
                  num_classes,
                  use_se=False,
-                 res_base=False):
+                 res_base=False,
+                 use_batch_statistics=None):
         super(ResNet, self).__init__()
 
         if not len(layer_nums) == len(in_channels) == len(out_channels) == 4:
@@ -380,17 +385,17 @@ class ResNet(nn.Cell):
 
         if self.use_se:
             self.conv1_0 = _conv3x3(3, 32, stride=2, use_se=self.use_se)
-            self.bn1_0 = _bn(32)
+            self.bn1_0 = _bn(32, use_batch_statistics=use_batch_statistics)
             self.conv1_1 = _conv3x3(32, 32, stride=1, use_se=self.use_se)
-            self.bn1_1 = _bn(32)
+            self.bn1_1 = _bn(32, use_batch_statistics=use_batch_statistics)
             self.conv1_2 = _conv3x3(32, 64, stride=1, use_se=self.use_se)
         else:
             self.conv1 = _conv7x7(3, 64, stride=2, res_base=self.res_base)
-        self.bn1 = _bn(64, self.res_base)
+        self.bn1 = _bn(64, self.res_base, use_batch_statistics=use_batch_statistics)
         self.relu = P.ReLU()
 
         if self.res_base:
-            self.pad = nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)))
+            self.pad = nn.Pad(paddings=((0, 0), (0, 0), (1, 1), (1, 1)), mode="REFLECT")
             self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="valid")
         else:
             self.maxpool = nn.MaxPool2d(kernel_size=3, stride=2, pad_mode="same")
@@ -400,33 +405,38 @@ class ResNet(nn.Cell):
                                        in_channel=in_channels[0],
                                        out_channel=out_channels[0],
                                        stride=strides[0],
-                                       use_se=self.use_se)
+                                       use_se=self.use_se,
+                                       use_batch_statistics=use_batch_statistics)
         self.layer2 = self._make_layer(block,
                                        layer_nums[1],
                                        in_channel=in_channels[1],
                                        out_channel=out_channels[1],
                                        stride=strides[1],
-                                       use_se=self.use_se)
+                                       use_se=self.use_se,
+                                       use_batch_statistics=use_batch_statistics)
         self.layer3 = self._make_layer(block,
                                        layer_nums[2],
                                        in_channel=in_channels[2],
                                        out_channel=out_channels[2],
                                        stride=strides[2],
                                        use_se=self.use_se,
-                                       se_block=self.se_block)
+                                       se_block=self.se_block,
+                                       use_batch_statistics=use_batch_statistics)
         self.layer4 = self._make_layer(block,
                                        layer_nums[3],
                                        in_channel=in_channels[3],
                                        out_channel=out_channels[3],
                                        stride=strides[3],
                                        use_se=self.use_se,
-                                       se_block=self.se_block)
+                                       se_block=self.se_block,
+                                       use_batch_statistics=use_batch_statistics)
 
         self.mean = P.ReduceMean(keep_dims=True)
         self.flatten = nn.Flatten()
         self.fc = _fc(out_channels[3], num_classes, use_se=self.use_se)
 
-    def _make_layer(self, block, layer_num, in_channel, out_channel, stride, use_se=False, se_block=False):
+    def _make_layer(self, block, layer_num, in_channel, out_channel, stride,
+                    use_se=False, se_block=False, use_batch_statistics=None):
         """
         Make stage network of ResNet.
 
@@ -445,17 +455,21 @@ class ResNet(nn.Cell):
         """
         layers = []
 
-        resnet_block = block(in_channel, out_channel, stride=stride, use_se=use_se)
+        resnet_block = block(in_channel, out_channel, stride=stride, use_se=use_se,
+                             use_batch_statistics=use_batch_statistics)
         layers.append(resnet_block)
         if se_block:
             for _ in range(1, layer_num - 1):
-                resnet_block = block(out_channel, out_channel, stride=1, use_se=use_se)
+                resnet_block = block(out_channel, out_channel, stride=1, use_se=use_se,
+                                     use_batch_statistics=use_batch_statistics)
                 layers.append(resnet_block)
-            resnet_block = block(out_channel, out_channel, stride=1, use_se=use_se, se_block=se_block)
+            resnet_block = block(out_channel, out_channel, stride=1, use_se=use_se,
+                                 se_block=se_block, use_batch_statistics=use_batch_statistics)
             layers.append(resnet_block)
         else:
             for _ in range(1, layer_num):
-                resnet_block = block(out_channel, out_channel, stride=1, use_se=use_se)
+                resnet_block = block(out_channel, out_channel, stride=1,
+                                     use_se=use_se, use_batch_statistics=use_batch_statistics)
                 layers.append(resnet_block)
         return nn.SequentialCell(layers)
 
@@ -489,7 +503,7 @@ class ResNet(nn.Cell):
         return [c2, c3, c4]
 
 
-def resnet18(class_num=10):
+def resnet18(class_num=10, use_batch_statistics=None):
     """
     Get ResNet18 neural network.
 
@@ -508,111 +522,5 @@ def resnet18(class_num=10):
                   [64, 128, 256, 512],
                   [1, 2, 2, 2],
                   class_num,
-                  res_base=True)
-
-
-def resnet34(class_num=10):
-    """
-    Get ResNet34 neural network.
-
-    Args:
-        class_num (int): Class number.
-
-    Returns:
-        Cell, cell instance of ResNet34 neural network.
-
-    Examples:
-        >>> net = resnet18(10)
-    """
-    return ResNet(ResidualBlockBase,
-                  [3, 4, 6, 3],
-                  [64, 64, 128, 256],
-                  [64, 128, 256, 512],
-                  [1, 2, 2, 2],
-                  class_num,
-                  res_base=True)
-
-
-def resnet50(class_num=10):
-    """
-    Get ResNet50 neural network.
-
-    Args:
-        class_num (int): Class number.
-
-    Returns:
-        Cell, cell instance of ResNet50 neural network.
-
-    Examples:
-        >>> net = resnet50(10)
-    """
-    return ResNet(ResidualBlock,
-                  [3, 4, 6, 3],
-                  [64, 256, 512, 1024],
-                  [256, 512, 1024, 2048],
-                  [1, 2, 2, 2],
-                  class_num)
-
-
-def se_resnet50(class_num=1001):
-    """
-    Get SE-ResNet50 neural network.
-
-    Args:
-        class_num (int): Class number.
-
-    Returns:
-        Cell, cell instance of SE-ResNet50 neural network.
-
-    Examples:
-        >>> net = se-resnet50(1001)
-    """
-    return ResNet(ResidualBlock,
-                  [3, 4, 6, 3],
-                  [64, 256, 512, 1024],
-                  [256, 512, 1024, 2048],
-                  [1, 2, 2, 2],
-                  class_num,
-                  use_se=True)
-
-
-def resnet101(class_num=1001):
-    """
-    Get ResNet101 neural network.
-
-    Args:
-        class_num (int): Class number.
-
-    Returns:
-        Cell, cell instance of ResNet101 neural network.
-
-    Examples:
-        >>> net = resnet101(1001)
-    """
-    return ResNet(ResidualBlock,
-                  [3, 4, 23, 3],
-                  [64, 256, 512, 1024],
-                  [256, 512, 1024, 2048],
-                  [1, 2, 2, 2],
-                  class_num)
-
-
-def resnet152(class_num=1001):
-    """
-    Get ResNet152 neural network.
-
-    Args:
-        class_num (int): Class number.
-
-    Returns:
-        Cell, cell instance of ResNet152 neural network.
-
-    Examples:
-        # >>> net = resnet152(1001)
-    """
-    return ResNet(ResidualBlock,
-                  [3, 8, 36, 3],
-                  [64, 256, 512, 1024],
-                  [256, 512, 1024, 2048],
-                  [1, 2, 2, 2],
-                  class_num)
+                  res_base=True,
+                  use_batch_statistics=use_batch_statistics)

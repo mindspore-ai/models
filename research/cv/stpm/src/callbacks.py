@@ -21,21 +21,23 @@ from src.utils import cal_anomaly_map
 
 class EvalCallBack(Callback):
     """EvalCallBack"""
-    def __init__(self, dataset, net, category, start_epoch=0,
-                 end_epoch=100, save_path=None, interval=1):
+
+    def __init__(self, dataset, net, args, save_path=None):
         self.dataset = dataset
         self.network = net
-        self.start_epoch = start_epoch
+        self.network.set_train(False)
+        self.start_epoch = args.start_eval_epoch
         self.save_path = save_path
-        self.interval = interval
+        self.interval = args.eval_interval
         self.best_pixel = 0
         self.best_image = 0
-        self.category = category
+        self.category = args.category
         self.best_epoch = 0
         self.best_image_added = 0
         self.best_pixel_added = 0
         self.best_epoch_added = 0
-        self.end_epoch = end_epoch
+        self.end_epoch = args.epoch
+        self.out_size = args.out_size
 
     def epoch_end(self, run_context):
         """epoch_end"""
@@ -44,8 +46,7 @@ class EvalCallBack(Callback):
         file_name = "../final.log"
         if cur_epoch >= self.start_epoch:
             if (cur_epoch - self.start_epoch) % self.interval == 0:
-                self.network.network.model_s.set_train(True)
-                self.network.network.model_t.set_train(False)
+                self.network.set_train(False)
                 pixel_auc, img_auc = self.inference()
                 if (pixel_auc + img_auc) >= (self.best_pixel_added + self.best_image_added):
                     self.best_image_added = img_auc
@@ -55,9 +56,9 @@ class EvalCallBack(Callback):
                                     self.category + "_best_added.ckpt")
                 print("\033[1;34m", flush=True)
                 print("epoch: {},  pixel auc: {}, image auc: {}. "
-                      "best pixel auc: {}, best image auc: {} at {} epoch".format(
-                          cur_epoch, pixel_auc, img_auc, self.best_pixel_added, self.best_image_added,
-                          self.best_epoch_added), flush=True)
+                      "best pixel auc: {}, best image auc: {} "
+                      "at {} epoch".format(cur_epoch, pixel_auc, img_auc, self.best_pixel_added,
+                                           self.best_image_added, self.best_epoch_added), flush=True)
                 print("\033[0m", flush=True)
                 if cur_epoch == self.end_epoch:
                     with open(file_name, "a+") as f:
@@ -66,10 +67,11 @@ class EvalCallBack(Callback):
                     print("\033[1;31m", flush=True)
                     print("epoch: {},  pixel auc: {}, image auc: {}. "
                           "best pixel auc: {}, best image auc: {} at {} epoch. "
-                          "best pixel added auc: {}, best image added auc: {} at {} epoch".format(
-                              cur_epoch, pixel_auc, img_auc, self.best_pixel, self.best_image,
-                              self.best_epoch, self.best_pixel_added, self.best_image_added,
-                              self.best_epoch_added), flush=True)
+                          "best pixel added auc: {}, best image added auc: {} "
+                          "at {} epoch".format(cur_epoch, pixel_auc, img_auc,
+                                               self.best_pixel, self.best_image, self.best_epoch,
+                                               self.best_pixel_added, self.best_image_added,
+                                               self.best_epoch_added), flush=True)
                     print("\033[0m", flush=True)
 
     def inference(self):
@@ -82,7 +84,7 @@ class EvalCallBack(Callback):
             gt = data['gt']
             label = data['label']
             features_s, features_t = self.network(data['img'])
-            anomaly_map = cal_anomaly_map(features_s, features_t, out_size=256)
+            anomaly_map = cal_anomaly_map(features_s, features_t, out_size=self.out_size)
             gt_np = gt.asnumpy()[0, 0].astype(int)
 
             gt_list_px_lvl.extend(gt_np.ravel())

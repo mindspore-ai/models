@@ -54,12 +54,14 @@
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
-```python
+```shell
 # 单机训练运行示例
-bash scripts/run_standalone_train.sh
+cd scripts
+bash run_standalone_train.sh  /path/dataset /path/backbone_ckpt category 1
 
 # 运行评估示例
-bash scripts/run_eval.sh
+cd scripts
+bash run_eval.sh  /path/dataset /path/ckpt category 1
 ```
 
 ## 脚本说明
@@ -79,6 +81,7 @@ bash scripts/run_eval.sh
   ├── Cmakelists.txt
  ├── scripts
   ├── run_310_infer.sh                  // 用于310推理的脚本
+  ├── run_all_mvtec.sh                  // 执行所有mvtec数据集的训练推理
   ├── run_standalone_train.sh           // 用于单机训练的shell脚本
   └── run_eval.sh                       // 用于评估的shell脚本
  ├──src
@@ -86,8 +89,7 @@ bash scripts/run_eval.sh
   ├── dataset.py                        // 创建数据集
   ├── callbacks.py                      // 回调
   ├── resnet.py                         // ResNet架构
-  ├── EvalOneStep.py
-  ├── STPM.py
+  ├── stpm.py
   ├── pth2ckpt.py                       // 该脚本可将torch的pth文件转为ckpt
   ├── utils.py
  ├── test.py                            // 测试脚本
@@ -113,19 +115,23 @@ train.py和test.py中主要参数如下：
 
 ## 预训练模型
 
-本模型的预训练模型为ResNet18。从modelzoo中下载ResNet18的预训练模型，将其中的每一个参数字段前加上"model_t"，转化为本模型所需的ckpt文件。使用该预训练模型加载到教师网络中，而学生网络则不使用预训练模型。
+本模型的预训练模型为ResNet18，使用该预训练模型加载到教师网络中，而学生网络则不使用预训练模型。可以从以下方式进行预训练模型的获取。
 
-[点此下载](https://download.mindspore.cn/model_zoo/r1.3/resnet18_ascend_v130_imagenet2012_official_cv_bs256_acc70.64/)
+1. 从modelzoo中下载ResNet18在ImageNet2012上进行训练得到预训练模型。由于modelzoo中ImageNet2012设置的类别数为1001，此时在训练推理时需要将参数num_class改为1001。
+2. 下载pytorch的ResNet18预训练模型，通过src/pth2ckpt.py脚本完成转换。
+3. 从我们预置归档的ckpt获取下载，[点此下载](https://download.mindspore.cn/model_zoo/r1.3/resnet18_ascend_v130_imagenet2012_official_cv_bs256_acc70.64/)。
 
 ## 训练过程
 
 ### 训练
 
 ```shell
-bash scripts/run_standalone_train.sh [DATASET_PATH] [CHECKPOINT_PATH] [CATEGORY]
+bash scripts/run_standalone_train.sh [DATASET_PATH] [BACKONE_PATH] [CATEGORY] [DEVICE_ID]
+对于mvtec数据集，可以执行以下命令，DEVICE_NUM为需要执行的卡数，mvtec下的15个数据集将分别独立运行于各个卡上。
+bash scripts/run_all_mvtec.sh [DATASET_PATH] [BACKONE_PATH] [DEVICE_NUM]
 ```
 
-上述shell脚本将在后台运行训练。可以通过`train.log`文件查看结果。
+上述shell脚本将在后台运行训练。可以通过对应的类别目录下的`train.log`文件查看结果。
 
 ## 评估过程
 
@@ -141,27 +147,27 @@ bash scripts/run_standalone_train.sh [DATASET_PATH] [CHECKPOINT_PATH] [CATEGORY]
 
 |  Category  | pixel-level | image-level |
 | :--------: | :---------: | :---------: |
-|   carpet   |    0.949    |    0.919    |
-|    grid    |    0.988    |    0.987    |
-|  leather   |    0.986    |    0.965    |
-|    tile    |    0.95     |    0.967    |
-|    wood    |    0.864    |    0.897    |
-|   bottle   |    0.982    |    0.998    |
-|   cable    |    0.951    |    0.943    |
-|  capsule   |    0.961    |    0.934    |
-|  hazelnut  |    0.979    |    0.986    |
-| metal nut  |    0.969    |    0.997    |
-|    pill    |    0.972    |    0.914    |
-|   screw    |    0.985    |    0.847    |
-| toothbrush |    0.98     |    0.875    |
-| transistor |    0.894    |    0.973    |
-|   zipper   |    0.983    |    0.986    |
-|    mean    |    0.960    |    0.946    |
+| bottle  | 0.987  | 1.000  |
+| cable  | 0.959  | 0.983  |
+| capsule  | 0.984  | 0.868  |
+| carpet  | 0.988  | 0.998  |
+| grid  | 0.990  | 0.997  |
+| hazelnut  | 0.989  | 1.000  |
+| leather  | 0.994  | 1.000  |
+| metal_nut  | 0.976  | 1.000  |
+| pill  | 0.973  | 0.962  |
+| screw  | 0.962  | 0.921  |
+| tile  | 0.965  | 0.978  |
+| toothbrush  | 0.985  | 0.911  |
+| transistor  | 0.829  | 0.942  |
+| wood  | 0.964  | 0.992  |
+| zipper  | 0.981  | 0.910  |
+| mean  | 0.968  | 0.964  |
 
 ## 导出mindir模型
 
 ```python
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --ckpt_file [CKPT_PATH] --category [FILE_NAME] --file_format [FILE_FORMAT]
 ```
 
 参数`ckpt_file` 是必需的，`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中进行选择。
@@ -185,8 +191,8 @@ bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 
 ```text
 category:  zipper
-Total pixel-level auc-roc score :  0.9817775778360928
-Total image-level auc-roc score : 0.9826680672268908
+Total pixel-level auc-roc score :  0.980967986777201
+Total image-level auc-roc score :  0.909926470588235
 ```
 
 # 模型描述

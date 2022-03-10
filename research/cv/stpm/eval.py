@@ -23,8 +23,7 @@ from mindspore import context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore import ops
 from src.dataset import createDataset
-from src.STPM import STPM
-from src.EvalOneStep import EvalOneStepCell
+from src.stpm import STPM
 
 parser = argparse.ArgumentParser(description='test')
 
@@ -32,6 +31,8 @@ parser.add_argument('--category', type=str, default='screw')
 parser.add_argument('--device_id', type=int, default=0, help='Device id')
 parser.add_argument('--data_url', type=str, default="/")
 parser.add_argument('--ckpt_path', type=str, default='./')
+parser.add_argument('--num_class', type=int, default=1000, help="the num of class")
+parser.add_argument('--out_size', type=int, default=256, help="out size")
 
 args = parser.parse_args()
 
@@ -72,11 +73,10 @@ if __name__ == "__main__":
 
     _, ds_test = createDataset(args.data_url, args.category)
 
-    net = STPM()
+    net = STPM(args, is_train=False)
     param = load_checkpoint(os.path.join(args.ckpt_path))
     load_param_into_net(net, param)
-
-    val = EvalOneStepCell(net)
+    net.set_train(False)
 
     gt_list_px_lvl = []
     pred_list_px_lvl = []
@@ -87,8 +87,8 @@ if __name__ == "__main__":
         gt = data['gt']
         label = data['label']
 
-        features_s, features_t = val(data['img'])
-        amap = cal_anomaly_map(features_s, features_t, out_size=256)
+        features_s, features_t = net(data['img'])
+        amap = cal_anomaly_map(features_s, features_t, out_size=args.out_size)
         gt_np = gt.asnumpy()[0, 0].astype(int)
 
         gt_list_px_lvl.extend(gt_np.ravel())
