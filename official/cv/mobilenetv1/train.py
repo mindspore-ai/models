@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,29 +14,22 @@
 # ============================================================================
 """train mobilenet_v1."""
 import os
-import time
-from mindspore import context
-from mindspore import Tensor
-from mindspore.nn.optim.momentum import Momentum
-from mindspore.train.model import Model
-from mindspore.context import ParallelMode
-from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
-from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
-from mindspore.train.loss_scale_manager import FixedLossScaleManager
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.common import set_seed
+
+import mindspore as ms
 import mindspore.nn as nn
+import mindspore.communication as comm
 import mindspore.common.initializer as weight_init
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
+
 from src.lr_generator import get_lr
 from src.CrossEntropySmooth import CrossEntropySmooth
 from src.mobilenet_v1 import mobilenet_v1 as mobilenet
 from src.model_utils.config import config
-from src.model_utils.moxing_adapter import moxing_wrapper
-from src.model_utils.device_adapter import get_device_id, get_device_num
+from src.model_utils.moxing_adapter import moxing_wrapper, modelarts_process
+from src.model_utils.device_adapter import get_device_num
 
 
-set_seed(1)
+ms.set_seed(1)
 
 if config.dataset == 'cifar10':
     from src.dataset import create_dataset1 as create_dataset
@@ -44,66 +37,11 @@ else:
     from src.dataset import create_dataset2 as create_dataset
 
 
-def modelarts_pre_process():
-    def unzip(zip_file, save_dir):
-        import zipfile
-        s_time = time.time()
-        if not os.path.exists(os.path.join(save_dir, config.modelarts_dataset_unzip_name)):
-            zip_isexist = zipfile.is_zipfile(zip_file)
-            if zip_isexist:
-                fz = zipfile.ZipFile(zip_file, 'r')
-                data_num = len(fz.namelist())
-                print("Extract Start...")
-                print("unzip file num: {}".format(data_num))
-                data_print = int(data_num / 100) if data_num > 100 else 1
-                i = 0
-                for file in fz.namelist():
-                    if i % data_print == 0:
-                        print("unzip percent: {}%".format(int(i * 100 / data_num)), flush=True)
-                    i += 1
-                    fz.extract(file, save_dir)
-                print("cost time: {}min:{}s.".format(int((time.time() - s_time) / 60),\
-                    int(int(time.time() - s_time) % 60)))
-                print("Extract Done")
-            else:
-                print("This is not zip.")
-        else:
-            print("Zip has been extracted.")
-
-    if config.need_modelarts_dataset_unzip:
-        zip_file_1 = os.path.join(config.data_path, config.modelarts_dataset_unzip_name + ".zip")
-        save_dir_1 = os.path.join(config.data_path)
-
-        sync_lock = "/tmp/unzip_sync.lock"
-
-        # Each server contains 8 devices as most
-        if get_device_id() % min(get_device_num(), 8) == 0 and not os.path.exists(sync_lock):
-            print("Zip file path: ", zip_file_1)
-            print("Unzip file save dir: ", save_dir_1)
-            unzip(zip_file_1, save_dir_1)
-            print("===Finish extract data synchronization===")
-            try:
-                os.mknod(sync_lock)
-            except IOError:
-                pass
-
-        while True:
-            if os.path.exists(sync_lock):
-                break
-            time.sleep(1)
-
-        print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
-        print("#" * 200, os.listdir(save_dir_1))
-        print("#" * 200, os.listdir(os.path.join(config.data_path, config.modelarts_dataset_unzip_name)))
-
-        config.dataset_path = os.path.join(config.data_path, config.modelarts_dataset_unzip_name)
-    config.save_checkpoint_path = config.output_path
-
 def init_weigth(net):
     # init weight
     if config.pre_trained:
-        param_dict = load_checkpoint(config.pre_trained)
-        load_param_into_net(net, param_dict)
+        param_dict = ms.load_checkpoint(config.pre_trained)
+        ms.load_param_into_net(net, param_dict)
     else:
         for _, cell in net.cells_and_names():
             if isinstance(cell, nn.Conv2d):
@@ -115,7 +53,8 @@ def init_weigth(net):
                                                              cell.weight.shape,
                                                              cell.weight.dtype))
 
-@moxing_wrapper(pre_process=modelarts_pre_process)
+
+@moxing_wrapper(pre_process=modelarts_process)
 def train_mobilenetv1():
     """ train_mobilenetv1 """
     if config.dataset == 'imagenet2012':
@@ -124,31 +63,31 @@ def train_mobilenetv1():
     ckpt_save_dir = config.save_checkpoint_path
 
     # init context
-    context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=False)
 
     # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
-    context.set_context(mempool_block_size="31GB")
+    ms.set_context(mempool_block_size="31GB")
 
     if config.parameter_server:
-        context.set_ps_context(enable_ps=True)
+        ms.set_ps_context(enable_ps=True)
     device_id = int(os.getenv('DEVICE_ID', '0'))
     if config.run_distribute:
         if target == "Ascend":
-            context.set_context(device_id=device_id)
-            context.set_auto_parallel_context(device_num=get_device_num(), parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
-            init()
-            context.set_auto_parallel_context(all_reduce_fusion_config=[75])
+            ms.set_context(device_id=device_id)
+            ms.set_auto_parallel_context(device_num=get_device_num(), parallel_mode=ms.ParallelMode.DATA_PARALLEL,
+                                         gradients_mean=True)
+            comm.init()
+            ms.set_auto_parallel_context(all_reduce_fusion_config=[75])
         # GPU target
         else:
-            init()
-            context.set_auto_parallel_context(device_num=get_group_size(), parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
-        ckpt_save_dir = config.save_checkpoint_path + "ckpt_" + str(get_rank()) + "/"
+            comm.init()
+            ms.set_auto_parallel_context(device_num=ms.get_group_size(), parallel_mode=ms.ParallelMode.DATA_PARALLEL,
+                                         gradients_mean=True)
+        ckpt_save_dir = config.save_checkpoint_path + "ckpt_" + str(comm.get_rank()) + "/"
 
     # create dataset
     dataset = create_dataset(dataset_path=config.dataset_path, do_train=True, device_num=config.device_num,
-                             repeat_num=1, batch_size=config.batch_size, target=target)
+                             batch_size=config.batch_size, target=target)
     step_size = dataset.get_dataset_size()
 
     # define net
@@ -162,7 +101,7 @@ def train_mobilenetv1():
     lr = get_lr(lr_init=config.lr_init, lr_end=config.lr_end, lr_max=config.lr_max,
                 warmup_epochs=config.warmup_epochs, total_epochs=config.epoch_size, steps_per_epoch=step_size,
                 lr_decay_mode=config.lr_decay_mode)
-    lr = Tensor(lr)
+    lr = ms.Tensor(lr)
 
     # define opt
     decayed_params = []
@@ -177,10 +116,10 @@ def train_mobilenetv1():
         group_params = [{'params': decayed_params, 'weight_decay': config.weight_decay},
                         {'params': no_decayed_params},
                         {'order_params': net.trainable_params()}]
-        opt = Momentum(group_params, lr, config.momentum, loss_scale=config.loss_scale)
+        opt = nn.Momentum(group_params, lr, config.momentum, loss_scale=config.loss_scale)
     else:
-        opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), lr, config.momentum,
-                       config.weight_decay)
+        opt = nn.Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), lr, config.momentum,
+                          config.weight_decay)
     # define loss, model
     if config.dataset == "imagenet2012":
         if not config.use_label_smooth:
@@ -188,13 +127,13 @@ def train_mobilenetv1():
         loss = CrossEntropySmooth(sparse=True, reduction="mean",
                                   smooth_factor=config.label_smooth_factor, num_classes=config.class_num)
     else:
-        loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-    loss_scale = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
+        loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+    loss_scale = ms.FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
     if target == "Ascend":
-        model = Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale, metrics={'acc'},
-                      amp_level="O2", keep_batchnorm_fp32=False)
+        model = ms.Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale, metrics={'acc'},
+                         amp_level="O2", keep_batchnorm_fp32=False)
     else:
-        model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'})
+        model = ms.Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'})
 
     # define callbacks
     time_cb = TimeMonitor(data_size=step_size)
@@ -209,6 +148,7 @@ def train_mobilenetv1():
     # train model
     model.train(config.epoch_size - config.pretrain_epoch_size, dataset, callbacks=cb,
                 sink_size=dataset.get_dataset_size(), dataset_sink_mode=(not config.parameter_server))
+
 
 if __name__ == '__main__':
     train_mobilenetv1()
