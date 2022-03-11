@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,15 +18,11 @@ create train or eval dataset.
 import os
 import numpy as np
 
-from mindspore import Tensor
-from mindspore.train.model import Model
-import mindspore.common.dtype as mstype
+import mindspore as ms
 import mindspore.dataset as ds
-import mindspore.dataset.vision.c_transforms as C
-import mindspore.dataset.transforms.c_transforms as C2
 
 
-def create_dataset(dataset_path, do_train, config, repeat_num=1, enable_cache=False, cache_session_id=None):
+def create_dataset(dataset_path, do_train, config, enable_cache=False, cache_session_id=None):
     """
     create a train or eval dataset
 
@@ -34,7 +30,6 @@ def create_dataset(dataset_path, do_train, config, repeat_num=1, enable_cache=Fa
         dataset_path(string): the path of dataset.
         do_train(bool): whether dataset is used for train or eval.
         config(struct): the config of train and eval in diffirent platform.
-        repeat_num(int): the repeat times of dataset. Default: 1.
         enable_cache(bool): whether tensor caching service is used for dataset on nfs. Default: False
         cache_session_id(string): If enable_cache, cache session_id need to be provided. Default: None
 
@@ -57,23 +52,24 @@ def create_dataset(dataset_path, do_train, config, repeat_num=1, enable_cache=Fa
     buffer_size = 1000
 
     # define map operations
-    decode_op = C.Decode()
-    resize_crop_op = C.RandomCropDecodeResize(resize_height, scale=(0.08, 1.0), ratio=(0.75, 1.333))
-    horizontal_flip_op = C.RandomHorizontalFlip(prob=0.5)
+    decode_op = ds.vision.c_transforms.Decode()
+    resize_crop_op = ds.vision.c_transforms.RandomCropDecodeResize(resize_height,
+                                                                   scale=(0.08, 1.0), ratio=(0.75, 1.333))
+    horizontal_flip_op = ds.vision.c_transforms.RandomHorizontalFlip(prob=0.5)
 
-    resize_op = C.Resize((256, 256))
-    center_crop = C.CenterCrop(resize_width)
-    rescale_op = C.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4)
-    normalize_op = C.Normalize(mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
-                               std=[0.229 * 255, 0.224 * 255, 0.225 * 255])
-    change_swap_op = C.HWC2CHW()
+    resize_op = ds.vision.c_transforms.Resize((256, 256))
+    center_crop = ds.vision.c_transforms.CenterCrop(resize_width)
+    rescale_op = ds.vision.c_transforms.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4)
+    normalize_op = ds.vision.c_transforms.Normalize(mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
+                                                    std=[0.229 * 255, 0.224 * 255, 0.225 * 255])
+    change_swap_op = ds.vision.c_transforms.HWC2CHW()
 
     if do_train:
         trans = [resize_crop_op, horizontal_flip_op, rescale_op, normalize_op, change_swap_op]
     else:
         trans = [decode_op, resize_op, center_crop, normalize_op, change_swap_op]
 
-    type_cast_op = C2.TypeCast(mstype.int32)
+    type_cast_op = ds.transforms.c_transforms.TypeCast(ms.int32)
 
     data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=num_workers)
     data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=num_workers)
@@ -83,9 +79,6 @@ def create_dataset(dataset_path, do_train, config, repeat_num=1, enable_cache=Fa
 
     # apply batch operations
     data_set = data_set.batch(config.batch_size, drop_remainder=True)
-
-    # apply dataset repeat operation
-    data_set = data_set.repeat(repeat_num)
 
     return data_set
 
@@ -102,7 +95,7 @@ def extract_features(net, dataset_path, config):
         raise ValueError("The step_size of dataset is zero. Check if the images count of train dataset is more \
             than batch_size in config.py")
 
-    model = Model(net)
+    model = ms.Model(net)
 
     for i, data in enumerate(dataset.create_dict_iterator(output_numpy=True)):
         features_path = os.path.join(features_folder, f"feature_{i}.npy")
@@ -110,7 +103,7 @@ def extract_features(net, dataset_path, config):
         if not os.path.exists(features_path) or not os.path.exists(label_path):
             image = data["image"]
             label = data["label"]
-            features = model.predict(Tensor(image))
+            features = model.predict(ms.Tensor(image))
             np.save(features_path, features.asnumpy())
             np.save(label_path, label)
         print(f"Complete the batch {i + 1}/{step_size}")
