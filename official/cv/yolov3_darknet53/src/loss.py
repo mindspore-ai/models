@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """YOLOV3 loss."""
-from mindspore.ops import operations as P
+import mindspore.ops as ops
 import mindspore.nn as nn
 
 
@@ -21,8 +21,8 @@ class XYLoss(nn.Cell):
     """Loss for x and y."""
     def __init__(self):
         super(XYLoss, self).__init__()
-        self.cross_entropy = P.SigmoidCrossEntropyWithLogits()
-        self.reduce_sum = P.ReduceSum()
+        self.cross_entropy = ops.SigmoidCrossEntropyWithLogits()
+        self.reduce_sum = ops.ReduceSum()
 
     def construct(self, object_mask, box_loss_scale, predict_xy, true_xy):
         xy_loss = object_mask * box_loss_scale * self.cross_entropy(predict_xy, true_xy)
@@ -34,11 +34,11 @@ class WHLoss(nn.Cell):
     """Loss for w and h."""
     def __init__(self):
         super(WHLoss, self).__init__()
-        self.square = P.Square()
-        self.reduce_sum = P.ReduceSum()
+        self.square = ops.Square()
+        self.reduce_sum = ops.ReduceSum()
 
     def construct(self, object_mask, box_loss_scale, predict_wh, true_wh):
-        wh_loss = object_mask * box_loss_scale * 0.5 * P.Square()(true_wh - predict_wh)
+        wh_loss = object_mask * box_loss_scale * 0.5 * ops.Square()(true_wh - predict_wh)
         wh_loss = self.reduce_sum(wh_loss, ())
         return wh_loss
 
@@ -47,8 +47,8 @@ class ConfidenceLoss(nn.Cell):
     """Loss for confidence."""
     def __init__(self):
         super(ConfidenceLoss, self).__init__()
-        self.cross_entropy = P.SigmoidCrossEntropyWithLogits()
-        self.reduce_sum = P.ReduceSum()
+        self.cross_entropy = ops.SigmoidCrossEntropyWithLogits()
+        self.reduce_sum = ops.ReduceSum()
 
     def construct(self, object_mask, predict_confidence, ignore_mask):
         confidence_loss = self.cross_entropy(predict_confidence, object_mask)
@@ -61,8 +61,8 @@ class ClassLoss(nn.Cell):
     """Loss for classification."""
     def __init__(self):
         super(ClassLoss, self).__init__()
-        self.cross_entropy = P.SigmoidCrossEntropyWithLogits()
-        self.reduce_sum = P.ReduceSum()
+        self.cross_entropy = ops.SigmoidCrossEntropyWithLogits()
+        self.reduce_sum = ops.ReduceSum()
 
     def construct(self, object_mask, predict_class, class_probs):
         class_loss = object_mask * self.cross_entropy(predict_class, class_probs)
