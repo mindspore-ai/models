@@ -67,11 +67,9 @@ MASS网络由Transformer实现，Transformer包括多个编码器层和多个解
 
 本文运用数据集包括：
 
-- News Crawl数据集（WMT，2019年）的英语单语数据，用于预训练
-- Gigaword语料库（Graff等人，2003年），用于文本摘要
-- Cornell电影对白语料库（DanescuNiculescu-Mizil & Lee，2011年）
-
-数据集相关信息，参见[MASS：语言生成的隐式序列到序列预训练](https://www.microsoft.com/en-us/research/uploads/prod/2019/06/MASS-paper-updated-002.pdf)。
+- [News Crawl数据集](https://www.statmt.org/wmt16/translation-task.html)（WMT，2019年）的英语单语数据，用于预训练
+- [Gigaword语料库](https://github.com/harvardnlp/sent-summary)（Graff等人，2003年），用于文本摘要
+- [Cornell电影对白语料库](https://github.com/suriyadeepan/datasets/tree/master/seq2seq/)（DanescuNiculescu-Mizil & Lee，2011年）
 
 ## 特性
 
