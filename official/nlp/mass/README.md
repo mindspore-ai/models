@@ -69,11 +69,9 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 
 Dataset used:
 
-- monolingual English data from News Crawl dataset(WMT 2019) for pre-training.
-- Gigaword Corpus(Graff et al., 2003) for Text Summarization.
-- Cornell movie dialog corpus(DanescuNiculescu-Mizil & Lee, 2011).
-
-Details about those dataset could be found in [MASS: Masked Sequence to Sequence Pre-training for Language Generation](https://www.microsoft.com/en-us/research/uploads/prod/2019/06/MASS-paper-updated-002.pdf).
+- [monolingual English data from News Crawl dataset](https://www.statmt.org/wmt16/translation-task.html)(WMT 2019) for pre-training.
+- [Gigaword Corpus](https://github.com/harvardnlp/sent-summary)(Graff et al., 2003) for Text Summarization.
+- [Cornell movie dialog corpus](https://github.com/suriyadeepan/datasets/tree/master/seq2seq/)(DanescuNiculescu-Mizil & Lee, 2011).
 
 # Features
 
