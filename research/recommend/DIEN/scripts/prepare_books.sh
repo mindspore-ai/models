@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+#!/bin/bash
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,16 @@
 # limitations under the License.
 # ============================================================================
 
-wget http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/reviews_Books.json.gz
+wget http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/reviews_Books_5.json.gz
 wget http://snap.stanford.edu/data/amazon/productGraph/categoryFiles/meta_Books.json.gz
-gunzip reviews_Books.json.gz
+gunzip reviews_Books_5.json.gz
 gunzip meta_Books.json.gz
 python ../src/process_data.py meta_Books.json reviews_Books_5.json
 python ../src/local_aggretor.py
 python ../src/split_by_user.py
 python ../src/generate_voc.py
+mkdir Books
+mv ./*info ./Books
+mv ./jointed* ./Books
+mv ./local* ./Books
+mv ./*.pkl ./Books

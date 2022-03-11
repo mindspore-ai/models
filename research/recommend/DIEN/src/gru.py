@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-'''RNN operators module, include RNN, GRU'''
+"""RNN operators module, include RNN, GRU"""
 import math
 import numpy as np
 import mindspore.ops as P
@@ -44,7 +44,7 @@ def _check_input_dtype(input_dtype, param_name, allow_dtypes, cls_name):
 
 
 def _rnn_tanh_cell(inputs, hidden, w_ih, w_hh, b_ih, b_hh):
-    '''RNN cell function with tanh activation'''
+    """RNN cell function with tanh activation"""
     if b_ih is None:
         igates = P.MatMul(False, True)(inputs, w_ih)
         hgates = P.MatMul(False, True)(hidden, w_hh)
@@ -55,7 +55,7 @@ def _rnn_tanh_cell(inputs, hidden, w_ih, w_hh, b_ih, b_hh):
 
 
 def _rnn_relu_cell(inputs, hidden, w_ih, w_hh, b_ih, b_hh):
-    '''RNN cell function with relu activation'''
+    """RNN cell function with relu activation"""
     if b_ih is None:
         igates = P.MatMul(False, True)(inputs, w_ih)
         hgates = P.MatMul(False, True)(hidden, w_hh)
@@ -66,7 +66,7 @@ def _rnn_relu_cell(inputs, hidden, w_ih, w_hh, b_ih, b_hh):
 
 
 def _lstm_cell(inputs, hidden, w_ih, w_hh, b_ih, b_hh):
-    '''LSTM cell function'''
+    """LSTM cell function"""
     hx, cx = hidden
     if b_ih is None:
         gates = P.MatMul(False, True)(inputs, w_ih) + P.MatMul(False, True)(hx, w_hh)
@@ -86,7 +86,7 @@ def _lstm_cell(inputs, hidden, w_ih, w_hh, b_ih, b_hh):
 
 
 def _gru_cell(inputs, hidden, w_ih, w_hh, b_ih, b_hh):
-    '''GRU cell function'''
+    """GRU cell function"""
     if b_ih is None:
         gi = P.MatMul(False, True)(inputs, w_ih)
         gh = P.MatMul(False, True)(hidden, w_hh)
@@ -105,7 +105,7 @@ def _gru_cell(inputs, hidden, w_ih, w_hh, b_ih, b_hh):
 
 
 class _DynamicRNN(Cell):
-    '''Dynamic RNN module to compute RNN cell by timesteps'''
+    """Dynamic RNN module to compute RNN cell by timesteps"""
 
     def __init__(self, mode):
         super().__init__()
@@ -124,7 +124,7 @@ class _DynamicRNN(Cell):
         self.is_lstm = mode == "LSTM"
 
     def recurrent(self, x, h_0, w_ih, w_hh, b_ih, b_hh):
-        '''recurrent steps without sequence length'''
+        """recurrent steps without sequence length"""
         time_step = x.shape[0]
         outputs = []
         t = 0
@@ -142,7 +142,7 @@ class _DynamicRNN(Cell):
         return outputs, h
 
     def variable_recurrent(self, x, h, seq_length, w_ih, w_hh, b_ih, b_hh):
-        '''recurrent steps with sequence length'''
+        """recurrent steps with sequence length"""
         time_step = x.shape[0]
         h_t = h
         if self.is_lstm:
@@ -184,7 +184,7 @@ class _DynamicRNN(Cell):
 
 
 class _RNNBase(Cell):
-    '''Basic class for RNN operators'''
+    """Basic class for RNN operators"""
 
     def __init__(self, mode, input_size, hidden_size, num_layers=1, has_bias=True,
                  batch_first=False, dropout=0.0, bidirectional=False):
@@ -346,7 +346,7 @@ class _RNNBase(Cell):
         return output, h_n.view(h.shape)
 
     def construct(self, x, hx=None, seq_length=None):
-        '''Defines the RNN like operators performed'''
+        """Defines the RNN like operators performed"""
         x_dtype = P.dtype(x)
         hx_dtype = P.dtype(hx)
         _check_input_dtype(x_dtype, "x", [mstype.float32], self.cls_name)
@@ -527,7 +527,7 @@ class GRU(_RNNBase):
 
 
 class _RNNCellBase(Cell):
-    '''Basic class for RNN Cells'''
+    """Basic class for RNN Cells"""
 
     def __init__(self, input_size: int, hidden_size: int, has_bias: bool, num_chunks: int):
         super().__init__()
@@ -608,7 +608,6 @@ class RNNCell(_RNNCellBase):
         self.nonlinearity = nonlinearity
 
     def construct(self, x, hx):
-        """construct"""
         x_dtype = P.dtype(x)
         hx_dtype = P.dtype(hx)
         _check_input_dtype(x_dtype, "x", [mstype.float32], self.cls_name)
@@ -686,7 +685,7 @@ class GRUCell(_RNNCellBase):
 
 
 class _DynamicRNNAUGRU(Cell):
-    '''Dynamic RNN module to compute RNN cell by timesteps'''
+    """Dynamic RNN module to compute RNN cell by timesteps"""
 
     def __init__(self, mode):
         super().__init__()
@@ -699,7 +698,7 @@ class _DynamicRNNAUGRU(Cell):
         self.is_lstm = mode == "LSTM"
 
     def recurrent(self, x, h_0, w_ih, w_hh, b_ih, b_hh, att_score):
-        '''recurrent steps without sequence length'''
+        """recurrent steps without sequence length"""
         time_step = x.shape[0]
         outputs = []
         t = 0
@@ -717,7 +716,7 @@ class _DynamicRNNAUGRU(Cell):
         return outputs, h
 
     def variable_recurrent(self, x, h, seq_length, w_ih, w_hh, b_ih, b_hh, att_score):
-        '''recurrent steps with sequence length'''
+        """recurrent steps with sequence length"""
         time_step = x.shape[0]
         h_t = h
         if self.is_lstm:
@@ -760,7 +759,7 @@ class _DynamicRNNAUGRU(Cell):
 
 
 class _RNNBaseAUGRU(Cell):
-    '''Basic class for RNN operators'''
+    """Basic class for RNN operators"""
 
     def __init__(self, mode, input_size, hidden_size, num_layers=1, has_bias=True,
                  batch_first=False, dropout=0.0, bidirectional=False):
@@ -914,7 +913,7 @@ class _RNNBaseAUGRU(Cell):
         return output, h_n.view(h.shape)
 
     def construct(self, att_score, x, hx=None, seq_length=None):
-        '''Defines the RNN like operators performed'''
+        """Defines the RNN like operators performed"""
         x_dtype = P.dtype(x)
         hx_dtype = P.dtype(hx)
         _check_input_dtype(x_dtype, "x", [mstype.float32], self.cls_name)
@@ -940,7 +939,7 @@ class _RNNBaseAUGRU(Cell):
 
 
 def _augru_cell(inputs, hidden, w_ih, w_hh, b_ih, b_hh, att_score):
-    '''AUGRU cell function'''
+    """AUGRU cell function"""
     if b_ih is None:
         gi = P.MatMul(False, True)(inputs, w_ih)
         gh = P.MatMul(False, True)(hidden, w_hh)
@@ -962,8 +961,6 @@ def _augru_cell(inputs, hidden, w_ih, w_hh, b_ih, b_hh, att_score):
 
 
 class AUGRUCell(_RNNCellBase):
-    """augruCell"""
-
     def __init__(self, input_size: int, hidden_size: int, has_bias: bool = True):
         super().__init__(input_size, hidden_size, has_bias, num_chunks=3)
 
@@ -977,7 +974,7 @@ class AUGRUCell(_RNNCellBase):
 
 
 class AUGRU(_RNNBaseAUGRU):
-    '''AUGRU'''
+    """AUGRU"""
 
     def __init__(self, *args, **kwargs):
         mode = 'AUGRU'

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,34 +13,33 @@
 # limitations under the License.
 # ============================================================================
 
-"""train"""
-
 import time
 import os
+import math
 
 import mindspore
-from mindspore import context
+from mindspore import context, Tensor
 from mindspore import dtype as mstype
-from mindspore import Tensor
 from mindspore.context import ParallelMode
 from mindspore.communication import get_rank, get_group_size
 from mindspore import save_checkpoint
 import mindspore.nn as nn
 import mindspore.dataset as ds
 
-from src.model import DIEN, Ctr_Loss, CustomWithLossCell, TrainOneStepCell
-from src.dataset_train import DataIterator, create_dataset
+from src.dataset import DataIterator, create_dataset
+from src.dien import DIEN, Ctr_Loss, CustomWithLossCell, TrainOneStepCell
 from src.config import parse_args
 
+# hyper-parameter
 EMBEDDING_DIM = 18
 HIDDEN_SIZE = 18 * 2
 ATTENTION_SIZE = 18 * 2
-best_auc = 0.0
-
 args_opt = parse_args()
 
 if args_opt.is_modelarts:
     import moxing as mox
+epoch_size = args_opt.epoch_size
+base_lr = args_opt.base_lr
 batch_size = args_opt.batch_size
 max_len = args_opt.max_len
 
@@ -52,10 +51,10 @@ def train(ds_train, save_checkpoint_path,
           cat_voc,
           meta_path,
           review_path,
-          batch_size_train,
-          maxlen,
+          batch_size_train=128,
+          maxlen=100,
           ):
-    """train data"""
+    # train data
     train_data = DataIterator(train_file, uid_voc, mid_voc, cat_voc, meta_path, review_path,
                               batch_size_train, maxlen,
                               shuffle_each_epoch=False)
@@ -67,14 +66,13 @@ def train(ds_train, save_checkpoint_path,
     loss_fn = Ctr_Loss()
     net_with_criterion = CustomWithLossCell(model, loss_fn)
 
-    # hyper-parameter
-    epoch_size = 3
-    if args_opt.dataset_type == 'Books':
-        milestone = [8486, 16972, 25458]
-        learning_rates = [0.001, 0.0005, 0.00025]
-    elif args_opt.dataset_type == 'Electronics':
-        milestone = [2707, 5414, 8121]
-        learning_rates = [0.001, 0.0005, 0.00025]
+    dataset_size = ds_train.get_dataset_size()
+
+    milestone = []
+    learning_rates = []
+    for i in range(epoch_size):
+        milestone.append(dataset_size * (i + 1))
+        learning_rates.append(base_lr * math.pow(0.5, i))
     lr = nn.dynamic_lr.piecewise_constant_lr(milestone, learning_rates)
 
     # optimizer
@@ -85,15 +83,17 @@ def train(ds_train, save_checkpoint_path,
     print(ds_train.get_dataset_size())
     for epoch in range(epoch_size):
         time_start = time.time()
+        pre_step_time = time_start
         step = 0
         print('epoch', epoch)
         loss_sum = Tensor(0.0, dtype=mstype.float32)
         for d in ds_train.create_dict_iterator():
             loss = train_net(d['mid_mask'], d['uids'], d['mids'], d['cats'], d['mid_his'], d['cat_his'],
                              d['noclk_mids'], d['noclk_cats'], d['target'])
-            print('step:', step)
-            print('loss:', loss)
             loss_sum += loss
+            step_end = time.time()
+            print("current_epoch:{0}, current_step:{1}, step_time:{2}".format(epoch, step, step_end - pre_step_time))
+            pre_step_time = step_end
             step += 1
         time_end = time.time()
         print('train_loss:', loss_sum.asnumpy() / step)
@@ -183,10 +183,7 @@ def not_modelarts(target):
     meta_path = os.path.join(dataset_file_path, "item-info")
     review_path = os.path.join(dataset_file_path, "reviews-info")
     save_checkpoint_path = './ckpt/'
-    if args_opt.dataset_type == 'Books':
-        train_mindrecord_path = os.path.join(args_opt.mindrecord_path, 'Books_train_1.mindrecord')
-    elif args_opt.dataset_type == 'Electronics':
-        train_mindrecord_path = os.path.join(args_opt.mindrecord_path, 'Electronics_train_1.mindrecord')
+    train_mindrecord_path = os.path.join(args_opt.mindrecord_path, '{0}_train.mindrecord'.format(args_opt.dataset_type))
     if args_opt.run_distribute:
         if target == 'Ascend':
             rank_id = get_rank()
@@ -205,6 +202,25 @@ def not_modelarts(target):
             train(ds_train, save_checkpoint_path, train_file=train_file, uid_voc=uid_voc,
                   mid_voc=mid_voc, cat_voc=cat_voc, meta_path=meta_path, review_path=review_path,
                   batch_size_train=batch_size, maxlen=max_len)
+        elif target == 'GPU':
+            mindspore.communication.init("nccl")
+            rank_size = get_group_size()
+            rank_id = get_rank()
+            context.set_context(device_id=rank_id)
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(device_num=rank_size,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              parameter_broadcast=True,
+                                              gradients_mean=True)
+
+            ds_train = ds.MindDataset(train_mindrecord_path,
+                                      num_shards=rank_size,
+                                      shard_id=rank_id)
+            save_checkpoint_path += str(rank_id)
+            if not os.path.exists(save_checkpoint_path):
+                os.mkdir(save_checkpoint_path)
+            train(ds_train, save_checkpoint_path, train_file=train_file, uid_voc=uid_voc,
+                  mid_voc=mid_voc, cat_voc=cat_voc, meta_path=meta_path, review_path=review_path)
     else:
         if target == 'Ascend':
             device_id = args_opt.device_id
@@ -213,6 +229,17 @@ def not_modelarts(target):
             train(ds_train, save_checkpoint_path, train_file=train_file, uid_voc=uid_voc,
                   mid_voc=mid_voc, cat_voc=cat_voc, meta_path=meta_path, review_path=review_path,
                   batch_size_train=batch_size, maxlen=max_len)
+
+        elif target == 'GPU':
+            device_id = args_opt.device_id
+            device_target = args_opt.device_target
+            context.set_context(mode=context.GRAPH_MODE, device_target=device_target, device_id=device_id)
+            ds_train = create_dataset(train_mindrecord_path)
+            if not os.path.exists(save_checkpoint_path):
+                os.mkdir(save_checkpoint_path)
+            train(ds_train, save_checkpoint_path, train_file=train_file, uid_voc=uid_voc,
+                  mid_voc=mid_voc, cat_voc=cat_voc, meta_path=meta_path,
+                  review_path=review_path, batch_size_train=batch_size, maxlen=max_len)
 
 
 def main():

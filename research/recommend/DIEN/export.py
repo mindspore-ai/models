@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
 # ============================================================================
 
 """export"""
-
+import os
 import numpy as np
 
 from mindspore import Tensor, export, load_checkpoint
 from mindspore import context
 
-from src.model import DIEN
-from src.dataset_train import DataIterator
+from src.dien import DIEN
+from src.dataset import DataIterator
 from src.config import parse_args
 
 args_opt = parse_args()
@@ -60,9 +60,11 @@ def main():
     context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
 
     device_id = args_opt.device_id
+
     context.set_context(device_id=device_id)
 
     dataset_file_path = args_opt.dataset_file_path
+    train_file = args_opt.train_mindrecord_path
     uid_voc = os.path.join(dataset_file_path, "uid_voc.pkl")
     mid_voc = os.path.join(dataset_file_path, "mid_voc.pkl")
     cat_voc = os.path.join(dataset_file_path, "cat_voc.pkl")

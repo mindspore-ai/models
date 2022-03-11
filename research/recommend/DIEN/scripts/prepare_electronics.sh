@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+#!/bin/bash
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,3 +22,8 @@ python ../src/process_data.py meta_Electronics.json reviews_Electronics_5.json
 python ../src/local_aggretor.py
 python ../src/split_by_user.py
 python ../src/generate_voc.py
+mkdir Electronics
+mv ./*info ./Electronics
+mv ./jointed* ./Electronics
+mv ./local* ./Electronics
+mv ./*.pkl ./Electronics
