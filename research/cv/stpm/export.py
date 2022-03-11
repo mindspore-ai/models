@@ -48,5 +48,5 @@ if __name__ == '__main__':
     param_dict = load_checkpoint(args.ckpt_file)
     load_param_into_net(net, param_dict)
 
-    input_arr = Tensor(np.ones([args.batch_size, 3, 256, 256]), mstype.float32)
+    input_arr = Tensor(np.ones([args.batch_size, 3, args.out_size, args.out_size]), mstype.float32)
     export(net, input_arr, file_name=args.category, file_format=args.file_format)

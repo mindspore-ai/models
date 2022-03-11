@@ -29,16 +29,18 @@ class MVTecDataset():
     """
     MVTecDataset
     """
-    def __init__(self, root, transform, gt_transform, phase, is_json=False):
+
+    def __init__(self, root, transform, gt_transform, phase, is_json=False, save_sample=False):
         if phase == 'train':
             self.img_path = os.path.join(root, 'train')
         else:
             self.img_path = os.path.join(root, 'test')
             self.gt_path = os.path.join(root, 'ground_truth')
-
+        self.save_sample = save_sample
         self.is_json = is_json
         self.transform = transform
         self.gt_transform = gt_transform
+        self.max_filename_length = 300
         self.img_paths, self.gt_paths, self.labels, self.types = self.load_dataset()
 
     def load_dataset(self):
@@ -72,6 +74,14 @@ class MVTecDataset():
 
         return img_tot_paths, gt_tot_paths, tot_labels, tot_types
 
+    def trans_filename(self, file_path, img_type):
+        file_name = os.path.split(file_path)[-1]
+        file_name = os.path.splitext(file_name)[0]
+        file_name_type = img_type + "_" + file_name
+        file_name_type = np.fromstring(file_name_type, np.uint8)
+        file_name_type = np.pad(file_name_type, (0, self.max_filename_length - file_name_type.shape[0]))
+        return file_name_type
+
     def __len__(self):
         return len(self.img_paths)
 
@@ -88,38 +98,47 @@ class MVTecDataset():
 
         if self.is_json:
             return os.path.basename(img_path[:-4]), img_type
+
+        if self.save_sample:
+            file_name = self.trans_filename(img_path, img_type)
+            return img, gt, label, idx, file_name
+
         return img, gt, label, idx
 
 
-def createDataset(dataset_path, category):
+def createDataset(dataset_path, category, save_sample=False, out_size=256, train_batch_size=32):
     """createDataset
     """
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
 
     data_transforms = Compose([
-        py_vision.Resize((256, 256), interpolation=Inter.ANTIALIAS),
-        py_vision.CenterCrop(256),
+        py_vision.Resize((out_size, out_size), interpolation=Inter.ANTIALIAS),
+        py_vision.CenterCrop(out_size),
         py_vision.ToTensor(),
         py_vision.Normalize(mean=mean, std=std)
     ])
     gt_transforms = Compose([
-        py_vision.Resize((256, 256)),
-        py_vision.CenterCrop(256),
+        py_vision.Resize((out_size, out_size)),
+        py_vision.CenterCrop(out_size),
         py_vision.ToTensor()
     ])
 
     train_data = MVTecDataset(root=os.path.join(dataset_path, category),
                               transform=data_transforms, gt_transform=gt_transforms, phase='train')
     test_data = MVTecDataset(root=os.path.join(dataset_path, category),
-                             transform=data_transforms, gt_transform=gt_transforms, phase='test')
+                             transform=data_transforms, gt_transform=gt_transforms,
+                             phase='test', save_sample=save_sample)
 
     train_dataset = ds.GeneratorDataset(train_data, column_names=['img', 'gt', 'label', 'idx'],
                                         shuffle=True)
-    test_dataset = ds.GeneratorDataset(test_data, column_names=['img', 'gt', 'label', 'idx'],
+    eval_column_names = ['img', 'gt', 'label', 'idx']
+    if save_sample:
+        eval_column_names.append('filename')
+    test_dataset = ds.GeneratorDataset(test_data, column_names=eval_column_names,
                                        shuffle=False)
 
-    train_dataset = train_dataset.batch(32, drop_remainder=False)
+    train_dataset = train_dataset.batch(train_batch_size, drop_remainder=False)
     test_dataset = test_dataset.batch(1, drop_remainder=True)
 
     return train_dataset, test_dataset

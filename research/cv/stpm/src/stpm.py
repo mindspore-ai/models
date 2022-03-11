@@ -44,11 +44,11 @@ class STPM(nn.Cell):
     '''
     STPM Network
     '''
-    def __init__(self, args, is_train=True):
+    def __init__(self, args, is_train=True, finetune=False):
         super(STPM, self).__init__()
         use_batch_statistics = False if is_train else None
         self.model_t = resnet18(args.num_class, use_batch_statistics=use_batch_statistics)
-        if is_train and not args.finetune:
+        if is_train and not finetune:
             self.model_t = load_ckpt_to_net(self.model_t, args)
         self.model_s = resnet18(args.num_class)
 

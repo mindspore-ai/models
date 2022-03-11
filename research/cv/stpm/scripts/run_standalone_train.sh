@@ -17,7 +17,7 @@ if [ $# != 4 ]
 then
     echo "=============================================================================================================="
     echo "Please run the script as: "
-    echo "bash run_all_mvtec.sh DATASET_PATH BACKONE_PATH CATEGORY DEVICE_ID"
+    echo "bash run_standalone_train.sh DATASET_PATH BACKONE_PATH CATEGORY DEVICE_ID"
     echo "For example: bash run_standalone_train.sh /path/dataset /path/backbone_ckpt category 1"
     echo "It is better to use the absolute path."
     echo "=============================================================================================================="
