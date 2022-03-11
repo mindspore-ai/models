@@ -118,9 +118,12 @@ The structure of the files in this repository is shown below.
     ├─ scripts
        ├─ docker_start.sh
        ├─ eval.sh                // launch ascend standalone evaluation
+       ├─ eval_gpu.sh                // launch gpu standalone evaluation
        ├─ run_infer_310.sh       //  310 infer
        ├─ train_distributed.sh   // launch ascend distributed training
-       └─ train_standalone.sh    // launch ascend standalone training
+       ├─ train_distributed_gpu.sh   // launch gpu distributed training
+       ├─ train_standalone.sh    // launch ascend standalone training
+       └─ train_standalone_gpu.sh    // launch gpu standalone training
     ├─ src
        ├─ callbacks.py           // user-defined callbacks
        ├─ crossentropy.py        // user-defined loss functions
@@ -150,7 +153,7 @@ Parameters for both training and evaluation and export can be set in `default_co
 
 - Configurations for DPN92 with ImageNet-1K dataset
 
-```default_config.yaml
+```text
 # model config
 config.image_size = (224,224)               # inpute image size
 config.num_classes = 1000                   # dataset class number
@@ -163,7 +166,7 @@ config.rank = 0                             # local rank of distributed
 config.group_size =  1                      # group size of distributed
 
 # training config
-config.batch_size =  32                     # batch_size
+config.batch_size =  32                     # batch_size=32 on Ascend; batch_size=16 on GPU
 config.global_step =  0                     # start step of learning rate
 config.epoch_size = 180                     # epoch_size
 config.loss_scale_num =  1024               # loss scale
@@ -198,6 +201,15 @@ Run `scripts/train_standalone.sh` to train the model standalone. The usage of th
 ```shell
 bash scripts/train_standalone.sh [device_id] [train_data_dir] [ckpt_path_to_save] [eval_each_epoch] [pretrained_ckpt(optional)]
 # example: bash scripts/train_standalone.sh 0 /home/DataSet/ImageNet_Original/train/ ./ckpt 0
+```
+
+#### Running on GPU
+
+Run `scripts/train_standalone_gpu.sh` to train the model standalone. The usage of the script is:
+
+```shell
+bash scripts/train_standalone_gpu.sh [device_id] [train_data_dir] [ckpt_path_to_save] [eval_each_epoch] [pretrained_ckpt(optional)]
+# example: bash scripts/train_standalone_gpu.sh 0 /home/DataSet/ImageNet_Original/train/ ./ckpt 0
 ```
 
 If eval_each_epoch is 1, it will evaluate after each epoch and save the parameters with the max accuracy. But in this case, the time of one epoch will be longer.
@@ -237,7 +249,7 @@ The model checkpoint will be saved into `[ckpt_path_to_save]`.
 
 Run `scripts/train_distributed.sh` to train the model distributed. The usage of the script is:
 
-```text
+```shell
 bash scripts/train_distributed.sh [rank_table] [train_data_dir] [ckpt_path_to_save]  [rank_size] [eval_each_epoch] [pretrained_ckpt(optional)]
 # example: bash scripts/train_distributed.sh ~/hccl_8p.json /home/DataSet/ImageNet_Original/train/ ./ckpt/ 8 0
 ```
@@ -252,6 +264,15 @@ Epoch time: 1350398.913 ms, per step time: 369.864 ms
 ...
 ```
 
+#### Running on GPU
+
+Run `scripts/train_distributed_gpu.sh` to train the model distributed. Note modify the batch size to 16 on GPU training. The usage of the script is:
+
+```shell
+bash scripts/train_distributed_gpu.sh [DATA_DIR] [SAVE_PATH] [RANK_SIZE] [EVAL_EACH_EPOCH] [PRETRAINED_CKPT_PATH]
+# example: bash scripts/train_distributed_gpu.sh /home/DataSet/ImageNet_Original/train/ ./ckpt/ 8 0
+```
+
 The model checkpoint will be saved into `[ckpt_path_to_save]`.
 
 ## [Evaluation Process](#contents)
@@ -263,6 +284,15 @@ Run `scripts/eval.sh` to evaluate the model with one Ascend processor. The usage
 ```text
 bash scripts/eval.sh [device_id] [eval_data_dir] [checkpoint_path]
 # example bash scripts/eval.sh 0 /home/DataSet/ImageNet_Original/validation_preprocess/ /home/model/dpn/ckpt/dpn-100_40036.ckpt
+```
+
+### [Running on GPU](#contents)
+
+Run `scripts/eval_gpu.sh` to evaluate the model on GPU. Note modify the batch size to 16 on GPU evaluating. The usage of the script is:
+
+```text
+bash scripts/eval_gpu.sh [device_id] [eval_data_dir] [checkpoint_path]
+# example bash scripts/eval_gpu.sh 0 /home/DataSet/ImageNet_Original/validation_preprocess/ /home/model/dpn/ckpt/dpn-100_40036.ckpt
 ```
 
 The above shell script will run evaluation in the background. You can view the results through the file `eval_log.txt`. The result will be achieved as follows:
@@ -390,31 +420,31 @@ All results are validated at image size of 224x224. The dataset preprocessing an
 
 #### DPN92 (Training)
 
-| Parameters        | Ascend                      |
-| ----------------- | --------------------------- |
-| Model Version     | DPN92 (Train)               |
-| Resource          | Ascend 910; OS Euler2.8                  |
-| Uploaded Date     | 12/20/2020 (month/day/year) |
-| MindSpore Version | 1.1.0                       |
-| Dataset           | ImageNet-1K                 |
-| epochs            | 180                         |
-| outputs           | probability                 |
-| train performance | Top1:78.91%; Top5:94.53%    |
+| Parameters        | Ascend                      |GPU                      |
+| ----------------- | --------------------------- | --------------------------- |
+| Model Version     | DPN92 (Train)               | DPN92 (Train)               |
+| Resource          | Ascend 910; OS Euler2.8                  | NV SMX3 V100-32G                  |
+| Uploaded Date     | 12/20/2020 (month/day/year) | 03/10/2022 (month/day/year) |
+| MindSpore Version | 1.1.0                       | 1.6.0                       |
+| Dataset           | ImageNet-1K                 | ImageNet2012                 |
+| epochs            | 180                         | 180                         |
+| outputs           | probability                 | probability                 |
+| train performance | Top1:78.91%; Top5:94.53%    | Top1:78.84%; Top5:94.41%;    |
 
 ### [Efficiency](#contents)
 
 #### DPN92
 
-| Parameters        | Ascend                            |
-| ----------------- | --------------------------------- |
-| Model Version     | DPN92                             |
-| Resource          | Ascend 910; OS Euler2.8                        |
-| Uploaded Date     | 12/20/2020 (month/day/year)       |
-| MindSpore Version | 1.1.0                             |
-| Dataset           | ImageNet-1K                       |
-| batch_size        | 32                                |
-| outputs           | probability                       |
-| speed             | 1pc:233 ms/step;8pc:240 ms/step   |
+| Parameters        | Ascend                            | GPU|
+| ----------------- | --------------------------------- | --------------------------------- |
+| Model Version     | DPN92                             | DPN92                             |
+| Resource          | Ascend 910; OS Euler2.8                        | NV SMX3 V100-32G                        |
+| Uploaded Date     | 12/20/2020 (month/day/year)       | 03/10/2022 (month/day/year) |
+| MindSpore Version | 1.1.0                             | 1.6.0                       |
+| Dataset           | ImageNet-1K                       | ImageNet2012                 |
+| batch_size        | 32                                | 16                                |
+| outputs           | probability                       | probability                       |
+| speed             | 1pc:233 ms/step;8pc:240 ms/step   | 8pc: 305 ms/step   |
 
 # [Description of Random Situation](#contents)
 

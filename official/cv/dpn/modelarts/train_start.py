@@ -135,7 +135,7 @@ def _parse_args():
                         help='warmup epochs')
 
     # export configs
-    parser.add_argument('--export_dir', type=str, default='export_dir',
+    parser.add_argument('--export_dir', type=str, default='',
                         help='dircetory to save exported model, frozen model if not None')
     parser.add_argument('--width', type=int, default=224,
                         help='export width')
@@ -332,7 +332,8 @@ def main():
     dpn_train(config_args, ma_config)
     print('DPN training success!')
     # export
-    dpn_export(config_args, ma_config)
+    if config_args.export_dir:
+        dpn_export(config_args, ma_config)
 
     # data sync
     mox.file.copy_parallel(config_args.output_path, config_args.train_url)
