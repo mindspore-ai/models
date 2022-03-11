@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,13 +22,12 @@ import numpy as np
 import cv2
 
 from mindspore.context import ParallelMode
-from mindspore.communication.management import init
 from mindspore import context
+from mindspore.communication.management import init
 from src.deep.feature_extractor import Extractor
 
 matplotlib.use("Agg")
 ASCEND_SLOG_PRINT_TO_STDOUT = 1
-
 
 def extract_image_patch(image, bbox, patch_shape=None):
     """Extract image patch from bounding box.
@@ -188,18 +187,18 @@ def parse_args():
     Parse command line arguments.
     """
     parser = argparse.ArgumentParser(description="Re-ID feature extractor")
+    parser.add_argument('--device', type=str, default='Ascend', choices=("GPU", "Ascend"),
+                        help="Device target, support GPU, Ascend.")
     parser.add_argument('--run_distribute', type=ast.literal_eval,
                         default=False, help='Run distribute')
     parser.add_argument('--run_modelarts', type=ast.literal_eval,
                         default=False, help='Run distribute')
-    parser.add_argument("--device_id", type=int, default=4,
-                        help="Use which device.")
     parser.add_argument('--data_url', type=str,
                         default='', help='Det directory.')
     parser.add_argument('--train_url', type=str, default='',
                         help='Train output directory.')
     parser.add_argument('--det_url', type=str, default='',
-                        help='Train output directory.')
+                        help='Url to prepared det.')
     parser.add_argument('--batch_size', type=int,
                         default=32, help='Batach size.')
     parser.add_argument("--ckpt_url", type=str, default='',
@@ -212,9 +211,17 @@ def parse_args():
 
 
 if __name__ == "__main__":
-    context.set_context(mode=context.GRAPH_MODE,
-                        device_target="Ascend", save_graphs=False)
     args = parse_args()
+
+    target = args.device
+    if target not in ('GPU', "Ascend"):
+        raise ValueError("Unsupported device target.")
+
+    context.set_context(mode=context.GRAPH_MODE,
+                        device_target=target,
+                        save_graphs=False,
+                        enable_auto_mixed_precision=True)
+
     if args.run_modelarts:
         import moxing as mox
         device_id = int(os.getenv('DEVICE_ID'))
@@ -234,7 +241,7 @@ if __name__ == "__main__":
         DATA_DIR = local_data_url + '/'
         ckpt_dir = local_ckpt_url + '/'
         det_dir = local_det_url + '/'
-    else:
+    elif target == "Ascend":
         if args.run_distribute:
             device_id = int(os.getenv('DEVICE_ID'))
             device_num = int(os.getenv('RANK_SIZE'))
@@ -251,9 +258,25 @@ if __name__ == "__main__":
         local_train_url = args.train_url
         ckpt_dir = args.ckpt_url
         det_dir = args.det_url
+    elif target == "GPU":
+        if args.run_distribute:
+            device_num = 8
+            init('nccl')
+            context.reset_auto_parallel_context()
+            args.batch_size = args.batch_size*int(8/device_num)
+            context.set_auto_parallel_context(device_num=device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+        else:
+            device_id = 0
+            context.set_context(device_id=device_id)
+        DATA_DIR = args.data_url
+        local_train_url = args.train_url
+        ckpt_dir = args.ckpt_url
+        det_dir = args.det_url
 
     encoder = create_box_encoder(
-        ckpt_dir+args.model_name, batch_size=args.batch_size)
+        os.path.join(ckpt_dir, args.model_name), batch_size=args.batch_size)
     generate_detections(encoder, DATA_DIR, local_train_url, det_path=det_dir)
     if args.run_modelarts:
         mox.file.copy_parallel(src_url=local_train_url, dst_url=args.train_url)

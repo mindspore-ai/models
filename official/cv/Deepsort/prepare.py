@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,20 +14,26 @@
 # ============================================================================
 import os
 from shutil import copyfile
+import argparse
+
+parser = argparse.ArgumentParser(description='Market 1501 dataset preparation')
+
+parser.add_argument('--data_path', type=str, default=None, help='Dataset path')
+args = parser.parse_args()
 
 # You only need to change this line to your dataset download path
-download_path = '../data/Market-1501'
+download_path = args.data_path
 
 if not os.path.isdir(download_path):
     print('please change the download_path')
 
-save_path = download_path + '/pytorch'
+save_path = download_path + '/prepared'
 if not os.path.isdir(save_path):
     os.mkdir(save_path)
 #-----------------------------------------
 #query
 query_path = download_path + '/query'
-query_save_path = download_path + '/pytorch/query'
+query_save_path = download_path + '/prepared/query'
 if not os.path.isdir(query_save_path):
     os.mkdir(query_save_path)
 
@@ -47,7 +53,7 @@ for root, dirs, files in os.walk(query_path, topdown=True):
 query_path = download_path + '/gt_bbox'
 # for dukemtmc-reid, we do not need multi-query
 if os.path.isdir(query_path):
-    query_save_path = download_path + '/pytorch/multi-query'
+    query_save_path = download_path + '/prepared/multi-query'
     if not os.path.isdir(query_save_path):
         os.mkdir(query_save_path)
 
@@ -65,7 +71,7 @@ if os.path.isdir(query_path):
 #-----------------------------------------
 #gallery
 gallery_path = download_path + '/bounding_box_test'
-gallery_save_path = download_path + '/pytorch/gallery'
+gallery_save_path = download_path + '/prepared/gallery'
 if not os.path.isdir(gallery_save_path):
     os.mkdir(gallery_save_path)
 
@@ -83,7 +89,7 @@ for root, dirs, files in os.walk(gallery_path, topdown=True):
 #---------------------------------------
 #train_all
 train_path = download_path + '/bounding_box_train'
-train_save_path = download_path + '/pytorch/train_all'
+train_save_path = download_path + '/prepared/train_all'
 if not os.path.isdir(train_save_path):
     os.mkdir(train_save_path)
 
@@ -102,8 +108,8 @@ for root, dirs, files in os.walk(train_path, topdown=True):
 #---------------------------------------
 #train_val
 train_path = download_path + '/bounding_box_train'
-train_save_path = download_path + '/pytorch/train'
-val_save_path = download_path + '/pytorch/val'
+train_save_path = download_path + '/prepared/train'
+val_save_path = download_path + '/prepared/val'
 if not os.path.isdir(train_save_path):
     os.mkdir(train_save_path)
     os.mkdir(val_save_path)

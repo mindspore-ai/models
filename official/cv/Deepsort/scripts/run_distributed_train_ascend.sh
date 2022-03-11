@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 3 ]; then
-  echo "Usage: sh run_distribute_train.sh [train_code_path][RANK_TABLE_FILE][DATA_PATH]"
+  echo "Usage: bash run_distribute_train_ascend.sh [train_code_path][RANK_TABLE_FILE][DATA_PATH]"
   exit 1
 fi
 
@@ -74,5 +74,7 @@ do
     python ${train_code_path}/deep_sort/deep/train.py    --data_url=${DATA_PATH}   \
                                                --train_url=./checkpoint   \
                                                --run_distribute=True   \
-                                               --run_modelarts=False > out.log 2>&1 &
+                                               --run_modelarts=False \
+                                               --device=Ascend \
+                                               --config_name=ascend_config.yaml > out.log 2>&1 &
 done

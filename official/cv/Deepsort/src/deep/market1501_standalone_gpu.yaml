@@ -1,0 +1,15 @@
+epoch: 24
+batch_size: 16
+learning_rate: 0.01
+decay_epoch: 20
+gamma: 0.1 #learning rate decay
+momentum: 0.9
+train_url: ""
+data_url: ""
+device: 'GPU'
+num_parallel_workers: 8
+pre_train: ""
+save_check_point: True
+run_distribute: False
+run_modelarts: False
+name: "Deepsort"

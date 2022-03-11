@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser(description='Tracking')
 parser.add_argument("--device_id", type=int, default=0, help="Device id")
 parser.add_argument("--batch_size", type=int, default=1, help="batch size")
 parser.add_argument('--device_target', type=str, default="Ascend",
-                    choices=['Ascend', 'GPU', 'CPU'],
+                    choices=['GPU', 'CPU', 'Ascend'],
                     help='device where the code will be implemented (default: Ascend)')
 parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
 parser.add_argument("--image_height", type=int, default=128, help="Image height.")

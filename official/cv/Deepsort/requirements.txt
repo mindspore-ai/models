@@ -3,3 +3,4 @@ mindspore
 numpy
 matplotlib
 shutil
+motmetrics

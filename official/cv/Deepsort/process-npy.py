@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import os
 import numpy as np
 
-npy_dir = "" #the npy files provided by author, and the directory name is MOT16_POI_train.
+npy_dir = "set_path_to_MOT16_POI_train" #the npy files provided by author
 
 for dirpath, dirnames, filenames in os.walk(npy_dir):
     for filename in filenames:
@@ -37,6 +37,5 @@ for dirpath, dirnames, filenames in os.walk(npy_dir):
                     s += ','
                 else:
                     break
-            #print(s)
             f.write(s)
             f.write('\n')

@@ -21,6 +21,7 @@
         - [结果](#结果)
 - [模型描述](#模型描述)
     - [性能](#性能)
+        - [训练表现](#训练表现)
         - [评估性能](#评估性能)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
@@ -72,20 +73,38 @@ Market-1501:
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
-```python
-# 进入脚本目录，提取det信息(使用作者提供的检测框信息)，在脚本中给出数据路径
-python process-npy.py
-# 进入脚本目录，预处理数据集(Market-1501)，在脚本中给出数据集路径
-python prepare.py
-# 进入脚本目录，训练DeepSort特征提取器
-python src/deep/train.py --run_modelarts=False --run_distribute=True --data_url="" --train_url=""
-# 进入脚本目录，提取detections信息
-python generater_detection.py --run_modelarts=False --run_distribute=True --data_url="" --train_url="" --det_url="" --ckpt_url="" --model_name=""
-# 进入脚本目录，生成跟踪信息
-python evaluate_motchallenge.py --data_url="" --train_url="" --detection_url=""
+- 在 GPU 上运行
 
-#Ascend多卡训练
-bash scripts/run_distribute_train.sh train_code_path  RANK_TABLE_FILE DATA_PATH
+```bash
+# 从脚本中的路径中提取检测信息
+python process-npy.py
+# 通过脚本中的路径预处理 Market-1501
+python prepare.py
+# 在单个 GPU 上训练 DeepSort 特征提取器
+bash run_standalone_train_gpu.sh DATA_PATH
+# 生成特征信息
+python generater-detection.py --data_url="" --train_url="" --det_url="" --ckpt_url="" --model_name=""
+# 生成结果
+python evaluate_motchallenge.py --data_url="" --train_url="" --detection_url=""
+# 使用产生 MOT16 挑战的指标 https://github.com/cheind/py-motmetrics
+python -m motmetrics.apps.eval_motchallenge <groundtruths> <tests>
+```
+
+- 在 Ascend 上运行
+
+```bash
+# 从脚本中的路径中提取检测信息
+python process-npy.py
+# 通过脚本中的路径预处理 Market-1501
+python prepare.py
+# 在 Ascend 上训练 DeepSort 特征提取器
+python src/deep/train.py --run_modelarts=False --run_distribute=True --data_url="" --train_url=""
+# 生成特征信息
+python generater_detection.py --run_modelarts=False --run_distribute=True --data_url="" --train_url="" --det_url="" --ckpt_url="" --model_name=""
+# 生成结果
+python evaluate_motchallenge.py --data_url="" --train_url="" --detection_url=""
+# 使用产生 MOT16 挑战的指标 https://github.com/cheind/py-motmetrics
+python -m motmetrics.apps.eval_motchallenge <groundtruths> <tests>
 ```
 
 Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
@@ -94,67 +113,70 @@ Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/m
 
 ### 脚本及样例代码
 
-```bash
+```text
 ├── DeepSort
-    ├── scripts
-    │   ├──run_distribute_train.sh          // 在Ascend中多卡训练
-    ├── src             //源码
+    ├── ascend310_infer
+    ├── infer
+    ├── modelarts
+    ├── scripts #scripts for training
+    │   ├──run_standalone_train_gpu.sh
+    │   ├──run_distributed_train_ascend.sh
+    │   ├──run_infer_310.sh
+    │   ├──docker_start.sh
+    ├── src
     │   │   ├── application_util
     │   │   │   ├──image_viewer.py
     │   │   │   ├──preprocessing.py
     │   │   │   ├──visualization.py
-    │   │   ├──deep
-    │   │   │   ├──feature_extractor.py     //提取目标框中人物特征信息
-    │   │   │   ├──original_model.py       //特征提取器模型
-    │   │   │   ├──train.py                //训练网络模型
+    │   │   ├──deep #features extractor code
+    │   │   │   ├──feature_extractor.py
+    │   │   │   ├──config.py
+    │   │   │   ├──market1501_standalone_gpu.yaml #parameters for 1P GPU training
+    │   │   │   ├──original_model.py
+    │   │   │   ├──train.py
     │   │   ├──sort
     │   │   │   ├──detection.py
-    │   │   │   ├──iou_matching.py              //预测信息与真实框匹配
-    │   │   │   ├──kalman_filter.py          //卡尔曼滤波，预测跟踪框信息
+    │   │   │   ├──iou_matching.py
+    │   │   │   ├──kalman_filter.py
     │   │   │   ├──linear_assignment.py
-    │   │   │   ├──nn_matching.py         //框匹配
-    │   │   │   ├──track.py             //跟踪器
-    │   │   │   ├──tracker.py           //跟踪器
-    ├── deep_sort_app.py                //目标跟踪
-    ├── evaluate_motchallenge.py        //生成跟踪结果信息
-    ├── generate_videos.py              //根据跟踪结果生成跟踪视频
-    ├── generater-detection.py          //生成detection信息
-    ├── postprocess.py                  //生成Ascend310推理数据
-    ├── preprocess.py                 //处理Ascend310推理结果，生成精度
-    ├── prepare.py                      //处理训练数据集
-    ├── process-npy.py                  //提取帧序列人物坐标和置信度
-    ├── show_results.py                 //展示跟踪结果
-    ├── README.md                    // DeepSort相关说明
+    │   │   │   ├──nn_matching.py
+    │   │   │   ├──track.py
+    │   │   │   ├──tracker.py
+    ├── deep_sort_app.py #auxiliary module
+    ├── Dockerfile
+    ├── evaluate_motchallenge.py #script for generating tracking result
+    ├── export.py
+    ├── generate_videos.py
+    ├── generater-detection.py #script for generating features information
+    ├── preprocess.py #auxiliary module
+    ├── prepare.py #script to prepare market-1501 dataset
+    ├── process-npy.py #script to extract and prepare MOT detections
+    ├── show_results.py
+    ├── pipeline.sh #example of calling all scripts in a sequence
+    ├── README.md
 ```
 
 ### 脚本参数
 
-```python
-train.py generater_detection.py evaluate_motchallenge.py 中主要参数如下:
+```text
+generater_detection.py evaluate_motchallenge.py:
 
---data_url: 到训练和提取信息数据集的绝对完整路径
---train_url: 输出文件路径。
---epoch: 总训练轮次
---batch_size: 训练批次大小
---device_targe: 实现代码的设备。值为'Ascend'
---ckpt_url: 训练后保存的检查点文件的绝对完整路径
---model_name: 模型文件名称
---det_url: 视频帧序列人物信息文件路径
---detection_url:  人物坐标信息、置信度以及特征信息文件路径
---run_distribute: 多卡运行
---run_modelarts: ModelArts上运行
+--data_url: path to dataset (MOT / Market)
+--train_url: output path
+--ckpt_url: path to checkpoint
+--model_name: name of the checkpoint
+--det_url: path to detection files
+--detection_url:  path to features files
 ```
 
 ### 训练过程
 
 #### 训练
 
-- Ascend处理器环境运行
+- Ascend 处理器环境运行
 
   ```bash
-  python src/deep/train.py --run_modelarts=False --run_distribute=False --data_url="" --train_url=""
-  # 或进入脚本目录，执行脚本
-  bash scripts/run_distribute_train.sh train_code_path  RANK_TABLE_FILE DATA_PATH
+  bash scripts/run_distributed_train_ascend.sh train_code_path RANK_TABLE_FILE DATA_PATH
   ```
 
   经过训练后，损失值如下：
@@ -175,6 +197,31 @@ train.py generater_detection.py evaluate_motchallenge.py 中主要参数如下:
   ...
   ```
 
+- GPU 处理器环境运行
+
+  ```bash
+  #standalone
+  bash run_standalone_train_gpu.sh DATA_PATH
+  ```
+
+  经过训练后，损失值如下：
+
+  ```bash
+  epoch: 1 step: 809, loss is 4.4773345
+  epoch time: 14821.373 ms, per step time: 18.321 ms
+  epoch: 2 step: 809, loss is 3.3706033
+  epoch time: 9110.971 ms, per step time: 11.262 ms
+  epoch: 3 step: 809, loss is 3.000544
+  epoch time: 9131.733 ms, per step time: 11.288 ms
+  epoch: 4 step: 809, loss is 1.196707
+  epoch time: 8973.570 ms, per step time: 11.092 ms
+  epoch: 5 step: 809, loss is 1.0504937
+  epoch time: 9051.383 ms, per step time: 11.188 ms
+  epoch: 6 step: 809, loss is 0.7604818
+  epoch time: 9384.670 ms, per step time: 11.600 ms
+  ...
+  ```
+
   模型检查点保存在当前目录下。
 
 ### 评估过程
@@ -183,32 +230,40 @@ train.py generater_detection.py evaluate_motchallenge.py 中主要参数如下:
 
 在运行以下命令之前，请检查用于评估的检查点路径。
 
-- Ascend处理器环境运行
+- GPU 处理器环境运行
 
-  ```bash
-  # 进入脚本目录，提取det信息(使用作者提供的检测框信息)
-    python process-npy.py
-  # 进入脚本目录，提取detections信息
-  python generater_detection.py --run_modelarts False --run_distribute True --data_url "" --train_url "" --det_url "" --ckpt_url "" --model_name ""
-  # 进入脚本目录，生成跟踪信息
+```bash
+  python generater-detection.py --data_url="" --train_url="" --det_url="" --ckpt_url="" --model_name=""
   python evaluate_motchallenge.py --data_url="" --train_url="" --detection_url=""
-  # 生成跟踪结果
-  python eval_motchallenge.py ----run_modelarts=False --data_url="" --train_url="" --result_url=""
-  ```
+  python -m motmetrics.apps.eval_motchallenge <groundtruths> <tests>
+```
 
-- [测评工具](https://github.com/cheind/py-motmetrics)
+- Ascend 处理器环境运行
 
-  说明:脚本中引用头文件可能存在一些问题，自行修改头文件路径即可
-
-  ```bash
-  #测量精度
-  python motmetrics/apps/eval_motchallenge.py --groundtruths="" --tests=""
-  ```
+```bash
+  python generater-detection.py --data_url="" --train_url="" --det_url="" --ckpt_url="" --model_name="" --device="Ascend"
+  python evaluate_motchallenge.py --data_url="" --train_url="" --detection_url=""
+  python -m motmetrics.apps.eval_motchallenge <groundtruths> <tests>
+```
 
 -
-  测试数据集的准确率如下：
+  测试数据集的准确率如下 (GPU)
 
-| 数据 | MOTA | MOTP| MT | ML| IDs | FM | FP | FN |
+| Seq | MOTA | MOTP| MT | ML| IDs | FM | FP | FN |
+| -------------------------- | -------------------------- | -------------------------- | -------------------------- | -------------------------- | -------------------------- | -------------------------- | -------------------------- | -----------------------------------------------------------
+| MOT16-02 | 29.0% | 0.207 | 12 | 10| 167 | 247 | 4212 | 8285 |
+| MOT16-04 | 58.7% | 0.168| 42 | 15| 58 | 254 | 6268 | 13328 |
+| MOT16-05 | 51.9% | 0.215| 31 | 27| 62 | 112 | 643 | 2577 |
+| MOT16-09 | 64.4% | 0.162| 13 | 1| 42 | 57 | 313 | 1519 |
+| MOT16-10 | 48.7% | 0.228| 24 | 1| 220 | 301 | 3183 | 2922 |
+| MOT16-11 | 65.3% | 0.153| 29 | 9| 57 | 95 | 927 | 2195 |
+| MOT16-13 | 44.3% | 0.237| 62 | 6| 328 | 332 | 3784 | 2264 |
+| overall | 51.7% | 0.190| 211 | 69| 934 | 1398 | 19330 | 33090 |
+
+-
+  测试数据集的准确率如下 (Ascend)
+
+| Seq | MOTA | MOTP| MT | ML| IDs | FM | FP | FN |
 | -------------------------- | -------------------------- | -------------------------- | -------------------------- | -------------------------- | -------------------------- | -------------------------- | -------------------------- | -----------------------------------------------------------
 | MOT16-02 | 29.0% | 0.207 | 11 | 11| 159 | 226 | 4151 | 8346 |
 | MOT16-04 | 58.6% | 0.167| 42 | 14| 62 | 242 | 6269 | 13374 |
@@ -244,22 +299,31 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DET_PATH] [NEED_PREPROCESS] 
 
 ### 性能
 
+#### 训练表现
+
+| 参数 | | |
+| -------------------------- | -----------------------------------------------------------|-------------------------------------------------------|
+| 资源 | GPU Tesla V100-PCIE 32G| Ascend 910 CPU 2.60GHz, 192 cores：755G |
+| 上传日期 | 2022-01-08 | 2021-08-12 |
+| MindSpore版本 | 1.6.0 |  1.2.0 |
+| 数据集 | MOT16 Market-1501 | MOT16 Market-1501 |
+| 训练参数 | epoch=24, batch_size=16, lr=0.01 | epoch=100, step=191, batch_size=8, lr=0.1 |
+| 优化器 | SGD |
+| 损失函数 | SoftmaxCrossEntropyWithLogits | SoftmaxCrossEntropyWithLogits |
+| 损失 | 0.04 | 0.03 |
+| 速度 | 12.8 ms/step | 9.804 ms/step |
+| 总时间 | 3 min | 10 min |
+| 微调检查点 | 23.4 Mb | 40 Mb |
+
 #### 评估性能
 
-| 参数 | ModelArts
-| -------------------------- | -----------------------------------------------------------
-| 资源 | Ascend 910；CPU 2.60GHz, 192核；内存：755G
-| 上传日期 | 2021-08-12
-| MindSpore版本 | 1.2.0
-| 数据集 | MOT16 Market-1501
-| 训练参数 | epoch=100, step=191, batch_size=8, lr=0.1
-| 优化器 | SGD
-| 损失函数 | SoftmaxCrossEntropyWithLogits
-| 损失 | 0.03
-| 速度 | 9.804毫秒/步
-| 总时间 | 10分钟
-| 微调检查点 | 大约40M （.ckpt文件）
-| 脚本 | [DeepSort脚本]
+| 参数          || |
+| ------------------- | --------------------------- | --- |
+| 资源 | GPU Tesla V100-PCIE 32G| Ascend 910 CPU 2.60GHz, 192 cores：755G |
+| MindSpore版本 | 1.6.0 |  1.2.0 |
+| 数据集 | MOT16 Market-1501 | MOT16 Market-1501 |
+| MOTA/MOTP | 51.7%/0.190                | 51.9%/0.189 |
+| 微调检查点 | 23.4 Mb | 40 Mb |
 
 ## 随机情况说明
 
