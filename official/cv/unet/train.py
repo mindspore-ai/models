@@ -89,9 +89,7 @@ def train_net(cross_valid_ind=1,
                                                    eval_resize=config.eval_resize, split=split, shuffle=False)
     else:
         repeat = config.repeat
-        dataset_sink_mode = False
-        if config.device_target == "GPU":
-            dataset_sink_mode = True
+        dataset_sink_mode = True
         per_print_times = 1
         train_dataset, valid_dataset = create_dataset(data_dir, repeat, batch_size, True, cross_valid_ind,
                                                       run_distribute, config.crop, config.image_size)
