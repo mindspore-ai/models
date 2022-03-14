@@ -1,0 +1,43 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+do_train: true
+do_valid: true
+do_test: true
+no_decay: true
+data_path: './data/wn18rr'
+negative_sample_size: 1024
+hidden_dim: 500
+gamma: 6.0
+adversarial_temperature: 0.5
+batch_size: 256
+test_batch_size: 8
+modulus_weight: 0.5
+phase_weight: 0.5
+learning_rate: 0.00005
+cpu_num: 10
+max_epochs: 120  # epoch num
+save_path: 'wn18rr/'
+random_seed: 1122
+
+# GPU
+device_target: GPU
+device_id: 2
+init_checkpoint: ''
+checkpoint_path: 'wn18rr/CKP-120_339.ckpt'
+
+# save checkpoint
+enable_save_ckpt: true
+enable_modelarts: true
+save_skpt_epoch_every: 50
+save_checkpoint_num: 50
+
+# distribution
+do_distribute: false
+max_rowsize: 6
+num_workers: 1
+
+
+---
+# Config description for each option
+data_path: 'data path'
+save_path: 'model checkpoint save path'
+
