@@ -14,9 +14,7 @@
 # limitations under the License.
 # ============================================================================
 
-"""
-convert dataset
-"""
+
 if [ $# -ne 1 ]
 then
     echo "=============================================================================================================="
@@ -41,17 +39,17 @@ case $TASK_NAME in
         ;;
     esac
 
-python src/reader.py --task_name=${TASK_NAME} \
+python3 src/reader.py --task_name=${TASK_NAME} \
                      --max_seq_len=256 \
                      --vocab_path=${DICT_NAME} \
                      --input_file=data/build.train.txt \
                      --output_file=data/train.mindrecord
-python src/reader.py --task_name=${TASK_NAME} \
+python3 src/reader.py --task_name=${TASK_NAME} \
                      --max_seq_len=256 \
                      --vocab_path=${DICT_NAME} \
                      --input_file=data/build.dev.txt \
                      --output_file=data/dev.mindrecord
-python src/reader.py --task_name=${TASK_NAME} \
+python3 src/reader.py --task_name=${TASK_NAME} \
                      --max_seq_len=256 \
                      --vocab_path=${DICT_NAME} \
                      --input_file=data/build.test.txt \
