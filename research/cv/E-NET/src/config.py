@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ parser.add_argument('--mindrecord_train_data', type=str)
 parser.add_argument('--stage', type=int)
 parser.add_argument('--ckpt_path', type=str)
 parser.add_argument('--num_class', type=int, default=20)
-
+parser.add_argument('--device_target', type=str, default='Ascend')
 config = parser.parse_args()
 
 max_lr = config.lr
@@ -38,10 +38,12 @@ repeat = config.repeat
 stage = config.stage
 ckpt_path = config.ckpt_path
 save_path = config.save_path
+device_target = config.device_target
 
 context.set_context(mode=context.GRAPH_MODE)
-context.set_context(device_target="Ascend")
-context.set_context(device_id=int(os.environ["DEVICE_ID"]))
+context.set_context(device_target=device_target)
+if not run_distribute:
+    context.set_context(device_id=int(os.environ["DEVICE_ID"]))
 context.set_context(save_graphs=False)
 
 seed_seed(2) # init random seed
@@ -56,7 +58,7 @@ class TrainConfig_1:
         self.subset = "train"
         self.num_class = 20
         self.train_img_size = 512
-        self.epoch_num_save = 10
+        self.epoch_num_save = 20
         self.epoch = 65
         self.encode = True
         self.attach_decoder = False
@@ -69,7 +71,7 @@ class TrainConfig_2:
         self.subset = "train"
         self.num_class = 20
         self.train_img_size = 512
-        self.epoch_num_save = 10
+        self.epoch_num_save = 20
         self.epoch = 85
         self.encode = True
         self.attach_decoder = False
@@ -82,7 +84,7 @@ class TrainConfig_3:
         self.subset = "train"
         self.num_class = 20
         self.train_img_size = 512
-        self.epoch_num_save = 10
+        self.epoch_num_save = 20
         self.epoch = 100
         self.encode = False
         self.attach_decoder = True

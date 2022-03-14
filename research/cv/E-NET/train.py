@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,14 +19,15 @@ from mindspore.communication.management import get_group_size, get_rank, init
 from mindspore.context import ParallelMode
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor, LossMonitor
 from mindspore.train.loss_scale_manager import DynamicLossScaleManager
-from mindspore.train.serialization import _update_param, load_checkpoint
-from src.config import (TrainConfig_1, TrainConfig_2, TrainConfig_3,
-                        ckpt_path, ms_train_data, num_class, repeat, run_distribute, save_path, stage, weight_init)
+from mindspore.train.serialization import _update_param, load_checkpoint, save_checkpoint
+from mindspore.common import set_seed
+from src.config import (TrainConfig_1, TrainConfig_2, TrainConfig_3, ckpt_path, ms_train_data, num_class, repeat, run_distribute, save_path, stage, weight_init)
 from src.criterion import SoftmaxCrossEntropyLoss
 from src.dataset import getCityScapesDataLoader_mindrecordDataset
 from src.model import Encoder_pred, Enet
 from src.util import getCityLossWeight
 
+set_seed(1)
 
 def attach(enet, encoder_pretrain):
     """move the params in encoder to enet"""
@@ -35,7 +36,7 @@ def attach(enet, encoder_pretrain):
     enet_par = enet.parameters_dict()
     for name, param_old in encoder_trained_par.items():
         if name.startswith("encoder"):
-            _update_param(enet_par[name], param_old)
+            _update_param(enet_par[name], param_old, True)
 
 def train(ckpt_path_, trainConfig_, rank_id, rank_size, stage_):
     """train enet"""
@@ -59,6 +60,7 @@ def train(ckpt_path_, trainConfig_, rank_id, rank_size, stage_):
         network_enet = Enet(num_class, weight_init)
         attach(network_enet, network)
         network = network_enet
+
     dataloader = getCityScapesDataLoader_mindrecordDataset(stage_, ms_train_data, 6, \
         trainConfig_.encode, trainConfig_.train_img_size, shuffle=True, aug=True, \
         rank_id=rank_id, global_size=rank_size, repeat=repeat)
@@ -84,15 +86,15 @@ def train(ckpt_path_, trainConfig_, rank_id, rank_size, stage_):
 
     print("============== Starting {} Training ==============".format(save_prefix))
     wrapper.train(trainConfig_.epoch, dataloader, callbacks=call_backs, dataset_sink_mode=True)
+    save_checkpoint(network, os.path.join(save_path, f"{save_prefix}_stage{stage_}.ckpt"))
+
     return network
 
 if __name__ == "__main__":
     rank_id_ = 0
     rank_size_ = 1
     if run_distribute:
-        context.set_auto_parallel_context(parameter_broadcast=True)
-        context.set_auto_parallel_context(parallel_mode=\
-            ParallelMode.DATA_PARALLEL, gradients_mean=False)
+        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=False)
         init()
         rank_id_ = get_rank()
         rank_size_ = get_group_size()

@@ -14,9 +14,9 @@
     - [数据集](#数据集)
     - [脚本说明](#脚本说明)
     - [训练与验证](#训练与验证)
-      - [单卡训练](#单卡训练)
-      - [多卡训练](#多卡训练)
-      - [验证单个ckpt](#验证单个ckpt)
+        - [单卡训练](#单卡训练)
+        - [多卡训练](#多卡训练)
+        - [验证单个ckpt](#验证单个ckpt)
     - [模型描述](#模型描述)
     - [310推理](#310推理)
 
@@ -45,7 +45,7 @@ E-NET主要用于图像分割领域，是一种端到端的分割方法。语义
 
 ## 环境
 
-Ascend
+Ascend，GPU
 
 ## 数据集
 
@@ -89,7 +89,9 @@ python src/build_mrdata.py \
 │       └── utils.cc                              // utils实现
 ├── scripts
 │   ├── run_distribute_train.sh                   // 多卡训练脚本
-│   └── run_standalone_train.sh                   // 单卡训练脚本
+│   ├── run_standalone_train.sh                   // 单卡训练脚本
+│   ├── run_standalone_train_gpu.sh               // 单卡训练脚本（GPU)
+│   └── run_distribute_train_gpu.sh               // 单卡训练脚本（GPU)
 ├── src
 │   ├── build_mrdata.py                           // 生成mindrecord数据集
 │   ├── config.py                                 // 配置参数脚本
@@ -112,11 +114,21 @@ python src/build_mrdata.py \
 
 如果你要使用单卡进行训练，进入项目根目录，键入
 
+#### Ascend单卡
+
 ```bash
 nohup bash scripts/run_standalone_train.sh /home/name/cityscapes 0 &
 ```
 
 其中/home/name/cityscapes指数据集的位置，其后的0指定device_id.
+
+#### GPU单卡
+
+```bash
+nohup `bash scripts/run_standalone_train_gpu.sh  0 /home/name/cityscapes` &
+```
+
+其中0指定device_id，其后的/home/name/cityscapes指数据集的位置
 
 运行该脚本会完成对模型的训练和评估两个阶段。
 
@@ -135,7 +147,9 @@ tail -f log_single_device/log_stage*.txt
 
 例如，你要使用4卡进行训练，进入项目根目录，键入
 
-```py
+#### Ascend多卡
+
+```bash
 nohup bash scripts/run_distribute_train.sh /home/name/cityscapes 4 0,1,2,3 /home/name/rank_table_4pcs.json &
 ```
 
@@ -149,21 +163,31 @@ tail -f log_multi_device/log0/log*.txt
 
 显示训练状态。
 
+#### GPU多卡
+
+```bash
+nohup `bash scripts/run_distribute_train_gpu.sh  4 0,1,2,3 /home/name/cityscapes` &
+```
+
+其中4指rank_size, 再后的0,1,2,3制定了设备的编号, /home/name/cityscapes指数据集的位置， 在项目根目录下会生成log_distribute_device文件夹，./log_distribute_device/log_output*/1/rank.*/stdout即为多卡日志文件，
+键入
+
+```bash
+tail -f log_distribute_device/log_output*/1/rank.*/stdout
+```
+
+显示训练状态。
+
 ### 验证单个ckpt
 
 键入
 
-```py
-python eval.py \
-    --data_path /path/cityscapes \
-    --run_distribute false \
-    --encode false \
-    --model_root_path /path/ENet/ENet.ckpt \
-    --device_id 1
+```bash
+bash scripts/run_eval_gpu.sh 0 /home/name/cityscapes /checkpoint/E-NET.ckpt
+
 ```
 
-data_path为数据集根目录，model_root_path为ckpt文件路径。
-
+其中0制定了设备的编号, /home/name/cityscapes指数据集的位置，/checkpoint/E-NET.ckpt指ckpt文件的位置键入
 验证完毕后，会在ckpt文件同目录下后缀metrics.txt文件记录结果。
 
 ```txt
@@ -185,38 +209,38 @@ iou_class [0.96626199 0.75290523 0.87924483 0.43634233 0.44190292 0.50485979
 
 ##### Cityscapes上训练E-Net
 
-| 参数                 | Ascend                                                      |
-| -------------------------- | ----------------------------------------------------------- |
-| 模型版本              | E-Net                                               |        |
-| 资源                   | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8             |
-| 上传日期              | 2021-10-09                                 | 2021-07-05 |
-| MindSpore版本          | 1.2.0                                                       |
-| 数据集                    | Cityscapes                                                    |
-| 训练参数        | epoch=250, steps=496, batch_size = 6, lr=5e-4              |
-| 优化器                  | Adam                                                    |
-| 损失函数              | 带权重的Softmax交叉熵                                       |
-| 输出                    | 语义分割图                                                 |
-| 损失                       | 0.17356214                                                      |
-| 速度                      | 单卡：882毫秒/步;                           |
-| 总时长                 | 单卡：30h;                            |
-| 参数(M)             | 0.34                                                      |
-| 微调检查点 | 4.40M (.ckpt文件)                                         |
-| 推理模型        | 9.97M(.air文件)                     |      |
+| 参数                 | Ascend                                                |  GPU|
+| --------------------| ----------------------------------------------------- |--------|
+| 模型版本             | E-Net                                                 |  E-Net   |
+| 资源                | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8  | RTX3090；CPU 2.90GHz，64核；内存 252G；系统 Ubuntu20.04|
+| 上传日期             | 2021-10-09                                            | 2022-3-23 |
+| MindSpore版本       | 1.2.0                                                 | 1.6.1    |
+| 数据集              | Cityscapes                                            | Cityscapes      |
+| 训练参数            | epoch=250, steps=496, batch_size = 6, lr=5e-4         | epoch=250, steps=495, batch_size = 6, lr=5e-4     |
+| 优化器              | Adam                                                  | Adam  |
+| 损失函数            | 带权重的Softmax交叉熵                                    | 带权重的Softmax交叉熵  |
+| 输出               | 语义分割图                                              |  语义分割图 |
+| 损失               | 0.17356214                                            |  0.20114072        |
+| 速度               | 单卡：882毫秒/步;                                       |  单卡：571毫秒/步;      |
+| 总时长             | 单卡：30h;                                             |   单卡：25h;   |
+| 参数(M)           | 0.34                                                  |   0.34      |
+| 微调检查点 | 4.40M (.ckpt文件)                                              |   4.60M    |
+| 推理模型        | 9.97M(.air文件)                                          |   9.97M(.air文件)     |
 
 #### 评估性能
 
 ##### Cityscapes上评估E-Net
 
-| 参数          | Ascend                      |
-| ------------------- | --------------------------- |
-| 模型版本       |       E-Net          |
-| 资源            |  Ascend 910；系统 Euler2.8                  |
-| 上传日期       | 2021-10-09 |
-| MindSpore 版本   | 1.2.0                       |
-| 数据集             | Cityscapes, 500张图像     |
-| batch_size          | 6                         |
-| 输出             | 语义分割图                 |
-| 准确性            | 单卡: 62.19%;  |
+| 参数          | Ascend                           | GPU                       |
+| ------------------- | --------------------------|---------------------------|
+| 模型版本       |       E-Net                      |   E-Net                  |
+| 资源            |  Ascend 910；系统 Euler2.8      | RTX3090；系统 Ubuntu20.04 |
+| 上传日期       | 2021-10-09                      | 2022-3-23                |
+| MindSpore 版本   | 1.2.0                        | 1.6.1                    |
+| 数据集             | Cityscapes, 500张图像       | Cityscapes, 500张图像      |
+| batch_size          | 6                       |  6                       |
+| 输出             | 语义分割图                   |  语义分割图                 |
+| 准确性            | 单卡: 62.19%;              | 单卡: 62.22%;            |
 
 ## 310推理
 
