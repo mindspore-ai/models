@@ -414,13 +414,15 @@ Test set results: auc= 0.87464 f1= 0.93635
 
 | Parameter            | SGCN (Ascend)                                                            |
 | -------------------- | ------------------------------------------------------------------------ |
-| Resource             | Ascend 910；CPU 2.60GHz，192 cores；Memory 755G； OS Euler2.8              |
+| Resource             | Ascend 910；CPU 2.60GHz，192 cores；Memory 755G； OS Euler2.8                |
 | Uploaded date        | 2021-10-01                                                               |
 | MindSpore version    | 1.3.0                                                                    |
 | Dataset              | Bitcoin-OTC / Bitcoin-Alpha                                              |
 | Training parameters  | epoch=500, lr=0.01, weight_decay=1e-5                                    |
 | Optimizer            | Adam                                                                     |
 | Loss function        | SoftmaxCrossEntropyWithLogits                                            |
+| Speed                | 0.44 ms/epoch (Bitcoin-OTC) / 0.37ms(Bitcoin-Alpha)                      |
+| Total time           | 8pcs: 440ms(Bitcoin-OTC) / 400ms(Bitcoin-Alpha)                          |
 | AUC                  | 0.8663 / 0.7979                                                          |
 | F1-Score             | 0.9309 / 0.9527                                                          |
 | Scripts              | [SGCN](https://gitee.com/mindspore/models/tree/master/research/gnn/sgcn) |

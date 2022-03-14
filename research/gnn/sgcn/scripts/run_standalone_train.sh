@@ -19,8 +19,15 @@ if [[ $# -gt 2 ]]; then
 exit 1
 fi
 
-if [ ! -d "logs" ]; then
-        mkdir logs
+export DEVICE_ID=$1
+if [ -d "train" ]; then
+        rm -rf ./train
 fi
 
-nohup python -u train.py --device_id=$1 --edge-path=$2 --features-path=$2 > logs/train.log 2>&1 &
+mkdir train
+cp -r ./src ./train
+cp ./train.py ./train
+cd ./train || exit
+scho "start training for device $DEVICE_ID"
+
+nohup python -u train.py --device_id=$1 --edge-path=$2 --features-path=$2 > train.log 2>&1 &
