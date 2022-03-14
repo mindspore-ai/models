@@ -1,0 +1,144 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+
+# Mel
+num_mels: 80
+text_cleaners: ['english_cleaners']
+
+# FastSpeech
+vocab_size: 300
+max_seq_len: 3000
+encoder_dim: 256
+encoder_n_layer: 4
+encoder_head: 2
+encoder_conv1d_filter_size: 1024
+decoder_dim: 256
+decoder_n_layer: 4
+decoder_head: 2
+decoder_conv1d_filter_size: 1024
+fft_conv1d_kernel: [9, 1]
+fft_conv1d_padding: [4, 0]
+duration_predictor_filter_size: 256
+duration_predictor_kernel_size: 3
+dropout: 0.1
+
+# Train
+batch_size: 32  # per one device
+epochs: 200
+n_warm_up_step: 5000
+lr_scale: 1
+mel_max_length: 900
+character_max_length: 200
+keep_checkpoint_max: 10
+
+# Eval
+mel_val_len: 3500
+
+# Other
+alpha: 1
+device_target: 'GPU'
+device_id: 0
+device_start: 0
+logs_dir: 'logs'
+output_dir: 'results'
+dataset_path: '/path/to/LJSpeech-1.1'
+fs_ckpt_url: '/path/to/fastspeech/ckpt'
+wg_ckpt_url: '/path/to/waveglow/ckpt'
+ds_ckpt_url: '/path/to/deepspeech/ckpt'
+
+# WaveGlow
+wg_n_mel_channels: 80
+wg_n_flows: 12
+wg_n_group: 8
+wg_n_early_every: 4
+wg_n_early_size: 2
+wg_n_layers: 8
+wg_n_channels: 256
+wg_kernel_size: 3
+wg_wav_value: 32768
+wg_sampling_rate: 22050
+
+# DeepSpeech2
+ds_sampling_rate: 16000
+ds_window_size: 0.02
+ds_window_stride: 0.01
+ds_window: 'hanning'
+ds_rnn_type: 'LSTM'
+ds_hidden_size: 1024
+ds_hidden_layers: 5
+ds_lookahead_context: 20
+labels: "'ABCDEFGHIJKLMNOPQRSTUVWXYZ _"
+
+# Audio
+au_max_wav_value: 32768
+au_sampling_rate: 22050
+au_filter_length: 1024
+au_hop_length: 256
+au_win_length: 1024
+au_n_mel_channels: 80
+au_mel_fmin: 0
+au_mel_fmax: 8000
+
+---
+# Config description for each option
+num_mels: "Number of channels of mel-spectrogram."
+text_cleaners: "Chosen language pipeline."
+vocab_size: "Vocabulary size"
+max_seq_len: "Max sequence length."
+encoder_dim: "Encoder dimension."
+encoder_n_layer: "Number of encoder layers."
+encoder_head: "Number of encoders head."
+encoder_conv1d_filter_size: "Conv out filters of encoder."
+decoder_dim: "Decoder dimension."
+decoder_n_layer: "Number of decoder layers."
+decoder_head: "Number of decoder head."
+decoder_conv1d_filter_size: "Conv out filters of decoder."
+fft_conv1d_kernel: "Conv kernel size of FFT block."
+fft_conv1d_padding: "Conv padding of FFT block."
+duration_predictor_filter_size: "Conv out filters of duration predictor."
+duration_predictor_kernel_size: "Conv kernel size of duration predictor."
+dropout: "Dropout ratio."
+batch_size: "Batch size for training."
+epochs: "Num of training epochs."
+n_warm_up_step: "Num of warmup steps."
+lr_scale: "Learning rate multiplier."
+mel_max_length: "Pad all samples of mels to max len during training."
+character_max_length: "Pad all samples of character sequences to max len during training."
+keep_checkpoint_max: "Save last N checkpoints during train."
+mel_val_len: "Max mel length at validation."
+alpha: "Speech speed regulator."
+device_target: "Target device platform."
+device_id: "Device id of the target platform."
+device_start: "Main device for distribute training."
+logs_dir: "Output logs dir."
+output_dir: "Output dir for synthesized audio."
+dataset_path: "Path to dataset folder."
+fs_ckpt_url: "Path to FastSpeech checkpoint."
+wg_ckpt_url: "Path to WaveGlow checkpoint."
+ds_ckpt_url: "Path to DeepSpeech2 checkpoint."
+wg_n_mel_channels: "WaveGlow num of mel-spectrogram channels."
+wg_n_flows: "WaveGlow num cells."
+wg_n_group: "WaveGlow num layers in cell."
+wg_n_early_every: "WaveGlow add noise every."
+wg_n_early_size: "WaveGlow param."
+wg_n_layers: "WaveGlow num layers."
+wg_n_channels: "WaveGlow num channels."
+wg_kernel_size: "WaveGlow kernel size."
+wg_wav_value: "WaveGlow audio wav value."
+wg_sampling_rate: "WaveGlow audio sampling rate."
+ds_sampling_rate: "DeepSpeech2 audio param."
+ds_window_size: "DeepSpeech2 window size."
+ds_window_stride: "DeepSpeech2 window stride."
+ds_window: "DeepSpeech2 window type."
+ds_rnn_type: "DeepSpeech2 rnn type."
+ds_hidden_size: "DeepSpeech2 size of hidden layer."
+ds_hidden_layers: "DeepSpeech2 num hidden layers."
+ds_lookahead_context: "DeepSpeech2 param."
+labels: "Symbols for the DeepSpeech2 model."
+au_max_wav_value: "DeepSpeech2 audio max wav value."
+au_sampling_rate: "DeepSpeech2 audio sampling rate."
+au_filter_length: "DeepSpeech2 audio filter length."
+au_hop_length: "DeepSpeech2 audio hop length."
+au_win_length: "DeepSpeech2 audio window length."
+au_n_mel_channels: "DeepSpeech2 audio num mel channels."
+au_mel_fmin: "DeepSpeech2 audio mel fmin."
+au_mel_fmax: "DeepSpeech2 audio mel fmax."
