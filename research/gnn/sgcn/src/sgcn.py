@@ -288,7 +288,8 @@ class SignedGCNTrainer:
                     save_checkpoint(self.model, self.args.checkpoint_file + '_f1.ckpt')
                     print('Best F1-Score checkpoint has been saved.')
         if self.args.rank_log_save_ckpt_flag:
-            print('Training fished! The best AUC and F1-Score is:', best_auc, best_f1, 'Total time:', time.time() - t0)
+            print('Training finished! The best AUC and F1-Score is:', best_auc, best_f1, 'Total time:',
+                  time.time() - t0)
 
     def structured_sampling(self, edge_index, num_nodes=None):
         """

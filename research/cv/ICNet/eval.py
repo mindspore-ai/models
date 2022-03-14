@@ -44,7 +44,7 @@ class Evaluator:
         self.cfg = config
 
         # get valid dataset images and targets
-        self.image_paths, self.mask_paths = _get_city_pairs(config["train"]["cityscapes_root"], "val")
+        self.image_paths, self.mask_paths = _get_city_pairs(args_opt.dataset_path, "val")
 
         # create network
         self.model = ICNet(nclass=19, pretrained_path=cfg["train"]["pretrained_model_path"], istraining=False)
