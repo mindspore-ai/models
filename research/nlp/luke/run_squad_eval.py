@@ -30,7 +30,7 @@ from src.model_utils.config_args import args_config as args
 from mindspore import context, load_checkpoint, load_param_into_net, Model
 
 args.data_dir = os.path.join(args.data, 'squad')
-context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
+context.set_context(mode=context.GRAPH_MODE, device_target=args.device)
 
 # load pretrain
 model_archive = ModelArchive.load(args.model_file)

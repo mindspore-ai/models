@@ -17,6 +17,7 @@ import functools
 import os
 from mindspore.common import set_seed
 from mindspore import context
+from mindspore.communication import get_group_size
 from mindspore.communication import init
 from mindspore.context import ParallelMode
 
@@ -28,7 +29,7 @@ from src.reading_comprehension.model import LukeForReadingComprehension
 from src.reading_comprehension.train import do_train
 from src.utils.model_utils import ModelArchive
 
-context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
+context.set_context(mode=context.GRAPH_MODE, device_target=args.device)
 set_seed(args.seed)
 if args.duoka:
     context.set_auto_parallel_context(device_num=get_device_num(),
@@ -45,6 +46,14 @@ if args.modelArts:
                                       parallel_mode=ParallelMode.DATA_PARALLEL,
                                       gradients_mean=True)
     init()
+
+if args.distribute:
+    init()
+    device_num = get_group_size()
+    context.set_auto_parallel_context(device_num=device_num,
+                                      parallel_mode=ParallelMode.DATA_PARALLEL,
+                                      gradients_mean=True)
+
 
 config = args
 

@@ -14,12 +14,14 @@
 # ============================================================================
 """data loader file"""
 import os
+import pickle5 as pickle
 
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
 import mindspore.dataset.transforms as C
 
-from src.model_utils.moxing_adapter import get_rank_id, get_device_num
+from src.model_utils.moxing_adapter import get_device_num
+from src.model_utils.moxing_adapter import get_rank_id
 
 
 def create_dataset(data_file=None, do_shuffle=True, device_num=1, rank=0, batch_size=1,
@@ -92,10 +94,9 @@ def load_eval(args):
     processor = None
 
     with open(args.data + '/squad_change/eval_obj.pickle', 'rb') as f:
-        import pickle
         eval_obj = pickle.load(f)
-        examples = eval_obj.examples
-        features = eval_obj.features
-        processor = eval_obj.processor
+    examples = eval_obj.examples
+    features = eval_obj.features
+    processor = eval_obj.processor
 
     return data_set, examples, features, processor
