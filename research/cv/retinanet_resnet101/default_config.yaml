@@ -126,7 +126,7 @@ pre_trained_epoch_size: 'Pretrained epoch size.'
 save_checkpoint_epochs: 'Save checkpoint epochs, default is 1.'
 loss_scale: 'Loss scale, default is 1024.'
 filter_weight: 'Filter weight parameters, default is False.'
-run_platform: 'Run platform, only support Ascend in training and export, only support Ascend and GPU in evaling.'
+run_platform: 'Run platform, only support Ascend and GPU.'
 file_format: 'file format'
 file_name: 'output file name.'
 result_path: 'result file path.'
@@ -139,5 +139,5 @@ train_url: 'Training output url for obs'
 data_path: 'Dataset path for local'
 
 ---
-run_platform: ['Ascend']
+run_platform: ['Ascend', 'GPU']
 file_format: ["AIR", "MINDIR"]

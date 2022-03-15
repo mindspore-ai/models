@@ -74,7 +74,7 @@ def retinanet_bboxes_encode(boxes):
     Labels anchors with ground truth inputs.
 
     Args:
-        boxex: ground truth with shape [N, 5], for each row, it stores [y, x, h, w, cls].
+        boxes: ground truth with shape [N, 5], for each row, it stores [y, x, h, w, cls].
 
     Returns:
         gt_loc: location ground truth with shape [num_anchors, 4].

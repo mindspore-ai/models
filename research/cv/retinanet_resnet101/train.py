@@ -19,13 +19,13 @@ import os
 import mindspore
 import mindspore.nn as nn
 from mindspore import context, Tensor
-from mindspore.communication.management import init, get_rank
+from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, LossMonitor, TimeMonitor, Callback
 from mindspore.train import Model
 from mindspore.context import ParallelMode
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.common import set_seed
-from src.retinahead import  retinanetWithLossCell, TrainingWrapper, retinahead
+from src.retinahead import retinanetWithLossCell, TrainingWrapper, retinahead
 from src.backbone import resnet101
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
@@ -36,6 +36,8 @@ from src.init_params import init_net_param, filter_checkpoint_parameter
 
 
 set_seed(1)
+
+
 class Monitor(Callback):
     """
     Monitor loss and time.
@@ -54,6 +56,7 @@ class Monitor(Callback):
         super(Monitor, self).__init__()
         self.lr_init = lr_init
         self.lr_init_len = len(lr_init)
+
     def step_end(self, run_context):
         cb_params = run_context.original_args()
         print("lr:[{:8.6f}]".format(self.lr_init[cb_params.cur_step_num-1]), flush=True)
@@ -65,11 +68,13 @@ def modelarts_process():
         config.coco_root = os.path.join(config.coco_root, config.modelarts_dataset_unzip_name)
         print(os.listdir(os.path.join(config.data_path, config.modelarts_dataset_unzip_name)))
 
+
 @moxing_wrapper(pre_process=modelarts_process)
 def train_retinanet_resnet101():
     """ train_retinanet_resnet101 """
+
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.run_platform)
     if config.run_platform == "Ascend":
-        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
         if config.distribute:
             if os.getenv("DEVICE_ID", "not_set").isdigit():
                 context.set_context(device_id=int(os.getenv("DEVICE_ID")))
@@ -83,8 +88,18 @@ def train_retinanet_resnet101():
             device_num = 1
             context.set_context(device_id=get_device_id())
 
+    elif config.run_platform == "GPU":
+        rank = config.device_id
+        device_num = config.device_num
+        if config.distribute:
+            init()
+            rank = get_rank()
+            device_num = get_group_size()
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
+                                              device_num=device_num)
+
     else:
-        raise ValueError("Unsupported platform.")
+        raise ValueError("Unsupported platform, GPU or Ascend is supported only.")
 
     mindrecord_file = create_mindrecord(config.dataset, "retina2.mindrecord", True)
 
@@ -98,11 +113,13 @@ def train_retinanet_resnet101():
         dataset_size = dataset.get_dataset_size()
         print("Create dataset done!")
 
-
         backbone = resnet101(config.num_classes)
         retinanet = retinahead(backbone, config)
         net = retinanetWithLossCell(retinanet, config)
-        net.to_float(mindspore.float16)
+        if config.run_platform == "Ascend":
+            net.to_float(mindspore.float16)
+        else:
+            net.to_float(mindspore.float32)
         init_net_param(net)
 
         if config.pre_trained:
@@ -136,6 +153,7 @@ def train_retinanet_resnet101():
         else:
             cb += [ckpt_cb]
             model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
+
 
 if __name__ == '__main__':
     train_retinanet_resnet101()

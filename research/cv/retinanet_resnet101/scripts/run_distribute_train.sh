@@ -59,6 +59,7 @@ do
     if [ $# == 5 ]
     then
         python train.py  \
+        --run_platform="Ascend" \
         --distribute=True  \
         --lr=$LR \
         --dataset=$DATASET \
@@ -70,6 +71,7 @@ do
     if [ $# == 7 ]
     then
         python train.py  \
+        --run_platform="Ascend" \
         --distribute=True  \
         --lr=$LR \
         --dataset=$DATASET \
