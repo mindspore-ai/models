@@ -16,6 +16,7 @@
 import os
 import datetime
 import time
+import glob
 
 from mindspore.context import ParallelMode
 from mindspore import context
@@ -30,8 +31,10 @@ from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper
 from model_utils.device_adapter import get_device_id, get_device_num
 
-config.data_root = os.path.join(config.data_dir, 'val2017')
-config.ann_val_file = os.path.join(config.data_dir, 'annotations/instances_val2017.json')
+
+config.data_root = glob.glob(os.path.join(config.data_dir, 'val*'))[0]
+config.ann_val_file = glob.glob(os.path.join(config.data_dir, 'annotations/instances_val*.json'))[0]
+
 
 def modelarts_pre_process():
     '''modelarts pre process function.'''

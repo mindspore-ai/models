@@ -16,6 +16,7 @@
 import os
 import time
 import datetime
+import glob
 
 from mindspore.context import ParallelMode
 from mindspore.nn.optim.momentum import Momentum
@@ -46,16 +47,16 @@ from model_utils.device_adapter import get_device_id, get_device_num
 
 set_seed(1)
 
+
 def set_default():
     if config.lr_scheduler == 'cosine_annealing' and config.max_epoch > config.t_max:
         config.t_max = config.max_epoch
 
     config.lr_epochs = list(map(int, config.lr_epochs.split(',')))
-    config.data_root = os.path.join(config.data_dir, 'train2017')
-    config.annFile = os.path.join(config.data_dir, 'annotations/instances_train2017.json')
-
-    config.data_val_root = os.path.join(config.data_dir, 'val2017')
-    config.ann_val_file = os.path.join(config.data_dir, 'annotations/instances_val2017.json')
+    config.data_root = glob.glob(os.path.join(config.data_dir, 'train*'))[0]
+    config.annFile = glob.glob(os.path.join(config.data_dir, 'annotations/instances_train*.json'))[0]
+    config.data_val_root = glob.glob(os.path.join(config.data_dir, 'val*'))[0]
+    config.ann_val_file = glob.glob(os.path.join(config.data_dir, 'annotations/instances_val*.json'))[0]
 
     device_id = int(os.getenv('DEVICE_ID', '0'))
     context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True,
