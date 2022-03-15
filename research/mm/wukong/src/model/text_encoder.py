@@ -15,6 +15,7 @@
 import numpy as np
 import mindspore.nn as nn
 import mindspore.ops as ops
+from mindspore import dtype as mstype
 from mindspore.ops import operations as P
 from mindspore import Parameter, Tensor
 from mindspore.common.initializer import TruncatedNormal, initializer
@@ -117,14 +118,23 @@ class BERTTransformer(nn.Cell):
 
 
 class BERT_Wukong(nn.Cell):
-    def __init__(self, context_length, vocab_size, output_dim, width, layers, heads):
+    def __init__(self,
+                 context_length,
+                 vocab_size,
+                 output_dim,
+                 width,
+                 layers,
+                 heads,
+                 return_full_embed=True):
         super(BERT_Wukong, self).__init__()
         self.width = width
         self.layers = layers
         self.vocab_size = vocab_size
+        self.return_full_embed = return_full_embed
         self.embedding_table = Parameter(initializer(TruncatedNormal(0.02), [vocab_size, width]))
         self.gather = ops.Gather()
         self.reshape = ops.Reshape()
+        self.cast = ops.Cast()
 
         self.positional_embedding = Parameter(initializer(TruncatedNormal(0.01), [context_length, width]))
         self.ln_final = nn.LayerNorm([self.width])
@@ -149,5 +159,8 @@ class BERT_Wukong(nn.Cell):
         x = self.transformer_layer(x)
         x = x.transpose(1, 0, 2)
         x = self.ln_final(x)
+        if not self.return_full_embed:
+            x = x[nn.Range(x.shape[0])(),
+                  self.cast(self.cast(text != 0, mstype.float32).sum(axis=-1), mstype.int32) - 1]
         x = ops.matmul(x, self.text_projection)
         return x

@@ -18,6 +18,8 @@ import mindspore.ops as ops
 from mindspore.ops import operations as P
 from mindspore import Parameter, Tensor
 
+from .token_learner import TokenLearnerModule
+
 
 class VITMultiheadAttention(nn.Cell):
     def __init__(self, d_model, n_head):
@@ -114,24 +116,37 @@ class VITTransformer(nn.Cell):
 
 
 class VisualTransformer(nn.Cell):
-    def __init__(self, input_resolution, patch_size, width, layers, output_dim, heads=None):
+    def __init__(self,
+                 input_resolution,
+                 patch_size,
+                 width,
+                 layers,
+                 output_dim,
+                 token_learner=None,
+                 heads=None):
         super(VisualTransformer, self).__init__()
         if heads is None:
             heads = width // 64
         self.input_resolution = input_resolution
         self.output_dim = output_dim
         self.conv1 = nn.Conv2d(3, width, patch_size, patch_size)
+        self.num_tokens = (input_resolution // patch_size) ** 2 + 1
+        self.num_tokens_side = input_resolution // patch_size
         scale = width ** -0.5
         self.class_embedding = Parameter(scale * Tensor(np.random.normal(0, 1, size=(width)).astype(np.float32)))
         self.positional_embedding = Parameter(
             scale * Tensor(np.random.normal(
-                size=((input_resolution // patch_size) ** 2 + 1, width)).astype(np.float32)))
+                size=(self.num_tokens, width)).astype(np.float32)))
         self.ln_pre = nn.LayerNorm([width])
         self.transformer = VITTransformer(width, layers, heads)
         self.ln_post = nn.LayerNorm([width])
         self.proj = Parameter(scale * Tensor(np.random.normal(0, 1, size=(width, output_dim)).astype(np.float32)))
+        if token_learner is not None:
+            self.token_learner = TokenLearnerModule(in_channels=output_dim, **token_learner)
+        self.width = width
         self.cat = ops.Concat(1)
         self.tile = ops.Tile()
+        self.expand_dim = ops.ExpandDims()
 
     def construct(self, x):
         x = self.conv1(x)
@@ -144,6 +159,35 @@ class VisualTransformer(nn.Cell):
         x = x.transpose(1, 0, 2)
         x = self.transformer(x)
         x = x.transpose(1, 0, 2)
+
+        x = self.ln_post(x)
+        x = ops.matmul(x, self.proj)
+        if hasattr(self, "token_learner"):
+            cls_token, x = x[:, 0, :], x[:, 1:, :]
+            x = x.view(-1, self.num_tokens_side, self.num_tokens_side, self.output_dim)
+            x, _ = self.token_learner(x)
+            cls_token = self.expand_dim(cls_token, 1).astype(x.dtype)
+            x = self.cat((cls_token, x))
+        return x
+
+
+class ClipVisualTransformer(VisualTransformer):
+    def __init__(self, *args, **kwargs):
+        super(ClipVisualTransformer, self).__init__(*args, **kwargs)
+
+    def construct(self, x):
+        x = self.conv1(x)
+        x = x.reshape(x.shape[0], x.shape[1], -1)
+        x = x.transpose(0, 2, 1)
+        class_embedding = self.tile(self.class_embedding, (x.shape[0], 1, 1))
+        x = self.cat((class_embedding, x))
+        x = x + self.positional_embedding
+        x = self.ln_pre(x)
+        x = x.transpose(1, 0, 2)
+        x = self.transformer(x)
+        x = x.transpose(1, 0, 2)
+
+        x = x[:, 0, :]
         x = self.ln_post(x)
         x = ops.matmul(x, self.proj)
         return x
