@@ -1,0 +1,27 @@
+batch_size: 32
+train_data: '../dataset/waterloo5050step40colorimage/'
+sigma: 15
+channel: 3
+epoch: 50
+lr: 0.001
+save_every: 1
+
+resume_path: ''
+resume_name: ''
+
+use_modelarts: False
+train_url: 'train_url/'
+data_url: 'data_url/'
+output_path: './output/'
+outer_path: 's3://output/'
+
+test_dir: ''
+pretrain_path: ''
+ckpt_name: ''
+
+device_target: 'GPU'
+is_distributed: False
+rank: 0
+group_size: 1
+is_save_on_master: True
+ckpt_save_max: 5

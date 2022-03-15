@@ -14,9 +14,10 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 6 ]; then
-  echo "Usage: sh run_eval.sh [train_code_path] [test_dir] [sigma]" \
-       "[channel] [pretrain_path] [ckpt_name]"
+if [ $# != 2 ]; then
+  echo "Usage: 
+        bash run_standalone_train_ascend.sh [config_file] [dataset_path]
+       " 
   exit 1
 fi
 
@@ -24,40 +25,42 @@ get_real_path() {
   if [ "${1:0:1}" == "/" ]; then
     echo "$1"
   else
-    echo "$(realpath -m $PWD/$1)/"
+    echo "$(realpath -m $PWD/$1)"
   fi
 }
 
-train_code_path=$(get_real_path $1)
-echo "train_code_path: "$train_code_path
+CONFIG=$(get_real_path $1)
+echo "CONFIG: "$CONFIG
 
-test_dir=$(get_real_path $2)
-echo "test_dir: "$test_dir
+DATASET=$(get_real_path $2)
+echo "DATASET: "$DATASET
 
-pretrain_path=$(get_real_path $5)
-echo "pretrain_path: "$pretrain_path
+BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
 
-if [ ! -d $train_code_path ]
+if [ ! -f $CONFIG ]
 then
-    echo "error: train_code_path=$train_code_path is not a dictionary."
+    echo "error: config=$CONFIG is not a file."
 exit 1
 fi
 
-if [ ! -d $test_dir ]
+if [ ! -d $DATASET ]
 then
-    echo "error: test_dir=$test_dir is not a dictionary."
+    echo "error: dataset=$DATASET is not a directory."
 exit 1
 fi
 
-if [ ! -d $pretrain_path ]
-then
-    echo "error: pretrain_path=$pretrain_path is not a dictionary."
-exit 1
-fi
+export PYTHONPATH=${BASE_PATH}:$PYTHONPATH
 
-python ${train_code_path}eval.py \
---test_dir=$test_dir \
---sigma=$3 \
---channel=$4 \
---pretrain_path=$pretrain_path \
---ckpt_name=$6
+if [ -d "../train" ];
+then
+    rm -rf ../train
+fi
+mkdir ../train
+cd ../train || exit
+
+echo "Training on Ascend..."
+echo
+env > env.log
+pwd
+echo
+nohup python ${BASE_PATH}/../train.py --device_target=Ascend --config_path=$CONFIG --train_data=$DATASET &> train.log &
