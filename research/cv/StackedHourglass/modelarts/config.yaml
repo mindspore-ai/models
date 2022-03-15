@@ -1,0 +1,164 @@
+create_algo:
+  name: StackedHourglass
+  description: "基于mindspore框架的Ascend910训练"
+  config:
+    training:
+      image:
+        engine_name: Ascend-Powered-Engine
+        engine_version: mindspore_1.3.0-cann_5.0.2-py_3.7-euler_2.8.3-aarch64
+      code:
+        relative_boot_file: train_start.py
+      inputs:
+        - name: 数据来源
+          parameter:
+            label: data_url
+            value: data_url/
+          dataset_enable: false
+          annotations:
+            - key: data_source
+              value:
+                - obs
+                - modelarts_dataset
+            - key: dataset_type
+              value:
+                - '0'
+            - key: data_format
+              value:
+                - Default
+      outputs:
+        - name: 模型输出
+          description: ''
+          parameter:
+            label: train_url
+            value: train_url/
+          artifact:
+            - type: ''
+          modelarts_hosted: false
+      flavor:
+        flavor_codes: []
+        annotations:
+          - key: flavor_type
+            value:
+              - Ascend
+          - key: is_multi_devices_supported
+            value:
+              - 'true'
+          - key: flavor_codes
+            value: []
+          - key: isMultiDevHide
+      parameters:
+        regular:
+          - key: "batch_size"
+            help: null
+            type: Integer
+            default_value: "32"
+            editable: true
+            required: false
+          - key: "num_epoch"
+            help: null
+            type: Integer
+            default_value: "100"
+            editable: true
+            required: false
+          - key: "save_checkpoint_epochs"
+            help: null
+            type: Integer
+            default_value: "5"
+            editable: true
+            required: false
+          - key: "keep_checkpoint_max"
+            help: null
+            type: Integer
+            default_value: "20"
+            editable: true
+            required: false
+          - key: "initial_lr"
+            help: null
+            type: Float
+            default_value: "0.001"
+            editable: true
+            required: false
+          - key: "decay_rate"
+            help: null
+            type: Float
+            default_value: "0.985"
+            editable: true
+            required: false
+          - key: "decay_epoch"
+              help: null
+              type: Integer
+              default_value: "1"
+              editable: true
+              required: false
+          - key: "parallel"
+            help: null
+            type: Bool
+            default_value: "False"
+            editable: true
+            required: false
+
+
+publish_algo:
+  item_name: 人体字体估计-StackedHourglass-Ascend_ModelZoo
+  short_desc: 基于MindSpore框架的Ascend 910训练
+  add_version_desc:
+
+create_train_job:
+  task_type: Attitude estimation
+  job_desc: null
+  config:
+    flavor:
+      code: modelarts.kat1.xlarge
+    log_url: null
+    parameter:
+      - label: "batch_size"
+        value: "32"
+        editable: true
+        required: false
+      - label: "num_epoch"
+        value: "100"
+        editable: true
+        required: false
+      - label: "save_checkpoint_epochs"
+        value: "5"
+        editable: true
+        required: false
+      - label: "keep_checkpoint_max"
+        value: "20"
+        editable: true
+        required: false
+      - label: "loss_log_interval"
+        value: "1"
+        editable: true
+        required: false
+      - label: "initial_lr"
+        value: "0.001"
+        editable: true
+        required: false
+      - label: "decay_rate"
+        value: "0.985"
+        editable: true
+        required: false
+      - label: "decay_epoch"
+        value: "1"
+        editable: true
+        required: false
+    inputs:
+      - data_source:
+          obs:
+            obs_url: null
+    outputs:
+      - value: null
+
+create_model:
+  model_type: MindSpore
+  description: null
+
+create_service:
+  schedule:
+    - duration: 1
+      time_units: HOURS
+      type: stop
+  description: null
+  config:
+    - specification: modelarts.kat1.xlarge
