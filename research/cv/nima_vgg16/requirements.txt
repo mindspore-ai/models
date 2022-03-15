@@ -1,0 +1,5 @@
+pillow
+pyyaml
+pandas
+opencv-python
+scipy
