@@ -1,0 +1,50 @@
+# train parameters
+device_target: 'GPU'
+lr: 0.0001
+lr_backbone: 0.00001
+batch_size: 4
+weight_decay: 0.0001
+epochs: 300
+lr_drop: 200
+clip_max_norm: 0.1
+coco_path: ''
+num_classes: 91
+seed: 42
+eval: False
+num_workers: 2
+is_distributed: False
+max_img_size: 906
+img_scales: [480, 512, 544, 576, 608, 640]
+log_frequency_step: 100
+keep_checkpoint_max: 10
+save_path: ''
+
+# model config
+backbone: 'resnet50'
+backbone_pretrain: ''
+enc_layers: 6
+dec_layers: 6
+dim_feedforward: 2048
+hidden_dim: 256
+dropout: 0.1
+nheads: 8
+num_queries: 100
+pre_norm: False
+
+# loss
+aux_loss: True
+class_loss_coef: 1
+bbox_loss_coef: 5
+giou_loss_coef: 2
+eos_coef: 0.1
+losses: ['labels', 'boxes', 'cardinality']
+
+# matcher
+set_cost_class: 1
+set_cost_bbox: 5
+set_cost_giou: 2
+
+# export and eval
+ckpt_path: ''
+file_format: 'MINDIR'
+file_name: ''
