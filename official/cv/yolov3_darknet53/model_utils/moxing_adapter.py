@@ -18,7 +18,6 @@
 import os
 import time
 import functools
-import moxing as mox
 import mindspore as ms
 from .config import config
 
@@ -50,6 +49,7 @@ def sync_data(from_path, to_path):
     Download data from remote obs to local directory if the first url is remote url and the second one is local path
     Upload data from local directory to remote obs in contrast.
     """
+    import moxing as mox
     global _global_sync_count
     sync_lock = "/tmp/copy_sync.lock" + str(_global_sync_count)
     _global_sync_count += 1
