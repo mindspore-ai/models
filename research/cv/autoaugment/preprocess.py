@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,4 +40,3 @@ if __name__ == "__main__":
             label_list.append(data["label"])
         np.save(os.path.join('./preprocess_Result/', "cifar10_label_ids.npy"), label_list)
         print("=" * 20, "export bin files finished", "=" * 20)
-        

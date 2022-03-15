@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """
-Helpers for creating Cifar-10 datasets (optionally with AutoAugment enabled).
+Helpers for creating SVHN datasets (optionally with AutoAugment enabled).
 """
 
 import os
@@ -25,8 +25,7 @@ import mindspore.dataset.vision.c_transforms as C
 from mindspore.communication.management import get_group_size
 from mindspore.communication.management import get_rank
 from mindspore.communication.management import init
-
-from .autoaugment import Augment
+from src.dataset.autoaugment import Augment
 
 
 def _get_rank_info():
@@ -43,10 +42,10 @@ def _get_rank_info():
     return rank_size, rank_id
 
 
-def create_cifar10_dataset(dataset_path, do_train=True, repeat_num=1, batch_size=32,
-                           target='Ascend', distribute=False, augment=True):
+def create_svhn_dataset(dataset_path, do_train=True, repeat_num=1, batch_size=32,
+                        target='Ascend', distribute=False, augment=True):
     """
-    Create a train or test cifar10 dataset.
+    Create a train or test svhn dataset.
 
     Args:
         dataset_path (string): Path to the dataset.
@@ -72,11 +71,9 @@ def create_cifar10_dataset(dataset_path, do_train=True, repeat_num=1, batch_size
 
     num_shards = None if rank_size == 1 else rank_size
     shard_id = None if rank_size == 1 else rank_id
-    dataset = ds.Cifar10Dataset(
-        dataset_path, usage='train' if do_train else 'test',
-        num_parallel_workers=8, shuffle=True,
-        num_shards=num_shards, shard_id=shard_id,
-    )
+    dataset = ds.ImageFolderDataset(
+        dataset_path, num_parallel_workers=8,
+        num_shards=num_shards, shard_id=shard_id, decode=True)
 
     # Define map operations
     MEAN = [0.4914, 0.4822, 0.4465]
@@ -84,21 +81,16 @@ def create_cifar10_dataset(dataset_path, do_train=True, repeat_num=1, batch_size
     trans = []
     if do_train and augment:
         trans += [
-            Augment(mean=MEAN, std=STD, policies='cifar10'),
+            Augment(mean=MEAN, std=STD, policies='svhn'),
         ]
     else:
-        if do_train:
-            trans += [
-                C.RandomCrop((32, 32), (4, 4, 4, 4)),
-                C.RandomHorizontalFlip(),
-            ]
         trans += [
             C.Rescale(1. / 255., 0.),
             C.Normalize(MEAN, STD),
             C.HWC2CHW(),
         ]
     dataset = dataset.map(operations=trans,
-                          input_columns='image', num_parallel_workers=1)
+                          input_columns='image', num_parallel_workers=8, python_multiprocessing=True)
 
     type_cast_op = C2.TypeCast(mstype.int32)
     dataset = dataset.map(operations=type_cast_op,

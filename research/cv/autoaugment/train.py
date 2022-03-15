@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,9 +29,10 @@ from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, \
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 
 from src.config import Config
-from src.dataset import create_cifar10_dataset
+from src.dataset.cifar10 import create_cifar10_dataset
+from src.dataset.svhn_dataset import create_svhn_dataset
 from src.network import WRN
-from src.optim import get_lr
+from src.optim.lr import get_lr
 from src.utils import init_utils
 
 
@@ -46,6 +47,7 @@ if __name__ == '__main__':
         device_target=conf.device_target,
         save_graphs=False,
     )
+    device_id = None
     if conf.run_distribute:
         if conf.device_target == 'Ascend':
             device_id = int(os.getenv('DEVICE_ID'))
@@ -66,10 +68,7 @@ if __name__ == '__main__':
                 gradients_mean=True,
             )
     else:
-        try:
-            device_id = int(os.getenv('DEVICE_ID'))
-        except TypeError:
-            device_id = 0
+        device_id = int(os.getenv('DEVICE_ID', '0'))
         context.set_context(device_id=device_id)
 
     # Create dataset
@@ -83,6 +82,19 @@ if __name__ == '__main__':
             distribute=conf.run_distribute,
             augment=conf.augment,
         )
+    elif conf.dataset == 'svhn':
+        dataset = create_svhn_dataset(
+            dataset_path=conf.dataset_path,
+            do_train=True,
+            repeat_num=1,
+            batch_size=conf.batch_size,
+            target=conf.device_target,
+            distribute=conf.run_distribute,
+            augment=conf.augment,
+        )
+    else:
+        raise ValueError("Dataset unsupported.(Choose from ['cifar10', 'svhn'])")
+
     step_size = dataset.get_dataset_size()
 
     # Define net
@@ -94,11 +106,14 @@ if __name__ == '__main__':
         load_param_into_net(net, param_dict)
 
     # Initialize learning rate
-    lr = Tensor(get_lr(
-        lr_init=conf.lr_init, lr_max=conf.lr_max,
-        warmup_epochs=conf.warmup_epochs, total_epochs=conf.epoch_size,
-        steps_per_epoch=step_size, lr_decay_mode=conf.lr_decay_mode,
-    ))
+    if conf.dataset in ['svhn', 'cifar10']:
+        lr = Tensor(get_lr(
+            lr_init=conf.lr_init, lr_max=conf.lr_max,
+            warmup_epochs=conf.warmup_epochs, total_epochs=conf.epoch_size,
+            steps_per_epoch=step_size, lr_decay_mode=conf.lr_decay_mode,
+        ))
+    else:
+        lr = conf.lr_init
 
     # Define loss, opt, and model
     loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
@@ -114,8 +129,12 @@ if __name__ == '__main__':
                   loss_scale_manager=loss_scale, metrics={'acc'})
 
     # Define callbacks
+    if  not conf.dataset_sink_mode:
+        loss_cb = LossMonitor(per_print_times=100)
+    else:
+        loss_cb = LossMonitor()
+
     time_cb = TimeMonitor(data_size=step_size)
-    loss_cb = LossMonitor()
     config_ck = CheckpointConfig(
         save_checkpoint_steps=conf.save_checkpoint_epochs * step_size,
         keep_checkpoint_max=conf.keep_checkpoint_max,
@@ -129,11 +148,11 @@ if __name__ == '__main__':
     # Train
     if conf.run_distribute:
         callbacks = [time_cb, loss_cb]
-        if conf.device_target == 'GPU' and str(get_rank()) == '0':
+        if conf.device_target == 'GPU' and get_rank() == 0:
             callbacks = [time_cb, loss_cb, ck_cb]
         elif conf.device_target == 'Ascend' and device_id == 0:
             callbacks = [time_cb, loss_cb, ck_cb]
     else:
         callbacks = [time_cb, loss_cb, ck_cb]
 
-    model.train(conf.epoch_size, dataset, callbacks=callbacks)
+    model.train(conf.epoch_size, dataset, callbacks=callbacks, dataset_sink_mode=conf.dataset_sink_mode)
