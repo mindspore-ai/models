@@ -28,7 +28,7 @@ _adam_opt = C.MultitypeFuncGraph("adam_opt")
 _scaler_one = Tensor(1, mstype.int32)
 _scaler_ten = Tensor(10, mstype.float32)
 
-@_adam_opt.register("Tensor", "Tensor", "Tensor", "Tensor", "Number", "Tensor", "Tensor", "Tensor",
+@_adam_opt.register("Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor",
                     "Tensor", "Bool", "Bool")
 def _update_run_kernel(beta1, beta2, eps, lr, weight_decay, param, m, v, gradient, decay_flags, optim_filter):
     """
@@ -43,7 +43,7 @@ def _update_run_kernel(beta1, beta2, eps, lr, weight_decay, param, m, v, gradien
         return next_param
     return gradient
 
-@_adam_opt.register("Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Number", "Tensor", "Tensor", "Tensor",
+@_adam_opt.register("Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor",
                     "Tensor", "Bool", "Bool")
 def _update_run_op(beta1, beta2, eps, lr, overflow, weight_decay, param, m, v, gradient, decay_flag, optim_filter):
     """
@@ -55,7 +55,7 @@ def _update_run_op(beta1, beta2, eps, lr, overflow, weight_decay, param, m, v, g
         eps (Tensor): Term added to the denominator to improve numerical stability. Should be greater than 0.
         lr (Tensor): Learning rate.
         overflow (Tensor): Whether overflow occurs.
-        weight_decay (Number): Weight decay. Should be equal to or greater than 0.
+        weight_decay (Tensor): Weight decay. Should be equal to or greater than 0.
         param (Tensor): Parameters.
         m (Tensor): m value of parameters.
         v (Tensor): v value of parameters.
