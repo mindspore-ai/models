@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-22 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,6 +28,11 @@ mkdir run_distribute_train
 cp -rf ./src/ train.py ./*.yaml ./run_distribute_train
 cd run_distribute_train || exit
 
+FILE_LIMIT=$(ulimit -n)
+if [ $FILE_LIMIT -lt 2048 ] ; then
+ulimit -n 2048;
+fi
+
 export RANK_SIZE=$1
 export CONFIG_PATH=$4
 EPOCH_SIZE=$2
@@ -48,3 +53,7 @@ mpirun -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
     --save_checkpoint_steps=2500 \
     --save_checkpoint_num=30 \
     --data_path=$DATA_PATH > log.txt 2>&1 &
+
+if [ $FILE_LIMIT -lt 2048 ] ; then
+ulimit -n $FILE_LIMIT;
+fi
