@@ -33,16 +33,13 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Computer Vision (CV)  | Image Classification  | [InceptionV3](https://gitee.com/mindspore/models/tree/master/official/cv/inceptionv3)   |  ✅ |    |   |
 | Computer Vision (CV)  | Image Classification  | [InceptionV4](https://gitee.com/mindspore/models/tree/master/official/cv/inceptionv4)    |  ✅ |    |   |
 | Computer Vision (CV)  | Image Classification  | [LeNet](https://gitee.com/mindspore/models/tree/master/official/cv/lenet)              |  ✅ |  ✅ | ✅ |
-| Computer Vision (CV)  | Image Classification  | [LeNet (Quantization)](https://gitee.com/mindspore/models/tree/master/official/cv/lenet_quant)      |  ✅ |  ✅ |   |
 | Computer Vision (CV)  | Image Classification  | [MobileNetV1](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv1)      |  ✅ |    |   |
 | Computer Vision (CV)  | Image Classification  | [MobileNetV2](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv2)      |  ✅ |  ✅ | ✅ |
-| Computer Vision (CV)  | Image Classification  | [MobileNetV2 (Quantization)](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv2_quant)   |  ✅ |  ✅ |   |
 | Computer Vision (CV)  | Image Classification  | [MobileNetV3](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv3)  |    |  ✅ |   |
 | Computer Vision (CV)  | Image Classification  | [NASNet](https://gitee.com/mindspore/models/tree/master/official/cv/nasnet) | ✅ | ✅ |   |
 | Computer Vision (CV)  | Image Classification  | [ResNet-18](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)          |  ✅ |    |   |
 | Computer Vision (CV)  | Image Classification  | [ResNet-34](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)          |  ✅ |    |   |
 | Computer Vision (CV)  | Image Classification  | [ResNet-50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)          |  ✅ |  ✅ | ✅ |
-| Computer Vision (CV)  | Image Classification  | [ResNet-50 (Quantization)](https://gitee.com/mindspore/models/tree/master/official/cv/resnet50_quant)          |  ✅ |    |   |
 |Computer Vision (CV)  | Image Classification  | [ResNet-101](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)       |  ✅ | ✅ |   |
 |Computer Vision (CV)  | Image Classification  | [ResNet-152](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)       |  ✅ |   |   |
 |Computer Vision (CV)  | Image Classification  | [ResNeXt50](https://gitee.com/mindspore/models/tree/master/official/cv/resnext)     |  ✅ | ✅ |   |
@@ -71,7 +68,6 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Computer Vision (CV) | Object Detection  | [WarpCTC](https://gitee.com/mindspore/models/tree/master/official/cv/warpctc)                    |  ✅ |  ✅ |   |
 | Computer Vision (CV)  | Object Detection  | [YOLOv3-ResNet18](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_resnet18)    | ✅ |    |   |
 | Computer Vision (CV)  | Object Detection  | [YOLOv3-DarkNet53](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53)         |  ✅ |  ✅ |   |
-| Computer Vision (CV)  | Object Detection  | [YOLOv3-DarkNet53 (Quantization)](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53_quant)  |  ✅ |    |   |
 | Computer Vision (CV)  | Object Detection  | [YOLOv4](https://gitee.com/mindspore/models/tree/master/official/cv/yolov4)         |  ✅ |    |   |
 | Computer Vision (CV) | Object Detection  |[YOLOv5](https://gitee.com/mindspore/models/tree/master/official/cv/yolov5) | ✅ |   |   |
 | Computer Vision (CV) | Object Detection  |[RetinaNet](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) | ✅ |   |   |

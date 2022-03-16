@@ -33,16 +33,13 @@
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [InceptionV3](https://gitee.com/mindspore/models/tree/master/official/cv/inceptionv3) |  ✅ |   |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [InceptionV4](https://gitee.com/mindspore/models/tree/master/official/cv/inceptionv4) |  ✅ |   |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [LeNet](https://gitee.com/mindspore/models/tree/master/official/cv/lenet)    |  ✅ |  ✅ | ✅ |
-| 计算机视觉（CV）  | 图像分类（Image Classification）  | [LeNet（量化）](https://gitee.com/mindspore/models/tree/master/official/cv/lenet_quant)    |  ✅ |  ✅ |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [MobileNetV1](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv1)        |  ✅ |   |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [MobileNetV2](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv2)        |  ✅ |  ✅ | ✅ |
-| 计算机视觉（CV）  | 图像分类（Image Classification）  | [MobileNetV2（量化）](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv2_quant)        |  ✅ |  ✅ |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [MobileNetV3](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv3)        |   |  ✅ |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [NASNet](https://gitee.com/mindspore/models/tree/master/official/cv/nasnet) | ✅ |  ✅ |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-18](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)   |  ✅ |   |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-34](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)   |  ✅ |   |  |
 | 计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)   |  ✅ |  ✅ | ✅ |
-| 计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-50（量化）](https://gitee.com/mindspore/models/tree/master/official/cv/resnet50_quant)   |  ✅ |   |  |
 |计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-101](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)        |  ✅ | ✅ |  |
 |计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNet-152](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)        |  ✅ |   |  |
 |计算机视觉（CV）  | 图像分类（Image Classification）  | [ResNeXt50](https://gitee.com/mindspore/models/tree/master/official/cv/resnext)    |  ✅ | ✅ |  |
@@ -71,7 +68,6 @@
 | 计算机视觉（CV） | 目标检测（Object Detection）  | [WarpCTC](https://gitee.com/mindspore/models/tree/master/official/cv/warpctc)                    |  ✅ |  ✅ |  |
 | 计算机视觉（CV）  | 目标检测（Object Detection）  | [YOLOv3-ResNet18](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_resnet18)   |  ✅ |   |  |
 | 计算机视觉（CV）  | 目标检测（Object Detection）  | [YOLOv3-DarkNet53](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53)   |  ✅ |  ✅ |  |
-| 计算机视觉（CV）  | 目标检测（Object Detection）  | [YOLOv3-DarkNet53（量化）](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_darknet53_quant)   |  ✅ |   |  |
 | 计算机视觉（CV） | 目标检测（Object Detection）  |[YOLOv4](https://gitee.com/mindspore/models/tree/master/official/cv/yolov4)         |  ✅ |   |  |
 | 计算机视觉（CV） | 目标检测（Object Detection）  |[YOLOv5](https://gitee.com/mindspore/models/tree/master/official/cv/yolov5) | ✅ |   |   |
 | 计算机视觉（CV） | 目标检测（Object Detection）  |[RetinaNet](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) | ✅ |   |   |
