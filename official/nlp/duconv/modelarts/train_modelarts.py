@@ -18,7 +18,9 @@ train model
 """
 import os
 import argparse
+import ast
 import numpy as np
+import moxing
 import mindspore.common.dtype as mstype
 from mindspore import Tensor, context, load_checkpoint, export
 from mindspore.nn.optim import Adam
@@ -29,54 +31,63 @@ from mindspore.communication.management import init
 from mindspore import set_seed
 
 from src.dataset import create_dataset
-from src.model_utils.config import config as cfg
 from src.model_utils.moxing_adapter import moxing_wrapper
-from src.model_utils.device_adapter import get_device_id, get_device_num, get_rank_id, get_job_id
+from src.model_utils.device_adapter import get_device_id, get_device_num, get_rank_id
 from src.model import RetrievalWithLoss
 from src.bert import BertConfig
 from src.lr_schedule import Noam
 from src.model import RetrievalWithSoftmax
-import moxing
+
 
 set_seed(0)
 
+parser = argparse.ArgumentParser(description='Duconv conversion')
+parser.add_argument('--data_url', type=str, default=None, help='Location of Data')
+parser.add_argument('--train_url', type=str, default='', help='Location of training outputs')
+parser.add_argument('--task_name', type=str, default="match_kn_gene", choices=['match', 'match_kn', 'match_kn_gene'],
+                    help='choose of task name')
+parser.add_argument('--max_seq_length', type=int, default=512, help='the max sequence length')
+parser.add_argument('--vocab_size', type=int, default=14373, help='vocab size')
+parser.add_argument('--batch_size', type=int, default=128, help='batch size')
+parser.add_argument('--epoch', type=int, default=30, help='epoch')
+parser.add_argument('--device_target', type=str, default='Ascend', choices=['Ascend', 'GPU'],
+                    help='device target, support Ascend and GPU.')
+parser.add_argument('--device_id', type=int, default=0, help='device id')
+parser.add_argument('--run_distribute', type=ast.literal_eval, default=False, help='run distribute.')
+parser.add_argument('--train_data_shuffle', type=ast.literal_eval, default=True, help='train data shuffle.')
+parser.add_argument('--warmup_proportion', type=float, default=0.1, help='warm up proportion.')
+parser.add_argument('--learning_rate', type=float, default=0.1, help='learning rate.')
+parser.add_argument('--save_checkpoint_steps', type=int, default=400, help='save checkpoint steps.')
+parser.add_argument('--dataset_sink_mode', type=ast.literal_eval, default=True, help='dataset sink mode.')
+parser.add_argument('--rank_save_ckpt_flag', type=ast.literal_eval, default=True, help='rank save ckpt flag.')
+parser.add_argument('--save_checkpoint_path', type=str, default="/cache/checkpoint", help='save checkpoint path.')
 
-def save_ckpt_to_air(save_ckpt_path):
+args, unknown = parser.parse_known_args()
+
+def save_ckpt_to_air(save_ckpt_path, path):
     '''save_ckpt_to_air:convert ckpt to air'''
-    use_kn = bool("kn" in cfg.task_name)
-    bertconfig = BertConfig(seq_length=cfg.max_seq_length, vocab_size=cfg.vocab_size)
+    use_kn = bool("kn" in args.task_name)
+    bertconfig = BertConfig(seq_length=args.max_seq_length, vocab_size=args.vocab_size)
     net = RetrievalWithSoftmax(bertconfig, use_kn)
-    load_checkpoint(os.path.join(save_ckpt_path, 'match_kn_gene_rank_0-1_400.ckpt'), net=net)
+    load_checkpoint(path, net=net)
     net.set_train(False)
-    context_id = Tensor(np.zeros([cfg.batch_size, cfg.max_seq_length]), mstype.int32)
-    context_segment_id = Tensor(np.zeros([cfg.batch_size, cfg.max_seq_length]), mstype.int32)
-    context_pos_id = Tensor(np.zeros([cfg.batch_size, cfg.max_seq_length]), mstype.int32)
-    kn_id = Tensor(np.zeros([cfg.batch_size, cfg.max_seq_length]), mstype.int32)
-    kn_seq_length = Tensor(np.zeros([cfg.batch_size, 1]), mstype.int32)
+    context_id = Tensor(np.zeros([args.batch_size, args.max_seq_length]), mstype.int32)
+    context_segment_id = Tensor(np.zeros([args.batch_size, args.max_seq_length]), mstype.int32)
+    context_pos_id = Tensor(np.zeros([args.batch_size, args.max_seq_length]), mstype.int32)
+    kn_id = Tensor(np.zeros([args.batch_size, args.max_seq_length]), mstype.int32)
+    kn_seq_length = Tensor(np.zeros([args.batch_size, 1]), mstype.int32)
     input_data = [context_id, context_segment_id, context_pos_id, kn_id, kn_seq_length]
     export(net.network, *input_data, file_name=save_ckpt_path +'Duconv', file_format="AIR")
+
 @moxing_wrapper()
 def run_duconv():
     '''duconv'''
-    parser = argparse.ArgumentParser(description='Duconv conversion')
-    parser.add_argument('--data_url', type=str, default=None, help='Location of Data')
-    parser.add_argument('--train_url', type=str, default='', help='Location of training outputs')
-    args = parser.parse_args()
-    dst_url = '/cache/data'
-    if not os.path.exists(dst_url):
-        os.makedirs(dst_url, exist_ok=True)
-    moxing.file.copy_parallel(args.data_url, dst_url)
-    print('device id:', get_device_id())
-    print('device num:', get_device_num())
-    print('rank id:', get_rank_id())
-    print('job id:', get_job_id())
-
-    config = BertConfig(seq_length=cfg.max_seq_length, vocab_size=cfg.vocab_size)
-    epoch = cfg.epoch
+    config = BertConfig(seq_length=args.max_seq_length, vocab_size=args.vocab_size)
+    epoch = args.epoch
     # set context and device init
-    if cfg.device_target == "Ascend":
-        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=cfg.device_id)
-        if cfg.run_distribute:
+    if args.device_target == "Ascend":
+        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=args.device_id)
+        if args.run_distribute:
             device_num = get_device_num()
             context.reset_auto_parallel_context()
             context.set_auto_parallel_context(device_num=device_num,
@@ -86,55 +97,54 @@ def run_duconv():
     else:
         raise Exception("Target error,  only Ascend is supported.")
 
-    use_kn = bool("kn" in cfg.task_name)
+    use_kn = bool("kn" in args.task_name)
     # define dataset
-    if cfg.run_distribute:
+    if args.run_distribute:
         device_num = get_device_num()
-        dataset = create_dataset(cfg.batch_size, data_file_path='/cache/data',
-                                 device_num=device_num, rank=cfg.device_id,
-                                 do_shuffle=(cfg.train_data_shuffle), use_knowledge=use_kn)
+        dataset = create_dataset(args.batch_size, args.data_url,
+                                 device_num=device_num, rank=args.device_id,
+                                 do_shuffle=(args.train_data_shuffle), use_knowledge=use_kn)
     else:
-        print("os.listdir(dst_url): ", os.listdir(dst_url))
-        dataset_path = os.path.join(dst_url, "train.mindrecord")
-        print("dst_url: ", dst_url)
-        print("dataset_path: ", dataset_path)
-        dataset = create_dataset(cfg.batch_size, data_file_path=dataset_path,
-                                 do_shuffle=(cfg.train_data_shuffle), use_knowledge=use_kn)
+        dataset_path = os.path.join(args.data_url, "train.mindrecord")
+        dataset = create_dataset(args.batch_size, data_file_path=dataset_path,
+                                 do_shuffle=(args.train_data_shuffle), use_knowledge=use_kn)
     steps_per_epoch = dataset.get_dataset_size()
 
-    max_train_steps = cfg.epoch * steps_per_epoch
-    warmup_steps = int(max_train_steps * cfg.warmup_proportion)
+    max_train_steps = args.epoch * steps_per_epoch
+    warmup_steps = int(max_train_steps * args.warmup_proportion)
     # define net
     network = RetrievalWithLoss(config, use_kn)
     # define rate
-    lr_schedule = Noam(config.hidden_size, warmup_steps, cfg.learning_rate)
+    lr_schedule = Noam(config.hidden_size, warmup_steps, args.learning_rate)
     # define optimizer
     optimizer = Adam(network.trainable_params(), lr_schedule)
     # define model
     model = Model(network=network, optimizer=optimizer, amp_level="O2")
 
-    data_size = cfg.save_checkpoint_steps if cfg.dataset_sink_mode else 100
+    data_size = args.save_checkpoint_steps if args.dataset_sink_mode else 100
     time_cb = TimeMonitor(data_size)
     loss_cb = LossMonitor(data_size)
     # define callbacks
     callbacks = [time_cb, loss_cb]
     # save model
     if get_rank_id() == 0:
-        if cfg.rank_save_ckpt_flag:
-            ckpt_cfg = CheckpointConfig(save_checkpoint_steps=cfg.save_checkpoint_steps,\
+        if args.rank_save_ckpt_flag:
+            ckpt_cfg = CheckpointConfig(save_checkpoint_steps=args.save_checkpoint_steps,\
                 keep_checkpoint_max=50)
-        save_ckpt_path = os.path.join(cfg.save_checkpoint_path, 'ckpt_' + str(cfg.device_id) + '/')
+        save_ckpt_path = os.path.join(args.save_checkpoint_path, 'ckpt_' + str(args.device_id) + '/')
         ckpt_cb = ModelCheckpoint(config=ckpt_cfg, directory=save_ckpt_path,\
-        prefix=cfg.task_name + '_rank_' + str(get_device_id()))
+        prefix=args.task_name + '_rank_' + str(get_device_id()))
         callbacks.append(ckpt_cb)
-    if cfg.dataset_sink_mode:
+    if args.dataset_sink_mode:
         epoch = 1
+    path = os.path.join(save_ckpt_path, args.task_name + '_rank_' +
+                        str(get_device_id())+'-'+str(epoch)+'_'+str(args.save_checkpoint_steps)+'.ckpt')
     # training
     print("============== Starting Training ==============")
-    model.train(epoch, dataset, callbacks, dataset_sink_mode=cfg.dataset_sink_mode, sink_size=data_size)
+    model.train(epoch, dataset, callbacks, dataset_sink_mode=args.dataset_sink_mode, sink_size=data_size)
     print("============== End Training ==============")
-    # save ckptfile as airmodel
-    save_ckpt_to_air(save_ckpt_path)
+    # save ckptfile as air model
+    save_ckpt_to_air(save_ckpt_path, path)
     moxing.file.copy_parallel(save_ckpt_path, args.train_url)
 if __name__ == "__main__":
     run_duconv()
