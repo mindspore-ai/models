@@ -1,0 +1,35 @@
+device: 'GPU'
+data_url: ''
+is_modelarts: False
+parallel: False
+rank_id: 0
+group_size: 1
+
+dataset_sink_mode: True
+profile: False
+
+eval_ckpt: ''
+
+# export
+file_name: 'ATAE_LSTM'
+file_format: 'MINDIR'
+existed_ckpt: ''
+word_path: ''
+
+rseed: 4373337
+epoch: 25
+batch_size: 25
+vocab_size: 5177
+dim_hidden: 300
+dim_word: 300
+dim_aspect: 300
+optimizer: 'Adagrad'
+dropout_prob: 0.6
+lr: 0.01
+lr_word_vector: 0.001
+momentum: 0.9
+weight_decay: 0.001
+aspect_num: 5
+grained: 3
+save_graphs: False
+keep_checkpoint_max: 5

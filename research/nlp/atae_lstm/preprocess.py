@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,11 +18,12 @@
 import argparse
 import os
 
-from src.config import Config
 from src.load_dataset import load_dataset
+
 
 parser = argparse.ArgumentParser(description='preprocess')
 parser.add_argument('--data_path', type=str, required=True, help='result path')
+parser.add_argument('--batch_size', type=int, default=1, help='batch size')
 parser.add_argument('--result_path', type=str,
                     default='./preprocess_Result/', help='result path')
 parser.add_argument('--device_target', type=str, default="Ascend",
@@ -30,9 +31,9 @@ parser.add_argument('--device_target', type=str, default="Ascend",
                     help='the target device to run, support "GPU", "CPU". Default: "Ascend".')
 args = parser.parse_args()
 
+
 if __name__ == '__main__':
     dataset = load_dataset(input_files=args.data_path, batch_size=1)
-    config = Config()
 
     content_path = os.path.join(args.result_path, "00_content")
     sen_len_path = os.path.join(args.result_path, "01_sen_len")
@@ -48,7 +49,7 @@ if __name__ == '__main__':
         os.makedirs(solution_path)
 
     for i, data in enumerate(dataset.create_dict_iterator(output_numpy=True)):
-        file_name = "atae_lstm_bs" + str(config.batch_size) + "_" + str(i) + ".bin"
+        file_name = "atae_lstm_bs" + str(args.batch_size) + "_" + str(i) + ".bin"
         content = data['content']
         content.tofile(os.path.join(content_path, file_name))
         sen_len = data['sen_len']

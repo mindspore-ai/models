@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021-2022 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,34 +17,40 @@
 if [ $# != 2 ]; then
   echo "=============================================================================================================="
   echo "Please run the script as: "
-  echo "bash convert_dataset.sh DATA_FOLDER GLOVE_FILE"
+  echo "bash run_distribute_train_gpu.sh DEVICE_NUM DATA_DIR"
   echo "for example:"
-  echo "  bash convert_dataset.sh \\"
-  echo "      /home/workspace/atae_lstm/data \\"
-  echo "      /home/workspace/atae_lstm/data/glove.840B.300d.txt"
+  echo "  bash run_distribute_train_gpu.sh 2 \\"
+  echo "      /home/workspace/atae_lstm/data/"
   echo "It is better to use absolute path."
   echo "=============================================================================================================="
   exit 1
 fi
 
-get_real_path() {
+get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
     echo "$1"
   else
-    echo "$(realpath -m $PWD/$1)"
+    realpath -m "$PWD"/"$1"
   fi
 }
-
-DATA_FOLDER=$(get_real_path $1)
-GLOVE_FILE=$(get_real_path $2)
-TRAIN_DATA=$DATA_FOLDER/train.mindrecord
-EVAL_DATA=$DATA_FOLDER/test.mindrecord
 
 BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
 echo ${BASE_PATH}
 
-python $BASE_PATH/../create_dataset.py \
-    --data_folder=$DATA_FOLDER \
-    --glove_file=$GLOVE_FILE \
-    --train_data=$TRAIN_DATA \
-    --eval_data=$EVAL_DATA
+ulimit -u unlimited
+export RANK_SIZE="$1"
+TRAIN_DIR=$(get_real_path "$2")
+
+if [ -d "$BASE_PATH/../train_parallel" ];
+then
+    rm -rf $BASE_PATH/../train_parallel
+fi
+mkdir $BASE_PATH/../train_parallel
+cd $BASE_PATH/../train_parallel || exit
+
+echo "start distributed training with $RANK_SIZE GPUs."
+
+mpirun --allow-run-as-root -n $RANK_SIZE --merge-stderr-to-stdout \
+  python -u $BASE_PATH/../train.py \
+    --data_url=$TRAIN_DIR \
+    --parallel=True > net_log.log 2>&1 &
