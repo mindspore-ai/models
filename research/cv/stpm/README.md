@@ -58,6 +58,9 @@
 # 单机训练运行示例
 cd scripts
 bash run_standalone_train.sh  /path/dataset /path/backbone_ckpt category 1
+在单张卡上执行所有的mvtec数据
+cd scripts
+bash run_all_mvtec.sh  /path/dataset /path/backbone_ckpt 1
 
 # 运行评估示例
 cd scripts
@@ -69,7 +72,7 @@ bash run_eval.sh  /path/dataset /path/ckpt category 1
 ## 脚本和样例代码
 
 ```text
-└── STPM
+└── stpm
  ├── README.md                          // STPM相关描述
  ├── ascend_310_infer                   // 310推理相关文件
   ├── inc
@@ -107,6 +110,9 @@ train.py和test.py中主要参数如下：
 -- modelarts：是否使用modelarts平台训练。可选值为True、False。默认为False。
 -- device_id：用于训练或评估数据集的设备ID。当使用train.sh进行分布式训练时，忽略此参数。
 -- train_url：checkpoint的输出路径。
+-- pre_ckpt_path：预训练模型的加载路径。
+-- save_sample：是否保存推理时的图片。
+-- save_sample_path：保存推理图片的路径。
 -- data_url：训练集路径。
 -- ckpt_url：checkpoint路径。
 -- eval_url：验证集路径。
@@ -119,7 +125,7 @@ train.py和test.py中主要参数如下：
 
 1. 从modelzoo中下载ResNet18在ImageNet2012上进行训练得到预训练模型。由于modelzoo中ImageNet2012设置的类别数为1001，此时在训练推理时需要将参数num_class改为1001。
 2. 下载pytorch的ResNet18预训练模型，通过src/pth2ckpt.py脚本完成转换。
-3. 从我们预置归档的ckpt获取下载，[点此下载](https://download.mindspore.cn/model_zoo/r1.3/resnet18_ascend_v130_imagenet2012_official_cv_bs256_acc70.64/)。
+3. 直接下载我们通过方式2转换完成的模型，[点此下载](https://download.mindspore.cn/thirdparty/stpm_backbone.ckpt)。
 
 ## 训练过程
 
@@ -201,9 +207,9 @@ Total image-level auc-roc score :  0.909926470588235
 
 ### 训练性能
 
-| 参数          | STPM                                            |
+| 参数          | stpm                                            |
 | ------------- | ----------------------------------------------- |
-| 模型版本      | STPM                                            |
+| 模型版本      | stpm                                            |
 | 资源          | Ascend 910； CPU： 2.60GHz，192内核；内存，755G |
 | 上传日期      | 2021-12-25                                      |
 | MindSpore版本 | 1.5.0                                           |

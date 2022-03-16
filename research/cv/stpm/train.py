@@ -48,6 +48,7 @@ parser.add_argument('--eval_interval', type=int, default=1)
 
 parser.add_argument('--num_class', type=int, default=1000, help="the num of class")
 parser.add_argument('--out_size', type=int, default=256, help="out size")
+parser.add_argument('--train_batch_size', type=int, default=32, help="batchsize")
 
 args = parser.parse_args()
 
@@ -83,14 +84,16 @@ def train():
         mox.file.copy_parallel(src_url=args.data_url, dst_url='/cache/dataset/')
         train_dataset_path = '/cache/dataset/'
 
-        ds_train, ds_test = createDataset(train_dataset_path, args.category)
+        ds_train, ds_test = createDataset(train_dataset_path, args.category,
+                                          args.out_size, train_batch_size=args.train_batch_size)
         if not os.path.exists("cache/train_output"):
             os.makedirs("cache/train_output")
     else:
-        ds_train, ds_test = createDataset(args.data_url, args.category)
+        ds_train, ds_test = createDataset(args.data_url, args.category, args.out_size,
+                                          train_batch_size=args.train_batch_size)
 
     # network
-    net = STPM(args)
+    net = STPM(args, is_train=True, finetune=args.finetune)
     net.model_s.set_train(True)
     for p in net.model_t.trainable_params():
         p.requires_grad = False

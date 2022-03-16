@@ -26,7 +26,7 @@ parser.add_argument('--result_dir', type=str, default='')
 parser.add_argument('--data_dir', type=str, default='')
 parser.add_argument('--label_dir', type=str, default='')
 parser.add_argument('--category', type=str, default='screw')
-
+parser.add_argument('--out_size', type=int, default=256, help="out size")
 args = parser.parse_args()
 
 
@@ -50,7 +50,7 @@ def cal_anomaly_map(fs_list, ft_list, out_size=224):
         a_map = 1 - cos
         a_map = np.expand_dims(a_map, 1)
         a_map = a_map[0, 0, :, :]
-        a_map = cv2.resize(a_map, (256, 256))
+        a_map = cv2.resize(a_map, (out_size, out_size))
         anomaly_map *= a_map
     return anomaly_map
 
@@ -80,7 +80,7 @@ if __name__ == '__main__':
         features_t = [np.fromfile(file_name_3, np.float32).reshape(1, 64, 64, 64),
                       np.fromfile(file_name_4, np.float32).reshape(1, 128, 32, 32),
                       np.fromfile(file_name_5, np.float32).reshape(1, 256, 16, 16)]
-        A_map = cal_anomaly_map(features_s, features_t, out_size=256)
+        A_map = cal_anomaly_map(features_s, features_t, out_size=args.out_size)
         gt_np = gt.asnumpy()[0, 0].astype(int)
 
         gt_list_px_lvl.extend(gt_np.ravel())

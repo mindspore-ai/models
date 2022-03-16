@@ -74,7 +74,7 @@ def pytorch2mindspore(pt_path):
         param_dict['data'] = Tensor(parameter.detach().numpy())
         new_params_list.append(param_dict)
 
-    save_checkpoint(new_params_list, 'STPM-99.ckpt')
+    save_checkpoint(new_params_list, 'stpm_backbone.ckpt')
 
 
 if __name__ == '__main__':
