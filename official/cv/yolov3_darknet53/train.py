@@ -140,16 +140,16 @@ def run_train():
     is_gpu = ms.get_context("device_target") == "GPU"
     if is_gpu:
         loss_scale_value = 1.0
-        loss_scale = ms.loss_scale_manager.FixedLossScaleManager(loss_scale_value, drop_overflow_update=False)
-        network = ms.amp.build_train_network(network, optimizer=opt, loss_scale_manager=loss_scale,
-                                             level="O2", keep_batchnorm_fp32=False)
+        loss_scale = ms.FixedLossScaleManager(loss_scale_value, drop_overflow_update=False)
+        network = ms.build_train_network(network, optimizer=opt, loss_scale_manager=loss_scale,
+                                         level="O2", keep_batchnorm_fp32=False)
         keep_loss_fp32(network)
     else:
         network = nn.TrainOneStepCell(network, opt, sens=config.loss_scale)
         network.set_train()
 
     t_end = time.time()
-    data_loader = ds.create_dict_iterator(output_numpy=True, num_epochs=1)
+    data_loader = ds.create_dict_iterator(output_numpy=True)
     first_step = True
     stop_profiler = False
 
