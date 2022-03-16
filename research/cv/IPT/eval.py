@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,18 +15,17 @@
 """eval script"""
 import os
 import numpy as np
+import mindspore as ms
 import mindspore.dataset as ds
-from mindspore import Tensor, context
-from mindspore.common import dtype as mstype
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore import Tensor
 from src.args import args
 import src.ipt_model as ipt
 from src.data.srdata import SRData
 from src.metrics import calc_psnr, quantize
 
 device_id = int(os.getenv('DEVICE_ID', '0'))
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=device_id, save_graphs=False)
-context.set_context(max_call_depth=10000)
+ms.set_context(mode=ms.GRAPH_MODE, device_target="Ascend", device_id=device_id, save_graphs=False)
+ms.set_context(max_call_depth=10000)
 
 def sub_mean(x):
     red_channel_mean = 0.4488 * 255
@@ -63,10 +62,10 @@ def eval_net():
 
     net_m = ipt.IPT(args)
     if args.pth_path:
-        param_dict = load_checkpoint(args.pth_path)
-        load_param_into_net(net_m, param_dict)
+        param_dict = ms.load_checkpoint(args.pth_path)
+        ms.load_param_into_net(net_m, param_dict)
     net_m.set_train(False)
-    idx = Tensor(np.ones(args.task_id), mstype.int32)
+    idx = Tensor(np.ones(args.task_id), ms.int32)
     inference = ipt.IPT_post(net_m, args)
     print('load mindspore net successfully.')
     num_imgs = train_de_dataset.get_dataset_size()
@@ -75,7 +74,7 @@ def eval_net():
         lr = imgs['LR']
         hr = imgs['HR']
         lr = sub_mean(lr)
-        lr = Tensor(lr, mstype.float32)
+        lr = Tensor(lr, ms.float32)
         pred = inference.forward(lr, idx)
         pred_np = add_mean(pred.asnumpy())
         pred_np = quantize(pred_np, 255)

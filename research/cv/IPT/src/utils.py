@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,12 +17,11 @@ import os
 import time
 from bisect import bisect_right
 import numpy as np
+import mindspore as ms
+import mindspore.ops as ops
 import mindspore.nn as nn
 from mindspore import Tensor
-from mindspore.common import dtype as mstype
 from mindspore.context import ParallelMode
-from mindspore.ops import operations as P
-from mindspore.ops import composite as C
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
 from mindspore.parallel._utils import _get_parallel_mode
 from mindspore.train.serialization import save_checkpoint
@@ -37,20 +36,20 @@ class MyTrain(nn.Cell):
         self.model = model
         self.con_loss = con_loss
         self.criterion = criterion
-        self.cast = P.Cast()
+        self.cast = ops.Cast()
 
     def construct(self, lr, hr, idx):
         """MyTrain"""
         if self.use_con:
             sr, x_con = self.model(lr, idx)
-            x_con = self.cast(x_con, mstype.float32)
-            sr = self.cast(sr, mstype.float32)
+            x_con = self.cast(x_con, ms.float32)
+            sr = self.cast(sr, ms.float32)
             loss1 = self.criterion(sr, hr)
             loss2 = self.con_loss(x_con)
             loss = loss1 + 0.1 * loss2
         else:
             sr = self.model(lr, idx)
-            sr = self.cast(sr, mstype.float32)
+            sr = self.cast(sr, ms.float32)
             loss = self.criterion(sr, hr)
         return loss
 
@@ -63,7 +62,7 @@ class MyTrainOneStepCell(nn.Cell):
         self.network.set_grad()
         self.weights = optimizer.parameters
         self.optimizer = optimizer
-        self.grad = C.GradOperation(get_by_list=True, sens_param=True)
+        self.grad = ops.GradOperation(get_by_list=True, sens_param=True)
         self.sens = sens
         self.reducer_flag = False
         self.grad_reducer = None
@@ -76,7 +75,7 @@ class MyTrainOneStepCell(nn.Cell):
     def construct(self, *args):
         weights = self.weights
         loss = self.network(*args)
-        sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
+        sens = ops.Fill()(ops.DType()(loss), ops.Shape()(loss), self.sens)
         grads = self.grad(self.network, weights)(*args, sens)
         if self.reducer_flag:
             grads = self.grad_reducer(grads)
@@ -127,9 +126,9 @@ class Trainer():
         for batch_idx, imgs in enumerate(self.trainloader):
             lr = imgs["LR"]
             hr = imgs["HR"]
-            lr = Tensor(sub_mean(lr), mstype.float32)
-            hr = Tensor(sub_mean(hr), mstype.float32)
-            idx = Tensor(np.ones(imgs["idx"][0]), mstype.int32)
+            lr = Tensor(sub_mean(lr), ms.float32)
+            hr = Tensor(sub_mean(hr), ms.float32)
+            idx = Tensor(np.ones(imgs["idx"][0]), ms.int32)
             t1 = time.time()
             loss, overflow, sens = self.bp(lr, hr, idx)
             t2 = time.time()
@@ -171,5 +170,5 @@ class Trainer():
         :type lr: float
         """
         lr_param = optimizer.get_lr()
-        lr_param.assign_value(Tensor(lr, mstype.float32))
+        lr_param.assign_value(Tensor(lr, ms.float32))
         print('==> ' + name + ' learning rate: ', lr_param.asnumpy())

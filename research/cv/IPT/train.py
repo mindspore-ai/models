@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
 """train"""
 import os
 import math
+import mindspore as ms
 import mindspore.dataset as ds
-from mindspore import Parameter, set_seed, context
+from mindspore import Parameter, set_seed
 from mindspore.context import ParallelMode
 from mindspore.common.initializer import initializer, HeUniform, XavierUniform, Uniform, Normal, Zero
 from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.args import args
 from src.data.bicubic import bicubic
 from src.data.imagenet import ImgData
@@ -99,7 +99,7 @@ def train_net(distribute, imagenet, epochs):
     """Train net"""
     set_seed(1)
     device_id = int(os.getenv('DEVICE_ID', '0'))
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False, device_id=device_id)
+    ms.set_context(mode=ms.GRAPH_MODE, device_target="Ascend", save_graphs=False, device_id=device_id)
 
     if imagenet == 1:
         train_dataset = ImgData(args)
@@ -111,7 +111,7 @@ def train_net(distribute, imagenet, epochs):
         args.rank = get_rank()
         args.group_size = get_group_size()
         parallel_mode = ParallelMode.DATA_PARALLEL
-        context.set_auto_parallel_context(parallel_mode=parallel_mode, device_num=args.group_size, gradients_mean=True)
+        ms.set_auto_parallel_context(parallel_mode=parallel_mode, device_num=args.group_size, gradients_mean=True)
         print('Rank {}, args.group_size {}'.format(args.rank, args.group_size))
         if imagenet == 1:
             train_de_dataset = ds.GeneratorDataset(train_dataset,
@@ -140,8 +140,8 @@ def train_net(distribute, imagenet, epochs):
     init_weights(net_work, init_type='he', init_gain=1.0)
     print("Init net weight successfully")
     if args.pth_path:
-        param_dict = load_checkpoint(args.pth_path)
-        load_param_into_net(net_work, param_dict)
+        param_dict = ms.load_checkpoint(args.pth_path)
+        ms.load_param_into_net(net_work, param_dict)
         print("Load net weight successfully")
 
     train_func = Trainer(args, train_loader, net_work)
