@@ -20,10 +20,10 @@ from __future__ import division
 import mindspore.nn as nn
 from mindspore.ops import operations as P
 from mindspore.ops import functional as F
-from mindspore.nn.loss.loss import _Loss
+from mindspore.nn.loss.loss import LossBase
 from mindspore.common import dtype as mstype
 
-class JointsMSELoss(_Loss):
+class JointsMSELoss(LossBase):
     '''
     JointsMSELoss
     '''

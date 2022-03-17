@@ -18,11 +18,11 @@ loss function script.
 import mindspore.ops as ops
 import mindspore.nn as nn
 from mindspore import Tensor
-from mindspore.nn.loss.loss import _Loss
+from mindspore.nn.loss.loss import LossBase
 import mindspore as ms
 import numpy as np
 
-class PrototypicalLoss(_Loss):
+class PrototypicalLoss(LossBase):
     '''
     Loss class deriving from Module for the prototypical loss function defined below
     '''

@@ -17,13 +17,7 @@
 from mindspore import nn
 from mindspore import Tensor
 from mindspore.common import dtype as mstype
-try:
-    from mindspore.nn.loss.loss import Loss
-except ImportError:
-    try:
-        from mindspore.nn.loss.loss import LossBase as Loss
-    except ImportError:
-        from mindspore.nn.loss.loss import _Loss as Loss
+from mindspore.nn.loss.loss import LossBase as Loss
 
 from mindspore.ops import functional as F
 from mindspore.ops import operations as P

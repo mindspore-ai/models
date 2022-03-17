@@ -16,7 +16,7 @@
 import os
 
 import mindspore.ops as ops
-from mindspore.nn.loss.loss import _Loss
+from mindspore.nn.loss.loss import LossBase
 from mindspore import nn
 from mindspore import load_checkpoint, load_param_into_net
 from mindspore.ops.functional import stop_gradient
@@ -108,7 +108,7 @@ class Vgg19(nn.Cell):
         return out
 
 
-class ContrastLoss(_Loss):
+class ContrastLoss(LossBase):
     """[ContrastLoss]
 
     Args:
