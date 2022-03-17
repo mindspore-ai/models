@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,11 @@
 # ============================================================================
 if [ $# != 3 ]
 then
-    echo "Usage: bash run_eval.sh [device_id] [DATASET_PATH] [CHECKPOINT_PATH]"
+    echo "Usage: bash run_eval.sh [DEVICE_TARGET] [DATASET_PATH] [CHECKPOINT_PATH]"
 exit 1
 fi
+
+BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
 
 if [ ! -f $3 ]
 then
@@ -25,11 +27,6 @@ then
 exit 1
 fi
 
-ulimit -u unlimited
-export DEVICE_NUM=1
-export DEVICE_ID=0
-export RANK_SIZE=$DEVICE_NUM
-export RANK_ID=0
+export RANK_SIZE=1
 
-python ../eval.py --device_id=$1  --dataset_path=$2 --resume=$3 &> eval.log &
-
+python $BASE_PATH/../eval.py --target=$1 --dataset_path=$2 --resume=$3 &> eval.log &

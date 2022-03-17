@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,35 +14,58 @@
 # ============================================================================
 """train"""
 import os
-import argparse
+from pprint import pprint
+from time import time
+
 import numpy as np
+
 import mindspore
 from mindspore import Model, context, Parameter
 from mindspore.nn import Accuracy
-from mindspore.parallel import set_algo_parameters
-from mindspore.communication.management import init, get_rank
+from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.context import ParallelMode
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, \
+                                     LossMonitor, TimeMonitor, LearningRateScheduler
 from mindspore.common import set_seed
-from src.config import cfg_res50
+from mindspore.dataset import config
+from mindspore.train.callback import Callback
+from mindspore.train.callback import SummaryCollector
+from mindspore.profiler import Profiler
+
+from src.config import config as cfg
 from src.dataset import create_dataset
 from src import Stnet_Res_model
 from src.eval_callback import EvalCallBack
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.CrossEntropySmooth import CrossEntropySmooth
 
-parser = argparse.ArgumentParser(description='video classification')
-parser.add_argument('--device_id', type=int, default=0, help='Device id.')
-parser.add_argument('--dataset_path', type=str, default=None, help='label path(not use in model art)')
-parser.add_argument('--run_distribute', type=int, default=0, help='0 -- run standalone, 1 -- run distribute')
-parser.add_argument('--device_num', type=int, default=1, help='Device num.')
-parser.add_argument('--resume', type=str, default='', help='pre_train_checkpoint file_url')
-parser.add_argument('--data_url', type=str, help='model art data url')
-parser.add_argument('--train_url', type=str, help='model art train_url ')
-args_opt = parser.parse_args()
 
-set_seed(1)
+class StopAtStep(Callback):
+    def __init__(self, start_step, stop_step):
+        super(StopAtStep, self).__init__()
+        self.start_step = start_step
+        self.stop_step = stop_step
+        self.profiler = Profiler(output_path=cfg.summary_dir, start_profile=False)
+    def step_begin(self, run_context):
+        cb_params = run_context.original_args()
+        step_num = cb_params.cur_step_num
+        if step_num == self.start_step:
+            self.profiler.start()
+    def step_end(self, run_context):
+        cb_params = run_context.original_args()
+        step_num = cb_params.cur_step_num
+        if step_num == self.stop_step:
+            self.profiler.stop()
+    def end(self, run_context):
+        self.profiler.analyse()
+
+
+def learning_rate_function(lr, cur_step_num):
+    steps_size = cfg.steps_size
+    if (cur_step_num // steps_size) % cfg.lr_decay_rate == 0:
+        lr = lr * 0.1
+    return lr
 
 
 def change_weights(model, state):
@@ -81,13 +104,12 @@ def apply_eval(eval_param):
 
 def run_eval(model, ckpt_save_dir, cb):
     """run_eval"""
-    config = cfg_res50
-    if config['run_eval']:
-        eval_dataset = create_dataset(data_dir=args_opt.dataset_path, config=config, shuffle=False, do_trains='val',
-                                      num_worker=config['device_num'], list_path=config['local_val_list'])
+    if cfg.run_eval:
+        eval_dataset = create_dataset(data_dir=cfg.dataset_path, config=cfg, shuffle=False, do_trains='val',
+                                      num_worker=cfg.workers, list_path=cfg.local_val_list)
         eval_param_dict = {"model": model, "dataset": eval_dataset, "metrics_name": "acc"}
-        eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=config['eval_interval'],
-                               eval_start_epoch=config['eval_start_epoch'], save_best_ckpt=config['save_best_ckpt'],
+        eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=cfg.eval_interval,
+                               eval_start_epoch=cfg.eval_start_epoch, save_best_ckpt=cfg.save_best_ckpt,
                                ckpt_directory=ckpt_save_dir, besk_ckpt_name="best_acc.ckpt",
                                metrics_name="acc")
         cb += [eval_cb]
@@ -95,72 +117,97 @@ def run_eval(model, ckpt_save_dir, cb):
 
 def set_save_ckpt_dir():
     """set save ckpt dir"""
-    config = cfg_res50
-    ckpt_save_dir = config['checkpoint_path']
+    ckpt_save_dir = cfg.checkpoint_path
 
-    if args_opt.run_distribute == 1:
-        ckpt_save_dir = ckpt_save_dir + "ckpt_" + str(get_rank()) + "/"
+    if cfg.run_distribute:
+        ckpt_save_dir = ckpt_save_dir + "_" + str(get_rank()) + "/"
 
     return ckpt_save_dir
 
 
-def set_parameter(config):
+def set_summary_dir():
+    """set summary dir"""
+    summary_dir = cfg.summary_dir
+
+    if cfg.run_distribute:
+        summary_dir = summary_dir + "/rank_" + str(get_rank()) + "/"
+
+    return summary_dir
+
+
+def set_parameter():
     """set_parameter"""
     # init context
-    if args_opt.run_distribute == 1:
-        device_num = int(os.getenv('RANK_SIZE'))
-        rank_id = int(os.getenv('DEVICE_ID'))
-
-        if config['mode'] == 'GRAPH':
-            context.set_context(mode=context.GRAPH_MODE, device_target=config['target'], save_graphs=False,
-                                enable_auto_mixed_precision=True,
-                                device_id=rank_id)
+    if cfg.run_distribute:
+        if cfg.mode == 'GRAPH':
+            context.set_context(mode=context.GRAPH_MODE, device_target=cfg.target, save_graphs=False)
         else:
-            context.set_context(mode=context.PYNATIVE_MODE, device_target=config['target'], save_graphs=False,
-                                device_id=rank_id)
+            context.set_context(mode=context.PYNATIVE_MODE, device_target=cfg.target, save_graphs=False)
 
-        # context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(device_num=device_num,
-                                          parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
-                                          parameter_broadcast=True)
-        set_algo_parameters(elementwise_op_strategy_follow=True)
-        init()
+        if cfg.target == "Ascend":
+            init()
+            cfg.device_num = get_group_size()
+            cfg.rank_id = get_rank()
+            context.set_auto_parallel_context(device_num=cfg.device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
+                                              parameter_broadcast=True)
+        elif cfg.target == "GPU":
+            init('nccl')
+            cfg.device_num = get_group_size()
+            cfg.rank_id = get_rank()
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(device_num=cfg.device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
+        else:
+            raise NotImplementedError("Only GPU and Ascend training supported")
+
     else:
-        if config['mode'] == 'GRAPH':
-            context.set_context(mode=context.GRAPH_MODE, device_target=config['target'], save_graphs=False,
-                                device_id=args_opt.device_id)
+        if cfg.mode == 'GRAPH':
+            context.set_context(mode=context.GRAPH_MODE, device_target=cfg.target, save_graphs=False,
+                                device_id=cfg.device_id)
         else:
-            context.set_context(mode=context.PYNATIVE_MODE, device_target=config['target'], save_graphs=False,
-                                device_id=args_opt.device_id)
+            context.set_context(mode=context.PYNATIVE_MODE, device_target=cfg.target, save_graphs=False,
+                                device_id=cfg.device_id)
+
+    config.set_enable_shared_mem(False) # we may get OOM when it set to 'True'
 
 
 @moxing_wrapper()
 def run_train():
     """train function"""
-    # load config
-    config = cfg_res50
-    set_parameter(config)
-    dataset_path = args_opt.dataset_path    # label path
+
+    if cfg.profile:
+        print("INFO: performance profiling mode enabled")
+        print("Profiling mode is performed only for 1 epoch with dataset_sink_mode=False")
+        cfg.dataset_sink_mode = False
+        cfg.num_epochs = 1
+
+    set_parameter()
+
+    dataset_path = cfg.dataset_path    # label path
 
     # Load the data
-    print('Loading the data...')
+    print(f'Loading the data... {dataset_path}')
 
-    video_datasets_train = create_dataset(data_dir=dataset_path, config=config, do_trains='train',
-                                          num_worker=config['device_num'],
-                                          list_path=config['local_train_list'])
+    video_datasets_train = create_dataset(data_dir=dataset_path, config=cfg, do_trains='train',
+                                          num_worker=cfg.workers,
+                                          list_path=cfg.local_train_list)
 
     print('Starting to training...')
     step_size_train = video_datasets_train.get_dataset_size()
     print('The size of training set is {}'.format(step_size_train))
+    cfg.steps_size = step_size_train
+
+    pprint(cfg)
 
     # define net
-    net = Stnet_Res_model.stnet50(input_channels=3, num_classes=config['class_num'], T=config['T'], N=config['N'])
+    net = Stnet_Res_model.stnet50(input_channels=3, num_classes=cfg.class_num, T=cfg.T, N=cfg.N)
 
     # load pretrain_resnet50
-    if config['pre_res50'] or config['pre_res50_art_load_path']:
-        path = config['pre_res50']
-        if config['run_online']:
-            path = config['pre_res50_art_load_path']
+    if cfg.pre_res50 or cfg.pre_res50_art_load_path:
+        path = cfg.pre_res50
+        if cfg.run_online:
+            path = cfg.pre_res50_art_load_path
         if os.path.isfile(path):
             net_parmerters = load_checkpoint(path)
             net_parmerters = change_weights(net, net_parmerters)
@@ -169,10 +216,10 @@ def run_train():
             raise RuntimeError('no such file{}'.format(path))
 
     # load pretrain model
-    if args_opt.resume or config['best_acc_art_load_path']:
-        resume = os.path.join(args_opt.resume)
-        if config['run_online']:
-            resume = config['best_acc_art_load_path']
+    if cfg.resume or cfg.best_acc_art_load_path:
+        resume = os.path.join(cfg.resume)
+        if cfg.run_online:
+            resume = cfg.best_acc_art_load_path
         if os.path.isfile(resume):
             net_parmerters = load_checkpoint(resume)
             load_param_into_net(net, net_parmerters, strict_load=True)
@@ -180,42 +227,57 @@ def run_train():
             raise RuntimeError('no such file{}'.format(resume))
 
     # define loss function
-    loss = CrossEntropySmooth(sparse=True, reduction='mean', num_classes=config['class_num'])
+    loss = CrossEntropySmooth(sparse=True, reduction='mean', num_classes=cfg.class_num)
 
     # lr
-    lr = config['lr']
+    lr = cfg.lr
     optimizer_ft = mindspore.nn.Momentum(params=net.trainable_params(), learning_rate=lr,
-                                         momentum=config['momentum'],
-                                         weight_decay=config['weight_decay'])
+                                         momentum=cfg.momentum,
+                                         weight_decay=cfg.weight_decay)
 
     # define model
     model = Model(net, loss_fn=loss, optimizer=optimizer_ft, metrics={'acc': Accuracy()})
 
     # define callback
     callback = []
-    time_cb = TimeMonitor(data_size=step_size_train)
+    time_cb = TimeMonitor(data_size=1)
+    loss_cb = LossMonitor(1)
+    lr_scheduler = LearningRateScheduler(learning_rate_function)
     callback.append(time_cb)
-    callback.append(LossMonitor(500))
+    callback.append(loss_cb)
+    callback.append(lr_scheduler)
 
     ckpt_save_dir = set_save_ckpt_dir()
-    if config['save_checkpoint']:
-        config_ck = CheckpointConfig(save_checkpoint_steps=config['save_checkpoint_epochs'] * step_size_train,
-                                     keep_checkpoint_max=config['keep_checkpoint_max'])
-        ckpt_cb = ModelCheckpoint(prefix="stnet", directory=ckpt_save_dir, config=config_ck)
+    if cfg.save_checkpoint:
+        cfg_ck = CheckpointConfig(save_checkpoint_steps=cfg.save_checkpoint_epochs * step_size_train,
+                                  keep_checkpoint_max=cfg.keep_checkpoint_max)
+        ckpt_cb = ModelCheckpoint(prefix="stnet", directory=ckpt_save_dir, config=cfg_ck)
         callback.append(ckpt_cb)
 
     # Init a SummaryCollector callback instance, and use it in model.train or model.eval
-    from mindspore.train.callback import SummaryCollector
-    if args_opt.run_distribute == 1:
-        summary_dir = config['summary_dir'] + str(get_rank())
-        summary_collector = SummaryCollector(summary_dir=summary_dir, collect_freq=1)
-        callback.append(summary_collector)
+    summary_dir = set_summary_dir()
+    summary_collector = SummaryCollector(summary_dir=summary_dir, collect_freq=1)
+    callback.append(summary_collector)
 
-    run_eval(model, ckpt_save_dir, callback)
+    if cfg.profile:
+        if cfg.dataset_sink_mode:
+            print("Dataset sink mode is not recommended while profiling, switching it to False")
+            cfg.dataset_sink_mode = False
+        profiler_cb = StopAtStep(start_step=10, stop_step=20)
+        callback.append(profiler_cb)
+
+    run_eval(model, ckpt_save_dir, callback)  # setting 'run_eval' config to True slow down train
+
     # train
-    model.train(config['num_epochs'], video_datasets_train,
-                callbacks=callback)
+    print("\nStarted training")
+
+    start_time = time()
+    model.train(cfg.num_epochs, video_datasets_train,
+                callbacks=callback, dataset_sink_mode=cfg.dataset_sink_mode)
+    total_time = time() - start_time
+    print(f"\nFinished training. Time taken: {int(total_time) // 60} min {int(total_time) % 60} sec")
 
 
 if __name__ == '__main__':
+    set_seed(1)
     run_train()

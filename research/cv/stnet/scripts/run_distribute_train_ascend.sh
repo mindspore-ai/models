@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 3 ] && [ $# != 4 ]
+if [ $# != 2 ] && [ $# != 3 ]
 then
-  echo "Usage: bash run_distribute_train.sh [run_distribute] [DATASET_PATH] [rank_table_PATH] [PRETRAINED_CKPT_PATH](optional)"
+  echo "Usage: bash run_distribute_train_ascend.sh [DATASET_PATH] [rank_table_PATH] [PRETRAINED_CKPT_PATH](optional)"
 exit 1
 fi
 
@@ -28,10 +28,9 @@ get_real_path(){
   fi
 }
 
-PATH1=$(get_real_path $3)
+PATH1=$(get_real_path $2)
 
 
-ulimit -u unlimited
 export DEVICE_NUM=2
 export RANK_SIZE=2
 export RANK_TABLE_FILE=$PATH1
@@ -46,6 +45,7 @@ do
     rm -rf ./train_parallel$i
     mkdir ./train_parallel$i
     cp ../*.py ./train_parallel$i
+    cp ../default_config.yaml ./train_parallel$i
     cp *.sh ./train_parallel$i
     cp -r ../src ./train_parallel$i
     cd ./train_parallel$i || exit
@@ -53,12 +53,12 @@ do
     env > env.log
     if [ $# == 3 ]
     then
-        python train.py --device_id=$DEVICE_ID  --run_distribute=$1 --device_num=$DEVICE_NUM --dataset_path=$2 &> log.txt &
+        python train.py --target=Ascend --device_id=$DEVICE_ID  --run_distribute True --device_num=$DEVICE_NUM --dataset_path=$2 &> log.txt &
     fi
 
     if [ $# == 4 ]
     then
-        python train.py --device_id=$DEVICE_ID  --run_distribute=$1 --device_num=$DEVICE_NUM --dataset_path=$2 --resume=$4 &> log.txt &
+        python train.py --target=Ascend --device_id=$DEVICE_ID  --run_distribute True --device_num=$DEVICE_NUM --dataset_path=$2 --resume=$4 &> log.txt &
     fi
 
     cd ..
