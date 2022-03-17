@@ -266,14 +266,14 @@ Proactive Conversation模型包含四个部分：
 
 - 在Ascend环境运行时评估DuConv数据集
 
-  在运行以下命令之前，请检查用于评估的检查点路径。请将检查点路径设置为绝对全路径，例如“username/googlenet/train_googlenet_cifar10-125_390.ckpt”。
+  在运行以下命令之前，请检查用于评估的检查点路径。请将检查点路径设置为绝对全路径，例如“/home/DuConv_mindspore/save_model/ckpt0”。
 
   ```bash
   ##example for evaluate model
-  bash run_preict.sh match_kn_gene /DuConv_mindspore/data/test.mindrecord ./save_model/ckpt_0 predict1p
+  bash run_preict.sh match_kn_gene /DuConv_mindspore/data/test.mindrecord /home/DuConv_mindspore/save_model/ckpt0 predict1p
   ```
 
-  上述python命令将在后台运行，您可以通过predict/predict_match_kn_gene_rank_?_ckpt.log文件查看结果。测试数据集的准确性如下：
+  上述python命令将在后台运行，您可以通过./predict/predict_match_kn_gene_rank_?_ckpt.log文件查看结果。测试数据集的准确性如下：
 
   ```bash
     F1: 31.50%
@@ -283,7 +283,7 @@ Proactive Conversation模型包含四个部分：
     DISTINCT2: 0.399%
   ```
 
-  注：对于分布式训练后评估，请将checkpoint_path设置为最后保存的检查点文件，如“username/DuConv_mindspore/output8p/match_kn_gene_rank_7-1_7023.ckpt”。测试数据集的准确性如下：
+  注：对于分布式训练后评估，请将checkpoint_path设置为所有检查点文件的目录，如“/home/DuConv_mindspore/output8p/save_model/ckpt0”。一个ckpt对应的测试数据集的准确性如下：
 
   ```bash
     F1: 31.17%
@@ -292,6 +292,8 @@ Proactive Conversation模型包含四个部分：
     DISTINCT1: 0.123%
     DISTINCT2: 0.405%
   ```
+
+  在predict文件夹含有所有ckpt目录中权重文件的的评估log，每个log的文件名与ckpt文件名对应，需要遍历所有log找到最优精度，通过对应文件名确认ckpt文件，或根据自己的需求，使用所需精度的ckpt。
 
 ## 导出过程
 
