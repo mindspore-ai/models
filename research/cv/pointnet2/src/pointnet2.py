@@ -16,7 +16,7 @@
 
 import mindspore.nn as nn
 import mindspore.ops as P
-from mindspore.nn.loss.loss import _Loss
+from mindspore.nn.loss.loss import LossBase
 from mindspore.ops import functional as F
 
 from src.layers import Dense
@@ -74,7 +74,7 @@ class PointNet2(nn.Cell):
         return x
 
 
-class NLLLoss(_Loss):
+class NLLLoss(LossBase):
     """NLL loss"""
 
     def __init__(self, reduction='mean'):

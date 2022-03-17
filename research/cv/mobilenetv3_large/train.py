@@ -25,7 +25,7 @@ from mindspore import Tensor
 from mindspore import nn
 from mindspore.nn.optim.momentum import Momentum
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
-from mindspore.nn.loss.loss import _Loss
+from mindspore.nn.loss.loss import LossBase
 from mindspore.ops import operations as P
 from mindspore.ops import functional as F
 from mindspore.common import dtype as mstype
@@ -90,7 +90,7 @@ class SaveCallback(Callback):
             print("Save the maximum accuracy checkpoint,the accuracy is", self.acc)
 
 
-class CrossEntropyWithLabelSmooth(_Loss):
+class CrossEntropyWithLabelSmooth(LossBase):
     """
     CrossEntropyWith LabelSmooth.
 

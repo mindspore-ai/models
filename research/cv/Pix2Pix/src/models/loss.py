@@ -24,12 +24,12 @@ import mindspore.ops.operations as P
 from mindspore.parallel._utils import (_get_device_num, _get_gradients_mean, _get_parallel_mode)
 from mindspore.context import ParallelMode
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
-from mindspore.nn.loss.loss import _Loss
+from mindspore.nn.loss.loss import LossBase
 from src.utils.config import get_args
 
 args = get_args()
 
-class SigmoidCrossEntropyWithLogits(_Loss):
+class SigmoidCrossEntropyWithLogits(LossBase):
     def __init__(self):
         super(SigmoidCrossEntropyWithLogits, self).__init__()
         self.cross_entropy = P.SigmoidCrossEntropyWithLogits()
@@ -38,7 +38,7 @@ class SigmoidCrossEntropyWithLogits(_Loss):
         x = self.cross_entropy(data, label)
         return self.get_loss(x)
 
-class D_Loss(_Loss):
+class D_Loss(LossBase):
     """
         Define Dloss.
     """
@@ -70,7 +70,7 @@ class D_WithLossCell(nn.Cell):
         pred0 = self.netD(realA, fakeB)
         return self._loss_fn(pred1, pred0)
 
-class G_Loss(_Loss):
+class G_Loss(LossBase):
     """
         Define Gloss.
     """

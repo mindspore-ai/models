@@ -13,14 +13,14 @@
 # limitations under the License.
 # ============================================================================
 """loss function"""
-from mindspore.nn.loss.loss import _Loss
+from mindspore.nn.loss.loss import LossBase
 from mindspore.ops import operations as P
 from mindspore.ops import functional as F
 from mindspore import Tensor
 from mindspore.common import dtype as mstype
 import mindspore.nn as nn
 
-class CrossEntropy(_Loss):
+class CrossEntropy(LossBase):
     """CrossEntropy"""
     def __init__(self, smooth_factor=0., num_classes=1000):
         super(CrossEntropy, self).__init__()
