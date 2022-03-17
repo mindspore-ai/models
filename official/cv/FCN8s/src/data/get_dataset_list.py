@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+
+
 import argparse
 import os
 
@@ -99,8 +101,8 @@ def create_voc_train_lst_txt():
     with open(VOC_TRAIN_LST_TXT, mode='w') as f:
         for id_ in voc_train_data_lst:
             id_ = id_.strip()
-            img_ = os.path.join(VOC_IMG_DIR, id_ + '.jpg').replace('./', '')
-            anno_ = os.path.join(VOC_ANNO_GRAY_DIR, id_ + '.png').replace('./', '')
+            img_ = os.path.join(VOC_IMG_DIR, id_ + '.jpg')
+            anno_ = os.path.join(VOC_ANNO_GRAY_DIR, id_ + '.png')
             f.write(img_ + ' ' + anno_ + '\n')
 
 
@@ -109,8 +111,8 @@ def create_voc_val_lst_txt():
     with open(VOC_VAL_LST_TXT, mode='w') as f:
         for id_ in voc_val_data_lst:
             id_ = id_.strip()
-            img_ = os.path.join(VOC_IMG_DIR, id_ + '.jpg').replace('./', '')
-            anno_ = os.path.join(VOC_ANNO_GRAY_DIR, id_ + '.png').replace('./', '')
+            img_ = os.path.join(VOC_IMG_DIR, id_ + '.jpg')
+            anno_ = os.path.join(VOC_ANNO_GRAY_DIR, id_ + '.png')
             f.write(img_ + ' ' + anno_ + '\n')
 
 
@@ -126,14 +128,14 @@ def create_voc_train_aug_lst_txt():
             if id_ in voc_train_data_lst + voc_val_data_lst:
                 continue
             id_ = id_.strip()
-            img_ = os.path.join(SBD_IMG_DIR, id_ + '.jpg').replace('./', '')
-            anno_ = os.path.join(SBD_ANNO_GRAY_DIR, id_ + '.png').replace('./', '')
+            img_ = os.path.join(SBD_IMG_DIR, id_ + '.jpg')
+            anno_ = os.path.join(SBD_ANNO_GRAY_DIR, id_ + '.png')
             f.write(img_ + ' ' + anno_ + '\n')
 
         for id_ in voc_train_data_lst:
             id_ = id_.strip()
-            img_ = os.path.join(VOC_IMG_DIR, id_ + '.jpg').replace('./', '')
-            anno_ = os.path.join(VOC_ANNO_GRAY_DIR, id_ + '.png').replace('./', '')
+            img_ = os.path.join(VOC_IMG_DIR, id_ + '.jpg')
+            anno_ = os.path.join(VOC_ANNO_GRAY_DIR, id_ + '.png')
             f.write(img_ + ' ' + anno_ + '\n')
 
 
