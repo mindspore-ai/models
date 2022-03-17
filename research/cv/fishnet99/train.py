@@ -31,7 +31,7 @@ from mindspore.context import ParallelMode
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.common import set_seed
 from mindspore.common import dtype as mstype
-from mindspore.nn.loss.loss import _Loss
+from mindspore.nn.loss.loss import LossBase
 from mindspore.ops import functional as F
 from mindspore.ops import operations as P
 
@@ -81,7 +81,7 @@ def warmup_cosine_annealing_lr(lr5, steps_per_epoch, warmup_epochs, max_epoch, T
     return np.array(lr_each_step).astype(np.float32)
 
 
-class CrossEntropySmooth(_Loss):
+class CrossEntropySmooth(LossBase):
     """CrossEntropy"""
     def __init__(self, sparse=True, reduction='mean', smooth_factor=0., num_classes=1000):
         super(CrossEntropySmooth, self).__init__()
