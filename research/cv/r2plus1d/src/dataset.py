@@ -375,7 +375,7 @@ def create_VideoDataset(dataset_root_path, dataset_name="ucf101", mode='train', 
                               dataset_name=dataset_name,
                               mode=mode,
                               clip_len=clip_len)
-    data_set = ds.GeneratorDataset(dataset, column_names=["image", "label"], num_parallel_workers=8, \
+    data_set = ds.GeneratorDataset(dataset, column_names=["image", "label"], num_parallel_workers=4, \
                                    shuffle=shuffle, num_shards=device_num, shard_id=rank)
     data_set = data_set.batch(batch_size, drop_remainder=True)
     return data_set, data_set.get_dataset_size()

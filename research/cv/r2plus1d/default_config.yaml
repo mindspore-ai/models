@@ -16,7 +16,7 @@ momentum: 0.9
 weight_decay: 0.0005
 
 # dataset options, we recommend the absolute path
-dataset_root_path: "/data/ucf101_img/"
+dataset_root_path: "/home/mindspore/MIPT_team/Datasets/UCF101_img"
 dataset_name: "ucf101"
 val_mode: "val"
 pack_file_name: ""
@@ -31,7 +31,7 @@ save_every: 1
 is_save_on_master: 1
 ckpt_save_max: 5
 output_path: './output/'
-pretrain_path: "/data/code/"
+pretrain_path: "./"
 ckpt_name: "r2plus1d_v1_resnet34_kinetics400.ckpt"
 resume_path: ""
 resume_name: ""
@@ -40,6 +40,7 @@ resume_epoch: 0
 # eval or transfer learning settings, other hyperparameters are shared with training
 eval_ckpt_path: "/data/code/"
 eval_ckpt_name: "r2plus1d_best_map.ckpt"
+eval_ckpt: ""
 
 # export settings stand alone, other hyperparameters are shared with training
 export_batch_size: 1
@@ -50,13 +51,13 @@ file_name: "r2plus1d"
 file_format: "MINDIR"
 
 # dataset preprocess settings
-source_data_dir: "/data/dataset/UCF-101/"
-output_dir: "../dataset/ucf101_img/"
+source_data_dir: "/home/mindspore/MIPT_team/Datasets/UCF101"
+output_dir: "/home/mindspore/MIPT_team/Datasets/UCF101_img"
 splited: 0
 
 # ======================================================================================
 # common options
-device_target: 'Ascend'
+device_target: ''
 is_distributed: 0
 rank: 0
 group_size: 1
