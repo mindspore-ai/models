@@ -12,8 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-from .visual_encoder import VisualTransformer
+from .visual_encoder import VisualTransformer, ClipVisualTransformer
 from .text_encoder import BERT_Wukong
-from .matrics import TemplateEncoder, FilipEval
+from .matrics import FilipTemplateEncoder, ClipTemplateEncoder, FilipEval, ClipEval
 
-__all__ = ['VisualTransformer', 'BERT_Wukong', 'TemplateEncoder', 'FilipEval']
+__all__ = ['VisualTransformer', 'ClipVisualTransformer', 'BERT_Wukong', 'FilipTemplateEncoder',
+           'ClipTemplateEncoder', 'FilipEval', 'ClipEval']

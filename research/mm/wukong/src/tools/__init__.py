@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 from .template_generate import generate_zh_template
-from .model_utils import load_model
+from .model_utils import load_model, load_visual_model, load_text_model
 
 
-__all__ = ['generate_zh_template', 'load_model']
+__all__ = ['generate_zh_template', 'load_model', 'load_text_model', 'load_visual_model']

@@ -17,13 +17,15 @@ import json
 import logging
 import argparse
 
+import yaml
+from tqdm import tqdm
 import numpy as np
 from mindspore import Tensor
 from mindspore import context
 from mindspore import dtype as mstype
 
-from src.model import VisualTransformer, BERT_Wukong, TemplateEncoder, FilipEval
-from src.tools import generate_zh_template, load_model
+from src.model import FilipTemplateEncoder, ClipTemplateEncoder, FilipEval, ClipEval
+from src.tools import generate_zh_template, load_visual_model, load_text_model
 from src.dataset import get_dataset
 
 
@@ -34,30 +36,20 @@ context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
 
 def main():
     parser = argparse.ArgumentParser(description='evaluation for wukong dataset')
+    parser.add_argument('--config_path', help='model configuration file path', required=True)
     parser.add_argument('--ckpt_path', help="checkpoint file path for torch model", required=True)
     parser.add_argument('--dataset_path', help="ILSVRC dataset path root", required=True)
     parser.add_argument('--batch_size', help="evaluate dataset batch size", type=int, default=4)
     args = parser.parse_args()
+    config_path = args.config_path
     ckpt_path = args.ckpt_path
     dataset_path = args.dataset_path
 
-    text_encoder = BERT_Wukong(
-        context_length=32,
-        vocab_size=21128,
-        width=768,
-        heads=12,
-        layers=12,
-        output_dim=256
-    )
-    visual_encoder = VisualTransformer(
-        input_resolution=224,
-        layers=24,
-        width=1024,
-        patch_size=14,
-        output_dim=256
-    )
-    load_model(ckpt_path, visual_encoder, text_encoder)
+    with open(config_path, 'r') as stream:
+        config = yaml.safe_load(stream)
 
+    text_encoder = load_text_model(config['model']['text'], ckpt_path)
+    text_encoder = text_encoder.to_float(mstype.float16)
     val_dataset = get_dataset(dataset_path, args.batch_size)
     dataset_size = val_dataset.get_dataset_size()
 
@@ -72,30 +64,42 @@ def main():
 
     template_tokens = generate_zh_template(dataset_labels)
     template_tokens = Tensor(template_tokens)
-    template_encoder = TemplateEncoder(text_encoder)
+    if config['eval'] == 'filip':
+        template_encoder = FilipTemplateEncoder(text_encoder)
+    elif config['eval'] == 'clip':
+        template_encoder = ClipTemplateEncoder(text_encoder)
+    else:
+        raise NotImplementedError
     template_encoder.set_train(False)
     template_feature, n_template = template_encoder(template_tokens)
     logger.info("template feature generated successfully")
     logger.info("==========================")
 
-    filip_eval = FilipEval(template_feature, n_template, visual_encoder, text_encoder)
-    filip_eval.set_train(False)
-    filip_eval = filip_eval.to_float(mstype.float16)
+    visual_encoder = load_visual_model(config['model']['visual'], ckpt_path)
+    visual_encoder = visual_encoder.to_float(mstype.float16)
+
+    if config['eval'] == 'filip':
+        eval_matric = FilipEval(template_feature, n_template, visual_encoder, text_encoder)
+    elif config['eval'] == 'clip':
+        eval_matric = ClipEval(template_feature, n_template, visual_encoder, text_encoder)
+    else:
+        raise NotImplementedError
+    eval_matric.set_train(False)
+    eval_matric = eval_matric.to_float(mstype.float16)
 
     correct_1 = []
     correct_5 = []
     logger.info('total iter: %d', dataset_size)
-    for i, data in enumerate(val_dataset):
-        logger.info('processing %d/%d', i, dataset_size)
-        output = filip_eval(*data)
+    for data in tqdm(val_dataset, total=dataset_size):
+        output = eval_matric(*data)
         acc1, acc5 = output[0].asnumpy(), output[1].asnumpy()
         correct_1.append(acc1)
         correct_5.append(acc5)
-
     correct_1 = np.hstack(correct_1)
     correct_1 = correct_1.mean()
     correct_5 = np.hstack(correct_5)
     correct_5 = correct_5.mean()
+    logger.info("model %s result:", config_path)
     logger.info("correct @1: {:.2f}; correct @5: {:.2f}".format(correct_1 * 100, correct_5 * 100))
 
 
