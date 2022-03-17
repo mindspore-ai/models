@@ -36,6 +36,6 @@ docker run -it \
     --privileged \
     -v //usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
     -v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
-    -v ${share_dir}:/home/HwHiAiUser \
+    -v ${share_dir}:${share_dir} \
     ${docker_image} \
     /bin/bash
