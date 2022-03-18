@@ -18,10 +18,10 @@ import mindspore.ops.operations as P
 import mindspore.ops as F
 from mindspore.common.tensor import Tensor
 from mindspore import dtype as mstype
-from mindspore.nn.loss.loss import _Loss
+from mindspore.nn.loss.loss import LossBase
 
 
-class CrossEntropyWithLogits(_Loss):
+class CrossEntropyWithLogits(LossBase):
     """
     Cross-entropy loss function for semantic segmentation,
     and different classes have the same weight.
@@ -61,7 +61,7 @@ class CrossEntropyWithLogits(_Loss):
         return loss
 
 
-class CrossEntropyWithWeights(_Loss):
+class CrossEntropyWithWeights(LossBase):
     """
     Cross-entropy loss function for semantic segmentation,
     and different classes have different weights.

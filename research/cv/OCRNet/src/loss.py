@@ -19,7 +19,7 @@ import mindspore.ops.operations as P
 import mindspore.ops as F
 from mindspore.common.tensor import Tensor
 from mindspore import dtype as mstype
-from mindspore.nn.loss.loss import _Loss
+from mindspore.nn.loss.loss import LossBase
 
 from src.config import config_hrnetv2_w48 as config
 
@@ -30,7 +30,7 @@ weights_list = [0.8373, 0.918, 0.866, 1.0345,
                 1.0865, 1.1529, 1.0507]
 
 
-class CrossEntropyWithLogits(_Loss):
+class CrossEntropyWithLogits(LossBase):
     """
     Cross-entropy loss function for semantic segmentation,
     and different classes have the same weight.
@@ -71,7 +71,7 @@ class CrossEntropyWithLogits(_Loss):
         return loss
 
 
-class CrossEntropyWithLogitsAndWeights(_Loss):
+class CrossEntropyWithLogitsAndWeights(LossBase):
     """
     Cross-entropy loss function for semantic segmentation,
     and different classes have different weights.

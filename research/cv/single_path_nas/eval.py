@@ -23,7 +23,7 @@ from mindspore import Tensor
 from mindspore import context
 from mindspore.common import dtype as mstype
 from mindspore.common import set_seed
-from mindspore.nn.loss.loss import _Loss
+from mindspore.nn.loss.loss import LossBase
 from mindspore.ops import functional as F
 from mindspore.ops import operations as P
 from mindspore.train.model import Model
@@ -48,7 +48,7 @@ parser.add_argument('--device_id', type=int, default=None, help='device id of As
 args_opt = parser.parse_args()
 
 
-class CrossEntropySmooth(_Loss):
+class CrossEntropySmooth(LossBase):
     """CrossEntropy"""
 
     def __init__(self, sparse=True, reduction='mean', smooth_factor=0., num_classes=1000):
