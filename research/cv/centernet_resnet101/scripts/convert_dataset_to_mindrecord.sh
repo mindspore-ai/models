@@ -24,8 +24,13 @@ MINDRECORD_DIR=$2
 
 export GLOG_v=1
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
+LOG_DIR=$PROJECT_DIR/../logs
+if [ ! -d $LOG_DIR ]
+then
+    mkdir $LOG_DIR
+fi
 
 python ${PROJECT_DIR}/../src/dataset.py  \
     --coco_data_dir=$COCO_DIR \
     --mindrecord_dir=$MINDRECORD_DIR \
-    --mindrecord_prefix="coco_det.train.mind" > create_dataset.log 2>&1 &
+    --mindrecord_prefix="coco_det.train.mind" >${LOG_DIR}/create_dataset.log 2>&1 &

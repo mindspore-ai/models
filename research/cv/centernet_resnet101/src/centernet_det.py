@@ -16,17 +16,12 @@
 CenterNet for training and evaluation
 """
 
-
 import mindspore.nn as nn
 import mindspore.ops as ops
-from mindspore import context
 from mindspore import dtype as mstype
 from mindspore.common.tensor import Tensor
-from mindspore.context import ParallelMode
 from mindspore.common.initializer import Constant
-from mindspore.communication.management import get_group_size
-from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
-from src.utils import Sigmoid, GradScale
+from src.utils import Sigmoid
 from src.utils import FocalLoss, RegLoss
 from src.decode import DetectionDecode
 from src.resnet101 import Bottleneck, ResNet101, weights_init
@@ -66,8 +61,7 @@ class GatherDetectionFeatureCell(nn.Cell):
         if net_config.reg_offset:
             heads.update({'reg': 2})
         head_conv = net_config.head_conv
-        self.resnet101 = ResNet101(self.block_class, self.layers,
-                                   heads, head_conv)
+        self.resnet101 = ResNet101(self.block_class, self.layers, heads, head_conv)
 
         weights_init(self.resnet101)
         self.hm_fn = _generate_feature(cin=64, cout=heads['hm'], kernel_size=1,
@@ -222,61 +216,16 @@ class CenterNetWithLossScaleCell(nn.Cell):
         Tuple of Tensors, the loss, overflow flag and scaling sens of the network.
     """
     def __init__(self, network, optimizer, sens=1):
-        super(CenterNetWithLossScaleCell, self).__init__(auto_prefix=False)
+        super(CenterNetWithLossScaleCell, self).__init__()
         self.image = ImagePreProcess()
-        self.network = network
-        self.network.set_grad()
-        self.weights = optimizer.parameters
-        self.optimizer = optimizer
-        self.grad = ops.GradOperation(get_by_list=True, sens_param=True)
-        self.reducer_flag = False
-        self.allreduce = ops.AllReduce()
-        self.parallel_mode = context.get_auto_parallel_context("parallel_mode")
-        if self.parallel_mode in [ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL]:
-            self.reducer_flag = True
-        self.grad_reducer = ops.identity
-        self.degree = 1
-        if self.reducer_flag:
-            self.degree = get_group_size()
-            self.grad_reducer = DistributedGradReducer(optimizer.parameters, False, self.degree)
-        self.is_distributed = (self.parallel_mode != ParallelMode.STAND_ALONE)
-        self.cast = ops.Cast()
-        self.alloc_status = ops.NPUAllocFloatStatus()
-        self.get_status = ops.NPUGetFloatStatus()
-        self.clear_before_grad = ops.NPUClearFloatStatus()
-        self.reduce_sum = ops.ReduceSum(keep_dims=False)
-        self.base = Tensor(1, mstype.float32)
-        self.less_equal = ops.LessEqual()
-        self.grad_scale = GradScale()
-        self.loss_scale = sens
+        manager = nn.FixedLossScaleUpdateCell(loss_scale_value=sens)
+        self.train_on_step = nn.TrainOneStepWithLossScaleCell(network, optimizer, scale_sense=manager)
 
     @ops.add_flags(has_effect=True)
     def construct(self, image, hm, reg_mask, ind, wh, reg):
         """Defines the computation performed."""
         image = self.image(image)
-        weights = self.weights
-        loss = self.network(image, hm, reg_mask, ind, wh, reg)
-        scaling_sens = self.cast(self.loss_scale, mstype.float32) * 2.0 / 2.0
-        # alloc status and clear should be right before gradoperation
-        init = self.alloc_status()
-        self.clear_before_grad(init)
-        grads = self.grad(self.network, weights)(image, hm, reg_mask, ind, wh, reg, scaling_sens)
-        grads = self.grad_reducer(grads)
-        grads = self.grad_scale(scaling_sens * self.degree, grads)
-        self.get_status(init)
-        flag_sum = self.reduce_sum(init, (0,))
-        if self.is_distributed:
-            flag_reduce = self.allreduce(flag_sum)
-            cond = self.less_equal(self.base, flag_reduce)
-        else:
-            cond = self.less_equal(self.base, flag_sum)
-        overflow = cond
-        if overflow:
-            succ = False
-        else:
-            succ = self.optimizer(grads)
-        ret = (loss, cond, scaling_sens)
-        return ops.depend(ret, succ)
+        return self.train_on_step(image, hm, reg_mask, ind, wh, reg)
 
 
 class CenterNetDetEval(nn.Cell):

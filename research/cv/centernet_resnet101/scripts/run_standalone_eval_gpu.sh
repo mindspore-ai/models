@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run_standalone_eval_ascend.sh DEVICE_ID RUN_MODE DATA_DIR LOAD_CHECKPOINT_PATH"
-echo "for example of validation: bash run_standalone_eval_ascend.sh 0 val /path/coco_dataset /path/load_ckpt"
-echo "for example of test: bash run_standalone_eval_ascend.sh 0 test /path/coco_dataset /path/load_ckpt"
+echo "bash run_standalone_eval_gpu.sh DEVICE_ID RUN_MODE DATA_DIR LOAD_CHECKPOINT_PATH"
+echo "for example of validation: bash run_standalone_eval_gpu.sh 0 val /path/coco_dataset /path/load_ckpt"
+echo "for example of test: bash run_standalone_eval_gpu.sh 0 test /path/coco_dataset /path/load_ckpt"
 echo "=============================================================================================================="
 DEVICE_ID=$1
 RUN_MODE=$2
@@ -27,6 +27,11 @@ LOAD_CHECKPOINT_PATH=$4
 mkdir -p ms_log 
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 CUR_DIR=`pwd`
+LOG_DIR=$PROJECT_DIR/../logs
+if [ ! -d $LOG_DIR ]
+then
+    mkdir $LOG_DIR
+fi
 export GLOG_log_dir=${CUR_DIR}/ms_log
 export GLOG_logtostderr=0
 export DEVICE_ID=$DEVICE_ID
@@ -51,12 +56,11 @@ else
 fi
 
 python ${PROJECT_DIR}/../eval.py  \
-    --device_target=Ascend \
+    --device_target=GPU \
     --device_id=$DEVICE_ID \
     --load_checkpoint_path=$LOAD_CHECKPOINT_PATH \
     --data_dir=$DATA_DIR \
     --run_mode=$RUN_MODE \
     --visual_image=true \
     --enable_eval=true \
-    --save_result_dir=./ > eval_log.txt 2>&1 &
-
+    --save_result_dir=./ > ${LOG_DIR}/eval_gpu_log.txt 2>&1 &

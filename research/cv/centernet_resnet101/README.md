@@ -96,9 +96,7 @@ Dataset used: [COCO2017](https://cocodataset.org/)
 
         ```pip
         pip install Cython
-
         pip install pycocotools
-
         pip install mmcv==0.2.14
         ```
 
@@ -112,7 +110,6 @@ Dataset used: [COCO2017](https://cocodataset.org/)
             └─instance_val2017.json
           ├─val2017
           └─train2017
-
         ```
 
     2. If your own dataset is used. **Select dataset to other when run script.**
@@ -134,15 +131,18 @@ Dataset used: [COCO2017](https://cocodataset.org/)
     ```shell
     # create dataset in mindrecord format
     bash scripts/convert_dataset_to_mindrecord.sh [COCO_DATASET_DIR] [MINDRECORD_DATASET_DIR]
-
     # standalone training on Ascend
     bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [MINDRECORD_DATASET_PATH] [LOAD_CHECKPOINT_PATH](optional)
-
+    # standalone training on GPU
+    bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [MINDRECORD_DATASET_PATH] [LOAD_CHECKPOINT_PATH](optional)
     # distributed training on Ascend
     bash scripts/run_distributed_train_ascend.sh [MINDRECORD_DATASET_PATH] [RANK_TABLE_FILE] [LOAD_CHECKPOINT_PATH](optional)
-
+    # distributed training on GPU
+    bash scripts/run_distributed_train_gpu.sh [MINDRECORD_DATASET_PATH] [RANK_SIZE] [LOAD_CHECKPOINT_PATH](optional)
     # eval on Ascend
     bash scripts/run_standalone_eval_ascend.sh [DEVICE_ID] [RUN_MODE] [DATA_DIR] [LOAD_CHECKPOINT_PATH]
+    # eval on GPU
+    bash scripts/run_standalone_eval_gpu.sh [DEVICE_ID] [RUN_MODE] [DATA_DIR] [LOAD_CHECKPOINT_PATH]
     ```
 
 - running on ModelArts
@@ -217,7 +217,7 @@ Dataset used: [COCO2017](https://cocodataset.org/)
     # (9) Set the "Output file path" and "Job log path" to your path on the website UI interface.
     # (10) Under the item "resource pool selection", select the specification of a single card.
     # (11) Create your job.
-    ```
+   ```
 
 # [Script Description](#contents)
 
@@ -243,9 +243,12 @@ Dataset used: [COCO2017](https://cocodataset.org/)
         │   │    ├── README.md
         │   ├── convert_dataset_to_mindrecord.sh        // shell script for converting coco type dataset to mindrecord
         │   ├── run_standalone_train_ascend.sh          // shell script for standalone training on ascend
+        │   ├── run_standalone_train_gpu.sh             // shell script for standalone training on gpu
         │   ├── run_infer_310.sh                        // shell script for 310 inference on ascend
         │   ├── run_distributed_train_ascend.sh         // shell script for distributed training on ascend
+        │   ├── run_distributed_train_gpu.sh            // shell script for distributed training on gpu
         │   ├── run_standalone_eval_ascend.sh           // shell script for standalone evaluation on ascend
+        │   ├── run_standalone_eval_gpu.sh              // shell script for standalone evaluation on gpu
         └── src
             ├── model_utils
             │   ├── config.py            // parsing parameter configuration file of "*.yaml"
@@ -433,6 +436,12 @@ The command above will run in the background, after converting mindrecord files 
 bash scripts/run_distributed_train_ascend.sh /path/mindrecord_dataset /path/hccl.json /path/load_ckpt(optional)
 ```
 
+#### Running on GPU
+
+```shell
+bash scripts/run_distributed_train_gpu.sh /path/mindrecord_dataset rank_size /path/load_ckpt(optional)
+```
+
 The command above will run in the background, you can view training logs in LOG*/training_log.txt and LOG*/ms_log/. After training finished, you will get some checkpoint files under the LOG*/ckpt_0 folder by default. The loss value will be displayed as follows:
 
 ```text
@@ -452,6 +461,8 @@ epoch time: 235430.151 ms, per step time: 514.040 ms
 # Evaluation base on validation dataset will be done automatically, while for test or test-dev dataset, the accuracy should be upload to the CodaLab official website(https://competitions.codalab.org).
 # On Ascend
 bash scripts/run_standalone_eval_ascend.sh device_id val(or test) /path/coco_dataset /path/load_ckpt
+# On GPU
+bash scripts/run_standalone_eval_gpu.sh device_id val(or test) /path/coco_dataset /path/load_ckpt
 ```
 
 you can see the MAP result below as below:
@@ -545,26 +556,26 @@ Inference result is saved in current path, you can find result like this in acc.
 
 ## [Performance](#contents)
 
-### Training Performance On Ascend 910
+### Training Performance
 
-CenterNet on 11.8K images(The annotation and data format must be the same as coco)
+CenterNet on 118K images(The annotation and data format must be the same as coco)
 
-| Parameters                 | CenterNet_ResNet101                                            |
-| -------------------------- | ---------------------------------------------------------------|
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G                |
-| uploaded Date              | 16/7/2021 (month/day/year)                                     |
-| MindSpore Version          | 1.2.0                                                          |
-| Dataset                    | COCO2017                                                   |
-| Training Parameters        | 8p, epoch=330, steps=151140, batch_size = 32, lr=4.8e-4          |
-| Optimizer                  | Adam                                                           |
-| Loss Function              | Focal Loss, L1 Loss, RegLoss                                   |
-| outputs                    | detections                                                     |
-| Loss                       | 1.5-2.0                                                        |
-| Speed                      | 8p 25 img/s                                      |
-| Total time: training       | 8p: 23 h                                     |
-| Total time: evaluation     | keep res: test 1h, val 0.7h; fix res: test 40min, val 8min|
-| Checkpoint                 | 591.70MB (.ckpt file)                                              |
-| Scripts                    | [centernet_resnet101 script](https://gitee.com/mindspore/models/tree/master/research/cv/centernet_resnet101) |
+| Parameters             | CenterNet_ResNet101                                          | CenterNte_ResNet101                                          |
+| ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Resource               | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G              |                                                              |
+| uploaded Date          | 16/7/2021 (day/month/year)                                   | 3/22/2022(day/month/year)                                    |
+| MindSpore Version      | 1.2.0                                                        | 1.5.0                                                        |
+| Dataset                | COCO2017                                                     | COCO2017                                                     |
+| Training Parameters    | 8p, epoch=330, steps=151140, batch_size = 32, lr=4.8e-4      | 8p, epoch=330, steps=151140, batch_size = 32, lr=4.8e-4      |
+| Optimizer              | Adam                                                         | Adam                                                         |
+| Loss Function          | Focal Loss, L1 Loss, RegLoss                                 | Focal Loss, L1 Loss, RegLoss                                 |
+| outputs                | detections                                                   | detections                                                   |
+| Loss                   | 1.5-2.0                                                      | 1.5-2.0                                                      |
+| Speed                  | 8p 25 img/s                                                  | 8p 1350ms/step                                               |
+| Total time: training   | 8p: 23 h                                                     | 8p: 59h                                                      |
+| Total time: evaluation | keep res: test 1h, val 0.7h; fix res: test 40min, val 8min   | val 10min                                                    |
+| Checkpoint             | 591.70MB (.ckpt file)                                        | 591.70MB(.ckpt file)                                         |
+| Scripts                | [centernet_resnet101 script](https://gitee.com/mindspore/models/tree/master/research/cv/centernet_resnet101) | [centernet_resnet101 script](https://gitee.com/mindspore/models/tree/master/research/cv/centernet_resnet101) |
 
 ### Inference Performance On Ascend 910
 

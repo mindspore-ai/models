@@ -265,7 +265,7 @@ run_mode: "test or validation, default is test."
 enable_eval: "Whether evaluate accuracy after prediction"
 
 ---
-device_target: ['Ascend']
+device_target: ['Ascend', 'GPU']
 distribute: ["true", "false"]
 need_profiler: ["true", "false"]
 enable_save_ckpt: ["true", "false"]
