@@ -33,7 +33,7 @@ from mindspore.common.initializer import XavierUniform, initializer
 from mindspore.communication import init
 from mindspore.context import ParallelMode
 from mindspore.nn import RMSProp, Momentum
-from mindspore.nn.loss.loss import _Loss
+from mindspore.nn.loss.loss import LossBase
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor, LossMonitor
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -65,7 +65,7 @@ args = arg_parser.parse_args()
 set_seed(1)
 
 
-class CrossEntropySmooth(_Loss):
+class CrossEntropySmooth(LossBase):
     """CrossEntropy"""
 
     def __init__(self, sparse=True, reduction='mean', smooth_factor=0., num_classes=1000):
