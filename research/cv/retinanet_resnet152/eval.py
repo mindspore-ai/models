@@ -38,6 +38,7 @@ def retinanet_eval(dataset_path, ckpt_path):
     net = retinahead(backbone, config)
     net = retinanetInferWithDecoder(net, Tensor(default_boxes), config)
     print("Load Checkpoint!")
+    print("ckpt_path: ", ckpt_path)
     param_dict = load_checkpoint(ckpt_path)
     net.init_parameters_data()
     load_param_into_net(net, param_dict)
@@ -77,6 +78,7 @@ def modelarts_process():
         config.coco_root = os.path.join(config.coco_root, config.modelarts_dataset_unzip_name)
         print(os.listdir(os.path.join(config.data_path, config.modelarts_dataset_unzip_name)))
 
+
 @moxing_wrapper(pre_process=modelarts_process)
 def eval_retinanet_resnet152():
     """ eval_retinanet_resnet152 """
@@ -114,6 +116,7 @@ def eval_retinanet_resnet152():
 
     print("Start Eval!")
     retinanet_eval(mindrecord_file, config.checkpoint_path)
+
 
 if __name__ == '__main__':
     eval_retinanet_resnet152()

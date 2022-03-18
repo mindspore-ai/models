@@ -56,9 +56,11 @@ do
     export RANK_ID=$i
     echo "start training for rank $i, device $DEVICE_ID"
     env > env.log
+
     if [ $# == 5 ]
     then
         python train.py  \
+        --run_platform="Ascend" \
         --distribute=True  \
         --lr=$LR \
         --dataset=$DATASET \
@@ -70,6 +72,7 @@ do
     if [ $# == 7 ]
     then
         python train.py  \
+        --run_platform="Ascend" \
         --distribute=True  \
         --lr=$LR \
         --dataset=$DATASET \

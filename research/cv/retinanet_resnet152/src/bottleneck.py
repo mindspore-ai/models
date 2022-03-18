@@ -18,6 +18,7 @@
 import mindspore.nn as nn
 from mindspore.ops import operations as P
 
+
 class FPN(nn.Cell):
     """FPN"""
     def __init__(self, config, backbone, is_training=True):
