@@ -31,7 +31,7 @@ CNN Direction Model's composition consists of 1 convolutional layer and 4 residu
 
 # [Dataset](#contents)
 
-Dataset used: [FSNS (French Street Name Signs)](https://arxiv.org/abs/1702.03970)
+For training and evaluation, we use the French Street Name Signs (FSNS) released by Google as the training data, which contains approximately 1 million training images and their corresponding ground truth words. Note that these datasets are very large.
 
 - Dataset size：~200GB，~1M 150*600 colored images with a label indicating the text within the image.
     - Train：200GB，1M, images
@@ -39,28 +39,7 @@ Dataset used: [FSNS (French Street Name Signs)](https://arxiv.org/abs/1702.03970
 - Data format：binary files
     - Note：Data will be processed in dataset.py
 
-- Download the dataset, the recommended directory structure to have is as follows:
-
-Annotations for training and testing should be in test_annot and train_annot.
-Training and Testing images should be in train and test.
-
-```shell
-├─test
-│
-└─test_annot
-│
-└─train
-│
-└─train_annot
-```
-
-- After downloading the data and converting it to it's raw format (.txt for annotations and .jpg, .jpeg, or .png for the images), add the image and annotations paths to the src/config.py file then cd to src and run:
-
-```python
-python create_mindrecord.py
-```
-
-This will create two folders: train and test in the target directory you specify in config.py.
+you can find how to generate dataset in [crnn_seq2seq_ocr](https://gitee.com/mindspore/models/tree/master/official/cv/crnn_seq2seq_ocr#quick-start)
 
 # [Environment Requirements](#contents)
 
