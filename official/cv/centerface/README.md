@@ -194,7 +194,9 @@ step6: eval
 # python setup.py install;
 # cd -; #cd ../../scripts;
 
-bash eval_all.sh [ground_truth_path]
+bash eval_all.sh [GROUND_TRUTH_PATH]
+or
+bash eval_all.sh [GROUND_TRUTH_PATH] [FILTER_EASY](optional) [FILTER_MEDIUM](optional) [FILTER_HARD](optional) [FILTER_SUM](optional)
 ```
 
 - Running on [ModelArts](https://support.huaweicloud.com/modelarts/)
@@ -651,7 +653,9 @@ cd ../../../scripts;
     ```python
     # you need to change the parameter in eval_all.sh
     # default eval the ckpt saved in ./scripts/output/centerface/[89-140]
-    bash eval_all.sh [ground_truth_path]
+    bash eval_all.sh [GROUND_TRUTH_PATH]
+    or
+    bash eval_all.sh [GROUND_TRUTH_PATH] [FILTER_EASY](optional) [FILTER_MEDIUM](optional) [FILTER_HARD](optional) [FILTER_SUM](optional)
     ```
 
 3. test+eval
