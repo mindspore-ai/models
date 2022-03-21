@@ -139,7 +139,7 @@ reduce precision" to view the operators with reduced precision.
 - Generate config json file for 8-card training
     - [Simple tutorial](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
     - For detailed configuration method, please refer to
-      the [official website tutorial](https://www.mindspore.cn/tutorials/zh-CN/master/intermediate/distributed_training/distributed_training_ascend.html#id3).
+      the [official website tutorial](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_ascend.html#configuring-distributed-environment-variables).
 
 # [Quick start](#Quickstart)
 

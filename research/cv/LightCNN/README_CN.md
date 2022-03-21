@@ -107,7 +107,7 @@ LightCNN适用于有大量噪声的人脸识别数据集，提出了maxout 的�
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 - 生成config json文件用于8卡训练。
     - [简易教程](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
-    - 详细配置方法请参照[官网教程](https://www.mindspore.cn/tutorials/zh-CN/master/intermediate/distributed_training/distributed_training_ascend.html#id3)。
+    - 详细配置方法请参照[官网教程](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html#配置分布式环境变量)。
 
 # 快速入门
 
