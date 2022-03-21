@@ -13,6 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """pth2ckpt."""
+import sys
 from mindspore import Tensor
 from mindspore.train.serialization import save_checkpoint
 import torch
@@ -21,7 +22,7 @@ import numpy as np
 
 def pytorch2mindspore():
     """pth to ckpt."""
-    par_dict = torch.load('/opt_data/xidian_wks/czp/midas/ckpt/ig_resnext101_32x8-c38310e5.pth', map_location='cpu')
+    par_dict = torch.load(sys.argv[1], map_location='cpu')
     new_params_list = []
     for name in par_dict:
         print(name)

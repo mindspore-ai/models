@@ -35,7 +35,10 @@ import h5py
 
 
 def eval_Kitti(data_path, net):
-    """eval Kitti."""
+    """
+    eval Kitti.
+    Return the value, loss.
+    """
     img_input_1 = transforms.Resize(config.img_width,
                                     config.img_height,
                                     resize_target=None,
@@ -93,7 +96,10 @@ def eval_Kitti(data_path, net):
 
 
 def eval_TUM(datapath, net):
-    """eval TUM."""
+    """
+    eval TUM.
+    Return the value, loss.
+    """
     img_input_1 = transforms.Resize(config.img_width,
                                     config.img_height,
                                     resize_target=None,
@@ -157,7 +163,10 @@ def eval_TUM(datapath, net):
 
 
 def eval_Sintel(datapath, net):
-    """eval Sintel."""
+    """
+    eval Sintel.
+    Return the value, loss.
+    """
     img_input_1 = transforms.Resize(config.img_width,
                                     config.img_height,
                                     resize_target=None,
@@ -220,7 +229,10 @@ def eval_Sintel(datapath, net):
 
 
 def eval_ETH3D(datapath, net):
-    """eval ETH3D."""
+    """
+    eval ETH3D.
+    Return the value, loss.
+    """
     img_input_1 = transforms.Resize(config.img_width,
                                     config.img_height,
                                     resize_target=True,
@@ -282,7 +294,10 @@ def eval_ETH3D(datapath, net):
 
 
 def eval_DIW(datapath, net):
-    """eval DIW."""
+    """
+    eval DIW.
+    Return the value, loss.
+    """
     img_input_1 = transforms.Resize(config.img_width,
                                     config.img_height,
                                     resize_target=True,
@@ -334,7 +349,10 @@ def eval_DIW(datapath, net):
 
 
 def eval_NYU(datamat, splitmat, net):
-    """eval NYU."""
+    """
+    eval NYU.
+    Return the value, loss.
+    """
     img_input_1 = Resize(config.img_width,
                          config.img_height,
                          resize_target=None,
@@ -404,7 +422,7 @@ def run_eval():
     splitmat = config.train_data_dir+config.datapath_NYU[1]
 
     net = MidasNet()
-    param_dict = serialization.load_checkpoint(config.train_data_dir+config.ckpt_path)
+    param_dict = serialization.load_checkpoint(config.ckpt_path)
     serialization.load_param_into_net(net, param_dict)
     results = {}
     if config.data_name == 'Sintel' or config.data_name == "all":

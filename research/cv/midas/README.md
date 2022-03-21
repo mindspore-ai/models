@@ -74,7 +74,7 @@ Midas的总体网络架构如下：
 
 - 预训练模型
 
-  当开始训练之前需要获取mindspore图像网络预训练模型，使用在resnext101上训练出来的预训练模型[resnext101_32x8d_wsl](<https://download.pytorch.org/models/ig_resnext101_32x8-c38310e5.pth>),下载完pth文件之后,运行`src/utils/pth2ckpt.py`将pth文件转换为ckpt文件,转换完之后将ckpt文件命名为`midas_resnext_101_WSL.ckpt`并存放于`midas/ckpt/`目录下即可.
+  当开始训练之前需要获取mindspore图像网络预训练模型，使用在resnext101上训练出来的预训练模型[resnext101_32x8d_wsl](<https://download.pytorch.org/models/ig_resnext101_32x8-c38310e5.pth>),下载完pth文件之后,运行`python src/utils/pth2ckpt.py /pth_path/ig_resnext101_32x8-c38310e5.pth`将pth文件转换为ckpt文件.
 - 数据集准备
 
   midas网络模型使用ReDWeb数据集用于训练,使用Sintel,KITTI,TUM数据集进行推理,数据集可通过[ReDWeb](<https://www.paperswithcode.com/dataset/redweb>),[Sintel](http://sintel.is.tue.mpg.de),[Kitti](http://www.cvlibs.net/datasets/kitti/raw_data.php),[TUM](https://vision.in.tum.de/data/datasets/rgbd-dataset/download#freiburg2_desk_with_person)官方网站下载使用.
@@ -122,13 +122,13 @@ Midas的总体网络架构如下：
 
 ```text
 # 分布式训练
-用法：sh run_distribute_train.sh 8
+用法：bash run_distribute_train.sh 8 ./ckpt/midas_resnext_101_WSL.ckpt
 
 # 单机训练
-用法：sh run_standalone_train.sh [DEVICE_ID]
+用法：bash run_standalone_train.sh [DEVICE_ID] [CKPT_PATH]
 
 # 运行评估示例
-用法：sh run_eval.sh [DEVICE_ID]
+用法：bash run_eval.sh [DEVICE_ID] [DATA_NAME] [CKPT_PATH]
 ```
 
 # 脚本说明
@@ -151,6 +151,7 @@ Midas的总体网络架构如下：
     ├── run_distribute_train.sh            # 启动Ascend分布式训练（8卡）
     ├── run_eval.sh                        # 启动Ascend评估
     ├── run_standalone_train.sh            # 启动Ascend单机训练（单卡）
+    ├── run_train_gpu.sh                   # 启动GPU训练
     └── run_infer_310.sh                   # 启动Ascend的310推理
   ├── src
     ├── utils
@@ -236,11 +237,24 @@ file_format: "AIR"                          #AIR/MIDIR
 
 ```text
 # 分布式训练
-用法：sh run_distribute_train.sh 8
+用法：bash run_distribute_train.sh 8 ./ckpt/midas_resnext_101_WSL.ckpt
 # 单机训练
-用法：sh run_standalone_train.sh [DEVICE_ID]
+用法：bash run_standalone_train.sh [DEVICE_ID] [CKPT_PATH]
 # 运行评估示例
-用法：sh run_eval.sh [DEVICE_ID] [DATA_NAME]
+用法：bash run_eval.sh [DEVICE_ID] [DATA_NAME] [CKPT_PATH]
+
+```
+
+#### GPU处理器环境运行
+
+```text
+用法：bash run_train_GPU.sh [DEVICE_NUM] [DEVICE_ID] [CKPT_PATH]
+# 分布式训练
+用法：bash run_train_GPU.sh 8 0,1,2,3,4,5,6,7 /ckpt/midas_resnext_101_WSL.ckpt
+# 单机训练
+用法：bash run_train_GPU.sh 1 0 /ckpt/midas_resnext_101_WSL.ckpt
+# 运行评估示例
+用法：bash run_eval.sh [DEVICE_ID] [DATA_NAME] [CKPT_PATH]
 
 ```
 
@@ -282,7 +296,22 @@ epoch time: 23696.833 ms, per step time: 423.158 ms
 
 ```bash
 # 评估
-sh run_eval.sh [DEVICE_ID] [DATA_NAME]
+bash run_eval.sh [DEVICE_ID] [DATA_NAME]
+```
+
+### 结果
+
+打开val.json查看推理的结果,如下所示：
+
+```text
+{"Kitti": 24.222 "Sintel":0.323 "TUM":15.08 }
+```
+
+#### GPU处理器环境运行
+
+```bash
+# 评估
+bash run_eval.sh [DEVICE_ID] [DATA_NAME] [CKPT_PATH] [DEVICE_TARGET]
 ```
 
 ### 结果
@@ -333,19 +362,19 @@ bash run_infer_310.sh [MODEL_PATH] [DATA_PATH] [DATASET_NAME] [DEVICE_ID]
 
 #### ReDWeb上性能参数
 
-| Parameters          | Ascend 910                   |
-| ------------------- | --------------------------- |
-| 模型版本       | Midas               |
-| 资源            | Ascend 910；CPU：2.60GHz，192核；内存：755G                  |
-| 上传日期       | 2021-06-24 |
-| MindSpore版本   | 1.2.0                       |
-| 数据集             | ReDWeb                  |
-| 预训练模型            | ResNeXt_101_WSL                  |
-| 训练参数 | epoch=400, batch_size=8, no_backbone_lr=1e-4,backbone_lr=1e-5   |
-| 优化器           | Adam                        |
-| 损失函数       | 自定义损失函数          |
-| 速度               | 8pc: 423.4 ms/step        |
-| 训练性能   | "Kitti": 24.222 "Sintel":0.323  "TUM":15.08    |
+| Parameters          | Ascend 910                   |V100-PCIE                   |
+| ------------------- | --------------------------- |--------------------------- |
+| 模型版本       | Midas               | Midas               |
+| 资源            | Ascend 910；CPU：2.60GHz，192核；内存：755G                  | Tesla V100-PCIE 32G ， cpu  52cores 2.60GHz，RAM 754G                 |
+| 上传日期       | 2021-06-24 |2021-11-30|
+| MindSpore版本   | 1.2.0                       |1.6.0.20211125|
+| 数据集             | ReDWeb                  |ReDWeb                  |
+| 预训练模型            | ResNeXt_101_WSL                  |ResNeXt_101_WSL                  |
+| 训练参数 | epoch=400, batch_size=8, no_backbone_lr=1e-4,backbone_lr=1e-5   | epoch=400, batch_size=8, no_backbone_lr=1e-4,backbone_lr=1e-5   |
+| 优化器           | Adam                        |Adam                        |
+| 损失函数       | 自定义损失函数          | 自定义损失函数          |
+| 速度               | 8pc: 423.4 ms/step        |8pc: 920 ms/step  1pc:655ms/step      |
+| 训练性能   | "Kitti": 24.222 "Sintel":0.323  "TUM":15.08    |"Kitti"：23.870 "sintel": 0.322569 "TUM": 16.198  |
 
 # ModelZoo主页
 

@@ -14,5 +14,6 @@
 # limitations under the License.
 # ============================================================================
 export DEVICE_ID=$1
+export model_weights=$2
 python -u ../midas_train.py  \
-    --device_id=$DEVICE_ID > train_$DEVICE_ID.log 2>&1 &
+    --device_id=$DEVICE_ID --run_distribute=False --is_modelarts=False --model_weights=$model_weights> train_$DEVICE_ID.log 2>&1 &

@@ -15,4 +15,6 @@
 # ============================================================================
 export DEVICE_ID=$1
 export DATA_NAME=$2
-python -u ../midas_eval.py  --device_id=$DEVICE_ID --data_name=$DATA_NAME > eval.txt 2>&1 &
+export ckpt_path=$3
+export device_target=$3
+python -u ../midas_eval.py  --device_id=$DEVICE_ID --data_name=$DATA_NAME --ckpt_path=$ckpt_path --device_target=$device_target> eval.txt 2>&1 &

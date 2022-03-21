@@ -22,10 +22,10 @@ from mindspore import Tensor
 from mindspore.context import ParallelMode
 import mindspore.dataset as ds
 from mindspore.common import set_seed
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore.train.serialization import load_checkpoint
 from mindspore.train.model import Model
 from mindspore.train.callback import LossMonitor, TimeMonitor, ModelCheckpoint, CheckpointConfig
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank
 from src.midas_net import MidasNet, Loss, NetwithCell
 from src.utils import loadImgDepth
 from src.config import config
@@ -33,8 +33,12 @@ from src.config import config
 set_seed(1)
 ds.config.set_seed(1)
 
+
 def dynamic_lr(num_epoch_per_decay, total_epochs, steps_per_epoch, lr, end_lr):
-    """dynamic learning rate generator"""
+    """
+    dynamic learning rate generator
+    Return the value, lr_each_step.
+    """
     lr_each_step = []
     total_steps = steps_per_epoch * total_epochs
     decay_steps = steps_per_epoch * num_epoch_per_decay
@@ -67,40 +71,46 @@ def train(mixdata_path):
         mixdata_path = os.path.join(local_data_path, mixdata_path)
         load_path = os.path.join(local_data_path, 'midas_resnext_101_WSL.ckpt')
         output_path = config.train_url
-        print('local_data_path:', local_data_path)
-        print('mixdata_path:', mixdata_path)
-        print('load_path:', load_path)
-        print('output_path:', output_path)
         # data download
-        print('Download data.')
         mox.file.copy_parallel(src_url=config.data_url, dst_url=local_data_path)
     elif config.run_distribute:
-        device_id = int(os.getenv('DEVICE_ID'))
-        device_num = int(os.getenv('RANK_SIZE'))
-        context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False,
-                            max_call_depth=10000)
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True,
-                                          device_num=device_num
-                                          )
-        init()
-        local_data_path = config.train_data_dir + '/data'
-        mixdata_path = config.train_data_dir + '/data/mixdata.json'
-        load_path = config.train_data_dir + '/midas/ckpt/midas_resnext_101_WSL.ckpt'
+        if config.device_target == 'GPU':
+            device_num = int(os.getenv('RANK_SIZE', '1'))
+            if device_num > 1:
+                init("nccl")
+                context.reset_auto_parallel_context()
+                context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                                  gradients_mean=True)
+                device_id = get_rank()
+                context.set_context(device_id=device_id, enable_graph_kernel=True)
+        else:
+            device_id = int(os.getenv('DEVICE_ID'))
+            device_num = int(os.getenv('RANK_SIZE'))
+            context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False,
+                                max_call_depth=10000)
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True,
+                                              device_num=device_num
+                                              )
+            init()
+        local_data_path = config.train_data_dir
+        mixdata_path = config.train_json_data_dir
+        load_path = config.model_weights
     else:
-        local_data_path = config.train_data_dir + '/data'
-        mixdata_path = config.train_data_dir + '/data/mixdata.json'
-        load_path = config.train_data_dir + '/midas/ckpt/midas_resnext_101_WSL.ckpt'
+        local_data_path = config.train_data_dir
+        mixdata_path = config.train_json_data_dir
+        load_path = config.model_weights
         device_id = config.device_id
-        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False, device_id=device_id,
+        context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target,
+                            save_graphs=False, device_id=device_id,
                             max_call_depth=10000)
     # load data
     f = open(mixdata_path)
     data_config = json.load(f)
     img_paths = data_config['img']
-    # depth_paths = data_config['depth']
     f.close()
     mix_dataset = loadImgDepth.LoadImagesDepth(local_path=local_data_path, img_paths=img_paths)
+    ds.config.set_enable_shared_mem(False)
     if config.is_modelarts or config.run_distribute:
         mix_dataset = ds.GeneratorDataset(mix_dataset, ['img', 'mask', 'depth'], shuffle=True, num_parallel_workers=8,
                                           num_shards=device_num, shard_id=device_id)
@@ -112,12 +122,9 @@ def train(mixdata_path):
     net = MidasNet()
     net = net.set_train()
     loss = Loss()
-    param_dict = load_checkpoint(load_path)
-    load_param_into_net(net, param_dict)
+    load_checkpoint(load_path, net=net)
     backbone_params = list(filter(lambda x: 'backbone' in x.name, net.trainable_params()))
     no_backbone_params = list(filter(lambda x: 'backbone' not in x.name, net.trainable_params()))
-    # no_backbone_params_lr = Tensor(dynamic_lr(5, epoch_number_total, per_step_size, 1e-4, 1e-6), mstype.float32)
-    # backbone_params_lr = Tensor(dynamic_lr(5, epoch_number_total, per_step_size, 1e-5, 1e-7), mstype.float32)
     if config.lr_decay:
         group_params = [{'params': backbone_params,
                          'lr': nn.PolynomialDecayLR(config.backbone_params_lr
@@ -139,7 +146,7 @@ def train(mixdata_path):
     # define callback
     loss_cb = LossMonitor()
     time_cb = TimeMonitor()
-    checkpointconfig = CheckpointConfig(saved_network=net)
+    checkpointconfig = CheckpointConfig(saved_network=net, save_checkpoint_steps=5, keep_checkpoint_max=2)
     if config.is_modelarts:
         ckpoint_cb = ModelCheckpoint(prefix='Midas_{}'.format(device_id), directory=local_data_path + '/output/ckpt',
                                      config=checkpointconfig)
