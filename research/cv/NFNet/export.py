@@ -22,7 +22,6 @@ from mindspore import Tensor, load_checkpoint, load_param_into_net, export, cont
 from mindspore import dtype as mstype
 
 from src.args import args
-from src.models.NFNet.std_conv import ScaledStdConv2dUnit
 from src.tools.cell import cast_amp
 from src.tools.criterion import get_criterion, NetWithLoss
 from src.tools.get_misc import get_model
@@ -44,10 +43,6 @@ if __name__ == '__main__':
 
     net.set_train(False)
     net.to_float(mstype.float32)
-    for name, cell in net.cells_and_names():
-        if isinstance(cell, ScaledStdConv2dUnit):
-            cell.weight.set_data(cell.wise_normalize())
-            print(f"=> uniwise {name}'s weight for inference")
 
     input_arr = Tensor(np.zeros([1, 3, args.test_input_size, args.test_input_size], np.float32))
     export(net, input_arr, file_name=args.arch, file_format=args.file_format)

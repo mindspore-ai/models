@@ -26,6 +26,7 @@ Code: https://github.com/joe-siyuan-qiao/WeightStandardization
 ScaledStdConv:
 Paper: `Characterizing signal propagation to close the performance gap in unnormalized ResNets`
     - https://arxiv.org/abs/2101.08692
+
 Official Deepmind JAX code: https://github.com/deepmind/deepmind-research/tree/master/nfnets
 
 Hacked together by / copyright Ross Wightman, 2021.
@@ -58,25 +59,15 @@ class ScaledStdConv2dUnit(nn.Conv2d):
         self.fan_in = Tensor(np.prod(self.weight[0].shape), mstype.float32)  # gamma * 1 / sqrt(fan-in)
         self.gamma = Tensor(gamma, mstype.float32)
         self.eps = eps
-        self.inference = args.inference
 
-    def wise_normalize(self):
+    def construct(self, x):
+        """ScaledStdConv2dUnit Construct"""
+
         mean = ops.ReduceMean(True)(self.weight, (1, 2, 3))
         var = ops.ReduceMean(True)(ops.Square()(self.weight - mean), (1, 2, 3))
         scale = ops.Rsqrt()(ops.Maximum()(var * self.fan_in, self.eps))
         weight = (self.weight - mean) * self.gain * scale
-        return weight
-
-    def construct(self, x):
-        """ScaledStdConv2dUnit Construct"""
-        if self.inference:
-            x = self.conv2d(x, self.weight)
-        else:
-            mean = ops.ReduceMean(True)(self.weight, (1, 2, 3))
-            var = ops.ReduceMean(True)(ops.Square()(self.weight - mean), (1, 2, 3))
-            scale = ops.Rsqrt()(ops.Maximum()(var * self.fan_in, self.eps))
-            weight = (self.weight - mean) * self.gain * scale
-            x = self.conv2d(x, weight)
+        x = self.conv2d(x, weight)
         if self.has_bias:
             x = self.bias_add(x, self.bias)
         return x

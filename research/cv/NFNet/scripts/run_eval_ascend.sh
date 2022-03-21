@@ -31,5 +31,5 @@ cd ./evaluation_ascend || exit
 echo  "start training for device id $DEVICE_ID"
 env > env.log
 python ../eval.py --device_target=Ascend --device_id=$DEVICE_ID --config=$CONFIG_PATH \
---pretrained=$CHECKPOINT_PATH --inference=True > eval.log 2>&1 &
+--pretrained=$CHECKPOINT_PATH > eval.log 2>&1 &
 cd ../

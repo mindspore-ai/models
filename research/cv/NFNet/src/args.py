@@ -51,8 +51,6 @@ def parse_arguments():
     parser.add_argument("--file_format", type=str, choices=["AIR", "MINDIR"], default="MINDIR", help="file format")
     parser.add_argument("--in_channel", default=3, type=int)
     parser.add_argument("--is_dynamic_loss_scale", default=1, type=int, help="is_dynamic_loss_scale ")
-    parser.add_argument("--inference", default=False, type=ast.literal_eval,
-                        help="inference mode")
     parser.add_argument("--keep_checkpoint_max", default=20, type=int, help="keep checkpoint max num")
     parser.add_argument("--optimizer", help="Which optimizer to use", default="sgd")
     parser.add_argument("--set", help="name of dataset", type=str, default="ImageNet")

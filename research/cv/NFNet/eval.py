@@ -20,7 +20,6 @@ from mindspore import nn
 from mindspore.common import set_seed
 
 from src.args import args
-from src.models.NFNet.std_conv import ScaledStdConv2dUnit
 from src.tools.cell import cast_amp
 from src.tools.criterion import get_criterion, NetWithLoss
 from src.tools.get_misc import get_dataset, set_device, get_model, pretrained, get_train_one_step
@@ -48,10 +47,7 @@ def main():
     net_with_loss = NetWithLoss(net, criterion)
     if args.pretrained:
         pretrained(args, net)
-    for name, cell in net.cells_and_names():
-        if isinstance(cell, ScaledStdConv2dUnit):
-            cell.weight.set_data(cell.wise_normalize())
-            print(f"=> uniwise {name}'s weight for inference")
+
     data = get_dataset(args, training=False)
     batch_num = data.val_dataset.get_dataset_size()
     optimizer = get_optimizer(args, net, batch_num)
