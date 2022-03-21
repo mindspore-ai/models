@@ -14,6 +14,26 @@
 # limitations under the License.
 # ============================================================================
 
+if [ $# != 1 ] && [ $# != 5 ]
+then
+  echo "Usage: bash eval_all.sh [GROUND_TRUTH_PATH]"
+  echo "       bash eval_all.sh [GROUND_TRUTH_PATH] [FILTER_EASY](optional) [FILTER_MEDIUM](optional) [FILTER_HARD](optional) [FILTER_SUM](optional)"
+  exit 1
+fi
+
+FILTER_EASY=0
+FILTER_MEDIUM=0
+FILTER_HARD=0
+FILTER_SUM=0
+
+if [ $# = 5 ]
+then
+  FILTER_EASY=$2
+  FILTER_MEDIUM=$3
+  FILTER_HARD=$4
+  FILTER_SUM=$5
+fi
+
 root=$PWD
 save_path=$root/output/centerface/
 if [ ! -d $save_path ]
@@ -44,9 +64,8 @@ do
 done
 wait
 
-line_number=`awk 'BEGIN{hard=0;nr=0}{if($0~"Hard"){if($4>hard){hard=$4;nr=NR}}}END{print nr}' log_eval_all.txt`
-start_line_number=`expr $line_number - 3`
-end_line_number=`expr $line_number + 1`
-
-echo "The best result " >> log_eval_all.txt
-sed -n "$start_line_number, $end_line_number p" log_eval_all.txt >> log_eval_all.txt
+python ../src/find_best_checkpoint.py --result_file_path=./log_eval_all.txt \
+--filter_easy=$FILTER_EASY \
+--filter_medium=$FILTER_MEDIUM \
+--filter_hard=$FILTER_HARD \
+--filter_sum=$FILTER_SUM >> log_eval_all.txt 2>&1 &
