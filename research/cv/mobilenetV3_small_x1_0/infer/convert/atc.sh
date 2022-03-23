@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 model=$1
-/usr/local/Ascend/atc/bin/atc \
+atc \
   --model=$model \
   --framework=1 \
   --output=../data/model/mobilenetv3_small \
