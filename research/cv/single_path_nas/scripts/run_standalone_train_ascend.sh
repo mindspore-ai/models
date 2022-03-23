@@ -14,15 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 0 ]
+if [ $# != 2 ]
 then
-    echo "Usage: bash run_train.sh"
-exit 1
-fi
-
-if [ ! -f $1 ]
-then
-    echo "error: RANK_TABLE_FILE=$1 is not a file"
+    echo "Usage: bash ./scripts/run_standalone_train_ascend.sh [DEVICE_ID] [DATA_PATH]"
 exit 1
 fi
 
@@ -31,10 +25,11 @@ dataset_type='imagenet'
 
 
 ulimit -u unlimited
-export DEVICE_ID=0
+export DEVICE_ID=$1
+export DATA_PATH=$2
 export DEVICE_NUM=1
 export RANK_ID=0
 export RANK_SIZE=1
 
 echo "start training for device $DEVICE_ID"
-python train.py --device_id=$DEVICE_ID --dataset_name=$dataset_type> log 2>&1 &
+python train.py --device_id=$DEVICE_ID --data_path=$2 --dataset_name=$dataset_type --device_target="Ascend" > log 2>&1 &

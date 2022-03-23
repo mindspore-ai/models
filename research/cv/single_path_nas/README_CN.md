@@ -77,13 +77,16 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
 
   ```bash
   # 运行训练示例
-  python train.py --device_id=0 > train.log 2>&1 &
+  python train.py --device_id=0 --data_path=/imagenet/train --device_target=Ascend> train.log 2>&1 &
+
+  # 运行单卡训练示例
+  bash ./scripts/run_standalone_train_ascend.sh [DEVICE_ID] [DATA_PATH]
 
   # 运行分布式训练示例
-  bash ./scripts/run_train.sh [RANK_TABLE_FILE] imagenet
+  bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DEVICE_NUM] [DATA_PATH]
 
   # 运行评估示例
-  python eval.py --checkpoint_path ./ckpt_0 > ./eval.log 2>&1 &
+  python eval.py --checkpoint_path=./ckpt_0 --device_id=0 --device_target="Ascend" --val_data_path/imagenet/val > ./eval.log 2>&1 &
 
   # 运行推理示例
   bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
@@ -99,14 +102,14 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
 
 ## 脚本及样例代码
 
-```bash
+```text
 ├── model_zoo
   ├── scripts
-  │   ├──run_distribute_train.sh              // 分布式到Ascend的shell脚本
-  │   ├──run_distribute_train_gou.sh          // Shell script for running the GPU distributed training
-  │   ├──run_standalone_train.sh              // Shell script for running the Ascend standalone training
+  │   ├──run_distribute_train_ascend.sh              // 分布式到Ascend的shell脚本
+  │   ├──run_distribute_train_gpu.sh          // Shell script for running the GPU distributed training
+  │   ├──run_standalone_train_ascend.sh              // Shell script for running the Ascend standalone training
   │   ├──run_standalone_train_gpu.sh          // Shell script for running the GPU standalone training
-  │   ├──run_eval.sh                          // 测试脚本
+  │   ├──run_eval_ascend.sh                          // 测试脚本
   │   ├──run_eval_gpu.sh                      // Shell script for running the GPU evaluation
   │   ├──run_infer_310.sh                     // 310推理脚本
   ├── src
@@ -147,10 +150,6 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
   'weight_decay':1e-5      # 权重衰减值
   'image_height':224       # 输入到模型的图像高度
   'image_width':224        # 输入到模型的图像宽度
-  'data_path':'/data/ILSVRC2012_train/'  # 训练数据集的绝对全路径
-  'val_data_path':'/data/ILSVRC2012_val/'  # 评估数据集的绝对全路径
-  'device_target':'Ascend' # 运行设备
-  'device_id':0            # 用于训练或评估数据集的设备ID使用run_train.sh进行分布式训练时可以忽略。
   'keep_checkpoint_max':40 # 最多保存80个ckpt模型文件
   'checkpoint_path':None  # checkpoint文件保存的绝对全路径
   ```
@@ -164,7 +163,7 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
 - Ascend处理器环境运行
 
   ```bash
-  python train.py --device_id=0 > train.log 2>&1 &
+  python train.py --device_id=0 --device_target="Ascend" --data_path=/imagenet/train > train.log 2>&1 &
   ```
 
   上述python命令将在后台运行，可以通过生成的train.log文件查看结果。
@@ -174,7 +173,7 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
 - Ascend处理器环境运行
 
   ```bash
-  bash ./scripts/run_train.sh [RANK_TABLE_FILE] imagenet
+  bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DEVICE_NUM] [DATA_PATH]
   ```
 
   上述shell脚本将在后台运行分布训练。
@@ -188,9 +187,9 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
   “./ckpt_0”是保存了训练好的.ckpt模型文件的目录。
 
   ```bash
-  python eval.py --checkpoint_path ./ckpt_0 > ./eval.log 2>&1 &
+  python eval.py --checkpoint_path=./ckpt_0 --device_id=0 --device_target="Ascend" --val_data_path=/imagenet/val > ./eval.log 2>&1 &
   OR
-  bash ./scripts/run_eval.sh
+  bash ./scripts/run_eval_ascend.sh [DEVICE_ID] [DATA_PATH] [CKPT_FILE/CKPT_DIR]
   ```
 
 ## 导出过程

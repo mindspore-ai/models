@@ -13,50 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
-
-if [ $# != 0 ] && [ $# != 1 ]
+if [ $# -lt 3 ]
 then
-  echo "Usage: bash run_distribute_train_gpu.sh [TRAIN_DATASET](optional)"
-  exit 1
+    echo "Usage: bash ./scripts/run_distributed_train_gpu.sh [CUDA_VISIBLE_DEVICES] [DEVICE_NUM] [DATA_PATH]"
+exit 1
 fi
 
-if [ $# == 1 ] && [ ! -d $1 ]
-then
-  echo "error: TRAIN_DATASET=$1 is not a directory"
-  exit 1
-fi
+dataset_name="imagenet"
+export RANK_SIZE=$1
+export DEVICE_NUM=$2
+export CUDA_VISIBLE_DEVICES=$1
+DATA_PATH=$3
 
-ulimit -u unlimited
+mpirun -n ${DEVICE_NUM} --allow-run-as-root --output-filename log_output \
+--merge-stderr-to-stdout python train.py \
+--device_target="GPU" --dataset_name=$dataset_name \
+--data_path=$DATA_PATH > log.txt 2>&1 &
 
-rm -rf ./train_parallel
-mkdir ./train_parallel
-cp ./*.py ./train_parallel
-cp -r ./src ./train_parallel
-cd ./train_parallel || exit
-env > env.log
-
-if [ $# == 0 ]
-then
-  mpirun -n 8 \
-    --allow-run-as-root \
-    --output-filename 'log_output' \
-    --merge-stderr-to-stdout \
-    python ./train.py \
-      --use_gpu_distributed=1 \
-      --device_target='GPU' \
-      --lr_init=1.5 > log.txt 2>&1 &
-fi
-
-if [ $# == 1 ]
-then
-  mpirun -n 8 \
-    --allow-run-as-root \
-    --output-filename 'log_output' \
-    --merge-stderr-to-stdout \
-    python ./train.py \
-      --use_gpu_distributed=1 \
-      --device_target='GPU' \
-      --data_path="$1" \
-      --lr_init=1.5 > log.txt 2>&1 &
-fi

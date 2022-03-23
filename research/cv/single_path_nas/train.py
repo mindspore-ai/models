@@ -74,15 +74,11 @@ if __name__ == '__main__':
                         help='dataset name.')
     parser.add_argument('--filter_prefix', type=str, default='huawei',
                         help='filter_prefix name.')
-    parser.add_argument('--lr_init', type=float, default=None,
-                        help='Override the learning rate value in the configuration file')
-    parser.add_argument('--device_id', type=int, default=None,
+    parser.add_argument('--device_id', type=int, default=0,
                         help='device id of Ascend. (Default: None)')
-    parser.add_argument('--device_target', type=str, choices=['Ascend', 'GPU'],
-                        default=None, help='Target device: Ascend or GPU')
-    parser.add_argument('--use_gpu_distributed', type=int, default=0,
-                        help='Enable distributed GPU training.')
-    parser.add_argument('--data_path', type=str, default=None,
+    parser.add_argument('--device_target', type=str, choices=['Ascend', 'GPU'], required=True,
+                        default="Ascend", help='Target device: Ascend or GPU')
+    parser.add_argument('--data_path', type=str, default=None, required=True,
                         help='Path to the training dataset (e.g. "/datasets/imagenet/train/")')
 
     args_opt = parser.parse_args()
@@ -92,32 +88,20 @@ if __name__ == '__main__':
     else:
         raise ValueError("Unsupported dataset.")
 
-    if args_opt.data_path is not None:
-        cfg.data_path = args_opt.data_path
-
-    # set context
-    if args_opt.device_target is not None:
-        cfg.device_target = args_opt.device_target
-
-    if args_opt.lr_init is not None:
-        cfg.lr_init = args_opt.lr_init
-
-    device_target = cfg.device_target
+    device_target = args_opt.device_target
 
     # We enabling the graph kernel only for the Ascend device.
-    enable_graph_kernel = (device_target == 'Ascend')
+    # enable_graph_kernel = (device_target == 'Ascend')
+    enable_graph_kernel = False
 
-    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target,
+    context.set_context(mode=context.GRAPH_MODE, device_target=device_target,
                         enable_graph_kernel=enable_graph_kernel)
 
-    device_num = int(os.environ.get("DEVICE_NUM", 1))
+    device_num = int(os.environ.get("DEVICE_NUM", "1"))
 
     rank = 0
     if device_target == "Ascend":
-        if args_opt.device_id is not None:
-            context.set_context(device_id=args_opt.device_id)
-        else:
-            context.set_context(device_id=cfg.device_id)
+        context.set_context(device_id=args_opt.device_id)
 
         if device_num > 1:
             context.reset_auto_parallel_context()
@@ -128,7 +112,7 @@ if __name__ == '__main__':
             rank = get_rank()
     elif device_target == "GPU":
         # Using the rank and devices number determined by the communication module.
-        if args_opt.use_gpu_distributed == 1:
+        if device_num > 1:
             init('nccl')
             device_num = get_group_size()
             rank = get_rank()
@@ -136,9 +120,6 @@ if __name__ == '__main__':
             context.set_auto_parallel_context(device_num=device_num,
                                               parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
-        else:
-            device_num = 1
-
     else:
         raise ValueError("Unsupported platform.")
 
@@ -146,12 +127,12 @@ if __name__ == '__main__':
 
     if args_opt.dataset_name == "imagenet":
         if device_num > 1:
-            dataset = create_dataset_imagenet(cfg.data_path, 1, num_parallel_workers=8,
+            dataset = create_dataset_imagenet(args_opt.data_path, 1, num_parallel_workers=8,
                                               device_num=device_num, rank_id=rank,
-                                              drop_reminder=dataset_drop_reminder)
+                                              drop_reminder=True)
         else:
-            dataset = create_dataset_imagenet(cfg.data_path, 1, num_parallel_workers=8,
-                                              drop_reminder=dataset_drop_reminder)
+            dataset = create_dataset_imagenet(args_opt.data_path, 1, num_parallel_workers=8,
+                                              drop_reminder=True)
     else:
         raise ValueError("Unsupported dataset.")
 
