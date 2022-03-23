@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,12 +16,10 @@
 
 import numpy as np
 
+import mindspore as ms
+import mindspore.ops as ops
 from mindspore._checkparam import Validator as validator
-from mindspore.ops import functional as F
-from mindspore.ops import operations as P
-from mindspore.ops import composite as C
 
-from mindspore.common import dtype as mstype
 from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
@@ -40,9 +38,9 @@ def _check_param_value(beta1, beta2, eps, prim_name):
     validator.check_positive_float(eps, "eps", prim_name)
 
 
-_grad_scale = C.MultitypeFuncGraph("grad_scale")
-op_mul = P.Mul()
-map_ = C.Map()
+_grad_scale = ops.MultitypeFuncGraph("grad_scale")
+op_mul = ops.Mul()
+map_ = ops.Map()
 
 
 @_grad_scale.register("Number", "Tensor")
@@ -50,22 +48,22 @@ def tensor_grad_scale(scale, grad):
     """Get grad with scale."""
     if scale == 1.0:
         return grad
-    return op_mul(grad, F.cast(scale, F.dtype(grad)))
+    return op_mul(grad, ops.cast(scale, grad.dtype))
 
 
 @_grad_scale.register("Tensor", "Tensor")
 def tensor_grad_scale_with_tensor(scale, grad):
     """Get grad with scale."""
-    return op_mul(grad, F.cast(scale, F.dtype(grad)))
+    return op_mul(grad, ops.cast(scale, grad.dtype))
 
 
 def scale_grad(gradients, reciprocal_scale):
-    gradients = map_(F.partial(_grad_scale, reciprocal_scale), gradients)
+    gradients = map_(ops.partial(_grad_scale, reciprocal_scale), gradients)
     return gradients
 
 
-_adam_opt = C.MultitypeFuncGraph("adam_opt")
-_scaler_one = Tensor(1, mstype.int32)
+_adam_opt = ops.MultitypeFuncGraph("adam_opt")
+_scaler_one = Tensor(1, ms.int32)
 
 
 @_adam_opt.register("Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Number", "Tensor", "Tensor", "Tensor",
@@ -92,22 +90,20 @@ def _update_run_op(beta1_power, beta2_power, beta1, beta2, eps, lr, weight_decay
         Tensor, the new value of v after updating.
     """
     if optim_filter:
-        # op_mul = P.Mul(), defined output
-        op_square = P.Square()
-        op_sqrt = P.Sqrt()
-        op_cast = P.Cast()
-        op_reshape = P.Reshape()
-        op_shape = P.Shape()
+        # op_mul = ops.Mul(), defined output
+        op_square = ops.Square()
+        op_sqrt = ops.Sqrt()
+        op_reshape = ops.Reshape()
 
-        param_fp32 = op_cast(param, mstype.float32)
-        m_fp32 = op_cast(m, mstype.float32)
-        v_fp32 = op_cast(v, mstype.float32)
-        gradient_fp32 = op_cast(gradient, mstype.float32)
+        param_fp32 = ops.cast(param, ms.float32)
+        m_fp32 = ops.cast(m, ms.float32)
+        v_fp32 = ops.cast(v, ms.float32)
+        gradient_fp32 = ops.cast(gradient, ms.float32)
 
-        next_m = op_mul(beta1, m_fp32) + op_mul(op_cast(F.tuple_to_array((1.0,)), mstype.float32)
+        next_m = op_mul(beta1, m_fp32) + op_mul(ops.cast(ops.tuple_to_array((1.0,)), ms.float32)
                                                 - beta1, gradient_fp32)
 
-        next_v = op_mul(beta2, v_fp32) + op_mul(op_cast(F.tuple_to_array((1.0,)), mstype.float32)
+        next_v = op_mul(beta2, v_fp32) + op_mul(ops.cast(ops.tuple_to_array((1.0,)), ms.float32)
                                                 - beta2, op_square(gradient_fp32))
 
         regulate_m = next_m / (_scaler_one - beta1_power)
@@ -118,13 +114,13 @@ def _update_run_op(beta1_power, beta2_power, beta1, beta2, eps, lr, weight_decay
             update = op_mul(weight_decay, param_fp32) + update
 
         update_with_lr = op_mul(lr, update)
-        next_param = param_fp32 - op_reshape(update_with_lr, op_shape(param_fp32))
+        next_param = param_fp32 - op_reshape(update_with_lr, ops.shape(param_fp32))
 
-        next_param = F.depend(next_param, F.assign(param, op_cast(next_param, F.dtype(param))))
-        next_param = F.depend(next_param, F.assign(m, op_cast(next_m, F.dtype(m))))
-        next_param = F.depend(next_param, F.assign(v, op_cast(next_v, F.dtype(v))))
+        next_param = ops.depend(next_param, ops.assign(param, ops.cast(next_param, param.dtype)))
+        next_param = ops.depend(next_param, ops.assign(m, ops.cast(next_m, m.dtype)))
+        next_param = ops.depend(next_param, ops.assign(v, ops.cast(next_v, v.dtype)))
 
-        return op_cast(next_param, F.dtype(param))
+        return ops.cast(next_param, param.dtype)
     return gradient
 
 
@@ -142,18 +138,18 @@ class AdamW(Optimizer):
         self.eps = Tensor(np.array([eps]).astype(np.float32))
         self.moments1 = self.parameters.clone(prefix="adam_m", init='zeros')
         self.moments2 = self.parameters.clone(prefix="adam_v", init='zeros')
-        self.hyper_map = C.HyperMap()
-        self.beta1_power = Parameter(initializer(1, [1], mstype.float32), name="beta1_power")
-        self.beta2_power = Parameter(initializer(1, [1], mstype.float32), name="beta2_power")
+        self.hyper_map = ops.HyperMap()
+        self.beta1_power = Parameter(initializer(1, [1], ms.float32), name="beta1_power")
+        self.beta2_power = Parameter(initializer(1, [1], ms.float32), name="beta2_power")
 
-        self.reciprocal_scale = Tensor(1.0 / loss_scale, mstype.float32)
+        self.reciprocal_scale = Tensor(1.0 / loss_scale, ms.float32)
         self.clip = clip
 
     def construct(self, gradients):
         lr = self.get_lr()
         gradients = scale_grad(gradients, self.reciprocal_scale)
         if self.clip:
-            gradients = C.clip_by_global_norm(gradients, 5.0, None)
+            gradients = ops.clip_by_global_norm(gradients, 5.0, None)
 
         beta1_power = self.beta1_power * self.beta1
         self.beta1_power = beta1_power
@@ -162,17 +158,17 @@ class AdamW(Optimizer):
 
         if self.is_group:
             if self.is_group_lr:
-                optim_result = self.hyper_map(F.partial(_adam_opt, beta1_power, beta2_power, \
+                optim_result = self.hyper_map(ops.partial(_adam_opt, beta1_power, beta2_power, \
                                               self.beta1, self.beta2, self.eps),
                                               lr, self.weight_decay, self.parameters, self.moments1, self.moments2,
                                               gradients, self.decay_flags, self.optim_filter)
             else:
-                optim_result = self.hyper_map(F.partial(_adam_opt, beta1_power, beta2_power, \
+                optim_result = self.hyper_map(ops.partial(_adam_opt, beta1_power, beta2_power, \
                                               self.beta1, self.beta2, self.eps, lr),
                                               self.weight_decay, self.parameters, self.moments1, self.moments2,
                                               gradients, self.decay_flags, self.optim_filter)
         else:
-            optim_result = self.hyper_map(F.partial(_adam_opt, beta1_power, beta2_power, self.beta1, self.beta2, \
+            optim_result = self.hyper_map(ops.partial(_adam_opt, beta1_power, beta2_power, self.beta1, self.beta2, \
                                           self.eps, lr, self.weight_decay),
                                           self.parameters, self.moments1, self.moments2,
                                           gradients, self.decay_flags, self.optim_filter)

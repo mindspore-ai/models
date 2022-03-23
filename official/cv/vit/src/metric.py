@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 
 import numpy as np
 
+import mindspore as ms
+import mindspore.ops as ops
 from mindspore.communication.management import GlobalComm
-from mindspore.ops import operations as P
 import mindspore.nn as nn
-import mindspore.common.dtype as mstype
 from mindspore.common.tensor import Tensor
 from mindspore.common.parameter import Parameter
 
@@ -29,14 +29,13 @@ class ClassifyCorrectWithCache(nn.Cell):
     def __init__(self, network, eval_dataset):
         super(ClassifyCorrectWithCache, self).__init__(auto_prefix=False)
         self._network = network
-        self.argmax = P.Argmax()
-        self.equal = P.Equal()
-        self.cast = P.Cast()
-        self.reduce_sum = P.ReduceSum()
-        self.allreduce = P.AllReduce(P.ReduceOp.SUM, GlobalComm.WORLD_COMM_GROUP)
-        self.assign_add = P.AssignAdd()
-        self.assign = P.Assign()
-        self._correct_num = Parameter(Tensor(0.0, mstype.float32), name="correct_num", requires_grad=False)
+        self.argmax = ops.Argmax()
+        self.equal = ops.Equal()
+        self.reduce_sum = ops.ReduceSum()
+        self.allreduce = ops.AllReduce(ops.ReduceOp.SUM, GlobalComm.WORLD_COMM_GROUP)
+        self.assign_add = ops.AssignAdd()
+        self.assign = ops.Assign()
+        self._correct_num = Parameter(Tensor(0.0, ms.float32), name="correct_num", requires_grad=False)
         # save data to parameter
         pdata = []
         plabel = []
@@ -45,11 +44,11 @@ class ClassifyCorrectWithCache(nn.Cell):
             pdata.append(batch["image"])
             plabel.append(batch["label"])
             step_num = step_num + 1
-        pdata = Tensor(np.array(pdata), mstype.float32)
-        plabel = Tensor(np.array(plabel), mstype.int32)
+        pdata = Tensor(np.array(pdata), ms.float32)
+        plabel = Tensor(np.array(plabel), ms.int32)
         self._data = Parameter(pdata, name="pdata", requires_grad=False)
         self._label = Parameter(plabel, name="plabel", requires_grad=False)
-        self._step_num = Tensor(step_num, mstype.int32)
+        self._step_num = Tensor(step_num, ms.int32)
 
     def construct(self, index):
         self._correct_num = 0
@@ -58,9 +57,9 @@ class ClassifyCorrectWithCache(nn.Cell):
             label = self._label[index]
             outputs = self._network(data)
             y_pred = self.argmax(outputs)
-            y_pred = self.cast(y_pred, mstype.int32)
+            y_pred = ops.cast(y_pred, ms.int32)
             y_correct = self.equal(y_pred, label)
-            y_correct = self.cast(y_correct, mstype.float32)
+            y_correct = ops.cast(y_correct, ms.float32)
             y_correct_sum = self.reduce_sum(y_correct)
             self._correct_num += y_correct_sum #self.assign(self._correct_num, y_correct_sum)
             index = index + 1
@@ -73,18 +72,17 @@ class ClassifyCorrectCell(nn.Cell):
     def __init__(self, network):
         super(ClassifyCorrectCell, self).__init__(auto_prefix=False)
         self._network = network
-        self.argmax = P.Argmax()
-        self.equal = P.Equal()
-        self.cast = P.Cast()
-        self.reduce_sum = P.ReduceSum()
-        self.allreduce = P.AllReduce(P.ReduceOp.SUM, GlobalComm.WORLD_COMM_GROUP)
+        self.argmax = ops.Argmax()
+        self.equal = ops.Equal()
+        self.reduce_sum = ops.ReduceSum()
+        self.allreduce = ops.AllReduce(ops.ReduceOp.SUM, GlobalComm.WORLD_COMM_GROUP)
 
     def construct(self, data, label):
         outputs = self._network(data)
         y_pred = self.argmax(outputs)
-        y_pred = self.cast(y_pred, mstype.int32)
+        y_pred = ops.cast(y_pred, ms.int32)
         y_correct = self.equal(y_pred, label)
-        y_correct = self.cast(y_correct, mstype.float32)
+        y_correct = ops.cast(y_correct, ms.float32)
         y_correct = self.reduce_sum(y_correct)
         total_correct = self.allreduce(y_correct)
         return (total_correct,)

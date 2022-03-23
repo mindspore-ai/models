@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,14 +19,13 @@ import time
 import socket
 import numpy as np
 
-from mindspore import context
+import mindspore as ms
 from mindspore import Tensor
 from mindspore.train.model import Model, ParallelMode
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.communication.management import init
 from mindspore.profiler.profiling import Profiler
-from mindspore.train.serialization import load_checkpoint
 import mindspore.dataset as ds
 
 from src.vit import get_network
@@ -100,34 +99,40 @@ def modelarts_pre_process():
     end_t = time.time()
     print('tar cost time {:.2f} sec'.format(end_t-start_t))
 
+def train_setcontext():
 
-@moxing_wrapper(pre_process=modelarts_pre_process)
-def train_net():
-    """train_net"""
     args = add_static_args(config)
     np.random.seed(args.seed)
     args.logger = get_logger(args.save_checkpoint_path, rank=local_rank)
 
-    context.set_context(device_id=device_id,
-                        mode=context.GRAPH_MODE,
-                        device_target="Ascend",
-                        save_graphs=False)
+    ms.set_context(device_id=device_id,
+                   mode=ms.GRAPH_MODE,
+                   device_target="Ascend",
+                   save_graphs=False)
 
     if args.auto_tune:
-        context.set_context(auto_tune_mode='GA')
+        ms.set_context(auto_tune_mode='GA')
     elif args.device_num == 1:
         pass
     else:
-        context.set_auto_parallel_context(device_num=device_num,
-                                          parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
-
-    if args.open_profiler:
-        profiler = Profiler(output_path="data_{}".format(local_rank))
+        ms.set_auto_parallel_context(device_num=device_num,
+                                     parallel_mode=ParallelMode.DATA_PARALLEL,
+                                     gradients_mean=True)
 
     # init the distribute env
     if not args.auto_tune and args.device_num > 1:
         init()
+
+    return args
+
+@moxing_wrapper(pre_process=modelarts_pre_process)
+def train_net():
+    """train_net"""
+
+    args = train_setcontext()
+
+    if args.open_profiler:
+        profiler = Profiler(output_path="data_{}".format(local_rank))
 
     # network
     net = get_network(backbone_name=args.backbone, args=args)
@@ -147,7 +152,7 @@ def train_net():
         print("warning!!!, no split point")
 
     if os.path.isfile(args.pretrained):
-        load_checkpoint(args.pretrained, net, strict_load=False)
+        ms.load_checkpoint(args.pretrained, net, strict_load=False)
 
     # loss
     if not args.use_label_smooth:

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,11 +17,10 @@
 import os
 import numpy as np
 
-from mindspore import context
+import mindspore as ms
 from mindspore.train.model import Model, ParallelMode
 from mindspore.communication.management import init
 from mindspore.profiler.profiling import Profiler
-from mindspore.train.serialization import load_checkpoint
 
 from src.vit import get_network
 from src.dataset import get_dataset
@@ -73,19 +72,19 @@ def eval_net():
     np.random.seed(args.seed)
     args.logger = get_logger(args.save_checkpoint_path, rank=local_rank)
 
-    context.set_context(device_id=device_id,
-                        mode=context.GRAPH_MODE,
-                        device_target="Ascend",
-                        save_graphs=False)
+    ms.set_context(device_id=device_id,
+                   mode=ms.GRAPH_MODE,
+                   device_target="Ascend",
+                   save_graphs=False)
 
     if args.auto_tune:
-        context.set_context(auto_tune_mode='GA')
+        ms.set_context(auto_tune_mode='GA')
     elif args.device_num == 1:
         pass
     else:
-        context.set_auto_parallel_context(device_num=device_num,
-                                          parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
+        ms.set_auto_parallel_context(device_num=device_num,
+                                     parallel_mode=ParallelMode.DATA_PARALLEL,
+                                     gradients_mean=True)
 
     if args.open_profiler:
         profiler = Profiler(output_path="data_{}".format(local_rank))
@@ -98,7 +97,7 @@ def eval_net():
     net = get_network(backbone_name=args.backbone, args=args)
 
     if os.path.isfile(args.pretrained):
-        load_checkpoint(args.pretrained, net, strict_load=False)
+        ms.load_checkpoint(args.pretrained, net, strict_load=False)
 
     # evaluation dataset
     eval_dataset = get_dataset(dataset_name=args.dataset_name,

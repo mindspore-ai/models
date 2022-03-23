@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,15 +22,12 @@ import glob
 import numpy as np
 import moxing as mox
 import mindspore as ms
-from mindspore import context
 from mindspore import Tensor
-from mindspore import export
 from mindspore.train.model import Model, ParallelMode
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.communication.management import init
 from mindspore.profiler.profiling import Profiler
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 import mindspore.dataset as ds
 
 from src.vit import get_network
@@ -87,11 +84,11 @@ def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
 
 
 def frozen_to_air(network, args):
-    param_dict_t = load_checkpoint(args.get("ckpt_file"))
-    load_param_into_net(network, param_dict_t)
+    param_dict_t = ms.load_checkpoint(args.get("ckpt_file"))
+    ms.load_param_into_net(network, param_dict_t)
     input_arr = Tensor(np.random.uniform(0.0, 1.0, size=[args.get("batch_size"), 3, args.get("width"), \
         args.get("height")]), ms.float32)
-    export(network, input_arr, file_name=args.get("file_name"), file_format=args.get("file_format"))
+    ms.export(network, input_arr, file_name=args.get("file_name"), file_format=args.get("file_format"))
 
 if __name__ == '__main__':
 
@@ -116,18 +113,18 @@ if __name__ == '__main__':
     config.batch_size = config.batch_size
     config.dataset_path = os.path.join(config.data_path, "train")
 
-    context.set_context(device_id=device_id,
-                        mode=context.GRAPH_MODE,
-                        device_target="Ascend",
-                        save_graphs=False)
+    ms.set_context(device_id=device_id,
+                   mode=ms.GRAPH_MODE,
+                   device_target="Ascend",
+                   save_graphs=False)
     if args_opt.auto_tune:
-        context.set_context(auto_tune_mode='GA')
+        ms.set_context(auto_tune_mode='GA')
     elif args_opt.device_num == 1:
         pass
     else:
-        context.set_auto_parallel_context(device_num=device_num,
-                                          parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
+        ms.set_auto_parallel_context(device_num=device_num,
+                                     parallel_mode=ParallelMode.DATA_PARALLEL,
+                                     gradients_mean=True)
 
     if args_opt.open_profiler:
         profiler = Profiler(output_path="data_{}".format(local_rank))
@@ -154,10 +151,10 @@ if __name__ == '__main__':
         print("warning!!!, no split point")
 
     if os.path.isfile(config.ckpt_path):
-        ckpt = load_checkpoint(config.ckpt_path)
+        ckpt = ms.load_checkpoint(config.ckpt_path)
         filter_list = [x.name for x in net.head.get_parameters()]
         filter_checkpoint_parameter_by_list(ckpt, filter_list)
-        load_param_into_net(net, ckpt)
+        ms.load_param_into_net(net, ckpt)
 
     # loss
     if not args_opt.use_label_smooth:
