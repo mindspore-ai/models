@@ -48,6 +48,7 @@ if [ -d ${ASCEND_HOME}/ascend-toolkit ]; then
     export PYTHONPATH=${TBE_IMPL_PATH}:$ASCEND_HOME/ascend-toolkit/latest/fwkacllib/python/site-packages:$PYTHONPATH
     export ASCEND_OPP_PATH=$ASCEND_HOME/ascend-toolkit/latest/opp
 else
+    export ASCEND_HOME=/usr/local/Ascend/latest/
     export PATH=$ASCEND_HOME/fwkacllib/ccec_compiler/bin:$ASCEND_HOME/fwkacllib/bin:$ASCEND_HOME/atc/ccec_compiler/bin:$ASCEND_HOME/atc/bin:$PATH
     export LD_LIBRARY_PATH=/usr/local/lib:$ASCEND_HOME/fwkacllib/lib64:$ASCEND_HOME/acllib/lib64:$ASCEND_HOME/driver/lib64:$ASCEND_HOME/atc/lib64:$LD_LIBRARY_PATH
     export TBE_IMPL_PATH=$ASCEND_HOME/opp/op_impl/built-in/ai_core/tbe
