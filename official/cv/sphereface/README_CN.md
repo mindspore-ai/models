@@ -49,7 +49,7 @@ Sphereface论文中给出了多种网络架构，本代码仅实现了其20层�
 
 # 数据集
 
-使用的数据集：[CASIA-WebFace](https://www.google.com/search?q=CASIA-WebFace&rlz=1C1GCEU_en__894__894&oq=CASIA-WebFace)
+使用的数据集：[CASIA-WebFace](<https://download.csdn.net/download/fire_light_/10291726>)
 
 - 数据集大小：4G，共10575个类、494414张250x250彩色或黑白图像
     - 训练集：3.7G，共45万张图像
@@ -474,7 +474,7 @@ sphereface网络使用LFW推理得到的结果如下:
 
 ### 推理
 
-如果您需要使用此训练模型在GPU、Ascend 910、Ascend 310等多个硬件平台上进行推理，可参考此[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/multi_platform_inference.html)。下面是操作步骤示例：
+如果您需要使用此训练模型在GPU、Ascend 910、Ascend 310等多个硬件平台上进行推理，可参考此[链接](https://www.mindspore.cn/docs/programming_guide/zh-CN/r1.6/quick_start/quick_video/inference.html?highlight=%E5%B9%B3%E5%8F%B0)。下面是操作步骤示例：
 
 - Ascend、GPU处理器环境运行
 

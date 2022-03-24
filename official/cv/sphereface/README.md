@@ -47,7 +47,7 @@ A variety of network architectures are given in the Sphereface paper. This code 
 
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 
-Dataset used: [CASIA-WebFace](https://www.google.com/search?q=CASIA-WebFace&rlz=1C1GCEU_en__894__894&oq=CASIA-WebFace)
+Dataset used: [CASIA-WebFace](https://download.csdn.net/download/fire_light_/10291726)
 
 - Dataset size：4G，494,414 250*250 colorful images in 10575 classes
     - Train：3.7G，454,000 images  
@@ -472,7 +472,7 @@ The accuracy of evaluating DenseNet121 on the test dataset of ImageNet will be a
 
 ### Inference
 
-If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/docs/programming_guide/en/master/multi_platform_inference.html). Following the steps below, this is a simple example:
+If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/docs/programming_guide/en/r1.6/quick_start/quick_video/inference.html). Following the steps below, this is a simple example:
 
 - Running on Ascend and GPU
 

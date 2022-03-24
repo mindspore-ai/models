@@ -146,6 +146,9 @@ class sphere20a(nn.Cell):
         self.fc5 = nn.Dense(512*7*6, 512, bias_init='normal')
         if not self.feature:
             self.fc6 = AngleLinear(512, self.classnum)
+        print('*'*20)
+        print(self.classnum)
+        print('*'*20)
 
     def construct(self, x):
         reshape = ops.Reshape()
