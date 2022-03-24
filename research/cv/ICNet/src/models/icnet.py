@@ -24,7 +24,7 @@ __all__ = ['ICNet']
 class ICNet(nn.Cell):
     """Image Cascade Network"""
 
-    def __init__(self, nclass=19, backbone='resnet50', pretrained_path='', istraining=True):
+    def __init__(self, nclass=19, backbone='resnet50', pretrained_path='', istraining=False):
         super(ICNet, self).__init__()
         self.conv_sub1 = nn.SequentialCell(
             _ConvBNReLU(3, 32, 3, 2),
@@ -34,7 +34,7 @@ class ICNet(nn.Cell):
         self.istraining = istraining
         self.ppm = PyramidPoolingModule()
 
-        self.backbone = SegBaseModel(root=pretrained_path)
+        self.backbone = SegBaseModel(root=pretrained_path, istraining=istraining)
 
         self.head = _ICHead(nclass)
 
@@ -228,11 +228,11 @@ class CascadeFeatureFusion24(nn.Cell):
 class SegBaseModel(nn.Cell):
     """Base Model for Semantic Segmentation"""
 
-    def __init__(self, nclass=19, backbone='resnet50', root=''):
+    def __init__(self, nclass=19, backbone='resnet50', root='', istraining=False):
         super(SegBaseModel, self).__init__()
         self.nclass = nclass
         if backbone == 'resnet50':
-            self.pretrained = get_resnet50v1b(ckpt_root=root)
+            self.pretrained = get_resnet50v1b(ckpt_root=root, istraining=istraining)
 
     def construct(self, x):
         """forwarding pre-trained network"""
