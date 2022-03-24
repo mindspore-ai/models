@@ -1,0 +1,151 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+data_path: "/cache/data"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+
+# ==============================================================================
+# options
+
+# Context options
+device_target: "GPU"
+is_train_distributed: True
+group_size: 1
+device_id: 0
+seed: 1
+
+# Model options
+model_name: "TransR"
+dim_e: 200
+dim_r: 200
+
+# Dataset options
+dataset_root: "/path/to/dataset/root"
+train_triplet_file_name: "train2id.txt"
+eval_triplet_file_name: "test2id.txt"
+filter_triplets_files_names:
+  - "train2id.txt"
+  - "valid2id.txt"
+  - "test2id.txt"
+entities_file_name: "entity2id.txt"
+relations_file_name: "relation2id.txt"
+negative_sampling_rate: 25
+train_batch_size: 453
+
+# Logging options
+train_output_dir: "train-outputs/"
+eval_output_dir: "eval-output/"
+export_output_dir: "export-output/"
+ckpt_save_interval: 5
+ckpt_save_on_master_only: True
+keep_checkpoint_max: 10
+log_interval: 100
+
+# Training options
+pre_trained: ""
+lr: 1.3333
+epochs_num: 1000
+weight_decay: 0.0
+margin: 4.0
+train_use_data_sink: False
+
+# Evaluation and export options
+ckpt_file: "/path/to/trained/checkpoint"
+file_format: "MINDIR"
+eval_use_data_sink: False
+export_batch_size: 1000
+
+---
+
+# Help description for each configuration
+
+# Context options
+device_target: "Device type which will be used for graph computations"
+is_train_distributed: "Whether the training process is distributed among several devices"
+group_size: "Number of the devices available for the distributed training"
+device_id: "Default device ID"
+
+# Model options
+model_name: "Name of the model"
+dim_e: "Size of embeddings for entities (heads/tails)."
+dim_r: "Size if embeddings for relations."
+
+# Dataset options
+dataset_root: "Path to the dataset root, containing the lists describing "
+train_triplet_file_name: "Name of the file containing the list of triplets for training."
+eval_triplet_file_name: "Name of the file containing the list of triplets for validation."
+filter_triplets_files_names: "Names of the files which will be used for filtering the evaluation triplets."
+entities_file_name: "Name of the file, containing the list of entities (heads/tails) names."
+relations_file_name: "Name of the file, containing the list of unique relations names among different entities."
+negative_sampling_rate: "The number of corrupted triplets, generated for a single triplet from the dataset."
+train_batch_size: "The batch size to be used for training"
+
+# Logging options
+train_output_dir: "Output directory, where the data from the train process will be stored."
+eval_output_dir: "Output directory, where the data from the validation process will be stored."
+export_output_dir: "Output directory, where the data from the export process will be stored."
+ckpt_save_interval: "Specifies the number epoch which must pass before saving a single checkpoint."
+ckpt_save_on_master_only: "Whether to save the checkpoints only for the process with Rank=0."
+keep_checkpoint_max: "Number of checkpoints to keep"
+log_interval: "Logging interval, epochs"
+
+# Training options
+pre_trained: "Path to the pre-trained model"
+lr: "Learning rate"
+epochs_num: "Number of the epochs"
+weight_decay: "Weight decay"
+margin: "Margin for the triplet loss"
+train_use_data_sink: "Use data sink mode during the model training."
+
+# Evaluation and export options
+ckpt_file: "Path to the checkpoint containing the weights of the trained model."
+file_format: "Format of the exported model"
+eval_use_data_sink: "Use data sink mode during the model evaluation."
+export_batch_size: "Batch size used for the exported model"
+
+---
+
+# Choices
+
+# Context options
+device_target:
+  - "GPU"
+  - "CPU"
+
+is_train_distributed:
+  - True
+  - False
+
+# Model options
+model_name:
+  - "TransE"
+  - "TransH"
+  - "TransR"
+  - "TransD"
+
+# Dataset options
+drop_reminder:
+  - True
+  - False
+
+# Logging options
+ckpt_save_on_master_only:
+  - True
+  - False
+
+# Training options
+train_use_data_sink:
+  - True
+  - False
+
+# Evaluation and export options
+file_format:
+  - "MINDIR"
+eval_use_data_sink:
+  - True
+  - False
