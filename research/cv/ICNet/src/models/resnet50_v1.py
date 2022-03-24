@@ -258,7 +258,7 @@ class Resnet50v1b(nn.Cell):
         return out
 
 
-def get_resnet50v1b(class_num=1001, ckpt_root='', pretrained=True):
+def get_resnet50v1b(class_num=1001, ckpt_root='', pretrained=True, istraining=False):
     """
     Get SE-ResNet50 neural network.
     Default : GE Theta+ version (best)
@@ -278,7 +278,7 @@ def get_resnet50v1b(class_num=1001, ckpt_root='', pretrained=True):
                         out_channels=[256, 512, 1024, 2048],
                         strides=[1, 2, 2, 2],
                         num_classes=class_num)
-
+    model.set_train(istraining)
     if pretrained and model.training:
         pretrained_ckpt = ckpt_root
         param_dict = load_checkpoint(pretrained_ckpt)
