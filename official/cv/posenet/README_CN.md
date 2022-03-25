@@ -285,13 +285,13 @@ PoseNet是剑桥大学提出的一种鲁棒、实时的6DOF（单目六自由度
 
 ### 导出
 
-在执行推理之前，需要通过export.py导出mindir文件。
+在执行推理之前，需要通过export.py导出MINDIR/AIR模型。
 
 ```shell
-python export.py --ckpt_url [CKPT_URL] --dataset [DATASET]
+python export.py --ckpt_url [CKPT_URL] --dataset [DATASET] --file_format [FILE_FORMAT]
 ```
 
-ckpt_url和dataset为必填项。
+CKPT_URL和DATASET为必填项, FILE_FORMAT默认为MINDIR，可配值MINDIR或AIR.
 
 ## 推理过程
 

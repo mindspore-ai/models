@@ -34,7 +34,7 @@ parser.add_argument('--dataset', type=str, default='KingsCollege',
                     help='Name of dataset.')
 parser.add_argument("--ckpt_url", type=str, required=True, help="Checkpoint file path.")
 parser.add_argument("--file_name", type=str, default="posenet", help="output file name.")
-parser.add_argument('--file_format', type=str, choices=["MINDIR"], default='MINDIR', help='file format')
+parser.add_argument('--file_format', type=str, choices=["MINDIR", "AIR"], default='MINDIR', help='file format')
 args = parser.parse_args()
 
 context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
