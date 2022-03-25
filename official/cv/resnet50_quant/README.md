@@ -27,7 +27,7 @@
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
-# [ResNet50 Description](#contents)
+## [ResNet50 Description](#contents)
 
 ResNet-50 is a convolutional neural network that is 50 layers deep, which can classify ImageNet image to 1000 object categories with 76% accuracy.
 
@@ -35,13 +35,13 @@ ResNet-50 is a convolutional neural network that is 50 layers deep, which can cl
 
 This is the quantitative network of ResNet50.
 
-# [Model Architecture](#contents)
+## [Model Architecture](#contents)
 
 The overall network architecture of Resnet50 is show below:
 
 [Link](https://arxiv.org/pdf/1512.03385.pdf)
 
-# [Dataset](#contents)
+## [Dataset](#contents)
 
 Dataset used: [ImageNet2012](http://www.image-net.org/)
 
@@ -49,7 +49,7 @@ Dataset used: [ImageNet2012](http://www.image-net.org/)
     - Train：1,281,167 images
     - Test： 50,000 images
 - Data format：jpeg
-   - Note：Data will be processed in dataset.py
+    - Note：Data will be processed in dataset.py
 - Download the dataset, the directory structure is as follows:
 
  ```python
@@ -58,24 +58,24 @@ Dataset used: [ImageNet2012](http://www.image-net.org/)
     └─validation_preprocess # evaluate dataset
 ```
 
-# [Features](#contents)
+## [Features](#contents)
 
 ## [Mixed Precision](#contents)
 
 The [mixed precision](https://www.mindspore.cn/docs/programming_guide/en/master/enable_mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
 For FP16 operators, if the input data type is FP32, the backend of MindSpore will automatically handle it with reduced precision. Users could check the reduced-precision operators by enabling INFO log and then searching ‘reduce precision’.
 
-# [Environment Requirements](#contents)
+## [Environment Requirements](#contents)
 
 - Hardware:Ascend
     - Prepare hardware environment with Ascend.
 - Framework
-  - [MindSpore](https://www.mindspore.cn/install/en)
+    - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-  - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-  - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
 
-# [Script description](#contents)
+## [Script description](#contents)
 
 ## [Script and sample code](#contents)
 
@@ -212,7 +212,7 @@ You can view the results through the file "acc.log". The accuracy of the test da
 'Accuracy':0.77052
 ```
 
-# [Model description](#contents)
+## [Model description](#contents)
 
 ## [Performance](#contents)
 
@@ -234,7 +234,7 @@ You can view the results through the file "acc.log". The accuracy of the test da
 | Total time                 | 8pcs: 17 hours(30 epochs with pretrained)                   |
 | Parameters (M)             | 25.5                                                        |
 | Checkpoint for Fine tuning | 197M (.ckpt file)                                           |
-| Scripts                    | [resnet50-quant script](https://gitee.com/mindspore/models/tree/master/official/cv/resnet50_quant) |
+| Scripts                    | [resnet50-quant script](https://gitee.com/mindspore/models/tree/r1.6/official/cv/resnet50_quant) |
 
 ### Inference Performance
 
@@ -250,10 +250,10 @@ You can view the results through the file "acc.log". The accuracy of the test da
 | Accuracy            | ACC1[76.57%] ACC5[92.90%]   |
 | Model for inference | 197M (.ckpt file)           |
 
-# [Description of Random Situation](#contents)
+## [Description of Random Situation](#contents)
 
 In dataset.py, we set the seed inside “create_dataset" function. We also use random seed in train.py.
 
-# [ModelZoo Homepage](#contents)
+## [ModelZoo Homepage](#contents)
 
 Please check the official [homepage](https://gitee.com/mindspore/models).
