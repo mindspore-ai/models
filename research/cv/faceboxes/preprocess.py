@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ def write2list(data_dir, go, output_path, is_train):
                 for file in items_deeper[2]:
                     with open(output_path, 'a') as fw:
                         if is_train:
-                            fw.write(file_dir + '/' + file + file.split('.')[0] + '\n')
+                            fw.write(file_dir + '/' + file + ' ' + file.split('.')[0] + '\n')   # adding  + ' '
                         else:
                             fw.write(file_dir + '/' + file + '\n')
 

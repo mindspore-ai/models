@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -56,13 +56,13 @@ faceboxes_config = {
     'gamma': 0.1,
 
     # ---------------- val ----------------
-    'val_model': '../train/rank0/ckpt_0/FaceBoxes-300_402.ckpt',
-    'val_dataset_folder': '../data/widerface/val/',
+    'val_model': './data/widerface/train/rank0/ckpt_0/FaceBoxes-300_1609.ckpt',
+    'val_dataset_folder': './data/widerface/val/',
     'val_origin_size': True,
     'val_confidence_threshold': 0.05,
     'val_nms_threshold': 0.4,
     'val_iou_threshold': 0.5,
     'val_save_result': False,
     'val_predict_save_folder': './widerface_result',
-    'val_gt_dir': '../data/widerface/val/ground_truth',
+    'val_gt_dir': './data/widerface/val/ground_truth',
 }
