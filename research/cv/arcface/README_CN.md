@@ -44,6 +44,8 @@
 python src/rec2jpg_dataset.py --include rec/dataset/path --output output/path
 ```
 
+注意：在arm环境中，需源码编译[mxnet](https://mxnet.apache.org/versions/1.9.0/get_started/build_from_source.html)才能正常运行。
+
 # 环境要求
 
 - 硬件：昇腾处理器（Ascend）
@@ -338,4 +340,4 @@ bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TAR
 
 # ModelZoo主页  
 
- 请浏览官网[主页](https://gitee.com/mindspore/models)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。
