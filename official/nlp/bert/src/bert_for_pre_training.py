@@ -813,6 +813,18 @@ class BertNetworkMatchBucket(nn.Cell):
             bucket_list = [seq_length]
         self.bucket_list = [bucket for bucket in bucket_list if bucket <= seq_length]
 
+        if network.reducer_flag:
+            reuse_attr = 'reuse_communication_node'
+            if not network.grad_reducer.split_fusion:
+                hccl_op = network.grad_reducer.allreduce
+                network.grad_reducer.allreduce = hccl_op.add_prim_attr(reuse_attr, getattr(hccl_op, 'fusion'))
+            else:
+                new_op_list = []
+                for hccl_op in network.grad_reducer.op_list:
+                    new_op = hccl_op.add_prim_attr(reuse_attr, getattr(hccl_op, 'fusion'))
+                    new_op_list.append(new_op)
+                network.grad_reducer.op_list = new_op_list
+
     def construct(self,
                   input_ids,
                   input_mask,
