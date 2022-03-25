@@ -94,7 +94,6 @@
 | 计算机视觉（CV） | 文本识别（Scene Text Recognition）  |[CNN+CTC](https://gitee.com/mindspore/models/tree/r1.6/official/cv/cnnctc) |  ✅ |   |  |
 | 计算机视觉（CV） | 文本识别（Scene Text Recognition）  |[CRNN-Seq2Seq-OCR](https://gitee.com/mindspore/models/tree/r1.6/official/cv/crnn_seq2seq_ocr) | ✅ |   |   |
 | 计算机视觉（CV） | 文本识别（Scene Text Recognition）  |[WarpCTC](https://gitee.com/mindspore/models/tree/r1.6/official/cv/warpctc) | ✅ |   |   |
-| 计算机视觉（CV） | 缺陷检测（Defect Detection）  |[PatchCore](https://gitee.com/mindspore/models/tree/r1.6/official/cv/patchcore) | ✅ |   |   |
 | 计算机视觉（CV） | 缺陷检测（Defect Detection）  |[ssim-ae](https://gitee.com/mindspore/models/tree/r1.6/official/cv/ssim-ae) | ✅ |   |   |
 | 计算机视觉（CV） | 人脸检测（Face Detection）  | [RetinaFace-ResNet50](https://gitee.com/mindspore/models/tree/r1.6/official/cv/retinaface_resnet50) | ✅ | ✅ |  |
 | 计算机视觉（CV） | 人脸检测（Face Detection）  | [CenterFace](https://gitee.com/mindspore/models/tree/r1.6/official/cv/centerface) | ✅ |   |   |
