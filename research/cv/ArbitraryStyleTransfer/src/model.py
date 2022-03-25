@@ -47,6 +47,7 @@ class style_transfer_model(nn.Cell):
         super(style_transfer_model, self).__init__()
         self.style_prediction_network = networks.style_prediction_network(args, style_dim=style_dim)
         self.style_transfer_network = networks.style_transfer_network(args, style_dim=style_dim)
+        self.concat_ops = ops.Concat(axis=0)
 
     def construct(self, content_img, style_feat):
         """construct"""
@@ -66,6 +67,10 @@ class style_transfer_model(nn.Cell):
         stylied_img_6 = self.style_transfer_network(content_img, style_vector_1 * 0.0 + style_vector_2 * 1.0)
         out = [stylied_img_1, stylied_img_2, stylied_img_3, stylied_img_4, stylied_img_5, stylied_img_6]
         return out
+    def construct_interpolation_310(self, content_img, style_feat_1, style_feat_2):
+        """construct_interpolation for 310"""
+        out = self.construct_interpolation(content_img, style_feat_1, style_feat_2)
+        return self.concat_ops(out)
 
 
 class TrainOnestepStyleTransfer(nn.Cell):

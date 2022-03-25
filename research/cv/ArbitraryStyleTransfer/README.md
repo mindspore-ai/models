@@ -9,6 +9,7 @@
     - [Script and Sample Code](#script-and-sample-code)
     - [Script Parameters](#script-parameters)
     - [Training Process](#training-process)
+    - [Ascend310 Inference Process](#ascend310-inference-process)
 - [Model Description](#model-description)
         - [Performance](#performance)
         - [Training Performance](#training-performance)  
@@ -104,7 +105,9 @@ style transfer
  └─ inceptionv3py # inception-v3 network define  
 ├─ output #result
 ├─ test.py # generate style transfer images
-└─ train.py # train script
+├─ train.py # train
+├─ export_for_310.py # export model for 310 infer
+└─ ascend310_infer # 310 main
 ```
 
 ## [Script Parameters](#contents)
@@ -137,6 +140,27 @@ bash ./scripts/run_eval.sh [PLATFORM] [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [I
 ### [Evaluation result](#content)
 
 Evaluation result will be stored in the output. Under this, you can find style transfer pictures.
+
+## [Ascend310 Inference Process](#contents)
+
+### Export MINDIR file
+
+```bash
+python  export_for_310.py --ckpt_file [/path/to/ckpt_file] --inception_ckpt [/path/to/inception_ckpt]
+```
+
+### Ascend310 Inference
+
+- Run `run_infer_310.sh` for Ascend310 inference.
+
+```bash
+# infer
+bash run_infer_310.sh [MINDIR_PATH] [CONTENT_PATH] [STYLE_PATH] [DEVICE_ID]
+# example
+bash run_infer_310.sh ./style_transfer_model.mindir ./content_test/ ./style_test/ 0
+```
+
+Stylized pictures will be stored in the postprocess_Result path.
 
 # [Model Description](#contents)
 
