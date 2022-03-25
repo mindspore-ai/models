@@ -24,7 +24,7 @@
 
 <!-- /TOC -->
 
-# [Model description](#contents)
+## [Model description](#contents)
 
 ## [Overview](#contents)
 
@@ -44,7 +44,7 @@ The overall network architecture of VGG16 is as follows:
 Pre-trained model:
 [Link](https://download.mindspore.cn/model_zoo/r1.3/vgg16_bn_ascend_v130_imagenet2012_official_cv_bs64_top1acc74.33__top5acc92.1/)
 
-# [Dataset](#contents)
+## [Dataset](#contents)
 
 ## [Download the dataset, and divide the training set and test set](#contents)
 
@@ -64,7 +64,7 @@ python ./src/dividing_label.py --config_path=~/config_single_gpu.yaml
     - Test set: 25,597 images
 - Data format: JEPG image
 
-# [Environmental requirements](#contents)
+## [Environmental requirements](#contents)
 
 - Hardware (GPU)
     - Prepare GPU processor to build the hardware environment.
@@ -74,7 +74,7 @@ python ./src/dividing_label.py --config_path=~/config_single_gpu.yaml
     - [MindSpore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
-# [Quick start](#contents)
+## [Quick start](#contents)
 
 After installing MindSpore through the official website, you can follow the steps below to train and evaluate:
 
@@ -94,7 +94,7 @@ bash ./scripts/run_eval_gpu.sh
 
 ```
 
-# [Script description](#contents)
+## [Script description](#contents)
 
 ## [Script and sample code](#contents)
 
@@ -225,10 +225,10 @@ SRCC: 0.63
 | Fine-tuning checkpoints | 1GB (.ckpt file)                                            |
 | Configuration file      | /cv/nima_vgg16/config_dist_8_gpu.yaml                       |
 
-# [Random description](#contents)
+## [Random description](#contents)
 
 Random.seed(10) is set in `dividing_label.py`, and set_seed(10) is also set in `train.py`.
 
-# [ModelZoo homepage](#contents)
+## [ModelZoo homepage](#contents)
 
-Please visit the official website [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo)
+Please visit the official website [homepage](https://gitee.com/mindspore/models)
