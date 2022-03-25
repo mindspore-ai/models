@@ -32,19 +32,17 @@
 
 [原论文](https://arxiv.org/abs/2006.07491): Mohamed Yousef, Tom E. Bishop, "OrigamiNet: Weakly-Supervised, Segmentation-Free, One-Step, Full Page Text Recognition by learning to unfold, " arXiv:2006.07491
 
-# 模型架构
+## 模型架构
 
 示例：在MindSpore上使用自制初高中作文数据集基于预训练模型训练出模型进行作文整篇识别
 
-# 数据集
+## 数据集
 
-[训练样例数据及字符集文件](https://pan.baidu.com/s/1_Nv3lMxZpfxUjRoqoDs8Tghwdb)
-
-提取码：hwdb
+[训练样例数据及字符集文件](https://github.com/IntuitionMachines/OrigamiNet#IAM)
 
 下载解压后将/data_set文件夹放在项目根目录下，将alph.gc放在项目的parameters/文件夹中
 
-# 环境要求
+## 环境要求
 
 - 硬件 (GPU)
     - 使用GPU来搭建硬件环境
@@ -170,3 +168,7 @@ bash run_eval.sh [TEST_DATA_DIR] [DEVICE_TARGET]
 | 输出             | nCER                         |
 | 准确率            | 0.146937                     |
 | 推理模型 | 10.59M (.ckpt文件)          |
+
+## ModelZoo主页
+
+请浏览官网[主页](https://gitee.com/mindspore/models)。
