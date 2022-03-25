@@ -42,8 +42,12 @@ if __name__ == '__main__':
     root_dir = os.path.abspath(args.dataset_path)
     e = ExperimentOTB(root_dir, version=2013)
     e.run(tracker, visualize=False)
-    prec_score, succ_score, succ_rate = e.report([tracker.name])
-    ss = '-prec_score:%.3f -succ_score:%.3f -succ_rate:%.3f' % (float(prec_score),
-                                                                float(succ_score),
-                                                                float(succ_rate))
-    print(args.model_path.split('/')[-1], ss)
+    prec_score = e.report(['SiamFC'])['SiamFC']['overall']
+    score = ['success_score', 'precision_score', 'success_rate']
+    mydic = []
+    for key in score:
+        mydic.append(prec_score[key])
+    ss = '-prec_score:%.3f -succ_score:%.3f -succ_rate:%.3f' % (float(mydic[1]),
+                                                                float(mydic[0]),
+                                                                float(mydic[2]))
+    print(ss)
