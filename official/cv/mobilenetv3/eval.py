@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,10 +16,8 @@
 eval.
 """
 import argparse
-from mindspore import context
+import mindspore as ms
 from mindspore import nn
-from mindspore.train.model import Model
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.dataset import create_dataset
 from src.dataset import create_dataset_cifar
 from src.config import config_gpu
@@ -38,8 +36,8 @@ if __name__ == '__main__':
     config = None
     if args_opt.device_target == "GPU":
         config = config_gpu
-        context.set_context(mode=context.GRAPH_MODE,
-                            device_target="GPU", save_graphs=False)
+        ms.set_context(mode=ms.GRAPH_MODE,
+                       device_target="GPU", save_graphs=False)
         dataset = create_dataset(dataset_path=args_opt.dataset_path,
                                  do_train=False,
                                  config=config,
@@ -47,8 +45,8 @@ if __name__ == '__main__':
                                  batch_size=config.batch_size)
     elif args_opt.device_target == "CPU":
         config = config_cpu
-        context.set_context(mode=context.GRAPH_MODE,
-                            device_target="CPU", save_graphs=False)
+        ms.set_context(mode=ms.GRAPH_MODE,
+                       device_target="CPU", save_graphs=False)
         dataset = create_dataset_cifar(dataset_path=args_opt.dataset_path,
                                        do_train=False,
                                        batch_size=config.batch_size)
@@ -61,10 +59,10 @@ if __name__ == '__main__':
     step_size = dataset.get_dataset_size()
 
     if args_opt.checkpoint_path:
-        param_dict = load_checkpoint(args_opt.checkpoint_path)
-        load_param_into_net(net, param_dict)
+        param_dict = ms.load_checkpoint(args_opt.checkpoint_path)
+        ms.load_param_into_net(net, param_dict)
     net.set_train(False)
 
-    model = Model(net, loss_fn=loss, metrics={'acc'})
+    model = ms.Model(net, loss_fn=loss, metrics={'acc'})
     res = model.eval(dataset)
     print("result:", res, "ckpt=", args_opt.checkpoint_path)

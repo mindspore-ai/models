@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ mobilenetv3 export mindir.
 """
 import argparse
 import numpy as np
-from mindspore import context, Tensor, load_checkpoint, load_param_into_net, export
+import mindspore as ms
 from src.config import config_gpu
 from src.config import config_cpu
 from src.config import config_ascend
@@ -35,20 +35,20 @@ if __name__ == '__main__':
     cfg = None
     if args_opt.device_target == "GPU":
         cfg = config_gpu
-        context.set_context(mode=context.GRAPH_MODE, device_target="GPU")
+        ms.set_context(mode=ms.GRAPH_MODE, device_target="GPU")
     elif args_opt.device_target == "CPU":
         cfg = config_cpu
-        context.set_context(mode=context.GRAPH_MODE, device_target="CPU")
+        ms.set_context(mode=ms.GRAPH_MODE, device_target="CPU")
     elif args_opt.device_target == "Ascend":
         cfg = config_ascend
-        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
+        ms.set_context(mode=ms.GRAPH_MODE, device_target="Ascend")
     else:
         raise ValueError("Unsupported device_target.")
 
     net = mobilenet_v3_large(num_classes=cfg.num_classes, activation="Softmax")
 
-    param_dict = load_checkpoint(args_opt.checkpoint_path)
-    load_param_into_net(net, param_dict)
+    param_dict = ms.load_checkpoint(args_opt.checkpoint_path)
+    ms.load_param_into_net(net, param_dict)
     input_shp = [1, 3, cfg.image_height, cfg.image_width]
-    input_array = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp).astype(np.float32))
-    export(net, input_array, file_name=args_opt.file_name, file_format=args_opt.file_format)
+    input_array = ms.Tensor(np.random.uniform(-1.0, 1.0, size=input_shp).astype(np.float32))
+    ms.export(net, input_array, file_name=args_opt.file_name, file_format=args_opt.file_format)
