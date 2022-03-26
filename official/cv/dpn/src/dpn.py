@@ -13,6 +13,7 @@
 # limitations under the License.
 # ============================================================================
 from collections import OrderedDict
+import mindspore as ms
 import mindspore.nn as nn
 import mindspore.ops.operations as F
 
@@ -54,9 +55,14 @@ class BottleBlock(nn.Cell):
         self.bn1 = nn.BatchNorm2d(in_chs, eps=1e-3, momentum=0.9)
         self.conv1 = nn.Conv2d(in_chs, num_1x1_a, 1, stride=1)
         self.bn2 = nn.BatchNorm2d(num_1x1_a, eps=1e-3, momentum=0.9)
-        self.conv2 = nn.CellList()
-        for _ in range(G):
-            self.conv2.append(nn.Conv2d(num_1x1_a // G, num_3x3_b // G, 3, key_stride, pad_mode='pad', padding=1))
+        if ms.context.get_context('device_target') == "Ascend":
+            self.split_conv_concat = True
+            self.conv2 = nn.CellList()
+            for _ in range(G):
+                self.conv2.append(nn.Conv2d(num_1x1_a // G, num_3x3_b // G, 3, key_stride, pad_mode='pad', padding=1))
+        else:
+            self.split_conv_concat = False
+            self.conv2 = nn.Conv2d(num_1x1_a, num_3x3_b, 3, key_stride, pad_mode='pad', padding=1, group=G)
         self.bn3 = nn.BatchNorm2d(num_3x3_b, eps=1e-3, momentum=0.9)
         self.conv3_r = nn.Conv2d(num_3x3_b, num_1x1_c, 1, stride=1)
         self.conv3_d = nn.Conv2d(num_3x3_b, inc, 1, stride=1)
@@ -71,11 +77,14 @@ class BottleBlock(nn.Cell):
         x = self.conv1(x)
         x = self.bn2(x)
         x = self.relu(x)
-        group_x = ()
-        input_x = self.split(x)
-        for i in range(self.G):
-            group_x = group_x + (self.conv2[i](input_x[i]),)
-        x = self.concat(group_x)
+        if self.split_conv_concat:
+            group_x = ()
+            input_x = self.split(x)
+            for i in range(self.G):
+                group_x = group_x + (self.conv2[i](input_x[i]),)
+            x = self.concat(group_x)
+        else:
+            x = self.conv2(x)
         x = self.bn3(x)
         x = self.relu(x)
         return (self.conv3_r(x), self.conv3_d(x))

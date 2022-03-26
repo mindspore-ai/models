@@ -15,7 +15,8 @@ enable_profiling: False
 # common options
 is_distributed: 0
 image_size: [224, 224]
-batch_size: 32
+batch_size: 32  
+# batch_size=16 on GPU
 num_parallel_workers: 4
 rank: 0
 group_size: 1
@@ -54,7 +55,7 @@ keep_checkpoint_max: 3
 # ======================================================================================
 # Eval options
 eval_data_dir: ""
-checkpoint_path: ""
+checkpoint_path: "./ckpt/"
 
 
 # export options

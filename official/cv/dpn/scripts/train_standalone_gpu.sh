@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,26 +13,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-#Usage: sh train_standalone.sh [DEVICE_ID] [DATA_DIR] [SAVE_CKPT_PATH] [EVAL_EACH_EPOCH] [PATH_CHECKPOINT]!
+#Usage: bssh train_standalone.sh [DEVICE_ID] [DATA_DIR] [SAVE_CKPT_PATH] [EVAL_EACH_EPOCH] [PATH_CHECKPOINT]!
 export DEVICE_ID=$1
 DATA_DIR=$2
 SAVE_CKPT_PATH=$3
 EVAL_EACH_EPOCH=$4
+BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
 
 if [ $# == 5 ]
 then
   PATH_CHECKPOINT=$5
 fi
-cd ../
+cd $BASE_PATH/../
 if [ $# == 4 ]
 then
         python train.py  \
         --is_distributed=0 \
+        --device_target=GPU \
         --ckpt_path=$SAVE_CKPT_PATH\
         --eval_each_epoch=$EVAL_EACH_EPOCH\
         --train_data_dir=$DATA_DIR > train_log.txt 2>&1 &
     echo "    python train.py  \
         --is_distributed=0 \
+        --device_target=GPU \
         --ckpt_path=$SAVE_CKPT_PATH\
         --eval_each_epoch=$EVAL_EACH_EPOCH\
         --train_data_dir=$DATA_DIR > train_log.txt 2>&1 &"
@@ -41,6 +44,7 @@ if [ $# == 5 ]
 then
         python train.py  \
         --is_distributed=0 \
+        --device_target=GPU \
         --ckpt_path=$SAVE_CKPT_PATH\
         --pretrained=$PATH_CHECKPOINT \
         --train_data_dir=$DATA_DIR\

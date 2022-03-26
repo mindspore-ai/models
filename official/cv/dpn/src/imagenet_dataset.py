@@ -77,10 +77,7 @@ def classification_dataset(data_dir, image_size, per_batch_size, max_epoch, rank
         >>>                               input_mode="txt", root=images_dir)
     """
     cv2.setNumThreads(0)
-    if mode == 'eval':
-        drop_remainder = False
-    else:
-        drop_remainder = True
+    drop_remainder = True
     mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
 
     std = [255 * 0.229, 255 * 0.224, 255 * 0.225]
