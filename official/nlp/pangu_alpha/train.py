@@ -149,7 +149,7 @@ def run_train(args_opt):
     # Set model property
     model_parallel_num = args_opt.op_level_model_parallel_num
     expert_parallel_num = args_opt.expert_parallel_num
-    data_parallel_num = int(device_num / model_parallel_num / expert_parallel_num)
+    data_parallel_num = int(device_num / model_parallel_num)
     batch_size = args_opt.per_batch_size * data_parallel_num
     micro_batch_interleaved = args_opt.micro_batch_interleaved
     parallel_config = TransformerOpParallelConfig(data_parallel=data_parallel_num, model_parallel=model_parallel_num,
@@ -172,10 +172,7 @@ def run_train(args_opt):
     print("===config is: ", config, flush=True)
     # Define network
     pangu_alpha = PanguAlphaModel(config=config)
-    if config.use_moe:
-        loss = CrossEntropyLoss(config.parallel_config.moe_parallel_config)
-    else:
-        loss = CrossEntropyLoss(config.parallel_config.dp_mp_config)
+    loss = CrossEntropyLoss(config.parallel_config.dp_mp_config)
     pangu_alpha_with_loss_net = MicroBatchInterleaved(PanGUAlphaWithLoss(config, pangu_alpha, loss),
                                                       micro_batch_interleaved)
     pangu_alpha_with_loss = _VirtualDatasetCell(pangu_alpha_with_loss_net)
