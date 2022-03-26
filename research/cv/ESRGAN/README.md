@@ -29,7 +29,11 @@ The ESRGAN contains a generation network and a discriminator network.
 
 Train ESRGAN Dataset used: [DIV2K](https://data.vision.ee.ethz.ch/cvl/DIV2K/)
 
-- Note: Please run the script extract_subimages.py to crop sub-images, then use the sub-images to train the model
+- Note: Before training, please modify the dataset path, align DIV2K dataset path in src/util/extract_subimages.py, and run the script:
+
+```shell
+    python src/util/extract_subimages.py
+```
 
 - Note: Data will be processed in src/dataset/traindataset.py
 
@@ -62,7 +66,10 @@ The process of training ESRGAN needs a pretrained VGG19 based on Imagenet.
 ESRGAN
 
 ├─ README.md                             # descriptions about ESRGAN
-├── scripts  
+├── scripts
+ ├─ run_distribute_train_gpu.sh              # launch GPU training(8 pcs)
+ ├─ run_eval_gpu.sh                          # launch GPU eval
+ ├─ run_stranalone_train_gpu.sh              # launch GPU training(1 pcs)
  ├─ run_distribute_train.sh              # launch ascend training(8 pcs)
  ├─ run_eval.sh                          # launch ascend eval
  └─ run_stranalone_train.sh              # launch ascend training(1 pcs)
@@ -93,18 +100,39 @@ ESRGAN
 
 ```shell
 # distributed training
+Ascend:
+
 Usage: bash run_distribute_train.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] [LRPATH] [GTPATH] [VGGCKPT] [VPSNRLRPATH] [VPSNRGTPATH] [VGANLRPATH] [VGANGTPATH]
 
 # The meaning of the parameters:  DEVICE_NUM(Number of machines) DISTRIBUTE(Whether to use multiple machines) RANK_TABLE_FILE(Machine configuration file) LRPATH(LR training data set picture location) GTPATH(HR training data set picture location) VGGCKPT(VGG19 pre-training parameter position) VPSNRLRPATH(Set5 test set LR picture position) VPSNRGTPATH(Set5 test set HR picture location) VGANLRPATH(Set14 test set LR picture position) VGANGTPATH(Set14 test set HR picture location)
 
 eg: bash run_distribute_train.sh 8 1 ./hccl_8p.json /data/DIV2K/DIV2K_train_LR_bicubic/X4_sub /data/DIV2K/DIV2K_train_HR_sub /home/HEU_535/A8/used/GAN_MD/VGG.ckpt /data/DIV2K/Set5/LRbicx4 /data/DIV2K/Set5/GTmod12 /data/DIV2K/Set14/LRbicx4 /data/DIV2K/Set14/GTmod12
 
+GPU:
+
+Usage: bash run_distribute_train_gpu.sh [DEVICE_NUM] [LRPATH] [GTPATH] [VGGCKPT] [VPSNRLRPATH] [VPSNRGTPATH] [VGANLRPATH] [VGANGTPATH]
+
+# The meaning of the parameters:  DEVICE_NUM(Number of machines) LRPATH(LR training data set picture location) GTPATH(HR training data set picture location) VGGCKPT(VGG19 pre-training parameter position) VPSNRLRPATH(Set5 test set LR picture position) VPSNRGTPATH(Set5 test set HR picture location) VGANLRPATH(Set14 test set LR picture position) VGANGTPATH(Set14 test set HR picture location)
+
+eg: bash run_distribute_train_gpu.sh 8  /data/DIV2K/DIV2K_train_LR_bicubic/X4_sub /data/DIV2K/DIV2K_train_HR_sub /home/HEU_535/A8/used/GAN_MD/VGG.ckpt /data/DIV2K/Set5/LRbicx4 /data/DIV2K/Set5/GTmod12 /data/DIV2K/Set14/LRbicx4 /data/DIV2K/Set14/GTmod12
+
 # standalone training
+Ascend:
+
 Usage: bash run_standalone_train.sh  [DEVICE_ID] [LRPATH] [GTPATH] [VGGCKPT] [VPSNRLRPATH] [VPSNRGTPATH] [VGANLRPATH] [VGANGTPATH]
 
 # The meaning of the parameters DEVICE_ID(Machine ID) LRPATH(LR training data set picture location) GTPATH(HR training data set picture location) VGGCKPT(VGG19 pre-training parameter position) VPSNRLRPATH(Set5 test set LR picture position) VPSNRGTPATH(Set5 test set HR picture position) VGANLRPATH(Set14 test set LR picture position) VGANGTPATH(Set14 test set HR picture position)
 
 eg: bash run_standalone_train.sh 0 /data/DIV2K/DIV2K_train_LR_bicubic/X4_sub /data/DIV2K/DIV2K_train_HR_sub /home/HEU_535/A8/used/GAN_MD/VGG.ckpt /data/DIV2K/Set5/LRbicx4 /data/DIV2K/Set5/GTmod12 /data/DIV2K/Set14/LRbicx4 /data/DIV2K/Set14/GTmod12
+
+GPU:
+
+Usage: bash run_standalone_train_gpu.sh  [DEVICE_ID] [LRPATH] [GTPATH] [VGGCKPT] [VPSNRLRPATH] [VPSNRGTPATH] [VGANLRPATH] [VGANGTPATH]
+
+# The meaning of the parameters DEVICE_ID(Machine ID) LRPATH(LR training data set picture location) GTPATH(HR training data set picture location) VGGCKPT(VGG19 pre-training parameter position) VPSNRLRPATH(Set5 test set LR picture position) VPSNRGTPATH(Set5 test set HR picture position) VGANLRPATH(Set14 test set LR picture position) VGANGTPATH(Set14 test set HR picture position)
+
+eg: bash run_standalone_train_gpu.sh 0  /data/DIV2K/DIV2K_train_LR_bicubic/X4_sub /data/DIV2K/DIV2K_train_HR_sub /home/HEU_535/A8/used/GAN_MD/VGG.ckpt /data/DIV2K/Set5/LRbicx4 /data/DIV2K/Set5/GTmod12 /data/DIV2K/Set14/LRbicx4 /data/DIV2K/Set14/GTmod12
+
 ```
 
 ### [Training Result](#content)
@@ -113,13 +141,21 @@ Training result will be stored in ckpt/train_parallel0/ckpt. You can find checkp
 
 ### [Evaluation Script Parameters](#content)
 
-- Run `run_eval.sh` for evaluation.
+- Run `run_eval.sh` or `run_eval_gpu.sh` for evaluation.
 
 ```bash
 # evaling
+Ascend:
+
 Usage: bash run_eval.sh [CKPT] [EVALLRPATH] [EVALGTPATH] [DEVICE_ID]
 
-eg: bash run_eval.sh ./ckpt/psnr_best.ckpt /data/DIV2K/Set5/LRbicx4 /data/DIV2K/Set5/GTmod12 0
+eg: bash run_eval.sh /ckpt/psnr_best.ckpt /data/DIV2K/Set5/LRbicx4 /data/DIV2K/Set5/GTmod12 0
+
+GPU:
+
+Usage: bash run_eval_gpu.sh [CKPT] [EVALLRPATH] [EVALGTPATH] [DEVICE_ID]
+
+eg: bash run_eval_gpu.sh /ckpt/psnr_best.ckpt /data/DIV2K/Set5/LRbicx4 /data/DIV2K/Set5/GTmod12 0
 ```
 
 ### [Evaluation result](#content)
@@ -132,20 +168,19 @@ Evaluation result will be stored in the ./result. Under this, you can find gener
 
 ### Training Performance
 
-| Parameters                 |                                                             |
-| -------------------------- | ----------------------------------------------------------- |
-| Model Version              | ESRGAN                                                      |
-| Resource                   | CentOs 8.2; Ascend 910; CPU 2.60GHz, 192cores; Memory 755G  |
-| MindSpore Version          | 1.3.0                                                       |
-| Dataset                    | DIV2K                                                       |
-| Training Parameters        | step=1000000+400000,  batch_size = 16                       |
-| Optimizer                  | Adam                                                        |
-| Loss Function              | BCEWithLogitsLoss  L1Loss VGGLoss                           |
-| outputs                    | super-resolution pictures                                   |
-| Accuracy                   | Set5 psnr 32.56, Set14 psnr 26.23                           |
-| Speed                      | 1pc(Ascend): 212,216 ms/step; 8pcs: 77,118 ms/step          |
-| Total time                 | 8pcs: 36h                                                   |
-| Checkpoint for Fine tuning | 64.86M (.ckpt file)                                         |
+| Parameters                 | Ascend 910                                                  | NVIDIA GeForce RTX 3090                        |
+| -------------------------- | ----------------------------------------------------------- |------------------------------------------------|
+| Model Version              | V1                                                          | V1                                             |
+| MindSpore Version          | 1.3.0                                                       | 1.6.0                                          |
+| Dataset                    | DIV2K                                                       | DIV2K                                          |
+| Training Parameters        | step=1000000+400000,  batch_size = 16                       | step=1000000+400000,  batch_size = 16          |
+| Optimizer                  | Adam                                                        | Adam                                           |
+| Loss Function              | BCEWithLogitsLoss  L1Loss VGGLoss                           | BCEWithLogitsLoss  L1Loss VGGLoss              |
+| outputs                    | super-resolution pictures                                   | super-resolution pictures                      |
+| Accuracy                   | Set5 psnr 32.56, Set14 psnr 26.23                           | Set5 psnr 30.37, Set14 psnr 26.51              |
+| Speed                      | 1pc(Ascend): 212,216 ms/step; 8pcs: 77,118 ms/step          | 8pcs:239ms/step + 409ms/step                   |
+| Total time                 | 8pcs: 36h                                                   |                                                |
+| Checkpoint for Fine tuning | 64.86M (.ckpt file)                                         |64.86M (.ckpt file)                             |
 | Scripts                    | [esrgan script](https://gitee.com/mindspore/models/tree/master/research/cv/ESRGAN) |
 
 # [ModelZoo Homepage](#contents)
