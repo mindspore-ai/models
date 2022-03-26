@@ -58,6 +58,7 @@ U-2-Net
  ├─  README.md # descriptions about U-2-Net
  ├─  scripts
      ├─ run_infer_310.sh        # 310 inference
+     ├─ run_distribute_gpu.sh # launch GPU training (8 GPU)
      └─ run_distribute_train.sh # launch Ascend training (8 Ascend)
  ├─ assets # save pics for README.MD
  ├─ ckpts  # save ckpt  
@@ -80,12 +81,15 @@ U-2-Net
 ### [Training Script Parameters](#contents)
 
 ```shell
-# distributed training
+# distributed training on Ascend
 cd scripts
 ./run_distribute_train.sh [/path/to/content] [/path/to/label] [/path/to/RANK_TABLE_FILE]
 
+# distributed training on GPU
+bash scripts/run_distribute_gpu.sh [/path/to/content] [/path/to/label]
+
 # standalone training
-python train.py --content_path [/path/to/content] --label_path [/path/to/label]
+bash scripts/run_standalone_train.sh [/path/to/content] [/path/to/label] [DEVICE_TARGET]
 ```
 
 ### Training Result
@@ -99,7 +103,7 @@ Training result will be stored in './ckpts'. You can find checkpoint file.
 
 ```bash
 # generate semantically segmented pictures
-python test.py --content_path [/path/to/content] &>test.log &
+python test.py --content_path [/path/to/content] --pre_trained [/path/to/ckpt_file] &>test.log &
 
 # evaling
 python eval.py --pred_dir [/path/to/pred_dir] --label_dir [/path/to/label] &>evaluation.log &
@@ -138,7 +142,7 @@ python eval.py --pred_dir [/path/to/pred_dir] --label_dir [/path/to/label] &>eva
 - Run `eval.py` to evaluate on modelarts
 
 ```bash
-#In order to run on modelars, you should place data files like this:
+#In order to run on modelarts, you should place data files like this:
 # └─  dataset
 #   ├─  pre_ckpt
 #   ├─  label_dir
@@ -150,23 +154,25 @@ python eval.py --pred_dir [/path/to/pred_dir] --label_dir [/path/to/label] &>eva
 
 ## [Training Process](#contents)
 
-### [Training](#contents)
+### [Standalone Training](#contents)
 
-- Run `run_standalone_train_ascend.sh` for non-distributed training of U-2-Net model.
+- Run `run_standalone_train.sh` for standalone training of U-2-Net model.
 
 ```bash
-# standalone training
-python train.py --content_path [/path/to/content] --label_path [/path/to/label]
+bash scripts/run_standalone_train.sh [/path/to/content] [/path/to/label] [DEVICE_TARGET]
 ```
 
 ### [Distributed Training](#contents)
 
-- Run `run_distributed_train_ascend.sh` for distributed training of U-2-Net model.
+- Run `run_distribute_train.sh` or `run_distribute_gpu.sh` for distributed training of U-2-Net model.
 
 ```bash
-# distributed training
+# run on Ascend
 cd scripts
 bash run_distribute_train.sh [/path/to/content] [/path/to/label] [/path/to/RANK_TABLE_FILE]
+
+# run on GPU
+bash scripts/run_distribute_gpu.sh [/path/to/content] [/path/to/label]
 ```
 
 - Notes
@@ -193,7 +199,7 @@ python  export.py --ckpt_file [/path/to/ckpt_file]
 
 ```bash
 # infer
-bash run_infer_310.sh [MINDIR_PATH] [CONTENT_PATH] [LABEL_PATH] [DEVICE_ID]
+bash run_infer_310.sh [/path/to/mindir] [/path/to/content] [/path/to/label] [DEVICE_ID]
 ```
 
 Semantically segmented pictures will be stored in the postprocess_Result path and the evaluation result will be stored in evaluation.log.
@@ -204,42 +210,42 @@ Semantically segmented pictures will be stored in the postprocess_Result path an
 
 ### Training Performance
 
-| Parameters                 |                                                       |
-| -------------------------- | ----------------------------------------------------- |
-| Model Version              | v1                                                    |
-| Resource                   | Red Hat 8.3.1; Ascend 910; CPU 2.60GHz; 192cores      |
-| MindSpore Version          | 1.3.0                                                 |
-| Dataset                    | DUTS-TR.                                              |
-| Training Parameters        | epoch=1500, batch_size = 16                           |
-| Optimizer                  | Adam                                                  |
-| Loss Function              | BCELoss                                               |
-| outputs                    | semantically segmented pictures                       |
-| Speed                      | 8 Ascend: 440 ms/step; 1 Ascend: 303 ms/step;         |
-| Total time                 | 8pcs: 15h                                             |
-| Checkpoint for Fine tuning | 512M (.ckpt file)                                     |
+| Parameters                 | Ascend                                                | GPU                                                   |
+| -------------------------- | ----------------------------------------------------- | ----------------------------------------------------- |
+| Model Version              | U-2-Net(Ascend)                                       | U-2-Net(GPU)                                          |
+| Resource                   | Red Hat 8.3.1; Ascend 910; CPU 2.60GHz; 192cores      | Tesla V100-PCIE 32G, CPU 2.60GHz; 52cores             |
+| MindSpore Version          | 1.3.0                                                 | 1.6.0                                                 |
+| Dataset                    | DUTS-TR.                                              | DUTS-TR.                                              |
+| Training Parameters        | epoch=1500, batch_size = 16                           | epoch=2150, batch_size = 16                           |
+| Optimizer                  | Adam                                                  | Adam                                                  |
+| Loss Function              | BCELoss                                               | BCELoss                                               |
+| outputs                    | semantically segmented pictures                       | semantically segmented pictures                       |
+| Speed                      | 8 Ascend: 440 ms/step; 1 Ascend: 303 ms/step;         | 8 GPU: 660 ms/step; 1 GPU: 450 ms/step;               |
+| Total time                 | 8pcs: 15h                                             | 8pcs: 24h                                             |
+| Checkpoint for Fine tuning | 512M (.ckpt file)                                     | 512M (.ckpt file)                                     |
 
 ### Picture Generating Performance
 
-| Parameters        | single Ascend                                    |
-| ----------------- | ------------------------------------------------ |
-| Model Version     | U-2-Net                                          |
-| Resource          | Red Hat 8.3.1; Ascend 910; CPU 2.60GHz; 192cores |
-| MindSpore Version | 1.3.0                                            |
-| Dataset           | content images                                   |
-| batch_size        | 1                                                |
-| outputs           | semantically segmented pictures                  |
-| Speed             | 95 ms/pic                                        |
+| Parameters        | single Ascend                                    | single GPU                                       |
+| ----------------- | ------------------------------------------------ | ------------------------------------------------ |
+| Model Version     | U-2-Net(Ascend)                                  | U-2-Net(GPU)                                     |
+| Resource          | Red Hat 8.3.1; Ascend 910; CPU 2.60GHz; 192cores | Tesla V100-PCIE 32G, CPU 2.60GHz; 52cores        |
+| MindSpore Version | 1.3.0                                            | 1.6.0                                            |
+| Dataset           | content images                                   | content images                                   |
+| batch_size        | 1                                                | 1                                                |
+| outputs           | semantically segmented pictures                  | semantically segmented pictures                  |
+| Speed             | 95 ms/pic                                        | 40 ms/pic                                        |
 
 ### Evaluation Performance
 
-| Parameters        | single Ascend                                    |
-| ----------------- | ------------------------------------------------ |
-| Model Version     | U-2-Net                                          |
-| Resource          | Red Hat 8.3.1; Ascend 910; CPU 2.60GHz; 192cores |
-| MindSpore Version | 1.3.0                                            |
-| Dataset           | DUTS-TE                                          |
-| batch_size        | 1                                                |
-| Accuracy          | 85.52%                                           |
+| Parameters        | single Ascend                                    | single GPU                                       |
+| ----------------- | ------------------------------------------------ | ------------------------------------------------ |
+| Model Version     | U-2-Net(Ascend)                                  | U-2-Net(GPU)                                     |
+| Resource          | Red Hat 8.3.1; Ascend 910; CPU 2.60GHz; 192cores | Tesla V100-PCIE 32G, CPU 2.60GHz; 52cores        |
+| MindSpore Version | 1.3.0                                            | 1.6.0                                            |
+| Dataset           | DUTS-TE                                          | DUTS-TE                                          |
+| batch_size        | 1                                                | 1                                                |
+| Accuracy          | 85.52%                                           | 85.37%                                           |
 
 # [Description of Random Situation](#contents)
 

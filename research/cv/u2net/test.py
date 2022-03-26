@@ -13,17 +13,16 @@
 # limitations under the License.
 # ============================================================================
 """operation to generate semantically segmented pictures"""
+import argparse
 import os
 import time
-import argparse
 
-import numpy as np
 import cv2
 import imageio
+import numpy as np
 from PIL import Image
-
-from mindspore import context
 from mindspore import Tensor
+from mindspore import context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 import src.blocks as blocks
@@ -33,7 +32,7 @@ parser.add_argument("--content_path", type=str, help='content_path, default: Non
 parser.add_argument('--pre_trained', type=str, help='model_path, local pretrained model to load')
 parser.add_argument("--output_dir", type=str, default='output_dir', help='output_path, path to store output')
 
-#additional params for online generating
+# additional params for online generating
 parser.add_argument("--run_online", type=int, default=0, help='whether train online, default: false')
 parser.add_argument("--data_url", type=str, help='path to data on obs, default: None')
 parser.add_argument("--train_url", type=str, help='output path on obs, default: None')
@@ -44,6 +43,7 @@ if __name__ == '__main__':
 
     if args.run_online:
         import moxing as mox
+
         mox.file.copy_parallel(args.data_url, "/cache/dataset")
         local_dataset_dir = "/cache/dataset/content_dir"
         pre_ckpt_dir = "/cache/dataset/pre_ckpt"
@@ -69,10 +69,8 @@ if __name__ == '__main__':
         return dn
 
 
-    def normalize(img, im_type):
+    def normalize(img):
         """normalize tensor"""
-        if im_type == "label":
-            return img
         if len(img.shape) == 3:
             img[:, :, 0] = (img[:, :, 0] - 0.485) / 0.229
             img[:, :, 1] = (img[:, :, 1] - 0.456) / 0.224
@@ -86,7 +84,7 @@ if __name__ == '__main__':
         """crop and resize tensors"""
         img = np.array(Image.open(img_path), dtype='float32')
         img = img / 255
-        img = normalize(img, im_type)
+        img = normalize(img)
         h, w = img.shape[:2]
         img = cv2.resize(img, dsize=(0, 0), fx=size / w, fy=size / h)
         if len(img.shape) == 2:
