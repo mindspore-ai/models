@@ -1,5 +1,5 @@
 """
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,6 +50,45 @@ class LossFn(nn.Cell):
 
         result = (loss + iou).mean()
         return result
+
+class BceIouLoss(nn.Cell):
+    """
+    a loss function
+    """
+    def __init__(self, batchsize):
+        super(BceIouLoss, self).__init__()
+        self.bce = nn.BCEWithLogitsLoss()
+        self.mean = ops.ReduceMean(keep_dims=False)
+        self.batchsize = batchsize
+        self.sigmoid = nn.Sigmoid()
+        self.sum = ops.ReduceSum()
+
+    def iou(self, predict, target):
+        pred = self.sigmoid(predict)
+        inter = self.sum(pred * target, (2, 3))
+        union = self.sum(pred + target, (2, 3))
+        iou = 1-(inter+1)/(union-inter+1)
+        return iou
+
+    def construct(self, predict, target):
+        iou1 = self.iou(predict[0], target)
+        bce1 = self.bce(predict[0], target)
+        loss1 = self.mean(iou1 + bce1)
+        iou2 = self.iou(predict[1], target)
+        bce2 = self.bce(predict[1], target)
+        loss2 = self.mean(iou2 + bce2)
+        iou3 = self.iou(predict[2], target)
+        bce3 = self.bce(predict[2], target)
+        loss3 = self.mean(iou3 + bce3)
+        iou4 = self.iou(predict[3], target)
+        bce4 = self.bce(predict[3], target)
+        loss4 = self.mean(iou4 + bce4)
+        iou5 = self.iou(predict[4], target)
+        bce5 = self.bce(predict[4], target)
+        loss5 = self.mean(iou5 + bce5)
+        loss_fuse = loss1 + loss2 + loss3 + loss4 + loss5
+        loss = loss_fuse / self.batchsize
+        return loss
 
 
 class BuildTrainNetwork(nn.Cell):

@@ -46,7 +46,7 @@ RAS总体网络架构如下:
 
 - DUTS-Train
     - image 10553张
-    - ground truth 10533张
+    - ground truth 10553张
 - 注：数据集在src/dataset_train.py中处理
 
 测试集
@@ -78,8 +78,8 @@ RAS总体网络架构如下:
 
 # 环境要求
 
-- 硬件：昇腾处理器（Ascend）
-    - 使用昇腾处理器来搭建硬件环境。
+- 硬件：昇腾处理器（Ascend/GPU）
+    - 使用昇腾处理器或GPU来搭建硬件环境。
 
 - 框架
   - [MindSpore](https://www.mindspore.cn/install)
@@ -101,6 +101,9 @@ RAS总体网络架构如下:
   │   ├──run_distribute_train.sh # 使用昇腾处理器进行八卡训练的shell脚本
   │   ├──run_train.sh    # 使用昇腾处理器进行单卡训练的shell脚本
   │   ├──run_eval.sh  # 使用昇腾处理器进行评估的单卡shell脚本
+  │   ├──run_distribute_train_gpu.sh # 使用GPU进行多卡训练的shell脚本
+  │   ├──run_train_gpu.sh    # 使用GPU进行单卡训练的shell脚本
+  │   ├──run_eval_gpu.sh  # 使用GPU进行评估的单卡shell脚本
   ├──src
   │   ├──dataset_train.py #创建训练数据集
   │   ├──dataset_test.py # 创建推理数据集
@@ -136,6 +139,7 @@ RAS总体网络架构如下:
 ### 用法
 
 - **注：在建立训练数据路径时，在目录最后一级创建两个文件夹images(存放训练图片),labels(存放GT);modelarts模式下无需建立目录，直接存放images.zip,labels.zip即可**
+- Ascend处理器环境运行
 
 ``` python
   - 直接使用python3在终端进行运行 ：
@@ -153,6 +157,24 @@ RAS总体网络架构如下:
         bash script/run_distribute_train.sh json_file rank_size data_url pretrained_model train_url    //多卡分布式训练
         注：json_file 为多卡训练的json_file文件路径
            rank_size 为多卡训练时需要的卡数
+```
+
+- GPU处理器环境运行
+
+  resnet50预训练模型下载路径：[https://download.mindspore.cn/model_zoo/r1.3/resnet50_gpu_v130_imagenet_official_cv_bs32_acc0/resnet50_gpu_v130_imagenet_official_cv_bs32_acc0.ckpt](https://download.mindspore.cn/model_zoo/r1.3/resnet50_gpu_v130_imagenet_official_cv_bs32_acc0/resnet50_gpu_v130_imagenet_official_cv_bs32_acc0.ckpt)
+
+``` python
+  - 直接使用python3在终端进行运行 ：
+     如：python3 -u train.py --is_modelarts NO --distribution_flag NO --device_target GPU --device_id 5 --lr 0.00005 --data_url '' --pretrained_model '' --train_url ''> output.log 2>&1 &
+         device_id 为硬件环境中的芯片ID
+         lr 为学习率
+         data_url 为训练数据路径
+         pretrained_model 为resnet50预训练模型路径
+         train_url 为输出的ckpt保存路径
+  - bash运行
+    bash script/run_train_gpu.sh device_id lr data_url pretrained_model train_url    //单卡训练
+    bash script/run_distribute_train_gpu.sh rank_size data_url pretrained_model train_url    //多卡分布式训练
+        rank_size 为多卡训练时需要的卡数
 ```
 
 ### 结果
@@ -193,6 +215,7 @@ The Consumption of per step is 0.136 s
 ### 用法
 
 - **注：在推理数据路径的最后一级目录下建立文件夹images和gts,分别将图片和groundtruth存入其中;modelarts模式下无需建立images，直接存储images.zip和gts.zip**
+- Ascend处理器环境运行
 
 ``` python
 # 推理示例
@@ -203,6 +226,19 @@ The Consumption of per step is 0.136 s
         pre_model 为网络resnet50预训练模型路径
   bash 运行
         bash script/run_eval.sh device_id data_url train_url model_path pre_model
+```
+
+- GPU处理器环境运行
+
+``` python
+# 推理示例
+  python3 -u eval.py --is_modelarts NO --device_target GPU --device_id 0 --data_url xxx --model_path xxx --pre_model xxx
+        device_id 为要进行推理的机器的ID
+        data_url  为推理数据路径
+        model_path 为训练保存的ckpt路径
+        pre_model 为网络resnet50预训练模型路径
+  bash 运行
+        bash script/run_eval_gpu.sh device_id data_url train_url model_path pre_model
 ```
 
 ### 结果
@@ -222,16 +258,16 @@ The Consumption of per step is 0.136 s
 
 ## 评估精度
 
-| 参数列表 | RAS |
-| -------------------------- | ----------------------------- |
-| 模型版本 | V1 |
-| 资源 |  Ascend 910；CPU 2.60HGHz 系统 Euler2.8  |
-| 上传日期 | 2021-11-30 |
-| MindSpore版本 | 1.5 |
-| 数据集 | ECSSD DUTS-Test  DUT-OMRON HUK-IS|
-| batch_size | 1 |
-| 输出 | 3位有效数字小数
-| F-measure | 0.921  0.820  0.749  0.907
+| 参数列表 | Ascend 910 | GPU |
+| -------------------------- | ----------------------------- | ------ |
+| 模型版本 | RAS | RAS |
+| 资源 |  Ascend 910；CPU 2.60HGHz 系统 Euler2.8  | RTX-3090 |
+| 上传日期 | 2021-11-30 | 2021-12-23 |
+| MindSpore版本 | 1.5 | 1.5 |
+| 数据集 | ECSSD DUTS-Test  DUT-OMRON HUK-IS |  ECSSD DUTS-Test  DUT-OMRON HUK-IS |
+| batch_size | 1 | 1 |
+| 输出 | 3位有效数字小数 | 3位有效数字小数 |
+| F-measure | 0.921  0.820  0.749  0.907 | 0.920 0.819 0.751 0.906 |
 
 ## 随机情况说明
 
