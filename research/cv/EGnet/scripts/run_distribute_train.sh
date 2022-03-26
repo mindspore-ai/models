@@ -43,4 +43,3 @@ do
   python -u ./train.py  --is_distributed True    > train.log 2>&1 &
   cd ../
 done
-

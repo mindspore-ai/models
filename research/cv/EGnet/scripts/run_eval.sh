@@ -14,27 +14,33 @@
 # limitations under the License.
 # ============================================================================
 cd ..
-python eval.py --test_fold='./result/ECSSD'   \
+python eval.py --device_target=Ascend   \
+      --test_fold='./result/ECSSD'      \
       --model='./EGNet/run-nnet/models/final_resnet_bone.ckpt'  \
       --sal_mode=e  \
       --base_model=resnet >test_e.log
-python eval.py --test_fold='./result/PASCAL-S'  \
+python eval.py --device_target=Ascend    \
+      --test_fold='./result/PASCAL-S'  \
       --model='./EGNet/run-nnet/models/final_resnet_bone.ckpt'  \
       --sal_mode=p  \
       --base_model=resnet >test_p.log
-python eval.py --test_fold='./result/DUT-OMRON'  \
+python eval.py --device_target=Ascend      \
+      --test_fold='./result/DUT-OMRON'  \
       --model='./EGNet/run-nnet/models/final_resnet_bone.ckpt'  \
       --sal_mode=d  \
       --base_model=resnet >test_d.log
-python eval.py --test_fold='./result/HKU-IS'  \
+python eval.py --device_target=Ascend   \
+      --test_fold='./result/HKU-IS'     \
       --model='./EGNet/run-nnet/models/final_resnet_bone.ckpt'  \
       --sal_mode=h  \
       --base_model=resnet >test_h.log
-python eval.py --test_fold='./result/SOD'  \
+python eval.py --device_target=Ascend   \
+      --test_fold='./result/SOD'           \
       --model='./EGNet/run-nnet/models/final_resnet_bone.ckpt'  \
       --sal_mode=s  \
       --base_model=resnet >test_s.log
-python eval.py --test_fold='./result/DUTS-TE'  \
+python eval.py --device_target=Ascend   \
+      --test_fold='./result/DUTS-TE'  \
       --model='./EGNet/run-nnet/models/final_resnet_bone.ckpt'  \
       --sal_mode=t  \
       --base_model=resnet >test_t.log

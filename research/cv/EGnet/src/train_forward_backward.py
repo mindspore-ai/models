@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 
 """Train forward and backward define"""
 
-from mindspore import ops, ParameterTuple
-from mindspore.nn import Cell
+from mindspore import ops
+from mindspore.nn import Cell, TrainOneStepCell
 
 _sum_op = ops.MultitypeFuncGraph("grad_sum_op")
 _clear_op = ops.MultitypeFuncGraph("clear_op")
@@ -37,19 +37,13 @@ def _clear_grad_sum(grad_sum, zero):
     return success
 
 
-class TrainForwardBackward(Cell):
+class TrainForwardBackward(TrainOneStepCell):
     """
     cell for step train
     """
     def __init__(self, network, optimizer, grad_sum, sens=1.0):
-        super(TrainForwardBackward, self).__init__(auto_prefix=False)
-        self.network = network
-        self.network.set_grad()
-        self.network.add_flags(defer_inline=True)
-        self.weights = ParameterTuple(network.trainable_params())
-        self.optimizer = optimizer
+        super(TrainForwardBackward, self).__init__(network, optimizer, sens)
         self.grad_sum = grad_sum
-        self.grad = ops.GradOperation(get_by_list=True, sens_param=True)
         self.sens = sens
         self.hyper_map = ops.HyperMap()
 
@@ -61,6 +55,7 @@ class TrainForwardBackward(Cell):
         loss = self.network(*inputs)
         sens = ops.Fill()(ops.DType()(loss), ops.Shape()(loss), self.sens)
         grads = self.grad(self.network, weights)(*inputs, sens)
+        grads = self.grad_reducer(grads)
         return ops.depend(loss, self.hyper_map(ops.partial(_sum_op), self.grad_sum, grads))
 
 
@@ -68,6 +63,7 @@ class TrainOptimize(Cell):
     """
     optimize cell
     """
+
     def __init__(self, optimizer, grad_sum):
         super(TrainOptimize, self).__init__(auto_prefix=False)
         self.optimizer = optimizer
@@ -85,6 +81,7 @@ class TrainClear(Cell):
     """
     clear cell
     """
+
     def __init__(self, grad_sum, zeros):
         super(TrainClear, self).__init__(auto_prefix=False)
         self.grad_sum = grad_sum
