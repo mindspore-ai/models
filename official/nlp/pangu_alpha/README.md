@@ -579,8 +579,16 @@ Q: `ERROR: device_num must be the power of 2`.
 A: The number of the cards must be the power of 2 if we use the parallel training. For example, if we want to train
 the 2.6B model, the number of cards should be 2, 4, 8, 16 and so on.
 
-Q: How to modify the the network's hyperparameter?
+Q: How to modify the network's hyperparameter?
 
 A: The pre-defined hyperparameter of the network is in the function `set_parse` of `src/pangu_alpha_config.py`. The
 parameter determines the layer numbers, hidden size and so on. The data parallel number is determined in `train.py` by
 `device_num / model_parallel`.
+
+Q: For Ascend devices, when training model on multi-node modes, the programs stuck for a long time?
+
+A: There are mainly two reasons:
+
+- The network is complex, so it should take such long time to compile.
+
+- For some reasons, some devices failed to compile and some devices are waiting for the failed devices. The wait time can be determined by the args `hccl_connect_time`. The value is default set to 6000 seconds. If you want to test whether the network and devices are ok, you can set it to be 1200 seconds and the layers to be 2 to see if you can see the loss.
