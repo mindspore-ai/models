@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,13 +61,14 @@ class ConvertLayer(nn.Cell):
         return tuple_resl
 
 
-class MergeLayer1(nn.Cell):  # list_k: [[64, 512, 64], [128, 512, 128], [256, 0, 256] ... ]
+class MergeLayer1(nn.Cell):
     """
     merge layer 1
     """
     def __init__(self, list_k):
         """
         initialize merge layer 1
+        @param list_k: [[64, 512, 64], [128, 512, 128], [256, 0, 256] ... ]
         """
         super(MergeLayer1, self).__init__()
         self.list_k = list_k
@@ -75,12 +76,10 @@ class MergeLayer1(nn.Cell):  # list_k: [[64, 512, 64], [128, 512, 128], [256, 0,
         for ik in list_k:
             if ik[1] > 0:
                 trans.append(nn.SequentialCell([nn.Conv2d(ik[1], ik[0], 1, 1, has_bias=False), nn.ReLU()]))
-            # Conv
             up.append(nn.SequentialCell(
                 [nn.Conv2d(ik[0], ik[2], ik[3], 1, has_bias=True, pad_mode="pad", padding=ik[4]), nn.ReLU(),
                  nn.Conv2d(ik[2], ik[2], ik[3], 1, has_bias=True, pad_mode="pad", padding=ik[4]), nn.ReLU(),
                  nn.Conv2d(ik[2], ik[2], ik[3], 1, has_bias=True, pad_mode="pad", padding=ik[4]), nn.ReLU()]))
-            # Conv |
             score.append(nn.Conv2d(ik[2], 1, 3, 1, pad_mode="pad", padding=1, has_bias=True))
         trans.append(nn.SequentialCell([nn.Conv2d(512, 128, 1, 1, has_bias=False), nn.ReLU()]))
         self.trans, self.up, self.score = nn.CellList(trans), nn.CellList(up), nn.CellList(score)
@@ -229,8 +228,6 @@ class EGNet(nn.Cell):
         for i in up_sal_final:
             tuple_up_sal_final += (i,)
 
-        # only can work in dynamic graph
-        # return tuple(up_edge), tuple(up_sal), tuple(up_sal_final)
         return tuple_up_edge, tuple_up_sal, tuple_up_sal_final
 
     def load_pretrained_model(self, model_file):

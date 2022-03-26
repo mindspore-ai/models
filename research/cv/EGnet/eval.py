@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ from model_utils.config import base_config
 from src.dataset import create_dataset
 from src.egnet import build_model
 
+
 def main(config):
     if config.eval_online:
         import moxing as mox
@@ -43,8 +44,8 @@ def main(config):
         elif config.sal_mode == "e":
             Evalname = "ECSSD"
         config.test_path = os.path.join("/cache", config.test_path)
-        local_data_url = os.path.join(config.test_path, "%s"%(Evalname))
-        local_list_eval = os.path.join(config.test_path, "%s/test.lst"%(Evalname))
+        local_data_url = os.path.join(config.test_path, "%s" % (Evalname))
+        local_list_eval = os.path.join(config.test_path, "%s/test.lst" % (Evalname))
         mox.file.copy_parallel(config.online_eval_path, local_data_url)
         mox.file.copy_parallel(os.path.join(config.online_eval_path, "test.lst"), local_list_eval)
         ckpt_path = os.path.join("/cache", os.path.dirname(config.model))
@@ -64,6 +65,7 @@ class Metric:
     """
     for metric
     """
+
     def __init__(self):
         self.epsilon = 1e-4
         self.beta = 0.3

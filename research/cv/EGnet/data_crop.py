@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import argparse
 from concurrent import futures
 import cv2
 import pandas as pd
+
 
 def crop_one(input_img_path, output_img_path):
     """
@@ -43,7 +44,7 @@ def crop(data_root, output_path):
     crop all images with thread pool
     """
     if not os.path.exists(data_root):
-        raise FileNotFoundError("data root not exist")
+        raise FileNotFoundError("data root not exist: " + data_root)
     if not os.path.exists(output_path):
         os.makedirs(output_path)
 
@@ -58,6 +59,7 @@ def crop(data_root, output_path):
         futures.wait(all_task)
     print("all done!")
 
+
 def save(data_root, output_path):
     file_list = []
     for path in os.listdir(data_root):
@@ -65,6 +67,7 @@ def save(data_root, output_path):
         file_list.append(filename)
     df = pd.DataFrame(file_list, columns=["one"])
     df.to_csv(os.path.join(output_path, "test.lst"), columns=["one"], index=False, header=False)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Crop Image to 200*200")
@@ -76,13 +79,13 @@ if __name__ == "__main__":
                         default="/home/data")
     args = parser.parse_known_args()[0]
     if args.data_name == "DUTS-TE":
-        Mask = "DUTS-TE-MASK"
+        Mask = "DUTS-TE-Mask"
         Image = "DUTS-TE-Image"
     elif args.data_name == "DUTS-TR":
         Mask = "DUTS-TR-Mask"
         Image = "DUTS-TR-Image"
     else:
-        Mask = "groud_truth_mask"
+        Mask = "ground_truth_mask"
         Image = "images"
     crop(os.path.join(args.data_root, args.data_name, Mask),
          os.path.join(args.output_path, args.data_name, Mask))

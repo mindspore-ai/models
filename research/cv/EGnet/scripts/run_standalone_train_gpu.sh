@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,5 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-cd ..
-python train.py --device_target=Ascend --base_model=vgg >train.log
+
+# Get absolute path
+get_real_path(){
+  if [ "${1:0:1}" == "/" ]; then
+    echo "$1"
+  else
+    echo "$(realpath -m $PWD/$1)"
+  fi
+}
+
+# Get current script path
+BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
+
+cd $BASE_PATH/..
+
+python train.py --device_target=GPU &>train.log &
+
+echo "The train log is at ../train.log."

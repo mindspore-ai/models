@@ -20,7 +20,6 @@ from mindspore.train import load_checkpoint
 import mindspore
 
 
-
 def vgg(cfg, i, batch_norm=False):
     """Make stage network of VGG."""
     layers = []

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,14 +24,18 @@ import numpy as np
 from model_utils.config import base_config
 from mindspore.dataset import GeneratorDataset
 from mindspore.communication.management import get_rank, get_group_size
+
 if base_config.train_online:
     import moxing as mox
+
     mox.file.shift('os', 'mox')
+
 
 class ImageDataTrain:
     """
     training dataset
     """
+
     def __init__(self, train_path=""):
         self.sal_root = train_path
         self.sal_source = os.path.join(train_path, "train_pair_edge.lst")
@@ -54,6 +58,7 @@ class ImageDataTest:
     """
     test dataset
     """
+
     def __init__(self, test_mode=1, sal_mode="e", test_path="", test_fold=""):
         if test_mode == 1:
             if sal_mode == "e":
@@ -97,7 +102,7 @@ class ImageDataTest:
 
     def __getitem__(self, item):
         image, _ = load_image_test(os.path.join(self.image_root, self.image_list[item]))
-        label = load_sal_label(os.path.join(self.test_root, self.image_list[item][0:-4]+".png"))
+        label = load_sal_label(os.path.join(self.test_root, self.image_list[item][0:-4] + ".png"))
         return image, label, item % self.image_num
 
     def save_folder(self):
@@ -109,7 +114,7 @@ class ImageDataTest:
 
 # get the dataloader (Note: without data augmentation, except saliency with random flip)
 def create_dataset(batch_size, mode="train", num_thread=1, test_mode=1, sal_mode="e", train_path="", test_path="",
-                   test_fold="", is_distributed=False):
+                   test_fold="", is_distributed=False, rank_id=0, rank_size=1):
     """
     create dataset
     """
@@ -135,7 +140,10 @@ def create_dataset(batch_size, mode="train", num_thread=1, test_mode=1, sal_mode
     return ds.batch(batch_size, drop_remainder=drop_remainder, num_parallel_workers=num_thread), dataset
 
 
-def save_img(img, path):
+def save_img(img, path, is_distributed=False):
+
+    if is_distributed and get_rank() != 0:
+        return
     range_ = np.max(img) - np.min(img)
     img = (img - np.min(img)) / range_
     img = img * 255 + 0.5
@@ -145,8 +153,7 @@ def save_img(img, path):
 
 def load_image(pah):
     if not os.path.exists(pah):
-        print("File Not Exists")
-        print(pah)
+        print("File Not Exists,", pah)
     im = cv2.imread(pah)
     in_ = np.array(im, dtype=np.float32)
     in_ -= np.array((104.00699, 116.66877, 122.67892))
@@ -163,7 +170,6 @@ def load_image_test(pah):
         pah = pah + ".png"
     else:
         pah = pah + ".jpg"
-    print("--------", pah)
     if not os.path.exists(pah):
         print("File Not Exists")
     im = cv2.imread(pah)
