@@ -100,7 +100,7 @@ def main():
     # set context
     device_id = get_device_id()
     context.set_context(mode=context.GRAPH_MODE,
-                        device_target="Ascend", save_graphs=False, device_id=device_id)
+                        device_target=config.device_target, save_graphs=False, device_id=device_id)
 
     # init model
     model = get_pose_net(config, is_train=False)

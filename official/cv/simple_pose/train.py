@@ -16,11 +16,12 @@ import os
 import time
 import numpy as np
 
-from mindspore import context, Tensor
+from mindspore import context, Tensor, Parameter
 from mindspore.context import ParallelMode
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank
 from mindspore.train import Model
 from mindspore.train.callback import TimeMonitor, LossMonitor, ModelCheckpoint, CheckpointConfig
+from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.nn.optim import Adam
 from mindspore.common import set_seed
 
@@ -123,19 +124,13 @@ def modelarts_pre_process():
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_train():
     print('batch size :{}'.format(config.TRAIN.BATCH_SIZE))
-    # distribution and context
-    context.set_context(mode=context.GRAPH_MODE,
-                        device_target="Ascend",
-                        save_graphs=False,
-                        device_id=get_device_id())
-
     if config.run_distribute:
-        rank = get_rank_id()
+        init("nccl")
+        rank = get_rank()
         device_num = get_device_num()
         context.set_auto_parallel_context(device_num=device_num,
                                           parallel_mode=ParallelMode.DATA_PARALLEL,
                                           gradients_mean=True)
-        init()
     else:
         rank = 0
         device_num = 1
@@ -145,15 +140,23 @@ def run_train():
     if rank == 0 or device_num == 1:
         rank_save_flag = True
 
-    # create
-    num_parallel_workers = 16
-    if config.run_distribute:
-        num_parallel_workers = 8
+    # distribution and context
+    if config.device_target == "GPU":
+        context.set_context(mode=context.GRAPH_MODE,
+                            device_target="GPU",
+                            save_graphs=False,
+                            device_id=get_rank_id())
+    else:
+        assert config.device_target == "Ascend"
+        context.set_context(mode=context.GRAPH_MODE,
+                            device_target="Ascend",
+                            save_graphs=False,
+                            device_id=get_rank_id())
     dataset, _ = keypoint_dataset(config,
                                   rank=rank,
                                   group_size=device_num,
                                   train_mode=True,
-                                  num_parallel_workers=num_parallel_workers)
+                                  num_parallel_workers=config.TRAIN.NUM_WORKERS)
 
     # network
     net = get_pose_net(config, True, ckpt_path=config.MODEL.PRETRAINED)
@@ -170,22 +173,30 @@ def run_train():
                        epoch_number_to_drop=config.TRAIN.LR_STEP))
     opt = Adam(net.trainable_params(), learning_rate=lr)
 
+    # resume params from checkpoint, resume from config.MODEL.PRETRAINED
+    if config.MODEL.RESUME:
+        param_dict = load_checkpoint(config.MODEL.PRETRAINED)
+        param_dict['learning_rate'] = Parameter(lr, requires_grad=False)
+        load_param_into_net(net, param_dict)
+        load_param_into_net(opt, param_dict)
+
     # callback
     time_cb = TimeMonitor(data_size=dataset_size)
-    loss_cb = LossMonitor()
+    loss_cb = LossMonitor(per_print_times=config.TRAIN.PRINT_STEP)
     cb = [time_cb, loss_cb]
-    if config.run_distribute:
+    if config.device_target == "Ascend" and config.run_distribute:
         config.ckpt_save_dir = os.path.join(config.ckpt_save_dir, str(get_rank_id()))
     if config.ckpt_save_dir and rank_save_flag:
-        config_ck = CheckpointConfig(save_checkpoint_steps=dataset_size, keep_checkpoint_max=5)
+        config_ck = CheckpointConfig(save_checkpoint_steps=dataset_size * config.TRAIN.SAVE_EPOCH,\
+            keep_checkpoint_max=config.TRAIN.KEEP_CKPT_MAX)
         ckpoint_cb = ModelCheckpoint(prefix="simplepose", directory=config.ckpt_save_dir, config=config_ck)
         cb.append(ckpoint_cb)
-        # train model
+
+    # train model
     model = Model(net_with_loss, loss_fn=None, optimizer=opt, amp_level="O2")
     epoch_size = config.TRAIN.END_EPOCH - config.TRAIN.BEGIN_EPOCH
     print('start training, epoch size = %d' % epoch_size)
-    model.train(epoch_size, dataset, callbacks=cb)
-
+    model.train(epoch_size, dataset, callbacks=cb, dataset_sink_mode=config.TRAIN.SINK_MODE)
 
 if __name__ == '__main__':
     run_train()
