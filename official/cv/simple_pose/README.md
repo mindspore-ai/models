@@ -120,11 +120,11 @@ In the example above, we put COCO2017 dataset in `../<ROOT>`.
 
 - running on local Ascend
 
-    To train the model on Ascend, run the shell script `scripts/train_ascend_standalone.sh` with the format below:
+    To train the model on Ascend, run the shell script `scripts/run_standalone_train.sh` with the format below:
 
     ```shell
-    bash scripts/train_ascend_standalone.sh [CKPT_SAVE_DIR] [DEVICE_ID] [BATCH_SIZE]
-    # example: bash scripts/train_ascend_standalone.sh ./ckpt/ascend_standalone 0 128
+    bash scripts/run_standalone_train.sh [CKPT_SAVE_DIR] [DEVICE_ID] [BATCH_SIZE]
+    # example: bash scripts/run_standalone_train.sh ./ckpt/ascend_standalone 0 128
     ```
 
     **Notice:** `[CKPT_SAVE_DIR]` is the relative path to `<ROOT>`.
@@ -138,20 +138,20 @@ In the example above, we put COCO2017 dataset in `../<ROOT>`.
     # Modify according to local path
     ```
 
-    Then, run the shell script `scripts/eval_ascend.sh` with the format below:
+    Then, run the shell script `scripts/run_eval.sh` with the format below:
 
     ```shell
-    bash scripts/eval_ascend.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [DEVICE_ID]
-    # example: bash scripts/eval_ascend.sh ./ckpt/ascend_standalone/simplepose-140_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
+    bash scripts/run_eval.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [DEVICE_ID]
+    # example: bash scripts/run_eval.sh ./ckpt/ascend_standalone/simplepose-140_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
     ```
 
 - running on local GPU
 
-    To train the model on GPU, run the shell script `scripts/train_gpu_standalone.sh` with the format below:
+    To train the model on GPU, run the shell script `scripts/run_standalone_train_gpu.sh` with the format below:
 
     ```shell
-    bash scripts/train_gpu_standalone.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
-    # example: bash scripts/train_gpu_standalone.sh ./ckpt/gpu_standalone/ 64 185 0
+    bash scripts/run_standalone_train_gpu.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+    # example: bash scripts/run_standalone_train_gpu.sh ./ckpt/gpu_standalone/ 64 185 0
     ```
 
     **Notice:** `[CKPT_SAVE_DIR]` is the relative path to `<ROOT>`.
@@ -165,11 +165,11 @@ In the example above, we put COCO2017 dataset in `../<ROOT>`.
     # Modify according to local path
     ```
 
-    Then, run the shell script `scripts/eval_gpu.sh` with the format below:
+    Then, run the shell script `scripts/run_eval_gpu.sh` with the format below:
 
     ```shell
-    bash scripts/eval_gpu.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
-    # example: bash scripts/eval_gpu.sh ./ckpt/gpu_standalone/simplepose-185_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
+    bash scripts/run_eval_gpu.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+    # example: bash scripts/run_eval_gpu.sh ./ckpt/gpu_standalone/simplepose-185_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
     ```
 
 - running on ModelArts
@@ -231,12 +231,13 @@ The structure of the files in this repository is shown below.
 ```text
 └─ simple_pose
     ├─ scripts
-    │  ├─ eval_ascend.sh                 // launch ascend evaluation
-    │  ├─ eval_gpu.sh                 // launch gpu standalone evaluation
-    │  ├─ train_ascend_distributed.sh    // launch ascend distributed training
-    │  ├─ train_ascend_standalone.sh     // launch ascend standalone training
-    │  ├─ train_gpu_distributed.sh    // launch gpu distributed training
-    │  └─ train_gpu_standalone.sh     // launch gpu standalone training
+    │  ├─ run_eval.sh                 // launch ascend evaluation
+    │  ├─ run_eval_gpu.sh                 // launch gpu standalone evaluation
+    │  ├─ run_distribute_train.sh    // launch ascend distributed training
+    │  ├─ run_standalone_train.sh     // launch ascend standalone training
+    │  ├─ run_distribute_train_gpu.sh    // launch gpu distributed training
+    │  ├─ run_standalone_train_gpu.sh     // launch gpu standalone training
+    │  └─ run_infer_310.sh
     ├─ src
     │  ├─ utils
     │  │  ├─ transform.py         // utils about image transformation
@@ -337,11 +338,11 @@ TEST:
 
 #### Running on Ascend
 
-Run `scripts/train_ascend_standalone.sh` to train the model standalone. The usage of the script is:
+Run `scripts/run_standalone_train.sh` to train the model standalone. The usage of the script is:
 
 ```shell
-bash scripts/train_ascend_standalone.sh [CKPT_SAVE_DIR] [DEVICE_ID] [BATCH_SIZE]
-# example: bash scripts/train_ascend_standalone.sh ./ckpt/ascend_standalone 0 128
+bash scripts/run_standalone_train.sh [CKPT_SAVE_DIR] [DEVICE_ID] [BATCH_SIZE]
+# example: bash scripts/run_standalone_train.sh ./ckpt/ascend_standalone 0 128
 ```
 
 The script will run training in the background, you can view the results through the file `train_log[X].txt` as follows:
@@ -364,14 +365,14 @@ The model checkpoint will be saved into `[CKPT_SAVE_DIR]`.
 
 #### Running on GPU
 
-Run `scripts/train_gpu_standalone.sh` to train the model standalone on GPU. The usage of the script is:
+Run `scripts/run_standalone_train_gpu.sh` to train the model standalone on GPU. The usage of the script is:
 
 ```shell
-bash scripts/train_gpu_standalone.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
-# example: bash scripts/train_gpu_standalone.sh ./ckpt/gpu_standalone/ 64 185 0
+bash scripts/run_standalone_train_gpu.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+# example: bash scripts/run_standalone_train_gpu.sh ./ckpt/gpu_standalone/ 64 185 0
 ```
 
-The script will run training in the background, you can view the results through the file `./logs/train_gpu_standalone.log` as follows:
+The script will run training in the background, you can view the results through the file `./logs/run_standalone_train_gpu.log` as follows:
 
 ```log
 ...
@@ -402,11 +403,11 @@ The model checkpoint will be saved into `[CKPT_SAVE_DIR]`.
 
 #### Running on Ascend
 
-Run `scripts/train_ascend_distributed.sh` to train the model distributed. The usage of the script is:
+Run `scripts/run_distribute_train.sh` to train the model distributed. The usage of the script is:
 
 ```shell
-bash scripts/train_ascend_distributed.sh [MINDSPORE_HCCL_CONFIG_PATH] [CKPT_SAVE_DIR] [RANK_SIZE]
-# example: bash scripts/train_ascend_distributed.sh /root/hccl_8p_01234567_10.155.170.71.json ./checkpoint 8
+bash scripts/run_distribute_train.sh [MINDSPORE_HCCL_CONFIG_PATH] [CKPT_SAVE_DIR] [RANK_SIZE]
+# example: bash scripts/run_distribute_train.sh /root/hccl_8p_01234567_10.155.170.71.json ./checkpoint 8
 ```
 
 The above shell script will run distribute training in the background. You can view the results through the file `train_parallel[X]/log.txt` as follows:
@@ -429,14 +430,14 @@ The model checkpoint will be saved into `[CKPT_SAVE_DIR]`.
 
 #### Running on GPU
 
-Run `scripts/train_gpu_distributed.sh` to train the model distributed. The usage of the script is:
+Run `scripts/run_distribute_train_gpu.sh` to train the model distributed. The usage of the script is:
 
 ```shell
-bash train_gpu_distributed.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
-# example: bash scripts/train_gpu_distributed.sh ./ckpt/gpu_distributed/ 32 165 8 0,1,2,3,4,5,6,7
+bash run_distribute_train_gpu.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+# example: bash scripts/run_distribute_train_gpu.sh ./ckpt/gpu_distributed/ 32 165 8 0,1,2,3,4,5,6,7
 ```
 
-The above shell script will run distribute training in the background. You can view the results through the file `./logs/train_gpu_distributed.log` as follows:
+The above shell script will run distribute training in the background. You can view the results through the file `./logs/run_distribute_train_gpu.log` as follows:
 
 ```log
 ...
@@ -478,11 +479,11 @@ The model checkpoint will be saved into `[CKPT_SAVE_DIR]`.
 
 ### Running on Ascend
 
-Run `scripts/eval_ascend.sh` to evaluate the model with one Ascend processor. The usage of the script is:
+Run `scripts/run_eval.sh` to evaluate the model with one Ascend processor. The usage of the script is:
 
 ```shell
-bash scripts/eval_ascend.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [DEVICE_ID]
-# example: bash scripts/eval_ascend.sh ./ckpt/ascend_standalone/simplepose-140_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
+bash scripts/run_eval.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [DEVICE_ID]
+# example: bash scripts/run_eval.sh ./ckpt/ascend_standalone/simplepose-140_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
 ```
 
 The above shell command will run validation procedure in the background. You can view the results through the file `eval_log[X].txt`. The result will be achieved as follows:
@@ -500,14 +501,14 @@ Total boxes: 104125
 
 ### Running on GPU
 
-Run `scripts/eval_gpu.sh` to evaluate the model with one GPU. The usage of the script is:
+Run `scripts/run_eval_gpu.sh` to evaluate the model with one GPU. The usage of the script is:
 
 ```shell
-bash scripts/eval_gpu.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
-# example: bash scripts/eval_gpu.sh ./ckpt/gpu_distributed/simplepose-185_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
+bash scripts/run_eval_gpu.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+# example: bash scripts/run_eval_gpu.sh ./ckpt/gpu_distributed/simplepose-185_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
 ```
 
-The above shell command will run validation procedure in the background. You can view the results through the file `./logs/eval_gpu.log`. The result will be achieved as follows:
+The above shell command will run validation procedure in the background. You can view the results through the file `./logs/run_eval_gpu.log`. The result will be achieved as follows:
 
 ```log
 use mindspore-style maxpool
