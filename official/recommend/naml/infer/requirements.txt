@@ -1,0 +1,4 @@
+mindspore
+numpy
+sklearn
+pyyaml
