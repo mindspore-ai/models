@@ -131,3 +131,5 @@
 
 "models/official/audio/lpcnet/ascend310_infer/inc/lpcnet.h" "runtime/int"
 "models/official/audio/lpcnet/ascend310_infer/src/main.cc" "build/include_subdir"
+
+"models/official/cv/simclr/infer/mxbase/SimCLRClassifyOpencv.h"                 "runtime/references"
