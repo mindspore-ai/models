@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,9 +19,7 @@
 
 import mindspore.nn as nn
 from mindspore.ops import Concat
-from ..utils.config import get_args
-
-args = get_args()
+from src.utils.config import config
 
 class ConvNormReLU(nn.Cell):
     """
@@ -60,9 +58,9 @@ class ConvNormReLU(nn.Cell):
         has_bias = (norm_mode == 'instance')
         if padding is None:
             padding = (kernel_size - 1) // 2
-        if args.pad_mode == 'REFLECT':
+        if config.pad_mode == 'REFLECT':
             pad_mode = "REFLECT"
-        elif args.pad_mode == "SYMMETRIC":
+        elif config.pad_mode == "SYMMETRIC":
             pad_mode = "SYMMETRIC"
         if pad_mode == 'CONSTANT':
             conv = nn.Conv2d(in_planes, out_planes, kernel_size, stride, pad_mode='pad',

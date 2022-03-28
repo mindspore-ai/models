@@ -120,6 +120,9 @@ The entire code structure is as following:
     ├─ __init__.py                     # init file
     ├─ config.py                       # parse args
     ├─ tools.py                        # tools for Pix2Pix model
+    ├─ device_adapter.py               # Get cloud ID
+    ├─ local_adapter.py                # Get local ID
+    ├─ moxing_adapter.py               # Parameter processing
 ├─ eval.py                             # evaluate Pix2Pix Model
 ├─ train.py                            # train script
 └─ export.py                           # export mindir script
@@ -163,21 +166,21 @@ Major parameters in train.py and config.py as follows:
 - running on Ascend with default parameters
 
 ```python
-python train.py --device_target [Ascend] --device_id [0] --train_data_dir [./data/facades/train]
+python train.py --device_target [Ascend] --device_id [0]
 ```
 
 - running distributed trainning on Ascend with fixed parameters
 
 ```python
-bash run_distribute_train_ascend.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] [DATASET_PATH] [DATASET_NAME]
+bash run_distribute_train_ascend.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] [DATASET_PATH]
 ```
 
 - running on GPU with fixed parameters
 
 ```python
-python train.py --device_target [GPU] --run_distribute [1] --device_num [8] --dataset_size 400 --train_data_dir [./data/facades/train] --pad_mode REFLECT
+python train.py --device_target [GPU] --device_id [0]
 OR
-bash scripts/run_train_gpu.sh [DATASET_PATH] [DATASET_NAME]
+bash scripts/run_train_gpu.sh [DEVICE_TARGET] [DEVICE_ID]
 ```
 
 - running distributed trainning on GPU with fixed parameters
@@ -199,10 +202,9 @@ bash scripts/run_eval_ascend.sh [DATASET_PATH] [DATASET_NAME] [CKPT_PATH] [RESUL
 - running on GPU
 
 ```python
-python eval.py --device_target [GPU] --device_id [0] --val_data_dir [./data/facades/test] --ckpt [./train/results/ckpt/Generator_200.ckpt] --predict_dir [./train/results/predict/] \
---dataset_size 1096 --pad_mode REFLECT
+python eval.py --device_target [GPU] --device_id [0] --val_data_dir [./data/facades/test] --ckpt [./train/results/ckpt/Generator_200.ckpt]
 OR
-bash scripts/run_eval_gpu.sh [DATASET_PATH] [DATASET_NAME] [CKPT_PATH] [RESULT_PATH]
+bash scripts/run_eval_gpu.sh [DATASET_PATH] [DATASET_NAME] [VAL_DATA_PATH] [CKPT_PATH]
 ```
 
 **Note:**: Before training and evaluating, create folders like "./results/...". Then you will get the results as following in "./results/predict".

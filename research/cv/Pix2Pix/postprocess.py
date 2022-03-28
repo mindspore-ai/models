@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 import os
 import numpy as np
 from PIL import Image
-from src.utils.config import get_args
+from src.utils.config import config
 from mindspore import Tensor
 
 def save_image(img, img_path):
@@ -52,7 +52,7 @@ if __name__ == '__main__':
     rst_path = result_dir
 
     for i in range(len(os.listdir(rst_path))):
-        file_name = os.path.join(rst_path, "Pix2Pix_data_bs" + str(args.batch_size) + '_' + str(i) + '_0.bin')
+        file_name = os.path.join(rst_path, "Pix2Pix_data_bs" + str(config.batch_size) + '_' + str(i) + '_0.bin')
         output = np.fromfile(file_name, np.float32).reshape(3, object_imageSize, object_imageSize)
         print(output.shape)
         save_image(output, './310_infer_img' + str(i + 1))

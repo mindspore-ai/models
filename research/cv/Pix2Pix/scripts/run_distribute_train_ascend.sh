@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if [ $# != 5 ]
+if [ $# != 4 ]
 then
-    echo "Usage: sh run_distribute_train.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] [DATASET_PATH] [DATASET_NAME]"
+    echo "Usage: sh run_distribute_train.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] [DATASET_PATH]"
     exit 1
 fi
 
@@ -50,15 +50,8 @@ do
         export RANK_ID=$i
         echo "start training for rank $i, device $DEVICE_ID"
         env > env.log
-        if [ $5 == 'facades' ];
-        then
-                python train.py --run_distribute=$DISTRIBUTE --device_target Ascend --device_num=$RANK_SIZE \
-                                --device_id=$DEVICE_ID --dataset_size 400 --train_data_dir $DATASET_PATH &> log &
-        
-        elif [ $5 == 'maps' ];
-        then
-                python train.py --run_distribute=$DISTRIBUTE --device_target Ascend --device_num=$RANK_SIZE \
-                                --device_id=$DEVICE_ID --dataset_size 1096 --train_data_dir $DATASET_PATH &> log &
-        fi
+
+        python train.py --run_distribute=$DISTRIBUTE --device_target Ascend --device_num=$RANK_SIZE \
+                        --device_id=$DEVICE_ID --train_data_dir $DATASET_PATH &> log &
         cd ..
 done

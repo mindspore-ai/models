@@ -1,81 +1,131 @@
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
-# Licensed under the Apache License, Version 2.0 (the "License");
+# Licensed under the Apache License Version 2.0(the "License");
 # you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+# you may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0#
 #
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# Unless required by applicable law or agreed to in writing software
+# distributed under the License is distributed on an "AS IS" BASIS
+# WITHOUT WARRANT IES OR CONITTONS OF ANY KIND， either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# ===========================================================================
+# ====================================================================================
 
-"""
-    Define the common options that are used in both training and test.
-"""
-
-import argparse
+"""Parse arguments"""
+import os
 import ast
+import argparse
+from pprint import pprint, pformat
+import yaml
 
 
-def get_args():
-    '''
-        get args.
-    '''
-    parser = argparse.ArgumentParser(description='Pix2Pix Model')
+_config_path = '../../default_config.yaml'
 
-    # parameters
-    parser.add_argument('--device_target', type=str, default='Ascend', choices=('Ascend', 'GPU'),
-                        help='device where the code will be implemented (default: Ascend)')
-    parser.add_argument('--run_distribute', type=int, default=0, help='distributed training, default is 0.')
-    parser.add_argument('--device_num', type=int, default=1, help='device num, default is 1.')
-    parser.add_argument('--device_id', type=int, default=6, help='device id, default is 0.')
-    parser.add_argument('--save_graphs', type=ast.literal_eval, default=False,
-                        help='whether save graphs, default is False.')
-    parser.add_argument('--init_type', type=str, default='normal', help='network initialization, default is normal.')
-    parser.add_argument('--init_gain', type=float, default=0.02,
-                        help='scaling factor for normal, xavier and orthogonal, default is 0.02.')
-    parser.add_argument('--pad_mode', type=str, default='CONSTANT', choices=('CONSTANT', 'REFLECT', 'SYMMETRIC'),
-                        help='scale images to this size, default is CONSTANT.')
-    parser.add_argument('--load_size', type=int, default=286, help='scale images to this size, default is 286.')
-    parser.add_argument('--batch_size', type=int, default=1, help='batch_size, default is 1.')
-    parser.add_argument('--LAMBDA_Dis', type=float, default=0.5, help='weight for Discriminator Loss, default is 0.5.')
-    parser.add_argument('--LAMBDA_GAN', type=int, default=1, help='weight for GAN Loss, default is 1.')
-    parser.add_argument('--LAMBDA_L1', type=int, default=100, help='weight for L1 Loss, default is 100.')
-    parser.add_argument('--beta1', type=float, default=0.5, help='adam beta1, default is 0.5.')
-    parser.add_argument('--beta2', type=float, default=0.999, help='adam beta2, default is 0.999.')
-    parser.add_argument('--lr', type=float, default=0.0002, help='the initial learning rate, default is 0.0002.')
-    parser.add_argument('--lr_policy', type=str, default='linear', help='learning rate policy, default is linear.')
-    parser.add_argument('--epoch_num', type=int, default=200, help='epoch number for training, default is 200.')
-    parser.add_argument('--n_epochs', type=int, default=100,
-                        help='number of epochs with the initial learning rate, default is 100.')
-    parser.add_argument('--n_epochs_decay', type=int, default=100,
-                        help='number of epochs with the dynamic learning rate, default is 100.')
-    parser.add_argument('--dataset_size', type=int, default=400, choices=(400, 1096),
-                        help='for Facade_dataset,the number is 400; for Maps_dataset,the number is 1096.')
 
-    # The location of input and output data
-    parser.add_argument('--train_data_dir', type=str, default=None, help='the file path of input data during training.')
-    parser.add_argument('--val_data_dir', type=str, default=None, help='the file path of input data during validating.')
-    parser.add_argument('--train_fakeimg_dir', type=str, default='./results/fake_img/',
-                        help='during training, the file path of stored fake img.')
-    parser.add_argument('--loss_show_dir', type=str, default='./results/loss_show',
-                        help='during training, the file path of stored loss img.')
-    parser.add_argument('--ckpt_dir', type=str, default='./results/ckpt/',
-                        help='during training, the file path of stored CKPT.')
-    parser.add_argument('--ckpt', type=str, default=None, help='during validating, the file path of the CKPT used.')
-    parser.add_argument('--predict_dir', type=str, default='./results/predict/',
-                        help='during validating, the file path of Generated image.')
+class Config:
+    """
+    Configuration namespace. Convert dictionary to members
+    """
+    def __init__(self, cfg_dict):
+        for k, v in cfg_dict.items():
+            if isinstance(v, (list, tuple)):
+                setattr(self, k, [Config(x) if isinstance(x, dict) else x for x in v])
+            else:
+                setattr(self, k, Config(v) if isinstance(v, dict) else v)
 
-    # modelarts
-    parser.add_argument("--data_url", type=str, default="./dataset", help='real input file path')
-    parser.add_argument("--modelarts_data_dir", type=str, default="/cache/dataset", help='modelart input path')
-    parser.add_argument("--modelarts_result_dir", type=str, default="/cache/result", help='modelart output path.')
-    parser.add_argument("--obs_result_dir", type=str, default="./output", help='real output file path include .ckpt and .air')  # modelarts -> obs
-    parser.add_argument("--modelarts_attrs", type=str, default="")
+    def __str__(self):
+        return pformat(self.__dict__)
 
+    def __repr__(self):
+        return self.__str__()
+
+
+def parse_cli_to_yaml(parser, cfg, helper=None, choices=None, cfg_path='default_config.yaml'):
+    """
+    Parse command line arguments to the configuration according to the default yaml
+
+    Args:
+        parser: Parent parser
+        cfg: Base configuration
+        helper: Helper description
+        cfg_path: Path to the default yaml config
+    """
+    parser = argparse.ArgumentParser(description='[REPLACE THIS at config.py]',
+                                     parents=[parser])
+    helper = {} if helper is None else helper
+    choices = {} if choices is None else choices
+    for item in cfg:
+        if not isinstance(cfg[item], list) and not isinstance(cfg[item], dict):
+            help_description = helper[item] if item in helper else 'Please reference to {}'.format(cfg_path)
+            choice = choices[item] if item in choices else None
+            if isinstance(cfg[item], bool):
+                parser.add_argument('--' + item, type=ast.literal_eval, default=cfg[item], choices=choice,
+                                    help=help_description)
+            else:
+                parser.add_argument('--' + item, type=type(cfg[item]), default=cfg[item], choices=choice,
+                                    help=help_description)
     args = parser.parse_args()
     return args
+
+
+def parse_yaml(yaml_path):
+    """
+    Parse the yaml config file
+
+    Args:
+        yaml_path: Path to the yaml config
+    """
+    with open(yaml_path, 'r') as fin:
+        try:
+            cfgs = yaml.load_all(fin.read(), Loader=yaml.FullLoader)
+            cfgs = [x for x in cfgs]
+            if len(cfgs) == 1:
+                cfg_helper = {}
+                cfg = cfgs[0]
+                cfg_choices = {}
+            elif len(cfgs) == 2:
+                cfg, cfg_helper = cfgs
+                cfg_choices = {}
+            elif len(cfgs) == 3:
+                cfg, cfg_helper, cfg_choices = cfgs
+            else:
+                raise ValueError('At most 3 docs (config description for help, choices) are supported in config yaml')
+            print(cfg_helper)
+        except:
+            raise ValueError('Failed to parse yaml')
+    return cfg, cfg_helper, cfg_choices
+
+
+def merge(args, cfg):
+    """
+    Merge the base config from yaml file and command line arguments
+
+    Args:
+        args: command line arguments
+        cfg: Base configuration
+    """
+    args_var = vars(args)
+    for item in args_var:
+        cfg[item] = args_var[item]
+    return cfg
+
+
+def get_config():
+    """
+    Get Config according to the yaml file and cli arguments
+    """
+    parser = argparse.ArgumentParser(description='default name', add_help=False)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    parser.add_argument('--config_path', type=str, default=os.path.join(current_dir, _config_path),
+                        help='Config file path')
+    path_args, _ = parser.parse_known_args()
+    default, helper, choices = parse_yaml(path_args.config_path)
+    args = parse_cli_to_yaml(parser=parser, cfg=default, helper=helper, choices=choices, cfg_path=path_args.config_path)
+    final_config = merge(args, default)
+    pprint(final_config)
+    print("Please check the above information for the configurations", flush=True)
+    return Config(final_config)
+
+config = get_config()

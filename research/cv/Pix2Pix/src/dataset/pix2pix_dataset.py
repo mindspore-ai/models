@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,9 +23,7 @@ from PIL import Image
 import mindspore
 from mindspore import dataset as de
 import mindspore.dataset.vision.c_transforms as C
-from ..utils.config import get_args
-
-args = get_args()
+from src.utils.config import config
 
 class pix2pixDataset():
     '''
@@ -50,8 +48,8 @@ class pix2pixDataset():
         A = AB.crop((w2, 0, w, h))
         B = AB.crop((0, 0, w2, h))
 
-        A = A.resize((args.load_size, args.load_size))
-        B = B.resize((args.load_size, args.load_size))
+        A = A.resize((config.load_size, config.load_size))
+        B = B.resize((config.load_size, config.load_size))
 
         transform_params = get_params(A.size)
         A_crop = crop(A, transform_params, size=256)
@@ -66,7 +64,7 @@ def get_params(size=(256, 256)):
     w, h = size
     new_h = h
     new_w = w
-    new_h = new_w = args.load_size      # args.load_size
+    new_h = new_w = config.load_size      # config.load_size
 
     x = np.random.randint(0, np.maximum(0, new_w - 256))
     y = np.random.randint(0, np.maximum(0, new_h - 256))
@@ -77,7 +75,7 @@ def crop(img, pos, size=256):
     '''
         Crop the images.
     '''
-    ow = oh = args.load_size
+    ow = oh = config.load_size
     x1, y1 = pos
     tw = th = size
     if (ow > tw or oh > th):

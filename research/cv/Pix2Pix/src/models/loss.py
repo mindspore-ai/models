@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,9 +25,7 @@ from mindspore.parallel._utils import (_get_device_num, _get_gradients_mean, _ge
 from mindspore.context import ParallelMode
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
 from mindspore.nn.loss.loss import LossBase
-from src.utils.config import get_args
-
-args = get_args()
+from src.utils.config import config
 
 class SigmoidCrossEntropyWithLogits(LossBase):
     def __init__(self):
@@ -47,7 +45,7 @@ class D_Loss(LossBase):
         self.sig = SigmoidCrossEntropyWithLogits()
         self.ones = ops.OnesLike()
         self.zeros = ops.ZerosLike()
-        self.LAMBDA_Dis = args.LAMBDA_Dis
+        self.LAMBDA_Dis = config.LAMBDA_Dis
 
     def construct(self, pred1, pred0):
         loss = self.sig(pred1, self.ones(pred1)) + self.sig(pred0, self.zeros(pred0))
@@ -79,8 +77,8 @@ class G_Loss(LossBase):
         self.sig = SigmoidCrossEntropyWithLogits()
         self.l1_loss = nn.L1Loss()
         self.ones = ops.OnesLike()
-        self.LAMBDA_GAN = args.LAMBDA_GAN
-        self.LAMBDA_L1 = args.LAMBDA_L1
+        self.LAMBDA_GAN = config.LAMBDA_GAN
+        self.LAMBDA_L1 = config.LAMBDA_L1
 
     def construct(self, fakeB, realB, pred0):
         loss_1 = self.sig(pred0, self.ones(pred0))
