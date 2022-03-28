@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-22 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,11 @@ fi
 rm -rf run_distribute_train
 mkdir run_distribute_train
 cd run_distribute_train || exit
+
+FILE_LIMIT=$(ulimit -n)
+if [ $FILE_LIMIT -lt 2048 ] ; then
+ulimit -n 2048;
+fi
 
 EPOCH_SIZE=$2
 DATA_PATH=$3
@@ -63,4 +68,9 @@ do
     --data_path=$DATA_PATH > log.txt 2>&1 &
     cd ../
 done
+
+if [ $FILE_LIMIT -lt 2048 ] ; then
+ulimit -n $FILE_LIMIT;
+fi
+
 cd ..

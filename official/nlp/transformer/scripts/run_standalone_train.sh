@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-22 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,11 @@ rm -rf run_standalone_train
 mkdir run_standalone_train
 cp -rf ./src/ train.py ./*.yaml ./run_standalone_train
 cd run_standalone_train || exit
+
+FILE_LIMIT=$(ulimit -n)
+if [ $FILE_LIMIT -lt 2048 ] ; then
+ulimit -n 2048;
+fi
 
 export DEVICE_TARGET=$1
 DEVICE_ID=$2
@@ -67,4 +72,9 @@ elif [ $DEVICE_TARGET == 'GPU' ];then
 else
     echo "Not supported device target."
 fi
+
+if [ $FILE_LIMIT -lt 2048 ] ; then
+ulimit -n $FILE_LIMIT;
+fi
+
 cd ..
