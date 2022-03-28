@@ -1,0 +1,64 @@
+# model config
+model_config:
+    encoder_layers: 12
+    encoder_num_heads: 12
+    encoder_dim: 768
+    mlp_ratio: 4
+
+# context config
+seed: 2022
+use_parallel: True
+context:
+    mode: 0 #0--Graph Mode; 1--Pynative Mode
+    device_target: "Ascend"
+    max_call_depth: 10000
+    save_graphs: False
+    device_id: 7
+
+# dataset base
+dataset_name: "imagenet"
+eval_engine: 'imagenet'
+
+# eval datasets
+eval_path: "/mnt/vision/ImageNet1K/CLS-LOC/val"
+interpolation: "BILINEAR"
+image_size: 224
+batch_size: 256
+eval_interval: 1
+eval_offset: -1
+num_workers: 12
+
+# eval config
+patch_size: 16
+dropout: 0.0
+num_classes: 1001
+per_step_size: 0
+use_ckpt: ""
+
+# loss
+use_label_smooth: 1
+label_smooth_factor: 0.1
+loss_name: "soft_ce"
+
+# learning_rate
+learning_rate: 1.0
+
+# loss scale manager
+use_dynamic_loss_scale: False # default use FixLossScaleUpdateCell
+loss_scale: 1024
+
+# with EMA
+use_ema: False
+ema_decay: 0.9999
+
+# use_global_norm
+use_global_norm: False
+clip_gn_value: 1.0
+
+# optimizer
+beta1: 0.9
+beta2: 0.999
+weight_decay: 0.05
+
+# save output file
+save_dir: "./output/"

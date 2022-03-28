@@ -1,0 +1,68 @@
+# model config
+encoder_layers: 12
+encoder_num_heads: 12
+encoder_dim: 768
+decoder_layers: 8
+decoder_num_heads: 16
+decoder_dim: 512
+mlp_ratio: 4
+masking_ratio: 0.75
+norm_pixel_loss: True
+
+# cloud context init config
+seed: 2022
+context:
+    mode: "GRAPH_MODE" #0--Graph Mode; 1--Pynative Mode
+    device_target: "Ascend"
+    max_call_depth: 10000
+    save_graphs: False
+    device_id: 0
+use_parallel: True
+parallel:
+    parallel_mode: "DATA_PARALLEL"
+    gradients_mean: True
+
+# train dataset
+data_path: "/mnt/vision/ImageNet1K/CLS-LOC"
+img_ids: "tot_ids.json" # ImageNet index of data path
+num_workers: 8
+image_size: 224
+
+# train config
+epoch: 800
+batch_size: 64
+patch_size: 16
+sink_mode: True
+per_step_size: 0
+use_ckpt: ""
+
+# loss scale manager
+use_dynamic_loss_scale: True # default use FixLossScaleUpdateCell
+
+# optimizer
+beta1: 0.9
+beta2: 0.95
+weight_decay: 0.05
+
+# lr schedule
+base_lr: 0.00015
+start_learning_rate: 0.
+end_learning_rate: 0.000000000001
+warmup_epochs: 40
+
+# with EMA
+use_ema: False
+ema_decay: 0.9999
+
+# use_global_norm
+use_global_norm: False
+clip_gn_value: 1.0
+
+
+# ckpt callback
+cb_size: 1
+save_ckpt_epochs: 1
+prefix: "MaeFintuneViT-B-P16"
+
+# cfts init config
+save_dir: "./output/"
