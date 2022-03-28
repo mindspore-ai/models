@@ -31,9 +31,9 @@ keep_checkpoint_max: 15
 use_label_smooth: True
 label_smooth_factor: 0.1
 lr_init: 0.05803
-lr_decay: 4.04839
+lr_decay: 4.0839
 lr_end_epoch: 53
-damping_init: 0.02714
+damping_init: 0.03
 damping_decay: 0.50036
 frequency: 834
 
