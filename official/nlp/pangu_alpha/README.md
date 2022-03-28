@@ -83,11 +83,11 @@ The following table gives a description of the tested environment, scripts and M
 
 | Parallel Mode      | MindSpore Version | GPU(V100)              | Ascend (Ascend 910)              |
 | -----------------  | ----------------- | ---------------------- | -------------------------------- |
-| data parallel      | 1.5.0 & master    | Supported              | Supported                        |
-| model parallel     | 1.5.0 & master    | Supported              | Supported                        |
-| optimizer parallel | 1.5.0 & master    | Supported              | Supported                        |
-| recompute          | 1.5.0 & master    | Supported              | Supported                        |
-| pipeline parallel  | 1.5.0 & master    | Not Supported          | Supported                        |
+| data parallel      | master    | Supported              | Supported                        |
+| model parallel     | master    | Supported              | Supported                        |
+| optimizer parallel | master    | Supported              | Supported                        |
+| recompute          | master    | Supported              | Supported                        |
+| pipeline parallel  | master    | Not Supported          | Supported                        |
 
 To obtain the pangu_alpha's script, you need `git` to clone the mindspore's code as followings:
 

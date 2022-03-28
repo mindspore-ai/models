@@ -31,7 +31,7 @@ _scaler_one = Tensor(1, mstype.int32)
 _scaler_ten = Tensor(10, mstype.float32)
 _cpu_div = P.RealDiv().add_prim_attr("primitive_target", "CPU")
 
-@_adam_opt.register("Function", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Number", "Tensor", "Tensor",
+@_adam_opt.register("Function", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor", "Tensor",
                     "Tensor", "Tensor", "Bool", "Bool")
 def _update_run_kernel(opt, clip_value, beta1, beta2, eps, lr, weight_decay,
                        param, m, v, gradient, decay_flags, optim_filter):
