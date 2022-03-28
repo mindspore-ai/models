@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,22 +17,19 @@ create train or eval dataset.
 """
 import os
 from multiprocessing import cpu_count
-import mindspore.common.dtype as mstype
+import mindspore as ms
 import mindspore.dataset as ds
-import mindspore.dataset.vision.c_transforms as C
-import mindspore.dataset.transforms.c_transforms as C2
-from mindspore.communication.management import get_rank, get_group_size
+import mindspore.communication as comm
 
 THREAD_NUM = 12 if cpu_count() >= 12 else 8
 
 
-def create_dataset1(dataset_path, do_train, device_num=1, repeat_num=1, batch_size=32, target="Ascend"):
+def create_dataset1(dataset_path, do_train, device_num=1, batch_size=32, target="Ascend"):
     """
     create a train or evaluate cifar10 dataset for mobilenet
     Args:
         dataset_path(string): the path of dataset.
         do_train(bool): whether dataset is used for train or eval.
-        repeat_num(int): the repeat times of dataset. Default: 1
         batch_size(int): the batch size of dataset. Default: 32
         target(str): the device target. Default: Ascend
 
@@ -50,38 +47,35 @@ def create_dataset1(dataset_path, do_train, device_num=1, repeat_num=1, batch_si
     trans = []
     if do_train:
         trans += [
-            C.RandomCrop((32, 32), (4, 4, 4, 4)),
-            C.RandomHorizontalFlip(prob=0.5)
+            ds.vision.c_transforms.RandomCrop((32, 32), (4, 4, 4, 4)),
+            ds.vision.c_transforms.RandomHorizontalFlip(prob=0.5)
         ]
 
     trans += [
-        C.Resize((224, 224)),
-        C.Rescale(1.0 / 255.0, 0.0),
-        C.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
-        C.HWC2CHW()
+        ds.vision.c_transforms.Resize((224, 224)),
+        ds.vision.c_transforms.Rescale(1.0 / 255.0, 0.0),
+        ds.vision.c_transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
+        ds.vision.c_transforms.HWC2CHW()
     ]
 
-    type_cast_op = C2.TypeCast(mstype.int32)
+    type_cast_op = ds.transforms.c_transforms.TypeCast(ms.int32)
 
     data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=THREAD_NUM)
     data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=THREAD_NUM)
 
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
-    # apply dataset repeat operation
-    data_set = data_set.repeat(repeat_num)
 
     return data_set
 
 
-def create_dataset2(dataset_path, do_train, device_num=1, repeat_num=1, batch_size=32, target="Ascend"):
+def create_dataset2(dataset_path, do_train, device_num=1, batch_size=32, target="Ascend"):
     """
     create a train or eval imagenet2012 dataset for mobilenet
 
     Args:
         dataset_path(string): the path of dataset.
         do_train(bool): whether dataset is used for train or eval.
-        repeat_num(int): the repeat times of dataset. Default: 1
         batch_size(int): the batch size of dataset. Default: 32
         target(str): the device target. Default: Ascend
 
@@ -103,30 +97,27 @@ def create_dataset2(dataset_path, do_train, device_num=1, repeat_num=1, batch_si
     # define map operations
     if do_train:
         trans = [
-            C.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
-            C.RandomHorizontalFlip(prob=0.5),
-            C.Normalize(mean=mean, std=std),
-            C.HWC2CHW()
+            ds.vision.c_transforms.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
+            ds.vision.c_transforms.RandomHorizontalFlip(prob=0.5),
+            ds.vision.c_transforms.Normalize(mean=mean, std=std),
+            ds.vision.c_transforms.HWC2CHW()
         ]
     else:
         trans = [
-            C.Decode(),
-            C.Resize(256),
-            C.CenterCrop(image_size),
-            C.Normalize(mean=mean, std=std),
-            C.HWC2CHW()
+            ds.vision.c_transforms.Decode(),
+            ds.vision.c_transforms.Resize(256),
+            ds.vision.c_transforms.CenterCrop(image_size),
+            ds.vision.c_transforms.Normalize(mean=mean, std=std),
+            ds.vision.c_transforms.HWC2CHW()
         ]
 
-    type_cast_op = C2.TypeCast(mstype.int32)
+    type_cast_op = ds.transforms.c_transforms.TypeCast(ms.int32)
 
     data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=THREAD_NUM)
     data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=THREAD_NUM)
 
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True)
-
-    # apply dataset repeat operation
-    data_set = data_set.repeat(repeat_num)
 
     return data_set
 
@@ -138,8 +129,8 @@ def _get_rank_info():
     rank_size = int(os.environ.get("RANK_SIZE", 1))
 
     if rank_size > 1:
-        rank_size = get_group_size()
-        rank_id = get_rank()
+        rank_size = comm.get_group_size()
+        rank_id = comm.get_rank()
     else:
         rank_size = 1
         rank_id = 0

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +17,10 @@
 
 import os
 import functools
-from mindspore import context
-from mindspore.profiler import Profiler
+import zipfile
+import time
+
+import mindspore as ms
 from .config import config
 
 _global_sync_count = 0
@@ -43,13 +45,13 @@ def get_job_id():
     job_id = job_id if job_id != "" else "default"
     return job_id
 
+
 def sync_data(from_path, to_path):
     """
     Download data from remote obs to local directory if the first url is remote url and the second one is local path
     Upload data from local directory to remote obs in contrast.
     """
     import moxing as mox
-    import time
     global _global_sync_count
     sync_lock = "/tmp/copy_sync.lock" + str(_global_sync_count)
     _global_sync_count += 1
@@ -93,7 +95,7 @@ def moxing_wrapper(pre_process=None, post_process=None):
                     sync_data(config.train_url, config.output_path)
                     print("Workspace downloaded: ", os.listdir(config.output_path))
 
-                context.set_context(save_graphs_path=os.path.join(config.output_path, str(get_rank_id())))
+                ms.set_context(save_graphs_path=os.path.join(config.output_path, str(get_rank_id())))
                 config.device_num = get_device_num()
                 config.device_id = get_device_id()
                 if not os.path.exists(config.output_path):
@@ -103,7 +105,7 @@ def moxing_wrapper(pre_process=None, post_process=None):
                     pre_process()
 
             if config.enable_profiling:
-                profiler = Profiler()
+                profiler = ms.profiler.Profiler()
 
             run_func(*args, **kwargs)
 
@@ -120,3 +122,64 @@ def moxing_wrapper(pre_process=None, post_process=None):
                     sync_data(config.output_path, config.train_url)
         return wrapped_func
     return wrapper
+
+
+def modelarts_process():
+    """ modelarts process """
+    def unzip(zip_file, save_dir):
+        s_time = time.time()
+        if not os.path.exists(os.path.join(save_dir, config.modelarts_dataset_unzip_name)):
+            zip_isexist = zipfile.is_zipfile(zip_file)
+            if zip_isexist:
+                fz = zipfile.ZipFile(zip_file, 'r')
+                data_num = len(fz.namelist())
+                print("Extract Start...")
+                print("unzip file num: {}".format(data_num))
+                data_print = int(data_num / 100) if data_num > 100 else 1
+                i = 0
+                for file in fz.namelist():
+                    if i % data_print == 0:
+                        print("unzip percent: {}%".format(int(i * 100 / data_num)), flush=True)
+                    i += 1
+                    fz.extract(file, save_dir)
+                print("cost time: {}min:{}s.".format(int((time.time() - s_time) / 60),
+                                                     int(int(time.time() - s_time) % 60)))
+                print("Extract Done")
+            else:
+                print("This is not zip.")
+        else:
+            print("Zip has been extracted.")
+
+    if config.need_modelarts_dataset_unzip:
+        zip_file_1 = os.path.join(config.data_path, config.modelarts_dataset_unzip_name + ".zip")
+        save_dir_1 = os.path.join(config.data_path)
+
+        sync_lock = "/tmp/unzip_sync.lock"
+
+        # Each server contains 8 devices as most
+        if get_device_id() % min(get_device_num(), 8) == 0 and not os.path.exists(sync_lock):
+            print("Zip file path: ", zip_file_1)
+            print("Unzip file save dir: ", save_dir_1)
+            unzip(zip_file_1, save_dir_1)
+            print("===Finish extract data synchronization===")
+            try:
+                os.mknod(sync_lock)
+            except IOError:
+                pass
+
+        while True:
+            if os.path.exists(sync_lock):
+                break
+            time.sleep(1)
+
+        print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
+        print("#" * 200, os.listdir(save_dir_1))
+        print("#" * 200, os.listdir(os.path.join(config.data_path, config.modelarts_dataset_unzip_name)))
+
+        config.dataset_path = os.path.join(config.data_path, config.modelarts_dataset_unzip_name)
+    config.checkpoint_path = os.path.join(config.output_path, config.checkpoint_path)
+
+
+def modelarts_export_preprocess():
+    """ modelarts export process """
+    config.file_name = os.path.join(config.output_path, config.file_name)
