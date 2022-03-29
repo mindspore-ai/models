@@ -454,4 +454,6 @@ We set the random seed before training in train.py.
 
 # [ModelZoo Homepage](#contents)
 
+Note: This model will be move to the `/models/research/` directory in r1.8.
+
 Please check the official [homepage](https://gitee.com/mindspore/models).  

@@ -26,6 +26,7 @@
         - [Performance](#performance)
             - [Training Performance](#training-performance)
             - [Evaluation Performance](#evaluation-performance)
+    - [ModelZoo Homepage](#modelzoo-homepage)
 
 ## [CRNN-Seq2Seq-OCR Description](#contents)
 
@@ -348,3 +349,9 @@ Annotation precision precision = 0.746213
 | outputs             | Annotation Precision, Character Precision            |
 | Accuracy            | Annotation Precision=74.62%, Character Precision=96.75% |
 | Model for inference | 12M (.ckpt file)           |
+
+# [ModelZoo Homepage](#contents)
+
+ Note: This model will be move to the `/models/research/` directory in r1.8.
+
+ Please check the official [homepage](https://gitee.com/mindspore/models).

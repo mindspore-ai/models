@@ -435,4 +435,6 @@ auc : 0.8057789065281104
 
 ## ModelZoo主页
 
+ 注意：此模型将在r1.8版本移动到`/models/research/`目录下。
+
  请浏览官网[主页](https://gitee.com/mindspore/models)。  
