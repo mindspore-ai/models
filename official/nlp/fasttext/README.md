@@ -376,4 +376,6 @@ This model has been validated in the Ascend environment and is not validated on 
 
 ## [ModelZoo HomePage](#contents)
 
+Note: This model will be move to the `/models/research/` directory in r1.8.
+
 Please check the official [homepage](https://gitee.com/mindspore/models)
