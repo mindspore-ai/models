@@ -239,7 +239,7 @@ class PanguAlpha_Model(Cell):
         self.num_layers = config.num_layers
         if config.use_moe:
             moe_config = MoEConfig(expert_num=config.expert_num,
-                                   capacity_factor=2.0, num_experts_chosen=config.per_token_num_experts_chosen)
+                                   num_experts_chosen=config.per_token_num_experts_chosen)
         else:
             moe_config = MoEConfig(expert_num=1)
         # The shard setting of Transformer is set within the class StackedTransformer
