@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -32,6 +32,8 @@ from .networks import ResnetGenerator, Discriminator, GWithLossCell, DWithLossCe
 from .cell import TrainOneStepG, TrainOneStepD, Generator
 from ..utils.tools import denorm, tensor2numpy, RGB2BGR, cam
 from ..dataset.dataset import TrainDataLoader, TestDataLoader
+from ..metrics.metrics import mean_kernel_inception_distance
+
 
 class UGATIT:
     """pipline"""
@@ -65,6 +67,7 @@ class UGATIT:
         self.lr = args.lr
         self.weight_decay = args.weight_decay
         self.ch = args.ch
+        self.use_global_norm = args.use_global_norm
 
         """ Weight """
         self.adv_weight = args.adv_weight
@@ -201,8 +204,9 @@ class UGATIT:
                                beta2=0.999,
                                weight_decay=self.weight_decay)
 
-        self.D_train_net = TrainOneStepD(self.D_loss_net, self.D_optim, loss_scale, True)
-        self.G_train_net = TrainOneStepG(self.G_loss_net, self.generator, self.G_optim, loss_scale, True)
+        self.D_train_net = TrainOneStepD(self.D_loss_net, self.D_optim, loss_scale, self.use_global_norm)
+        self.G_train_net = TrainOneStepG(self.G_loss_net, self.generator, self.G_optim,
+                                         loss_scale, self.use_global_norm)
 
     def get_lr(self):
         """
@@ -329,8 +333,10 @@ class UGATIT:
             fake_A2B2A, _, fake_A2B2A_heatmap = self.genB2A(fake_A2B)
             fake_B2A2B, _, fake_B2A2B_heatmap = self.genA2B(fake_B2A)
 
-            fake_A2A, _, fake_A2A_heatmap = self.genB2A(real_A)
-            fake_B2B, _, fake_B2B_heatmap = self.genA2B(real_B)
+            # Without copying real_A and real_B tensors before feeding them
+            # into genB2A and genA2B does not work correctly with the GPU backend.
+            fake_A2A, _, fake_A2A_heatmap = self.genB2A(real_A.copy())
+            fake_B2B, _, fake_B2B_heatmap = self.genA2B(real_B.copy())
 
             A2B = np.concatenate((A2B, np.concatenate((RGB2BGR(tensor2numpy(denorm(real_A[0]))),
                                                        cam(tensor2numpy(fake_A2A_heatmap[0]), self.img_size),
@@ -378,14 +384,15 @@ class UGATIT:
             not_load['disLB'] = load_param_into_net(self.disLB, disLB_params)
         print("these params are not loaded: ", not_load)
 
-    def test(self):
+    def test(self, inception_ckpt_path=None):
         """test"""
         self.genA2B.set_train(True)
-        model_list = glob(os.path.join(self.output_path, self.dataset, 'model', '*.ckpt'))
+        output_path = os.path.join(self.output_path, self.dataset)
+        model_list = glob(os.path.join(output_path, 'model', '*.ckpt'))
         if model_list:
             model_list.sort()
             start_epoch = int(model_list[-1].split('_')[-1].split('.')[0])
-            self.load(os.path.join(self.output_path, self.dataset, 'model'), start_epoch)
+            self.load(os.path.join(output_path, 'model'), start_epoch)
             print(" [*] epoch %d Load SUCCESS" % start_epoch)
         else:
             print(" [*] Load FAILURE")
@@ -397,5 +404,9 @@ class UGATIT:
             A = RGB2BGR(tensor2numpy(denorm(real_A[0])))
             A2B = RGB2BGR(tensor2numpy(denorm(fake_A2B[0])))
 
-            cv2.imwrite(os.path.join(self.output_path, self.dataset, 'test', 'A_%d.png' % (n + 1)), A * 255.0)
-            cv2.imwrite(os.path.join(self.output_path, self.dataset, 'test', 'A2B_%d.png' % (n + 1)), A2B * 255.0)
+            cv2.imwrite(os.path.join(output_path, 'test', 'A_%d.png' % (n + 1)), A * 255.0)
+            cv2.imwrite(os.path.join(output_path, 'test', 'A2B_%d.png' % (n + 1)), A2B * 255.0)
+
+        if inception_ckpt_path is not None:
+            dataset_path = os.path.join(self.data_path, self.dataset)
+            mean_kernel_inception_distance(output_path, dataset_path, inception_ckpt_path)

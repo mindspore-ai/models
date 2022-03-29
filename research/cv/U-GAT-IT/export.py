@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,15 +17,16 @@
 python export.py
 """
 import os
-import numpy as np
 
+import numpy as np
 from mindspore import Tensor, export, context
 from mindspore import load_checkpoint, load_param_into_net
-from src.models.networks import ResnetGenerator
+
 from src.modelarts_utils.config import config
+from src.models.networks import ResnetGenerator
 from src.utils.tools import check_folder
 
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
+context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
 
 def run_export():
     """export"""
@@ -46,7 +47,7 @@ def run_export():
     check_folder(config.MINDIR_outdir)
     G_A2B_file = os.path.join(config.MINDIR_outdir, "UGATIT_AtoB")
     export(genA2B, input_array, file_name=G_A2B_file, file_format=config.export_file_format)
-    print("export MINDIR file")
+    print(f"export into {config.export_file_format} format")
 
 if __name__ == '__main__':
     run_export()

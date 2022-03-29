@@ -26,6 +26,8 @@ decay_epoch: 50
 resume: False
 save_graphs: False
 graph_path: graph_path
+compute_metrics: False
+inception_ckpt_path: '/path/to/inception_for_metrics.ckpt'
 
 loss_scale: 1024.0
 lr: 0.0001
@@ -40,6 +42,7 @@ n_res: 4
 n_dis: 6
 img_size: 256
 img_ch: 3
+use_global_norm: True
 
 device_id: "4"
 genA2B_ckpt: './results/selfie2anime_genA2B_params_latest.ckpt'
