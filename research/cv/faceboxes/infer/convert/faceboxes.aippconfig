@@ -1,0 +1,29 @@
+aipp_op {
+    aipp_mode: static
+    input_format : YUV420SP_U8
+    csc_switch : true
+    crop: false
+    rbuv_swap_switch : false
+    src_image_size_w: 1056
+    src_image_size_h: 2496
+    matrix_r0c0: 256
+    matrix_r0c1: 454
+    matrix_r0c2: 0
+    matrix_r1c0: 256
+    matrix_r1c1: -88
+    matrix_r1c2: -183
+    matrix_r2c0: 256
+    matrix_r2c1: 0
+    matrix_r2c2: 359
+    input_bias_0 : 0
+    input_bias_1 : 128
+    input_bias_2 : 128
+    #uint8->fp16，pixel_out_chx(i) = [pixel_in_chx(i) – mean_chn_i – min_chn_i] * var_reci_chn
+    #BGR
+    mean_chn_0: 104
+    mean_chn_1: 117
+    mean_chn_2: 123
+    var_reci_chn_0 : 1
+    var_reci_chn_1 : 1
+    var_reci_chn_2 : 1
+}
