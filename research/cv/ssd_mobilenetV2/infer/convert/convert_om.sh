@@ -23,6 +23,5 @@ echo "Output OM file path: ${om_path}"
 
 atc --input_format=NCHW \
     --framework=1 --model="${air_path}" \
-    --input_shape="x:1, 3, 300, 300" \
     --output="${om_path}" \
     --soc_version=Ascend310

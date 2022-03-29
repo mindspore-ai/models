@@ -59,12 +59,6 @@ bool MxBaseInfer::Init(const std::string &om_path) {
         return false;
     }
 
-    ret = m_dvppwarpper.Init();
-    if (ret != APP_ERR_OK) {
-        LogError << "m_dvppwarpper init error.";
-        return false;
-    }
-
     m_model_path = om_path;
     m_is_init = true;
 
@@ -78,7 +72,6 @@ bool MxBaseInfer::Init(const std::string &om_path) {
 
 bool MxBaseInfer::UnInit() {
     if (IsInit()) {
-        m_dvppwarpper.DeInit();
         m_model_processor.DeInit();
         m_model_path.clear();
         m_model_desc = MxBase::ModelDesc();

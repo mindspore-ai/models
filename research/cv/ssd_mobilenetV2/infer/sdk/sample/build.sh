@@ -17,7 +17,7 @@
 set -e
 
 # complie
-g++ no_aipp.cpp \
+g++ main.cpp \
     -I "../../../" \
     -I "${ASCEND_HOME}/nnrt/latest/acllib/include" \
     -I "${MX_SDK_HOME}/opensource/include/opencv4" \
@@ -27,4 +27,4 @@ g++ no_aipp.cpp \
     -L "${MX_SDK_HOME}/lib/" \
     -L "${MX_SDK_HOME}/opensource/lib/" \
     -std=c++11 -D_GLIBCXX_USE_CXX11_ABI=0 -Dgoogle=mindxsdk_private -fPIC -fstack-protector-all -g -Wl,-z,relro,-z,now,-z,noexecstack -pie -Wall \
-    -lglog -lmxbase -lstreammanager -lcpprest -lmxpidatatype -lopencv_world -lboost_filesystem -lpthread -lmindxsdk_protobuf -o no_aipp
+    -lglog -lmxbase -lstreammanager -lcpprest -lmxpidatatype -lopencv_world -lboost_filesystem -lpthread -lmindxsdk_protobuf -o main

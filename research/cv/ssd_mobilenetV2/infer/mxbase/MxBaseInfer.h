@@ -20,7 +20,6 @@
 #include <string>
 #include <vector>
 
-#include "MxBase/DvppWrapper/DvppWrapper.h"
 #include "MxBase/ErrorCode/ErrorCode.h"
 #include "MxBase/ModelInfer/ModelInferenceProcessor.h"
 #include "MxBase/Tensor/TensorBase/TensorBase.h"
@@ -57,7 +56,6 @@ class MxBaseInfer {
  protected:
     MxBase::ModelInferenceProcessor m_model_processor;
     MxBase::ModelDesc m_model_desc;
-    MxBase::DvppWrapper m_dvppwarpper;
     uint32_t m_deviceId;
     bool m_is_init;
 

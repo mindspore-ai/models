@@ -35,7 +35,6 @@
 #include "infer/mxbase/SSDPostProcessor.h"
 
 DEFINE_string(model, "../data/models/ssd-mobilenet-v2.om", "om model path.");
-DEFINE_bool(use_aipp, false, "is using aipp");
 DEFINE_bool(debug, false, "is using debug");
 DEFINE_string(out_images, "../data/", "out image file or path.");
 DEFINE_int32(device, 0, "device id used");
@@ -43,8 +42,8 @@ DEFINE_string(color, "bgr", "input color space need for model.");
 DEFINE_string(classes_path, "../data/classes.json", "classes path");
 DEFINE_string(classes_id_path, "../data/classes_id.json", "classes id path");
 DEFINE_string(coco_path, "../data/coco2017/", "coco data dir");
-DEFINE_int32(width, 300, "model_width");
-DEFINE_int32(height, 300, "model_height");
+DEFINE_int32(width, 320, "model_width");
+DEFINE_int32(height, 320, "model_height");
 DEFINE_string(config_cfg_path, "../data/config.cfg", "cfg path");
 DEFINE_string(label_path, "../data/coco_ssd_mobile_net_v2.name", "label_path");
 
@@ -63,7 +62,6 @@ int main(int argc, char *argv[]) {
     OptionManager::getInstance()->parseCommandLineFlags(argc, argv);
 
     LogInfo << "model : " << FLAGS_model;
-    LogInfo << "use_aipp : " << FLAGS_use_aipp;
     LogInfo << "debug : " << FLAGS_debug;
     LogInfo << "out_images : " << FLAGS_out_images;
     LogInfo << "device : " << FLAGS_device;
@@ -74,7 +72,7 @@ int main(int argc, char *argv[]) {
 
     sdk_infer::mxbase_infer::SSDInfer infer(
         FLAGS_device, FLAGS_classes_path, FLAGS_classes_id_path,
-        FLAGS_out_images, FLAGS_debug, FLAGS_use_aipp, FLAGS_width,
+        FLAGS_out_images, FLAGS_debug, FLAGS_width,
         FLAGS_height, FLAGS_config_cfg_path, FLAGS_label_path);
     if (!infer.Init(FLAGS_model)) {
         LogError << "init inference module failed !!!";
