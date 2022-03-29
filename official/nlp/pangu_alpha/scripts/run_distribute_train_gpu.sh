@@ -28,8 +28,7 @@ DATASET=$3
 PER_BATCH_SIZE=$4
 MODE=$5
 
-
-mpirun --allow-run-as-root -x PATH -x LD_LIBRARY_PATH -x PYTHONPATH -x NCCL_DEBUG -x GLOG_v -n $RANK_SIZE --hostfile $HOSTFILE --output-filename log_output --merge-stderr-to-stdout \
+mpirun --allow-run-as-root -x PATH -x NCCL_IB_HCA -x NCCL_SOCKET_IFNAME -x LD_LIBRARY_PATH -x PYTHONPATH -x NCCL_DEBUG -x GLOG_v -n $RANK_SIZE --hostfile $HOSTFILE --output-filename log_output --merge-stderr-to-stdout \
     python -s ${self_path}/../train.py  \
       --distribute=true                 \
       --device_num=$RANK_SIZE           \
