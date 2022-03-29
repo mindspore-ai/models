@@ -102,10 +102,7 @@ if config.device_target == "Ascend":
 
 # Set mempool block size for improving memory utilization, which will not take effect in GRAPH_MODE
 if context.get_context("mode") == context.PYNATIVE_MODE:
-    context.set_context(mempool_block_size="31GB")
-    # Since the default max memory pool available size on ascend is 30GB, which does not meet the requirements and needs to be adjusted larger
-    if context.get_context("device_target") == "Ascend":
-        context.set_context(max_device_memory="31GB")
+    context.set_context(mempool_block_size="28GB")
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_maskrcnn_mobilenetv1():
