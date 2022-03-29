@@ -1,0 +1,36 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+
+# support Ascend/GPU
+device_type: 'Ascend'
+# indicate the physical serial number of the card, default: 0
+device_id: 0
+step: 0
+# ======================================================================================================
+# config on Ascend/GPU for RCNN, VOC2007.
+# training options
+train_batch_size: 4096
+# evaluation options
+work_nums: 8
+finetune_learning_rate: 0.013
+finetune_momentum: 0.9
+finetune_weight_decay: 1e-4
+svm_learning_rate: 1e-3
+svm_momentum: 0.9
+svm_weight_decay: 1e-4
+regression_learning_rate: 1e-4
+
+---
+# Help description for each configuration
+device_type: "support Ascend/GPU ,chose the right option for your environments,default: Ascend"
+device_id: "the physical serial number of the card, default: 0"
+train_batch_size: "batch_size for training phase, default: 4096"
+work_nums: "the numbers of parallel processing threads for evaluation, default: 8"
+eval_batch_size: "batch_size for inference phase, default: 4096."
+finetune_learning_rate: "learning rate of finetune, default:0.013"
+finetune_momentum: "momentum of finetune, default:0.9"
+finetune_weight_decay: "weight_decay of finetune, default:1e-4"
+svm_learning_rate: "learning rate of svm, default:1e-3"
+svm_momentum: "momentum of svm, default:0.9"
+svm_weight_decay: "weight_decay of svm, default:1e-4"
+regression_learning_rate: "learning rate of regression, default:1e-4"
+---

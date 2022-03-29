@@ -69,11 +69,10 @@ class MSUtils:
     """
     utils for initialize and prepare dataloader
     """
-
     @staticmethod
     def initialize(device="CPU", device_id=0):
         """
-        :param device: CPU/Ascend, do not support GPU
+        :param device: support GPU/CPU/Ascend
         """
         set_seed(1)
         ds.config.set_seed(1)

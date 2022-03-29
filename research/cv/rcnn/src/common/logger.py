@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import traceback
 import colorlog
 
 from src import paths
-
+from mindspore.communication import get_rank
 
 def wrap_trace_info(message):
     trace_info = traceback.extract_stack()[-3]
@@ -43,7 +43,12 @@ class Logger:
     def __init__(self, name='main', debug=True):
         self.logger = logging.getLogger(name)
         self.logger.setLevel(logging.DEBUG)
-        log_dir = paths.Log.root
+        device_num = int(os.getenv('RANK_SIZE', '1'))
+        if device_num > 1:
+            rank_id = get_rank()
+        elif device_num == 1:
+            rank_id = 0
+        log_dir = paths.Log.root + str(rank_id)
 
         # set handlers
         if not self.logger.handlers:

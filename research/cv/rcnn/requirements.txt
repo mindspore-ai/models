@@ -1,3 +1,5 @@
 opencv-python
 opencv-contrib-python
 xmltodict
+tqdm
+colorlog

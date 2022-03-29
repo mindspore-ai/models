@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ class MultiMarginLoss(nn.Cell):
         self.margin = margin
         self.on_value, self.off_value = Tensor(1.0, mindspore.float32), Tensor(0.0, mindspore.float32)
         self.op_sum = ops.ReduceSum(keep_dims=True)
-        self.onehot = nn.OneHot(depth=class_num, axis=1)
+        self.onehot = nn.OneHot(depth=class_num, axis=-1)
         self.relu = nn.ReLU()
 
     def construct(self, input_: Tensor, target: Tensor) -> Tensor:
