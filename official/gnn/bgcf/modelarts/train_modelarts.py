@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ from src.bgcf import BGCF
 from src.utils import convert_item_id
 from src.callback import TrainBGCF
 from src.dataset import load_graph, create_dataset
-from src.callback_modelarts import ForwardBGCF
+from src.callback import ForwardBGCF
 
 from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper
