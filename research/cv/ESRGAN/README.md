@@ -9,9 +9,14 @@
     - [Script and Sample Code](#script-and-sample-code)
     - [Script Parameters](#script-parameters)
     - [Training Process](#training-process)
+- [Inference Process](#inference-process)
+    - [Export MindIR](#export-mindir)
+    - [Infer on Ascend310](#infer-on-ascend310)
+    - [Result](#result)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Training Performance](#training-performance)  
+        - [Evaluation Performance](#evaluation-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -67,6 +72,7 @@ ESRGAN
 
 ├─ README.md                             # descriptions about ESRGAN
 ├── scripts
+ ├─ run_infer_310.sh                     # launch ascend 310 inference
  ├─ run_distribute_train_gpu.sh              # launch GPU training(8 pcs)
  ├─ run_eval_gpu.sh                          # launch GPU eval
  ├─ run_stranalone_train_gpu.sh              # launch GPU training(1 pcs)
@@ -89,8 +95,10 @@ ESRGAN
  └─ util
   ├─ extract_subimages.py                # crop large images to sub-images
   └─ util.py                             # Utils for model
-├─ export.py                             # generate images
+├─ export.py                             # export mindir script
 ├─ eval.py                               # eval script
+├─ preprocess.py                         # preprocess script
+├─ postprocess.py                        # postprocess scripts
 └─ train.py                              # train script
 ```
 
@@ -162,6 +170,38 @@ eg: bash run_eval_gpu.sh /ckpt/psnr_best.ckpt /data/DIV2K/Set5/LRbicx4 /data/DIV
 
 Evaluation result will be stored in the ./result. Under this, you can find generator pictures.
 
+# [Inference Process](#contents)
+
+## [Export MindIR](#contents)
+
+```shell
+python export.py --file_name [FILE_NAME] --file_format [FILE_FORMAT] --generator_path[CKPT_PATH]
+
+eg: python export.py ESRGAN MINDIR ./ckpt/psnr_best.ckpt
+```
+
+The ckpt_file parameter is required,
+`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+
+## [Infer on Ascend310](#contents)
+
+Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [TEST_DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
+
+eg: bash run_infer_310.sh /home/stu/ESRGAN_model.mindir /home/stu/Set5 y Ascend 0  
+```
+
+### [Result](#contents)
+
+Inference result is saved in current path, you can find result like this in acc.log file.
+
+```bash
+'avg psnr': 31.83
+```
+
 # [Model Description](#contents)
 
 ## [Performance](#contents)
@@ -182,6 +222,16 @@ Evaluation result will be stored in the ./result. Under this, you can find gener
 | Total time                 | 8pcs: 36h                                                   |                                                |
 | Checkpoint for Fine tuning | 64.86M (.ckpt file)                                         |64.86M (.ckpt file)                             |
 | Scripts                    | [esrgan script](https://gitee.com/mindspore/models/tree/master/research/cv/ESRGAN) |
+
+### Evaluation Performance
+
+| Parameters          | Ascend 910               |
+| ------------------- | -------------------------|
+| Model Version       | V1                       |
+| MindSpore Version   | 1.3.0                    |
+| Dataset             | Set14                    |
+| batch_size          | 1                        |
+| outputs             | super-resolution pictures|
 
 # [ModelZoo Homepage](#contents)
 
