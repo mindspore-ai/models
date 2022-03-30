@@ -1,0 +1,48 @@
+# Architecture 72.41%
+arch: RepVGG-A0
+
+# ===== Dataset ===== #
+data_url: ../data/imagenet
+set: ImageNet
+num_classes: 1000
+mix_up: 0.
+cutmix: 0.
+auto_augment: None
+interpolation: bicubic
+re_prob: 0.0
+re_mode: pixel
+re_count: 1
+mixup_prob: 0.
+switch_prob: 0.
+mixup_mode: batch
+image_size: 224
+
+
+# ===== Learning Rate Policy ======== #
+optimizer: momentum
+base_lr: 0.1
+warmup_lr: 0.00000007
+min_lr: 0.0000006
+lr_scheduler: cosine_lr
+warmup_length: 0
+
+
+# ===== Network training config ===== #
+amp_level: O1
+keep_bn_fp32: True
+beta: [ 0.9, 0.999 ]
+clip_global_norm_value: 5.
+is_dynamic_loss_scale: True
+epochs: 180
+label_smoothing: 0.1
+weight_decay: 0.0001
+momentum: 0.9
+batch_size: 512
+
+# ===== EMA ===== #
+with_ema: False
+ema_decay: 0.9999
+
+# ===== Hardware setup ===== #
+num_parallel_workers: 16
+device_target: Ascend
