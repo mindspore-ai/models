@@ -108,19 +108,19 @@ python pretrain_eval.py
 - Set bert network config and optimizer hyperparameters in `task_[DOWNSTREAM_TASK]_config.yaml`.
 
 - Classification task: Set task related hyperparameters in scripts/run_classifier.sh.
-- Run `bash scripts/run_classifier.sh` for fine-tuning of BERT-base and BERT-NEZHA model.
+- Run `bash scripts/run_classifier.sh [DEVICE_ID]` for fine-tuning of BERT-base and BERT-NEZHA model.
 
-  bash scripts/run_classifier.sh
+  bash scripts/run_classifier.sh DEVICE_ID(optional)
 
 - NER task: Set task related hyperparameters in scripts/run_ner.sh.
-- Run `bash scripts/run_ner.sh` for fine-tuning of BERT-base and BERT-NEZHA model.
+- Run `bash scripts/run_ner.sh [DEVICE_ID]` for fine-tuning of BERT-base and BERT-NEZHA model.
 
-  bash scripts/run_ner.sh
+  bash scripts/run_ner.sh DEVICE_ID(optional)
 
 - SQuAD task: Set task related hyperparameters in scripts/run_squad.sh.
-- Run `bash scripts/run_squad.sh` for fine-tuning of BERT-base and BERT-NEZHA model.
+- Run `bash scripts/run_squad.sh [DEVICE_ID]` for fine-tuning of BERT-base and BERT-NEZHA model.
 
-  bash scripts/run_squad.sh
+  bash scripts/run_squad.sh DEVICE_ID(optional)
 ```
 
 - Running on GPU
@@ -137,19 +137,19 @@ bash scripts/run_distributed_pretrain_for_gpu.sh 8 40 /path/cn-wiki-128
 - Set bert network config and optimizer hyperparameters in `task_[DOWNSTREAM_TASK]_config.yaml`.
 
 - Classification task: Set task related hyperparameters in scripts/run_classifier.sh.
-- Run `bash scripts/run_classifier.sh` for fine-tuning of BERT-base and BERT-NEZHA model.
+- Run `bash scripts/run_classifier.sh [DEVICE_ID]` for fine-tuning of BERT-base and BERT-NEZHA model.
 
-  bash scripts/run_classifier.sh
+  bash scripts/run_classifier.sh DEVICE_ID(optional)
 
 - NER task: Set task related hyperparameters in scripts/run_ner.sh.
-- Run `bash scripts/run_ner.sh` for fine-tuning of BERT-base and BERT-NEZHA model.
+- Run `bash scripts/run_ner.sh [DEVICE_ID]` for fine-tuning of BERT-base and BERT-NEZHA model.
 
-  bash scripts/run_ner.sh
+  bash scripts/run_ner.sh DEVICE_ID(optional)
 
 - SQuAD task: Set task related hyperparameters in scripts/run_squad_gpu.sh.
-- Run `bash scripts/run_squad_gpu.py` for fine-tuning of BERT-base and BERT-NEZHA model.
+- Run `bash scripts/run_squad_gpu.py [DEVICE_ID]` for fine-tuning of BERT-base and BERT-NEZHA model.
 
-  bash scripts/run_squad_gpu.sh
+  bash scripts/run_squad_gpu.sh DEVICE_ID(optional)
 ```
 
 - running on ModelArts
@@ -688,7 +688,7 @@ python src/finetune_data_preprocess.py --data_dir=/path/msra_dataset.xml --vocab
 For finetune and evaluation, just do
 
 ```bash
-bash scripts/run_ner.sh
+bash scripts/run_ner.sh DEVICE_ID(optional)
 ```
 
 The command above will run in the background, you can view training logs in ner_log.txt.

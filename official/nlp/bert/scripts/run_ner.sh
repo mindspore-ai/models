@@ -16,10 +16,18 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash scripts/run_ner.sh"
-echo "for example: bash scripts/run_ner.sh"
+echo "bash scripts/run_ner.sh DEVICE_ID"
+echo "DEVICE_ID is optional, default value is zero"
+echo "for example: bash scripts/run_ner.sh 1"
 echo "assessment_method include: [BF1, MF1, clue_benchmark]"
 echo "=============================================================================================================="
+
+if [ -z $1 ]
+then
+    export DEVICE_ID=0
+else
+    export DEVICE_ID=$1
+fi
 
 mkdir -p ms_log
 CUR_DIR=`pwd`
@@ -34,7 +42,7 @@ python ${PROJECT_DIR}/../run_ner.py  \
     --assessment_method="BF1" \
     --use_crf="false" \
     --with_lstm="false" \
-    --device_id=0 \
+    --device_id=$DEVICE_ID \
     --epoch_num=5 \
     --train_data_shuffle="true" \
     --eval_data_shuffle="false" \

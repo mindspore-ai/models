@@ -110,19 +110,19 @@ bash scripts/run_distributed_pretrain_ascend.sh /path/cn-wiki-128 /path/hccl.jso
 - 在`task_[DOWNSTREAM_TASK]_config.yaml`中设置BERT网络配置和优化器超参。
 
 - 分类任务：在scripts/run_classifier.sh中设置任务相关的超参。
-- 运行`bash scripts/run_classifier.sh`，对BERT-base和BERT-NEZHA模型进行微调。
+- 运行`bash scripts/run_classifier.sh [DEVICE_ID]`，对BERT-base和BERT-NEZHA模型进行微调。
 
-  bash scripts/run_classifier.sh
+  bash scripts/run_classifier.sh DEVICE_ID(optional)
 
 - NER任务：在scripts/run_ner.sh中设置任务相关的超参。
-- 运行`bash scripts/run_ner.sh`，对BERT-base和BERT-NEZHA模型进行微调。
+- 运行`bash scripts/run_ner.sh [DEVICE_ID]`，对BERT-base和BERT-NEZHA模型进行微调。
 
-  bash scripts/run_ner.sh
+  bash scripts/run_ner.sh DEVICE_ID(optional)
 
 - SQUAD任务：在scripts/run_squad.sh中设置任务相关的超参。
--运行`bash scripts/run_squad.sh`，对BERT-base和BERT-NEZHA模型进行微调。
+-运行`bash scripts/run_squad.sh [DEVICE_ID]`，对BERT-base和BERT-NEZHA模型进行微调。
 
-  bash scripts/run_squad.sh
+  bash scripts/run_squad.sh DEVICE_ID(optional)
 ```
 
 - 在GPU上运行
@@ -143,19 +143,19 @@ bash scripts/run_distributed_pretrain_for_gpu.sh 8 40 /path/cn-wiki-128
 - 在`task_[DOWNSTREAM_TASK]_config.yaml`中设置BERT网络配置和优化器超参。
 
 - 分类任务：在scripts/run_classifier.sh中设置任务相关的超参。
-- 运行`bash scripts/run_classifier.sh`，对BERT-base和BERT-NEZHA模型进行微调。
+- 运行`bash scripts/run_classifier.sh [DEVICE_ID]`，对BERT-base和BERT-NEZHA模型进行微调。
 
-  bash scripts/run_classifier.sh
+  bash scripts/run_classifier.sh DEVICE_ID(optional)
 
 - NER任务：在scripts/run_ner.sh中设置任务相关的超参。
-- 运行`bash scripts/run_ner.sh`，对BERT-base和BERT-NEZHA模型进行微调。
+- 运行`bash scripts/run_ner.sh [DEVICE_ID]`，对BERT-base和BERT-NEZHA模型进行微调。
 
-  bash scripts/run_ner.sh
+  bash scripts/run_ner.sh DEVICE_ID(optional)
 
 - SQUAD任务：在scripts/run_squad_gpu.sh中设置任务相关的超参。
--运行`bash scripts/run_squad_gpu.sh`，对BERT-base和BERT-NEZHA模型进行微调。
+-运行`bash scripts/run_squad_gpu.sh [DEVICE_ID]`，对BERT-base和BERT-NEZHA模型进行微调。
 
-  bash scripts/run_squad_gpu.sh
+  bash scripts/run_squad_gpu.sh DEVICE_ID(optional)
 ```
 
 - 在ModelArts上运行(如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
