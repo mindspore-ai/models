@@ -212,6 +212,8 @@ MASS脚本及代码结构如下：
 python tokenize_corpus.py --corpus_folder /{path}/corpus --output_folder /{path}/tokenized_corpus --tokenizer {nltk|jieba} --pool_size 16
 ```
 
+如果你要使用`nltk`，请确保你已经完成了`nltk data`的安装。如果你本地无法完成安装，请尝试使用`jieba`。
+
 ### 字节对编码
 
 标记化后，使用提供的`all.bpe.codes`对标记后的语料进行字节对编码处理。
