@@ -81,7 +81,7 @@ def train_mobilenetv1():
         # GPU target
         else:
             comm.init()
-            ms.set_auto_parallel_context(device_num=ms.get_group_size(), parallel_mode=ms.ParallelMode.DATA_PARALLEL,
+            ms.set_auto_parallel_context(device_num=comm.get_group_size(), parallel_mode=ms.ParallelMode.DATA_PARALLEL,
                                          gradients_mean=True)
         ckpt_save_dir = config.save_checkpoint_path + "ckpt_" + str(comm.get_rank()) + "/"
 
