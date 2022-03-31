@@ -11,6 +11,7 @@
     - [准备prompt文件](#准备prompt文件)
     - [准备预训练模型文件](#准备预训练模型文件)
     - [Zero-shot分类推理](#zero-shot分类推理)
+- [Wukong数据集处理](#wukong数据集预处理)
 
 ## Wukong数据集
 
@@ -103,3 +104,66 @@ INFO:main:correct @1: 51.51; correct @5: 78.33
 |ViT-L-G|56.15|79.86|57.54|81.46|
 |ViT-L-F|49.74|76.3|52.83|78.88|
 |ViT-L|50.22|74.79|54.43|80.1|
+
+## Wukong数据集预处理
+
+### 下载Wukong数据集文件
+
+Wukong 100m数据集文件可从[Wukong](https://wukong-dataset.github.io/wukong-dataset/download.html)下载，解压后文件结构如下：
+
+```text
+.
+└── data_root
+    └─wukong_release
+        ├─ wukong_100m_0.csv
+        ├─ wukong_100m_1.csv
+        ├─ wukong_100m_2.csv
+        ├─ ....
+        └─ wukong_100m_255.csv
+```
+
+### 下载图片
+
+我们提供了一个多线程python脚本来实现数据集图片的下载
+
+```shell
+cd models/research/mm/wukong/src/dataset/
+python wukong_download.py --csv_dir /path/to/data_root/wukong_release/ --img_dir IMG_DIR [--start_id 0] [--end_id -1] [--thread_num 4]
+```
+
+其中IMG_DIR表示图片下载目录，可选项start_id与end_id表示csv文件的开始与结束id，thread_num表示进行下载的线程数。默认参数将会下载目录下的所有csv文件中的图片到指定目录：
+
+```text
+.
+└── IMG_DIR
+    ├─000
+    │   ├─ 00000.jpg
+    │   ├─ 00001.jpg
+    │   ├─ 00002.jpg
+    │   └─ ......
+    ├─001
+    ├─002
+    ├─...
+```
+
+### 生成MindRecord
+
+为了便于在mindspore中使用，我们将数据集的格式转化为[MindRecord](https://www.mindspore.cn/docs/api/zh-CN/r1.6/api_python/mindspore.mindrecord.html#module-mindspore.mindrecord)格式通过运行：
+
+```shell
+cd models/research/mm/wukong/
+python -m src.dataset.generate_dataset --csv_dir /path/to/data_root/wukong_release/ --img_dir IMG_DIR --data_record_dir DATA_RECORD_DIR [--shard_num 10] [--worker_num 4] [--block_size 2000]
+```
+
+这里DATA_RECORD_DIR指代最终生成的mindrecord文件的目录，shard_num对应mindrecord文件生成时切分的份数，worker_num表示转化用的worker数量，block_size表示单次写入数据块的大小。最终生成的目录结构如下：
+
+```text
+└─DATA_RECORD_DIR
+        ├─ wukong100m.mindrecord0
+        ├─ wukong100m.mindrecord0.db
+        ├─ ....
+        ├─ wukong100m.mindrecord9
+        └─ wukong100m.mindrecord9.db
+```
+
+接下来就可以适用mindspore的库加载这种标准格式的数据了，可以参考models/research/mm/wukong/src/dataset/dataset.py中的get_wukong_dataset函数。

@@ -13,14 +13,13 @@
 # limitations under the License.
 # ============================================================================
 import logging
-
 import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore import dtype as mstype
 
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger('main')
+logger = logging.getLogger(__name__)
 
 
 class FilipTemplateEncoder(nn.Cell):

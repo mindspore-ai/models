@@ -11,6 +11,7 @@
     - [Propare prompt files](#propare-prompt-files)
     - [Prepare pretrained model checkpoint](#prepare-pretrained-model-checkpoint)
     - [Zero-shot Classification](#zero-shot-classification)
+- [Wukong Dataset](#quick-start-on-wukong-dataset)
 
 ## Wukong Dataset
 
@@ -84,7 +85,7 @@ Download corresponding pretrained checkpoint files following links in the [table
 Run eval.py to do zero-shot classification, each model has its config file under src/config/ folder.
 
 ```shell
-python eval.py --config_paht [config_path] --ckpt_path [ckpt_path] --dataset_path [/path/to/data_root] --batch_size [batch size]
+python eval.py --config_path [config_path] --ckpt_path [ckpt_path] --dataset_path [/path/to/data_root] --batch_size [batch size]
 ```
 
 evaluation result is something like this
@@ -103,3 +104,66 @@ Detailed zero-shot classification performance is as below:
 |ViT-L-G|56.15|79.86|57.54|81.46|
 |ViT-L-F|49.74|76.3|52.83|78.88|
 |ViT-L|50.22|74.79|54.43|80.1|
+
+## Quick Start on Wukong Dataset
+
+### Download Wukong Dataset annotation files
+
+Wukong 100m dataset files can be downloaed from [Wukong](https://wukong-dataset.github.io/wukong-dataset/download.html), file structure should be like this:
+
+```text
+.
+└── data_root
+    └─wukong_release
+        ├─ wukong_100m_0.csv
+        ├─ wukong_100m_1.csv
+        ├─ wukong_100m_2.csv
+        ├─ ....
+        └─ wukong_100m_255.csv
+```
+
+### Download images
+
+We provide a multi-threaded python script for downloading the images through annotation files.
+
+```shell
+cd models/research/mm/wukong/src/dataset/
+python wukong_download.py --csv_dir /path/to/data_root/wukong_release/ --img_dir IMG_DIR [--start_id 0] [--end_id -1] [--thread_num 4]
+```
+
+where IMG_DIR refer to the downloaded image dir, option start_id and end_id defines the start and end id for csv files to be downloaded, thread_num defines the number of threads used for parallel downloading. If not provided, default setting will download images in all csv files. Each csv file corresponds to a subdir under IMG_DIR and the final structure is like this:
+
+```text
+.
+└── IMG_DIR
+    ├─000
+    │   ├─ 00000.jpg
+    │   ├─ 00001.jpg
+    │   ├─ 00002.jpg
+    │   └─ ......
+    ├─001
+    ├─002
+    ├─...
+```
+
+### Generate MindRecord
+
+In order to be used in Mindspore, we convert the raw data into [MindRecord](https://www.mindspore.cn/docs/api/en/r1.6/api_python/mindspore.mindrecord.html#module-mindspore.mindrecord) format. To do this, run code
+
+```shell
+cd models/research/mm/wukong/
+python -m src.dataset.generate_dataset --csv_dir /path/to/data_root/wukong_release/ --img_dir IMG_DIR --data_record_dir DATA_RECORD_DIR [--shard_num 10] [--worker_num 4] [--block_size 2000]
+```
+
+Here DATA_RECORD_DIR refer to the path where mindrecord files will be generated into; shared_num refer to the number of files mindrecord is splited; worker_num refer to the number of workers to convert mindrecord and block size defines the block size of each write. After execution the mindrecord files should be like this
+
+```text
+└─DATA_RECORD_DIR
+        ├─ wukong100m.mindrecord0
+        ├─ wukong100m.mindrecord0.db
+        ├─ ....
+        ├─ wukong100m.mindrecord9
+        └─ wukong100m.mindrecord9.db
+```
+
+Then you can load the dataset in a standard format like get_wukong_dataset function in models/research/mm/wukong/src/dataset/dataset.py.
