@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ from mindspore import context
 from mindspore.common.parameter import ParameterTuple
 from mindspore.communication.management import get_group_size
 from mindspore.context import ParallelMode
-from mindspore.ops import functional as F
 from mindspore.parallel._auto_parallel_context import auto_parallel_context
 
 
@@ -247,7 +246,7 @@ class TrainOneStepCell(nn.Cell):
             negative_k(Int): A tensor with given values.
 
         Returns:
-            F.depend(loss, self.optimizer(grads))(Tensor): sgcn_loss
+            loss(Tensor): sgcn_loss
         """
         weights = self.weights
         loss = self.network(
@@ -268,7 +267,8 @@ class TrainOneStepCell(nn.Cell):
         )
         if self.reducer_flag:
             grads = self.grad_reducer(grads)
-        return F.depend(loss, self.optimizer(grads))
+        self.optimizer(grads)
+        return loss
 
 
 class TrainNetWrapper(nn.Cell):

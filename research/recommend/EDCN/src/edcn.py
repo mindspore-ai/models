@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ import numpy as np
 from sklearn.metrics import roc_auc_score
 import mindspore.common.dtype as mstype
 from mindspore.ops import composite as C
-from mindspore.ops import functional as F
 from mindspore.ops import operations as P
 from mindspore.nn import Dropout
 from mindspore.nn.optim import Adam
@@ -353,7 +352,8 @@ class TrainStepWrap(nn.Cell):
         loss = self.network(batch_ids, batch_wts, label)
         sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens) #
         grads = self.grad(self.network, weights)(batch_ids, batch_wts, label, sens)
-        return F.depend(loss, self.optimizer(grads))
+        self.optimizer(grads)
+        return loss
 
 
 class PredictWithSigmoid(nn.Cell):

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -152,7 +152,8 @@ class TrainOneStepCell(nn.Cell):
         sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
         grads = grad(loss_net, weights)(real_data, latent_code3, sens)
         grads = grad_reducer(grads)
-        return F.depend(loss, optimizer(grads))
+        optimizer(grads)
+        return loss
 
     # train generator
     def trainG(self, latent_code4, loss, loss_net, grad, optimizer, weights,
@@ -160,7 +161,8 @@ class TrainOneStepCell(nn.Cell):
         sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
         grads = grad(loss_net, weights)(latent_code4, sens)
         grads = grad_reducer(grads)
-        return F.depend(loss, optimizer(grads))
+        optimizer(grads)
+        return loss
 
     def construct(self, real_data, latent_code5):
         '''construct'''

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -80,7 +80,7 @@ class TrainOneStepWithLossScaleCellGlobalNormClip(nn.TrainOneStepWithLossScaleCe
         if not overflow:
             if self.clip_global_norm:
                 grads = C.clip_by_global_norm(grads, clip_norm=self.clip_global_norm_value)
-            loss = F.depend(loss, self.optimizer(grads))
+            self.optimizer(grads)
         else:
             self.print("=============Over Flow, skipping=============")
         return loss

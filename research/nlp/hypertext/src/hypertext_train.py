@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -140,4 +140,5 @@ class HModelTrainOneStepCell(nn.Cell):
         loss = self.network(x1, x2, label)
         gradient_function = self.grad(self.network, weights)
         grads = gradient_function(x1, x2, label)
-        return F.depend(loss, self.optimizer(grads))
+        self.optimizer(grads)
+        return loss

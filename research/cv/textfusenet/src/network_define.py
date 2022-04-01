@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ import time
 import numpy as np
 import mindspore.nn as nn
 from mindspore.common.tensor import Tensor
-from mindspore.ops import functional as F
 from mindspore.ops import composite as C
 from mindspore import ParameterTuple
 from mindspore.train.callback import Callback
@@ -147,5 +146,5 @@ class TrainOneStepCell(nn.Cell):
         grads = self.grad(self.network, weights)(x, img_shape, gt_bboxe, gt_label, gt_num, gt_mask, self.sens)
         if self.reduce_flag:
             grads = self.grad_reducer(grads)
-
-        return F.depend(loss, self.optimizer(grads))
+        self.optimizer(grads)
+        return loss

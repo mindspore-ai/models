@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ from mindspore import context
 from mindspore.communication.management import get_group_size
 from mindspore.context import ParallelMode
 from mindspore.ops import composite as C
-from mindspore.ops import functional as F
 from mindspore.ops import operations as P
 from mindspore.parallel._auto_parallel_context import auto_parallel_context
 
@@ -87,5 +86,5 @@ class TrainingWrapper(nn.Cell):
             grads = self.grad_reducer(grads)
         if self.use_global_norm:
             grads = C.clip_by_global_norm(grads, clip_norm=self.clip_global_norm_value)
-        loss = F.depend(loss, self.optimizer(grads))
+        self.optimizer(grads)
         return loss

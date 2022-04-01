@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -227,9 +227,7 @@ class ParallelTrainOneStepWithLossScaleCell(TrainOneStepWithLossScaleCell):
         overflow = cond
         if self.loss_scaling_manager is not None:
             overflow = self.loss_scaling_manager(self.scale_sense, cond)
-        if overflow:
-            succ = False
-        else:
-            succ = self.optimizer(grads)
+        if not overflow:
+            self.optimizer(grads)
         ret = (loss, overflow, scaling_sens, args[-1])
-        return F.depend(ret, succ)
+        return ret

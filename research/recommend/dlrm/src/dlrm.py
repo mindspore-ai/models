@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import numpy as np
 from sklearn.metrics import accuracy_score
 
 import mindspore.common.dtype as mstype
-from mindspore.ops import functional as F
 from mindspore.ops import composite as C
 from mindspore.ops import operations as P
 from mindspore.nn import Dropout
@@ -436,8 +435,9 @@ class TrainStepWrap(nn.Cell):
         if self.reducer_flag:
             # apply grad reducer on grads
             grads = self.grad_reducer(grads)
+        self.optimizer(grads)
+        return loss
 
-        return F.depend(loss, self.optimizer(grads))
 
 class PredictWithSigmoid(nn.Cell):
     """Predict method
