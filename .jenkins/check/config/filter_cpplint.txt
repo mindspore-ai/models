@@ -103,6 +103,16 @@
 "models/official/recommend/wide_and_deep/infer/sdk/sample/main.cpp"  "runtime/references"
 
 "models/research/cv/fairmot/infer/mxbase/src/Fairmot.h" "runtime/references"
+"models/research/cv/SiamFC/infer/mxbase/src/main.cpp"            "runtime/references"
+"models/research/cv/SiamFC/infer/mxbase/src/SiamFCBase.cpp"         "runtime/references"
+"models/research/cv/SiamFC/infer/mxbase/src/SiamFCBase.h"          "runtime/references"
+"models/official/cv/psenet/infer/mxbase/src/main.cpp"  "runtime/references"
+"models/official/cv/psenet/infer/mxbase/src/PsenetDetection.h"  "runtime/references"
+"models/official/cv/psenet/infer/mxbase/src/PsenetDetection.cpp"  "runtime/references"
+
+"models/research/recommend/autodis/infer/mxbase/src/main.cpp"  "runtime/references"
+"models/research/recommend/autodis/infer/mxbase/src/Autodis.h"  "runtime/references"
+"models/research/recommend/autodis/infer/mxbase/src/Autodis.cpp"  "runtime/references"
 
 "models/official/cv/psenet/infer/mxbase/src/main.cpp"  "runtime/references"
 "models/official/cv/psenet/infer/mxbase/src/PsenetDetection.h"  "runtime/references"
