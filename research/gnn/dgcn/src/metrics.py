@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ from mindspore.common import dtype as mstype
 from mindspore.ops import operations as P
 from mindspore.common.parameter import ParameterTuple
 from mindspore.ops import composite as C
-from mindspore.ops import functional as F
+
 
 class Loss(nn.Cell):
     """Softmax cross-entropy loss with masking."""
@@ -124,7 +124,8 @@ class TrainOneStepCell(nn.Cell):
         loss = self.network(adj, ppmi, feature, ret)
         sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
         grads = self.grad(self.network, weights)(adj, ppmi, feature, ret, sens)
-        return F.depend(loss, self.optimizer(grads))
+        self.optimizer(grads)
+        return loss
 
 
 class TrainNetWrapper(nn.Cell):

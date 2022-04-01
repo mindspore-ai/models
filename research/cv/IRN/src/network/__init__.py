@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -89,5 +89,5 @@ class TrainOneStepCell_IRN(nn.TrainOneStepCell):
             for grad in grads:
                 new_grads += (self.mul(grad, clip_coef),)  # 更新梯度
             grads = new_grads
-
-        return F.depend(loss, self.optimizer(grads))
+        self.optimizer(grads)
+        return loss

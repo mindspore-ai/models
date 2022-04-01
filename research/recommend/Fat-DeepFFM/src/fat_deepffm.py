@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ from mindspore.common.initializer import initializer
 
 import mindspore.ops as P
 from mindspore.ops import composite as C
-from mindspore.ops import functional as F
 
 from mindspore import Parameter, ParameterTuple
 from mindspore import Tensor
@@ -351,7 +350,8 @@ class TrainStepWrap(nn.Cell):
         grads = self.grad(self.network, weights)(cats_vals, num_vals, label, sens)
         if self.reducer_flag:
             grads = self.grad_reducer(grads)
-        return F.depend(loss, self.optimizer(grads))
+        self.optimizer(grads)
+        return loss
 
 
 class ModelBuilder:

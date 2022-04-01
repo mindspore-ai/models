@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -77,5 +77,5 @@ class TrainOneStepCell(nn.Cell):
         sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
         grads = self.grad(self.network, weights)(image, label, sens)
         grads = self.grad_reducer(grads)
-
-        return F.depend(loss, self.optimizer(grads)), acc
+        self.optimizer(grads)
+        return loss, acc

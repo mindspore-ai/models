@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -252,5 +252,5 @@ class PoseTrainOneStepCell(nn.Cell):
         grads = self.grad(self.network, self.weights)(*inputs, sens)
         grads = self.hyper_map(F.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
         grads = self.grad_reducer(grads)
-        loss = F.depend(loss, self.optimizer(grads))
+        self.optimizer(grads)
         return loss

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -280,5 +280,5 @@ class GRUTrainOneStepCell(nn.TrainOneStepCell):
         if self.enable_clip_grad:
             grads = self.clip_gradients(grads, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE)
         grads = self.grad_reducer(grads)
-        succ = self.optimizer(grads)
-        return F.depend(loss, succ)
+        self.optimizer(grads)
+        return loss

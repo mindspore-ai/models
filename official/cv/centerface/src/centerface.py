@@ -1,4 +1,4 @@
-# Copyright 2020-21 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -309,7 +309,8 @@ class TrainingWrapper(nn.Cell):
             cond = self.less_equal(self.base, flag_sum)
 
         ret = (loss, cond, sens)
-        return F.depend(ret, self.optimizer(grads))
+        self.optimizer(grads)
+        return ret
 
 
 class CenterFaceWithNms(nn.Cell):

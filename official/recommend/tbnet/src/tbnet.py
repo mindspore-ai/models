@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 from mindspore import nn
 from mindspore import ParameterTuple
 from mindspore.ops import operations as P
-from mindspore.ops import functional as F
 from mindspore.ops import composite as C
 from mindspore.parallel._utils import _get_device_num, _get_parallel_mode, _get_gradients_mean
 from mindspore.context import ParallelMode
@@ -329,8 +328,8 @@ class TrainStepWrap(nn.Cell):
         if self.reducer_flag:
             # apply grad reducer on grads
             grads = self.grad_reducer(grads)
-
-        return F.depend(loss, self.optimizer(grads))
+        self.optimizer(grads)
+        return loss
 
 
 class PredictWithSigmoid(nn.Cell):

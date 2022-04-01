@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -183,4 +183,5 @@ class TrainOneStepCell(nn.Cell):
         grads = self.grad(self.network, weights)(*inputs)
         grads = self.grad_reducer(grads)
         grads = ops.clip_by_global_norm(grads, 0.5)
-        return F.depend(loss, self.optimizer(grads))
+        self.optimizer(grads)
+        return loss
