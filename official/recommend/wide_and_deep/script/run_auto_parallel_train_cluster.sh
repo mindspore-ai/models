@@ -31,20 +31,29 @@ export RANK_TABLE_FILE=$9
 DEVICE_START=0
 # shellcheck source=/dev/null
 source $ENV_SH
-for((i=0;i<=7;i++));
-do
-  export RANK_ID=$[i+RANK_START]
-  export DEVICE_ID=$[i+DEVICE_START]
-  rm -rf ${execute_path}/device_$RANK_ID
-  mkdir ${execute_path}/device_$RANK_ID
-  cd ${execute_path}/device_$RANK_ID || exit
-  if [ $MODE == "host_device_mix" ]; then
-    python -s ${self_path}/../train_and_eval_auto_parallel.py --data_path=$DATASET --epochs=$EPOCH_SIZE --vocab_size=$VOCAB_SIZE --emb_dim=$EMB_DIM --dropout_flag=True --host_device_mix=1 >train_deep$i.log 2>&1 &
-  elif [ $MODE == "field_slice_host_device_mix" ]; then
-    python -s ${self_path}/../train_and_eval_auto_parallel.py --data_path=$DATASET --epochs=$EPOCH_SIZE --vocab_size=$VOCAB_SIZE --emb_dim=$EMB_DIM --dropout_flag=True --host_device_mix=1 --full_batch=True --field_slice=True >train_deep$i.log 2>&1 &
-  elif [ $MODE == "forward_unique" ]; then
-    python -s ${self_path}/../train_and_eval_auto_parallel.py --data_path=$DATASET --epochs=$EPOCH_SIZE --vocab_size=$VOCAB_SIZE --emb_dim=$EMB_DIM --dropout_flag=True --sparse=True >train_deep$i.log 2>&1 &
-  else
-    python -s ${self_path}/../train_and_eval_auto_parallel.py --data_path=$DATASET --epochs=$EPOCH_SIZE --vocab_size=$VOCAB_SIZE --emb_dim=$EMB_DIM --dropout_flag=True --host_device_mix=0 >train_deep$i.log 2>&1 &
-  fi
-done
+
+if [ $MODE == "forward_unique" ]; then
+  export GRAPH_OP_RUN=1
+  export HCCL_WHITELIST_DISABLE=1
+  rm -rf ${execute_path}/train_parallel
+  mkdir ${execute_path}/train_parallel
+  cd ${execute_path}/train_parallel || exit
+  mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
+    python -s ${self_path}/../train_and_eval_auto_parallel.py --data_path=$DATASET --epochs=$EPOCH_SIZE --vocab_size=$VOCAB_SIZE --emb_dim=$EMB_DIM --dropout_flag=True --sparse=True >train_deep.log 2>&1 &
+else
+  for((i=0;i<=7;i++));
+  do
+    export RANK_ID=$[i+RANK_START]
+    export DEVICE_ID=$[i+DEVICE_START]
+    rm -rf ${execute_path}/device_$RANK_ID
+    mkdir ${execute_path}/device_$RANK_ID
+    cd ${execute_path}/device_$RANK_ID || exit
+    if [ $MODE == "host_device_mix" ]; then
+      python -s ${self_path}/../train_and_eval_auto_parallel.py --data_path=$DATASET --epochs=$EPOCH_SIZE --vocab_size=$VOCAB_SIZE --emb_dim=$EMB_DIM --dropout_flag=True --host_device_mix=1 >train_deep$i.log 2>&1 &
+    elif [ $MODE == "field_slice_host_device_mix" ]; then
+      python -s ${self_path}/../train_and_eval_auto_parallel.py --data_path=$DATASET --epochs=$EPOCH_SIZE --vocab_size=$VOCAB_SIZE --emb_dim=$EMB_DIM --dropout_flag=True --host_device_mix=1 --full_batch=True --field_slice=True >train_deep$i.log 2>&1 &
+    else
+      python -s ${self_path}/../train_and_eval_auto_parallel.py --data_path=$DATASET --epochs=$EPOCH_SIZE --vocab_size=$VOCAB_SIZE --emb_dim=$EMB_DIM --dropout_flag=True --host_device_mix=0 >train_deep$i.log 2>&1 &
+    fi
+  done
+fi
