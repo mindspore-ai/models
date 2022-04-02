@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -eq 3 ]
+if [ $# -ne 3 ]
 then
     echo "Usage: bash run_eval_ascend.sh [DEVICE_ID] [DATASET_PATH] [CHECKPOINT_PATH]"
 exit 1
