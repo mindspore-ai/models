@@ -209,8 +209,8 @@ sh scripts/run_eval_gpu.sh path/evalset path/ckpt
 | 损失函数      | SoftmaxCrossEntropyExpand                       |
 | 输出          | 概率                                            |
 | 损失          | 0.6                                            |
-| 速度 | 1卡：127毫秒/步；8卡：132毫秒/步 |
-| 总时间 | 1卡：65小时；8卡：9.5小时 |
+| 速度 | 1卡：127毫秒/步；8卡：153毫秒/步 |
+| 总时间 | 1卡：65小时；8卡：10小时 |
 | 参数(M) | 46.15 |
 | 微调检查点 | 293M （.ckpt file） |
 | 脚本 | [脚本路径](https://gitee.com/mindspore/mindspore/tree/r1.3/model_zoo/research/cv/ibnnet) |
