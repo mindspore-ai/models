@@ -1,0 +1,90 @@
+# model config
+model_config:
+    encoder_layers: 12
+    encoder_num_heads: 12
+    encoder_dim: 768
+    mlp_ratio: 4
+
+# cloud context init config
+seed: 2022
+context:
+    mode: "GRAPH_MODE" #0--Graph Mode; 1--Pynative Mode
+    device_target: "Ascend"
+    max_call_depth: 10000
+    save_graphs: False
+    device_id: 0
+use_parallel: True
+parallel:
+    parallel_mode: "DATA_PARALLEL"
+    gradients_mean: True
+
+# dataset base
+dataset_name: "imagenet"
+eval_engine: 'imagenet'
+
+# train dataset
+dataset_path: "/mnt/vision/ImageNet1K/CLS-LOC/train"
+num_workers: 8
+interpolation: "BICUBIC"
+image_size: 224
+auto_augment: "rand-m9-mstd0.5-inc1"
+crop_min: 0.2
+mixup: 0.8
+cutmix: 1.0
+mixup_prob: 1.0
+switch_prob: 0.5
+re_prop: 0.5
+re_mode: 'pixel'
+re_count: 1
+label_smoothing: 0.1
+
+# eval datasets
+eval_path: "/mnt/vision/ImageNet1K/CLS-LOC/val"
+eval_interval: 1
+eval_offset: -1
+
+# train config
+epoch: 100
+batch_size: 32
+patch_size: 16
+sink_mode: True
+dropout: 0.1
+num_classes: 1001
+per_step_size: 0
+use_ckpt: "" # mae vit pretrain model
+
+# loss
+use_label_smooth: 1
+label_smooth_factor: 0.1
+loss_name: "soft_ce"
+
+# loss scale manager
+use_dynamic_loss_scale: False
+loss_scale: 1024
+
+# with EMA
+use_ema: False
+ema_decay: 0.9999
+
+# use_global_norm
+use_global_norm: False
+clip_gn_value: 1.0
+
+# optimizer
+beta1: 0.9
+beta2: 0.999
+weight_decay: 0.05
+layer_decay: 0.75
+
+# lr schedule
+base_lr: 0.0005
+start_learning_rate: 0.
+end_learning_rate: 0.000000000001
+warmup_epochs: 10
+
+# ckpt callback
+save_ckpt_epochs: 1
+prefix: "MaeFintuneViT-B"
+
+# cfts init config
+save_dir: "./output/"
