@@ -12,3 +12,6 @@
 
 # research
 "models/research/"                                                                       "missing-docstring"
+
+# benchmark
+"models/benchmark/"                                                                       "missing-docstring"
