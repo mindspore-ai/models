@@ -18,8 +18,7 @@ import numpy as np
 import cv2
 from tqdm import tqdm
 import mindspore.numpy as ms_np
-from mindspore import load_checkpoint, load_param_into_net, ops, Tensor
-from .alexnet import SiameseAlexNet
+from mindspore import ops, Tensor
 from .config import config
 from .utils import get_exemplar_image, get_pyramid_instance_image, show_image
 
@@ -29,9 +28,8 @@ class SiamFCTracker:
         Args:
             model_path : checkpoint path
     """
-    def __init__(self, model_path, is_deterministic=True):
-        self.network = SiameseAlexNet(train=False)
-        load_param_into_net(self.network, load_checkpoint(model_path), strict_load=True)
+    def __init__(self, network, is_deterministic=True):
+        self.network = network
         self.network.set_train(False)
         self.name = 'SiamFC'
         self.is_deterministic = is_deterministic

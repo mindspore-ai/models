@@ -19,7 +19,9 @@ import os
 import sys
 from got10k.experiments import ExperimentOTB
 from mindspore import context
+from mindspore import load_checkpoint, load_param_into_net
 from src import SiamFCTracker
+from src.alexnet import SiameseAlexNet
 
 sys.path.append(os.getcwd())
 
@@ -27,17 +29,20 @@ sys.path.append(os.getcwd())
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='siamfc tracking')
     parser.add_argument('--device_id', type=int, default=0, help='device id of GPU or Ascend')
-    parser.add_argument('--model_path', default='/root/SiamFC/models/siamfc_{}.ckpt/SiamFC-6650.ckpt'
+    parser.add_argument('--model_path', default='/root/SiamFC/models/siamfc/SiamFC-6650.ckpt'
                                                 , type=str, help='eval one special video')
     parser.add_argument('--dataset_path', default='/root/datasets/OTB2013', type=str)
+    parser.add_argument('--device_target', default='Ascend', type=str, help='device target')
 
     args = parser.parse_args()
     context.set_context(
         mode=context.GRAPH_MODE,
         device_id=args.device_id,
         save_graphs=False,
-        device_target='Ascend')
-    tracker = SiamFCTracker(model_path=args.model_path)
+        device_target=args.device_target)
+    networks = SiameseAlexNet(train=False)
+    load_param_into_net(networks, load_checkpoint(args.model_path), strict_load=True)
+    tracker = SiamFCTracker(network=networks)
 
     root_dir = os.path.abspath(args.dataset_path)
     e = ExperimentOTB(root_dir, version=2013)
