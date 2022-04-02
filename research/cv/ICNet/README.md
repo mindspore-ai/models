@@ -237,8 +237,8 @@ avgtime 0.19648232793807982
 |training parameter     |epoch=160,batch_size=4   |
 |optimizer              |SGD optimizer，momentum=0.9,weight_decay=0.0001    |
 |loss function          |SoftmaxCrossEntropyLoss   |
-|training speed         | epoch time：21469.152 ms(8pcs) per step time :230.851 ms(8pcs) |
-|total time             |1h1m34s(8pcs)    |
+|training speed         | epoch time：21469.152 ms(8pcs) per step time :330.851 ms(8pcs) |
+|total time             |1h20m34s(8pcs)    |
 |Script URL             |   |
 |Random number seed     |set_seed = 1234     |
 
