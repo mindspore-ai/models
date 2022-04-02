@@ -95,12 +95,28 @@ After installing MindSpore via the official website, you can start training and 
 
 ```bash
 # standalone training
-export DEVICE_ID=0
-python train.py --dataset_path=/data/cifar10
+python train.py --data_url=/data/cifar10 --device_id=Ascend --device_id=0
 
 # run evaluation
-export DEVICE_ID=0
-python eval.py --checkpoint_path=/resnet/sknet_90.ckpt --dataset_path=/data/cifar10
+
+## just test one ckpt
+python eval.py --checkpoint_path=/resnet/sknet_90.ckpt --data_url=/data/cifar10 --device_id=Ascend --device_id=0
+## test all .ckpt in dir
+python eval.py --checkpoint_path=/resnet --data_url=/data/cifar10 --device_id=Ascend --device_id=0
+```
+
+- Running on GPU
+
+```bash
+# standalone training
+python train.py --data_url=/data/cifar10 --device_id=GPU --device_id=0
+
+# run evaluation
+
+## just test one ckpt
+python eval.py --checkpoint_path=/resnet/sknet_90.ckpt --data_url=/data/cifar10 --device_id=GPU --device_id=0
+## test all .ckpt in dir
+python eval.py --checkpoint_path=/resnet --data_url=/data/cifar10 --device_id=GPU --device_id=0
 ```
 
 # [Script Description](#contents)
@@ -169,12 +185,11 @@ Parameters for both training and evaluation can be set in config.py.
 ```bash
 # distributed training
 Usage:
-bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE] [DEVICE_NUM]
+bash run_distribute_train_ascend.sh [DATA_URL] [RANK_TABLE_FILE] [DEVICE_NUM]
 
 # standalone training
 Usage:
-export DEVICE_ID=0
-bash run_standalone_train.sh [DATASET_PATH]
+bash run_standalone_train_ascend.sh [DATA_URL] [DEVICE_ID]
 ```
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
@@ -183,14 +198,16 @@ Please follow the instructions in the link [hccn_tools](https://gitee.com/mindsp
 
 Training result will be stored in the example path, whose folder name begins with "train" or "train_parallel". Under this, you can find checkpoint file together with result like the following in log.
 
-### Result
-
-- Training SKNET50 with CIFAR10 dataset
+#### Running on GPU
 
 ```bash
-# distribute training result(8 pcs)
-epoch: 90 step: 195, loss is 1.1160697e-05
-epoch time: 35059.094 ms, per step time: 179.790 ms
+# distributed training
+Usage:
+bash run_distribute_train_gpu.sh [DATA_URL] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DEVICE_NUM]
+
+# standalone training
+Usage:
+bash run_standalone_train_gpu.sh [DATA_URL] [DEVICE_ID]
 ```
 
 ## [Evaluation Process](#contents)
@@ -200,16 +217,29 @@ epoch time: 35059.094 ms, per step time: 179.790 ms
 #### Running on Ascend
 
 ```bash
-export DEVICE_ID=0
-bash run_eval.sh [DATASET_PATH]  [CHECKPOINT_PATH]
+bash run_eval_ascend.sh [DATA_URL]  [CHECKPOINT_PATH / CHECKPOINT_DIR] [DEVICE_ID]
+```
+
+#### Running on GPU
+
+```bash
+bash run_eval_gpu.sh [DATA_URL]  [CHECKPOINT_PATH / CHECKPOINT_DIR] [DEVICE_ID]
 ```
 
 ### Result
 
 - Evaluating SKNet50 with CIFAR10 dataset
 
-```bash
-result: {'top_5_accuracy': 0.9982972756410257, 'top_1_accuracy': 0.9449118589743589}
+#### Result on Ascend
+
+```text
+result: {'top_1_accuracy': 0.9493189102564102, 'top_5_accuracy': 0.9982972756410257, 'loss': 0.26100944656317526} ckpt= ./scripts/train_parallel0/ckpt_0/sknet-87_390.ckpt
+```
+
+#### Result on GPU
+
+```text
+result: {'top_1_accuracy': 0.9525240384615384, 'top_5_accuracy': 0.9987980769230769, 'loss': 0.24511159359111354} ckpt= ./train/ckpt_1/sknet-73_390.ckpt
 ```
 
 ## [Inference Process](#contents)
@@ -255,37 +285,37 @@ result: {'top_1_accuracy': 0.9449118589743589}
 
 #### SKNet50 on CIFRA10
 
-| Parameters                 | Ascend 910
-| -------------------------- | ------------------------------------------------------------------------ |
-| Model Version              | SKNet50                                               |
-| Resource                   | CentOs 8.2, Ascend 910，CPU 2.60GHz 192cores，Memory 755G  |
-| uploaded Date              | 06/28/2021 (month/day/year)                         |
-| MindSpore Version          | 1.2.0                                                 |
-| Dataset                    | CIFAR10                                                |
-| Training Parameters        | epoch=90, steps per epoch=195, batch_size = 32             |
-| Optimizer                  | Momentum                                              |
-| Loss Function              | Softmax Cross Entropy                                       |
-| outputs                    | probability                                                 |
-| Loss                       | 0.000011160697                                                   |
-| Speed                      | 181.3 ms/step（8pcs）                     |
-| Total time                 | 179 mins                                                  |
-| Parameters (M)             | 13.2M                                                     |
-| Checkpoint for Fine tuning | 224M (.ckpt file)                                         |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/sknet) |
+| Parameters                 | Ascend 910| A100|
+| -------------------------- | --------------------------------------| ------ |
+| Model Version              | SKNet50                                               | Sknet50|
+| Resource                   | CentOs 8.2, Ascend 910，CPU 2.60GHz 96cores，Memory 1028G  | Ubuntu18.04, A100, CPU 2.4Ghz, 64cores, Memory 384G|
+| uploaded Date              | 27/11/2021 (month/day/year)                   | 27/11/2021 (month/day/year)        |
+| MindSpore Version          | 1.3.0(ModelArts)                                                 |1.5.0|
+| Dataset                    | CIFAR10                                                |CIFAR10|
+| Training Parameters        | epoch=90, steps per epoch=390, batch_size = 32             |epoch=90, steps per epoch=390, batch_size = 32|
+| Optimizer                  | Momentum              |Momentum            |
+| Loss Function              | Softmax Cross Entropy       |Softmax Cross Entropy   |
+| outputs                    | probability                 |probability |
+| Loss                       | 0.261      | 0.244|
+| Speed                      |  95.360 ms/step（4pcs）    |133.638 ms/step（4pcs） |
+| Total time                 | 1h11min    |1h42min|
+| Parameters (M)             | 27.5M|      27.5M|
+| Checkpoint for Fine tuning | 194.96M(.ckpt file)     |194.96M(.ckpt file)|
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/sknet) |[Link](https://gitee.com/mindspore/models/tree/master/research/cv/sknet)|
 
 ### Inference Performance
 
 #### SKNet50 on CIFAR10
 
-| Parameters          | Ascend                      |
-| ------------------- | --------------------------- |
-| Model Version       | SKNet50                 |
-| Resource            | Ascend 910                  |
-| Uploaded Date       | 06/27/2021 (month/day/year) |
-| MindSpore Version   | 1.2.0                 |
-| Dataset             | CIFAR10                |
-| batch_size          | 32                          |
-| Accuracy            | 94.49%                      |
+| Parameters          | Ascend                      | GPU |
+| ------------------- | --------------------------- | ------ |
+| Model Version       | SKNet50                 |SKNet50      |
+| Resource            | Ascend 910                  | A100 |
+| Uploaded Date       | 27/11/2021 (month/day/year)  |27/11/2021 (month/day/year)        |
+| MindSpore Version   | 1.3.0                 |1.5.0                 |
+| Dataset             | CIFAR10                |CIFAR10                |
+| batch_size          | 32(4p)                          |32(4p)     |
+| Accuracy            | 95.02%                 |95.26%|
 
 ### 310 Inference Performance
 

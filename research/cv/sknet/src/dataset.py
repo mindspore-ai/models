@@ -16,11 +16,13 @@
 create train or eval dataset.
 """
 import os
+
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
-import mindspore.dataset.vision.c_transforms as C
 import mindspore.dataset.transforms.c_transforms as C2
-from mindspore.communication.management import init, get_rank, get_group_size
+import mindspore.dataset.vision.c_transforms as C
+from mindspore.communication.management import get_group_size, get_rank, init
+
 
 def create_dataset_cifar10(dataset_path, do_train=False, repeat_num=1, batch_size=32, target="Ascend", distribute=False,
                            enable_cache=False, cache_session_id=None):
@@ -52,6 +54,7 @@ def create_dataset_cifar10(dataset_path, do_train=False, repeat_num=1, batch_siz
             device_num = get_group_size()
         else:
             device_num = 1
+            rank_id = 0
     if device_num == 1:
         data_set = ds.Cifar10Dataset(dataset_path, num_parallel_workers=8, shuffle=True)
     else:

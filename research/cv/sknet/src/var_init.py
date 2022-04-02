@@ -15,12 +15,12 @@
 """weight initialization"""
 
 import math
-import numpy as np
 
+import numpy as np
+from mindspore import Tensor, nn
 from mindspore.common import initializer as init
 from mindspore.common.initializer import Initializer as MeInitializer
-import mindspore.nn as nn
-from mindspore import Tensor
+
 
 def assignment(arr, num):
     """Assign the value of `num` to `arr`."""

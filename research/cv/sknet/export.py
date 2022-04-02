@@ -17,15 +17,15 @@
 python export.py
 """
 import argparse
-import numpy as np
 
-from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
+import numpy as np
+from mindspore import (Tensor, context, export, load_checkpoint,
+                       load_param_into_net)
+
 from src.config import config1 as config
 from src.sknet50 import sknet50 as sknet
 
 parser = argparse.ArgumentParser(description='sknet export')
-parser.add_argument('--network_dataset', type=str, default="se-resnet50", choices=["se-resnet50"],
-                    help='network and dataset name.')
 parser.add_argument("--device_id", type=int, default=1, help="Device id")
 parser.add_argument("--batch_size", type=int, default=32, help="batch size")
 parser.add_argument("--ckpt_file", type=str, default="/path/to/sknet-90_195.ckpt", help="Checkpoint file path.")
@@ -34,12 +34,11 @@ parser.add_argument('--width', type=int, default=224, help='input width')
 parser.add_argument('--height', type=int, default=224, help='input height')
 parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="AIR", help="file format")
 parser.add_argument("--device_target", type=str, default="Ascend",
-                    choices=["Ascend", "GPU", "CPU"], help="device target(default: Ascend)")
+                    choices=["Ascend", "GPU"], help="device target(default: Ascend)")
 args = parser.parse_args()
 
-context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
-if args.device_target == "Ascend":
-    context.set_context(device_id=args.device_id)
+context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
+context.set_context(device_id=args.device_id)
 
 if __name__ == '__main__':
     net = sknet(config.class_num)

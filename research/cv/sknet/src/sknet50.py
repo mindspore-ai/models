@@ -13,14 +13,13 @@
 # limitations under the License.
 # ============================================================================
 '''sknet
-The sample can be run on Ascend 910 AI processor.
+The sample can be run on Ascend 910 AI processor and GPU processor.
 '''
+import os
 
 import numpy as np
-import mindspore.nn as nn
-from mindspore import Tensor
-import mindspore.ops as ops
-from src.util import GroupConv
+from mindspore import Tensor, nn, ops
+
 
 def weight_variable_0(shape):
     """weight_variable_0"""
@@ -91,13 +90,18 @@ class SKConv(nn.Cell):
         self.features = features
         self.G = G
         self.convs = nn.CellList([])
+        device_target = os.getenv("DEVICE_TARGET")
+        if device_target == "GPU":
+            GroupConv = nn.Conv2d
+        else:
+            from src.utils import GroupConv
         for i in range(M):
-            self.convs.append(nn.SequentialCell(
-                GroupConv(features, features, kernel_size=3 + 2 * i, stride=stride, pad_mode='pad', pad=1 + i,
-                          groups=G),
-                nn.BatchNorm2d(features),
+            self.convs.append(nn.SequentialCell([
+                GroupConv(in_channels=features, out_channels=features, kernel_size=3, stride=stride, pad_mode='pad',
+                          padding=1 + i, dilation=1 + i, group=G, has_bias=False),
+                nn.BatchNorm2d(num_features=features, momentum=0.95),
                 nn.ReLU()
-            ))
+            ]))
         self.fc = nn.Dense(features, d)
         self.fcs = nn.CellList([])
         for i in range(M):
@@ -254,7 +258,7 @@ def sknet50(class_num=10):
         class_num (int): Class number.
 
     Returns:
-        Cell, cell instance of ResNet50 neural network.
+        Cell, cell instance of SkNet50 neural network.
 
     Examples:
 

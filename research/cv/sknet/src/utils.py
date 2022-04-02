@@ -16,8 +16,9 @@
 network operations
 """
 import mindspore.nn as nn
-from mindspore.ops import operations as P
 from mindspore.common import dtype as mstype
+from mindspore import ops as P
+
 
 class GroupConv(nn.Cell):
     """
@@ -32,23 +33,26 @@ class GroupConv(nn.Cell):
     Returns:
         tensor, output tensor.
     """
-    def __init__(self, in_channels, out_channels, kernel_size, stride, pad_mode="pad", pad=0, groups=1, has_bias=False):
+
+    def __init__(self, in_channels, out_channels, kernel_size, stride,
+                 pad_mode="pad", padding=0, group=1, has_bias=False, dilation=1):
         super(GroupConv, self).__init__()
-        assert in_channels % groups == 0 and out_channels % groups == 0
-        self.groups = groups
+        assert in_channels % group == 0 and out_channels % group == 0
+        self.group = group
         self.convs = nn.CellList()
-        self.op_split = P.Split(axis=1, output_num=self.groups)
+        self.op_split = P.Split(axis=1, output_num=self.group)
         self.op_concat = P.Concat(axis=1)
         self.cast = P.Cast()
-        for _ in range(groups):
-            self.convs.append(nn.Conv2d(in_channels//groups, out_channels//groups,
+        for _ in range(group):
+            self.convs.append(nn.Conv2d(in_channels//group, out_channels//group,
                                         kernel_size=kernel_size, stride=stride, has_bias=has_bias,
-                                        padding=pad, pad_mode=pad_mode, group=1))
+                                        padding=padding, pad_mode=pad_mode, group=1, dilation=dilation))
 
     def construct(self, x):
         features = self.op_split(x)
         outputs = ()
-        for i in range(self.groups):
-            outputs = outputs + (self.convs[i](self.cast(features[i], mstype.float32)),)
+        for i in range(self.group):
+            outputs = outputs + \
+                (self.convs[i](self.cast(features[i], mstype.float32)),)
         out = self.op_concat(outputs)
         return out
