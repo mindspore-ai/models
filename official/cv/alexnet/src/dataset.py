@@ -25,17 +25,18 @@ from mindspore.common import dtype as mstype
 from mindspore.communication.management import get_rank, get_group_size
 
 
-def create_dataset_cifar10(cfg, data_path, batch_size=32, repeat_size=1, status="train", target="Ascend",
+def create_dataset_cifar10(cfg, data_path, batch_size=32, status="train", target="Ascend",
                            num_parallel_workers=8):
     """
     create dataset for train or test
     """
 
+    ds.config.set_prefetch_size(64)
     if target == "Ascend":
         device_num, rank_id = _get_rank_info()
 
     if target != "Ascend" or device_num == 1:
-        cifar_ds = ds.Cifar10Dataset(data_path)
+        cifar_ds = ds.Cifar10Dataset(data_path, shuffle=True)
     else:
         cifar_ds = ds.Cifar10Dataset(data_path, num_parallel_workers=num_parallel_workers,
                                      shuffle=True, num_shards=device_num, shard_id=rank_id)
@@ -52,24 +53,14 @@ def create_dataset_cifar10(cfg, data_path, batch_size=32, repeat_size=1, status=
     channel_swap_op = CV.HWC2CHW()
     typecast_op = C.TypeCast(mstype.int32)
     cifar_ds = cifar_ds.map(input_columns="label", operations=typecast_op,
-                            num_parallel_workers=num_parallel_workers)
+                            num_parallel_workers=1)
     if status == "train":
-        cifar_ds = cifar_ds.map(input_columns="image", operations=random_crop_op,
-                                num_parallel_workers=num_parallel_workers)
-        cifar_ds = cifar_ds.map(input_columns="image", operations=random_horizontal_op,
-                                num_parallel_workers=num_parallel_workers)
-    cifar_ds = cifar_ds.map(input_columns="image", operations=resize_op,
-                            num_parallel_workers=num_parallel_workers)
-    cifar_ds = cifar_ds.map(input_columns="image", operations=rescale_op,
-                            num_parallel_workers=num_parallel_workers)
-    cifar_ds = cifar_ds.map(input_columns="image", operations=normalize_op,
-                            num_parallel_workers=num_parallel_workers)
-    cifar_ds = cifar_ds.map(input_columns="image", operations=channel_swap_op,
-                            num_parallel_workers=num_parallel_workers)
+        compose_op = [random_crop_op, random_horizontal_op, resize_op, rescale_op, normalize_op, channel_swap_op]
+    else:
+        compose_op = [resize_op, rescale_op, normalize_op, channel_swap_op]
+    cifar_ds = cifar_ds.map(input_columns="image", operations=compose_op, num_parallel_workers=num_parallel_workers)
 
-    cifar_ds = cifar_ds.shuffle(buffer_size=cfg.buffer_size)
     cifar_ds = cifar_ds.batch(batch_size, drop_remainder=True)
-    cifar_ds = cifar_ds.repeat(repeat_size)
     return cifar_ds
 
 
