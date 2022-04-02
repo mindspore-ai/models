@@ -311,7 +311,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DET_PATH] [NEED_PREPROCESS] 
 | 优化器 | SGD |
 | 损失函数 | SoftmaxCrossEntropyWithLogits | SoftmaxCrossEntropyWithLogits |
 | 损失 | 0.04 | 0.03 |
-| 速度 | 12.8 ms/step | 9.804 ms/step |
+| 速度 | 12.8 ms/step | 12.4 ms/step |
 | 总时间 | 3 min | 10 min |
 | 微调检查点 | 23.4 Mb | 40 Mb |
 

@@ -265,8 +265,8 @@ Inference result is saved in current path, you can find result like this in acc.
 | Optimizer                  | Momentum                                                    |
 | Loss Function              | Softmax Cross Entropy                                       |
 | outputs                    | probability                                                 | |
-| Speed                      | 8pcs: 17.5 ms/step                                          |
-| Total time                 | 8pcs: 5.2 hours                                             | |
+| Speed                      | 8pcs: 22.5 ms/step                                          |
+| Total time                 | 8pcs: 6.1 hours                                             | |
 | Checkpoint for Fine tuning | 13.24M (.ckpt file)                                          |
 | Scripts                    | [squeezenet script](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) |
 
