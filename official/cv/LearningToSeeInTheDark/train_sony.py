@@ -114,10 +114,10 @@ def get_dataset(input_dir1, gt_dir1, train_ids1, num_shards=None, shard_id=None,
             input_final_data.append(input_image[0])
     data = (input_final_data, gt_final_data)
     if distribute:
-        datasets = ds.NumpySlicesDataset(data, ['input', 'label'], shuffle=False,
+        datasets = ds.NumpySlicesDataset(data, ['input', 'label'], shuffle=True,
                                          num_shards=num_shards, shard_id=shard_id)
     else:
-        datasets = ds.NumpySlicesDataset(data, ['input', 'label'], shuffle=False)
+        datasets = ds.NumpySlicesDataset(data, ['input', 'label'], shuffle=True)
     return datasets
 
 
@@ -195,7 +195,6 @@ if __name__ == "__main__":
         dataset = get_dataset(input_dir, gt_dir, train_ids)
     transform_list = [random_crop_and_flip]
     dataset = dataset.map(transform_list, input_columns=['input', 'label'], output_columns=['input', 'label'])
-    dataset = dataset.shuffle(buffer_size=161)
     dataset = dataset.batch(batch_size=config.batch_size, drop_remainder=True)
     batches_per_epoch = dataset.get_dataset_size()
 
