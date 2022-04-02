@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,8 @@
 # ============================================================================
 import os
 import argparse
-import cv2
 import numpy as np
-
+import cv2
 
 def extract_image_patch(image, bbox, patch_shape=None):
     """Extract image patch from bounding box.
@@ -174,7 +173,7 @@ def parse_args():
     """
     Parse command line arguments.
     """
-    parser = argparse.ArgumentParser(description="Ascend 310 feature extractor")
+    parser = argparse.ArgumentParser(description="Feature extractor")
     parser.add_argument('--data_path', type=str, default='', help='MOT directory.')
     parser.add_argument('--det_path', type=str, default='', help='Det directory.')
     parser.add_argument('--result_path', type=str, default='', help='Inference output directory.')
