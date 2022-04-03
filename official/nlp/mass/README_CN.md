@@ -235,7 +235,7 @@ python tokenize_corpus.py --corpus_folder /{path}/corpus --output_folder /{path}
 示例代码如下：
 
 ```bash
-python tokenize_corpus.py --codes /{path}/all.bpe.codes \
+python apply_bpe_encoding.py --codes /{path}/all.bpe.codes \
     --src_folder /{path}/tokenized_corpus \
     --output_folder /{path}/tokenized_corpus/bpe \
     --prefix tokenized \
