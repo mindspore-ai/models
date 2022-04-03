@@ -17,17 +17,17 @@
         - [Evaluation Performance](#evaluation-performance)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
-# [Relation Network Description](#contents)
+## [Relation Network Description](#contents)
 
 [Relation Network](https://arxiv.org/abs/1711.06025) was propsed in 2018, a conceptually simple, flexible, and general framework for few-shot learning. It was used to learn to recognise new classes given only few examples from each. Once trained, a RN is able to classify images of new classes by computing relation scores between query images and the few examples of each new class without further updating the network.
 
 [Paper](https://arxiv.org/abs/1711.06025): Flood Sung, Yongxin Yang, Li Zhang, Tao Xiang, Philip H.S. Torr, Timothy M. Hospedales. Learning to Compare: Relation Network for Few-Shot Learning. 2018.
 
-# [Model Architecture](#contents)
+## [Model Architecture](#contents)
 
 Relation-Net contains 2 parts named Encoder and Relation. The former one has 4 convolution layers, the latter one has 2 convolution layers and 2 linear layers.
 
-# [Dataset](#contents)
+## [Dataset](#contents)
 
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 
@@ -50,17 +50,17 @@ Dataset used: [omniglot](https://github.com/brendenlake/omniglot)
            Angelic
 ```
 
-# [Environment Requirements](#contents)
+## [Environment Requirements](#contents)
 
 - Hardware (Ascend/GPU)
     - Prepare hardware environment with Ascend/GPU processor.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-  - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-  - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
 
-# [Quick Start](#contents)
+## [Quick Start](#contents)
 
 After installing MindSpore via the official website, you can start training and evaluation as follows:
 
@@ -76,7 +76,7 @@ bash run_distribution_ascend.sh ./hccl_8p_01234567_127.0.0.1.json  ./ckpt /data/
 ```
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
-Please follow the instructions in the link: https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.
+Please follow the instructions in the link: <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
 
 - Running on GPU
 
@@ -89,9 +89,9 @@ bash run_standalone_eval_gpu.sh ./ckpt/omniglot_encoder_relation_network5way_1sh
 bash run_distribution_gpu.sh /data/omniglot_resized 8
 ```
 
-# [Script Description](#contents)
+## [Script Description](#contents)
 
-## [Script and Sample Code](#contents)
+### [Script and Sample Code](#contents)
 
 ```shell
 ├── cv
@@ -116,7 +116,7 @@ bash run_distribution_gpu.sh /data/omniglot_resized 8
         └── argparser.py                          # command line arguments parsing
 ```
 
-## [Script Parameters](#contents)
+### [Script Parameters](#contents)
 
 Major parameters in train.py and config.py as follows:
 
@@ -133,9 +133,9 @@ Major parameters in train.py and config.py as follows:
 --data_path: Path where the dataset is saved
 ```
 
-## [Training Process](#contents)
+### [Training Process](#contents)
 
-### Training
+#### Training
 
 - Running on Ascend
 
@@ -174,9 +174,9 @@ Episode: 300 Train, Loss(MSE): 0.1247341
 
 The model checkpoint will be saved in the current directory.
 
-## [Evaluation Process](#contents)
+### [Evaluation Process](#contents)
 
-### Evaluation
+#### Evaluation
 
 Before running the command below, please check the checkpoint path used for evaluation.
 
@@ -221,7 +221,7 @@ grep "Average accuracy:" eval.log
 Average accuracy: 0.9911
 ```
 
-### [Export MindIR](#contents)
+#### [Export MindIR](#contents)
 
 ```shell
 # export model
@@ -231,11 +231,11 @@ python export.py --ckpt_file ./scripts/ckpt/omniglot_encoder_relation_network5wa
 The ckpt_file parameter is required,
 `FILE_FORMAT` should be in ["AIR", "MINDIR"]
 
-# [Model Description](#contents)
+## [Model Description](#contents)
 
-## [Performance](#contents)
+### [Performance](#contents)
 
-### Evaluation Performance
+#### Evaluation Performance
 
 | Parameters                 | Ascend 910 (8 pcs)                                          | GPU Tesla V100 (single)                                    | GPU GeForce RTX 3090 (8 pcs)                                     |
 | -------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------------- |
@@ -253,11 +253,11 @@ The ckpt_file parameter is required,
 | Checkpoint for Fine tuning | 875k (.ckpt file)                                           | 905K (.ckpt file)                                          | 905K (.ckpt file) |
 | Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/relationnet) | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/relationnet) |[Link](https://gitee.com/mindspore/models/tree/master/research/cv/relationnet) |
 
-# [Description of Random Situation](#contents)
+## [Description of Random Situation](#contents)
 
 In dataset.py, we set the seed inside ```omniglot_character_folders``` function.
 In net_train.py, we set the random.choice inside ```train``` function.
 
-# [ModelZoo Homepage](#contents)
+## [ModelZoo Homepage](#contents)
 
  Please check the official [homepage](https://gitee.com/mindspore/models).  
