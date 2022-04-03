@@ -20,17 +20,17 @@
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
-# [RCNN Description](#contents)
+## [RCNN Description](#contents)
 
 RCNN (regions with CNN features) is a milestone in the application of CNN method to target detection.With the help of CNN's good feature extraction and classification performance, the transformation of target detection problem is realized by the region proposal method.
 
 [Paper](https://arxiv.org/abs/1311.2524) Ross Girshick,Jeff Donahue,Trevor Darrell,Jitendra Malik. "Rich feature hierarchies for accurate object detection and semantic segmentation." IEEE Conference on Computer Vision and Pattern Recognition (CVPR), 2014.
 
-# [Model architecture](#contents)
+## [Model architecture](#contents)
 
 The overall network architecture of R-CNN is show below: [Link](https://arxiv.org/abs/1311.2524)
 
-# [Dataset](#contents)
+## [Dataset](#contents)
 
 Dataset used: [VOC2007](https://pjreddie.com/projects/pascal-voc-dataset-mirror/)
 
@@ -40,7 +40,7 @@ Dataset used: [VOC2007](https://pjreddie.com/projects/pascal-voc-dataset-mirror/
 - Data format: RGB images.
     - Note: Data will be processed in src/dataset.py
 
-# [Environment Requirements](#contents)
+## [Environment Requirements](#contents)
 
 - Hardware（GPU/Ascend/CPU）
     - Prepare hardware environment with GPU/Ascend/CPU processor.
@@ -50,9 +50,9 @@ Dataset used: [VOC2007](https://pjreddie.com/projects/pascal-voc-dataset-mirror/
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.3/index.html)
 
-# [Script description](#contents)
+## [Script description](#contents)
 
-## [Script and sample code](#contents)
+### [Script and sample code](#contents)
 
 ```shell
 ├── RCNN
@@ -83,13 +83,13 @@ Dataset used: [VOC2007](https://pjreddie.com/projects/pascal-voc-dataset-mirror/
   ├──requirements.txt       # python extension packages
 ```
 
-## [Preparation](#contents)
+### [Preparation](#contents)
 
-You need to have the model of AlexNet that trained over ImageNet2012.Therefore,you can train it with [alexnet](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) scripts in modelzoo,and save the checkpoint file in a folder named "models".  The naming of the pretrained model is set in the "src/paths.py" .
+You need to have the model of AlexNet that trained over ImageNet2012.Therefore,you can train it with AlexNet scripts in [ModelZoo](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet),and save the checkpoint file in a folder named "models".  The naming of the pretrained model is set in the "src/paths.py" .
 
 You also need to create a floder named "data" to save data.The training set and test set are respectively in two folders, one is "VOC2007" and the other is "VOCtest_06-Nov-2007".The paths are also set in the "src/paths.py".
 
-## [Data Preprocessing](#contents)
+### [Data Preprocessing](#contents)
 
 Run this script,it will extract thousands of candidate regions whose categories are independent from each image and generate data used in finetune, SVM and regression phases according to the IOU thresholds.
 Note: Please make sure that the relevant dependencies in requirements.txt have been installed.
@@ -98,9 +98,9 @@ Note: Please make sure that the relevant dependencies in requirements.txt have b
 python process_data.py
  ```
 
-## [Training Process](#contents)
+### [Training Process](#contents)
 
-### [Training](#contents)
+#### [Training](#contents)
 
 - running on Ascend：
 
@@ -176,7 +176,7 @@ bash scripts/run_standalone_train_gpu.sh 0
   The model checkpoint file will be saved in the folder "models".
   <!-- The model checkpoint will be saved in the directory models.  -->
 
-### [Distributed Training](#contents)
+#### [Distributed Training](#contents)
 
 - distributed running on Ascend：
 
@@ -241,9 +241,9 @@ scripts/log_train_regression:[2021-11-09 14:40:58.586][DEBUG] trainer.py(121)->t
 ...
 ```
 
-## [Evaluation Process](#contents)
+### [Evaluation Process](#contents)
 
-### [Evaluation](#contents)
+#### [Evaluation](#contents)
 
 - evaluation on VOC2007 dataset when running on Ascend:
 
@@ -279,11 +279,11 @@ svm_thresh: 0.3, map: 0.3190850349142451
 svm_thresh: 0.6, map: 0.3254243053285871
 ```
 
-# [Model Description](#contents)
+## [Model Description](#contents)
 
-## [Performance](#contents)
+### [Performance](#contents)
 
-### [Training Performance](#contents)
+#### [Training Performance](#contents)
 
 | Parameters                 | Ascend                                                      |GPU                                                      |
 | -------------------------- | ------------------------------------------------------ | ----------------------------------------------------------- |
@@ -310,9 +310,9 @@ svm_thresh: 0.6, map: 0.3254243053285871
 | Checkpoint for finetune | 214M (.ckpt file)                                         | 214M (.ckpt file)|
 | Checkpoint for SVM | 214M (.ckpt file)                                         |214M (.ckpt file)|
 | Checkpoint for regression | 214M (.ckpt file)                                         |214M (.ckpt file)|
-| Scripts                    | [RCNN Scripts](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/rcnn) |[RCNN Scripts](https://gitee.com/mindspore/models/research/cv/rcnn) |
+| Scripts                    | [RCNN Scripts](https://gitee.com/mindspore/models/tree/master/research/cv/) |[RCNN Scripts](https://gitee.com/mindspore/models/tree/master/research/cv/rcnn) |
 
-### [Inference Performance](#contents)
+#### [Inference Performance](#contents)
 
 | Parameters          | Ascend                      |GPU                      |
 | ------------------- | --------------------------- |--------------------------- |
@@ -325,12 +325,12 @@ svm_thresh: 0.6, map: 0.3254243053285871
 | Outputs             | mAP                 | mAP                 |
 | Accuracy            | 31.58%                 | 32.54%                 |
 
-# [Description of Random Situation](#contents)
+## [Description of Random Situation](#contents)
 
 In src/common/mindspore_utils.py, we set the seed inside “initialize" function of "MSUtils" class. We use random seed in train.py.
 
 In train.py, we set the seed which is used by numpy.random, mindspore.common.Initializer, mindspore.ops.composite.random_ops and mindspore.nn.probability.distribution.
 
-# [ModelZoo Homepage](#contents)
+## [ModelZoo Homepage](#contents)
 
  Please check the official [homepage](https://gitee.com/mindspore/models).  
