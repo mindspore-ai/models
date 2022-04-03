@@ -210,6 +210,8 @@ Sample code:
 python tokenize_corpus.py --corpus_folder /{path}/corpus --output_folder /{path}/tokenized_corpus --tokenizer {nltk|jieba} --pool_size 16
 ```
 
+If you are using `nltk`, make sure you have installed both `nltk` and `nltk data`. Otherwise you could try `jieba`.
+
 ### Byte Pair Encoding
 
 After tokenization, BPE is applied to tokenized corpus with provided `all.bpe.codes`.
@@ -231,7 +233,7 @@ Major parameters in `apply_bpe_encoding.py`:
 Sample code:
 
 ```bash
-python tokenize_corpus.py --codes /{path}/all.bpe.codes \
+python apply_bpe_encoding.py --codes /{path}/all.bpe.codes \
     --src_folder /{path}/tokenized_corpus \
     --output_folder /{path}/tokenized_corpus/bpe \
     --prefix tokenized \
