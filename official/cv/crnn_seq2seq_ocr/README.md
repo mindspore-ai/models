@@ -81,16 +81,7 @@ For training and evaluation, we use the French Street Name Signs (FSNS) released
                  ├── ...
                  ├── train-00511-of-00512
         - 2.Use tf2file_v3.py transform to intermediate dataset (from tfrecord files to original files).
-            - set some parameters in tf2file_v3.py
-
-              ```shell
-              phase: "train" or "test"
-              save_img_dir
-              save_annot_dir
-              tfrecord_dir: "tfrecord/train" or "tfrecord/test"
-              ```
-
-            - python tf2file_v3.py
+            - python tf2file_v3.py phase(train or test) save_img_dir tfrecord_dir
                 after running this command, the dir structure of intermediate dataset is as follows:
 
                 ```shell
