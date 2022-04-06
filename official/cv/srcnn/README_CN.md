@@ -409,13 +409,14 @@ python src/create_dataset.py --src_folder=/dataset/train --output_folder=/datase
 
 ### 导出
 
-在导出之前需要指定checkpoint文件：
+在导出之前需要指定所需导出模型文件格式和checkpoint文件路径，MINDIR为默认导出格式：
 
 ```shell
-python export.py --checkpoint_path /checkpoint_path
+python export.py --checkpoint_path /checkpoint_path --file_format="MINDIR"
 ```
 
 并且注意因为310推理只支持静态shape，所以需要指定图片的形状，可以通过修改config.yaml的image_width和image_height来改变。
+EXPORT_FORMAT 可在["AIR","MINDIR"]中选择。
 
 ## 推理过程
 
@@ -446,16 +447,20 @@ python export.py --checkpoint_path /checkpoint_path
 | 参数          | Ascend                                                   | GPU                                  |
 | ------------- | -------------------------------------------------------- | ------------------------------------ |
 | 模型版本      | Inception V1                                             | Inception V1                         |
-| 资源          | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 | NV SMX2 V100-32G                     |
+| 资源          | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8   | NV SMX2 V100-32G                     |
 | 上传日期      | 2021-12-08                                               | 2021-12-08                           |
 | MindSpore版本 | 1.3.0                                                    | 1.3.0                                |
-| 数据集        | ILSVRC2013_DET_train, scale:2                         | ILSVRC2013_DET_train, scale:2      |
+| 数据集        | ILSVRC2013_DET_train, scale:2                            | ILSVRC2013_DET_train, scale:2        |
 | 训练参数      | epoch=20, batch_size = 16, lr=0.0001                     | epoch=20, batch_size = 16, lr=0.0001 |
-| 优化器      | Adam                                                 | Adam                             |
+| 优化器      | Adam                                                       | Adam                                 |
 | 损失函数      | MSE Loss                                                 | MSE Loss                             |
 | 输出          | 图片                                                     | 图片                                 |
-| 损失          | 0.00163                                                   | 0.00179                               |
-| 总时长        | 单卡：2小时15分钟 <br/>8卡：16分钟                       | 1 h 8ps                       |
+| 损失          | 0.00163                                                  | 0.00179                              |
+| 精度          | SET5:36.71                                               |                                     |
+|               | SET14:32.586                                             |                                     |
+|               | BSD200:33.809                                            |                                    |
+| 总时长        | 单卡：2小时15分钟 <br/>8卡：16分钟                         | 1 h 8ps                             |
+| 性能规格（ms/step）   | 单卡：0.67                                        |                                     |
 
 ### 推理性能
 
