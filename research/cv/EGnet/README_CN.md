@@ -92,7 +92,7 @@ EGNet网络由三个部分组成，NLSEM（边缘提取模块）、PSFEM（目�
     ├──Imgs
 ```
 
-- 测试集：[DUTS-OMRON数据集](http://saliencydetection.net/dut-omron/download/DUT-OMRON-image.zip,http://saliencydetection.net/dut-omron/download/DUT-OMRON-gt-pixelwise.zip.zip)，107 MB，共5168张最大边长为400像素的彩色图像。数据集中具有一个或多个显著对象和相对复杂的背景，具有眼睛固定、边界框和像素方面的大规模真实标注的数据集.
+- 测试集：[DUTS-OMRON数据集](http://saliencydetection.net/dut-omron/)，107 MB，共5168张最大边长为400像素的彩色图像。数据集中具有一个或多个显著对象和相对复杂的背景，具有眼睛固定、边界框和像素方面的大规模真实标注的数据集.
 
 创建名为“DUTS-OMRON-image”的文件夹，根据以上链接下载数据集放入文件夹，并解压到当前路径。
 

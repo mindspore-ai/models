@@ -182,11 +182,11 @@ RelationNet
 
     例如：
 
-       ```bash
+    ```bash
        bash convert.sh ./data/model/relationnet.air ./data/model/relationnet
-       ```
+    ```
 
- (注：本脚本在https://gitee.obs.cn-north-4.myhuaweicloud.com/cann%E5%8C%85/Ascend-cann-toolkit_5.0.3.alpha005_linux-x86_64.run [https://gitee.obs.cn-north-4.myhuaweicloud.com/cann%E5%8C%85/Ascend-cann-toolkit_5.0.3.alpha005_linux-aarch64.run](https://gitee.obs.cn-north-4.myhuaweicloud.com/cann包/Ascend-cann-toolkit_5.0.3.alpha005_linux-aarch64.run)包下完成测试)
+ （注：本脚本在Ascend-cann-toolkit_5.0.3.alpha005_linux-x86_64.run/Ascend-cann-toolkit_5.0.3.alpha005_linux-aarch64.run 包下完成测试）
 
 ### mxBase推理
 
@@ -329,4 +329,3 @@ RelationNet
    ```
 
    (注：数据的预处理有随机性，准确率会在99%上下浮动)
-
