@@ -80,6 +80,8 @@ echo "start training on $RANK_SIZE devices"
 mkdir ${current_exec_path}/train_distribute_gpu
 cd ${current_exec_path}/train_distribute_gpu || exit
 
+ulimit -u 10240
+
 mpirun --allow-run-as-root -n $1 --output-filename log_output --merge-stderr-to-stdout \
     python ${dirname_path}/${SCRIPT_NAME} \
     --lr=4e-3 \
