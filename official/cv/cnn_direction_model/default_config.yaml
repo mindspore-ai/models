@@ -21,9 +21,15 @@ run_distribute: False
 # Training options
 
 # create train dataset options
-train_annotation_file: ""
-data_root_train: ""
+annotation_file: ""
+data_root: ""
 mindrecord_dir: ""
+
+go_shift: 1
+characters_dictionary: {"pad_id": 0, "go_id": 1, "eos_id": 2, "unk_id": 3}
+labels_not_use: ['%#�?%', '%#背景#%', '%#不识�?%', '#%不识�?#', '%#模糊#%', '%#模糊#%']
+vocab_path: "./general_chars.txt"
+max_length: 64
 
 # training options
 dataset_name: "fsns"
@@ -52,8 +58,8 @@ is_save_on_master: 1
 # Eval options
 
 # create eval dataset options
-test_annotation_file: ""
-data_root_test: ""
+val_annotation_file: ""
+val_data_root: ""
 
 # eval options
 eval_dataset_path: ""

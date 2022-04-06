@@ -20,7 +20,7 @@ import time
 
 import mindspore.common.dtype as mstype
 from mindspore import context, Tensor
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
 from mindspore.train import Model
 from mindspore.context import ParallelMode
@@ -95,37 +95,7 @@ def modelarts_pre_process():
     config.save_checkpoint_path = config.output_path
     config.pre_trained = os.path.join(config.output_path, config.pre_trained)
 
-
-context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
-if config.device_target == "Ascend":
-    context.set_context(device_id=config.device_id)
-
-# Set mempool block size for improving memory utilization, which will not take effect in GRAPH_MODE
-if context.get_context("mode") == context.PYNATIVE_MODE:
-    context.set_context(mempool_block_size="28GB")
-
-@moxing_wrapper(pre_process=modelarts_pre_process)
-def train_maskrcnn_mobilenetv1():
-    config.mindrecord_dir = os.path.join(config.coco_root, config.mindrecord_dir)
-    print('config:\n', config)
-    print("Start training for maskrcnn_mobilenetv1!")
-    if not config.do_eval and config.run_distribute:
-        rank = get_rank_id()
-        device_num = get_device_num()
-        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
-        init()
-    else:
-        rank = 0
-        device_num = 1
-
-    print("Start create dataset!")
-
-    # It will generate mindrecord file in config.mindrecord_dir,
-    # and the file name is MaskRcnn.mindrecord0, 1, ... file_num.
-    prefix = "MaskRcnn.mindrecord"
-    mindrecord_dir = config.mindrecord_dir
-    mindrecord_file = os.path.join(mindrecord_dir, prefix + "0")
+def create_mindrecord_files(rank, mindrecord_file, mindrecord_dir, prefix):
     if rank == 0 and not os.path.exists(mindrecord_file):
         if not os.path.isdir(mindrecord_dir):
             os.makedirs(mindrecord_dir)
@@ -146,16 +116,50 @@ def train_maskrcnn_mobilenetv1():
     while not os.path.exists(mindrecord_file+".db"):
         time.sleep(5)
 
-    if not config.only_create_dataset:
-        # loss_scale = float(config.loss_scale)
+context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+if config.device_target == "Ascend":
+    context.set_context(device_id=config.device_id)
 
+# Set mempool block size for improving memory utilization, which will not take effect in GRAPH_MODE
+if context.get_context("mode") == context.PYNATIVE_MODE:
+    context.set_context(mempool_block_size="28GB")
+
+@moxing_wrapper(pre_process=modelarts_pre_process)
+def train_maskrcnn_mobilenetv1():
+    config.mindrecord_dir = os.path.join(config.coco_root, config.mindrecord_dir)
+    print("Start training for maskrcnn_mobilenetv1! config:\n", config)
+    if not config.do_eval and config.run_distribute:
+        device_num = get_device_num()
+        if config.device_target == "Ascend":
+            rank = get_rank_id()
+            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+            init()
+        elif config.device_target == "GPU":
+            init()
+            rank = get_rank()
+            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+    else:
+        rank = 0
+        device_num = 1
+
+    print("Start create dataset!")
+
+    # It will generate mindrecord file in config.mindrecord_dir,
+    # and the file name is MaskRcnn.mindrecord0, 1, ... file_num.
+    prefix = "MaskRcnn.mindrecord"
+    mindrecord_dir = config.mindrecord_dir
+    mindrecord_file = os.path.join(mindrecord_dir, prefix + "0")
+    create_mindrecord_files(rank, mindrecord_file, mindrecord_dir, prefix)
+
+    if not config.only_create_dataset:
         # When create MindDataset, using the fitst mindrecord file, such as MaskRcnn.mindrecord0.
         dataset = create_maskrcnn_dataset(mindrecord_file, batch_size=config.batch_size,
                                           device_num=device_num, rank_id=rank)
 
         dataset_size = dataset.get_dataset_size()
-        print("total images num: ", dataset_size)
-        print("Create dataset done!")
+        print("Create dataset done, and total images num: ", dataset_size)
 
         net = Mask_Rcnn_Mobilenetv1(config=config)
         net = net.set_train()
@@ -186,7 +190,7 @@ def train_maskrcnn_mobilenetv1():
         loss_cb = LossCallBack(rank_id=rank)
         cb = [time_cb, loss_cb]
         if config.save_checkpoint:
-            ckptconfig = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_epochs * dataset_size,
+            ckptconfig = CheckpointConfig(save_checkpoint_steps=dataset_size,
                                           keep_checkpoint_max=config.keep_checkpoint_max)
             save_checkpoint_path = os.path.join(config.save_checkpoint_path, 'ckpt_' + str(rank) + '/')
             ckpoint_cb = ModelCheckpoint(prefix='mask_rcnn', directory=save_checkpoint_path, config=ckptconfig)

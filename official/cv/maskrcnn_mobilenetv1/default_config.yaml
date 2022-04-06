@@ -152,7 +152,6 @@ weight_decay: 0.0001 # 1e-4
 pretrain_epoch_size: 0
 epoch_size: 12
 save_checkpoint: True
-save_checkpoint_epochs: 12
 keep_checkpoint_max: 12
 save_checkpoint_path: "./"
 
