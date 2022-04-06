@@ -1,6 +1,7 @@
 # MindSpore Lite 端侧图像分类demo（Android）
 
 本示例程序演示了如何在端侧利用MindSpore Lite C++ API（Android JNI）以及MindSpore Lite 图像分类模型完成端侧推理，实现对设备摄像头捕获的内容进行分类，并在App图像预览界面中显示出最可能的分类结果。
+> 本示例程序目的是演示如何使用MindSpore Lite API完成推理，图像分类效果取决于模型以及模型训练使用的数据集，不是本示例程序的重点。
 
 ## 运行依赖
 

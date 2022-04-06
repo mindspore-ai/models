@@ -1,6 +1,7 @@
 # Demo of Image Classification
 
 The following describes how to use the MindSpore Lite C++ APIs (Android JNIs) and MindSpore Lite image classification models to perform on-device inference, classify the content captured by a device camera, and display the most possible classification result on the application's image preview screen.
+> The purpose of this sample program is to demonstrate how to use mindspire Lite API to complete inference. The effect of image classification depends on the model and the data set used in model training, which is not the focus of this sample program.
 
 ## Running Dependencies
 
