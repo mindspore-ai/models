@@ -28,6 +28,7 @@ class CONFIG:
         # Hardware equipment selection
         self.mode = context.GRAPH_MODE
 
+
         # Dataset path
         self.data_path = data_dir
         self.valid_csv_path = os.path.join(self.data_path, "exp_data/TACoS/val_clip-sentvec.pkl")
@@ -46,14 +47,14 @@ class CONFIG:
 
         # Training strategy
         self.max_epoch = 3
-        self.batch_size = 64
+        self.batch_size = 56
         self.test_batch_size = 128
         self.save_checkpoint_steps = 200
-        self.keep_checkpoint_max = 10
+        self.keep_checkpoint_max = 100
 
         # Optimizer hyperparameters
         self.optimizer = 'Adam'
-        self.lr = 2e-5
+        self.lr = 5e-5
         self.weight_decay = 1e-5
         self.momentum = 0.9
 
