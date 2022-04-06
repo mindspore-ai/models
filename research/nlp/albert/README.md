@@ -52,7 +52,7 @@ The backbone of the ALBERT architecture is similar to BERT in that it uses a tra
 # [Dataset](#contents)
 
 - Download the zhwiki or enwiki dataset for pre-training. Extract and refine texts in the dataset with [WikiExtractor](https://github.com/attardi/wikiextractor). Convert the dataset to TFRecord format. Please refer to create_pretraining_data.py file in [ALBERT](https://github.com/google-research/albert) repository.
-- Download dataset for fine-tuning and evaluation such as GLUE, SQuAD v1.1, etc. Convert dataset files from JSON(or TSV) format to MINDRECORD format, please run ```bash convert_finetune_datasets_[DOWNSTREAM_TASK].sh``` in /path/albert/scripts as follows:
+- Download dataset for fine-tuning and evaluation such as [GLUE](https://gluebenchmark.com/tasks), SQuAD v1.1, etc. Convert dataset files from JSON(or TSV) format to MINDRECORD format, please run ```bash convert_finetune_datasets_[DOWNSTREAM_TASK].sh``` in /path/albert/scripts as follows:
 
 Before running the command below, please check the vocab and spm model file path has been set. Please set the path to be the absolute full path, e.g:
 
@@ -60,15 +60,17 @@ Before running the command below, please check the vocab and spm model file path
 
 --spm_model_file="albert_base/30k-clean.model"
 
-You can download from [Albert]((https://github.com/google-research/albert)).
+You can download from [ALBERT](https://github.com/google-research/albert) or [ALBERT_BASE](https://storage.googleapis.com/albert_models/albert_base_v1.tar.gz).
 
 ```bash
-# convert classifier task dataset from tsv to mindrecord
+# convert classifier task dataset from tsv to mindrecord, [TASK_NAME] is dataset name
 bash scripts/convert_finetune_datasets_classifier.sh
 
 # convert squad task dataset from JSON to mindrecord
 bash scripts/convert_finetune_datasets_squad.sh
 ```
+
+You can convert different dataset by changing [TASK_NAME], e.g.:TASK_NAME="MNLI"
 
 # [Environment Requirements](#contents)
 
@@ -85,19 +87,22 @@ bash scripts/convert_finetune_datasets_squad.sh
 
 - Convert pre-training model
 
-For the Tensorflow albert pre-train model, you can download from [Albert]((https://github.com/google-research/albert)).
+For the Tensorflow albert pre-train model, you can download from [Albert](https://github.com/google-research/albert),
+or [ALBERT_BASE](https://storage.googleapis.com/albert_models/albert_base_v1.tar.gz).
 
-In the tensorflow environment, run read_weight_tf.py as follows:
+Firstly, convert model.ckpt-best into npy files. You need tensorflow environment, run read_weight_tf.py as follows:
 
 ```text
 python convert_tf_ckpt/read_weight_tf.py --ckpt_file_path=albert_base/model.ckpt-best --output_path=path/output/
 ```
 
-In the MindSpore environment, run save_weight_ms.py as follows:
+Secondly, convert all npy files into one MindSpore ckpt file. You need MindSpore environment, run save_weight_ms.py as follows:
 
 ```text
 python convert_tf_ckpt/save_weight_ms.py --load_dir=npy_file_path/ --output_file_name=path/ms_albert_pretrain.ckpt
 ```
+
+*load_dir equal to the output_path in first step.
 
 After installing MindSpore via the official website, you can start pre-training, fine-tuning and evaluation as follows:
 
@@ -127,7 +132,7 @@ bash scripts/run_distributed_pretrain_ascend.sh /path/cn-wiki-128 /path/hccl.jso
 
 - Running on ModelArts
 
-If you want to run in modelarts, please check the official documentation of [modelarts]((https://support.huaweicloud.com/modelarts/)), and you can start training as follows
+If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows
 
 - Pretraining with 8 cards on ModelArts
 
@@ -288,7 +293,7 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
   ├─pretrain_eval.py                          # train and eval net
   ├─run_classifier.py                         # finetune and eval net for classifier task
   ├─run_pretrain.py                           # train net for pretraining phase
-  ├─run_squad_v1.py                              # finetune and eval net for squad task
+  ├─run_squad_v1.py                           # finetune and eval net for squad task
   ├─task_classifier_config.yaml               # parameter configuration for downstream_task_classifier
   └─task_squad_config.yaml                    # parameter configuration for downstream_task_squad
 ```
@@ -553,15 +558,14 @@ Before running the command below, please check the load pretrain checkpoint path
 
 --train_data_file_path="/data/sst2/train.mindrecord" \
 
---eval_data_file_path="/data/sst2/dev.mindrecord" \
-
---schema_file_path="/data/sst2/dataset.json"
+--eval_data_file_path="/data/sst2/dev.mindrecord"
 
 ```bash
 bash scripts/run_classifier.sh
 ```
 
-The command above will run in the background, you can view training logs in classfier_log.txt.
+The command above will run in the background, you can view training logs in classfier_log.txt in albert root path.
+"load_pretrain_checkpoint_path" is mindspore ckpt file.
 
 If you choose accuracy as assessment method, the result will be as follows:
 
