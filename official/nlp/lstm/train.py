@@ -22,6 +22,7 @@ from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.dataset import convert_to_mindrecord
 from src.dataset import lstm_create_dataset
+from src.eval_callback import EvalCallBack, apply_eval
 from src.lr_schedule import get_lr
 from src.lstm import SentimentNet
 
@@ -113,10 +114,21 @@ def train_lstm():
                                  keep_checkpoint_max=config.keep_checkpoint_max)
     ckpoint_cb = ModelCheckpoint(prefix="lstm", directory=config.ckpt_path, config=config_ck)
     time_cb = TimeMonitor(data_size=ds_train.get_dataset_size())
+    cb = [time_cb, ckpoint_cb, loss_cb]
+    if config.run_eval and rank == 0:
+        eval_net = network
+        eval_net.set_train(False)
+        eval_dataset = lstm_create_dataset(config.preprocess_path, config.batch_size, training=False)
+        eval_param_dict = {"net": eval_net, "dataset": eval_dataset}
+        eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=config.eval_interval,
+                               eval_start_epoch=config.eval_start_epoch, save_best_ckpt=True,
+                               ckpt_directory=config.ckpt_path, besk_ckpt_name="lstm_best_f1.ckpt",
+                               metrics_name="f1")
+        cb += [eval_cb]
     if config.device_target == "CPU":
-        model.train(config.num_epochs, ds_train, callbacks=[time_cb, ckpoint_cb, loss_cb], dataset_sink_mode=False)
+        model.train(config.num_epochs, ds_train, callbacks=cb, dataset_sink_mode=False)
     else:
-        model.train(config.num_epochs, ds_train, callbacks=[time_cb, ckpoint_cb, loss_cb])
+        model.train(config.num_epochs, ds_train, callbacks=cb)
     print("============== Training Success ==============")
 
 if __name__ == '__main__':
