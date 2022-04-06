@@ -1,0 +1,32 @@
+{
+    "user_pipeline": {
+        "stream_config": {
+            "deviceId": "0"
+        },
+        "appsrc0": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_tensorinfer1"
+        },
+        "mxpi_tensorinfer1": {
+            "props": {
+                "dataSource": "appsrc0",
+                 "modelPath": "../data/model/naml_user_encoder_bs_1.om"
+            },
+            "factory": "mxpi_tensorinfer",
+            "next": "mxpi_dataserialize0"
+        },
+        "mxpi_dataserialize0": {
+            "props": {
+                "outputDataKeys": "mxpi_tensorinfer1"
+            },
+            "factory": "mxpi_dataserialize",
+            "next": "appsink0"
+        },
+        "appsink0": {
+            "factory": "appsink"
+            }
+    }
+}
