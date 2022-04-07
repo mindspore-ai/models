@@ -552,7 +552,7 @@ if __name__ == '__main__':
     parser.add_argument('--val_model', type=str, default='./train_parallel3/checkpoint/ckpt_3/RetinaFace-56_201.ckpt',
                         help='val_model location')
     args = parser.parse_args()
-    if args_opt.backbone_name == 'ResNet50':
+    if args.backbone_name == 'ResNet50':
         val_with_resnet(args_opt=args)
-    elif args_opt.backbone_name == 'MobileNet025':
+    elif args.backbone_name == 'MobileNet025':
         val_with_mobilenet(args_opt=args)

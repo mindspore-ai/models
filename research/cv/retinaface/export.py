@@ -21,7 +21,7 @@ import numpy as np
 
 from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
 
-from src.network import RetinaFace, resnet50
+from src.network_with_resnet import RetinaFace, resnet50
 from src.config import cfg_res50
 
 parser = argparse.ArgumentParser(description='senet export')
