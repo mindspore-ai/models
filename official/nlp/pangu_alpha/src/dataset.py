@@ -22,6 +22,7 @@ import mindspore.dataset as ds
 import mindspore.dataset.transforms.c_transforms as C
 import mindspore.common.dtype as mstype
 
+from mindspore import context
 
 def get_input_data_batch_slice_map(input_ids, eod_id, rank, dis, eod_reset):
     """
@@ -88,6 +89,9 @@ def create_dataset(batch_size, data_path, device_num=1, rank=0, drop=True, full_
     # Control the size of data queue in the consideration of the memory
     ds.config.set_prefetch_size(1)
 
+    is_data_parallel = context.get_auto_parallel_context(
+        "parallel_mode") == context.ParallelMode.DATA_PARALLEL
+
     # Get path for source data files
     home_path = os.path.join(os.getcwd(), data_path)
     files = os.listdir(data_path)
@@ -104,7 +108,7 @@ def create_dataset(batch_size, data_path, device_num=1, rank=0, drop=True, full_
     type_cast_op = C.TypeCast(mstype.int32)
     type_cast_op_float = C.TypeCast(mstype.float16)
 
-    if full_batch:
+    if full_batch or is_data_parallel:
         # no need to slice from the inputs
         rank = 0
         dis = batch_size

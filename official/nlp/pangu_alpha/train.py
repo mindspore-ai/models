@@ -100,13 +100,14 @@ def set_parallel_context(args_opt):
     print("rank_id is {}, device_num is {}".format(rank, device_num))
     context.reset_auto_parallel_context()
     context.set_auto_parallel_context(
-        parallel_mode=ParallelMode.SEMI_AUTO_PARALLEL, gradients_mean=False,
+        parallel_mode=args_opt.parallel_mode, gradients_mean=False,
         full_batch=bool(args_opt.full_batch), strategy_ckpt_load_file=args_opt.strategy_load_ckpt_path,
         enable_parallel_optimizer=bool(args_opt.optimizer_shard), strategy_ckpt_save_file='strategy.ckpt',
         enable_alltoall=bool(args_opt.enable_alltoall))
     set_algo_parameters(elementwise_op_strategy_follow=True)
     _set_multi_subgraphs()
     return rank, device_num
+
 
 def set_optimizer(optimizer, opt_offload, group_params, learning_rate, config):
     r"""Set optimizer"""
@@ -121,7 +122,7 @@ def set_optimizer(optimizer, opt_offload, group_params, learning_rate, config):
 
 def run_train(args_opt):
     r"""The main training process."""
-    os.environ['HCCL_CONNECT_TIMEOUT'] = "6000"
+    os.environ['HCCL_CONNECT_TIMEOUT'] = str(args_opt.hccl_connect_time)
     # Set execution mode
     context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, variable_memory_max_size="30GB")
     # Set parallel context
@@ -130,6 +131,9 @@ def run_train(args_opt):
     if args_opt.distribute == "true":
         rank, device_num = set_parallel_context(args_opt)
     context.set_context(save_graphs=False, save_graphs_path="./graphs_of_device_id_" + str(rank))
+    if args_opt.parallel_mode == "data_parallel":
+        # in avoid of the loop call depth
+        context.set_context(max_call_depth=10000)
 
     # env variable prepare
     group_info_file = os.getenv("GROUP_INFO_FILE")
@@ -150,7 +154,8 @@ def run_train(args_opt):
     model_parallel_num = args_opt.op_level_model_parallel_num
     expert_parallel_num = args_opt.expert_parallel_num
     data_parallel_num = int(device_num / model_parallel_num)
-    batch_size = args_opt.per_batch_size * data_parallel_num
+    batch_size = args_opt.per_batch_size * data_parallel_num if context.get_auto_parallel_context(
+        "parallel_mode") != ParallelMode.DATA_PARALLEL else args_opt.per_batch_size
     micro_batch_interleaved = args_opt.micro_batch_interleaved
     parallel_config = TransformerOpParallelConfig(data_parallel=data_parallel_num, model_parallel=model_parallel_num,
                                                   expert_parallel=expert_parallel_num,
@@ -391,7 +396,7 @@ def set_pipeline_parallel_context(args_opt):
     print("rank_id is {}, device_num is {}".format(rank_id, device_num))
     context.reset_auto_parallel_context()
     context.set_auto_parallel_context(
-        parallel_mode=ParallelMode.SEMI_AUTO_PARALLEL, gradients_mean=False,
+        parallel_mode=args_opt.parallel_mode, gradients_mean=False,
         full_batch=bool(args_opt.full_batch), loss_repeated_mean=True,
         device_num=device_num, enable_parallel_optimizer=bool(args_opt.optimizer_shard),
         pipeline_stages=args_opt.stage_num, enable_alltoall=bool(args_opt.enable_alltoall))
@@ -403,11 +408,11 @@ def set_pipeline_parallel_context(args_opt):
 def run_train_pipeline(args_opt):
     r"""The main training process in pipeline."""
     # Set hccl connect time
-    os.environ['HCCL_CONNECT_TIMEOUT'] = "6000"
+    os.environ['HCCL_CONNECT_TIMEOUT'] = str(args_opt.hccl_connect_time)
 
     context.set_context(save_graphs=False, mode=context.GRAPH_MODE, device_target=args_opt.device_target)
     context.set_context(variable_memory_max_size="30GB")
-    rank_id = int(os.getenv("RANK_ID"))
+    rank_id = 0
     device_num = 1
     if args_opt.distribute == "true":
         rank_id, device_num = set_pipeline_parallel_context(args_opt)
@@ -424,8 +429,6 @@ def run_train_pipeline(args_opt):
     stage_device_num = int(device_num / args_opt.stage_num)
     data_parallel_num = int(stage_device_num / model_parallel_num)
     is_last_stage = (rank_id // stage_device_num) == args_opt.stage_num -1
-    if data_parallel_num <= 1 and args_opt.optimizer_shard == 1:
-        raise ValueError("The data parallel number must be larger than 1 when applying optimizer shard.")
     per_batch_size = args_opt.per_batch_size
     batch_size = per_batch_size * data_parallel_num * args_opt.micro_size
     micro_batch_interleaved = args_opt.micro_batch_interleaved

@@ -30,6 +30,7 @@ import mindspore.common.dtype as mstype
 from mindspore.common.tensor import Tensor
 from mindspore.nn.learning_rate_schedule import LearningRateSchedule, PolynomialDecayLR, WarmUpLR, CosineDecayLR
 from mindspore.parallel._auto_parallel_context import auto_parallel_context
+from mindspore.context import ParallelMode
 from mindspore.communication.management import get_rank, get_group_size, create_group
 from mindspore.nn import AdamWeightDecay
 from mindspore.common import Parameter, ParameterTuple
@@ -142,12 +143,19 @@ class GlobalNorm(nn.Cell):
         self.norm = nn.Norm()
         self.hyper_map = C.HyperMap()
         self.is_pipeline = context.get_auto_parallel_context("pipeline_stages") > 1
+        self.is_data_parallel = context.get_auto_parallel_context("parallel_mode") == ParallelMode.DATA_PARALLEL
+        self.config = config
+        self.group_size = 1
+        if self.is_data_parallel:
+            self.merge_op = P.identity()
+        else:
+            self.merge_op = P.AllReduce()
         if self.is_pipeline:
             if context.get_auto_parallel_context("enable_parallel_optimizer"):
-                group_size = get_group_size() // config.parallel_config.pipeline_stage
+                self.group_size = get_group_size() // config.parallel_config.pipeline_stage
             else:
-                group_size = config.parallel_config.model_parallel
-            group_list, group_name = _get_model_parallel_group(group_size)
+                self.group_size = config.parallel_config.model_parallel
+            group_list, group_name = _get_model_parallel_group(self.group_size)
             # In avoid of the group name too long
             hashed = hashlib.md5(group_name.encode()).hexdigest()[:48]
             print(f"Creating hash value for the group_name hash({group_name})={hashed}")
@@ -161,20 +169,12 @@ class GlobalNorm(nn.Cell):
             create_group(pipeline_group_name, pipeline_group_list)
             self.allreduce2 = P.AllReduce(group=pipeline_group_name)
         else:
-            group_size = get_group_size()
+            self.group_size = get_group_size()
         self.allreduce_group_size = ()
-        for x in params:
-            if "projection.bias" not in x.name and "layernorm" not in x.name and "embedding_table" not in x.name:
-                self.allreduce_group_size = self.allreduce_group_size + (1.0,)
-            elif "embedding_table" not in x.name:
-                self.allreduce_group_size = self.allreduce_group_size + (group_size * 1.0,)
-            else:
-                if not config.parallel_config.vocab_emb_dp and "position_embedding.embedding_table" not in x.name \
-                        and "top_query_embedding_table" not in x.name:
-                    self.allreduce_group_size = self.allreduce_group_size +\
-                                                (config.parallel_config.data_parallel * 1.0,)
-                else:
-                    self.allreduce_group_size = self.allreduce_group_size + (group_size * 1.0,)
+        if self.is_data_parallel:
+            self.allreduce_group_size = (1,) * len(params)
+        else:
+            self.allreduce_group_size = self._get_scale_for_gradient_norm(params)
 
     def construct(self, grads):
         """Calculate global norm construct"""
@@ -185,9 +185,24 @@ class GlobalNorm(nn.Cell):
             global_square_reduce_sum = self.allreduce2(stage_square_reduce_sum)
             global_norms = F.sqrt(global_square_reduce_sum)
         else:
-            global_norms = F.sqrt(P.AllReduce()(square_reduce_sum))
+            global_norms = F.sqrt(self.merge_op(square_reduce_sum))
         return grads, global_norms
 
+    def _get_scale_for_gradient_norm(self, params):
+        allreduce_group_size = ()
+        for x in params:
+            if "projection.bias" not in x.name and "layernorm" not in x.name and "embedding_table" not in x.name:
+                allreduce_group_size = allreduce_group_size + (1.0,)
+            elif "embedding_table" not in x.name:
+                allreduce_group_size = allreduce_group_size + (self.group_size * 1.0,)
+            else:
+                if not self.config.parallel_config.vocab_emb_dp and "position_embedding.embedding_table" not in x.name \
+                        and "top_query_embedding_table" not in x.name:
+                    allreduce_group_size = allreduce_group_size + \
+                                                (self.config.parallel_config.data_parallel * 1.0,)
+                else:
+                    allreduce_group_size = allreduce_group_size + (self.group_size * 1.0,)
+        return allreduce_group_size
 
 class ClipByGlobalNorm(nn.Cell):
     """
@@ -397,6 +412,12 @@ def add_training_params(opt):
                      help="Parallel split num of batch size. default 2")
 
 
+def add_context_args_mode(opt):
+    """Add context args params"""
+    opt.add_argument("--parallel_mode",
+                     type=str,
+                     default="semi_auto_parallel",
+                     choices=['data_parallel', "semi_auto_parallel", "auto_parallel"], help="The parallel context mode")
 
 def add_retrain_params(opt):
     """
@@ -523,6 +544,11 @@ def get_args(inference=False):
                         type=int,
                         default=0,
                         help="Enable alltoall communication, only effective when applying moe. Default 0")
+    parser.add_argument("--hccl_connect_time",
+                        type=int,
+                        default=6000,
+                        help="Set the hccl build time out, only effective on Ascend. Default 6000")
+    add_context_args_mode(parser)
     add_training_params(parser)
     add_retrain_params(parser)
     if inference:
