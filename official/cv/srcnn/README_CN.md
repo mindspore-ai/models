@@ -416,7 +416,7 @@ python export.py --checkpoint_path /checkpoint_path --file_format="MINDIR"
 ```
 
 并且注意因为310推理只支持静态shape，所以需要指定图片的形状，可以通过修改config.yaml的image_width和image_height来改变。
-EXPORT_FORMAT 可在["AIR","MINDIR"]中选择。
+file_format 可在["AIR","MINDIR"]中选择。
 
 ## 推理过程
 
@@ -456,7 +456,7 @@ EXPORT_FORMAT 可在["AIR","MINDIR"]中选择。
 | 损失函数      | MSE Loss                                                 | MSE Loss                             |
 | 输出          | 图片                                                     | 图片                                 |
 | 损失          | 0.00163                                                  | 0.00179                              |
-| 精度          | SET5:36.71                                               |                                     |
+| PSNR          | SET5:36.71                                               |                                     |
 |               | SET14:32.586                                             |                                     |
 |               | BSD200:33.809                                            |                                    |
 | 总时长        | 单卡：2小时15分钟 <br/>8卡：16分钟                         | 1 h 8ps                             |
