@@ -28,6 +28,7 @@
         - [310Inference Performance](#310inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
+- [FAQ](#faq)
 
 <!-- /TOC -->
 
@@ -874,3 +875,11 @@ In var_init.py, we set seed for weight initialization
 # [ModelZoo Homepage](#contents)
 
  Please check the official [homepage](https://gitee.com/mindspore/models).
+
+# FAQ
+
+Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some common question.
+
+- **Q: How to resolve the error "can't start new thread"?**
+
+  **A**: This is caused by exceed the limit of max user thread, you can use `ulimit -u <MAX_THREAD_NUM>` to update the limit.
