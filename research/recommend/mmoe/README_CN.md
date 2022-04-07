@@ -13,11 +13,11 @@
     - [脚本参数](#脚本参数)
     - [训练过程](#训练过程)
         - [用法](#用法)
-        - [Ascend处理器环境运行](#ascend处理器环境运行)
+        - [Ascend处理器或GPU环境运行](#Ascend处理器或GPU环境运行)
         - [结果](#结果)
 - [评估过程](#评估过程)
-    - [用法](#用法)
-    - [Ascend处理器环境运行](#ascend处理器环境运行)
+    - [评估用法](#评估用法)
+    - [Ascend处理器或GPU环境运行评估](#Ascend处理器或GPU环境运行评估)
     - [结果](#结果)
 - [Ascend310推理过程](#推理过程)
     - [导出MindIR](#导出MindIR)
@@ -26,7 +26,7 @@
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
-            - [cifar10上的WideResNet](#cifar10上的wideresnet)
+            - [census-income上的MMoE](#census-income上的MMoE)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
 
@@ -53,8 +53,12 @@ MMoE的总体网络架构如下：
 
 - 数据集大小：共9.4Mb、299,285条数据
     - 训练集：共6.3Mb，199,523条数据
+
     - 测试集：共3.1Mb，99726条数据
+
     - 注：数据在data.py中处理成mindrecord格式。
+
+      使用命令 python data.py --local_data_path  ./Census-income
 - 下载原始数据集，目录结构如下：
 
 ```text
@@ -77,26 +81,40 @@ MMoE的总体网络架构如下：
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
-- Ascend处理器环境运行
+- Ascend处理器或GPU环境运行
 
 ```Shell
-# 分布式训练
+# 分布式训练（Ascend）
 Usage: bash run_distribution_ascend.sh [RANK_TABLE_FILE] [DATA_PATH] [CKPT_PATH] [CONFIG_FILE]
 [RANK_TABLE_FILE]是多卡的具体信息。
 [DATA_PATH]是数据集的路径。
 [CKPT_PATH]是要将ckpt保存的位置。
 [CONFIG_FILE]是模型及运行的整体参数。
 
-# 单机训练
+# 单机训练(Ascend)
 Usage: bash run_standalone_train_ascend.sh [DATA_PATH] [DEVICE_ID] [CKPT_PATH] [CONFIG_FILE]
 [DATA_PATH]是数据集的路径。
 [CKPT_PATH]是要将ckpt保存的位置。
 [DEVICE_ID]为执行train.py的ID号。
 [CONFIG_FILE]是模型及运行的整体参数。
 
-# 运行评估示例
+# 单机训练(GPU)
+Usage: bash run_standalone_train_gpu.sh [DATA_PATH] [DEVICE_ID] [CKPT_PATH] [CONFIG_FILE]
+[DATA_PATH]是数据集的路径(mindrecord文件所在的目录)。
+[CKPT_PATH]是要将ckpt保存的位置。
+[DEVICE_ID]为执行train.py的ID号。
+[CONFIG_FILE]是模型及运行的整体参数。
+
+# 运行评估示例（Ascend）
 Usage: bash run_standalone_eval_ascend.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID] [CONFIG_FILE]
 [DATA_PATH]是数据集的路径。
+[CKPT_PATH]是保存ckpt的位置。
+[DEVICE_ID]为执行eval.py的ID号。
+[CONFIG_FILE]是模型及运行的整体参数。
+
+# 运行评估示例（GPU）
+Usage: bash run_standalone_eval_gpu.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID] [CONFIG_FILE]
+[DATA_PATH]是数据集的路径(mindrecord文件所在的目录)。
 [CKPT_PATH]是保存ckpt的位置。
 [DEVICE_ID]为执行eval.py的ID号。
 [CONFIG_FILE]是模型及运行的整体参数。
@@ -120,21 +138,25 @@ Usage: bash run_standalone_eval_ascend.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID] [C
   ├── scripts
     ├── run_distribute_ascend.sh            # 启动Ascend分布式训练（8卡）
     ├── run_standalone_eval_ascend.sh       # 启动Ascend910评估
+    ├── run_standalone_eval_gpu.sh          # 启动GPU评估
     ├── run_infer_310.sh                    # 启动Ascend310评估
-    └── run_standalone_train_ascend.sh      # 启动Ascend单机训练（单卡）
+    ├── run_standalone_train_ascend.sh      # 启动Ascend单机训练（单卡）
+    └── run_standalone_train_gpu.sh         # 启动GPU单机训练（单卡）
   ├── src
     ├── model_utils
         ├── config.py                        # 参数配置
         ├── device_adapter.py                # 适配云上或线下
         ├── local_adapter.py                 # 线下配置
         ├── moxing_adapter.py                # 云上配置
+    ├── callback.py                          # 训练过程中进行评估的回调  
     ├── data.py                              # 数据预处理
     ├── load_dataset.py                      # 加载处理好的mindrecord格式数据
     ├── get_lr.py                            # 生成每个步骤的学习率
     ├── mmoe.py                              # 模型整体架构
     └── mmoe_utils.py                        # 每一层架构
   ├── eval.py                                # 910评估网络
-  ├── default_config.yaml                    # 参数配置
+  ├── default_config.yaml                    # 默认的参数配置
+  ├── default_config_gpu.yaml                # 针对GPU环境默认的参数配置
   ├── export.py                              # 910导出网络
   ├── postprocess.py                         # 310推理精度计算
   ├── preprocess.py                          # 310推理前数据处理
@@ -153,7 +175,7 @@ Usage: bash run_standalone_eval_ascend.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID] [C
 "units":4,                         # 每一层的unit数
 "batch_size":32,                   # 输入张量的批次大小
 "epoch_size":100,                  # 训练周期大小
-"lr":0.001,                        # 初始学习率
+"learning_rate":0.001,             # 初始学习率
 "save_checkpoint":True,            # 是否保存检查点
 "save_checkpoint_epochs":1,        # 两个检查点之间的周期间隔；默认情况下，最后一个检查点将在最后一个周期完成后保存
 "keep_checkpoint_max":10,          # 只保存最后一个keep_checkpoint_max检查点
@@ -164,26 +186,40 @@ Usage: bash run_standalone_eval_ascend.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID] [C
 
 ## 用法
 
-## Ascend处理器环境运行
+## Ascend处理器或GPU环境运行
 
 ```Shell
-# 分布式训练
+# 分布式训练（Ascend）
 Usage: bash run_distribution_ascend.sh [RANK_TABLE_FILE] [DATA_PATH] [CKPT_PATH] [CONFIG_FILE]
 [RANK_TABLE_FILE]是多卡的具体信息。
 [DATA_PATH]是数据集的路径。
 [CKPT_PATH]是要将ckpt保存的位置。
 [CONFIG_FILE]是模型及运行的整体参数。
 
-# 单机训练
+# 单机训练(Ascend)
 Usage: bash run_standalone_train_ascend.sh [DATA_PATH] [DEVICE_ID] [CKPT_PATH] [CONFIG_FILE]
 [DATA_PATH]是数据集的路径。
 [CKPT_PATH]是要将ckpt保存的位置。
 [DEVICE_ID]为执行train.py的ID号。
 [CONFIG_FILE]是模型及运行的整体参数。
 
-# 运行评估示例
+# 单机训练(GPU)
+Usage: bash run_standalone_train_gpu.sh [DATA_PATH] [DEVICE_ID] [CKPT_PATH] [CONFIG_FILE]
+[DATA_PATH]是数据集的路径(mindrecord文件所在的目录)。
+[CKPT_PATH]是要将ckpt保存的位置。
+[DEVICE_ID]为执行train.py的ID号。
+[CONFIG_FILE]是模型及运行的整体参数。
+
+# 运行评估示例（Ascend）
 Usage: bash run_standalone_eval_ascend.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID] [CONFIG_FILE]
 [DATA_PATH]是数据集的路径。
+[CKPT_PATH]是保存ckpt的位置。
+[DEVICE_ID]为执行eval.py的ID号。
+[CONFIG_FILE]是模型及运行的整体参数。
+
+# 运行评估示例（GPU）
+Usage: bash run_standalone_eval_gpu.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID] [CONFIG_FILE]
+[DATA_PATH]是数据集的路径(mindrecord文件所在的目录)。
 [CKPT_PATH]是保存ckpt的位置。
 [DEVICE_ID]为执行eval.py的ID号。
 [CONFIG_FILE]是模型及运行的整体参数。
@@ -200,7 +236,7 @@ Usage: bash run_standalone_eval_ascend.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID] [C
 - 使用census-income数据集训练MMoE
 
 ```text
-# 分布式训练结果（8P）
+# 分布式训练结果（8P Ascend）
 epoch: 1 step: 780, loss is 0.5584626
 epoch: 2 step: 780, loss is 0.72126234
 epoch: 3 step: 780, loss is 0.28167123
@@ -213,13 +249,34 @@ epoch: 9 step: 780, loss is 0.37079066
 epoch: 10 step: 780, loss is 0.2761521
 
 ...
+
+# 单卡GPU训练结果
+epoch: 1 step: 1558, loss is 0.7738624215126038
+epoch time: 23271.168 ms, per step time: 14.937 ms
+start infer...
+infer data finished, start eval...
+result : income_auc=0.956143804122577, marital_auc=0.8883598309142848, use time 2s
+The best income_auc is 0.956143804122577,             the best marital_auc is 0.8883598309142848,             the best income_marital_auc_avg is 0.9222518175184309
+epoch: 2 step: 1558, loss is 0.4517086148262024
+epoch time: 17804.081 ms, per step time: 11.428 ms
+start infer...
+infer data finished, start eval...
+result : income_auc=0.9856142129882843, marital_auc=0.9194419616798691, use time 1s
+The best income_auc is 0.9856142129882843,             the best marital_auc is 0.9194419616798691,             the best income_marital_auc_avg is 0.9525280873340767
+epoch: 3 step: 1558, loss is 0.41103610396385193
+epoch time: 17853.932 ms, per step time: 11.460 ms
+start infer...
+infer data finished, start eval...
+result : income_auc=0.9876599788311389, marital_auc=0.9663552616198483, use time 1s
+The best income_auc is 0.9876599788311389,             the best marital_auc is 0.9663552616198483,             the best income_marital_auc_avg is 0.9770076202254936
+...
 ```
 
 # 评估过程
 
-## 用法
+## 评估用法
 
-### Ascend处理器环境运行
+### Ascend处理器或GPU环境运行评估
 
 ```Shell
 # 评估
@@ -283,23 +340,24 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 
 #### census-income上的MMoE
 
-| 参数 | Ascend 910  |
-|---|---|
-| 模型版本  | MMoE  |
-| 资源  |  Ascend 910；CPU：2.60GHz，192核；内存：755G |
-| 上传日期  |2021-11-12 ;  |
-| MindSpore版本  | 1.3.0 |
-| 数据集  | census-income |
-| 训练参数  | epoch=100, batch_size = 32  |
-| 优化器  | Adam  |
-| 损失函数  | BCELoss |
-| 输出  | 概率 |
-|  损失 | 0.20949207 |
-|速度|0.671毫秒/步 |
-|总时长   |  17分钟 |
-|参数(M)   | 23.55 |
-|  微调检查点 | 2.66M（.ckpt文件）  |
-| 脚本  | [链接](https://gitee.com/mindspore/models/tree/master/research/recommend/mmoe)  |
+| 参数 | Ascend 910  | V100 GPU |
+|---|---|---|
+| 模型版本  | MMoE  |MMoE|
+| 资源  |  Ascend 910；CPU：2.60GHz，192核；内存：755G |V100 GPU；CPU：8核；内存：64G|
+| 上传日期  |2021-11-12 ;  |2022-2-19|
+| MindSpore版本  | 1.3.0 |1.6.0|
+| 数据集  | census-income |census-income|
+| 训练参数  | epoch=100, batch_size = 32  |epoch=100, batch_size = 128|
+| 优化器  | Adam  |Adam|
+| 损失函数  | BCELoss |BCELoss|
+| 输出  | 概率 |概率|
+|  损失 | 0.20949207 |0.21848808228969574|
+|速度|0.671毫秒/步 |11.399毫秒/步|
+|总时长   |  17分钟 |32分钟|
+|参数   | 23.55KB |23.55KB|
+|精度指标   | best income_auc:0.9895    best marital_auc:0.9837 |best income_auc:0.9892    best marital_auc:0.9826|
+|  微调检查点 | 2.66MB（.ckpt文件）  |893.8KB（.ckpt文件）|
+| 脚本  | [链接](https://gitee.com/mindspore/models/tree/master/research/recommend/mmoe)  |[链接](https://gitee.com/mindspore/models/tree/master/research/recommend/mmoe)|
 
 # 随机情况说明
 

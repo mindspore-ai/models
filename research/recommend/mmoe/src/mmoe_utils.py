@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,9 +19,17 @@ from mindspore import Parameter
 from mindspore.common.initializer import initializer, TruncatedNormal, Zero
 import mindspore.ops as P
 
+from src.model_utils.config import config
+
+if config.device_target == 'Ascend':
+    use_mstype = ms.float16
+else:
+    use_mstype = ms.float32
+
 
 class expert(nn.Cell):
     """expert network"""
+
     def __init__(self,
                  input_size,
                  units,
@@ -37,7 +45,8 @@ class expert(nn.Cell):
         self.bias_add = P.Add()
         self.relu = nn.ReLU()
         self.expert_kernels = Parameter(initializer(TruncatedNormal(),
-                                                    (self.input_size, self.units, self.num_experts),
+                                                    (self.input_size, self.units,
+                                                     self.num_experts),
                                                     ms.float32),
                                         requires_grad=True)
         if self.use_expert_bias:
@@ -52,15 +61,18 @@ class expert(nn.Cell):
     def construct(self, x):
         """construct of expert network"""
         # expert_output = self.mul(x.astype(ms.float16), self.expert_kernels.astype(ms.float16), (1, 0))
-        expert_output = self.mul(x, self.expert_kernels.astype(ms.float16), (1, 0))
+        expert_output = self.mul(
+            x, self.expert_kernels.astype(use_mstype), (1, 0))
         if self.use_expert_bias:
-            expert_output = self.bias_add(expert_output, self.expert_bias.astype(ms.float16))
+            expert_output = self.bias_add(
+                expert_output, self.expert_bias.astype(use_mstype))
         expert_output = self.relu(expert_output)
         return expert_output
 
 
 class gate(nn.Cell):
     """gate network"""
+
     def __init__(self,
                  input_size,
                  num_experts,
@@ -73,7 +85,8 @@ class gate(nn.Cell):
         self.bias_add = P.BiasAdd()
         self.softmax = nn.Softmax()
         self.gate_kernel = Parameter(initializer(TruncatedNormal(),
-                                                 (self.input_size, self.num_experts),
+                                                 (self.input_size,
+                                                  self.num_experts),
                                                  ms.float32),
                                      requires_grad=True)
 
@@ -89,15 +102,17 @@ class gate(nn.Cell):
     def construct(self, x):
         """construct of gate network"""
         # gate_output = P.dot(x1=x.astype(ms.float16), x2=self.gate_kernel.astype(ms.float16))
-        gate_output = P.dot(x1=x, x2=self.gate_kernel.astype(ms.float16))
+        gate_output = P.dot(x1=x, x2=self.gate_kernel.astype(use_mstype))
         if self.use_gate_bias:
-            gate_output = self.bias_add(gate_output, self.gate_bias.astype(ms.float16))
+            gate_output = self.bias_add(
+                gate_output, self.gate_bias.astype(use_mstype))
         gate_output = self.softmax(gate_output)
         return gate_output
 
 
 class shared_output(nn.Cell):
     """Gate controls the weights of different experts for different tasks"""
+
     def __init__(self,
                  input_size,
                  num_experts,
@@ -114,7 +129,9 @@ class shared_output(nn.Cell):
     def construct(self, x, x1):
         """construct of shared output"""
         expanded_gate_output = self.expand_dims(x1, 1)
-        weighted_expert_output = x * self.repeat_elements(x=expanded_gate_output, rep=self.units, axis=1)
+        weighted_expert_output = x * \
+            self.repeat_elements(x=expanded_gate_output,
+                                 rep=self.units, axis=1)
         final_outputs = self.sum(weighted_expert_output, 2)
 
         return final_outputs
@@ -122,6 +139,7 @@ class shared_output(nn.Cell):
 
 class tower(nn.Cell):
     """dense with TRelu activation"""
+
     def __init__(self, in_channels, out_channels):
         super(tower, self).__init__()
         self.relu = nn.ReLU()
@@ -129,7 +147,7 @@ class tower(nn.Cell):
                                     out_channels,
                                     weight_init=TruncatedNormal(),
                                     activation=self.relu)
-        self.tower_layer.to_float(ms.float16)
+        self.tower_layer.to_float(use_mstype)
         self.print = P.Print()
 
     def construct(self, x):
@@ -140,6 +158,7 @@ class tower(nn.Cell):
 
 class output(nn.Cell):
     """dense with TSoftmax activation"""
+
     def __init__(self, in_channels, out_channels):
         super(output, self).__init__()
         self.softmax = nn.Softmax()
@@ -147,7 +166,7 @@ class output(nn.Cell):
                                out_channels,
                                weight_init=TruncatedNormal(),
                                activation=self.softmax)
-        self.output.to_float(ms.float16)
+        self.output.to_float(use_mstype)
         self.print = P.Print()
 
     def construct(self, x):
