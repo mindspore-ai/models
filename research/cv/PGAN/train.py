@@ -16,7 +16,7 @@
 #################train pgan########################
 """
 import os
-import datetime
+import time
 import numpy as np
 from mindspore import nn
 from mindspore.common import set_seed
@@ -199,6 +199,7 @@ def run_train():
         dataset = dataset.batch(batch_size=cfg.batch_size, drop_remainder=True)
         dataset_iter = dataset.create_tuple_iterator()
         i_batch = 0
+        time_stamp = time.time()
         while i_batch < cfg.num_batch[scale_index] / cfg.device_num:
             epoch = 0
             for data in dataset_iter:
@@ -216,10 +217,11 @@ def run_train():
                 if i_batch >= cfg.num_batch[scale_index] / cfg.device_num:
                     break
                 if i_batch % 100 == 0:
-                    time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
-                    print('batch_i:{} alpha:{} loss G:{} loss D:{} overflow:{},time:{}'.format(i_batch, alpha, lossG,
-                                                                                               lossD, overflow,
-                                                                                               time_now))
+                    time_now = time.time()
+                    print('batch_i:{} alpha:{} loss G:{} loss D:{} overflow:{}'.format(i_batch, alpha,
+                                                                                       lossG, lossD, overflow))
+                    print("per step time is ", (time_now - time_stamp)/100, "ms")
+                    time_stamp = time_now
                 if (i_batch + 1) % cfg.model_save_step == 0:
                     save_checkpoint_g(avg_gnet, gnet, dnet, this_scale_checkpoint, i_batch)
             epoch += 1
