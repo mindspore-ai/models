@@ -18,7 +18,11 @@ import mindspore as ms
 import mindspore.dataset as de
 from .model_utils.config import config
 
+
 de.config.set_seed(1)
+de.config.set_prefetch_size(512)
+
+
 def create_transformer_dataset(rank_size=1, rank_id=0, do_shuffle="true", dataset_path=None,
                                bucket_boundaries=None, device_target="Ascend"):
     """create dataset"""

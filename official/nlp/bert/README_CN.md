@@ -142,15 +142,15 @@ bash scripts/run_distributed_pretrain_for_gpu.sh 8 40 /path/cn-wiki-128
 - 如需运行微调任务，请先准备预训练生成的权重文件（ckpt）。
 - 在`task_[DOWNSTREAM_TASK]_config.yaml`中设置BERT网络配置和优化器超参。
 
-- 分类任务：在scripts/run_classifier.sh中设置任务相关的超参。
-- 运行`bash scripts/run_classifier.sh [DEVICE_ID]`，对BERT-base和BERT-NEZHA模型进行微调。
+- 分类任务：在scripts/run_classifier_gpu.sh中设置任务相关的超参。
+- 运行`bash scripts/run_classifier_gpu.sh [DEVICE_ID]`，对BERT-base和BERT-NEZHA模型进行微调。
 
-  bash scripts/run_classifier.sh DEVICE_ID(optional)
+  bash scripts/run_classifier_gpu.sh DEVICE_ID(optional)
 
-- NER任务：在scripts/run_ner.sh中设置任务相关的超参。
-- 运行`bash scripts/run_ner.sh [DEVICE_ID]`，对BERT-base和BERT-NEZHA模型进行微调。
+- NER任务：在scripts/run_ner_gpu.sh中设置任务相关的超参。
+- 运行`bash scripts/run_ner_gpu.sh [DEVICE_ID]`，对BERT-base和BERT-NEZHA模型进行微调。
 
-  bash scripts/run_ner.sh DEVICE_ID(optional)
+  bash scripts/run_ner_gpu.sh DEVICE_ID(optional)
 
 - SQUAD任务：在scripts/run_squad_gpu.sh中设置任务相关的超参。
 -运行`bash scripts/run_squad_gpu.sh [DEVICE_ID]`，对BERT-base和BERT-NEZHA模型进行微调。
@@ -283,8 +283,10 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
         ├─hyper_parameter_config.ini          # 分布式预训练超参
         ├─get_distribute_pretrain_cmd.py      # 分布式预训练脚本
         --README.md
-    ├─run_classifier.sh                       # Ascend或GPU设备上单机分类器任务shell脚本
-    ├─run_ner.sh                              # Ascend或GPU设备上单机NER任务shell脚本
+    ├─run_classifier.sh                       # Ascend设备上单机分类器任务shell脚本
+    ├─run_classifier_gpu.sh                   # GPU设备上单机分类器任务shell脚本
+    ├─run_ner.sh                              # Ascend设备上单机NER任务shell脚本
+    ├─run_ner.sh                              # GPU设备上单机NER任务shell脚本
     ├─run_squad.sh                            # Ascend设备上单机SQUAD任务shell脚本
     ├─run_squad_gpu.sh                        # GPU设备上单机SQUAD任务shell脚本
     ├─run_standalone_pretrain_ascend.sh       # Ascend设备上单机预训练shell脚本
