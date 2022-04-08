@@ -33,8 +33,8 @@ do
     cp -r ./src ./train_parallel$i
     cp ./train.py ./train_parallel$i
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
-    cd ./train_parallel$i ||exit
+    cd ./train_parallel$i || exit
     env > env.log
-    python train.py --backbone_name 'ResNet50' --device_id=$i > log 2>&1 &
+    python train.py --backbone_name 'ResNet50' > log 2>&1 &
     cd ..
 done
