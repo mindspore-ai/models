@@ -15,7 +15,6 @@
         - [生成数据集](#生成数据集)
             - [News Crawl语料库](#news-crawl语料库)
             - [Gigaword语料库](#gigaword语料库)
-            - [Cornell电影对白语料库](#cornell电影对白语料库)
     - [配置](#配置)
     - [训练&评估过程](#训练评估过程)
     - [权重平均值](#权重平均值)
@@ -34,7 +33,6 @@
 - [性能](#性能)
     - [结果](#结果-1)
         - [文本摘要微调](#文本摘要微调)
-        - [会话应答微调](#会话应答微调)
         - [训练性能](#训练性能)
         - [推理性能](#推理性能)
 - [随机情况说明](#随机情况说明)
@@ -69,7 +67,6 @@ MASS网络由Transformer实现，Transformer包括多个编码器层和多个解
 
 - [News Crawl数据集](https://www.statmt.org/wmt16/translation-task.html)（WMT，2019年）的英语单语数据，用于预训练
 - [Gigaword语料库](https://github.com/harvardnlp/sent-summary)（Graff等人，2003年），用于文本摘要
-- [Cornell电影对白语料库](https://github.com/suriyadeepan/datasets/tree/master/seq2seq/)（DanescuNiculescu-Mizil & Lee，2011年）
 
 ## 特性
 
@@ -176,7 +173,6 @@ MASS脚本及代码结构如下：
   ├── weights_average.py                     // 将各模型检查点平均转换到NPZ格式
   ├── news_crawl.py                          // 创建预训练所用的News Crawl数据集
   ├── gigaword.py                            // 创建Gigaword语料库
-  ├── cornell_dialog.py                      // 创建Cornell电影对白数据集，用于对话应答
 
 ```
 
@@ -278,7 +274,7 @@ print([vocabulary.index[s] for s in sentence])
 
 ### 生成数据集
 
-如前所述，MASS模式下使用了三个语料数据集，相关数据集生成脚本已提供。
+如前所述，MASS模式下使用了两个语料数据集，相关数据集生成脚本已提供。
 
 #### News Crawl语料库
 
@@ -338,34 +334,6 @@ python gigaword.py --train_src /{path}/gigaword/train_src.txt \
     --existed_vocab /{path}/mass/vocab/all_en.dict.bin \
     --noise_prob 0.1 \
     --output_folder /{path}/gigaword_dataset \
-    --max_len 64
-```
-
-#### Cornell电影对白语料库
-
-数据集生成脚本为`cornell_dialog.py`。
-
-`cornell_dialog.py`主要参数如下：
-
-```bash
---src_folder:       Corpus folders.
---existed_vocab:    Persisted vocabulary file.
---train_prefix:     Train source and target file prefix.Default: train.
---test_prefix:      Test source and target file prefix.Default: test.
---output_folder:    Output dataset files folder path.
---max_len:          Maximum sentence length.If a sentence longer than `max_len`, then drop it.
---valid_prefix:     Optional, Valid source and target file prefix.Default: valid.
-```
-
-示例代码如下：
-
-```bash
-python cornell_dialog.py --src_folder /{path}/cornell_dialog \
-    --existed_vocab /{path}/mass/vocab/all_en.dict.bin \
-    --train_prefix train \
-    --test_prefix test \
-    --noise_prob 0.1 \
-    --output_folder /{path}/cornell_dialog_dataset \
     --max_len 64
 ```
 
@@ -680,15 +648,7 @@ bash run_infer_310.sh [MINDIR_PATH] [CONFIG] [VOCAB] [OUTPUT] [NEED_PREPROCESS] 
 
 | 方法| RG-1(F) | RG-2(F) | RG-L(F) |
 |:---------------|:--------------|:-------------|:-------------|
-| MASS | 进行中 | 进行中 | 进行中 |
-
-### 会话应答微调
-
-下表展示了，相较于其他两种基线方法，MASS在Cornell电影对白语料库中困惑度（PPL）的得分情况。
-
-| 方法 | 数据 = 10K | 数据 = 110K |
-|--------------------|------------------|-----------------|
-| MASS | 进行中 | 进行中 |
+| MASS | 38.73 | 19.71 | 35.96 |
 
 ### 训练性能
 
@@ -698,13 +658,13 @@ bash run_infer_310.sh [MINDIR_PATH] [CONFIG] [VOCAB] [OUTPUT] [NEED_PREPROCESS] 
 | 资源                   | Ascend 910；CPU 2.60GHz，192核；内存 755GB；系统 Euler2.8              |
 | 上传日期              | 2021-06-21                                                 |
 | MindSpore版本          | 1.2.1                                                                     |
-| 数据集 | News Crawl 2007-2017英语单语语料库、Gigaword语料库、Cornell电影对白语料库 |
+| 数据集 | News Crawl 2007-2017英语单语语料库、Gigaword语料库 |
 | 训练参数 | Epoch=50, steps=XXX, batch_size=192, lr=1e-4 |
 | 优化器                  | Adam                                                        |
 | 损失函数 | 标签平滑交叉熵准则 |
 | 输出 | 句子及概率 |
 | 损失                       | 小于2                                                            |
-| 准确性 | 会话应答PPL=23.52，文本摘要RG-1=29.79|
+| 准确性 | 文本摘要RG-1=45.98 |
 | 速度                      | 611.45句子/秒                              |
 | 总时长                 |                               |
 | 参数(M)                 | 44.6M                                                          |
@@ -717,10 +677,10 @@ bash run_infer_310.sh [MINDIR_PATH] [CONFIG] [VOCAB] [OUTPUT] [NEED_PREPROCESS] 
 | 资源                  | Ascend 910；系统 Euler2.8                                                     |
 | 上传日期 | 2020-06-21 |
 | MindSpore版本 | 1.2.1 |
-| 数据集 | Gigaword语料库、Cornell电影对白语料库 |
+| 数据集 | Gigaword语料库 |
 | batch_size          | ---                                                        |
 | 输出 | 句子及概率 |
-| 准确度 | 会话应答PPL=23.52，文本摘要RG-1=29.79|
+| 准确度 | 文本摘要RG-1=45.98 |
 | 速度                      | ----句子/秒                              |
 | 总时长 | --/-- |
 

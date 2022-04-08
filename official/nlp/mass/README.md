@@ -15,7 +15,6 @@
         - [Generate Dataset](#generate-dataset)
             - [News Crawl Corpus](#news-crawl-corpus)
             - [Gigaword Corpus](#gigaword-corpus)
-            - [Cornell Movie Dialog Corpus](#cornell-movie-dialog-corpus)
     - [Configuration](#configuration)
     - [Training & Evaluation process](#training--evaluation-process)
     - [Weights average](#weights-average)
@@ -34,7 +33,6 @@
 - [Performance](#performance)
     - [Results](#results)
         - [Fine-Tuning on Text Summarization](#fine-tuning-on-text-summarization)
-        - [Fine-Tuning on Conversational ResponseGeneration](#fine-tuning-on-conversational-responsegeneration)
         - [Training Performance](#training-performance)
         - [Inference Performance](#inference-performance)
 - [Description of random situation](#description-of-random-situation)
@@ -71,7 +69,6 @@ Dataset used:
 
 - [monolingual English data from News Crawl dataset](https://www.statmt.org/wmt16/translation-task.html)(WMT 2019) for pre-training.
 - [Gigaword Corpus](https://github.com/harvardnlp/sent-summary)(Graff et al., 2003) for Text Summarization.
-- [Cornell movie dialog corpus](https://github.com/suriyadeepan/datasets/tree/master/seq2seq/)(DanescuNiculescu-Mizil & Lee, 2011).
 
 # Features
 
@@ -174,7 +171,6 @@ MASS script and code structure are as follow:
   ├── weights_average.py                     // Average multi model checkpoints to NPZ format.
   ├── news_crawl.py                          // Create News Crawl dataset for pre-training.
   ├── gigaword.py                            // Create Gigaword Corpus.
-  ├── cornell_dialog.py                      // Create Cornell Movie Dialog dataset for conversation response.
 
 ```
 
@@ -276,7 +272,7 @@ For more detail, please refer to the source file.
 
 ### Generate Dataset
 
-As mentioned above, three corpus are used in MASS mode, dataset generation scripts for them are provided.
+As mentioned above, two corpus are used in MASS mode, dataset generation scripts for them are provided.
 
 #### News Crawl Corpus
 
@@ -336,34 +332,6 @@ python gigaword.py --train_src /{path}/gigaword/train_src.txt \
     --existed_vocab /{path}/mass/vocab/all_en.dict.bin \
     --noise_prob 0.1 \
     --output_folder /{path}/gigaword_dataset \
-    --max_len 64
-```
-
-#### Cornell Movie Dialog Corpus
-
-Script can be found in `cornell_dialog.py`.
-
-Major parameters in `cornell_dialog.py`:
-
-```bash
---src_folder:       Corpus folders.
---existed_vocab:    Persisted vocabulary file.
---train_prefix:     Train source and target file prefix. Default: train.
---test_prefix:      Test source and target file prefix. Default: test.
---output_folder:    Output dataset files folder path.
---max_len:          Maximum sentence length. If a sentence longer than `max_len`, then drop it.
---valid_prefix:     Optional, Valid source and target file prefix. Default: valid.
-```
-
-Sample code:
-
-```bash
-python cornell_dialog.py --src_folder /{path}/cornell_dialog \
-    --existed_vocab /{path}/mass/vocab/all_en.dict.bin \
-    --train_prefix train \
-    --test_prefix test \
-    --noise_prob 0.1 \
-    --output_folder /{path}/cornell_dialog_dataset \
     --max_len 64
 ```
 
@@ -679,15 +647,7 @@ with 3.8M training data are as follows:
 
 | Method         |  RG-1(F)      | RG-2(F)      | RG-L(F)      |
 |:---------------|:--------------|:-------------|:-------------|
-| MASS           | Ongoing       | Ongoing      | Ongoing      |
-
-### Fine-Tuning on Conversational ResponseGeneration
-
-The comparisons between MASS and other baseline methods in terms of PPL on Cornell Movie Dialog corpus are as follows:
-
-| Method             | Data = 10K       |  Data = 110K    |
-|--------------------|------------------|-----------------|
-| MASS               | Ongoing          | Ongoing         |
+| MASS           | 38.73       | 19.71      | 35.96      |
 
 ### Training Performance
 
@@ -697,13 +657,13 @@ The comparisons between MASS and other baseline methods in terms of PPL on Corne
 | Resource                   | Ascend 910; cpu 2.60GHz, 192cores; memory 755G; OS Euler2.8                            |
 | uploaded Date              | 06/21/2021                                                                |
 | MindSpore Version          | 1.2.1                                                                     |
-| Dataset                    | News Crawl 2007-2017 English monolingual corpus, Gigaword corpus, Cornell Movie Dialog corpus |
+| Dataset                    | News Crawl 2007-2017 English monolingual corpus, Gigaword corpus |
 | Training Parameters        | Epoch=50, steps=XXX, batch_size=192, lr=1e-4                              |
 | Optimizer                  | Adam                                                                      |
 | Loss Function              | Label smoothed cross-entropy criterion                                    |
 | outputs                    | Sentence and probability                                                  |
 | Loss                       | Lower than 2                                                              |
-| Accuracy                   | For conversation response, ppl=23.52, for text summarization, RG-1=29.79. |
+| Accuracy                   | For text summarization, RG-1=45.98. |
 | Speed                      | 611.45 sentences/s                                                        |
 | Total time                 | --/--                                                                     |
 | Params (M)                 | 44.6M                                                                     |
@@ -716,10 +676,10 @@ The comparisons between MASS and other baseline methods in terms of PPL on Corne
 | Resource                   | Ascend 910; OS Euler2.8                                                 |
 | uploaded Date              | 06/21/2021                                                 |
 | MindSpore Version          | 1.2.1                                                      |
-| Dataset                    | Gigaword corpus, Cornell Movie Dialog corpus               |
+| Dataset                    | Gigaword corpus |
 | batch_size                 | ---                                                        |
 | outputs                    | Sentence and probability                                   |
-| Accuracy                   | ppl=23.52 for conversation response, RG-1=29.79 for text summarization. |
+| Accuracy                   | RG-1=45.98 for text summarization. |
 | Speed                      | ---- sentences/s                                           |
 | Total time                 | --/--                                                      |
 
