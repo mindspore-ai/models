@@ -119,6 +119,7 @@ def set_parse_13B(args_opt):
         args_opt.end_lr = 1e-6
         args_opt.optimizer_shard = 1
         args_opt.full_batch = args_opt.opt_offload
+        args_opt.micro_batch_interleaved = 1
         if args_opt.per_batch_size == 0:
             args_opt.per_batch_size = 8
         if args_opt.stage_num > 1:
