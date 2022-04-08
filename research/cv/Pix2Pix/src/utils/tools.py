@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,10 +21,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 from mindspore import Tensor
-from src.utils.config import get_args
+from src.utils.config import config
 
 plt.switch_backend('Agg')
-args = get_args()
 
 def save_losses(G_losses, D_losses, idx):
     plt.figure(figsize=(10, 5))
@@ -34,7 +33,7 @@ def save_losses(G_losses, D_losses, idx):
     plt.xlabel("iterations")
     plt.ylabel("Losses")
     plt.legend()
-    plt.savefig(args.loss_show_dir+"/{}.png".format(idx))
+    plt.savefig(config.loss_show_dir+"/{}.png".format(idx))
 
 
 def save_image(img, img_path):
@@ -66,10 +65,10 @@ def get_lr():
     Keep the same learning rate for the first <opt.n_epochs> epochs
     and linearly decay the rate to zero over the next <opt.n_epochs_decay> epochs.
     """
-    lrs = [args.lr] * args.dataset_size * args.n_epochs
+    lrs = [config.lr] * config.dataset_size * config.n_epochs
     lr_epoch = 0
-    for epoch in range(args.n_epochs_decay):
-        lr_epoch = args.lr * (args.n_epochs_decay - epoch) / args.n_epochs_decay
-        lrs += [lr_epoch] * args.dataset_size
-    lrs += [lr_epoch] * args.dataset_size * (args.epoch_num - args.n_epochs_decay - args.n_epochs)
+    for epoch in range(config.n_epochs_decay):
+        lr_epoch = config.lr * (config.n_epochs_decay - epoch) / config.n_epochs_decay
+        lrs += [lr_epoch] * config.dataset_size
+    lrs += [lr_epoch] * config.dataset_size * (config.epoch_num - config.n_epochs_decay - config.n_epochs)
     return Tensor(np.array(lrs).astype(np.float32))

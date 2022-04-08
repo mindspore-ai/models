@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,18 +18,18 @@
 import os
 import numpy as np
 from src.dataset.pix2pix_dataset import pix2pixDataset_val, create_val_dataset
-from src.utils.config import get_args
+from src.utils.config import config
 
 if __name__ == '__main__':
     args = get_args()
     result_path = "./preprocess_Result/"
-    dataset_val = pix2pixDataset_val(root_dir=args.val_data_dir)
+    dataset_val = pix2pixDataset_val(root_dir=config.val_data_dir)
     ds_val = create_val_dataset(dataset_val)
     img_path = os.path.join(result_path, "00_data")
     os.makedirs(img_path)
     target_images_list = []
     for i, data in enumerate(ds_val.create_dict_iterator(output_numpy=True)):
-        file_name = "Pix2Pix_data_bs" + str(args.batch_size) + "_" + str(i) + ".bin"
+        file_name = "Pix2Pix_data_bs" + str(config.batch_size) + "_" + str(i) + ".bin"
         file_path = img_path + "/" + file_name
         data['input_images'].tofile(file_path)
         target_images_list.append(data['target_images'])

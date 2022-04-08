@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ echo "==========================================================================
 
 if [ $# != 4 ]
 then
-    echo "Usage: bash run_eval_gpu.sh [DATASET_PATH] [DATASET_NAME] [CKPT_PATH] [RESULT_DIR]"
+    echo "Usage: bash run_eval_gpu.sh [DEVICE_TARGET] [DEVICE_ID] [VAL_DATA_DIR] [CKPT_PATH]"
     exit 1
 fi
 
@@ -29,22 +29,18 @@ get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
     echo "$1"
   else
-    echo "$(realpath -m $PWD/$1)"
+    echo "$(realpath -m $PWD/$3)"
   fi
 }
 
-PATH1=$(get_real_path $1)
-CKPT_PATH=$(get_real_path $3)
-RESULT_PATH=$4
+PATH1=$(get_real_path $3)
+CKPT_PATH=$(get_real_path $4)
 if [ ! -d $PATH1 ]
 then
     echo "error: DATASET_PATH=$PATH1 is not a directory"
     exit 1
 fi
 
-if [ $2 == 'facades' ]; then
-  python eval.py --device_target Ascend --device_id 0 --val_data_dir $PATH1 --ckpt $CKPT_PATH --predict_dir $RESULT_PATH --dataset_size 400
-elif [ $2 == 'maps' ]; then
-  python eval.py --device_target Ascend --device_id 0 --val_data_dir $PATH1 --ckpt $CKPT_PATH --predict_dir $RESULT_PATH --dataset_size 1096
-fi
+python eval.py --device_target Ascend --device_id 0 --val_data_dir $PATH1 --ckpt $CKPT_PATH
+
 

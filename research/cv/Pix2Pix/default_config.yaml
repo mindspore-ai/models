@@ -1,0 +1,115 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unlesee you know exactly what you are doing)
+enable_modelarts: False
+# url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# path for local
+data_path: "/cache/data"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+device_target: "Ascend"
+enable_profiling: False
+need_modelarts_dataset_unzip: False
+
+# common options
+run_distribute: False
+device_id: 0
+ckpt: None
+batch_size: 32
+
+# optimiter options
+workers: 24
+mode: "sink"
+epoch_size: 500
+pre_trained: ""
+pre_trained_epoch_size: 0
+loss_scale: 1024
+filter_weight: False
+
+result_path: ""
+img_path: ""
+img_id_file: ""
+
+# train options
+train_data_dir: "data/datasets/facades/train/"
+train_fakeimg_dir: "results/fake_img/"
+loss_show_dir: "results/loss_show"
+ckpt_dir: "results/ckpt"
+save_graphs: False
+init_type: 'normal'
+init_gain: 0.02
+pad_mode: 'CONSTANT'
+load_size: 286
+batch_size: 1
+LAMBDA_Dis: 0.5
+LAMBDA_GAN: 1
+LAMBDA_L1: 100
+beta1: 0.5
+beta2: 0.999
+lr: 0.0002
+lr_policy: 'linear'
+epoch_num: 200
+n_epochs: 100
+n_epochs_decay: 100
+dataset_size: 400
+
+# eval options
+val_data_dir: None
+predict_dir: "results/predict/"
+
+# export options
+image_size: 256
+file_format: "MINDIR"
+file_name: "pix2pix"
+
+---
+# Help description for each configuration
+enable_modelarts: "Whether training on modelarts default: False"
+data_url: "Url for modelarts"
+train_url: "Url for modelarts"
+data_path: "The location of input data"
+output_pah: "The location of the output file"
+device_target: "device id of GPU or Ascend. (Default: None)"
+enable_profiling: "Whether enable profiling while training default: False"
+workers: "Num parallel workers."
+lr: "Learning rate, default is 0.1."
+mode: "Run sink mode or not, default is sink."
+epoch_size: "Epoch size, default is 500."
+batch_size: "Batch size, default is 32."
+pre_trained: "Pretrained Checkpoint file path."
+pre_trained_epoch_size: "Pretrained epoch size."
+save_checkpoint_epochs: "Save checkpoint epochs, default is 1."
+loss_scale: "Loss scale, default is 1024."
+filter_weight: "Filter weight parameters, default is False."
+device_id: "Device id, default is 0."
+file_format: "file format choices [AIR, MINDIR]"
+file_name: "output file name."
+result_path: "result file path."
+img_path: "image file path."
+img_id_file: "image id file."
+save_graphs: "whether to save graphs"
+init_type: "network init type"
+init_gain: "scaling factor for normal xavier and orthogonal"
+pad_mode: "pad mode"
+load_size: "scale images to this size"
+batch_size: "batch size"
+LAMBDA_Dis: "weight for discriminator loss"
+LAMBDA_GAN: "weight for GAN loss"
+LAMBDA_L1: "weight for L1 loss"
+beta1: "Adam beta1"
+beta2: "Adam beta2"
+lr: "initial learning rate"
+lr_policy: 'learning rate policy'
+epoch_num: "epoch number for training"
+n_epochs: "number of epochs with the initial learning rate"
+n_epochs_decay: "number of epochs with the dynamic learning rate"
+dataset_size: "for Facade dataset size=400, for Maps dataset size=1096"
+train_data_dir: "file path of training input data"
+val_data_dir: "file path of validation input data"
+train_fakeimg_dir: "file path of stored fake img in training"
+loss_show_dir: "file path of stored loss img in training"
+ckpt_dir: "file path of stored checkpoint file in training"
+ckpt: "file path of checking point file used in validation"
+predict_dir: "file path of generated image in validation"
+image_size: "export image size default=256"
