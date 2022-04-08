@@ -51,7 +51,7 @@
                 "dataSource": "mxpi_tensorinfer0",
                 "postProcessConfigPath": "./models/resnext101.cfg",
                 "labelPath": "./models/imagenet1000_clsidx_to_labels.names",
-                "postProcessLibPath": "../../../lib/modelpostprocessors/libresnet50postprocess.so"
+                "postProcessLibPath": "libresnet50postprocess.so"
             },
             "factory": "mxpi_classpostprocessor",
             "next": "mxpi_dataserialize0"

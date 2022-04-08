@@ -29,5 +29,5 @@ export GST_PLUGIN_PATH=${MX_SDK_HOME}/opensource/lib/gstreamer-1.0:${MX_SDK_HOME
 #to set PYTHONPATH, import the StreamManagerApi.py
 export PYTHONPATH=$PYTHONPATH:${MX_SDK_HOME}/python
 
-python3.7 main.py $image_path  $result_dir
+python3 main.py $image_path  $result_dir
 exit 0

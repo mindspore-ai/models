@@ -51,7 +51,7 @@
                         "dataSource": "mxpi_tensorinfer0",
                         "postProcessConfigPath": "../data/config/xception_aipp.cfg",
                         "labelPath": "../data/config/imagenet1000_clsidx_to_labels.names",
-                        "postProcessLibPath": "/usr/local/sdk_home/mxManufacture/lib/modelpostprocessors/libresnet50postprocess.so"
+                        "postProcessLibPath": "libresnet50postprocess.so"
                 },
                 "factory": "mxpi_classpostprocessor",
                 "next": "mxpi_dataserialize0"
