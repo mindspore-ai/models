@@ -17,13 +17,16 @@ Train CenterNet and get network model files(.ckpt)
 """
 
 import os
+import ast
+import numpy as np
+import moxing as mox
 import mindspore.communication.management as D
 from mindspore.communication.management import get_rank
-from mindspore import context
+from mindspore import context, Tensor
 from mindspore.train.model import Model
 from mindspore.context import ParallelMode
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore.train.serialization import load_checkpoint, load_param_into_net, export
 from mindspore.nn.optim import Adam
 from mindspore import log as logger
 from mindspore.common import set_seed
@@ -32,8 +35,9 @@ from mindspore.profiler import Profiler
 from src.dataset import COCOHP
 from src import CenterNetMultiPoseLossCell, CenterNetWithLossScaleCell
 from src import CenterNetWithoutLossScaleCell
+from src import CenterNetMultiPoseEval
 from src.utils import LossCallBack, CenterNetPolynomialDecayLR, CenterNetMultiEpochsDecayLR
-from src.model_utils.config import config, dataset_config, net_config, train_config
+from src.model_utils.config import config, dataset_config, net_config, train_config, eval_config, export_config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id, get_rank_id, get_device_num
 
@@ -122,6 +126,48 @@ def modelarts_pre_process():
     config.mindrecord_dir = config.data_path
     config.save_checkpoint_path = os.path.join(config.output_path,
                                                config.save_checkpoint_path)
+
+
+def get_epoch(ckpt_name):
+    start = ckpt_name.find('-')
+    start += len('-')
+    end = ckpt_name.find('_', start)
+    steps = ast.literal_eval(ckpt_name[start:end].strip())
+    epoch = int(steps//2003)
+    return epoch
+
+
+def get_ckpt_epoch(ckpt_dir):
+    """get ckechpoint epoch"""
+    ckpt_epoch = {}
+    files = os.listdir(ckpt_dir)
+    for file_name in files:
+        file_path = os.path.join(ckpt_dir, file_name)
+        if os.path.splitext(file_path)[1] == '.ckpt':
+            epoch = get_epoch(file_name)
+            ckpt_epoch[file_name] = epoch
+    newest_ckpt = max(ckpt_epoch, key=ckpt_epoch.get)
+    max_epoch = ckpt_epoch[newest_ckpt]
+    return newest_ckpt, max_epoch
+
+
+def run_export(ckpt_path):
+    """model train function"""
+    context.set_context(mode=context.GRAPH_MODE,
+                        device_target="Ascend", device_id=0)
+    net = CenterNetMultiPoseEval(net_config, eval_config.K)
+    ckpt, _ = get_ckpt_epoch(ckpt_path)
+    print("ckpt: ", ckpt)
+    param_dict = load_checkpoint(os.path.join(ckpt_path, ckpt))
+    load_param_into_net(net, param_dict)
+    net.set_train(False)
+    input_shape = [1, 3, export_config.input_res[0],
+                   export_config.input_res[1]]
+    input_data = Tensor(np.random.uniform(-1.0, 1.0, size=input_shape).astype(np.float32))
+    export(net, input_data, file_name=export_config.export_name,
+           file_format=export_config.export_format)
+    mox.file.copy(export_config.export_name+"."+export_config.export_format.lower(),
+                  os.path.join(config.train_url, export_config.export_name+"."+export_config.export_format.lower()))
 
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
@@ -221,6 +267,7 @@ def train():
                 callbacks=callback,
                 dataset_sink_mode=(config.enable_data_sink == "true"),
                 sink_size=config.data_sink_steps)
+    run_export(ckpt_save_dir)
 
 
 if __name__ == '__main__':
