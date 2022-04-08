@@ -381,3 +381,7 @@ MindSpore已获得Apache 2.0许可，请参见LICENSE文件。
 - **Q: 网络在310推理时出现编译失败，报错信息指向gflags，例如*undefined reference to 'google::FlagRegisterer::FlagRegisterer'*，该怎么处理?**
 
   **A**: 优先检查一下环境GCC版本和gflags版本是否匹配，可以参考[官方链接](https://www.mindspore.cn/install)安装对应的GCC版本，[gflags](https://github.com/gflags/gflags/archive/v2.2.2.tar.gz)安装gflags。你需要保证所使用的组件之间是ABI兼容的，更多信息可以参考[_GLIBCXX_USE_CXX11_ABI](https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html)
+
+- **Q: 在Mac系统上加载mindrecord格式的数据集出错,例如*Invalid file, failed to open files for reading mindrecord files.*，该怎么处理?**
+
+  **A**: 优先使用*ulimit -a*检查系统限制，如果*file descriptors*数量为256（默认值），需要使用*ulimit -n 1024*将其设置为1024（或者更大的值）。之后再检查文件是否损坏或者被修改。

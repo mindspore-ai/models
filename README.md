@@ -379,3 +379,7 @@ For more information about `MindSpore` framework, please refer to [FAQ](https://
 - **Q: How to resolve the compile error point to gflags when infer on ascend310 with errors such as *undefined reference to 'google::FlagRegisterer::FlagRegisterer'*?**
 
   **A**: Please check the version of GCC and gflags. You can refer to [GCC](https://www.mindspore.cn/install) and [gflags](https://github.com/gflags/gflags/archive/v2.2.2.tar.gz) to install GCC and gflags. You need to ensure that the components used are ABI compatible, for more information, please refer to [_GLIBCXX_USE_CXX11_ABI](https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html).
+
+- **Q: How to solve the error when loading dataset in mindrecord format on Mac system, such as *Invalid file, failed to open files for reading mindrecord files.*?**
+
+  **A**: Please check the system limit with *ulimit -a*, if the number of *file descriptors* is 256 (default), you need to use *ulimit -n 1024* to set it to 1024 (or larger). Then check whether the file is damaged or modified.
