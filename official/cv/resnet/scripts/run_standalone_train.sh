@@ -70,7 +70,6 @@ then
   CACHE_SESSION_ID=$(generate_cache_session)
 fi
 
-ulimit -u unlimited
 export DEVICE_NUM=1
 export RANK_ID=0
 export RANK_SIZE=1

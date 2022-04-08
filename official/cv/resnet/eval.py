@@ -18,6 +18,7 @@ import mindspore as ms
 from mindspore.common import set_seed
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 from mindspore.train.model import Model
+from mindspore import context
 from src.CrossEntropySmooth import CrossEntropySmooth
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
@@ -50,10 +51,10 @@ def eval_net():
     target = config.device_target
 
     # init context
-    ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=False)
+    context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
     if target == "Ascend":
         device_id = int(os.getenv('DEVICE_ID'))
-        ms.set_context(device_id=device_id)
+        context.set_context(device_id=device_id)
 
     # create dataset
     dataset = create_dataset(dataset_path=config.data_path, do_train=False, batch_size=config.batch_size,

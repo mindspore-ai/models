@@ -51,7 +51,7 @@ def cre_groundtruth_dict_fromtxt(gtfile_path):
     img_gt_dict = {}
     with open(gtfile_path, 'r')as f:
         for line in f.readlines():
-            temp = line.strip().split(" ")
+            temp = line.strip().split("\t")
             img_name = temp[0].split(".")[0]
             img_lab = temp[1]
             img_gt_dict[img_name] = img_lab
@@ -170,7 +170,6 @@ if __name__ == '__main__':
 
     if not os.path.exists(result_json_path):
         print("Result folder doesn't exist.")
-
     img_label_dict = cre_groundtruth_dict_fromtxt(annotation_file_path)
     create_visualization_statistical_result(folder_davinci_target,
                                             result_json_path, json_file_name,

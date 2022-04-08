@@ -86,8 +86,8 @@ APP_ERROR Resnet18ClassifyOpencv::DeInit() {
 
 APP_ERROR Resnet18ClassifyOpencv::ConvertImageToTensorBase(const std::string &imgPath,
                                                            TensorBase &tensorBase) {
-    static constexpr uint32_t resizeHeight = 304;
-    static constexpr uint32_t resizeWidth = 304;
+    static constexpr uint32_t resizeHeight = 224;
+    static constexpr uint32_t resizeWidth = 224;
 
     cv::Mat imageMat = cv::imread(imgPath, cv::IMREAD_COLOR);
     cv::resize(imageMat, imageMat, cv::Size(resizeWidth, resizeHeight));
