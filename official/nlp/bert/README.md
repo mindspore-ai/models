@@ -136,15 +136,15 @@ bash scripts/run_distributed_pretrain_for_gpu.sh 8 40 /path/cn-wiki-128
 - If you are going to run a fine-tuning task, please prepare a checkpoint generated from pre-training.
 - Set bert network config and optimizer hyperparameters in `task_[DOWNSTREAM_TASK]_config.yaml`.
 
-- Classification task: Set task related hyperparameters in scripts/run_classifier.sh.
-- Run `bash scripts/run_classifier.sh [DEVICE_ID]` for fine-tuning of BERT-base and BERT-NEZHA model.
+- Classification task: Set task related hyperparameters in scripts/run_classifier_gpu.sh.
+- Run `bash scripts/run_classifier_gpu.sh [DEVICE_ID]` for fine-tuning of BERT-base and BERT-NEZHA model.
 
-  bash scripts/run_classifier.sh DEVICE_ID(optional)
+  bash scripts/run_classifier_gpu.sh DEVICE_ID(optional)
 
-- NER task: Set task related hyperparameters in scripts/run_ner.sh.
-- Run `bash scripts/run_ner.sh [DEVICE_ID]` for fine-tuning of BERT-base and BERT-NEZHA model.
+- NER task: Set task related hyperparameters in scripts/run_ner_gpu.sh.
+- Run `bash scripts/run_ner_gpu.sh [DEVICE_ID]` for fine-tuning of BERT-base and BERT-NEZHA model.
 
-  bash scripts/run_ner.sh DEVICE_ID(optional)
+  bash scripts/run_ner_gpu.sh DEVICE_ID(optional)
 
 - SQuAD task: Set task related hyperparameters in scripts/run_squad_gpu.sh.
 - Run `bash scripts/run_squad_gpu.py [DEVICE_ID]` for fine-tuning of BERT-base and BERT-NEZHA model.
@@ -280,8 +280,10 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
         ├─hyper_parameter_config.ini          # hyper parameter for distributed pretraining
         ├─get_distribute_pretrain_cmd.py          # script for distributed pretraining
         ├─README.md
-    ├─run_classifier.sh                       # shell script for standalone classifier task on ascend or gpu
-    ├─run_ner.sh                              # shell script for standalone NER task on ascend or gpu
+    ├─run_classifier.sh                       # shell script for standalone classifier task on ascend
+    ├─run_classifier_gpu.sh                   # shell script for standalone classifier task on gpu
+    ├─run_ner.sh                              # shell script for standalone NER task on ascend
+    ├─run_ner_gpu.sh                          # shell script for standalone SQUAD task on gpu
     ├─run_squad.sh                            # shell script for standalone SQUAD task on ascend
     ├─run_squad_gpu.sh                        # shell script for standalone SQUAD task on gpu
     ├─run_standalone_pretrain_ascend.sh       # shell script for standalone pretrain on ascend
