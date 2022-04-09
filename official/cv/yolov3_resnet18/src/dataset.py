@@ -17,6 +17,7 @@
 from __future__ import division
 
 import os
+import platform
 import numpy as np
 from PIL import Image
 import mindspore.dataset as de
@@ -278,10 +279,17 @@ def create_yolo_dataset(mindrecord_dir, batch_size=32, device_num=1, rank=0,
                         is_training=True, num_parallel_workers=8):
     """Create YOLOv3 dataset with MindDataset."""
     de.config.set_prefetch_size(64)
-    ds = de.MindDataset(mindrecord_dir, columns_list=["image", "annotation"], num_shards=device_num, shard_id=rank,
-                        num_parallel_workers=2, shuffle=is_training)
+    if "x86" in platform.machine():
+        ds = de.MindDataset(mindrecord_dir, columns_list=["image", "annotation"], num_shards=device_num, shard_id=rank,
+                            num_parallel_workers=num_parallel_workers, shuffle=is_training)
+    else:
+        ds = de.MindDataset(mindrecord_dir, columns_list=["image", "annotation"], num_shards=device_num, shard_id=rank,
+                            num_parallel_workers=2, shuffle=is_training)
     decode = C.Decode()
-    ds = ds.map(operations=decode, input_columns=["image"], num_parallel_workers=1)
+    if "x86" in platform.machine():
+        ds = ds.map(operations=decode, input_columns=["image"], num_parallel_workers=num_parallel_workers)
+    else:
+        ds = ds.map(operations=decode, input_columns=["image"], num_parallel_workers=1)
     compose_map_func = (lambda image, annotation: preprocess_fn(image, annotation, is_training))
 
     if is_training:
@@ -290,7 +298,10 @@ def create_yolo_dataset(mindrecord_dir, batch_size=32, device_num=1, rank=0,
                     output_columns=["image", "bbox_1", "bbox_2", "bbox_3", "gt_box1", "gt_box2", "gt_box3"],
                     column_order=["image", "bbox_1", "bbox_2", "bbox_3", "gt_box1", "gt_box2", "gt_box3"],
                     num_parallel_workers=num_parallel_workers)
-        ds = ds.map(operations=hwc_to_chw, input_columns=["image"], num_parallel_workers=1)
+        if "x86" in platform.machine():
+            ds = ds.map(operations=hwc_to_chw, input_columns=["image"], num_parallel_workers=num_parallel_workers)
+        else:
+            ds = ds.map(operations=hwc_to_chw, input_columns=["image"], num_parallel_workers=1)
         ds = ds.batch(batch_size, drop_remainder=True)
     else:
         ds = ds.map(operations=compose_map_func, input_columns=["image", "annotation"],
