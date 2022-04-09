@@ -1,0 +1,48 @@
+# ==============================================================================
+# Device
+device_target:          "GPU"
+device_id:              0
+
+# Dataset Setup
+crop_type:              Random                   # Type of cropping operation (Random and Center) when training
+crop_size:              [384, 512]               # (Height, Width) of image when training
+eval_size:              [256, 256]               # (Height, Width) of image when eval
+
+# Experiment Setup
+model:                  "FlowNet2"                # Name of model to be loaded
+rgb_max:                255                       # rgb channel used
+batchNorm:              False                     # boolean switch to whether add batchnorm before conv
+lr:                     0.0000001                 # Learning rate
+num_parallel_workers:   2                         # Number of CPU worker used to load data
+max_rowsize:            2                         # Number of max rowsize used to load data
+batch_size:             8                         # Numbers of image pairs in a mini-batch
+epoch_size:             20                        # Total number of epochs
+pre_trained:            1                         # Load pretrained network
+pre_trained_ckpt_path:  "/path/flownet2.ckpt"     # Pretrained ckpt path
+seed:                   1                         # Seed for reproducibility
+is_dynamicLoss_scale:   0                         # Using dynamicLoss scale or fix scale
+scale:                  1024                      # Fix scale value
+weight_decay:           0.00001                   # Weight decay
+train_data:             "FlyingChairs"            # Train Dataset name
+train_data_path:        "/path/ds/FlyingChairs_release/data"       # Train Dataset path
+
+# Train Setup
+run_distribute:         0                         # Distributed training or not
+is_save_on_master:      1                         # Only save ckpt on master device
+save_checkpoint:        1                         # Is save ckpt while training
+save_ckpt_interval:     1                         # Saving ckpt interval
+keep_checkpoint_max:    5                         # Max ckpt file number
+save_checkpoint_path:   "/path/ckpt/"             # Ckpt save path
+
+# eval Setup
+eval_data:              "MpiSintelClean"          # Eval Dataset name
+eval_data_path:         "/path/ds/training"       # Eval Dataset path
+eval_checkpoint_path:   "/path/flownet2.ckpt"     # Ckpt path used to eval
+run_evalCallback:       1                         # Is run evalCallBack while training
+eval_start_epoch:       1                         # EvalCallback start epoch
+eval_interval:          1                         # EvalCallback running interval
+save_best_ckpt:         1                         # Is save best ckpt
+
+# Export Setup
+mindir_file_name:        "Flownet2"               # Save file path
+file_format:             "MINDIR"                 # Save file format
