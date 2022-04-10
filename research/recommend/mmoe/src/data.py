@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,6 +13,8 @@
 # limitations under the License.
 # ============================================================================
 """Generate data in mindrecord format."""
+import os
+
 import pandas as pd
 import numpy as np
 
@@ -52,28 +54,36 @@ def generate_npy(data_path, do_train):
             index_col=None,
             names=column_names
         )
-    ds_transformed = pd.get_dummies(ds.drop(label_columns, axis=1), columns=categorical_columns)
+    ds_transformed = pd.get_dummies(
+        ds.drop(label_columns, axis=1), columns=categorical_columns)
     if not do_train:
         ds_transformed['det_hh_fam_stat_ Grandchild <18 ever marr not in subfamily'] = 0
     data = ds_transformed
-    np.save('data.npy', np.array(data), allow_pickle=False)
+    np.save(data_path + '/data.npy', np.array(data), allow_pickle=False)
 
     ds_raw_labels = ds[label_columns]
     ds_raw_labels['marital_stat'] = ds_raw_labels['marital_stat'].apply(
         lambda x: 'never married' if x == ' Never married' else 'married')
 
     income_labels = pd.get_dummies(ds_raw_labels['income_50k'])
-    np.save('income_labels.npy', np.array(income_labels), allow_pickle=False)
+    np.save(data_path + '/income_labels.npy',
+            np.array(income_labels), allow_pickle=False)
 
     married_labels = pd.get_dummies(ds_raw_labels['marital_stat'])
-    np.save('married_labels.npy', np.array(married_labels), allow_pickle=False)
+    np.save(data_path + '/married_labels.npy',
+            np.array(married_labels), allow_pickle=False)
 
-    data = np.load('data.npy').astype(np.float32)
-    income = np.load('income_labels.npy').astype(np.float32)
-    married = np.load('married_labels.npy').astype(np.float32)
+    data = np.load(data_path + '/data.npy').astype(np.float32)
+    income = np.load(data_path + '/income_labels.npy').astype(np.float32)
+    married = np.load(data_path + '/married_labels.npy').astype(np.float32)
+
+    mindrecord_path = data_path + "/mindrecord"
+
+    if not os.path.exists(mindrecord_path):
+        os.mkdir(mindrecord_path)
 
     if do_train:
-        MINDRECORD_FILE = "../data/train.mindrecord"
+        MINDRECORD_FILE = mindrecord_path + "/train.mindrecord"
         writer = FileWriter(file_name=MINDRECORD_FILE, shard_num=1)
 
         nlp_schema = {"data": {"type": "float32", "shape": [-1]},
@@ -84,11 +94,14 @@ def generate_npy(data_path, do_train):
             sample = {"data": data[i],
                       "income_labels": income[i],
                       "married_labels": married[i]}
+
+            if i % 10000 == 0:
+                print(f'write {i} lines.')
 
             writer.write_raw_data([sample])
         writer.commit()
     else:
-        MINDRECORD_FILE = "../data/eval.mindrecord"
+        MINDRECORD_FILE = mindrecord_path + "/eval.mindrecord"
         writer = FileWriter(file_name=MINDRECORD_FILE, shard_num=1)
 
         nlp_schema = {"data": {"type": "float32", "shape": [-1]},
@@ -99,6 +112,9 @@ def generate_npy(data_path, do_train):
             sample = {"data": data[i],
                       "income_labels": income[i],
                       "married_labels": married[i]}
+
+            if i % 10000 == 0:
+                print(f'write {i} lines.')
 
             writer.write_raw_data([sample])
         writer.commit()
@@ -106,3 +122,4 @@ def generate_npy(data_path, do_train):
 
 if __name__ == '__main__':
     generate_npy(data_path=config.local_data_path, do_train=True)
+    generate_npy(data_path=config.local_data_path, do_train=False)

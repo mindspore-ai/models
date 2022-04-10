@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ import mindspore.dataset as de
 from mindspore.communication.management import get_rank, get_group_size
 import mindspore.dataset.transforms.c_transforms as C
 import mindspore.common.dtype as mstype
+
 
 def _get_rank_info(run_distribute):
     """get rank size and rank id"""
@@ -49,36 +50,41 @@ def create_dataset(data_path,
     if target != "Ascend" or device_num == 1:
         if training:
             ds = de.MindDataset(input_file,
-                                columns_list=['data', 'income_labels', 'married_labels'],
-                                num_parallel_workers=32,
+                                columns_list=[
+                                    'data', 'income_labels', 'married_labels'],
+                                num_parallel_workers=8,
                                 shuffle=True)
         else:
             ds = de.MindDataset(input_file,
-                                columns_list=['data', 'income_labels', 'married_labels'],
-                                num_parallel_workers=32,
+                                columns_list=[
+                                    'data', 'income_labels', 'married_labels'],
+                                num_parallel_workers=8,
                                 shuffle=False)
     else:
         if training:
             ds = de.MindDataset(input_file,
-                                columns_list=['data', 'income_labels', 'married_labels'],
+                                columns_list=[
+                                    'data', 'income_labels', 'married_labels'],
                                 num_parallel_workers=4,
                                 shuffle=True,
                                 num_shards=device_num,
                                 shard_id=rank_id)
         else:
             ds = de.MindDataset(input_file,
-                                columns_list=['data', 'income_labels', 'married_labels'],
+                                columns_list=[
+                                    'data', 'income_labels', 'married_labels'],
                                 num_parallel_workers=4,
                                 shuffle=False,
                                 num_shards=device_num,
                                 shard_id=rank_id)
-    ds_label = [
-        C.TypeCast(mstype.float16)
-    ]
-    ds = ds.map(operations=ds_label, input_columns=["data"])
-    ds = ds.map(operations=ds_label, input_columns=["income_labels"])
-    ds = ds.map(operations=ds_label, input_columns=["married_labels"])
-    ds = ds.batch(batch_size)
+    if target == 'Ascend':
+        ds_label = [
+            C.TypeCast(mstype.float16)
+        ]
+        ds = ds.map(operations=ds_label, input_columns=["data"])
+        ds = ds.map(operations=ds_label, input_columns=["income_labels"])
+        ds = ds.map(operations=ds_label, input_columns=["married_labels"])
+    ds = ds.batch(batch_size, drop_remainder=True)
     return ds
 
 

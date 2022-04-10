@@ -1,4 +1,4 @@
-# Copyright 2021-2022 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,11 +26,13 @@ from mindspore import Parameter, Tensor
 from mindspore import context
 from mindspore.context import ParallelMode
 
+from src.model_utils.config import config
 from src.mmoe_utils import expert, gate, shared_output, tower, output
 
 
 class MMoE_Layer(nn.Cell):
     """MMoE network"""
+
     def __init__(self, input_size, num_experts, units):
         super(MMoE_Layer, self).__init__()
         self.input_size = input_size
@@ -39,8 +41,10 @@ class MMoE_Layer(nn.Cell):
         self.expert = expert(self.input_size, self.units, self.num_experts)
         self.gate1 = gate(self.input_size, self.num_experts)
         self.gate2 = gate(self.input_size, self.num_experts)
-        self.shared_output1 = shared_output(self.input_size, self.num_experts, self.units)
-        self.shared_output2 = shared_output(self.input_size, self.num_experts, self.units)
+        self.shared_output1 = shared_output(
+            self.input_size, self.num_experts, self.units)
+        self.shared_output2 = shared_output(
+            self.input_size, self.num_experts, self.units)
         self.tower_layer1 = tower(4, 8)
         self.tower_layer2 = tower(4, 8)
         self.output_layer1 = output(8, 2)
@@ -66,13 +70,15 @@ class MMoE_Layer(nn.Cell):
 
 def MMoE(num_features, num_experts, units):
     """MMoE call function"""
-    net = MMoE_Layer(input_size=num_features, num_experts=num_experts, units=units)
+    net = MMoE_Layer(input_size=num_features,
+                     num_experts=num_experts, units=units)
 
     return net
 
 
 class LossForMultiLabel(LossBase):
     """loss for two labels"""
+
     def __init__(self):
         super(LossForMultiLabel, self).__init__()
         self.bceloss = BCELoss()
@@ -89,6 +95,7 @@ class LossForMultiLabel(LossBase):
 
 class NetWithLossClass(nn.Cell):
     """net with loss"""
+
     def __init__(self, model, loss_fn):
         super(NetWithLossClass, self).__init__()
         self.model = model
@@ -184,7 +191,7 @@ def _grad_div(val, grad):
 class TrainStepWrap(nn.Cell):
     """TrainStepWrap definition"""
 
-    def __init__(self, network, optimizer, scale_update_cell):  # 16384.0
+    def __init__(self, network, optimizer, scale_update_cell, device_target):  # 16384.0
         super(TrainStepWrap, self).__init__(auto_prefix=False)
         self.network = network
         self.network.set_grad()
@@ -235,6 +242,9 @@ class TrainStepWrap(nn.Cell):
             mean = _get_gradients_mean()
             self.grad_reducer = DistributedGradReducer(
                 self.weights, mean, self.degree)
+        self.device_target = device_target
+        self.grad_scale_sense_type = mindspore.float16 \
+            if config.device_target == 'Ascend' else mindspore.float32
 
     def construct(self, data, label1, label2):
         """construct"""
@@ -243,11 +253,14 @@ class TrainStepWrap(nn.Cell):
 
         scale_sense = self.loss_scale
 
-        init = self.alloc_status()
-        init = F.depend(init, loss)
+        if self.device_target == 'Ascend':
+            init = self.alloc_status()
+            init = F.depend(init, loss)
 
-        clear_status = self.clear_before_grad(init)
-        scale_sense = F.depend(scale_sense, clear_status)
+            clear_status = self.clear_before_grad(init)
+            scale_sense = F.depend(scale_sense, clear_status)
+        else:
+            init = False
 
         grads = self.grad(
             self.network,
@@ -255,7 +268,7 @@ class TrainStepWrap(nn.Cell):
                 data,
                 label1,
                 label2,
-                scale_sense.astype(mindspore.float16))
+                scale_sense.astype(self.grad_scale_sense_type))
         grads = self.grad_reducer(grads)
         grads = self.hyper_map(
             F.partial(
@@ -270,10 +283,15 @@ class TrainStepWrap(nn.Cell):
                 GRADIENT_CLIP_VALUE),
             grads)
 
-        init = F.depend(init, grads)
-        get_status = self.get_status(init)
-        init = F.depend(init, get_status)
-        flag_sum = self.reduce_sum(init, (0,))
+        if self.device_target == 'Ascend':
+            init = F.depend(init, grads)
+            get_status = self.get_status(init)
+            init = F.depend(init, get_status)
+            flag_sum = self.reduce_sum(init, (0,))
+        else:
+            flag_sum = self.hyper_map(F.partial(_grad_overflow), grads)
+            flag_sum = P.AddN()(flag_sum)
+            flag_sum = P.Reshape()(flag_sum, (()))
 
         if self.is_distributed:
             flag_reduce = self.all_reduce(flag_sum)
@@ -283,7 +301,10 @@ class TrainStepWrap(nn.Cell):
 
         overflow = self.loss_scaling_manager(self.loss_scale, cond)
 
-        if not overflow:
-            self.optimizer(grads)
+        if overflow:
+            succ = False
+        else:
+            succ = self.optimizer(grads)
+
         ret = (loss, scale_sense)
-        return ret
+        return F.depend(ret, succ)

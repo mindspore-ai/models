@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,6 +34,7 @@ from src.model_utils.config import config
 from src.mmoe import LossForMultiLabel, NetWithLossClass
 from src.model_utils.device_adapter import get_device_id, get_device_num, get_rank_id, get_job_id
 from src.get_lr import get_lr
+from src.callback import EvalCallBack
 
 set_seed(1)
 
@@ -51,11 +52,9 @@ def run_train():
     print('job id:', get_job_id())
 
     device_target = config.device_target
-    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+    context.set_context(mode=context.GRAPH_MODE,
+                        device_target=config.device_target)
     context.set_context(save_graphs=False)
-    if config.device_target == "GPU":
-        context.set_context(enable_graph_kernel=True)
-        context.set_context(graph_kernel_flags="--enable_cluster_ops=MatMul")
 
     device_num = get_device_num()
 
@@ -72,14 +71,18 @@ def run_train():
         context.set_context(device_id=get_device_id())
     print("init finished.")
 
-    ds_train = create_dataset(config.data_path, config.batch_size, training=True, \
-        target=config.device_target, run_distribute=config.run_distribute)
+    ds_train = create_dataset(config.data_path, config.batch_size, training=True,
+                              target=config.device_target, run_distribute=config.run_distribute)
+    ds_eval = create_dataset(config.data_path, config.batch_size,
+                             training=False, target=config.device_target)
 
     if ds_train.get_dataset_size() == 0:
-        raise ValueError("Please check dataset size > 0 and batch_size <= dataset size.")
+        raise ValueError(
+            "Please check dataset size > 0 and batch_size <= dataset size.")
     print("create dataset finished.")
 
-    net = MMoE_Layer(input_size=config.num_features, num_experts=config.num_experts, units=config.units)
+    net = MMoE_Layer(input_size=config.num_features,
+                     num_experts=config.num_experts, units=config.units)
     print("model created.")
     loss = LossForMultiLabel()
     loss_net = NetWithLossClass(net, loss)
@@ -88,9 +91,13 @@ def run_train():
     print("train dataset size:", step_per_size)
 
     if config.run_distribute:
-        learning_rate = get_lr(0.0005, config.epoch_size, step_per_size, step_per_size * 2)
+        learning_rate = get_lr(config.learning_rate / 2,
+                               config.epoch_size,
+                               step_per_size, step_per_size * 2)
     else:
-        learning_rate = get_lr(0.001, config.epoch_size, step_per_size, step_per_size * 5)
+        learning_rate = get_lr(config.learning_rate,
+                               config.epoch_size,
+                               step_per_size, step_per_size * 5)
     opt = Adam(net.trainable_params(),
                learning_rate=learning_rate,
                beta1=0.9,
@@ -98,19 +105,24 @@ def run_train():
                eps=1e-7,
                weight_decay=0.0,
                loss_scale=1.0)
-    scale_update_cell = DynamicLossScaleUpdateCell(loss_scale_value=2 ** 12,
-                                                   scale_factor=2,
-                                                   scale_window=1000)
-    train_net = TrainStepWrap(loss_net, opt, scale_update_cell)
+    scale_update_cell = DynamicLossScaleUpdateCell(
+        loss_scale_value=2 ** 12 if config.device_target == 'Ascend' else 1.0,
+        scale_factor=2,
+        scale_window=1000)
+    train_net = TrainStepWrap(
+        loss_net, opt, scale_update_cell, config.device_target)
     train_net.set_train()
     model = Model(train_net)
 
     time_cb = TimeMonitor()
-    loss_cb = LossMonitor(step_per_size)
-    config_ck = CheckpointConfig(save_checkpoint_steps=step_per_size, keep_checkpoint_max=100)
-    callbacks_list = [time_cb, loss_cb]
+    loss_cb = LossMonitor()
+    eval_cb = EvalCallBack(net, ds_eval, config.ckpt_path, get_rank_id())
+    config_ck = CheckpointConfig(
+        save_checkpoint_steps=step_per_size, keep_checkpoint_max=config.keep_checkpoint_max)
+    callbacks_list = [time_cb, loss_cb, eval_cb]
     if get_rank_id() == 0:
-        ckpoint_cb = ModelCheckpoint(prefix='MMoE_train', directory=config.ckpt_path, config=config_ck)
+        ckpoint_cb = ModelCheckpoint(
+            prefix='MMoE_train', directory=config.ckpt_path, config=config_ck)
         callbacks_list.append(ckpoint_cb)
 
     print("train start!")
