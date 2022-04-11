@@ -45,9 +45,17 @@ export RANK_SIZE=$2
 cityscapes_path=$1
 IFS="," read -r -a devices <<< "$3";
 export RANK_TABLE_FILE=$4
+BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
+cd $BASE_PATH/../
 
-mkdir ./log
-cd ./log
+if [ -d "distribute_train" ]
+then
+  echo "delete old logs!"
+  rm -rf distribute_train
+fi
+
+mkdir distribute_train
+cd distribute_train
 
 # 1.train
 for((i=0;i<RANK_SIZE;i++))

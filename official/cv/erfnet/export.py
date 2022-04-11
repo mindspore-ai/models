@@ -20,12 +20,13 @@ from src.model import ERFNet
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument('--model_path', type=str)
+    parser.add_argument('--device_target', default="Ascend", type=str)
     config = parser.parse_args()
 
     net = ERFNet(1, 20, "XavierUniform", run_distribute=False, train=False)
 
     context.set_context(mode=context.GRAPH_MODE)
-    context.set_context(device_target="Ascend")
+    context.set_context(device_target=config.device_target)
     context.set_context(device_id=0)
 
     load_checkpoint(config.model_path, net=net)

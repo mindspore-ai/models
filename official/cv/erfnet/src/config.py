@@ -21,6 +21,8 @@ from src.util import getBool, seed_seed, getLR
 parser = ArgumentParser()
 parser.add_argument('--lr', type=float)
 parser.add_argument('--run_distribute', type=str)
+# for gpu: --device_target='GPU'
+parser.add_argument('--device_target', default="Ascend", type=str)
 parser.add_argument('--save_path', type=str)
 parser.add_argument('--repeat', type=int)
 parser.add_argument('--mindrecord_train_data', type=str)
@@ -29,23 +31,25 @@ parser.add_argument('--ckpt_path', type=str)
 
 config = parser.parse_args()
 
-max_lr = config.lr
+# train.config
 run_distribute = getBool(config.run_distribute)
 global_size = int(os.environ["RANK_SIZE"])
+
+max_lr = config.lr
 repeat = config.repeat
 stage = config.stage
+device_target = config.device_target
 ckpt_path = config.ckpt_path
 save_path = config.save_path
-
-context.set_context(mode=context.GRAPH_MODE)
-context.set_context(device_target="Ascend")
-context.set_context(device_id=int(os.environ["DEVICE_ID"]))
-context.set_context(save_graphs=False)
 
 seed_seed() # init random seed
 weight_init = XavierUniform() # weight init
 ms_train_data = config.mindrecord_train_data
 num_class = 20
+
+context.set_context(mode=context.GRAPH_MODE)
+context.set_context(device_target=device_target)
+context.set_context(save_graphs=False)
 
 # train config
 class TrainConfig_1:
