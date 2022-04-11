@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 """MobileNetV3 model define"""
 from functools import partial
 import numpy as np
+import mindspore as ms
 import mindspore.nn as nn
-from mindspore.ops import operations as P
-from mindspore import Tensor
+import mindspore.ops as ops
 
 
 __all__ = ['mobilenet_v3_large',
@@ -71,7 +71,7 @@ class GlobalAvgPooling(nn.Cell):
 
     def __init__(self, keep_dims=False):
         super(GlobalAvgPooling, self).__init__()
-        self.mean = P.ReduceMean(keep_dims=keep_dims)
+        self.mean = ops.ReduceMean(keep_dims=keep_dims)
 
     def construct(self, x):
         x = self.mean(x, (2, 3))
@@ -103,7 +103,7 @@ class SE(nn.Cell):
         self.conv2 = nn.Conv2d(in_channels=num_mid, out_channels=num_out,
                                kernel_size=1, has_bias=True, pad_mode='pad')
         self.act2 = Activation('hsigmoid')
-        self.mul = P.Mul()
+        self.mul = ops.Mul()
 
     def construct(self, x):
         out = self.pool(x)
@@ -197,7 +197,7 @@ class ResUnit(nn.Cell):
                           padding=0, act_type=act_type, use_act=False)
         if num_in != num_out or stride != 1:
             self.use_short_cut_conv = False
-        self.add = P.Add() if self.use_short_cut_conv else None
+        self.add = ops.Add() if self.use_short_cut_conv else None
 
     def construct(self, x):
         """construct"""
@@ -292,13 +292,13 @@ class MobileNetV3(nn.Cell):
             self.output = nn.Conv2d(in_channels=model_cfgs['cls_ch_expand'],
                                     out_channels=num_classes,
                                     kernel_size=1, has_bias=True, pad_mode='pad')
-            self.squeeze = P.Squeeze(axis=(2, 3))
+            self.squeeze = ops.Squeeze(axis=(2, 3))
             if activation != "None":
                 self.need_activation = True
                 if activation == "Sigmoid":
-                    self.activation = P.Sigmoid()
+                    self.activation = ops.Sigmoid()
                 elif activation == "Softmax":
-                    self.activation = P.Softmax()
+                    self.activation = ops.Softmax()
                 else:
                     raise NotImplementedError(f"The activation {activation} not in [Sigmoid, Softmax].")
 
@@ -339,22 +339,21 @@ class MobileNetV3(nn.Cell):
         for _, m in self.cells_and_names():
             if isinstance(m, (nn.Conv2d)):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                m.weight.set_data(Tensor(np.random.normal(0, np.sqrt(2. / n),
-                                                          m.weight.data.shape).astype("float32")))
+                m.weight.set_data(ms.Tensor(np.random.normal(0, np.sqrt(2. / n),
+                                                             m.weight.data.shape).astype("float32")))
                 if m.bias is not None:
                     m.bias.set_data(
-                        Tensor(np.zeros(m.bias.data.shape, dtype="float32")))
+                        ms.numpy.zeros(m.bias.data.shape, dtype="float32"))
             elif isinstance(m, nn.BatchNorm2d):
                 m.gamma.set_data(
-                    Tensor(np.ones(m.gamma.data.shape, dtype="float32")))
+                    ms.Tensor(np.ones(m.gamma.data.shape, dtype="float32")))
                 m.beta.set_data(
-                    Tensor(np.zeros(m.beta.data.shape, dtype="float32")))
+                    ms.numpy.zeros(m.beta.data.shape, dtype="float32"))
             elif isinstance(m, nn.Dense):
-                m.weight.set_data(Tensor(np.random.normal(
+                m.weight.set_data(ms.Tensor(np.random.normal(
                     0, 0.01, m.weight.data.shape).astype("float32")))
                 if m.bias is not None:
-                    m.bias.set_data(
-                        Tensor(np.zeros(m.bias.data.shape, dtype="float32")))
+                    m.bias.set_data(ms.numpy.zeros(m.bias.data.shape, dtype="float32"))
 
 
 def mobilenet_v3(model_name, **kwargs):

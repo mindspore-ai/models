@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,21 +19,10 @@ import argparse
 import ast
 import numpy as np
 
-from mindspore import context
-from mindspore import Tensor
-from mindspore import nn
-from mindspore.nn.optim.momentum import Momentum
-from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
-from mindspore.nn.loss.loss import LossBase
-from mindspore.ops import operations as P
-from mindspore.ops import functional as F
-from mindspore.common import dtype as mstype
-from mindspore.train.model import Model
-from mindspore.context import ParallelMode
+import mindspore as ms
+import mindspore.nn as nn
+import mindspore.ops as ops
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, Callback
-from mindspore.train.loss_scale_manager import FixedLossScaleManager
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.common import set_seed
 from mindspore.communication.management import init, get_group_size, get_rank
 
 from src.dataset import create_dataset
@@ -43,7 +32,7 @@ from src.config import config_gpu
 from src.config import config_cpu
 from src.mobilenetV3 import mobilenet_v3_large
 
-set_seed(1)
+ms.set_seed(1)
 
 parser = argparse.ArgumentParser(description='Image classification')
 parser.add_argument('--dataset_path', type=str, default=None, help='Dataset path')
@@ -53,23 +42,23 @@ parser.add_argument('--run_distribute', type=ast.literal_eval, default=False, he
 args_opt = parser.parse_args()
 
 if args_opt.device_target == "GPU":
-    context.set_context(mode=context.GRAPH_MODE,
-                        device_target="GPU",
-                        save_graphs=False)
+    ms.set_context(mode=ms.GRAPH_MODE,
+                   device_target="GPU",
+                   save_graphs=False)
     if args_opt.run_distribute:
         init()
-        context.set_auto_parallel_context(device_num=get_group_size(),
-                                          parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
+        ms.set_auto_parallel_context(device_num=get_group_size(),
+                                     parallel_mode=ms.ParallelMode.DATA_PARALLEL,
+                                     gradients_mean=True)
 elif args_opt.device_target == "CPU":
-    context.set_context(mode=context.GRAPH_MODE,
-                        device_target="CPU",
-                        save_graphs=False)
+    ms.set_context(mode=ms.GRAPH_MODE,
+                   device_target="CPU",
+                   save_graphs=False)
 else:
     raise ValueError("Unsupported device_target.")
 
 
-class CrossEntropyWithLabelSmooth(LossBase):
+class CrossEntropyWithLabelSmooth(nn.LossBase):
     """
     CrossEntropyWith LabelSmooth.
 
@@ -86,16 +75,15 @@ class CrossEntropyWithLabelSmooth(LossBase):
 
     def __init__(self, smooth_factor=0., num_classes=1000):
         super(CrossEntropyWithLabelSmooth, self).__init__()
-        self.onehot = P.OneHot()
-        self.on_value = Tensor(1.0 - smooth_factor, mstype.float32)
-        self.off_value = Tensor(1.0 * smooth_factor /
-                                (num_classes - 1), mstype.float32)
+        self.onehot = ops.OneHot()
+        self.on_value = ms.Tensor(1.0 - smooth_factor, ms.float32)
+        self.off_value = ms.Tensor(1.0 * smooth_factor / (num_classes - 1), ms.float32)
         self.ce = nn.SoftmaxCrossEntropyWithLogits()
-        self.mean = P.ReduceMean(False)
-        self.cast = P.Cast()
+        self.mean = ops.ReduceMean(False)
+        self.cast = ops.Cast()
 
     def construct(self, logit, label):
-        one_hot_label = self.onehot(self.cast(label, mstype.int32), F.shape(logit)[1],
+        one_hot_label = self.onehot(self.cast(label, ms.int32), ops.shape(logit)[1],
                                     self.on_value, self.off_value)
         out_loss = self.ce(logit, one_hot_label)
         out_loss = self.mean(out_loss, 0)
@@ -113,7 +101,7 @@ class Monitor(Callback):
         None
 
     Examples:
-        >>> Monitor(100,lr_init=Tensor([0.05]*100).asnumpy())
+        >>> Monitor(100,lr_init=ms.Tensor([0.05]*100).asnumpy())
     """
 
     def __init__(self, lr_init=None):
@@ -142,9 +130,9 @@ class Monitor(Callback):
         step_mseconds = (time.time() - self.step_time) * 1000
         step_loss = cb_params.net_outputs
 
-        if isinstance(step_loss, (tuple, list)) and isinstance(step_loss[0], Tensor):
+        if isinstance(step_loss, (tuple, list)) and isinstance(step_loss[0], ms.Tensor):
             step_loss = step_loss[0]
-        if isinstance(step_loss, Tensor):
+        if isinstance(step_loss, ms.Tensor):
             step_loss = np.mean(step_loss.asnumpy())
 
         self.losses.append(step_loss)
@@ -160,7 +148,7 @@ if __name__ == '__main__':
     config_ = None
     if args_opt.device_target == "GPU":
         config_ = config_gpu
-        context.set_context(enable_graph_kernel=True)
+        ms.set_context(enable_graph_kernel=True)
     elif args_opt.device_target == "CPU":
         config_ = config_cpu
     else:
@@ -176,7 +164,7 @@ if __name__ == '__main__':
         loss = CrossEntropyWithLabelSmooth(
             smooth_factor=config_.label_smooth, num_classes=config_.num_classes)
     else:
-        loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+        loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
     # define dataset
     epoch_size = config_.epoch_size
     if args_opt.device_target == "GPU":
@@ -184,7 +172,6 @@ if __name__ == '__main__':
                                  do_train=True,
                                  config=config_,
                                  device_target=args_opt.device_target,
-                                 repeat_num=1,
                                  batch_size=config_.batch_size,
                                  run_distribute=args_opt.run_distribute)
     elif args_opt.device_target == "CPU":
@@ -196,23 +183,22 @@ if __name__ == '__main__':
     step_size = dataset.get_dataset_size()
     # resume
     if args_opt.pre_trained:
-        param_dict = load_checkpoint(args_opt.pre_trained)
-        load_param_into_net(net, param_dict)
+        param_dict = ms.load_checkpoint(args_opt.pre_trained)
+        ms.load_param_into_net(net, param_dict)
     # define optimizer
-    loss_scale = FixedLossScaleManager(
+    loss_scale = ms.FixedLossScaleManager(
         config_.loss_scale, drop_overflow_update=False)
-    lr = Tensor(get_lr(global_step=0,
-                       lr_init=0,
-                       lr_end=0,
-                       lr_max=config_.lr,
-                       warmup_epochs=config_.warmup_epochs,
-                       total_epochs=epoch_size,
-                       steps_per_epoch=step_size))
-    opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), lr, config_.momentum,
-                   config_.weight_decay, config_.loss_scale)
+    lr = ms.Tensor(get_lr(global_step=0,
+                          lr_init=0,
+                          lr_end=0,
+                          lr_max=config_.lr,
+                          warmup_epochs=config_.warmup_epochs,
+                          total_epochs=epoch_size,
+                          steps_per_epoch=step_size))
+    opt = nn.Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), lr, config_.momentum,
+                      config_.weight_decay, config_.loss_scale)
     # define model
-    model = Model(net, loss_fn=loss, optimizer=opt,
-                  loss_scale_manager=loss_scale)
+    model = ms.Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale)
 
     cb = [Monitor(lr_init=lr.asnumpy())]
     if args_opt.run_distribute and args_opt.device_target != "CPU":
