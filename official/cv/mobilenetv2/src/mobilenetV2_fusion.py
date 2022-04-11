@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 # """MobileNetV2 Quant model define"""
 
 import numpy as np
+import minspore as ms
 import mindspore.nn as nn
-from mindspore.ops import operations as P
-from mindspore import Tensor
+import mindspore.ops as ops
 
 __all__ = ['mobilenetV2']
 
@@ -47,7 +47,7 @@ class GlobalAvgPooling(nn.Cell):
 
     def __init__(self):
         super(GlobalAvgPooling, self).__init__()
-        self.mean = P.ReduceMean(keep_dims=False)
+        self.mean = ops.ReduceMean(keep_dims=False)
 
     def construct(self, x):
         x = self.mean(x, (2, 3))
@@ -120,7 +120,7 @@ class InvertedResidual(nn.Cell):
             nn.Conv2dBnAct(hidden_dim, oup, kernel_size=1, stride=1, pad_mode='pad', padding=0, group=1, has_bn=True)
         ])
         self.conv = nn.SequentialCell(layers)
-        self.add = P.Add()
+        self.add = ops.Add()
 
     def construct(self, x):
         out = self.conv(x)
@@ -215,25 +215,25 @@ class mobilenetV2(nn.Cell):
         for _, m in self.cells_and_names():
             if isinstance(m, nn.Conv2d):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                w = Tensor(np.random.normal(0, np.sqrt(2. / n), m.weight.data.shape).astype("float32"))
+                w = ms.Tensor(np.random.normal(0, np.sqrt(2. / n), m.weight.data.shape).astype("float32"))
                 m.weight.set_data(w)
                 if m.bias is not None:
-                    m.bias.set_data(Tensor(np.zeros(m.bias.data.shape, dtype="float32")))
+                    m.bias.set_data(ms.numpy.zeros(m.bias.data.shape, dtype="float32"))
             elif isinstance(m, nn.Conv2dBnAct):
                 n = m.conv.kernel_size[0] * m.conv.kernel_size[1] * m.conv.out_channels
-                w = Tensor(np.random.normal(0, np.sqrt(2. / n), m.conv.weight.data.shape).astype("float32"))
+                w = ms.Tensor(np.random.normal(0, np.sqrt(2. / n), m.conv.weight.data.shape).astype("float32"))
                 m.conv.weight.set_data(w)
                 if m.conv.bias is not None:
-                    m.conv.bias.set_data(Tensor(np.zeros(m.conv.bias.data.shape, dtype="float32")))
+                    m.conv.bias.set_data(ms.numpy.zeros(m.conv.bias.data.shape, dtype="float32"))
             elif isinstance(m, nn.BatchNorm2d):
-                m.gamma.set_data(Tensor(np.ones(m.gamma.data.shape, dtype="float32")))
-                m.beta.set_data(Tensor(np.zeros(m.beta.data.shape, dtype="float32")))
+                m.gamma.set_data(ms.Tensor(np.ones(m.gamma.data.shape, dtype="float32")))
+                m.beta.set_data(ms.numpy.zeros(m.beta.data.shape, dtype="float32"))
             elif isinstance(m, nn.Dense):
-                m.weight.set_data(Tensor(np.random.normal(0, 0.01, m.weight.data.shape).astype("float32")))
+                m.weight.set_data(ms.Tensor(np.random.normal(0, 0.01, m.weight.data.shape).astype("float32")))
                 if m.bias is not None:
-                    m.bias.set_data(Tensor(np.zeros(m.bias.data.shape, dtype="float32")))
+                    m.bias.set_data(ms.numpy.zeros(m.bias.data.shape, dtype="float32"))
             elif isinstance(m, nn.DenseBnAct):
                 m.dense.weight.set_data(
-                    Tensor(np.random.normal(0, 0.01, m.dense.weight.data.shape).astype("float32")))
+                    ms.Tensor(np.random.normal(0, 0.01, m.dense.weight.data.shape).astype("float32")))
                 if m.dense.bias is not None:
-                    m.dense.bias.set_data(Tensor(np.zeros(m.dense.bias.data.shape, dtype="float32")))
+                    m.dense.bias.set_data(ms.numpy.zeros(m.dense.bias.data.shape, dtype="float32"))

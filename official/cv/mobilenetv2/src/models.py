@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
 # ============================================================================
 import time
 import numpy as np
-from mindspore import Tensor
-from mindspore import nn
-from mindspore.ops import operations as P
-from mindspore.ops import functional as F
-from mindspore.common import dtype as mstype
-from mindspore.nn.loss.loss import LossBase
+import mindspore as ms
+import mindspore.nn as nn
+import mindspore.ops as ops
 from mindspore.train.callback import Callback
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.mobilenetV2 import MobileNetV2Backbone, MobileNetV2Head, mobilenet_v2
+from src.model_utils.config import config
 
-class CrossEntropyWithLabelSmooth(LossBase):
+
+class CrossEntropyWithLabelSmooth(nn.LossBase):
     """
     CrossEntropyWith LabelSmooth.
 
@@ -41,20 +39,21 @@ class CrossEntropyWithLabelSmooth(LossBase):
 
     def __init__(self, smooth_factor=0., num_classes=1000):
         super(CrossEntropyWithLabelSmooth, self).__init__()
-        self.onehot = P.OneHot()
-        self.on_value = Tensor(1.0 - smooth_factor, mstype.float32)
-        self.off_value = Tensor(1.0 * smooth_factor /
-                                (num_classes - 1), mstype.float32)
+        self.onehot = ops.OneHot()
+        self.on_value = ms.Tensor(1.0 - smooth_factor, ms.float32)
+        self.off_value = ms.Tensor(1.0 * smooth_factor /
+                                   (num_classes - 1), ms.float32)
         self.ce = nn.SoftmaxCrossEntropyWithLogits()
-        self.mean = P.ReduceMean(False)
-        self.cast = P.Cast()
+        self.mean = ops.ReduceMean(False)
+        self.cast = ops.Cast()
 
     def construct(self, logit, label):
-        one_hot_label = self.onehot(self.cast(label, mstype.int32), F.shape(logit)[1],
+        one_hot_label = self.onehot(self.cast(label, ms.int32), ops.shape(logit)[1],
                                     self.on_value, self.off_value)
         out_loss = self.ce(logit, one_hot_label)
         out_loss = self.mean(out_loss, 0)
         return out_loss
+
 
 class Monitor(Callback):
     """
@@ -67,7 +66,7 @@ class Monitor(Callback):
         None
 
     Examples:
-        >>> Monitor(100,lr_init=Tensor([0.05]*100).asnumpy())
+        >>> Monitor(100,lr_init=ms.Tensor([0.05]*100).asnumpy())
     """
 
     def __init__(self, lr_init=None, model=None, eval_dataset=None):
@@ -108,9 +107,9 @@ class Monitor(Callback):
         step_mseconds = (time.time() - self.step_time) * 1000
         step_loss = cb_params.net_outputs
 
-        if isinstance(step_loss, (tuple, list)) and isinstance(step_loss[0], Tensor):
+        if isinstance(step_loss, (tuple, list)) and isinstance(step_loss[0], ms.Tensor):
             step_loss = step_loss[0]
-        if isinstance(step_loss, Tensor):
+        if isinstance(step_loss, ms.Tensor):
             step_loss = np.mean(step_loss.asnumpy())
 
         self.losses.append(step_loss)
@@ -124,17 +123,34 @@ class Monitor(Callback):
 
 def load_ckpt(network, pretrain_ckpt_path, trainable=True):
     """load checkpoint into network."""
-    param_dict = load_checkpoint(pretrain_ckpt_path)
-    load_param_into_net(network, param_dict)
+    param_dict = ms.load_checkpoint(pretrain_ckpt_path)
+    ms.load_param_into_net(network, param_dict)
     if not trainable:
         for param in network.get_parameters():
             param.requires_grad = False
 
-def define_net(config, is_training=True):
+
+def define_net(cfg, is_training=True):
     backbone_net = MobileNetV2Backbone()
-    activation = config.activation if not is_training else "None"
+    activation = cfg.activation if not is_training else "None"
     head_net = MobileNetV2Head(input_channel=backbone_net.out_channels,
-                               num_classes=config.num_classes,
+                               num_classes=cfg.num_classes,
                                activation=activation)
     net = mobilenet_v2(backbone_net, head_net)
     return backbone_net, head_net, net
+
+
+def build_params_groups(net):
+    """build params groups"""
+    decayed_params = []
+    no_decayed_params = []
+    for param in net.trainable_params():
+        if 'beta' not in param.name and 'gamma' not in param.name and 'bias' not in param.name:
+            decayed_params.append(param)
+        else:
+            no_decayed_params.append(param)
+
+    group_params = [{'params': decayed_params, 'weight_decay': config.weight_decay},
+                    {'params': no_decayed_params},
+                    {'order_params': net.trainable_params()}]
+    return group_params

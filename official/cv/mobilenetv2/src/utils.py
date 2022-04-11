@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,10 +13,9 @@
 # limitations under the License.
 # ============================================================================
 
-from mindspore import context
-from mindspore.context import ParallelMode
+import mindspore as ms
+import mindspore.communication as comm
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
-from mindspore.communication.management import get_rank, init, get_group_size
 
 from src.models import Monitor
 
@@ -26,18 +25,18 @@ def context_device_init(config):
     config.rank_id = 0
     config.rank_size = 1
     if config.platform == "CPU":
-        context.set_context(mode=context.GRAPH_MODE, device_target=config.platform, save_graphs=False)
+        ms.set_context(mode=ms.GRAPH_MODE, device_target=config.platform, save_graphs=False)
 
     elif config.platform in ["Ascend", "GPU"]:
-        context.set_context(mode=context.GRAPH_MODE, device_target=config.platform, device_id=config.device_id,
-                            save_graphs=False)
+        ms.set_context(mode=ms.GRAPH_MODE, device_target=config.platform, device_id=config.device_id,
+                       save_graphs=False)
         if config.run_distribute:
-            init()
-            config.rank_id = get_rank()
-            config.rank_size = get_group_size()
-            context.set_auto_parallel_context(device_num=config.rank_size,
-                                              parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
+            comm.init()
+            config.rank_id = comm.get_rank()
+            config.rank_size = comm.get_group_size()
+            ms.set_auto_parallel_context(device_num=config.rank_size,
+                                         parallel_mode=ms.ParallelMode.DATA_PARALLEL,
+                                         gradients_mean=True)
     else:
         raise ValueError("Only support CPU, GPU and Ascend.")
 

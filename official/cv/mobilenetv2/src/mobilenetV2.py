@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,10 +14,9 @@
 # ============================================================================
 """MobileNetV2 model define"""
 import numpy as np
+import mindspore as ms
 import mindspore.nn as nn
-from mindspore.ops import operations as P
-from mindspore.ops.operations import Add
-from mindspore import Tensor
+import mindspore.ops as ops
 
 __all__ = ['MobileNetV2Backbone', 'MobileNetV2Head', 'mobilenet_v2']
 
@@ -47,7 +46,7 @@ class GlobalAvgPooling(nn.Cell):
 
     def __init__(self):
         super(GlobalAvgPooling, self).__init__()
-        self.mean = P.ReduceMean(keep_dims=False)
+        self.mean = ops.ReduceMean(keep_dims=False)
 
     def construct(self, x):
         x = self.mean(x, (2, 3))
@@ -129,8 +128,8 @@ class InvertedResidual(nn.Cell):
             nn.BatchNorm2d(oup),
         ])
         self.conv = nn.SequentialCell(layers)
-        self.add = Add()
-        self.cast = P.Cast()
+        self.add = ops.Add()
+        self.cast = ops.Cast()
 
     def construct(self, x):
         identity = x
@@ -212,16 +211,17 @@ class MobileNetV2Backbone(nn.Cell):
         for _, m in self.cells_and_names():
             if isinstance(m, nn.Conv2d):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                m.weight.set_data(Tensor(np.random.normal(0, np.sqrt(2. / n),
-                                                          m.weight.data.shape).astype("float32")))
+                m.weight.set_data(ms.Tensor(np.random.normal(0, np.sqrt(2. / n),
+                                                             m.weight.data.shape).astype("float32")))
+
                 if m.bias is not None:
                     m.bias.set_data(
-                        Tensor(np.zeros(m.bias.data.shape, dtype="float32")))
+                        ms.numpy.zeros(m.bias.data.shape, dtype="float32"))
             elif isinstance(m, nn.BatchNorm2d):
                 m.gamma.set_data(
-                    Tensor(np.ones(m.gamma.data.shape, dtype="float32")))
+                    ms.Tensor(np.ones(m.gamma.data.shape, dtype="float32")))
                 m.beta.set_data(
-                    Tensor(np.zeros(m.beta.data.shape, dtype="float32")))
+                    ms.numpy.zeros(m.beta.data.shape, dtype="float32"))
 
     @property
     def get_features(self):
@@ -251,9 +251,9 @@ class MobileNetV2Head(nn.Cell):
         self.dense = nn.Dense(input_channel, num_classes, has_bias=True)
         self.need_activation = True
         if activation == "Sigmoid":
-            self.activation = P.Sigmoid()
+            self.activation = ops.Sigmoid()
         elif activation == "Softmax":
-            self.activation = P.Softmax()
+            self.activation = ops.Softmax()
         else:
             self.need_activation = False
         self._initialize_weights()
@@ -280,11 +280,11 @@ class MobileNetV2Head(nn.Cell):
         self.init_parameters_data()
         for _, m in self.cells_and_names():
             if isinstance(m, nn.Dense):
-                m.weight.set_data(Tensor(np.random.normal(
+                m.weight.set_data(ms.Tensor(np.random.normal(
                     0, 0.01, m.weight.data.shape).astype("float32")))
                 if m.bias is not None:
                     m.bias.set_data(
-                        Tensor(np.zeros(m.bias.data.shape, dtype="float32")))
+                        ms.numpy.zeros(m.bias.data.shape, dtype="float32"))
 
 
 class MobileNetV2Combine(nn.Cell):

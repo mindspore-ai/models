@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 mobilenetv2 export file.
 """
 import numpy as np
-from mindspore import Tensor, export
+import mindspore as ms
 from src.models import define_net, load_ckpt
 from src.utils import context_device_init
 from src.model_utils.config import config
@@ -26,10 +26,8 @@ from src.model_utils.moxing_adapter import moxing_wrapper
 config.batch_size = config.batch_size_export
 config.is_training = config.is_training_export
 
-def modelarts_process():
-    pass
 
-@moxing_wrapper(pre_process=modelarts_process)
+@moxing_wrapper()
 def export_mobilenetv2():
     """ export_mobilenetv2 """
     print('\nconfig: \n', config)
@@ -40,8 +38,9 @@ def export_mobilenetv2():
 
     load_ckpt(net, config.ckpt_file)
     input_shp = [config.batch_size, 3, config.image_height, config.image_width]
-    input_array = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp).astype(np.float32))
-    export(net, input_array, file_name=config.file_name, file_format=config.file_format)
+    input_array = ms.Tensor(np.random.uniform(-1.0, 1.0, size=input_shp).astype(np.float32))
+    ms.export(net, input_array, file_name=config.file_name, file_format=config.file_format)
+
 
 if __name__ == '__main__':
     export_mobilenetv2()
