@@ -122,6 +122,7 @@ parser.add_argument('--data_url', default=None, help='Directory contains dataset
 parser.add_argument('--train_url', default=None, help='Directory contains checkpoint file')
 parser.add_argument("--file_name", type=str, default="dcgan", help="output file name.")
 parser.add_argument("--file_format", type=str, default="MINDIR", help="file format")
+parser.add_argument("--only_load_netG", type=str, default=False, help="export only load netG, default is false.")
 args = parser.parse_args()
 
 if args.run_modelart:
@@ -154,6 +155,12 @@ if __name__ == '__main__':
         if args.run_modelart:
             mox.file.copy_parallel(src_url=file_name,
                                    dst_url=os.path.join(args.ckpt_url, file_name))
+    elif args.only_load_netG:
+        dcgan = load_dcgan(local_ckpt_url)
+        netG_trained = dcgan.myTrainOneStepCellForG.network.netG
+        netG_trained.set_train(False)
+        latent_code = Tensor(np.random.rand(args.batch_size, 100, 1, 1), mstype.float32)
+        export(netG_trained, latent_code, file_name=args.file_name, file_format=args.file_format)
     else:
         dcgan = load_dcgan(local_ckpt_url)
         # inputs = Tensor(np.random.rand(args.batch_size, 3, 448, 448), mstype.float32)
