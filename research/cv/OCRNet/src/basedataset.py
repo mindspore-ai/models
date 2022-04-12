@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,11 +15,11 @@
 
 """Base dataset generator definition."""
 import random
+
 import cv2
 import numpy as np
-
-import mindspore.ops as P
 from mindspore import Tensor
+from mindspore import ops as P
 from mindspore.common import dtype
 
 
@@ -46,6 +46,7 @@ class BaseDataset:
         self.files = []
 
     def __len__(self):
+        """ Dataset length """
         return len(self.files)
 
     def input_transform(self, image):
@@ -142,6 +143,7 @@ class BaseDataset:
         if flip:
             flip_img = image.asnumpy()[:, :, :, ::-1]
             flip_output = model(Tensor(flip_img.copy()))
+            flip_output = flip_output[-1]
             flip_output = P.ResizeBilinear((shape[-2], shape[-1]))(flip_output)
             flip_pred = flip_output.asnumpy()
             flip_pred = Tensor(flip_pred[:, :, :, ::-1])

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
 # ============================================================================
 
 """Callback for inference while training."""
-import os
-import mindspore.ops as P
-from mindspore.train.callback import Callback
-from mindspore import save_checkpoint
 import numpy as np
+from mindspore import ops as P
+from mindspore import save_checkpoint
+from mindspore.train.callback import Callback
 
 
 def get_confusion_matrix(label, pred, shape, num_classes, ignore_label):
@@ -58,14 +57,14 @@ def evaluate_model(net, data_helper, num_classes, ignore_label):
     pos = confusion_matrix.sum(1)
     res = confusion_matrix.sum(0)
     tp = np.diag(confusion_matrix)
-    IoU_array = (tp / np.maximum(1.0, pos + res - tp))
-    mean_IoU = IoU_array.mean()
-    return IoU_array, mean_IoU
+    iou_array = (tp / np.maximum(1.0, pos + res - tp))
+    mean_iou = iou_array.mean()
+    return iou_array, mean_iou
 
 
 class EvalCallback(Callback):
     """Callback for inference while training."""
-    def __init__(self, network, eval_data, num_classes, ignore_label, train_url, eval_interval=1):
+    def __init__(self, network, eval_data, num_classes, ignore_label, train_url, eval_interval=1, device_id=0):
         self.network = network
         self.eval_data = eval_data
         self.best_iouarray = None
@@ -75,23 +74,23 @@ class EvalCallback(Callback):
         self.ignore_label = ignore_label
         self.eval_interval = eval_interval
         self.train_url = train_url
+        self.device_id = device_id
 
     def epoch_end(self, run_context):
         """Executions after each epoch."""
         cb_param = run_context.original_args()
         cur_epoch = cb_param.cur_epoch_num
-        device_id = int(os.getenv("DEVICE_ID"))
         if cur_epoch % self.eval_interval == 0:
             iou_array, miou = evaluate_model(self.network, self.eval_data, self.num_classes, self.ignore_label)
             if miou > self.best_miou:
                 self.best_miou = miou
                 self.best_iouarray = iou_array
                 self.best_epoch = cur_epoch
-                save_checkpoint(self.network, self.train_url + "/best_card%d.ckpt" % device_id)
+                save_checkpoint(self.network, self.train_url + "/best_card%d.ckpt" % self.device_id)
 
             log_text1 = 'EPOCH: %d, mIoU: %.4f\n' % (cur_epoch, miou)
             log_text2 = 'BEST EPOCH: %s, BEST mIoU: %0.4f\n' % (self.best_epoch, self.best_miou)
-            log_text3 = 'DEVICE_ID: %d\n' % device_id
+            log_text3 = 'DEVICE_ID: %d\n' % self.device_id
             print("==================================================\n",
                   log_text3,
                   log_text1,
