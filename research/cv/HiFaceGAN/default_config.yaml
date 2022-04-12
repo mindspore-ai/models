@@ -1,0 +1,103 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+# ==============================================================================
+# Options
+data_path: '/path/to/data'
+outputs_dir: './results'
+degradation_type: 'full'
+device_target: 'GPU'
+device_id: 0
+img_size: 512
+batch_size: 1
+
+# Generator architecture
+ngf: 64
+input_nc: 3
+
+# Discriminator architecture
+ndf: 64
+
+# Train options
+is_distributed: False
+rank: 0
+group_size: 1
+continue_train: False
+which_epoch: 'latest'
+num_epochs: 30
+num_epochs_decay: 20
+save_checkpoint_epochs: 1
+print_iter: 100
+keep_checkpoint_max: 5
+
+# Loss options
+use_gan_feat_loss: True
+use_vgg_loss: True
+lambda_feat: 10.0
+lambda_vgg: 10.0
+pretrained_vgg_path: '/path/to/vgg.ckpt'
+
+# Optimizer and learning rate options
+lr_policy: 'constant'
+use_ttur: True
+lr: 0.0002
+beta1: 0.0
+beta2: 0.9
+
+# Test options
+ckpt_path: '/path/to/ckpts/'
+num_to_eval: 5
+
+# Export options
+file_name: 'HiFaceGAN_generator'
+file_format: 'MINDIR'
+ckpt_file: ''
+
+---
+# Config description for each option
+data_path: 'The dataset path'
+outputs_dir: 'The directory where the data from the train and eval process will be stored'
+degradation type: 'The degradation type for images'
+device_target: 'Device type for graph computations'
+device_id: 'Device id, default is 0'
+img_size: 'Size of image'
+batch_size: 'The batch size to be used for training and evaluation'
+
+ngf: 'The number of generator features'
+input_nc: 'The number of channels of input image'
+
+ndf: 'The number of discriminator features'
+
+is_distributed: 'Whether the training process is distributed among several devices'
+rank: 'Rank id, default is 0'
+continue_train: ''
+which epoch: ''
+num_epochs: 'The number of epochs'
+num_epochs_decay: 'The number of epochs with linear lr decay'
+save_checkpoint_epochs: 'Specifies the number of epoch which passes before saving a single checkpoint'
+group_size: 'The number of devices available for the distributed training'
+print_iter: 'Logging interval (in number of iterations)'
+keep_checkpoint_max: 'How many generator checkpoints to keep'
+
+use_gan_feat_loss: 'Whether to use gan feature loss for generator, default is True'
+use_vgg_loss: 'Whether to use vgg loss for generator, default is True'
+lambda_feat: 'The scale factor for gan feature loss, default is 10'
+lambda_vgg: 'The scale factor for vgg loss, default is 10'
+pretrained_vgg_path: 'Checkpoint file for vgg loss'
+
+lr_policy: 'Learning rate policy'
+use_ttur: 'Whether or not to use the Two-Time scale Update Rule, default is True'
+lr: 'Initial learning rate'
+beta1: 'Beta1 parameter for Adam optimizer'
+beta2: 'Beta2 parameter for Adam optimizer'
+
+ckpt_path: 'Checkpoint file path'
+num_to_eval: 'The number of checkpoints to use for the metrics computation'
+
+file_name: 'Output file name'
+file_format: 'Output file format'
+ckpt_file: 'HiFaceGAN ckpt file'
+
+---
+device_target: ['GPU']
+file_format: ['MINDIR']
+degradation_type: ['full', 'down', 'noise', 'blur', 'jpeg']
+lr_policy: ['linear', 'constant']
