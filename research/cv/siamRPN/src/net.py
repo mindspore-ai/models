@@ -81,6 +81,8 @@ class SiameseRPN(nn.Cell):
         self.transpose = ops.Transpose()
         self.softmax = ops.Softmax(axis=2)
         self.print = ops.Print()
+        self.anchor_num = config.anchor_num
+        self.score_size = config.score_size
 
     def construct(self, template=None, detection=None, ckernal=None, rkernal=None):
         """ forward function """
@@ -172,13 +174,13 @@ class SiameseRPN(nn.Cell):
                 routputs = routputs + (self.conv2d_rout(r_features[i], r_weights[i]),)
             coutputs = self.op_concat(coutputs)
             routputs = self.op_concat(routputs)
-            coutputs = self.reshape(coutputs, (self.groups, 2*config.anchor_num, config.score_size, config.score_size))
-            routputs = self.reshape(routputs, (self.groups, 4*config.anchor_num, config.score_size, config.score_size))
+            coutputs = self.reshape(coutputs, (self.groups, 2*self.anchor_num, self.score_size, self.score_size))
+            routputs = self.reshape(routputs, (self.groups, 4*self.anchor_num, self.score_size, self.score_size))
             routputs = self.regress_adjust(routputs)
             coutputs = self.transpose(
-                self.reshape(coutputs, (-1, 2, config.anchor_num * config.score_size* config.score_size)), (0, 2, 1))
+                self.reshape(coutputs, (-1, 2, self.anchor_num * self.score_size* self.score_size)), (0, 2, 1))
             routputs = self.transpose(
-                self.reshape(routputs, (-1, 4, config.anchor_num * config.score_size* config.score_size)),
+                self.reshape(routputs, (-1, 4, self.anchor_num * self.score_size* self.score_size)),
                 (0, 2, 1))
             out1, out2 = coutputs, routputs
         else:
