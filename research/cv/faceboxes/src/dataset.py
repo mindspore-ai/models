@@ -63,9 +63,10 @@ class WiderFaceWithVOCType():
 
             if self.target_transform is not None:
                 target = self.target_transform(target)
-
-            self.images_list.append(img)
-            self.labels_list.append(target)
+            target = [ai for ai in target if len(ai) > 0]
+            if target:
+                self.images_list.append(img)
+                self.labels_list.append(target)
 
     def __getitem__(self, item):
         return self.images_list[item], self.labels_list[item]
