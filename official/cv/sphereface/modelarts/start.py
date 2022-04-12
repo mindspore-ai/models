@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,19 +16,23 @@
 import os
 import time
 import datetime
+import glob
 import mindspore
 import mindspore.nn as nn
 from mindspore import Tensor
 from mindspore.nn.optim import Momentum
+from mindspore import export
 from mindspore.communication.management import init, get_group_size, get_rank
 from mindspore.train.callback import ModelCheckpoint
 from mindspore.train.callback import CheckpointConfig, Callback
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.train.model import Model
-from mindspore.train.loss_scale_manager import DynamicLossScaleManager, FixedLossScaleManager
+from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore import context
 from mindspore.context import ParallelMode
 from mindspore.common import set_seed
+import numpy as np
+import moxing as mox
 from src.optimizers import get_param_groups
 from src.losses.crossentropy import AngleLoss
 from src.lr_scheduler import MultiStepLR, CosineAnnealingLR
@@ -38,7 +42,6 @@ from src.network.spherenet import sphere20a
 from src.model_utils.device_adapter import get_rank_id, get_device_id
 from src.datasets.classification import classification_dataset_imagenet
 set_seed(100)
-
 
 class BuildTrainNetwork(nn.Cell):
     """build training network"""
@@ -84,7 +87,6 @@ class ProgressMonitor(Callback):
                                                                                                  cb_params.net_outputs,
                                                                                                  fps_mean))
         if self.configs.rank_save_ckpt_flag:
-            import glob
             ckpts = glob.glob(os.path.join(self.configs.outputs_dir, '*.ckpt'))
             for ckpt in ckpts:
                 ckpt_fn = os.path.basename(ckpt)
@@ -108,6 +110,13 @@ class ProgressMonitor(Callback):
     def end(self, run_context):
         self.configs.logger.info('end network train...')
 
+def frozen_to_air(modelnet, modelargs):
+    param_dict = load_checkpoint(modelargs.get("ckpt_file"))
+    load_param_into_net(modelnet, param_dict)
+
+    input_arr = Tensor(
+        np.zeros([1, 3, modelargs.get("height"), modelargs.get("width")], np.float32))
+    export(modelnet, input_arr, file_name=modelargs.get("file_name"), file_format=modelargs.get("file_format"))
 
 def get_lr_scheduler(configs):
     if configs.lr_scheduler == 'exponential':
@@ -119,6 +128,20 @@ def get_lr_scheduler(configs):
     else:
         raise NotImplementedError(configs.lr_scheduler)
     return lr_scheduler
+
+def ckpt_save():
+    ckpt_path = '/cache/train_output/device' + os.getenv('DEVICE_ID') + '/'
+    ckpt_list = glob.glob(ckpt_path + "*.ckpt")
+    ckpt_list.sort(key=os.path.getmtime)
+    ckpt_model = ckpt_list[-1]
+    net = sphere20a(config.num_classes, True)
+    frozen_to_air_args = {'ckpt_file': ckpt_model,
+                          'height': 112,
+                          'width': 96,
+                          'file_name': '/cache/train_output/sphereface',
+                          'file_format': 'AIR'}
+    frozen_to_air(net, frozen_to_air_args)
+
 
 def train():
     """training process"""
@@ -139,9 +162,6 @@ def train():
         context.set_context(device_id=devid)
         config.rank = get_rank_id()
 
-    # init loss_scale set
-    loss_scale_manager = DynamicLossScaleManager(init_loss_scale=65536, scale_factor=2, scale_window=2000)
-
     # select for master rank save ckpt or all rank save, compatible for model parallel
     config.rank_save_ckpt_flag = 0
     if config.is_save_on_master:
@@ -155,21 +175,22 @@ def train():
     config.logger = get_logger(config.outputs_dir, config.rank)
 
     # dataloader
-    data_dir = config.train_data_dir
-    images_dir = config.train_img_dir
-    if config.enable_modelarts:
-        import moxing as mox
-        images_dir = '/cache/dataset/device' + os.getenv("DEVICE_ID")
-        os.system('mkdir %s' %images_dir)
-        mox.file.copy_parallel(src_url=config.data_url, dst_url='/cache/dataset/device'+os.getenv('DEVICE_ID'))
-        os.system('cd %s ; tar -xvf CASIA-WebFace.tar' % (images_dir))
-        os.system('cd %s ; tar -xvf CASIA-WebFace2.tar' % (images_dir))
-        images_dir = images_dir +'/'
-        data_dir = images_dir + 'casia_landmark.txt'
+    images_dir = '/cache/dataset/device' + os.getenv("DEVICE_ID")
+    os.system('mkdir %s' %images_dir)
+    mox.file.copy_parallel(src_url=config.data_url, dst_url='/cache/dataset/device'+os.getenv('DEVICE_ID'))
+    os.system('cd %s ; tar -xvf CASIA-WebFace.tar' % (images_dir))
+    os.system('cd %s ; tar -xvf CASIA-WebFace2.tar' % (images_dir))
+    images_dir = images_dir +'/'
+    data_dir = images_dir + 'casia_landmark.txt'
     de_dataset = classification_dataset_imagenet(data_dir, image_size=[112, 96],
                                                  per_batch_size=config.per_batch_size, max_epoch=config.max_epoch,
                                                  rank=config.rank, group_size=config.group_size,
                                                  input_mode="txt", root=images_dir, shuffle=True)
+    pretrained_path = config.train_pretrained
+    config.train_pretrained = images_dir + pretrained_path
+    print("="*20)
+    print(config.train_pretrained)
+    print(os.path.isfile(config.train_pretrained))
     config.steps_per_epoch = de_dataset.get_dataset_size()
     config.logger.save_args(config)
 
@@ -182,7 +203,6 @@ def train():
     if not config.label_smooth:
         config.smooth_factor = 0.0
     criterion = AngleLoss(classnum=config.num_classes, smooth_factor=config.smooth_factor)
-
     # load pretrain model
     if os.path.isfile(config.train_pretrained):
         param_dict = load_checkpoint(config.train_pretrained)
@@ -191,12 +211,12 @@ def train():
             if key.startswith('moments.'):
                 continue
             elif key.startswith('network.'):
-                if config.filter_weight and  key == 'network.fc6.weight':
+                if config.filter_weight and key == 'network.fc6.weight':
                     continue
                 param_dict_new[key[8:]] = values
             else:
                 param_dict_new[key] = values
-
+        print(param_dict_new)
         load_param_into_net(network, param_dict_new)
         config.logger.info('load model success')
 
@@ -243,8 +263,9 @@ def train():
                                       prefix='%s' % config.rank)
         callbacks.append(ckpt_cb)
     model.train(config.max_epoch, de_dataset, callbacks=callbacks, dataset_sink_mode=False)
-    if config.enable_modelarts:
-        mox.file.copy_parallel(src_url='/cache/train_output', dst_url=config.train_url)
+    ckpt_save()
+
+    mox.file.copy_parallel(src_url='/cache/train_output', dst_url=config.train_url)
 
 if __name__ == "__main__":
     train()

@@ -1,8 +1,8 @@
 # Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
-enable_modelarts: False
+enable_modelarts: True
 # Url for modelarts
-data_url: ""
-train_url: ""
+data_url: "/mindx-user-12/data/"
+train_url: "/mindx-user-12/output/"
 checkpoint_url: ""
 # Path for local
 data_path: "/cache/data"
@@ -21,38 +21,39 @@ group_size: 1
 
 # ==============================================================================
 # Training options
+filter_weight: True
 label_smooth: 1
 smooth_factor: 0.15
 train_data_dir: "./dataset/casia_landmark.txt"
 train_img_dir : "./dataset/CASIA-WebFace/"
-train_pretrained: ""
+train_pretrained: "sphereface_ascend_v130_casiawebface_official_cv_bs32_acc99.11.ckpt"
 model_train_url: ""
 image_size: "112, 96"
-num_classes: 10574
+num_classes: 20000
 lr: 0.15
 lr_scheduler: "cosine_annealing"
-lr_epochs: "6,8,10,12,14,16,18"
+lr_epochs: "1"
 lr_gamma: 0.35
 eta_min: 0
-T_max: 19
-max_epoch: 20
-per_batch_size: 256
+T_max: 1
+max_epoch: 1
+per_batch_size: 1
 warmup_epochs: 0
 weight_decay: 0.0005
 momentum: 0.9
 is_dynamic_loss_scale: 0
 loss_scale: 1024
 log_interval: 100
-ckpt_interval: 5000
+ckpt_interval: 500
 save_ckpt_path: "./"
 is_save_on_master: 1
 
 # Eval options
 eval_data_dir: "./result_Files"
-ckpt_files: "./ckpt/0-20_1775.ckpt"
-datatxt_src: './dataset/lfw_landmark.txt'
-pairtxt_src: './dataset/pairs.txt'
-datasrc: './dataset/lfw/'
+ckpt_files: "./sphereface_ascend_v130_casiawebface_official_cv_bs32_acc99.11.ckpt"
+datatxt_src: './lfw//lfw_landmark.txt'
+pairtxt_src: './lfw/pairs.txt'
+datasrc: './lfw/lfw/'
 log_path: ""
 eval_url: ""
 
@@ -60,7 +61,7 @@ eval_url: ""
 device_id: 1
 batch_size: 32
 file_name: "sphereface"
-file_format: "MINDIR"
+file_format: "AIR"
 
 ---
 # Help description for each configuration
