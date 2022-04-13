@@ -73,13 +73,13 @@ def write_mindrecord_images(image_ids, image_dict, mindrecord_dir, data_schema, 
 
 def create_mindrecord():
 
-    annot_files_train = [config.train_annotation_file]
-    annot_files_test = [config.test_annotation_file]
-    ret_code, ret_message, images_train, image_path_dict_train = get_images(image_dir=config.data_root_train,
+    annot_files_train = [config.annotation_file]
+    annot_files_test = [config.val_annotation_file]
+    ret_code, ret_message, images_train, image_path_dict_train = get_images(image_dir=config.data_root,
                                                                             annot_files=annot_files_train)
     if ret_code != SUCCESS:
         return ret_code, ret_message, "", ""
-    ret_code, ret_message, images_test, image_path_dict_test = get_images(image_dir=config.data_root_test,
+    ret_code, ret_message, images_test, image_path_dict_test = get_images(image_dir=config.val_data_root,
                                                                           annot_files=annot_files_test)
     if ret_code != SUCCESS:
         return ret_code, ret_message, "", ""

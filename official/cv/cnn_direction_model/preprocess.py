@@ -29,7 +29,7 @@ de.config.set_seed(1)
 
 def preprocess():
     dataset_name = config.dataset_name
-    dataset_lr, dataset_rl = create_dataset_eval(config.data_root_test +  "/" + dataset_name +
+    dataset_lr, dataset_rl = create_dataset_eval(config.val_data_root +  "/" + dataset_name +
                                                  ".mindrecord0", config=config, dataset_name=dataset_name)
 
     lr_img_path = os.path.join(config.result_path, "lr_dataset/" + "img_data")
