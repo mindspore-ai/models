@@ -447,18 +447,18 @@ Inference result is saved in current path, you can find result like this in acc.
 
 | Parameters                 | Ascend                                                      | GPU                                              | Ascend-8P                               |
 | -------------------------- | ------------------------------------------------------------| -------------------------------------------------|------------------------------------------|
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | NV SMX2 V100-32G                                 | Ascend 910 * 8; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 |
-| uploaded Date              | 07/05/2021 (day/month/year)                                 | 17/09/2020 (day/month/year)                      | 23/09/2021 (day/month/year)              |
-| MindSpore Version          | 1.2.1                                                       | 1.2.1                                            | 1.5.0-rc1                                |
+| Resource                   | Ascend 910; ARM CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | Tesla V100-PCIE-32GB; X86_64 CPU Xeon 8180 2.50GHz, 112cores                                | Ascend 910 * 8; ARM CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 |
+| uploaded Date              | 14/04/2022 (day/month/year)                                 | 14/04/2022 (day/month/year)                      | 14/04/2022 (day/month/year)              |
+| MindSpore Version          | 1.7.0                                                       | 1.7.0                                            | 1.7.0                                |
 | Dataset                    | CIFAR-10                                                    | CIFAR-10                                         | ImageNet2012                             |
-| Training Parameters        | epoch=30, steps=1562, batch_size = 32, lr=0.002             | epoch=30, steps=1562, batch_size = 32, lr=0.002  | epoch=150, steps=625, batch_size=256*8, lr=0.01 |
+| Training Parameters        | epoch=30, steps=1562, batch_size = 32, lr=0.01             | epoch=30, steps=1562, batch_size = 32, lr=0.002  | epoch=150, steps=625, batch_size=256*8, lr=0.01 |
 | Optimizer                  | Momentum                                                    | Momentum                                         | Momentum                                 |
 | Loss Function              | Softmax Cross Entropy                                       | Softmax Cross Entropy                            | Softmax Cross Entropy                    |
 | outputs                    | probability                                                 | probability                                      | probability                              |
-| Loss                       | 0.08                                                        | 0.01                                             | 1.65                                     |
-| Speed                      | 7.3 ms/step                                                 | 16.8 ms/step                                     | 120 ms/step                              |
-| Total time                 | 6 mins                                                      | 14 mins                                          | 190 mins                                 |
-| Checkpoint for Fine tuning | 445M (.ckpt file)                                           | 445M (.ckpt file)                                | 459M (.ckpt file)                        |
+| Loss                       | 0.01                                                        | 0.15                                             | 1.72                                     |
+| Speed                      | 7.2 ms/step                                                 | 7.4 ms/step                                     | 60.9 ms/step                              |
+| Total time                 | 6 mins                                                      | 6 mins                                          | 96 mins                                 |
+| Checkpoint for Fine tuning | 428M (.ckpt file)                                           | 428M (.ckpt file)                                | 459M (.ckpt file)                        |
 | Scripts                    | [AlexNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) | [AlexNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) | [AlexNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) |
 
 ## [Description of Random Situation](#contents)
