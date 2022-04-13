@@ -70,6 +70,7 @@ TinyBERT模型的主干结构是转换器，转换器包含四个编码器模块
     - 使用Ascend或GPU处理器准备硬件环境。
 - 框架
     - [MindSpore](https://gitee.com/mindspore/mindspore)
+    - scipy>=1.7
 - 更多关于Mindspore的信息，请查看以下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
@@ -105,7 +106,7 @@ TinyBERT模型的主干结构是转换器，转换器包含四个编码器模块
     详情参见如下链接：
     https:gitee.com/mindspore/models/tree/master/utils/hccl_tools.
 
-    如需设置数据集格式和参数，请创建JSON格式的视图配置文件，详见[TFRecord](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/dataset_loading.html#tfrecord) 格式。
+    如需设置数据集格式和参数，请创建JSON格式的视图配置文件，详见[TFRecord](https://www.mindspore.cn/docs/zh-CN/master/api_python/dataset/mindspore.dataset.TFRecordDataset.html) 格式。
 
     ```text
     For general task, schema file contains ["input_ids", "input_mask", "segment_ids"].
@@ -622,6 +623,8 @@ run_standaloned_td.sh脚本中设置了do_shuffle来轮换数据集。
 gd_config.yaml和td_config/*.yaml文件中设置了hidden_dropout_prob和attention_pros_dropout_prob，使网点随机失活。
 
 run_general_distill.py文件中设置了随机种子，确保分布式训练初始权重相同。
+
+若结果精度不达标，可能原因为使用的scipy版本低于1.7
 
 # ModelZoo主页
 

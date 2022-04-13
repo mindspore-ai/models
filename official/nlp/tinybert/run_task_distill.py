@@ -410,8 +410,7 @@ def run_main():
         if lists:
             lists.sort(key=lambda fn: os.path.getmtime(td_phase1_save_ckpt_dir + '/' + fn))
             name_ext = os.path.splitext(lists[-1])
-            if name_ext[-1] != ".ckpt":
-                raise ValueError("Invalid file, checkpoint file should be .ckpt file")
+            assert name_ext[-1] == ".ckpt", "Invalid file, checkpoint file should be .ckpt file"
             newest_ckpt_file = os.path.join(td_phase1_save_ckpt_dir, lists[-1])
             # run task distill
             run_task_distill(newest_ckpt_file)
