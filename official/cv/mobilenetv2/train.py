@@ -96,7 +96,8 @@ def train_mobilenetv2():
             model = ms.Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale,
                              metrics=metrics, eval_network=dist_eval_network,
                              amp_level="O2", keep_batchnorm_fp32=False,
-                             boost_level=config.boost_mode)
+                             boost_level=config.boost_mode,
+                             boost_config_dict={"grad_freeze": {"total_steps": epoch_size * step_size}})
 
         else:
             opt = nn.Momentum(net.trainable_params(), lr, config.momentum, config.weight_decay)
