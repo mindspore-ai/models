@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +13,34 @@
 # limitations under the License.
 # ============================================================================
 """Dnet define"""
+from mindspore import context
+from mindspore import dtype as mstype
 from mindspore import ops, nn
-import mindspore
+
 from src.customer_layer import EqualizedConv2d, EqualizedLinear, num_flat_features
+
+
+class CustomMaxPool2x2(nn.Cell):
+    """CustomMaxPool2x2"""
+
+    def __init__(self):
+        super().__init__()
+        self.kernel_size = 2
+        self.stride = 2
+        self.max_op = ops.ReduceMax()
+
+    def construct(self, x):
+        """CustomMaxPool2x2
+
+        Returns:
+            output.
+        """
+        shape = x.shape
+        batch, channel, height, width = shape
+        x_reshaped = x.reshape((batch, channel, height // 2, 2, width // 2, 2))
+        x_pooled = self.max_op(x_reshaped, 5)
+        x_pooled = self.max_op(x_pooled, 3)
+        return x_pooled
 
 
 class DNet4_4_Train(nn.Cell):
@@ -28,7 +53,7 @@ class DNet4_4_Train(nn.Cell):
                  dimInput=3):
         super(DNet4_4_Train, self).__init__()
         self.dimInput = dimInput
-        self.depthScale0 = depthScale0  # 512
+        self.depthScale0 = depthScale0
         self.fromRGBLayers = EqualizedConv2d(dimInput, depthScale0, 1, padding=0, pad_mode="same", has_bias=True)
         self.dimEntryScale0 = depthScale0
         self.groupScale0 = EqualizedConv2d(self.dimEntryScale0, depthScale0, 3, padding=1, pad_mode="pad",
@@ -104,7 +129,12 @@ class DNetNext_Train(nn.Cell):
         self.groupScale0 = EqualizedConv2d(depthNewScale, depthNewScale, 3, padding=1, pad_mode="pad", has_bias=True)
         self.groupScale1 = EqualizedConv2d(depthNewScale, depthLastScale, 3, padding=1, pad_mode="pad", has_bias=True)
         self.leakyRelu = nn.LeakyReLU(leakyReluLeak)
-        self.avgPool2d = ops.MaxPool(kernel_size=2, strides=2)
+        if context.get_context('device_target') != "GPU":
+            self.avgPool2d = ops.MaxPool(kernel_size=2, strides=2)
+        else:
+            # GPU does not support the second derivative for MaxPool (MaxPoolGradGrad).
+            # Thus, we use our custom implementation based on the transpose and ReduceMax operations.
+            self.avgPool2d = CustomMaxPool2x2()
         self.cast = ops.Cast()
 
     def construct(self, x, alpha=0):
@@ -113,14 +143,14 @@ class DNetNext_Train(nn.Cell):
         Returns:
             output.
         """
-        mid = self.cast(x, mindspore.float16)
+        mid = self.cast(x, mstype.float16)
         y = self.avgPool2d(mid)
-        y = self.cast(y, mindspore.float32)
+        y = self.cast(y, mstype.float32)
         y = self.leakyRelu(self.last_fromRGBLayers(y))
         x = self.leakyRelu(self.fromRGBLayers(x))
         x = self.leakyRelu(self.groupScale0(x))
         x = self.leakyRelu(self.groupScale1(x))
-        x = self.cast(x, mindspore.float16)
+        x = self.cast(x, mstype.float16)
         x = self.avgPool2d(x)
         x = alpha * y + (1 - alpha) * x
         out = self.last_Dnet(x)
@@ -140,7 +170,12 @@ class DNetNext_Last(nn.Cell):
         self.groupScale0 = dNetNext_Train.groupScale0
         self.groupScale1 = dNetNext_Train.groupScale1
         self.leakyRelu = dNetNext_Train.leakyRelu
-        self.avgPool2d = ops.MaxPool(kernel_size=2, strides=2)
+        if context.get_context('device_target') != "GPU":
+            self.avgPool2d = ops.MaxPool(kernel_size=2, strides=2)
+        else:
+            # GPU does not support the second derivative for MaxPool (MaxPoolGradGrad).
+            # Thus, we use our custom implementation based on the transpose and ReduceMax operations.
+            self.avgPool2d = CustomMaxPool2x2()
         self.cast = ops.Cast()
 
     def construct(self, x):
@@ -151,8 +186,8 @@ class DNetNext_Last(nn.Cell):
         """
         x = self.leakyRelu(self.groupScale0(x))
         x = self.leakyRelu(self.groupScale1(x))
-        x = self.cast(x, mindspore.float16)
+        x = self.cast(x, mstype.float16)
         x = self.avgPool2d(x)
-        x = self.cast(x, mindspore.float32)
+        x = self.cast(x, mstype.float32)
         out = self.last_Dnet(x)
         return out

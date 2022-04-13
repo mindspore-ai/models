@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,12 +24,11 @@ from src.network_G import GNet4_4_Train, GNet4_4_last, GNetNext_Train, GNetNext_
 def preLauch():
     """parse the console argument"""
     parser = argparse.ArgumentParser(description='MindSpore PGAN training')
-    parser.add_argument('--device_id', type=int, default=0,
-                        help='device id of Ascend (Default: 0)')
-    parser.add_argument('--checkpoint_g', type=str,
-                        default='ckpt', help='checkpoint dir of PGAN')
+    parser.add_argument('--device_id', type=int, default=0, help='device id of Ascend (Default: 0)')
+    parser.add_argument('--device_target', type=str, required=True, choices=['Ascend', 'GPU'], help='Device target')
+    parser.add_argument('--checkpoint_g', type=str, default='ckpt', help='checkpoint dir of PGAN')
     args = parser.parse_args()
-    context.set_context(device_id=args.device_id, mode=context.GRAPH_MODE, device_target="Ascend")
+    context.set_context(device_id=args.device_id, mode=context.GRAPH_MODE, device_target=args.device_target)
     return args
 
 
