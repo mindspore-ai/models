@@ -220,7 +220,7 @@ def run_train():
                     time_now = time.time()
                     print('batch_i:{} alpha:{} loss G:{} loss D:{} overflow:{}'.format(i_batch, alpha,
                                                                                        lossG, lossD, overflow))
-                    print("per step time is ", (time_now - time_stamp)/100, "ms")
+                    print("per step time is ", (time_now - time_stamp)/100, "s")
                     time_stamp = time_now
                 if (i_batch + 1) % cfg.model_save_step == 0:
                     save_checkpoint_g(avg_gnet, gnet, dnet, this_scale_checkpoint, i_batch)
