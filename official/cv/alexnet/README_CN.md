@@ -336,18 +336,18 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 
 | 参数 | Ascend | GPU | Ascend-8P |
 | -------------------------- | -------------------------- | -------------------------- | -------------------------- |
-| 资源 | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 | NV SMX2 V100-32G |  Ascend 910 * 8；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 |
-| 上传日期 | 2021-07-05 | 2020-09-17 | 2021-09-23 |
-| MindSpore版本 | 1.2.1 | 1.2.1 | 1.5.0-rc1 |
+| 资源 | Ascend 910；ARM CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 | Tesla V100-PCIE-32GB; X86_64 CPU Xeon 8180 2.50GHz; 112核 |  Ascend 910 * 8；ARM CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 |
+| 上传日期 | 2022-04-14 | 2022-04-14 | 2022-04-14 |
+| MindSpore版本 | 1.7.0 | 1.7.0 | 1.7.0 |
 | 数据集 | CIFAR-10 | CIFAR-10 | Imagenet2012 |
-| 训练参数 | epoch=30, step=1562, batch_size=32, lr=0.002 | epoch=30, step=1562, batch_size=32, lr=0.002 | epoch=150, step=625, batch_size=256*8, lr=0.01 |
+| 训练参数 | epoch=30, step=1562, batch_size=32, lr=0.01 | epoch=30, step=1562, batch_size=32, lr=0.002 | epoch=150, step=625, batch_size=256*8, lr=0.01 |
 | 优化器 | Momentum | Momentum | Momentum |
 | 损失函数 | Softmax交叉熵 | Softmax交叉熵 | Softmax交叉熵 |
 | 输出 | 概率 | 概率 | 概率 |
-| 损失 | 0.0016 | 0.01 | 1.65
-| 速度 | 7毫秒/步 | 16.8毫秒/步 | 120毫秒/步 |
-| 总时间 | 6分钟 | 14分钟| 190分钟 |
-| 微调检查点 | 445M （.ckpt文件） | 445M （.ckpt文件） | 459M （.ckpt文件）|
+| 损失 | 0.01 | 0.15 | 1.72
+| 速度 | 7.2毫秒/步 | 7.4毫秒/步 | 60.9毫秒/步 |
+| 总时间 | 6分钟 | 6分钟| 96分钟 |
+| 微调检查点 | 428M （.ckpt文件） | 428M （.ckpt文件） | 459M （.ckpt文件）|
 | 脚本 | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) |
 
 ## 随机情况说明

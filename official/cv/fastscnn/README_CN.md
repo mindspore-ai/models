@@ -345,7 +345,7 @@ FastSCNN on “Cityscapes ”
 | Loss Function              | MixSoftmaxCrossEntropyLoss                                   |
 | outputs                    | image with segmentation mask                                 |
 | Loss                       | 0.4                                                          |
-| Accuracy                   | 55.48%                                                       |
+| Accuracy                   | 54.84%                                                       |
 | Total time                 | 8p：8h20m                                                    |
 | Checkpoint for Fine tuning | 8p: 14.51MB(.ckpt file)                                      |
 | Scripts                    | [FastSCNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/fastscnn) |
