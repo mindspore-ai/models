@@ -143,3 +143,7 @@
 "models/official/audio/lpcnet/ascend310_infer/src/main.cc" "build/include_subdir"
 
 "models/official/cv/simclr/infer/mxbase/SimCLRClassifyOpencv.h"                 "runtime/references"
+
+"models/research/recommend/mmoe/infer/mxbase/src/main.cpp"  "runtime/references"
+"models/research/recommend/mmoe/infer/mxbase/src/Vgg19Classify.h"  "runtime/references"
+"models/research/recommend/mmoe/infer/mxbase/src/Vgg19Classify.cpp"  "runtime/references"
