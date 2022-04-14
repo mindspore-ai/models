@@ -47,10 +47,10 @@ set_seed(1)
 
 if __name__ == '__main__':
     model_config = ModelConfig()
-    device_id = 0
-    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=device_id)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
     if args.device_target == "Ascend":
         device_id = int(os.getenv('DEVICE_ID', '0'))
+        context.set_context(device_id=device_id)
     if rank_size == 1 or args.device_target == "CPU":
         rank_id = 0
     elif rank_size > 1:
