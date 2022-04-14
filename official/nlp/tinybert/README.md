@@ -65,6 +65,7 @@ The backbone structure of TinyBERT is transformer, the transformer contains four
     - Prepare hardware environment with Ascend or GPU processor.
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
+    - scipy>=1.7
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
@@ -100,7 +101,7 @@ The backbone structure of TinyBERT is transformer, the transformer contains four
     Please follow the instructions in the link below:
     https:gitee.com/mindspore/models/tree/master/utils/hccl_tools.
 
-    For dataset, if you want to set the format and parameters, a schema configuration file with JSON format needs to be created, please refer to [tfrecord](https://www.mindspore.cn/docs/programming_guide/en/master/dataset_loading.html#tfrecord) format.
+    For dataset, if you want to set the format and parameters, a schema configuration file with JSON format needs to be created, please refer to [tfrecord](https://www.mindspore.cn/docs/en/master/api_python/dataset/mindspore.dataset.TFRecordDataset.html) format.
 
     ```text
     For general task, schema file contains ["input_ids", "input_mask", "segment_ids"].
@@ -626,6 +627,8 @@ In run_standaloned_td.sh, we set do_shuffle to shuffle the dataset.
 In gd_config.yaml and td_config/*.yaml, we set the hidden_dropout_prob and attention_pros_dropout_prob to dropout some network node.
 
 In run_general_distill.py, we set the random seed to make sure distribute training has the same init weight.
+
+If accuracy < standard, may be scipy version < 1.7.
 
 # [ModelZoo Homepage](#contents)
 
