@@ -149,13 +149,47 @@ CelebFaces Attributes Dataset (CelebA) 是一个大规模的人脸属性数据�
 - 在Ascend环境下生成图片
   用户生成64张人脸图片
 
-  评估时选择已经生成好的检查点文件，作为参数传入测试脚本，对应参数为`checkpoint_g`(保存了生成器的checkpoint)
+  评估时选择已经生成好的检查点文件，作为参数传入测试脚本，对应参数为`checkpoint_g`(保存了生成器的checkpoint)。请指定“AvG**.ckpt”进行推理。
 
   ```bash
   bash run_eval.sh /path/checkpoint 0
   ```
 
   测试脚本执行完成后，用户进入当前目录下的`img_eval/`下查看生成的人脸图片。
+  默认推理配置为scale=128，如推理scale=64规格的图片，请将eval.py中的设置更改为
+
+  ```bash
+  scales = [4, 8, 16, 32, 64]
+  depth = [512, 512, 512, 512, 256]
+  ```
+
+  如推理scale=32规格的图片，请将eval.py中的设置更改为
+
+  ```bash
+  scales = [4, 8, 16, 32]
+  depth = [512, 512, 512, 512]
+  ```
+
+  如推理scale=16规格的图片，请将eval.py中的设置更改为
+
+  ```bash
+  scales = [4, 8, 16]
+  depth = [512, 512, 512]
+  ```
+
+  如推理scale=8规格的图片，请将eval.py中的设置更改为
+
+  ```bash
+  scales = [4, 8]
+  depth = [512, 512]
+  ```
+
+  如推理scale=4规格的图片，请将eval.py中的设置更改为
+
+  ```bash
+  scales = [4]
+  depth = [512]
+  ```
 
 ## 推理过程
 
@@ -165,7 +199,7 @@ CelebFaces Attributes Dataset (CelebA) 是一个大规模的人脸属性数据�
 python export.py --checkpoint_g [GENERATOR_CKPT_NAME] --device_id [DEVICE_ID]
 ```
 
-脚本会在当前目录下生成对应的MINDIR文件。
+默认使用scale=128生成的ckpt文件进行导出，脚本会在当前目录下生成对应的MINDIR文件。
 
 ### 在Ascend310执行推理
 
