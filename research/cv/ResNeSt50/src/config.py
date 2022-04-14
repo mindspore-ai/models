@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ from easydict import EasyDict as ed
 
 config_train = ed({
     "net_name": "resnest50",
-    "root": "/mass_data/imagenet/imagenet/",
+    "root": "/data1/datasets/imagenet/",
     "base_size": 224,
     "crop_size": 224,
     "num_classes": 1000,
@@ -28,7 +28,7 @@ config_train = ed({
     "final_drop": 1.0,
     "epochs": 270,
     "start_epoch": 0,
-    "num_workers": 64,
+    "num_workers": 50,
 
     "lr": 0.025,
     "steps_per_epoch": 1,

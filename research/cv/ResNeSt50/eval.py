@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -91,7 +91,7 @@ def Parse(args=None):
     parser.add_argument('--device_target', type=str, default="Ascend", choices=['Ascend', 'GPU'],
                         help='device where the code will be implemented (default: Ascend)')
 
-    parser.add_argument('--resume_path', type=str, default="./output/ckpt_0/resnest50-270_2502.ckpt",
+    parser.add_argument('--pretrained_ckpt_path', type=str, default="./output/ckpt_0/resnest50-270_2502.ckpt",
                         help='put the path to resuming file if needed')
     parser.add_argument('--run_distribute', type=bool, default=False, help='Run distribute')
     args = parser.parse_args()
@@ -157,15 +157,13 @@ def test():
 
     # initialize model
     args.logger.important_info('start create network')
-    net = get_network(config.net_name, True, args.resume_path)
+    net = get_network(config.net_name, True, args.pretrained_ckpt_path)
 
     img_tot = 0
     top1_correct = 0
     top5_correct = 0
     if target == "Ascend":
         net.to_float(mstype.float16)
-    else:
-        auto_mixed_precision(net)
     net.set_train(False)
     t_end = time.time()
     it_name = 0
@@ -190,7 +188,7 @@ def test():
         fps = (img_tot - config.batch_size) * config.group_size / time_used
         args.logger.info('Inference Performance: {:.2f} img/sec'.format(fps))
 
-    results = get_result(args, args.resume_path, top1_correct, top5_correct, img_tot)
+    results = get_result(args, args.pretrained_ckpt_path, top1_correct, top5_correct, img_tot)
     top1_correct = results[0, 0]
     top5_correct = results[1, 0]
     img_tot = results[2, 0]

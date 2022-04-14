@@ -18,7 +18,6 @@ from mindspore.common import initializer as init
 from mindspore import nn
 from mindspore.ops import operations as P
 from mindspore.train.serialization import load_param_into_net
-
 from src.models.splat import SplAtConv2d
 from src.models.utils import Resume
 
