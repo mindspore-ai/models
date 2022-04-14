@@ -309,7 +309,7 @@ After processing, the mindrecord file of training and reasoning is generated in 
 
 ### Finetune Training Process
 
-- Set options in `src/config.py`, including loss_scale, learning rate and network hyperparameters. Click [here](https://www.mindspore.cn/docs/programming_guide/en/master/dataset_sample.html) for more information about dataset.
+- Set options in `src/config.py`, including loss_scale, learning rate and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
 
 - Run `run_distribute_train_ascend_single_machine.sh` for distributed and single machine training of CPM model.
 

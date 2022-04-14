@@ -287,7 +287,7 @@ bash run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [RANK_TABL
 bash run_single_train.sh [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
 ```
 
-> Note: RANK_TABLE_FILE related reference materials see in this [link](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_ascend.html), for details on how to get device_ip check this [link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+> Note: RANK_TABLE_FILE related reference materials see in this [link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html), for details on how to get device_ip check this [link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
 - GPU
 

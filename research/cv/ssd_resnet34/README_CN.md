@@ -169,7 +169,7 @@ sh scripts/run_eval.sh [DEVICE_ID] [DATASET] [DATASET_PATH] [CHECKPOINT_PATH] [M
 
 ## 训练过程
 
-运行`train.py`训练模型。如果`mindrecord_dir`为空，则会通过`coco_root`（coco数据集）或`image_dir`和`anno_path`（自己的数据集）生成[MindRecord](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/convert_dataset.html)文件。**注意，如果mindrecord_dir不为空，将使用mindrecord_dir代替原始图像。**
+运行`train.py`训练模型。如果`mindrecord_dir`为空，则会通过`coco_root`（coco数据集）或`image_dir`和`anno_path`（自己的数据集）生成[MindRecord](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/dataset/record.html)文件。**注意，如果mindrecord_dir不为空，将使用mindrecord_dir代替原始图像。**
 
 ### Ascend上训练
 

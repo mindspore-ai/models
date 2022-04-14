@@ -133,7 +133,7 @@ Usage: bash run_standalone_train_ascend.sh [DATA_URL] [TRAIN_URL]
 
 ## [Training Process](#contents)
 
-- Set options in `config.py`, including learning rate, output filename and network hyperparameters. Click [here](https://www.mindspore.cn/docs/programming_guide/en/master/dataset_sample.html) for more information about dataset.
+- Set options in `config.py`, including learning rate, output filename and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
 - Get ResNet50 pretrained model from [Mindspore Hub](https://www.mindspore.cn/resources/hub/details?MindSpore/ascend/v1.2/resnet50_v1.2_imagenet2012)
 
 ### [Training](#content)
