@@ -100,10 +100,10 @@ bash scripts/run_standalone_train.sh [DEVICE_ID] [DATASET_PATH] [PRETRAINED_CKPT
 ```default_config.yaml
 Major parameters in default_config.yaml as follows:
 
---data_root_train: The path to the raw training data images for conversion to mindrecord script.
---data_root_test: The path to the raw test data images for conversion to mindrecord script.
---test_annotation_file: The path to the raw training annotation file.
---train_annotation_file: The path to the raw test annotation file.
+--data_root: The path to the raw training data images for conversion to mindrecord script.
+--val_data_root: The path to the raw test data images for conversion to mindrecord script.
+--annotation_file: The path to the raw training annotation file.
+--val_annotation_file: The path to the raw test annotation file.
 --mindrecord_dir: The path to which create_mindrecord.py uses to save the resulting mindrecords for training and testing.
 --epoch_size: Total training epochs.
 --batch_size: Training batch size.
