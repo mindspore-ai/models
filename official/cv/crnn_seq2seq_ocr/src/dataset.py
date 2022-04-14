@@ -27,6 +27,9 @@ import mindspore.common.dtype as mstype
 from src.model_utils.config import config
 
 
+de.config.set_prefetch_size(512)
+
+
 class AugmentationOps():
     def __init__(self, min_area_ratio=0.8, aspect_ratio_range=(0.8, 1.2), brightness=32./255.,
                  contrast=0.5, saturation=0.5, hue=0.2, img_tile_shape=(150, 150)):
