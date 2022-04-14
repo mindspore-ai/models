@@ -208,7 +208,7 @@ bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [EXPERIMENT_LABEL]
 
 For distributed training, a hostfile configuration needs to be created in advance.
 
-Please follow the instructions in the link [GPU-Multi-Host](https://www.mindspore.cn/docs/programming_guide/en/master/distributed_training_gpu.html).
+Please follow the instructions in the link [GPU-Multi-Host](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_gpu.html).
 
 ##### Evaluation while training
 

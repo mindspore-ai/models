@@ -238,7 +238,7 @@ Parameters for both training and evaluation can be set in default_config.yaml.
 
 ## [Training Process](#contents)
 
-- Set options in `config.py`, including learning rate and other network hyperparameters. Click [MindSpore dataset preparation tutorial](https://www.mindspore.cn/docs/programming_guide/en/master/dataset_sample.html) for more information about dataset.
+- Set options in `config.py`, including learning rate and other network hyperparameters. Click [MindSpore dataset preparation tutorial](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
 
 ### [Training](#contents)
 

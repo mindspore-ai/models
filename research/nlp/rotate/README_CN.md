@@ -86,7 +86,7 @@ bash run_infer_310.sh [MINDIR_HEAD_PATH] [MINDIR_TAIL_PATH] [DATASET_PATH] [NEED
 
 在裸机环境（本地有Ascend 910 AI 处理器）进行分布式训练时，需要配置当前多卡环境的组网信息文件。
 请遵循一下链接中的说明创建json文件：
-<https://www.mindspore.cn/docs/programming_guide/zh-CN/master/distributed_training_ascend.html#配置分布式环境变量>
+<https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html#配置分布式环境变量>
 
 - GPU处理器环境运行
 

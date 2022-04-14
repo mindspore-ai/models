@@ -504,7 +504,7 @@ The above python command will run in the background. You can view the results th
 ### Inference
 
 If you need to use the trained model to perform inference on multiple hardware platforms, such as Ascend 910 or Ascend 310, you
-can refer to this [Link](https://www.mindspore.cn/docs/programming_guide/en/master/multi_platform_inference.html). Following
+can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/master/infer/inference.html). Following
 the steps below, this is a simple example:
 
 #### Running on Ascend 310

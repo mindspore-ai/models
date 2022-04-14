@@ -257,7 +257,7 @@ save_checkpoint_path: "./checkpoints"       # 检查点保存路径，相对于t
 
 ## 训练过程
 
-- 在`default_config.yaml`中设置选项，包括学习率和网络超参数。单击[MindSpore加载数据集教程](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/dataset_sample.html)，了解更多信息。
+- 在`default_config.yaml`中设置选项，包括学习率和网络超参数。单击[MindSpore加载数据集教程](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/dataset.html)，了解更多信息。
 
 ### 训练
 

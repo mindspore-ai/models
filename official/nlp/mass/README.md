@@ -501,7 +501,7 @@ subword-nmt
 rouge
 ```
 
-<https://www.mindspore.cn/docs/programming_guide/en/master/multi_platform_inference.html>
+<https://www.mindspore.cn/tutorials/experts/en/master/infer/inference.html>
 
 # Get started
 
@@ -563,7 +563,7 @@ Get the log and output files under the path `./train_mass_*/`, and the model fil
 
 ## Inference
 
-If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/docs/programming_guide/en/master/multi_platform_inference.html).
+If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/master/infer/inference.html).
 For inference, config the options in `default_config.yaml` firstly:
 
 - Assign the `default_config.yaml` under `data_path` node to the dataset path.

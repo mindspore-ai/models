@@ -209,8 +209,6 @@ Please follow the instructions in the link below to create an hccl.json file in 
 
 For distributed training among multiple machines, training command should be executed on each machine in a small time interval. Thus, an hccl.json is needed on each machine. [merge_hccl](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools#merge_hccl) is a tool to create hccl.json for multi-machine case.
 
-For dataset, if you want to set the format and parameters, a schema configuration file with JSON format needs to be created, please refer to [tfrecord](https://www.mindspore.cn/docs/programming_guide/en/master/dataset_loading.html#tfrecord) format.
-
 ```text
 For pretraining, schema file contains ["input_ids", "input_mask", "segment_ids", "next_sentence_labels", "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"].
 

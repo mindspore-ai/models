@@ -342,7 +342,7 @@ Parameters for learning rate:
 
 ## [Training Process](#contents)
 
-- Set options in `default_config.yaml`, including loss_scale, learning rate and network hyperparameters. Click [here](https://www.mindspore.cn/docs/programming_guide/en/master/dataset_sample.html) for more information about dataset.
+- Set options in `default_config.yaml`, including loss_scale, learning rate and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
 
 - Run `run_standalone_train.sh` for non-distributed training of Transformer model.
 
