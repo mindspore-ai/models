@@ -50,10 +50,17 @@ export DATA_PATH=$3
 export CKPT_PATH=$4
 echo "RANK_TABLE_FILE=${RANK_TABLE_FILE}"
 
+cpus=`cat /proc/cpuinfo| grep "processor"| wc -l`
+avg=`expr $cpus \/ $DEVICE_NUM`
+gap=`expr $avg \- 1`
+
 export SERVER_ID=0
 rank_start=$((DEVICE_NUM * SERVER_ID))
 for((i=0; i<${DEVICE_NUM}; i++))
 do
+    start=`expr $i \* $avg`
+    end=`expr $start \+ $gap`
+    cmdopt=$start"-"$end
     export DEVICE_ID=$i
     export RANK_ID=$((rank_start + i))
     rm -rf ./train_parallel$i
@@ -63,7 +70,7 @@ do
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     cd ./train_parallel$i ||exit
     env > env.log
-    python ../../train.py --config_path=$CONFIG_FILE --device_id=$i --dataset_name=$DATASET_NAME \
+    taskset -c $cmdopt python ../../train.py --config_path=$CONFIG_FILE --device_id=$i --dataset_name=$DATASET_NAME \
     --data_path=$DATA_PATH --ckpt_path=$CKPT_PATH > log 2>&1 &
     cd ..
 done
