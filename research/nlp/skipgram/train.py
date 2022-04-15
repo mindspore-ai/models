@@ -83,7 +83,7 @@ if __name__ == '__main__':
     config_ck = CheckpointConfig(save_checkpoint_steps=w2v_cfg.save_checkpoint_steps,
                                  keep_checkpoint_max=w2v_cfg.keep_checkpoint_max)
     ckpoint = ModelCheckpoint(prefix="w2v", directory=w2v_cfg.ckpt_dir, config=config_ck)
-    loss_monitor = LossMonitor(1000)
+    loss_monitor = LossMonitor(w2v_cfg.print_interval)
     time_monitor = TimeMonitor()
     total_step = dataset.get_dataset_size() * w2v_cfg.train_epoch
     print('Total Step:', total_step)
@@ -104,8 +104,12 @@ if __name__ == '__main__':
     print('Done.')
 
     print("Train Model...")
-    model.train(epoch=w2v_cfg.train_epoch, train_dataset=dataset,
-                callbacks=callbacks, dataset_sink_mode=w2v_cfg.dataset_sink_mode)
+    if w2v_cfg.dataset_sink_mode:
+        epoch_num = int(w2v_cfg.train_epoch * dataset.get_dataset_size() / w2v_cfg.print_interval)
+    else:
+        epoch_num = w2v_cfg.train_epoch
+    model.train(epoch=epoch_num, train_dataset=dataset,
+                callbacks=callbacks, dataset_sink_mode=w2v_cfg.dataset_sink_mode, sink_size=w2v_cfg.print_interval)
     print('Done.')
 
     print("Save Word2Vec Embedding...")

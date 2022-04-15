@@ -63,10 +63,32 @@ __
 └─text8
 ```
 
-- 下载好数据集后，通过如下命令处理并获得Mindrecord
+- 下载好数据集后，通过如下命令处理并获得Mindrecord，这个过程大概耗时5h。
 
 ```bash
 bash scripts/create_mindrecord.sh [TRAIN_DATA_DIR]
+```
+
+运行结束后，得到的mindrecord文件在./temp文件夹中，目录结构如下：
+
+```bash
+temp
+├──w2v_emb
+      ├──word2id.npy
+      └──id2word.npy
+└──ms_dir
+      ├──text5.mindrecord.db
+      ├──text5.mindrecord
+      ├──text4.mindrecord.db
+      ├──text4.mindrecord
+      ├──text3.mindrecord.db
+      ├──text3.mindrecord
+      ├──text2.mindrecord.db
+      ├──text2.mindrecord
+      ├──text1.mindrecord.db
+      ├──text1.mindrecord
+      ├──text0.mindrecord.db
+      └──text0.mindrecord
 ```
 
 ## 下游任务数据集
@@ -74,6 +96,12 @@ bash scripts/create_mindrecord.sh [TRAIN_DATA_DIR]
 - 使用的任务集：[questions-words.txt](https://code.google.com/archive/p/word2vec/source/default/source)
 
 - 数据格式：文本文件
+- 下载数据集。目录结构如下：
+
+```bash
+__
+└─questions-words.txt
+```
 
 # 环境要求
 
@@ -93,13 +121,13 @@ bash scripts/create_mindrecord.sh [TRAIN_DATA_DIR]
 
   ```Shell
   # 分布式训练
-  用法：bash run_distribute_train.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
+  用法：bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
 
   # 单机训练
-  用法：bash run_standalone_train.sh [DEVICE_TARGET] [TRAIN_DATA_DIR]
+  用法：bash scripts/run_standalone_train.sh [DEVICE_TARGET] [TRAIN_DATA_DIR]
 
   # 运行评估示例
-  用法：bash run_eval.sh [EVAL_DATA_DIR]
+  用法：bash scripts/run_eval.sh [EVAL_DATA_DIR]
   ```
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
@@ -143,6 +171,7 @@ data_epoch              # number of times to traverse the corpus
 power                   # decay rate of learning rate
 batch_size              # batch size
 dataset_sink_mode       # dataset sink mode
+print_interval          # the steps between prints of loss and time
 emb_size                # embedding size
 min_count               # keep vocabulary that have appeared at least 'min_count' times
 window_size             # window size of center word
@@ -165,22 +194,25 @@ eval_data_dir           # directory of evaluating corpus
 
   ```Shell
   # 单机训练
-  用法：bash run_standalone_train.sh [DEVICE_TARGET] [TRAIN_DATA_DIR]
+  用法：bash scripts/run_standalone_train.sh [DEVICE_TARGET] [TRAIN_DATA_DIR]
 
   # 运行评估示例
-  用法：bash run_eval.sh [CHECKPOINT_PATH] [ID2WORD_DICTIONARY] [EVAL_DATA_DIR]
+  用法：bash scripts/run_eval.sh [CHECKPOINT_PATH] [ID2WORD_DICTIONARY] [EVAL_DATA_DIR]
+  或者：bash scripts/run_eval.sh [EVAL_DATA_DIR]
   ```
 
-  训练检查点保存在config.py中指定的文件夹中。训练日志保存在工作区所在的文件夹下的train.log，内容如下所示。
+  训练日志保存在工作区所在的文件夹下的train.log，dataset_sink_mode = False日志内容如下所示：
 
-```Shell
-# 分布式训练结果（1P）
-epoch: 1 step: 1000, loss is 3.0921426
-epoch: 1 step: 2000, loss is 2.8683748
-epoch: 1 step: 3000, loss is 2.7949429
-...
+  ```text
+  # 分布式训练结果（1P）
+  epoch: 1 step: 1000, loss is 3.0921426
+  epoch: 1 step: 2000, loss is 2.8683748
+  epoch: 1 step: 3000, loss is 2.7949429
+  ...
 
-```
+  ```
+
+  训练检查点保存在config.py中指定的文件夹中，默认保存在./temp下的/ckpts文件夹中。
 
 - GPU处理器环境运行
 
@@ -197,13 +229,14 @@ epoch: 1 step: 3000, loss is 2.7949429
 
   ```Shell
   # 分布式训练
-  用法：bash run_distribute_train.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
+  用法：bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
 
   # 运行评估示例
-  用法：bash run_eval.sh [CHECKPOINT_PATH] [ID2WORD_DICTIONARY] [EVAL_DATA_DIR]
+  用法：bash scripts/run_eval.sh [CHECKPOINT_PATH] [ID2WORD_DICTIONARY] [EVAL_DATA_DIR]
+  或者：bash scripts/run_eval.sh [EVAL_DATA_DIR]
   ```
 
-  上述shell脚本将在后台运行分布训练。您可以通过train[X].log文件查看结果。采用以下方式达到损失值：
+  上述shell脚本将在后台运行分布训练。您可以通过train[X].log文件查看训练日志，dataset_sink_mode = False日志内容如下所示：
 
   ```text
   # 分布式训练结果（8P）
@@ -212,6 +245,25 @@ epoch: 1 step: 3000, loss is 2.7949429
   epoch: 1 step: 3000, loss is 2.5079641
   ...
   ```
+
+  dataset_sink_mode = True日志内容如下所示：
+
+  ```text
+  # 分布式训练结果（8P）
+  epoch: 2 step: 1000, loss is 2.5814912
+  epoch time: 8792.515 ms, per step time: 8.793 ms
+  epoch: 3 step: 1000, loss is 2.5152225
+  epoch time: 8795.622 ms, per step time: 8.796 ms
+  epoch: 4 step: 1000, loss is 2.5367362
+  epoch time: 8783.248 ms, per step time: 8.783 ms
+  epoch: 5 step: 1000, loss is 2.339932
+  epoch time: 8782.935 ms, per step time: 8.783 ms
+  ...
+
+  ```
+
+  打印间隔由print_interval参数控制，如想10个step打印一次，在config.py中更改print_interval=10即可。
+  训练检查点保存在config.py中指定的文件夹中，默认保存在./temp下的/ckpts文件夹中。
 
 ## 评估过程
 

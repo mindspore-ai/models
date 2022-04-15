@@ -32,7 +32,8 @@ class ConfigSkipgram:
     data_epoch = 10                    # generate data epoch
     power = 1                          # decay rate of learning rate
     batch_size = 128                   # batch size
-    dataset_sink_mode = False
+    dataset_sink_mode = True
+    print_interval = 1000
     emb_size = 288                     # embedding size
     min_count = 5                      # keep vocabulary that have appeared at least 'min_count' times
     window_size = 5                    # window size of center word
