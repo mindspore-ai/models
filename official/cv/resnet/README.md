@@ -216,7 +216,7 @@ If you want to run in modelarts, please check the official documentation of [mod
     ├── resnet34_imagenet2012_config.yaml
     ├── resnet34_imagenet2012_config_gpu.yaml
     ├── resnet50_cifar10_config.yaml
-    ├── resnet50_imagenet2012_Boost_config.yaml     # High performance version: The performance is improved by more than 10% and the precision decrease less than 1%
+    ├── resnet50_imagenet2012_Boost_config.yaml     # High performance version: The performance is improved by more than 10% and the precision decrease less than 1%, the current configuration file supports 8 pcs.
     ├── resnet50_imagenet2012_Ascend_Thor_config.yaml
     ├── resnet50_imagenet2012_config.yaml
     ├── resnet50_imagenet2012_GPU_Thor_config.yaml
