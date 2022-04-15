@@ -100,6 +100,7 @@ bash run_distribution_gpu.sh /data/omniglot_resized 8
         ├── scripts
         │   ├──run_distribution_ascend.sh         # launch ascend distributed training (8 pcs)
         │   ├──run_distribution_gpu.sh            # launch GPU distributed training (8 pcs)
+        │   ├──run_infer_310.sh                   # launch infer on Ascend310
         │   ├──run_standalone_eval_ascend.sh      # launch ascend evaluation
         │   ├──run_standalone_eval_gpu.sh         # launch gpu evaluation
         │   ├──run_standalone_train_ascend.sh     # launch ascend standalone training (1 pcs)
@@ -110,6 +111,12 @@ bash run_distribution_gpu.sh /data/omniglot_resized 8
         │   ├──lr_generator.py                    # generate lr
         │   ├──relationnet.py                     # relationnet architecture
         │   └──net_train.py                       # train model
+        ├── ascend310_infer                       # Source code for Ascend310 Infer
+            ├──inc
+                └──utils.h
+            └──src
+                ├──main.cc
+                └──utils.cc
         ├── train.py                              # training script
         ├── eval.py                               # evaluation script
         ├── export.py                             # export model
@@ -219,6 +226,21 @@ Average accuracy: 0.9925
 ```shell
 grep "Average accuracy:" eval.log
 Average accuracy: 0.9911
+```
+
+### Evaluation On Ascend310
+
+Enter ./scripts and execute run_infer_310.sh
+
+```shell
+bash run_infer_310.sh [path_to_mindir] [path_to_dataset_directory]
+```
+
+And we will get the result as followed
+
+```shell
+NN inference cost average time: 1.10642ms of infer_count 1000
+aver_accuracy: 0.9926
 ```
 
 ### [Export MindIR](#contents)
