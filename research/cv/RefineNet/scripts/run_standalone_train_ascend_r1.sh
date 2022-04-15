@@ -1,5 +1,5 @@
 #! /bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# -ne 3 ]
 then 
-    echo "Usage: sh run_standalone_train_ascend.sh [DATASET_PATH] [PRETRAINED_PATH] [DEVICE_ID]"
+    echo "Usage: bash scripts/run_standalone_train_ascend_r1.sh [DATASET_PATH] [PRETRAINED_PATH] [DEVICE_ID]"
 exit 1
 fi
 

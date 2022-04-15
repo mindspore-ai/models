@@ -1,5 +1,5 @@
 #! /bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 # ============================================================================
 if [ $# -ne 3 ]
 then 
-    echo "Usage: sh run_eval_ascend.sh [DATASET_PATH] [PRETRAINED_PATH] [DEVICE_ID]"
+    echo "Usage: bash scripts/run_standalone_train_gpu_r1.sh [DATASET_PATH] [PRETRAINED_PATH] [DEVICE_ID]"
 exit 1
 fi
 
@@ -49,7 +49,7 @@ export DEVICE_NUM=1
 export DEVICE_ID=$3
 export RANK_ID=0
 export RANK_SIZE=1
-LOCAL_DIR=eval$DEVICE_ID
+LOCAL_DIR=train$DEVICE_ID
 rm -rf $LOCAL_DIR
 mkdir $LOCAL_DIR
 cp ../*.py $LOCAL_DIR
@@ -58,6 +58,6 @@ cp -r ../src $LOCAL_DIR
 cd $LOCAL_DIR || exit
 echo "start training for device $DEVICE_ID"
 env > env.log
-python eval.py --data_lst=$DATASET_PATH --ckpt_path=$PRETRAINED_PATH --device_id=$DEVICE_ID --flip &> log &
+python train.py --data_file=$DATASET_PATH --ckpt_pre_trained=$PRETRAINED_PATH --device_id=$DEVICE_ID --base_lr=0.001 --batch_size=16 --device_target='GPU' &> log &
 cd ..
 

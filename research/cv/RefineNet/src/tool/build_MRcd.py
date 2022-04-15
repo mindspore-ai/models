@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ def parse_args():
     parser = argparse.ArgumentParser('mindrecord')
     parser.add_argument('--data_root', type=str, default='', help='root path of data')
     parser.add_argument('--data_lst', type=str, default='', help='list of data')
-    parser.add_argument('--dst_path', type=str, default='', help='save path of mindrecords')
+    parser.add_argument('--dst_path', type=str, default='', help='save path and the file name')
     parser.add_argument('--num_shards', type=int, default=8, help='number of shards')
     parser_args, _ = parser.parse_known_args()
     return parser_args

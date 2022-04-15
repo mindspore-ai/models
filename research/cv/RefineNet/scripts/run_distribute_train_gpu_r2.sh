@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 if [ $# -ne 3 ]
-then 
-    echo "Usage: bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATASET_PATH] [PRETRAINED_PATH]"
+then
+    echo "Usage: bash scripts/run_distribute_train_gpu_r1.sh [DATASET_PATH] [PRETRAINED_PATH] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]"
 exit 1
 fi
 
@@ -27,26 +27,17 @@ get_real_path(){
   fi
 }
 
-RANK_TABLE_PATH=$(get_real_path $1)
-echo $RANK_TABLE_PATH
-
-if [ ! -f $RANK_TABLE_PATH ]
-then 
-    echo "error: RANK_TABLE_FILE=$RANK_TABLE_PATH is not a file"
-exit 1
-fi
-
-DATASET_PATH=$2
+DATASET_PATH=$1
 if [ ! -f $DATASET_PATH ]
 then
     echo "error: DATASET_PATH=$DATASET_PATH is not a file"
 exit 1
 fi
 
-PRETRAINED_PATH=$(get_real_path $3)
+PRETRAINED_PATH=$(get_real_path $2)
 echo $PRETRAINED_PATH
 if [ ! -f $PRETRAINED_PATH ]
-then 
+then
     echo "error: PRETRAINED_PATH=$PRETRAINED_PATH is not a file"
 exit 1
 fi
@@ -54,21 +45,25 @@ fi
 ulimit -u unlimited
 export DEVICE_NUM=8
 export RANK_SIZE=8
-export RANK_TABLE_FILE=$RANK_TABLE_PATH
+export CUDA_VISIBLE_DEVICES="$3"
 
-for((i=0; i<${DEVICE_NUM}; i++))
-do
-    export DEVICE_ID=$i
-    export RANK_ID=$i
-    rm -rf ./train_parallel$i
-    mkdir ./train_parallel$i
-    cp ../*.py ./train_parallel$i
-    cp *.sh ./train_parallel$i
-    cp -r ../src ./train_parallel$i
-    cd ./train_parallel$i || exit
-    echo "start training for rank $RANK_ID, device $DEVICE_ID"
-    env > env.log
-    python train.py --device_id=$i --rank=$i --is_distribute --data_file=$DATASET_PATH --ckpt_pre_trained=$PRETRAINED_PATH --base_lr=0.0032 --batch_size=32 &> log &
-    cd ..
-done
+rm -rf ./train_parallel_r2
+mkdir ./train_parallel_r2
+cp ../*.py ./train_parallel_r2
+cp *.sh ./train_parallel_r2
+cp -r ../src ./train_parallel_r2
+cd ./train_parallel_r2 || exit
+echo "start training "
+env > env.log
 
+if [ $# == 3 ]
+then
+    mpirun --allow-run-as-root -n 8 \
+    python train.py  \
+    --is_distribute  \
+    --data_file=$DATASET_PATH  \
+    --ckpt_pre_trained=$PRETRAINED_PATH  \
+    --base_lr=0.00004  \
+    --batch_size=8  \
+    --device_target='GPU' &> log &
+fi
