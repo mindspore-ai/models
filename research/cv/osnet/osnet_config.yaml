@@ -35,6 +35,7 @@ save_checkpoint: True
 save_checkpoint_epochs: 10
 pretrained_dir: 'model_utils'
 run_distribute: False
+LogSummary: False
 
 # optimizer
 adam_beta1: 0.9

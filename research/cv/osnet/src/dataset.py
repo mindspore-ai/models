@@ -18,7 +18,7 @@
 import os
 import mindspore.dataset as ds
 from model_utils.transforms import build_train_transforms, build_test_transforms
-from .datasets_define import (Market1501, DukeMTMCreID, MSMT17, CUHK03)
+from .datasets_define import Market1501, DukeMTMCreID, MSMT17, CUHK03
 
 
 def init_dataset(name, **kwargs):

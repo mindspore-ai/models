@@ -179,4 +179,9 @@ def eval_net(net=None):
         i += 1
 
 if __name__ == '__main__':
+    if config.target == 'msmt17' or config.target == 'cuhk03 ':
+        config.dist_metric = 'cosine'
+    else:
+        config.dist_metric = 'euclidean'
+    print(config.dist_metric)
     eval_net()
