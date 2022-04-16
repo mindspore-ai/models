@@ -342,7 +342,8 @@ def train_net():
     else:
         model = Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale, metrics=metrics,
                       amp_level="O2", boost_level=config.boost_mode, keep_batchnorm_fp32=False,
-                      eval_network=dist_eval_network)
+                      eval_network=dist_eval_network,
+                      boost_config_dict={"grad_freeze": {"total_steps": config.epoch_size * step_size}})
 
     if config.optimizer == "Thor" and config.dataset == "imagenet2012":
         from src.lr_generator import get_thor_damping
