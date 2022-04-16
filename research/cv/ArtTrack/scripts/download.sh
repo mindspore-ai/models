@@ -51,6 +51,7 @@ function download_pretrained_resnet101() {
   cd $base_dir/out || exit
   $DOWNLOADER http://download.tensorflow.org/models/resnet_v1_101_2016_08_28.tar.gz
   tar xf resnet_v1_101_2016_08_28.tar.gz
+  $DOWNLOADER https://download.mindspore.cn/model_zoo/r1.3/resnet101_ascend_v130_imagenet2012_official_cv_bs32_top1acc78.55__top5acc94.34/resnet101_ascend_v130_imagenet2012_official_cv_bs32_top1acc78.55__top5acc94.34.ckpt
 }
 
 function download_dataset_coco() {

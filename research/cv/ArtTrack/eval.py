@@ -20,7 +20,10 @@ import mindspore as ms
 from mindspore import context as ctx
 import numpy as np
 from scipy import io as sio
+from tqdm import tqdm
+import cv2
 
+from config import check_config
 from src.args_util import command, create_arg_parser, TARGET_COCO_MULTI, TARGET_MPII_SINGLE
 from src.dataset.mpii import MPII
 from src.dataset.pose import Batch
@@ -50,6 +53,49 @@ def test(parser, args, cfg):
     else:
         parser.print_help()
 
+def reshape_image(cfg=None, batch=None):
+    """
+    reshape image
+    """
+    test_shape = (cfg.image_width, cfg.image_height)
+    img = batch[Batch.inputs].transpose([1, 2, 0])
+    img_shape = img.shape
+    ratio = (test_shape[0] / img_shape[1], test_shape[1] / img_shape[0])
+    img = cv2.resize(img, test_shape, interpolation=cv2.INTER_CUBIC)
+    return np.expand_dims(img.transpose([2, 0, 1]), axis=0), ratio
+
+def test_ascend(test_net, cfg=None):
+    """
+    entry for predicting single mpii
+    Args:
+        cfg: config
+        visual: if True, visualize prediction
+        cache: if True, cache score map
+        output: path to output
+    """
+    dataset = MPII(cfg)
+    dataset.set_mirror(False)
+
+    num_images = len(dataset)
+    predictions = np.zeros((num_images,), dtype=np.object)
+
+    for i in tqdm(range(num_images)):
+        batch = dataset.get_item(i)
+        img, ratio = reshape_image(cfg, batch)
+        o = test_net(ms.Tensor(img, dtype=ms.dtype.float32))
+        out = o[0].transpose([0, 2, 3, 1]).asnumpy()
+        locref = o[2].transpose([0, 2, 3, 1]).asnumpy() if (len(o) >= 3 and o[2] is not None) else None
+        pairwise_pred = o[1].transpose([0, 2, 3, 1]).asnumpy() if (len(o) >= 2 and o[1] is not None) else None
+        scmap, locref, _ = extract_cnn_output(out, locref, pairwise_pred, cfg)
+        pose = argmax_pose_predict(scmap, locref, cfg.stride)
+
+        pose_refscale = np.copy(pose)
+        pose_refscale[:, 0:2] /= cfg.global_scale
+        pose_refscale[:, 0] /= ratio[0]
+        pose_refscale[:, 1] /= ratio[1]
+        predictions[i] = pose_refscale
+
+    return predictions
 
 @process_cfg
 def predict_mpii(cfg=None, visual=False, cache=False, output=None):
@@ -122,10 +168,13 @@ def eval_mpii(cfg=None, prediction=None):
     eval mpii entry
     """
     dataset = MPII(cfg)
-    filename = prediction or cfg.output
-    pred = sio.loadmat(filename)
+    if prediction is None or isinstance(prediction, str):
+        filename = prediction or cfg.output
+        pred = sio.loadmat(filename)
 
-    joints = pred['joints']
+        joints = pred['joints']
+    else:
+        joints = np.array([prediction])
     pck_ratio_thresh = cfg.pck_threshold
 
     num_joints = cfg.num_joints
@@ -166,8 +215,20 @@ def eval_mpii(cfg=None, prediction=None):
 def main():
     parser = create_arg_parser()['eval']
     args = parser.parse_args(sys.argv[1:])
-    test(parser, args)
+    if args.device_target == 'Ascend':
+        cfg = check_config(args.config, args)
+        cfg.model_arts.IS_MODEL_ARTS = False
+        ms.context.set_context(**cfg.context)
+        net = PoseNet(cfg=cfg)
+        test_net = PoseNetTest(net, cfg)
+        ms.load_checkpoint(args.option[0], net=test_net)
+        print("Loading", args.option[0], "succeeded!")
 
+        cfg.train = False
+        predictions = test_ascend(test_net, cfg)
+        eval_mpii(cfg, predictions)
+    else:
+        test(parser, args)
 
 if __name__ == '__main__':
     main()

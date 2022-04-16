@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
-from .util import DATASET_TYPE_MPII_MR, DATASET_TYPE_MPII_RAW, DATASET_TYPE_COCO
-from .mpii import MPII
+echo "========================================================================"
+echo "Please run the script as: "
+echo "bash scripts/run_standalone_train.sh DEVICE_ID"
+echo "For example: bash scripts/run_standalone_train.sh 0"
+echo "It is better to use the absolute path."
+echo "========================================================================"
+export DEVICE_ID=$1
+echo "start training for device $DEVICE_ID"
+python -u train.py --device_target 'Ascend' --device_id ${DEVICE_ID} > train${DEVICE_ID}.log 2>&1 &
+tail -f train${DEVICE_ID}.log
+echo "finish"
