@@ -54,36 +54,6 @@ elif args_opt.dataset_type == "mindrecord":
     dataset_type = DataType.MINDRECORD
 else:
     raise Exception("dataset format is not supported yet")
-DEFAULT_NUM_LABELS = 2
-DEFAULT_SEQ_LENGTH = 128
-task_params = {"SST-2": {"num_labels": 2, "seq_length": 64},
-               "QNLI": {"num_labels": 2, "seq_length": 128},
-               "MNLI": {"num_labels": 3, "seq_length": 128},
-               "TNEWS": {"num_labels": 15, "seq_length": 128},
-               "CLUENER": {"num_labels": 43, "seq_length": 128}}
-
-
-class Task:
-    """
-    Encapsulation class of get the task parameter.
-    """
-    def __init__(self, task_name):
-        self.task_name = task_name
-
-    @property
-    def num_labels(self):
-        if self.task_name in task_params and "num_labels" in task_params[self.task_name]:
-            return task_params[self.task_name]["num_labels"]
-        return DEFAULT_NUM_LABELS
-
-    @property
-    def seq_length(self):
-        if self.task_name in task_params and "seq_length" in task_params[self.task_name]:
-            return task_params[self.task_name]["seq_length"]
-        return DEFAULT_SEQ_LENGTH
-
-
-task = Task(args_opt.task_name)
 
 
 def run_predistill():
@@ -96,7 +66,7 @@ def run_predistill():
     netwithloss = BertNetworkWithLoss_td(teacher_config=td_teacher_net_cfg, teacher_ckpt=load_teacher_checkpoint_path,
                                          student_config=td_student_net_cfg, student_ckpt=load_student_checkpoint_path,
                                          is_training=True, task_type=args_opt.task_type,
-                                         num_labels=task.num_labels, is_predistill=True)
+                                         num_labels=args_opt.num_labels, is_predistill=True)
 
     rank = 0
     device_num = 1
@@ -163,7 +133,7 @@ def run_task_distill(ckpt_file):
     netwithloss = BertNetworkWithLoss_td(teacher_config=td_teacher_net_cfg, teacher_ckpt=load_teacher_checkpoint_path,
                                          student_config=td_student_net_cfg, student_ckpt=load_student_checkpoint_path,
                                          is_training=True, task_type=args_opt.task_type,
-                                         num_labels=task.num_labels, is_predistill=False)
+                                         num_labels=args_opt.num_labels, is_predistill=False)
 
     rank = 0
     device_num = 1
@@ -251,9 +221,9 @@ def do_eval_standalone():
     if ckpt_file == '':
         raise ValueError("Student ckpt file should not be None")
     if args_opt.task_type == "classification":
-        eval_model = BertModelCLS(td_student_net_cfg, False, task.num_labels, 0.0, phase_type="student")
+        eval_model = BertModelCLS(td_student_net_cfg, False, args_opt.num_labels, 0.0, phase_type="student")
     elif args_opt.task_type == "ner":
-        eval_model = BertModelNER(td_student_net_cfg, False, task.num_labels, 0.0, phase_type="student")
+        eval_model = BertModelNER(td_student_net_cfg, False, args_opt.num_labels, 0.0, phase_type="student")
     else:
         raise ValueError(f"Not support the task type {args_opt.task_type}")
     param_dict = load_checkpoint(ckpt_file)
@@ -275,9 +245,9 @@ def do_eval_standalone():
     if args_opt.assessment_method == "accuracy":
         callback = Accuracy()
     elif args_opt.assessment_method == "bf1":
-        callback = F1(num_labels=task.num_labels)
+        callback = F1(num_labels=args_opt.num_labels)
     elif args_opt.assessment_method == "mf1":
-        callback = F1(num_labels=task.num_labels, mode="MultiLabel")
+        callback = F1(num_labels=args_opt.num_labels, mode="MultiLabel")
     else:
         raise ValueError("Assessment method not supported, support: [accuracy, f1]")
     columns_list = ["input_ids", "input_mask", "segment_ids", "label_ids"]
@@ -399,9 +369,6 @@ def run_main():
         td_student_net_cfg.dtype = mstype.float32
         td_student_net_cfg.compute_type = mstype.float32
         enable_loss_scale = False
-
-    td_teacher_net_cfg.seq_length = task.seq_length
-    td_student_net_cfg.seq_length = task.seq_length
 
     if args_opt.do_train == "true":
         # run predistill
