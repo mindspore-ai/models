@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,11 +23,10 @@ from src.mcnn import MCNN
 parser = argparse.ArgumentParser(description='MindSpore MNIST Example')
 parser.add_argument("--device_id", type=int, default=4, help="Device id")
 parser.add_argument("--batch_size", type=int, default=1, help="batch size")
-parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
-parser.add_argument("--image_height", type=int, required=True, help="Image height.")
-parser.add_argument("--image_width", type=int, required=True, help="Image width.")
+parser.add_argument("--input_size", type=int, default=1024, help="batch size")
+parser.add_argument("--ckpt_file", type=str, default="./train_output/best.ckpt", help="Checkpoint file path.")
 parser.add_argument("--file_name", type=str, default="mcnn", help="output file name.")
-parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="AIR", help="file format")
+parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
 parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"], default="Ascend",
                     help="device target")
 args = parser.parse_args()
@@ -45,5 +44,6 @@ if __name__ == "__main__":
     load_param_into_net(network, param_dict)
 
     # export network
-    inputs = Tensor(np.ones([args.batch_size, 1, args.image_height, args.image_width]), mindspore.float32)
+    inputs = Tensor(np.ones([args.batch_size, 1, args.input_size, args.input_size]), mindspore.float32)
+
     export(network, inputs, file_name=args.file_name, file_format=args.file_format)
