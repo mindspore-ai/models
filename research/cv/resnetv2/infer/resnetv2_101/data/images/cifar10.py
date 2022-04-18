@@ -59,11 +59,11 @@ def convert_test_data(file_dir):
         img = np.reshape(test_dict[b'data'][m], (3, 32, 32))
         img = np.transpose(img, (1, 2, 0))
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        img_name = '%s%s%s%s' % (loc_2, str(test_dict[b'labels'][m]), str(10000 + m), '.jpg')
+        img_name = '%s%s%s%s' % (loc_2, str(test_dict[b'labels'][m]), str(10000 + m), '.png')
         img_label = "%s%s.jpg" % (str(test_dict[b'labels'][m]), str(10000 + m))
         cv2.imwrite(img_name, img)
         with open("test_label.txt", "a") as f:
-            f.write(img_label + " " * 10 + str(test_dict[b'labels'][m]))
+            f.write(img_label + "\t" + str(test_dict[b'labels'][m]))
             f.write("\n")
     print("{} is done".format(test_data_name))
 

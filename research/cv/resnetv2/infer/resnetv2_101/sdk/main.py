@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     for file_name in file_list:
         file_path = os.path.join(dir_name, file_name)
-        if not (file_name.lower().endswith(".jpg")
+        if not (file_name.lower().endswith(".png")
                 or file_name.lower().endswith(".jpeg")):
             continue
 

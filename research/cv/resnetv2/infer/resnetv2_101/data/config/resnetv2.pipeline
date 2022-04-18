@@ -30,7 +30,7 @@
         "mxpi_tensorinfer0": {
             "props": {
                 "dataSource": "mxpi_imageresize0",
-                "modelPath": "../data/model/resnetv2.om",
+                "modelPath": "../convert/resnetv2_101.om",
                 "waitingTime": "1",
                 "outputDeviceId": "-1"
             },
@@ -42,7 +42,7 @@
                 "dataSource": "mxpi_tensorinfer0",
                 "postProcessConfigPath": "../data/config/resnetv2.cfg",
                 "labelPath": "../data/config/cifar10.names",
-                "postProcessLibPath": "/usr/local/sdk_home/mxManufacture/lib/modelpostprocessors/libresnet50postprocess.so"
+                "postProcessLibPath": "libresnet50postprocess.so"
             },
             "factory": "mxpi_classpostprocessor",
             "next": "mxpi_dataserialize0"
