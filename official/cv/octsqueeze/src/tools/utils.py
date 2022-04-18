@@ -29,6 +29,7 @@ def find_entropy(stream):
     return entropy(counts, base=2)
 
 def node_data2int(data):
+    value = data * np.array([1, 2, 4, 8, 16, 32, 64, 128])
     return np.sum(value)
 
 

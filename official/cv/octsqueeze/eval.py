@@ -100,8 +100,8 @@ def compression_decompression_simulation(dataset_path, precision_oct):
         time_sum = time_sum + time_cost
 
         # Write compressed file
-        with open(os.path.join(args.compression, frame), "wb") as bitout:
-            bitout = contextlib.closing(arithmetic_coding_base.BitOutputStream(bitout))
+        f_frame = open(os.path.join(args.compression, frame), "wb")
+        with contextlib.closing(arithmetic_coding_base.BitOutputStream(f_frame)) as bitout:
             enc = arithmetic_coding_base.ArithmeticEncoder(32, bitout)
 
             for node_idx in range(output.shape[0]):
@@ -114,6 +114,7 @@ def compression_decompression_simulation(dataset_path, precision_oct):
                 enc.write(frequencies, gt_occupancy)
 
             enc.finish()
+        f_frame.close()
         file_size = os.path.getsize(os.path.join(args.compression, frame)) * 8
 
         # occupancy stream in the compressed binary file
