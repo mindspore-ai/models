@@ -49,11 +49,10 @@ def test_net():
 
     # logger
     config.outputs_dir = os.path.join(config.save_dir, datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
-    dataset, _ = classification_dataset(config.batch_size, shuffle=False, repeat_num=1,
-                                        drop_remainder=False)
+    dataset, _ = classification_dataset(config.batch_size, 1, shuffle=True, repeat_num=1,
+                                        drop_remainder=True)
 
     batch_num = dataset.get_dataset_size()
-    config.steps_per_epoch = dataset.get_dataset_size()
 
     # network
     print('start create network')
