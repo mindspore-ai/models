@@ -20,6 +20,7 @@ import mindspore as ms
 import mindspore.dataset as ds
 from mindspore.communication.management import init, get_rank, get_group_size
 
+
 def create_dataset1(dataset_path, do_train, batch_size=32, train_image_size=224, eval_image_size=224,
                     target="Ascend", distribute=False, enable_cache=False, cache_session_id=None):
     """
@@ -81,6 +82,7 @@ def create_dataset1(dataset_path, do_train, batch_size=32, train_image_size=224,
     data_set = data_set.batch(batch_size, drop_remainder=True)
 
     return data_set
+
 
 def create_dataset2(dataset_path, do_train, batch_size=32, train_image_size=224, eval_image_size=224,
                     target="Ascend", distribute=False, enable_cache=False, cache_session_id=None):
@@ -154,6 +156,7 @@ def create_dataset2(dataset_path, do_train, batch_size=32, train_image_size=224,
 
     return data_set
 
+
 def create_dataset_pynative(dataset_path, do_train, batch_size=32, train_image_size=224,
                             eval_image_size=224, target="Ascend", distribute=False, enable_cache=False,
                             cache_session_id=None):
@@ -223,6 +226,7 @@ def create_dataset_pynative(dataset_path, do_train, batch_size=32, train_image_s
 
     return data_set
 
+
 def create_dataset3(dataset_path, do_train, batch_size=32, train_image_size=224, eval_image_size=224,
                     target="Ascend", distribute=False, enable_cache=False, cache_session_id=None):
     """
@@ -288,6 +292,7 @@ def create_dataset3(dataset_path, do_train, batch_size=32, train_image_size=224,
     data_set = data_set.batch(batch_size, drop_remainder=True)
 
     return data_set
+
 
 def create_dataset4(dataset_path, do_train, batch_size=32, train_image_size=224, eval_image_size=224,
                     target="Ascend", distribute=False, enable_cache=False, cache_session_id=None):
@@ -356,6 +361,7 @@ def create_dataset4(dataset_path, do_train, batch_size=32, train_image_size=224,
 
     return data_set
 
+
 def _get_rank_info(distribute):
     """
     get rank size and rank id
@@ -368,6 +374,7 @@ def _get_rank_info(distribute):
         rank_id = 0
         device_num = 1
     return device_num, rank_id
+
 
 def get_num_parallel_workers(num_parallel_workers):
     """

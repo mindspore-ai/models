@@ -17,8 +17,12 @@ import os
 import argparse
 import ast
 import moxing as mox
-
+import numpy as np
 import mindspore as ms
+import mindspore.nn as nn
+import mindspore.log as logger
+
+from mindspore import context
 from mindspore import Tensor
 from mindspore.nn.optim import Momentum, thor
 from mindspore.train.model import Model
@@ -27,16 +31,17 @@ from mindspore.train.train_thor import ConvertModelUtils
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
-from mindspore.communication.management import init, get_rank, get_group_size
+from mindspore.communication.management import init, get_group_size
 from mindspore.common import set_seed
 from mindspore.parallel import set_algo_parameters
-import mindspore.nn as nn
-import mindspore.log as logger
-from src.lr_generator import get_lr, warmup_cosine_annealing_lr, get_resnet34_lr
+
+from src.lr_generator import get_lr, warmup_cosine_annealing_lr
 from src.CrossEntropySmooth import CrossEntropySmooth
-from src.config import cfg
 from src.eval_callback import EvalCallBack
 from src.metric import DistAccuracy, ClassifyCorrectCell
+from src.resnet import resnet18 as resnet
+from src.dataset import create_dataset1 as create_dataset
+from modelarts.ResNet18.config import config
 
 
 parser = argparse.ArgumentParser(description='Image classification')
@@ -48,7 +53,7 @@ parser.add_argument('--data_url', type=str, default='',
 parser.add_argument('--net', type=str, default="resnet18",
                     help='Resnet Model, resnet18, resnet34, '
                          'resnet50 or resnet101')
-parser.add_argument('--dataset', type=str, default="imagenet2012",
+parser.add_argument('--dataset', type=str, default="cifar10",
                     help='Dataset, either cifar10 or imagenet2012')
 parser.add_argument('--run_distribute', type=ast.literal_eval, default=False,
                     help='Run distribute')
@@ -92,44 +97,18 @@ parser.add_argument("--epoch_size", type=int, default=1,
 parser.add_argument("--num_classes", type=int, default=1001,
                     help="number of dataset categories, default is 1001.")
 
+
 args_opt = parser.parse_args()
 
-CKPT_OUTPUT_PATH = "./"
+CKPT_OUTPUT_PATH = "./output"
 
 set_seed(1)
 
-if args_opt.net in ("resnet18", "resnet50"):
-    if args_opt.net == "resnet18":
-        from src.resnet import resnet18 as resnet
-    if args_opt.net == "resnet50":
-        from src.resnet import resnet50 as resnet
-    if args_opt.dataset == "cifar10":
-        from src.config import config1 as config
-        from src.dataset import create_dataset1 as create_dataset
-    else:
-        from src.config import config2 as config
-        if args_opt.mode == "GRAPH":
-            from src.dataset import create_dataset2 as create_dataset
-        else:
-            from src.dataset import create_dataset_pynative as create_dataset
-elif args_opt.net == "resnet34":
-    from src.resnet import resnet34 as resnet
-    from src.config import config_resnet34 as config
-    from src.dataset import create_dataset_resnet34 as create_dataset
-elif args_opt.net == "resnet101":
-    from src.resnet import resnet101 as resnet
-    from src.config import config3 as config
-    from src.dataset import create_dataset3 as create_dataset
-else:
-    from src.resnet import se_resnet50 as resnet
-    from src.config import config4 as config
-    from src.dataset import create_dataset4 as create_dataset
-
-if cfg.optimizer == "Thor":
+if config.optimizer == "Thor":
     if args_opt.device_target == "Ascend":
-        from src.config import config_thor_Ascend as config
+        from modelarts.ResNet18.config import config_thor_Ascend as config
     else:
-        from src.config import config_thor_gpu as config
+        from modelarts.ResNet18.config import config_thor_gpu as config
 
 
 def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
@@ -174,9 +153,9 @@ def _export_air(ckpt_dir):
     param_dict = ms.load_checkpoint(ckpt_file)
     ms.load_param_into_net(net, param_dict)
 
-    input_arr = ms.numpy.zeros([1, 3, 304, 304], ms.float32)
-
-    ms.export(net, input_arr, file_name="resnet", file_format="AIR")
+    input_arr = Tensor(np.zeros([1, 3, 304, 304]), ms.float32)
+    file_path = os.path.join(args_opt.train_url, "resnet")
+    ms.export(net, input_arr, file_name=file_path, file_format="AIR")
 
 
 def set_config():
@@ -186,44 +165,44 @@ def set_config():
 
 def init_context(target):
     if args_opt.mode == 'GRAPH':
-        ms.set_context(mode=ms.GRAPH_MODE, device_target=target,
-                       save_graphs=False)
+        context.set_context(mode=context.GRAPH_MODE, device_target=target,
+                            save_graphs=False)
         set_graph_kernel_context(target, args_opt.net)
     else:
-        ms.set_context(mode=ms.PYNATIVE_MODE, device_target=target,
-                       save_graphs=False)
+        context.set_context(mode=context.PYNATIVE_MODE, device_target=target,
+                            save_graphs=False)
     if args_opt.parameter_server:
-        ms.set_ps_context(enable_ps=True)
+        context.set_ps_context(enable_ps=True)
     if args_opt.run_distribute:
         if target == "Ascend":
             device_id = int(os.getenv('DEVICE_ID'))
-            ms.set_context(device_id=device_id)
-            ms.set_auto_parallel_context(
+            context.set_context(device_id=device_id)
+            context.set_auto_parallel_context(
                 device_num=args_opt.device_num,
                 parallel_mode=ParallelMode.DATA_PARALLEL,
                 gradients_mean=True)
             set_algo_parameters(elementwise_op_strategy_follow=True)
             if args_opt.net == "resnet50" or args_opt.net == "se-resnet50":
-                ms.set_auto_parallel_context(
+                context.set_auto_parallel_context(
                     all_reduce_fusion_config=[85, 160])
             elif args_opt.net == "resnet101":
-                ms.set_auto_parallel_context(
+                context.set_auto_parallel_context(
                     all_reduce_fusion_config=[80, 210, 313])
             init()
         # GPU target
         else:
             init()
-            ms.set_auto_parallel_context(
+            context.set_auto_parallel_context(
                 device_num=get_group_size(),
                 parallel_mode=ParallelMode.DATA_PARALLEL,
                 gradients_mean=True)
             if args_opt.net == "resnet50":
-                ms.set_auto_parallel_context(
+                context.set_auto_parallel_context(
                     all_reduce_fusion_config=[85, 160])
 
 
 def init_weight(net):
-    if os.path.exists(args_opt.pre_trained):
+    if args_opt.pre_trained:
         param_dict = ms.load_checkpoint(args_opt.pre_trained)
         if args_opt.filter_weight:
             filter_list = [x.name for x in net.end_point.get_parameters()]
@@ -244,7 +223,7 @@ def init_weight(net):
 
 
 def init_lr(step_size):
-    if cfg.optimizer == "Thor":
+    if config.optimizer == "Thor":
         from src.lr_generator import get_thor_lr
         lr = get_thor_lr(0, config.lr_init, config.lr_decay,
                          config.lr_end_epoch, step_size, decay_epochs=39)
@@ -260,13 +239,6 @@ def init_lr(step_size):
             lr = warmup_cosine_annealing_lr(
                 config.lr, step_size, config.warmup_epochs, config.epoch_size,
                 config.pretrain_epoch_size * step_size)
-    if args_opt.net == "resnet34":
-        lr = get_resnet34_lr(lr_init=config.lr_init,
-                             lr_end=config.lr_end,
-                             lr_max=config.lr_max,
-                             warmup_epochs=config.warmup_epochs,
-                             total_epochs=config.epoch_size,
-                             steps_per_epoch=step_size)
     return Tensor(lr)
 
 
@@ -352,14 +324,13 @@ def main():
 
     # init context
     init_context(target)
-    ckpt_save_dir = config.save_checkpoint_path + "ckpt_" + str(
-        get_rank()) + "/"
+    ckpt_save_dir = CKPT_OUTPUT_PATH
 
     # create dataset
     dataset = create_dataset(dataset_path=args_opt.dataset_path, do_train=True,
-                             repeat_num=1,
                              batch_size=config.batch_size, target=target,
                              distribute=args_opt.run_distribute)
+
     step_size = dataset.get_dataset_size()
 
     # define net
@@ -379,7 +350,7 @@ def main():
     # define model
     model, loss, loss_scale = define_model(net, opt, target)
 
-    if cfg.optimizer == "Thor" and args_opt.dataset == "imagenet2012":
+    if config.optimizer == "Thor" and args_opt.dataset == "imagenet2012":
         from src.lr_generator import get_thor_damping
         damping = get_thor_damping(0, config.damping_init, config.damping_decay,
                                    70, step_size)
@@ -419,16 +390,14 @@ def main():
                 dataset_sink_mode=dataset_sink_mode)
 
     if args_opt.run_eval and args_opt.enable_cache:
-        print(
-            "Remember to shut down the cache server via \"cache_admin --stop\"")
+        print("Remember to shut down the cache server via \"cache_admin --stop\"")
 
 
 if __name__ == '__main__':
-    # 将数据集拷贝到ModelArts指定读取的cache目录
+
     mox.file.copy_parallel(args_opt.data_url, '/cache')
     main()
-    # 训练完成后把生成的模型拷贝到指导输出目录
     if not os.path.exists(CKPT_OUTPUT_PATH):
-        os.makedirs(CKPT_OUTPUT_PATH, exist_ok=True)
+        os.makedirs(CKPT_OUTPUT_PATH)
     _export_air(CKPT_OUTPUT_PATH)
     mox.file.copy_parallel(CKPT_OUTPUT_PATH, args_opt.train_url)

@@ -45,7 +45,6 @@ then
 exit 1
 fi 
 
-ulimit -u unlimited
 export DEVICE_NUM=1
 export DEVICE_ID=0
 export RANK_SIZE=$DEVICE_NUM

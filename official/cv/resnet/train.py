@@ -32,6 +32,7 @@ from mindspore.common import set_seed
 from mindspore.parallel import set_algo_parameters
 import mindspore.nn as nn
 import mindspore.log as logger
+from mindspore import context
 
 from src.lr_generator import get_lr, warmup_cosine_annealing_lr
 from src.CrossEntropySmooth import CrossEntropySmooth
@@ -41,7 +42,6 @@ from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_rank_id, get_device_num
 from src.resnet import conv_variance_scaling_initializer
-
 
 set_seed(1)
 
@@ -73,6 +73,7 @@ class LossCallBack(LossMonitor):
             raise ValueError("epoch: {} step: {}. Invalid loss, terminating training.".format(
                 cb_params.cur_epoch_num, cur_step_in_epoch))
         if self._per_print_times != 0 and cb_params.cur_step_num % self._per_print_times == 0:
+            # pylint: disable=line-too-long
             print("epoch: %s step: %s, loss is %s" % (cb_params.cur_epoch_num + int(self.has_trained_epoch),
                                                       cur_step_in_epoch, loss), flush=True)
 
@@ -135,22 +136,22 @@ def set_parameter():
     if config.mode_name == 'GRAPH':
         if target == "Ascend":
             rank_save_graphs_path = os.path.join(config.save_graphs_path, "soma", str(os.getenv('DEVICE_ID')))
-            ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=config.save_graphs,
-                           save_graphs_path=rank_save_graphs_path)
+            context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=config.save_graphs,
+                                save_graphs_path=rank_save_graphs_path)
         else:
-            ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=config.save_graphs)
+            context.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=config.save_graphs)
         set_graph_kernel_context(target, config.net_name)
     else:
-        ms.set_context(mode=ms.PYNATIVE_MODE, device_target=target, save_graphs=False)
+        context.set_context(mode=ms.PYNATIVE_MODE, device_target=target, save_graphs=False)
 
     if config.parameter_server:
         ms.set_ps_context(enable_ps=True)
     if config.run_distribute:
         if target == "Ascend":
             device_id = int(os.getenv('DEVICE_ID'))
-            ms.set_context(device_id=device_id)
-            ms.set_auto_parallel_context(device_num=config.device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                         gradients_mean=True)
+            context.set_context(device_id=device_id)
+            context.set_auto_parallel_context(device_num=config.device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
             set_algo_parameters(elementwise_op_strategy_follow=True)
             if config.net_name == "resnet50" or config.net_name == "se-resnet50":
                 if config.boost_mode not in ["O1", "O2"]:

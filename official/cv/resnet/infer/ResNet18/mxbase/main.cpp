@@ -19,7 +19,7 @@
 #include "MxBase/Log/Log.h"
 
 namespace {
-const uint32_t CLASS_NUM = 1001;
+const uint32_t CLASS_NUM = 10;
 }
 
 APP_ERROR ReadFilesFromPath(const std::string &path, std::vector<std::string> *files) {
@@ -52,11 +52,11 @@ int main(int argc, char* argv[]) {
     InitParam initParam = {};
     initParam.deviceId = 0;
     initParam.classNum = CLASS_NUM;
-    initParam.labelPath = "../data/config/imagenet1000_clsidx_to_labels.names";
+    initParam.labelPath = "../data/config/cifar10.names";
     initParam.topk = 5;
     initParam.softmax = false;
     initParam.checkTensor = true;
-    initParam.modelPath = "../data/model/resnet18-304_304.om";
+    initParam.modelPath = "../convert/resnet18.om";
     auto resnet18 = std::make_shared<Resnet18ClassifyOpencv>();
     APP_ERROR ret = resnet18->Init(initParam);
     if (ret != APP_ERR_OK) {

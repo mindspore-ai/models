@@ -19,16 +19,20 @@ python export.py
 import os
 
 import mindspore as ms
+from mindspore import context, Tensor
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
+import numpy as np
 
-ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target)
+context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
 if config.device_target != "GPU":
-    ms.set_context(device_id=config.device_id)
+    context.set_context(device_id=config.device_id)
+
 
 def modelarts_pre_process():
-    '''modelarts pre process function.'''
+    # modelarts pre process function.
     config.file_name = os.path.join(config.output_path, config.file_name)
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_export():
@@ -54,10 +58,8 @@ def run_export():
 
     param_dict = ms.load_checkpoint(config.checkpoint_file_path)
     ms.load_param_into_net(net, param_dict)
-
-    input_arr = ms.numpy.zeros([config.batch_size, 3, config.height, config.width], ms.float32)
+    input_arr = Tensor(np.zeros([config.batch_size, 3, config.height, config.width]), ms.float32)
     ms.export(net, input_arr, file_name=config.file_name, file_format=config.file_format)
-
 
 if __name__ == '__main__':
     run_export()

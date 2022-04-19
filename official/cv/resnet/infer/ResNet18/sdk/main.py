@@ -52,10 +52,8 @@ def run():
 
     for file_name in file_list:
         file_path = os.path.join(dir_name, file_name)
-        if not (file_name.lower().endswith(
-                ".jpg") or file_name.lower().endswith(".jpeg")):
+        if not (file_name.lower().endswith(".jpg") or file_name.lower().endswith(".png")):
             continue
-
         with open(file_path, 'rb') as f:
             data_input.data = f.read()
 
@@ -81,13 +79,13 @@ def run():
 
         load_dict = json.loads(infer_result.data.decode())
         if load_dict.get('MxpiClass') is None:
-            with open(res_dir_name + "/" + file_name[:-5] + '.txt',
+            with open(res_dir_name + "/" + file_name[:-4] + '.txt',
                       'w') as f_write:
                 f_write.write("")
             continue
         res_vec = load_dict.get('MxpiClass')
 
-        with open(res_dir_name + "/" + file_name[:-5] + '_1.txt',
+        with open(res_dir_name + "/" + file_name[:-4] + '_1.txt',
                   'w') as f_write:
             res_list = [str(item.get("classId")) + " " for item in res_vec]
             f_write.writelines(res_list)
