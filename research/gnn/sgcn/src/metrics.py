@@ -15,7 +15,9 @@
 """Loss and accuracy."""
 import mindspore.nn as nn
 import mindspore.ops as ops
+from mindspore import Tensor
 from mindspore import context
+from mindspore import dtype as mstype
 from mindspore.common.parameter import ParameterTuple
 from mindspore.communication.management import get_group_size
 from mindspore.context import ParallelMode
@@ -36,6 +38,14 @@ class SGCNLoss(nn.Cell):
         self.concat = ops.Concat(axis=1)
         self.concat0 = ops.Concat(axis=0)
         self.log_softmax = nn.LogSoftmax(axis=1)
+
+        if context.get_context('device_target') == 'GPU':
+            # GPU does not have any performance benefits from calculating this layer using float16.
+            # Therefore, we preserve the single precision.
+            self.matmul = nn.MatMul()
+        else:
+            self.matmul = nn.MatMul().to_float(mstype.float16)
+
         self.ce = nn.SoftmaxCrossEntropyWithLogits(sparse=True)
         self.lamb = lamb
 
@@ -74,7 +84,7 @@ class SGCNLoss(nn.Cell):
         surr_pos_i = self.concat((positive_z_i, positive_z_k))
         surr_pos_j = self.concat((positive_z_j, positive_z_k))
         features = self.concat0((pos, neg, surr_neg_i, surr_neg_j, surr_pos_i, surr_pos_j))
-        predictions = ops.matmul(features, self.regression_weights) + self.regression_bias
+        predictions = self.matmul(features, self.regression_weights) + self.regression_bias
         loss_term = self.ce(predictions, target).mean()
         return loss_term
 
@@ -279,6 +289,7 @@ class TrainNetWrapper(nn.Cell):
     def __init__(self, network, label, weight_decay, learning_rate, lamb):
         super(TrainNetWrapper, self).__init__(auto_prefix=False)
         self.network = network
+        label = Tensor(label)
         loss_net = LossWrapper(network, label, lamb)
         optimizer = nn.Adam(
             loss_net.trainable_params(),

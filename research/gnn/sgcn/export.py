@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ def remove_self_loops(edge_index):
         Tensor(edge_index): removed self loops
     """
     mask = edge_index[0] != edge_index[1]
-    edge_index = edge_index.asnumpy()[:, mask.asnumpy()]
+    edge_index = edge_index[:, mask]
     return Tensor(edge_index)
 
 

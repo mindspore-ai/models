@@ -421,8 +421,8 @@ Test set results: auc= 0.87464 f1= 0.93635
 | Training parameters  | epoch=500, lr=0.01, weight_decay=1e-5                                    |
 | Optimizer            | Adam                                                                     |
 | Loss function        | SoftmaxCrossEntropyWithLogits                                            |
-| Speed                | 0.44 ms/epoch (Bitcoin-OTC) / 0.37ms(Bitcoin-Alpha)                      |
-| Total time           | 8pcs: 440ms(Bitcoin-OTC) / 400ms(Bitcoin-Alpha)                          |
+| Speed                | 0.128 s/epoch (Bitcoin-OTC) / 0.118 s (Bitcoin-Alpha)                      |
+| Total time           | 8pcs: 64 s (Bitcoin-OTC) / 60 s (Bitcoin-Alpha)                          |
 | AUC                  | 0.8663 / 0.7979                                                          |
 | F1-Score             | 0.9309 / 0.9527                                                          |
 | Scripts              | [SGCN](https://gitee.com/mindspore/models/tree/master/research/gnn/sgcn) |
