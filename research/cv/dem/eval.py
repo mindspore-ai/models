@@ -14,18 +14,12 @@
 # ============================================================================
 """
 ######################## eval DEM ########################
-python eval.py --data_path = /YourDataPath \
-               --dataset = AwA or CUB \
-               --train_mode = att, word or fusion
 """
-
-import mindspore.nn as nn
 from mindspore import context
 from mindspore import load_checkpoint
 
 from src.dataset import dataset_AwA, dataset_CUB
-from src.utils import acc_cfg, backbone_cfg, param_cfg, withlosscell_cfg
-from src.demnet import MyTrainOneStepCell, MyWithLossCell
+from src.utils import acc_cfg, backbone_cfg
 from src.set_parser import set_parser
 from src.accuracy import compute_accuracy_att, compute_accuracy_word, compute_accuracy_fusion
 
@@ -48,16 +42,10 @@ if __name__ == "__main__":
 
     # Initialize parameters
     pred_len = acc_cfg(args)
-    lr, weight_decay, clip_param = param_cfg(args)
     save_ckpt = args.save_ckpt
 
     # Build network
     net = backbone_cfg(args)
-    loss_fn = nn.MSELoss(reduction='mean')
-    optim = nn.Adam(net.trainable_params(), lr, weight_decay)
-    MyWithLossCell = withlosscell_cfg(args)
-    loss_net = MyWithLossCell(net, loss_fn)
-    train_net = MyTrainOneStepCell(loss_net, optim)
 
     # Eval
     print("============== Starting Evaluating ==============")

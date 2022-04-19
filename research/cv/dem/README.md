@@ -12,6 +12,7 @@
         - [Training](#training)  
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
+    - [Model Export](#model-export)
 - [Model Description](#model-description)
     - [Performance](#performance)  
         - [Evaluation Performance](#evaluation-performance)
@@ -201,6 +202,14 @@ The accuracy of the test dataset is as follows:
 ```bash
 ============== Starting Evaluating ==============
 accuracy _ CUB _ att = 0.58984
+```
+
+## Model Export
+
+Before running the command below, please check the checkpoint path used for export.
+
+```bash
+python export.py --save_ckpt=[CKPT_PATH] --dataset=[AwA|CUB] --train_mode=[att|word|fusion]
 ```
 
 # [Model Description](#contents)
