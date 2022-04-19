@@ -13,70 +13,46 @@
 # limitations under the License.
 # ============================================================================
 """
-######################## train DEMnet example ########################
-train DEMnet
-python train.py --data_path = /YourDataPath \
-                --dataset = AwA or CUB \
-                --train_mode = att, word or fusion
+######################## export DEM ########################
 """
 
-import mindspore
-import mindspore.nn as nn
-from mindspore import context
-from mindspore import export
-from mindspore import Tensor
-
+import mindspore as ms
 from src.set_parser import set_parser
-from src.utils import acc_cfg, backbone_cfg, param_cfg, withlosscell_cfg
+from src.utils import backbone_cfg
 
 import numpy as np
 
 if __name__ == "__main__":
     # Set graph mode, device id
     args = set_parser()
-    context.set_context(mode=context.PYNATIVE_MODE, \
-                        device_target=args.device_target, \
-                        device_id=args.device_id)
-
-    # Loading datasets and iterators
-    if args.dataset == 'AwA':
-        train_x, train_att, train_word, \
-        test_x, test_att, test_word, \
-        test_label, test_id = dataset_AwA(args.data_path)
-    elif args.dataset == 'CUB':
-        train_att, train_x, \
-        test_x, test_att, \
-        test_label, test_id = dataset_CUB(args.data_path)
+    ms.context.set_context(mode=ms.context.PYNATIVE_MODE, \
+                           device_target=args.device_target, \
+                           device_id=args.device_id)
 
     # Initialize parameters
-    num = acc_cfg(args)
-    lr, weight_decay, clip_param = param_cfg(args)
     save_ckpt = args.save_ckpt
 
     # Build network
     net = backbone_cfg(args)
-    loss_fn = nn.MSELoss(reduction='mean')
-    optim = nn.Adam(net.trainable_params(), lr, weight_decay)
-    MyWithLossCell = withlosscell_cfg(args)
-    loss_net = MyWithLossCell(net, loss_fn)
-    train_net = MyTrainOneStepCell(loss_net, optim)
 
-    print("============== Starting Exporting ==============")
+    # Eval
+    print("============== Starting Evaluating ==============")
     if args.train_mode == 'att':
+        ms.load_checkpoint(save_ckpt, net)
         if args.dataset == 'AwA':
-            input0 = Tensor(np.zeros([args.batch_size, 85]), mindspore.float32)
+            input0 = ms.Tensor(np.zeros([args.batch_size, 85]), ms.float32)
         elif args.dataset == 'CUB':
-            input0 = Tensor(np.zeros([args.batch_size, 312]), mindspore.float32)
-        export(net, input0, file_name=save_ckpt, file_format=args.file_format)
+            input0 = ms.Tensor(np.zeros([args.batch_size, 312]), ms.float32)
+        ms.export(net, input0, file_name="DEM_att", file_format=args.file_format)
         print("Successfully convert to", args.file_format)
-
     elif args.train_mode == 'word':
-        input0 = Tensor(np.zeros([args.batch_size, 1000]), mindspore.float32)
-        export(net, input0, file_name=save_ckpt, file_format=args.file_format)
+        ms.load_checkpoint(save_ckpt, net)
+        input0 = ms.Tensor(np.zeros([args.batch_size, 1000]), ms.float32)
+        ms.export(net, input0, file_name="DEM_word", file_format=args.file_format)
         print("Successfully convert to", args.file_format)
-
     elif args.train_mode == 'fusion':
-        input1 = Tensor(np.zeros([args.batch_size, 85]), mindspore.float32)
-        input2 = Tensor(np.zeros([args.batch_size, 1000]), mindspore.float32)
-        export(net, input1, input2, file_name=save_ckpt, file_format=args.file_format)
+        ms.load_checkpoint(save_ckpt, net)
+        input1 = ms.Tensor(np.zeros([args.batch_size, 85]), ms.float32)
+        input2 = ms.Tensor(np.zeros([args.batch_size, 1000]), ms.float32)
+        ms.export(net, input1, input2, file_name="DEM_fusion", file_format=args.file_format)
         print("Successfully convert to", args.file_format)

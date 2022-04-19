@@ -15,6 +15,7 @@
         - [训练](#训练)
     - [评估过程](#评估过程)
         - [评估](#评估)
+    - [模型导出](#模型导出)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -196,6 +197,14 @@ sh run_standalone_eval_ascend.sh CUB att /data/DEM_data ../output/train.ckpt
 ```bash
 ============== Starting Evaluating ==============
 accuracy _ CUB _ att = 0.58984
+```
+
+## 模型导出
+
+在运行以下命令之前，请检查用于模型导出的检查点路径。
+
+```bash
+python export.py --save_ckpt=[CKPT_PATH] --dataset=[AwA|CUB] --train_mode=[att|word|fusion]
 ```
 
 # 模型描述
