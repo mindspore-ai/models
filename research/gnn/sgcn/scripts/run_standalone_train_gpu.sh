@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,10 +14,13 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -gt 3 ]]; then
+if [[ $# != 3 ]]; then
     echo "Usage: bash ./scripts/run_standalone_train_gpu.sh [DEVICE_ID] [EDGE_PATH] [CKPT_NAME]"
-exit 1
+    exit 1
 fi
+
+EDGE_PATH=$2
+CKPT_NAME=$3
 
 if [ ! -d "logs" ]; then
     mkdir logs
@@ -26,8 +29,8 @@ fi
 export DEVICE_ID=$1
 
 nohup python -u train.py \
-  --device_target=GPU \
-  --device_id=$1 \
-  --edge-path=$2 \
-  --features-path=$2 \
-  --checkpoint_file=./logs/standalone_$3 > logs/standalone_train.log 2>&1 &
+  --device_target="GPU" \
+  --device_id="$1" \
+  --edge-path="$EDGE_PATH" \
+  --features-path="$EDGE_PATH" \
+  --checkpoint_file="./logs/standalone_$CKPT_NAME" > logs/standalone_train.log 2>&1 &

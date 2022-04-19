@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,19 +14,19 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -gt 4 ]]; then
+if [[ $# != 4 ]]; then
     echo "Usage: bash ./scripts/run_export_gpu.sh [DEVICE_ID] [CKPT_PATH] [EDGE_PATH] [OUTPUT_FILE_NAME]"
-exit 1
+    exit 1
 fi
 
 if [ ! -d "logs" ]; then
-        mkdir logs
+    mkdir logs
 fi
 
 nohup python export.py \
---device_id=$1 \
---device_target=GPU \
---checkpoint_file=$2 \
---edge_path=$3 \
---features-path=$3 \
---file_name=$4 > logs/export.log 2>&1 &
+  --device_id="$1" \
+  --device_target="GPU" \
+  --checkpoint_file="$2" \
+  --edge_path="$3" \
+  --features-path="$3" \
+  --file_name="$4" > logs/export.log 2>&1 &

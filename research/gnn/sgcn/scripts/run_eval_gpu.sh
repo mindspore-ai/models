@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -gt 3 ]]; then
+if [[ $# != 3 ]]; then
     echo "Usage: bash ./scripts/run_eval_gpu.sh [CKPT_AUC] [CKPT_F1] [EDGE_PATH]"
-exit 1
+    exit 1
 fi
 
 if [ ! -d "logs" ]; then
-        mkdir logs
+    mkdir logs
 fi
 
 CKPT_AUC=$1
@@ -29,7 +29,7 @@ EDGE_PATH=$3
 
 nohup python eval.py \
   --device_target=GPU \
-  --checkpoint_auc=$CKPT_AUC \
-  --checkpoint_f1=$CKPT_F1 \
-  --edge_path=$EDGE_PATH \
-  --features-path=$EDGE_PATH > logs/eval.log 2>&1 &
+  --checkpoint_auc="$CKPT_AUC" \
+  --checkpoint_f1="$CKPT_F1" \
+  --edge_path="$EDGE_PATH" \
+  --features-path="$EDGE_PATH" > logs/eval.log 2>&1 &

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 if [ $# != 3 ]
 then
     echo "Usage: bash ./scripts/run_distribute_train_gpu.sh [EDGE_PATH] [CKPT_NAME] [DEVICE_NUM]"
-exit 1
+    exit 1
 fi
 
 if [ ! -d "logs" ]; then
@@ -33,6 +33,6 @@ mpirun --allow-run-as-root -n "$DEVICE_NUM" \
 python train.py \
   --device_target=GPU \
   --distributed=True \
-  --edge-path=$EDGE_PATH \
-  --features-path=$EDGE_PATH \
-  --checkpoint_file=./logs/distributed_$CKPT_NAME > logs/distributed_train_$CKPT_NAME.log 2>&1 &
+  --edge-path="$EDGE_PATH" \
+  --features-path="$EDGE_PATH" \
+  --checkpoint_file="./logs/distributed_$CKPT_NAME" > "logs/distributed_train_$CKPT_NAME.log" 2>&1 &
