@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,22 +17,13 @@ import os
 import argparse
 import ast
 import moxing as mox
-import numpy as np
 import mindspore as ms
 import mindspore.nn as nn
 import mindspore.log as logger
 
-from mindspore import context
-from mindspore import Tensor
-from mindspore.nn.optim import Momentum, thor
-from mindspore.train.model import Model
-from mindspore.context import ParallelMode
 from mindspore.train.train_thor import ConvertModelUtils
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
-from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
-from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.communication.management import init, get_group_size
-from mindspore.common import set_seed
 from mindspore.parallel import set_algo_parameters
 
 from src.lr_generator import get_lr, warmup_cosine_annealing_lr
@@ -102,7 +93,7 @@ args_opt = parser.parse_args()
 
 CKPT_OUTPUT_PATH = "./output"
 
-set_seed(1)
+ms.set_seed(1)
 
 if config.optimizer == "Thor":
     if args_opt.device_target == "Ascend":
@@ -153,7 +144,7 @@ def _export_air(ckpt_dir):
     param_dict = ms.load_checkpoint(ckpt_file)
     ms.load_param_into_net(net, param_dict)
 
-    input_arr = Tensor(np.zeros([1, 3, 304, 304]), ms.float32)
+    input_arr = ms.numpy.zeros([1, 3, 304, 304], ms.float32)
     file_path = os.path.join(args_opt.train_url, "resnet")
     ms.export(net, input_arr, file_name=file_path, file_format="AIR")
 
@@ -165,39 +156,38 @@ def set_config():
 
 def init_context(target):
     if args_opt.mode == 'GRAPH':
-        context.set_context(mode=context.GRAPH_MODE, device_target=target,
-                            save_graphs=False)
+        ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=False)
         set_graph_kernel_context(target, args_opt.net)
     else:
-        context.set_context(mode=context.PYNATIVE_MODE, device_target=target,
-                            save_graphs=False)
+        ms.set_context(mode=ms.PYNATIVE_MODE, device_target=target, save_graphs=False)
+
     if args_opt.parameter_server:
-        context.set_ps_context(enable_ps=True)
+        ms.set_ps_context(enable_ps=True)
     if args_opt.run_distribute:
         if target == "Ascend":
             device_id = int(os.getenv('DEVICE_ID'))
-            context.set_context(device_id=device_id)
-            context.set_auto_parallel_context(
+            ms.set_context(device_id=device_id)
+            ms.set_auto_parallel_context(
                 device_num=args_opt.device_num,
-                parallel_mode=ParallelMode.DATA_PARALLEL,
+                parallel_mode=ms.ParallelMode.DATA_PARALLEL,
                 gradients_mean=True)
             set_algo_parameters(elementwise_op_strategy_follow=True)
             if args_opt.net == "resnet50" or args_opt.net == "se-resnet50":
-                context.set_auto_parallel_context(
+                ms.set_auto_parallel_context(
                     all_reduce_fusion_config=[85, 160])
             elif args_opt.net == "resnet101":
-                context.set_auto_parallel_context(
+                ms.set_auto_parallel_context(
                     all_reduce_fusion_config=[80, 210, 313])
             init()
         # GPU target
         else:
             init()
-            context.set_auto_parallel_context(
+            ms.set_auto_parallel_context(
                 device_num=get_group_size(),
-                parallel_mode=ParallelMode.DATA_PARALLEL,
+                parallel_mode=ms.ParallelMode.DATA_PARALLEL,
                 gradients_mean=True)
             if args_opt.net == "resnet50":
-                context.set_auto_parallel_context(
+                ms.set_auto_parallel_context(
                     all_reduce_fusion_config=[85, 160])
 
 
@@ -239,7 +229,7 @@ def init_lr(step_size):
             lr = warmup_cosine_annealing_lr(
                 config.lr, step_size, config.warmup_epochs, config.epoch_size,
                 config.pretrain_epoch_size * step_size)
-    return Tensor(lr)
+    return ms.Tensor(lr)
 
 
 def define_opt(net, lr):
@@ -256,8 +246,8 @@ def define_opt(net, lr):
         {'params': decayed_params, 'weight_decay': config.weight_decay},
         {'params': no_decayed_params},
         {'order_params': net.trainable_params()}]
-    opt = Momentum(group_params, lr, config.momentum,
-                   loss_scale=config.loss_scale)
+    opt = nn.Momentum(group_params, lr, config.momentum, loss_scale=config.loss_scale)
+
     return opt
 
 
@@ -269,9 +259,9 @@ def define_model(net, opt, target):
                                   smooth_factor=config.label_smooth_factor,
                                   num_classes=config.class_num)
     else:
-        loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-    loss_scale = FixedLossScaleManager(config.loss_scale,
-                                       drop_overflow_update=False)
+        loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+    loss_scale = ms.FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
+
     dist_eval_network = ClassifyCorrectCell(
         net) if args_opt.run_distribute else None
     metrics = {"acc"}
@@ -282,13 +272,13 @@ def define_model(net, opt, target):
                              "se-resnet50")) or args_opt.parameter_server \
             or target == "CPU":
         # fp32 training
-        model = Model(net, loss_fn=loss, optimizer=opt, metrics=metrics,
-                      eval_network=dist_eval_network)
+        model = ms.Model(net, loss_fn=loss, optimizer=opt, metrics=metrics,
+                         eval_network=dist_eval_network)
     else:
-        model = Model(net, loss_fn=loss, optimizer=opt,
-                      loss_scale_manager=loss_scale, metrics=metrics,
-                      amp_level="O2", keep_batchnorm_fp32=False,
-                      eval_network=dist_eval_network)
+        model = ms.Model(net, loss_fn=loss, optimizer=opt,
+                         loss_scale_manager=loss_scale, metrics=metrics,
+                         amp_level="O2", keep_batchnorm_fp32=False,
+                         eval_network=dist_eval_network)
     return model, loss, loss_scale
 
 
@@ -355,10 +345,10 @@ def main():
         damping = get_thor_damping(0, config.damping_init, config.damping_decay,
                                    70, step_size)
         split_indices = [26, 53]
-        opt = thor(net, lr, Tensor(damping), config.momentum,
-                   config.weight_decay, config.loss_scale,
-                   config.batch_size, split_indices=split_indices,
-                   frequency=config.frequency)
+        opt = nn.thor(net, lr, ms.Tensor(damping), config.momentum,
+                      config.weight_decay, config.loss_scale,
+                      config.batch_size, split_indices=split_indices,
+                      frequency=config.frequency)
         model = ConvertModelUtils().convert_to_thor_model(
             model=model, network=net, loss_fn=loss, optimizer=opt,
             loss_scale_manager=loss_scale, metrics={'acc'}, amp_level="O2",

@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,15 +15,12 @@
 """eval resnet."""
 import os
 import mindspore as ms
-from mindspore.common import set_seed
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
-from mindspore.train.model import Model
-from mindspore import context
 from src.CrossEntropySmooth import CrossEntropySmooth
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 
-set_seed(1)
+ms.set_seed(1)
 
 if config.net_name in ("resnet18", "resnet34", "resnet50", "resnet152"):
     if config.net_name == "resnet18":
@@ -51,10 +48,10 @@ def eval_net():
     target = config.device_target
 
     # init context
-    context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=False)
     if target == "Ascend":
         device_id = int(os.getenv('DEVICE_ID'))
-        context.set_context(device_id=device_id)
+        ms.set_context(device_id=device_id)
 
     # create dataset
     dataset = create_dataset(dataset_path=config.data_path, do_train=False, batch_size=config.batch_size,
@@ -80,7 +77,7 @@ def eval_net():
         loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
 
     # define model
-    model = Model(net, loss_fn=loss, metrics={'top_1_accuracy', 'top_5_accuracy'})
+    model = ms.Model(net, loss_fn=loss, metrics={'top_1_accuracy', 'top_5_accuracy'})
 
     # eval model
     res = model.eval(dataset)

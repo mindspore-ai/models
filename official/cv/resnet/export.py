@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,14 +19,12 @@ python export.py
 import os
 
 import mindspore as ms
-from mindspore import context, Tensor
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
-import numpy as np
 
-context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target)
 if config.device_target != "GPU":
-    context.set_context(device_id=config.device_id)
+    ms.set_context(device_id=config.device_id)
 
 
 def modelarts_pre_process():
@@ -58,7 +56,7 @@ def run_export():
 
     param_dict = ms.load_checkpoint(config.checkpoint_file_path)
     ms.load_param_into_net(net, param_dict)
-    input_arr = Tensor(np.zeros([config.batch_size, 3, config.height, config.width]), ms.float32)
+    input_arr = ms.numpy.zeros([config.batch_size, 3, config.height, config.width], ms.float32)
     ms.export(net, input_arr, file_name=config.file_name, file_format=config.file_format)
 
 if __name__ == '__main__':

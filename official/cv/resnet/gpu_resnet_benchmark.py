@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,23 +17,17 @@ import os
 import time
 import numpy as np
 import mindspore as ms
-from mindspore import Tensor
-from mindspore.nn.optim.momentum import Momentum
-from mindspore.train.model import Model
-from mindspore.context import ParallelMode
-from mindspore.train.callback import Callback, ModelCheckpoint, CheckpointConfig
-from mindspore.train.loss_scale_manager import FixedLossScaleManager
-from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.common import set_seed
 import mindspore.nn as nn
 import mindspore.dataset as ds
+from mindspore.train.callback import Callback, ModelCheckpoint, CheckpointConfig
+from mindspore.communication.management import init, get_rank, get_group_size
 from src.resnet_gpu_benchmark import resnet50 as resnet
 from src.CrossEntropySmooth import CrossEntropySmooth
 from src.momentum import Momentum as MomentumWeightDecay
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 
-set_seed(1)
+ms.set_seed(1)
 
 class MyTimeMonitor(Callback):
     def __init__(self, batch_size, sink_size, dataset_size, mode):
@@ -51,10 +45,10 @@ class MyTimeMonitor(Callback):
         loss = cb_params.net_outputs
 
         if isinstance(loss, (tuple, list)):
-            if isinstance(loss[0], Tensor) and isinstance(loss[0].asnumpy(), np.ndarray):
+            if isinstance(loss[0], ms.Tensor) and isinstance(loss[0].asnumpy(), np.ndarray):
                 loss = loss[0]
 
-        if isinstance(loss, Tensor) and isinstance(loss.asnumpy(), np.ndarray):
+        if isinstance(loss, ms.Tensor) and isinstance(loss.asnumpy(), np.ndarray):
             loss = np.mean(loss.asnumpy())
 
         cur_epoch_num = int(cb_params.cur_epoch_num / (self.data_size / self.size) +1)
@@ -165,7 +159,7 @@ def train():
     if config.run_distribute:
         init()
         device_num = get_group_size()
-        ms.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+        ms.set_auto_parallel_context(device_num=device_num, parallel_mode=ms.ParallelMode.DATA_PARALLEL,
                                      gradients_mean=True, all_reduce_fusion_config=all_reduce_fusion_config)
         ckpt_save_dir = ckpt_save_dir + "ckpt_" + str(get_rank()) + "/"
 
@@ -194,7 +188,7 @@ def train():
     # init lr
     lr = get_liner_lr(lr_init=0, lr_end=0, lr_max=0.8, warmup_epochs=0, total_epochs=epoch_size,
                       steps_per_epoch=step_size)
-    lr = Tensor(lr)
+    lr = ms.Tensor(lr)
 
     # define opt
     decayed_params = []
@@ -207,17 +201,17 @@ def train():
 
     # define loss, model
     loss = CrossEntropySmooth(sparse=True, reduction='mean', smooth_factor=0.1, num_classes=1001)
-    opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), lr, 0.9, 1e-4)
-    loss_scale = FixedLossScaleManager(1024, drop_overflow_update=False)
-    model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'})
+    opt = nn.Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), lr, 0.9, 1e-4)
+    loss_scale = ms.FixedLossScaleManager(1024, drop_overflow_update=False)
+    model = ms.Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'})
     # Mixed precision
     if compute_type == "fp16":
         if mode == ms.PYNATIVE_MODE:
             opt = MomentumWeightDecay(filter(lambda x: x.requires_grad, net.get_parameters()), lr, 0.9, 1e-4, 1024)
         else:
-            opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), lr, 0.9, 1e-4, 1024)
-        model = Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale, metrics={'acc'},
-                      amp_level="O2", keep_batchnorm_fp32=False)
+            opt = nn.Momentum(filter(lambda x: x.requires_grad, net.get_parameters()), lr, 0.9, 1e-4, 1024)
+        model = ms.Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale, metrics={'acc'},
+                         amp_level="O2", keep_batchnorm_fp32=False)
     # define callbacks
     if mode == ms.PYNATIVE_MODE:
         print_per_steps = 1
@@ -259,7 +253,7 @@ def eval_():
     # define loss, model
     loss = CrossEntropySmooth(sparse=True, reduction='mean', smooth_factor=0.1, num_classes=1001)
     # define model
-    model = Model(net, loss_fn=loss, metrics={'top_1_accuracy', 'top_5_accuracy'})
+    model = ms.Model(net, loss_fn=loss, metrics={'top_1_accuracy', 'top_5_accuracy'})
     # eval model
     print("========START EVAL RESNET50 ON GPU ========")
     res = model.eval(dataset)

@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,18 +20,12 @@ import numpy as np
 import moxing as mox
 
 import mindspore as ms
-from mindspore import Tensor
-from mindspore.nn.optim import Momentum, thor, LARS
-from mindspore.train.model import Model
-from mindspore.context import ParallelMode
+import mindspore.nn as nn
 from mindspore.train.train_thor import ConvertModelUtils
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
-from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
-from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.communication.management import init, get_rank
-from mindspore.common import set_seed
 from mindspore.parallel import set_algo_parameters
-import mindspore.nn as nn
+
 import mindspore.log as logger
 
 from modelarts.ResNet152.config import config
@@ -46,7 +40,7 @@ from src.resnet import conv_variance_scaling_initializer
 
 
 
-set_seed(1)
+ms.set_seed(1)
 
 
 class LossCallBack(LossMonitor):
@@ -65,10 +59,10 @@ class LossCallBack(LossMonitor):
         loss = cb_params.net_outputs
 
         if isinstance(loss, (tuple, list)):
-            if isinstance(loss[0], Tensor) and isinstance(loss[0].asnumpy(), np.ndarray):
+            if isinstance(loss[0], ms.Tensor) and isinstance(loss[0].asnumpy(), np.ndarray):
                 loss = loss[0]
 
-        if isinstance(loss, Tensor) and isinstance(loss.asnumpy(), np.ndarray):
+        if isinstance(loss, ms.Tensor) and isinstance(loss.asnumpy(), np.ndarray):
             loss = np.mean(loss.asnumpy())
 
         cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
@@ -155,7 +149,7 @@ def set_parameter():
         if target == "Ascend":
             device_id = int(os.getenv('DEVICE_ID'))
             ms.set_context(device_id=device_id)
-            ms.set_auto_parallel_context(device_num=config.device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+            ms.set_auto_parallel_context(device_num=config.device_num, parallel_mode=ms.ParallelMode.DATA_PARALLEL,
                                          gradients_mean=True)
             set_algo_parameters(elementwise_op_strategy_follow=True)
             if config.net_name == "resnet50" or config.net_name == "se-resnet50":
@@ -168,7 +162,7 @@ def set_parameter():
         else:
             init()
             ms.set_auto_parallel_context(device_num=get_device_num(),
-                                         parallel_mode=ParallelMode.DATA_PARALLEL,
+                                         parallel_mode=ms.ParallelMode.DATA_PARALLEL,
                                          gradients_mean=True)
             if config.net_name == "resnet50":
                 ms.set_auto_parallel_context(all_reduce_fusion_config=config.all_reduce_fusion_config)
@@ -238,7 +232,7 @@ def init_weight(net, param_dict):
                     in_channel = cell.in_channels
                     out_channel = cell.out_channels
                     weight = np.random.normal(loc=0, scale=0.01, size=out_channel * in_channel)
-                    weight = Tensor(np.reshape(weight, (out_channel, in_channel)), dtype=cell.weight.dtype)
+                    weight = ms.Tensor(np.reshape(weight, (out_channel, in_channel)), dtype=cell.weight.dtype)
                     cell.weight.set_data(weight)
 
 
@@ -265,7 +259,7 @@ def init_loss_scale():
         loss = CrossEntropySmooth(sparse=True, reduction="mean",
                                   smooth_factor=config.label_smooth_factor, num_classes=config.class_num)
     else:
-        loss = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+        loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
     return loss
 
 
@@ -359,15 +353,15 @@ def train_net():
         net.set_param_ps()
 
     init_weight(net=net, param_dict=ckpt_param_dict)
-    lr = Tensor(init_lr(step_size=step_size))
+    lr = ms.Tensor(init_lr(step_size=step_size))
     # define opt
     group_params = init_group_params(net)
-    opt = Momentum(group_params, lr, config.momentum, loss_scale=config.loss_scale)
+    opt = nn.Momentum(group_params, lr, config.momentum, loss_scale=config.loss_scale)
     if config.optimizer == "LARS":
-        opt = LARS(opt, epsilon=config.lars_epsilon, coefficient=config.lars_coefficient,
-                   lars_filter=lambda x: 'beta' not in x.name and 'gamma' not in x.name and 'bias' not in x.name)
+        opt = nn.LARS(opt, epsilon=config.lars_epsilon, coefficient=config.lars_coefficient,
+                      lars_filter=lambda x: 'beta' not in x.name and 'gamma' not in x.name and 'bias' not in x.name)
     loss = init_loss_scale()
-    loss_scale = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
+    loss_scale = ms.FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
     dist_eval_network = ClassifyCorrectCell(net) if config.run_distribute else None
     metrics = {"acc"}
     if config.run_distribute:
@@ -375,19 +369,19 @@ def train_net():
     if (config.net_name not in ("resnet18", "resnet34", "resnet50", "resnet101", "resnet152", "se-resnet50")) or \
             config.parameter_server or target == "CPU":
         ## fp32 training
-        model = Model(net, loss_fn=loss, optimizer=opt, metrics=metrics, eval_network=dist_eval_network)
+        model = ms.Model(net, loss_fn=loss, optimizer=opt, metrics=metrics, eval_network=dist_eval_network)
     else:
-        model = Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale, metrics=metrics,
-                      amp_level="O2",  # boost_level=config.boost_mode,
-                      keep_batchnorm_fp32=False,
-                      eval_network=dist_eval_network)
+        model = ms.Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale, metrics=metrics,
+                         amp_level="O2",  # boost_level=config.boost_mode,
+                         keep_batchnorm_fp32=False,
+                         eval_network=dist_eval_network)
 
     if config.optimizer == "Thor" and config.dataset == "imagenet2012":
         from src.lr_generator import get_thor_damping
         damping = get_thor_damping(0, config.damping_init, config.damping_decay, 70, step_size)
         split_indices = [26, 53]
-        opt = thor(net, lr, Tensor(damping), config.momentum, config.weight_decay, config.loss_scale,
-                   config.batch_size, split_indices=split_indices, frequency=config.frequency)
+        opt = nn.thor(net, lr, ms.Tensor(damping), config.momentum, config.weight_decay, config.loss_scale,
+                      config.batch_size, split_indices=split_indices, frequency=config.frequency)
         model = ConvertModelUtils().convert_to_thor_model(model=model, network=net, loss_fn=loss, optimizer=opt,
                                                           loss_scale_manager=loss_scale, metrics={'acc'},
                                                           amp_level="O2", keep_batchnorm_fp32=False)
