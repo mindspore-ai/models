@@ -154,7 +154,7 @@ class SingleRoIExtractor(nn.Cell):
             Tensor: Level index (0-based) of each RoI, shape (k, )
         """
         scale = self.sqrt(rois[::, 3:4:1] - rois[::, 1:2:1] + self.ones) * \
-             self.sqrt(rois[::, 4:5:1] - rois[::, 2:3:1] + self.ones)
+                self.sqrt(rois[::, 4:5:1] - rois[::, 2:3:1] + self.ones)
 
         target_lvls = self.log2(scale / self.finest_scale + self.epslion)
         target_lvls = ops.Floor()(target_lvls)

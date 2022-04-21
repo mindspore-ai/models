@@ -33,24 +33,23 @@ def modelarts_pre_process():
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def get_eval_result(anno_path, result_path):
     """ get evaluation result of faster rcnn"""
-    max_num = 128
+    max_num = config.num_gts
     result_path = result_path
-
     outputs = []
 
     dataset_coco = COCO(anno_path)
     img_ids = dataset_coco.getImgIds()
 
     for img_id in img_ids:
-        file_id = str(img_id).zfill(12)
-
+        image_info = dataset_coco.loadImgs(img_id)
+        file_name = image_info[0]["file_name"]
+        file_id = file_name.split('.')[0]
         bbox_result_file = os.path.join(result_path, file_id + "_0.bin")
         label_result_file = os.path.join(result_path, file_id + "_1.bin")
         mask_result_file = os.path.join(result_path, file_id + "_2.bin")
-
-        all_bbox = np.fromfile(bbox_result_file, dtype=np.float16).reshape(80000, 5)
-        all_label = np.fromfile(label_result_file, dtype=np.int32).reshape(80000, 1)
-        all_mask = np.fromfile(mask_result_file, dtype=np.bool_).reshape(80000, 1)
+        all_bbox = np.fromfile(bbox_result_file, dtype=np.float16).reshape(-1, 5)
+        all_label = np.fromfile(label_result_file, dtype=np.int32).reshape(-1, 1)
+        all_mask = np.fromfile(mask_result_file, dtype=np.bool_).reshape(-1, 1)
 
         all_bbox_squee = np.squeeze(all_bbox)
         all_label_squee = np.squeeze(all_label)

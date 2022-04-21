@@ -180,8 +180,8 @@ class RPN(nn.Cell):
 
         for i in range(num_layers):
             rpn_reg_cls_block = RpnRegClsBlock(in_channels, feat_channels, num_anchors, cls_out_channels, \
-                                            weight_conv, bias_conv, weight_cls, \
-                                            bias_cls, weight_reg, bias_reg)
+                                               weight_conv, bias_conv, weight_cls, \
+                                               bias_cls, weight_reg, bias_reg)
             if self.device_type == "Ascend":
                 rpn_reg_cls_block.to_float(ms.float16)
             rpn_layer.append(rpn_reg_cls_block)

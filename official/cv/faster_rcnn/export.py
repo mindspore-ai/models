@@ -27,6 +27,7 @@ if config.device_target == "Ascend":
     ms.set_context(device_id=get_device_id())
 
 
+
 def modelarts_pre_process():
     pass
 
@@ -43,6 +44,7 @@ def export_fasterrcnn():
 
     param_dict_new = {}
     for key, value in param_dict.items():
+        key = key.replace("ncek", "neck")
         param_dict_new["network." + key] = value
 
     ms.load_param_into_net(net, param_dict_new)
@@ -61,6 +63,7 @@ def export_fasterrcnn():
         ms.export(net, img, file_name=config.file_name, file_format=config.file_format)
     else:
         ms.export(net, img, img_metas, file_name=config.file_name, file_format=config.file_format)
+
 
 
 if __name__ == '__main__':
