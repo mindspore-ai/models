@@ -127,8 +127,11 @@
         ├── README_CN.md             // FishNet99相关说明
         ├── ascend310_infer          // 实现310推理源代码
         ├── scripts
+        │   ├──run_eval_ascend.sh    // Ascend评估的shell脚本
         │   ├──run_eval_gpu.sh       // GPU评估的shell脚本
         │   ├──run_infer_310.sh      // Ascend推理的shell脚本
+        │   ├──run_standalone_train_ascend.sh   // Ascend单卡训练的shell脚本
+        │   ├──run_standalone_train_gpu.sh      // GPU单卡训练的shell脚本
         │   ├──run_train_ascend.sh   // 分布式到Ascend的shell脚本
         │   ├──run_train_gpu.sh      // 分布式到GPU处理器的shell脚本
         ├── src
@@ -145,7 +148,7 @@
 
 在config.py中可以同时配置训练参数和评估参数。
 
-- 配置FishNet99和ImageNet-1k数据集。
+- 配置fishnet99和ImageNet-1k数据集。
 
   ```python
   'name':'imagenet'        # 数据集
@@ -177,6 +180,8 @@
 
   ```bash
   python train.py --device_id=0 --device_type=Ascend > train.log 2>&1 &
+  OR
+  bash ./scripts/run_standalone_train_ascend.sh
   ```
 
   上述python命令将在后台运行，可以通过生成的train.log文件查看结果。
@@ -197,6 +202,8 @@
 
   ```bash
   python train.py --device_id=0 --device_type=GPU > train_gpu.log 2>&1 &
+  OR
+  bash ./scripts/run_standalone_train_gpu.sh
   ```
 
   上述python命令将在后台运行，可以通过生成的train_gpu.log文件查看结果。
@@ -233,6 +240,8 @@
 
   ```bash
   python eval.py --checkpoint_path ./ckpt_0 --device_type=Ascend > ./eval.log 2>&1 &
+  OR
+  bash ./scripts/run_ascend.sh ./ckpt_0
   ```
 
 - 在GPU处理器环境运行时评估ImageNet-1k数据集
@@ -242,7 +251,7 @@
   ```bash
   python eval.py --checkpoint_path ./ckpt_0 --device_type=GPU > ./eval_gpu.log 2>&1 &
   OR
-  bash ./scripts/run_eval.sh
+  bash ./scripts/run_eval.sh ./ckpt_0
   ```
 
 ## 导出过程
