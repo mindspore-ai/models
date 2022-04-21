@@ -24,7 +24,8 @@ from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMoni
 from mindspore.nn import SoftmaxCrossEntropyWithLogits
 from mindspore.common import set_seed
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
-
+from mindspore.context import ParallelMode
+from mindspore.communication.management import init, get_rank
 # should find /src
 
 from src.lr_generator import get_lr
@@ -41,6 +42,9 @@ parser.add_argument('--train_url', type=str, required=True, default='',
                     help='where training ckpts saved')
 parser.add_argument('--data_url', type=str, required=True, default='',
                     help='path of dataset')
+
+parser.add_argument('--run_distribute', type=bool, default=False, help='Run distribute')
+parser.add_argument('--device_num', type=int, default=1, help='Device num.')
 
 # train
 parser.add_argument('--pre_trained', type=str, default=None, help='pretrained checkpoint path')
@@ -86,9 +90,19 @@ def _train():
     # init context
     context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
 
+    if args.run_distribute:
+        device_id = int(os.getenv('DEVICE_ID'))
+        context.set_context(device_id=device_id)
+        # init parallel training parameters
+        context.set_auto_parallel_context(device_num=args.device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                          gradients_mean=True)
+        # init HCCL
+        init()
+
     # create dataset
     dataset = create_dataset(dataset_path=args.data_url, do_train=True, repeat_num=1,
-                             batch_size=config.batch_size, target=target)
+                             batch_size=config.batch_size, target=target, distribute=args.run_distribute)
+
     step_size = dataset.get_dataset_size()
 
     # define net
@@ -131,7 +145,14 @@ def _train():
                                  directory=ckpt_save_dir, config=config_ck)
 
     # train
-    callbacks = [time_cb, loss_cb, ckpoint_cb]
+    if args.run_distribute:
+        callbacks = [time_cb, loss_cb]
+        if target == "GPU" and str(get_rank()) == '0':
+            callbacks = [time_cb, loss_cb, ckpoint_cb]
+        elif target == "Ascend" and device_id == 0:
+            callbacks = [time_cb, loss_cb, ckpoint_cb]
+    else:
+        callbacks = [time_cb, loss_cb, ckpoint_cb]
     model.train(epoch_size, dataset, callbacks=callbacks)
 
 def _get_last_ckpt(ckpt_dir):
