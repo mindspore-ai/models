@@ -15,6 +15,7 @@
 '''train.py'''
 import os
 import datetime
+from time import time
 
 import mindspore
 import mindspore.nn as nn
@@ -118,7 +119,7 @@ def train():
     callbacks = []
     if cfg.rank == 0:
         time_cb = TimeMonitor(data_size=cfg.steps_per_epoch)
-        loss_cb = LossMonitor(10)
+        loss_cb = LossMonitor(1)
         callbacks = [time_cb, loss_cb]
     if cfg.rank_save_ckpt_flag:
         ckpt_config = CheckpointConfig(save_checkpoint_steps=cfg.steps_per_epoch*cfg.save_every,
@@ -143,11 +144,17 @@ def train():
                                f_model=f_model)
         callbacks.append(eval_cb)
 
-    model.train(cfg.epochs-cfg.resume_epoch, train_dataset, callbacks=callbacks, dataset_sink_mode=False)
+    cfg.logger.info("training started....")
+    start_time = time()
+    model.train(cfg.epochs-cfg.resume_epoch, train_dataset, callbacks=callbacks, dataset_sink_mode=True)
+    total_time = int(time() - start_time)
+    print(f"Time taken: {total_time // 60} min {total_time % 60} sec")
     cfg.logger.info("training finished....")
 
 if __name__ == '__main__':
     set_seed(1)
+    if not (cfg.device_target in ["Ascend", "GPU"]):
+        raise NotImplementedError("Training implemented only on GPU and Ascend target devices")
     cfg.save_dir = os.path.join(cfg.output_path, datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
     if not cfg.use_modelarts and not os.path.exists(cfg.save_dir):
         os.makedirs(cfg.save_dir)
@@ -158,8 +165,7 @@ if __name__ == '__main__':
         if cfg.device_target == "Ascend":
             context.set_context(device_id=device_id)
             init("hccl")
-        else:
-            assert cfg.device_target == "GPU"
+        elif cfg.device_target == "GPU":
             init("nccl")
         cfg.rank = get_rank()
         cfg.group_size = get_group_size()

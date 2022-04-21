@@ -62,7 +62,7 @@ def test():
     '''
     f_model = get_r2plus1d_model(cfg.num_classes, cfg.layer_num)
     f_model.set_train(False)
-    eval_ckpt_path = os.path.join(cfg.eval_ckpt_path, cfg.eval_ckpt_name)
+    eval_ckpt_path = cfg.eval_ckpt
     cfg.logger.info('load validation weights from %s', str(eval_ckpt_path))
     load_param_into_net(f_model, load_checkpoint(eval_ckpt_path))
     cfg.logger.info('loaded validation weights from %s', str(eval_ckpt_path))
@@ -78,7 +78,7 @@ def test():
     loss_fn = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='sum')
     model = Model(f_model, loss_fn, optimizer, amp_level="auto", metrics={'top_1_accuracy', 'top_5_accuracy'})
     result = model.eval(val_dataloader, dataset_sink_mode=False)
-    cfg.logger.info('Final Accuracy：%s', str(result))
+    cfg.logger.info('Final Accuracy: %s', str(result))
     cfg.logger.info("validation finished....")
 
 if __name__ == '__main__':

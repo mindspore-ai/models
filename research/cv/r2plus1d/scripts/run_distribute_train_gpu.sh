@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,17 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 1 ]; then
-  echo "Usage: bash run_eval_ascend.sh [device_id]"
-  exit 1
-fi
-export DEVICE_ID=$1
 
 DIR="$( cd "$( dirname "$0"  )" && pwd  )"
 
+# help message
+if [ $# != 2 ]; then
+  echo "Usage: bash run_distribute_train_gpu.sh [num_devices] [cuda_visible_devices(0,1,2,3,4,5,6,7)]"
+  exit 1
+fi
+
+ulimit -c unlimited
 ulimit -n 65530
 
+export CUDA_VISIBLE_DEVICES=$2
+
 cd $DIR/../ || exit
-nohup python eval.py --device_target=Ascend > eval_ascend_log.txt 2>&1 &
-echo 'Validation task has been started successfully!'
-echo 'Please check the log at eval_ascend_log.txt'
+mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+  python train.py --device_target=GPU --is_distributed=1 &> distribute_train_gpu_log.txt &
