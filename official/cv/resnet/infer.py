@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 import os
 import numpy as np
 import mindspore as ms
-from mindspore import Tensor
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 
@@ -82,7 +81,7 @@ def infer_net():
         images = data["image"]
         label = data["label"]
         file_name = data["filename"]
-        res = net(Tensor(images))
+        res = net(ms.Tensor(images))
         res = res.asnumpy()
         predict_id = np.argmax(res, axis=1)
         predict_negative, only_file = show_predict_info(label.tolist(), predict_id.tolist(),
