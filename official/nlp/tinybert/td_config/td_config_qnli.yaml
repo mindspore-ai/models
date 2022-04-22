@@ -39,6 +39,7 @@ dataset_type: "tfrecord"
 ckpt_file: ''
 file_name: "tinybert"
 file_format: "AIR"
+num_labels: 2
 phase1_cfg:
     batch_size: 32
     loss_scale_value: 256
