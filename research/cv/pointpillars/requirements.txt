@@ -1,0 +1,4 @@
+fire
+numba
+scikit-image
+tqdm
