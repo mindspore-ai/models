@@ -84,8 +84,11 @@ class Rcnn(nn.Cell):
         self.rcnn_fc_out_channels = cfg.rcnn_fc_out_channels
         self.target_means = target_means
         self.target_stds = target_stds
+        self.without_bg_loss = config.without_bg_loss
         self.num_classes = num_classes
-        self.num_classes_fronted = num_classes - 1
+        self.num_classes_fronted = num_classes
+        if self.without_bg_loss:
+            self.num_classes_fronted = num_classes - 1
         self.in_channels = cfg.rcnn_in_channels
         self.train_batch_size = batch_size
         self.test_batch_size = cfg.test_batch_size
@@ -136,6 +139,7 @@ class Rcnn(nn.Cell):
 
         range_max = np.arange(self.num_bboxes_test).astype(np.int32)
         self.range_max = Tensor(range_max)
+        self.delta = 0.0001  # Avoid to produce 0
 
     def construct(self, featuremap, bbox_targets, labels, mask):
         x = self.flatten(featuremap)
@@ -169,13 +173,18 @@ class Rcnn(nn.Cell):
 
         bbox_weights = self.cast(self.onehot(bbox_weights, self.num_classes, self.on_value, self.off_value),
                                  self.ms_type)
-        bbox_weights = bbox_weights[:, 1:] * self.rmv_first_tensor
-
+        if self.without_bg_loss:
+            bbox_weights = bbox_weights[:, 1:] * self.rmv_first_tensor
+        else:
+            bbox_weights = bbox_weights * self.rmv_first_tensor
         pos_bbox_pred = self.reshape(bbox_pred, (self.num_bboxes, -1, 4))
         loss_reg = self.loss_bbox(pos_bbox_pred, bbox_targets)
         loss_reg = self.sum_loss(loss_reg, (2,))
         loss_reg = loss_reg * bbox_weights
-        loss_reg = loss_reg / (self.sum_loss(weights, (0,)) + 1)
+        if self.without_bg_loss:
+            loss_reg = loss_reg / (self.sum_loss(weights, (0,)) + self.delta)
+        else:
+            loss_reg = loss_reg / (self.sum_loss(weights, (0,)))
         loss_reg = self.sum_loss(loss_reg, (0, 1))
 
         loss = self.rcnn_loss_cls_weight * loss_cls + self.rcnn_loss_reg_weight * loss_reg

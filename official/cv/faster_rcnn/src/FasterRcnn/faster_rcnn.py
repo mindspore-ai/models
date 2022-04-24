@@ -65,7 +65,11 @@ class Faster_Rcnn(nn.Cell):
         self.dtype = np.float32
         self.ms_type = ms.float32
         self.train_batch_size = config.batch_size
+        self.without_bg_loss = config.without_bg_loss
         self.num_classes = config.num_classes
+        self.num_cls_bbox = config.num_classes
+        if self.without_bg_loss:
+            self.num_cls_bbox = config.num_classes - 1
         self.anchor_scales = config.anchor_scales
         self.anchor_ratios = config.anchor_ratios
         self.anchor_strides = config.anchor_strides
@@ -363,7 +367,7 @@ class Faster_Rcnn(nn.Cell):
         scores = self.softmax(cls_logits)
 
         boxes_all = ()
-        for i in range(self.num_classes - 1):
+        for i in range(self.num_cls_bbox):
             k = i * 4
             reg_logits_i = self.squeeze(reg_logits[::, k:k+4:1])
             out_boxes_i = self.decode(rois, reg_logits_i)
@@ -379,7 +383,7 @@ class Faster_Rcnn(nn.Cell):
             scale_h = scale[2]
             scale_w = scale[3]
             boxes_tuple = ()
-            for j in range(self.num_classes - 1):
+            for j in range(self.num_cls_bbox):
                 boxes_tmp = self.split(boxes_all[j])
                 out_boxes_h = boxes_tmp[i] / scale_h
                 out_boxes_w = boxes_tmp[i] / scale_w
@@ -408,7 +412,10 @@ class Faster_Rcnn(nn.Cell):
             for j in range(self.num_classes - 1):
                 k = j + 1
                 _cls_scores = scores[::, k:k + 1:1]
-                _bboxes = self.squeeze(bboxes[j])
+                if self.without_bg_loss:
+                    _bboxes = self.squeeze(bboxes[j])
+                else:
+                    _bboxes = self.squeeze(bboxes[k])
                 _mask_o = self.reshape(masks, (self.rpn_max_num, 1))
 
                 cls_mask = self.greater(_cls_scores, self.test_score_thresh)

@@ -96,6 +96,7 @@ def modelarts_pre_process():
 def load_ckpt_to_network(net):
     load_path = config.pre_trained
     if load_path != "":
+        new_param = {}
         if config.finetune:
             param_not_load = ["learning_rate", "stat.rcnn.cls_scores.weight", "stat.rcnn.cls_scores.bias",
                               "stat.rcnn.reg_scores.weight", "stat.rcnn.reg_scores.bias",
@@ -104,12 +105,10 @@ def load_ckpt_to_network(net):
                               "accum.rcnn.reg_scores.weight", "accum.rcnn.reg_scores.bias"
                               ]
             param_dict = ms.load_checkpoint(load_path, filter_prefix=param_not_load)
-            new_param = {}
             for key, val in param_dict.items():
                 # Correct previous misspellings
                 key = key.replace("ncek", "neck")
                 new_param[key] = val
-            ms.load_param_into_net(net, new_param)
         else:
             print(f"\n[{rank}]", "===> Loading from checkpoint:", load_path)
             param_dict = ms.load_checkpoint(load_path)
@@ -138,7 +137,17 @@ def load_ckpt_to_network(net):
             for key, value in param_dict.items():
                 tensor = value.asnumpy().astype(np.float32)
                 param_dict[key] = Parameter(tensor, key)
-            ms.load_param_into_net(net, param_dict)
+            new_param = param_dict
+
+        try:
+            ms.load_param_into_net(net, new_param)
+        except RuntimeError as ex:
+            ex = str(ex)
+            print("Traceback:\n", ex, flush=True)
+            if "reg_scores.weight" in ex:
+                exit("[ERROR] The loss calculation of faster_rcnn has been updated. "
+                     "If the training is on an old version, please set `without_bg_loss` to False.")
+
     print(f"[{rank}]", "\tDone!\n")
     return net
 

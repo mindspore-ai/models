@@ -22,10 +22,9 @@ from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id
 from src.FasterRcnn.faster_rcnn import FasterRcnn_Infer
 
-ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target)
+ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, max_call_depth=2000)
 if config.device_target == "Ascend":
     ms.set_context(device_id=get_device_id())
-
 
 
 def modelarts_pre_process():
@@ -40,7 +39,14 @@ def export_fasterrcnn():
     config.ori_w = None
     net = FasterRcnn_Infer(config=config)
 
-    param_dict = ms.load_checkpoint(config.ckpt_file)
+    try:
+        param_dict = ms.load_checkpoint(config.ckpt_file)
+    except RuntimeError as ex:
+        ex = str(ex)
+        print("Traceback:\n", ex, flush=True)
+        if "reg_scores.weight" in ex:
+            exit("[ERROR] The loss calculation of faster_rcnn has been updated. "
+                 "If the training is on an old version, please set `without_bg_loss` to False.")
 
     param_dict_new = {}
     for key, value in param_dict.items():
@@ -63,7 +69,6 @@ def export_fasterrcnn():
         ms.export(net, img, file_name=config.file_name, file_format=config.file_format)
     else:
         ms.export(net, img, img_metas, file_name=config.file_name, file_format=config.file_format)
-
 
 
 if __name__ == '__main__':
