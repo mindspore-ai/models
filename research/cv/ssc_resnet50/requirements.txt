@@ -1,0 +1,3 @@
+Pillow
+PyYAML
+scipy
