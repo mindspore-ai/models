@@ -117,7 +117,7 @@ class COCOHP(ds.Dataset):
         self.num_samples = len(self.images)
         self.keep_res = keep_res
         logger.info('Loaded {} {} samples'.format(self.run_mode, self.num_samples))
-
+        print('Loaded {} {} samples'.format(self.run_mode, self.num_samples))
     def __len__(self):
         return self.num_samples
 

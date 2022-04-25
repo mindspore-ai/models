@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,13 +16,13 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run_standalone_train_ascend.sh DEVICE_ID MINDRECORD_DIR LOAD_CHECKPOINT_PATH"
-echo "for example: bash run_standalone_train_ascend.sh 0 /path/mindrecord_dataset /path/load_ckpt"
-echo "if no ckpt, just run: bash run_standalone_train_ascend.sh 0 /path/mindrecord_dataset"
+echo "bash run_distributed_train_gpu.sh MINDRECORD_DIR DEVICE_NUM LOAD_CHECKPOINT_PATH"
+echo "for example: bash run_distributed_train_gpu.sh /path/mindrecord_dataset 8 /path/load_ckpt"
+echo "if no ckpt, just run: bash run_distributed_train_gpu.sh /path/mindrecord_dataset 8"
 echo "=============================================================================================================="
 
-DEVICE_ID=$1
-MINDRECORD_DIR=$2
+MINDRECORD_DIR=$1
+RANK_SIZE=$2
 if [ $# == 3 ];
 then
     LOAD_CHECKPOINT_PATH=$3
@@ -33,24 +33,30 @@ fi
 mkdir -p ms_log 
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 CUR_DIR=`pwd`
+LOG_DIR=$PROJECT_DIR/../logs
+if [ ! -d $LOG_DIR ]
+then
+    mkdir $LOG_DIR
+fi
 export GLOG_log_dir=${CUR_DIR}/ms_log
 export GLOG_logtostderr=0
-export DEVICE_ID=$DEVICE_ID
+export RANK_SIZE=$RANK_SIZE
 
-python ${PROJECT_DIR}/../train.py  \
-    --distribute=false \
+mpirun -n $RANK_SIZE --allow-run-as-root python ${PROJECT_DIR}/../train.py  \
+    --distribute=true \
+    --device_num=$RANK_SIZE \
+    --device_target=GPU \
     --need_profiler=false \
     --profiler_path=./profiler \
-    --device_id=$DEVICE_ID \
     --enable_save_ckpt=true \
     --do_shuffle=true \
-    --enable_data_sink=true \
+    --enable_data_sink=false \
     --data_sink_steps=-1 \
     --epoch_size=330 \
     --load_checkpoint_path=$LOAD_CHECKPOINT_PATH \
     --save_checkpoint_steps=3664 \
-    --save_checkpoint_num=1 \
+    --save_checkpoint_num=5 \
     --mindrecord_dir=$MINDRECORD_DIR \
     --mindrecord_prefix="coco_det.train.mind" \
     --visual_image=false \
-    --save_result_dir="" > training_log.txt 2>&1 &
+    --save_result_dir="" >${LOG_DIR}/distributed_training_gpu_log.txt 2>&1 &
