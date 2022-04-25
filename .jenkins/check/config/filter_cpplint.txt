@@ -122,6 +122,10 @@
 "models/research/recommend/autodis/infer/mxbase/src/Autodis.h"  "runtime/references"
 "models/research/recommend/autodis/infer/mxbase/src/Autodis.cpp"  "runtime/references"
 
+"models/research/recommend/mmoe/infer/mxbase/src/main.cpp"  "runtime/references"
+"models/research/recommend/mmoe/infer/mxbase/src/MMoE.h"  "runtime/references"
+"models/research/recommend/mmoe/infer/mxbase/src/MMoE.cpp"  "runtime/references"
+
 "models/research/cv/textfusenet/infer/mxbase/src/Textfusenet.h" "runtime/references"
 "models/research/cv/textfusenet/infer/mxbase/src/Textfusenet.cpp" "runtime/references"
 "models/research/cv/textfusenet/infer/mxbase/src/PostProcess/TextfusenetMindsporePost.h" "runtime/references"
