@@ -222,8 +222,8 @@ python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 | Output                     | predict class                                               |
 | Accuracy                   | 310: 78.2%                                             |
 | Loss                       | 10.9852                                                     |
-| Speed                      | 1pc: 420 ms/step;  8pcs:  143 ms/step                          |
-| Total time                 | 1pc: 24.32 hours                                            |
+| Speed                      | 1pc: 420 ms/step;  8pcs:  195 ms/step                          |
+| Total time                 | 1pc: 25.32 hours                                            |
 | Checkpoint for Fine tuning | 79.05M(.ckpt file)                                         |
 | Scripts                    | [dcgan script](https://gitee.com/mindspore/models/tree/master/research/cv/dcgan) |
 

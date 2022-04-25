@@ -16,50 +16,36 @@
 rec format to jpg
 """
 import os
-import argparse
-import cv2
+from skimage import io
 import mxnet as mx
+from mxnet import recordio
+from tqdm import tqdm
 
-def main(input_args):
-    """
-    trans rec format to jpg
-    :param args: inputs arguments
-    :return:
-    """
-    include_datasets = input_args.include.split(',')
-    rec_list = []
-    for ds in include_datasets:
-        path_imgrec = os.path.join(ds, 'train.rec')
-        path_imgidx = os.path.join(ds, 'train.idx')
-        imgrec = mx.recordio.MXIndexedRecordIO(path_imgidx, path_imgrec, 'r')
-        rec_list.append(imgrec)
-    if not os.path.exists(input_args.output):
-        os.makedirs(input_args.output)
 
-    imgid = 0
-    for ds_id in range(len(rec_list)):
-        imgrec = rec_list[ds_id]
-        s = imgrec.read_idx(0)
-        header, _ = mx.recordio.unpack(s)
-        assert header.flag > 0
-        seq_identity = range(int(header.label[0]), int(header.label[1]))
+def main(dataset_path, output_dir):
+    path_imgrec = os.path.join(dataset_path, 'train.rec')
+    path_imgidx = os.path.join(dataset_path, 'train.idx')
+    if not os.path.exists(output_dir):
+        os.mkdir(output_dir)
 
-        for identity in seq_identity:
-            s = imgrec.read_idx(identity)
-            header, _ = mx.recordio.unpack(s)
-            for _idx in range(int(header.label[0]), int(header.label[1])):
-                s = imgrec.read_idx(_idx)
-                _header, _img = mx.recordio.unpack(s)
-                label = int(_header.label[0])
-                class_path = os.path.join(args.output, "%d" % label)
-                if not os.path.exists(class_path):
-                    os.makedirs(class_path)
-                _img = mx.image.imdecode(_img).asnumpy()[:, :, ::-1]  # to bgr
-                image_path = os.path.join(class_path, "%d_%d.jpg" % (label, imgid))
-                cv2.imwrite(image_path, _img)
-                imgid += 1
-                if imgid % 10000 == 0:
-                    print(imgid)
+    imgrec = recordio.MXIndexedRecordIO(path_imgidx, path_imgrec, 'r')
+    img_info = imgrec.read_idx(0)
+    header, _ = mx.recordio.unpack(img_info)
+    max_idx = int(header.label[0])
+    print('max_idx:', max_idx)
+    for i in tqdm(range(max_idx)):
+        header, s = recordio.unpack(imgrec.read_idx(i + 1))
+        img = mx.image.imdecode(s).asnumpy()
+        label = str(header.label)
+        ids = str(i)
+
+        label_dir = os.path.join(output_dir, label)
+        if not os.path.exists(label_dir):
+            os.mkdir(label_dir)
+        fname = 'Figure_{}.png'.format(ids)
+        fpath = os.path.join(label_dir, fname)
+        io.imsave(fpath, img)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='do dataset merge')
@@ -67,4 +53,4 @@ if __name__ == '__main__':
     parser.add_argument('--include', default='', type=str, help='')
     parser.add_argument('--output', default='', type=str, help='')
     args = parser.parse_args()
-    main(args)
+    main(args.include, args.output)

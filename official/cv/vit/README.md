@@ -419,8 +419,8 @@ Current batch_ Size can only be set to 1.
 | Loss Function              | Softmax Cross Entropy                                       |
 | outputs                    | probability                                                 |
 | Loss                       | 1.0                                                         |
-| Speed                      | 1pc: 180 ms/step;  8pcs: 185 ms/step                        |
-| Total time                 | 8pcs: 11 hours                                              |
+| Speed                      | 1pc: 251 ms/step;  8pcs: 265 ms/step                        |
+| Total time                 | 8pcs: 13 hours                                              |
 | Parameters (M)             | 86.0                                                        |
 | Checkpoint for Fine tuning | 1000M (.ckpt file)                                          |
 | Scripts                    | [vit script](https://gitee.com/mindspore/models/tree/master/official/cv/vit) |
