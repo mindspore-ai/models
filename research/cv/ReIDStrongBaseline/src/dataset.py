@@ -186,6 +186,7 @@ def create_dataset(
         column_names=['image', 'label'],
         sampler=sampler,
         shuffle=shuffle,
+        num_parallel_workers=num_parallel_workers,
     )
 
     dataset = dataset.map(

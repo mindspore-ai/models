@@ -128,16 +128,23 @@ def _prepare_configuration():
                 if not config.need_modelarts_dataset_unzip:
                     init()
 
-        config.group_size = get_group_size()
-        config.rank = get_rank()
+            config.group_size = get_group_size()
+            config.rank = get_rank()
 
-        device_num = config.group_size
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(
-            device_num=device_num,
-            parallel_mode=ParallelMode.DATA_PARALLEL,
-            gradients_mean=True,
-        )
+            device_num = config.group_size
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(
+                device_num=device_num,
+                parallel_mode=ParallelMode.DATA_PARALLEL,
+                gradients_mean=True,
+            )
+        if config.device_target == "Ascend":
+            device_id = int(os.getenv('DEVICE_ID'))
+            context.set_context(device_id=device_id)
+            init()
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
+            config.rank = get_rank()
+            config.group_size = get_group_size()
     else:
         config.group_size = 1
         config.rank = 0
