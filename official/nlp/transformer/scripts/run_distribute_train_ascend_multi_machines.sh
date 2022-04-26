@@ -57,7 +57,7 @@ do
     --distribute="true" \
     --epoch_size=$EPOCH_SIZE \
     --device_id=$DEVICE_ID \
-    --device_num=$DEVICE_NUM \
+    --device_num=$RANK_SIZE \
     --enable_save_ckpt="true" \
     --enable_lossscale="true" \
     --do_shuffle="true" \
