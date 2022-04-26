@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,13 +14,12 @@
 # ============================================================================
 """loss functions"""
 
+import mindspore as ms
+import mindspore.ops as ops
 from mindspore import nn
 from mindspore import Tensor
-from mindspore.common import dtype as mstype
 from mindspore.nn.loss.loss import LossBase as Loss
 
-from mindspore.ops import functional as F
-from mindspore.ops import operations as P
 
 
 class CrossEntropySmooth(Loss):
@@ -28,10 +27,10 @@ class CrossEntropySmooth(Loss):
     def __init__(self, sparse=True, reduction='mean', smooth_factor=0., num_classes=1000, aux_factor=0.4):
         super().__init__()
         self.aux_factor = aux_factor
-        self.onehot = P.OneHot()
+        self.onehot = ops.OneHot()
         self.sparse = sparse
-        self.on_value = Tensor(1.0 - smooth_factor, mstype.float32)
-        self.off_value = Tensor(1.0 * smooth_factor / (num_classes - 1), mstype.float32)
+        self.on_value = Tensor(1.0 - smooth_factor, ms.float32)
+        self.off_value = Tensor(1.0 * smooth_factor / (num_classes - 1), ms.float32)
         self.ce = nn.SoftmaxCrossEntropyWithLogits(reduction=reduction)
 
     def construct(self, logits, label):
@@ -41,7 +40,7 @@ class CrossEntropySmooth(Loss):
             logit, aux_logit = logits, None
 
         if self.sparse:
-            label = self.onehot(label, F.shape(logit)[1], self.on_value, self.off_value)
+            label = self.onehot(label, logit.shape[1], self.on_value, self.off_value)
 
         loss = self.ce(logit, label)
         if aux_logit is not None:
@@ -53,14 +52,14 @@ class CrossEntropySmoothMixup(Loss):
     """CrossEntropy"""
     def __init__(self, reduction='mean', smooth_factor=0., num_classes=1000):
         super().__init__()
-        self.on_value = Tensor(1.0 - smooth_factor, mstype.float32)
+        self.on_value = Tensor(1.0 - smooth_factor, ms.float32)
         self.off_value = 1.0 * smooth_factor / (num_classes - 2)
         self.cross_entropy = nn.SoftmaxCrossEntropyWithLogits(reduction=reduction)
 
     def construct(self, logit, label):
-        off_label = P.Select()(P.Equal()(label, 0.0), \
-           P.Fill()(mstype.float32, P.Shape()(label), self.off_value), \
-           P.Fill()(mstype.float32, P.Shape()(label), 0.0))
+        off_label = ops.Select()(ops.Equal()(label, 0.0), \
+           ops.Fill()(ms.float32, label.shape, self.off_value), \
+           ops.Fill()(ms.float32, label.shape, 0.0))
 
         label = self.on_value * label + off_label
         loss = self.cross_entropy(logit, label)
@@ -71,27 +70,27 @@ class CrossEntropyIgnore(Loss):
     """CrossEntropyIgnore"""
     def __init__(self, num_classes=21, ignore_label=255):
         super().__init__()
-        self.one_hot = P.OneHot(axis=-1)
-        self.on_value = Tensor(1.0, mstype.float32)
-        self.off_value = Tensor(0.0, mstype.float32)
-        self.cast = P.Cast()
+        self.one_hot = ops.OneHot(axis=-1)
+        self.on_value = Tensor(1.0, ms.float32)
+        self.off_value = Tensor(0.0, ms.float32)
+        self.cast = ops.Cast()
         self.ce = nn.SoftmaxCrossEntropyWithLogits()
-        self.not_equal = P.NotEqual()
+        self.not_equal = ops.NotEqual()
         self.num_cls = num_classes
         self.ignore_label = ignore_label
-        self.mul = P.Mul()
-        self.sum = P.ReduceSum(False)
-        self.div = P.RealDiv()
-        self.transpose = P.Transpose()
-        self.reshape = P.Reshape()
+        self.mul = ops.Mul()
+        self.sum = ops.ReduceSum(False)
+        self.div = ops.RealDiv()
+        self.transpose = ops.Transpose()
+        self.reshape = ops.Reshape()
 
     def construct(self, logits, labels):
-        labels_int = self.cast(labels, mstype.int32)
+        labels_int = self.cast(labels, ms.int32)
         labels_int = self.reshape(labels_int, (-1,))
         logits_ = self.transpose(logits, (0, 2, 3, 1))
         logits_ = self.reshape(logits_, (-1, self.num_cls))
         weights = self.not_equal(labels_int, self.ignore_label)
-        weights = self.cast(weights, mstype.float32)
+        weights = self.cast(weights, ms.float32)
         one_hot_labels = self.one_hot(labels_int, self.num_cls, self.on_value, self.off_value)
         loss = self.ce(logits_, one_hot_labels)
         loss = self.mul(weights, loss)

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ from io import BytesIO
 from PIL import Image
 import numpy as np
 
-import mindspore.common.dtype as mstype
+import mindspore as ms
 import mindspore.dataset.engine as de
 import mindspore.dataset.vision.c_transforms as C
 import mindspore.dataset.transforms.c_transforms as C2
@@ -126,7 +126,7 @@ def create_dataset(dataset_path,
             C.HWC2CHW()
         ]
 
-    type_cast_op = C2.TypeCast(mstype.int32)
+    type_cast_op = C2.TypeCast(ms.int32)
 
     ds = ds.repeat(repeat_num)
     ds = ds.map(input_columns="image", num_parallel_workers=num_workers, operations=trans, python_multiprocessing=True)

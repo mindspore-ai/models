@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 # ============================================================================
 """eval engine"""
 
+import mindspore as ms
 from mindspore import Tensor
-import mindspore.common.dtype as mstype
 
 from src.metric import ClassifyCorrectWithCache, ClassifyCorrectCell, DistAccuracy
 
@@ -53,12 +53,12 @@ class ImageNetCacheEvelEngine(BasicEvalEngine):
         self.args = args
 
     def compile(self, sink_size=-1):
-        index = Tensor(0, mstype.int32)
+        index = Tensor(0, ms.int32)
         self.dist_eval_network.set_train(False)
         self.dist_eval_network.compile(index)
 
     def eval(self):
-        index = Tensor(0, mstype.int32)
+        index = Tensor(0, ms.int32)
         output = self.dist_eval_network(index)
         output = output.asnumpy() / 50000
         self.outputs = {"acc": output}

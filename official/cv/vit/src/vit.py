@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,12 +18,11 @@ from importlib import import_module
 from easydict import EasyDict as edict
 import numpy as np
 
-import mindspore
+import mindspore as ms
+import mindspore.ops as ops
 from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
 from mindspore.nn import Cell, Dense, Dropout, SequentialCell
-from mindspore.ops import operations as P
-import mindspore.common.dtype as mstype
 from mindspore import Tensor
 
 MIN_NUM_PATCHES = 4
@@ -36,39 +35,39 @@ class VitConfig:
         self.configs = configs
 
         # network init
-        self.network_norm = mindspore.nn.LayerNorm((configs.normalized_shape,))
-        self.network_init = mindspore.common.initializer.Normal(sigma=1.0)
+        self.network_norm = ms.nn.LayerNorm((configs.normalized_shape,))
+        self.network_init = ms.common.initializer.Normal(sigma=1.0)
         self.network_dropout_rate = 0.1
         self.network_pool = 'cls'
         self.network = ViT
 
         # stem
-        self.stem_init = mindspore.common.initializer.XavierUniform()
+        self.stem_init = ms.common.initializer.XavierUniform()
         self.stem = VitStem
 
         # body
-        self.body_norm = mindspore.nn.LayerNorm
+        self.body_norm = ms.nn.LayerNorm
         self.body_drop_path_rate = 0.1
         self.body = Transformer
 
         # body attention
-        self.attention_init = mindspore.common.initializer.XavierUniform()
-        self.attention_activation = mindspore.nn.Softmax()
+        self.attention_init = ms.common.initializer.XavierUniform()
+        self.attention_activation = ms.nn.Softmax()
         self.attention_dropout_rate = 0.1
         self.attention = Attention
 
         # body feedforward
-        self.feedforward_init = mindspore.common.initializer.XavierUniform()
-        self.feedforward_activation = mindspore.nn.GELU()
+        self.feedforward_init = ms.common.initializer.XavierUniform()
+        self.feedforward_activation = ms.nn.GELU()
         self.feedforward_dropout_rate = 0.1
         self.feedforward = FeedForward
 
         # head
         self.head = origin_head
-        self.head_init = mindspore.common.initializer.XavierUniform()
+        self.head_init = ms.common.initializer.XavierUniform()
         self.head_dropout_rate = 0.1
-        self.head_norm = mindspore.nn.LayerNorm((configs.normalized_shape,))
-        self.head_activation = mindspore.nn.GELU()
+        self.head_norm = ms.nn.LayerNorm((configs.normalized_shape,))
+        self.head_activation = ms.nn.GELU()
 
 
 class DropPath(Cell):
@@ -79,19 +78,17 @@ class DropPath(Cell):
         super(DropPath, self).__init__()
         self.keep_prob = 1 - drop_prob
         seed = min(seed, 0) # always be 0
-        self.rand = P.UniformReal(seed=seed) # seed must be 0, if set to other value, it's not rand for multiple call
-        self.shape = P.Shape()
-        self.floor = P.Floor()
+
+        self.shape = ops.Shape()
+        self.ones = ops.Ones()
+        self.dropout = Dropout(self.keep_prob)
 
     def construct(self, x):
+        x_shape = self.shape(x)
         if self.training:
             x_shape = self.shape(x) # B N C
-            random_tensor = self.rand((x_shape[0], 1, 1))
-            random_tensor = random_tensor + self.keep_prob
-            random_tensor = self.floor(random_tensor)
-            x = x / self.keep_prob
-            x = x * random_tensor
-        return x
+            mask = self.ones((x_shape[0], 1, 1), ms.float32)
+        return self.dropout(mask)*x
 
 
 class BatchDense(Cell):
@@ -102,7 +99,7 @@ class BatchDense(Cell):
         self.out_features = out_features
         self.dense = Dense(in_features, out_features, has_bias=has_bias)
         self.dense.weight.set_data(initializer(initialization, [out_features, in_features]))
-        self.reshape = P.Reshape()
+        self.reshape = ops.Reshape()
 
     def construct(self, x):
         bs, seq_len, d_model = x.shape
@@ -173,8 +170,8 @@ class VitStem(Cell):
         patch_dim = channels * patch_size ** 2
 
         self.patch_size = patch_size
-        self.reshape = P.Reshape()
-        self.transpose = P.Transpose()
+        self.reshape = ops.Reshape()
+        self.transpose = ops.Transpose()
         self.patch_to_embedding = BatchDense(patch_dim, d_model, initialization, has_bias=True)
 
     def construct(self, img):
@@ -214,15 +211,14 @@ class ViT(Cell):
                                        name='cls', requires_grad=True)
             self.pos_embedding = Parameter(initializer(initialization, (1, num_patches + 1, d_model)),
                                            name='pos_embedding', requires_grad=True)
-            self.tile = P.Tile()
-            self.cat_1 = P.Concat(axis=1)
+            self.tile = ops.Tile()
+            self.cat_1 = ops.Concat(axis=1)
         else:
             self.pos_embedding = Parameter(initializer(initialization, (1, num_patches, d_model)),
                                            name='pos_embedding', requires_grad=True)
-            self.mean = P.ReduceMean(keep_dims=False)
+            self.mean = ops.ReduceMean(keep_dims=False)
         self.pool = pool
 
-        self.cast = P.Cast()
         self.dropout = Dropout(keep_prob=(1. - dropout_rate))
         self.stem = stem
         self.body = body
@@ -240,9 +236,9 @@ class ViT(Cell):
         else:
             x += self.pos_embedding[:, :seq_len]
 
-        y = self.cast(x, mstype.float32)
+        y = ops.cast(x, ms.float32)
         y = self.dropout(y)
-        x = self.cast(y, x.dtype)
+        x = ops.cast(y, x.dtype)
 
         x = self.body(x)
 
@@ -289,12 +285,11 @@ class Attention(Cell):
         self.activation = activation
 
         #auxiliary functions
-        self.reshape = P.Reshape()
-        self.transpose = P.Transpose()
-        self.cast = P.Cast()
-        self.mul = P.Mul()
-        self.q_matmul_k = P.BatchMatMul(transpose_b=True)
-        self.attn_matmul_v = P.BatchMatMul()
+        self.reshape = ops.Reshape()
+        self.transpose = ops.Transpose()
+        self.mul = ops.Mul()
+        self.q_matmul_k = ops.BatchMatMul(transpose_b=True)
+        self.attn_matmul_v = ops.BatchMatMul()
         self.softmax_nz = True
 
     def construct(self, x):
@@ -307,7 +302,7 @@ class Attention(Cell):
         if self.softmax_nz:
             q = self.reshape(q, (bs, seq_len, h, d))
             q = self.transpose(q, (0, 2, 1, 3))
-            q = self.cast(q, mstype.float32)
+            q = ops.cast(q, ms.float32)
             q = self.mul(q, self.scale)
 
             k = self.reshape(k, (bs, seq_len, h, d))
@@ -315,9 +310,9 @@ class Attention(Cell):
             v = self.reshape(v, (bs, seq_len, h, d))
             v = self.transpose(v, (0, 2, 1, 3))
 
-            q = self.cast(q, k.dtype)
+            q = ops.cast(q, k.dtype)
             attn_scores = self.q_matmul_k(q, k) #bs x h x seq_len x seq_len
-            attn_scores = self.cast(attn_scores, x.dtype)
+            attn_scores = ops.cast(attn_scores, x.dtype)
             attn_scores = self.activation(attn_scores)
         else:
             q = self.reshape(q, (bs, seq_len, h, d))
@@ -328,9 +323,9 @@ class Attention(Cell):
             v = self.transpose(v, (0, 2, 1, 3))
 
             attn_scores = self.q_matmul_k(q, k) #bs x h x seq_len x seq_len
-            attn_scores = self.cast(attn_scores, mstype.float32)
+            attn_scores = ops.cast(attn_scores, ms.float32)
             attn_scores = self.mul(attn_scores, self.scale)
-            attn_scores = self.cast(attn_scores, x.dtype)
+            attn_scores = ops.cast(attn_scores, x.dtype)
             attn_scores = self.activation(attn_scores)
 
         out = self.attn_matmul_v(attn_scores, v) #bs x h x seq_len x dim_head
@@ -339,9 +334,9 @@ class Attention(Cell):
         out = self.to_out(out)
         out = self.reshape(out, (bs, seq_len, d_model))
         #out = self.dropout(out)
-        y = self.cast(out, mstype.float32)
+        y = ops.cast(out, ms.float32)
         y = self.dropout(y)
-        out = self.cast(y, out.dtype)
+        out = ops.cast(y, out.dtype)
         #out = self.reshape(out, (bs, seq_len, d_model))
         return out
 
@@ -363,18 +358,17 @@ class FeedForward(Cell):
         self.activation = activation
         self.dropout = Dropout(keep_prob=1.-dropout_rate)
         self.ff2 = BatchDense(hidden_dim, d_model, initialization)
-        self.cast = P.Cast()
 
     def construct(self, x):
         y = self.ff1(x)
-        y = self.cast(y, mstype.float32)
+        y = ops.cast(y, ms.float32)
         y = self.activation(y)
         y = self.dropout(y)
-        y = self.cast(y, x.dtype)
+        y = ops.cast(y, x.dtype)
         y = self.ff2(y)
-        y = self.cast(y, mstype.float32)
+        y = ops.cast(y, ms.float32)
         y = self.dropout(y)
-        y = self.cast(y, x.dtype)
+        y = ops.cast(y, x.dtype)
         return y
 
 
