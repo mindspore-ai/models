@@ -343,13 +343,13 @@ Parameters for learning rate:
 
 - 在`default_config.yaml`中设置选项，包括loss_scale、学习率和网络超参数。点击[这里](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/dataset.html)查看更多数据集信息。
 
-- 运行`run_standalone_train.sh`，进行Transformer模型的非分布式训练。
+- 运行`run_standalone_train.sh`，进行Transformer模型的单卡训练。
 
     ``` bash
     bash scripts/run_standalone_train.sh [DEVICE_TARGET] [DEVICE_ID] [EPOCH_SIZE] [GRADIENT_ACCUMULATE_STEP] [DATA_PATH]
     ```
 
-- 运行`run_distribute_train_ascend.sh`，进行Transformer模型的非分布式训练。
+- 运行`run_distribute_train_ascend.sh`，进行Transformer模型的分布式训练。
 
     ``` bash
     # Ascend environment
