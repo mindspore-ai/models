@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -117,7 +117,7 @@ class SegDataset:
     def get_dataset1(self):
         """get dataset"""
         ds.config.set_seed(1000)
-        data_set = ds.MindDataset(dataset_file=self.data_file, columns_list=["data", "label"],
+        data_set = ds.MindDataset(self.data_file, columns_list=["data", "label"],
                                   shuffle=True, num_parallel_workers=self.num_readers,
                                   num_shards=self.shard_num, shard_id=self.shard_id)
         decode_op = C.Decode()

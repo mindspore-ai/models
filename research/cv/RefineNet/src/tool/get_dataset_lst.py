@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import scipy.io
 from PIL import Image
 
 parser = argparse.ArgumentParser('dataset list generator')
-parser.add_argument("--data_dir", type=str, default='D:/datasets/', help='where dataset stored.')
+parser.add_argument("--data_dir", type=str, default='~/data/', help='where dataset stored.')
 
 args, _ = parser.parse_known_args()
 

@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 if [ $# -ne 3 ]
-then 
-    echo "Usage: bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATASET_PATH] [PRETRAINED_PATH]"
+then
+    echo "Usage: bash scripts/run_standalone_train_gpu_r2.sh [DATASET_PATH] [PRETRAINED_PATH] [DEVICE_ID]"
 exit 1
 fi
 
@@ -27,48 +27,37 @@ get_real_path(){
   fi
 }
 
-RANK_TABLE_PATH=$(get_real_path $1)
-echo $RANK_TABLE_PATH
+DATASET_PATH=$(get_real_path $1)
+PRETRAINED_PATH=$(get_real_path $2)
+echo $DATASET_PATH
+echo $PRETRAINED_PATH
 
-if [ ! -f $RANK_TABLE_PATH ]
-then 
-    echo "error: RANK_TABLE_FILE=$RANK_TABLE_PATH is not a file"
-exit 1
-fi
-
-DATASET_PATH=$2
 if [ ! -f $DATASET_PATH ]
 then
     echo "error: DATASET_PATH=$DATASET_PATH is not a file"
 exit 1
 fi
 
-PRETRAINED_PATH=$(get_real_path $3)
-echo $PRETRAINED_PATH
 if [ ! -f $PRETRAINED_PATH ]
-then 
+then
     echo "error: PRETRAINED_PATH=$PRETRAINED_PATH is not a file"
 exit 1
 fi
 
 ulimit -u unlimited
-export DEVICE_NUM=8
-export RANK_SIZE=8
-export RANK_TABLE_FILE=$RANK_TABLE_PATH
-
-for((i=0; i<${DEVICE_NUM}; i++))
-do
-    export DEVICE_ID=$i
-    export RANK_ID=$i
-    rm -rf ./train_parallel$i
-    mkdir ./train_parallel$i
-    cp ../*.py ./train_parallel$i
-    cp *.sh ./train_parallel$i
-    cp -r ../src ./train_parallel$i
-    cd ./train_parallel$i || exit
-    echo "start training for rank $RANK_ID, device $DEVICE_ID"
-    env > env.log
-    python train.py --device_id=$i --rank=$i --is_distribute --data_file=$DATASET_PATH --ckpt_pre_trained=$PRETRAINED_PATH --base_lr=0.0032 --batch_size=32 &> log &
-    cd ..
-done
+export DEVICE_NUM=1
+export DEVICE_ID=$3
+export RANK_ID=0
+export RANK_SIZE=1
+LOCAL_DIR=train$DEVICE_ID
+rm -rf $LOCAL_DIR
+mkdir $LOCAL_DIR
+cp ../*.py $LOCAL_DIR
+cp *.sh $LOCAL_DIR
+cp -r ../src $LOCAL_DIR
+cd $LOCAL_DIR || exit
+echo "start training for device $DEVICE_ID"
+env > env.log
+python train.py --data_file=$DATASET_PATH --ckpt_pre_trained=$PRETRAINED_PATH --device_id=$DEVICE_ID --base_lr=0.0001 --batch_size=16 --device_target='GPU' &> log &
+cd ..
 

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -41,6 +41,8 @@ def parse_args():
     parser.add_argument('--device_id', type=str, default='0', choices=['0', '1', '2', '3', '4', '5', '6', '7'],
                         help='which device will be implemented')
     parser.add_argument('--ckpt_path', type=str, default='', help='model to evaluate')
+    parser.add_argument('--device_target', type=str, default='Ascend', choices=['Ascend', 'GPU'],
+                        help='device where the code will be implemented. (Default: Ascend)')
     args, _ = parser.parse_known_args()
     return args
 
@@ -140,7 +142,7 @@ def net_eval():
     with open(args.data_lst) as f:
         img_lst = f.readlines()
 
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False,
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, save_graphs=False,
                         device_id=int(args.device_id))
 
     network = RefineNet(Bottleneck, [3, 4, 23, 3], args.num_classes)

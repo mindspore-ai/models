@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 """ train Refinenet """
 import argparse
 import math
+import os
 from mindspore import Parameter, context
 from mindspore.train.model import Model
 import mindspore.nn as nn
@@ -63,7 +64,7 @@ def parse_args():
     parser.add_argument('--ckpt_pre_trained', type=str, default='', help='PreTrained model')
 
     # train
-    parser.add_argument('--device_target', type=str, default='Ascend', choices=['Ascend', 'CPU'],
+    parser.add_argument('--device_target', type=str, default='Ascend', choices=['Ascend', 'GPU'],
                         help='device where the code will be implemented. (Default: Ascend)')
     parser.add_argument('--device_id', type=str, default='0', choices=['0', '1', '2', '3', '4', '5', '6', '7'],
                         help='which device will be implemented')
@@ -83,19 +84,37 @@ def weights_init(net):
             cell.weight = Parameter(initializer(HeUniform(negative_slope=math.sqrt(5)), cell.weight.shape,
                                                 cell.weight.dtype), name=cell.weight.name)
 
+def get_device_id():
+    device_id = os.getenv('DEVICE_ID', '0')
+    return int(device_id)
 
 def train():
     """train"""
     args = parse_args()
-    context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True, save_graphs=False,
-                        device_target="Ascend", device_id=int(args.device_id))
+    if args.device_target == 'Ascend':
+        context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True, save_graphs=False,
+                            device_target=args.device_target, device_id=int(args.device_id))
+        if args.is_distributed:
+            init()
+            args.rank = get_rank()
+            args.group_size = get_group_size()
+            parallel_mode = ParallelMode.DATA_PARALLEL
+            context.set_auto_parallel_context(parallel_mode=parallel_mode, gradients_mean=True,
+                                              device_num=args.group_size)
+    elif args.device_target == 'GPU':
+        if args.is_distributed:
+            context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True, save_graphs=False,
+                                device_target=args.device_target, device_id=get_device_id())
+            init()
+            args.rank = get_rank()
+            args.group_size = get_group_size()
+            parallel_mode = ParallelMode.DATA_PARALLEL
+            context.set_auto_parallel_context(parallel_mode=parallel_mode, gradients_mean=True,
+                                              device_num=args.group_size)
+        else:
+            context.set_context(mode=context.GRAPH_MODE, enable_auto_mixed_precision=True, save_graphs=False,
+                                device_target=args.device_target, device_id=int(args.device_id))
 
-    if args.is_distributed:
-        init()
-        args.rank = get_rank()
-        args.group_size = get_group_size()
-        parallel_mode = ParallelMode.DATA_PARALLEL
-        context.set_auto_parallel_context(parallel_mode=parallel_mode, gradients_mean=True, device_num=args.group_size)
     # dataset
     dataset = data_generator.SegDataset(image_mean=args.image_mean,
                                         image_std=args.image_std,
@@ -141,7 +160,11 @@ def train():
 
     # loss scale
     manager_loss_scale = FixedLossScaleManager(args.loss_scale, drop_overflow_update=False)
-    amp_level = "O0" if args.device_target == "CPU" else "O3"
+
+    if args.device_target == "GPU":
+        amp_level = "O2"
+    elif args.device_target == "Ascend":
+        amp_level = "O3"
     model = Model(network, loss_, optimizer=opt, amp_level=amp_level, loss_scale_manager=manager_loss_scale)
 
     # callback for saving ckpts
