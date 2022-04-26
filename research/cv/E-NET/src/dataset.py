@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ from PIL import Image, ImageFilter
 import mindspore.dataset as ds
 
 EXTENSIONS = ['.jpg', '.png']
-
 
 class MyGaussianBlur(ImageFilter.Filter):
     """GaussianBlur"""
@@ -167,9 +166,9 @@ class cityscapes:
         filename = self.filenames[index]
         filenameGt = self.filenamesGt[index]
 
-        with open(image_path_city(self.images_root, filename), 'rb') as f:
+        with open(filename, 'rb') as f:
             image = load_image(f).convert('RGB')
-        with open(image_path_city(self.labels_root, filenameGt), 'rb') as f:
+        with open(filenameGt, 'rb') as f:
             label = load_image(f).convert('P')
         image, label = self.transform(image, label)
         return image, label
@@ -210,7 +209,7 @@ def getCityScapesDataLoader_GeneratorDataset(CityScapesRoot, subset, batch_size,
     """CityScapesGeneratorDataset"""
     dataset = cityscapes(CityScapesRoot, subset, enc, aug, height)
     dataloader = ds.GeneratorDataset(dataset, column_names=["images", "labels"],
-                                     num_parallel_workers=8, shuffle=shuffle, shard_id=rank_id,
+                                     num_parallel_workers=6, shuffle=shuffle, shard_id=rank_id,
                                      num_shards=global_size, python_multiprocessing=True)
     if shuffle:
         dataloader = dataloader.shuffle(batch_size*10)
@@ -224,16 +223,16 @@ def getCityScapesDataLoader_mindrecordDataset(stage, data_path, batch_size, enc,
                                               shuffle, aug, rank_id=0, global_size=1, repeat=1):
     """CityScapesmindrecordDataset"""
     dataloader = ds.MindDataset(data_path, columns_list=["data", "label"],
-                                num_parallel_workers=8, shuffle=shuffle, shard_id=rank_id, num_shards=global_size)
+                                num_parallel_workers=6, shuffle=shuffle, shard_id=rank_id, num_shards=global_size)
     transform = MyCoTransform(stage, enc, aug, height, if_from_mindrecord=True)
     dataloader = dataloader.map(operations=transform,
                                 input_columns=["data", "label"], output_columns=["data", "label"],
-                                num_parallel_workers=8, python_multiprocessing=True)
+                                num_parallel_workers=6, python_multiprocessing=True)
 
     if shuffle:
         dataloader = dataloader.shuffle(batch_size*10)
 
-    dataloader = dataloader.batch(batch_size, drop_remainder=False)
+    dataloader = dataloader.batch(batch_size, drop_remainder=True)
     if repeat > 1:
         dataloader = dataloader.repeat(repeat)
     return dataloader

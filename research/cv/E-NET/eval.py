@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,12 +21,12 @@ from argparse import ArgumentParser
 import numpy as np
 from mindspore import context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-
+from mindspore.common import set_seed
 from src.criterion import SoftmaxCrossEntropyLoss
 from src.dataset import getCityScapesDataLoader_GeneratorDataset
 from src.iou_eval import iouEval
 from src.model import Encoder_pred, Enet
-from src.util import getBool, getCityLossWeight, seed_seed
+from src.util import getBool, getCityLossWeight
 
 
 def IOU(network_trained, dataloader, num_class, enc):
@@ -88,7 +88,8 @@ if __name__ == "__main__":
     parser.add_argument('--run_distribute', type=str)
     parser.add_argument('--encode', type=str)
     parser.add_argument('--model_root_path', type=str)
-    parser.add_argument('--device_id', type=int)
+    parser.add_argument('--device_id', type=int, default=0)
+    parser.add_argument('--device_target', type=str, default='Ascend')
 
     config = parser.parse_args()
     model_root_path_ = config.model_root_path
@@ -96,10 +97,11 @@ if __name__ == "__main__":
     device_id = config.device_id
     CityScapesRoot = config.data_path
     run_distribute = getBool(config.run_distribute)
+    device_target = config.device_target
 
-    seed_seed()
+    set_seed(1)
     context.set_context(mode=context.GRAPH_MODE)
-    context.set_context(device_target="Ascend")
+    context.set_context(device_target=device_target)
     context.set_context(device_id=device_id)
     context.set_context(save_graphs=False)
 
