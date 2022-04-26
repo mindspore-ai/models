@@ -21,6 +21,8 @@ modelarts_dataset_unzip_name: ''
 ckpt_save_dir: 'checkpoints'
 batch_size: 64
 run_distribute: False
+dataset_path: ''
+end_epoch: 0
 eval_model_file: ''
 coco_bbox_file: ''
 #pose_resnet-related
@@ -38,12 +40,13 @@ POSE_RESNET:
 MODEL:
     NAME: 'pose_resnet'
     INIT_WEIGHTS: True
-    PRETRAINED: './resnet50.ckpt'
+    PRETRAINED: './models/resnet50.ckpt'
+    RESUME: False
     NUM_JOINTS: 17
     IMAGE_SIZE: [192, 256]  # width * height, ex: 192 * 256
 #dataset-related
 DATASET:
-    ROOT: '/data/coco2017/'
+    ROOT: '../coco2017/'
     TEST_SET: 'val2017'
     TRAIN_SET: 'train2017'
     FLIP: True
@@ -51,9 +54,14 @@ DATASET:
     SCALE_FACTOR: 0.3
 #train-related
 TRAIN:
+    SINK_MODE: False
+    NUM_WORKERS: 8
     BATCH_SIZE: 64
     BEGIN_EPOCH: 0
     END_EPOCH: 140
+    PRINT_STEP: 100
+    SAVE_EPOCH: 1
+    KEEP_CKPT_MAX: 5
     LR: 0.001
     LR_FACTOR: 0.1
     LR_STEP: [90, 120]

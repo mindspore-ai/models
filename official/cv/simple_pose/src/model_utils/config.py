@@ -122,6 +122,10 @@ def extra_operations(cfg):
         cfg.TEST.COCO_BBOX_FILE = cfg.coco_bbox_file
     if cfg.batch_size:
         cfg.TRAIN.BATCH_SIZE = cfg.batch_size
+    if cfg.dataset_path:
+        cfg.DATASET.ROOT = cfg.dataset_path
+    if cfg.end_epoch:
+        cfg.TRAIN.END_EPOCH = cfg.end_epoch
 
 
 def get_config():

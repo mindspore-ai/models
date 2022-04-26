@@ -67,7 +67,7 @@ To run the python scripts in the repository, you need to prepare the environment
     - Prepare hardware environment with Ascend.
 - Python and dependencies
     - python 3.7
-    - mindspore 1.2.0
+    - mindspore 1.2.0 (Ascend), mindspore-gpu 1.6.1 (GPU)
     - opencv-python 4.3.0.36
     - pycocotools 2.0
 - For more information, please check the resources below：
@@ -99,46 +99,77 @@ Before you start your training process, you need to obtain mindspore imagenet pr
 ```
 
 ```dataset
- └─ cocodataset
+ └─ coco2017
   └─train2017
   └─val2017
   └─annotations
 ```
 
-```default_config.yaml
+```text
 DATASET:
-    ROOT:/home/DataSet/cocodataset
+    ROOT:../coco2017
 MODEL:
-    PRETRAINED:./resnet50.ckpt
+    PRETRAINED:./models/resnet50.ckpt
 
 # Modify according to local path
 ```
 
+In the example above, we put COCO2017 dataset in `../<ROOT>`.
+
 ## [Running](#contents)
 
-- running on local
+- running on local Ascend
 
-    To train the model, run the shell script `scripts/train_standalone.sh` with the format below:
+    To train the model on Ascend, run the shell script `scripts/train_ascend_standalone.sh` with the format below:
 
     ```shell
-    bash scripts/train_standalone.sh [CKPT_SAVE_DIR] [DEVICE_ID] [BATCH_SIZE]
-    # example: bash scripts/train_standalone.sh ./ 0 128
+    bash scripts/train_ascend_standalone.sh [CKPT_SAVE_DIR] [DEVICE_ID] [BATCH_SIZE]
+    # example: bash scripts/train_ascend_standalone.sh ./ckpt/ascend_standalone 0 128
     ```
 
-    To validate the model, change the settings in `default_config.yaml` to the path of the model you want to validate or setting that on the terminal. For example:
+    **Notice:** `[CKPT_SAVE_DIR]` is the relative path to `<ROOT>`.
 
-    ```default_config.yaml
+    To validate the model on Ascend, change the settings in `default_config.yaml` to the path of the model you want to validate or setting that on the terminal. For example:
+
+    ```text
     TEST:
         ...
-        MODEL_FILE : /home/model/simple_pose/ckpt/simplepose-140_1170.ckpt
+        MODEL_FILE : ./ckpt/ascend_standalone/simplepose-140_1170.ckpt
     # Modify according to local path
     ```
 
-    Then, run the shell script `scripts/eval.sh` with the format below:
+    Then, run the shell script `scripts/eval_ascend.sh` with the format below:
 
     ```shell
-    bash scripts/eval.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [DEVICE_ID]
-    # example: bash scripts/eval.sh /home/model/simple_pose/ckpt/simplepose-140_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
+    bash scripts/eval_ascend.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [DEVICE_ID]
+    # example: bash scripts/eval_ascend.sh ./ckpt/ascend_standalone/simplepose-140_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
+    ```
+
+- running on local GPU
+
+    To train the model on GPU, run the shell script `scripts/train_gpu_standalone.sh` with the format below:
+
+    ```shell
+    bash scripts/train_gpu_standalone.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+    # example: bash scripts/train_gpu_standalone.sh ./ckpt/gpu_standalone/ 64 185 0
+    ```
+
+    **Notice:** `[CKPT_SAVE_DIR]` is the relative path to `<ROOT>`.
+
+    To validate the model on GPU, change the settings in `default_config.yaml` to the path of the model you want to validate or setting that on the terminal. For example:
+
+    ```text
+    TEST:
+        ...
+        MODEL_FILE : ./ckpt/gpu_standalone/simplepose-185_1170.ckpt
+    # Modify according to local path
+    ```
+
+    Then, run the shell script `scripts/eval_gpu.sh` with the format below:
+
+    ```shell
+    bash scripts/eval_gpu.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+    # example: bash scripts/eval_gpu.sh ./ckpt/gpu_standalone/simplepose-185_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
     ```
 
 - running on ModelArts
@@ -200,9 +231,12 @@ The structure of the files in this repository is shown below.
 ```text
 └─ simple_pose
     ├─ scripts
-    │  ├─ eval.sh                 // launch ascend standalone evaluation
-    │  ├─ train_distributed.sh    // launch ascend distributed training
-    │  └─ train_standalone.sh     // launch ascend standalone training
+    │  ├─ eval_ascend.sh                 // launch ascend evaluation
+    │  ├─ eval_gpu.sh                 // launch gpu standalone evaluation
+    │  ├─ train_ascend_distributed.sh    // launch ascend distributed training
+    │  ├─ train_ascend_standalone.sh     // launch ascend standalone training
+    │  ├─ train_gpu_distributed.sh    // launch gpu distributed training
+    │  └─ train_gpu_standalone.sh     // launch gpu standalone training
     ├─ src
     │  ├─ utils
     │  │  ├─ transform.py         // utils about image transformation
@@ -230,11 +264,13 @@ Configurations for both training and evaluation are set in `default_config.yaml`
 
 - config for SimplePoseNet on COCO2017 dataset:
 
-```default_config.yaml
+```text
 # These parameters can be modified at the terminal
 ckpt_save_dir: 'checkpoints'                # the folder to save the '*.ckpt' file
 batch_size: 128                             # TRAIN.BATCH_SIZE
 run_distribute: False                       # training by several devices: "true"(training by more than 1 device) | "false", default is "false"
+dataset_path: ''                            # DATASET.ROOT
+end_epoch: 0                                # TRAIN.EPOCH
 eval_model_file: ''                         # TEST.MODEL_FILE
 coco_bbox_file: ''                          # TEST.COCO_BBOX_FILE
 #pose_resnet-related
@@ -253,11 +289,12 @@ MODEL:
     NAME: 'pose_resnet'                     # model name
     INIT_WEIGHTS: True                      # init model weights by resnet
     PRETRAINED: './resnet50.ckpt'           # pretrained model
+    RESUME: False                           # whether resume training from pretrained checkpoint
     NUM_JOINTS: 17                          # the number of keypoints
     IMAGE_SIZE: [192, 256]                  # image size
 #dataset-related
 DATASET:
-    ROOT: '/data/coco2017/'                 # coco2017 dataset root
+    ROOT: '../coco2017/'                 # coco2017 dataset root
     TEST_SET: 'val2017'                     # folder name of test set
     TRAIN_SET: 'train2017'                  # folder name of train set
     FLIP: True                              # random flip
@@ -268,6 +305,9 @@ TRAIN:
     BATCH_SIZE: 64                          # batch size
     BEGIN_EPOCH: 0                          # begin epoch
     END_EPOCH: 140                          # end epoch
+    PRINT_STEP: 100                         # print step
+    SAVE_EPOCH: 5                           # number of epochs per saving
+    KEEP_CKPT_MAX: 5                       # maximum number of checkpoint files can be saved
     LR: 0.001                               # initial learning rate
     LR_FACTOR: 0.1                          # learning rate reduce factor
     LR_STEP: [90, 120]                      # step to reduce lr
@@ -289,17 +329,19 @@ TEST:
     NMS_THRE: 1.0                           # nms threshold
 ```
 
+**Notice:** When `TRAIN.RESUME=True`, the training script resume training from `TRAIN.PRETRAINED`.
+
 ## [Training Process](#contents)
 
 ### [Training](#contents)
 
 #### Running on Ascend
 
-Run `scripts/train_standalone.sh` to train the model standalone. The usage of the script is:
+Run `scripts/train_ascend_standalone.sh` to train the model standalone. The usage of the script is:
 
 ```shell
-bash scripts/train_standalone.sh [CKPT_SAVE_DIR] [DEVICE_ID] [BATCH_SIZE]
-# example: bash scripts/train_standalone.sh ./ 0 128
+bash scripts/train_ascend_standalone.sh [CKPT_SAVE_DIR] [DEVICE_ID] [BATCH_SIZE]
+# example: bash scripts/train_ascend_standalone.sh ./ckpt/ascend_standalone 0 128
 ```
 
 The script will run training in the background, you can view the results through the file `train_log[X].txt` as follows:
@@ -307,7 +349,7 @@ The script will run training in the background, you can view the results through
 ```log
 loading parse...
 batch size :128
-loading dataset from /data/coco2017/train2017
+loading dataset from ../coco2017/train2017
 loaded 149813 records from coco dataset.
 loading pretrained model ./models/resnet50.ckpt
 start training, epoch size = 140
@@ -320,15 +362,51 @@ Epoch time: 456265.617, per step time: 389.971
 
 The model checkpoint will be saved into `[CKPT_SAVE_DIR]`.
 
+#### Running on GPU
+
+Run `scripts/train_gpu_standalone.sh` to train the model standalone on GPU. The usage of the script is:
+
+```shell
+bash scripts/train_gpu_standalone.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+# example: bash scripts/train_gpu_standalone.sh ./ckpt/gpu_standalone/ 64 185 0
+```
+
+The script will run training in the background, you can view the results through the file `./logs/train_gpu_standalone.log` as follows:
+
+```log
+...
+batch size :64
+loading dataset from ../coco2017/train2017
+loaded 149813 records from coco dataset.
+use mindspore-style maxpool
+loading pretrained model ./models/resnet50.ckpt
+start training, epoch size = 200
+epoch: 1 step: 100, loss is 0.001145
+epoch: 1 step: 200, loss is 0.001206
+...
+epoch: 1 step: 2200, loss is 0.000607
+epoch: 1 step: 2300, loss is 0.0007854
+epoch time: 496858.148 ms, per step time: 212.333 ms
+epoch: 2 step: 60, loss is 0.0005794
+epoch: 2 step: 160, loss is 0.0006633
+...
+epoch: 2 step: 2160, loss is 0.000607
+epoch: 2 step: 2260, loss is 0.0006447
+epoch time: 491012.196 ms, per step time: 209.834 ms
+...
+```
+
+The model checkpoint will be saved into `[CKPT_SAVE_DIR]`.
+
 ### [Distributed Training](#contents)
 
 #### Running on Ascend
 
-Run `scripts/train_distributed.sh` to train the model distributed. The usage of the script is:
+Run `scripts/train_ascend_distributed.sh` to train the model distributed. The usage of the script is:
 
 ```shell
-bash scripts/train_distributed.sh [MINDSPORE_HCCL_CONFIG_PATH] [CKPT_SAVE_DIR] [RANK_SIZE]
-# example: bash scripts/train_distributed.sh /root/hccl_8p_01234567_10.155.170.71.json ./checkpoint 8
+bash scripts/train_ascend_distributed.sh [MINDSPORE_HCCL_CONFIG_PATH] [CKPT_SAVE_DIR] [RANK_SIZE]
+# example: bash scripts/train_ascend_distributed.sh /root/hccl_8p_01234567_10.155.170.71.json ./checkpoint 8
 ```
 
 The above shell script will run distribute training in the background. You can view the results through the file `train_parallel[X]/log.txt` as follows:
@@ -349,15 +427,62 @@ Epoch time: 164792.001, per step time: 281.696
 
 The model checkpoint will be saved into `[CKPT_SAVE_DIR]`.
 
+#### Running on GPU
+
+Run `scripts/train_gpu_distributed.sh` to train the model distributed. The usage of the script is:
+
+```shell
+bash train_gpu_distributed.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+# example: bash scripts/train_gpu_distributed.sh ./ckpt/gpu_distributed/ 32 165 8 0,1,2,3,4,5,6,7
+```
+
+The above shell script will run distribute training in the background. You can view the results through the file `./logs/train_gpu_distributed.log` as follows:
+
+```log
+...
+batch size : 32
+Now we use 8 devices! This is No.0
+Now we use 8 devices! This is No.4
+Now we use 8 devices! This is No.6
+Now we use 8 devices! This is No.7
+Now we use 8 devices! This is No.1
+Now we use 8 devices! This is No.2
+Now we use 8 devices! This is No.5
+Now we use 8 devices! This is No.3
+loading dataset from ../coco2017/train2017
+loading dataset from ../coco2017/train2017
+...
+epoch: 1 step: 400, loss is 0.0009723
+epoch: 1 step: 500, loss is 0.0009146
+epoch: 1 step: 500, loss is 0.00093
+epoch: 1 step: 500, loss is 0.0007286
+epoch: 1 step: 500, loss is 0.000901
+epoch: 1 step: 500, loss is 0.0008855
+epoch: 1 step: 500, loss is 0.0007744
+epoch: 1 step: 500, loss is 0.0008564
+epoch: 1 step: 500, loss is 0.0008945
+epoch time: 398171.379 ms, per step time: 680.635 ms
+epoch time: 398149.378 ms, per step time: 680.597 ms
+epoch time: 398115.206 ms, per step time: 680.539 ms
+epoch time: 398193.271 ms, per step time: 680.672 ms
+epoch time: 398175.092 ms, per step time: 680.641 ms
+epoch time: 398161.965 ms, per step time: 680.619 ms
+epoch time: 397954.691 ms, per step time: 680.264 ms
+epoch time: 398129.488 ms, per step time: 680.563 ms
+...
+```
+
+The model checkpoint will be saved into `[CKPT_SAVE_DIR]`.
+
 ## [Evaluation Process](#contents)
 
 ### Running on Ascend
 
-run `scripts/eval.sh` to evaluate the model with one Ascend processor. The usage of the script is:
+Run `scripts/eval_ascend.sh` to evaluate the model with one Ascend processor. The usage of the script is:
 
 ```shell
-bash scripts/eval.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [DEVICE_ID]
-# example: bash scripts/eval.sh /home/model/simple_pose/ckpt/simplepose-140_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
+bash scripts/eval_ascend.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [DEVICE_ID]
+# example: bash scripts/eval_ascend.sh ./ckpt/ascend_standalone/simplepose-140_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
 ```
 
 The above shell command will run validation procedure in the background. You can view the results through the file `eval_log[X].txt`. The result will be achieved as follows:
@@ -365,12 +490,60 @@ The above shell command will run validation procedure in the background. You can
 ```log
 use flip test: True
 loading model ckpt from results/distributed/sim-140_1170.ckpt
-loading dataset from /data/coco2017/val2017
+loading dataset from ../coco2017/val2017
 loading bbox file from experiments/COCO_val2017_detections_AP_H_56_person.json
 Total boxes: 104125
 1024 samples validated in 18.133189916610718 seconds
 2048 samples validated in 4.724390745162964 seconds
 ...
+```
+
+### Running on GPU
+
+Run `scripts/eval_gpu.sh` to evaluate the model with one GPU. The usage of the script is:
+
+```shell
+bash scripts/eval_gpu.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+# example: bash scripts/eval_gpu.sh ./ckpt/gpu_distributed/simplepose-185_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
+```
+
+The above shell command will run validation procedure in the background. You can view the results through the file `./logs/eval_gpu.log`. The result will be achieved as follows:
+
+```log
+use mindspore-style maxpool
+loading model ckpt from ./ckpt/gpu_distributed/simplepose-165_585.ckpt
+loading dataset from ../coco2017/val2017
+loading bbox file from ./experiments/COCO_val2017_detections_AP_H_56_person.json
+Total boxes: 104125
+1024 samples validated in 17.805729389190674 seconds
+...
+103424 samples validated in 3.9891345500946045 seconds
+(104125, 17, 3) (104125, 2) 104125
+loading annotations into memory...
+Done (t=0.27s)
+creating index...
+index created!
+Loading and preparing results...
+DONE (t=3.44s)
+creating index...
+index created!
+Running per image evaluation...
+Evaluate annotation type *keypoints*
+DONE (t=12.62s).
+Accumulating evaluation results...
+DONE (t=0.40s).
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.704
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.891
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.779
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = 0.670
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.773
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 20 ] = 0.764
+ Average Recall     (AR) @[ IoU=0.50      | area=   all | maxDets= 20 ] = 0.932
+ Average Recall     (AR) @[ IoU=0.75      | area=   all | maxDets= 20 ] = 0.832
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets= 20 ] = 0.719
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets= 20 ] = 0.827
+coco eval results saved to ckpt/gpu_dist/simplepose-165_585/results/keypoints_results.pkl
+AP: 0.7043184629348278
 ```
 
 ## Inference Process
@@ -433,21 +606,21 @@ AP: 0.7036180026660003
 
 ### SimplePoseNet on COCO2017 with detector
 
-#### Performance parameters
+#### Ascend and GPU Performance parameters
 
-| Parameters          | Standalone                  | Distributed                 |
-| ------------------- | --------------------------- | --------------------------- |
-| Model Version       | SimplePoseNet               | SimplePoseNet               |
-| Resource            | Ascend 910; OS Euler2.8                  | 4 Ascend 910 cards; OS Euler2.8          |
-| Uploaded Date       | 12/18/2020 (month/day/year) | 12/18/2020 (month/day/year) |
-| MindSpore Version   | 1.1.0                       | 1.1.0                       |
-| Dataset             | COCO2017                    | COCO2017                    |
-| Training Parameters | epoch=140, batch_size=128   | epoch=140, batch_size=64    |
-| Optimizer           | Adam                        | Adam                        |
-| Loss Function       | Mean Squared Error          | Mean Squared Error          |
-| Outputs             | heatmap                     | heatmap                     |
-| Train Performance   | mAP: 70.4                   | mAP: 70.4                   |
-| Speed               | 1pc: 389.915 ms/step        | 4pc: 281.356 ms/step        |
+| Parameters          | Ascend Standalone           | Ascend Distributed          | GPU Standalone              | GPU Distributed             |
+| ------------------- | --------------------------- | --------------------------- | --------------------------- | --------------------------- |
+| Model Version       | SimplePoseNet               | SimplePoseNet               | SimplePoseNet               | SimplePoseNet               |
+| Resource            | Ascend 910; OS Euler2.8     | 4 Ascend 910 cards; OS Euler2.8  | Tesla V100-PCIE 32G; Ubuntu 18.04.3 LTS |8 Tesla V100-PCIE 32G cards; Ubuntu 18.04.3 LTS |
+| Uploaded Date       | 12/18/2020 (month/day/year) | 12/18/2020 (month/day/year) | 10/13/2021 (month/day/year) | 10/29/2021 (month/day/year) |
+| MindSpore Version   | 1.1.0                       | 1.1.0                       | 1.5.0rc1                    | 1.5.0rc1                    |
+| Dataset             | COCO2017                    | COCO2017                    | COCO2017                    | COCO2017                    |
+| Training Parameters | epoch=140, batch_size=128   | epoch=140, batch_size=64    | epoch=185, batch_size=64    | epoch=165, batch_size=32    |
+| Optimizer           | Adam                        | Adam                        | Adam                        | Adam                        |
+| Loss Function       | Mean Squared Error          | Mean Squared Error          | Mean Squared Error          | Mean Squared Error          |
+| Outputs             | heatmap                     | heatmap                     | heatmap                     | heatmap                     |
+| Train Performance   | mAP: 70.4                   | mAP: 70.4                   | mAP: 70.1                   | mAP: 70.5                   |
+| Speed               | 1pc: 389.915 ms/step        | 4pc: 281.356 ms/step        | 1pc: 234.818 ms/step        | 8pc: 188.138 ms/step        |
 
 #### Note
 
