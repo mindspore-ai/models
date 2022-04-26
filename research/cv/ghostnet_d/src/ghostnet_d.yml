@@ -1,0 +1,41 @@
+general: 
+    backend: mindspore
+    device_category: NPU
+    parallel_fully_train: True
+    
+pipeline: [fully_train]
+
+fully_train:
+    pipe_step:
+        type: TrainPipeStep
+
+    model:
+        model_desc:
+            type: ghostnet_d.ghostnet101
+
+    trainer:
+        type: Trainer
+        epochs: 120
+        mixup: True
+        optimizer:
+            type: SGD
+            params:
+                lr: 0.001
+                momentum: 0.9
+                weight_decay: 0.0001
+        lr_scheduler:
+            type: CosineAnnealingLR
+            by_epoch: True
+            params:
+                T_max: 120
+        loss:
+            type: CrossEntropyLoss
+            params:
+                sparse: True
+
+    dataset:
+        type: Imagenet
+        common:
+            data_path: "/cache/datasets/ILSVRC/Data/CLS-LOC"
+            batch_size: 128
+            n_class: 1000
