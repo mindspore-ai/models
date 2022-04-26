@@ -20,7 +20,7 @@ import numpy as np
 import mindspore as ms
 import mindspore.nn as nn
 from mindspore.ops import operations as ops
-
+from mindspore import dtype as mstype, context
 import src.network.util as mutil
 
 
@@ -110,6 +110,12 @@ class HaarDownsampling(nn.Cell):
 
     def __init__(self, channel_in):
         super(HaarDownsampling, self).__init__()
+
+        if context.get_context("device_target") == "Ascend":
+            self.cast_type = mstype.float16
+        else:
+            self.cast_type = mstype.float32
+
         self.channel_in = channel_in
 
         self.haar_weights = np.ones((4, 1, 2, 2))
@@ -124,8 +130,8 @@ class HaarDownsampling(nn.Cell):
         self.haar_weights[3, 0, 0, 1] = -1
 
         self.haar_weights = np.concatenate(
-            [self.haar_weights] * self.channel_in, 0).astype(np.float16)
-        self.haar_weights = ms.Tensor(self.haar_weights)
+            [self.haar_weights] * self.channel_in, 0)
+        self.haar_weights = ms.Tensor(self.haar_weights).astype(self.cast_type)
         self.haar_weights.requires_grad = False
 
         self.conv2d = mutil.GroupConv(

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,23 +19,20 @@ Model training entrypoint.
 import os
 import ast
 import argparse
-
 import src.options.options as option
 import src.utils.util as util
 from src.data import create_dataset
 from src.optim import warmup_step_lr, warmup_cosine_annealing_lr
 from src.optim.adam_clip import AdamClipped
 from src.network import create_model, IRN_loss
-
 from mindspore import context, Tensor
-
 from mindspore.train.callback import TimeMonitor, LossMonitor, CheckpointConfig, ModelCheckpoint
-from mindspore.communication.management import init, get_group_size
+from mindspore.communication.management import init, get_rank
 from mindspore.train.model import ParallelMode
-from mindspore import Model, load_checkpoint, load_param_into_net
+from mindspore.train.model import Model
+from mindspore import load_checkpoint, load_param_into_net
 from mindspore.common import set_seed
-set_seed(0)
-
+set_seed(10)
 
 current_path = os.path.abspath(__file__)
 root_path = os.path.dirname(current_path)
@@ -44,12 +41,11 @@ X2_TRAIN_YAML_FILE = os.path.join(
 X4_TRAIN_YAML_FILE = os.path.join(
     root_path, "src", "options", "train", "train_IRN_x4.yml")
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="irn training")
     parser.add_argument('--scale', type=int, default=4, choices=(2, 4),
                         help='Rescaling Parameter.')
-    parser.add_argument('--dataset_GT_path', type=str, default='/home/nonroot/DIV2K/DIV2K_train_HR',
+    parser.add_argument('--dataset_GT_path', type=str, default='/home/nonroot/IRN/data/DIV2K_train_HR',
                         help='Path to the folder where the intended GT dataset is stored.')
     parser.add_argument('--dataset_LQ_path', type=str, default=None,
                         help='Path to the folder where the intended LQ dataset is stored.')
@@ -88,18 +84,21 @@ if __name__ == '__main__':
             context.set_auto_parallel_context(device_num=args.device_num,
                                               parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
+            init()
         elif args.device_target == "GPU":
-            context.set_context(device_num=get_group_size(),
-                                parallel_mode=ParallelMode.DATA_PARALLEL,
-                                gradients_mean=True)
+            init("nccl")
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True,
+                                              device_num=args.device_num)
         else:
             raise ValueError("Unsupported device target.")
-        init()
+        rank_id = get_rank()
     else:
         if args.device_target == "Ascend":
             context.set_context(device_id=int(os.getenv('DEVICE_ID')))
         opt['dist'] = False
-        rank = -1
+        rank_id = 0
         print('Disabled distributed training.')
 
     context.set_context(max_call_depth=4030)
@@ -115,6 +114,7 @@ if __name__ == '__main__':
     train_dataset = create_dataset(
         dataset_opt["dataroot_GT"],
         dataset_opt["scale"],
+        target=args.device_target,
         batch_size=dataset_opt["batch_size"],
         distribute=args.run_distribute,
     )
@@ -124,10 +124,10 @@ if __name__ == '__main__':
     # learning rate
     wd_G = train_opt['weight_decay_G'] if train_opt['weight_decay_G'] else 0
     if train_opt['lr_scheme'] == 'MultiStepLR':
-        lr = warmup_step_lr(train_opt['lr_G']*2,
+        lr = warmup_step_lr(train_opt['lr_G'],
                             train_opt['lr_steps'],
                             step_size,
-                            200,
+                            0,
                             total_epochs,
                             train_opt['lr_gamma'],
                             )
@@ -160,19 +160,24 @@ if __name__ == '__main__':
         beta1=train_opt['beta1'], beta2=train_opt['beta2'], weight_decay=wd_G)
 
     # Model
-    model = Model(network=loss, optimizer=optimizer, amp_level="O3")
+    if args.device_target == "Ascend":
+        model = Model(network=loss, optimizer=optimizer, amp_level="O3")
+    elif args.device_target == "GPU":
+        model = Model(network=loss, optimizer=optimizer, amp_level="O0")
+    else:
+        raise ValueError("Unsupported device target.")
 
     # define callbacks
     ckpt_save_steps = step_size*100
     callbacks = [LossMonitor(), TimeMonitor(data_size=ckpt_save_steps)]
     config_ck = CheckpointConfig(
-        save_checkpoint_steps=ckpt_save_steps, keep_checkpoint_max=50)
+        save_checkpoint_steps=ckpt_save_steps, keep_checkpoint_max=10)
     save_ckpt_path = os.path.join(
-        'ckpt/', 'ckpt_one_step_x4/', util.get_timestamp() + '/')
+        'ckpt/', 'ckpt_one_step_x{}/'.format(args.scale), util.get_timestamp() + '/')
     ckpt_cb = ModelCheckpoint(
         prefix="irn_onestep", directory=save_ckpt_path, config=config_ck)
-    callbacks.append(ckpt_cb)
 
     # training
-    model.train(total_epochs, train_dataset, callbacks=callbacks,
-                dataset_sink_mode=True)
+    if rank_id == 0:
+        callbacks.append(ckpt_cb)
+    model.train(total_epochs, train_dataset, callbacks=callbacks, dataset_sink_mode=True)

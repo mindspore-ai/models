@@ -1,3 +1,4 @@
-yaml
+PyYAML
 numpy
-cv2
+opencv-python
+mindspore-gpu==1.6.1

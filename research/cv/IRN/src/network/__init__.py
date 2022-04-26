@@ -14,18 +14,14 @@
 # ============================================================================
 """Initializing for network"""
 
-
 import mindspore as ms
 import mindspore.nn as nn
 from mindspore.ops import functional as F
 from mindspore.ops import composite as C
 from mindspore.ops import operations as ops
 from mindspore import dtype as mstype
-
-
 import src.network.Invnet as Invnet
 from .net_with_loss import IRN_loss
-
 
 def create_model(opt):
     """
@@ -36,7 +32,6 @@ def create_model(opt):
         m = Invnet.define_G(opt)
     print('Model [{:s}] is created.'.format(m.__class__.__name__))
     return m
-
 
 class TrainOneStepCell_IRN(nn.TrainOneStepCell):
     """
@@ -87,7 +82,7 @@ class TrainOneStepCell_IRN(nn.TrainOneStepCell):
         if clip_coef < 1:
             new_grads = ()
             for grad in grads:
-                new_grads += (self.mul(grad, clip_coef),)  # 更新梯度
+                new_grads += (self.mul(grad, clip_coef),)
             grads = new_grads
         self.optimizer(grads)
         return loss
