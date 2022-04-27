@@ -1,0 +1,68 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+vgg_ckpt_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+
+vgg_ckpt_path: "/cache/vggckpt_path"
+output_path: "/home/stu/cyf/415/"
+
+
+data_path: "/home/stu/cyf/BSR"
+load_path: "/cache/checkpoint_path"
+cxx_path: "/home/stu/cyf/415/src/cxx"
+
+device_target: "Ascend"
+need_modelarts_dataset_unzip: False
+modelarts_dataset_unzip_name: ""
+
+# ==============================================================================
+# Train options
+lr: 1.5e-3
+epoch_size: 600
+weight_decay: 0.0002
+momentum: 0.9
+distribute: 1
+rank: 0
+para_workers: 24
+
+save_checkpoint_epochs: 100
+keep_checkpoint_max: 5
+# Eval options
+log_path: "outputs/"
+ckpt_path: './ckpt'
+res_output_path : '/home/stu/cyf/415/res'
+# Test option
+ckpt_p: "hed_mindspore-500_200.ckpt"
+alg: "HED"
+show_plot: False
+model_name_list: "hed"
+result_dir: ""
+save_dir: ""
+gt_dir: ""
+key: "result"
+file_format_eval: ".mat"
+workers: -1
+
+# Export options
+testing_shape: [321, 481]
+device_id: 0
+batch_size: 1
+
+ckpt_file: "/home/cyf/hed_mindspore-600_20.ckpt"
+
+file_name: "hed"
+file_format: "MINDIR"
+
+#310 infer-related
+pre_result_path: './preprocess_Result'
+post_result_path: './result_Files'
+
+---
+
+# Help description for each configuration
+# Train options
+lr: "learning rate for hed"

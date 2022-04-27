@@ -1,0 +1,121 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+vgg_ckpt_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+data_path: "/home/cyf/BSR"
+output_path: "./outputs"
+load_path: "/home/cyf/hed/LOG0/outputs/ckpt_0/hed_mindspore-500_20.ckpt"
+vgg_ckpt_path: "/home/cyf/vgg16.ckpt"
+cxx_path: "/cache/cxx"
+device_target: "Ascend"
+need_modelarts_dataset_unzip: False
+modelarts_dataset_unzip_name: ""
+vgg16_caffe: ""
+
+
+# ==============================================================================
+# Train options
+lr: 1.5e-3
+epoch_size: 500
+weight_decay: 0.0002
+momentum: 0.9
+ckpt_path: "outputs/"
+distribute: 0
+rank: 0
+para_workers: 24
+
+save_checkpoint_epochs: 10
+keep_checkpoint_max: 5
+# Eval options
+log_path: "outputs/"
+ckpt_path: './ckpt'
+save_checkpoint_path: "/cache/train/checkpoint"
+save_checkpoint_path_dis: "./ckpt"
+res_output_path : './hed'
+# Test option
+ckpt_p: "hed_mindspore-500_200.ckpt"
+alg: "HED"
+model_name_list: "hed"
+result_dir: ""
+save_dir: ""
+gt_dir: ""
+key: "result"
+file_format_eval: ".mat"
+workers: -1
+
+# Export options
+device_id: 0
+batch_size: 10
+ckpt_file: ""
+file_format: "AIR"
+
+img_id_file_path: ""
+result_files: './result_Files'
+
+---
+
+# Help description for each configuration
+# Train options
+data_dir: "Train dataset directory."
+per_batch_size: "Batch size for Training."
+pretrained_backbone: "The ckpt file of CspDarkNet53."
+resume_yolov4: "The ckpt file of YOLOv4, which used to fine tune."
+pretrained_checkpoint: "The ckpt file of YoloV4CspDarkNet53."
+filter_weight: "Filter the last weight parameters"
+lr_scheduler: "Learning rate scheduler, options: exponential, cosine_annealing."
+lr: "Learning rate."
+lr_epochs: "Epoch of changing of lr changing, split with ','."
+lr_gamma: "Decrease lr by a factor of exponential lr_scheduler."
+eta_min: "Eta_min in cosine_annealing scheduler."
+t_max: "T-max in cosine_annealing scheduler."
+max_epoch: "Max epoch num to train the model."
+warmup_epochs: "Warmup epochs."
+weight_decay: "Weight decay factor."
+momentum: "Momentum."
+loss_scale: "Static loss scale."
+label_smooth: "Whether to use label smooth in CE."
+label_smooth_factor: "Smooth strength of original one-hot."
+log_interval: "Logging interval steps."
+ckpt_path: "Checkpoint save location."
+ckpt_interval: "Save checkpoint interval."
+is_save_on_master: "Save ckpt on master or all rank, 1 for master, 0 for all ranks."
+is_distributed: "Distribute train or not, 1 for yes, 0 for no."
+rank: "Local rank of distributed."
+group_size: "World size of device."
+need_profiler: "Whether use profiler. 0 for no, 1 for yes."
+training_shape: "Fix training shape."
+resize_rate: "Resize rate for multi-scale training."
+run_eval: "Run evaluation when training."
+save_best_ckpt: "Save best checkpoint when run_eval is True."
+eval_start_epoch: "Evaluation start epoch when run_eval is True."
+eval_interval: "Evaluation interval when run_eval is True"
+ann_file: "path to annotation"
+each_multiscale: "Apply multi-scale for each scale"
+detect_head_loss_coff: "the loss coefficient of detect head.
+                       The order of coefficients is large head, medium head and small head"
+bbox_class_loss_coff: "bbox and class loss coefficient.
+                       The order of coefficients is ciou loss, confidence loss and class loss"
+labels: "the label of train data"
+mosaic: "use mosaic data augment"
+multi_label: "use multi label to nms"
+multi_label_thresh: "multi label thresh"
+
+# Eval options
+pretrained: "model_path, local pretrained model to load"
+log_path: "checkpoint save location"
+ann_val_file: "path to annotation"
+
+# Export options
+device_id: "Device id for export"
+batch_size: "batch size for export"
+testing_shape: "shape for test"
+ckpt_file: "Checkpoint file path for export"
+file_name: "output file name for export"
+file_format: "file format for export"
+keep_detect: "keep the detect module or not, default: True"
+img_id_file_path: 'path of image dataset'
+result_files: 'path to 310 infer result floder'
