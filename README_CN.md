@@ -385,3 +385,7 @@ MindSpore已获得Apache 2.0许可，请参见LICENSE文件。
 - **Q: 在Mac系统上加载mindrecord格式的数据集出错,例如*Invalid file, failed to open files for reading mindrecord files.*，该怎么处理?**
 
   **A**: 优先使用*ulimit -a*检查系统限制，如果*file descriptors*数量为256（默认值），需要使用*ulimit -n 1024*将其设置为1024（或者更大的值）。之后再检查文件是否损坏或者被修改。
+
+- **Q: 我在多台服务器构成的大集群上进行训练，但是得到的精度比预期要低，该怎么办？**
+
+  **A**: 当前模型库中的大部分模型只在单机内进行过验证，最大使用8卡进行训练。由于MindSpore训练时指定的`batch_size`是单卡的，所以当单机8卡升级到多机时，会导致全局的`global_batch_size`变大，这就导致需要针对当前多机场景的`global_batch_size`进行重新调参优化。

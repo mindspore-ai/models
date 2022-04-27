@@ -17,7 +17,6 @@
     - [Dataset Preparation](#dataset-preparation)
     - [Training Process](#training-process)
     - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
         - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
@@ -29,6 +28,7 @@
             - [Evaluation Performance](#evaluation-performance)
     - [Description of Random Situation](#description-of-random-situation)
     - [ModelZoo Homepage](#modelzoo-homepage)
+    - [FAQ](#faq)
 
 ## [Transformer Description](#contents)
 
@@ -487,3 +487,12 @@ Some seeds have already been set in train.py to avoid the randomness of dataset 
 ## [ModelZoo Homepage](#contents)
 
 Please check the official [homepage](https://gitee.com/mindspore/models).
+
+## FAQ
+
+Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some common question.
+
+- **Q: Why the last checkpoint I got can't reach the accuracy?**
+
+  **A**: At the end stage of training, the model accuracy usually drifts irregularly. Because we have to use a third-party perl scripts for evaluation, we can't find the best checkpoint as soon as the training process finished.
+  You can try to evaluate the last several checkpoints to find the best one.
