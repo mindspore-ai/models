@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,14 +20,14 @@ import os
 import sys
 import time
 
+import mindspore
 import mindspore.dataset as ds
 import mindspore.nn as nn
 from mindspore import Model, Tensor, context, load_checkpoint, load_param_into_net
-from mindspore.communication.management import init
 from mindspore.context import ParallelMode
 from mindspore.profiler import Profiler
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
-
+from mindspore.communication.management import init, get_rank
 from src.dataset import DatasetGenerator
 from src.lr_scheduler import MultiStepLR
 from src.pointnet2 import PointNet2, NLLLoss
@@ -61,29 +61,49 @@ def parse_args():
     parser.add_argument('--data_url', type=str)
     parser.add_argument('--train_url', type=str)
     parser.add_argument('--mox_freq', type=int, default=10, help='mox frequency')
+    parser.add_argument('--keep_checkpoint_max', type=int, default=5, help='max number of ckpt files to save')
+    parser.add_argument('--dataset_sink_mode', type=ast.literal_eval, default=False, help='enable dataset sink mode')
 
     return parser.parse_known_args()[0]
 
 
-def run_train():
-    """run train"""
-    args = parse_args()
+def content_init(args, device_id, device_num):
+    '''content_init'''
+    _platform = args.platform
+    _platform = _platform.lower()
 
-    # INIT
-    device_id = int(os.getenv('DEVICE_ID', '0'))
-    device_num = int(os.getenv('RANK_SIZE', '1'))
-    rank_id = int(os.getenv('RANK_ID', '0'))
+    if not _platform in ("ascend", "gpu"):
+        raise ValueError("Unsupported platform {}".format(args.platform))
 
-    if args.platform == "Ascend":
-        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=device_id)
+    if _platform == "ascend":
+        context.set_context(mode=context.GRAPH_MODE,
+                            device_target="Ascend",
+                            device_id=device_id)
         context.set_context(max_call_depth=2048)
 
         if device_num > 1:
             init()
-            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
+            context.set_auto_parallel_context(
+                parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
     else:
-        raise ValueError("Unsupported platform.")
+        context.set_context(mode=context.GRAPH_MODE,
+                            device_target="GPU",
+                            max_call_depth=2048)
+        if device_num > 1:
+            mindspore.dataset.config.set_enable_shared_mem(False)
+            context.set_auto_parallel_context(
+                parallel_mode=context.ParallelMode.DATA_PARALLEL,
+                gradients_mean=True,
+                device_num=device_num)
+            mindspore.common.set_seed(1234)
+            init()
+        else:
+            context.set_context(device_id=device_id)
 
+
+def get_data_url(args, rank_id=0):
+    '''get_data_url'''
+    log_file = None
     if args.enable_modelarts:
         import moxing as mox
 
@@ -95,45 +115,70 @@ def run_train():
         local_train_url = "/cache/train_output"
         save_dir = local_train_url
         if rank_id == 0:
-            mox.file.copy_parallel(os.path.join(args.train_url, 'log_train.txt'),
-                                   os.path.join(save_dir, 'log_train.txt'))
+            mox.file.copy_parallel(
+                os.path.join(args.train_url, 'log_train.txt'),
+                os.path.join(save_dir, 'log_train.txt'))
             log_file = open(os.path.join(save_dir, 'log_train.txt'), 'w')
             sys.stdout = log_file
+        raise ValueError("Unsupported enable_modelarts")
+    local_data_url = args.data_path
+    pretrained_ckpt_path = args.pretrained_ckpt if args.pretrained_ckpt.endswith(
+        '.ckpt') else ""
+    local_train_url = args.save_dir
+    save_dir = args.save_dir
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir, exist_ok=True)
+    return local_data_url, pretrained_ckpt_path, local_train_url, log_file
+
+
+def get_train_ds(device_num, train_ds_generator, num_workers, rank_id):
+    '''get_train_ds'''
+    if device_num > 1:
+        train_ds = ds.GeneratorDataset(train_ds_generator, ["data", "label"],
+                                       num_parallel_workers=num_workers,
+                                       shuffle=True,
+                                       shard_id=rank_id,
+                                       num_shards=device_num)
     else:
-        local_data_url = args.data_path
-        if args.pretrained_ckpt.endswith('.ckpt'):
-            pretrained_ckpt_path = args.pretrained_ckpt
-        local_train_url = args.save_dir
-        save_dir = args.save_dir
-        if not os.path.exists(save_dir):
-            os.makedirs(save_dir)
+        train_ds = ds.GeneratorDataset(train_ds_generator, ["data", "label"],
+                                       num_parallel_workers=num_workers,
+                                       shuffle=True)
+    return train_ds
 
-    if args.enable_profiling:
-        profiler = Profiler()
 
+def run_train():
+    """run train"""
+    args = parse_args()
+    # INIT
+    device_id = int(os.getenv('DEVICE_ID', '0'))
+    device_num = int(os.getenv('RANK_SIZE', '1'))
+    content_init(args, device_id, device_num)
+    rank_id = get_rank() if device_num > 1 else device_id
+    local_data_url, pretrained_ckpt_path, local_train_url, log_file = get_data_url(args)
+    print(f"device:{device_num}, rank_id:{rank_id}")
     print(args)
-
     # DATA LOADING
     print('Load dataset ...')
     data_path = local_data_url
-
-    num_workers = 4
-    train_ds_generator = DatasetGenerator(root=data_path, args=args, split='train', process_data=args.process_data)
-    if device_num > 1:
-        train_ds = ds.GeneratorDataset(train_ds_generator, ["data", "label"], num_parallel_workers=num_workers,
-                                       shuffle=True, shard_id=rank_id, num_shards=device_num)
-    else:
-        train_ds = ds.GeneratorDataset(train_ds_generator, ["data", "label"], num_parallel_workers=num_workers,
-                                       shuffle=True)
+    num_workers = 8
+    train_ds_generator = DatasetGenerator(root=data_path,
+                                          args=args,
+                                          split='train',
+                                          process_data=args.process_data)
+    train_ds = get_train_ds(device_num, train_ds_generator, num_workers,
+                            rank_id)
     random_input_dropout = RandomInputDropout()
-    train_ds = train_ds.batch(batch_size=args.batch_size, per_batch_map=random_input_dropout,
-                              input_columns=["data", "label"], drop_remainder=True, num_parallel_workers=num_workers)
+
+    train_ds = train_ds.batch(batch_size=args.batch_size,
+                              per_batch_map=random_input_dropout,
+                              input_columns=["data", "label"],
+                              drop_remainder=True,
+                              num_parallel_workers=num_workers,
+                              python_multiprocessing=True)
 
     steps_per_epoch = train_ds.get_dataset_size()
-
     # MODEL
     net = PointNet2(args.num_category, args.use_normals)
-
     # load checkpoint
     if args.pretrained_ckpt.endswith('.ckpt'):
         print("Load checkpoint: %s" % args.pretrained_ckpt)
@@ -141,34 +186,37 @@ def run_train():
         load_param_into_net(net, param_dict)
 
     net_loss = NLLLoss()
-
     lr_epochs = list(range(20, 201, 20))
-    lr_fun = MultiStepLR(args.learning_rate, lr_epochs, 0.7, steps_per_epoch, args.epoch)
+    lr_fun = MultiStepLR(args.learning_rate, lr_epochs, 0.7, steps_per_epoch,
+                         args.epoch)
     lr = lr_fun.get_lr()
-
     if args.optimizer == 'Adam':
-        net_opt = nn.Adam(
-            net.trainable_params(),
-            learning_rate=Tensor(lr),
-            beta1=0.9,
-            beta2=0.999,
-            eps=1e-08,
-            weight_decay=args.decay_rate
-        )
+        net_opt = nn.AdamWeightDecay(net.trainable_params(),
+                                     learning_rate=Tensor(lr),
+                                     beta1=0.9,
+                                     beta2=0.999,
+                                     eps=1e-08,
+                                     weight_decay=args.decay_rate)
     else:
-        net_opt = nn.SGD(net.trainable_params(), learning_rate=args.learning_rate, momentum=0.9)
+        net_opt = nn.SGD(net.trainable_params(),
+                         learning_rate=args.learning_rate,
+                         momentum=0.9)
 
     model = Model(net, net_loss, net_opt)
-
-    config_ck = CheckpointConfig(save_checkpoint_steps=steps_per_epoch, keep_checkpoint_max=args.epoch)
-    ckpt_cb = ModelCheckpoint(prefix="ckpt_pointnet2", directory=local_train_url, config=config_ck)
-
+    config_ck = CheckpointConfig(save_checkpoint_steps=steps_per_epoch,
+                                 keep_checkpoint_max=args.keep_checkpoint_max)
+    ckpt_cb = ModelCheckpoint(prefix="ckpt_pointnet2",
+                              directory=local_train_url,
+                              config=config_ck)
     loss_freq = max(steps_per_epoch // args.loss_per_epoch, 1)
-
     cb = []
     cb += [TimeMonitor()]
     cb += [LossMonitor(loss_freq)]
-    if (not args.enable_modelarts) or (rank_id == 0):
+    if args.enable_profiling:
+        profiler = Profiler(output_path="./profile/")
+    if (device_num == 1 and\
+        ((not args.enable_modelarts) or\
+         (rank_id == 0))) or (device_num > 1 and rank_id == 0):
         cb += [ckpt_cb]
 
     if args.enable_modelarts:
@@ -184,12 +232,13 @@ def run_train():
         mox.file.copy_parallel(local_train_url, args.train_url)
 
     time_start = time.time()
-
-    model.train(epoch=args.epoch, train_dataset=train_ds, callbacks=cb, dataset_sink_mode=True)
-
+    model.train(epoch=args.epoch,
+                train_dataset=train_ds,
+                callbacks=cb,
+                dataset_sink_mode=args.dataset_sink_mode)
     # END
     print('End of training.')
-    print('Total time cost: {} min'.format("%.2f" % ((time.time() - time_start) / 60)))
+    print('Total time cost: {} min'.format("%.2f" %((time.time() - time_start) / 60)))
 
     if args.enable_profiling:
         profiler.analyse()

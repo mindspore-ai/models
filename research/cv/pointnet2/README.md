@@ -7,16 +7,16 @@
 - [Environment Requirements](#environment-requirements)
 - [Quick Start](#quick-start)
 - [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Script Parameters](#script-parameters)
-    - [Training Process](#training-process)
-        - [Training](#training)
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+- [Script and Sample Code](#script-and-sample-code)
+- [Script Parameters](#script-parameters)
+- [Training Process](#training-process)
+    - [Training](#training)
+- [Evaluation Process](#evaluation-process)
+    - [Evaluation](#evaluation)
 - [Model Description](#model-description)
     - [Performance](#performance)
-        - [Training Performance](#training-performance)
-        - [Inference Performance](#inference-performance)
+    - [Training Performance](#training-performance)
+    - [Inference Performance](#inference-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -73,7 +73,7 @@ bash scripts/run_standalone_train.sh modelnet40_normal_resampled save pointnet2.
 # Run distributed training
 bash scripts/run_distributed_train.sh [RANK_TABLE_FILE] [DATA_PATH] [SAVE_DIR] [PRETRAINDE_CKPT(optional)]
 # example:
-bash scripts/run_standalone_train.sh hccl_8p_01234567_127.0.0.1.json modelnet40_normal_resampled save pointnet2.ckpt
+bash scripts/run_distributed_train.sh hccl_8p_01234567_127.0.0.1.json modelnet40_normal_resampled save pointnet2.ckpt
 
 # Evaluate
 bash scripts/run_eval.sh [DATA_PATH] [CKPT_NAME]
@@ -81,29 +81,52 @@ bash scripts/run_eval.sh [DATA_PATH] [CKPT_NAME]
 bash scripts/run_eval.sh modelnet40_normal_resampled pointnet2.ckpt
 ```
 
+if you want to run this model on GPU
+
+```shell
+# Run stand-alone training
+bash scripts/run_standalone_train_gpu.sh [DATA_PATH] [SAVE_DIR] [PRETRAINDE_CKPT(optional)]
+# example:
+bash scripts/run_standalone_train_gpu.sh modelnet40_normal_resampled save pointnet2.ckpt
+
+# Run distributed training
+bash scripts/run_distributed_train_gpu.sh [DEVICE_NUM] [DATA_PATH] [SAVE_DIR] [PRETRAINDE_CKPT(optional)]
+# example:
+bash scripts/run_distributed_train_gpu.sh 8 modelnet40_normal_resampled save pointnet2.ckpt
+
+# Evaluate
+bash scripts/run_eval_gpu.sh [DATA_PATH] [CKPT_NAME]
+# example:
+bash scripts/run_eval_gpu.sh modelnet40_normal_resampled pointnet2.ckpt
+```
+
 # [Script Description](#contents)
 
 # [Script and Sample Code](#contents)
 
 ```bash
-├── .
-    ├── PointNet2
-        ├── scripts
-        │   ├── run_distribute_train.sh  # launch distributed training with ascend platform (8p)
-        │   ├── run_eval.sh              # launch evaluating with ascend platform
-        │   └── run_train_ascend.sh      # launch standalone training with ascend platform (1p)
-        ├── src
-        │   ├── callbacks.py          # callbacks definition
-        │   ├── dataset.py            # data preprocessing
-        │   ├── layers.py             # network layers initialization
-        │   ├── lr_scheduler.py       # learning rate scheduler
-        │   ├── PointNet2.py          # network definition
-        │   ├── PointNet2_utils.py    # network definition utils
-        │   └── provider.py           # data preprocessing for training
-        ├── eval.py             # eval net
-        ├── README.md
-        ├── requirements.txt
-        └── train.py            # train net
+├── PointNet2
+    ├── eval.py                             # eval net
+    ├── export.py
+    ├── README.md
+    ├── requirements.txt
+    ├── scripts
+    │   ├── run_distributed_train_gpu.sh    # launch distributed training with GPU platform (8p)
+    │   ├── run_distributed_train.sh        # launch distributed training with ascend platform (8p)
+    │   ├── run_eval_gpu.sh                 # launch evaluating with GPU platform
+    │   ├── run_eval.sh                     # launch evaluating with ascend platform
+    │   ├── run_standalone_train_gpu.sh     # launch standalone training with GPU platform (1p)
+    │   └── run_standalone_train.sh         # launch standalone training with ascend platform (1p)
+    ├── src
+    │   ├── callbacks.py                    # callbacks definition
+    │   ├── dataset.py                      # data preprocessing
+    │   ├── layers.py                       # network layers initialization
+    │   ├── lr_scheduler.py                 # learning rate scheduler
+    │   ├── pointnet2.py                    # network definition
+    │   ├── pointnet2_utils.py              # network definition utils
+    │   ├── provider.py                     # data preprocessing for training
+    │
+    └── train.py                            # train net
 ```
 
 # [Script Parameters](#contents)
@@ -116,7 +139,7 @@ Major parameters in train.py are as follows:
 --optimizer         # Optimizer for training. Optional values are "Adam", "SGD".
 --data_path         # The path to the train and evaluation datasets.
 --loss_per_epoch    # The times to print loss value per epoch.
---save_dir           # The path to save files generated during training.
+--save_dir          # The path to save files generated during training.
 --use_normals       # Whether to use normals data in training.
 --pretrained_ckpt   # The file path to load checkpoint.
 --enable_modelarts         # Whether to use modelarts.
@@ -137,12 +160,22 @@ bash scripts/run_standalone_train.sh modelnet40_normal_resampled save pointnet2.
 # Run distributed training
 bash scripts/run_distributed_train.sh [RANK_TABLE_FILE] [DATA_PATH] [SAVE_DIR] [PRETRAINDE_CKPT(optional)]
 # example:
-bash scripts/run_standalone_train.sh hccl_8p_01234567_127.0.0.1.json modelnet40_normal_resampled save pointnet2.ckpt
+bash scripts/run_distributed_train.sh hccl_8p_01234567_127.0.0.1.json modelnet40_normal_resampled save pointnet2.ckpt
 ```
 
-Distributed training requires the creation of an HCCL configuration file in JSON format in advance. For specific
-operations, see the instructions
-in [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+- running on GPU
+
+```shell
+# Run stand-alone training
+bash scripts/run_standalone_train_gpu.sh [DATA_PATH] [SAVE_DIR] [PRETRAINDE_CKPT(optional)]
+# example:
+bash scripts/run_standalone_train_gpu.sh modelnet40_normal_resampled save pointnet2.ckpt
+
+# Run distributed training
+bash scripts/run_distributed_train_gpu.sh [DEVICE_NUM] [DATA_PATH] [SAVE_DIR] [PRETRAINDE_CKPT(optional)]
+# example:
+bash scripts/run_distributed_train_gpu.sh 8 modelnet40_normal_resampled save pointnet2.ckpt
+```
 
 After training, the loss value will be achieved as follows:
 
@@ -178,11 +211,20 @@ bash scripts/run_eval.sh [DATA_PATH] [CKPT_NAME]
 bash scripts/run_eval.sh modelnet40_normal_resampled pointnet2.ckpt
 ```
 
+- running on GPU
+
+```shell
+# Evaluate
+bash scripts/run_eval_gpu.sh [DATA_PATH] [CKPT_NAME]
+# example:
+bash scripts/run_eval_gpu.sh modelnet40_normal_resampled pointnet2.ckpt
+```
+
 You can view the results through the file "eval.log". The accuracy of the test dataset will be as follows:
 
 ```bash
 # grep "Accuracy: " eval.log
-'Accuracy': 0.9146
+'Accuracy': 0.916
 ```
 
 # [Model Description](#contents)
@@ -191,35 +233,35 @@ You can view the results through the file "eval.log". The accuracy of the test d
 
 ## Training Performance
 
-| Parameters                 | Ascend                                                      |
-| -------------------------- | ----------------------------------------------------------- |
-| Model Version              | PointNet++                                                  |
-| Resource                   | Ascend 910; CPU 24cores; Memory 256G; OS Euler2.8           |
-| uploaded Date              | 08/31/2021 (month/day/year)                                 |
-| MindSpore Version          | 1.3.0                                                       |
-| Dataset                    | ModelNet40                                                  |
-| Training Parameters        | epoch=200, steps=82000, batch_size=24, lr=0.001             |
-| Optimizer                  | Adam                                                        |
-| Loss Function              | NLLLoss                                                     |
-| outputs                    | probability                                                 |
-| Loss                       | 0.01                                                        |
-| Speed                      | 1.2 s/step (1p)                                             |
-| Total time                 | 27.3 h (1p)                                                 |
-| Checkpoint for Fine tuning | 17 MB (.ckpt file)                                          |
+| Parameters                 | Ascend                                            | GPU                                             |
+| -------------------------- | ------------------------------------------------- | ----------------------------------------------- |
+| Model Version              | PointNet++                                        | PointNet++                                      |
+| Resource                   | Ascend 910; CPU 24cores; Memory 256G; OS Euler2.8 | RTX 3090; GPU Memory 24268MiB; Ubuntu           |
+| uploaded Date              | 08/31/2021 (month/day/year)                       | 12/20/2021 (month/day/year)                     |
+| MindSpore Version          | 1.3.0                                             | 1.5.0rc1                                           |
+| Dataset                    | ModelNet40                                        | ModelNet40                                      |
+| Training Parameters        | epoch=200, steps=82000, batch_size=24, lr=0.001   | epoch=200, steps=82000, batch_size=24, lr=0.001 |
+| Optimizer                  | Adam                                              | Adam                                            |
+| Loss Function              | NLLLoss                                           | NLLLoss                                         |
+| outputs                    | probability                                       | probability                                     |
+| Loss                       | 0.01                                              | 0.01                                            |
+| Speed                      | 1.2 s/step (1p)                                   | 390 ms/step (1p)                                |
+| Total time                 | 27.3 h (1p)                                       | 8h8m6s (1p)                                     |
+| Checkpoint for Fine tuning | 17 MB (.ckpt file)                                | 17 MB (.ckpt file)                              |
 
 ## Inference Performance
 
-| Parameters          | Ascend                      |
-| ------------------- | --------------------------- |
-| Model Version       | PointNet++                  |
-| Resource            | Ascend 910; CPU 24cores; Memory 256G; OS Euler2.8 |
-| Uploaded Date       | 08/31/2021 (month/day/year) |
-| MindSpore Version   | 1.3.0                       |
-| Dataset             | ModelNet40                  |
-| Batch_size          | 24                          |
-| Outputs             | probability                 |
-| Accuracy            | 91.5% (1p)                  |
-| Total time          | 2.5 min                     |
+| Parameters        | Ascend                                            | GPU                                   |
+| ----------------- | ------------------------------------------------- | ------------------------------------- |
+| Model Version     | PointNet++                                        | PointNet++                            |
+| Resource          | Ascend 910; CPU 24cores; Memory 256G; OS Euler2.8 | RTX 3090; GPU Memory 24268MiB; Ubuntu |
+| Uploaded Date     | 08/31/2021 (month/day/year)                       | 12/20/2021 (month/day/year)           |
+| MindSpore Version | 1.3.0                                             | 1.3.0                                 |
+| Dataset           | ModelNet40                                        | ModelNet40                            |
+| Batch_size        | 24                                                | 24                                    |
+| Outputs           | probability                                       | probability                           |
+| Accuracy          | 91.5% (1p)                                        | 91.42% (1p)                           |
+| Total time        | 2.5 min                                           | 1.13 min                              |
 
 # [Description of Random Situation](#contents)
 

@@ -73,7 +73,7 @@ def run_eval():
         context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=device_id)
         context.set_context(max_call_depth=2048)
     else:
-        raise ValueError("Unsupported platform.")
+        context.set_context(mode=context.GRAPH_MODE, device_target="GPU", max_call_depth=2000, device_id=device_id)
 
     print(args)
 
@@ -109,7 +109,7 @@ def run_eval():
 
     # END
     print('Total time cost: {} min'.format("%.2f" % ((time.time() - time_start) / 60)))
-
+    print('Eval done!')
     if args.enable_modelarts:
         mox.file.copy_parallel(local_eval_url, args.train_url)
 
