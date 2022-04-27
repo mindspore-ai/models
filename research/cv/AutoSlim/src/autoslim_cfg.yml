@@ -1,0 +1,30 @@
+# Copyright 2022 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+# Hyper Parameters
+reset_parameters: True
+depth: 50
+channel_num_list: [[24, 72, 8, 16, 72, 16, 16, 72, 8, 8, 72, 240, 16, 24, 240, 16, 24, 240, 16, 16, 240,
+16, 24, 240, 704, 72, 72, 704, 48, 72, 704, 48, 72, 704, 72, 72, 704, 48, 48, 704, 48, 48, 704, 1680,
+280, 240, 1680, 120, 200, 1680, 280, 280, 1680, 1000],
+[32, 72, 16, 16, 72, 16, 16, 72, 8, 8, 72, 280, 24, 40, 280, 16, 24, 280, 16, 24, 280,
+24, 40, 280, 880, 72, 72, 880, 72, 96, 880, 72, 72, 880, 72, 72, 880, 48, 72, 880, 168,
+96, 880, 2016, 360, 280, 2016, 320, 360, 2016, 480, 440, 2016, 1000],
+[40, 120, 16, 16, 120, 24, 24, 120, 16, 24, 120, 440, 48, 72, 440, 32, 48, 440, 40, 56,
+440, 64, 72, 440, 1024, 168, 168, 1024, 96, 144, 1024, 120, 168, 1024, 120, 144, 1024,
+120, 144, 1024, 256, 256, 1024, 2016, 512, 512, 2016, 480, 480, 2016, 512, 512, 2016, 1000],
+[48, 192, 16, 16, 192, 56, 56, 192, 24, 40, 192, 512, 88, 112, 512, 64, 104, 512, 104,
+112, 512, 80, 128, 512, 1024, 240, 216, 1024, 144, 216, 1024, 192, 192, 1024, 144, 240,
+1024, 240, 256, 1024, 256, 256, 1024, 2016, 512, 512, 2016, 480, 512, 2016, 512, 512, 2016, 1000]]
