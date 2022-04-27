@@ -83,8 +83,11 @@ MSCOCO2017
   ├─scripts
     ├─run_single_train.sh                     # 使用Ascend环境单卡训练
     ├─run_distribute_train.sh                 # 使用Ascend环境八卡并行训练
+    ├─run_distribute_train_gpu.sh             # 使用GPU环境八卡并行训练
+    ├─run_single_train_gpu.sh                 # 使用GPU环境单卡训练
     ├─run_infer_310.sh                        # Ascend推理shell脚本
     ├─run_eval.sh                             # 使用Ascend环境运行推理脚本
+    ├─run_eval_gpu.sh                         # 使用GPU环境运行推理脚本
   ├─src
     ├─dataset.py                              # 数据预处理
     ├─retinanet.py                            # 网络模型定义
@@ -179,11 +182,11 @@ MSCOCO2017
 # 八卡并行训练示例：
 
 创建 RANK_TABLE_FILE
-bash scripts/run_distribute_train.sh DEVICE_NUM RANK_TABLE_FILE MINDRECORD_DIR PRE_TRAINED(optional) PRE_TRAINED_EPOCH_SIZE(optional)
+bash scripts/run_distribute_train.sh DEVICE_NUM RANK_TABLE_FILE CONFIG_PATH MINDRECORD_DIR PRE_TRAINED(optional) PRE_TRAINED_EPOCH_SIZE(optional)
 
 # 单卡训练示例：
 
-bash scripts/run_single_train.sh DEVICE_ID MINDRECORD_DIR PRE_TRAINED(optional) PRE_TRAINED_EPOCH_SIZE(optional)
+bash scripts/run_single_train.sh DEVICE_ID MINDRECORD_DIR CONFIG_PATH PRE_TRAINED(optional) PRE_TRAINED_EPOCH_SIZE(optional)
 
 ```
 
@@ -213,21 +216,30 @@ mindrecord_dr: /home/DataSet/MindRecord_COCO
 
 ```MindRecord
 # 生成训练数据集
-python create_data.py --create_dataset coco --prefix retinanet.mindrecord --is_training True
+python create_data.py --create_dataset coco --prefix retinanet.mindrecord --is_training True --config_path
+(例如：python create_data.py  --create_dataset coco --prefix retinanet.mindrecord --is_training True --config_path /home/retinanet/config/default_config.yaml)
 
 # 生成测试数据集
-python create_data.py --create_dataset coco --prefix retinanet_eval.mindrecord --is_training False
+python create_data.py --create_dataset coco --prefix retinanet_eval.mindrecord --is_training False --config_path
+(例如：python create_data.py  --create_dataset coco --prefix retinanet.mindrecord --is_training False --config_path /home/retinanet/config/default_config.yaml)
 ```
 
 ```bash
 Ascend:
 # 八卡并行训练示例(在retinanet目录下运行)：
-bash scripts/run_distribute_train.sh [DEVICE_NUM] [RANK_TABLE_FILE] [MINDRECORD_DIR] [PRE_TRAINED(optional)] [PRE_TRAINED_EPOCH_SIZE(optional)]
-# example: bash scripts/run_distribute_train.sh 8 ~/hccl_8p.json /home/DataSet/MindRecord_COCO/
+bash scripts/run_distribute_train.sh [DEVICE_NUM] [RANK_TABLE_FILE] [MINDRECORD_DIR] [CONFIG_PATH] [PRE_TRAINED(optional)] [PRE_TRAINED_EPOCH_SIZE(optional)]
+# example: bash scripts/run_distribute_train.sh 8 ~/hccl_8p.json /home/DataSet/MindRecord_COCO/ /home/retinanet/config/default_config.yaml
 
 # 单卡训练示例(在retinanet目录下运行)：
-bash scripts/run_single_train.sh [DEVICE_ID] [MINDRECORD_DIR]
-# example: bash scripts/run_single_train.sh 0 /home/DataSet/MindRecord_COCO/
+bash scripts/run_single_train.sh [DEVICE_ID] [MINDRECORD_DIR] [CONFIG_PATH]
+# example: bash scripts/run_single_train.sh 0 /home/DataSet/MindRecord_COCO/ /home/retinanet/config/default_config.yaml
+```
+
+```bash
+GPU:
+# 八卡并行训练示例(在retinanet目录下运行)：
+bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [MINDRECORD_DIR] [CONFIG_PATH] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [PRE_TRAINED(optional)] [PRE_TRAINED_EPOCH_SIZE(optional)]
+# example: bash scripts/run_distribute_train_gpu.sh 8 /home/DataSet/MindRecord_COCO/ /home/retinanet/config/default_config_gpu.yaml 0,1,2,3,4,5,6,7
 ```
 
 #### 结果
@@ -309,15 +321,16 @@ Epoch time: 164531.610, per step time: 359.239
 
 使用shell脚本进行评估。shell脚本的用法如下:
 
-```eval
-bash scripts/run_eval.sh [DEVICE_ID] [DATASET] [MINDRECORD_DIR] [CHECKPOINT_PATH] [ANN_FILE PATH]
-# example: bash scripts/run_eval.sh 0 coco /home/DataSet/MindRecord_COCO/ /home/model/retinanet/ckpt/retinanet_500-458.ckpt /home/DataSet/cocodataset/annotations/instances_{}.json
+```bash
+Ascend:
+bash scripts/run_eval.sh [DEVICE_ID] [DATASET] [MINDRECORD_DIR] [CHECKPOINT_PATH] [ANN_FILE PATH] [CONFIG_PATH]
+# example: bash scripts/run_eval.sh 0 coco /home/DataSet/MindRecord_COCO/ /home/model/retinanet/ckpt/retinanet_500-458.ckpt /home/DataSet/cocodataset/annotations/instances_{}.json /home/retinanet/config/default_config.yaml
 ```
 
-#### <span id="running">运行</span>
-
-```eval运行
-bash scripts/run_eval.sh 0 coco /home/DataSet/MindRecord_COCO/ /home/model/retinanet/ckpt/retinanet_500-458.ckpt /home/DataSet/cocodataset/annotations/instances_{}.json
+```bash
+GPU:
+bash scripts/run_eval_gpu.sh [DEVICE_ID] [DATASET] [MINDRECORD_DIR] [CHECKPOINT_PATH] [ANN_FILE PATH] [CONFIG_PATH]
+# example: bash scripts/run_eval_gpu.sh 0 coco /home/DataSet/MindRecord_COCO/ /home/model/retinanet/ckpt/retinanet_500-458.ckpt /home/DataSet/cocodataset/annotations/instances_{}.json /home/retinanet/config/default_config_gpu.yaml
 ```
 
 > checkpoint 可以在训练过程中产生.
@@ -327,6 +340,7 @@ bash scripts/run_eval.sh 0 coco /home/DataSet/MindRecord_COCO/ /home/model/retin
 计算结果将存储在示例路径中，您可以在 `eval.log` 查看.
 
 ```mAP
+Ascend:
  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.347
  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.503
  Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.385
@@ -343,6 +357,26 @@ bash scripts/run_eval.sh 0 coco /home/DataSet/MindRecord_COCO/ /home/model/retin
 ========================================
 
 mAP: 0.34747137754625645
+```
+
+```mAP
+GPU:
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.349
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.504
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.385
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.136
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.366
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.506
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.302
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.414
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.415
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.156
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.434
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.608
+
+========================================
+
+mAP: 0.34852168035724435
 ```
 
 ### [模型导出](#content)
@@ -430,34 +464,34 @@ mAP: 0.3499478734634595
 
 #### 训练性能
 
-| 参数                        | Ascend                                |
-| -------------------------- | ------------------------------------- |
-| 模型名称                    | Retinanet                             |
-| 运行环境                    | Ascend 910；CPU 2.6GHz，192cores；Memory 755G；系统 Euler2.8  |
-| 上传时间                    | 10/01/2021                            |
-| MindSpore 版本             | 1.2.0                                 |
-| 数据集                      | 123287 张图片                          |
-| Batch_size                 | 32                                   |
-| 训练参数                    | src/config.py                         |
-| 优化器                      | Momentum                              |
-| 损失函数                    | Focal loss                            |
-| 最终损失                    | 0.582                                  |
-| 精确度 (8p)                 | mAP[0.3475]               |
-| 训练总时间 (8p)             | 23h16m54s                              |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) |
+| 参数                        | Ascend                                |GPU|
+| -------------------------- | ------------------------------------- |------------------------------------- |
+| 模型名称                    | Retinanet                             |Retinanet                             |
+| 运行环境                    | Ascend 910；CPU 2.6GHz，192cores；Memory 755G；系统 Euler2.8  | Rtx3090;Memory 512G |
+| 上传时间                    | 10/01/2021                            |17/02/2022                            |
+| MindSpore 版本             | 1.2.0                                 |1.5.0|
+| 数据集                      | 123287 张图片                          |123287 张图片                          |
+| Batch_size                 | 32                                   |32                                   |
+| 训练参数                    | src/config.py                         |config/default_config_gpu.yaml
+| 优化器                      | Momentum                              |Momentum                              |
+| 损失函数                    | Focal loss                            |Focal loss                            |
+| 最终损失                    | 0.582                                  |0.57|
+| 精确度 (8p)                 | mAP[0.3475]               |mAP[0.3499]               |
+| 训练总时间 (8p)             | 23h16m54s                              |51h39m6s|
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) |[链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) |
 
 #### 推理性能
 
-| 参数                 | Ascend                      |
-| ------------------- | --------------------------- |
-| 模型名称             | Retinanet                |
-| 运行环境             | Ascend 910；CPU 2.6GHz，192cores；Memory 755G；系统 Euler2.8|
-| 上传时间             | 10/01/2021                  |
-| MindSpore 版本      | 1.2.0                        |
-| 数据集              | 5k 张图片                   |
-| Batch_size          | 32                          |
-| 精确度              | mAP[0.3475]                  |
-| 总时间              | 10 mins and 50 seconds       |
+| 参数                 | Ascend                      |GPU|
+| ------------------- | --------------------------- |--|
+| 模型名称             | Retinanet                |Retinanet                |
+| 运行环境             | Ascend 910；CPU 2.6GHz，192cores；Memory 755G；系统 Euler2.8|Rtx3090;Memory 512G |
+| 上传时间             | 10/01/2021                  |17/02/2022 |
+| MindSpore 版本      | 1.2.0                        |1.5.0|
+| 数据集              | 5k 张图片                   |5k 张图片                   |
+| Batch_size          | 32                          |32                          |
+| 精确度              | mAP[0.3475]                  |mAP[0.3499]               |
+| 总时间              | 10 mins and 50 seconds       |13 mins and 40 seconds       |
 
 ## [随机情况的描述](#content)
 

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import ast
 import time
 import mindspore.nn as nn
 from mindspore import context, Tensor
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, LossMonitor, TimeMonitor, Callback
 from mindspore.train import Model
 from mindspore.context import ParallelMode
@@ -33,7 +33,6 @@ from src.init_params import init_net_param, filter_checkpoint_parameter
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id, get_device_num, get_rank_id
-
 
 set_seed(1)
 
@@ -113,6 +112,11 @@ def modelarts_pre_process():
 
         print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
 
+def set_graph_kernel_context(device_target):
+    if device_target == "GPU":
+        # Enable graph kernel for default model ssd300 on GPU back-end.
+        context.set_context(enable_graph_kernel=True,
+                            graph_kernel_flags="--enable_parallel_fusion --enable_expand_ops=Conv2D")
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def main():
@@ -126,7 +130,7 @@ def main():
             if os.getenv("DEVICE_ID", "not_set").isdigit():
                 context.set_context(device_id=get_device_id())
             init()
-            device_num = get_device_num()
+            device_num = config.device_num
             rank = get_rank_id()
             context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
                                               device_num=device_num)
@@ -135,8 +139,22 @@ def main():
             device_num = 1
             context.set_context(device_id=get_device_id())
 
-        # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
-        context.set_context(mempool_block_size="31GB")
+    elif config.device_target == "GPU":
+        context.set_context(mode=context.GRAPH_MODE, device_target="GPU")
+        set_graph_kernel_context(config.device_target)
+        if config.distribute:
+            if os.getenv("DEVICE_ID", "not_set").isdigit():
+                context.set_context(device_id=get_device_id())
+            init()
+            device_num = config.device_num
+            rank = get_rank()
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
+                                              device_num=device_num)
+        else:
+            rank = 0
+            device_num = 1
+            context.set_context(device_id=get_device_id())
     else:
         raise ValueError("Unsupported platform.")
 
@@ -145,10 +163,9 @@ def main():
     loss_scale = float(config.loss_scale)
 
     # When create MindDataset, using the fitst mindrecord file, such as retinanet.mindrecord0.
-    dataset = create_retinanet_dataset(mindrecord_file, num_parallel_workers=config.workers,
-                                       batch_size=config.batch_size,
-                                       device_num=device_num,
-                                       rank=rank)
+    dataset = create_retinanet_dataset(mindrecord_file, repeat_num=1,
+                                       num_parallel_workers=8,
+                                       batch_size=config.batch_size, device_num=device_num, rank=rank)
 
     dataset_size = dataset.get_dataset_size()
     print("Create dataset done!")

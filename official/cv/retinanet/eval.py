@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -158,7 +158,7 @@ def retinanet_eval():
     make_dataset_dir(mindrecord_dir, mindrecord_file, prefix)
 
     batch_size = 1
-    ds = create_retinanet_dataset(mindrecord_file, batch_size=batch_size, is_training=False)
+    ds = create_retinanet_dataset(mindrecord_file, batch_size=batch_size, repeat_num=1, is_training=False)
     backbone = resnet50(config.num_classes)
     net = retinanet50(backbone, config)
     net = retinanetInferWithDecoder(net, Tensor(default_boxes), config)
