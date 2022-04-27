@@ -30,11 +30,7 @@ set(LIB_PATH $ENV{NPU_HOST_LIB})
 
 # Dynamic libraries in the stub directory can only be used for compilation
 if(NOT DEFINED ENV{NPU_HOST_LIB})
-    if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
-        set(LIB_PATH "C:/Program Files/HuaWei/Ascend/Acllib/lib64")
-    else()
-        set(LIB_PATH "/usr/local/Ascend/acllib/lib64/stub/")
-    endif()
+    set(LIB_PATH "/usr/local/Ascend/acllib/lib64/stub/")
     message(STATUS "set default LIB_PATH: ${LIB_PATH}")
 else()
     message(STATUS "env LIB_PATH: ${LIB_PATH}")
@@ -61,16 +57,12 @@ add_executable(main
         sample_process.cpp
         main.cpp)
 
+include_directories(/usr/local/Ascend/runtime/include)
 if(target STREQUAL "Simulator_Function")
     target_link_libraries(main funcsim)
 else()
-    if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
-        target_link_libraries(main
-            libascendcl)
-    else()
-        target_link_libraries(main
-            ascendcl stdc++)
-    endif()
+    target_link_libraries(main
+              ascendcl stdc++)
 endif()
 
 install(TARGETS main DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})

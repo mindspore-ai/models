@@ -20,29 +20,29 @@ if [[ $# -lt 3 ]]; then
 exit 1
 fi
 
-source ${ASCEND_PATH}/ascend-toolkit/set_env.sh
+export ASCEND_HOME=/usr/local/Ascend/
 
-# atc
-export CPU_ARCH=x86_64
-export THIRDPART_PATH=${ASCEND_PATH}/thirdpart/${CPU_ARCH}
-export INSTALL_DIR=${ASCEND_PATH}/ascend-toolkit/latest
-export PATH=${ASCEND_PATH}/ascend-toolkit/latest/atc/bin:${PATH}
+if [ -d ${ASCEND_HOME}/ascend-toolkit/ ]; then
+    export ASCEND_HOME=${ASCEND_HOME}/ascend-toolkit/
+fi
 
-# python
-export PYTHON_INTERPRETER=$(which python3.7)
-export PYTHON_BASE_PATH=$(readlink -f "${PYTHON_INTERPRETER}") # path to the symlink target
-export PYTHON_BASE_PATH=$(dirname "${PYTHON_BASE_PATH}") # directory which ends with 'bin'
-export PYTHON_BASE_PATH=$(dirname "${PYTHON_BASE_PATH}") # base path
-export PATH=${PYTHON_BASE_PATH}/bin:$PATH
-export LD_LIBRARY_PATH=${PYTHON_BASE_PATH}/lib:$LD_LIBRARY_PATH
+if [ -d ${ASCEND_HOME}/latest/ ]; then
+    export ASCEND_HOME=${ASCEND_HOME}/latest/
+fi
+
+export ASCEND_OPP_PATH=$ASCEND_HOME/opp
+export PATH=$ASCEND_HOME/fwkacllib/ccec_compiler/bin:$ASCEND_HOME/atc/bin:$PATH
+export LD_LIBRARY_PATH=$ASCEND_HOME/atc/lib64:$ASCEND_HOME/fwkacllib/lib64$LD_LIBRARY_PATH
+export TBE_IMPL_PATH=$ASCEND_HOME/latest/opp/op_impl/built-in/ai_core/tbe
+export PYTHONPATH=${TBE_IMPL_PATH}:$ASCEND_HOME/fwkacllib/python/site-packages:$PYTHONPATH
 
 # msprof
-export PATH=${ASCEND_PATH}/ascend-toolkit/latest/tools/profiler/bin/:${PATH}
-MSPROF_PY="${PYTHON_INTERPRETER} ${ASCEND_PATH}/ascend-toolkit/latest/toolkit/tools/profiler/profiler_tool/analysis/msprof/msprof.py"
+export PATH=${ASCEND_HOME}/tools/profiler/bin/:${PATH}
+MSPROF_PY="python3.7 ${ASCEND_HOME}/toolkit/tools/profiler/profiler_tool/analysis/msprof/msprof.py"
 
 #build
-export DDK_PATH=${ASCEND_PATH}/ascend-toolkit/latest/x86_64-linux
-export NPU_HOST_LIB=${ASCEND_PATH}/ascend-toolkit/latest/x86_64-linux/runtime/lib64/stub
+export DDK_PATH=${ASCEND_HOME}
+export NPU_HOST_LIB=${ASCEND_HOME}/runtime/lib64/
 
 INFER_EXEC=$(pwd)/../ascend_run_tool/out/main
 ACL_CONFIG=$(realpath ./acl.json)
@@ -84,9 +84,6 @@ mkdir -p "$INFER_RESULT_PATH"
 AIR_FILE=${AIR_ROOT}/${NET_NAME}.air
 OM_FILE=${OM_ROOT}/${NET_NAME}.om
 
-echo "ASCEND_PATH: ${ASCEND_PATH}"
-echo "PYTHON_INTERPRETER: ${PYTHON_INTERPRETER}"
-echo "PYTHON_BASE_PATH: ${PYTHON_BASE_PATH}"
 echo "JSON_PATH: ${JSON_PATH}"
 echo "CKPT_PATH: ${CKPT_PATH}"
 echo "VAL_DATA_ROOT: ${VAL_DATA_ROOT}"
@@ -157,10 +154,9 @@ function profile()
         echo "msprof failed"
         return 1
     fi
-    TMPSTR=$(grep "Profiling data of device" ${EXP_BASE_PATH}/profile.log)
+    TMPSTR=$(grep "Process profiling data complete. Data is saved in" ${EXP_BASE_PATH}/profile.log)
 
-    ARR=("$TMPSTR")
-    PROFILE_PATH=${ARR[-1]}
+    PROFILE_PATH=$(echo "${TMPSTR}" | awk '{print $NF}')
 
     CMD="${MSPROF_PY} export summary -dir ${PROFILE_PATH} --format=csv"
     echo ${CMD}
