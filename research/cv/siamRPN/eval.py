@@ -144,7 +144,7 @@ def test(model_path, data_path, save_name):
 def parse_args():
     '''parse_args'''
     parser = argparse.ArgumentParser(description='Mindspore SiameseRPN Infering')
-    parser.add_argument('--platform', type=str, default='Ascend', choices=('Ascend'), help='run platform')
+    parser.add_argument('--device_target', type=str, default='Ascend', choices=('Ascend', 'GPU'), help='run platform')
     parser.add_argument('--device_id', type=int, default=0, help='DEVICE_ID')
     parser.add_argument('--dataset_path', type=str, default='', help='Dataset path')
     parser.add_argument('--checkpoint_path', type=str, default='', help='checkpoint of siamRPN')
@@ -154,10 +154,10 @@ def parse_args():
 
 if __name__ == '__main__':
     args = parse_args()
-    if args.platform == 'Ascend':
+    if args.device_target == 'Ascend':
         device_id = args.device_id
         context.set_context(device_id=device_id)
-    context.set_context(mode=context.GRAPH_MODE, device_target=args.platform)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
     model_file_path = args.checkpoint_path
     data_file_path = args.dataset_path
     save_file_name = args.filename

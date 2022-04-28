@@ -2,7 +2,7 @@
 
 - [目录](#目录)
 - [SiamRPN描述](#概述)
-- [模型架构](#s模型架构)
+- [模型架构](#模型架构)
 - [数据集](#数据集)
 - [特性](#特性)
     - [混合精度](#混合精度)
@@ -17,6 +17,7 @@
     - [评估过程](#评估过程)
         - [评估](#评估)
             - [910评估](#910评估)
+            - [GPU评估](#gpu评估)
             - [310评估·](#310评估)
 - [模型描述](#模型描述)
     - [性能](#性能)
@@ -82,6 +83,20 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 
   ```
 
+- GPU处理器环境运行
+
+  ```python
+  # 运行训练示例
+  bash scripts/run_gpu.sh 0
+
+  # 运行分布式训练示例
+  bash scripts/run_distribute_train_gpu.sh  device_num device_list
+
+  # 运行评估示例
+  bash scripts/run_eval_gpu.sh 0 /path/dataset /path/ckpt/siamRPN-50_1417.ckpt eval.json
+
+  ```
+
 # 脚本说明
 
 ## 脚本及样例代码
@@ -92,23 +107,44 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
     ├── research
         ├── cv
             ├── siamRPN
-                ├── README_CN.md           // googlenet相关说明
+                ├── README_CN.md            // SiamRPN相关说明
                 ├── ascend_310_infer        // 实现310推理源代码
                 ├── scripts
                 │    ├──run.sh              // 训练脚本
-                |    |──run_distribute_train.sh //本地多卡训练脚本
+                |    |──run_distribute_train.sh //本地Ascend多卡训练脚本
                 |    |──run_eval.sh         //910评估脚本
+                |    |──run_eval_gpu.sh     // GPU评估脚本
+                |    |──run_distribute_train_gpu.sh      // 本地GPU多卡训练脚本
                 |    |──run_infer_310.sh    //310推理评估脚本
+                |    |──run_gpu.sh          //GPU单卡训练脚本
                 ├── src
-                │    ├──data_loader.py      // 数据集加载处理脚本
-                │    ├──net.py              //  siamRPN架构
-                │    ├──loss.py             //  损失函数
-                │    ├──util.py             //  工具脚本
-                │    ├──tracker.py
-                │    ├──generate_anchors.py
-                │    ├──tracker.py
-                │    ├──evaluation.py
-                │    ├──config.py          // 参数配置
+                │    ├── data_loader.py      // 数据集加载处理脚本
+                │    ├── net.py              //  siamRPN架构
+                │    ├── loss.py             //  损失函数
+                │    ├── util.py             //  工具脚本
+                │    ├── tracker.py
+                │    ├── generate_anchors.py
+                │    ├── tracker.py
+                │    ├── evaluation.py
+                │    ├── config.py          // 参数配置
+                ├── ytb_vid_filter         //训练集(需要自己下载)
+                │    ├── --0bLFuriZ4
+                │    ├── --4VWx_0Sc4
+                │    ├── ······
+                │    ├── ······
+                │    └── meta_data.pkl
+                ├── vot2015                //测试集(需要自己下载)
+                │    ├── bag
+                │    ├── ball1
+                │    ├── ······
+                │    ├── ······
+                │    └── list.txt
+                ├── vot2016                //测试集(需要自己下载)
+                │    ├── bag
+                │    ├── ball1
+                │    ├── ······
+                │    ├── ······
+                │    └── list.txt
                 ├── train.py               // 训练脚本
                 ├── eval.py                // 评估脚本
                 ├── export_mindir.py       // 将checkpoint文件导出到air/mindir
@@ -144,7 +180,7 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 - Ascend处理器环境运行
 
   ```bash
-  python train.py --device_id=0 > train.log 2>&1 &
+  python train.py --device_id=0 --device_target="Ascend"> train.log 2>&1 &
   ```
 
   上述python命令将在后台运行，您可以通过train.log文件查看结果。
@@ -160,7 +196,17 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 
   模型检查点保存在当前目录下。
 
-### 分布式训练
+- GPU处理器环境运行
+
+  在运行train.py文件前，需要手动配置src/config.py文件中的pretrain_model参数、train_path参数和checkpoint_path参数，pretrain_model参数代表预训练权重模型路径，train_path参数代表训练集存放的位置，checkpoint_path参数代表存放生成得到的训练模型的位置。
+
+  ```bash
+  python train.py --device_id=0 --device_target="GPU"> train.log 2>&1 &
+  ```
+
+  上述python命令将在后台运行，您可以通过train.log文件查看结果。
+
+### Ascend分布式训练
 
   对于分布式训练，需要提前创建JSON格式的hccl配置文件。
 
@@ -185,6 +231,17 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
       # (6) 创建训练作业
       ```
 
+#### GPU分布式训练
+
+  ```bash
+  cd  SiamRPN      //进入到SiamRPN文件根目录
+
+  bash scripts/run_distribute_train_gpu.sh DEVICE_NUM DEVICE_ LIST //运行脚本
+
+  # DEVICE_NUM表示显卡数量
+  # DEVICE_LIST: GPU处理器的id，需用户指定，例如“0,1,2,3”
+  ```
+
 ## 评估过程
 
 ### 评估
@@ -194,14 +251,29 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 - 评估过程如下，需要vot数据集对应video的图片放于对应文件夹的color文件夹下，标签groundtruth.txt放于该目录下。
 
 ```bash
-# 使用数据集
-  python eval.py --device_id=0 --dataset_path=/path/dataset --checkpoint_path=/path/ckpt/siamRPN-50_1417.ckpt --filename=eval.json &> evallog &
+# 使用Ascend
+  python eval.py --device_id=0 --dataset_path=/path/dataset --checkpoint_path=/path/ckpt/siamRPN-xx_xxxx.ckpt --filename=eval.json --device_target="Ascend"&> evallog &
 ```
 
 - 上述python命令在后台运行，可通过`evallog`文件查看评估进程，结束后可通过`eval.json`文件查看评估结果。评估结果如下：
 
 ```bash
 {... "all_videos": {"accuracy": 0.5809545709441025, "robustness": 0.33422978326730364, "eao": 0.3102655908013835}}
+```
+
+#### GPU评估
+
+- 评估过程如下，需要vot数据集对应video的图片放于对应文件夹的color文件夹下，标签groundtruth.txt放于该目录下。
+
+```bash
+# 使用gpu
+  python eval.py --device_id=0 --dataset_path=/path/dataset --checkpoint_path=/path/ckpt/siamRPN-xx_xxxx.ckpt --filename=eval.json --device_target="GPU"&> evallog &
+```
+
+- 上述python命令在后台运行，可通过`evallog`文件查看评估进程，结束后可通过`eval.json`文件查看评估结果。评估结果如下：
+
+```bash
+{... "all_videos": {"accuracy": 0.5826686315079969, "robustness": 0.2982987648566767, "eao": 0.3289693903290864}}
 ```
 
 #### 310评估
@@ -225,35 +297,35 @@ cat acc.log
 
 ### 训练性能
 
-| 参数           | siamRPN(Ascend)                                  |
-| -------------------------- | ---------------------------------------------- |
-| 模型版本                | siamRPN                                          |
-| 资源                   | Ascend 910；CPU：2.60GHz，192核；内存：755 GB    |
-| 上传日期              | 2021-07-22                                           |
-| MindSpore版本        | 1.2.0-alpha                                     |
-| 数据集                |VID-youtube-bb                                     |
-| 训练参数  |epoch=50, steps=1471, batch_size = 32 |
-| 优化器                  | SGD                                                        |
-| 损失函数 | 自定义损失函数 |
-| 输出              | 目标框                                                |
-| 损失             |100~0.05                                          |
-| 速度 | 8卡：120毫秒/步 |
-| 总时长 | 8卡：12.3小时 |
-| 调优检查点 |    247.58MB（.ckpt 文件）               |
-| 脚本                | [siamRPN脚本](https://gitee.com/mindspore/models/tree/master/research/cv/siamRPN) |
+| 参数           | siamRPN(Ascend)                                  | siamRPN(GPU) |
+| -------------------------- | ---------------------------------------------- | --------- |
+| 模型版本                | siamRPN                                          | siamRPN |
+| 资源                   | Ascend 910；CPU：2.60GHz，192核；内存：755 GB    | RTX3090 |
+| 上传日期              | 2021-07-22                                           |   |
+| MindSpore版本        | 1.2.0-alpha                                     |   |
+| 数据集                |VID-youtube-bb                                     | VID-youtube-bb|
+| 训练参数  |epoch=50, steps=1417, batch_size = 32                      | epoch=50, steps=1417, batch_size = 32  |
+| 优化器                  | SGD                                               | SGD  |
+| 损失函数 | 自定义损失函数 | 自定义损失函数 |
+| 输出              | 目标框                                                |目标框  |
+| 损失             |100~0.05                                          | 100~0.05     |
+| 速度 | 8卡：625毫秒/步 | 8卡：296毫秒/步  |
+| 总时长 | 8卡：12.3小时 | 8卡： 5.8小时|
+| 调优检查点 |    247.58MB（.ckpt 文件）               | 247.44MB（.ckpt 文件）|
+| 脚本                | [siamRPN脚本](https://gitee.com/mindspore/models/tree/master/research/cv/siamRPN) | [siamRPN脚本](https://gitee.com/mindspore/models/tree/master/research/cv/siamRPN) |
 
 ### 评估性能
 
-| 参数  | siamRPN(Ascend)                         | siamRPN(Ascend)                         |
-| ------------------- | --------------------------- | --------------------------- |
-| 模型版本      | simaRPN                       | simaRPN                       |
-| 资源        | Ascend 910                  | Ascend 910                  |
-| 上传日期              | 2021-07-22                    | 2021-07-22                    |
-| MindSpore版本   | 1.2.0-alpha                 | 1.2.0-alpha                 |
-| 数据集 | vot2015，60个video | vot2016，60个video |
-| batch_size          |   1                        |   1                        |
-| 输出 | 目标框 | 目标框 |
-| 准确率 | 单卡：accuracy：0.58,robustness：0.33,eao:0.31; | 单卡：accuracy：0.56,robustness：0.39,eao:0.28;|
+| 参数  | siamRPN(Ascend)        | siamRPN(Ascend)     | siamRPN(GPU)         | siamRPN(GPU)                   |
+| ------------------- | --------------------------- | --------------------------- |--------------------------- | --------------------------- |
+| 模型版本      | simaRPN               | simaRPN          |simaRPN                       | simaRPN                       |
+| 资源        | Ascend 910           | Ascend 910       |GPU         | GPU                       |
+| 上传日期              | 2021-07-22         | 2021-07-22         |     2021-12-7      |         2021-12-7             |
+| MindSpore版本   | 1.2.0-alpha                 | 1.2.0-alpha       |      1.5.0   |   1.5.0   |
+| 数据集 | vot2015，60个video | vot2016，60个video |vot2015，60个video          | vot2016，60个video            |
+| batch_size          |   1                |   1               |1           | 1                |
+| 输出 | 目标框 | 目标框 |目标框             | 目标框        |
+| 准确率 | 单卡：accuracy：0.58,robustness：0.33,eao:0.31; | 单卡：accuracy：0.56,robustness：0.39,eao:0.28;|单卡：accuracy：0.5826,robustness：0.298,eao:0.329;       | 单卡：accuracy：0.5538,robustness：0.345,eao:0.295;                  |
 
 # 随机情况说明
 
