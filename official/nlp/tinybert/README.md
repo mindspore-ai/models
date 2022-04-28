@@ -50,14 +50,63 @@ The backbone structure of TinyBERT is transformer, the transformer contains four
 # [Dataset](#contents)
 
 - Create dataset for general distill phase
-    - Download the [zhwiki](https://dumps.wikimedia.org/zhwiki/) or [enwiki](https://dumps.wikimedia.org/enwiki/) dataset for pre-training.
-        - Extract and refine texts in the dataset with [WikiExtractor](https://github.com/attardi/wikiextractor). The commands are as follows:
+    - Download the [enwiki](https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2) dataset for pre-training.
+    - Extract and refine texts in the dataset with [WikiExtractor](https://github.com/attardi/wikiextractor). The commands are as follows:
         - pip install wikiextractor
-        - python -m wikiextractor.WikiExtractor -o <output file path> -b <output file size> <Wikipedia dump file>
-    - Convert the dataset to TFRecord format. Please refer to create_pretraining_data.py file in [BERT](https://github.com/google-research/bert) repository and download vocab.txt here, if AttributeError: module 'tokenization' has no attribute 'FullTokenizer' occur, please install bert-tensorflow.
+        - python -m wikiextractor.WikiExtractor [Wikipedia dump file] -o [output file path] -b 2G
+    - Download [BERT](https://github.com/google-research/bert), and download [BERT-Base, Uncased](https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip), it contains `vocab.txt`, `bert_config.json`, and pretrain model.
+    - Use `create_pretraining_data.py`, transform data to tfrecord, please refer to readme file, if AttributeError: module 'tokenization' has no attribute 'FullTokenizer' occur, please install bert-tensorflow.
+    - Transform tensorflow model to mindspore model
+
+        ```bash
+        cd scripts/ms2tf
+        python ms_and_tf_checkpoint_transfer_tools.py --tf_ckpt_path=PATH/model.ckpt　\
+            --new_ckpt_path=PATH/ms_model_ckpt.ckpt　\
+            --tarnsfer_option=tf2ms
+        # Attention，tensorflow model include 3 parts，data, index and meta，the input of tf_ckpt_path is *.ckpt
+        ```
+
 - Create dataset for task distill phase
-    - Download [GLUE](https://github.com/nyu-mll/GLUE-baselines) dataset for task distill phase
-    - Convert dataset files from JSON format to TFRECORD format, please refer to run_classifier.py file in [BERT](https://github.com/google-research/bert) repository.
+    - Download [GLUE](https://github.com/nyu-mll/GLUE-baselines) dataset for task distill phase, use `download_glue_data.py` to download sst2, mnli, qnli dataset.
+    - Transform dataset to TFRecord format. Use `run_classifier.py` in [BERT](https://github.com/google-research/bert), referring to readme. Besides, transforming sst2 dataset, you should add code in [PR:327](https://github.com/google-research/bert/pull/327); transforming qnli dataset, you should refer sst2 add add follow code. Parts of code, such as training, evaling, predicting, are useless, you can comment them and only left necessary code. task_name should be SST2, ber_config_files should be `bert_config.json`, max_seq_length should be 64.
+
+    ```python
+    ...
+    class QnliProcessor(DataProcessor):
+    """Processor for the QNLI data set (GLUE version)."""
+
+        def get_train_examples(self, data_dir):
+            """See base class."""
+            return self._create_examples(
+                self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+        def get_dev_examples(self, data_dir):
+            """See base class."""
+            return self._create_examples(
+                self._read_tsv(os.path.join(data_dir, "dev.tsv")),
+                               "dev_matched")
+
+        def get_labels(self):
+            """See base class."""
+            return ["entailment", "not_entailment"]
+
+        def _create_examples(self, lines, set_type):
+            """Creates examples for the training and dev sets."""
+            examples = []
+            for (i, line) in enumerate(lines):
+                if i == 0:
+                    continue
+                guid = "%s-%s" % (set_type, line[0])
+                text_a = line[1]
+                text_b = line[2]
+                label = line[-1]
+                examples.append(
+                    InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+            return examples
+    ...
+    "qnli": QnliProcessor,
+    ...
+    ```
 
 # [Environment Requirements](#contents)
 
@@ -587,6 +636,7 @@ Inference result is saved in current path, you can find result like this in acc.
 #### Inference Performance
 
 > SST2 dataset
+
 | Parameters                 | Ascend                        | GPU                       |
 | -------------------------- | ----------------------------- | ------------------------- |
 | Model Version              |                               |                           |
@@ -597,7 +647,9 @@ Inference result is saved in current path, you can find result like this in acc.
 | batch_size                 | 32                            | 32                        |
 | Accuracy                   | 0.902777                      | 0.9086                    |
 | Model for inference        | 74M(.ckpt file)               | 74M(.ckpt file)           |
+
 > QNLI dataset
+
 | Parameters                 | Ascend                        | GPU                       |
 | --------------             | ----------------------------- | ------------------------- |
 | Model Version              |                               |                           |
@@ -608,7 +660,9 @@ Inference result is saved in current path, you can find result like this in acc.
 | batch_size                 | 32                            | 32                        |
 | Accuracy                   | 0.8860                        | 0.8755                    |
 | Model for inference        | 74M(.ckpt file)               | 74M(.ckpt file)           |
+
 > MNLI dataset
+
 | Parameters                 | Ascend                        | GPU                       |
 | --------------             | ----------------------------- | ------------------------- |
 | Model Version              |                               |                           |
