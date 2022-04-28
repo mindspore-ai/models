@@ -33,8 +33,12 @@ def create_dataset_imagenet(dataset_path, num_parallel_workers=None):
     Returns:
         dataset
     """
-
-    data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers)
+    device_num, rank_id = _get_rank_info()
+    if device_num == 1:
+        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers)
+    else:
+        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers,
+                                         num_shards=device_num, shard_id=rank_id)
 
     assert dcgan_imagenet_cfg.image_height == dcgan_imagenet_cfg.image_width, "image_height not equal image_width"
     image_size = dcgan_imagenet_cfg.image_height

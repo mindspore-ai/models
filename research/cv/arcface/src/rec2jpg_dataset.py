@@ -16,6 +16,7 @@
 rec format to jpg
 """
 import os
+import argparse
 from skimage import io
 import mxnet as mx
 from mxnet import recordio
