@@ -29,6 +29,7 @@
             - [评估性能](#评估性能)
     - [随机情况说明](#随机情况说明)
     - [ModelZoo主页](#modelzoo主页)
+    - [FAQ](#faq)
 
 <!-- /TOC -->
 
@@ -458,3 +459,11 @@ train.py已经设置了一些种子，避免数据集轮换和权重初始化的
 ## ModelZoo主页
 
 请浏览官网[主页](https://gitee.com/mindspore/models)。
+
+## FAQ
+
+优先参考[ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ)来查找一些常见的公共问题。
+
+- **Q: 为什么我最后的checkpoint的精度不好？**
+
+  **A**： 因为我们需要使用一个第三方的perl脚本来进行验证，所以我们没办法在训练的时候就获取最优checkpoint。你可以尝试对最后的多个checkpoint进行验证，从中获取最好的一个。

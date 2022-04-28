@@ -383,3 +383,7 @@ For more information about `MindSpore` framework, please refer to [FAQ](https://
 - **Q: How to solve the error when loading dataset in mindrecord format on Mac system, such as *Invalid file, failed to open files for reading mindrecord files.*?**
 
   **A**: Please check the system limit with *ulimit -a*, if the number of *file descriptors* is 256 (default), you need to use *ulimit -n 1024* to set it to 1024 (or larger). Then check whether the file is damaged or modified.
+
+- **Q: What should I do if I can't reach the accuracy while training with several servers instead of a single server?**
+
+  **A**: Most of the models has only been trained on single server with at most 8 pcs. Because the `batch_size` used in MindSpore only represent the batch size of single GPU/NPU, the `global_batch_size` will increase while training with multi-server. Different `gloabl_batch_size` requires different hyper parameter including learning_rate, etc. So you have to optimize these hyperparameters will training with multi-servers.
