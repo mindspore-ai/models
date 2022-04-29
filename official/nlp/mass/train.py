@@ -220,7 +220,7 @@ def _build_training_pipeline(pre_training_dataset=None,
     callbacks.append(time_cb)
     ckpt_save_dir = os.path.join(config.output_path, config.checkpoint_path)
     if rank_size is not None and int(rank_size) > 1:
-        loss_monitor = LossCallBack(config, rank_id=MultiAscend.get_rank())
+        loss_monitor = LossCallBack(rank_id=MultiAscend.get_rank())
         callbacks.append(loss_monitor)
         if MultiAscend.get_rank() % 8 == 0:
             ckpt_callback = ModelCheckpoint(
@@ -234,7 +234,7 @@ def _build_training_pipeline(pre_training_dataset=None,
             prefix=config.ckpt_prefix,
             directory=os.path.join(ckpt_save_dir, 'ckpt_{}'.format(os.getenv('DEVICE_ID'))),
             config=ckpt_config)
-        loss_monitor = LossCallBack(config, rank_id=os.getenv('DEVICE_ID'))
+        loss_monitor = LossCallBack(rank_id=os.getenv('DEVICE_ID'))
         callbacks.append(loss_monitor)
         callbacks.append(ckpt_callback)
 

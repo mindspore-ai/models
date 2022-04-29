@@ -15,7 +15,6 @@
 """Loss monitor."""
 import time
 from mindspore.train.callback import Callback
-from config import TransformerConfig
 
 
 class LossCallBack(Callback):
@@ -33,11 +32,10 @@ class LossCallBack(Callback):
     time_stamp_init = False
     time_stamp_first = 0
 
-    def __init__(self, config: TransformerConfig, per_print_times: int = 1, rank_id: int = 0):
+    def __init__(self, per_print_times: int = 1, rank_id: int = 0):
         super(LossCallBack, self).__init__()
         if not isinstance(per_print_times, int) or per_print_times < 0:
             raise ValueError("print_step must be int and >= 0.")
-        self.config = config
         self._per_print_times = per_print_times
         self.rank_id = rank_id
 
