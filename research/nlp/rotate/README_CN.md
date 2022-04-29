@@ -228,7 +228,7 @@ bash scripts/run_eval.sh [DEVICE_ID] [DEVICE_TARGET] [EVAL_CHECKPOINT] [EVAL_LOG
   在运行以下命令之前，请检查用于评估的检查点路径。
 
   ```bash
-  bash scripts/run_eval.sh 0 Ascend Data/wn18rr/ checkpoints/rotate-standalone-ascend/rotate.ckpt eval-standalone-ascend.log
+  bash scripts/run_eval.sh 0 Ascend checkpoints/rotate-standalone-ascend/rotate.ckpt eval-standalone-ascend.log
   ```
 
   上述python命令将在后台运行，您可以通过ms_log/eval-standalone-ascend文件查看类似如下的结果：
