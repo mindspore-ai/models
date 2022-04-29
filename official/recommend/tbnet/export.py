@@ -30,7 +30,7 @@ def get_args():
     parser.add_argument(
         '--config_path',
         type=str,
-        required=False,
+        required=True,
         default='',
         help="json file for dataset"
     )
