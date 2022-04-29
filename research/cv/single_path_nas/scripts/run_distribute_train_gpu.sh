@@ -13,26 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
-if [ $# != 1 ]
+if [ $# -lt 3 ]
 then
-    echo "Usage: sh run_eval.sh checkpoint_path_dir/checkpoint_path_file"
+    echo "Usage: bash ./scripts/run_distributed_train_gpu.sh [CUDA_VISIBLE_DEVICES] [DEVICE_NUM] [DATA_PATH]"
 exit 1
 fi
 
+dataset_name="imagenet"
+export RANK_SIZE=$1
+export DEVICE_NUM=$2
+export CUDA_VISIBLE_DEVICES=$1
+DATA_PATH=$3
 
-if [ ! -d $1 ] && [ ! -f $1 ]
-then
-    echo "error: checkpoint_path=$1 is neither a directory nor a file"
-    exit 1
-fi
+mpirun -n ${DEVICE_NUM} --allow-run-as-root --output-filename log_output \
+--merge-stderr-to-stdout python train.py \
+--device_target="GPU" --dataset_name=$dataset_name \
+--data_path=$DATA_PATH > log.txt 2>&1 &
 
-
-ulimit -u unlimited
-export DEVICE_NUM=1
-export DEVICE_ID=0
-export RANK_SIZE=$DEVICE_NUM
-export RANK_ID=0
-
-echo "start evaluation for device $DEVICE_ID"
-python eval.py --checkpoint_path=$1 > ./eval.log 2>&1 &

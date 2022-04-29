@@ -57,7 +57,7 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
 
 ## 混合精度
 
-采用[混合精度](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/enable_mixed_precision.html) 的训练方法，使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
+采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html) 的训练方法，使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
 
 # 环境要求
 
@@ -77,13 +77,16 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
 
   ```bash
   # 运行训练示例
-  python train.py --device_id=0 > train.log 2>&1 &
+  python train.py --device_id=0 --data_path=/imagenet/train --device_target=Ascend> train.log 2>&1 &
+
+  # 运行单卡训练示例
+  bash ./scripts/run_standalone_train_ascend.sh [DEVICE_ID] [DATA_PATH]
 
   # 运行分布式训练示例
-  bash ./scripts/run_train.sh [RANK_TABLE_FILE] imagenet
+  bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DEVICE_NUM] [DATA_PATH]
 
   # 运行评估示例
-  python eval.py --checkpoint_path ./ckpt_0 > ./eval.log 2>&1 &
+  python eval.py --checkpoint_path=./ckpt_0 --device_id=0 --device_target="Ascend" --val_data_path/imagenet/val > ./eval.log 2>&1 &
 
   # 运行推理示例
   bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
@@ -93,27 +96,41 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/r1.5/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
 
 # 脚本说明
 
 ## 脚本及样例代码
 
-```bash
+```text
 ├── model_zoo
-  ├── README_CN.md             // Single-Path-NAS相关说明
   ├── scripts
-  │   ├──run_train.sh          // 分布式到Ascend的shell脚本
-  │   ├──run_eval.sh           // 测试脚本
-  │   ├──run_infer_310.sh      // 310推理脚本
+  │   ├──run_distribute_train_ascend.sh              // 分布式到Ascend的shell脚本
+  │   ├──run_distribute_train_gpu.sh          // Shell script for running the GPU distributed training
+  │   ├──run_standalone_train_ascend.sh              // Shell script for running the Ascend standalone training
+  │   ├──run_standalone_train_gpu.sh          // Shell script for running the GPU standalone training
+  │   ├──run_eval_ascend.sh                          // 测试脚本
+  │   ├──run_eval_gpu.sh                      // Shell script for running the GPU evaluation
+  │   ├──run_infer_310.sh                     // 310推理脚本
   ├── src
-  │   ├──lr_scheduler          // 学习率相关文件夹，包含学习率变化策略的py文件
-  │   ├──dataset.py            // 创建数据集
-  │   ├──CrossEntropySmooth.py // 损失函数相关
-  │   ├──spnasnet.py           //  Single-Path-NAS网络架构
-  │   ├──config.py             // 参数配置
-  │   ├──utils.py              // spnasnet.py的自定义网络模块
-  ├── train.py                 // 训练和测试文件
+  │   ├──lr_scheduler                         // 学习率相关文件夹，包含学习率变化策略的py文件
+  │   │   ├──__init__.py
+  │   │   ├──linear_warmup.py                 // Definitions for the warm-up functionality
+  │   │   ├──warmup_cosine_annealing_lr.py    // Definitions for the cosine annealing learning rate schedule
+  │   │   ├──warmup_step_lr.py                // Definitions for the exponential learning rate schedule
+  │   ├──__init__.py
+  │   ├──dataset.py                           // 创建数据集
+  │   ├──CrossEntropySmooth.py                // 损失函数相关
+  │   ├──spnasnet.py                          // Single-Path-NAS网络架构
+  │   ├──config.py                            // 参数配置
+  │   ├──utils.py                             // spnasnet.py的自定义网络模块
+  ├── create_imagenet2012_label.py            // Creating ImageNet labels
+  ├── eval.py                                 // Evaluate the trained model
+  ├── export.py                               // Export model to other formats
+  ├── postprocess.py                          // Postprocess for the Ascend 310 inference.
+  ├── README.md                               // Single-Path-NAS related instruction in English
+  ├── README_CN.md                            // Single-Path-NAS相关说明
+  ├── train.py                                // 训练和测试文件
 ```
 
 ## 脚本参数
@@ -133,10 +150,6 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
   'weight_decay':1e-5      # 权重衰减值
   'image_height':224       # 输入到模型的图像高度
   'image_width':224        # 输入到模型的图像宽度
-  'data_path':'/data/ILSVRC2012_train/'  # 训练数据集的绝对全路径
-  'val_data_path':'/data/ILSVRC2012_val/'  # 评估数据集的绝对全路径
-  'device_target':'Ascend' # 运行设备
-  'device_id':0            # 用于训练或评估数据集的设备ID使用run_train.sh进行分布式训练时可以忽略。
   'keep_checkpoint_max':40 # 最多保存80个ckpt模型文件
   'checkpoint_path':None  # checkpoint文件保存的绝对全路径
   ```
@@ -150,7 +163,7 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
 - Ascend处理器环境运行
 
   ```bash
-  python train.py --device_id=0 > train.log 2>&1 &
+  python train.py --device_id=0 --device_target="Ascend" --data_path=/imagenet/train > train.log 2>&1 &
   ```
 
   上述python命令将在后台运行，可以通过生成的train.log文件查看结果。
@@ -160,7 +173,7 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
 - Ascend处理器环境运行
 
   ```bash
-  bash ./scripts/run_train.sh [RANK_TABLE_FILE] imagenet
+  bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DEVICE_NUM] [DATA_PATH]
   ```
 
   上述shell脚本将在后台运行分布训练。
@@ -174,9 +187,9 @@ single-path-nas的作者用一个7x7的大卷积，来代表3x3、5x5和7x7的�
   “./ckpt_0”是保存了训练好的.ckpt模型文件的目录。
 
   ```bash
-  python eval.py --checkpoint_path ./ckpt_0 > ./eval.log 2>&1 &
+  python eval.py --checkpoint_path=./ckpt_0 --device_id=0 --device_target="Ascend" --val_data_path=/imagenet/val > ./eval.log 2>&1 &
   OR
-  bash ./scripts/run_eval.sh
+  bash ./scripts/run_eval_ascend.sh [DEVICE_ID] [DATA_PATH] [CKPT_FILE/CKPT_DIR]
   ```
 
 ## 导出过程

@@ -14,27 +14,25 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 0 ]
+if [ $# != 3 ]
 then
-    echo "Usage: sh run_train.sh"
-exit 1
-fi
-
-if [ ! -f $1 ]
-then
-    echo "error: RANK_TABLE_FILE=$1 is not a file"
+    echo "Usage: bash ./scripts/run_eval_ascend.sh [DEVICE_ID] [DATA_PATH] [CKPT_FILE/CKPT_DIR]"
 exit 1
 fi
 
 
-dataset_type='imagenet'
+if [ ! -d $3 ] && [ ! -f $3 ]
+then
+    echo "error: checkpoint_path=$3 is neither a directory nor a file"
+    exit 1
+fi
 
 
 ulimit -u unlimited
-export DEVICE_ID=0
 export DEVICE_NUM=1
+export DEVICE_ID=$1
+export RANK_SIZE=$DEVICE_NUM
 export RANK_ID=0
-export RANK_SIZE=1
 
-echo "start training for device $DEVICE_ID"
-python train.py --device_id=$DEVICE_ID --dataset_name=$dataset_type> log 2>&1 &
+echo "start evaluation for device $DEVICE_ID"
+python eval.py --checkpoint_path=$3 --val_data_path=$2 --device_id=$DEVICE_ID --device_target="Ascend" > ./eval.log 2>&1 &

@@ -15,7 +15,6 @@
 """
 Data operations, will be used in train.py and eval.py
 """
-import os
 
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
@@ -26,28 +25,27 @@ from src.config import imagenet_cfg
 
 
 def create_dataset_imagenet(dataset_path, repeat_num=1, training=True,
-                            num_parallel_workers=None, shuffle=True):
+                            num_parallel_workers=None, shuffle=True,
+                            device_num=None, rank_id=None, drop_reminder=False):
     """
     create a train or eval imagenet2012 dataset for resnet50
 
     Args:
         dataset_path(string): the path of dataset.
-        do_train(bool): whether dataset is used for train or eval.
         repeat_num(int): the repeat times of dataset. Default: 1
-        batch_size(int): the batch size of dataset. Default: 32
-        target(str): the device target. Default: Ascend
-
+        training(bool): whether dataset is used for train or eval. Default: True.
+        num_parallel_workers(int): Number of parallel workers. Default: None.
+        shuffle(bool): whether dataset is used for train or eval. Default: True.
+        device_num(int): Number of devices for the distributed training. Default: None
+        rank_id(int): Rank of the process for the distributed training. Default: None
+        drop_reminder (bool): Drop reminder of the dataset,
+            if its size is less than the specified batch size. Default: False
     Returns:
         dataset
     """
 
-    device_num, rank_id = _get_rank_info()
-
-    if device_num == 1:
-        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers, shuffle=shuffle)
-    else:
-        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers, shuffle=shuffle,
-                                         num_shards=device_num, shard_id=rank_id)
+    data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers,
+                                     shuffle=shuffle, num_shards=device_num, shard_id=rank_id)
 
     assert imagenet_cfg.image_height == imagenet_cfg.image_width, "image_height not equal image_width"
     image_size = imagenet_cfg.image_height
@@ -73,32 +71,14 @@ def create_dataset_imagenet(dataset_path, repeat_num=1, training=True,
         ]
 
     transform_label = [C.TypeCast(mstype.int32)]
-    if training:
-        data_set = data_set.map(input_columns="image", num_parallel_workers=16, operations=transform_img)
-        data_set = data_set.map(input_columns="label", num_parallel_workers=4, operations=transform_label)
-    else:
-        data_set = data_set.map(input_columns="image", num_parallel_workers=16, operations=transform_img)
-        data_set = data_set.map(input_columns="label", num_parallel_workers=4, operations=transform_label)
+    data_set = data_set.map(input_columns="image", num_parallel_workers=16,
+                            operations=transform_img, python_multiprocessing=True)
+    data_set = data_set.map(input_columns="label", num_parallel_workers=4,
+                            operations=transform_label)
     # apply batch operations
-    data_set = data_set.batch(imagenet_cfg.batch_size, drop_remainder=False)
+    data_set = data_set.batch(imagenet_cfg.batch_size, drop_remainder=drop_reminder)
 
     # apply dataset repeat operation
     data_set = data_set.repeat(repeat_num)
 
     return data_set
-
-
-def _get_rank_info():
-    """
-    get rank size and rank id
-    """
-    rank_size = int(os.environ.get("RANK_SIZE", 1))
-
-    if rank_size > 1:
-        from mindspore.communication.management import get_rank, get_group_size
-        rank_size = get_group_size()
-        rank_id = get_rank()
-    else:
-        rank_size = rank_id = None
-
-    return rank_size, rank_id
