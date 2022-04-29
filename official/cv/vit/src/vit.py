@@ -84,11 +84,11 @@ class DropPath(Cell):
         self.dropout = Dropout(self.keep_prob)
 
     def construct(self, x):
-        x_shape = self.shape(x)
         if self.training:
             x_shape = self.shape(x) # B N C
             mask = self.ones((x_shape[0], 1, 1), ms.float32)
-        return self.dropout(mask)*x
+            x = self.dropout(mask)*x
+        return x
 
 
 class BatchDense(Cell):
