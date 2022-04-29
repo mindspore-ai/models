@@ -308,10 +308,6 @@ bash scripts/run_eval.sh [DEVICE_ID] [DATASET_PATH] [CHECKPOINT_PATH]
    python torch2mindspore.py --pth_path [TORCH_MODEL_PATH] --ckpt_path [OUTPUT_MODEL_PATH]
    ```
 
-2. 自行训练
-
-   HRNet分类任务已经实现了MindSpore版本，并提供可达到目标精度的超参，可自行训练获取预训练模型。详情请参考：[HRNet图像分类-MindSpore实现](https://git.openi.org.cn/OpenModelZoo/HRNet-cls) 。
-
 ### 用法
 
 #### Ascend处理器环境运行

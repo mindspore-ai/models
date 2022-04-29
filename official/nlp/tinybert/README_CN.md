@@ -55,14 +55,63 @@ TinyBERT模型的主干结构是转换器，转换器包含四个编码器模块
 # 数据集
 
 - 生成通用蒸馏阶段数据集
-    - 下载[zhwiki](https://dumps.wikimedia.org/zhwiki/)或[enwiki](https://dumps.wikimedia.org/enwiki/)数据集进行预训练，
+    - 下载[enwiki](https://dumps.wikimedia.org/enwiki/latest/enwiki-latest-pages-articles.xml.bz2)数据集进行预训练，
     - 使用[WikiExtractor](https://github.com/attardi/wikiextractor)提取和整理数据集中的文本，使用步骤如下：
         - pip install wikiextractor
-        - python -m wikiextractor.WikiExtractor -o <output file path> -b <output file size> <Wikipedia dump file>
-    - 将数据集转换为TFRecord格式。详见[BERT](https://github.com/google-research/bert)代码仓中的create_pretraining_data.py文件，同时下载对应的vocab.txt文件, 如果出现AttributeError: module 'tokenization' has no attribute 'FullTokenizer’，请安装bert-tensorflow。
+        - python -m wikiextractor.WikiExtractor [Wikipedia dump file] -o [output file path] -b 2G
+    - 下载[BERT](https://github.com/google-research/bert)代码仓，并下载[BERT-Base, Uncased](https://storage.googleapis.com/bert_models/2018_10_18/uncased_L-12_H-768_A-12.zip)，其中包含了转化需要使用的`vocab.txt`, `bert_config.json`和预训练模型
+    - 使用`create_pretraining_data.py`文件，将下载得到的文件转化成tfrecord数据集，详细用法请参考readme文件，其中input_file第2步会生成多个文本文件，请转化为`bert0.tfrecord-bertx.tfrecord`，如果出现AttributeError: module 'tokenization' has no attribute 'FullTokenizer’，请安装bert-tensorflow
+    - 将下载得到的tensorflow模型转化为mindspore模型
+
+        ```bash
+        cd scripts/ms2tf
+        python ms_and_tf_checkpoint_transfer_tools.py --tf_ckpt_path=PATH/model.ckpt　\
+            --new_ckpt_path=PATH/ms_model_ckpt.ckpt　\
+            --tarnsfer_option=tf2ms
+        # 注意，tensorflow的模型包括三部分，data, index和meta，这里传入的tf_ckpt_path传入的文件名到.ckpt截至
+        ```
+
 - 生成下游任务蒸馏阶段数据集
-    - 下载数据集进行微调和评估，如[GLUE](https://github.com/nyu-mll/GLUE-baselines)
-    - 将数据集文件从JSON格式转换为TFRecord格式。详见[BERT](https://github.com/google-research/bert)代码仓中的run_classifier.py文件。
+    - 下载数据集进行微调和评估，如[GLUE](https://github.com/nyu-mll/GLUE-baselines)，使用`download_glue_data.py`脚本下载SST2, MNLI, QNLI数据集
+    - 将数据集文件从JSON格式转换为TFRecord格式。使用通用蒸馏阶段的第三步BERT代码，参考readme使用代码仓中的`run_classifier.py`文件。转化SST2数据集需要[PR:327](https://github.com/google-research/bert/pull/327)，该PR是未合入状态，需要手动添加到代码中；转化QNLI数据集需要参考SST2在`run_classifier.py`合适的位置插入以下代码；另外，`run_classifier.py`代码中包含了训练，推理和预测的代码，对于转化tfrecord数据集来说，这部分代码是多余的，可以将这部分代码注释掉，只保留转化数据集的代码．其中task_name指定为SST2，bert_config_file指定为通用蒸馏阶段下载得到的bert_config.json文件，max_seq_length为64
+
+    ```python
+    ...
+    class QnliProcessor(DataProcessor):
+    """Processor for the QNLI data set (GLUE version)."""
+
+    def get_train_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        """See base class."""
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")),
+                           "dev_matched")
+
+    def get_labels(self):
+        """See base class."""
+        return ["entailment", "not_entailment"]
+
+    def _create_examples(self, lines, set_type):
+        """Creates examples for the training and dev sets."""
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, line[0])
+            text_a = line[1]
+            text_b = line[2]
+            label = line[-1]
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+    ...
+    "qnli": QnliProcessor,
+    ...
+    ```
 
 # 环境要求
 
@@ -583,6 +632,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [SCHEMA_DIR] [DATASET_TYPE] [
 #### 推理性能
 
 > SST2数据集
+
 | 参数                 | Ascend                        | GPU                       |
 | -------------------------- | ----------------------------- | ------------------------- |
 | 模型版本              |                               |                           |
@@ -593,7 +643,9 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [SCHEMA_DIR] [DATASET_TYPE] [
 | batch_size                 | 32                            | 32                        |
 | 准确率                   | 0.902777                      | 0.9086                    |
 | 推理模型        | 74M(.ckpt 文件)               | 74M(.ckpt 文件)           |
+
 > QNLI数据集
+
 | 参数                 | Ascend                        | GPU                       |
 | --------------      | ----------------------------- | ------------------------- |
 | 模型版本              |                               |                           |
@@ -604,7 +656,9 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [SCHEMA_DIR] [DATASET_TYPE] [
 | batch_size           | 32                            | 32                        |
 | 准确率                | 0.8860                        | 0.8755                    |
 | 推理模型              | 74M(.ckpt 文件)                | 74M(.ckpt 文件)           |
+
 > MNLI数据集
+
 | 参数                 | Ascend                        | GPU                       |
 | --------------      | ----------------------------- | ------------------------- |
 | 模型版本              |                               |                           |
