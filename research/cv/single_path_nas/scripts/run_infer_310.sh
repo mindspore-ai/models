@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [[ $# -lt 2 || $# -gt 3 ]]; then
-    echo "Usage: sh run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi
@@ -47,6 +47,7 @@ if [ -d ${ASCEND_HOME}/ascend-toolkit ]; then
     export PYTHONPATH=${TBE_IMPL_PATH}:$ASCEND_HOME/ascend-toolkit/latest/fwkacllib/python/site-packages:$PYTHONPATH
     export ASCEND_OPP_PATH=$ASCEND_HOME/ascend-toolkit/latest/opp
 else
+    export ASCEND_HOME=/usr/local/Ascend/latest/
     export PATH=$ASCEND_HOME/atc/ccec_compiler/bin:$ASCEND_HOME/atc/bin:$PATH
     export LD_LIBRARY_PATH=/usr/local/lib:$ASCEND_HOME/atc/lib64:$ASCEND_HOME/acllib/lib64:$ASCEND_HOME/driver/lib64:$ASCEND_HOME/add-ons:$LD_LIBRARY_PATH
     export PYTHONPATH=$ASCEND_HOME/atc/python/site-packages:$PYTHONPATH
@@ -59,7 +60,7 @@ function compile_app()
     if [ -f "Makefile" ]; then
         make clean
     fi
-    sh build.sh &> build.log    
+    bash build.sh &> build.log
 }
 
 function infer()

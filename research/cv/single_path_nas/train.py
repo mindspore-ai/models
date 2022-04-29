@@ -22,11 +22,17 @@ import os
 from mindspore import Tensor
 from mindspore import context
 from mindspore.common import set_seed
-from mindspore.communication.management import init, get_rank
+from mindspore.communication.management import get_group_size
+from mindspore.communication.management import get_rank
+from mindspore.communication.management import init
 from mindspore.context import ParallelMode
 from mindspore.nn.optim.momentum import Momentum
-from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
-from mindspore.train.loss_scale_manager import DynamicLossScaleManager, FixedLossScaleManager
+from mindspore.train.callback import CheckpointConfig
+from mindspore.train.callback import LossMonitor
+from mindspore.train.callback import ModelCheckpoint
+from mindspore.train.callback import TimeMonitor
+from mindspore.train.loss_scale_manager import DynamicLossScaleManager
+from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.train.model import Model
 
 from src import spnasnet
@@ -64,10 +70,17 @@ def lr_steps_imagenet(_cfg, steps_per_epoch):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Single-Path-NAS Training')
-    parser.add_argument('--dataset_name', type=str, default='imagenet', choices=['imagenet',],
+    parser.add_argument('--dataset_name', type=str, default='imagenet', choices=['imagenet'],
                         help='dataset name.')
-    parser.add_argument('--filter_prefix', type=str, default='huawei', help='filter_prefix name.')
-    parser.add_argument('--device_id', type=int, default=None, help='device id of Ascend. (Default: None)')
+    parser.add_argument('--filter_prefix', type=str, default='huawei',
+                        help='filter_prefix name.')
+    parser.add_argument('--device_id', type=int, default=0,
+                        help='device id of Ascend. (Default: None)')
+    parser.add_argument('--device_target', type=str, choices=['Ascend', 'GPU'], required=True,
+                        default="Ascend", help='Target device: Ascend or GPU')
+    parser.add_argument('--data_path', type=str, default=None, required=True,
+                        help='Path to the training dataset (e.g. "/datasets/imagenet/train/")')
+
     args_opt = parser.parse_args()
 
     if args_opt.dataset_name == "imagenet":
@@ -75,30 +88,51 @@ if __name__ == '__main__':
     else:
         raise ValueError("Unsupported dataset.")
 
-    # set context
-    device_target = cfg.device_target
-    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target, enable_graph_kernel=True)
+    device_target = args_opt.device_target
 
-    device_num = int(os.environ.get("DEVICE_NUM", 1))
+    # We enabling the graph kernel only for the Ascend device.
+    # enable_graph_kernel = (device_target == 'Ascend')
+    enable_graph_kernel = False
+
+    context.set_context(mode=context.GRAPH_MODE, device_target=device_target,
+                        enable_graph_kernel=enable_graph_kernel)
+
+    device_num = int(os.environ.get("DEVICE_NUM", "1"))
 
     rank = 0
     if device_target == "Ascend":
-        if args_opt.device_id is not None:
-            context.set_context(device_id=args_opt.device_id)
-        else:
-            context.set_context(device_id=cfg.device_id)
+        context.set_context(device_id=args_opt.device_id)
 
         if device_num > 1:
             context.reset_auto_parallel_context()
-            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+            context.set_auto_parallel_context(device_num=device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
             init()
             rank = get_rank()
+    elif device_target == "GPU":
+        # Using the rank and devices number determined by the communication module.
+        if device_num > 1:
+            init('nccl')
+            device_num = get_group_size()
+            rank = get_rank()
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(device_num=device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
     else:
         raise ValueError("Unsupported platform.")
 
+    dataset_drop_reminder = (device_target == 'GPU')
+
     if args_opt.dataset_name == "imagenet":
-        dataset = create_dataset_imagenet(cfg.data_path, 1)
+        if device_num > 1:
+            dataset = create_dataset_imagenet(args_opt.data_path, 1, num_parallel_workers=8,
+                                              device_num=device_num, rank_id=rank,
+                                              drop_reminder=True)
+        else:
+            dataset = create_dataset_imagenet(args_opt.data_path, 1, num_parallel_workers=8,
+                                              drop_reminder=True)
     else:
         raise ValueError("Unsupported dataset.")
 
@@ -110,7 +144,6 @@ if __name__ == '__main__':
     loss_scale_manager = None
     if args_opt.dataset_name == 'imagenet':
         lr = lr_steps_imagenet(cfg, batch_num)
-
 
         def get_param_groups(network):
             """ get param groups """
@@ -151,6 +184,9 @@ if __name__ == '__main__':
             loss_scale_manager = DynamicLossScaleManager(init_loss_scale=65536, scale_factor=2, scale_window=2000)
         else:
             loss_scale_manager = FixedLossScaleManager(cfg.loss_scale, drop_overflow_update=False)
+
+    else:
+        raise ValueError("Unsupported dataset.")
 
     model = Model(net, loss_fn=loss, optimizer=opt, metrics={'top_1_accuracy', 'top_5_accuracy', 'loss'},
                   amp_level="O3", keep_batchnorm_fp32=True, loss_scale_manager=loss_scale_manager)

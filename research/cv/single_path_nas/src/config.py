@@ -28,10 +28,6 @@ imagenet_cfg = edict({
     'weight_decay': 1e-5,
     'image_height': 224,
     'image_width': 224,
-    'data_path': '/data/ILSVRC2012_train/',
-    'val_data_path': '/data/ILSVRC2012_val/',
-    'device_target': 'Ascend',
-    'device_id': 0,
     'keep_checkpoint_max': 40,
     'checkpoint_path': None,
     'onnx_filename': 'single-path-nas',
@@ -42,7 +38,7 @@ imagenet_cfg = edict({
     'lr_epochs': [30, 60, 90],
     'lr_gamma': 0.3,
     'eta_min': 0.0,
-    'T_max': 150,
+    'T_max': 180,
     'warmup_epochs': 0,
 
     # loss related
