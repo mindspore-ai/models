@@ -37,14 +37,15 @@ from src.dataset import create_dataset_imagenet
 set_seed(1)
 
 parser = argparse.ArgumentParser(description='single-path-nas')
-parser.add_argument('--dataset_name', type=str, default='imagenet', choices=['imagenet',],
+parser.add_argument('--dataset_name', type=str, default='imagenet', choices=['imagenet'],
                     help='dataset name.')
-parser.add_argument('--val_data_path', type=str, default=None,
+parser.add_argument('--val_data_path', type=str, default=None, required=True,
                     help='Path to the validation dataset (e.g. "/datasets/imagenet/val/")')
-parser.add_argument('--device_target', type=str, choices=['Ascend', 'GPU', 'CPU'],
-                    default=None, help='Target device: Ascend, GPU or CPU')
-parser.add_argument('--checkpoint_path', type=str, default='./ckpt_0', help='Checkpoint file path or dir path')
-parser.add_argument('--device_id', type=int, default=None, help='device id of Ascend. (Default: None)')
+parser.add_argument('--device_target', type=str, choices=['Ascend', 'GPU', 'CPU'], required=True,
+                    default="Ascend", help='Target device: Ascend, GPU or CPU')
+parser.add_argument('--checkpoint_path', type=str, default='./ckpt_0', help='Checkpoint file path or dir path',
+                    required=True)
+parser.add_argument('--device_id', type=int, default=None, help='device id of Ascend. (Default: None)', required=True)
 args_opt = parser.parse_args()
 
 
@@ -67,20 +68,10 @@ class CrossEntropySmooth(LossBase):
 
 
 if __name__ == '__main__':
-
+    device_target = args_opt.device_target
     if args_opt.dataset_name == "imagenet":
         cfg = imagenet_cfg
-
-        if args_opt.val_data_path is not None:
-            cfg.val_data_path = args_opt.val_data_path
-
-        if args_opt.device_target is not None:
-            cfg.device_target = args_opt.device_target
-
-        device_target = cfg.device_target
-        dataset_drop_reminder = (device_target == 'GPU')
-
-        dataset = create_dataset_imagenet(cfg.val_data_path, 1, False, drop_reminder=dataset_drop_reminder)
+        dataset = create_dataset_imagenet(args_opt.val_data_path, 1, False, drop_reminder=True)
     else:
         raise ValueError("dataset is not support.")
 
@@ -91,12 +82,8 @@ if __name__ == '__main__':
     net = spnasnet.spnasnet(num_classes=cfg.num_classes)
     model = Model(net, loss_fn=loss, metrics={'top_1_accuracy', 'top_5_accuracy'})
 
-    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target)
-    if device_target == "Ascend":
-        if args_opt.device_id is not None:
-            context.set_context(device_id=args_opt.device_id)
-        else:
-            context.set_context(device_id=cfg.device_id)
+    context.set_context(mode=context.GRAPH_MODE, device_target=device_target)
+    context.set_context(device_id=args_opt.device_id)
 
     print(f'Checkpoint path: {args_opt.checkpoint_path}')
 

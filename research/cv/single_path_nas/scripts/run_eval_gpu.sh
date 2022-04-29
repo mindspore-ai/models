@@ -14,38 +14,25 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 1 ] && [ $# != 2 ]
+if [ $# != 3 ]
 then
-  echo "Usage: bash run_eval_gpu.sh [CKPT_FILE_OR_DIR] [VALIDATION_DATASET](optional)"
-  exit 1
+    echo "Usage: bash ./scripts/run_eval_gpu.sh [DEVICE_ID] [DATA_PATH] [CKPT_FILE/CKPT_DIR]"
+exit 1
 fi
 
 
-if [ ! -d $1 ] && [ ! -f $1 ]
+if [ ! -d $3 ] && [ ! -f $3 ]
 then
-  echo "error: CKPT_FILE_OR_DIR=$1 is neither a directory nor a file"
-  exit 1
+    echo "error: checkpoint_path=$3 is neither a directory nor a file"
+    exit 1
 fi
 
-if [ $# == 2 ] && [ ! -d $2 ]
-then
-  echo "error: VALIDATION_DATASET=$2 is not a directory"
-  exit 1
-fi
 
 ulimit -u unlimited
+export DEVICE_NUM=1
+export DEVICE_ID=$1
+export RANK_SIZE=$DEVICE_NUM
+export RANK_ID=0
 
-if [ $# == 1 ]
-then
-  GLOG_v=3 python eval.py \
-    --checkpoint_path="$1" \
-    --device_target="GPU" > "./eval.log" 2>&1 &
-fi
-
-if [ $# == 2 ]
-then
-  GLOG_v=3 python eval.py \
-    --checkpoint_path="$1" \
-    --val_data_path="$2" \
-    --device_target="GPU" > "./eval.log" 2>&1 &
-fi
+echo "start evaluation for device $DEVICE_ID"
+python eval.py --checkpoint_path=$3 --val_data_path=$2 --device_id=$DEVICE_ID --device_target="GPU" > ./eval.log 2>&1 &

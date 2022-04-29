@@ -94,13 +94,16 @@ After installing MindSpore through the official website, you can follow the step
 
   ```bash
   # Run the training example
-  python train.py --device_id=0 > train.log 2>&1 &
+  python train.py --device_id=0 --device_target="Ascend" --data_path=/imagenet/train > train.log 2>&1 &
+
+  # Run the standalone training example
+  bash ./scripts/run_standalone_train_ascend.sh [DEVICE_ID] [DATA_PATH]
 
   # Run a distributed training example
-  bash ./scripts/run_train.sh [RANK_TABLE_FILE] imagenet
+  bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DEVICE_NUM] [DATA_PATH]
 
   # Run evaluation example
-  python eval.py --checkpoint_path ./ckpt_0 > ./eval.log 2>&1 &
+  python eval.py --checkpoint_path=./ckpt_0 --val_data_path=/imagenet/val --device_id=0 --device_target="Ascend"> ./eval.log 2>&1 &
 
   # Run the inference example
   bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
@@ -116,27 +119,30 @@ After installing MindSpore through the official website, you can follow the step
 
   ```bash
   # Run the training example
-  python train.py --device_target="GPU" --data_path="/path/to/imagenet/train/" --lr_init=0.26 > train.log 2>&1 &
+  python train.py --device_id=0 --device_target="GPU" --data_path=/imagenet/train > train.log 2>&1 &
+
+  # Run the standalone training example
+  bash ./scripts/run_standalone_train_gpu.sh [DEVICE_ID] [DATA_PATH] > train.log 2>&1 &
 
   # Run a distributed training example
-  bash ./scripts/run_distribute_train_gpu.sh "/path/to/imagenet/train/"
+  bash ./scripts/run_distributed_train_gpu.sh [CUDA_VISIBLE_DEVICES] [DEVICE_NUM] [DATA_PATH]
 
   # Run evaluation example
-  python eval.py --device_target="GPU" --val_data_path="/path/to/imagenet/val/" --checkpoint_path ./ckpt_0 > ./eval.log 2>&1 &
+  python eval.py --device_target="GPU" --device_id=0 --val_data_path="/path/to/imagenet/val/" --checkpoint_path ./ckpt_0 > ./eval.log 2>&1 &
   ```
 
 # Scripts Description
 
 ## Scripts and sample code
 
-```bash
+```text
 ├── model_zoo
   ├── scripts
-  │   ├──run_distribute_train.sh              // Shell script for running the Ascend distributed training
-  │   ├──run_distribute_train_gou.sh          // Shell script for running the GPU distributed training
-  │   ├──run_standalone_train.sh              // Shell script for running the Ascend standalone training
+  │   ├──run_distribute_train_ascend.sh              // Shell script for running the Ascend distributed training
+  │   ├──run_distribute_train_gpu.sh          // Shell script for running the GPU distributed training
+  │   ├──run_standalone_train_ascend.sh              // Shell script for running the Ascend standalone training
   │   ├──run_standalone_train_gpu.sh          // Shell script for running the GPU standalone training
-  │   ├──run_eval.sh                          // Shell script for running the Ascend evaluation
+  │   ├──run_eval_ascend.sh                          // Shell script for running the Ascend evaluation
   │   ├──run_eval_gpu.sh                      // Shell script for running the GPU evaluation
   │   ├──run_infer_310.sh                     // Shell script for running the Ascend 310 inference
   ├── src
@@ -177,10 +183,6 @@ Training parameters and evaluation parameters can be configured in a `config.py`
   'weight_decay':1e-5                      # Weight decay value
   'image_height':224                       # Height of the model input image
   'image_width':224                        # Width of the model input image
-  'data_path':'/data/ILSVRC2012_train/'    # The absolute path to the training dataset
-  'val_data_path':'/data/ILSVRC2012_val/'  # The absolute path to the validation dataset
-  'device_target':'Ascend'                 # Device
-  'device_id':0                            # ID of the device used for training/evaluation.
   'keep_checkpoint_max':40                 # Number of checkpoints to keep
   'checkpoint_path':None                   # The absolute path to the checkpoint file or a directory, where the checkpoints are saved
 
@@ -205,7 +207,7 @@ For more configuration details, please refer to the script `config.py`.
 - Using an Ascend processor environment
 
   ```bash
-  python train.py --device_id=0 > train.log 2>&1 &
+  python train.py --device_id=0 --device_target="Ascend" --data_path=/imagenet/train > train.log 2>&1 &
   ```
 
   The above python command will run in the background, and the result can be viewed through the generated train.log file.
@@ -213,7 +215,7 @@ For more configuration details, please refer to the script `config.py`.
 - Using an GPU environment
 
   ```bash
-  python train.py --device_target='GPU' --data_path="/path/to/imagenet/train/" --lr_init=0.26 > train.log 2>&1 &
+  python train.py --device_id=0 --device_target="GPU" --data_path=/imagenet/train > train.log 2>&1 &
   ```
 
   The above python command will run in the background, and the result can be viewed through the generated train.log file.
@@ -223,7 +225,7 @@ For more configuration details, please refer to the script `config.py`.
 - Using an Ascend processor environment
 
   ```bash
-  bash ./scripts/run_distribute_train.sh [RANK_TABLE_FILE]
+  bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DEVICE_NUM] [DATA_PATH]
   ```
 
   The above shell script will run distributed training in the background.
@@ -231,7 +233,7 @@ For more configuration details, please refer to the script `config.py`.
 - Using a GPU environment
 
   ```bash
-  bash ./scripts/run_distribute_train_gpu.sh [TRAIN_PATH](optional)
+  bash ./scripts/run_distributed_train_gpu.sh [CUDA_VISIBLE_DEVICES] [DEVICE_NUM] [DATA_PATH]
   ```
 
 > TRAIN_PATH - Path to the directory with the training subset of the dataset.
@@ -249,9 +251,9 @@ the training log files and the checkpoints will be stored.
   “./ckpt_0” is a directory, where the trained model is saved in the .ckpt format.
 
   ```bash
-  python eval.py --checkpoint_path ./ckpt_0 > ./eval.log 2>&1 &
+  python eval.py --checkpoint_path=./ckpt_0 --device_id=0 --device_target="Ascend" --val_data_path/imagenet/val > ./eval.log 2>&1 &
   OR
-  bash ./scripts/run_eval.sh
+  bash ./scripts/run_eval_ascend.sh [DEVICE_ID] [DATA_PATH] [CKPT_FILE/CKPT_DIR]
   ```
 
 - Evaluate the model on the ImageNet-1k dataset using the GPU environment
@@ -259,9 +261,9 @@ the training log files and the checkpoints will be stored.
   “./ckpt_0” is a directory, where the trained model is saved in the .ckpt format.
 
   ```bash
-  python eval.py --device_target="GPU" --checkpoint_path ./ckpt_0 > ./eval.log 2>&1 &
+  python eval.py --checkpoint_path=./ckpt_0 --device_id=0 --device_target="GPU" --val_data_path/imagenet/val > ./eval.log 2>&1 &
   OR
-  bash ./scripts/run_eval_gpu.sh [CKPT_FILE_OR_DIR] [VALIDATION_DATASET](optional)
+  bash ./scripts/run_eval_gpu.sh [DEVICE_ID] [DATA_PATH] [CKPT_FILE/CKPT_DIR]
   ```
 
 > CKPT_FILE_OR_DIR - Path to the trained model checkpoint or to the directory, containing checkpoints.

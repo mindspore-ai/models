@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,33 +14,22 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 0 ] && [ $# != 1 ]
+if [ $# != 2 ]
 then
-  echo "Usage: bash run_standalone_train_gpu.sh [TRAIN_DATASET](optional)"
-  exit 1
+    echo "Usage: bash ./scripts/run_standalone_train_gpu.sh [DEVICE_ID] [DATA_PATH]"
+exit 1
 fi
 
-if [ $# == 1 ] && [ ! -d $1 ]
-then
-  echo "error: TRAIN_DATASET=$1 is not a directory"
-  exit 1
-fi
+
+dataset_type='imagenet'
+
 
 ulimit -u unlimited
+export DEVICE_ID=$1
+export DATA_PATH=$2
+export DEVICE_NUM=1
+export RANK_ID=0
+export RANK_SIZE=1
 
-rm -rf ./train_standalone
-mkdir ./train_standalone
-cp ./*.py ./train_standalone
-cp -r ./src ./train_standalone
-cd ./train_standalone || exit
-env > env.log
-
-if [ $# == 0 ]
-then
-  python train.py --device_target='GPU' --lr_init=0.26 > log.txt 2>&1 &
-fi
-
-if [ $# == 1 ]
-then
-  python train.py --device_target='GPU' --data_path="$1" --lr_init=0.26 > log.txt 2>&1 &
-fi
+echo "start training for device $DEVICE_ID"
+python train.py --device_id=$DEVICE_ID --data_path=$2 --dataset_name=$dataset_type --device_target="GPU" > log 2>&1 &
