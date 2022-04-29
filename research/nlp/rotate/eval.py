@@ -42,20 +42,20 @@ class KGEModel(nn.Cell):
     def __init__(self, network, mode='head-mode'):
         super(KGEModel, self).__init__()
         self.network = network
+        self.construct_head = self.network.construct_head
+        self.construct_tail = self.network.construct_tail
         self.mode = mode
         self.sort = P.Sort(axis=1, descending=True)
 
     def construct(self, positive_sample, negative_sample, filter_bias):
         """ Sort candidate entity id and positive sample entity id. """
         if self.mode == 'head-mode':
-            score = self.network.construct_head((positive_sample, negative_sample))
-            positive_arg = positive_sample[:, 0]
+            score = self.construct_head((positive_sample, negative_sample))
         else:
-            score = self.network.construct_tail((positive_sample, negative_sample))
-            positive_arg = positive_sample[:, 2]
+            score = self.construct_tail((positive_sample, negative_sample))
         score += filter_bias
         _, argsort = self.sort(score)
-        return argsort, positive_arg
+        return argsort
 
 
 class EvalKGEMetric(nn.Cell):
@@ -77,25 +77,33 @@ class EvalKGEMetric(nn.Cell):
 
     def construct(self, positive_sample, negative_sample, filter_bias):
         """ Calculate metrics. """
-        batch_size = positive_sample.shape[0]
-        argsort, positive_arg = self.kgemodel(positive_sample, negative_sample, filter_bias)
-        argsort, positive_arg = argsort.asnumpy(), positive_arg.asnumpy()
-        log = []
-        for i in range(batch_size):
-            ranking = np.where(argsort[i, :] == positive_arg[i])[0][0]
-            ranking = 1 + ranking
-            log.append({
-                'MRR': 1.0 / ranking,
-                'MR': ranking,
-                'HITS@1': 1.0 if ranking <= 1 else 0.0,
-                'HITS@3': 1.0 if ranking <= 3 else 0.0,
-                'HITS@10': 1.0 if ranking <= 10 else 0.0,
-            })
-        return log
+        argsort = self.kgemodel(positive_sample, negative_sample, filter_bias)
+        if self.mode == 'head-mode':
+            positive_arg = positive_sample[:, 0]
+        else:
+            positive_arg = positive_sample[:, 2]
+        return argsort, positive_arg
 
 
 def modelarts_process():
     pass
+
+
+def generate_log(argsort, positive_arg, batch_size):
+    """ cal hit index and write metric result to log """
+    argsort, positive_arg = argsort.asnumpy(), positive_arg.asnumpy()
+    log = []
+    for i in range(batch_size):
+        ranking = np.where(argsort[i, :] == positive_arg[i])[0][0]
+        ranking = 1 + ranking
+        log.append({
+            'MRR': 1.0 / ranking,
+            'MR': ranking,
+            'HITS@1': 1.0 if ranking <= 1 else 0.0,
+            'HITS@3': 1.0 if ranking <= 3 else 0.0,
+            'HITS@10': 1.0 if ranking <= 10 else 0.0,
+        })
+    return log
 
 
 @moxing_wrapper(pre_process=modelarts_process)
@@ -127,10 +135,16 @@ def eval_kge():
     eval_model_tail = EvalKGEMetric(network=eval_net, mode='tail-mode')
 
     for test_data in test_dataloader_head.create_dict_iterator():
-        log_head = eval_model_head.construct(test_data["positive"], test_data["negative"], test_data["filter_bias"])
+        argsort, positive_arg = eval_model_head.construct(test_data["positive"], test_data["negative"],
+                                                          test_data["filter_bias"])
+        batch_size = test_data["positive"].shape[0]
+        log_head = generate_log(argsort, positive_arg, batch_size)
         logs += log_head
     for test_data in test_dataloader_tail.create_dict_iterator():
-        log_tail = eval_model_tail.construct(test_data["positive"], test_data["negative"], test_data["filter_bias"])
+        argsort, positive_arg = eval_model_tail.construct(test_data["positive"], test_data["negative"],
+                                                          test_data["filter_bias"])
+        batch_size = test_data["positive"].shape[0]
+        log_tail = generate_log(argsort, positive_arg, batch_size)
         logs += log_tail
 
     metrics = {}
