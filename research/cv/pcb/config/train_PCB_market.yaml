@@ -1,0 +1,58 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+run_distribute: False
+enable_profiling: False
+dataset_path: "/cache/dataset/"
+output_path: "/cache/output/"
+load_path: "/cache/load_checkpoint/"
+device_target: "Ascend"
+
+log_save_path: "./log/PCB/market/train"
+checkpoint_save_path: "./checkpoint/PCB/market/train"
+checkpoint_file_path: "/cache/load_checkpoint/pretrained_resnet50.ckpt"
+# =========================================================================
+
+# dataset setting
+mindrecord_dir: "./MindRecord"
+dataset_name: "market"
+batch_size: 64
+num_parallel_workers: 4
+device_num: 1
+
+# model setting
+model_name: "PCB"
+
+# optimizer setting
+learning_rate: 0.1
+lr_mult: 0.1
+decay_rate: 0.1
+momentum: 0.9
+weight_decay: 5e-4
+nesterov: True
+loss_scale: 1.0
+
+# training setting
+mode_name: "GRAPH"
+sink_mode: True
+seed: 37
+epoch_size: 60
+decay_epoch_size: 40
+warmup_epoch_size: 1
+
+# checkpoint callbacks setting
+save_checkpoint: True
+save_checkpoint_epochs: 60
+keep_checkpoint_max: 15
+
+# EvalCallBack setting
+run_eval: False
+eval_interval: 15
+eval_start_epoch: 60
+
+use_G_feature: True
