@@ -1,0 +1,50 @@
+dataset:
+  path: ./coco
+  type: coco
+  parallel: 4
+  # need about 24G GPU memory
+  batch_size: 16
+  phase: train2014
+  ann: person_keypoints  # 'image_info' or 'person_keypoints'
+  padding: yes
+  mirror: yes
+load_ckpt: out/pretrained_resnet101.ckpt
+epoch: 25
+train: yes
+
+context:
+  # GRAPH
+  # mode: 0
+
+  # PYNATIVE
+  mode: 1
+  device_target: GPU
+
+parallel_context:
+  parallel_mode: data_parallel
+
+coco_only_images_with_people: true
+all_joints: [ [ 0 ], [ 2, 1 ], [ 4, 3 ], [ 6, 5 ], [ 8, 7 ], [ 10, 9 ], [ 12, 11 ], [ 14, 13 ], [ 16, 15 ] ]
+all_joints_names: [ "nose", 'eye', 'ear', 'shoulder', 'elbow', 'hand', 'hip', 'knee', 'foot' ]
+num_joints: 17
+global_scale: 1.0
+pos_dist_thresh: 17
+
+location_refinement: true
+locref_huber_loss: true
+locref_loss_weight: 0.05
+locref_stdev: 7.2801
+
+pairwise_predict: yes
+pairwise_huber_loss: true
+pairwise_loss_weight: 0.05
+pairwise_stats_fn: out/pairwise_stats.mat
+
+intermediate_supervision: true
+intermediate_supervision_layer: 12
+intermediate_supervision_input: 1024
+
+max_input_size: 650
+multi_step:
+  - [ 0.05,0.2,0.02,0.005,0.002,0.0005 ]
+  - [ 32,1400,2500,3200,5000, 6000 ]
