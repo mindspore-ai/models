@@ -907,3 +907,7 @@ Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some com
 - **Q: Why the modification in yaml config file doesn't take effect?**
 
   **A**: Configuration is defined by both `yaml` file and `command line arguments`, additionally with the `ini` file if you are using `ascend_distributed_launcher`. The priority of these configuration is **command line arguments > ini file > yaml file**.
+
+- **Q: Why the time of graph compile become longer and the memory become larger in boost mode?**
+
+  **A**: Because the boost mode divides the data of different sentence lengths in the data set into buckets by customizing the dataset, so as to speed up the network training. This operation will enable more graph optimization to speed up the performance, so the compilation time will increase. At the same time, additional data queues are used in the customized data to store the bucket data, so the memory will increase. User can also refer to [custom dataset](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/dataset/custom.html) and define the data according to own needs.
