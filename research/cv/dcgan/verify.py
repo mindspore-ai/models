@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,7 @@
 # ============================================================================
 """verify by svm"""
 import time
-import argparse
 import numpy as np
-
-from mindspore import context
-
 from sklearn import svm
 from sklearn.preprocessing import StandardScaler
 
@@ -85,14 +81,5 @@ def verify_cifar10():
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='image production training')
-    parser.add_argument('--device_target', type=str, default='Ascend', choices=('Ascend', 'GPU'),
-                        help='device where the code will be implemented (default: Ascend)')
-    parser.add_argument('--device_id', type=int, default=0, help='device id of GPU or Ascend. (Default: 0)')
-    args = parser.parse_args()
-    device_target = args.device_target
-    device_id = args.device_id
-    context.set_context(mode=context.GRAPH_MODE, device_target=device_target, save_graphs=False, device_id=device_id)
-
     print("============================verify_cifar10")
     verify_cifar10()

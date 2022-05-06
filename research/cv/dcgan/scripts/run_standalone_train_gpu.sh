@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]
+if [ $# != 3 ]
 then
-    echo "Usage: sh run_eval.sh [IMG_URL] [CKPT_URL]"
+    echo "Usage: bash run_standalone_train_gpu.sh [DEVICE_ID] [DATA_URL] [TRAIN_URL]"
 exit 1
 fi
 
@@ -28,38 +28,43 @@ get_real_path(){
   fi
 }
 
-PATH1=$(get_real_path $1)
-PATH2=$(get_real_path $2)
+ID=$1
+echo $ID
+PATH1=$2
+echo $PATH1
+PATH2=$(get_real_path $3)
+echo $PATH2
 
 if [ ! -d $PATH1 ]
 then
-    echo "error: IMG_URL=$PATH1 is not a directory"
+    echo "error: DATA_URL=$PATH1 is not a directory"
 exit 1
 fi
 
-if [ ! -f $PATH2 ]
+if [ ! -d $PATH2 ]
 then
-    echo "error: CKPT_URL=$PATH2 is not a file"
+    echo "error: TRAIN_URL=$PATH2 is not a directory"
 exit 1
 fi
 
-ulimit -u unlimited
+ulimit -c unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=0
-export RANK_SIZE=$DEVICE_NUM
-export RANK_ID=0
+export DEVICE_ID=$ID
+export RANK_ID=$ID
+export RANK_SIZE=1
 
-if [ -d "eval" ];
+if [ -d "train" ];
 then
-    rm -rf ./eval
+    rm -rf ./train
 fi
-mkdir ./eval
-cp ../*.py ./eval
-cp *.sh ./eval
-cp -r ../src ./eval
-cd ./eval || exit
+mkdir ./train
+mkdir ./train/scripts
+cp ../*.py ./train
+cp *.sh ./train/scripts
+cp -r ../src ./train
+cp -r ../gpu_infer ./train
+cd ./train || exit
+echo "start training for device $ID"
 env > env.log
-echo "start evaluation for device $DEVICE_ID"
-nohup python -u eval.py --device_id=$DEVICE_ID --img_url=$PATH1 --ckpt_url=$PATH2 > eval_log 2>&1 &
+nohup python -u train.py --device_target=GPU --device_id=$ID --data_url=$PATH1 --train_url=$PATH2 > output.train_log 2>&1 &
 cd ..
-

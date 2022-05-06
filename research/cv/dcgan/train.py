@@ -17,25 +17,25 @@
 import argparse
 import ast
 import os
+import time
 import datetime
 import numpy as np
-
 from mindspore import context
 from mindspore import nn, Tensor
 from mindspore.train.callback import CheckpointConfig, _InternalCallbackParam, ModelCheckpoint, RunContext
 from mindspore.context import ParallelMode
-from mindspore.communication.management import init, get_rank
+from mindspore.common import set_seed
+from mindspore.communication.management import init, get_rank, get_group_size
 from src.dataset import create_dataset_imagenet
 from src.config import dcgan_imagenet_cfg as cfg
 from src.generator import Generator
 from src.discriminator import Discriminator
 from src.cell import WithLossCellD, WithLossCellG
 from src.dcgan import DCGAN
-
 import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')
-
+set_seed(1)
 
 def save_imgs(gen_imgs, idx):
     """
@@ -80,6 +80,7 @@ parser.add_argument("--run_modelart", type=ast.literal_eval, default=False,
                     help="Run on modelArt, default is false.")
 parser.add_argument("--run_distribute", type=ast.literal_eval, default=False,
                     help="Run distribute, default is false.")
+parser.add_argument('--device_target', type=str, default='Ascend', help='GPU or Ascend')
 parser.add_argument('--device_id', type=int, default=0, help='device id of Ascend (Default: 0)')
 parser.add_argument('--data_url', default=None, help='Directory contains ImageNet-1k dataset.')
 parser.add_argument('--train_url', default=None, help='Directory of training output.')
@@ -114,19 +115,32 @@ if run_modelart:
     mox.file.copy_parallel(src_url=args.losses_url, dst_url=local_losses_url)
 
 elif args.run_distribute:
-    device_id = args.device_id
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False)
-    context.set_context(device_id=device_id)
-    init()
-    device_num = 1
-    context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                      gradients_mean=True)
-    local_input_url = args.data_url
-    local_output_url = args.train_url
-    rank = get_rank()
+    if args.device_target == 'Ascend':
+        device_id = args.device_id
+        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False)
+        context.set_context(device_id=device_id)
+        init()
+        device_num = 1
+        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                          gradients_mean=True)
+        local_input_url = args.data_url
+        local_output_url = args.train_url
+        rank = get_rank()
+    elif args.device_target == 'GPU':
+        context.set_context(mode=context.GRAPH_MODE, device_target='GPU', enable_graph_kernel=True)
+        init()
+        rank = get_rank()
+        device_num = get_group_size()
+        args.device_id = rank
+        context.set_auto_parallel_context(device_num=device_num, global_rank=rank,
+                                          parallel_mode=ParallelMode.DATA_PARALLEL,
+                                          gradients_mean=True)
+        local_input_url = args.data_url
+        local_output_url = args.train_url
 else:
     device_id = args.device_id
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False)
+    device_target = args.device_target
+    context.set_context(mode=context.GRAPH_MODE, device_target=device_target, save_graphs=False)
     context.set_context(device_id=device_id)
     rank = 0
     device_num = 1
@@ -135,8 +149,9 @@ else:
 
 
 if __name__ == '__main__':
+    start = time.time()
     # Load Dataset
-    ds = create_dataset_imagenet(os.path.join(local_input_url), num_parallel_workers=2)
+    ds = create_dataset_imagenet(os.path.join(local_input_url), num_parallel_workers=4)
 
     steps_per_epoch = ds.get_dataset_size()
 
@@ -195,8 +210,9 @@ if __name__ == '__main__':
             G_losses.append(netG_loss.asnumpy())
             cb_params.cur_step_num = cb_params.cur_step_num + 1
         cb_params.cur_epoch_num = cb_params.cur_epoch_num + 1
-        print("================saving model===================")
+
         if args.device_id == 0 or not args.run_distribute:
+            print("================saving model===================")
             ckpt_cb.step_end(run_context)
             if run_modelart:
                 fake = netG(fixed_noise)
@@ -207,4 +223,6 @@ if __name__ == '__main__':
                 mox.file.copy_parallel(src_url=local_images_url, dst_url=args.images_url)
                 mox.file.copy_parallel(src_url=local_losses_url, dst_url=args.losses_url)
                 mox.file.copy_parallel(src_url=local_output_url, dst_url=args.train_url)
-        print("================success================")
+            print("================success================")
+    t = time.time() - start
+    print("train time:", t)
