@@ -260,7 +260,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 
 ## FAQ
 
-优先参考[ModelZoo FAQ](https://gitee.com/mindspore/mindspore/tree/master/model_zoo#FAQ)来查找一些常见的公共问题。
+优先参考[ModelZoo FAQ](https://gitee.com/mindspore/models/blob/master/README_CN.md#faq)来查找一些常见的公共问题。
 
 - **Q**：使用PYNATIVE_MODE发生内存溢出。
 

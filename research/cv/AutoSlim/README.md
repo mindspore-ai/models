@@ -245,11 +245,11 @@ In train.py, we use "dataset.Generator(shuffle=True)" to shuffle dataset.
 
 ## [ModelZoo Homepage](#contents)  
 
-Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+Please check the official [homepage](https://gitee.com/mindspore/models).
 
 ## FAQ
 
-Please refer to [ModelZoo FAQ](https://gitee.com/mindspore/mindspore/tree/master/model_zoo#FAQ) to get some common FAQ.
+Please refer to [ModelZoo FAQ](https://gitee.com/mindspore/models/blob/master/README.md#faq) to get some common FAQ.
 
 - **Q**: Get "out of memory" error in PYNATIVE_MODE.
 
