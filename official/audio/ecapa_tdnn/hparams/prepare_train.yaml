@@ -1,0 +1,86 @@
+# Basic parameters
+output_folder: /home/abc000/data/data_aug/
+save_folder: !ref <output_folder>/save/
+feat_folder: /home/abc000/data/feat_train/ # path to store single file train feature
+feat_folder_merge: /home/abc000/data/feat_train_merge/ # path to store merged train feature
+
+# Data files
+data_folder: /home/abc000/data/voxceleb12  # e.g. data folder
+train_annotation: !ref <save_folder>/train.csv  # pre generated csv, regenerate if not exist
+valid_annotation: !ref <save_folder>/dev.csv    # pre generated csv, regenerate if not exist
+
+verification_file: /home/abc000/data/voxceleb12/meta/veri_test2.txt
+
+skip_prep: true  # if false, generate csv file
+
+# Training parameters
+number_of_epochs: 1 
+batch_size: 32
+sample_rate: 16000
+sentence_len: 3.0 # seconds
+shuffle: true
+random_chunk: true
+
+# Feature parameters
+n_mels: 80
+left_frames: 0
+right_frames: 0
+deltas: false
+
+dataloader_options:
+  batch_size: 32
+  shuffle: true
+  num_workers: 4
+
+# Functions
+compute_features: &id006 !new:speechbrain.lobes.features.Fbank
+  n_mels: 80
+  left_frames: 0
+  right_frames: 0
+  deltas: false
+
+augment_wavedrop: &id001 !new:speechbrain.lobes.augment.TimeDomainSpecAugment
+  sample_rate: 16000
+  speeds: [100]
+
+augment_speed: &id002 !new:speechbrain.lobes.augment.TimeDomainSpecAugment
+  sample_rate: 16000
+  speeds: [95, 100, 105]
+
+add_rev: &id003 !new:speechbrain.lobes.augment.EnvCorrupt
+  openrir_folder: /home/abc000/data//voxceleb12
+  openrir_max_noise_len: 3.0    # seconds
+  reverb_prob: 1.0
+  noise_prob: 0.0
+  noise_snr_low: 0
+  noise_snr_high: 15
+  rir_scale_factor: 1.0
+
+add_noise: &id004 !new:speechbrain.lobes.augment.EnvCorrupt
+  openrir_folder: /home/abc000/data//voxceleb12
+  openrir_max_noise_len: 3.0    # seconds
+  reverb_prob: 0.0
+  noise_prob: 1.0
+  noise_snr_low: 0
+  noise_snr_high: 15
+  rir_scale_factor: 1.0
+
+add_rev_noise: &id005 !new:speechbrain.lobes.augment.EnvCorrupt
+  openrir_folder: /home/abc000/data//voxceleb12
+  openrir_max_noise_len: 3.0    # seconds
+  reverb_prob: 1.0
+  noise_prob: 1.0
+  noise_snr_low: 0
+  noise_snr_high: 15
+  rir_scale_factor: 1.0
+
+# data aug function
+augment_pipeline: [*id001, *id002, *id003, *id004, *id005]
+concat_augment: true
+
+mean_var_norm: &id009 !new:speechbrain.processing.features.InputNormalization
+
+  norm_type: sentence
+  std_norm: false
+
+
