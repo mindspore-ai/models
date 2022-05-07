@@ -114,9 +114,13 @@ bash run_infer_310.sh ../mcnn.mindir ../test_data/images ../test_data/ground_tru
 ├── cv
     ├── MCNN
         ├── README.md                    // descriptions about MCNN
+        ├── ascend310_infer              // 310 reasoning source code
+        ├── infer
+        ├── modelarts
         ├── scripts
         │   ├──run_distribute_train.sh             // train in distribute
-        │   ├──run_eval.sh                         // eval in ascend
+        │   ├──run_eval.sh                         // eval  in ascend
+        │   ├──run_infer_310.sh                    // infer in 310
         │   ├──run_standalone_train.sh             // train in standalone
         │   ├──run_train_gpu.sh                    // train on GPU
         ├── src
