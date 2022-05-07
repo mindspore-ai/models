@@ -20,80 +20,102 @@ import cv2
 import numpy as np
 
 
-def random_perspective(
-        img,
-        targets=(),
+def get_aug_params(value, center=0):
+    if len(value) != 2 and not isinstance(value, float):
+        raise ValueError(
+            "Affine params should be either a sequence containing two values\
+             or single float values. Got {}".format(value)
+        )
+    if isinstance(value, float):
+        return random.uniform(center - value, center + value)
+
+    return random.uniform(value[0], value[1])
+
+
+def get_affine_matrix(
+        target_size,
         degrees=10,
         translate=0.1,
-        scale=0.1,
+        scales=0.1,
         shear=10,
-        perspective=0.0,
-        border=(0, 0),
 ):
-    """ random perspective for images"""
-    height = img.shape[0] + border[0] * 2
-    width = img.shape[1] + border[1] * 2
-
-    # Center
-    C = np.eye(3)
-    C[0, 2] = -img.shape[1] / 2  # x translation (pixels)
-    C[1, 2] = -img.shape[0] / 2  # y translation (pixels)
+    twidth, theight = target_size
 
     # Rotation and Scale
-    R = np.eye(3)
-    a = random.uniform(-degrees, degrees)
-    s = random.uniform(scale[0], scale[1])
-    R[:2] = cv2.getRotationMatrix2D(angle=a, center=(0, 0), scale=s)
+    angle = get_aug_params(degrees)
+    scale = get_aug_params(scales, center=1.0)
 
+    if scale <= 0.0:
+        raise ValueError("Argument scale should be positive")
+
+    R = cv2.getRotationMatrix2D(angle=angle, center=(0, 0), scale=scale)
+
+    M = np.ones([2, 3])
     # Shear
-    S = np.eye(3)
-    S[0, 1] = math.tan(random.uniform(-shear, shear) * math.pi / 180)
-    S[1, 0] = math.tan(random.uniform(-shear, shear) * math.pi / 180)
+    shear_x = math.tan(get_aug_params(shear) * math.pi / 180)
+    shear_y = math.tan(get_aug_params(shear) * math.pi / 180)
+
+    M[0] = R[0] + shear_y * R[1]
+    M[1] = R[1] + shear_x * R[0]
 
     # Translation
-    T = np.eye(3)
-    T[0, 2] = (random.uniform(0.5 - translate, 0.5 + translate) * width)  # x translation (pixels)
-    T[1, 2] = (random.uniform(0.5 - translate, 0.5 + translate) * height)  # y translation (pixels)
+    translation_x = get_aug_params(translate) * twidth  # x translation (pixels)
+    translation_y = get_aug_params(translate) * theight  # y translation (pixels)
 
-    # Combined rotation matrix
-    M = T @ S @ R @ C  # order of operations (right to left) is IMPORTANT
+    M[0, 2] = translation_x
+    M[1, 2] = translation_y
 
-    if (border[0] != 0) or (border[1] != 0) or (M != np.eye(3)).any():  # image changed
-        if perspective:
-            img = cv2.warpPerspective(
-                img, M, dsize=(width, height), borderValue=(114, 114, 114)
-            )
-        else:  # affine
-            img = cv2.warpAffine(
-                img, M[:2], dsize=(width, height), borderValue=(114, 114, 114)
-            )
+    return M, scale
+
+
+def apply_affine_to_bboxes(targets, target_size, M):
+    num_gts = len(targets)
+
+    # warp corner points
+    twidth, theight = target_size
+    corner_points = np.ones((4 * num_gts, 3))
+    corner_points[:, :2] = targets[:, [0, 1, 2, 3, 0, 3, 2, 1]].reshape(
+        4 * num_gts, 2
+    )  # x1y1, x2y2, x1y2, x2y1
+    corner_points = corner_points @ M.T  # apply affine transform
+    corner_points = corner_points.reshape(num_gts, 8)
+
+    # create new boxes
+    corner_xs = corner_points[:, 0::2]
+    corner_ys = corner_points[:, 1::2]
+    new_bboxes = (
+        np.concatenate(
+            (corner_xs.min(1), corner_ys.min(1), corner_xs.max(1), corner_ys.max(1))
+        )
+        .reshape(4, num_gts)
+        .T
+    )
+
+    # clip boxes
+    new_bboxes[:, 0::2] = new_bboxes[:, 0::2].clip(0, twidth)
+    new_bboxes[:, 1::2] = new_bboxes[:, 1::2].clip(0, theight)
+
+    targets[:, :4] = new_bboxes
+
+    return targets
+
+
+def random_affine(
+        img,
+        targets=(),
+        target_size=(640, 640),
+        degrees=10,
+        translate=0.1,
+        scales=0.1,
+        shear=10,
+):
+    M, _ = get_affine_matrix(target_size, degrees, translate, scales, shear)
+
+    img = cv2.warpAffine(img, M, dsize=target_size, borderValue=(114, 114, 114))
 
     # Transform label coordinates
-    n = len(targets)
-    if n:
-        xy = np.ones((n * 4, 3))
-        xy[:, :2] = targets[:, [0, 1, 2, 3, 0, 3, 2, 1]].reshape(
-            n * 4, 2
-        )
-        xy = xy @ M.T
-        if perspective:
-            xy = (xy[:, :2] / xy[:, 2:3]).reshape(n, 8)
-        else:
-            xy = xy[:, :2].reshape(n, 8)
-
-        # create new boxes
-        x = xy[:, [0, 2, 4, 6]]
-        y = xy[:, [1, 3, 5, 7]]
-        xy = np.concatenate((x.min(1), y.min(1), x.max(1), y.max(1))).reshape(4, n).T
-
-        # clip boxes
-        xy[:, [0, 2]] = xy[:, [0, 2]].clip(0, width)
-        xy[:, [1, 3]] = xy[:, [1, 3]].clip(0, height)
-
-        # filter candidates
-        i = box_candidates(box1=targets[:, :4].T * s, box2=xy.T)
-        targets = targets[i]
-        targets[:, :4] = xy[i]
+    if targets:
+        targets = apply_affine_to_bboxes(targets, target_size, M)
 
     return img, targets
 
@@ -214,7 +236,9 @@ class TrainTransform:
         padded_labels[range(len(targets_t))[: self.max_labels]] = targets_t[: self.max_labels]
         padded_labels = np.ascontiguousarray(padded_labels, dtype=np.float32)
         gt_bboxes_per_image = padded_labels[:, 1:5]
+        # is_in_boxes_all [gt_max, 8400]
         is_in_boxes_all, is_in_boxes_and_center = self.get_in_boxes_info(gt_bboxes_per_image, true_labels)
+        # is_in_boxes_all [gt_max, 8400]
         is_in_boxes_all = is_in_boxes_all.any(1).reshape((-1, 1)) * is_in_boxes_all.any(0).reshape((1, -1))
         return image_t, padded_labels, is_in_boxes_all, is_in_boxes_and_center
 

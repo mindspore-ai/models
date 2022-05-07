@@ -14,8 +14,8 @@
 # limitations under the License.
 # ===========================================================================
 if [[ $# -lt 3 || $# -gt 4 ]];then
-    echo "Usage1: sh run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE] [BACKBONE]  for first data aug epochs"
-    echo "Usage2: sh run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE] [BACKBONE] [RESUME_CKPT] for last no data aug epochs"
+    echo "Usage1: bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE] [BACKBONE]  for first data aug epochs"
+    echo "Usage2: bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE] [BACKBONE] [RESUME_CKPT] for last no data aug epochs"
 exit 1
 fi
 
@@ -93,6 +93,7 @@ then
           --warmup_epochs=5 \
           --no_aug_epochs=15  \
           --min_lr_ratio=0.001 \
+          --eval_interval=10 \
           --lr_scheduler=yolox_warm_cos_lr  > log.txt 2>&1 &
       cd ..
   done
@@ -127,6 +128,7 @@ then
           --warmup_epochs=5 \
           --no_aug_epochs=15  \
           --min_lr_ratio=0.001 \
+          --eval_interval=1 \
           --lr_scheduler=yolox_warm_cos_lr  > log.txt 2>&1 &
       cd ..
   done

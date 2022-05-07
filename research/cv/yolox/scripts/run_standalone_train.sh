@@ -62,8 +62,10 @@ if [ $# == 2 ]
 then
   echo "Start to launch first data augment epochs..."
   python train.py \
+        --data_dir=$DATASET_PATH \
         --data_aug=True \
         --is_distributed=0 \
+        --eval_interval=10 \
         --backbone=$BACKBONE > log.txt 2>&1 &
 fi
 
@@ -73,8 +75,10 @@ then
   CKPT_FILE=$(get_real_path $3)
   echo $CKPT_FILE
   python train.py \
+      --data_dir=$DATASET_PATH \
       --data_aug=False \
       --is_distributed=0 \
+      --eval_interval=1 \
       --backbone=$BACKBONE \
       --yolox_no_aug_ckpt=$CKPT_FILE > log.txt 2>&1 &
 fi

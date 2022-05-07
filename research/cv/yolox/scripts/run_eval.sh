@@ -16,7 +16,7 @@
 
 if [ $# != 4 ]
 then
-    echo "Usage: sh run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [BACKBONE] [BATCH_SIZE] "
+    echo "Usage: bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [BACKBONE] [BATCH_SIZE] "
 exit 1
 fi
 
