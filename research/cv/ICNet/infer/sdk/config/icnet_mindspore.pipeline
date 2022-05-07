@@ -1,0 +1,62 @@
+{
+    "segmentation": {
+        "stream_config": {
+            "deviceId": "0"
+        },
+        "appsrc0": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_imagedecoder0"
+        },
+        "mxpi_imagedecoder0": {
+            "props": {
+                "handleMethod": "opencv",
+                "outputDataFormat": "RGB"
+            },
+            "factory": "mxpi_imagedecoder",
+            "next": "opencv_normalize0"
+        },
+        "opencv_normalize0": {
+            "props": {
+                "alpha": "123.675, 116.28, 103.53",
+                "beta": "58.395, 57.12, 57.375",
+                "dataType": "FLOAT32"
+            },
+            "factory": "mxpi_imagenormalize",
+            "next": "mxpi_tensorinfer0"
+        },
+        "mxpi_tensorinfer0": {
+            "props": {
+                "dataSource": "opencv_normalize0",
+                "modelPath": "../data/models/icnet_tran.om"
+            },
+            "factory": "mxpi_tensorinfer",
+            "next": "mxpi_semanticsegpostprocessor0"
+        },
+        "mxpi_semanticsegpostprocessor0": {
+            "props": {
+                "dataSource": "mxpi_tensorinfer0",
+                "postProcessConfigPath": "../data/models/icnet.cfg",
+                "labelPath": "../data/models/icnet.names",
+                "postProcessLibPath": "libdeeplabv3post.so"
+            },
+            "factory": "mxpi_semanticsegpostprocessor",
+            "next": "mxpi_dataserialize0"
+        },
+        "mxpi_dataserialize0": {
+            "props": {
+                "outputDataKeys": "mxpi_semanticsegpostprocessor0"
+            },
+            "factory": "mxpi_dataserialize",
+            "next": "appsink0"
+        },
+        "appsink0": {
+            "props": {
+                "blocksize": "4096000"
+            },
+            "factory": "appsink"
+        }
+    }
+}
