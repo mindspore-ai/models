@@ -246,7 +246,7 @@ def image2template_feature(img_feats=None, templates=None, media=None):
     '''image2template_feature
     '''
     # ==========================================================
-    # 1. face image feature l2 normalization. img_feats:[number_image x feats_dim]
+    # 1. image feature l2 normalization. img_feats:[number_image x feats_dim]
     # 2. compute media feature.
     # 3. compute template feature.
     # ==========================================================
