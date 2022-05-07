@@ -23,27 +23,30 @@ per_batch_size: 8
 
 # network configuration
 depth_wise: False
-max_gt: 48
+max_gt: 120
 num_classes: 80
 input_size: [640, 640]
 fpn_strides: [8, 16, 32]
 use_l1: False
 use_syc_bn: True
+updates: 0.0
 
 # dynamic_k
 n_candidate_k: 10
 
 # optimizer and lr related
-lr: 0.01
+lr: 0.011
 min_lr_ratio: 0.01
 warmup_epochs: 5
 weight_decay: 0.0005
 momentum: 0.9
 no_aug_epochs: 15
 # logging related
-log_interval: 36
+log_interval: 30
 ckpt_interval: -1
 is_save_on_master: 1
+ckpt_max_num: 60
+opt: "Momentum"
 
 # distributed related
 is_distributed: 1
@@ -72,6 +75,7 @@ log_path: "val/outputs/"
 val_ckpt: "0-2755_64.ckpt"
 conf_thre: 0.001
 nms_thre: 0.65
+eval_interval: 10
 # modelarts
 is_modelart: False
 result_path: ''

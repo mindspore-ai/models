@@ -20,8 +20,8 @@ import argparse
 
 from mindspore.context import ParallelMode
 from mindspore.common import set_seed
-from mindspore.nn import Momentum
-from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, SummaryCollector
+from mindspore.common.parameter import ParameterTuple
+from mindspore.train.callback import CheckpointConfig, ModelCheckpoint
 from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore import context, Model, DynamicLossScaleManager, load_checkpoint, load_param_into_net
 from mindspore.profiler.profiling import Profiler
@@ -30,12 +30,11 @@ from mindspore.common.tensor import Tensor
 from model_utils.config import config
 from model_utils.device_adapter import get_device_id, get_device_num
 from model_utils.moxing_adapter import moxing_wrapper
-from src.initializer import default_recurisive_init, load_resume_params
+from src.initializer import default_recurisive_init
 from src.logger import get_logger
 from src.network_blocks import use_syc_bn
-from src.util import get_param_groups, YOLOXCB, get_lr, load_backbone, EvalCallBack, DetectionEngine
-from src.yolox import YOLOLossCell, TrainOneStepWithEMA, DetectionBaseBlock, DetectionTrainBlock, \
-    DetectionTestBlock
+from src.util import get_param_groups, YOLOXCB, get_lr, load_backbone, EvalCallBack, DetectionEngine, EMACallBack
+from src.yolox import YOLOLossCell, TrainOneStepWithEMA, DetectionBlock
 from src.yolox_dataset import create_yolox_dataset
 
 set_seed(42)
@@ -193,6 +192,50 @@ def get_val_dataset():
     return ds_test
 
 
+def get_optimizer(cfg, network, lr):
+    param_group = get_param_groups(network, cfg.weight_decay)
+    if cfg.opt == "SGD":
+        from mindspore.nn import SGD
+        opt = SGD(params=param_group, learning_rate=Tensor(lr), momentum=config.momentum, nesterov=True)
+        cfg.logger.info("Use SGD Optimizer")
+    else:
+        from mindspore.nn import Momentum
+        opt = Momentum(params=param_group,
+                       learning_rate=Tensor(lr),
+                       momentum=cfg.momentum,
+                       use_nesterov=True)
+        cfg.logger.info("Use Momentum Optimizer")
+    return opt
+
+
+def load_resume_checkpoint(cfg, network, ckpt_path):
+    param_dict = load_checkpoint(ckpt_path)
+
+    ema_train_weight = []
+    ema_moving_weight = []
+    param_load = {}
+    for key, param in param_dict.items():
+        if key.startswith("network.") or key.startswith("moments."):
+            param_load[key] = param
+        elif "updates" in key:
+            cfg.updates = param
+            network.updates = cfg.updates
+            config.logger.info("network_ema updates:%s" % network.updates.asnumpy().item())
+    load_param_into_net(network, param_load)
+
+    for key, param in network.parameters_and_names():
+        if key.startswith("ema.") and "moving_mean" not in key and "moving_variance" not in key:
+            ema_train_weight.append(param_dict[key])
+        elif key.startswith("ema.") and ("moving_mean" in key or "moving_variance" in key):
+            ema_moving_weight.append(param_dict[key])
+
+    if network.ema:
+        if ema_train_weight and ema_moving_weight:
+            network.ema_weight = ParameterTuple(ema_train_weight)
+            network.ema_moving_weight = ParameterTuple(ema_moving_weight)
+            config.logger.info("successful loading ema weights")
+
+
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_train():
     """ Launch Train process """
@@ -217,18 +260,16 @@ def run_train():
         backbone = "yolofpn"
     else:
         backbone = "yolopafpn"
-    base_network = DetectionBaseBlock(config, backbone=backbone)
-    test_network = DetectionTestBlock(base_network)
-    network = DetectionTrainBlock(base_network)  # train network
+    base_network = DetectionBlock(config, backbone=backbone)
     if config.pretrained:
-        network = load_backbone(network, config.pretrained, config)
+        base_network = load_backbone(base_network, config.pretrained, config)
     config.logger.info('Training backbone is: %s' % config.backbone)
     if config.use_syc_bn:
         config.logger.info("Using Synchronized batch norm layer...")
-        use_syc_bn(network)
-    default_recurisive_init(network)
+        use_syc_bn(base_network)
+    default_recurisive_init(base_network)
     config.logger.info("Network weights have been initialized...")
-    network = YOLOLossCell(network, config)
+    network = YOLOLossCell(base_network, config)
     config.logger.info('Finish getting network...')
     config.data_root = os.path.join(config.data_dir, 'train2017')
     config.annFile = os.path.join(config.data_dir, 'annotations/instances_train2017.json')
@@ -247,43 +288,45 @@ def run_train():
     lr = get_lr(config)
     config.logger.info("Learning rate scheduler:%s, base_lr:%s, min lr ratio:%s" % (config.lr_scheduler, config.lr,
                                                                                     config.min_lr_ratio))
-    opt = Momentum(params=get_param_groups(network, config.weight_decay),
-                   learning_rate=Tensor(lr),
-                   momentum=config.momentum,
-                   use_nesterov=True)
+    opt = get_optimizer(config, network, lr)
     loss_scale_manager = DynamicLossScaleManager(init_loss_scale=2 ** 22)
     update_cell = loss_scale_manager.get_update_cell()
     network_ema = TrainOneStepWithEMA(network, opt, update_cell,
-                                      ema=True, decay=0.9999, updates=0).set_train()
+                                      ema=True, decay=0.9998, updates=config.updates).set_train()
     if config.resume_yolox:
-        load_resume_params(config, network_ema)
+        resume_steps = config.updates.asnumpy().items()
+        config.resume_epoch = resume_steps // config.steps_per_epoch
+        lr = lr[resume_steps:]
+        opt = get_optimizer(config, network, lr)
+        network_ema = TrainOneStepWithEMA(network, opt, update_cell,
+                                          ema=True, decay=0.9998, updates=resume_steps).set_train()
+        load_resume_checkpoint(config, network_ema, config.resume_yolox)
+
     if not config.data_aug:
         if os.path.isfile(config.yolox_no_aug_ckpt):  # Loading the resume checkpoint for the last no data aug epochs
-            param_dict = load_checkpoint(config.yolox_no_aug_ckpt)
-            if "learning_rate" in param_dict:
-                param_dict.pop("learning_rate")
-            if "global_step" in param_dict:
-                param_dict.pop("global_step")
-            load_param_into_net(network_ema, param_dict)
+            load_resume_checkpoint(config, network_ema, config.yolox_no_aug_ckpt)
             config.logger.info("Finish load the resume checkpoint, begin to train the last...")
         else:
             raise FileNotFoundError('{} not exist or not a pre-trained file'.format(config.yolox_no_aug_ckpt))
+
     config.logger.info("Add ema model")
     model = Model(network_ema, amp_level="O0")
-    cb = [SummaryCollector(summary_dir="./summary_dir", collect_freq=1)]
+    cb = []
     save_ckpt_path = None
     if config.rank_save_ckpt_flag:
-        ckpt_max_num = config.max_epoch * config.steps_per_epoch // config.ckpt_interval
+        cb.append(EMACallBack(network_ema, config.steps_per_epoch))
         ckpt_config = CheckpointConfig(save_checkpoint_steps=config.steps_per_epoch * config.ckpt_interval,
-                                       keep_checkpoint_max=ckpt_max_num)
+                                       keep_checkpoint_max=config.ckpt_max_num)
         save_ckpt_path = os.path.join(config.outputs_dir, 'ckpt_' + str(config.rank) + '/')
         cb.append(ModelCheckpoint(config=ckpt_config,
                                   directory=save_ckpt_path,
-                                  prefix='{}'.format(config.rank)))
+                                  prefix='{}'.format(config.backbone)))
     cb.append(YOLOXCB(config.logger, config.steps_per_epoch, lr=lr, save_ckpt_path=save_ckpt_path,
                       is_modelart=config.enable_modelarts,
                       per_print_times=config.log_interval, train_url=args_opt.train_url))
-    cb.append(EvalCallBack(ds_test, test_network, DetectionEngine(config), config.logger, interval=513))
+    cb.append(
+        EvalCallBack(ds_test, DetectionBlock(config, backbone=backbone), network_ema, DetectionEngine(config), config,
+                     interval=config.eval_interval))
     if config.need_profiler:
         model.train(3, ds, callbacks=cb, dataset_sink_mode=True, sink_size=config.log_interval)
         profiler.analyse()
@@ -291,8 +334,8 @@ def run_train():
         config.logger.info("Epoch number:%s" % config.max_epoch)
         config.logger.info("All steps number:%s" % (config.max_epoch * config.steps_per_epoch))
         config.logger.info("==================Start Training=========================")
-        model.train(config.max_epoch * config.steps_per_epoch // config.log_interval, ds, callbacks=cb,
-                    dataset_sink_mode=True, sink_size=config.log_interval)
+        model.train(config.max_epoch, ds, callbacks=cb,
+                    dataset_sink_mode=False, sink_size=-1)
     config.logger.info("==================Training END======================")
 
 

@@ -19,13 +19,12 @@ import time
 import math
 import json
 import stat
-
 from datetime import datetime
 from collections import Counter
-
 import numpy as np
 import mindspore.common.dtype as mstype
-from mindspore import load_checkpoint, load_param_into_net, save_checkpoint
+from mindspore import load_checkpoint, load_param_into_net, save_checkpoint, Tensor, Parameter
+from mindspore.common.parameter import ParameterTuple
 from mindspore.train.callback import Callback
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
@@ -280,7 +279,6 @@ def load_backbone(net, ckpt_path, args):
         else:
             param_not_load.append(param.name)
     args.logger.info("not loading param is :", len(param_not_load))
-
     return net
 
 
@@ -327,6 +325,41 @@ def keep_loss_fp32(network):
             cell.to_float(mstype.float32)
 
 
+class EMACallBack(Callback):
+
+    def __init__(self, network, steps_per_epoch, cur_steps=0):
+        self.steps_per_epoch = steps_per_epoch
+        self.cur_steps = cur_steps
+        self.network = network
+
+    def epoch_begin(self, run_context):
+        if self.network.ema:
+            if not isinstance(self.network.ema_moving_weight, list):
+                tmp_moving = []
+                for weight in self.network.ema_moving_weight:
+                    tmp_moving.append(weight.asnumpy())
+                self.network.ema_moving_weight = tmp_moving
+
+    def step_end(self, run_context):
+        if self.network.ema:
+            self.network.moving_parameter_update()
+            self.cur_steps += 1
+
+            if self.cur_steps % self.steps_per_epoch == 0:
+                if isinstance(self.network.ema_moving_weight, list):
+                    tmp_moving = []
+                    moving_name = []
+                    idx = 0
+                    for key in self.network.moving_name:
+                        moving_name.append(key)
+
+                    for weight in self.network.ema_moving_weight:
+                        param = Parameter(Tensor(weight), name=moving_name[idx])
+                        tmp_moving.append(param)
+                        idx += 1
+                    self.network.ema_moving_weight = ParameterTuple(tmp_moving)
+
+
 class YOLOXCB(Callback):
     """
     YOLOX Callback.
@@ -345,6 +378,7 @@ class YOLOXCB(Callback):
         self.current_step = 0
         self.save_ckpt_path = save_ckpt_path
         self.iter_time = time.time()
+        self.epoch_start_time = time.time()
         self.average_loss = []
         self.logger = logger
 
@@ -355,6 +389,8 @@ class YOLOXCB(Callback):
         Args:
             run_context (RunContext): Include some information of the model.
         """
+        self.epoch_start_time = time.time()
+        self.iter_time = time.time()
 
     def epoch_end(self, run_context):
         """
@@ -363,6 +399,15 @@ class YOLOXCB(Callback):
         Args:
             run_context (RunContext): Include some information of the model.
         """
+        cb_params = run_context.original_args()
+        cur_epoch = cb_params.cur_epoch_num
+        loss = cb_params.net_outputs
+        loss = "loss: %.4f, overflow: %s, scale: %s" % (float(loss[0].asnumpy()),
+                                                        bool(loss[1].asnumpy()),
+                                                        int(loss[2].asnumpy()))
+        self.logger.info(
+            "epoch: %s epoch time %.2fs %s" % (cur_epoch, time.time() - self.epoch_start_time, loss))
+
         if self.current_step % (self.step_per_epoch * 1) == 0:
             if self.is_modelarts:
                 import moxing as mox
@@ -387,19 +432,20 @@ class YOLOXCB(Callback):
         Args:
             run_context (RunContext): Include some information of the model.
         """
-        cb_params = run_context.original_args()
-        loss = cb_params.net_outputs
 
-        cur_epoch = self.current_step // self.step_per_epoch
-
-        loss = "loss: %.4f, overflow: %s, scale: %s" % (float(loss[0].asnumpy()),
-                                                        bool(loss[1].asnumpy()),
-                                                        int(loss[2].asnumpy()))
-        self.logger.info("epoch: %s step: [%s/%s], %s, lr: %.6f, time: %.2f" % (
-            cur_epoch, self.current_step % self.step_per_epoch, self.step_per_epoch, loss, self.lr[self.current_step],
-            (time.time() - self.iter_time) * 1000 / self._per_print_times))
-        self.iter_time = time.time()
-        self.current_step += self._per_print_times
+        cur_epoch_step = (self.current_step + 1) % self.step_per_epoch
+        if cur_epoch_step % self._per_print_times == 0 and cur_epoch_step != 0:
+            cb_params = run_context.original_args()
+            cur_epoch = cb_params.cur_epoch_num
+            loss = cb_params.net_outputs
+            loss = "loss: %.4f, overflow: %s, scale: %s" % (float(loss[0].asnumpy()),
+                                                            bool(loss[1].asnumpy()),
+                                                            int(loss[2].asnumpy()))
+            self.logger.info("epoch: %s step: [%s/%s], %s, lr: %.6f, avg step time: %.2f ms" % (
+                cur_epoch, cur_epoch_step, self.step_per_epoch, loss, self.lr[self.current_step],
+                (time.time() - self.iter_time) * 1000 / self._per_print_times))
+            self.iter_time = time.time()
+        self.current_step += 1
 
     def end(self, run_context):
         """
@@ -411,25 +457,47 @@ class YOLOXCB(Callback):
 
 
 class EvalCallBack(Callback):
-    def __init__(self, dataset, net, detection, logger, start_epoch=0,
-                 end_epoch=100, save_path=None, interval=1):
+    def __init__(self, dataset, test_net, train_net, detection, config, start_epoch=0, interval=1):
         self.dataset = dataset
-        self.network = net
+        self.network = train_net
+        self.test_network = test_net
         self.detection = detection
-        self.logger = logger
+        self.logger = config.logger
         self.start_epoch = start_epoch
-        self.save_path = save_path
         self.interval = interval
+        self.max_epoch = config.max_epoch
         self.best_result = 0
         self.best_epoch = 0
-        self.end_epoch = end_epoch
+        self.rank = config.rank
+
+    def load_ema_parameter(self):
+        param_dict = {}
+        for name, param in self.network.parameters_and_names():
+            if name.startswith("ema."):
+                new_name = name.split('ema.')[-1]
+                param_new = param.clone()
+                param_new.name = new_name
+                param_dict[new_name] = param_new
+        load_param_into_net(self.test_network, param_dict)
+
+    def load_network_parameter(self):
+        param_dict = {}
+        for name, param in self.network.parameters_and_names():
+            if name.startswith("network."):
+                param_new = param.clone()
+                param_dict[name] = param_new
+        load_param_into_net(self.test_network, param_dict)
 
     def epoch_end(self, run_context):
         cb_param = run_context.original_args()
         cur_epoch = cb_param.cur_epoch_num
         if cur_epoch >= self.start_epoch:
-            if (cur_epoch - self.start_epoch) % self.interval == 0:
-                self.network.set_train(False)
+            if (cur_epoch - self.start_epoch) % self.interval == 0 or cur_epoch == self.max_epoch:
+                if self.rank == 0:
+                    self.load_ema_parameter()
+                else:
+                    self.load_network_parameter()
+                self.test_network.set_train(False)
                 eval_print_str, results = self.inference()
                 if results >= self.best_result:
                     self.best_result = results
@@ -441,6 +509,9 @@ class EvalCallBack(Callback):
                 self.logger.info(eval_print_str)
                 self.logger.info('Ending inference...')
 
+    def end(self, run_context):
+        self.logger.info("Best result %s at %s epoch" % (self.best_result, self.best_epoch))
+
     def inference(self):
         self.logger.info('Start inference...')
         self.logger.info("eval dataset size, %s" % self.dataset.get_dataset_size())
@@ -449,7 +520,7 @@ class EvalCallBack(Callback):
             image = data['image']
             img_info = data['image_shape']
             img_id = data['img_id']
-            prediction = self.network(image)
+            prediction = self.test_network(image)
             prediction = prediction.asnumpy()
             img_shape = img_info.asnumpy()
             img_id = img_id.asnumpy()
@@ -461,8 +532,10 @@ class EvalCallBack(Callback):
         result_file_path = self.detection.evaluate_prediction()
         self.logger.info('result file path: %s', result_file_path)
         eval_result, results = self.detection.get_eval_result()
-        eval_print_str = '\n=============coco eval result=========\n' + eval_result
-        return eval_print_str, results
+        if eval_result is not None and results is not None:
+            eval_print_str = '\n=============coco eval result=========\n' + eval_result
+            return eval_print_str, results
+        return None, 0
 
     def remove_ckpoint_file(self, file_name):
         """Remove the specified checkpoint file from this checkpoint manager and also from the directory."""
@@ -640,10 +713,18 @@ class DetectionEngine:
             raise RuntimeError("Unable to open json file to dump. What():{}".format(str(e)))
         else:
             f.close()
+            if not self.data_list:
+                self.file_path = ''
+                return self.file_path
+
+            self.data_list.clear()
             return self.file_path
 
     def get_eval_result(self):
         """Get eval result"""
+        if not self.file_path:
+            return None, None
+
         cocoGt = self._coco
         cocoDt = cocoGt.loadRes(self.file_path)
         cocoEval = COCOeval(cocoGt, cocoDt, 'bbox')

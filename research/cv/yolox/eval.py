@@ -29,6 +29,7 @@ from src.yolox import DetectionBlock
 from src.yolox_dataset import create_yolox_dataset
 from src.initializer import default_recurisive_init
 
+
 def run_test():
     """The function of eval"""
     config.data_root = os.path.join(config.data_dir, 'val2017')
@@ -53,13 +54,20 @@ def run_test():
         backbone = "yolofpn"
     else:
         backbone = "yolopafpn"
-    network = DetectionBlock(config, backbone=backbone, is_training=False)  # default yolo-darknet53
+    network = DetectionBlock(config, backbone=backbone)  # default yolo-darknet53
     default_recurisive_init(network)
     config.logger.info(config.val_ckpt)
     if os.path.isfile(config.val_ckpt):
         param_dict = load_checkpoint(config.val_ckpt)
+        ema_param_dict = {}
+        for param in param_dict:
+            if param.startswith("ema."):
+                new_name = param.split("ema.")[1]
+                data = param_dict[param]
+                data.name = new_name
+                ema_param_dict[new_name] = data
 
-        load_param_into_net(network, param_dict)
+        load_param_into_net(network, ema_param_dict)
         config.logger.info('load model %s success', config.val_ckpt)
     else:
         config.logger.info('%s doesn''t exist or is not a pre-trained file', config.val_ckpt)

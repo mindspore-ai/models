@@ -22,7 +22,7 @@ import cv2
 import mindspore.dataset as de
 from pycocotools.coco import COCO
 
-from src.transform import box_candidates, random_perspective, TrainTransform, ValTransform
+from src.transform import box_candidates, random_affine, TrainTransform, ValTransform
 
 min_keypoints_per_image = 10
 
@@ -173,16 +173,15 @@ class COCOYoloXDataset:
                 np.clip(mosaic_labels[:, 2], 0, 2 * input_w, out=mosaic_labels[:, 2])
                 np.clip(mosaic_labels[:, 3], 0, 2 * input_h, out=mosaic_labels[:, 3])
 
-            mosaic_img, mosaic_labels = random_perspective(
+            mosaic_img, mosaic_labels = random_affine(
                 mosaic_img,
                 mosaic_labels,
+                target_size=(input_w, input_h),
                 degrees=self.degrees,
                 translate=self.translate,
-                scale=self.scale,
+                scales=self.scale,
                 shear=self.shear,
-                perspective=self.perspective,
-                border=[-input_h // 2, -input_w // 2],
-            )  # border to remove
+            )
 
             if (
                     self.enable_mixup

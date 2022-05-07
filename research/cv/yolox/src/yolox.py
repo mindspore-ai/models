@@ -18,6 +18,7 @@ import mindspore
 import mindspore.nn as nn
 from mindspore import Tensor, Parameter
 from mindspore import ops
+from mindspore.common.parameter import ParameterTuple
 from mindspore.ops import composite as C
 from mindspore.ops import functional as F
 from mindspore.ops import operations as P
@@ -113,138 +114,14 @@ class DetectionPerFPN(nn.Cell):
         return cls_output, reg_output, obj_output
 
 
-class DetectionBaseBlock(nn.Cell):
-    def __init__(self, config, backbone="yolopafpn"):
-        super(DetectionBaseBlock, self).__init__()
-        self.num_classes = config.num_classes
-        self.attr_num = self.num_classes + 5
-        self.depthwise = config.depth_wise
-        self.strides = Tensor([8, 16, 32], mindspore.float32)
-        self.input_size = config.input_size
-        # network
-        if backbone == "yolopafpn":
-            self.backbone = YOLOPAFPN(depth=1.33, width=1.25, input_w=self.input_size[1], input_h=self.input_size[0])
-            self.head_inchannels = [1024, 512, 256]
-            self.activation = "silu"
-            self.width = 1.25
-        else:
-            self.backbone = YOLOFPN(input_w=self.input_size[1], input_h=self.input_size[0])
-            self.head_inchannels = [512, 256, 128]
-            self.activation = "lrelu"
-            self.width = 1.0
-        self.head_l = DetectionPerFPN(in_channels=self.head_inchannels, num_classes=self.num_classes, scale='l',
-                                      act=self.activation, width=self.width)
-        self.head_m = DetectionPerFPN(in_channels=self.head_inchannels, num_classes=self.num_classes, scale='m',
-                                      act=self.activation, width=self.width)
-        self.head_s = DetectionPerFPN(in_channels=self.head_inchannels, num_classes=self.num_classes, scale='s',
-                                      act=self.activation, width=self.width)
-
-    def construct(self, x):
-        x_l, x_m, x_s = self.backbone(x)
-        cls_output_l, reg_output_l, obj_output_l = self.head_l(x_l)  # (bs, 80, 80, 80)(bs, 4, 80, 80)(bs, 1, 80, 80)
-        cls_output_m, reg_output_m, obj_output_m = self.head_m(x_m)  # (bs, 80, 40, 40)(bs, 4, 40, 40)(bs, 1, 40, 40)
-        cls_output_s, reg_output_s, obj_output_s = self.head_s(x_s)  # (bs, 80, 20, 20)(bs, 4, 20, 20)(bs, 1, 20, 20)
-        return cls_output_l, reg_output_l, obj_output_l, \
-               cls_output_m, reg_output_m, obj_output_m, \
-               cls_output_s, reg_output_s, obj_output_s
-
-    def mapping_to_img(self, output, stride):
-        """ map to origin image scale for each fpn """
-
-        batch_size = P.Shape()(output)[0]
-        n_ch = self.attr_num
-        grid_size = P.Shape()(output)[2:4]
-        range_x = range(grid_size[1])
-        range_y = range(grid_size[0])
-        stride = P.Cast()(stride, output.dtype)
-        grid_x = P.Cast()(F.tuple_to_array(range_x), output.dtype)
-        grid_y = P.Cast()(F.tuple_to_array(range_y), output.dtype)
-        grid_y = P.ExpandDims()(grid_y, 1)
-        grid_x = P.ExpandDims()(grid_x, 0)
-        yv = P.Tile()(grid_y, (1, grid_size[1]))
-        xv = P.Tile()(grid_x, (grid_size[0], 1))
-        grid = P.Stack(axis=2)([xv, yv])  # (80, 80, 2)
-        grid = P.Reshape()(grid, (1, 1, grid_size[0], grid_size[1], 2))  # (1,1,80,80,2)
-        output = P.Reshape()(output,
-                             (batch_size, n_ch, grid_size[0], grid_size[1]))  # bs, 6400, 85-->(bs,85,80,80)
-        output = P.Transpose()(output, (0, 2, 1, 3))  # (bs,85,80,80)-->(bs,80,85,80)
-        output = P.Transpose()(output, (0, 1, 3, 2))  # (bs,80,85,80)--->(bs, 80, 80, 85)
-        output = P.Reshape()(output, (batch_size, 1 * grid_size[0] * grid_size[1], -1))  # bs, 6400, 85
-        grid = P.Reshape()(grid, (1, -1, 2))  # grid(1, 6400, 2)
-
-        output_xy = output[..., :2]
-        output_xy = (output_xy + grid) * stride
-        output_wh = output[..., 2:4]
-        output_wh = P.Exp()(output_wh) * stride
-        output_other = output[..., 4:]
-        output_t = P.Concat(axis=-1)([output_xy, output_wh, output_other])
-        return output_t
-
-
-class DetectionTrainBlock(nn.Cell):
-    def __init__(self, base_network):
-        super(DetectionTrainBlock, self).__init__()
-        self.base_network = base_network
-
-    def construct(self, x):
-        cls_output_l, reg_output_l, obj_output_l, \
-        cls_output_m, reg_output_m, obj_output_m, \
-        cls_output_s, reg_output_s, obj_output_s = self.base_network(x)
-        output_l = P.Concat(axis=1)((reg_output_l, obj_output_l, cls_output_l))  # (bs, 85, 80, 80)
-        output_m = P.Concat(axis=1)((reg_output_m, obj_output_m, cls_output_m))  # (bs, 85, 40, 40)
-        output_s = P.Concat(axis=1)((reg_output_s, obj_output_s, cls_output_s))  # (bs, 85, 20, 20)
-        outputs = []
-        output_l = self.base_network.mapping_to_img(output_l,
-                                                    stride=self.base_network.strides[0])  # (bs, 6400, 85)x_c, y_c, w, h
-        output_m = self.base_network.mapping_to_img(output_m,
-                                                    stride=self.base_network.strides[1])  # (bs, 1600, 85)x_c, y_c, w, h
-        output_s = self.base_network.mapping_to_img(output_s,
-                                                    stride=self.base_network.strides[2])  # (bs,  400, 85)x_c, y_c, w, h
-        outputs.append(output_l)
-        outputs.append(output_m)
-        outputs.append(output_s)
-        return P.Concat(axis=1)(outputs)  # batch_size, 8400, 85
-
-
-class DetectionTestBlock(nn.Cell):
-    def __init__(self, base_network):
-        super(DetectionTestBlock, self).__init__()
-        self.base_network = base_network
-
-    def construct(self, x):
-        cls_output_l, reg_output_l, obj_output_l, \
-        cls_output_m, reg_output_m, obj_output_m, \
-        cls_output_s, reg_output_s, obj_output_s = self.base_network(x)
-        output_l = P.Concat(axis=1)(
-            (reg_output_l, P.Sigmoid()(obj_output_l), P.Sigmoid()(cls_output_l)))  # bs, 85, 80, 80
-
-        output_m = P.Concat(axis=1)(
-            (reg_output_m, P.Sigmoid()(obj_output_m), P.Sigmoid()(cls_output_m)))  # bs, 85, 40, 40
-
-        output_s = P.Concat(axis=1)(
-            (reg_output_s, P.Sigmoid()(obj_output_s), P.Sigmoid()(cls_output_s)))  # bs, 85, 20, 20
-        output_l = self.base_network.mapping_to_img(output_l,
-                                                    stride=self.base_network.strides[0])  # (bs, 6400, 85)x_c, y_c, w, h
-        output_m = self.base_network.mapping_to_img(output_m,
-                                                    stride=self.base_network.strides[1])  # (bs, 1600, 85)x_c, y_c, w, h
-        output_s = self.base_network.mapping_to_img(output_s,
-                                                    stride=self.base_network.strides[2])  # (bs,  400, 85)x_c, y_c, w, h
-        outputs = []
-        outputs.append(output_l)
-        outputs.append(output_m)
-        outputs.append(output_s)
-        return P.Concat(axis=1)(outputs)  # batch_size, 8400, 85
-
-
 class DetectionBlock(nn.Cell):
     """ connect yolox backbone and head """
 
-    def __init__(self, config, backbone="yolopafpn", is_training=True):
+    def __init__(self, config, backbone="yolopafpn"):
         super(DetectionBlock, self).__init__()
         self.num_classes = config.num_classes
         self.attr_num = self.num_classes + 5
         self.depthwise = config.depth_wise
-        self.is_training = is_training
         self.strides = Tensor([8, 16, 32], mindspore.float32)
         self.input_size = config.input_size
 
@@ -274,7 +151,7 @@ class DetectionBlock(nn.Cell):
         cls_output_l, reg_output_l, obj_output_l = self.head_l(x_l)  # (bs, 80, 80, 80)(bs, 4, 80, 80)(bs, 1, 80, 80)
         cls_output_m, reg_output_m, obj_output_m = self.head_m(x_m)  # (bs, 80, 40, 40)(bs, 4, 40, 40)(bs, 1, 40, 40)
         cls_output_s, reg_output_s, obj_output_s = self.head_s(x_s)  # (bs, 80, 20, 20)(bs, 4, 20, 20)(bs, 1, 20, 20)
-        if self.is_training:
+        if self.training:
             output_l = P.Concat(axis=1)((reg_output_l, obj_output_l, cls_output_l))  # (bs, 85, 80, 80)
             output_m = P.Concat(axis=1)((reg_output_m, obj_output_m, cls_output_m))  # (bs, 85, 40, 40)
             output_s = P.Concat(axis=1)((reg_output_s, obj_output_s, cls_output_s))  # (bs, 85, 20, 20)
@@ -533,24 +410,55 @@ def _tensor_grad_overflow(grad):
 class TrainOneStepWithEMA(nn.TrainOneStepWithLossScaleCell):
     """ Train one step with ema model """
 
-    def __init__(self, network, optimizer, scale_sense, ema=True, decay=0.9998, updates=0):
+    def __init__(self, network, optimizer, scale_sense, ema=True, decay=0.9998, updates=0, moving_name=None,
+                 ema_moving_weight=None):
         super(TrainOneStepWithEMA, self).__init__(network, optimizer, scale_sense)
         self.ema = ema
+        self.moving_name = moving_name
+        self.ema_moving_weight = ema_moving_weight
         if self.ema:
             self.ema_weight = self.weights.clone("ema", init='same')
             self.decay = decay
             self.updates = Parameter(Tensor(updates, mindspore.float32))
             self.assign = ops.Assign()
+            self.ema_moving_parameters()
+
+    def ema_moving_parameters(self):
+        self.moving_name = {}
+        moving_list = []
+        idx = 0
+        for key, param in self.network.parameters_and_names():
+            if "moving_mean" in key or "moving_variance" in key:
+                new_param = param.clone()
+                new_param.name = "ema." + param.name
+                moving_list.append(new_param)
+                self.moving_name["ema." + key] = idx
+                idx += 1
+        self.ema_moving_weight = ParameterTuple(moving_list)
 
     def ema_update(self):
         """Update EMA parameters."""
         if self.ema:
             self.updates += 1
             d = self.decay * (1 - ops.Exp()(-self.updates / 2000))
+            # update trainable parameters
             for ema_v, weight in zip(self.ema_weight, self.weights):
                 tep_v = ema_v * d
                 self.assign(ema_v, (1.0 - d) * weight + tep_v)
         return self.updates
+
+    # moving_parameter_update is executed inside the callback(EMACallBack)
+    def moving_parameter_update(self):
+        if self.ema:
+            d = (self.decay * (1 - ops.Exp()(-self.updates / 2000))).asnumpy().item()
+            # update moving mean and moving var
+            for key, param in self.network.parameters_and_names():
+                if "moving_mean" in key or "moving_variance" in key:
+                    idx = self.moving_name["ema." + key]
+                    moving_weight = param.asnumpy()
+                    tep_v = self.ema_moving_weight[idx] * d
+                    ema_value = (1.0 - d) * moving_weight + tep_v
+                    self.ema_moving_weight[idx] = ema_value
 
     def construct(self, *inputs):
         """ Forward """
