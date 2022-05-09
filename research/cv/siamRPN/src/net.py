@@ -84,6 +84,9 @@ class SiameseRPN(nn.Cell):
         self.anchor_num = config.anchor_num
         self.score_size = config.score_size
 
+        self.anchor_num = config.anchor_num
+        self.score_size = config.score_size
+
     def construct(self, template=None, detection=None, ckernal=None, rkernal=None):
         """ forward function """
         if self.is_train is True and template is not None and detection is not None:

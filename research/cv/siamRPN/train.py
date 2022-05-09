@@ -27,6 +27,7 @@ import mindspore.dataset as ds
 from mindspore.context import ParallelMode
 from mindspore.communication.management import init, get_rank
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore.communication.management import get_group_size
 import numpy as np
 from src.data_loader import TrainDataLoader
 from src.net import SiameseRPN, BuildTrainNet, MyTrainOneStepCell
@@ -47,7 +48,10 @@ parser.add_argument('--data_url', default=None, help='Location of data.')
 
 parser.add_argument('--unzip_mode', default=0, type=int, metavar='N', help='unzip mode:0:no unzip,1:tar,2:unzip')
 
-parser.add_argument('--device_id', default=2, type=int, metavar='N', help='number of total epochs to run')
+parser.add_argument('--device_id', default=0, type=int, metavar='N', help='number of total epochs to run')
+
+parser.add_argument('--device_target', default="Ascend", type=str, choices=["Ascend", "GPU"],
+                    help='type of platform:Ascend or GPU')
 
 
 #add random seed
@@ -79,7 +83,7 @@ def main(args):
         # create dataset
         dataset = ds.GeneratorDataset(data_loader, ["template", "detection", "label"], shuffle=True,
                                       num_parallel_workers=rank_size, num_shards=rank_size, shard_id=rank_id)
-    else:
+    if not args.is_parallel:
         dataset = ds.GeneratorDataset(data_loader, ["template", "detection", "label"], shuffle=True)
     dataset = dataset.batch(config.batch_size, drop_remainder=True)
 
@@ -129,17 +133,19 @@ def main(args):
                   "avg_loss is %s, step time is %s" % (cb_params.cur_epoch_num, cb_params.cur_step_num, loss,
                                                        self.tlosses.avg, step_mseconds), flush=True)
     print_cb = Print_info()
+    cb = [loss_cb, print_cb]
     #save checkpoint
     ckpt_cfg = CheckpointConfig(save_checkpoint_steps=dataset.get_dataset_size(), keep_checkpoint_max=51)
     if args.is_cloudtrain:
         ckpt_cb = ModelCheckpoint(prefix='siamRPN', directory=config.train_path+'/ckpt', config=ckpt_cfg)
     else:
         ckpt_cb = ModelCheckpoint(prefix='siamRPN', directory='./ckpt', config=ckpt_cfg)
-
+    if rank == 0:
+        cb += [ckpt_cb]
     if config.checkpoint_path is not None and os.path.exists(config.checkpoint_path):
-        model.train(total_epoch, dataset, callbacks=[loss_cb, ckpt_cb, print_cb], dataset_sink_mode=False)
+        model.train(total_epoch, dataset, callbacks=cb, dataset_sink_mode=False)
     else:
-        model.train(epoch=total_epoch, train_dataset=dataset, callbacks=[loss_cb, ckpt_cb, print_cb],
+        model.train(epoch=total_epoch, train_dataset=dataset, callbacks=cb,
                     dataset_sink_mode=False)
 
 
@@ -178,7 +184,7 @@ def adjust_learning_rate(start_lr, end_lr, total_epochs, steps_pre_epoch):
 
 if __name__ == '__main__':
     Args = parser.parse_args()
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
+    context.set_context(mode=context.GRAPH_MODE, device_target=Args.device_target)
     if Args.is_cloudtrain:
         import moxing as mox
         device_id = int(os.getenv('DEVICE_ID') if os.getenv('DEVICE_ID') is not None else 0)
@@ -199,18 +205,29 @@ if __name__ == '__main__':
             local_data_path = local_data_path + '/train/ytb_vid_filter'
         config.train_path = local_data_path
     else:
-        config.train_path = Args.train_url
+        rank = 0
         if Args.is_parallel:
-            device_id = int(os.getenv('DEVICE_ID'))
-            device_num = int(os.getenv('RANK_SIZE'))
-            if device_num > 1:
-                context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target="Ascend")
-                context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                                  parameter_broadcast=True, gradients_mean=True)
+            if Args.device_target == "Ascend":
+                config.train_path = Args.train_url
+                device_id = int(os.getenv('DEVICE_ID'))
+                device_num = int(os.getenv('RANK_SIZE'))
+                if device_num > 1:
+                    context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target="Ascend")
+                    context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                                      parameter_broadcast=True, gradients_mean=True)
+                    init()
+            elif Args.device_target == "GPU":
                 init()
+                context.set_context(device_id=Args.device_id)
+                device_num = get_group_size()
+                context.reset_auto_parallel_context()
+                rank = get_rank()
+                context.set_auto_parallel_context(device_num=device_num,
+                                                  parallel_mode=ParallelMode.DATA_PARALLEL,
+                                                  gradients_mean=True)
         else:
             device_id = Args.device_id
-            context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target="Ascend")
+            context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target=Args.device_target)
     main(Args)
     if Args.is_cloudtrain:
         mox.file.copy_parallel(src_url=local_data_path + '/ckpt', dst_url=Args.train_url + '/ckpt')
