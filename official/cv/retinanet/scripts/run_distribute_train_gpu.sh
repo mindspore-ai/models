@@ -45,7 +45,7 @@ mkdir ./LOG
 cp ./*.py ./LOG
 cp -r ./src ./LOG
 cp -r ./scripts ./LOG
-cp ./config/*yaml ./LOG
+cp -r ./config ./LOG
 cd ./LOG || exit
 
 if [ $# == 4 ]
