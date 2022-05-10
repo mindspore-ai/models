@@ -35,6 +35,11 @@ Fixes #
 - [ ] I have commented my code, particularly in hard-to-understand areas. All the comments in code files are in English.
 - [ ] I have made corresponding changes to the documentation.
 - [ ] I have squashed all the commits into one.
+- [ ] I have test and ascertained the effect of my change in all related cases.
+    - [ ] Different hardware: `CPU`, `GPU`, `Ascend910`, `Ascend310`, `Ascend701`.
+    - [ ] Different mode: `GRAPH_MODE`, `PYNATIVE_MODE`.
+    - [ ] Different system: `Linux`, `Windows`, `MAC`.
+    - [ ] Different number of cluster: `1pc`, `8pcs`.
 - [ ] I have checked the following usual mistakes:
     - [ ] It is recommended to use `bash` instead of `sh`.
     - [ ] Don't use `type=bool` in argparse.
@@ -42,3 +47,6 @@ Fixes #
     - [ ] I have added at least one `README`
     - [ ] The models implemented for the cloud could work offline on the local server as well.
     - [ ] I have made sure the changes for new device target will not make differences on the original one.
+- [ ] If you are contributing a new function, please check:
+    - [ ] I have added the corresponding information in README.
+    - [ ] I have notify the maintenance team about this function.
