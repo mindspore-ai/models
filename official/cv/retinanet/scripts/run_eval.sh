@@ -44,7 +44,7 @@ fi
 mkdir ./eval$2
 cp ./*.py ./eval$2
 cp -r ./src ./eval$2
-cp ./config/*yaml ./eval$2
+cp -r ./config ./eval$2
 cd ./eval$2 || exit
 env > env.log
 echo "start inferring for device $DEVICE_ID"

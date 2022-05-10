@@ -48,7 +48,7 @@ do
     cp ./*.py ./LOG$i
     cp -r ./src ./LOG$i
     cp -r ./scripts ./LOG$i
-    cp ./config/*yaml ./LOG$i
+    cp -r ./config ./LOG$i
     start=`expr $i \* $process_cores`
     end=`expr $start \+ $(($process_cores-1))`
     cmdopt=$start"-"$end
