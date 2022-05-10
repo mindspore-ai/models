@@ -176,7 +176,7 @@ if __name__ == '__main__':
     parser.add_argument('--file_batch_size', type=int, default=1024)
     parser.add_argument('--num_process', type=int, default=64)
     parser.add_argument('--seq_length', type=int, default=1025)
-    parser.add_argument('--eot', type=int, default=50256)
+    parser.add_argument('--eot', type=int, default=3, help="Eod of text depends on the vocab file.")
     parser.add_argument('--data_column_name', type=str, default='input_ids')
 
 
