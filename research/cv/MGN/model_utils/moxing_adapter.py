@@ -51,7 +51,34 @@ def get_job_id():
     return job_id
 
 
-def sync_data(from_path, to_path):
+def unzip(zip_file, save_dir):
+    import zipfile
+    import time
+    s_time = time.time()
+    if not os.path.exists(os.path.join(save_dir, config.modelarts_dataset_unzip_name)):
+        zip_isexist = zipfile.is_zipfile(zip_file)
+        if zip_isexist:
+            fz = zipfile.ZipFile(zip_file, 'r')
+            data_num = len(fz.namelist())
+            print("Extract Start...")
+            print("unzip file num: {}".format(data_num))
+            data_print = int(data_num / 100) if data_num > 100 else 1
+            i = 0
+            for file in fz.namelist():
+                if i % data_print == 0:
+                    print("unzip percent: {}%".format(int(i * 100 / data_num)), flush=True)
+                i += 1
+                fz.extract(file, save_dir)
+            print("cost time: {}min:{}s.".format(int((time.time() - s_time) / 60),
+                                                 int(int(time.time() - s_time) % 60)))
+            print("Extract Done.")
+        else:
+            print("This is not zip.")
+    else:
+        print("Zip has been extracted.")
+
+
+def sync_data(from_path, to_path, need_unzip=False, zip_file=""):
     """
     Download data from remote obs to local directory if the first url is remote url and the second one is local path
     Upload data from local directory to remote obs in contrast.
@@ -67,6 +94,8 @@ def sync_data(from_path, to_path):
         print("from path: ", from_path)
         print("to path: ", to_path)
         mox.file.copy_parallel(from_path, to_path)
+        if need_unzip:
+            unzip(os.path.join(to_path, zip_file), to_path)
         print("===finish data synchronization===")
         try:
             os.mknod(sync_lock)
@@ -92,8 +121,17 @@ def moxing_wrapper(pre_process=None, post_process=None):
             # Download data from data_url
             if config.enable_modelarts:
                 if config.data_url:
-                    sync_data(config.data_url, config.data_path)
-                    print("Dataset downloaded: ", os.listdir(config.data_path))
+                    sync_data(config.data_url, config.data_dir,
+                              need_unzip=config.need_modelarts_dataset_unzip,
+                              zip_file=config.modelarts_dataset_unzip_name + ".zip")
+                    if config.pre_trained_backbone:
+                        config.pre_trained_backbone = os.path.join(config.data_dir,
+                                                                   os.path.basename(config.pre_trained_backbone))
+                    if not os.path.exists(config.pre_trained_backbone):
+                        print("!!! Fail to get pre_trained_backbone checkpoint", config.pre_trained_backbone)
+                        config.pre_trained_backbone = ""
+                    print("Pretrain ckpt:", config.pre_trained_backbone)
+                    print("Dataset downloaded: ", config.data_dir, os.listdir(config.data_dir))
                 if config.checkpoint_url:
                     sync_data(config.checkpoint_url, config.load_path)
                     print("Preload downloaded: ", os.listdir(config.load_path))
