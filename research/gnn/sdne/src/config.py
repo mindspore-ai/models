@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,56 +22,63 @@ cfg = EasyDict({
     'WIKI': {
         'batch': 3000,
         'delimiter': ' ',
-        'node_size': 2405,
         'hidden_size': [256, 128],
-        'weight_init': 'uniform',
-        'learning_rate': 0.002,
-        'weight_decay': 1.0e-4,
-        'alpha': 1.0e-6,
+        'node_size': 2405,
+        'weight_init': {
+            'name': 'uniform',
+        },
+        'optim': {
+            'name': 'Adam',
+            'learning_rate': 0.002,
+            'weight_decay': 0.0001,
+        },
+        'act': 'relu',
+        'alpha': 1,
         'beta': 5,
-        'dataset_path': './Wiki_edgelist.txt',
+        'gamma': 1.0e-6,
         'ckpt_step': 32,
         'ckpt_max': 10,
-        'generate_emb': True,
-        'generate_rec': False,
-        'eval': {
-            'frac': 1,
-            'use_rand': False,
+        'generate_emb': False,
+        'data_path': './Wiki_edgelist.txt',
+        'label_path': './wiki_labels.txt',
+        'reconstruction': {
+            'check': True,
             'k_query': [1, 10, 20, 100, 200, 1000, 2000, 6000, 8000, 10000],
         },
         'classify': {
-            'label': './wiki_labels.txt',
-            'skip_head': False,
-            'has_index': True,
+            'check': False,
             'tr_frac': 0.8,
         },
-        'linkpred': None,
     },
-    'BLOGCATALOG': {
-        'batch': 2048,
-        'delimiter': ',',
-        'hidden_size': [10300, 1000, 100],
-        'weight_init': 'uniform',
-        'learning_rate': 0.01,
-        'weight_decay': 1.0e-4,
-        'alpha': 2,
-        'beta': 2,
-        'dataset_path': './edges.csv',
+    'GRQC': {
+        'batch': 32,
+        'delimiter': ' ',
+        'hidden_size': [100],
+        'node_size': 5242,
+        'weight_init': {
+            'name': 'normal',
+            'sigma': 1,
+        },
+        'optim': {
+            'name': 'RMSProp',
+            'learning_rate': 0.01,
+            'weight_decay': 1,
+        },
+        'act': 'sigmoid',
+        'alpha': 100,
+        'beta': 10,
+        'gamma': 1,
         'ckpt_step': 32,
-        'ckpt_max': 10,
-        'generate_emb': True,
-        'generate_rec': False,
-        'eval': {
-            'frac': 0.3,
-            'use_rand': True,
-            'k_query': [1, 10, 20, 100, 200, 1000, 2000, 6000, 8000, 10000],
+        'ckpt_max': 1,
+        'generate_emb': False,
+        'data_path': './ca-Grqc.txt',
+        'label_path': '',
+        'reconstruction': {
+            'check': True,
+            'k_query': [10, 100],
         },
         'classify': {
-            'label': './group-edges.csv',
-            'skip_head': False,
-            'has_index': True,
-            'tr_frac': 0.8,
+            'check': False,
         },
-        'linkpred': None,
     },
 })

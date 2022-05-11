@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ import mindspore.nn as nn
 import mindspore.numpy as np
 import mindspore.ops as ops
 
-class SDNELoss(nn.Cell):
+class SDNELoss1(nn.Cell):
     """
-    SDNELoss
+    SDNELoss1
 
     Args:
         X_(Tensor): net reconstruction matrix
@@ -32,10 +32,11 @@ class SDNELoss(nn.Cell):
     Returns:
         loss(float): loss
     """
-    def __init__(self, alpha=1e-6, beta=5):
-        super(SDNELoss, self).__init__()
+    def __init__(self, alpha=1, beta=1, gamma=1):
+        super(SDNELoss1, self).__init__()
         self.alpha = alpha
         self.beta = beta
+        self.gamma = gamma
         self.matmul1 = ops.MatMul()
         self.matmul2 = ops.MatMul(transpose_a=True)
 
@@ -45,7 +46,7 @@ class SDNELoss(nn.Cell):
         """
         loss1 = self._loss_1st(Y, L)
         loss2 = self._loss_2nd(X_, X)
-        return loss1 + loss2
+        return self.gamma * loss1 + self.alpha * loss2
 
     def _loss_2nd(self, X_, X):
         """
@@ -64,4 +65,54 @@ class SDNELoss(nn.Cell):
         batch_size = L.shape[0]
         loss = self.matmul2(Y, L)
         loss = self.matmul1(loss, Y)
-        return self.alpha * 2 * loss.trace() / batch_size
+        return 2 * loss.trace() / batch_size
+
+class SDNELoss2(nn.Cell):
+    """
+    SDNELoss1
+
+    Args:
+        X_(Tensor): net reconstruction matrix
+        Y(Tensor): embeddings matrix
+        X(Tensor): origin net matrix
+        Xadj(Tensor): adjacency matrix corresponding to X
+
+    Returns:
+        loss(float): loss
+    """
+    def __init__(self, alpha=1, beta=1, gamma=1):
+        super(SDNELoss2, self).__init__()
+        self.alpha = alpha
+        self.beta = beta
+        self.gamma = gamma
+        self.matmul1 = ops.MatMul()
+        self.matmul2 = ops.MatMul(transpose_a=True)
+
+    def construct(self, X_, Y, X, Xadj):
+        """
+        construct
+        """
+        loss1 = self._loss_1st(Y, Xadj)
+        loss2 = self._loss_2nd(X_, X)
+
+        return self.gamma * loss1 + self.alpha * loss2
+
+    def _loss_2nd(self, X_, X):
+        """
+        2nd loss
+        """
+        B = X * (self.beta - 1) + 1
+        loss = np.square((X_ - X) * B)
+
+        return np.sum(loss)
+
+    def _loss_1st(self, Y, Xadj):
+        """
+        1st loss
+        """
+        D = np.diag(np.sum(Xadj, 1))
+        L = D - Xadj
+        loss = self.matmul2(Y, L)
+        loss = self.matmul1(loss, Y)
+
+        return 2 * loss.trace()

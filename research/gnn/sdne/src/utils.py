@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,33 +34,8 @@ def preprocess_nxgraph(graph):
         node2idx[node] = node_size
         idx2node.append(node)
         node_size += 1
+
     return np.array(idx2node, dtype=np.int32), node2idx
-
-def read_node_label(filename, skip_head=False):
-    """
-    create node label
-
-    Args:
-        filename(str): the label path
-        skip_head(bool): whether skip the first line
-
-    Returns:
-        node list and the corresponding label list
-    """
-    fin = open(filename, 'r')
-    X = []
-    Y = []
-    while 1:
-        if skip_head:
-            fin.readline()
-        l = fin.readline()
-        if l == '':
-            break
-        vec = l.strip().split(' ')
-        X.append(vec[0])
-        Y.append(vec[1:])
-    fin.close()
-    return X, Y
 
 def reconstruction_precision_k(reconstructions, vertices, graph, k_query=None):
     """
@@ -105,6 +80,7 @@ def reconstruction_precision_k(reconstructions, vertices, graph, k_query=None):
                 break
 
         AP = np.sum(precision_list) / true_size_edges
+
         return prec_k_list, AP
 
     print('\nReconstruction Precision K ', k_query)
@@ -115,3 +91,63 @@ def reconstruction_precision_k(reconstructions, vertices, graph, k_query=None):
         k_query_res.append(precisionK_list[k - 1])
     print('MAP : ', AP)
     return k_query_res, AP
+
+def get_similarity(result):
+    """
+    calculate similarity array
+
+    Args:
+        result(array): embedding array
+
+    Returns:
+        similarity array
+    """
+    print("getting similarity...")
+
+    return np.dot(result, result.T)
+
+def check_reconstruction(embeddings, graph, idx2node=None, k_query=None):
+    """
+    check reconstruction precision
+
+    Args:
+        embeddings(array): embedding array
+        graph(DiGraph): original graph data
+        idx2node(dict): the table for converting index to node
+        k_query(list): k query set
+
+    Returns:
+        precision@k list
+    """
+    if k_query is None:
+        k_query = [1, 10, 100, 1000, 10000]
+
+    def get_precisionK(embeddings, graph, max_index, idx2node):
+        similarity = get_similarity(embeddings).reshape(-1)
+        sorted_idx = np.argsort(similarity)
+        cur = 0
+        count = 0
+        precisionK = []
+        sorted_idx = sorted_idx[::-1]
+        for idx in sorted_idx:
+            x = idx // graph.number_of_nodes()
+            x = idx2node[x]
+            y = idx % graph.number_of_nodes()
+            y = idx2node[y]
+            count += 1
+            if (graph.has_edge(x, y) or graph.has_edge(y, x) or x == y):
+                cur += 1
+            precisionK.append(1.0 * cur / count)
+            if count > max_index:
+                break
+
+        return precisionK
+
+    print('\nReconstruction Precision K ', k_query)
+    precisionK = get_precisionK(embeddings, graph, np.max(k_query), idx2node)
+    ret = []
+    for index in k_query:
+        print(f"Precision@K({index})=\t{precisionK[index - 1]}")
+        ret.append(precisionK[index - 1])
+
+    return ret

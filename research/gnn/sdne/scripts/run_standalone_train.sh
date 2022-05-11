@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,19 +14,28 @@
 # limitations under the License.
 # ============================================================================
 
-echo "=============================================================================================================="
-echo "Please run the script as: "
-echo "bash run.sh DATA_PATH CKPT_PATH"
-echo "For example: bash run.sh /path/dataset /path/ckpt"
-echo "It is better to use the absolute path."
-echo "=============================================================================================================="
-DATA_PATH=$1
-CKPT_PATH=$2
+DATASET_NAME=$1
+DATA_URL=$2
+CKPT_URL=$3
+EPOCH_NUM=$4
+DEVICE_ID=$5
+
+if [ $# -ne 5 ]; then
+  echo "=============================================================================================================="
+  echo "Please run the script as: "
+  echo "bash run_standalone_train.sh DATASET_NAME DATA_URL CKPT_URL EPOCH_NUM DEVICE_ID"
+  echo "For example: bash run_standalone_train.sh NAME /path/dataset /path/ckpt epochnum device_id"
+  echo "It is better to use the absolute path."
+  echo "=============================================================================================================="
+  exit 1
+fi
 
 python train.py  \
-    --epochs 40 \
-    --data_url "$DATA_PATH" \
-    --ckpt_url "$CKPT_PATH" \
+    --epochs $EPOCH_NUM \
+    --dataset $DATASET_NAME \
+    --data_url "$DATA_URL" \
+    --ckpt_url "$CKPT_URL" \
+    --device_id $DEVICE_ID \
     > train.log 2>&1 &
 echo "start training"
-cd ../
+exit 0

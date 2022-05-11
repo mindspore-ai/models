@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@
 python sdne.py
 """
 import mindspore.nn as nn
-from tqdm import tqdm
-import numpy as np
+import mindspore.numpy as np
 
 class SDNE(nn.Cell):
     """
@@ -30,19 +29,20 @@ class SDNE(nn.Cell):
         X_(Tensor): net reconstruction matrix
         Y(Tensor): embeddings matrix
     """
-    def __init__(self, node_size, hidden_size=None, weight_init='normal'):
+    def __init__(self, node_size, hidden_size=None, act='relu', weight_init='normal'):
         super(SDNE, self).__init__()
         in_channels = node_size
         self.encode = nn.SequentialCell()
+        activation = nn.Sigmoid() if act == 'sigmoid' else nn.ReLU()
         for i in range(len(hidden_size)):
-            self.encode.append(nn.Dense(in_channels, hidden_size[i], activation=nn.ReLU(), weight_init=weight_init))
+            self.encode.append(nn.Dense(in_channels, hidden_size[i], activation=activation, weight_init=weight_init))
             in_channels = hidden_size[i]
 
         self.decode = nn.SequentialCell()
         for i in reversed(range(len(hidden_size) - 1)):
-            self.decode.append(nn.Dense(in_channels, hidden_size[i], activation=nn.ReLU(), weight_init=weight_init))
+            self.decode.append(nn.Dense(in_channels, hidden_size[i], activation=activation, weight_init=weight_init))
             in_channels = hidden_size[i]
-        self.decode.append(nn.Dense(in_channels, node_size, activation=nn.ReLU(), weight_init=weight_init))
+        self.decode.append(nn.Dense(in_channels, node_size, activation=activation, weight_init=weight_init))
 
     def construct(self, X):
         """
@@ -62,7 +62,7 @@ class SDNEWithLossCell(nn.Cell):
 
     Args:
         X(Tensor): origin net matrix
-        L(Tensor): laplacian matrix
+        Xadj(Tensor): adjacency matrix corresponding to X
 
     Returns:
         loss(float): loss
@@ -72,12 +72,14 @@ class SDNEWithLossCell(nn.Cell):
         self._backbone = backbone
         self._loss_fn = loss_fn
 
-    def construct(self, X, L):
+    def construct(self, X, Xadj):
         """
         construct
         """
         X_, Y = self._backbone(X)
-        return self._loss_fn(X_, Y, X, L)
+        loss = self._loss_fn(X_, Y, X, Xadj)
+
+        return loss
 
     def get_backbone(self):
         """
@@ -85,23 +87,31 @@ class SDNEWithLossCell(nn.Cell):
         """
         return self._backbone
 
-    def get_embeddings(self, X):
-        """
-        get embeddings matrix
-        """
-        _, embeddings = self._backbone(X)
-        return embeddings.asnumpy()
-
-    def get_reconstructions(self, X, idx2node_y, idx2node_x=None):
+    def get_reconstructions(self, X, idx2node):
         """
         get net reconstruction matrix items and their node pairs
         """
         reconstructions, _ = self._backbone(X)
-        look_back_x = idx2node_y if idx2node_x is None else idx2node_x
-        look_back_y = idx2node_y
+        look_back = idx2node
         vertices = []
-        for i in tqdm(range(reconstructions.shape[0])):
+        for i in range(reconstructions.shape[0]):
             for j in range(reconstructions.shape[1]):
-                vertices.append([look_back_x[i], look_back_y[j]])
+                vertices.append([look_back[i], look_back[j]])
 
-        return reconstructions.reshape(-1).asnumpy(), np.array(vertices, dtype=np.int32)
+        return reconstructions.reshape(-1).asnumpy(), np.array(vertices, dtype=np.int32).asnumpy()
+
+    def get_embeddings(self, X, batch=256):
+        """
+        get embeddings matrix
+        """
+        nodenum = X.shape[0]
+        if batch <= 0:
+            batch = nodenum
+        _, embeddings = self._backbone(X[0: min(batch, nodenum)])
+        cnt = embeddings.shape[0]
+        while cnt < nodenum:
+            _, tmp = self._backbone(X[cnt: min(cnt + batch, nodenum)])
+            embeddings = np.vstack((embeddings, tmp))
+            cnt += batch
+
+        return embeddings.asnumpy()
