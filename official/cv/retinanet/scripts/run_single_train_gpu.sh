@@ -43,7 +43,7 @@ rm -rf LOG$1
 mkdir ./LOG$1
 cp ./*.py ./LOG$1
 cp -r ./src ./LOG$1
-cp ./config/*yaml ./LOG$1
+cp -r ./config ./LOG$1
 cd ./LOG$1 || exit
 echo "start training for device $1"
 env > env.log

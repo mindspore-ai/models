@@ -130,7 +130,7 @@ def main():
             if os.getenv("DEVICE_ID", "not_set").isdigit():
                 context.set_context(device_id=get_device_id())
             init()
-            device_num = config.device_num
+            device_num = get_device_num()
             rank = get_rank_id()
             context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
                                               device_num=device_num)
@@ -138,6 +138,9 @@ def main():
             rank = 0
             device_num = 1
             context.set_context(device_id=get_device_id())
+
+        # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
+        context.set_context(mempool_block_size="31GB")
 
     elif config.device_target == "GPU":
         context.set_context(mode=context.GRAPH_MODE, device_target="GPU")
@@ -164,7 +167,7 @@ def main():
 
     # When create MindDataset, using the fitst mindrecord file, such as retinanet.mindrecord0.
     dataset = create_retinanet_dataset(mindrecord_file, repeat_num=1,
-                                       num_parallel_workers=8,
+                                       num_parallel_workers=config.workers,
                                        batch_size=config.batch_size, device_num=device_num, rank=rank)
 
     dataset_size = dataset.get_dataset_size()

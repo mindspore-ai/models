@@ -97,7 +97,7 @@ save_checkpoint_path: "./ckpt"
 finish_epoch: 0
 
 # optimiter options
-workers: 16
+workers: 8
 mode: "sink"
 epoch_size: 500
 batch_size: 32
