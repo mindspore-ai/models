@@ -281,6 +281,7 @@ class PanguAlpha_Model(Cell):
                                           hidden_act=config.hidden_act,
                                           param_init_type=config.param_init_type,
                                           use_past=config.use_past,
+                                          softmax_compute_type=config.softmax_compute_type,
                                           parallel_config=config.parallel_config)
         if config.parallel_config.recompute:
             self.top_query_layer.recompute()
