@@ -125,10 +125,8 @@ def train_lstm():
                                ckpt_directory=config.ckpt_path, besk_ckpt_name="lstm_best_f1.ckpt",
                                metrics_name="f1")
         cb += [eval_cb]
-    if config.device_target == "CPU":
-        model.train(config.num_epochs, ds_train, callbacks=cb, dataset_sink_mode=False)
-    else:
-        model.train(config.num_epochs, ds_train, callbacks=cb)
+
+    model.train(config.num_epochs, ds_train, callbacks=cb, dataset_sink_mode=(config.device_target != "CPU"))
     print("============== Training Success ==============")
 
 if __name__ == '__main__':
