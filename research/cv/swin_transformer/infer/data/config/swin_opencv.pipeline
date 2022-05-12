@@ -1,0 +1,56 @@
+{
+"swin_opencv": {
+    "appsrc": {
+        "factory": "appsrc",
+        "next": "imageDecoder"
+        },
+    "imageDecoder": {
+        "props": {
+            "imageFormat": "jpeg",
+            "cvProcessor": "opencv"
+        },
+        "factory": "mxpi_imagedecoder",
+        "next": "imageResize"
+    },
+    "imageResize":{
+        "props":{
+            "resizeHeight": "256",
+            "resizeWidth": "256",
+            
+            "cvProcessor": "opencv"
+        },
+        "factory": "mxpi_imageresize",
+        "next": "modelInfer"
+    },
+    "modelInfer": {
+        "props": {
+            "modelPath": "../data/model/swin_opencv.om"
+        },
+        "factory": "mxpi_modelinfer",
+        "next": "modelPostprocess"
+        },
+    "modelPostprocess": {
+        "props": {
+            "dataSource": "modelInfer",
+            "postProcessConfigPath": "../data/config/postProcess_config.cfg",
+            "labelPath": "../data/config/label.txt",
+            "postProcessLibPath": "libresnet50postprocess.so"
+        },
+        "factory": "mxpi_classpostprocessor",
+        "next": "dataserialize"
+    },    
+
+    "dataserialize": {
+        "props": {
+        "outputDataKeys": "modelPostprocess"
+        },
+        "factory": "mxpi_dataserialize",
+        "next": "appsink0"
+    },
+    "appsink0": {
+        "factory": "appsink"
+    }
+
+
+}
+}
