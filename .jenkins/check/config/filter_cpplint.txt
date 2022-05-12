@@ -25,6 +25,11 @@
 "models/official/cv/nasnet/infer/mxbase/NASNet_A_MobileClassifyOpencv.h"  "runtime/references"
 "models/official/cv/nasnet/infer/mxbase/main_opencv.cpp"    "runtime/references"
 
+"models/official/cv/yolov4/infer/mxbase/src/Yolov4Detection.h"    "runtime/references"
+"models/official/cv/yolov4/infer/mxbase/src/Yolov4Detection.cpp"    "runtime/references"
+"models/official/cv/yolov4/infer/mxbase/src/PostProcess/Yolov4MindsporePost.h"    "runtime/references"
+"models/official/cv/yolov4/infer/mxbase/src/PostProcess/Yolov4MindsporePost.cpp"    "runtime/references"
+
 "models/official/cv/shufflenetv2/infer/mxbase/ShuffleNetV2ClassifyOpencv.h"  "runtime/references"
 "models/official/cv/shufflenetv2/infer/mxbase/main_opencv.cpp"    "runtime/references"
 
