@@ -1,0 +1,94 @@
+# Copyright 2022 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ============================================================================
+
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: "experiments"
+checkpoint_url: "experiments"
+
+# Path for local
+datadir: "/home/mindspore/msp_txl/official/nlp/transformer_xl/data/enwik8"
+dataset: "enwik8"
+ckpt_path: "/home/mindspore/msp_txl/official/nlp/transformer_xl/script/experiments-enwik8/20220416-140816/model0.ckpt"
+device: "GPU"
+device_id: 0
+
+# ==============================================================================
+# Training options
+
+n_layer: 12
+n_head: 8
+d_head: 64
+d_embed: 512
+d_model: 512
+d_inner: 2048
+dropout: 0.1
+dropatt: 0.0
+optim: "adam"
+scheduler: "cosine"
+lr: 0.00025
+lr_min: 0.0
+warmup_step: 0
+max_step: 400000
+log-interval: 200
+eval-interval: 4000
+batch_size: 22
+tgt_len: 512
+eval_tgt_len: 128
+mem_len: 512
+clamp_len: -1
+init: "normal"
+emb_init: "normal"
+init_range: 0.1
+emb_init_range: 0.01
+init_std: 0.02
+proj_init_std: 0.01
+mom: 0.0
+decay_rate: 0.5
+clip: 0.25
+batch_chunk: 1
+seed: 1111
+div_val: 1
+attn_type: 0
+ext_len: 0
+eta_min: 0.0
+max_eval_steps: -1
+sample_softmax: -1
+patience: 0
+adaptive: False
+varlen: False
+pre_lnorm: False
+same_length: False
+
+# Model Description
+
+
+
+---
+# Config description for each option
+enable_modelarts: 'Whether training on modelarts, default: False'
+data_url: 'Dataset url for obs'
+train_url: 'Training output url for obs'
+data_path: 'Dataset path for local'
+output_path: 'Training output path for local'
+
+device_target: 'Target device type'
+enable_profiling: 'Whether enable profiling while training, default: False'
+
+
+---
+device_target: [ 'Ascend', 'GPU', 'CPU' ]
