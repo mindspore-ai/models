@@ -201,7 +201,7 @@ Parameters for both training and evaluation can be set in `default_config.yaml`
   batch_size: 16000                   # batch_size for exported model.
   ckpt_file: ''                       # the path of the weight file to be exported relative to the file `export.py`, and the weight file must be included in the code directory.
   file_name: "autodis"                # output file name.
-  file_format: "AIR"                  # output file format, you can choose from AIR or MINDIR, default is AIR"
+  file_format: "MINDIR"                  # output file format, you can choose from AIR or MINDIR, default is AIR"
   ```
 
 ## [Training Process](#contents)

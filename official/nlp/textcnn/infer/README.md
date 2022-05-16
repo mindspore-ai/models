@@ -559,7 +559,7 @@ ModelArts环境下执行模型训练及冻结操作时，首先应在华为云�
 
         # Export options
         file_name: "textcnn"
-        file_format: "AIR"
+        file_format: "MINDIR"
         ```
 
 ### 创建训练作业

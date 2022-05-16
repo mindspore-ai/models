@@ -51,7 +51,7 @@ workers: -1
 device_id: 0
 batch_size: 10
 ckpt_file: ""
-file_format: "AIR"
+file_format: "MINDIR"  # ["AIR", "MINDIR"]
 
 img_id_file_path: ""
 result_files: './result_Files'

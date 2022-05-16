@@ -63,7 +63,7 @@ eval_neg_sample: -1
 
 # export option
 export_file_dir: "./"
-file_format: "AIR"
+file_format: "MINDIR"
 export_neg_sample: -1
 
 ---

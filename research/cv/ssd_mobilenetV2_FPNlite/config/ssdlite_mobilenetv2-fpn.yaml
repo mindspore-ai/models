@@ -32,7 +32,7 @@ exp_device_id: 0
 exp_batch_size: 1
 exp_ckpt_file: ""
 exp_file_name: "ssd"
-exp_file_format: 'AIR'
+exp_file_format: 'MINDIR'  # ['AIR', 'MINDIR']
 exp_device_target: "Ascend"
 
 #modelarts

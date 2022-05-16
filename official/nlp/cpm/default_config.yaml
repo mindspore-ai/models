@@ -30,7 +30,7 @@ ckpt_epoch: 4
 multi_machine: False
 
 file_name: "cpm"
-file_format: "AIR" # ["AIR", "MINDIR"]
+file_format: "MINDIR" # ["AIR", "MINDIR"]
 
 config_zero_shot_standalone:
     dp: 1

@@ -3,7 +3,7 @@ device_id: 0
 batch_size: 1
 ckpt_file: ""
 file_name: "ssd"
-file_format: 'AIR'
+file_format: 'MINDIR'  # ['AIR', 'MINDIR']
 device_target: "Ascend"
 
 #modelarts
@@ -80,5 +80,5 @@ device_id: "Device id"
 batch_size: "Export batch size"
 ckpt_file: "Checkpoint file path."
 file_name: "output file name."
-file_format: "file format. choices - 'AIR', 'ONNX', 'MINDIR', default - 'AIR'"
+file_format: "file format. choices - 'AIR', 'ONNX', 'MINDIR', default - 'MINDIR'"
 device_target: "device target. choices - 'Ascend', default = 'Ascend'"

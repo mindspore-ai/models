@@ -176,14 +176,14 @@ You can start training using python or shell scripts. The usage of shell scripts
       # (2) Perform a or b.
       #       a. Set "enable_modelarts=True" on MINDlarge_config.yaml file.
       #          Set "platform=Ascend" on MINDlarge_config.yaml file.
-      #          Set "file_format='AIR'" on MINDlarge_config.yaml file.
+      #          Set "file_format='MINDIR'" on MINDlarge_config.yaml file.
       #          Set "batch_size=1" on MINDlarge_config.yaml file.
       #          Set "checkpoint_url='s3://dir_to_trained_ckpt/'" on MINDlarge_config.yaml file.
       #          Set "checkpoint_path='/cache/checkpoint_path/model.ckpt'" on MINDlarge_config.yaml file.
       #          Set other parameters on MINDlarge_config.yaml file you need.
       #       b. Add "enable_modelarts=True" on the website UI interface.
       #          Add "platform=Ascend" on the website UI interface.
-      #          Add "file_format=AIR" on the website UI interface.
+      #          Add "file_format=MINDIR" on the website UI interface.
       #          Add "batch_size=1" on the website UI interface.
       #          Add "checkpoint_url=s3://dir_to_trained_ckpt/" on the website UI interface.
       #          Add "checkpoint_path=/cache/checkpoint_path/model.ckpt" on the website UI interface.

@@ -41,7 +41,7 @@ model_ckpt: ""
 device_id: 0
 ckpt_file: ""
 file_name: "fasttexts"
-file_format: "AIR"
+file_format: "MINDIR"
 ---
 
 # Help description for each configuration

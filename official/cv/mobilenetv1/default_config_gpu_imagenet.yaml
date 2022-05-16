@@ -51,7 +51,7 @@ ckpt_file: "/cache/data/mobilenetv1-90_625.ckpt"
 width: 224
 height: 224
 file_name: "mobilenetv1"
-file_format: "AIR"
+file_format: 'MINDIR'
 
 # postprocess
 result_dir: ''

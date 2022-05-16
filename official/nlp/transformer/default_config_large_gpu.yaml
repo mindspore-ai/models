@@ -68,7 +68,7 @@ accumulation_steps: 1
 
 # export.py /eval_config - transformer export
 file_name: "transformer"
-file_format: 'AIR'
+file_format: 'MINDIR'
 
 #'postprocess / from eval_config'
 result_dir: "./result_Files"

@@ -180,13 +180,13 @@ bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_P
     # (1) 执行 a 或者 b.
     #       a. 在 base_config.yaml 文件中设置 "enable_modelarts=True"
     #          在 base_config.yaml 文件中设置 "file_name='transformer'"
-    #          在 base_config.yaml 文件中设置 "file_format='AIR'"
+    #          在 base_config.yaml 文件中设置 "file_format='MINDIR'"
     #          在 base_config.yaml 文件中设置 "checkpoint_url='/The path of checkpoint in S3/'"
     #          在 base_config.yaml 文件中设置 "ckpt_file='/cache/checkpoint_path/model.ckpt'"
     #          在 base_config.yaml 文件中设置 其他参数
     #       b. 在网页上设置 "enable_modelarts=True"
     #          在网页上设置 "file_name='transformer'"
-    #          在网页上设置 "file_format='AIR'"
+    #          在网页上设置 "file_format='MINDIR'"
     #          在网页上设置 "checkpoint_url='/The path of checkpoint in S3/'"
     #          在网页上设置 "ckpt_file='/cache/checkpoint_path/model.ckpt'"
     #          在网页上设置 其他参数

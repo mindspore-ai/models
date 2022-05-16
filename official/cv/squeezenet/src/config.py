@@ -62,7 +62,7 @@ config_imagenet = ed({
     "width": 227,
     "height": 227,
     "file_name": "squeezenet",
-    "file_format": "AIR"
+    "file_format": "MINDIR"
 })
 
 # config for squeezenet, cifar10
@@ -108,5 +108,5 @@ config_cifar = ed({
     "width": 227,
     "height": 227,
     "file_name": "squeezenet",
-    "file_format": "AIR"
+    "file_format": "MINDIR"
 })

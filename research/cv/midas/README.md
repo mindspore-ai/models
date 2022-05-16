@@ -226,7 +226,7 @@ data_name: 'all'                                               #需要推理的�
 input_path: '/midas/input'                  #输入图片的路径
 output_path: '/midas/output'                #模型输出图片的路径
 model_weights: '/ckpt/Midas_0-600_56_1.ckpt'#模型参数路径
-file_format: "AIR"                          #AIR/MIDIR
+file_format: "MINDIR"  # ["AIR", "MINDIR"]                          #AIR/MIDIR
 ```
 
 ## 训练过程

@@ -104,7 +104,7 @@ voc_root: "/data/voc_dataset"
 image_dir: ""
 anno_path: ""
 file_name: "ssd"
-file_format: "AIR"
+file_format: 'MINDIR'
 
 ---
 # Help description for each configuration

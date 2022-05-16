@@ -64,7 +64,7 @@ ckpt_steps: 1000
 # export option
 batch_size: 16
 file_name: "facerecognition"
-file_format: "AIR"
+file_format: "AIR"  # ["AIR", "MINDIR"]
 export_pre_bn: 0
 export_inference: 1
 export_use_se: 0

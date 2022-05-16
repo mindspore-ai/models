@@ -21,7 +21,7 @@ air_name: 'protonet.air'
 # Model Description
 model_name: protonet
 file_name: 'protonet'
-file_format: 'AIR'
+file_format: 'MINDIR'  # ['AIR', 'MINDIR']
 
 
 ---

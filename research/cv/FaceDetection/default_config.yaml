@@ -60,7 +60,7 @@ nms_thresh: 0.45
 
 #export
 file_name: "FaceDetection"
-file_format: "AIR"
+file_format: "MINDIR"  # ["AIR", "MINDIR"]
 
 #310 infer
 preprocess_path: ""

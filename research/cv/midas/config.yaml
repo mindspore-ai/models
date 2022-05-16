@@ -32,7 +32,7 @@ resize_method: "upper_bound"
 input_path: '/input'
 output_path: '/output'
 model_weights: '/ckpt/Midas_0-600_56_1.ckpt'
-file_format: "AIR"  #AIR/MIDIR
+file_format: "MINDIR"  # ["AIR", "MINDIR"] 
 
 #eval
 

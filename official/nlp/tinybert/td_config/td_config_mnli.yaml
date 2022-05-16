@@ -38,7 +38,7 @@ dataset_type: "tfrecord"
 # export related
 ckpt_file: ''
 file_name: "tinybert"
-file_format: "AIR"
+file_format: "MINDIR"
 num_labels: 3
 phase1_cfg:
     batch_size: 32
