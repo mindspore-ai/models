@@ -16,17 +16,17 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash scripts/run_squad.sh DEVICE_ID"
+echo "bash scripts/run_ner_gpu.sh DEVICE_ID"
 echo "DEVICE_ID is optional, default value is zero"
-echo "for example: bash scripts/run_squad.sh 1 true ./enwiki/vocab.txt ./enwiki/checkpoint/checkpoint_bert-100_1.ckpt ./enwiki/tfrecord/train.tf_record ./enwiki/dev-v1.1.json"
-echo "assessment_method include: [Accuracy]"
+echo "for example: bash scripts/run_ner_gpu.sh 1"
+echo "assessment_method include: [BF1, MF1, clue_benchmark]"
 echo "=============================================================================================================="
 
 if [ -z $1 ]
 then
-    export DEVICE_ID=0
+    export CUDA_VISIBLE_DEVICES=0
 else
-    export DEVICE_ID=$1
+    export CUDA_VISIBLE_DEVICES="$1"
 fi
 
 mkdir -p ms_log
@@ -34,30 +34,25 @@ CUR_DIR=`pwd`
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 export GLOG_log_dir=${CUR_DIR}/ms_log
 export GLOG_logtostderr=0
-
-do_eval=$2
-vocab_file_path=$3
-load_pretrain_checkpoint_path=$4
-train_data_file_path=$5
-eval_json_path=$6
-
-
-python ${PROJECT_DIR}/../run_squad.py  \
-    --config_path="../../task_squad_config.yaml" \
-    --device_target="Ascend" \
+python ${PROJECT_DIR}/../run_ner.py  \
+    --config_path="../../task_ner_config.yaml" \
+    --device_target="GPU" \
     --do_train="true" \
-    --do_eval=${do_eval} \
-    --device_id=$DEVICE_ID \
-    --epoch_num=3 \
-    --num_class=2 \
+    --do_eval="false" \
+    --assessment_method="BF1" \
+    --use_crf="false" \
+    --with_lstm="false" \
+    --epoch_num=5 \
     --train_data_shuffle="true" \
     --eval_data_shuffle="false" \
     --train_batch_size=32 \
     --eval_batch_size=1 \
-    --vocab_file_path=${vocab_file_path} \
+    --vocab_file_path="" \
+    --label_file_path="" \
     --save_finetune_checkpoint_path="" \
-    --load_pretrain_checkpoint_path=${load_pretrain_checkpoint_path} \
+    --load_pretrain_checkpoint_path="" \
     --load_finetune_checkpoint_path="" \
-    --train_data_file_path=${train_data_file_path} \
-    --eval_json_path=${eval_json_path} \
-    --schema_file_path="" > squad_log.txt 2>&1 &
+    --train_data_file_path="" \
+    --eval_data_file_path="" \
+    --dataset_format="tfrecord" \
+    --schema_file_path="" > ner_log.txt 2>&1 &
