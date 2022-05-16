@@ -30,7 +30,7 @@
 
 如下为MindSpore使用Triplet loss和Quadruptlet loss在SOP数据集调优ResNet50的示例，Triplet loss可参考[论文1](https://arxiv.org/abs/1503.03832)，Quadruptlet loss是Triplet loss的一个变体，可参考[论文2](https://arxiv.org/abs/1704.01719)。
 
-为了训练度量学习模型，我们需要一个神经网络模型作为骨架模型（ResNet50）和度量学习代价函数来进行优化。残差神经网络（ResNet）由微软研究院何凯明等五位华人提出，效果非常显著。整个网络只需要学习输入和输出的差异部分，简化了学习目标和难度。ResNet的结构大幅提高了神经网络训练的速度，并且大大提高了模型的准确率。正因如此，ResNet十分受欢迎，经常被各个领域用作backbone网络，在这选择ResNet-50结构作为度量学习的主干网络。我们首先使用softmax来进行预训练，然后使用其它的代价函数来进行微调，例如：triplet，quadruplet。下面就是先在SOP数据集上预训练个pretrain模型，然后用triplet，quadruplet代价函数来微调从softmax得到的pretrain模型，使用8卡Ascend 910训练网络模型，仅需30个周期，就可以在SOP数据集的5184种类别上，TOP1准确率达到了73.9%和74.3%。
+为了训练度量学习模型，我们需要一个神经网络模型作为骨架模型（ResNet50）和度量学习代价函数来进行优化。残差神经网络（ResNet）由微软研究院何凯明等五位华人提出，效果非常显著。整个网络只需要学习输入和输出的差异部分，简化了学习目标和难度。ResNet的结构大幅提高了神经网络训练的速度，并且大大提高了模型的准确率。正因如此，ResNet十分受欢迎，经常被各个领域用作backbone网络，在这选择ResNet-50结构作为度量学习的主干网络。我们首先加载ResNet-50-ImageNet[模型权重](https://www.mindspore.cn/resources/hub/details/en?MindSpore/ascend/1.3/resnet50_v1.3_imagenet2012)作为预训练模型，然后修改分类层使用softmax函数在SOP数据集上对模型进行微调，最后利用度量学习损失（例如：triplet，quadruplet）进一步finetune模型。下面就是在SOP数据集上分别使用softmax、triplet和quadruplet代价函数微调的结果，使用8卡Ascend 910训练网络模型，仅需30个周期，就可以在SOP数据集的5184种类别上，TOP1准确率达到了73.9%和74.3%。
 
 ## 论文
 
