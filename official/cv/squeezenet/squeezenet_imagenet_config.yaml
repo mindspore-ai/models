@@ -43,7 +43,7 @@ pre_trained: ""
 width: 227
 height: 227
 file_name: "squeezenet"
-file_format: "AIR"
+file_format: "MINDIR"
 
 ---
 # Help description for each configuration

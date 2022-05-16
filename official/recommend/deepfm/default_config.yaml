@@ -53,7 +53,7 @@ checkpoint_path: "/cache/train/deepfm-5_2582.ckpt"
 device_id: 0
 ckpt_file: "/cache/train/deepfm-5_2582.ckpt"
 file_name: "deepfm"
-file_format: "AIR"
+file_format: "MINDIR"
 
 # 'preprocess.'
 result_path: './preprocess_Result'

@@ -31,7 +31,7 @@ parser.add_argument('--height', type=int, default=224, help='input height')
 parser.add_argument("--file_name", type=str,
                     default="resnext152", help="output file name.")
 parser.add_argument("--file_format", type=str,
-                    choices=["AIR", "ONNX", "MINDIR"], default="AIR", help="file format")
+                    choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
 parser.add_argument("--device_target", type=str, default="Ascend",
                     choices=["Ascend", "GPU", "CPU"], help="device target (default: Ascend)")
 args = parser.parse_args()

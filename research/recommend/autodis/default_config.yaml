@@ -25,7 +25,7 @@ checkpoint_path: ''
 batch_size: 16000
 ckpt_file: ''
 file_name: "autodis"
-file_format: "AIR"
+file_format: "MINDIR"
 # 310infer related
 dataset_path: ""
 result_path: "./result_Files"

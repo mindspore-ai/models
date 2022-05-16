@@ -61,7 +61,7 @@ eval_url: ""
 device_id: 1
 batch_size: 32
 file_name: "sphereface"
-file_format: "AIR"
+file_format: 'MINDIR'
 
 ---
 # Help description for each configuration

@@ -65,7 +65,7 @@ model_path: ""
 
 ckpt_file: "./0-70_25620.ckpt"
 file_name: "faceattri"
-file_format: "AIR"
+file_format: "AIR"  # ["AIR", "MINDIR"]
 
 ---
 

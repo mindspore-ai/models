@@ -71,7 +71,7 @@ output: "./output.npz"
 
 # export option
 file_name: "gnmt_v2"
-file_format: "AIR"
+file_format: "MINDIR"
 vocab_file: ""
 
 ---

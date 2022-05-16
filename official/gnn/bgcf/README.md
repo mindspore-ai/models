@@ -178,7 +178,7 @@ After installing MindSpore via the official website and Dataset is correctly gen
       #          Set "ckpt_file='/cache/checkpoint_path/model.ckpt'" on default_config.yaml file.
       #          Set "checkpoint_url='s3://dir_to_your_trained_ckpt/'" on default_config.yaml file.
       #          Set "file_name='bgcf'" on default_config.yaml file.
-      #          Set "file_format='AIR'" on default_config.yaml file.
+      #          Set "file_format='MINDIR'" on default_config.yaml file.
       #          (options)Set "device_target=GPU" on default_config.yaml file if run on GPU.
       #          Set other parameters on default_config.yaml file you need.
       #       b. Add "enable_modelarts=True" on the website UI interface.

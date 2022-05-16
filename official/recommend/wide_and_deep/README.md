@@ -155,13 +155,13 @@ python eval.py  --data_path=./data/mindrecord --dataset_type=mindrecord --device
     # (1) Perform a or b.
     #       a. Set "enable_modelarts=True" on base_config.yaml file.
     #          Set "file_name='wide_and_deep'" on base_config.yaml file.
-    #          Set "file_format='AIR'" on base_config.yaml file.
+    #          Set "file_format='MINDIR'" on base_config.yaml file.
     #          Set "checkpoint_url='/The path of checkpoint in S3/'" on beta_config.yaml file.
     #          Set "ckpt_file='/cache/checkpoint_path/model.ckpt'" on base_config.yaml file.
     #          Set other parameters on base_config.yaml file you need.
     #       b. Add "enable_modelarts=True" on the website UI interface.
     #          Add "file_name='wide_and_deep'" on the website UI interface.
-    #          Add "file_format='AIR'" on the website UI interface.
+    #          Add "file_format='MINDIR'" on the website UI interface.
     #          Add "checkpoint_url='/The path of checkpoint in S3/'" on the website UI interface.
     #          Add "ckpt_file='/cache/checkpoint_path/model.ckpt'" on the website UI interface.
     #          Add other parameters on the website UI interface.

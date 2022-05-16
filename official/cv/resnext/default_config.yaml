@@ -50,7 +50,7 @@ device_id: 0
 width: 224
 height: 224
 file_name: "resnext50"
-file_format: "AIR"
+file_format: 'MINDIR'
 result_path: ""
 label_path: ""
 

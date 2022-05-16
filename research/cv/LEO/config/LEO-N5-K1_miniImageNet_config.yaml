@@ -44,7 +44,7 @@ total_steps: 100000
 # Model Description
 model_name: LEO
 file_name: 'leo'
-file_format: 'AIR'
+file_format: 'MINDIR'  # ['AIR', 'MINDIR']
 
 
 ---

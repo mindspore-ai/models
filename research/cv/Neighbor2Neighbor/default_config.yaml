@@ -44,7 +44,7 @@ image_height: 512
 image_width: 512
 ckpt_file: "./best_map.ckpt"
 file_name: "neighbor2neighbor"
-file_format: "AIR"
+file_format: "MINDIR"  # ["AIR", "MINDIR"]
 
 # ======================================================================================
 # common options

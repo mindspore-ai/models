@@ -31,7 +31,7 @@ result_path: "./preprocess_Result/"
 
 # Export options
 file_name: "textcnn"
-file_format: "AIR"
+file_format: "MINDIR"
 
 ---
 # Help description for each configuration

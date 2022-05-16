@@ -51,7 +51,7 @@ manual_shape: None
 device_id: 0
 ckpt_file: "/cache/train/widedeep_train-15_2582.ckpt"
 file_name: "wide_and_deep"
-file_format: "AIR"
+file_format: "MINDIR"
 
 #'postprocess'
 result_path: "./result_Files"

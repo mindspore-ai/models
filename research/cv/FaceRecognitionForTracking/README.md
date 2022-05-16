@@ -296,7 +296,7 @@ epoch[179], iter[14930], loss:1.694281, 13417.38 imgs/sec, lr=0.0250000003725290
     # (1) Perform a or b.
     #       a. Set "enable_modelarts=True" on reid_1p_config.yaml file.
     #          Set "batch_size=1" on reid_1p_config.yaml file.
-    #          Set "file_format='AIR'" on reid_1p_config.yaml file.
+    #          Set "file_format='MINDIR'" on reid_1p_config.yaml file.
     #          Set "file_name='FaceRecognitionForTracking'" on reid_1p_config.yaml file.
     #          Set "device_target=Ascend" on reid_1p_config.yaml file.
     #          Set "checkpoint_url='s3://dir_to_trained_ckpt/'" on reid_1p_config.yaml file.
@@ -304,7 +304,7 @@ epoch[179], iter[14930], loss:1.694281, 13417.38 imgs/sec, lr=0.0250000003725290
     #          Set other parameters on reid_1p_config.yaml file you need.
     #       b. Add "enable_modelarts=True" on the website UI interface.
     #          Add "batch_size=1" on the website UI interface.
-    #          Add "file_format='AIR'" on the website UI interface.
+    #          Add "file_format='MINDIR'" on the website UI interface.
     #          Add "file_name='FaceRecognitionForTracking'" on the website UI interface.
     #          Add "device_target=Ascend" on the website UI interface.
     #          Add "checkpoint_url='s3://dir_to_trained_ckpt/'" on the website UI interface.

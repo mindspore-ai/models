@@ -172,7 +172,7 @@ checkpoint_path: "/cache/train/fasterrcnn/faster_rcnn-12_7393.ckpt"
 
 # export.py fasterrcnn_export
 file_name: "faster_rcnn"
-file_format: "AIR"
+file_format: "MINDIR"  # ["AIR", "MINDIR"]
 ckpt_file: "/cache/train/fasterrcnn/faster_rcnn-12_7393.ckpt"
 
 # postprocess ("./src/config_50.yaml")

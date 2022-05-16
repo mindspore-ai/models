@@ -38,6 +38,6 @@ eval_freq: 1
 evaluate: False
 # ==============================================================================
 # export
-checkpoint_path: ucf101bestacc.ckpt
-file_format: AIR
-file_name: ecolite
+checkpoint_path: "ucf101bestacc.ckpt"
+file_format: "MINDIR"
+file_name: "ecolite"

@@ -31,7 +31,7 @@ model_ckpt: ""  #  used when eval; if modelarts: set /cache/checkpoint_path/mode
 device_id: 0
 ckpt_file: ""
 file_name: "tacotron2"
-file_format: "AIR"
+file_format: "MINDIR"
 ---
 
 # Help description for each configuration

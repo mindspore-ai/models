@@ -44,7 +44,7 @@ enable_graph_kernel: "true"
 ckpt_file: './ckpt_lstm/lstm-20_390.ckpt'
 device_id: 0
 file_name: "lstm"
-file_format: "AIR"
+file_format: "MINDIR"
 
 # LSTM Postprocess
 label_dir: ''

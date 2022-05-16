@@ -37,7 +37,7 @@ train_num_eval: 300
 ckpt_file: "ckpt-100_695.ckpt"
 # Export
 file_name: "Hourglass"
-file_format: "AIR"
+file_format: "MINDIR"  # ["AIR", "MINDIR"]
 result_path: "../ascend310_infer/preprocess_Result"
 out_path: "../ascend310_infer/result_Files"
 

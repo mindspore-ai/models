@@ -39,7 +39,7 @@ dist_reg: 0.003
 device_id: 0
 ckpt_file: ""
 file_name: "bgcf"
-file_format: "AIR"
+file_format: "MINDIR"
 row_neighs: 40
 
 ---
