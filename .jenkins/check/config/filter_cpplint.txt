@@ -14,6 +14,8 @@
 
 "models/research/cv/FaceQualityAssessment/infer/mxbase/src/FQA.h"  "runtime/references"
 "models/research/cv/FaceQualityAssessment/infer/mxbase/src/FQA.cpp"  "runtime/references"
+"models/research/cv/TCN/infer/mxbase/src/TCN.h"  "runtime/references"
+"models/research/cv/TCN/infer/mxbase/src/TCN.cpp"  "runtime/references"
 "models/research/cv/FaceQualityAssessment/infer/util/plugins/MxpiTransposePlugin.h"  "runtime/references"
 "models/research/cv/FaceQualityAssessment/infer/util/plugins/MxpiTransposePlugin.h"  "build/namespaces"
 "models/research/cv/FaceQualityAssessment/infer/util/plugins/MxpiTransposePlugin.cpp"  "runtime/references"
