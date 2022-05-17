@@ -1,0 +1,97 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+
+device_target: "Ascend"
+#device_target: "GPU"
+device_id: 0
+device_num: 1
+rank_id: 0
+exp_dir: ""
+print_freq: 50
+# ==============================================================================
+# Train options
+is_distributed: True
+pre_trained: ""
+
+epochs: 410
+warm_epochs: 10
+start_epoch: 0
+
+# lr options
+lr: 0.1
+momentum: 0.9
+weight_decay: 0.0001
+
+# Model options
+temperature: 0.1
+low_dim: 128
+moco_m: 0.996
+K: 30000
+thr: 0.4
+contrast_th: 0.4
+lam_u: 10
+lam_c: 1
+num_hist: 128
+alpha: 0.9
+
+# Dataset options
+workers: 10
+batch_size: 20
+num_clas: 1000
+annotation: "/path/to/annotation.json"
+unlabel_label: 4
+unlabel_aug: True
+unlabel_randomaug_count: 2
+unlabel_randomaug_intensity: 10
+label_aug: True
+label_randomaug_count: 3
+label_randomaug_intensity: 5
+
+# Eval options
+test_root: "/path/to/eval/dataset"
+eval_pre_trained: "/path/to/eval/checkpoint"
+folder: 0
+
+---
+# Help description for each configuration
+# Train options
+is_distributed: "Use distributed"
+pre_trained: ""
+
+epochs: "Max epoch num to train the model."
+warm_epochs: "Warmup epochs."
+start_epoch: "epoch num start train"
+
+# lr options
+lr: "Learning rate"
+momentum: "Momentum."
+weight_decay: "Weight decay"
+
+# Model options
+temperature: "Temperature for similarity scaling"
+low-dim: "Feature dimension"
+moco-m: "momentum of updating momentum encoder"
+K: "Size of memory bank and momentum queue"
+thr: "Pseudo-label confidence threshold"
+contrast_th: "Pseudo-label graph connection threshold"
+lam-u: "Weight for unsupervised cross-entropy loss"
+lam-c: "Weight for unsupervised contrastive loss"
+num_hist: "Num of hist len"
+alpha: "Weight for model prediction in constructing pseudo-label"
+
+# Dataset options
+workers: "Number of data loading workers"
+batch_size: "Batch size"
+num_clas: "Num of classes"
+annotation: "Annotation path"
+unlabel_label: "Value of unlabel:label"
+unlabel_aug: "Whether use unlabel aug"
+unlabel_randomaug_count: "Count of unlabel aug"
+unlabel_randomaug_intensity: "Intensity of unlabel aug"
+label_aug: "Whether use label aug"
+label_randomaug_count: "Count of label aug"
+label_randomaug_intensity: "Intensity of label aug"
+
+# Eval options
+test_root: "The test root of imagenet val folder"
+eval_pre_trained: "Pretrained model path"
+folder: "1 means:eval folder; 0 means eval specific model"
