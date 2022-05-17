@@ -29,7 +29,7 @@ std::vector<double> g_inferCost;
 
 void InitPointnetParam(InitParam* initParam) {
     initParam->deviceId = 0;
-    initParam->modelPath = "../data/pointnet.om";
+    initParam->modelPath = "../../convert/pointnet.om";
 }
 
 APP_ERROR ReadFilesFromPath(const std::string &path, std::vector<std::string> *files) {
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
         return ret;
     }
 
-    std::string inferPath = "../datapath_BS1/00_data/";
+    std::string inferPath = "../../data/datapath_BS1/00_data/";
     std::vector<std::string> files;
     ret = ReadFilesFromPath(inferPath, &files);
     LogInfo << "successfully read files";

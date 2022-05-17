@@ -10,7 +10,7 @@
         "mxpi_tensorinfer0": {
             "props": {
                 "dataSource": "appsrc0",
-                "modelPath": "../data/model/pointnet.om",
+                "modelPath": "../convert/pointnet.om",
                 "waitingTime": "2000"
             },
             "factory": "mxpi_tensorinfer",
