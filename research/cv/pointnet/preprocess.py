@@ -37,7 +37,8 @@ if __name__ == '__main__':
         root=args.dataset_path,
         classification=False,
         split='test',
-        class_choice=[args.class_choice])
+        class_choice=[args.class_choice],
+        data_augmentation=False)
     dataset = ds.GeneratorDataset(dataset_generator, column_names=["point", "label"])
     dataset = dataset.batch(args.batchSize)
 
