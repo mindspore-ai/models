@@ -12,6 +12,9 @@
 "models/research/cv/FaceRecognitionForTracking/infer/util/plugins/MxpiTransposePlugin.h"  "runtime/references"
 "models/research/cv/FaceRecognitionForTracking/infer/util/plugins/MxpiTransposePlugin.h"  "build/namespaces"
 
+
+"models/research/cv/nas-fpn/infer/mxbase/src/Nasfpn.h"  "runtime/references"
+"models/research/cv/nas-fpn/infer/mxbase/src/Nasfpn.cpp"  "runtime/references"
 "models/research/cv/FaceQualityAssessment/infer/mxbase/src/FQA.h"  "runtime/references"
 "models/research/cv/FaceQualityAssessment/infer/mxbase/src/FQA.cpp"  "runtime/references"
 "models/research/cv/TCN/infer/mxbase/src/TCN.h"  "runtime/references"
