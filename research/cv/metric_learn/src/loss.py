@@ -18,10 +18,11 @@ import mindspore
 import mindspore.nn as nn
 from mindspore import Tensor
 from mindspore.common import dtype as mstype
+from mindspore.nn.loss.loss import LossBase
 from mindspore.ops import operations as P
 from mindspore.ops import functional as F
 
-class Softmaxloss():
+class Softmaxloss(LossBase):
     """Softmaxloss"""
     def __init__(self, sparse=True, smooth_factor=0.1, num_classes=5184):
         super(Softmaxloss, self).__init__()
@@ -37,7 +38,7 @@ class Softmaxloss():
         loss = self.ce(logit, label)
         return loss
 
-class Tripletloss():
+class Tripletloss(LossBase):
     """Tripletloss"""
     def __init__(self, margin=0.1):
         super(Tripletloss, self).__init__()
@@ -92,7 +93,7 @@ def generate_index(batch_size, samples_each_class):
     res = np.array(res).astype(np.int32)
     return res
 
-class Quadrupletloss():
+class Quadrupletloss(LossBase):
     """Quadrupletloss"""
     def __init__(self, train_batch_size=30, samples_each_class=2, margin=0.1):
         super(Quadrupletloss, self).__init__()
