@@ -29,7 +29,7 @@ from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id
 from src.FasterRcnn.faster_rcnn import Faster_Rcnn
-
+ms.context.set_context(max_call_depth=2000)
 
 def fasterrcnn_eval(dataset_path, ckpt_path, anno_path):
     """FasterRcnn evaluation."""
@@ -37,7 +37,15 @@ def fasterrcnn_eval(dataset_path, ckpt_path, anno_path):
         raise RuntimeError("CheckPoint file {} is not valid.".format(ckpt_path))
     ds = create_fasterrcnn_dataset(config, dataset_path, batch_size=config.test_batch_size, is_training=False)
     net = Faster_Rcnn(config)
-    param_dict = ms.load_checkpoint(ckpt_path)
+
+    try:
+        param_dict = ms.load_checkpoint(ckpt_path)
+    except RuntimeError as ex:
+        ex = str(ex)
+        print("Traceback:\n", ex, flush=True)
+        if "reg_scores.weight" in ex:
+            exit("[ERROR] The loss calculation of faster_rcnn has been updated. "
+                 "If the training is on an old version, please set `without_bg_loss` to False.")
 
     # in previous version of code there was a typo in layer name 'fpn_neck': it was 'fpn_ncek'
     # in order to make backward compatibility with checkpoints created with that typo
