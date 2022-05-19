@@ -17,6 +17,7 @@ eval.
 """
 import os
 import mindspore as ms
+import mindspore.nn as nn
 from src.dataset import create_dataset
 from src.models import define_net, load_ckpt
 from src.utils import context_device_init
@@ -45,8 +46,8 @@ def eval_mobilenetv2():
             than batch_size in config.py")
 
     net.set_train(False)
-
-    model = ms.Model(net, metrics={'acc'})
+    loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
+    model = ms.Model(net, loss_fn=loss, metrics={'acc'})
 
     res = model.eval(dataset)
     print(f"result:{res}\npretrain_ckpt={config.pretrain_ckpt}")
