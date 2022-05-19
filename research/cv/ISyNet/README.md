@@ -177,18 +177,18 @@ Inference result is saved in current path, you can find result like this in acc.
 
 ### Evaluation Performance
 
-| Model               | ImageNet Top-1 mindspore | Latency, ms* | Params, x10^6 | MACs, x10^9 |
-| ------------------- | ------------------------ | ------------ | ------------- |-------------|
-| ISyNet-N0           | 75.03                    |0.43          | 9.59          | 1.13        |
-| ResNet-18+          | 74.3                     |0.63          | 11.69         | 2.28        |
-| ISyNet-N1           | 76.41                    |0.72          | 7.42          | 2.85        |
-| ISyNet-N1-S1        | 76.78                    |0.74          | 7.82          | 2.88        |
-| ISyNet-N1-S2        | 77.45                    |0.83          | 8.86          | 3.34        |
-| ISyNet-N1-S3        | 78.25                    |0.97          | 10.81         | 4.12        |
-| ResNet-34+          | 77.95                    |1.05          | 21.8          | 4.63        |
-| ISyNet-N2           | 79.07                    |1.10          | 19.43         | 4.93        |
-| ISyNet-N3           | 80.43                    |1.55          | 20.47         | 7.32        |
-| ResNet-50+          | 80.18                    |1.64          | 25.56         | 5.19        |
+| Model               | ImageNet Top-1 mindspore | Latency, ms* | Params, x10^6 | MACs, x10^9 | Checkpoint |
+| ------------------- | ------------------------ | ------------ | ------------- |-------------|------------|
+| ISyNet-N0           | 75.03                    |0.43          | 9.59          | 1.13        | [Link](https://download.mindspore.cn/models/r1.6/isynet_N0_ascend_v160_imagenet2012_research_cv_top1acc75.00.ckpt) |
+| ResNet-18+          | 74.3                     |0.63          | 11.69         | 2.28        |  |
+| ISyNet-N1           | 76.41                    |0.72          | 7.42          | 2.85        | [Link](https://download.mindspore.cn/models/r1.6/isynet_N1_ascend_v160_imagenet2012_research_cv_top1acc76.00.ckpt) |
+| ISyNet-N1-S1        | 76.78                    |0.74          | 7.82          | 2.88        | [Link](https://download.mindspore.cn/models/r1.6/isynet_N1S1_ascend_v160_imagenet2012_research_cv_top1acc76.00.ckpt) |
+| ISyNet-N1-S2        | 77.45                    |0.83          | 8.86          | 3.34        | [Link](https://download.mindspore.cn/models/r1.6/isynet_N1S2_ascend_v160_imagenet2012_research_cv_top1acc77.45_top5acc93.68.ckpt) |
+| ISyNet-N1-S3        | 78.25                    |0.97          | 10.81         | 4.12        | [Link](https://download.mindspore.cn/models/r1.6/isynet_N1S3_ascend_v160_imagenet2012_research_cv_top1acc78.00.ckpt) |
+| ResNet-34+          | 77.95                    |1.05          | 21.8          | 4.63        |  |
+| ISyNet-N2           | 79.07                    |1.10          | 19.43         | 4.93        | [Link](https://download.mindspore.cn/models/r1.6/isynet_N2_ascend_v160_imagenet2012_research_cv_top1acc79.00.ckpt) |
+| ISyNet-N3           | 80.43                    |1.55          | 20.47         | 7.32        | [Link](https://download.mindspore.cn/models/r1.6/isynet_N3_ascend_v160_imagenet2012_research_cv_top1acc80.00.ckpt) |
+| ResNet-50+          | 80.18                    |1.64          | 25.56         | 5.19        |  |
 
 Latency is measured on Ascend 310 NPU accelerator with batch size 16 in fp16 precision.
 
