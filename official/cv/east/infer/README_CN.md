@@ -95,7 +95,7 @@ python export.py \
 --image_width=1280 \
 --ckpt_file=xxx/east.ckpt \
 --file_name=east \
---file_format=AIR \
+--file_format='MINDIR' \
 --device_target=Ascend \
 --device_id=0 \
 ```

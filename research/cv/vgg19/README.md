@@ -229,13 +229,13 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=
 # (2) Perform a or b.
 #       a. Set "enable_modelarts=True" on imagenet2012_config.yaml file.
 #          Set "file_name='vgg19'" on imagenet2012_config.yaml file.
-#          Set "file_format='AIR'" on imagenet2012_config.yaml file.
+#          Set "file_format='MINDIR'" on imagenet2012_config.yaml file.
 #          Set "checkpoint_url='s3://dir_to_your_trained_model/'" on imagenet2012_config.yaml file.
 #          Set "ckpt_file='/cache/checkpoint_path/model.ckpt'" on imagenet2012_config.yaml file.
 #          Set other parameters on imagenet2012_config.yaml file you need.
 #       b. Add "enable_modelarts=True" on the website UI interface.
 #          Add "file_name=vgg19" on the website UI interface.
-#          Add "file_format=AIR" on the website UI interface.
+#          Add "file_format='MINDIR'" on the website UI interface.
 #          Add "checkpoint_url=s3://dir_to_your_trained_model/" on the website UI interface.
 #          Add "ckpt_file=/cache/checkpoint_path/model.ckpt" on the website UI interface.
 #          Add other parameters on the website UI interface.

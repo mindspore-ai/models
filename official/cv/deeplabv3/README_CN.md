@@ -446,7 +446,7 @@ bash run_eval_s8_multiscale_flip.sh
     #          在 base_config.yaml 文件中设置 "export_model='deeplab_v3_s8'"
     #          在 base_config.yaml 文件中设置 "export_batch_size=1"
     #          在 base_config.yaml 文件中设置 "file_name='deeplabv3'"
-    #          在 base_config.yaml 文件中设置 "file_format='AIR'"
+    #          在 base_config.yaml 文件中设置 "file_format='MINDIR'"
     #          在 base_config.yaml 文件中设置 "checkpoint_url='/The path of checkpoint in S3/'"
     #          在 base_config.yaml 文件中设置 "ckpt_file='/cache/checkpoint_path/model.ckpt'"
     #          在 base_config.yaml 文件中设置 其他参数
@@ -454,7 +454,7 @@ bash run_eval_s8_multiscale_flip.sh
     #          在网页上设置 "export_model='deeplab_v3_s8'"
     #          在网页上设置 "export_batch_size=1"
     #          在网页上设置 "file_name='deeplabv3'"
-    #          在网页上设置 "file_format='AIR'"
+    #          在网页上设置 "file_format='MINDIR'"
     #          在网页上设置 "checkpoint_url='/The path of checkpoint in S3/'"
     #          在网页上设置 "ckpt_file='/cache/checkpoint_path/model.ckpt'"
     #          在网页上设置 其他参数

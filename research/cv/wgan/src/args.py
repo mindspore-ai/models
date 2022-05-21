@@ -56,7 +56,7 @@ def get_args(phase):
         parser.add_argument('--ckpt_file', type=str, required=True, help="Checkpoint file path.")
         parser.add_argument('--file_name', type=str, default="WGAN", help="output file name prefix.")
         parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], \
-                                                      default='AIR', help='file format')
+                                                      default='MINDIR', help='file format')
         parser.add_argument('--nimages', required=True, type=int, help="number of images to generate", default=1)
 
     elif phase == 'eval':

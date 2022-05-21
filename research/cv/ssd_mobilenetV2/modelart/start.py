@@ -199,7 +199,7 @@ def get_args():
             "AIR",
             "ONNX",
             "MINDIR"],
-        default='AIR',
+        default='MINDIR',
         help='file format')
     args_opt = parser.parse_args()
 

@@ -99,7 +99,7 @@ test_data_dir: "Test dataset dir, default is None"
 checkpoint_path: " Relative path of '*.ckpt' to be evaluated relative to the eval.py"
 ckpt_file: "Checkpoint file path."
 file_name: "Output file name."
-file_format: "Output file format, you can choose from AIR or MINDIR, default is AIR"
+file_format: "Output file format, you can choose from AIR or MINDIR, default is MINDIR"
 ---
 #Choices
 device_target: ["Ascend", "GPU"]

@@ -49,5 +49,5 @@ if __name__ == "__main__":
     print("====================    Start exporting   ==================")
     print(" | Ckpt path: {}".format(Load_checkpoint_path))
     print(" | Air path: {}".format(save_air_path))
-    export(net, *input_data, file_name=os.path.join(save_air_path, 'gpt2'), file_format="AIR")
+    export(net, *input_data, file_name=os.path.join(save_air_path, 'gpt2'), file_format="MINDIR")
     print("====================    Exporting finished   ==================")

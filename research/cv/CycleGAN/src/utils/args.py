@@ -112,7 +112,7 @@ parser.add_argument("--export_batch_size", type=int, default=1, \
 parser.add_argument("--export_file_name", type=str, default="CycleGAN", \
                     help="output file name.")
 parser.add_argument("--export_file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], \
-                    default="AIR", help="file format")
+                    default='MINDIR', help="file format")
 args = parser.parse_args()
 
 

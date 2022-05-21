@@ -201,7 +201,7 @@ Parameters for both training and evaluation can be set in `default_config.yaml`
   batch_size: 16000                   # batch_size for exported model.
   ckpt_file: ''                       # the path of the weight file to be exported relative to the file `export.py`, and the weight file must be included in the code directory.
   file_name: "autodis"                # output file name.
-  file_format: "MINDIR"                  # output file format, you can choose from AIR or MINDIR, default is AIR"
+  file_format: "MINDIR"                  # output file format, you can choose from AIR or MINDIR, default is MINDIR"
   ```
 
 ## [Training Process](#contents)
@@ -293,7 +293,7 @@ Parameters for both training and evaluation can be set in `default_config.yaml`
   #         1. Add ”enable_modelarts=True“
   #         2. Add “ckpt_file=./{path}/*.ckpt”('ckpt_file' indicates the path of the weight file to be exported relative to the file `export.py`, and the weight file must be included in the code directory.)
   #         3. Add ”file_name=autodis“
-  #         4. Add ”file_format=AIR“(you can choose from AIR or MINDIR)
+  #         4. Add ”file_format='MINDIR'“(you can choose from AIR or MINDIR)
   # (7) Check the "data storage location" on the website UI interface and set the "Dataset path" path (This step is useless, but necessary.).
   # (8) Set the "Output file path" and "Job log path" to your path on the website UI interface.
   # (9) Under the item "resource pool selection", select the specification of a single card.

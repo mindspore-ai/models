@@ -30,7 +30,7 @@ if __name__ == '__main__':
     parser.add_argument("--ckpt_url", type=str, required=True, help="Checkpoint file path.")
     parser.add_argument("--file_name", type=str, default="vehiclenet", help="output file name.")
     parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"],
-                        default='AIR', help='file format')
+                        default='MINDIR', help='file format')
     args = parser.parse_args()
 
     context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)

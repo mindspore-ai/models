@@ -49,7 +49,7 @@ python export.py \
 --image_width=768 \
 --ckpt_file=xxx/fastscnn.ckpt \
 --file_name=fastscnn \
---file_format=AIR \
+--file_format='MINDIR' \
 --device_target=Ascend \
 --device_id=0 \
 

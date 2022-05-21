@@ -51,4 +51,4 @@ if __name__ == '__main__':
 
     input_arr = Tensor(np.zeros([1, 3, 227, 227], np.float32))
     export(net, input_arr, file_name=onnx_filename, file_format="ONNX")
-    export(net, input_arr, file_name=air_filename, file_format="AIR")
+    export(net, input_arr, file_name=air_filename, file_format="MINDIR")
