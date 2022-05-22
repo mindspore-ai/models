@@ -13,18 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
-if [ $# != 3 ]; then
-  echo "Usage: bash scripts/run_eval.sh [DATASET_PATH] [DEVICE_ID] [PRETRAINED_MODEL]"
-  exit 1
+if [ -d out ]; then
+    rm -rf out
 fi
 
-run_ascend() {
-  ulimit -u unlimited
-  echo "start evaluation for device $2"
-  env >env.log
-  python eval.py --test_mindrecord=$1 --device_id=$2 --pretrained_model=$3 > log_eval.txt 2>&1 &
-  cd ..
-}
+mkdir out
+cd out || exit
 
-run_ascend $1 $2 $3
+if [ -f "Makefile" ]; then
+  make clean
+fi
+
+cmake .. \
+    -DMINDSPORE_PATH="`pip show mindspore-ascend | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
+make
