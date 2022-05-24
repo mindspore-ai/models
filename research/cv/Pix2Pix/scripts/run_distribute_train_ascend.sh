@@ -46,6 +46,7 @@ do
         mkdir ./train_parallel$i/results/loss_show
         cp -r ../src ./train_parallel$i
         cp -r ../*.py ./train_parallel$i
+        cp -r ../*.yaml ./train_parallel$i
         cd ./train_parallel$i || exit
         export RANK_ID=$i
         echo "start training for rank $i, device $DEVICE_ID"

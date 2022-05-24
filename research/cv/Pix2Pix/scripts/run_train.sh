@@ -21,7 +21,7 @@ echo "==========================================================================
 
 if [ $# != 2 ]
 then
-    echo "Usage: bash run_train_gpu.sh [DEVICE_TARGET] [DEVICE_ID]"
+    echo "Usage: bash run_train.sh [DEVICE_TARGET] [DEVICE_ID]"
     exit 1
 fi
 
@@ -35,6 +35,7 @@ mkdir ./train/results/predict
 cp ./*.py ./train
 cp ./scripts/*.sh ./train
 cp -r ./src ./train
+cp -r ./*.yaml ./train
 cd ./train || exit
 
-python train.py --device_target GPU --device_id 0 &> log &
+python train.py --device_target $1 --device_id $2 &> log &
