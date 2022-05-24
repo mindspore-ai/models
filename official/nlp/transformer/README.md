@@ -203,14 +203,24 @@ bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_P
 ```shell
 .
 └─Transformer
+  ├─README_CN.md
   ├─README.md
+  ├─ascend310_infer
+    ├─build.sh
+    ├─CMakeLists.txt
+    ├─inc
+    │ └─utils.h
+    └─src
+      ├─main.cc
+      └─utils.cc
   ├─scripts
     ├─process_output.sh
     ├─replace-quote.perl
-    ├─run_distribute_train_ascend.sh
     ├─run_distribute_train_ascend_multi_machines.sh
-    ├─run_eval.sh
+    ├─run_distribute_train_ascend.sh
+    ├─run_distribute_train_gpu.sh
     ├─run_eval_onnx.sh                                      // bash script for ONNX evaluation
+    ├─run_eval.sh
     ├─run_infer_310.sh
     └─run_standalone_train.sh
   ├─src
@@ -224,20 +234,22 @@ bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_P
     ├─transformer_model.py
     ├─weight_init.py
     └─model_utils
+      ├─__init__.py
       ├─config.py
       ├─device_adapter.py
       ├─local_adapter.py
       └─moxing_adapter.py
-  ├─default_config.yaml
-  ├─default_config_large.yaml
-  ├─default_config_large_gpu.yaml
   ├─create_data.py
+  ├─default_config_large_gpu.yaml
+  ├─default_config_large.yaml
+  ├─default_config.yaml
+  ├─eval_onnx.py                                            // script for ONNX evaluation
   ├─eval.py
-  ├─eval.py                                                 // script for ONNX evaluation
   ├─export.py
   ├─mindspore_hub_conf.py
   ├─postprocess.py
   ├─preprocess.py
+  ├─requirements.txt
   └─train.py
 ```
 
@@ -418,7 +430,7 @@ Parameters for learning rate:
 ### [Export MindIR](#contents)
 
 ```shell
-python export.py --model_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --model_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [CONFIG_PATH]
 ```
 
 The ckpt_file parameter is required,
@@ -430,7 +442,7 @@ Before performing inference, the mindir file must be exported by `export.py` scr
 
 ```shell
 # Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CONFIG_PATH]
 ```
 
 - `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'.

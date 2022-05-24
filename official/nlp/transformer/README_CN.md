@@ -204,12 +204,23 @@ bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_P
 ```shell
 .
 └─Transformer
+  ├─README_CN.md
   ├─README.md
+  ├─ascend310_infer
+    ├─build.sh
+    ├─CMakeLists.txt
+    ├─inc
+    │ └─utils.h
+    └─src
+      ├─main.cc
+      └─utils.cc
   ├─scripts
     ├─process_output.sh
     ├─replace-quote.perl
-    ├─run_distribute_train_ascend.sh
     ├─run_distribute_train_ascend_multi_machines.sh
+    ├─run_distribute_train_ascend.sh
+    ├─run_distribute_train_gpu.sh
+    ├─run_eval_onnx.sh
     ├─run_eval.sh
     ├─run_infer_310.sh
     └─run_standalone_train.sh
@@ -224,19 +235,22 @@ bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_P
     ├─transformer_model.py
     ├─weight_init.py
     └─model_utils
+      ├─__init__.py
       ├─config.py
       ├─device_adapter.py
       ├─local_adapter.py
       └─moxing_adapter.py
-  ├─default_config.yaml
-  ├─default_config_large.yaml
-  ├─default_config_large_gpu.yaml
   ├─create_data.py
+  ├─default_config_large_gpu.yaml
+  ├─default_config_large.yaml
+  ├─default_config.yaml
+  ├─eval_onnx.py
   ├─eval.py
   ├─export.py
   ├─mindspore_hub_conf.py
   ├─postprocess.py
   ├─preprocess.py
+  ├─requirements.txt
   └─train.py
 ```
 
@@ -390,7 +404,7 @@ Parameters for learning rate:
 ### [导出MindIR](#contents)
 
 ```shell
-python export.py --model_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --model_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [CONFIG_PATH]
 ```
 
 参数ckpt_file为必填项，
@@ -402,7 +416,7 @@ python export.py --model_file [CKPT_PATH] --file_name [FILE_NAME] --file_format 
 
 ```shell
 # Ascend310 推理
-bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CONFIG_PATH]
 ```
 
 - `NEED_PREPROCESS` 表示是否需要对数据集进行预处理, 取值为'y' 或者 'n'。
