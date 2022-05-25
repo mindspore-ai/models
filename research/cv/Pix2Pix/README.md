@@ -96,10 +96,9 @@ The entire code structure is as following:
   └─download_Pix2Pix_dataset.sh        # download dataset
 ├── scripts
   └─run_infer_310.sh                   # launch ascend 310 inference
-  └─run_train_ascend.sh                # launch ascend training(1 pcs)
   └─run_distribute_train_ascend.sh     # launch ascend training(8 pcs)
   └─run_eval_ascend.sh                 # launch ascend eval
-  └─run_train_gpu.sh                   # launch gpu training(1 pcs)
+  └─run_train.sh                       # launch gpu/ascend training(1 pcs)
   └─run_distribute_train_gpu.sh        # launch gpu training(8 pcs)
   └─run_eval_gpu.sh                    # launch gpu eval
 ├─ imgs
@@ -180,7 +179,7 @@ bash run_distribute_train_ascend.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] 
 ```python
 python train.py --device_target [GPU] --device_id [0]
 OR
-bash scripts/run_train_gpu.sh [DEVICE_TARGET] [DEVICE_ID]
+bash scripts/run_train.sh [DEVICE_TARGET] [DEVICE_ID]
 ```
 
 - running distributed trainning on GPU with fixed parameters
