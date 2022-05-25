@@ -28,8 +28,8 @@ def _conv(in_channels, out_channels, kernel_size=3, stride=1, padding=0, pad_mod
     shp_weight_conv = (out_channels, in_channels, kernel_size, kernel_size)
 
     shp_bias_conv = (out_channels,)
-    weights = initializer('Normal', shape=shp_weight_conv, dtype=mstype.float32).to_tensor()
-    bias_conv = initializer(0, shape=shp_bias_conv, dtype=mstype.float32).to_tensor()
+    weights = initializer('Normal', shape=shp_weight_conv, dtype=mstype.float32).init_data()
+    bias_conv = initializer(0, shape=shp_bias_conv, dtype=mstype.float32).init_data()
 
     layers = []
     layers += [nn.Conv2d(in_channels, out_channels,
@@ -193,18 +193,18 @@ class RPN(nn.Cell):
 
         shp_weight_conv = (feat_channels, in_channels, 3, 3)
         shp_bias_conv = (feat_channels,)
-        weight_conv = initializer('Normal', shape=shp_weight_conv, dtype=mstype.float32).to_tensor()
-        bias_conv = initializer(0, shape=shp_bias_conv, dtype=mstype.float32).to_tensor()
+        weight_conv = initializer('Normal', shape=shp_weight_conv, dtype=mstype.float32).init_data()
+        bias_conv = initializer(0, shape=shp_bias_conv, dtype=mstype.float32).init_data()
 
         shp_weight_cls = (num_anchors * cls_out_channels, feat_channels, 1, 1)
         shp_bias_cls = (num_anchors * cls_out_channels,)
-        weight_cls = initializer('Normal', shape=shp_weight_cls, dtype=mstype.float32).to_tensor()
-        bias_cls = initializer(0, shape=shp_bias_cls, dtype=mstype.float32).to_tensor()
+        weight_cls = initializer('Normal', shape=shp_weight_cls, dtype=mstype.float32).init_data()
+        bias_cls = initializer(0, shape=shp_bias_cls, dtype=mstype.float32).init_data()
 
         shp_weight_reg = (num_anchors * 4, feat_channels, 1, 1)
         shp_bias_reg = (num_anchors * 4,)
-        weight_reg = initializer('Normal', shape=shp_weight_reg, dtype=mstype.float32).to_tensor()
-        bias_reg = initializer(0, shape=shp_bias_reg, dtype=mstype.float32).to_tensor()
+        weight_reg = initializer('Normal', shape=shp_weight_reg, dtype=mstype.float32).init_data()
+        bias_reg = initializer(0, shape=shp_bias_reg, dtype=mstype.float32).init_data()
 
         rpn_reg_cls_block = RpnRegClsBlock(in_channels, feat_channels, num_anchors, cls_out_channels, \
                                            weight_conv, bias_conv, weight_cls, \

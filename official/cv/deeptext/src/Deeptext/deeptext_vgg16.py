@@ -36,8 +36,8 @@ def _conv(in_channels, out_channels, kernel_size=3, stride=1, padding=0, pad_mod
     shp_weight_conv = (out_channels, in_channels, kernel_size, kernel_size)
 
     shp_bias_conv = (out_channels,)
-    weights = initializer('Normal', shape=shp_weight_conv, dtype=mstype.float32).to_tensor()
-    bias_conv = initializer(0, shape=shp_bias_conv, dtype=mstype.float32).to_tensor()
+    weights = initializer('Normal', shape=shp_weight_conv, dtype=mstype.float32).init_data()
+    bias_conv = initializer(0, shape=shp_bias_conv, dtype=mstype.float32).init_data()
 
     layers = []
     layers += [nn.Conv2d(in_channels, out_channels,
