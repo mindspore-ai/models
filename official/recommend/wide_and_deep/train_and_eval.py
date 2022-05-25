@@ -113,7 +113,6 @@ def train_wide_and_deep():
                         enable_graph_kernel=_enable_graph_kernel, device_target=cfg.device_target)
     if _enable_graph_kernel:
         context.set_context(graph_kernel_flags="--enable_cluster_ops=MatMul")
-    context.set_context(enable_sparse=cfg.sparse)
     test_train_eval(cfg)
 
 if __name__ == "__main__":

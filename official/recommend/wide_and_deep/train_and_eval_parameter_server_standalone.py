@@ -127,8 +127,6 @@ def train_wide_and_deep():
     """ train_wide_and_deep """
     if not cache_enable:
         cfg.sparse = True
-    if cfg.sparse:
-        context.set_context(enable_sparse=True)
     if cfg.device_target == "GPU":
         context.set_context(enable_graph_kernel=True)
         context.set_context(graph_kernel_flags="--enable_cluster_ops=MatMul")
