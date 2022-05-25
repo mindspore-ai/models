@@ -152,6 +152,10 @@
 "models/official/cv/retinanet/infer/mxbase/retinanetDetection/RetinanetDetection.h"     "runtime/references"
 "models/official/cv/retinanet/infer/mxbase/retinanetDetection/RetinanetDetection.cpp"   "runtime/references"
 
+"models/official/audio/melgan/infer/mxbase/src/main.cpp" "runtime/references"
+"models/official/audio/melgan/infer/mxbase/src/Melgan.h" "runtime/references"
+"models/official/audio/melgan/infer/mxbase/src/Melgan.cpp" "runtime/references"
+
 "models/official/audio/lpcnet/ascend310_infer/inc/lpcnet.h" "runtime/int"
 "models/official/audio/lpcnet/ascend310_infer/src/main.cc" "build/include_subdir"
 
