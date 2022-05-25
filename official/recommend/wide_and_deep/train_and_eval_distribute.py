@@ -130,7 +130,6 @@ def train_wide_and_deep():
         context.set_context(enable_graph_kernel=True)
         context.set_context(graph_kernel_flags="--enable_cluster_ops=MatMul")
 
-    context.set_context(enable_sparse=cfg.sparse)
     init()
     context.set_context(save_graphs_path='./graphs_of_device_id_'+str(get_rank()))
     context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,

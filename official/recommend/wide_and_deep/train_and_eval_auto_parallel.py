@@ -154,7 +154,6 @@ def train_wide_and_deep():
     if cfg.device_target == "GPU":
         context.set_context(enable_graph_kernel=True)
     context.set_context(variable_memory_max_size="24GB")
-    context.set_context(enable_sparse=True)
     init()
     context.set_context(save_graphs_path='./graphs_of_device_id_' + str(get_rank()), save_graphs=True)
     if cfg.sparse:
