@@ -50,7 +50,7 @@ python export.py \
 --image_width=500 \
 --ckpt_file=xxx/brdnet.ckpt \
 --file_name=brdnet \
---file_format=AIR \
+--file_format='AIR' \
 --device_target=Ascend \
 --device_id=0 \
 ```

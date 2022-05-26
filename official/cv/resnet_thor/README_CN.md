@@ -120,7 +120,7 @@ bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]
     │    └── dataset.py                            # 数据预处理
     ├── eval.py                                    # 推理脚本
     ├── train.py                                   # 训练脚本
-    ├── export.py                                  # 将checkpoint文件导出为AIR文件
+    ├── export.py                                  # 将checkpoint文件导出为MINDIR,AIR文件
     └── mindspore_hub_conf.py                      # MinSpore Hub仓库的配置文件
 ```
 

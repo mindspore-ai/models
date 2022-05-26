@@ -64,7 +64,7 @@ def export_models(checkpoint_path):
         input_data = Tensor(np.zeros([1, 3, 224, 224]), mstype.float32)
 
         if args_opt.export_mindir_model:
-            export(net, input_data, file_name=output_file, file_format="MINDIR")
+            export(net, input_data, file_name=output_file, file_format="AIR")
         if args_opt.export_air_model and context.get_context("device_target") == "Ascend":
             export(net, input_data, file_name=output_file, file_format="AIR")
         if args_opt.export_onnx_model:

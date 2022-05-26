@@ -45,7 +45,7 @@ parser.add_argument('--file_name', type=str,
                     default='wrn-autoaugment', help='Output file name.',)
 parser.add_argument(
     '--file_format', type=str, choices=['AIR', 'ONNX', 'MINDIR'],
-    default='AIR', help='Export format.',
+    default='MINDIR', help='Export format.',
 )
 parser.add_argument(
     '--device_target', type=str, choices=['Ascend', 'GPU', 'CPU'],

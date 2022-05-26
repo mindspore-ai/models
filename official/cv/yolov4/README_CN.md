@@ -258,7 +258,7 @@ YOLOv4需要CSPDarknet53主干来提取图像特征进行检测。 您可以从[
     ├─config.py                       # 参数配置
     ├─cspdarknet53.py                 # 网络主干
     ├─distributed_sampler.py          # 数据集迭代器
-    ├─export.py                       # 将MindSpore模型转换为AIR模型
+    ├─export.py                       # 将MindSpore模型转换为MINDIR,AIR模型
     ├─initializer.py                  # 参数初始化器
     ├─logger.py                       # 日志函数
     ├─loss.py                         # 损失函数

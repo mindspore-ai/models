@@ -268,13 +268,13 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
     # (1) 执行 a 或者 b.
     #       a. 在 base_config.yaml 文件中设置 "enable_modelarts=True"
     #          在 base_config.yaml 文件中设置 "file_name='faster_rcnn'"
-    #          在 base_config.yaml 文件中设置 "file_format='AIR'"
+    #          在 base_config.yaml 文件中设置 "file_format='MINDIR'"
     #          在 base_config.yaml 文件中设置 "checkpoint_url='/The path of checkpoint in S3/'"
     #          在 base_config.yaml 文件中设置 "ckpt_file='/cache/checkpoint_path/model.ckpt'"
     #          在 base_config.yaml 文件中设置 其他参数
     #       b. 在网页上设置 "enable_modelarts=True"
     #          在网页上设置 "file_name='faster_rcnn'"
-    #          在网页上设置 "file_format='AIR'"
+    #          在网页上设置 "file_format='MINDIR'"
     #          在网页上设置 "checkpoint_url='/The path of checkpoint in S3/'"
     #          在网页上设置 "ckpt_file='/cache/checkpoint_path/model.ckpt'"
     #          在网页上设置 其他参数

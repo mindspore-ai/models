@@ -92,7 +92,7 @@ python export.py \
 --image_width=112 \
 --ckpt_file=xxx/r2plus1d_best_map.ckpt \
 --file_name=r2plus1d \
---file_format=AIR \
+--file_format='MINDIR' \
 --device_target=Ascend
 ```
 

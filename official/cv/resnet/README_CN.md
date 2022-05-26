@@ -680,12 +680,12 @@ ModelArts导出mindir
 #          设置 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt" 在 yaml 文件。
 #          设置 "checkpoint_url=/The path of checkpoint in S3/" 在 yaml 文件。
 #          设置 "file_name='./resnet'"参数在yaml文件。
-#          设置 "file_format='AIR'" 参数在yaml文件。
+#          设置 "file_format='MINDIR'" 参数在yaml文件。
 #       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
 #          增加 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" 参数在modearts的界面上。
 #          增加 "checkpoint_url=/The path of checkpoint in S3/" 参数在modearts的界面上。
 #          设置 "file_name='./resnet'"参数在modearts的界面上。
-#          设置 "file_format='AIR'" 参数在modearts的界面上。
+#          设置 "file_format='MINDIR'" 参数在modearts的界面上。
 # (4) 在modelarts的界面上设置代码的路径 "/path/resnet"。
 # (5) 在modelarts的界面上设置模型的启动文件 "export.py" 。
 # 模型的输出路径"Output file path" 和模型的日志路径 "Job log path" 。

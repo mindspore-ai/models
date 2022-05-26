@@ -114,7 +114,7 @@ def export_AIR(opt, reals):
         G_curr.set_train(False)
         x = Tensor(functions.generate_noise([opt.nc_z, opt.nzx, opt.nzy]))
         y = Tensor(functions.generate_noise([opt.nc_z, opt.nzx, opt.nzy]))
-        export(G_curr, x, y, file_name='%s/SinGAN' % (opt.out_mindir), file_format="MINDIR")
+        export(G_curr, x, y, file_name='%s/SinGAN' % (opt.out_mindir), file_format="AIR")
         scale_num += 1
     print("SinGAN exported")
 

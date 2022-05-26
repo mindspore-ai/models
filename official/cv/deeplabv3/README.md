@@ -445,7 +445,7 @@ bash run_eval_s8_multiscale_flip.sh
     #          Set "export_model='deeplab_v3_s8'" on base_config.yaml file.
     #          Set "export_batch_size=1" on base_config.yaml file.
     #          Set "file_name='deeplabv3'" on base_config.yaml file.
-    #          Set "file_format='AIR'" on base_config.yaml file.
+    #          Set "file_format='MINDIR'" on base_config.yaml file.
     #          Set "checkpoint_url='/The path of checkpoint in S3/'" on beta_config.yaml file.
     #          Set "ckpt_file='/cache/checkpoint_path/model.ckpt'" on base_config.yaml file.
     #          Set other parameters on base_config.yaml file you need.
@@ -453,7 +453,7 @@ bash run_eval_s8_multiscale_flip.sh
     #          Add "export_model='deeplab_v3_s8'" on the website UI interface.
     #          Add "export_batch_size=1" on the website UI interface.
     #          Add "file_name='deeplabv3'" on the website UI interface.
-    #          Add "file_format='AIR'" on the website UI interface.
+    #          Add "file_format='MINDIR'" on the website UI interface.
     #          Add "checkpoint_url='/The path of checkpoint in S3/'" on the website UI interface.
     #          Add "ckpt_file='/cache/checkpoint_path/model.ckpt'" on the website UI interface.
     #          Add other parameters on the website UI interface.

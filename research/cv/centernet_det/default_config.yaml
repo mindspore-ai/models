@@ -235,7 +235,7 @@ eval_config:
 export_config:
     input_res: dataset_config.input_res
     ckpt_file: "./ckpt_file.ckpt"
-    export_format: "AIR"
+    export_format: "MINDIR"
     export_name: "CenterNet_Hourglass"
 
 ---

@@ -185,7 +185,7 @@ After installing MindSpore via the official website and Dataset is correctly gen
       #          Add "ckpt_file=/cache/checkpoint_path/model.ckpt" on the website UI interface.
       #          Add "checkpoint_url=s3://dir_to_your_trained_ckpt/" on the website UI interface.
       #          Add "file_name=bgcf" on the website UI interface.
-      #          Add "file_format=AIR" on the website UI interface.
+      #          Add "file_format='MINDIR'" on the website UI interface.
       #          (options)Add "device_target=GPU" on the website UI interface if run on GPU.
       #          Add other parameters on the website UI interface.
       # (2) Upload or copy your trained model to S3 bucket.
