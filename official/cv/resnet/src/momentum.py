@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -139,7 +139,7 @@ class Momentum(Optimizer):
         weight_decay = Tensor(0.0, ms.float32)
         scale = Tensor(1.0, ms.float32)
         if self.exec_weight_decay:
-            weight_decay = self.weight_decay_tensor
+            weight_decay = self.weight_decay
         if self.need_scale:
             scale = self.reciprocal_scale
         lr = self.get_lr()
