@@ -21,7 +21,7 @@ from pprint import pprint, pformat
 import yaml
 
 
-_config_path = '../../default_config.yaml'
+_config_path = '../../config/default_config.yaml'
 
 
 class Config:
