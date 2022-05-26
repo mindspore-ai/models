@@ -15,8 +15,8 @@
 # ============================================================================
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_standalone_train_gpu.sh DATASET_PATH"
-echo "for example: sh run_standalone_train_gpu.sh /home/workspace/ag"
+echo "sh run_standalone_train_gpu.sh DATASET_PATH DATASET_NAME"
+echo "for example: sh run_standalone_train_gpu.sh /home/workspace/ag ag"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 get_real_path(){
@@ -28,9 +28,9 @@ get_real_path(){
 }
 
 DATASET=$(get_real_path $1)
-echo $DATASET
-DATANAME=$(basename $DATASET)
-echo $DATANAME
+echo DATASET_PATH=$DATASET
+DATANAME=$2
+echo DATANAME=$DATANAME
 
 config_path="./${DATANAME}_config.yaml"
 echo "config path is : ${config_path}"

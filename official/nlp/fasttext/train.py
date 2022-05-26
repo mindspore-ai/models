@@ -16,7 +16,6 @@
 import os
 import time
 from mindspore import context
-from mindspore.communication.management import init, get_rank
 from mindspore.nn.optim import Adam
 from mindspore.common import set_seed
 from mindspore.train.model import Model
@@ -249,14 +248,7 @@ def modelarts_pre_process():
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_train():
     '''run train.'''
-    if config.device_target == "Ascend":
-        config.rank_id = get_device_id()
-    elif config.device_target == "GPU":
-        init("nccl")
-        config.rank_id = get_rank()
-    else:
-        raise ValueError("Not support device target: {}".format(config.device_target))
-
+    config.rank_id = int(os.environ.get("RANK_ID", "0"))
     if config.run_distribute:
         train_paralle(config.dataset_path)
     else:
