@@ -70,7 +70,10 @@ After installing MindSpore via the official website, you can start training and 
                   --device_target [TARGET] \
                   --data_path [DATA_PATH]> train.log 2>&1 &
   OR
-  sh scripts/run_train.sh [DATASET]
+  # Ascend
+  bash scripts/run_train.sh [DATASET]
+  # CPU
+  bash scripts/run_train_cpu.sh
 
   # run evaluation example
   # need set config_path in config.py file and set data_path, checkpoint_file_path in yaml file
@@ -79,7 +82,10 @@ After installing MindSpore via the official website, you can start training and 
                  --checkpoint_file_path [CKPT_FILE] \
                  --data_path [DATA_PATH] > eval.log 2>&1 &
   OR
-  sh scripts/run_eval.sh [CKPT_FILE] [DATASET]
+  # Ascend
+  bash scripts/run_eval.sh [CKPT_FILE] [DATASET]
+  # CPU
+  bash scripts/run_eval_cpu.sh [CKPT_FILE]
   ```
 
 - running on GPU
@@ -202,7 +208,10 @@ For more configuration details, please refer the script `*.yaml`.
                   --device_target [DEVICE_TARGET] \
                   --data_path [DATA_PATH]> train.log 2>&1 &
   OR
+  # Ascend
   bash scripts/run_train.sh [DATASET]
+  # CPU
+  bash scripts/run_train_cpu.sh
   ```
 
 - running on GPU
@@ -214,7 +223,7 @@ For more configuration details, please refer the script `*.yaml`.
                   --device_target GPU \
                   --data_path [DATA_PATH]> train.log 2>&1 &
   OR
-  bash scripts/run_train.sh [DATASET] [DATA_PATH]
+  bash scripts/run_train_gpu.sh [DATASET] [DATA_PATH]
   ```
 
   The python command above will run in the background, you can view the results through the file `train.log`.
@@ -244,7 +253,10 @@ For more configuration details, please refer the script `*.yaml`.
                  --checkpoint_file_path [CKPT_FILE] \
                  --data_path [DATA_PATH] > eval.log 2>&1 &
   OR
+  # Ascend
   bash scripts/run_eval.sh [CKPT_FILE] [DATASET]
+  # CPU
+  bash scripts/run_eval_cpu.sh [CKPT_FILE]
   ```
 
 - evaluation on movie review dataset when running on GPU

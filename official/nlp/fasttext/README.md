@@ -157,10 +157,10 @@ The FastText network script and code result are as follows:
   │   ├──load_dataset.py                     // Dataset loader to feed into model.
   │   ├──lr_scheduler.py                     // Learning rate scheduler.
   ├── scripts
-  │   ├──run_distributed_train.sh            // shell script for distributed train on ascend.
+  │   ├──create_dataset.sh                   // shell script for Dataset preparation.
   │   ├──run_eval.sh                         // shell script for standalone eval on ascend.
   │   ├──run_standalone_train.sh             // shell script for standalone eval on ascend.
-  │   ├──run_distributed_train_gpu.sh        // shell script for distributed train on GPU.
+  │   ├──run_distribute_train_gpu.sh        // shell script for distributed train on GPU.
   │   ├──run_eval_gpu.sh                     // shell script for standalone eval on GPU.
   │   ├──run_standalone_train_gpu.sh         // shell script for standalone train on GPU.
   ├── ag_config.yaml                         // ag dataset arguments
@@ -230,7 +230,7 @@ Parameters for both training and evaluation can be set in config.py. All the dat
 
         ```bash
         cd ./scripts
-        bash run_distributed_train_gpu.sh [DATASET_PATH] [NUM_OF_DEVICES]
+        bash run_distribute_train_gpu.sh [DATASET_PATH] [NUM_OF_DEVICES]
         ```
 
 ### [Inference Process](#content)
