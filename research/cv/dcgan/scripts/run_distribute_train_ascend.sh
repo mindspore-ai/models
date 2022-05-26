@@ -16,7 +16,7 @@
 
 if [ $# != 3 ]
 then
-    echo "Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_URL] [TRAIN_URL]"
+    echo "Usage: bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATA_URL] [TRAIN_URL]"
 exit 1
 fi
 
@@ -81,7 +81,7 @@ do
     cd ./train_parallel$i || exit
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     env > env.log
-    taskset -c $cmdopt nohup python -u train.py --device_id=$i --run_distribute=True \
+    taskset -c $cmdopt nohup python -u train.py --device_target=Ascend --device_id=$i --run_distribute=True \
                     --data_url=$PATH2 --train_url=$PATH3 > distribute_train_log 2>&1 &
     cd ..
 done

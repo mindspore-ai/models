@@ -72,11 +72,23 @@ Train DCGAN Dataset used: [Imagenet-1k](<http://www.image-net.org/index>)
          └─utils.cc                      # 310 inference utils file
       ├─build.sh                         # 310 inference build file
       └─CMakeLists.txt                   # 310 inference cmake file
+  ├─ gpu_infer
+      ├─inc
+         └─utils.h                       # gpu inference header file
+      ├─src
+         ├─main.cc                       # gpu inference main file
+         └─utils.cc                      # gpu inference utils file
+      ├─build.sh                         # gpu inference build file
+      └─CMakeLists.txt                   # gpu inference cmake file
   ├─scripts                              # shell script
-    ├─run_standalone_train.sh            # training in standalone mode(1pcs)
-    ├─run_distribute_train.sh            # training in parallel mode(8 pcs)
-    ├─run_eval.sh                        # evaluation
-    └─run_infer_310.sh                   # infer on 310
+    ├─run_standalone_train_ascend.sh     # training in standalone mode(1pc)
+    ├─run_standalone_train_gpu.sh        # training in standalone mode(1pc)
+    ├─run_distribute_train_ascend.sh     # training in parallel mode(8pcs)
+    ├─run_distribute_train_gpu.sh        # training in parallel mode(8pcs)
+    ├─run_eval_ascend.sh                 # evaluation on ascend
+    ├─run_eval_gpu.sh                    # evaluation on gpu
+    ├─run_infer_310.sh                   # infer on 310
+    └─run_infer_gpu.sh                   # infer on gpu
   ├─ src
     ├─dataset.py                         # dataset create
     ├─cell.py                            # network definition
@@ -87,10 +99,9 @@ Train DCGAN Dataset used: [Imagenet-1k](<http://www.image-net.org/index>)
  ├─ train.py                             # train dcgan
  ├─ eval.py                              # eval dcgan
  ├─ preprocess.py                        # preprocess on 310
- ├─ postprocess.py                       # postprocess on 310
- ├─ verifyBySklSvmNetD_20_all_310.py     # verify on 310
  ├─ export.py                            # export checkpoint file
- └─ export_310.py                        # export checkpoint file for 310
+ ├─ verify.py                            # verify on 310
+ └─ requirements.txt                     # requirements
 ```
 
 ## [Script Parameters](#contents)
@@ -98,11 +109,17 @@ Train DCGAN Dataset used: [Imagenet-1k](<http://www.image-net.org/index>)
 ### [Training Script Parameters](#contents)
 
 ```shell
-# distributed training
-Usage: bash run_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [SAVE_PATH]
+# distributed training on ascend
+Usage: bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATA_URL] [TRAIN_URL]
 
-# standalone training
-Usage: bash run_standalone_train.sh [DATASET_PATH] [SAVE_PATH]
+# standalone training on ascend
+Usage: bash run_standalone_train_ascend.sh [DEVICE_ID] [DATA_URL] [TRAIN_URL]
+
+# distributed training on gpu
+Usage: bash run_distribute_train_gpu.sh [DEVICE_NUM] [CUDA_VISIBLE_DEVICES] [DATA_URL] [TRAIN_URL]
+
+# standalone training on gpu
+Usage: bash run_standalone_train_gpu.sh [DEVICE_ID] [DATA_URL] [TRAIN_URL]
 ```
 
 ### [Parameters Configuration](#contents)
@@ -135,6 +152,8 @@ dcgan_cifar10_cfg {
 }
 ```
 
+- In order to conveniently store the files of the inference process,  batch_size of cifar10 is set to 100
+
 ## [Training Process](#contents)
 
 - Set options in `config.py`, including learning rate, output filename and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
@@ -145,7 +164,7 @@ dcgan_cifar10_cfg {
 
 ```bash
 # standalone training
-run_standalone_train.sh [DATASET_PATH] [SAVE_PATH]
+Usage: bash run_standalone_train_ascend.sh [DEVICE_ID] [DATA_URL] [TRAIN_URL]
 ```
 
 ### [Distributed Training](#content)
@@ -153,7 +172,7 @@ run_standalone_train.sh [DATASET_PATH] [SAVE_PATH]
 - Run `run_distribute_train.sh` for distributed training of DCGAN model.
 
 ```bash
-run_distribute.sh [RANK_TABLE_FILE] [DATASET_PATH] [SAVE_PATH]
+bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATA_URL] [TRAIN_URL]
 ```
 
 - Notes
@@ -177,19 +196,26 @@ Date time:  2021-04-13 13:57:28         epoch:  0 / 20         step:  250 / 1001
 
 ### [Evaluation](#content)
 
-- Run `run_eval.sh` for evaluation.
+- Run  the evaluation script.
 
 ```bash
-# infer
-bush run_eval.sh [IMG_URL] [CKPT_URL]
+# eval on ascend or gpu
+bush run_eval_ascend.sh [IMG_URL] [CKPT_URL] [DEVICE_ID]
+# bush run_eval_gpu.sh [IMG_URL] [CKPT_URL] [DEVICE_ID]
 ```
 
-- Implement inference at Ascend310 platform.
+- Implement inference at Ascend310 or GPU platform.
 
 ```bash
-# infer
-bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
+# infer on ascend or gpu
+bash run_infer_310.sh [MINDIR_PATH] [DATA_URL] [DEVICE_ID]
+# bash run_infer_gpu.sh [MINDIR_PATH] [DATA_URL] [DEVICE_ID]
 ```
+
+- Notes
+1. A major contribution of the dcgan paper is to verify the capability of unsupervised representation learning with CNN, so we reproduce it on run_infer_310.sh or run_infer_gpu.sh.
+2. The infer process requires environment variable to be set, such as LD_PRELOAD, PYTHONPATH, LD_LIBRARY_PATH in run_infer_gpu.sh.
+3. 2.If you have the problem of `undefined reference to google::FlagRegisterer`, please refer to the [issue](#https://gitee.com/mindspore/mindspore/issues/I3X1EA).
 
 ### [Evaluation result](#content)
 
@@ -209,23 +235,23 @@ python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 
 ### Evaluation Performance
 
-| Parameters                 | Ascend                                                      |
-| -------------------------- | ----------------------------------------------------------- |
-| Model Version              | V1                                                          |
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G             |
-| uploaded Date              | 16/04/2021 (month/day/year)                                 |
-| MindSpore Version          | 1.1.1                                                       |
-| Dataset                    | ImageNet2012                                                |
-| Training Parameters        | epoch=20,  batch_size = 128                                 |
-| Optimizer                  | Adam                                                         |
-| Loss Function              | BCELoss                                      |
-| Output                     | predict class                                               |
-| Accuracy                   | 310: 78.2%                                             |
-| Loss                       | 10.9852                                                     |
-| Speed                      | 1pc: 420 ms/step;  8pcs:  195 ms/step                          |
-| Total time                 | 1pc: 25.32 hours                                            |
-| Checkpoint for Fine tuning | 79.05M(.ckpt file)                                         |
-| Scripts                    | [dcgan script](https://gitee.com/mindspore/models/tree/master/research/cv/dcgan) |
+| Parameters                 | Ascend                                                       | GPU                                                          |
+| -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Model Version              | V1                                                           | V1                                                           |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G              | RTX 3090; CPU 2.90GHz, 64cores; Memory, 256G                 |
+| uploaded Date              | 16/04/2021 (month/day/year)                                  | 06/05/2022 (month/day/year)                                  |
+| MindSpore Version          | 1.1.1                                                        | 1.6.1                                                        |
+| Dataset                    | ImageNet2012, cifar-10                                       | ImageNet2012, cifar-10                                       |
+| Training Parameters        | epoch=20,  batch_size = 128                                  | epoch=20,  batch_size = 128                                  |
+| Optimizer                  | Adam                                                         | Adam                                                         |
+| Loss Function              | BCELoss                                                      | BCELoss                                                      |
+| Output                     | predict class                                                | predict class                                                |
+| Accuracy                   | 310: 78.2%                                                   | 1pc: 77.8% ;  8pcs:  75.1%                                   |
+| Loss                       | 10.9852                                                      | 0.3325(Dloss); 4.6742(Gloss)                                 |
+| Speed                      | 1pc: 420 ms/step;  8pcs:  195 ms/step                        | 1pc: 104 ms/step;  8pcs:  178 ms/step                        |
+| Total time                 | 1pc: 25.32 hours                                             | 1pc: 5.79 hours;  8pcs:  1.24 hours                          |
+| Checkpoint for Fine tuning | 79.05M(.ckpt file)                                           | 69.67M(.ckpt file)                                           |
+| Scripts                    | [dcgan script](https://gitee.com/mindspore/models/tree/master/research/cv/dcgan) | [dcgan script](https://gitee.com/mindspore/models/tree/master/research/cv/dcgan) |
 
 # [Description of Random Situation](#contents)
 

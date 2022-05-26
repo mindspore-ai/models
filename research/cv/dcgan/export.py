@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -115,14 +115,16 @@ parser.add_argument("--run_modelart", type=ast.literal_eval, default=False, help
 parser.add_argument('--device_target', type=str, default='Ascend', choices=('Ascend', 'GPU'),
                     help='device where the code will be implemented (default: Ascend)')
 parser.add_argument("--device_id", type=int, default=0, help="Device id")
-parser.add_argument("--batch_size", type=int, default=128, help="batch size")
+parser.add_argument("--batch_size", type=int, default=100, help="batch size")
 parser.add_argument("--ckpt_url", default=None, help="Checkpoint file url.")
 parser.add_argument("--ckpt_file", default=None, help="Checkpoint file name.")
 parser.add_argument('--data_url', default=None, help='Directory contains dataset.')
 parser.add_argument('--train_url', default=None, help='Directory contains checkpoint file')
 parser.add_argument("--file_name", type=str, default="dcgan", help="output file name.")
 parser.add_argument("--file_format", type=str, default="MINDIR", help="file format")
-parser.add_argument("--only_load_netG", type=str, default=False, help="export only load netG, default is false.")
+parser.add_argument("--load_netG", type=str, default=False, help="export  netG, default is false.")
+parser.add_argument("--load_netD", type=str, default=True, help="export  netD for infer, default is True.")
+parser.add_argument("--load_G_and_D", type=str, default=False, help="export  netG and netD, default is false.")
 args = parser.parse_args()
 
 if args.run_modelart:
@@ -131,31 +133,27 @@ if args.run_modelart:
     context.set_context(mode=context.GRAPH_MODE, device_target="Ascend",
                         save_graphs=False)
     context.set_context(device_id=device_id)
-
     import moxing as mox
     mox.file.copy_parallel(src_url=args.ckpt_url, dst_url=local_ckpt_url)
+    local_ckpt_url = local_ckpt_url + args.ckpt_file
 else:
-    local_ckpt_url = args.ckpt_url + args.ckpt_file
+    local_ckpt_url = args.ckpt_file
     device_target = args.device_target
     device_id = args.device_id
     context.set_context(mode=context.GRAPH_MODE, device_target=device_target, save_graphs=False, device_id=device_id)
 
 
 if __name__ == '__main__':
-    if args.run_modelart:
-        dcgan = load_dcgan(local_ckpt_url + args.ckpt_file)
+    if args.load_netD:
+        dcgan = load_dcgan(local_ckpt_url)
         d_conv1, d_leakyReLU1, d_conv2, d_bm1, d_leakyReLU2, d_conv3 = load_discriminator(dcgan)
         discriminator_convert = DiscriminatorConvert(conv1=d_conv1, leakyReLU1=d_leakyReLU1, conv2=d_conv2, bm1=d_bm1,
                                                      leakyReLU2=d_leakyReLU2, conv3=d_conv3)
         discriminator_convert.set_train(False)
 
-        inputs = Tensor(np.random.rand(1, 3, 32, 32), mstype.float32)
+        inputs = Tensor(np.random.rand(args.batch_size, 3, 32, 32), mstype.float32)
         export(discriminator_convert, inputs, file_name=args.file_name, file_format=args.file_format)
-        file_name = args.file_name + "." + args.file_format.lower()
-        if args.run_modelart:
-            mox.file.copy_parallel(src_url=file_name,
-                                   dst_url=os.path.join(args.ckpt_url, file_name))
-    elif args.only_load_netG:
+    elif args.load_netG:
         dcgan = load_dcgan(local_ckpt_url)
         netG_trained = dcgan.myTrainOneStepCellForG.network.netG
         netG_trained.set_train(False)
@@ -168,3 +166,7 @@ if __name__ == '__main__':
         latent_code = Tensor(np.random.rand(args.batch_size, 100, 1, 1), mstype.float32)
         inputs = [real_data, latent_code]
         export(dcgan, *inputs, file_name=args.file_name, file_format=args.file_format)
+    if args.run_modelart:
+        file_name = args.file_name + "." + args.file_format.lower()
+        mox.file.copy_parallel(src_url=file_name,
+                               dst_url=os.path.join(args.ckpt_url, file_name))

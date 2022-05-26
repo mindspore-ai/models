@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,12 +64,13 @@ def load_dcgan(ckpt_url):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='MindSpore dcgan training')
-    parser.add_argument('--device_id', type=int, default=0, help='device id of Ascend (Default: 0)')
+    parser.add_argument('--device_target', type=str, default='Ascend', help='Ascend or GPU')
+    parser.add_argument('--device_id', type=int, default=0, help='device id of Ascend or GPU (Default: 0)')
     parser.add_argument('--img_url', type=str, default=None, help='img save path')
     parser.add_argument('--ckpt_url', type=str, default=None, help='checkpoint load path')
     args = parser.parse_args()
 
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
     context.set_context(device_id=args.device_id)
 
     fixed_noise = Tensor(np.random.normal(size=(16, cfg.latent_size, 1, 1)).astype("float32"))
