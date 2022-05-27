@@ -223,14 +223,7 @@ Parameters for both training and evaluation can be set in config.py. All the dat
 
         ```bash
         cd ./scripts
-        bash run_standalone_train_gpu.sh [DATASET_PATH]
-        ```
-
-    - Running scripts for distributed training of FastText. Task training on multiple device and run the following command in bash to be executed in `scripts/`:
-
-        ```bash
-        cd ./scripts
-        bash run_distribute_train_gpu.sh [DATASET_PATH] [NUM_OF_DEVICES]
+        bash run_standalone_train_gpu.sh [DATASET_PATH] [DATANAME]
         ```
 
 ### [Inference Process](#content)
