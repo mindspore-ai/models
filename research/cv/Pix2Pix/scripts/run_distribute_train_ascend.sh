@@ -13,9 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if [ $# != 4 ]
+if [ $# != 2 ]
 then
-    echo "Usage: sh run_distribute_train.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] [DATASET_PATH]"
+    echo "Usage: sh run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH]"
     exit 1
 fi
 
@@ -29,12 +29,12 @@ get_real_path(){
   fi
 }
 
-export RANK_SIZE=$1
-export DISTRIBUTE=$2
-export RANK_TABLE_FILE=$(get_real_path $3)
-export DATASET_PATH=$(get_real_path $4)
+export RANK_SIZE=8
+export DEVICE_NUM=8
+export RANK_TABLE_FILE=$(get_real_path $1)
+export DATASET_PATH=$(get_real_path $2)
 
-for((i=0;i<RANK_SIZE;i++))
+for((i=0;i<$DEVICE_NUM;i++))
 do
         export DEVICE_ID=$i
         rm -rf ./train_parallel$i
@@ -49,10 +49,11 @@ do
         cp -r ../*.yaml ./train_parallel$i
         cd ./train_parallel$i || exit
         export RANK_ID=$i
+        export DEVICE_ID=$i
         echo "start training for rank $i, device $DEVICE_ID"
         env > env.log
 
-        python train.py --run_distribute=$DISTRIBUTE --device_target Ascend --device_num=$RANK_SIZE \
+        python train.py --run_distribute 1 --device_target Ascend \
                         --device_id=$DEVICE_ID --train_data_dir $DATASET_PATH &> log &
         cd ..
 done

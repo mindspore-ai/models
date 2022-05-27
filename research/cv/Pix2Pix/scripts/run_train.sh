@@ -14,9 +14,9 @@
 # limitations under the License.
 
 echo "====================================================================================================================="
-echo "Please run the train as: "
-echo "python train.py device_target device_id"
-echo "for example: python train.py --device_target GPU --device_id 0"
+echo "Run this script as: "
+echo "bash run_train.sh [device_target] [device_id]"
+echo "for example: bash run_train.sh --device_target GPU --device_id 0"
 echo "====================================================================================================================="
 
 if [ $# != 2 ]
@@ -32,10 +32,10 @@ mkdir ./train/results/fake_img
 mkdir ./train/results/loss_show
 mkdir ./train/results/ckpt
 mkdir ./train/results/predict
-cp ./*.py ./train
-cp ./scripts/*.sh ./train
-cp -r ./src ./train
-cp -r ./*.yaml ./train
+cp ../*.py ./train
+cp ../scripts/*.sh ./train
+cp -r ../src ./train
+cp -r ../*.yaml ./train
 cd ./train || exit
 
 python train.py --device_target $1 --device_id $2 &> log &
