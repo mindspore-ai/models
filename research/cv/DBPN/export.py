@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,31 +13,38 @@
 # limitations under the License.
 # ============================================================================
 
-"""export file."""
-
+"""export net together with checkpoint into air/mindir models"""
+import os
+import os.path as osp
 import argparse
-
 import numpy as np
-from mindspore import context, Tensor
-from mindspore.train.serialization import export
+from src.model.generator import get_generator
+from mindspore import Tensor, context, export
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
-from src.model.generator import get_generator
-
-parser = argparse.ArgumentParser(description="DBPN export")
-parser.add_argument('--file_name', type=str, default='D-DBPN', help='output file name prefix.')
-parser.add_argument('--file_format', type=str, choices=['AIR', 'ONNX', 'MINDIR'], default='MINDIR', help='file format')
-parser.add_argument("--generator_path", type=str, default='/data/DBPN_data/dbpn_ckpt/gen_ckpt/D-DBPN-best.ckpt')
+parser = argparse.ArgumentParser(description='dbpn export')
+parser.add_argument("--batch_size", type=int, default=1, help="batch size")
+parser.add_argument("--ckpt_path", type=str, required=True, help="path of checkpoint file")
+parser.add_argument("--file_name", type=str, default="ddbpn", help="output file name.")
+parser.add_argument("--file_format", type=str, default="MINDIR", choices=['MINDIR', 'AIR', 'ONNX'], help="file format")
+parser.add_argument('--scale', type=int, default='4', help='super resolution scale')
 parser.add_argument("--device_id", type=int, default=0, help="device id, default: 0.")
+parser.add_argument('--model_type', type=str, default='DDBPN', choices=["DBPNS", "DDBPN", "DBPN", "DDBPNL"])
+args = parser.parse_args()
 
 if __name__ == '__main__':
-    args = parser.parse_args()
     context.set_context(mode=context.GRAPH_MODE, device_id=args.device_id)
-    generator = get_generator("D-DBPN", 4)
-    params = load_checkpoint(args.generator_path)
+    model = args.model_type
+    generator = get_generator(model, args.scale)
+    params = load_checkpoint(args.ckpt_path)
     load_param_into_net(generator, params)
-    generator.set_train(True)
-    input_shp = [16, 3, 60, 60]
+    generator.set_train(False)
+    print('load mindspore net and checkpoint successfully.')
+    input_shp = [1, 3, 200, 200]
     input_array = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp).astype(np.float32))
     G_file = "{}_model".format(args.file_name)
-    export(generator, input_array, file_name=G_file, file_format=args.file_format)
+    G_file_path = osp.join(os.getcwd(), G_file)
+    if not osp.exists(G_file_path):
+        os.makedirs(G_file_path)
+    export(generator, input_array, file_name=G_file_path, file_format=args.file_format)
+    print('export successfully!')

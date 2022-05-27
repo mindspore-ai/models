@@ -14,6 +14,8 @@
 # ============================================================================
 
 """DBPN test"""
+import os
+import os.path as osp
 import argparse
 import ast
 import time
@@ -35,7 +37,7 @@ parser.add_argument('--model_type', type=str, default='DDBPN', choices=["DBPNS",
 parser.add_argument('--vgg', type=ast.literal_eval, default=True, help="use vgg")
 parser.add_argument('--isgan', type=ast.literal_eval, default=False, help="is_gan decides the way of training ")
 parser.add_argument('--testBatchSize', type=int, default=1, help='testing batch size')
-parser.add_argument('--save_eval_path', type=str, default="./Results/eval", help='save eval image path')
+parser.add_argument('--save_eval_path', type=str, default="Results/eval", help='save eval image path')
 
 args = parser.parse_args()
 print(args)
@@ -47,6 +49,13 @@ def predict(ds, model):
         ds(Dataset): eval dataset
         model(Cell): the generate model
     """
+    sum_psnr = 0
+    val_steps = ds.get_dataset_size()
+    start = time.time()
+    # savepath = osp.join(os.getcwd(), args.save_eval_path)
+    savepath = args.save_eval_path
+    if not osp.exists(savepath):
+        os.makedirs(savepath)
     for index, batch in enumerate(ds.create_dict_iterator(), 1):
         lr = batch['input_image']
         hr = batch['target_image']
@@ -58,8 +67,11 @@ def predict(ds, model):
         print("hr shape", hr.shape)
         print("prediction shape", prediction.shape)
         print("===> Processing: {} compute_psnr:{:.4f}|| Timer: {:.2f} sec.".format(index, psnr_value, (t1 - t0)))
-        save_img(prediction, str(index), args.save_eval_path)
-
+        sum_psnr += psnr_value
+        save_img(prediction, str(index), savepath)
+    end = time.time()
+    mean = sum_psnr / val_steps
+    print("Avg_psnr:{:.4f} ||Timer:{:.2f} min".format(mean, int((end - start) / 60)))
 
 if __name__ == "__main__":
     context.set_context(mode=context.GRAPH_MODE, device_id=args.device_id)

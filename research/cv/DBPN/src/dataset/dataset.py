@@ -22,6 +22,7 @@ from PIL import Image, ImageOps
 import mindspore.dataset.vision.py_transforms as P
 from mindspore import dataset as de, context
 from mindspore.context import ParallelMode
+from mindspore.communication import get_rank, get_group_size
 
 
 def is_image_file(filename):
@@ -156,10 +157,10 @@ class DistributedSampler:
 
 def create_train_dataset(dataset, args):
     """return train dataset """
-    device_num = int(os.getenv("RANK_SIZE"))
-    rank = int(os.getenv('DEVICE_ID'))
     parallel_mode = context.get_auto_parallel_context("parallel_mode")
     if parallel_mode in [ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL]:
+        rank = get_rank()
+        device_num = get_group_size()
         distributed_sampler = DistributedSampler(len(dataset), device_num, rank, shuffle=True)
         train_ds = de.GeneratorDataset(dataset, column_names=['target_image', 'input_image', 'bicubic_image'],
                                        sampler=distributed_sampler)
