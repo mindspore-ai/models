@@ -47,7 +47,7 @@ def calculate_fan_in_and_fan_out(shape):
 
 def get_conv_bias(cell):
     weight = initializer.initializer(initializer.HeUniform(negative_slope=math.sqrt(5)),
-                                     cell.weight.shape, cell.weight.dtype).to_tensor()
+                                     cell.weight.shape, cell.weight.dtype).init_data()
     fan_in, _ = calculate_fan_in_and_fan_out(weight.shape)
     bound = 1 / math.sqrt(fan_in)
     return initializer.initializer(initializer.Uniform(scale=bound),

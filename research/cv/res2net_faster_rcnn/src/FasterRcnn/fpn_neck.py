@@ -34,7 +34,7 @@ def _conv(
     shape = (out_channels, in_channels, kernel_size, kernel_size)
     weights = initializer(
         "XavierUniform", shape=shape, dtype=mstype.float32
-    ).to_tensor()
+    ).init_data()
     shape_bias = (out_channels,)
     biass = bias_init_zeros(shape_bias)
     return nn.Conv2d(
