@@ -18,12 +18,21 @@ then
   echo "Please run the script as: "
   echo "For example:"
   echo "cd DBPN"
-  echo "Usage: sh run_eval.sh [DEVICE_ID] [CKPT] [MODEL_TYPE] [VAL_GT_PATH] [VAL_LR_PATH]"
-  echo "bash scripts/run_eval.sh 0 /data/DBPN_data/dbpn_ckpt/gen_ckpt/D-DBPN-best.ckpt DDBPN /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR"
+  echo "Usage: bash run_eval.sh [DEVICE_ID] [CKPT] [MODEL_TYPE] [VAL_GT_PATH] [VAL_LR_PATH]"
+  echo "bash run_eval.sh 0 /data/DBPN_data/dbpn_ckpt/gen_ckpt/D-DBPN-best.ckpt DDBPN /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR"
   echo "MODE control the way of trian gan network or only train generator"
   echo "Using absolute path is recommended"
   echo "==========================================================================="
   exit 1
 fi
-mkdir -p ../Results/eval
-python ../eval.py  --device_id=$1 --ckpt=$2 --model_type=$3 --val_GT_path=$4 --val_LR_path=$5
+
+export DEVICE_ID=$1
+export RANK_SIZE=1
+
+rm -rf ./eval
+mkdir ./eval
+cp -r ../src ./eval
+cp -r ../*.py ./eval
+
+env > env.log
+python ./eval/eval.py  --device_id=$1 --ckpt=$2 --model_type=$3 --val_GT_path=$4 --val_LR_path=$5 > eval.log 2>&1 &

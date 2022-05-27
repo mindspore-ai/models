@@ -37,10 +37,12 @@ The DBPN contains a generation network and a discriminator network.
 
 Train DBPN Dataset used: [DIV2K](<https://data.vision.ee.ethz.ch/cvl/DIV2K/>)
 
-- Note: Data will be processed in src/dataset/traindataset.py
+- Note: Data will be processed in src/dataset/dataset.py
 
 Validation and eval evaluationdataset
-used: [Set5](<http://people.rennes.inria.fr/Aline.Roumy/results/SR_BMVC12.html>) [Set14](<https://sites.google.com/site/romanzeyde/research-interests>)
+used: [Set5](<http://people.rennes.inria.fr/Aline.Roumy/results/SR_BMVC12.html>)
+
+datasets of Set5, you can download from: [Set5](https://gitee.com/yzzheng/dbpn-310/tree/master/Set5)
 
 - Note:Data will be processed in src/dataset/dataset.py
 
@@ -62,17 +64,18 @@ The entire code structure is as following:
 
 ```markdown
 .DBPN
-├─ README.md                    # descriptions about DBPN
-├── scripts  
-  └─run_distribute_train.sh     # launch ascend training(8 pcs)
-  └─run_stranalone_train.sh     # launch ascend training(1 pcs)
-  └─run_eval.sh                 # launch ascend eval
+├─ README.md                       # descriptions about DBPN
+├── scripts
+  ├─ run_infer_310.sh              # launch ascend 310 inference
+  └─ run_distribute_train.sh       # launch ascend training(8 pcs)
+  └─ run_stranalone_train.sh       # launch ascend training(1 pcs)
+  └─ run_eval.sh                   # launch ascend eval
 ├─ src
   ├─ dataset
-    └─ dataset.py                 # dataset for training and evaling
+    └─ dataset.py                  # dataset for training and evaling
   ├─ loss
-    ├─ withlosscell.py            # DBPN Gan loss Cell define
-    └─ generatorloss.py           # compute_psnr losses function define
+    ├─ withlosscell.py             # DBPN Gan loss Cell define
+    └─ generatorloss.py            # compute_psnr losses function define
   ├─ model
     ├─ base_network.py             # the basic unit for build neural network
     ├─ dbpns.py                    # generator DBPNS define  T = 2
@@ -93,6 +96,8 @@ The entire code structure is as following:
 ├─ train_dbpn.py                   # train dbpn  script
 ├─ train_dbpngan.py                # train gan network script
 ├─ eval.py                         # eval
+├─ preprocess.py                   # preprocess script
+├─ postprocess.py                  # postprocess scripts
 └─ export.py                       # export mindir script
 ```
 
@@ -101,15 +106,26 @@ The entire code structure is as following:
 ### [Training Script Parameters](#contents)
 
 ```shell
-# distributed training DBPN models
-Usage: bash run_distribute_train.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] [TRAIN_GT_PATH] [VAL_GT_PATH] [VAL_LR_PATH] [MODE]
+# distributed training DDBPN models
+Usage: bash run_distribute_train.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] [MODEL_TYPE] [TRAIN_GT_PATH] [VAL_GT_PATH] [VAL_LR_PATH] [BATCHSIZE] [MODE]
 
-eg: bash run_distribute_train.sh 8 1 ./hccl_8p.json /data/DBPN_data/DIV2K_train_HR /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR False
+eg: bash run_distribute_train.sh 8 1 ./hccl_8p.json DDBPN /data/DBPN_data/DIV2K_train_HR /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR 4 False
+
+# distributed training DBPNGAN models
+Usage: bash run_distribute_train.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] [MODEL_TYPE] [TRAIN_GT_PATH] [VAL_GT_PATH] [VAL_LR_PATH] [BATCHSIZE] [MODE]
+
+eg: bash run_distribute_train.sh 8 1 ./hccl_8p.json DBPN /data/DBPN_data/DIV2K_train_HR /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR 4 True
+
+# standalone training DDBPN models
+Usage: bash run_standalone_train.sh [DEVICE_ID] [MODEL_TYPE] [TRAIN_GT_PATH] [VAL_GT_PATH] [VAL_LR_PATH] [BATCHSIZE] [MODE]
+
+eg: bash run_standalone_train.sh 0 DDBPN /data/DBPN_data/DIV2K_train_HR /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR 16 False
 
 # standalone training DBPN models
-Usage: bash run_standalone_train.sh [DEVICE_ID] [MODEL_TYPE] [TRAIN_GT_PATH] [VAL_GT_PATH] [VAL_LR_PATH] [MODE]
+Usage: bash run_standalone_train.sh [DEVICE_ID] [MODEL_TYPE] [TRAIN_GT_PATH] [VAL_GT_PATH] [VAL_LR_PATH] [BATCHSIZE] [MODE]
 
-eg: bash run_standalone_train.sh 0 DDBPN /data/DBPN_data/DIV2K_train_HR /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR False
+eg: bash run_standalone_train.sh 0 DBPN /data/DBPN_data/DIV2K_train_HR /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR 4 True
+
 ```
 
 ### [Training Result](#content)
@@ -125,14 +141,62 @@ You can find checkpoint file in ckpt.
 - Run `run_eval.sh` for evaluation.
 
 ```bash
-#evaling
+#evaling DDBPN
 bash run_eval.sh [DEVICE_ID] [CKPT] [MODEL_TYPE] [VAL_GT_PATH] [VAL_LR_PATH]
-eg: bash scripts/run_eval.sh 0 /data/DBPN_data/dbpn_ckpt/gen_ckpt/D-DBPN-best.ckpt DDBPN /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR
+
+eg: bash run_eval.sh 0 /data/DBPN_data/dbpn_ckpt/gen_ckpt/D-DBPN-best.ckpt DDBPN /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR
+
+#evaling DBPNGAN network
+bash run_eval.sh [DEVICE_ID] [CKPT] [MODEL_TYPE] [VAL_GT_PATH] [VAL_LR_PATH]
+
+eg: bash run_eval.sh 0 /data/DBPN_data/dbpn_ckpt/gan_ckpt/best_G.ckpt DBPN /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR
 ```
 
 ### [Evaluation result](#content)
 
 Evaluation result will be stored in the result. Under this, you can find generator pictures.
+
+## [Inference Process](#contents)
+
+### [Export MindIR](#contents)
+
+```bash
+# export DDBPN
+python export.py  [CKPT] [FILE_NAME] [FILE_FORMAT]
+
+eg: python export.py --ckpt_path=ckpt/Set5_DDBPN_best.ckpt --file_name=ddbpn --file_format=MINDIR --model_type=DDBPN
+
+# export DBPN GAN networks
+python export.py  [CKPT] [FILE_NAME] [FILE_FORMAT]
+
+eg: python export.py --ckpt_path=ckpt/best_G.ckpt --file_name=dbpn --file_format=MINDIR --model_type=DBPN
+```
+
+The pretrained parameter is required. EXPORT_FORMAT should be in ["AIR", "MINDIR"] Current batch_size can only be set to 1.
+
+### [Infer on Ascend310](#contents)
+
+Before performing inference, the mindir file must be exported by `export.py`.Current batch_Size can only be set to 1.
+
+```shell
+# Ascend310 inference about DDBPN network
+bash run_infer_310.sh [MINDIR_PATH] [VAL_GT_PATH] [VAL_LR_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
+
+eg: bash run_infer_310.sh ddbpn_model.mindir /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR y Ascend 0
+
+# Ascend310 inference about DBPN network
+bash run_infer_310.sh [MINDIR_PATH] [VAL_GT_PATH] [VAL_LR_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
+
+eg: bash run_infer_310.sh dbpn_model.mindir /data/DBPN_data/Set5/HR /data/DBPN_data/Set5/LR y Ascend 0
+```
+
+### [Result](#contents)
+
+Inference result is saved in current path, you can find result like this in acc.log file.
+
+```bash
+'avg psnr': 27.52
+```
 
 # [Model Description](#contents)
 

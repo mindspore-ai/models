@@ -21,6 +21,7 @@ Example:
        --val_LR_path="/data/DBPN_data/Set5/LR" --val_GT_path="/data/DBPN_data/Set5/HR"
 """
 import os
+import os.path as osp
 import time
 
 import mindspore
@@ -37,23 +38,27 @@ from src.util.config import get_args
 from src.util.utils import save_losses, denorm, save_img, compute_psnr, save_psnr
 
 args = get_args(is_gan=True)
-
 print(args)
 mindspore.set_seed(args.seed)
-
 G_losses = []
 D_losses = []
 best_psnr = 0
 eval_psnr = []
 
 # create save eval folder
-save_eval_path = os.path.join(args.Results, args.valDataset, args.model_type)
-if not os.path.exists(save_eval_path):
+save_eval_path = osp.join(os.getcwd(), args.Results, args.valDataset, args.model_type)
+if not osp.exists(save_eval_path):
     os.makedirs(save_eval_path)
 
-save_loss_path = 'results/ganloss/'
-if not os.path.exists(save_loss_path):
+# create save loss folder
+save_loss_path = osp.join(os.getcwd(), 'results/ganloss')
+if not osp.exists(save_loss_path):
     os.makedirs(save_loss_path)
+
+# create save ckpt folder
+saveckpt = osp.join(os.getcwd(), os.getcwd(), args.save_folder)
+if not osp.exists(saveckpt):
+    os.makedirs(saveckpt)
 
 
 class DBPNGAN(nn.Cell):
@@ -98,10 +103,11 @@ def pretrain_netG(net, ds):
             G_losses.append(loss)
         mean = epoch_loss.asnumpy() / ds_steps
         print("===> Epoch {} Complete: Avg. Loss: {:.4f}".format(epoch, mean))
-        pname = os.path.join(save_loss_path, args.valDataset + '_' + args.model_type)
+        lossname = "{}-{}.png".format(args.valDataset, args.model_type)
+        pname = os.path.join(save_loss_path, lossname)
         save_losses(G_losses, D_losses, pname)
     print('Pre-training finished.')
-    save_path = os.path.join(args.save_folder, args.pretrained_dbpn)
+    save_path = os.path.join(saveckpt, args.pretrained_dbpn)
     save_checkpoint(net, save_path)
     print('the checkpoint has been saved!')
 
@@ -127,11 +133,13 @@ def predict(net, ds):
     mean = sum_psnr / val_steps
     print(" Avg_psnr:{:.4f} ||Timer:{:.2f} min".format(mean, int((t1 - t0) / 60)))
     eval_psnr.append(mean)
-    savepath = "result/ganloss/{}-{}-psnr.png".format(args.valDataset, args.model_type)
+    img_name = "{}-{}-psnr.png".format(args.valDataset, args.model_type)
+    savepath = osp.join(save_loss_path, img_name)
     save_psnr(eval_psnr, savepath, args.model_type)
     if best_psnr < mean:
         best_psnr = mean
-        save_checkpoint(netG, os.path.join(args.save_folder, 'best_G.ckpt'))
+        best_checkpoint_path = os.path.join(saveckpt, 'best_G.ckpt')
+        save_checkpoint(netG, best_checkpoint_path)
 
 
 if __name__ == "__main__":
@@ -213,8 +221,9 @@ if __name__ == "__main__":
             G_losses.append(netG_loss.asnumpy())
         end = time.time()
         step_time = (end - start) / size
-        print("===>Epoch {} Complete, per step time: {}ms.".format(num+1, step_time*1000))
-        name = os.path.join(save_loss_path, args.valDataset + '_' + args.model_type)
-        save_losses(G_losses, D_losses, name)
+        print("===>Epoch {} Complete, per step time: {:.2f}ms.".format(num+1, step_time*1000))
+        loss_name = "{}-{}.png".format(args.valDataset, args.model_type)
+        lname = os.path.join(save_loss_path, loss_name)
+        save_losses(G_losses, D_losses, lname)
         if args.eval_flag:
             predict(netG, val_ds)
