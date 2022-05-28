@@ -171,7 +171,7 @@ python train.py --device_target [Ascend] --device_id [0]
 - running distributed trainning on Ascend with fixed parameters
 
 ```python
-bash run_distribute_train_ascend.sh [DEVICE_NUM] [DISTRIBUTE] [RANK_TABLE_FILE] [DATASET_PATH]
+bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATASET_PATH]
 ```
 
 - running on GPU with fixed parameters
@@ -185,7 +185,7 @@ bash scripts/run_train.sh [DEVICE_TARGET] [DEVICE_ID]
 - running distributed trainning on GPU with fixed parameters
 
 ```python
-bash run_distribute_train_gpu.sh [DATASET_PATH] [DATASET_NAME] [DEVICE_NUM]
+bash run_distribute_train_gpu.sh [DATASET_PATH] [DATASET_NAME]
 ```
 
 ## [Evaluation](#contents)

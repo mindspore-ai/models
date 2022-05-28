@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 3 ]
+if [ $# != 2 ]
 then
-    echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [DATASET_NAME] [DEVICE_NUM]"
+    echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [DATASET_NAME]"
     exit 1
 fi
 
@@ -37,8 +37,8 @@ then
     exit 1
 fi
 
-export DEVICE_NUM=$3
-export RANK_SIZE=$3
+export DEVICE_NUM=4
+export RANK_SIZE=4
 
 rm -rf ./train_parallel
 mkdir ./train_parallel
@@ -55,11 +55,11 @@ cd ./train_parallel || exit
 
 if [ $2 == 'facades' ];
 then
-    mpirun -n $3 --output-filename log_output --merge-stderr-to-stdout --allow-run-as-root python train.py --device_target GPU \
-    --run_distribute 1 --device_num $3 --dataset_size 400 --train_data_dir $PATH1 --pad_mode REFLECT &> log &
+    mpirun -n $DEVICE_NUM --output-filename log_output --merge-stderr-to-stdout --allow-run-as-root python train.py --device_target GPU \
+    --run_distribute 1 --dataset_size 400 --train_data_dir $PATH1 --pad_mode REFLECT &> log &
 elif [ $2 == 'maps' ];
 then
-    mpirun --allow-run-as-root -n $3 --output-filename log_output --merge-stderr-to-stdout \
-    python train.py --device_target GPU --device_num $3 --dataset_size 1096 \
+    mpirun --allow-run-as-root -n $DEVICE_NUM --output-filename log_output --merge-stderr-to-stdout \
+    python train.py --device_target GPU --dataset_size 1096 \
     --run_distribute 1 --train_data_dir $PATH1 --pad_mode REFLECT &> log &
 fi
