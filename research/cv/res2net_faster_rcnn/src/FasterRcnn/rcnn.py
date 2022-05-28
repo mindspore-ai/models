@@ -101,11 +101,11 @@ class Rcnn(nn.Cell):
         shape_0 = (self.rcnn_fc_out_channels, representation_size)
         weights_0 = initializer(
             "XavierUniform", shape=shape_0[::-1], dtype=self.ms_type
-        ).to_tensor()
+        ).init_data()
         shape_1 = (self.rcnn_fc_out_channels, self.rcnn_fc_out_channels)
         weights_1 = initializer(
             "XavierUniform", shape=shape_1[::-1], dtype=self.ms_type
-        ).to_tensor()
+        ).init_data()
         self.shared_fc_0 = DenseNoTranpose(
             representation_size, self.rcnn_fc_out_channels, weights_0
         )
@@ -117,12 +117,12 @@ class Rcnn(nn.Cell):
             "Normal",
             shape=[num_classes, self.rcnn_fc_out_channels][::-1],
             dtype=self.ms_type,
-        ).to_tensor()
+        ).init_data()
         reg_weight = initializer(
             "Normal",
             shape=[num_classes * 4, self.rcnn_fc_out_channels][::-1],
             dtype=self.ms_type,
-        ).to_tensor()
+        ).init_data()
         self.cls_scores = DenseNoTranpose(
             self.rcnn_fc_out_channels, num_classes, cls_weight
         )
