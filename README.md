@@ -349,7 +349,7 @@ MindSpore is Apache 2.0 licensed. Please see the LICENSE file.
 
 ## FAQ
 
-For more information about `MindSpore` framework, please refer to [FAQ](https://www.mindspore.cn/docs/faq/en/master/index.html)
+For more information about `MindSpore` framework, please refer to [FAQ](https://www.mindspore.cn/docs/en/master/faq/installation.html)
 
 - **Q: How to resolve the lack of memory while using the model directly under "models" with errors such as *Failed to alloc memory pool memory*?**
 

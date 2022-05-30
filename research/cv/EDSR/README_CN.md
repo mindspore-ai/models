@@ -107,7 +107,7 @@ EDSR是由多个优化后的residual blocks串联而成，相比原始版本的r
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/docs/programming_guide/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
 # 快速入门
