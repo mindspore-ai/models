@@ -350,7 +350,7 @@ MindSpore已获得Apache 2.0许可，请参见LICENSE文件。
 
 ## FAQ
 
-想要获取更多关于`MindSpore`框架使用本身的FAQ问题的，可以参考[官网FAQ](https://www.mindspore.cn/docs/faq/zh-CN/master/index.html)
+想要获取更多关于`MindSpore`框架使用本身的FAQ问题的，可以参考[官网FAQ](https://www.mindspore.cn/docs/zh-CN/master/faq/installation.html)
 
 - **Q: 直接使用models下的模型出现内存不足错误，例如*Failed to alloc memory pool memory*, 该怎么处理?**
 

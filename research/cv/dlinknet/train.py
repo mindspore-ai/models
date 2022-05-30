@@ -34,7 +34,7 @@ def create_dataset(_dataset_generator, _device_num, _rank_id, _batch_size):
     """
     when doing distributed training, dataset.GeneratorDataset need to set num_shards and shard_id
     see:
-    https://mindspore.cn/docs/api/zh-CN/master/api_python/dataset/mindspore.dataset.GeneratorDataset.html#mindspore.dataset.GeneratorDataset
+    https://mindspore.cn/docs/zh-CN/master/api_python/dataset/mindspore.dataset.GeneratorDataset.html#mindspore.dataset.GeneratorDataset
     https://blog.csdn.net/weixin_43431343/article/details/121895510
     """
     if device_num == 1:
