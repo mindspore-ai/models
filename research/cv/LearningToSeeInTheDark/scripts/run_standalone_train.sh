@@ -35,7 +35,7 @@ then
 fi
 
 if [ ! -d $PATH1 ]
-then 
+then
     echo "error: DATASET_PATH=$PATH1 is not a directory"
 exit 1
 fi
@@ -60,7 +60,7 @@ mkdir ./train
 cp ../*.py ./train
 cp *.sh ./train
 cp -r ../src ./train
-cd ./train 
+cd ./train
 echo "start training for device $DEVICE_ID"
 env > env.log
 if [ $# == 1 ]
@@ -73,5 +73,3 @@ then
     python train_sony.py  --run_distribute=False  --data_url=$PATH1 --pre_trained=$PATH2 &> train.log &
 fi
 cd ..
-
-

@@ -1,0 +1,14 @@
+mode: 1
+device: 'GPU'
+device_id: 0
+input_dir: './dataset/SID/Sony/short/'
+gt_dir: './dataset/SID/Sony/long/'
+checkpoint_dir: './result_Sony_ms/'
+result_dir: './result_Sony_ms/'
+save_freq: 500
+epochs: 9000
+batch_size: 1
+lr: 0.0001
+
+# test
+checkpoint: "checkpoints/ckpt_sony_ms_adam-2000_161.ckpt"
