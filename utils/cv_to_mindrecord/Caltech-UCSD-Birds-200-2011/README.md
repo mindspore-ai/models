@@ -26,8 +26,8 @@ Download Caltech-UCSD Birds-200-2011 dataset, transfer it to mindrecord, use Min
 ### Download Caltech-UCSD Birds-200-2011 dataset and unzip
 
 1. Download the training data zip.
-    > [Caltech-UCSD Birds-200-2011 dataset download address](http://www.vision.caltech.edu/visipedia/CUB-200-2011.html)  
-    > **1) -> Download -> All Images and Annotations**  
+    > [Caltech-UCSD Birds-200-2011 dataset download address](http://www.vision.caltech.edu/datasets/cub_200_2011/)  
+    > **1) -> Download -> Images and annotations**  
     > **2) -> Download -> Segmentations**  
 
 2. Unzip the training data to dir example/nlp_to_mindrecord/Caltech-UCSD-Birds-200-2011/data.

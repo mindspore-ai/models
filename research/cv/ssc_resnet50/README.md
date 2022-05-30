@@ -302,7 +302,7 @@ acc1:>=76.5
 | 总时长         | 270h\*2                            | 370h\*2                            |
 | 参数(M)        | 25.5                               | 25.5                               |
 | 微调检查点     | 720.27M(ckpt)                       | 720.27M(ckpt)                      |
-| 配置文件       | [链接](https://gitee.com/mindspore/models/research/ssc_resnet50/deafult_config.yaml) | [链接](https://gitee.com/mindspore/models/research/ssc_resnet50/deafult_config.yaml) |
+| 配置文件       | [链接](https://gitee.com/mindspore/models/blob/master/research/cv/ssc_resnet50/default_config.yaml) | [链接](https://gitee.com/mindspore/models/blob/master/research/cv/ssc_resnet50/default_config.yaml) |
 
 ## 随机情况说明
 

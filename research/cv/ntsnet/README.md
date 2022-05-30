@@ -32,7 +32,7 @@ NTS-Net consists of a Navigator agent, a Teacher agent and a Scrutinizer agent. 
 
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 
-Dataset used: [Caltech-UCSD Birds-200-2011](<http://www.vision.caltech.edu/visipedia/CUB-200-2011.html>)
+Dataset used: [Caltech-UCSD Birds-200-2011](<http://www.vision.caltech.edu/datasets/cub_200_2011/>)
 
 Please download the datasets [CUB_200_2011.tgz] and unzip it, then put all training images into a directory named "train", put all testing images into a directory named "test".
 
