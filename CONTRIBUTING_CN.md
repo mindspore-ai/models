@@ -123,6 +123,7 @@
 
 - 在 [GitHub](https://github.com/mindspore-ai/mindspore/issues) 或者 [Gitee](https://gitee.com/mindspore/mindspore/issues) 针对一个*issue*提出你的解决方案。
 - 在议题讨论和设计方案审核达成共识后，fork后完成开发后提交PR
+- 提交PR后需要：签订cla，根据自检列表完成代码自检，在评论区评论/retest运行代码检查
 - 贡献者的代码需要至少两个committer*LGTM*，PR才可以被允许推送，注意贡献者不允许在自己的PR上添加*LGTM*。
 - 在PR被详细评审后，这个PR将会被确定能否被合入。
 
