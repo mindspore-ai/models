@@ -1,0 +1,63 @@
+{
+    "segmentation": {
+        "stream_config": {
+            "deviceId": "0"
+        },
+        "appsrc0": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_imagedecoder0"
+        },
+        "mxpi_imagedecoder0": {
+            "props": {
+                "handleMethod": "opencv",
+                "outputDataFormat": "RGB"
+            },
+            "factory": "mxpi_imagedecoder",
+            "next": "opencv_normalize0"
+        },
+        "opencv_normalize0": {
+            "props": {
+                "alpha": "103.53, 116.28, 123.675",
+                "beta": "57.375, 57.12, 58.395",
+                "dataType": "FLOAT32",
+                "format": "BGR888"
+            },
+            "factory": "mxpi_imagenormalize",
+            "next": "mxpi_tensorinfer0"
+        },
+        "mxpi_tensorinfer0": {
+            "props": {
+                "dataSource": "opencv_normalize0",
+                "modelPath": "../model/Auto-DeepLab-s_NHWC_BGR.om"
+            },
+            "factory": "mxpi_modelinfer",
+            "next": "mxpi_semanticsegpostprocessor0"
+        },
+        "mxpi_semanticsegpostprocessor0": {
+            "props": {
+                "dataSource": "mxpi_tensorinfer0",
+                "postProcessConfigPath": "../model/autodeeplab.cfg",
+                "labelPath": "../model/autodeeplab.names",
+                "postProcessLibPath": "libdeeplabv3post.so"
+            },
+            "factory": "mxpi_semanticsegpostprocessor",
+            "next": "mxpi_dataserialize0"
+        },
+        "mxpi_dataserialize0": {
+            "props": {
+                "outputDataKeys": "mxpi_semanticsegpostprocessor0"
+            },
+            "factory": "mxpi_dataserialize",
+            "next": "appsink0"
+        },
+        "appsink0": {
+            "props": {
+                "blocksize": "4096000"
+            },
+            "factory": "appsink"
+        }
+    }
+}
