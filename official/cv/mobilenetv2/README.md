@@ -231,8 +231,8 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 You can start training using python or shell scripts. The usage of shell scripts as follows:
 
 - Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH] [CKPT_PATH(optional)] [FREEZE_LAYER(optional)] [FILTER_HEAD(optional)]
-- GPU: bash run_trian.sh GPU [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
-- CPU: bash run_trian.sh CPU [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
+- GPU: bash run_trian.sh GPU [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
+- CPU: bash run_trian.sh CPU [CONFIG_PATH] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
 
 `DATASET_PATH` is the train dataset path. We use `ImageFolderDataset` as default dataset, which is a source dataset that reads images from a tree of directories. The directory structure is as follows, and you should use `DATASET_PATH=dataset/train` for training and `DATASET_PATH=dataset/val` for evaluation:
 
@@ -275,40 +275,40 @@ You can start training using python or shell scripts. The usage of shell scripts
 # training example
   python:
       Ascend: python train.py --platform Ascend --config_path [CONFIG_PATH] --dataset_path [TRAIN_DATASET_PATH]
-      GPU: python train.py --platform GPU --dataset_path [TRAIN_DATASET_PATH]
-      CPU: python train.py --platform CPU --dataset_path [TRAIN_DATASET_PATH]
+      GPU: python train.py --platform GPU --config_path [CONFIG_PATH] --dataset_path [TRAIN_DATASET_PATH]
+      CPU: python train.py --platform CPU --config_path [CONFIG_PATH] --dataset_path [TRAIN_DATASET_PATH]
 
   shell:
       Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH]
-      # example: bash run_train.sh Ascend default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/
+      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/
 
-      GPU: bash run_train.sh GPU 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH]
-      CPU: bash run_train.sh CPU [TRAIN_DATASET_PATH]
+      GPU: bash run_train.sh GPU [CONFIG_PATH] 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH]
+      CPU: bash run_train.sh CPU [CONFIG_PATH] [TRAIN_DATASET_PATH]
 
 # finetune whole network example
   python:
       Ascend: python train.py --platform Ascend --config_path [CONFIG_PATH] --dataset_path [TRAIN_DATASET_PATH] --pretrain_ckpt [CKPT_PATH] --freeze_layer none --filter_head True
-      GPU: python train.py --platform GPU --dataset_path [TRAIN_DATASET_PATH] --pretrain_ckpt [CKPT_PATH] --freeze_layer none --filter_head True
-      CPU: python train.py --platform CPU --dataset_path [TRAIN_DATASET_PATH] --pretrain_ckpt [CKPT_PATH] --freeze_layer none --filter_head True
+      GPU: python train.py --platform GPU --config_path [CONFIG_PATH] --dataset_path [TRAIN_DATASET_PATH] --pretrain_ckpt [CKPT_PATH] --freeze_layer none --filter_head True
+      CPU: python train.py --platform CPU --config_path [CONFIG_PATH] --dataset_path [TRAIN_DATASET_PATH] --pretrain_ckpt [CKPT_PATH] --freeze_layer none --filter_head True
 
   shell:
       Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
-      # example: bash run_train.sh Ascend default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/predtrain/mobilenet-200_625.ckpt none True
+      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/predtrain/mobilenet-200_625.ckpt none True
 
-      GPU: bash run_train.sh GPU 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH] [CKPT_PATH] none True
+      GPU: bash run_train.sh GPU --config_path [CONFIG_PATH] 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH] [CKPT_PATH] none True
       CPU: bash run_train.sh CPU [TRAIN_DATASET_PATH] [CKPT_PATH] none True
 
 # finetune full connected layers example
   python:
-      Ascend: python train.py --platform Ascend --config_path default_config.yaml --dataset_path [TRAIN_DATASET_PATH]--pretrain_ckpt [CKPT_PATH] --freeze_layer backbone
-      GPU: python train.py --platform GPU --dataset_path [TRAIN_DATASET_PATH] --pretrain_ckpt [CKPT_PATH] --freeze_layer backbone
-      CPU: python train.py --platform CPU --dataset_path [TRAIN_DATASET_PATH] --pretrain_ckpt [CKPT_PATH] --freeze_layer backbone
+      Ascend: python train.py --platform Ascend --config_path ../default_config.yaml --dataset_path [TRAIN_DATASET_PATH]--pretrain_ckpt [CKPT_PATH] --freeze_layer backbone
+      GPU: python train.py --platform GPU --config_path ../default_config_gpu.yaml --dataset_path [TRAIN_DATASET_PATH] --pretrain_ckpt [CKPT_PATH] --freeze_layer backbone
+      CPU: python train.py --platform CPU --config_path ../default_config_cpu.yaml --dataset_path [TRAIN_DATASET_PATH] --pretrain_ckpt [CKPT_PATH] --freeze_layer backbone
 
   shell:
       Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER]
-      # example: bash run_train.sh Ascend default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/backbone/mobilenet-200_625.ckpt backbone
+      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/backbone/mobilenet-200_625.ckpt backbone
 
-      GPU: bash run_train.sh GPU 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH] [CKPT_PATH] backbone
+      GPU: bash run_train.sh GPU [CONFIG_PATH] 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH] [CKPT_PATH] backbone
       CPU: bash run_train.sh CPU [TRAIN_DATASET_PATH] [CKPT_PATH] backbone
 ```
 
@@ -329,25 +329,25 @@ epoch time: 138331.250, per step time: 221.330, avg loss: 3.917
 
 You can start training using python or shell scripts.If the train method is train or fine tune, should not input the `[CHECKPOINT_PATH]` The usage of shell scripts as follows:
 
-- Ascend: bash run_eval.sh Ascend [DATASET_PATH] [CHECKPOINT_PATH]
-- GPU: bash run_eval.sh GPU [DATASET_PATH] [CHECKPOINT_PATH]
-- CPU: bash run_eval.sh CPU [DATASET_PATH] [BACKBONE_CKPT_PATH]
+- Ascend: bash run_eval.sh Ascend [CONFIG_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+- GPU: bash run_eval.sh GPU [CONFIG_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+- CPU: bash run_eval.sh CPU [CONFIG_PATH] [DATASET_PATH] [BACKBONE_CKPT_PATH]
 
 ### Launch
 
 ```shell
 # eval example
   python:
-      Ascend: python eval.py --platform Ascend --dataset_path [VAL_DATASET_PATH] --pretrain_ckpt ./ckpt_0/mobilenetv2_15.ckpt
-      GPU: python eval.py --platform GPU --dataset_path [VAL_DATASET_PATH] --pretrain_ckpt ./ckpt_0/mobilenetv2_15.ckpt
-      CPU: python eval.py --platform CPU --dataset_path [VAL_DATASET_PATH] --pretrain_ckpt ./ckpt_0/mobilenetv2_15.ckpt
+      Ascend: python eval.py --platform Ascend --config_path [CONFIG_PATH] --dataset_path [VAL_DATASET_PATH] --pretrain_ckpt ./ckpt_0/mobilenetv2_15.ckpt
+      GPU: python eval.py --platform GPU --config_path [CONFIG_PATH] --dataset_path [VAL_DATASET_PATH] --pretrain_ckpt ./ckpt_0/mobilenetv2_15.ckpt
+      CPU: python eval.py --platform CPU --config_path [CONFIG_PATH] --dataset_path [VAL_DATASET_PATH] --pretrain_ckpt ./ckpt_0/mobilenetv2_15.ckpt
 
   shell:
-      Ascend: bash run_eval.sh Ascend [DATASET_PATH] [CHECKPOINT_PATH]
-      # example: bash run_eval.sh Ascend /home/DataSet/ImageNet_Original/ /home/model/mobilenetV2/ckpt/mobilenet-200_625.ckpt
+      Ascend: bash run_eval.sh Ascend [CONFIG_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+      # example: bash run_eval.sh Ascend ../default_config.yaml /home/DataSet/ImageNet_Original/ /home/model/mobilenetV2/ckpt/mobilenet-200_625.ckpt
 
-      GPU: bash run_eval.sh GPU [VAL_DATASET_PATH] ./checkpoint/mobilenetv2_head_15.ckpt
-      CPU: bash run_eval.sh CPU [VAL_DATASET_PATH] ./checkpoint/mobilenetv2_head_15.ckpt
+      GPU: bash run_eval.sh GPU [CONFIG_PATH] [VAL_DATASET_PATH] ./checkpoint/mobilenetv2_head_15.ckpt
+      CPU: bash run_eval.sh CPU [CONFIG_PATH] [VAL_DATASET_PATH] ./checkpoint/mobilenetv2_head_15.ckpt
 ```
 
 > checkpoint can be produced in training process.
