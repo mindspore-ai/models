@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,9 +17,8 @@ create train or eval dataset.
 """
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
-import mindspore.dataset.vision.c_transforms as C
-import mindspore.dataset.transforms.c_transforms as C2
-import mindspore.dataset.vision.py_transforms as py_vision
+import mindspore.dataset.vision as C
+import mindspore.dataset.transforms as C2
 from mindspore.dataset.vision import Inter
 import cv2
 import numpy as np
@@ -70,8 +69,8 @@ def create_dataset(args, dataset_mode, repeat_num=1):
             color_jitter = C.RandomColorAdjust(0.8 * scale, 0.8 * scale, 0.8 * scale, 0.2 * scale)
             trans += [C2.RandomApply([color_jitter], prob=0.8)]
         if args.use_color_gray:
-            trans += [py_vision.ToPIL(),
-                      py_vision.RandomGrayscale(prob=0.2),
+            trans += [C.ToPIL(),
+                      C.RandomGrayscale(prob=0.2),
                       np.array]  # need to convert PIL image to a NumPy array to pass it to C++ operation
         if args.use_blur:
             trans += [C2.RandomApply([gaussian_blur], prob=0.8)]

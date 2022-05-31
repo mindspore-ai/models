@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ from lxml import etree
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
 import mindspore.dataset.text as text
-import mindspore.dataset.transforms.c_transforms as ops
+import mindspore.dataset.transforms as ops
 from utils import convert_labels_to_index
 
 

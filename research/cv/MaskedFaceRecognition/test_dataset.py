@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@ create train or eval dataset.
 """
 import mindspore.common.dtype as mstype
 import mindspore.dataset.engine as de
-import mindspore.dataset.vision.c_transforms as CV
-import mindspore.dataset.transforms.c_transforms as C
+import mindspore.dataset.vision as CV
+import mindspore.dataset.transforms as C
 from config import config
 from dataset.Dataset import Dataset
 

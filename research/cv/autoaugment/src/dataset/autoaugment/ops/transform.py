@@ -21,7 +21,6 @@ import random
 
 from PIL import Image, __version__
 
-from mindspore.dataset.vision.py_transforms import DE_PY_INTER_MODE
 from mindspore.dataset.vision.py_transforms_util import (
     augment_error_message,
     is_pil,
@@ -46,7 +45,7 @@ class ShearX:
             raise TypeError('shear must be a single number.')
 
         self.shear = shear
-        self.resample = DE_PY_INTER_MODE[resample]
+        self.resample = resample
         self.fill_value = fill_value
 
     def __call__(self, img):
@@ -91,7 +90,7 @@ class ShearY:
             raise TypeError('shear must be a single number.')
 
         self.shear = shear
-        self.resample = DE_PY_INTER_MODE[resample]
+        self.resample = resample
         self.fill_value = fill_value
 
     def __call__(self, img):
@@ -136,7 +135,7 @@ class TranslateX:
             raise TypeError('translate must be a single number.')
 
         self.translate = translate
-        self.resample = DE_PY_INTER_MODE[resample]
+        self.resample = resample
         self.fill_value = fill_value
 
     def __call__(self, img):
@@ -181,7 +180,7 @@ class TranslateY:
             raise TypeError('Translate must be a single number.')
 
         self.translate = translate
-        self.resample = DE_PY_INTER_MODE[resample]
+        self.resample = resample
         self.fill_value = fill_value
 
     def __call__(self, img):
@@ -212,12 +211,12 @@ class TranslateY:
 
 class Rotate:
     """
-    Rotate is similar to py_vision.RandomRotation but uses a fixed degree.
+    Rotate is similar to mindspore.dataset.vision.transform's RandomRotation but uses a fixed degree.
 
     Args:
         degree (int): the degree to rotate.
 
-    Please refer to py_transforms.RandomRotation for more argument
+    Please refer to mindspore.dataset.vision.transforms Rotation for more argument
     specifications.
     """
 
@@ -229,7 +228,7 @@ class Rotate:
             raise TypeError('degree must be a single number.')
 
         self.degree = degree
-        self.resample = DE_PY_INTER_MODE[resample]
+        self.resample = resample
         self.expand = expand
         self.center = center
         self.fill_value = fill_value

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import os.path
 import random
 import csv
 import cv2
-import mindspore.dataset.vision.py_transforms as P_VISION
+import mindspore.dataset.vision as vision
 import mindspore.ops as ops
 from mindspore import Tensor
 from mindspore import dtype as mstype
@@ -139,8 +139,8 @@ def init_AB(opt, AB_path):
         (opt.loadSize, opt.loadSize), Image.BICUBIC)
     B = AB.crop((w2, 0, w, h)).resize(
         (opt.loadSize, opt.loadSize), Image.BICUBIC)
-    A = P_VISION.ToTensor()(A)
-    B = P_VISION.ToTensor()(B)
+    A = vision.ToTensor()(A)
+    B = vision.ToTensor()(B)
     w_offset = random.randint(
         0, max(0, opt.loadSize - opt.fineSize - 1))
     h_offset = random.randint(
@@ -151,8 +151,8 @@ def init_AB(opt, AB_path):
     B = B[:, h_offset:h_offset + opt.fineSize,
           w_offset:w_offset + opt.fineSize]
 
-    A = P_VISION.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))(A)
-    B = P_VISION.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))(B)
+    A = vision.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5), is_hwc=False)(A)
+    B = vision.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5), is_hwc=False)(B)
     return A, B
 
 def regions_process(opt, regions, feats, item, A, B, input_nc, output_nc):
@@ -270,7 +270,7 @@ class AlignedDataset(BaseDataset):
             bgdir = self.opt.bg_dir
             bgpath = os.path.join(bgdir, basen[:-4] + '.png')
             im_bg = Image.open(bgpath)
-            mask2 = P_VISION.ToTensor()(im_bg)  # mask out background
+            mask2 = vision.ToTensor()(im_bg)  # mask out background
 
             if flipped:
                 mask2 = np.take(mask2, idx, axis=2)

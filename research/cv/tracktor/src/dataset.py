@@ -24,7 +24,7 @@ import os.path as osp
 import cv2
 import mindspore as ms
 import mindspore.dataset as de
-import mindspore.dataset.vision.c_transforms as C
+import mindspore.dataset.vision as C
 from mindspore.mindrecord import FileWriter
 import numpy as np
 from numpy import random

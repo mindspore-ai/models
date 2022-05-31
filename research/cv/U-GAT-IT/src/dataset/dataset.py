@@ -22,7 +22,7 @@ import math
 
 import numpy as np
 from PIL import Image
-import mindspore.dataset.vision.py_transforms as py_vision
+import mindspore.dataset.vision as vision
 import mindspore.dataset as ds
 from mindspore.communication.management import get_rank, get_group_size
 
@@ -30,18 +30,18 @@ from mindspore.communication.management import get_rank, get_group_size
 def TrainDataLoader(img_size, data_path, dataset, batch_size, distributed):
     """ DataLoader """
     train_transform = [
-        py_vision.ToPIL(),
-        py_vision.RandomHorizontalFlip(),
-        py_vision.Resize((img_size + 30, img_size + 30)),
-        py_vision.RandomCrop(img_size),
-        py_vision.ToTensor(),
-        py_vision.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+        vision.ToPIL(),
+        vision.RandomHorizontalFlip(),
+        vision.Resize((img_size + 30, img_size + 30)),
+        vision.RandomCrop(img_size),
+        vision.ToTensor(),
+        vision.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], is_hwc=False),
     ]
     test_transform = [
-        py_vision.ToPIL(),
-        py_vision.Resize((img_size, img_size)),
-        py_vision.ToTensor(),
-        py_vision.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+        vision.ToPIL(),
+        vision.Resize((img_size, img_size)),
+        vision.ToTensor(),
+        vision.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], is_hwc=False),
     ]
     rank_size = 1
     if distributed:
@@ -76,10 +76,10 @@ def TrainDataLoader(img_size, data_path, dataset, batch_size, distributed):
 def TestDataLoader(img_size, data_path, dataset):
     """ DataLoader """
     test_transform = [
-        py_vision.ToPIL(),
-        py_vision.Resize((img_size, img_size)),
-        py_vision.ToTensor(),
-        py_vision.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5]),
+        vision.ToPIL(),
+        vision.Resize((img_size, img_size)),
+        vision.ToTensor(),
+        vision.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], is_hwc=False),
     ]
     testA_generator = GetDatasetGenerator(os.path.join(data_path, dataset), 'test')
     testA = ds.GeneratorDataset(testA_generator, ["image_A", "image_B"], shuffle=False, num_parallel_workers=12)

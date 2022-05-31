@@ -156,7 +156,7 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, device_num, rank,
 
     yolo_dataset = COCOYoloDataset(root=image_dir, ann_file=anno_path, filter_crowd_anno=filter_crowd,
                                    remove_images_without_annotations=remove_empty_anno, is_training=is_training)
-    hwc_to_chw = ds.vision.c_transforms.HWC2CHW()
+    hwc_to_chw = ds.vision.HWC2CHW()
 
     config.dataset_size = len(yolo_dataset)
     cores = multiprocessing.cpu_count()
@@ -168,12 +168,12 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, device_num, rank,
                                 "gt_box1", "gt_box2", "gt_box3"]
         if device_num != 8:
             dataset = ds.GeneratorDataset(yolo_dataset, column_names=dataset_column_names, sampler=distributed_sampler)
-            dataset = dataset.map(operations=ds.vision.c_transforms.Decode(), input_columns=["image"])
+            dataset = dataset.map(operations=ds.vision.Decode(), input_columns=["image"])
             dataset = dataset.batch(batch_size, per_batch_map=multi_scale_trans, input_columns=dataset_column_names,
                                     num_parallel_workers=min(32, num_parallel_workers), drop_remainder=True)
         else:
             dataset = ds.GeneratorDataset(yolo_dataset, column_names=dataset_column_names, sampler=distributed_sampler)
-            dataset = dataset.map(operations=ds.vision.c_transforms.Decode(), input_columns=["image"])
+            dataset = dataset.map(operations=ds.vision.Decode(), input_columns=["image"])
             dataset = dataset.batch(batch_size, per_batch_map=multi_scale_trans, input_columns=dataset_column_names,
                                     num_parallel_workers=min(8, num_parallel_workers), drop_remainder=True)
     else:

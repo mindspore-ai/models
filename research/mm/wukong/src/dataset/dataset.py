@@ -15,8 +15,8 @@
 from mindspore import dtype as mstype
 import mindspore.dataset as ds
 from mindspore.dataset.vision import Inter
-import mindspore.dataset.vision.c_transforms as C
-import mindspore.dataset.transforms.c_transforms as C2
+import mindspore.dataset.vision as C
+import mindspore.dataset.transforms as C2
 
 
 def get_wukong_dataset(dataset_path, columns_list, num_parallel_workers, shuffle, num_shards, shard_id, batch_size):

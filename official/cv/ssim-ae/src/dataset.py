@@ -20,7 +20,7 @@ import numpy as np
 import cv2
 
 import mindspore.dataset as ds
-import mindspore.dataset.vision.c_transforms as c_trans
+import mindspore.dataset.vision as c_trans
 
 from model_utils.config import config as cfg
 from src.utils import read_img, get_file_list

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,8 @@
 import os
 
 import mindspore.dataset as dataset
-import mindspore.dataset.transforms.c_transforms as C
-import mindspore.dataset.vision.c_transforms as V_C
-import mindspore.dataset.vision.py_transforms as P_C
+import mindspore.dataset.transforms as C
+import mindspore.dataset.vision as V_C
 from mindspore.common import dtype as mstype
 
 from src.datasets.autoaug import RandAugment
@@ -44,10 +43,10 @@ def ImageNet(root, mode,
                 V_C.RandomResizedCrop(crop_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
                 V_C.RandomHorizontalFlip(prob=0.5),
                 V_C.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4),
-                P_C.ToPIL(),
+                V_C.ToPIL(),
                 RandAugment(2, 12, True, True),
-                P_C.ToTensor(),
-                P_C.Normalize(mean=mean, std=std)]
+                V_C.ToTensor(),
+                V_C.Normalize(mean=mean, std=std, is_hwc=False)]
         else:
             mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
             std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
@@ -55,7 +54,7 @@ def ImageNet(root, mode,
                 V_C.Decode(),
                 V_C.Resize((320, 320)),
                 V_C.CenterCrop(256),
-                V_C.Normalize(mean=mean, std=std),
+                V_C.Normalize(mean=mean, std=std, is_hwc=True),
                 V_C.HWC2CHW()]
     else:
         transform_img = transform

@@ -23,7 +23,7 @@ from mindspore import dataset as ds
 from mindspore.common import set_seed
 from mindspore.communication.management import get_group_size
 from mindspore.communication.management import get_rank
-from mindspore.dataset.vision import py_transforms as PY
+from mindspore.dataset.vision import transforms as vision
 from mindspore.train.serialization import load_checkpoint
 
 from cfg.config import config as default_config
@@ -69,7 +69,7 @@ def main(
         opt.dataset_root,
         test_paths,
         augment=False,
-        transforms=PY.ToTensor(),
+        transforms=vision.ToTensor(),
         config=opt,
     )
 

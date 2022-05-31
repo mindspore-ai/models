@@ -49,24 +49,24 @@ def create_dataset(dataset_path, do_train, config, device_target, batch_size=32,
     buffer_size = 1000
 
     # define map operations
-    decode_op = ds.vision.c_transforms.Decode()
-    resize_crop_op = ds.vision.c_transforms.RandomCropDecodeResize(resize_height,
-                                                                   scale=(0.08, 1.0), ratio=(0.75, 1.333))
-    horizontal_flip_op = ds.vision.c_transforms.RandomHorizontalFlip(prob=0.5)
+    decode_op = ds.vision.Decode()
+    resize_crop_op = ds.vision.RandomCropDecodeResize(resize_height,
+                                                      scale=(0.08, 1.0), ratio=(0.75, 1.333))
+    horizontal_flip_op = ds.vision.RandomHorizontalFlip(prob=0.5)
 
-    resize_op = ds.vision.c_transforms.Resize(256)
-    center_crop = ds.vision.c_transforms.CenterCrop(resize_width)
-    rescale_op = ds.vision.c_transforms.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4)
-    normalize_op = ds.vision.c_transforms.Normalize(mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
-                                                    std=[0.229 * 255, 0.224 * 255, 0.225 * 255])
-    change_swap_op = ds.vision.c_transforms.HWC2CHW()
+    resize_op = ds.vision.Resize(256)
+    center_crop = ds.vision.CenterCrop(resize_width)
+    rescale_op = ds.vision.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4)
+    normalize_op = ds.vision.Normalize(mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
+                                       std=[0.229 * 255, 0.224 * 255, 0.225 * 255])
+    change_swap_op = ds.vision.HWC2CHW()
 
     if do_train:
         trans = [resize_crop_op, horizontal_flip_op, rescale_op, normalize_op, change_swap_op]
     else:
         trans = [decode_op, resize_op, center_crop, normalize_op, change_swap_op]
 
-    type_cast_op = ds.transforms.c_transforms.TypeCast(ms.int32)
+    type_cast_op = ds.transforms.transforms.TypeCast(ms.int32)
 
     data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=8)
     data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=8)
@@ -99,24 +99,24 @@ def create_dataset_cifar(dataset_path,
     # define map operations
     if do_train:
         trans = [
-            ds.vision.c_transforms.RandomCrop((32, 32), (4, 4, 4, 4)),
-            ds.vision.c_transforms.RandomHorizontalFlip(prob=0.5),
-            ds.vision.c_transforms.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4),
-            ds.vision.c_transforms.Resize((224, 224)),
-            ds.vision.c_transforms.Rescale(1.0 / 255.0, 0.0),
-            ds.vision.c_transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
-            ds.vision.c_transforms.CutOut(112),
-            ds.vision.c_transforms.HWC2CHW()
+            ds.vision.RandomCrop((32, 32), (4, 4, 4, 4)),
+            ds.vision.RandomHorizontalFlip(prob=0.5),
+            ds.vision.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4),
+            ds.vision.Resize((224, 224)),
+            ds.vision.Rescale(1.0 / 255.0, 0.0),
+            ds.vision.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
+            ds.vision.CutOut(112),
+            ds.vision.HWC2CHW()
         ]
     else:
         trans = [
-            ds.vision.c_transforms.Resize((224, 224)),
-            ds.vision.c_transforms.Rescale(1.0 / 255.0, 0.0),
-            ds.vision.c_transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
-            ds.vision.c_transforms.HWC2CHW()
+            ds.vision.Resize((224, 224)),
+            ds.vision.Rescale(1.0 / 255.0, 0.0),
+            ds.vision.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
+            ds.vision.HWC2CHW()
         ]
 
-    type_cast_op = ds.transforms.c_transforms.TypeCast(ms.int32)
+    type_cast_op = ds.transforms.transforms.TypeCast(ms.int32)
 
     data_set = data_set.map(operations=type_cast_op,
                             input_columns="label",

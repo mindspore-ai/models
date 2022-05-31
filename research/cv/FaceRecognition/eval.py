@@ -21,8 +21,8 @@ import numpy as np
 import cv2
 
 from mindspore.common import dtype as mstype
-import mindspore.dataset.transforms.py_transforms as transforms
-import mindspore.dataset.vision.py_transforms as vision
+import mindspore.dataset.transforms as transforms
+import mindspore.dataset.vision as vision
 import mindspore.dataset as de
 from mindspore import Tensor, context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -266,9 +266,8 @@ def run_eval(args):
     args.logger.info('INFO, graph compile finished, time used:{:.2f}s, start calculate img embedding'.
                      format(compile_time_used))
 
-    img_transforms = transforms.Compose([vision.ToTensor(), vision.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
-
-
+    img_transforms = transforms.Compose([vision.ToTensor(),
+        vision.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5), is_hwc=False)])
 
     #for test images
     args.logger.info('INFO, start step1, calculate test img embedding, weight file = {}'.format(args.weight))

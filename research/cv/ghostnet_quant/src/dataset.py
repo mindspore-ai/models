@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,9 +18,8 @@ create train or eval dataset.
 import os
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
-import mindspore.dataset.transforms.vision.c_transforms as C
-import mindspore.dataset.transforms.vision.py_transforms as P
-import mindspore.dataset.transforms.c_transforms as C2
+import mindspore.dataset.vision as C
+import mindspore.dataset.transforms as C2
 from mindspore.dataset.transforms.vision import Inter
 
 
@@ -73,18 +72,18 @@ def create_dataset(dataset_path, do_train, config, platform, repeat_num=1, batch
     change_swap_op = C.HWC2CHW()
 
     # define python operations
-    decode_p = P.Decode()
+    decode_p = C.Decode(True)
     if model == 'ghostnet-600':
         s = 274
         c = 240
     else:
         s = 256
         c = 224
-    resize_p = P.Resize(s, interpolation=Inter.BICUBIC)
-    center_crop_p = P.CenterCrop(c)
-    totensor = P.ToTensor()
-    normalize_p = P.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
-    composeop = P.ComposeOp(
+    resize_p = C.Resize(s, interpolation=Inter.BICUBIC)
+    center_crop_p = C.CenterCrop(c)
+    totensor = C.ToTensor()
+    normalize_p = C.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225), is_hwc=False)
+    composeop = C.ComposeOp(
         [decode_p, resize_p, center_crop_p, totensor, normalize_p])
     if do_train:
         trans = [resize_crop_op, horizontal_flip_op, color_op,

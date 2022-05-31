@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ import os
 import glob
 import numpy as np
 import mindspore.dataset as ds
-from mindspore.dataset.transforms.py_transforms import Compose
+from mindspore.dataset.transforms.transforms import Compose
 from src.model_utils.config import config
 from src.transform import Dataset, ExpandChannel, LoadData, Orientation, ScaleIntensityRange, RandomCropSamples, OneHot
 

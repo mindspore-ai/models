@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License Version 2.0(the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 
 import math
 import random
-from mindspore.dataset.vision.c_transforms import Resize, Rescale, Normalize, HWC2CHW, RandomHorizontalFlip
-from mindspore.dataset.transforms.c_transforms import Compose
+from mindspore.dataset.vision import Resize, Rescale, Normalize, HWC2CHW, RandomHorizontalFlip
+from mindspore.dataset.transforms import Compose
 
 
 class RandomErasing():

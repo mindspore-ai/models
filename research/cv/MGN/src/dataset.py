@@ -20,7 +20,7 @@ import random
 import re
 
 import mindspore.dataset as ds
-import mindspore.dataset.vision.c_transforms as C
+import mindspore.dataset.vision as C
 import numpy as np
 from PIL import Image
 

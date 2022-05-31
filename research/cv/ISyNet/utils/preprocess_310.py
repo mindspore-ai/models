@@ -18,8 +18,8 @@ import argparse
 
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
-import mindspore.dataset.vision.c_transforms as C
-import mindspore.dataset.transforms.c_transforms as C2
+import mindspore.dataset.vision as C
+import mindspore.dataset.transforms as C2
 
 PARSER = argparse.ArgumentParser(description="ISyNet preprocess")
 PARSER.add_argument("--data_path", type=str, required=True, help="data path.")

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,8 +23,8 @@ import mindspore.ops as ops
 from mindspore.context import ParallelMode
 from mindspore import load_checkpoint, load_param_into_net
 from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.dataset.transforms.py_transforms import Compose
-from mindspore.dataset.vision.py_transforms import ToTensor, Normalize
+from mindspore.dataset.transforms.transforms import Compose
+from mindspore.dataset.vision import ToTensor, Normalize
 
 from src.dataloader import create_CitySegmentation
 from src.fast_scnn import FastSCNN
@@ -140,7 +140,7 @@ def validation():
     # image transform
     input_transform = Compose([
         ToTensor(),
-        Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
+        Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225], is_hwc=False),
     ])
     if args.use_modelarts:
         import moxing as mox

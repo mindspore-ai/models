@@ -16,7 +16,7 @@
 random augment class
 """
 import numpy as np
-import mindspore.dataset.vision.py_transforms as P
+import mindspore.dataset.vision as vision
 from src import transform_utils
 
 IMAGENET_DEFAULT_MEAN = (0.485, 0.456, 0.406)
@@ -37,9 +37,9 @@ class RandAugment:
         # assert the imgs object are pil_images
         ret_imgs = []
         ret_labels = []
-        py_to_pil_op = P.ToPIL()
-        to_tensor = P.ToTensor()
-        normalize_op = P.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD)
+        py_to_pil_op = vision.ToPIL()
+        to_tensor = vision.Tensor()
+        normalize_op = vision.Normalize(IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD, is_hwc=False)
         rand_augment_ops = transform_utils.rand_augment_transform(self.config_str, self.hparams)
         for i, image in enumerate(imgs):
             img_pil = py_to_pil_op(image)

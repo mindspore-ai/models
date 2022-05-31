@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,9 +19,8 @@ import os
 
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
-import mindspore.dataset.transforms.c_transforms as C
-import mindspore.dataset.vision.c_transforms as vision
-import mindspore.dataset.vision.py_transforms as py_vision
+import mindspore.dataset.transforms as C
+import mindspore.dataset.vision as vision
 from mindspore.dataset.vision.utils import Inter
 
 from src.data.augment.auto_augment import _pil_interp, rand_augment_transform
@@ -94,12 +93,12 @@ def create_dataset_imagenet(dataset_dir, args, repeat_num=1, training=True):
             vision.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(3 / 4, 4 / 3),
                                           interpolation=Inter.BICUBIC),
             vision.RandomHorizontalFlip(prob=0.5),
-            py_vision.ToPIL()
+            vision.ToPIL()
         ]
         transform_img += [rand_augment_transform(auto_augment, aa_params)]
         transform_img += [
-            py_vision.ToTensor(),
-            py_vision.Normalize(mean=mean, std=std),
+            vision.ToTensor(),
+            vision.Normalize(mean=mean, std=std, is_hwc=False),
             RandomErasing(args.re_prob, mode=args.re_mode, max_count=args.re_count)
         ]
     else:
@@ -111,14 +110,14 @@ def create_dataset_imagenet(dataset_dir, args, repeat_num=1, training=True):
                 vision.Decode(),
                 vision.Resize(int(256 / 224 * image_size), interpolation=Inter.BICUBIC),
                 vision.CenterCrop(image_size),
-                vision.Normalize(mean=mean, std=std),
+                vision.Normalize(mean=mean, std=std, is_hwc=True),
                 vision.HWC2CHW()
             ]
         else:
             transform_img = [
                 vision.Decode(),
                 vision.Resize(int(image_size), interpolation=Inter.BICUBIC),
-                vision.Normalize(mean=mean, std=std),
+                vision.Normalize(mean=mean, std=std, is_hwc=True),
                 vision.HWC2CHW()
             ]
 

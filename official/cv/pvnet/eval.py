@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,8 +18,7 @@ import time
 
 import numpy as np
 import mindspore
-import mindspore.dataset.transforms.c_transforms as C
-import mindspore.dataset.vision.py_transforms as P
+import mindspore.dataset.transforms as C
 from mindspore import context
 
 from model_utils.config import config as cfg
@@ -82,9 +81,9 @@ def test(args):
         pose = test_db[idx]['RT'].copy()
 
         rgb = read_rgb_np(rgb_path)
-        rgb = P.ToTensor()(rgb)
+        rgb = C.ToTensor()(rgb)
         rgb = C.TypeCast(mindspore.dtype.float32)(rgb)
-        rgb = P.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])(rgb)
+        rgb = C.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], is_hwc=False)(rgb)
         rgb = np.expand_dims(rgb, axis=0)
         rgb = mindspore.Tensor(rgb)
 

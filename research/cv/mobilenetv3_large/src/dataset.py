@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 """Create train or eval dataset."""
 import mindspore.common.dtype as mstype
 import mindspore.dataset as de
-import mindspore.dataset.vision.c_transforms as C
-import mindspore.dataset.transforms.c_transforms as C2
+import mindspore.dataset.vision as C
+import mindspore.dataset.transforms as C2
 from mindspore.communication.management import get_rank, get_group_size
 
 def create_dataset(dataset_path, do_train, config, repeat_num=1, batch_size=32, run_distribute=True):

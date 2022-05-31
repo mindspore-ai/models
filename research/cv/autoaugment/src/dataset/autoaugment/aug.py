@@ -18,7 +18,7 @@ The Augment operator.
 
 import random
 
-import mindspore.dataset.vision.py_transforms as py_trans
+import mindspore.dataset.vision as vision
 
 from .third_party.policies import good_policies
 from .third_party.policies import svhn_good_policies
@@ -61,8 +61,8 @@ class Augment:
             self.policies = policies
 
         self.oc = OperatorClasses()
-        self.to_pil = py_trans.ToPIL()
-        self.to_tensor = py_trans.ToTensor()
+        self.to_pil = vision.ToPIL()
+        self.to_tensor = vision.ToTensor()
 
         self.enable_basic = enable_basic
         self.random_crop = self.oc.RandomCrop(None)
@@ -73,7 +73,7 @@ class Augment:
         self.as_pil = as_pil
         self.normalize = None
         if mean is not None and std is not None:
-            self.normalize = py_trans.Normalize(mean, std)
+            self.normalize = vision.Normalize(mean, std, is_hwc=False)
 
     def _apply(self, name, prob, level, img):
         if random.random() > prob:

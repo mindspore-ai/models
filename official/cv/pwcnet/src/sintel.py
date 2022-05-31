@@ -19,8 +19,8 @@ import numpy as np
 
 import mindspore.dataset as de
 import mindspore
-import mindspore.dataset.vision.py_transforms as CV
-import mindspore.dataset.transforms.c_transforms as C
+import mindspore.dataset.vision as V
+import mindspore.dataset.transforms as T
 
 import src.common as common
 import src.transforms as transforms
@@ -129,16 +129,16 @@ class Sintel():
         # photometric_augmentations
         if augmentations:
             self._photometric_transform = transforms.ConcatTransformSplitChainer([
-                CV.ToPIL(),
-                CV.RandomColorAdjust(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5),
-                CV.ToTensor(),
+                V.ToPIL(),
+                V.RandomColorAdjust(brightness=0.5, contrast=0.5, saturation=0.5, hue=0.5),
+                V.ToTensor(),
                 transforms.RandomGamma(min_gamma=0.7, max_gamma=1.5, clip_image=True)
                 ])
 
         else:
             self._photometric_transform = transforms.ConcatTransformSplitChainer([
-                CV.ToPIL(),
-                CV.ToTensor(),
+                V.ToPIL(),
+                V.ToTensor(),
                 ])
 
         self._size = len(self._image_list)
@@ -182,8 +182,8 @@ def SintelTraining(dir_root, augmentations, imgtype, dstype, batchsize, num_para
                                      shuffle=True, num_shards=world_size, shard_id=local_rank)
 
     # apply map operations on images
-    de_dataset = de_dataset.map(input_columns="im1", operations=C.TypeCast(mindspore.float32))
-    de_dataset = de_dataset.map(input_columns="im2", operations=C.TypeCast(mindspore.float32))
-    de_dataset = de_dataset.map(input_columns="flo", operations=C.TypeCast(mindspore.float32))
+    de_dataset = de_dataset.map(input_columns="im1", operations=T.TypeCast(mindspore.float32))
+    de_dataset = de_dataset.map(input_columns="im2", operations=T.TypeCast(mindspore.float32))
+    de_dataset = de_dataset.map(input_columns="flo", operations=T.TypeCast(mindspore.float32))
     de_dataset = de_dataset.batch(batchsize, drop_remainder=True)
     return de_dataset, dataset_len

@@ -16,7 +16,7 @@
 import os
 import mindspore.dataset as de
 from mindspore.communication.management import get_rank, get_group_size
-import mindspore.dataset.transforms.c_transforms as C
+import mindspore.dataset.transforms as C
 import mindspore.common.dtype as mstype
 
 

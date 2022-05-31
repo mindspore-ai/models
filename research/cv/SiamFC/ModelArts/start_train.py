@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ from mindspore import nn
 from mindspore.train import Model
 from mindspore import Tensor
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
-import mindspore.dataset.transforms.py_transforms as py_transforms
+import mindspore.dataset.transforms as data_trans
 from mindspore.train.serialization import load_checkpoint, export, load_param_into_net
 from src.config import config
 from src.create_lmdb import create_lmdb
@@ -104,12 +104,12 @@ def train(args):
 
     set_seed(1234)
     random_crop_size = config.instance_size - 2 * config.total_stride
-    train_z_transforms = py_transforms.Compose([
+    train_z_transforms = data_trans.Compose([
         RandomStretch(),
         CenterCrop((config.exemplar_size, config.exemplar_size)),
         ToTensor()
     ])
-    train_x_transforms = py_transforms.Compose([
+    train_x_transforms = data_trans.Compose([
         RandomStretch(),
         RandomCrop((random_crop_size, random_crop_size),
                    config.max_translate),

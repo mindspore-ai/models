@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import numpy as np
 
 import mindspore.ops as P
 from mindspore import Tensor
-import mindspore.dataset.vision.py_transforms as V
+import mindspore.dataset.vision as V
 from src.dataset import get_rotate_mat
 
 import lanms
@@ -44,7 +44,7 @@ def load_pil(img):
     """convert PIL Image to Tensor
     """
     img = V.ToTensor()(img)
-    img = V.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))(img)
+    img = V.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5), is_hwc=False)(img)
     img = Tensor(img)
     img = P.ExpandDims()(img, 0)
     return img

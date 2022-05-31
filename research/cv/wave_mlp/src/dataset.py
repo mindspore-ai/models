@@ -17,15 +17,14 @@ import os
 import numpy as np
 import mindspore.common.dtype as mstype
 import mindspore.dataset.engine as de
-import mindspore.dataset.transforms.c_transforms as C2
-import mindspore.dataset.vision.py_transforms as pytrans
-import mindspore.dataset.transforms.py_transforms as py_transforms
+import mindspore.dataset.transforms as C2
+import mindspore.dataset.transforms as transforms
 
-from mindspore.dataset.transforms.py_transforms import Compose
-import mindspore.dataset.vision.c_transforms as C
+from mindspore.dataset.transforms.transforms import Compose
+import mindspore.dataset.vision as C
 
 
-class ToNumpy(py_transforms.PyTensorOperation):
+class ToNumpy(transforms.PyTensorOperation):
 
     def __init__(self, output_type=np.float32):
         self.output_type = output_type
@@ -81,13 +80,13 @@ def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=128):
         ]
     else:
         trans = [
-            pytrans.Decode(),
-            pytrans.Resize(235),
-            pytrans.CenterCrop(224)
+            C.Decode(True),
+            C.Resize(235),
+            C.CenterCrop(224)
         ]
     trans += [
-        pytrans.ToTensor(),
-        pytrans.Normalize(mean=mean, std=std),
+        C.ToTensor(),
+        C.Normalize(mean=mean, std=std, is_hwc=False),
     ]
     trans = Compose(trans)
 

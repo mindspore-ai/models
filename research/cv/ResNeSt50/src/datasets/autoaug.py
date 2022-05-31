@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 import random
 import numpy as np
 import PIL
-import mindspore.dataset.vision.py_transforms as py_trans
+import mindspore.dataset.vision as vision
 
 RESAMPLE_MODE = PIL.Image.BICUBIC
 
@@ -175,8 +175,8 @@ class RandAugment:
         self.n = n
         self.m = m
         self.augment_list = rand_augment_list()
-        self.to_pil = py_trans.ToPIL()
-        self.to_tensor = py_trans.ToTensor()
+        self.to_pil = vision.ToPIL()
+        self.to_tensor = vision.ToTensor()
         self.from_pil = from_pil
         self.as_pil = as_pil
 

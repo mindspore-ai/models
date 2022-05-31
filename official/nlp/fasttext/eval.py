@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ from mindspore.common.tensor import Tensor
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 import mindspore.dataset as ds
-import mindspore.dataset.transforms.c_transforms as deC
+import mindspore.dataset.transforms as deC
 from mindspore import context
 from src.fasttext_model import FastText
 

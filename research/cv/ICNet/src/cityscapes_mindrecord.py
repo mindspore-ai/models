@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ from PIL import ImageOps
 from PIL import ImageFilter
 import mindspore.dataset as de
 from mindspore.mindrecord import FileWriter
-import mindspore.dataset.vision.py_transforms as transforms
-import mindspore.dataset.transforms.py_transforms as tc
+import mindspore.dataset.vision as transforms
+import mindspore.dataset.transforms as tc
 
 
 def _get_city_pairs(folder, split='train'):
@@ -103,7 +103,8 @@ def _sync_transform(img, mask):
 
 def _class_to_index(mask):
     """class to index"""
-    # reference: https://github.com/mcordts/cityscapesScripts/blob/master/cityscapesscripts/helpers/labels.py
+    # Reference:
+    # https://github.com/mcordts/cityscapesScripts/blob/master/cityscapesscripts/helpers/labels.py
     _key = np.array([-1, -1, -1, -1, -1, -1,
                      -1, -1, 0, 1, -1, -1,
                      2, 3, 4, -1, -1, -1,
@@ -136,7 +137,7 @@ def _img_mask_transform(img, mask):
     """img and mask transform"""
     input_transform = tc.Compose([
         transforms.ToTensor(),
-        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))])
+        transforms.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225), is_hwc=False)])
     img = _img_transform(img)
     mask = _mask_transform(mask)
     img = input_transform(img)

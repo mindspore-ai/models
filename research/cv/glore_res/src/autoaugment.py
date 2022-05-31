@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 """define autoaugment"""
 import os
 import mindspore.dataset.engine as de
-import mindspore.dataset.transforms.c_transforms as c_transforms
-import mindspore.dataset.vision.c_transforms as c_vision
+import mindspore.dataset.transforms as data_trans
+import mindspore.dataset.vision as vision
 from mindspore import dtype as mstype
 from mindspore.communication.management import init, get_rank, get_group_size
 
@@ -34,101 +34,101 @@ def int_parameter(level, maxval):
 
 def shear_x(level):
     v = float_parameter(level, 0.3)
-    return c_transforms.RandomChoice(
-        [c_vision.RandomAffine(degrees=0, shear=(-v, -v)), c_vision.RandomAffine(degrees=0, shear=(v, v))])
+    return data_trans.RandomChoice(
+        [vision.RandomAffine(degrees=0, shear=(-v, -v)), vision.RandomAffine(degrees=0, shear=(v, v))])
 
 
 def shear_y(level):
     v = float_parameter(level, 0.3)
-    return c_transforms.RandomChoice(
-        [c_vision.RandomAffine(degrees=0, shear=(0, 0, -v, -v)), c_vision.RandomAffine(degrees=0, shear=(0, 0, v, v))])
+    return data_trans.RandomChoice(
+        [vision.RandomAffine(degrees=0, shear=(0, 0, -v, -v)), vision.RandomAffine(degrees=0, shear=(0, 0, v, v))])
 
 
 def translate_x(level):
     v = float_parameter(level, 150 / 331)
-    return c_transforms.RandomChoice(
-        [c_vision.RandomAffine(degrees=0, translate=(-v, -v)), c_vision.RandomAffine(degrees=0, translate=(v, v))])
+    return data_trans.RandomChoice(
+        [vision.RandomAffine(degrees=0, translate=(-v, -v)), vision.RandomAffine(degrees=0, translate=(v, v))])
 
 
 def translate_y(level):
     v = float_parameter(level, 150 / 331)
-    return c_transforms.RandomChoice([c_vision.RandomAffine(degrees=0, translate=(0, 0, -v, -v)),
-                                      c_vision.RandomAffine(degrees=0, translate=(0, 0, v, v))])
+    return data_trans.RandomChoice([vision.RandomAffine(degrees=0, translate=(0, 0, -v, -v)),
+                                    vision.RandomAffine(degrees=0, translate=(0, 0, v, v))])
 
 
 def color_impl(level):
     v = float_parameter(level, 1.8) + 0.1
-    return c_vision.RandomColor(degrees=(v, v))
+    return vision.RandomColor(degrees=(v, v))
 
 
 def rotate_impl(level):
     v = int_parameter(level, 30)
-    return c_transforms.RandomChoice(
-        [c_vision.RandomRotation(degrees=(-v, -v)), c_vision.RandomRotation(degrees=(v, v))])
+    return data_trans.RandomChoice(
+        [vision.RandomRotation(degrees=(-v, -v)), vision.RandomRotation(degrees=(v, v))])
 
 
 def solarize_impl(level):
     level = int_parameter(level, 256)
     v = 256 - level
-    return c_vision.RandomSolarize(threshold=(0, v))
+    return vision.RandomSolarize(threshold=(0, v))
 
 
 def posterize_impl(level):
     level = int_parameter(level, 4)
     v = 4 - level
-    return c_vision.RandomPosterize(bits=(v, v))
+    return vision.RandomPosterize(bits=(v, v))
 
 
 def contrast_impl(level):
     v = float_parameter(level, 1.8) + 0.1
-    return c_vision.RandomColorAdjust(contrast=(v, v))
+    return vision.RandomColorAdjust(contrast=(v, v))
 
 
 def autocontrast_impl(level):
-    return c_vision.AutoContrast()
+    return vision.AutoContrast()
 
 
 def sharpness_impl(level):
     v = float_parameter(level, 1.8) + 0.1
-    return c_vision.RandomSharpness(degrees=(v, v))
+    return vision.RandomSharpness(degrees=(v, v))
 
 
 def brightness_impl(level):
     v = float_parameter(level, 1.8) + 0.1
-    return c_vision.RandomColorAdjust(brightness=(v, v))
+    return vision.RandomColorAdjust(brightness=(v, v))
 
 
 # define the Auto Augmentation policy
 imagenet_policy = [
     [(posterize_impl(8), 0.4), (rotate_impl(9), 0.6)],
     [(solarize_impl(5), 0.6), (autocontrast_impl(5), 0.6)],
-    [(c_vision.Equalize(), 0.8), (c_vision.Equalize(), 0.6)],
+    [(vision.Equalize(), 0.8), (vision.Equalize(), 0.6)],
     [(posterize_impl(7), 0.6), (posterize_impl(6), 0.6)],
-    [(c_vision.Equalize(), 0.4), (solarize_impl(4), 0.2)],
+    [(vision.Equalize(), 0.4), (solarize_impl(4), 0.2)],
 
-    [(c_vision.Equalize(), 0.4), (rotate_impl(8), 0.8)],
-    [(solarize_impl(3), 0.6), (c_vision.Equalize(), 0.6)],
-    [(posterize_impl(5), 0.8), (c_vision.Equalize(), 1.0)],
+    [(vision.Equalize(), 0.4), (rotate_impl(8), 0.8)],
+    [(solarize_impl(3), 0.6), (vision.Equalize(), 0.6)],
+    [(posterize_impl(5), 0.8), (vision.Equalize(), 1.0)],
     [(rotate_impl(3), 0.2), (solarize_impl(8), 0.6)],
-    [(c_vision.Equalize(), 0.6), (posterize_impl(6), 0.4)],
+    [(vision.Equalize(), 0.6), (posterize_impl(6), 0.4)],
 
     [(rotate_impl(8), 0.8), (color_impl(0), 0.4)],
-    [(rotate_impl(9), 0.4), (c_vision.Equalize(), 0.6)],
-    [(c_vision.Equalize(), 0.0), (c_vision.Equalize(), 0.8)],
-    [(c_vision.Invert(), 0.6), (c_vision.Equalize(), 1.0)],
+    [(rotate_impl(9), 0.4), (vision.Equalize(), 0.6)],
+    [(vision.Equalize(), 0.0), (vision.Equalize(), 0.8)],
+    [(vision.Invert(), 0.6), (vision.Equalize(), 1.0)],
     [(color_impl(4), 0.6), (contrast_impl(8), 1.0)],
 
     [(rotate_impl(8), 0.8), (color_impl(2), 1.0)],
     [(color_impl(8), 0.8), (solarize_impl(7), 0.8)],
-    [(sharpness_impl(7), 0.4), (c_vision.Invert(), 0.6)],
-    [(shear_x(5), 0.6), (c_vision.Equalize(), 1.0)],
-    [(color_impl(0), 0.4), (c_vision.Equalize(), 0.6)],
+    [(sharpness_impl(7), 0.4), (vision.Invert(), 0.6)],
+    [(shear_x(5), 0.6), (vision.Equalize(), 1.0)],
+    [(color_impl(0), 0.4), (vision.Equalize(), 0.6)],
 
-    [(c_vision.Equalize(), 0.4), (solarize_impl(4), 0.2)],
+    [(vision.Equalize(), 0.4), (solarize_impl(4), 0.2)],
     [(solarize_impl(5), 0.6), (autocontrast_impl(5), 0.6)],
-    [(c_vision.Invert(), 0.6), (c_vision.Equalize(), 1.0)],
+    [(vision.Invert(), 0.6), (vision.Equalize(), 1.0)],
     [(color_impl(4), 0.6), (contrast_impl(8), 1.0)],
-    [(c_vision.Equalize(), 0.8), (c_vision.Equalize(), 0.6)],
+    [(vision.Equalize(), 0.8), (vision.Equalize(), 0.6)],
 ]
 
 
@@ -153,19 +153,19 @@ def autoaugment(dataset_path, repeat_num=1, batch_size=32, target="Ascend"):
     mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
     std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
     trans = [
-        c_vision.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
+        vision.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
     ]
 
     post_trans = [
-        c_vision.RandomHorizontalFlip(prob=0.5),
-        c_vision.Normalize(mean=mean, std=std),
-        c_vision.HWC2CHW()
+        vision.RandomHorizontalFlip(prob=0.5),
+        vision.Normalize(mean=mean, std=std),
+        vision.HWC2CHW()
     ]
     dataset = ds.map(operations=trans, input_columns="image")
-    dataset = dataset.map(operations=c_vision.RandomSelectSubpolicy(imagenet_policy), input_columns=["image"])
+    dataset = dataset.map(operations=vision.RandomSelectSubpolicy(imagenet_policy), input_columns=["image"])
     dataset = dataset.map(operations=post_trans, input_columns="image")
 
-    type_cast_op = c_transforms.TypeCast(mstype.int32)
+    type_cast_op = data_trans.TypeCast(mstype.int32)
     dataset = dataset.map(operations=type_cast_op, input_columns="label")
     # apply the batch operation
     dataset = dataset.batch(batch_size, drop_remainder=True)

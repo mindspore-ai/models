@@ -16,7 +16,7 @@
 Package initialization for custom PIL operators.
 """
 
-from mindspore.dataset.vision import py_transforms
+from mindspore.dataset.vision import transforms
 
 from .crop import RandomCrop
 from .cutout import RandomCutout
@@ -41,9 +41,9 @@ from .transform import (
 
 class OperatorClasses:
     """OperatorClasses gathers all unary-image transformations listed in the
-    Table 6 of https://arxiv.org/abs/1805.09501 and uses discrte levels for
-    these transformations (The Sample Pairing transformation is an
-    exception, which involes multiple images from a single mini-batch and
+    Table 6 of https://arxiv.org/abs/1805.09501 and uses discrete levels for
+    these transformations. (The Sample Pairing transformation is an
+    exception, which involves multiple images from a single mini-batch and
     is not exploited in this implementation.)
 
     Additionally, there are RandomHorizontalFlip and RandomCrop.
@@ -56,9 +56,9 @@ class OperatorClasses:
         self.TranslateX = self.decorate(TranslateX, max_val=10, rounding=True)
         self.TranslateY = self.decorate(TranslateY, max_val=10, rounding=True)
 
-        self.AutoContrast = self.decorate(py_transforms.AutoContrast)
-        self.Invert = self.decorate(py_transforms.Invert)
-        self.Equalize = self.decorate(py_transforms.Equalize)
+        self.AutoContrast = self.decorate(transforms.AutoContrast)
+        self.Invert = self.decorate(transforms.Invert)
+        self.Equalize = self.decorate(transforms.Equalize)
 
         self.Solarize = self.decorate(
             Solarize, max_val=256, rounding=True, post=lambda x: 256 - x)
@@ -76,7 +76,7 @@ class OperatorClasses:
         self.Cutout = self.decorate(RandomCutout, max_val=20, rounding=True)
 
         self.RandomHorizontalFlip = self.decorate(
-            py_transforms.RandomHorizontalFlip)
+            transforms.RandomHorizontalFlip)
         self.RandomCrop = self.decorate(RandomCrop)
 
     def vars(self):

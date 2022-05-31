@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import numpy as np
 import cv2
 
 import mindspore.dataset as de
-import mindspore.dataset.vision.c_transforms as V_C
+import mindspore.dataset.vision as V_C
 
 from src.utils.transform import fliplr_joints, get_affine_transform, affine_transform
 

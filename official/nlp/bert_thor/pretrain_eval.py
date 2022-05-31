@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ from src.evaluation_config import cfg, bert_net_cfg
 
 import mindspore.common.dtype as mstype
 import mindspore.dataset as de
-import mindspore.dataset.transforms.c_transforms as C
+import mindspore.dataset.transforms as C
 import mindspore.nn as nn
 from mindspore import context
 from mindspore.common.parameter import Parameter

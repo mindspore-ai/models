@@ -19,8 +19,8 @@ from PIL import ImageFile
 
 from mindspore import dtype as mstype
 import mindspore.dataset as de
-import mindspore.dataset.vision.c_transforms as VC
-import mindspore.dataset.transforms.c_transforms as C
+import mindspore.dataset.vision as VC
+import mindspore.dataset.transforms as C
 
 sys.path.append('./')
 sys.path.append('../data/')

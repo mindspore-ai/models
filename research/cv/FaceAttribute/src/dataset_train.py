@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 # ============================================================================
 """Face attribute dataset for train"""
 import mindspore.dataset as de
-import mindspore.dataset.vision.py_transforms as F
-import mindspore.dataset.transforms.py_transforms as F2
+import mindspore.dataset.vision as F
+import mindspore.dataset.transforms as F2
 
 __all__ = ['data_generator']
 
@@ -28,11 +28,11 @@ def data_generator(args):
     batch_size = args.per_batch_size
     attri_num = args.attri_num
     max_epoch = args.max_epoch
-    transform_img = F2.Compose([F.Decode(),
+    transform_img = F2.Compose([F.Decode(True)),
                                 F.Resize((dst_w, dst_h)),
                                 F.RandomHorizontalFlip(prob=0.5),
                                 F.ToTensor(),
-                                F.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+                                F.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5), is_hwc=False)])
 
     de_dataset = de.MindDataset(mindrecord_path + "0", columns_list=["image", "label"], num_shards=args.world_size,
                                 shard_id=args.local_rank)

@@ -19,7 +19,7 @@ Visualization for testing purposes.
 import matplotlib.pyplot as plt
 
 import mindspore.dataset as ds
-import mindspore.dataset.vision.py_transforms as py_trans
+import mindspore.dataset.vision as vision
 from mindspore import context
 context.set_context(mode=context.PYNATIVE_MODE, device_target='CPU')
 
@@ -36,7 +36,7 @@ def compare(data_path, trans, output_path='./ops_test.png'):
 
     # Apply transformations
     dataset_augmented = dataset_orig.map(
-        operations=[py_trans.ToPIL()] + trans + [py_trans.ToTensor()],
+        operations=[vision.ToPIL()] + trans + [vision.ToTensor()],
         input_columns=['image'],
     )
 

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ Data loader
 
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
-import mindspore.dataset.transforms.c_transforms as C
+import mindspore.dataset.transforms as C
 from mindspore import log as logger
 
 def create_dataset(batch_size, device_num=1, rank=0, num_workers=8, do_shuffle=True,

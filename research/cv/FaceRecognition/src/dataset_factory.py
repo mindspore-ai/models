@@ -18,8 +18,8 @@ import math
 import numpy as np
 
 import mindspore.dataset as de
-import mindspore.dataset.vision.py_transforms as F
-import mindspore.dataset.transforms.py_transforms as F2
+import mindspore.dataset.vision as F
+import mindspore.dataset.transforms as F2
 
 from src.custom_dataset import DistributedCustomSampler, CustomDataset
 
@@ -27,7 +27,7 @@ __all__ = ['get_de_dataset']
 
 def get_de_dataset(args):
     '''get_de_dataset'''
-    lbl_transforms = [F.ToType(np.int32)]
+    lbl_transforms = [F2.TypeCast(np.int32)]
     transform_label = F2.Compose(lbl_transforms)
 
     drop_remainder = True
@@ -35,7 +35,7 @@ def get_de_dataset(args):
     transforms = [F.ToPIL(),
                   F.RandomHorizontalFlip(),
                   F.ToTensor(),
-                  F.Normalize(mean=[0.5], std=[0.5])]
+                  F.Normalize(mean=[0.5], std=[0.5], is_hwc=False)]
     transform = F2.Compose(transforms)
     cache_path = os.path.join('cache', os.path.basename(args.data_dir), 'data_cache.pkl')
     if args.device_target == 'GPU' and args.local_rank != 0:

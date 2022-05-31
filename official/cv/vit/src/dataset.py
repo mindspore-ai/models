@@ -22,9 +22,8 @@ import numpy as np
 
 import mindspore as ms
 import mindspore.dataset.engine as de
-import mindspore.dataset.vision.c_transforms as C
-import mindspore.dataset.transforms.c_transforms as C2
-import mindspore.dataset.vision.py_transforms as P
+import mindspore.dataset.vision as C
+import mindspore.dataset.transforms as C2
 from mindspore.dataset.vision.utils import Inter
 
 from .autoaugment import ImageNetPolicy
@@ -107,7 +106,7 @@ def create_dataset(dataset_path,
         ]
         if autoaugment:
             trans += [
-                P.ToPIL(),
+                C.ToPIL(),
                 ImageNetPolicy(),
                 ToNumpy(),
             ]

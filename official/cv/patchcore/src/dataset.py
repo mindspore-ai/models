@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,9 +20,9 @@ from pathlib import Path
 import numpy as np
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
-import mindspore.dataset.transforms.c_transforms as C2
-import mindspore.dataset.vision.py_transforms as py_vision
-from mindspore.dataset.transforms.py_transforms import Compose
+import mindspore.dataset.transforms as C2
+import mindspore.dataset.vision as vision
+from mindspore.dataset.transforms.transforms import Compose
 from mindspore.dataset.vision import Inter
 from PIL import Image
 
@@ -137,15 +137,15 @@ def createDataset(dataset_path, category):
     std = [0.229, 0.224, 0.225]
 
     data_transforms = Compose([
-        py_vision.Resize((256, 256), interpolation=Inter.ANTIALIAS),
-        py_vision.CenterCrop(224),
-        py_vision.ToTensor(),
-        py_vision.Normalize(mean=mean, std=std)
+        vision.Resize((256, 256), interpolation=Inter.ANTIALIAS),
+        vision.CenterCrop(224),
+        vision.ToTensor(),
+        vision.Normalize(mean=mean, std=std, is_hwc=False)
     ])
     gt_transforms = Compose([
-        py_vision.Resize((256, 256)),
-        py_vision.CenterCrop(224),
-        py_vision.ToTensor()
+        vision.Resize((256, 256)),
+        vision.CenterCrop(224),
+        vision.ToTensor()
     ])
 
     train_json_path, test_json_path = createDatasetJson(dataset_path, category, data_transforms, gt_transforms)

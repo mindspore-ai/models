@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ from skimage import io, transform, color
 from mindspore import context
 from mindspore import dataset as ds
 from mindspore.common import dtype as mstype
-import mindspore.dataset.transforms.c_transforms as CC
+import mindspore.dataset.transforms as CC
 from mindspore.context import ParallelMode
 from mindspore.communication.management import get_rank, get_group_size
 

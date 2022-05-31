@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ import mindspore
 import mindspore.dataset as ds
 from mindspore import context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-import mindspore.dataset.transforms.c_transforms as C
+import mindspore.dataset.transforms as C
 from src.model import DnCNN
 
 class DnCNN_eval_Dataset():

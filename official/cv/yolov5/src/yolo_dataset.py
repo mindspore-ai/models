@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -240,7 +240,7 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, device_num, rank,
                                    remove_images_without_annotations=remove_empty_anno, is_training=is_training)
     distributed_sampler = DistributedSampler(len(yolo_dataset), device_num, rank, shuffle=shuffle)
     yolo_dataset.size = len(distributed_sampler)
-    hwc_to_chw = ds.vision.c_transforms.HWC2CHW()
+    hwc_to_chw = ds.vision.HWC2CHW()
 
     config.dataset_size = len(yolo_dataset)
     cores = multiprocessing.cpu_count()
@@ -267,7 +267,7 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, device_num, rank,
                               num_parallel_workers=min(4, num_parallel_workers), python_multiprocessing=False)
         mean = [m * 255 for m in [0.485, 0.456, 0.406]]
         std = [s * 255 for s in [0.229, 0.224, 0.225]]
-        dataset = dataset.map([ds.vision.c_transforms.Normalize(mean, std), hwc_to_chw],
+        dataset = dataset.map([ds.vision.Normalize(mean, std), hwc_to_chw],
                               num_parallel_workers=min(4, num_parallel_workers))
 
         def concatenate(images):

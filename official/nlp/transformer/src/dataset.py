@@ -33,7 +33,7 @@ def create_transformer_dataset(rank_size=1, rank_id=0, do_shuffle="true", datase
                                           "target_sos_ids", "target_sos_mask",
                                           "target_eos_ids", "target_eos_mask"],
                             shuffle=(do_shuffle == "true"), num_shards=rank_size, shard_id=rank_id)
-        type_cast_op = de.transforms.c_transforms.TypeCast(ms.int32)
+        type_cast_op = de.transforms.transforms.TypeCast(ms.int32)
         ds = ds.map(operations=type_cast_op, input_columns="source_eos_ids")
         ds = ds.map(operations=type_cast_op, input_columns="source_eos_mask")
         ds = ds.map(operations=type_cast_op, input_columns="target_sos_ids")

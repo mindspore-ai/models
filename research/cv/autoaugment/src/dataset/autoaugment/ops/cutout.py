@@ -21,7 +21,7 @@ import random
 
 class RandomCutout:
     """
-    RandomCutout is similar to py_transforms.Cutout but is simplified and
+    RandomCutout is similar to transforms.CutOut but is simplified and
     crafted for PIL images.
 
     Args:

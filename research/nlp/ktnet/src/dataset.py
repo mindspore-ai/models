@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
-import mindspore.dataset.transforms.c_transforms as C
+import mindspore.dataset.transforms as C
 
 
 def create_train_dataset(data_file=None, do_shuffle=True, device_num=1, rank=0, batch_size=1,

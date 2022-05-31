@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ import copy
 import json
 from pathlib import Path
 import mindspore.dataset as ds
-import mindspore.dataset.vision.py_transforms as py_vision
-from mindspore.dataset.transforms.py_transforms import Compose
+import mindspore.dataset.vision as vision
+from mindspore.dataset.transforms.transforms import Compose
 
 from .veri import VeRiDataset
 
@@ -42,8 +42,8 @@ def create_dataset(cfg, data_dir, is_train=True):
                 "joints", "joints_vis"], num_parallel_workers=1, shuffle=False, num_shards=1, shard_id=0)
 
     trans = Compose([
-        py_vision.ToTensor(),
-        py_vision.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+        vision.ToTensor(),
+        vision.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225), is_hwc=False)
     ])
 
     dataset = dataset.map(operations=trans, input_columns="input", num_parallel_workers=8)

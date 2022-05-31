@@ -19,8 +19,8 @@ import cv2
 import numpy as np
 import mindspore
 import mindspore.dataset as ds
-import mindspore.dataset.vision.c_transforms as C2
-import mindspore.dataset.transforms.c_transforms as C
+import mindspore.dataset.vision as C2
+import mindspore.dataset.transforms as C
 mindspore.set_seed(1)
 
 def prepare_image_cv2(im):

@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 """Face detection yolov3 data pre-process."""
 import multiprocessing
 import numpy as np
-import mindspore.dataset.vision.py_transforms as P
+import mindspore.dataset.vision as V
 import mindspore.dataset as de
 
 from src.transforms import RandomCropLetterbox, RandomFlip, HSVShift, ResizeLetterbox
@@ -31,10 +31,10 @@ class SingleScaleTrans:
     def __call__(self, imgs, ann, image_names, image_size, batch_info):
 
         size = self.resize
-        decode = P.Decode()
+        decode = P.Decode(True)
         resize_letter_box_op = ResizeLetterbox(input_dim=size)
 
-        to_tensor = P.ToTensor()
+        to_tensor = V.ToTensor()
         ret_imgs = []
         ret_anno = []
 
@@ -204,7 +204,7 @@ def preprocess_fn(image, annotation):
     anchors = config.anchors
     anchors_mask = config.anchors_mask
 
-    decode = P.Decode()
+    decode = P.Decode(True)
     random_crop_letter_box_op = RandomCropLetterbox(jitter=jitter, input_dim=size)
     random_flip_op = RandomFlip(flip)
     hsv_shift_op = HSVShift(hue, sat, val)

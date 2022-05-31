@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,9 +22,8 @@ from mindspore.mindrecord import FileWriter
 import mindspore.dataset as ds
 from mindspore.dataset.vision import Inter
 import mindspore.common.dtype as mstype
-import mindspore.dataset.vision.c_transforms as C
-import mindspore.dataset.transforms.c_transforms as C2
-import mindspore.dataset.vision.py_transforms as P_C
+import mindspore.dataset.vision as C
+import mindspore.dataset.transforms as C2
 
 class Dataset:
     """Dataset"""
@@ -151,9 +150,9 @@ def create_vehiclenet_dataset(mindrecord_file, batch_size=1, device_num=1, is_tr
 
     if is_training:
         if use_aug:
-            py_to_pil_op = P_C.ToPIL()
+            py_to_pil_op = C.ToPIL()
             autoaugment_op = ImageNetPolicy()
-            to_tensor_op = P_C.ToTensor()
+            to_tensor_op = C.ToTensor()
             transforms_list += [py_to_pil_op, autoaugment_op, to_tensor_op]
 
         resized_op = C.Resize([train_inputsize, train_inputsize], interpolation=Inter.BICUBIC)

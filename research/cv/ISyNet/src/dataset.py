@@ -19,9 +19,8 @@ import os
 import numpy as np
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
-import mindspore.dataset.vision.c_transforms as C
-import mindspore.dataset.transforms.c_transforms as C2
-import mindspore.dataset.vision.py_transforms as P
+import mindspore.dataset.vision as C
+import mindspore.dataset.transforms as C2
 from mindspore.dataset.vision import Inter
 from mindspore.communication.management import init, get_rank, get_group_size
 from src.model_utils.config import config
@@ -83,7 +82,7 @@ def create_dataset1(dataset_path, do_train, repeat_num=1, batch_size=32, target=
     ]
     if autoaugment:
         trans += [
-            P.ToPIL(),
+            C.ToPIL(),
             ImageNetPolicy(),
             ToNumpy(),
         ]
@@ -171,7 +170,7 @@ def create_dataset2(dataset_path, do_train, repeat_num=1, batch_size=32, target=
                 ]
             if autoaugment:
                 trans += [
-                    P.ToPIL(),
+                    C.ToPIL(),
                     ImageNetPolicy(),
                     ToNumpy(),
                     ]
@@ -267,7 +266,7 @@ def create_dataset_pynative(dataset_path, do_train, repeat_num=1, batch_size=32,
             ]
         if autoaugment:
             trans += [
-                P.ToPIL(),
+                C.ToPIL(),
                 ImageNetPolicy(),
                 ToNumpy(),
                 ]
@@ -351,7 +350,7 @@ def create_dataset3(dataset_path, do_train, repeat_num=1, batch_size=32, target=
             ]
         if autoaugment:
             trans += [
-                P.ToPIL(),
+                C.ToPIL(),
                 ImageNetPolicy(),
                 ToNumpy(),
                 ]
@@ -437,7 +436,7 @@ def create_dataset4(dataset_path, do_train, repeat_num=1, batch_size=32, target=
                 ]
         if autoaugment:
             trans += [
-                P.ToPIL(),
+                C.ToPIL(),
                 ImageNetPolicy(),
                 ToNumpy(),
                 ]

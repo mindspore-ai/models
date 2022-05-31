@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import numpy as np
 import cv2
 
 import mindspore.dataset as de
-import mindspore.dataset.vision.c_transforms as C2
+import mindspore.dataset.vision as C2
 from mindspore.mindrecord import FileWriter
 from src.model_utils.config import config
 from .box_utils import jaccard_numpy, ssd_bboxes_encode

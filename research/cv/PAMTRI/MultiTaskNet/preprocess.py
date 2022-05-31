@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import argparse
 from pathlib import Path
 import mindspore.dataset as ds
 import mindspore.common.dtype as mstype
-import mindspore.dataset.transforms.c_transforms as C2
+import mindspore.dataset.transforms as C2
 from src.dataset.data_manager import DatasetManager
 from src.dataset.data_loader import ImageDataset
 from src.dataset.transforms import Compose_Keypt, Resize_Keypt, ToTensor_Keypt, Normalize_Keypt

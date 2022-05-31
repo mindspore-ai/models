@@ -16,7 +16,7 @@ import argparse
 import os
 import ast
 import numpy as np
-import mindspore.dataset.vision.c_transforms as C
+import mindspore.dataset.vision as C
 import mindspore.dataset as ds
 import mindspore.nn as nn
 from mindspore import Tensor, context
@@ -24,7 +24,7 @@ from mindspore.communication.management import init, get_rank
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, LossMonitor, TimeMonitor
 from mindspore.train.model import Model
 from mindspore.context import ParallelMode
-import mindspore.dataset.transforms.c_transforms as C2
+import mindspore.dataset.transforms as C2
 from mindspore.common import set_seed
 import mindspore.common.dtype as mstype
 from original_model import Net
