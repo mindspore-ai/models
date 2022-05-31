@@ -1,0 +1,67 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: True
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+data_path: "/cache/data/"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+checkpoint_path: './checkpoint/'
+checkpoint_file: './checkpoint/cbam_train-70_3437.ckpt'
+device_target: Ascend
+enable_profiling: False
+
+ckpt_path: "/cache/train"
+ckpt_file: "/cache/train//cbam_train-70_3437.ckpt"
+# ==============================================================================
+# Training options
+lr: 0.01
+lr_init: 0.01
+lr_max: 0.1
+lr_epochs: '30, 60, 90, 120'
+lr_scheduler: "piecewise"
+warmup_epochs: 5
+epoch_size: 70
+max_epoch: 70
+momentum: 0.9
+loss_scale: 1.0
+label_smooth: 0
+label_smooth_factor: 0
+weight_decay: 0.0005
+batch_size: 32
+keep_checkpoint_max: 10
+MINDIR_name: 'cbam.MINDIR'
+ckpt_file_path: './cbam_train-70_3437.ckpt'
+num_classes : 4
+dataset_name: 'rate'
+dataset_sink_mode: True
+device_id: 0
+save_checkpoint: True
+save_checkpoint_epochs: 1
+local_data_path: '../data'
+run_distribute: False
+batch_norm: False
+initialize_mode: "KaimingNormal"
+padding: 1
+pad_mode: 'pad'
+has_bias: False
+has_dropout: True
+
+# Model Description
+model_name: CBAM
+file_name: 'CBAM'
+file_format: 'MINDIR'
+
+---
+# Config description for each option
+enable_modelarts: 'Whether training on modelarts, default: False'
+data_url: 'Dataset url for obs'
+train_url: 'Training output url for obs'
+data_path: 'Dataset path for local'
+output_path: 'Training output path for local'
+
+device_target: 'Target device type'
+enable_profiling: 'Whether enable profiling while training, default: False'
+
+---
+device_target: ['Ascend', 'GPU', 'CPU']
