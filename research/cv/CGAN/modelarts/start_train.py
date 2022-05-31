@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +15,6 @@
 """train"""
 import os
 import ast
-import time
 import datetime
 import argparse
 import numpy as np
@@ -28,10 +27,10 @@ from mindspore.context import ParallelMode
 from mindspore.common import dtype as mstype
 from mindspore.communication.management import init, get_group_size
 from mindspore.train.serialization import export
-import mindspore.ops as ops
+from src.reporter import Reporter
 from src.dataset import create_dataset
-from src.model import Generator, Discriminator
-from src.cell import GenWithLossCell, DisWithLossCell, TrainOneStepCell
+from src.model import Generator, Discriminator, init_weights
+from src.cell import GenWithLossCell, DisWithLossCell, TrainOneStepG, TrainOneStepD
 
 
 def preLauch():
@@ -41,13 +40,16 @@ def preLauch():
                         help="Run distribute, default is false.")
     parser.add_argument('--device_id', type=int, default=0,
                         help='device id of Ascend (Default: 0)')
+    parser.add_argument('--batch_size', type=int, default=128,
+                        help='batch size id of training (Default: 128)')
     parser.add_argument('--ckpt_dir', type=str,
                         default='ckpt', help='checkpoint dir of CGAN')
-    parser.add_argument('--epochs', type=int,
+    parser.add_argument('--epoch_size', type=int,
                         default=50, help='epochs of CGAN for training')
-    parser.add_argument('--dataset', type=str, default='data/MNIST_Data/train',
+    parser.add_argument('--data_path', type=str, default='data/MNIST_Data/train',
                         help='dataset dir (default data/MNISt_Data/train)')
-
+    parser.add_argument("--real_valued_mnist", type=bool, default=True,
+                        help='If load real valued MNIST dataset(default False)')
     # model art
     parser.add_argument("--data_url", type=str, default="./dataset", help='real input file path')
     parser.add_argument("--modelarts_data_dir", type=str, default="/cache/dataset", help='modelart input path')
@@ -113,8 +115,9 @@ def modelarts_result2obs(args):
     if not mox.file.exists(obs_result_dir):
         print(f"obs_result_dir[{obs_result_dir}] not exist!")
         mox.file.make_dirs(obs_result_dir)
-    mox.file.copy_parallel(src_url='./ckpt', dst_url=os.path.join(obs_result_dir, 'ckpt'))
-    print("===>>>Copy Event or Checkpoint from modelarts dir: ./ckpt to obs:{}".format(obs_result_dir))
+    mox.file.copy_parallel(src_url=os.path.join(args.modelarts_result_dir, 'ckpt'),
+                           dst_url=os.path.join(obs_result_dir, 'ckpt'))
+    print("===>>>Copy Event or Checkpoint from modelarts to obs:{}".format(obs_result_dir))
     mox.file.copy(src_url='CGAN.air',
                   dst_url=os.path.join(obs_result_dir, 'CGAN.air'))
     files = os.listdir(obs_result_dir)
@@ -126,22 +129,19 @@ def export_AIR(args):
     """
     # training argument
     input_dim = 100
-    n_image = 200
     n_col = 20
-    # create G Cell & D Cell
+    n_row = 10
+    n_image = n_row * n_col
+
+    # create G Cell
     netG = Generator(input_dim)
 
-    latent_code_eval = Tensor(np.random.randn(n_image, input_dim).astype(np.float32))
-
-    label_eval = np.zeros((n_image, 10), dtype=np.float32)
-    for i in range(n_image):
-        j = i // n_col
-        label_eval[i][j] = 1
-    label_eval = Tensor(label_eval.astype(np.float32))
+    latent_code_eval = Tensor(np.random.randn(n_image, input_dim).astype(np.float32), dtype=mstype.float32)
+    label_eval = Tensor((np.arange(n_image) % 10).astype(np.int32), mstype.int32)
 
     param_G = load_checkpoint("ckpt/CGAN.ckpt")
     load_param_into_net(netG, param_G)
-
+    netG.set_train(False)
     export(netG, latent_code_eval, label_eval, file_name="CGAN", file_format="AIR")
     print("CGAN exported")
 
@@ -154,20 +154,29 @@ def main():
     args.train_path = args.modelarts_data_dir + "/MNIST_Data/train"
 
     # training argument
-    batch_size = 128
+    lr = 0.0002
+    classes_num = 10
+    img_channels = 1
+    img_size = 32
     input_dim = 100
-    epoch_start = 0
-    epoch_end = args.epochs
-    lr = 0.001
+    embed_size = 100
+    start_epochs = 0
+    epoch_size = args.epoch_size
+    batch_size = args.batch_size
+    output_path = args.modelarts_result_dir
 
     dataset = create_dataset(args.train_path,
-                             flatten_size=28 * 28,
+                             img_size=img_size,
                              batch_size=batch_size,
+                             real_valued_mnist=args.real_valued_mnist,
                              num_parallel_workers=args.device_num)
-
+    dataset_size = dataset.get_dataset_size()
+    dataset = dataset.create_dict_iterator()
     # create G Cell & D Cell
-    netG = Generator(input_dim)
-    netD = Discriminator(batch_size)
+    netG = Generator(input_dim, img_channels, classes_num, embed_size=embed_size)
+    netD = Discriminator(img_channels, classes_num, embed_size=img_size * img_size)
+    init_weights(netG)
+    init_weights(netD)
     # create WithLossCell
     netG_with_loss = GenWithLossCell(netG, netD)
     netD_with_loss = DisWithLossCell(netG, netD)
@@ -175,38 +184,35 @@ def main():
     optimizerG = nn.Adam(netG.trainable_params(), lr)
     optimizerD = nn.Adam(netD.trainable_params(), lr)
 
-    net_train = TrainOneStepCell(netG_with_loss,
-                                 netD_with_loss,
-                                 optimizerG,
-                                 optimizerD)
-
+    net_G_train = TrainOneStepG(netG_with_loss, optimizerG)
+    net_D_train = TrainOneStepD(netD_with_loss, optimizerD)
     netG.set_train()
     netD.set_train()
 
-    data_size = dataset.get_dataset_size()
-    print("data-size", data_size)
-    print("=========== start training ===========")
-    for epoch in range(epoch_start, epoch_end):
-        step = 0
-        start = time.time()
+    reporter = Reporter(output_path=output_path, stage='train', start_epochs=start_epochs, dataset_size=dataset_size,
+                        batch_size=batch_size)
+    reporter.info('==========start training===============')
+    fixed_noise = Tensor(np.random.normal(size=(batch_size, input_dim)),
+                         dtype=mstype.float32)
+    fixed_label = Tensor((np.arange(fixed_noise.shape[0]) % 10), dtype=mstype.int32)
+
+    for _ in range(start_epochs, epoch_size):
+        reporter.epoch_start()
         for data in dataset:
-            img = data[0]
-            label = data[1]
-            img = ops.Reshape()(img, (batch_size, 1, 28, 28))
-            latent_code = Tensor(np.random.randn(
-                batch_size, input_dim), dtype=mstype.float32)
-            dout, gout = net_train(img, latent_code, label)
-            step += 1
+            real_img = data['image']
+            label = data['label']
+            noise = Tensor(np.random.normal(size=(batch_size, input_dim)),
+                           dtype=mstype.float32)
 
-            if step % data_size == 0:
-                end = time.time()
-                pref = (end-start)*1000 / data_size
-                print("epoch {}, {:.3f} ms per step, d_loss is {:.4f}, g_loss is {:.4f}".format(epoch,
-                                                                                                pref, dout.asnumpy(),
-                                                                                                gout.asnumpy()))
+            res_D = net_D_train(real_img, noise, label)
+            fake_img, res_G = net_G_train(noise, label)
 
+            fixed_fake_img = netG(fixed_noise, fixed_label)
+            reporter.step_end(res_G, res_D)
+            reporter.visualizer(fake_img, fixed_fake_img)
+        reporter.epoch_end(net_G_train)
+    reporter.end_train()
     save_checkpoint(netG, './ckpt/CGAN.ckpt')
-    print("===========training success================")
     ## start export air
     export_AIR(args)
     ## copy result from modelarts to obs

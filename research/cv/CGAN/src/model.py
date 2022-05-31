@@ -13,129 +13,163 @@
 # limitations under the License.
 # ============================================================================
 """model define"""
-import math
 from mindspore import nn
 import mindspore.ops.operations as P
 from mindspore.common import initializer as init
 
 
-def init_weights(net, init_type='normal', init_gain=0.02):
+def init_weights(net, init_type='he', init_gain=0.02):
     """
     Initialize network weights.
 
-    Parameters:
+    Args:
         net (Cell): Network to be initialized
         init_type (str): The name of an initialization method: normal | xavier.
         init_gain (float): Gain factor for normal and xavier.
 
+    Returns:
+        init_type(str): init_type, 'normal', 'xavier', 'he', 'constant'
     """
     for _, cell in net.cells_and_names():
         if isinstance(cell, (nn.Conv2d, nn.Conv2dTranspose)):
             if init_type == 'normal':
-                cell.weight.set_data(init.initializer(
-                    init.Normal(init_gain), cell.weight.shape))
+                cell.weight.set_data(init.initializer(init.Normal(init_gain), cell.weight.shape))
             elif init_type == 'xavier':
-                cell.weight.set_data(init.initializer(
-                    init.XavierUniform(init_gain), cell.weight.shape))
-            elif init_type == 'KaimingUniform':
-                cell.weight.set_data(init.initializer(
-                    init.HeUniform(init_gain), cell.weight.shape))
+                cell.weight.set_data(init.initializer(init.XavierUniform(init_gain), cell.weight.shape))
+            elif init_type == 'he':
+                cell.weight.set_data(init.initializer(init.HeUniform(init_gain), cell.weight.shape))
             elif init_type == 'constant':
-                cell.weight.set_data(
-                    init.initializer(0.001, cell.weight.shape))
+                cell.weight.set_data(init.initializer(0.001, cell.weight.shape))
             else:
-                raise NotImplementedError(
-                    'initialization method [%s] is not implemented' % init_type)
-        elif isinstance(cell, nn.GroupNorm):
+                # print(init_type)
+                raise NotImplementedError('initialization method [%s] is not implemented' % init_type)
+        elif isinstance(cell, nn.BatchNorm2d):
             cell.gamma.set_data(init.initializer('ones', cell.gamma.shape))
             cell.beta.set_data(init.initializer('zeros', cell.beta.shape))
-
+        elif isinstance(cell, nn.Dense):
+            if init_type == 'normal':
+                cell.weight.set_data(init.initializer(init.Normal(init_gain), cell.weight.shape))
+            elif init_type == 'xavier':
+                cell.weight.set_data(init.initializer(init.XavierUniform(init_gain), cell.weight.shape))
+            elif init_type == 'he':
+                cell.weight.set_data(init.initializer(init.HeUniform(init_gain), cell.weight.shape))
+            elif init_type == 'constant':
+                cell.weight.set_data(init.initializer(0.001, cell.weight.shape))
+            cell.bias.set_data(init.initializer(0.001, cell.bias.shape))
+    return init_type
 
 class Generator(nn.Cell):
-    """Generator"""
-    def __init__(self, input_dim, output_dim=1, input_size=28, class_num=10):
-        super(Generator, self).__init__()
-        self.input_dim = input_dim
-        self.output_dim = output_dim
-        self.input_size = input_size
-        self.class_num = class_num
-        self.concat = P.Concat(1)
+    """
+    Generator network
+    """
 
-        self.fc = nn.SequentialCell(
-            nn.Dense(self.input_dim + self.class_num, 1024),
-            nn.BatchNorm1d(1024),
-            nn.ReLU(),
-            nn.Dense(1024, 128 * (self.input_size // 4)
-                     * (self.input_size // 4)),
-            nn.BatchNorm1d(128 * (self.input_size // 4)
-                           * (self.input_size // 4)),
-            nn.ReLU(),
-        )
-        self.deconv = nn.SequentialCell(
-            nn.Conv2dTranspose(128, 64, 4, 2, padding=0,
-                               has_bias=True, pad_mode='same'),
-            nn.BatchNorm2d(64),
-            nn.ReLU(),
-            nn.Conv2dTranspose(64, self.output_dim, 4, 2,
-                               padding=0, has_bias=True, pad_mode='same'),
-            nn.Tanh(),
-        )
-        init_weights(self.deconv, 'KaimingUniform', math.sqrt(5))
+    def __init__(self, noise_channel=100, img_channels=1, classes_num=10, embed_size=100, features_d=64,
+                 norm_mode='group', auto_prefix=True):
+        super(Generator, self).__init__(auto_prefix=auto_prefix)
+        self.concat = P.Concat(axis=1)
+        self.embed = nn.Embedding(classes_num, embed_size)
+        self.unsqueeze = P.ExpandDims()
+        self.has_bias = True
+        self.norm_mode = norm_mode
+        if norm_mode is not None:
+            self.has_bias = False
+        self.net = nn.SequentialCell([
+            self._block(noise_channel + embed_size, features_d * 4, 4, 1, pad_mode='valid', padding=0),
+            self._block(features_d * 4, features_d * 2, 4, 2, pad_mode='pad', padding=1),
+            self._block(features_d * 2, features_d, 4, 2, pad_mode='pad', padding=1),
+            nn.Conv2dTranspose(features_d, img_channels, 4, 2, pad_mode='pad', padding=1),
+            nn.Sigmoid()
+        ])
 
-    def construct(self, input_param, label):
-        """construct"""
-        x = self.concat((input_param, label))
-        x = self.fc(x)
-        x = x.view(-1, 128, (self.input_size // 4), (self.input_size // 4))
-        x = self.deconv(x)
+    def _get_norm(self, out_channels):  # 'instance', 'group'
+        if self.norm_mode == 'instance':
+            norm = nn.InstanceNorm2d(out_channels)
+        elif self.norm_mode == 'batch':
+            norm = nn.BatchNorm2d(out_channels)
+        elif self.norm_mode == 'group':
+            norm = nn.GroupNorm(1, out_channels)
+        else:
+            raise Exception("Invalid norm_mode!", self.norm_mode)
+        return norm
+
+    def _block(self, in_channels, out_channels, kernel_size, stride, pad_mode, padding):
+        return nn.SequentialCell([
+            nn.Conv2dTranspose(in_channels, out_channels, kernel_size, stride, pad_mode, padding,
+                               has_bias=self.has_bias),
+            self._get_norm(out_channels),
+            nn.ReLU()
+        ])
+
+    def construct(self, x, labels):
+        """
+        construct
+
+        Args:
+            x(Tensor): noise
+            labels(Tensor): labels
+
+        Returns:
+            x: net output
+        """
+        embedding = self.embed(labels)
+        x = self.concat((x, embedding))
+        x = self.unsqueeze(self.unsqueeze(x, 2), 2)
+        x = self.net(x)
 
         return x
 
 
+
 class Discriminator(nn.Cell):
-    """Discriminator"""
-    def __init__(self, batch_size, input_dim=1, output_dim=1, input_size=28, class_num=10):
-        super(Discriminator, self).__init__()
-        self.batch_size = batch_size
-        self.input_dim = input_dim
-        self.output_dim = output_dim
-        self.input_size = input_size
-        self.class_num = class_num
-        self.concat = P.Concat(1)
-        self.ExpandDims = P.ExpandDims()
-        self.expand = P.BroadcastTo
-
-        self.conv = nn.SequentialCell(
-            nn.Conv2d(self.input_dim + self.class_num, 64, 4, 2,
-                      padding=0, has_bias=True, pad_mode='same'),
-            nn.LeakyReLU(0.2),
-            nn.Conv2d(64, 128, 4, 2, padding=0,
-                      has_bias=True, pad_mode='same'),
-            nn.BatchNorm2d(128),
-            nn.LeakyReLU(0.2),
-        )
-        self.fc = nn.SequentialCell(
-            nn.Dense(128 * (self.input_size // 4) *
-                     (self.input_size // 4), 1024),
-            nn.BatchNorm1d(1024),
-            nn.LeakyReLU(0.2),
-            nn.Dense(1024, self.output_dim),
+    """Discriminator network"""
+    def __init__(self, img_channels=1, classes_num=10, embed_size=32 * 32, features_d=64, img_size=32,
+                 norm_mode='group', auto_prefix=True):
+        super(Discriminator, self).__init__(auto_prefix=auto_prefix)
+        self.img_size = img_size
+        self.has_bias = True
+        self.norm_mode = norm_mode
+        if norm_mode is not None:
+            self.has_bias = False
+        self.net = nn.SequentialCell([
+            self._block(img_channels + 1, features_d, 4, 2, pad_mode='pad', padding=1),
+            self._block(features_d, features_d * 2, 4, 2, pad_mode='pad', padding=1),
+            self._block(features_d * 2, features_d * 4, 4, 2, pad_mode='pad', padding=1),
+            nn.Conv2d(features_d * 4, 1, 4, 2, pad_mode='valid'),
             nn.Sigmoid(),
-        )
-        init_weights(self.conv, 'KaimingUniform', math.sqrt(5))
+        ])
+        self.concat = P.Concat(axis=1)
+        self.embed = nn.Embedding(classes_num, embed_size)
 
-    def construct(self, input_param, label):
-        """construct"""
-        # expand_fill
-        label_fill = self.ExpandDims(label, 2)
-        label_fill = self.ExpandDims(label_fill, 3)
-        shape = (self.batch_size, 10, self.input_size, self.input_size)
-        label_fill = self.expand(shape)(label_fill)
+    def _get_norm(self, out_channels):  # 'instance', 'group'
+        if self.norm_mode == 'instance':
+            norm = nn.InstanceNorm2d(out_channels)
+        elif self.norm_mode == 'batch':
+            norm = nn.BatchNorm2d(out_channels)
+        elif self.norm_mode == 'group':
+            norm = nn.GroupNorm(1, out_channels)
+        else:
+            raise Exception("Invalid norm_mode!", self.norm_mode)
+        return norm
 
-        # forward
-        x = self.concat((input_param, label_fill))
-        x = self.conv(x)
-        x = x.view(-1, 128 * (self.input_size // 4) * (self.input_size // 4))
-        x = self.fc(x)
+    def _block(self, in_channels, out_channels, kernel_size, stride, pad_mode, padding):
+        return nn.SequentialCell([
+            nn.Conv2d(in_channels, out_channels, kernel_size, stride, pad_mode, padding, has_bias=self.has_bias),
+            self._get_norm(out_channels),
+            nn.LeakyReLU()
+        ])
 
+    def construct(self, x, label):
+        """
+        construct
+
+        Args:
+            x(Tensor): noise
+            labels(Tensor): labels
+
+        Returns:
+            x: net output
+        """
+        embedding = self.embed(label).reshape(label.shape[0], 1, self.img_size, self.img_size)
+        x = self.concat((x, embedding))
+        x = self.net(x)
         return x

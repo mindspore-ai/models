@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,12 +36,7 @@ if __name__ == "__main__":
 
     input_dim = 100
     latent_code_eval = np.random.randn(200, input_dim).astype(np.float32)
-
-    label_eval = np.zeros((200, 10)).astype(np.float32)
-    for i in range(200):
-        j = i // 20
-        label_eval[i][j] = 1
-    label_eval = label_eval.astype(np.float32)
+    label_eval = (np.arange(200) % 10).astype(np.int32)
 
     file_name = "cgan_bs" + str(200) + ".bin"
     latent_code_file_path = os.path.join(latent_code_path, file_name)

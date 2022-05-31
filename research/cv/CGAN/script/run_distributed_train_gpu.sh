@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021-2022 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,10 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
 if [ $# != 4 ]
 then
-    echo "Usage: bash run_eval_ascend.sh [G_CKPT] [DATA_PATH] [OUTPUT_PATH] [DEVICE_ID]"
+    echo "Usage: bash run_distributed_train_gpu.sh [DATA_PATH] [OUTPUT_PATH] [CUDA_VISIBLE_DEVICES] [DEVICE_NUM]"
 exit 1
 fi
 
@@ -28,15 +27,33 @@ get_real_path(){
   fi
 }
 
-CKPT_PATH=$(get_real_path $1)
-DATA_PATH=$(get_real_path $2)
-OUTPUT_PATH=$(get_real_path $3)
+DATA_PATH=$(get_real_path $1)
+OUTPUT_PATH=$(get_real_path $2)
 
-export CKPT=$CKPT_PATH
 export DATASET=$DATA_PATH
 export OUTPUT_PATH=$OUTPUT_PATH
-export DEVICE_ID=$4
+export CUDA_VISIBLE_DEVICES=$3
+export DEVICE_NUM=$4
+export RANK_SIZE=$4
 
-echo "start eval on DEVICE $DEVICE_ID"
+# remove old train_parallel files
+rm -rf ./train_parallel
+# mkdirs
+mkdir ./train_parallel
+mkdir ./train_parallel/src
+
+# move files
+cp ../*.py ./train_parallel/
+cp ../src/*.py ./train_parallel/src
+
+# goto the training dirs of each training
+cd ./train_parallel/ || exit
+
+echo "start training on $DEVICE_NUM devices"
 echo "the results will saved in $OUTPUT_PATH"
-python -u ../eval.py --G_ckpt_path=$CKPT --data_path=$DATASET --device_id=$DEVICE_ID --output_path=$OUTPUT_PATH  --device_target=Ascend> eval_log 2>&1 &
+
+# input logs to env.log
+mpirun -n $DEVICE_NUM --output-filename log_output --merge-stderr-to-stdout --allow-run-as-root\
+ python train.py --data_path=$DATASET --output_path=$OUTPUT_PATH --device_target=GPU --distribute=True > log 2>&1 &
+
+

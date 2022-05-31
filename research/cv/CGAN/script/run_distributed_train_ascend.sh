@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,15 +13,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 3 ]
+if [ $# != 4 ]
 then
-    echo "Usage: sh run_standalone_train_ascend.sh [dataset] [rank_table] [device_num]"
+    echo "Usage: sh run_distributed_train_ascend.sh [DATA_PATH] [OUTPUT_PATH] [RANK_TABLE] [DEVICE_NUM]"
 exit 1
 fi
 
-export DATASET=$1
-export RANK_TABLE_FILE=$2
-export DEVICE_NUM=$3
+get_real_path(){
+  if [ "${1:0:1}" == "/" ]; then
+    echo "$1"
+  else
+    echo "$(realpath -m $PWD/$1)"
+  fi
+}
+
+DATA_PATH=$(get_real_path $1)
+OUTPUT_PATH=$(get_real_path $2)
+
+export DATASET=$DATA_PATH
+export OUTPUT_PATH=$OUTPUT_PATH
+export RANK_TABLE_FILE=$3
+export DEVICE_NUM=$4
 export RANK_SIZE=$DEVICE_NUM
 export HCCL_CONNECT_TIMEOUT=600
 export SERVER_ID=0
@@ -50,7 +62,7 @@ while [ $i -lt ${DEVICE_NUM} ]; do
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     # input logs to env.log
     env > env.log
-    python -u train.py --device_id=$i --distribute=True --ckpt_dir=./ckpt --dataset=$DATASET > log 2>&1 &
+    python -u train.py --device_target=Ascend --device_id=$i --distribute=True --data_path=$DATASET --output_path=$OUTPUT_PATH > log 2>&1 &
     cd ../..
     i=$((i + 1))
 done
