@@ -203,7 +203,7 @@ SLOG_PRINT_TO_STDOUT=1 python eval.py --device_id 0
         |     └─moxing_adapter.py  // Parameter processing
         ├── train.py               // training script
         ├── eval.py                //  evaluation script
-        ├── export.py              //  export model in air format
+        ├── export.py              //  export model in air/mindir format
         ├─default_config.yaml      // Training parameter profile
         └─train.py                 // Train net
 ```

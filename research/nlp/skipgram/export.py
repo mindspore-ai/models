@@ -26,7 +26,7 @@ parser = argparse.ArgumentParser(description='SkipGram export')
 parser.add_argument("--device_id", type=int, default=0, help="device id")
 parser.add_argument("--checkpoint_path", type=str, required=True, help="checkpoint file path.")
 parser.add_argument("--file_name", type=str, default="skipgram", help="output file name.")
-parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='AIR', help='file format')
+parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='MINDIR', help='file format')
 parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU"], default="Ascend", help="device target")
 
 args = parser.parse_args()

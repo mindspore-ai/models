@@ -29,7 +29,7 @@ from src.utils.load_weights import load_infer_weights
 
 parser = argparse.ArgumentParser(description="seq2seq export")
 parser.add_argument("--file_name", type=str, default="seq2seq", help="output file name.")
-parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="AIR", help="file format")
+parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
 parser.add_argument('--infer_config', type=str, required=True, help='seq2seq config file')
 parser.add_argument("--existed_ckpt", type=str, required=True, help="existed checkpoint address.")
 parser.add_argument('--vocab_file', type=str, required=True, help='vocabulary file')

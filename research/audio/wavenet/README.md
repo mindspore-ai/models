@@ -80,7 +80,7 @@ Dataset used: [The LJ Speech Dataset](<https://keithito.com/LJ-Speech-Dataset>)
         ├── audio.py                             // Audio utils. Note this script should be downloaded from the above link
         ├── compute-meanvar-stats.py             // Compute mean-variance Normalization stats. Note this script should be downloaded from the above link
         ├── evaluate.py                          // Evaluation
-        ├── export.py                            // Convert mindspore model to air model
+        ├── export.py                            // Convert mindspore model to air/mindir model
         ├── hparams.py                           // Hyper-parameter configuration. Note this script should be downloaded from the above link
         ├── mksubset.py                          // Make subset of dataset. Note this script should be downloaded from the above link
         ├── preprocess.py                        // Preprocess dataset. Note this script should be downloaded from the above link

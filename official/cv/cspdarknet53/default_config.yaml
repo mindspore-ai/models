@@ -64,7 +64,7 @@ graph_ckpt: "graph ckpt or feed ckpt"
 # export options
 export_batch_size: "batch size for export"
 ckpt_file: "cspdarknet53 ckpt file"
-file_name: "output air name."
+file_name: "output mindir name."
 file_format: "file format, choices in ['AIR', 'ONNX', 'MINDIR']"
 width: "input width"
 height: "input height"

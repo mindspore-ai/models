@@ -101,7 +101,7 @@ The entire code structure is as following:
     ├─ run_distribute_train_gpu.sh          # launch distributed training(8p) in GPU
     ├─ run_eval.sh                          # launch evaluating in ascend
     ├─ run_infer_310.sh                     # launch inference on Ascend310
-    └─ run_export.sh                        # launch exporting air model
+    └─ run_export.sh                        # launch exporting air/mindir model
   ├─ src
     ├─ FaceDetection
       ├─ voc_wrapper.py                     # get detection results
@@ -122,7 +122,7 @@ The entire code structure is as following:
   ├─ postprocess.py                         # postprocess script
   ├─ preprocess.py                          # preprocess script
   ├─ bin.py                                 # bin script
-  └─ export.py                              # export air model
+  └─ export.py                              # export air/mindir model
 ```
 
 ## [Running Example](#contents)

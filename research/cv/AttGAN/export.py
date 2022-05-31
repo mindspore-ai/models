@@ -28,7 +28,7 @@ parser = argparse.ArgumentParser(description='Attribute Edit')
 parser.add_argument("--device_id", type=int, default=0, help="Device id")
 parser.add_argument("--batch_size", type=int, default=1, help="batch size")
 parser.add_argument('--gen_ckpt_name', type=str, default='')
-parser.add_argument('--file_format', type=str, choices=["AIR", "MINDIR"], default='AIR', help='file format')
+parser.add_argument('--file_format', type=str, choices=["AIR", "MINDIR"], default='MINDIR', help='file format')
 parser.add_argument('--experiment_name', dest='experiment_name', required=True)
 
 args_ = parser.parse_args()

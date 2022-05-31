@@ -210,7 +210,7 @@ Dataset used: [COCO2017](https://cocodataset.org/)
     ├── centernet
         ├── train.py                     // training scripts
         ├── eval.py                      // testing and evaluation outputs
-        ├── export.py                    // convert mindspore model to air model
+        ├── export.py                    // convert mindspore model to air/mindir model
         ├── README.md                    // descriptions about CenterNet
         ├── default_config.yaml          // parameter configuration
         ├── scripts
@@ -342,9 +342,9 @@ eval_config:
 
 ```text
 config for export.
-    input_res: dataset_config.input_res            // input resolution of the model air, default is [512, 512]
+    input_res: dataset_config.input_res            // input resolution of the model air/mindir, default is [512, 512]
     ckpt_file: "./ckpt_file.ckpt"                  // checkpoint file, default is "./ckkt_file.ckpt"
-    export_format: "MINDIR"                        // the exported format of model air, default is MINDIR
+    export_format: "MINDIR"                        // the exported format of model air/mindir, default is MINDIR
     export_name: "CenterNet_MultiPose"             // the exported file name, default is "CentNet_MultiPose"
 ```
 

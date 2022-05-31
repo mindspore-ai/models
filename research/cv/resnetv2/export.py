@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""Convert ckpt to air."""
+"""Convert ckpt to air/mindir."""
 import argparse
 import numpy as np
 
@@ -28,7 +28,7 @@ parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint fil
 parser.add_argument("--file_name", type=str, default="resnetv2", help="output file name.")
 parser.add_argument('--width', type=int, default=32, help='input width')
 parser.add_argument('--height', type=int, default=32, help='input height')
-parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="AIR", help="file format")
+parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
 parser.add_argument("--device_target", type=str, default="Ascend",
                     choices=["Ascend", "GPU", "CPU"], help="device target(default: Ascend)")
 args = parser.parse_args()

@@ -252,7 +252,7 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
   keep_checkpoint_max: 10 # 仅仅保持最新的keep_checkpoint_max个checkpoint文件
   checkpoint_path: '/train_tinydarknet.ckpt'  # 保存checkpoint文件的绝对路径
   onnx_filename: 'tinydarknet.onnx' # 用于export.py 文件中的onnx模型的文件名
-  air_filename: 'tinydarknet.air'   # 用于export.py 文件中的air模型的文件名
+  air_filename: 'tinydarknet.air'   # 用于export.py 文件中的air/mindir模型的文件名
   lr_scheduler: 'exponential'     # 学习率策略
   lr_epochs: [70, 140, 210, 280]  # 学习率进行变化的epoch数
   lr_gamma: 0.3            # lr_scheduler为exponential时的学习率衰减因子

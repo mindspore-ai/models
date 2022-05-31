@@ -26,7 +26,7 @@ parser.add_argument("--device_id", type=int, default=0, help="Device id")
 parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
 parser.add_argument("--dataset", type=str, default="cora", choices=["cora", "citeseer"], help="Dataset.")
 parser.add_argument("--file_name", type=str, default="gcn", help="output file name.")
-parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="AIR", help="file format")
+parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
 parser.add_argument("--device_target", type=str, default="Ascend",
                     choices=["Ascend", "GPU", "CPU"], help="device target (default: Ascend)")
 args = parser.parse_args()

@@ -122,7 +122,7 @@ bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL] [BACKBO
 bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
 
 # inference (the values of IMAGE_WIDTH and IMAGE_HEIGHT must be set or use default at the same time.)
-bash run_infer_310.sh [AIR_PATH] [DATA_PATH] [ANN_FILE_PATH] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [DEVICE_ID](optional)
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE_PATH] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [DEVICE_ID](optional)
 ```
 
 ## Run on GPU

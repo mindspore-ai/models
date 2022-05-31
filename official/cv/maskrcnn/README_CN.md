@@ -138,7 +138,7 @@ pip install mmcv=0.2.14
    ```
 
    注：
-   1. AIR_PATH是在910上使用export脚本导出的模型。
+   1. MINDIR_PATH是在910上使用export脚本导出的模型。
    2. ANN_FILE_PATH是推理使用的标注文件。
 
 # 在docker上运行

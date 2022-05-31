@@ -144,7 +144,7 @@ pip install mmcv=0.2.14
    ```
 
    Note:
-   1. AIR_PATH is a model file, exported by export script file on the Ascend910 environment.
+   1. MINDIR_PATH is a model file, exported by export script file on the Ascend910 environment.
    2. ANN_FILE_PATH is a annotation file for inference.
 
 # Run in docker
@@ -228,9 +228,9 @@ bash run_eval.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [DATA_PATH]
     # (5) Set the code directory to "/path/maskrcnn" on the website UI interface.
     # (6) Set the startup file to "train.py" on the website UI interface.
     # (7) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
-    # (8) Create your job.[AIR_PATH] [DATA_PATH] [ANN_FILE_PATH]
+    # (8) Create your job.[MINDIR_PATH] [DATA_PATH] [ANN_FILE_PATH]
     #
-    # Train 1p with Ascend[AIR_PATH] [DATA_PATH] [ANN_FILE_PATH]
+    # Train 1p with Ascend[MINDIR_PATH] [DATA_PATH] [ANN_FILE_PATH]
     # (1) Perform a or b.
     #       a. Set "enable_modelarts=True" on default_config.yaml file.
     #          Set "need_modelarts_dataset_unzip=True" on default_config.yaml file.

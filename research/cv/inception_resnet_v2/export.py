@@ -25,8 +25,8 @@ from src.inception_resnet_v2 import Inception_resnet_v2
 parser = argparse.ArgumentParser(description='inception_resnet_v2 export')
 parser.add_argument("--device_id", type=int, default=0, help="Device id")
 parser.add_argument('--ckpt_file', type=str, required=True, help='inception_resnet_v2 ckpt file.')
-parser.add_argument('--file_name', type=str, default='inception_resnet_v2', help='inception_resnet_v2 output air name.')
-parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='AIR', help='file format')
+parser.add_argument('--file_name', type=str, default='inception_resnet_v2', help='output air or mindir name.')
+parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='MINDIR', help='file format')
 parser.add_argument('--width', type=int, default=299, help='input width')
 parser.add_argument('--height', type=int, default=299, help='input height')
 parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"], default="Ascend",

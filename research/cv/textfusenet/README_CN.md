@@ -121,7 +121,7 @@ Shapely==1.5.9
    ```
 
    注：
-   1. AIR_PATH是在910上使用export脚本导出的模型。
+   1. MINDIR_PATH是在910上使用export脚本导出的模型。
    2. ANN_FILE_PATH是推理使用的标注文件。
 
 # 脚本说明

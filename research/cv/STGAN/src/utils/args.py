@@ -255,7 +255,7 @@ def get_args(phase):
     parser.add_argument('--outputs_dir', type=str, default='./outputs', \
                         help='models are saved here, default is ./outputs.')
     parser.add_argument("--dataroot", type=str, default='./dataset')
-    parser.add_argument('--file_format', type=str, choices=['AIR', 'ONNX', 'MINDIR'], default='AIR', \
+    parser.add_argument('--file_format', type=str, choices=['AIR', 'ONNX', 'MINDIR'], default='MINDIR', \
                     help='file format')
     parser.add_argument('--file_name', type=str, default='STGAN', help='output file name prefix.')
     parser.add_argument('--ckpt_path', default=None, help='path of checkpoint file.')

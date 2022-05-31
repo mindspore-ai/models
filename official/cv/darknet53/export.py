@@ -32,7 +32,7 @@ parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint fil
 parser.add_argument("--file_name", type=str, default="darknet53", help="output file name.")
 parser.add_argument('--width', type=int, default=256, help='input width')
 parser.add_argument('--height', type=int, default=256, help='input height')
-parser.add_argument("--file_format", type=str, choices=["AIR", "MINDIR"], default="AIR", help="file format")
+parser.add_argument("--file_format", type=str, choices=["AIR", "MINDIR"], default="MINDIR", help="file format")
 parser.add_argument("--device_target", type=str, default="GPU",
                     choices=["GPU", "CPU"], help="device target(default: GPU)")
 args = parser.parse_args()

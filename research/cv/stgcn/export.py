@@ -39,7 +39,7 @@ parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint fil
 parser.add_argument("--n_pred", type=int, default=3, help="The number of time interval for predcition.")
 parser.add_argument("--graph_conv_type", type=str, default="chebconv", help="Grapg convolution type.")
 parser.add_argument("--file_name", type=str, default="stgcn", help="output file name.")
-parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="AIR", help="file format")
+parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
 args = parser.parse_args()
 
 context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)

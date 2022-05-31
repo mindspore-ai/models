@@ -67,7 +67,7 @@ output_path: 'Training output path for local'
 
 device_target: 'Target device type' 
 enable_profiling: 'Whether enable profiling while training, default: False'
-file_name: 'inceptionv3 output air name.'
+file_name: 'inceptionv3 output mindir name.'
 file_format: 'file format'
 result_path: "result file path"
 label_file: "label file"

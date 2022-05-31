@@ -319,7 +319,7 @@ Parameters for both training and evaluation can be set in config.py
   'keep_checkpoint_max': 10 # only keep the last keep_checkpoint_max checkpoint
   'checkpoint_path': './train_googlenet_cifar10-125_390.ckpt'  # the absolute full path to save the checkpoint file
   'onnx_filename': 'googlenet.onnx' # file name of the onnx model used in export.py
-  'air_filename': 'googlenet.air' # file name of the air model used in export.py
+  'air_filename': 'googlenet.air' # file name of the air/mindir model used in export.py
   ```
 
 - config for GoogleNet, ImageNet dataset
@@ -341,7 +341,7 @@ Parameters for both training and evaluation can be set in config.py
   'keep_checkpoint_max': 10 # only keep the last keep_checkpoint_max checkpoint
   'checkpoint_path': './train_googlenet_cifar10-125_390.ckpt'  # the absolute full path to save the checkpoint file
   'onnx_filename': 'googlenet.onnx' # file name of the onnx model used in export.py
-  'air_filename': 'googlenet.air'   # file name of the air model used in export.py
+  'air_filename': 'googlenet.air'   # file name of the air/mindir model used in export.py
   'lr_scheduler': 'exponential'     # learning rate scheduler
   'lr_epochs': [70, 140, 210, 280]  # epoch of lr changing
   'lr_gamma': 0.3            # decrease lr by a factor of exponential lr_scheduler
