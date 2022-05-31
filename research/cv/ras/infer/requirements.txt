@@ -1,0 +1,4 @@
+numpy
+PIL
+argparse
+opencv-python
