@@ -29,6 +29,16 @@
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
         - [result](#result-2)
+- [Apply algorithm in MindSpore Golden Stick](#apply-algorithm-in-mindspore-golden-stick)
+    - [Apply SimQAT algorithm](#apply-simqat-algorithm)
+        - [Training Process](#Training Process-1)
+            - [Running on GPU](#running-on-gpu-2)
+        - [Resume Process](#resume-process-1)
+        - [Evaluation Process](#evaluation-process-1)
+            - [Running on GPU](#running-on-gpu-3)
+            - [Result](#resutl-3)
+        - [Inference Process](#inference-process-1)
+            - [Export MindIR](#export-mindir-1)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
@@ -798,6 +808,71 @@ Total data: 50000, top1 accuracy: 0.78625, top5 accuracy: 0.94358.
 ```bash
 Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 ```
+
+# Apply algorithm in MindSpore Golden Stick
+
+## Apply SimQAT algorithm
+
+SimQAT is a quantization-aware training algorithm that trains the quantization parameters of certain layers in the network by introducing pseudo-quantization nodes, so that the model can perform inference with less power consumption or higher performance during the deployment phase.
+
+### Training Process
+
+#### Running on GPU
+
+```text
+# distributed training
+cd ./golden_stick/scripts/
+# PYTHON_PATH represents path to directory of 'train.py'.
+bash run_distribute_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [FP32_CKPT_PATH]
+
+# distributed training example
+cd ./golden_stick/scripts/
+bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml ./cifar10/train/ ./checkpoint/resnet-90.ckpt
+
+# standalone training
+cd ./golden_stick/scripts/
+# PYTHON_PATH represents path to directory of 'train.py'.
+bash run_standalone_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [FP32_CKPT_PATH]
+
+# standalone training example
+cd ./golden_stick/scripts/
+bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml ./cifar10/train/ ./checkpoint/resnet-90.ckpt
+```
+
+### Resume Process
+
+SimQAT algorithm is not support to resume training process now.
+
+### Evaluation Process
+
+#### Running on GPU
+
+```text
+# evaluation
+cd ./golden_stick/scripts/
+# PYTHON_PATH represents path to directory of 'eval.py'.
+bash run_eval_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CHECKPOINT_PATH]
+
+# evaluation example
+cd ./golden_stick/scripts/
+bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml ./cifar10/train/ ./checkpoint/resnet-90.ckpt
+```
+
+#### Result
+
+Evaluation result will be stored in the example path, whose folder name is "eval". Under this, you can find result like the following in log.
+
+- Apply SumQAT on ResNet50, and evaluating with CIFAR-10 dataset
+
+```bash
+result:{'top_1_accuracy': 0.9354967948717948, 'top_5_accuracy': 0.9981971153846154} ckpt=~/resnet50_cifar10/train_parallel0/resnet-180_195.ckpt
+```
+
+### Inference Process
+
+#### Export MindIR
+
+Not support exporting MindIR now.
 
 # [Model Description](#contents)
 

@@ -31,6 +31,16 @@
         - [导出MindIR](#导出mindir)
         - [在Ascend310执行推理](#在ascend310执行推理)
         - [结果](#结果-2)
+- [应用金箍棒模型压缩算法](#应用金箍棒模型压缩算法)
+    - [应用SimQAT算法](#应用simqat算法)
+        - [训练过程](#训练过程-1)
+            - [GPU处理器环境运行](#gpu处理器环境运行-2)
+        - [续训过程](#续训过程-1)
+        - [评估过程](#评估过程-1)
+            - [GPU处理器环境运行](#gpu处理器环境运行-3)
+            - [结果](#结果-3)
+        - [推理过程](#推理过程-1)
+            - [导出MindIR](#导出mindir-1)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -757,6 +767,73 @@ Total data: 50000, top1 accuracy: 0.78625, top5 accuracy: 0.94358.
 ```bash
 Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 ```
+
+# 应用金箍棒模型压缩算法
+
+## 应用SimQAT算法
+
+SimQAT是一种量化感知训练算法，通过引入伪量化节点来训练网络中的某些层的量化参数，从而在部署阶段，模型得以以更小的功耗或者更高的性能进行推理。
+
+### 训练过程
+
+#### GPU处理器环境运行
+
+```text
+# 分布式训练
+cd ./golden_stick/scripts/
+# PYTHON_PATH 表示'train.py'脚本所在的目录
+bash run_distribute_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [FP32_CKPT_PATH]
+
+# 分布式训练示例
+cd ./golden_stick/scripts/
+bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml ./cifar10/train/ ./checkpoint/resnet-90.ckpt
+
+# 单机训练
+cd ./golden_stick/scripts/
+# PYTHON_PATH 表示'train.py'脚本所在的目录
+bash run_standalone_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [FP32_CKPT_PATH]
+
+# 单机训练示例
+cd ./golden_stick/scripts/
+bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml ./cifar10/train/ ./checkpoint/resnet-90.ckpt
+```
+
+### 续训过程
+
+SimQAT算法当前暂不支持续训、
+
+### 评估过程
+
+#### GPU处理器环境运行
+
+```text
+# 评估
+cd ./golden_stick/scripts/
+# PYTHON_PATH 表示'eval.py'脚本所在的目录
+bash run_eval_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CHECKPOINT_PATH]
+```
+
+```text
+# 评估示例
+cd ./golden_stick/scripts/
+bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml ./cifar10/train/ ./checkpoint/resnet-90.ckpt
+```
+
+#### 结果
+
+评估结果保存在示例路径中，文件夹名为“eval”。您可在此路径下的日志找到如下结果：
+
+- 使用SimQAT算法量化ResNet50，并使用CIFAR-10数据集评估
+
+```bash
+result:{'top_1_accuracy': 0.9354967948717948, 'top_5_accuracy': 0.9981971153846154} ckpt=~/resnet50_cifar10/train_parallel0/resnet-180_195.ckpt
+```
+
+### 推理过程
+
+#### 导出MindIR
+
+当前暂不支持导出MindIR
 
 # 模型描述
 
