@@ -39,7 +39,7 @@ def run_export():
     parser.add_argument("--batch_size", type=int, default=1, help="batch size")
     parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
     parser.add_argument("--file_name", type=str, default="inceptionv2", help="output file name.")
-    parser.add_argument('--file_format', type=str, choices=["AIR", "MINDIR"], default='AIR', help='file format')
+    parser.add_argument('--file_format', type=str, choices=["AIR", "MINDIR"], default='MINDIR', help='file format')
     parser.add_argument("--platform", type=str, choices=["Ascend", "GPU"], default="Ascend", help="platform")
     args = parser.parse_args()
 

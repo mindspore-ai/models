@@ -135,7 +135,7 @@ The entire code structure is as following:
     ├─ run_distribute_train_gpu.sh          # launch distributed training(8p) in GPU
     ├─ run_eval.sh                          # launch evaluating in ascend
     ├─ run_eval_gpu.sh                      # launch evaluating in gpu
-    └─ run_export.sh                        # launch exporting air model
+    └─ run_export.sh                        # launch exporting air/mindir model
     ├─ run_infer_310.sh                     # shell script for 310 inference
   ├─ src
     ├─ FaceAttribute
@@ -158,7 +158,7 @@ The entire code structure is as following:
   ├─ preprocess.py                          # preprocess scripts
   ├─ train.py                               # training scripts
   ├─ eval.py                                # evaluation scripts
-  └─ export.py                              # export air model
+  └─ export.py                              # export air/mindir model
 ```
 
 ## [Running Example](#contents)
@@ -386,7 +386,7 @@ mask f1:  0.9992691394116572
 
 ### Convert model
 
-If you want to infer the network on Ascend 310, you should convert the model to AIR:
+If you want to infer the network on Ascend 310, you should convert the model to AIR/MINDIR:
 
 ```bash Ascend
 cd ./scripts

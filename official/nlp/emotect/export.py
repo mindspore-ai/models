@@ -26,7 +26,7 @@ parser.add_argument("--device_id", type=int, default=0, help="Device id")
 parser.add_argument("--batch_size", type=int, default=32, help="batch size")
 parser.add_argument("--number_labels", type=int, default=3, help="batch size")
 parser.add_argument("--ckpt_file", type=str, required=True, help="Bert ckpt file.")
-parser.add_argument("--file_name", type=str, default="emotect", help="bert output air name.")
+parser.add_argument("--file_name", type=str, default="emotect", help="bert output mindir name.")
 parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"],
                     default='MINDIR', help="file format")
 parser.add_argument("--device_target", type=str, default="Ascend",

@@ -33,7 +33,7 @@ parser.add_argument("--image_height", type=int, default=768, help="Image height.
 parser.add_argument("--image_width", type=int, default=768, help="Image width.")
 parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
 parser.add_argument("--file_name", type=str, default="fastscnn", help="output file name.")
-parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="AIR", help="file format")
+parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
 parser.add_argument('--device_target', type=str, default='Ascend'
                     , help='device where the code will be implemented. (Default: Ascend)')
 parser.add_argument("--device_id", type=int, default=0, help="Device id")

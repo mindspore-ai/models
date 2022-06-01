@@ -99,7 +99,7 @@ The entire code structure is as following:
     ├─ run_standalone_train.sh              # launch standalone training(1p) in ascend
     ├─ run_distribute_train.sh              # launch distributed training(8p) in ascend
     ├─ run_eval.sh                          # launch evaluating in ascend
-    ├─ run_export.sh                        # launch exporting air model
+    ├─ run_export.sh                        # launch exporting air/mindir model
     ├─ run_standalone_train_gpu.sh          # launch standalone training(1p) in gpu
     ├─ run_distribute_train_gpu.sh          # launch distributed training(8p) in gpu
     ├─ run_eval_gpu.sh                      # launch evaluating in gpu
@@ -116,7 +116,7 @@ The entire code structure is as following:
   ├─ default_config.yaml                    # Configurations
   ├─ train.py                               # training scripts
   ├─ eval.py                                # evaluation scripts
-  └─ export.py                              # export air model
+  └─ export.py                              # export air/mindir model
 ```
 
 ## [Running Example](#contents)
@@ -411,7 +411,7 @@ MAE of elur:17.69762644062826
 
 ### Convert model
 
-If you want to infer the network on Ascend 310, you should convert the model to AIR:
+If you want to infer the network on Ascend 310, you should convert the model to AIR/MINDIR:
 
 ```bash
 Ascend

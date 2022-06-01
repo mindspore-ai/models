@@ -109,7 +109,7 @@ spm_model_file: "Spm path, it is better to use absolute path"
 
 export_batch_size: "export batch size."
 export_ckpt_file: "Bert ckpt file."
-export_file_name: "bert output air name."
+export_file_name: "bert output mindir name."
 file_format: "file format"
 ---
 # chocies

@@ -126,7 +126,7 @@ bash wmt14_en_fr.sh
   │   ├──filter_dataset.py                 // dataset filter
   ├── create_dataset.py                    // Dataset preparation.
   ├── eval.py                              // Infer API entry.
-  ├── export.py                            // Export checkpoint file into air models.
+  ├── export.py                            // Export checkpoint file into air/mindir models.
   ├── mindspore_hub_conf.py                // Hub config.
   ├── requirements.txt                     // Requirements of third party package.
   ├── train.py                             // Train API entry.

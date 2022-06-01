@@ -125,7 +125,7 @@ bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL] [BACKBO
 bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)
 
 # inference
-bash run_infer_310.sh [AIR_PATH] [DATA_PATH] [ANN_FILE_PATH]
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE_PATH]
 ```
 
 ## Run on GPU

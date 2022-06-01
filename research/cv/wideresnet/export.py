@@ -33,7 +33,7 @@ parser.add_argument('--data_url', default=None, help='Directory contains cifar10
 parser.add_argument('--train_url', default=None, help='Directory contains checkpoint file')
 parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file name.")
 parser.add_argument("--batch_size", type=int, default=1, help="batch size")
-parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='AIR', help='file format')
+parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='MINDIR', help='file format')
 args = parser.parse_args()
 
 context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)

@@ -237,7 +237,7 @@ The GNMT network script and code result are as follows:
   ├── create_dataset.py                      // Dataset preparation.
   ├── eval.py                                // Infer API entry.
   ├── eval_onnx.py                           // ONNX infer API entry.
-  ├── export.py                              // Export checkpoint file into air models.
+  ├── export.py                              // Export checkpoint file into air/mindir models.
   ├── mindspore_hub_conf.py                  // Hub config.
   ├── pip-requirements.txt                   // Requirements of third party package for modelarts.
   ├── requirements.txt                       // Requirements of third party package.

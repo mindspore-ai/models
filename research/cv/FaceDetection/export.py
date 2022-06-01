@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""Convert ckpt to air."""
+"""Convert ckpt to air/mindir."""
 import os
 import numpy as np
 

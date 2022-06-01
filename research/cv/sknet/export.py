@@ -32,7 +32,7 @@ parser.add_argument("--ckpt_file", type=str, default="/path/to/sknet-90_195.ckpt
 parser.add_argument("--file_name", type=str, default="sknet_export", help="output file name.")
 parser.add_argument('--width', type=int, default=224, help='input width')
 parser.add_argument('--height', type=int, default=224, help='input height')
-parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="AIR", help="file format")
+parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
 parser.add_argument("--device_target", type=str, default="Ascend",
                     choices=["Ascend", "GPU"], help="device target(default: Ascend)")
 args = parser.parse_args()

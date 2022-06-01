@@ -133,7 +133,7 @@ After installing MindSpore through the official website, you can follow the step
         ├── README_CN.md                // resnet50_bam description in Chinese
         ├── create_imagenet2012_label.py // create imagenet 2012 label
         ├── eval.py                     // evaluation script
-        ├── export.py                   // export a ckpt to air/mindi
+        ├── export.py                   // export a ckpt to air/mindir
         ├── postprocess.py              // Ascend310 postrocess
         ├── train.py                    // trainig script
 ```
@@ -239,7 +239,7 @@ python export.py --ckpt_file [CKPT_FILE] --device_target [DEVICE_TARGET] --file_
 
 ### Inference
 
-Before inference, we need to export the model first. Mindir can be exported in any environment, and the air model can only be exported in the Shengteng 910 environment. The following shows an example of using the mindir model to perform inference.
+Before inference, we need to export the model first. Mindir can be exported in any environment, and the air/mindir model can only be exported in the Shengteng 910 environment. The following shows an example of using the mindir model to perform inference.
 
 - Use ImageNet2012 data set for inference on Shengteng 31
 

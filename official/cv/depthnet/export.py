@@ -57,7 +57,7 @@ if __name__ == "__main__":
         export(coarse_net, Tensor(input_rgb_coarsenet), file_name=os.path.join(mindir_dir, "FinalCoarseNet"),
                file_format='MINDIR')
         export(coarse_net, Tensor(input_rgb_coarsenet), file_name=os.path.join(air_dir, "FinalCoarseNet"),
-               file_format='MINDIR')
+               file_format='AIR')
     else:
         fine_net = FineNet()
         fine_net_file_name = os.path.join(ckpt_dir, "FinalFineNet.ckpt")
@@ -68,4 +68,4 @@ if __name__ == "__main__":
         export(fine_net, Tensor(input_rgb_finenet), Tensor(input_coarse_depth),
                file_name=os.path.join(mindir_dir, "FinalFineNet"), file_format='MINDIR')
         export(fine_net, Tensor(input_rgb_finenet), Tensor(input_coarse_depth),
-               file_name=os.path.join(air_dir, "FinalFineNet"), file_format='MINDIR')
+               file_name=os.path.join(air_dir, "FinalFineNet"), file_format='AIR')

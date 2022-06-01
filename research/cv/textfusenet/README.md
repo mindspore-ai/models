@@ -111,11 +111,11 @@ Shapely==1.5.9
 
    ```shell
    # inference
-   bash run_infer_310.sh [AIR_PATH] [DATA_PATH] [ANN_FILE_PATH]
+   bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE_PATH]
    ```
 
    Note:
-   1. AIR_PATH is a model file, exported by export script file on the Ascend910 environment.
+   1. MINDIR_PATH is a model file, exported by export script file on the Ascend910 environment.
    2. ANN_FILE_PATH is a annotation file for inference.
 
 # [Script Description](#contents)

@@ -33,7 +33,7 @@ parser.add_argument(
     "--file_name",
     type=str,
     default="Senta",
-    help="Senta output air name.")
+    help="Senta output mindir name.")
 parser.add_argument(
     "--file_format",
     type=str,

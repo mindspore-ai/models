@@ -81,7 +81,7 @@ The entire code structure is as following:
   │   ├── run_eval.sh                       // shell script for evaluation on Ascend
   │   ├── run_eval_cpu.sh                   // shell script for evaluation on CPU
   │   ├── run_eval_gpu.sh                   // shell script for evaluation on gpu
-  │   ├── run_export.sh                     // shell script for exporting air model
+  │   ├── run_export.sh                     // shell script for exporting air/mindir model
   │   ├── run_standalone_train_base.sh      // shell script for standalone training on Ascend
   │   ├── run_standalone_train_beta.sh      // shell script for standalone training on Ascend
   │   ├── run_standalone_train_for_gpu.sh   // shell script for standalone training on GPU
@@ -115,7 +115,7 @@ The entire code structure is as following:
   ├─ inference_config_cpu.yaml              // parameter configuration
   ├─ train.py                               // training scripts
   ├─ eval.py                                // evaluation scripts
-  └─ export.py                              // export air model
+  └─ export.py                              // export air/mindir model
 ```
 
 ## [Running Example](#contents)
@@ -351,7 +351,7 @@ If you want to run in modelarts, please check the official documentation of [mod
 
 ### Convert model
 
-If you want to infer the network on Ascend 310, you should convert the model to AIR:
+If you want to infer the network on Ascend 310, you should convert the model to AIR/MINDIR:
 
 ```bash
 cd ./scripts

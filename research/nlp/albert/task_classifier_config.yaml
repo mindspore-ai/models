@@ -105,7 +105,7 @@ schema_file_path: "Schema path, it is better to use absolute path"
 
 export_batch_size: "export batch size."
 export_ckpt_file: "Alert ckpt file."
-export_file_name: "Albert output air name."
+export_file_name: "Albert output mindir name."
 file_format: "file format"
 ---
 # chocies
