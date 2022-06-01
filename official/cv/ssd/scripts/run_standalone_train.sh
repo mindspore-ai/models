@@ -28,17 +28,25 @@ then
     exit 1
 fi
 
-# Before start distribute train, first create mindrecord files.
+get_real_path(){
+  if [ "${1:0:1}" == "/" ]; then
+    echo "$1"
+  else
+    echo "$(realpath -m $PWD/$1)"
+  fi
+}
+
+CONFIG_PATH=$(get_real_path $5)
+# Before start training, first create mindrecord files.
 BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
 cd $BASE_PATH/../ || exit
-python train.py --only_create_dataset=True --dataset=$4
+python train.py --only_create_dataset=True --dataset=$4 --config_path=$CONFIG_PATH
 
 echo "After running the script, the network runs in the background. The log will be generated in LOGx/log.txt"
 DEVICE_ID=$1
 EPOCH_SIZE=$2
 LR=$3
 DATASET=$4
-CONFIG_PATH=$5
 PRE_TRAINED=$6
 PRE_TRAINED_EPOCH_SIZE=$7
 
