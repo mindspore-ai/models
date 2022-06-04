@@ -37,6 +37,39 @@ from src.model_utils.device_adapter import get_device_id
 
 set_seed(1)
 
+text_mapping = {
+    u'(': u'（',
+    u')': u'）',
+    u':': u'：',
+    u'-': u' ',
+    u'À': u'A',
+    u'à': u'a',
+    u'Â': u'A',
+    u'â': u'a',
+    u'Ç': u'C',
+    u'ç': u'c',
+    u'É': u'E',
+    u'é': u'e',
+    u'È': u'E',
+    u'è': u'e',
+    u'Ê': u'E',
+    u'ê': u'e',
+    u'Ë': u'E',
+    u'ë': u'e',
+    u'Î': u'I',
+    u'î': u'i',
+    u'Ï': u'I',
+    u'ï': u'i',
+    u'Ô': u'O',
+    u'ô': u'o',
+    u'Û': u'U',
+    u'û': u'u',
+    u'Ù': u'U',
+    u'ù': u'u',
+    u'Ü': u'U',
+    u'ü': u'u',
+    u'Ÿ': u'Y'
+}
 
 def text_standardization(text_in):
     """
@@ -44,9 +77,8 @@ def text_standardization(text_in):
     """
     stand_text = text_in.strip()
     stand_text = ' '.join(stand_text.split())
-    stand_text = stand_text.replace(u'(', u'（')
-    stand_text = stand_text.replace(u')', u'）')
-    stand_text = stand_text.replace(u':', u'：')
+    for key in text_mapping:
+        stand_text = stand_text.replace(key, text_mapping[key])
     return stand_text
 
 
