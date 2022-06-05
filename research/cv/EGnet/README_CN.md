@@ -260,8 +260,10 @@ bash run_eval_gpu.sh
         │   ├──run_standalone_train_gpu.sh  # 启动GPU单机训练（单卡）
         │   ├──run_distribute_train_gpu.sh  # 启动GPU分布式训练（多卡）
         │   ├──run_eval_gpu.sh              # 启动GPU评估
+        │   ├──run_infer_310.sh             # 启动Ascend310评估
         │   ├──dataset_preprocess.sh        # 对数据集预处理并生成lst文件
         │   ├──convert_model.sh             # 转换预训练模型
+        ├── ascend310_infer
         ├── src
         │   ├──dataset.py                   # 加载数据集
         │   ├──egnet.py                     # EGNet的网络结构
@@ -279,6 +281,8 @@ bash run_eval_gpu.sh
         ├── data_crop.py                    # 数据裁剪并生成test.lst文件
         ├── train.py                        # 训练脚本
         ├── eval.py                         # 评估脚本
+        ├── preprocess.py                   # Ascend310评估预处理脚本
+        ├── postprocess.py                  # Ascend310评估后处理脚本
         ├── export.py                       # 模型导出脚本
         ├── default_config.yaml             # 参数配置文件
         ├── requirements.txt                # 其他依赖包
@@ -395,11 +399,26 @@ model: "EGNet/run-nnet/models/final_vgg_bone.ckpt"      # 测试时使用的chec
 bash run_eval_gpu.sh
 ```
 
+- Ascend310处理器环境运行，需修改default_config.yaml文件：
+1. 修改infer_path路径为所有推理数据集存放的根目录
+2. infer_image_root路径为推理数据集的原图
+3. 修改sal_mode为数据集类型(e对应ECSSD，t对应DUTS-TE，d对应DUT-OMRON，h对应HKU-IS，p对应PASCAL-S, s对应SOD)
+
+```text
+infer_path: "./data_crop"                               # 所有推理数据集存放的根目录
+infer_image_root: "./data_crop/SOD/images/"             # 推理数据集的原图
+```
+
+```bash
+bash run_infer_310.sh [MINDIR_PATH]
+```
+
 ## 导出过程
 
 ### 导出
 
-在导出之前需要修改default_config.ymal配置文件的配置项ckpt_file或传入参数--ckpt_file.
+在导出之前需要修改default_config.yaml配置文件的配置项ckpt_file或传入参数--ckpt_file.
+在default_config.yaml 中修改base_model为骨干网络 ，如"resnet"或 "vgg".
 
 ```shell
 python export.py --ckpt_file=[CKPT_FILE]

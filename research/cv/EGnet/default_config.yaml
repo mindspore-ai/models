@@ -6,6 +6,8 @@ device_target: "Ascend"                                   #  device to run the m
 # Dataset settings
 train_path: "/home/data2/egnet/DUTS-TR-10498"             #  training dataset dir;
 test_path: "/home/data2/egnet/data200"                    #  testing dataset root;
+infer_path: "/home/data2/egnet/data200"                   #  infer dataset root;
+infer_image_root: "/home/stu/lrsh/data_crop/SOD/images/"  #  infer dataset image;
 
 # Training settings
 base_model: "resnet"                                      #  bone network ["resnet", "vgg"], used when train and eval;
