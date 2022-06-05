@@ -15,9 +15,12 @@
   - [训练过程](#训练过程)
       - [用法](#用法)
       - [结果](#结果)
+  - [导出过程](#导出过程)
+      - [导出](#导出)
   - [推理过程](#推理过程)
       - [用法](#用法-1)
       - [结果](#结果-1)
+      - [Ascend310推理](#Ascend310推理)
   - [评估推理结果](#评估推理结果)
   - [ONNX模型导出及评估](#onnx模型导出及评估)
       - [ONNX模型导出](#onnx模型导出)
@@ -100,6 +103,7 @@ RAS总体网络架构如下:
 ``` python
 ├── RAS
   ├── Readme.md
+  ├── ascend310_infer   # 310推理目录
   ├── scripts
   │   ├──run_distribute_train.sh # 使用昇腾处理器进行八卡训练的shell脚本
   │   ├──run_train.sh    # 使用昇腾处理器进行单卡训练的shell脚本
@@ -108,6 +112,7 @@ RAS总体网络架构如下:
   │   ├──run_train_gpu.sh    # 使用GPU进行单卡训练的shell脚本
   │   ├──run_eval_gpu.sh  # 使用GPU进行评估的单卡shell脚本
   │   ├──run_eval_onnx_gpu.sh  # 使用GPU对导出的onnx模型进行评估的单卡shell脚本
+  │   ├──run_infer_310.sh   # 310推理脚本
   ├──src
   │   ├──dataset_train.py #创建训练数据集
   │   ├──dataset_test.py # 创建推理数据集
@@ -217,6 +222,20 @@ epoch:1, learning_rate:0.00005000,iter [180/10553],Loss    ||  0.27287382
 The Consumption of per step is 0.136 s
 ```
 
+## 导出过程
+
+### 导出
+
+``` python
+python export.py --pre_model [PRE_MODEL_PATH] --ckpt_file [CKPT_PATH] --file_format [FILE_FORMAT]
+```
+
+- `PRE_MODEL_PATH` 为resnet50预训练模型路径
+- `CKPT_PATH` 为训练保存的ckpt路径
+- `FILE_FORMAT` 为导出的文件格式，默认“MINDIR”，可选“AIR”、 “ONNX”、 “MINDIR”
+
+执行完后会在当前路径生成RAS.mindir文件。
+
 ## 推理过程
 
 ### 用法
@@ -255,6 +274,25 @@ The Consumption of per step is 0.136 s
 ``` python
 该推理过程结束后,会在--train_url中生成结果图片,为了评估推理结果，需要将图片继续进行处理
 ```
+
+### Ascend310推理
+
+在进行推理之前我们需要先导出模型。`mindir`文件需要通过`export.py`导出。
+
+在Ascend310上进行推理：
+
+``` sh
+# Ascend310 inference
+bash run_infer_310.sh [GEN_MINDIR_PATH] [DATA_PATH] [NEED_PREPROCESS] [DEVICE_ID] [GT_PATH]
+```
+
+- `GEN_MINDIR_PATH`代表生成的mindir文件
+- `DATA_PATH`代表数据集路径
+- `NEED_PREPROCESS`表示是否需要预处理，它的值为'y'或者'n'
+- `DEVICE_ID`表示执行推理的设备id
+- `GT_PATH`可选，groundtruth路径，若不为空则对结果进行评估
+
+推理结果保存在当前路径的`result_Files/`目录下，推理时间则保存在`time_Result/`目录下，若对结果进行了评估，则可以在当前路径`evaluation.log`中查看评估结果。
 
 ## 评估推理结果
 

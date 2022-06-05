@@ -22,25 +22,26 @@ from mindspore import load_checkpoint, load_param_into_net, export
 from src.model import BoneModel
 
 
-def run_export(device_target, device_id, pretrained_model, model_ckpt, batchsize):
+def run_export(device_target, device_id, pretrained_model, model_ckpt, batchsize, file_format):
     ms.context.set_context(mode=ms.context.GRAPH_MODE, device_target=device_target, device_id=device_id)
     net = BoneModel(device_target, pretrained_model)
     param_dict = load_checkpoint(model_ckpt)
     load_param_into_net(net, param_dict)
     input_arr = ms.Tensor(np.ones((batchsize, 3, 352, 352)).astype(np.float32))
 
-    export(net, input_arr, file_name="RAS", file_format='MINDIR')
+    export(net, input_arr, file_name="RAS", file_format=file_format)
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--device_target', type=str, default='Ascend', help="device's name, Ascend,GPU,CPU")
-    parser.add_argument('--device_id', type=int, default=5, help="Number of device")
-    parser.add_argument('--batchsize', type=int, default=10, help="training batch size")
+    parser.add_argument('--device_id', type=int, default=0, help="Number of device")
+    parser.add_argument('--batchsize', type=int, default=1, help="training batch size")
+    parser.add_argument('--file_format', type=str, default='MINDIR', help="file format")
     parser.add_argument('--pre_model', type=str)
     parser.add_argument('--ckpt_file', type=str)
     par = parser.parse_args()
 
 
-    run_export(par.device_target, int(par.device_id), par.pre_model, par.ckpt_file, par.batchsize)
+    run_export(par.device_target, int(par.device_id), par.pre_model, par.ckpt_file, par.batchsize, par.file_format)
