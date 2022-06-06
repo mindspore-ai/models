@@ -49,7 +49,7 @@ def get_parser():
     function of get parser
     """
     parser = argparse.ArgumentParser(description="DDAG Code Mindspore Version")
-    parser.add_argument('--msmode', default='GRAPH_MODE',
+    parser.add_argument('--MSmode', default='GRAPH_MODE',
                         choices=['GRAPH_MODE', 'PYNATIVE_MODE'])
 
     # dataset settings
@@ -151,7 +151,7 @@ if __name__ == "__main__":
     ########################################################################
     device = args.device_target
     # init context
-    if args.msmode == 'GRAPH_MODE':
+    if args.MSmode == 'GRAPH_MODE':
         context.set_context(mode=context.GRAPH_MODE,
                             device_target=device, save_graphs=False)
     else:
