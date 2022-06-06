@@ -13,12 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-# Usage: train_standalone.sh [CKPT_SAVE_DIR] [DEVICE_ID]
 echo "$1 $2 $3"
 
 if [ $# != 1 ] && [ $# != 2 ] && [ $# != 3 ]
 then
-    echo "Usage: bash train_standalone.sh [CKPT_SAVE_DIR] [DEVICE_ID] [BATCH_SIZE]"
+    echo "Usage: bash scripts/run_standalone_train.sh [CKPT_SAVE_DIR] [DEVICE_ID] [BATCH_SIZE]"
 exit 1
 fi
 

@@ -13,11 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-# Usage: sh train_distributed.sh  [MINDSPORE_HCCL_CONFIG_PATH] [CKPT_SAVE_DIR] [RANK_SIZE]
 echo "$1 $2 $3"
 
 if [ $# != 3 ]; then
-  echo "Usage: sh train_distributed.sh  [MINDSPORE_HCCL_CONFIG_PATH] [CKPT_SAVE_DIR] [RANK_SIZE]"
+  echo "Usage: bash scripts/run_distribute_train.sh  [MINDSPORE_HCCL_CONFIG_PATH] [CKPT_SAVE_DIR] [RANK_SIZE]"
   exit 1
 fi
 if [ ! -f $1 ]; then

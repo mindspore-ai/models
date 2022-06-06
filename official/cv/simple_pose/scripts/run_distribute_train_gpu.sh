@@ -17,7 +17,7 @@
 if [ $# -lt 5 ]
 then
     echo "Usage: \
-          bash scripts/train_gpu_distributed.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]\
+          bash scripts/run_distributed_train_gpu.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]\
           "
 exit 1
 fi

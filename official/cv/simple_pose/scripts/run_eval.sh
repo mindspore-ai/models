@@ -17,7 +17,7 @@ echo "$1 $2 $3"
 
 if [ $# != 1 ] && [ $# != 2 ] && [ $# != 3 ]
 then
-    echo "Usage: bash train_standalone.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [DEVICE_ID]"
+    echo "Usage: bash scripts/run_eval.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [DEVICE_ID]"
 exit 1
 fi
 
