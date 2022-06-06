@@ -269,9 +269,10 @@ result: {'top_5_accuracy': 0.9467147435897436, 'top_1_accuracy': 0.7908052884615
 ### Export MindIR
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --batch_size [BATCH_SIZE] --file_format [FILE_FORMAT]
+python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --batch_size [BATCH_SIZE] --file_format [FILE_FORMAT]
 ```
 
+The config_path is required,
 The ckpt_file parameter is required,
 `FILE_FORMAT` should be in ["AIR", "MINDIR"]
 `BATCH_SIZE` current batch_size can only be set to 1.

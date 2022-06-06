@@ -117,6 +117,7 @@ loss_scale: 256
 momentum: 0.91
 weight_decay: 0.00001
 epoch_size: 20
+run_eval: False
 save_checkpoint: True
 save_checkpoint_epochs: 1
 keep_checkpoint_max: 5
