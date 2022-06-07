@@ -55,7 +55,7 @@ def run_train():
 
 
     args_opt = parser.parse_args()
-    device_id = int(os.getenv("DEVICE_ID"))
+    device_id = int(os.getenv("DEVICE_ID", '0'))
     context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=device_id)
     if args_opt.distribute == "true":
         D.init()
