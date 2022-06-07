@@ -22,14 +22,14 @@ from mindspore.dataset.vision.utils import Inter
 
 def create_cifar10_dataset(data_dir, training=True, repeat_num=1, num_parallel_workers=5,
                            resize_height=32, resize_width=32, batch_size=512,
-                           num_samples=None, shuffle=None, cutout_length=0, device_id=0, device_num=1):
+                           num_samples=None, shuffle=None, cutout_length=0, rank_id=0, rank_size=1):
     """Data operations."""
     ds.config.set_seed(1)
     ds.config.set_num_parallel_workers(num_parallel_workers)
 
     if training:
         data_set = ds.Cifar10Dataset(data_dir, num_samples=num_samples,
-                                     shuffle=shuffle, num_shards=device_num, shard_id=device_id)
+                                     shuffle=shuffle, num_shards=rank_size, shard_id=rank_id)
     else:
         data_set = ds.Cifar10Dataset(data_dir, num_samples=num_samples,
                                      shuffle=shuffle, num_shards=1, shard_id=0)
