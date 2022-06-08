@@ -1,5 +1,5 @@
 # Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
-enable_modelarts: True
+enable_modelarts: False
 # Url for modelarts
 data_url: "/mindx-user-12/data/"
 train_url: "/mindx-user-12/output/"
