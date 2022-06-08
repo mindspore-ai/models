@@ -231,7 +231,7 @@ def get_lr(args):
         lr = yolox_warm_cos_lr(lr=args.lr,
                                steps_per_epoch=args.steps_per_epoch,
                                warmup_epochs=args.warmup_epochs,
-                               max_epoch=args.max_epoch,
+                               max_epoch=args.total_epoch,
                                no_aug_epochs=args.no_aug_epochs,
                                min_lr_ratio=args.min_lr_ratio)
     elif args.lr_scheduler == 'no_aug_lr':
@@ -493,10 +493,7 @@ class EvalCallBack(Callback):
         cur_epoch = cb_param.cur_epoch_num
         if cur_epoch >= self.start_epoch:
             if (cur_epoch - self.start_epoch) % self.interval == 0 or cur_epoch == self.max_epoch:
-                if self.rank == 0:
-                    self.load_ema_parameter()
-                else:
-                    self.load_network_parameter()
+                self.load_network_parameter()
                 self.test_network.set_train(False)
                 eval_print_str, results = self.inference()
                 if results >= self.best_result:

@@ -30,7 +30,12 @@ get_real_path(){
 DATASET_PATH=$(get_real_path $1)
 RANK_TABLE_FILE=$(get_real_path $2)
 BACKBONE=$3
-
+if [ "$BACKBONE" = 'yolox_darknet53' ]
+then
+  CONFIG_PATH='yolox_darknet53.yaml'
+else
+  CONFIG_PATH='yolox_x.yaml'
+fi
 echo $DATASET_PATH
 echo $RANK_TABLE_FILE
 echo $BACKBONE
@@ -83,6 +88,7 @@ then
       echo "start training for rank $RANK_ID, device $DEVICE_ID"
       env > env.log
       taskset -c $cmdopt python train.py \
+          --config_path=$CONFIG_PATH\
           --data_dir=$DATASET_PATH \
           --yolox_no_aug_ckpt=$RESUME_CKPT \
           --backbone=$BACKBONE \
@@ -118,6 +124,7 @@ then
       echo "start training for rank $RANK_ID, device $DEVICE_ID"
       env > env.log
       taskset -c $cmdopt python train.py \
+          --config_path=$CONFIG_PATH\
           --data_dir=$DATASET_PATH \
           --yolox_no_aug_ckpt=$RESUME_CKPT \
           --backbone=$BACKBONE \

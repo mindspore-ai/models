@@ -2,8 +2,7 @@
 
 <!-- TOC -->
 
-- [目录](#目录)
-- [YOLOX描述](#yolox描述)
+- [YOLOX描述](#YOLOX描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [环境要求](#环境要求)
@@ -12,7 +11,7 @@
     - [脚本及样例代码](#脚本及样例代码)
     - [脚本参数](#脚本参数)
     - [训练过程](#训练过程)
-        - [训练](#训练)
+        - [训练](#单卡训练)
         - [分布式训练](#分布式训练)
     - [评估过程](#评估过程)
         - [评估](#评估)
@@ -26,7 +25,7 @@
         - [评估性能](#评估性能)
         - [推理性能](#推理性能)
 - [随机情况说明](#随机情况说明)
-- [ModelZoo主页](#modelzoo主页)
+- [ModelZoo主页](#ModelZoo主页)
 
 <!-- TOC -->
 
@@ -80,7 +79,7 @@ head中的回归分支和分类分支进行了解耦(Decoupled head),并且将ob
     - 使用Ascend处理器来搭建硬件环境。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
-- 如需查看详情，请参见如下资源：
+- 如需查看详情，请参见如下资源
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
@@ -209,6 +208,7 @@ train.py中主要的参数如下:
 --is_distributed            是否分发训练，1代表是，0代表否。 默认值：1
 --rank                      分布式本地进程序号。 默认值：0
 --group_size                设备进程总数。 默认值：1
+--run_eval                  是否开启边训练边推理。默认为False
 
 ```
 
@@ -216,29 +216,39 @@ train.py中主要的参数如下:
 
 由于 YOLOX 使用了强大的数据增强，在ImageNet上的预训练模型参数不再重要，因此所有的训练都将从头开始训练。训练分为两步：第一步是从头训练并开启数据增强，第二步是使用第一步训练好的检查点文件作为预训练模型并关闭数据增强训练。
 
-### 训练
+### 单卡训练
 
 在Ascend设备上，使用python脚本直接开始训练(单卡)
 
-- 第一步
+- 第一步\
+    python命令启动
 
-```shell
+    ```shell
+    # 单卡训练(前285轮，开启数据增强)
+    python train.py --data_aug=True --is_distributed=0 --backbone='yolox_darknet53'
+    ```
 
-  # 单卡训练(前285轮，开启数据增强)
-  python train.py --data_aug=True --is_distributed=0 --backbone='yolox_darknet53'
+    shell脚本启动
 
-```
+    ```shell
+    bash run_standalone_train.sh  [DATASET_PATH] [BACKBONE]
+    ```
 
-第一步训练结束后，在默认文件夹中找到最后一个轮次保存的检查点文件，并且将文件路径作为第二步训练的参数输入，如下所示：
+    第一步训练结束后，在默认文件夹中找到最后一个轮次保存的检查点文件，并且将文件路径作为第二步训练的参数输入，如下所示：
 
-- 第二步
+- 第二步\
+    python命令启动
 
-```shell
+    ```shell
+    # 单卡训练(后15轮，关闭数据增强)
+    python train.py --data_aug=False --is_distributed=0 --backbone='yolox_darknet53' --yolox_no_aug_ckpt="your_285_ckpt_file_path.ckpt"
+     ```
 
-  # 单卡训练(后15轮，关闭数据增强)
-  python train.py --data_aug=False --is_distributed=0 --backbone='yolox_darknet53' --yolox_no_aug_ckpt="your_285_ckpt_file_path.ckpt"
+    shell脚本启动
 
- ```
+    ```shell
+    bash run_standalone_train.sh  [DATASET_PATH] [BACKBONE] [LATEST_CKPT]
+    ```
 
 ### 分布式训练
 
@@ -265,36 +275,44 @@ train.py中主要的参数如下:
 
   上述shell脚本将在后台运行分布式训练。 您可以通过train_parallel0/log.txt文件查看结果。 得到如下损失值：
 
-```log
+    ```log
 
-...
-2021-12-24 16:16:14,099:INFO:epoch: 0 step: [612/1848], loss: 11.5023, overflow: False, scale: 262144, lr: 0.000044, time: 303.65
-2021-12-24 16:16:25,031:INFO:epoch: 0 step: [648/1848], loss: 11.4281, overflow: False, scale: 262144, lr: 0.000049, time: 303.66
-2021-12-24 16:16:35,966:INFO:epoch: 0 step: [684/1848], loss: 11.2717, overflow: False, scale: 262144, lr: 0.000055, time: 303.72
-2021-12-24 16:16:46,900:INFO:epoch: 0 step: [720/1848], loss: 11.4875, overflow: False, scale: 262144, lr: 0.000061, time: 303.72
-2021-12-24 16:16:57,834:INFO:epoch: 0 step: [756/1848], loss: 11.2793, overflow: False, scale: 262144, lr: 0.000067, time: 303.73
-2021-12-24 16:17:08,770:INFO:epoch: 0 step: [792/1848], loss: 11.4845, overflow: False, scale: 262144, lr: 0.000074, time: 303.76
-2021-12-24 16:17:19,705:INFO:epoch: 0 step: [828/1848], loss: 11.4574, overflow: False, scale: 262144, lr: 0.000080, time: 303.74
-2021-12-24 16:17:30,638:INFO:epoch: 0 step: [864/1848], loss: 11.7713, overflow: False, scale: 262144, lr: 0.000088, time: 303.69
-2021-12-24 16:17:41,571:INFO:epoch: 0 step: [900/1848], loss: 11.3390, overflow: False, scale: 262144, lr: 0.000095, time: 303.70
-2021-12-24 16:17:52,503:INFO:epoch: 0 step: [936/1848], loss: 11.4625, overflow: False, scale: 262144, lr: 0.000103, time: 303.66
-2021-12-24 16:18:03,437:INFO:epoch: 0 step: [972/1848], loss: 11.4421, overflow: False, scale: 262144, lr: 0.000111, time: 303.72
-2021-12-24 16:18:14,372:INFO:epoch: 0 step: [1008/1848], loss: 11.1791, overflow: False, scale: 262144, lr: 0.000119, time: 303.74
-2021-12-24 16:18:25,304:INFO:epoch: 0 step: [1044/1848], loss: 11.3785, overflow: False, scale: 262144, lr: 0.000128, time: 303.66
-2021-12-24 16:18:36,236:INFO:epoch: 0 step: [1080/1848], loss: 11.4149, overflow: False, scale: 262144, lr: 0.000137, time: 303.64
-...
+    ...
+    2021-12-24 16:16:14,099:INFO:epoch: 0 step: [612/1848], loss: 11.5023, overflow: False, scale: 262144, lr: 0.000044, time: 303.65
+    2021-12-24 16:16:25,031:INFO:epoch: 0 step: [648/1848], loss: 11.4281, overflow: False, scale: 262144, lr: 0.000049, time: 303.66
+    2021-12-24 16:16:35,966:INFO:epoch: 0 step: [684/1848], loss: 11.2717, overflow: False, scale: 262144, lr: 0.000055, time: 303.72
+    2021-12-24 16:16:46,900:INFO:epoch: 0 step: [720/1848], loss: 11.4875, overflow: False, scale: 262144, lr: 0.000061, time: 303.72
+    2021-12-24 16:16:57,834:INFO:epoch: 0 step: [756/1848], loss: 11.2793, overflow: False, scale: 262144, lr: 0.000067, time: 303.73
+    2021-12-24 16:17:08,770:INFO:epoch: 0 step: [792/1848], loss: 11.4845, overflow: False, scale: 262144, lr: 0.000074, time: 303.76
+    2021-12-24 16:17:19,705:INFO:epoch: 0 step: [828/1848], loss: 11.4574, overflow: False, scale: 262144, lr: 0.000080, time: 303.74
+    2021-12-24 16:17:30,638:INFO:epoch: 0 step: [864/1848], loss: 11.7713, overflow: False, scale: 262144, lr: 0.000088, time: 303.69
+    2021-12-24 16:17:41,571:INFO:epoch: 0 step: [900/1848], loss: 11.3390, overflow: False, scale: 262144, lr: 0.000095, time: 303.70
+    2021-12-24 16:17:52,503:INFO:epoch: 0 step: [936/1848], loss: 11.4625, overflow: False, scale: 262144, lr: 0.000103, time: 303.66
+    2021-12-24 16:18:03,437:INFO:epoch: 0 step: [972/1848], loss: 11.4421, overflow: False, scale: 262144, lr: 0.000111, time: 303.72
+    2021-12-24 16:18:14,372:INFO:epoch: 0 step: [1008/1848], loss: 11.1791, overflow: False, scale: 262144, lr: 0.000119, time: 303.74
+    2021-12-24 16:18:25,304:INFO:epoch: 0 step: [1044/1848], loss: 11.3785, overflow: False, scale: 262144, lr: 0.000128, time: 303.66
+    2021-12-24 16:18:36,236:INFO:epoch: 0 step: [1080/1848], loss: 11.4149, overflow: False, scale: 262144, lr: 0.000137, time: 303.64
+    ...
 
-```
+    ```
 
 ## 评估过程
 
 ### 评估
 
+#### python命令启动
+
 ```shell
-python eval.py --data_dir=./dataset/xxx --val_ckpt=your_val_ckpt_file_path --per_batch_size=8
+python eval.py --data_dir=./dataset/xxx --val_ckpt=your_val_ckpt_file_path --per_batch_size=8 --backbone=yolox_x
 ```
 
-上述python命令将在后台运行。 您可以通过```%Y-%m-%d_time_%H_%M_%S.log```文件查看结果。 测试数据集的mAP如下：
+backbone参数指定为yolox_darknet53或者yolox_x,上述python命令将在后台运行。 您可以通过```%Y-%m-%d_time_%H_%M_%S.log```文件查看结果。
+
+#### shell脚本启动
+
+```shell
+bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [BACKBONE] [BATCH_SIZE]
+```
 
 ```log
 
@@ -318,7 +336,7 @@ python eval.py --data_dir=./dataset/xxx --val_ckpt=your_val_ckpt_file_path --per
 
 ```shell
 
-python export.py --backbone [backbone] --val_ckpt [CKPT_PATH]
+python export.py --backbone [backbone] --val_ckpt [CKPT_PATH] --file_format [MINDIR/AIR]
 
 ```
 
@@ -344,10 +362,11 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_DIR] [DEVICE_ID]
 
 ### 结果
 
-推理结果保存在当前路径，可在acc.log中看到最终精度结果。
+推理结果保存在当前路径，通过cat acc.log中看到最终精度结果。
 
 ```text
 
+                            yolox-darknet53
 =============================coco eval result==================================
  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.473
  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.670
@@ -361,7 +380,20 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_DIR] [DEVICE_ID]
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.430
  Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.671
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.772
-
+                                    yolox-x
+=============================coco eval result==================================
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.502
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.685
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.545
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.306
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.548
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.661
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.380
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.611
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.649
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.449
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.700
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.818
 
 ```
 
@@ -378,12 +410,11 @@ YOLOX应用于118000张图像上（标注和数据格式必须与COCO 2017相同
 |资源| Ascend 910；CPU 2.60GHz, 192核；内存：755G；系统：EulerOS 2.8；|
 |上传日期|2022年3月11日|
 | MindSpore版本|1.3.0-alpha|
-|数据集|118000张图像|
+|数据集|coco2017|
 |训练参数|epoch=300, batch_size=8, lr=0.011,momentum=0.9|
 | 优化器                  | Momentum                                                    |
-|损失函数|Sigmoid Cross Entropy with logits, Giou Loss|
+|损失函数|Sigmoid Cross Entropy, Iou Loss, L1 Loss|
 |输出|框和标签|
-|损失| 50 |
 |速度| 1卡：25FPS；8卡：190FPS (shape=640)|
 |总时长|52小时|
 |微调检查点|约750M（.ckpt文件）|
@@ -397,7 +428,7 @@ YOLOX应用于118000张图像上（标注和数据格式必须与COCO 2017相同
 |数据集|118000张图像|
 |训练参数|epoch=300, batch_size=8, lr=0.04,momentum=0.9|
 | 优化器                  | Momentum                                                    |
-|损失函数|Sigmoid Cross Entropy with logits, Giou Loss|
+|损失函数|Sigmoid Cross Entropy, Iou Loss, L1 Loss|
 |输出|框和标签|
 |损失| 50 |
 |速度| 1卡：12FPS；8卡：93FPS (shape=640)|

@@ -1,4 +1,4 @@
-backbone: "yolox_darknet53" #option for backbone, you can choose 'yolox_darknet53' or 'yolox_x'
+backbone: "yolox_darknet53" #option for backbone
 data_aug: True
 # path for local
 device_target: "Ascend"
@@ -37,7 +37,7 @@ updates: 0.0
 n_candidate_k: 10
 
 # optimizer and lr related
-lr: 0.01 # 0.04 for yolox-x
+lr: 0.011 # 0.04 for yolox-x
 min_lr_ratio: 0.001
 warmup_epochs: 5
 weight_decay: 0.0005

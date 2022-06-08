@@ -40,7 +40,8 @@ def run_export():
         backbone = "yolofpn"
     else:
         backbone = "yolopafpn"
-    network = DetectionBlock(config, backbone=backbone, is_training=False)  # default yolo-darknet53
+    network = DetectionBlock(config, backbone=backbone)  # default yolo-darknet53
+    network.set_train(False)
     assert config.val_ckpt is not None, "config.ckpt_file is None."
     param_dict = load_checkpoint(config.val_ckpt)
     load_param_into_net(network, param_dict)
