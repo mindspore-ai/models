@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ from nibabel import load as load_nii
 
 import mindspore.dataset as ds
 import mindspore.common.dtype as mstype
-import mindspore.dataset.transforms.c_transforms as C2
+import mindspore.dataset.transforms as C2
 
 
 def norm(image):

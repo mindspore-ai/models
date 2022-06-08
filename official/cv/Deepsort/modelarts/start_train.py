@@ -21,7 +21,7 @@ import numpy as np
 import moxing as mox
 import mindspore.nn as nn
 import mindspore.dataset as ds
-import mindspore.dataset.vision.c_transforms as C
+import mindspore.dataset.vision as C
 
 from mindspore.common import set_seed
 from mindspore.common import dtype as mstype

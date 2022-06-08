@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 
 import numpy as np
 import mindspore.dataset as ds
-import mindspore.dataset.vision.py_transforms as transforms
-import mindspore.dataset.transforms.c_transforms as C
-from mindspore.dataset.transforms.py_transforms import Compose
+import mindspore.dataset.transforms as data_trans
+import mindspore.dataset.vision as vision
+from mindspore.dataset.transforms.transforms import Compose
 from mindspore.common import dtype as mstype
 from src.RandAugment import RandAugment
 from src.autoaugment import CIFAR10Policy
@@ -32,39 +32,39 @@ class CIFAR10Dataset():
 
         if not training:
             trsfm = Compose([
-                transforms.ToTensor(),
-                transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+                vision.ToTensor(),
+                vision.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010), is_hwc=False),
             ])
         else:
             if not use_third_trsfm:
                 trsfm = Compose([
-                    transforms.ToPIL(),
-                    transforms.RandomResizedCrop(size=32, scale=(0.2, 1.)),
-                    transforms.RandomColorAdjust(0.4, 0.4, 0.4, 0.4),
-                    transforms.RandomGrayscale(prob=0.2),
-                    transforms.RandomHorizontalFlip(),
-                    transforms.ToTensor(),
-                    transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+                    vision.ToPIL(),
+                    vision.RandomResizedCrop(size=32, scale=(0.2, 1.)),
+                    vision.RandomColorAdjust(0.4, 0.4, 0.4, 0.4),
+                    vision.RandomGrayscale(prob=0.2),
+                    vision.RandomHorizontalFlip(),
+                    vision.ToTensor(),
+                    vision.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010), is_hwc=False),
                 ])
             else:
                 if use_auto_augment:
                     trsfm = Compose([
-                        transforms.ToPIL(),
-                        transforms.RandomResizedCrop(size=32, scale=(0.2, 1.)),
-                        transforms.RandomHorizontalFlip(),
+                        vision.ToPIL(),
+                        vision.RandomResizedCrop(size=32, scale=(0.2, 1.)),
+                        vision.RandomHorizontalFlip(),
                         CIFAR10Policy(),
-                        transforms.ToTensor(),
-                        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+                        vision.ToTensor(),
+                        vision.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010), is_hwc=False),
                     ])
                 else:
                     rand_augment = RandAugment(n=2, m=10)
                     trsfm = Compose([
-                        transforms.ToPIL(),
-                        transforms.RandomResizedCrop(size=32, scale=(0.2, 1.)),
-                        transforms.RandomHorizontalFlip(),
+                        vision.ToPIL(),
+                        vision.RandomResizedCrop(size=32, scale=(0.2, 1.)),
+                        vision.RandomHorizontalFlip(),
                         rand_augment,
-                        transforms.ToTensor(),
-                        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+                        vision.ToTensor(),
+                        vision.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010), is_hwc=False),
                     ])
 
         self.trsfm = trsfm
@@ -83,7 +83,7 @@ class CIFAR10Dataset():
                                     num_shards=self.device_num, shard_id=self.device_id)
 
         ds_ = ds_.map(input_columns=["image"], operations=self.trsfm)
-        typecast_op = C.TypeCast(mstype.int32)
+        typecast_op = data_trans.TypeCast(mstype.int32)
         ds_ = ds_.map(input_columns=["label"], operations=typecast_op)
         return ds_
 

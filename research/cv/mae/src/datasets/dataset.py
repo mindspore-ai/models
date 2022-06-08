@@ -23,9 +23,8 @@ import numpy as np
 import mindspore.dataset as de
 import mindspore.common.dtype as mstype
 from mindspore.dataset.vision.utils import Inter
-import mindspore.dataset.vision.c_transforms as C
-import mindspore.dataset.vision.py_transforms as P
-import mindspore.dataset.transforms.c_transforms as C2
+import mindspore.dataset.vision as C
+import mindspore.dataset.transforms as C2
 
 from src.datasets.mixup import Mixup
 from src.datasets.random_erasing import RandomErasing
@@ -111,12 +110,12 @@ def create_dataset(dataset_path,
             C.RandomCropDecodeResize(image_size, scale=(crop_min, 1.0), ratio=(3 / 4, 4 / 3),
                                      interpolation=interpolation),
             C.RandomHorizontalFlip(prob=hflip),
-            P.ToPIL()
+            C.ToPIL()
         ]
         trans += [rand_augment_transform(auto_augment, aa_params)]
         trans += [
-            P.ToTensor(),
-            P.Normalize(mean=mean, std=std),
+            C.ToTensor(),
+            C.Normalize(mean=mean, std=std, is_hwc=False),
             RandomErasing(probability=re_prop, mode=re_mode, max_count=re_count)
         ]
 
@@ -127,7 +126,7 @@ def create_dataset(dataset_path,
             C.Decode(),
             C.Resize(int(256 / 224 * image_size), interpolation=interpolation),
             C.CenterCrop(image_size),
-            C.Normalize(mean=mean, std=std),
+            C.Normalize(mean=mean, std=std, is_hwc=True),
             C.HWC2CHW()
         ]
 

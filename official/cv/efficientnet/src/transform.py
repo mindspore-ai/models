@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 random augment class
 """
 import numpy as np
-import mindspore.dataset.vision.py_transforms as P
+import mindspore.dataset.vision as vision
 from src import transform_utils
 
 
@@ -35,9 +35,9 @@ class RandAugment:
         # assert the imgs object are pil_images
         ret_imgs = []
         ret_labels = []
-        py_to_pil_op = P.ToPIL()
-        to_tensor = P.ToTensor()
-        normalize_op = P.Normalize(self.mean, self.std)
+        py_to_pil_op = vision.ToPIL()
+        to_tensor = vision.ToTensor()
+        normalize_op = vision.Normalize(self.mean, self.std, is_hwc=False)
         rand_augment_ops = transform_utils.rand_augment_transform(self.config_str, self.hparams)
         for i, image in enumerate(imgs):
             img_pil = py_to_pil_op(image)

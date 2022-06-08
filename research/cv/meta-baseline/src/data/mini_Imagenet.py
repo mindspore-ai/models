@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ MiniImageNet
 import os
 import pickle
 import numpy as np
-import mindspore.dataset.vision.py_transforms as py_transforms
-from mindspore.dataset.transforms.py_transforms import Compose
+import mindspore.dataset.vision as vision
+from mindspore.dataset.transforms.transforms import Compose
 from PIL import Image
 
 
@@ -45,19 +45,19 @@ class MiniImageNet:
         label = [x - min_label for x in label]
 
         image_size = 84
-        normalize = py_transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        normalize = vision.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], is_hwc=False)
         if split == 'train':
             self.transforms = Compose([
                 decode,
-                py_transforms.RandomCrop(image_size, padding=4),
-                py_transforms.ToTensor(),
+                vision.RandomCrop(image_size, padding=4),
+                vision.ToTensor(),
                 normalize
             ])
         else:
             self.transforms = Compose([
                 decode,
-                py_transforms.Resize(image_size),
-                py_transforms.ToTensor(),
+                vision.Resize(image_size),
+                vision.ToTensor(),
                 normalize
             ])
         data = [self.transforms(x)[0] for x in data]

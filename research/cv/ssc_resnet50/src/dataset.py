@@ -23,8 +23,8 @@ import logging
 import numpy as np
 from PIL import Image
 from PIL import ImageFile
-import mindspore.dataset.vision.py_transforms as py_vision
-import mindspore.dataset.transforms.py_transforms as py_trans
+import mindspore.dataset.vision as vision
+import mindspore.dataset.transforms as data_trans
 import mindspore.ops
 import mindspore.dataset as de
 
@@ -91,12 +91,12 @@ class CoMatchDatasetImageNet:
         self.samples = samples
         logging.info("sample len: %d", len(self.samples))
 
-        self.random_resize_crop = py_vision.RandomResizedCrop(224, scale=(0.2, 1.))
-        self.random_horizontal_flip = py_vision.RandomHorizontalFlip()
-        self.to_tensor = py_vision.ToTensor()
-        self.normalize = py_vision.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-        self.random_apply = py_trans.RandomApply([py_vision.RandomColorAdjust(0.4, 0.4, 0.4, 0.1)], prob=0.8)
-        self.random_grayscale = py_vision.RandomGrayscale(prob=0.2)
+        self.random_resize_crop = vision.RandomResizedCrop(224, scale=(0.2, 1.))
+        self.random_horizontal_flip = vision.RandomHorizontalFlip()
+        self.to_tensor = vision.ToTensor()
+        self.normalize = vision.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], is_hwc=False)
+        self.random_apply = data_trans.RandomApply([vision.RandomColorAdjust(0.4, 0.4, 0.4, 0.1)], prob=0.8)
+        self.random_grayscale = vision.RandomGrayscale(prob=0.2)
 
         self.unlable_randomaugmentMC = RandAugmentMC(int(args.unlabel_randomaug_count),
                                                      int(args.unlabel_randomaug_intensity))
@@ -297,10 +297,10 @@ class CoMatchDatasetImageNetTest:
         logging.info("sample len: %d", len(self.samples))
 
         # for test
-        self.resize = py_vision.Resize(256)
-        self.center_crop = py_vision.CenterCrop(224)
-        self.to_tensor = py_vision.ToTensor()
-        self.normalize = py_vision.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        self.resize = vision.Resize(256)
+        self.center_crop = vision.CenterCrop(224)
+        self.to_tensor = vision.ToTensor()
+        self.normalize = vision.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], is_hwc=False)
 
     def __getitem__(self, index):
         """
@@ -362,11 +362,11 @@ class CoMatchSelectSample:
         self.samples = samples
 
         # for test
-        self.random_resize_crop = py_vision.RandomResizedCrop(224, scale=(0.2, 1.))
-        self.random_horizontal_flip = py_vision.RandomHorizontalFlip()
+        self.random_resize_crop = vision.RandomResizedCrop(224, scale=(0.2, 1.))
+        self.random_horizontal_flip = vision.RandomHorizontalFlip()
 
-        self.to_tensor = py_vision.ToTensor()
-        self.normalize = py_vision.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        self.to_tensor = vision.ToTensor()
+        self.normalize = vision.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], is_hwc=False)
 
     def __getitem__(self, index):
         """

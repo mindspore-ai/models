@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import numpy as np
 import Polygon as plg
 import pyclipper
 import mindspore.dataset as ds
-import mindspore.dataset.vision.py_transforms as py_transforms
+import mindspore.dataset.vision as vision
 from src.model_utils.config import config
 
 __all__ = ['train_dataset_creator', 'test_dataset_creator']
@@ -255,13 +255,13 @@ class TrainDataset:
         if self.is_transform:
             img = Image.fromarray(img)
             img = img.convert('RGB')
-            img = py_transforms.RandomColorAdjust(brightness=32.0 / 255, saturation=0.5)(img)
+            img = vision.RandomColorAdjust(brightness=32.0 / 255, saturation=0.5)(img)
         else:
             img = Image.fromarray(img)
             img = img.convert('RGB')
 
-        img = py_transforms.ToTensor()(img)
-        img = py_transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])(img)
+        img = vision.ToTensor()(img)
+        img = vision.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], is_hwc=False)(img)
 
         gt_text = gt_text.astype(np.float32)
         gt_kernels = gt_kernels.astype(np.float32)
@@ -306,8 +306,8 @@ def IC15_TEST_Generator():
 
         img_resized = Image.fromarray(img_resized)
         img_resized = img_resized.convert('RGB')
-        img_resized = py_transforms.ToTensor()(img_resized)
-        img_resized = py_transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])(img_resized)
+        img_resized = vision.ToTensor()(img_resized)
+        img_resized = vision.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], is_hwc=False)(img_resized)
 
         yield img, img_resized, img_name
 

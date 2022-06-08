@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,10 +21,10 @@ python trans.py --cfg config.yaml --ckpt_path Your.ckpt --data_dir datapath
 import os
 import argparse
 import mindspore.dataset as ds
-import mindspore.dataset.vision.py_transforms as py_vision
+import mindspore.dataset.vision as vision
 
 from mindspore import context
-from mindspore.dataset.transforms.py_transforms import Compose
+from mindspore.dataset.transforms.transforms import Compose
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 from src.model import get_pose_net
@@ -62,8 +62,8 @@ if __name__ == '__main__':
                                            num_parallel_workers=1, shuffle=False, num_shards=1, shard_id=0)
 
     trans = Compose([
-        py_vision.ToTensor(),
-        py_vision.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
+        vision.ToTensor(),
+        vision.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225), is_hwc=False)
     ])
 
     test_dataloader = test_dataloader.map(operations=trans, input_columns="input", num_parallel_workers=1)

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ from skimage.io import imread
 from skimage import color
 
 import mindspore.dataset as ds
-import mindspore.dataset.vision.c_transforms as CV
+import mindspore.dataset.vision as CV
 
 class Dataset:
     '''Dataset'''

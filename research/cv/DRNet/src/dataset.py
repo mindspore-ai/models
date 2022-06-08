@@ -16,9 +16,8 @@
 import os
 import mindspore.common.dtype as mstype
 import mindspore.dataset.engine as de
-import mindspore.dataset.transforms.c_transforms as C2
-import mindspore.dataset.transforms.py_transforms as py_transforms
-import mindspore.dataset.vision.py_transforms as py_vision
+import mindspore.dataset.transforms as C2
+import mindspore.dataset.vision as vision
 from mindspore.dataset.vision import Inter
 
 def create_dataset(dataset_path, do_train, repeat_num=1, infer_910=True, device_id=0, batch_size=128):
@@ -55,16 +54,16 @@ def create_dataset(dataset_path, do_train, repeat_num=1, infer_910=True, device_
         ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=8, shuffle=True,
                                    num_shards=device_num, shard_id=rank_id)
 
-    decode_p = py_vision.Decode()
-    resize_p = py_vision.Resize(int(256), interpolation=Inter.BILINEAR)
-    center_crop_p = py_vision.CenterCrop(224)
-    totensor = py_vision.ToTensor()
-    normalize_p = py_vision.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    trans = py_transforms.Compose([decode_p, resize_p, center_crop_p, totensor, normalize_p])
+    decode_p = vision.Decode(True)
+    resize_p = vision.Resize(int(256), interpolation=Inter.BILINEAR)
+    center_crop_p = vision.CenterCrop(224)
+    totensor = vision.ToTensor()
+    normalize_p = vision.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225], is_hwc=False)
+    trans = C2.Compose([decode_p, resize_p, center_crop_p, totensor, normalize_p])
     type_cast_op = C2.TypeCast(mstype.int32)
     ds = ds.map(input_columns="image", operations=trans, num_parallel_workers=8)
     ds = ds.map(input_columns="label", operations=type_cast_op, num_parallel_workers=8)
 
     ds = ds.batch(batch_size, drop_remainder=True)
     return ds
-    
+

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ import copy
 import random
 
 import cv2
-import mindspore.dataset.vision.py_transforms as PV
+import mindspore.dataset.vision as vision
 import numpy as np
 from PIL import Image
 
@@ -566,6 +566,6 @@ class MultiScaleTrans:
 
     def __call__(self, img, anno, input_size, mosaic_flag):
         if mosaic_flag[0] == 0:
-            img = PV.Decode()(img)
+            img = vision.Decode(True)(img)
         img, anno = preprocess_fn(img, anno, self.config, input_size, self.device_num)
         return img, anno, np.array(img.shape[0:2])

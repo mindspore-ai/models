@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 # ============================================================================
 """Face attribute dataset for eval"""
 import mindspore.dataset as de
-import mindspore.dataset.vision.py_transforms as F
-import mindspore.dataset.transforms.py_transforms as F2
+import mindspore.dataset.vision as F
+import mindspore.dataset.transforms as F2
 
 __all__ = ['data_generator_eval']
 
@@ -27,10 +27,10 @@ def data_generator_eval(args):
     dst_h = args.dst_h
     batch_size = 1
     attri_num = args.attri_num
-    transform_img = F2.Compose([F.Decode(),
+    transform_img = F2.Compose([F.Decode(True),
                                 F.Resize((dst_w, dst_h)),
                                 F.ToTensor(),
-                                F.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+                                F.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5), is_hwc=False)])
 
     de_dataset = de.MindDataset(mindrecord_path + "0", columns_list=["image", "label"])
     de_dataset = de_dataset.map(input_columns="image", operations=transform_img, num_parallel_workers=args.workers,

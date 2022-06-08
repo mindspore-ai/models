@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,13 +24,13 @@ from tqdm import tqdm
 import mindspore as ms
 import mindspore.ops as P
 import mindspore.dataset as ds
-import mindspore.dataset.vision.py_transforms as py_trans
+import mindspore.dataset.vision as vision
 
 from mindspore import context, load_checkpoint, \
     load_param_into_net, save_checkpoint, DatasetHelper
 from mindspore.context import ParallelMode
 from mindspore.communication.management import init, get_group_size
-from mindspore.dataset.transforms.py_transforms import Compose
+from mindspore.dataset.transforms.transforms import Compose
 from mindspore.nn import SGD, Adam
 from mindspore import nn
 
@@ -289,33 +289,33 @@ if __name__ == "__main__":
     transform_train_rgb = Compose(
         [
             decode,
-            py_trans.RandomCrop((args.img_h, args.img_w)),
-            py_trans.RandomGrayscale(prob=0.5),
-            py_trans.RandomHorizontalFlip(),
-            py_trans.ToTensor(),
-            py_trans.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            py_trans.RandomErasing(prob=0.5)
+            vision.RandomCrop((args.img_h, args.img_w)),
+            vision.RandomGrayscale(prob=0.5),
+            vision.RandomHorizontalFlip(),
+            vision.ToTensor(),
+            vision.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], is_hwc=False),
+            vision.RandomErasing(prob=0.5)
         ]
     )
 
     transform_train_ir = Compose(
         [
             decode,
-            py_trans.RandomCrop((args.img_h, args.img_w)),
-            # py_trans.RandomGrayscale(prob=0.5),
-            py_trans.RandomHorizontalFlip(),
-            py_trans.ToTensor(),
-            py_trans.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-            py_trans.RandomErasing(prob=0.5)
+            vision.RandomCrop((args.img_h, args.img_w)),
+            # vision.RandomGrayscale(prob=0.5),
+            vision.RandomHorizontalFlip(),
+            vision.ToTensor(),
+            vision.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], is_hwc=False),
+            vision.RandomErasing(prob=0.5)
         ]
     )
 
     transform_test = Compose(
         [
             decode,
-            py_trans.Resize((args.img_h, args.img_w)),
-            py_trans.ToTensor(),
-            py_trans.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+            vision.Resize((args.img_h, args.img_w)),
+            vision.ToTensor(),
+            vision.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], is_hwc=False)
         ]
     )
 

@@ -23,7 +23,7 @@ from mindspore.common.parameter import Parameter
 from mindspore.common.tensor import Tensor
 from mindspore.train.model import Model
 import mindspore.dataset as ds
-import mindspore.dataset.transforms.c_transforms as deC
+import mindspore.dataset.transforms as deC
 
 from src.transformer_model import TransformerModel
 from src.model_utils.config import config

@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ import argparse
 import numpy as np
 from PIL import Image
 
-import mindspore.dataset.vision.py_transforms as V
-import mindspore.dataset.transforms.py_transforms as T
+import mindspore.dataset.vision as V
+import mindspore.dataset.transforms as T
 
 
 def load_images(paths, batch_size=1):
@@ -28,7 +28,7 @@ def load_images(paths, batch_size=1):
     resize = V.Resize((96, 64))
     transform = T.Compose([
         V.ToTensor(),
-        V.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
+        V.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5], is_hwc=False)])
     for i, _ in enumerate(paths):
         im = Image.open(paths[i])
         im = resize(im)

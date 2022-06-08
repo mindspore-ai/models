@@ -18,8 +18,7 @@ Produce the dataset
 import os
 
 import mindspore.dataset as ds
-import mindspore.dataset.vision.c_transforms as c_vision
-import mindspore.dataset.vision.py_transforms as py_vision
+import mindspore.dataset.vision as vision
 
 def data_transforms(args):
     """get transform of dataset"""
@@ -40,18 +39,18 @@ def data_transforms(args):
         std = [0.229, 0.224, 0.225]
         crop_scale = 0.25
         jitter_param = 0.4
-    train_transforms = [c_vision.RandomCropDecodeResize(224, scale=(crop_scale, 1.0)),
-                        c_vision.RandomColorAdjust(brightness=jitter_param,
-                                                   contrast=jitter_param,
-                                                   saturation=jitter_param),
-                        c_vision.RandomHorizontalFlip(),
-                        c_vision.HWC2CHW(),
+    train_transforms = [vision.RandomCropDecodeResize(224, scale=(crop_scale, 1.0)),
+                        vision.RandomColorAdjust(brightness=jitter_param,
+                                                 contrast=jitter_param,
+                                                 saturation=jitter_param),
+                        vision.RandomHorizontalFlip(),
+                        vision.HWC2CHW(),
                         ]
-    val_transforms = [py_vision.Decode(),
-                      py_vision.Resize(256),
-                      py_vision.CenterCrop(224),
-                      py_vision.ToTensor(),
-                      py_vision.Normalize(mean=mean, std=std)
+    val_transforms = [vision.Decode(True),
+                      vision.Resize(256),
+                      vision.CenterCrop(224),
+                      vision.ToTensor(),
+                      vision.Normalize(mean=mean, std=std, is_hwc=False)
                       ]
     return train_transforms, val_transforms
 

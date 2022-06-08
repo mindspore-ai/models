@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ from xml.etree import ElementTree
 import cv2
 import numpy as np
 from mindspore import dataset as ds
-from mindspore.dataset.vision import c_transforms as C
+from mindspore.dataset.vision import transforms as C
 from mindspore.mindrecord import FileWriter
 
 from .box_utils import jaccard_numpy

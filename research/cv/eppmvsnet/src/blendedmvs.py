@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import cv2
 import numpy as np
 from PIL import Image
 
-import mindspore.dataset.vision.py_transforms as py_vision
+import mindspore.dataset.vision as vision
 
 from src.utils import read_pfm
 
@@ -202,15 +202,15 @@ class BlendedMVSDataset:
     def define_transforms(self):
         if self.training_tag and self.split == 'train':  # you can add augmentation here
             self.transform = Compose([
-                py_vision.ToTensor(),
-                py_vision.Normalize(mean=[0.485, 0.456, 0.406],
-                                    std=[0.229, 0.224, 0.225]),
+                vision.ToTensor(),
+                vision.Normalize(mean=[0.485, 0.456, 0.406],
+                                 std=[0.229, 0.224, 0.225], is_hwc=False),
             ])
         else:
             self.transform = Compose([
-                py_vision.ToTensor(),
-                py_vision.Normalize(mean=[0.485, 0.456, 0.406],
-                                    std=[0.229, 0.224, 0.225]),
+                vision.ToTensor(),
+                vision.Normalize(mean=[0.485, 0.456, 0.406],
+                                 std=[0.229, 0.224, 0.225], is_hwc=False),
             ])
 
     def __len__(self):

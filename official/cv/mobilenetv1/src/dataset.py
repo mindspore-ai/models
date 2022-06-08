@@ -47,18 +47,18 @@ def create_dataset1(dataset_path, do_train, device_num=1, batch_size=32, target=
     trans = []
     if do_train:
         trans += [
-            ds.vision.c_transforms.RandomCrop((32, 32), (4, 4, 4, 4)),
-            ds.vision.c_transforms.RandomHorizontalFlip(prob=0.5)
+            ds.vision.RandomCrop((32, 32), (4, 4, 4, 4)),
+            ds.vision.RandomHorizontalFlip(prob=0.5)
         ]
 
     trans += [
-        ds.vision.c_transforms.Resize((224, 224)),
-        ds.vision.c_transforms.Rescale(1.0 / 255.0, 0.0),
-        ds.vision.c_transforms.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
-        ds.vision.c_transforms.HWC2CHW()
+        ds.vision.Resize((224, 224)),
+        ds.vision.Rescale(1.0 / 255.0, 0.0),
+        ds.vision.Normalize([0.4914, 0.4822, 0.4465], [0.2023, 0.1994, 0.2010]),
+        ds.vision.HWC2CHW()
     ]
 
-    type_cast_op = ds.transforms.c_transforms.TypeCast(ms.int32)
+    type_cast_op = ds.transforms.transforms.TypeCast(ms.int32)
 
     data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=THREAD_NUM)
     data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=THREAD_NUM)
@@ -97,21 +97,21 @@ def create_dataset2(dataset_path, do_train, device_num=1, batch_size=32, target=
     # define map operations
     if do_train:
         trans = [
-            ds.vision.c_transforms.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
-            ds.vision.c_transforms.RandomHorizontalFlip(prob=0.5),
-            ds.vision.c_transforms.Normalize(mean=mean, std=std),
-            ds.vision.c_transforms.HWC2CHW()
+            ds.vision.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
+            ds.vision.RandomHorizontalFlip(prob=0.5),
+            ds.vision.Normalize(mean=mean, std=std),
+            ds.vision.HWC2CHW()
         ]
     else:
         trans = [
-            ds.vision.c_transforms.Decode(),
-            ds.vision.c_transforms.Resize(256),
-            ds.vision.c_transforms.CenterCrop(image_size),
-            ds.vision.c_transforms.Normalize(mean=mean, std=std),
-            ds.vision.c_transforms.HWC2CHW()
+            ds.vision.Decode(),
+            ds.vision.Resize(256),
+            ds.vision.CenterCrop(image_size),
+            ds.vision.Normalize(mean=mean, std=std),
+            ds.vision.HWC2CHW()
         ]
 
-    type_cast_op = ds.transforms.c_transforms.TypeCast(ms.int32)
+    type_cast_op = ds.transforms.transforms.TypeCast(ms.int32)
 
     data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=THREAD_NUM)
     data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=THREAD_NUM)

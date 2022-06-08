@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import numbers
 import math
 from PIL import Image, ImageOps
 import numpy as np
-from mindspore.dataset.vision import py_transforms as py_trans
+import mindspore.dataset.vision as vision
 
 
 class GroupRandomCrop:
@@ -55,7 +55,7 @@ class GroupCenterCrop:
     """GroupCenterCrop"""
 
     def __init__(self, size):
-        self.worker = py_trans.CenterCrop(size)
+        self.worker = vision.CenterCrop(size)
 
     def __call__(self, img_group):
         return [self.worker(img) for img in img_group]

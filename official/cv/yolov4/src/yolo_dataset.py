@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import numpy as np
 from PIL import Image
 from pycocotools.coco import COCO
 import mindspore.dataset as de
-import mindspore.dataset.vision.c_transforms as CV
+import mindspore.dataset.vision as CV
 from model_utils.config import config
 from src.distributed_sampler import DistributedSampler
 from src.transforms import reshape_fn, MultiScaleTrans

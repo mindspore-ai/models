@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ create train or eval dataset.
 import os
 import mindspore.common.dtype as mstype
 import mindspore.dataset as de
-import mindspore.dataset.transforms.c_transforms as c_transforms
-import mindspore.dataset.vision.c_transforms as vision
+import mindspore.dataset.transforms as data_trans
+import mindspore.dataset.vision as vision
 
 def create_dataset(dataset_path, do_train, config, platform, repeat_num=1, batch_size=1):
     """
@@ -63,7 +63,7 @@ def create_dataset(dataset_path, do_train, config, platform, repeat_num=1, batch
     rescale_op = vision.Rescale(1.0 / 255.0, 0.0)
     normalize_op = vision.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225))
     changeswap_op = vision.HWC2CHW()
-    type_cast_op = c_transforms.TypeCast(mstype.int32)
+    type_cast_op = data_trans.TypeCast(mstype.int32)
 
     c_trans = []
     if do_train:

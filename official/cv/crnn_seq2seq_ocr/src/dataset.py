@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,9 +19,8 @@ import numpy as np
 from PIL import Image
 
 import mindspore.dataset as de
-import mindspore.dataset.vision.c_transforms as C
-import mindspore.dataset.vision.py_transforms as P
-import mindspore.dataset.transforms.c_transforms as ops
+import mindspore.dataset.vision as C
+import mindspore.dataset.transforms as ops
 import mindspore.common.dtype as mstype
 
 from src.model_utils.config import config
@@ -36,7 +35,7 @@ class AugmentationOps():
         self.min_area_ratio = min_area_ratio
         self.aspect_ratio_range = aspect_ratio_range
         self.img_tile_shape = img_tile_shape
-        self.random_image_distortion_ops = P.RandomColorAdjust(brightness=brightness,
+        self.random_image_distortion_ops = C.RandomColorAdjust(brightness=brightness,
                                                                contrast=contrast,
                                                                saturation=saturation,
                                                                hue=hue)

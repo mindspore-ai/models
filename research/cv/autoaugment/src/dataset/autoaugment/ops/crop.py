@@ -16,17 +16,17 @@
 RandomCrop operator.
 """
 
-from mindspore.dataset.vision import py_transforms
+from mindspore.dataset.vision import transforms
 from mindspore.dataset.vision import py_transforms_util
 from mindspore.dataset.vision import utils
 
 
-class RandomCrop(py_transforms.RandomCrop):
+class RandomCrop(transforms.RandomCrop):
     """
-    RandomCrop inherits from py_transforms.RandomCrop but derives/uses the
+    RandomCrop inherits from transforms.RandomCrop but derives/uses the
     original image size as the output size.
 
-    Please refer to py_transforms.RandomCrop for argument specifications.
+    Please refer to transforms.RandomCrop for argument specifications.
     """
 
     def __init__(self, padding=4, pad_if_needed=False,

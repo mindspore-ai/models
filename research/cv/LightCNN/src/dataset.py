@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import cv2
 import numpy as np
 
 import mindspore.dataset as ds
-import mindspore.dataset.vision.py_transforms as py_vision
-from mindspore.dataset.transforms.py_transforms import Compose
+import mindspore.dataset.vision as vision
+from mindspore.dataset.transforms.transforms import Compose
 
 
 def img_loader(path):
@@ -67,19 +67,19 @@ def create_dataset(mode, data_url, data_list, batch_size, resize_size=144,
     if mode == 'Train':
         shuffle = True
         drop_last = True
-        image_ops = Compose([py_vision.ToPIL(),
-                             py_vision.Resize(resize_size),
-                             py_vision.RandomCrop(input_size),
-                             py_vision.RandomHorizontalFlip(),
-                             py_vision.ToTensor()])
+        image_ops = Compose([vision.ToPIL(),
+                             vision.Resize(resize_size),
+                             vision.RandomCrop(input_size),
+                             vision.RandomHorizontalFlip(),
+                             vision.ToTensor()])
 
     elif mode == 'Val':
         shuffle = False
         drop_last = False
-        image_ops = Compose([py_vision.ToPIL(),
-                             py_vision.Resize(resize_size),
-                             py_vision.CenterCrop(input_size),
-                             py_vision.ToTensor()])
+        image_ops = Compose([vision.ToPIL(),
+                             vision.Resize(resize_size),
+                             vision.CenterCrop(input_size),
+                             vision.ToTensor()])
 
     dataset_generator = ImageList(root=data_url, fileList=data_list)
 

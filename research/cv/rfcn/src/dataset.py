@@ -23,7 +23,7 @@ from numpy import random
 import cv2
 from PIL import Image
 import mindspore.dataset as de
-import mindspore.dataset.vision.c_transforms as C
+import mindspore.dataset.vision as C
 from mindspore.mindrecord import FileWriter
 
 def bbox_overlaps(bboxes1, bboxes2, mode='iou'):

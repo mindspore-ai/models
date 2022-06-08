@@ -18,8 +18,7 @@ import os
 import csv
 import numpy as np
 from PIL import Image
-import mindspore.dataset.vision.py_transforms as P
-import mindspore.dataset.vision.c_transforms as C
+import mindspore.dataset.vision as C
 import mindspore.dataset as de
 
 
@@ -68,17 +67,17 @@ def get_dataloader(train_root_dir, valid_root_dir,
         'train': [
             C.RandomResize(size=(224, 224)),
             C.RandomHorizontalFlip(),
-            P.ToTensor(),
-            P.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])],
+            C.ToTensor(),
+            C.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], is_hwc=False)],
         'train_valid': [
             C.RandomResize(size=(224, 224)),
             C.RandomHorizontalFlip(),
-            P.ToTensor(),
-            P.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])],
+            C.ToTensor(),
+            C.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], is_hwc=False)],
         'valid': [
             C.RandomResize(size=(224, 224)),
-            P.ToTensor(),
-            P.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])]}
+            C.ToTensor(),
+            C.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], is_hwc=False)]}
 
 
     dataset_column_names = ["anc_img", "pos_img", "neg_img", "pos_class", "neg_class"]

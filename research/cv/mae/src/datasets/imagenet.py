@@ -21,7 +21,7 @@ from PIL import Image
 
 import mindspore.dataset as de
 from mindspore.dataset.vision import Inter
-import mindspore.dataset.vision.c_transforms as C
+import mindspore.dataset.vision as C
 
 
 class DataLoader:

@@ -20,8 +20,8 @@ import os
 
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
-import mindspore.dataset.transforms.c_transforms as C2
-import mindspore.dataset.vision.c_transforms as C
+import mindspore.dataset.transforms as C2
+import mindspore.dataset.vision as C
 from mindspore.communication.management import get_group_size
 from mindspore.communication.management import get_rank
 from mindspore.communication.management import init

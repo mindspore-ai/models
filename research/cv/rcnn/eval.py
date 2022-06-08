@@ -25,7 +25,7 @@ from operator import itemgetter
 import cv2
 import mindspore
 import mindspore.dataset
-import mindspore.dataset.vision.c_transforms as c_trans
+import mindspore.dataset.vision as c_trans
 from mindspore import load_param_into_net, load_checkpoint, ops
 import numpy as np
 from tqdm import tqdm

@@ -16,11 +16,10 @@
 import os
 import mindspore.common.dtype as mstype
 import mindspore.dataset.engine as de
-import mindspore.dataset.transforms.c_transforms as C2
-import mindspore.dataset.vision.py_transforms as pytrans
+import mindspore.dataset.transforms as C2
 
-from mindspore.dataset.transforms.py_transforms import Compose
-import mindspore.dataset.vision.c_transforms as C
+from mindspore.dataset.transforms.transforms import Compose
+import mindspore.dataset.vision as C
 
 
 def create_dataset(dataset_path, do_train, repeat_num=1, infer_910=True, device_id=0, batch_size=128):
@@ -59,13 +58,13 @@ def create_dataset(dataset_path, do_train, repeat_num=1, infer_910=True, device_
         ]
     else:
         trans = [
-            pytrans.Decode(),
-            pytrans.Resize(235),
-            pytrans.CenterCrop(224)
+            C.Decode(True),
+            C.Resize(235),
+            C.CenterCrop(224)
         ]
     trans += [
-        pytrans.ToTensor(),
-        pytrans.Normalize(mean=mean, std=std),
+        C.ToTensor(),
+        C.Normalize(mean=mean, std=std, is_hwc=False),
     ]
     trans = Compose(trans)
 

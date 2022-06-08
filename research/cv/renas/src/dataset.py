@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,14 +17,12 @@ import math
 import os
 
 import numpy as np
-import mindspore.dataset.vision.py_transforms as py_vision
-import mindspore.dataset.transforms.py_transforms as py_transforms
-import mindspore.dataset.transforms.c_transforms as c_transforms
+import mindspore.dataset.vision as vision
+import mindspore.dataset.transforms as data_trans
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
 from mindspore.communication.management import get_rank, get_group_size
 from mindspore.dataset.vision import Inter
-import mindspore.dataset.vision.c_transforms as vision
 
 
 # values that should remain constant
@@ -55,24 +53,24 @@ def create_dataset(batch_size, train_data_url='', workers=8, distributed=False,
     """Create ImageNet training dataset"""
     if not os.path.exists(train_data_url):
         raise ValueError('Path not exists')
-    decode_op = py_vision.Decode()
-    type_cast_op = c_transforms.TypeCast(mstype.int32)
+    decode_op = vision.Decode(True)
+    type_cast_op = data_trans.TypeCast(mstype.int32)
 
-    random_resize_crop_bicubic = py_vision.RandomResizedCrop(size=(input_size, input_size),
-                                                             scale=SCALE, ratio=RATIO,
-                                                             interpolation=Inter.BICUBIC)
-    random_horizontal_flip_op = py_vision.RandomHorizontalFlip(0.5)
+    random_resize_crop_bicubic = vision.RandomResizedCrop(size=(input_size, input_size),
+                                                          scale=SCALE, ratio=RATIO,
+                                                          interpolation=Inter.BICUBIC)
+    random_horizontal_flip_op = vision.RandomHorizontalFlip(0.5)
     adjust_range = (max(0, 1 - color_jitter), 1 + color_jitter)
-    random_color_jitter_op = py_vision.RandomColorAdjust(brightness=adjust_range,
-                                                         contrast=adjust_range,
-                                                         saturation=adjust_range)
-    to_tensor = py_vision.ToTensor()
-    normalize_op = py_vision.Normalize(
-        IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD)
+    random_color_jitter_op = vision.RandomColorAdjust(brightness=adjust_range,
+                                                      contrast=adjust_range,
+                                                      saturation=adjust_range)
+    to_tensor = vision.ToTensor()
+    normalize_op = vision.Normalize(
+        IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD, is_hwc=False)
 
     # assemble all the transforms
-    image_ops = py_transforms.Compose([decode_op, random_resize_crop_bicubic,
-                                       random_horizontal_flip_op, random_color_jitter_op, to_tensor, normalize_op])
+    image_ops = data_trans.Compose([decode_op, random_resize_crop_bicubic,
+                                    random_horizontal_flip_op, random_color_jitter_op, to_tensor, normalize_op])
 
     rank_id = get_rank() if distributed else 0
     rank_size = get_group_size() if distributed else 1
@@ -121,16 +119,16 @@ def create_dataset_val(batch_size=128, val_data_url='', workers=8, distributed=F
     else:
         scale_size = int(math.floor(input_size / DEFAULT_CROP_PCT))
 
-    type_cast_op = c_transforms.TypeCast(mstype.int32)
-    decode_op = py_vision.Decode()
-    resize_op = py_vision.Resize(size=scale_size, interpolation=Inter.BICUBIC)
-    center_crop = py_vision.CenterCrop(size=input_size)
-    to_tensor = py_vision.ToTensor()
-    normalize_op = py_vision.Normalize(
-        IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD)
+    type_cast_op = data_trans.TypeCast(mstype.int32)
+    decode_op = vision.Decode(True)
+    resize_op = vision.Resize(size=scale_size, interpolation=Inter.BICUBIC)
+    center_crop = vision.CenterCrop(size=input_size)
+    to_tensor = vision.ToTensor()
+    normalize_op = vision.Normalize(
+        IMAGENET_DEFAULT_MEAN, IMAGENET_DEFAULT_STD, is_hwc=False)
 
-    image_ops = py_transforms.Compose([decode_op, resize_op, center_crop,
-                                       to_tensor, normalize_op])
+    image_ops = data_trans.Compose([decode_op, resize_op, center_crop,
+                                    to_tensor, normalize_op])
 
     dataset = dataset.map(input_columns=["label"], operations=type_cast_op,
                           num_parallel_workers=workers)
@@ -176,9 +174,9 @@ def create_dataset_cifar10(data_home, repeat_num=1, training=True, cifar_cfg=Non
     random_horizontal_op = vision.RandomHorizontalFlip()
     resize_op = vision.Resize((resize_height, resize_width))  # interpolation default BILINEAR
     rescale_op = vision.Rescale(1.0 / 255.0, 0.0)
-    normalize_op = vision.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
+    normalize_op = vision.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010), is_hwc=True)
     changeswap_op = vision.HWC2CHW()
-    type_cast_op = c_transforms.TypeCast(mstype.int32)
+    type_cast_op = data_trans.TypeCast(mstype.int32)
 
     c_trans = []
     if training:

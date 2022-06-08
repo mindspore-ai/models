@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 import os
 import numpy as np
 from PIL import Image
-import mindspore.dataset.vision.py_transforms as P
+import mindspore.dataset.vision as V
 import mindspore.dataset as de
 from model_utils.config import config
 
@@ -30,7 +30,7 @@ class SingleScaleTrans_Infer:
 
     def __call__(self, imgs, ann, image_names, image_size, batch_info):
 
-        decode = P.Decode()
+        decode = V.Decode(True)
         ret_imgs = []
         ret_anno = []
 

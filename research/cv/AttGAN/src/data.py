@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import numpy as np
 from PIL import Image
 
 import mindspore.dataset as de
-import mindspore.dataset.vision.py_transforms as py_vision
-from mindspore.dataset.transforms import py_transforms
+import mindspore.dataset.vision as vision
+from mindspore.dataset.transforms.transforms import Compose
 
 from src.utils import DistributedSampler
 
@@ -40,11 +40,11 @@ class Custom:
 
         mean = [0.5, 0.5, 0.5]
         std = [0.5, 0.5, 0.5]
-        transform = [py_vision.ToPIL()]
-        transform.append(py_vision.Resize([128, 128]))
-        transform.append(py_vision.ToTensor())
-        transform.append(py_vision.Normalize(mean=mean, std=std))
-        transform = py_transforms.Compose(transform)
+        transform = [vision.ToPIL()]
+        transform.append(vision.Resize([128, 128]))
+        transform.append(vision.ToTensor())
+        transform.append(vision.Normalize(mean=mean, std=std), is_hwc=False)
+        transform = Compose(transform)
         self.transform = transform
         self.images = np.array([images]) if images.size == 1 else images[0:]
         self.labels = np.array([labels]) if images.size == 1 else labels[0:]
@@ -108,12 +108,12 @@ def get_loader(data_root, attr_path, selected_attrs, crop_size=170, image_size=1
 
     mean = [0.5, 0.5, 0.5]
     std = [0.5, 0.5, 0.5]
-    transform = [py_vision.ToPIL()]
-    transform.append(py_vision.CenterCrop((crop_size, crop_size)))
-    transform.append(py_vision.Resize([image_size, image_size]))
-    transform.append(py_vision.ToTensor())
-    transform.append(py_vision.Normalize(mean=mean, std=std))
-    transform = py_transforms.Compose(transform)
+    transform = [vision.ToPIL()]
+    transform.append(vision.CenterCrop((crop_size, crop_size)))
+    transform.append(vision.Resize([image_size, image_size]))
+    transform.append(vision.ToTensor())
+    transform.append(vision.Normalize(mean=mean, std=std), is_hwc=False)
+    transform = Compose(transform)
 
     dataset = CelebA(data_root, attr_path, image_size, mode, selected_attrs, transform, split_point=split_point)
 

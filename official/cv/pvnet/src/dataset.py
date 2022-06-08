@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,9 +18,8 @@ import os
 import cv2
 import mindspore.common.dtype as mstype
 import mindspore.dataset as de
-import mindspore.dataset.transforms.c_transforms as C
-import mindspore.dataset.vision.c_transforms as CV
-import mindspore.dataset.vision.py_transforms as P
+import mindspore.dataset.transforms as C
+import mindspore.dataset.vision as CV
 import numpy as np
 
 from model_utils.config import config as cfg
@@ -242,9 +241,9 @@ def create_dataset(cls_list, batch_size=16, workers=16, devices=1, rank=0, multi
         CV.RandomColorAdjust(
             cfg.brightness, cfg.contrast,
             cfg.saturation, cfg.hue),
-        P.ToTensor(),  # 0~255 HWC to 0~1 CHW
+        C.ToTensor(),  # 0~255 HWC to 0~1 CHW
         C.TypeCast(mstype.float32),
-        P.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225)),
+        C.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225), is_hwc=False),
     ])
 
     mask_transforms = [

@@ -24,9 +24,9 @@ import numpy as np
 from mindspore import dataset as ds
 from mindspore.common import dtype as mstype
 from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.dataset.transforms import c_transforms as C2
+from mindspore.dataset.transforms import transforms as C2
 from mindspore.dataset.vision import Inter
-from mindspore.dataset.vision import c_transforms as C
+from mindspore.dataset.vision import transforms as C
 from mindspore.mindrecord import FileWriter
 
 from src import datasets

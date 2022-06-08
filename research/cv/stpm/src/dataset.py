@@ -21,8 +21,8 @@ import numpy as np
 from PIL import Image
 import mindspore.dataset as ds
 from mindspore.dataset.vision import Inter
-import mindspore.dataset.vision.py_transforms as py_vision
-from mindspore.dataset.transforms.py_transforms import Compose
+import mindspore.dataset.vision as vision
+from mindspore.dataset.transforms.transforms import Compose
 
 
 class MVTecDataset():
@@ -113,15 +113,15 @@ def createDataset(dataset_path, category, save_sample=False, out_size=256, train
     std = [0.229, 0.224, 0.225]
 
     data_transforms = Compose([
-        py_vision.Resize((out_size, out_size), interpolation=Inter.ANTIALIAS),
-        py_vision.CenterCrop(out_size),
-        py_vision.ToTensor(),
-        py_vision.Normalize(mean=mean, std=std)
+        vision.Resize((out_size, out_size), interpolation=Inter.ANTIALIAS),
+        vision.CenterCrop(out_size),
+        vision.ToTensor(),
+        vision.Normalize(mean=mean, std=std, is_hwc=False)
     ])
     gt_transforms = Compose([
-        py_vision.Resize((out_size, out_size)),
-        py_vision.CenterCrop(out_size),
-        py_vision.ToTensor()
+        vision.Resize((out_size, out_size)),
+        vision.CenterCrop(out_size),
+        vision.ToTensor()
     ])
 
     train_data = MVTecDataset(root=os.path.join(dataset_path, category),

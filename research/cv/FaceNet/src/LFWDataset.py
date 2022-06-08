@@ -17,8 +17,7 @@
 import os
 import numpy as np
 from PIL import Image
-import mindspore.dataset.vision.c_transforms as C
-import mindspore.dataset.vision.py_transforms as P
+import mindspore.dataset.vision as C
 import mindspore.dataset as de
 from mindspore.common import set_seed
 set_seed(0)
@@ -94,9 +93,9 @@ class LFWDataset:
 def get_lfw_dataloader(eval_root_dir, eval_pairs_path, eval_batch_size):
 
     data_transforms = [C.RandomResize(size=(224, 224)),
-                       P.ToPIL(),
-                       P.ToTensor(),
-                       P.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])]
+                       C.ToPIL(),
+                       C.ToTensor(),
+                       C.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], is_hwc=False)]
 
 
     face_dataset = LFWDataset(data_dir=eval_root_dir, pairs_path=eval_pairs_path)

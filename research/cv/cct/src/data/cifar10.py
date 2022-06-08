@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import os
 
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
-import mindspore.dataset.transforms.c_transforms as C
-import mindspore.dataset.vision.py_transforms as py_vision
+import mindspore.dataset.transforms as C
+import mindspore.dataset.vision as vision
 
 from src.data.augment.auto_augment import rand_augment_transform
 from src.data.augment.mixup import Mixup
@@ -89,15 +89,15 @@ def create_dataset_cifar10(dataset_dir, args, repeat_num=1, training=True):
         auto_augment = args.auto_augment
         assert auto_augment.startswith('rand')
         transform_img = [
-            py_vision.ToPIL(),
+            vision.ToPIL(),
             RandomResizedCropAndInterpolation(size=args.image_size, scale=(0.8, 1.0), ratio=(3. / 4., 4. / 3.),
                                               interpolation=interpolation),
-            py_vision.RandomHorizontalFlip(prob=0.5),
+            vision.RandomHorizontalFlip(prob=0.5),
         ]
         transform_img += [rand_augment_transform(auto_augment, aa_params)]
         transform_img += [
-            py_vision.ToTensor(),
-            py_vision.Normalize(mean=mean, std=std)]
+            vision.ToTensor(),
+            vision.Normalize(mean=mean, std=std, is_hwc=False)]
         if args.re_prob > 0.:
             transform_img += [RandomErasing(args.re_prob, mode=args.re_mode, max_count=args.re_count)]
     else:
@@ -105,10 +105,10 @@ def create_dataset_cifar10(dataset_dir, args, repeat_num=1, training=True):
         std = [0.2470, 0.2435, 0.2616]
         # test transform complete
         transform_img = [
-            py_vision.ToPIL(),
+            vision.ToPIL(),
             Resize(int(image_size), interpolation="bicubic"),
-            py_vision.ToTensor(),
-            py_vision.Normalize(mean=mean, std=std)
+            vision.ToTensor(),
+            vision.Normalize(mean=mean, std=std, is_hwc=False)
         ]
 
     transform_label = C.TypeCast(mstype.int32)

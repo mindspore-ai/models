@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import mindspore.ops as ops
 from mindspore import Tensor
 from mindspore import load_param_into_net
 from mindspore import load_checkpoint
-import mindspore.dataset.vision.py_transforms as transforms
+import mindspore.dataset.vision as vision
 from models.icnet import ICNet
 
 __all__ = ['get_color_palette', 'set_img_color',
@@ -30,8 +30,8 @@ __all__ = ['get_color_palette', 'set_img_color',
 
 def _img_transform(img):
     """img_transform"""
-    totensor = transforms.ToTensor()
-    normalize = transforms.Normalize([.485, .456, .406], [.229, .224, .225])
+    totensor = vision.ToTensor()
+    normalize = vision.Normalize([.485, .456, .406], [.229, .224, .225], is_hwc=False)
     img = totensor(img)
     img = normalize(img)
     return img

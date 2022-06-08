@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@ import multiprocessing
 import numpy as np
 from PIL import Image
 
-import mindspore.dataset.vision.py_transforms as py_vision
-import mindspore.dataset.transforms.py_transforms as py_transforms
+import mindspore.dataset.vision as vision
+import mindspore.dataset.transforms as data_trans
 import mindspore.dataset as de
 
 from src.utils import DistributedSampler
@@ -146,14 +146,14 @@ def get_loader(data_root, attr_path, selected_attrs, crop_size=178, image_size=1
     """Build and return a data loader."""
     mean = [0.5, 0.5, 0.5]
     std = [0.5, 0.5, 0.5]
-    transform = [py_vision.ToPIL()]
+    transform = [vision.ToPIL()]
     if mode == 'train':
-        transform.append(py_vision.RandomHorizontalFlip())
-        transform.append(py_vision.CenterCrop(crop_size))
-    transform.append(py_vision.Resize([image_size, image_size]))
-    transform.append(py_vision.ToTensor())
-    transform.append(py_vision.Normalize(mean=mean, std=std))
-    transform = py_transforms.Compose(transform)
+        transform.append(vision.RandomHorizontalFlip())
+        transform.append(vision.CenterCrop(crop_size))
+    transform.append(vision.Resize([image_size, image_size]))
+    transform.append(vision.ToTensor())
+    transform.append(vision.Normalize(mean=mean, std=std, is_hwc=False))
+    transform = data_trans.Compose(transform)
 
     if dataset == 'CelebA':
         dataset = CelebA(data_root, attr_path, selected_attrs, transform, mode)

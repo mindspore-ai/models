@@ -22,7 +22,7 @@ import numpy as np
 from mindspore.communication.management import get_rank, get_group_size
 import mindspore.dataset as de
 import mindspore.common.dtype as mstype
-import mindspore.dataset.transforms.c_transforms as C
+import mindspore.dataset.transforms as C
 
 
 def _get_rank_info(run_distribute):

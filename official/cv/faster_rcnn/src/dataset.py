@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -552,7 +552,7 @@ def create_fasterrcnn_dataset(config, mindrecord_file, batch_size=2, device_num=
     de.config.set_prefetch_size(8)
     ds = de.MindDataset(mindrecord_file, columns_list=["image", "annotation"], num_shards=device_num, shard_id=rank_id,
                         num_parallel_workers=4, shuffle=is_training)
-    decode = ms.dataset.vision.c_transforms.Decode()
+    decode = ms.dataset.vision.Decode()
     ds = ds.map(input_columns=["image"], operations=decode)
     compose_map_func = (lambda image, annotation: preprocess_fn(image, annotation, is_training, config=config))
 

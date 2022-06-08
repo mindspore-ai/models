@@ -32,7 +32,7 @@ def create_dataset(data_file=None, do_shuffle=True, device_num=1, rank=0, batch_
                                            "start_positions", "end_positions"],
                              shuffle=do_shuffle, num_shards=device_num, shard_id=rank,
                              num_samples=num, num_parallel_workers=num_parallel_workers)
-    type_int32 = C.c_transforms.TypeCast(mstype.int32)
+    type_int32 = C.TypeCast(mstype.int32)
     dataset = dataset.map(operations=type_int32, input_columns="word_ids")
     dataset = dataset.map(operations=type_int32, input_columns="word_segment_ids")
     dataset = dataset.map(operations=type_int32, input_columns="word_attention_mask")
@@ -57,7 +57,7 @@ def create_eval_dataset(data_file=None, do_shuffle=True, device_num=1, rank=0, b
                                            "example_indices"],
                              shuffle=do_shuffle, num_shards=device_num, shard_id=rank,
                              num_samples=num, num_parallel_workers=num_parallel_workers)
-    type_int32 = C.c_transforms.TypeCast(mstype.int32)
+    type_int32 = C.TypeCast(mstype.int32)
     dataset = dataset.map(operations=type_int32, input_columns="word_ids")
     dataset = dataset.map(operations=type_int32, input_columns="word_segment_ids")
     dataset = dataset.map(operations=type_int32, input_columns="word_attention_mask")

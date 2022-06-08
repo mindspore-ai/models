@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import os
 import random
 import numpy as np
 from PIL import Image, ImageOps
-import mindspore.dataset.vision.py_transforms as P
+import mindspore.dataset.vision as V
 from mindspore import dataset as de, context
 from mindspore.context import ParallelMode
 from mindspore.communication import get_rank, get_group_size
@@ -173,10 +173,10 @@ def create_train_dataset(dataset, args):
         mean = [0.5, 0.5, 0.5]
         std = [0.5, 0.5, 0.5]
     trans = [
-        P.ToTensor(),
+        V.ToTensor(),
     ]
     if args.isgan:
-        trans.append(P.Normalize(mean=mean, std=std))
+        trans.append(V.Normalize(mean=mean, std=std, is_hwc=False))
     train_ds = train_ds.map(operations=trans, input_columns=['target_image'])
     train_ds = train_ds.map(operations=trans, input_columns=['input_image'])
     train_ds = train_ds.map(operations=trans, input_columns=['bicubic_image'])
@@ -215,9 +215,9 @@ def create_val_dataset(dataset, args):
     if not args.vgg:
         mean = [0.5, 0.5, 0.5]
         std = [0.5, 0.5, 0.5]
-    trans = [P.ToTensor()]
+    trans = [V.ToTensor()]
     if args.isgan:
-        trans.append(P.Normalize(mean=mean, std=std))
+        trans.append(V.Normalize(mean=mean, std=std, is_hwc=False))
     val_ds = val_ds.map(operations=trans, input_columns=["target_image"])
     val_ds = val_ds.map(operations=trans, input_columns=["input_image"])
     val_ds = val_ds.map(operations=trans, input_columns=["bicubic_image"])

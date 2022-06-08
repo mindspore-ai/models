@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 """base dataset"""
 
 from PIL import Image
-import mindspore.dataset.vision.py_transforms as py_trans
-from mindspore.dataset.transforms.py_transforms import Compose
+import mindspore.dataset.vision as vision
+from mindspore.dataset.transforms.transforms import Compose
 from mindspore.dataset.vision import Inter
 
 
@@ -45,17 +45,17 @@ def get_transform(opt):
     transform_list = []
     if opt.resize_or_crop == 'resize_and_crop':
         osize = [opt.loadSize, opt.fineSize]
-        transform_list.append(py_trans.Resize(osize, Inter.BICUBIC))  # PIL
-        transform_list.append(py_trans.RandomCrop(opt.fineSize))  # PIL
+        transform_list.append(vision.Resize(osize, Inter.BICUBIC))  # PIL
+        transform_list.append(vision.RandomCrop(opt.fineSize))  # PIL
     elif opt.resize_or_crop == 'crop':
-        transform_list.append(py_trans.RandomCrop(opt.fineSize))
+        transform_list.append(vision.RandomCrop(opt.fineSize))
     elif opt.resize_or_crop == 'scale_width':
         transform_list.append(
             lambda img: __scale_width(img, opt.fineSize))
     elif opt.resize_or_crop == 'scale_width_and_crop':
         transform_list.append(
             lambda img: __scale_width(img, opt.loadSize))
-        transform_list.append(py_trans.RandomCrop(opt.fineSize))
+        transform_list.append(vision.RandomCrop(opt.fineSize))
     elif opt.resize_or_crop == 'none':
         transform_list.append(
             lambda img: __adjust(img))
@@ -63,11 +63,11 @@ def get_transform(opt):
         raise ValueError('--resize_or_crop %s is not a valid option.' % opt.resize_or_crop)
 
     if opt.isTrain and not opt.no_flip:
-        transform_list.append(py_trans.RandomHorizontalFlip())
+        transform_list.append(vision.RandomHorizontalFlip())
 
-    transform_list += [py_trans.ToTensor(),
-                       py_trans.Normalize((0.5, 0.5, 0.5),
-                                          (0.5, 0.5, 0.5))]
+    transform_list += [vision.ToTensor(),
+                       vision.Normalize((0.5, 0.5, 0.5),
+                                        (0.5, 0.5, 0.5), is_hwc=False)]
     return Compose(transform_list)
 
 # just modify the width and height to be multiple of 4

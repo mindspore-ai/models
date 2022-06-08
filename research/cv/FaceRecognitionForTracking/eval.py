@@ -21,8 +21,8 @@ import numpy as np
 from PIL import Image
 from tqdm import tqdm
 
-import mindspore.dataset.vision.py_transforms as V
-import mindspore.dataset.transforms.py_transforms as T
+import mindspore.dataset.vision as V
+import mindspore.dataset.transforms as T
 from mindspore import context, Tensor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
@@ -98,7 +98,7 @@ def load_images(paths, batch_size=128):
     resize = V.Resize((96, 64))
     transform = T.Compose([
         V.ToTensor(),
-        V.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5])])
+        V.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5], is_hwc=False)])
     for i, _ in enumerate(paths):
         im = Image.open(paths[i])
         im = resize(im)

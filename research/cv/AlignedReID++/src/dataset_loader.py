@@ -1,5 +1,5 @@
 """get the dataset"""
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@ import os.path as osp
 from PIL import Image
 
 from mindspore.dataset import GeneratorDataset
-from mindspore.dataset.transforms.py_transforms import Compose
-import mindspore.dataset.vision.py_transforms as P1
+from mindspore.dataset.transforms.transforms import Compose
+import mindspore.dataset.vision as vision
 
 from .import data_manager
 from .import samplers
@@ -159,9 +159,9 @@ def create_train_dataset(real_path, args, rank_id, rank_size):
     transform_train = [
         decode,
         Random2DTranslation(args.height, args.width),
-        P1.RandomHorizontalFlip(0.5),
-        P1.ToTensor(),
-        P1.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        vision.RandomHorizontalFlip(0.5),
+        vision.ToTensor(),
+        vision.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], is_hwc=False),
         RandomErasing()
     ]
     transform_train = Compose(transform_train)
@@ -186,9 +186,9 @@ def create_test_dataset(real_path, args):
 
     transform_test = [
         decode,
-        P1.Resize((args.height, args.width)),
-        P1.ToTensor(),
-        P1.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        vision.Resize((args.height, args.width)),
+        vision.ToTensor(),
+        vision.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], is_hwc=False)
     ]
     transform_test = Compose(transform_test)
 
@@ -212,4 +212,4 @@ def create_test_dataset(real_path, args):
     galleryloader = galleryloader.batch(batch_size=32, drop_remainder=True)
 
     return queryloader, galleryloader, dataset.num_train_pids
-          
+

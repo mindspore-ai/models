@@ -25,7 +25,7 @@ from mindspore.communication.management import get_group_size
 from mindspore.communication.management import get_rank
 from mindspore.communication.management import init
 from mindspore.context import ParallelMode
-from mindspore.dataset.vision import py_transforms as PY
+from mindspore.dataset.vision import transforms as vision
 from mindspore.train.callback import CheckpointConfig
 from mindspore.train.callback import LossMonitor
 from mindspore.train.callback import ModelCheckpoint
@@ -177,7 +177,7 @@ if __name__ == "__main__":
         trainset_paths,
         k_max=config.k_max,
         augment=True,
-        transforms=PY.ToTensor(),
+        transforms=vision.ToTensor(),
         config=config,
     )
 

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import mindspore.ops as ops
 from mindspore import load_param_into_net
 from mindspore import load_checkpoint
 from mindspore import Tensor
-import mindspore.dataset.vision.py_transforms as transforms
+import mindspore.dataset.vision as vision
 
 parser = argparse.ArgumentParser(description="ICNet Evaluation")
 parser.add_argument("--dataset_path", type=str, default="/data/cityscapes/", help="dataset path")
@@ -98,8 +98,8 @@ class Evaluator:
 
     def _img_transform(self, image):
         """img_transform"""
-        to_tensor = transforms.ToTensor()
-        normalize = transforms.Normalize([.485, .456, .406], [.229, .224, .225])
+        to_tensor = vision.ToTensor()
+        normalize = vision.Normalize([.485, .456, .406], [.229, .224, .225], is_hwc=False)
         image = to_tensor(image)
         image = normalize(image)
         return image

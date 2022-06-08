@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import random
 import collections
 import cv2
 
-import mindspore.dataset.vision.py_transforms as py_vision
+import mindspore.dataset.vision as vision
 
 if sys.version_info < (3, 3):
     Iterable = collections.Iterable
@@ -54,7 +54,7 @@ class ToTensor_Keypt():
     In the other cases, tensors are returned without scaling.
     """
     def __init__(self):
-        self.to_tensor = py_vision.ToTensor()
+        self.to_tensor = vision.ToTensor()
 
     def __call__(self, img, vkeypt):
         """
@@ -104,7 +104,7 @@ class Normalize_Keypt():
             self.mean.extend([mean_avg] * (channels_new - channels_orig))
             self.std.extend([std_avg] * (channels_new - channels_orig))
 
-        normalize = py_vision.Normalize(self.mean, self.std)
+        normalize = vision.Normalize(self.mean, self.std, is_hwc=False)
         return normalize(tensor)
 
 class Resize_Keypt():

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ import csv
 import numpy as np
 from PIL import Image
 
-import mindspore.dataset.vision.py_transforms as py_vision
-import mindspore.dataset.transforms.py_transforms as py_transforms
+import mindspore.dataset.vision as vision
+import mindspore.dataset.transforms as data_trans
 import mindspore.dataset as de
 
 
@@ -112,12 +112,12 @@ def get_loader(data_root, mode='train'):
     """Build and return a data loader."""
     mean = [0.5, 0.5, 0.5]
     std = [0.5, 0.5, 0.5]
-    transform = [py_vision.ToPIL()]
+    transform = [vision.ToPIL()]
     if mode == 'train':
-        transform.append(py_vision.RandomHorizontalFlip())
-    transform.append(py_vision.ToTensor())
-    transform.append(py_vision.Normalize(mean=mean, std=std))
-    transform = py_transforms.Compose(transform)
+        transform.append(vision.RandomHorizontalFlip())
+    transform.append(vision.ToTensor())
+    transform.append(vision.Normalize(mean=mean, std=std, is_hwc=False))
+    transform = data_trans.Compose(transform)
 
     dataset = Youtube(data_root, mode, transform=transform)
 

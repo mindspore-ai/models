@@ -18,8 +18,8 @@ Data operations, will be used in train.py and eval.py
 import os
 import mindspore.common.dtype as mstype
 import mindspore.dataset.engine as de
-import mindspore.dataset.vision.c_transforms as C
-import mindspore.dataset.transforms.c_transforms as C2
+import mindspore.dataset.vision as C
+import mindspore.dataset.transforms as C2
 from mindspore.communication.management import init, get_rank, get_group_size
 
 def create_dataset_ImageNet(dataset_path, do_train, repeat_num=1, batch_size=32, target="Ascend"):

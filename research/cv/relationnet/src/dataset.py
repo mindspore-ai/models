@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ import random
 import os
 from PIL import Image
 import numpy as np
-import mindspore.dataset.vision.py_transforms as py_vision
-from mindspore.dataset.transforms.py_transforms import Compose
+import mindspore.dataset.vision as vision
+from mindspore.dataset.transforms.transforms import Compose
 from mindspore import Tensor
 
 
@@ -176,8 +176,8 @@ class ClassBalancedSampler():
 def get_data_loader(task, num_per_class=1, split='train', shuffle=True, rotation=0, flip=None):
     '''get dataloader'''
     mean, std = [0.92206], [0.08426]
-    transform = Compose([py_vision.ToTensor(),  # numpy HWC-> Tensor CHW
-                         py_vision.Normalize(mean=mean, std=std)])
+    transform = Compose([vision.ToTensor(),  # numpy HWC-> Tensor CHW
+                         vision.Normalize(mean=mean, std=std, is_hwc=False)])
 
     dataset = Omniglot(task, split=split, transform=transform, rotation=rotation, flip=flip)
     if split == 'train':

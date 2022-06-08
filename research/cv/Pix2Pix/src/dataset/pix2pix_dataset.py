@@ -22,7 +22,7 @@ import numpy as np
 from PIL import Image
 import mindspore
 from mindspore import dataset as de
-import mindspore.dataset.vision.c_transforms as C
+import mindspore.dataset.vision as C
 from src.utils.config import config
 
 class pix2pixDataset():

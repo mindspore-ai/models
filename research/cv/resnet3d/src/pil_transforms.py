@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ transforms by PIL.
 """
 import numpy as np
 
-import mindspore.dataset.vision.py_transforms as py_trans
+import mindspore.dataset.vision as vision
 
 
 class PILTrans:
@@ -27,16 +27,16 @@ class PILTrans:
 
     def __init__(self, opt, mean, std):
         super(PILTrans).__init__()
-        self.to_pil = py_trans.ToPIL()
+        self.to_pil = vision.ToPIL()
         self.random_resized_crop = \
-            py_trans.RandomResizedCrop(opt.sample_size, scale=(opt.train_crop_min_scale, 1.0),
-                                       ratio=(opt.train_crop_min_ratio, 1.0 / opt.train_crop_min_ratio))
-        self.random_horizontal_flip = py_trans.RandomHorizontalFlip(prob=0.5)
-        self.color = py_trans.RandomColorAdjust(0.4, 0.4, 0.4, 0.1)
-        self.normalize = py_trans.Normalize(mean=mean, std=std)
-        self.to_tensor = py_trans.ToTensor()
-        self.resize = py_trans.Resize(opt.sample_size)
-        self.center_crop = py_trans.CenterCrop(opt.sample_size)
+            vision.RandomResizedCrop(opt.sample_size, scale=(opt.train_crop_min_scale, 1.0),
+                                     ratio=(opt.train_crop_min_ratio, 1.0 / opt.train_crop_min_ratio))
+        self.random_horizontal_flip = vision.RandomHorizontalFlip(prob=0.5)
+        self.color = vision.RandomColorAdjust(0.4, 0.4, 0.4, 0.1)
+        self.normalize = vision.Normalize(mean=mean, std=std, is_hwc=False)
+        self.to_tensor = vision.ToTensor()
+        self.resize = vision.Resize(opt.sample_size)
+        self.center_crop = vision.CenterCrop(opt.sample_size)
         self.opt = opt
 
     def __call__(self, data, labels, batchInfo):
@@ -72,11 +72,11 @@ class EvalPILTrans:
 
     def __init__(self, opt, mean, std):
         super(EvalPILTrans).__init__()
-        self.to_pil = py_trans.ToPIL()
-        self.resize = py_trans.Resize(opt.sample_size)
-        self.center_crop = py_trans.CenterCrop(opt.sample_size)
-        self.normalize = py_trans.Normalize(mean=mean, std=std)
-        self.to_tensor = py_trans.ToTensor()
+        self.to_pil = vision.ToPIL()
+        self.resize = vision.Resize(opt.sample_size)
+        self.center_crop = vision.CenterCrop(opt.sample_size)
+        self.normalize = vision.Normalize(mean=mean, std=std, is_hwc=False)
+        self.to_tensor = vision.ToTensor()
 
     def __call__(self, data, labels, batchInfo):
         data = data[0]

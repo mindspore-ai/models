@@ -23,7 +23,7 @@ import numpy as np
 import cv2
 import mindspore
 import mindspore.dataset as ds
-import mindspore.dataset.transforms.c_transforms as C
+import mindspore.dataset.transforms as C
 
 
 def ResziePadding(img, fixed_side=256):

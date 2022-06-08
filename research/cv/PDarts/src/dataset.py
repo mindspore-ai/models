@@ -15,8 +15,8 @@
 """Read train and eval data"""
 import mindspore.dataset as ds
 from mindspore.common import dtype as mstype
-import mindspore.dataset.transforms.c_transforms as C
-import mindspore.dataset.vision.c_transforms as vision
+import mindspore.dataset.transforms as C
+import mindspore.dataset.vision as vision
 from mindspore.dataset.vision.utils import Inter
 
 

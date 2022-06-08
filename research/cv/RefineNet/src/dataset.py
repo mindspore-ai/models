@@ -15,7 +15,7 @@
 """ dataset """
 import numpy as np
 import cv2
-import mindspore.dataset.vision.c_transforms as C
+import mindspore.dataset.vision as C
 import mindspore.dataset as ds
 from mindspore.common import set_seed
 cv2.setNumThreads(0)

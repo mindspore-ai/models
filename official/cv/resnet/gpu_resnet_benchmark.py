@@ -90,28 +90,28 @@ def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32, target="
     std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
 
     # define map operations
-    normalize_op = ds.vision.c_transforms.Normalize(mean=mean, std=std)
+    normalize_op = ds.vision.Normalize(mean=mean, std=std)
     if dtype == "fp16":
         if config.eval:
             x_dtype = "float32"
         else:
             x_dtype = "float16"
-        normalize_op = ds.vision.c_transforms.NormalizePad(mean=mean, std=std, dtype=x_dtype)
+        normalize_op = ds.vision.NormalizePad(mean=mean, std=std, dtype=x_dtype)
     if do_train:
         trans = [
-            ds.vision.c_transforms.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
-            ds.vision.c_transforms.RandomHorizontalFlip(prob=0.5),
+            ds.vision.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
+            ds.vision.RandomHorizontalFlip(prob=0.5),
             normalize_op,
         ]
     else:
         trans = [
-            ds.vision.c_transforms.Decode(),
-            ds.vision.c_transforms.Resize(256),
-            ds.vision.c_transforms.CenterCrop(image_size),
+            ds.vision.Decode(),
+            ds.vision.Resize(256),
+            ds.vision.CenterCrop(image_size),
             normalize_op,
         ]
     if dtype == "fp32":
-        trans.append(ds.vision.c_transforms.HWC2CHW())
+        trans.append(ds.vision.HWC2CHW())
     data_set = data_set.map(operations=trans, input_columns="image", num_parallel_workers=map_num_parallel_worker)
     # apply batch operations
     data_set = data_set.batch(batch_size, drop_remainder=True, num_parallel_workers=batch_num_parallel_worker)

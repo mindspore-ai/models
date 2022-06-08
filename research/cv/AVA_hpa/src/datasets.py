@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,9 +19,9 @@ from collections import Counter
 from PIL import Image
 import numpy as np
 import pandas as pd
-import mindspore.dataset.vision.py_transforms as transforms
+import mindspore.dataset.vision as vision
 from mindspore.dataset import GeneratorDataset
-from mindspore.dataset.transforms.py_transforms import Compose
+from mindspore.dataset.transforms.transforms import Compose
 from src.RandAugment import RandAugment
 
 # split train val test = 4:1:5
@@ -40,35 +40,35 @@ class TransformOnImg:
         self.mode = mode
         rand_augment = RandAugment(n=2, m=10)
         self.trsfm_basic = Compose([
-            transforms.ToPIL(),
-            transforms.Resize(256),
-            transforms.RandomResizedCrop(size=224, scale=(0.2, 1.)),
-            transforms.RandomColorAdjust(0.4, 0.4, 0.4, 0),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+            vision.ToPIL(),
+            vision.Resize(256),
+            vision.RandomResizedCrop(size=224, scale=(0.2, 1.)),
+            vision.RandomColorAdjust(0.4, 0.4, 0.4, 0),
+            vision.RandomHorizontalFlip(),
+            vision.ToTensor(),
+            vision.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010), is_hwc=False),
         ])
         self.trsfm_aux = Compose([
-            transforms.ToPIL(),
-            transforms.Resize(256),
-            transforms.RandomResizedCrop(size=224, scale=(0.2, 1.)),
-            transforms.RandomHorizontalFlip(),
+            vision.ToPIL(),
+            vision.Resize(256),
+            vision.RandomResizedCrop(size=224, scale=(0.2, 1.)),
+            vision.RandomHorizontalFlip(),
             rand_augment,
-            transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+            vision.ToTensor(),
+            vision.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010), is_hwc=False),
         ])
         self.trsfm_train = Compose([
-            transforms.ToPIL(),
-            transforms.Resize(256),
-            transforms.RandomResizedCrop(size=224, scale=(0.2, 1.)),
-            transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+            vision.ToPIL(),
+            vision.Resize(256),
+            vision.RandomResizedCrop(size=224, scale=(0.2, 1.)),
+            vision.ToTensor(),
+            vision.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010), is_hwc=False),
         ])
         self.trsfm = Compose([
-            transforms.ToPIL(),
-            transforms.Resize(224),
-            transforms.ToTensor(),
-            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010)),
+            vision.ToPIL(),
+            vision.Resize(224),
+            vision.ToTensor(),
+            vision.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010), is_hwc=False),
         ])
 
     def __call__(self, img, use_aux=False):
