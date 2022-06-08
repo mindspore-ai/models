@@ -20,7 +20,8 @@ import os
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
 import mindspore.dataset.transforms as C
-import mindspore.dataset.vision as vision
+import mindspore.dataset.vision.c_transforms as vision
+
 from src.config import imagenet_cfg
 
 

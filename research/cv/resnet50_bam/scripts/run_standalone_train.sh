@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ mkdir ./logs
 
 if [ $# != 1 ]
 then
-    echo "Usage: bash run_standalone_train_gpu.sh [DEVICE_ID]"
+    echo "Usage: bash run_standalone_train.sh [DEVICE_ID]"
 exit 1
 fi
 
 DEVICE_ID=$1
-echo "start training for GPU $DEVICE_ID"
-python train.py --device_target='GPU' --device_id=$DEVICE_ID > ./logs/standalone_train_gpu.log 2>&1 &
+echo "start training for Ascend $DEVICE_ID"
+python train.py --device_target='Ascend' --device_id=$DEVICE_ID > ./logs/standalone_train_ascend.log 2>&1 &
