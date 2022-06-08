@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,10 +14,10 @@
 # ============================================================================
 """Tool functions."""
 import math
-import numpy as np
 
-import mindspore.nn as nn
+import numpy as np
 from mindspore import Tensor
+from mindspore import nn
 from mindspore.common import initializer
 
 
@@ -52,7 +52,7 @@ def calculate_fan_in_and_fan_out(shape):
 def get_conv_bias(cell):
     """Bias initializer for conv."""
     weight = initializer.initializer(initializer.HeUniform(negative_slope=math.sqrt(5)),
-                                     cell.weight.shape, cell.weight.dtype).init_data()
+                                     cell.weight.shape, cell.weight.dtype)
     fan_in, _ = calculate_fan_in_and_fan_out(weight.shape)
     bound = 1 / math.sqrt(fan_in)
     return initializer.initializer(initializer.Uniform(scale=bound),
