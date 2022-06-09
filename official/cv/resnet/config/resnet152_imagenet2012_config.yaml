@@ -29,7 +29,7 @@ save_checkpoint: True
 save_checkpoint_epochs: 5
 keep_checkpoint_max: 10
 save_checkpoint_path: "./"
-warmup_epochs: 0
+warmup_epochs: 2
 lr_decay_mode: "step"
 use_label_smooth: True
 label_smooth_factor: 0.1

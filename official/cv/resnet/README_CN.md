@@ -284,7 +284,7 @@ bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]  [CONFIG_PATH]
 "save_checkpoint":True,          # 是否保存检查点
 "save_checkpoint_epochs":5,      # 两个检查点之间的周期间隔；默认情况下，最后一个检查点将在最后一个周期完成后保存
 "keep_checkpoint_max":10,        # 只保存最后一个keep_checkpoint_max检查点
-"warmup_epochs":0,               # 热身周期数
+"warmup_epochs":2,               # 热身周期数
 "lr_decay_mode":"Linear",        # 用于生成学习率的衰减模式
 "use_label_smooth":True,         # 标签平滑
 "label_smooth_factor":0.1,       # 标签平滑因子
@@ -310,7 +310,7 @@ bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]  [CONFIG_PATH]
 "save_checkpoint":True,          # 是否保存检查点
 "save_checkpoint_epochs":5,      # 两个检查点之间的周期间隔；默认情况下，最后一个检查点将在最后一个周期完成后保存
 "keep_checkpoint_max":1,         # 只保存最后一个keep_checkpoint_max检查点
-"warmup_epochs":0,               # 热身周期数
+"warmup_epochs":2,               # 热身周期数
 "optimizer":"Momentum",          # 优化器
 "use_label_smooth":True,         # 标签平滑
 "label_smooth_factor":0.1,       # 标签平滑因子
@@ -336,7 +336,7 @@ bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]  [CONFIG_PATH]
 "save_checkpoint":True,          # 是否保存检查点
 "save_checkpoint_epochs":5,      # 两个检查点之间的周期间隔；默认情况下，最后一个检查点将在最后一个周期完成后保存
 "keep_checkpoint_max":10,        # 只保存最后一个keep_checkpoint_max检查点
-"warmup_epochs":0,               # 热身周期数
+"warmup_epochs":2,               # 热身周期数
 "lr_decay_mode":"cosine”         # 用于生成学习率的衰减模式
 "use_label_smooth":True,         # 标签平滑
 "label_smooth_factor":0.1,       # 标签平滑因子
@@ -360,7 +360,7 @@ bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]  [CONFIG_PATH]
 "save_checkpoint_epochs":5,      # 两个检查点之间的周期间隔；默认情况下，最后一个检查点将在最后一个周期完成后保存
 "keep_checkpoint_max":10,        # 只保存最后一个keep_checkpoint_max检查点
 "save_checkpoint_path":"./",     # 检查点相对于执行路径的保存路径
-"warmup_epochs":0,               # 热身周期数  
+"warmup_epochs":2,               # 热身周期数  
 "lr_decay_mode":"steps",         # 用于生成学习率的衰减模式
 "use_label_smooth":True,         # 标签平滑
 "label_smooth_factor":0.1,       # 标签平滑因子
