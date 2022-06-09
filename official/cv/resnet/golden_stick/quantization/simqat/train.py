@@ -22,7 +22,7 @@ from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMoni
 from mindspore.communication.management import init, get_rank
 from mindspore.parallel import set_algo_parameters
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
-import mindspore.log as logger
+from simqat import create_simqat
 from src.lr_generator import get_lr
 from src.CrossEntropySmooth import CrossEntropySmooth
 from src.metric import DistAccuracy
@@ -73,16 +73,6 @@ class LossCallBack(LossMonitor):
                                                       cur_step_in_epoch, loss), flush=True)
 
 
-def get_comp_algo():
-    if config.comp_algo == "SimQAT":
-        from simqat import create_simqat
-        return create_simqat()
-    if config.comp_algo == "LSQ":
-        logger.warning("LSQ is not implemented now!")
-        return None
-    return None
-
-
 def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
     """remove useless parameters according to filter_list"""
     for key in list(origin_dict.keys()):
@@ -124,56 +114,61 @@ def set_parameter():
             ms.set_auto_parallel_context(all_reduce_fusion_config=config.all_reduce_fusion_config)
 
 
-def load_pre_trained_checkpoint():
-    """
-    Load checkpoint according to pre_trained path.
-    """
-    param_dict = None
+def init_weight(net):
+    """init_weight"""
+    for _, cell in net.cells_and_names():
+        if isinstance(cell, nn.Conv2d):
+            if config.conv_init == "XavierUniform":
+                cell.weight.set_data(ms.common.initializer.initializer(ms.common.initializer.XavierUniform(),
+                                                                       cell.weight.shape,
+                                                                       cell.weight.dtype))
+            elif config.conv_init == "TruncatedNormal":
+                weight = conv_variance_scaling_initializer(cell.in_channels,
+                                                           cell.out_channels,
+                                                           cell.kernel_size[0])
+                cell.weight.set_data(weight)
+        if isinstance(cell, nn.Dense):
+            if config.dense_init == "TruncatedNormal":
+                cell.weight.set_data(ms.common.initializer.initializer(ms.common.initializer.TruncatedNormal(),
+                                                                       cell.weight.shape,
+                                                                       cell.weight.dtype))
+            elif config.dense_init == "RandomNormal":
+                in_channel = cell.in_channels
+                out_channel = cell.out_channels
+                weight = np.random.normal(loc=0, scale=0.01, size=out_channel * in_channel)
+                weight = ms.Tensor(np.reshape(weight, (out_channel, in_channel)), dtype=cell.weight.dtype)
+                cell.weight.set_data(weight)
+
+
+def load_fp32_ckpt(net):
+    if config.fp32_ckpt:
+        if os.path.isfile(config.fp32_ckpt):
+            ckpt = ms.load_checkpoint(config.fp32_ckpt)
+            if config.filter_weight:
+                filter_list = [x.name for x in net.end_point.get_parameters()]
+                filter_checkpoint_parameter_by_list(ckpt, filter_list)
+            ms.load_param_into_net(net, ckpt)
+        else:
+            print(f"Invalid fp32_ckpt {config.fp32_ckpt} parameter.")
+
+
+def load_pretrained_ckpt(net):
     if config.pre_trained:
         if os.path.isfile(config.pre_trained):
-            param_dict = ms.load_checkpoint(config.pre_trained)
+            ckpt = ms.load_checkpoint(config.pre_trained)
+            if ckpt.get("epoch_num") and ckpt.get("step_num"):
+                config.has_trained_epoch = int(ckpt["epoch_num"].data.asnumpy())
+                config.has_trained_step = int(ckpt["step_num"].data.asnumpy())
+            else:
+                config.has_trained_epoch = 0
+                config.has_trained_step = 0
+
+            if config.filter_weight:
+                filter_list = [x.name for x in net.end_point.get_parameters()]
+                filter_checkpoint_parameter_by_list(ckpt, filter_list)
+            ms.load_param_into_net(net, ckpt)
         else:
             print(f"Invalid pre_trained {config.pre_trained} parameter.")
-    return param_dict
-
-
-def init_weight(net, param_dict):
-    """init_weight"""
-    if config.pre_trained and param_dict:
-        if param_dict.get("epoch_num") and param_dict.get("step_num"):
-            config.has_trained_epoch = int(param_dict["epoch_num"].data.asnumpy())
-            config.has_trained_step = int(param_dict["step_num"].data.asnumpy())
-        else:
-            config.has_trained_epoch = 0
-            config.has_trained_step = 0
-
-        if config.filter_weight:
-            filter_list = [x.name for x in net.end_point.get_parameters()]
-            filter_checkpoint_parameter_by_list(param_dict, filter_list)
-        ms.load_param_into_net(net, param_dict)
-    else:
-        for _, cell in net.cells_and_names():
-            if isinstance(cell, nn.Conv2d):
-                if config.conv_init == "XavierUniform":
-                    cell.weight.set_data(ms.common.initializer.initializer(ms.common.initializer.XavierUniform(),
-                                                                           cell.weight.shape,
-                                                                           cell.weight.dtype))
-                elif config.conv_init == "TruncatedNormal":
-                    weight = conv_variance_scaling_initializer(cell.in_channels,
-                                                               cell.out_channels,
-                                                               cell.kernel_size[0])
-                    cell.weight.set_data(weight)
-            if isinstance(cell, nn.Dense):
-                if config.dense_init == "TruncatedNormal":
-                    cell.weight.set_data(ms.common.initializer.initializer(ms.common.initializer.TruncatedNormal(),
-                                                                           cell.weight.shape,
-                                                                           cell.weight.dtype))
-                elif config.dense_init == "RandomNormal":
-                    in_channel = cell.in_channels
-                    out_channel = cell.out_channels
-                    weight = np.random.normal(loc=0, scale=0.01, size=out_channel * in_channel)
-                    weight = ms.Tensor(np.reshape(weight, (out_channel, in_channel)), dtype=cell.weight.dtype)
-                    cell.weight.set_data(weight)
 
 
 def init_group_params(net):
@@ -214,8 +209,9 @@ def train_net():
     """train net"""
     print("Train configure: {}".format(config))
     target = config.device_target
+    if target != "GPU":
+        raise NotImplementedError("SimQAT only support running on GPU now!")
     set_parameter()
-    ckpt_param_dict = load_pre_trained_checkpoint()
     dataset = create_dataset(dataset_path=config.data_path, do_train=True,
                              batch_size=config.batch_size, train_image_size=config.train_image_size,
                              eval_image_size=config.eval_image_size, target=target,
@@ -223,14 +219,11 @@ def train_net():
     step_size = dataset.get_dataset_size()
     net = resnet(class_num=config.class_num)
 
-    # apply golden-stick algo
-    algo = get_comp_algo()
-    if algo:
-        fp32_ckpt = ms.load_checkpoint(config.fp32_ckpt)
-        ms.load_param_into_net(net, fp32_ckpt)
-        net = algo.apply(net)
-    else:
-        init_weight(net=net, param_dict=ckpt_param_dict)
+    init_weight(net)
+    load_fp32_ckpt(net)
+    algo = create_simqat()
+    net = algo.apply(net)
+    load_pretrained_ckpt(net)
 
     lr = get_lr(lr_init=config.lr_init,
                 lr_end=0.0,
@@ -240,7 +233,7 @@ def train_net():
                 steps_per_epoch=step_size,
                 lr_decay_mode='cosine')
     if config.pre_trained:
-        lr = lr[config.pretrained_epoch_size * step_size:]
+        lr = lr[config.has_trained_epoch * step_size:]
     lr = ms.Tensor(lr)
     # define opt
     group_params = init_group_params(net)
@@ -273,8 +266,7 @@ def train_net():
         cb += [ckpt_cb]
     # train model
     dataset_sink_mode = target != "CPU"
-    config.pretrain_epoch_size = config.has_trained_epoch
-    model.train(config.epoch_size - config.pretrain_epoch_size, dataset, callbacks=cb,
+    model.train(config.epoch_size - config.has_trained_epoch, dataset, callbacks=cb,
                 sink_size=dataset.get_dataset_size(), dataset_sink_mode=dataset_sink_mode)
 
 
