@@ -18,6 +18,8 @@ test_mindrecord: ""
 pretrained_model: ""
 save_dir: "./"
 model_name: "predrnn_pp"
+file_name: "predrnn_pp"
+file_path: "./"
 input_length: 10
 seq_length: 20
 img_width: 64
@@ -35,3 +37,7 @@ snapshot_interval: 1000
 sink_size: 10
 device_num: 1
 device_id: 0
+result_path: "./scripts/preprocess_Result/"
+
+result_dir: ""
+input0_path: ""

@@ -15,6 +15,12 @@
         - [Training](#training)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
+    - [Export Process](#export-process)
+        - [Export](#export)
+    - [Preprocess Process](#preprocess-process)
+        - [Preprocess](#preprocess)
+      - [Infer Process](#infer-process)
+        - [Infer](#infer)
     - [Model Description](#model-description)
         - [Performance](#performance)
             - [Training Performance](#training-performance)
@@ -40,12 +46,14 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 
 We use the moving mnist dataset (http://www.cs.toronto.edu/~nitish/unsupervised_video/) mentioned in the paper for training and evaluation.
 
+Dataset Partition Results(https://onedrive.live.com/?authkey=%21AGzXjcOlzTQw158&id=FF7F539F0073B9E2%21124&cid=FF7F539F0073B9E2)
+
 ### [Dataset Prepare](#content)
 
 The moving mnist dataset from the official website contains 3 files: train/valid/test.npz. Use generate_mindrecord.py to convert dataset to mindrecord format, DATASET_PATH is the path of the moving mnist dataset folder:
 
 ```shell
-    $ python generate_mindrecord.py --dataset_path=[DATASET_PATH]
+     python generate_mindrecord.py --dataset_path=[DATASET_PATH]
 ```
 
 ## [Environment Requirements](#contents)
@@ -67,7 +75,7 @@ The moving mnist dataset from the official website contains 3 files: train/valid
     ```bash
     # standalone training example in Ascend
     # TRAIN_MINDRECORD_PATH is the path of the file mnist_train.mindrecord
-    $ bash scripts/run_standalone_train.sh [TRAIN_MINDRECORD_PATH] [DEVICE_ID]
+    bash scripts/run_standalone_train.sh [TRAIN_MINDRECORD_PATH] [DEVICE_ID]
     ```
 
 ## [Script Description](#contents)
@@ -77,10 +85,12 @@ The moving mnist dataset from the official website contains 3 files: train/valid
 ```shell
 Predrnn++
 ├── README.md
+├── ascend310_infer                             # Implement 310 Reasoning Source Code
 ├── generate_mindrecord.py                      # Convert moving mnist dataset to mindrecord
 ├── requirements.txt
 ├── scripts
 │   ├── run_eval.sh                             # Launch evaluation in Ascend
+│   ├── run_infer_310.sh                         # Ascend inference shell script
 │   └── run_standalone_train.sh                 # Launch standalone training in Ascend (1 pcs)
 ├── nets
 │   ├── predrnn_pp.py                           # Model definition
@@ -98,6 +108,9 @@ Predrnn++
 ├── config.py                                   # Dataset patch functions
 ├── train.py                                    # Training script
 ├── eval.py                                     # Evaluation script
+├── preprocess.py                               # 310 Inference Preprocessing Script
+├── postprocess.py                              # 310 Inference Postprocessing Scripts
+├── export.py                                   # Export checkpoint files to air/mindir
 ├── default_config.yaml                         # Config file
 ```
 
@@ -118,6 +131,7 @@ test_mindrecord: ""                             # path to test dataset
 pretrained_model: ""                            # path to pretrained model
 save_dir: "./"                                  # path to save model checkpoint
 model_name: "predrnn_pp"                        # model name
+file_format: "MINDIR"                           # export format
 input_length: 10                                # length of input sequence
 seq_length: 20                                  # length of total sequence
 img_width: 64                                   # width of input image
@@ -135,6 +149,9 @@ snapshot_interval: 1000                         # number of iters to save models
 sink_size: 10                                   # number of data to sink per epoch
 device_num: 1                                   # number of NPU used
 device_id: 0                                    # id of NPU used
+result_path: "./preprocess_Result/"             # export result path
+result_dir: ""                                  # Inference result path
+input0_path: ""                                 # export input path
 
 ```lang-yaml
 
@@ -179,6 +196,43 @@ mse per frame: 47.858854093653633
     62.79542451746323
     67.35081808324804
     72.32624973970302
+
+```
+
+## [Export Process](#contents)
+
+### [Export](#contents)
+
+```shell
+
+    # PRETRAINED_MODEL is the path of the file predrnn_pp-8000_10.ckpt
+    python export.py --device_id=[DEVICE_ID] --pretrained_model=[PRETRAINED_MODEL] --file_format=[FILE_FORMAT]
+
+```
+
+## [Preprocess Process](#contents)
+
+### [Preprocess](#contents)
+
+```shell
+
+    # TEST_MINDRECORD is the path of the file mnist_test.mindrecord
+    python preprocess.py --test_mindrecord=[TEST_MINDRECORD] --device_id=[DEVICE_ID]
+
+```
+
+## [Infer Process](#contents)
+
+### [Infer](#contents)
+
+Before we can run inference we need to export the model first. Air models can only be exported on the Ascend 910 environment, mindir can be exported on any environment. batch_size only supports 1.
+
+Inference process are stored in scripts/infer.log.
+Inference results are stored in scripts/acc.log.
+
+``` bash
+
+bash scripts/run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 
 ```
 
