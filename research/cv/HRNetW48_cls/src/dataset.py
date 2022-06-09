@@ -19,8 +19,8 @@ from mindspore import dataset as ds
 from mindspore.common import dtype as mstype
 from mindspore.communication.management import get_group_size
 from mindspore.communication.management import get_rank
-from mindspore.dataset.transforms import c_transforms as C2
-from mindspore.dataset.vision import c_transforms as C
+import mindspore.dataset.transforms as C2
+import mindspore.dataset.vision as C
 
 
 def create_imagenet(

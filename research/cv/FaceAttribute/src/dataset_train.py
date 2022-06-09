@@ -28,7 +28,7 @@ def data_generator(args):
     batch_size = args.per_batch_size
     attri_num = args.attri_num
     max_epoch = args.max_epoch
-    transform_img = F2.Compose([F.Decode(True)),
+    transform_img = F2.Compose([F.Decode(True),
                                 F.Resize((dst_w, dst_h)),
                                 F.RandomHorizontalFlip(prob=0.5),
                                 F.ToTensor(),
