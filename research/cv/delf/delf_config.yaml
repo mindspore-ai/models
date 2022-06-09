@@ -25,7 +25,7 @@ attention_loss_weight: 1.0
 
 traindata_path: "/mass_data/gldv2_dataset/mindrecord/train.mindrecord000"
 keep_checkpoint_max: 1
-imagenet_checkpoint: "/home/resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5"
+imagenet_checkpoint: "./resnet50_weights_tf_dim_ordering_tf_kernels_notop.h5"
 checkpoint_path: ""
 save_ckpt: "./ckpt/"
 save_ckpt_step: 2000
