@@ -308,7 +308,7 @@ Parameters for both training and evaluation can be set in config file.
 "save_checkpoint": True,          # whether save checkpoint or not
 "save_checkpoint_epochs": 5,      # the epoch interval between two checkpoints. By default, the last checkpoint will be saved after the last epoch
 "keep_checkpoint_max": 10,        # only keep the last keep_checkpoint_max checkpoint
-"warmup_epochs": 0,               # number of warmup epoch
+"warmup_epochs": 2,               # number of warmup epoch
 "lr_decay_mode": "Linear",        # decay mode for generating learning rate
 "use_label_smooth": True,         # label smooth
 "label_smooth_factor": 0.1,       # label smooth factor
@@ -334,7 +334,7 @@ Parameters for both training and evaluation can be set in config file.
 "save_checkpoint": True,          # whether save checkpoint or not
 "save_checkpoint_epochs": 5,      # the epoch interval between two checkpoints. By default, the last checkpoint will be saved after the last epoch
 "keep_checkpoint_max": 1,        # only keep the last keep_checkpoint_max checkpoint
-"warmup_epochs": 0,               # number of warmup epoch
+"warmup_epochs": 2,               # number of warmup epoch
 "optimizer": 'Momentum',          # optimizer
 "use_label_smooth": True,         # label smooth
 "label_smooth_factor": 0.1,       # label smooth factor
@@ -356,7 +356,7 @@ Parameters for both training and evaluation can be set in config file.
 "save_checkpoint": True,          # whether save checkpoint or not
 "save_checkpoint_epochs": 5,      # the epoch interval between two checkpoints. By default, the last checkpoint will be saved after the last epoch
 "keep_checkpoint_max": 10,        # only keep the last keep_checkpoint_max checkpoint
-"warmup_epochs": 0,               # number of warmup epoch
+"warmup_epochs": 2,               # number of warmup epoch
 "lr_decay_mode": "cosine"         # decay mode for generating learning rate
 "use_label_smooth": True,         # label_smooth
 "label_smooth_factor": 0.1,       # label_smooth_factor
@@ -380,7 +380,7 @@ Parameters for both training and evaluation can be set in config file.
 "save_checkpoint_path":"./",      # the save path of the checkpoint relative to the execution path
 "save_checkpoint_epochs": 5,      # the epoch interval between two checkpoints. By default, the last checkpoint will be saved after the last epoch
 "keep_checkpoint_max": 10,        # only keep the last keep_checkpoint_max checkpoint
-"warmup_epochs": 0,               # number of warmup epoch
+"warmup_epochs": 2,               # number of warmup epoch
 "lr_decay_mode": "steps"          # decay mode for generating learning rate
 "use_label_smooth": True,         # label_smooth
 "label_smooth_factor": 0.1,       # label_smooth_factor
