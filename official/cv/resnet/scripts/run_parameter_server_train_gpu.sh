@@ -57,6 +57,10 @@ export MS_SERVER_NUM=8
 export MS_SCHED_HOST=127.0.0.1
 export MS_SCHED_PORT=8081
 
+ulimit -n 4096
+export PARALLEL_EXCUTE=ms_ps
+export fusion=True
+
 export MS_ROLE=MS_SCHED
 rm -rf ./sched
 mkdir ./sched
@@ -67,14 +71,12 @@ cp -r ../src ./sched
 cd ./sched || exit
 if [ $# == 2 ]
 then
-    mpirun --allow-run-as-root -n 1 --output-filename log_output --merge-stderr-to-stdout \
     python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU" \
     --data_path=$PATH1 --parameter_server=True --config_path=$CONFIG_FILE --output_path './output' &> sched.log &
 fi
 
 if [ $# == 3 ]
 then
-    mpirun --allow-run-as-root -n 1 --output-filename log_output --merge-stderr-to-stdout \
     python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU" \
     --data_path=$PATH1 --parameter_server=True --pre_trained=$PATH2 --config_path=$CONFIG_FILE --output_path './output' &> sched.log &
 fi
@@ -92,14 +94,12 @@ do
     cd ./server_$i || exit
     if [ $# == 2 ]
     then
-        mpirun --allow-run-as-root -n 1 --output-filename log_output --merge-stderr-to-stdout \
         python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU" \
         --data_path=$PATH1 --parameter_server=True --config_path=$CONFIG_FILE --output_path './output' &> server_$i.log &
     fi
         
     if [ $# == 3 ]
     then
-        mpirun --allow-run-as-root -n 1 --output-filename log_output --merge-stderr-to-stdout \
         python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU" \
         --data_path=$PATH1 --parameter_server=True --pre_trained=$PATH2 \
         --config_path=$CONFIG_FILE --output_path './output' &> server_$i.log &
@@ -108,25 +108,26 @@ do
 done
 
 export MS_ROLE=MS_WORKER
-rm -rf ./worker
-mkdir ./worker
-cp ../config/*.yaml ./worker 
-cp ../*.py ./worker
-cp *.sh ./worker
-cp -r ../src ./worker
-cd ./worker || exit
-if [ $# == 2 ]
-then
-    mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
-    python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU" \
-    --data_path=$PATH1 --parameter_server=True --config_path=$CONFIG_FILE --output_path './output' &> worker.log &
-fi
+for((i=0;i<$MS_WORKER_NUM;i++));
+do
+    rm -rf ./worker_$i
+    mkdir ./worker_$i
+    cp ../config/*.yaml ./worker_$i 
+    cp ../*.py ./worker_$i
+    cp *.sh ./worker_$i
+    cp -r ../src ./worker_$i
+    cd ./worker_$i || exit
+    if [ $# == 2 ]
+    then
+        python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU" \
+        --data_path=$PATH1 --parameter_server=True --config_path=$CONFIG_FILE --output_path './output' &> worker_$i.log &
+    fi
 
-if [ $# == 3 ]
-then
-    mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
-    python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU"\
-    --data_path=$PATH1 --parameter_server=True --pre_trained=$PATH2 \
-    --config_path=$CONFIG_FILE --output_path './output' &> worker.log &
-fi
-cd ..
+    if [ $# == 3 ]
+    then
+        python train.py --run_distribute=True --device_num=$DEVICE_NUM --device_target="GPU"\
+        --data_path=$PATH1 --parameter_server=True --pre_trained=$PATH2 \
+        --config_path=$CONFIG_FILE --output_path './output' &> worker_$i.log &
+    fi
+    cd ..
+done

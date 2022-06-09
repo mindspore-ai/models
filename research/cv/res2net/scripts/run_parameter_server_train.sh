@@ -66,6 +66,10 @@ export MS_SERVER_NUM=1
 export MS_SCHED_HOST=127.0.0.1
 export MS_SCHED_PORT=8081
 
+ulimit -n 4096
+export PARALLEL_EXCUTE=ms_ps
+export fusion=True
+
 export MS_ROLE=MS_SCHED
 export DEVICE_ID=0
 export RANK_ID=0
