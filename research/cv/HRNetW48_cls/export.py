@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,14 +24,16 @@ from src.config import config_hrnetw48_cls as config
 
 parser = argparse.ArgumentParser(description="Export IR file for HRNetW48_cls.")
 parser.add_argument("--checkpoint_path", type=str, required=True, help="Checkpoint file path")
-parser.add_argument("--file_name", type=str, default="hrnetw48cls", help="output file name.")
-parser.add_argument("--width", type=int, default=224, help="input width")
-parser.add_argument("--height", type=int, default=224, help="input height")
+parser.add_argument("--file_name", type=str, default="hrnetw48cls", help="Output file name.")
+parser.add_argument("--width", type=int, default=224, help="Input width")
+parser.add_argument("--height", type=int, default=224, help="Input height")
 parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
+parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU"], default="Ascend",
+                    help="Target device platform.")
 args_opt = parser.parse_args()
 
 if __name__ == "__main__":
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target)
 
     net = get_cls_model(config)
 
