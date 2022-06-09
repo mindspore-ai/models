@@ -85,7 +85,7 @@ def train_navier(epoch, lr, batch_size, n_train, path, noise, num_neuron, ck_pat
         np.random.seed(seed)
         set_seed(seed)
 
-    context.set_context(mode=context.GRAPH_MODE, device_target='GPU')
+    context.set_context(mode=context.GRAPH_MODE, device_target='GPU', runtime_num_threads=60)
 
     layers = [3, num_neuron, num_neuron, num_neuron, num_neuron, num_neuron, num_neuron, num_neuron,
               num_neuron, 2]
