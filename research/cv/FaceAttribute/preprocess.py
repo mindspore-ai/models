@@ -28,7 +28,7 @@ def eval_data_generator(args):
     dst_h = args.dst_h
     batch_size = 1
     #attri_num = args.attri_num
-    transform_img = F2.Compose([F.Decode(True)),
+    transform_img = F2.Compose([F.Decode(True),
                                 F.Resize((dst_w, dst_h)),
                                 F.ToTensor(),
                                 F.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5), is_hwc=False)])
