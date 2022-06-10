@@ -781,7 +781,7 @@ SimQAT是一种量化感知训练算法，通过引入伪量化节点来训练�
 ```text
 # 分布式训练
 cd ./golden_stick/scripts/
-# PYTHON_PATH 表示'train.py'脚本所在的目录
+# PYTHON_PATH 表示'train.py'脚本所在的目录。
 bash run_distribute_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [FP32_CKPT_PATH]
 
 # 分布式训练示例
@@ -790,7 +790,7 @@ bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/
 
 # 单机训练
 cd ./golden_stick/scripts/
-# PYTHON_PATH 表示'train.py'脚本所在的目录
+# PYTHON_PATH 表示'train.py'脚本所在的目录。
 bash run_standalone_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [FP32_CKPT_PATH]
 
 # 单机训练示例
@@ -800,7 +800,7 @@ bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/
 
 ### 续训过程
 
-SimQAT算法当前暂不支持续训、
+SimQAT算法当前暂不支持续训。
 
 ### 评估过程
 
@@ -809,7 +809,7 @@ SimQAT算法当前暂不支持续训、
 ```text
 # 评估
 cd ./golden_stick/scripts/
-# PYTHON_PATH 表示'eval.py'脚本所在的目录
+# PYTHON_PATH 表示'eval.py'脚本所在的目录。
 bash run_eval_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
@@ -823,7 +823,7 @@ bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cif
 
 评估结果保存在示例路径中，文件夹名为“eval”。您可在此路径下的日志找到如下结果：
 
-- 使用SimQAT算法量化ResNet50，并使用CIFAR-10数据集评估
+- 使用SimQAT算法量化ResNet50，并使用CIFAR-10数据集评估：
 
 ```bash
 result:{'top_1_accuracy': 0.9354967948717948, 'top_5_accuracy': 0.9981971153846154} ckpt=~/resnet50_cifar10/train_parallel0/resnet-180_195.ckpt
@@ -833,7 +833,7 @@ result:{'top_1_accuracy': 0.9354967948717948, 'top_5_accuracy': 0.99819711538461
 
 #### 导出MindIR
 
-当前暂不支持导出MindIR
+当前暂不支持导出MindIR。
 
 # 模型描述
 

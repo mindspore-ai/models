@@ -17,10 +17,15 @@
 CURPATH="$(dirname "$0")"
 # shellcheck source=/dev/null
 
-if [ $# != 4 ]
-then 
-    echo "Usage: bash run_distribute_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [FP32_CKPT_PATH]"
-    echo "PYTHON_PATH represents path to directory of 'train.py'."
+if [ $# != 3 ] && [ $# != 5 ]; then
+    echo "Usage: bash run_distribute_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CKPT_TYPE](optional) [CKPT_PATH](optional)"
+    echo "Examples:"
+    echo "  Train from the beginning:"
+    echo "    bash run_distribute_train_gpu.sh /path/to/train.py resnet50_config.yaml /path/to/dataset"
+    echo "  Train from full precision checkpoint:"
+    echo "    bash run_distribute_train_gpu.sh /path/to/train.py resnet50_config.yaml /path/to/dataset FP32 /path/to/fp32_ckpt"
+    echo "  Train from pretrained checkpoint:"
+    echo "    bash run_distribute_train_gpu.sh /path/to/train.py resnet50_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt"
     exit 1
 fi
 
@@ -35,7 +40,6 @@ get_real_path(){
 PYTHON_PATH=$(get_real_path $1)
 CONFIG_FILE=$(get_real_path $2)
 DATASET_PATH=$(get_real_path $3)
-FP32_CKPT_FILE=$(get_real_path $4)
 
 if [ ! -d $PYTHON_PATH ]
 then
@@ -55,10 +59,18 @@ then
     exit 1
 fi 
 
-if [ ! -f $FP32_CKPT_FILE ]
-then
-    echo "error: FP32_CKPT_FILE=$FP32_CKPT_FILE is not a file"
-    exit 1
+if [ $# == 5 ]; then
+  CKPT_TYPE=$4
+  CKPT_FILE=$(get_real_path $5)
+
+  if [ "x$CKPT_TYPE" != "xFP32" ] && [ "x$CKPT_TYPE" != "xPRETRAINED" ]; then
+      echo "error: CKPT_TYPE=$CKPT_TYPE is not valid, should be FP32 or PRETRAINED"
+      exit 1
+  fi
+  if [ ! -f $CKPT_FILE ]; then
+      echo "error: CKPT_FILE=$CKPT_FILE is not a file"
+      exit 1
+  fi
 fi
 
 ulimit -u unlimited
@@ -74,6 +86,16 @@ cp ${PYTHON_PATH}/*.py ./train_parallel
 cp -r ${CURPATH}/../../src ./train_parallel
 cd ./train_parallel || exit
 
-mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
-       python train.py --config_path=$CONFIG_FILE --run_distribute=True --device_target="GPU" \
-       --data_path=$DATASET_PATH --fp32_ckpt=$FP32_CKPT_FILE --output_path './output' &> log &
+if [ "x$CKPT_TYPE" == "xFP32" ]; then
+  mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
+         python train.py --config_path=$CONFIG_FILE --run_distribute=True --device_target="GPU" \
+         --data_path=$DATASET_PATH --fp32_ckpt=$CKPT_FILE --output_path './output' &> log &
+elif [ "x$CKPT_TYPE" == "xPRETRAINED" ]; then
+  mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
+         python train.py --config_path=$CONFIG_FILE --run_distribute=True --device_target="GPU" \
+         --data_path=$DATASET_PATH --pre_trained=$CKPT_FILE --output_path './output' &> log &
+else
+  mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
+         python train.py --config_path=$CONFIG_FILE --run_distribute=True --device_target="GPU" \
+         --data_path=$DATASET_PATH --output_path './output' &> log &
+fi
