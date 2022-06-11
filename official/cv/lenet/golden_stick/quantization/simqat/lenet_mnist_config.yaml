@@ -1,0 +1,57 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+data_path: "/cache/data"
+output_path: "/cache/train"
+device_target: GPU
+enable_profiling: False
+checkpoint_file_path: ""
+
+# ==============================================================================
+# Training options
+num_classes: 10
+lr: 0.01
+momentum: 0.9
+epoch_size: 10
+batch_size: 32
+buffer_size: 1000
+image_height: 32
+image_width: 32
+save_checkpoint_steps: 1875
+keep_checkpoint_max: 10
+device_id: 0
+file_name: "lenet-sim-qat"
+file_format: "MINDIR"
+fp32_ckpt: ""
+  
+model_name: lenet
+learning_rate: 0.002
+dataset_name: 'mnist'
+sink_size: -1
+dataset_sink_mode: True
+save_checkpoint: True
+save_checkpoint_epochs: 2
+mode_name: "GRAPH"
+
+# lenet acc calculation
+result_path: ''
+img_path: ''
+
+---
+# Config description for each option
+data_url: 'Dataset url for obs'
+train_url: 'Training output url for obs'
+data_path: 'Dataset path for local'
+output_path: 'Training output path for local'
+
+device_target: 'Target device type' 
+enable_profiling: 'Whether enable profiling while training, default: False'
+file_name: 'output file name.'
+file_format: 'file format'
+result_path: "result files path."
+img_path: "image file path."
+---
+device_target: ['GPU']
+file_format: ['AIR', 'MINDIR']
