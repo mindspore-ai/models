@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,21 +15,22 @@
 """export checkpoint file into air, onnx, mindir models"""
 
 import numpy as np
-
-import mindspore.common.dtype as mstype
 from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
+from mindspore.common import dtype as mstype
+
 from src.FasterRcnn.faster_rcnn_resnet import FasterRcnn_Infer
 from src.model_utils.config import config
-from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id
-
+from src.model_utils.moxing_adapter import moxing_wrapper
 
 context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
 if config.device_target == "Ascend":
     context.set_context(device_id=get_device_id())
 
+
 def modelarts_pre_process():
-    pass
+    """Prepare everything for modelarts"""
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def export_fasterrcnn():
@@ -52,6 +53,7 @@ def export_fasterrcnn():
     img_metas = Tensor(np.random.uniform(0.0, 1.0, size=[config.test_batch_size, 4]), mstype.float32)
 
     export(net, img, img_metas, file_name=config.file_name, file_format=config.file_format)
+
 
 if __name__ == '__main__':
     export_fasterrcnn()

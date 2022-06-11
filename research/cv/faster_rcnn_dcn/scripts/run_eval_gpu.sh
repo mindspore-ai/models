@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -le 2 ]
+if [ $# != 4 ] && [ $# != 5 ]
 then 
-    echo "Usage: sh run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [COCO_ROOT] [MINDRECORD_DIR](option)"
+    echo "Usage: bash run_eval_gpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [COCO_ROOT] [DEVICE_ID] [MINDRECORD_DIR](option)"
 exit 1
 fi
 
@@ -35,10 +35,10 @@ echo $PATH1
 echo $PATH2
 
 if [ ! -f $PATH1 ]
-then 
+then
     echo "error: ANNO_PATH=$PATH1 is not a file"
 exit 1
-fi 
+fi
 
 if [ ! -f $PATH2 ]
 then 
@@ -53,9 +53,9 @@ exit 1
 fi
 
 mindrecord_dir=$PATH3/FASTERRCNN_MINDRECORD/
-if [ $# -eq 4 ]
+if [ $# == 5 ]
 then
-    mindrecord_dir=$(get_real_path $4)
+    mindrecord_dir=$(get_real_path $5)
     if [ ! -d $mindrecord_dir ]
     then
         echo "error: mindrecord_dir=$mindrecord_dir is not a dir"
@@ -65,12 +65,11 @@ fi
 echo $mindrecord_dir
 
 BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
-CONFIG_FILE="${BASE_PATH}/../default_config.yaml"
+CONFIG_FILE="${BASE_PATH}/../default_config_gpu.yaml"
 
-ulimit -u unlimited
 export DEVICE_NUM=1
 export RANK_SIZE=$DEVICE_NUM
-export DEVICE_ID=0
+export DEVICE_ID=$4
 export RANK_ID=0
 
 if [ -d "eval" ];

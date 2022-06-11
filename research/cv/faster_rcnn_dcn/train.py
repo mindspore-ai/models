@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,37 +16,45 @@
 
 import os
 import time
-import numpy as np
 
-import mindspore.common.dtype as mstype
+import numpy as np
 from mindspore import context, Tensor, Parameter
-from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
-from mindspore.train import Model
-from mindspore.context import ParallelMode
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.nn import SGD
+from mindspore.common import dtype as mstype
 from mindspore.common import set_seed
+from mindspore.communication.management import init, get_rank, get_group_size
+from mindspore.context import ParallelMode
+from mindspore.nn import SGD
+from mindspore.train import Model
+from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
+from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 from src.FasterRcnn.faster_rcnn_resnet import Faster_Rcnn_Resnet
-from src.network_define import LossCallBack, WithLossCell, TrainOneStepCell, LossNet
 from src.dataset import data_to_mindrecord_byte_image, create_fasterrcnn_dataset
 from src.lr_schedule import dynamic_lr
 from src.model_utils.config import config
+from src.model_utils.device_adapter import get_device_id, get_device_num, get_rank_id
 from src.model_utils.moxing_adapter import moxing_wrapper
-from src.model_utils.device_adapter import get_device_id
+from src.network_define import LossCallBack, WithLossCell, TrainOneStepCell, LossNet
 
 set_seed(1)
 context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
 
 if config.device_target == "GPU":
-    context.set_context(enable_graph_kernel=True)
+    context.set_context(enable_graph_kernel=False)
 if config.run_distribute:
-    init()
-    rank = get_rank()
-    device_num = get_group_size()
-    context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                      gradients_mean=True)
+    if config.device_target == "Ascend":
+        rank = get_rank_id()
+        device_num = get_device_num()
+        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                          gradients_mean=True)
+        init()
+    else:
+        init("nccl")
+        context.reset_auto_parallel_context()
+        rank = get_rank()
+        device_num = get_group_size()
+        context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
+                                          gradients_mean=True)
 else:
     rank = 0
     device_num = 1
@@ -58,6 +66,7 @@ if config.save_on_master:
         config.save_checkpoint = 1
 else:
     config.save_checkpoint = 1
+
 
 def train_fasterRcnn_():
     """ train_fasterrcnn_ """
@@ -109,7 +118,9 @@ def train_fasterRcnn_():
 
     return dataset_size, dataset
 
+
 def modelarts_pre_process():
+    """Prepare everything for modelarts"""
     config.save_checkpoint_path = config.output_path
     config.pre_trained = os.path.join(config.load_path, config.pre_trained)
 
@@ -182,6 +193,7 @@ def train_fasterRcnn():
     model = Model(net)
     print("Start training")
     model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
+
 
 if __name__ == '__main__':
     train_fasterRcnn()

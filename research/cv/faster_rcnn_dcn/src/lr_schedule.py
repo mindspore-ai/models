@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,18 +16,54 @@
 
 import math
 
+
 def linear_warmup_learning_rate(current_step, warmup_steps, base_lr, init_lr):
+    """
+    Scheduler for linear warmup of learning rate
+
+    Args:
+        current_step: Number of the current step
+        warmup_steps: Number of steps to warmup
+        base_lr: Base value of learning rate
+        init_lr: Initial value of learning rate
+
+    Returns:
+        Current value of learning rate
+    """
     lr_inc = (float(base_lr) - float(init_lr)) / float(warmup_steps)
     learning_rate = float(init_lr) + lr_inc * current_step
     return learning_rate
 
+
 def a_cosine_learning_rate(current_step, base_lr, warmup_steps, decay_steps):
+    """
+    Generate values for cosine annealing
+
+    Args:
+        current_step: Number of the current step
+        base_lr: Base value of learning rate
+        warmup_steps: Number of steps to warmup
+        decay_steps: General number of steps
+
+    Returns:
+        Current value of learning rate
+    """
     base = float(current_step - warmup_steps) / float(decay_steps)
     learning_rate = (1 + math.cos(base * math.pi)) / 2 * base_lr
     return learning_rate
 
+
 def dynamic_lr(config, steps_per_epoch):
-    """dynamic learning rate generator"""
+    """
+    Dynamic learning rate generator
+
+    Args:
+        config: Config object with training parameters
+        steps_per_epoch: Number of steps per epoch
+
+    Returns:
+        List of learning rate values
+    """
     base_lr = config.base_lr
     total_steps = steps_per_epoch * (config.epoch_size + 1)
     warmup_steps = int(config.warmup_step)

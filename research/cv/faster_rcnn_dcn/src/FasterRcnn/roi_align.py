@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
 """FasterRcnn-DCN ROIAlign module."""
 
 import numpy as np
-import mindspore.nn as nn
-import mindspore.common.dtype as mstype
-from mindspore.ops import operations as P
-from mindspore.ops import composite as C
-from mindspore.nn import layer as L
+from mindspore import nn
+from mindspore.common import dtype as mstype
 from mindspore.common.tensor import Tensor
+from mindspore.nn import layer as L
+from mindspore.ops import composite as C
+from mindspore.ops import operations as P
+
 
 class ROIAlign(nn.Cell):
     """
@@ -44,6 +45,7 @@ class ROIAlign(nn.Cell):
         self.sample_num = int(sample_num)
         self.align_op = P.ROIAlign(self.out_size[0], self.out_size[1],
                                    self.spatial_scale, self.sample_num)
+
     def construct(self, features, rois):
         return self.align_op(features, rois)
 
@@ -120,16 +122,28 @@ class SingleRoIExtractor(nn.Cell):
         self.twos = Tensor(np.array(np.ones((self.batch_size, 1)), dtype=self.dtype) * 2)
         self.res_ = Tensor(np.array(np.zeros((self.batch_size, self.out_channels,
                                               self.out_size, self.out_size)), dtype=self.dtype))
+
     def num_inputs(self):
+        """Number of inputs"""
         return len(self.featmap_strides)
 
     def init_weights(self):
-        pass
+        """Initialize weights"""
 
     def log2(self, value):
+        """Calc logarithm"""
         return self.log(value) / self.log(self.twos)
 
     def build_roi_layers(self, featmap_strides):
+        """
+        Build ROI layers
+
+        Args:
+            featmap_strides: Strides of featuremaps
+
+        Returns:
+            ROI layers
+        """
         roi_layers = []
         for s in featmap_strides:
             layer_cls = ROIAlign(self.out_size, self.out_size,

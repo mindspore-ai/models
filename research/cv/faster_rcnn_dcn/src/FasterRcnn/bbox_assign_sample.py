@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 """FasterRcnn-DCN positive and negative sample screening for RPN."""
 
 import numpy as np
-import mindspore.nn as nn
-from mindspore.ops import operations as P
+from mindspore import nn
+from mindspore.common import dtype as mstype
 from mindspore.common.tensor import Tensor
-import mindspore.common.dtype as mstype
+from mindspore.ops import operations as P
 
 
 class BboxAssignSample(nn.Cell):

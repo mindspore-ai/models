@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,14 +15,15 @@
 """FasterRcnn-DCN training network wrapper."""
 
 import time
+
 import numpy as np
-import mindspore.nn as nn
-from mindspore.common.tensor import Tensor
-from mindspore.ops import functional as F
-from mindspore.ops import composite as C
 from mindspore import ParameterTuple
-from mindspore.train.callback import Callback
+from mindspore import nn
+from mindspore.common.tensor import Tensor
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
+from mindspore.ops import composite as C
+from mindspore.ops import functional as F
+from mindspore.train.callback import Callback
 
 time_stamp_init = False
 time_stamp_first = 0
@@ -56,7 +57,14 @@ class LossCallBack(Callback):
             time_stamp_init = True
 
     def step_end(self, run_context):
-        """step_end"""
+        """
+        Event on the end of step
+        Args:
+            run_context: Data related to the finished step
+
+        Returns:
+
+        """
         cb_params = run_context.original_args()
         loss = cb_params.net_outputs.asnumpy()
         cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
@@ -83,6 +91,7 @@ class LossCallBack(Callback):
 class LossNet(nn.Cell):
     """FasterRcnn loss method"""
     def construct(self, x1, x2, x3, x4, x5, x6):
+        """Forward pass throw network"""
         return x1 + x2
 
 
@@ -100,6 +109,7 @@ class WithLossCell(nn.Cell):
         self._loss_fn = loss_fn
 
     def construct(self, x, img_shape, gt_bboxe, gt_label, gt_num):
+        """Forward pass throw network"""
         loss1, loss2, loss3, loss4, loss5, loss6 = self._backbone(x, img_shape, gt_bboxe, gt_label, gt_num)
         return self._loss_fn(loss1, loss2, loss3, loss4, loss5, loss6)
 
@@ -143,6 +153,7 @@ class TrainOneStepCell(nn.Cell):
             self.grad_reducer = DistributedGradReducer(optimizer.parameters, mean, degree)
 
     def construct(self, x, img_shape, gt_bboxe, gt_label, gt_num):
+        """Forward pass throw network"""
         weights = self.weights
         loss = self.network(x, img_shape, gt_bboxe, gt_label, gt_num)
         grads = self.grad(self.network, weights)(x, img_shape, gt_bboxe, gt_label, gt_num, self.sens)

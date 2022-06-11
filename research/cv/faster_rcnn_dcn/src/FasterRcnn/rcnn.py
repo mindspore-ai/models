@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,13 +15,13 @@
 """FasterRcnn-DCN Rcnn network."""
 
 import numpy as np
-import mindspore.common.dtype as mstype
-import mindspore.nn as nn
-from mindspore.ops import operations as P
-from mindspore.common.tensor import Tensor
+from mindspore import context
+from mindspore import nn
+from mindspore.common import dtype as mstype
 from mindspore.common.initializer import initializer
 from mindspore.common.parameter import Parameter
-from mindspore import context
+from mindspore.common.tensor import Tensor
+from mindspore.ops import operations as P
 
 
 class DenseNoTranpose(nn.Cell):
@@ -37,6 +37,7 @@ class DenseNoTranpose(nn.Cell):
         self.device_type = "Ascend" if context.get_context("device_target") == "Ascend" else "Others"
 
     def construct(self, x):
+        """Forward pass throw model"""
         if self.device_type == "Ascend":
             x = self.cast(x, mstype.float16)
             weight = self.cast(self.weight, mstype.float16)

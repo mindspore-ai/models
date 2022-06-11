@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,25 +17,37 @@
 import os
 import time
 from collections import defaultdict
-import numpy as np
-from pycocotools.coco import COCO
-import mindspore.common.dtype as mstype
-from mindspore import context
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.common import set_seed, Parameter
 
-from src.dataset import data_to_mindrecord_byte_image, create_fasterrcnn_dataset, parse_json_annos_from_txt
-from src.util import coco_eval, bbox2result_1image, results2json
-from src.model_utils.config import config
-from src.model_utils.moxing_adapter import moxing_wrapper
-from src.model_utils.device_adapter import get_device_id
+import numpy as np
+from mindspore import context
+from mindspore.common import dtype as mstype
+from mindspore.common import set_seed, Parameter
+from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from pycocotools.coco import COCO
+
 from src.FasterRcnn.faster_rcnn_resnet import Faster_Rcnn_Resnet
+from src.dataset import data_to_mindrecord_byte_image, create_fasterrcnn_dataset, parse_json_annos_from_txt
+from src.model_utils.config import config
+from src.model_utils.device_adapter import get_device_id
+from src.model_utils.moxing_adapter import moxing_wrapper
+from src.util import coco_eval, bbox2result_1image, results2json
 
 set_seed(1)
 context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
 
+
 def fasterrcnn_eval(dataset_path, ckpt_path, anno_path):
-    """FasterRcnn evaluation."""
+    """
+    Evaluate FasterRCNN on the provided dataset
+
+    Args:
+        dataset_path: Path to dataset
+        ckpt_path: Path to checkpoint
+        anno_path: Path to annotation
+
+    Returns:
+
+    """
     if not os.path.isfile(ckpt_path):
         raise RuntimeError("CheckPoint file {} is not valid.".format(ckpt_path))
     ds = create_fasterrcnn_dataset(config, dataset_path, batch_size=config.test_batch_size, is_training=False)
@@ -117,11 +129,14 @@ def fasterrcnn_eval(dataset_path, ckpt_path, anno_path):
     acc_file.close()
     print("eval end")
 
+
 def modelarts_pre_process():
+    """Prepare everything for modelarts"""
     config.coco_root = config.data_path
     config.mindrecord_dir = os.path.join(config.coco_root, "MindRecord_COCO")
     config.checkpoint_path = os.path.join(config.load_path, config.checkpoint_path)
     config.acclog_path = os.path.join(config.output_path, "mAP.log")
+
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def eval_fasterrcnn():
@@ -152,6 +167,7 @@ def eval_fasterrcnn():
     print("CHECKING MINDRECORD FILES DONE!")
     print("Start Eval!")
     fasterrcnn_eval(mindrecord_file, config.checkpoint_path, config.anno_path)
+
 
 if __name__ == '__main__':
     config.acclog_path = "./mAP.log"
