@@ -21,8 +21,8 @@
             "props": {
                 "handleMethod": "opencv",
                 "resizeType": "Resizer_Stretch",
-                "resizeHeight": "256",
-                "resizeWidth": "256"
+                "resizeHeight": "265",
+                "resizeWidth": "265"
             },
             "factory": "mxpi_imageresize",
             "next": "mxpi_opencvcentercrop0"
