@@ -9,7 +9,6 @@ run_distribute: False
 enable_profiling: False
 data_path: "/cache/data"
 output_path: "/cache/train"
-load_path: "/cache/checkpoint_path/"
 device_target: "Ascend"
 checkpoint_path: "./checkpoint/"
 checkpoint_file_path: ""
@@ -17,7 +16,6 @@ checkpoint_file_path: ""
 # ==============================================================================
 # Training options
 optimizer: "Momentum"
-infer_label: ""
 class_num: 10
 batch_size: 32
 loss_scale: 1024
@@ -40,15 +38,8 @@ dataset: "cifar10"
 device_num: 1
 pre_trained: ""
 fp32_ckpt: ""
-run_eval: False
-eval_dataset_path: ""
-parameter_server: False
 filter_weight: False
 save_best_ckpt: True
-eval_start_epoch: 40
-eval_interval: 1
-enable_cache: False
-cache_session_id: ""
 mode_name: "GRAPH"
 boost_mode: "O0"
 conv_init: "XavierUniform"
@@ -76,20 +67,13 @@ save_graphs_path: "./graphs"
 has_trained_epoch: 0
 has_trained_step: 0
 
-# postprocess resnet inference
-result_path: ''
-label_path: ''
-
 ---
 # Help description for each configuration
-enable_modelarts: "Whether training on modelarts, default: False"
 data_url: "Dataset url for obs"
 checkpoint_url: "The location of checkpoint for obs"
 data_path: "Dataset path for local"
 output_path: "Training output path for local"
-load_path: "The location of checkpoint for obs"
 device_target: "Target device type, available: [Ascend, GPU, CPU]"
-enable_profiling: "Whether enable profiling while training, default: False"
 num_classes: "Class for dataset"
 batch_size: "Batch size for training and evaluation"
 epoch_size: "Total training epochs."

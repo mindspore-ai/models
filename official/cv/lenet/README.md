@@ -17,6 +17,14 @@
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
         - [result](#result)
+    - [Apply algorithm in MindSpore Golden Stick](#apply-algorithm-in-mindspore-golden-stick)
+        - [Training Process](#Training Process-1)
+            - [Running on GPU](#running-on-gpu-1)
+        - [Evaluation Process](#evaluation-process-1)
+            - [Running on GPU](#running-on-gpu-2)
+            - [Result](#resutl-3)
+        - [Inference Process](#inference-process-1)
+            - [Export MindIR](#export-mindir-1)
     - [Model Description](#model-description)
         - [Performance](#performance)
             - [Evaluation Performance](#evaluation-performance)
@@ -279,6 +287,64 @@ Inference result is saved in current path, you can find result like this in acc.
 ```bash
 'Accuracy': 0.9843
 ```
+
+# Apply algorithm in MindSpore Golden Stick
+
+MindSpore Golden Stick is a compression algorithm set for MindSpore. We usually apply algorithm in Golden Stick before training for smaller model size, lower power consuming or faster inference process.
+MindSpore Golden Stick provides SimQAT algorithm for Lenet5. SimQAT is a quantization-aware training algorithm that trains the quantization parameters of certain layers in the network by introducing fake-quantization nodes, so that the model can perform inference with less power consumption or higher performance during the deployment phase.
+
+## Training Process
+
+### Running on GPU
+
+```text
+cd ./golden_stick/scripts/
+# PYTHON_PATH represents path to directory of 'train.py'.
+bash run_standalone_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CKPT_TYPE](optional) [CKPT_PATH](optional)
+
+# standalone training example, apply SimQAT and train from beginning
+cd ./golden_stick/scripts/
+bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/lenet_mnist_config.yaml /path/to/dataset
+
+# standalone training example, apply SimQAT and train from full precision checkpoint
+cd ./golden_stick/scripts/
+bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/lenet_mnist_config.yaml /path/to/dataset FP32 /path/to/fp32_ckpt
+
+# standalone training example, apply SimQAT and train from pretrained checkpoint
+cd ./golden_stick/scripts/
+bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/lenet_mnist_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt
+```
+
+## Evaluation Process
+
+### Running on GPU
+
+```text
+# evaluation
+cd ./golden_stick/scripts/
+# PYTHON_PATH represents path to directory of 'eval.py'.
+bash run_eval_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CHECKPOINT_PATH]
+
+# evaluation example
+cd ./golden_stick/scripts/
+bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/lenet_mnist_config.yaml /path/to/dataset ./checkpoint/lenet-10.ckpt
+```
+
+### Result
+
+Evaluation result will be stored in the example path, whose folder name is "eval". Under this, you can find result like the following in log.
+
+- Apply SimQAT on Lenet5, and evaluating with MNIST dataset
+
+```bash
+================ {'Accuracy': 0.9907852564102564} ================
+```
+
+## Inference Process
+
+### Export MindIR
+
+Not support exporting MindIR now.
 
 ## [Model Description](#contents)
 
