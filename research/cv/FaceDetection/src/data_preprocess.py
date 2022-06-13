@@ -31,7 +31,7 @@ class SingleScaleTrans:
     def __call__(self, imgs, ann, image_names, image_size, batch_info):
 
         size = self.resize
-        decode = P.Decode(True)
+        decode = V.Decode(True)
         resize_letter_box_op = ResizeLetterbox(input_dim=size)
 
         to_tensor = V.ToTensor()
@@ -204,11 +204,11 @@ def preprocess_fn(image, annotation):
     anchors = config.anchors
     anchors_mask = config.anchors_mask
 
-    decode = P.Decode(True)
+    decode = V.Decode(True)
     random_crop_letter_box_op = RandomCropLetterbox(jitter=jitter, input_dim=size)
     random_flip_op = RandomFlip(flip)
     hsv_shift_op = HSVShift(hue, sat, val)
-    to_tensor = P.ToTensor()
+    to_tensor = V.ToTensor()
 
     img_pil = decode(image)
     input_data = img_pil, annotation
