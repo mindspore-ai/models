@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -69,6 +69,7 @@ echo $PRETRAINED_BACKBONE
 
 export RANK_TABLE_FILE=$RANK_TABLE
 export RANK_SIZE=8
+export GLOG_v=3
 
 cpus=`cat /proc/cpuinfo| grep "processor"| wc -l`
 avg=`expr $cpus \/ $RANK_SIZE`
