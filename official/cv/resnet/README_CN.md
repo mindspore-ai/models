@@ -771,7 +771,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 
 金箍棒是MindSpore的模型压缩算法集，我们可以在模型训练前应用金箍棒中的模型压缩算法，从而达到压缩模型大小、降低模型推理功耗，或者加速推理过程的目的。
 
-针对ResNet50，金箍棒提供了SimQAT算法，SimQAT是一种量化感知训练算法，通过引入伪量化节点来训练网络中的某些层的量化参数，从而在部署阶段，模型得以以更小的功耗或者更高的性能进行推理。
+针对ResNet50，金箍棒提供了SimQAT和SCOP算法，SimQAT是一种量化感知训练算法，通过引入伪量化节点来训练网络中的某些层的量化参数，从而在部署阶段，模型得以以更小的功耗或者更高的性能进行推理。SCOP算法提出一种可靠剪枝方法，通过构建一种科学控制机制减少所有潜在不相关因子的影响，有效的按比例进行节点删除，从而实现模型小型化。
 
 ## 训练过程
 
@@ -794,6 +794,10 @@ bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/
 # 分布式训练示例（应用SimQAT算法并加载之前训练的checkoutpoint，继续进行量化训练）
 cd ./golden_stick/scripts/
 bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt
+
+# 分布式训练示例（应用SCOP算法进行剪枝训练）
+cd ./golden_stick/scripts/
+bash run_distribute_train_gpu.sh ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml ./cifar10/train/ PRETRAINED /path/to/pretrained_ckpt
 
 # 单机训练
 cd ./golden_stick/scripts/
@@ -838,6 +842,12 @@ bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cif
 
 ```bash
 result:{'top_1_accuracy': 0.9354967948717948, 'top_5_accuracy': 0.9981971153846154} ckpt=~/resnet50_cifar10/train_parallel0/resnet-180_195.ckpt
+```
+
+- 使用SCOP算法剪枝ResNet，并使用CIFAR-10数据集评估：
+
+```text
+result:{'top_1_accuracy': 0.9273838141025641} prune_rate=0.45 ckpt=~/resnet50_cifar10/train_parallel0/resnet-400_390.ckpt
 ```
 
 ## 推理过程

@@ -9,6 +9,7 @@
 "models/official/"                                                                       "missing-docstring"
 "models/official/cv"                                                                     "c-extension-no-member"
 "models/official/nlp/bert_thor/src/bert_model.py"                                        "redefined-outer-name"
+"models/official/cv/resnet/golden_stick/pruner/scop/train.py"                            "protected-access"
 
 # research
 "models/research/"                                                                       "missing-docstring"
