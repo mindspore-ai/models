@@ -24,6 +24,6 @@ export DEVICE_ID=$2
 
 echo "start training for device $DEVICE_ID"
 env > env.log
-python train.py --device_num=$DEVICE_NUM --device_id=$DEVICE_ID > log_train_standalone.txt 2>&1 &
+python train.py --device_num=$DEVICE_NUM --device_id=$DEVICE_ID --device_target="Ascend" > log_train_standalone.txt 2>&1 &
 
 cd ..

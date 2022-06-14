@@ -94,8 +94,6 @@ if __name__ == '__main__':
         dataset_path = args_opt.data_url
         rank = 0
         if args_opt.run_distribute:
-            if os.getenv("DEVICE_ID", "not_set").isdigit():
-                context.set_context(device_id=int(os.getenv("DEVICE_ID")))
             device_num = args_opt.device_num
             context.reset_auto_parallel_context()
             context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
