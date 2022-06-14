@@ -12,8 +12,13 @@
 "models/research/cv/FaceRecognitionForTracking/infer/util/plugins/MxpiTransposePlugin.h"  "runtime/references"
 "models/research/cv/FaceRecognitionForTracking/infer/util/plugins/MxpiTransposePlugin.h"  "build/namespaces"
 
+
+"models/research/cv/nas-fpn/infer/mxbase/src/Nasfpn.h"  "runtime/references"
+"models/research/cv/nas-fpn/infer/mxbase/src/Nasfpn.cpp"  "runtime/references"
 "models/research/cv/FaceQualityAssessment/infer/mxbase/src/FQA.h"  "runtime/references"
 "models/research/cv/FaceQualityAssessment/infer/mxbase/src/FQA.cpp"  "runtime/references"
+"models/research/cv/TCN/infer/mxbase/src/TCN.h"  "runtime/references"
+"models/research/cv/TCN/infer/mxbase/src/TCN.cpp"  "runtime/references"
 "models/research/cv/FaceQualityAssessment/infer/util/plugins/MxpiTransposePlugin.h"  "runtime/references"
 "models/research/cv/FaceQualityAssessment/infer/util/plugins/MxpiTransposePlugin.h"  "build/namespaces"
 "models/research/cv/FaceQualityAssessment/infer/util/plugins/MxpiTransposePlugin.cpp"  "runtime/references"
@@ -24,13 +29,19 @@
 
 "models/research/cv/vehiclenet/infer/mxbase/src/Vehiclenet.h"  "runtime/references"
 
+"models/research/cv/vnet/infer/mxbase/src/Vnet.h"  "runtime/references"
+"models/research/cv/vnet/infer/mxbase/src/Vnet.cpp"  "runtime/references"
 "models/official/cv/maskrcnn_mobilenetv1/infer/mxbase/src/PostProcess/MaskRcnnMindsporePost.h" "runtime/references"
 "models/official/cv/maskrcnn_mobilenetv1/infer/mxbase/src/MaskRCNN.h" "runtime/references"
 "models/official/cv/maskrcnn_mobilenetv1/infer/mxbase/src/PostProcess/MaskRcnnMindsporePost.cpp" "runtime/references"
 "models/official/cv/maskrcnn_mobilenetv1/infer/mxbase/src/MaskRCNN.cpp" "runtime/references"
 
+"models/official/cv/octsqueeze/infer/mxbase/src/Octsqueeze.cpp" "runtime/references"
+"models/official/cv/octsqueeze/infer/mxbase/src/Octsqueeze.h" "runtime/references"
 "models/official/cv/Deepsort/infer/mxbase/src/main.cpp" "runtime/references"
 "models/official/cv/Deepsort/infer/mxbase/src/Deepsort.h" "runtime/references"
+"models/official/cv/dncnn/infer/mxbase/src/DnCNN.h"  "runtime/references"
+"models/official/cv/dncnn/infer/mxbase/src/DnCNN.cpp"  "runtime/references"
 "models/official/cv/densenet/infer/mxbase/Densenet121.h" "runtime/references"
 "models/official/cv/densenet/infer/mxbase/main.cpp" "runtime/references"
 "models/official/cv/Deepsort/infer/mxbase/src/Deepsort.cpp" "runtime/references"
@@ -58,6 +69,11 @@
 "models/official/cv/resnext/infer/mxbase/src/resnext50Classify.h" "runtime/references"
 "models/official/cv/cnn_direction_model/infer/mxbase/src/Cnndirection.h" "runtime/references"
 "models/official/cv/cnn_direction_model/infer/mxbase/src/main.cpp" "runtime/references"
+
+"models/research/cv/Neighbor2Neighbor/infer/mxbase/src/Neighbor2Neighbor.h" "runtime/references"
+"models/research/cv/Neighbor2Neighbor/infer/mxbase/src/Neighbor2Neighbor.cpp" "runtime/references"
+"models/research/cv/Neighbor2Neighbor/infer/mxbase/src/main.cpp" "runtime/references"
+
 
 "models/research/cv/SE-Net/infer/mxbase/src/Senet_resnet50_opencv.h"                 "runtime/references"
 "models/research/cv/SE-Net/infer/mxbase/src/main.cpp"                                "runtime/references"
@@ -103,10 +119,28 @@
 "models/official/recommend/wide_and_deep/infer/sdk/sample/main.cpp"  "runtime/references"
 
 "models/research/cv/fairmot/infer/mxbase/src/Fairmot.h" "runtime/references"
+"models/research/cv/SiamFC/infer/mxbase/src/main.cpp"            "runtime/references"
+"models/research/cv/SiamFC/infer/mxbase/src/SiamFCBase.cpp"         "runtime/references"
+"models/research/cv/SiamFC/infer/mxbase/src/SiamFCBase.h"          "runtime/references"
+"models/official/cv/psenet/infer/mxbase/src/main.cpp"  "runtime/references"
+"models/official/cv/psenet/infer/mxbase/src/PsenetDetection.h"  "runtime/references"
+"models/official/cv/psenet/infer/mxbase/src/PsenetDetection.cpp"  "runtime/references"
+
+"models/research/recommend/autodis/infer/mxbase/src/main.cpp"  "runtime/references"
+"models/research/recommend/autodis/infer/mxbase/src/Autodis.h"  "runtime/references"
+"models/research/recommend/autodis/infer/mxbase/src/Autodis.cpp"  "runtime/references"
 
 "models/official/cv/psenet/infer/mxbase/src/main.cpp"  "runtime/references"
 "models/official/cv/psenet/infer/mxbase/src/PsenetDetection.h"  "runtime/references"
 "models/official/cv/psenet/infer/mxbase/src/PsenetDetection.cpp"  "runtime/references"
+
+"models/research/recommend/autodis/infer/mxbase/src/main.cpp"  "runtime/references"
+"models/research/recommend/autodis/infer/mxbase/src/Autodis.h"  "runtime/references"
+"models/research/recommend/autodis/infer/mxbase/src/Autodis.cpp"  "runtime/references"
+
+"models/research/recommend/mmoe/infer/mxbase/src/main.cpp"  "runtime/references"
+"models/research/recommend/mmoe/infer/mxbase/src/MMoE.h"  "runtime/references"
+"models/research/recommend/mmoe/infer/mxbase/src/MMoE.cpp"  "runtime/references"
 
 "models/research/cv/textfusenet/infer/mxbase/src/Textfusenet.h" "runtime/references"
 "models/research/cv/textfusenet/infer/mxbase/src/Textfusenet.cpp" "runtime/references"
@@ -125,5 +159,15 @@
 "models/official/cv/retinanet/infer/mxbase/retinanetDetection/RetinanetDetection.h"     "runtime/references"
 "models/official/cv/retinanet/infer/mxbase/retinanetDetection/RetinanetDetection.cpp"   "runtime/references"
 
+"models/official/audio/melgan/infer/mxbase/src/main.cpp" "runtime/references"
+"models/official/audio/melgan/infer/mxbase/src/Melgan.h" "runtime/references"
+"models/official/audio/melgan/infer/mxbase/src/Melgan.cpp" "runtime/references"
+
 "models/official/audio/lpcnet/ascend310_infer/inc/lpcnet.h" "runtime/int"
 "models/official/audio/lpcnet/ascend310_infer/src/main.cc" "build/include_subdir"
+
+"models/official/cv/simclr/infer/mxbase/SimCLRClassifyOpencv.h"                 "runtime/references"
+
+"models/research/recommend/mmoe/infer/mxbase/src/main.cpp"  "runtime/references"
+"models/research/recommend/mmoe/infer/mxbase/src/Vgg19Classify.h"  "runtime/references"
+"models/research/recommend/mmoe/infer/mxbase/src/Vgg19Classify.cpp"  "runtime/references"
