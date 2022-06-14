@@ -13,12 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-'''
-transforms
-'''
+""" transforms """
 from __future__ import division
 import numpy as np
 import cv2
+
 
 def flip_back(output_flipped, matched_parts):
     '''
@@ -55,9 +54,7 @@ def fliplr_joints(joints, joints_vis, width, matched_parts):
 
 
 def transform_preds(coords, center, scale, output_size):
-    '''
-    transform_preds
-    '''
+    """transform_preds"""
     target_coords = np.zeros(coords.shape)
     trans = get_affine_transform(center, scale, 0, output_size, inv=1)
     for p in range(coords.shape[0]):
@@ -65,15 +62,8 @@ def transform_preds(coords, center, scale, output_size):
     return target_coords
 
 
-def get_affine_transform(center,
-                         scale,
-                         rot,
-                         output_size,
-                         shift=np.array([0, 0], dtype=np.float32),
-                         inv=0):
-    '''
-    get_affine_transform
-    '''
+def get_affine_transform(center, scale, rot, output_size, shift=np.array([0, 0], dtype=np.float32), inv=0):
+    """get_affine_transform"""
     if not isinstance(scale, np.ndarray) and not isinstance(scale, list):
         print(scale)
         scale = np.array([scale, scale])

@@ -12,21 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-'''
-prediction picture
-'''
+""" prediction picture """
 import math
 import numpy as np
 
 from src.utils.transforms import transform_preds
 
+
 def get_max_preds(batch_heatmaps):
-    '''
+    """
     get predictions from score maps
     heatmaps: numpy.ndarray([batch_size, num_joints, height, width])
-    '''
-    assert isinstance(batch_heatmaps, np.ndarray), \
-        'batch_heatmaps should be numpy.ndarray'
+    """
+    assert isinstance(batch_heatmaps, np.ndarray), 'batch_heatmaps should be numpy.ndarray'
     assert batch_heatmaps.ndim == 4, 'batch_images should be 4-ndim'
 
     batch_size = batch_heatmaps.shape[0]
@@ -50,10 +48,11 @@ def get_max_preds(batch_heatmaps):
     preds *= pred_mask
     return preds, maxvals
 
+
 def get_final_preds(config, batch_heatmaps, center, scale):
-    '''
+    """
     get final predictions from score maps
-    '''
+    """
     coords, maxvals = get_max_preds(batch_heatmaps)
     heatmap_height = batch_heatmaps.shape[2]
     heatmap_width = batch_heatmaps.shape[3]

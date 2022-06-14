@@ -13,16 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-'''
-nms operation
-'''
+""" nms operation """
 from __future__ import division
 import numpy as np
 
+
 def oks_iou(g, d, a_g, a_d, sigmas=None, in_vis_thre=None):
-    '''
-    oks_iou
-    '''
     if not isinstance(sigmas, np.ndarray):
         sigmas = np.array([.26, .25, .25, .35, .35, .79, .79, .72, .72,
                            .62, .62, 1.07, 1.07, .87, .87, .89, .89]) / 10.0
@@ -43,6 +39,7 @@ def oks_iou(g, d, a_g, a_d, sigmas=None, in_vis_thre=None):
             e = e[ind]
         ious[n_d] = np.sum(np.exp(-e)) / e.shape[0] if e.shape[0] != 0 else 0.0
     return ious
+
 
 def oks_nms(kpts_db, thresh, sigmas=None, in_vis_thre=None):
     """

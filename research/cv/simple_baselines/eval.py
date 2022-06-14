@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-'''
-This file evaluates the model used.
-'''
+""" This file evaluates the model """
 from __future__ import division
 
 import argparse
@@ -32,25 +30,28 @@ from src.dataset import flip_pairs
 from src.dataset import keypoint_dataset
 from src.utils.coco import evaluate
 from src.utils.transforms import flip_back
-from src.utils.inference import get_final_preds
+from src.predict import get_final_preds
 
 if config.MODELARTS.IS_MODEL_ARTS:
     import moxing as mox
 
 set_seed(config.GENERAL.EVAL_SEED)
-device_id = int(os.getenv('DEVICE_ID'))
+
 
 def parse_args():
+    """command line arguments parsing"""
     parser = argparse.ArgumentParser(description='Evaluate')
     parser.add_argument('--data_url', required=False, default=None, help='Location of data.')
     parser.add_argument('--train_url', required=False, default=None, help='Location of evaluate outputs.')
+    parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"], default="Ascend",
+                        help="device target")
+    parser.add_argument("--device_id", type=int, default=0, help="Device id, default is 0.")
     args = parser.parse_args()
     return args
 
+
 def validate(cfg, val_dataset, model, output_dir, ann_path):
-    '''
-    validate
-    '''
+    """evaluate model"""
     model.set_train(False)
     num_samples = val_dataset.get_dataset_size() * cfg.TEST.BATCH_SIZE
     all_preds = np.zeros((num_samples, cfg.MODEL.NUM_JOINTS, 3),
@@ -98,22 +99,21 @@ def validate(cfg, val_dataset, model, output_dir, ann_path):
 
 
 def main():
-    context.set_context(mode=context.GRAPH_MODE,
-                        device_target="Ascend", save_graphs=False, device_id=device_id)
-
+    """main"""
     args = parse_args()
+    context.set_context(mode=context.GRAPH_MODE,
+                        device_target=args.device_target, save_graphs=False, device_id=args.device_id)
 
     if config.MODELARTS.IS_MODEL_ARTS:
         mox.file.copy_parallel(src_url=args.data_url, dst_url=config.MODELARTS.CACHE_INPUT)
 
     model = GetPoseResNet(config)
 
-    ckpt_name = ''
     if config.MODELARTS.IS_MODEL_ARTS:
         ckpt_name = config.MODELARTS.CACHE_INPUT
+        ckpt_name = os.path.join(ckpt_name, config.TEST.MODEL_FILE)
     else:
-        ckpt_name = config.DATASET.ROOT
-    ckpt_name = ckpt_name + config.TEST.MODEL_FILE
+        ckpt_name = config.TEST.MODEL_FILE
     print('loading model ckpt from {}'.format(ckpt_name))
     load_param_into_net(model, load_checkpoint(ckpt_name))
 
@@ -126,20 +126,19 @@ def main():
     ckpt_name = ckpt_name.split('/')
     ckpt_name = ckpt_name[len(ckpt_name) - 1]
     ckpt_name = ckpt_name.split('.')[0]
-    output_dir = ''
-    ann_path = ''
     if config.MODELARTS.IS_MODEL_ARTS:
         output_dir = config.MODELARTS.CACHE_OUTPUT
         ann_path = config.MODELARTS.CACHE_INPUT
     else:
         output_dir = config.TEST.OUTPUT_DIR
         ann_path = config.DATASET.ROOT
-    output_dir = output_dir + ckpt_name
-    ann_path = ann_path + config.DATASET.TEST_JSON
+    output_dir = os.path.join(output_dir, ckpt_name)
+    ann_path = os.path.join(ann_path, config.DATASET.TEST_JSON)
     validate(config, valid_dataset, model, output_dir, ann_path)
 
     if config.MODELARTS.IS_MODEL_ARTS:
         mox.file.copy_parallel(src_url=config.MODELARTS.CACHE_OUTPUT, dst_url=args.train_url)
+
 
 if __name__ == '__main__':
     main()

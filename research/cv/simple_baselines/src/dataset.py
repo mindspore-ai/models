@@ -12,16 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-'''
-dataset processing
-'''
+""" dataset processing """
+
 from __future__ import division
 
 import json
 import os
 from copy import deepcopy
 import random
-
+import multiprocessing as mp
 import numpy as np
 import cv2
 
@@ -29,14 +28,15 @@ import mindspore.dataset as ds
 import mindspore.dataset.vision as C
 from src.utils.transforms import fliplr_joints, get_affine_transform, affine_transform
 
-ds.config.set_seed(1) # Set Random Seed
+ds.config.set_seed(1)  # Set Random Seed
 flip_pairs = [[1, 2], [3, 4], [5, 6], [7, 8],
               [9, 10], [11, 12], [13, 14], [15, 16]]
 
+
 class KeypointDatasetGenerator:
-    '''
-    About the specific operations of coco2017 data set processing
-    '''
+    """
+    About the specific operations of coco2017 dataset processing
+    """
     def __init__(self, cfg, is_train=False):
         self.image_thre = cfg.TEST.IMAGE_THRE
         self.image_size = np.array(cfg.MODEL.IMAGE_SIZE, dtype=np.int32)
@@ -56,9 +56,7 @@ class KeypointDatasetGenerator:
         self.num_joints = 17
 
     def load_gt_dataset(self, image_path, ann_file):
-        '''
-        load_gt_dataset
-        '''
+        """ load_gt_dataset """
         self.db = []
 
         with open(ann_file, "rb") as f:
@@ -134,11 +132,8 @@ class KeypointDatasetGenerator:
                 })
 
     def load_detect_dataset(self, image_path, ann_file, bbox_file):
-        '''
-        load_detect_dataset
-        '''
+        """ load detection dataset """
         self.db = []
-        all_boxes = None
         with open(bbox_file, 'r') as f:
             all_boxes = json.load(f)
 
@@ -245,9 +240,7 @@ class KeypointDatasetGenerator:
         return image, target, target_weight, s, c, score, db_rec['id']
 
     def generate_heatmap(self, joints, joints_vis):
-        '''
-        generate_heatmap
-        '''
+        """ generate heatmap"""
         target_weight = np.ones((self.num_joints, 1), dtype=np.float32)
         target_weight[:, 0] = joints_vis[:, 0]
 
@@ -300,6 +293,7 @@ class KeypointDatasetGenerator:
     def __len__(self):
         return len(self.db)
 
+
 def keypoint_dataset(config,
                      ann_file=None,
                      image_path=None,
@@ -307,7 +301,7 @@ def keypoint_dataset(config,
                      rank=0,
                      group_size=1,
                      train_mode=True,
-                     num_parallel_workers=8,
+                     num_parallel_workers=mp.cpu_count(),
                      transform=None,
                      shuffle=None):
     """
@@ -315,9 +309,8 @@ def keypoint_dataset(config,
 
     Args:
         rank (int): The shard ID within num_shards (default=None).
-        group_size (int): Number of shards that the dataset should be divided
-            into (default=None).
-         mode (str): "train" or others. Default: " train".
+        group_size (int): Number of shards that the dataset should be divided into (default=None).
+        mode (str): "train" or others. Default: " train".
         num_parallel_workers (int): Number of workers to read the data. Default: None.
     """
     # config

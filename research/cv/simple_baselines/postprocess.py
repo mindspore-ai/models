@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""
-postprocess.
-"""
+""" postprocess script """
 import os
 import numpy as np
 
@@ -24,8 +22,9 @@ from src.predict import get_final_preds
 from src.dataset import flip_pairs
 from src.config import config
 
+
 def get_acc():
-    '''calculate accuracy'''
+    """ calculate accuracy """
     ckpt_file = config.TEST.MODEL_FILE
     output_dir = ckpt_file.split('.')[0]
     if config.enable_modelarts:
@@ -85,6 +84,7 @@ def get_acc():
     _, perf_indicator = evaluate(
         cfg, all_preds[:idx], output_dir, all_boxes[:idx], image_id, None)
     print("AP:", perf_indicator)
+
 
 if __name__ == '__main__':
     get_acc()

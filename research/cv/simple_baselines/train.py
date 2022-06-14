@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,18 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-'''
-train
-'''
+"""Train simple baselines."""
 from __future__ import division
 
 import os
 import ast
 import argparse
 import numpy as np
+
 from mindspore import context, Tensor
 from mindspore.context import ParallelMode
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train import Model
 from mindspore.train.callback import TimeMonitor, LossMonitor, ModelCheckpoint, CheckpointConfig
 from mindspore.nn.optim import Adam
@@ -38,16 +37,10 @@ if config.MODELARTS.IS_MODEL_ARTS:
     import moxing as mox
 
 set_seed(config.GENERAL.TRAIN_SEED)
-def get_lr(begin_epoch,
-           total_epochs,
-           steps_per_epoch,
-           lr_init=0.1,
-           factor=0.1,
-           epoch_number_to_drop=(90, 120)
-           ):
-    '''
-    get_lr
-    '''
+
+
+def get_lr(begin_epoch, total_epochs, steps_per_epoch, lr_init=0.1, factor=0.1,
+           epoch_number_to_drop=(90, 120)):
     lr_each_step = []
     total_steps = steps_per_epoch * total_epochs
     step_number_to_drop = [steps_per_epoch * x for x in epoch_number_to_drop]
@@ -60,11 +53,10 @@ def get_lr(begin_epoch,
     learning_rate = lr_each_step[current_step:]
     return learning_rate
 
+
 def parse_args():
-    '''
-    args
-    '''
-    parser = argparse.ArgumentParser(description="Simplebaseline training")
+    """command line arguments parsing"""
+    parser = argparse.ArgumentParser(description="Simple Baselines training")
     parser.add_argument('--data_url', required=False, default=None, help='Location of data.')
     parser.add_argument('--train_url', required=False, default=None, help='Location of training outputs.')
     parser.add_argument('--device_id', required=False, default=None, type=int, help='Location of training outputs.')
@@ -75,30 +67,38 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+
 def main():
     print("loading parse...")
     args = parse_args()
-    device_id = args.device_id
     device_target = args.device_target
     config.GENERAL.RUN_DISTRIBUTE = args.run_distribute
     config.MODELARTS.IS_MODEL_ARTS = args.is_model_arts
-    if config.GENERAL.RUN_DISTRIBUTE or config.MODELARTS.IS_MODEL_ARTS:
-        device_id = int(os.getenv('DEVICE_ID'))
-    context.set_context(mode=context.GRAPH_MODE,
-                        device_target=device_target,
-                        save_graphs=False,
-                        device_id=device_id)
 
-    if config.GENERAL.RUN_DISTRIBUTE:
-        init()
-        rank = int(os.getenv('DEVICE_ID'))
-        device_num = int(os.getenv('RANK_SIZE'))
-        context.set_auto_parallel_context(device_num=device_num,
-                                          parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
-    else:
+    context.set_context(mode=context.GRAPH_MODE, device_target=device_target, save_graphs=False)
+    if device_target == "Ascend":
         rank = 0
         device_num = 1
+        context.set_context(device_id=rank)
+        if config.GENERAL.RUN_DISTRIBUTE:
+            init()
+            rank = int(os.getenv('DEVICE_ID'))
+            device_num = int(os.getenv('RANK_SIZE'))
+            context.set_auto_parallel_context(device_num=device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+    elif device_target == "GPU":
+        rank = int(os.getenv('DEVICE_ID', "0"))
+        device_num = int(os.getenv('RANK_SIZE', "0"))
+        if device_num > 1:
+            init()
+            rank = get_rank()
+            device_num = get_group_size()
+            context.set_auto_parallel_context(device_num=device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+    else:
+        raise ValueError("Unsupported device, only GPU or Ascend is supported.")
 
     if config.MODELARTS.IS_MODEL_ARTS:
         mox.file.copy_parallel(src_url=args.data_url, dst_url=config.MODELARTS.CACHE_INPUT)
@@ -106,9 +106,7 @@ def main():
     dataset, _ = keypoint_dataset(config,
                                   rank=rank,
                                   group_size=device_num,
-                                  train_mode=True,
-                                  num_parallel_workers=config.TRAIN.NUM_PARALLEL_WORKERS,
-                                  )
+                                  train_mode=True)
     net = GetPoseResNet(config)
     loss = JointsMSELoss(config.LOSS.USE_TARGET_WEIGHT)
     net_with_loss = PoseResNetWithLoss(net, loss)
@@ -123,24 +121,25 @@ def main():
     time_cb = TimeMonitor(data_size=dataset_size)
     loss_cb = LossMonitor()
     cb = [time_cb, loss_cb]
+
     if config.TRAIN.SAVE_CKPT:
-        config_ck = CheckpointConfig(save_checkpoint_steps=dataset_size, keep_checkpoint_max=20)
-        prefix = ''
+        config_ck = CheckpointConfig(save_checkpoint_steps=dataset_size*config.TRAIN.SAVE_CKPT_EPOCH,
+                                     keep_checkpoint_max=config.TRAIN.KEEP_CKPT_MAX)
         if config.GENERAL.RUN_DISTRIBUTE:
-            prefix = 'multi_' + 'train_poseresnet_' + config.GENERAL.VERSION + '_' + os.getenv('DEVICE_ID')
+            prefix = 'multi_' + 'train_poseresnet_' + config.GENERAL.VERSION + '_' + str(rank)
         else:
             prefix = 'single_' + 'train_poseresnet_' + config.GENERAL.VERSION
 
-        directory = ''
         if config.MODELARTS.IS_MODEL_ARTS:
-            directory = config.MODELARTS.CACHE_OUTPUT + 'device_'+ os.getenv('DEVICE_ID')
+            directory = os.path.join(config.MODELARTS.CACHE_OUTPUT, 'device_' + str(rank))
         elif config.GENERAL.RUN_DISTRIBUTE:
-            directory = config.TRAIN.CKPT_PATH + 'device_'+ os.getenv('DEVICE_ID')
+            directory = os.path.join(config.TRAIN.CKPT_PATH, 'device_' + str(rank))
         else:
-            directory = config.TRAIN.CKPT_PATH + 'device'
+            directory = os.path.join(config.TRAIN.CKPT_PATH, 'device')
 
         ckpoint_cb = ModelCheckpoint(prefix=prefix, directory=directory, config=config_ck)
         cb.append(ckpoint_cb)
+
     model = Model(net_with_loss, loss_fn=None, optimizer=opt, amp_level="O2")
     epoch_size = config.TRAIN.END_EPOCH - config.TRAIN.BEGIN_EPOCH
     print("************ Start training now ************")
@@ -149,6 +148,7 @@ def main():
 
     if config.MODELARTS.IS_MODEL_ARTS:
         mox.file.copy_parallel(src_url=config.MODELARTS.CACHE_OUTPUT, dst_url=args.train_url)
+
 
 if __name__ == '__main__':
     main()
