@@ -810,7 +810,10 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 # Apply algorithm in MindSpore Golden Stick
 
 MindSpore Golden Stick is a compression algorithm set for MindSpore. We usually apply algorithm in Golden Stick before training for smaller model size, lower power consuming or faster inference process.
-MindSpore Golden Stick provides SimQAT algorithm for ResNet50. SimQAT is a quantization-aware training algorithm that trains the quantization parameters of certain layers in the network by introducing fake-quantization nodes, so that the model can perform inference with less power consumption or higher performance during the deployment phase.
+
+MindSpore Golden Stick provides SimQAT and SCOP algorithm for ResNet50. SimQAT is a quantization-aware training algorithm that trains the quantization parameters of certain layers in the network by introducing fake-quantization nodes, so that the model can perform inference with less power consumption or higher performance during the deployment phase. SCOP algorithm is a reliable pruning algorithm, which reduces the influence of all potential irrelevant factors by constructing a scientific control mechanism, and effectively deletes nodes in proportion, thereby realizing the miniaturization of the model.
+
+MindSpore Golden Stick provides SLB algorithm for ResNet18. SLB is provided by Huawei Noah's Ark Lab. SLB is a quantization algorithm with low-bit weight searching, it regards the discrete weights in an arbitrary quantized neural network as searchable variables, and utilize a differential method to search them accurately. In particular, each weight is represented as a probability distribution over the discrete value set. The probabilities are optimized during training and the values with the highest probability are selected to establish the desired quantized network. SLB have more advantage when quantize with low-bit compared with SimQAT.
 
 ## Training Process
 
@@ -850,7 +853,12 @@ bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/
 # standalone training example, apply SimQAT and train from pretrained checkpoint
 cd ./golden_stick/scripts/
 bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt
+
+# Just replace PYTHON_PATH CONFIG_FILE for applying different algorithm, take SLB algorithm as an example
+bash run_standalone_train_gpu.sh ../quantization/slb/ ../quantization/slb/resnet18_cifar10_config.yaml /path/to/dataset
 ```
+
+- SLB only support standalone training now, and not support train from full precision checkpoint.
 
 ## Evaluation Process
 
@@ -865,16 +873,49 @@ bash run_eval_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CHECKPOINT_PATH
 # evaluation example
 cd ./golden_stick/scripts/
 bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml ./cifar10/train/ ./checkpoint/resnet-90.ckpt
+
+# Just replace PYTHON_PATH CONFIG_FILE for applying different algorithm, take SLB algorithm as an example
+bash run_eval_gpu.sh ../quantization/slb/ ../quantization/slb/resnet18_cifar10_config.yaml ./cifar10/train/ ./checkpoint/resnet-100.ckpt
 ```
 
 ### Result
 
 Evaluation result will be stored in the example path, whose folder name is "eval". Under this, you can find result like the following in log.
 
-- Apply SimQAT on ResNet50, and evaluating with CIFAR-10 dataset
+- Apply SimQAT on ResNet50, and evaluating with CIFAR-10 dataset:
 
-```bash
+```text
 result:{'top_1_accuracy': 0.9354967948717948, 'top_5_accuracy': 0.9981971153846154} ckpt=~/resnet50_cifar10/train_parallel0/resnet-180_195.ckpt
+```
+
+- Apply SCOP on ResNet50, and evaluating with CIFAR-10 dataset:
+
+```text
+result:{'top_1_accuracy': 0.9273838141025641} prune_rate=0.45 ckpt=~/resnet50_cifar10/train_parallel0/resnet-400_390.ckpt
+```
+
+- Apply SLB on ResNet18 with W4A8, and evaluating with CIFAR-10 dataset. W4A8 means quantize weight with 4bit and activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.9285857371794872, 'top_5_accuracy': 0.9959935897435898} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+```
+
+- Apply SLB on ResNet18 with W2A8, and evaluating with CIFAR-10 dataset. W2A8 means quantize weight with 2bit and activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.9207732371794872, 'top_5_accuracy': 0.9955929487179487} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+```
+
+- Apply SLB on ResNet18 with W1A8, and evaluating with CIFAR-10 dataset. W1A8 means quantize weight with 1bit and activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.8976362179487182, 'top_5_accuracy': 0.9923878205128205} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+```
+
+- Apply SLB on ResNet18 with W1A4, and evaluating with CIFAR-10 dataset. W1A4 means quantize weight with 1bit and activation with 4bit:
+
+```text
+result:{'top_1_accuracy': 0.8845152243589743, 'top_5_accuracy': 0.9914863782051282} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
 ```
 
 ## Inference Process
