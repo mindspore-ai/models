@@ -104,7 +104,7 @@ def load_images(paths, batch_size=128):
         im = resize(im)
         img = np.array(im)
         ts = transform(img)
-        ll.append(ts[0])
+        ll.append(ts)
         if len(ll) == batch_size:
             yield np.stack(ll, axis=0)
             ll.clear()
