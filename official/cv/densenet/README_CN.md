@@ -22,6 +22,7 @@
         - [导出](#导出)
     - [推理过程](#推理过程)
         - [推理](#推理)
+        - [onnx推理](#onnx推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [DenseNet121](#densenet121)
@@ -212,6 +213,7 @@ DenseNet-100使用的数据集： Cifar-10
         ├── densenet100_config.yaml          // 配置文件
         ├── densenet121_config.yaml          // 配置文件
         ├── eval.py                          // 评估脚本
+        ├── eval_onnx.py                     // onnx评估脚本
         ├── export.py                        // 导出脚本
         ├── mindspore_hub_conf.py            // hub配置脚本
         ├── postprocess.py                   // 310 推理后处理脚本
@@ -226,6 +228,7 @@ DenseNet-100使用的数据集： Cifar-10
         │   ├── run_eval_cpu.sh              // CPU训练shell脚本
         │   ├── run_infer_310.sh             // Ascend 310 推理shell脚本
         │   ├── run_train_cpu.sh             // CPU评估shell脚本
+        │   ├── run_onnx_eval.sh             // onnx推理shell脚本
         ├── src
         │   ├── datasets                     // 数据集处理函数
         │       ├── classification.py
@@ -424,7 +427,7 @@ bash run_distribute_train_gpu.sh 8 0,1,2,3,4,5,6,7 [NET_NAME] [DATASET_NAME] [DA
 python export.py --net [NET_NAME] --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format [EXPORT_FORMAT] --batch_size [BATCH_SIZE]
 ```
 
-`EXPORT_FORMAT` 可选 ["AIR", "MINDIR"]
+`EXPORT_FORMAT` 可选 ["AIR", "MINDIR","ONNX"]
 
 - 在modelarts上导出MindIR
 
@@ -467,6 +470,28 @@ Densenet121网络使用ImageNet推理得到的结果如下:
   2020-08-24 09:21:50,551:INFO:after allreduce eval: top1_correct=37657, tot=49920, acc=75.56%
   2020-08-24 09:21:50,551:INFO:after allreduce eval: top5_correct=46224, tot=49920, acc=92.74%
   ```
+
+### onnx推理
+
+在推理之前需要先导出模型，onnx模型可在任意环境导出。
+
+```shell
+# 导出模型为onnx
+python export.py --net densenet121 --ckpt_file /path/to/checkpoint.ckpt --device_target CPU --file_format ONNX --batch_size 32
+```
+
+```shell
+# onnx模型推理
+python eval_onnx.py --eval_data_dir imagenet_val --ckpt_files /path/to/exported.onnx --device_target GPU > output.eval_onnx.log 2>&1 &
+```
+
+推理结果保存在output.eval_onnx.log文件下，
+Densenet121网络使用ImageNet推理得到的结果如下:
+
+```bash
+2020-08-24 09:21:50,551:INFO:after allreduce eval: top1_correct=37756, tot=49984, acc=75.54%
+2020-08-24 09:21:50,551:INFO:after allreduce eval: top5_correct=46354, tot=49984, acc=92.74%
+```
 
 # 模型描述
 
