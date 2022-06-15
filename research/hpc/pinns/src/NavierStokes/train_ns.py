@@ -29,7 +29,7 @@ from src.NavierStokes.net import PINNs_navier
 
 class EvalCallback(Callback):
     """eval callback."""
-    def __init__(self, data_path, ckpt_dir, per_eval_epoch, num_neuron=20):
+    def __init__(self, data_path, ckpt_dir, per_eval_epoch, num_neuron=20, eval_begin_epoch=10000):
         super(EvalCallback, self).__init__()
         if not isinstance(per_eval_epoch, int) or per_eval_epoch <= 0:
             raise ValueError("per_eval_epoch must be int and > 0")
@@ -39,6 +39,7 @@ class EvalCallback(Callback):
         self.network = PINNs_navier(layers, lb, ub)
         self.ckpt_dir = ckpt_dir
         self.per_eval_epoch = per_eval_epoch
+        self.eval_begin_epoch = eval_begin_epoch
         self.best_result = None
 
     def epoch_end(self, run_context):
@@ -46,7 +47,7 @@ class EvalCallback(Callback):
         cb_params = run_context.original_args()
         cur_epoch = cb_params.cur_epoch_num
         batch_num = cb_params.batch_num
-        if cur_epoch % self.per_eval_epoch == 0:
+        if cur_epoch % self.per_eval_epoch == 0 and cur_epoch >= self.eval_begin_epoch:
             ckpt_format = os.path.join(self.ckpt_dir,
                                        "checkpoint_PINNs_NavierStokes*-{}_{}.ckpt".format(cur_epoch, batch_num))
             ckpt_list = glob.glob(ckpt_format)
@@ -98,9 +99,9 @@ def train_navier(epoch, lr, batch_size, n_train, path, noise, num_neuron, ck_pat
     #call back configuration
     loss_print_num = 1 # print loss per loss_print_num epochs
     # save model
-    config_ck = CheckpointConfig(save_checkpoint_steps=1000, keep_checkpoint_max=20)
+    config_ck = CheckpointConfig(save_checkpoint_steps=200, keep_checkpoint_max=20)
     ckpoint = ModelCheckpoint(prefix="checkpoint_PINNs_NavierStokes", directory=ck_path, config=config_ck)
-    eval_cb = EvalCallback(data_path=path, ckpt_dir=ck_path, per_eval_epoch=100)
+    eval_cb = EvalCallback(data_path=path, ckpt_dir=ck_path, per_eval_epoch=20)
 
     model = Model(network=n, loss_fn=loss, optimizer=opt)
 
