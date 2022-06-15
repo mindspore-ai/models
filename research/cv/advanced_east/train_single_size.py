@@ -90,8 +90,6 @@ if __name__ == '__main__':
         args.group_size = device_num
         context.reset_auto_parallel_context()
         context.set_auto_parallel_context(device_num=8, gradients_mean=True, parallel_mode=ParallelMode.DATA_PARALLEL)
-    else:
-        context.set_context(device_id=args.device_id)
 
     # logger
     args.outputs_dir = os.path.join(args.ckpt_path,

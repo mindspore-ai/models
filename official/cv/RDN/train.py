@@ -33,7 +33,6 @@ def train_net():
     """train rdn"""
     set_seed(1)
     device_id = int(os.getenv('DEVICE_ID', '0'))
-    start_id = int(os.getenv('START_ID', str(device_id)))
     rank_id = int(os.getenv('RANK_ID', '0'))
 
     if args.device_target == 'GPU':
@@ -87,7 +86,7 @@ def train_net():
                                  keep_checkpoint_max=args.ckpt_save_max)
     ckpt_cb = ModelCheckpoint(prefix="rdn", directory=args.ckpt_save_path, config=config_ck)
 
-    if rank_id == start_id:
+    if rank_id == 0:
         cb += [ckpt_cb]
     model.train(args.epochs, train_de_dataset, callbacks=cb, dataset_sink_mode=True)
 
