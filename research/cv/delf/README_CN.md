@@ -86,6 +86,9 @@
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+- 依赖包
+    - h5py版本：3.4.0
+    - 其它依赖包信息详见requirements.txt文件
 
 # 快速入门
 
@@ -93,7 +96,7 @@
 
 - 数据集下载和预处理
 
-  ```yaml
+  ```shell
   # Google Landmarks Dataset v2 训练集下载以及转化为mindrecord文件
   # 【注】请准备至少1.1TB的存储空间，若空间不足可以将可选参数[NEED_ROMOVE_TAR]设置为'y'，设置后占用约633G存储空间
   bash scripts/download_gldv2.sh 500 [DATASET_PATH] [NEED_ROMOVE_TAR]
@@ -104,9 +107,9 @@
   bash scripts/download_paris.sh [DATASET_PATH]
   ```
 
-- 迁移学习预训练权重下载
+- 预训练权重下载
 
-  ```yaml
+  ```shell
   # 下载ImageNet预训练的Resnet50权重和pca降维预训练转换矩阵
   bash scripts/download_pretrained.sh
   ```
@@ -121,12 +124,14 @@
   ```
 
   ```shell
+  # 请确保前面步骤的预训练权重已经下载完毕！
   # 运行训练示例，分为两阶段进行训练
   # 微调阶段：
-  python train.py --train_state=tuning > train_tuning.log 2>&1 &
+  bash scripts/run_1p_train.sh tuning
   # 注意力训练阶段：
-  # 修改checkpoint_path为微调阶段得到的checkpoint
-  python train.py --train_state=attn --checkpoint_path=/home/delf/ckpt/checkpoint_delf_tuning-1_4989.ckpt > train_attn.log 2>&1 &
+  # 修改[CHECKPOINT]为微调阶段得到的checkpoint文件路径
+  bash scripts/run_1p_train.sh attn [CHECKPOINT]
+  # example: bash scripts/run_1p_train.sh attn ./ckpt/checkpoint_delf_tuning-1_4989.ckpt
 
   # 运行分布式训练示例
   # 微调阶段
@@ -204,33 +209,34 @@
     ├── ascend310_infer                                      # 310推理源代码
     ├── model_utils                                          # model_utils工具包
     ├── scripts
-    │   ├── download_gldv2.sh                                # 下载 Google Landmarks Dataset v2 的shell脚本
-    │   ├── download_oxf.sh                                  # 下载 Oxford5k 的shell脚本
-    │   ├── download_paris.sh                                # 下载 Paris6k 的shell脚本
-    │   ├── download_pretrained.sh                           # 下载预训练权重的shell脚本
-    │   ├── run_8p_train.sh                                  # 分布式训练的shell脚本
-    │   ├── run_eval_match_images.sh                         # 图像匹配评估的shell脚本
-    │   ├── run_eval_retrieval_images.sh                     # 图像检索评估的shell脚本
-    │   ├── run_infer_310_match_images.sh                    # 310推理图像匹配的shell脚本
-    │   └── run_infer_310_retrieval_images.sh                # 310推理图像检索的shell脚本
+    │   ├── download_gldv2.sh                                # 下载 Google Landmarks Dataset v2 的shell脚本
+    │   ├── download_oxf.sh                                  # 下载 Oxford5k 的shell脚本
+    │   ├── download_paris.sh                                # 下载 Paris6k 的shell脚本
+    │   ├── download_pretrained.sh                           # 下载预训练权重的shell脚本
+    │   ├── run_1p_train.sh                                  # 单卡训练的shell脚本
+    │   ├── run_8p_train.sh                                  # 分布式训练的shell脚本
+    │   ├── run_eval_match_images.sh                         # 图像匹配评估的shell脚本
+    │   ├── run_eval_retrieval_images.sh                     # 图像检索评估的shell脚本
+    │   ├── run_infer_310_match_images.sh                    # 310推理图像匹配的shell脚本
+    │   └── run_infer_310_retrieval_images.sh                # 310推理图像检索的shell脚本
     ├── src
-    │   ├── __init__.py                                      # 初始化文件
-    │   ├── box_list_np.py                                   # 边界框定义
-    │   ├── box_list_ops_np.py                               # 边界框操作定义
-    │   ├── build_feature_dataset.py                         # 创建特征数据库
-    │   ├── build_image_dataset.py                           # 创建训练数据集
-    │   ├── convert_h5_to_weight.py                          # 转换h5权重文件为ckpt权重
-    │   ├── data_augmentation_parallel.py                    # 训练数据预处理和加载
-    │   ├── dataset.py                                       # 读取查询集、索引集和gt
-    │   ├── delf_config.py                                   # 图像金字塔配置
-    │   ├── delf_model.py                                    # delf网络定义
-    │   ├── extract_feature.py                               # 提取图像特征
-    │   ├── extract_utils_np.py                              # 提取图像特征工具（pca降维）
-    │   ├── feature_io.py                                    # 读写图像特征
-    │   ├── preprocess.py                                    # 310推理预处理脚本
-    │   ├── postprocess.py                                   # 310推理后处理脚本
-    │   ├── match_images.py                                  # 图像特征匹配
-    │   └── perform_retrieval.py                             # 图像检索
+    │   ├── __init__.py                                      # 初始化文件
+    │   ├── box_list_np.py                                   # 边界框定义
+    │   ├── box_list_ops_np.py                               # 边界框操作定义
+    │   ├── build_feature_dataset.py                         # 创建特征数据库
+    │   ├── build_image_dataset.py                           # 创建训练数据集
+    │   ├── convert_h5_to_weight.py                          # 转换h5权重文件为ckpt权重
+    │   ├── data_augmentation_parallel.py                    # 训练数据预处理和加载
+    │   ├── dataset.py                                       # 读取查询集、索引集和gt
+    │   ├── delf_config.py                                   # 图像金字塔配置
+    │   ├── delf_model.py                                    # delf网络定义
+    │   ├── extract_feature.py                               # 提取图像特征
+    │   ├── extract_utils_np.py                              # 提取图像特征工具（pca降维）
+    │   ├── feature_io.py                                    # 读写图像特征
+    │   ├── preprocess.py                                    # 310推理预处理脚本
+    │   ├── postprocess.py                                   # 310推理后处理脚本
+    │   ├── match_images.py                                  # 图像特征匹配
+    │   └── perform_retrieval.py                             # 图像检索
     ├── list_images.txt                                      # 图像匹配配置文件
     ├── train.py                                             # 训练脚本
     ├── delf_config.yaml                                     # 训练配置文件
@@ -282,32 +288,32 @@ bash scripts/download_gldv2.sh 500 [DATASET_PATH] [NEED_ROMOVE_TAR]
 .
 └─ gldv2
     ├── train
-    │   ├── 0                                                # 图片存放的文件夹，共15个
-    │   ├── 1
-    │   ├── ...
-    │   ├── f
-    │   ├── md5.images_000.txt                               # md5校验文件，共500个
-    │   ├── md5.images_001.txt
-    │   ├── ...
-    │   ├── md5.images_499.txt
-    │   ├── images_000.tar                                   # 图像压缩包，共500个
-    │   ├── images_001.tar
-    │   ├── ...
-    │   ├── images_499.tar
-    │   ├── train_attribution.csv                            # 保存图像标签属性等信息的文件
-    │   ├── train_clean.csv
-    │   ├── train.csv
-    │   └── train_label_to_category.csv
+    │   ├── 0                                                # 图片存放的文件夹，共15个
+    │   ├── 1
+    │   ├── ...
+    │   ├── f
+    │   ├── md5.images_000.txt                               # md5校验文件，共500个
+    │   ├── md5.images_001.txt
+    │   ├── ...
+    │   ├── md5.images_499.txt
+    │   ├── images_000.tar                                   # 图像压缩包，共500个
+    │   ├── images_001.tar
+    │   ├── ...
+    │   ├── images_499.tar
+    │   ├── train_attribution.csv                            # 保存图像标签属性等信息的文件
+    │   ├── train_clean.csv
+    │   ├── train.csv
+    │   └── train_label_to_category.csv
     ├── mindrecord
-    │   ├── relabeling.csv                                   # 图像标签文件
-    │   ├── train.mindrecord000                              # mindrecord文件，，共128x2个
-    │   ├── train.mindrecord000.db
-    │   ├── train.mindrecord001
-    │   ├── train.mindrecord001.db
-    │   ├── ...
-    │   ├── ...
-    │   ├── train.mindrecord127
-    │   └── train.mindrecord127.db
+    │   ├── relabeling.csv                                   # 图像标签文件
+    │   ├── train.mindrecord000                              # mindrecord文件，，共128x2个
+    │   ├── train.mindrecord000.db
+    │   ├── train.mindrecord001
+    │   ├── train.mindrecord001.db
+    │   ├── ...
+    │   ├── ...
+    │   ├── train.mindrecord127
+    │   └── train.mindrecord127.db
 ```
 
 ​ 使用以下命令可以下载Oxford5k和Paris6k的数据集：
@@ -350,18 +356,19 @@ bash scripts/download_paris.sh [DATASET_PATH]
   为了让模型达到更好更快地收敛，delf模型需要进行两个阶段的训练，微调阶段和注意力训练阶段，微调阶段运行命令：
 
   ```bash
-  python train.py --train_state=tuning > train_tuning.log 2>&1 &
+  bash scripts/run_1p_train.sh tuning
   ```
 
   注意力训练阶段运行命令：
 
   ```bash
-  python train.py --train_state=attn --checkpoint_path=/home/delf/ckpt/checkpoint_delf_tuning-1_4989.ckpt > train_attn.log 2>&1 &
+  bash scripts/run_1p_train.sh attn [CHECKPOINT]
+  # example: bash scripts/run_1p_train.sh attn ./ckpt/checkpoint_delf_tuning-1_4989.ckpt
   ```
 
   需要注意的是注意力训练阶段要载入微调阶段已经训练好的checkpoint权重。
 
-  上述python命令将在后台运行，您可以通过train_tuning.log或train_attn.log文件查看结果。
+  上述命令将在后台运行，您可以通过train_tuning.log或train_attn.log文件查看结果。
 
   训练结束后，您可在默认脚本文件夹的`ckpt`目录下找到检查点文件。
 
@@ -424,7 +431,7 @@ bash scripts/download_paris.sh [DATASET_PATH]
   bash scripts/run_eval_match_images.sh [IMAGES_PATH] [CHECKPOINT] [DEVICES]
   ```
 
-  上述python命令将在后台打印日志，您可以通过`extract_feature.log`文件查看特征提取情况，通过`match_images.log`文件查看特征匹配情况。最后得到展示两个图像匹配特征的图片，它会保存为默认脚本目录下的`eval_match.png`。
+  上述命令将在后台打印日志，您可以通过`extract_feature.log`文件查看特征提取情况，通过`match_images.log`文件查看特征匹配情况。最后得到展示两个图像匹配特征的图片，它会保存为默认脚本目录下的`eval_match.png`。
 
   注：对于分布式训练后评估，请将checkpoint_path设置为最后保存的检查点文件，如`/username/delf/train_parallel0/ckpt/attn-1-4898.ckpt`。
 
@@ -440,7 +447,7 @@ bash scripts/download_paris.sh [DATASET_PATH]
   bash scripts/run_eval_retrieval_images.sh [IMAGES_PATH] [GT_PATH] [CHECKPOINT] [DEVICES]
   ```
 
-  上述python命令将在后台打印日志，您可以通过`extract_feature.log`文件查看特征提取情况，通过`./retrieval_dataset/process[X]/retrieval[X].log`文件查看检索情况，通过`calculate_mAP.log`文件查看计算mAP的情况。计算得到的mAP结果会在脚本运行完成后打印在终端，也会保存到默认脚本目录下的mAP.txt文件中：
+  上述命令将在后台打印日志，您可以通过`extract_feature.log`文件查看特征提取情况，通过`./retrieval_dataset/process[X]/retrieval[X].log`文件查看检索情况，通过`calculate_mAP.log`文件查看计算mAP的情况。计算得到的mAP结果会在脚本运行完成后打印在终端，也会保存到默认脚本目录下的mAP.txt文件中：
 
   ```matlab
   # cat mAP.txt
