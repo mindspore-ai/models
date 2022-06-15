@@ -45,7 +45,8 @@ do
                 python train.py \
                 --run_distribute=$DISTRIBUTE \
                 --device_num=$RANK_SIZE \
-                --device_id=$DEVICE_ID > log.txt 2>&1 &
+                --device_id=$DEVICE_ID \
+                --device_target="Ascend" > log.txt 2>&1 &
         fi
         cd ../
 done
