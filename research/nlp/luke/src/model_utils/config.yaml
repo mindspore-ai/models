@@ -15,6 +15,7 @@ local_checkpoint_url: "/cache/ckpt_url"
 # options
 model_file: "./pre_luke/luke_large"
 data: "./squad_data"
+model_type: "luke-large"
 
 # create squad data
 wikipedia: "./enwiki_dataset"
@@ -41,7 +42,9 @@ adam_eps: 0.000001 # 1e-6
 warmup_proportion: 0.09
 seed: 14
 duoka: False
+distribute: False
 dataset_sink_mode: False
+device: GPU
 
 # eval
 checkpoint_file: "./output/luke.ckpt"
@@ -50,6 +53,7 @@ eval_batch_size: 8
 # export option
 export_batch_size: 8
 file_name: "luke_squad"
+file_format: 'MINDIR'
 
 # preprocess
 result_path: "./preprocess_result/"
@@ -61,6 +65,7 @@ result_dir: ./result_files
 
 # Help description for each configuration
 modelArts: "use modelArt"
+file_format: "export file format"
 
 # Url for modelarts
 data_url: "obs data url"
