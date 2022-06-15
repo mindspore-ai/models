@@ -12,6 +12,7 @@
             - [分布式训练](#分布式训练)
         - [评估过程](#评估过程)
             - [评估](#评估)
+            - [ONNX评估](#ONNX评估)
         - [导出mindir模型](#导出mindir模型)
         - [推理过程](#推理过程)
             - [用法](#用法)
@@ -107,7 +108,9 @@ python src/rec2jpg_dataset.py --include rec/dataset/path --output output/path
   ├── run_distribute_train.sh    // 用于分布式训练的shell脚本
   ├── run_standalone_train.sh    // 用于单机训练的shell脚本
   ├── run_eval_ijbc.sh           // 用于IJBC数据集评估的shell脚本
-  └── run_eval.sh                // 用于评估的shell脚本
+  ├── run_eval.sh                // 用于评估的shell脚本
+  ├── run_eval_ijbc_onnx.sh      // 用于IJBC数据集ONNX评估的shell脚本
+  └── run_eval_onnx.sh           // 用于ONNX评估的shell脚本
  ├──src
   ├── loss.py                         //损失函数
   ├── dataset.py                      // 创建数据集
@@ -119,6 +122,8 @@ python src/rec2jpg_dataset.py --include rec/dataset/path --output output/path
  ├── requirements.txt
  ├── preprocess.py                    // 310推理数据预处理
  ├── preprocess.py                    // 310推理数据后处理
+ ├── eval_onnx.py                     // ONNX评估
+ └── eval_ijbc_onnx.py                // IJBC数据集的ONNX评估
 
 ```
 
@@ -272,6 +277,85 @@ train.py和val.py中主要参数如下：
   | ijbc-IJBC | 86.67 | 94.35 | 96.19  | 97.55 | 98.38 | 99.10 |
   +-----------+-------+-------+--------+-------+-------+-------+
   ```
+
+### ONNX评估
+
+评估所需ckpt获取地址：[获取地址](https://www.mindspore.cn/resources/hub/details?MindSpore/1.6/arcface_ms1mv2)
+
+在执行评估之前，需要通过export.py导出onnx文件。
+
+'''python
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --batch_size [BATCH_SIZE] --file_format ONNX
+'''
+
+- 在GPU环境中运行ONNX评估lfw、cfp_fp、agedb_30、calfw、cplfw数据集
+
+  ```bash
+  bash run_eval_onnx.sh /path/evalset /path/onnx
+
+  # 使用onnx评估的示例：
+  python export.py --batch_size 64 --ckpt_file ./arcface_ascend_v160_ms1mv2_research_cv_IJBB97.67_IJBC98.36.ckpt --file_name onnx_64 --file_format ONNX --device_target GPU
+  cd ./scripts/
+  bash run_eval_onnx.sh ../dataset/ ../onnx_64.onnx
+  ```
+
+  上述python命令将在后台运行，您可以通过eval_onnx.log文件查看结果。测试数据集的准确性如下：
+
+  ```bash
+  [lfw]Accuracy-Flip: 0.99750+-0.00291
+  [cfp_fp]Accuracy-Flip: 0.98500+-0.00643
+  [agedb_30]Accuracy-Flip: 0.98050+-0.00778
+  [calfw]Accuracy-Flip: 0.96117+-0.01118
+  [cplfw]Accuracy-Flip: 0.92900+-0.01250
+  ```
+
+- 在GPU环境运行ONNX评估IJB-B数据集
+
+  在运行以下命令之前，请检查用于评估的检查点路径。请确保传入的评估数据集路径为“IJB_release/IJBB/”。
+
+  ```bash
+  bash run_eval_ijbc_onnx.sh /path/evalset path/onnx_bs path/onnx_rs IJBB
+
+  # 使用onnx评估的示例：
+  python export.py --batch_size 256 --ckpt_file ./arcface_ascend_v160_ms1mv2_research_cv_IJBB97.67_IJBC98.36.ckpt --file_name onnx_256 --file_format ONNX --device_target GPU
+  python export.py --batch_size 92 --ckpt_file ./arcface_ascend_v160_ms1mv2_research_cv_IJBB97.67_IJBC98.36.ckpt --file_name onnx_92 --file_format ONNX --device_target GPU
+  cd ./scripts/
+  bash run_eval_ijbc_onnx.sh ../dataset/IJB_release/IJBB ../onnx_256.onnx ../onnx_92.onnx IJBB
+  ```
+
+  上述python命令将在后台运行，您可以通过eval_onnx_IJBB.log文件查看结果。测试数据集的准确性如下：
+
+  '''bash
+  +-----------+-------+-------+--------+-------+-------+-------+
+  |  Methods  | 1e-06 | 1e-05 | 0.0001 | 0.001 |  0.01 |  0.1  |
+  +-----------+-------+-------+--------+-------+-------+-------+
+  | ijbb-IJBB | 46.81 | 89.89 | 94.81  | 96.54 | 97.68 | 98.70 |
+  +-----------+-------+-------+--------+-------+-------+-------+
+  '''
+
+- 在GPU环境运行ONNX评估IJB-C数据集
+
+  在运行以下命令之前，请检查用于评估的检查点路径。请确保传入的评估数据集路径为“IJB_release/IJBC/”。
+
+  ```bash
+  bash run_eval_ijbc_onnx.sh /path/evalset path/onnx_bs path/onnx_rs IJBC
+
+  # 使用onnx评估的示例：
+  python export.py --batch_size 256 --ckpt_file ./arcface_ascend_v160_ms1mv2_research_cv_IJBB97.67_IJBC98.36.ckpt --file_name onnx_256 --file_format ONNX --device_target GPU
+  python export.py --batch_size 254 --ckpt_file ./arcface_ascend_v160_ms1mv2_research_cv_IJBB97.67_IJBC98.36.ckpt --file_name onnx_254 --file_format ONNX --device_target GPU
+  cd ./scripts/
+  bash run_eval_ijbc_onnx.sh ../dataset/IJB_release/IJBC ../onnx_256.onnx ../onnx_254.onnx IJBC
+  ```
+
+  上述python命令将在后台运行，您可以通过eval_onnx_IJBC.log文件查看结果。测试数据集的准确性如下：
+
+  '''bash
+  +-----------+-------+-------+--------+-------+-------+-------+
+  |  Methods  | 1e-06 | 1e-05 | 0.0001 | 0.001 |  0.01 |  0.1  |
+  +-----------+-------+-------+--------+-------+-------+-------+
+  | ijbc-IJBC | 88.76 | 94.39 | 96.28  | 97.52 | 98.36 | 99.12 |
+  +-----------+-------+-------+--------+-------+-------+-------+
+  '''
 
 ## 导出mindir模型
 
