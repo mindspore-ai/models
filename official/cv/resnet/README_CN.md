@@ -773,6 +773,8 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 
 针对ResNet50，金箍棒提供了SimQAT和SCOP算法，SimQAT是一种量化感知训练算法，通过引入伪量化节点来训练网络中的某些层的量化参数，从而在部署阶段，模型得以以更小的功耗或者更高的性能进行推理。SCOP算法提出一种可靠剪枝方法，通过构建一种科学控制机制减少所有潜在不相关因子的影响，有效的按比例进行节点删除，从而实现模型小型化。
 
+针对ResNet18，金箍棒引入了华为自研量化算法SLB，SLB是一种基于权值搜索的低比特量化算法，利用连续松弛策略搜索离散权重，训练时优化离散权重的分布，最后根据概率挑选离散权重实现量化。与传统的量化算法相比，规避了不准确的梯度更新过程，在极低比特量化中更有优势。
+
 ## 训练过程
 
 ### GPU处理器环境运行
@@ -795,10 +797,6 @@ bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/
 cd ./golden_stick/scripts/
 bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt
 
-# 分布式训练示例（应用SCOP算法进行剪枝训练）
-cd ./golden_stick/scripts/
-bash run_distribute_train_gpu.sh ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml ./cifar10/train/ PRETRAINED /path/to/pretrained_ckpt
-
 # 单机训练
 cd ./golden_stick/scripts/
 # PYTHON_PATH 表示需要应用的算法的'train.py'脚本所在的目录。
@@ -815,7 +813,12 @@ bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/
 # 单机训练示例（应用SimQAT算法并加载上次量化训练的checkoutpoint，继续进行量化训练）
 cd ./golden_stick/scripts/
 bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt
+
+# 针对不同的量化算法，只需替换PYTHON_PATH CONFIG_FILE即可，以SLB算法为例：
+bash run_standalone_train_gpu.sh ../quantization/slb/ ../quantization/slb/resnet18_cifar10_config.yaml ./cifar10/train/
 ```
+
+- 当前SLB只支持单机训练，且不支持加载预训练的全精度checkpoint
 
 ## 评估过程
 
@@ -832,6 +835,9 @@ bash run_eval_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CHECKPOINT_PATH
 # 评估示例
 cd ./golden_stick/scripts/
 bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml ./cifar10/train/ ./checkpoint/resnet-90.ckpt
+
+# 针对不同的量化算法，只需替换PYTHON_PATH CONFIG_FILE即可，以SLB算法为例：
+bash run_eval_gpu.sh ../quantization/slb/ ../quantization/slb/resnet18_cifar10_config.yaml ./cifar10/train/ ./checkpoint/resnet-100.ckpt
 ```
 
 ### 结果
@@ -840,14 +846,38 @@ bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cif
 
 - 使用SimQAT算法量化ResNet50，并使用CIFAR-10数据集评估：
 
-```bash
+```text
 result:{'top_1_accuracy': 0.9354967948717948, 'top_5_accuracy': 0.9981971153846154} ckpt=~/resnet50_cifar10/train_parallel0/resnet-180_195.ckpt
 ```
 
-- 使用SCOP算法剪枝ResNet，并使用CIFAR-10数据集评估：
+- 使用SCOP算法剪枝ResNet50，并使用CIFAR-10数据集评估：
 
 ```text
 result:{'top_1_accuracy': 0.9273838141025641} prune_rate=0.45 ckpt=~/resnet50_cifar10/train_parallel0/resnet-400_390.ckpt
+```
+
+- 使用SLB算法对ResNet18做W4A8量化，并使用CIFAR-10数据集评估，W4A8表示weight量化为4bit，activation量化为8bit：
+
+```text
+result:{'top_1_accuracy': 0.9285857371794872, 'top_5_accuracy': 0.9959935897435898} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+```
+
+- 使用SLB算法对ResNet18做W2A8量化，并使用CIFAR-10数据集评估，W2A8表示weight量化为2bit，activation量化为8bit：
+
+```text
+result:{'top_1_accuracy': 0.9207732371794872, 'top_5_accuracy': 0.9955929487179487} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+```
+
+- 使用SLB算法对ResNet18做W1A8量化，并使用CIFAR-10数据集评估，W1A8表示weight量化为1bit，activation量化为8bit：
+
+```text
+result:{'top_1_accuracy': 0.8976362179487182, 'top_5_accuracy': 0.9923878205128205} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+```
+
+- 使用SLB算法对ResNet18做W1A4量化，并使用CIFAR-10数据集评估，W1A4表示weight量化为1bit，activation量化为4bit：
+
+```text
+result:{'top_1_accuracy': 0.8845152243589743, 'top_5_accuracy': 0.9914863782051282} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
 ```
 
 ## 推理过程
