@@ -58,8 +58,9 @@
 
 # [环境要求](#目录)
 
-- 硬件（Ascend）
+- 硬件
     - 使用Ascend来搭建硬件环境。
+    - 使用GPU来搭建硬件环境。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
@@ -77,6 +78,9 @@
       ├──run_standalone_train_ascend.sh   // 单卡Ascend910训练脚本
       ├──run_distribute_train_ascend.sh   // 多卡Ascend910训练脚本
       ├──run_eval_ascend.sh               // 测试脚本
+      ├──run_standalone_train_gpu.sh      // 单卡GPU训练脚本
+      ├──run_distribute_train_gpu.sh      // 多卡GPU训练脚本
+      ┕──run_eval_gpu.sh                  // 测试脚本
   ├── src
       ├──configs                          // ConvNeXt的配置文件
       ├──data                             // 数据集配置文件
@@ -178,6 +182,27 @@
 
   [hccl工具](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
 
+- GPU环境运行
+
+  ```bash
+  # 使用python启动单卡训练
+  python train.py --device_id 0 --device_target GPU --config ./src/configs/convnext_tiny_gpu.yaml \
+  > train.log 2>&1 &
+
+  # 使用脚本启动单卡训练
+  bash ./scripts/run_standalone_train_gpu.sh [DEVICE_ID] [CONFIG_PATH]
+
+  # 使用脚本启动多卡训练
+  bash ./scripts/run_distribute_train_gpu.sh [CUDA_VISIBLE_DEVICES] [CONFIG_PATH]
+
+  # 使用python启动单卡运行评估示例
+  python eval.py --device_id 0 --device_target GPU --config ./src/configs/convnext_tiny.yaml \
+  --pretrained ./ckpt_0/convnext_tiny.ckpt > ./eval.log 2>&1 &
+
+  # 使用脚本启动单卡运行评估示例
+  bash ./scripts/run_eval_run.sh [DEVICE_ID] [CONFIG_PATH] [CHECKPOINT_PATH]
+  ```
+
 ## 导出过程
 
 ### 导出
@@ -196,22 +221,24 @@
 
 #### ImageNet-1k上的ConvNeXt
 
-| 参数                 | Ascend                                                       |
-| -------------------------- | ----------------------------------------------------------- |
-|模型|ConvNeXt|
-| 模型版本              | convnext_tiny                                                |
-| 资源                   | Ascend 910               |
-| 上传日期              | 2022-01-23                                 |
-| MindSpore版本          | 1.3.0                                                 |
-| 数据集                    | ImageNet-1k Train，共1,281,167张图像                                              |
-| 训练参数        | epoch=300, batch_size=256            |
-| 优化器                  | AdamWeightDecay                                                    |
-| 损失函数              | SoftTargetCrossEntropy                                       |
-| 损失| 0.8114|
-| 输出                    | 概率                                                 |
-| 分类准确率             | 八卡：top1:82.072% top5:95.694%                   |
-| 速度                      | 16卡：1106.875毫秒/步                        |
-| 训练耗时          |31h36min04s（run on ModelArts）|
+| 参数          | Ascend                               | GPU                                  |
+| ------------- | ------------------------------------ | ------------------------------------ |
+| 模型          | ConvNeXt                             | ConvNeXt                             |
+| 模型版本      | convnext_tiny                        | convnext_tiny                        |
+| 资源          | Ascend 910                           | NVIDIA GeForce RTX 3090              |
+| 上传日期      | 2022-01-23                           | 2022-05-23                           |
+| MindSpore版本 | 1.3.0                                | 1.7.0                                |
+| 数据集        | ImageNet-1k Train，共1,281,167张图像 | ImageNet-1k Train，共1,281,167张图像 |
+| 训练参数      | epoch=300, batch_size=256            | epoch=300, batch_size=224            |
+| 优化器        | AdamWeightDecay                      | AdamWeightDecay                      |
+| 损失函数      | SoftTargetCrossEntropy               | SoftTargetCrossEntropy               |
+| 损失          | 0.8114                               | 0.7939                               |
+| 输出          | 概率                                 | 概率                                 |
+| 分类准确率    | 八卡：top1:82.072% top5:95.694%      | 8卡：top1:81.504% top5:95.630%       |
+| 速度          | 16卡：1106.875毫秒/步                | 8卡：6103.531毫秒/步                 |
+| 训练耗时      | 31h36min04s（run on ModelArts）      | 415h30min43s                         |
+
+GPU训练经过多次调参，目前最好能达到81.504%，但是由于需要的算力太多，没有再做过多的尝试，用户在使用过程中可以基于使用的数据集进行调参
 
 # ModelZoo主页
 
