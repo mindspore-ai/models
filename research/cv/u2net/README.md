@@ -85,7 +85,7 @@ cd scripts
 ./run_distribute_train.sh [/path/to/content] [/path/to/label] [/path/to/RANK_TABLE_FILE]
 
 # standalone training
-python train.py --content_path [/path/to/content] --label_path [/path/to/label]
+bash scripts/run_standalone_train.sh [/path/to/content] [/path/to/label] [DEVICE_TARGET]
 ```
 
 ### Training Result
@@ -156,7 +156,7 @@ python eval.py --pred_dir [/path/to/pred_dir] --label_dir [/path/to/label] &>eva
 
 ```bash
 # standalone training
-python train.py --content_path [/path/to/content] --label_path [/path/to/label]
+bash scripts/run_standalone_train.sh [/path/to/content] [/path/to/label] [DEVICE_TARGET]
 ```
 
 ### [Distributed Training](#contents)
