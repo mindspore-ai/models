@@ -83,7 +83,7 @@ class Val_Callback(Callback):
     """
 
     def __init__(self, model, train_dataset, val_dataset, checkpoint_path, prefix,
-                 network, img_size, device_id=0, is_eval_train_dataset='False'):
+                 network, img_size, rank_id=0, is_eval_train_dataset='False'):
         super(Val_Callback, self).__init__()
         self.model = model
         self.train_dataset = train_dataset
@@ -93,7 +93,7 @@ class Val_Callback(Callback):
         self.prefix = prefix
         self.network = network
         self.img_size = img_size
-        self.device_id = device_id
+        self.rank_id = rank_id
         self.is_eval_train_dataset = is_eval_train_dataset
 
     def epoch_end(self, run_context):
@@ -118,7 +118,7 @@ class Val_Callback(Callback):
             self.max_val_acc = val_acc
             cb_params = run_context.original_args()
             epoch = cb_params.cur_epoch_num
-            model_info = self.prefix + '_id' + str(self.device_id) + \
+            model_info = self.prefix + '_id' + str(self.rank_id) + \
                 '_epoch' + str(epoch) + '_valacc' + str(val_acc)
             if self.checkpoint_path.startswith('s3://') or self.checkpoint_path.startswith('obs://'):
                 save_path = '/cache/save_model/'
