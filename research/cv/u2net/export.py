@@ -31,7 +31,6 @@ args = parser.parse_args()
 context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
 
 if __name__ == '__main__':
-    context.set_context(device_id="Ascend")
     net = U2NET()
     param_dict = load_checkpoint(args.ckpt_file)
     load_param_into_net(net, param_dict)
