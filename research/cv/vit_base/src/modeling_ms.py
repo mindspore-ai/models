@@ -27,9 +27,6 @@ def swish(x):
     return x * P.Sigmoid()(x)
 
 
-ACT2FN = {"gelu": nn.GELU(), "relu": P.ReLU(), "swish": swish}
-
-
 class Attention(nn.Cell):
     """Attention"""
     def __init__(self, config):
@@ -87,7 +84,7 @@ class Mlp(nn.Cell):
                             weight_init='XavierUniform', bias_init='Normal')
         self.fc2 = nn.Dense(config.transformer_mlp_dim, config.hidden_size,
                             weight_init='XavierUniform', bias_init='Normal')
-        self.act_fn = ACT2FN["gelu"]
+        self.act_fn = nn.GELU()
         self.dropout = nn.Dropout(config.transformer_dropout_rate)
 
     def construct(self, x):
