@@ -30,8 +30,8 @@ run_ascend()
         FILTER_HEAD=$9
     else
         echo "Usage:
-              Ascend: sh run_train.sh Ascend [CONFIG_FILE] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH] [CKPT_PATH](optional) [FREEZE_LAYER](optional) [FILTER_HEAD](optional)
-              Ascend: sh run_train.sh Ascend [CONFIG_FILE] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH]"
+              Ascend: sh run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH] [CKPT_PATH](optional) [FREEZE_LAYER](optional) [FILTER_HEAD](optional)
+              Ascend: sh run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH]"
         exit 1
     fi;
 
@@ -46,9 +46,18 @@ run_ascend()
         echo "error: DATASET_PATH=$6 is not a directory or file"
     exit 1
     fi
-    BASEPATH=$(cd "`dirname $0`" || exit; pwd)
-    CONFIG_FILE="${BASEPATH}/../$2"
 
+    get_real_path(){
+        if [ "${1:0:1}" == "/" ]; then
+            echo "$1"
+        else
+            echo "$(realpath -m $PWD/$1)"
+        fi
+    }
+    
+    CONFIG_FILE=$(get_real_path $2)
+    DATASET_PATH=$(get_real_path $6)
+    
     VISIABLE_DEVICES=$4
     IFS="," read -r -a CANDIDATE_DEVICE <<< "$VISIABLE_DEVICES"
     if [ ${#CANDIDATE_DEVICE[@]} -ne $3 ]
@@ -74,7 +83,7 @@ run_ascend()
             --run_distribute=$RUN_DISTRIBUTE \
             --config_path=$CONFIG_FILE \
             --platform=$1 \
-            --dataset_path=$6 \
+            --dataset_path=$DATASET_PATH \
             --pretrain_ckpt=$PRETRAINED_CKPT \
             --freeze_layer=$FREEZE_LAYER \
             --filter_head=$FILTER_HEAD \
@@ -103,7 +112,7 @@ run_ascend()
             --run_distribute=$RUN_DISTRIBUTE \
             --config_path=$CONFIG_FILE \
             --platform=$1 \
-            --dataset_path=$6 \
+            --dataset_path=$DATASET_PATH \
             --pretrain_ckpt=$PRETRAINED_CKPT \
             --freeze_layer=$FREEZE_LAYER \
             --filter_head=$FILTER_HEAD \
@@ -114,33 +123,42 @@ run_ascend()
 
 run_gpu()
 {
-    if [ $# = 4 ] ; then
+    if [ $# = 5 ] ; then
         PRETRAINED_CKPT=""
         FREEZE_LAYER="none"
         FILTER_HEAD="False"
-    elif [ $# = 6 ] ; then
-        PRETRAINED_CKPT=$5
-        FREEZE_LAYER=$6
-        FILTER_HEAD="False"
     elif [ $# = 7 ] ; then
-        PRETRAINED_CKPT=$5
-        FREEZE_LAYER=$6
-        FILTER_HEAD=$7
+        PRETRAINED_CKPT=$6
+        FREEZE_LAYER=$7
+        FILTER_HEAD="False"
+    elif [ $# = 8 ] ; then
+        PRETRAINED_CKPT=$6
+        FREEZE_LAYER=$7
+        FILTER_HEAD=$8
     else
         echo "Usage:
-              GPU: sh run_train.sh GPU [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH](optional) [FREEZE_LAYER](optional) [FILTER_HEAD](optional)
-              GPU: sh run_train.sh GPU [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]"
+              GPU: sh run_train.sh GPU [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH](optional) [FREEZE_LAYER](optional) [FILTER_HEAD](optional)
+              GPU: sh run_train.sh GPU [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]"
         exit 1
     fi;
 
-    if [ ! -d $4 ]
+    if [ ! -d $5 ]
     then
-        echo "error: DATASET_PATH=$4 is not a directory"
+        echo "error: DATASET_PATH=$5 is not a directory"
     exit 1
     fi
 
+    get_real_path(){
+        if [ "${1:0:1}" == "/" ]; then
+            echo "$1"
+        else
+            echo "$(realpath -m $PWD/$1)"
+        fi
+    }
+
     BASEPATH=$(cd "`dirname $0`" || exit; pwd)
-    CONFIG_FILE="${BASEPATH}/../default_config_gpu.yaml"
+    CONFIG_FILE=$(get_real_path $2)
+    DATASET_PATH=$(get_real_path $5)
 
     export PYTHONPATH=${BASEPATH}:$PYTHONPATH
     if [ -d "../train" ];
@@ -150,33 +168,33 @@ run_gpu()
     mkdir ../train
     cd ../train || exit
 
-    export CUDA_VISIBLE_DEVICES="$3"
+    export CUDA_VISIBLE_DEVICES="$4"
 
-    if [ $2 -eq 1 ] ; then
+    if [ $3 -eq 1 ] ; then
         RUN_DISTRIBUTE=False
         nohup python ${BASEPATH}/../train.py \
         --config_path=$CONFIG_FILE \
         --platform=$1 \
         --run_distribute=$RUN_DISTRIBUTE \
-        --dataset_path=$4 \
+        --dataset_path=$DATASET_PATH \
         --pretrain_ckpt=$PRETRAINED_CKPT \
         --freeze_layer=$FREEZE_LAYER \
         --filter_head=$FILTER_HEAD \
         &> ../train.log &
         exit 1
-    elif [ $2 -gt 1 ] && [ $2 -le 8 ] ; then
+    elif [ $3 -gt 1 ] && [ $3 -le 8 ] ; then
         RUN_DISTRIBUTE=True
     else
-        echo "error: DEVICE_NUM=$2 is not in (1-8)"
+        echo "error: DEVICE_NUM=$3 is not in (1-8)"
         exit 1
     fi;
 
-    mpirun -n $2 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+    mpirun -n $3 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
     python ${BASEPATH}/../train.py \
         --config_path=$CONFIG_FILE \
         --platform=$1 \
         --run_distribute=$RUN_DISTRIBUTE \
-        --dataset_path=$4 \
+        --dataset_path=$DATASET_PATH \
         --pretrain_ckpt=$PRETRAINED_CKPT \
         --freeze_layer=$FREEZE_LAYER \
         --filter_head=$FILTER_HEAD \
@@ -185,32 +203,41 @@ run_gpu()
 
 run_cpu()
 {
-    if [ $# = 2 ] ; then
+    if [ $# = 3 ] ; then
         PRETRAINED_CKPT=""
         FREEZE_LAYER="none"
         FILTER_HEAD="False"
-    elif [ $# = 4 ] ; then
-        PRETRAINED_CKPT=$3
-        FREEZE_LAYER=$4
-        FILTER_HEAD="False"
     elif [ $# = 5 ] ; then
-        PRETRAINED_CKPT=$3
-        FREEZE_LAYER=$4
-        FILTER_HEAD=$5
+        PRETRAINED_CKPT=$4
+        FREEZE_LAYER=$5
+        FILTER_HEAD="False"
+    elif [ $# = 6 ] ; then
+        PRETRAINED_CKPT=$4
+        FREEZE_LAYER=$5
+        FILTER_HEAD=$6
     else
         echo "Usage:
-              CPU: sh run_train.sh CPU [DATASET_PATH]
-              CPU: sh run_train.sh CPU [DATASET_PATH] [CKPT_PATH](optional) [FREEZE_LAYER](optional) [FILTER_HEAD](optional)"
+              CPU: sh run_train.sh CPU [CONFIG_PATH] [DATASET_PATH]
+              CPU: sh run_train.sh CPU [CONFIG_PATH] [DATASET_PATH] [CKPT_PATH](optional) [FREEZE_LAYER](optional) [FILTER_HEAD](optional)"
         exit 1
     fi;
-    if [ ! -d $2 ]
+    if [ ! -d $3 ]
     then
-        echo "error: DATASET_PATH=$2 is not a directory"
+        echo "error: DATASET_PATH=$3 is not a directory"
     exit 1
     fi
 
+    get_real_path(){
+        if [ "${1:0:1}" == "/" ]; then
+            echo "$1"
+        else
+            echo "$(realpath -m $PWD/$1)"
+        fi
+    }
+
     BASEPATH=$(cd "`dirname $0`" || exit; pwd)
-    CONFIG_FILE="${BASEPATH}/../default_config_cpu.yaml"
+    CONFIG_FILE=$(get_real_path $2)
+    DATASET_PATH=$(get_real_path $3)
 
     export PYTHONPATH=${BASEPATH}:$PYTHONPATH
     if [ -d "../train" ];
@@ -223,7 +250,7 @@ run_cpu()
     python ${BASEPATH}/../train.py \
         --config_path=$CONFIG_FILE \
         --platform=$1 \
-        --dataset_path=$2 \
+        --dataset_path=$DATASET_PATH \
         --pretrain_ckpt=$PRETRAINED_CKPT \
         --freeze_layer=$FREEZE_LAYER \
         --filter_head=$FILTER_HEAD \
