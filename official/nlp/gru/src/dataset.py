@@ -39,8 +39,8 @@ def create_gru_dataset(epoch_count=1, batch_size=1, rank_size=1, rank_id=0, do_s
     ds = ds.map(operations=operations, input_columns=["source_ids", "target_ids", "target_mask"],
                 output_columns=["source_ids", "target_ids", "teacher_force"],
                 column_order=["source_ids", "target_ids", "teacher_force"])
-    type_cast_op = deC.TypeCast(mstype.int32)
-    type_cast_op_bool = deC.TypeCast(mstype.bool_)
+    type_cast_op = deC.c_transforms.TypeCast(mstype.int32)
+    type_cast_op_bool = deC.c_transforms.TypeCast(mstype.bool_)
     ds = ds.map(operations=type_cast_op, input_columns="source_ids")
     ds = ds.map(operations=type_cast_op, input_columns="target_ids")
     ds = ds.map(operations=type_cast_op_bool, input_columns="teacher_force")
