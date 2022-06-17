@@ -1,4 +1,4 @@
-# Copyright 2021-2022 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,8 +19,9 @@ import os
 
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
-import mindspore.dataset.transforms as C
-import mindspore.dataset.vision as vision
+import mindspore.dataset.transforms.c_transforms as C
+import mindspore.dataset.vision.c_transforms as vision
+import mindspore.dataset.vision.py_transforms as py_vision
 from mindspore.dataset.vision.utils import Inter
 
 from src.data.augment.auto_augment import _pil_interp, rand_augment_transform
@@ -62,16 +63,14 @@ def create_dataset_imagenet(dataset_dir, args, repeat_num=1, training=True):
     Returns:
         dataset
     """
-
     device_num, rank_id = _get_rank_info()
     shuffle = bool(training)
     if device_num == 1 or not training:
         data_set = ds.ImageFolderDataset(dataset_dir, num_parallel_workers=args.num_parallel_workers,
                                          shuffle=shuffle)
     else:
-        data_set = ds.ImageFolderDataset(dataset_dir, num_parallel_workers=args.num_parallel_workers, shuffle=shuffle,
+        data_set = ds.ImageFolderDataset(dataset_dir, shuffle=shuffle, num_parallel_workers=args.num_parallel_workers,
                                          num_shards=device_num, shard_id=rank_id)
-
     image_size = args.image_size
 
     # define map operations
@@ -93,12 +92,12 @@ def create_dataset_imagenet(dataset_dir, args, repeat_num=1, training=True):
             vision.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(3 / 4, 4 / 3),
                                           interpolation=Inter.BICUBIC),
             vision.RandomHorizontalFlip(prob=0.5),
-            vision.ToPIL()
+            py_vision.ToPIL()
         ]
         transform_img += [rand_augment_transform(auto_augment, aa_params)]
         transform_img += [
-            vision.ToTensor(),
-            vision.Normalize(mean=mean, std=std, is_hwc=False),
+            py_vision.ToTensor(),
+            py_vision.Normalize(mean=mean, std=std),
             RandomErasing(args.re_prob, mode=args.re_mode, max_count=args.re_count)
         ]
     else:
@@ -110,24 +109,23 @@ def create_dataset_imagenet(dataset_dir, args, repeat_num=1, training=True):
                 vision.Decode(),
                 vision.Resize(int(256 / 224 * image_size), interpolation=Inter.BICUBIC),
                 vision.CenterCrop(image_size),
-                vision.Normalize(mean=mean, std=std, is_hwc=True),
+                vision.Normalize(mean=mean, std=std),
                 vision.HWC2CHW()
             ]
         else:
             transform_img = [
                 vision.Decode(),
                 vision.Resize(int(image_size), interpolation=Inter.BICUBIC),
-                vision.Normalize(mean=mean, std=std, is_hwc=True),
+                vision.Normalize(mean=mean, std=std),
                 vision.HWC2CHW()
             ]
 
     transform_label = C.TypeCast(mstype.int32)
-
     data_set = data_set.map(input_columns="image", num_parallel_workers=args.num_parallel_workers,
                             operations=transform_img)
     data_set = data_set.map(input_columns="label", num_parallel_workers=args.num_parallel_workers,
                             operations=transform_label)
-    if (args.mix_up > 0. or args.cutmix > 0.)  and not training:
+    if (args.mix_up > 0. or args.cutmix > 0.) and not training:
         # if use mixup and not training(False), one hot val data label
         one_hot = C.OneHot(num_classes=args.num_classes)
         data_set = data_set.map(input_columns="label", num_parallel_workers=args.num_parallel_workers,
@@ -135,7 +133,6 @@ def create_dataset_imagenet(dataset_dir, args, repeat_num=1, training=True):
     # apply batch operations
     data_set = data_set.batch(args.batch_size, drop_remainder=True,
                               num_parallel_workers=args.num_parallel_workers)
-
     if (args.mix_up > 0. or args.cutmix > 0.) and training:
         mixup_fn = Mixup(
             mixup_alpha=args.mix_up, cutmix_alpha=args.cutmix, cutmix_minmax=None,
@@ -144,10 +141,12 @@ def create_dataset_imagenet(dataset_dir, args, repeat_num=1, training=True):
 
         data_set = data_set.map(operations=mixup_fn, input_columns=["image", "label"],
                                 num_parallel_workers=args.num_parallel_workers)
-
     # apply dataset repeat operation
     data_set = data_set.repeat(repeat_num)
 
+    #ds.config.set_auto_num_workers(True)
+    #ds.config.set_prefetch_size(512)
+    #ds.config.set_enable_shared_mem(True)
     return data_set
 
 

@@ -114,7 +114,7 @@ def get_train_one_step(args, net_with_loss, optimizer):
                                                                     scale_window=2000)
     else:
         print(f"=> Using FixedLossScaleUpdateCell, loss_scale_value:{args.loss_scale}")
-        scale_sense = nn.wrap.FixedLossScaleUpdateCell(loss_scale_value=args.loss_cale)
+        scale_sense = nn.wrap.FixedLossScaleUpdateCell(loss_scale_value=args.loss_scale)
     net_with_loss = TrainClipGrad(net_with_loss, optimizer, scale_sense=scale_sense,
                                   clip_global_norm_value=args.clip_global_norm_value,
                                   use_global_norm=True)
