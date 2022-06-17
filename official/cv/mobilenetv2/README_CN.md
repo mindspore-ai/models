@@ -45,9 +45,9 @@ MobileNetV2总体网络架构如下：
 
 使用的数据集：[imagenet](http://www.image-net.org/)
 
-- 数据集大小：125G，共1000个类、1.2万张彩色图像
-    - 训练集：120G，共1.2万张图像
-    - 测试集：5G，共5万张图像
+- 数据集大小：约125G, 共1000个类，224*224彩色图像
+    - 训练集：120G，共1281167张图像
+    - 测试集：5G，共50000张图像
 - 数据格式：RGB
     - 注：数据在src/dataset.py中处理。
 
@@ -187,7 +187,8 @@ MobileNetV2总体网络架构如下：
 
 ## 脚本和样例代码
 
-```python
+```text
+.
 ├── MobileNetV2
   ├── README.md                  # MobileNetV2相关描述
   ├── ascend310_infer            # 用于310推理
@@ -231,7 +232,7 @@ MobileNetV2总体网络架构如下：
 - GPU: bash run_trian.sh GPU [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
 - CPU: bash run_trian.sh CPU [CONFIG_PATH] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
 
-`DATASET_PATH`是训练的路径. 我们使用`ImageFolderDataset` 作为默认数据处理方式, 这种数据处理方式是从原始目录中读取图片，目录结构如下, 训练时设置`DATASET_PATH=dataset/train`，验证时设置`DATASET_PATH=dataset/val`:
+`DATASET_PATH`是数据集的路径. 我们使用`ImageFolderDataset` 作为默认数据处理方式, 这种数据处理方式是从原始目录中读取图片，目录结构如下, 训练和验证时设置`DATASET_PATH=dataset/`:
 
 ```path
         └─dataset
@@ -245,7 +246,7 @@ MobileNetV2总体网络架构如下：
                 ├─0001.jpg
                 ......
                 └─xxxx.jpg
-            └─val
+            └─validation_preprocess
               ├─class1
                 ├─0001.jpg
                 ......

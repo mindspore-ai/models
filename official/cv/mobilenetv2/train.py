@@ -37,6 +37,7 @@ ms.set_seed(1)
 
 @moxing_wrapper(pre_process=modelarts_process)
 def train_mobilenetv2():
+    """ train_mobilenetv2 """
     config.train_dataset_path = os.path.join(config.dataset_path, 'train')
     config.eval_dataset_path = os.path.join(config.dataset_path, 'validation_preprocess')
     if not config.device_id:
@@ -128,15 +129,15 @@ def train_mobilenetv2():
             epoch_start = time.time()
             losses = []
             for j in idx_list:
-                feature = ms.Tensor(np.load(os.path.join(features_path, f"feature_{j}.npy")))
-                label = ms.Tensor(np.load(os.path.join(features_path, f"label_{j}.npy")))
+                feature = ms.Tensor(np.load(os.path.join(features_path, "feature_{}.npy".format(j))))
+                label = ms.Tensor(np.load(os.path.join(features_path, "label_{}.npy".format(j))))
                 losses.append(network(feature, label).asnumpy())
             epoch_mseconds = (time.time()-epoch_start) * 1000
             per_step_mseconds = epoch_mseconds / step_size
             print("epoch[{}/{}], iter[{}] cost: {:5.3f}, per step time: {:5.3f}, avg loss: {:5.3f}"\
             .format(epoch + 1, epoch_size, step_size, epoch_mseconds, per_step_mseconds, np.mean(np.array(losses))))
             if (epoch + 1) % config.save_checkpoint_epochs == 0:
-                ms.save_checkpoint(net, os.path.join(save_ckpt_path, f"mobilenetv2_{epoch+1}.ckpt"))
+                ms.save_checkpoint(net, os.path.join(save_ckpt_path, "mobilenetv2_{}.ckpt".format(epoch + 1)))
         print("total cost {:5.4f} s".format(time.time() - start))
 
     if config.enable_cache:

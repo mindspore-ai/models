@@ -49,8 +49,8 @@ The overall network architecture of MobileNetV2 is show below:
 
 Dataset used: [imagenet](http://www.image-net.org/)
 
-- Dataset size: ~125G, 1.2W colorful images in 1000 classes
-    - Train: 120G, 1.2W images
+- Dataset size: ~125G, 224*224 colorful images in 1000 classes
+    - Train: 120G, 1281167 images
     - Test: 5G, 50000 images
 - Data format: RGB images.
     - Note: Data will be processed in src/dataset.py
@@ -191,7 +191,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 
 ## [Script and sample code](#contents)
 
-```python
+```text
 ├── MobileNetV2
   ├── README.md                  # descriptions about MobileNetV2
   ├── ascend310_infer            # application for 310 inference
@@ -234,7 +234,7 @@ You can start training using python or shell scripts. The usage of shell scripts
 - GPU: bash run_trian.sh GPU [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
 - CPU: bash run_trian.sh CPU [CONFIG_PATH] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
 
-`DATASET_PATH` is the train dataset path. We use `ImageFolderDataset` as default dataset, which is a source dataset that reads images from a tree of directories. The directory structure is as follows, and you should use `DATASET_PATH=dataset/train` for training and `DATASET_PATH=dataset/val` for evaluation:
+`DATASET_PATH` is the dataset path. We use `ImageFolderDataset` as default dataset, which is a source dataset that reads images from a tree of directories. The directory structure is as follows, and you should use `DATASET_PATH=dataset/` for training and evaluation:
 
 ```path
         └─dataset
@@ -248,7 +248,7 @@ You can start training using python or shell scripts. The usage of shell scripts
                 ├─0001.jpg
                 ......
                 └─xxxx.jpg
-            └─val
+            └─validation_preprocess
               ├─class1
                 ├─0001.jpg
                 ......

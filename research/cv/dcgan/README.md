@@ -34,8 +34,8 @@ Architecture guidelines for stable Deep Convolutional GANs
 
 Train DCGAN Dataset used: [Imagenet-1k](<http://www.image-net.org/index>)
 
-- Dataset size: ~125G, 1.2W colorful images in 1000 classes
-    - Train: 120G, 1.2W images
+- Dataset size: ~125G, 224*224 colorful images in 1000 classes
+    - Train: 120G, 1281167 images
     - Test: 5G, 50000 images
 - Data format: RGB images.
     - Note: Data will be processed in src/dataset.py
