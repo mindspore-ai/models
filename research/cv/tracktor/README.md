@@ -278,7 +278,7 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --device_ta
 | Speed               | 1pcs 256.678 ms/step 8pcs: 357.489 ms/step                                                               |
 | Total time          | 1pcs 5 hours 8pcs: 1 hour                                                                                |
 | Parameters (M)      | 250                                                                                                      |
-| Scripts             | [fasterrcnn script](https://gitee.com/mindspore/mindspore/tree/master/model_zoo/official/cv/faster_rcnn) |
+| Scripts             | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
 
 ### Inference Performance
 
@@ -295,4 +295,4 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --device_ta
 
 # [ModelZoo Homepage](#contents)  
 
- Please check the official [homepage](https://gitee.com/mindspore/mindspore/tree/master/model_zoo).
+ Please check the official [homepage](https://gitee.com/mindspore/models/).
