@@ -40,6 +40,9 @@ show_eval: False
 color: [[0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255], [0, 255, 255], [255, 0, 255], [255, 255, 255]]
 
 #Eval options
+eval_metrics: "dice_coeff"
+eval_start_epoch: 0
+eval_interval: 1
 keep_checkpoint_max: 10
 eval_activate: "Softmax"
 eval_resize: False
