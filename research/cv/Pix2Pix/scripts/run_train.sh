@@ -16,7 +16,7 @@
 echo "====================================================================================================================="
 echo "Run this script as: "
 echo "bash run_train.sh [device_target] [device_id]"
-echo "for example: bash run_train.sh --device_target GPU --device_id 0"
+echo "for example: bash run_train.sh GPU 0"
 echo "====================================================================================================================="
 
 if [ $# != 2 ]
