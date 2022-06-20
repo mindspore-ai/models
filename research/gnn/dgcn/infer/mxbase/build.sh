@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,13 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-# env
-
-mkdir -p build
-cd build || exit
-
-function make_plugin() {
+path_cur=$(dirname $0)
+function check_env()
+{
     # set ASCEND_VERSION to ascend-toolkit/latest when it was not specified by user
     if [ ! "${ASCEND_VERSION}" ]; then
         export ASCEND_VERSION=ascend-toolkit/latest
@@ -27,27 +22,28 @@ function make_plugin() {
     else
         echo "ASCEND_VERSION is set to ${ASCEND_VERSION} by user"
     fi
-
-    if ! cmake ..;
-    then
-      echo "cmake failed."
-      return 1
+    if [ ! "${ARCH_PATTERN}" ]; then
+        # set ARCH_PATTERN to ./ when it was not specified by user
+        export ARCH_PATTERN=./
+        echo "ARCH_PATTERN is set to the default value: ${ARCH_PATTERN}"
+    else
+        echo "ARCH_PATTERN is set to ${ARCH_PATTERN} by user"
     fi
-
-    if ! (make);
-    then
-      echo "make failed."
-      return 1
-    fi
-
-    return 0
 }
-
-if make_plugin;
-then
-  echo "INFO: Build successfully."
-else
-  echo "ERROR: Build failed."
-fi
-
-cd - || exit
+function build_bert()
+{
+    cd $path_cur
+    rm -rf build
+    mkdir -p build
+    cd build
+    cmake ..
+    make
+    ret=$?
+    if [ ${ret} -ne 0 ]; then
+        echo "Failed to build bert."
+        exit ${ret}
+    fi
+    make install
+}
+check_env
+build_bert
