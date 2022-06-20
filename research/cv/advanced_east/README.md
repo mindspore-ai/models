@@ -9,6 +9,8 @@
     - [Data Preprocess](#data-preprocess)
     - [Training Process](#training-process)
     - [Evaluation Process](#evaluation-process)
+        - [Evaluation](#evaluation)
+        - [ONNX Evaluation](#onnx-evaluation)
 - [Performance](#performance)
     - [Training Performance](#training-performance)
     - [Evaluation Performance](#evaluation-performance)
@@ -61,8 +63,10 @@ This project is inherited by [huoyijie/AdvancedEAST](https://github.com/huoyijie
     ├── run_distribute_train_ascend.sh        # launch ascend distributed training(8 pcs)
     ├── run_standalone_train_ascend.sh     # launch ascend standalone training(1 pcs)
     ├── run_distribute_train_gpu.sh        # launch gpu distributed training(8 pcs)
-    └── run_standalone_train_gpu.sh        # launch gpu standalone training(1 pcs)
-    └── eval.sh                            # evaluate model(1 pcs)
+    ├── run_standalone_train_gpu.sh        # launch gpu standalone training(1 pcs)
+    ├── run_eval_ascend.sh                 # evaluate model(1 pcs)
+    ├── run_eval_gpu.sh                    # evaluate model(1 pcs)
+    └── run_eval_onnx.sh                   # evaluate model(1 pcs)
   ├── src
     ├── cfg.py                             # parameter configuration
     ├── dataset.py                         # data preprocessing
@@ -76,6 +80,7 @@ This project is inherited by [huoyijie/AdvancedEAST](https://github.com/huoyijie
     └── vgg.py                             # vgg model
   ├── export.py                            # export model for inference
   ├── prepare_data.py                      # exec data preprocessing
+  ├── eval_onnx.py                         # eval onnx
   ├── eval.py                              # eval net
   ├── train.py                             # train net on multi-size input
   └── train_single_size.py                 # train net on fix-size input
@@ -181,6 +186,8 @@ config.py：
 
 ## [Evaluation Process](#contents)
 
+### Evaluation
+
 The above python command will run in the background, you can view the results through the file output.eval.log. You will get the accuracy as following.
 You can get loss, accuracy, recall, F1 score and the box vertices of an image.
 
@@ -204,6 +211,22 @@ bash scripts/run_distribute_train_gpu.sh
 # get prediction of an image
 bash run_eval.sh 0_8-24_1012.ckpt pred ./demo/001.png
 ```
+
+### ONNX Evaluation
+
+- Export your model to ONNX:  
+
+  ```shell
+  python export.py --ckpt_file /path/to/AdvancedEast.ckpt --file_name /path/to/AdvancedEast --file_format ONNX --device_target CPU
+  ```
+
+- Run ONNX evaluation from advanced_east directory:
+
+  ```shell
+  bash scripts/run_eval_onnx.sh ./icpr/ GPU AdvancedEast.onnx
+  ```
+
+- You can view the results through the file output.eval.log.
 
 ## Inference Process
 
