@@ -266,8 +266,8 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DE
 | MindSpore Version   | 1.6.0                       |
 | Dataset             | moving mnist                |
 | batch_size          | 8                           |
-| output metrics      | MSE/SSIM                    |
-| outputs             | 47.9/0.878                  |
+| output metrics      | MSE                         |
+| outputs             | 47.9                        |
 | Model for inference | 177.27M (.ckpt file)        |
 
 ## [ModelZoo Homepage](#contents)
