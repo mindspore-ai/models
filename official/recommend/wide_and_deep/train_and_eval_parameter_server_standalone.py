@@ -21,6 +21,7 @@ from mindspore import Model, context
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor
 from mindspore.common import set_seed
 
+from mindspore.communication.management import init
 from src.wide_and_deep import PredictWithSigmoid, TrainStepWrap, NetWithLossClass, WideDeepModel
 from src.callbacks import LossCallBack, EvalCallBack
 from src.datasets import create_dataset, DataType
@@ -125,12 +126,14 @@ cache_enable = cfg.vocab_cache_size > 0
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_wide_and_deep():
     """ train_wide_and_deep """
+    context.set_ps_context(enable_ps=True)
+    init()
+
     if not cache_enable:
         cfg.sparse = True
     if cfg.device_target == "GPU":
         context.set_context(enable_graph_kernel=True)
         context.set_context(graph_kernel_flags="--enable_cluster_ops=MatMul")
-    context.set_ps_context(enable_ps=True)
 
     train_and_eval(cfg)
 

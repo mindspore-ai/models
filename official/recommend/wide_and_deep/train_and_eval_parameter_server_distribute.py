@@ -92,7 +92,7 @@ def train_and_eval(config):
     if cache_enable:
         config.full_batch = True
     print("epochs is {}".format(epochs))
-    if config.full_batch:
+    if config.full_batch and os.getenv("MS_ROLE") == "MS_WORKER":
         context.set_auto_parallel_context(full_batch=True)
         ds.config.set_seed(1)
         ds_train = create_dataset(data_path, train_mode=True,
@@ -160,8 +160,9 @@ def train_wide_and_deep():
     context.set_context(save_graphs_path='./graphs_of_device_id_'+str(get_rank()))
 
     if cache_enable:
-        context.set_auto_parallel_context(
-            parallel_mode=ParallelMode.AUTO_PARALLEL, gradients_mean=True)
+        if os.getenv("MS_ROLE") == "MS_WORKER":
+            context.set_auto_parallel_context(
+                parallel_mode=ParallelMode.AUTO_PARALLEL, gradients_mean=True)
     else:
         context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
                                           device_num=get_group_size())
