@@ -77,7 +77,7 @@ APP_ERROR ICNet::ReadImage(const std::string &imgPath, cv::Mat &imageMat) {
     return APP_ERR_OK;
 }
 
-void ICNet::Normalize(const cv::Mat &srcImageMat, cv::Mat &dstImageMat) {
+APP_ERROR ICNet::Normalize(const cv::Mat &srcImageMat, cv::Mat &dstImageMat) {
     constexpr size_t ALPHA_AND_BETA_SIZE = 3;
     cv::Mat float32Mat;
     srcImageMat.convertTo(float32Mat, CV_32FC3);
@@ -91,6 +91,7 @@ void ICNet::Normalize(const cv::Mat &srcImageMat, cv::Mat &dstImageMat) {
         tmp[i].convertTo(tmp[i], CV_32FC3, 1 / std[i], - mean[i] / std[i]);
     }
     cv::merge(tmp, dstImageMat);
+    return APP_ERR_OK;
 }
 
 void ICNet::GetResizeInfo(const cv::Mat &srcImageMat, MxBase::ResizedImageInfo &resizedImageInfo) {
