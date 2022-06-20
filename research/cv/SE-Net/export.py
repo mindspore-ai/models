@@ -28,7 +28,7 @@ if config.device_target == "Ascend":
 def run_export():
     """run export."""
     if config.network_dataset == 'se-resnet50_imagenet2012':
-        from src.resnet import resnet50 as resnet
+        from src.resnet import se_resnet50 as resnet
     elif config.network_dataset == 'se-resnet101_imagenet2012':
         from src.resnet import resnet101 as resnet
     else:
