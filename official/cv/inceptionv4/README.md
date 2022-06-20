@@ -34,11 +34,13 @@ The overall network architecture of InceptionV4 is show below:
 
 Dataset used can refer to paper.
 
+- Dataset: ImageNet2012
 - Dataset size: 125G, 1250k colorful images in 1000 classes
     - Train: 120G, 1200k images
     - Test: 5G, 50k images
 - Data format: RGB images.
     - Note: Data will be processed in src/dataset.py
+- Data path: http://www.image-net.org/download-images
 
 # [Features](#contents)
 
@@ -193,6 +195,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
     ├─run_standalone_train_ascend.sh    # launch standalone training with ascend platform(1p)
     ├─run_distribute_train_ascend.sh    # launch distributed training with ascend platform(8p)
     ├─run_infer_310.sh                  # shell script for 310 inference
+    ├─run_onnx_eval.sh                  # shell script for onnx evaluating
     └─run_eval_ascend.sh                # launch evaluating with ascend platform
   ├─src
     ├─dataset.py                      # data preprocessing
@@ -207,6 +210,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
   ├─default_config_cpu.yaml         # Training parameter profile(cpu)
   ├─default_config_gpu.yaml         # Training parameter profile(gpu)
   ├─eval.py                         # eval net
+  ├─eval_onnx.py                    # onnx eval
   ├─export.py                       # export checkpoint, surpport .onnx, .air, .mindir convert
   ├─postprogress.py                 # post process for 310 inference
   └─train.py                        # train net
@@ -383,7 +387,7 @@ metric: {'Loss': 0.8144, 'Top1-Acc': 0.8009, 'Top5-Acc': 0.9457}
 python export.py --config_path [CONFIG_FILE] --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format[EXPORT_FORMAT]
 ```
 
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+`EXPORT_FORMAT` should be in ["AIR", "MINDIR", "ONNX"]
 
 ## Inference Process
 
@@ -397,6 +401,16 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
 ```
 
 -NOTE:Ascend310 inference use Imagenet dataset . The label of the image is the number of folder which is started from 0 after sorting.
+
+Before performing inference, the model file must be exported by export script.
+
+```shell
+# ONNX inference
+bash scripts/run_onnx_eval.sh [DATA_PATH] [DATASET_TYPE] [DEVICE_TYPE] [FILE_TYPE] [ONNX_PATH]
+# example: bash scripts/run_onnx_eval.sh /path/to/dataset imagenet GPU ONNX /path/to/inceptionv4.onnx
+```
+
+-NOTE:ONNX inference use Imagenet dataset .
 
 ### result
 

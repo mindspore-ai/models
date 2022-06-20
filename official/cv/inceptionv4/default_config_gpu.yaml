@@ -8,6 +8,8 @@ output_path: "/cache/train"
 load_path: "/cache/checkpoint_path"
 device_target: GPU
 enable_profiling: False
+num_parallel_workers: 1
+group_size: 1
 
 # ==============================================================================
 dataset_path: "/cache/data"
@@ -18,7 +20,7 @@ resume: ''
 is_distributed: False
 device_id: 0
 platform: 'GPU'
-file_name: 'inceptionv3'
+file_name: 'inceptionv4'
 file_format: 'MINDIR'
 width: 299
 height: 299

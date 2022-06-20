@@ -18,7 +18,7 @@ resume: ''
 is_distributed: False
 device_id: 0
 platform: 'CPU'
-file_name: 'inceptionv3'
+file_name: 'inceptionv4'
 file_format: 'MINDIR'
 width: 299
 height: 299
