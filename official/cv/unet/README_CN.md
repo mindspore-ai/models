@@ -45,7 +45,7 @@ UNet++是U-Net的增强版本，使用了新的跨层链接方式和深层监督
 
 ## 数据集
 
-使用的数据集： [ISBI Challenge](http://brainiac2.mit.edu/isbi_challenge/home)
+使用的数据集： [ISBI Challenge](https://www.kaggle.com/code/kerneler/starter-isbi-challenge-dataset-21087002-9/data)
 
 - 说明：训练和测试数据集为两组30节果蝇一龄幼虫腹神经索（VNC）的连续透射电子显微镜（ssTEM）数据集。微立方体的尺寸约为2 x 2 x 1.5微米，分辨率为4x4x50纳米/像素。
 - 许可证：您可以免费使用这个数据集来生成或测试非商业图像分割软件。若科学出版物使用此数据集，则必须引用TrakEM2和以下出版物： Cardona A, Saalfeld S, Preibisch S, Schmid B, Cheng A, Pulokas J, Tomancak P, Hartenstein V. 2010. An Integrated Micro- and Macroarchitectural Analysis of the Drosophila Brain by Computer-Assisted Serial Section Electron Microscopy. PLoS Biol 8(10): e1000502. doi:10.1371/journal.pbio.1000502.
