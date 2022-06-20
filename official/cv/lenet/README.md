@@ -18,13 +18,11 @@
         - [Infer on Ascend310](#infer-on-ascend310)
         - [result](#result)
     - [Apply algorithm in MindSpore Golden Stick](#apply-algorithm-in-mindspore-golden-stick)
-        - [Training Process](#Training Process-1)
+        - [Training Process](#training-process-1)
             - [Running on GPU](#running-on-gpu-1)
         - [Evaluation Process](#evaluation-process-1)
             - [Running on GPU](#running-on-gpu-2)
-            - [Result](#resutl-3)
-        - [Inference Process](#inference-process-1)
-            - [Export MindIR](#export-mindir-1)
+            - [Result](#result-3)
     - [Model Description](#model-description)
         - [Performance](#performance)
             - [Evaluation Performance](#evaluation-performance)
@@ -339,12 +337,6 @@ Evaluation result will be stored in the example path, whose folder name is "eval
 ```bash
 ================ {'Accuracy': 0.9907852564102564} ================
 ```
-
-## Inference Process
-
-### Export MindIR
-
-Not support exporting MindIR now.
 
 ## [Model Description](#contents)
 

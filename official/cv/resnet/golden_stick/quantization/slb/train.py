@@ -183,9 +183,11 @@ class TemperatureScheduler(callback.Callback):
     """
     TemperatureScheduler for SLB.
     """
-    def __init__(self, model, epoch_size=100, t_start_val=1.0, t_start_time=0.2, t_end_time=0.6, t_factor=1.2):
+    def __init__(self, model, epoch_size=100, has_trained_epoch=0,
+                 t_start_val=1.0, t_start_time=0.2, t_end_time=0.6, t_factor=1.2):
         super().__init__()
         self.epochs = epoch_size
+        self.has_trained_epoch = has_trained_epoch
         self.t_start_val = t_start_val
         self.t_start_time = t_start_time
         self.t_end_time = t_end_time
@@ -197,7 +199,7 @@ class TemperatureScheduler(callback.Callback):
         Epoch_begin.
         """
         cb_params = run_context.original_args()
-        epoch = cb_params.cur_epoch_num
+        epoch = cb_params.cur_epoch_num + self.has_trained_epoch
         # Compute temperature value
         t = self.t_start_val
         t_start_epoch = int(self.epochs*self.t_start_time)
@@ -208,9 +210,8 @@ class TemperatureScheduler(callback.Callback):
         for _, cell in self.model.train_network.cells_and_names():
             if cell.cls_name == 'QBNNFakeQuantizerPerLayer': # for QBNN
                 cell.set_temperature(t)
-                if epoch == t_end_epoch:
+                if epoch >= t_end_epoch:
                     cell.set_temperature_end_flag()
-                    print('Temperature stops changing. Start applying one-hot to latent weights.')
 
 
 def train_net():
@@ -266,7 +267,7 @@ def train_net():
     if algo:
         algo_cb = algo.callback()
         cb.append(algo_cb)
-        cb.append(TemperatureScheduler(model, config.epoch_size, config.t_start_val,
+        cb.append(TemperatureScheduler(model, config.epoch_size, config.has_trained_epoch, config.t_start_val,
                                        config.t_start_time, config.t_end_time, config.t_factor))
     ckpt_save_dir = set_save_ckpt_dir()
     if config.save_checkpoint:

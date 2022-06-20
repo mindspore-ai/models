@@ -30,13 +30,11 @@
         - [Infer on Ascend310](#infer-on-ascend310)
         - [result](#result-2)
 - [Apply algorithm in MindSpore Golden Stick](#apply-algorithm-in-mindspore-golden-stick)
-    - [Training Process](#Training Process-1)
+    - [Training Process](#training-process-1)
         - [Running on GPU](#running-on-gpu-2)
     - [Evaluation Process](#evaluation-process-1)
         - [Running on GPU](#running-on-gpu-3)
-        - [Result](#resutl-3)
-    - [Inference Process](#inference-process-1)
-        - [Export MindIR](#export-mindir-1)
+        - [Result](#result-3)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
@@ -917,12 +915,6 @@ result:{'top_1_accuracy': 0.8976362179487182, 'top_5_accuracy': 0.99238782051282
 ```text
 result:{'top_1_accuracy': 0.8845152243589743, 'top_5_accuracy': 0.9914863782051282} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
 ```
-
-## Inference Process
-
-### Export MindIR
-
-Not support exporting MindIR now.
 
 # [Model Description](#contents)
 
