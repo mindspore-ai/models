@@ -28,10 +28,11 @@ class data_set_navier_stokes:
         noise (float): noise intensity, 0 for noiseless training data
         train (bool): True for training set, False for evaluation set
     """
-    def __init__(self, n_train, path, noise, train=True):
+    def __init__(self, n_train, path, noise, batch_size, train=True):
         data = scio.loadmat(path)
         self.n_train = n_train
         self.noise = noise
+        self.batch_size = batch_size
 
         # load data
         X_star = data['X_star'].astype(np.float32)
@@ -64,8 +65,10 @@ class data_set_navier_stokes:
             self.t = t[idx, :]
             u_train = u[idx, :]
             self.u = u_train + noise*np.std(u_train)*np.random.randn(u_train.shape[0], u_train.shape[1])
+            self.u = self.u.astype(np.float32)
             v_train = v[idx, :]
             self.v = v_train + noise*np.std(v_train)*np.random.randn(v_train.shape[0], v_train.shape[1])
+            self.v = self.v.astype(np.float32)
         else:
             self.x = x
             self.y = y
@@ -78,17 +81,17 @@ class data_set_navier_stokes:
             self.p = PP.flatten()[:, None]
 
     def __getitem__(self, index):
-        ans_x = self.x[index]
-        ans_y = self.y[index]
-        ans_t = self.t[index]
-        ans_u = self.u[index]
-        ans_v = self.v[index]
-        input_data = np.hstack((ans_x, ans_y, ans_t)).astype(np.float32)
-        label = np.hstack((ans_u, ans_v, np.array([0.]))).astype(np.float32)  #
+        ans_x = self.x[index * self.batch_size : (index + 1) * self.batch_size]
+        ans_y = self.y[index * self.batch_size : (index + 1) * self.batch_size]
+        ans_t = self.t[index * self.batch_size : (index + 1) * self.batch_size]
+        ans_u = self.u[index * self.batch_size : (index + 1) * self.batch_size]
+        ans_v = self.v[index * self.batch_size : (index + 1) * self.batch_size]
+        input_data = np.hstack((ans_x, ans_y, ans_t))
+        label = np.hstack((ans_u, ans_v, np.zeros([self.batch_size, 1], dtype=np.float32)))
         return input_data, label
 
     def __len__(self):
-        return self.n_train
+        return self.n_train // self.batch_size
 
 
 def generate_training_set_navier_stokes(batch_size, n_train, path, noise):
@@ -101,9 +104,9 @@ def generate_training_set_navier_stokes(batch_size, n_train, path, noise):
         path (str): path of dataset
         noise (float): noise intensity, 0 for noiseless training data
     """
-    s = data_set_navier_stokes(n_train, path, noise, True)
+    s = data_set_navier_stokes(n_train, path, noise, batch_size, True)
     lb = s.lb
     ub = s.ub
-    dataset = ds.GeneratorDataset(source=s, column_names=['data', 'label'], shuffle=True)
-    dataset = dataset.batch(batch_size)
+    dataset = ds.GeneratorDataset(source=s, column_names=['data', 'label'], shuffle=True,
+                                  num_parallel_workers=2, python_multiprocessing=True)
     return dataset, lb, ub
