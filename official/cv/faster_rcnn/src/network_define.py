@@ -15,12 +15,10 @@
 """FasterRcnn training network wrapper."""
 
 import time
-import mindspore.common.dtype as mstype
+import mindspore as ms
 import mindspore.ops as ops
 import mindspore.nn as nn
-from mindspore import ParameterTuple, Tensor
 from mindspore.train.callback import Callback
-from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
 
 time_stamp_init = False
 time_stamp_first = 0
@@ -114,7 +112,15 @@ class WithLossCell(nn.Cell):
         return self._backbone
 
 
-class TrainOneStepCell(nn.Cell):
+_grad_scale = ops.MultitypeFuncGraph("grad_scale")
+
+
+@_grad_scale.register("Tensor", "Tensor")
+def tensor_grad_scale(scale, grad):
+    return grad * ops.cast(ops.Reciprocal()(scale), ops.dtype(grad))
+
+
+class TrainOneStepCell(nn.TrainOneStepWithLossScaleCell):
     """
     Network training package class.
 
@@ -125,29 +131,33 @@ class TrainOneStepCell(nn.Cell):
         network (Cell): The training network.
         optimizer (Cell): Optimizer for updating the weights.
         sens (Number): The adjust parameter. Default value is 1.0.
-        reduce_flag (bool): The reduce flag. Default value is False.
-        mean (bool): Allreduce method. Default value is False.
-        degree (int): Device number. Default value is None.
+        grad_clip (bool): Whether clip gradients. Default value is False.
     """
 
-    def __init__(self, network, optimizer, sens=1.0, reduce_flag=False, mean=True, degree=None):
-        super(TrainOneStepCell, self).__init__(auto_prefix=False)
-        self.network = network
-        self.network.set_grad()
-        self.weights = ParameterTuple(network.trainable_params())
-        self.optimizer = optimizer
-        self.grad = ops.GradOperation(get_by_list=True,
-                                      sens_param=True)
-        self.sens = Tensor([sens,], mstype.float32)
-        self.reduce_flag = reduce_flag
-        if reduce_flag:
-            self.grad_reducer = DistributedGradReducer(optimizer.parameters, mean, degree)
+    def __init__(self, network, optimizer, scale_sense=1, grad_clip=False):
+        if isinstance(scale_sense, (int, float)):
+            scale_sense = ms.Tensor(scale_sense, ms.float32)
+        super(TrainOneStepCell, self).__init__(network, optimizer, scale_sense)
+        self.grad_clip = grad_clip
 
     def construct(self, x, img_shape, gt_bboxe, gt_label, gt_num):
         weights = self.weights
         loss = self.network(x, img_shape, gt_bboxe, gt_label, gt_num)
-        grads = self.grad(self.network, weights)(x, img_shape, gt_bboxe, gt_label, gt_num, self.sens)
-        if self.reduce_flag:
-            grads = self.grad_reducer(grads)
+        scaling_sens = self.scale_sense
 
-        return ops.depend(loss, self.optimizer(grads))
+        status, scaling_sens = self.start_overflow_check(loss, scaling_sens)
+
+        scaling_sens_filled = ops.ones_like(loss) * ops.cast(scaling_sens, ops.dtype(loss))
+        grads = self.grad(self.network, weights)(x, img_shape, gt_bboxe, gt_label, gt_num, scaling_sens_filled)
+        grads = self.hyper_map(ops.partial(_grad_scale, scaling_sens), grads)
+        # apply grad reducer on grads
+        grads = self.grad_reducer(grads)
+        # get the overflow buffer
+        cond = self.get_overflow_status(status, grads)
+        overflow = self.process_loss_scale(cond)
+        if self.grad_clip:
+            grads = ops.clip_by_global_norm(grads)
+        # if there is no overflow, do optimize
+        if not overflow:
+            loss = ops.depend(loss, self.optimizer(grads))
+        return loss

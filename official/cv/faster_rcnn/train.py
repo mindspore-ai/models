@@ -48,7 +48,7 @@ def train_fasterrcnn_():
     mindrecord_file = os.path.join(mindrecord_dir, prefix + "0")
     print("CHECKING MINDRECORD FILES ...")
 
-    if rank == 0 and not os.path.exists(mindrecord_file):
+    if rank == 0 and not os.path.exists(mindrecord_file + ".db"):
         if not os.path.isdir(mindrecord_dir):
             os.makedirs(mindrecord_dir)
         if config.dataset == "coco":
@@ -181,25 +181,19 @@ def train_fasterrcnn():
         raise ValueError("Optimize type should be 'SGD' or 'Adam'")
     if config.opt_type.lower() == "sgd":
         opt = SGD(params=net.trainable_params(), learning_rate=lr, momentum=config.momentum,
-                  weight_decay=config.weight_decay, loss_scale=config.loss_scale)
+                  weight_decay=config.weight_decay)
     else:
-        opt = Adam(params=net.trainable_params(), learning_rate=lr,
-                   loss_scale=config.loss_scale, weight_decay=config.weight_decay)
+        opt = Adam(params=net.trainable_params(), learning_rate=lr, weight_decay=config.weight_decay)
     net_with_loss = WithLossCell(net, loss)
     print(f"[{rank}]", "\tDone!\n")
-    if config.run_distribute:
-        print(f"\n[{rank}]", "===> Run distributed training...\n")
-        net = TrainOneStepCell(net_with_loss, opt, sens=config.loss_scale, reduce_flag=True,
-                               mean=True, degree=device_num)
-    else:
-        print(f"\n[{rank}]", "===> Run single GPU training...\n")
-        net = TrainOneStepCell(net_with_loss, opt, sens=config.loss_scale)
-
+    net = TrainOneStepCell(net_with_loss, opt, scale_sense=config.loss_scale)
     print(f"\n[{rank}]", "===> Creating callbacks...")
-    summary_collector = SummaryCollector(summary_dir)
     time_cb = TimeMonitor(data_size=dataset_size)
     loss_cb = LossCallBack(per_print_times=dataset_size, rank_id=rank, lr=lr.asnumpy())
-    cb = [time_cb, loss_cb, summary_collector]
+    cb = [time_cb, loss_cb]
+    if config.log_summary:
+        summary_collector = SummaryCollector(summary_dir)
+        cb.apprnd(summary_collector)
     print(f"[{rank}]", "\tDone!\n")
 
     print(f"\n[{rank}]", "===> Configurating checkpoint saving...")
