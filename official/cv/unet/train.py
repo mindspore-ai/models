@@ -97,12 +97,12 @@ def train_net(cross_valid_ind=1,
                                                       run_distribute, config.crop, config.image_size)
     train_data_size = train_dataset.get_dataset_size()
     print("dataset length is:", train_data_size)
-    ckpt_save_dir = os.path.join(config.output_path, config.checkpoint_path)
+    ckpt_save_dir = os.path.join(config.output_path, config.checkpoint_path, f'ckpt_{rank}')
     save_ck_steps = train_data_size * epochs
     ckpt_config = CheckpointConfig(save_checkpoint_steps=save_ck_steps,
                                    keep_checkpoint_max=config.keep_checkpoint_max)
     ckpoint_cb = ModelCheckpoint(prefix='ckpt_{}_adam'.format(config.model_name),
-                                 directory=ckpt_save_dir+'./ckpt_{}/'.format(rank),
+                                 directory=ckpt_save_dir,
                                  config=ckpt_config)
 
     optimizer = nn.Adam(params=net.trainable_params(), learning_rate=lr, weight_decay=config.weight_decay,
@@ -120,7 +120,7 @@ def train_net(cross_valid_ind=1,
         eval_param_dict = {"model": eval_model, "dataset": valid_dataset, "metrics_name": config.eval_metrics}
         eval_cb = EvalCallBack(apply_eval, eval_param_dict, interval=config.eval_interval,
                                eval_start_epoch=config.eval_start_epoch, save_best_ckpt=True,
-                               ckpt_directory=ckpt_save_dir+'./ckpt_{}/'.format(rank), besk_ckpt_name="best.ckpt",
+                               ckpt_directory=ckpt_save_dir, besk_ckpt_name="best.ckpt",
                                metrics_name=config.eval_metrics)
         callbacks.append(eval_cb)
     model.train(int(epochs / repeat), train_dataset, callbacks=callbacks, dataset_sink_mode=dataset_sink_mode)
