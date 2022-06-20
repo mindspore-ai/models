@@ -50,7 +50,9 @@ def create_dataset(cfg, data_home, shuffle=False):
     """
 
     dataset_generator = DatasetGenerator(data_home)
-    distributed_sampler = DistributedSampler(len(dataset_generator), cfg.group_size, cfg.rank, shuffle=True)
+    distributed_sampler = None
+    if cfg.run_distribute:
+        distributed_sampler = DistributedSampler(len(dataset_generator), cfg.group_size, cfg.rank, shuffle=True)
     vox2_ds = ds.GeneratorDataset(dataset_generator, ["data", "label"], shuffle=shuffle, sampler=distributed_sampler)
     cnt = int(len(dataset_generator) / cfg.group_size)
     return vox2_ds, cnt
