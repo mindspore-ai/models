@@ -165,6 +165,8 @@ rank_id: 0
 image_dir: ''
 anno_path: ''
 backbone: 'inception_resnet_v2'
+log_summary: False
+grad_clip: False
 
 # eval.py FasterRcnn evaluation
 checkpoint_path: "/cache/checkpoint_path/faster_rcnn-20_7393.ckpt"
