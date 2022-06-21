@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [[ $# -gt 4 ]]; then 
-    echo "Usage: bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE] [DEVICE_NUM] [DEVICE_START] [DATASET_NAME]"
+    echo "Usage: bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE] [DEVICE_NUM] [RANK_SIZE] [DATASET_NAME]"
 exit 1
 fi
 
