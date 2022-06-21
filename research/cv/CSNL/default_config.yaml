@@ -1,0 +1,52 @@
+data_path: "/home/mindspore/CSNLN/cache/datasets"
+output_path: "./cache/train"
+load_path: "./cache/checkpoint_path"
+device_target: "GPU"
+rank: 0
+# options
+dataset_name: "DIV2K"
+name: "DIV2K"
+pre_trained: False
+data_test: "Set5/image_SRF_2"
+data_train: "DIV2K"
+data_range: "1-800/801-810"
+ext: "sep"
+scale: [ 2 ]
+patch_size: 48
+rgb_range: 1
+n_colors: 3
+keep_checkpoint_max: 10
+checkpoint_path: "./train_CSNLN_DIV2k.ckpt"
+no_argument: False
+
+
+# optimizer and lr related
+decay: "200-1000"
+lr_init: 0.0001
+gamma: 0.5
+momentum: 0.9
+weight_decay: 0.0001
+beta1: 0.9
+beta2: 0.99
+epsilon: 0.00000001
+
+# model specification
+pre_train: False
+n_feats: 128
+shift_mean: True
+depth: 12
+model: "CSNLN"
+# training specifications
+epoches: 500
+batch_size: 16
+test_only: False
+test_every: 1000
+distribute: True
+device_num: 4
+
+# export option
+ckpt_file: ""
+file_name: csnln
+file_format: "MINDIR"
+ckpt_save_dir: "./ckpt/"
+save: "./CSNLN_X2/"
