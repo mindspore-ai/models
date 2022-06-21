@@ -100,7 +100,6 @@ def create_dataset(data_path, is_training=True, is_shuffle=True, batch_size=1, r
         dataset = HED_Dataset_e(data_path, is_training)
         dataloader = ds.GeneratorDataset(dataset, ['test', 'label'], num_parallel_workers=8, shuffle=is_shuffle)
         dataloader = dataloader.map(input_columns='test', operations=C.TypeCast(mindspore.float32))
-        dataloader = dataloader.map(input_columns='label', operations=C.TypeCast(mindspore.float32))
         dataloader = dataloader.batch(batch_size, drop_remainder=False)
 
     # apply DatasetOps
