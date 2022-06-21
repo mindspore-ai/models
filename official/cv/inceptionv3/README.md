@@ -21,6 +21,9 @@
         - [Launch](#launch-1)
         - [Result](#result-1)
     - [Model Export](#model-export)
+    - [ONNX Export And Evaluation](#onnx-export-and-evaluation)
+        - [ONNX Export](#onnx-export)
+        - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Usage](#usage-2)
         - [result](#result-2)
@@ -217,6 +220,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
     ├─run_infer_310.sh                        # shell script for 310 inference
     ├─run_eval_cpu.sh                         # launch evaluation with cpu platform
     ├─run_eval_gpu.sh                         # launch evaluation with gpu platform
+    ├─run_eval_onnx_gpu.sh                    # launch ONNX model evaluation with gpu platform
     └─run_eval.sh                             # launch evaluating with ascend platform
   ├─src
     ├─dataset.py                      # data preprocessing
@@ -232,6 +236,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
   ├─default_config_cpu.yaml         # Training parameter profile(cpu)
   ├─default_config_gpu.yaml         # Training parameter profile(gpu)
   ├─eval.py                           # eval net
+  ├─eval_onnx.py                      # eval ONNX model
   ├─export.py                         # convert checkpoint
   ├─mindspore_hub_conf.py             # create network model
   ├─postprogress.py                   # post process for 310 inference
@@ -262,6 +267,7 @@ Major parameters in train.py and config.py are:
 'opt_eps'                    # epsilon
 'keep_checkpoint_max'        # max numbers to keep checkpoints
 'ckpt_path'                  # save checkpoint path
+'onnx_file'                  # save exported ONNX model path
 'is_save_on_master'          # save checkpoint on rank0, distributed parameters
 'dropout_keep_prob'          # the keep rate, between 0 and 1, e.g. keep_prob = 0.9, means dropping out 10% of input units
 'has_bias'                   # specifies whether the layer uses a bias vector.
@@ -395,7 +401,23 @@ metric: {'Loss': 1.778, 'Top1-Acc':0.788, 'Top5-Acc':0.942}
 python export.py --config_path CONFIG_FILE --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format[EXPORT_FORMAT]
 ```
 
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
+`EXPORT_FORMAT` should be in ["AIR", "MINDIR", "ONNX"]
+
+## ONNX Export And Evaluation
+
+### ONNX Export
+
+```bash
+python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format "ONNX"
+# example:python export.py --ckpt_file /home/models/official/cv/inceptionv3/inceptionv3_ascend_v160_imagenet2012_official_cv_top1acc78.69_top5acc94.3.ckpt --device_target "GPU" --file_format "ONNX"
+```
+
+### ONNX Evaluation
+
+```bash
+    bash run_eval_onnx_gpu.sh [DEVICE_ID] [DATA_DIR] [PATH_ONNX]
+    # example: bash run_eval_onnx_gpu.sh 2 /home/data/ /home/models/official/cv/inceptionv3/inceptionv3.onnx
+```
 
 ## Inference Process
 

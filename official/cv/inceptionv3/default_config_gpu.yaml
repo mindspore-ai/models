@@ -6,7 +6,7 @@ checkpoint_url: ""
 data_path: "/cache/data"
 output_path: "/cache/train"
 load_path: "/cache/checkpoint_path"
-device_target: Ascend
+device_target: GPU
 enable_profiling: False
 
 # ==============================================================================
@@ -14,6 +14,7 @@ dataset_path: "/cache/data"
 ckpt_path: '/cache/data/'
 checkpoint: '/cache/data/inceptionv3/inceptionv3-rank3_1-247_1251.ckpt'
 ckpt_file: '/cache/data/inceptionv3/inceptionv3-rank3_1-247_1251.ckpt'
+onnx_file: ''
 resume: ''
 is_distributed: False
 device_id: 0

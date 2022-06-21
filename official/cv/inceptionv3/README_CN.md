@@ -23,13 +23,16 @@
         - [启动](#启动-1)
         - [结果](#结果-1)
     - [模型导出](#模型导出)
+    - [ONNX模型导出及评估](#onnx模型导出及评估)
+        - [ONNX模型导出](#onnx模型导出)
+        - [ONNX模型评估](#onnx模型评估)
     - [推理过程](#推理过程)
         - [使用方法](#使用方法)
         - [结果](#结果-2)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [训练性能](#训练性能)
-            - [推理性能](#推理性能)
+        - [推理性能](#推理性能)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
 
@@ -221,6 +224,7 @@ InceptionV3的总体网络架构如下：
     ├─run_infer_310.sh                        # Ascend推理shell脚本
     ├─run_eval_cpu.sh                         # 启动CPU评估
     ├─run_eval_gpu.sh                         # 启动GPU评估
+    ├─run_eval_onnx_gpu.sh                    # 启动GPU下ONNX模型的评估
     └─run_eval.sh                             # 启动Ascend评估
   ├─src
     ├─dataset.py                      # 数据预处理
@@ -236,6 +240,7 @@ InceptionV3的总体网络架构如下：
   ├─default_config_cpu.yaml           # 训练配置参数(cpu)
   ├─default_config_gpu.yaml           # 训练配置参数(gpu)
   ├─eval.py                           # 评估网络
+  ├─eval_onnx.py                      # 评估导出的ONNX模型
   ├─export.py                         # 导出 AIR,MINDIR模型的脚本
   ├─mindspore_hub_conf.py             # 创建网络模型
   ├─postprogress.py                   # 310推理后处理脚本
@@ -268,6 +273,7 @@ train.py和config.py中主要参数如下：
 'opt_eps'                    # epsilon
 'keep_checkpoint_max'        # 保存检查点的最大数量
 'ckpt_path'                  # 保存检查点路径
+'onnx_file'                  # 保存导出的ONNX模型路径
 'is_save_on_master'          # 保存Rank0的检查点，分布式参数
 'dropout_keep_prob'          # 保持率，介于0和1之间，例如keep_prob = 0.9，表示放弃10%的输入单元
 'has_bias'                   # 层是否使用偏置向量
@@ -395,7 +401,23 @@ metric:{'Loss':1.778, 'Top1-Acc':0.788, 'Top5-Acc':0.942}
 python export.py --config_path [CONFIG_FILE] --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format[EXPORT_FORMAT]
 ```
 
-`EXPORT_FORMAT` 可选 ["AIR", "MINDIR"]
+`EXPORT_FORMAT` 可选 ["AIR", "MINDIR", "ONNX"]
+
+## ONNX模型导出及评估
+
+### ONNX模型导出
+
+```bash
+python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format "ONNX"
+# example:python export.py --ckpt_file /home/models/official/cv/inceptionv3/inceptionv3_ascend_v160_imagenet2012_official_cv_top1acc78.69_top5acc94.3.ckpt --device_target "GPU" --file_format "ONNX"
+```
+
+### ONNX模型评估
+
+```bash
+    bash run_eval_onnx_gpu.sh [DEVICE_ID] [DATA_DIR] [PATH_ONNX]
+    # example: bash run_eval_onnx_gpu.sh 2 /home/data/ /home/models/official/cv/inceptionv3/inceptionv3.onnx
+```
 
 ## 推理过程
 
@@ -443,7 +465,7 @@ accuracy:78.742
 | 训练速度                   | 单卡：1200img/s;8卡：9500 img/s                         |
 | 脚本                       | [inceptionv3脚本](https://gitee.com/mindspore/models/tree/master/official/cv/inceptionv3) |
 
-#### 推理性能
+### 推理性能
 
 | 参数             | Ascend                 |
 | ------------------- | --------------------------- |
