@@ -83,7 +83,7 @@ vit_base的总体网络架构如下： [链接](https://arxiv.org/abs/2010.11929
 
   # 运行分布式训练示例
   # Ascend
-  bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE] [DEVICE_NUM] [DEVICE_START] [DATASET_NAME]
+  bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE] [DEVICE_NUM] [RANK_SIZE] [DATASET_NAME]
   # GPU
   bash ./scripts/run_distribute_train_gpu.sh [DATASET_NAME] [DEVICE_NUM] [LR_INIT] [LOGS_CKPT_DIR]
 
@@ -217,7 +217,7 @@ vit_base的总体网络架构如下： [链接](https://arxiv.org/abs/2010.11929
 
   ```bash
   # Ascend
-  bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE] [DEVICE_NUM] [DEVICE_START] [DATASET_NAME]
+  bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE] [DEVICE_NUM] [RANK_SIZE] [DATASET_NAME]
   # GPU
   bash ./scripts/run_distribute_train_gpu.sh [DATASET_NAME] [DEVICE_NUM] [LR_INIT] [LOGS_CKPT_DIR]
   ```
