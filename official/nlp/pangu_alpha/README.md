@@ -241,7 +241,7 @@ Training 60B model using 8 NPU in one server requires that the server has at lea
 ```bash
 # run distributed training example in one ascend machine
 
-bash run_distributed_train_moe_host_device.sh /path/dataset /path/hccl.json 8 fp32 2.6B 1 1 1 0 8 36 0
+bash run_distributed_train_moe_host_device.sh /path/dataset /path/hccl.json 8 fp32 2.6B 1 1 2 0 8 36 0
 ```
 
 #### Training on homogeneous

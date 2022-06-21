@@ -30,4 +30,5 @@ python train.py  \
     --epoch_size=$EPOCH_SIZE \
     --device_id=$DEVICE_ID \
     --data_path=$DATA_DIR \
+    --model_parallel=1 \
     --optimizer="adam" > training_log.txt 2>&1 &
