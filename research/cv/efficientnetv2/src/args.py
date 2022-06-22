@@ -47,7 +47,8 @@ def parse_arguments():
     parser.add_argument("--device_target", default="Ascend", choices=["GPU", "Ascend", "CPU"], type=str)
     parser.add_argument("--epochs", default=300, type=int, metavar="N", help="number of total epochs to run")
     parser.add_argument("--eps", default=1e-3, type=float)
-    parser.add_argument("--file_format", type=str, choices=["AIR", "MINDIR"], default="MINDIR", help="file format")
+    parser.add_argument("--file_format", type=str, choices=["AIR", "MINDIR", "ONNX"], default="MINDIR",
+                        help="file format")
     parser.add_argument("--in_channel", default=3, type=int)
     parser.add_argument("--is_dynamic_loss_scale", default=1, type=int, help="is_dynamic_loss_scale ")
     parser.add_argument("--keep_checkpoint_max", default=50, type=int, help="keep checkpoint max num")

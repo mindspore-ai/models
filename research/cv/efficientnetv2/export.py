@@ -44,5 +44,8 @@ if __name__ == '__main__':
     net.set_train(False)
     net.to_float(mstype.float32)
 
+    if args.device_target == 'ONNX':
+        args.img_size = 384
+
     input_arr = Tensor(np.zeros([1, 3, args.image_size, args.image_size], np.float32))
     export(net, input_arr, file_name=args.arch, file_format=args.file_format)

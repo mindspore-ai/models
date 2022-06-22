@@ -76,6 +76,7 @@
       ├──run_standalone_train_ascend.sh   // 单卡Ascend910训练脚本
       ├──run_distribute_train_ascend.sh   // 多卡Ascend910训练脚本
       ├──run_eval_ascend.sh               // 测试脚本
+      ├──run_infer_onnx.sh                // onnx推理脚本
       ├──run_infer_310.sh                 // 310推理脚本
   ├── src
       ├──configs                          // EfficientNetV2的配置文件
@@ -95,6 +96,7 @@
   ├── train.py                            // 训练文件
   ├── eval.py                             // 评估文件
   ├── export.py                           // 导出模型文件
+  ├── infer_onnx.py                       // ONNX推理文件
   ├── postprocess.py                      // 推理计算精度文件
   ├── preprocess.py                       // 推理预处理图片文件
 
@@ -193,16 +195,17 @@
 ### 导出
 
   ```shell
-  python export.py --pretrained [CKPT_FILE] --config [CONFIG_PATH] --device_target [DEVICE_TARGET]
+  python export.py --pretrained [CKPT_FILE] --config [CONFIG_PATH] --device_target [DEVICE_TARGET] --file_format[EXPORT_FORMAT]
   ```
 
+`EXPORT_FORMAT`可选["AIR", "MINDIR", "ONNX"]
 导出的模型会以模型的结构名字命名并且保存在当前目录下
 
 ## 推理过程
 
 ### 推理
 
-在进行推理之前我们需要先导出模型。mindir可以在任意环境上导出，air模型只能在昇腾910环境上导出。以下展示了使用mindir模型执行推理的示例。
+在进行推理之前我们需要先导出模型。mindir可以在任意环境上导出，air模型只能在昇腾910环境上导出，onnx可以在CPU/GPU环境下导出。以下展示了使用mindir模型执行推理的示例。
 
 - 在昇腾310上使用ImageNet-1k数据集进行推理
 
@@ -214,6 +217,14 @@
   Top1 acc:  0.838
   Top5 acc:  0.96956
   ```
+
+- 在GPU/CPU上使用ImageNet-1k数据集进行推理
+
+    推理的结果保存在主目录下，在infer_onnx.log日志文件中可以找到推理结果。
+
+   ```shell
+   bash run_infer_onnx.sh [ONNX_PATH] [CONFIG] [DEVICE_TARGET]
+   ```
 
 # [模型描述](#目录)
 
