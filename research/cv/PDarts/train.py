@@ -99,14 +99,15 @@ def cosine_lr(base_lr, decay_steps, total_steps):
 
 
 def main():
-    device_num = int(os.getenv('RANK_SIZE', '1'))
-    device_id = get_rank()
     context.set_context(mode=context.GRAPH_MODE,
                         device_target=args.device_target)
     context.set_context(enable_graph_kernel=True)
-    if device_num > 1:
+    rank_size = int(os.getenv('RANK_SIZE', '1'))
+    rank_id = 0
+    if rank_size > 1:
         init()
-        context.set_auto_parallel_context(device_num=device_num,
+        rank_id = get_rank()
+        context.set_auto_parallel_context(device_num=rank_size,
                                           parallel_mode=ParallelMode.DATA_PARALLEL,
                                           gradients_mean=True)
 
@@ -142,10 +143,10 @@ def main():
     train_path = os.path.join(args.data_url, 'train')
     train_dataset = create_cifar10_dataset(
         train_path, True, batch_size=args.batch_size, shuffle=True, cutout_length=args.cutout_length,
-        device_id=device_id, device_num=device_num)
+        rank_id=rank_id, rank_size=rank_size)
     val_path = os.path.join(args.data_url, 'val')
     val_dataset = create_cifar10_dataset(
-        val_path, False, batch_size=128, shuffle=False, device_id=device_id, device_num=device_num)
+        val_path, False, batch_size=128, shuffle=False, rank_id=rank_id, rank_size=rank_size)
 
     # learning rate setting
     step_size = train_dataset.get_dataset_size()
@@ -185,7 +186,7 @@ def main():
     time_cb = TimeMonitor()
     val_callback = Val_Callback(model, train_dataset, val_dataset, args.train_url,
                                 prefix='PDarts', network=network, img_size=32,
-                                device_id=device_id, is_eval_train_dataset=True)
+                                rank_id=rank_id, is_eval_train_dataset=True)
     callbacks = [loss_cb, time_cb, val_callback, set_attr_cb]
 
     model.train(args.epochs, train_dataset,
