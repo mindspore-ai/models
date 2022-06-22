@@ -18,7 +18,6 @@ import glob
 import random
 import numpy as np
 from skimage.io import imread
-from skimage import color
 
 import mindspore.dataset as ds
 import mindspore.dataset.vision as CV
@@ -48,7 +47,6 @@ class Dataset:
                 image = image[::-1, :, :].copy()
                 mask = mask[::-1, :].copy()
 
-        image = color.gray2rgb(image)
         mask = mask[:, :, np.newaxis]
         return image, mask
 
