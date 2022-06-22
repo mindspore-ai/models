@@ -125,7 +125,7 @@ def modelarts_pre_process():
 def run_train():
     print('batch size :{}'.format(config.TRAIN.BATCH_SIZE))
     if config.run_distribute:
-        init("nccl")
+        init()
         rank = get_rank()
         device_num = get_device_num()
         context.set_auto_parallel_context(device_num=device_num,
