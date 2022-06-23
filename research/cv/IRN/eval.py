@@ -46,7 +46,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="irn testing")
     parser.add_argument('--scale', type=int, default=4, choices=(2, 4),
                         help='Rescaling Parameter.')
-    parser.add_argument('--dataset_GT_path', type=str, default='/home/nonroot/DIV2K/DIV2K_train_HR',
+    parser.add_argument('--dataset_GT_path', type=str, default='/home/nonroot/IRN/data/DIV2K_train_HR',
                         help='Path to the folder where the intended GT dataset is stored.')
     parser.add_argument('--dataset_LQ_path', type=str, default=None,
                         help='Path to the folder where the intended LQ dataset is stored.')
@@ -86,6 +86,7 @@ if __name__ == '__main__':
     val_dataset = create_dataset(
         args.dataset_GT_path,
         args.scale,
+        target=args.device_target,
         do_train=False,
         batch_size=1)
 
@@ -109,7 +110,12 @@ if __name__ == '__main__':
                             learning_rate=0.1, momentum=0.9)
 
     # Model
-    model = Model(network=loss, optimizer=optimizer, amp_level="O3")
+    if args.device_target == "Ascend":
+        model = Model(network=loss, optimizer=optimizer, amp_level="O3")
+    elif args.device_target == "GPU":
+        model = Model(network=loss, optimizer=optimizer, amp_level="O0")
+    else:
+        raise ValueError("Unsupported device target.")
 
     val_iter = val_dataset.create_dict_iterator()
 

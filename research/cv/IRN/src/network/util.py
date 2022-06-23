@@ -17,33 +17,39 @@
 import mindspore
 import mindspore.nn as nn
 import mindspore.common.initializer as init
-from mindspore.ops import operations as ops
-from mindspore.common import dtype as mstype
-
+import mindspore.ops as ops
+from mindspore import Tensor
+from mindspore import dtype as mstype, context
 
 class ReconstructionLoss(nn.Cell):
     """L1 and L2 Loss """
-
     def __init__(self, losstype='l2', eps=1e-6):
         super(ReconstructionLoss, self).__init__()
         self.losstype = losstype
-        self.eps = eps
+
+        if context.get_context("device_target") == "Ascend":
+            self.cast_type = mstype.float16
+        else:
+            self.cast_type = mstype.float32
 
         self.mean = ops.ReduceMean()
-        self.sum = ops.ReduceSum()
+        self.sum = ops.ReduceSum(keep_dims=False)
+        self.abs = ops.Abs()
+        self.cast = ops.Cast()
         self.sqrt = ops.Sqrt()
+        self.eps = Tensor(eps, self.cast_type)
 
     def construct(self, x, target):
         '''construct method for loss'''
+        x = self.cast(x, self.cast_type)
+        target = self.cast(target, self.cast_type)
         if self.losstype == 'l2':
             return self.mean(self.sum((x - target)**2, (1, 2, 3)))
         if self.losstype == 'l1':
             diff = x - target
             return self.mean(self.sum(self.sqrt(diff * diff + self.eps), (1, 2, 3)))
-
         print("reconstruction loss type error!")
         return 0
-
 
 def initialize_weights(net_l, scale=1):
     """weights initialization"""
@@ -163,7 +169,10 @@ class GroupConv(nn.Cell):
         self.op_split_w = ops.Split(axis=0, output_num=self.groups)
         self.op_concat = ops.Concat(axis=1)
         self.cast = ops.Cast()
-
+        if context.get_context("device_target") == "Ascend":
+            self.cast_type = mstype.float16
+        else:
+            self.cast_type = mstype.float32
         for _ in range(groups):
             self.convs.append(mindspore.ops.Conv2D(out_channels//groups,
                                                    kernel_size=kernel_size, stride=stride,
@@ -176,9 +185,10 @@ class GroupConv(nn.Cell):
         for i in range(self.groups):
             outputs = outputs + \
                 (self.convs[i](
-                    self.cast(features[i], mstype.float16), weights[i]),)
+                    self.cast(features[i], self.cast_type), weights[i]),)
         out = self.op_concat(outputs)
         return out
+
 
 
 class GroupTransConv(nn.Cell):
@@ -208,7 +218,10 @@ class GroupTransConv(nn.Cell):
 
         self.op_concat = ops.Concat(axis=1)
         self.cast = ops.Cast()
-
+        if context.get_context("device_target") == "Ascend":
+            self.cast_type = mstype.float16
+        else:
+            self.cast_type = mstype.float32
         weights = self.op_split_w(weight_init)
 
         for i in range(groups):
@@ -222,6 +235,6 @@ class GroupTransConv(nn.Cell):
         outputs = ()
         for i in range(self.groups):
             outputs = outputs + \
-                (self.convsTrans[i](self.cast(features[i], mstype.float16)),)
+                (self.convsTrans[i](self.cast(features[i], self.cast_type)),)
         out = self.op_concat(outputs)
         return out

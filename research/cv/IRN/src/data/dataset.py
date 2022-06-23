@@ -109,7 +109,8 @@ class SRDataset():
 
         # pil -> numpy, HWC -> CHW
         orig = np.transpose(
-            np.asarray(orig), (2, 0, 1)).astype(np.float16) / 255.
+            np.asarray(orig), (2, 0, 1)).astype(np.float32) / 255.
         downscaled = np.transpose(
-            np.asarray(downscaled), (2, 0, 1)).astype(np.float16) / 255.
+            np.asarray(downscaled), (2, 0, 1)).astype(np.float32) / 255.
+
         return downscaled, orig

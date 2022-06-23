@@ -36,22 +36,23 @@ Mingqing Xiao, Shuxin Zheng, Chang Liu, Yaolong Wang, Di He, Guolin Ke, Jiang Bi
 
 ## 模型架构
 
-![1](./figures/architecture.jpg)
+![1](./figures/architecture.png)
 
 ## 数据集
 
 本示例使用[DIV2K](https://data.vision.ee.ethz.ch/cvl/DIV2K/)，其目录结构如下：
 
 ```bash
-DIV2K_data
-├── DIV2K_train_HR/                 # 训练集数据
-└── DIV2K_valid_HR/                 # 测试集数据
+data/
+    ├── DIV2K_train_HR/                 # 训练集高分辨率数据
+    └── DIV2K_valid_HR/                 # 测试集高分辨率数据
 ```
 
 ## 环境要求
 
 - 硬件
     - Ascend处理器
+    - GPU
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/)
 - 如需查看详情，请参见如下资源：
@@ -62,17 +63,39 @@ DIV2K_data
 
 完成计算设备和框架环境的准备后，开发者可以运行如下指令对本示例进行训练和评估。
 
+- GPU环境运行
+
+```bash
+# 单卡训练
+# 用法：bash run_standalone_train_gpu.sh [SCALE] [DATASET_GT_PATH]
+bash run_standalone_train_gpu.sh 4 /home/nonroot/IRN/data/DIV2K_train_HR
+
+# 分布式训练
+# 用法：bash run_distribute_train_gpu.sh [DEVICE_NUM] [SCALE] [DATASET_PATH]
+# 样例：DEVICE_NUM等于2、4、8，分别对应2、4、8卡分布式
+bash run_distribute_train_gpu.sh 8 4 /home/nonroot/IRN/data/DIV2K_train_HR
+
+# 单卡评估
+# 用法：bash run_eval_gpu.sh [SCALE] [DATASET_PATH] [CHECKPOINT_PATH]
+bash run_eval_gpu.sh 4 /home/nonroot/IRN/data/DIV2K_valid_HR /home/nonroot/IRN/ckpt/latest.ckpt
+
+```
+
 - Ascend处理器环境运行
 
 ```bash
-# 8卡分布式训练
-用法：bash run_distribute_train.sh [RANK_TABLE_FILE] [SCALE] [DATASET_PATH]
-
 # 单卡训练
-用法：bash run_standalone_train.sh [SCALE] [DATASET_GT_PATH]
+# 用法：bash run_standalone_train_ascend.sh [SCALE] [DATASET_GT_PATH]
+bash run_standalone_train_ascend.sh 4 /home/nonroot/IRN/data/DIV2K_train_HR
+
+# 8卡分布式训练
+# 用法：bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [SCALE] [DATASET_PATH]
+bash run_distribute_train_ascend.sh rank_table_file.json 4 /home/nonroot/IRN/data/DIV2K_train_HR
 
 # 单卡评估
-用法：bash run_eval.sh [SCALE] [DATASET_PATH] [CHECKPOINT_PATH]
+# 用法：bash run_eval_ascend.sh [SCALE] [DATASET_PATH] [CHECKPOINT_PATH]
+bash run_eval_ascend.sh 4 /home/nonroot/IRN/data/DIV2K_valid_HR /home/nonroot/IRN/ckpt/latest.ckpt
+
 ```
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
@@ -85,9 +108,12 @@ DIV2K_data
 .
 ├── README.md                               # 说明文档
 ├── scripts
-│   ├── run_distribute_train.sh             # Ascend处理器环境多卡训练脚本
-│   ├── run_eval.sh                         # Ascend处理器环境评估脚本
-│   └── run_standalone_train.sh             # Ascend处理器环境单卡训练脚本
+│   ├── run_distribute_train_ascend.sh      # Ascend处理器环境多卡训练脚本
+│   ├── run_distribute_train_gpu.sh         # GPU处理器环境多卡训练脚本
+│   ├── run_eval_ascend.sh                  # Ascend处理器环境评估脚本
+│   ├── run_eval_gpu.sh                     # GPU处理器环境评估脚本
+│   ├── run_standalone_train_ascend.sh      # Ascend处理器环境单卡训练脚本
+│   └── run_standalone_train_gpu.sh         # GPU处理器环境单卡训练脚本
 ├── src
 │   ├── data
 │   │   ├── dataset.py                      # 数据集处理
@@ -111,7 +137,9 @@ DIV2K_data
 │   └── utils
 │       └── util.py                         # 评价指标计算
 ├── train.py                                # 训练网络
-└── eval.py                                 # 测试网络
+├── export.py                               # 导出网络
+├── requirements.txt                        # 环境需求文件
+└── val.py                                  # 测试网络
 ```
 
 ## 脚本参数
@@ -201,8 +229,7 @@ optional arguments:
 # python test.py -h
 usage: eval.py  [--scale {2,4}] [--dataset_GT_path {path of intended GT dataset}] [--dataset_LQ_path {path of intended LQ dataset}] [--resume_state {path of the checkpoint}] [--device_target {Ascend,GPU,CPU}]
 
-
-AutoAugment for image classification.
+IRN for image rescaling.
 
 optional arguments:
   -h, --help            Show this help message and exit
@@ -225,18 +252,17 @@ optional arguments:
 
 ```bash
 # python export.py -h
-
 usage: export.py [-h] [--scale {2,4}] [--device_id DEVICE_ID] --checkpoint_path
                  CHECKPOINT_PATH [--file_name FILE_NAME]
                  [--file_format {AIR,ONNX,MINDIR}]
                  [--device_target {Ascend,GPU,CPU}]
 
-WRN with AutoAugment export.
+IRN with AutoAugment export.
 
 optional arguments:
   -h, --help            Show this help message and exit
   --scale {2,4}
-                        Rescaling parameter
+                        ResIcaling parameter
   --device_id DEVICE_ID
                         Device id.
   --checkpoint_path CHECKPOINT_PATH
@@ -252,20 +278,20 @@ optional arguments:
 
 ## 模型描述
 
-| 参数 | 单卡GPU | 单卡Ascend 910 | 8卡Ascend 910 |
-|:---|:---|:---|:--|
-| 资源 | GTX 1080ti | Ascend 910 | Ascend 910|
-| 上传日期 | 2021.09.25 | 2021.09.25 | 2021.11.01 |
-| MindSpore版本 | 1.2.0 | 1.3.0 | 1.3.0 |
-| 训练数据集 | DIV2K | DIV2K | DIV2K |
-| 优化器 | Adam | Adam | Adam |
-| 输出 | Reconstructed HR image | Reconstructed HR image | Reconstructed HR image |
-| PSNR | 34.83 | 34.11 | 33.88 |
-| SSIM | 0.9287  | 0.9206 | 0.9167 |
-| 速度 | 1534 ms/step | 271 ms/step | 409 ms/step |
-| 总时长 | 3162 mins | 2258 mins | 409 mins
-| 微调检查点 | 50.1M（.ckpt文件) | 50.1M（.ckpt文件) | 50.1M（.ckpt文件) |
-| 脚本 | [IRN](./) | [IRN](./) | [IRN](./) |
+| 参数          | 单卡GPU                 | 4卡GPU                  | 单卡Ascend 910         | 8卡Ascend 910          |
+| :------------ | :---------------------- | ----------------------- | :--------------------- | ---------------------- |
+| 资源          | NVIDIA V100 | NVIDIA GeForce RTX 3090 | Ascend 910             | Ascend 910             | V |
+| 上传日期      | 2022.6.13               | 2022.6.13               | 2021.09.25             | 2021.11.01             |
+| MindSpore版本 | 1.6.1                   | 1.6.1                   | 1.3.0                  | 1.3.0                  |
+| 训练数据集    | DIV2K                   | DIV2K                   | DIV2K                  | DIV2K                  |
+| 优化器        | Adam                    | Adam                    | Adam                   | Adam                   |
+| 输出          | Reconstructed HR image  | Reconstructed HR image  | Reconstructed HR image | Reconstructed HR image |
+| PSNR          | NaN                     | 34.53                   | 34.11                  | 33.88                  |
+| SSIM          | NaN                     | 0.9246                  | 0.9206                 | 0.9167                 |
+| 速度          | 836ms/step              | 1417 ms/step            | 271 ms/step            | 409 ms/step            |
+| 总时长        | NaN                     | 2952mins                | 2258 mins              | 409 mins               |
+| 微调检查点    | 50.1M（.ckpt文件）      | 50.1M（.ckpt文件)       | 50.1M（.ckpt文件)      | 50.1M（.ckpt文件)      |
+| 脚本          | [IRN](./)               | [IRN](./)               | [IRN](./)              | [IRN](./)              |
 
 ## 随机情况说明
 

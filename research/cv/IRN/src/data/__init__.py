@@ -87,19 +87,21 @@ def create_dataset(dataset_path, scale, do_train=True, repeat_num=1,
         rank_size, rank_id = _get_rank_info()
     else:
         if distribute:
-            init()
             rank_id = get_rank()
             rank_size = get_group_size()
+            sampler = Sampler(len(sr_ds), rank_id, rank_size)
         else:
+            sampler = None
             rank_size = 1
+            rank_id = 0
 
     num_shards = None if rank_size == 1 else rank_size
     shard_id = None if rank_size == 1 else rank_id
     if do_train:
         dataset = ds.GeneratorDataset(
             sr_ds, ["downscaled", "original"],
-            num_parallel_workers=1, shuffle=True,
-            sampler=Sampler(len(sr_ds), rank_id, rank_size),
+            num_parallel_workers=4 * rank_size, shuffle=True,
+            sampler=sampler,
             num_shards=num_shards, shard_id=shard_id,
         )
     else:
