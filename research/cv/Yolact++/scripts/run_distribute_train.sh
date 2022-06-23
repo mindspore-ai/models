@@ -58,7 +58,6 @@ do
     mkdir ./train_parallel$i
     cp ../*.py ./train_parallel$i
     cp *.sh ./train_parallel$i
-    cp -r ../weights ./train_parallel$i
     cp -r ../src ./train_parallel$i
     cd ./train_parallel$i || exit
 
