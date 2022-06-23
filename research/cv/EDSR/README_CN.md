@@ -21,6 +21,7 @@
         - [推理](#推理)
             - [在昇腾310上使用DIV2K数据集进行推理](#在昇腾310上使用DIV2K数据集进行推理)
             - [在昇腾310上使用其他数据集进行推理](#在昇腾310上使用其他数据集进行推理)
+            - [进行onnx推理](#进行onnx推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [训练性能](#训练性能)
@@ -218,7 +219,7 @@ EDSR是由多个优化后的residual blocks串联而成，相比原始版本的r
 
 ## 脚本及样例代码
 
-```bash
+```text
 ├── model_zoo
     ├── README.md                       // 所有模型相关说明
     ├── EDSR
@@ -229,6 +230,7 @@ EDSR是由多个优化后的residual blocks串联而成，相比原始版本的r
         │   ├──run_train.sh             // 分布式到Ascend的shell脚本
         │   ├──run_eval.sh              // Ascend评估的shell脚本
         │   ├──run_infer_310.sh         // Ascend-310推理shell脚本
+        │   └── run_eval_onnx.sh        // 用于ONNX评估的shell脚本
         ├── src
         │   ├──dataset.py               // 创建数据集
         │   ├──edsr.py                  // edsr网络架构
@@ -237,7 +239,8 @@ EDSR是由多个优化后的residual blocks串联而成，相比原始版本的r
         │   ├──utils.py                 // train.py/eval.py公用的代码段
         ├── train.py                    // 训练脚本
         ├── eval.py                     // 评估脚本
-        ├── export.py                   // 将checkpoint文件导出到air/mindir
+        ├── eval_onnx.py                // ONNX评估脚本
+        ├── export.py                   // 将checkpoint文件导出到onnx/air/mindir
         ├── preprocess.py               // Ascend-310推理的数据预处理脚本
         ├── ascend310_infer
         │   ├──src                      // 实现Ascend-310推理源代码
@@ -310,7 +313,8 @@ EDSR是由多个优化后的residual blocks串联而成，相比原始版本的r
 
 ## 导出
 
-在运行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
+在运行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir/onnx可以在任意环境上导出。batch_size只支持1。
+注意：若要导出onnx需要将export.py代码中file_format = 'MINDIR'修改为file_format = 'ONNX'
 
 ### 导出脚本
 
@@ -356,14 +360,44 @@ python export.py --config_path DIV2K_config.yaml --output_path [dir to save mode
 
 - 推理流程
 
-```bash
-# (1) 整理数据集，lr图片统一padding到一个固定尺寸。参考preprocess.py
-# (2) 根据固定尺寸导出模型，参考export.py
-# (3) 使用build.sh在ascend310_infer文件夹内编译推理程序，得到程序ascend310_infer/out/main
-# (4) 配置数据集图片路径，模型路径，输出路径等，使用main推理得到超分辨率重建图片。
-./ascend310_infer/out/main --mindir_path=[model] --dataset_path=[read_data_path] --device_id=[device_id] --save_dir=[save_data_path]
-# (5) 后处理图片，去除padding的无效区域。和hr图一起统计指标。参考preprocess.py
-```
+  ```bash
+  # (1) 整理数据集，lr图片统一padding到一个固定尺寸。参考preprocess.py
+  # (2) 根据固定尺寸导出模型，参考export.py
+  # (3) 使用build.sh在ascend310_infer文件夹内编译推理程序，得到程序ascend310_infer/out/main
+  # (4) 配置数据集图片路径，模型路径，输出路径等，使用main推理得到超分辨率重建图片。
+  ./ascend310_infer/out/main --mindir_path=[model] --dataset_path=[read_data_path] --device_id=[device_id] --save_dir=[save_data_path]
+  # (5) 后处理图片，去除padding的无效区域。和hr图一起统计指标。参考preprocess.py
+  ```
+
+#### 进行onnx推理
+
+- 推理流程
+
+  ```bash
+  # (1) 整理数据集，lr图片统一padding到一个固定尺寸。参考preprocess.py
+  # (2) 根据固定尺寸导出模型，参考export.py
+  # (3) 执行推理脚本
+  ```
+
+- 在GPU环境中运行ONNX评估
+
+  ```bash
+  # 运行X2评估示例(EDSR(x2) in the paper)
+  bash scripts/run_eval_onnx.sh ./DIV2K_config.yaml  2  DIV2K path output_path  pre_trained_model_path  ONNX
+  # 运行X3评估示例(EDSR(x3) in the paper)
+  bash scripts/run_eval_onnx.sh ./DIV2K_config.yaml  3  DIV2K path output_path  pre_trained_model_path  ONNX
+  # 运行X4评估示例(EDSR(x4) in the paper)
+  bash scripts/run_eval_onnx.sh ./DIV2K_config.yaml  2  DIV2K path output_path  pre_trained_model_path  ONNX
+  ```
+
+  上述python命令将在后台运行，您可以通过eval_onnx.log文件查看结果。测试数据集的准确性如下：
+
+  ```bash
+  .....
+  [100/100] rank = 0 result = {'psnr': 29.297856984107398, 'num_sr': 100.0, 'time': 5.842652082443237}
+  evaluation result = {'psnr': 29.297856984107398, 'num_sr': 100.0, 'time': 2905.9808044433594}
+  eval success
+  ```
 
 # 模型描述
 
