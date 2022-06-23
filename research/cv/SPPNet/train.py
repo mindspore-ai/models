@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
     if args.is_distributed:
         if args.device_target == "Ascend":
-            context.set_context(device_id=device_id)
+            context.set_context(device_id=args.device_id)
             init("hccl")
         else:
             assert args.device_target == "GPU"

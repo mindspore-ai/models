@@ -54,8 +54,8 @@ DATASET:
     SCALE_FACTOR: 0.3
 #train-related
 TRAIN:
-    SINK_MODE: False
-    NUM_WORKERS: 8
+    SINK_MODE: True
+    NUM_WORKERS: 16
     BATCH_SIZE: 64
     BEGIN_EPOCH: 0
     END_EPOCH: 140
