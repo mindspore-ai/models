@@ -129,6 +129,7 @@ esac
 done
 
 file_path=$(cd "$(dirname $0)" || exit; pwd)
+export PYTHONPATH=$(realpath ${file_path}/..):$PYTHONPATH
 for((i=0; i < $RANK_SIZE; i++))
 do
   if [ $RANK_SIZE -gt 1 ]
