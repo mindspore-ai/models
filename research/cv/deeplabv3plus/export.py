@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ from mindspore import Tensor, context, load_checkpoint, load_param_into_net, exp
 from src.deeplab_v3plus import DeepLabV3Plus
 
 context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
-
 
 class BuildEvalNetwork(nn.Cell):
     """BuildEvalNetwork"""
@@ -52,13 +51,14 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.model == 'DeepLabV3plus_s16':
-        network = DeepLabV3Plus('eval', args.num_classes, 16, True)
+        network = DeepLabV3Plus('eval', args.num_classes, 16, False)
     else:
-        network = DeepLabV3Plus('eval', args.num_classes, 8, True)
+        network = DeepLabV3Plus('eval', args.num_classes, 8, False)
     network = BuildEvalNetwork(network, "NCHW")
     param_dict = load_checkpoint(args.checkpoint)
 
     # load the parameter into net
     load_param_into_net(network, param_dict)
-    input_data = Tensor(np.ones([1, 3, 513, 513]).astype(np.float32))
+    input_data = Tensor(np.ones([8, 3, 513, 513]).astype(np.float32))
+    #if deeplabv3+s8，batchsize=8，if s16，batchsize为16
     export(network, input_data, file_name=args.filename, file_format='MINDIR')

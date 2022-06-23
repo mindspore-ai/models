@@ -3,4 +3,5 @@ numpy
 Pillow
 python-opencv
 scipy
+onnxruntime-gpu
 

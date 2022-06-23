@@ -85,7 +85,7 @@ Pascal VOC数据集和语义边界数据集（Semantic Boundaries Dataset，SBD�
 
 ## 混合精度
 
-采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
+采用[混合精度](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
 以FP16算子为例，如果输入数据类型为FP32，MindSpore后台会自动降低精度来处理数据。用户可打开INFO日志，搜索“reduce precision”查看精度降低的算子。
 
 # 环境要求
@@ -640,6 +640,32 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_
 | 性能 | 187736.386 ms（单卡，s16）<br>  44474.187 ms（八卡，s16） |  1080 ms/step（单卡，s16）|  
 | 微调检查点 | 453M （.ckpt文件） | 454M （.ckpt文件）|
 | 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/deeplabv3plus) |[链接](https://gitee.com/mindspore/models/tree/master/research/cv/deeplabv3plus) |
+
+#### Running ONNX evaluation
+
+First, export your model:
+
+```shell
+python export.py \
+  --checkpoint /path/to/checkpoint.ckpt \
+  --filename /path/to/exported.onnx \
+  --model [deeplab_v3_s16 or deeplab_v3_s8]  
+```
+
+Next, run evaluation:
+
+```shell
+python eval_onnx.py \
+  --file_name /path/to/exported.onnx
+  --data_root /path/to/VOC2012/
+  --data_lst /path/to/VOC2012/voc_val_lst.txt \
+  --device_target GPU \
+  --batch_size [batch size]
+
+or
+
+bash run_eval_onnx.sh [DATA_ROOT] [DATA_LST] [FILE_NAME]
+```
 
 # 随机情况说明
 
