@@ -29,7 +29,6 @@ rm -rf ./train_parallel_standalone
 mkdir ./train_parallel_standalone
 cp ../*.py ./train_parallel_standalone
 cp *.sh ./train_parallel_standalone
-cp -r ../weights ./train_parallel_standalone
 cp -r ../src ./train_parallel_standalone
 cd ./train_parallel_standalone || exit
 
