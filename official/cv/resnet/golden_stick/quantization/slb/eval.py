@@ -13,6 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """eval resnet."""
+
 import mindspore as ms
 import mindspore.log as logger
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits

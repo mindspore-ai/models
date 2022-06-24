@@ -720,7 +720,7 @@ bash run_infer_310.sh [MINDIR_PATH] [NET_TYPE] [DATASET] [DATA_PATH] [CONFIG_PAT
 - 使用CIFAR-10数据集评估ResNet18
 
 ```bash
-Total data: 10000, top1 accuracy: 0.94.26, top5 accuracy: 0.9987.
+Total data: 10000, top1 accuracy: 0.9426, top5 accuracy: 0.9987.
 ```
 
 - 使用ImageNet2012数据集评估ResNet18
@@ -854,28 +854,22 @@ result:{'top_1_accuracy': 0.9354967948717948, 'top_5_accuracy': 0.99819711538461
 result:{'top_1_accuracy': 0.9273838141025641} prune_rate=0.45 ckpt=~/resnet50_cifar10/train_parallel0/resnet-400_390.ckpt
 ```
 
-- 使用SLB算法对ResNet18做W4A8量化，并使用CIFAR-10数据集评估，W4A8表示weight量化为4bit，activation量化为8bit：
+- 使用SLB算法对ResNet18做W4量化，并使用CIFAR-10数据集评估，W4表示weight量化为4bit：
 
 ```text
-result:{'top_1_accuracy': 0.9285857371794872, 'top_5_accuracy': 0.9959935897435898} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+result:{'top_1_accuracy': 0.9534254807692307, 'top_5_accuracy': 0.9969951923076923} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
 ```
 
-- 使用SLB算法对ResNet18做W2A8量化，并使用CIFAR-10数据集评估，W2A8表示weight量化为2bit，activation量化为8bit：
+- 使用SLB算法对ResNet18做W2量化，并使用CIFAR-10数据集评估，W2表示weight量化为2bit：
 
 ```text
-result:{'top_1_accuracy': 0.9207732371794872, 'top_5_accuracy': 0.9955929487179487} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+result:{'top_1_accuracy': 0.9503205128205128, 'top_5_accuracy': 0.9966947115384616} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
 ```
 
-- 使用SLB算法对ResNet18做W1A8量化，并使用CIFAR-10数据集评估，W1A8表示weight量化为1bit，activation量化为8bit：
+- 使用SLB算法对ResNet18做W1量化，并使用CIFAR-10数据集评估，W1表示weight量化为1bit：
 
 ```text
-result:{'top_1_accuracy': 0.8976362179487182, 'top_5_accuracy': 0.9923878205128205} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
-```
-
-- 使用SLB算法对ResNet18做W1A4量化，并使用CIFAR-10数据集评估，W1A4表示weight量化为1bit，activation量化为4bit：
-
-```text
-result:{'top_1_accuracy': 0.8845152243589743, 'top_5_accuracy': 0.9914863782051282} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+result:{'top_1_accuracy': 0.9485176282051282, 'top_5_accuracy': 0.9965945512820513} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
 ```
 
 # 模型描述

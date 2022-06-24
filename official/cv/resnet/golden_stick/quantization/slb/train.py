@@ -13,9 +13,9 @@
 # limitations under the License.
 # ============================================================================
 """train resnet."""
+
 import os
 import numpy as np
-
 import mindspore as ms
 import mindspore.nn as nn
 import mindspore.train.callback as callback
@@ -130,7 +130,7 @@ def load_pretrained_ckpt(net):
     if config.pre_trained:
         if os.path.isfile(config.pre_trained):
             ckpt = ms.load_checkpoint(config.pre_trained)
-            if False and ckpt.get("epoch_num") and ckpt.get("step_num"):
+            if ckpt.get("epoch_num") and ckpt.get("step_num"):
                 config.has_trained_epoch = int(ckpt["epoch_num"].data.asnumpy())
                 config.has_trained_step = int(ckpt["step_num"].data.asnumpy())
             else:
@@ -208,7 +208,7 @@ class TemperatureScheduler(callback.Callback):
             t *= self.t_factor**(min(epoch, t_end_epoch) - t_start_epoch)
         # Assign new value to temperature parameter
         for _, cell in self.model.train_network.cells_and_names():
-            if cell.cls_name == 'QBNNFakeQuantizerPerLayer': # for QBNN
+            if cell.cls_name == 'SlbFakeQuantizerPerLayer': # for SLB
                 cell.set_temperature(t)
                 if epoch >= t_end_epoch:
                     cell.set_temperature_end_flag()

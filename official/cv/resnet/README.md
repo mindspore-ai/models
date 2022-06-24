@@ -892,28 +892,22 @@ result:{'top_1_accuracy': 0.9354967948717948, 'top_5_accuracy': 0.99819711538461
 result:{'top_1_accuracy': 0.9273838141025641} prune_rate=0.45 ckpt=~/resnet50_cifar10/train_parallel0/resnet-400_390.ckpt
 ```
 
-- Apply SLB on ResNet18 with W4A8, and evaluating with CIFAR-10 dataset. W4A8 means quantize weight with 4bit and activation with 8bit:
+- Apply SLB on ResNet18 with W4, and evaluating with CIFAR-10 dataset. W4 means quantize weight with 4bit:
 
 ```text
-result:{'top_1_accuracy': 0.9285857371794872, 'top_5_accuracy': 0.9959935897435898} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+result:{'top_1_accuracy': 0.9534254807692307, 'top_5_accuracy': 0.9969951923076923} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
 ```
 
-- Apply SLB on ResNet18 with W2A8, and evaluating with CIFAR-10 dataset. W2A8 means quantize weight with 2bit and activation with 8bit:
+- Apply SLB on ResNet18 with W2, and evaluating with CIFAR-10 dataset. W2 means quantize weight with 2bit:
 
 ```text
-result:{'top_1_accuracy': 0.9207732371794872, 'top_5_accuracy': 0.9955929487179487} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+result:{'top_1_accuracy': 0.9503205128205128, 'top_5_accuracy': 0.9966947115384616} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
 ```
 
-- Apply SLB on ResNet18 with W1A8, and evaluating with CIFAR-10 dataset. W1A8 means quantize weight with 1bit and activation with 8bit:
+- Apply SLB on ResNet18 with W1, and evaluating with CIFAR-10 dataset. W1 means quantize weight with 1bit:
 
 ```text
-result:{'top_1_accuracy': 0.8976362179487182, 'top_5_accuracy': 0.9923878205128205} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
-```
-
-- Apply SLB on ResNet18 with W1A4, and evaluating with CIFAR-10 dataset. W1A4 means quantize weight with 1bit and activation with 4bit:
-
-```text
-result:{'top_1_accuracy': 0.8845152243589743, 'top_5_accuracy': 0.9914863782051282} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+result:{'top_1_accuracy': 0.9485176282051282, 'top_5_accuracy': 0.9965945512820513} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
 ```
 
 # [Model Description](#contents)
