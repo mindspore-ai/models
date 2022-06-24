@@ -14,21 +14,15 @@
 # ============================================================================
 """Create SLB-QAT algorithm instance."""
 
-from mindspore_gs.quantization.slb import SlbQuantAwareTraining as QBNNQAT
+from mindspore_gs.quantization.slb import SlbQuantAwareTraining as SlbQAT
 from mindspore_gs.quantization.constant import QuantDtype
 
-def create_slb(quant_type="graph_W4A8"):
-    algo = QBNNQAT()
-    if "W4A8" in quant_type:
+def create_slb(quant_type="W1"):
+    algo = SlbQAT()
+    if "W4" in quant_type:
         algo.set_weight_quant_dtype(QuantDtype.INT4)
-        algo.set_act_quant_dtype(QuantDtype.INT8)
-    elif "W2A8" in quant_type:
+    elif "W2" in quant_type:
         algo.set_weight_quant_dtype(QuantDtype.INT2)
-        algo.set_act_quant_dtype(QuantDtype.INT8)
-    elif "W1A8" in quant_type:
+    elif "W1" in quant_type:
         algo.set_weight_quant_dtype(QuantDtype.INT1)
-        algo.set_act_quant_dtype(QuantDtype.INT8)
-    elif "W1A4" in quant_type:
-        algo.set_weight_quant_dtype(QuantDtype.INT1)
-        algo.set_act_quant_dtype(QuantDtype.INT4)
     return algo

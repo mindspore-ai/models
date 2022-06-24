@@ -60,7 +60,7 @@ eval_image_size: 224
 
 # Golden-stick options
 comp_algo: "SLB"
-quant_type: "W1A8"
+quant_type: "W1"
 t_start_val: 1.0
 t_start_time: 0.2
 t_end_time: 0.6
