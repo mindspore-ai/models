@@ -23,7 +23,7 @@ import mindspore as ms
 import mindspore.nn as nn
 from mindspore import Tensor
 from mindspore.train.serialization import save_checkpoint
-from mindspore.communication.management import init, get_group_size
+from mindspore.communication.management import init
 from mindspore.context import ParallelMode
 from src.models.loss import D_Loss, D_WithLossCell, G_Loss, G_WithLossCell, TrainOneStepCell
 from src.models.pix2pix import Pix2Pix, get_generator, get_discriminator
@@ -47,28 +47,17 @@ def train():
 
     steps_per_epoch = ds.get_dataset_size()
     ms.set_context(mode=ms.GRAPH_MODE)
-    if config.device_target == 'Ascend':
-        if config.run_distribute:
-            print("Ascend distribute")
-            ms.set_context(device_id=int(os.getenv("DEVICE_ID")), device_target="Ascend")
-            ms.reset_auto_parallel_context()
-            ms.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
-                                         device_num=device_num)
-            init()
 
-            rank = get_rank_id()
-        else:
-            ms.set_context(device_id=get_device_id(), device_target="Ascend")
-    elif config.device_target == 'GPU':
-        if config.run_distribute:
-            print("GPU distribute")
-            init()
-            ms.set_context(device_target="GPU")
-            ms.set_auto_parallel_context(device_num=get_group_size(),
-                                         parallel_mode=ParallelMode.DATA_PARALLEL,
-                                         gradients_mean=True)
-        else:
-            ms.set_context(device_id=get_device_id(), device_target="GPU")
+    if config.run_distribute:
+        init()
+        ms.set_context(device_id=get_device_id(), device_target=config.device_target)
+        ms.reset_auto_parallel_context()
+        ms.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
+                                     device_num=device_num)
+        rank = get_rank_id()
+    else:
+        ms.set_context(device_id=get_device_id(), device_target=config.device_target)
+
     netG = get_generator()
     netD = get_discriminator()
 
@@ -100,8 +89,7 @@ def train():
 
     data_loader = ds.create_dict_iterator(output_numpy=True, num_epochs=config.epoch_num)
     print("Starting Training Loop...")
-    if config.run_distribute:
-        rank = get_rank()
+
     for epoch in range(config.epoch_num):
         for i, data in enumerate(data_loader):
             start_time = datetime.datetime.now()
