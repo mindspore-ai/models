@@ -26,10 +26,9 @@ RANK_TABLE_FILE=$(realpath $1)
 export RANK_TABLE_FILE
 echo "RANK_TABLE_FILE=${RANK_TABLE_FILE}"
 
-device_start=$3
 for((i=0; i<${DEVICE_NUM}; i++))
 do
-    export DEVICE_ID=$((device_start + i))
+    export DEVICE_ID=$i
     export RANK_ID=$i
     rm -rf ./train_parallel$i
     mkdir ./train_parallel$i
