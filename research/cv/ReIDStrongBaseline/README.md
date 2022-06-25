@@ -84,8 +84,8 @@ DukeMTMC-reID
 
 ## [Environment Requirements](#contents)
 
-- Hardware（GPU）
-    - Prepare hardware environment with GPU processor.
+- Hardware（Ascend/GPU）
+    - Prepare hardware environment with Ascend or GPU processor.
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
@@ -94,13 +94,23 @@ DukeMTMC-reID
 
 ## [Quick Start](#contents)
 
-### [Running scripts](#contents)
-
 Model uses pre-trained backbone ResNet50 trained on ImageNet2012. [Link](https://download.mindspore.cn/model_zoo/r1.3/resnet50_ascend_v130_imagenet2012_official_cv_bs256_top1acc76.97__top5acc_93.44/)
 
 After dataset preparation, you can start training and evaluation as follows:
 
 (Note that you must specify dataset path in `configs/market1501_config.yml`)
+
+### [Running on Ascend](#contents)
+
+```bash
+# run distributed training example
+bash scripts/run_distribute_train_ascend.sh ./configs/market1501_config.yml /path/to/dataset/ /path/to/output/ /path/to/pretrained_resnet50.ckpt rank_table_8pcs.json 8
+
+# run evaluation example
+bash scripts/run_eval_ascend.sh ./configs/market1501_config.yml /your/path/checkpoint_file /path/to/dataset/
+```
+
+### [Running on GPU](#contents)
 
 ```bash
 # run training example
@@ -119,6 +129,7 @@ bash scripts/run_eval_gpu.sh ./configs/market1501_config.yml /your/path/checkpoi
 
 ```text
 ReIDStrongBaseline
+├── ascend310_infer  # application for 310 inference
 ├── configs
 │   ├── dukemtmc_config.yml  # Training/evaluation config on DukeMTMC dataset
 │   └── market1501_config.yml  # Training/evaluation config on Market1501 dataset
@@ -129,8 +140,11 @@ ReIDStrongBaseline
 │   ├── local_adapter.py # Environment variables parser
 │   └── moxing_adapter.py # Moxing adapter for ModelArts
 ├── scripts
+│   ├── run_distribute_train_Ascend.sh  # Start multi Ascend training
 │   ├── run_distribute_train_gpu.sh  # Start multi GPU training
+│   ├── run_eval_Ascend.sh  # Start single Ascend evaluation
 │   ├── run_eval_gpu.sh # Start single GPU evaluation
+│   ├── run_infer_310.sh  # Start 310 inference
 │   └── run_standalone_train_gpu.sh  # Start single GPU training
 ├── src
 │   ├── callbacks.py # Logging to file callbacks
@@ -154,6 +168,7 @@ ReIDStrongBaseline
 │   └── triplet_loss.py  # Triplet  Loss definition
 ├── eval.py # Evaluate the network
 ├── export.py # Export the network
+├── postprogress.py # post process for 310 inference
 ├── train.py # Train the network
 ├── requirements.txt # Required libraries
 └── README.md
@@ -176,7 +191,7 @@ usage: train.py  --config_path CONFIG_PATH [--distribute DISTRIBUTE] [--device_t
 options:
     --config_path              path to .yml config file
     --distribute               pre_training by several devices: "true"(training by more than 1 device) | "false", default is "false"
-    --device_target            target device ("GPU" | "CPU")
+    --device_target            target device ("Ascend" | "GPU" | "CPU")
     --max_epoch                epoch size: N, default is 120
     --start_decay_epoch        epoch to decay, default is '40,70'
     --ids_per_batch            number of person in batch, default is 16 (8 for distributed)
@@ -225,6 +240,19 @@ Parameters for learning rate:
 - Set options in `configs/market1501_config.yaml` or `configs/dukemtmc_config.yaml`,
   including paths, learning rate and network hyperparameters.
 
+### Usage
+
+#### on Ascend
+
+- Run `run_distribute_train_Ascend.sh` for distributed training of ReID Strong Baseline model.
+- The `RANK_TABLE_FILE` is placed under `scripts/`
+
+    ```bash
+    bash scripts/run_distribute_train_Ascend.sh CONFIG_PATH DATA_DIR OUTPUT_PATH PRETRAINED_RESNET50 RANK_TABLE_FILE RANK_SIZE
+    ```
+
+#### on GPU
+
 - Run `run_standalone_train_gpu.sh` for non-distributed training of  model.
 
     ```bash
@@ -240,6 +268,18 @@ Parameters for learning rate:
 ## [Evaluation Process](#contents)
 
 - Set options in `market1501_config.yaml`.
+
+### Usage
+
+#### on Ascend
+
+- Run `bash scripts/run_eval_Ascend.sh` for evaluation of ReID Strong Baseline model.
+
+    ```bash
+    bash scripts/run_eval_Ascend.sh CONFIG_PATH CKPT_PATH DATA_DIR
+    ```
+
+#### on GPU
 
 - Run `bash scripts/run_eval_gpu.sh` for evaluation of ReID Strong Baseline model.
 
@@ -274,61 +314,61 @@ Inference result will be shown in the terminal
 
 #### Market1501 Training Performance
 
-| Parameters                 | GPU                                                            |
-| -------------------------- | -------------------------------------------------------------- |
-| Resource                   | 8x Tesla V100-PCIE 32G                                         |
-| uploaded Date              | 03/11/2022 (month/day/year)                                    |
-| MindSpore Version          | 1.5.0                                                          |
-| Dataset                    | Market1501                                                     |
-| Training Parameters        | max_epoch=120, ids_per_batch=8, start_decay_epoch=151, lr_init=0.0014, lr_cri=1.0, decay_epochs='40,70' |
-| Optimizer                  | Adam, SGD                                                      |
-| Loss Function              | Triplet, Smooth Identity, Center                               |
-| Speed                      | 182ms/step (8pcs)                                              |
-| Loss                       | 0.24                                                           |
-| Params (M)                 | 25.1                                                           |
-| Checkpoint for inference   | 319Mb (.ckpt file)                                             |
-| Scripts                    | [ReID Strong Baseline scripts](scripts)                        |
+| Parameters                 | Ascend                      | GPU                                                       |
+| -------------------------- | --------------------------- |---------------------------------------------------------- |
+| Resource                   | 8x Ascend 910 32G      |8x Tesla V100-PCIE 32G                                          |
+| uploaded Date              | 04/21/2022 (month/day/year) |03/11/2022 (month/day/year)                                |
+| MindSpore Version          | 1.3.0                       |1.5.0                                                      |
+| Dataset                    | Market1501                  |Market1501                                                 |
+| Training Parameters        | max_epoch=120, ids_per_batch=8, start_decay_epoch=151, lr_init=0.0014, lr_cri=1.0, decay_epochs='40,70' |max_epoch=120, ids_per_batch=8, start_decay_epoch=151, lr_init=0.0014, lr_cri=1.0, decay_epochs='40,70' |
+| Optimizer                  | Adam, SGD                   |Adam, SGD                                                  |
+| Loss Function              | Triplet, Smooth Identity, Center |Triplet, Smooth Identity, Center                      |
+| Speed                      | 536ms/step (8pcs) |182ms/step (8pcs)                                                    |
+| Loss                       | 0.28                        |0.24                                                       |
+| Params (M)                 | 24.8                        |25.1                                                      |
+| Checkpoint for inference   | 305Mb (.ckpt file)          |319Mb (.ckpt file)                                        |
+| Scripts                    | [ReID Strong Baseline scripts](scripts) |[ReID Strong Baseline scripts](scripts)        |
 
 #### Market1501 Evaluation Performance
 
-| Parameters          | GPU                         |
-| ------------------- | --------------------------- |
-| Resource            | 1x Tesla V100-PCIE 32G      |
-| Uploaded Date       | 03/11/2022 (month/day/year) |
-| MindSpore Version   | 1.5.0                       |
-| Dataset             | Market1501                  |
-| batch_size          | 32                          |
-| outputs             | mAP, Rank-1                 |
-| Accuracy            | mAP: 86.99%, rank-1: 94.48% |
+| Parameters          | Ascend                        | GPU                         |
+| ------------------- | ----------------------------- | --------------------------- |
+| Resource            | 1x Ascend 910 32G             | 1x Tesla V100-PCIE 32G      |
+| Uploaded Date       | 04/21/2022 (month/day/year)   | 03/11/2022 (month/day/year) |
+| MindSpore Version   | 1.3.0                         | 1.5.0                       |
+| Dataset             | Market1501                    | Market1501                  |
+| batch_size          | 32                            | 32                          |
+| outputs             | mAP, Rank-1                   | mAP, Rank-1                 |
+| Accuracy            | mAP: 86.85%, rank-1: 94.36%   | mAP: 86.99%, rank-1: 94.48% |
 
 #### DukeMTMC-reID Training Performance
 
-| Parameters                 | GPU                                                            |
-| -------------------------- | -------------------------------------------------------------- |
-| Resource                   | 8x Tesla V100-PCIE 32G                                         |
-| uploaded Date              | 03/11/2022 (month/day/year)                                    |
-| MindSpore Version          | 1.5.0                                                          |
-| Dataset                    | DukeMTMC-reID                                                  |
-| Training Parameters        | max_epoch=120, ids_per_batch=8, start_decay_epoch=151, lr_init=0.0014, lr_cri=1.0, decay_epochs='40,70' |
-| Optimizer                  | Adam, SGD                                                      |
-| Loss Function              | Triplet, Smooth Identity, Center                               |
-| Speed                      | 180ms/step (8pcs)                                              |
-| Loss                       | 0.24                                                           |
-| Params (M)                 | 25.1                                                           |
-| Checkpoint for inference   | 319Mb (.ckpt file)                                             |
-| Scripts                    | [ReID Strong Baseline scripts](scripts)                        |
+| Parameters                 |  Ascend                     | GPU                                         |
+| -------------------------- |---------------------------- | ------------------------------------------- |
+| Resource                   | 8x Ascend 910 32G           | 8x Tesla V100-PCIE 32G                      |
+| uploaded Date              | 04/21/2022 (month/day/year) | 03/11/2022 (month/day/year)                 |
+| MindSpore Version          | 1.3.0                       | 1.5.0                                       |
+| Dataset                    | DukeMTMC-reID               | DukeMTMC-reID                               |
+| Training Parameters        | max_epoch=120, ids_per_batch=8, start_decay_epoch=151, lr_init=0.0014, lr_cri=1.0, decay_epochs='40,70'| max_epoch=120, ids_per_batch=8, start_decay_epoch=151, lr_init=0.0014, lr_cri=1.0, decay_epochs='40,70' |
+| Optimizer                  | Adam, SGD                   | Adam, SGD                                   |
+| Loss Function              | Triplet, Smooth Identity, Center | Triplet, Smooth Identity, Center       |
+| Speed                      | 524ms/step (8pcs)           | 180ms/step (8pcs)                           |
+| Loss                       | 0.27                        | 0.24                                        |
+| Params (M)                 | 24.8                        |25.1                                                      |
+| Checkpoint for inference   | 302Mb (.ckpt file)          | 319Mb (.ckpt file)                          |
+| Scripts                    | [ReID Strong Baseline scripts](scripts)| [ReID Strong Baseline scripts](scripts) |
 
 #### DukeMTMC-reID Evaluation Performance
 
-| Parameters          | GPU                         |
-| ------------------- | --------------------------- |
-| Resource            | 1x Tesla V100-PCIE 32G      |
-| Uploaded Date       | 03/11/2022 (month/day/year) |
-| MindSpore Version   | 1.5.0                       |
-| Dataset             | DukeMTMC-reID               |
-| batch_size          | 32                          |
-| outputs             | mAP, Rank-1                 |
-| Accuracy            | mAP: 76.68%, rank-1: 87.34% |
+| Parameters          | Ascend                      | GPU                         |
+| ------------------- | --------------------------- | --------------------------- |
+| Resource            | 1x Ascend 910 32G           | 1x Tesla V100-PCIE 32G      |
+| Uploaded Date       | 04/21/2022 (month/day/year) | 03/11/2022 (month/day/year) |
+| MindSpore Version   | 1.3.0                       | 1.5.0                       |
+| Dataset             | DukeMTMC-reID               | DukeMTMC-reID               |
+| batch_size          | 32                          | 32                          |
+| outputs             | mAP, Rank-1                 | mAP, Rank-1                 |
+| Accuracy            | mAP: 76.58%, rank-1: 87.43% | mAP: 76.68%, rank-1: 87.34% |
 
 ## [Description of Random Situation](#contents)
 
