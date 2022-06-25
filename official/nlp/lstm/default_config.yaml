@@ -76,4 +76,4 @@ enable_graph_kernel: 'Accelerate by graph kernel, default is true.'
 device_target: ['Ascend', 'GPU', 'CPU']
 distribute: ['true', 'false']
 enable_graph_kernel: ['true', 'false']
-file_format: ['AIR', 'MINDIR']
+file_format: ['AIR', 'MINDIR', 'ONNX']

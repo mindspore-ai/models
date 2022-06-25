@@ -1,0 +1,9 @@
+#ONNX runtime inference
+#onnx model path
+onnx_file: '/home/mindspore/lstm/biLSTM/lstm/lstm.onnx'
+onnx_target: 'GPU'
+embed_size: 300
+aclimdb_path: "/home/mindspore/lstm/biLSTM/aclImdb"
+batch_size: 64
+preprocess_path: "/home/mindspore/lstm/preprocess"
+glove_path: "/home/mindspore/lstm/biLSTM/glove"
