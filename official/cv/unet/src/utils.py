@@ -92,10 +92,11 @@ class dice_coeff(nn.Metric):
         self._iou_sum = 0
         self._samples_num = 0
         self.img_num = 0
-        self.eval_images_path = "./draw_eval"
-        if os.path.exists(self.eval_images_path):
-            shutil.rmtree(self.eval_images_path)
-        os.mkdir(self.eval_images_path)
+        if self.show_eval:
+            self.eval_images_path = "./draw_eval"
+            if os.path.exists(self.eval_images_path):
+                shutil.rmtree(self.eval_images_path)
+            os.mkdir(self.eval_images_path)
 
     def draw_img(self, gray, index):
         """

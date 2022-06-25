@@ -39,6 +39,9 @@ DATASET=$(get_real_path $2)
 CONFIG_PATH=$(get_real_path $3)
 RANK_TABLE=$(get_real_path $1)
 export RANK_TABLE_FILE=$RANK_TABLE
+
+ulimit -u unlimited
+
 for((i=0;i<RANK_SIZE;i++))
 do
     rm -rf LOG$i

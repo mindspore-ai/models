@@ -257,7 +257,7 @@ def create_multi_class_dataset(data_dir, img_size, repeat, batch_size, num_class
     mc_dataset = MultiClassDataset(data_dir, repeat, is_train, split, shuffle)
     dataset = ds.GeneratorDataset(mc_dataset, mc_dataset.column_names, shuffle=True,
                                   num_shards=group_size, shard_id=rank,
-                                  num_parallel_workers=num_parallel_workers, python_multiprocessing=True)
+                                  num_parallel_workers=num_parallel_workers, python_multiprocessing=is_train)
     compose_map_func = (lambda image, mask: preprocess_img_mask(image, mask, num_classes, tuple(img_size),
                                                                 augment and is_train, eval_resize))
     dataset = dataset.map(operations=compose_map_func, input_columns=mc_dataset.column_names,
