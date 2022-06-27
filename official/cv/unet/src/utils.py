@@ -82,10 +82,10 @@ class dice_coeff(nn.Metric):
 
     def __init__(self, print_res=True, show_eval=False):
         super(dice_coeff, self).__init__()
-        self.clear()
         self.show_eval = show_eval
         self.print_res = print_res
         self.img_num = 0
+        self.clear()
 
     def clear(self):
         self._dice_coeff_sum = 0
