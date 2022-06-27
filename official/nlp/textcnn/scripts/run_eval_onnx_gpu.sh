@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021-2022 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 if [ $# -ne 3 ]; then
-    echo "Usage: bash run_eval_gpu.sh [CKPT_FILE] [DATASET] [DATA_PATH]
+    echo "Usage: bash run_eval_onnx_gpu.sh [ONNX_FILE] [DATASET] [DATA_PATH]
     DATASET must choose from ['MR', 'SUBJ', 'SST2']"
 exit 1
 fi
@@ -44,9 +44,9 @@ then
     fi
     dataset_type=$2
 fi
-python ${BASE_PATH}/../eval.py \
+python ${BASE_PATH}/../eval_onnx.py \
   --device_target="GPU" \
-  --checkpoint_file_path=$1 \
+  --onnx_file=$1 \
   --dataset=$dataset_type \
   --data_path=$data_path \
-  --config_path=$CONFIG_FILE > eval.log 2>&1 &
+  --config_path=$CONFIG_FILE > eval_onnx.log 2>&1 &

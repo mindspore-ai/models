@@ -11,6 +11,9 @@
     - [Training Process](#training-process)
     - [Evaluation Process](#evaluation-process)
     - [Export MindIR](#export-mindir)
+    - [ONNX Export And Evaluation](#onnx-export-and-evaluation)
+        - [ONNX Export](#onnx-export)
+        - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
 - [Model Description](#model-description)
     - [Performance](#performance)
@@ -146,9 +149,9 @@ If you want to run in modelarts, please check the official documentation of [mod
 
 ```bash
 ├── model_zoo
-    ├── README.md                          // descriptions about all the models
+    ├── README.md                         // descriptions about all the models
     ├── textcnn
-        ├── README.md                      // descriptions about textcnn
+        ├── README.md                     // descriptions about textcnn
         ├──scripts
         │   ├── run_train.sh              // shell script for distributed on Ascend
         │   ├── run_eval.sh               // shell script for evaluation on Ascend
@@ -156,6 +159,7 @@ If you want to run in modelarts, please check the official documentation of [mod
         │   ├── run_eval_cpu.sh           // shell script for evaluation on CPU
         │   ├── run_train_gpu.sh          // shell script for training on GPU
         │   ├── run_eval_gpu.sh           // shell script for evaluation on GPU
+        │   ├── run_eval_onnx_gpu.sh      // shell script for onnx evaluation on GPU
         ├── src
         │   ├── dataset.py                // Processing dataset
         │   ├── textcnn.py                // textcnn architecture
@@ -164,13 +168,14 @@ If you want to run in modelarts, please check the official documentation of [mod
         │   ├──local_adapter.py           // local adapter
         │   ├──moxing_adapter.py          // moxing adapter
         │   ├──config.py                  // parameter analysis
-        ├── mr_config.yaml                 // parameter configuration
-        ├── mr_config_cpu.yaml             // parameter configuration
-        ├── sst2_config.yaml               // parameter configuration
-        ├── subj_config.yaml               // parameter configuration
-        ├── train.py                       // training script
-        ├── eval.py                        //  evaluation script
-        ├── export.py                      //  export checkpoint to other format file
+        ├── mr_config.yaml                // parameter configuration
+        ├── mr_config_cpu.yaml            // parameter configuration
+        ├── sst2_config.yaml              // parameter configuration
+        ├── subj_config.yaml              // parameter configuration
+        ├── train.py                      // training script
+        ├── eval.py                       // evaluation script
+        ├── eval_onnx.py                  // onnx evaluation script
+        ├── export.py                     // export checkpoint to other format file
 ```
 
 ## [Script Parameters](#contents)
@@ -180,19 +185,20 @@ Parameters for both training and evaluation can be set in config.py
 - config for movie review dataset
 
   ```python
-  'pre_trained': 'False'    # whether training based on the pre-trained model
-  'nump_classes': 2         # the number of classes in the dataset
-  'batch_size': 64          # training batch size
-  'epoch_size': 4           # total training epochs
-  'weight_decay': 3e-5      # weight decay value
-  'data_path': './data/'    # absolute full path to the train and evaluation datasets
-  'device_target': 'Ascend' # device running the program
-  'device_id': 0            # device ID used to train or evaluate the dataset. Ignore it when you use run_train.sh for distributed training
-  'keep_checkpoint_max': 1  # only keep the last keep_checkpoint_max checkpoint
+  'pre_trained': 'False'                     # whether training based on the pre-trained model
+  'nump_classes': 2                          # the number of classes in the dataset
+  'batch_size': 64                           # training batch size
+  'epoch_size': 4                            # total training epochs
+  'weight_decay': 3e-5                       # weight decay value
+  'data_path': './data/'                     # absolute full path to the train and evaluation datasets
+  'device_target': 'Ascend'                  # device running the program
+  'device_id': 0                             # device ID used to train or evaluate the dataset. Ignore it when you use run_train.sh for distributed training
+  'keep_checkpoint_max': 1                   # only keep the last keep_checkpoint_max checkpoint
   'checkpoint_path': './train_textcnn.ckpt'  # the absolute full path to save the checkpoint file
-  'word_len': 51            # The length of the word
-  'vec_length': 40          # The length of the vector
-  'base_lr': 1e-3          # The base learning rate
+  'onnx_file': './sst2_textcnn.onnx'         # the absolute full path to the exported onnx file
+  'word_len': 51                             # The length of the word
+  'vec_length': 40                           # The length of the vector
+  'base_lr': 1e-3                            # The base learning rate
   ```
 
 For more configuration details, please refer the script `*.yaml`.
@@ -315,6 +321,36 @@ Export on ModelArts (If you want to run in modelarts, please check the official 
 # (5) Set the "Output file path" and "Job log path" to your path on the website UI interface.
 # (6) Create your job.
 ```
+
+## [ONNX Export And Evaluation](#contents)
+
+### ONNX Export
+
+```bash
+python export.py --checkpoint_file_path [CKPT_PATH] --file_name [FILE_NAME] --file_format "ONNX" --config_path [CONFIG_FILE] --data_path [DATA_PATH] --device_target "GPU"
+# example:python export.py --checkpoint_file_path train_textcnn-4_1052.ckpt --file_name 'sst2_textcnn' --file_format "ONNX" --config_path sst2_config.yaml --data_path data/SST-2/ --device_target "GPU"
+```
+
+### ONNX Evaluation
+
+  Running scripts for onnx evaluation of GRU. The command as below.
+
+  ```bash
+  # `CONFIG_PATH` `ONNX_FILE` `DATA_PATH` `DATASET` parameters need to be passed externally or modified yaml file
+  # `DATASET` must choose from ['MR', 'SUBJ', 'SST2']"
+  python eval_onnx.py --config_path [CONFIG_PATH] \
+                      --device_target GPU \
+                      --onnx_file [ONNX_FILE] \
+                      --data_path [DATA_PATH] > eval_onnx.log 2>&1 &
+  OR
+  bash scripts/run_eval_onnx_gpu.sh [ONNX_FILE] [DATASET] [DATA_PATH]
+  ```
+
+  The above python command will run in the background. You can view the results through the file "eval_onnx.log". The accuracy of the test dataset will be as follows:
+
+  ```bash
+  acc: 0.8329326923076923
+  ```
 
 ## [Inference Process](#contents)
 
