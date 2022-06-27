@@ -47,9 +47,9 @@ MINDRECORD_FILE=$(get_real_path $2)
 USE_DEVICE_ID=$3
 PRETRAINED_BACKBONE=$(get_real_path $4)
 
-if [ ! -f $PRETRAINED_BACKBONE ]
+if [ ! -f $PRETRAINED_BACKBONE ] && [ ! -d $PRETRAINED_BACKBONE ]
     then
-    echo "error: PRETRAINED_PATH=$PRETRAINED_BACKBONE is not a file"
+    echo "error: PRETRAINED_PATH=$PRETRAINED_BACKBONE is not a file neither a dir."
 exit 1
 fi
 

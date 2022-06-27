@@ -406,6 +406,8 @@ Saving ../../results/0-2441_61000/.._.._results_0-2441_61000_face_AP_0.7575.png
 | Accuracy            | 8pcs: 76.0%                 | 4pcs: 77.8%                 |
 | Model for inference | 37M (.ckpt file)            | --                          |
 
+Note there is ±2 deviation of accuracy.
+
 ### Inference Performance
 
 | Parameters          | Ascend                      |
