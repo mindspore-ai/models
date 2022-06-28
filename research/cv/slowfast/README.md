@@ -141,10 +141,11 @@ slowfast是由Facebook AI研究团队提出的一种新颖的方法来分析视�
 
 # 环境要求
 
-- 硬件（Ascend）
-    - 使用Ascend处理器来搭建硬件环境。
+- 硬件（Ascend/GPU）
+    - 使用Ascend或GPU处理器来搭建硬件环境。
 - 框架
-    - [MindSpore1.5.2](https://www.mindspore.cn/install/en)
+    - Ascend：[MindSpore1.5.2](https://www.mindspore.cn/install/en)
+    - GPU：[MindSpore1.7.0](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
@@ -153,29 +154,42 @@ slowfast是由Facebook AI研究团队提出的一种新颖的方法来分析视�
 
 # 快速入门
 
-通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
+通过官方网站安装MindSpore后，运行启动命令之前请将相关启动脚本中的路径改为对应机器上的路径，您可以按照如下步骤进行训练和评估：
 
 - Ascend处理器环境运行
 
   ```text
   # 运行训练示例
-  bash scripts/run_standalone_train.sh configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava SLOWFAST_8x8_R50.pkl.ckpt
+  bash scripts/run_standalone_train_ascend.sh configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava SLOWFAST_8x8_R50.pkl.ckpt
 
   # 运行分布式训练示例
-  bash scripts/run_distribute_train.sh RANK_TABLE_FILE configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava SLOWFAST_8x8_R50.pkl.ckpt
+  bash scripts/run_distribute_train_ascend.sh RANK_TABLE_FILE configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava SLOWFAST_8x8_R50.pkl.ckpt
 
   # 运行推理示例
-  bash scripts/run_standalone_eval.sh configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava checkpoint_epoch_00020_best248.pyth.ckpt 1
+  bash scripts/run_standalone_eval_ascend.sh configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava checkpoint_epoch_00020_best248.pyth.ckpt 1
 
   # 310离线推理
   bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
   ```
 
-  对于分布式训练，需要提前创建JSON格式的hccl配置文件。
+  对于Ascend分布式训练，需要提前创建JSON格式的hccl配置文件。
 
   请遵循以下链接中的说明：
 
  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+
+- GPU处理器环境运行
+
+  ```text
+  # 运行训练示例
+  bash scripts/run_standalone_train_gpu.sh configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava SLOWFAST_8x8_R50.pkl.ckpt
+
+  # 运行分布式训练示例
+  bash scripts/run_distribute_train_gpu.sh configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava SLOWFAST_8x8_R50.pkl.ckpt
+
+  # 运行推理示例
+  bash scripts/run_standalone_eval_gpu.sh configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava SLOWFAST_8x8_R50.pkl.ckpt
+  ```
 
 # 脚本说明
 
@@ -189,10 +203,13 @@ slowfast是由Facebook AI研究团队提出的一种新颖的方法来分析视�
         ├── ascend310_infer              // 实现310推理源代码
         ├── scripts
         │   ├──run_310_infer.sh      // 310离线推理的shell脚本
-        │   ├──run_distribute_train.sh      // Ascend训练的shell脚本
+        │   ├──run_distribute_train.sh      // Ascend分布式训练的shell脚本
+        │   ├──run_distribute_train_gpu.sh  // GPU分布式训练的shell脚本
         │   ├──run_export.sh                // checkpoint文件导出的shell脚本
         │   ├──run_standalone_eval.sh       // Ascend推理的shell脚本
-        │   ├──run_standalone_train.sh      // 分布式Ascend训练的shell脚本
+        │   ├──run_standalone_train.sh      // Ascend单卡训练的shell脚本
+        │   ├──run_standalone_eval_gpu.sh   // GPU推理的shell脚本
+        │   ├──run_standalone_train_gpu.sh  // GPU单卡训练的shell脚本
         ├── src
         │   ├── datasets  // ava数据集处理
         │   ├── models
@@ -253,16 +270,16 @@ slowfast是由Facebook AI研究团队提出的一种新颖的方法来分析视�
 - Ascend处理器环境运行
 
   ```text
-  bash scripts/run_standalone_train.sh CFG DATA_DIR CHECKPOINT_FILE_PATH
+  bash scripts/run_standalone_train_ascend.sh CFG DATA_DIR CHECKPOINT_FILE_PATH
   ```
 
   如
 
   ```text
-  bash scripts/run_distribute_train.sh RANK_TABLE_FILE configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava SLOWFAST_8x8_R50.pkl.ckpt
+  bash scripts/run_standalone_train_ascend.sh RANK_TABLE_FILE configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava SLOWFAST_8x8_R50.pkl.ckpt
   ```
 
-  上述python命令将在后台运行，您可以通过train.log文件查看结果。
+  上述python命令将在后台运行，您可以通过log_standalone_ascend文件查看结果。
 
   训练结束后，您可在默认脚本文件夹下找到检查点文件。采用以下方式达到损失值：
 
@@ -270,6 +287,23 @@ slowfast是由Facebook AI研究团队提出的一种新颖的方法来分析视�
   # grep "loss is " train.log
   epoch:1 step:390, loss is 1.4842823
   epcoh:2 step:390, loss is 1.0897788
+  ...
+  ```
+
+- GPU处理器环境运行
+
+  ```text
+  bash scripts/run_standalone_train_gpu.sh configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava SLOWFAST_8x8_R50.pkl.ckpt
+  ```
+
+  上述python命令将在后台运行，您可以通过log_standalone_gpu文件查看结果。
+
+  训练结束后，您可在默认脚本文件夹下找到检查点文件。采用以下方式达到损失值：
+
+  ```text
+  # grep "loss is " train.log
+  epoch:1 step:390, loss is 0.0990763
+  epcoh:2 step:390, loss is 0.0603111
   ...
   ```
 
@@ -283,15 +317,34 @@ slowfast是由Facebook AI研究团队提出的一种新颖的方法来分析视�
   bash scripts/run_distribute_train ~/hccl_8p_01234567_127.0.0.1.json
   ```
 
-  上述shell脚本将在后台运行分布训练。您可以通过train_parallel[X]/log文件查看结果。采用以下方式达到损失值：
+  上述shell脚本将在后台运行分布训练。您可以通过log_distributed_ascend文件查看结果。采用以下方式达到损失值：
 
   ```text
-  # grep "result:" train_parallel*/log
+  # grep "result:" log_distributed_ascend
   train_parallel0/log:epoch:1 step:48, loss is 1.4302931
   train_parallel0/log:epcoh:2 step:48, loss is 1.4023874
   ...
   train_parallel1/log:epoch:1 step:48, loss is 1.3458025
   train_parallel1/log:epcoh:2 step:48, loss is 1.3729336
+  ...
+  ...
+  ```
+
+- GPU处理器环境运行
+
+  ```text
+  bash scripts/run_distribute_train_gpu.sh configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava SLOWFAST_8x8_R50.pkl.ckpt
+  ```
+
+  上述shell脚本将在后台运行分布训练。您可以通过log_distributed_gpu文件查看结果。采用以下方式达到损失值：
+
+  ```text
+  # grep "result:" log_distributed_gpu
+  train_parallel0/log:epoch:1 step:48, loss is 0.2674269
+  train_parallel0/log:epcoh:2 step:48, loss is 0.0610401
+  ...
+  train_parallel1/log:epoch:1 step:48, loss is 0.2730093
+  train_parallel1/log:epcoh:2 step:48, loss is 0.0648247
   ...
   ...
   ```
@@ -313,13 +366,12 @@ slowfast是由Facebook AI研究团队提出的一种新颖的方法来分析视�
 
 ### 推理
 
-在运行推理之前我们需要先导出模型。
-
 - 在昇腾910上使用ava数据集进行推理
 
+  在运行推理之前我们需要先导出模型。
   在执行下面的命令之前，我们需要先修改ava的配置文件。修改的项包括AVA.FRAME_DIR、AVA.FRAME_LIST_DIR、AVA.ANNOTATION_DIR和TRAIN.CHECKPOINT_FILE_PATH。
 
-  推理的结果保存在当前目录下，在evalX/log日志文件中可以找到类似以下的结果。
+  推理的结果保存在当前目录下，在log_eval_ascend日志文件中可以找到类似以下的结果。
 
   ```text
   'PascalBoxes_PerformanceByCategory/AP@0.5IOU/turn (e.g., a screwdriver)': 0.0031881659969238293,
@@ -334,13 +386,33 @@ slowfast是由Facebook AI研究团队提出的一种新颖的方法来分析视�
   ```
 
   ```text
-  bash scripts/run_standalone_eval.sh CFG DATA_DIR CHECKPOINT_FILE_PATH DEVICE_ID
+  bash scripts/run_standalone_eval_ascend.sh CFG DATA_DIR CHECKPOINT_FILE_PATH DEVICE_ID
   ```
 
   示例
 
   ```text
-  bash scripts/run_standalone_eval.sh configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava checkpoint_epoch_00020_best248.pyth.ckpt 1
+  bash scripts/run_standalone_eval_ascend.sh configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava checkpoint_epoch_00020_best248.pyth.ckpt 1
+  ```
+
+- 在GPU上使用ava数据集进行推理
+
+  推理的结果保存在当前目录下，在log_eval_gpu日志文件中可以找到类似以下的结果。
+
+  ```text
+  'PascalBoxes_PerformanceByCategory/AP@0.5IOU/turn (e.g., a screwdriver)': 0.0031881659969238293,
+  'PascalBoxes_PerformanceByCategory/AP@0.5IOU/walk': 0.7207324941463648,
+  'PascalBoxes_PerformanceByCategory/AP@0.5IOU/watch (a person)': 0.6626902737325869,
+  'PascalBoxes_PerformanceByCategory/AP@0.5IOU/watch (e.g., TV)': 0.10220154817817734,
+  'PascalBoxes_PerformanceByCategory/AP@0.5IOU/work on a computer': 0.028072906328370745,
+  'PascalBoxes_PerformanceByCategory/AP@0.5IOU/write': 0.0774830044468495,
+  'PascalBoxes_Precision/mAP@0.5IOU': 0.2173776249697695}
+  [04/04 14:49:23][INFO] ava_eval_helper.py: 169: AVA eval done in 698.487868 seconds.
+  [04/04 14:49:23][INFO] logging.py:  84: json_stats: {"map": 0.21738, "mode": "test"}
+  ```
+
+  ```text
+  bash scripts/run_standalone_eval_gpu.sh configs/AVA/SLOWFAST_32x2_R50_SHORT.yaml data/ava SLOWFAST_8x8_R50.pkl.ckpt
   ```
 
 - 在昇腾310上使用ava数据集进行推理
@@ -380,6 +452,8 @@ slowfast是由Facebook AI研究团队提出的一种新颖的方法来分析视�
 
 #### 训练slowfast
 
+- 使用Ascend
+
 | 参数                 | Ascend                                                      |
 | -------------------------- | ----------------------------------------------------------- |
 | 模型版本              | Kunpeng-920
@@ -392,9 +466,25 @@ slowfast是由Facebook AI研究团队提出的一种新颖的方法来分析视�
 | 速度                      | 8卡：476毫秒/步                        |
 | 总时长                 | 8卡：8.1小时                                             |
 
+- 使用GPU
+
+| 参数                 | GPU                                                      |
+| -------------------------- | ----------------------------------------------------------- |
+| 模型版本              | Nvidia
+| 资源                   | Nvidia-GeForce RTX 3090；CPU 2.90GHz，64核；内存 251G；               |
+| MindSpore版本          | 1.7.0                                                       |
+| 数据集                    | AVA2.2                                                |
+| 训练参数        | lr=0.15,fp=32,mmt=0.9,nesterov=false,roiend=1               |
+| 优化器                  | Momentum                                                    |
+| 损失函数              | BCELoss二分类交叉熵                                       |
+| 速度                      | 8卡：1500毫秒/步                        |
+| 总时长                 | 8卡：30.6小时                                             |
+
 ### 评估性能
 
 #### 评估slowfast
+
+- 使用Ascend
 
 | 参数          | Ascend                      |
 | ------------------- | --------------------------- |
@@ -403,6 +493,18 @@ slowfast是由Facebook AI研究团队提出的一种新颖的方法来分析视�
 | MindSpore版本   | 1.5.2                       |
 | 数据集             | ava2.2                |
 | batch_size          | 8                         |
+| 输出             | 概率                 |
+| 准确性            | 8卡: 21.73%                |
+
+- 使用GPU
+
+| 参数          | GPU                      |
+| ------------------- | --------------------------- |
+| 模型版本       | Nvidia               |
+| 资源            |  Nvidia-GeForce RTX 3090；               |
+| MindSpore版本   | 1.7.0                       |
+| 数据集             | AVA2.2                |
+| batch_size          | 16                         |
 | 输出             | 概率                 |
 | 准确性            | 8卡: 21.73%                |
 

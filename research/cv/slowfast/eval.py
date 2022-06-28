@@ -35,8 +35,7 @@ def run_eval():
     logger.info(cfg)
     # setup context
     device_id = int(os.getenv('DEVICE_ID', '0'))
-    context.set_context(device_id=device_id,
-                        mode=context.GRAPH_MODE, device_target="Ascend")
+    context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target=args.device_target)
     context.set_context(save_graphs=True, save_graphs_path='irs_eval')
     # build dataset
     dataset = build_dataset(cfg, "test")

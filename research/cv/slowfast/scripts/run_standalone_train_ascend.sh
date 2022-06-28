@@ -28,4 +28,4 @@ python -u train.py --cfg "$CFG" \
      AVA.FRAME_DIR "${DATA_DIR}/frames" \
      AVA.FRAME_LIST_DIR "${DATA_DIR}/ava_annotations" \
      AVA.ANNOTATION_DIR "${DATA_DIR}/ava_annotations" \
-     TRAIN.CHECKPOINT_FILE_PATH "$CHECKPOINT_FILE_PATH" > log 2>&1 &
+     TRAIN.CHECKPOINT_FILE_PATH "$CHECKPOINT_FILE_PATH" > log_standalone_ascend 2>&1 &

@@ -15,9 +15,11 @@
 
 """Train."""
 import os
+import numpy as np
 from mindspore import context, nn, dtype, load_checkpoint, set_seed
 from mindspore import DynamicLossScaleManager
-from mindspore.communication import init
+from mindspore.communication import init, get_rank
+from mindspore.common.tensor import Tensor
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.train import Model
 from src.config.defaults import assert_and_infer_cfg
@@ -28,6 +30,40 @@ from src.models.video_model_builder import SlowFast
 from src.models import optimizer as optim
 
 set_seed(42)
+
+class LossMonitor_Standalone(LossMonitor):
+    def __init__(self, per_print_times=1):
+        super(LossMonitor_Standalone, self).__init__(per_print_times=1)
+        self._per_print_times = per_print_times
+        self._last_print_time = 0
+
+    def step_end(self, run_context):
+        """
+        Print training loss at the end of step.
+
+        Args:
+            run_context (RunContext): Include some information of the model.
+        """
+        cb_params = run_context.original_args()
+        loss = cb_params.net_outputs
+
+        print(loss)
+        if isinstance(loss, (tuple, list)):
+            if isinstance(loss[0], Tensor) and isinstance(loss[0].asnumpy(), np.ndarray):
+                loss = loss[0]
+
+        if isinstance(loss, Tensor) and isinstance(loss.asnumpy(), np.ndarray):
+            loss = float(np.mean(loss.asnumpy()))
+
+        cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
+
+        if self._per_print_times != 0 and (cb_params.cur_step_num <= self._last_print_time):
+            while cb_params.cur_step_num <= self._last_print_time:
+                self._last_print_time -=\
+                    max(self._per_print_times, cb_params.batch_num if cb_params.dataset_sink_mode else 1)
+        if self._per_print_times != 0 and (cb_params.cur_step_num - self._last_print_time) >= self._per_print_times:
+            self._last_print_time = cb_params.cur_step_num
+            print("epoch: %s step: %s, loss is %s" % (cb_params.cur_epoch_num, cur_step_in_epoch, loss), flush=True)
 
 class NetWithLoss(nn.Cell):
     """Construct Loss Net."""
@@ -59,16 +95,16 @@ def train():
     rank_id = int(os.getenv('RANK_ID', '0'))
     device_id = int(os.getenv('DEVICE_ID', '0'))
     device_num = int(os.getenv('DEVICE_NUM', '1'))
-    context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target="Ascend")
+    context.set_context(device_id=device_id, mode=context.GRAPH_MODE, device_target=args.device_target)
     context.set_context(save_graphs=True, save_graphs_path='irs')
     if device_num > 1:
         init()
         context.set_auto_parallel_context(device_num=device_num,
                                           parallel_mode=context.ParallelMode.DATA_PARALLEL,
                                           gradients_mean=True)
-
+        rank_id = get_rank()
     # build dataset
-    dataset = build_dataset(cfg, "train", num_shards=device_num, shard_id=rank_id)
+    dataset = build_dataset(cfg, "train", num_shards=device_num, shard_id=rank_id, device_target=args.device_target)
     steps_per_epoch = dataset.get_dataset_size()
     # build net with loss
     network = SlowFast(cfg).set_train(True)
@@ -81,8 +117,11 @@ def train():
     optimizer = optim.construct_optimizer(net_with_loss, steps_per_epoch, cfg)
 
     # setup callbacks
-    callbacks = [TimeMonitor(), LossMonitor()]
-    if (device_num == 1) or (device_num > 1 and device_id in [0, 7]):
+    if device_num > 1:
+        callbacks = [TimeMonitor(), LossMonitor()]
+    else:
+        callbacks = [TimeMonitor(), LossMonitor_Standalone()]
+    if rank_id == 0:
         ckpt_cfg = CheckpointConfig(save_checkpoint_steps=steps_per_epoch, keep_checkpoint_max=cfg.SOLVER.MAX_EPOCH)
         ckpt_cb = ModelCheckpoint(prefix="slowfast", directory='checkpoints', config=ckpt_cfg)
         callbacks.append(ckpt_cb)
@@ -92,7 +131,7 @@ def train():
     # start training
     logger.info("============== Starting Training ==============")
     logger.info("total_epoch=%d, steps_per_epoch=%d", cfg.SOLVER.MAX_EPOCH, steps_per_epoch)
-    model.train(cfg.SOLVER.MAX_EPOCH, dataset, callbacks=callbacks, dataset_sink_mode=True)
+    model.train(cfg.SOLVER.MAX_EPOCH, dataset, callbacks=callbacks, dataset_sink_mode=bool(args.dataset_sink_mode))
 
 if __name__ == "__main__":
     train()

@@ -19,7 +19,7 @@ from src.datasets.ava_dataset import Ava
 ds.config.set_prefetch_size(8)
 ds.config.set_numa_enable(True)
 
-def build_dataset(cfg, split, num_shards=None, shard_id=None):
+def build_dataset(cfg, split, num_shards=None, shard_id=None, device_target='Ascend'):
     """
     Args:
         cfg (CfgNode): configs. Details can be found in
@@ -36,7 +36,7 @@ def build_dataset(cfg, split, num_shards=None, shard_id=None):
     if split == 'train':
         dataset = ds.GeneratorDataset(dataset_generator,
                                       ["slowpath", "fastpath", "boxes", "labels", "mask"],
-                                      num_parallel_workers=16,
+                                      num_parallel_workers=16 if device_target == 'Ascend' else 6,
                                       python_multiprocessing=False,
                                       shuffle=True,
                                       num_shards=num_shards,
@@ -45,7 +45,7 @@ def build_dataset(cfg, split, num_shards=None, shard_id=None):
     else:
         dataset = ds.GeneratorDataset(dataset_generator,
                                       ["slowpath", "fastpath", "boxes", "labels", "ori_boxes", "metadata", "mask"],
-                                      num_parallel_workers=16,
+                                      num_parallel_workers=16 if device_target == 'Ascend' else 6,
                                       python_multiprocessing=False,
                                       shuffle=False)
         dataset = dataset.batch(cfg.TEST.BATCH_SIZE)

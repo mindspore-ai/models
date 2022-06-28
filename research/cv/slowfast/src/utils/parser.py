@@ -68,6 +68,9 @@ def parse_args():
         default=None,
         nargs=argparse.REMAINDER,
     )
+    # Define parameters for device target and dataset_sink_mode
+    parser.add_argument("--device_target", default="Ascend", type=str, help="Ascend/GPU")
+    parser.add_argument("--dataset_sink_mode", default=1, type=int, help="dataset_sink_mode")
     # define 2 parameters for running on modelArts
     parser.add_argument('--data_url',
                         help='path to training/inference dataset folder',
