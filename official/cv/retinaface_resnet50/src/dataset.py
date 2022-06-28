@@ -135,17 +135,34 @@ def create_dataset(data_dir, cfg, batch_size=32, repeat_num=1, shuffle=True, mul
     aug = preproc(cfg['image_size'])
     encode = bbox_encode(cfg)
 
-    def union_data(image, annot):
+    def read_data_from_dataset(image, annot):
         i, a = read_dataset(image, annot)
-        i, a = aug(i, a)
-        out = encode(i, a)
+        return i, a
 
+    def augmentation(image, annot):
+        i, a = aug(image, annot)
+        return i, a
+
+    def encode_data(image, annot):
+        out = encode(image, annot)
         return out
 
     de_dataset = de_dataset.map(input_columns=["image", "annotation"],
+                                output_columns=["image", "annotation"],
+                                column_order=["image", "annotation"],
+                                operations=read_data_from_dataset,
+                                python_multiprocessing=multiprocessing,
+                                num_parallel_workers=num_worker)
+    de_dataset = de_dataset.map(input_columns=["image", "annotation"],
+                                output_columns=["image", "annotation"],
+                                column_order=["image", "annotation"],
+                                operations=augmentation,
+                                python_multiprocessing=multiprocessing,
+                                num_parallel_workers=num_worker)
+    de_dataset = de_dataset.map(input_columns=["image", "annotation"],
                                 output_columns=["image", "truths", "conf", "landm"],
                                 column_order=["image", "truths", "conf", "landm"],
-                                operations=union_data,
+                                operations=encode_data,
                                 python_multiprocessing=multiprocessing,
                                 num_parallel_workers=num_worker)
 

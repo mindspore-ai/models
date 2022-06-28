@@ -20,7 +20,7 @@ cfg_res50 = {
     'class_weight': 1.0,
     'landm_weight': 1.0,
     'batch_size': 8,
-    'num_workers': 8,
+    'num_workers': 4,
     'num_anchor': 29126,
     'ngpu': 4,
     'image_size': 840,
