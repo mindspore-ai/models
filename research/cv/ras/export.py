@@ -19,7 +19,7 @@ import argparse
 import numpy as np
 import mindspore as ms
 from mindspore import load_checkpoint, load_param_into_net, export
-from .src.model import BoneModel
+from src.model import BoneModel
 
 
 def run_export(device_target, device_id, pretrained_model, model_ckpt, batchsize):
