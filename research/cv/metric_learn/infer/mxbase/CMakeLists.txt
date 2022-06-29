@@ -1,0 +1,55 @@
+cmake_minimum_required(VERSION 3.14.0)
+project(metric_learn)
+set(TARGET metric_learn)
+
+add_definitions(-DENABLE_DVPP_INTERFACE)
+add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
+add_definitions(-Dgoogle=mindxsdk_private)
+add_compile_options(-std=c++11 -fPIE -fstack-protector-all -fPIC -Wall)
+add_link_options(-Wl,-z,relro,-z,now,-z,noexecstack -pie)
+
+# Check environment variable
+if(NOT DEFINED ENV{ASCEND_HOME})
+    message(FATAL_ERROR "please define environment variable:ASCEND_HOME")
+endif()
+if(NOT DEFINED ENV{ASCEND_VERSION})
+    message(WARNING "please define environment variable:ASCEND_VERSION")
+endif()
+if(NOT DEFINED ENV{ARCH_PATTERN})
+    message(WARNING "please define environment variable:ARCH_PATTERN")
+endif()
+set(ACL_INC_DIR $ENV{ASCEND_HOME}/$ENV{ASCEND_VERSION}/$ENV{ARCH_PATTERN}/acllib/include)
+set(ACL_LIB_DIR $ENV{ASCEND_HOME}/$ENV{ASCEND_VERSION}/$ENV{ARCH_PATTERN}/acllib/lib64)
+
+set(MXBASE_ROOT_DIR $ENV{MX_SDK_HOME})
+set(MXBASE_INC $ENV{MX_SDK_HOME}/include)
+set(MXBASE_LIB_DIR $ENV{MX_SDK_HOME}/lib)
+set(MXBASE_POST_LIB_DIR $ENV{MX_SDK_HOME}/lib/modelpostprocessors)
+set(MXBASE_POST_PROCESS_DIR $ENV{MX_SDK_HOME}/include/MxBase/postprocess/include/)
+
+if(DEFINED ENV{MXSDK_OPENSOURCE_DIR})
+    set(OPENSOURCE_DIR $ENV{MXSDK_OPENSOURCE_DIR})
+else()
+    set(OPENSOURCE_DIR $ENV{MX_SDK_HOME}/opensource)
+endif()
+
+include_directories(${ACL_INC_DIR})
+include_directories(${MXBASE_INC})
+include_directories(${MXBASE_POST_PROCESS_DIR})
+include_directories(${OPENSOURCE_DIR}/include)
+include_directories(${OPENSOURCE_DIR}/include/opencv4)
+
+link_directories(${ACL_LIB_DIR})
+link_directories(${MXBASE_LIB_DIR})
+link_directories(${MXBASE_POST_LIB_DIR})
+link_directories(${OPENSOURCE_DIR}/lib)
+
+include_directories($ENV{ASCEND_HOME}/$ENV{ASCEND_VERSION}/x86_64-linux/runtime/include)
+link_directories($ENV{ASCEND_HOME}/$ENV{ASCEND_VERSION}/x86_64-linux/x86_64-linux/lib64/)
+include_directories($ENV{MX_SDK_HOME}/opensource/lib/glib-2.0/include)
+include_directories($ENV{ASCEND_HOME}/ascend-toolkit/5.0.4/x86_64-linux/runtime/include)
+
+add_executable(${TARGET} src/main.cpp src/MetricLearn.cpp)
+target_link_libraries(${TARGET} glog cpprest mxbase opencv_world stdc++fs)
+
+install(TARGETS ${TARGET} RUNTIME DESTINATION ${PROJECT_SOURCE_DIR}/)
