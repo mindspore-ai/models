@@ -19,18 +19,19 @@ from easydict import EasyDict as edict
 
 facenet_cfg = edict({
     "rank": 0,
-    "num_epochs": 600,
+    "num_epochs": 240,
     "num_train_triplets": 3000000,
     "num_valid_triplets": 10000,
-    "batch_size": 64,
-    "num_workers": 2,
+    "batch_size": 64,  #64
+    "num_workers": 8,
     "learning_rate": 0.004,
     "margin": 0.5,
-    "per_print_times": 19,
+    "per_print_times": 1,
     "step_size": 50,
     "keep_checkpoint_max": 10,
-    "lr_epochs": '100,200,300,400,500,600',
+    "lr_epochs": '30,60,90,120,150,180,210,240',
     "lr_gamma": 0.1,
     "T_max": 200,
-    "warmup_epochs": 0
+    "warmup_epochs": 0,
+    "device_target": "Ascend"
 })

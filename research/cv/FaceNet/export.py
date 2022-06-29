@@ -19,7 +19,7 @@ python export.py
 import argparse
 import numpy as np
 
-from mindspore import Tensor, export, context
+from mindspore import Tensor, export, context, load_checkpoint, load_param_into_net
 
 from src.models import FaceNetModelwithLoss
 
@@ -40,7 +40,11 @@ if __name__ == '__main__':
 
     assert args.ckpt_file is not None, "checkpoint_path is None."
 
-    net = FaceNetModelwithLoss(num_classes=500, margin=0.5)
+    net = FaceNetModelwithLoss(num_classes=1001, margin=0.5)
+    state_dict = load_checkpoint(ckpt_file_name=args.ckpt_file, net=net)
+    print("Loading the trained models from ckpt")
+    load_param_into_net(net, state_dict)
 
     input_arr = Tensor(np.zeros([args.batch_size, 3, args.height, args.width], np.float32))
-    export(net, input_arr, file_name=args.net_name, file_format=args.file_format)
+    input_arr2 = Tensor(np.zeros([args.batch_size, 3, args.height, args.width], np.float32))
+    export(net, input_arr, input_arr2, file_name=args.net_name, file_format=args.file_format)

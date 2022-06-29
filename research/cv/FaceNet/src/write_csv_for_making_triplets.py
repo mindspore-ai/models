@@ -24,7 +24,7 @@ import pandas as pd
 
 parser = argparse.ArgumentParser(description="Generating csv file for triplet loss!")
 parser.add_argument('--dataroot', type=str, required=True,)
-parser.add_argument('--csv_name', type=str)
+parser.add_argument('--csv_name', type=str, default="VGGFACE2.csv")
 args = parser.parse_args()
 
 
@@ -48,7 +48,7 @@ def generate_csv_file(dataroot, csv_name):
 
     progress_bar = enumerate((files))
     # "datasets/people0/123.jpg"
-    for file in progress_bar:
+    for _, file in progress_bar:
 
         face_id = os.path.basename(file).split('.')[0]
         face_label = os.path.basename(os.path.dirname(file))
