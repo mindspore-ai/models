@@ -29,6 +29,12 @@
             - [基于SST-2数据集进行评估](#基于sst-2数据集进行评估)
             - [基于MNLI数据集进行评估](#基于mnli数据集进行评估)
             - [基于QNLI数据集进行评估](#基于qnli数据集进行评估)
+    - [ONNX模型导出及评估](#onnx模型导出及评估)
+        - [ONNX模型导出](#onnx模型导出)
+        - [ONNX模型评估](#onnx模型评估)
+            - [基于SST-2数据集进行ONNX评估](#基于sst-2数据集进行ONNX评估)
+            - [基于MNLI数据集进行ONNX评估](#基于mnli数据集进行ONNX评估)
+            - [基于QNLI数据集进行ONNX评估](#基于qnli数据集进行ONNX评估)
     - [推理过程](#推理过程)
         - [导出MindIR](#导出mindir)
         - [在Ascend310执行推理](#在ascend310执行推理)
@@ -256,6 +262,7 @@ TinyBERT模型的主干结构是转换器，转换器包含四个编码器模块
     ├─run_infer_310.sh                   # 310推理的shell脚本
     ├─run_standalone_gd.sh               # 单机运行一般蒸馏的shell脚本
     ├─run_standalone_td.sh               # 单机运行任务蒸馏的shell脚本
+    ├─run_eval_onnx.sh                   # 对导出的ONNX模型评估的shell脚本
   ├─src
     ├─model_utils
       ├── config.py                      # 解析 *.yaml参数配置文件
@@ -281,6 +288,7 @@ TinyBERT模型的主干结构是转换器，转换器包含四个编码器模块
   ├─postprocess.py                       # 310推理前处理脚本
   ├─preprocess.py                        # 310推理后处理脚本
   ├─run_general_distill.py               # 一般蒸馏训练网络
+  ├─run_eval_onnx.py                     # 对导出的onnx模型进行评估
   └─run_task_distill.py                  # 任务蒸馏训练评估网络
 ```
 
@@ -533,6 +541,65 @@ The best acc is 0.875183
 ...
 The best acc is 0.891176
 ...
+```
+
+## ONNX模型导出及评估
+
+### ONNX模型导出
+
+```bash
+python export.py --ckpt_file [CKPT_PATH] --task_name [TASK_NAME] --file_name [FILE_NAME] --file_format "ONNX" --config_path [CONFIG_PATH]
+# example:python export.py --ckpt_file tinybert_ascend_v170_enwiki128_sst2_official_nlp_acc90.28.ckpt --task_name SST-2 --file_name 'sst2_tinybert' --file_format "ONNX" --config_path td_config/td_config_sst2.yaml
+```
+
+### ONNX模型评估
+
+#### 基于SST-2数据集进行ONNX评估
+
+运行如下命令前，请确保已设置ONNX模型路径。请将ONNX模型路径设置为绝对全路径，例如:"/home/username/models/official/nlp/tinybert/SST-2.onnx".
+
+```bash
+bash scripts/run_eval_onnx.sh {path}/*.yaml
+```
+
+以上命令后台运行，您可以在log.txt文件中查看运行结果。测试数据集的准确率如下：
+
+```text
+=================================================================
+============== acc is 0.8862132352941177
+=================================================================
+```
+
+#### 基于MNLI数据集进行ONNX评估
+
+运行如下命令前，请确保已设置ONNX模型路径。请将ONNX模型路径设置为绝对全路径，例如:"/home/username/models/official/nlp/tinybert/MNLI.onnx".
+
+```bash
+bash scripts/run_eval_onnx.sh {path}/*.yaml
+```
+
+以上命令后台运行，您可以在log.txt文件中查看运行结果。测试数据集的准确率如下：
+
+```text
+=================================================================
+============== acc is 0.8862132352941177
+=================================================================
+```
+
+#### 基于QNLI数据集进行ONNX评估
+
+运行如下命令前，请确保已设置ONNX模型路径。请将ONNX模型路径设置为绝对全路径，例如:"/home/username/models/official/nlp/tinybert/QNLI.onnx".
+
+```bash
+bash scripts/run_eval_onnx.sh {path}/*.yaml
+```
+
+以上命令后台运行，您可以在log.txt文件中查看运行结果。测试数据集的准确率如下：
+
+```text
+=================================================================
+============== acc is 0.8862132352941177
+=================================================================
 ```
 
 ## 推理过程

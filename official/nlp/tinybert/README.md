@@ -26,6 +26,12 @@
             - [evaluation on SST-2 dataset](#evaluation-on-sst-2-dataset)
             - [evaluation on MNLI dataset](#evaluation-on-mnli-dataset)
             - [evaluation on QNLI dataset](#evaluation-on-qnli-dataset)
+    - [ONNX Export And Evaluation](#onnx-export-and-evaluation)
+        - [ONNX Export](#onnx-export)
+        - [ONNX Evaluation](#onnx-evaluation)
+            - [ONNX evaluation on SST-2 dataset](#onnx-evaluation-on-sst-2-dataset)
+            - [ONNX evaluation on MNLI dataset](#onnx-evaluation-on-mnli-dataset)
+            - [ONNX evaluation on QNLI dataset](#onnx-evaluation-on-qnli-dataset)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
@@ -253,6 +259,7 @@ The backbone structure of TinyBERT is transformer, the transformer contains four
     ├─run_infer_310.sh                   # shell script for 310 infer
     ├─run_standalone_gd.sh               # shell script for standalone general distill phase
     ├─run_standalone_td.sh               # shell script for standalone task distill phase
+    ├─run_eval_onnx.sh                   # shell script for exported onnx model eval
   ├─src
     ├─model_utils
       ├── config.py                      # parse *.yaml parameter configuration file
@@ -278,6 +285,7 @@ The backbone structure of TinyBERT is transformer, the transformer contains four
   ├─postprocess.py                       # scripts for 310 postprocess
   ├─preprocess.py                        # scripts for 310 preprocess
   ├─run_general_distill.py               # train net for general distillation
+  ├─run_eval_onnx.py                     # eval exported onnx model
   └─run_task_distill.py                  # train and eval net for task distillation
 ```
 
@@ -534,6 +542,65 @@ The best acc is 0.875183
 ...
 The best acc is 0.891176
 ...
+```
+
+## [ONNX Export And Evaluation](#contents)
+
+### ONNX Export
+
+```bash
+python export.py --ckpt_file [CKPT_PATH] --task_name [TASK_NAME] --file_name [FILE_NAME] --file_format "ONNX" --config_path [CONFIG_PATH]
+# example:python export.py --ckpt_file tinybert_ascend_v170_enwiki128_sst2_official_nlp_acc90.28.ckpt --task_name SST-2 --file_name 'sst2_tinybert' --file_format "ONNX" --config_path td_config/td_config_sst2.yaml
+```
+
+### ONNX Evaluation
+
+#### ONNX evaluation on SST-2 dataset  
+
+Before running the command below, please check the onnx path has been set. Please set the onnx path to be the absolute full path, e.g:"/home/username/models/official/nlp/tinybert/SST-2.onnx".
+
+```bash
+bash scripts/run_eval_onnx.sh {path}/*.yaml
+```
+
+The command above will run in the background, you can view the results the file log.txt. The accuracy of the test dataset will be as follows:
+
+```text
+=================================================================
+============== acc is 0.8862132352941177
+=================================================================
+```
+
+#### ONNX evaluation on MNLI dataset
+
+Before running the command below, please check the onnx path has been set. Please set the onnx path to be the absolute full path, e.g:"/home/username/models/official/nlp/tinybert/MNLI.onnx".
+
+```bash
+bash scripts/run_eval_onnx.sh {path}/*.yaml
+```
+
+The command above will run in the background, you can view the results the file log.txt. The accuracy of the test dataset will be as follows:
+
+```text
+=================================================================
+============== acc is 0.8862132352941177
+=================================================================
+```
+
+#### ONNX evaluation on QNLI dataset
+
+Before running the command below, please check the onnx path has been set. Please set the onnx path to be the absolute full path, e.g:"/home/username/models/official/nlp/tinybert/QNLI.onnx".
+
+```bash
+bash scripts/run_eval_onnx.sh {path}/*.yaml
+```
+
+The command above will run in the background, you can view the results the file log.txt. The accuracy of the test dataset will be as follows:
+
+```text
+=================================================================
+============== acc is 0.8862132352941177
+=================================================================
 ```
 
 ## Inference Process
