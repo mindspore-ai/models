@@ -1,0 +1,53 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+data_path: "/cache/data"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+device_target: Ascend
+checkpoint_path: "./checkpoint/"
+run_distribute: False
+enable_profiling: False
+
+ckpt_path: '/cache/train/'
+ckpt_file: '/cache/train/output/checkpoint/lenet-5-250.ckpt'
+
+# ==============================================================================
+# Training options
+optimizer: "Adam"
+loss_function: "MSE"
+class_num: 10
+batch_size: 200
+lr_init: 0.001
+momentum: 0.9
+weight_decay: 0.0001
+warmup_epochs: 5
+epoch_size: 5
+image_height: 32
+image_width: 32
+save_checkpoint_epochs: 1
+keep_checkpoint_max: 5
+loss_scale: 1024
+
+net_name: "lenet"
+device_num: 1
+device_id: 0
+pre_trained: ""
+save_checkpoint: True
+mode_name: "GRAPH"   # can be PYNATIVE or GRAPH
+all_reduce_fusion_config: []
+save_graphs: False
+
+---
+# Config description for each option
+enable_modelarts: 'Whether training on modelarts, default: False'
+data_url: 'Dataset url for obs'
+train_url: 'Training output url for obs'
+data_path: 'Dataset path for local'
+output_path: 'Training output path for local'
+
+device_target: 'Target device type'
+enable_profiling: 'Whether enable profiling while training, default: False'
+---
