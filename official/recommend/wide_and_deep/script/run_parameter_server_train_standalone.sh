@@ -27,15 +27,14 @@ export MS_SERVER_NUM=$4
 export MS_SCHED_HOST=$5
 export MS_SCHED_PORT=$6
 DEVICE_ID=$7
-export RANK_TABLE_FILE=$8
-export VOCAB_CACHE_SIZE=$9
-export SPARSE=${10}
+export VOCAB_CACHE_SIZE=$8
+export SPARSE=$9
 
-if [[ ! -n "$9" ]]; then
+if [[ ! -n "$8" ]]; then
   export VOCAB_CACHE_SIZE=0
 fi
 
-if [[ ! -n "${10}" ]]; then
+if [[ ! -n "$9" ]]; then
   export SPARSE=False
 fi
 
@@ -77,7 +76,6 @@ export MS_ROLE=MS_WORKER
 rm -rf ${execute_path}/worker/
 mkdir ${execute_path}/worker/
 cd ${execute_path}/worker/ || exit
-export RANK_ID=0
 python -s ${self_path}/../train_and_eval_parameter_server_standalone.py --device_target=$DEVICE_TARGET  \
        --epochs=$EPOCH_SIZE --data_path=$DATASET --parameter_server=1                                   \
        --vocab_cache_size=$VOCAB_CACHE_SIZE --sparse=$SPARSE --dropout_flag=True >worker.log 2>&1 &
