@@ -33,7 +33,7 @@ import mindspore.common.dtype as mstype
 from mindspore.parallel import set_algo_parameters
 from mindspore.parallel._cost_model_context import _set_multi_subgraphs
 from mindspore.nn.wrap.cell_wrapper import PipelineCell, _VirtualDatasetCell, MicroBatchInterleaved
-from mindspore.nn.transformer import TransformerOpParallelConfig, CrossEntropyLoss
+from mindspore.nn.transformer import TransformerOpParallelConfig, CrossEntropyLoss, TransformerRecomputeConfig
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.serialization import load_distributed_checkpoint, load_checkpoint, load_param_into_net
 
@@ -122,7 +122,6 @@ def set_optimizer(optimizer, opt_offload, group_params, learning_rate, config):
 
 def run_train(args_opt):
     r"""The main training process."""
-    os.environ['HCCL_CONNECT_TIMEOUT'] = str(args_opt.hccl_connect_time)
     # Set execution mode
     context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, variable_memory_max_size="30GB")
     # Set parallel context
@@ -152,22 +151,23 @@ def run_train(args_opt):
         download_data(src_data_url=args_opt.eval_data_url, tgt_data_path=eval_cache_url, rank=rank)
     # Set model property
     model_parallel_num = args_opt.op_level_model_parallel_num
-    expert_parallel_num = args_opt.expert_parallel_num
     data_parallel_num = int(device_num / model_parallel_num)
     batch_size = args_opt.per_batch_size * data_parallel_num if context.get_auto_parallel_context(
         "parallel_mode") != ParallelMode.DATA_PARALLEL else args_opt.per_batch_size
     micro_batch_interleaved = args_opt.micro_batch_interleaved
+    recompute_config = TransformerRecomputeConfig(recompute=True,
+                                                  recompute_slice_activation=bool(args_opt.recompute_slice_activation))
     parallel_config = TransformerOpParallelConfig(data_parallel=data_parallel_num, model_parallel=model_parallel_num,
-                                                  expert_parallel=expert_parallel_num,
+                                                  expert_parallel=args_opt.expert_parallel_num,
                                                   pipeline_stage=args_opt.stage_num,
                                                   micro_batch_num=args_opt.micro_size,
                                                   optimizer_shard=bool(args_opt.optimizer_shard),
-                                                  vocab_emb_dp=bool(args_opt.word_emb_dp), recompute=True,
+                                                  vocab_emb_dp=bool(args_opt.word_emb_dp), recompute=recompute_config,
                                                   gradient_aggregation_group=args_opt.gradient_aggregation_group)
     config = PanguAlphaConfig(batch_size=batch_size // micro_batch_interleaved, num_heads=args_opt.num_heads,
                               hidden_size=args_opt.embedding_size, seq_length=args_opt.seq_length,
-                              vocab_size=args_opt.vocab_size, num_layers=args_opt.num_layers,
-                              ffn_hidden_size=args_opt.embedding_size * 4, eod_token=bool(args_opt.eod_reset),
+                              vocab_size=args_opt.vocab_size, num_layers=args_opt.num_layers, eod_token=args_opt.eod_id,
+                              ffn_hidden_size=args_opt.embedding_size * 4, eod_reset=bool(args_opt.eod_reset),
                               load_ckpt_path=args_opt.load_ckpt_path, expert_num=args_opt.expert_num,
                               param_init_type=mstype.float32 if args_opt.param_init_type == 'fp32' else mstype.float16,
                               enable_offload=bool(args_opt.opt_offload), use_moe=bool(args_opt.use_moe),
@@ -407,9 +407,6 @@ def set_pipeline_parallel_context(args_opt):
 
 def run_train_pipeline(args_opt):
     r"""The main training process in pipeline."""
-    # Set hccl connect time
-    os.environ['HCCL_CONNECT_TIMEOUT'] = str(args_opt.hccl_connect_time)
-
     context.set_context(save_graphs=False, mode=context.GRAPH_MODE, device_target=args_opt.device_target)
     context.set_context(variable_memory_max_size="30GB")
     rank_id = 0
@@ -432,17 +429,19 @@ def run_train_pipeline(args_opt):
     per_batch_size = args_opt.per_batch_size
     batch_size = per_batch_size * data_parallel_num * args_opt.micro_size
     micro_batch_interleaved = args_opt.micro_batch_interleaved
+    recompute_config = TransformerRecomputeConfig(recompute=True,
+                                                  recompute_slice_activation=bool(args_opt.recompute_slice_activation))
     parallel_config = TransformerOpParallelConfig(data_parallel=data_parallel_num, model_parallel=model_parallel_num,
                                                   pipeline_stage=args_opt.stage_num,
                                                   micro_batch_num=args_opt.micro_size,
                                                   optimizer_shard=bool(args_opt.optimizer_shard),
-                                                  vocab_emb_dp=bool(args_opt.word_emb_dp), recompute=True)
+                                                  vocab_emb_dp=bool(args_opt.word_emb_dp), recompute=recompute_config)
     config = PanguAlphaConfig(batch_size=batch_size // parallel_config.micro_batch_num // micro_batch_interleaved,
                               num_heads=args_opt.num_heads, hidden_size=args_opt.embedding_size,
                               seq_length=args_opt.seq_length, vocab_size=args_opt.vocab_size,
-                              use_moe=bool(args_opt.use_moe),
+                              use_moe=bool(args_opt.use_moe), eod_reset=bool(args_opt.eod_reset),
                               num_layers=args_opt.num_layers, ffn_hidden_size=args_opt.embedding_size * 4,
-                              eod_token=bool(args_opt.eod_reset), load_ckpt_path=args_opt.load_ckpt_path,
+                              eod_token=args_opt.eod_id, load_ckpt_path=args_opt.load_ckpt_path,
                               param_init_type=mstype.float32 if args_opt.param_init_type == 'fp32' else mstype.float16,
                               enable_offload=bool(args_opt.opt_offload), parallel_config=parallel_config)
 
@@ -464,7 +463,7 @@ def run_train_pipeline(args_opt):
         optimizer = AdamWeightDecayOp(group_params, learning_rate=lr, eps=1e-8, beta1=0.9, beta2=0.95,
                                       param_init_type=config.param_init_type)
     else:
-        optimizer = nn.AdamWeightDecay(group_params, learning_rate=lr, beta1=0.9, beta2=0.95, eps=1e-8)
+        optimizer = FP32StateAdamWeightDecay(group_params, learning_rate=lr, beta1=0.9, beta2=0.95, eps=1e-8)
 
     ds = create_dataset(config.batch_size * parallel_config.micro_batch_num * micro_batch_interleaved,
                         data_path=cache_url, device_num=stage_device_num,
@@ -519,6 +518,7 @@ if __name__ == "__main__":
         raise ValueError("The per_batch_size has not been configured.")
     if bool(opt.enable_alltoall) is True and bool(opt.use_moe) is False:
         raise ValueError("The alltoall communication is only effective when applying moe")
+    os.environ['HCCL_CONNECT_TIMEOUT'] = str(opt.hccl_connect_time)
     if opt.stage_num > 1:
         run_train_pipeline(opt)
     else:
