@@ -179,14 +179,16 @@ bash scripts/run_eval_ascend.sh
 ```path
 └── psenet
  ├── export.py                           // mindir转换脚本
+ ├── infer_psenet_onnx.py                // onnx推理脚本
  ├── mindspore_hub_conf.py               // 网络模型
  ├─postprogress.py                           # 310推理后处理脚本
  ├── README.md                           // PSENet相关描述英文版
  ├── README_CN.md                        // PSENet相关描述中文版
  ├── scripts
   ├── run_distribute_train.sh    // 用于分布式训练的shell脚本
-  └── run_eval_ascend.sh     // 用于评估的shell脚本
-  ├─run_infer_310.sh                        # Ascend 310 推理shell脚本
+  ├── run_eval_ascend.sh     // 用于评估的shell脚本
+  ├── run_infer_310.sh                        # Ascend 310 推理shell脚本
+  └── run_infer_onnx.sh                     # Onnx 推理脚本
  ├── src
   ├──model_utils
    ├──config.py                            # 参数配置
@@ -268,7 +270,7 @@ cd eval_ic15
 unzip script_test_ch4_t1_e1-1577983151.zip
 cd ..
 
-bash ./script/run_eval_ascend.sh
+bash ./scripts/run_eval_ascend.sh
 ```
 
 ### 结果
@@ -284,7 +286,7 @@ python export.py --ckpt [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_
 ```
 
 参数ckpt为必填项，
-`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
+`FILE_FORMAT` 必须在 ["AIR", "MINDIR", "ONNX"]中选择。
 
 - 在modelarts上导出MindIR
 
@@ -315,6 +317,8 @@ python export.py --ckpt [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_
 ```shell
 # Ascend310 推理
 bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+# ONNX 推理
+bash run_infer_onnx.sh [ONNX_PATH] [TEST_ROOT_DIR]
 ```
 
 - `DEVICE_ID` 可选，默认值为0。
