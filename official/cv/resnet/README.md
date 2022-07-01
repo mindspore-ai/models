@@ -815,6 +815,16 @@ MindSpore Golden Stick provides SLB algorithm for ResNet18. SLB is provided by H
 
 ## Training Process
 
+| **Algorithm**  | SimQAT | SLB | SCOP |
+| --------- | ------ | --- | ---- |
+| **supported backend**  | GPU | GPU、Ascend | GPU |
+| **support pretrain** | yes | must provide pretrained ckpt | don't need and can't load pretrained ckpt |
+| **support continue-train** | yes | yes | yes |
+| **support distribute train** | yes | no | yes |
+
+- `pretrain` means training the network without applying algorithm. `pretrained ckpt` is loaded when training network with algorithm applied.
+- `continue-train` means stop the training process after applying algorithm and continue training process from checkpoint file of previous training process.
+
 ### Running on GPU
 
 ```text
@@ -825,7 +835,7 @@ bash run_distribute_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CKP
 
 # distributed training example, apply SimQAT and train from beginning
 cd ./golden_stick/scripts/
-bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml ./cifar10/train/
+bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml /path/to/dataset
 
 # distributed training example, apply SimQAT and train from full precision checkpoint
 cd ./golden_stick/scripts/
@@ -842,7 +852,7 @@ bash run_standalone_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CKP
 
 # standalone training example, apply SimQAT and train from beginning
 cd ./golden_stick/scripts/
-bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml ./cifar10/train/
+bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml /path/to/dataset
 
 # standalone training example, apply SimQAT and train from full precision checkpoint
 cd ./golden_stick/scripts/

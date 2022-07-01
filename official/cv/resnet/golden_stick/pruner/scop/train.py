@@ -221,7 +221,7 @@ def train_net():
 
     # apply golden-stick algo
     algo_kf = PrunerKfCompressAlgo({})
-    pre_ckpt = ms.load_checkpoint(config.pre_trained)
+    pre_ckpt = ms.load_checkpoint(config.fp32_ckpt)
     ms.load_param_into_net(net, pre_ckpt)
     model = algo_kf.apply(net)
 

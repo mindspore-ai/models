@@ -775,6 +775,16 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 
 ## 训练过程
 
+| **算法**  | SimQAT | SLB | SCOP |
+| --------- | ------ | --- | ---- |
+| **支持的后端**  | GPU | GPU、Ascend | GPU |
+| **是否支持预训练** | 支持加载预训练ckpt | 必须提供预训练ckpt | 算法原理上无法复用原ckpt，无法加载预训练ckpt |
+| **是否支持续训练** | 支持 | 支持 | 支持 |
+| **是否支持多卡训练** | 支持 | 不支持 | 支持 |
+
+- 预训练是指先不应用算法，先训练收敛一个全精度的网络。预训练获得的checkpoint文件被用于后续应用算法后的训练。
+- 续训练是指应用算法后训练网络，在训练过程中中断训练，后续从中断处的ckpt继续进行训练。
+
 ### GPU处理器环境运行
 
 ```text
@@ -785,7 +795,7 @@ bash run_distribute_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CKP
 
 # 分布式训练示例（应用SimQAT算法并从头开始量化训练）
 cd ./golden_stick/scripts/
-bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml ./cifar10/train/
+bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml /path/to/dataset
 
 # 分布式训练示例（应用SimQAT算法并加载预训练的全精度checkoutpoint，进行量化训练）
 cd ./golden_stick/scripts/
@@ -802,7 +812,7 @@ bash run_standalone_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CKP
 
 # 单机训练示例（应用SimQAT算法并从头开始量化训练）
 cd ./golden_stick/scripts/
-bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml ./cifar10/train/
+bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml /path/to/dataset
 
 # 单机训练示例（应用SimQAT算法并加载预训练的全精度checkoutpoint，并进行量化训练）
 cd ./golden_stick/scripts/
@@ -812,11 +822,13 @@ bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/
 cd ./golden_stick/scripts/
 bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt
 
-# 针对不同的量化算法，只需替换PYTHON_PATH CONFIG_FILE即可，以SLB算法为例：
-bash run_standalone_train_gpu.sh ../quantization/slb/ ../quantization/slb/resnet18_cifar10_config.yaml ./cifar10/train/
+# 针对不同的算法，只需替换PYTHON_PATH和CONFIG_FILE即可，比如需要应用SLB算法并使用单卡训练：
+cd ./golden_stick/scripts/
+bash run_standalone_train_gpu.sh ../quantization/slb/ ../quantization/slb/resnet18_cifar10_config.yaml /path/to/dataset
+# 比如需要应用SCOP算法并使用多卡训练：
+cd ./golden_stick/scripts/
+bash run_distribute_train_gpu.sh ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml /path/to/dataset
 ```
-
-- 当前SLB只支持单机训练，且不支持加载预训练的全精度checkpoint
 
 ## 评估过程
 
@@ -832,10 +844,10 @@ bash run_eval_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CHECKPOINT_PATH
 ```text
 # 评估示例
 cd ./golden_stick/scripts/
-bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml ./cifar10/train/ ./checkpoint/resnet-90.ckpt
+bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml /path/to/dataset /path/to/ckpt
 
-# 针对不同的量化算法，只需替换PYTHON_PATH CONFIG_FILE即可，以SLB算法为例：
-bash run_eval_gpu.sh ../quantization/slb/ ../quantization/slb/resnet18_cifar10_config.yaml ./cifar10/train/ ./checkpoint/resnet-100.ckpt
+# 针对不同的量化算法，只需替换PYTHON_PATH和CONFIG_FILE即可，比如需要评估应用SLB算法后的resnet18网络精度：
+bash run_eval_gpu.sh ../quantization/slb/ ../quantization/slb/resnet18_cifar10_config.yaml /path/to/dataset /path/to/ckpt
 ```
 
 ### 结果
