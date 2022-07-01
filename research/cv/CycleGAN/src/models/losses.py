@@ -129,7 +129,7 @@ class GeneratorLoss(nn.Cell):
             loss_idt_A = 0
             loss_idt_B = 0
         loss_G = loss_G_A + loss_G_B + loss_C_A + loss_C_B + loss_idt_A + loss_idt_B
-        return (fake_A, fake_B, loss_G, loss_G_A, loss_G_B, loss_C_A, loss_C_B, loss_idt_A, loss_idt_B)
+        return (loss_G, fake_A, fake_B, loss_G_A, loss_G_B, loss_C_A, loss_C_B, loss_idt_A, loss_idt_B)
 
 
 class DiscriminatorLoss(nn.Cell):
