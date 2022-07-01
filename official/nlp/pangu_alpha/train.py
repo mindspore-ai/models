@@ -219,8 +219,8 @@ def run_train(args_opt):
         if not flag:
             restore_checkpoint(args_opt, args_opt.sink_size, ds, model,
                                pangu_alpha_with_grads, epoch=actual_epoch_num)
-        loss_callback.has_trained_epoch = args_opt.has_trained_epoch
-        loss_callback.has_trained_step = args_opt.has_trained_step
+        loss_callback.has_trained_epoch = args_opt.has_trained_epoches
+        loss_callback.has_trained_step = args_opt.has_trained_steps
     add_checkpoint_callback_policy(args_opt, callback, rank)
     if args_opt.incremental_training:
         strategy = model.infer_train_layout(train_dataset=ds, sink_size=args_opt.sink_size)
@@ -504,8 +504,8 @@ def run_train_pipeline(args_opt):
         if not flag:
             restore_checkpoint(args_opt, callback_size, ds, model, pangu_alpha_with_grads, epoch=actual_epoch_num)
 
-        loss_callback.has_trained_epoch = args_opt.has_trained_epoch
-        loss_callback.has_trained_step = args_opt.has_trained_step
+        loss_callback.has_trained_epoch = args_opt.has_trained_epoches
+        loss_callback.has_trained_step = args_opt.has_trained_steps
     add_checkpoint_callback_policy(args_opt, callback, rank_id)
 
     model.train(actual_epoch_num, ds, callbacks=callback,
