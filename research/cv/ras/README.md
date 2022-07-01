@@ -19,6 +19,9 @@
       - [用法](#用法-1)
       - [结果](#结果-1)
   - [评估推理结果](#评估推理结果)
+  - [ONNX模型导出及评估](#onnx模型导出及评估)
+      - [ONNX模型导出](#onnx模型导出)
+      - [ONNX模型评估](#onnx模型评估)
 - [模型描述](#模型描述)
   - [评估精度](#评估性能)
 - [随机情况说明](#随机情况说明)
@@ -104,6 +107,7 @@ RAS总体网络架构如下:
   │   ├──run_distribute_train_gpu.sh # 使用GPU进行多卡训练的shell脚本
   │   ├──run_train_gpu.sh    # 使用GPU进行单卡训练的shell脚本
   │   ├──run_eval_gpu.sh  # 使用GPU进行评估的单卡shell脚本
+  │   ├──run_eval_onnx_gpu.sh  # 使用GPU对导出的onnx模型进行评估的单卡shell脚本
   ├──src
   │   ├──dataset_train.py #创建训练数据集
   │   ├──dataset_test.py # 创建推理数据集
@@ -113,7 +117,9 @@ RAS总体网络架构如下:
   │   ├──TrainOneStepMyself.py  #自定义训练，参数更新过程
   ├── train.py # 训练脚本
   ├── eval.py # 推理脚本
+  ├── eval_onnx.py # onnx推理脚本
   ├── export.py
+  ├── export_onnx.py # onnx导出脚本
 ```
 
 ### 脚本参数
@@ -131,6 +137,7 @@ RAS总体网络架构如下:
     'print_flag' : 20                   //训练时每print_flag个step输出一次loss
     'device_id'  : 5                   //训练时硬件的ID
     'data_url'   : xxx                 //数据路径
+    'onnx_file'  : xxx                 //导出的onnx模型路径
     'pretrained_model':xxx             //resnet50预训练模型路径 在eval该参数为"pre_model"
   ```
 
@@ -253,6 +260,27 @@ The Consumption of per step is 0.136 s
 
 推理完成后，要对结果进行处理，为了方便，已经将评估部分加入到推理中，在推理完成后即可看到
 该推理结果的Fmeasure，在推理的log中可以找到
+
+## ONNX模型导出及评估
+
+### ONNX模型导出
+
+```bash
+    python export_onnx.py --device_target [DEVICE_TARGET] --pre_model [PRE_MODEL] --ckpt_file [CKPT_FILE]
+        ckpt_file 为训练保存的ckpt路径
+        pre_model 为网络resnet50预训练模型路径
+    # example: python export_onnx.py --device_target "GPU" --pre_model resnet50_gpu_v130_imagenet_official_cv_bs32_acc0.ckpt --ckpt_file ras_ascend_v170_dutstrain_research_cv_ECSSD91_DUTStest81_DUTOMRON75_HKUIS90.ckpt
+```
+
+### ONNX模型评估
+
+```bash
+    bash script/run_eval_onnx_gpu.sh [data_url] [save_url] [onnx_file]
+        data_url  为推理数据路径
+        save_url  为生成结果图片的路径
+        onnx_file 为导出的onnx文件路径
+    # example: bash script/run_eval_onnx_gpu.sh dataset/HKU-IS/ ./output_hku_is ras_onnx.onnx
+```
 
 # 模型描述
 
