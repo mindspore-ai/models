@@ -25,7 +25,8 @@ from mindspore.communication.management import init, get_rank
 from mindspore.parallel import set_algo_parameters
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
-from mindspore_gs import PrunerKfCompressAlgo, PrunerFtCompressAlgo, KfConv2d, MaskedConv2dbn
+from mindspore_gs import PrunerKfCompressAlgo, PrunerFtCompressAlgo
+from mindspore_gs.pruner.scop.scop_pruner import KfConv2d, MaskedConv2dbn
 from src.lr_generator import get_lr
 from src.CrossEntropySmooth import CrossEntropySmooth
 from src.resnet import conv_variance_scaling_initializer
