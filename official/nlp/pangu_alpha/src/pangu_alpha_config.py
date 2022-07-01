@@ -35,6 +35,7 @@ class PanguAlphaConfig:
                  post_layernorm_residual=False,
                  dropout_rate=0.1,
                  eod_token=6,
+                 pad_token=6,
                  use_past=False,
                  hidden_act='fast_gelu',
                  eod_reset=True,
@@ -69,6 +70,7 @@ class PanguAlphaConfig:
         self.expert_num = expert_num
         self.per_token_num_experts_chosen = per_token_num_experts_chosen
         self.run_type = run_type
+        self.pad_token = pad_token
 
     def __str__(self):
         info = '===' * 10 + "[PANGUALPHAConfig]" + '===' * 10 + '\n'

@@ -216,8 +216,8 @@ def set_parallel_configure_for_layer(network, layer_id, offset, parallel_config,
     else:
         network.set_comm_fusion(int((layer_id + offset) / dis) + 1)
     # Used for enabling recomputation of the block
-    if parallel_config.recompute:
-        network.recompute()
+    if parallel_config.recompute.recompute:
+        network.recompute(recompute_slice_activation=parallel_config.recompute.recompute_slice_activation)
 
 
 class PanguAlpha_Model(Cell):
@@ -284,8 +284,9 @@ class PanguAlpha_Model(Cell):
                                           use_past=config.use_past,
                                           softmax_compute_type=config.softmax_compute_type,
                                           parallel_config=config.parallel_config)
-        if config.parallel_config.recompute:
-            self.top_query_layer.recompute()
+        if config.parallel_config.recompute.recompute:
+            self.top_query_layer.recompute(recompute_slice_activation=
+                                           config.parallel_config.recompute.recompute_slice_activation)
         self.top_query_layer.set_comm_fusion(config.parallel_config.gradient_aggregation_group)
         self.top_query_layer.pipeline_stage = config.parallel_config.pipeline_stage - 1
 
@@ -416,7 +417,7 @@ class PanGUAlphaWithLoss(Cell):
         self.seq_length = config.seq_length
         dp = config.parallel_config.data_parallel
         self.network = network
-        self.eod_token = config.eod_token
+        self.pad_token = config.pad_token
         self.loss = loss
 
         self.slice = P.StridedSlice().shard(((dp, 1),))
@@ -434,7 +435,7 @@ class PanGUAlphaWithLoss(Cell):
         input_position = self.slice(input_position, (0, 0), (self.batch_size, self.len), (1, 1))
         decoder_attention_masks = self.slice2(attention_mask, (0, 0, 0), (self.batch_size, self.len, self.len),
                                               (1, 1, 1))
-        input_mask = F.cast(self.not_equal(tokens, self.eod_token),
+        input_mask = F.cast(self.not_equal(tokens, self.pad_token),
                             mstype.float32)
 
         logits = self.network(tokens,
