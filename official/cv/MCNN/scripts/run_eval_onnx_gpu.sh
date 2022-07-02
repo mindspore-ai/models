@@ -14,32 +14,31 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 4 ]
+if [ $# != 3 ]
 then
-    echo "Usage: bash run_eval.sh [RUN_OFFLINE] [VAL_PATH] [VAL_GT_PATH] [CKPT_PATH]"
+    echo "Usage: bash run_eval_onnx_gpu.sh [VAL_PATH] [VAL_GT_PATH] [ONNX_PATH]"
 exit 1
 fi
 
 ulimit -u unlimited
 export DEVICE_ID=0
 export RANK_SIZE=1
-export RUN_OFFLINE=$1
-export VAL_PATH=$2
-export VAL_GT_PATH=$3
-export CKPT_PATH=$4
+export VAL_PATH=$1
+export VAL_GT_PATH=$2
+export ONNX_PATH=$3
 
-if [ -d "eval" ];
+if [ -d "eval_onnx" ];
 then
-    rm -rf ./eval
+    rm -rf ./eval_onnx
 fi
 
-mkdir ./eval
-cp ../*.py ./eval
-cp *.sh ./eval
-cp -r ../src ./eval
-cd ./eval || exit
-env > env.log
+mkdir ./eval_onnx
+cp ../*.py ./eval_onnx
+cp *.sh ./eval_onnx
+cp -r ../src ./eval_onnx
+cd ./eval_onnx || exit
+env > env_onnx.log
 echo "start evaluation for device $DEVICE_ID"
-python eval.py --run_offline=$RUN_OFFLINE --val_path=$VAL_PATH \
-               --val_gt_path=$VAL_GT_PATH --ckpt_path=$CKPT_PATH &> log &
+python eval_onnx.py --val_path=$VAL_PATH \
+                    --val_gt_path=$VAL_GT_PATH --onnx_path=$ONNX_PATH &> log_onnx &
 cd ..
