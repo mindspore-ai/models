@@ -44,6 +44,9 @@ file_name: "srcnn"
 file_format: "MINDIR"
 #batch_size: 1
 
+# onnx evaluation
+onnx_path: "srcnn.onnx"
+
 ---
 
 # Help description for each configuration

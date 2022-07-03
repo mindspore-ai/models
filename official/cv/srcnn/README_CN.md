@@ -16,6 +16,7 @@
         - [分布式训练](#分布式训练)
     - [评估过程](#评估过程)
         - [评估](#评估)
+        - [ONNX评估](#ONNX评估)
     - [导出过程](#导出过程)
         - [导出](#导出)
     - [推理过程](#推理过程)
@@ -59,9 +60,8 @@ SRCNN首先使用双三次(bicubic)插值将低分辨率图像放大成目标尺
 - 验证集
     - Set5: 5 images
     - Set14: 14 images
-        - Set5 & Set14 download url: [http://vllab.ucmerced.edu/wlai24/LapSRN/results/SR_testing_datasets.zip](https://gitee.com/link?target=http%3A%2F%2Fvllab.ucmerced.edu%2Fwlai24%2FLapSRN%2Fresults%2FSR_testing_datasets.zip)
     - BSDS200: 200 images
-        - BSDS200 download url: [http://vllab.ucmerced.edu/wlai24/LapSRN/results/SR_training_datasets.zip](https://gitee.com/link?target=http%3A%2F%2Fvllab.ucmerced.edu%2Fwlai24%2FLapSRN%2Fresults%2FSR_training_datasets.zip)
+    - download_url: [https://gitee.com/a1085728420/srcnn-dataset](https://gitee.com/a1085728420/srcnn-dataset)
 
 - 数据格式：RGB
 
@@ -71,7 +71,7 @@ SRCNN首先使用双三次(bicubic)插值将低分辨率图像放大成目标尺
 
 ## 混合精度
 
-采用[混合精度](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
+采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
 以FP16算子为例，如果输入数据类型为FP32，MindSpore后台会自动降低精度来处理数据。用户可打开INFO日志，搜索“reduce precision”查看精度降低的算子。
 
 # 环境要求
@@ -205,12 +205,14 @@ python src/create_dataset.py --src_folder=/dataset/train --output_folder=/datase
     ├── export.py     // 将checkpoint文件导出到air/mindir
     ├── postprocess.py    // 310推理预处理数据
     ├── preprocess.py    // 310推理后处理数据
+    ├── eval_onnx.py          // ONNX评估脚本
     ├── scripts
     │   ├── run_distribute_train_ascend.sh // 分布式到Ascend的shell脚本
     │   ├── run_distribute_train_gpu.sh    // 分布式到GPU处理器的shell脚本
     │   ├── run_eval_ascend.sh        // Ascend评估的shell脚本
     │   ├── run_eval_gpu.sh           // GPU处理器评估的shell脚本
     │   ├── run_infer_310.sh        // Ascend推理shell脚本
+    │   ├── run_onnx_eval_gpu.sh                  // ONNX评估的shell脚本
     │   └── run_single_train_ascend.sh    // Ascend的单卡训练脚本
     ├── src
     │   ├── create_dataset.py        // 创建mindrecord数据集
@@ -404,6 +406,37 @@ python src/create_dataset.py --src_folder=/dataset/train --output_folder=/datase
   ```
 
   注：对于分布式训练后评估，请将checkpoint_path设置为最后保存的检查点文件，
+
+### ONNX评估
+
+- 导出ONNX模型
+
+  ```bash
+  python export.py --checkpoint_path=/path/to/checkpoint.ckpt --device_target=GPU --file_format="ONNX"
+  ```
+
+  上述命令运行后，将在当前目录下生成srcnn.onnx
+
+- 运行ONNX模型评估
+
+  ```bash
+  bash scripts/run_onnx_eval_gpu.sh DATA_PATH DEVICE_ID ONNX_MODEL_PATH
+      DATA_PATH 为推理数据路径
+      DEVICE_ID 为GPU设备id
+      ONNX_MODEL_PATH 为onnx模型路径
+  #example: bash scripts/run_onnx_eval_gpu.sh /path/to/data 0 /path/to/srcnn.onnx
+  ```
+
+- 上述命令将在后台运行，运行结束后可以通过文件`eval_onnx.log`查看结果。将会得到如下精度：
+
+  ```bash
+  # Set5
+  PSNR: 42.2718
+  # Set14
+  PSNR: 35.3049
+  #BSDS200
+  PSNR: 36.1434
+  ```
 
 ## 导出过程
 
