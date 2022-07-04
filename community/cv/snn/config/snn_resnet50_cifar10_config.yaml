@@ -1,0 +1,68 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+run_distribute: False
+enable_profiling: False
+data_path: "/cache/data"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path/"
+device_target: "Ascend"
+checkpoint_path: "./checkpoint/"
+ckpt_path: '/cache/train/'
+ckpt_file: '/cache/train/output/checkpoint/resnet50-5_1562.ckpt'
+
+# ==============================================================================
+# Training options
+optimizer: "Momentum"
+loss_function: "SoftmaxCrossEntropy"
+class_num: 10
+batch_size: 32
+loss_scale: 1024
+momentum: 0.9
+weight_decay: 0.0001
+epoch_size: 10
+save_checkpoint: True
+save_checkpoint_epochs: 5
+keep_checkpoint_max: 10
+warmup_epochs: 5
+lr_decay_mode: "poly"
+lr_init: 0.01
+lr_end: 0.00001
+lr_max: 0.1
+
+net_name: "resnet50"
+device_num: 1
+device_id: 0
+pre_trained: ""
+mode_name: "GRAPH"  # can be PYNATIVE or GRAPH
+conv_init: "XavierUniform"
+dense_init: "TruncatedNormal"
+all_reduce_fusion_config:
+    - 85
+    - 160
+train_image_size: 224
+eval_image_size: 224
+
+save_graphs: False
+
+---
+# Help description for each configuration
+enable_modelarts: "Whether training on modelarts, default: False"
+data_url: "Dataset url for obs"
+checkpoint_url: "The location of checkpoint for obs"
+data_path: "Dataset path for local"
+output_path: "Training output path for local"
+load_path: "The location of checkpoint for obs"
+device_target: "Target device type, available: [Ascend, GPU, CPU]"
+enable_profiling: "Whether enable profiling while training, default: False"
+num_classes: "Class for dataset"
+batch_size: "Batch size for training and evaluation"
+epoch_size: "Total training epochs."
+checkpoint_path: "The location of the checkpoint file."
+checkpoint_file_path: "The location of the checkpoint file."
+save_graphs: "Whether save graphs during training, default: False."
+save_graphs_path: "Path to save graphs."
