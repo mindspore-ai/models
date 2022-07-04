@@ -69,6 +69,7 @@ EfficientNet总体网络架构如下：
   │   ├──run_standalone_train.sh   # 用于单卡训练的shell脚本
   │   ├──run_distribute_train.sh   # 用于八卡训练的shell脚本
   │   ├──run_infer_310.sh          # Ascend推理shell脚本
+  │   ├──run_infer_onnx.sh         # ONNX推理shell脚本
   │   └──run_eval.sh               # 用于评估的shell脚本
   ├── src
   │   ├──models                    # 模型架构
@@ -81,6 +82,7 @@ EfficientNet总体网络架构如下：
   │   └──Monitor.py                # 监控网络损失和其他数据
   ├── create_imagenet2012_label.py # 创建数据标签
   ├── eval.py                      # 评估脚本
+  ├── infer_onnx.py                # ONNX评估
   ├── export.py                    # 模型格式转换脚本
   ├── postprogress.py              # 310推理后处理脚本
   └── train.py                     # 训练脚本
@@ -173,7 +175,7 @@ result: {'Loss': 1.8745046273255959, 'Top_1_Acc': 0.7668870192307692, 'Top_5_Acc
 python export.py --checkpoint_path [CKPT_PATH] --file_name [OUT_FILE] --file_format[EXPORT_FORMAT]
 ```
 
-`EXPORT_FORMAT` 可选 ["AIR", "MINDIR"]
+`EXPORT_FORMAT` 可选 ["AIR", "MINDIR", "ONNX"]
 
 ## 推理过程
 
@@ -194,6 +196,15 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 
 ```python
 accuracy:0.767
+```
+
+### ONNX推理
+
+在推理之前需要在GPU环境上完成模型的导出。
+
+```shell
+# ONNX inference
+bash scripts/run_infer_onnx.sh [ONNX_PATH] [DATASET_PATH] [DEVICE_TARGET]
 ```
 
 # 模型说明
