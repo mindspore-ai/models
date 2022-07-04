@@ -189,9 +189,12 @@ class TrainOneStepG(nn.Cell):
 
     def construct(self, img_A, img_B):
         weights = self.weights
-        fake_A, fake_B, lg, lga, lgb, lca, lcb, lia, lib = self.G(img_A, img_B)
-        sens = ops.Fill()(ops.DType()(lg), ops.Shape()(lg), self.sens)
-        grads_g = self.grad(self.net, weights)(img_A, img_B, sens)
+        out = self.G(img_A, img_B)
+        lg, fake_A, fake_B, lga, lgb, lca, lcb, lia, lib = out
+        sens_tuple = (ops.ones_like(lg) * self.sens,)
+        for i in range(1, len(out)):
+            sens_tuple += (ops.zeros_like(out[i]),)
+        grads_g = self.grad(self.G, weights)(img_A, img_B, sens_tuple)
         if self.reducer_flag:
             # apply grad reducer on grads
             grads_g = self.grad_reducer(grads_g)
