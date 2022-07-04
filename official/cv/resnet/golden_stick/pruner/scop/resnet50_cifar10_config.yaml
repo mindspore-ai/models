@@ -42,6 +42,7 @@ lr_ft_max: 0.4
 net_name: "resnet50"
 dataset: "cifar10"
 device_num: 1
+ngpu: 1
 pre_trained: ""
 fp32_ckpt: ""
 run_eval: False
