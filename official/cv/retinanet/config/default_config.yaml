@@ -118,6 +118,11 @@ export_batch_size: 1
 file_name: "retinanet"
 
 # ======================================================================================
+# Onnx eval options
+dataset: "coco"
+onnx_path: "./retinanet.onnx"
+
+# ======================================================================================
 # postprocess options
 result_path: ""
 img_path: ""
