@@ -77,6 +77,7 @@ EfficientNet总体网络架构如下：
 │   │   ├─ run_standalone_train.sh      # 用于单卡训练的shell脚本
 │   │   ├─ run_distribute_train.sh      # 用于八卡训练的shell脚本
 │   │   └─ run_eval.sh                  # 用于评估的shell脚本
+│   │   └─ run_infer_onnx.sh            # 用于ONNX推理的shell脚本
 │   ├─ src
 │   │   ├─ model_utils                  # modelarts训练适应脚本
 │   │   │   └─ moxing_adapter.py
@@ -90,6 +91,7 @@ EfficientNet总体网络架构如下：
 │   │   └─ utils.py                     # 工具函数脚本
 │   ├─ create_imagenet2012_label.py     # 创建ImageNet2012标签
 │   ├─ eval.py                          # 评估脚本
+│   ├─ infer_onnx.py                    # ONNX评估
 │   ├─ export.py                        # 模型格式转换脚本
 │   ├─ postprocess.py                   # 310推理后处理脚本
 │   └─ train.py                         # 训练脚本
@@ -210,9 +212,24 @@ python export.py --checkpoint_path [CHECKPOINT_FILE_PATH] --file_name [OUTPUT_FI
 bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 ```
 
+## 导出ONNX
+
+```bash
+python export.py --checkpoint_path [CHECKPOINT_FILE_PATH] --file_name [OUTPUT_FILE_NAME] --width 240 --height 240 --file_format ONNX
+```
+
+## 在GPU执行ONNX推理
+
+在执行推理前，ONNX文件必须通过 `export.py` 脚本导出。以下展示了使用ONNX模型执行推理的示例。
+
+```bash
+# ONNX inference
+bash scripts/run_infer_onnx.sh [ONNX_PATH] [DATA_PATH] [DEVICE_TARGET]
+```
+
 ## 结果
 
-推理结果保存在脚本执行的当前路径，你可以在acc.log中看到精度计算结果。
+推理结果保存在脚本执行的当前路径，你可以在acc.log中看到Ascend 310精度计算结果,在infer_onnx.log中看到ONNX推理精度计算结果。
 
 # 模型说明
 
