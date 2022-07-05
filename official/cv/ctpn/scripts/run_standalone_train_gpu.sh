@@ -52,12 +52,11 @@ cp -r ./src ./train
 cd ./train || exit
 
 export DEVICE_NUM=1
-export DEVICE_ID=$3
 export RANK_ID=0
 export RANK_SIZE=1
 
-echo "start training for device $DEVICE_ID"
-export CUDA_VISIBLE_DEVICES=$DEVICE_ID
+echo "start training for device $3"
+export CUDA_VISIBLE_DEVICES=$3
 env > env.log
 python train.py --task_type=$TASK_TYPE --pre_trained=$PRETRAINED_PATH --device_target="GPU" &> log &
 cd ..
