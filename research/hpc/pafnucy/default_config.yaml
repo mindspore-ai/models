@@ -1,0 +1,93 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+data_path: "/data/pafnucy/tests/data/dataset"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+mindrecord_path: ""
+device_target: Ascend
+enable_profiling: False
+distribute: False
+
+ckpt_path: '/cache/train/'
+ckpt_file: './scripts/train/ckpt/pafnucy.ckpt'
+
+# ==============================================================================
+# Training options
+grid_spacing: 1.0
+lr: 1e-5
+momentum: 0.9
+weight_decay: 0.001
+epoch_size: 20
+batch_size: 20
+max_dist: 10.0
+conv_patch: 5
+pool_patch: 2
+conv_channels: [64, 128, 256]
+dense_sizes: [1000, 500, 200]
+keep_prob: 0.5
+isize: 21
+lmbda: 0.001
+rotations: 24
+air_name: "pafnucy"
+device_id: 5
+log_interval: 1
+file_name: "pafnucy"
+file_format: 'MINDIR'
+dataset_sink_mode: True
+save_checkpoint: True
+save_checkpoint_epochs: 2
+
+# acc calculation
+result_path: ''
+img_path: ''
+
+#Testing options
+hdf_file: './complexes.hdf'
+charge_scaler: 0.425896
+verbose: True
+
+#Prepare molecular data for the network
+ligands: ["/data/complexes/10gs/10gs_ligand.mol2"]
+pockets: ["/data/complexes/10gs/10gs_pocket.mol2"]
+ligand_format: "mol2"
+pocket_format: "mol2"
+output: "complexes.hdf"
+mode: 'w'
+affinities: ""
+pre_output: "./predictions.csv"
+predict_input: "./complexes.hdf"
+
+---
+# Config description for each option
+enable_modelarts: 'Whether training on modelarts, default: False'
+data_url: 'Dataset url for obs'
+train_url: 'Training output url for obs'
+data_path: 'Dataset path for local'
+output_path: 'Training output path for local'
+device_target: 'Target device type'
+enable_profiling: 'Whether enable profiling while training, default: False'
+file_name: 'output file name.'
+file_format: 'file format'
+result_path: "result files path."
+img_path: "image file path."
+grid_spacing: "distance between grid points"
+max_dist: "max distance from complex center"
+conv_patch: "kernel size for convolutional layers"
+pool_patch: "kernel size for pooling layers"
+conv_channel: "number of fileters in convolutional layers"
+dense_size: "number of neurons in dense layers"
+rotations: "rotations to perform"
+charge_scaler: "scaling factor for the charge (use the same factor when preparing data for training and for predictions)"
+verbose: "whether to print messages."
+ligand: "files with ligands structures"
+pocket: "file with pockers structures"
+ligand_format: "file format for the ligand, must be supported by openbabel"
+pocket_format: "file format for the pocker must be supported by openbabel"
+output: "name  for the file with the prepared structures"
+mode: "mode for the output fiel"
+affinities: "CSV table with affinity values, it must contain two columns:name which must be equal to ligand's
+            file name without extension and affinity which must contain floats"
+---
