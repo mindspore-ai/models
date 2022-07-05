@@ -11,8 +11,11 @@
     - [Training Process](#training-process)
 - [Inference Process](#inference-process)
     - [Export MindIR](#export-mindir)
+    - [Export ONNX](#export-onnx)
     - [Infer on Ascend310](#infer-on-ascend310)
-    - [Result](#result)
+        - [Result](#result)
+    - [ONNX Infer](#onnx-infer)
+        - [Result](#result)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Training Performance](#training-performance)  
@@ -75,6 +78,7 @@ ESRGAN
  ├─ run_infer_310.sh                     # launch ascend 310 inference
  ├─ run_distribute_train_gpu.sh              # launch GPU training(8 pcs)
  ├─ run_eval_gpu.sh                          # launch GPU eval
+ ├─ run_eval_onnx_gpu                        # launch ONNX inference
  ├─ run_stranalone_train_gpu.sh              # launch GPU training(1 pcs)
  ├─ run_distribute_train.sh              # launch ascend training(8 pcs)
  ├─ run_eval.sh                          # launch ascend eval
@@ -96,7 +100,9 @@ ESRGAN
   ├─ extract_subimages.py                # crop large images to sub-images
   └─ util.py                             # Utils for model
 ├─ export.py                             # export mindir script
+├─ export_onnx.py                        # export onnx script
 ├─ eval.py                               # eval script
+├─ eval_onnx.py                          # eval onnx script
 ├─ preprocess.py                         # preprocess script
 ├─ postprocess.py                        # postprocess scripts
 └─ train.py                              # train script
@@ -183,6 +189,21 @@ eg: python export.py ESRGAN MINDIR ./ckpt/psnr_best.ckpt
 The ckpt_file parameter is required,
 `EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
 
+## [Export ONNX](#contents)
+
+The model will generate different ONNX file depending on the input size.
+Need to use validation set Set5, Set14 for model export and inference.
+
+```shell
+python export.py --file_name [FILE_NAME] --file_format [FILE_FORMAT]--test_LR_path [EVALLRPATH] --test_GT_path [EVALGTPATH] --generator_path [CKPT] --device_id [DEVICE_ID]
+
+eg: python export.py --file_name ESRGAN --file_format ONNX --test_LR_path /data/DIV2K/Set5/LRbicx4 --test_GT_path /data/DIV2K/Set5/GTmod12 --device_id 0
+eg:python export.py --file_name ESRGAN --file_format ONNX --test_LR_path /data/DIV2K/Set14/LRbicx4 --test_GT_path /data/DIV2K/Set14/GTmod12 --device_id 0
+```
+
+The ckpt_file parameter is required.
+`EXPORT_FORMAT` should be "ONNX".
+
 ## [Infer on Ascend310](#contents)
 
 Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
@@ -202,36 +223,55 @@ Inference result is saved in current path, you can find result like this in acc.
 'avg psnr': 31.83
 ```
 
+## [ONNX Infer](#contents)
+
+Before performing inference, the onnx file must be exported by `export_onnx.py` script.
+
+```shell
+bash run_eval_onnx_gpu.sh [TEST_LR_PATH] [TEST_GT_PATH] [ONNX_PATH]
+
+eg: bash run_eval_onnx_gpu.sh /data/Set5/LRbicx4 /data/Set5/GTmod12 /home/stu/ESRGAN/
+```
+
+### [Result](#contents)
+
+Inference result is saved in `eval_onnx`, you can find result like this in `log_onnx` file.
+
+```text
+=======starting test=====
+avg PSNR: 28.85
+```
+
 # [Model Description](#contents)
 
 ## [Performance](#contents)
 
 ### Training Performance
 
-| Parameters                 | Ascend 910                                                  | NVIDIA GeForce RTX 3090                        |
-| -------------------------- | ----------------------------------------------------------- |------------------------------------------------|
-| Model Version              | V1                                                          | V1                                             |
-| MindSpore Version          | 1.3.0                                                       | 1.6.0                                          |
-| Dataset                    | DIV2K                                                       | DIV2K                                          |
-| Training Parameters        | step=1000000+400000,  batch_size = 16                       | step=1000000+400000,  batch_size = 16          |
-| Optimizer                  | Adam                                                        | Adam                                           |
-| Loss Function              | BCEWithLogitsLoss  L1Loss VGGLoss                           | BCEWithLogitsLoss  L1Loss VGGLoss              |
-| outputs                    | super-resolution pictures                                   | super-resolution pictures                      |
-| Accuracy                   | Set5 psnr 32.56, Set14 psnr 26.23                           | Set5 psnr 30.37, Set14 psnr 26.51              |
-| Speed                      | 1pc(Ascend): 212,216 ms/step; 8pcs: 77,118 ms/step          | 8pcs:239ms/step + 409ms/step                   |
-| Total time                 | 8pcs: 36h                                                   |                                                |
-| Checkpoint for Fine tuning | 64.86M (.ckpt file)                                         |64.86M (.ckpt file)                             |
+| Parameters                 | Ascend 910                                                                         | NVIDIA GeForce RTX 3090               |
+| -------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------- |
+| Model Version              | V1                                                                                 | V1                                    |
+| MindSpore Version          | 1.3.0                                                                              | 1.6.0                                 |
+| Dataset                    | DIV2K                                                                              | DIV2K                                 |
+| Training Parameters        | step=1000000+400000,  batch_size = 16                                              | step=1000000+400000,  batch_size = 16 |
+| Optimizer                  | Adam                                                                               | Adam                                  |
+| Loss Function              | BCEWithLogitsLoss  L1Loss VGGLoss                                                  | BCEWithLogitsLoss  L1Loss VGGLoss     |
+| outputs                    | super-resolution pictures                                                          | super-resolution pictures             |
+| Accuracy                   | Set5 psnr 32.56, Set14 psnr 26.23                                                  | Set5 psnr 30.37, Set14 psnr 26.51     |
+| Speed                      | 1pc(Ascend): 212,216 ms/step; 8pcs: 77,118 ms/step                                 | 8pcs:239ms/step + 409ms/step          |
+| Total time                 | 8pcs: 36h                                                                          |                                       |
+| Checkpoint for Fine tuning | 64.86M (.ckpt file)                                                                | 64.86M (.ckpt file)                   |
 | Scripts                    | [esrgan script](https://gitee.com/mindspore/models/tree/master/research/cv/ESRGAN) |
 
 ### Evaluation Performance
 
-| Parameters          | Ascend 910               |
-| ------------------- | -------------------------|
-| Model Version       | V1                       |
-| MindSpore Version   | 1.3.0                    |
-| Dataset             | Set14                    |
-| batch_size          | 1                        |
-| outputs             | super-resolution pictures|
+| Parameters        | Ascend 910                |
+| ----------------- | ------------------------- |
+| Model Version     | V1                        |
+| MindSpore Version | 1.3.0                     |
+| Dataset           | Set14                     |
+| batch_size        | 1                         |
+| outputs           | super-resolution pictures |
 
 # [ModelZoo Homepage](#contents)
 
