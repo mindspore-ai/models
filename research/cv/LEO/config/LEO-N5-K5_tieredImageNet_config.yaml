@@ -2,6 +2,8 @@
 enable_modelarts: False
 data_url: ""
 train_url: ""
+ckpt_url: 'ckpt files'
+result_url: 'infer result files'
 checkpoint_url: ""
 device_target: "GPU"
 device_num: 1
@@ -39,7 +41,7 @@ num_steps_limit: int(1e5)
 outer_lr: 0.0025 # parameters
 gradient_threshold: 0.1
 gradient_norm_threshold: 0.1
-total_steps: 100000
+total_steps: 200000
 
 # Model Description
 model_name: LEO

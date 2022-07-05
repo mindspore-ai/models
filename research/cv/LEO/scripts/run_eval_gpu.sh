@@ -12,14 +12,18 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-echo "============================================================================================================================"
-echo "Please run the script as: "
-echo "bash scripts/run_eval_gpu.sh [DATA_PATH] [DATA_NAME] [NUM_TR_EXAMPLES_PER_CLASS] [CKPT_FILE] "
-echo "For example: bash scripts/run_eval_gpu.sh /home/mindspore/dataset/embeddings/ miniImageNet 1 ./ckpt/1P_mini_1/xxx.ckpt "
-echo "============ bash scripts/run_eval_gpu.sh /home/mindspore/dataset/embeddings/ miniImageNet 5 ./ckpt/1P_mini_5/xxx.ckpt "
-echo "============ bash scripts/run_eval_gpu.sh /home/mindspore/dataset/embeddings/ tieredImageNet 1 ./ckpt/1P_tiered_1/xxx.ckpt "
-echo "============ bash scripts/run_eval_gpu.sh /home/mindspore/dataset/embeddings/ tieredImageNet 5 ./ckpt/1P_tiered_5/xxx.ckpt "
-echo "============================================================================================================================"
+if [[ $# -ne 6 ]]; then
+    echo "============================================================================================================================"
+    echo "Please run the script as: "
+    echo "bash scripts/run_eval_gpu.sh [DATA_PATH] [DATA_NAME] [NUM_TR_EXAMPLES_PER_CLASS] [CKPT_FILE] "
+    echo "For example: bash scripts/run_eval_gpu.sh /home/mindspore/dataset/embeddings/ miniImageNet 1 ./ckpt/1P_mini_1/xxx.ckpt "
+    echo "============ bash scripts/run_eval_gpu.sh /home/mindspore/dataset/embeddings/ miniImageNet 5 ./ckpt/1P_mini_5/xxx.ckpt "
+    echo "============ bash scripts/run_eval_gpu.sh /home/mindspore/dataset/embeddings/ tieredImageNet 1 ./ckpt/1P_tiered_1/xxx.ckpt "
+    echo "============ bash scripts/run_eval_gpu.sh /home/mindspore/dataset/embeddings/ tieredImageNet 5 ./ckpt/1P_tiered_5/xxx.ckpt "
+    echo "============================================================================================================================"
+    exit 1;
+fi
+
 export  GLOG_v=3
 export  DEVICE_TARGET=GPU
 export  DATA_PATH=$1
