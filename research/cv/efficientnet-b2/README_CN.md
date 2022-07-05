@@ -67,6 +67,7 @@ EfficientNet总体网络架构如下：
 │   ├──run_distribute_train.sh  # 用于八卡训练的shell脚本
 │   ├──run_train_gpu.sh  # 用于八卡GPU训练的shell脚本
 │   ├──run_eval_gpu.sh  # 用于评估的GPUshell脚本
+│   ├──run_infer_onnx.sh  # 用于ONNX评估的shell脚本
 │   ├──run_distribute_resume.sh  # 用于恢复训练的shell脚本
 │   └──run_eval.sh  # 用于评估的shell脚本
 ├── src
@@ -165,6 +166,23 @@ epoch 5: epoch time: 645621.756, per step time: 1032.995, avg loss: 3.342
 
 ```shell
 result: {'Loss': 1.7495090191180889, 'Top_1_Acc': 0.7979567307692308, 'Top_5_Acc': 0.9468549679487179} ckpt = ./checkpoint/model_0/Efficientnet_b2-rank0-350_625.ckpt
+```
+
+## ONNX推理
+
+### 导出ONNX
+
+```bash
+python export.py --checkpoint_path [CHECKPOINT_FILE_PATH] --file_name [OUTPUT_FILE_NAME] --width 260 --height 260 --file_format ONNX --device_target GPU
+```
+
+### 在GPU执行ONNX推理
+
+在执行推理前，ONNX文件必须通过 `export.py` 脚本导出。以下展示了使用ONNX模型执行推理的示例。
+
+```bash
+# ONNX inference
+bash scripts/run_infer_onnx.sh [ONNX_PATH] [DATA_PATH] [DEVICE_TARGET]
 ```
 
 # 模型说明
