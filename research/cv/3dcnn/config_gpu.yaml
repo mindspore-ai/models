@@ -40,6 +40,9 @@ ckpt_file: "./dense24-5_4200.ckpt"
 file_name: "dense24"
 file_format: "MINDIR"
 
+# onnx eval
+onnx_path: ""
+
 ---
 # Help description for each configuration
 data_path: "The directory of data."
