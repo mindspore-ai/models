@@ -9,6 +9,7 @@
     - [脚本和样例代码](#脚本和样例代买)
     - [脚本参数](#脚本参数)
     - [训练过程](#训练过程)
+    - [Ascend310推理过程](#ascend310推理过程)
 - [模型描述](#模型描述)
     - [效果](#效果)
         - [训练效果](#训练效果)  
@@ -71,7 +72,7 @@ Style Transfer Networks的训练过程需要预先训练的VGG16和Inception-v3
 
 # [脚本描述](#内容)
 
-## [[脚本和样例代码](#内容)
+## [脚本和样例代码](#内容)
 
 ```shell
 style transfer
@@ -102,7 +103,9 @@ style transfer
  └─ inceptionv3py # inception-v3 网络的定义  
 ├─ output # 输出结果的文件夹
 ├─ test.py # 模型测试代码
-└─ train.py # 模型训练代码
+├─ train.py # 模型训练代码
+├─ export_for_310.py # 为310推理导出模型
+└─ ascend310_infer # 310推理程序
 ```
 
 ## [脚本参数](#内容)
@@ -135,6 +138,27 @@ bash ./scripts/run_eval.sh [PLATFORM] [DEVICE_ID] [CONTENT_PATH] [STYLE_PATH] [I
 ### [评估结果](#内容)
 
 评估结果将存储在输出中。在那里，你可以找到风格转换图片。
+
+## [Ascend310推理过程](#内容)
+
+### 导出 MINDIR 文件
+
+```bash
+python  export_for_310.py --ckpt_file [/path/to/ckpt_file] --inception_ckpt [/path/to/inception_ckpt]
+```
+
+### Ascend310推理
+
+- 运行 `run_infer_310.sh` 以进行310推理.
+
+```bash
+# 310推理
+bash run_infer_310.sh [MINDIR_PATH] [CONTENT_PATH] [STYLE_PATH] [DEVICE_ID]
+# 示例
+bash run_infer_310.sh ./style_transfer_model.mindir ./content_test/ ./style_test/ 0
+```
+
+风格化图片将存储在 postprocess_Result 文件夹中.
 
 # [模型描述](#内容)
 

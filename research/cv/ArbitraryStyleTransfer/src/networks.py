@@ -15,10 +15,12 @@
 
 
 """arbitrary style transfer network."""
+import numpy as np
+import mindspore
 import mindspore.nn as nn
 from mindspore import dtype as mstype
 from mindspore import Parameter
-from mindspore import ops
+from mindspore import ops, Tensor
 from mindspore.common import initializer as init
 
 
@@ -37,18 +39,24 @@ class InstanceNorm2d(nn.Cell):
                  beta_init='zeros'):
         super().__init__()
         self.num_features = num_features
-        self.eps = eps
         self.moving_mean = Parameter(init.initializer('zeros', num_features), name="mean", requires_grad=False)
         self.moving_variance = Parameter(init.initializer('ones', num_features), name="variance", requires_grad=False)
         self.gamma = Parameter(init.initializer(gamma_init, num_features), name="gamma", requires_grad=affine)
         self.beta = Parameter(init.initializer(beta_init, num_features), name="beta", requires_grad=affine)
-
+        self.sqrt = ops.Sqrt()
+        self.eps = Tensor(np.array([eps]), mindspore.float32)
+        self.cast = ops.Cast()
     def construct(self, x):
         """calculate InstanceNorm output"""
         mean = ops.ReduceMean(keep_dims=True)(x, (2, 3))
-        var = ops.ReduceMean(keep_dims=True)(((x - mean) ** 2), (2, 3))
-        std = (var + self.eps) ** 0.5
-        x = (x - mean) / std * self.gamma.reshape(1, -1, 1, 1) + self.beta.reshape(1, -1, 1, 1)
+        mean = self.cast(mean, mindspore.float32)
+        tmp = x - mean
+        tmp = tmp * tmp
+        var = ops.ReduceMean(keep_dims=True)(tmp, (2, 3))
+        std = self.sqrt(var+ self.eps)
+        gamma_t = self.cast(self.gamma, mindspore.float32)
+        beta_t = self.cast(self.beta, mindspore.float32)
+        x = (x - mean) / std * gamma_t.reshape(1, -1, 1, 1) + beta_t.reshape(1, -1, 1, 1)
         return x
 
 
@@ -273,6 +281,7 @@ class UpsampleConvInReluWithStyle(nn.Cell):
             self.instancenorm = InstanceNorm2d(channels_out)
         self.fc_beta = nn.Dense(style_dim, channels_out)
         self.fc_gamma = nn.Dense(style_dim, channels_out)
+        self.cast = ops.Cast()
         if activation:
             self.activation = activation()
         else:
@@ -290,7 +299,8 @@ class UpsampleConvInReluWithStyle(nn.Cell):
         gamma = self.fc_gamma(style)
         gamma = expand_dims(gamma, 2)
         gamma = expand_dims(gamma, 3)
-
+        gamma = self.cast(gamma, mindspore.float32)
+        beta = self.cast(beta, mindspore.float16)
         if self.upsample:
             x = self.upsample_layer(x, scale_factor=self.upsample)
         x = self.pad(x)
