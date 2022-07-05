@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_distribution_ascend.sh [RANK_TABLE_FILE] [CKPTS_DIR] [DATA_PATH]"
+    echo "Usage: bash scripts/run_distribution_ascend.sh [RANK_TABLE_FILE] [CKPTS_DIR] [DATA_PATH]"
 exit 1
 fi
 
@@ -52,11 +52,11 @@ do
     export RANK_ID=$((rank_start + i))
     rm -rf ./train_parallel$i
     mkdir ./train_parallel$i
-    cp -r ../src ./train_parallel$i
-    cp ../train.py ./train_parallel$i
+    cp -r ./src ./train_parallel$i
+    cp ./train.py ./train_parallel$i
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     cd ./train_parallel$i ||exit
     env > env.log
-    python -u train.py --device_id=$i --train_url=$CKPTS_DIR --data_url=$DATA_PATH 
+    nohup python -u train.py --device_id=$i --train_url=$CKPTS_DIR --data_url=$DATA_PATH >log_distribution_ascend 2>&1 &
     cd ..
 done

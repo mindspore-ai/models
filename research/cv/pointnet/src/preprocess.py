@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,7 +38,8 @@ if __name__ == '__main__':
         root=args.dataset_path,
         classification=False,
         split='test',
-        class_choice=[args.class_choice])
+        class_choice=[args.class_choice],
+        data_augmentation=False)
     dataset = ds.GeneratorDataset(dataset_generator, column_names=["point", "label"])
     dataset = dataset.batch(args.batchSize)
 
