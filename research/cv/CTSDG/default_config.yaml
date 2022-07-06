@@ -1,0 +1,57 @@
+# Dataset
+train_masks_root: ''
+eval_masks_root: ''
+
+data_root: ''
+anno_path: ''
+
+anno_train_index: 0
+anno_eval_index: 2
+
+# Data preprocessing
+image_load_size: [256, 256]
+sigma: 2
+num_parallel_workers: 4
+
+# Device configuration
+device_target: GPU
+device_num: 1
+rank_id: 0
+device_id: 0
+
+# Train options
+is_distributed: False
+seed: 42
+gen_lr_train: 0.0002
+gen_lr_finetune: 0.00005
+dis_lr_multiplier: 0.1
+
+batch_size: 6
+log_frequency_step: 1000
+save_checkpoint_steps: 10000
+keep_checkpoint_max: 3
+save_path: ''
+train_iter: 350000
+finetune_iter: 150000
+start_iter: 0
+pretrained_vgg: ''
+torch_pretrained_vgg: ''
+
+hole_loss_w: 60.0
+valid_loss_w: 10.0
+perceptual_loss_w: 0.1
+style_loss_w: 250.0
+adversarial_loss_w: 0.1
+intermediate_loss_w: 1.0
+
+# Eval and export options
+test_batch_size: 1
+checkpoint_path: ''
+output_path: ''
+verbose_step: 1000
+file_format: 'MINDIR'
+
+# Model options
+image_in_channels: 3
+edge_in_channels: 2
+out_channels: 3
