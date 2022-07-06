@@ -50,9 +50,12 @@ Up to 15 cars and 30 pedestrians are visible per image. The 3D object detection 
 
 ## [Environment requirements](#contents)
 
-- Hardware（GPU）
+- Hardware（GPU/Ascend）
+
     - Prepare hardware environment with GPU processor.
+    - Prepare hardware environment with Ascend processor.
 - Framework
+
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
@@ -101,6 +104,42 @@ Example:
 bash ./scripts/run_eval_gpu.sh ./configs/car_xyres16.yaml ./experiments/car/poinpitllars-160_37120.ckpt 0
 ```
 
+### [Running on Ascend](#contents)
+
+#### Train
+
+```shell
+# standalone train
+bash ./scripts/run_standalone_train.sh [CFG_PATH] [SAVE_PATH] [DEVICE_ID]
+
+# distribute train
+bash ./scripts/run_distribute_train.sh [CFG_PATH] [SAVE_PATH] [RANK_SIZE] [RANK_TABLE]
+```
+
+Example:
+
+```shell
+# standalone train
+bash ./scripts/run_standalone_train.sh ./configs/car_xyres16.yaml ./experiments/car/ 0
+
+# distribute train (8p)
+bash ./scripts/run_distribute_train.sh ./configs/car_xyres16.yaml ./experiments/car/ 8 /home/hccl_8p_01234567_192.168.88.13.json
+```
+
+#### Evaluate
+
+```shell
+# evaluate
+bash ./scripts/run_eval.sh [CFG_PATH] [CKPT_PATH] [DEVICE_ID]
+```
+
+Example:
+
+```shell
+# evaluate
+bash ./scripts/run_eval.sh ./configs/car_xyres16.yaml ./experiments/car/poinpitllars-160_37120.ckpt 0
+```
+
 ## [Script Description](#contents)
 
 ### [Script and Sample Code](#contents)
@@ -108,14 +147,25 @@ bash ./scripts/run_eval_gpu.sh ./configs/car_xyres16.yaml ./experiments/car/poin
 ```text
 .
 └── pointpillars
+    ├── ascend310_infer
+    │    ├── inc
+    │         └── utils.h
+    │    ├── src
+    │         ├── main.cc
+    │         └── utils.cc
+    │    ├── build.sh
+    │    └── CMakeLists.txt
     ├── configs
-    │    ├── car_xyres16.yaml                       # config for car detection
-    │    └── ped_cycle_xyres16.yaml                 # config for pedestrian and cyclist detection
+    │    ├── car_xyres16.yaml  # config for car detection
+    │    └── ped_cycle_xyres16.yaml  # config for pedestrian and cyclist detection
     ├── scripts
-    │    ├── run_distribute_train_gpu.sh            # launch distributed training(8p) on GPU
-    │    ├── run_eval_gpu.sh                        # launch evaluating on GPU
-    │    ├── run_export_gpu.sh                      # launch export mindspore model to mindir
-    │    └── run_standalone_train_gpu.sh            # launch standalone traininng(1p) on GPU
+    │    ├── run_distribute_train_gpu.sh  # launch distributed training(8p) on GPU
+    │    ├── run_eval_gpu.sh              # launch evaluating on GPU
+    │    ├── run_export_gpu.sh            # launch export mindspore model to mindir
+    │    ├── run_standalone_train_gpu.sh  # launch standalone traininng(1p) on GPU
+    │    ├── run_distribute_train.sh
+    │    ├── run_eval.sh
+    │    └── run_standalone_train.sh
     ├── src
     │    ├── builder
     │    │    ├── __init__.py                       # init file
@@ -125,7 +175,7 @@ bash ./scripts/run_eval_gpu.sh ./configs/car_xyres16.yaml ./experiments/car/poin
     │    │    ├── dbsampler_builder.py              # builder for db sampler
     │    │    ├── model_builder.py                  # builder for model
     │    │    ├── preprocess_builder.py             # builder for preprocess
-    │    │    ├── similarity_calculator_builder.py  # builder for similarity calculator
+    │    │    ├── similarity_calculator_builder.py # builder for similarity calculator
     │    │    ├── target_assigner_builder.py        # builder for target assigner
     │    │    └── voxel_builder.py                  # builder for voxel generator
     │    ├── core
@@ -154,9 +204,10 @@ bash ./scripts/run_eval_gpu.sh ./configs/car_xyres16.yaml ./experiments/car/poin
     │    │    ├── dataset.py                        # kitti dataset
     │    │    ├── kitti_common.py                   # auxiliary file for kitti
     │    │    └── preprocess.py                     # preprocess dataset
-    │    ├── create_data.py                         # create dataset for train model
     │    ├── __init__.py                            # init file
+    │    ├── create_data.py                         # create dataset for train model
     │    ├── pointpillars.py                        # pointpillars model
+    │    ├── utils.py                               # utilities functions
     │    └── predict.py                             # postprocessing pointpillars`s output
     ├── __init__.py                                 # init file
     ├── eval.py                                     # evaluate mindspore model
@@ -300,6 +351,47 @@ Result:
 2022-01-18 08:32:27 epoch:3, iter:750, loss:0.90943766, fps:67.59 imgs/sec
 ```
 
+#### [Run on Ascend](#contents)
+
+##### Standalone training
+
+```shell
+bash ./scripts/run_standalone_train.sh ./configs/car_xyres16.yaml ./output/car/ 0
+```
+
+Logs will be saved to `./experiments/cars/log.txt`
+
+Result:
+
+```text
+2022-08-10 15:26:18 epoch:1, iter:3450,  loss:0.58619386, fps:8.42 imgs/sec,  step time: 0.006396604252272639 ms
+2022-08-10 15:26:30 epoch:1, iter:3500,  loss:0.67319953, fps:8.5 imgs/sec,  step time: 0.006337071544137494 ms
+2022-08-10 15:26:42 epoch:1, iter:3550,  loss:0.5983803, fps:8.21 imgs/sec,  step time: 0.006562378385971333 ms
+2022-08-10 15:26:53 epoch:1, iter:3600,  loss:0.6749635, fps:8.87 imgs/sec,  step time: 0.0060733427004567506 ms
+2022-08-10 15:27:05 epoch:1, iter:3650,  loss:0.56281704, fps:8.43 imgs/sec,  step time: 0.0063904304185817985 ms
+2022-08-10 15:27:17 epoch:1, iter:3700,  loss:0.7617205, fps:8.32 imgs/sec,  step time: 0.006478644907474518 ms
+```
+
+##### Distribute training (8p)
+
+```shell
+bash ./scripts/run_distribute_train.sh /home/group1/pointpillars/
+configs/car_xyres16.yaml ./output/dist/ 8 /home/hccl_8p_01234567_192.168.88.13.json
+```
+
+Logs will be saved to `./experiments/cars/log.txt`
+
+Result:
+
+```text
+2022-08-10 15:48:11 epoch:4, iter:1000,  loss:0.74541646, fps:67.11 imgs/sec,  step time: 0.051382866399041535 ms
+2022-08-10 15:48:24 epoch:4, iter:1050,  loss:0.87863845, fps:61.0 imgs/sec,  step time: 0.05652883032272602 ms
+2022-08-10 15:48:37 epoch:4, iter:1100,  loss:0.52257985, fps:62.88 imgs/sec,  step time: 0.05484302907154478 ms
+2022-08-10 15:48:49 epoch:4, iter:1150,  loss:0.5654994, fps:66.59 imgs/sec,  step time: 0.05178481545941583 ms
+2022-08-10 15:49:01 epoch:5, iter:1200,  loss:0.5621812, fps:64.18 imgs/sec,  step time: 0.05373023707291175 ms
+2022-08-10 15:49:13 epoch:5, iter:1250,  loss:0.5237954, fps:67.22 imgs/sec,  step time: 0.05129807262585081 ms
+```
+
 ### [Evaluation Process](#contents)
 
 #### GPU
@@ -360,6 +452,38 @@ and 3769 validation samples, while for our test submission we created a minival
 set of 784 samples from the validation set and trained on the remaining 6733 samples.
 ```
 
+#### Ascend
+
+```shell
+bash ./scripts/run_eval.sh [CFG_PATH] [CKPT_PATH] [DEVICE_ID]
+```
+
+Example:
+
+```shell
+bash ./scripts/run_eval.sh ./configs/car_xyres16.yaml ./experiments/car/pointpillars-160_37120.ckpt 0
+```
+
+Result:
+
+Here is model for cars detection as an example，you can view the result in log file `./experiments/car/log_eval.txt`：
+
+```text
+        Easy   Mod    Hard
+Car AP@0.70, 0.70, 0.70:
+bbox AP:90.47, 88.53, 87.31
+```
+
+Here is result for pedestrian and cyclist detection：
+
+```text
+        Easy   Mod    Hard
+Cyclist AP@0.50, 0.50, 0.50:
+bbox AP:84.23, 64.64, 61.48
+Pedestrian AP@0.50, 0.50, 0.50:
+bbox AP:65.55, 62.05, 58.94
+```
+
 ### [Export MINDIR](#contents)
 
 If you want to infer the network on Ascend 310, you should convert the model to MINDIR.
@@ -394,23 +518,59 @@ The output should look as following:
 pointpillars.mindir exported successfully!
 ```
 
+#### Ascend
+
+```shell
+python export.py --cfg_path=cfg_path.yaml --ckpt_path=ckpt_path.ckpt --file_name=file_name --file_format=MINDIR
+```
+
+Example:
+
+```shell
+python export.py --cfg_path=./configs/car_xyres16.yaml --ckpt_path=./experiments/car/pointpillars.ckpt --file_name=pointpillars --file_format=MINDIR
+```
+
+The output should look as following:
+
+```text
+pointpillars.mindir exported successfully!
+```
+
+### [310 Infer](#contents)
+
+Before performing inference, the mindir file must be exported by export.py script. We only provide an example of inference using MINDIR model.
+
+- `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n', if you choose y, the kitti dataset will be preprocessd. (Recommend to use 'y' at the first running.)
+
+#### Ascend
+
+```shell
+bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [CONFIG_PATH] [DEVICE_ID]
+```
+
+Example:
+
+```shell
+bash run_infer_310.sh pointpillars.mindir y ../configs/car_xyres16.yaml 0
+```
+
 ## [Model Description](#contents)
 
-### [Training Performance on GPU](#contents)
+### [Training Performance](#contents)(再加两列Ascend的结果)
 
-| Parameter           | PointPillars (1p)                                                                                                                                                                                                                                                                                                                                                                      | PointPillars (8p)                                                                                                                                                                                                                                                                                                                                                                      |
-|---------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Resource            | 1x Nvidia RTX 3090                                                                                                                                                                                                                                                                                                                                                                     | 8x Nvidia RTX 3090                                                                                                                                                                                                                                                                                                                                                                     |
-| Uploaded date       | -                                                                                                                                                                                                                                                                                                                                                                                      | -                                                                                                                                                                                                                                                                                                                                                                                      |
-| Mindspore version   | 1.5.0                                                                                                                                                                                                                                                                                                                                                                                  | 1.5.0                                                                                                                                                                                                                                                                                                                                                                                  |
-| Dataset             | KITTI                                                                                                                                                                                                                                                                                                                                                                                  | KITTI                                                                                                                                                                                                                                                                                                                                                                                  |
-| Training parameters | epoch=160, lr=0.0002, weight_decay=0.0001, batch_size=2                                                                                                                                                                                                                                                                                                                                | epoch=160, lr=0.0016, weight_decay=0.0001, batch_size=2                                                                                                                                                                                                                                                                                                                                |
-| Optimizer           | Adam                                                                                                                                                                                                                                                                                                                                                                                   | Adam                                                                                                                                                                                                                                                                                                                                                                                   |
-| Loss function       | WeightedSmoothL1LocalizationLoss, WeightedSoftmaxClassificationLoss, SigmoidFocalClassificationLoss                                                                                                                                                                                                                                                                                    | WeightedSmoothL1LocalizationLoss, WeightedSoftmaxClassificationLoss, SigmoidFocalClassificationLoss                                                                                                                                                                                                                                                                                    |
-| Speed               | Car: 14 img/s; Pedestrian + Cyclist: 11 img/s                                                                                                                                                                                                                                                                                                                                          | Car: 66 img/s; Pedestrian + Cyclist: 64 img/s                                                                                                                                                                                                                                                                                                                                          |
-| mAP (BEV detection) | <table> <tr> <td></td> <td>Easy</td> <td>Moderate</td> <td>Hard</td> </tr> <tr> <td>Car</td> <td>89.81</td> <td>86.99</td> <td>85.0</td> </tr> <tr> <td>Pedestrian</td> <td>72.16</td> <td>67.5</td> <td>62.51</td> </tr> <tr> <td>Cyclist</td> <td>83.25</td> <td>63.02</td> <td>59.65</td> </tr> <tr> <td>mAP</td> <td>81.74</td> <td>**72.4**</td> <td>69.05</td> </tr> </table>    | <table> <tr> <td></td> <td>Easy</td> <td>Moderate</td> <td>Hard</td> </tr> <tr> <td>Car</td> <td>89.75</td> <td>87.14</td> <td>84.58</td> </tr> <tr> <td>Pedestrian</td> <td>68.21</td> <td>62.83</td> <td>58.06</td> </tr> <tr> <td>Cyclist</td> <td>81.63</td> <td>62.75</td> <td>59.21</td> </tr> <tr> <td>mAP</td> <td>79.86</td> <td>**70.91**</td> <td>67.28</td> </tr> </table> |
-| mAP (3D detection)  | <table> <tr> <td></td> <td>Easy</td> <td>Moderate</td> <td>Hard</td> </tr> <tr> <td>Car</td> <td>86.90</td> <td>76.89</td> <td>72.79</td> </tr> <tr> <td>Pedestrian</td> <td>66.48</td> <td>60.62</td> <td>55.87</td> </tr> <tr> <td>Cyclist</td> <td>80.13</td> <td>60.26</td> <td>56.07</td> </tr> <tr> <td>mAP</td> <td>77.83</td> <td>**65.92**</td> <td>61.58</td> </tr> </table> | <table> <tr> <td></td> <td>Easy</td> <td>Moderate</td> <td>Hard</td> </tr> <tr> <td>Car</td> <td>85.96</td> <td>76.33</td> <td>69.84</td> </tr> <tr> <td>Pedestrian</td> <td>57.60</td> <td>53.37</td> <td>48.35</td> </tr> <tr> <td>Cyclist</td> <td>79.53</td> <td>60.70</td> <td>56.96</td> </tr> <tr> <td>mAP</td> <td>74.36</td> <td>**63.47**</td> <td>58.38</td> </tr> </table> |
-| mAOS                | <table> <tr> <td></td> <td>Easy</td> <td>Moderate</td> <td>Hard</td> </tr> <tr> <td>Car</td> <td>90.43</td> <td>88.47</td> <td>86.78</td> </tr> <tr> <td>Pedestrian</td> <td>46.27</td> <td>44.96</td> <td>43.03</td> </tr> <tr> <td>Cyclist</td> <td>83.79</td> <td>63.86</td> <td>60.78</td> </tr> <tr> <td>mAP</td> <td>73.5</td> <td>**65.76**</td> <td>63.53</td> </tr> </table>  | <table> <tr> <td></td> <td>Easy</td> <td>Moderate</td> <td>Hard</td> </tr> <tr> <td>Car</td> <td>90.46</td> <td>88.27</td> <td>86.52</td> </tr> <tr> <td>Pedestrian</td> <td>40.06</td> <td>39.23</td> <td>37.29</td> </tr> <tr> <td>Cyclist</td> <td>83.17</td> <td>63.21</td> <td>61.08</td> </tr> <tr> <td>mAP</td> <td>71.23</td> <td>**63.57**</td> <td>61.63</td> </tr> </table> |
+| Parameter           | PointPillars (1p)                                            | PointPillars (8p)                                            | PointPillars (1p)                                            | PointPillars (8p)                                            |
+| ------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Resource            | 1x Nvidia RTX 3090                                           | 8x Nvidia RTX 3090                                           | Ascend                                                       | Ascend                                                       |
+| Uploaded date       | -                                                            | -                                                            | -                                                            | -                                                            |
+| Mindspore version   | 1.5.0                                                        | 1.5.0                                                        | 1.8.0                                                        | 1.8.0                                                        |
+| Dataset             | KITTI                                                        | KITTI                                                        | KITTI                                                        | KITTI                                                        |
+| Training parameters | epoch=160, lr=0.0002, weight_decay=0.0001, batch_size=2      | epoch=160, lr=0.0016, weight_decay=0.0001, batch_size=2      | poch=160, lr=0.0002, weight_decay=0.0001, batch_size=2       | epoch=160, lr=0.0016, weight_decay=0.0001, batch_size=2      |
+| Optimizer           | Adam                                                         | Adam                                                         | Adam                                                         |                                                              |
+| Loss function       | WeightedSmoothL1LocalizationLoss, WeightedSoftmaxClassificationLoss, SigmoidFocalClassificationLoss | WeightedSmoothL1LocalizationLoss, WeightedSoftmaxClassificationLoss, SigmoidFocalClassificationLoss | WeightedSmoothL1LocalizationLoss, WeightedSoftmaxClassificationLoss, SigmoidFocalClassificationLoss | WeightedSmoothL1LocalizationLoss, WeightedSoftmaxClassificationLoss, SigmoidFocalClassificationLoss |
+| Speed               | Car: 14 img/s; Pedestrian + Cyclist: 11 img/s                | Car: 66 img/s; Pedestrian + Cyclist: 64 img/s                | Car: 8.4 img/s;                                              | Car: 64 img/s;                                               |
+| mAP (BEV detection) | <table> <tr> <td></td> <td>Easy</td> <td>Moderate</td> <td>Hard</td> </tr> <tr> <td>Car</td> <td>89.81</td> <td>86.99</td> <td>85.0</td> </tr> <tr> <td>Pedestrian</td> <td>72.16</td> <td>67.5</td> <td>62.51</td> </tr> <tr> <td>Cyclist</td> <td>83.25</td> <td>63.02</td> <td>59.65</td> </tr> <tr> <td>mAP</td> <td>81.74</td> <td>**72.4**</td> <td>69.05</td> </tr> </table> | <table> <tr> <td></td> <td>Easy</td> <td>Moderate</td> <td>Hard</td> </tr> <tr> <td>Car</td> <td>89.75</td> <td>87.14</td> <td>84.58</td> </tr> <tr> <td>Pedestrian</td> <td>68.21</td> <td>62.83</td> <td>58.06</td> </tr> <tr> <td>Cyclist</td> <td>81.63</td> <td>62.75</td> <td>59.21</td> </tr> <tr> <td>mAP</td> <td>79.86</td> <td>**70.91**</td> <td>67.28</td> </tr> </table> | -                                                            | -                                                            |
+| mAP (3D detection)  | <table> <tr> <td></td> <td>Easy</td> <td>Moderate</td> <td>Hard</td> </tr> <tr> <td>Car</td> <td>86.90</td> <td>76.89</td> <td>72.79</td> </tr> <tr> <td>Pedestrian</td> <td>66.48</td> <td>60.62</td> <td>55.87</td> </tr> <tr> <td>Cyclist</td> <td>80.13</td> <td>60.26</td> <td>56.07</td> </tr> <tr> <td>mAP</td> <td>77.83</td> <td>**65.92**</td> <td>61.58</td> </tr> </table> | <table> <tr> <td></td> <td>Easy</td> <td>Moderate</td> <td>Hard</td> </tr> <tr> <td>Car</td> <td>85.96</td> <td>76.33</td> <td>69.84</td> </tr> <tr> <td>Pedestrian</td> <td>57.60</td> <td>53.37</td> <td>48.35</td> </tr> <tr> <td>Cyclist</td> <td>79.53</td> <td>60.70</td> <td>56.96</td> </tr> <tr> <td>mAP</td> <td>74.36</td> <td>**63.47**</td> <td>58.38</td> </tr> </table> | -                                                            | -                                                            |
+| mAOS                | <table> <tr> <td></td> <td>Easy</td> <td>Moderate</td> <td>Hard</td> </tr> <tr> <td>Car</td> <td>90.43</td> <td>88.47</td> <td>86.78</td> </tr> <tr> <td>Pedestrian</td> <td>46.27</td> <td>44.96</td> <td>43.03</td> </tr> <tr> <td>Cyclist</td> <td>83.79</td> <td>63.86</td> <td>60.78</td> </tr> <tr> <td>mAP</td> <td>73.5</td> <td>**65.76**</td> <td>63.53</td> </tr> </table> | <table> <tr> <td></td> <td>Easy</td> <td>Moderate</td> <td>Hard</td> </tr> <tr> <td>Car</td> <td>90.46</td> <td>88.27</td> <td>86.52</td> </tr> <tr> <td>Pedestrian</td> <td>40.06</td> <td>39.23</td> <td>37.29</td> </tr> <tr> <td>Cyclist</td> <td>83.17</td> <td>63.21</td> <td>61.08</td> </tr> <tr> <td>mAP</td> <td>71.23</td> <td>**63.57**</td> <td>61.63</td> </tr> </table> | -                                                            | -                                                            |
 
 For cars required a bounding box overlap of 70%, while for pedestrians and cyclists required a bounding box overlap of 50%.
 

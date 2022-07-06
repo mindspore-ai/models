@@ -43,7 +43,7 @@ def prepare_loss_weights(labels,
     negative_cls_weights = negatives.astype(dtype) * neg_cls_weight
     cls_weights = negative_cls_weights + pos_cls_weight * positives.astype(dtype)
     reg_weights = positives.astype(dtype)
-    pos_normalizer = positives.sum(1, keepdims=True).astype(dtype)
+    pos_normalizer = positives.astype(mstype.float16).sum(1, keepdims=True).astype(dtype)
     reg_weights /= ops.clip_by_value(
         pos_normalizer,
         clip_value_min=_create_on_value(),
@@ -182,7 +182,7 @@ class PFNLayer(nn.Cell):
         else:
             self.norm = ops.Identity()
         self.linear = nn.Dense(in_channels, self.units, has_bias=not use_norm)
-
+        self.linear.to_float(mstype.float16)
         self.transpose = ops.Transpose()
         self.tile = ops.Tile()
         self.concat = ops.Concat(axis=2)
@@ -194,7 +194,7 @@ class PFNLayer(nn.Cell):
         x = self.linear(inputs)
         x = self.norm(x.transpose((0, 3, 1, 2)))  # [bs, V, P, 4]
         x = ops.ReLU()(x)
-        x_max = self.argmax_w_value(x)[1].transpose((0, 2, 3, 1))  # [bs, V, P, 4]
+        x_max = self.argmax_w_value(x)[1].transpose((0, 2, 3, 1))
         if self.last_vfe:
             return x_max
         x_repeat = self.tile(x_max, (1, 1, inputs.shape[1], 1))  # [bs, V, P, 4]
@@ -246,17 +246,20 @@ class PillarFeatureNet(nn.Cell):
 
     def construct(self, features, num_points, coors):
         """forward graph"""
+        features = features.astype(mstype.float32)
         bs, v, _, _ = features.shape
         points_mean = (features[:, :, :, :3].sum(axis=2, keepdims=True) /
                        ops.Maximum()(num_points, 1).view(bs, v, 1, 1))
         f_cluster = features[:, :, :, :3] - points_mean
 
-        # Find distance of x, y, and z from pillar center
-        f_center = ops.ZerosLike()(features[:, :, :, :2])
-        f_center[:, :, :, 0] = features[:, :, :, 0] - (
+        f_center0 = features[:, :, :, 0] - (
             self.expand_dims(coors[:, :, 2].astype(mstype.float32), 2) * self.vx + self.x_offset)
-        f_center[:, :, :, 1] = features[:, :, :, 1] - (
+        f_center1 = features[:, :, :, 1] - (
             self.expand_dims(coors[:, :, 1].astype(mstype.float32), 2) * self.vy + self.y_offset)
+
+        f_center0 = ops.ExpandDims()(f_center0, 3)
+        f_center1 = ops.ExpandDims()(f_center1, 3)
+        f_center = ops.Concat(axis=-1)((f_center0, f_center1)).astype(features.dtype)
 
         # Combine feature decorations
         features_ls = [features, f_cluster, f_center]
@@ -293,11 +296,12 @@ class PointPillarsScatter(nn.Cell):
         """forward graph"""
         # Batch_canvas will be the final output.
         batch_size = voxel_features.shape[0]
+        coords = coords.astype(mstype.float32)
         # z coordinate is not used, z -> batch
         for i in range(batch_size):  # [bs, v, p, 64]
             coords[i, :, 0] = i
         shape = (batch_size, self.ny, self.nx, 2, self.n_channels)
-        batch_canvas = self.scatter_nd(coords, voxel_features, shape)  # [bs, v, p, 2, 64]
+        batch_canvas = self.scatter_nd(coords.astype(mstype.int32), voxel_features, shape)  # [bs, v, p, 2, 64]
         batch_canvas = batch_canvas[:, :, :, 1]
         batch_canvas = self.transpose(batch_canvas, (0, 3, 1, 2))
         return batch_canvas
@@ -469,7 +473,7 @@ class RPN(nn.Cell):
 
     def construct(self, x, bev=None):
         """forward graph"""
-        x = self.block1(x)
+        x = self.block1(x.astype(mstype.float32))
         up1 = self.deconv1(x)
         if self.use_bev:
             bev[:, -1] = ops.Log()(1 + bev[:, -1]) / _log16()

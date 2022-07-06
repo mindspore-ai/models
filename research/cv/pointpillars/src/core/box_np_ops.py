@@ -362,7 +362,7 @@ def center_to_corner_box2d(centers, dims, angles=None, origin=0.5):
     return corners
 
 
-@numba.jit(nopython=True)
+#@numba.jit(nopython=True)
 def box2d_to_corner_jit(boxes):
     """box 2d to corner"""
     num_box = boxes.shape[0]
@@ -613,7 +613,7 @@ def remove_outside_points(points, rect, trv2c, p2, image_shape):
     return points
 
 
-@numba.jit(nopython=True)
+#@numba.jit(nopython=True)
 def iou_jit(boxes, query_boxes, eps=0.0):
     """calculate box iou. note that jit version runs 2x faster than cython in
     my machine!
@@ -682,7 +682,7 @@ def corner_to_surfaces_3d(corners):
     return surfaces
 
 
-@numba.jit(nopython=True)
+#@numba.jit(nopython=True)
 def corner_to_surfaces_3d_jit(corners):
     """convert 3d box corners from corner function above
     to surfaces that normal vectors all direct to internal.
@@ -705,7 +705,7 @@ def corner_to_surfaces_3d_jit(corners):
     return surfaces
 
 
-@numba.jit(nopython=True)
+##@numba.jit(nopython=True)
 def sparse_sum_for_anchors_mask(coors, shape):
     """sparse sum for anchors mask"""
     ret = np.zeros(shape, dtype=np.float32)
@@ -714,7 +714,7 @@ def sparse_sum_for_anchors_mask(coors, shape):
     return ret
 
 
-@numba.jit(nopython=True)
+#@numba.jit(nopython=True)
 def fused_get_anchors_area(dense_map, anchors_bv, stride,
                            offset, grid_size):
     """fused get anchors area"""
@@ -740,7 +740,7 @@ def fused_get_anchors_area(dense_map, anchors_bv, stride,
     return ret
 
 
-@numba.jit(nopython=True)
+#@numba.jit(nopython=True)
 def distance_similarity(points,
                         qpoints,
                         dist_norm,

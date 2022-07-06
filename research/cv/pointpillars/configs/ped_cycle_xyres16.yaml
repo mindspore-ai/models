@@ -49,7 +49,7 @@ train_input_reader:
 
 eval_input_reader:
   class_names: ["Cyclist", "Pedestrian"]
-  batch_size: 2
+  batch_size: 1
   max_number_of_voxels: 12000
   shuffle_points: false
   num_workers: 1

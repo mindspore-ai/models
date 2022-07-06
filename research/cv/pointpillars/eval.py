@@ -19,7 +19,7 @@ import os
 import warnings
 from time import time
 
-from mindspore import context
+from mindspore import context, Tensor
 from mindspore import dataset as de
 from mindspore import load_checkpoint
 from mindspore import load_param_into_net
@@ -70,7 +70,7 @@ def run_evaluate(args):
     )
     batch_size = eval_input_cfg['batch_size']
     ds = ds.batch(batch_size, drop_remainder=False)
-    data_loader = ds.create_dict_iterator(num_epochs=1)
+    data_loader = ds.create_dict_iterator(num_epochs=1, output_numpy=True)
 
     class_names = list(eval_input_cfg['class_names'])
 
@@ -86,17 +86,17 @@ def run_evaluate(args):
         coors = data["coordinates"]
         bev_map = data.get('bev_map', False)
 
-        preds = pointpillarsnet(voxels, num_points, coors, bev_map)
+        preds = pointpillarsnet(Tensor(voxels), Tensor(num_points), Tensor(coors), Tensor(bev_map))
         if len(preds) == 2:
             preds = {
-                'box_preds': preds[0],
-                'cls_preds': preds[1],
+                'box_preds': preds[0].asnumpy(),
+                'cls_preds': preds[1].asnumpy(),
             }
         else:
             preds = {
-                'box_preds': preds[0],
-                'cls_preds': preds[1],
-                'dir_cls_preds': preds[2]
+                'box_preds': preds[0].asnumpy(),
+                'cls_preds': preds[1].asnumpy(),
+                'dir_cls_preds': preds[2].asnumpy()
             }
         preds = predict(data, preds, model_cfg, box_coder)
 
@@ -123,7 +123,17 @@ if __name__ == '__main__':
     parser.add_argument('--cfg_path', required=True, help='Path to config file.')
     parser.add_argument('--ckpt_path', required=True, help='Path to checkpoint.')
     parser.add_argument('--device_target', default='GPU', help='device target')
+    parser.add_argument('--is_modelarts', default='0', help='')
+    parser.add_argument('--data_url', default='', help='')
+    parser.add_argument('--train_url', default='', help='')
 
     parse_args = parser.parse_args()
-
+    if parse_args.is_modelarts == '1':
+        import moxing as mox
+        data_dir = '/home/work/user-job-dir/data'
+        if not os.path.exists(data_dir):
+            os.mkdir(data_dir)
+        obs_data_url = parse_args.data_url
+        mox.file.copy_parallel(obs_data_url, data_dir)
+        print("Successfully Download {} to {}".format(obs_data_url, data_dir))
     run_evaluate(parse_args)

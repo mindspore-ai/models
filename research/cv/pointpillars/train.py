@@ -12,18 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""Train script"""
+
 import argparse
 import datetime
 import os
 import warnings
 from pathlib import Path
-from time import time
+import time
 
 from mindspore import context
 from mindspore import dataset as de
 from mindspore import nn
 from mindspore import set_seed
+from mindspore import dtype as mstype
 from mindspore.communication.management import get_group_size
 from mindspore.communication.management import get_rank
 from mindspore.communication.management import init
@@ -77,7 +78,7 @@ def set_default(args):
     return cfg, rank, device_num
 
 
-def run_train(args):
+def train(args, save_dir):
     """run train"""
     cfg, rank, device_num = set_default(args)
     save_ckpt_log_flag = rank == 0
@@ -109,6 +110,7 @@ def run_train(args):
     )
 
     pointpillarsnet_wloss = PointPillarsWithLossCell(pointpillarsnet, cfg['model'])
+    pointpillarsnet_wloss.to_float(mstype.float16)
     network = TrainingWrapper(pointpillarsnet_wloss, optimizer)
 
     train_column_names = dataset.data_keys
@@ -133,7 +135,7 @@ def run_train(args):
         )
         ckpt_cb = ModelCheckpoint(
             config=ckpt_config,
-            directory=args.save_path,
+            directory=save_dir,
             prefix='pointpillars'
         )
         cb_params = _InternalCallbackParam()
@@ -145,7 +147,7 @@ def run_train(args):
 
     log_freq = train_cfg['log_frequency_step']
     old_progress = -1
-    start = time()
+    start = time.time()
     for i, data in enumerate(data_loader):
         voxels = data["voxels"]
         num_points = data["num_points"]
@@ -162,14 +164,15 @@ def run_train(args):
             ckpt_cb.step_end(run_context)
 
             if i % log_freq == 0:
-                time_used = time() - start
+                time_used = time.time() - start
                 epoch = i // steps_per_epoch
                 fps = (i - old_progress) * batch_size * device_num / time_used
                 date_time = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                print(f'{date_time} epoch:{epoch}, iter:{i}, '
-                      f'loss:{loss}, fps:{round(fps, 2)} imgs/sec',
+                print(f'{date_time} epoch:{epoch}, iter:{i}, ',
+                      f'loss:{loss}, fps:{round(fps, 2)} imgs/sec, ',
+                      f'step time: {time_used/steps_per_epoch} ms',
                       flush=True)
-                start = time()
+                start = time.time()
                 old_progress = i
 
             if (i + 1) % steps_per_epoch == 0:
@@ -178,9 +181,29 @@ def run_train(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--cfg_path', required=True, help='Path to config file.')
-    parser.add_argument('--save_path', required=True, help='Path to save checkpoints.')
-    parser.add_argument('--device_target', default='GPU', help='device target')
+    parser.add_argument('--cfg_path', default='./default_config.yaml', help='Path to config file.')
+    parser.add_argument('--save_path', default='./train_output/', help='Path to save checkpoints.')
+    parser.add_argument('--device_target', default='Ascend', help='device target')
     parser.add_argument('--is_distributed', default=0, help='distributed train')
+    parser.add_argument('--is_modelarts', default='0', help='')
+    parser.add_argument('--data_url', default='', help='')
+    parser.add_argument('--train_url', default='', help='')
     parse_args = parser.parse_args()
-    run_train(parse_args)
+    train_dir = parse_args.save_path
+    if parse_args.is_modelarts == '1':
+        import moxing as mox
+        data_dir = '/home/work/user-job-dir/data'
+        train_dir = '/home/work/user-job-dir/model'
+        if not os.path.exists(data_dir):
+            os.mkdir(data_dir)
+        obs_train_url = parse_args.train_url
+        if not os.path.exists(train_dir):
+            os.mkdir(train_dir)
+        obs_data_url = parse_args.data_url
+        mox.file.copy_parallel(obs_data_url, data_dir)
+        print("Successfully Download {} to {}".format(obs_data_url, data_dir))
+    train(parse_args, train_dir)
+    if parse_args.is_modelarts == '1':
+        import moxing as mox
+        mox.file.copy_parallel(train_dir, obs_train_url)
+        print("Successfully Upload {} to {}".format(train_dir, obs_train_url))
