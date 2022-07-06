@@ -1,0 +1,136 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+data_path: "/cache/data"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+
+# ==============================================================================
+# options
+
+# Context options
+device_target: "GPU"
+is_train_distributed: False
+group_size: 1
+device_id: 0
+seed: 1
+
+# Model options
+num_segments: 8
+subsample_num: 3
+
+# Dataset options
+image_size: 224
+img_feature_dim: 256
+dataset_root: "/path/to/dataset/root"
+images_dir_name: "20bn-jester-v1"
+categories_list_file_name: "categories.txt"
+train_list_file_name: "train_videofolder.txt"
+eval_list_file_name: "val_videofolder.txt"
+
+
+# Logging options
+train_output_dir: "train-logs/"
+eval_output_dir: "eval-logs/"
+export_output_dir: "export-logs/"
+ckpt_save_interval: 5
+ckpt_save_on_master_only: True
+keep_checkpoint_max: 10
+log_interval: 100
+
+
+# Training options
+pre_trained_backbone: "/path/to/trained/backbone"
+lr: 0.001
+clip_grad_norm: 20.0
+update_lr_epochs: 50
+epochs_num: 120
+train_batch_size: 24
+train_workers: 8
+momentum: 0.9
+dropout: 0.2
+weight_decay: 0.0005  # 5e-4
+
+
+# Evaluation and export options
+ckpt_file: "/path/to/trained/checkpoint"
+model_name: "trn"
+file_format: "MINDIR"
+export_batch_size: 1
+
+---
+
+# Help description for each configuration
+
+# Context options
+device_target: "Device type which will be used for graph computations"
+is_train_distributed: "Whether the training process is distributed among several devices"
+group_size: "Number of the devices available for the distributed training"
+device_id: "Default device ID"
+seed: "Random seed"
+
+# Model options
+num_segments: "Number of input frames"
+subsample_num: "Number of sub-samples for each TRN head"
+
+# Dataset options
+dataset_root: "Path to the dataset root, containing the lists describing"
+images_dir_name: "Name of the directory, containing the folders with video frames"
+categories_list_file_name: "Name of the file containing the list of categories"
+train_list_file_name: "Name of the file containing the markup for training"
+eval_list_file_name: "Name of the file containing the markup for validation"
+image_size: "Size for resize input image"
+img_feature_dim: "Backbone out channels"
+
+# Logging options
+train_output_dir: "Output directory, where the data from the train process will be stored"
+eval_output_dir: "Output directory, where the data from the validation process will be stored"
+export_output_dir: "Output directory, where the data from the export process will be stored"
+ckpt_save_interval: "Specifies the number epoch which must pass before saving a single checkpoint"
+ckpt_save_on_master_only: "Whether to save the checkpoints only for the process with Rank=0"
+keep_checkpoint_max: "Number of checkpoints to keep"
+log_interval: "Logging interval, steps"
+
+# Training options
+pre_trained_backbone: "Path to the pre-trained backbone (BNInception) model"
+lr: "Learning rate"
+clip_grad_norm: "Maximum gradients norm"
+update_lr_epochs: "Number of epochs before learning rate update"
+epochs_num: "Number of the epochs"
+train_batch_size: "The batch size to be used for training"
+train_workers: "Number of workers for the dataset processing"
+momentum: "Momentum"
+weight_decay: "Weight decay"
+dropout: "Dropout probability"
+
+# Evaluation and export options
+ckpt_file: "Path to the checkpoint containing the weights of the trained model."
+file_name: "Name for export file"
+file_format: "Format of the exported model"
+export_batch_size: "Batch size used for the exported model"
+
+---
+
+# Choices
+
+# Context options
+device_target:
+  - "GPU"
+  - "CPU"
+
+is_train_distributed:
+  - True
+  - False
+
+# Logging options
+ckpt_save_on_master_only:
+  - True
+  - False
+
+# Evaluation and export options
+file_format:
+  - "MINDIR"
