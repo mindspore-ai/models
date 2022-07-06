@@ -26,6 +26,7 @@
             - [Ascend处理器环境运行](#ascend处理器环境运行-1)
             - [GPU处理器环境运行](#gpu处理器环境运行-1)
     - [推理结果](#推理结果)
+    - [onnx模型导出与推理](#onnx模型导出与推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [训练性能](#训练性能)
@@ -393,6 +394,29 @@ bash run_eval.sh ~/Imagenet/val/  ~/glore_resnet200-150_2502.ckpt ../config/conf
 ```text
 result:{'top_1 acc':0.802303685897436}
 ```
+
+## onnx模型导出与推理
+
+- 导出 ONNX:  
+
+  ```shell
+  python export.py --config_path /path/to/glore.yaml --ckpt_url /path/to/glore_res50.ckpt --file_name /path/to/glore_res50 --batch_size 1 --file_format ONNX --device_target CPU
+  ```
+
+- 运行推理-python方式:
+
+  ```shell
+  python eval_onnx.py --config_path /path/to/glore.yaml --data_path /path/to/image_val/ --onnx_path /path/to/.onnx --batch_size 1 --device_target GPU > output.eval.log 2>&1
+  ```
+
+- 运行推理-bash方式:
+
+  ```shell
+  # 需要修改对应yaml配置文件的配置项
+  bash scripts/run_eval_onnx.sh /path/to/glore.yaml
+  ```
+
+- 推理结果将存放在 output.eval.log 中.
 
 # 模型描述
 
