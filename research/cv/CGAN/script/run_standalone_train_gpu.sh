@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021-2022 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,10 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
-if [ $# != 4 ]
+if [ $# != 3 ]
 then
-    echo "Usage: bash run_eval_ascend.sh [G_CKPT] [DATA_PATH] [OUTPUT_PATH] [DEVICE_ID]"
+    echo "Usage: bash run_standalone_train_gpu.sh [DATA_PATH] [OUTPUT_PATH] [DEVICE_ID]"
 exit 1
 fi
 
@@ -28,15 +27,21 @@ get_real_path(){
   fi
 }
 
-CKPT_PATH=$(get_real_path $1)
-DATA_PATH=$(get_real_path $2)
-OUTPUT_PATH=$(get_real_path $3)
-
-export CKPT=$CKPT_PATH
+DATA_PATH=$(get_real_path $1)
+OUTPUT_PATH=$(get_real_path $2)
 export DATASET=$DATA_PATH
 export OUTPUT_PATH=$OUTPUT_PATH
-export DEVICE_ID=$4
+export DEVICE_ID=$3
 
-echo "start eval on DEVICE $DEVICE_ID"
+
+rm -rf ./train
+mkdir ./train
+cp ../*.py ./train
+cp -r ../src ./train/src
+cd ./train || exit
+
+echo "start training on DEVICE $DEVICE_ID"
 echo "the results will saved in $OUTPUT_PATH"
-python -u ../eval.py --G_ckpt_path=$CKPT --data_path=$DATASET --device_id=$DEVICE_ID --output_path=$OUTPUT_PATH  --device_target=Ascend> eval_log 2>&1 &
+python -u ./train.py --data_path=$DATASET --device_id=$DEVICE_ID --device_target=GPU --output_path=$OUTPUT_PATH > log 2>&1 &
+
+

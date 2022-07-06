@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,7 +27,7 @@ args = parser.parse_args()
 if __name__ == "__main__":
 
     f_name = os.path.join(args.input_path, "cgan_bs" + str(200) + "_0.bin")
-    fake = np.fromfile(f_name, dtype=np.float32).reshape((-1, 784))
+    fake = np.fromfile(f_name, dtype=np.float32).reshape((-1, 1024))
 
     fig, ax = plt.subplots(10, 20, figsize=(10, 5))
     for digit, num in itertools.product(range(10), range(20)):
@@ -39,7 +39,7 @@ if __name__ == "__main__":
             print("process ========= {}/200".format(i+1))
         digit = i // 20
         num = i % 20
-        img = fake[i].reshape((28, 28))
+        img = fake[i].reshape((32, 32))
         ax[digit, num].cla()
         ax[digit, num].imshow(img * 127.5 + 127.5, cmap="gray")
 

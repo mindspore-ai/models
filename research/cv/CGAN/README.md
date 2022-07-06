@@ -23,6 +23,7 @@
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
+- [Evaluation Index](#Evaluation Index)
 - [Description of Random Situation](#description-of-random-situation)
 - [Model_Zoo Homepage](#model_zoo-homepage)
 
@@ -79,15 +80,21 @@ Train CGAN Dataset used: [MNIST](<http://yann.lecun.com/exdb/mnist/>)
   ├─README.md               # README
   ├─requirements.txt        # required modules
   ├─scripts                 # shell script
-    ├─run_standalone_train.sh            # training in standalone mode(1pcs)
-    ├─run_distributed_train_ascend.sh    # training in parallel mode(8 pcs)
-    └─run_eval_ascend.sh    # evaluation
+    ├─run_standalone_train_ascend.sh         # training in standalone mode(1pcs)
+    ├─run_standalone_train_gpu.sh            # training in standalone mode(1pcs)
+    ├─run_distributed_train_ascend.sh        # training in parallel mode(8 pcs)
+    ├─run_distributed_train_gpu.sh           # training in parallel mode(8 pcs)
+    ├─run_eval_ascend.sh    # evaluation
+    ├─run_eval_gpu.sh       # evaluation
     └─run_infer_310.sh      # 310inference
   ├─ src
     ├─dataset.py            # dataset create
     ├─cell.py               # network definition
     ├─ckpt_util.py          # utility of checkpoint
     ├─model.py              # discriminator & generator structure
+    ├─parzen_numpy.py       # parzen estimation
+    ├─tools.py              # useful tools
+    └─reporter.py           # reporter the training process
   ├─ train.py               # train cgan
   ├─ eval.py                # eval cgan
   ├─ export.py              # export mindir
@@ -102,14 +109,17 @@ Train CGAN Dataset used: [MNIST](<http://yann.lecun.com/exdb/mnist/>)
 ### [Training Script Parameters](#contents)
 
 ```shell
-# distributed training
-bash run_distributed_train_ascend.sh /path/to/MNIST_Data/train /path/to/hccl_8p_01234567_127.0.0.1.json 8
+# distributed training on ascend or gpu
+bash run_distributed_train_ascend.sh [DATA_PATH] [OUTPUT_PATH] [RANK_TABLE_FILE] [DEVICE_NUM]
+# bash run_distributed_train_gpu.sh [DATA_PATH] [OUTPUT_PATH] [CUDA_VISIBLE_DEVICES] [DEVICE_NUM]
 
-# standalone training
-bash run_standalone_train.sh /path/MNIST_Data/train 0
+# standalone training on ascend or gpu
+bash run_standalone_train_ascend.sh [DATA_PATH] [OUTPUT_PATH] [DEVICE_ID]
+# bash run_standalone_train_gpu.sh [DATA_PATH] [OUTPUT_PATH] [DEVICE_ID]
 
-# evaluating
-bash run_eval_ascend.sh /path/to/script/train_parallel/0/ckpt/G_50.ckpt 0
+# evaluating on ascend or gpu
+bash run_eval_ascend.sh [G_CKPT] [DATA_PATH] [OUTPUT_PATH] [DEVICE_ID]
+# bash run_eval_gpu.sh [G_CKPT] [DATA_PATH] [OUTPUT_PATH] [DEVICE_ID]
 ```
 
 ## [Training Process](#contents)
@@ -119,8 +129,9 @@ bash run_eval_ascend.sh /path/to/script/train_parallel/0/ckpt/G_50.ckpt 0
 - Run `run_standalone_train_ascend.sh` for non-distributed training of CGAN model.
 
 ```bash
-# standalone training
-bash run_standalone_train_ascend.sh /path/MNIST_Data/train 0
+# standalone training on ascend or gpu
+bash run_standalone_train_ascend.sh /path/MNIST_Data/train /path/to/result  0
+# bash run_standalone_train_gpu.sh /path/to/MNIST_Data/train /path/to/result  0
 ```
 
 ### [Distributed Training](#content)
@@ -128,7 +139,8 @@ bash run_standalone_train_ascend.sh /path/MNIST_Data/train 0
 - Run `run_distributed_train_ascend.sh` for distributed training of CGAN model.
 
 ```bash
-bash run_distributed_train_ascend.sh /path/to/MNIST_Data/train /path/to/hccl_8p_01234567_127.0.0.1.json 8
+bash run_distributed_train_ascend.sh /path/to/MNIST_Data/train /path/to/result /path/to/hccl_8p_01234567_127.0.0.1.json 8
+# bash run_distributed_train_gpu.sh /path/to/MNIST_Data/train /path/to/result 0,1,2,3,4,5,6,7 8
 ```
 
 - Notes
@@ -136,7 +148,7 @@ bash run_distributed_train_ascend.sh /path/to/MNIST_Data/train /path/to/hccl_8p_
 
 ### [Training Result](#content)
 
-Training result will be stored in `img_eval`.
+Training result will be stored in ` /path/to/result `.
 
 ## [Evaluation Process](#contents)
 
@@ -146,17 +158,18 @@ Training result will be stored in `img_eval`.
 
 ```bash
 # eval
-bash run_eval_ascend.sh /path/to/script/train_parallel/0/ckpt/G_50.ckpt 0
+bash run_eval_ascend.sh /path/to/ckpt /path/to/MNIST_Data/train /path/to/result 0
+# bash run_eval_gpu.sh /path/to/ckpt /path/to/MNIST_Data/train /path/to/result 0
 ```
 
 ### [Evaluation Result](#content)
 
-Evaluation result will be stored in the img_eval path. Under this, you can find generator result in result.png.
+Evaluation result will be stored in the /path/to/result/eval/random_results. Under this, you can find generator result.
 
 ## Model Export
 
 ```bash
-python  export.py --ckpt_dir /path/to/train/ckpt/G_50.ckpt
+python  export.py --ckpt_dir [G_CKPT] --device_target [DEVICE_TARGET]
 ```
 
 ## [Ascend310 Inference Process](#contents)
@@ -164,7 +177,7 @@ python  export.py --ckpt_dir /path/to/train/ckpt/G_50.ckpt
 ### [Export MINDIR file](#content)
 
 ```bash
-python  export.py --ckpt_dir /path/to/train/ckpt/G_50.ckpt
+python  export.py --ckpt_dir /path/to/train/ckpt/G_50.ckpt --device_target Ascend
 ```
 
 ### [Ascend310 Inference](#content)
@@ -178,27 +191,41 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 
 Ascend310 inference result will be stored in the postprocess_Result path. Under this, you can find generator result in result.png.
 
+### [Generated example](#contents)
+
+![generated_example](imgs/generated_ example.jpg)
+
 # Model Description
 
 ## Performance
 
 ### Evaluation Performance
 
-| Parameters                 | Ascend                                                                                      |
-| -------------------------- | ------------------------------------------------------------------------------------------- |
-| Model Version              | V1                                                                                          |
-| Resource                   | CentOs 8.2; Ascend 910; CPU 2.60GHz, 192cores; Memory 755G                                             |
-| uploaded Date              | 07/04/2021 (month/day/year)                                                                 |
-| MindSpore Version          | 1.2.0                                                                                       |
-| Dataset                    | MNIST Dataset                                                                               |
-| Training Parameters        | epoch=50,  batch_size = 128                                                                 |
-| Optimizer                  | Adam                                                                                        |
-| Loss Function              | BCELoss                                                                                     |
-| Output                     | predict class                                                                               |
-| Loss                       | g_loss: 4.9693 d_loss: 0.1540                                                               |
-| Total time                 | 7.5 mins(8p)                                                                                     |
-| Checkpoint for Fine tuning | 26.2M(.ckpt file)                                                                           |
-| Scripts                    | [cgan script](https://gitee.com/mindspore/models/tree/master/research/cv/CGAN) |
+| Parameters                 | Ascend                                                       | GPU                                                          |
+| -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Model Version              | V1                                                           | V1                                                           |
+| Resource                   | CentOs 8.2; Ascend 910; CPU 2.60GHz, 192cores; Memory 755G   | Ubuntu1 18.04.1; GPU RTX 3090; CPU 2.90GHz, 64cores; Memory, 256G |
+| uploaded Date              | 07/04/2021 (month/day/year)                                  | 06/01/2022 (month/day/year)                                  |
+| MindSpore Version          | 1.2.0                                                        | 1.6.1                                                        |
+| Dataset                    | MNIST Dataset                                                | MNIST Dataset                                                |
+| Training Parameters        | epoch=50,  batch_size = 128                                  | epoch=50,  batch_size = 128                                  |
+| Optimizer                  | Adam                                                         | Adam                                                         |
+| Loss Function              | BCELoss                                                      | BCELoss                                                      |
+| Output                     | predict class                                                | predict class                                                |
+| Loss                       | g_loss: 4.9693 d_loss: 0.1540                                | g_loss: 0.98 d_loss: 0.59                                    |
+| Total time                 | 7.5 mins(8p)                                                 | 36 mins(1p);11.2mins(8p)                                     |
+| Checkpoint for Fine tuning | 26.2M(.ckpt file)                                            | 5.7M (G_Net); 2.6M (D_Net)                                   |
+| Scripts                    | [cgan script](https://gitee.com/mindspore/models/tree/master/research/cv/CGAN) | [cgan script](https://gitee.com/mindspore/models/tree/master/research/cv/CGAN) |
+
+### [Evaluation Index](#contents)
+
+|                       Model                        | Gaussian Parzen window log-likelihood estimate for the MNIST dataset |
+| :------------------------------------------------: | :----------------------------------------------------------: |
+|            Adversarial nets (original )            |                           225 ± 2                            |
+|     Conditional adversarial nets  (original )      |                          132 ± 1.8                           |
+| Conditional adversarial nets  (MindSpore Version ) |                        283.03 ± 2.15                         |
+
+Note: , The higher the value, the better. For more information about Gaussian Parzen window log-likelihood, please refer to the [blog](https://blog.csdn.net/Nianzu_Ethan_Zheng/article/details/79211861).
 
 # [Description of Random Situation](#contents)
 

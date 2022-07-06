@@ -13,126 +13,213 @@
 # limitations under the License.
 # ============================================================================
 """cell define"""
-from mindspore import nn
-import mindspore.ops.operations as P
-import mindspore.ops.functional as F
-import mindspore.ops.composite as C
-from mindspore.parallel._utils import _get_device_num, _get_parallel_mode, _get_gradients_mean
+import mindspore.nn as nn
+import mindspore.ops as ops
+from mindspore import context
 from mindspore.context import ParallelMode
+from mindspore.parallel._auto_parallel_context import auto_parallel_context
+from mindspore.communication.management import get_group_size
 from mindspore.ops import OnesLike, ZerosLike
-from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
 
 
 class GenWithLossCell(nn.Cell):
-    """GenWithLossCell"""
-    def __init__(self, netG, netD, auto_prefix=True):
-        super(GenWithLossCell, self).__init__(auto_prefix=auto_prefix)
-        self.netG = netG
-        self.netD = netD
-        self.loss_fn = nn.BCELoss(reduction="mean")
+    """
+    CGAN generator loss.
+    Args:
+        generator (Cell): Generator of GAN.
+        discriminator (Cell): Discriminator of GAN.
+    Outputs:
+        the losses of generator.
+    """
+    def __init__(self, generator, discriminator):
+        super(GenWithLossCell, self).__init__()
 
+        self.dis_loss = nn.BCELoss(reduction="mean")
+        self.generator = generator
+        self.discriminator = discriminator
 
-    def construct(self, latent_code, label):
-        """cgan construct"""
-        fake_data = self.netG(latent_code, label)
+    def construct(self, noise, labels):
+        """
+        construct
 
-        # loss
-        fake_out = self.netD(fake_data, label)
+        Args:
+          noise(Tensor): noise
+          labels(Tensor): labels
+
+        Returns:
+          img_loss:  img and loss
+        """
+        fake_img = self.generator(noise, labels)
+        fake_out = self.discriminator(fake_img, labels)
         ones = OnesLike()(fake_out)
-        loss_G = self.loss_fn(fake_out, ones)
+        loss_G = self.dis_loss(fake_out, ones)
+        img_loss = (fake_img, loss_G)
 
-        return loss_G
-
+        return img_loss
 
 class DisWithLossCell(nn.Cell):
-    """DisWithLossCell"""
-    def __init__(self, netG, netD, auto_prefix=True):
-        super(DisWithLossCell, self).__init__(auto_prefix=auto_prefix)
-        self.netG = netG
-        self.netD = netD
-        self.loss_fn = nn.BCELoss(reduction="mean")
+    """
+    CGAN generator loss.
+    Args:
+        args (class): Option class.
+        generator (Cell): Generator of GAN.
+        discriminator (Cell): Discriminator of GAN.
+    Outputs:
+        the losses of discriminator.
+    """
+    def __init__(self, generator, discriminator):
+        super(DisWithLossCell, self).__init__()
 
-    def construct(self, real_data, latent_code, label):
-        """construct"""
-        # fake_data
-        fake_data = self.netG(latent_code, label)
-        # fake_loss
-        fake_out = self.netD(fake_data, label)
+        self.dis_loss = nn.BCELoss(reduction="mean")
+        self.generator = generator
+        self.discriminator = discriminator
+
+    def construct(self, real_img, noise, label):
+        """
+        construct
+
+        Args:
+            real_img(Tensor): real img
+            noise(Tensor): noise
+            label(Tensor): labels
+
+        Returns:
+            loss_D: loss
+        """
+        fake_img = self.generator(noise, label)
+        fake_out = self.discriminator(fake_img, label)
+        real_out = self.discriminator(real_img, label)
         zeros = ZerosLike()(fake_out)
-        fake_loss = self.loss_fn(fake_out, zeros)
-        # real loss
-        real_out = self.netD(real_data, label)
         ones = OnesLike()(real_out)
-        real_loss = self.loss_fn(real_out, ones)
-
-        # d loss
-        loss_D = real_loss + fake_loss
-
+        loss_D_f = self.dis_loss(fake_out, zeros)
+        loss_D_r = self.dis_loss(real_out, ones)
+        loss_D = (loss_D_f + loss_D_r) * 0.5
         return loss_D
 
+class WithLossCell(nn.Cell):
+    """
+    Wrap the network with loss function to return generator loss.
+    Args:
+        network (Cell): The target network to wrap.
+    """
 
-class TrainOneStepCell(nn.Cell):
-    """define TrainOneStepCell"""
-    def __init__(self,
-                 netG,
-                 netD,
-                 optimizerG: nn.Optimizer,
-                 optimizerD: nn.Optimizer,
-                 sens=1.0,
-                 auto_prefix=True):
+    def __init__(self, network):
+        super(WithLossCell, self).__init__(auto_prefix=False)
+        self.network = network
 
-        super(TrainOneStepCell, self).__init__(auto_prefix=auto_prefix)
-        self.netG = netG
-        self.netG.set_grad()
-        self.netG.add_flags(defer_inline=True)
+    def construct(self, noise, label):
+        _, lg = self.network(noise, label)
+        return lg
 
-        self.netD = netD
-        self.netD.set_grad()
-        self.netD.add_flags(defer_inline=True)
+class TrainOneStepG(nn.Cell):
+    """
+    Encapsulation class of CGAN generator network training.
+    Append an optimizer to the training network after that the construct
+    function can be called to create the backward graph.
+    Args:
+        G (Cell): Generator with loss Cell. Note that loss function should have been added.
+        generator (Cell): Generator of CGAN.
+        optimizer (Optimizer): Optimizer for updating the weights.
+        sens (Number): The adjust parameter. Default: 1.0.
+    """
 
-        self.weights_G = optimizerG.parameters
-        self.optimizerG = optimizerG
-        self.weights_D = optimizerD.parameters
-        self.optimizerD = optimizerD
+    def __init__(self, G_with_loss, optimizer, sens=1.0):
+        super(TrainOneStepG, self).__init__(auto_prefix=False)
+        self.optimizer = optimizer
+        self.G_with_loss = G_with_loss
+        self.G_with_loss.set_grad()
+        self.G_with_loss.set_train()
 
-        self.grad = C.GradOperation(get_by_list=True, sens_param=True)
-
+        self.grad = ops.GradOperation(get_by_list=True, sens_param=True)
         self.sens = sens
+        self.weights = optimizer.parameters
+        self.loss_net = WithLossCell(G_with_loss)
         self.reducer_flag = False
-        self.grad_reducer_G = F.identity
-        self.grad_reducer_D = F.identity
-        self.parallel_mode = _get_parallel_mode()
-        if self.parallel_mode in (ParallelMode.DATA_PARALLEL,
-                                  ParallelMode.HYBRID_PARALLEL):
+        self.grad_reducer = None
+        self.parallel_mode = context.get_auto_parallel_context("parallel_mode")
+        if self.parallel_mode in [ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL]:
             self.reducer_flag = True
         if self.reducer_flag:
-            mean = _get_gradients_mean()
-            degree = _get_device_num()
-            self.grad_reducer_G = DistributedGradReducer(
-                self.weights_G, mean, degree)
-            self.grad_reducer_D = DistributedGradReducer(
-                self.weights_D, mean, degree)
+            mean = context.get_auto_parallel_context("gradients_mean")
+            if auto_parallel_context().get_device_num_is_set():
+                degree = context.get_auto_parallel_context("device_num")
+            else:
+                degree = get_group_size()
+            self.grad_reducer = nn.DistributedGradReducer(optimizer.parameters, mean, degree)
 
-    def trainD(self, real_data, latent_code, label, loss):
-        """trainD"""
-        sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
-        grads = self.grad(self.netD, self.weights_D)(real_data, latent_code, label, sens)
-        grads = self.grad_reducer_D(grads)
-        self.optimizerD(grads)
+    def construct(self, noise, labels):
+        """
+        construct
+
+        Args:
+          noise(Tensor): noise
+          labels(Tensor): labels
+
+        Returns:
+          fake_img: net output
+          loss: loss
+        """
+        fake_img, loss_G = self.G_with_loss(noise, labels)
+        sens = ops.Fill()(ops.DType()(loss_G), ops.Shape()(loss_G), self.sens)
+        grads_g = self.grad(self.loss_net, self.weights)(noise, labels, sens)
+        if self.reducer_flag:
+            # apply grad reducer on grads
+            grads_g = self.grad_reducer(grads_g)
+        loss = ops.depend(loss_G, self.optimizer(grads_g))
+        return fake_img, loss
+
+
+class TrainOneStepD(nn.Cell):
+    """
+    Encapsulation class of CGAN discriminator network training.
+    Append an optimizer to the training network after that the construct
+    function can be called to create the backward graph.
+    Args:
+        D (Cell): D with loss Cell. Note that loss function should have been added.
+        optimizer (Optimizer): Optimizer for updating the weights.
+        sens (Number): The adjust parameter. Default: 1.0.
+    """
+
+    def __init__(self, D_with_loss, optimizer, sens=1.0):
+        super(TrainOneStepD, self).__init__(auto_prefix=False)
+        self.optimizer = optimizer
+        self.D_with_loss = D_with_loss
+        self.D_with_loss.set_grad()
+        self.D_with_loss.set_train()
+        self.grad = ops.GradOperation(get_by_list=True, sens_param=True)
+        self.sens = sens
+        self.weights = optimizer.parameters
+        self.reducer_flag = False
+        self.grad_reducer = None
+        self.parallel_mode = context.get_auto_parallel_context("parallel_mode")
+        if self.parallel_mode in [ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL]:
+            self.reducer_flag = True
+        if self.reducer_flag:
+            mean = context.get_auto_parallel_context("gradients_mean")
+            if auto_parallel_context().get_device_num_is_set():
+                degree = context.get_auto_parallel_context("device_num")
+            else:
+                degree = get_group_size()
+            self.grad_reducer = nn.DistributedGradReducer(optimizer.parameters, mean, degree)
+
+    def construct(self, real_img, noise, labels):
+        """
+        construct
+
+        Args:
+            real_img
+            noise(Tensor): noise
+            labels(Tensor): labels
+
+        Returns:
+            loss: loss
+        """
+        weights = self.weights
+        ld = self.D_with_loss(real_img, noise, labels)
+        sens_d = ops.Fill()(ops.DType()(ld), ops.Shape()(ld), self.sens)
+        grads_d = self.grad(self.D_with_loss, weights)(real_img, noise, labels, sens_d)
+        if self.reducer_flag:
+            # apply grad reducer on grads
+            grads_d = self.grad_reducer(grads_d)
+        loss = ops.depend(ld, self.optimizer(grads_d))
         return loss
-
-    def trainG(self, latent_code, label, loss):
-        """trainG"""
-        sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
-        grads = self.grad(self.netG, self.weights_G)(latent_code, label, sens)
-        grads = self.grad_reducer_G(grads)
-        self.optimizerG(grads)
-        return loss
-
-    def construct(self, real_data, latent_code, label):
-        """construct"""
-        loss_D = self.netD(real_data, latent_code, label)
-        loss_G = self.netG(latent_code, label)
-        d_out = self.trainD(real_data, latent_code, label, loss_D)
-        g_out = self.trainG(latent_code, label, loss_G)
-        return d_out, g_out

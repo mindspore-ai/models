@@ -16,7 +16,7 @@
 
 if [ $# != 4 ]
 then
-    echo "Usage: bash run_eval_ascend.sh [G_CKPT] [DATA_PATH] [OUTPUT_PATH] [DEVICE_ID]"
+    echo "Usage: bash run_eval_gpu.sh [G_CKPT] [DATA_PATH] [OUTPUT_PATH] [DEVICE_ID]"
 exit 1
 fi
 
@@ -39,4 +39,4 @@ export DEVICE_ID=$4
 
 echo "start eval on DEVICE $DEVICE_ID"
 echo "the results will saved in $OUTPUT_PATH"
-python -u ../eval.py --G_ckpt_path=$CKPT --data_path=$DATASET --device_id=$DEVICE_ID --output_path=$OUTPUT_PATH  --device_target=Ascend> eval_log 2>&1 &
+python -u ../eval.py --G_ckpt_path=$CKPT --data_path=$DATASET --device_id=$DEVICE_ID --output_path=$OUTPUT_PATH --device_target=GPU > eval_log 2>&1 &

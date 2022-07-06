@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,34 +13,42 @@
 # limitations under the License.
 # ============================================================================
 """eval cgan"""
-import os
-import itertools
+
 import argparse
 import numpy as np
-import matplotlib.pyplot as plt
 from mindspore import Tensor
 from mindspore import context
+import mindspore.ops.operations as P
 from mindspore.common import dtype as mstype
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from src.dataset import get_real_valued_mnist
+from src.tools import load_ckpt
+from src.reporter import Reporter
 from src.model import Generator
+from src.parzen_numpy import cross_validate_sigma, parzen_estimation, get_nll
 
 def preLauch():
     """parse the console argument"""
     parser = argparse.ArgumentParser(description='MindSpore cgan training')
+    parser.add_argument('--device_target', type=str, default='GPU',
+                        help='device target, Ascend or GPU (Default: GPU)')
     parser.add_argument('--device_id', type=int, default=0,
                         help='device id of Ascend (Default: 0)')
-    parser.add_argument('--ckpt_dir', type=str,
-                        default='ckpt', help='checkpoint dir of CGAN')
-    parser.add_argument('--img_out', type=str,
-                        default='img_eval', help='the dir of output img')
+    parser.add_argument('--batch_size', type=int, default=200,
+                        help='batch size id of training (Default: 200)')
+    parser.add_argument('--G_ckpt_path', type=str,
+                        default=None, help='checkpoint path of generator')
+    parser.add_argument('--data_path', type=str, default='data/train',
+                        help='dataset dir (default data/train)')
+    parser.add_argument('--output_path', type=str, default='./output',
+                        help='output path of training (default ./output)')
+    parser.add_argument("--real_valued_mnist", type=bool, default=True,
+                        help='If load real valued MNIST dataset(default False)')
     args = parser.parse_args()
 
     context.set_context(device_id=args.device_id,
                         mode=context.GRAPH_MODE,
-                        device_target="Ascend")
-    # if not exists 'img_out', make it
-    if not os.path.exists(args.img_out):
-        os.mkdir(args.img_out)
+                        device_target=args.device_target)
+
     return args
 
 
@@ -49,46 +57,69 @@ def main():
     args = preLauch()
 
     # training argument
+    sigma = 0.1
+    classes_num = 10
+    img_channels = 1
     input_dim = 100
-    n_col = 20
-    n_row = 10
-    n_image = n_row * n_col
+    embed_size = 100
+    generator_size = 10000
+    batch_size = args.batch_size
+    G_ckpt_path = args.G_ckpt_path
+    data_path = args.data_path
+    output_path = args.output_path
+    if_parzen_estimates = True
+    if_cross_validate_sigma = True
 
-    # create G Cell & D Cell
-    netG = Generator(input_dim)
+    # create G Cell
+    netG = Generator(input_dim, img_channels, classes_num, embed_size=embed_size)
+    if G_ckpt_path is not None:
+        load_ckpt(G_ckpt_path, netG)
+    netG.set_train(False)
 
-    latent_code_eval = Tensor(np.random.randn(n_image, input_dim), dtype=mstype.float32)
+    reporter = Reporter(output_path=output_path, batch_size=batch_size, stage='eval')
+    reporter.info('==========start predict %s===============')
+    reporter.start_predict()
 
-    label_eval = np.zeros((n_image, 10))
-    for i in range(n_image):
-        j = i // n_col
-        label_eval[i][j] = 1
-    label_eval = Tensor(label_eval, dtype=mstype.float32)
+    steps = np.ceil(generator_size / batch_size).astype(np.int32)
+    sample_list = []
+    resize = P.ResizeBilinear((28, 28))
+    for step in range(steps):
+        noise = Tensor(np.random.normal(size=(batch_size, input_dim)),
+                       dtype=mstype.float32)
+        label = Tensor((np.arange(noise.shape[0]) % 10), dtype=mstype.int32)
+        samples = netG(noise, label)  # 10000
 
-    fig, ax = plt.subplots(n_row, n_col, figsize=(10, 5))
-    for digit, num in itertools.product(range(n_row), range(n_col)):
-        ax[digit, num].get_xaxis().set_visible(False)
-        ax[digit, num].get_yaxis().set_visible(False)
+        samples = resize(samples)
+        samples = samples.asnumpy()
+        sample_list.append(samples)
+        reporter.visualizer_eval(samples, step)
+    reporter.end_predict(step)
 
-    param_G = load_checkpoint(args.ckpt_dir)
-    load_param_into_net(netG, param_G)
-    gen_imgs_eval = netG(latent_code_eval, label_eval)
-    for i in range(n_image):
-        if (i + 1) % n_col == 0:
-            print("process ========= {}/200".format(i+1))
-        digit = i // n_col
-        num = i % n_col
-        img = gen_imgs_eval[i].asnumpy().reshape((28, 28))
-        ax[digit, num].cla()
-        ax[digit, num].imshow(img * 127.5 + 127.5, cmap="gray")
+    samples = np.concatenate(sample_list, axis=0)
+    samples = samples[:generator_size]
+    sample_data = samples.reshape(-1, 784).astype('float32')
 
-    label = 'eval result'
-    fig.text(0.5, 0.01, label, ha='center')
-    fig.tight_layout()
-    plt.subplots_adjust(wspace=0.01, hspace=0.01)
-    print("===========saving image===========")
-    plt.savefig("./img_eval/result.png")
-    print("===========success================")
+    if if_parzen_estimates:
+        reporter.info('start Gaussian Parzen window log-likelihood estimate')
+        dataset_train = get_real_valued_mnist(dataset_dir=data_path, usage='train', out_as_numpy=True)
+        dataset_train = dataset_train[0]
+
+        valid_data = dataset_train[10000:10000 + generator_size].reshape(-1, 784).astype('float32') / 255
+        test_data = dataset_train[50000:50000 + generator_size].reshape(-1, 784).astype('float32') / 255
+
+        if if_cross_validate_sigma:
+            sigma_range = np.logspace(-1, 0, 10)
+            # get appropriate sigmas
+            sigma, _ = cross_validate_sigma(sample_data, valid_data, sigma_range, batch_size, 2)
+        else:
+            sigma = sigma
+        print(sigma)
+
+        parzen = parzen_estimation(sample_data, sigma, mode='gauss')  # the density estimate p(x)
+        ll = get_nll(test_data, parzen, batch_size=batch_size)  # get ll on multi batch
+        se = ll.std() / np.sqrt(test_data.shape[0])
+        info = "Log-Likelihood of test set = {}, se: {}".format(ll.mean(), se)
+        reporter.info(info)
 
 
 if __name__ == '__main__':
