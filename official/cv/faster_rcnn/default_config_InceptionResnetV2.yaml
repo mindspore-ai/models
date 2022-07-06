@@ -13,6 +13,7 @@ enable_profiling: False
 # config
 img_width: 1024
 img_height: 1024
+# The value of keep_ratio must be the same as the [KEEP_RATIO] parameter in Ascend310 inference
 keep_ratio: True
 flip_ratio: 0.5
 expand_ratio: 1.0

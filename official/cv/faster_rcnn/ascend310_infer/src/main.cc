@@ -56,9 +56,10 @@ DEFINE_string(dataset_path, ".", "dataset path");
 DEFINE_int32(device_id, 0, "device id");
 DEFINE_int32(IMAGEWIDTH, 1280, "image width");
 DEFINE_int32(IMAGEHEIGHT, 768, "image height");
+DEFINE_bool(KEEP_RATIO, true, "keep_ratio");
 DEFINE_bool(RESTOREBBOX, true, "restore bbox");
 
-int PadImage(const MSTensor &input, MSTensor *output) {
+int RescaleImage(const MSTensor &input, MSTensor *output) {
     std::shared_ptr<TensorTransform> normalize(new Normalize({103.53, 116.28, 123.675},
                                                              {57.375, 57.120, 58.395}));
     Execute composeNormalize({normalize});
@@ -118,6 +119,29 @@ int PadImage(const MSTensor &input, MSTensor *output) {
               std::cout << "ERROR: Normalize failed." << std::endl;
               return 1;
         }
+    }
+    return 0;
+}
+
+int ResizeImage(const MSTensor &input, MSTensor *output) {
+    std::shared_ptr<TensorTransform> normalize(new Normalize({123.675, 116.28, 103.53},
+                                                             {58.395, 57.120, 57.375}));
+    Execute composeNormalize({normalize});
+    auto imgResize = MSTensor();
+
+    Status ret;
+
+    std::shared_ptr<TensorTransform> resize(new Resize({FLAGS_IMAGEHEIGHT, FLAGS_IMAGEWIDTH}));
+    Execute composeResize({resize});
+    ret = composeResize(input, &imgResize);
+    if (ret != kSuccess) {
+        std::cout << "ERROR: Resize failed." << std::endl;
+        return 1;
+    }
+    ret = composeNormalize(imgResize, output);
+    if (ret != kSuccess) {
+        std::cout << "ERROR: Normalize failed." << std::endl;
+        return 1;
     }
     return 0;
 }
@@ -198,22 +222,31 @@ int main(int argc, char **argv) {
             std::cout << "ERROR: Decode failed." << std::endl;
             return 1;
         }
-        auto imgPad = MSTensor();
-        PadImage(imgDecode, &imgPad);
+        auto imgRescale = MSTensor();
+        if (FLAGS_KEEP_RATIO) {
+            RescaleImage(imgDecode, &imgRescale);
+        } else {
+            ResizeImage(imgDecode, &imgRescale);
+        }
         auto img = MSTensor();
-        composeTranspose(imgPad, &img);
+        composeTranspose(imgRescale, &img);
 
         std::vector<int64_t> shape = imgDecode.Shape();
 
         float widthScale = static_cast<float>(FLAGS_IMAGEWIDTH) / shape[1];
         float heightScale = static_cast<float>(FLAGS_IMAGEHEIGHT) / shape[0];
-        float resizeScale = widthScale < heightScale ? widthScale : heightScale;
 
         float imgInfo[4];
         imgInfo[0] = shape[0];
         imgInfo[1] = shape[1];
-        imgInfo[2] = resizeScale;
-        imgInfo[3] = resizeScale;
+        if (FLAGS_KEEP_RATIO) {
+            float resizeScale = widthScale < heightScale ? widthScale : heightScale;
+            imgInfo[2] = resizeScale;
+            imgInfo[3] = resizeScale;
+        } else {
+            imgInfo[2] = heightScale;
+            imgInfo[3] = widthScale;
+        }
 
         MSTensor imgMeta("imgMeta", DataType::kNumberTypeFloat32, {static_cast<int64_t>(4)}, imgInfo, 16);
         bool restore_bbox = static_cast<bool>(FLAGS_RESTOREBBOX);

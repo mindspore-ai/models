@@ -14,11 +14,11 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 3 || $# -gt 6 ]]; then
-    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [DEVICE_ID](optional)
-    IMAGE_WIDTH, IMAGE_HEIGHT and DEVICE_ID is optional. IMAGE_WIDTH and IMAGE_HEIGHT must be set at the same time
-    or not at the same time. IMAGE_WIDTH default value is 1280, IMAGE_HEIGHT default value is 760, DEVICE_ID can be 
-    set by environment variable device_id, otherwise the value is zero"
+if [[ $# -lt 3 || $# -gt 7 ]]; then
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [KEEP_RATIO](optional) [DEVICE_ID](optional)
+    IMAGE_WIDTH, IMAGE_HEIGHT and DEVICE_ID is optional. IMAGE_WIDTH and IMAGE_HEIGHT must be set at the same time or not at the same time. 
+    IMAGE_WIDTH default value is 1280, IMAGE_HEIGHT default value is 768, KEEP_RATIO default value is true, must be the same as that during 
+    training. DEVICE_ID can be set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi
 
@@ -35,6 +35,8 @@ anno_path=$(get_real_path $3)
 device_id=0
 image_width=1280
 image_height=768
+# If keep_ratio is set to False during model training, it should be also set to false here.
+keep_ratio=true
 # If restore_bbox is set to False during export.py, it should be also set to false here (only support true or false and case sensitive).
 restore_bbox=true
 
@@ -50,7 +52,13 @@ fi
 if [ $# -eq 6 ]; then
     image_width=$4
     image_height=$5
-    device_id=$6
+    keep_ratio=$6
+fi
+if [ $# -eq 7 ]; then
+    image_width=$4
+    image_height=$5
+    keep_ratio=$6
+    device_id=$7
 fi
 
 echo "mindir name: "$model
@@ -59,6 +67,7 @@ echo "anno_path: " $anno_path
 echo "device id: "$device_id
 echo "image_width: "$image_width
 echo "image_height: "$image_height
+echo "keep_ratio: "$keep_ratio
 echo "restore_bbox: "$restore_bbox
 
 export ASCEND_HOME=/usr/local/Ascend/
@@ -93,7 +102,7 @@ function infer()
     fi
     mkdir result_Files
     mkdir time_Result
-    ../ascend310_infer/out/main --mindir_path=$model --dataset_path=$data_path --device_id=$device_id --IMAGEWIDTH=$image_width --IMAGEHEIGHT=$image_height  --RESTOREBBOX=$restore_bbox &> infer.log
+    ../ascend310_infer/out/main --mindir_path=$model --dataset_path=$data_path --device_id=$device_id --IMAGEWIDTH=$image_width --IMAGEHEIGHT=$image_height  --KEEP_RATIO=$keep_ratio --RESTOREBBOX=$restore_bbox &> infer.log
 }
 
 function cal_acc()

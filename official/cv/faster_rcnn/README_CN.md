@@ -479,8 +479,13 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --device_ta
 
 ```shell
 # Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [DEVICE_ID](optional)
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [KEEP_RATIO](optional) [DEVICE_ID](optional)
 ```
+
+- `IMAGE_WIDTH` 可选，默认值为1024。
+- `IMAGE_HEIGHT` 可选，默认值为768。
+- `KEEP_RATIO` 可选，默认值为true。
+- `DEVICE_ID` 可选，默认值为0。
 
 ### 结果
 

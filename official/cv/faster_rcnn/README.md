@@ -481,8 +481,13 @@ The following example only supports mindir inference with batch_size=1.
 
 ```shell
 # Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [DEVICE_ID](optional)
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optional) [IMAGE_HEIGHT](optional) [KEEP_RATIO](optional) [DEVICE_ID](optional)
 ```
+
+- `IMAGE_WIDTH` is optional, default value is 1024.
+- `IMAGE_HEIGHT` is optional, default value is 768.
+- `KEEP_RATIO` is optional, default value is true.
+- `DEVICE_ID` is optional, default value is 0.
 
 ### result
 
