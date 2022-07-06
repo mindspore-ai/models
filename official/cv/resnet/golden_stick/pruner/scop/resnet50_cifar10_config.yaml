@@ -23,8 +23,8 @@ batch_size: 32
 loss_scale: 1024
 momentum: 0.9
 weight_decay: 0.0001
-epoch_size: 90
-epochs_ft: 400
+epoch_kf: 90
+epoch_ft: 400
 pretrain_epoch_size: 0
 save_checkpoint: True
 save_checkpoint_epochs: 5
@@ -32,12 +32,10 @@ keep_checkpoint_max: 10
 warmup_epochs: 5
 lr_decay_mode: "poly"
 lr_init: 0.01
-lr_end: 0.00001
-lr_max: 0.1
-lars_epsilon: 0.0
-lars_coefficient: 0.001
-lr_ft_end: 0.0001
-lr_ft_max: 0.4
+lr_end_kf: 0.0001
+lr_max_kf: 0.1
+lr_end_ft: 0.0001
+lr_max_ft: 0.04
 
 net_name: "resnet50"
 dataset: "cifar10"

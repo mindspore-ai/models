@@ -239,9 +239,9 @@ def train_net():
 
     lr = get_lr(lr_init=config.lr_init,
                 lr_end=0.0,
-                lr_max=config.lr_max,
+                lr_max=config.lr_max_kf,
                 warmup_epochs=config.warmup_epochs,
-                total_epochs=config.epoch_size,
+                total_epochs=config.epoch_kf,
                 steps_per_epoch=step_size,
                 lr_decay_mode='cosine')
 
@@ -256,12 +256,28 @@ def train_net():
     net_with_loss = NetWithLossCell(model, kf_loss_fn, 1)
 
     net_train_step = nn.TrainOneStepCell(net_with_loss, optimizer)
-    train_kf(dataset, net_train_step, model, kfconv_list, kfscale_list)
+    if config.pre_trained:
+        for _, (_, module) in enumerate(model.cells_and_names()):
+            if isinstance(module, KfConv2d):
+                module.score = module.bn.gamma.data.abs() * ops.Squeeze()(
+                    module.kfscale.data - (1 - module.kfscale.data))
+                module.prune_rate = config.prune_rate
+        for _, (_, module) in enumerate(model.cells_and_names()):
+            if isinstance(module, KfConv2d):
+                _, index = ops.Sort()(module.score)
+                num_pruned_channel = int(module.prune_rate * module.score.shape[0])
+                module.out_index = index[num_pruned_channel:]
+        for param in model.get_parameters():
+            param.requires_grad = True
+        train_ft(model, dataset)
+    else:
+        model = train_kf(dataset, net_train_step, model, kfconv_list, kfscale_list)
+        train_ft(model, dataset)
 
 
 def train_kf(dataset, net_train_step, model, kfconv_list, kfscale_list):
     """train konckoff."""
-    for _ in range(0, config.epoch_size):
+    for _ in range(0, config.epoch_kf):
         from copy import deepcopy
         for _, (kf_data, kf_target) in enumerate(dataset.create_tuple_iterator()):
             kf = deepcopy(kf_data)
@@ -304,18 +320,21 @@ def train_kf(dataset, net_train_step, model, kfconv_list, kfscale_list):
             _, index = ops.Sort()(module.score)
             num_pruned_channel = int(module.prune_rate * module.score.shape[0])
             module.out_index = index[num_pruned_channel:]
-    train_ft(model, dataset)
+    return model
 
 
 def train_ft(model, dataset):
     """train finetune."""
     algo_ft = PrunerFtCompressAlgo({})
     model = algo_ft.apply(model)
+    if config.pre_trained:
+        pre_ckpt = ms.load_checkpoint(config.pre_trained)
+        ms.load_param_into_net(model, pre_ckpt)
     lr_ft_new = ms.Tensor(get_lr(lr_init=config.lr_init,
-                                 lr_end=config.lr_ft_end,
-                                 lr_max=config.lr_ft_max,
+                                 lr_end=config.lr_end_ft,
+                                 lr_max=config.lr_max_ft,
                                  warmup_epochs=config.warmup_epochs,
-                                 total_epochs=config.epochs_ft,
+                                 total_epochs=config.epoch_ft,
                                  steps_per_epoch=dataset.get_dataset_size(),
                                  lr_decay_mode='poly'))
 
@@ -337,13 +356,14 @@ def train_ft(model, dataset):
 
     time_cb = TimeMonitor(data_size=step_size)
     loss_cb = LossMonitor()
+    ckpt_save_dir = set_save_ckpt_dir()
     config_ck = CheckpointConfig(save_checkpoint_steps=5 * step_size,
                                  keep_checkpoint_max=10)
-    ckpt_cb = ModelCheckpoint(prefix="resnet", directory=config.output_path,
+    ckpt_cb = ModelCheckpoint(prefix="resnet", directory=ckpt_save_dir,
                               config=config_ck)
     ft_cb = [time_cb, loss_cb, ckpt_cb]
 
-    model_ft.train(config.epochs_ft, dataset, callbacks=ft_cb,
+    model_ft.train(config.epoch_ft, dataset, callbacks=ft_cb,
                    sink_size=dataset.get_dataset_size(), dataset_sink_mode=True)
 
     masked_conv_list = []
