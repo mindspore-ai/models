@@ -1,16 +1,20 @@
-<TOC>
+# 目录
 
-# 标题， 模型名称
+# 模型名称
 
-> 可以是模型的不同架构，名称可以代表你所实现的模型架构
+> 模型简介，论文模型概括
 
-## 特性（可选）
+## 模型架构
 
-> 展示你在模型实现中使用的特性，例如分布式自动并行或者一些特殊的训练技巧
+> 如包含多种模型架构，展示你实现的部分
 
 ## 数据集
 
-> 提供你所使用的数据信息，检查数据版权，通常情况下你需要提供下载数据的链接
+> 提供你所使用的数据信息，检查数据版权，通常情况下你需要提供下载数据的链接，数据集的目录结构，数据集大小等信息
+
+## 特性（可选）
+
+> 展示你在模型实现中使用的特性，例如分布式自动并行或者混合精度等一些特殊的训练技巧
 
 ## 环境要求
 
@@ -23,7 +27,11 @@
 
 ## 快速入门
 
-> 使用一条什么样的命令可以直接运行
+> 展示可以直接运行的命令
+> 按照你开发的版本，可能包含：
+> * 训练命令，推理命令，export命令
+> * Ascend版本，GPU版本，CPU版本
+> * 线下运行版本，线上运行版本
 
 ## 脚本说明
 
@@ -31,19 +39,19 @@
 
 ### 脚本和样例代码
 
-> 描述项目中每个文件的作用
+> 提供完整的代码目录展示（包含子文件夹的展开），描述每个文件的作用
 
 ### 脚本参数
 
-> 注释模型中的每个参数，特别是`config.py`中的参数
+> 注解模型中的每个参数，特别是`config.py`中的参数，如有多个配置文件，请注解每一份配置文件的参数
 
 ## 训练过程
 
-> 提供训练信息
+> 提供训练信息，区别于quick start，此部分需要提供除用法外的日志等详细信息
 
-### 用法
+### 训练
 
-> 提供训练脚本的使用情况
+> 提供训练脚本的使用方法
 
 例如：在昇腾上使用分布式训练运行下面的命令
 
@@ -51,26 +59,65 @@
 bash run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL]
 ```
 
+> 提供训练过程日志
+
+```log
+# grep "loss is " train.log
+epoch:1 step:390, loss is 1.4842823
+epcoh:2 step:390, loss is 1.0897788
+```
+
+> 提供训练结果日志
+例如：训练checkpoint将被保存在`XXXX/ckpt_0`中，你可以从如下的log文件中获取结果
+
+```log
+epoch: 11 step: 7393 ,rpn_loss: 0.02003, rcnn_loss: 0.52051, rpn_cls_loss: 0.01761, rpn_reg_loss: 0.00241, rcnn_cls_loss: 0.16028, rcnn_reg_loss: 0.08411, rcnn_mask_loss: 0.27588, total_loss: 0.54054
+epoch: 12 step: 7393 ,rpn_loss: 0.00547, rcnn_loss: 0.39258, rpn_cls_loss: 0.00285, rpn_reg_loss: 0.00262, rcnn_cls_loss: 0.08002, rcnn_reg_loss: 0.04990, rcnn_mask_loss: 0.26245, total_loss: 0.39804
+```
+
 ### 迁移训练（可选）
 
 > 提供如何根据预训练模型进行迁移训练的指南
 
-### 训练结果
+### 分布式训练
 
-> 提供训练结果
+> 同上
 
-例如：训练checkpoint将被保存在`XXXX/ckpt_0`中，你可以从如下的log文件中获取结果
+## 评估
 
+### 评估过程
+
+> 提供eval脚本用法
+
+### 评估结果
+
+> 提供推理结果
+
+例如：上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
+
+```log
+accuracy:{'acc':0.934}
 ```
-epoch: 11 step: 7393 ,rpn_loss: 0.02003, rcnn_loss: 0.52051, rpn_cls_loss: 0.01761, rpn_reg_loss: 0.00241, rcnn_cls_loss: 0.16028, rcnn_reg_loss: 0.08411, rcnn_mask_loss: 0.27588, total_loss: 0.54054
-epoch: 12 step: 7393 ,rpn_loss: 0.00547, rcnn_loss: 0.39258, rpn_cls_loss: 0.00285, rpn_reg_loss: 0.00262, rcnn_cls_loss: 0.08002, rcnn_reg_loss: 0.04990, rcnn_mask_loss: 0.26245, total_loss: 0.39804
-```
+
+## 导出
+
+### 导出过程
+
+> 提供export脚本用法
+
+### 导出结果
+
+> 提供export结果日志
 
 ## 推理
 
 ### 推理过程
 
 > 提供推理脚本
+
+```bash
+bash run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [LABEL_FILE] [DEVICE_ID]
+```
 
 ### 推理结果
 
@@ -126,6 +173,7 @@ epoch: 12 step: 7393 ,rpn_loss: 0.00547, rcnn_loss: 0.39258, rpn_cls_loss: 0.002
 
 ## 参考模板
 
+此部分不需要出现在你的README中
 [maskrcnn_readme](https://gitee.com/mindspore/models/blob/master/official/cv/maskrcnn/README_CN.md)
 
 ## 贡献指南
@@ -133,6 +181,8 @@ epoch: 12 step: 7393 ,rpn_loss: 0.00547, rcnn_loss: 0.39258, rpn_cls_loss: 0.002
 如果你想参与贡献昇思的工作当中，请阅读[昇思贡献指南](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/master/how_to_contribute)
 
 ### 贡献者
+
+此部分根据自己的情况进行更改，填写自己的院校和邮箱
 
 * [c34](https://gitee.com/c_34) (Huawei)
 
