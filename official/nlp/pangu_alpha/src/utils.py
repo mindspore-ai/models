@@ -314,32 +314,25 @@ def add_inference_params(opt):
 def add_training_params(opt):
     """Add training params"""
     opt.add_argument("--seq_length",
-                     type=int,
-                     default=1024,
+                     type=int, default=1024,
                      help="sequence length, default is 1024.")
     opt.add_argument("--vocab_size",
-                     type=int,
-                     default=40000,
+                     type=int, default=40000,
                      help="vocabulary size, default is 40000.")
     opt.add_argument("--embedding_size",
-                     type=int,
-                     default=16384,
+                     type=int, default=16384,
                      help="embedding table size, default is 16384.")
     opt.add_argument("--num_layers",
-                     type=int,
-                     default=64,
+                     type=int, default=64,
                      help="total layers, default is 64.")
     opt.add_argument("--num_heads",
-                     type=int,
-                     default=128,
+                     type=int, default=128,
                      help="head size, default is 128.")
     opt.add_argument("--stage_num",
-                     type=int,
-                     default=1,
+                     type=int, default=1,
                      help="Pipeline stage num, default is 1.")
     opt.add_argument("--micro_size",
-                     type=int,
-                     default=1,
+                     type=int, default=1,
                      help="Pipeline micro_size, default is 1.")
     opt.add_argument("--eod_reset",
                      type=int, default=1,
@@ -351,8 +344,7 @@ def add_training_params(opt):
                      type=int, default=200000,
                      help="Decay step, default is 200000.")
     opt.add_argument("--optimizer",
-                     type=str,
-                     default="adam",
+                     type=str, default="adam",
                      choices=["adam", "lamb"],
                      help="select which optimizer to be used, default adam")
     opt.add_argument("--opt_offload",
@@ -370,6 +362,9 @@ def add_training_params(opt):
     opt.add_argument("--eod_id",
                      type=int, default=6,
                      help="The id of end of document")
+    opt.add_argument("--padding_id",
+                     type=int, default=6,
+                     help="The padding id of dataset")
     opt.add_argument("--epoch_size",
                      type=int, default=1,
                      help="The training epoch")
@@ -410,6 +405,9 @@ def add_training_params(opt):
     opt.add_argument("--micro_batch_interleaved",
                      type=int, default=2,
                      help="Parallel split num of batch size. default 2")
+    opt.add_argument("--recompute_slice_activation",
+                     type=int, default=0,
+                     help="Enable slice the recompute activation state. default 0")
 
 
 def add_context_args_mode(opt):
@@ -518,8 +516,8 @@ def get_args(inference=False):
                         help="The path where stores vocab and vocab model file")
     parser.add_argument("--param_init_type",
                         type=str,
-                        default="fp32",
-                        help="The initialization type for parameters. Default fp32.")
+                        default="fp16",
+                        help="The initialization type for parameters. Default fp16.")
     parser.add_argument("--offline",
                         type=int,
                         default=1,
