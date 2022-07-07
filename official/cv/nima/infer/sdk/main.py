@@ -79,7 +79,7 @@ def run():
 
         # image preprocess
         img_cv = cv2.imread(file_path)[:, :, ::-1]
-        img_cv = cv2.resize(img_cv, (224, 224), interpolation=cv2.INTER_CUBIC)
+        img_cv = cv2.resize(img_cv, (224, 224), interpolation=cv2.INTER_LINEAR)
         print(img_cv.shape)
         # normalize
         mean = [0.485, 0.456, 0.406]
