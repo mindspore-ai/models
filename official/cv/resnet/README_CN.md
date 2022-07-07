@@ -31,7 +31,7 @@
         - [导出MindIR](#导出mindir)
         - [在Ascend310执行推理](#在ascend310执行推理)
         - [结果](#结果-2)
-- [应用金箍棒模型压缩算法](#应用金箍棒模型压缩算法)
+- [应用MindSpore Golden Stick模型压缩算法](#应用mindspore-golden-stick模型压缩算法)
     - [训练过程](#训练过程-1)
         - [GPU处理器环境运行](#gpu处理器环境运行-2)
     - [续训过程](#续训过程-1)
@@ -765,22 +765,22 @@ Total data: 50000, top1 accuracy: 0.78625, top5 accuracy: 0.94358.
 Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 ```
 
-# 应用金箍棒模型压缩算法
+# 应用MindSpore Golden Stick模型压缩算法
 
-金箍棒是MindSpore的模型压缩算法集，我们可以在模型训练前应用金箍棒中的模型压缩算法，从而达到压缩模型大小、降低模型推理功耗，或者加速推理过程的目的。
+MindSpore Golden Stick是MindSpore的模型压缩算法集，我们可以在模型训练前应用MindSpore Golden Stick中的模型压缩算法，从而达到压缩模型大小、降低模型推理功耗，或者加速推理过程的目的。
 
-针对ResNet50，金箍棒提供了SimQAT和SCOP算法，SimQAT是一种量化感知训练算法，通过引入伪量化节点来训练网络中的某些层的量化参数，从而在部署阶段，模型得以以更小的功耗或者更高的性能进行推理。SCOP算法提出一种可靠剪枝方法，通过构建一种科学控制机制减少所有潜在不相关因子的影响，有效的按比例进行节点删除，从而实现模型小型化。
+针对ResNet50，MindSpore Golden Stick提供了SimQAT和SCOP算法，SimQAT是一种量化感知训练算法，通过引入伪量化节点来训练网络中的某些层的量化参数，从而在部署阶段，模型得以以更小的功耗或者更高的性能进行推理。SCOP算法提出一种可靠剪枝方法，通过构建一种科学控制机制减少所有潜在不相关因子的影响，有效的按比例进行节点删除，从而实现模型小型化。
 
-针对ResNet18，金箍棒引入了华为自研量化算法SLB，SLB是一种基于权值搜索的低比特量化算法，利用连续松弛策略搜索离散权重，训练时优化离散权重的分布，最后根据概率挑选离散权重实现量化。与传统的量化算法相比，规避了不准确的梯度更新过程，在极低比特量化中更有优势。
+针对ResNet18，MindSpore Golden Stick引入了华为自研量化算法SLB，SLB是一种基于权值搜索的低比特量化算法，利用连续松弛策略搜索离散权重，训练时优化离散权重的分布，最后根据概率挑选离散权重实现量化。与传统的量化算法相比，规避了不准确的梯度更新过程，在极低比特量化中更有优势。
 
 ## 训练过程
 
-| **算法**  | SimQAT | SLB | SCOP |
+| **算法**  | SimQAT | SCOP | SLB |
 | --------- | ------ | --- | ---- |
 | **支持的后端**  | GPU | GPU、Ascend | GPU |
 | **是否支持预训练** | 支持加载预训练ckpt | 必须提供预训练ckpt | 算法原理上无法复用原ckpt，无法加载预训练ckpt |
 | **是否支持续训练** | 支持 | 支持 | 支持 |
-| **是否支持多卡训练** | 支持 | 不支持 | 支持 |
+| **是否支持多卡训练** | 支持 | 支持 | 不支持 |
 
 - 预训练是指先不应用算法，先训练收敛一个全精度的网络。预训练获得的checkpoint文件被用于后续应用算法后的训练。
 - 续训练是指应用算法后训练网络，在训练过程中中断训练，后续从中断处的ckpt继续进行训练。
@@ -827,7 +827,7 @@ cd ./golden_stick/scripts/
 bash run_standalone_train_gpu.sh ../quantization/slb/ ../quantization/slb/resnet18_cifar10_config.yaml /path/to/dataset
 # 比如需要应用SCOP算法并使用多卡训练：
 cd ./golden_stick/scripts/
-bash run_distribute_train_gpu.sh ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml /path/to/dataset
+bash run_distribute_train_gpu.sh ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml /path/to/dataset FP32 /path/to/fp32_ckpt
 ```
 
 ## 评估过程

@@ -815,12 +815,12 @@ MindSpore Golden Stick provides SLB algorithm for ResNet18. SLB is provided by H
 
 ## Training Process
 
-| **Algorithm**  | SimQAT | SLB | SCOP |
+| **Algorithm**  | SimQAT | SCOP | SLB |
 | --------- | ------ | --- | ---- |
 | **supported backend**  | GPU | GPU、Ascend | GPU |
 | **support pretrain** | yes | must provide pretrained ckpt | don't need and can't load pretrained ckpt |
 | **support continue-train** | yes | yes | yes |
-| **support distribute train** | yes | no | yes |
+| **support distribute train** | yes | yes | no |
 
 - `pretrain` means training the network without applying algorithm. `pretrained ckpt` is loaded when training network with algorithm applied.
 - `continue-train` means stop the training process after applying algorithm and continue training process from checkpoint file of previous training process.
@@ -862,8 +862,12 @@ bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/
 cd ./golden_stick/scripts/
 bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cifar10_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt
 
-# Just replace PYTHON_PATH CONFIG_FILE for applying different algorithm, take SLB algorithm as an example
+# Just replace PYTHON_PATH and CONFIG_FILE for applying different algorithm, take standalone training ResNet18 with SLB algorithm applied as an example
+cd ./golden_stick/scripts/
 bash run_standalone_train_gpu.sh ../quantization/slb/ ../quantization/slb/resnet18_cifar10_config.yaml /path/to/dataset
+Or if we want to train ResNet50 distributively with SCOP algorithm applied
+cd ./golden_stick/scripts/
+bash run_distribute_train_gpu.sh ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml /path/to/dataset FP32 /path/to/fp32_ckpt
 ```
 
 - SLB only support standalone training now, and not support train from full precision checkpoint.

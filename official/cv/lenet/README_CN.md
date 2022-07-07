@@ -19,7 +19,7 @@
         - [导出MindIR](#导出mindir)
         - [在Ascend310执行推理](#在ascend310执行推理)
         - [结果](#结果)
-    - [应用金箍棒模型压缩算法](#应用金箍棒模型压缩算法)
+    - [应用MindSpore Golden Stick模型压缩算法](#应用mindspore-golden-stick模型压缩算法)
         - [训练过程](#训练过程-1)
             - [GPU处理器环境运行](#gpu处理器环境运行)
         - [评估过程](#评估过程-1)
@@ -284,11 +284,11 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [DEVICE_ID]
 'Accuracy':0.9843
 ```
 
-# 应用金箍棒模型压缩算法
+# 应用MindSpore Golden Stick模型压缩算法
 
-金箍棒是MindSpore的模型压缩算法集，我们可以在模型训练前应用金箍棒中的模型压缩算法，从而达到压缩模型大小、降低模型推理功耗，或者加速推理过程的目的。
+MindSpore Golden Stick是MindSpore的模型压缩算法集，我们可以在模型训练前应用MindSpore Golden Stick中的模型压缩算法，从而达到压缩模型大小、降低模型推理功耗，或者加速推理过程的目的。
 
-针对Lenet5，金箍棒提供了SimQAT算法，SimQAT是量化感知训练算法，通过引入伪量化节点来训练网络中的某些层的量化参数，从而在部署阶段，模型得以以更小的功耗或者更高的性能进行推理。
+针对Lenet5，MindSpore Golden Stick提供了SimQAT算法，SimQAT是量化感知训练算法，通过引入伪量化节点来训练网络中的某些层的量化参数，从而在部署阶段，模型得以以更小的功耗或者更高的性能进行推理。
 
 ## 训练过程
 
