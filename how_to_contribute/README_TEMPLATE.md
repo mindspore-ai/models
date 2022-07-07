@@ -1,6 +1,6 @@
-<TOC>
+# Content
 
-# Title, Model name
+# Model name
 
 > The Description of Model. The paper present this model.
 
@@ -8,13 +8,13 @@
 
 > There could be various architecture about some model. Represent the architecture of your implementation.
 
+## Dataset
+
+> Provide the information of the dataset you used. Check the copyrights of the dataset you used, usually you need to provide the hyperlink to download the dataset, scope and data size.
+
 ## Features(optional)
 
 > Represent the distinctive feature you used in the model implementation. Such as distributed auto-parallel or some special training trick.
-
-## Dataset
-
-> Provide the information of the dataset you used. Check the copyrights of the dataset you used, usually you need to provide the hyperlink to download the dataset.
 
 ## Requirements
 
@@ -28,6 +28,10 @@
 ## Quick Start
 
 > How to take a try without understanding anything about the model.
+> Maybe include：
+> * run train，run eval，run export
+> * Ascend version, GPU version，CPU version
+> * offline version，ModelArts version
 
 ## Script Description
 
@@ -35,15 +39,15 @@
 
 ### Scripts and Sample Code
 
-> Explain every file in your project.
+> Show the scope of project(include children directory), Explain every file in your project.
 
 ### Script Parameter
 
-> Explain every parameter of the model. Especially the parameters in `config.py`.
+> Explain every parameter of the model. Especially the parameters in `config.py`. If there are multiple config files, please explain separately.
 
 ## Training
 
-> Provide training information.
+> Provide training information. Include usage and log.
 
 ### Training Process
 
@@ -55,28 +59,57 @@ e.g. Run the following command for distributed training on Ascend.
 bash run_distribute_train.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL]
 ```
 
-### Transfer Training(Optional)
+> Provide training logs.
 
-> Provide the guidelines about how to run transfer training based on an pretrained model.
+```log
+# grep "loss is " train.log
+epoch:1 step:390, loss is 1.4842823
+epcoh:2 step:390, loss is 1.0897788
+```
 
-### Training Result
-
-> Provide the result of training.
-
+> Provide training result.
 e.g. Training checkpoint will be stored in `XXXX/ckpt_0`. You will get result from log file like the following:
 
-```
+```log
 epoch: 11 step: 7393 ,rpn_loss: 0.02003, rcnn_loss: 0.52051, rpn_cls_loss: 0.01761, rpn_reg_loss: 0.00241, rcnn_cls_loss: 0.16028, rcnn_reg_loss: 0.08411, rcnn_mask_loss: 0.27588, total_loss: 0.54054
 epoch: 12 step: 7393 ,rpn_loss: 0.00547, rcnn_loss: 0.39258, rpn_cls_loss: 0.00285, rpn_reg_loss: 0.00262, rcnn_cls_loss: 0.08002, rcnn_reg_loss: 0.04990, rcnn_mask_loss: 0.26245, total_loss: 0.39804
 ```
 
+### Transfer Training(Optional)
+
+> Provide the guidelines about how to run transfer training based on an pretrained model.
+
+### Distribute Training
+
+> Same as Training
+
 ## Evaluation
 
-### Evaluation Process
+### Evaluation Process 910
 
 > Provide the use of evaluation scripts.
 
-### Evaluation Result
+### Evaluation Result 910
+
+> Provide the result of evaluation.
+
+## Export
+
+### Export Process
+
+> Provide the use of export scripts.
+
+### Export Result
+
+> Provide the result of export.
+
+## Evaluation 310
+
+### Evaluation Process 310
+
+> Provide the use of evaluation scripts.
+
+### Evaluation Result 310
 
 > Provide the result of evaluation.
 
@@ -134,9 +167,12 @@ e.g. you can reference the following template
 
 ## Contributions
 
+This part should not exist in your readme.
 If you want to contribute, please review the [contribution guidelines](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING.md) and [how_to_contribute](https://gitee.com/mindspore/models/tree/master/how_to_contribute)
 
 ### Contributors
+
+Update your school and email/gitee.
 
 * [c34](https://gitee.com/c_34) (Huawei)
 

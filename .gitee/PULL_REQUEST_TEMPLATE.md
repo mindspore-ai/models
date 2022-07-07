@@ -36,7 +36,7 @@ Fixes #
 - [ ] I have made corresponding changes to the documentation.
 - [ ] I have squashed all the commits into one.
 - [ ] I have test and ascertained the effect of my change in all related cases.
-    - [ ] Different hardware: `CPU`, `GPU`, `Ascend910`, `Ascend310`, `Ascend701`.
+    - [ ] Different hardware: `CPU`, `GPU`, `Ascend910`, `Ascend310`, `Ascend310P`.
     - [ ] Different mode: `GRAPH_MODE`, `PYNATIVE_MODE`.
     - [ ] Different system: `Linux`, `Windows`, `MAC`.
     - [ ] Different number of cluster: `1pc`, `8pcs`.
