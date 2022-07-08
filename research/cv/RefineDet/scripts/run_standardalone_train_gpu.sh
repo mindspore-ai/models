@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021-2022 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run_distribute_train.sh DEVICE_ID EPOCH_SIZE LR DATASET PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
-echo "for example: bash run_distribute_train.sh 0 500 0.05 coco /models/refinedet.ckpt(optional) 200(optional)"
+echo "bash run_distribute_train_gpu.sh DEVICE_ID EPOCH_SIZE LR DATASET PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
+echo "for example: bash run_distribute_train.sh 0 500 0.05 coco /opt/ssd-300.ckpt(optional) 200(optional)"
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 
 if [ $# != 4 ] && [ $# != 6 ]
 then
-    echo "Usage: bash run_distribute_train.sh [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] \
+    echo "Usage: bash run_distribute_train_gpu.sh [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] \
     [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)"
     exit 1
 fi
@@ -31,7 +31,7 @@ fi
 # Before start distribute train, first create mindrecord files.
 BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
 cd $BASE_PATH/../ || exit
-python train.py --only_create_dataset=True --dataset=$4 > mindrecord.log 2>&1
+python train.py --only_create_dataset=True --dataset=$4 --run_platform="GPU" > mindrecord.log 2>&1
 
 echo "After running the script, the network runs in the background. The log will be generated in LOGx/log.txt"
 DEVICE_ID=$1
@@ -50,22 +50,24 @@ cd ./LOG$DEVICE_ID || exit
 
 echo "start training with device $DEVICE_ID"
 env > env.log
-if [ $# == 4 ]
+if [ $# = 4 ]
 then
     python train.py  \
     --lr=$LR \
     --dataset=$DATASET \
     --device_id=$DEVICE_ID  \
+    --run_platform="GPU" \
     --epoch_size=$EPOCH_SIZE > log.txt 2>&1 &
 fi
 
-if [ $# == 6 ]
+if [ $# = 6 ]
 then
     python train.py  \
     --lr=$LR \
     --dataset=$DATASET \
     --device_id=$DEVICE_ID  \
     --pre_trained=$PRE_TRAINED \
+    --run_platform="GPU" \
     --pre_trained_epoch_size=$PRE_TRAINED_EPOCH_SIZE \
     --epoch_size=$EPOCH_SIZE > log.txt 2>&1 &
 fi
