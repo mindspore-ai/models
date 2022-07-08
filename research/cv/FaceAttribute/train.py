@@ -120,7 +120,7 @@ def modelarts_pre_process():
 def run_train():
     '''run train.'''
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False,
-                        device_id=get_device_id())
+                        runtime_num_threads=10, device_id=get_device_id())
     mindspore.set_seed(1)
 
     # init distributed
