@@ -8,8 +8,8 @@ checkpoint_url: ""
 data_path: "/cache/data"
 output_path: "/cache/train"
 load_path: "/cache/checkpoint_path"
-device_target: "Ascend"
-gpu_distribute_training: 0
+device_target: "GPU"
+gpu_distribute_training: 1
 
 
 # ==============================================================================
@@ -18,13 +18,13 @@ dataset_name: "celeba"
 name: "celeba"
 resume_load_scale: -1
 batch_size: 16
-batch_size_list: []
-train_data_path: ""
-resume_check_d: "checkpoint_path/"
-resume_check_g: "checkpoint_path/"
+batch_size_list: [ 16, 16, 16, 16, 16, 8]
+train_data_path: "/path/to/dataset/images"
+resume_check_d: "chekpoint_from_huawei/D_12000.ckpt"
+resume_check_g: "chekpoint_from_huawei/AvG_12000.ckpt"
 ckpt_save_dir: "./checkpoint"
 eval_img_save_dir: "./eval_img"
-model_save_step: 10000
+model_save_step: 1000
 save_ckpt_from_device_with_id: 0
 #network
 scales: [4, 8, 16, 32, 64, 128]
@@ -33,7 +33,7 @@ num_batch: [48000, 96000, 96000, 96000, 96000, 96000]
 alpha_jumps: [0, 600, 600, 600, 600, 600]
 alpha_size_jumps: [32, 32, 32, 32, 32, 32]
 # optimizer and lr related
-lr: 0.001
+lr: 0.002
 lr_list: []
 # loss related
 loss_scale_value: 12
@@ -53,7 +53,7 @@ train_url: "Url for modelarts"
 data_path: "The location of the input data."
 output_path: "The location of the output file."
 device_target: 'Target device type'
-gpu_distribute_training: 'Use more then 1 device to train network. 1 - true, 0 - false. Used only for GPU'
+distributed_training: 'Use more then 1 device to train network. 1 - true, 0 - false. Used only for GPU'
 enable_profiling: 'Whether enable profiling while training, default: False'
 
 dataset_name: "the name of the dataset being used"  #unused

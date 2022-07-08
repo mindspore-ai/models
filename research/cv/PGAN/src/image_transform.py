@@ -14,6 +14,7 @@
 # ============================================================================
 """image transform"""
 import os
+
 import numpy as np
 from PIL import Image
 
@@ -34,6 +35,22 @@ class NumpyResize():
             img = Image.fromarray(img)
         np_image = np.array(img.resize(self.size, resample=Image.BILINEAR))
         return np_image
+
+
+class Crop():
+    """Crop"""
+    def __init__(self, cx=89, cy=121):
+        self.cx = cx
+        self.cy = cy
+
+    def __call__(self, img):
+        r"""
+        Args:
+            img (np array): image to be cropped
+        Returns:
+            np.Array: cropped image
+        """
+        return np.array(img)[self.cy - 64: self.cy + 64, self.cx - 64: self.cx + 64]
 
 
 class Resize():
