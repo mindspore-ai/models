@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,17 +15,19 @@
 
 """Export checkpoint into mindir or air for 310 inference."""
 import argparse
-import numpy as np
 
+import numpy as np
 from mindspore import Tensor, context, load_checkpoint, load_param_into_net, export
 
-from src.seg_hrnet_ocr import get_seg_model
 from src.config import config_hrnetv2_w48 as config
+from src.seg_hrnet_ocr import get_seg_model
 
 
 def main():
+    """Export process."""
     parser = argparse.ArgumentParser("OCRNet Semantic Segmentation exporting.")
     parser.add_argument("--device_id", type=int, default=0, help="Device ID. ")
+    parser.add_argument("--device_target", type=str, default="Ascend", help="Target device [Ascend, GPU]")
     parser.add_argument("--checkpoint_file", type=str, help="Checkpoint file path. ")
     parser.add_argument("--file_name", type=str, help="Output file name. ")
     parser.add_argument("--file_format", type=str, default="MINDIR",
@@ -33,7 +35,7 @@ def main():
 
     args = parser.parse_args()
 
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=args.device_id)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
 
     net = get_seg_model(config)
     params_dict = load_checkpoint(args.checkpoint_file)

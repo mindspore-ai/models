@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,34 +14,33 @@
 # ============================================================================
 
 """OCRNet training."""
-import os
-import ast
 import argparse
+import ast
+import os
+
 import numpy as np
-
-import mindspore.dataset as de
-from mindspore.common import set_seed
-from mindspore.context import ParallelMode
-from mindspore.communication.management import init
 from mindspore import context, Model
+from mindspore import dataset as de
+from mindspore.common import set_seed
+from mindspore.communication.management import init, get_rank, get_group_size
+from mindspore.context import ParallelMode
 from mindspore.nn import SGD
-from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.train.callback import LossMonitor, TimeMonitor, ModelCheckpoint, CheckpointConfig
+from mindspore.train.loss_scale_manager import FixedLossScaleManager
 
+from src.callback import EvalCallback
+from src.cityscapes import Cityscapes
 from src.config import config_hrnetv2_w48 as config
 from src.config import organize_configuration
-from src.cityscapes import Cityscapes
-from src.seg_hrnet_ocr import get_seg_model
 from src.loss import CrossEntropy
-from src.callback import EvalCallback
 from src.model_utils.moxing_adapter import moxing_wrapper
-
+from src.seg_hrnet_ocr import get_seg_model
 
 set_seed(1)
 de.config.set_seed(1)
 
 
-def eval_callback(network, cfg):
+def eval_callback(network, cfg, device_id=0):
     """Create an object for inference while training."""
     dataset = Cityscapes(cfg.data_path,
                          num_samples=None,
@@ -61,7 +60,8 @@ def eval_callback(network, cfg):
                                   num_parallel_workers=cfg.workers)
     data_vl = data_vl.batch(1, drop_remainder=True)
     eval_cb = EvalCallback(network, data_vl, cfg.dataset.num_classes,
-                           cfg.dataset.ignore_label, cfg.output_path, eval_interval=cfg.eval_interval)
+                           cfg.dataset.ignore_label, cfg.output_path, eval_interval=cfg.eval_interval,
+                           device_id=device_id)
     return eval_cb
 
 
@@ -69,7 +69,7 @@ def get_exp_lr(base_lr, xs, power=4e-10):
     """Get learning rates for each step."""
     ys = []
     for x in xs:
-        ys.append(base_lr / np.exp(power*x**2))
+        ys.append(base_lr / np.exp(power * x ** 2))
     return ys
 
 
@@ -79,6 +79,7 @@ def parse_args():
     parser.add_argument("--data_url", type=str, default=None, help="Storage path of dataset in OBS.")
     parser.add_argument("--train_url", type=str, default=None, help="Storage path of training results in OBS.")
     parser.add_argument("--data_path", type=str, default=None, help="Storage path of dataset on machine.")
+    parser.add_argument("--device_target", type=str, default="Ascend", help="Target device [Ascend, GPU]")
     parser.add_argument("--output_path", type=str, default=None, help="Storage path of training results on machine.")
     parser.add_argument("--checkpoint_url", type=str, default=None,
                         help="Storage path of checkpoint for pretraining or resuming in OBS.")
@@ -111,8 +112,8 @@ def main():
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
     if config.run_distribute:
         init()
-        device_id = int(os.getenv("DEVICE_ID"))
-        device_num = int(os.getenv("RANK_SIZE"))
+        device_id = int(os.getenv("DEVICE_ID")) if config.device_target == "Ascend" else get_rank()
+        device_num = int(os.getenv("RANK_SIZE")) if config.device_target == "Ascend" else get_group_size()
         parallel_mode = ParallelMode.DATA_PARALLEL
         context.set_auto_parallel_context(parallel_mode=parallel_mode,
                                           gradients_mean=True,
@@ -165,7 +166,8 @@ def main():
     lr = get_exp_lr(config.lr, xs, power=config.lr_power)
     lr = lr[begin_step: end_step]
     # Optimizer
-    opt = SGD(filter(lambda x: x.requires_grad, net.get_parameters()),
+    params = [{'params': net.trainable_params()}]
+    opt = SGD(params,
               lr,
               config.train.opt_momentum,
               config.train.wd)
@@ -175,17 +177,17 @@ def main():
                   keep_batchnorm_fp32=False)
     # Callbacks
     time_cb = TimeMonitor(data_size=steps_per_epoch)
-    loss_cb = LossMonitor()
+    loss_cb = LossMonitor(per_print_times=steps_per_epoch)
     # Save-checkpoint callback
     ckpt_config = CheckpointConfig(save_checkpoint_steps=steps_per_epoch * config.save_checkpoint_epochs,
                                    keep_checkpoint_max=config.keep_checkpoint_max)
     ckpt_cb = ModelCheckpoint(prefix='{}'.format("seg_OCRNet-SGD"),
-                              directory=config.output_path+"/card" + str(device_id),
+                              directory=config.output_path + "/card" + str(device_id),
                               config=ckpt_config)
     cb = [time_cb, loss_cb, ckpt_cb]
     # Self-defined callbacks
-    if config.eval_callback:
-        eval_cb = eval_callback(net, config)
+    if config.eval_callback and device_id == 0:
+        eval_cb = eval_callback(net, config, device_id)
         cb.append(eval_cb)
 
     train_epoch = config.end_epoch - config.begin_epoch

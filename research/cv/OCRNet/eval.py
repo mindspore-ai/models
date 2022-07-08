@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,20 +14,20 @@
 # ============================================================================
 
 """OCRNet inference."""
-import ast
 import argparse
-import numpy as np
+import ast
 
-import mindspore.ops as P
-import mindspore.dataset.engine as de
+import numpy as np
 from mindspore import context, DatasetHelper
+from mindspore import ops as P
+from mindspore.dataset import engine as de
 from mindspore.train.serialization import load_param_into_net, load_checkpoint
 
-from src.seg_hrnet_ocr import get_seg_model
 from src.cityscapes import Cityscapes
 from src.config import config_hrnetv2_w48 as config
 from src.config import organize_configuration
 from src.model_utils.moxing_adapter import moxing_wrapper
+from src.seg_hrnet_ocr import get_seg_model
 
 
 def parse_args():
@@ -41,10 +41,13 @@ def parse_args():
                         help="Storage path of evaluation results in OBS. It's useless here.")
     parser.add_argument("--data_path", type=str, default=None,
                         help="Storage path of dataset in OBS.")
+    parser.add_argument("--device_target", type=str, default=None, help="Target device [Ascend, GPU]")
     parser.add_argument("--output_path", type=str, default=None,
                         help="Storage path of evaluation results on machine. It's useless here.")
     parser.add_argument("--modelarts", type=ast.literal_eval, default=False,
                         help="Run online or offline.")
+    parser.add_argument("--flip_eval", type=ast.literal_eval, default=False,
+                        help="Add result for flipped image.")
     parser.add_argument("--checkpoint_url", type=str,
                         help="Storage path of checkpoint file in OBS.")
     parser.add_argument("--checkpoint_path", type=str,
@@ -56,7 +59,7 @@ def get_confusion_matrix(label, pred, shape, num_class, ignore=-1):
     """
     Calcute the confusion matrix by given label and pred.
     """
-    output = pred.asnumpy().transpose(0, 2, 3, 1)   # NCHW -> NHWC
+    output = pred.asnumpy().transpose(0, 2, 3, 1)  # NCHW -> NHWC
     seg_pred = np.asarray(np.argmax(output, axis=3), dtype=np.uint8)
     seg_gt = np.asarray(label.asnumpy()[:, :shape[-2], :shape[-1]], dtype=np.int32)
 
@@ -84,14 +87,14 @@ def testval(dataset, helper, model, num_classes=19, ignore_label=255, scales=Non
     count = 0
     for batch in helper:
         print("=====> Image: ", count)
-        image, label = batch    # NCHW, NHW
+        image, label = batch  # NCHW, NHW
         shape = label.shape
         pred = dataset.multi_scale_inference(model, image,
                                              scales=scales,
                                              flip=flip)
 
         if pred.shape[-2] != shape[-2] or pred.shape[-1] != shape[-1]:
-            pred = P.ResizeBilinear((shape[-2], shape[-1]))(pred)       # Tensor
+            pred = P.ResizeBilinear((shape[-2], shape[-1]))(pred)  # Tensor
 
         confusion_matrix += get_confusion_matrix(label, pred, shape, num_classes, ignore_label)
         count += 1
@@ -100,12 +103,10 @@ def testval(dataset, helper, model, num_classes=19, ignore_label=255, scales=Non
     pos = confusion_matrix.sum(1)
     res = confusion_matrix.sum(0)
     tp = np.diag(confusion_matrix)
-    # pixel_acc = tp.sum() / pos.sum()
-    # mean_acc = (tp / np.maximum(1.0, pos)).mean()
-    IoU_array = (tp / np.maximum(1.0, pos + res - tp))
-    mean_IoU = IoU_array.mean()
+    iou_array = (tp / np.maximum(1.0, pos + res - tp))
+    mean_iou = iou_array.mean()
 
-    return mean_IoU, IoU_array
+    return mean_iou, iou_array
 
 
 @moxing_wrapper(config)
@@ -139,18 +140,19 @@ def main():
     helper = DatasetHelper(dataset, dataset_sink_mode=False)
 
     # Calculate results
-    mean_IoU, IoU_array = testval(ori_dataset, helper, net,
+    mean_iou, iou_array = testval(ori_dataset, helper, net,
                                   num_classes=config.dataset.num_classes,
                                   ignore_label=config.dataset.ignore_label,
                                   scales=config.eval.scale_list, flip=config.eval.flip)
     # Show results
     print("=========== Validation Result ===========")
-    print("===> mIoU:", mean_IoU)
-    print("===> IoU array: \n", IoU_array)
+    print("===> mIoU:", mean_iou)
+    print("===> IoU array: \n", iou_array)
     print("=========================================")
 
 
 if __name__ == '__main__':
     args = parse_args()
     organize_configuration(cfg=config, args=args)
+    config.eval.flip = args.flip_eval
     main()
