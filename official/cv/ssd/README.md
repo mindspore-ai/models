@@ -291,11 +291,14 @@ Then you can run everything just like on ascend.
     "save_best_ckpt": True                           # Save best checkpoint when run_eval is True
     "eval_start_epoch": 40                           # Evaluation start epoch when run_eval is True
     "eval_interval": 1                               # valuation interval when run_eval is True
+    "data_path": "your_path/data"                    # your_path represents absolute path
+    "output_path": "your_path/data/train"            # your_path represents absolute path
+    "load_path": "your_path/data/checkpoint"         # your_path represents absolute path
 
     "class_num": 81                                  # Dataset class number
-    "img_shape": [300, 300]                        # Image height and width used as input to the model
+    "img_shape": [300, 300]                          # Image height and width used as input to the model
     "mindrecord_dir": "/data/MindRecord_COCO"        # MindRecord path
-    "coco_root": "/data/coco2017"                    # COCO2017 dataset path
+    "coco_root": "your_path/cocodataset"             # COCO2017 dataset path
     "voc_root": "/data/voc_dataset"                  # VOC original dataset path
     "voc_json": "annotations/voc_instances_val.json" # is the path of json file with coco format for evaluation
     "image_dir": ""                                  # Other dataset image path, if coco or voc used, it will be useless
@@ -483,6 +486,12 @@ mAP: 0.2244936111705981
   bash scripts/run_eval_onnx.sh <DATA_DIR> <COCO_SUBDIR> <ONNX_MODEL_PATH> [<INSTANCES_SET>] [<DEVICE_TARGET>] [<CONFIG_PATH>]
   ```
 
+We need three parameters for this scripts.
+
+- `DATA_DIR`：mindspore evaluation generate the data path.
+- `COCO_SUBDIR`: COCO2017 dataset path.
+- `ONNX_MODEL_PATH`: ONNX model path.
+
   Results will be saved in eval.log and have the following form:
 
   ```log
@@ -503,16 +512,16 @@ mAP: 0.2244936111705981
 
 ## Inference Process
 
-### [Export MindIR](#contents)
+### [Export Model](#contents)
 
-Export MindIR on local
+Export Model on local
 
 ```shell
 python export.py --checkpoint_file_path [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [CONFIG_PATH]
 ```
 
 The ckpt_file parameter is required,
-`FILE_FORMAT` should be in ["AIR", "MINDIR"]
+`FILE_FORMAT` should be in ["AIR", "MINDIR", "ONNX"]
 
 Export on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start as follows)
 

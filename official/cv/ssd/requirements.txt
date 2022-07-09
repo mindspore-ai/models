@@ -1,4 +1,5 @@
 pycocotools >= 2.0.1
+Cython
 opencv-python
 xml-python
 Pillow
