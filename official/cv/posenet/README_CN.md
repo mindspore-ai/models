@@ -16,6 +16,7 @@
         - [分布式训练](#分布式训练)
     - [评估过程](#评估过程)
         - [评估](#评估)
+        - [ONNX评估](#ONNX评估)
     - [导出过程](#导出过程)
         - [导出](#导出)
     - [推理过程](#推理过程)
@@ -129,6 +130,7 @@ PoseNet是剑桥大学提出的一种鲁棒、实时的6DOF（单目六自由度
         │   ├──run_standalone_train_gpu.sh          // 单机到GPU的shell脚本
         │   ├──run_distribute_train_gpu.sh         // 分布式到GPU的shell脚本
         │   ├──run_eval_gpu.sh              // GPU评估的shell脚本
+        │   ├──run_eval_onnx_gpu.sh              // GPU评估onnx的shell脚本
         ├── src
         │   ├──dataset.py             // 数据集转换成mindrecord格式，创建数据集及数据预处理
         │   ├──posenet.py            // posenet架构
@@ -136,6 +138,7 @@ PoseNet是剑桥大学提出的一种鲁棒、实时的6DOF（单目六自由度
         │   ├──config.py            // 参数配置
         ├── train.py               // 训练脚本
         ├── eval.py               // 评估脚本
+        ├── eval_onnx.py               // onnx评估脚本
         ├── export.py               // 将checkpoint文件导出到mindir下
 ```
 
@@ -281,17 +284,42 @@ PoseNet是剑桥大学提出的一种鲁棒、实时的6DOF（单目六自由度
   Median error  3.56644630432129 m  and  3.07089155413442 degrees
   ```
 
+### ONNX评估
+
+  在GPU环境运行时评估KingsCollege数据集
+
+  评估所需ckpt获取地址：[获取地址](https://www.mindspore.cn/resources/hub/details?MindSpore/1.7/posenet_kingscollege)
+
+  在执行评估之前，需要通过export.py导出onnx文件。
+
+  '''python
+  python export.py --ckpt_url [CKPT_URL] --dataset [DATASET] --file_format ONNX
+  '''
+
+  在运行以下命令之前，请检查用于评估的检查点路径。
+  请将检查点路径设置为相对路径，例如“../checkpoint/posenet_ascend_v170_kingscollege_official_cv_2.2m_3.44d.ckpt”。
+
+  ```bash
+  bash run_eval_onnx_gpu.sh [DEVICE_ID] [DATASET_NAME] [CKPT_PATH]
+  ```
+
+  上述python命令将在后台运行，您可以通过eval_onnx/eval_onnx.log文件查看结果。测试数据集的准确性如下：
+
+  ```bash
+  Median error  2.196361780166626 m  and  3.4336043976571102 degrees
+  ```
+
 ## 导出过程
 
 ### 导出
 
-在执行推理之前，需要通过export.py导出MINDIR/AIR模型。
+在执行推理之前，需要通过export.py导出MINDIR/AIR模型/ONNX模型。
 
 ```shell
 python export.py --ckpt_url [CKPT_URL] --dataset [DATASET] --file_format [FILE_FORMAT]
 ```
 
-CKPT_URL和DATASET为必填项, FILE_FORMAT默认为MINDIR，可配值MINDIR或AIR.
+CKPT_URL和DATASET为必填项, FILE_FORMAT默认为MINDIR，可配值MINDIR或AIR或ONNX.
 
 ## 推理过程
 
