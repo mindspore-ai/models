@@ -830,6 +830,26 @@ cd ./golden_stick/scripts/
 bash run_distribute_train_gpu.sh ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml /path/to/dataset FP32 /path/to/fp32_ckpt
 ```
 
+### Ascend处理器环境运行
+
+```text
+# 分布式训练
+cd ./golden_stick/scripts/
+# PYTHON_PATH 表示需要应用的算法的'train.py'脚本所在的目录。
+bash run_distribute_train.sh [RANK_TABLE_FILE] [PYTHON_PATH] [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)
+
+# 分布式训练示例(SCOP算法使用多卡训练)
+bash run_standalone_train.sh /path/to/rank_table_file ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml /path/to/dataset
+
+# 单机训练
+cd ./golden_stick/scripts/
+# PYTHON_PATH 表示需要应用的算法的'train.py'脚本所在的目录。
+bash run_standalone_train.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CKPT_TYPE](optional) [CKPT_PATH](optional)
+
+# 单机训练示例(SCOP算法使用单卡训练)
+bash run_standalone_train_ascend.sh ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml /path/to/dataset
+```
+
 ## 评估过程
 
 ### GPU处理器环境运行
@@ -850,9 +870,26 @@ bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cif
 bash run_eval_gpu.sh ../quantization/slb/ ../quantization/slb/resnet18_cifar10_config.yaml /path/to/dataset /path/to/ckpt
 ```
 
+### Ascend处理器环境运行
+
+```text
+# 评估
+cd ./golden_stick/scripts/
+# PYTHON_PATH 表示需要应用的算法的'eval.py'脚本所在的目录。
+bash run_eval_ascend.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CHECKPOINT_PATH]
+```
+
+```text
+# 评估示例
+cd ./golden_stick/scripts/
+bash run_eval_gpu.sh ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml /path/to/dataset /path/to/ckpt
+```
+
 ### 结果
 
 评估结果保存在示例路径中，文件夹名为“eval”。您可在此路径下的日志找到如下结果：
+
+#### GPU结果
 
 - 使用SimQAT算法量化ResNet50，并使用CIFAR-10数据集评估：
 
@@ -882,6 +919,14 @@ result:{'top_1_accuracy': 0.9503205128205128, 'top_5_accuracy': 0.99669471153846
 
 ```text
 result:{'top_1_accuracy': 0.9485176282051282, 'top_5_accuracy': 0.9965945512820513} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+```
+
+#### Ascend结果
+
+- 使用SCOP算法剪枝ResNet50，并使用CIFAR-10数据集评估：
+
+```text
+result:{'top_1_accuracy': 0.928385416666666} prune_rate=0.45 ckpt=~/resnet50_cifar10/train_parallel0/resnet-400_195.ckpt
 ```
 
 # 模型描述
