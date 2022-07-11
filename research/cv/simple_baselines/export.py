@@ -31,7 +31,7 @@ parser.add_argument("--device_id", type=int, default=0, help="Device id")
 parser.add_argument("--ckpt_url", default="/home/dataset/coco/multi_train_poseresnet_commit_0-140_292.ckpt",
                     help="Checkpoint file path.")
 parser.add_argument("--file_name", type=str, default="simple_baselines", help="output file name.")
-parser.add_argument('--file_format', type=str, choices=["MINDIR"], default='MINDIR', help='file format')
+parser.add_argument('--file_format', type=str, choices=["MINDIR", "ONNX"], default='MINDIR', help='file format')
 args = parser.parse_args()
 
 if __name__ == '__main__':
