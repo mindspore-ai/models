@@ -16,7 +16,7 @@
 
 CURPATH="$(dirname "$0")"
 
-if [ $# != 4 ] && [ $# != 5 ]
+if [ $# != 4 ] && [ $# != 6 ]
 then
   echo "Usage: bash run_distribute_train.sh [RANK_TABLE_FILE] [PYTHON_PATH] [CONFIG_PATH] [DATASET_PATH] [CKPT_TYPE](optional) [CKPT_PATH](optional)"
   exit 1
@@ -41,10 +41,6 @@ then
     exit 1
 fi
 
-if [ $# == 5 ]
-then
-  PATH3=$(get_real_path $5)
-fi
 
 if [ ! -f $PATH1 ]
 then 
@@ -58,34 +54,18 @@ then
 exit 1
 fi 
 
-if [ $# == 5 ] && [ ! -f $PATH3 ]
-then
-    echo "error: FP32_CKPT=$PATH3 is not a file"
-exit 1
-fi
-if [ $# == 5 ]; then
-  CKPT_TYPE=$4
-  CKPT_FILE=$(get_real_path $5)
+if [ $# == 6 ]; then
+  CKPT_TYPE=$5
+  CKPT_FILE=$(get_real_path $6)
 
   if [ "x$CKPT_TYPE" != "xFP32" ] && [ "x$CKPT_TYPE" != "xPRETRAINED" ]; then
       echo "error: CKPT_TYPE=$CKPT_TYPE is not valid, should be FP32 or PRETRAINED"
       exit 1
   fi
   if [ ! -f $CKPT_FILE ]; then
-      echo "error: CKPT_FILE=$CKPT_FILE is not a file"
+      echo "error: CKPT_PATH=$CKPT_FILE is not a file"
       exit 1
   fi
-fi
-
-if [ "x${RUN_EVAL}" == "xTrue" ] && [ ! -d $EVAL_DATASET_PATH ]
-then
-  echo "error: EVAL_DATASET_PATH=$EVAL_DATASET_PATH is not a directory"
-  exit 1
-fi
-
-if [ "x${RUN_EVAL}" == "xTrue" ]
-then
-  bootup_cache_server
 fi
 
 ulimit -u unlimited
