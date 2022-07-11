@@ -18,11 +18,9 @@ import math
 import re
 from copy import deepcopy
 
-import mindspore as ms
 from mindspore import nn
 from mindspore.common.initializer import (Normal, One, Uniform, Zero)
 from mindspore.ops import operations as P
-from mindspore.ops.composite import clip_by_value
 
 relu = P.ReLU()
 sigmoid = P.Sigmoid()
@@ -343,14 +341,6 @@ def _decode_arch_def(arch_def, depth_multiplier=1.0, depth_trunc='ceil'):
             repeats.append(rep)
         arch_args.append(_scale_stage_depth(stack_args, repeats, depth_multiplier, depth_trunc))
     return arch_args
-
-
-def hard_swish(x):
-    x = P.Cast()(x, ms.float32)
-    y = x + 3.0
-    y = clip_by_value(y, 0.0, 6.0)
-    y = y / 6.0
-    return x * y
 
 
 class BlockBuilder(nn.Cell):
@@ -702,7 +692,7 @@ def _gen_efficientnet(channel_multiplier=1.0, depth_multiplier=1.0, num_classes=
         channel_multiplier=channel_multiplier,
         num_features=num_features,
         bn_args=_resolve_bn_args(kwargs),
-        act_fn=hard_swish,
+        act_fn=nn.HSwish(),
         **kwargs
     )
     return model
