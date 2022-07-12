@@ -684,6 +684,8 @@ In run_general_distill.py, we set the random seed to make sure distribute traini
 
 If accuracy < standard, may be scipy version < 1.7.
 
+if this error occurs, `connect p2p timeout, timeout: 120s.`, please add `export HCCL_CONNECT_TIMEOUT=600` in shell to resolve it.
+
 # [ModelZoo Homepage](#contents)
 
 Please check the official [homepage](https://gitee.com/mindspore/models).
