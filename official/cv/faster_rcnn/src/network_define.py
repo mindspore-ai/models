@@ -145,19 +145,14 @@ class TrainOneStepCell(nn.TrainOneStepWithLossScaleCell):
         loss = self.network(x, img_shape, gt_bboxe, gt_label, gt_num)
         scaling_sens = self.scale_sense
 
-        status, scaling_sens = self.start_overflow_check(loss, scaling_sens)
+        _, scaling_sens = self.start_overflow_check(loss, scaling_sens)
 
         scaling_sens_filled = ops.ones_like(loss) * ops.cast(scaling_sens, ops.dtype(loss))
         grads = self.grad(self.network, weights)(x, img_shape, gt_bboxe, gt_label, gt_num, scaling_sens_filled)
         grads = self.hyper_map(ops.partial(_grad_scale, scaling_sens), grads)
         # apply grad reducer on grads
         grads = self.grad_reducer(grads)
-        # get the overflow buffer
-        cond = self.get_overflow_status(status, grads)
-        overflow = self.process_loss_scale(cond)
         if self.grad_clip:
             grads = ops.clip_by_global_norm(grads)
-        # if there is no overflow, do optimize
-        if not overflow:
-            loss = ops.depend(loss, self.optimizer(grads))
+        loss = ops.depend(loss, self.optimizer(grads))
         return loss
