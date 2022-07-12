@@ -57,38 +57,31 @@ class PINNs_training_set:
         self.X_f = self.lb + (self.ub-self.lb)*lhs(2, self.Nf)
 
     def __getitem__(self, index):
+        box_0 = np.ones((self.N0, 1), np.float32)
+        box_b = np.ones((self.Nb, 1), np.float32)
+        box_f = np.ones((self.Nf, 1), np.float32)
 
-        if index < self.N0:  # N0 initial points
-            x = np.array([self.x0[index][0]], np.float32)
-            t = np.array([0], np.float32)
-            u_target = np.array(self.u0[index], np.float32)
-            v_target = np.array(self.v0[index], np.float32)
-
-        elif self.N0 <= index < self.N0+self.Nb: # Nb lower bound points
-            ind = index - self.N0
-            x = np.array([self.lb[0]], np.float32)
-            t = np.array([self.tb[ind][0]], np.float32)
-            u_target = np.array([self.ub[0]], np.float32)
-            v_target = t
-
-        elif self.N0+self.Nb <= index < self.N0+2*self.Nb: # Nb upper bound points
-            ind = index - self.N0 - self.Nb
-            x = np.array([self.ub[0]], np.float32)
-            t = np.array([self.tb[ind][0]], np.float32)
-            u_target = np.array([self.lb[0]], np.float32)
-            v_target = t
-
-        else: # Nf collocation points
-            ind = index - self.N0 - 2*self.Nb
-            x = np.array(self.X_f[ind, 0:1], np.float32)
-            t = np.array(self.X_f[ind, 1:2], np.float32)
-            u_target = np.array([0], np.float32)
-            v_target = np.array([0], np.float32)
+        x = np.vstack((self.x0.astype(np.float32),
+                       self.lb[0].astype(np.float32) * box_b,
+                       self.ub[0].astype(np.float32) * box_b,
+                       self.X_f[:, 0:1].astype(np.float32)))
+        t = np.vstack((np.array([0], np.float32) * box_0,
+                       self.tb.astype(np.float32),
+                       self.tb.astype(np.float32),
+                       self.X_f[:, 1:2].astype(np.float32)))
+        u_target = np.vstack((self.u0.astype(np.float32),
+                              self.ub[0].astype(np.float32) * box_b,
+                              self.lb[0].astype(np.float32) * box_b,
+                              np.array([0], np.float32) * box_f))
+        v_target = np.vstack((self.v0.astype(np.float32),
+                              self.tb.astype(np.float32),
+                              self.tb.astype(np.float32),
+                              np.array([0], np.float32) * box_f))
 
         return np.hstack((x, t)), np.hstack((u_target, v_target))
 
     def __len__(self):
-        return self.N0+2*self.Nb+self.Nf
+        return 1
 
 
 def generate_PINNs_training_set(N0, Nb, Nf, lb, ub, path='./Data/NLS.mat'):
@@ -98,8 +91,8 @@ def generate_PINNs_training_set(N0, Nb, Nf, lb, ub, path='./Data/NLS.mat'):
     Args: see class PINNs_train_set
     """
     s = PINNs_training_set(N0, Nb, Nf, lb, ub, path)
-    dataset = ds.GeneratorDataset(source=s, column_names=['data', 'label'], shuffle=False)
-    dataset = dataset.batch(batch_size=len(s))
+    dataset = ds.GeneratorDataset(source=s, column_names=['data', 'label'], shuffle=False,
+                                  python_multiprocessing=True)
     return dataset
 
 
