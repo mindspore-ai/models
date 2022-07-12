@@ -257,16 +257,6 @@ def train_net():
 
     net_train_step = nn.TrainOneStepCell(net_with_loss, optimizer)
     if config.pre_trained:
-        for _, (_, module) in enumerate(model.cells_and_names()):
-            if isinstance(module, KfConv2d):
-                module.score = module.bn.gamma.data.abs() * ops.Squeeze()(
-                    module.kfscale.data - (1 - module.kfscale.data))
-                module.prune_rate = config.prune_rate
-        for _, (_, module) in enumerate(model.cells_and_names()):
-            if isinstance(module, KfConv2d):
-                _, index = ops.Sort()(module.score)
-                num_pruned_channel = int(module.prune_rate * module.score.shape[0])
-                module.out_index = index[num_pruned_channel:]
         for param in model.get_parameters():
             param.requires_grad = True
         train_ft(model, dataset)
@@ -304,15 +294,9 @@ def train_kf(dataset, net_train_step, model, kfconv_list, kfscale_list):
 
     for param in model.get_parameters():
         param.requires_grad = True
-    for kfscale in kfscale_list[10]:
-        print(ops.Squeeze()(kfscale).asnumpy())
-    for kfscale_last in kfscale_list:
-        print(ops.Squeeze()(kfscale_last[-1]).asnumpy())
-
     for _, (_, module) in enumerate(model.cells_and_names()):
         if isinstance(module, KfConv2d):
             module.score = module.bn.gamma.data.abs() * ops.Squeeze()(module.kfscale.data - (1 - module.kfscale.data))
-
     for kfconv in kfconv_list:
         kfconv.prune_rate = config.prune_rate
     for _, (_, module) in enumerate(model.cells_and_names()):
@@ -326,10 +310,20 @@ def train_kf(dataset, net_train_step, model, kfconv_list, kfscale_list):
 def train_ft(model, dataset):
     """train finetune."""
     algo_ft = PrunerFtCompressAlgo({})
-    model = algo_ft.apply(model)
     if config.pre_trained:
         pre_ckpt = ms.load_checkpoint(config.pre_trained)
+        out_index = []
+        param_dict = ms.load_checkpoint(config.checkpoint_file_path)
+        for key in param_dict.keys():
+            if 'out_index' in key:
+                out_index.append(param_dict[key])
+        for _, (_, module) in enumerate(model.cells_and_names()):
+            if isinstance(module, KfConv2d):
+                module.out_index = out_index.pop(0)
+        model = algo_ft.apply(model)
         ms.load_param_into_net(model, pre_ckpt)
+    else:
+        model = algo_ft.apply(model)
     lr_ft_new = ms.Tensor(get_lr(lr_init=config.lr_init,
                                  lr_end=config.lr_end_ft,
                                  lr_max=config.lr_max_ft,

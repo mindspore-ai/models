@@ -14,9 +14,11 @@
 # ============================================================================
 """eval resnet."""
 import os
+import numpy as np
 import mindspore as ms
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 from mindspore_gs import PrunerKfCompressAlgo, PrunerFtCompressAlgo
+from mindspore_gs.pruner.scop.scop_pruner import KfConv2d, MaskedConv2dbn
 from src.CrossEntropySmooth import CrossEntropySmooth
 from src.resnet import resnet50 as resnet
 from src.model_utils.config import config
@@ -46,10 +48,17 @@ def eval_net():
     # define net
     net = resnet(class_num=config.class_num)
     net = PrunerKfCompressAlgo({}).apply(net)
+    out_index = []
+    param_dict = ms.load_checkpoint(config.checkpoint_file_path)
+    for key in param_dict.keys():
+        if 'out_index' in key:
+            out_index.append(param_dict[key])
+    for _, (_, module) in enumerate(net.cells_and_names()):
+        if isinstance(module, KfConv2d):
+            module.out_index = out_index.pop(0)
     net = PrunerFtCompressAlgo({}).apply(net)
 
     # load checkpoint
-    param_dict = ms.load_checkpoint(config.checkpoint_file_path)
     ms.load_param_into_net(net, param_dict)
     net.set_train(False)
 
@@ -68,7 +77,24 @@ def eval_net():
 
     # eval model
     res = model.eval(dataset)
-    print("result:", res, "prune_rate=", config.prune_rate, "ckpt=", config.checkpoint_file_path)
+    masked_conv_list = []
+    for imd, (nam, module) in enumerate(net.cells_and_names()):
+        if isinstance(module, MaskedConv2dbn):
+            masked_conv_list.append((nam, module))
+    for imd in range(len(masked_conv_list)):
+        if 'conv2' in masked_conv_list[imd][0] or 'conv3' in masked_conv_list[imd][0]:
+            masked_conv_list[imd][1].in_index = masked_conv_list[imd - 1][1].out_index
+
+    # Only use when calculate params, next version will provide the interface.
+    net = PrunerFtCompressAlgo({})._pruning_conv(net)
+
+    # calculate params
+    total_params = 0
+    for param in net.trainable_params():
+        total_params += np.prod(param.shape)
+
+    print("result:", res, "prune_rate=", config.prune_rate,
+          "ckpt=", config.checkpoint_file_path, "params=", total_params)
 
 
 if __name__ == '__main__':
