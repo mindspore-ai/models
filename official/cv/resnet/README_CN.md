@@ -453,16 +453,20 @@ bash run_parameter_server_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_
 
 ```bash
 # Ascend 分布式训练时推理示例:
+cd scripts/
 bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
 
 # Ascend 单机训练时推理示例:
-bash run_standalone_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
+cd scripts/
+bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
 
 # GPU 分布式训练时推理示例:
-bash run_distribute_train_gpu.sh [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
+cd scripts/
+bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
 
 # GPU 单机训练时推理示例:
-bash run_standalone_train_gpu.sh [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
+cd scripts/
+bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
 ```
 
 训练时推理需要在设置`RUN_EVAL`为True，与此同时还需要设置`EVAL_DATASET_PATH`。此外，当设置`RUN_EVAL`为True时还可为python脚本设置`save_best_ckpt`, `eval_start_epoch`, `eval_interval`等参数。
