@@ -1,0 +1,93 @@
+# training params
+batch_size: 16
+epochs: 30
+learning_rate: 0.01  # 1P training
+backbone_lr_mult: 100
+lr_decay: 0.1
+milestones: [20, 26]
+input_size: 320
+
+# validation params
+img_size: [1080, 1620]
+
+# model params
+width_mult: 1.0
+output_stride: 32
+decoder_kernel_size: 5
+conv_operator: 'std_conv'
+apply_aspp: True
+use_context: True
+use_nonlinear: True
+
+# backbone params (mobilenetv2)
+rate: 1
+current_stride: 1
+# expand_ratio, input_chn, output_chn, num_blocks, stride, dilation
+inverted_residual_setting: [
+    [1, 32, 16, 1, 1, 1],
+    [6, 16, 24, 2, 2, 1],
+    [6, 24, 32, 3, 2, 1],
+    [6, 32, 64, 4, 2, 1],
+    [6, 64, 96, 3, 1, 1],
+    [6, 96, 160, 3, 2, 1],
+    [6, 160, 320, 1, 1, 1],
+]
+
+# data processing params
+num_bgs_train: 96
+num_bgs_val: 20
+
+# data normalization params
+img_scale: 255
+scales: [1, 1.5, 2]
+img_std: [0.229, 0.224, 0.225, 1]
+img_mean: [0.485, 0.456, 0.406, 0]
+
+# other
+data_dir: '/path/to/matting/dataset/'
+bg_dir: '/path/to/coco/backgrounds/'
+ckpt_url: '/path/to/checkpoint/'
+logs_dir: 'logs'
+device_target: 'GPU'
+device_id: 0
+device_start: 0
+keep_checkpoint_max: 10
+is_distributed: False
+num_workers: 12
+
+---
+# Config description for each option
+batch_size: "Batch size for training."
+epochs: "Number of training epochs."
+learning_rate: "Learning rate init."
+backbone_lr_mult: "Learning rate scaling (division) for backbone params."
+lr_decay: "Learning rate scaling at milestone."
+milestones: "Milestones for learning rate scheduler."
+input_size: "Input crop size for training."
+img_size: "Validation input image size."
+width_mult: "Hidden layers ratio."
+output_stride: "Output image stride."
+decoder_kernel_size: "Decoder conv kernel size."
+conv_operator: "Conv operator for decoder."
+apply_aspp: "Use ASPP."
+use_context: "Use context in index blocks."
+use_nonlinear: "Use nonlinear in index blocks."
+rate: "Encoder (mobilenetv2) rate."
+current_stride: "Encoder (mobilenetv2) stride."
+inverted_residual_setting: "Encoder (mobilenetv2) settings."
+num_bgs_train: "Number of backgrounds to merge with foreground (for processing train part)."
+num_bgs_val: "Number of backgrounds to merge with foreground (for processing validation part)."
+img_scale: "Image scaling value."
+scales: "Scales for cropping."
+img_std: "Std to every channel for image normalization."
+img_mean: "Mean to every channel for image normalization."
+data_dir: "Image matting dataset dir."
+bg_dir: "COCO dataset train part dir."
+ckpt_url: "Checkpoint url (and url for pretrained)."
+logs_dir: "Output logs dir."
+device_target: "Target device platform."
+device_id: "Device id of the target platform."
+device_start: "Main device for distribute training."
+keep_checkpoint_max: "Save last N checkpoints during train."
+is_distributed: "Run distribute train or not."
+num_workers: "Number of the parallel CPU workers for dataloader."
