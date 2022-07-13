@@ -840,10 +840,10 @@ bash run_distribute_train_gpu.sh ../pruner/scop/ ../pruner/scop/resnet50_cifar10
 # 分布式训练
 cd ./golden_stick/scripts/
 # PYTHON_PATH 表示需要应用的算法的'train.py'脚本所在的目录。
-bash run_distribute_train.sh [RANK_TABLE_FILE] [PYTHON_PATH] [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_PATH](optional)
+bash run_distribute_train.sh [RANK_TABLE_FILE] [PYTHON_PATH] [CONFIG_PATH] [DATASET_PATH] [CKPT_TYPE](optional) [CKPT_PATH](optional)
 
 # 分布式训练示例(SCOP算法使用多卡训练)
-bash run_standalone_train.sh /path/to/rank_table_file ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml /path/to/dataset
+bash run_distribute_train.sh /path/to/rank_table_file ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml /path/to/dataset
 
 # 单机训练
 cd ./golden_stick/scripts/
