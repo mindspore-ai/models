@@ -151,6 +151,8 @@ GPT-2脚本及代码结构如下：
 
 `python read_weight_tf.py --ckpt_file_path=/{path}/model.ckpt`
 
+> tf模型以model.ckpt开头的有３个文件，分别为.data，.index，.meta文件，此处传参为model.ckpt，而不是任何一个其中的单独文件
+
 - 在mindspore的环境下，运行`save_weight_ms.py`，示例代码如下：
 
 `python save_weight_ms.py --output_file_name="mindspore_gpt2_small.ckpt"`

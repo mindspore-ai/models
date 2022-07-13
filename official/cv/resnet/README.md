@@ -482,15 +482,19 @@ bash run_parameter_server_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_
 
 ```bash
 # evaluation with distributed training Ascend example:
+cd scripts/
 bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
 
 # evaluation with standalone training Ascend example:
-bash run_standalone_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
+cd scripts/
+bash run_standalone_train.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
 
 # evaluation with distributed training GPU example:
+cd scripts/
 bash run_distribute_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
 
 # evaluation with standalone training GPU example:
+cd scripts/
 bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optional) [EVAL_DATASET_PATH](optional)
 ```
 
