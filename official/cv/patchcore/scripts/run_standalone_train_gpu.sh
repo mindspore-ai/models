@@ -14,12 +14,12 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 3 ]
+if [ $# != 4 ]
 then
     echo "=============================================================================================================="
     echo "Please run the script as: "
-    echo "bash run_all_mvtec.sh DATA_PATH DEVICE_ID PRETRAINED_PATH CATEGORY"
-    echo "For example: bash run_all_mvtec.sh /path/dataset /path/pretrained_path 0"
+    echo "bash run_standalone_train_gpu.sh DATA_PATH PRETRAINED_PATH DEVICE_ID CATEGORY"
+    echo "For example: bash run_standalone_train_gpu.sh /path/dataset /path/pretrained_path 0 category"
     echo "It is better to use the absolute path."
     echo "=============================================================================================================="
 exit 1
@@ -30,23 +30,35 @@ get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
     echo "$1"
   else
-    echo "$(realpath -m $PWD/$1)"
+    realpath -m "$PWD"/"$1"
   fi
 }
-DATA_PATH=$(get_real_path $1)
-CKPT_APTH=$(get_real_path $2)
-export DATA_PATH=$DATA_PATH
+DATA_PATH=$(get_real_path "$1")
+CKPT_PATH=$(get_real_path "$2")
 
-arr=("bottle" "cable" "capsule" "capsule" "carpet" "grid" "hazelnut" "leather" "metal_nut" "pill" "screw" "tile" "toothbrush" "transistor" "wood" "zipper")
+train_path=train_$3
+if [ -d "$train_path" ];
+then
+    rm -rf ./"$train_path"
+fi
+mkdir ./"$train_path"
+cd ./"$train_path"
+env > env0.log
+echo "[INFO] start train dataset $4."
+python ../../train.py \
+      --dataset_path "$DATA_PATH" \
+      --isModelArts False \
+      --pre_ckpt_path "$CKPT_PATH" \
+      --category "$4" \
+      --device_id "$3" \
+      --platform "GPU" \
+      &> train.log
 
-for value in "${arr[@]}"
-do
-  bash run_standalone_train.sh  $DATA_PATH  $CKPT_APTH $value $3
-  bash run_eval.sh  $DATA_PATH  $CKPT_APTH $value $3
-done
-
-img_auc=$(grep "auc" eval_*/eval.log | awk -F "img_auc:" '{print $2}' | awk -F "," '{print $1}' | awk '{sum+=$1}END{print sum/NR}' | awk '{printf("%.3f", $1)}')
-echo "[INFO] average img_auc = $img_auc"
-
-pixel_auc=$(grep "auc" eval_*/eval.log | awk -F "img_auc:" '{print $2}' | awk -F "pixel_auc:" '{print $2}' | awk '{sum+=$1}END{print sum/NR}' | awk '{printf("%.3f", $1)}')
-echo "[INFO] average pixel_auc = $pixel_auc"
+if [ "$?" -eq 0 ];then
+    echo "[INFO] training success"
+else
+    echo "[ERROR] training failed"
+    exit 2
+fi
+echo "[INFO] finish"
+cd ../

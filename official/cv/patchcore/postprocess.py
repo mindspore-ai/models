@@ -26,7 +26,7 @@ from scipy.ndimage import gaussian_filter
 from sklearn.metrics import roc_auc_score
 from sklearn.random_projection import SparseRandomProjection
 
-from src.config import _C as cfg
+from src.config import cfg
 from src.operator import (embedding_concat, prep_dirs, reshape_embedding,
                           save_anomaly_map)
 from src.sampling_methods.kcenter_greedy import kCenterGreedy

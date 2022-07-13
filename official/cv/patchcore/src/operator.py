@@ -97,7 +97,7 @@ def prep_dirs(path, category):
     """
     prep_dirs function
     """
-    root = os.path.join(path, category)
+    root = os.path.join(path, 'checkpoint', category)
     os.makedirs(root, exist_ok=True)
 
     # make embeddings dir

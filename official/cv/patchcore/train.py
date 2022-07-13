@@ -13,11 +13,11 @@
 # limitations under the License.
 # ============================================================================
 """train"""
-import ast
+
+import sys
 import datetime
 import os
 import time
-import argparse
 import faiss
 import numpy as np
 from mindspore import context
@@ -31,50 +31,42 @@ from src.oneStep import OneStepCell
 from src.operator import embedding_concat, prep_dirs, reshape_embedding
 from src.sampling_methods.kcenter_greedy import kCenterGreedy
 
+from src.config import cfg, merge_from_cli_list
+
 set_seed(1)
 
-parser = argparse.ArgumentParser(description='train')
+opts = sys.argv[1:]
+merge_from_cli_list(opts)
+cfg.freeze()
+print(cfg)
 
-parser.add_argument('--train_url', type=str)
-parser.add_argument('--data_url', type=str)
-parser.add_argument('--isModelArts', type=ast.literal_eval, default=False)
-
-parser.add_argument('--category', type=str, default='screw')
-parser.add_argument('--coreset_sampling_ratio', type=float, default=0.01)
-parser.add_argument('--num_epochs', type=int, default=1, help='Epoch size')
-parser.add_argument('--device_id', type=int, default=0, help='Device id')
-parser.add_argument('--dataset_path', type=str, help='Dataset path')
-parser.add_argument('--pre_ckpt_path', type=str, help='Pretrain checkpoint file path')
-
-args = parser.parse_args()
-
-if args.isModelArts:
+if cfg.isModelArts:
     import moxing as mox
 
 if __name__ == '__main__':
     current_path = os.path.abspath(os.path.dirname(__file__))
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', save_graphs=False)
-    if args.isModelArts:
+    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.platform, save_graphs=False)
+    if cfg.isModelArts:
         device_id = int(os.getenv('DEVICE_ID'))
         context.set_context(device_id=device_id)
     else:
-        context.set_context(device_id=args.device_id)
+        context.set_context(device_id=cfg.device_id)
 
     # dataset
-    if args.isModelArts:
-        mox.file.copy_parallel(src_url=args.data_url, dst_url='/cache/dataset/device_' + os.getenv('DEVICE_ID'))
+    if cfg.isModelArts:
+        mox.file.copy_parallel(src_url=cfg.data_url, dst_url='/cache/dataset/device_' + os.getenv('DEVICE_ID'))
         train_dataset_path = '/cache/dataset/device_' + os.getenv('DEVICE_ID')
         prep_path = '/cache/train_output/device_' + os.getenv('DEVICE_ID')
 
-        train_dataset, _, _, _ = createDataset(train_dataset_path, args.category)
-        embedding_dir_path, _ = prep_dirs(prep_path, args.category)
+        train_dataset, _, _, _ = createDataset(train_dataset_path, cfg.category)
+        embedding_dir_path, _ = prep_dirs(prep_path, cfg.category)
     else:
-        train_dataset, _, _, _ = createDataset(args.dataset_path, args.category)
-        embedding_dir_path, _ = prep_dirs(current_path, args.category)
+        train_dataset, _, _, _ = createDataset(cfg.dataset_path, cfg.category)
+        embedding_dir_path, _ = prep_dirs(current_path, cfg.category)
 
     # network
     network = wide_resnet50_2()
-    param_dict = load_checkpoint(args.pre_ckpt_path)
+    param_dict = load_checkpoint(cfg.pre_ckpt_path)
     load_param_into_net(network, param_dict)
 
     for p in network.trainable_params():
@@ -85,7 +77,7 @@ if __name__ == '__main__':
     # train
     embedding_list = []
     print("***************start train***************")
-    for epoch in range(args.num_epochs):
+    for epoch in range(cfg.num_epochs):
         data_iter = train_dataset.create_dict_iterator()
         step_size = train_dataset.get_dataset_size()
 
@@ -110,7 +102,7 @@ if __name__ == '__main__':
         selector = kCenterGreedy(total_embeddings, 0, 0)
         selected_idx = selector.select_batch(model=randomprojector,
                                              already_selected=[],
-                                             N=int(total_embeddings.shape[0] * args.coreset_sampling_ratio))
+                                             N=int(total_embeddings.shape[0] * cfg.coreset_sampling_ratio))
         embedding_coreset = total_embeddings[selected_idx]
 
         print('initial embedding size : {}'.format(total_embeddings.shape))
@@ -121,7 +113,7 @@ if __name__ == '__main__':
         index.add(embedding_coreset)
         faiss.write_index(index, os.path.join(embedding_dir_path, 'index.faiss'))
 
-    if args.isModelArts:
-        mox.file.copy_parallel(src_url='/cache/train_output', dst_url=args.train_url)
+    if cfg.isModelArts:
+        mox.file.copy_parallel(src_url='/cache/train_output', dst_url=cfg.train_url)
 
     print("***************train end***************")

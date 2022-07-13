@@ -26,7 +26,7 @@ from mindspore.common import set_seed
 from mindspore.dataset.transforms.py_transforms import Compose
 from mindspore.dataset.vision import Inter
 
-from src.config import _C as cfg
+from src.config import cfg
 from src.dataset import MVTecDataset
 
 set_seed(1)

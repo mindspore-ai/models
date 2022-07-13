@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,11 +30,11 @@ get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
     echo "$1"
   else
-    echo "$(realpath -m $PWD/$1)"
+    realpath -m "$PWD"/"$1"
   fi
 }
-DATA_PATH=$(get_real_path $1)
-CKPT_APTH=$(get_real_path $2)
+DATA_PATH=$(get_real_path "$1")
+CKPT_APTH=$(get_real_path "$2")
 export DATA_PATH=$DATA_PATH
 
 train_path=train_$3
@@ -45,7 +45,7 @@ fi
 mkdir ./$train_path
 cd ./$train_path
 env > env0.log
-echo "[INFO] start train dataset $3."
+echo "[INFO] start train dataset $4."
 python ../../train.py --dataset_path $DATA_PATH --isModelArts False --pre_ckpt_path $CKPT_APTH --category $3  --device_id $4 &> train.log
 
 if [ $? -eq 0 ];then

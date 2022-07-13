@@ -13,7 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """eval"""
-import argparse
+import sys
 import json
 import os
 from pathlib import Path
@@ -26,42 +26,38 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from scipy.ndimage import gaussian_filter
 from sklearn.metrics import roc_auc_score
 
-from src.config import _C as cfg
+from src.config import cfg, merge_from_cli_list
 from src.dataset import createDataset
 from src.model import wide_resnet50_2
 from src.oneStep import OneStepCell
 from src.operator import (embedding_concat, normalize, prep_dirs,
                           reshape_embedding, save_anomaly_map)
 
-parser = argparse.ArgumentParser(description='eval')
-
-parser.add_argument('--category', type=str, default='screw')
-parser.add_argument('--device_id', type=int, default=0, help='Device id')
-parser.add_argument('--dataset_path', type=str, required=True, help='Dataset path')
-parser.add_argument('--pre_ckpt_path', type=str, required=True, help='Pretrain checkpoint file path')
-
-args = parser.parse_args()
+opts = sys.argv[1:]
+merge_from_cli_list(opts)
+cfg.freeze()
+print(cfg)
 
 if __name__ == '__main__':
     current_path = os.path.abspath(os.path.dirname(__file__))
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=args.device_id)
+    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.platform, device_id=cfg.device_id)
 
     # dataset
     mean = cfg.mean
     std = cfg.std
-    _, test_dataset, _, test_json_path = createDataset(args.dataset_path, args.category)
+    _, test_dataset, _, test_json_path = createDataset(cfg.dataset_path, cfg.category)
     json_path = Path(test_json_path)
     with json_path.open('r') as label_file:
         label = json.load(label_file)
     data_iter = test_dataset.create_dict_iterator()
     step_size = test_dataset.get_dataset_size()
 
-    embedding_dir_path, sample_path = prep_dirs(current_path, args.category)
+    embedding_dir_path, sample_path = prep_dirs(current_path, cfg.category)
     index = faiss.read_index(os.path.join(embedding_dir_path, 'index.faiss'))
 
     # network
     network = wide_resnet50_2()
-    param_dict = load_checkpoint(args.pre_ckpt_path)
+    param_dict = load_checkpoint(cfg.pre_ckpt_path)
     load_param_into_net(network, param_dict)
 
     for p in network.trainable_params():
@@ -108,5 +104,5 @@ if __name__ == '__main__':
     img_auc = roc_auc_score(gt_list_img_lvl, pred_list_img_lvl)
 
     print('\ntest_epoch_end')
-    print('category is {}'.format(args.category))
+    print('category is {}'.format(cfg.category))
     print("img_auc: {}, pixel_auc: {}".format(img_auc, pixel_auc))
