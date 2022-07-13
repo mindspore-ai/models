@@ -16,6 +16,7 @@ include_directories($ENV{MX_SDK_HOME}/opensource/include/opencv4)
 include_directories($ENV{MX_SDK_HOME}/opensource/include/gstreamer-1.0)
 include_directories($ENV{MX_SDK_HOME}/opensource/include/glib-2.0)
 include_directories($ENV{MX_SDK_HOME}/opensource/lib/glib-2.0/include)
+include_directories($ENV{ASCEND_HOME}/ascend-toolkit/latest/include)
 
 link_directories($ENV{MX_SDK_HOME}/lib)
 link_directories($ENV{MX_SDK_HOME}/opensource/lib/)
