@@ -29,7 +29,7 @@ if [ ! -d "${share_dir}" ]; then
 fi
 
 
-docker run -it \
+docker run -it -u root \
     --device=/dev/davinci0 \
     --device=/dev/davinci_manager \
     --device=/dev/devmm_svm \
