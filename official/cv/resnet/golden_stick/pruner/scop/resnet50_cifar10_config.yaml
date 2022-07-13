@@ -19,12 +19,12 @@ checkpoint_file_path: ""
 optimizer: "Momentum"
 infer_label: ""
 class_num: 10
-batch_size: 32
+batch_size: 64
 loss_scale: 1024
 momentum: 0.9
 weight_decay: 0.0001
 epoch_kf: 90
-epoch_ft: 400
+epoch_ft: 200
 pretrain_epoch_size: 0
 save_checkpoint: True
 save_checkpoint_epochs: 5
