@@ -24,8 +24,8 @@ import jieba
 import numpy as np
 from opencc import OpenCC
 from mindspore.mindrecord import FileWriter
-from src.tokenizer import convert_to_unicode, CharTokenizer
-from src.utils import get_file_list
+from .tokenizer import convert_to_unicode, CharTokenizer
+from .utils import get_file_list
 
 class ErnieDataReader:
     """Ernie data reader"""

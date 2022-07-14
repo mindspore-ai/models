@@ -10,11 +10,11 @@
 - [环境要求](#环境要求)
 - [快速入门](#快速入门)
     - [脚本说明](#脚本说明)
-    - [脚本和样例代码](#脚本和样例代码)
+    - [脚本和代码](#脚本和代码)
     - [选项及参数](#选项及参数)
         - [选项](#选项)
         - [参数](#参数)
-    - [训练过程](#训练过程)
+    - [预训练过程](#预训练过程)
         - [用法](#用法)
             - [下载数据集并预处理](#下载数据集并预处理)
             - [Ascend处理器上运行](#ascend处理器上运行)
@@ -24,13 +24,26 @@
             - [Ascend处理器上运行单卡微调](#ascend处理器上运行单卡微调)
             - [Ascend处理器上单机多卡微调](#ascend处理器上单机多卡微调)
             - [Ascend处理器上运行微调后的模型评估](#ascend处理器上运行微调后的模型评估)
+    - [导出onnx模型](#导出onnx模型)
+        - [onnx模型导出](#onnx模型导出)
+        - [onnx模型评估](#onnx模型评估)
+            - [基于chnsenticorp数据集进行onnx评估](#基于chnsenticorp数据集进行onnx评估)
+            - [基于xnli数据集进行onnx评估](#基于xnli数据集进行onnx评估)
+            - [基于dbqa数据集进行onnx评估](#基于dbqa数据集进行onnx评估)
     - [导出mindir模型](#导出mindir模型)
     - [推理过程](#推理过程)
         - [用法](#用法-2)
         - [结果](#结果)
-    - [精度与性能](#精度与性能)
-        - [推理性能](#推理性能)
+    - [模型描述](#模型描述)
+        - [精度与性能](#精度与性能)
+            - [推理性能](#推理性能)
+                - [命名实体识别任务](#命名实体识别任务)
+                - [情感分析任务](#情感分析任务)
+                - [自然语言接口](#自然语言接口)
+                - [问答](#问答)
+                - [阅读理解](#阅读理解)
 - [ModelZoo主页](#modelzoo主页)
+- [FAQ](#faq)
 
 <!-- /TOC -->
 
@@ -77,9 +90,9 @@ bash scripts/download_datasets.sh pretrain
 
 # 将数据集转为MindRecord
 # 预训练数据集
-bash scripts/convert_pretrain_dataset.sh /path/zh_wiki/ /path/zh_wiki/mindrecord/
+bash scripts/convert_pretrain_datasets.sh /path/zh_wiki/ /path/zh_wiki/mindrecord/
 # 微调数据集
-bash scripts/convert_finetune_dataset.sh /path/msra_ner/ /path/msra_ner/mindrecord/ msra_ner
+bash scripts/convert_finetune_datasets.sh /path/msra_ner/ /path/msra_ner/mindrecord/ msra_ner
 
 # 单机运行预训练示例
 bash scripts/run_standalone_pretrain_ascend.sh 0 1 /path/cn-wiki-128
@@ -112,6 +125,7 @@ bash scripts/run_distribute_finetune.sh rank_table.json xnli
     ├─export.sh                               # 导出模型中间表示脚本，如MindIR
     ├─migrate_pretrained_models.sh            # 在x86设备上将Paddle预训练权重参数转为MindSpore权重参数脚本
     ├─run_distribute_finetune.sh              # Ascend设备上多卡运行微调任务脚本
+    ├─run_eval_onnx.sh                        # 对导出的onnx模型评估脚本
     ├─run_finetune_eval.sh                    # Ascend设备上测试微调结果脚本
     ├─run_infer_310.sh                        # Ascend 310设备推理脚本
     ├─run_standalone_finetune.sh              # Ascend设备上单卡运行微调任务脚本
@@ -138,7 +152,8 @@ bash scripts/run_distribute_finetune.sh rank_table.json xnli
   ├─run_ernie_classifier.py                   # 分类器任务的微调和评估网络
   ├─run_ernie_mrc.py                          # 阅读理解任务的微调和评估网络
   ├─run_ernie_ner.py                          # NER任务的微调和评估网络
-  └─run_ernie_pretrain.py                     # 预训练网络
+  ├─run_ernie_pretrain.py                     # 预训练网络
+  └─run_eval_onnx.py                          # 评估onnx模型
 ```
 
 ## 选项及参数
@@ -215,15 +230,19 @@ bash scripts/download_datasets.sh pretrain
 然后进行数据预处理，对文本进行分词，并随机mask词语：
 
 ```bash
-bash scripts/convert_pretrain_dataset.sh /path/zh_wiki/ /path/zh_wiki/mindrecord/
+bash scripts/convert_pretrain_datasets.sh /path/zh_wiki/ /path/zh_wiki/mindrecord/
 ```
 
 > **注意：**
+>
 > 1. 维基百科文本抽取依赖`wikiextractor`，数据预处理依赖结巴分词和`OpenCC`繁简体转换，可以通过以下命令安装依赖：
->```bash
->   pip install -r requirements.txt
->```
+>
+> ```bash
+> pip install -r requirements.txt
+> ```
+>
 > 2. 若需要使用私有词典进行分词，可修改`scr/pretrain_reader.py`中`get_word_segs`方法。
+
 #### Ascend处理器上运行
 
 ```bash
@@ -284,6 +303,7 @@ bash scripts/run_distribute_finetune.sh [RANK_TABLE_FILE] [TASK_TYPE]
 以上命令后台运行，您可以在{task_type}_train_log.txt中查看训练日志。
 
 > **注意：**
+>
 > 1. `rank_table.json`可以通过`/etc/hccn.conf`获取加速卡IP进行配置。
 > 2. `drcd, cmrc`数据集评估需要使用`nltk`，请通过以下命令安装并下载依赖库，然后运行微调脚本。
 
@@ -322,6 +342,93 @@ F1 0.920507
 
 ```text
 {"exact_match": 84.13970798740338, "f1": 90.52935807300771}
+```
+
+## 导出onnx模型
+
+### finetune数据集转化为mindspore格式
+
+```shell
+bash scripts/convert_finetune_datasets.sh [DATASET_PATH] [OUTPUT_PATH] [TASK_TYPE]
+# bash scripts/convert_finetune_datasets.sh data/chnsenticorp/ data/chnsenticorp/ chnsenticorp
+# bash scripts/convert_finetune_datasets.sh data/xnli/ data/xnli/ xnli
+# bash scripts/convert_finetune_datasets.sh data/nlpcc-dbqa/ data/nlpcc-dbqa/ dbqa
+```
+
+[DATASET_PATH]：数据集路径； [OUTPUT_PATH]：转换后输出路径； [TASK_TYPE]：任务类型
+
+### onnx模型导出
+
+```bash
+python export.py --ckpt_file [CKPT_PATH] --file_format onnx --file_name [FILE_NAME] --device_target GPU --task_type [TASK_TYPE] --number_labels [NUMBER_LABELS]
+# chnsenticorp数据集
+# python export.py --ckpt_file ./save_models/chnsenticorp-0-3_300.ckpt --file_format ONNX --file_name ernie_finetune --device_target GPU --task_type chnsenticorp --number_labels 3
+
+# xnli数据集
+# python export.py --ckpt_file ./save_models/ernie_ascend_v170_xnli_official_nlp_acc77.94.ckpt --file_format ONNX --device_target GPU --task_type xnli --number_labels 3
+
+# dbqa数据集
+# python export.py --ckpt_file ./save_models/ernie_ascend_v170_bdqa_official_nlp_F1score84.96.ckpt --file_format ONNX --device_target GPU --task_type dbqa --number_labels 2
+```
+
+[CKPT_PATH]：为ckpt路径；
+
+[FILE_NAME]：为导出onnx文件名称；
+
+[TASK_TYPE]：任务数据集名称，包括`[chnsenticorp, xnli, dbqa]`
+
+[NUMBER_LABELS]：分类任务label数量， chnsenticorp、xnli为3， dbqa为2
+
+### onnx模型评估
+
+```bash
+bash scripts/run_eval_onnx.sh [TASK_TYPE]
+# bash scripts/run_eval_onnx.sh chnsenticorp
+# TASK_TYPE including [chnsenticorp, xnli, dbqa]
+```
+
+以上命令后台运行，您可以在`./ms_log/[TASK_TYPE]_onnx_log.txt`查看运行结果。
+
+onnx模型路径为 `ONNX_PATH=${CUR_DIR}/ernie_finetune.onnx`
+
+eval数据集路径为 `EVAL_DATA_PATH=${CUR_DIR}/data/${TASK_TYPE}/${TASK_TYPE}_test.mindrecord`
+    如：`home/models/official/nlp/ernie/data/chnsenticorp/chnsenticorp_test.mindrecord`
+
+具体请看 scripts/run_eval_onnx.sh 脚本
+
+#### 基于chnsenticorp数据集进行onnx评估
+
+```bash
+bash scripts/run_eval_onnx.sh chnsenticorp
+
+cat ms_log/chnsenticorp_onnx_log.txt
+==============================================================
+acc_num 1150 , total_num 1200, accuracy 0.958333
+==============================================================
+```
+
+#### 基于xnli数据集进行onnx评估
+
+```bash
+bash scripts/run_eval_onnx.sh xnli
+
+cat ms_log/xnli_onnx_log.txt
+==============================================================
+acc_num 3902 , total_num 5010, accuracy 0.778842
+==============================================================
+```
+
+#### 基于dbqa数据集进行onnx评估
+
+```bash
+bash scripts/run_eval_onnx.sh dbqa
+
+cat ms_log/dbqa_onnx_log.txt
+==============================================================
+Precision 0.804701
+Recall 0.897794
+F1 0.848703
+==============================================================
 ```
 
 ## 导出mindir模型
