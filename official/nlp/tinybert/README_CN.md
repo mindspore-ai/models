@@ -623,6 +623,8 @@ gd_config.yaml和td_config/*.yaml文件中设置了hidden_dropout_prob和attenti
 
 run_general_distill.py文件中设置了随机种子，确保分布式训练初始权重相同。
 
+若出现`connect p2p timeout, timeout: 120s.`报错信息，可以添加环境变量`export HCCL_CONNECT_TIMEOUT=600`方式适当延长HCCL建链时长解决该问题．
+
 # ModelZoo主页
 
 请浏览官网[主页](https://gitee.com/mindspore/models)。

@@ -627,6 +627,8 @@ In gd_config.yaml and td_config/*.yaml, we set the hidden_dropout_prob and atten
 
 In run_general_distill.py, we set the random seed to make sure distribute training has the same init weight.
 
+if this error occurs, `connect p2p timeout, timeout: 120s.`, please add `export HCCL_CONNECT_TIMEOUT=600` in shell to resolve it.
+
 # [ModelZoo Homepage](#contents)
 
 Please check the official [homepage](https://gitee.com/mindspore/models).
