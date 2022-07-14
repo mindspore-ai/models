@@ -20,6 +20,8 @@ then
   exit 1
 fi
 
+ulimit -n 9999
+
 BASEPATH=$(cd "`dirname $0`" || exit; pwd)
 export PYTHONPATH=${BASEPATH}:$PYTHONPATH
 
