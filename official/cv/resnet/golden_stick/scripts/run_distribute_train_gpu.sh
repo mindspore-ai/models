@@ -89,13 +89,13 @@ cd ./train_parallel || exit
 if [ "x$CKPT_TYPE" == "xFP32" ]; then
   mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
          python train.py --config_path=$CONFIG_FILE --run_distribute=True --device_target="GPU" \
-         --data_path=$DATASET_PATH --fp32_ckpt=$CKPT_FILE --output_path './output' &> log &
+         --device_num=$DEVICE_NUM --data_path=$DATASET_PATH --fp32_ckpt=$CKPT_FILE --output_path './output' &> log &
 elif [ "x$CKPT_TYPE" == "xPRETRAINED" ]; then
   mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
          python train.py --config_path=$CONFIG_FILE --run_distribute=True --device_target="GPU" \
-         --data_path=$DATASET_PATH --pre_trained=$CKPT_FILE --output_path './output' &> log &
+         --device_num=$DEVICE_NUM --data_path=$DATASET_PATH --pre_trained=$CKPT_FILE --output_path './output' &> log &
 else
   mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
          python train.py --config_path=$CONFIG_FILE --run_distribute=True --device_target="GPU" \
-         --data_path=$DATASET_PATH --output_path './output' &> log &
+         --device_num=$DEVICE_NUM --data_path=$DATASET_PATH --output_path './output' &> log &
 fi
