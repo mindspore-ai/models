@@ -24,7 +24,7 @@ import argparse
 import tensorflow as tf
 import numpy as np
 
-from .trans_dict import trans_dict_tf
+from trans_dict import trans_dict_tf
 
 
 def read_weight(ckpt_path):
