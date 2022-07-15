@@ -24,6 +24,9 @@
         - [导出](#导出)
     - [推理过程](#推理过程)
         - [推理](#推理)
+    - [ONNX模型导出及评估](#onnx模型导出及评估)
+        - [ONNX模型导出](#onnx模型导出)
+        - [ONNX模型评估](#onnx模型评估)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -178,8 +181,10 @@ auxiliary.ckpt文件获取：从 https://cg.cs.tsinghua.edu.cn/people/~Yongjin/A
     ├─ config_eval_and_export.yaml         # 评估和导出超参数设置
     ├─ config_train.yaml                   # 训练超参数设置
     ├─ eval.py                             # 评估脚本
+    ├─ eval_onnx.py                        # ONNX模型评估脚本
     ├─ train.py                            # 训练脚本
     ├─ export.py                           # 模型导出脚本
+    ├─ export_onnx.py                      # ONNX模型导出脚本
     ├─ auxiliary                           # 预训练权重值
     │  └─ auxiliary.ckpt                   # 预训练模型ckpt
     ├─ dataset
@@ -199,6 +204,7 @@ auxiliary.ckpt文件获取：从 https://cg.cs.tsinghua.edu.cn/people/~Yongjin/A
     │     └─ ALL
     ├─ scripts
     │  ├─ run_eval.sh                      # 启动评估
+    │  ├─ run_eval_onnx.sh                 # 启动对导出的onnx模型的评估
     │  ├─ run_distribute_train.sh          # 启动多卡训练
     │  ├─ run_train.sh                     # 启动单卡训练
     │  └─ run_infer_310.sh                 # 实现310推理源代码
@@ -390,6 +396,45 @@ auxiliary.ckpt文件获取：从 https://cg.cs.tsinghua.edu.cn/people/~Yongjin/A
   ```bash
   NN inference cost average time: 168.92 ms of infer_count 39
   ```
+
+## ONNX模型导出及评估
+
+### ONNX模型导出
+
+因为在该模型评估时，对于每张图片的处理，网络需要根据对应图片的center信息进行set_pad设置，所以需要对于评估集中每张图片对应的网络分别导出一个onnx模型文件，进行该图片的onnx推理。
+所以下述onnx导出指令将会生成一系列的onnx文件。
+
+  ```bash
+  python export_onnx.py  --model_path=checkpoint/netG_300.ckpt
+                         --dataroot=test_dataset/data/test_single
+                         --lm_dir=test_dataset/landmark/ALL
+                         --bg_dir=test_dataset/mask/ALL
+  ```
+
+执行完后，会在当前路径生成一系列以每张图片的center信息命名的onnx模型文件，提供给onnx模型评估使用。
+
+### ONNX模型评估
+
+  运行评估脚本，对用户指定的测试数据集进行测试，测试数据集包括测试图片、测试图片的背景轮廓图片及测试图片的脸部特征点数据，最终会给每张测试图片生成对应的肖像画图片。在运行以下命令前，请检查各数据源的路径是否正确。
+
+  ```bash
+  python eval_onnx.py  --dataroot=test_dataset/data/test_single
+                       --lm_dir=test_dataset/landmark/ALL
+                       --bg_dir=test_dataset/mask/ALL
+                       --results_dir=test_dataset/result
+                       --onnx_path=./ > eval_onnx.log 2>&1 &
+  ```
+
+  或者，
+
+  ```bash
+  bash scripts/run_eval_onnx.sh [DATA_PATH] [LM_PATH] [BG_PATH] [RESULT_PATH] [ONNX_PATH]
+  # example: bash scripts/run_eval_onnx.sh test_dataset/data/test_single/ test_dataset/landmark/ALL test_dataset/mask/ALL result_onnx onnx_file/
+  ```
+
+  注意，其中[ONNX_PATH]指的是前一步导出的一系列onnx模型文件的目录。
+
+  上述python命令将在后台运行，您可以通过eval_onnx.log文件查看评估过程。测试数据生成的对应肖像画图片保存在指定的结果目录中，例如：上述指令指定的 result_onnx 目录中。
 
 # 模型描述
 
