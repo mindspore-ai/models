@@ -55,6 +55,11 @@ eval_dataset_path: ""
 file_name: "shufflenetv1"
 file_format: "MINDIR"
 
+# ======================================================================================
+# onnx
+onnx_path: ""
+onnx_dataset_path: ""
+
 ---
 # Help description for each configuration
 enable_modelarts: "Whether training on modelarts default: False"
