@@ -86,12 +86,11 @@ class Upsampler(nn.Cell):
         """rcan"""
         super(Upsampler, self).__init__()
         m = []
-        for s in scale:
-            if (s & (s - 1)) == 0:
-                for _ in range(int(math.log(s, 2))):
-                    m.append(SmallUpSampler(conv, 2, n_feats, has_bias=has_bias))
-            elif s == 3:
-                m.append(SmallUpSampler(conv, 3, n_feats, has_bias=has_bias))
+        if (scale & (scale - 1)) == 0:
+            for _ in range(int(math.log(scale, 2))):
+                m.append(SmallUpSampler(conv, 2, n_feats, has_bias=has_bias))
+        elif scale == 3:
+            m.append(SmallUpSampler(conv, 3, n_feats, has_bias=has_bias))
         self.net = nn.SequentialCell(m)
 
     def construct(self, x):
@@ -186,7 +185,7 @@ class RCAN(nn.Cell):
         n_feats = args.n_feats
         kernel_size = 3
         reduction = args.reduction
-        scale = args.scale
+        scale = args.scale[0]
         self.dytpe = mstype.float16
 
         # RGB mean for DIV2K
