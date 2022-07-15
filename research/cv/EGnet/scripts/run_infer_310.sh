@@ -59,7 +59,7 @@ function preprocess_data()
     fi
     mkdir preprocess_Result
     mkdir preprocess_Mask_Result
-    python3.7 ../preprocess.py
+    python ../preprocess.py
 }
 function compile_app()
 {
@@ -88,12 +88,12 @@ function post_process()
        rm -rf ./postprocess_Result
     fi
     mkdir postprocess_Result
-    python3.7 ../postprocess.py --bin_path='./result_Files/' --mask_path='./preprocess_Mask_Result/' --output_dir='./postprocess_Result/' &> postprocess.log
+    python ../postprocess.py --bin_path='./result_Files/' --mask_path='./preprocess_Mask_Result/' --output_dir='./postprocess_Result/' &> postprocess.log
 }
 
 function evaluation()
 {
-    python3.7 ../eval_310.py --pred_dir='./postprocess_Result/' &> evaluation.log
+    python ../eval_310.py --pred_dir='./postprocess_Result/' &> evaluation.log
 }
 
 preprocess_data

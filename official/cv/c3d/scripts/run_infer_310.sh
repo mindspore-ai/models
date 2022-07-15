@@ -76,7 +76,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --batch_size 1
+    python ../preprocess.py --batch_size 1
 }
 
 function compile_app()
@@ -104,9 +104,9 @@ function infer()
 function cal_acc()
 {
     if [ "$dataset" == "HMDB51" ]; then
-        python3.7 ../postprocess.py  --batch_size 1 &> acc.log
+        python ../postprocess.py  --batch_size 1 &> acc.log
     else
-      python3.7 ../postprocess.py  --num_classes 101 --batch_size 1 &> acc.log
+      python ../postprocess.py  --num_classes 101 --batch_size 1 &> acc.log
     fi
 }
 

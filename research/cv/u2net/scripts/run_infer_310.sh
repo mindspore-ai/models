@@ -57,7 +57,7 @@ function preprocess_data()
        rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --content_path $content_path --output_path='./preprocess_Result/'
+    python ../preprocess.py --content_path $content_path --output_path='./preprocess_Result/'
 }
 function compile_app()
 {
@@ -86,12 +86,12 @@ function post_process()
        rm -rf ./postprocess_Result
     fi
     mkdir postprocess_Result
-    python3.7 ../postprocess.py --bin_path='./result_Files' --content_path $content_path --output_dir='./postprocess_Result/' &> postprocess.log
+    python ../postprocess.py --bin_path='./result_Files' --content_path $content_path --output_dir='./postprocess_Result/' &> postprocess.log
 }
 
 function evaluation()
 {
-    python3.7 ../eval.py --pred_dir='./postprocess_Result/' --label_dir $label_path &> evaluation.log
+    python ../eval.py --pred_dir='./postprocess_Result/' --label_dir $label_path &> evaluation.log
 }
 
 preprocess_data

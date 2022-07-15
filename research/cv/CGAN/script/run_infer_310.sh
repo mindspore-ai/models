@@ -66,7 +66,7 @@ function preprocess_data()
        rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --output_path='./preprocess_Result/'
+    python ../preprocess.py --output_path='./preprocess_Result/'
 }
 function compile_app()
 {
@@ -96,7 +96,7 @@ function post_process()
        rm -rf ./postprocess_Result
     fi
     mkdir postprocess_Result
-    python3.7 ../postprocess.py --output_path='./postprocess_Result/'
+    python ../postprocess.py --output_path='./postprocess_Result/'
 }
 
 preprocess_data

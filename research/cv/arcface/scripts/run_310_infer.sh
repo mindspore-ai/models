@@ -81,7 +81,7 @@ function preprocess_data()
         rm -rf ./label
     fi
     mkdir label
-    python3.7 ../preprocess.py --dataset_path=$dataset_path --result_dir=./preprocess_Result/ --label_dir=./label/
+    python ../preprocess.py --dataset_path=$dataset_path --result_dir=./preprocess_Result/ --label_dir=./label/
 }
 
 function compile_app()
@@ -108,7 +108,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --data_set=$dataset_path --result_dir=./result_Files --label_dir=./label/issame_list.npy &> acc.log
+    python ../postprocess.py --data_set=$dataset_path --result_dir=./result_Files --label_dir=./label/issame_list.npy &> acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

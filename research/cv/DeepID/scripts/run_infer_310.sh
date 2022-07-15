@@ -65,7 +65,7 @@ function preprocess_data()
     fi
     mkdir bin_data
     cd $scripts_path
-    python3.7 ../preprocess.py --data_url=$data_path &> preprocess.log
+    python ../preprocess.py --data_url=$data_path &> preprocess.log
 }
 
 function compile_app()
@@ -96,7 +96,7 @@ function infer()
 function postprocess()
 {
     cd $scripts_path
-    python3.7 ../postprocess.py --result_path='./result_Files' --ori_path='../bin_data/label' &> postprocess.log
+    python ../postprocess.py --result_path='./result_Files' --ori_path='../bin_data/label' &> postprocess.log
 }
 
 preprocess_data

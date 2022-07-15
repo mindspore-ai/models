@@ -24,5 +24,5 @@ if [ -f "Makefile" ]; then
   make clean
 fi
 
-cmake ..  -DMINDSPORE_PATH="`pip3.7 show mindspore-ascend | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
+cmake ..  -DMINDSPORE_PATH="`pip show mindspore-ascend | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
 make

@@ -119,7 +119,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --test_list=$test_list --modality=$modality --result_dir=./result_Files --label_dir=../ascend310_infer/preprocess_Result/label_ids.npy --save_scores=$score_name  &> acc.log
+    python ../postprocess.py --test_list=$test_list --modality=$modality --result_dir=./result_Files --label_dir=../ascend310_infer/preprocess_Result/label_ids.npy --save_scores=$score_name  &> acc.log
 }
 
 compile_app

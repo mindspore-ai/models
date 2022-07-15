@@ -65,7 +65,7 @@ function preprocess_data()
     fi
     mkdir bin_data
     cd $scripts_path
-    python3.7 ../preprocess.py --celeba_image_dir=$data_path"/img_celeba" --attr_path=$data_path"/list_attr_celeba.txt" &> preprocess.log
+    python ../preprocess.py --celeba_image_dir=$data_path"/img_celeba" --attr_path=$data_path"/list_attr_celeba.txt" &> preprocess.log
 }
 
 function compile_app()
@@ -96,7 +96,7 @@ function infer()
 function postprocess()
 {
     cd $scripts_path
-    python3.7 ../postprocess.py --result_path='./result_Files' --ori_path="../bin_data/img_data" --save_path='../save_images_result' &> postprocess.log
+    python ../postprocess.py --result_path='./result_Files' --ori_path="../bin_data/img_data" --save_path='../save_images_result' &> postprocess.log
 }
 
 preprocess_data

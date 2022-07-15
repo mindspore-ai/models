@@ -65,7 +65,7 @@ do
        rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ./preprocess.py --output_path='./preprocess_Result/' --input_path='./postprocess_Result/' \
+    python ./preprocess.py --output_path='./preprocess_Result/' --input_path='./postprocess_Result/' \
                                 --input_dir=$input_dir --input_name=$input_name --scale_num=$i --noise_amp_path=$noise_amp_dir
 
     if [ $? -ne 0 ]; then
@@ -104,7 +104,7 @@ do
        rm -rf ./postprocess_Result
     fi
     mkdir postprocess_Result
-    python3.7 ./postprocess.py --output_path='./postprocess_Result/' --input_dir=$input_dir \
+    python ./postprocess.py --output_path='./postprocess_Result/' --input_dir=$input_dir \
                                 --input_name=$input_name --scale_num=$i
     if [ $? -ne 0 ]; then
         echo "scale $i: execute post_process failed"

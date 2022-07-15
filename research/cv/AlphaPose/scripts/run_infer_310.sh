@@ -68,7 +68,7 @@ function preprocess_data()
     if [ -d ./data_bin ]; then
         rm -rf ./data_bin
     fi
-    python3.7 ../data_to_bin.py --dataset_path=$data_path &> preprocess.log
+    python ../data_to_bin.py --dataset_path=$data_path &> preprocess.log
 }
 
 function compile_app()

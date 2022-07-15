@@ -73,7 +73,7 @@ function preprocess()
     mkdir test
     mkdir query
     cd ../scripts
-    python3.7 ../preprocess.py --test_bin_path $test_bin_path --query_bin_path $query_bin_path --test_path $input1_path --query_path $input2_path
+    python ../preprocess.py --test_bin_path $test_bin_path --query_bin_path $query_bin_path --test_path $input1_path --query_path $input2_path
 }
 
 function compile_app()
@@ -113,7 +113,7 @@ function query_infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --test_label $test_label --query_label $query_label --test_out_path $test_out_path --query_out_path $query_out_path &> acc.log
+    python ../postprocess.py --test_label $test_label --query_label $query_label --test_out_path $test_out_path --query_out_path $query_out_path &> acc.log
 }
 
 preprocess

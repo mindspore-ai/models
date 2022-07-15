@@ -90,7 +90,7 @@ function preprocess_data()
         rm -rf ./preprocess_result
     fi
     mkdir preprocess_result
-    python3.7 ../preprocess.py --eval_data_file_path=$eval_data_file_path --task_type=$task_type --result_path=./preprocess_result/ --eval_json_path=$eval_json_path --vocab_file_path=$vocab_file_path --spm_model_file=$spm_model_file
+    python ../preprocess.py --eval_data_file_path=$eval_data_file_path --task_type=$task_type --result_path=./preprocess_result/ --eval_json_path=$eval_json_path --vocab_file_path=$vocab_file_path --spm_model_file=$spm_model_file
 }
 
 function compile_app()
@@ -118,7 +118,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --result_dir=./result_files --task_type=$task_type \
+    python ../postprocess.py --result_dir=./result_files --task_type=$task_type \
     --label_dir=./preprocess_result/03_data --eval_data_file_path=$eval_data_file_path --eval_json_path=$eval_json_path \
     --input1_path=./preprocess_result/01_data &> acc.log
 }

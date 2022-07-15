@@ -85,7 +85,7 @@ function preprocess_data() {
     fi
     mkdir label
 
-    python3.7 ../preprocess.py --cfg ../config.yaml --result_dir ./input/ --label_dir ./label/ --data_dir $dataset_path
+    python ../preprocess.py --cfg ../config.yaml --result_dir ./input/ --label_dir ./label/ --data_dir $dataset_path
 }
 
 function compile_app() {
@@ -110,7 +110,7 @@ function infer() {
 }
 
 function cal_acc() {
-    python3.7 ../postprocess.py --cfg ../config.yaml --data_dir $dataset_path --result_dir ./result_Files/ --label_dir ./label/label.json --input_dir ./input/ > acc.log
+    python ../postprocess.py --cfg ../config.yaml --data_dir $dataset_path --result_dir ./result_Files/ --label_dir ./label/label.json --input_dir ./input/ > acc.log
 }
  
 if [ $need_preprocess == "y" ]; then
