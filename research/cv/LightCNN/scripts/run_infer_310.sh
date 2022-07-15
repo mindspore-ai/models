@@ -64,7 +64,7 @@ function preprocess_data()
     fi
     mkdir bin_data
     cd $scripts_path
-    python3.7 ../preprocess.py --data_path=$data_path &> preprocess.log
+    python ../preprocess.py --data_path=$data_path &> preprocess.log
 }
 
 function compile_app()
@@ -93,7 +93,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --result_path=./result_Files --mat_files_path=../mat_files &> acc.log
+    python ../postprocess.py --result_path=./result_Files --mat_files_path=../mat_files &> acc.log
 }
 
 preprocess_data

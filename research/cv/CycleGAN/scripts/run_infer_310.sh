@@ -83,7 +83,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 preprocess.py  --dataroot=$dataset_path --data_dir=$dataset_mode --outputs_dir=./preprocess_Result/ >& preprocess.log
+    python preprocess.py  --dataroot=$dataset_path --data_dir=$dataset_mode --outputs_dir=./preprocess_Result/ >& preprocess.log
 }
 
 function compile_app()
@@ -114,7 +114,7 @@ function generate_img()
         rm -rf ./infer_output_img
     fi
     mkdir infer_output_img
-    python3.7 postprocess.py  --dataroot=./result_Files --outputs_dir=./infer_output_img --device_id=$device_id &> acc.log
+    python postprocess.py  --dataroot=./result_Files --outputs_dir=./infer_output_img --device_id=$device_id &> acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

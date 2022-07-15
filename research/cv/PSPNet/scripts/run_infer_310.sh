@@ -52,7 +52,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 preprocess.py --config=$YAML_PATH --save_path=./preprocess_Result/ --data_path=$DATA_PATH &> preprocess.log
+    python preprocess.py --config=$YAML_PATH --save_path=./preprocess_Result/ --data_path=$DATA_PATH &> preprocess.log
 }
 
 function compile_app()
@@ -81,7 +81,7 @@ function postprocess_data()
         rm -rf ./postprocess_Result
     fi
     mkdir postprocess_Result
-    python3.7 postprocess.py --config=$YAML_PATH --data_path=$DATA_PATH &> postprocess.log
+    python postprocess.py --config=$YAML_PATH --data_path=$DATA_PATH &> postprocess.log
 }
 
 preprocess_data

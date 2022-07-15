@@ -91,7 +91,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --dataset_name=$dataset_name --data_path=$dataset_path  & #--result_path=./preprocess_Result/
+    python ../preprocess.py --dataset_name=$dataset_name --data_path=$dataset_path  & #--result_path=./preprocess_Result/
 }
 
 function compile_app()
@@ -117,7 +117,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --dataset_name=$dataset_name  &> acc.log
+    python ../postprocess.py --dataset_name=$dataset_name  &> acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

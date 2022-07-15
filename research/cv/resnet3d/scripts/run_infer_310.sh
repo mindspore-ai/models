@@ -73,7 +73,7 @@ function pre_process_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --config_path ../${dataset}_config.yaml --video_path $video_path --annotation_path \
+    python ../preprocess.py --config_path ../${dataset}_config.yaml --video_path $video_path --annotation_path \
     $annotation_path --batch_size=1
 }
 
@@ -102,7 +102,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --config_path ../${dataset}_config.yaml --annotation_path $annotation_path &> acc.log &
+    python ../postprocess.py --config_path ../${dataset}_config.yaml --annotation_path $annotation_path &> acc.log &
 }
 
 if [ $need_preprocess == 'y' ]; then

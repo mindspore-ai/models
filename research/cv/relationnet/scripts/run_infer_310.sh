@@ -30,7 +30,7 @@ fi
 function prepocess()
 {
     cd ..
-    python3 preprocess.py
+    python preprocess.py
     
 }
 function compile_app()
@@ -66,7 +66,7 @@ function infer()
 function cal_acc()
 {
     cd 。。、
-    python3 postprocess.py
+    python postprocess.py
     if [ $? -ne 0 ]; then
         echo "calculate accuracy failed"
         exit 1

@@ -66,7 +66,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ./preprocess.py --data_path=$data_path --train_path=./preprocess_Result &> preprocess.log
+    python ./preprocess.py --data_path=$data_path --train_path=./preprocess_Result &> preprocess.log
 }
 
 function infer()
@@ -85,7 +85,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ./postprocess.py --result_path=./result_Files --label_path=./preprocess_Result/label &> acc.log
+    python ./postprocess.py --result_path=./result_Files --label_path=./preprocess_Result/label &> acc.log
     if [ $? -ne 0 ]; then
         echo "Calculate accuracy failed."
         exit 1

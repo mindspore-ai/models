@@ -75,7 +75,7 @@ function infer()
         rm -rf ./testdata
     fi
     mkdir testdata
-    python3 ../ascend310_infer/310infer_preprocess.py $datapath
+    python ../ascend310_infer/310infer_preprocess.py $datapath
     if [ -d output ]; then
         rm -rf ./output
     fi

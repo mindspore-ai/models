@@ -67,7 +67,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py
+    python ../preprocess.py
 }
 
 function compile_app()
@@ -94,7 +94,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py &> acc.log
+    python ../postprocess.py &> acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

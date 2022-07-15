@@ -69,7 +69,7 @@ function preprocess_data()
         rm -rf ./preprocess_path
     fi
     mkdir preprocess_path
-    python3.7 ../preprocess.py --test_LR_path=$test_LR_path --test_GT_path=$test_GT_path  --result_path=./preprocess_path/
+    python ../preprocess.py --test_LR_path=$test_LR_path --test_GT_path=$test_GT_path  --result_path=./preprocess_path/
 }
 
 function compile_app()
@@ -100,7 +100,7 @@ function cal_acc()
         rm -rf ./infer_output
     fi
     mkdir infer_output
-    python3.7 ../postprocess.py --test_LR_path=$test_LR_path --test_GT_path=$test_GT_path --device_id=$device_id &> acc.log
+    python ../postprocess.py --test_LR_path=$test_LR_path --test_GT_path=$test_GT_path --device_id=$device_id &> acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

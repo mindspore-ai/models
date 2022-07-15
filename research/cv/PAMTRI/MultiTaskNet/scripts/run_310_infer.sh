@@ -111,7 +111,7 @@ function preprocess_data() {
     fi
     mkdir label
 
-    python3.7 ../preprocess.py --result_dir ./input/ --label_dir ./label/ --data_dir $dataset_path --heatmapaware $use_heatmap --segmentaware $use_segment
+    python ../preprocess.py --result_dir ./input/ --label_dir ./label/ --data_dir $dataset_path --heatmapaware $use_heatmap --segmentaware $use_segment
 }
 
 function compile_app() {
@@ -136,7 +136,7 @@ function infer() {
 }
 
 function cal_acc() {
-    python3.7 ../postprocess.py --input_dir ./ --result_dir ./result_Files/ --label_dir ./label/ > acc.log
+    python ../postprocess.py --input_dir ./ --result_dir ./result_Files/ --label_dir ./label/ > acc.log
 }
 
 if [ $need_preprocess == "y" ]; then

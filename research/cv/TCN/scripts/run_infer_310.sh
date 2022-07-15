@@ -114,7 +114,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --dataset_name=$dataset_name --result_path=./result_Files --label_path=./preprocess_Result/label &> acc.log
+    python ../postprocess.py --dataset_name=$dataset_name --result_path=./result_Files --label_path=./preprocess_Result/label &> acc.log
     
 }
 

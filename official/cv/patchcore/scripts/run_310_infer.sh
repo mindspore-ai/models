@@ -76,7 +76,7 @@ function preprocess_data() {
     mkdir ./img/$category/infer
     mkdir ./img/$category/label
 
-    python3.7 ../preprocess.py \
+    python ../preprocess.py \
     --data_dir $dataset_path \
     --img_dir ./img \
     --category $category
@@ -119,7 +119,7 @@ function infer() {
 }
 
 function cal_acc() {
-    python3 ../postprocess.py \
+    python ../postprocess.py \
         --result_dir ./img/$category/result/ \
         --img_dir ./img/$category/infer/ \
         --label_dir ./img/$category/label/ \

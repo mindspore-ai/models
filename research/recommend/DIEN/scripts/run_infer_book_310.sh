@@ -76,7 +76,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --result_path=./result_Files --target_path=$input_path/target --dataset_type=Books &> acc_book.log &
+    python ../postprocess.py --result_path=./result_Files --target_path=$input_path/target --dataset_type=Books &> acc_book.log &
 }
 
 compile_app

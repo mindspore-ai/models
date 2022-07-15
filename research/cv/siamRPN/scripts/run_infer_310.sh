@@ -73,7 +73,7 @@ function compile_app()
 }
 function generate_config()
 {
-  python3.7 ../preprocess.py
+  python ../preprocess.py
   if [ $? -ne 0 ]; then
         echo "preprocess failed"
         exit 1
@@ -102,7 +102,7 @@ function infer()
 
 function cal_acc()
 {
-    python3.7 ../postprocess.py --dataset=$data_path/$dataset_name --predict_dataset=./result_Files/$dataset_name &> acc.log
+    python ../postprocess.py --dataset=$data_path/$dataset_name --predict_dataset=./result_Files/$dataset_name &> acc.log
     if [ $? -ne 0 ]; then
         echo "calculate accuracy failed"
         exit 1

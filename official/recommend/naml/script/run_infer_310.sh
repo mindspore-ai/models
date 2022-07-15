@@ -66,7 +66,7 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --preprocess_path=./preprocess_Result &> preprocess.log
+    python ../preprocess.py --preprocess_path=./preprocess_Result &> preprocess.log
     if [ $? -ne 0 ]; then
         echo "preprocess data failed"
         exit 1

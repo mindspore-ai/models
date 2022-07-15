@@ -83,7 +83,7 @@ function generate_img()
         rm -rf ./infer_output_img
     fi
     mkdir infer_output_img
-    python3.7 postprocess.py  --bifile_outputdir=./result_Files --eval_outputdir=./infer_output_img --device_id=$device_id &> acc.log
+    python postprocess.py  --bifile_outputdir=./result_Files --eval_outputdir=./infer_output_img --device_id=$device_id &> acc.log
 }
 
 compile_app

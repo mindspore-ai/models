@@ -57,7 +57,7 @@ function preprocess_data()
        rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python3.7 ../preprocess.py --content_path $content_path --style_path $style_path --output_path='./preprocess_Result/'
+    python ../preprocess.py --content_path $content_path --style_path $style_path --output_path='./preprocess_Result/'
 }
 function compile_app()
 {
@@ -90,7 +90,7 @@ function post_process()
        rm -rf ./postprocess_Result_interpolation
     fi
     mkdir postprocess_Result_interpolation
-    python3.7 ../postprocess.py --bin_path='./result_Files' --output_dir='./postprocess_Result/' --output_dir_interpolation='./postprocess_Result_interpolation/' &> postprocess.log
+    python ../postprocess.py --bin_path='./result_Files' --output_dir='./postprocess_Result/' --output_dir_interpolation='./postprocess_Result_interpolation/' &> postprocess.log
 }
 
 preprocess_data
