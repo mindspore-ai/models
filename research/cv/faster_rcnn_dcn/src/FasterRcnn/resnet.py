@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,19 +15,42 @@
 """Resnet backbone."""
 
 import numpy as np
-import mindspore.nn as nn
-from mindspore.ops import operations as P
+from mindspore import nn
 from mindspore.common.tensor import Tensor
 from mindspore.ops import functional as F
+from mindspore.ops import operations as P
+
 from .dcn_v2 import DeformConv2d
 
+
 def weight_init_ones(shape):
-    """Weight init."""
+    """
+    Weight init
+
+    Args:
+        shape: Data shape
+
+    Returns:
+        Initialized weights
+    """
     return Tensor(np.full(shape, 0.01).astype(np.float32))
 
 
 def _conv(in_channels, out_channels, kernel_size=3, stride=1, padding=0, pad_mode='pad'):
-    """Conv2D wrapper."""
+    """
+    Conv2D wrapper
+
+    Args:
+        in_channels: Input channels
+        out_channels:  Output channels
+        kernel_size: Size of kernel
+        stride: Strides
+        padding: Paddings
+        pad_mode: Padding mode
+
+    Returns:
+        Wrapped Conv2D layer
+    """
     shape = (out_channels, in_channels, kernel_size, kernel_size)
     weights = weight_init_ones(shape)
     return nn.Conv2d(in_channels, out_channels,
@@ -36,7 +59,18 @@ def _conv(in_channels, out_channels, kernel_size=3, stride=1, padding=0, pad_mod
 
 
 def _BatchNorm2dInit(out_chls, momentum=0.1, affine=True, use_batch_statistics=True):
-    """Batchnorm2D wrapper."""
+    """
+    Batchnorm2D wrapper
+
+    Args:
+        out_chls: Number of output channels
+        momentum: Momentum
+        affine: Flag to apply affine transformations
+        use_batch_statistics: Flag to use batch statistics
+
+    Returns:
+        Wrapped BatchNorm2d layer
+    """
     dtype = np.float32
     gamma_init = Tensor(np.array(np.ones(out_chls)).astype(dtype))
     beta_init = Tensor(np.array(np.ones(out_chls) * 0).astype(dtype))

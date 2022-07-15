@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,12 +15,13 @@
 """RPN for FasterRCNN-DCN"""
 
 import numpy as np
-import mindspore.nn as nn
-import mindspore.common.dtype as mstype
 from mindspore import context, Tensor
-from mindspore.ops import operations as P
-from mindspore.ops import functional as F
+from mindspore import nn
+from mindspore.common import dtype as mstype
 from mindspore.common.initializer import initializer
+from mindspore.ops import functional as F
+from mindspore.ops import operations as P
+
 from .bbox_assign_sample import BboxAssignSample
 
 
@@ -65,6 +66,7 @@ class RpnRegClsBlock(nn.Cell):
                                  has_bias=True, weight_init=weight_reg, bias_init=bias_reg)
 
     def construct(self, x):
+        """Forward pass throw network"""
         x = self.relu(self.rpn_conv(x))
 
         x1 = self.rpn_cls(x)

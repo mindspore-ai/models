@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -le 2 ]
+if [ $# != 3 ] && [ $# != 4 ]
 then 
-    echo "Usage: sh run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [COCO_ROOT] [MINDRECORD_DIR](option)"
+    echo "Usage: bash run_standalone_train_gpu.sh [PRETRAINED_PATH] [COCO_ROOT] [DEVICE_ID] [MINDRECORD_DIR](option)"
 exit 1
 fi
 
@@ -27,33 +27,26 @@ get_real_path(){
     echo "$(realpath -m $PWD/$1)"
   fi
 }
+
 PATH1=$(get_real_path $1)
 PATH2=$(get_real_path $2)
-PATH3=$(get_real_path $3)
-echo $PATH3
 echo $PATH1
 echo $PATH2
 
 if [ ! -f $PATH1 ]
 then 
-    echo "error: ANNO_PATH=$PATH1 is not a file"
-exit 1
-fi 
-
-if [ ! -f $PATH2 ]
-then 
-    echo "error: CHECKPOINT_PATH=$PATH2 is not a file"
-exit 1
-fi 
-
-if [ ! -d $PATH3 ]
-then
-    echo "error: COCO_ROOT=$PATH3 is not a dir"
+    echo "error: PRETRAINED_PATH=$PATH1 is not a file"
 exit 1
 fi
 
-mindrecord_dir=$PATH3/FASTERRCNN_MINDRECORD/
-if [ $# -eq 4 ]
+if [ ! -d $PATH2 ]
+then
+    echo "error: COCO_ROOT=$PATH2 is not a dir"
+exit 1
+fi
+
+mindrecord_dir=$PATH2/FASTERRCNN_MINDRECORD/
+if [ $# == 4 ]
 then
     mindrecord_dir=$(get_real_path $4)
     if [ ! -d $mindrecord_dir ]
@@ -65,26 +58,25 @@ fi
 echo $mindrecord_dir
 
 BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
-CONFIG_FILE="${BASE_PATH}/../default_config.yaml"
+CONFIG_FILE="${BASE_PATH}/../default_config_gpu.yaml"
 
-ulimit -u unlimited
 export DEVICE_NUM=1
-export RANK_SIZE=$DEVICE_NUM
-export DEVICE_ID=0
+export DEVICE_ID=$3
 export RANK_ID=0
+export RANK_SIZE=1
 
-if [ -d "eval" ];
+if [ -d "train" ];
 then
-    rm -rf ./eval
+    rm -rf ./train
 fi
-mkdir ./eval
-cp ../*.py ./eval
-cp ../*.yaml ./eval
-cp *.sh ./eval
-cp -r ../src ./eval
-cd ./eval || exit
+mkdir ./train
+cp ../*.py ./train
+cp ../*.yaml ./train
+cp *.sh ./train
+cp -r ../src ./train
+cd ./train || exit
+echo "start training for device $DEVICE_ID"
 env > env.log
-echo "start eval for device $DEVICE_ID"
-python eval.py --config_path=$CONFIG_FILE --device_id=$DEVICE_ID --anno_path=$PATH1 --checkpoint_path=$PATH2 \
---coco_root=$PATH3 --mindrecord_dir=$mindrecord_dir &> log &
+python train.py --config_path=$CONFIG_FILE --coco_root=$PATH2 --mindrecord_dir=$mindrecord_dir \
+--device_id=$DEVICE_ID --pre_trained=$PATH1 --device_target="GPU" > log 2>&1 &
 cd ..

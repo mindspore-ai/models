@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 """coco eval for FasterRcnn-DCN"""
 
 import json
+
 import numpy as np
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
@@ -35,8 +36,21 @@ summary_init = {
     'Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ]': _init_value,
 }
 
+
 def coco_eval(result_files, result_types, coco, max_dets=(100, 300, 1000), single_result=False):
-    """coco eval for fasterrcnn"""
+    """
+    Coco evaluation of FasterRCNN
+
+    Args:
+        result_files: Files to save results
+        result_types: Result types
+        coco: COCO dataset path
+        max_dets: Maximum depth
+        single_result: Flag to obtain single result
+
+    Returns:
+        Dict with metrics summary
+    """
     anns = json.load(open(result_files['bbox']))
     if not anns:
         return summary_init
@@ -101,14 +115,25 @@ def coco_eval(result_files, result_types, coco, max_dets=(100, 300, 1000), singl
 
     return summary_metrics
 
+
 def xyxy2xywh(bbox):
+    """
+    Transform bounding box format
+
+    Args:
+        bbox: Bounding box in xyxy format
+
+    Returns:
+        Bounding box in xywh format
+    """
     _bbox = bbox.tolist()
     return [
         _bbox[0],
         _bbox[1],
         _bbox[2] - _bbox[0] + 1,
         _bbox[3] - _bbox[1] + 1,
-        ]
+    ]
+
 
 def bbox2result_1image(bboxes, labels, num_classes):
     """Convert detection results to a list of numpy arrays.
@@ -127,11 +152,21 @@ def bbox2result_1image(bboxes, labels, num_classes):
         result = [bboxes[labels == i, :] for i in range(num_classes - 1)]
     return result
 
+
 def proposal2json(dataset, results):
-    """convert proposal to json mode"""
+    """
+    Convert proposal to json mode
+
+    Args:
+        dataset: Dataset object
+        results: Results of the network
+
+    Returns:
+        Predicts stored in the JSON format
+    """
     img_ids = dataset.getImgIds()
     json_results = []
-    dataset_len = dataset.get_dataset_size()*2
+    dataset_len = dataset.get_dataset_size() * 2
     for idx in range(dataset_len):
         img_id = img_ids[idx]
         bboxes = results[idx]
@@ -144,8 +179,18 @@ def proposal2json(dataset, results):
             json_results.append(data)
     return json_results
 
+
 def det2json(dataset, results):
-    """convert det to json mode"""
+    """
+    Convert detections to json mode
+
+    Args:
+        dataset: Dataset object
+        results: Results of the network
+
+    Returns:
+        Predicts stored in the JSON format
+    """
     cat_ids = dataset.getCatIds()
     img_ids = dataset.getImgIds()
     json_results = []
@@ -165,8 +210,19 @@ def det2json(dataset, results):
                 json_results.append(data)
     return json_results
 
+
 def segm2json(dataset, results):
-    """convert segm to json mode"""
+    """
+    Convert segmentations to json mode
+
+    Args:
+        dataset: Dataset object
+        results: Results of the network
+
+    Returns:
+        Predicts stored in the JSON format for bounding box;
+        Predicts stored in the JSON format for segmentation;
+    """
     bbox_json_results = []
     segm_json_results = []
     for idx in range(len(dataset)):
@@ -199,8 +255,19 @@ def segm2json(dataset, results):
                 segm_json_results.append(data)
     return bbox_json_results, segm_json_results
 
+
 def results2json(dataset, results, out_file):
-    """convert result convert to json mode"""
+    """
+    Convert results to json mode
+
+    Args:
+        dataset: Dataset object
+        results: Results of the network
+        out_file: Output file
+
+    Returns:
+        JSON dict with results
+    """
     result_files = dict()
     if isinstance(results[0], list):
         json_results = det2json(dataset, results)

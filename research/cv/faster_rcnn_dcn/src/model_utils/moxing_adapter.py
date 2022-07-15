@@ -14,38 +14,73 @@
 # ============================================================================
 """Moxing adapter for ModelArts"""
 
-import os
 import functools
+import os
+
 from mindspore import context
 from mindspore.profiler import Profiler
+
 from .config import config
 
 _global_sync_count = 0
 
+
 def get_device_id():
+    """
+    Get device ID
+
+    Returns:
+        Device ID
+    """
     device_id = os.getenv('DEVICE_ID', '0')
     return int(device_id)
 
 
 def get_device_num():
+    """
+    Get number of devices
+
+    Returns:
+        Number of devices
+    """
     device_num = os.getenv('RANK_SIZE', '1')
     return int(device_num)
 
 
 def get_rank_id():
+    """
+    Get ID of current device
+
+    Returns:
+        Current device ID
+    """
     global_rank_id = os.getenv('RANK_ID', '0')
     return int(global_rank_id)
 
 
 def get_job_id():
+    """
+    Get job id
+
+    Returns:
+        Job ID
+    """
     job_id = os.getenv('JOB_ID')
     job_id = job_id if job_id != "" else "default"
     return job_id
+
 
 def sync_data(from_path, to_path):
     """
     Download data from remote obs to local directory if the first url is remote url and the second one is local path
     Upload data from local directory to remote obs in contrast.
+
+    Args:
+        from_path: Source path
+        to_path: Destination path
+
+    Returns:
+
     """
     import moxing as mox
     import time
@@ -75,7 +110,14 @@ def sync_data(from_path, to_path):
 
 def moxing_wrapper(pre_process=None, post_process=None):
     """
-    Moxing wrapper to download dataset and upload outputs.
+    Moxing wrapper to download dataset and upload outputs
+
+    Args:
+        pre_process: Preprocessing function
+        post_process: Postprocessing function
+
+    Returns:
+        Moxing wrapper
     """
     def wrapper(run_func):
         @functools.wraps(run_func)

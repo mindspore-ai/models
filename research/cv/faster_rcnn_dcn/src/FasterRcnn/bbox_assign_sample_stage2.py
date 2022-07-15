@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,10 +15,10 @@
 """FasterRcnn-DCN tpositive and negative sample screening for Rcnn."""
 
 import numpy as np
-import mindspore.nn as nn
-import mindspore.common.dtype as mstype
-from mindspore.ops import operations as P
+from mindspore import nn
+from mindspore.common import dtype as mstype
 from mindspore.common.tensor import Tensor
+from mindspore.ops import operations as P
 
 
 class BboxAssignSampleForRcnn(nn.Cell):
@@ -110,12 +110,22 @@ class BboxAssignSampleForRcnn(nn.Cell):
 
     def construct(self, gt_bboxes_i, gt_labels_i, valid_mask, bboxes, gt_valids):
         """construct"""
-        gt_bboxes_i = self.select(self.cast(self.tile(self.reshape(self.cast(gt_valids, mstype.int32), \
-                                  (self.num_gts, 1)), (1, 4)), mstype.bool_), \
-                                  gt_bboxes_i, self.check_gt_one)
-        bboxes = self.select(self.cast(self.tile(self.reshape(self.cast(valid_mask, mstype.int32), \
-                             (self.num_bboxes, 1)), (1, 4)), mstype.bool_), \
-                             bboxes, self.check_anchor_two)
+        gt_bboxes_i = self.select(
+            self.cast(
+                self.tile(self.reshape(self.cast(gt_valids, mstype.int32), (self.num_gts, 1)), (1, 4)),
+                mstype.bool_
+            ),
+            gt_bboxes_i,
+            self.check_gt_one
+        )
+        bboxes = self.select(
+            self.cast(
+                self.tile(self.reshape(self.cast(valid_mask, mstype.int32), (self.num_bboxes, 1)), (1, 4)),
+                mstype.bool_
+            ),
+            bboxes,
+            self.check_anchor_two
+        )
 
         overlaps = self.iou(bboxes, gt_bboxes_i)
 
@@ -130,7 +140,7 @@ class BboxAssignSampleForRcnn(nn.Cell):
         assigned_gt_inds2 = self.select(neg_sample_iou_mask, self.assigned_gt_zeros, self.assigned_gt_inds)
 
         pos_sample_iou_mask = self.greaterequal(max_overlaps_w_gt, self.scalar_pos_iou_thr)
-        assigned_gt_inds3 = self.select(pos_sample_iou_mask, \
+        assigned_gt_inds3 = self.select(pos_sample_iou_mask,
                                         max_overlaps_w_gt_index + self.assigned_gt_ones, assigned_gt_inds2)
 
         for j in range(self.num_gts):

@@ -1,4 +1,4 @@
-# Copyright 2021-2022 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,12 +17,12 @@
 from __future__ import division
 
 import os
-import numpy as np
-from numpy import random
 
 import cv2
-import mindspore.dataset as de
-import mindspore.dataset.vision as C
+import numpy as np
+import numpy.random as random
+from mindspore import dataset as de
+from mindspore.dataset.vision import c_transforms as C
 from mindspore.mindrecord import FileWriter
 
 
@@ -74,6 +74,7 @@ def bbox_overlaps(bboxes1, bboxes2, mode='iou'):
 
 class PhotoMetricDistortion:
     """Photo Metric Distortion"""
+
     def __init__(self,
                  brightness_delta=32,
                  contrast_range=(0.5, 1.5),
@@ -85,6 +86,18 @@ class PhotoMetricDistortion:
         self.hue_delta = hue_delta
 
     def __call__(self, img, boxes, labels):
+        """
+        Apply random brightness
+        Args:
+            img: Source image
+            boxes: Bounding boxes positions
+            labels: Labels
+
+        Returns:
+            Image with random brightness;
+            Bounding boxes positions;
+            Labels
+        """
         # random brightness
         img = img.astype('float32')
 
@@ -134,7 +147,8 @@ class PhotoMetricDistortion:
 
 
 class Expand:
-    """expand image"""
+    """Expand an image"""
+
     def __init__(self, mean=(0, 0, 0), to_rgb=True, ratio_range=(1, 4)):
         if to_rgb:
             self.mean = mean[::-1]
@@ -143,6 +157,16 @@ class Expand:
         self.min_ratio, self.max_ratio = ratio_range
 
     def __call__(self, img, boxes, labels):
+        """
+        Apply an image expansion
+        Args:
+            img: Source image
+            boxes: Bounding boxes positions
+            labels: Labels
+
+        Returns:
+            Expanded images
+        """
         if random.randint(2):
             return img, boxes, labels
 
@@ -159,6 +183,17 @@ class Expand:
 
 
 def rescale_with_tuple(img, scale):
+    """
+    Rescale an image with given scales
+
+    Args:
+        img: Source image
+        scale: Scales to rescale with them
+
+    Returns:
+        Rescaled image
+        Scale factor
+    """
     h, w = img.shape[:2]
     scale_factor = min(max(scale) / max(h, w), min(scale) / min(h, w))
     new_size = int(w * float(scale_factor) + 0.5), int(h * float(scale_factor) + 0.5)
@@ -168,17 +203,44 @@ def rescale_with_tuple(img, scale):
 
 
 def rescale_with_factor(img, scale_factor):
+    """
+    Rescale ab image with given scales
+
+    Args:
+        img: Source image
+        scale_factor: Scale given as factor
+
+    Returns:
+        Rescaled image
+    """
     h, w = img.shape[:2]
     new_size = int(w * float(scale_factor) + 0.5), int(h * float(scale_factor) + 0.5)
     return cv2.resize(img, new_size, interpolation=cv2.INTER_NEAREST)
 
 
 def rescale_column(img, img_shape, gt_bboxes, gt_label, gt_num, config):
-    """rescale operation for image"""
+    """
+    Rescale operation for an image
+
+    Args:
+        img: Source image
+        img_shape: Shape of the image
+        gt_bboxes: Ground truth bounding boxes
+        gt_label: Ground truth labels
+        gt_num: Number of ground truth labels
+        config: Config object with training parameters
+
+    Returns:
+        Padded image
+        Shape of image
+        Ground truth bounding boxes
+        Ground truth labels
+        Number of ground truth labels
+    """
     img_data, scale_factor = rescale_with_tuple(img, (config.img_width, config.img_height))
     if img_data.shape[0] > config.img_height:
         img_data, scale_factor2 = rescale_with_tuple(img_data, (config.img_height, config.img_height))
-        scale_factor = scale_factor*scale_factor2
+        scale_factor = scale_factor * scale_factor2
 
     gt_bboxes = gt_bboxes * scale_factor
     gt_bboxes[:, 0::2] = np.clip(gt_bboxes[:, 0::2], 0, img_data.shape[1] - 1)
@@ -194,14 +256,32 @@ def rescale_column(img, img_shape, gt_bboxes, gt_label, gt_num, config):
     img_shape = (config.img_height, config.img_width, 1.0)
     img_shape = np.asarray(img_shape, dtype=np.float32)
 
-    return  (pad_img_data, img_shape, gt_bboxes, gt_label, gt_num)
+    return pad_img_data, img_shape, gt_bboxes, gt_label, gt_num
+
 
 def rescale_column_test(img, img_shape, gt_bboxes, gt_label, gt_num, config):
-    """rescale operation for image of eval"""
+    """
+    Rescale operation for an image of evaluation data
+
+    Args:
+        img: Source image
+        img_shape: Shape of the image
+        gt_bboxes: Ground truth bounding boxes
+        gt_label: Ground truth labels
+        gt_num: Number of ground truth labels
+        config: Config object with training parameters
+
+    Returns:
+        Padded image
+        Shape of image
+        Ground truth bounding boxes
+        Ground truth labels
+        Number of ground truth labels
+    """
     img_data, scale_factor = rescale_with_tuple(img, (config.img_width, config.img_height))
     if img_data.shape[0] > config.img_height:
         img_data, scale_factor2 = rescale_with_tuple(img_data, (config.img_height, config.img_height))
-        scale_factor = scale_factor*scale_factor2
+        scale_factor = scale_factor * scale_factor2
 
     pad_h = config.img_height - img_data.shape[0]
     pad_w = config.img_width - img_data.shape[1]
@@ -213,11 +293,28 @@ def rescale_column_test(img, img_shape, gt_bboxes, gt_label, gt_num, config):
     img_shape = np.append(img_shape, (scale_factor, scale_factor))
     img_shape = np.asarray(img_shape, dtype=np.float32)
 
-    return  (pad_img_data, img_shape, gt_bboxes, gt_label, gt_num)
+    return pad_img_data, img_shape, gt_bboxes, gt_label, gt_num
 
 
 def resize_column(img, img_shape, gt_bboxes, gt_label, gt_num, config):
-    """resize operation for image"""
+    """
+    Resize operation for an image
+
+    Args:
+        img: Source image
+        img_shape: Shape of the image
+        gt_bboxes: Ground truth bounding boxes
+        gt_label: Ground truth labels
+        gt_num: Number of ground truth labels
+        config: Config object with training parameters
+
+    Returns:
+        Padded image
+        Shape of image
+        Ground truth bounding boxes
+        Ground truth labels
+        Number of ground truth labels
+    """
     img_data = img
     h, w = img_data.shape[:2]
     img_data = cv2.resize(
@@ -235,11 +332,28 @@ def resize_column(img, img_shape, gt_bboxes, gt_label, gt_num, config):
     gt_bboxes[:, 0::2] = np.clip(gt_bboxes[:, 0::2], 0, img_shape[1] - 1)
     gt_bboxes[:, 1::2] = np.clip(gt_bboxes[:, 1::2], 0, img_shape[0] - 1)
 
-    return (img_data, img_shape, gt_bboxes, gt_label, gt_num)
+    return img_data, img_shape, gt_bboxes, gt_label, gt_num
 
 
 def resize_column_test(img, img_shape, gt_bboxes, gt_label, gt_num, config):
-    """resize operation for image of eval"""
+    """
+    Resize operation for an image of evaluation data
+
+    Args:
+        img: Source image
+        img_shape: Shape of the image
+        gt_bboxes: Ground truth bounding boxes
+        gt_label: Ground truth labels
+        gt_num: Number of ground truth labels
+        config: Config object with training parameters
+
+    Returns:
+        Padded image
+        Shape of image
+        Ground truth bounding boxes
+        Ground truth labels
+        Number of ground truth labels
+    """
     img_data = img
     h, w = img_data.shape[:2]
     img_data = cv2.resize(
@@ -257,21 +371,55 @@ def resize_column_test(img, img_shape, gt_bboxes, gt_label, gt_num, config):
     gt_bboxes[:, 0::2] = np.clip(gt_bboxes[:, 0::2], 0, img_shape[1] - 1)
     gt_bboxes[:, 1::2] = np.clip(gt_bboxes[:, 1::2], 0, img_shape[0] - 1)
 
-    return (img_data, img_shape, gt_bboxes, gt_label, gt_num)
+    return img_data, img_shape, gt_bboxes, gt_label, gt_num
 
 
 def impad_to_multiple_column(img, img_shape, gt_bboxes, gt_label, gt_num, config):
-    """impad operation for image"""
+    """
+    Image padding operation for sn image
+
+    Args:
+        img: Source image
+        img_shape: Shape of the image
+        gt_bboxes: Ground truth bounding boxes
+        gt_label: Ground truth labels
+        gt_num: Number of ground truth labels
+        config: Config object with training parameters
+
+    Returns:
+        Padded image
+        Shape of image
+        Ground truth bounding boxes
+        Ground truth labels
+        Number of ground truth labels
+    """
     img_data = cv2.copyMakeBorder(img,
                                   0, config.img_height - img.shape[0], 0, config.img_width - img.shape[1],
                                   cv2.BORDER_CONSTANT,
                                   value=0)
     img_data = img_data.astype(np.float32)
-    return (img_data, img_shape, gt_bboxes, gt_label, gt_num)
+    return img_data, img_shape, gt_bboxes, gt_label, gt_num
 
 
 def imnormalize_column(img, img_shape, gt_bboxes, gt_label, gt_num):
-    """imnormalize operation for image"""
+    """
+    Image normalization operation for an image
+
+    Args:
+        img: Source image
+        img_shape: Shape of the image
+        gt_bboxes: Ground truth bounding boxes
+        gt_label: Ground truth labels
+        gt_num: Number of ground truth labels
+        config: Config object with training parameters
+
+    Returns:
+        Padded image
+        Shape of image
+        Ground truth bounding boxes
+        Ground truth labels
+        Number of ground truth labels
+    """
     mean = np.asarray([123.675, 116.28, 103.53])
     std = np.asarray([58.395, 57.12, 57.375])
     img_data = img.copy().astype(np.float32)
@@ -280,11 +428,28 @@ def imnormalize_column(img, img_shape, gt_bboxes, gt_label, gt_num):
     cv2.multiply(img_data, 1 / np.float64(std.reshape(1, -1)), img_data)  # inplace
 
     img_data = img_data.astype(np.float32)
-    return (img_data, img_shape, gt_bboxes, gt_label, gt_num)
+    return img_data, img_shape, gt_bboxes, gt_label, gt_num
 
 
 def flip_column(img, img_shape, gt_bboxes, gt_label, gt_num):
-    """flip operation for image"""
+    """
+    Flip operation for an image
+
+    Args:
+        img: Source image
+        img_shape: Shape of the image
+        gt_bboxes: Ground truth bounding boxes
+        gt_label: Ground truth labels
+        gt_num: Number of ground truth labels
+        config: Config object with training parameters
+
+    Returns:
+        Padded image
+        Shape of image
+        Ground truth bounding boxes
+        Ground truth labels
+        Number of ground truth labels
+    """
     img_data = img
     img_data = np.flip(img_data, axis=1)
     flipped = gt_bboxes.copy()
@@ -293,11 +458,28 @@ def flip_column(img, img_shape, gt_bboxes, gt_label, gt_num):
     flipped[..., 0::4] = w - gt_bboxes[..., 2::4] - 1
     flipped[..., 2::4] = w - gt_bboxes[..., 0::4] - 1
 
-    return (img_data, img_shape, flipped, gt_label, gt_num)
+    return img_data, img_shape, flipped, gt_label, gt_num
 
 
 def transpose_column(img, img_shape, gt_bboxes, gt_label, gt_num):
-    """transpose operation for image"""
+    """
+    Transpose operation for an image
+
+    Args:
+        img: Source image
+        img_shape: Shape of the image
+        gt_bboxes: Ground truth bounding boxes
+        gt_label: Ground truth labels
+        gt_num: Number of ground truth labels
+        config: Config object with training parameters
+
+    Returns:
+        Padded image
+        Shape of image
+        Ground truth bounding boxes
+        Ground truth labels
+        Number of ground truth labels
+    """
     img_data = img.transpose(2, 0, 1).copy()
     img_data = img_data.astype(np.float32)
     img_shape = img_shape.astype(np.float32)
@@ -305,27 +487,73 @@ def transpose_column(img, img_shape, gt_bboxes, gt_label, gt_num):
     gt_label = gt_label.astype(np.int32)
     gt_num = gt_num.astype(np.bool)
 
-    return (img_data, img_shape, gt_bboxes, gt_label, gt_num)
+    return img_data, img_shape, gt_bboxes, gt_label, gt_num
 
 
 def photo_crop_column(img, img_shape, gt_bboxes, gt_label, gt_num):
-    """photo crop operation for image"""
+    """
+    Photo crop operation for an image
+
+    Args:
+        img: Source image
+        img_shape: Shape of the image
+        gt_bboxes: Ground truth bounding boxes
+        gt_label: Ground truth labels
+        gt_num: Number of ground truth labels
+        config: Config object with training parameters
+
+    Returns:
+        Padded image
+        Shape of image
+        Ground truth bounding boxes
+        Ground truth labels
+        Number of ground truth labels
+    """
     random_photo = PhotoMetricDistortion()
     img_data, gt_bboxes, gt_label = random_photo(img, gt_bboxes, gt_label)
 
-    return (img_data, img_shape, gt_bboxes, gt_label, gt_num)
+    return img_data, img_shape, gt_bboxes, gt_label, gt_num
 
 
 def expand_column(img, img_shape, gt_bboxes, gt_label, gt_num):
-    """expand operation for image"""
+    """
+    Expand operation for an image
+
+    Args:
+        img: Source image
+        img_shape: Shape of the image
+        gt_bboxes: Ground truth bounding boxes
+        gt_label: Ground truth labels
+        gt_num: Number of ground truth labels
+        config: Config object with training parameters
+
+    Returns:
+        Padded image
+        Shape of image
+        Ground truth bounding boxes
+        Ground truth labels
+        Number of ground truth labels
+    """
     expand = Expand()
     img, gt_bboxes, gt_label = expand(img, gt_bboxes, gt_label)
 
-    return (img, img_shape, gt_bboxes, gt_label, gt_num)
+    return img, img_shape, gt_bboxes, gt_label, gt_num
 
 
 def preprocess_fn(image, box, is_training, config):
-    """Preprocess function for dataset."""
+    """
+    Preprocess function for dataset
+
+    Args:
+        image: Source image
+        box: Bounding box
+        is_training: Flag is this training mode
+        config: Config object with training parameters
+
+    Returns:
+        Preprocessed images
+    """
+
     def _infer_data(image_bgr, image_shape, gt_box_new, gt_label_new, gt_iscrowd_new_revert):
         image_shape = image_shape[:2]
         input_data = image_bgr, image_shape, gt_box_new, gt_label_new, gt_iscrowd_new_revert
@@ -340,7 +568,17 @@ def preprocess_fn(image, box, is_training, config):
         return output_data
 
     def _data_aug(image, box, is_training):
-        """Data augmentation function."""
+        """
+        Data augmentation function
+
+        Args:
+            image: Source image
+            box: Bounding box
+            is_training: Flag is this training mode
+
+        Returns:
+            Augmented images
+        """
         image_bgr = image.copy()
         image_bgr[:, :, 0] = image[:, :, 2]
         image_bgr[:, :, 1] = image[:, :, 1]
@@ -380,7 +618,17 @@ def preprocess_fn(image, box, is_training, config):
 
 
 def create_coco_label(is_training, config):
-    """Get image path and annotation from COCO."""
+    """
+    Get image path and annotation from COCO
+
+    Args:
+        is_training: Flag is this training mode
+        config: Config object with training parameters
+
+    Returns:
+        Image files
+        Image annotations dict
+    """
     from pycocotools.coco import COCO
 
     coco_root = config.coco_root
@@ -431,7 +679,16 @@ def create_coco_label(is_training, config):
 
 
 def parse_json_annos_from_txt(anno_file, config):
-    """for user defined annotations text file, parse it to json format data"""
+    """
+    For user defined annotations text file, parse it to json format data
+
+    Args:
+        anno_file: Annotation file
+        config: Config object with training parameters
+
+    Returns:
+        Annotations in JSON format
+    """
     if not os.path.isfile(anno_file):
         raise RuntimeError("Evaluation annotation file {} is not valid.".format(anno_file))
 
@@ -478,7 +735,18 @@ def parse_json_annos_from_txt(anno_file, config):
 
 
 def create_train_data_from_txt(image_dir, anno_path):
-    """Filter valid image file, which both in image_dir and anno_path."""
+    """
+    Filter valid image file, which both in image_dir and anno_path.
+
+    Args:
+        image_dir: Directory with images
+        anno_path: Annotation path
+
+    Returns:
+        Image files
+        Image annotations dict
+    """
+
     def anno_parser(annos_str):
         """Parse annotation from string to list."""
         annos = []
@@ -489,6 +757,7 @@ def create_train_data_from_txt(image_dir, anno_path):
             iscrowd = int(anno[5])
             annos.append([xmin, ymin, xmax, ymax, cls_id, iscrowd])
         return annos
+
     image_files = []
     image_anno_dict = {}
     if not os.path.isdir(image_dir):
@@ -510,7 +779,19 @@ def create_train_data_from_txt(image_dir, anno_path):
 
 
 def data_to_mindrecord_byte_image(config, dataset="coco", is_training=True, prefix="fasterrcnn.mindrecord", file_num=8):
-    """Create MindRecord file."""
+    """
+    Create MindRecord file
+
+    Args:
+        config: Config object with training parameters
+        dataset: Dataset name
+        is_training: Flag is it training mode
+        prefix: Prefix for mindrecords names
+        file_num: Number of filters
+
+    Returns:
+
+    """""
     mindrecord_dir = config.mindrecord_dir
     mindrecord_path = os.path.join(mindrecord_dir, prefix)
     writer = FileWriter(mindrecord_path, file_num)
@@ -536,7 +817,22 @@ def data_to_mindrecord_byte_image(config, dataset="coco", is_training=True, pref
 
 def create_fasterrcnn_dataset(config, mindrecord_file, batch_size=2, device_num=1, rank_id=0, is_training=True,
                               num_parallel_workers=8, python_multiprocessing=False):
-    """Create FasterRcnn dataset with MindDataset."""
+    """
+    Create FasterRcnn dataset with MindDataset
+
+    Args:
+        config: Config object with training parameters
+        mindrecord_file: Mindrecord file
+        batch_size: Size of batch
+        device_num: Number of device
+        rank_id: ID of current device
+        is_training: Flag is it training mode
+        num_parallel_workers: Number of parallel workers
+        python_multiprocessing: Flag to use python multiprocessing
+
+    Returns:
+        Dataset object
+    """
     cv2.setNumThreads(0)
     de.config.set_prefetch_size(8)
     ds = de.MindDataset(mindrecord_file, columns_list=["image", "annotation"], num_shards=device_num, shard_id=rank_id,

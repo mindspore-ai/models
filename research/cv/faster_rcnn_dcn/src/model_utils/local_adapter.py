@@ -17,20 +17,45 @@
 
 import os
 
+
 def get_device_id():
+    """
+    Get device ID
+
+    Returns:
+        Device ID
+    """
     device_id = os.getenv('DEVICE_ID', '0')
     return int(device_id)
 
 
 def get_device_num():
+    """
+    Get device number
+
+    Returns:
+        Number of device
+    """
     device_num = os.getenv('RANK_SIZE', '1')
     return int(device_num)
 
 
 def get_rank_id():
+    """
+    Get rank ID
+
+    Returns:
+        Rank ID
+    """
     global_rank_id = os.getenv('RANK_ID', '0')
     return int(global_rank_id)
 
 
 def get_job_id():
+    """
+    Get job ID
+
+    Returns:
+        Job ID
+    """
     return "Local Job"

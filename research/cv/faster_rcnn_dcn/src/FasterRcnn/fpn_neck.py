@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,20 +15,41 @@
 """FasterRcnn-DCN feature pyramid network."""
 
 import numpy as np
-import mindspore.nn as nn
-from mindspore.ops import operations as P
-from mindspore.common.tensor import Tensor
+from mindspore import nn
 from mindspore.common import dtype as mstype
 from mindspore.common.initializer import initializer
+from mindspore.common.tensor import Tensor
+from mindspore.ops import operations as P
 
 
 def bias_init_zeros(shape):
-    """Bias init method."""
+    """
+    Bias init method
+
+    Args:
+        shape: Tensor shape
+
+    Returns:
+        Bias tensor initialized with zeros
+    """
     return Tensor(np.array(np.zeros(shape).astype(np.float32)))
 
 
 def _conv(in_channels, out_channels, kernel_size=3, stride=1, padding=0, pad_mode='pad'):
-    """Conv2D wrapper."""
+    """
+    Conv2D wrapper
+
+    Args:
+        in_channels: Input channels
+        out_channels:  Output channels
+        kernel_size: Size of kernel
+        stride: Strides
+        padding: Paddings
+        pad_mode: Padding mode
+
+    Returns:
+        Wrapped Conv2D layer
+    """
     shape = (out_channels, in_channels, kernel_size, kernel_size)
     weights = initializer("XavierUniform", shape=shape, dtype=mstype.float32).init_data()
     shape_bias = (out_channels,)

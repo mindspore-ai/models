@@ -14,11 +14,13 @@
 # ============================================================================
 """Parse arguments"""
 
-import os
-import ast
 import argparse
+import ast
+import os
 from pprint import pprint, pformat
+
 import yaml
+
 
 class Config:
     """
@@ -32,9 +34,11 @@ class Config:
                 setattr(self, k, Config(v) if isinstance(v, dict) else v)
 
     def __str__(self):
+        """Convert object to string"""
         return pformat(self.__dict__)
 
     def __repr__(self):
+        """Get string representation"""
         return self.__str__()
 
 
@@ -123,5 +127,6 @@ def get_config():
     pprint(final_config)
     print("Please check the above information for the configurations", flush=True)
     return Config(final_config)
+
 
 config = get_config()

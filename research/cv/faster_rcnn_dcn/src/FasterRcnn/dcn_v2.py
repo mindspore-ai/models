@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,11 +14,12 @@
 # ============================================================================
 """Deformable Convolution operator V2"""
 
-import numpy as np
 import mindspore as ms
+import mindspore.common.dtype as mstype
 import mindspore.nn as nn
 import mindspore.ops as ops
-import mindspore.common.dtype as mstype
+import numpy as np
+
 np.random.seed(0)
 ms.common.set_seed(0)
 
@@ -64,7 +65,6 @@ def _get_offset_base(offset_shape, stride):
 
 
 def _get_feature_by_index(x, p_h, p_w):
-
     """gather feature by specified index"""
     # x (n, c, h_in, w_in)
     # p_h (n, h, w, k*k)

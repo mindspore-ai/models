@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,20 +15,21 @@
 """FasterRcnn-DCN based on ResNet."""
 
 import numpy as np
-import mindspore.nn as nn
 from mindspore import context
-from mindspore.ops import operations as P
+from mindspore import nn
+from mindspore.common import dtype as mstype
 from mindspore.common.tensor import Tensor
-import mindspore.common.dtype as mstype
 from mindspore.ops import functional as F
-from .resnet import ResNetFea, ResidualBlockUsing, ResidualBlockUsingDCN
+from mindspore.ops import operations as P
+
+from .anchor_generator import AnchorGenerator
 from .bbox_assign_sample_stage2 import BboxAssignSampleForRcnn
 from .fpn_neck import FeatPyramidNeck
 from .proposal_generator import Proposal
 from .rcnn import Rcnn
-from .rpn import RPN
+from .resnet import ResNetFea, ResidualBlockUsing, ResidualBlockUsingDCN
 from .roi_align import SingleRoIExtractor
-from .anchor_generator import AnchorGenerator
+from .rpn import RPN
 
 
 class Faster_Rcnn_Resnet(nn.Cell):
@@ -222,7 +223,7 @@ class Faster_Rcnn_Resnet(nn.Cell):
         self.test_num_proposal = self.test_batch_size * self.rpn_max_num
 
     def init_tensor(self, config):
-
+        """Initialize tensor"""
         roi_align_index = [np.array(np.ones((config.num_expected_pos_stage2 + config.num_expected_neg_stage2, 1)) * i,
                                     dtype=self.dtype) for i in range(self.train_batch_size)]
 
@@ -478,12 +479,15 @@ class Faster_Rcnn_Resnet(nn.Cell):
 
         return multi_level_anchors
 
+
 class FasterRcnn_Infer(nn.Cell):
+    """Perform inference of FasterRCNN"""
     def __init__(self, config):
         super(FasterRcnn_Infer, self).__init__()
         self.network = Faster_Rcnn_Resnet(config)
         self.network.set_train(False)
 
     def construct(self, img_data, img_metas):
+        """Forward pass throw network"""
         output = self.network(img_data, img_metas, None, None, None)
         return output
