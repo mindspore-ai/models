@@ -19,14 +19,11 @@ import datetime
 import mindspore
 import mindspore.nn as nn
 from mindspore import context
-from mindspore import Tensor
 from mindspore.nn.optim import Momentum
 from mindspore.communication.management import get_group_size, init, get_rank
 from mindspore.nn import TrainOneStepCell
 from mindspore.context import ParallelMode
-from mindspore.train.callback import ModelCheckpoint, RunContext, CheckpointConfig
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.common import dtype as mstype
+from mindspore.train.serialization import load_checkpoint, load_param_into_net, save_checkpoint
 from src.FaceAttribute.resnet18 import get_resnet18
 from src.FaceAttribute.loss_factory import get_loss
 from src.dataset_train import data_generator
@@ -176,69 +173,30 @@ def run_train():
     # mixed precision training
     criterion.add_flags_recursive(fp32=True)
     train_net = TrainOneStepCell(train_net, opt, sens=config.loss_scale)
-
-    if config.local_rank == 0:
-        ckpt_max_num = config.max_epoch
-        train_config = CheckpointConfig(save_checkpoint_steps=config.steps_per_epoch, keep_checkpoint_max=ckpt_max_num)
-        ckpt_cb = ModelCheckpoint(config=train_config, directory=config.outputs_dir,
-                                  prefix='{}'.format(config.local_rank))
-        cb_params = InternalCallbackParam()
-        cb_params.train_network = train_net
-        cb_params.epoch_num = ckpt_max_num
-        cb_params.cur_epoch_num = 0
-        run_context = RunContext(cb_params)
-        ckpt_cb.begin(run_context)
-
     train_net.set_train()
-    t_end = time.time()
-    t_epoch = time.time()
-    old_progress = -1
 
-    i = 0
-    for _, (data, gt_classes) in enumerate(de_dataloader):
-
-        data_tensor = Tensor(data, dtype=mstype.float32)
-        gt_tensor = Tensor(gt_classes, dtype=mstype.int32)
-
-        loss = train_net(data_tensor, gt_tensor)
-        loss_meter.update(loss.asnumpy()[0])
-
-        if config.local_rank == 0:
-            cb_params.cur_step_num = i + 1
-            cb_params.batch_num = i + 2
-            ckpt_cb.step_end(run_context)
-
-        if (i + 1) % config.steps_per_epoch == 0 and config.local_rank == 0:
-            cb_params.cur_epoch_num += 1
-
-        if i == 0:
-            time_for_graph_compile = time.time() - create_network_start
-            config.logger.important_info(
-                '{}, graph compile time={:.2f}s'.format(config.backbone, time_for_graph_compile))
-
-        if (i + 1) % config.log_interval == 0 and config.local_rank == 0:
-            time_used = time.time() - t_end
-            epoch = int((i + 1) / config.steps_per_epoch)
-            fps = config.per_batch_size * (i - old_progress) * config.world_size / time_used
-            config.logger.info('epoch[{}], iter[{}], {}, {:.2f} imgs/sec'.format(epoch, i + 1, loss_meter, fps))
-
-            t_end = time.time()
-            loss_meter.reset()
-            old_progress = i
-
-        if (i + 1) % config.steps_per_epoch == 0 and config.local_rank == 0:
-            epoch_time_used = time.time() - t_epoch
-            epoch = int((i + 1) / config.steps_per_epoch)
-            fps = config.per_batch_size * config.world_size * config.steps_per_epoch / epoch_time_used
-            per_step_time = epoch_time_used / config.steps_per_epoch
-            config.logger.info('=================================================')
-            config.logger.info('epoch[{}], iter[{}], {:.2f} imgs/sec'.format(epoch, i + 1, fps))
-            config.logger.info('epoch[{}], epoch time: {:5.3f} ms, per step time: {:5.3f} ms'.format(
-                epoch, epoch_time_used * 1000, per_step_time * 1000))
-            config.logger.info('=================================================')
-            t_epoch = time.time()
-
-        i += 1
+    first_step = True
+    for epoch_idx in range(config.max_epoch):
+        epoch_begin_time = time.time()
+        for data_tensor, gt_tensor in de_dataloader:
+            loss = train_net(data_tensor, gt_tensor)
+            loss_meter.update(loss.asnumpy()[0])
+            if first_step:
+                time_for_graph_compile = time.time() - create_network_start
+                config.logger.important_info('{}, graph compile time={:.2f}s'.format(
+                    config.backbone, time_for_graph_compile))
+                first_step = False
+        epoch_end_time = time.time()
+        epoch_time = epoch_end_time - epoch_begin_time
+        fps = config.per_batch_size * config.world_size * config.steps_per_epoch / epoch_time
+        config.logger.info('=================================================')
+        config.logger.info('epoch[{}], iter[{}], {}, {:.2f} imgs/sec'.format(
+            epoch_idx, (epoch_idx + 1) * config.steps_per_epoch, loss_meter, fps))
+        config.logger.info('epoch[{}], epoch time: {:5.3f} ms, per step time: {:5.3f} ms'.format(
+            epoch_idx, epoch_time * 1000, epoch_time / config.steps_per_epoch * 1000))
+        if config.local_rank % 8 == 0:
+            save_checkpoint(train_net, os.path.join(config.outputs_dir, "{}-{}_{}.ckpt".format(
+                config.local_rank, epoch_idx, config.steps_per_epoch)))
 
     config.logger.info('--------- trains out ---------')
 

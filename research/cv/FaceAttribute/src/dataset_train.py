@@ -13,6 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """Face attribute dataset for train"""
+import os
 import mindspore.dataset as de
 import mindspore.dataset.vision as F
 import mindspore.dataset.transforms as F2
@@ -27,7 +28,8 @@ def data_generator(args):
     dst_h = args.dst_h
     batch_size = args.per_batch_size
     attri_num = args.attri_num
-    max_epoch = args.max_epoch
+    if os.cpu_count() >= 192:
+        args.workers = 12
     transform_img = F2.Compose([F.Decode(True),
                                 F.Resize((dst_w, dst_h)),
                                 F.RandomHorizontalFlip(prob=0.5),
@@ -40,8 +42,7 @@ def data_generator(args):
                                 python_multiprocessing=True)
     de_dataset = de_dataset.batch(batch_size, drop_remainder=True)
     steps_per_epoch = de_dataset.get_dataset_size()
-    de_dataset = de_dataset.repeat(max_epoch)
-    de_dataloader = de_dataset.create_tuple_iterator(output_numpy=True)
+    de_dataloader = de_dataset.create_tuple_iterator()
 
     num_classes = attri_num
 
