@@ -76,6 +76,7 @@ RepVGG是由清华大学&旷世科技等提出的一种新颖的CNN设计范式�
       ├──run_distribute_train_ascend.sh   // 多卡Ascend910训练脚本
       ├──run_infer_310.sh                 // Ascend310推理脚本
       ├──run_eval_ascend.sh               // 测试脚本
+      ├──run_infer_onnx.sh                // ONNX推理脚本
   ├── src
       ├──configs                          // RepVGG的配置文件
       ├──data                             // 数据集配置文件
@@ -99,6 +100,7 @@ RepVGG是由清华大学&旷世科技等提出的一种新颖的CNN设计范式�
   ├── export.py                           // 模型导出文件
   ├── preprocess.py                       // 推理数据集与处理文件
   ├── postprocess.py                      // 推理精度处理文件
+  ├── infer_onnx.py                      // 推理onnx文件
 ```
 
 ## 脚本参数
@@ -111,7 +113,7 @@ RepVGG是由清华大学&旷世科技等提出的一种新颖的CNN设计范式�
     # Architecture
     arch: RepVGG-A0-A0tiny              # RepVGG结构选择
     # ===== Dataset ===== #
-    data_url: ./data/imagenet           # 数据集地址
+    data_url: ./dataset                 # 数据集地址
     set: ImageNet                       # 数据集名字
     num_classes: 1000                   # 数据集分类数目
     mix_up: 0.0                         # MixUp数据增强参数
@@ -173,6 +175,9 @@ RepVGG是由清华大学&旷世科技等提出的一种新颖的CNN设计范式�
 
   # 使用脚本启动单卡运行评估示例
   bash ./scripts/run_eval_ascend.sh [DEVICE_ID] [CONFIG_PATH] [CHECKPOINT_PATH]
+
+  # 使用脚本启动onnx单卡运行评估示例
+  bash ./scripts/run_infer_onnx.sh [ONNX_PATH] [DATASET_PATH] [DEVICE_TARGET] [DEVICE_ID]
   ```
 
   对于分布式训练，需要提前创建JSON格式的hccl配置文件。
@@ -189,13 +194,13 @@ RepVGG是由清华大学&旷世科技等提出的一种新颖的CNN设计范式�
   python export.py --pretrained [CKPT_FILE] --config [CONFIG_PATH] --device_target [DEVICE_TARGET] --file_format [FILE_FORMAT]
   ```
 
-导出的模型会以模型的结构名字命名并且保存在当前目录下, 注意: FILE_FORMAT 必须在 ["AIR", "MINDIR"]中选择。
+导出的模型会以模型的结构名字命名并且保存在当前目录下, 注意: FILE_FORMAT 必须在 ["AIR", "MINDIR", "ONNX"]中选择。
 
 ## 推理过程
 
 ### 推理
 
-在进行推理之前我们需要先导出模型。mindir可以在任意环境上导出，air模型只能在昇腾910环境上导出。以下展示了使用mindir模型执行推理的示例。
+在进行推理之前我们需要先导出模型。mindir可以在任意环境上导出，air模型只能在昇腾910环境上导出。onnx可以在CPU/GPU/Ascend环境下导出。以下展示了使用mindir模型执行推理的示例。
 
 - 在昇腾310上使用ImageNet-1k数据集进行推理
 
@@ -206,6 +211,17 @@ RepVGG是由清华大学&旷世科技等提出的一种新颖的CNN设计范式�
     bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [DEVICE_ID]
     Top1 acc: 0.72242
     Top5 acc: 0.90734
+    ```
+
+- 在GPU/CPU上使用ImageNet-1k数据集进行ONNX推理
+
+  推理的结果保存在主目录下，在infer_onnx.log日志文件中可以找到推理结果。
+
+    ```bash
+    # onnx inference
+    bash run_infer_onnx.sh [ONNX_PATH] [DATASET_PATH] [DEVICE_TARGET] [DEVICE_ID]
+    top-1 accuracy: 0.72024
+    top-5 accuracy: 0.90394
     ```
 
 # [模型描述](#目录)
