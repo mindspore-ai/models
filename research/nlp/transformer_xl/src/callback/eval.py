@@ -40,6 +40,8 @@ def doEval(net, dataset, tgt_len, ext_len, mem_len, eval_tgt_len):
     test_loss = total_loss / total_len
     test_loss = np.mean(test_loss.asnumpy())
     net.set_train(tgt_len, ext_len, mem_len, eval_tgt_len, True)
+    if config.device_target == 'Ascend':
+        test_loss -= config.pos_loss
     return test_loss
 
 

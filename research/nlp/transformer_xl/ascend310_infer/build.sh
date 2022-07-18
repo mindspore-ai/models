@@ -13,30 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-echo "=== Acquiring datasets ==="
-echo "---"
-
-mkdir -p data
-cd data
-
-echo "- Downloading enwik8 (Character)"
-if [[ ! -d 'enwik8' ]]; then
-    mkdir -p enwik8
-    cd enwik8
-    wget --continue http://mattmahoney.net/dc/enwik8.zip --no-check-certificate
-    wget https://raw.githubusercontent.com/salesforce/awd-lstm-lm/master/data/enwik8/prep_enwik8.py --no-check-certificate
-    python3 prep_enwik8.py
-    cd ..
+if [ -d out ]; then
+    rm -rf out
 fi
 
-echo "- Downloading text8 (Character)"
-if [[ ! -d 'text8' ]]; then
-    mkdir -p text8
-    cd text8
-    wget --continue http://mattmahoney.net/dc/text8.zip --no-check-certificate
-    python ../../prep_text8.py
-    cd ..
+mkdir out
+cd out || exit
+
+if [ -f "Makefile" ]; then
+  make clean
 fi
 
-echo "---"
-echo "Happy language modeling :)"
+cmake .. \
+    -DMINDSPORE_PATH="`pip show mindspore-ascend | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
+make

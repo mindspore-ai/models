@@ -15,6 +15,7 @@
 
 import os
 import numpy as np
+from mindspore.dataset import GeneratorDataset
 from src.model.vocabulary import Vocab
 
 
@@ -155,3 +156,29 @@ def getGenerator(_data, batch_size, tgt_len, ext_len=None, varlen=False, start=0
     if varlen:
         return VariableGenerator(_data, batch_size, tgt_len, ext_len, start, std, min_len, max_deviation)
     return Generator(_data, batch_size, tgt_len, ext_len)
+
+
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(description='unit test')
+    parser.add_argument('--datadir', type=str, default='../../data/enwik8',
+                        help='location of the data corpus')
+    parser.add_argument('--dataset', type=str, default='enwik8',
+                        choices=['enwik8', 'text8'],
+                        help='dataset name')
+    parser.add_argument('--varlen', action='store_true', default=False,
+                        help='use variable length')
+    parser.add_argument('--batch_size', type=int, default=60,
+                        help='batch size')
+    parser.add_argument('--tgt_len', type=int, default=70,
+                        help='number of tokens to predict')
+    parser.add_argument('--ext_len', type=int, default=0,
+                        help='length of the extended context')
+    args = parser.parse_args()
+
+    dataset = Enwik8_Dataset(args.datadir, args.dataset, args.batch_size, args.tgt_len, args.ext_len, args.varlen)
+    train_dataset = GeneratorDataset(source=dataset.get_train_generator(), column_names=['data', 'target', 'seq_len'])
+
+    for i, (data, target, seq_len) in enumerate(train_dataset.create_tuple_iterator()):
+        print(str(i) + ' {}'.format(data))

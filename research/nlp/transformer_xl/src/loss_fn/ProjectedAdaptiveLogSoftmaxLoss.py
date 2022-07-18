@@ -85,10 +85,10 @@ class ProjectedAdaptiveLogSoftmaxLoss(LossBase):
         return logit
 
     def construct(self, hidden, target):
-        """
+        '''
             hidden :: [len*bsz x d_proj]
             target :: [len*bsz]
-        """
+        '''
 
         logit = self.out_layers[0](hidden)
         nll = self.squeeze_1(self.gather(-self.log_softmax_n_1(logit), 1, self.expandDims(target, 1)))

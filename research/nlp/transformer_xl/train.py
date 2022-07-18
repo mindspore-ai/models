@@ -15,18 +15,22 @@
 """Transformer training script."""
 
 import math
+import os
 import argparse
 import numpy as np
 import mindspore as ms
+from mindspore import DynamicLossScaleManager
 from mindspore.communication import init
 import mindspore.nn.optim as optim
 import mindspore.context as context
 from mindspore.dataset import GeneratorDataset
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.model import Model
 from src.callback.eval import EvalDuringTrain, doEval
 from src.callback.log import TrainLogger
 from src.callback.flag import FlagModifiedCallback
 from src.model.mem_transformer import MemTransformerLM
+from src.model.mem_transformer_for_ascend import MemTransformerLM as MemTransformerLMAscend
 from src.model_utils.device_adapter import get_device_id, get_device_num, get_rank_id
 from src.model_utils.config import config
 from src.utils.dataset_util import get_dataset
@@ -43,13 +47,6 @@ def init_weight(weight, _config):
 
 def init_bias(bias):
     constant_(bias, 0.0)
-
-
-def weights_init_Dense(m, config1):
-    if hasattr(m, 'weight') and m.weight is not None:
-        init_weight(m.weight, config1)
-    if hasattr(m, 'bias') and m.bias is not None:
-        init_bias(m.bias)
 
 
 def weights_init_AdaptiveEmbedding(m, config1):
@@ -90,9 +87,7 @@ def weights_init_TransformerLM(m, config1):
 
 def weights_init(m, config1):
     classname = m.__class__.__name__
-    if classname.find('Dense') != -1:
-        weights_init_Dense(m, config1)
-    elif classname.find('AdaptiveEmbedding') != -1:
+    if classname.find('AdaptiveEmbedding') != -1:
         weights_init_AdaptiveEmbedding(m, config1)
     elif classname.find('Embedding') != -1:
         if hasattr(m, 'weight'):
@@ -130,7 +125,7 @@ def get_optimizer(_config, net, scheduler):
             optimizer_sparse = optim.SGD(sparse_params, learning_rate=_config.lr * 2)
             optimizer = optim.SGD(dense_params, learning_rate=_config.lr, momentum=_config.mom)
         else:
-            optimizer = optim.SGD(net.trainable_params(), learning_rate=_config.lr,
+            optimizer = optim.SGD(net.trainable_params(), learning_rate=lr,
                                   momentum=_config.mom)
     elif _config.optim.lower() == 'adam':
         if _config.sample_softmax > 0:
@@ -144,6 +139,23 @@ def get_optimizer(_config, net, scheduler):
             optimizer = optim.Adam(dense_params, learning_rate=lr)
         else:
             optimizer = optim.Adam(net.trainable_params(), learning_rate=lr)
+    elif _config.optim.lower() == 'adamw':
+        filter_word = ['norm', 'bias']
+
+        def decay_filter(p):
+            name = p.name
+            for fw in filter_word:
+                if name.find(fw) != -1:
+                    return False
+            return True
+
+        params = net.trainable_params()
+        decay_params = list(filter(decay_filter, params))
+        other_params = list(filter(lambda x: not decay_filter(x), params))
+        group_params = [{'params': decay_params, 'weight_decay': _config.weight_decay},
+                        {'params': other_params, 'weight_decay': 0.0},
+                        {'order_params': params}]
+        optimizer = optim.AdamWeightDecay(group_params, learning_rate=lr)
     elif _config.optim.lower() == 'adagrad':
         optimizer = optim.Adagrad(net.trainable_params(), learning_rate=lr)
     return optimizer, optimizer_sparse
@@ -171,14 +183,17 @@ def a_cosine_learning_rate(current_step, base_lr, warmup_steps, total_steps):
 def dynamic_lr():
     """dynamic learning rate generator"""
     base_lr = config.lr
+    min_lr = config.lr_min
     total_steps = int(config.max_step)
     warmup_steps = int(config.warmup_step)
     lr = []
     for i in range(total_steps):
+        curr_lr = min_lr
         if i < warmup_steps:
-            lr.append(linear_warmup_learning_rate(i, warmup_steps, base_lr, base_lr * config.warmup_ratio))
+            curr_lr = max(curr_lr, linear_warmup_learning_rate(i, warmup_steps, base_lr, base_lr * config.warmup_ratio))
         else:
-            lr.append(a_cosine_learning_rate(i, base_lr, warmup_steps, total_steps))
+            curr_lr = max(curr_lr, a_cosine_learning_rate(i, base_lr, warmup_steps, total_steps))
+        lr.append(curr_lr)
     return lr
 
 
@@ -207,27 +222,33 @@ def set_seed():
     ms.set_seed(config.seed)
 
 
-def main():
-    # Set the random seed manually for reproducibility.
-    set_seed()
-
+def construct_args():
     parser = argparse.ArgumentParser(description='Transformer-XL train running')
     parser.add_argument('--datadir', default='./data/enwik8',
                         help='Directory contains enwik8 dataset.')
     parser.add_argument('--dataset', default='enwik8',
                         help='Dataset Name.', choices=["enwik8", "text8"])
     parser.add_argument('--train_url', default="./", help='Directory of training output.')
-    parser.add_argument("--device", type=str, default="GPU", help="Device Target, default GPU",
+    parser.add_argument("--device_target", type=str, default="GPU", help="Device Target, default GPU",
                         choices=["Ascend", "GPU"])
 
     args = parser.parse_args()
+    return args
+
+
+def main():
+    # Set the random seed manually for reproducibility.
+    set_seed()
+
+    args = construct_args()
     datadir = args.datadir
     dataset = args.dataset
+    config.device_target = args.device_target
 
     device_id = get_device_id()
     device_num = get_device_num()
 
-    if config.device == 'Ascend':
+    if args.device_target == 'Ascend':
         context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=device_id)
         if device_num > 1:
             context.reset_auto_parallel_context()
@@ -235,7 +256,7 @@ def main():
                                               gradients_mean=True)
             init()
 
-    elif config.device == 'GPU':
+    elif args.device_target == 'GPU':
         context.set_context(mode=context.GRAPH_MODE, device_target="GPU", max_device_memory="39.0GB",
                             enable_graph_kernel=True)
         if device_num > 1:
@@ -260,14 +281,22 @@ def main():
     ###############################################################################
     # Build the model
     ###############################################################################
-
-    net = MemTransformerLM(ntokens, config.n_layer, config.n_head, config.d_model,
-                           config.d_head, config.d_inner, config.dropout, config.dropatt,
-                           batch_size=config.batch_size,
-                           d_embed=config.d_embed, div_val=config.div_val,
-                           pre_lnorm=config.pre_lnorm, tgt_len=config.tgt_len,
-                           ext_len=config.ext_len, mem_len=config.mem_len, eval_tgt_len=config.eval_tgt_len,
-                           cutoffs=cutoffs, same_length=config.same_length, clamp_len=config.clamp_len)
+    if args.device_target == 'Ascend':
+        net = MemTransformerLMAscend(ntokens, config.n_layer, config.n_head, config.d_model,
+                                     config.d_head, config.d_inner, config.dropout, config.dropatt,
+                                     batch_size=config.batch_size,
+                                     d_embed=config.d_embed, div_val=config.div_val,
+                                     pre_lnorm=config.pre_lnorm, tgt_len=config.tgt_len,
+                                     ext_len=config.ext_len, mem_len=config.mem_len, eval_tgt_len=config.eval_tgt_len,
+                                     cutoffs=cutoffs, same_length=config.same_length, clamp_len=config.clamp_len)
+    else:
+        net = MemTransformerLM(ntokens, config.n_layer, config.n_head, config.d_model,
+                               config.d_head, config.d_inner, config.dropout, config.dropatt,
+                               batch_size=config.batch_size,
+                               d_embed=config.d_embed, div_val=config.div_val,
+                               pre_lnorm=config.pre_lnorm, tgt_len=config.tgt_len,
+                               ext_len=config.ext_len, mem_len=config.mem_len, eval_tgt_len=config.eval_tgt_len,
+                               cutoffs=cutoffs, same_length=config.same_length, clamp_len=config.clamp_len)
 
     # ensure embedding init is not overridden by out_layer in case of weight sharing
     weights_init(net, config)
@@ -310,17 +339,32 @@ def main():
 
     flagModifiedCallback = FlagModifiedCallback()
     train_log = TrainLogger(per_print_times=config.log_interval, n_batch=config.n_batch)
-    evalDuringTrain = EvalDuringTrain(dataset=valid_dataset, per_print_times=config.eval_interval,
-                                      tgt_len=config.tgt_len, ext_len=config.ext_len, mem_len=config.mem_len,
-                                      eval_tgt_len=config.eval_tgt_len)
+    if args.device_target == 'Ascend':
+        if device_id == 0:
+            config_ck = CheckpointConfig(save_checkpoint_steps=4000, keep_checkpoint_max=4)
+            modelCheckpoint = ModelCheckpoint(directory=os.path.join(config.checkpoint_url, 'device_' + str(device_id)),
+                                              config=config_ck)
+            callbacks = [flagModifiedCallback, train_log, modelCheckpoint]
+        else:
+            callbacks = [flagModifiedCallback, train_log]
 
-    model = Model(network=net, loss_fn=None, optimizer=optimizer, metrics=None)
-    model.train(config.max_step, train_dataset, sink_size=1,
-                callbacks=[flagModifiedCallback, train_log, evalDuringTrain])
+        loss_scale_manager = DynamicLossScaleManager()
+
+        model = Model(network=net, loss_fn=None, optimizer=optimizer, metrics=None,
+                      loss_scale_manager=loss_scale_manager)
+        model.train(config.max_step, train_dataset, sink_size=1, callbacks=callbacks)
+    else:
+        evalDuringTrain = EvalDuringTrain(dataset=valid_dataset, per_print_times=config.eval_interval,
+                                          tgt_len=config.tgt_len, ext_len=config.ext_len, mem_len=config.mem_len,
+                                          eval_tgt_len=config.eval_tgt_len)
+
+        model = Model(network=net, loss_fn=None, optimizer=optimizer, metrics=None)
+        model.train(config.max_step, train_dataset, sink_size=1,
+                    callbacks=[flagModifiedCallback, train_log, evalDuringTrain])
 
     # Test #
 
-    if device_id == 0:
+    if device_id == 0 and args.device_target == 'GPU':
         test_loss = doEval(net=net, dataset=test_dataset, tgt_len=config.tgt_len, ext_len=config.ext_len,
                            mem_len=config.mem_len, eval_tgt_len=config.eval_tgt_len)
         print('=' * 100)

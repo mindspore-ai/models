@@ -43,6 +43,9 @@ datadir = args.datadir
 dataset = args.dataset
 pt_path = args.pt_path
 device_id = args.device_id
+print(datadir)
+print(dataset)
+print(pt_path)
 
 numpy_param_path = pt_path
 with open(numpy_param_path, 'rb') as f:

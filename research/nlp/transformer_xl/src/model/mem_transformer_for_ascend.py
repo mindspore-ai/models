@@ -17,12 +17,11 @@ import mindspore.numpy as np
 import mindspore as ms
 import mindspore.nn as nn
 import mindspore.ops as P
-from mindspore import Tensor
-from mindspore import Parameter
-from mindspore.ops import Zeros, Ones
+from mindspore import Parameter, Tensor
+from mindspore.ops import Zeros, Ones, clip_by_value
 from mindspore.ops import ExpandDims, Concat
-from mindspore.ops import clip_by_value
-from mindspore.nn import Tril, Triu
+from mindspore.nn import Tril, Triu, Dense
+
 from src.loss_fn.ProjectedAdaptiveLogSoftmaxLoss import ProjectedAdaptiveLogSoftmaxLoss
 from src.model.embedding import AdaptiveEmbedding, PositionalEmbedding
 from src.model.layer import RelPartialLearnableDecoderLayer
@@ -81,7 +80,7 @@ class MemTransformerLM(nn.Cell):
         self.sample_softmax = sample_softmax
         # use sampled softmax
         if self.sample_softmax > 0:
-            self.out_layer = nn.Dense(d_model, n_token)
+            self.out_layer = Dense(d_model, n_token).to_float(ms.float16)
             if tie_weight:
                 self.out_layer.weight = self.word_emb.emb_projs[0].embedding_table
             self.tie_weight = tie_weight
@@ -103,11 +102,12 @@ class MemTransformerLM(nn.Cell):
                         self.crit.out_projs[i] = self.word_emb.emb_projs[i]
 
         self.same_length = same_length
-        # self.clamp_len = clamp_len
         self.clamp_len = Tensor(clamp_len, ms.float32)
         self.min_clamp_len = Tensor(0, ms.float32)
 
         self._create_params()
+
+        self.idx = 0
 
         self.add_flags_recursive(is_first_iteration=True)
 
@@ -121,12 +121,9 @@ class MemTransformerLM(nn.Cell):
         self.mems = Parameter(
             self.zeros((self.n_layer, self.mem_len, self.batch_size, self.d_model), ms.float32),
             requires_grad=False)
-        self.valid_mems = Parameter(
-            self.zeros((self.n_layer, self.mem_len + self.tgt_len - self.eval_tgt_len, self.batch_size, self.d_model),
-                       ms.float32), requires_grad=False)
-        self.empty_valid_mems = Parameter(
-            self.zeros((self.n_layer, self.mem_len + self.tgt_len - self.eval_tgt_len, self.batch_size, self.d_model),
-                       ms.float32), requires_grad=False)
+        self.empty_valid_mems = self.zeros(
+            (self.n_layer, self.mem_len + self.tgt_len - self.eval_tgt_len, self.batch_size, self.d_model), ms.float32)
+        self.valid_mems = Parameter(self.empty_valid_mems, requires_grad=False)
 
     def reset_length(self, tgt_len, ext_len, mem_len):
         self.tgt_len = tgt_len
@@ -183,8 +180,8 @@ class MemTransformerLM(nn.Cell):
         else:
             # If the model does not use memory at all, make the ext_len longer.
             # Otherwise, make the mem_len longer and keep the ext_len the same.
-            self.assign(self.valid_mems, self.empty_valid_mems)
             self.add_flags_recursive(is_first_iteration=True)
+            self.assign(self.valid_mems, self.empty_valid_mems)
             if mem_len == 0:
                 self.reset_length(eval_tgt_len,
                                   ext_len + tgt_len - eval_tgt_len, mem_len)
@@ -194,7 +191,6 @@ class MemTransformerLM(nn.Cell):
         return True
 
     def construct(self, data, target, idx=None):
-
         tgt_len = target.size
         qlen, _ = data.shape
         word_emb = self.word_emb(data)
@@ -204,7 +200,7 @@ class MemTransformerLM(nn.Cell):
             else (self.mem_len if self.training else self.mem_len + self.tgt_len - self.eval_tgt_len)
 
         klen = qlen + mlen
-        all_ones = np.ones((qlen, klen), ms.int16)
+        all_ones = np.ones((qlen, klen), ms.int32)
 
         if self.same_length:
             mask_len = klen - self.mem_len
@@ -212,8 +208,8 @@ class MemTransformerLM(nn.Cell):
                 mask_shift_len = qlen - mask_len
             else:
                 mask_shift_len = qlen
-            dec_attn_mask = np.expand_dims((np.triu((all_ones, 1 + mlen), ms.int16)
-                                            + np.tril((all_ones, -mask_shift_len), ms.int16)), -1)  # -1
+            dec_attn_mask = np.expand_dims((np.triu((all_ones, 1 + mlen), ms.int32)
+                                            + np.tril((all_ones, -mask_shift_len), ms.int32)), -1)  # -1
         else:
             dec_attn_mask = np.expand_dims(np.triu(all_ones, 1 + mlen), -1)
 
@@ -238,4 +234,5 @@ class MemTransformerLM(nn.Cell):
         ###########################################################################
         pred_hid = hidden[-tgt_len:]
         loss = self.crit(pred_hid.reshape(-1, pred_hid.shape[-1]), target.reshape(-1))
+
         return loss

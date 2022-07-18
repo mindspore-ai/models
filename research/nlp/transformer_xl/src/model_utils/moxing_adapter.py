@@ -24,9 +24,9 @@ _global_sync_count = 0
 
 
 def get_device_id():
-    if config.device == "ascend":
+    if config.device_target == "Ascend":
         device_id = os.getenv('DEVICE_ID', '0')
-    elif config.device == "gpu":
+    elif config.device_target == "GPU":
         device_id = os.getenv('OMPI_COMM_WORLD_LOCAL_RANK', '0')
     else:
         device_id = 0
@@ -34,9 +34,9 @@ def get_device_id():
 
 
 def get_device_num():
-    if config.device == "ascend":
+    if config.device_target == "Ascend":
         local_device_num = os.getenv('RANK_SIZE', '1')
-    elif config.device == "gpu":
+    elif config.device_target == "GPU":
         local_device_num = os.getenv('OMPI_COMM_WORLD_SIZE', '1')
     else:
         local_device_num = 1
@@ -44,9 +44,9 @@ def get_device_num():
 
 
 def get_local_device_num():
-    if config.device == "ascend":
+    if config.device_target == "Ascend":
         local_device_num = min(get_device_num, 8)
-    elif config.device == "gpu":
+    elif config.device_target == "GPU":
         local_device_num = os.getenv('OMPI_COMM_WORLD_LOCAL_SIZE', '1')
     else:
         local_device_num = 1
@@ -54,9 +54,9 @@ def get_local_device_num():
 
 
 def get_rank_id():
-    if config.device == "ascend":
+    if config.device_target == "Ascend":
         global_rank_id = os.getenv('RANK_ID', '0')
-    elif config.device == "gpu":
+    elif config.device_target == "GPU":
         global_rank_id = os.getenv('OMPI_COMM_WORLD_RANK', '0')
     else:
         global_rank_id = 0

@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -lt 4 ]; then
+if [ $# -ne 5 ]; then
     echo "Usage: bash run_standalone_train_gpu.sh [DEVICE_ID] [DATA_DIR] [DATA_NAME]
      [TRAIN_URL] [CONFIG_PATH]"
 exit 1
@@ -41,4 +41,4 @@ cd ./train_stand || exit
 
 echo "Start training for device $DEVICE_ID :)"
 
-CUDA_VISIBLE_DEVICES=$DEVICE_ID python ../../train.py --device="GPU" --datadir=$DATA_DIR --dataset=$DATA_NAME --train_url=$TRAIN_URL > train_stand_gpu.log 2>&1 &
+CUDA_VISIBLE_DEVICES=$DEVICE_ID python ../../train.py --device_target="GPU" --datadir=$DATA_DIR --dataset=$DATA_NAME --train_url=$TRAIN_URL > train_stand_gpu.log 2>&1 &
