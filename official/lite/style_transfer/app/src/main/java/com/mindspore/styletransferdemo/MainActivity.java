@@ -16,6 +16,7 @@
 package com.mindspore.styletransferdemo;
 
 import android.Manifest;
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -212,8 +213,7 @@ public class MainActivity extends AppCompatActivity implements OnBackgroundImage
     private void openCamera() {
         if (isAllGranted) {
             Intent intentToTakePhoto = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-            String mTempPhotoPath = Environment.getExternalStorageDirectory() + File.separator + "photo.jpeg";
-            imageUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".fileprovider", new File(mTempPhotoPath));
+            imageUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, new ContentValues());
             intentToTakePhoto.putExtra(MediaStore.EXTRA_OUTPUT, imageUri);
             startActivityForResult(intentToTakePhoto, RC_CHOOSE_CAMERA);
         } else {
