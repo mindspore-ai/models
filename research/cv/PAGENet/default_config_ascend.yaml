@@ -1,0 +1,31 @@
+enable_modelarts: False
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+output_path: "./output"
+train_img_path: "./dataset/train_dataset/images"
+train_gt_path: "./dataset/train_dataset/labels"
+train_edge_path: "./dataset/train_dataset/edges"
+
+test_task: "DUT-OMRON"
+test_img_path: "./dataset/test_dataset/DUT-OMRON/DUT-OMRON-image"
+test_gt_path: "./dataset/test_dataset/DUT-OMRON/DUT-OMRON-mask"
+
+vgg_init: "vgg16_20M.ckpt"
+batch_size: 8
+train_size: 224
+
+device_target: "Ascend"
+optimizer: "adamw"          # in ["adam", "adamw"]
+need_loss_scale: True
+LR: 0.00002
+WD: 0.00005
+EPOCH: 100
+
+
+MODE: "graph"
+ckpt_file: "output/PAGENET.ckpt"
+
+file_name: 'pagenet'
+file_format: 'MINDIR'
+train_mode: "single"

@@ -12,33 +12,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+import os
 import time
-import argparse
-import mindspore
+import mindspore as ms
 import mindspore.nn as nn
 from mindspore import context
 from mindspore.communication.management import init, get_rank, get_group_size
-from config import MODE, device_target, train_size, train_img_path, train_edge_path, train_gt_path, batch_size, EPOCH, \
-    LR, WD
 from src.pagenet import MindsporeModel
-from src.train_loss import total_loss, WithLossCell
+from src.train_loss import TotalLoss, WithLossCell
 from src.mind_dataloader_final import get_train_loader
+from src.model_utils.config import config
+from src.model_utils.moxing_adapter import moxing_wrapper
+from src.mytrainonestep import CustomTrainOneStepCell
 
-
-def main(train_mode='single'):
-    context.set_context(mode=MODE,
-                        device_target=device_target,
+@moxing_wrapper()
+def main():
+    context.set_context(mode=config.MODE,
+                        device_target=config.device_target,
                         reserve_class_name_in_scope=False)
 
-    if train_mode == 'single':
-        # env set
-
+    if config.train_mode == 'single':
         # dataset
-        train_loader = get_train_loader(train_img_path, train_gt_path, train_edge_path, batchsize=batch_size,
-                                        trainsize=train_size)
+        train_loader = get_train_loader(config.train_img_path, config.train_gt_path, config.train_edge_path,
+                                        batchsize=config.batch_size, trainsize=config.train_size)
         train_data_size = train_loader.get_dataset_size()
         # epoch
-        epoch = EPOCH
+        epoch = config.EPOCH
     else:
         init()
         rank_id = get_rank()
@@ -47,27 +46,40 @@ def main(train_mode='single'):
                                           parallel_mode=context.ParallelMode.DATA_PARALLEL)
 
         # dataset
-        train_loader = get_train_loader(train_img_path, train_gt_path, train_edge_path, device_num=device_num,
-                                        rank_id=rank_id, num_parallel_workers=8, batchsize=batch_size,
-                                        trainsize=train_size)
+        if config.need_loss_scale:
+            config.batch_size = int(config.batch_size // device_num)
+        train_loader = get_train_loader(config.train_img_path, config.train_gt_path, config.train_edge_path,
+                                        device_num=device_num, rank_id=rank_id, num_parallel_workers=8,
+                                        batchsize=config.batch_size, trainsize=config.train_size)
 
         train_data_size = train_loader.get_dataset_size()
         # epoch
-        epoch = EPOCH * 2
-
+        epoch = config.EPOCH * 2
+    if not os.path.exists(config.output_path):
+        os.makedirs(config.output_path, exist_ok=True)
     # setup train_parameters
 
-    model = MindsporeModel()
+    model = MindsporeModel(config)
     # loss function
-    loss_fn = total_loss()
+    loss_fn = TotalLoss()
 
     # learning_rate and optimizer
+    lr = config.LR
 
-    optimizer = nn.Adam(model.trainable_params(), learning_rate=LR, weight_decay=WD)
+    if config.optimizer == "adam":
+        optimizer = nn.Adam(model.trainable_params(), learning_rate=lr, weight_decay=config.WD)
+    elif config.optimizer == "adamw":
+        optimizer = nn.AdamWeightDecay(model.trainable_params(), learning_rate=lr, weight_decay=config.WD)
+    else:
+        raise ValueError(f"Not support {config.optimizer}, support ['adam', 'adamw']")
 
     # train model
     net_with_loss = WithLossCell(model, loss_fn)
-    train_network = nn.TrainOneStepCell(net_with_loss, optimizer)
+    if config.need_loss_scale:
+        loss_scale = 2048
+        train_network = CustomTrainOneStepCell(net_with_loss, optimizer, loss_scale)
+    else:
+        train_network = nn.TrainOneStepCell(net_with_loss, optimizer)
     train_network.set_train()
 
     data_iterator = train_loader.create_tuple_iterator(num_epochs=epoch)
@@ -82,15 +94,15 @@ def main(train_mode='single'):
             total_train_step = total_train_step + 1
 
             if total_train_step % 10 == 0:
-                print("epoch： {}，  step： {}/{}， loss: {}".format(i, total_train_step, train_data_size, loss))
+                print("epoch: {}，LR: {},  step： {}/{}， loss: {}".format(i, lr, total_train_step, train_data_size, loss))
 
-    if train_mode == 'single':
-        mindspore.save_checkpoint(train_network, "PAGENET" + '.ckpt')
+    if config.train_mode == 'single':
+        ms.save_checkpoint(train_network, os.path.join(config.output_path, "PAGENET.ckpt"))
         print("PAGENET.ckpt" + " have saved!")
 
     else:
-        mindspore.save_checkpoint(train_network, "PAGENET" + str(get_rank()) + '.ckpt')
-        print("PAGENET" + str(get_rank()) + '.ckpt' + " have saved!")
+        ms.save_checkpoint(train_network, os.path.join(config.output_path, f"PAGENET{get_rank()}.ckpt"))
+        print(f"PAGENET{get_rank()}.ckpt have saved!")
     end = time.time()
     total = end - start
     print("total time is {}h".format(total / 3600))
@@ -98,7 +110,4 @@ def main(train_mode='single'):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='manual to this script')
-    parser.add_argument('-m', '--train_mode', type=str)
-    args = parser.parse_args()
-    main(args.train_mode)
+    main()

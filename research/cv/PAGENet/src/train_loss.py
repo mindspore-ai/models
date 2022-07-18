@@ -21,9 +21,9 @@ from mindspore import nn
 from mindspore import Parameter
 
 
-class total_loss(nn.Cell):
+class TotalLoss(nn.Cell):
     def __init__(self):
-        super(total_loss, self).__init__()
+        super(TotalLoss, self).__init__()
         self.loss_fn1 = nn.MSELoss()
         self.loss_fn2 = nn.BCELoss(reduction="mean")
         self.zero = ms.Tensor(0, dtype=ms.float32)
@@ -32,7 +32,9 @@ class total_loss(nn.Cell):
         self.edge_loss = Parameter(default_input=0.0, requires_grad=False)
         self.total_loss = Parameter(default_input=0.0, requires_grad=False)
 
+
     def construct(self, pres, gts, edges):
+
         loss_edg_5 = self.loss_fn1(pres[1], edges)
         loss_sal_5 = self.loss_fn2(pres[2], gts)
         loss_5 = loss_sal_5 + loss_edg_5
@@ -48,7 +50,6 @@ class WithLossCell(nn.Cell):
     """
     loss cell
     """
-
     def __init__(self, backbone, loss_fn):
         super(WithLossCell, self).__init__(auto_prefix=False)
         self.backbone = backbone

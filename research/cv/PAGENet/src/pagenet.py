@@ -12,26 +12,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+import os
 import mindspore.ops as P
 from mindspore import nn
-
+from mindspore import load_checkpoint, load_param_into_net
+from src.vgg import VGG
 
 class upSampleLike(nn.Cell):
 
     def __init__(self):
         super(upSampleLike, self).__init__()
         self.resize = nn.ResizeBilinear()
-
     def construct(self, fm, x1):
         fm = self.resize(fm, (x1.shape[2], x1.shape[3]))
         return fm
 
+class MyMaxPool(nn.Cell):
+    def __init__(self, stride):
+        super().__init__()
+        self.reduce_max = P.ReduceMax(keep_dims=False)
+        self.stride = stride
+
+    def construct(self, x):
+        n, c, h, w = x.shape
+        x_t = P.reshape(x, (n, c, h // self.stride, self.stride, w // self.stride, self.stride))
+        return self.reduce_max(x_t, (3, 5))
 
 class MindsporeModel(nn.Cell):
 
-    def __init__(self):
+    def __init__(self, config):
         super(MindsporeModel, self).__init__()
 
+        self.premodel = config.vgg_init
+        self.device = config.device_target
         self.in_channels = 3
         self.conv3_64 = self.__make_layer(64, 2)
         self.conv3_128 = self.__make_layer(128, 2)
@@ -41,8 +54,8 @@ class MindsporeModel(nn.Cell):
         self.max_1 = nn.MaxPool2d((2, 2), stride=(2, 2), pad_mode='same')
         self.max_4 = nn.MaxPool2d((4, 4), stride=(4, 4), pad_mode='same')
         self.max_8 = nn.MaxPool2d((8, 8), stride=(8, 8), pad_mode='same')
-        self.max_16 = nn.MaxPool2d((16, 16), stride=(16, 16), pad_mode='same')
-        self.max_32 = nn.MaxPool2d((32, 32), stride=(32, 32), pad_mode='same')
+        self.max_16 = MyMaxPool(16)
+        self.max_32 = MyMaxPool(32)
 
         self.upSampleLike = upSampleLike()
 
@@ -132,7 +145,9 @@ class MindsporeModel(nn.Cell):
                                     padding=(1, 1, 1, 1), pad_mode='pad', group=1, has_bias=True)
         self.conv_33_32 = nn.Conv2d(kernel_size=(3, 3), in_channels=33, out_channels=32, stride=(1, 1), dilation=(1, 1),
                                     padding=(1, 1, 1, 1), pad_mode='pad', group=1, has_bias=True)
-
+        self.vgg = VGG()
+        if self.device == "Ascend":
+            self.init_vgg()
     def __make_layer(self, channels, num):
         layers = []
         for i in range(num):
@@ -150,6 +165,18 @@ class MindsporeModel(nn.Cell):
             self.in_channels = channels
             i = i - 1
         return nn.SequentialCell(*layers)
+
+    def mymax_16(self, target):
+        target_shape = target.shape
+        resize = P.ResizeBilinear((target_shape[-2]/16, target_shape[-1]/16))
+        target = resize(target)
+        return target
+
+    def mymax_32(self, target):
+        target_shape = target.shape
+        resize = P.ResizeBilinear((target_shape[-2]/32, target_shape[-1]/32))
+        target = resize(target)
+        return target
 
     def attention5(self, sal_5):
         att_5a = self.sigmoid(self.conv1_256(sal_5))
@@ -275,18 +302,32 @@ class MindsporeModel(nn.Cell):
         sal_1 = self.Add(att_1, sal_1)
         return sal_1
 
+    def init_vgg(self):
+        if os.path.exists(self.premodel):
+            param_dict = load_checkpoint(self.premodel)
+            new_param = {}
+            for key in param_dict.keys():
+                new_key = "vgg.model." + key
+                new_param[new_key] = param_dict[key]
+            load_param_into_net(self.vgg, new_param)
+            print("successfully load vgg model")
+        return 0
+
     def construct(self, x):
         # vgg16
-        x1 = self.conv3_64(x)  # x1:(64, 224, 224)
-        x1_max = self.max_1(x1)  # x1_max:(64, 112, 112)
-        x2 = self.conv3_128(x1_max)  # x2:(128, 112, 112)
-        x2_max = self.max_1(x2)  # x2_max:(128, 56, 56)
-        x3 = self.conv3_256(x2_max)  # x3:(256, 56, 56)
-        x3_max = self.max_1(x3)  # x3_max:(256, 28, 28)
-        x4 = self.conv3_512a(x3_max)  # x4:(512, 28, 28)
-        x4_max = self.max_1(x4)  # x4_max:(512, 14, 14)
-        x5 = self.conv3_512b(x4_max)  # x5:(512, 14, 14)
-        x6 = self.max_1(x5)  # x6:(512, 7, 7)
+        if self.device == "Ascend":
+            x1, x2, x3, x4, x5, x6 = self.vgg(x)
+        else:
+            x1 = self.conv3_64(x)  # x1:(64, 224, 224)
+            x1_max = self.max_1(x1)  # x1_max:(64, 112, 112)
+            x2 = self.conv3_128(x1_max)  # x2:(128, 112, 112)
+            x2_max = self.max_1(x2)  # x2_max:(128, 56, 56)
+            x3 = self.conv3_256(x2_max)  # x3:(256, 56, 56)
+            x3_max = self.max_1(x3)  # x3_max:(256, 28, 28)
+            x4 = self.conv3_512a(x3_max)  # x4:(512, 28, 28)
+            x4_max = self.max_1(x4)  # x4_max:(512, 14, 14)
+            x5 = self.conv3_512b(x4_max)  # x5:(512, 14, 14)
+            x6 = self.max_1(x5)  # x6:(512, 7, 7)
 
         # sal_conv
         sal_6 = self.relu(self.salConv6(x6))

@@ -12,27 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-import argparse
+
 import time
 import numpy as np
 import mindspore.nn as nn
 import mindspore as ms
 from mindspore import context
-import config
-from config import MODE, device_target, train_size
 
 from src.pagenet import MindsporeModel
 from src.mind_dataloader_final import get_test_loader
+from src.model_utils.config import config
 
 
 def main(test_img_path, test_gt_path, ckpt_file):
     # context_set
-    context.set_context(mode=MODE,
-                        device_target=device_target,
+    context.set_context(mode=config.MODE,
+                        device_target=config.device_target,
                         reserve_class_name_in_scope=False)
 
     # dataset
-    test_loader = get_test_loader(test_img_path, test_gt_path, batchsize=1, testsize=train_size)
+    test_loader = get_test_loader(test_img_path, test_gt_path, batchsize=1, testsize=config.train_size)
     data_iterator = test_loader.create_tuple_iterator()
     # step
     total_test_step = 0
@@ -73,6 +72,7 @@ def main(test_img_path, test_gt_path, ckpt_file):
 
     end = time.time()
     total = end - start
+    print(f"task: {config.test_task}")
     print("total time is {}h".format(total / 3600))
     print("step time is {}s".format(total / (test_data_size)))
     mae_result = mae.eval()
@@ -84,26 +84,4 @@ def main(test_img_path, test_gt_path, ckpt_file):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='manual to this script')
-    parser.add_argument('-s', '--test_set', type=str)
-    parser.add_argument('-c', '--ckpt', type=str)
-    args = parser.parse_args()
-    if args.test_set == 'DUT-OMRON':
-        img_path = config.DUT_OMRON_img_path
-        gt_path = config.DUT_OMRON_gt_path
-    elif args.test_set == 'DUTS-TE':
-        img_path = config.DUTS_TE_img_path
-        gt_path = config.DUTS_TE_gt_path
-    elif args.test_set == 'ECCSD':
-        img_path = config.ECCSD_img_path
-        gt_path = config.ECCSD_gt_path
-    elif args.test_set == 'HKU-IS':
-        img_path = config.HKU_IS_img_path
-        gt_path = config.HKU_IS_gt_path
-    elif args.test_set == 'SOD':
-        img_path = config.SOD_img_path
-        gt_path = config.SOD_gt_path
-    else:
-        print("dataset is not exist")
-    ckpt = args.ckpt
-    main(img_path, gt_path, ckpt)
+    main(config.test_img_path, config.test_gt_path, config.ckpt_file)
