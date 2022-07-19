@@ -53,8 +53,8 @@ Currently we support host-device mode with multi-dimensional partition parallel 
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -458,7 +458,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Params(M)                | 75.84                           | 75.84                           | 75.84                           | 75.84                           |
 | Checkpoint for inference | 233MB(.ckpt file)               | 230MB(.ckpt)                    | 233MB(.ckpt file)               | 233MB(.ckpt file)               |
 
-All executable scripts can be found in [here](https://gitee.com/mindspore/models/tree/master/official/recommend/wide_and_deep/script)
+All executable scripts can be found in [here](https://gitee.com/mindspore/models/tree/r1.8/official/recommend/wide_and_deep/script)
 
 Note: The result of GPU is tested under the master version. The parameter server mode of the Wide&Deep model is still under development.
 

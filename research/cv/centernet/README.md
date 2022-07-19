@@ -81,8 +81,8 @@ Dataset used: [COCO2017](https://cocodataset.org/)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 - Download the dataset COCO2017.
 - We use COCO2017 as training dataset in this example by default, and you can also use your own datasets.
 
@@ -579,7 +579,7 @@ CenterNet on 11.8K images(The annotation and data format must be the same as coc
 | Total time: training       | 1p: 4.38 days; 8p: 13-14 h                                     |
 | Total time: evaluation     | keep res: test 1.7h, val 0.7h; fix res: test 50 min, val 12 min|
 | Checkpoint                 | 242M (.ckpt file)                                              |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/cv/centernet> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/r1.8/research/cv/centernet> |
 
 ### Inference Performance On Ascend
 

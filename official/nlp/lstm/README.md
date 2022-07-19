@@ -52,8 +52,8 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -445,7 +445,7 @@ Inference result is saved in current path, you can find result in acc.log file.
 | Loss                       | 0.12                       | 0.12                                                           | 0.12                       |
 | Params (M)                 | 6.45                       | 6.45                                                           | 6.45                       |
 | Checkpoint for inference   | 292.9M (.ckpt file)        | 292.9M (.ckpt file)                                            | 292.9M (.ckpt file)        |
-| Scripts                    | [lstm script](https://gitee.com/mindspore/models/tree/master/official/nlp/lstm) | [lstm script](https://gitee.com/mindspore/models/tree/master/official/nlp/lstm) | [lstm script](https://gitee.com/mindspore/models/tree/master/official/nlp/lstm) |
+| Scripts                    | [lstm script](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/lstm) | [lstm script](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/lstm) | [lstm script](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/lstm) |
 
 ### Evaluation Performance
 

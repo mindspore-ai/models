@@ -93,7 +93,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 
 ### Mixed Precision
 
-The [mixed precision](https://www.mindspore.cn/tutorials/experts/en/master/others/mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
+The [mixed precision](https://www.mindspore.cn/tutorials/experts/en/r1.8/others/mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
 
 For FP16 operators, if the input data type is FP32, the backend of MindSpore will automatically handle it with reduced precision. Users could check the reduced-precision operators by enabling INFO log and then searching ‘reduce precision’.
 
@@ -104,8 +104,8 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -126,7 +126,7 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --data_dir=[DATA_PATH]  --pre_tr
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 Please follow the instructions in the link below:
-<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+<https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools>
 
 - Running on GPU
 
@@ -460,7 +460,7 @@ train_parallel1/log:epcoh: 2 step: 97, loss is 1.7133579
 ...
 ```
 
-> About rank_table.json, you can refer to the [distributed training tutorial](https://www.mindspore.cn/tutorials/experts/en/master/parallel/introduction.html).
+> About rank_table.json, you can refer to the [distributed training tutorial](https://www.mindspore.cn/tutorials/experts/en/r1.8/parallel/introduction.html).
 > **Attention** This will bind the processor cores according to the `device_num` and total processor numbers. If you don't expect to run pretraining with binding processor cores, remove the operations about `taskset` in `scripts/run_distribute_train.sh`
 
 ##### Run vgg16 on GPU
@@ -592,7 +592,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 1pc: 79 ms/step;  8pcs: 104 ms/step              |1pc: 81 ms/step; 8pcs 94.4ms/step                |
 | Total time                 | 1pc: 72 mins;  8pcs: 11.8 mins              |8pcs: 19.7 hours                                 |
 | Checkpoint for Fine tuning | 1.1G(.ckpt file)                             |1.1G(.ckpt file)                                 |
-| Scripts                    |[vgg16](https://gitee.com/mindspore/models/tree/master/official/cv/vgg16) |                   |
+| Scripts                    |[vgg16](https://gitee.com/mindspore/models/tree/r1.8/official/cv/vgg16) |                   |
 
 #### Evaluation Performance
 

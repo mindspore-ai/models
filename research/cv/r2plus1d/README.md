@@ -74,8 +74,8 @@ The 5-dimensional data (NCTHW) input by the network goes through five (2+1)D con
 - frame
     - [MindSpore](https://www.mindspore.cn/install)
 - For details, see the following resources:
-    - [MindSpore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## Quick start
 
@@ -108,7 +108,7 @@ Configure paths to datasets and other parameters in configuration file (```defau
   bash scripts/run_eval.sh Ascend 0 ../r2plus1d_best.ckpt
   ```
 
-  Ascend training: generate [RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+  Ascend training: generate [RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)
 
 - GPU environment:
 
@@ -559,7 +559,7 @@ Validation for R(2+1)D
 | Accuracy | top_1=0.9786, top_5=0.9981 | top_1=0.9771, top_5=0.9969 |
 | Total time | 8p: 1h58m (without validation), 1p: 3h (without validation) | 8p: 1h24m (without validation) |
 | Checkpoint for Fine tuning | 8p: 706MB(.ckpt file) | 8p: 706MB(.ckpt file) |
-| Scripts | [R(2+1)D Script](https://gitee.com/mindspore/models/tree/master/research/cv/r2plus1d) | [R(2+1)D Script](https://gitee.com/mindspore/models/tree/master/research/cv/r2plus1d) |
+| Scripts | [R(2+1)D Script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/r2plus1d) | [R(2+1)D Script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/r2plus1d) |
 
 ## random situation description
 

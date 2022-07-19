@@ -55,8 +55,8 @@ Transformer具体包括六个编码模块和六个解码模块。每个编码模
 - 框架
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -356,7 +356,7 @@ Parameters for learning rate:
 
 ### 训练过程
 
-- 在`default_config.yaml`中设置选项，包括loss_scale、学习率和网络超参数。点击[这里](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/dataset.html)查看更多数据集信息。
+- 在`default_config.yaml`中设置选项，包括loss_scale、学习率和网络超参数。点击[这里](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/dataset.html)查看更多数据集信息。
 
 - 运行`run_standalone_train.sh`，进行Transformer模型的单卡训练。
 
@@ -446,7 +446,7 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CONFIG_PATH]
 | 损失                        | 2.8                               | 2.9                            |
 | 参数 (M)                    | 213.7                             | 213.7                          |
 | 推理检查点                   | 2.4G （.ckpt文件）                 | 2.4G                            |
-| 脚本                        | <https://gitee.com/mindspore/models/tree/master/official/nlp/transformer> |
+| 脚本                        | <https://gitee.com/mindspore/models/tree/r1.8/official/nlp/transformer> |
 
 #### 评估性能
 

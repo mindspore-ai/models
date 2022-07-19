@@ -46,8 +46,8 @@ AutoDis leverages a set of meta-embeddings for each numerical field, which are s
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -102,7 +102,7 @@ After installing MindSpore via the official website, you can start training and 
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools>.
 
 - running on ModelArts
 
@@ -339,7 +339,7 @@ Inference result is saved in current path, you can find result in acc.log file.
 | Total time                 | 1pc: 90 mins;                                                | 1pc: 41mins;                                                 |
 | Parameters (M)             | 16.5                                                         | 16.5                                                         |
 | Checkpoint for Fine tuning | 191M (.ckpt file)                                            | 191M (.ckpt file)                                            |
-| Scripts                    | [AutoDis script](https://gitee.com/mindspore/models/tree/master/research/recommend/autodis) | [AutoDis script](https://gitee.com/mindspore/models/tree/master/research/recommend/autodis) |
+| Scripts                    | [AutoDis script](https://gitee.com/mindspore/models/tree/r1.8/research/recommend/autodis) | [AutoDis script](https://gitee.com/mindspore/models/tree/r1.8/research/recommend/autodis) |
 
 ### Inference Performance
 

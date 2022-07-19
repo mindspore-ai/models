@@ -77,8 +77,8 @@ WideResNet的总体网络架构如下：[链接](https://arxiv.org/abs/1605.0714
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -195,7 +195,7 @@ bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [PRETRAINED_CKPT_P
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)中的说明。
 
 训练结果保存在示例路径中，文件夹名称以“train”或“train_parallel”开头。您可在此路径下的日志中找到检查点文件以及结果，如下所示。
 
@@ -211,7 +211,7 @@ bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [EXPERIMENT_LABEL]
 
 对于分布式培训，需要提前创建主机文件配置。
 
-请按照链接中的说明操作 [GPU-Multi-Host](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_gpu.html).
+请按照链接中的说明操作 [GPU-Multi-Host](https://www.mindspore.cn/tutorials/experts/en/r1.8/parallel/train_gpu.html).
 
 ## 培训时的评估
 
@@ -348,7 +348,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 |总时长   |  70分钟 |16.8 工作时数    | ~ 2.4工作时数|
 |参数(M)   | 52.1 |52.1 |52.1 |
 |  微调检查点 | 426.49M（.ckpt文件）  |428M（.ckpt文件）  |- |
-| 脚本  | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/wideresnet)  |[链接](https://gitee.com/mindspore/models/tree/master/research/cv/wideresnet)  |[链接](https://gitee.com/mindspore/models/tree/master/research/cv/wideresnet)  |
+| 脚本  | [链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/wideresnet)  |[链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/wideresnet)  |[链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/wideresnet)  |
 
 # 随机情况说明
 

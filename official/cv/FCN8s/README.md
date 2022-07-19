@@ -61,8 +61,8 @@ Dataset used:
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需获取更多信息，请查看如下链接：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # [快速开始](#contents)
 
@@ -232,7 +232,7 @@ ckpt_file: /home/FCN8s/ckpt/FCN8s_1-133_300.ckpt
   # example: bash scripts/run_train.sh 8 ~/hccl_8p.json
   ```
 
-  分布式训练需要提前创建JSON格式的HCCL配置文件,请遵循[链接说明](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+  分布式训练需要提前创建JSON格式的HCCL配置文件,请遵循[链接说明](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)
 
 - running on GPU with gpu default parameters
 
@@ -450,7 +450,7 @@ python export.py
 | outputs                    | probability                                                 | probability                                      |
 | Loss                       | 0.038                                                       | 0.036                                            |
 | Speed                      | 1pc: 564.652 ms/step;                                       | 1pc: 455.460 ms/step;                            |
-| Scripts                    | [FCN script](https://gitee.com/mindspore/models/tree/master/official/cv/FCN8s)
+| Scripts                    | [FCN script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/FCN8s)
 
 ### Inference Performance
 
@@ -471,7 +471,7 @@ python export.py
 
 ### 教程
 
-如果你需要在不同硬件平台（如GPU，Ascend 910 或者 Ascend 310）使用训练好的模型，你可以参考这个 [Link](https://www.mindspore.cn/tutorials/experts/zh-CN/master/infer/inference.html)。以下是一个简单例子的步骤介绍：
+如果你需要在不同硬件平台（如GPU，Ascend 910 或者 Ascend 310）使用训练好的模型，你可以参考这个 [Link](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/infer/inference.html)。以下是一个简单例子的步骤介绍：
 
 - Running on Ascend
 

@@ -54,8 +54,8 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -354,7 +354,7 @@ Parameters for learning rate:
 
 ## [Training Process](#contents)
 
-- Set options in `default_config.yaml`, including loss_scale, learning rate and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
+- Set options in `default_config.yaml`, including loss_scale, learning rate and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/r1.8/advanced/dataset.html) for more information about dataset.
 
 - Run `run_standalone_train.sh` for non-distributed training of Transformer model.
 
@@ -472,7 +472,7 @@ Inference result is saved in current path, 'output_file' will generate in path s
 | Loss                       | 2.8                                        | 2.9                             |
 | Params (M)                 | 213.7                                      | 213.7                           |
 | Checkpoint for inference   | 2.4G (.ckpt file)                          | 2.4G (.ckpt file)               |
-| Scripts                    | [Transformer scripts](https://gitee.com/mindspore/models/tree/master/official/nlp/transformer) |
+| Scripts                    | [Transformer scripts](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/transformer) |
 
 #### Evaluation Performance
 

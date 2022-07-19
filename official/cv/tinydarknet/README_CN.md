@@ -64,7 +64,7 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
 
 <!-- 不同的机器有同一个模型的多个副本，每个机器分配到不同的数据，然后将所有机器的计算结果按照某种方式合并 -->
 
-<!-- 在深度学习中，当数据集和参数量的规模越来越大，训练所需的时间和硬件资源会随之增加，最后会变成制约训练的瓶颈。[分布式并行训练](<https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/introduction.html>)，可以降低对内存、计算性能等硬件的需求，是进行训练的重要优化手段。本模型使用了mindspore提供的自动并行模式AUTO_PARALLEL：该方法是融合了数据并行、模型并行及混合并行的1种分布式并行模式，可以自动建立代价模型，找到训练时间较短的并行策略，为用户选择1种并行模式。 -->
+<!-- 在深度学习中，当数据集和参数量的规模越来越大，训练所需的时间和硬件资源会随之增加，最后会变成制约训练的瓶颈。[分布式并行训练](<https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/parallel/introduction.html>)，可以降低对内存、计算性能等硬件的需求，是进行训练的重要优化手段。本模型使用了mindspore提供的自动并行模式AUTO_PARALLEL：该方法是融合了数据并行、模型并行及混合并行的1种分布式并行模式，可以自动建立代价模型，找到训练时间较短的并行策略，为用户选择1种并行模式。 -->
 
 # [环境要求](#目录)
 
@@ -73,8 +73,8 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 更多的信息请访问以下链接：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # [快速入门](#目录)
 
@@ -100,7 +100,7 @@ Tiny-DarkNet是Joseph Chet Redmon等人提出的一个16层的针对于经典的
 
   请按照以下链接的指导进行设置:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+  <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.>
 
 - running on GPU with gpu default parameters
 
@@ -515,7 +515,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_PATH] [DVPP] [DEVICE_ID]
 | 速度                       | 8卡: 104 ms/step                                            | 8卡: 255 ms/step                                    |                          单卡：11081 ms/step                     |
 | 总时间                     | 8卡: 17.8小时                                               | 8卡: 46.9小时                                       |                             > 200小时                    |
 | 参数(M)                    | 4.0;                                                        | 4.0;                                              |                             4.0;                       |
-| 脚本                       | [Tiny-Darknet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/tinydarknet)
+| 脚本                       | [Tiny-Darknet脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/tinydarknet)
 
 ### [评估性能](#目录)
 

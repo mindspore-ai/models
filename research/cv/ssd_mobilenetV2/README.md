@@ -221,7 +221,7 @@ bash scripts/run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
 
 ### [Training Process](#contents)
 
-To train the model, run `train.py`. If the `mindrecord_dir` is empty, it will generate [mindrecord](https://www.mindspore.cn/tutorials/en/master/advanced/dataset/record.html) files by `coco_root`(coco dataset), `voc_root`(voc dataset) or `image_dir` and `anno_path`(own dataset). **Note if mindrecord_dir isn't empty, it will use mindrecord_dir instead of raw images.**
+To train the model, run `train.py`. If the `mindrecord_dir` is empty, it will generate [mindrecord](https://www.mindspore.cn/tutorials/en/r1.8/advanced/dataset/record.html) files by `coco_root`(coco dataset), `voc_root`(voc dataset) or `image_dir` and `anno_path`(own dataset). **Note if mindrecord_dir isn't empty, it will use mindrecord_dir instead of raw images.**
 
 #### Training on Ascend
 
@@ -237,7 +237,7 @@ We need five or seven parameters for this scripts.
 - `EPOCH_NUM`: epoch num for distributed train.
 - `LR`: learning rate init value for distributed train.
 - `DATASET`：the dataset mode for distributed train.
-- `RANK_TABLE_FILE :` the path of [rank_table.json](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools), it is better to use absolute path.
+- `RANK_TABLE_FILE :` the path of [rank_table.json](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools), it is better to use absolute path.
 - `PRE_TRAINED :` the path of pretrained checkpoint file, it is better to use absolute path.
 - `PRE_TRAINED_EPOCH_SIZE :` the epoch num of pretrained.
 
@@ -487,7 +487,7 @@ mAP:0.2522562031397977
 | Loss Function       | Sigmoid Cross Entropy,SmoothL1Loss   | Sigmoid Cross Entropy,SmoothL1Loss   |
 | Speed               | 8pcs: 80ms/step  |4pcs: 332ms/step  |
 | Total time          | 8pcs: 4.67hours      | 4pcs: 21.9 hours      |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/research/cv/ssd_mobilenetV2> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/r1.8/research/cv/ssd_mobilenetV2> |
 
 #### Inference Performance
 

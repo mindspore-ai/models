@@ -41,8 +41,8 @@ Dataset used: Seamount
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below:
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## Quick Start
 
@@ -93,7 +93,7 @@ Training result will be stored in the current path, whose folder name begins wit
 | Outputs                    | numpy file
 | Speed                      | 17 ms/step
 | Total time                 | 3 mins
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/research/hpc/ocean_model)
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r1.8/research/hpc/ocean_model)
 
 ## Description of Random Situation
 

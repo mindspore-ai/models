@@ -45,8 +45,8 @@ Fat - DeepFFM consists of three parts. The FFM component is a factorization mach
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -95,7 +95,7 @@ Fat - DeepFFM consists of three parts. The FFM component is a factorization mach
 
   Please follow the instructions in the link below:
 
-  [hccl tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+  [hccl tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 
 - running on GPU
 
@@ -302,7 +302,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 8pc: 4.5 hours;                                             |
 | Parameters (M)             | 560.34                                                        |
 | Checkpoint for Fine tuning | 87.65M (.ckpt file)                                           |
-| Scripts                    | [deepfm script](https://gitee.com/mindspore/models/tree/master/research/recommend/Fat-DeepFFM) |
+| Scripts                    | [deepfm script](https://gitee.com/mindspore/models/tree/r1.8/research/recommend/Fat-DeepFFM) |
 
 ### Inference Performance
 

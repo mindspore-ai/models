@@ -63,8 +63,8 @@ The moving mnist dataset from the official website contains 3 files: train/valid
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -157,7 +157,7 @@ input0_path: ""                                 # export input path
 
 ## [Training Process](#contents)
 
-- Set options in `config.py`, including learning rate and other network hyperparameters. Click [MindSpore dataset preparation tutorial](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
+- Set options in `config.py`, including learning rate and other network hyperparameters. Click [MindSpore dataset preparation tutorial](https://www.mindspore.cn/tutorials/en/r1.8/advanced/dataset.html) for more information about dataset.
 
 ### [Training](#contents)
 
@@ -255,7 +255,7 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DE
 | Speed                      | 1000 ms/step(1pcs)                                |
 | Total time                 | 22h                                               |
 | Checkpoint for Fine tuning | 177.27M (.ckpt file)                              |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/predrnn++) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r1.8/official/cv/predrnn++) |
 
 #### [Evaluation Performance](#contents)
 

@@ -72,8 +72,8 @@ Sphereface论文中给出了多种网络架构，本代码仅实现了其20层�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -110,7 +110,7 @@ Sphereface论文中给出了多种网络架构，本代码仅实现了其20层�
 
   请遵循以下链接中的说明：
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+  <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.>
 
 - GPU处理器环境运行
 
@@ -453,7 +453,7 @@ sphereface网络使用LFW推理得到的结果如下:
 | 总时长                 | 单卡：469.98分钟;  8卡：68.79分钟                     |单卡：412.39分钟;  8卡：220.69分钟                     |
 | 参数(M)             | 13.0                                                 |13.0                                                 |
 | 微调检查点 | 214.58M (.ckpt文件)                                        |214.58M (.ckpt文件)                                        |
-| 脚本                    | [sphereface脚本](https://gitee.com/mindspore/models/tree/master/official/cv/sphereface) | [sphereface脚本](https://gitee.com/mindspore/models/tree/master/official/cv/sphereface) |
+| 脚本                    | [sphereface脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/sphereface) | [sphereface脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/sphereface) |
 
 ### 推理性能
 

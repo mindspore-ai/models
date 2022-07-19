@@ -79,8 +79,8 @@ YOLOv3 Tiny是YOLOv3的一个轻量级变体，它使用池化层并减少卷积
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -409,7 +409,7 @@ YOLOv3-tiny应用于118000张图像上（标注和数据格式必须与COCO 2017
 | 速度                       | 单卡：130imgs/s;  8卡：980imgs/s                            |
 | 总时长                     | 8卡: 10小时                                                 |
 | 参数(M)                    | 69                                                          |
-| 脚本                       | [YOLOv3_Tiny脚本](https://gitee.com/mindspore/models/tree/master/research/cv/yolov3_tiny) |
+| 脚本                       | [YOLOv3_Tiny脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/yolov3_tiny) |
 
 ### 推理性能
 

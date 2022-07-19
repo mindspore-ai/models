@@ -58,8 +58,8 @@ folders.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Script and sample code](#Contents)
 
@@ -255,7 +255,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | about  50min |about 50min |
 | Parameters (M)             | 8.7M                                     | 8.7M                        |
 | Checkpoint for Fine tuning | 31.4M (.ckpt file)                                     | 31.4M (.ckpt file)                     |
-| Scripts                    | [link](https://gitee.com/mindspore/models/tree/master/research/cv/meta-baseline) ||
+| Scripts                    | [link](https://gitee.com/mindspore/models/tree/r1.8/research/cv/meta-baseline) ||
 
 ### Inference Performance
 

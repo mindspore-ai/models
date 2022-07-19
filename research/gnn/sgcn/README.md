@@ -54,8 +54,8 @@ used for train and 20% for test.
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 - Download [Bitcoin-Alpha and Bitcoin-OTC](https://github.com/benedekrozemberczki/SGCN/tree/master/input) and put them
   into the input folder under the root directory.
 
@@ -425,7 +425,7 @@ Test set results: auc= 0.87464 f1= 0.93635
 | Total time           | 8pcs: 440ms(Bitcoin-OTC) / 400ms(Bitcoin-Alpha)                          |
 | AUC                  | 0.8663 / 0.7979                                                          |
 | F1-Score             | 0.9309 / 0.9527                                                          |
-| Scripts              | [SGCN](https://gitee.com/mindspore/models/tree/master/research/gnn/sgcn) |
+| Scripts              | [SGCN](https://gitee.com/mindspore/models/tree/r1.8/research/gnn/sgcn) |
 
 ### [Training Performance on GPU](#contents)
 
@@ -454,7 +454,7 @@ Test set results: auc= 0.87464 f1= 0.93635
 | Loss function         | SoftmaxCrossEntropyWithLogits                                            |
 | AUC                   | 0.8746 / 0.8227                                                          |
 | F1-Score              | 0.9363 / 0.9543                                                          |
-| Scripts               | [SGCN](https://gitee.com/mindspore/models/tree/master/research/gnn/sgcn) |
+| Scripts               | [SGCN](https://gitee.com/mindspore/models/tree/r1.8/research/gnn/sgcn) |
 
 ## [Description of Random Situation](#contents)
 

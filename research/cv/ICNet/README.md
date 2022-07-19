@@ -48,8 +48,8 @@ It contains 5,000 finely annotated images split into training, validation and te
 - frame:
     - [Mindspore](https://www.mindspore.cn/install)
 - For details, please refer to the following resources:
-    - [MindSpore course](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore course](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # [Scription Description](#Content)
 
@@ -154,7 +154,7 @@ keep_checkpoint_max: 10
 
 ### Pre-training
 
-The folder Res50V1_PRE contains the scripts for pre-training and its dataset is [image net](https://image-net.org/). More details in [GENet_Res50](https://gitee.com/mindspore/models/tree/master/research/cv/GENet_Res50)
+The folder Res50V1_PRE contains the scripts for pre-training and its dataset is [image net](https://image-net.org/). More details in [GENet_Res50](https://gitee.com/mindspore/models/tree/r1.8/research/cv/GENet_Res50)
 
 - Usage:
 
@@ -164,7 +164,7 @@ The folder Res50V1_PRE contains the scripts for pre-training and its dataset is 
 
 - Notes:
 
-The hccl.json file specified by [RANK_TABLE_FILE] is used when running distributed tasks. You can use [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) to generate this file.
+The hccl.json file specified by [RANK_TABLE_FILE] is used when running distributed tasks. You can use [hccl_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools) to generate this file.
 
 ### Training
 

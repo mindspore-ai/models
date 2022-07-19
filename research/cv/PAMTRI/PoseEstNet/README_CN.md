@@ -72,8 +72,8 @@
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -108,7 +108,7 @@ bash run_trans.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
 
 对于分布式训练，需要提前创建JSON格式的hccl配置文件。
 请遵循以下链接中的说明：
-<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+<https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.>
 
 # 脚本说明
 
@@ -301,7 +301,7 @@ python3.7 export.py --cfg config.yaml --ckpt_path CKPT_PATH
 | 总时长                | 8卡：40分钟 |
 | 微调检查点 | 335M (.ckpt文件)                                         |
 | 推理模型        | 113M (.mindir文件)                     |
-| 脚本                    | [PoseEstNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/PoseEstNet) |
+| 脚本                    | [PoseEstNet脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/PAMTRI/PoseEstNet) |
 
 ### 推理性能
 

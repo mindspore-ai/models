@@ -38,8 +38,8 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -115,7 +115,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 | Optimizer                  | AdamWeightDecay            |AdamWeightDecay             |
 | Loss Function              | CRF LOSS                   | CRF LOSS                   |
 | Checkpoint for inference   | 64.9M (.ckpt file)         | 64.9M (.ckpt file)         |
-| Scripts                    | [lstm script](https://gitee.com/mindspore/models/tree/master/research/nlp/lstm_crf) | [lstm script](https://gitee.com/mindspore/models/tree/master/research/nlp/lstm_crf) |
+| Scripts                    | [lstm script](https://gitee.com/mindspore/models/tree/r1.8/research/nlp/lstm_crf) | [lstm script](https://gitee.com/mindspore/models/tree/r1.8/research/nlp/lstm_crf) |
 
 ### Evaluation Performance
 

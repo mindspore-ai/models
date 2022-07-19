@@ -40,8 +40,8 @@ Wide&Deep model jointly trained wide linear models and deep neural network, whic
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -182,7 +182,7 @@ python eval.py
 | Params(M)                | 349                             | 349                             |
 | Checkpoint for inference | 1.1GB(.ckpt file)               | 1.1GB(.ckpt file)               |
 
-All executable scripts can be found in [here](https://gitee.com/mindspore/models/tree/master/official/recommend/wide_and_deep_multitable/script)
+All executable scripts can be found in [here](https://gitee.com/mindspore/models/tree/r1.8/official/recommend/wide_and_deep_multitable/script)
 
 #### Evaluation Performance
 

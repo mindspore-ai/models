@@ -70,8 +70,8 @@ python psenet_model_torch2mindspore.py --torch_file=/path_to_model/resnet50-19c8
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 - 安装Mindspore
 - 安装[pyblind11](https://github.com/pybind/pybind11)
 - 安装[Opencv3.4](https://docs.opencv.org/3.4.9/)
@@ -230,7 +230,7 @@ bash scripts/run_eval_ascend.sh
 
   分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-  请遵循链接中的说明：[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+  请遵循链接中的说明：[链接](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)
 
 ```shell
 # 第一个参数为rank_table文件，第二个参数为生成的预训练模型，第三个参数为下载的训练数据集
@@ -346,7 +346,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 | 总时间 | 1卡：75.48小时；8卡：7.11小时|
 | 参数(M) | 27.36 |
 | 微调检查点 | 109.44M （.ckpt file） |
-| 脚本 | <https://gitee.com/mindspore/models/tree/master/official/cv/psenet> |
+| 脚本 | <https://gitee.com/mindspore/models/tree/r1.8/official/cv/psenet> |
 
 ### 推理性能
 
@@ -364,7 +364,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 
 ### 推理
 
-如果您需要使用已训练模型在GPU、Ascend 910、Ascend 310等多个硬件平台上进行推理，可参考[此处](https://www.mindspore.cn/tutorials/experts/zh-CN/master/infer/inference.html)。操作示例如下：
+如果您需要使用已训练模型在GPU、Ascend 910、Ascend 310等多个硬件平台上进行推理，可参考[此处](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/infer/inference.html)。操作示例如下：
 
 ```python
 # 加载未知数据集进行推理

@@ -72,8 +72,8 @@ data
 - Framework
     - [MindSpore](https://www.mindspore.cn/install)
 - For more information, please check the resources below：
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -298,7 +298,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 4pcs: 7.6 hours                                              |
 | Parameters (M)             | 3.84M                                                        |
 | Checkpoint for Fine tuning | 13M (.ckpt file)                                             |
-| Scripts                    | [faceboxes script](https://gitee.com/mindspore/models/tree/master/research/cv/faceboxes) |
+| Scripts                    | [faceboxes script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/faceboxes) |
 
 ### Inference Performance
 

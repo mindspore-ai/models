@@ -245,7 +245,7 @@ bash run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID] [CONFIG_PATH]
 
 ## 训练过程
 
-运行`train.py`训练模型。如果`mindrecord_dir`为空，则会通过`coco_root`（coco数据集）或`image_dir`和`anno_path`（自己的数据集）生成[MindRecord](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/dataset/record.html)文件。**注意，如果mindrecord_dir不为空，将使用mindrecord_dir代替原始图像。**
+运行`train.py`训练模型。如果`mindrecord_dir`为空，则会通过`coco_root`（coco数据集）或`image_dir`和`anno_path`（自己的数据集）生成[MindRecord](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/dataset/record.html)文件。**注意，如果mindrecord_dir不为空，将使用mindrecord_dir代替原始图像。**
 
 ### Ascend上训练
 
@@ -261,7 +261,7 @@ bash run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID] [CONFIG_PATH]
 - `EPOCH_NUM`：分布式训练的轮次数。
 - `LR`：分布式训练的学习率初始值。
 - `DATASET`：分布式训练的数据集模式。
-- `RANK_TABLE_FILE`：[rank_table.json](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)的路径。最好使用绝对路径。
+- `RANK_TABLE_FILE`：[rank_table.json](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)的路径。最好使用绝对路径。
 - `CONFIG_PATH`: 参数配置。
 - `PRE_TRAINED`：预训练检查点文件的路径。最好使用绝对路径。
 - `PRE_TRAINED_EPOCH_SIZE`：预训练的轮次数。
@@ -478,7 +478,7 @@ mAP: 0.33880018942412393
 | 评价指标            | IoU=0.50: 22%               | IoU=0.50: 22%             |
 | 推理模型大小 | 34M(.ckpt file)             | 34M(.ckpt file)             |
 | 参数文件           | ssd300_config.yaml          |ssd300_config_gpu.yaml       |
-| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/r1.8/official/cv/ssd> |
 
 | 参数          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -496,7 +496,7 @@ mAP: 0.33880018942412393
 | 评价指标            | IoU=0.50: 29.1 %             | IoU=0.50: 29.1 %             |
 | 推理模型大小 | 96M(.ckpt file)             | 96M(.ckpt file)             |
 | 参数文件           | ssd_mobilenet_v1_fpn_config.yaml  |ssd_mobilenet_v1_fpn_config_gpu.yaml       |
-| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/r1.8/official/cv/ssd> |
 
 | 参数          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -514,7 +514,7 @@ mAP: 0.33880018942412393
 | 评价指标            | IoU=0.50: 34.3%            | IoU=0.50: 34.3 %           |
 | 推理模型大小 | 255M(.ckpt file)             | 255M(.ckpt file)             |
 | 参数文件           | ssd_resnet50_fpn_config.yaml | ssd_resnet50_fpn_config_gpu.yaml       |
-| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/r1.8/official/cv/ssd> |
 
 | 参数          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -532,7 +532,7 @@ mAP: 0.33880018942412393
 | 评价指标            | IoU=0.50: 23.2%               | IoU=0.50: 23.2%             |
 | 推理模型大小 | 186M(.ckpt file)             | 186M(.ckpt file)             |
 | 参数文件           | ssd_vgg16_config.yaml      | ssd_vgg16_config_gpu.yaml      |
-| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/r1.8/official/cv/ssd> |
 
 | 参数           |                        GPU                         |
 | ------------------- | ------------------------------------------------------ |
@@ -550,7 +550,7 @@ mAP: 0.33880018942412393
 | 评价指标            | IoU=0.50: 21.5%                       |
 | 推理模型大小 | 88M(.ckpt file)                |
 | 参数文件          | ssd_mobilenet_v1_300_config_gpu.yaml    |
-| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/r1.8/official/cv/ssd> |
 
 # 随机情况说明
 

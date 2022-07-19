@@ -78,8 +78,8 @@ cifar-10-batches-bin
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -100,7 +100,7 @@ cifar-10-batches-bin
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，请参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，请参见[hccn_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)中的说明。
 
 ## 脚本说明
 

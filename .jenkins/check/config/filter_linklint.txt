@@ -1,2 +1,4 @@
 http://dl.yf.io/dla/models/imagenet/dla34-ba72cf86.pth
 https://github.com/mcordts/cityscapesScripts/blob/master/cityscapesscripts/helpers/labels.py_key
+*mindspore.cn/*/r1.8/*
+https://persagen.com/files/misc/wang2014knowledge.pdf

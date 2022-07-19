@@ -67,8 +67,8 @@ Style Transfer Networks的训练过程需要预先训练的VGG16和Inception-v3
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 欲了解更多信息，请查看以下资源:
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [脚本描述](#内容)
 

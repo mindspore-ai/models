@@ -55,8 +55,8 @@ CelebFaces Attributes Dataset (CelebA) 是一个大规模的人脸属性数据�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -86,7 +86,7 @@ CelebFaces Attributes Dataset (CelebA) 是一个大规模的人脸属性数据�
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+ <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools>
 
   对于评估脚本，checkpoint文件被训练脚本默认放置在
   `/output/{scale}/checkpoint`目录下，执行脚本时需要将检查点文件（Generator）的名称作为参数传入。
@@ -238,7 +238,7 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [NIMAGES] [DEVICE_ID]
 | 生成器输出                 | image                                                       |
 | 速度                       |8p:9h26m54S; 1p:76h23m39s; 1.1s/step                                |
 | 收敛loss                    |G:[-232.61 to 273.87] loss D:[-27.736 to 2.601]                             |
-| 脚本                       | [PGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/PGAN) |
+| 脚本                       | [PGAN script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/PGAN) |
 
 # ModelZoo主页
 

@@ -80,8 +80,8 @@ YOLOv4需要CSPDarknet53主干来提取图像特征进行检测。 您可以从[
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 更多关于Mindspore的信息，请查看以下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # [快速入门](#目录)
 
@@ -558,7 +558,7 @@ YOLOv4应用于118000张图像上（标注和数据格式必须与COCO 2017相�
 |速度| 1卡：53FPS；8卡：390FPS (shape=416) 220FPS (动态形状)|
 |总时长|48小时（动态形状）|
 |微调检查点|约500M（.ckpt文件）|
-|脚本| <https://gitee.com/mindspore/models/tree/master/official/cv/yolov4> |
+|脚本| <https://gitee.com/mindspore/models/tree/r1.8/official/cv/yolov4> |
 
 ### 推理性能
 

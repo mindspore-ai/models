@@ -70,8 +70,8 @@ OctSqueeze网络由特征提取和特征融合两部分。由5层mlp组成的特
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -310,7 +310,7 @@ At precision 0.08: bpip =  1.22112; each frame cost 53100 ms
 | 总时长        | 单卡：3.3h；8卡：0.6h                                        |
 | 参数(M)       | 0.34M                                                        |
 | 微调检查点    | 3M (.ckpt文件)                                               |
-| 脚本          | [octsqueeze脚本](https://gitee.com/mindspore/models/tree/master/official/cv/octsqueeze) |
+| 脚本          | [octsqueeze脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/octsqueeze) |
 
 ### 推理性能
 

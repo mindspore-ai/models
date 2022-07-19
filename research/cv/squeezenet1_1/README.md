@@ -63,12 +63,12 @@ Dataset used: [ImageNet2012](http://www.image-net.org/)
 # [Environment Requirements](#contents)
 
 - Hardware（Ascend）
-    - Prepare hardware environment with Ascend processor. Squeezenet1_1 training on GPU performs is not good now, and it is still in research. See [squeezenet in research](https://gitee.com/mindspore/models/tree/master/research/cv/squeezenet1_1) to get up-to-date details.
+    - Prepare hardware environment with Ascend processor. Squeezenet1_1 training on GPU performs is not good now, and it is still in research. See [squeezenet in research](https://gitee.com/mindspore/models/tree/r1.8/research/cv/squeezenet1_1) to get up-to-date details.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -167,7 +167,7 @@ checkpoint can be produced in training process and be saved in the folder ./trai
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
-Please follow the instructions in the link [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+Please follow the instructions in the link [hccl_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 
 Training result will be stored in the example path, whose folder name begins with "train" or "train_parallel". Under this, you can find checkpoint file together with result like the followings in log.
 
@@ -268,7 +268,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 8pcs: 22.5 ms/step                                          |
 | Total time                 | 8pcs: 6.1 hours                                             | |
 | Checkpoint for Fine tuning | 13.24M (.ckpt file)                                          |
-| Scripts                    | [squeezenet script](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) |
+| Scripts                    | [squeezenet script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/squeezenet) |
 
 ### Inference Performance
 
@@ -304,7 +304,7 @@ Inference result is saved in current path, you can find result like this in acc.
 
 ### Inference
 
-If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/master/infer/inference.html). Following the steps below, this is a simple example:
+If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/r1.8/infer/inference.html). Following the steps below, this is a simple example:
 
 - Running on Ascend
 

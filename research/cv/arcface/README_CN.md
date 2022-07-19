@@ -54,8 +54,8 @@ python src/rec2jpg_dataset.py --include rec/dataset/path --output output/path
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -320,7 +320,7 @@ bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TAR
 | 总时间        | 1卡：65小时；8卡：8.5小时                                    | 8卡：75小时                                        |
 | 参数(M)       | 85.2                                                         | 85.2                                         |
 | 微调检查点    | 1249M （.ckpt file）                                         | 1249M （.ckpt file）                            |
-| 脚本          | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/cv/arcface) | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/cv/arcface) |
+| 脚本          | [脚本路径](https://gitee.com/mindspore/models/tree/r1.8/research/cv/arcface) | [脚本路径](https://gitee.com/mindspore/models/tree/r1.8/research/cv/arcface) |
 
 ### 评估性能
 

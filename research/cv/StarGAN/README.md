@@ -47,8 +47,8 @@ The dataset can be employed as the training and test sets for the following comp
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Script Description](#contents)
 
@@ -157,7 +157,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 | Total time                 | 1pc: 10h;                                                 |
 | Parameters (M)             | 8.423  M                                                   |
 | Checkpoint for Fine tuning | 32.15M (.ckpt file)                                            |
-| Scripts                    | [StarGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/StarGAN) |
+| Scripts                    | [StarGAN script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/StarGAN) |
 
 ### Inference Performance
 

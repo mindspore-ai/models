@@ -81,7 +81,7 @@ glore_res200网络模型的backbone是ResNet200, 在Stage2, Stage3中分别均�
 
 ## 混合精度
 
-采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
+采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
 以FP16算子为例，如果输入数据类型为FP32，MindSpore后台会自动降低精度来处理数据。用户可打开INFO日志，搜索“reduce precision”查看精度降低的算子。
 
 # 环境要求
@@ -91,8 +91,8 @@ glore_res200网络模型的backbone是ResNet200, 在Stage2, Stage3中分别均�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -128,7 +128,7 @@ glore_res200网络模型的backbone是ResNet200, 在Stage2, Stage3中分别均�
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.>
 
 # 脚本说明
 
@@ -304,7 +304,7 @@ glore_res200网络模型的backbone是ResNet200, 在Stage2, Stage3中分别均�
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)中的说明。
+具体操作，参见[hccn_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)中的说明。
 
 训练结果保存在示例路径中，文件夹名称以“train”或“train_parallel”开头。您可在此路径下的日志中找到检查点文件以及结果，如下所示。
 
@@ -418,7 +418,7 @@ result:{'top_1 acc':0.802303685897436}
 | 总时长                 | 10.98小时                                   |58.5 小时                          |
 | 参数(M)             | 30.5                                            |30.5                          |
 | 微调检查点| 233.46M（.ckpt文件）                                      |233.46M（.ckpt文件）                          |
-| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/glore_res) |
+| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/glore_res) |
 
 #### ImageNet2012上的Glore_resnet101
 
@@ -438,7 +438,7 @@ result:{'top_1 acc':0.802303685897436}
 | 总时长                 |30 小时                          |
 | 参数(M)             |57                          |
 | 微调检查点|579.06M（.ckpt文件）                          |
-| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/glore_res) |
+| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/glore_res) |
 
 #### ImageNet2012上的Glore_resnet200
 
@@ -458,7 +458,7 @@ result:{'top_1 acc':0.802303685897436}
 | 总时长                 | 33时35分钟                                   |94时08分                          |
 | 参数(M)             | 70.6                                           |70.6                          |
 | 微调检查点| 807.57M（.ckpt文件）                                      |808.28(.ckpt)                          |
-| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/glore_res) |
+| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/glore_res) |
 
 ### 推理性能
 

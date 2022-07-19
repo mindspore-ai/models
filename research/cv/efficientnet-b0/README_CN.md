@@ -54,8 +54,8 @@ EfficientNet总体网络架构如下：
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 脚本说明
 
@@ -215,7 +215,7 @@ accuracy:0.767
 | 训练总时间 (8p)             | 29.5h                                    |
 | 评估总时间                  | 1min                                    |
 | 参数量 (M)                 | 61M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/efficientnet-b0) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/efficientnet-b0) |
 
 # 随机情况的描述
 

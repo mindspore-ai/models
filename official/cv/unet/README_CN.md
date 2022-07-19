@@ -117,8 +117,8 @@ python preprocess_dataset.py --config_path path/unet/unet_nested_cell_config.yam
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -475,7 +475,7 @@ bash scripts/run_distribute_train_gpu.sh [RANKSIZE] [DATASET] [CONFIG_PATH]
 | 参数(M)  | 93M                                                       | 93M                                                    |
 | 微调检查点 | 355.11M (.ckpt文件)                                         | 355.11M (.ckpt文件)                        |
 | 配置文件 | unet_medical_config.yaml | unet_medical_gpu_config.yaml                                 |
-| 脚本| [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) |
+| 脚本| [U-Net脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/unet) | [U-Net脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/unet) |
 
 | 参数 | Ascend | GPU |
 | ----- | ------ | ----- |
@@ -496,13 +496,13 @@ bash scripts/run_distribute_train_gpu.sh [RANKSIZE] [DATASET] [CONFIG_PATH]
 | 参数(M)  | 27M | 27M |
 | 微调检查点 | 103.4M(.ckpt文件) | 103.4M(.ckpt文件) |
 | 配置文件 | unet_nested_cell_config.yaml | unet_nested_cell_config.yaml|
-| 脚本 | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) |
+| 脚本 | [U-Net脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/unet) | [U-Net脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/unet) |
 
 ### 用法
 
 #### 推理
 
-如果您需要使用训练好的模型在Ascend 910、Ascend 310等多个硬件平台上进行推理上进行推理，可参考此[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/infer/inference.html)。下面是一个简单的操作步骤示例：
+如果您需要使用训练好的模型在Ascend 910、Ascend 310等多个硬件平台上进行推理上进行推理，可参考此[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/infer/inference.html)。下面是一个简单的操作步骤示例：
 
 ##### Ascend 310环境运行
 

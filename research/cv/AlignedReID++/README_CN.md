@@ -61,7 +61,7 @@ AlignedReID++采用resnet50作为backbone，重新命名了AlignedReID中提出�
 
 ## 混合精度
 
-采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
+采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
 以FP16算子为例，如果输入数据类型为FP32，MindSpore后台会自动降低精度来处理数据。用户可打开INFO日志，搜索“reduce precision”查看精度降低的算子。
 
 # 环境要求
@@ -71,8 +71,8 @@ AlignedReID++采用resnet50作为backbone，重新命名了AlignedReID中提出�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -382,7 +382,7 @@ market1501上训练AlignedReID++
 | 参数(M)       | 13.0                                                         |
 | ckpt模型      | 193M (.ckpt文件)                                             |
 | 推理模型      | 21.50M (.onnx文件),  21.60M(.air文件)                        |
-| 脚本          | [AlignedReID++脚本](https://gitee.com/mindspore/models/tree/master/research/cv/AlignedReID++) |
+| 脚本          | [AlignedReID++脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/AlignedReID++) |
 
 ### 推理性能
 
@@ -403,7 +403,7 @@ market1501上评估AlignedReID++
 
 ### 推理
 
-如果您需要使用此训练模型在GPU、Ascend 910、Ascend 310等多个硬件平台上进行推理，可参考此[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/infer/inference.html)。下面是操作步骤示例：
+如果您需要使用此训练模型在GPU、Ascend 910、Ascend 310等多个硬件平台上进行推理，可参考此[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/infer/inference.html)。下面是操作步骤示例：
 
 在进行推理之前我们需要先导出模型，mindir可以在本地环境上导出。batch_size默认为1。
 

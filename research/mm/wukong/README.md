@@ -35,8 +35,8 @@ More benchmark of the multi-modality modal please refer to [Noah-Wukong Benchmar
 - Framework
     - [Mindspore](https://www.mindspore.cn/ "Mindspore")
 - Tutorial
-    - [Mindspore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [Mindspore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [Mindspore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [Mindspore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## Quick Start
 

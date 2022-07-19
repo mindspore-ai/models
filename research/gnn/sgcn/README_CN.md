@@ -50,8 +50,8 @@ SGCN根据正负连接分别包含三个图卷积层。每一层都以相应的�
 - 安装[MindSpore](https://www.mindspore.cn/install)
 - 安装相关依赖 pip install -r requirements.txt
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 - 下载数据集Bitcoin-Alpha和Bitcoin-OTC，[可点此下载](https://github.com/benedekrozemberczki/SGCN/tree/master/input)并放到根目录下input文件夹中。
 
 ## 快速开始
@@ -158,7 +158,7 @@ bash ./scripts/run_standalone_train.sh 0 ./input/bitcoin_otc.csv
 bash ./scripts/run_distributed_train.sh ./rank_table_8pcs.json 8 0 ./input/bitcoin_otc.csv True
 ```
 
-其中，Ascend多卡训练还需要将相应`RANK_TABLE_FILE`文件的放置目录输入脚本（如`./rank_table_8pcs.json`），`RANK_TABLE_FILE`可按[此方法](#https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成。
+其中，Ascend多卡训练还需要将相应`RANK_TABLE_FILE`文件的放置目录输入脚本（如`./rank_table_8pcs.json`），`RANK_TABLE_FILE`可按[此方法](#https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)生成。
 
 #### 结果
 
@@ -274,7 +274,7 @@ Test set results: auc= 0.87464 f1= 0.93635
 | 损失函数              | Softmax交叉熵                                          |
 | AUC                   | 0.8663 / 0.7979                                                      |
 | F1-Score             | 0.9309 / 0.9527                                                    |
-| 脚本                    | [SGCN](https://gitee.com/mindspore/models/tree/master/research/gnn/sgcn) |
+| 脚本                    | [SGCN](https://gitee.com/mindspore/models/tree/r1.8/research/gnn/sgcn) |
 
 ### Ascend310性能
 
@@ -289,7 +289,7 @@ Test set results: auc= 0.87464 f1= 0.93635
 | 损失函数      | Softmax交叉熵                                                |
 | AUC           | 0.8746 / 0.8227                                              |
 | F1-Score      | 0.9363 / 0.9543                                              |
-| 脚本          | [SGCN](https://gitee.com/mindspore/models/tree/master/research/gnn/sgcn) |
+| 脚本          | [SGCN](https://gitee.com/mindspore/models/tree/r1.8/research/gnn/sgcn) |
 
 ## 随机情况说明
 

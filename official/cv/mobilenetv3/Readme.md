@@ -51,8 +51,8 @@ Dataset used: [imagenet](http://www.image-net.org/)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Script description](#contents)
 
@@ -198,7 +198,7 @@ Eval: top1_correct=37051, tot=50000, acc=74.10%
 | Total time                 | 1433 min                  |
 | Params (M)                 | 5.48 M                    |
 | Checkpoint for Fine tuning | 44 M                      |
-|  Scripts                   | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv3)|
+|  Scripts                   | [Link](https://gitee.com/mindspore/models/tree/r1.8/official/cv/mobilenetv3)|
 
 # [Description of Random Situation](#contents)
 

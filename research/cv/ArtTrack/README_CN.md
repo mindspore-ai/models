@@ -71,8 +71,8 @@ mpii
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -364,7 +364,7 @@ python eval.py mpii_single --config config/mpii_eval.yaml --accuracy  --predicti
 | 速度          | 1292.854毫秒/步(8卡)                                                        |
 | 总时长        | 3.2小时                                                                     |
 | 微调检查点    | 496M (.ckpt文件)                                                            |
-| 脚本          | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/ArtTrack) |
+| 脚本          | [链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/ArtTrack) |
 
 # ModelZoo主页
 

@@ -35,8 +35,8 @@
 - 框架
     - [Mindspore](https://www.mindspore.cn/ "Mindspore")
 - 如需查看详情，请参考如下资源
-    - [Mindspore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [Mindspore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [Mindspore 教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [Mindspore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速开始
 

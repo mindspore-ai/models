@@ -53,8 +53,8 @@ datasets of Set5, you can download from: [Set5](https://gitee.com/yzzheng/dbpn-3
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Script Description](#contents)
 
@@ -218,9 +218,9 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 1pc(Ascend): 3463 ms/step(ddbpn), 800.41ms/step(dbpngan); 8pcs: 1781ms/step(ddbpn)  818.22ms/step(dbpngan) |
 | Total time                 | 8pcs: 12h43m50s(ddbpn), 13h50m28s(dbpngan)                                                    |
 | Checkpoint of DBPN models  | 58.8M (.ckpt file)                                           |
-| Scripts                    | [DBPN script](https://gitee.com/mindspore/models/tree/master/research/cv/DBPN) |
+| Scripts                    | [DBPN script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/DBPN) |
 
 # [ModelZoo Homepage](#contents)
 
-Please check the official [homepage](https://gitee.com/mindspore/models/tree/master/)
+Please check the official [homepage](https://gitee.com/mindspore/models/tree/r1.8/)
 .

@@ -54,8 +54,8 @@ architecture. In the following sections, we will introduce how to run the script
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#content)
 
@@ -271,7 +271,7 @@ Parameters for both training and evaluation can be set in config.py. All the dat
 | Loss                     | 0.0067                                                       | 0.0085                                                       |
 | Params (M)               | 22                                                           | 22                                                           |
 | Checkpoint for inference | 254M (.ckpt file)                                            | 254M (.ckpt file)                                            |
-| Scripts                  | [fasttext](https://gitee.com/mindspore/models/tree/master/official/nlp/fasttext) | [fasttext](https://gitee.com/mindspore/models/tree/master/official/nlp/fasttext) |
+| Scripts                  | [fasttext](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/fasttext) | [fasttext](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/fasttext) |
 
 | Parameters               | Ascend                                                       | GPU                                                          |
 | ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -288,7 +288,7 @@ Parameters for both training and evaluation can be set in config.py. All the dat
 | Loss                     | 2.6e-4                                                       | 0.0004                                                       |
 | Params (M)               | 106                                                          | 106                                                          |
 | Checkpoint for inference | 1.2G (.ckpt file)                                            | 1.2G (.ckpt file)                                            |
-| Scripts                  | [fasttext](https://gitee.com/mindspore/models/tree/master/official/nlp/fasttext) | [fasttext](https://gitee.com/mindspore/models/tree/master/official/nlp/fasttext) |
+| Scripts                  | [fasttext](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/fasttext) | [fasttext](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/fasttext) |
 
 | Parameters               | Ascend                                                       | GPU                                                          |
 | ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -305,7 +305,7 @@ Parameters for both training and evaluation can be set in config.py. All the dat
 | Loss                     | 0.062                                                        | 0.002                                                        |
 | Params (M)               | 103                                                          | 103                                                          |
 | Checkpoint for inference | 1.2G (.ckpt file)                                            | 1.2G (.ckpt file)                                            |
-| Scripts                  | [fasttext](https://gitee.com/mindspore/models/tree/master/official/nlp/fasttext) | [fasttext](https://gitee.com/mindspore/models/tree/master/official/nlp/fasttext) |
+| Scripts                  | [fasttext](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/fasttext) | [fasttext](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/fasttext) |
 
 #### Inference Performance
 

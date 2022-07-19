@@ -14,17 +14,17 @@ public class MSLinkUtils {
     public static final String HELP_INTELLIGENT_POETRY = BASE_URL + "/resources/tech/nlp/poetry";
     public static final String USER_PRIVACY_RULES = "file:///android_asset/privacy.html";
     public static final String COLLEGE_MAIN_CLOUD = BASE_URL + "/news/newschildren?id=354";
-    public static final String COLLEGE_QUICK_TRAIN = BASE_URL + "/tutorial/training/zh-CN/master/quick_start/quick_start.html";
-    public static final String COLLEGE_QUICK_EXECUTE = BASE_URL + "/tutorial/inference/zh-CN/master/multi_platform_inference.html";
-    public static final String COLLEGE_QUICK_APP = BASE_URL + "/tutorial/lite/zh-CN/master/quick_start/quick_start.html";
-    public static final String COLLEGE_QUICK_VIDEO = BASE_URL + "/tutorial/training/zh-CN/master/quick_start/quick_video.html";
-    public static final String COLLEGE_MAIN_FAQ = BASE_URL + "/doc/faq/zh-CN/master/index.html";
+    public static final String COLLEGE_QUICK_TRAIN = BASE_URL + "/tutorial/training/zh-CN/r1.8/quick_start/quick_start.html";
+    public static final String COLLEGE_QUICK_EXECUTE = BASE_URL + "/tutorial/inference/zh-CN/r1.8/multi_platform_inference.html";
+    public static final String COLLEGE_QUICK_APP = BASE_URL + "/tutorial/lite/zh-CN/r1.8/quick_start/quick_start.html";
+    public static final String COLLEGE_QUICK_VIDEO = BASE_URL + "/tutorial/training/zh-CN/r1.8/quick_start/quick_video.html";
+    public static final String COLLEGE_MAIN_FAQ = BASE_URL + "/doc/faq/zh-CN/r1.8/index.html";
     public static final String COLLEGE_MAIN_ASK = "https://bbs.huaweicloud.com/forum/forum-1076-1.html";
 
     public static final String[] COLLEGE_QUICK_WEB_ARRAY = new String[]{COLLEGE_QUICK_TRAIN, COLLEGE_QUICK_EXECUTE, COLLEGE_QUICK_APP, COLLEGE_QUICK_VIDEO};
 
     public static final String ME_APK_URL = "https://download.mindspore.cn/model_zoo/official/lite/apk/mindmain.html";
     public static final String ME_HELP_URL = "https://gitee.com/mindspore/mindspore/issues/new?issue%5Bassignee_id%5D=0&issue%5Bmilestone_id%5D=0";
-    public static final String ME_CODE_URL = "https://gitee.com/mindspore/models/tree/master/official/lite";
+    public static final String ME_CODE_URL = "https://gitee.com/mindspore/models/tree/r1.8/official/lite";
     public static final String ME_STAR_URL = "https://gitee.com/mindspore/mindspore";
 }

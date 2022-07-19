@@ -57,8 +57,8 @@ The classical first-order optimization algorithm, such as SGD, has a small amoun
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## Quick Start
 
@@ -74,7 +74,7 @@ bash scripts/run_distribute_pretrain.sh [DEVICE_NUM] [EPOCH_SIZE] [DATA_DIR] [SC
 python pretrain_eval.py
 ```
 
-> For distributed training, a hccl configuration file with JSON format needs to be created in advance. About the configuration file, you can refer to the [HCCL_TOOL](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+> For distributed training, a hccl configuration file with JSON format needs to be created in advance. About the configuration file, you can refer to the [HCCL_TOOL](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 
 ## Script Description
 
@@ -220,7 +220,7 @@ step:  3000 Accuracy:  [0.71377236]
 | Total time                 | 11 mins                          |
 | Parameters (M)             | 330                                                       |
 | Checkpoint for Fine tuning | 4.5G(.ckpt file)                                         |
-| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/nlp/bert_thor |
+| Scripts                    | https://gitee.com/mindspore/models/tree/r1.8/official/nlp/bert_thor |
 
 ## Description of Random Situation
 

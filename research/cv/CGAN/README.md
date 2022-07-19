@@ -67,8 +67,8 @@ Train CGAN Dataset used: [MNIST](<http://yann.lecun.com/exdb/mnist/>)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Script Description](#contents)
 
@@ -144,7 +144,7 @@ bash run_distributed_train_ascend.sh /path/to/MNIST_Data/train /path/to/result /
 ```
 
 - Notes
-1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 
 ### [Training Result](#content)
 
@@ -215,7 +215,7 @@ Ascend310 inference result will be stored in the postprocess_Result path. Under 
 | Loss                       | g_loss: 4.9693 d_loss: 0.1540                                | g_loss: 0.98 d_loss: 0.59                                    |
 | Total time                 | 7.5 mins(8p)                                                 | 36 mins(1p);11.2mins(8p)                                     |
 | Checkpoint for Fine tuning | 26.2M(.ckpt file)                                            | 5.7M (G_Net); 2.6M (D_Net)                                   |
-| Scripts                    | [cgan script](https://gitee.com/mindspore/models/tree/master/research/cv/CGAN) | [cgan script](https://gitee.com/mindspore/models/tree/master/research/cv/CGAN) |
+| Scripts                    | [cgan script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/CGAN) | [cgan script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/CGAN) |
 
 ### [Evaluation Index](#contents)
 

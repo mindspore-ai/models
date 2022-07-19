@@ -64,8 +64,8 @@ SPPNET基于ZFNET，ZFNET由5个卷积层和3个全连接层组成，SPPNET在�
     - [MindSpore](https://www.mindspore.cn/install)
 
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -587,7 +587,7 @@ train.py中主要参数如下：
 | 速度 | 106毫秒/步 | 87毫秒/步 |
 | 总时间 | 22小时 | 18.5小时 |
 | 微调检查点 | 594M （.ckpt文件） | 594M (.ckpt文件) |
-| 脚本 | [SPPNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/SPPNet) | [SPPNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/SPPNet) |
+| 脚本 | [SPPNet脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/SPPNet) | [SPPNet脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/SPPNet) |
 
 #### Imagenet2012上的sppnet(single train)
 
@@ -605,7 +605,7 @@ train.py中主要参数如下：
 | 速度 | 203毫秒/步 | 87毫秒/步 |
 | 总时间 | 200小时 | 18.5小时 |
 | 微调检查点 | 594M （.ckpt文件） | 594M （.ckpt文件） |
-| 脚本 | [SPPNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/SPPNet) | [SPPNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/SPPNet) |
+| 脚本 | [SPPNet脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/SPPNet) | [SPPNet脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/SPPNet) |
 
 #### Imagenet2012上的sppnet(single mult)
 
@@ -623,7 +623,7 @@ train.py中主要参数如下：
 | 速度 | 180毫秒/步 | 213毫秒/步 |
 | 总时间 | 200小时 | 95小时                                                       |
 | 微调检查点 | 601M （.ckpt文件） | 601M （.ckpt文件） |
-| 脚本 | [SPPNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/SPPNet) | [SPPNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/SPPNet) |
+| 脚本 | [SPPNet脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/SPPNet) | [SPPNet脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/SPPNet) |
 
 # 随机情况说明
 

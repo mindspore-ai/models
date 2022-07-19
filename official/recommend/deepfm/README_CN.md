@@ -51,8 +51,8 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -98,7 +98,7 @@ FM和深度学习部分拥有相同的输入原样特征向量，让DeepFM能从
 
   具体操作，参见：
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools>.
 
 - 在GPU上运行
 
@@ -413,7 +413,7 @@ auc : 0.8057789065281104
 | 总时长| 单卡：90 分钟;                                               | 待运行                 |
 | 参数(M)             | 16.5                                                        | 待运行                  |
 | 微调检查点 | 190M (.ckpt 文件)                                           | 待运行                  |
-| 脚本                    | [DeepFM脚本](https://gitee.com/mindspore/models/tree/master/official/recommend/deepfm) | 待运行                  |
+| 脚本                    | [DeepFM脚本](https://gitee.com/mindspore/models/tree/r1.8/official/recommend/deepfm) | 待运行                  |
 
 ### 推理性能
 

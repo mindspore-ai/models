@@ -52,7 +52,7 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 
 ## 混合精度
 
-采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
+采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
 以FP16算子为例，如果输入数据类型为FP32，MindSpore后台会自动降低精度来处理数据。用户可打开INFO日志，搜索“reduce precision”查看精度降低的算子。
 
 # 环境要求
@@ -212,7 +212,7 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.>
 
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
 
@@ -312,7 +312,7 @@ cat acc.log
 | 速度 | 8卡：625毫秒/步 | 8卡：296毫秒/步  |
 | 总时长 | 8卡：12.3小时 | 8卡： 5.8小时|
 | 调优检查点 |    247.58MB（.ckpt 文件）               | 247.44MB（.ckpt 文件）|
-| 脚本                | [siamRPN脚本](https://gitee.com/mindspore/models/tree/master/research/cv/siamRPN) | [siamRPN脚本](https://gitee.com/mindspore/models/tree/master/research/cv/siamRPN) |
+| 脚本                | [siamRPN脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/siamRPN) | [siamRPN脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/siamRPN) |
 
 ### 评估性能
 

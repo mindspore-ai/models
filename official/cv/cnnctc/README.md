@@ -94,7 +94,7 @@ This takes around 75 minutes.
 
 ## Mixed Precision
 
-The [mixed precision](https://www.mindspore.cn/tutorials/experts/en/master/others/mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
+The [mixed precision](https://www.mindspore.cn/tutorials/experts/en/r1.8/others/mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
 For FP16 operators, if the input data type is FP32, the backend of MindSpore will automatically handle it with reduced precision. Users could check the reduced-precision operators by enabling INFO log and then searching ‘reduce precision’.
 
 # [Environment Requirements](#contents)
@@ -106,9 +106,9 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
+    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
 
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -261,7 +261,7 @@ bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_CKPT(o
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools>.
 
 Results and checkpoints are written to `./train_parallel_{i}` folder for device `i` respectively.
  Log can be found in `./train_parallel_{i}/log_{i}.log` and loss values are recorded in `./train_parallel_{i}/loss.log`.
@@ -468,7 +468,7 @@ accuracy:  0.8533
 | Speed                      | 1pc: 250 ms/step;  8pcs: 260 ms/step                          |
 | Total time                 | 1pc: 15 hours;  8pcs: 1.92 hours                          |
 | Parameters (M)             | 177                                                         |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/official/cv/cnnctc> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/r1.8/official/cv/cnnctc> |
 
 | Parameters                 | CNNCTC                                                   |
 | -------------------------- | ----------------------------------------------------------- |
@@ -483,7 +483,7 @@ accuracy:  0.8533
 | Speed                      | 1pc: 1180 ms/step;  8pcs: 1180 ms/step                          |
 | Total time                 | 1pc: 62.9 hours;  8pcs: 8.67 hours                          |
 | Parameters (M)             | 177                                                         |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/official/cv/cnnctc> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/r1.8/official/cv/cnnctc> |
 
 ### Evaluation Performance
 
@@ -517,7 +517,7 @@ accuracy:  0.8533
 
 ### Inference
 
-If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/master/infer/inference.html). Following the steps below, this is a simple example:
+If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/r1.8/infer/inference.html). Following the steps below, this is a simple example:
 
 - Running on Ascend
 

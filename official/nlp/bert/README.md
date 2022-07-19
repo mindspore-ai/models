@@ -83,8 +83,8 @@ We have provided several kinds of pretrained checkpoint.
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -205,9 +205,9 @@ If you want to run in modelarts, please check the official documentation of [mod
 For distributed training on Ascend, an hccl configuration file with JSON format needs to be created in advance.
 
 Please follow the instructions in the link below to create an hccl.json file in need:
-[https://gitee.com/mindspore/models/tree/master/utils/hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+[https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 
-For distributed training among multiple machines, training command should be executed on each machine in a small time interval. Thus, an hccl.json is needed on each machine. [merge_hccl](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools#merge_hccl) is a tool to create hccl.json for multi-machine case.
+For distributed training among multiple machines, training command should be executed on each machine in a small time interval. Thus, an hccl.json is needed on each machine. [merge_hccl](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools#merge_hccl) is a tool to create hccl.json for multi-machine case.
 
 ```text
 For pretraining, schema file contains ["input_ids", "input_mask", "segment_ids", "next_sentence_labels", "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"].
@@ -834,7 +834,7 @@ python run_eval_onnx.py --config_path [/path/*.yaml] --eval_data_file_path [EVAL
 | Total time                 | 63H                                                        | 610H                      |
 | Params (M)                 | 110M                                                       | 110M                      |
 | Checkpoint for Fine tuning | 1.2G(.ckpt file)                                           | 1.2G(.ckpt file)          |
-| Scripts                    | [BERT_base](https://gitee.com/mindspore/models/tree/master/official/nlp/bert)  | [BERT_base](https://gitee.com/mindspore/models/tree/master/official/nlp/bert)     |
+| Scripts                    | [BERT_base](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/bert)  | [BERT_base](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/bert)     |
 
 | Parameters                 | Ascend                                                     |
 | -------------------------- | ---------------------------------------------------------- |
@@ -854,7 +854,7 @@ python run_eval_onnx.py --config_path [/path/*.yaml] --eval_data_file_path [EVAL
 | Total time                 | 180h                                                       |
 | Params (M)                 | 340M                                                       |
 | Checkpoint for Fine tuning | 3.2G(.ckpt file)                                           |
-| Scripts                    | [BERT_NEZHA](https://gitee.com/mindspore/models/tree/master/official/nlp/bert)  |
+| Scripts                    | [BERT_NEZHA](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/bert)  |
 
 #### Inference Performance
 

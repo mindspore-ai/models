@@ -90,8 +90,8 @@ ECO-Lite模型，发表于ECCV 2018，ECO: Efficient Convolutional Network for O
     - [MindSpore](https://www.mindspore.cn/install/en)
 
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -115,7 +115,7 @@ ECO-Lite模型，发表于ECCV 2018，ECO: Efficient Convolutional Network for O
 
   对于分布式训练，需要提前创建JSON格式的hccl配置文件。
   请遵循以下链接中的说明：
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.>
 默认使用ucf101数据集。
 
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))

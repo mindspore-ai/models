@@ -52,8 +52,8 @@ GCN包含两个图卷积层。每一层以节点特征和邻接矩阵为输入�
 - 框架
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -293,7 +293,7 @@ Test set results: accuracy= 0.81300
 | 损失函数              | Softmax交叉熵                                          | Softmax交叉熵 |
 | 准确率                   | 81.5/70.3                                                      | 86.8/76.7 |
 | 参数(B)             | 92160/59344                                                    | 92160/59344 |
-| 脚本                    | [GCN](https://gitee.com/mindspore/models/tree/master/official/gnn/gcn) | [GCN](https://gitee.com/mindspore/models/tree/master/official/gnn/gcn) |
+| 脚本                    | [GCN](https://gitee.com/mindspore/models/tree/r1.8/official/gnn/gcn) | [GCN](https://gitee.com/mindspore/models/tree/r1.8/official/gnn/gcn) |
 
 ## 随机情况说明
 

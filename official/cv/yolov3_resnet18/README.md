@@ -75,8 +75,8 @@ Dataset used: [COCO2017](<http://images.cocodataset.org/>), labeling uses unpubl
 - Framework
   - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-  - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-  - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+  - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -269,7 +269,7 @@ After installing MindSpore via the official website, you can start training and 
 
 ### Training on Ascend
 
-To train the model, run `train.py` with the dataset `image_dir`, `anno_path` and `mindrecord_dir`. If the `mindrecord_dir` is empty, it wil generate [mindrecord](https://www.mindspore.cn/tutorials/en/master/advanced/dataset/record.html) file by `image_dir` and `anno_path`(the absolute image path is joined by the `image_dir` and the relative path in `anno_path`). **Note if `mindrecord_dir` isn't empty, it will use `mindrecord_dir` rather than `image_dir` and `anno_path`.**
+To train the model, run `train.py` with the dataset `image_dir`, `anno_path` and `mindrecord_dir`. If the `mindrecord_dir` is empty, it wil generate [mindrecord](https://www.mindspore.cn/tutorials/en/r1.8/advanced/dataset/record.html) file by `image_dir` and `anno_path`(the absolute image path is joined by the `image_dir` and the relative path in `anno_path`). **Note if `mindrecord_dir` isn't empty, it will use `mindrecord_dir` rather than `image_dir` and `anno_path`.**
 
 - Stand alone mode
 
@@ -285,7 +285,7 @@ To train the model, run `train.py` with the dataset `image_dir`, `anno_path` and
     bash run_distribute_train.sh 8 150 /data/Mindrecord_train /data /data/train.txt /data/hccl.json
     ```
 
-    The input variables are device numbers, epoch size, mindrecord directory path, dataset directory path, train TXT file path and [hccl json configuration file](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). **It is better to use absolute path.**
+    The input variables are device numbers, epoch size, mindrecord directory path, dataset directory path, train TXT file path and [hccl json configuration file](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools). **It is better to use absolute path.**
 
 You will get the loss value and time of each step as following:
 
@@ -310,7 +310,7 @@ Note the results is two-classification(person and face) used our own annotations
 
 ### Evaluation on Ascend
 
-To eval, run `eval.py` with the dataset `image_dir`, `anno_path`(eval txt), `mindrecord_dir` and `ckpt_path`. `ckpt_path` is the path of [checkpoint](https://www.mindspore.cn/tutorials/en/master/advanced/train/save.html) file.
+To eval, run `eval.py` with the dataset `image_dir`, `anno_path`(eval txt), `mindrecord_dir` and `ckpt_path`. `ckpt_path` is the path of [checkpoint](https://www.mindspore.cn/tutorials/en/r1.8/advanced/train/save.html) file.
 
   ```bash
   bash run_eval.sh 0 yolo.ckpt ./Mindrecord_eval ./dataset ./dataset/eval.txt
@@ -381,7 +381,7 @@ Inference result is saved in current path, you can find result in acc.log file.
 | Speed                      | 1pc: 120 ms/step;  8pcs: 160 ms/step                        |
 | Total time                 | 1pc: 150 mins;  8pcs: 70 mins                               |
 | Parameters (M)             | 189                                                         |
-| Scripts                    | [yolov3_resnet18 script](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_resnet18) | [yolov3_resnet18 script](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_resnet18) |
+| Scripts                    | [yolov3_resnet18 script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/yolov3_resnet18) | [yolov3_resnet18 script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/yolov3_resnet18) |
 
 ### Inference Performance
 

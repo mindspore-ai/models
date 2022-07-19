@@ -52,8 +52,8 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -63,7 +63,7 @@ After installing MindSpore via the official website, you can start training and 
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 Please follow the instructions in the link below:
-<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+<https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools>
 
 - Running on [ModelArts](https://support.huaweicloud.com/modelarts/)
 

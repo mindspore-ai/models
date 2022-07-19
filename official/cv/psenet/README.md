@@ -70,8 +70,8 @@ python psenet_model_torch2mindspore.py --torch_file=/path_to_model/resnet50-19c8
 - Framework
     - [MindSpore](http://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 - install Mindspore
 - install [pyblind11](https://github.com/pybind/pybind11)
 - install [Opencv3.4](https://docs.opencv.org/3.4.9/)
@@ -236,13 +236,13 @@ Major parameters in default_config.yaml are:
 
   For distributed ascend training, a hccl configuration file with JSON format needs to be created in advance.
 
-  Please follow the instructions in the link below: <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  Please follow the instructions in the link below: <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools>.
 
 ```shell
 bash scripts/run_distribute_train.sh [RANK_FILE] [PRETRAINED_PATH] [TRAIN_ROOT_DIR]
 ```
 
-rank_table_file which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+rank_table_file which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 The above shell script will run distribute training in the background. You can view the results through the file
 `device[X]/test_*.log`. The loss value will be achieved as follows:
 
@@ -391,7 +391,7 @@ The `res` folder is generated in the upper-level directory. For details about th
 | Total time                 | 1pc: 75.48 h;  8pcs: 7.11 h                                 |
 | Parameters (M)             | 27.36                                                       |
 | Checkpoint for Fine tuning | 109.44M (.ckpt file)                                        |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/official/cv/psenet> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/r1.8/official/cv/psenet> |
 
 | Parameters                 | GPU                                                   |
 | -------------------------- | ----------------------------------------------------------- |
@@ -409,7 +409,7 @@ The `res` folder is generated in the upper-level directory. For details about th
 | Total time                 | 1pc: 335.6 h;  8pcs: 41.95 h                                |
 | Parameters (M)             | 27.36                                                       |
 | Checkpoint for Fine tuning | 109.44M (.ckpt file)                                        |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/official/cv/psenet> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/r1.8/official/cv/psenet> |
 
 ### Inference Performance
 
@@ -427,7 +427,7 @@ The `res` folder is generated in the upper-level directory. For details about th
 
 ### Inference
 
-If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/master/infer/inference.html). Following the steps below, this is a simple example:
+If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/r1.8/infer/inference.html). Following the steps below, this is a simple example:
 
 ```python
 # Load unseen dataset for inference

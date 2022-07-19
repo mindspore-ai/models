@@ -46,8 +46,8 @@ PFNN根据方程信息和计算区域信息生成训练集和测试集。
 - 框架
     - [Mindspore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
-    - [Mindspore教程](#https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [Mindspore Python API](#https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [Mindspore教程](#https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [Mindspore Python API](#https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## [快速开始](#目录)
 
@@ -101,7 +101,7 @@ python eval.sh --problem [PROBLEM] --device [DEVICE]
 | Speed         | 12.2ms/step                                                   |
 | 精度          | 0.00043                                                      |
 | 训练耗时      | 55s                                                          |
-| Scripts       | [Link](https://gitee.com/mindspore/models/tree/master/research/hpc/pfnn) |
+| Scripts       | [Link](https://gitee.com/mindspore/models/tree/r1.8/research/hpc/pfnn) |
 
 ## [ModelZoo主页](#目录)
 

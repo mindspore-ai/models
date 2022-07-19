@@ -72,8 +72,8 @@ other datasets need to use the same format as MS COCO.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -551,7 +551,7 @@ YOLOv4 on 118K images(The annotation and data format must be the same as coco201
 | Speed                      | 1p 53FPS 8p 390FPS(shape=416) 220FPS(dynamic shape)         |
 | Total time                 | 48h(dynamic shape)                                          |
 | Checkpoint for Fine tuning | about 500M (.ckpt file)                                     |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/official/cv/yolov4> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/r1.8/official/cv/yolov4> |
 
 ### Inference Performance
 

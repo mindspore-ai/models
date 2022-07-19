@@ -70,8 +70,8 @@ We provide `convert_ic03.py`, `convert_iiit5k.py`, `convert_svt.py` as exmples f
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -122,7 +122,7 @@ We provide `convert_ic03.py`, `convert_iiit5k.py`, `convert_svt.py` as exmples f
     For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
     Please follow the instructions in the link below:
-    [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+    [hccl_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 
 - Run on docker
 
@@ -237,7 +237,7 @@ Parameters for both training and evaluation can be set in default_config.yaml.
 
 ## [Training Process](#contents)
 
-- Set options in `config.py`, including learning rate and other network hyperparameters. Click [MindSpore dataset preparation tutorial](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
+- Set options in `config.py`, including learning rate and other network hyperparameters. Click [MindSpore dataset preparation tutorial](https://www.mindspore.cn/tutorials/en/r1.8/advanced/dataset.html) for more information about dataset.
 
 ### [Training](#contents)
 
@@ -443,7 +443,7 @@ result CRNNAccuracy is: 0.806666666666
 | Total time                 | 557 mins                                          | 189 mins                                          |
 | Parameters (M)             | 83M (.ckpt file)                                  | 96M                                               |
 | Checkpoint for Fine tuning | 20.3M (.ckpt file)                                |                                                   |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/crnn) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/crnn) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r1.8/official/cv/crnn) | [Link](https://gitee.com/mindspore/models/tree/r1.8/official/cv/crnn) |
 
 #### [Evaluation Performance](#contents)
 

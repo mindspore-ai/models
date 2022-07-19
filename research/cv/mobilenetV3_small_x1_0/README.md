@@ -50,8 +50,8 @@ Dataset used: [imagenet](http://www.image-net.org/)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -74,7 +74,7 @@ bash run_distribute_train_ascend.sh ./hccl_8p_01234567_127.0.0.1.json /data/Imag
 ```
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
-Please follow the instructions in the link: https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.
+Please follow the instructions in the link: https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.
 
 - Running on GPU (examples)
 
@@ -256,7 +256,7 @@ result: {'Loss': 2.3101649037352554, 'Top_1_Acc': 0.6746546546546547, 'Top_5_Acc
 | Speed                       |                                       | 430 ms/step                                                     | 3500 ms/step                       |
 | Total time                  | 16.4h (8 pcs)                         | 80h (1 pcs)                                                     | 117h (6 pcs)                       |
 | Checkpoint size             | 36 M                                  | 36 M                                                            | 36 M                               |
-| Scripts                     | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/mobilenetV3_small_x1_0) | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/mobilenetV3_small_x1_0) | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/mobilenetV3_small_x1_0) |
+| Scripts                     | [Link](https://gitee.com/mindspore/models/tree/r1.8/research/cv/mobilenetV3_small_x1_0) | [Link](https://gitee.com/mindspore/models/tree/r1.8/research/cv/mobilenetV3_small_x1_0) | [Link](https://gitee.com/mindspore/models/tree/r1.8/research/cv/mobilenetV3_small_x1_0) |
 
 # [Description of Random Situation](#contents)
 

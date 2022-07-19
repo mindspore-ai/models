@@ -49,8 +49,8 @@ The dataset is self-generated using a third-party library called [captcha](https
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -90,7 +90,7 @@ The dataset is self-generated using a third-party library called [captcha](https
 
     Please follow the instructions in the link below:
 
-    <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+    <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools>.
 
     - Running on GPU
 
@@ -254,7 +254,7 @@ save_checkpoint_path: "./checkpoint"        # path to save checkpoint
 
 ### [Training Process](#contents)
 
-- Set options in `default_config.yaml`, including learning rate and other network hyperparameters. Click [MindSpore dataset preparation tutorial](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
+- Set options in `default_config.yaml`, including learning rate and other network hyperparameters. Click [MindSpore dataset preparation tutorial](https://www.mindspore.cn/tutorials/en/r1.8/advanced/dataset.html) for more information about dataset.
 
 #### [Training](#contents)
 
@@ -370,7 +370,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 30 mins                                       | 5 mins|
 | Parameters (M)             | 2.75                                          | 2.75 |
 | Checkpoint for Fine tuning | 20.3M (.ckpt file)                            | 20.3M (.ckpt file) |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/warpctc) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/warpctc) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r1.8/official/cv/warpctc) | [Link](https://gitee.com/mindspore/models/tree/r1.8/official/cv/warpctc) |
 
 #### [Evaluation Performance](#contents)
 

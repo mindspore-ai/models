@@ -106,8 +106,8 @@ FLICKR
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the following resources:
-    - [MindSpore Tutorial](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorial](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Script Description](#table-of-contents)
 

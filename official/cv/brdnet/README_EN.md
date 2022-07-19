@@ -54,8 +54,8 @@ Test dataset: CBSD68, Kodak24, and McMaster
 - Framework
     - [MindSpore](https://www.mindspore.cn/install)
 - For details, please refer to the following resources:
-    - [MindSpore](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/api_python/mindspore.html)
+    - [MindSpore](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/api_python/mindspore.html)
 
 ## Quick start
 
@@ -87,7 +87,7 @@ cd scripts
 bash run_eval_gpu.sh [config_file] [test_dataset_path] [pretrain_path] [ckpt_name]
 ```
 
-Ascend training: generation of [RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+Ascend training: generation of [RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)
 
 ## Script description
 
@@ -489,7 +489,7 @@ BRDNet on “waterloo5050step40colorimage”
 | Speed                      | 8p about 7000FPS to 7400FPS                                                    | 8p 78ms/step |
 | Total time                 | 8p  about 2h 14min                                                             | 8p 5h |
 | Checkpoint for Fine tuning | 8p: 13.68MB , 1p: 19.76MB (.ckpt file)                                         | 14M (.ckpt file) |
-| Scripts                    | [BRDNet](https://gitee.com/mindspore/models/tree/master/official/cv/brdnet) | [BRDNet](https://gitee.com/mindspore/models/tree/master/official/cv/brdnet) |
+| Scripts                    | [BRDNet](https://gitee.com/mindspore/models/tree/r1.8/official/cv/brdnet) | [BRDNet](https://gitee.com/mindspore/models/tree/r1.8/official/cv/brdnet) |
 
 ## Random description
 

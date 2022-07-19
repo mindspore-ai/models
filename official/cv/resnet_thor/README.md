@@ -62,8 +62,8 @@ The classical first-order optimization algorithm, such as SGD, has a small amoun
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## Quick Start
 
@@ -79,7 +79,7 @@ bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [DEVICE_NUM]
 bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
-> For distributed training, a hccl configuration file with JSON format needs to be created in advance. About the configuration file, you can refer to the [HCCL_TOOL](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+> For distributed training, a hccl configuration file with JSON format needs to be created in advance. About the configuration file, you can refer to the [HCCL_TOOL](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 
 - Running on GPU
 
@@ -276,7 +276,7 @@ Inference result will be stored in the example path, whose folder name is "eval"
 | Total time(acc to 75.9%)   | 72 mins                          | 229 mins|
 | Parameters (M)             | 25.5                                                         | 25.5 |
 | Checkpoint for Fine tuning | 491M (.ckpt file)                                         |380M (.ckpt file)     |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet_thor) |[Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet_thor) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r1.8/official/cv/resnet_thor) |[Link](https://gitee.com/mindspore/models/tree/r1.8/official/cv/resnet_thor) |
 
 ### Inference Performance
 

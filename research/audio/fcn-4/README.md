@@ -41,7 +41,7 @@ FCN-4 is a convolutional neural network architecture, its name FCN-4 comes from 
 
 ### Mixed Precision
 
-The [mixed precision](https://www.mindspore.cn/tutorials/experts/en/master/others/mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
+The [mixed precision](https://www.mindspore.cn/tutorials/experts/en/r1.8/others/mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
 For FP16 operators, if the input data type is FP32, the backend of MindSpore will automatically handle it with reduced precision. Users could check the reduced-precision operators by enabling INFO log and then searching ‘reduce precision’.
 
 ## [Environment Requirements](#contents)
@@ -51,8 +51,8 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -332,7 +332,7 @@ AUC: 0.90995
 | Speed                      | 1pc: 160 samples/sec;                                       | 1pc: 160 samples/sec;                                       |
 | Total time                 | 1pc: 20 mins;                                               | 1pc: 20 mins;                                               |
 | Checkpoint for Fine tuning | 198.73M(.ckpt file)                                         | 198.73M(.ckpt file)                                         |
-| Scripts                    | [music_auto_tagging script](https://gitee.com/mindspore/models/tree/master/research/audio/fcn-4)             |
+| Scripts                    | [music_auto_tagging script](https://gitee.com/mindspore/models/tree/r1.8/research/audio/fcn-4)             |
 
 ## [ModelZoo Homepage](#contents)  
 

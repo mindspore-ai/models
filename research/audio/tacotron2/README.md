@@ -53,8 +53,8 @@ Dataset used: [The LJ Speech Dataset](<https://keithito.com/LJ-Speech-Dataset>)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -88,7 +88,7 @@ After installing MindSpore via the official website, you can start training and 
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools>.
 
 - ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows)
 
@@ -284,7 +284,7 @@ Parameters for both training and evaluation can be set in [DATASET]_config.yaml
 | Speed|1264ms/step|
 | Total time: training       | 8p: 72h/19m/41s;;                                  |
 | Checkpoint                 | 328.9M (.ckpt file)                                              |
-| Scripts                    | [Tacotron2 script](https://gitee.com/mindspore/models/tree/master/research/audio/tacotron2) |
+| Scripts                    | [Tacotron2 script](https://gitee.com/mindspore/models/tree/r1.8/research/audio/tacotron2) |
 
 ### Inference Performance
 

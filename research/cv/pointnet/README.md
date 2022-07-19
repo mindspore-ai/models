@@ -47,8 +47,8 @@ Dataset used: Segmentation on A subset of shapenet [shapenet](<https://shapenet.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -160,7 +160,7 @@ bash scripts/run_distribute_gpu.sh ./ckpts ../shapenetcore_partanno_segmentation
 
 Distributed training requires the creation of an HCCL configuration file in JSON format in advance. For specific
 operations, see the instructions
-in [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+in [hccl_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 
 After training, the loss value will be achieved as follows:
 

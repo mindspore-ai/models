@@ -40,8 +40,8 @@ YOLACT提出的实时实例分割算法在2020年被作者扩展为YOLACT++：�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 更多关于MindSpore的信息，请查看以下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # [脚本说明](#目录)
 
@@ -117,7 +117,7 @@ bash run_distribute_train.sh RANK_TABLE_FILE DEVICE_NUMS
 | Accuracy            | 0                                                            |
 | Speed               | 1pc(Ascend): 10000 ms/step                                   |
 | Total time          | 1pc: 270days                                                 |
-| Scripts             | [Yolact++ script](https://gitee.com/mindspore/models/tree/master/research/cv/Yolact++) |
+| Scripts             | [Yolact++ script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/Yolact++) |
 
 # [ModelZoo Homepage](#目录)
 

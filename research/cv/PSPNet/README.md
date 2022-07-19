@@ -47,8 +47,8 @@ The pyramid pooling module fuses features under four different pyramid scales.Fo
 - frame:
     - [Mindspore](https://www.mindspore.cn/install)
 - For details, please refer to the following resources:
-    - [MindSpore course](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore course](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # [Scription Description](#Content)
 
@@ -206,7 +206,7 @@ The ckpt_file parameter is required,
 |loss function          |SoftmaxCrossEntropyLoss   |
 |training speed         |epoch time: 493974.632 ms, per step time: 464.699 ms(1p for voc2012)|
 |total time             |6h10m34s(1pcs)    |
-|Script URL             |https://gitee.com/mindspore/models/tree/master/research/cv/PSPNet|
+|Script URL             |https://gitee.com/mindspore/models/tree/r1.8/research/cv/PSPNet|
 |Random number seed     |set_seed = 1234     |
 
 ## Inference Performance

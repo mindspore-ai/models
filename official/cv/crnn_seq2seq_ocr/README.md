@@ -53,8 +53,8 @@ For training and evaluation, we use the French Street Name Signs (FSNS) released
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -123,7 +123,7 @@ For training and evaluation, we use the French Street Name Signs (FSNS) released
     For distributed training, a hccl configuration file with JSON format needs to be created in advance.
 
     Please follow the instructions in the link below:
-    [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+    [hccl_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 
     - Running on ModelArts
 
@@ -229,7 +229,7 @@ Parameters for both training and evaluation can be set in config.py.
 
 ## [Training Process](#contents)
 
-- Set options in `default_config.yaml`, including learning rate and other network hyperparameters. Click [MindSpore dataset preparation tutorial](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
+- Set options in `default_config.yaml`, including learning rate and other network hyperparameters. Click [MindSpore dataset preparation tutorial](https://www.mindspore.cn/tutorials/en/r1.8/advanced/dataset.html) for more information about dataset.
 
 ### [Training](#contents)
 
@@ -325,7 +325,7 @@ Annotation precision precision = 0.746213
 | Speed                      | 1pc: 355 ms/step;  8pcs: 385 ms/step                  |
 | Total time                 | 1pc: 64 hours;  8pcs: 9 hours                       |
 | Parameters (M)             | 12                                                          |
-| Scripts                    | [crnn_seq2seq_ocr script](https://gitee.com/mindspore/models/tree/master/official/cv/crnn_seq2seq_ocr) |
+| Scripts                    | [crnn_seq2seq_ocr script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/crnn_seq2seq_ocr) |
 
 ### Inference Performance
 

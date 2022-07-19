@@ -99,8 +99,8 @@ To ultilize the strong computation power of Ascend chip, and accelerate the trai
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below:
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -314,7 +314,7 @@ test acc=0.84199995
 | Accuracy           | 83.0/72.5                                                    | 83.0/72.5                                                    |
 | Speed              | 0.195s/epoch                                                 | 0.086s/epoch                                                 |
 | Total time         | 39s                                                          | 17.2s                                                        |
-| Scripts            | [GAT Script](https://gitee.com/mindspore/models/tree/master/official/gnn/gat) | [GAT Script](https://gitee.com/mindspore/models/tree/master/official/gnn/gat) |
+| Scripts            | [GAT Script](https://gitee.com/mindspore/models/tree/r1.8/official/gnn/gat) | [GAT Script](https://gitee.com/mindspore/models/tree/r1.8/official/gnn/gat) |
 
 ## [Description of random situation](#contents)
 

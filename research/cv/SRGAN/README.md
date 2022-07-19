@@ -45,7 +45,7 @@ Validation and eval evaluationdataset used: [Set5](http://people.rennes.inria.fr
 
 The process of training SRGAN needs a pretrained VGG19 based on Imagenet.
 
-[Training scripts](<https://gitee.com/mindspore/models/tree/master/official/cv/vgg16>)|
+[Training scripts](<https://gitee.com/mindspore/models/tree/r1.8/official/cv/vgg16>)|
 [VGG19 pretrained model](<https://download.mindspore.cn/model_zoo/>)
 
 # [Environment Requirements](#contents)
@@ -55,8 +55,8 @@ The process of training SRGAN needs a pretrained VGG19 based on Imagenet.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Script Description](#contents)
 
@@ -204,7 +204,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Accuracy                   | Set14 psnr 27.03                 | Set14 psnr 27.57                            |
 | Speed                      | 1pc:540 ms/step;8pcs:1500 ms/step| 1pc: 260+260ms/step; 8pcs: 460+520ms/step   |
 | Checkpoint for Fine tuning | 184M (.ckpt file)                | 193M (.ckpt file)                           |
-| Scripts                    | [srgan script](https://gitee.com/mindspore/models/tree/master/research/cv/SRGAN)|[srgan script](https://gitee.com/mindspore/models/tree/master/research/cv/SRGAN)|
+| Scripts                    | [srgan script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/SRGAN)|[srgan script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/SRGAN)|
 
 ### Evaluation Performance
 

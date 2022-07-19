@@ -85,8 +85,8 @@ BERT的主干结构为Transformer。对于BERT_base，Transformer包含12个编�
 - 框架
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - 更多关于Mindspore的信息，请查看以下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -208,9 +208,9 @@ bash scripts/run_distributed_pretrain_for_gpu.sh 8 40 /path/cn-wiki-128
 
 在Ascend设备上做分布式训练时，请提前创建JSON格式的HCCL配置文件。
 
-在Ascend设备上做单机分布式训练时，请参考[hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)创建HCCL配置文件。
+在Ascend设备上做单机分布式训练时，请参考[hccl_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)创建HCCL配置文件。
 
-在Ascend设备上做多机分布式训练时，训练命令需要在很短的时间间隔内在各台设备上执行。因此，每台设备上都需要准备HCCL配置文件。请参考[merge_hccl](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools#merge_hccl)创建多机的HCCL配置文件。
+在Ascend设备上做多机分布式训练时，训练命令需要在很短的时间间隔内在各台设备上执行。因此，每台设备上都需要准备HCCL配置文件。请参考[merge_hccl](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools#merge_hccl)创建多机的HCCL配置文件。
 
 ```text
 For pretraining, schema file contains ["input_ids", "input_mask", "segment_ids", "next_sentence_labels", "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"].

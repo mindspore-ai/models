@@ -51,8 +51,8 @@
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -249,7 +249,7 @@ bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH]
 | 总时间 | 1卡：65小时；8卡：10小时 |
 | 参数(M) | 46.15 |
 | 微调检查点 | 293M （.ckpt file） |
-| 脚本 | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/cv/ibnnet) |
+| 脚本 | [脚本路径](https://gitee.com/mindspore/models/tree/r1.8/research/cv/ibnnet) |
 
 ### 评估性能
 

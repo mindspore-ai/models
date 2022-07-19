@@ -52,8 +52,8 @@ The directory structure is as follows, you need to split the dataset by yourself
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Script Description](#contents)
 
@@ -133,7 +133,7 @@ Usage: bash run_standalone_train_ascend.sh [DATA_URL] [TRAIN_URL]
 
 ## [Training Process](#contents)
 
-- Set options in `config.py`, including learning rate, output filename and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
+- Set options in `config.py`, including learning rate, output filename and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/r1.8/advanced/dataset.html) for more information about dataset.
 - Get ResNet50 pretrained model from [Mindspore Hub](https://www.mindspore.cn/resources/hub/details?MindSpore/ascend/v1.2/resnet50_v1.2_imagenet2012)
 
 ### [Training](#content)
@@ -167,7 +167,7 @@ bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)
 ```
 
 - Notes
-1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 2. As for PRETRAINED_MODEL, it should be a trained ResNet50 checkpoint, name the pretraied weight to resnet50.ckpt and put it in dataset directory. See [Training Process](#Training Process)
 
 ### [Training Result](#content)
@@ -265,7 +265,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 8pcs: 5.93 hours                                            |                                                           |
 | Parameters                 | 87.6                                                        | 87.5                                                      |
 | Checkpoint for Fine tuning | 333.07M(.ckpt file)                                         | 222.03(.ckpt file)                                        |
-| Scripts                    | [ntsnet script](https://gitee.com/mindspore/models/tree/master/research/cv/ntsnet) | [ntsnet script](https://gitee.com/mindspore/models/tree/master/research/cv/ntsnet)|
+| Scripts                    | [ntsnet script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/ntsnet) | [ntsnet script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/ntsnet)|
 
 # [Description of Random Situation](#contents)
 

@@ -70,7 +70,7 @@ Dataset used：[ImageNet2012](http://www.image-net.org/)
 
 ## Mixed Precision
 
-The [mixed-precision](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html)
+The [mixed-precision](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/others/mixed_precision.html)
 training method uses single-precision and half-precision data to improve the training speed of
 deep learning neural networks, while maintaining the network accuracy that can be achieved by single-precision training.
 Mixed-precision training increases computing speed and reduces memory usage, while supporting training larger models or
@@ -113,7 +113,7 @@ After installing MindSpore through the official website, you can follow the step
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+  <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.>
 
 - For the GPU hardware
 

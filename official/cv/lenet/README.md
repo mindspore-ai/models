@@ -72,8 +72,8 @@ Dataset used: [MNIST](<http://yann.lecun.com/exdb/mnist/>)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -358,7 +358,7 @@ Evaluation result will be stored in the example path, whose folder name is "eval
 | Speed                      | 1.071 ms/step                          |
 | Total time                 | 32.1s                          |                                       |
 | Checkpoint for Fine tuning | 482k (.ckpt file)                                         |
-| Scripts                    | [LeNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/lenet)s |
+| Scripts                    | [LeNet Script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/lenet)s |
 
 #### Inference Performance
 

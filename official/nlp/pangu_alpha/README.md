@@ -45,7 +45,7 @@ with our parallel setting. We summarized the training tricks as followings:
 2. Pipeline Model Parallelism
 3. Optimizer Model Parallelism
 
-The above features can be found [here](https://www.mindspore.cn/tutorials/experts/en/master/parallel/introduction.html).
+The above features can be found [here](https://www.mindspore.cn/tutorials/experts/en/r1.8/parallel/introduction.html).
 More amazing features are still under developing.
 
 The technical report and checkpoint file can be found [here](https://git.openi.org.cn/PCL-Platform.Intelligence/PanGu-AIpha).
@@ -71,8 +71,8 @@ The above dataset is preprocessed with 1024 tokens for each example. The default
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -151,7 +151,7 @@ bash scripts/run_distribute_train.sh /data/pangu_30_step_ba64/ /root/hccl_8p.jso
 The above command involves some `args` described below:
 
 - DATASET: The path to the mindrecord files's parent directory . For example: `/home/work/mindrecord/`.
-- RANK_TABLE: The details of the rank table can be found [here](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html). It's a json file describes the `device id`, `service ip` and `rank`.
+- RANK_TABLE: The details of the rank table can be found [here](https://www.mindspore.cn/tutorials/experts/en/r1.8/parallel/train_ascend.html). It's a json file describes the `device id`, `service ip` and `rank`.
 - RANK_SIZE: The device number. This can be your total device numbers. For example, 8, 16, 32 ...
 - TYPE: The param init type. The parameters will be initialized with float32. Or you can replace it with `fp16`. This will save a little memory used on the device.
 - MODE: The configure mode. This mode will set the `hidden size` and `layers` to make the parameter number near 2.6 billions. The other mode can be `13B` (`hidden size` 5120 and `layers` 40, which needs at least 16 cards to train.) and `200B`.
@@ -180,7 +180,7 @@ bash scripts/run_distribute_train.sh /path/dataset /path/hccl.json 16 fp32 2.6B 
 
 For distributed training, an hccl configuration file with JSON format needs to be created in advance.
 Please follow the instructions in the link below:
-https:gitee.com/mindspore/models/tree/master/utils/hccl_tools.
+https:gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.
 
 Once you start training, the training log is redirected to device{rank_id}/log{rank_id}.txt(For example,
 device0/log0.log).
@@ -189,7 +189,7 @@ device0/log0.log).
 
 The script will launch the GPU training through `mpirun`, the user can run the following command on any machine to start training.
 Note when start training multi-node, the variables `NCCL_SOCKET_IFNAME` `NCCL_IB_HCA` may be different on some servers. If you meet some errors and
-strange phenomenon, please unset or set the NCCL variables. Details can be checked on this [link](https://www.mindspore.cn/docs/zh-CN/master/faq/distributed_configure.html).
+strange phenomenon, please unset or set the NCCL variables. Details can be checked on this [link](https://www.mindspore.cn/docs/zh-CN/r1.8/faq/distributed_configure.html).
 
 ```bash
 # The following variables are optional.
@@ -200,7 +200,7 @@ bash scripts/run_distributed_train_gpu.sh RANK_SIZE HOSTFILE DATASET PER_BATCH M
 ```
 
 - RANK_SIZE: The device number. This can be your total device numbers. For example, 8, 16, 32 ...
-- HOSTFILE:  It's a text file describes the host ip and its devices. Please see our [tutorial](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_gpu.html) or [OpenMPI](https://www.open-mpi.org/) for more details.
+- HOSTFILE:  It's a text file describes the host ip and its devices. Please see our [tutorial](https://www.mindspore.cn/tutorials/experts/en/r1.8/parallel/train_gpu.html) or [OpenMPI](https://www.open-mpi.org/) for more details.
 - DATASET: The path to the mindrecord files's parent directory . For example: `/home/work/mindrecord/`.
 - PER_BATCH: The batch size for each data parallel-way.
 - MODE: Can be `1.3B` `2.6B`, `13B` and `200B`.
@@ -222,7 +222,7 @@ bash scripts/run_distribute_train_moe_host_device.sh DATASET RANK_TABLE RANK_SIZ
 The above command involves some `args` described below:
 
 - DATASET: The path to the mindrecord files's parent directory . For example: `/home/work/mindrecord/`.
-- RANK_TABLE: The details of the rank table can be found [here](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html). It's a json file describes the `device id`, `service ip` and `rank`.
+- RANK_TABLE: The details of the rank table can be found [here](https://www.mindspore.cn/tutorials/experts/en/r1.8/parallel/train_ascend.html). It's a json file describes the `device id`, `service ip` and `rank`.
 - RANK_SIZE: The device number. This can be your total device numbers. For example, 8, 16, 32 ...
 - TYPE: The param init type. The parameters will be initialized with float32. Or you can replace it with `fp16`. This will save a little memory used on the device.
 - MODE: The configure mode. This mode will set the `hidden size` and `layers` to make the parameter number near 2.6 billions. The other mode can be `13B` (`hidden size` 5120 and `layers` 40, which needs at least 16 cards to train.) and `200B`.
@@ -404,7 +404,7 @@ ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TAR
 
 ### Serving 13B or 2.6B in Distributed mode [Ascend910 8 cards]
 
-- Generate [rank table file](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+- Generate [rank table file](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 
   ```shell
   # models/utils/hccl_tools/hccl_tools.
@@ -487,7 +487,7 @@ ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TAR
 
 ### Serving in Distributed mode [Ascend910 8 cards * N machine]
 
-- Generate [rank table file](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+- Generate [rank table file](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 - In every machine, prepare for checkpoint files and embedding files. We can also use 13B as a test example.
 - In every machine, use scripts/run_cluster_export.sh to export MindIR models, and move all device* to
   'serving_increment/pangu_distributed/models/'.

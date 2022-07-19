@@ -67,8 +67,8 @@ RetinaFace使用ResNet50骨干提取图像特征进行检测。从ModelZoo获取
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -257,7 +257,7 @@ RetinaFace使用ResNet50骨干提取图像特征进行检测。从ModelZoo获取
 | 总时长                 | 4卡: 6.4 小时                                               |
 | 参数 (M)             | 27.29M                                                        |
 | 调优检查点 | 336.3M (.ckpt 文件)                                           |
-| 脚本                    | [retinaface script](https://gitee.com/mindspore/models/tree/master/official/cv/retinaface_resnet50) |
+| 脚本                    | [retinaface script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/retinaface_resnet50) |
 
 ### 评估性能
 

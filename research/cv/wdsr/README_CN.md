@@ -116,8 +116,8 @@ WDSR网络主要由几个基本模块（包括卷积层和池化层）组成。�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -298,7 +298,7 @@ FILE_FORMAT 可选 ['MINDIR', 'AIR', 'ONNX'], 默认['MINDIR']。
 | 总时长        | 1卡：4小时                                                     |8卡：1.5小时|
 |              | 8卡：0.5小时                                                   |          |
 | 微调检查点    | 35 MB(.ckpt文件)                                        |14 MB(.ckpt文件)|
-| 脚本          | [WDSR](https://gitee.com/mindspore/models/tree/master/research/cv/wdsr) |[WDSR](https://gitee.com/mindspore/models/tree/master/research/cv/wdsr)|
+| 脚本          | [WDSR](https://gitee.com/mindspore/models/tree/r1.8/research/cv/wdsr) |[WDSR](https://gitee.com/mindspore/models/tree/r1.8/research/cv/wdsr)|
 
 ### 评估性能
 
