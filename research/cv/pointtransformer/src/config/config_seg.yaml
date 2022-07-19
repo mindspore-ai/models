@@ -1,0 +1,35 @@
+model_type: 'segmentation'
+is_modelarts: False
+data_url: ''
+train_url: ''
+
+# platform configuration
+device_id: 0
+device_target: Ascend
+
+
+# dataset configuration
+dataset_type: 'ShapeNet'
+dataset_path: ''
+batch_size: 16
+num_points: 2048
+uniform: False
+use_normals: True
+num_workers: 16
+
+# checkpoint configuration
+pretrain_ckpt: ""
+save_checkpoint_path: './ckpt'
+
+# training config
+epoch_size: 200
+eval_proid: 1
+eval_start: 80
+run_distribute: False
+learning_rate: 0.05
+weight_decay: 0.0001
+enable_profiling: False
+
+#export config
+file_name: "pointTrans_seg"
+file_format: "MINDIR"
