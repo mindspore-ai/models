@@ -120,7 +120,6 @@ MSCOCO2017
 "nms_thershold": 0.6,                                                                           # 非极大抑制阈值
 "min_score": 0.1,                                                                               # 最低得分
 "max_boxes": 100,                                                                               # 检测框最大数量
-"global_step": 0,                                                                               # 全局步数
 "lr_init": 1e-6,                                                                                # 初始学习率
 "lr_end_rate": 5e-3,                                                                            # 最终学习率与最大学习率的比值
 "warmup_epochs1": 2,                                                                            # 第一阶段warmup的周期数

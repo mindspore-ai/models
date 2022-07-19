@@ -280,7 +280,6 @@ Ascend:
     lr_max                        # max learning rate of Dynamic learning rate
     lr_adjust_epoch               # Dynamic learning rate adjust epoch
     warmup_epochs                 # warmup epochs
-    global_step                   # global step
 ```
 
 ### Network Parameters

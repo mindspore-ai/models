@@ -81,14 +81,14 @@ def dpn_train():
         load_param_into_net(net, load_checkpoint(config.pretrained))
     if config.lr_schedule == 'drop':
         print("lr_schedule:drop")
-        lr = Tensor(get_lr_drop(global_step=config.global_step,
+        lr = Tensor(get_lr_drop(global_step=0,
                                 total_epochs=config.epoch_size,
                                 steps_per_epoch=train_step_size,
                                 lr_init=config.lr_init,
                                 factor=config.factor))
     elif config.lr_schedule == 'warmup':
         print("lr_schedule:warmup")
-        lr = Tensor(get_lr_warmup(global_step=config.global_step,
+        lr = Tensor(get_lr_warmup(global_step=0,
                                   total_epochs=config.epoch_size,
                                   steps_per_epoch=train_step_size,
                                   lr_init=config.lr_init,

@@ -186,7 +186,7 @@ def main():
             filter_checkpoint_parameter(param_dict)
         load_param_into_net(net, param_dict)
 
-    lr = Tensor(get_lr(global_step=config.global_step,
+    lr = Tensor(get_lr(global_step=0,
                        lr_init=config.lr_init, lr_end=config.lr_end_rate * config.lr, lr_max=config.lr,
                        warmup_epochs1=config.warmup_epochs1, warmup_epochs2=config.warmup_epochs2,
                        warmup_epochs3=config.warmup_epochs3, warmup_epochs4=config.warmup_epochs4,

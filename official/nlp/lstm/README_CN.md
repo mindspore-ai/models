@@ -281,7 +281,6 @@ Ascend:
     lr_max                        # 动态学习率的最大学习率
     lr_adjust_epoch               # 动态学习率在此epoch范围内调整
     warmup_epochs                 # warmup的epoch数
-    global_step                   # 全局步数
 ```
 
 ### 网络参数

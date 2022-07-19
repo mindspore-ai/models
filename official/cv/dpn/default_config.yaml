@@ -33,7 +33,6 @@ is_save_on_master: True
 pretrained: ""
 ckpt_path: "./"
 eval_each_epoch: 0
-global_step: 0
 epoch_size: 180
 loss_scale_num: 1024
 momentum: 0.9

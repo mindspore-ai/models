@@ -48,7 +48,6 @@ parser.add_argument("--lr_adjust_epoch", type=int, default=6,
                     help="the epoch interval of adjusting learning rate, effective when enable dynamic_lr")
 parser.add_argument("--warmup_epochs", type=int, default=1,
                     help="the epoch interval of warmup, effective when enable dynamic_lr")
-parser.add_argument("--global_step", type=int, default=0, help="global step of train, effective when enable dynamic_lr")
 parser.add_argument("--momentum", type=float, default=0.9, help="")
 parser.add_argument("--num_epochs", type=int, default=20, help="")
 parser.add_argument("--batch_size", type=int, default=64, help="")
