@@ -14,7 +14,9 @@
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
-        - [result](#result)
+        - [Ascend310 result](#result)
+        - [Infer on ONNX](#infer-on-onnx)
+        - [ONNX result](#result)
 - [Model Description](#model-description)
     - [Performance](#performance)  
         - [Training Performance](#evaluation-performance)
@@ -80,6 +82,7 @@ In this project, the file organization is recommended as below:
     ├─run_distribute_ascend.sh           # launch distributed training with ascend platform(8p)
     ├─run_distribute_gpu.sh              # launch distributed training with GPU platform(8p)
     ├─run_eval_ascend.sh                 # launch evaluating with ascend platform
+    ├─run_infer_onnx.sh                  # shell script for infer on onnx
     └─run_eval.sh                        # launch evaluating with GPU platform
   ├─src
     ├─dataset.py                      # data proprocessing
@@ -90,6 +93,7 @@ In this project, the file organization is recommended as below:
     ├─initializer.py                  # init
     └─logger.py                       # logger output
   ├─eval.py                           # eval net
+  ├─infer_east_onnx.py                # application for onnx inference
   └─train.py                          # train net
 ```
 
@@ -301,11 +305,12 @@ Calculated {"precision": 0.8329088130412634, "recall": 0.7871930669234473, "hmea
 ### [Export MindIR](#contents)
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --image_height [image_height] --image_width [image_width] --device_target [DEVICE_TARGET]
 ```
 
 The ckpt_file parameter is required,
-`file_format` should be in ["AIR", "MINDIR"]
+`file_format` should be in ["AIR", "MINDIR", "ONNX"]
+`device_target` should be in ["Ascend", "GPU", "CPU"]
 
 ### Infer on Ascend310
 
@@ -319,12 +324,31 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 
 - `DEVICE_ID` is optional, default value is 0.
 
-### result
+### Ascend310 result
 
 Inference result is saved in current path, you can find result like this in acc.log file.
 
 ```bash
 Calculated {"precision": 0.8329088130412634, "recall": 0.7871930669234473, "hmean": 0.8094059405940593, "AP": 0}
+```
+
+### Infer on ONNX
+
+Before performing inference, the onnx file must be exported by `export.py` script. We only provide an example of inference using ONNX model.
+
+```shell
+# ONNX inference
+bash run_infer_onnx.sh [ONNX_PATH] [TEST_DATASET_PATH] [DEVICE_ID]
+```
+
+- `DEVICE_ID` is optional, default value is 0.
+
+### ONNX result
+
+Inference result is saved in current path, you can find result like this in acc.log file.
+
+```bash
+Calculated!{"precision": 0.8214109521460287, "recall": 0.8016369764082811, "hmean": 0.8114035087719298, "AP": 0}
 ```
 
 # [Model description](#contents)
