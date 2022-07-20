@@ -214,10 +214,12 @@ YOLOv3使用DarkNet53执行特征提取，这是YOLOv2中的Darknet-19和残差�
   ├─scripts
     ├─run_standalone_train.sh         # 在Ascend中启动单机训练(1卡)
     ├─run_distribute_train.sh         # 在Ascend中启动分布式训练(8卡)
+    ├─run_infer_310.sh                # 在Ascend中启动推理
     └─run_eval.sh                     # 在Ascend中启动评估
     ├─run_standalone_train_gpu.sh     # 在GPU中启动单机训练(1卡)
     ├─run_distribute_train_gpu.sh     # 在GPU中启动分布式训练(8卡)
-    └─run_eval_gpu.sh                 # 在GPU中启动评估
+    ├─run_eval_gpu.sh                 # 在GPU中启动评估
+    └─run_infer_gpu.sh                # 在GPU中启动ONNX推理
   ├─src
     ├─__init__.py                     # python初始化文件
     ├─config.py                       # 参数配置
@@ -232,6 +234,7 @@ YOLOv3使用DarkNet53执行特征提取，这是YOLOv2中的Darknet-19和残差�
     ├─yolo.py                         # yolov3网络
     ├─yolo_dataset.py                 # 为YOLOV3创建数据集
   ├─eval.py                           # 评估网络
+  ├─eval_onnx.py                      # 推理网络
   └─train.py                          # 训练网络
 ```
 
@@ -398,20 +401,23 @@ bash run_eval.sh dataset/coco2014/ train_parallel0/outputs/{year}-{month}-{day}_
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.551
 ```
 
-## 导出mindir模型
+## 导出mindir，onnx模型
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --keep_detect [Bool]
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --keep_detect [Bool] --device_target=[DEVICE]
 ```
 
 参数`ckpt_file` 是必需的，目前,`FILE_FORMAT` 必须在 ["AIR", "ONNX", "MINDIR"]中进行选择。
-参数`keep_detect` 是否保留坐标检测模块, 默认为True
+参数`keep_detect` 是否保留坐标检测模块, 默认为True。
+参数`device_target` 默认为Ascend，目前,`DEVICE` 必须在 ["Ascend", "GPU", "CPU"]中进行选择。
 
 ## 推理过程
 
 ### 用法
 
-在执行推理之前，需要通过export.py导出mindir文件。
+运行以下命令。如果在GPU上运行，请在python命令中添加`--device_target=GPU`。
+
+在执行推理之前，需要通过export.py导出mindir或者onnx文件。
 目前仅可处理batch_Size为1，由于使用了DVPP硬件进行图片处理，因此图片必须满足JPEG编码格式，否则将会报错。比如coco2014数据集中的COCO_val2014_000000320612.jpg需要删除。
 
 ```shell
@@ -421,9 +427,16 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 
 `DEVICE_ID` 可选，默认值为 0。DATA_PATH为推理数据所在的路径，ANNO_PATH为数据注解文件，为json文件，如instances_val2014.json。
 
+```shell
+# onnx 推理
+bash run_infer_gpu.sh [DATA_PATH] [ONNX_PATH]
+```
+
+DATA_PATH为推理数据所在的路径，路径下应包含数据注解文件，如instances_val2014.json。
+
 ### 结果
 
-推理结果保存在当前路径，可在acc.log中看到最终精度结果。
+Ascend310 推理结果保存在当前路径，可在acc.log中看到最终精度结果。
 
 ```eval log
 # acc.log
@@ -440,6 +453,25 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.224
  Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.442
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.551
+```
+
+onnx 推理结果保存在当前路径，可在log.txt中看到最终精度结果。
+
+```log
+# log.txt
+=============coco eval reulst=========
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.314
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.532
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.326
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.133
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.328
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.449
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.263
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.405
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.431
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.234
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.453
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.579
 ```
 
 # 模型描述

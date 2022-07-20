@@ -213,10 +213,12 @@ Dataset used: [COCO2014](https://cocodataset.org/#download)
   ├─scripts
     ├─run_standalone_train.sh         # launch standalone training(1p) in ascend
     ├─run_distribute_train.sh         # launch distributed training(8p) in ascend
+    ├─run_infer_310.sh                # launch inference in ascend
     └─run_eval.sh                     # launch evaluating in ascend
     ├─run_standalone_train_gpu.sh     # launch standalone training(1p) in gpu
     ├─run_distribute_train_gpu.sh     # launch distributed training(8p) in gpu
-    └─run_eval_gpu.sh                 # launch evaluating in gpu
+    ├─run_eval_gpu.sh                 # launch evaluating in gpu
+    └─run_infer_gpu.sh                # launch ONNX inference in gpu
   ├─src
     ├─__init__.py                     # python init file
     ├─config.py                       # parameter configuration
@@ -231,6 +233,7 @@ Dataset used: [COCO2014](https://cocodataset.org/#download)
     ├─yolo.py                         # yolov3 network
     ├─yolo_dataset.py                 # create dataset for YOLOV3
   ├─eval.py                           # eval net
+  ├─eval_onnx.py                      # inference net
   └─train.py                          # train net
 ```
 
@@ -401,23 +404,24 @@ This the standard format from `pycocotools`, you can refer to [cocodataset](http
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.551
 ```
 
-### [Export MindIR](#contents)
+### [Export MindIR or ONNX](#contents)
 
 Currently, batchsize can only set to 1.
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --keep_detect [Bool]
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --keep_detect [Bool] --device_target=[DEVICE]
 ```
 
 The ckpt_file parameter is required,
 Currently,`FILE_FORMAT` should be in ["AIR", "ONNX", "MINDIR"]
 `keep_detect` keep the detect module or not, default: True
+`device_target` should be in ["Ascend", "GPU", "CPU"], default: Ascend
 
 ### [Inference Process](#contents)
 
 #### Usage
 
-Before performing inference, the air file must bu exported by export.py.
+Before performing inference, the air or onnx file must be exported by export.py.
 Current batch_Size can only be set to 1. Because the DVPP hardware is used for processing, the picture must comply with the JPEG encoding format, Otherwise, an error will be reported. For example, the COCO_val2014_000000320612.jpg in coco2014 dataset needs to be deleted.
 
 ```shell
@@ -427,9 +431,16 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 
 `DEVICE_ID` is optional, default value is 0. DATA_PATH is evaluation data path, ANNO_PATH is annotation file path, json format. e.g., instances_val2014.json.
 
+```shell
+# onnx inference
+bash run_infer_gpu.sh [DATA_PATH] [ONNX_PATH]
+```
+
+DATA_PATH is evaluation data path, include annotation file path, json format. e.g., instances_val2014.json.
+
 #### result
 
-Inference result is saved in current path, you can find result in acc.log file.
+Inference result in Ascend is saved in current path, you can find result in acc.log file.
 
 ```eval log
 # acc.log
@@ -446,6 +457,25 @@ Inference result is saved in current path, you can find result in acc.log file.
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.224
  Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.442
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.551
+```
+
+Inference result in ONNX is saved in current path, you can find result in log.txt file.
+
+```log
+# log.txt
+=============coco eval reulst=========
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.314
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.532
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.326
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.133
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.328
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.449
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.263
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.405
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.431
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.234
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.453
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.579
 ```
 
 ## [Model Description](#contents)
