@@ -20,14 +20,12 @@ from src.models.StackedHourglassNet import StackedHourglassNet
 import src.dataset.MPIIDataLoader as ds
 import mindspore.nn as nn
 import mindspore.ops as ops
-from mindspore import Tensor, context, export, load_checkpoint, load_param_into_net
-
+from mindspore import Tensor, export, load_checkpoint, load_param_into_net
 args = parse_args()
-
 
 class MaxPool2dFilter(nn.Cell):
     """
-    maxpool 2d for filter
+        Maxpool 2d for filter
     """
 
     def __init__(self):
@@ -37,7 +35,7 @@ class MaxPool2dFilter(nn.Cell):
 
     def construct(self, x):
         """
-        forward
+            forward
         """
         maxm = self.pool(x)
         return self.eq(maxm, x)
@@ -54,12 +52,13 @@ class Hourglass(nn.Cell):
         self.pool = nn.MaxPool2d(3, 1, "same")
         self.eq = ops.Equal()
 
-    def construct(self, input1, input2):
+
+    def construct(self, x):
         """
-        forward
+            forward
         """
-        tmp1 = self.net(input1)
-        tmp2 = self.net(input2)
+        tmp1 = self.net(x)
+        tmp2 = self.net(x[:, ::-1])
         tmp = ops.Concat(0)((tmp1, tmp2))
 
         det = tmp[0, -1] + tmp[1, -1, :, :, ::-1][ds.flipped_parts["mpii"]]
@@ -80,17 +79,9 @@ if __name__ == "__main__":
         print("ckpt file not valid")
         exit()
 
-    # Set context mode
-    if args.context_mode == "GRAPH":
-        context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, save_graphs=False)
-    else:
-        context.set_context(mode=context.PYNATIVE_MODE, device_target=args.device_target)
-
     # Import net
     net = StackedHourglassNet(args.nstack, args.inp_dim, args.oup_dim)
     param_dict = load_checkpoint(args.ckpt_file)
     load_param_into_net(net, param_dict)
     input_arr = Tensor(np.zeros([1, args.input_res, args.input_res, 3], np.float32))
-    input_arr2 = Tensor(np.zeros([1, args.input_res, args.input_res, 3], np.float32))
-    net = Hourglass(net)
-    export(net, input_arr, input_arr2, file_name='Hourglass', file_format=args.file_format)
+    export(net, input_arr, file_name='Hourglass', file_format=args.file_format)

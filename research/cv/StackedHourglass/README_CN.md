@@ -61,6 +61,7 @@ Stacked Hourglass 是一个用于人体姿态检测的模型，它采用堆叠�
 ├──scripts
 │   ├──run_distribute_train.sh     # 分布式训练脚本
 │   ├──run_eval.sh                 # 评估脚本
+│   ├──run_eval_onnx.sh            # 评估onnx推理模型精度脚本
 │   └──run_standalone_train.sh     # 单卡训练脚本
 ├──src
 │   ├──dataset
@@ -75,6 +76,7 @@ Stacked Hourglass 是一个用于人体姿态检测的模型，它采用堆叠�
 │   │   └──inference.py            # 推理相关的函数，包含了推理的准确率计算等
 │   └── config.py                  # 参数配置
 ├── eval.py                        # 评估脚本
+├── eval_onnx.py                   # ONNX模型评估脚本
 ├── export.py                      # 导出脚本
 ├── README_CN.md                   # 项目相关描述
 └── train.py                       # 训练脚本
@@ -164,10 +166,12 @@ Tra PCK @, 0.5 , hip : 0.918 , count: 587
 可以使用 `export.py` 脚本进行模型导出，使用方法为：
 
 ```sh
-python export.py --ckpt_file [ckpt 文件路径]
+python export.py --ckpt_file [ckpt 文件路径] --device_target [device 环境设备] --file_format [导出文件格式]
 ```
 
-参数`ckpt_file` 是必需的
+- `ckpt_file` 导出的ckpt模型文件，参数`ckpt_file` 是必需的
+- `device_target`环境设备【Ascend】【GPU】【CPU】
+- `file_format`导出文件格式【ONNX】【MINDIR】【AIR】
 
 ## 推理过程
 
@@ -197,6 +201,46 @@ Val PCK @, 0.5 , knee : 0.819 , count: 4963
 Tra PCK @, 0.5 , knee : 0.91 , count: 499
 Val PCK @, 0.5 , hip : 0.871 , count: 5777
 Tra PCK @, 0.5 , hip : 0.918 , count: 587
+
+[...]
+```
+
+### 运行
+
+在导出onnx模型后，进行onnx模型推理评估，使用方法为：
+
+```bash
+python eval_onnx.py --onnx_file [onnx onnx模型文件路径] --device_target [device 环境设备]
+```
+
+- `onnx_file` 导出的onnx模型文件
+- `device_target`环境设备【Ascend】【GPU】【CPU】
+
+或则可以运行onn推理脚本。
+
+```shell
+bash ./scripts/run_eval_onnx.sh [MINDIR_PATH] [ANNOT_PATH] [IMAGES_PATH] [DEVICE_TARGET]
+```
+
+- `ONNX_PATH` ONNX模型的路径
+- `ANNOT_PATH` ANNO文件路径
+- `IMAGES_PATH` 图像路径
+- `DEVICE_TARGET` 环境设备【Ascend】【GPU】【CPU】
+
+### 结果
+
+运行完成，可以看到最终的精度结果。
+
+```text
+all :
+Val PCK @, 0.5 , total : 0.877 , count: 44239
+Tra PCK @, 0.5 , total : 0.943 , count: 4443
+Val PCK @, 0.5 , ankle : 0.762 , count: 4234
+Tra PCK @, 0.5 , ankle : 0.855 , count: 392
+Val PCK @, 0.5 , knee : 0.808 , count: 4963
+Tra PCK @, 0.5 , knee : 0.908 , count: 499
+Val PCK @, 0.5 , hip : 0.863 , count: 5777
+Tra PCK @, 0.5 , hip : 0.945 , count: 587
 
 [...]
 ```

@@ -33,9 +33,10 @@ def parse_args():
     parser.add_argument("--output_res", type=int, default=64)
     parser.add_argument("--annot_dir", type=str, default="./MPII/annot")
     parser.add_argument("--img_dir", type=str, default="./MPII/images")
+
     # Context
     parser.add_argument("--context_mode", type=str, default="GRAPH", choices=["GRAPH", "PYNATIVE"])
-    parser.add_argument("--device_target", type=str, default="Ascend", choices=["Ascend", "CPU"])
+    parser.add_argument("--device_target", type=str, default="Ascend", choices=["Ascend", "GPU", "CPU"])
     # Train
     parser.add_argument("--parallel", type=ast.literal_eval, default=False)
     parser.add_argument("--amp_level", type=str, default="O2", choices=["O0", "O1", "O2", "O3"])
@@ -53,7 +54,9 @@ def parse_args():
     parser.add_argument("--ckpt_file", type=str, default="")
     # Export
     parser.add_argument("--file_name", type=str, default="Hourglass")
-    parser.add_argument("--file_format", type=str, default="MINDIR")
+    parser.add_argument("--file_format", type=str, default="ONNX")
+    # Onnx
+    parser.add_argument("--onnx_file", type=str, default="")
     # infer_310
     parser.add_argument("--result_path", type=str, default="../ascend310_infer/preprocess_Result")
     parser.add_argument("--out_path", type=str, default="../ascend310_infer/result_Files")
