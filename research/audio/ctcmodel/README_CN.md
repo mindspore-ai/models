@@ -60,8 +60,8 @@ Connectionist temporal classification: labelling unsegmented sequence data with 
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 通过下面网址可以获得更多信息:
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 - 依赖
     - 见requirements.txt文件，使用方法如下:
 

@@ -52,8 +52,8 @@ Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -260,7 +260,7 @@ Inference result is saved in current path, you can find result in acc.log file.
 | Loss Function              | NT-Xent Loss                                                |
 | linear eval                | 84.505%                                                     |
 | Total time                 | 25m04s                                                      |
-| Scripts                    | [SimCLR Script](https://gitee.com/mindspore/models/tree/master/official/cv/simclr) | [SimCLR Script](https://gitee.com/mindspore/models/tree/master/official/cv/simclr) |
+| Scripts                    | [SimCLR Script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/simclr) | [SimCLR Script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/simclr) |
 
 ## [Description of Random Situation](#contents)
 

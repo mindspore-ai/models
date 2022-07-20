@@ -57,8 +57,8 @@ Dataset used: [omniglot](https://github.com/brendenlake/omniglot)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-  - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-  - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+  - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -76,7 +76,7 @@ bash run_distribution_ascend.sh ./hccl_8p_01234567_127.0.0.1.json  ./ckpt /data/
 ```
 
 For distributed training, a hccl configuration file with JSON format needs to be created in advance.
-Please follow the instructions in the link: https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.
+Please follow the instructions in the link: https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.
 
 - Running on GPU
 
@@ -273,7 +273,7 @@ The ckpt_file parameter is required,
 | Speed                      | 70 ms/episode                                               | 41 ms/episode                                              | 58 ms/episode |
 | Total time                 | 4.5h (8 pcs)                                                | 4.5h (1 pcs)                                               | 2h (8 pcs) |
 | Checkpoint for Fine tuning | 875k (.ckpt file)                                           | 905K (.ckpt file)                                          | 905K (.ckpt file) |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/relationnet) | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/relationnet) |[Link](https://gitee.com/mindspore/models/tree/master/research/cv/relationnet) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r1.8/research/cv/relationnet) | [Link](https://gitee.com/mindspore/models/tree/r1.8/research/cv/relationnet) |[Link](https://gitee.com/mindspore/models/tree/r1.8/research/cv/relationnet) |
 
 # [Description of Random Situation](#contents)
 

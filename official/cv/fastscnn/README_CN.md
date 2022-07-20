@@ -57,8 +57,8 @@ Cityscapes 数据集，即城市景观数据集，包含来自 50 个不同城�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/api_python/mindspore.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/api_python/mindspore.html)
 
 ## 快速入门
 
@@ -95,7 +95,7 @@ python eval.py \
 bash ./scripts/run_eval.sh [train_code_path] [dataset] [resume_path] [resume_name] [output_path]
 ```
 
-Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)
 
 ## 脚本说明
 
@@ -348,7 +348,7 @@ FastSCNN on “Cityscapes ”
 | Accuracy                   | 54.84%                                                       |
 | Total time                 | 8p：8h20m                                                    |
 | Checkpoint for Fine tuning | 8p: 14.51MB(.ckpt file)                                      |
-| Scripts                    | [FastSCNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/fastscnn) |
+| Scripts                    | [FastSCNN脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/fastscnn) |
 
 ## 随机情况说明
 

@@ -62,8 +62,8 @@ Download split txt: [link](https://github.com/jakesnell/prototypical-networks/tr
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -206,7 +206,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 215 ms/step                          | 144 ms/step                          |
 | Total time                 | 3 h 23m (8p)                | 2 h 48m (8p)                |
 | Checkpoint for Fine tuning | 440 KB (.ckpt file)                                         | 441 KB (.ckpt file)                                         |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/cv/ProtoNet> |<https://gitee.com/mindspore/models/tree/master/research/cv/ProtoNet> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/r1.8/research/cv/ProtoNet> |<https://gitee.com/mindspore/models/tree/r1.8/research/cv/ProtoNet> |
 
 # [ModelZoo Homepage](#contents)
 

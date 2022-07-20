@@ -70,8 +70,8 @@ PoseNet是剑桥大学提出的一种鲁棒、实时的6DOF（单目六自由度
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -94,7 +94,7 @@ PoseNet是剑桥大学提出的一种鲁棒、实时的6DOF（单目六自由度
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.>
 
 - GPU处理器环境运行
 
@@ -343,7 +343,7 @@ result_path 为输出路径。
 | 参数(M)             | 10.7                                                        | 10.7                   |
 | 微调检查点 | 82.91M (.ckpt文件)                                         | 82.91M (.ckpt文件)                |
 | 推理模型        | 41.66M (.mindir文件)                     | 41.66M (.mindir文件)                 |
-| 脚本                    | <https://gitee.com/mindspore/models/tree/master/official/cv/posenet> | <https://gitee.com/mindspore/models/tree/master/official/cv/posenet> |
+| 脚本                    | <https://gitee.com/mindspore/models/tree/r1.8/official/cv/posenet> | <https://gitee.com/mindspore/models/tree/r1.8/official/cv/posenet> |
 
 #### StMarysChurch上的PoseNet
 
@@ -363,7 +363,7 @@ result_path 为输出路径。
 | 参数(M)             | 10.7                                                        | 10.7                   |
 | 微调检查点 | 82.91M (.ckpt文件)                                         | 82.91M (.ckpt文件)                |
 | 推理模型        | 41.66M (.mindir文件)                     | 41.66M (.mindir文件)                 |
-| 脚本                    | [posenet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/posenet) | [posenet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/posenet) |
+| 脚本                    | [posenet脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/posenet) | [posenet脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/posenet) |
 
 ### 推理性能
 

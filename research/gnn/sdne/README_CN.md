@@ -45,8 +45,8 @@
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -179,7 +179,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 | 总时间 | 1卡：44秒 |
 | 参数(M) | 1.30 |
 | 微调检查点 | 15M （.ckpt file） |
-| 脚本 | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/gnn/sdne) |
+| 脚本 | [脚本路径](https://gitee.com/mindspore/models/tree/r1.8/research/gnn/sdne) |
 
 ### 评估性能
 

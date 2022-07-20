@@ -65,7 +65,7 @@ Dataset used: [CIFAR-10](http://www.cs.toronto.edu/~kriz/cifar.html)
 
 ## [Mixed Precision(Ascend)](#contents)
 
-The [mixed precision](https://www.mindspore.cn/tutorials/experts/en/master/others/mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
+The [mixed precision](https://www.mindspore.cn/tutorials/experts/en/r1.8/others/mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
 
 For FP16 operators, if the input data type is FP32, the backend of MindSpore will automatically handle it with reduced precision. Users could check the reduced-precision operators by enabling INFO log and then searching ‘reduce precision’.
 
@@ -76,8 +76,8 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 - Running on [ModelArts](https://support.huaweicloud.com/modelarts/)
 
@@ -297,7 +297,7 @@ bash scripts/run_standalone_train.sh [DEVICE_ID] [DATA_PATH] [CKPT_PATH]
 bash scripts/run_standalone_train_cpu.sh DATA_PATH
 ```
 
-> 1. RANK_TABLE_FILE can refer to [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV3, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
+> 1. RANK_TABLE_FILE can refer to [Link](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools). For large models like InceptionV3, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 >
 > 2. This is processor cores binding operation regarding the `device_num` and total processor numbers. If you are not expect to do it, remove the operations `taskset` in `scripts/run_distribute_train.sh`
 
@@ -442,7 +442,7 @@ accuracy:78.742
 | Checkpoint for Fine tuning | 313M                                           |
 | Model for inference        | 92M (.onnx file)                               |
 | Speed                      | 1pc:1200 img/s;8pc:9500 img/s                  |
-| Scripts                    | [inceptionv3 script](https://gitee.com/mindspore/models/tree/master/official/cv/inceptionv3) |
+| Scripts                    | [inceptionv3 script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/inceptionv3) |
 
 ### Inference Performance
 

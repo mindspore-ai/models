@@ -44,8 +44,8 @@ You can download the dataset and put the directory in structure as follows:
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Script description](#contents)
 
@@ -110,7 +110,7 @@ You can start training using python or shell scripts. The usage of shell scripts
 
     Please follow the instructions in the link below:
 
-    <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+    <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools>.
 
 - ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows)
 

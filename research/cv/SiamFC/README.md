@@ -45,8 +45,8 @@ used Dataset :[ILSVRC2015-VID](http://bvisionweb1.cs.unc.edu/ilsvrc2015/ILSVRC20
 - frame:
     - [Mindspore](https://www.mindspore.cn/install/en)
 - For details, please refer to the following resources:
-    - [MindSpore course](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore course](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 - more API
     - got10k toolkit
     - opencv
@@ -93,7 +93,7 @@ After installing mindspree through the official website, you can follow the foll
         ├── README.md                    // Notes on siamfc
         ├── ascend310_infer             // Implementation inference script on ascend310
         │   ├──inc                      //Head file
-        │   ├──src                      //Main.cc and utils.cc file 
+        │   ├──src                      //Main.cc and utils.cc file
         │   ├──build.sh                 //Build file
         │   ├──CMakeLists.txt           //Required library files
         ├── scripts
@@ -214,7 +214,7 @@ Run this reference scripts need two different MINDIR
 |loss function     |BCEWithLogits   |
 |training speed    | epoch time：285693.557 ms per step time :42.961 ms |
 |total time        |about 5 hours    |
-|Script URL        |<https://gitee.com/mindspore/models/tree/master/research/cv/SiamFC>  |
+|Script URL        |<https://gitee.com/mindspore/models/tree/r1.8/research/cv/SiamFC>  |
 |Random number seed         |set_seed = 1234     |
 
 ## performance

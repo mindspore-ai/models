@@ -77,8 +77,8 @@ Dataset used： [DeepGlobe Road Extraction Dataset](https://www.kaggle.com/balra
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## quick-start
 
@@ -296,7 +296,7 @@ bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
 | Parameters (M)  | 31M|
 | Checkpoint for Fine tuning | 118.70M (.ckpt file)|
 | configuration | dlinknet_config.yaml |
-| Scripts| [D-LinkNet scripts](https://gitee.com/mindspore/models/tree/master/research/cv/dlinknet) |
+| Scripts| [D-LinkNet scripts](https://gitee.com/mindspore/models/tree/r1.8/research/cv/dlinknet) |
 
 ### infer-performance
 
@@ -316,7 +316,7 @@ bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
 #### inference
 
 If you need to use the trained model to perform inference on multiple hardware platforms, such as Ascend 910 or Ascend 310, you
-can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/master/infer/inference.html). Following
+can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/r1.8/infer/inference.html). Following
 the steps below, this is a simple example:
 
 ##### running-on-ascend-310

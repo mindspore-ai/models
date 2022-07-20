@@ -97,9 +97,9 @@ The directory structure of the unzipped and organized data set should be as foll
 
 - For details, please refer to the following resources：
 
-    - [MindSpore tutorial](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+    - [MindSpore tutorial](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
 
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -117,7 +117,7 @@ cd ./model_zoo/research/cv/tall
 bash scripts/run_eval.sh [CHECKPOINT_PATH] [EVAL_DATA_DIR] [DEVICE_ID]
 ```
 
-If you need distributed parallel training, you can use [the tool](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) to generate the configuration file of your server, and then follow the steps below to train:
+If you need distributed parallel training, you can use [the tool](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools) to generate the configuration file of your server, and then follow the steps below to train:
 
 ```shell script
 # Ascend Distribute training
@@ -224,7 +224,7 @@ bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
 
 This script requires two parameters.
 
-- `RANK_TABLE_FILE`：The path of [rank_table.json](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). It is best to use absolute paths.
+- `RANK_TABLE_FILE`：The path of [rank_table.json](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools). It is best to use absolute paths.
 - `TRAIN_DATA_DIR`：The dataset path, which is [data_path] above.
 
 #### [Output](#contents)

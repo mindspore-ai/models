@@ -119,7 +119,7 @@ Dataset structure:
 
 ## [Mixed Precision](#mixedprecision)
 
-The [mixed-precision](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html) training
+The [mixed-precision](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/others/mixed_precision.html) training
 method uses single-precision and half-precision data to improve the training speed of deep learning neural networks,
 while maintaining the network accuracy that can be achieved by single-precision training. Mixed-precision training
 increases computing speed and reduces memory usage, while supporting training larger models or achieving larger batches
@@ -134,12 +134,12 @@ reduce precision" to view the operators with reduced precision.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install)
 - For details, please refer to the following resources:
-    - [MindSpore tutorial](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore tutorial](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 - Generate config json file for 8-card training
-    - [Simple tutorial](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+    - [Simple tutorial](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)
     - For detailed configuration method, please refer to
-      the [official website tutorial](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html#configuring-distributed-environment-variables).
+      the [official website tutorial](https://www.mindspore.cn/tutorials/experts/en/r1.8/parallel/train_ascend.html#configuring-distributed-environment-variables).
 
 # [Quick start](#Quickstart)
 
@@ -589,7 +589,7 @@ Run the applicable training script to get the results. To get the same result, f
 | Loss | 0.10905003 |0.10246127|0.10246127|
 | Speed | - | 147.1 ms/step |191.5 ms/step|
 | Performance | 103h（1 card）<br>  24h（8 cards） |129h|21h|
-| Script | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/LightCNN) |[Link](https://gitee.com/mindspore/models/tree/master/research/cv/LightCNN)|[Link](https://gitee.com/mindspore/models/tree/master/research/cv/LightCNN)|
+| Script | [Link](https://gitee.com/mindspore/models/tree/r1.8/research/cv/LightCNN) |[Link](https://gitee.com/mindspore/models/tree/r1.8/research/cv/LightCNN)|[Link](https://gitee.com/mindspore/models/tree/r1.8/research/cv/LightCNN)|
 
 ### Evaluation Performance
 
@@ -637,7 +637,7 @@ Please check the official [homepage](https://gitee.com/mindspore/models).
 
 [5]: https://pan.baidu.com/s/1eR6vHFO
 
-[6]: https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html
+[6]: https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/others/mixed_precision.html
 
 [7]: http://www.cbsr.ia.ac.cn/users/scliao/projects/blufr/BLUFR.zip
 

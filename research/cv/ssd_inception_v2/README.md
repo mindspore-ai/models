@@ -213,7 +213,7 @@ bash scripts/docker_start.sh ssd:20.1.0 [DATA_DIR] [MODEL_DIR]
 
 ### [Training Process](#contents)
 
-To train the model, run `train.py`. If the `mindrecord_dir` is empty, it will generate [mindrecord](https://www.mindspore.cn/tutorials/en/master/advanced/dataset/record.html) files by `coco_root`(coco dataset). **Note if mindrecord_dir isn't empty, it will use mindrecord_dir instead of raw images.**
+To train the model, run `train.py`. If the `mindrecord_dir` is empty, it will generate [mindrecord](https://www.mindspore.cn/tutorials/en/r1.8/advanced/dataset/record.html) files by `coco_root`(coco dataset). **Note if mindrecord_dir isn't empty, it will use mindrecord_dir instead of raw images.**
 
 #### Training on GPU
 
@@ -327,7 +327,7 @@ The ckpt_file parameter is required,
 | Speed               | 1pcs: 141 ms/step                                                             |8pcs: 383 ms/step                                                             |
 | Total time          | 1pcs: 50.4 hours                                                              |8pcs: 17hours                                                                 |
 | Parameters (M)      | 14M                                                                           |14M                                                                           |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/research/cv/ssd_inception_v2>  | <https://gitee.com/mindspore/models/tree/master/research/cv/ssd_inception_v2> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/r1.8/research/cv/ssd_inception_v2>  | <https://gitee.com/mindspore/models/tree/r1.8/research/cv/ssd_inception_v2> |
 
 #### Inference Performance
 

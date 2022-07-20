@@ -50,8 +50,8 @@ MobileNetV3总体网络架构如下：
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 脚本说明
 
@@ -211,7 +211,7 @@ result: {'Loss': 2.3101649037352554, 'Top_1_Acc': 0.6746546546546547, 'Top_5_Acc
 | 速度                       |                                       | 430 ms/step                                                     | 3500 ms/step                       |
 | 训练总时间 (8p)             | 16.4h                                    | 80h (1 pcs)                                                     | 117h (6 pcs)                       |
 | 参数量 (M)                 | 36M                                   | 36M                                   | 36M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/mobilenetV3_small_x1_0) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/mobilenetV3_small_x1_0) |
 
 # 随机情况的描述
 

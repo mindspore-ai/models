@@ -53,8 +53,8 @@ LSTM模型包含嵌入层、编码器和解码器这几个模块，编码器模�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 更多关于Mindspore的信息，请查看以下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -446,7 +446,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TAR
 | 损失                       | 0.12                       | 0.12                                                           | 0.12                       |
 | 参数（M）                  | 6.45                       | 6.45                                                           | 6.45                       |
 | 推理检查点                 | 292.9M（.ckpt文件）        | 292.9M（.ckpt文件）                                            | 292.9M（.ckpt文件）        |
-| 脚本 | [LSTM脚本](https://gitee.com/mindspore/models/tree/master/official/nlp/lstm) | [LSTM脚本](https://gitee.com/mindspore/models/tree/master/official/nlp/lstm) | [LSTM脚本](https://gitee.com/mindspore/models/tree/master/official/nlp/lstm) |
+| 脚本 | [LSTM脚本](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/lstm) | [LSTM脚本](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/lstm) | [LSTM脚本](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/lstm) |
 
 ### 评估性能
 

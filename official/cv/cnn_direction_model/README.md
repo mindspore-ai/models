@@ -39,7 +39,7 @@ For training and evaluation, we use the French Street Name Signs (FSNS) released
 - Data format：binary files
     - Note：Data will be processed in dataset.py
 
-you can find how to generate dataset in [crnn_seq2seq_ocr](https://gitee.com/mindspore/models/tree/master/official/cv/crnn_seq2seq_ocr#quick-start)
+you can find how to generate dataset in [crnn_seq2seq_ocr](https://gitee.com/mindspore/models/tree/r1.8/official/cv/crnn_seq2seq_ocr#quick-start)
 
 # [Environment Requirements](#contents)
 
@@ -48,8 +48,8 @@ you can find how to generate dataset in [crnn_seq2seq_ocr](https://gitee.com/min
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -147,7 +147,7 @@ Results of evaluation will be printed after evaluation process is completed.
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools>.
 
 Run `scripts/run_distribute_train_ascend.sh` to train the model distributed. The usage of the script is:
 

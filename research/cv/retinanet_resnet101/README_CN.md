@@ -68,8 +68,8 @@ Retinanet的整体网络架构如下所示：
 - 架构
     - [MindSpore](https://www.mindspore.cn/install)
 - 想要获取更多信息，请检查以下资源：
-    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
 
     ```python
@@ -292,7 +292,7 @@ bash run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [RANK_TABL
 bash run_single_train.sh [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
 ```
 
-> 注意: RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+> 注意: RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/parallel/train_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 
 - GPU
 
@@ -485,7 +485,7 @@ mAP: 0.36858371862143824
 | 最终损失                    | 0.43                              | 0.49                 | 0.49 |
 | 速度                       |                                   | 696 毫秒/步           | 881 毫秒/步 |
 | 训练总时间 (8p)             | 34h50m20s                         | 708h                 | 120h |
-| 脚本                       | [Retianet script](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet101) |
+| 脚本                       | [Retianet script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/retinanet_resnet101) |
 
 #### 评估性能
 

@@ -56,8 +56,8 @@ Autoslim基于文章《Universally Slimmable Networks and Improved Training Tech
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -260,7 +260,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 
 ## FAQ
 
-优先参考[ModelZoo FAQ](https://gitee.com/mindspore/models/blob/master/README_CN.md#faq)来查找一些常见的公共问题。
+优先参考[ModelZoo FAQ](https://gitee.com/mindspore/models/tree/r1.8/README_CN.md#faq)来查找一些常见的公共问题。
 
 - **Q**：使用PYNATIVE_MODE发生内存溢出。
 

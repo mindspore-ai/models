@@ -57,8 +57,8 @@ Dataset used: alignment [ModelNet40](<https://shapenet.cs.stanford.edu/media/mod
 - Framework
     - [MindSpore](https://www.mindspore.cn/install)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # [Quick Start](#contents)
 

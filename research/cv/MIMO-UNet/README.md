@@ -139,8 +139,8 @@ the /path/to/preprocessed/dataset/root path. Below is the file structure of the 
 - Framework
     - [MindSpore](https://www.mindspore.cn/install)
 - For details, see the following resources:
-    - [MindSpore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 - Additional python packages:
     - Pillow
     - scikit-image

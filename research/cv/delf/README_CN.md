@@ -84,8 +84,8 @@
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 - 依赖包
     - h5py版本：3.4.0
     - 其它依赖包信息详见requirements.txt文件
@@ -168,7 +168,7 @@
 
   请遵循以下链接中的说明：
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+  <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.>
 
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
 
@@ -518,7 +518,7 @@ python export.py --device_id=0 --ckpt_path=/home/delf/ckpt/...
 | 总时长        | 微调阶段：23小时36.66分钟;  注意力训练阶段：21小时39.96分                               |
 | 微调检查点    | 2.89G (.ckpt文件)                                                                       |
 | 推理模型      | 92.26M (.mindir文件)                                                                    |
-| 脚本          | [delft脚本](https://gitee.com/mindspore/models/tree/master/research/cv/delf)            |
+| 脚本          | [delft脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/delf)            |
 
 ### 推理性能
 

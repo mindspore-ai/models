@@ -52,8 +52,8 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 - Framework
     - Install [MindSpore](https://www.mindspore.cn/install/en).
 - For more information, please check the resources below:
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## Software
 
@@ -418,7 +418,7 @@ For more configuration details, please refer the script `./default_config.yaml` 
 | Loss                       | 63.35                                                          | 55.42                                                         |
 | Params (M)                 | 613                                                            | 613                                                           |
 | Checkpoint for inference   | 1.8G (.ckpt file)                                              | 1.8G (.ckpt file)                                              |
-| Scripts                    | [gnmt_v2](https://gitee.com/mindspore/models/tree/master/official/nlp/gnmt_v2) | [gnmt_v2](https://gitee.com/mindspore/models/tree/master/official/nlp/gnmt_v2) |
+| Scripts                    | [gnmt_v2](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/gnmt_v2) | [gnmt_v2](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/gnmt_v2) |
 
 ### Inference Performance
 

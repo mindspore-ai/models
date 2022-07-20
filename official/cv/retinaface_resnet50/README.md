@@ -62,8 +62,8 @@ Dataset acquisition:
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -248,7 +248,7 @@ Parameters for both training and evaluation can be set in config.py
 | Total time                 | 4pcs: 6.4 hours                                               |
 | Parameters (M)             | 27.29M                                                        |
 | Checkpoint for Fine tuning | 336.3M (.ckpt file)                                           |
-| Scripts                    | [retinaface script](https://gitee.com/mindspore/models/tree/master/official/cv/retinaface_resnet50) |
+| Scripts                    | [retinaface script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/retinaface_resnet50) |
 
 ### Inference Performance
 

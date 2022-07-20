@@ -50,8 +50,8 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -286,7 +286,7 @@ Test set results: accuracy= 0.81300
 | Loss Function       | Softmax Cross Entropy                                        | Softmax Cross Entropy                                                |
 | Accuracy            | 81.5/70.3                                                    | 86.8/76.7                                                    |
 | Parameters (B)      | 92160/59344                                                  | 92160/59344                                                  |
-| Scripts             | [GCN Script](https://gitee.com/mindspore/models/tree/master/official/gnn/gcn) | [GCN Script](https://gitee.com/mindspore/models/tree/master/official/gnn/gcn) |
+| Scripts             | [GCN Script](https://gitee.com/mindspore/models/tree/r1.8/official/gnn/gcn) | [GCN Script](https://gitee.com/mindspore/models/tree/r1.8/official/gnn/gcn) |
 
 ## [Description of Random Situation](#contents)
 

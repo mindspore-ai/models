@@ -63,8 +63,8 @@ TB-Net将用户和物品的交互信息以及物品的属性信息在知识图�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # [快速入门](#目录)
 
@@ -259,7 +259,7 @@ auc: 0.8251359368836292
 | 速度                  | 单卡：90毫秒/步                                      |
 | 总时长                | 单卡：297秒                                          |
 | 微调检查点             | 104.66M (.ckpt 文件)                                |
-| 脚本                  | [TB-Net脚本](https://gitee.com/mindspore/models/tree/master/official/recommend/tbnet) |
+| 脚本                  | [TB-Net脚本](https://gitee.com/mindspore/models/tree/r1.8/official/recommend/tbnet) |
 
 ### [评估性能](#目录)
 

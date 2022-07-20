@@ -48,7 +48,7 @@ R-CNN的整体网络架构详情，请参考链接: [Link](https://arxiv.org/abs
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 更多详情，点击下面链接：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.3/index.html)
 
 ## [脚本简介](#contents)
@@ -86,7 +86,7 @@ R-CNN的整体网络架构详情，请参考链接: [Link](https://arxiv.org/abs
 
 ### [准备](#contents)
 
-准备AlexNet在ImageNet2012上的预训练模型，可直接通过链接下载[link](https://download.mindspore.cn/)；也可自己训练，脚本参考[ModelZoo](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet)，并将checkpoints文件保存在“models”文件夹中。您还需要创建一个名为“data”的文件夹来存放数据集和处理后的数据。训练集和测试集分别在两个文件夹中，一个是“VOC2007”，另一个是“VOCtest_06-Nov-2007”。 路径也在“src/paths.py”中设置。
+准备AlexNet在ImageNet2012上的预训练模型，可直接通过链接下载[link](https://download.mindspore.cn/)；也可自己训练，脚本参考[ModelZoo](https://gitee.com/mindspore/models/tree/r1.8/official/cv/alexnet)，并将checkpoints文件保存在“models”文件夹中。您还需要创建一个名为“data”的文件夹来存放数据集和处理后的数据。训练集和测试集分别在两个文件夹中，一个是“VOC2007”，另一个是“VOCtest_06-Nov-2007”。 路径也在“src/paths.py”中设置。
 
 ### [数据预处理](#contents)
 
@@ -305,7 +305,7 @@ svm_thresh: 0.6, map: 0.3254243053285871
 | Checkpoint for finetune | 214M (.ckpt file)                                         | 214M (.ckpt file)|
 | Checkpoint for SVM | 214M (.ckpt file)                                         |214M (.ckpt file)|
 | Checkpoint for regression | 214M (.ckpt file)                                         |214M (.ckpt file)|
-| Scripts                    | [RCNN Scripts](https://gitee.com/mindspore/models/tree/master/research/cv/rcnn) |[RCNN Scripts](https://gitee.com/mindspore/models/tree/master/research/cv/rcnn) |
+| Scripts                    | [RCNN Scripts](https://gitee.com/mindspore/models/tree/r1.8/research/cv/rcnn) |[RCNN Scripts](https://gitee.com/mindspore/models/tree/r1.8/research/cv/rcnn) |
 
 #### [推理性能](#contents)
 

@@ -54,8 +54,8 @@ In this model, we use the Multi30K dataset as our train and test dataset.As trai
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## Requirements
 
@@ -406,7 +406,7 @@ perl multi-bleu.perl target.txt.forbleu < output.txt.forbleu
 | Loss                       | 3.86888                       |2.533958                   |
 | Params (M)                 | 21                            | 21                        |
 | Checkpoint for inference   | 272M (.ckpt file)             | 272M (.ckpt file)         |
-| Scripts                    | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/gru) |[gru](https://gitee.com/mindspore/models/tree/master/official/nlp/gru) |
+| Scripts                    | [gru](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/gru) |[gru](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/gru) |
 
 ### Inference Performance
 

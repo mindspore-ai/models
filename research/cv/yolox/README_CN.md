@@ -81,8 +81,8 @@ head中的回归分支和分类分支进行了解耦(Decoupled head),并且将ob
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -387,7 +387,7 @@ YOLOX应用于118000张图像上（标注和数据格式必须与COCO 2017相同
 |速度| 1卡：25FPS；8卡：190FPS (shape=640)|
 |总时长|52小时|
 |微调检查点|约750M（.ckpt文件）|
-|脚本| <https://gitee.com/mindspore/models/tree/master/official/cv/yolov4> |
+|脚本| <https://gitee.com/mindspore/models/tree/r1.8/official/cv/yolov4> |
 
 |参数| YOLOX-x |
 | -------------------------- | ----------------------------------------------------------- |
@@ -403,7 +403,7 @@ YOLOX应用于118000张图像上（标注和数据格式必须与COCO 2017相同
 |速度| 1卡：12FPS；8卡：93FPS (shape=640)|
 |总时长|106小时|
 |微调检查点|约1100M（.ckpt文件）|
-|脚本| <https://gitee.com/mindspore/models/tree/master/official/cv/yolov4> |
+|脚本| <https://gitee.com/mindspore/models/tree/r1.8/official/cv/yolov4> |
 
 ### 推理性能
 

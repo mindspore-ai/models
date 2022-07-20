@@ -77,8 +77,8 @@ YOLOv3整体网络架构如下：
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -268,7 +268,7 @@ YOLOv3整体网络架构如下：
 
 ### Ascend上训练
 
-训练模型运行`train.py`，使用数据集`image_dir`、`anno_path`和`mindrecord_dir`。如果`mindrecord_dir`为空，则通过`image_dir`和`anno_path`（图像绝对路径由`image_dir`和`anno_path`中的相对路径连接）生成[MindRecord](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/dataset/record.html)文件。**注意，如果`mindrecord_dir`不为空，将使用`mindrecord_dir`而不是`image_dir`和`anno_path`。**
+训练模型运行`train.py`，使用数据集`image_dir`、`anno_path`和`mindrecord_dir`。如果`mindrecord_dir`为空，则通过`image_dir`和`anno_path`（图像绝对路径由`image_dir`和`anno_path`中的相对路径连接）生成[MindRecord](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/dataset/record.html)文件。**注意，如果`mindrecord_dir`不为空，将使用`mindrecord_dir`而不是`image_dir`和`anno_path`。**
 
 - 单机模式
 
@@ -284,7 +284,7 @@ YOLOv3整体网络架构如下：
     bash run_distribute_train.sh 8 150 /data/Mindrecord_train /data /data/train.txt /data/hccl.json
     ```
 
-    输入变量为设备编号、轮次大小、MindRecord目录路径、数据集目录路径、训练TXT文件路径和[hccl_tools配置文件](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)。**最好使用绝对路径。**
+    输入变量为设备编号、轮次大小、MindRecord目录路径、数据集目录路径、训练TXT文件路径和[hccl_tools配置文件](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)。**最好使用绝对路径。**
 
 每步的损失值和时间如下：
 
@@ -309,7 +309,7 @@ YOLOv3整体网络架构如下：
 
 ### Ascend评估
 
-运行`eval.py`，数据集为`image_dir`、`anno_path`(评估TXT)、`mindrecord_dir`和`ckpt_path`。`ckpt_path`是[检查点](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/train/save.html)文件的路径。
+运行`eval.py`，数据集为`image_dir`、`anno_path`(评估TXT)、`mindrecord_dir`和`ckpt_path`。`ckpt_path`是[检查点](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/train/save.html)文件的路径。
 
   ```shell script
   bash run_eval.sh 0 yolo.ckpt ./Mindrecord_eval ./dataset ./dataset/eval.txt
@@ -377,7 +377,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 | 速度                      | 1pc：120毫秒/步;  8卡：160毫秒/步                        |
 | 总时长                 | 1pc：150分钟;  8卡: 70分钟                               |
 | 参数(M)             | 189                                                         |
-| 脚本                    | [yolov3_resnet18脚本](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_resnet18) | [yolov3_resnet18脚本](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_resnet18) |
+| 脚本                    | [yolov3_resnet18脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/yolov3_resnet18) | [yolov3_resnet18脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/yolov3_resnet18) |
 
 ### 推理性能
 

@@ -53,8 +53,8 @@ Dataset used: [COCO2017](<http://images.cocodataset.org/>)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 - Install [MindSpore](https://www.mindspore.cn/install/en).
 
@@ -210,7 +210,7 @@ If you want to run in modelarts, please check the official documentation of [mod
 
 ### Training on Ascend
 
-To train the model, run `train.py`. If the `mindrecord_dir` is empty, it will generate [mindrecord](https://www.mindspore.cn/tutorials/en/master/advanced/dataset/record.html) files by `coco_root`(coco dataset) or `iamge_dir` and `anno_path`(own dataset). **Note if mindrecord_dir isn't empty, it will use mindrecord_dir instead of raw images.**
+To train the model, run `train.py`. If the `mindrecord_dir` is empty, it will generate [mindrecord](https://www.mindspore.cn/tutorials/en/r1.8/advanced/dataset/record.html) files by `coco_root`(coco dataset) or `iamge_dir` and `anno_path`(own dataset). **Note if mindrecord_dir isn't empty, it will use mindrecord_dir instead of raw images.**
 
 - Distribute mode
 
@@ -228,7 +228,7 @@ We need five or seven parameters for this scripts.
 
 - `DATASET`：the dataset mode for distributed train.
 
-- `RANK_TABLE_FILE :` the path of [rank_table.json](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools), it is better to use absolute path.
+- `RANK_TABLE_FILE :` the path of [rank_table.json](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools), it is better to use absolute path.
 
 - `PRE_TRAINED :` the path of pretrained checkpoint file, it is better to use absolute path.
 

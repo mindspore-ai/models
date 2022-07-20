@@ -49,8 +49,8 @@
 - 框架
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -111,7 +111,7 @@ train.valInterval = 100                                       #边训练边推�
 
 ## 训练过程
 
-- 在`parameters/hwdb.gin`中设置选项，包括学习率和网络超参数。单击[MindSpore加载数据集教程](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/dataset.html)，了解更多信息。
+- 在`parameters/hwdb.gin`中设置选项，包括学习率和网络超参数。单击[MindSpore加载数据集教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/dataset.html)，了解更多信息。
 
 ### 训练
 
@@ -153,7 +153,7 @@ bash run_eval.sh [TEST_DATA_DIR] [DEVICE_TARGET]
 | 总时长                 | 15小时(1pcs)|
 | 参数(M)             | 12.6 |
 | 微调检查点 | 10.59M (.ckpt文件) |
-| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/essay-recogination) |
+| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/r1.8/official/cv/essay-recogination) |
 
 #### 评估性能
 

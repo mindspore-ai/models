@@ -64,8 +64,8 @@ Dataset used (refer to paper): [COCO2017](https://cocodataset.org/#download)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install)
 - For more information about MindSpore, please check the resources below：
-    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 - Training in ModelArts (If you want to run on ModelArts, you can refer to the following [modelarts documents](https://support.huaweicloud.com/modelarts/))
 
@@ -291,8 +291,8 @@ bash run_distribute_train.sh DEVICE_NUM EPOCH_SIZE LR DATASET RANK_TABLE_FILE PR
 bash run_distribute_train.sh DEVICE_ID EPOCH_SIZE LR DATASET PRE_TRAINED(optional) PRE_TRAINED_EPOCH_SIZE(optional)
 ```
 
-> Note: RANK_TABLE_FILE related reference materials see in this [link](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html),
-> for details on how to get device_ip check this [link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+> Note: RANK_TABLE_FILE related reference materials see in this [link](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/parallel/train_ascend.html),
+> for details on how to get device_ip check this [link](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 
 - GPU:
 
@@ -483,7 +483,7 @@ mAP: 0.35625723922139957
 | Final loss                 | 0.69                                                                                   | 0.84                                                                                   | 0.84                                                                                   |
 | Speed                      |                                                                                        | 860 ms/step                                                                            | 1205 ms/step                                                                           |
 | Total training time (8p)   | 41h 32m 20s                                                                            | 440h                                                                                   | 72h                                                                                    |
-| Script                     | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet152) | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet152) | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/retinanet_resnet152) |
+| Script                     | [Link](https://gitee.com/mindspore/models/tree/r1.8/research/cv/retinanet_resnet152) | [Link](https://gitee.com/mindspore/models/tree/r1.8/research/cv/retinanet_resnet152) | [Link](https://gitee.com/mindspore/models/tree/r1.8/research/cv/retinanet_resnet152) |
 
 #### Evaluation Performance
 

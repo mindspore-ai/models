@@ -204,8 +204,8 @@ bash convert_model.sh [MODEL_NAME] [PTH_FILE] [MSP_FILE]
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -363,7 +363,7 @@ bash run_standalone_train_gpu.sh
 bash run_distribute_train.sh 8 [RANK_TABLE_FILE]
 ```
 
-线下运行分布式训练请参照[mindspore分布式并行训练基础样例（Ascend）](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html)
+线下运行分布式训练请参照[mindspore分布式并行训练基础样例（Ascend）](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/parallel/train_ascend.html)
 
 - 线上modelarts分布式训练
 
@@ -445,7 +445,7 @@ python export.py --ckpt_file=[CKPT_FILE]
 | 速度                      | 单卡：593.460毫秒/步 ;  8卡：460.952毫秒/步                         | 单卡：569.524毫秒/步;  8卡：466.667毫秒/步       |
 | 总时长                 | 单卡：5h3m ;   8卡： 4h2m                         | 单卡：4h59m ;  8卡：4h5m     |
 | 微调检查点 | 412M (.ckpt文件)                                         | 426M (.ckpt文件)    |
-| 脚本                    | [EGNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/EGnet) | [EGNet 脚本](https://gitee.com/mindspore/models/tree/master/research/cv/EGnet) |
+| 脚本                    | [EGNet脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/EGnet) | [EGNet 脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/EGnet) |
 
 ##### DUTS-TR上的EGNet(GPU)
 
@@ -462,7 +462,7 @@ python export.py --ckpt_file=[CKPT_FILE]
 | 速度                      | 单卡：1148.571毫秒/步 ;  2卡：921.905毫秒/步                          | 单卡：1323.810毫秒/步;  2卡：1057.143毫秒/步      |
 | 总时长                 | 单卡：10h3m ;  2卡：8h4m                          | 单卡：11h35m ;  2卡：9h15m      |
 | 微调检查点 | 412M (.ckpt文件)                                         | 426M (.ckpt文件)    |
-| 脚本                    | [EGNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/EGnet) | [EGNet 脚本](https://gitee.com/mindspore/models/tree/master/research/cv/EGnet) |
+| 脚本                    | [EGNet脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/EGnet) | [EGNet 脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/EGnet) |
 
 #### 推理性能
 

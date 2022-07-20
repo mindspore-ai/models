@@ -67,8 +67,8 @@ Dataset used: [KITTI](<http://www.cvlibs.net/datasets/kitti/>)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below:
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -306,7 +306,7 @@ At precision 0.08: bpip =  1.22112; each frame cost 53100 ms
 | Total Time    | 1P: 3.3h；8P: 0.6h                                           |
 | parameters(M) | 0.34M                                                        |
 | Checkpoint for Fine tuning | 3M (.ckpt file)                                 |
-| Scripts       | [octsqueeze script](https://gitee.com/mindspore/models/tree/master/official/cv/octsqueeze) |
+| Scripts       | [octsqueeze script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/octsqueeze) |
 
 ### Inference Performance
 

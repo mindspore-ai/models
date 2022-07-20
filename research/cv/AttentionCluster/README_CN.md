@@ -83,8 +83,8 @@ Attention Cluster模型为ActivityNet Kinetics Challenge 2017中最佳序列模�
 - 安装[MindSpore](https://www.mindspore.cn/install)
 - 安装相关依赖 pip install -r requirements.txt
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速开始
 
@@ -171,7 +171,7 @@ bash run_standalone_train.sh 1 1 200 '../data' '../results' 0
 bash bash run_distribution_train.sh './rank_table_8pcs.json' 8 0 1 1 200 '../data' '../results'
 ```
 
-其中，Ascend多卡训练还需要将相应`RANK_TABLE_FILE`文件的放置目录输入脚本（如`./rank_table_8pcs.json`），`RANK_TABLE_FILE`可按[此方法](#https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)生成。
+其中，Ascend多卡训练还需要将相应`RANK_TABLE_FILE`文件的放置目录输入脚本（如`./rank_table_8pcs.json`），`RANK_TABLE_FILE`可按[此方法](#https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)生成。
 
 #### 训练结果
 
@@ -251,7 +251,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 | 数据集                    | MNIST                                                 |
 | 优化器                 | Adam                                                           |
 | 损失函数              | Softmax交叉熵                                          |
-| 脚本                    | [AttentionCluster](https://gitee.com/mindspore/models/tree/master/research/cv/AttentionCluster) |
+| 脚本                    | [AttentionCluster](https://gitee.com/mindspore/models/tree/r1.8/research/cv/AttentionCluster) |
 
 |  fc类型 | natt数量 |  epoches | 学习率  | weight decay | t-1 accuracy(%) |
 |-------|--------|----------|------|--------------|-----------------|

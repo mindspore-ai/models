@@ -69,8 +69,8 @@ Dataset used: [LibriSpeech](<https://www.openslr.org/12/>)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -251,7 +251,7 @@ Inference result is saved in ./infer.log.
 | Total Time | 1P：17.5h；8P：2.5h                               |
 | parameters(M) | 1.2M                                                        |
 | Checkpoint for Fine tuning | 15.7M (.ckpt file)                                               |
-| Scripts   | [lpcnet script](https://gitee.com/mindspore/models/tree/master/official/cv/octsqueeze) |
+| Scripts   | [lpcnet script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/octsqueeze) |
 
 ### Inference Performance
 

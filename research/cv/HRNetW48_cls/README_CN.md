@@ -45,8 +45,8 @@ HRNet是一个全能型的CV骨干网络，可用于图像分类、语义分割�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 脚本说明
 
@@ -178,7 +178,7 @@ bash scripts/run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
 | 训练总时间 (8p)             | 28.7h                                    |
 | 评估总时间                  | 5min                                    |
 | 参数量 (M)                 | 296M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/HRNetW48_cls) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/HRNetW48_cls) |
 
 # 随机情况的描述
 

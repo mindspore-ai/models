@@ -61,8 +61,8 @@ Note that the \<item\> needs to traverse candidate items (all items by default) 
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -257,7 +257,7 @@ auc: 0.8251359368836292
 | Speed                      | 1pc: 90ms/step                                              |
 | Total Time                 | 1pc: 297s                                                   |
 | Checkpoint for Fine Tuning | 104.66M (.ckpt file)                                        |
-| Scripts                    | [TB-Net scripts](https://gitee.com/mindspore/models/tree/master/official/recommend/tbnet) |
+| Scripts                    | [TB-Net scripts](https://gitee.com/mindspore/models/tree/r1.8/official/recommend/tbnet) |
 
 ### Evaluation Performance
 

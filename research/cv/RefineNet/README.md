@@ -126,8 +126,8 @@ Usage: python ~src/tool/build_MRcd.py --data_root=~/data/ --data_lst=~/voc_train
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 - 安装requirements.txt中的python包。
 - 生成config json文件用于8卡训练。
 
@@ -508,7 +508,7 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_ID]
 | 损失 | 0.027490407 | 0.08345377 |
 | 性能 | 54294.528ms（Ascend八卡） 298406.836ms（Ascend单卡）| 723.160 ms（GPU单卡）|
 | 微调检查点 | 901M（.ckpt文件） | 900M（.ckpt文件）|
-| 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/RefineNet) | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/RefineNet)
+| 脚本 | [链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/RefineNet) | [链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/RefineNet)
 
 # 随机情况说明
 

@@ -58,8 +58,8 @@ Dataset used: [CelebA](http://mmlab.ie.cuhk.edu.hk/projects/CelebA.html)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -261,7 +261,7 @@ NN inference cost average time: 9.98606 ms of infer_count 10
 | Speed                      | 1pc: 400 ms/step;  8pcs:  143 ms/step                       | 1pc: 369 ms/step;  8pcs:  68 ms/step |
 | Total time                 | 1pc: 41:36:07                                               | 1pc: 29:15:09 |
 | Checkpoint for Fine tuning | 170.55M(.ckpt file)                                         | 283.76M(.ckpt file) |
-| Scripts                    | [STGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/STGAN) | [STGAN script](https://gitee.com/mindspore/models/tree/master/research/cv/STGAN) |
+| Scripts                    | [STGAN script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/STGAN) | [STGAN script](https://gitee.com/mindspore/models/tree/r1.8/research/cv/STGAN) |
 
 ## [Model Description](#contents)
 

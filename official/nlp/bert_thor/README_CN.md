@@ -60,8 +60,8 @@ BERT的总体架构包含3个嵌入层，用于查找令牌嵌入、位置嵌入
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 更多关于Mindspore的信息，请查看以下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -77,7 +77,7 @@ bash scripts/run_distribute_pretrain.sh [DEVICE_NUM] [EPOCH_SIZE] [DATA_DIR] [SC
 python pretrain_eval.py
 ```
 
-> 分布式训练，请提前创建JSON格式的HCCL配置文件。关于配置文件，可以参考[HCCL_TOOL](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)。
+> 分布式训练，请提前创建JSON格式的HCCL配置文件。关于配置文件，可以参考[HCCL_TOOL](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)。
 
 ## 脚本说明
 
@@ -224,7 +224,7 @@ step:  3000 Accuracy:  [0.71377236]
 | 总时长 | 11分钟 |
 | 参数（M） | 330 |
 | 微调检查点 | 4.5G （.ckpt文件） |
-| 脚本                    | https://gitee.com/mindspore/models/tree/master/official/nlp/bert_thor |
+| 脚本                    | https://gitee.com/mindspore/models/tree/r1.8/official/nlp/bert_thor |
 
 ## 随机情况说明
 

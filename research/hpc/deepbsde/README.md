@@ -32,8 +32,8 @@ Hamilton–Jacobi–Bellman Equation which is the term curse of dimensionality w
 - Framework
     - [MindSpore](https:#www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https:#www.mindspore.cn/tutorial/training/en/master/index.html)
-    - [MindSpore Python API](https:#www.mindspore.cn/doc/api_python/en/master/index.html)
+    - [MindSpore Tutorials](https:#www.mindspore.cn/tutorial/training/en/r1.8/index.html)
+    - [MindSpore Python API](https:#www.mindspore.cn/doc/api_python/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 

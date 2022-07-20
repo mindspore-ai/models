@@ -94,7 +94,7 @@ VGG 16网络主要由几个基本模块（包括卷积层和池化层）和三�
 
 ### 混合精度
 
-采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
+采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
 
 以FP16算子为例，如果输入数据类型为FP32，MindSpore后台会自动降低精度来处理数据。用户可打开INFO日志，搜索“reduce precision”查看精度降低的算子。
 
@@ -105,8 +105,8 @@ VGG 16网络主要由几个基本模块（包括卷积层和池化层）和三�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -127,7 +127,7 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --data_dir=[DATA_PATH]  --pre_tr
 
 分布式训练需要提前创建JSON格式的HCCL配置文件。
 具体操作，参见：
-<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+<https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools>
 
 - GPU处理器环境运行
 
@@ -460,7 +460,7 @@ train_parallel1/log:epcoh: 2 step: 97, loss is 1.7133579
 ...
 ```
 
-> 关于rank_table.json，可以参考[分布式并行训练](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/introduction.html)。
+> 关于rank_table.json，可以参考[分布式并行训练](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/parallel/introduction.html)。
 > **注意** 将根据`device_num`和处理器总数绑定处理器核。如果您不希望预训练中绑定处理器内核，请在`scripts/run_distribute_train.sh`脚本中移除`taskset`相关操作。
 
 ##### GPU处理器环境运行VGG16
@@ -558,7 +558,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 | 速度 | 1卡：79 毫秒/步；8卡：104毫秒/步 | 1卡：81毫秒/步；8卡：94.4毫秒/步 |
 | 总时长 | 1卡：72分钟；8卡：11.8分钟 | 8卡：19.7小时 |
 | 调优检查点 | 1.1 GB（.ckpt 文件）                                           |    1.1 GB（.ckpt 文件）               |
-| 脚本                  |[VGG16](https://gitee.com/mindspore/models/tree/master/official/cv/vgg16) |                   |
+| 脚本                  |[VGG16](https://gitee.com/mindspore/models/tree/r1.8/official/cv/vgg16) |                   |
 
 #### 评估性能
 

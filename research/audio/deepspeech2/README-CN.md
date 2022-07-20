@@ -62,8 +62,8 @@ DeepSpeech2是一个使用 CTC 损失训练的语音识别模型。它用神经�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 通过下面网址可以获得更多信息：
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # [文件说明和运行说明](#contents)
 
@@ -273,7 +273,7 @@ python export.py --pre_trained_model_path='ckpt_path'
 | 运行速度                      | 2p 2.139s/step                                   |
 | 训练总时间       | 2p: around 1 week;                                  |
 | Checkpoint文件大小                 | 991M (.ckpt file)                                              |
-| 代码                   | [DeepSpeech script](https://gitee.com/mindspore/models/tree/master/research/audio/deepspeech2) |
+| 代码                   | [DeepSpeech script](https://gitee.com/mindspore/models/tree/r1.8/research/audio/deepspeech2) |
 
 ### Inference Performance
 

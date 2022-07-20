@@ -82,8 +82,8 @@
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -125,7 +125,7 @@ pip install -r requirements.txt
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.>
 
 # 脚本说明
 
@@ -337,7 +337,7 @@ python export.py --root /path/dataset --ckpt_path /path/ckpt --segmentaware --he
 | 总时长                 | 8卡：2小时50分钟(segment)  2小时50分钟(heatmap)                       |
 | 微调检查点 | 118M (.ckpt文件)                                         |
 | 推理模型        | 40M (.mindir文件)                     |
-| 脚本                    | [MultiTaskNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/MultiTaskNet) |
+| 脚本                    | [MultiTaskNet脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/PAMTRI/MultiTaskNet) |
 
 ### 推理性能
 

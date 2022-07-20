@@ -116,8 +116,8 @@ The backbone structure of TinyBERT is transformer, the transformer contains four
     - [MindSpore](https://gitee.com/mindspore/mindspore)
     - scipy>=1.7
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -148,9 +148,9 @@ The backbone structure of TinyBERT is transformer, the transformer contains four
 
     For distributed training on Ascend, a hccl configuration file with JSON format needs to be created in advance.
     Please follow the instructions in the link below:
-    https:gitee.com/mindspore/models/tree/master/utils/hccl_tools.
+    https:gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.
 
-    For dataset, if you want to set the format and parameters, a schema configuration file with JSON format needs to be created, please refer to [tfrecord](https://www.mindspore.cn/docs/en/master/api_python/dataset/mindspore.dataset.TFRecordDataset.html) format.
+    For dataset, if you want to set the format and parameters, a schema configuration file with JSON format needs to be created, please refer to [tfrecord](https://www.mindspore.cn/docs/en/r1.8/api_python/dataset/mindspore.dataset.TFRecordDataset.html) format.
 
     ```text
     For general task, schema file contains ["input_ids", "input_mask", "segment_ids"].
@@ -631,7 +631,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 17.3h(3poch, 8p)                                           | 48h(3poch, 8p)            |
 | Params (M)                 | 15M                                                        | 15M                       |
 | Checkpoint for task distill| 74M(.ckpt file)                                            | 74M(.ckpt file)           |
-| Scripts                    | [TinyBERT](https://gitee.com/mindspore/models/tree/master/official/nlp/tinybert) |          |
+| Scripts                    | [TinyBERT](https://gitee.com/mindspore/models/tree/r1.8/official/nlp/tinybert) |          |
 
 #### Inference Performance
 

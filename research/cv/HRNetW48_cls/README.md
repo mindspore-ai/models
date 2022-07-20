@@ -51,8 +51,8 @@ Dataset used: [ImageNet](http://www.image-net.org/)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install)
 - For more information, see the following resources:
-    - [MindSpore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # Script Description
 
@@ -219,7 +219,7 @@ python export.py --checkpoint_path [CHECKPOINT_PATH] --file_name [FILE_NAME] --f
 | Loss function            | CrossEntropySmooth        | CrossEntropySmooth                                   |
 | Training duration (8p)   | 28.7h                     | 55.8h                                                |
 | Parameter quantity (M)   | 296M                      | 296M                                                 |
-| Script                   | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/HRNetW48_cls) | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/HRNetW48_cls) |
+| Script                   | [链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/HRNetW48_cls) | [链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/HRNetW48_cls) |
 
 ## Inference Performance
 

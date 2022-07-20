@@ -96,8 +96,8 @@ BGCF包含两个主要模块。首先是抽样，它生成基于节点复制的�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -407,7 +407,7 @@ recall_@10:0.10383,     recall_@20:0.15524,     ndcg_@10:0.07503,    ndcg_@20:0.
 | Recall@20                  | 0.1534                                     | 0.15524                                    |
 | NDCG@20                    | 0.0912                                     | 0.09249                                    |
 | 训练成本                   | 25min                                      | 60min                                      |
-| 脚本                       | [bgcf脚本](https://gitee.com/mindspore/models/tree/master/official/gnn/bgcf) | [bgcf脚本](https://gitee.com/mindspore/models/tree/master/official/gnn/bgcf) |
+| 脚本                       | [bgcf脚本](https://gitee.com/mindspore/models/tree/r1.8/official/gnn/bgcf) | [bgcf脚本](https://gitee.com/mindspore/models/tree/r1.8/official/gnn/bgcf) |
 
 ### 推理性能
 

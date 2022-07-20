@@ -66,8 +66,8 @@
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -108,7 +108,7 @@ bash ./scripts/run_eval_gpu.sh device_id
 e.g. bash ./scripts/run_eval_gpu.sh 0
 ```
 
-Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)
 
 ## 脚本说明
 
@@ -388,7 +388,7 @@ Validation for Neighbor2Neighbor
 | Accuracy                   | PSNR = 32.1240, SSIM = 0.8863                                | PSNR = 32.0975, SSIM = 0.8795                                |
 | Total time                 | 8p：3h50m (without validation)                               | 8p：5h54m (without validation)                               |
 | Checkpoint for Fine tuning | 8p: 18.60MB(.ckpt file)                                      | 8p: 14.90MB(.ckpt file)                                      |
-| Scripts                    | [Neighbor2Neighbor脚本](https://gitee.com/mindspore/models/tree/master/research/cv/Neighbor2Neighbor) | [Neighbor2Neighbor脚本](https://gitee.com/mindspore/models/tree/master/research/cv/Neighbor2Neighbor) |
+| Scripts                    | [Neighbor2Neighbor脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/Neighbor2Neighbor) | [Neighbor2Neighbor脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/Neighbor2Neighbor) |
 
 ## 随机情况说明
 

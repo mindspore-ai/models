@@ -61,8 +61,8 @@ AlexNet由5个卷积层和3个全连接层组成。多个卷积核用于提取�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -348,7 +348,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 | 速度 | 7.2毫秒/步 | 7.4毫秒/步 | 60.9毫秒/步 |
 | 总时间 | 6分钟 | 6分钟| 96分钟 |
 | 微调检查点 | 428M （.ckpt文件） | 428M （.ckpt文件） | 459M （.ckpt文件）|
-| 脚本 | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) | [AlexNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) |
+| 脚本 | [AlexNet脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/alexnet) | [AlexNet脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/alexnet) | [AlexNet脚本](https://gitee.com/mindspore/models/tree/r1.8/official/cv/alexnet) |
 
 ## 随机情况说明
 

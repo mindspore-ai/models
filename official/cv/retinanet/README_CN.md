@@ -68,8 +68,8 @@ MSCOCO2017
 - 架构
     - [MindSpore](https://www.mindspore.cn/install)
 - 想要获取更多信息，请检查以下资源：
-    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## [脚本说明](#content)
 
@@ -192,7 +192,7 @@ bash scripts/run_single_train.sh DEVICE_ID MINDRECORD_DIR CONFIG_PATH PRE_TRAINE
 
 > 注意:
 
-  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/parallel/train_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 
 #### 运行
 
@@ -478,7 +478,7 @@ mAP: 0.3499478734634595
 | 最终损失                    | 0.582                                  |0.57|
 | 精确度 (8p)                 | mAP[0.3475]               |mAP[0.3499]               |
 | 训练总时间 (8p)             | 23h16m54s                              |51h39m6s|
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) |[链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/r1.8/official/cv/retinanet) |[链接](https://gitee.com/mindspore/models/tree/r1.8/official/cv/retinanet) |
 
 #### 推理性能
 

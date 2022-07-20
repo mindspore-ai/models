@@ -46,8 +46,8 @@ To train U<sup>2</sup>-Net, We use the dataset [DUTS-TR](http://saliencydetectio
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below£º
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Script Description](#contents)
 
@@ -178,7 +178,7 @@ bash scripts/run_distribute_gpu.sh [/path/to/content] [/path/to/label]
 - Notes
 
 1. hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it
-   by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+   by using the [hccl_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 ## [Model Export](#contents)
 
 ```bash

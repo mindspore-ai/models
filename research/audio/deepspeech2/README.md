@@ -60,8 +60,8 @@ Dataset used: [LibriSpeech](<http://www.openslr.org/12>)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Script Description](#contents)
 
@@ -277,7 +277,7 @@ python export.py --pre_trained_model_path='ckpt_path'
 | Speed                      | 2p 2.139s/step                                   |
 | Total time: training       | 2p: around 1 week;                                  |
 | Checkpoint                 | 991M (.ckpt file)                                              |
-| Scripts                    | [DeepSpeech script](https://gitee.com/mindspore/models/tree/master/research/audio/deepspeech2) |
+| Scripts                    | [DeepSpeech script](https://gitee.com/mindspore/models/tree/r1.8/research/audio/deepspeech2) |
 
 ### Inference Performance
 

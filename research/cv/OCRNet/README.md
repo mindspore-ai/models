@@ -92,8 +92,8 @@ Cityscapes
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below:
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # Quick Start
 
@@ -357,7 +357,7 @@ bash scripts/run_standalone_train.sh [DEVICE_ID] [DATASET_PATH] [TRAIN_OUTPUT_PA
 
 Distributed training requires creating an HCCL configuration file in JSON format in advance.
 
-For specific operations, see the instructions in [hccn_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+For specific operations, see the instructions in [hccn_tools](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools).
 
 The training results are saved in the example path, and the folder name starts with "train" or "train_parallel".
 You can find the checkpoint file along with the results in the log at this path, as shown below.

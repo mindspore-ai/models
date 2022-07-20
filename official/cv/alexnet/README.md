@@ -60,8 +60,8 @@ Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 ## [Quick Start](#contents)
 
@@ -459,7 +459,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 7.2 ms/step                                                 | 7.4 ms/step                                     | 60.9 ms/step                              |
 | Total time                 | 6 mins                                                      | 6 mins                                          | 96 mins                                 |
 | Checkpoint for Fine tuning | 428M (.ckpt file)                                           | 428M (.ckpt file)                                | 459M (.ckpt file)                        |
-| Scripts                    | [AlexNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) | [AlexNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) | [AlexNet Script](https://gitee.com/mindspore/models/tree/master/official/cv/alexnet) |
+| Scripts                    | [AlexNet Script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/alexnet) | [AlexNet Script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/alexnet) | [AlexNet Script](https://gitee.com/mindspore/models/tree/r1.8/official/cv/alexnet) |
 
 ## [Description of Random Situation](#contents)
 

@@ -77,8 +77,8 @@ D-LinkNet的解码器与原始LinkNet相同，这在计算上是有效的。解�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -301,7 +301,7 @@ bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
 | 参数(M)  | 31M|
 | 微调检查点 | 118.70M (.ckpt文件)|
 | 配置文件 | dlinknet_config.yaml |
-| 脚本| [D-LinkNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/dlinknet) |
+| 脚本| [D-LinkNet脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/dlinknet) |
 
 ### 推理性能
 
@@ -320,7 +320,7 @@ bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
 
 #### 推理
 
-如果您需要使用训练好的模型在Ascend 910、Ascend 310等多个硬件平台上进行推理上进行推理，可参考此[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/infer/inference.html)。下面是一个简单的操作步骤示例：
+如果您需要使用训练好的模型在Ascend 910、Ascend 310等多个硬件平台上进行推理上进行推理，可参考此[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/infer/inference.html)。下面是一个简单的操作步骤示例：
 
 ##### Ascend 310环境运行
 

@@ -66,8 +66,8 @@ ResNet-50的总体网络架构如下：[链接](https://arxiv.org/pdf/1512.03385
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -83,7 +83,7 @@ bash run_distribute_train.sh [RANK_TABLE_FILE] [DATASET_PATH] [DEVICE_NUM]
 bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
 ```
 
-> 对于分布式训练，需要提前创建JSON格式的HCCL配置文件。关于配置文件，可以参考[HCCL_TOOL](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+> 对于分布式训练，需要提前创建JSON格式的HCCL配置文件。关于配置文件，可以参考[HCCL_TOOL](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)
 。
 
 - GPU处理器环境运行
@@ -281,7 +281,7 @@ epoch： 36 step: 5004，loss is 1.645802
 | 总时间（按75.9%计算） | 72分钟 | 229分钟 |
 | 参数(M) | 25.5 |25.5 |
 | checkpoint | 491M（.ckpt file） | 380M（.ckpt file） |
-| 脚本 |[链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet_thor) |[链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet_thor) |
+| 脚本 |[链接](https://gitee.com/mindspore/models/tree/r1.8/official/cv/resnet_thor) |[链接](https://gitee.com/mindspore/models/tree/r1.8/official/cv/resnet_thor) |
 
 ### 推理性能
 

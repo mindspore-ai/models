@@ -103,11 +103,11 @@ LightCNN适用于有大量噪声的人脸识别数据集，提出了maxout 的�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 - 生成config json文件用于8卡训练。
-    - [简易教程](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
-    - 详细配置方法请参照[官网教程](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html#配置分布式环境变量)。
+    - [简易教程](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)
+    - 详细配置方法请参照[官网教程](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/parallel/train_ascend.html#配置分布式环境变量)。
 
 # 快速入门
 
@@ -473,7 +473,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 | 损失 | 0.10905003 |0.10246127| 0.10246127 |
 | 速度 | - | 147.1 毫秒/步 | 191.5 毫秒/步 |
 | 总时长 | 369,144,120.56 ms（单卡）<br>  85,369,778.48 ms（八卡） | 129小时 | 21小时 |
-| 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/LightCNN) |
+| 脚本 | [链接](https://gitee.com/mindspore/models/tree/r1.8/research/cv/LightCNN) |
 
 ### 评估性能
 
@@ -516,7 +516,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 [3]: https://drive.google.com/file/d/0ByNaVHFekDPRbFg1YTNiMUxNYXc/view?usp=sharing
 [4]: https://hyper.ai/datasets/5543
 [5]: https://pan.baidu.com/s/1eR6vHFO
-[6]: https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html
+[6]: https://www.mindspore.cn/tutorials/experts/zh-CN/r1.8/others/mixed_precision.html
 [7]: http://www.cbsr.ia.ac.cn/users/scliao/projects/blufr/BLUFR.zip
 [8]: https://github.com/AlfredXiangWu/face_verification_experiment/blob/master/code/lfw_pairs.mat
 [9]: https://github.com/AlfredXiangWu/face_verification_experiment/blob/master/results/LightenedCNN_B_lfw.mat

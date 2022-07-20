@@ -65,8 +65,8 @@ Dataset used can refer to [paper](<https://ieeexplore.ieee.org/abstract/document
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information,please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
 
 # [Quick Start](#contents)
 
@@ -92,7 +92,7 @@ After installing MindSpore via the official website, you can start training and 
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+  <https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools.>
 
 - running on GPU with gpu default parameters
 
@@ -506,7 +506,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Loss Function                   | Softmax Cross Entropy                                       | Softmax Cross Entropy                               |                   Softmax Cross Entropy                  |
 | Speed                       | 8pc: 104 ms/step                                            | 8pc: 255 ms/step                                          |                          1p：11081 ms/step                     |
 | Parameters(M)                    | 4.0;                                                        | 4.0;                               |                             4.0;                       |
-| Scripts                       | [Tiny-Darknet scripts](https://gitee.com/mindspore/models/tree/master/official/cv/tinydarknet)
+| Scripts                       | [Tiny-Darknet scripts](https://gitee.com/mindspore/models/tree/r1.8/official/cv/tinydarknet)
 
 ### [Evaluation Performance](#contents)
 

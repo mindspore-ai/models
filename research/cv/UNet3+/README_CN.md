@@ -54,8 +54,8 @@ UNet3+ 处理的数据为RGB图像，故训练前应该将源数据预处理为�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 ## 快速入门
 
@@ -83,7 +83,7 @@ bash ./scripts/run_eval.sh [root path of code]
 #推理日志将输出到 eval_log.txt 文件
 ```
 
-Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)
 
 ## 脚本说明
 
@@ -279,7 +279,7 @@ UNet3+ on “LiTS2017 ”
 | Accuracy                   | 97.71%                                                       |
 | Total time                 | 8p：2h44m (without validation)                               |
 | Checkpoint for Fine tuning | 8p: 19.30MB(.ckpt file)                                      |
-| Scripts                    | [UNet3+脚本](https://gitee.com/mindspore/models/tree/master/research/cv/UNet3+) |
+| Scripts                    | [UNet3+脚本](https://gitee.com/mindspore/models/tree/r1.8/research/cv/UNet3+) |
 
 ## 随机情况说明
 

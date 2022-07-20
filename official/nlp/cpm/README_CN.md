@@ -53,8 +53,8 @@ CPM网络由GPT实现，GPT包括多层解码器模块。
 - 框架
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -309,7 +309,7 @@ Parameters for dataset and network (Training/Evaluation):
 
 ### Finetune训练过程
 
-- 在`src/config.py`中设置，包括模型并行、batchsize、学习率和网络超参数。点击[这里](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/dataset.html)查看更多数据集信息。
+- 在`src/config.py`中设置，包括模型并行、batchsize、学习率和网络超参数。点击[这里](https://www.mindspore.cn/tutorials/zh-CN/r1.8/advanced/dataset.html)查看更多数据集信息。
 
 - 运行`run_distribute_train_ascend_single_machine.sh`，进行CPM模型的单机8卡分布式训练。
 
@@ -400,7 +400,7 @@ Zero-shot单机双卡推理性能和精度如下：
 | 损失                   | 0.7                                            |
 | 参数 (M)               | 2597.1                                            |
 | 推理检查点   | 76G （.ckpt文件）                                            |
-| 脚本                    | <https://gitee.com/mindspore/models/tree/master/official/nlp/cpm> |
+| 脚本                    | <https://gitee.com/mindspore/models/tree/r1.8/official/nlp/cpm> |
 
 四机32卡Finetune性能和精度如下：
 
@@ -418,7 +418,7 @@ Zero-shot单机双卡推理性能和精度如下：
 | 损失                  | 0.03                                                |
 | 参数 (M)             | 2597.1                                                |
 | 推理检查点   | 57G （.ckpt文件）                                            |
-| 脚本                    | <https://gitee.com/mindspore/models/tree/master/official/nlp/cpm> |
+| 脚本                    | <https://gitee.com/mindspore/models/tree/r1.8/official/nlp/cpm> |
 
 # 随机情况说明
 

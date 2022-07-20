@@ -46,7 +46,7 @@ Dataset used: [Movie Review Data](<http://www.cs.cornell.edu/people/pabo/movie-r
 
 - Hardware: Ascend/GPU
 - Framework: [MindSpore](https://www.mindspore.cn/install/en)
-- For more information, please check the resources below：[MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html), [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html).
+- For more information, please check the resources below：[MindSpore tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html), [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html).
 
 ## [Quick Start](#contents)
 
