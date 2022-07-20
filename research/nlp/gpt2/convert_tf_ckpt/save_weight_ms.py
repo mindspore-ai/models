@@ -23,7 +23,7 @@ import numpy as np
 from mindspore import Tensor
 from mindspore.train.serialization import save_checkpoint
 
-from .trans_dict import trans_dict_tf
+from trans_dict import trans_dict_tf
 
 
 def trans_model_parameter(ckpt_name):
