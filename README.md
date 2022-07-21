@@ -75,7 +75,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Computer Vision (CV) | Text Detection  | [PSENet](https://gitee.com/mindspore/models/tree/master/official/cv/psenet)   |  ✅ |    |   |
 | Computer Vision (CV) | Text Recognition  | [CNN+CTC](https://gitee.com/mindspore/models/tree/master/official/cv/cnnctc)                |  ✅ |    |   |
 | Computer Vision (CV) | Semantic Segmentation  | [DeepLabV3](https://gitee.com/mindspore/models/tree/master/official/cv/deeplabv3)     |  ✅ |    | ✅ |
-| Computer Vision (CV) | Semantic Segmentation  | [DeepLabV3+](https://gitee.com/mindspore/models/tree/master/official/cv/deeplabv3plus)     |  ✅ |    |   |
+| Computer Vision (CV) | Semantic Segmentation  | [DeepLabV3+](https://gitee.com/mindspore/models/tree/master/research/cv/deeplabv3plus)     |  ✅ |    |   |
 | Computer Vision (CV) | Semantic Segmentation  | [U-Net2D (Medical)](https://gitee.com/mindspore/models/tree/master/official/cv/unet)                |  ✅ |    |   |
 | Computer Vision (CV) | Semantic Segmentation  | [U-Net3D (Medical)](https://gitee.com/mindspore/models/tree/master/official/cv/unet3d)                |  ✅ |    |   |
 | Computer Vision (CV) | Semantic Segmentation  | [U-Net++](https://gitee.com/mindspore/models/tree/master/official/cv/unet)                |  ✅ |    |   |
@@ -147,8 +147,8 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Computer Vision (CV) | Image Classification |[fishnet99](https://gitee.com/mindspore/models/tree/master/research/cv/fishnet99) | ✅ |   |   |
 | Computer Vision (CV) | Image Classification |[GENET](https://gitee.com/mindspore/models/tree/master/research/cv/GENet_Res50) | ✅ |   |   |
 | Computer Vision (CV) | Image Classification |[GhostNet](https://gitee.com/mindspore/models/tree/master/research/cv/ghostnet) | ✅ |   |   |
-| Computer Vision (CV) | Image Classification |[Glore_res200](https://gitee.com/mindspore/models/tree/master/research/cv/glore_res200) | ✅ |   |   |
-| Computer Vision (CV) | Image Classification |[Glore_res50](https://gitee.com/mindspore/models/tree/master/research/cv/glore_res50) | ✅ |   |   |
+| Computer Vision (CV) | Image Classification |[Glore_res200](https://gitee.com/mindspore/models/tree/master/research/cv/glore_res) | ✅ |   |   |
+| Computer Vision (CV) | Image Classification |[Glore_res50](https://gitee.com/mindspore/models/tree/master/research/cv/glore_res) | ✅ |   |   |
 | Computer Vision (CV) | Image Classification |[HarDNet](https://gitee.com/mindspore/models/tree/master/research/cv/hardnet) | ✅ |   |   |
 | Computer Vision (CV) | Image Classification |[HourNAS](https://gitee.com/mindspore/models/tree/master/research/cv/HourNAS) | ✅ |   |   |
 | Computer Vision (CV) | Image Classification |[HRNetW48-cls](https://gitee.com/mindspore/models/tree/master/research/cv/HRNetW48_cls) | ✅ |   |   |
