@@ -149,7 +149,7 @@ def _export_air(ckpt_dir):
     param_dict = load_checkpoint(ckpt_file)
     load_param_into_net(net, param_dict)
 
-    input_arr = Tensor(np.zeros([1, 3, 224, 224],
+    input_arr = Tensor(np.zeros([1, 3, config.image_size[0], config.image_size[1]],
                                 np.float32))
     print("Start export air.")
     export(net, input_arr, file_name=config.file_name,
