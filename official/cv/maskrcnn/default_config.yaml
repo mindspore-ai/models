@@ -137,7 +137,7 @@ sgd_momentum: 0.9
 
 # train
 batch_size: 2
-loss_scale: 1
+loss_scale: 1024
 momentum: 0.91
 weight_decay: 0.0001 # 1e-4
 pretrain_epoch_size: 0
