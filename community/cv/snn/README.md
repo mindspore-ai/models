@@ -287,7 +287,7 @@ result: {'acc': 59.5400 %} ckpt=~/snn/train/output/checkpoint/lenet-5_250.ckpt
 | Total time                 | 7 mins                                                       |
 | Checkpoint for Fine tuning | 1.3M (.ckpt file)                                            |
 | Accuracy                   | 59.54%                                                       |
-| config                     | [Link](https://gitee.com/mindspore/models/community/cv/snn/config)|
+| config                     | [Link](https://gitee.com/mindspore/models/tree/master/community/cv/snn/config)|
 
 # [Description of Random Situation](#contents)
 
