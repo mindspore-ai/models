@@ -147,8 +147,8 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Computer Vision (CV) | Image Classification |[fishnet99](https://gitee.com/mindspore/models/tree/r1.8/research/cv/fishnet99) | ✅ |   |   |
 | Computer Vision (CV) | Image Classification |[GENET](https://gitee.com/mindspore/models/tree/r1.8/research/cv/GENet_Res50) | ✅ |   |   |
 | Computer Vision (CV) | Image Classification |[GhostNet](https://gitee.com/mindspore/models/tree/r1.8/research/cv/ghostnet) | ✅ |   |   |
-| Computer Vision (CV) | Image Classification |[Glore_res200](https://gitee.com/mindspore/models/tree/r1.8/research/cv/glore_res200) | ✅ |   |   |
-| Computer Vision (CV) | Image Classification |[Glore_res50](https://gitee.com/mindspore/models/tree/r1.8/research/cv/glore_res50) | ✅ |   |   |
+| Computer Vision (CV) | Image Classification |[Glore_res200](https://gitee.com/mindspore/models/tree/r1.8/research/cv/glore_res) | ✅ |   |   |
+| Computer Vision (CV) | Image Classification |[Glore_res50](https://gitee.com/mindspore/models/tree/r1.8/research/cv/glore_res) | ✅ |   |   |
 | Computer Vision (CV) | Image Classification |[HarDNet](https://gitee.com/mindspore/models/tree/r1.8/research/cv/hardnet) | ✅ |   |   |
 | Computer Vision (CV) | Image Classification |[HourNAS](https://gitee.com/mindspore/models/tree/r1.8/research/cv/HourNAS) | ✅ |   |   |
 | Computer Vision (CV) | Image Classification |[HRNetW48-cls](https://gitee.com/mindspore/models/tree/r1.8/research/cv/HRNetW48_cls) | ✅ |   |   |
