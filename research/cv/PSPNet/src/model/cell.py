@@ -14,7 +14,7 @@
 # ============================================================================
 """ PSPNet loss function """
 from mindspore import nn
-from src.utils.metrics import SoftmaxCrossEntropyLoss
+from src.utils.aux_loss import SoftmaxCrossEntropyLoss
 
 
 class Aux_CELoss_Cell(nn.Cell):

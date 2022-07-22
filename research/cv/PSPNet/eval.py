@@ -39,13 +39,13 @@ context.set_context(mode=context.GRAPH_MODE, device_target="Ascend",
 def get_parser():
     """
     Read parameter file
-        -> for ADE20k: ./src/config/voc2012_pspnet50.yaml
-        -> for voc2012: ./src/config/voc2012_pspnet50.yaml
+        -> for ADE20k: ./config/ade20k_pspnet50.yaml
+        -> for voc2012: ./config/voc2012_pspnet50.yaml
     """
     parser = argparse.ArgumentParser(description='MindSpore Semantic Segmentation')
-    parser.add_argument('--config', type=str, required=True, default='./src/config/voc2012_pspnet50.yaml',
+    parser.add_argument('--config', type=str, required=True, default='./config/voc2012_pspnet50.yaml',
                         help='config file')
-    parser.add_argument('opts', help='see ./src/config/voc2012_pspnet50.yaml for all options', default=None,
+    parser.add_argument('opts', help='see ./config/voc2012_pspnet50.yaml for all options', default=None,
                         nargs=argparse.REMAINDER)
     args_ = parser.parse_args()
     assert args_.config is not None
