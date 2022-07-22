@@ -82,14 +82,14 @@ class SmallUpSampler(nn.Cell):
 
 class Upsampler(nn.Cell):
     """rcan"""
-    def __init__(self, conv, s, n_feats, has_bias=True):
+    def __init__(self, conv, scale, n_feats, has_bias=True):
         """rcan"""
         super(Upsampler, self).__init__()
         m = []
-        if (s & (s - 1)) == 0:
-            for _ in range(int(math.log(s, 2))):
+        if (scale & (scale - 1)) == 0:
+            for _ in range(int(math.log(scale, 2))):
                 m.append(SmallUpSampler(conv, 2, n_feats, has_bias=has_bias))
-        elif s == 3:
+        elif scale == 3:
             m.append(SmallUpSampler(conv, 3, n_feats, has_bias=has_bias))
         self.net = nn.SequentialCell(m)
 
