@@ -117,10 +117,11 @@ class Reporter(logging.Logger):
             save_checkpoint(net.G.D_A, os.path.join(self.ckpts_dir, f"D_A_{self.epoch}.ckpt"))
             save_checkpoint(net.G.D_B, os.path.join(self.ckpts_dir, f"D_B_{self.epoch}.ckpt"))
             # left latest 20, remove outdated ckpts.
-            ckpt_files = sorted(os.listdir(self.ckpts_dir), key=os.path.getmtime)
+            ckpt_files = [os.path.join(self.ckpts_dir, file) for file in os.listdir(self.ckpts_dir)]
+            ckpt_files = sorted(ckpt_files, key=os.path.getmtime)
             if len(ckpt_files) > 20:
                 for i in range(len(ckpt_files) - 20):
-                    os.remove(os.path.join(self.ckpts_dir, ckpt_files[i]))
+                    os.remove(ckpt_files[i])
 
 
     def visualizer(self, img_A, img_B, fake_A, fake_B):
