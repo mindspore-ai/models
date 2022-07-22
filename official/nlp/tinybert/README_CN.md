@@ -680,6 +680,8 @@ run_general_distill.py文件中设置了随机种子，确保分布式训练初�
 
 若结果精度不达标，可能原因为使用的scipy版本低于1.7
 
+若出现`connect p2p timeout, timeout: 120s.`报错信息，可以添加环境变量`export HCCL_CONNECT_TIMEOUT=600`方式适当延长HCCL建链时长解决该问题．
+
 # ModelZoo主页
 
 请浏览官网[主页](https://gitee.com/mindspore/models)。

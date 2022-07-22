@@ -151,6 +151,8 @@ GPT-2脚本及代码结构如下：
 
 `python read_weight_tf.py --ckpt_file_path=/{path}/model.ckpt`
 
+> tf模型以model.ckpt开头的有３个文件，分别为.data，.index，.meta文件，此处传参为model.ckpt，而不是任何一个其中的单独文件
+
 - 在mindspore的环境下，运行`save_weight_ms.py`，示例代码如下：
 
 `python save_weight_ms.py --output_file_name="mindspore_gpt2_small.ckpt"`
@@ -163,10 +165,10 @@ GPT-2脚本及代码结构如下：
 
 - [WikiText2数据集下载](https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-2-v1.zip) 解压后使用`wikitext-2 /wiki.test.tokens`作为测试集
 - [WikiText103数据集下载](https://s3.amazonaws.com/research.metamind.io/wikitext/wikitext-103-v1.zip) 解压后使用`wikitext-103 /wiki.test.tokens`作为测试集
-- [PTB数据集下载](http://www.fit.vutbr.cz/~imikolov/rnnlm/simple-examples.tgz) 解压后使用  `/simple-examples/data/ptb.test.txt` 测试集，使用 `/simple-examples/data/ptb.test.txt` 作为训练集
-- [1BW数据集下载](http://www.statmt.org/lm-benchmark/1-billion-word-language-modeling-benchmark-r13output.tar.gz) 解压后使用`1-billion-word-language-modeling-benchmark-r13output/heldout-monolingual.tokenized.shuffled/news.en.heldout-00000-of-00050`作为测试集，使用`1-billion-word-language-modeling-benchmark-r13output/training-monolingual.tokenized.shuffled/news.en-00001-of-00100`作为原始训练集，进行随机采样后得到30000条训练集样本
+- [PTB数据集下载](http://www.fit.vutbr.cz/~imikolov/rnnlm/simple-examples.tgz) 解压后使用`/simple-examples/data/ptb.test.txt` 测试集，使用 `/simple-examples/data/ptb.test.txt`作为训练集
+- [1BW数据集下载](https://github.com/ciprian-chelba/1-billion-word-language-modeling-benchmark) 根据README说明下载[单语义语言模型训练数据集](http://statmt.org/wmt11/training-monolingual.tgz)，使用get-data.sh脚本对数据进行预处理，使用`heldout-monolingual.tokenized.shuffled/news.en.heldout-00000-of-00050`作为测试集，使用`training-monolingual.tokenized.shuffled/news.en-00001-of-00100`作为原始训练集，进行随机采样后得到30000条训练集样本
 
-使用`task_dataset_preprocess.py`可以对以上数据集进行清洗。
+- 使用`task_dataset_preprocess.py`可以对以上数据集进行清洗。
 
 `task_dataset_preprocess.py`的主要参数如下：
 
