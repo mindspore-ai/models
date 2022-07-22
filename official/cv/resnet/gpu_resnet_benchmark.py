@@ -66,7 +66,8 @@ class MyTimeMonitor(Callback):
         fps = self.batch_size / step_mseconds * 1000 * self.size
         print("epoch: [%s/%s] step: [%s/%s], loss is %s" % (cur_epoch_num, total_epochs,\
             cur_step_in_epoch, self.data_size, loss),\
-                "Epoch time: {:5.3f} ms, fps: {:d} img/sec.".format(step_mseconds, int(fps)), flush=True)
+                "Epoch time: {:5.3f} ms, per_step_time: {:.2f} ms, fps: {:d} img/sec.".format(
+                    step_mseconds, step_mseconds / self.size, int(fps)), flush=True)
 
 
 def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32, target="GPU", dtype="fp16",
