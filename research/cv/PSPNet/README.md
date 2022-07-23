@@ -40,6 +40,15 @@ The pyramid pooling module fuses features under four different pyramid scales.Fo
 - [ADE20K Dataset Website](http://groups.csail.mit.edu/vision/datasets/ADE20K/)
  - It contains 22,210 finely annotated images split into training and testing sets with 20,210 and 2,000 images respectively.
 
+Datasets: attributes (names and colors) are needed, and please download as follows:
+
+- [PASCAL VOC 2012 names.txt and colors.txt Website](https://github.com/hszhao/semseg/tree/master/data/voc2012)
+- [ADE20K names.txt and colors.txt Website](https://github.com/hszhao/semseg/tree/master/data/ade20k)
+
+# [Pretrained model](#contents)
+
+[resnet50-imagenet pretrained model](https://download.mindspore.cn/thirdparty/pspnet/resnet_deepbase.ckpt)
+
 # [Environmental requirements](#Contents)
 
 - Hardware :(Ascend)
@@ -61,10 +70,10 @@ The pyramid pooling module fuses features under four different pyramid scales.Fo
 ├── eval.py                                    # Evaluation python file for ADE20K/VOC2012
 ├── export.py                                  # export mindir
 ├── README.md                                  # descriptions about PSPnet
+├── config                                     # the training config file
+│   ├── ade20k_pspnet50.yaml
+│   └── voc2012_pspnet50.yaml
 ├── src                                        # PSPNet
-│   ├── config                           # the training config file
-│   │   ├── ade20k_pspnet50.yaml
-│   │   └── voc2012_pspnet50.yaml
 │   ├── dataset                          # data processing
 │   │   ├── dataset.py
 │   │   └── transform.py
@@ -89,7 +98,7 @@ The pyramid pooling module fuses features under four different pyramid scales.Fo
 
 ## Script Parameters
 
-Set script parameters in src/config/ade20k_pspnet50.yaml and src/config/voc2012_pspnet50.yaml
+Set script parameters in ./config/ade20k_pspnet50.yaml and ./config/voc2012_pspnet50.yaml
 
 ### Model
 
