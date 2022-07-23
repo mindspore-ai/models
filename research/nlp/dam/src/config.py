@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@ def parse_args():
     parser.add_argument('--is_emb_init', type=ast.literal_eval, default=True)
     parser.add_argument('--do_eval', type=ast.literal_eval, default=False,
                         help="Whether side training changes verification.")
+    parser.add_argument('--file_format', type=str, default='MINDIR')
     # net args
     parser.add_argument('--max_turn_num', type=int, default=9)
     parser.add_argument('--max_turn_len', type=int, default=50)

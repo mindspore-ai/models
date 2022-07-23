@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -43,8 +43,6 @@ def evaluate(file_path):
 
             data.append((float(tokens[0]), int(tokens[1])))
 
-    # assert len(data) % 10 == 0
-
     p_at_1_in_2 = 0.0
     p_at_1_in_10 = 0.0
     p_at_2_in_10 = 0.0
@@ -76,8 +74,6 @@ def evaluate_m(logits, labels):
     for i in range(len(logits)):
         data.append((float(logits[i]), int(labels[i])))
 
-    # assert len(data) % 10 == 0
-
     p_at_1_in_2 = 0.0
     p_at_1_in_10 = 0.0
     p_at_2_in_10 = 0.0
@@ -87,8 +83,6 @@ def evaluate_m(logits, labels):
 
     for i in range(0, length):
         ind = i * 10
-        assert data[ind][1] == 1
-
         p_at_1_in_2 += get_p_at_n_in_m(data, 1, 2, ind)
         p_at_1_in_10 += get_p_at_n_in_m(data, 1, 10, ind)
         p_at_2_in_10 += get_p_at_n_in_m(data, 2, 10, ind)

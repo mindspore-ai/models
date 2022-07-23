@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ import os
 import numpy as np
 from mindspore import Tensor, context, load_checkpoint, load_param_into_net, export
 
-from src.net import DAMNet
+from src.net import DAMNet, PredictWithNet
 from src.config import parse_args
 
 context.set_context(mode=context.GRAPH_MODE, save_graphs=False)
@@ -35,6 +35,8 @@ if __name__ == '__main__':
 
     # net
     network = DAMNet(args)
+    network = PredictWithNet(network)
+    network.set_train(False)
 
     # load checkpoint
     ckpt_file = os.path.join(args.ckpt_path, args.ckpt_name)
@@ -42,10 +44,10 @@ if __name__ == '__main__':
     load_param_into_net(network, param_dict)
 
     turns = Tensor(np.zeros([args.batch_size, args.max_turn_num, args.max_turn_len]).astype(np.int32))
-    every_turn_len = Tensor(np.zeros([args.batch_size, args.max_turn_num]).astype(np.float32))
+    every_turn_len = Tensor(np.zeros([args.batch_size, args.max_turn_num]).astype(np.int32))
     response = Tensor(np.zeros([args.batch_size, args.max_turn_len]).astype(np.int32))
-    response_len = Tensor(np.zeros([args.batch_size, 1]).astype(np.float32))
-    labels = Tensor(np.zeros([args.batch_size, 1]).astype(np.float32))
+    response_len = Tensor(np.zeros([args.batch_size, 1]).astype(np.int32))
+    labels = Tensor(np.zeros([args.batch_size, 1]).astype(np.int32))
 
     input_data = [turns, every_turn_len, response, response_len, labels]
-    export(network, *input_data, file_name=args.model_name, file_format="MINDIR")
+    export(network, *input_data, file_name=args.model_name, file_format=args.file_format)
