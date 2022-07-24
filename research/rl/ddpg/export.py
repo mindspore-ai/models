@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,12 +14,19 @@
 # ============================================================================
 """export"""
 
+import argparse
 import math
 import gym
 import mindspore as ms
 from mindspore import Tensor, export, context, nn, ops
 from mindspore import load_checkpoint
 from mindspore.common.initializer import Uniform
+
+parser = argparse.ArgumentParser(description='ddpg')
+parser.add_argument("--device_id", type=int, default=0, help="Device id")
+parser.add_argument("--file_name", type=str, default="ddpg", help="output file name.")
+parser.add_argument('--file_format', type=str, choices=["MINDIR", "AIR", "ONNX"], default='MINDIR', help='file format')
+args = parser.parse_args()
 
 
 class ActorNet(nn.Cell):
@@ -52,8 +59,12 @@ class ActorNet(nn.Cell):
 
 def run_export():
     """export"""
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
-    env = gym.make('Pendulum-v0')
+    if args.file_format == "MINDIR":
+        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
+        env = gym.make('Pendulum-v0')
+    elif args.file_format == "ONNX":
+        context.set_context(mode=context.GRAPH_MODE, device_target="GPU")
+        env = gym.make('Pendulum-v1')
     env = env.unwrapped
     env.seed(1)
     state_dim = env.observation_space.shape[0]
@@ -62,10 +73,16 @@ def run_export():
     state = Tensor(state, ms.float32)
     expand_dims = ops.ExpandDims()
     state = expand_dims(state, 0)
+
     actor_net = ActorNet(state_dim, action_dim)
     load_checkpoint("actor_net.ckpt", net=actor_net)
-    export(actor_net, state, file_name="test", file_format="MINDIR")
-    print("export MINDIR file at {}".format("./test.mindir"))
+    if args.file_format == "MINDIR":
+        export(actor_net, state, file_name="test", file_format="MINDIR")
+        print("export Actor file at {}".format("./test.mindir"))
+    elif args.file_format == "ONNX":
+        export(actor_net, state, file_name="actornet", file_format="ONNX")
+        print("export Actor file at {}".format("./Actor.ONNX"))
+
 
 if __name__ == '__main__':
     run_export()

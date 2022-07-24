@@ -98,6 +98,7 @@ ddpg
 │   ├── run_910_train.sh    # 训练shell脚本
 │   ├── run_910_verify.sh   # ddpg Ascend 310推理shell脚本
 │   ├── run_infer_310 .sh   # ddpg Ascend 310 推理shell脚本
+│   ├── run_ONNX_infer .sh   # ddpg GPU ONNX 推理shell脚本
 ├── src
 │   ├── agent.py            # ddpg 模型脚本
 │   ├── ac_net.py           # ddpg 基础网络
@@ -106,6 +107,7 @@ ddpg
 ├── train.py                # ddpg 训练脚本
 ├── verify.py               # ddpg Ascend 910推理脚本
 ├── verify_310.py           # ddpg Ascend 310推理脚本
+├── verify_ONNX.py           # ddpg ONNX推理脚本
 ├── export.py               # ddpg 模型导出脚本
 ```
 
@@ -225,6 +227,37 @@ STEP_TEST = 100          #  测试单轮步数
     # example
     cd scripts
     bash run_infer_310.sh ../test.mindir ../output 0
+    ```
+
+- GPU 运行ONNX推理脚本
+
+    在GPU环境运行时评估
+    评估所需ckpt获取地址：[获取地址](https://www.mindspore.cn/resources/hub/details?MindSpore/1.5/ddpg_critictarget_none)
+                                    (https://www.mindspore.cn/resources/hub/details?MindSpore/1.5/ddpg_criticnet_none)
+                                    (https://www.mindspore.cn/resources/hub/details?MindSpore/1.5/ddpg_actornet_none)
+                                    (https://www.mindspore.cn/resources/hub/details?MindSpore/1.5/ddpg_actortarget_none)
+
+    在执行评估之前，需要通过export.py导出onnx文件。
+
+    ```python
+    python export.py
+    ```
+
+    在运行以下命令之前，请检查用于评估的检查点路径。
+    请将检查点路径设置为相对路径，例如“../actornet.ckpt”。
+
+    ```shell
+    # 先编译C++文件，再执行Python推理
+    bash run_onnx_infer.sh
+    # example
+    cd scripts
+    bash run_onnx_infer.sh
+    ```
+
+    上述python命令将在后台运行，您可以通过verify_onnx/verify_onnx.log文件查看结果。测试的准确性如下：
+
+    ```bash
+    Final Average Reward: 6.260091564789905
     ```
 
 # 随机情况说明
