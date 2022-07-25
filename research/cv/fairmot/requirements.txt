@@ -1,6 +1,5 @@
 yacs
 opencv-python
-cython
 scipy
 numba
 progress
@@ -10,5 +9,8 @@ lap
 openpyxl
 Pillow
 tensorboardX
-cython-bbox
 sympy
+decorator
+pycocotools
+cython-bbox
+PyYAML

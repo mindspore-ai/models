@@ -1,0 +1,57 @@
+# basic experiment setting
+device: ""
+workers: 6
+load_model: "/Fairmot/ckpt/Fairmot_7-30_1595.ckpt"
+load_pre_model: "/Fairmot/ckpt/dla34-ba72cf86_ms.ckpt"
+data_cfg: "../data/data.json"
+arch: "dla_34"
+num_epochs: 30
+lr: 0.0001
+batch_size: 12
+input-video: "/videos/MOT16-03.mp4"
+output-root: "./exports"
+is_modelarts: False
+run_distribute: False
+data_url: ""
+train_url: ""
+id: 0
+
+# model
+head_conv: -1
+down_ratio: 4
+
+# input
+input_res: -1
+input_h: -1
+input_w: -1
+
+# test
+K: 500
+not_prefetch_test: False
+fix_res: False
+keep_res: False
+
+# tracking
+conf_thres: 0.3
+det_thres: 0.3
+nms_thres: 0.4
+track_buffer: 30
+min-box-area: 100
+output-format: "video"
+
+data_dir: "/home/dataset"
+
+# loss
+mse_loss: False
+reg_loss: "l1"
+hm_weight: 1
+off_weight: 1
+wh_weight: 0.1
+id_loss: "ce"
+id_weight: 1
+reid_dim: 128
+ltrb: True
+norm_wh: False
+dense_wh: False
+cat_spec_wh: False
+not_reg_offset: False

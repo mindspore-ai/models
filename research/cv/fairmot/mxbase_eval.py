@@ -16,6 +16,10 @@
 import os
 import os.path as osp
 import logging
+import cv2
+import motmetrics as mm
+import numpy as np
+
 from src.opts import Opts
 from src.tracking_utils import visualization as vis
 from src.tracking_utils.log import logger
@@ -23,9 +27,7 @@ from src.tracking_utils.utils import mkdir_if_missing
 from src.tracking_utils.evaluation import Evaluator
 from src.tracking_utils.io import read_results, unzip_objs
 import src.utils.jde as datasets
-import cv2
-import motmetrics as mm
-import numpy as np
+
 
 
 def main(data_root, seqs=('MOT17-01-SDP',), save_dir=None):

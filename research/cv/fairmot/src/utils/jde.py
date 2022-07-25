@@ -162,7 +162,7 @@ class JointDataset:
         self.tid_start_index = collections.OrderedDict()
         self.num_classes = 1
         for ds, path in paths.items():
-            path = root + path
+            path = osp.join(root, path)
             with open(path, 'r') as file:
                 self.img_files[ds] = file.readlines()
                 self.img_files[ds] = [osp.join(root, x.strip()) for x in self.img_files[ds]]
@@ -192,6 +192,7 @@ class JointDataset:
         self.nds = [len(x) for x in self.img_files.values()]  # 图片数量
         print('nds', self.nds)
         self.cds = [sum(self.nds[:i]) for i in range(len(self.nds))]
+        print('cds', self.cds)
         self.nF = sum(self.nds)
         self.width = img_size[0]
         self.height = img_size[1]
@@ -231,12 +232,12 @@ class JointDataset:
             wh = np.zeros((self.max_objs, 2), dtype=np.float32)
         reg = np.zeros((self.max_objs, 2), dtype=np.float32)
         ind = np.zeros((self.max_objs,), dtype=np.int32)
-        reg_mask = np.zeros((self.max_objs,), dtype=np.uint8)
+        reg_mask = np.zeros((self.max_objs,), dtype=np.int32)
         ids = np.zeros((self.max_objs,), dtype=np.int32)
         bbox_xys = np.zeros((self.max_objs, 4), dtype=np.float32)
 
         draw_gaussian = draw_msra_gaussian if self.opt.mse_loss else draw_umich_gaussian
-        for k in range(num_objs):
+        for k in range(min(num_objs, self.max_objs)):
             label = labels[k]
             bbox = label[2:]
             cls_id = int(label[0])

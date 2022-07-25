@@ -274,7 +274,7 @@ class IDAUp(nn.Cell):
         for i in range(startp + 1, endp):
             upsample = self.up[i - startp - 1]
             project = self.proj[i - startp - 1]
-            layers[i] = upsample(project(layers[i]))
+            layers[i] = upsample(project(layers[i].copy()))
             node = self.node[i - startp - 1]
             layers[i] = node(layers[i] + layers[i - 1])
         return layers
@@ -391,7 +391,7 @@ class DLASegConv(nn.Cell):
         x = self.dla_up(x)
         y = []
         for i in range(self.last_level - self.first_level):
-            y.append(x[i])
+            y.append(x[i].copy())
         y = self.ida_up(y, 0, len(y))
         hm = self.hm_fc(y[-1])
         wh = self.wh_fc(y[-1])
