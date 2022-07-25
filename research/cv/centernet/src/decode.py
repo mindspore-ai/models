@@ -148,6 +148,7 @@ class GatherFeatureByInd(nn.Cell):
         self.reshape = ops.Reshape()
         self.enable_cpu_gatherd = enable_cpu_gatherd
         if self.enable_cpu_gatherd:
+            self.value = Tensor(2, mstype.int32)
             self.gather_nd = ops.GatherD()
             self.expand_dims = ops.ExpandDims()
         else:
@@ -164,7 +165,7 @@ class GatherFeatureByInd(nn.Cell):
             # (b, J, K, N)
             index = self.expand_dims(ind, -1)
             index = self.tile(index, (1, 1, 1, N))
-            feat = self.gather_nd(feat, 2, index)
+            feat = self.gather_nd(feat, self.value, index)
         else:
             ind = self.reshape(ind, (-1, 1))
             ind_b = nn.Range(0, b * J, 1)()
