@@ -118,6 +118,7 @@ Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/m
         ├── scripts
         │   ├──run_distribute_train.sh         // Ascend 8卡训练脚本
         │   ├──run_eval.sh                     // 推理启动脚本
+        │   ├──run_eval_onnx_gpu.sh            // ONNX模型推理启动脚本
         │   ├──run_train.sh                    // 训练启动脚本
         │   ├──run_infer_310.sh                // 启动310推理的脚本
         │   ├──docker_start.sh                 // 使用 MindX 推理时的 docker 启动脚本
@@ -125,9 +126,11 @@ Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/m
         │   ├──dataset.py                      // 数据集处理
         │   ├──logger.py                       // 日志打印文件
         │   ├──models.py                       // 模型结构
+        │   ├──models_onnx.py                  // 为适配ONNX关闭自动Padding的模型结构
         ├── export.py                          // 将权重文件导出为 MINDIR 等格式的脚本
         ├── train.py                           // 训练脚本
         ├── eval.py                            // 推理脚本
+        ├── eval_onnx.py                       // onnx模型推理脚本
         ├── cal_psnr.py                        // 310推理时计算最终PSNR值的脚本
         ├── preprocess.py                      // 310推理时为测试图片添加噪声的脚本
 ```
@@ -169,6 +172,18 @@ eval.py 中的主要参数如下:
 --output_path:  日志等文件输出目录
 --outer_path: 输出到 obs 外部的目录（仅在 modelarts 上运行时有效）
 --device_target: 运行设备（默认 "Ascend"）
+
+eval_onnx.py 中的主要参数如下:
+--test_dir: 测试数据集路径（必须以"/"结尾）。
+--sigma: 高斯噪声强度
+--channel: 推理类型（3：彩色图；1：灰度图）
+--onnx_name: 需要使用的brdnet的ONNX模型的路径
+--use_modelarts: 是否使用 modelarts（1 for True, 0 for False; 设置为 1 时将使用 moxing 从 obs 拷贝数据）
+--train_url: （ modelsarts 需要的参数，但因该名称存在歧义而在代码中未使用）
+--data_url: （ modelsarts 需要的参数，但因该名称存在歧义而在代码中未使用）
+--output_path:  日志等文件输出目录
+--outer_path: 输出到 obs 外部的目录（仅在 modelarts 上运行时有效）
+--device_target: 运行设备（默认 "GPU"）
 
 export.py 中的主要参数如下:
 --batch_size: 批次大小
@@ -402,7 +417,7 @@ cal_psnr.py 中的主要参数如下:
   --output_path=./output/ \
   --is_distributed=0 > log.txt 2>&1 &
 
-  #通过 bash 命令启动评估 (对 test_dir 等参数的路径格式无要求，内部会自动转为绝对路径以及以"/"结尾)
+  #通过 bash 命令启动评估
   bash run_eval.sh [train_code_path] [test_dir] [sigma] [channel] [pretrain_path] [ckpt_name]
   ```
 
@@ -488,6 +503,62 @@ cal_psnr.py 中的主要参数如下:
 | 66   | 67      | 24.61875916 | 30.81770706 | 0.84768647  | 0.957114518 |
 | 67   | 68      | 24.61875916 | 32.24455261 | 0.623004258 | 0.97843051  |
 | 68   | Average | 24.61875916 | 34.05390495 | 0.555872787 | 0.935704286 |
+
+- 导出ONNX模型
+
+  ```python
+  假设基于waterloo数据集，图片分辨率为50*50
+  当前目录brdnet，运行：
+  python export.py --image_height=50 --image_width=50 --file_format=ONNX --device_target=GPU --ckpt_file=ckpt模型路径
+  即可得到brdnet.onnx文件
+  ```
+
+- ONNX模型评估
+
+  ```python
+  #通过直接运行brdnet文件夹下的eval_onnx.py脚本进行评估，例子如下：
+  测试用的数据集存放于brdnet文件夹下的waterloo5050step40colorimage文件夹
+  导出的ONNX模型存放于brdnet文件夹下的brdnet.onnx文件
+  测试在GPU和CPU上运行通过，当前目录brdnet，运行：
+  python eval_onnx.py --test_dir=./waterloo5050step40colorimage/ --onnx_name=./brdnet.onnx --device_target=GPU
+
+  !!!注意：其它可修改参数如sigma、channel、output_path等的修改办法
+  1. 可以通过直接修改default_config.yaml中对应参数的值进行修改
+  2. 在运行脚本时在后面加上 --参数名=设置值 进行修改
+  ```
+
+  ```python
+  #通过 bash 命令运行brdnet/scripts/run_eval_onnx_gpu.sh启动评估 (对 test_dir 等参数的路径格式无要求，内部会自动转为绝对路径以及以"/"结尾)
+  bash run_eval_onnx_gpu.sh [ONNX_NAME] [TESTSET_PATH]
+  具体例子
+  测试用的数据集存放于brdnet文件夹下的waterloo5050step40colorimage文件夹
+  导出的ONNX模型存放于brdnet文件夹下的brdnet.onnx文件
+  当前目录brdnet/scripts，运行：
+  bash run_eval_onnx_gpu.sh ../brdnet.onnx ../waterloo5050step40colorimage/
+  运行结果将保存于brdnet/eval/output文件夹下
+
+  !!!注意：使用run_eval_onnx_gpu.sh启动评估将在后台运行，可使用ps -u找到在后台运行评估的进程
+  ```
+
+  ```python
+  评估完成后，您可以在 --output_path 参数指定的目录下找到 加高斯噪声后的图片和经过模型去除高斯噪声后的图片，图片命名方式代表了处理结果。例如 00001_sigma15_psnr24.62.bmp 是加噪声后的图片（加噪声后 psnr=24.62），00001_psnr31.18.bmp 是去噪声后的图片（去噪后 psnr=31.18）。
+  同时，您还可以在 --output_path 参数指定的目录下找到测试结果记录文件，结果记录文件按照日期-时间的方式命名，如2022-07-14_time_16_29_22_rank_0.log，通过 bash 命令运行的结果默认放在brdnet/eval文件夹下。
+  打开log文件即可查看ONNX模型验证的结果，验证结果示例如下：
+  2022-07-14 16:31:52,317:INFO:Start to test on /data1/models/official/cv/brdnet/waterloo5050step40colorimage
+  2022-07-14 16:31:53,317:INFO:Start to test on load test weights from /data1/models/official/cv/brdnet/brdnet.onnx
+  2022-07-14 16:31:54,528:INFO:start testing....
+  2022-07-14 18:42:41,267:INFO:Before denoise: Average PSNR_b = 24.712742, SSIM_b = 0.520469;After denoise: Average PSNR = 36.140112, SSIM = 0.943783
+  2022-07-14 18:42:41,294:INFO:testing finished....
+  2022-07-14 18:42:41,294:INFO:time cost: 7846.765776634216 seconds!
+
+  以下为官网原始权重brdnet_ascend_v170_waterloo_official_cv_PSNR36.14.ckpt的验证结果，可以看到计算结果相同。
+  2022-07-15 11:16:58,964:INFO:Start to test on ./waterloo5050step40colorimage/
+  2022-07-15 11:16:59,089:INFO:load test weights from brdnet_ascend_v170_waterloo_official_cv_PSNR36.14.ckpt
+  2022-07-15 11:17:01,400:INFO:start testing....
+  2022-07-15 14:15:06,262:INFO:Before denoise: Average PSNR_b = 24.712742, SSIM_b = 0.520469;After denoise: Average PSNR = 36.140112, SSIM = 0.943783
+  2022-07-15 14:15:06,262:INFO:testing finished....
+  2022-07-15 14:15:06,262:INFO:time cost: 10684.862426519394 seconds!
+  ```
 
 ### 310推理
 
