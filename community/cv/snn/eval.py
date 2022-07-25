@@ -20,11 +20,11 @@ from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.dataset import create_dataset_cifar10
 
-import mindspore.ops as ops
+import mindspore.nn as nn
 from mindspore import context
+from mindspore.train import Model
+from mindspore.nn.metrics import Accuracy
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-import mindspore as ms
-from mindspore.ops import operations as P
 
 
 def modelarts_process():
@@ -35,16 +35,10 @@ def snn_model_build():
     build snn model for lenet and resnet50
     """
     if config.net_name == "resnet50":
-        if config.mode_name == 'GRAPH':
-            from src.snn_resnet import snn_resnet50_graph as snn_resnet50
-        else:
-            from src.snn_resnet import snn_resnet50_pynative as snn_resnet50
+        from src.snn_resnet import snn_resnet50
         net = snn_resnet50(class_num=config.class_num)
     elif config.net_name == "lenet":
-        if config.mode_name == 'GRAPH':
-            from src.snn_lenet import snn_lenet_graph as snn_lenet
-        else:
-            from src.snn_lenet import snn_lenet_pynative as snn_lenet
+        from src.snn_lenet import snn_lenet
         net = snn_lenet(num_class=config.class_num)
     else:
         raise ValueError(f'config.model: {config.model_name} is not supported')
@@ -57,8 +51,6 @@ def eval_net():
     eval net
     """
     print('eval with config: ', config)
-    correct = 0.0
-    total = 0.0
     if config.mode_name == 'GRAPH':
         context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
     else:
@@ -68,23 +60,12 @@ def eval_net():
     if ds_eval.get_dataset_size() == 0:
         raise ValueError("Please check dataset size > 0 and batch_size <= dataset size")
     network_eval = snn_model_build()
+    net_loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
+    model = Model(network_eval, net_loss, metrics={"Accuracy": Accuracy()})
     param_dict = load_checkpoint(config.ckpt_path)
     load_param_into_net(network_eval, param_dict)
-    network_eval.set_train(False)
-    print("============== Starting Testing ==============", flush=True)
-    for _, data in enumerate(ds_eval.create_dict_iterator()):
-        image = data['image']
-        label = data['label']
-        outspikes = network_eval(image)
-        predicted = ops.Argmax(output_type=ms.int32)(outspikes)
-        total += label.shape[0]
-        cast = P.Cast()
-        correct += cast((predicted == label), ms.float32).sum().asnumpy().item()
-        if config.mode_name == 'PYNATIVE':
-            network_eval.reset_net()
-
-    accuracy = 100 * correct / total
-    print('Accuracy of the network is: %.4f %%' % accuracy, flush=True)
+    acc = model.eval(ds_eval)
+    print("============== {} ==============".format(acc))
 
 if __name__ == "__main__":
     eval_net()

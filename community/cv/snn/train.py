@@ -150,17 +150,11 @@ class AverageMeter:
 def snn_model_build():
     """build snn model for resnet50 and lenet"""
     if config.net_name == "resnet50":
-        if config.mode_name == 'GRAPH':
-            from src.snn_resnet import snn_resnet50_graph as snn_resnet50
-        else:
-            from src.snn_resnet import snn_resnet50_pynative as snn_resnet50
+        from src.snn_resnet import snn_resnet50
         net = snn_resnet50(class_num=config.class_num)
         init_weight(net=net)
     elif config.net_name == "lenet":
-        if config.mode_name == 'GRAPH':
-            from src.snn_lenet import snn_lenet_graph as snn_lenet
-        else:
-            from src.snn_lenet import snn_lenet_pynative as snn_lenet
+        from src.snn_lenet import snn_lenet
         net = snn_lenet(num_class=config.class_num)
     else:
         raise ValueError(f'config.model: {config.model_name} is not supported')
@@ -223,8 +217,6 @@ def train_net():
                 label = onehot(label, config.class_num, Tensor(1.0, ms.float32), Tensor(0.0, ms.float32))
             loss = network_train(images, label)
             loss_meter.update(loss.asnumpy())
-            if config.mode_name == 'PYNATIVE':
-                net.reset_net()
 
             if config.save_checkpoint:
                 cb_params.cur_epoch_num = epoch_idx + 1
