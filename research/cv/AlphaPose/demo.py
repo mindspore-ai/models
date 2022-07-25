@@ -66,15 +66,15 @@ def inference(bboxes):
     '''
     inference
     '''
-    image_width = config.MODEL.IMAGE_SIZE[0]
-    image_height = config.MODEL.IMAGE_SIZE[1]
+    image_width = config.MODEL_IMAGE_SIZE[0]
+    image_height = config.MODEL_IMAGE_SIZE[1]
     aspect_ratio = image_width * 1.0 / image_height
     scales, centers = bbox2sc(bboxes, aspect_ratio)
     model = createModel()
     ckpt_name = config.fast_pose_ckpt
     print('loading model fastpose_ckpt from {}'.format(ckpt_name))
     load_param_into_net(model, load_checkpoint(ckpt_name))
-    image_size = np.array(config.MODEL.IMAGE_SIZE, dtype=np.int32)
+    image_size = np.array(config.MODEL_IMAGE_SIZE, dtype=np.int32)
     data_numpy = cv.imread(config.detect_image, cv.IMREAD_COLOR | cv.IMREAD_IGNORE_ORIENTATION)
 
 
@@ -82,7 +82,7 @@ def inference(bboxes):
 
     inputs = []
     bbox_num = bboxes.shape[0]
-    image_size = np.array(config.MODEL.IMAGE_SIZE, dtype=np.int32)
+    image_size = np.array(config.MODEL_IMAGE_SIZE, dtype=np.int32)
     for i in range(bbox_num):
         s, c = scales[i], centers[i]
         trans = get_affine_transform(c, s, 0, image_size, inv=0)
@@ -91,12 +91,12 @@ def inference(bboxes):
         inputs.append(image_data)
     inputs = np.array(inputs, dtype=np.float32)
     output = model(Tensor(inputs, float32)).asnumpy()
-    if config.TEST.FLIP_TEST:
+    if config.TEST_FLIP_TEST:
         inputs_flipped = Tensor(inputs[:, :, :, ::-1], float32)
         output_flipped = model(inputs_flipped)
         output_flipped = flip_back(output_flipped.asnumpy(), flip_pairs)
 
-        if config.TEST.SHIFT_HEATMAP:
+        if config.TEST_SHIFT_HEATMAP:
             output_flipped[:, :, :, 1:] = \
                 output_flipped.copy()[:, :, :, 0:-1]
 
@@ -127,7 +127,7 @@ def DataWrite(result):
 
 def main():
     context.set_context(mode=context.GRAPH_MODE,
-                        device_target="Ascend", save_graphs=False, device_id=5)
+                        device_target=config.DEVICE_TARGET, save_graphs=False)
     bboxes = detect_bbox()
     pose_preds, pose_scores = inference(bboxes)
 

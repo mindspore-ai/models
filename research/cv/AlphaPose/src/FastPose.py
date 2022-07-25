@@ -15,17 +15,21 @@
 '''
 Alphapose network
 '''
+import os
 import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore import load_checkpoint, load_param_into_net
+
 from src.DUC import DUC
 from src.SE_Resnet import SEResnet
 from src.config import config
 
-if config.MODELARTS.IS_MODEL_ARTS:
-    pretrained = config.MODELARTS.CACHE_INPUT + config.MODEL.PRETRAINED
+
+if config.MODELARTS_IS_MODEL_ARTS:
+    pretrained = os.path.join(config.MODELARTS_CACHE_INPUT, config.MODEL_PRETRAINED)
 else:
-    pretrained = config.TRAIN.CKPT_PATH + config.MODEL.PRETRAINED
+    pretrained = os.path.join(config.MODEL_PRETRAINED)
+
 
 def createModel():
     '''
@@ -49,7 +53,7 @@ class FastPose_SE(nn.Cell):
         self.duc2 = DUC(256, 512, upscale_factor=2)
 
         self.conv_out = nn.Conv2d(
-            self.conv_dim, config.TRAIN.nClasses, kernel_size=3, stride=1, pad_mode='pad', padding=1, has_bias=True)
+            self.conv_dim, config.TRAIN_nClasses, kernel_size=3, stride=1, pad_mode='pad', padding=1, has_bias=True)
     def construct(self, x):
         '''
         construct

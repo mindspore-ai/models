@@ -16,8 +16,8 @@
 
 echo "========================================================================"
 echo "Please run the script as: "
-echo "bash run.sh RANK_TABLE"
-echo "For example: bash run_distribute.sh RANK_TABLE"
+echo "bash run_distribute_train.sh RANK_TABLE"
+echo "For example: bash run_distribute_train.sh RANK_TABLE"
 echo "It is better to use the absolute path."
 echo "========================================================================"
 set -e
@@ -50,6 +50,7 @@ do
     cd src
     mkdir utils
     cd ../../../
+    cp ./default_config.yaml ./distribute_train/device$i
     cp ./train.py ./distribute_train/device$i
     cp ./src/*.py ./distribute_train/device$i/src
     cp ./src/utils/*.py ./distribute_train/device$i/src/utils
@@ -58,7 +59,7 @@ do
     export RANK_ID=$i
     echo "start training for device $i"
     env > env$i.log
-    python train.py --is_model_arts False --run_distribute True > train$i.log 2>&1 &
+    python train.py --DEVICE_TARGET Ascend --MODELARTS_IS_MODEL_ARTS False --RUN_DISTRIBUTE True > train$i.log 2>&1 &
     echo "$i finish"
     cd ../
 done

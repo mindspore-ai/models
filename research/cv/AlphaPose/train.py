@@ -18,24 +18,21 @@ train
 from __future__ import division
 
 import os
-import ast
-import argparse
+
 import numpy as np
 from mindspore import context, Tensor
 from mindspore.context import ParallelMode
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train import Model
-from mindspore.train.callback import TimeMonitor, LossMonitor, ModelCheckpoint, CheckpointConfig
+from mindspore.train.callback import TimeMonitor, LossMonitor, ModelCheckpoint,\
+                                     CheckpointConfig, SummaryCollector
 from mindspore.nn.optim import Adam
 from mindspore.common import set_seed
+
 from src.dataset import CreateDatasetCoco
 from src.config import config
 from src.network_with_loss import JointsMSELoss, PoseResNetWithLoss
 from src.FastPose import createModel
-if config.MODELARTS.IS_MODEL_ARTS:
-    import moxing as mox
-
-set_seed(config.GENERAL.TRAIN_SEED)
 
 
 def get_lr(begin_epoch,
@@ -61,104 +58,102 @@ def get_lr(begin_epoch,
     return learning_rate
 
 
-def parse_args():
-    '''
-    parse_args
-    '''
-    parser = argparse.ArgumentParser(description="Simpleposenet training")
-    parser.add_argument('--data_url', required=False,
-                        default=None, help='Location of data.')
-    parser.add_argument('--train_url', required=False,
-                        default=None, help='Location of training outputs.')
-    parser.add_argument('--device_id', required=False, default=0,
-                        type=int, help='Location of training outputs.')
-    parser.add_argument('--run_distribute', type=ast.literal_eval,
-                        default=False, help='Location of training outputs.')
-    parser.add_argument('--is_model_arts', type=ast.literal_eval,
-                        default=False, help='Location of training outputs.')
-    args = parser.parse_args()
-    return args
-
-
 def main():
-    print("loading parse...")
-    args = parse_args()
-    device_id = args.device_id
-    config.GENERAL.RUN_DISTRIBUTE = args.run_distribute
-    config.MODELARTS.IS_MODEL_ARTS = args.is_model_arts
-    if config.GENERAL.RUN_DISTRIBUTE or config.MODELARTS.IS_MODEL_ARTS:
-        device_id = int(os.getenv('DEVICE_ID'))
     context.set_context(mode=context.GRAPH_MODE,
-                        device_target="Ascend",
-                        save_graphs=False,
-                        device_id=device_id)
-    if config.GENERAL.RUN_DISTRIBUTE:
-        init()
-        rank = int(os.getenv('DEVICE_ID'))
-        device_num = int(os.getenv('RANK_SIZE'))
-        context.set_auto_parallel_context(device_num=device_num,
-                                          parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
+                        device_target=config.DEVICE_TARGET,
+                        save_graphs=False)
+
+    if config.DEVICE_TARGET == "Ascend":
+        device_id = int(os.getenv('DEVICE_ID', '0'))
+        context.set_context(device_id=device_id)
+
+    if config.RUN_DISTRIBUTE:
+        if config.DEVICE_TARGET == 'Ascend':
+            init()
+            rank = get_rank()
+            device_num = get_group_size()
+            context.set_auto_parallel_context(device_num=device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True,
+                                              parameter_broadcast=True)
+        elif config.DEVICE_TARGET == 'GPU':
+            init("nccl")
+            rank = get_rank()
+            device_num = get_group_size()
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(device_num=device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+        else:
+            raise NotImplementedError("Only GPU and Ascend training supported")
     else:
         rank = 0
         device_num = 1
 
-    if config.MODELARTS.IS_MODEL_ARTS:
-        mox.file.copy_parallel(src_url=args.data_url,
-                               dst_url=config.MODELARTS.CACHE_INPUT)
+    if config.MODELARTS_IS_MODEL_ARTS:
+        mox.file.copy_parallel(src_url=config.MODELARTS_DATA_URL,
+                               dst_url=config.MODELARTS_CACHE_INPUT)
 
+    print(f"Running on {config.DEVICE_TARGET}, device num: {device_num}, rank: {rank}")
     dataset = CreateDatasetCoco(rank=rank,
                                 group_size=device_num,
                                 train_mode=True,
-                                num_parallel_workers=config.TRAIN.NUM_PARALLEL_WORKERS,
+                                num_parallel_workers=config.TRAIN_NUM_PARALLEL_WORKERS,
                                 )
     m = createModel()
-    loss = JointsMSELoss(config.LOSS.USE_TARGET_WEIGHT)
+    loss = JointsMSELoss(config.LOSS_USE_TARGET_WEIGHT)
     net_with_loss = PoseResNetWithLoss(m, loss)
     dataset_size = dataset.get_dataset_size()
-    lr = Tensor(get_lr(config.TRAIN.BEGIN_EPOCH,
-                       config.TRAIN.END_EPOCH,
+    print(f"Dataset size = {dataset_size}")
+    lr = Tensor(get_lr(config.TRAIN_BEGIN_EPOCH,
+                       config.TRAIN_END_EPOCH,
                        dataset_size,
-                       lr_init=config.TRAIN.LR,
-                       factor=config.TRAIN.LR_FACTOR,
-                       epoch_number_to_drop=config.TRAIN.LR_STEP))
+                       lr_init=config.TRAIN_LR,
+                       factor=config.TRAIN_LR_FACTOR,
+                       epoch_number_to_drop=config.TRAIN_LR_STEP))
     optim = Adam(m.trainable_params(), learning_rate=lr)
     time_cb = TimeMonitor(data_size=dataset_size)
     loss_cb = LossMonitor()
-    cb = [time_cb, loss_cb]
-    if config.TRAIN.SAVE_CKPT:
+    summary_cb = SummaryCollector(os.path.join(config.SUMMARY_DIR, f'rank_{rank}'))
+    cb = [time_cb, loss_cb, summary_cb]
+    if config.TRAIN_SAVE_CKPT:
         config_ck = CheckpointConfig(
             save_checkpoint_steps=dataset_size, keep_checkpoint_max=2)
         prefix = ''
-        if config.GENERAL.RUN_DISTRIBUTE:
+        if config.RUN_DISTRIBUTE:
             prefix = 'multi_' + 'train_fastpose_' + \
-                config.GENERAL.VERSION + '_' + os.getenv('DEVICE_ID')
+                config.VERSION + '_' + str(rank)
         else:
-            prefix = 'single_' + 'train_fastpose_' + config.GENERAL.VERSION
+            prefix = 'single_' + 'train_fastpose_' + config.VERSION
 
         directory = ''
-        if config.MODELARTS.IS_MODEL_ARTS:
-            directory = config.MODELARTS.CACHE_OUTPUT + \
-                'device_' + os.getenv('DEVICE_ID')
-        elif config.GENERAL.RUN_DISTRIBUTE:
-            directory = config.TRAIN.CKPT_PATH + \
-                'device_' + os.getenv('DEVICE_ID')
+        if config.MODELARTS_IS_MODEL_ARTS:
+            directory = config.MODELARTS_CACHE_OUTPUT + \
+                'device_' + str(rank)
+        elif config.RUN_DISTRIBUTE:
+            directory = config.TRAIN_CKPT_PATH + \
+                'device_' + str(rank)
         else:
-            directory = config.TRAIN.CKPT_PATH + 'device'
+            directory = config.TRAIN_CKPT_PATH + 'device'
 
         ckpoint_cb = ModelCheckpoint(
             prefix=prefix, directory=directory, config=config_ck)
         cb.append(ckpoint_cb)
     model = Model(net_with_loss, optimizer=optim, amp_level="O2")
-    epoch_size = config.TRAIN.END_EPOCH - config.TRAIN.BEGIN_EPOCH
-    print("************ Start training now ************")
-    print('start training, epoch size = %d' % epoch_size)
-    model.train(epoch_size, dataset, callbacks=cb)
+    epoch_size = config.TRAIN_END_EPOCH - config.TRAIN_BEGIN_EPOCH
 
-    if config.MODELARTS.IS_MODEL_ARTS:
+    print("************ Start training now ************")
+    print(f'start training, {epoch_size} epochs, {dataset_size} steps per epoch')
+    model.train(epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
+
+    if config.MODELARTS_IS_MODEL_ARTS:
         mox.file.copy_parallel(
-            src_url=config.MODELARTS.CACHE_OUTPUT, dst_url=args.train_url)
+            src_url=config.MODELARTS_CACHE_OUTPUT, dst_url=config.MODELARTS_TRAIN_URL)
 
 
 if __name__ == '__main__':
+    if config.MODELARTS_IS_MODEL_ARTS:
+        import moxing as mox
+    set_seed(config.TRAIN_SEED)
+
     main()

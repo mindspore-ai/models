@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +13,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 4 ]; then
+
+if [ $# != 5 ]; then
   echo "Usage: 
-        bash run_eval.sh [DEVICE_TARGET] [CONFIG] [CKPT_PATH] [DATASET]
+        bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIBLE_DEVICES(0,1,2,3,4,5,6,7)] [config_file] [dataset_dir] [pretrained_backbone]
        " 
   exit 1
 fi
@@ -30,16 +31,14 @@ get_real_path() {
 
 BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
 
-DEVICE_TARGET=$1
-
-CONFIG=$(get_real_path $2)
+CONFIG=$(get_real_path $3)
 echo "CONFIG: "$CONFIG
 
-CKPT_PATH=$(get_real_path $3)
-echo "CKPT_PATH: "$CKPT_PATH
-
 DATASET=$(get_real_path $4)
-echo "CKPT_PATH: "$DATASET
+echo "DATASET: "$DATASET
+
+BACKBONE=$(get_real_path $5)
+echo "BACKBONE: "$BACKBONE
 
 if [ ! -f $CONFIG ]
 then
@@ -53,22 +52,26 @@ then
 exit 1
 fi
 
-if [ ! -f $CKPT_PATH ]
+if [ ! -f $BACKBONE ]
 then
-    echo "error: CKPT_PATH=$CKPT_PATH is not a file."
+    echo "error: pretrained_backbone=$BACKBONE is not a file."
 exit 1
 fi
 
-if [ -d "$BASE_PATH/../eval" ];
+if [ -d "$BASE_PATH/../train_parallel" ];
 then
-    rm -rf $BASE_PATH/../eval
+    rm -rf $BASE_PATH/../train_parallel
 fi
-mkdir $BASE_PATH/../eval
-cd $BASE_PATH/../eval || exit
+mkdir $BASE_PATH/../train_parallel
+cd $BASE_PATH/../train_parallel || exit
+
+export CUDA_VISIBLE_DEVICES="$2"
 
 export PYTHONPATH=${BASE_PATH}:$PYTHONPATH
 
-echo "start eval"
+echo "start training on multiple GPUs"
 env > env.log
 echo
-python $BASE_PATH/../eval.py --TEST_device_target $DEVICE_TARGET --config_path $CONFIG --checkpoint_path $CKPT_PATH --MODEL_PRETRAINED $CKPT_PATH --DATASET_ROOT $DATASET  &> eval.log &
+mpirun -n $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
+  python -u ${BASE_PATH}/../train.py --DEVICE_TARGET GPU --RUN_DISTRIBUTE True \
+    --config_path $CONFIG --DATASET_ROOT $DATASET --MODEL_PRETRAINED $BACKBONE &> train.log &
