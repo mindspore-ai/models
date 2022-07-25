@@ -37,7 +37,7 @@ class relusigmoid(nn.Cell):
         # must be a tuple
         return (grad_x,)
 
-class IFNode_GRAPH(nn.Cell):
+class IFNode(nn.Cell):
     """
     integrate and fire cell for GRAPH mode, it will output spike value
     """
@@ -48,43 +48,10 @@ class IFNode_GRAPH(nn.Cell):
         self.surrogate_function = surrogate_function
 
     def construct(self, x, v):
-        """ neuronal_charge: v need to do add"""
+        """neuronal_charge: v need to do add"""
         v = v + x
         if self.fire:
             spike = self.surrogate_function(v - self.v_threshold) * self.v_threshold
             v -= spike
             return spike, v
         return v, v
-
-
-class IFNode_PYNATIVE(nn.Cell):
-    """
-    integrate and fire cell for PYNATIVE mode, it will output spike value
-    """
-    def __init__(self, v_threshold=1.0, v_reset=0.0, fire=True, surrogate_function=relusigmoid()):
-        super().__init__()
-        self.v_threshold = v_threshold
-        if v_reset is None:
-            self.v_reset = 0.0
-        else:
-            self.v_reset = v_reset
-        self.v = self.v_reset
-        self.fire = fire
-        self.surrogate_function = surrogate_function
-
-    def construct(self, x):
-        """ neuronal_charge: self.v need to do add"""
-        self.v = self.v + x
-        # neuronal_fire
-        if self.fire:
-            spike = self.surrogate_function(self.v - self.v_threshold) * self.v_threshold
-            self.v -= spike
-            return spike
-        return self.v
-
-    def reset(self):
-        """each batch should reset the accumulated value of the net such as self.v"""
-        if self.v_reset is None:
-            self.v = 0.0
-        else:
-            self.v = self.v_reset
