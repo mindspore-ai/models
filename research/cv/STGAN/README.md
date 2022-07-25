@@ -104,6 +104,8 @@ After installing MindSpore via the official website, you can start training and 
         │   ├──run_standalone_train_gpu.sh      // train in GPU
         │   ├──run_eval_gpu.sh                  //  evaluate in GPU
         │   ├──run_distribute_train_gpu.sh      // distributed train in GPU
+        │   ├──run_infer_onnx.sh                // infer onnx in GPU
+        │   ├──run_infer_310.sh                 // infer in ascend
         ├── src
             ├── dataset
                 ├── datasets.py                 // creating dataset
@@ -120,6 +122,9 @@ After installing MindSpore via the official website, you can start training and 
         ├── train.py               // training script
         ├── eval.py               //  evaluation script
         ├── export.py               //  model-export script
+        ├── infer_stgan_onnx.py   //  onnx model infer script
+        ├── postprocess.py        // post process for 310 inference
+        ├── preprocess.py         // pre process for 310 inference
 ```
 
 ### [Script Parameters](#contents)
@@ -132,6 +137,8 @@ Major parameters in train.py and utils/args.py as follows:
 --batch_size: Training batch size.
 --image_size: Image size used as input to the model.
 --device_target: Device where the code will be implemented. Optional value is "Ascend" or "GPU".
+--onnx_path: Path of onnx file.
+--onnx_output: Path of onnx infer output.
 ```
 
 ### [Training Process](#contents)
@@ -202,7 +209,10 @@ Before running the command below, please check the checkpoint path used for eval
 python export.py --ckpt_path [CHECKPOINT_PATH] --platform [PLATFORM] --file_format[EXPORT_FORMAT]
 ```
 
-If you want to infer the network on Ascend 310, `EXPORT_FORMAT` should be "MINDIR"
+- The ckpt_path parameter is required.
+- `PLATFORM` should be in ["Ascend", "GPU", "CPU"]
+- `EXPORT_FORMAT` should be in ["AIR", "ONNX", "MINDIR"].
+- If you want to infer the network on Ascend 310, `EXPORT_FORMAT` should be "MINDIR"
 
 ## Inference Process
 
@@ -231,6 +241,23 @@ bash run_infer_310.sh [GEN_MINDIR_PATH] [DATA_PATH][NEED_PREPROCESS] [DEVICE_ID]
 - `NEED_PREPROCESS`  means weather need preprocess or not, it's value is 'y' or 'n'. This step will process the image and label into .bin file and put them in the `process_Data` folder.
 - `DEVICE_ID` is optional, it can be set by environment variable device_id, otherwise the value is zero.
 
+### ONNX Infer
+
+Before inferring, the onnx file should be exported by the `export.py` script
+
+```shell
+# ONNX inference
+python infer_stgan_onnx.py --dataroot ./dataset --onnx_path ./STGAN_model.onnx --experiment_name 128 --platform GPU
+# or run the script
+bash ./scripts/run_infer_onnx.sh [DATA_PATH] [EXPERIMENT_NAME] [DEVICE_ID] [ONNX_PATH]
+eg: bash ./scripts/run_infer_onnx.sh  ./dataset 128 0 ./STGAN_model.onnx
+```
+
+- `DATA_PATH` path of dataset
+- `EXPERIMENT_NAME` default:128
+- `DEVICE_ID` default:0
+- `ONNX_PATH` onnx file path
+
 ### Result
 
 Inference result is saved in `result_Files/` in current path, Inference time result is saved in `time_Result/`. The edited picture is saved as xxx.jpg format, such as `183800.jpg`.
@@ -239,6 +266,11 @@ Inference result is saved in `result_Files/` in current path, Inference time res
 # time result
 NN inference cost average time: 9.98606 ms of infer_count 10
 ```
+
+- ONNX result
+
+Onnx infer outputs are saved in  `infer_onnx_outputs/`
+Onnx infer results is saved in `infer_onnx_log.log`
 
 ## Model Description
 
