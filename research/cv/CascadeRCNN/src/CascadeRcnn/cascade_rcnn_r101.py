@@ -269,8 +269,9 @@ class Cascade_Rcnn_Resnet101(nn.Cell):
         else:
             proposal, proposal_mask = self.proposal_generator_test(cls_score, bbox_pred, self.anchor_list)
 
-        gt_labels = self.cast(gt_labels, mstype.int32)
-        gt_valids = self.cast(gt_valids, mstype.int32)
+        if self.training:
+            gt_labels = self.cast(gt_labels, mstype.int32)
+            gt_valids = self.cast(gt_valids, mstype.int32)
 
         roi_feats, bbox_targets, rcnn_labels, rcnn_mask_squeeze, rois, _ = self.rcnn_stage1(x, gt_bboxes,
                                                                                             gt_labels, gt_valids,

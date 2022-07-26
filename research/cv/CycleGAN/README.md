@@ -46,11 +46,6 @@ Download CycleGAN datasets and create your own datasets. We provide data/downloa
     - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
-## [Dependences](#contents)
-
-- Python==3.7.5
-- Mindspore==1.2.0
-
 # [Script Description](#contents)
 
 ## [Script and Sample Code](#contents)
