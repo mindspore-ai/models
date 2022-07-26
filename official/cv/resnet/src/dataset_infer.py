@@ -89,7 +89,8 @@ class ImgDataset:
         return len(self.data)
 
 
-def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32, target="Ascend", distribute=False):
+def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32, image_size=224,
+                   target="Ascend", distribute=False):
     """
     create a train or eval imagenet2012 dataset for resnet50
 
@@ -123,7 +124,6 @@ def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32, target="
                                        num_parallel_workers=8, shuffle=True,
                                        num_shards=device_num, shard_id=rank_id)
 
-    image_size = 224
     mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
     std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
 
@@ -163,7 +163,8 @@ def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32, target="
     return data_set
 
 
-def create_dataset2(dataset_path, do_train, repeat_num=1, batch_size=32, target="Ascend", distribute=False):
+def create_dataset2(dataset_path, do_train, repeat_num=1, batch_size=32, image_size=224,
+                    target="Ascend", distribute=False):
     """
     create a train or eval imagenet2012 dataset for resnet101
     Args:
@@ -195,7 +196,6 @@ def create_dataset2(dataset_path, do_train, repeat_num=1, batch_size=32, target=
         data_set = ds.GeneratorDataset(source=dataset_generator, column_names=["label", "image", "filename"],
                                        num_parallel_workers=8, shuffle=True,
                                        num_shards=device_num, shard_id=rank_id)
-    image_size = 224
     mean = [0.475 * 255, 0.451 * 255, 0.392 * 255]
     std = [0.275 * 255, 0.267 * 255, 0.278 * 255]
 
@@ -232,7 +232,8 @@ def create_dataset2(dataset_path, do_train, repeat_num=1, batch_size=32, target=
     return data_set
 
 
-def create_dataset3(dataset_path, do_train, repeat_num=1, batch_size=32, target="Ascend", distribute=False):
+def create_dataset3(dataset_path, do_train, repeat_num=1, batch_size=32, image_size=224,
+                    target="Ascend", distribute=False):
     """
     create a train or eval imagenet2012 dataset for se-resnet50
 
@@ -264,7 +265,6 @@ def create_dataset3(dataset_path, do_train, repeat_num=1, batch_size=32, target=
         data_set = ds.GeneratorDataset(source=dataset_generator, column_names=["label", "image", "filename"],
                                        num_parallel_workers=8, shuffle=True,
                                        num_shards=device_num, shard_id=rank_id)
-    image_size = 224
     mean = [123.68, 116.78, 103.94]
     std = [1.0, 1.0, 1.0]
 
