@@ -260,12 +260,11 @@ def run_train():
     network_1 = DistributedHelper(_backbone, margin_fc_1)
     config.logger.info('DistributedHelper----out----')
     config.logger.info('network fp16----in----')
-    if config.fp16 == 1:
-        network_1.add_flags_recursive(fp16=True)
+    network_1.add_flags_recursive(fp16=True)
     config.logger.info('network fp16----out----')
 
     criterion_1 = get_loss(config)
-    if config.fp16 == 1 and config.model_parallel == 0:
+    if config.model_parallel == 0:
         criterion_1.add_flags_recursive(fp32=True)
 
     network_1 = load_pretrain(config, network_1)

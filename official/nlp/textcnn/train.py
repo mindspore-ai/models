@@ -30,7 +30,7 @@ from model_utils.moxing_adapter import moxing_wrapper
 from model_utils.device_adapter import get_device_id, get_rank_id
 from model_utils.config import config
 from src.textcnn import TextCNN
-from src.textcnn import SoftmaxCrossEntropyExpand
+from src.textcnn import SoftmaxCrossEntropyExpand, EvalCallback
 from src.dataset import MovieReview, SST2, Subjectivity
 
 set_seed(1)
@@ -55,7 +55,10 @@ def train_net():
         instance = SST2(root_dir=config.data_path, maxlen=config.word_len, split=0.9)
 
     dataset = instance.create_train_dataset(batch_size=config.batch_size, epoch_size=config.epoch_size)
+    eval_dataset = instance.create_test_dataset(batch_size=config.batch_size)
     batch_num = dataset.get_dataset_size()
+    if config.sink_size == -1:
+        config.sink_size = batch_num
 
     base_lr = float(config.base_lr)
     learning_rate = []
@@ -79,13 +82,19 @@ def train_net():
 
     model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc': Accuracy()})
 
-    config_ck = CheckpointConfig(save_checkpoint_steps=int(config.epoch_size * batch_num / 2),
+    config_ck = CheckpointConfig(save_checkpoint_steps=config.sink_size,
                                  keep_checkpoint_max=config.keep_checkpoint_max)
     time_cb = TimeMonitor(data_size=batch_num)
     ckpt_save_dir = os.path.join(config.output_path, config.checkpoint_path)
     ckpoint_cb = ModelCheckpoint(prefix="train_textcnn", directory=ckpt_save_dir, config=config_ck)
     loss_cb = LossMonitor()
-    model.train(config.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb])
+    eval_callback = EvalCallback(model, eval_dataset, save_path=ckpt_save_dir)
+    if config.device_target == "CPU":
+        model.train(config.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb])
+    else:
+        epoch_count = config.epoch_size * batch_num // config.sink_size
+        model.train(epoch_count, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb, eval_callback],
+                    sink_size=config.sink_size)
     print("train success")
 
 
