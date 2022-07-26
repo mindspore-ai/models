@@ -289,19 +289,19 @@ acc: 0.8180614591317679
 
 ##### tnews上的HyperText
 
-| 参数                 | Ascend 910                                                   | GPU |
-| -------------------| --------------------------------------  | -------------------------------------- |
-| 模型版本              | HyperText                                               | HyperText |
-| 资源                    |  Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 |   GPU(Tesla V100 SXM2)；CPU：2.1GHz，24核；内存：128G |
-| 上传日期              | 2021-11-18  ;                                           | 2021-11-18 |
-| MindSpore版本    | 1.3.0                                                        | 1.5.0 |
-| 数据集                 | tnews                                                       | tnews           |
-| 训练参数              |  epoch=2, batch_size = 32                        |   epoch=2, batch_size = 32  |
-| 优化器                  | radam                                                     |  radam|
-| 损失函数              | SoftmaxCrossEntropyWithLogits               | SoftmaxCrossEntropyWithLogits |
-| 输出                    | 精度                                                          |  精度 |
-| 损失                      | 0.9087                                                    |  0.905 |
-| 速度                      | 1958.810毫秒/步（单卡）                          | 315.949毫秒/步（单卡） |
+| 参数                 | Ascend 910                                                  | GPU                                         |
+| -------------------| --------------------------------------  |---------------------------------------------|
+| 模型版本              | HyperText                                               | HyperText                                   |
+| 资源                    |  Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 | GPU(Tesla V100 SXM2)；CPU：2.1GHz，24核；内存：128G |
+| 上传日期              | 2021-11-18  ;                                           | 2021-11-18                                  |
+| MindSpore版本    | 1.3.0                                                       | 1.5.0                                       |
+| 数据集                 | tnews                                                      | tnews                                       |
+| 训练参数              |  epoch=2, batch_size = 32                        | epoch=2, batch_size = 32                    |
+| 优化器                  | radam                                                    | radam                                       |
+| 损失函数              | SoftmaxCrossEntropyWithLogits               | SoftmaxCrossEntropyWithLogits               |
+| 输出                    | 精度                                                         | 精度                                          |
+| 损失                      | 0.818                                                    | 0.818                                       |
+| 速度                      | 1958.810毫秒/步（单卡）                          | 315.949毫秒/步（单卡）                             |
 
 ##### iflytek上的HyperText
 
