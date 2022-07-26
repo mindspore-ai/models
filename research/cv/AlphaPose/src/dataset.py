@@ -304,13 +304,19 @@ class CocoDatasetGenerator:
 def CreateDatasetCoco(rank=0,
                       group_size=1,
                       train_mode=True,
+                      onnx_eval_mode=False,
                       num_parallel_workers=8,
                       transform=None,
                       shuffle=None):
     '''
     CreateDatasetCoco
     '''
-    per_batch_size = config.TRAIN_BATCH_SIZE if train_mode else config.TEST_BATCH_SIZE
+    if train_mode:
+        per_batch_size = config.TRAIN_BATCH_SIZE
+    elif onnx_eval_mode:
+        per_batch_size = config.ONNX_TEST_BATCH_SIZE
+    else:
+        per_batch_size = config.TEST_BATCH_SIZE
 
     image_path = ''
     ann_file = ''

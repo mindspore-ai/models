@@ -2,3 +2,4 @@ opencv-python
 pycocotools
 easydict
 PyYAML
+onnxruntime-gpu

@@ -93,6 +93,12 @@ fast_pose_ckpt: "FastPose.ckpt"
 # eval
 checkpoint_path: ''
 
+#onnx_eval
+ONNX_device_target: "GPU"
+ONNX_device_id: 0
+ONNX_TEST_BATCH_SIZE: 1
+ONNX_CKPT_PATH: ''
+
 # confidence under ignore_threshold means no object when training
 yolo_threshold: 0.1
 save_bbox_image: True

@@ -55,7 +55,7 @@ AlphaPose的总体网络架构如下：
 
 ## 混合精度
 
-采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
+采用[混合精度](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
 以FP16算子为例，如果输入数据类型为FP32，MindSpore后台会自动降低精度来处理数据。用户可打开INFO日志，搜索“reduce precision”查看精度降低的算子。
 
 # 环境要求
@@ -108,6 +108,7 @@ AlphaPose的总体网络架构如下：
     ├── run_distribute_train.sh            # 启动Ascend分布式训练（8卡）
     ├── run_demo.sh                        # 启动demo（单卡）
     ├── run_eval.sh                        # 启动Ascend评估
+    ├── run_eval_onnx.sh                   # 启动onnx模型评估
     └── run_standalone_train.sh            # 启动Ascend单机训练（单卡）
   ├── src
     ├── utils
@@ -128,6 +129,7 @@ AlphaPose的总体网络架构如下：
   ├── export.py                            # 将ckpt模型文件转为mindir
   ├── postprocess.py                       # 后处理求精度
   ├── eval.py                              # 评估网络
+  ├── eval_onnx.py                         # onnx模型评估
   └── train.py                             # 训练网络
 ```
 
@@ -246,13 +248,42 @@ epoch:270 step:292, loss is 0.0002532
 bash scripts/run_eval.sh checkpoint_path device_id
 ```
 
-### 结果
+#### 结果
 
 使用COCO2017数据集文件夹中val2017进行评估Alphapose,如下所示：
 
 ```text
 coco eval results saved to /cache/train_output/multi_train_poseresnet_v5_2-140_2340/keypoints_results.pkl
 AP: 0.723
+```
+
+### onnx评估
+
+#### 导出onnx格式
+
+```bash
+# 导出onnx
+python export.py [ckpt_url] [device_target] [device_id] [file_name] [file_format]
+# 例如
+python export.py --ckpt_url path/to/ckpt --device_target CPU --file_name exported --file_format ONNX
+```
+
+#### GPU环境运行，需要预训练的ckpt文件
+
+```bash
+# onnx评估
+bash scripts/run_eval_onnx.sh [device_target] [onnx_path] [ckpt_path] [dataset_path]
+# 例如
+bash scripts/run_eval_onnx.sh GPU exported.onnx alphapose.ckpt dataset
+```
+
+#### 结果
+
+使用COCO2017数据集文件夹中val2017进行评估Alphapose,如下所示：
+
+```text
+coco eval results saved to results/exported/keypoints_results.pkl
+AP: 0.7186055356224863
 ```
 
 ## 310推理过程

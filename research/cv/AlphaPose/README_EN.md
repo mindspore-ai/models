@@ -126,6 +126,7 @@ bash scripts/run_eval.sh [DEVICE_TARGET] [CONFIG] [CKPT_PATH] [DATASET]
     ├── run_distribute_train_gpu.sh        # Start GPU distributed training (8 cards)
     ├── run_demo.sh                        # Start the demo (single card)
     ├── run_eval.sh                        # Start Ascend eval
+    ├── run_eval_onnx.sh                   # Start onnx eval
     ├── run_standalone_train.sh            # Start Ascend stand-alone training (single card)
     └── run_standalone_train_gpu.sh        # Start GPU stand-alone training (single card)
   ├── src
@@ -149,6 +150,7 @@ bash scripts/run_eval.sh [DEVICE_TARGET] [CONFIG] [CKPT_PATH] [DATASET]
   ├── export.py                            # Convert ckpt model file to mindir
   ├── postprocess.py                       # Post-processing precision
   ├── eval.py                              # Evaluate the network
+  ├── eval_onnx.py                         # onnx evaluate
   └── train.py                             # train the network
 ```
 
@@ -287,13 +289,42 @@ bash scripts/run_eval.sh [DEVICE_TARGET] [CONFIG] [CKPT_PATH] [DATASET]
 bash scripts/run_eval.sh [DEVICE_TARGET] [CONFIG] [CKPT_PATH] [DATASET]
 ```
 
-### result
+#### result
 
 Alphapose is evaluated using val2017 in the COCO2017 dataset folder as follows:
 
 ```text
 coco eval results saved to /cache/train_output/multi_train_poseresnet_v5_2-140_2340/keypoints_results.pkl
 AP: 0.723
+```
+
+### onnx evaluate
+
+#### export to onnx
+
+```bash
+# export to onnx
+python export.py [ckpt_url] [device_target] [device_id] [file_name] [file_format]
+# for example
+python export.py --ckpt_url path/to/ckpt --device_target CPU --file_name exported --file_format ONNX
+```
+
+#### running on GPU and pretrained ckpt is needed
+
+```bash
+# onnx evaluate
+bash scripts/run_eval_onnx.sh [device_target] [onnx_path] [ckpt_path] [dataset_path]
+# for example
+bash scripts/run_eval_onnx.sh GPU exported.onnx alphapose.ckpt dataset
+```
+
+#### result
+
+Alphapose is evaluated using val2017 in the COCO2017 dataset folder as follows:
+
+```text
+coco eval results saved to results/exported/keypoints_results.pkl
+AP: 0.7186055356224863
 ```
 
 ## 310 Inference Process
