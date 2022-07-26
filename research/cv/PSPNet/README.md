@@ -39,6 +39,37 @@ The pyramid pooling module fuses features under four different pyramid scales.Fo
  - It contains 11,357 finely annotated images split into training and testing sets with 8,498 and 2,857 images respectively.
 - [ADE20K Dataset Website](http://groups.csail.mit.edu/vision/datasets/ADE20K/)
  - It contains 22,210 finely annotated images split into training and testing sets with 20,210 and 2,000 images respectively.
+ - The ADE20k directory structure is as follows:
+
+     ```text
+         ├── ADE
+             ├── annotations
+                 ├─ training
+                 │   ├─ADE_train_***.png
+                 │   ├─ ...
+                 │   └─ADE_train_***.png
+                 └─ validation
+                     ├─ADE_val_***.png
+                     ├─ ...
+                     └─ADE_val_***.png
+             ├── images
+                 ├─ training
+                 │   ├─ADE_train_***.jpg
+                 │   ├─ ...
+                 │   └─ADE_train_***.jpg
+                 └─ validation
+                     ├─ADE_val_***.jpg
+                     ├─ ...
+                     └─ADE_val_***.jpg
+     ```
+
+ - After download dataset, you can run create_data_txt.py to generate train_list.txt and val_list.txt for ADE20K as follows:
+
+ ```bash
+  python create_data_txt.py --data_root [DATA_ROOT] --image_prefix [IMAGE_PREFIX] --mask_prefix [MASK_PREFIX] --output_txt [OUTPUT_TXT]
+  example:
+  python create_data_txt.py --data_root /root/ADE/ --image_prefix images/training --mask_prefix annotations/training --output_txt training_list.txt
+ ```
 
 Datasets: attributes (names and colors) are needed, and please download as follows:
 
@@ -76,6 +107,7 @@ Datasets: attributes (names and colors) are needed, and please download as follo
 ├── src                                        # PSPNet
 │   ├── dataset                          # data processing
 │   │   ├── dataset.py
+│   │   ├── create_data_txt.py           # generate train_list.txt and val_list.txt
 │   │   └── transform.py
 │   ├── model                            # models for training and test
 │   │   ├── PSPNet.py
