@@ -17,8 +17,6 @@ import os
 import numpy as np
 from src.model_utils.config import config
 
-batch_size = 1
-
 
 def calcul_acc(labels, preds):
     return sum(1 for x, y in zip(labels, preds) if x == y) / len(labels)

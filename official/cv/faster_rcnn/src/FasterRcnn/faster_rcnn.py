@@ -276,13 +276,13 @@ class Faster_Rcnn(nn.Cell):
         else:
             proposal, proposal_mask = self.proposal_generator_test(cls_score, bbox_pred, self.anchor_list)
 
-        gt_labels = self.cast(gt_labels, ms.int32)
-        gt_valids = self.cast(gt_valids, ms.int32)
         bboxes_tuple = ()
         deltas_tuple = ()
         labels_tuple = ()
         mask_tuple = ()
         if self.training:
+            gt_labels = self.cast(gt_labels, ms.int32)
+            gt_valids = self.cast(gt_valids, ms.int32)
             for i in range(self.train_batch_size):
                 gt_bboxes_i = self.squeeze(gt_bboxes[i:i + 1:1, ::])
 
