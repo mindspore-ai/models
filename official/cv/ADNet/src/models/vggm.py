@@ -58,7 +58,7 @@ class VGGM(nn.Cell):
             nn.MaxPool2d((3, 3), (2, 2), 'valid')
         ])
         self.classifier = nn.SequentialCell([
-            nn.Dense(18432, 4096),
+            nn.Dense(18432, 4096),  # 18432 = 4 * 3 * 3 * 512
             nn.ReLU(),
             nn.Dropout(0.5),
             nn.Dense(4096, 4096),

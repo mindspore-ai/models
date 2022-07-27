@@ -413,7 +413,7 @@ eval average dice is 0.9502010010453671
 
 ### [Performance](#contents)
 
-#### Evaluation Performance
+#### Training Performance
 
 | Parameters          | Ascend                                                    |     GPU                                              |
 | ------------------- | --------------------------------------------------------- | ---------------------------------------------------- |

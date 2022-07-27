@@ -39,7 +39,7 @@ class SoftmaxCrossEntropyLoss(nn.Cell):
     def construct(self, logits, labels):
         labels_int = self.cast(labels, mstype.int32)
         labels_int = self.reshape(labels_int, (-1,))
-        logits_ = self.transpose(logits, (0, 2, 3, 1))
+        logits_ = self.transpose(logits, (0, 2, 3, 1))  # NCHW->NHWC
         logits_ = self.reshape(logits_, (-1, self.num_cls))
         weights = self.not_equal(labels_int, self.ignore_label)
         weights = self.cast(weights, mstype.float32)
