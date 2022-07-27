@@ -32,7 +32,6 @@ lr_end: 0.01
 lr_max: 0.1
 lr_adjust_epoch: 6
 warmup_epochs: 1
-global_step: 0
 
 # MindSpore LSTM Example - train.py
 preprocess: 'false'

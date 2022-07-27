@@ -26,7 +26,6 @@ max_boxes: 100
 all_reduce_fusion_config: [29, 58, 89]
 
 # learning rate settings
-global_step: 0
 lr_init: 0.01333
 lr_end_rate: 0.0
 warmup_epochs: 2

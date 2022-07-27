@@ -35,7 +35,6 @@ device_num: 1
 
 # learning rate settings
 lr: 0.1
-global_step: 0
 lr_init: 1e-6
 lr_end_rate: 5e-3
 warmup_epochs1: 2

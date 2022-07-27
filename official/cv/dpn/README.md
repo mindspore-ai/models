@@ -167,7 +167,6 @@ config.group_size =  1                      # group size of distributed
 
 # training config
 config.batch_size =  32                     # batch_size=32 on Ascend; batch_size=16 on GPU
-config.global_step =  0                     # start step of learning rate
 config.epoch_size = 180                     # epoch_size
 config.loss_scale_num =  1024               # loss scale
 # optimizer config
