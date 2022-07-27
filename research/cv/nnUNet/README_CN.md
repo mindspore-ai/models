@@ -53,7 +53,7 @@ nnUNet能够根据任务不同来选择2D或是3D的Unet，Unet由编码器和�
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 # 快速入门
 

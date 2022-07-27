@@ -93,7 +93,7 @@ Cityscapes
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below:
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 # Quick Start
 

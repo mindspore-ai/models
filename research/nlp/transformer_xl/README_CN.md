@@ -101,7 +101,7 @@ text8同样包含了100MB的Wikipedia文本，区别在于在enwik8数据集的�
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 ## 快速入门
 

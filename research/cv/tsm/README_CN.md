@@ -70,7 +70,7 @@ TSM应用了一种通用而有效的时间转移模块。  时间转移模块将
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 # 快速入门
 

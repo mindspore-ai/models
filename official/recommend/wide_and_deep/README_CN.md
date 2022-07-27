@@ -57,7 +57,7 @@ Wide&Deep模型训练了宽线性模型和深度学习神经网络，结合了�
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 # 快速入门
 

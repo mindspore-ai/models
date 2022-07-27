@@ -53,7 +53,7 @@ Dataset used: [The LJ Speech Dataset](<https://keithito.com/LJ-Speech-Dataset>)
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
     - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.8/index.html)
 
 # [Script Description](#contents)
 

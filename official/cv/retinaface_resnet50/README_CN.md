@@ -68,7 +68,7 @@ RetinaFace使用ResNet50骨干提取图像特征进行检测。从ModelZoo获取
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 # 快速入门
 

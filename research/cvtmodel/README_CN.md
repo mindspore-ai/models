@@ -32,5 +32,5 @@ Mindconverter转换出ckpt文件后，再使用export.py脚本导出MINDIR文件
 - [MindInsight] (https://www.mindspore.cn/mindinsight/docs/zh-CN/r1.8/mindinsight_install.html)
 - 如需查看详情，请参见如下资源：
 - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-- [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+- [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 - [MindConverter教程] (https://www.mindspore.cn/mindinsight/docs/zh-CN/r1.8/migrate_3rd_scripts_mindconverter.html)

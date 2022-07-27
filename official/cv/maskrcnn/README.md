@@ -69,7 +69,7 @@ Note that you can run the scripts based on the dataset mentioned in original pap
     - [Ascend Hub](https://ascend.huawei.com/ascendhub/#/home)
 - For more information, please check the resources below:
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.8/index.html)
 
 - third-party libraries
 

@@ -83,8 +83,8 @@ allowing larger batches for training on specific hardware.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the links below:
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.3/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.3/index.html)
+    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 # Quick Start
 

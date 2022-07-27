@@ -65,8 +65,8 @@ Adopt [mixed precision](https://www.mindspore.cn/docs/programming_guide/zh-CN/r1
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For details, please refer to the following resources:
-    - [MindSpore version](https://www.mindspore.cn/tutorials/zh-CN/r1.3/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.3/index.html)
+    - [MindSpore version](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 # Quick start
 

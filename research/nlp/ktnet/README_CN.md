@@ -158,7 +158,7 @@ mv wn_concept2vec.txt nell_concept2vec.txt data/KB_embeddings
 
 - 更多关于Mindspore的信息，请查看以下资源：
   - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-  - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 ## 脚本说明
 

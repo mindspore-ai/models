@@ -55,7 +55,7 @@ architecture. In the following sections, we will introduce how to run the script
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.8/index.html)
 
 ## [Quick Start](#content)
 

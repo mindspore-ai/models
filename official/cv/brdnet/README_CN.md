@@ -55,7 +55,7 @@ BRDNet 包含上下两个分支。上分支仅仅包含残差学习与 BRN；下
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/api_python/mindspore.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/api_python/mindspore.html)
 
 ## 快速入门
 

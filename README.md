@@ -75,7 +75,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Computer Vision (CV) | Text Detection  | [PSENet](https://gitee.com/mindspore/models/tree/r1.8/official/cv/psenet)   |  ✅ |    |   |
 | Computer Vision (CV) | Text Recognition  | [CNN+CTC](https://gitee.com/mindspore/models/tree/r1.8/official/cv/cnnctc)                |  ✅ |    |   |
 | Computer Vision (CV) | Semantic Segmentation  | [DeepLabV3](https://gitee.com/mindspore/models/tree/r1.8/official/cv/deeplabv3)     |  ✅ |    | ✅ |
-| Computer Vision (CV) | Semantic Segmentation  | [DeepLabV3+](https://gitee.com/mindspore/models/tree/r1.8/official/cv/deeplabv3plus)     |  ✅ |    |   |
+| Computer Vision (CV) | Semantic Segmentation  | [DeepLabV3+](https://gitee.com/mindspore/models/tree/r1.8/research/cv/deeplabv3plus)     |  ✅ |    |   |
 | Computer Vision (CV) | Semantic Segmentation  | [U-Net2D (Medical)](https://gitee.com/mindspore/models/tree/r1.8/official/cv/unet)                |  ✅ |    |   |
 | Computer Vision (CV) | Semantic Segmentation  | [U-Net3D (Medical)](https://gitee.com/mindspore/models/tree/r1.8/official/cv/unet3d)                |  ✅ |    |   |
 | Computer Vision (CV) | Semantic Segmentation  | [U-Net++](https://gitee.com/mindspore/models/tree/r1.8/official/cv/unet)                |  ✅ |    |   |
