@@ -14,11 +14,40 @@
 # ============================================================================
 """TextCNN"""
 
+import os
+
 import mindspore.ops as ops
 import mindspore.nn as nn
 from mindspore import Tensor
 from mindspore.nn.cell import Cell
 import mindspore
+from mindspore.train.callback import Callback
+
+
+class EvalCallback(Callback):
+    """
+    Evaluation per epoch, and save the best accuracy checkpoint.
+    """
+    def __init__(self, model, eval_ds, begin_eval_epoch=1, save_path="./"):
+        self.model = model
+        self.eval_ds = eval_ds
+        self.begin_eval_epoch = begin_eval_epoch
+        self.best_acc = 0
+        self.save_path = save_path
+
+    def epoch_end(self, run_context):
+        """
+        evaluate at epoch end.
+        """
+        cb_params = run_context.original_args()
+        cur_epoch = cb_params.cur_epoch_num
+        if cur_epoch >= self.begin_eval_epoch:
+            res = self.model.eval(self.eval_ds)
+            acc = res["acc"]
+            if acc > self.best_acc:
+                self.best_acc = acc
+                mindspore.save_checkpoint(cb_params.train_network, os.path.join(self.save_path, "best_acc.ckpt"))
+                print("the best epoch is", cur_epoch, "best acc is", self.best_acc)
 
 
 class SoftmaxCrossEntropyExpand(Cell):

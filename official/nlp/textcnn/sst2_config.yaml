@@ -18,8 +18,9 @@ pre_trained: False
 num_classes: 2
 batch_size: 64
 epoch_size: 4
+sink_size: 200
 weight_decay: 3e-5
-keep_checkpoint_max: 1
+keep_checkpoint_max: 10
 checkpoint_path: "./checkpoint/"
 checkpoint_file_path: "train_textcnn-4_149.ckpt"
 word_len: 51
