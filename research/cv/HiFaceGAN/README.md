@@ -107,7 +107,7 @@ FLICKR
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the following resources:
     - [MindSpore Tutorial](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
 # [Script Description](#table-of-contents)
 

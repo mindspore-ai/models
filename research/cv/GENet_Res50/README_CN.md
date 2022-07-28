@@ -79,7 +79,7 @@ Imagenet 2017和Imagenet 2012 数据集一致
 
   - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
 
-  - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 ## 脚本说明
 

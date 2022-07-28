@@ -36,7 +36,7 @@
     - [Mindspore](https://www.mindspore.cn/ "Mindspore")
 - 如需查看详情，请参考如下资源
     - [Mindspore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [Mindspore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [Mindspore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 ## 快速开始
 
@@ -148,7 +148,7 @@ python wukong_download.py --csv_dir /path/to/data_root/wukong_release/ --img_dir
 
 ### 生成MindRecord
 
-为了便于在mindspore中使用，我们将数据集的格式转化为[MindRecord](https://www.mindspore.cn/docs/api/zh-CN/r1.6/api_python/mindspore.mindrecord.html#module-mindspore.mindrecord)格式通过运行：
+为了便于在mindspore中使用，我们将数据集的格式转化为[MindRecord](https://www.mindspore.cn/docs/zh-CN/master/api_python/mindspore.mindrecord.html#module-mindspore.mindrecord)格式通过运行：
 
 ```shell
 cd models/research/mm/wukong/

@@ -69,7 +69,7 @@ MSCOCO2017
     - [MindSpore](https://www.mindspore.cn/install)
 - 想要获取更多信息，请检查以下资源：
     - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 ## [脚本说明](#content)
 

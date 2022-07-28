@@ -72,7 +72,7 @@ To run the python scripts in the repository, you need to prepare the environment
     - pycocotools 2.0
 - For more information, please check the resources below：
     - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
 # [Quick Start](#contents)
 

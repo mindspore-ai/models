@@ -71,7 +71,7 @@ This dataset contains 32,668 annotated bounding boxes of 1,501 identities. If th
 For details, please refer to the following resources:
 
 - [MindSpore](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-- [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+- [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 # [Quick start](#contents)
 

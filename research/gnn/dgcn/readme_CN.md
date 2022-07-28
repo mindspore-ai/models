@@ -53,7 +53,7 @@
 - 安装相关依赖 pip install -r requirements.txt
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 - 下载数据集Cora，Citeseer和Pubmed，[可点此下载](https://github.com/kimiyoung/planetoid/tree/master/data)
 - 将数据集放到代码目录下，文件夹应该包含如下文件（以Cora数据集为例）：
 

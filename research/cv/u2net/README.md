@@ -47,7 +47,7 @@ To train U<sup>2</sup>-Net, We use the dataset [DUTS-TR](http://saliencydetectio
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below£º
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
 # [Script Description](#contents)
 

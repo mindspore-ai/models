@@ -55,7 +55,7 @@ Test dataset: CBSD68, Kodak24, and McMaster
     - [MindSpore](https://www.mindspore.cn/install)
 - For details, please refer to the following resources:
     - [MindSpore](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/api_python/mindspore.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/api_python/mindspore.html)
 
 ## Quick start
 

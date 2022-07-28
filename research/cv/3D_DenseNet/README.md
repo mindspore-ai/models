@@ -119,7 +119,7 @@ After Download the Dataset you will get two zip files, iSeg-2017-Training.zip an
 
   -[MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
 
-  -[MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+  -[MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
 ### Python Package
 

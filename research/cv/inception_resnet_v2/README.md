@@ -56,7 +56,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
     - [MindSpore](https://www.mindspore.cn/install)
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 # [Script description](#contents)
 

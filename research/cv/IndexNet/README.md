@@ -125,7 +125,7 @@ Processed dataset will have the following structure:
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
 Note: We use MindSpore 1.6.1 GPU, thus make sure that you install >= 1.6.1 version.
 

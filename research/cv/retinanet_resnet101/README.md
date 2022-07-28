@@ -66,7 +66,7 @@ Dataset used (refer to paper): [COCO2017](https://cocodataset.org/#download)
     - [MindSpore](https://www.mindspore.cn/install)
 - For more information about MindSpore, please check the resources below：
     - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 - Training in ModelArts (If you want to run on ModelArts, you can refer to the following [modelarts documents](https://support.huaweicloud.com/modelarts/))
 
     ```python
