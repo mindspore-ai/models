@@ -15,7 +15,11 @@
 # ============================================================================
 
 # Get absolute path
-echo "Usage: bash run_distribute_gpu.sh"
+if [ $# != 1 ]
+then
+    echo "Usage: bash run_distribute_gpu.sh [CONFIG_PATH]"
+exit 1
+fi
 
 get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
@@ -30,6 +34,6 @@ BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
 
 cd $BASE_PATH/..
 
-mpirun --allow-run-as-root -n 8 python train.py --train_mode 'distribute'  &> distribute.log 2>&1 &
+mpirun --allow-run-as-root -n 8 python train.py --train_mode 'distribute' --config_path $1 &> distribute.log 2>&1 &
 
 echo "The train log is at ../distribute.log."

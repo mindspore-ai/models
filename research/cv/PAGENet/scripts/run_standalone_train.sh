@@ -12,12 +12,22 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# =========================================================================
-if [ $# != 1 ]
-then
-    echo "Usage: bash run_eval.sh [CONFIG_PATH]"
-exit 1
-fi
+# ============================================================================
+421
+get_real_path(){
+  if [ "${1:0:1}" == "/" ]; then
+    echo "$1"
+  else
+    echo "$(realpath -m $PWD/$1)"
+  fi
+}
+export DEVICE_ID=0
+export RANK_ID=0 
+# Get current script path
+BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
 
-cd ..
-python eval.py --config_path $1 &> test.log 2>&1 &
+cd $BASE_PATH/..
+
+python train.py  --config_path $1 &> standalone_train.log 2>&1 &
+
+echo "The train log is at ../standalone_train.log."

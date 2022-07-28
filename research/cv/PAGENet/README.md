@@ -1,7 +1,7 @@
 ## 目录
 
 - [目录](#目录)
-    - [pagenet描述](#pagenet描述)
+    - [PAGE-Net描述](#PAGE-Net描述)
     - [模型架构](#模型架构)
     - [数据集](#数据集)
         - [数据集配置](#数据集配置)
@@ -17,9 +17,9 @@
     - [模型描述](#模型描述)
         - [评估性能](#评估性能)
         - [推理性能](#推理性能)
-    - [modelzoo主页](#modelzoo主页)
+    - [ModelZoo主页](#modelzoo主页)
 
-## pagenet描述
+## PAGE-Net描述
 
 PAGE-Net是通过监督学习解决显著性目标检测问题，它由提取特征的骨干网络模块，金字塔注意力模块和显著性边缘检测模块三部分构成。作者通过融合不同分辨率的显著性信息使得到的特征有更大的感受野和更好的表达能力，同时显著性边缘检测模块获得的边缘信息也能更加精确的分割显著性物体的边缘部分，从而使检测的结果更加精确。与其他19个工作在6个数据集上通过3种评价指标进行评估表明，PAGE-Net有着更加优异的性能和有竞争力的结果。
 
@@ -53,13 +53,13 @@ PAGE-Net网络由三个部分组成，提取特征的CNN模块，金字塔注意
 
   [HKU-IS数据集](https://gitee.com/link?target=https%3A%2F%2Fi.cs.hku.hk%2F~gbli%2Fdeep_saliency.html)，899MB，共4447张
 
-  [SOD数据集](https://gitee.com/link?target=https%3A%2F%2Fwww.elderlab.yorku.ca%2F%3Fsmd_process_download%3D1%26download_id%3D8285)，19.7MB，共1000张
+  [SOD数据集](https://gitee.com/link?target=https%3A%2F%2Fwww.elderlab.yorku.ca%2F%3Fsmd_process_download%3D1%26download_id%3D8285)，6.49MB，共300张
 
   [DUTS-TE数据集](https://gitee.com/link?target=http%3A%2F%2Fsaliencydetection.net%2Fduts%2Fdownload%2FDUTS-TE.zip)，132MB，共5019张
 
 ## 环境要求
 
-- 硬件（CPU/GPU）
+- 硬件（CPU/GPU/Ascend）
 
 - 如需查看详情，请参见如下资源：
 
@@ -68,7 +68,7 @@ PAGE-Net网络由三个部分组成，提取特征的CNN模块，金字塔注意
 
 - 需要的包
 
-  Mindspore-GPU  1.5.0
+  Mindspore  1.5.0
 
 ## 脚本说明
 
@@ -78,57 +78,87 @@ PAGE-Net网络由三个部分组成，提取特征的CNN模块，金字塔注意
 ├── model_zoo
     ├── PAGENet
         ├── dataset
-        │   ├──train_dataset                #训练集
-        │   ├──test_dataset                 #测试集
-        ├──README.md                    # README文件
-        ├── config.py                       # 参数配置脚本文件
+        │   ├── train_dataset                #训练集
+        │   ├── test_dataset                 #测试集
+        ├── README.md                        # README文件
+        ├── default_config_ascend.yaml       # 参数配置脚本文件(ascned)
+        ├── default_config_gpu.yaml          # 参数配置脚本文件(gpu)
         ├── scripts
-        │   ├──run_standalone_train_gpu.sh  # 单卡训练脚本文件
-        │   ├──run_distribute_train_gpu.sh  # 多卡训练脚本文件
-        │   ├──run_eval.sh                  # 评估脚本文件
+        │   ├── run_standalone_train_gpu.sh  # 单卡训练脚本文件(gpu)
+        │   ├── run_standalone_train.sh      # 单卡训练脚本文件(ascend)
+        │   ├── run_distribute_train_gpu.sh  # 多卡训练脚本文件(gpu)
+        │   ├── run_distribute_train.sh      # 多卡训练脚本文件(ascend)
+        │   ├── run_eval.sh                  # 评估脚本文件
         ├── src
-        │   ├──mind_dataloader.py           # 加载数据集并进行预处理
-        │   ├──pagenet.py                   # pageNet的网络结构
-        │   ├──train_loss.py                # 损失定义
-        ├── train.py                        # 训练脚本
-        ├── eval.py                         # 评估脚本
-        ├── export.py                       # 模型导出脚本
+        |   ├── model_utils
+        |   |   ├── config.py
+        |   |   ├── device_adapter.py
+        |   |   ├── local_adapter.py
+        |   |   ├── moxing_adapter.py
+        │   ├── mind_dataloader.py           # 加载数据集并进行预处理
+        │   ├── pagenet.py                   # pageNet的网络结构
+        │   ├── train_loss.py                # 损失定义
+        |   ├── MyTrainOneStep.py            # 定义训练网络封装类
+        |   ├── vgg.py                       # 定义vgg
+        ├── train.py                         # 训练脚本
+        ├── eval.py                          # 评估脚本
+        ├── export.py                        # 模型导出脚本
+        ├── requirements.txt                 # 需求文档
 ```
 
 ### 脚本参数
 
 ```markdown
-device_target: "GPU"                                    # 运行设备 ["CPU", "GPU"]
-batch_size: 20                                         # 训练批次大小
+device_target: "Ascend"                                    # 运行设备 ["CPU", "GPU", "Ascend"]
+batch_size: 8                                           # 训练批次大小
 n_ave_grad: 10                                          # 梯度累积step数
 epoch_size: 100                                          # 总计训练epoch数
 image_height: 224                                      # 输入到模型的图像高度
 image_width: 224                                        # 输入到模型的图像宽度
-train_path: "./data/DUTS-TR/"                           # 训练数据集的路径
-test_path: "./data"                                     # 测试数据集的根目录
-vgg: "/home/EGnet/EGnet/model/vgg16.ckpt"               # vgg预训练模型的路径
-resnet: "/home/EGnet/EGnet/model/resnet50.ckpt"         # resnet预训练模型的路径
-model: "EGNet/run-nnet/models/final_vgg_bone.ckpt"      # 测试时使用的checkpoint文件
+train_path: "dataset/train_dataset"                           # 训练数据集的路径
+test_path: "dataset/test_dataset/"                                     # 测试数据集的根目录
+model: "output/PAGENET.ckpt"                # 测试时使用的checkpoint文件,分布式训练时保存在./scripts/device/output中
 ```
 
 ## 训练过程
 
-```bash
-
 ### 训练
+
+```markdown
 cd scripts
-bash run_standalone_train_gpu.sh
+bash run_standalone_train_gpu.sh [CONFIG_PATH]  #运行gpu单卡训练
+bash run_standalone_train.sh   [CONFIG_PATH]    #运行ascend单卡训练,config路径默认为ascend
+```
 
 ### 分布式训练
-bash run_distribute_train_gpu.sh
+
+```markdown
+bash run_distribute_train_gpu.sh [CONFIG_PATH]          #运行gpu分布式训练
+bash run_distribute_train.sh 8 rank_table_8pcs.json  [CONFIG_PATH]   #运行ascend分布式训练，config路径默认为ascend
+```
+
+### 云上训练
+
+```markdown
+启动文件: train.py
+运行参数：
+        device_target = Ascend      #指定训练设备
+        enable_modelarts = True          #启动云上训练
+        train_mode = single/distribute     #单卡训练时为single，八卡训练时为distribute
+        config_path = [CONFIG_PATH]       #指定训练用参数config
+#数据集位置存储在环境变量data_url中，训练输出路径存储在环境变量train_url中
+```
 
 ## 评估过程
-bash run_eval.sh [CKPT_FILE] #CKPT_FILE 为权重文件名，请将权重文件放在当前目录下
+
+```markdown
+bash run_eval.sh  [CONFIG_PATH] #运行推理
+```
 
 ## 导出过程
 
-python export.py
-
+```markdown
+python export.py  #导出mindir，模型文件路径为config中的ckpt_file
 ```
 
 ## 模型描述
@@ -150,6 +180,21 @@ python export.py
 | 总时长        |   7h15m0s                         |      3h28m0s                      |
 | 微调检查点    |    390M(.ckpt文件)                |          390M(.ckpt文件)          |
 
+  THUS10K上的PAGE-Net（Ascend）
+
+| 参数          | Ascend(单卡)                         | Ascend（8卡）                      |
+| ------------- | --------------------------------  | ------------------------------- |
+| 模型          | PAGE-Net                          | PAGE-Net                        |
+| 上传日期      |  2022.6.20                         |   2022.6.20                     |
+| Mindspore版本 | 1.5.0                             | 1.5.0                           |
+| 数据集        | THUS10K                           | THUS10K                         |
+| 训练参数      | epoch=100,steps=1250,batch_size=8|epoch=100,steps=1250,batch_size=8|
+| 损失函数      |  MSE&BCE                          |   MSE&BCE                       |
+| 优化器        |  Adam                             |      Adam                       |
+| 速度          |  15.37ms/step                       |       48.8ms/step                 |
+| 总时长        |   4h50m                         |      1h54m                     |
+| 微调检查点    |    558M(.ckpt文件)                |          558M(.ckpt文件)          |
+
 ### 推理性能
 
 显著性目标检测数据集上的PAGE-Net（GPU）
@@ -159,8 +204,8 @@ python export.py
 | 模型          | PAGE-Net              | PAGE-Net             |
 | 上传日期      |  2022.6.20            |   2022.6.20          |
 | Mindspore版本 | 1.5.0                 | 1.5.0                |
-| 数据集        | SOD, 1000张图像       | SOD, 1000张图像       |
-| 评估指标      |  F-score:0.974        | F-score:0.974        |
+| 数据集        | SOD, 300张图像       | SOD, 300张图像       |
+| 评估指标      |  F-score:0.593        | F-score:0.593        |
 | 数据集        | ECCSD, 1000张图像     | ECCSD, 1000张图像     |
 | 评估指标      | F-score: 0.845        | F-score:0.845        |
 | 数据集        | DUTS-OMRON, 5163张图像| DUTS-OMRON, 5163张图像|
@@ -170,6 +215,24 @@ python export.py
 | 数据集        | DUTS-TE, 5019张图像   | DUTS-TE, 5019张图像   |
 | 评估指标      | F-score: 0.778        | F-score: 0.778       |
 
-## modelzoo主页
+显著性目标检测数据集上的PAGE-Net（Ascend）
+
+| 参数          | Ascend(单卡)             | Ascend（8卡）            |
+| ------------- | --------------------- | ---------------------|
+| 模型          | PAGE-Net              | PAGE-Net             |
+| 上传日期      |  2022.6.29            |   2022.6.29          |
+| Mindspore版本 | 1.5.0                 | 1.5.0                |
+| 数据集        | SOD, 300张图像       | SOD, 300张图像       |
+| 评估指标      |  F-score:0.659        | F-score:0.659        |
+| 数据集        | ECCSD, 1000张图像     | ECCSD, 1000张图像     |
+| 评估指标      | F-score: 0.927        | F-score:0.927        |
+| 数据集        | DUTS-OMRON, 5163张图像| DUTS-OMRON, 5163张图像|
+| 评估指标      |  F-score: 0.874        | F-score: 0.874       |
+| 数据集        | HKU-IS, 4447张图像    | HKU-IS, 4447张图像    |
+| 评估指标      |  F-score: 0.935       | F-score: 0.935       |
+| 数据集        | DUTS-TE, 5019张图像   | DUTS-TE, 5019张图像   |
+| 评估指标      | F-score: 0.779        | F-score: 0.779       |
+
+## ModelZoo主页
 
 请浏览官网[主页](https://gitee.com/mindspore/models)。

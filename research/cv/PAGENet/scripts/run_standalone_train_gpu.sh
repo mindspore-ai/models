@@ -28,6 +28,6 @@ BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
 
 cd $BASE_PATH/..
 
-python train.py --train_mode 'single' &> standalone_train.log 2>&1 &
+python train.py --train_mode 'single' --config_path $1 &> standalone_train.log 2>&1 &
 
 echo "The train log is at ../standalone_train.log."

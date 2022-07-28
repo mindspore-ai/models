@@ -17,13 +17,13 @@
 ##############export checkpoint file into air, mindir models#################
 python export.py
 """
+import os
 import numpy as np
-
 import mindspore as ms
 from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
 
 from src.pagenet import MindsporeModel
-import config
+from src.model_utils.config import config
 
 
 def run_export():
@@ -34,7 +34,7 @@ def run_export():
 
     net = MindsporeModel()
 
-    if config.ckpt_file is not None:
+    if not os.path.exists(config.ckpt_file):
         print("config.ckpt_file is None.")
     param_dict = load_checkpoint(config.ckpt_file)
     load_param_into_net(net, param_dict)

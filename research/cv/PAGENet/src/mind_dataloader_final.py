@@ -13,21 +13,24 @@
 # limitations under the License.
 # ============================================================================
 
+
 import os
+import sys
 import numpy as np
 import mindspore.dataset as ds
 import mindspore.dataset.transforms as transforms
 import mindspore.dataset.vision as vision
 import mindspore.dataset.vision.c_transforms as C
 from PIL import Image
+sys.path.append("..")
 
 
-# transform img to tensor and resize to 224x224x3
 class TrainData:
     """
     dataloader for pageNet
     """
 
+    # image_root="D:\\Page-Net-pytorch\\image", gt_root="D:\\Page-Net-pytorch\\groundTruth"
     def __init__(self, image_root, gt_root, edge_root, img_size, augmentations):
         self.img_size = img_size
         self.augmentations = augmentations
@@ -75,15 +78,16 @@ class TrainData:
 
         return img, gt, edge
 
+
     def __len__(self):
         return self.size
-
 
 class TestData:
     """
     dataloader for pageNet
     """
 
+    # image_root="D:\\Page-Net-pytorch\\image", gt_root="D:\\Page-Net-pytorch\\groundTruth"
     def __init__(self, image_root, gt_root, img_size, augmentations):
         self.img_size = img_size
         self.augmentations = augmentations
@@ -93,6 +97,8 @@ class TestData:
         self.images = sorted(self.images)
         self.gts = sorted(self.gts)
         self.size = len(self.images)
+
+
 
         self.img_transform = transforms.c_transforms.Compose([
             C.Resize((self.img_size, self.img_size)),
@@ -108,6 +114,8 @@ class TestData:
 
         gt = Image.open(self.gts[index], 'r').convert('1')
 
+
+
         if self.img_transform is not None:
             img = np.array(img, dtype=np.float32)
             img -= np.array((104.00699, 116.66877, 122.67892))
@@ -120,15 +128,27 @@ class TestData:
 
         return img, gt
 
+    def resize(self, img, gt):
+        assert img.size == gt.size
+        w, h = img.size
+        if h < self.img_size or w < self.img_size:
+            h = max(h, self.img_size)
+            w = max(w, self.img_size)
+            return img.resize((w, h), Image.BILINEAR), gt.resize((w, h), Image.NEAREST)
+        return img, gt
+
     def __len__(self):
         return self.size
 
 
-def get_train_loader(image_root, gt_root, edge_root, batchsize, trainsize, device_num=1, rank_id=0, shuffle=True,
-                     num_parallel_workers=1, augmentation=False):
+def get_train_loader(image_root, gt_root, edge_root, batchsize, trainsize,
+                     device_num=1, rank_id=0, shuffle=True,
+                     num_parallel_workers=1,
+                     augmentation=False):
     dataset_generator = TrainData(image_root, gt_root, edge_root, trainsize, augmentation)
     dataset = ds.GeneratorDataset(dataset_generator, ["imgs", "gts", "edges"], shuffle=shuffle,
-                                  num_parallel_workers=num_parallel_workers, num_shards=device_num, shard_id=rank_id)
+                                  num_parallel_workers=num_parallel_workers,
+                                  num_shards=device_num, shard_id=rank_id)
 
     data_loader = dataset.batch(batch_size=batchsize)
 
@@ -141,3 +161,12 @@ def get_test_loader(image_root, gt_root, batchsize, testsize, augmentation=False
 
     data_loader = dataset.batch(batch_size=batchsize)
     return data_loader
+
+
+if __name__ == '__main__':
+    train_loader = get_train_loader(train_img_path, train_gt_path, train_edge_path, batchsize=1, trainsize=train_size)
+
+    test_loader = get_test_loader(test_img_path, test_gt_path, batchsize=1, testsize=train_size)
+    for data in train_loader:
+        imgs, targets = data
+        print(targets.shape)
