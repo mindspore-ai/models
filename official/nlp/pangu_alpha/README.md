@@ -72,7 +72,7 @@ The above dataset is preprocessed with 1024 tokens for each example. The default
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
 # [Quick Start](#contents)
 

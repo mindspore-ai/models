@@ -67,7 +67,7 @@ The [mixed-precision](https://www.mindspore.cn/tutorials/experts/zh-CN/master/ot
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For details, please refer to the following resources：
     - [MindSpore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 # Quick start
 

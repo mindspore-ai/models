@@ -182,7 +182,7 @@ unpacked_JESTER/
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 - Checkpoint of the BNInception model, trained on ImageNet2012.
     - Download the original model from [here](https://yjxiong.blob.core.windows.net/models/bn_inception-9f5701afb96c8044.pth)
     - Convert the checkpoint into MindSpore format (Please refer the section ["Quick Start"](#quick-start)).

@@ -84,7 +84,7 @@ Attention Cluster模型为ActivityNet Kinetics Challenge 2017中最佳序列模�
 - 安装相关依赖 pip install -r requirements.txt
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 ## 快速开始
 

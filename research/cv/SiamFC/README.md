@@ -46,7 +46,7 @@ used Dataset :[ILSVRC2015-VID](http://bvisionweb1.cs.unc.edu/ilsvrc2015/ILSVRC20
     - [Mindspore](https://www.mindspore.cn/install/en)
 - For details, please refer to the following resources:
     - [MindSpore course](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 - more API
     - got10k toolkit
     - opencv
@@ -93,7 +93,7 @@ After installing mindspree through the official website, you can follow the foll
         ├── README.md                    // Notes on siamfc
         ├── ascend310_infer             // Implementation inference script on ascend310
         │   ├──inc                      //Head file
-        │   ├──src                      //Main.cc and utils.cc file 
+        │   ├──src                      //Main.cc and utils.cc file
         │   ├──build.sh                 //Build file
         │   ├──CMakeLists.txt           //Required library files
         ├── scripts

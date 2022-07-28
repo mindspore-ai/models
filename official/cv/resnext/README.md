@@ -66,7 +66,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
 - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-- [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+- [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
 If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training and evaluation as follows:
 

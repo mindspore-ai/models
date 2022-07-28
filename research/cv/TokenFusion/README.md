@@ -43,7 +43,7 @@ Dataset used: [NYUDv2](https://cs.nyu.edu/~silberman/datasets/nyu_depth_v2.html)
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below:
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
 # [Script Description](#contents)
 
