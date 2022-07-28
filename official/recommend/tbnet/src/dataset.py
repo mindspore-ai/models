@@ -14,10 +14,12 @@
 # ============================================================================
 """Dataset loader."""
 
+import os
 from functools import partial
 
 import numpy as np
-from mindspore.dataset import GeneratorDataset
+import mindspore.dataset as ds
+import mindspore.mindrecord as record
 
 
 def create(data_path, per_item_num_paths, train, users=None, **kwargs):
@@ -39,13 +41,71 @@ def create(data_path, per_item_num_paths, train, users=None, **kwargs):
     """
     if isinstance(users, int):
         users = (users,)
-    kwargs['source'] = partial(csv_generator, data_path, per_item_num_paths, users, train)
 
     if train:
-        kwargs['column_names'] = ['item', 'relation1', 'entity', 'relation2', 'hist_item', 'rating']
+        kwargs['columns_list'] = ['item', 'relation1', 'entity', 'relation2', 'hist_item', 'rating']
     else:
-        kwargs['column_names'] = ['user', 'item', 'relation1', 'entity', 'relation2', 'hist_item', 'rating']
-    return GeneratorDataset(**kwargs)
+        kwargs['columns_list'] = ['user', 'item', 'relation1', 'entity', 'relation2', 'hist_item', 'rating']
+    mindrecord_file_path = csv_dataset(partial(csv_generator, data_path, per_item_num_paths, users, train), data_path,
+                                       train)
+    return ds.MindDataset(mindrecord_file_path, **kwargs)
+
+
+def csv_dataset(generator, csv_path, train):
+    """Dataset for csv datafile."""
+    file_name = os.path.basename(csv_path)
+    mindrecord_file_path = os.path.join(os.path.dirname(csv_path), file_name[0:file_name.rfind('.')] + '.mindrecord')
+
+    if os.path.exists(mindrecord_file_path):
+        os.remove(mindrecord_file_path)
+
+    if os.path.exists(mindrecord_file_path + ".db"):
+        os.remove(mindrecord_file_path + ".db")
+
+    data_schema = {
+        "item": {"type": "int32", "shape": []},
+        "relation1": {"type": "int32", "shape": [-1]},
+        "entity": {"type": "int32", "shape": [-1]},
+        "relation2": {"type": "int32", "shape": [-1]},
+        "hist_item": {"type": "int32", "shape": [-1]},
+        "rating": {"type": "float32", "shape": []},
+    }
+    if not train:
+        data_schema["user"] = {"type": "int32", "shape": []}
+
+    writer = record.FileWriter(file_name=mindrecord_file_path, shard_num=1)
+    writer.add_schema(data_schema, "Preprocessed dataset.")
+
+    data = []
+    for i, row in enumerate(generator()):
+        if train:
+            sample = {
+                "item": row[0],
+                "relation1": row[1],
+                "entity": row[2],
+                "relation2": row[3],
+                "hist_item": row[4],
+                "rating": row[5],
+            }
+        else:
+            sample = {
+                "user": row[0],
+                "item": row[1],
+                "relation1": row[2],
+                "entity": row[3],
+                "relation2": row[4],
+                "hist_item": row[5],
+                "rating": row[6],
+            }
+        data.append(sample)
+
+        if i % 10 == 0:
+            writer.write_raw_data(data)
+            data = []
+    if data:
+        writer.write_raw_data(data)
+    writer.commit()
+    return mindrecord_file_path
 
 
 def csv_generator(csv_path, per_item_num_paths, users, train):
@@ -81,8 +141,8 @@ def csv_generator(csv_path, per_item_num_paths, users, train):
         if train:
             # item, relation1, entity, relation2, hist_item, rating
             yield np.array(item, dtype=np.int), relation1, entity, relation2, hist_item, \
-                np.array(rating, dtype=np.float32)
+                  np.array(rating, dtype=np.float32)
         else:
             # user, item, relation1, entity, relation2, hist_item, rating
-            yield np.array(user, dtype=np.int), np.array(item, dtype=np.int),\
-                relation1, entity, relation2, hist_item, np.array(rating, dtype=np.float32)
+            yield np.array(user, dtype=np.int), np.array(item, dtype=np.int), \
+                  relation1, entity, relation2, hist_item, np.array(rating, dtype=np.float32)

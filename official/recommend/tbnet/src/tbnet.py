@@ -14,15 +14,24 @@
 # ============================================================================
 """TB-Net Model."""
 
-from mindspore import nn
+from mindspore import nn, Tensor
 from mindspore import ParameterTuple
 from mindspore.ops import operations as P
+from mindspore.ops import functional as F
 from mindspore.ops import composite as C
 from mindspore.parallel._utils import _get_device_num, _get_parallel_mode, _get_gradients_mean
 from mindspore.context import ParallelMode
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
+import mindspore.common.dtype as mstype
 
 from src.embedding import EmbeddingMatrix
+
+grad_scale = C.MultitypeFuncGraph("grad_scale")
+
+
+@grad_scale.register("Tensor", "Tensor")
+def gradient_scale(scale, grad):
+    return grad * F.cast(scale, F.dtype(grad))
 
 
 class TBNet(nn.Cell):
@@ -68,8 +77,8 @@ class TBNet(nn.Cell):
     def _parse_config(self, config):
         """Argument parsing."""
 
-        self.num_entity = config.num_entity
-        self.num_relation = config.num_relation
+        self.num_entity = config.num_items + config.num_references + 1
+        self.num_relation = config.num_relations
         self.dim = config.embedding_dim
         self.kge_weight = config.kge_weight
         self.node_weight = config.node_weight
@@ -279,7 +288,7 @@ class NetWithLossClass(nn.Cell):
 class TrainStepWrap(nn.Cell):
     """TrainStepWrap definition."""
 
-    def __init__(self, network, lr, sens=1):
+    def __init__(self, network, lr, sens=1, loss_scale=False):
         super(TrainStepWrap, self).__init__(auto_prefix=False)
         self.network = network
         self.network.set_train()
@@ -294,11 +303,13 @@ class TrainStepWrap(nn.Cell):
                                  loss_scale=sens)
 
         self.hyper_map = C.HyperMap()
+        self.reciprocal_sense = Tensor(1 / sens, mstype.float32)
         self.grad = C.GradOperation(get_by_list=True, sens_param=True)
         self.sens = sens
 
         self.reducer_flag = False
         self.grad_reducer = None
+        self.loss_scale = loss_scale
         parallel_mode = _get_parallel_mode()
         if parallel_mode in (ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL):
             self.reducer_flag = True
@@ -306,6 +317,10 @@ class TrainStepWrap(nn.Cell):
             mean = _get_gradients_mean()
             degree = _get_device_num()
             self.grad_reducer = DistributedGradReducer(self.optimizer.parameters, mean, degree)
+
+    def scale_grad(self, gradients):
+        gradients = self.hyper_map(F.partial(grad_scale, self.reciprocal_sense), gradients)
+        return gradients
 
     def construct(self, items, relation1, mid_entity, relation2, hist_item, labels):
         """
@@ -325,11 +340,14 @@ class TrainStepWrap(nn.Cell):
         sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
         grads = self.grad(self.network, weights)(items, relation1, mid_entity, relation2, hist_item, labels, sens)
 
+        if self.loss_scale:
+            grads = self.scale_grad(grads)
+
         if self.reducer_flag:
             # apply grad reducer on grads
             grads = self.grad_reducer(grads)
-        self.optimizer(grads)
-        return loss
+
+        return F.depend(loss, self.optimizer(grads))
 
 
 class PredictWithSigmoid(nn.Cell):

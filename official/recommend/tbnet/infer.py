@@ -16,8 +16,10 @@
 
 import os
 import argparse
+import math
 
 from mindspore import load_checkpoint, load_param_into_net, context
+import mindspore.common.dtype as mstype
 from src.config import TBNetConfig
 from src.tbnet import TBNet
 from src.aggregator import InferenceAggregator
@@ -88,8 +90,8 @@ def get_args():
         type=str,
         required=False,
         default='GPU',
-        choices=['GPU'],
-        help="run code on GPU"
+        choices=['GPU', 'Ascend'],
+        help="run code on GPU or Ascend NPU"
     )
 
     parser.add_argument(
@@ -121,12 +123,17 @@ def infer_tbnet():
 
     print(f"creating TBNet from checkpoint {args.checkpoint_id}...")
     config = TBNetConfig(config_path)
+    if args.device_target == 'Ascend':
+        config.per_item_paths = math.ceil(config.per_item_paths / 16) * 16
+        config.embedding_dim = math.ceil(config.embedding_dim / 16) * 16
     network = TBNet(config)
+    if args.device_target == 'Ascend':
+        network.to_float(mstype.float16)
     param_dict = load_checkpoint(os.path.join(ckpt_path, f'tbnet_epoch{args.checkpoint_id}.ckpt'))
     load_param_into_net(network, param_dict)
 
     print(f"creating dataset from {data_path}...")
-    infer_ds = dataset.create(data_path, config.per_item_num_paths, train=False, users=args.user)
+    infer_ds = dataset.create(data_path, config.per_item_paths, train=False, users=args.user)
     infer_ds = infer_ds.batch(config.batch_size)
 
     print("inferring...")
