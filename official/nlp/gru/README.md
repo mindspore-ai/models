@@ -14,6 +14,9 @@
     - [Training Process](#training-process)
     - [Inference Process](#inference-process)
     - [Export MindIR](#export-mindir)
+    - [ONNX Export And Evaluation](#onnx-export-and-evaluation)
+        - [ONNX Export](#onnx-export)
+        - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process-1)
         - [Usage](#usage)
         - [result](#result)
@@ -62,6 +65,7 @@ In this model, we use the Multi30K dataset as our train and test dataset.As trai
 ```txt
 nltk
 numpy
+onnxruntime-gpu
 ```
 
 To install nltk, you should install nltk as follow:
@@ -92,7 +96,7 @@ nltk.download()
     bash preprocess.sh [DATASET_PATH]
 
     # create mindrecord
-    bash create_dataset.sh [DATASET_PATH] [DATASET_PATH]
+    bash create_dataset.sh [DATASET_PATH] [OUTPUT_PATH]
 
     # run training example
     bash run_standalone_train_{platform}.sh [TRAIN_DATASET_PATH]
@@ -196,6 +200,7 @@ The GRU network script and code result are as follows:
   │   ├──run_distributed_train_gpu.sh        // shell script for distributed train on gpu.
   │   ├──run_eval_ascend.sh                  // shell script for standalone eval on ascend.
   │   ├──run_eval_gpu.sh                     // shell script for standalone eval on gpu.
+  │   ├──run_eval_onnx_gpu.sh                // shell script for standalone onnx model eval on gpu.
   │   ├──run_infer_310.sh                    // shell script for 310 inference.
   │   ├──run_standalone_train_ascend.sh      // shell script for standalone eval on ascend.
   │   ├──run_standalone_train_gpu.sh         // shell script for standalone eval on gpu.
@@ -204,6 +209,7 @@ The GRU network script and code result are as follows:
   ├── preprocess.py                          // GRU preprocess script.
   ├── export.py                              // Export API entry.
   ├── eval.py                                // Infer API entry.
+  ├── eval_onnx.py                           // ONNX infer API entry.
   ├── requirements.txt                       // Requirements of third party package.
   ├── train.py                               // Train API entry.
 ```
@@ -238,7 +244,7 @@ After preprocess, we will get the dataset file which is suffix with ".tok" and t
 Then we provided scripts/create_dataset.sh to create the dataset file which format is mindrecord.
 
 ```bash
-bash preprocess.sh [DATASET_PATH] [OUTPUT_PATH]
+bash create_dataset.sh [DATASET_PATH] [OUTPUT_PATH]
 ```
 
 Finally, we will get multi30k_train_mindrecord_0 ~ multi30k_train_mindrecord_8 as our train dataset, and multi30k_test_mindrecord as our test dataset.
@@ -296,17 +302,17 @@ Parameters for both training and evaluation can be set in config.py. All the dat
 
 ## [Inference Process](#content)
 
-- Running scripts for evaluation of GRU. The commdan as below.
+- Running scripts for evaluation of GRU. The command as below.
 
     ``` bash
     cd ./scripts
     bash run_eval_{platform}.sh [CKPT_FILE] [DATASET_PATH]
     # platform: ascend or gpu
-    #example:
+    # example:
     bash run_eval_ascend.sh /data/ckpt_0/0-20_1807.ckpt /data/mindrecord/multi30k_test_mindrecord_32
     ```
 
-- After evalulation, we will get eval/target.txt and eval/output.txt.Then we can use scripts/parse_output.sh to get the translation.
+- After evaluation, we will get eval/target.txt and eval/output.txt.Then we can use parse_output.sh to get the translation.
 
     ``` bash
     cp eval/*.txt ./
@@ -357,6 +363,40 @@ Note: The `DATASET_PATH` is path to mindrecord. eg. train: /dataset_path/multi30
     # (5) Create your job.
     ```
 
+## [ONNX Export And Evaluation](#contents)
+
+### ONNX Export
+
+```bash
+python export.py --device_target="GPU" --file_format="ONNX" --ckpt_file [CKPT_PATH]
+# example:python export.py --device_target="GPU" --file_format="ONNX" --ckpt_file models/official/nlp/gru/0-25_1807.ckpt
+```
+
+### ONNX Evaluation
+
+- Running scripts for onnx evaluation of GRU. The command as below.
+
+    ``` bash
+    cd ./scripts
+    bash run_eval_onnx_gpu.sh [ONNX_CKPT_FILE] [DATASET_PATH]
+    # platform: gpu
+    # example:
+    bash run_eval_onnx_gpu.sh gru.onnx /data/mindrecord/multi30k_test_mindrecord_32
+    ```
+
+- After evaluation, we will get eval/target.txt and eval/output.txt.Then we can use parse_output.sh to get the translation.
+
+    ``` bash
+    cp eval/*.txt ./
+    bash parse_output.sh target.txt output.txt /path/vocab.en
+    ```
+
+- After parse output, we will get target.txt.forbleu and output.txt.forbleu. To calculate BLEU score, you may use this [perl script](https://github.com/moses-smt/mosesdecoder/blob/master/scripts/generic/multi-bleu.perl) and run following command to get the BLEU score.
+
+    ```bash
+    perl multi-bleu.perl target.txt.forbleu < output.txt.forbleu
+    ```
+
 ## [Inference Process](#contents)
 
 ### Usage
@@ -373,7 +413,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 
 ### result
 
-we will get target.txt and output.txt.Then we can use scripts/parse_output.sh to get the translation.
+we will get target.txt and output.txt.Then we can use parse_output.sh to get the translation.
 
 ``` bash
 bash parse_output.sh target.txt output.txt /path/vocab.en
