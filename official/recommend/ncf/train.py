@@ -90,7 +90,7 @@ def run_train():
     model = Model(train_net)
     callback = LossMonitor(per_print_times=ds_train.get_dataset_size())
     ckpt_config = CheckpointConfig(save_checkpoint_steps=(4970845+config.batch_size-1)//(config.batch_size),
-                                   keep_checkpoint_max=100)
+                                   keep_checkpoint_max=5)
     ckpoint_cb = ModelCheckpoint(prefix='NCF', directory=config.checkpoint_path, config=ckpt_config)
     model.train(epochs,
                 ds_train,
