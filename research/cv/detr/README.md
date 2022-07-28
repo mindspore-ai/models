@@ -62,7 +62,7 @@ Dataset used: [COCO2017](https://cocodataset.org/#download)
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.8/index.html)
 - Download [COCO2017](https://cocodataset.org/#download)
 
 ## [Quick start](#contents)

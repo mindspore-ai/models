@@ -88,7 +88,7 @@ RAS总体网络架构如下:
 
   - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
 
-  - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 ## 脚本说明
 

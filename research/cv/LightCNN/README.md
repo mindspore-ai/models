@@ -135,7 +135,7 @@ reduce precision" to view the operators with reduced precision.
     - [MindSpore](https://www.mindspore.cn/install)
 - For details, please refer to the following resources:
     - [MindSpore tutorial](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 - Generate config json file for 8-card training
     - [Simple tutorial](https://gitee.com/mindspore/models/tree/r1.8/utils/hccl_tools)
     - For detailed configuration method, please refer to

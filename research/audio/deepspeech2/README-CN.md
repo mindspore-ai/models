@@ -63,7 +63,7 @@ DeepSpeech2是一个使用 CTC 损失训练的语音识别模型。它用神经�
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 通过下面网址可以获得更多信息：
     - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 # [文件说明和运行说明](#contents)
 

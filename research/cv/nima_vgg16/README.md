@@ -72,7 +72,7 @@ python ./src/dividing_label.py --config_path=~/config_single_gpu.yaml
         - [MindSpore](https://www.mindspore.cn/install/en)
 - For details, please refer to the following resources:
     - [MindSpore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 ## [Quick start](#contents)
 

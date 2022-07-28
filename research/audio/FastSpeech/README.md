@@ -106,7 +106,7 @@ After pre-precessing the data, the dataset structure should be as follows:
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below:
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.8/index.html)
 
 Note: We use MindSpore 1.6.0 GPU, thus make sure that you install > 1.6.0 version.
 

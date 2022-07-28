@@ -54,7 +54,7 @@ BJER4
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需获取更多信息，请查看如下链接：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.8/index.html)
 
 # [快速开始](#contents)
 

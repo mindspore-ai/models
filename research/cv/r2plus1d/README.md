@@ -75,7 +75,7 @@ The 5-dimensional data (NCTHW) input by the network goes through five (2+1)D con
     - [MindSpore](https://www.mindspore.cn/install)
 - For details, see the following resources:
     - [MindSpore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 ## Quick start
 

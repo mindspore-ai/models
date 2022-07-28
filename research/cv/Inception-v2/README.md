@@ -69,7 +69,7 @@ the INFO log and search for "reduce precision" to view operators with reduced pr
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For details，see the following resources:
     - [MindSpore tutorial](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 # [Script Description](#contents)
 

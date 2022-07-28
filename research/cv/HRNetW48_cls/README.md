@@ -52,7 +52,7 @@ Dataset used: [ImageNet](http://www.image-net.org/)
     - [MindSpore](https://www.mindspore.cn/install)
 - For more information, see the following resources:
     - [MindSpore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 # Script Description
 

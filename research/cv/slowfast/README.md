@@ -147,7 +147,7 @@ slowfast是由Facebook AI研究团队提出的一种新颖的方法来分析视�
     - [MindSpore1.5.2](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 - 三方lib，请参见以下文件：
     - pip-requirements.txt
 

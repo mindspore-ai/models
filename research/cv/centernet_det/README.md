@@ -87,7 +87,7 @@ Dataset used: [COCO2017](https://cocodataset.org/)
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
     - [MindSpore tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 - Download the dataset COCO2017.
 - We use COCO2017 as training dataset in this example by default, and you can also use your own datasets.
 

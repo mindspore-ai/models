@@ -205,7 +205,7 @@ The overall directory structure of the data files is as follows:
 
 - For more information about MindSpore, please check the resources below:
   - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-  - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 # Script Description
 

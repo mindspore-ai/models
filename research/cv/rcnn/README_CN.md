@@ -49,7 +49,7 @@ R-CNN的整体网络架构详情，请参考链接: [Link](https://arxiv.org/abs
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 更多详情，点击下面链接：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.3/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
 
 ## [脚本简介](#contents)
 

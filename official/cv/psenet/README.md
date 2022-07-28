@@ -71,7 +71,7 @@ python psenet_model_torch2mindspore.py --torch_file=/path_to_model/resnet50-19c8
     - [MindSpore](http://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.8/index.html)
 - install Mindspore
 - install [pyblind11](https://github.com/pybind/pybind11)
 - install [Opencv3.4](https://docs.opencv.org/3.4.9/)
