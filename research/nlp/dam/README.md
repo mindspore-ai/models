@@ -256,7 +256,40 @@ The results were as follows:
 
 ```bash
 Ubuntu:R2@1/R10@1/R10@2/R10@5  0.937/0.765/0.870/0.968
+Douban:MAP/MRR/P@1/R10@1/R10@2/R10@5  0.550/0.601/0.427/0.254/0.410/0.757
 ````
+
+## Model Export
+
+```shell
+python export.py --model_name [MODEL_NAME] --ckpt_path [CKPT_PATH] --ckpt_name [CKPT_NAME] --device_target [DEVICE_TARGET] --file_format[EXPORT_FORMAT] --batch_size [BATCH_SIZE]
+```
+
+`MODEL_NAME` can be in ["DAM_ubuntu", "DAM_douban"]
+`EXPORT_FORMAT` can be in ["AIR", "MINDIR"]
+`BATCH_SIZE` default value of ubuntu is 200， default value of douban is 256.
+
+## Inference Process
+
+### Usage
+
+Before performing inference, the model file must be exported by export script on the Ascend910 environment.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [MINDIR_PATH] [MODEL_NAME] [DATA_FILE_PATH] [EVAL_BATCH_SIZE] [NEED_PREPROCESS] [DEVICE_ID]（optional）
+```
+
+- `DEVICE_ID` is optional, default value is 0.
+
+### result
+
+Inference result is saved in current path, you can find result like this in acc.log file.
+
+```log
+Ubuntu: accuracy: (0.93736, 0.75458, 0.87044, 0.96802)
+Douban: accuracy: (0.5479, 0.5967, 0.4227, 0.2504, 0.4167, 0.7552)
+```
 
 # [Model Description](#contents)
 
@@ -264,19 +297,19 @@ Ubuntu:R2@1/R10@1/R10@2/R10@5  0.937/0.765/0.870/0.968
 
 ### Distributed Training Performance
 
-| Parameters          | DAM                                                          |
-| ------------------- | ------------------------------------------------------------ |
-| Resource            | Ascend 910 * 8; CPU 2.60GHz, 192cores; Memory 755G           |
-| MindSpore Version   | 1.3.0                                                        |
-| Dataset             | Ubuntu                                                       |
-| Training Parameters | epoch=2, batch_size = 256, learning_rate=1e-3, decay_steps=405 |
-| Optimizer           | Adam                                                         |
-| Loss Function       | SigmoidCrossEntropyWithLogits                                |
-| Outputs             | score                                                        |
-| Accuracy            | 0.937/0.765/0.870/0.968 (Ubuntu)                             |
-| Speed               | 197.425 ms/step (8pcs);                                      |
-| Total time          | 3h (8pcs)                                                    |
-| Checkpoint          | 1010.56 M (.ckpt file)                                       |
+| Parameters          | DAM                                                          | DAM                                                          |
+| ------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Resource            | Ascend 910 * 8; CPU 2.60GHz, 192cores; Memory 755G           | Ascend 910 * 8; CPU 2.60GHz, 192cores; Memory 755G           |
+| MindSpore Version   | 1.3.0                                                        | 1.3.0                                                        |
+| Dataset             | Ubuntu                                                       | Douban                                                       |
+| Training Parameters | epoch=2, batch_size = 256, learning_rate=1e-3, decay_steps=405 | epoch=2, batch_size = 256, learning_rate=1e-3, decay_steps=405 |
+| Optimizer           | Adam                                                         | Adam                                                         |
+| Loss Function       | SigmoidCrossEntropyWithLogits                                | SigmoidCrossEntropyWithLogits                                |
+| Outputs             | score                                                        | score                                                        |
+| Accuracy            | 0.937/0.765/0.870/0.968 (Ubuntu)                             | 0.550/0.601/0.427/0.254/0.410/0.757 (Douban)                 |
+| Speed               | 197.425 ms/step (8pcs);                                      | 197.425 ms/step (8pcs);                                      |
+| Total time          | 4h52min (8pcs)                                               | 13h4m (8pcs)                                                 |
+| Checkpoint          | 1010.56 M (.ckpt file)                                       | 410 M (.ckpt file)                                           |
 
 # [Description of Random Situation](#Content)
 
