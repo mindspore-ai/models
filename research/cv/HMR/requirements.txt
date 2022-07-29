@@ -1,0 +1,7 @@
+h5py==2.10.0
+mindspore==1.5.0
+numpy==1.21.6
+opencv_python==4.5.1.48
+PyYAML==6.0
+scipy==1.5.2
+chumpy==0.70

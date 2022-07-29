@@ -1,0 +1,46 @@
+run_distribute: False
+data_url: ""
+train_url: ""
+device_target: "Ascend"
+encoder_network: "resnet50"
+model_save: "./"
+dataset: "human3.6m"
+data_path: "/mass_store/dataset/HMR_DATA"
+output_path: "preprocess_Result"
+preprocess_Result: ""
+total_theta_count: 85
+file_name : "./hmr"
+file_format: "MINDIR"
+checkpoint_file_path: ""
+label_file: ""
+result_path: ""
+batch_size: 16
+batch_3d_size: 16
+adv_batch_size: 32
+eval_batch_size: 400
+joint_count: 24
+beta_count: 10
+use_adv_train: True
+scale_min: 1.1
+scale_max: 1.5
+num_worker: 8
+iter_count: 20001
+e_lr: 0.0002
+d_lr: 0.0001
+e_wd: 0.0001
+d_wd: 0.0001
+e_loss_weight: 60
+d_loss_weight: 1
+d_disc_ratio: 1.0
+e_3d_loss_weight: 60
+e_shape_ratio: 5
+e_3d_kp_ratio: 10.0
+e_pose_ratio: 20
+save_folder: ""
+enable_inter_supervision: False
+train_2d_set : ["coco", "lsp", "lsp_ext"]
+train_3d_set : ["mpi-inf-3dhp", "hum3.6m"]
+train_adv_set : ["mosh"]
+feature_count : 2048
+encoder_feature_count : 2048
+crop_size : 224
