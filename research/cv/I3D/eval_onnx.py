@@ -19,17 +19,14 @@ Evaluate I3D and get accuracy.
 import argparse
 import random
 import time
-import os
 
 import mindspore
 import mindspore.dataset as ds
-import mindspore.ops as ops
-from mindspore import context
 import numpy as np
+import onnxruntime as ort
 
 from src.get_dataset import get_loader
-from src.i3d import InceptionI3D
-from src.transforms.spatial_transforms import Compose, CenterCrop
+from src.transforms.spatial_transforms import CenterCrop, Compose
 from src.transforms.target_transforms import ClassLabel
 from src.transforms.temporal_transforms import TemporalCenterCrop
 
@@ -54,49 +51,52 @@ class Joint_dataset:
 
 def parse_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--video_path', type=str,
+    parser.add_argument('--num_val_samples', type=int, default=1, help='Number of validation samples for each activity')
+    parser.add_argument('--test_sample_duration', default=64, type=int,
+                        help='Temporal duration of inputs during testing')
+    parser.add_argument('--spatial_size', default=224, type=int, help='Height and width of inputs')
+    parser.add_argument('--num_workers', default=8, type=int, help='Number of threads for multi-thread loading')
+
+    parser.add_argument('--test_mode', type=str, required=True, help='rgb, flow, joint')
+    parser.add_argument('--batch_size', default=8, type=int, help='Batch Size, Preferably the same as during training')
+    parser.add_argument('--device_target', default='GPU', help='Device string')
+    parser.add_argument('--device_id', default=0, type=int, help='ID of the target device')
+
+    parser.add_argument('--rgb_path', help='model to save/load', default='./ckpt_url')
+    parser.add_argument('--flow_path', help='model to save/load', default='./ckpt_url')
+    parser.add_argument('--dataset', type=str, required=True, help='Dataset string (ucf101 | hmdb51)')
+    parser.add_argument('--video_path', type=str, required=True,
                         help='Path to location of dataset videos (if joint mode : rgb file)')
-    parser.add_argument('--annotation_path', type=str,
+    parser.add_argument('--annotation_path', type=str, required=True,
                         help='Path to location of dataset annotation file (if joint mode : rgb file)')
     parser.add_argument('--video_path_joint_flow', type=str,
                         help='Path to location of joint mode flow dataset videos (joint mode only : flow file)')
     parser.add_argument('--annotation_path_joint_flow', type=str,
                         help='Path to location of joint mode flow dataset annotation file (joint mode only: flow file)')
-    parser.add_argument('--dataset', type=str, required=True, help='Dataset string (ucf101 | hmdb51)')
-    parser.add_argument('--test_mode', type=str, required=True, help='rgb, flow, joint')
-    parser.add_argument('--flow_path', default='', type=str, help='path to flow pretrained model')
-    parser.add_argument('--rgb_path', default='', type=str, help='path to rgb pretrained model')
-    parser.add_argument('--num_classes', default=51, type=int,
-                        help='Number of classes (ucf101: 101, hmdb51: 51)')
-    parser.add_argument('--num_val_samples', type=int, default=1, help='Number of validation samples for each activity')
-    parser.add_argument('--batch_size', default=8, type=int, help='Batch Size, Preferably the same as during training')
-    parser.add_argument('--test_sample_duration', default=256, type=int,
-                        help='Temporal duration of inputs during testing')
-    parser.add_argument('--spatial_size', default=224, type=int, help='Height and width of inputs')
-    parser.add_argument('--context', default='gr', help='py(pynative) or gr(graph)')
-    parser.add_argument('--device_target', default='Ascend', help='Device string')
-    parser.add_argument('--device_id', default=0, type=int, help='ID of the target device')
-    parser.add_argument('--num_workers', default=16, type=int, help='Number of threads for multi-thread loading')
-    parser.add_argument('--dropout_keep_prob', default=0.5, type=float, help='Dropout keep probability')
 
-    parser.add_argument('--data_url', help='path to training/inference dataset folder', default='./data')
-    parser.add_argument('--ckpt_url', help='model to save/load', default='./ckpt_url')
-    parser.add_argument('--result_url', help='result folder to save/load', default='./result')
-    parser.add_argument('--openI', default=False, type=bool, help='Train model on openI')
     config = parser.parse_args()
 
     if config.test_mode == 'rgb' or config.test_mode == 'flow':
         config.mode = config.test_mode
-        print('checkpoint:', config.flow_path+config.rgb_path)
     elif config.test_mode == 'joint':
         config.mode_flow = 'flow'
         config.mode_rgb = 'rgb'
 
-    if config.dataset == 'ucf101':
-        config.num_classes = 101
-
     return config
 
+def create_session(checkpoint_path, target_device, device_id):
+    if target_device == 'GPU':
+        providers = ['CUDAExecutionProvider']
+    elif target_device == 'CPU':
+        providers = ['CPUExecutionProvider']
+    else:
+        raise ValueError(
+            f'Unsupported target device {target_device}, '
+            f'Expected one of: "CPU", "GPU"'
+        )
+    session = ort.InferenceSession(checkpoint_path, providers=providers, provider_options=[{'device_id': device_id}])
+    input_name = session.get_inputs()[0].name
+    return session, input_name
 
 def get_single_dataset(config, validation_transforms):
     if config.dataset == 'ucf101' or config.dataset == 'hmdb51':
@@ -179,21 +179,8 @@ def get_joint_dataset(config, validation_transforms):
 
 
 def eval_rgb(config, dataset_validation):
-    argmax = ops.ArgMaxWithValue(axis=1)
-    model = InceptionI3D(
-        is_train=False,
-        amp_level='O0',
-        num_classes=config.num_classes,
-        train_spatial_squeeze=False,
-        final_endpoint='logits',
-        in_channels=3,
-        dropout_keep_prob=config.dropout_keep_prob,
-        sample_duration=config.test_sample_duration
-    )
+    session, input_name = create_session(config.rgb_path, config.device_target, config.device_id)
 
-    model.set_train(False)
-    pretrained_weights = mindspore.load_checkpoint(config.rgb_path)
-    mindspore.load_param_into_net(model, pretrained_weights)
     total_steps = dataset_validation.get_dataset_size()
     accuracies = np.zeros(total_steps, np.float32)
     print('total steps:', total_steps)
@@ -205,46 +192,25 @@ def eval_rgb(config, dataset_validation):
 
         targets = columns["target"]
         targets = targets.asnumpy()
-
-        clips = columns["clip"]
-        logits = model(clips)
-        preds, _ = argmax(logits)
+        clips = columns["clip"].asnumpy()
+        logits = session.run(None, {input_name: clips})[0]
+        preds = np.argmax(logits, axis=1)
 
         correct = 0
         for i in range(len(preds)):
             if preds[i].item() == targets[i].item():
                 correct = correct + 1
         accuracy = correct / config.batch_size
-
-        if step % 1 == 0:
-            print('step:', step, '  acc:', accuracy)
+        print('step:', step, '  acc:', accuracy, ' class:')
         accuracies[step] = accuracy
         step = step + 1
 
     epoch_avg_acc = np.mean(accuracies)
     print('rgb accuracy:', epoch_avg_acc)
-    if config.openI:
-        log_file = os.path.join(config.result_url, 'log.txt')
-        with open(log_file, "w") as f_w:
-            f_w.write('rgb accuracy:' + str(epoch_avg_acc))
-
 
 def eval_flow(config, dataset_validation):
-    argmax = ops.ArgMaxWithValue(axis=1)
-    model = InceptionI3D(
-        is_train=False,
-        amp_level='O0',
-        num_classes=config.num_classes,
-        train_spatial_squeeze=False,
-        final_endpoint='logits',
-        in_channels=2,
-        dropout_keep_prob=config.dropout_keep_prob,
-        sample_duration=config.test_sample_duration
-    )
+    session, input_name = create_session(config.flow_path, config.device_target, config.device_id)
 
-    model.set_train(False)
-    pretrained_weights = mindspore.load_checkpoint(config.flow_path)
-    mindspore.load_param_into_net(model, pretrained_weights)
     total_steps = dataset_validation.get_dataset_size()
     accuracies = np.zeros(total_steps, np.float32)
     print('total steps:', total_steps)
@@ -254,66 +220,31 @@ def eval_flow(config, dataset_validation):
     iterator = dataset_validation.create_dict_iterator()
     for columns in iterator:
 
-        targets = columns["target"]
-        targets = targets.asnumpy()
-
-        clips = columns["clip"]
-        logits = model(clips)
-        preds, _ = argmax(logits)
+        targets = columns["target"].asnumpy()
+        clips = columns["clip"].asnumpy()
+        logits = session.run(None, {input_name: clips})[0]
+        preds = np.argmax(logits, axis=1)
 
         correct = 0
         for i in range(len(preds)):
             if preds[i].item() == targets[i].item():
                 correct = correct + 1
         accuracy = correct / config.batch_size
-
-        if step % 1 == 0:
-            print('step:', step, '  acc:', accuracy)
+        print('step:', step, '  acc:', accuracy)
         accuracies[step] = accuracy
         step = step + 1
 
     epoch_avg_acc = np.mean(accuracies)
     print('flow accuracy:', epoch_avg_acc)
-    if config.openI:
-        log_file = os.path.join(config.result_url, 'log.txt')
-        with open(log_file, "w") as f_w:
-            f_w.write('flow accuracy:' + str(epoch_avg_acc))
-
 
 def eval_joint(config, dataset_validation_joint):
-    argmax = ops.ArgMaxWithValue(axis=1)
-    rgb_model = InceptionI3D(
-        is_train=False,
-        amp_level='O0',
-        num_classes=config.num_classes,
-        train_spatial_squeeze=False,
-        final_endpoint='logits',
-        in_channels=3,
-        dropout_keep_prob=config.dropout_keep_prob,
-        sample_duration=config.test_sample_duration
-    )
-    rgb_model.set_train(False)
+    sess_rgb, input_name_rgb = create_session(config.rgb_path, config.device_target, config.device_id)
+    sess_flow, input_name_flow = create_session(config.flow_path, config.device_target, config.device_id)
 
-    pretrained_weights = mindspore.load_checkpoint(config.rgb_path)
-    mindspore.load_param_into_net(rgb_model, pretrained_weights)
-
-    flow_model = InceptionI3D(
-        is_train=False,
-        amp_level='O0',
-        num_classes=config.num_classes,
-        train_spatial_squeeze=False,
-        final_endpoint='logits',
-        in_channels=2,
-        dropout_keep_prob=config.dropout_keep_prob,
-        sample_duration=config.test_sample_duration
-    )
-    flow_model.set_train(False)
-
-    pretrained_weights = mindspore.load_checkpoint(config.flow_path)
-    mindspore.load_param_into_net(flow_model, pretrained_weights)
     total_steps = dataset_validation_joint.get_dataset_size()
     accuracies_rgb = np.zeros(total_steps, np.float32)
     accuracies_flow = np.zeros(total_steps, np.float32)
+    accuracies_joint = np.zeros(total_steps, np.float32)
     print('total steps:', total_steps)
     print('running evaluation')
     step = 0
@@ -325,35 +256,42 @@ def eval_joint(config, dataset_validation_joint):
         targets_rgb = targets_rgb.asnumpy()
         targets_flow = columns["target_flow"]
         targets_flow = targets_flow.asnumpy()
+        clips_rgb = columns["clip_rgb"].asnumpy()
+        logits_rgb = sess_rgb.run(None, {input_name_rgb: clips_rgb})[0]
 
-        clips_rgb = columns["clip_rgb"]
-        logits_rgb = rgb_model(clips_rgb)
-        clips_flow = columns["clip_flow"]
-        logits_flow = flow_model(clips_flow)
+        clips_flow = columns["clip_flow"].asnumpy()
+        logits_flow = sess_flow.run(None, {input_name_flow: clips_flow})[0]
+
         logits = logits_flow + logits_rgb
-        preds, _ = argmax(logits)
+        preds_rgb = np.argmax(logits_rgb, axis=1)
+        preds_flow = np.argmax(logits_flow, axis=1)
+        preds = np.argmax(logits, axis=1)
 
         correct_rgb = 0
         correct_flow = 0
+        correct_joint = 0
         for i in range(len(preds)):
-            if preds[i].item() == targets_rgb[i].item():
+            if preds_rgb[i].item() == targets_rgb[i].item():
                 correct_rgb = correct_rgb + 1
-            if preds[i].item() == targets_flow[i].item():
+            if preds_flow[i].item() == targets_flow[i].item():
                 correct_flow = correct_flow + 1
-
+            if preds[i].item() == targets_flow[i].item():
+                correct_joint = correct_joint + 1
         accuracy_rgb = correct_rgb / config.batch_size
         accuracy_flow = correct_flow / config.batch_size
-        if step % 1 == 0:
-            print('(use rgb target) step:', step, '  acc:', accuracy_rgb)
-            print('(use flow target) step:', step, '  acc:', accuracy_flow)
+        accuracy_joint = correct_joint / config.batch_size
+        print('(rgb) step:', step, '  acc:', accuracy_rgb)
+        print('(flow) step:', step, '  acc:', accuracy_flow)
         accuracies_rgb[step] = accuracy_rgb
         accuracies_flow[step] = accuracy_flow
+        accuracies_joint[step] = accuracy_joint
         step = step + 1
 
     epoch_avg_acc_rgb = np.mean(accuracies_rgb)
     epoch_avg_acc_flow = np.mean(accuracies_flow)
-    print('accuracy of use rgb targerts:', epoch_avg_acc_rgb, '   accuracy of use flow targerts:',
-          epoch_avg_acc_flow)
+    epoch_avg_acc_joint = np.mean(accuracies_joint)
+    print('accuracy of rgb:', epoch_avg_acc_rgb, '   accuracy of flow:',
+          epoch_avg_acc_flow, 'accuracy of joint:', epoch_avg_acc_joint)
 
 
 def main():
@@ -363,42 +301,6 @@ def main():
     mindspore.set_seed(2022)
     np.random.seed(2022)
     random.seed(2022)
-
-    if config.openI:
-        import moxing as mox
-        obs_data_url = config.data_url
-        config.data_url = 'cache/user-job-dir/data/'
-        if not os.path.exists(config.data_url):
-            os.makedirs(config.data_url)
-        mox.file.copy_parallel(obs_data_url, config.data_url)
-        print("Successfully Download {} to {}".format(obs_data_url, config.data_url))
-
-        obs_ckpt_url = config.ckpt_url
-        if config.test_mode == 'flow':
-            config.ckpt_url = os.path.join('cache/user-job-dir', config.flow_path)
-            config.flow_path = config.ckpt_url
-        if config.test_mode == 'rgb':
-            config.ckpt_url = os.path.join('cache/user-job-dir', config.rgb_path)
-            config.rgb_path = config.ckpt_url
-        mox.file.copy(obs_ckpt_url, config.ckpt_url)
-        print("Successfully Download {} to {}".format(obs_ckpt_url, config.ckpt_url))
-
-        obs_result_url = config.result_url
-        config.result_url = 'cache/user-job-dir/result/'
-        if not os.path.exists(config.result_url):
-            os.makedirs(config.result_url)
-
-        config.video_path = os.path.join(config.data_url, config.dataset, 'jpg')
-        if config.dataset == 'ucf101':
-            config.annotation_path = os.path.join(config.data_url, config.dataset, 'annotation/ucf101_01.json')
-        if config.dataset == 'hmdb51':
-            config.annotation_path = os.path.join(config.data_url, config.dataset, 'annotation/hmdb51_1.json')
-
-    assert config.context in ['py', 'gr']
-    if config.context == 'py':
-        context.set_context(mode=context.PYNATIVE_MODE, device_target=config.device_target, device_id=config.device_id)
-    else:
-        context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=config.device_id)
 
     validation_transforms = {
         'spatial': Compose([CenterCrop(config.spatial_size)]),
@@ -425,12 +327,6 @@ def main():
     toc = time.time()
     total_time = toc - tic
     print('total_time:', total_time)
-
-    if config.openI:
-        mox.file.copy_parallel(config.result_url, obs_result_url)
-        print("Successfully Upload {} to {}".format(config.result_url, obs_result_url))
-
-
 
 if __name__ == "__main__":
     main()
