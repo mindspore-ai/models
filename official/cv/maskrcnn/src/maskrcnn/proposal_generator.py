@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -64,15 +64,14 @@ class Proposal(nn.Cell):
         self.target_means = target_means
         self.target_stds = target_stds
         self.use_sigmoid_cls = use_sigmoid_cls
+        self.reshape_shape = (-1, 1)
 
         if self.use_sigmoid_cls:
             self.cls_out_channels = num_classes - 1
             self.activation = P.Sigmoid()
-            self.reshape_shape = (-1, 1)
         else:
             self.cls_out_channels = num_classes
             self.activation = P.Softmax(axis=1)
-            self.reshape_shape = (-1, 2)
 
         if self.cls_out_channels <= 0:
             raise ValueError('num_classes={} is too small'.format(num_classes))
