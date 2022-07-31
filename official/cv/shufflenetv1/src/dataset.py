@@ -64,3 +64,38 @@ def create_dataset(dataset_path, do_train, device_num=1, rank=0):
     # apply batch operations
     data_set = data_set.batch(config.batch_size, drop_remainder=True)
     return data_set
+
+
+def create_flower_dataset(device_num=1, rank=0):
+    ds.config.set_seed(1)
+    if device_num == 1:
+        dataset = ds.ImageFolderDataset(config.dataset_path, num_parallel_workers=6, shuffle=False)
+    else:
+        dataset = ds.ImageFolderDataset(config.dataset_path, num_parallel_workers=6, shuffle=False,
+                                        num_shards=device_num, shard_id=rank)
+    train_dataset, eval_dataset = dataset.split([0.8, 0.2], randomize=True)
+
+    trans = [
+        C.RandomCropDecodeResize(224),
+        C.RandomHorizontalFlip(prob=0.5),
+        C.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4),
+        C.Normalize(mean=[0.485 * 255, 0.456 * 255, 0.406 * 255], std=[0.229 * 255, 0.224 * 255, 0.225 * 255]),
+        C.HWC2CHW()
+    ]
+    evals = [
+        C.Decode(),
+        C.Resize(239),
+        C.CenterCrop(224),
+        C.Normalize(mean=[0.485 * 255, 0.456 * 255, 0.406 * 255], std=[0.229 * 255, 0.224 * 255, 0.225 * 255]),
+        C.HWC2CHW()
+    ]
+
+    type_cast_op = C2.TypeCast(mstype.int32)
+    train_dataset = train_dataset.map(input_columns="image", operations=trans, num_parallel_workers=6)
+    train_dataset = train_dataset.map(input_columns="label", operations=type_cast_op, num_parallel_workers=6)
+    eval_dataset = eval_dataset.map(input_columns="image", operations=evals, num_parallel_workers=6)
+    eval_dataset = eval_dataset.map(input_columns="label", operations=type_cast_op, num_parallel_workers=6)
+    # apply batch operations
+    train_dataset = train_dataset.batch(config.batch_size, drop_remainder=True)
+    eval_dataset = eval_dataset.batch(config.batch_size, drop_remainder=True)
+    return train_dataset, eval_dataset

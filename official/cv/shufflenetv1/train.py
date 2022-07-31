@@ -13,9 +13,10 @@
 # limitations under the License.
 # ============================================================================
 """train ShuffleNetV1"""
+import argparse
 import os
 import time
-from mindspore import context
+from mindspore import context, nn
 from mindspore import Tensor
 from mindspore.common import set_seed
 from mindspore.nn.optim.momentum import Momentum
@@ -25,11 +26,12 @@ from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMoni
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
+from mindvision.engine.callback import ValAccMonitor
 from src.lr_generator import get_lr
 from src.shufflenetv1 import ShuffleNetV1
-from src.dataset import create_dataset
+from src.dataset import create_dataset, create_flower_dataset
 from src.crossentropysmooth import CrossEntropySmooth
-from src.model_utils.config import config
+from src.model_utils.config import get_config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id
 
@@ -68,12 +70,21 @@ def train():
                               num_classes=config.num_classes)
 
     # define dataset
-    dataset = create_dataset(config.train_dataset_path, do_train=True, device_num=group_size, rank=rank)
-    batches_per_epoch = dataset.get_dataset_size()
+    if config.is_transfer:
+        train_dataset, eval_dataset = create_flower_dataset(device_num=group_size, rank=rank)
+        batches_per_epoch = train_dataset.get_dataset_size()
+    else:
+        dataset = create_dataset(config.train_dataset_path, do_train=True, device_num=group_size, rank=rank)
+        batches_per_epoch = dataset.get_dataset_size()
 
     # resume
     if config.resume:
         ckpt = load_checkpoint(config.resume)
+        if config.is_transfer:
+            ckpt.pop('classifier.weight')
+            ckpt.pop('classifier.bias')
+            ckpt.pop('moments.classifier.weight')
+            ckpt.pop('moments.classifier.bias')
         load_param_into_net(net, ckpt)
 
     # get learning rate
@@ -86,29 +97,51 @@ def train():
 
     # model
     loss_scale_manager = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
-    model = Model(net, loss_fn=loss, optimizer=optimizer, amp_level=config.amp_level,
-                  loss_scale_manager=loss_scale_manager)
+
+    if config.is_transfer:
+        model = Model(net, loss_fn=loss, optimizer=optimizer, amp_level=config.amp_level,
+                      loss_scale_manager=loss_scale_manager, metrics={'Top_1_Acc': nn.Top1CategoricalAccuracy()})
+    else:
+        model = Model(net, loss_fn=loss, optimizer=optimizer, amp_level=config.amp_level,
+                      loss_scale_manager=loss_scale_manager)
 
     # define callbacks
     cb = [TimeMonitor(), LossMonitor()]
     if config.save_checkpoint:
         save_ckpt_path = config.save_ckpt_path
-        config_ck = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_epochs * batches_per_epoch,
-                                     keep_checkpoint_max=config.keep_checkpoint_max)
-        ckpt_cb = ModelCheckpoint("shufflenetv1", directory=save_ckpt_path, config=config_ck)
+        if config.is_transfer:
+            ckpt_cb = ValAccMonitor(model=model, dataset_val=eval_dataset, num_epochs=config.epoch_size,
+                                    ckpt_directory=save_ckpt_path, best_ckpt_name="shufflenetv1_transfer_best.ckpt",
+                                    metric_name="Top_1_Acc", dataset_sink_mode=False)
+        else:
+            config_ck = CheckpointConfig(save_checkpoint_steps=config.save_checkpoint_epochs * batches_per_epoch,
+                                         keep_checkpoint_max=config.keep_checkpoint_max)
+            ckpt_cb = ModelCheckpoint("shufflenetv1", directory=save_ckpt_path, config=config_ck)
+        if config.is_distributed:
+            if rank == 0:
+                cb += [ckpt_cb]
+        else:
+            cb += [ckpt_cb]
 
     print("============== Starting Training ==============")
     start_time = time.time()
     # begin train
-    if config.is_distributed:
-        if rank == 0:
-            cb += [ckpt_cb]
+    if config.is_transfer:
+        model.train(config.epoch_size, train_dataset, callbacks=cb, dataset_sink_mode=False)
     else:
-        cb += [ckpt_cb]
-    model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
-    print("time: ", (time.time() - start_time) * 1000)
+        model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
+    use_time = time.time() - start_time
+    hour = str(int(use_time // 60 // 60))
+    minute = str(int(use_time // 60 % 60))
+    second = str(int(use_time % 60))
+    print("total time:" + hour + "h " + minute + "m " + second + "s")
     print("============== Train Success ==============")
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='train', add_help=False)
+    parser.add_argument('--config_path', type=str, default='../../default_config.yaml',
+                        help='Config file path')
+    args = parser.parse_args()
+    config = get_config(args.config_path)
     train()

@@ -21,13 +21,12 @@ from pprint import pprint, pformat
 import yaml
 
 
-_config_path = '../../default_config.yaml'
-
 
 class Config:
     """
     Configuration namespace. Convert dictionary to members
     """
+
     def __init__(self, cfg_dict):
         for k, v in cfg_dict.items():
             if isinstance(v, (list, tuple)):
@@ -54,6 +53,8 @@ def parse_cli_to_yaml(parser, cfg, helper=None, choices=None, cfg_path='default_
     """
     parser = argparse.ArgumentParser(description='[REPLACE THIS at config.py]',
                                      parents=[parser])
+    # extra argument on jupyter
+    parser.add_argument('-f', type=str, default="extra argument on jupyter")
     helper = {} if helper is None else helper
     choices = {} if choices is None else choices
     for item in cfg:
@@ -112,13 +113,13 @@ def merge(args, cfg):
     return cfg
 
 
-def get_config():
+def get_config(config_path='../../default_config.yaml'):
     """
     Get Config according to the yaml file and cli arguments
     """
     parser = argparse.ArgumentParser(description='default name', add_help=False)
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    parser.add_argument('--config_path', type=str, default=os.path.join(current_dir, _config_path),
+    parser.add_argument('--config_path', type=str, default=os.path.join(current_dir, config_path),
                         help='Config file path')
     path_args, _ = parser.parse_known_args()
     default, helper, choices = parse_yaml(path_args.config_path)
