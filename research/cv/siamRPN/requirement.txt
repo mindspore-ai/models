@@ -3,3 +3,4 @@ fire
 opencv-python
 tqdm
 Shapely
+onnxruntime-gpu
