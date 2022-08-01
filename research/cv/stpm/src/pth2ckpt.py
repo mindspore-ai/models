@@ -12,9 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""
-python pth2ckpt.py
-"""
+""" python pth2ckpt.py """
+
 import argparse
 import torch
 from mindspore.train.serialization import save_checkpoint
@@ -58,6 +57,10 @@ def pytorch2mindspore(pt_path):
         object:
     """
     par_dict = torch.load(pt_path, map_location='cpu')
+
+    # model = _resnet18(pretrained=pretrained, **kwargs)
+    # model.load_state_dict(torch.hub.load_state_dict_from_url('https://download.pytorch.org/models/resnet18-5c106cde.pth',
+    #                                                          progress=False)
 
     new_params_list = []
 

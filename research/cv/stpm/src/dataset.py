@@ -26,9 +26,7 @@ from mindspore.dataset.transforms.transforms import Compose
 
 
 class MVTecDataset():
-    """
-    MVTecDataset
-    """
+    """MVTecDataset"""
 
     def __init__(self, root, transform, gt_transform, phase, is_json=False, save_sample=False):
         if phase == 'train':
