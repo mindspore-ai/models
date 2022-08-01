@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,7 +46,6 @@ def score_model(preds, test_pos, test_neg, weight, bias):
     scores = np.dot(np.concatenate((test_positive_z, test_negative_z), axis=0), weight) + bias
     probability_scores = np.exp(softmax(scores))
     predictions = probability_scores[:, 0] / probability_scores[:, 0: 2].sum(1)
-    # predictions = predictions.asnumpy()
     targets = [0] * len(test_pos) + [1] * len(test_neg)
     auc, f1 = calculate_auc(targets, predictions)
     return auc, f1

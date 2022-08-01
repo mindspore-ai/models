@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,10 +18,10 @@ Evaluation script
 import argparse
 import ast
 
-import mindspore.numpy as mnp
 import mindspore.ops as ops
 from mindspore import Tensor
 from mindspore import context
+from mindspore import dtype as mstype
 from mindspore import load_checkpoint
 from mindspore import load_param_into_net
 from mindspore.common import set_seed
@@ -42,8 +42,9 @@ def remove_self_loops(edge_index):
         Tensor(edge_index): removed self loops
     """
     mask = edge_index[0] != edge_index[1]
-    edge_index = edge_index.asnumpy()[:, mask.asnumpy()]
+    edge_index = edge_index[:, mask]
     return Tensor(edge_index)
+
 
 def main():
     """main"""
@@ -90,12 +91,10 @@ def main():
     load_param_into_net(net_f1, param_dict)
     # Evaluation auc
     res = net_auc(repos, reneg)
-    score_positive_edges = mnp.array(pos_test, dtype=mnp.int32).T
-    score_negative_edges = mnp.array(neg_test, dtype=mnp.int32).T
-    test_positive_z = ops.Concat(axis=1)((res[score_positive_edges[0, :], :],
-                                          res[score_positive_edges[1, :], :]))
-    test_negative_z = ops.Concat(axis=1)((res[score_negative_edges[0, :], :],
-                                          res[score_negative_edges[1, :], :]))
+    score_positive_edges = Tensor(pos_test, dtype=mstype.int32).T
+    score_negative_edges = Tensor(neg_test, dtype=mstype.int32).T
+    test_positive_z = ops.Concat(axis=1)((res[score_positive_edges[0, :], :], res[score_positive_edges[1, :], :]))
+    test_negative_z = ops.Concat(axis=1)((res[score_negative_edges[0, :], :], res[score_negative_edges[1, :], :]))
     scores = ops.matmul(ops.Concat(axis=0)((test_positive_z, test_negative_z)),
                         net_auc.regression_weights) + net_auc.regression_bias
     probability_scores = ops.Exp()(ops.Softmax(axis=1)(scores))
@@ -105,10 +104,8 @@ def main():
     auc, _ = calculate_auc(targets, predictions)
     # Evaluation f1
     res = net_f1(repos, reneg)
-    test_positive_z = ops.Concat(axis=1)((res[score_positive_edges[0, :], :],
-                                          res[score_positive_edges[1, :], :]))
-    test_negative_z = ops.Concat(axis=1)((res[score_negative_edges[0, :], :],
-                                          res[score_negative_edges[1, :], :]))
+    test_positive_z = ops.Concat(axis=1)((res[score_positive_edges[0, :], :], res[score_positive_edges[1, :], :]))
+    test_negative_z = ops.Concat(axis=1)((res[score_negative_edges[0, :], :], res[score_negative_edges[1, :], :]))
     scores = ops.matmul(ops.Concat(axis=0)((test_positive_z, test_negative_z)),
                         net_f1.regression_weights) + net_f1.regression_bias
     probability_scores = ops.Exp()(ops.Softmax(axis=1)(scores))

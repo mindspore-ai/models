@@ -18,6 +18,7 @@ import math
 import numpy as np
 from mindspore import Parameter
 from mindspore import Tensor
+from mindspore import context
 from mindspore import dtype as mstype
 from mindspore import nn
 from mindspore import numpy as mnp
@@ -119,6 +120,12 @@ class SignedSAGEConvolution(nn.Cell):
         self.out_channels = out_channels
         self.norm = norm
         self.norm_embed = norm_embed
+        if context.get_context('device_target') == 'GPU':
+            # GPU does not have any performance benefits from calculating this layer using float16.
+            # Therefore, we preserve the single precision.
+            self.matmul = nn.MatMul()
+        else:
+            self.matmul = nn.MatMul().to_float(mstype.float16)
         self.l2_normalize = ops.L2Normalize(epsilon=1e-12, axis=-1)
         self.concat = ops.Concat(axis=1)
         self.weight_tensor = Tensor(shape=[self.in_channels, out_channels], dtype=mstype.float32,
@@ -164,7 +171,7 @@ class SignedSAGEConvolutionBase(SignedSAGEConvolution):
         else:
             out = ms_scatter_add(x[col], row, dim_size=x.shape[0])
         out = self.concat((out, x))
-        out = ops.matmul(out, self.weight)
+        out = self.matmul(out, self.weight)
         if self.bias is not None:
             out = out + self.bias
         if self.norm_embed:
@@ -201,7 +208,7 @@ class SignedSAGEConvolutionDeep(SignedSAGEConvolution):
             out_2 = ms_scatter_add(x_2[col_neg], row_neg, dim_size=x_2.shape[0])
 
         out = self.concat((out_1, out_2, x_1))
-        out = ops.matmul(out, self.weight)
+        out = self.matmul(out, self.weight)
         if self.bias is not None:
             out = out + self.bias
         if self.norm_embed:

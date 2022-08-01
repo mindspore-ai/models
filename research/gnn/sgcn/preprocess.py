@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -30,11 +30,11 @@ from src.ms_utils import setup_features
 def setup_dataset(args, edges):
     """
     Returns:
-        X(Tensor): Dataset.
-        positive_edges(Tensor): Positive edges for training.
-        negative_edges(Tensor): Negative edges for training.
-        test_positive_edges(Tensor): Positive edges for testing.
-        test_negative_edges(Tensor): Negative edges for testing.
+        X(np.ndarray): Dataset.
+        positive_edges(np.ndarray): Positive edges for training.
+        negative_edges(np.ndarray): Negative edges for training.
+        test_positive_edges(np.ndarray): Positive edges for testing.
+        test_negative_edges(np.ndarray): Negative edges for testing.
     """
     positive_edges, test_positive_edges = train_test_split(edges["positive_edges"],
                                                            test_size=args.test_size, random_state=1)
@@ -44,12 +44,10 @@ def setup_dataset(args, edges):
     ecount = len(positive_edges + negative_edges)
 
     X = setup_features(args, positive_edges, negative_edges, edges["ncount"])
-    X = np.array(X.tolist())
     positive_edges = np.array(positive_edges, dtype=np.int32).T
     negative_edges = np.array(negative_edges, dtype=np.int32).T
     y = np.array([0 if i < int(ecount / 2) else 1 for i in range(ecount)] + [2] * (ecount * 2))
     y = np.array(y, np.int32)
-    X = np.array(X, np.float32)
     print(positive_edges.dtype, negative_edges.dtype, y.dtype)
     return X, positive_edges, negative_edges, test_positive_edges, test_negative_edges
 
