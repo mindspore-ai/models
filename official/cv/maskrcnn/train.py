@@ -94,7 +94,7 @@ def modelarts_pre_process():
     config.pre_trained = os.path.join(config.coco_root, config.pre_trained)
     config.save_checkpoint_path = config.output_path
 
-def create_mindrecord_dir(prefix, mindrecord_dir):
+def create_mindrecord_dir(prefix, mindrecord_dir, mindrecord_file):
     if not os.path.isdir(mindrecord_dir):
         os.makedirs(mindrecord_dir)
     if config.dataset == "coco":
@@ -178,7 +178,7 @@ def train_maskrcnn():
     mindrecord_dir = config.mindrecord_dir
     mindrecord_file = os.path.join(mindrecord_dir, prefix + "0")
     if rank == 0 and not os.path.exists(mindrecord_file):
-        create_mindrecord_dir(prefix, mindrecord_dir)
+        create_mindrecord_dir(prefix, mindrecord_dir, mindrecord_file)
 
     if not config.only_create_dataset:
         # loss_scale = float(config.loss_scale)
