@@ -798,3 +798,15 @@ In dataset.py, we set the seed inside “create_dataset" function. We also use r
 # [ModelZoo Homepage](#contents)
 
 Please check the official [homepage](https://gitee.com/mindspore/models).
+
+## FAQ
+
+Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some common question.
+
+- **Q: Why does modifying the max_instance_count parameter in the yaml configuration file report the problem that the shape does not correspond?**
+
+  **A**: Because the values of max_instance_count and num_gts are not equal. When modifying max_instance_count, num_gts also needs to be modified accordingly, and their values need to remain equal.
+
+- **Q: Why does modifying the mask_shape parameter in the yaml configuration file report the problem that the shape does not correspond?**
+
+  **A**: Because the value relationship between mask_shape and mask_out_size is incorrect. The value of mask_shape should be twice the value of mask_out_size. For example: when mask_shape=[46, 46], mask_out_size=23。
