@@ -1,0 +1,28 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+
+enable_modelarts: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# Path for local
+run_distribute: False
+enable_profiling: False
+dataset_path: "/cache/dataset/"
+output_path: "/cache/output/"
+load_path: "/cache/load_checkpoint/"
+device_target: "Ascend"
+log_save_path: "./log/PCB/duke/eval/"
+checkpoint_save_path: ""
+checkpoint_file_path: "/cache/load_checkpoint/PCB-60_258.ckpt"
+# =========================================================================
+
+# dataset setting
+mindrecord_dir: "./MindRecord"
+dataset_name: "duke"
+batch_size: 64
+num_parallel_workers: 4
+
+# model setting
+model_name: "PCB"
+use_G_feature: True
