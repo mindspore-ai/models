@@ -20,14 +20,16 @@ import mindspore.common.dtype as mstype
 
 from mindspore.common.initializer import initializer
 
+
 class Align(nn.Cell):
     """align"""
+
     def __init__(self, c_in, c_out):
         super(Align, self).__init__()
         self.c_in = c_in
         self.c_out = c_out
-        self.align_conv = nn.Conv2d(in_channels=self.c_in, out_channels=self.c_out, kernel_size=1, \
-         pad_mode='valid', weight_init='he_uniform')
+        self.align_conv = nn.Conv2d(in_channels=self.c_in, out_channels=self.c_out, kernel_size=1,
+                                    pad_mode='valid', weight_init='he_uniform')
         self.concat = ops.Concat(axis=1)
         self.zeros = ops.Zeros()
 
@@ -41,10 +43,12 @@ class Align(nn.Cell):
             x_align = self.concat((x, y))
         return x_align
 
+
 class CausalConv2d(nn.Cell):
     """causal conv2d"""
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1, \
-     enable_padding=False, dilation=1, groups=1, bias=True):
+
+    def __init__(self, in_channels, out_channels, kernel_size, stride=1,
+                 enable_padding=False, dilation=1, groups=1, bias=True):
         super(CausalConv2d, self).__init__()
         if isinstance(kernel_size, int):
             kernel_size = (kernel_size, kernel_size)
@@ -59,14 +63,17 @@ class CausalConv2d(nn.Cell):
             self.__padding = 0
         if isinstance(self.__padding, int):
             self.left_padding = (self.__padding, self.__padding)
-        self.conv2d = nn.Conv2d(in_channels, out_channels, kernel_size, stride=stride, \
-         padding=0, pad_mode='valid', dilation=dilation, group=groups, has_bias=bias, weight_init='he_uniform')
+        self.conv2d = nn.Conv2d(in_channels, out_channels, kernel_size, stride=stride,
+                                padding=0, pad_mode='valid', dilation=dilation, group=groups,
+                                has_bias=bias, weight_init='he_uniform')
         self.pad = ops.Pad(((0, 0), (0, 0), (self.left_padding[0], 0), (self.left_padding[1], 0)))
+
     def construct(self, x):
         if self.__padding != 0:
             x = self.pad(x)
         result = self.conv2d(x)
         return result
+
 
 class TemporalConvLayer(nn.Cell):
     """
@@ -81,6 +88,7 @@ class TemporalConvLayer(nn.Cell):
 
     #param x: tensor, [batch_size, c_in, timestep, n_vertex]
     """
+
     def __init__(self, Kt, c_in, c_out, n_vertex, act_func):
         super(TemporalConvLayer, self).__init__()
         self.Kt = Kt
@@ -89,8 +97,8 @@ class TemporalConvLayer(nn.Cell):
         self.n_vertex = n_vertex
         self.act_func = act_func
         self.align = Align(self.c_in, self.c_out)
-        self.causal_conv = CausalConv2d(in_channels=self.c_in, out_channels=2 * self.c_out, \
-         kernel_size=(self.Kt, 1), enable_padding=False, dilation=1)
+        self.causal_conv = CausalConv2d(in_channels=self.c_in, out_channels=2 * self.c_out,
+                                        kernel_size=(self.Kt, 1), enable_padding=False, dilation=1)
         self.linear = nn.Dense(self.n_vertex, self.n_vertex).to_float(mstype.float16)
         self.sigmoid = nn.Sigmoid()
         self.tanh = nn.Tanh()
@@ -107,8 +115,6 @@ class TemporalConvLayer(nn.Cell):
         x_pq = self.split(x_tc_out)
         x_p = x_pq[0]
         x_q = x_pq[1]
-        x_glu = x_causal_conv
-        x_gtu = x_causal_conv
         if self.act_func == 'glu':
             # (x_p + x_in) ⊙ Sigmoid(x_q)
             x_glu = self.mul(self.add(x_p, x_in), self.sigmoid(x_q))
@@ -120,8 +126,10 @@ class TemporalConvLayer(nn.Cell):
             x_tc_out = x_gtu
         return x_tc_out
 
+
 class ChebConv(nn.Cell):
     """cheb conv"""
+
     def __init__(self, c_in, c_out, Ks, chebconv_matrix):
         super(ChebConv, self).__init__()
         self.c_in = c_in
@@ -155,14 +163,16 @@ class ChebConv(nn.Cell):
                 x_list.append(self.matmul(2 * self.chebconv_matrix, x_list[k - 1]) - x_list[k - 2])
         x_tensor = self.stack(x_list)
 
-        x_mul = self.matmul(self.reshape(x_tensor, (-1, self.Ks * c_in)), self.reshape(self.weight, \
-         (self.Ks * c_in, -1)))
+        x_mul = self.matmul(self.reshape(x_tensor, (-1, self.Ks * c_in)), self.reshape(self.weight,
+                                                                                       (self.Ks * c_in, -1)))
         x_mul = self.reshape(x_mul, (-1, self.c_out))
         x_chebconv = self.bias_add(x_mul, self.bias)
         return x_chebconv
 
+
 class GCNConv(nn.Cell):
     """gcn conv"""
+
     def __init__(self, c_in, c_out, gcnconv_matrix):
         super(GCNConv, self).__init__()
         self.c_in = c_in
@@ -190,8 +200,10 @@ class GCNConv(nn.Cell):
 
         return x_gcnconv_out
 
+
 class GraphConvLayer(nn.Cell):
     """grarh conv layer"""
+
     def __init__(self, Ks, c_in, c_out, graph_conv_type, graph_conv_matrix):
         super(GraphConvLayer, self).__init__()
         self.Ks = Ks
@@ -220,6 +232,7 @@ class GraphConvLayer(nn.Cell):
         x_gc_out = x_gc_with_rc
         return x_gc_out
 
+
 class STConvBlock(nn.Cell):
     """
     # STConv Block contains 'TNSATND' structure
@@ -230,8 +243,9 @@ class STConvBlock(nn.Cell):
     # D: Dropout
     #Kt    Ks   n_vertex
     """
-    def __init__(self, Kt, Ks, n_vertex, last_block_channel, channels, gated_act_func, graph_conv_type, \
-     graph_conv_matrix, drop_rate):
+
+    def __init__(self, Kt, Ks, n_vertex, last_block_channel, channels, gated_act_func, graph_conv_type,
+                 graph_conv_matrix, drop_rate):
         super(STConvBlock, self).__init__()
         self.Kt = Kt
         self.Ks = Ks
@@ -243,14 +257,14 @@ class STConvBlock(nn.Cell):
         self.graph_conv_type = graph_conv_type
         self.graph_conv_matrix = graph_conv_matrix
         self.drop_rate = drop_rate
-        self.tmp_conv1 = TemporalConvLayer(self.Kt, self.last_block_channel, self.channels[0], \
-         self.n_vertex, self.gated_act_func)
-        self.graph_conv = GraphConvLayer(self.Ks, self.channels[0], self.channels[1], \
-         self.graph_conv_type, self.graph_conv_matrix)
-        self.tmp_conv2 = TemporalConvLayer(self.Kt, self.channels[1], self.channels[2], \
-         self.n_vertex, self.gated_act_func)
-        self.tc2_ln = nn.LayerNorm([self.n_vertex, self.channels[2]], begin_norm_axis=2, \
-         begin_params_axis=2, epsilon=1e-05)
+        self.tmp_conv1 = TemporalConvLayer(self.Kt, self.last_block_channel, self.channels[0],
+                                           self.n_vertex, self.gated_act_func)
+        self.graph_conv = GraphConvLayer(self.Ks, self.channels[0], self.channels[1],
+                                         self.graph_conv_type, self.graph_conv_matrix)
+        self.tmp_conv2 = TemporalConvLayer(self.Kt, self.channels[1], self.channels[2],
+                                           self.n_vertex, self.gated_act_func)
+        self.tc2_ln = nn.LayerNorm([self.n_vertex, self.channels[2]],
+                                   begin_norm_axis=2, begin_params_axis=2, epsilon=1e-05)
 
         self.relu = nn.ReLU()
         self.do = nn.Dropout(keep_prob=self.drop_rate)
@@ -269,6 +283,7 @@ class STConvBlock(nn.Cell):
         x_st_conv_out = x_do
         return x_st_conv_out
 
+
 class OutputBlock(nn.Cell):
     """
     # Output block contains 'TNFF' structure
@@ -277,6 +292,7 @@ class OutputBlock(nn.Cell):
     # F: Fully-Connected Layer
     # F: Fully-Connected Layer
     """
+
     def __init__(self, Ko, last_block_channel, channels, end_channel, n_vertex, gated_act_func, drop_rate):
         super(OutputBlock, self).__init__()
         self.Ko = Ko
@@ -286,12 +302,12 @@ class OutputBlock(nn.Cell):
         self.n_vertex = n_vertex
         self.gated_act_func = gated_act_func
         self.drop_rate = drop_rate
-        self.tmp_conv1 = TemporalConvLayer(self.Ko, self.last_block_channel, \
-         self.channels[0], self.n_vertex, self.gated_act_func)
+        self.tmp_conv1 = TemporalConvLayer(self.Ko, self.last_block_channel,
+                                           self.channels[0], self.n_vertex, self.gated_act_func)
         self.fc1 = nn.Dense(self.channels[0], self.channels[1]).to_float(mstype.float16)
         self.fc2 = nn.Dense(self.channels[1], self.end_channel).to_float(mstype.float16)
-        self.tc1_ln = nn.LayerNorm([self.n_vertex, self.channels[0]], begin_norm_axis=2, \
-         begin_params_axis=2, epsilon=1e-05)
+        self.tc1_ln = nn.LayerNorm([self.n_vertex, self.channels[0]],
+                                   begin_norm_axis=2, begin_params_axis=2, epsilon=1e-05)
         self.sigmoid = nn.Sigmoid()
         self.transpose = ops.Transpose()
 

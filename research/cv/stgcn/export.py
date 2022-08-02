@@ -16,50 +16,36 @@
 ##############export checkpoint file into air, onnx, mindir models#################
 python export.py
 """
-import argparse
 import numpy as np
 import pandas as pd
 
 import mindspore as ms
 from mindspore import context, Tensor, load_checkpoint, load_param_into_net, export
-from src import dataloader, utility
-from src.config import stgcn_chebconv_45min_cfg, stgcn_chebconv_30min_cfg, stgcn_chebconv_15min_cfg, stgcn_gcnconv_45min_cfg, stgcn_gcnconv_30min_cfg, stgcn_gcnconv_15min_cfg
+
+from src.argparser import arg_parser
+from src import dataloader, utility, config
 from src.model import models
 
-parser = argparse.ArgumentParser(description='Tracking')
-parser.add_argument("--device_id", type=int, default=0, help="Device id")
-parser.add_argument("--batch_size", type=int, default=1, help="batch size")
-parser.add_argument('--device_target', type=str, default="Ascend",
-                    choices=['Ascend', 'GPU', 'CPU'],
-                    help='device where the code will be implemented (default: Ascend)')
-parser.add_argument('--data_url', type=str, help='Train dataset directory.')
-parser.add_argument('--data_path', type=str, default="vel.csv", help='Dataset file of vel.')
-parser.add_argument('--wam_path', type=str, default="adj_mat.csv", help='Dataset file of warm.')
-parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
-parser.add_argument("--n_pred", type=int, default=3, help="The number of time interval for predcition.")
-parser.add_argument("--graph_conv_type", type=str, default="chebconv", help="Grapg convolution type.")
-parser.add_argument("--file_name", type=str, default="stgcn", help="output file name.")
-parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
-args = parser.parse_args()
+args = arg_parser()
 
 context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
 
 if args.graph_conv_type == "chebconv":
     if args.n_pred == 9:
-        cfg = stgcn_chebconv_45min_cfg
+        cfg = config.stgcn_chebconv_45min_cfg
     elif args.n_pred == 6:
-        cfg = stgcn_chebconv_30min_cfg
+        cfg = config.stgcn_chebconv_30min_cfg
     elif args.n_pred == 3:
-        cfg = stgcn_chebconv_15min_cfg
+        cfg = config.stgcn_chebconv_15min_cfg
     else:
         raise ValueError("Unsupported n_pred.")
 elif args.graph_conv_type == "gcnconv":
     if args.n_pred == 9:
-        cfg = stgcn_gcnconv_45min_cfg
+        cfg = config.stgcn_gcnconv_45min_cfg
     elif args.n_pred == 6:
-        cfg = stgcn_gcnconv_30min_cfg
+        cfg = config.stgcn_gcnconv_30min_cfg
     elif args.n_pred == 3:
-        cfg = stgcn_gcnconv_15min_cfg
+        cfg = config.stgcn_gcnconv_15min_cfg
     else:
         raise ValueError("Unsupported pred.")
 else:
@@ -76,9 +62,8 @@ if (cfg.graph_conv_type == 'gcnconv') and (cfg.Ks != 2):
 
 # blocks: settings of channel size in st_conv_blocks and output layer,
 # using the bottleneck design in st_conv_blocks
-blocks = []
-blocks.append([1])
-for l in range(cfg.stblock_num):
+blocks = [[1]]
+for _ in range(cfg.stblock_num):
     blocks.append([64, 16, 64])
 if Ko == 0:
     blocks.append([128])
@@ -118,8 +103,8 @@ elif cfg.graph_conv_type == "gcnconv":
     if (cfg.mat_type != "hat_sym_normd_lap_mat") and (cfg.mat_type != "hat_rw_normd_lap_mat"):
         raise ValueError(f'ERROR: {cfg.mat_type} is wrong.')
 
-stgcn_conv = models.STGCN_Conv(cfg.Kt, cfg.Ks, blocks, cfg.n_his, n_vertex, \
-    cfg.gated_act_func, cfg.graph_conv_type, conv_matrix, cfg.drop_rate)
+stgcn_conv = models.STGCN_Conv(cfg.Kt, cfg.Ks, blocks, cfg.n_his, n_vertex, cfg.gated_act_func,
+                               cfg.graph_conv_type, conv_matrix, cfg.drop_rate)
 net = stgcn_conv
 
 if __name__ == '__main__':

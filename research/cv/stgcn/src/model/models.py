@@ -20,6 +20,7 @@ import mindspore.nn as nn
 
 from src.model import layers
 
+
 class STGCN_Conv(nn.Cell):
     """
     # STGCN(ChebConv) contains 'TGTND TGTND TNFF' structure
@@ -49,14 +50,14 @@ class STGCN_Conv(nn.Cell):
     def __init__(self, Kt, Ks, blocks, T, n_vertex, gated_act_func, graph_conv_type, chebconv_matrix, drop_rate):
         super(STGCN_Conv, self).__init__()
         modules = []
-        for l in range(len(blocks) - 3):
-            modules.append(layers.STConvBlock(Kt, Ks, n_vertex, blocks[l][-1], blocks[l+1], \
-             gated_act_func, graph_conv_type, chebconv_matrix, drop_rate))
+        for i in range(len(blocks) - 3):
+            modules.append(layers.STConvBlock(Kt, Ks, n_vertex, blocks[i][-1], blocks[i+1],
+                                              gated_act_func, graph_conv_type, chebconv_matrix, drop_rate))
         self.st_blocks = nn.SequentialCell(modules)
         Ko = T - (len(blocks) - 3) * 2 * (Kt - 1)
         self.Ko = Ko
-        self.output = layers.OutputBlock(self.Ko, blocks[-3][-1], blocks[-2], \
-         blocks[-1][0], n_vertex, gated_act_func, drop_rate)
+        self.output = layers.OutputBlock(self.Ko, blocks[-3][-1], blocks[-2], blocks[-1][0],
+                                         n_vertex, gated_act_func, drop_rate)
 
     def construct(self, x):
         x_stbs = self.st_blocks(x)

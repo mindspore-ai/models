@@ -14,34 +14,23 @@
 # ============================================================================
 """generate dataset for ascend 310"""
 import os
-import argparse
 import numpy as np
-
-from src.config import stgcn_chebconv_45min_cfg
-from src import dataloader
 from sklearn import preprocessing
 
-parser = argparse.ArgumentParser('mindspore stgcn testing')
-parser.add_argument('--device_target', type=str, default='Ascend', \
- help='device where the code will be implemented. (Default: Ascend)')
-# Path for data and checkpoint
-parser.add_argument('--data_url', type=str, default='', help='Test dataset directory.')
-parser.add_argument('--data_path', type=str, default="vel.csv", help='Dataset file of vel.')
-parser.add_argument('--result_path', type=str, default='./preprocess_Result/', help='result path')
-# Super parameters for testing
-parser.add_argument('--n_pred', type=int, default=9, help='The number of time interval for predcition')
+from src import dataloader, config
+from src.argparser import arg_parser
 
-args, _ = parser.parse_known_args()
+args = arg_parser()
 
-cfg = stgcn_chebconv_45min_cfg
+cfg = config.stgcn_chebconv_45min_cfg
 cfg.batch_size = 1
 
 if __name__ == "__main__":
 
     zscore = preprocessing.StandardScaler()
 
-    dataset = dataloader.create_dataset(args.data_url+args.data_path, \
-     cfg.batch_size, cfg.n_his, cfg.n_pred, zscore, True, mode=2)
+    dataset = dataloader.create_dataset(args.data_url+args.data_path, cfg.batch_size,
+                                        cfg.n_his, cfg.n_pred, zscore, True, mode=2)
 
     img_path = os.path.join(args.result_path, "00_data")
     os.mkdir(img_path)

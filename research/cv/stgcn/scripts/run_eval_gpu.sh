@@ -1,6 +1,5 @@
 #!/bin/bash
-#!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,7 +16,7 @@
 
 if [ $# != 5 ]
 then
-    echo "Usage: bash scripts/run_eval_ascend.sh [DATA_PATH] [CKPT_PATH] [N_PRED] [GRAPH_CONV_TYPE] [DEVICE_ID]"
+    echo "Usage: bash scripts/run_eval_gpu.sh [DATA_PATH] [CKPT_PATH] [N_PRED] [GRAPH_CONV_TYPE] [DEVICE_ID]"
 exit 1
 fi
 
@@ -27,12 +26,12 @@ export N_PRED=$3
 export GRAPH_CONV_TYPE=$4
 export DEVICE_ID=$5
 
-python eval.py --data_url=$DATA_PATH   \
-                --device_target="Ascend"  \
-                --train_url=./checkpoint   \
-                --run_distribute=False   \
-                --run_modelarts=False   \
-                --device_id=$DEVICE_ID  \
-                --ckpt_url=$CKPT_PATH   \
-                --n_pred=$N_PRED    \
+python eval.py --data_url=$DATA_PATH \
+                --device_target="GPU"  \
+                --train_url=./checkpoint \
+                --run_distribute=False \
+                --run_modelarts=False \
+                --device_id=$DEVICE_ID \
+                --ckpt_url=$CKPT_PATH \
+                --n_pred=$N_PRED \
                 --graph_conv_type=$GRAPH_CONV_TYPE > eval.log 2>&1 &
