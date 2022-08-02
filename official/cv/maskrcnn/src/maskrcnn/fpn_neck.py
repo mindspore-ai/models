@@ -55,7 +55,7 @@ class FeatPyramidNeck(nn.Cell):
         Tuple, with tensors of same channel size.
 
     Examples:
-        neck = FeatPyramidNeck([100,200,300], 50, 4)
+        neck = FeatPyramidNeck([100,200,300], 50, 4, config.feature_shapes)
         input_data = (normal(0,0.1,(1,c,1280//(4*2**i), 768//(4*2**i)),
                       dtype=np.float32) \
                       for i, c in enumerate(config.fpn_in_channels))
@@ -65,7 +65,8 @@ class FeatPyramidNeck(nn.Cell):
     def __init__(self,
                  in_channels,
                  out_channels,
-                 num_outs):
+                 num_outs,
+                 feature_shapes):
         super(FeatPyramidNeck, self).__init__()
 
         if context.get_context("device_target") == "Ascend":
@@ -91,9 +92,9 @@ class FeatPyramidNeck(nn.Cell):
             self.fpn_convs_.append(fpn_conv)
         self.lateral_convs_list = nn.layer.CellList(self.lateral_convs_list_)
         self.fpn_convs_list = nn.layer.CellList(self.fpn_convs_)
-        self.interpolate1 = P.ResizeBilinear((48, 80))
-        self.interpolate2 = P.ResizeBilinear((96, 160))
-        self.interpolate3 = P.ResizeBilinear((192, 320))
+        self.interpolate1 = P.ResizeBilinear(feature_shapes[2])
+        self.interpolate2 = P.ResizeBilinear(feature_shapes[1])
+        self.interpolate3 = P.ResizeBilinear(feature_shapes[0])
         self.cast = P.Cast()
         self.maxpool = P.MaxPool(kernel_size=1, strides=2, pad_mode="same")
 

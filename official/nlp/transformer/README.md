@@ -508,3 +508,7 @@ Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some com
 
   **A**: At the end stage of training, the model accuracy usually drifts irregularly. Because we have to use a third-party perl scripts for evaluation, we can't find the best checkpoint as soon as the training process finished.
   You can try to evaluate the last several checkpoints to find the best one.
+
+- **Q: Why does the program run with an error "for'add', x.shape and y.shape need to broadcast.", or other operator shapes do not match?**
+
+  **A**:Because the parameters are configured according to the dataset provided in readme．If user changes the dataset, the relevant parameters need to be modified according to the parameter definition.

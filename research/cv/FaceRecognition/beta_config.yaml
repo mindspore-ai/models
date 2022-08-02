@@ -27,7 +27,6 @@ backbone: "r100"
 use_se: 0
 emb_size: 256
 act_type: "relu"
-fp16: 1
 pre_bn: 0
 inference: 0
 use_drop: 1
