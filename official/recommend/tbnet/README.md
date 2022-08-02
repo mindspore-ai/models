@@ -165,6 +165,12 @@ python infer.py \
         ├─src_train.csv             # training dataset
         └─id_maps.json              # explanation configuration
   ├─src
+    ├─utils
+        ├─__init__.py               # init file
+        ├─device_adapter.py         # Get cloud ID
+        ├─local_adapter.py          # Get local ID
+        ├─moxing_adapter.py         # Parameter processing
+        └─param.py                  # parse args
     ├─aggregator.py                 # inference result aggregation
     ├─config.py                     # parsing parameter configuration
     ├─dataset.py                    # generate dataset
@@ -172,16 +178,33 @@ python infer.py \
     ├─metrics.py                    # model metrics
     ├─steam.py                      # 'steam' dataset text explainer
     └─tbnet.py                      # TB-Net model
-  ├─export.py                         # export mindir script
+  ├─export.py                       # export mindir script
   ├─preprocess_dataset.py           # dataset preprocess script
-  ├─preprocess.py                         # inference data preprocess script
-  ├─postprocess.py                         # inference result calculation script
+  ├─preprocess.py                   # inference data preprocess script
+  ├─postprocess.py                  # inference result calculation script
   ├─eval.py                         # evaluation
   ├─infer.py                        # inference and explanation
   └─train.py                        # training
 ```
 
 ## [Script Parameters](#contents)
+
+The entire code structure is as following:
+
+```python
+data_path: "."                      # The location of input data
+load_path: "./checkpoint"           # file path of stored checkpoint file in training
+checkpoint_id: 19                   # checkpoint id
+same_relation: False                # only generate paths that relation1 is same as relation2
+dataset: "steam"                    # dataset name
+train_csv: "train.csv"              # the train csv datafile inside the dataset folder
+test_csv: "test.csv"                # the test csv datafile inside the dataset folder
+infer_csv: "infer.csv"              # the infer csv datafile inside the dataset folder
+device_id: 0                        # Device id
+device_target: "GPU"                # device id of GPU or Ascend
+run_mode: "graph"                   # run code by GRAPH mode or PYNATIVE mode
+epochs: 20                          # number of training epochs
+```
 
 - preprocess_dataset.py parameters
 

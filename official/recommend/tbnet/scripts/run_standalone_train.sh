@@ -29,5 +29,6 @@ if [ $# == 3 ]; then
     DEVICE_TARGET=$3
 fi
 
-python ../preprocess_dataset.py --dataset $DATA_NAME --device_target $DEVICE_TARGET &> train_standalone_log &&
-python ../train.py --dataset $DATA_NAME --device_target $DEVICE_TARGET --device_id $DEVICE_ID &>> train_standalone_log &
+cd ..
+python preprocess_dataset.py --dataset $DATA_NAME --device_target $DEVICE_TARGET &> scripts/train_standalone_log &&
+python train.py --dataset $DATA_NAME --device_target $DEVICE_TARGET --device_id $DEVICE_ID &>> scripts/train_standalone_log &

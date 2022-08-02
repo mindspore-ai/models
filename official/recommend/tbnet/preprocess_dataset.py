@@ -18,44 +18,12 @@
 
 import os
 import io
-import argparse
 import json
 import math
 
 from src.path_gen import PathGen
 from src.config import TBNetConfig
-
-
-def get_args():
-    """Parse commandline arguments."""
-    parser = argparse.ArgumentParser(description='Preprocess TB-Net data.')
-
-    parser.add_argument(
-        '--dataset',
-        type=str,
-        required=False,
-        default='steam',
-        help="'steam' dataset is supported currently"
-    )
-
-    parser.add_argument(
-        '--device_target',
-        type=str,
-        required=False,
-        default='GPU',
-        choices=['GPU', 'Ascend'],
-        help="run code on GPU or Ascend NPU"
-    )
-
-    parser.add_argument(
-        '--same_relation',
-        required=False,
-        action='store_true',
-        default=False,
-        help="only generate paths that relation1 is same as relation2"
-    )
-
-    return parser.parse_args()
+from src.utils.param import param
 
 
 def preprocess_csv(path_gen, data_home, src_name, out_name):
@@ -69,17 +37,14 @@ def preprocess_csv(path_gen, data_home, src_name, out_name):
 
 def preprocess_data():
     """Pre-process the dataset."""
-    args = get_args()
-    home = os.path.dirname(os.path.realpath(__file__))
-
-    data_home = os.path.join(home, 'data', args.dataset)
+    data_home = os.path.join(param.data_path, 'data', param.dataset)
     config_path = os.path.join(data_home, 'config.json')
     id_maps_path = os.path.join(data_home, 'id_maps.json')
 
     cfg = TBNetConfig(config_path)
-    if args.device_target == 'Ascend':
+    if param.device_target == 'Ascend':
         cfg.per_item_paths = math.ceil(cfg.per_item_paths / 16) * 16
-    path_gen = PathGen(per_item_paths=cfg.per_item_paths, same_relation=args.same_relation)
+    path_gen = PathGen(per_item_paths=cfg.per_item_paths, same_relation=param.same_relation)
 
     preprocess_csv(path_gen, data_home, 'src_train.csv', 'train.csv')
 

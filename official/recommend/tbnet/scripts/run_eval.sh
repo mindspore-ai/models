@@ -31,5 +31,6 @@ if [ $# == 4 ]; then
     DEVICE_TARGET=$4
 fi
 
-python ../eval.py --checkpoint_id $CHECKPOINT_ID --dataset $DATA_NAME --device_target $DEVICE_TARGET \
-       --device_id $DEVICE_ID  &> eval_standalone_gpu_log &
+cd ..
+python eval.py --checkpoint_id $CHECKPOINT_ID --dataset $DATA_NAME --device_target $DEVICE_TARGET \
+       --device_id $DEVICE_ID  &> scripts/eval_standalone_gpu_log &
