@@ -54,10 +54,17 @@ Note that the \<item\> needs to traverse candidate items (all items by default) 
 #format:user,item,rating,relation1,entity,relation2,hist_item,relation1,entity,relation2,hist_item,...,relation1,entity,relation2,hist_item  # module [relation1,entity,relation2,hist_item] repeats PER_ITEM_NUM_PATHS times
 ```
 
+We have to download the data package and put it underneath the current project path。
+
+```bash
+wget https://mindspore-website.obs.myhuaweicloud.com/notebook/datasets/xai/tbnet_data.tar.gz
+tar -xf tbnet_data.tar.gz
+```
+
 # [Environment Requirements](#contents)
 
-- Hardware（GPU）
-    - Prepare hardware environment with GPU processor.
+- Hardware（NVIDIA GPU or Ascend NPU）
+    - Prepare hardware environment with NVIDIA GPU or Ascend NPU processor.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
@@ -70,43 +77,47 @@ After installing MindSpore via the official website, you can start training and 
 
 - Data preprocessing
 
-Process the data to the format in chapter [Dataset](#Dataset) (e.g. 'steam' dataset), and then run code as follows.
+Download the data package(e.g. 'steam' dataset) and put it underneath the current project path.
+
+```bash
+wget https://mindspore-website.obs.myhuaweicloud.com/notebook/datasets/xai/tbnet_data.tar.gz
+tar -xf tbnet_data.tar.gz
+cd scripts
+```
+
+and then run code as follows.
 
 - Training
 
 ```bash
-python train.py \
-  --dataset [DATASET] \
-  --epochs [EPOCHS]
+bash run_standalone_train.sh [DATA_NAME] [DEVICE_ID] [DEVICE_TARGET]
 ```
 
 Example:
 
 ```bash
-python train.py \
-  --dataset steam \
-  --epochs 20
+bash run_standalone_train.sh steam 0 Ascend
 ```
 
 - Evaluation
 
+Evaluation model on test dataset.
+
 ```bash
-python eval.py \
-  --dataset [DATASET] \
-  --checkpoint_id [CHECKPOINT_ID]
+bash run_eval.sh [CHECKPOINT_ID] [DATA_NAME] [DEVICE_ID] [DEVICE_TARGET]
 ```
 
-Argument `--checkpoint_id` is required.
+Argument `[CHECKPOINT_ID]` is required.
 
 Example:
 
 ```bash
-python eval.py \
-  --dataset steam \
-  --checkpoint_id 8
+bash run_eval.sh 19 steam 0 Ascend
 ```
 
 - Inference and Explanation
+
+Recommende items to user acrodding to `user`, the number of items is determined by `items`.
 
 ```bash
 python infer.py \
@@ -114,7 +125,9 @@ python infer.py \
   --checkpoint_id [CHECKPOINT_ID] \
   --user [USER] \
   --items [ITEMS] \
-  --explanations [EXPLANATIONS]
+  --explanations [EXPLANATIONS] \
+  --csv [CSV] \
+  --device_target [DEVICE_TARGET]
 ```
 
 Arguments `--checkpoint_id` and `--user` are required.
@@ -124,10 +137,12 @@ Example:
 ```bash
 python infer.py \
   --dataset steam \
-  --checkpoint_id 8 \
-  --user 1 \
+  --checkpoint_id 19 \
+  --user 2 \
   --items 1 \
-  --explanations 3
+  --explanations 3 \
+  --csv test.csv \
+  --device_target Ascend
 ```
 
 # [Script Description](#contents)
@@ -139,14 +154,16 @@ python infer.py \
 └─tbnet
   ├─README.md
   ├── scripts
-  │   └─run_infer_310.sh    # Ascend310 inference script
+      ├─run_infer_310.sh                  # Ascend310 inference script
+      ├─run_standalone_train.sh           # NVIDIA GPU or Ascend NPU training script
+      └─run_eval.sh                       # NVIDIA GPU or Ascend NPU evaluation script
   ├─data
     ├─steam
         ├─config.json               # data and training parameter configuration
-        ├─infer.csv                 # inference and explanation dataset
-        ├─test.csv                  # evaluation dataset
-        ├─train.csv                 # training dataset
-        └─trainslate.json           # explanation configuration
+        ├─src_infer.csv             # inference and explanation dataset
+        ├─src_test.csv              # evaluation dataset
+        ├─src_train.csv             # training dataset
+        └─id_maps.json              # explanation configuration
   ├─src
     ├─aggregator.py                 # inference result aggregation
     ├─config.py                     # parsing parameter configuration
@@ -156,6 +173,7 @@ python infer.py \
     ├─steam.py                      # 'steam' dataset text explainer
     └─tbnet.py                      # TB-Net model
   ├─export.py                         # export mindir script
+  ├─preprocess_dataset.py           # dataset preprocess script
   ├─preprocess.py                         # inference data preprocess script
   ├─postprocess.py                         # inference result calculation script
   ├─eval.py                         # evaluation
@@ -165,6 +183,14 @@ python infer.py \
 
 ## [Script Parameters](#contents)
 
+- preprocess_dataset.py parameters
+
+```text
+--dataset         'steam' dataset is supported currently
+--device_target   run code on GPU or Ascend NPU
+--same_relation   only generate paths that relation1 is same as relation2
+```
+
 - train.py parameters
 
 ```text
@@ -173,7 +199,7 @@ python infer.py \
 --test_csv        the test csv datafile inside the dataset folder
 --device_id       device id
 --epochs          number of training epochs
---device_target   run code on GPU
+--device_target   run code on GPU or Ascend NPU
 --run_mode        run code by GRAPH mode or PYNATIVE mode
 ```
 
@@ -184,7 +210,7 @@ python infer.py \
 --csv             the csv datafile inside the dataset folder (e.g. test.csv)
 --checkpoint_id   use which checkpoint(.ckpt) file to eval
 --device_id       device id
---device_target   run code on GPU
+--device_target   run code on GPU or Ascend NPU
 --run_mode        run code by GRAPH mode or PYNATIVE mode
 ```
 
@@ -198,7 +224,7 @@ python infer.py \
 --items           no. of items to be recommended
 --reasons         no. of recommendation reasons to be shown
 --device_id       device id
---device_target   run code on GPU
+--device_target   run code on GPU or Ascend NPU
 --run_mode        run code by GRAPH mode or PYNATIVE mode
 ```
 
@@ -215,6 +241,17 @@ python export.py --config_path [CONFIG_PATH] --checkpoint_path [CKPT_PATH] --dev
 - `DEVICE` should be in ['Ascend', 'GPU'].
 - `FILE_FORMAT` should be in ['MINDIR', 'AIR'].
 
+Example：
+
+```bash
+python export.py \
+  --config_path ./data/steam/config.json \
+  --checkpoint_path ./checkpoints/tbnet_epoch19.ckpt \
+  --device_target Ascend \
+  --file_name model \
+  --file_format MINDIR
+```
+
 ### [Infer on Ascend310](#contents)
 
 Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
@@ -227,6 +264,12 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 - `MINDIR_PATH` specifies path of used "MINDIR" model.
 - `DATA_PATH` specifies path of test.csv.
 - `DEVICE_ID` is optional, default value is 0.
+
+Example：
+
+```bash
+bash run_infer_310.sh ../model.mindir ../data/steam/test.csv 0
+```
 
 ### [Result](#contents)
 
@@ -242,35 +285,35 @@ auc: 0.8251359368836292
 
 ### Training Performance
 
-| Parameters                 | GPU                                                         |
-| -------------------------- | ----------------------------------------------------------- |
-| Model Version              | TB-Net                                                      |
-| Resource                   |Tesla V100-SXM2-32GB                                         |
-| Uploaded Date              | 2021-08-01                                                  |
-| MindSpore Version          | 1.3.0                                                       |
-| Dataset                    | steam                                                       |
-| Training Parameter         | epoch=20, batch_size=1024, lr=0.001                         |
-| Optimizer                  | Adam                                                        |
-| Loss Function              | Sigmoid Cross Entropy                                       |
-| Outputs                    | AUC=0.8596，Accuracy=0.7761                                 |
-| Loss                       | 0.57                                                        |
-| Speed                      | 1pc: 90ms/step                                              |
-| Total Time                 | 1pc: 297s                                                   |
-| Checkpoint for Fine Tuning | 104.66M (.ckpt file)                                        |
-| Scripts                    | [TB-Net scripts](https://gitee.com/mindspore/models/tree/master/official/recommend/tbnet) |
+| Parameters                 | GPU                                                                                        | Ascend NPU                                   |
+| -------------------------- |--------------------------------------------------------------------------------------------| ---------------------------------------------|
+| Model Version              | TB-Net                                                                                     | TB-Net                                       |
+| Resource                   | NVIDIA RTX 3090                                                                            | Ascend 910                                   |
+| Uploaded Date              | 2022-07-14                                                                                 | 2022-06-30                                   |
+| MindSpore Version          | 1.6.1                                                                                      | 1.6.1                                        |
+| Dataset                    | steam                                                                                      | steam                                        |
+| Training Parameter         | epoch=20, batch_size=1024, lr=0.001                                                        | epoch=20, batch_size=1024, lr=0.001          |
+| Optimizer                  | Adam                                                                                       | Adam                                         |
+| Loss Function              | Sigmoid Cross Entropy                                                                      | Sigmoid Cross Entropy                        |
+| Outputs                    | AUC=0.8573，Accuracy=0.7733                                                                 | AUC=0.8592，准确率=0.7741                      |
+| Loss                       | 0.57                                                                                       | 0.59                                         |
+| Speed                      | 1pc: 90ms/step                                                                             | 单卡：80毫秒/步                                |
+| Total Time                 | 1pc: 297s                                                                                  | 单卡：336秒                                    |
+| Checkpoint for Fine Tuning | 686.3K (.ckpt file)                                                                       | 671K (.ckpt 文件)                             |
+| Scripts                    | [TB-Net scripts](https://gitee.com/mindspore/models/tree/master/official/recommend/tbnet)  |
 
 ### Evaluation Performance
 
-| Parameters                | GPU                           |
-| ------------------------- | ----------------------------- |
-| Model Version             | TB-Net                        |
-| Resource                  | Tesla V100-SXM2-32GB          |
-| Uploaded Date             | 2021-08-01                    |
-| MindSpore Version         | 1.3.0                         |
-| Dataset                   | steam                         |
-| Batch Size                | 1024                          |
-| Outputs                   | AUC=0.8252，Accuracy=0.7503   |
-| Total Time                | 1pc: 5.7s                     |
+| Parameters                | GPU                        | Ascend NPU                    |
+| ------------------------- |----------------------------| ----------------------------- |
+| Model Version             | TB-Net                     | TB-Net                        |
+| Resource                  | NVIDIA RTX 3090            | Ascend 910                    |
+| Uploaded Date             | 2022-07-14                 | 2022-06-30                    |
+| MindSpore Version         | 1.3.0                      | 1.5.1                         |
+| Dataset                   | steam                      | steam                         |
+| Batch Size                | 1024                       | 1024                          |
+| Outputs                   | AUC=0.8487，Accuracy=0.7699 | AUC=0.8486，Accuracy=0.7704    |
+| Total Time                | 1pc: 5.7s                  | 1pc: 1.1秒                    |
 
 ### Inference and Explanation Performance
 

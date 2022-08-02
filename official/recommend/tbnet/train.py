@@ -16,11 +16,13 @@
 
 import os
 import argparse
+import math
 
 import numpy as np
 from mindspore import context, Model, Tensor
 from mindspore.train.serialization import save_checkpoint
 from mindspore.train.callback import Callback, TimeMonitor
+import mindspore.common.dtype as mstype
 
 from src import tbnet, config, metrics, dataset
 
@@ -104,8 +106,8 @@ def get_args():
         type=str,
         required=False,
         default='GPU',
-        choices=['GPU'],
-        help="run code on GPU"
+        choices=['GPU', 'Ascend'],
+        help="run code on GPU or Ascend NPU"
     )
 
     parser.add_argument(
@@ -141,13 +143,21 @@ def train_tbnet():
 
     print(f"creating dataset from {train_csv_path}...")
     net_config = config.TBNetConfig(config_path)
-    train_ds = dataset.create(train_csv_path, net_config.per_item_num_paths, train=True).batch(net_config.batch_size)
-    test_ds = dataset.create(test_csv_path, net_config.per_item_num_paths, train=True).batch(net_config.batch_size)
+    if args.device_target == 'Ascend':
+        net_config.per_item_paths = math.ceil(net_config.per_item_paths / 16) * 16
+        net_config.embedding_dim = math.ceil(net_config.embedding_dim / 16) * 16
+    train_ds = dataset.create(train_csv_path, net_config.per_item_paths, train=True).batch(net_config.batch_size)
+    test_ds = dataset.create(test_csv_path, net_config.per_item_paths, train=True).batch(net_config.batch_size)
 
     print("creating TBNet for training...")
     network = tbnet.TBNet(net_config)
     loss_net = tbnet.NetWithLossClass(network, net_config)
-    train_net = tbnet.TrainStepWrap(loss_net, net_config.lr)
+    if args.device_target == 'Ascend':
+        loss_net.to_float(mstype.float16)
+        train_net = tbnet.TrainStepWrap(loss_net, net_config.lr, loss_scale=True)
+    else:
+        train_net = tbnet.TrainStepWrap(loss_net, net_config.lr)
+
     train_net.set_train()
     eval_net = tbnet.PredictWithSigmoid(network)
     time_callback = TimeMonitor(data_size=train_ds.get_dataset_size())
@@ -161,7 +171,8 @@ def train_tbnet():
         test_out = model.eval(test_ds, dataset_sink_mode=False)
         print(f'Train AUC:{train_out["auc"]} ACC:{train_out["acc"]}  Test AUC:{test_out["auc"]} ACC:{test_out["acc"]}')
 
-        save_checkpoint(network, os.path.join(ckpt_path, f'tbnet_epoch{i}.ckpt'))
+        if i >= args.epochs-5:
+            save_checkpoint(network, os.path.join(ckpt_path, f'tbnet_epoch{i}.ckpt'))
 
 
 if __name__ == '__main__':

@@ -58,8 +58,8 @@ TB-Net将用户和物品的交互信息以及物品的属性信息在知识图�
 
 # [环境要求](#目录)
 
-- 硬件（GPU）
-    - 使用GPU处理器准备硬件环境。
+- 硬件（NVIDIA GPU or Ascend NPU）
+    - 使用NVIDIA GPU处理器或者Ascend NPU处理器准备硬件环境。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
@@ -72,43 +72,47 @@ TB-Net将用户和物品的交互信息以及物品的属性信息在知识图�
 
 - 数据准备
 
-将数据处理成上一节[数据集](#数据集)中的格式（以'steam'数据集为例），然后按照以下步骤运行代码。
+下载用例数据集包（以'steam'数据集为例），解压到当前项目路径。
+
+```bash
+wget https://mindspore-website.obs.myhuaweicloud.com/notebook/datasets/xai/tbnet_data.tar.gz
+tar -xf tbnet_data.tar.gz
+cd scripts
+```
+
+然后按照以下步骤运行代码。
 
 - 训练
 
 ```bash
-python train.py \
-  --dataset [DATASET] \
-  --epochs [EPOCHS]
+bash run_standalone_train.sh [DATA_NAME] [DEVICE_ID] [DEVICE_TARGET]
 ```
 
 示例：
 
 ```bash
-python train.py \
-  --dataset steam \
-  --epochs 20
+bash run_standalone_train.sh steam 0 Ascend
 ```
 
 - 评估
 
+评估模型在测试集上的指标。
+
 ```bash
-python eval.py \
-  --dataset [DATASET] \
-  --checkpoint_id [CHECKPOINT_ID]
+bash run_eval.sh [CHECKPOINT_ID] [DATA_NAME] [DEVICE_ID] [DEVICE_TARGET]
 ```
 
-参数`--checkpoint_id`是必填项。
+参数`[CHECKPOINT_ID]`是必填项。
 
 示例：
 
 ```bash
-python eval.py \
-  --dataset steam \
-  --checkpoint_id 8
+bash run_eval.sh 19 steam 0 Ascend
 ```
 
 - 推理和解释
+
+根据`user`推荐一定数量的物品，数量由`items`决定。
 
 ```bash
 python infer.py \
@@ -116,7 +120,9 @@ python infer.py \
   --checkpoint_id [CHECKPOINT_ID] \
   --user [USER] \
   --items [ITEMS] \
-  --explanations [EXPLANATIONS]
+  --explanations [EXPLANATIONS] \
+  --csv [CSV] \
+  --device_target [DEVICE_TARGET]
 ```
 
 参数`--checkpoint_id`和`--user`是必填项。
@@ -126,10 +132,12 @@ python infer.py \
 ```bash
 python infer.py \
   --dataset steam \
-  --checkpoint_id 8 \
-  --user 1 \
+  --checkpoint_id 19 \
+  --user 2 \
   --items 1 \
-  --explanations 3
+  --explanations 3 \
+  --csv test.csv \
+  --device_target Ascend
 ```
 
 # [脚本说明](#目录)
@@ -141,14 +149,16 @@ python infer.py \
 └─tbnet
   ├─README.md
   ├── scripts
-  │   └─run_infer_310.sh    # 用于Ascend310推理的脚本
+      ├─run_infer_310.sh                  # 用于Ascend310推理的脚本
+      ├─run_standalone_train.sh           # 用于NVIDIA GPU或者Ascend NPU训练的脚本
+      └─run_eval.sh                       # 用于NVIDIA GPU或者Ascend NPU评估的脚本
   ├─data
     ├─steam
         ├─config.json               # 数据和训练参数配置
-        ├─infer.csv                 # 推理和解释数据集
-        ├─test.csv                  # 测试数据集
-        ├─train.csv                 # 训练数据集
-        └─trainslate.json           # 输出解释相关配置
+        ├─src_infer.csv             # 推理和解释数据集
+        ├─src_test.csv              # 测试数据集
+        ├─src_train.csv             # 训练数据集
+        └─id_maps.json              # 输出解释相关配置
   ├─src
     ├─aggregator.py                 # 推理结果聚合
     ├─config.py                     # 参数配置解析
@@ -157,15 +167,24 @@ python infer.py \
     ├─metrics.py                    # 模型度量
     ├─steam.py                      # 'steam'数据集文本解析
     └─tbnet.py                      # TB-Net网络
-  ├─export.py                         # 导出MINDIR脚本
-  ├─preprocess.py                         # 推理数据预处理脚本
-  ├─postprocess.py                         # 推理结果计算脚本
+  ├─export.py                       # 导出MINDIR脚本
+  ├─preprocess_dataset.py           # 数据集预处理脚本
+  ├─preprocess.py                   # 推理数据预处理脚本
+  ├─postprocess.py                  # 推理结果计算脚本
   ├─eval.py                         # 评估网络
   ├─infer.py                        # 推理和解释
   └─train.py                        # 训练网络
 ```
 
 ## [脚本参数](#目录)
+
+- preprocess_dataset.py参数
+
+```text
+--dataset         'steam' dataset is supported currently
+--device_target   run code on GPU or Ascend NPU
+--same_relation   only generate paths that relation1 is same as relation2
+```
 
 - train.py参数
 
@@ -175,7 +194,7 @@ python infer.py \
 --test_csv        the test csv datafile inside the dataset folder
 --device_id       device id
 --epochs          number of training epochs
---device_target   run code on GPU
+--device_target   run code on GPU or Ascend NPU
 --run_mode        run code by GRAPH mode or PYNATIVE mode
 ```
 
@@ -186,7 +205,7 @@ python infer.py \
 --csv             the csv datafile inside the dataset folder (e.g. test.csv)
 --checkpoint_id   use which checkpoint(.ckpt) file to eval
 --device_id       device id
---device_target   run code on GPU
+--device_target   run code on GPU or Ascend NPU
 --run_mode        run code by GRAPH mode or PYNATIVE mode
 ```
 
@@ -200,7 +219,7 @@ python infer.py \
 --items           no. of items to be recommended
 --reasons         no. of recommendation reasons to be shown
 --device_id       device id
---device_target   run code on GPU
+--device_target   run code on GPU or Ascend NPU
 --run_mode        run code by GRAPH mode or PYNATIVE mode
 ```
 
@@ -209,13 +228,29 @@ python infer.py \
 ### 导出MindIR
 
 ```shell
-python export.py --config_path [CONFIG_PATH] --checkpoint_path [CKPT_PATH] --device_target [DEVICE] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py \
+  --config_path [CONFIG_PATH] \
+  --checkpoint_path [CKPT_PATH] \
+  --device_target [DEVICE] \
+  --file_name [FILE_NAME] \
+  --file_format [FILE_FORMAT]
 ```
 
 - `CKPT_PATH` 为必填项。
 - `CONFIG_PATH` 即数据集的`config.json`文件, 包含数据和训练参数配置。
 - `DEVICE` 可选项为 ['Ascend', 'GPU']。
 - `FILE_FORMAT` 可选项为 ['MINDIR', 'AIR']。
+
+示例：
+
+```bash
+python export.py \
+  --config_path ./data/steam/config.json \
+  --checkpoint_path ./checkpoints/tbnet_epoch19.ckpt \
+  --device_target Ascend \
+  --file_name model \
+  --file_format MINDIR
+```
 
 ### 在Ascend310执行推理
 
@@ -229,6 +264,12 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 - `MINDIR_PATH` mindir文件路径
 - `DATA_PATH` 推理数据集test.csv路径
 - `DEVICE_ID` 可选，默认值为0。
+
+示例：
+
+```bash
+bash run_infer_310.sh ../model.mindir ../data/steam/test.csv 0
+```
 
 ### 结果
 
@@ -244,35 +285,35 @@ auc: 0.8251359368836292
 
 ### [训练性能](#目录)
 
-| 参数                  | GPU                                                |
-| -------------------  | --------------------------------------------------- |
-| 模型版本              | TB-Net                                              |
-| 资源                  |Tesla V100-SXM2-32GB                                 |
-| 上传日期              | 2021-08-01                                          |
-| MindSpore版本         | 1.3.0                                               |
-| 数据集                | steam                                               |
-| 训练参数              | epoch=20, batch_size=1024, lr=0.001                 |
-| 优化器                | Adam                                                |
-| 损失函数              | Sigmoid交叉熵                                        |
-| 输出                  | AUC=0.8596，准确率=0.7761                            |
-| 损失                  | 0.57                                               |
-| 速度                  | 单卡：90毫秒/步                                      |
-| 总时长                | 单卡：297秒                                          |
-| 微调检查点             | 104.66M (.ckpt 文件)                                |
+| 参数                  | GPU                                                                                 | Ascend NPU                          |
+| -------------------  |-------------------------------------------------------------------------------------|-------------------------------------|
+| 模型版本              | TB-Net                                                                              | TB-Net                              |
+| 资源                  | NVIDIA RTX 3090                                                                     | Ascend 910                          |
+| 上传日期              | 2022-07-14                                                                          | 2022-06-30                          |
+| MindSpore版本         | 1.6.1                                                                               | 1.6.1                               |
+| 数据集                | steam                                                                               | steam                               |
+| 训练参数              | epoch=20, batch_size=1024, lr=0.001                                                 | epoch=20, batch_size=1024, lr=0.001 |
+| 优化器                | Adam                                                                                | Adam                                |
+| 损失函数              | Sigmoid交叉熵                                                                          | Sigmoid交叉熵                          |
+| 输出                  | AUC=0.8573，准确率=0.7733                                                               | AUC=0.8592，准确率=0.7741               |
+| 损失                  | 0.57                                                                                | 0.59                                |
+| 速度                  | 单卡：90毫秒/步                                                                           | 单卡：80毫秒/步                           |
+| 总时长                | 单卡：297秒                                                                             | 单卡：336秒                             |
+| 微调检查点             | 686.3K (.ckpt 文件)                                                                   | 671K (.ckpt 文件)                     |
 | 脚本                  | [TB-Net脚本](https://gitee.com/mindspore/models/tree/master/official/recommend/tbnet) |
 
 ### [评估性能](#目录)
 
-| 参数                        | GPU                          |
-| -------------------------- | ----------------------------- |
-| 模型版本                    | TB-Net                        |
-| 资源                        | Tesla V100-SXM2-32GB         |
-| 上传日期                    | 2021-08-01                    |
-| MindSpore版本               | 1.3.0                         |
-| 数据集                      | steam                         |
-| 批次大小                    | 1024                          |
-| 输出                        | AUC=0.8252，准确率=0.7503      |
-| 总时长                      | 单卡：5.7秒                    |
+| 参数                        | GPU                   | Ascend NPU                      |
+| -------------------------- |-----------------------| ----------------------------- |
+| 模型版本                    | TB-Net                | TB-Net                        |
+| 资源                        | NVIDIA RTX 3090       | Ascend 910                    |
+| 上传日期                    | 2022-07-14            | 2022-06-30                    |
+| MindSpore版本               | 1.6.1                 | 1.6.1                         |
+| 数据集                      | steam                 | steam                         |
+| 批次大小                    | 1024                  | 1024                          |
+| 输出                        | AUC=0.8487，准确率=0.7699 | AUC=0.8486，准确率=0.7704       |
+| 总时长                      | 单卡：5.7秒               | 单卡：1.1秒                     |
 
 ### [推理和解释性能](#目录)
 

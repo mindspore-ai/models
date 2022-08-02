@@ -17,6 +17,7 @@
 import os
 import argparse
 import shutil
+import math
 import numpy as np
 
 from mindspore import context
@@ -44,7 +45,6 @@ def get_args():
         help="the csv datafile inside the dataset folder (e.g. test.csv)"
     )
 
-
     parser.add_argument(
         '--device_id',
         type=int,
@@ -58,8 +58,8 @@ def get_args():
         type=str,
         required=False,
         default='Ascend',
-        choices=['Ascend'],
-        help="run code on GPU"
+        choices=['Ascend', 'GPU'],
+        help="run code on GPU or Ascend NPU"
     )
 
     parser.add_argument(
@@ -90,7 +90,9 @@ def preprocess_tbnet():
 
     print(f"creating dataset from {test_csv_path}...")
     net_config = config.TBNetConfig(config_path)
-    eval_ds = dataset.create(test_csv_path, net_config.per_item_num_paths, train=True).batch(1)
+    if args.device_target == 'Ascend':
+        net_config.per_item_paths = math.ceil(net_config.per_item_paths / 16) * 16
+    eval_ds = dataset.create(test_csv_path, net_config.per_item_paths, train=True).batch(1)
     item_path = os.path.join('./preprocess_Result/', '00_item')
     rl1_path = os.path.join('./preprocess_Result/', '01_rl1')
     ety_path = os.path.join('./preprocess_Result/', '02_ety')
@@ -134,5 +136,7 @@ def preprocess_tbnet():
         rate_rst.tofile(rate_real_path)
 
         idx += 1
+
+
 if __name__ == '__main__':
     preprocess_tbnet()

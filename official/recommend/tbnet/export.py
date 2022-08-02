@@ -16,6 +16,7 @@
 
 import os
 import argparse
+import math
 import numpy as np
 
 from mindspore import context, load_checkpoint, load_param_into_net, Tensor, export
@@ -103,20 +104,23 @@ def export_tbnet():
         context.set_context(mode=context.PYNATIVE_MODE, device_target=args.device_target)
 
     net_config = config.TBNetConfig(config_path)
-
+    if args.device_target == 'Ascend':
+        net_config.per_item_paths = math.ceil(net_config.per_item_paths / 16) * 16
+        net_config.embedding_dim = math.ceil(net_config.embedding_dim / 16) * 16
     network = tbnet.TBNet(net_config)
     param_dict = load_checkpoint(ckpt_path)
     load_param_into_net(network, param_dict)
     eval_net = tbnet.PredictWithSigmoid(network)
 
     item = Tensor(np.ones((1,)).astype(np.int))
-    rl1 = Tensor(np.ones((1, 39)).astype(np.int))
-    ety = Tensor(np.ones((1, 39)).astype(np.int))
-    rl2 = Tensor(np.ones((1, 39)).astype(np.int))
-    his = Tensor(np.ones((1, 39)).astype(np.int))
+    rl1 = Tensor(np.ones((1, net_config.per_item_paths)).astype(np.int))
+    ety = Tensor(np.ones((1, net_config.per_item_paths)).astype(np.int))
+    rl2 = Tensor(np.ones((1, net_config.per_item_paths)).astype(np.int))
+    his = Tensor(np.ones((1, net_config.per_item_paths)).astype(np.int))
     rate = Tensor(np.ones((1,)).astype(np.float32))
     inputs = [item, rl1, ety, rl2, his, rate]
     export(eval_net, *inputs, file_name=args.file_name, file_format=args.file_format)
+
 
 if __name__ == '__main__':
     export_tbnet()

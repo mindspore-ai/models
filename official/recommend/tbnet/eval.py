@@ -16,8 +16,10 @@
 
 import os
 import argparse
+import math
 
 from mindspore import context, Model, load_checkpoint, load_param_into_net
+import mindspore.common.dtype as mstype
 
 from src import tbnet, config, metrics, dataset
 
@@ -62,8 +64,8 @@ def get_args():
         type=str,
         required=False,
         default='GPU',
-        choices=['GPU'],
-        help="run code on GPU"
+        choices=['GPU', 'Ascend'],
+        help="run code on GPU or Ascend NPU"
     )
 
     parser.add_argument(
@@ -95,10 +97,15 @@ def eval_tbnet():
 
     print(f"creating dataset from {test_csv_path}...")
     net_config = config.TBNetConfig(config_path)
-    eval_ds = dataset.create(test_csv_path, net_config.per_item_num_paths, train=True).batch(net_config.batch_size)
+    if args.device_target == 'Ascend':
+        net_config.per_item_paths = math.ceil(net_config.per_item_paths / 16) * 16
+        net_config.embedding_dim = math.ceil(net_config.embedding_dim / 16) * 16
+    eval_ds = dataset.create(test_csv_path, net_config.per_item_paths, train=True).batch(net_config.batch_size)
 
     print(f"creating TBNet from checkpoint {args.checkpoint_id} for evaluation...")
     network = tbnet.TBNet(net_config)
+    if args.device_target == 'Ascend':
+        network.to_float(mstype.float16)
     param_dict = load_checkpoint(os.path.join(ckpt_path, f'tbnet_epoch{args.checkpoint_id}.ckpt'))
     load_param_into_net(network, param_dict)
 
