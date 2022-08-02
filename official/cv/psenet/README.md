@@ -179,6 +179,7 @@ bash scripts/run_eval_ascend.sh
 ```path
 └── psenet  
  ├── export.py                           // export mindir file
+ ├── infer_psenet_onnx.py                // application for onnx inference
  ├── postprocess.py                   // 310 Inference post-processing script
  ├── __init__.py
  ├── mindspore_hub_conf.py               // hub config file
@@ -190,6 +191,7 @@ bash scripts/run_eval_ascend.sh
   ├── run_eval_ascend.sh    // shell script for evaluation ascend
   ├── run_eval_gpu.sh     // shell script for evaluation gpu
   ├── ascend310_infer              // application for 310 inference
+  └── run_infer_onnx.sh            // shell script for infer on onnx
  ├── src  
   ├── model_utils
    ├──config.py             // Parameter config
@@ -329,7 +331,7 @@ python export.py --ckpt [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_
 ```
 
 The ckpt_file parameter is required,
-`FILE_FORMAT` should be in ["AIR", "MINDIR"]
+`FILE_FORMAT` should be in ["AIR", "MINDIR", "ONNX"]
 
 - Export MindIR on Modelarts
 
@@ -360,6 +362,8 @@ Current batch_Size can only be set to 1. Before running the following process, p
 ```shell
 # Ascend310 inference
 bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+# ONNX inference
+bash run_infer_onnx.sh [ONNX_PATH] [TEST_ROOT_DIR]
 ```
 
 - `DEVICE_ID` is optional, default value is 0.

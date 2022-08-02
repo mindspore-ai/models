@@ -52,6 +52,7 @@ TEST_ROOT_DIR: ""
 TEST_BUFFER_SIZE: 4
 TEST_DROP_REMAINDER: False
 INFERENCE: True
+onnx_path: ""
 
 # ======================================================================================
 #export options
@@ -85,3 +86,4 @@ object_home: "your direction name"
 modelarts_home: "modelarts working path"
 result_path: "result Files path."
 img_path: "image files path."
+onnx_path: "onnx files path"
