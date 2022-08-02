@@ -12,17 +12,27 @@
     - [Training Process](#training-process)
         - [Training](#training)
             - [running on Ascend](#running-on-ascend)
-            - [Distributed Training](#distributed-training)
+            - [running on GPU](#running-on-gpu)
+        - [Distributed Training](#distributed-training)
+            - [running on Ascend for distributed training](#running-on-ascend-for-distributed-training)
+            - [running on GPU for distributed training](#running-on-gpu-for-distributed-training)
+            - [Evaluation while training](#evaluation-while-training)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
+    - [Inference process](#inference-process)
+        - [Export AIR, MindIR, ONNX](#export-air-mindir-onnx)
+            - [Export MindIR on Modelarts](#export-mindir-on-modelarts)
+        - [Infer on Onnx](#infer-on-onnx)
+            - [Export on Onnx](#export-on-onnx)
+            - [Evaluation on Onnx](#evaluation-on-onnx)
+            - [Result](#result)
     - [Model Description](#model-description)
         - [Performance](#performance)
             - [Evaluation Performance](#evaluation-performance)
-        - [How to use](#how-to-use)
-            - [Inference](#inference)
-                - [Running on Ascend 310](#running-on-ascend-310)
-            - [Continue Training on the Pretrained Model](#continue-training-on-the-pretrained-model)
-            - [Transfer training](#transfer-training)
+    - [How to use](#how-to-use)
+        - [Inference](#inference)
+        - [Continue Training on the Pretrained Model](#continue-training-on-the-pretrained-model)
+        - [Transfer training](#transfer-training)
     - [Description of Random Situation](#description-of-random-situation)
     - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -114,7 +124,7 @@ python preprocess_dataset.py --config_path path/unet/unet_nested_cell_config.yam
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
 
 ## [Quick Start](#contents)
 
@@ -230,8 +240,9 @@ If you want to run in modelarts, please check the official documentation of [mod
         │   ├──run_standalone_train.sh      // shell script for standalone on Ascend
         │   ├──run_standalone_eval.sh       // shell script for evaluation on Ascend
         │   ├──run_standalone_train_gpu.sh      // shell script for training on GPU
-        │   ├──run_standalone_eval_gpu.sh       // shell script forevaluation on GPU
+        │   ├──run_standalone_eval_gpu.sh       // shell script for evaluation on GPU
         │   ├──run_distribute_train_gpu.sh      // shell script for distributed on GPU
+        │   ├──run_eval_onnx.sh             // shell script for evaluation on ONNX
         ├── src
         │   ├──__init__.py
         │   ├──data_loader.py               // creating dataset
@@ -259,8 +270,10 @@ If you want to run in modelarts, please check the official documentation of [mod
         ├── unet_nested_config.yaml         // parameter configuration
         ├── unet_simple_config.yaml         // parameter configuration
         ├── unet_simple_coco_config.yaml    // parameter configuration
+        ├── default_config.yaml             // parameter configuration
         ├── train.py                        // training script
         ├── eval.py                         // evaluation script
+        ├── infer_unet_onnx.py              // evaluation script on ONNX
         ├── export.py                       // export script
         ├── mindspore_hub_conf.py           // hub config file
         ├── postprocess.py                  // unet 310 infer postprocess.
@@ -384,7 +397,7 @@ The python command above will run in the background, you can view the results th
 
 ### Distributed Training
 
-#### running on Ascend
+#### running on Ascend for distributed training
 
 ```shell
 bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET]
@@ -401,7 +414,7 @@ bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET]
   step: 300, loss is 0.18949677, fps is 57.63118508760329
   ```
 
-#### running on GPU
+#### running on GPU for distributed training
 
   ```shell
 bash scripts/run_distribute_train_gpu.sh [RANKSIZE] [DATASET] [CONFIG_PATH]
@@ -449,6 +462,106 @@ The above python command will run in the background. You can view the results th
 ```shell
 # grep "Cross valid dice coeff is:" eval.log
 ============== Cross valid dice coeff is: {'dice_coeff': 0.9089390969777261}
+```
+
+## Inference process
+
+### Export AIR, MindIR, ONNX
+
+```shell
+python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[model_name] --file_format=[EXPORT_FORMAT]
+```
+
+The `checkpoint_file_path` parameter is required,  
+`EXPORT_FORMAT` should be in ["AIR", "MINDIR", "ONNX"]. BATCH_SIZE current batch_size can only be set to 1.
+
+#### Export MindIR on Modelarts
+
+ (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start as follows)
+
+```text
+# Export on ModelArts
+# (1) Perform a or b.
+#       a. Set "enable_modelarts=True" on default_config.yaml file.
+#          Set "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" on default_config.yaml file.
+#          Set "checkpoint_url='s3://dir_to_trained_ckpt/'" on default_config.yaml file.
+#          Set "file_name='./unet'" on default_config.yaml file.
+#          Set "file_format='MINDIR'" on default_config.yaml file.
+#          Set other parameters on default_config.yaml file you need.
+#       b. Add "enable_modelarts=True" on the website UI interface.
+#          Add "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" on the website UI interface.
+#          Add "checkpoint_url='s3://dir_to_trained_ckpt/'" on the website UI interface.
+#          Add "file_name='./unet'" on the website UI interface.
+#          Add "file_format='MINDIR'" on the website UI interface.
+#          Add other parameters on the website UI interface.
+# (2) Set the config_path="/path/yaml file" on the website UI interface.
+# (3) Set the code directory to "/path/unet" on the website UI interface.
+# (4) Set the startup file to "export.py" on the website UI interface.
+# (5) Set the "Output file path" and "Job log path" to your path on the website UI interface.
+# (6) Create your job.
+```
+
+Before performing inference, the mindir file must be exported by export.py script. We only provide an example of inference using MINDIR model.
+
+```shell
+# Ascend310 inference
+bash run_infer_310.sh [NETWORK] [MINDIR_PATH] [DEVICE_ID] [NEED_PREPROCESS]
+```
+
+`NETWORK` Now, the supported networks are `unet` and `unet++`. The corresponding configuration files are `unet_simple_config.yaml` and `unet_nested_cell_config.yaml` respectively.
+`NEED_PREPROCESS` indicates whether data needs to be preprocessed. `y` means that data needs to be preprocessed. If `y` is selected, the dataset of `unet` is processed in the numpy format, the `unet++` validation dataset will be separated from the raw dataset for inference, and the value in `yaml` configuration file need to be set，for example，change the value of `batch_size` to 1 and set the dataset path.
+`DEVICE_ID` is optional, default value is 0.
+
+Inference result is saved in current path, you can find result in acc.log file.
+
+```text
+Cross valid dice coeff is: 0.9054352151297033
+```
+
+### Infer on Onnx
+
+Before performing inference, the onnx file must be exported by export.py script. We only provide an example of inference using ONNX model.  
+Only ONNX models with batch size of 1 are supported for model inference accuracy verification, so `--batch_size=1` is set in ONNX export.
+
+#### Export on Onnx
+
+```shell
+python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[model_name] --file_format=ONNX --batch_size=1
+```
+
+#### Evaluation on Onnx
+
+Command  
+
+```shell
+ python infer_unet_onnx.py [CONFIG_PATH] [ONNX_MODEL] [DATASET_PATH] [DEVICE_TARGET]
+```
+
+ `CONFIG_PATH`： is the relative path to the YAML config file.  
+ `ONNX_MODEL`：is the relative path to the ONNX file.  
+ `DATASET_PATH`：is the relative path to the dataset.  
+ `DEVICE_TARGET`：Device name e.g. GPU, Ascend .  
+
+Script
+
+```shell
+bash ./scripts/run_eval_onnx.sh [DATASET_PATH] [ONNX_MODEL] [DEVICE_TARGET] [CONFIG_PATH]
+```
+
+#### Result
+
+Result on Checkpoint
+
+```shell
+============== Cross valid dice coeff is: 0.9138285672951554
+============== Cross valid IOU is: 0.8414870790389525
+```
+
+Result on ONNX
+
+```shell
+============== Cross valid dice coeff is: 0.9138280814519938
+============== Cross valid IOU is: 0.8414862558573599
 ```
 
 ## [Model Description](#contents)
@@ -506,61 +619,7 @@ If you need to use the trained model to perform inference on multiple hardware p
 can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/master/infer/inference.html). Following
 the steps below, this is a simple example:
 
-#### Running on Ascend 310
-
-Export MindIR on local
-
-Before exporting, you need to modify the parameter in the configuration — checkpoint_file_path and batch_ Size . checkpoint_ file_ Path is the CKPT file path, batch_ Size is set to 1.
-
-```shell
-python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[model_name] --file_format=[EXPORT_FORMAT]
-```
-
-The `checkpoint_file_path` parameter is required,
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"]
-
-Export on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start as follows)
-
-```text
-# Export on ModelArts
-# (1) Perform a or b.
-#       a. Set "enable_modelarts=True" on default_config.yaml file.
-#          Set "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" on default_config.yaml file.
-#          Set "checkpoint_url='s3://dir_to_trained_ckpt/'" on default_config.yaml file.
-#          Set "file_name='./unet'" on default_config.yaml file.
-#          Set "file_format='MINDIR'" on default_config.yaml file.
-#          Set other parameters on default_config.yaml file you need.
-#       b. Add "enable_modelarts=True" on the website UI interface.
-#          Add "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" on the website UI interface.
-#          Add "checkpoint_url='s3://dir_to_trained_ckpt/'" on the website UI interface.
-#          Add "file_name='./unet'" on the website UI interface.
-#          Add "file_format='MINDIR'" on the website UI interface.
-#          Add other parameters on the website UI interface.
-# (2) Set the config_path="/path/yaml file" on the website UI interface.
-# (3) Set the code directory to "/path/unet" on the website UI interface.
-# (4) Set the startup file to "export.py" on the website UI interface.
-# (5) Set the "Output file path" and "Job log path" to your path on the website UI interface.
-# (6) Create your job.
-```
-
-Before performing inference, the MINDIR file must be exported by export script on the 910 environment.
-
-```shell
-# Ascend310 inference
-bash run_infer_310.sh [NETWORK] [MINDIR_PATH] [DEVICE_ID] [NEED_PREPROCESS]
-```
-
-`NETWORK` Now, the supported networks are `unet` and `unet++`. The corresponding configuration files are `unet_simple_config.yaml` and `unet_nested_cell_config.yaml` respectively.
-`NEED_PREPROCESS` indicates whether data needs to be preprocessed. `y` means that data needs to be preprocessed. If `y` is selected, the dataset of `unet` is processed in the numpy format, the `unet++` validation dataset will be separated from the raw dataset for inference, and the value in `yaml` configuration file need to be set，for example，change the value of `batch_size` to 1 and set the dataset path.
-`DEVICE_ID` is optional, default value is 0.
-
-Inference result is saved in current path, you can find result in acc.log file.
-
-```text
-Cross valid dice coeff is: 0.9054352151297033
-```
-
-#### Continue Training on the Pretrained Model
+### Continue Training on the Pretrained Model
 
 Set options `resume` to True in `*.yaml`, and set `resume_ckpt` to the path of your checkpoint. e.g.
 
@@ -571,7 +630,7 @@ Set options `resume` to True in `*.yaml`, and set `resume_ckpt` to the path of y
   'filter_weight': ["final.weight"]
 ```
 
-#### Transfer training
+### Transfer training
 
 Do the same thing as resuming traing above. In addition, set `transfer_training` to True. The `filter_weight` shows the weights which will be filtered for different dataset. Usually, the default value of `filter_weight` don't need to be changed. The default values includes the weights which depends on the class number. e.g.
 
