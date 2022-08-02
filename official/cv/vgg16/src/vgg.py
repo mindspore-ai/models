@@ -27,6 +27,7 @@ def _make_layer(base, args, batch_norm):
     """Make stage network of VGG."""
     layers = []
     in_channels = 3
+    padding = 0 if args.pad_mode == 'same' else 1
     for v in base:
         if v == 'M':
             layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
@@ -39,7 +40,7 @@ def _make_layer(base, args, batch_norm):
             conv2d = nn.Conv2d(in_channels=in_channels,
                                out_channels=v,
                                kernel_size=3,
-                               padding=args.padding,
+                               padding=padding,
                                pad_mode=args.pad_mode,
                                has_bias=args.has_bias,
                                weight_init=weight)
