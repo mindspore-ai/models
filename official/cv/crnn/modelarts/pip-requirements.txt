@@ -1,0 +1,5 @@
+python-Levenshtein==0.12.2
+Pillow
+xml-python
+pyyaml
+numpy
