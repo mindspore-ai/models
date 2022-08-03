@@ -116,6 +116,8 @@ def run_train():
     '''run train'''
     config.lr_epochs = list(map(int, config.lr_epochs.split(',')))
     config.image_size = list(map(int, config.image_size.split(',')))
+    if list(map(lambda x: x % 32, config.image_size)) != [0, 0]:
+        print("Image size is set to", config.image_size, ". Image size should be divisible by 32.")
     config.per_batch_size = config.batch_size
 
     _enable_graph_kernel = config.device_target == "GPU"

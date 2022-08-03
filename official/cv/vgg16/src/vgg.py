@@ -74,6 +74,8 @@ class Vgg(nn.Cell):
                  include_top=True):
         super(Vgg, self).__init__()
         _ = batch_size
+        self.image_h = args.image_size[0]
+        self.image_w = args.image_size[1]
         self.layers = _make_layer(base, args, batch_norm=batch_norm)
         self.include_top = include_top
         self.flatten = nn.Flatten()
@@ -81,7 +83,7 @@ class Vgg(nn.Cell):
         if not args.has_dropout or phase == "test":
             dropout_ratio = 1.0
         self.classifier = nn.SequentialCell([
-            nn.Dense(512 * 7 * 7, 4096),
+            nn.Dense(512 * (self.image_h // 32) * (self.image_w // 32), 4096),
             nn.ReLU(),
             nn.Dropout(dropout_ratio),
             nn.Dense(4096, 4096),
