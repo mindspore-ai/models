@@ -129,6 +129,7 @@ def get_config():
                                                                         "../../default_config_ascend.yaml"),
                         help="Config file path")
     path_args, _ = parser.parse_known_args()
+    print(f"config path is {path_args.config_path}")
     default, helper, choices = parse_yaml(path_args.config_path)
     args = parse_cli_to_yaml(parser=parser, cfg=default, helper=helper, choices=choices, cfg_path=path_args.config_path)
     final_config = merge(args, default)

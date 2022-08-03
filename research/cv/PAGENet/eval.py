@@ -41,7 +41,7 @@ def main(test_img_path, test_gt_path, ckpt_file):
     mae = nn.MAE()
     F_score = nn.F1()
     # model
-    model = MindsporeModel()
+    model = MindsporeModel(config)
     ckpt_file_name = ckpt_file
     ms.load_checkpoint(ckpt_file_name, net=model)
 

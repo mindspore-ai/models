@@ -14,16 +14,35 @@
 # limitations under the License.
 # ============================================================================
 
+if [ $# != 3 ]
+then
+    echo "Usage: bash scripts/run_distribute_train.sh [DEVICE_NUM] [RANK_TABLE_FILE] [CONFIG_PATH]"
+exit 1
+fi
+
+get_real_path(){
+  if [ "${1:0:1}" == "/" ]; then
+    echo "$1"
+  else
+    echo "$(realpath -m $PWD/$1)"
+  fi
+}
+
 BASE_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 RANK_SIZE=$1
-RANK_TABLE_FILE=$2
-
-echo $RANK_TABLE_FILE
+RANK_TABLE_FILE=$(get_real_path $2)
+CONFIG_PATH=$(get_real_path $3)
 
 if [ ! -f ${RANK_TABLE_FILE} ]; then
-echo "${RANK_TABLE_FILE} file not exists"
+echo "rank table ${RANK_TABLE_FILE} file not exists"
 exit
 fi
+
+if [ ! -f ${CONFIG_PATH} ]; then
+echo "config path ${CONFIG_PATH} file not exists"
+exit
+fi
+
 export RANK_TABLE_FILE=${RANK_TABLE_FILE}
 export RANK_SIZE=${RANK_SIZE}
 rank_start=0
@@ -36,11 +55,13 @@ do
   rm -rf device$DEVICE_ID
   mkdir device$DEVICE_ID
 
-  ln -s $BASE_DIR/../data ./device$DEVICE_ID
   cp -r $BASE_DIR/../src  ./device$DEVICE_ID
   cp  $BASE_DIR/../*.py ./device$DEVICE_ID
-  cp  $BASE_DIR/../*.ckpt ./device$DEVICE_ID
+  cp  $BASE_DIR/../*.yaml ./device$DEVICE_ID
   cd ./device$DEVICE_ID
-  python -u ./train.py  --train_mode 'distribute' config_path $3 > train.log 2>&1 &
+  python -u ./train.py \
+      --train_mode="distribute" \
+      --device_target="Ascend" \
+      --config_path=$CONFIG_PATH > train.log 2>&1 &
   cd ../
 done

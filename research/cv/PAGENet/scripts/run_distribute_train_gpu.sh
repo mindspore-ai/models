@@ -15,9 +15,9 @@
 # ============================================================================
 
 # Get absolute path
-if [ $# != 1 ]
+if [ $# != 2 ]
 then
-    echo "Usage: bash run_distribute_gpu.sh [CONFIG_PATH]"
+    echo "Usage: bash scripts/run_distribute_gpu.sh [DEVICE_NUM] [CONFIG_PATH]"
 exit 1
 fi
 
@@ -31,9 +31,18 @@ get_real_path(){
 
 # Get current script path
 BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
+CONFIG_PATH=$(get_real_path $2)
+
+if [ ! -f ${CONFIG_PATH} ]; then
+echo "config path ${CONFIG_PATH} file not exists"
+exit
+fi
 
 cd $BASE_PATH/..
 
-mpirun --allow-run-as-root -n 8 python train.py --train_mode 'distribute' --config_path $1 &> distribute.log 2>&1 &
+mpirun --allow-run-as-root -n $1 python train.py \
+    --train_mode="distribute" \
+    --device_target="GPU" \
+    --config_path=$CONFIG_PATH &> distribute.log 2>&1 &
 
 echo "The train log is at ../distribute.log."

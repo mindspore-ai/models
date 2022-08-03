@@ -37,7 +37,7 @@ PAGE-Net网络由三个部分组成，提取特征的CNN模块，金字塔注意
 
 ### 数据集配置
 
-数据集目录修改在config.py中，训练集变量为train_dataset_imgs,train_dataset_gts,train_dataset_edges,
+数据集目录修改在config.py中，训练集变量为train_dataset_imgs,train_dataset_gts,train_dataset_edges, vgg_init
 测试集路径请自行修改
 测试集若要使用自己的数据集，请添加数据集路径，并在train.py中添加新增的数据集
 
@@ -84,11 +84,10 @@ PAGE-Net网络由三个部分组成，提取特征的CNN模块，金字塔注意
         ├── default_config_ascend.yaml       # 参数配置脚本文件(ascned)
         ├── default_config_gpu.yaml          # 参数配置脚本文件(gpu)
         ├── scripts
-        │   ├── run_standalone_train_gpu.sh  # 单卡训练脚本文件(gpu)
-        │   ├── run_standalone_train.sh      # 单卡训练脚本文件(ascend)
+        │   ├── run_standalone_train.sh      # 单卡训练脚本文件(ascend & gpu)
         │   ├── run_distribute_train_gpu.sh  # 多卡训练脚本文件(gpu)
         │   ├── run_distribute_train.sh      # 多卡训练脚本文件(ascend)
-        │   ├── run_eval.sh                  # 评估脚本文件
+        │   ├── run_eval.sh                  # 评估脚本文件(ascend & gpu)
         ├── src
         |   ├── model_utils
         |   |   ├── config.py
@@ -124,17 +123,15 @@ model: "output/PAGENET.ckpt"                # 测试时使用的checkpoint文件
 
 ### 训练
 
-```markdown
-cd scripts
-bash run_standalone_train_gpu.sh [CONFIG_PATH]  #运行gpu单卡训练
-bash run_standalone_train.sh   [CONFIG_PATH]    #运行ascend单卡训练,config路径默认为ascend
+```shell
+bash scripts/run_standalone_train.sh [DEVICE_ID] [CONFIG_PATH]    #运行单卡训练,config路径默认为ascend
 ```
 
 ### 分布式训练
 
-```markdown
-bash run_distribute_train_gpu.sh [CONFIG_PATH]          #运行gpu分布式训练
-bash run_distribute_train.sh 8 rank_table_8pcs.json  [CONFIG_PATH]   #运行ascend分布式训练，config路径默认为ascend
+```shell
+bash scripts/run_distribute_gpu.sh [DEVICE_NUM] [CONFIG_PATH]          #运行gpu分布式训练
+bash scripts/run_distribute_train.sh [DEVICE_NUM] [RANK_TABLE_FILE] [CONFIG_PATH]   #运行ascend分布式训练，config路径默认为ascend
 ```
 
 ### 云上训练
@@ -152,13 +149,13 @@ bash run_distribute_train.sh 8 rank_table_8pcs.json  [CONFIG_PATH]   #运行asce
 ## 评估过程
 
 ```markdown
-bash run_eval.sh  [CONFIG_PATH] #运行推理
+bash scripts/eval.sh [DEVICE_ID] [CONFIG_PATH] #运行推理
 ```
 
 ## 导出过程
 
-```markdown
-python export.py  #导出mindir，模型文件路径为config中的ckpt_file
+```shell
+python export.py --config_path=[CONFIG_PATH]  #导出mindir，模型文件路径为config中的ckpt_file
 ```
 
 ## 模型描述
