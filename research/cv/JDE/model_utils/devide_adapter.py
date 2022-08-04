@@ -12,25 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""Logger."""
-import logging
 
+"""Device adapter for ModelArts"""
 
-def get_logger(name='root'):
-    """
-    Get Logger.
-    """
-    formatter = logging.Formatter(
-        fmt='%(asctime)s [%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+from model_utils.config import config
 
-    handler = logging.StreamHandler()
-    handler.setFormatter(formatter)
+if config.enable_modelarts:
+    from model_utils.moxing_adapter import get_device_id, get_device_num, get_rank_id, get_job_id
+else:
+    from model_utils.local_adapter import get_device_id, get_device_num, get_rank_id, get_job_id
 
-    logg = logging.getLogger(name)
-    logg.setLevel(logging.DEBUG)
-    logg.addHandler(handler)
-
-    return logg
-
-
-logger = get_logger('root')
+__all__ = [
+    "get_device_id", "get_device_num", "get_rank_id", "get_job_id"
+]

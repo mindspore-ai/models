@@ -12,25 +12,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""Logger."""
-import logging
+# This file was copied from project [WHULuoJiaTeam][luojianet]
+"""Local adapter"""
+
+import os
+
+def get_device_id():
+    device_id = os.getenv('DEVICE_ID', '0')
+    return int(device_id)
 
 
-def get_logger(name='root'):
-    """
-    Get Logger.
-    """
-    formatter = logging.Formatter(
-        fmt='%(asctime)s [%(levelname)s]: %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
-
-    handler = logging.StreamHandler()
-    handler.setFormatter(formatter)
-
-    logg = logging.getLogger(name)
-    logg.setLevel(logging.DEBUG)
-    logg.addHandler(handler)
-
-    return logg
+def get_device_num():
+    device_num = os.getenv('RANK_SIZE', '1')
+    return int(device_num)
 
 
-logger = get_logger('root')
+def get_rank_id():
+    global_rank_id = os.getenv('RANK_ID', '0')
+    return int(global_rank_id)
+
+
+def get_job_id():
+    return "Local Job"

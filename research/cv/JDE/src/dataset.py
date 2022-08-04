@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+# This file was copied from project [calendar_day_1][Towards-Realtime-MOT]
 """Dataloader script."""
+import glob
 import math
 import os
 import os.path as osp
 import random
 from collections import OrderedDict
-from pathlib import Path
 
 import cv2
 import numpy as np
@@ -33,19 +34,25 @@ class LoadImages:
     Loader for inference.
 
     Args:
-        path (str): Path to the directory, containing images.
+        path (str): Dict with relative paths for datasets.
         img_size (list): Size of output image.
 
     Returns:
-        img (np.array): Processed image.
-        img0 (np.array): Original image.
+        img_path:
+        img:
+        img0:
     """
-    def __init__(self, path, anchor_scales, img_size=(1088, 608)):
-        path = Path(path)
-        if not path.is_dir():
-            raise NotADirectoryError(f'Expected a path to the directory with images, got "{path}"')
+    def __init__(self, path, opt):
+        self.opt = opt
+        anchor_scales = opt.anchor_scales
+        img_size = opt.img_size
 
-        self.files = sorted(path.glob('*.jpg'))
+        if os.path.isdir(path):
+            image_format = ['.jpg', '.jpeg', '.png', '.tif']
+            self.files = sorted(glob.glob(f'{path}/*.*'))
+            self.files = list(filter(lambda x: os.path.splitext(x)[1].lower() in image_format, self.files))
+        elif os.path.isfile(path):
+            self.files = [path]
 
         self.anchors, self.strides = create_anchors_vec(anchor_scales)
         self.nf = len(self.files)  # Number of img files.
@@ -63,23 +70,7 @@ class LoadImages:
         self.count += 1
         if self.count == self.nf:
             raise StopIteration
-        img_path = str(self.files[self.count])
-
-        # Read image
-        img0 = cv2.imread(img_path)  # BGR
-        assert img0 is not None, 'Failed to load ' + img_path
-
-        # Padded resize
-        img, _, _, _ = letterbox(img0, height=self.height, width=self.width)
-
-        # Normalize RGB
-        img = img[:, :, ::-1].transpose(2, 0, 1)
-        img = np.ascontiguousarray(img, dtype=np.float32)
-        img /= 255.0
-
-        output = (img, img0)
-
-        return output
+        return self[self.count]
 
     def __getitem__(self, idx):
         idx = idx % self.nf
@@ -104,6 +95,62 @@ class LoadImages:
     def __len__(self):
         return self.nf  # number of files
 
+class Load310:
+    """
+    Loader for 310 inference.
+
+    Args:
+        path (str): path of bin file
+        seq (str): data seq name
+        opt (dict): config
+
+    Returns:
+        img_path:
+        img: output & output_top_k
+        img0: None
+    """
+    def __init__(self, path_img, seq, opt):
+        self.opt = opt
+        self.path_bin = './result_Files'
+
+        if os.path.isdir(path_img):
+            image_format = ['.jpg', '.jpeg', '.png', '.tif']
+            self.file_img = sorted(glob.glob(f'{path_img}/*.*'))
+            self.file_img = list(filter(lambda x: os.path.splitext(x)[1].lower() in image_format, self.file_img))
+        elif os.path.isfile(path_img):
+            self.file_img = [path_img]
+
+        # load bin file
+        self.file_bin = [f for f in os.listdir(self.path_bin) if f.startswith(seq) and f.endswith('.bin')]
+        self.file_bin = sorted(self.file_bin)
+        self.nf = len(self.file_bin)
+
+        self.count = 0
+        assert self.nf > 0, 'No images found'
+
+
+    def __iter__(self):
+        self.count = -1
+        return self
+
+    def __next__(self):
+        self.count += 1
+        if self.count == self.nf:
+            raise StopIteration
+        return self.__getitem__(self.count)
+
+    def __getitem__(self, idx):
+        idx = idx % self.nf
+        bf = np.fromfile(os.path.join(self.path_bin, self.file_bin[idx]), np.float32)
+        bf = bf.reshape(1, 800, 518)
+
+        if np.isnan(bf).any():
+            print('NAN!!!', self.file_img[idx])
+
+        return bf, cv2.imread(self.file_img[idx])
+
+    def __len__(self):
+        return self.nf
 
 class LoadVideo:
     """
@@ -168,8 +215,7 @@ class LoadVideo:
         return output
 
     def __len__(self):
-        return self.vn  # number of files
-
+        return self.vn
 
 class JointDataset:
     """
@@ -251,6 +297,7 @@ class JointDataset:
         print('dataset summary')
         print(self.tid_num)
         print('total # identities:', self.nid)
+        print("total images:", self.nf)
         print('start index')
         print(self.tid_start_index)
         print('=' * 40)
@@ -420,26 +467,16 @@ class JointDatasetDetection(JointDataset):
         return output
 
 
-def letterbox(
-        img,
-        height=608,
-        width=1088,
-        color=(127.5, 127.5, 127.5),
-):
-    """
-    Resize a rectangular image to a padded rectangular
-    and fill padded border with color.
-    """
+def letterbox(img, height=608, width=1088, color=(127.5, 127.5, 127.5)):
     shape = img.shape[:2]  # shape = [height, width]
-    ratio = min(float(height) / shape[0], float(width) / shape[1])
+    ratio = min(float(height)/shape[0], float(width)/shape[1])
     new_shape = (round(shape[1] * ratio), round(shape[0] * ratio))  # new_shape = [width, height]
-    dw = (width - new_shape[0]) / 2  # width padding
-    dh = (height - new_shape[1]) / 2  # height padding
+    dw = (width - new_shape[0])/2  # width padding
+    dh = (height - new_shape[1])/2  # height padding
     top, bottom = round(dh - 0.1), round(dh + 0.1)
     left, right = round(dw - 0.1), round(dw + 0.1)
     img = cv2.resize(img, new_shape, interpolation=cv2.INTER_AREA)  # resized, no border
     img = cv2.copyMakeBorder(img, top, bottom, left, right, cv2.BORDER_CONSTANT, value=color)  # padded rectangular
-
     return img, ratio, dw, dh
 
 

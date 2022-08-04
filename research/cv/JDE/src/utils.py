@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+# This file was copied from project [calendar_day_1][Towards-Realtime-MOT]
 """Auxiliary utils."""
 import os
 
@@ -204,7 +205,7 @@ def build_targets_thres(target, anchor_wh, na, ngh, ngw, k_max):
     t_indices = np.zeros(k_max)
     t_indices[..., :min(k_max, k)] = indices[..., :min(k_max, k)]
 
-    return tconf, tbox, tid, t_indices
+    return (tconf, tbox, tid, t_indices)
 
 
 def bbox_iou(box1, box2, x1y1x2y2=False):

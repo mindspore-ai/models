@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -ne 4 ]]; then
-    echo "Usage: bash ./scripts/run_standalone_train_npu.sh [DEVICE_ID] [LOGS_CKPT_DIR] [CKPT_URL] [DATASET_ROOT]"
-    exit 1
+if [[ $# -ne 3 ]]; then
+    echo "Usage: bash ./scripts/run_eval_gpu.sh [DEVICE_ID] [CKPT_URL] [DATASET_ROOT]"
+    exit 1;
 fi
 
 
@@ -28,26 +28,22 @@ get_real_path(){
     fi
 }
 
-LOGS_CKPT_DIR="$2"
+CKPT_URL=$(get_real_path "$2")
+DATASET_ROOT=$(get_real_path "$3")
 
-if [ !  -d "$LOGS_CKPT_DIR" ]; then
-  mkdir "$LOGS_CKPT_DIR"
-  mkdir "$LOGS_CKPT_DIR/training_configs"
+if [ ! -d "$DATASET_ROOT" ]; then
+    echo "The specified dataset root is not a directory: $DATASET_ROOT"
+    exit 1;
 fi
 
-DATASET_ROOT=$(get_real_path "$4")
-CKPT_URL=$(get_real_path "$3")
+if [ ! -f "$CKPT_URL" ]; then
+    echo "The specified checkpoint does not exist: $CKPT_URL"
+    exit 1;
+fi
 
-cp ./*.py ./"$LOGS_CKPT_DIR"/training_configs
-cp ./*.yaml ./"$LOGS_CKPT_DIR"/training_configs
-cp -r ./cfg ./"$LOGS_CKPT_DIR"/training_configs
-cp -r ./src ./"$LOGS_CKPT_DIR"/training_configs
-
-python ./train.py \
+python ./eval.py \
     --device_target="Ascend" \
     --device_id=$1 \
-    --logs_dir="$LOGS_CKPT_DIR" \
-    --dataset_root="$DATASET_ROOT" \
     --ckpt_url="$CKPT_URL" \
-    --lr=0.01 \
-    > ./"$2"/standalone_train.log 2>&1 &
+    --dataset_root="$DATASET_ROOT" \
+    > ./eval.log 2>&1 &

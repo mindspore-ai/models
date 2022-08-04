@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+# This file was copied from project [Huawei Noahs Ark Lab][noah-vega]
 """Parse arguments"""
 import argparse
 import ast

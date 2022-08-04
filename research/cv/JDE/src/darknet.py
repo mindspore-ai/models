@@ -12,10 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+# This file was copied from project [ascend][modelzoo-his]
 """DarkNet model."""
 from mindspore import nn
 from mindspore.ops import operations as P
-
+from src.initializer import init_cov, init_bn
 
 def conv_block(
         in_channels,
@@ -45,7 +46,8 @@ def conv_block(
             nn.ReLU(),
         ]
     )
-
+    init_cov(dbl[0])
+    init_bn(dbl[1])
     return dbl
 
 

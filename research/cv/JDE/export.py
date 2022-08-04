@@ -22,7 +22,7 @@ from mindspore import dtype as mstype
 from mindspore import load_checkpoint
 from mindspore.train.serialization import export
 
-from cfg.config import config as default_config
+from model_utils.config import config as default_config
 from src.darknet import DarkNet, ResidualBlock
 from src.model import JDEeval
 from src.model import YOLOv3
@@ -50,11 +50,14 @@ def run_export(config):
     load_checkpoint(config.ckpt_url, net)
     net.set_train(False)
 
-    input_data = Tensor(np.zeros([1, 3, 1088, 608]), dtype=mstype.float32)
+    width = config.img_size[0]
+    height = config.img_size[1]
+
+    input_data = Tensor(np.zeros([1, 3, height, width]), dtype=mstype.float32)
     name = Path(config.ckpt_url).stem
 
-    export(net, input_data, file_name=name, file_format='MINDIR')
-    print('Model exported successfully!')
+    export(net, input_data, file_name=name, file_format=config.file_format)
+    print('Export <{}> format, model exported successfully!'.format(config.file_format))
 
 
 if __name__ == "__main__":

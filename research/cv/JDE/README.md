@@ -12,15 +12,17 @@
         - [Training Process](#training-process)
             - [Standalone Training](#standalone-training)
             - [Distribute Training](#distribute-training)
-        - [Evaluation Process](#evaluation-process)
-            - [Evaluation](#evaluation)
-        - [Inference Process](#inference-process)
-            - [Usage](#usage)
-            - [Result](#result)
+    - [Evaluation Process](#evaluation-process)
+        - [Evaluation](#evaluation)
+    - [GPU Inference Process](#gpu-inference-process)
+        - [Usage](#usage)
+        - [Result](#result)
+    - [Export Process](#export-process)
+    - [Ascend Inference Process](#ascend-inference-process)
     - [Model Description](#model-description)
-        - [Performance](#performance)
-            - [Training Performance](#training-performance)
-            - [Evaluation Performance](#evaluation-performance)
+    - [Performance](#performance)
+        - [Training Performance](#training-performance)
+        - [Evaluation Performance](#evaluation-performance)
     - [ModelZoo Homepage](#modelzoo-homepage)
 
 ## [JDE Description](#contents)
@@ -81,13 +83,13 @@ Information about train part of dataset.
 
 ## [Environment Requirements](#contents)
 
-- Hardware（GPU）
-- Prepare hardware environment with GPU processor.
+- Hardware（GPU/Ascend）
+- Prepare hardware environment with GPU/Ascend processor.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
 
 ## [Quick Start](#contents)
 
@@ -112,6 +114,12 @@ python -m src.convert_checkpoint --ckpt_url [PATH_TO_PYTORCH_CHECKPOINT]
 
 After converting the checkpoint and installing the requirements.txt, you can run the training scripts:
 
+note: please change the parameter is_distributed of default_config.yaml file by running environment.
+
+- running on GPU
+
+for running on GPU,please modify default_config.yaml: device_target from Ascend to GPU
+
 ```bash
 # Run standalone training example
 bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [LOGS_CKPT_DIR] [CKPT_URL] [DATASET_ROOT]
@@ -120,7 +128,18 @@ bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [LOGS_CKPT_DIR] [CKPT_URL] 
 bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [LOGS_CKPT_DIR] [CKPT_URL] [DATASET_ROOT]
 ```
 
+- running on Ascend
+
+```bash
+# Run standalone training example
+bash scripts/run_standalone_train.sh [DEVICE_ID] [LOGS_CKPT_DIR] [LOAD_DARKNET_URL] [DATASET_ROOT]
+
+# Run distribute training example
+bash scripts/run_distribute_train.sh [DEVICE_NUM] [LOGS_CKPT_DIR] [LOAD_DARKNET_URL] [DATASET_ROOT] [RANK_TABLE_FILE]
+```
+
 - DEVICE_ID - Device ID
+- DEVICE_NUM - Device Number
 - LOGS_CKPT_DIR - path to the directory, where the training results will be stored.
 - CKPT_URL - Path to the converted pre-trained DarkNet53 backbone.
 - DATASET_ROOT - Path to the dataset root directory (containing all dataset parts, described in [DATASET_ZOO.md](DATASET_ZOO.md))
@@ -134,19 +153,27 @@ bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [LOGS_CKPT_DIR] [CKPT_URL]
 └─JDE
   ├─data
   │ └─prepare_mot17.py                 # MOT17 data preparation script
-  ├─cfg
+  ├─model_utils
   │ ├─ccmcpe.json                      # paths to dataset schema (defining relative paths structure)
-  │ └─config.py                        # parameter parser
+  │ ├─config.py                        # parameter parser
+  | ├─devide_adapter.py                # device adapter script
+  | ├─local_adapter.py                 # local device adapter script
+  | └─moxing_adapter.py                # distribute device adapter script
   ├─scripts
-  │ ├─run_distribute_train_gpu.sh      # launch distribute train on GPU
   │ ├─run_eval_gpu.sh                  # launch evaluation on GPU
-  │ └─run_standalone_train_gpu.sh      # launch standalone train on GPU
+  │ ├─run_eval.sh                  # launch evaluation on Ascend
+  | ├─run_infer_310.sh                 # launch infer on Ascend310
+  │ ├─run_distribute_train_gpu.sh      # launch distribute train on GPU
+  │ ├─run_distribute_train.sh      # launch distribute train on Ascend
+  │ ├─run_standalone_train_gpu.sh      # launch standalone train on GPU
+  │ └─run_standalone_train.sh      # launch standalone train on Ascend
   ├─src
   │ ├─__init__.py
   │ ├─convert_checkpoint.py            # backbone checkpoint converter (torch to mindspore)
   │ ├─darknet.py                       # backbone of network
   │ ├─dataset.py                       # create dataset
   │ ├─evaluation.py                    # motmetrics evaluator
+  │ ├─initializer.py                   # model initialization
   │ ├─io.py                            # MOT evaluation utils
   │ ├─kalman_filter.py                 # kalman filter script
   │ ├─log.py                           # logger script
@@ -159,12 +186,15 @@ bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [LOGS_CKPT_DIR] [CKPT_URL]
   │ ├─basetrack.py                     # base class for tracking
   │ ├─matching.py                      # matching for tracking script
   │ └─multitracker.py                  # tracker init script
+  ├─ascend310_infer                    # Ascend310 inference source code
   ├─DATASET_ZOO.md                     # dataset preparing description
   ├─README.md
   ├─default_config.yaml                # default configs
   ├─eval.py                            # evaluation script
   ├─eval_detect.py                     # detector evaluation script
   ├─export.py                          # export to MINDIR script
+  ├─preprocess.py                      # 310 inference preprocess script
+  ├─postprocess.py                     # 310 inference postprocess script
   ├─infer.py                           # inference script
   ├─requirements.txt
   └─train.py                           # training script
@@ -212,13 +242,23 @@ Include arguments for Train/Evaluation/Inference.
 --output_root             Expected output root path
 --save_images             Save tracking results (image)
 --save_videos             Save tracking results (video)
+--file_format:            "MINDIR" # ["AIR", "ONNX", "MINDIR"]
+--infer310:               whether infer310
 ```
 
 ### [Training Process](#contents)
 
 #### Standalone Training
 
-Note: For all trainings necessary to use pretrained backbone darknet53.
+Note: For all trainings necessary to use pretrained backbone darknet53 and please change the parameter is_distributed of default_config.yaml file by running environment
+
+- running on Ascend
+
+```bash
+bash scripts/run_standalone_train.sh [DEVICE_ID] [LOGS_CKPT_DIR] [CKPT_URL] [DATASET_ROOT]
+```
+
+- running on GPU
 
 ```bash
 bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [LOGS_CKPT_DIR] [CKPT_URL] [DATASET_ROOT]
@@ -230,11 +270,77 @@ bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [LOGS_CKPT_DIR] [CKPT_URL] 
 - DATASET_ROOT - Path to the dataset root directory (containing all dataset parts, described in [DATASET_ZOO.md](DATASET_ZOO.md))
 
 The above command will run in the background, you can view the result through the generated standalone_train.log file.
+
 After training, you can get the training loss and time logs in chosen logs_dir.
 
 The model checkpoints will be saved in LOGS_CKPT_DIR directory.
 
 #### Distribute Training
+
+- running on Ascend
+
+```bash
+bash scripts/run_distribute_train.sh [DEVICE_NUM] [LOGS_CKPT_DIR] [CKPT_URL] [DATASET_ROOT] [RANK_TABLE_FILE]
+```
+
+```text
+epoch: 50 step: 1072, loss is -14.7477
+epoch: 50 step: 1072, loss is -11.798253
+epoch: 50 step: 1172, loss is -18.3406
+epoch: 50 step: 1172, loss is -20.445492
+epoch: 50 step: 1172, loss is -13.039152
+epoch: 50 step: 1172, loss is -16.564177epoch: 50 step: 1172, loss is -11.598206
+epoch: 50 step: 1172, loss is -12.547735
+epoch: 50 step: 1172, loss is -16.880716
+epoch: 50 step: 1172, loss is -19.950447
+epoch: 50 step: 1272, loss is -16.732803
+epoch: 50 step: 1272, loss is -19.284496
+epoch: 50 step: 1272, loss is -13.200997
+epoch: 50 step: 1272, loss is -20.25792
+epoch: 50 step: 1272, loss is -18.699135epoch: 50 step: 1272, loss is -17.323572
+epoch: 50 step: 1272, loss is -19.999825
+epoch: 50 step: 1272, loss is -15.697657
+epoch: 50 step: 1372, loss is -7.870503
+epoch: 50 step: 1372, loss is -18.403461
+epoch: 50 step: 1372, loss is -19.886168
+epoch: 50 step: 1372, loss is -16.99081
+epoch: 50 step: 1372, loss is -16.271353epoch: 50 step: 1372, loss is -18.211508
+epoch: 50 step: 1372, loss is -16.854897
+epoch: 50 step: 1372, loss is -15.579943
+epoch: 50 step: 1472, loss is -19.984272
+epoch: 50 step: 1472, loss is -12.321886
+epoch: 50 step: 1472, loss is -17.311712epoch: 50 step: 1472, loss is -17.272167
+epoch: 50 step: 1472, loss is -18.001553
+epoch: 50 step: 1472, loss is -18.723167
+epoch: 50 step: 1472, loss is -16.447176
+epoch: 50 step: 1472, loss is -20.523182
+epoch: 50 step: 1572, loss is -20.207062
+epoch: 50 step: 1572, loss is -19.602242
+epoch: 50 step: 1572, loss is -19.595556
+epoch: 50 step: 1572, loss is -15.631174epoch: 50 step: 1572, loss is -19.064281
+epoch: 50 step: 1572, loss is -17.65372
+epoch: 50 step: 1572, loss is -19.230976epoch: 50 step: 1572, loss is -17.307154
+epoch: 50 step: 1672, loss is -20.424273
+epoch: 50 step: 1672, loss is -19.456707epoch: 50 step: 1672, loss is -18.910358
+epoch: 50 step: 1672, loss is -15.7901325
+epoch: 50 step: 1672, loss is -17.905373epoch: 50 step: 1672, loss is -18.419804
+epoch: 50 step: 1672, loss is -19.16711
+epoch: 50 step: 1672, loss is -17.312708
+epoch time: 710695.457 ms, per step time: 425.057 ms
+epoch time: 710700.617 ms, per step time: 425.060 ms
+epoch time: 710695.830 ms, per step time: 425.057 msepoch time: 710700.808 ms, per step time: 425.060 ms
+epoch time: 710702.623 ms, per step time: 425.061 ms
+epoch time: 710703.826 ms, per step time: 425.062 ms
+epoch time: 711144.133 ms, per step time: 425.325 ms
+train success
+train success
+train success
+train success
+train success
+train success
+```
+
+- running on GPU
 
 ```bash
 bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [LOGS_CKPT_DIR] [CKPT_URL] [DATASET_ROOT]
@@ -284,7 +390,7 @@ Tracking ability of the model is tested on the train part of the MOT16 dataset (
 To start tracker evaluation run the command below.
 
 ```bash
-bash scripts/run_eval_gpu.sh [DEVICE_ID] [CKPT_URL] [DATASET_ROOT]
+bash scripts/run_eval[_gpu].sh [DEVICE_ID] [CKPT_URL] [DATASET_ROOT]
 ```
 
 - DEVICE_ID - Device ID.
@@ -296,6 +402,23 @@ bash scripts/run_eval_gpu.sh [DEVICE_ID] [CKPT_URL] [DATASET_ROOT]
 The above python command will run in the background. The validation logs will be saved in "eval.log".
 
 For more details about `motmetrics`, you can refer to [MOT benchmark](https://motchallenge.net/).
+
+- Evaluation on Ascend
+
+```text
+DATE-DATE-DATE TIME:TIME:TIME [INFO]: Time elapsed: 323.49 seconds, FPS: 16.39
+          IDF1   IDP   IDR  Rcll  Prcn  GT  MT  PT ML   FP    FN  IDs    FM  MOTA  MOTP IDt IDa IDm
+MOT16-02 54.4% 59.6% 50.0% 74.4% 88.7%  54  25  24  5 1698  4557  345   530 63.0% 0.211 149  83   8
+MOT16-04 72.4% 79.7% 66.3% 79.2% 95.3%  83  39  33 11 1860  9884  191   424 74.9% 0.210  72  59   3
+MOT16-05 70.1% 75.3% 65.6% 79.6% 91.3% 125  64  52  9  518  1394  129   208 70.1% 0.216  80  54  26
+MOT16-09 57.7% 63.8% 52.7% 77.6% 94.0%  25  16   8  1  262  1175  130   161 70.2% 0.193  68  34   3
+MOT16-10 62.7% 65.7% 60.0% 81.5% 89.2%  54  30  24  0 1219  2284  313   506 69.0% 0.229 136  72   5
+MOT16-11 70.7% 72.7% 68.8% 88.8% 93.7%  69  46  21  2  544  1031   82   144 81.9% 0.184  28  33   4
+MOT16-13 70.7% 77.2% 65.2% 78.5% 92.9% 107  63  38  6  685  2462  236   539 70.5% 0.219 115  70  32
+OVERALL  67.2% 72.9% 62.4% 79.4% 92.8% 517 283 200 34 6786 22787 1426  2512 71.9% 0.210 648 405  81
+```
+
+- Evaluation on GPU
 
 ```text
 DATE-DATE-DATE TIME:TIME:TIME [INFO]: Time elapsed: 240.54 seconds, FPS: 22.04
@@ -322,6 +445,22 @@ python eval_detect.py --device_id [DEVICE_ID] --ckpt_url [CKPT_URL] --dataset_ro
 
 Results of evaluation will be visualized at command line.
 
+- evaluation on Ascend
+
+```text
+    Image      Total          P          R        mAP
+       4000      30353      0.849      0.782      0.771      0.271s
+       8000      30353      0.878      0.796      0.785      0.253s
+      12000      30353      0.869      0.814      0.801      0.259s
+      16000      30353      0.873      0.823      0.811      0.287s
+      20000      30353      0.881      0.833      0.822       0.26s
+      24000      30353      0.886      0.842      0.832      0.261s
+      28000      30353      0.887      0.838      0.828      0.275s
+mean_mAP: 0.8214, mean_R: 0.8316, mean_P: 0.8843
+```
+
+- evaluation on GPU
+
 ```text
       Image      Total          P          R        mAP
        4000      30353      0.829      0.778      0.765      0.426s
@@ -334,7 +473,7 @@ Results of evaluation will be visualized at command line.
 mean_mAP: 0.8225, mean_R: 0.8325, mean_P: 0.8700
 ```
 
-### [Inference Process](#contents)
+### [GPU Inference Process](#contents)
 
 #### Usage
 
@@ -353,11 +492,56 @@ python infer.py --device_id [DEVICE_ID] --ckpt_url [CKPT_URL] --input_video [INP
 
 Results of the inference will be saved into default `./results` folder, logs will be shown at command line.
 
+## [Export Process](#contents)
+
+change some parameters of default_config.yaml, such as ckpt_url、img_size、file_format.
+
+```bash
+python export.py --ckpt_url [CKPT_URL] --file_format [FILE_FORMAT]
+```
+
+- CKPT_URL - Path to the trained JDE model.
+
+- file_format - choose from["AIR", "MINDIR"]
+
+## [Ascend Inference Process](#contents)
+
+Before inference we need to export the model first. Air models can only be exported on the Ascend 910 environment, mindir can be exported on any environment. batch_size only supports 1.
+
+```bash
+# Ascend310 inference
+bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+```
+
+- MINDIR_PATH - Path to exported model.
+
+- DATA_PATH   - Inference dataset MOT16 path, (PATH TO/MOT16/train).
+
+- DEVICE_ID   - Device ID.
+
 ## [Model Description](#contents)
 
 ### [Performance](#contents)
 
 #### Training Performance
+
+- running on Ascend
+
+| Parameters                 | Ascend (8p)                                                                            |
+| -------------------------- |-----------------------------------------------------------------------------------  |
+| Model                      | JDE (1088*608)                                                                      |
+| Hardware                   | Ascend: 8 * Ascend-910                              |
+| Upload Date                | 06/08/2022 (day/month/year)                                                         |
+| MindSpore Version          | 1.5.0                                                                               |
+| Dataset                    | Joint Dataset (see `DATASET_ZOO.md`)                                                |
+| Training Parameters        | epoch=30, batch_size=4 (per device), lr=0.01, momentum=0.9, weight_decay=0.0001     |
+| Optimizer                  | SGD                                                                                 |
+| Loss Function              | SmoothL1Loss, SoftmaxCrossEntropyWithLogits (and apply auto-balancing loss strategy)|
+| Outputs                    | Tensor of bbox cords, conf, class, emb                                              |
+| Speed                      | Eight cards: ~425 ms/step                                                          |
+| Total time                 | Eight cards: ~15 hours
+
+- running on GPU
 
 | Parameters                 | GPU (8p)                                                                            |
 | -------------------------- |-----------------------------------------------------------------------------------  |
@@ -374,6 +558,22 @@ Results of the inference will be saved into default `./results` folder, logs wil
 | Total time                 | Eight cards: ~17 hours                                                              |
 
 #### Evaluation Performance
+
+- evaluation on Ascend
+
+| Parameters          |  Ascend(1p)                                               |
+| ------------------- |--------------------------------------------------------|
+| Model               | JDE (1088*608)                                         |
+| Resource            | Ascend: 1 * Ascend-910                |
+| Upload Date         | 02/02/2022 (day/month/year)                            |
+| MindSpore Version   | 1.5.0                                                  |
+| Dataset             | MOT-16                                                 |
+| Batch_size          | 1                                                      |
+| Outputs             | Metrics, .txt predictions                              |
+| FPS                 | 16.39                                               |
+| Metrics             | mAP 82.14, MOTA 71.9%
+
+- evaluation on GPU
 
 | Parameters          | GPU (1p)                                               |
 | ------------------- |--------------------------------------------------------|

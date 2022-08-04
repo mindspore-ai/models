@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+# This file was copied from project [calendar_day_1][Towards-Realtime-MOT]
 """Multiple objects tracking."""
 from collections import deque
 
@@ -206,7 +207,10 @@ class JDETracker:
         self.opt = opt
 
         self.model = net
-        logger.info('Inference for: %s', opt.ckpt_url)
+        if opt.infer310:
+            logger.info('Inference for 310')
+        else:
+            logger.info('Inference for: %s', opt.ckpt_url)
 
         self.tracked_stracks = []  # type: list[TrackS]
         self.lost_stracks = []  # type: list[TrackS]
@@ -352,11 +356,14 @@ class JDETracker:
         tracked_stracks = []  # type: list[TrackS]
 
         # Step 1: Network forward, get detections & embeddings
-        _, pred = self.model.predict(im_blob)
-
+        if self.opt.infer310:
+            pred = im_blob
+        else:
+            _, pred = self.model.predict(im_blob)
+            pred = pred.asnumpy()
+        # print('pred:',pred.sum())
         # Pred is tensor of all the proposals (default number of proposals: 54264).
         # Proposals have information associated with the bounding box and embeddings.
-        pred = pred.asnumpy()
         pred = pred[pred[:, :, 4] > self.opt.conf_thres]
         # Pred now has lesser number of proposals. Proposals rejected on basis of object confidence score.
 

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+# This file was copied from project [calendar_day_1][Towards-Realtime-MOT]
 """Tracker evaluation script."""
 import logging
 import os
@@ -26,7 +27,7 @@ from mindspore import context
 from mindspore import dtype as mstype
 from mindspore.train.serialization import load_checkpoint
 
-from cfg.config import config as default_config
+from model_utils.config import config as default_config
 from src import visualization as vis
 from src.darknet import DarkNet, ResidualBlock
 from src.dataset import LoadImages
@@ -195,7 +196,7 @@ def main(
 
         logger.info('start seq: %s', seq)
 
-        dataloader = LoadImages(osp.join(data_root, seq, 'img1'), opt.anchor_scales, opt.img_size)
+        dataloader = LoadImages(osp.join(data_root, seq, 'img1'), opt)
 
         result_filename = os.path.join(result_root, f'{seq}.txt')
 
@@ -252,7 +253,7 @@ def main(
 if __name__ == '__main__':
     config = default_config
 
-    context.set_context(mode=context.GRAPH_MODE, device_target='GPU')
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
     context.set_context(device_id=config.device_id)
 
     data_root_path = os.path.join(config.dataset_root, _MOT16_DIR_FOR_TEST)
