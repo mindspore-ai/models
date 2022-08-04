@@ -34,6 +34,8 @@ class AngleLoss(nn.Cell):
         self.lamb = Parameter(Tensor(1500, mindspore.float32))
         self.on_value = Tensor(1.0 - smooth_factor, mindspore.float32)
         self.off_value = Tensor(1.0 * smooth_factor / (classnum - 1), mindspore.float32)
+        self.value = Tensor(5, mindspore.float32)
+
     def construct(self, inputs, target):
         self.it += 1.0
         cos_theta = inputs[0]
@@ -43,7 +45,7 @@ class AngleLoss(nn.Cell):
         if self.it < 3000:
             lamb = 1500 / (1 + 0.1 * self.it)
         else:
-            lamb = 5
+            lamb = self.value
         output = cos_theta * 1.0
         cos_theta = one_hot_label * cos_theta * (1.0 / (1 + lamb))
         phi_theta = one_hot_label * phi_theta * (1.0 / (1 + lamb))
