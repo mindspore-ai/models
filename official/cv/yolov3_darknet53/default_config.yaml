@@ -183,3 +183,6 @@ keep_detect: "keep the detect module or not, default: True"
 # convert weight option
 input_file: "input file path."
 output_file: "output file path."
+
+---
+lr_scheduler: ["exponential", "cosine_annealing"]
