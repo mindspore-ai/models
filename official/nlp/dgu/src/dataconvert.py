@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -36,15 +36,15 @@ TASK_CLASSES = {
 def data_save_to_file(data_file_path=None, vocab_file_path='bert-base-uncased-vocab.txt', \
         output_path=None, task_name=None, mode="train", max_seq_length=128):
     """data save to mindrecord file."""
-    MINDRECORD_FILE_PATH = output_path + task_name+"/" + task_name + "_" + mode + ".mindrecord"
-    if not os.path.exists(output_path + task_name):
-        os.makedirs(output_path + task_name)
+    MINDRECORD_FILE_PATH = output_path + "/" + task_name + "/" + task_name + "_" + mode + ".mindrecord"
+    if not os.path.exists(output_path + "/" + task_name):
+        os.makedirs(output_path + "/" + task_name)
     if os.path.exists(MINDRECORD_FILE_PATH):
         os.remove(MINDRECORD_FILE_PATH)
         os.remove(MINDRECORD_FILE_PATH + ".db")
     dataset_class = TASK_CLASSES[task_name]
     tokenizer = FullTokenizer(vocab_file=vocab_file_path, do_lower_case=True)
-    dataset = dataset_class(data_file_path+task_name, mode=mode)
+    dataset = dataset_class(data_file_path + "/" + task_name, mode=mode)
     applid_data = []
     datalist = []
     print(task_name + " " + mode + " data process begin")

@@ -18,13 +18,16 @@
         - [选项](#选项)
         - [参数](#参数)
     - [训练过程](#训练过程)
-        - [用法](#用法)
+        - [用法](#训练用法)
             - [Ascend处理器上运行](#ascend处理器上运行)
             - [GPU上运行](#GPU上运行)
     - [评估过程](#评估过程)
-        - [用法](#用法-1)
+        - [用法](#评估用法)
             - [Ascend处理器上运行后评估各个任务的模型](#Ascend处理器上运行后评估各个任务的模型)
             - [GPU上运行后评估各个任务的模型](#GPU上运行后评估各个任务的模型)
+    - [ONNX推理](#ONNX推理)
+        - [导出ONNX模型](#导出ONNX模型)
+        - [用法](#GPU上执行推理)
     - [310推理](#310推理)
         - [导出模型](#导出模型)
         - [用法](#在ascend310执行推理)
@@ -51,11 +54,11 @@ BERT的主干结构为Transformer。对于BERT_base，Transformer包含12个编�
 # 数据准备
 
 - 下载数据集压缩包并解压后，DGU_datasets目录下共存在6个目录，分别对应每个任务的训练集train.txt、评估集dev.txt和测试集test.txt。
-    wget https://paddlenlp.bj.bcebos.com/datasets/DGU_datasets.tar.gz
+    wget <https://paddlenlp.bj.bcebos.com/datasets/DGU_datasets.tar.gz>
     tar -zxf DGU_datasets.tar.gz
 - 下载数据集进行微调和评估，如udc、atis_intent、mrda、swda等。将数据集文件从JSON格式转换为MindRecord格式。详见src/dataconvert.py文件。
-- BERT模型训练的词汇表bert-base-uncased-vocab.txt 下载地址：https://s3.amazonaws.com/models.huggingface.co/bert/bert-base-uncased-vocab.txt
-- bert-base-uncased预训练模型原始权重 下载地址：https://paddlenlp.bj.bcebos.com/models/transformers/bert-base-uncased.pdparams
+- BERT模型训练的词汇表bert-base-uncased-vocab.txt 下载地址：<https://s3.amazonaws.com/models.huggingface.co/bert/bert-base-uncased-vocab.txt>
+- bert-base-uncased预训练模型原始权重 下载地址：<https://paddlenlp.bj.bcebos.com/models/transformers/bert-base-uncased.pdparams>
 
 # 环境要求
 
@@ -65,7 +68,7 @@ BERT的主干结构为Transformer。对于BERT_base，Transformer包含12个编�
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - 更多关于Mindspore的信息，请查看以下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
 # 快速入门
 
@@ -164,6 +167,7 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
   ├─scripts
     ├─run_dgu.sh                     # Ascend上单机DGU任务shell脚本
     ├─run_dgu_gpu.sh                 # GPU上单机DGU任务shell脚本
+    ├─run_eval_onnx.sh               # GPU上单机DGU任务评估shell脚本
     ├─download_data.sh               # 下载数据集shell脚本
     ├─download_pretrain_model.sh     # 下载预训练模型权重shell脚本
     ├─export.sh                      # export脚本
@@ -183,9 +187,11 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
     ├─finetune_eval_config.py                 # 微调参数配置
     ├─finetune_eval_model.py                  # 网络骨干编码
     ├─metric.py                               # 评估过程的测评方法
-    ├─pretrainmodel_convert.py           # 预训练模型权重转换
+    ├─pretrainmodel_convert.py                # 预训练模型权重转换
     ├─tokenizer.py                            # tokenizer函数
     └─utils.py                                # util函数
+  ├─eval_onnx.py                              # ONNX评估脚本
+  ├─export.py                                 # 推理模型导出脚本
   └─run_dgu.py                                # DGU模型的微调和评估网络
 ```
 
@@ -194,7 +200,7 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
 ### 微调与评估
 
 ```shell
-用法：dataconvert.py   [--task_name TASK_NAME]
+用法：dataconvert.py [--task_name TASK_NAME]
                     [--data_dir DATA_DIR]
                     [--vocab_file_path VOCAB_FILE_PATH]
                     [--output_dir OUTPUT_DIR]
@@ -208,16 +214,19 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
     --max_seq_len                     train数据集的max_seq_len
     --eval_max_seq_len                dev或test数据集的max_seq_len
 
-用法：run_dgu.py [--device_target DEVICE_TARGET] [--do_train DO_TRAIN] [----do_eval DO_EVAL]
-                    [--device_id N] [--epoch_num N]
-                    [--train_data_shuffle TRAIN_DATA_SHUFFLE]
-                    [--eval_data_shuffle EVAL_DATA_SHUFFLE]
-                    [--checkpoint_path CHECKPOINT_PATH]
-                    [--model_name_or_path MODEL_NAME_OR_PATH]
-                    [--train_data_file_path TRAIN_DATA_FILE_PATH]
-                    [--eval_data_file_path EVAL_DATA_FILE_PATH]
-                    [--eval_ckpt_path EVAL_CKPT_PATH]
-                    [--is_modelarts_work IS_MODELARTS_WORK]
+用法：run_dgu.py [--device_target DEVICE_TARGET]
+                [--do_train DO_TRAIN]
+                [--do_eval DO_EVAL]
+                [--device_id N]
+                [--epoch_num N]
+                [--train_data_shuffle TRAIN_DATA_SHUFFLE]
+                [--eval_data_shuffle EVAL_DATA_SHUFFLE]
+                [--checkpoint_path CHECKPOINT_PATH]
+                [--model_name_or_path MODEL_NAME_OR_PATH]
+                [--train_data_file_path TRAIN_DATA_FILE_PATH]
+                [--eval_data_file_path EVAL_DATA_FILE_PATH]
+                [--eval_ckpt_path EVAL_CKPT_PATH]
+                [--is_modelarts_work IS_MODELARTS_WORK]
 选项:
     --task_name                       训练任务的名称
     --device_target                   代码实现设备，可选项为Ascend或CPU。默认为Ascend
@@ -295,7 +304,7 @@ Parameters for optimizer:
 
 ## 训练过程
 
-### 用法
+### 训练用法
 
 #### Ascend处理器上运行
 
@@ -359,7 +368,7 @@ epoch time: 1711860.908 ms, per step time: 280.909 ms
 
 ## 评估过程
 
-### 用法
+### 评估用法
 
 #### Ascend处理器上运行后评估各个任务的模型
 
@@ -403,6 +412,50 @@ evaling...
 Accuracy  : 0.8082890070921985
 ```
 
+## ONNX推理
+
+### 导出ONNX模型
+
+```shell
+# 导出ONNX
+python export.py [batch_size] [task_name] [ckpt_file] [file_name] [file_format] [device_target] [number_label]
+# 例如
+python export.py --batch_size 100 --task_name udc --ckpt_file path/to/ckpt --file_name dgu_udc --file_format ONNX --device_target GPU --number_label 2
+```
+
+### GPU上执行推理
+
+以下展示了使用ONNX模型执行推理的示例。
+
+```shell
+# ONNX推理
+bash scripts/run_eval_onnx.sh [DEVICE_TARGET] [TASK_NAME] [DATA_FILE_PATH] [ONNX_MODEL]
+# 例如
+bash scripts/run_eval_onnx.sh GPU udc data/udc/udc_test.mindrecord dgu_udc.onnx
+```
+
+- `DEVICE_TARGET` 为代码实现设备。
+- `TASK_NAME` 为评估任务的名称。
+- `DATA_FILE_PATH` 为预处理为MindRecord格式的测试数据。
+- `ONNX_MODEL` 为需要执行推理的ONNX模型。
+
+### ONNX推理结果
+
+使用udc数据集进行评估，可得到如下结果：
+
+```text
+eval model:  /data1/dgu/dgu_udc.onnx
+loading...
+evaling...
+==============================================================
+(w/o first and last) elapsed time: 775.1821091175079, per step time : 0.1550984612079848
+==============================================================
+Recall@K  : [0.82142, 0.90456, 0.97746]
+R1@10:  0.82142
+R2@10:  0.90456
+R5@10:  0.97746
+```
+
 ## 310推理
 
 ### 导出模型
@@ -429,7 +482,7 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_FILE_PATH] [NEED_PREPROCESS] [
 - `DEVICE_ID` 可选，默认值为0。
 - `DATASET` 为执行推理的数据集，可选，数据集包括['atis', 'mrda', 'swda', 'udc'],默认值为'atis'。
 
-### 结果
+### 310推理结果
 
 推理结果保存在脚本执行的当前路径，精度计算结果可以在acc.log中看到。
 
