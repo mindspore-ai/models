@@ -18,6 +18,7 @@
     - [Mindir推理](#Mindir推理)
         - [导出模型](#导出模型)
         - [在Ascend310执行推理](#在Ascend310执行推理)
+        - [onnx推理](#onnx推理)
         - [结果](#结果)
 - [模型描述](#模型描述)
     - [性能](#性能)
@@ -107,6 +108,7 @@ Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/m
         │   ├──run_eval.sh                   // 推理启动脚本
         │   ├──run_train.sh                  // 训练启动脚本
         |   ├──run_infer_310.sh              // 310推理启动脚本
+            |——run_eval_onnx.sh              // onnx推理启动脚本
         ├── src
         │   ├──config.py                     // 配置加载文件
         │   ├──dataset.py                    // 数据集处理
@@ -120,6 +122,7 @@ Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/m
         ├── dataset_preprocess.py            // 数据集预处理脚本
         ├── postprocess.py                   // 310精度计算脚本
         ├── preprocess.py                    // 310预处理脚本
+        |—— eval_onnx.py                     // onnx推理脚本
 
 ```
 
@@ -234,11 +237,11 @@ Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/m
 ### [导出MindIR](#contents)
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --device_target [DEVICE_TARGET]
 ```
 
 - `ckpt_file`为必填项。
-- `file_format` 必须在 ["AIR", "MINDIR"]中选择。
+- `file_format` 必须在 ["AIR", "MINDIR","ONNX"]中选择。
 
 ### 在Ascend310执行推理
 
@@ -252,6 +255,19 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 - `DATA_PATH` 为测试集所在的路径。
 - `NEED_PREPROCESS` 表示数据是否需要预处理，取值范围为 'y' 或者 'n'。
 - `DEVICE_ID` 可选，默认值为0。
+
+### onnx推理
+
+在执行推理前，onnx文件必须通过`export.py`脚本导出。
+
+```shell
+# onnx inference
+bash run_eval_onnx.sh [DATASET_PATH] [ONNX_MODEL] [DEVICE_TARGET]
+```
+
+- `DATASET_PATH` 为测试集所在的路径
+- `ONNX_MODEL` 为导出的onnx模型所在路径
+- `DEVICE_TARGET` 必须在['Ascend','CPU','GPU']中选择
 
 ### 结果
 
