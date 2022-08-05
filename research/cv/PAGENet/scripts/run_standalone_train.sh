@@ -13,7 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-421
+
+if [ $# != 2 ]
+then
+    echo "Usage: bash scripts/run_standalone_train.sh [DEVICE_ID] [CONFIG_PATH]"
+exit 1
+fi
+
 get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
     echo "$1"
@@ -21,13 +27,21 @@ get_real_path(){
     echo "$(realpath -m $PWD/$1)"
   fi
 }
-export DEVICE_ID=0
-export RANK_ID=0 
+
+export DEVICE_ID=$1
+export CUDA_VISIBLE_DEVICES=$1
+export RANK_ID=0
+CONFIG_PATH=$(get_real_path $2)
+
+if [ ! -f ${CONFIG_PATH} ]; then
+echo "config path ${CONFIG_PATH} file not exists"
+exit
+fi
 # Get current script path
 BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
 
 cd $BASE_PATH/..
 
-python train.py  --config_path $1 &> standalone_train.log 2>&1 &
+python train.py --config_path=$CONFIG_PATH &> standalone_train.log 2>&1 &
 
-echo "The train log is at ../standalone_train.log."
+echo "The train log is at $BASE_PATH/../standalone_train.log."

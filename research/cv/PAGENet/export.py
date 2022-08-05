@@ -32,10 +32,10 @@ def run_export():
     """
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
 
-    net = MindsporeModel()
+    net = MindsporeModel(config)
 
     if not os.path.exists(config.ckpt_file):
-        print("config.ckpt_file is None.")
+        raise ValueError("config.ckpt_file is None.")
     param_dict = load_checkpoint(config.ckpt_file)
     load_param_into_net(net, param_dict)
 

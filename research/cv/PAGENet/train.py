@@ -25,6 +25,8 @@ from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.mytrainonestep import CustomTrainOneStepCell
 
+ms.set_seed(1)
+
 @moxing_wrapper()
 def main():
     context.set_context(mode=config.MODE,

@@ -13,11 +13,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # =========================================================================
-if [ $# != 1 ]
+if [ $# != 2 ]
 then
-    echo "Usage: bash run_eval.sh [CONFIG_PATH]"
+    echo "Usage: bash scripts/eval.sh [DEVICE_ID] [CONFIG_PATH]"
 exit 1
 fi
+get_real_path(){
+  if [ "${1:0:1}" == "/" ]; then
+    echo "$1"
+  else
+    echo "$(realpath -m $PWD/$1)"
+  fi
+}
 
-cd ..
-python eval.py --config_path $1 &> test.log 2>&1 &
+export DEVICE_ID=$1
+export CUDA_VISIBLE_DEVICES=$1
+export RANK_ID=0
+CONFIG_PATH=$(get_real_path $2)
+
+if [ ! -f ${CONFIG_PATH} ]; then
+echo "config path ${CONFIG_PATH} file not exists"
+exit
+fi
+# Get current script path
+BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
+
+cd $BASE_PATH/..
+python eval.py --config_path=$CONFIG_PATH &> test.log 2>&1 &
+echo "The eval log is at $BASE_PATH/../test.log."
