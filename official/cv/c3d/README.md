@@ -137,9 +137,9 @@ img_path:    [IMAGE_FILE_PATH]       # Path to the image file for the given data
 ```text
 mkdir ./pretrained_model
 # download C3D pretrained file
-wget -O ./pretrained_model/c3d-pretrained.pth https://umich.box.com/shared/static/znmyt8uph3w7bjxoevg7pukfatyu3z6k.pth
+wget -O ./pretrained_model/c3d-pretrained.pth https://download.mindspore.cn/thirdparty/c3d_pretrained.pth
 # download C3D Mean file
-wget -O ./pretrained_model/sport1m_train16_128_mean.npy https://umich.box.com/shared/static/ppbnldsa5rty615osdjh2yi8fqcx0a3b.npy
+wget -O ./pretrained_model/sport1m_train16_128_mean.npy https://download.mindspore.cn/thirdparty/sport1m_train16_128_mean.npy
 ```
 
 - Convert pretrained model (from pytorch to mindspore, both Pytorch and Mindspore must be installed.)
