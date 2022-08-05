@@ -31,7 +31,7 @@ parser.add_argument('--ckpt_file', type=str, required=True,
 parser.add_argument('--file_name', type=str,
                     default='resnet-3d', help='Output file name.')
 parser.add_argument('--file_format', type=str,
-                    choices=['AIR', 'MINDIR'], default='MINDIR', help='File format.')
+                    choices=['AIR', 'MINDIR', 'ONNX'], default='MINDIR', help='File format.')
 parser.add_argument('--device_target', type=str, choices=['Ascend', 'CPU', 'GPU'], default='Ascend',
                     help='Device target')
 parser.add_argument('--sample_duration', type=int, default=16)

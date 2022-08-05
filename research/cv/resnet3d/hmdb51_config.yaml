@@ -14,6 +14,7 @@ annotation_path: ""
 result_path: ""
 pretrain_path: ""
 inference_ckpt_path: ""
+onnx_path: ""
 n_classes: 51
 sample_size: 112
 sample_duration: 16
