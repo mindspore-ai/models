@@ -121,8 +121,6 @@ class PanguAlphaTrainOneStepWithLossScaleCell(TrainOneStepWithLossScaleCell):
         else:
             self.clip = ClipByGlobalNorm(self.weights, config)
         self.cast = P.Cast()
-        self.sync_all_reduce = P.AllReduce()
-        self.sync_tensor = Tensor(0.0, dtype=mstype.float32)
 
     def construct(self, input_ids, input_position, attention_mask, layer_past=None, sens=None):
         """Defines the computation performed."""
@@ -158,12 +156,7 @@ class PanguAlphaTrainOneStepWithLossScaleCell(TrainOneStepWithLossScaleCell):
         # if not, update weights
         if not overflow:
             if self.enable_offload:
-                res = self.optimizer(grads, clip_value)
-                # For moe and enable_offload, compile time of difference devices have great gap and cause
-                # notify wait, a sync allreduce at the end of last graph is need
-                sync_tensor = F.depend(self.sync_tensor, res)
-                sync_flag = self.sync_all_reduce(sync_tensor)
-                loss = F.depend(loss, sync_flag)
+                self.optimizer(grads, clip_value)
             else:
                 self.optimizer(grads)
         return loss, cond, scaling_sens
