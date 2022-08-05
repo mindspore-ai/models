@@ -160,6 +160,12 @@ python infer.py \
         ├─src_train.csv             # 训练数据集
         └─id_maps.json              # 输出解释相关配置
   ├─src
+    ├─utils
+        ├─__init__.py               # 初始化文件
+        ├─device_adapter.py         # 获得云设备id
+        ├─local_adapter.py          # 获得本地id
+        ├─moxing_adapter.py         # 参数处理
+        └─param.py                  # 解析参数
     ├─aggregator.py                 # 推理结果聚合
     ├─config.py                     # 参数配置解析
     ├─dataset.py                    # 创建数据集
@@ -171,12 +177,30 @@ python infer.py \
   ├─preprocess_dataset.py           # 数据集预处理脚本
   ├─preprocess.py                   # 推理数据预处理脚本
   ├─postprocess.py                  # 推理结果计算脚本
+  ├─default_config.yaml             # yaml配置文件
   ├─eval.py                         # 评估网络
   ├─infer.py                        # 推理和解释
   └─train.py                        # 训练网络
 ```
 
 ## [脚本参数](#目录)
+
+train.py与param.py主要参数如下：
+
+```python
+data_path: "."                      # 数据集路径
+load_path: "./checkpoint"           # 检查点保存路径
+checkpoint_id: 19                   # 检查点id
+same_relation: False                # 预处理数据集时，只生成`relation1`与`relation2`相同的路径
+dataset: "steam"                    # 数据集名陈
+train_csv: "train.csv"              # 数据集中训练集文件名
+test_csv: "test.csv"                # 数据集中测试集文件名
+infer_csv: "infer.csv"              # 数据集中推理数据文件名
+device_id: 0                        # 设备id
+device_target: "GPU"                # 运行平台
+run_mode: "graph"                   # 运行模式
+epochs: 20                          # 训练轮数
+```
 
 - preprocess_dataset.py参数
 

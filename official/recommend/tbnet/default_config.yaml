@@ -1,0 +1,31 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unlesee you know exactly what you are doing)
+enable_modelarts: False
+# url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+
+# url for openi
+ckpt_url: ""
+result_url: ""
+
+# path for local
+data_path: "."
+output_path: "./output"
+load_path: "./checkpoint"
+
+# preprocess_data
+same_relation: False
+
+#train
+dataset: "steam"
+train_csv: "train.csv"
+test_csv: "test.csv"
+infer_csv: "infer.csv"
+device_id: 0
+epochs: 20
+device_target: "GPU"
+run_mode: "graph"
+
+#eval
+checkpoint_id: 19

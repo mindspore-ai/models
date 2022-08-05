@@ -15,7 +15,6 @@
 """TB-Net evaluation."""
 
 import os
-import argparse
 import math
 
 from mindspore import context, Model, load_checkpoint, load_param_into_net
@@ -23,90 +22,36 @@ import mindspore.common.dtype as mstype
 
 from src import tbnet, config, metrics, dataset
 
-
-def get_args():
-    """Parse commandline arguments."""
-    parser = argparse.ArgumentParser(description='Train TBNet.')
-
-    parser.add_argument(
-        '--dataset',
-        type=str,
-        required=False,
-        default='steam',
-        help="'steam' dataset is supported currently"
-    )
-
-    parser.add_argument(
-        '--csv',
-        type=str,
-        required=False,
-        default='test.csv',
-        help="the csv datafile inside the dataset folder (e.g. test.csv)"
-    )
-
-    parser.add_argument(
-        '--checkpoint_id',
-        type=int,
-        required=True,
-        help="use which checkpoint(.ckpt) file to eval"
-    )
-
-    parser.add_argument(
-        '--device_id',
-        type=int,
-        required=False,
-        default=0,
-        help="device id"
-    )
-
-    parser.add_argument(
-        '--device_target',
-        type=str,
-        required=False,
-        default='GPU',
-        choices=['GPU', 'Ascend'],
-        help="run code on GPU or Ascend NPU"
-    )
-
-    parser.add_argument(
-        '--run_mode',
-        type=str,
-        required=False,
-        default='graph',
-        choices=['graph', 'pynative'],
-        help="run code by GRAPH mode or PYNATIVE mode"
-    )
-
-    return parser.parse_args()
+from src.utils.param import param
+from src.utils.moxing_adapter import moxing_wrapper
+from preprocess_dataset import preprocess_data
 
 
+@moxing_wrapper(preprocess_data)
 def eval_tbnet():
     """Evaluation process."""
-    args = get_args()
+    config_path = os.path.join(param.data_path, 'data', param.dataset, 'config.json')
+    test_csv_path = os.path.join(param.data_path, 'data', param.dataset, param.test_csv)
+    ckpt_path = param.load_path
 
-    home = os.path.dirname(os.path.realpath(__file__))
-    config_path = os.path.join(home, 'data', args.dataset, 'config.json')
-    test_csv_path = os.path.join(home, 'data', args.dataset, args.csv)
-    ckpt_path = os.path.join(home, 'checkpoints')
-
-    context.set_context(device_id=args.device_id)
-    if args.run_mode == 'graph':
-        context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
+    context.set_context(device_id=param.device_id)
+    if param.run_mode == 'graph':
+        context.set_context(mode=context.GRAPH_MODE, device_target=param.device_target)
     else:
-        context.set_context(mode=context.PYNATIVE_MODE, device_target=args.device_target)
+        context.set_context(mode=context.PYNATIVE_MODE, device_target=param.device_target)
 
     print(f"creating dataset from {test_csv_path}...")
     net_config = config.TBNetConfig(config_path)
-    if args.device_target == 'Ascend':
+    if param.device_target == 'Ascend':
         net_config.per_item_paths = math.ceil(net_config.per_item_paths / 16) * 16
         net_config.embedding_dim = math.ceil(net_config.embedding_dim / 16) * 16
     eval_ds = dataset.create(test_csv_path, net_config.per_item_paths, train=True).batch(net_config.batch_size)
 
-    print(f"creating TBNet from checkpoint {args.checkpoint_id} for evaluation...")
+    print(f"creating TBNet from checkpoint {param.checkpoint_id} for evaluation...")
     network = tbnet.TBNet(net_config)
-    if args.device_target == 'Ascend':
+    if param.device_target == 'Ascend':
         network.to_float(mstype.float16)
-    param_dict = load_checkpoint(os.path.join(ckpt_path, f'tbnet_epoch{args.checkpoint_id}.ckpt'))
+    param_dict = load_checkpoint(os.path.join(ckpt_path, f'tbnet_epoch{param.checkpoint_id}.ckpt'))
     load_param_into_net(network, param_dict)
 
     loss_net = tbnet.NetWithLossClass(network, net_config)
@@ -117,7 +62,10 @@ def eval_tbnet():
 
     print("evaluating...")
     e_out = model.eval(eval_ds, dataset_sink_mode=False)
-    print(f'Test AUC:{e_out ["auc"]} ACC:{e_out ["acc"]}')
+    print(f'Test AUC:{e_out["auc"]} ACC:{e_out["acc"]}')
+    if param.enable_modelarts:
+        with open(os.path.join(param.output_path, 'result.txt'), 'w') as f:
+            f.write(f'Test AUC:{e_out["auc"]} ACC:{e_out["acc"]}')
 
 
 if __name__ == '__main__':
