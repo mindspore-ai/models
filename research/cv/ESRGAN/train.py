@@ -80,6 +80,8 @@ parser.add_argument("--device_id", type=int, default=0, help="device id, default
 parser.add_argument("--device_num", type=int, default=1, help="number of device, default: 1.")
 parser.add_argument("--rank_id", type=int, default=0, help="Rank id, default: 0.")
 parser.add_argument("--version", type=int, default=0, help="version, default: 0.")
+parser.add_argument("--best_ckpt_path", type=str, default="./best_ckpt",
+                    help="best ckpt save path, not use in modelarts.")
 
 
 def evaluate(model, test_data_loader, cur_step, cur_epoch, cur_best_psnr, eval_mode, runs_path):
@@ -128,15 +130,19 @@ if __name__ == '__main__':
 
         local_train_runs_path = os.path.join(device_data_url, 'runs')
         local_train_ckpt_path = os.path.join(device_data_url, 'ckpt')
+        best_ckpt_path = os.path.join(local_data_url, "best_ckpt")
 
         mox.file.make_dirs(local_data_url)
         mox.file.make_dirs(device_data_url)
         mox.file.make_dirs(local_train_runs_path)
         mox.file.make_dirs(local_train_ckpt_path)
+        if rank == 0:
+            mox.file.make_dirs(best_ckpt_path)
         mox.file.copy_parallel(src_url=args.data_url, dst_url=local_data_url)
     else:
         local_train_runs_path = './runs'
         local_train_ckpt_path = './ckpt'
+        best_ckpt_path = args.best_ckpt_path
         if args.run_distribute:
             print("distribute")
             rank_id = int(os.getenv('RANK_ID'))
@@ -212,10 +218,10 @@ if __name__ == '__main__':
         # Check whether the evaluation index of the current model is the highest.
         is_best = psnr > best_psnr
         best_psnr = max(psnr, best_psnr)
-        if is_best:
+        if is_best and rank == 0:
             print("best_psnr saving ckpt    ", end="")
             print(best_psnr)
-            save_checkpoint(generator, os.path.join(local_train_ckpt_path, 'psnr_best.ckpt'))
+            save_checkpoint(generator, os.path.join(best_ckpt_path, 'psnr_best.ckpt'))
         # save checkpoint every epoch
         save_checkpoint(generator, os.path.join(local_train_ckpt_path, f'{epoch}_psnr_generator.ckpt'))
         print(f"{epoch + 1}/{total_psnr_epochs} epoch finished")
@@ -226,7 +232,7 @@ if __name__ == '__main__':
     generator = get_generator(3, 3)
     discriminator = get_discriminator(3)
     # load checkpoint
-    params = load_checkpoint(os.path.join(local_train_ckpt_path, 'psnr_best.ckpt'))
+    params = load_checkpoint(os.path.join(best_ckpt_path, 'psnr_best.ckpt'))
     load_param_into_net(generator, params)
 
     milestone = [50000, 100000, 200000, 300000, 400000]
@@ -272,8 +278,8 @@ if __name__ == '__main__':
         if is_best:
             print("best_psnr saving ckpt    ", end="")
             print(best_psnr)
-            save_checkpoint(generator, os.path.join(local_train_ckpt_path, 'gan_generator_best.ckpt'))
-            save_checkpoint(discriminator, os.path.join(local_train_ckpt_path, 'gan_discriminator_best.ckpt'))
+            save_checkpoint(generator, os.path.join(best_ckpt_path, 'gan_generator_best.ckpt'))
+            save_checkpoint(discriminator, os.path.join(best_ckpt_path, 'gan_discriminator_best.ckpt'))
         # save checkpoint every epoch
         save_checkpoint(generator, os.path.join(local_train_ckpt_path, f'{epoch}_gan_generator.ckpt'))
         save_checkpoint(discriminator, os.path.join(local_train_ckpt_path, f'{epoch}_gan_discriminator.ckpt'))
@@ -285,3 +291,5 @@ if __name__ == '__main__':
     if args.modelArts:
         mox.file.copy_parallel(src_url=local_train_runs_path, dst_url=args.train_url)
         mox.file.copy_parallel(src_url=local_train_ckpt_path, dst_url=args.train_url)
+        if rank == 0:
+            mox.file.copy_parallel(src_url=best_ckpt_path, dst_url=args.train_url)

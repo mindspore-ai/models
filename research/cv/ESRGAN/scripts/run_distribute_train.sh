@@ -31,6 +31,7 @@ export VPSNRLRPATH=$7
 export VPSNRGTPATH=$8
 export VGANLRPATH=$9
 export VGANGTPATH=${10}
+CWD=`pwd`
 
 
 
@@ -48,6 +49,6 @@ do
                 python train.py --run_distribute=$DISTRIBUTE --device_num=$RANK_SIZE \
                                 --device_id=$DEVICE_ID --train_LR_path=$LRPATH --train_GT_path=$GTPATH --vgg_ckpt=$VGGCKPT \
                                 --val_PSNR_LR_path=$VPSNRLRPATH --val_PSNR_GT_path=$VPSNRGTPATH --val_GAN_LR_path=$VGANLRPATH \
-                                --val_GAN_GT_path=$VGANGTPATH > train.log 2>&1 &
+                                --val_GAN_GT_path=$VGANGTPATH --best_ckpt_path=${CWD}/best_ckpt > train.log 2>&1 &
         cd ..
 done

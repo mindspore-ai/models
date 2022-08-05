@@ -60,6 +60,6 @@ if __name__ == '__main__':
             raise ValueError("Load param into network fail!")
     # export network
     print("============== Starting export ==============")
-    inputs = Tensor(np.ones([1, 3, 224, 224]))
+    inputs = Tensor(np.ones([1, 3, 224, 224], dtype=np.float32))
     export(network, inputs, file_format=args_opt.format_type, file_name="GENet_Res50")
     print("============== End export ==============")
