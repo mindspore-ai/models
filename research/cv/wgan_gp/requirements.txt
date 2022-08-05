@@ -1,0 +1,2 @@
+Pillow
+onnxruntime-gpu
