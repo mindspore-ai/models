@@ -29,6 +29,7 @@ export VPSNRLRPATH=$5
 export VPSNRGTPATH=$6
 export VGANLRPATH=$7
 export VGANGTPATH=${8}
+CWD=`pwd`
 
 
 rm -rf ./train_parallel
@@ -47,6 +48,6 @@ else
  python train.py --run_distribute=1 --device_num=$RANK_SIZE \
        --train_LR_path=$LRPATH --train_GT_path=$GTPATH --vgg_ckpt=$VGGCKPT \
        --val_PSNR_LR_path=$VPSNRLRPATH --val_PSNR_GT_path=$VPSNRGTPATH --val_GAN_LR_path=$VGANLRPATH \
-       --val_GAN_GT_path=$VGANGTPATH --platform=GPU > log 2>&1 &
+       --val_GAN_GT_path=$VGANGTPATH --platform=GPU --best_ckpt_path=${CWD}/best_ckpt > log 2>&1 &
 cd ..
 fi
