@@ -88,8 +88,7 @@ function infer()
     mkdir result_Files
     mkdir time_Result
 
-    ../ascend310_infer/out/main --mindir_path=$model --dataset_name=$dataset_name --input0_path=$dataset_path .\
-    --device_id=$device_id  &> infer.log
+    ../ascend310_infer/src/main --mindir_path=$model --dataset_name=$dataset_name --input0_path=$dataset_path --device_id=$device_id  &> infer.log
 }
 
 function cal_acc()

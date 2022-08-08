@@ -43,7 +43,7 @@ SwinTransformer是新型的视觉Transformer，它可以用作计算机视觉的
     - 注：数据在dataset.py中处理。
 - 下载数据集，目录结构如下：
 
- ```text
+```text
 └─dataset
     ├─train                 # 训练数据集
     └─val                   # 评估数据集
@@ -77,7 +77,9 @@ SwinTransformer是新型的视觉Transformer，它可以用作计算机视觉的
   ├── scripts
       ├──run_standalone_train_ascend.sh   // 单卡Ascend910训练脚本
       ├──run_distribute_train_ascend.sh   // 多卡Ascend910训练脚本
-      ├──run_eval_ascend.sh               // 测试脚本
+      ├──run_distribute_train_gpu.sh      // 多卡GPU训练脚本
+      ├──run_eval_ascend.sh               // Ascend测试脚本
+      ├──run_eval_gpu.sh                  // GPU测试脚本
       ├──run_infer_310.sh                 // 310推理脚本
   ├── src
       ├──configs                          // SwinTransformer的配置文件
@@ -163,7 +165,7 @@ SwinTransformer是新型的视觉Transformer，它可以用作计算机视觉的
 
   ```bash
   # 使用python启动单卡训练
-  python train.py --device_id 0 --device_target Ascend --swin_config ./src/configs/swin_tiny_patch4_window7_224.yaml > train.log 2>&1 &
+  python train.py --device_id 0 --device_target Ascend --swin_config ./src/configs/ascend_swin_tiny_patch4_window7_224.yaml > train.log 2>&1 &
 
   # 使用脚本启动单卡训练
   bash ./scripts/run_standalone_train_ascend.sh [DEVICE_ID] [CONFIG_PATH]
@@ -172,7 +174,7 @@ SwinTransformer是新型的视觉Transformer，它可以用作计算机视觉的
   bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [CONFIG_PATH]
 
   # 使用python启动单卡运行评估示例
-  python eval.py --device_id 0 --device_target Ascend --swin_config ./src/configs/swin_tiny_patch4_window7_224.yaml --pretrained ./ckpt_0/swin_tiny_patch4_window7_224.ckpt > ./eval.log 2>&1 &
+  python eval.py --device_id 0 --device_target Ascend --swin_config ./src/configs/ascend_swin_tiny_patch4_window7_224.yaml --pretrained ./ckpt_0/swin_tiny_patch4_window7_224.ckpt > ./eval.log 2>&1 &
 
   # 使用脚本启动单卡运行评估示例
   bash ./scripts/run_eval_ascend.sh [RANK_TABLE_FILE] [CONFIG_PATH]
@@ -186,6 +188,19 @@ SwinTransformer是新型的视觉Transformer，它可以用作计算机视觉的
   请遵循以下链接中的说明：
 
 [hccl工具](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+
+- GPU环境运行
+
+  ```bash
+  # 使用脚本启用多卡训练
+  bash ./scripts/run_distribute_train_gpu.sh [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+
+  # 使用脚本启动单卡训练
+  bash ./scripts/run_standalone_train_gpu.sh [CONFIG_PATH] [DEVICE_ID]
+
+  # 使用脚本启用单卡评估
+  bash ./scripts/run_eval_gpu.sh [DEVICE_ID] [CONFIG_PATH] [CHECKPOINT_PATH]
+  ```
 
 ## 导出过程
 
@@ -221,22 +236,22 @@ SwinTransformer是新型的视觉Transformer，它可以用作计算机视觉的
 
 #### ImageNet-1k上的SwinTransformer
 
-| 参数                 | Ascend                                                       |
-| -------------------------- | ----------------------------------------------------------- |
-|模型|SwinTransformer|
-| 模型版本              | swin_tiny_patch4_window7_224                                                |
-| 资源                   | Ascend 910               |
-| 上传日期              | 2021-10-25                                 |
-| MindSpore版本          | 1.3.0                                                 |
-| 数据集                    | ImageNet-1k Train，共1,281,167张图像                                              |
-| 训练参数        | epoch=300, batch_size=128            |
-| 优化器                  | AdamWeightDecay                                                    |
-| 损失函数              | SoftTargetCrossEntropy                                       |
-| 损失| 0.8279|
-| 输出                    | 概率                                                 |
-| 分类准确率             | 八卡：top1:81.07% top5:95.31%                   |
-| 速度                      | 八卡：624.124毫秒/步                        |
-| 训练耗时          |79h55min08s（run on ModelArts）|
+| 参数                 | Ascend                                                       | GPU                                                    |
+| -------------------------- | ----------------------------------------------------------- | ----------------------------------------------------------- |
+|模型|SwinTransformerSwinTransformer| SwinTransformerSwinTransformer       |
+| 模型版本              | swin_tiny_patch4_window7_224                                                | swin_tiny_patch4_window7_224                    |
+| 资源                   | Ascend 910               | Gefore RTX 3090 * 8 |
+| 上传日期              | 2021-10-25                                 | 2022-5-28                        |
+| MindSpore版本          | 1.3.0                                                 | 1.6.1                                |
+| 数据集                    | ImageNet-1k Train，共1,281,167张图像                                              | ImageNet-1k Train，共1,281,167张图像               |
+| 训练参数        | epoch=300, batch_size=128            | epoch=300, batch_size=128 |
+| 优化器                  | AdamWeightDecay                                                    | AdamWeightDecay                                     |
+| 损失函数              | SoftTargetCrossEntropy                                       | SoftTargetCrossEntropy                 |
+| 损失| 0.8279| |
+| 输出                    | 概率                                                 | 概率                                               |
+| 分类准确率             | 八卡：top1:81.07% top5:95.31%                   | 八卡：top1:80.65% top5:95.38% |
+| 速度                      | 八卡：624.124毫秒/步                        | 八卡：4323ms/step          |
+| 训练耗时          |79h55min08s（run on ModelArts）||
 
 ### 推理性能
 
