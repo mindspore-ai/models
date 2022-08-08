@@ -88,6 +88,7 @@ PAGE-Net网络由三个部分组成，提取特征的CNN模块，金字塔注意
         │   ├── run_distribute_train_gpu.sh  # 多卡训练脚本文件(gpu)
         │   ├── run_distribute_train.sh      # 多卡训练脚本文件(ascend)
         │   ├── run_eval.sh                  # 评估脚本文件(ascend & gpu)
+        │   ├── run_infer_310.sh             # 评估脚本文件(ascend 310)
         ├── src
         |   ├── model_utils
         |   |   ├── config.py
@@ -99,10 +100,13 @@ PAGE-Net网络由三个部分组成，提取特征的CNN模块，金字塔注意
         │   ├── train_loss.py                # 损失定义
         |   ├── MyTrainOneStep.py            # 定义训练网络封装类
         |   ├── vgg.py                       # 定义vgg
+        ├── ascend310_infer                  # 310推理
         ├── train.py                         # 训练脚本
         ├── eval.py                          # 评估脚本
         ├── export.py                        # 模型导出脚本
         ├── requirements.txt                 # 需求文档
+        ├── preprocess.py                    # 预处理
+        ├── postprocess.py                   # 后处理
 ```
 
 ### 脚本参数
@@ -156,6 +160,19 @@ bash scripts/eval.sh [DEVICE_ID] [CONFIG_PATH] #运行推理
 
 ```shell
 python export.py --config_path=[CONFIG_PATH]  #导出mindir，模型文件路径为config中的ckpt_file
+```
+
+```text
+成功导出模型之后，执行以下指令进行310推理
+首先需修改default_config_ascend.yaml文件：
+1. 修改test_img_path为推理数据集原图的路径
+2. 修改test_gt_path为推理数据集MASK的路径
+3. 修改batchsize为1
+执行推理指令如下：
+```
+
+```bash
+bash run_infer_310.sh [MINDIR_PATH] [CONFIG_PATH] [DEVICE_ID]
 ```
 
 ## 模型描述
