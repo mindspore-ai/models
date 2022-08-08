@@ -31,6 +31,6 @@ mkdir ./evaluation_gpu
 cd ./evaluation_gpu || exit
 echo  "start training for device id $DEVICE_ID"
 env > env.log
-python ../eval.py --device_target=GPU --swin_config=$CONFIG_PATH --pretrained=$CHECKPOINT_PATH > eval.log 2>&1 &
+python ../eval.py --device_target="GPU" --swin_config=$CONFIG_PATH --pretrained=$CHECKPOINT_PATH > eval.log 2>&1 &
 cd ../
 

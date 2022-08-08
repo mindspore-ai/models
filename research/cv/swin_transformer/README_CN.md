@@ -165,7 +165,7 @@ SwinTransformer是新型的视觉Transformer，它可以用作计算机视觉的
 
   ```bash
   # 使用python启动单卡训练
-  python train.py --device_id 0 --device_target Ascend --swin_config ./src/configs/ascend_swin_tiny_patch4_window7_224.yaml > train.log 2>&1 &
+  python train.py --device_id 0 --device_target Ascend --swin_config ./src/configs/swin_tiny_patch4_window7_224.yaml > train.log 2>&1 &
 
   # 使用脚本启动单卡训练
   bash ./scripts/run_standalone_train_ascend.sh [DEVICE_ID] [CONFIG_PATH]
@@ -174,7 +174,7 @@ SwinTransformer是新型的视觉Transformer，它可以用作计算机视觉的
   bash ./scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [CONFIG_PATH]
 
   # 使用python启动单卡运行评估示例
-  python eval.py --device_id 0 --device_target Ascend --swin_config ./src/configs/ascend_swin_tiny_patch4_window7_224.yaml --pretrained ./ckpt_0/swin_tiny_patch4_window7_224.ckpt > ./eval.log 2>&1 &
+  python eval.py --device_id 0 --device_target Ascend --swin_config ./src/configs/swin_tiny_patch4_window7_224.yaml --pretrained ./ckpt_0/swin_tiny_patch4_window7_224.ckpt > ./eval.log 2>&1 &
 
   # 使用脚本启动单卡运行评估示例
   bash ./scripts/run_eval_ascend.sh [RANK_TABLE_FILE] [CONFIG_PATH]
