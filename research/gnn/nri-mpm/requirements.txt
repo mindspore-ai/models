@@ -1,0 +1,3 @@
+numpy==1.21.4
+mindspore==1.5.0
+scipy==1.7.3
