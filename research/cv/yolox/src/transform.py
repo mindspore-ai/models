@@ -21,15 +21,18 @@ import numpy as np
 
 
 def get_aug_params(value, center=0):
-    if len(value) != 2 and not isinstance(value, float):
+    if isinstance(value, float):
+        min_v = center - value
+        max_v = center + value
+    elif len(value) == 2:
+        min_v = value[0]
+        max_v = value[1]
+    else:
         raise ValueError(
             "Affine params should be either a sequence containing two values\
              or single float values. Got {}".format(value)
         )
-    if isinstance(value, float):
-        return random.uniform(center - value, center + value)
-
-    return random.uniform(value[0], value[1])
+    return random.uniform(min_v, max_v)
 
 
 def get_affine_matrix(
@@ -68,7 +71,7 @@ def get_affine_matrix(
     return M, scale
 
 
-def apply_affine_to_bboxes(targets, target_size, M):
+def apply_affine_to_bboxes(targets, target_size, M, scale):
     num_gts = len(targets)
 
     # warp corner points
@@ -84,12 +87,7 @@ def apply_affine_to_bboxes(targets, target_size, M):
     corner_xs = corner_points[:, 0::2]
     corner_ys = corner_points[:, 1::2]
     new_bboxes = (
-        np.concatenate(
-            (corner_xs.min(1), corner_ys.min(1), corner_xs.max(1), corner_ys.max(1))
-        )
-        .reshape(4, num_gts)
-        .T
-    )
+        np.concatenate((corner_xs.min(1), corner_ys.min(1), corner_xs.max(1), corner_ys.max(1))).reshape(4, num_gts).T)
 
     # clip boxes
     new_bboxes[:, 0::2] = new_bboxes[:, 0::2].clip(0, twidth)
@@ -109,14 +107,13 @@ def random_affine(
         scales=0.1,
         shear=10,
 ):
-    M, _ = get_affine_matrix(target_size, degrees, translate, scales, shear)
+    M, scale = get_affine_matrix(target_size, degrees, translate, scales, shear)
 
     img = cv2.warpAffine(img, M, dsize=target_size, borderValue=(114, 114, 114))
 
     # Transform label coordinates
     if targets:
-        targets = apply_affine_to_bboxes(targets, target_size, M)
-
+        targets = apply_affine_to_bboxes(targets, target_size, M, scale)
     return img, targets
 
 
@@ -267,7 +264,7 @@ class TrainTransform:
         expanded_strides = np.concatenate(expanded_strides, axis=1)
         return x_shifts, y_shifts, expanded_strides
 
-    def get_in_boxes_info(self, gt_bboxes_per_image, true_lables):
+    def get_in_boxes_info(self, gt_bboxes_per_image, true_labels):
         """ get the pre in-center and in-box info for each image """
         x_shifts, y_shifts, expanded_strides = self.get_grid()
         num_total_anchor = x_shifts.shape[1]
@@ -300,7 +297,7 @@ class TrainTransform:
 
         bbox_deltas = np.stack([b_l, b_t, b_r, b_b], 2)
         is_in_boxes = bbox_deltas.min(axis=-1) > 0.0
-        is_in_boxes[true_lables:, ...] = False
+        is_in_boxes[true_labels:, ...] = False
 
         center_radius = 2.5
         gt_bboxes_per_image_l = np.repeat(np.expand_dims((gt_bboxes_per_image[:, 0]), 1), num_total_anchor, 1) - \
@@ -322,7 +319,7 @@ class TrainTransform:
 
         center_deltas = np.stack([c_l, c_r, c_t, c_b], 2)
         is_in_centers = center_deltas.min(axis=-1) > 0.0
-        is_in_centers[true_lables:, ...] = False  # padding gts are set False
+        is_in_centers[true_labels:, ...] = False  # padding gts are set False
 
         is_in_boxes_all = is_in_boxes | is_in_centers
         is_in_boxes_and_center = is_in_boxes & is_in_centers

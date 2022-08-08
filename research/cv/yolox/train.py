@@ -37,14 +37,14 @@ from src.util import get_param_groups, YOLOXCB, get_lr, load_backbone, EvalCallB
 from src.yolox import YOLOLossCell, TrainOneStepWithEMA, DetectionBlock
 from src.yolox_dataset import create_yolox_dataset
 
-set_seed(42)
+set_seed(888)
 
 
 def set_default():
     """ set default """
     if config.enable_modelarts:
-        config.data_root = os.path.join(config.data_dir, 'train2017')
-        config.annFile = os.path.join(config.data_dir, 'annotations')
+        config.data_root = os.path.join(config.data_dir, 'coco2017/train2017')
+        config.annFile = os.path.join(config.data_dir, 'coco2017/annotations')
         outputs_dir = os.path.join(config.outputs_dir, config.ckpt_path)
     else:
         config.data_root = os.path.join(config.data_dir, 'train2017')
@@ -251,7 +251,7 @@ def run_train():
         local_data_url = os.path.join(config.data_path, str(config.rank))
         local_annFile = os.path.join(config.data_path, str(config.rank))
         mox.file.copy_parallel(config.data_root, local_data_url)
-        config.data_root = local_data_url
+        config.data_dir = os.path.join(config.data_path, 'coco2017')
         mox.file.copy_parallel(config.annFile, local_annFile)
         config.annFile = os.path.join(local_data_url, 'instances_train2017.json')
     profiler = network_init(config)
@@ -273,12 +273,8 @@ def run_train():
     config.logger.info('Finish getting network...')
     config.data_root = os.path.join(config.data_dir, 'train2017')
     config.annFile = os.path.join(config.data_dir, 'annotations/instances_train2017.json')
-    ds = create_yolox_dataset(image_dir=config.data_root,
-                              anno_path=config.annFile,
-                              batch_size=config.per_batch_size,
-                              device_num=config.group_size,
-                              rank=config.rank,
-                              data_aug=config.data_aug)
+    ds = create_yolox_dataset(image_dir=config.data_root, anno_path=config.annFile, batch_size=config.per_batch_size,
+                              device_num=config.group_size, rank=config.rank, data_aug=config.data_aug)
     ds_test = get_val_dataset()
     config.logger.info('Finish loading training dataset! batch size:%s' % config.per_batch_size)
     config.steps_per_epoch = ds.get_dataset_size()
@@ -301,14 +297,12 @@ def run_train():
         network_ema = TrainOneStepWithEMA(network, opt, update_cell,
                                           ema=True, decay=0.9998, updates=resume_steps).set_train()
         load_resume_checkpoint(config, network_ema, config.resume_yolox)
-
     if not config.data_aug:
         if os.path.isfile(config.yolox_no_aug_ckpt):  # Loading the resume checkpoint for the last no data aug epochs
             load_resume_checkpoint(config, network_ema, config.yolox_no_aug_ckpt)
             config.logger.info("Finish load the resume checkpoint, begin to train the last...")
         else:
             raise FileNotFoundError('{} not exist or not a pre-trained file'.format(config.yolox_no_aug_ckpt))
-
     config.logger.info("Add ema model")
     model = Model(network_ema, amp_level="O0")
     cb = []
@@ -318,15 +312,15 @@ def run_train():
         ckpt_config = CheckpointConfig(save_checkpoint_steps=config.steps_per_epoch * config.ckpt_interval,
                                        keep_checkpoint_max=config.ckpt_max_num)
         save_ckpt_path = os.path.join(config.outputs_dir, 'ckpt_' + str(config.rank) + '/')
-        cb.append(ModelCheckpoint(config=ckpt_config,
-                                  directory=save_ckpt_path,
-                                  prefix='{}'.format(config.backbone)))
+        cb.append(ModelCheckpoint(config=ckpt_config, directory=save_ckpt_path, prefix='{}'.format(config.backbone)))
     cb.append(YOLOXCB(config.logger, config.steps_per_epoch, lr=lr, save_ckpt_path=save_ckpt_path,
                       is_modelart=config.enable_modelarts,
                       per_print_times=config.log_interval, train_url=args_opt.train_url))
-    cb.append(
-        EvalCallBack(ds_test, DetectionBlock(config, backbone=backbone), network_ema, DetectionEngine(config), config,
-                     interval=config.eval_interval))
+    if config.run_eval:
+        test_block = DetectionBlock(config, backbone=backbone)
+        cb.append(
+            EvalCallBack(ds_test, test_block, network_ema, DetectionEngine(config), config,
+                         interval=config.eval_interval))
     if config.need_profiler:
         model.train(3, ds, callbacks=cb, dataset_sink_mode=True, sink_size=config.log_interval)
         profiler.analyse()
@@ -334,8 +328,7 @@ def run_train():
         config.logger.info("Epoch number:%s" % config.max_epoch)
         config.logger.info("All steps number:%s" % (config.max_epoch * config.steps_per_epoch))
         config.logger.info("==================Start Training=========================")
-        model.train(config.max_epoch, ds, callbacks=cb,
-                    dataset_sink_mode=False, sink_size=-1)
+        model.train(config.max_epoch, ds, callbacks=cb, dataset_sink_mode=False, sink_size=-1)
     config.logger.info("==================Training END======================")
 
 

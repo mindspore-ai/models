@@ -32,7 +32,12 @@ DATA_DIR=$(get_real_path $1)
 VAL_CKPT=$(get_real_path $2)
 BACKBONE=$3
 PER_BATCH_SIZE=$4
-
+if [ "$BACKBONE" = 'yolox_darknet53' ]
+then
+  CONFIG_PATH='yolox_darknet53.yaml'
+else
+  CONFIG_PATH='yolox_x.yaml'
+fi
 echo $DATA_DIR
 echo $VAL_CKPT
 echo $PER_BATCH_SIZE
@@ -66,6 +71,7 @@ cd ./eval || exit
 env > env.log
 echo "start inferring for device $DEVICE_ID"
 python eval.py \
+    --config_path=$CONFIG_PATH \
     --data_dir=$DATA_DIR \
     --val_ckpt=$VAL_CKPT \
     --backbone=$BACKBONE \

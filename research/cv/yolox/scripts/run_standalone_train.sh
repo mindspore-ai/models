@@ -16,7 +16,7 @@
 
 if [[ $# -lt 2 || $# -gt 3 ]];then
     echo "Usage1: bash run_standalone_train.sh  [DATASET_PATH] [BACKBONE]  for first data aug epochs"
-    echo "Usage2: bash run_standalone_train.sh  [DATASET_PATH] [BACKBONE] [RESUME_CKPT] for last no data aug epochs"
+    echo "Usage2: bash run_standalone_train.sh  [DATASET_PATH] [BACKBONE] [LATEST_CKPT] for last no data aug epochs"
 exit 1
 fi
 
@@ -30,6 +30,12 @@ get_real_path(){
 
 DATASET_PATH=$(get_real_path $1)
 BACKBONE=$2
+if [ "$BACKBONE" = 'yolox_darknet53' ]
+then
+  CONFIG_PATH='yolox_darknet53.yaml'
+else
+  CONFIG_PATH='yolox_x.yaml'
+fi
 echo $DATASET_PATH
 echo $BACKBONE
 
@@ -62,6 +68,7 @@ if [ $# == 2 ]
 then
   echo "Start to launch first data augment epochs..."
   python train.py \
+        --config_path=$CONFIG_PATH \
         --data_dir=$DATASET_PATH \
         --data_aug=True \
         --is_distributed=0 \
