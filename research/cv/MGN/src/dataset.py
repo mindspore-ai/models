@@ -58,11 +58,11 @@ class Market1501:
 
         data_path = datadir
         if data_part == 'train':
-            data_path += '/bounding_box_train'
+            data_path = os.path.join(data_path, 'bounding_box_train')
         elif data_part == 'test':
-            data_path += '/bounding_box_test'
+            data_path = os.path.join(data_path, 'bounding_box_test')
         else:
-            data_path += '/query'
+            data_path = os.path.join(data_path, 'query')
 
         self.imgs = [path for path in list_pictures(data_path) if self.id(path) != -1]
 
@@ -252,7 +252,7 @@ def create_dataset(
             num_parallel_workers=num_parallel_workers,
         )
 
-    dataset = dataset.batch(batch_size, drop_remainder=False)
+    dataset = dataset.batch(batch_size, drop_remainder=(data_part == 'train'))
 
     if data_part == 'train':
         return dataset

@@ -14,11 +14,11 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 1 ] ; then
+if [ $# != 3 ] ; then
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash scripts/run_eval_gpu.sh CKPT_PATH"
-echo "for example: bash scripts/run_eval_gpu.sh /your/path/checkpoint_file"
+echo "bash scripts/run_eval.sh DATA_DIR CKPT_PATH DEVICE_TARGET"
+echo "for example: bash scripts/run_eval.sh /your/path/dataset /your/path/checkpoint_file Ascend"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 exit 1;
@@ -31,12 +31,16 @@ get_real_path(){
         echo "$(realpath -m $PWD/$1)"
     fi
 }
+
 config_path=$(get_real_path "./configs/market1501_config.yml")
 
-PATH1=$(get_real_path $1)
+DATA_DIR=$(get_real_path $1)
+PATH1=$(get_real_path $2)
+DEVICE_TARGET=$3
 echo "$PATH1"
 
 python eval.py  \
     --config_path="$config_path" \
-    --device_target="GPU" \
+    --data_dir="$DATA_DIR" \
+    --device_target=$DEVICE_TARGET \
     --eval_model="$PATH1" > output.eval.log 2>&1 &

@@ -8,7 +8,7 @@ checkpoint_url: ""
 data_path: "/cache/data"
 output_path: "/cache/train"
 load_path: "/cache/checkpoint_path"
-device_target: "GPU"
+device_target: "Ascend"
 need_modelarts_dataset_unzip: False
 modelarts_dataset_unzip_name: "market1501"
 
@@ -16,6 +16,9 @@ modelarts_dataset_unzip_name: "market1501"
 # options
 lr_init: 0.00015 # 2e-4
 decay_epochs: '320,380'
+optimizer: "adam"
+use_map: False
+run_eval: False
 ims_per_id: 4
 ids_per_batch: 12
 max_epoch: 400

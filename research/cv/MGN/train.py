@@ -16,7 +16,6 @@
 
 import os
 import time
-
 import mindspore.nn as nn
 from mindspore import Tensor
 from mindspore import context
@@ -26,10 +25,11 @@ from mindspore.context import ParallelMode
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_param_into_net, load_checkpoint
-
+from mindspore.train.loss_scale_manager import DynamicLossScaleManager
 from model_utils.config import get_config
 from model_utils.device_adapter import get_device_id, get_device_num
 from model_utils.moxing_adapter import moxing_wrapper
+from src.MGN_Callback import mgn_callback
 from src.callbacks import SavingLossMonitor, SavingTimeMonitor
 from src.dataset import create_dataset
 from src.loss import MGNLoss
@@ -110,23 +110,15 @@ def _prepare_configuration():
     config.image_mean = list(map(float, config.image_mean.split(',')))
     config.image_std = list(map(float, config.image_std.split(',')))
 
-    _enable_graph_kernel = False
     context.set_context(
         mode=context.GRAPH_MODE,
-        enable_graph_kernel=_enable_graph_kernel,
         device_target=config.device_target,
     )
 
     config.device_id = get_device_id()
 
     if config.is_distributed:
-        if config.device_target == "GPU":
-            if not config.enable_modelarts:
-                init()
-            else:
-                if not config.need_modelarts_dataset_unzip:
-                    init()
-
+        init()
         config.group_size = get_group_size()
         config.rank = get_rank()
 
@@ -158,7 +150,7 @@ def _prepare_configuration():
         config.rank_print_ckpt_flag = 1
 
 
-@moxing_wrapper(pre_process=modelarts_pre_process)
+@moxing_wrapper()
 def run_train():
     """ Run train """
     _prepare_configuration()
@@ -198,7 +190,13 @@ def run_train():
         decay_epochs=config.decay_epochs,
     )
     lr = Tensor(lr)
-    opt = nn.Adam(network.trainable_params(), learning_rate=lr, weight_decay=config.weight_decay)
+    if config.optimizer == "adamw":
+        opt = nn.AdamWeightDecay(network.trainable_params(), learning_rate=lr,
+                                 weight_decay=config.weight_decay)
+    elif config.optimizer == "adam":
+        opt = nn.Adam(network.trainable_params(), learning_rate=lr, weight_decay=config.weight_decay)
+    else:
+        raise ValueError(f'Unsupport optimizer {config.optimizer}')
 
     timestamp = time.strftime("%Y%m%d_%H%M%S") + '_' + str(config.rank)
 
@@ -234,15 +232,18 @@ def run_train():
             prefix='{}'.format(config.rank),
         )
         callbacks.append(ckpt_cb)
+    if config.use_map:
+        loss_scale = DynamicLossScaleManager(2**20)
+        model = Model(network, loss_fn=reid_loss, optimizer=opt,
+                      amp_level="O3", loss_scale_manager=loss_scale)
+    else:
+        model = Model(network, loss_fn=reid_loss, optimizer=opt)
 
-    model = Model(
-        network,
-        loss_fn=reid_loss,
-        optimizer=opt,
-    )
+    if config.run_eval:
+        eval_callback = mgn_callback(network)
+        callbacks.append(eval_callback)
 
-    model.train(config.max_epoch, dataset, callbacks=callbacks, dataset_sink_mode=False)
-
+    model.train(config.max_epoch, dataset, callbacks=callbacks, dataset_sink_mode=True)
 
 if __name__ == '__main__':
     run_train()

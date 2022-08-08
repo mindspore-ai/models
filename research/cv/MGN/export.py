@@ -16,7 +16,6 @@
 
 import numpy as np
 from mindspore import Tensor
-from mindspore import context
 from mindspore.train.serialization import load_param_into_net, load_checkpoint, export
 
 from model_utils.config import get_config
@@ -26,18 +25,9 @@ from src.mgn import MGN
 config = get_config()
 
 
-def modelarts_pre_process():
-    """model arts pre process"""
-
-
-@moxing_wrapper(pre_process=modelarts_pre_process)
+@moxing_wrapper()
 def export_network():
     """ Export network """
-    context.set_context(
-        mode=context.GRAPH_MODE,
-        device_target=config.device_target,
-    )
-
     network = MGN(num_classes=config.n_classes)
     config.image_size = list(map(int, config.image_size.split(',')))
 

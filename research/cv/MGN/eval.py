@@ -14,93 +14,24 @@
 # ============================================================================
 """ Evaluation script """
 
-import os
-import time
-
 import numpy as np
 from mindspore import Tensor
 from mindspore import context
 from mindspore import numpy as mnp
 from mindspore.common import set_seed
-from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.serialization import load_param_into_net, load_checkpoint
 from scipy.spatial.distance import cdist
 
 from metric_utils.functions import cmc, mean_ap
 from metric_utils.re_ranking import re_ranking
 from model_utils.config import get_config
-from model_utils.device_adapter import get_device_id, get_device_num
+from model_utils.device_adapter import get_device_id
 from model_utils.moxing_adapter import moxing_wrapper
 from src.dataset import create_dataset
 from src.mgn import MGN
 
 set_seed(1)
 config = get_config()
-
-
-def modelarts_pre_process():
-    """ Modelarts pre process function """
-    def unzip(zip_file, save_dir):
-        import zipfile
-        s_time = time.time()
-        if not os.path.exists(os.path.join(save_dir, config.modelarts_dataset_unzip_name)):
-            zip_isexist = zipfile.is_zipfile(zip_file)
-            if zip_isexist:
-                fz = zipfile.ZipFile(zip_file, 'r')
-                data_num = len(fz.namelist())
-                print("Extract Start...")
-                print("unzip file num: {}".format(data_num))
-                data_print = int(data_num / 100) if data_num > 100 else 1
-                i = 0
-                for file in fz.namelist():
-                    if i % data_print == 0:
-                        print("unzip percent: {}%".format(int(i * 100 / data_num)), flush=True)
-                    i += 1
-                    fz.extract(file, save_dir)
-                print("cost time: {}min:{}s.".format(int((time.time() - s_time) / 60),
-                                                     int(int(time.time() - s_time) % 60)))
-                print("Extract Done.")
-            else:
-                print("This is not zip.")
-        else:
-            print("Zip has been extracted.")
-
-    if config.need_modelarts_dataset_unzip:
-        zip_file_1 = os.path.join(config.data_path, config.modelarts_dataset_unzip_name + ".zip")
-        save_dir_1 = os.path.join(config.data_path)
-
-        sync_lock = "/tmp/unzip_sync.lock"
-
-        # Each server contains 8 devices as most.
-        if config.device_target == "GPU":
-            init()
-            device_id = get_rank()
-            device_num = get_group_size()
-        elif config.device_target == "Ascend":
-            device_id = get_device_id()
-            device_num = get_device_num()
-        else:
-            raise ValueError("Not support device_target.")
-
-        # Each server contains 8 devices as most.
-        if device_id % min(device_num, 8) == 0 and not os.path.exists(sync_lock):
-            print("Zip file path: ", zip_file_1)
-            print("Unzip file save dir: ", save_dir_1)
-            unzip(zip_file_1, save_dir_1)
-            print("===Finish extract data synchronization===")
-            try:
-                os.mknod(sync_lock)
-            except IOError:
-                pass
-
-        while True:
-            if os.path.exists(sync_lock):
-                break
-            time.sleep(1)
-
-        print("Device: {}, Finish sync unzip data from {} to {}.".format(device_id, zip_file_1, save_dir_1))
-
-    config.log_path = os.path.join(config.output_path, config.log_path)
 
 
 def extract_feature(model, dataset):
@@ -133,7 +64,7 @@ def extract_feature(model, dataset):
     return np.concatenate(features, axis=0)
 
 
-@moxing_wrapper(pre_process=modelarts_pre_process)
+@moxing_wrapper()
 def run_eval():
     """ Run evaluation """
     re_rank = True
@@ -142,10 +73,8 @@ def run_eval():
     config.image_mean = list(map(float, config.image_mean.split(',')))
     config.image_std = list(map(float, config.image_std.split(',')))
 
-    _enable_graph_kernel = False
     context.set_context(
         mode=context.GRAPH_MODE,
-        enable_graph_kernel=_enable_graph_kernel,
         device_target=config.device_target,
     )
 
