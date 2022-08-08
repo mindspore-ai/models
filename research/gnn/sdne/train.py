@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,32 +21,35 @@ import random
 import numpy as np
 
 import mindspore
-from mindspore import nn
 from mindspore import context
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor, Callback
 
 from src import GraphDataset
-from src import SDNE, SDNEWithLossCell, SDNELoss
+from src import SDNE, SDNEWithLossCell, SDNELoss1, SDNELoss2
+from src import initializer, optimizer
+from src import read_node_label, check_reconstruction, check_multi_label_classification
 from src import reconstruction_precision_k
 from src import cfg
 
 if cfg.is_modelarts:
     import moxing as mox
 
-DATA_PATH = "/cache/data/"
-CKPT_PATH = "/cache/ckpt/"
-TMP_PATH = "/cache/tmp/"
+DATA_URL = "/cache/data/"
+CKPT_URL = "/cache/ckpt/"
+TMP_URL = "/cache/tmp/"
 
 parser = argparse.ArgumentParser(description='Mindspore SDNE Training')
 
 # Datasets
 parser.add_argument('--train_url', type=str, default='./train', help="train path")
 parser.add_argument('--ckpt_url', type=str, default='./ckpt', help="ckpt path")
-parser.add_argument('--data_url', type=str, default='', help='data path')
+parser.add_argument('--data_url', type=str, default='', help='dataset path')
+parser.add_argument('--data_path', type=str, default='', help='data path')
+parser.add_argument('--label_path', type=str, default='', help='label path')
 parser.add_argument('--dataset', type=str, default='WIKI',
-                    choices=['WIKI', 'BLOGCATALOG', 'FLICKR', 'YOUTUBE', 'GRQC', 'NEWSGROUP'])
+                    choices=['WIKI', 'GRQC'])
 
 # Optimization options
 parser.add_argument('--epochs', type=int, default=40)
@@ -66,38 +69,55 @@ class EvalCallBack(Callback):
     Precision verification using callback function.
     """
     # define the operator required and config
-    def __init__(self, ds, eval_cfg, gemb=False, grec=False, tmp_dir='./tmp/'):
+    def __init__(self, ds, c, lp='', tmp_dir='./tmp/'):
         super(EvalCallBack, self).__init__()
         self.ds = ds
-        self.frac = eval_cfg['frac']
-        self.use_rand = eval_cfg['use_rand']
-        self.k_query = eval_cfg['k_query']
-        self.gemb = gemb
-        self.grec = grec
+        self.gemb = c['generate_emb']
+        self.rec = c['reconstruction']
+        self.clf = c['classify']
+        self.batch = c['batch']
+        self.label_path = lp
         self.tmp_dir = tmp_dir
 
-    # define operator function after network training
+    # define operator function after finishing train
     def end(self, run_context):
         """
         eval function
         """
         cb_param = run_context.original_args()
-        backbone = cb_param.train_network.network.network
+        backbone = cb_param.train_network.network
         graph = self.ds.get_graph()
-        index, data = self.ds.get_data(self.frac, self.use_rand)
-        idx2node_y = self.ds.get_idx2node()
-        idx2node_x = idx2node_y[index]
-        reconstructions, vertices = backbone.get_reconstructions(data, idx2node_y, idx2node_x)
-        reconstruction_precision_k(reconstructions, vertices, graph, self.k_query)
-        if self.grec:
-            print('Storing reconstruction data')
-            np.save(self.tmp_dir + "reconstruction.npy", reconstructions)
-            np.save(self.tmp_dir + "reconstruction_idx.npy", vertices)
+        _, data = self.ds.get_data()
+        idx2node = self.ds.get_idx2node()
+        node2idx = self.ds.get_node2idx()
+        embeddings = None
+        if self.rec['check']:
+            if args.dataset == 'WIKI':
+                reconstructions, vertices = backbone.get_reconstructions(data, idx2node)
+                reconstruction_precision_k(reconstructions, vertices, graph, self.rec['k_query'])
+            else:
+                embeddings = backbone.get_embeddings(data, self.batch)
+                check_reconstruction(embeddings, graph, idx2node, self.rec['k_query'])
+        if self.clf['check']:
+            if embeddings is None:
+                embeddings = backbone.get_embeddings(data, self.batch)
+            labels = read_node_label(self.label_path, node2idx)
+            check_multi_label_classification(embeddings, labels, self.clf['tr_frac'])
         if self.gemb:
-            print('Storing embeddings data')
-            embeddings = backbone.get_embeddings(data)
+            print('Storing embeddings data...')
+            if embeddings is None:
+                embeddings = backbone.get_embeddings(data, self.batch)
             np.save(self.tmp_dir + "embeddings.npy", embeddings)
-            np.save(self.tmp_dir + "embeddings_idx.npy", idx2node_x)
+            np.save(self.tmp_dir + "embeddings_idx.npy", idx2node)
+
+def count_params(n):
+    """
+    count param
+    """
+    total_param = 0
+    for param in n.trainable_params():
+        total_param += np.prod(param.shape)
+    return total_param
 
 if __name__ == "__main__":
     context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=args.device_id)
@@ -109,45 +129,61 @@ if __name__ == "__main__":
     np.random.seed(1)
     random.seed(1)
 
-    data_url = args.data_url
-    ckpt_url = args.ckpt_url
-    tmp_url = "./"
+    # set all paths
+    ckpt_url = ''
+    tmp_url = ''
+    data_path = ''
+    label_path = ''
     if cfg.is_modelarts:
-        if not os.path.exists(DATA_PATH):
-            os.makedirs(DATA_PATH, 0o755)
-        mox.file.copy_parallel(args.data_url, DATA_PATH)
-        print("data finish copy to %s." % DATA_PATH)
-        data_url = DATA_PATH + config['dataset_path']
-        if not os.path.exists(CKPT_PATH):
-            os.makedirs(CKPT_PATH, 0o755)
-        ckpt_url = CKPT_PATH
-        if not os.path.exists(TMP_PATH):
-            os.makedirs(TMP_PATH, 0o755)
-        tmp_url = TMP_PATH
+        if not os.path.exists(DATA_URL):
+            os.makedirs(DATA_URL, 0o755)
+        mox.file.copy_parallel(args.data_url, DATA_URL)
+        print("data finish copy to %s." % DATA_URL)
+        data_path = DATA_URL + (config['data_path'] if args.data_path == '' else args.data_path)
+        label_path = DATA_URL + (config['label_path'] if args.label_path == '' else args.label_path)
+        if not os.path.exists(CKPT_URL):
+            os.makedirs(CKPT_URL, 0o755)
+        ckpt_url = CKPT_URL
+        if not os.path.exists(TMP_URL):
+            os.makedirs(TMP_URL, 0o755)
+        tmp_url = TMP_URL
+    else:
+        if args.data_url == '':
+            data_path = args.data_path
+            label_path = args.label_path
+        else:
+            data_path = args.data_url + (config['data_path'] if args.data_path == '' else args.data_path)
+            label_path = args.data_url + (config['label_path'] if args.label_path == '' else args.label_path)
+        tmp_url = args.train_url
+        ckpt_url = args.ckpt_url
 
-    if data_url == '':
-        data_url = config['dataset_path']
-    dataset = GraphDataset(data_url, batch=config['batch'],
-                           delimiter=config['delimiter'], linkpred=config['linkpred'])
-    net = SDNEWithLossCell(SDNE(dataset.get_node_size(), hidden_size=config['hidden_size'],
-                                weight_init=config['weight_init']),
-                           SDNELoss(alpha=config['alpha'], beta=config['beta']))
+    # read dataset
+    dataset = GraphDataset(args.dataset, data_path, batch=config['batch'], delimiter=config['delimiter'])
+
+    # initialize the SDNE model
+    loss = None
+    if args.dataset == 'WIKI':
+        loss = SDNELoss1(alpha=config['alpha'], beta=config['beta'], gamma=config['gamma'])
+    else:
+        loss = SDNELoss2(alpha=config['alpha'], beta=config['beta'], gamma=config['gamma'])
+    net = SDNEWithLossCell(SDNE(dataset.get_node_size(), hidden_size=config['hidden_size'], act=config['act'],
+                                weight_init=initializer(config['weight_init'])), loss)
     if args.pretrained:
         param_dict = load_checkpoint(args.checkpoint)
         load_param_into_net(net, param_dict)
-    optim = nn.Adam(params=net.trainable_params(), learning_rate=config['learning_rate'],
-                    weight_decay=config['weight_decay'])
+    optim = optimizer(net, config['optim'], args.epochs, dataset.get_data_size())
     model = Model(net, optimizer=optim)
+    print('param num: ', count_params(net))
 
     config_ck = CheckpointConfig(save_checkpoint_steps=config['ckpt_step'], keep_checkpoint_max=config['ckpt_max'])
-    ckpoint_cb = ModelCheckpoint(prefix="SDNE", config=config_ck, directory=ckpt_url)
+    ckpoint_cb = ModelCheckpoint(prefix="SDNE_" + args.dataset, config=config_ck, directory=ckpt_url)
     time_cb = TimeMonitor(data_size=dataset.get_node_size())
     loss_cb = LossMonitor()
-    eval_cb = EvalCallBack(dataset, config['eval'], config['generate_emb'], config['generate_rec'], tmp_dir=tmp_url)
+    eval_cb = EvalCallBack(dataset, config, label_path, tmp_url)
     cb = [ckpoint_cb, time_cb, loss_cb, eval_cb]
 
-    model.train(args.epochs, dataset.get_dataset(), callbacks=cb)
+    model.train(args.epochs, dataset.get_dataset(), callbacks=cb, dataset_sink_mode=False)
 
     if cfg.is_modelarts:
-        mox.file.copy_parallel(CKPT_PATH, args.train_url)
-        mox.file.copy_parallel(TMP_PATH, args.train_url)
+        mox.file.copy_parallel(CKPT_URL, args.train_url)
+        mox.file.copy_parallel(TMP_URL, args.train_url)

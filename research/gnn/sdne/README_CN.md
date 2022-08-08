@@ -14,6 +14,9 @@
         - [评估过程](#评估过程)
             - [评估](#评估)
         - [导出mindir模型](#导出mindir模型)
+        - [推理过程](#推理过程)
+            - [用法](#用法)
+            - [结果](#结果)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [训练性能](#训练性能)
@@ -33,9 +36,11 @@
 
 # 数据集
 
-使用的数据集：[Wiki](https://github.com/shenweichen/GraphEmbedding/tree/master/data/wiki)
-节点数: 2405个
-边数: 17981条
+使用的数据集：
+
+- [WIKI](https://github.com/shenweichen/GraphEmbedding/tree/master/data/wiki/) 节点数: 2405个 边数: 17981条
+
+- [CA-GRQC](https://github.com/suanrong/SDNE/tree/master/GraphData/) 节点数: 5242个 边数: 11496条
 
 # 环境要求
 
@@ -54,10 +59,10 @@
 
 ```python
 # 单机训练运行示例
-bash scripts/run_standalone_train.sh /path/Wiki_edgelist.txt /path/ckpt
+bash scripts/run_standalone_train.sh dataset_name /path/data /path/ckpt epoch_num 0
 
 # 运行评估示例
-bash scripts/run_eval.sh  /path/Wiki_edgelist.txt /path/checkpoint
+bash scripts/run_eval.sh dataset_name /path/data /path/ckpt 0
 ```
 
 ## 脚本说明
@@ -68,16 +73,27 @@ bash scripts/run_eval.sh  /path/Wiki_edgelist.txt /path/checkpoint
 └── SDNE  
  ├── README_CN.md                    // SDNE相关描述
  ├── scripts
+  ├── run_310_infer.sh               // 310推理脚本
   ├── run_standalone_train.sh        // 用于单机训练的shell脚本
   └── run_eval.sh                    // 用于评估的shell脚本
+ ├── ascend310_infer                 // 310推理相关代码
+  ├── inc
+   └── utils.h
+  ├── src
+   ├── main.cc
+   └── utils.cc
+  ├── build.sh
+  ├── convert_data.py                // 转换数据脚本
+  └── CMakeLists.txt
  ├── src
   ├── __init__.py
   ├── loss.py                        // 损失函数
-  ├── config.yaml                    // 参数配置
+  ├── config.py                      // 参数配置
   ├── dataset.py                     // 创建数据集
   ├── sdne.py                        // SDNE架构
+  ├── initializer.py                 // 初始化脚本
+  ├── optimizer.py                   // 优化器脚本
   └── utils.py                       // 功能性函数
- ├── classify.py                     // 分类任务脚本
  ├── export.py
  ├── eval.py                         // 测试脚本
  └── train.py                        // 训练脚本
@@ -102,10 +118,10 @@ train.py中主要参数如下：
 
 ### 训练
 
-- 在Ascend环境训练
+- 在Ascend环境训练WIKI数据集
 
 ```shell
-bash scripts/run_standalone_train.sh /path/Wiki_edgelist.txt /path/ckpt
+bash scripts/run_standalone_train.sh WIKI /path/wiki /path/ckpt 40 0
 ```
 
 上述shell脚本将运行训练。可以通过`train.log`文件查看结果。
@@ -113,49 +129,106 @@ bash scripts/run_standalone_train.sh /path/Wiki_edgelist.txt /path/ckpt
 
 ```log
 ...
-epoch: 38 step: 1, loss is 27.804518
-epoch time: 1104.996 ms, per step time: 1104.996 ms
-epoch: 39 step: 1, loss is 26.283232
-epoch time: 1105.147 ms, per step time: 1105.147 ms
-epoch: 40 step: 1, loss is 24.820133
-epoch time: 1105.217 ms, per step time: 1105.217 ms
+epoch: 36 step: 1, loss is 31.026050567626953
+epoch time: 1121.593 ms, per step time: 1121.593 ms
+epoch: 37 step: 1, loss is 29.539968490600586
+epoch time: 1121.818 ms, per step time: 1121.818 ms
+epoch: 38 step: 1, loss is 27.804513931274414
+epoch time: 1120.751 ms, per step time: 1120.751 ms
+epoch: 39 step: 1, loss is 26.283227920532227
+epoch time: 1121.551 ms, per step time: 1121.551 ms
+epoch: 40 step: 1, loss is 24.820133209228516
+epoch time: 1123.054 ms, per step time: 1123.054 ms
+```
 
+- 在Ascend环境训练GRQC数据集
+
+```shell
+bash scripts/run_standalone_train.sh GRQC /path/grqc /path/ckpt 2 0
+```
+
+上述shell脚本将运行训练。可以通过`train.log`文件查看结果。
+采用以下方式达到损失值：
+
+```log
+...
+epoch: 2 step: 157, loss is 607002.3125
+epoch: 2 step: 158, loss is 638598.0625
+epoch: 2 step: 159, loss is 485911.40625
+epoch: 2 step: 160, loss is 774514.1875
+epoch: 2 step: 161, loss is 733589.0625
+epoch: 2 step: 162, loss is 504986.1875
+epoch: 2 step: 163, loss is 416679.625
+epoch: 2 step: 164, loss is 524830.75
+epoch time: 14036.608 ms, per step time: 85.589 ms
 ```
 
 ## 评估过程
 
 ### 评估
 
-- 在Ascend环境运行时评估ImageNet数据集
+- 在Ascend环境运行时评估WIKI数据集
 
 ```bash
-bash scripts/run_eval.sh  /path/Wiki_edgelist.txt /path/checkpoint
+bash scripts/run_eval.sh WIKI /path/wiki /path/ckpt 0
 ```
 
 上述命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
 
 ```bash
 Reconstruction Precision K  [1, 10, 20, 100, 200, 1000, 2000, 6000, 8000, 10000]
-Precision@K(1)=  1.0
-Precision@K(10)= 1.0
-Precision@K(20)= 1.0
-Precision@K(100)=        1.0
-Precision@K(200)=        1.0
-Precision@K(1000)=       1.0
-Precision@K(2000)=       1.0
-Precision@K(6000)=       0.9986666666666667
-Precision@K(8000)=       0.991375
-Precision@K(10000)=      0.966
-MAP :  0.6673926527718224
+Precision@K(1)= 1.0
+Precision@K(10)=        1.0
+Precision@K(20)=        1.0
+Precision@K(100)=       1.0
+Precision@K(200)=       1.0
+Precision@K(1000)=      1.0
+Precision@K(2000)=      1.0
+Precision@K(6000)=      0.9986666666666667
+Precision@K(8000)=      0.991375
+Precision@K(10000)=     0.966
+MAP :  0.6673926856547066
+```
+
+- 在Ascend环境运行时评估GRQC数据集
+
+```bash
+bash scripts/run_eval.sh GRQC /path/grqc /path/ckpt 0
+```
+
+上述命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
+
+```bash
+Reconstruction Precision K  [10, 100]
+getting similarity...
+Precision@K(10)=        1.0
+Precision@K(100)=       1.0
 ```
 
 ## 导出mindir模型
 
 ```python
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --dataset [NAME] --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
 ```
 
-参数`ckpt_file` 是必需的，`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中进行选择。
+参数`ckpt_file` 是必需的，`dataset`是数据集名称，例如`GRQC`，FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中进行选择。
+
+## 推理过程
+
+### 用法
+
+在执行推理之前，需要通过`export.py`导出`mindir`文件。
+
+```bash
+# Ascend310 推理
+bash run_310_infer.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [DEVICE_ID]
+```
+
+`MINDIR_PATH`为`mindir`文件路径，`DATASET_NAME`为数据集名称，`DATASET_PATH`表示数据集文件的路径（例如`/datapath/sdne_wiki_dataset/WIKI/Wiki_edgelist.txt`）。
+
+### 结果
+
+推理结果保存在当前路径，可在`acc.log`中看到最终精度结果。
 
 # 模型描述
 
@@ -169,16 +242,34 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 | 资源          | Ascend 910； CPU： 2.60GHz，192内核；内存，755G |
 | 上传日期      | 2021-12-31                                     |
 | MindSpore版本 | 1.5.0                          |
-| 数据集        | wiki                                       |
+| 数据集        | WIKI                                       |
 | 训练参数      | lr=0.002                     |
 | 优化器        | Adam                                             |
 | 损失函数      | SDNE Loss Function                       |
 | 输出          | 概率                                            |
-| 损失          | 24.8                                            |
+| 损失          | 24.8                                          |
 | 速度 | 1卡：1105毫秒/步 |
 | 总时间 | 1卡：44秒 |
 | 参数(M) | 1.30 |
 | 微调检查点 | 15M （.ckpt file） |
+| 脚本 | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/gnn/sdne) |
+
+| 参数          | SDNE                                         |
+| ------------- | ----------------------------------------------- |
+| 模型版本      | SDNE                                  |
+| 资源          | Ascend 910； CPU： 2.60GHz，192内核；内存，755G |
+| 上传日期      | 2022-4-7                                     |
+| MindSpore版本 | 1.5.0                          |
+| 数据集        | CA-GRQC                                       |
+| 训练参数      | lr=0.01                     |
+| 优化器        | RMSProp                                             |
+| 损失函数      | SDNE Loss Function                       |
+| 输出          | 概率                                            |
+| 损失          | 736119.18                                            |
+| 速度 | 1卡：86毫秒/步 |
+| 总时间 | 1卡：28秒 |
+| 参数(M) | 1.05 |
+| 微调检查点 | 13M （.ckpt file） |
 | 脚本 | [脚本路径](https://gitee.com/mindspore/models/tree/master/research/gnn/sdne) |
 
 ### 评估性能
@@ -189,9 +280,19 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 | 资源          | Ascend 910         |
 | 上传日期      | 2021/12/31        |
 | MindSpore版本 | MindSpore-1.3.0-c78      |
-| 数据集        | wiki          |
+| 数据集        | WIKI          |
 | 输出          | 概率               |
 | 准确性        | 1卡：66.74% |
+
+| 参数          | SDNE            |
+| ------------- | ------------------ |
+| 模型版本      | SDNE     |
+| 资源          | Ascend 910         |
+| 上传日期      | 2021/4/7        |
+| MindSpore版本 | MindSpore-1.3.0-c78      |
+| 数据集        | CA-GRQC          |
+| 输出          | 概率               |
+| 准确性        | 1卡：1 |
 
 # 随机情况说明
 

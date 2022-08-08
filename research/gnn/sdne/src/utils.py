@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,6 +16,10 @@
 python utils.py
 """
 import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import f1_score
+from sklearn.multiclass import OneVsRestClassifier
 
 def preprocess_nxgraph(graph):
     """
@@ -34,33 +38,36 @@ def preprocess_nxgraph(graph):
         node2idx[node] = node_size
         idx2node.append(node)
         node_size += 1
+
     return np.array(idx2node, dtype=np.int32), node2idx
 
-def read_node_label(filename, skip_head=False):
+def read_node_label(filename, node2idx):
     """
     create node label
 
     Args:
         filename(str): the label path
-        skip_head(bool): whether skip the first line
+        node2idx(dict): convert table
 
     Returns:
-        node list and the corresponding label list
+        label array
     """
-    fin = open(filename, 'r')
-    X = []
-    Y = []
-    while 1:
-        if skip_head:
-            fin.readline()
-        l = fin.readline()
-        if l == '':
-            break
-        vec = l.strip().split(' ')
-        X.append(vec[0])
-        Y.append(vec[1:])
+    fin = open(filename, "r")
+    firstLine = fin.readline().strip().split()
+    nodenum, groupnum = int(firstLine[0]), int(firstLine[1])
+    labels = np.zeros([nodenum, groupnum], np.bool)
+    lines = fin.readlines()
+    for line in lines:
+        line = line.strip().split(' : ')
+        node_idx = node2idx[int(line[0])]
+        if len(line[1]) > 1:
+            labs = line[1].split()
+            for lab in labs:
+                group_idx = int(lab)
+                labels[node_idx][group_idx] = True
     fin.close()
-    return X, Y
+
+    return labels
 
 def reconstruction_precision_k(reconstructions, vertices, graph, k_query=None):
     """
@@ -105,6 +112,7 @@ def reconstruction_precision_k(reconstructions, vertices, graph, k_query=None):
                 break
 
         AP = np.sum(precision_list) / true_size_edges
+
         return prec_k_list, AP
 
     print('\nReconstruction Precision K ', k_query)
@@ -115,3 +123,99 @@ def reconstruction_precision_k(reconstructions, vertices, graph, k_query=None):
         k_query_res.append(precisionK_list[k - 1])
     print('MAP : ', AP)
     return k_query_res, AP
+
+def get_similarity(result):
+    """
+    calculate similarity array
+
+    Args:
+        result(array): embedding array
+
+    Returns:
+        similarity array
+    """
+    print("getting similarity...")
+
+    return np.dot(result, result.T)
+
+def check_reconstruction(embeddings, graph, idx2node=None, k_query=None):
+    """
+    check reconstruction precision
+
+    Args:
+        embeddings(array): embedding array
+        graph(DiGraph): original graph data
+        idx2node(dict): the table for converting index to node
+        k_query(list): k query set
+
+    Returns:
+        precision@k list
+    """
+    if k_query is None:
+        k_query = [1, 10, 100, 1000, 10000]
+
+    def get_precisionK(embeddings, graph, max_index, idx2node):
+        similarity = get_similarity(embeddings).reshape(-1)
+        sorted_idx = np.argsort(similarity)
+        cur = 0
+        count = 0
+        precisionK = []
+        sorted_idx = sorted_idx[::-1]
+        for idx in sorted_idx:
+            x = idx // graph.number_of_nodes()
+            x = idx2node[x]
+            y = idx % graph.number_of_nodes()
+            y = idx2node[y]
+            count += 1
+            if (graph.has_edge(x, y) or graph.has_edge(y, x) or x == y):
+                cur += 1
+            precisionK.append(1.0 * cur / count)
+            if count > max_index:
+                break
+
+        return precisionK
+
+    print('\nReconstruction Precision K ', k_query)
+    precisionK = get_precisionK(embeddings, graph, np.max(k_query), idx2node)
+    ret = []
+    for index in k_query:
+        print(f"Precision@K({index})=\t{precisionK[index - 1]}")
+        ret.append(precisionK[index - 1])
+
+    return ret
+
+def check_multi_label_classification(embeddings, labels, tr_frac=0.9):
+    """
+    check multi-label classification performance
+
+    Args:
+        embeddings(array): embedding array
+        labels(array): labels corresponding to embedding
+        tr_frac(float): train dataset size in all dataset
+
+    Returns:
+        micro, macro
+    """
+
+    def small_trick(y_test, y_pred):
+        y_pred_new = np.zeros(y_pred.shape, np.bool)
+        sort_index = np.flip(np.argsort(y_pred, axis=1), 1)
+        for i in range(y_test.shape[0]):
+            num = sum(y_test[i])
+            for j in range(num):
+                y_pred_new[i][sort_index[i][j]] = True
+        return y_pred_new
+
+    x_train, x_test, y_train, y_test = train_test_split(embeddings, labels, test_size=(1 - tr_frac))
+    clf = OneVsRestClassifier(LogisticRegression())
+    clf.fit(x_train, y_train)
+    y_pred = clf.predict_proba(x_test)
+
+    # small trick : we assume that we know how many label to predict
+    y_pred = small_trick(y_test, y_pred)
+
+    micro = f1_score(y_test, y_pred, average="micro")
+    macro = f1_score(y_test, y_pred, average="macro")
+    print("micro_f1: %.4f macro_f1 : %.4f" % (micro, macro))
+
+    return micro, macro
