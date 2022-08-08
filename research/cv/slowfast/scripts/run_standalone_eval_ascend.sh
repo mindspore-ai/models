@@ -48,5 +48,5 @@ taskset -c $cpu_range python -u eval.py --cfg "${CFG}" \
      AVA.FRAME_DIR "${DATA_DIR}/frames" \
      AVA.FRAME_LIST_DIR "${DATA_DIR}/ava_annotations" \
      AVA.ANNOTATION_DIR "${DATA_DIR}/ava_annotations" \
-    TEST.CHECKPOINT_FILE_PATH "${CHECKPOINT_FILE_PATH}" > log 2>&1 &
+    TEST.CHECKPOINT_FILE_PATH "${CHECKPOINT_FILE_PATH}" > log_eval_ascend 2>&1 &
 cd ..
