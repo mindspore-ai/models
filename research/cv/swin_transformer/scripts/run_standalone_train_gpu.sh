@@ -19,23 +19,19 @@ then
 exit 1
 fi
 BASEPATH=$(cd "`dirname $0`" || exit; pwd)
-export CONFIG_PATH=$1
+CONFIG_PATH=$1
 export CUDA_VISIBLE_DEVICES="$2"
 export RANK_SIZE=1
-export DEVICE_NUM=1
-export DEPLOY_MODE=0
-# export LD_LIBRARY_PATH="/usr/local/cuda-11.1/extras/CUPTI/lib64"
-export GE_USE_STATIC_MEMORY=1
+cd $BASEPATH/..
 rm -rf train_gpu_alone
 mkdir ./train_gpu_alone
 cd ./train_gpu_alone || exit
 env > env.log
-# pip show mindspore_gpu
-# python -c "import mindspore;mindspore.run_check()"
-nohup python ${BASEPATH}/../train.py  --device_target="GPU" \
-    --swin_config $CONFIG_PATH \
-    --start_epoch 0 \
-    --epochs 350 > log.txt 2>&1 &
+
+python -u ../train.py \
+    --device_id=$DEVICE_ID \
+    --device_target="GPU" \
+    --swin_config=$CONFIG_PATH > log.txt 2>&1 &
 cd ../
 
 
