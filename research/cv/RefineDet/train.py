@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ from mindspore.common import set_seed, dtype
 from src.config import get_config
 from src.dataset import create_refinedet_dataset, create_mindrecord
 from src.lr_schedule import get_lr
-from src.init_params import init_net_param
+from src.init_params import init_net_param, filter_checkpoint_parameter_by_list
 from src.refinedet import refinedet_vgg16, refinedet_resnet101
 from src.refinedet_loss_cell import RefineDetLossCell, TrainingWrapper
 
@@ -73,12 +73,15 @@ def get_args():
     parser.add_argument("--loss_scale", type=int, default=1024, help="Loss scale, default is 1024.")
     parser.add_argument("--filter_weight", type=ast.literal_eval, default=False,
                         help="Filter head weight parameters, default is False.")
+    parser.add_argument('--freeze_layer', type=str, default="none", choices=["none", "backbone"],
+                        help="freeze the weights of network, support freeze the backbone's weights, "
+                             "default is not freezing.")
     parser.add_argument('--debug', type=str, default="0", choices=["0", "1", "2", "3"],
                         help="Active the debug mode. 0 for no debug mode,"
                              "Under debug mode 1, the network would be run in PyNative mode,"
                              "Under debug mode 2, all ascend log would be print on stdout,"
                              "Under debug mode 3, all ascend log would be print on stdout."
-                        "And network will run in PyNative mode.")
+                             "And network will run in PyNative mode.")
     parser.add_argument("--check_point", type=str, default="./ckpt",
                         help="The directory path to save check point files")
     args_opt = parser.parse_args()
@@ -140,7 +143,7 @@ def train_main(args_opt):
     dataset_size = dataset.get_dataset_size()
     print(f"Create dataset done! dataset size is {dataset_size}")
     refinedet = refinedet_model_build(config, args_opt)
-    if ("use_float16" in config and config.use_float16) or args_opt.run_platform == "GPU":
+    if ("use_float16" in config and config.use_float16):
         refinedet.to_float(dtype.float16)
     net = RefineDetLossCell(refinedet, config)
 
@@ -152,6 +155,8 @@ def train_main(args_opt):
 
     if args_opt.pre_trained:
         param_dict = load_checkpoint(args_opt.pre_trained)
+        if args_opt.filter_weight:
+            filter_checkpoint_parameter_by_list(param_dict, config.checkpoint_filter_list)
         load_param_into_net(net, param_dict, True)
 
     lr = Tensor(get_lr(global_step=args_opt.pre_trained_epoch_size * dataset_size,
