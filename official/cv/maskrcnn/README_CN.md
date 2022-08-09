@@ -741,3 +741,15 @@ Accumulating evaluation results...
 # ModelZoo主页
 
 请浏览官网[主页](https://gitee.com/mindspore/models)。
+
+## FAQ
+
+优先参考[ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ)来查找一些常见的公共问题。
+
+- **Q: 为什么修改yaml配置文件中的max_instance_count参数会报shape对应不上的问题？**
+
+  **A**: 是因为max_instance_count和num_gts的值不相等导致。在修改max_instance_count时，num_gts也需要做相应修改，且它们的值需保持相等。
+
+- **Q: 为什么修改yaml配置文件中的mask_shape参数会报shape对应不上的问题？**
+
+  **A**: 是因为mask_shape和mask_out_size的取值关系不对导致。mask_shape的取值应该是mask_out_size值的二倍。 例如:当mask_shape=[46, 46]时，mask_out_size=23。
