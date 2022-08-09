@@ -31,7 +31,6 @@ label_smooth_factor: 0
 buffer_size: 10
 image_size: '224,224'
 pad_mode: 'same'
-padding: 0
 has_bias: False
 batch_norm: True
 keep_checkpoint_max: 10
@@ -85,6 +84,7 @@ ckpt_path: "checkpoint save location"
 ckpt_interval: "ckpt_interval"
 is_save_on_master: "save ckpt on master or all rank"
 is_distributed: "if multi device"
+pad_mode: "choices in ['same', 'pad']"
 
 # eval options
 per_batch_size: "batch size for per npu"
