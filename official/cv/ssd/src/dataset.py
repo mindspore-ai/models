@@ -401,6 +401,7 @@ def create_ssd_dataset(mindrecord_file, batch_size=32, device_num=1, rank=0,
     decode = de.vision.Decode()
     ds = ds.map(operations=decode, input_columns=["image"])
     change_swap_op = de.vision.HWC2CHW()
+    # Computed from random subset of ImageNet training images
     normalize_op = de.vision.Normalize(mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
                                        std=[0.229 * 255, 0.224 * 255, 0.225 * 255])
     color_adjust_op = de.vision.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4)

@@ -43,6 +43,7 @@ def score_lst(lst):
     return res
 
 def create_dataset(args, data_mode='train'):
+    # Computed from random subset of ImageNet training images
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
     rank_id = args.rank

@@ -220,6 +220,7 @@ def impad_to_multiple_column(img, img_shape, gt_bboxes, gt_label, gt_num):
 
 def imnormalize_column(img, img_shape, gt_bboxes, gt_label, gt_num):
     """imnormalize operation for image"""
+    # Computed from random subset of ImageNet training images
     mean = np.asarray([123.675, 116.28, 103.53])
     std = np.asarray([58.395, 57.12, 57.375])
     img_data = img.copy().astype(np.float32)
@@ -476,6 +477,7 @@ def create_deeptext_dataset(mindrecord_file, batch_size=2, repeat_num=12, device
     compose_map_func = (lambda image, annotation: preprocess_fn(image, annotation, is_training))
 
     hwc_to_chw = C.HWC2CHW()
+    # Computed from random subset of ImageNet training images
     normalize_op = C.Normalize((123.675, 116.28, 103.53), (58.395, 57.12, 57.375))
     horizontally_op = C.RandomHorizontalFlip(1)
     type_cast0 = CC.TypeCast(mstype.float32)

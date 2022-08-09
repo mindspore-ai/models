@@ -52,6 +52,7 @@ def parser_args():
     return res_args
 
 def process_img(img_file, p_c, p_s):
+    # Computed from random subset of ImageNet training images
     mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
     std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
     img = cv2.imread(img_file, cv2.IMREAD_COLOR | cv2.IMREAD_IGNORE_ORIENTATION)

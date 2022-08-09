@@ -57,6 +57,7 @@ def create_dataset(dataset_path, do_train, config, device_target, batch_size=32,
     resize_op = ds.vision.Resize(256)
     center_crop = ds.vision.CenterCrop(resize_width)
     rescale_op = ds.vision.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4)
+    # Computed from random subset of ImageNet training images
     normalize_op = ds.vision.Normalize(mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
                                        std=[0.229 * 255, 0.224 * 255, 0.225 * 255])
     change_swap_op = ds.vision.HWC2CHW()

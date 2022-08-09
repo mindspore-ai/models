@@ -138,6 +138,7 @@ def train():
     # image transform
     input_transform = Compose([
         ToTensor(),
+        # Computed from random subset of ImageNet training images
         Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225], is_hwc=False),
     ])
 

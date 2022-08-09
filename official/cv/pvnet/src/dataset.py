@@ -243,6 +243,7 @@ def create_dataset(cls_list, batch_size=16, workers=16, devices=1, rank=0, multi
             cfg.saturation, cfg.hue),
         C.ToTensor(),  # 0~255 HWC to 0~1 CHW
         C.TypeCast(mstype.float32),
+        # Computed from random subset of ImageNet training images
         C.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225), is_hwc=False),
     ])
 

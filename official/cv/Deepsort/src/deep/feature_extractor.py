@@ -29,6 +29,7 @@ class Extractor:
 
     def statistic_normalize_img(self, img, statistic_norm=True):
         """Statistic normalize images."""
+        # Computed from random subset of ImageNet training images
         mean = np.array([0.485, 0.456, 0.406])
         std = np.array([0.229, 0.224, 0.225])
         if statistic_norm:

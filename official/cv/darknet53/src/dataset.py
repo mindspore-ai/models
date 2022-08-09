@@ -54,6 +54,7 @@ def create_dataset(dataset_path, do_train, repeat_num=1, batch_size=32, target="
                                          num_shards=device_num, shard_id=rank_id)
 
     image_size = 256
+    # Computed from random subset of ImageNet training images
     mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
     std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
 

@@ -41,6 +41,7 @@ class DataNormTranspose(nn.Cell):
     """
     def __init__(self):
         super(DataNormTranspose, self).__init__()
+        # Computed from random subset of ImageNet training images
         self.mean = Tensor(np.array([0.485 * 255, 0.456 * 255, 0.406 * 255]).reshape((1, 1, 1, 3)), mstype.float32)
         self.std = Tensor(np.array([0.229 * 255, 0.224 * 255, 0.225 * 255]).reshape((1, 1, 1, 3)), mstype.float32)
 

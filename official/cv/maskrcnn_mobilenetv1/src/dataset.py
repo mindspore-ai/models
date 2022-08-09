@@ -288,6 +288,7 @@ def impad_to_multiple_column(img, img_shape, gt_bboxes, gt_label, gt_num, gt_mas
 
 def imnormalize_column(img, img_shape, gt_bboxes, gt_label, gt_num, gt_mask):
     """imnormalize operation for image"""
+    # Computed from random subset of ImageNet training images
     mean = np.asarray([123.675, 116.28, 103.53])
     std = np.asarray([58.395, 57.12, 57.375])
     img_data = img.copy().astype(np.float32)

@@ -94,6 +94,7 @@ def create_dataset(dataset_path,
               shuffle=False, num_shards=device_num, shard_id=rank_id)
             print("eval dataset size: {}".format(ds.get_dataset_size()))
 
+    # Computed from random subset of ImageNet training images
     mean = [0.485*255, 0.456*255, 0.406*255]
     std = [0.229*255, 0.224*255, 0.225*255]
 

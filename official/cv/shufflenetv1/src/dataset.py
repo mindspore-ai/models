@@ -54,6 +54,7 @@ def create_dataset(dataset_path, do_train, device_num=1, rank=0):
             C.CenterCrop(224)
         ]
     trans += [
+        # Computed from random subset of ImageNet training images
         C.Normalize(mean=[0.485 * 255, 0.456 * 255, 0.406 * 255], std=[0.229 * 255, 0.224 * 255, 0.225 * 255]),
         C.HWC2CHW(),
     ]
