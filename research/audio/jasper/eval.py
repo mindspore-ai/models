@@ -18,6 +18,7 @@ Eval for Japer
 """
 import argparse
 import json
+import os
 import pickle
 import numpy as np
 from src.config import eval_config, symbols, encoder_kw, decoder_kw
@@ -30,13 +31,20 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 parser = argparse.ArgumentParser(description='jasper evaluation')
 parser.add_argument('--pretrain_ckpt', type=str,
                     default='./checkpoint/ckpt_0/jasper10.ckpt', help='Pretrained checkpoint path')
-parser.add_argument('--device_target', type=str, default="GPU", choices=("GPU", "CPU"),
+parser.add_argument('--device_target', type=str, default="GPU", choices=("GPU", "Ascend", "CPU"),
                     help='Device target, support GPU and CPU, Default: GPU')
 args = parser.parse_args()
 
 if __name__ == '__main__':
-    context.set_context(mode=context.GRAPH_MODE,
-                        device_target=args.device_target, save_graphs=False)
+    if args.device_target == "Ascend":
+        device_id = int(os.getenv('DEVICE_ID'))
+        context.set_context(mode=context.GRAPH_MODE,
+                            device_id=device_id,
+                            device_target=args.device_target,
+                            save_graphs=False)
+    else:
+        context.set_context(mode=context.GRAPH_MODE,
+                            device_target=args.device_target, save_graphs=False)
     config = eval_config
     with open(config.DataConfig.labels_path) as label_file:
         labels = json.load(label_file)

@@ -7,16 +7,17 @@
   - [Script Description](#script-description)
     - [Script and Sample Code](#script-parameters)
     - [Script Parameters](#script-parameters)
-    - [Training and eval Process](#training-process)
-    - [Export](#Export)
+    - [Training and eval](#training-and-eval)
+    - [Export and infer](#export-and-infer)
   - [Performance](#performance)
     - [Training Performance](#training-performance)
     - [Inference Performance](#inference-performance)
+  - [FAQ](#FAQ)
   - [ModelZoo Homepage](#modelzoo-homepage)
 
 ## [Jasper Description](#contents)
 
-Jasper is an end-to-end speech recognition models which is trained with CTC loss. Jasper model uses only 1D convolutions, batch normalization, ReLU, dropout, and residual connections. We support training and evaluation on CPU and GPU.
+Jasper is an end-to-end speech recognition models which is trained with CTC loss. Jasper model uses only 1D convolutions, batch normalization, ReLU, dropout, and residual connections. We support training and evaluation on CPU, GPU and Ascend.
 
 [Paper](https://arxiv.org/pdf/1904.03288v3.pdf): Jason Li, et al. Jasper: An End-to-End Convolutional Neural Acoustic Model.
 
@@ -46,8 +47,8 @@ Data format：wav and txt files
 
 ## [Environment Requirements](#contents)
 
-Hardware（GPU）
-  Prepare hardware environment with GPU processor.
+Hardware
+  Prepare hardware environment with GPU processor or Ascend processor.
 Framework
   [MindSpore](https://www.mindspore.cn/install/en)
 For more information, please check the resources below：
@@ -70,6 +71,8 @@ For more information, please check the resources below：
         │  README.md                        //English readme
         │  requirements.txt                 //required library file
         │  train.py                         //train file
+        │  preprocess.py                    //inference preprocess
+        │  postprocess.py                   //inference postprocess
         │
         ├─scripts
         │      download_librispeech.sh      //download data
@@ -79,6 +82,12 @@ For more information, please check the resources below：
         │      run_eval_gpu.sh              //GPU evaluate
         │      run_standalone_train_cpu.sh  //one CPU train
         │      run_standalone_train_gpu.sh  //one GPU train
+        │      run_distribute_train_ascend.sh  //8 Ascend-910 cards training
+        │      run_standalone_train_ascend.sh  //single Ascend-910 training
+        │      run_eval_ascend.sh           //Ascend-910 evaluation
+        │      run_infer_310.sh             //Ascend-310 inference
+        |
+        ├─ascend310_infer                   //ascend-310 inference code
         │
         ├─src
         │      audio.py                     //preprocess data
@@ -113,16 +122,16 @@ For more information, please check the resources below：
 #### Training
 
 ```text
-usage: train.py  [--use_pretrained USE_PRETRAINED]
-                 [--pre_trained_model_path PRE_TRAINED_MODEL_PATH]
+usage: train.py  [--pre_trained_model_path PRE_TRAINED_MODEL_PATH]
                  [--is_distributed IS_DISTRIBUTED]
-                 [--bidirectional BIDIRECTIONAL]
                  [--device_target DEVICE_TARGET]
+                 [--device_id DEVICE_ID]
 options:
     --pre_trained_model_path    pretrained checkpoint path, default is ''
     --is_distributed            distributed training, default is False
     is True. Currently, only bidirectional model is implemented
-    --device_target             device where the code will be implemented: "GPU" | "CPU", default is "GPU"
+    --device_target             device where the code will be implemented: "GPU" | "CPU" | "Ascend", default is "GPU"
+    --device_id                 device id, it is used when device_target is Ascend, default is 0
 ```
 
 #### Evaluation
@@ -135,7 +144,7 @@ usage: eval.py  [--bidirectional BIDIRECTIONAL]
 options:
     --bidirectional              whether to use bidirectional RNN, default is True. Currently, only bidirectional model is implemented
     --pretrain_ckpt              saved checkpoint path, default is ''
-    --device_target              device where the code will be implemented: "GPU" | "CPU", default is "GPU"
+    --device_target              device where the code will be implemented: "GPU" | "CPU" | "Ascend", default is "GPU"
 ```
 
 #### Options and Parameters
@@ -144,7 +153,7 @@ Parameters for training and evaluation can be set in file `config.py`
 
 ```text
 config for training.
-    epochs                       number of training epoch, default is 70
+    epochs                       number of training epoch, default is 440
 ```
 
 ```text
@@ -183,7 +192,7 @@ config for checkpoint.
     keep_checkpoint_max          max number of checkpoints to save, delete older checkpoints, default is 10
 ```
 
-## [Training and Eval process](#contents)
+## [Training and Eval](#contents)
 
 Before training, the dataset should be processed.
 
@@ -245,7 +254,15 @@ bash ./scripts/run_standalone_train_cpu.sh
 # distributed training gpu
 bash ./scripts/run_distribute_train_gpu.sh
 
+# standalone training Ascend
+bash ./scripts/run_standalone_train_ascend.sh [DEVICE_ID]
+
+# distributed training  Ascend
+bash ./scripts/run_distribute_train_ascend.sh [RANK_SIZE] [BEGIN] [RANK_TABLE_FILE]
+
 ```
+
+For example, you can do distributed training on 8 card Ascend like this: `bash ./scripts/run_distribute_train_ascend.sh 8 0 ./hccl_config/hccl_8.json`.
 
 The following script is used to evaluate the model. Note we only support greedy decoder now and before run the script:
 
@@ -257,7 +274,52 @@ bash ./scripts/run_eval_cpu.sh [PATH_CHECKPOINT]
 # eval on gpu
 bash ./scripts/run_eval_gpu.sh [DEVICE_ID] [PATH_CHECKPOINT]
 
+# eval on Ascend
+bash ./scripts/run_eval_ascend.sh [DEVICE_ID] [PATH_CHECKPOINT]
+
 ```
+
+## [Export and Infer](#contents)
+
+### Export
+
+Before inference, you need to export the mindir file. And you need to prepare the trained checkpoint.
+
+```shell
+# export on Ascend 910
+DEVICE_ID=[DEVIC_ID] python export.py --pre_trained_model_path [CKPT_FILE] --device_target 'Ascend'
+```
+
+### Infer
+
+Inference must be executed on Ascend 310. You need to put the export file `jasper_graph.mindir` and `jasper_variables/` in current path. Modify "DataConfig" of `src/config.py`. And we only support greedy decoder now and before running the script you need to install pytorch in your environment.
+
+```shell
+# Inference config
+"DataConfig": {
+    "Data_dir": '/home/dataset/LibriSpeech',
+    "test_manifest": ['/home/dataset/LibriSpeech/librispeech-test-clean-wav.json'],
+},
+"batch_size_infer": 1,
+# for preprocess
+"result_path": "./preprocess_Result",
+# for postprocess
+"result_dir": "./result_Files",
+"post_out": "./infer_output.txt"
+
+```
+
+run the inference script:
+
+```shell
+bash scripts/run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` the mindir file.
+- `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'.
+- `DEVICE_ID` is optional, default value is 0.
+
+After inference, you can view the result in `infer_output.txt`.
 
 ## [Model Description](#contents)
 
@@ -268,16 +330,16 @@ bash ./scripts/run_eval_gpu.sh [DEVICE_ID] [PATH_CHECKPOINT]
 | Parameters           | Jasper                                                       |
 | -------------------- | ------------------------------------------------------------ |
 | Resource             | NV SMX2 V100-32G                                             |
-| uploaded Date        | 2/7/2022 (month/day/year)                                    |
+| uploaded Date        | 7/2/2022 (month/day/year)                                    |
 | MindSpore Version    | 1.8.0                                                        |
 | Dataset              | LibriSpeech                                                  |
 | Training Parameters  | 8p, epoch=70, steps=1088 * epoch, batch_size = 64, lr=3e-4   |
 | Optimizer            | Adam                                                         |
 | Loss Function        | CTCLoss                                                      |
 | outputs              | probability                                                  |
-| Loss                 | 0.2-0.7                                                      |
-| Speed                | 8p 2.7s/step                                                 |
-| Total time: training | 8p: around 194 h;                                            |
+| Loss                 | 32-33                                                      |
+| Speed                | GPU: 8p 2.7s/step; Ascend: 8p 1.7s/step             |
+| Total time: training | GPU: 8p around 194h; Ascend 8p around 220h                 |
 | Checkpoint           | 991M (.ckpt file)                                            |
 | Scripts              | [Jasper script](https://gitee.com/mindspore/models/tree/master/research/audio/jasper) |
 
@@ -291,9 +353,18 @@ bash ./scripts/run_eval_gpu.sh [DEVICE_ID] [PATH_CHECKPOINT]
 | Dataset             | LibriSpeech                |
 | batch_size          | 64                         |
 | outputs             | probability                |
-| Accuracy(dev-clean) | 8p: WER: 5.754  CER: 2.151 |
-| Accuracy(dev-other) | 8p: WER: 19.213 CER: 9.393 |
+| Accuracy(dev-clean) | GPU: 8p WER: 5.754  CER: 2.151; Ascend: 8p, WER: 4.597  CER: 1.544 |
+| Accuracy(dev-other) | GPU: 8p, WER: 19.213 CER: 9.393; Ascend: 8p, WER, 12.871 CER: 5.618 |
 | Model for inference | 330M (.mindir file)        |
+
+## [FAQ](#contents)
+
+Q1. How to continue training after training interruption?  
+A1. The CKPT file at the time of interruption is used as the parameter "pre_path" of the training script. The path parameter can be used to continue training.  
+Q2. How to choose the CKPT file after training?  
+A2. You can find the training log in log files, and choose the checkpoint whose loss is the lowest.  
+Q3. How to set the TRAIN_INPUT_PAD_LENGTH constant in src/dataset.py, src/model.py and src/model_test.py?  
+A3. TRAIN_INPUT_PAD_LENGTH means the input data length after padding. You can increase its value properly to reduce WER but extending training time.  
 
 ## [ModelZoo Homepage](#contents)
 

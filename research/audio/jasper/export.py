@@ -19,17 +19,16 @@ export checkpoint file to mindir model
 import json
 import argparse
 import numpy as np
-import mindspore as ms
 from mindspore import context, Tensor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net, export
 from src.config import train_config, encoder_kw, decoder_kw
-from src.model import Jasper
+from src.model_test import Jasper, PredictWithSoftmax
 
 parser = argparse.ArgumentParser(
     description='Export DeepSpeech model to Mindir')
 parser.add_argument('--pre_trained_model_path', type=str,
                     default='', help=' existed checkpoint path')
-parser.add_argument('--device_target', type=str, default="GPU", choices=("GPU", "CPU"),
+parser.add_argument('--device_target', type=str, default="GPU", choices=("GPU", "CPU", "Ascend"),
                     help='Device target, support GPU and CPU, Default: GPU')
 args = parser.parse_args()
 
@@ -40,8 +39,8 @@ if __name__ == '__main__':
     with open(config.DataConfig.labels_path) as label_file:
         labels = json.load(label_file)
 
-    jasper_net = Jasper(encoder_kw=encoder_kw,
-                        decoder_kw=decoder_kw).to_float(ms.float16)
+    jasper_net = PredictWithSoftmax(
+        Jasper(encoder_kw=encoder_kw, decoder_kw=decoder_kw))
 
     param_dict = load_checkpoint(args.pre_trained_model_path)
     load_param_into_net(jasper_net, param_dict)

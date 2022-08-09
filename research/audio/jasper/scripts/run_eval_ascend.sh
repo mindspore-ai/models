@@ -14,5 +14,19 @@
 # limitations under the License.
 # ============================================================================
 
+if [ $# -lt 2 ]; then
+    echo "Usage: bash scripts/run_eval_ascend.sh 
+    [PRETRAIN_CKPT] [DEVICE_ID]"
+exit 1
+fi
+
+log_dir="./eval_out"
+
+if [ ! -d $log_dir ]; then
+    mkdir eval_out
+fi
+
 DEVICE_ID=$1
-CUDA_VISIBLE_DEVICES=$DEVICE_ID python ./train.py --device_target 'GPU' > train.log 2>&1 &
+PRETRAIN_CKPT=$2
+
+DEVICE_ID=$DEVICE_ID python eval.py --device_target 'Ascend' --pretrain_ckpt $PRETRAIN_CKPT > eval_out/eval.log 2>&1 &

@@ -23,7 +23,7 @@ import mindspore.dataset.engine as de
 from src.audio import AudioSegment, SpeedPerturbation
 from src.text import _clean_text, punctuation_map
 
-TRAIN_INPUT_PAD_LENGTH = 1300
+TRAIN_INPUT_PAD_LENGTH = 1500
 TRAIN_LABEL_PAD_LENGTH = 360
 TEST_INPUT_PAD_LENGTH = 3500
 

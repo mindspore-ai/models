@@ -14,5 +14,17 @@
 # limitations under the License.
 # ============================================================================
 
+if [ $# -lt 1 ]; then
+    echo "Usage: bash scripts/run_standalone_train_ascend.sh [DEVICE_ID]"
+exit 1
+fi
+
+log_dir="./log"
+
+if [ ! -d $log_dir ]; then
+    mkdir log
+fi
+
 DEVICE_ID=$1
-CUDA_VISIBLE_DEVICES=$DEVICE_ID python ./train.py --device_target 'GPU' > train.log 2>&1 &
+
+python train.py --device_target 'Ascend' --device_id $DEVICE_ID > log/train_standalone.log 2>&1 &

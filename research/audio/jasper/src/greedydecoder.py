@@ -45,7 +45,8 @@ class MSGreedyDecoder(GreedyDecoder):
 
     def decode(self, probs, sizes=None):
         probs = probs.asnumpy()
-        sizes = sizes.asnumpy()
+        if sizes is not None:
+            sizes = sizes.asnumpy()
 
         max_probs = np.argmax(probs, axis=-1)
         strings, offsets = self.convert_to_strings(max_probs, sizes, remove_repetitions=True, return_offsets=True)
