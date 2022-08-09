@@ -112,7 +112,8 @@ def random_affine(
     img = cv2.warpAffine(img, M, dsize=target_size, borderValue=(114, 114, 114))
 
     # Transform label coordinates
-    if targets:
+    target_length = len(targets)
+    if target_length:
         targets = apply_affine_to_bboxes(targets, target_size, M, scale)
     return img, targets
 
