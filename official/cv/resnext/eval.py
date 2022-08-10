@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -69,12 +69,14 @@ def set_parameters():
     config.logger = get_logger(config.outputs_dir, config.rank)
     return config
 
+
 def get_top5_acc(top5_arg, gt_class):
     sub_count = 0
     for top5, gt in zip(top5_arg, gt_class):
         if gt in top5:
             sub_count += 1
     return sub_count
+
 
 def get_result(model, top1_correct, top5_correct, img_tot):
     """calculate top1 and top5 value."""
@@ -120,6 +122,7 @@ def get_result(model, top1_correct, top5_correct, img_tot):
 
     config.logger.info('after results=%s', results)
     return results
+
 
 def set_graph_kernel_context(device_target):
     if device_target == "GPU":
