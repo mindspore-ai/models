@@ -14,6 +14,7 @@
     - [脚本参数](#脚本参数)
     - [训练过程](#训练过程)
     - [评估过程](#评估过程)
+        - [onnx推理](#onnx推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -103,6 +104,7 @@ simple_baselines的总体网络架构如下：
     ├── run_distribute_train.sh            # 启动Ascend分布式训练（8卡）
     ├── run_eval.sh                        # 启动Ascend评估
     ├── run_standalone_train.sh            # 启动Ascend单机训练（单卡）
+    ├── run_onnx_eval.sh                   # 启动onnx推理
   ├── src
     ├── utils
         ├── coco.py                        # COCO数据集评估结果
@@ -114,6 +116,7 @@ simple_baselines的总体网络架构如下：
     ├── network_with_loss.py               # 损失函数定义
     └── pose_resnet.py                     # 主干网络定义
   ├── eval.py                              # 评估网络
+  ├── eval_onnx.py                         # onnx推理
   └── train.py                             # 训练网络
 ```
 
@@ -231,6 +234,40 @@ coco eval results saved to /cache/train_output/multi_train_poseresnet_v5_2-140_2
 AP: 0.704
 ```
 
+### onnx推理
+
+在推理之前需要先导出模型，onnx模型可在任意环境导出,通过device_target参数可进行设置。
+
+```bash
+python export.py --device_target CPU --ckpt_url /path/to/exported.ckpt --file_format ONNX
+```
+
+推理数据集目录为下
+
+```text
+└──coco
+  ├── val2017
+    ├── 000000000139.jpg
+    ├── ...
+    └── 000000000285.jpg
+  ├── annotations
+    └── person_keypoints_val2017.json
+```
+
+推理前需要更改src/config.py文件。更改config.DATASET.ROOT为当前数据集coco目录，例如/home/dataset/coco/，更改config.DATASET.TEST_JSON为annotations/person_keypoints_val2017.json
+
+```bash
+# onnx模型推理
+bash run_onnx_eval.sh  CKPT_FILES DEVICE_TYPE
+```
+
+推理结果保存在output.eval_onnx.log文件下
+simple_baselines网络使用COCO数据集推理得到的结果如下：
+
+```text
+AP:0.72296
+```
+
 ## 推理过程
 
 ### [导出mindir]
@@ -261,7 +298,7 @@ python export.py
 # You will see simple_pose.mindir under {Output file path}.
 ```
 
-`FILE_FORMAT` 变量应该在["AIR", "MINDIR"]中选择
+`FILE_FORMAT` 变量应该在["AIR", "MINDIR", "ONNX"]中选择
 
 ### 310推理
 
