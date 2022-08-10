@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import numpy as np
 from mindspore import dtype as mstype
 from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
 
-from src import SDNE, SDNEWithLossCell, SDNELoss
+from src import SDNE, SDNEWithLossCell, SDNELoss1
 from src import cfg
 
 parser = argparse.ArgumentParser(description='Export Script')
@@ -34,7 +34,7 @@ parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"]
 parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"], default="Ascend",
                     help="device target")
 parser.add_argument('--dataset', type=str, default='WIKI',
-                    choices=['WIKI', 'BLOGCATALOG', 'FLICKR', 'YOUTUBE', 'GRQC', 'NEWSGROUP'])
+                    choices=['WIKI', 'GRQC'])
 args = parser.parse_args()
 
 context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
@@ -44,8 +44,7 @@ if args.device_target == "Ascend":
 if __name__ == '__main__':
     config = cfg[args.dataset]
 
-    net = SDNEWithLossCell(SDNE(config['node_size'], hidden_size=config['hidden_size']),
-                           SDNELoss(alpha=config['alpha'], beta=config['beta']))
+    net = SDNEWithLossCell(SDNE(config['node_size'], hidden_size=config['hidden_size']), SDNELoss1())
 
     assert args.ckpt_file is not None, "args.ckpt_file is None."
     param_dict = load_checkpoint(args.ckpt_file)
