@@ -265,6 +265,7 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, device_num, rank,
         dataset = dataset.map(operations=PreprocessTrueBox(config), input_columns=map2_in_column_names,
                               output_columns=map2_out_column_names, column_order=output_column_names,
                               num_parallel_workers=min(4, num_parallel_workers), python_multiprocessing=False)
+        # Computed from random subset of ImageNet training images
         mean = [m * 255 for m in [0.485, 0.456, 0.406]]
         std = [s * 255 for s in [0.229, 0.224, 0.225]]
         dataset = dataset.map([ds.vision.Normalize(mean, std), hwc_to_chw],

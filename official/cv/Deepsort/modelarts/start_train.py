@@ -116,6 +116,7 @@ data = ds.ImageFolderDataset(DATA_DIR, decode=True, shuffle=True,\
 transform_img = [
     C.RandomCrop((128, 64), padding=4),
     C.RandomHorizontalFlip(prob=0.5),
+    # Computed from random subset of ImageNet training images
     C.Normalize([0.485*255, 0.456*255, 0.406*255], [0.229*255, 0.224*255, 0.225*255]),
     C.HWC2CHW()
         ]

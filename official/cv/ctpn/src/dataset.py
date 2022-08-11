@@ -288,6 +288,7 @@ def create_ctpn_dataset(mindrecord_file, batch_size=1, device_num=1, rank_id=0,
     ds = ds.map(operations=decode, input_columns=["image"], num_parallel_workers=num_parallel_workers)
     compose_map_func = (lambda image, annotation: preprocess_fn(image, annotation, is_training))
     hwc_to_chw = C.HWC2CHW()
+    # Computed from random subset of ImageNet training images
     normalize_op = C.Normalize((123.675, 116.28, 103.53), (58.395, 57.12, 57.375))
     type_cast0 = CC.TypeCast(mstype.float32)
     type_cast1 = CC.TypeCast(mtype)

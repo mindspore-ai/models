@@ -86,6 +86,7 @@ def create_posenet_dataset(mindrecord_file, batch_size=1, device_num=1, is_train
     decode = C.Decode()
     dataset = dataset.map(operations=decode, input_columns=["image"])
     transforms_list = []
+    # Computed from random subset of ImageNet training images
     mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
     std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
     if is_training:

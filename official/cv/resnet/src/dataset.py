@@ -111,6 +111,7 @@ def create_dataset2(dataset_path, do_train, batch_size=32, train_image_size=224,
         data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=get_num_parallel_workers(12), shuffle=True,
                                          num_shards=device_num, shard_id=rank_id)
 
+    # Computed from random subset of ImageNet training images
     mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
     std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
 
@@ -184,6 +185,7 @@ def create_dataset_pynative(dataset_path, do_train, batch_size=32, train_image_s
         data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=get_num_parallel_workers(2), shuffle=True,
                                          num_shards=device_num, shard_id=rank_id)
 
+    # Computed from random subset of ImageNet training images
     mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
     std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
 
@@ -320,6 +322,7 @@ def create_dataset4(dataset_path, do_train, batch_size=32, train_image_size=224,
         data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=get_num_parallel_workers(12), shuffle=True,
                                          num_shards=device_num, shard_id=rank_id)
 
+    # Computed from random subset of ImageNet training images
     mean = [123.68, 116.78, 103.94]
     std = [1.0, 1.0, 1.0]
 

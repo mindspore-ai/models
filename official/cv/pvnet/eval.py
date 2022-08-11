@@ -83,6 +83,7 @@ def test(args):
         rgb = read_rgb_np(rgb_path)
         rgb = C.ToTensor()(rgb)
         rgb = C.TypeCast(mindspore.dtype.float32)(rgb)
+        # Computed from random subset of ImageNet training images
         rgb = C.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225], is_hwc=False)(rgb)
         rgb = np.expand_dims(rgb, axis=0)
         rgb = mindspore.Tensor(rgb)

@@ -57,6 +57,7 @@ def process_img(img_file):
     """
     Preprocessing the images
     """
+    # Computed from random subset of ImageNet training images
     mean = np.array([0.485, 0.456, 0.406], dtype=np.float32)
     std = np.array([0.229, 0.224, 0.225], dtype=np.float32)
     img = Image.open(img_file).convert("RGB")

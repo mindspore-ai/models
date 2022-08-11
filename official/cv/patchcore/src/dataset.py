@@ -133,6 +133,7 @@ def createDatasetJson(dataset_path, category, data_transforms, gt_transforms):
 
 def createDataset(dataset_path, category):
     """createDataset"""
+    # Computed from random subset of ImageNet training images
     mean = [0.485, 0.456, 0.406]
     std = [0.229, 0.224, 0.225]
 

@@ -56,6 +56,7 @@ def create_dataset_imagenet(dataset_path, do_train, cfg, repeat_num=1):
         ]
     trans += [
         C.c_transforms.Rescale(1.0 / 255.0, 0.0),
+        # Computed from random subset of ImageNet training images
         C.c_transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
         C.c_transforms.HWC2CHW()
     ]

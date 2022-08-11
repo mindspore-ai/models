@@ -363,6 +363,7 @@ def keypoint_dataset(config,
     if transform is None:
         transform_img = [
             V_C.Rescale(1.0 / 255.0, 0.0),
+            # Computed from random subset of ImageNet training images
             V_C.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
             V_C.HWC2CHW()
         ]

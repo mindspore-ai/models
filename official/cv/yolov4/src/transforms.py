@@ -64,6 +64,7 @@ def statistic_normalize_img(img, statistic_norm):
     if isinstance(img, Image.Image):
         img = np.array(img)
     img = img/255.
+    # Computed from random subset of ImageNet training images
     mean = np.array([0.485, 0.456, 0.406])
     std = np.array([0.229, 0.224, 0.225])
     if statistic_norm:

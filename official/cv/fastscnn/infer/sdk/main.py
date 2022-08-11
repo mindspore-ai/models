@@ -306,6 +306,7 @@ def main():
 
         img = img.astype(np.float32)
         mask = mask.astype(np.int32)
+        # Computed from random subset of ImageNet training images
         mean = [0.485, 0.456, 0.406]
         std = [0.229, 0.224, 0.225]
         img = img.transpose((2, 0, 1))#HWC->CHW

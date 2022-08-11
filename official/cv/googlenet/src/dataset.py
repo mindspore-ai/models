@@ -91,6 +91,7 @@ def create_dataset_imagenet(dataset_path, repeat_num=1, training=True,
 
     assert imagenet_cfg.image_height == imagenet_cfg.image_width, "image_height not equal image_width"
     image_size = imagenet_cfg.image_height
+    # Computed from random subset of ImageNet training images
     mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
     std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
 

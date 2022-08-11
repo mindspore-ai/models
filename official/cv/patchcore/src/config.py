@@ -20,6 +20,7 @@ _C = CN()
 # Pre/Post -process
 _C.mean_dft = [-0.485, -0.456, -0.406]
 _C.std_dft = [0.229, 0.224, 0.255]
+# Computed from random subset of ImageNet training images
 _C.mean = [-0.485/0.229, -0.456/0.224, -0.406/0.255]
 _C.std = [1/0.229, 1/0.224, 1/0.255]
 
