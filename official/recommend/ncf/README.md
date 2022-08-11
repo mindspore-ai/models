@@ -84,18 +84,21 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
     - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
 
 # [Quick Start](#contents)
 
 After installing MindSpore via the official website, you can start training and evaluation as follows:
 
-```python
+```bash
 #run data process
 bash scripts/run_download_dataset.sh
 
-# run training example on Ascend
+# run training example
 bash scripts/run_train.sh
+
+# run training example on Ascend
+bash scripts/run_train_ascend.sh
 
 # run training example on GPU
 bash scripts/run_train_gpu.sh
@@ -103,11 +106,14 @@ bash scripts/run_train_gpu.sh
 # run training distribute example on Ascend
 bash scripts/run_distribute_train.sh /path/hccl.json /path/MovieLens
 
+# run evaluation example
+bash scripts/run_eval.sh
+
 # run evaluation example on Ascend
-bash run_eval.sh
+bash scripts/run_eval_ascend.sh
 
 # run evaluation example on GPU
-bash run_eval_gpu.sh
+bash scripts/run_eval_gpu.sh
 ```
 
 If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training and evaluation as follows:
@@ -164,9 +170,11 @@ If you want to run in modelarts, please check the official documentation of [mod
     │   ├──ascend_distributed_launcher
     │       ├──__init__.py                      // init file
     │       ├──get_distribute_pretrain_cmd.py   // create distribute shell script
-    │   ├──run_train.sh                    // shell script for train on Ascend
+    │   ├──run_train.sh                    // shell script for train
+    │   ├──run_train_ascend.sh             // shell script for train on Ascend
     │   ├──run_distribute_train.sh         // shell script for distribute train
-    │   ├──run_eval.sh                     // shell script for evaluation on Ascend
+    │   ├──run_eval.sh                     // shell script for evaluation
+    │   ├──run_eval_ascend.sh              // shell script for evaluation on Ascend
     │   ├──run_train_gpu.sh                // shell script for train on GPU
     │   ├──run_eval_gpu.sh                 // shell script for evaluation on GPU
     │   ├──run_download_dataset.sh         // shell script for dataget and process
@@ -195,7 +203,7 @@ Parameters for both training and evaluation can be set in config.py.
 
 - config for NCF, ml-1m dataset
 
-  ```python
+  ```text
   * `--data_path`: This should be set to the same directory given to the data_download data_dir argument.
   * `--dataset`: The dataset name to be downloaded and preprocessed. By default, it is ml-1m.
   * `--train_epochs`: Total train epochs.
@@ -214,22 +222,28 @@ Parameters for both training and evaluation can be set in config.py.
 
 - on Ascend
 
-  ```python
+  ```bash
   # train single
-  bash scripts/run_train.sh
+  bash scripts/run_train_ascend.sh [DATASET_PATH] [CKPT_FILE]
   # train distribute
   bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH]
   ```
 
 - on GPU
 
-  ```python
-  bash scripts/run_train_gpu.sh
+  ```bash
+  bash scripts/run_train_gpu.sh [DATASET_PATH] [CKPT_FILE] [DEVICE_ID]
+  ```
+
+- on CPU
+
+  ```bash
+  python train.py --data_path=./dataset --dataset=ml-1m --train_epochs=25 --batch_size=256 --output_path=./output/ --checkpoint_path=./checkpoint --device_target=CPU --device_id=0 --num_parallel_workers=2 > train.log 2>&1 &
   ```
 
   The python command above will run in the background, you can view the results through the file `train.log`. After training, you'll get some checkpoint files under the script folder by default. The loss value will be achieved as follows:
 
-  ```python
+  ```log
   # grep "loss is " train.log
   ds_train.size: 95
   epoch: 1 step: 95, loss is 0.25074288
@@ -248,13 +262,13 @@ Parameters for both training and evaluation can be set in config.py.
 
   Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path, e.g., "checkpoint/ncf-125_390.ckpt".
 
-  ```python
-  bash scripts/run_eval.sh
+  ```bash
+  bash scripts/run_eval_ascend.sh [DATASET_PATH] [CKPT_FILE] [DEVICE_ID]
   ```
 
   The above python command will run in the background. You can view the results through the file "eval.log". The accuracy of the test dataset will be as follows:
 
-  ```python
+  ```log
   # grep "accuracy: " eval.log
   HR:0.6846,NDCG:0.410
   ```
@@ -263,8 +277,21 @@ Parameters for both training and evaluation can be set in config.py.
 
   For details, see the above contents `evaluation on ml-1m dataset when running on Ascend`.
 
-  ```python
-  bash scripts/run_eval_gpu.sh
+  ```bash
+  bash scripts/run_eval_gpu.sh [DATASET_PATH] [CKPT_FILE] [DEVICE_ID]
+  ```
+
+- evaluation on ml-1m dataset when running on CPU
+
+  ```bash
+  python eval.py --data_path=./dataset --dataset=ml-1m --eval_batch_size=160000 --output_path=./output/ --eval_file_name=eval.log --checkpoint_file_path=./ckpt --device_target=CPU --device_id=0 > log.txt 2>&1 &
+  ```
+
+  The accuracy of the test dataset will be as follows:
+
+  ```log
+  # grep "accuracy: " eval.log
+  HR = 0.6975, NDCG = 0.420
   ```
 
 ## Inference Process
@@ -304,32 +331,32 @@ Inference result is saved in current path, you can find result like this in acc.
 
 ### Evaluation Performance
 
-| Parameters                 | Ascend                                                       | GPU                                                       |
-| -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Model Version              | NCF                                                 | NCF                                                 |
-| Resource                   | Ascend 910; CPU 2.60GHz, 56cores; Memory 314G; OS Euler2.8             | NV SMX2 V100-32G             |
-| uploaded Date              | 10/23/2020 (month/day/year)                                  | 08/28/2021 (month/day/year)                                  |
-| MindSpore Version          | 1.0.0                                                | 1.4.0                                                |
-| Dataset                    | ml-1m                                                        | ml-1m                                                        |
-| Training Parameters        | epoch=25, steps=19418, batch_size = 256, lr=0.00382059       | epoch=25, steps=19418, batch_size = 256, lr=0.00382059       |
-| Optimizer                  | GradOperation                                                | GradOperation                                                |
-| Loss Function              | Softmax Cross Entropy                                        | Softmax Cross Entropy                                        |
-| outputs                    | probability                                                  | probability                                                  |
-| Speed                      | 1pc: 0.575 ms/step                                          | 1pc: 2.5 ms/step                                          |
-| Total time                 | 1pc: 5 mins                       | 1pc: 25 mins                       |
+| Parameters                 | Ascend                                                       | GPU                                                       | CPU                                                    |
+| -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |--------------------------------------------------------|
+| Model Version              | NCF                                                 | NCF                                                 | NCF                                                    |
+| Resource                   | Ascend 910; CPU 2.60GHz, 56cores; Memory 314G; OS Euler2.8             | NV SMX2 V100-32G             | CPU AMD R75800H,3.2GHz,8cores;Memory 16G; 0S Windows11 |
+| uploaded Date              | 10/23/2020 (month/day/year)                                  | 08/28/2021 (month/day/year)                                  | 07/27/2022 (month/day/year)                            |
+| MindSpore Version          | 1.0.0                                                | 1.4.0                                                | 1.6.1                                                  |
+| Dataset                    | ml-1m                                                        | ml-1m                                                        | ml-1m                                                  |
+| Training Parameters        | epoch=25, steps=19418, batch_size = 256, lr=0.00382059       | epoch=25, steps=19418, batch_size = 256, lr=0.00382059       | epoch=25, steps=19418, batch_size = 256, lr=0.00382059 |
+| Optimizer                  | GradOperation                                                | GradOperation                                                | GradOperation                                          |
+| Loss Function              | Softmax Cross Entropy                                        | Softmax Cross Entropy                                        | Softmax Cross Entropy                                  |
+| outputs                    | probability                                                  | probability                                                  | probability                                            |
+| Speed                      | 1pc: 0.575 ms/step                                          | 1pc: 2.5 ms/step                                          | 1pc: 3.6 ms/step                                       |
+| Total time                 | 1pc: 5 mins                       | 1pc: 25 mins                       | 1pc: 29 mins                                           |
 
 ### Inference Performance
 
-| Parameters          | Ascend              |
-| ------------------- | --------------------------- |
-| Model Version       | NCF               |
-| Resource            | Ascend 910; OS Euler2.8                  |
-| Uploaded Date       | 10/23/2020 (month/day/year)  |
-| MindSpore Version   | 1.0.0                |  
-| Dataset             | ml-1m                       |
-| batch_size          | 256                         |
-| outputs             | probability                 |
-| Accuracy            | HR:0.6846,NDCG:0.410        |
+| Parameters          | Ascend              | CPU                        |
+| ------------------- | --------------------------- |----------------------------|
+| Model Version       | NCF               | NCF                        |
+| Resource            | Ascend 910; OS Euler2.8                  | AMD R75800H; OS Windows11  |
+| Uploaded Date       | 10/23/2020 (month/day/year)  | 7/27/2022 (month/day/year) |
+| MindSpore Version   | 1.0.0                | 1.6.1                      |
+| Dataset             | ml-1m                       | ml-1m                      |
+| batch_size          | 256                         | 256                        |
+| outputs             | probability                 | probability                |
+| Accuracy            | HR:0.6846,NDCG:0.410        | HR:0.6975, NDCG:0.420      |
 
 ## [How to use](#contents)
 
