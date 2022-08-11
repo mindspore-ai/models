@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [[ $# -gt 8 ]]; then
-    echo "Usage: bash run_distribution_train.sh [RANK_TABLE][RANK_SIZE][DEVICE_START][FC][NATT][EPOCHS][DATASET_DIR][RESULT_DIR]"
+    echo "Usage: bash run_distributed_train_Ascend.sh [RANK_TABLE][RANK_SIZE][DEVICE_START][FC][NATT][EPOCHS][DATASET_DIR][RESULT_DIR]"
 exit 1
 fi
 
@@ -53,9 +53,10 @@ do
     cp -r ../src ./device$i
     cp -r ../data ./device$i
     cp ../*.py ./device$i
+    cp ../default_config.yaml ./device$i
     echo "Start training for rank $RANK_ID, device $DEVICE_ID"
     cd ./device$i
     env > env.log
-    python train.py --fc $4 --natt $5 --epochs $6 --data-dir $DATASET_DIR --result-dir $8 --device-id=$i --distributed 1 > log 2>&1 &
+    python train.py --fc $4 --natt $5 --epochs $6 --data_dir $DATASET_DIR --result_dir $8 --device_id=$i --distributed True --device Ascend > log 2>&1 &
     cd ..
 done

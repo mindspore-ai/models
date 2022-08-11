@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 3 ]; then
-  echo "Usage: 
-        bash make_dataset.sh [DEVICE] [DATASET_DIR] [RESULT_DIR]
+if [ $# != 2 ]; then
+  echo "Usage:
+        bash run_standalone_train.sh [CONFIG] [DATASET_DIR]
        "
   exit 1
 fi
@@ -31,7 +31,17 @@ get_real_path(){
     echo "$(realpath -m $PWD/$1)"
   fi
 }
+
+BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
+
+CONFIG=$(get_real_path $1)
 DATASET_DIR=$(get_real_path $2)
+
+if [ ! -f $CONFIG ]
+then
+    echo "error: config=$CONFIG is not a file."
+exit 1
+fi
 
 if [ ! -d $DATASET_DIR ]
 then
@@ -39,4 +49,15 @@ then
 exit 1
 fi
 
-python make_dataset.py --device $1 --data_dir $DATASET_DIR --result_dir $3
+echo "CONFIG: $CONFIG"
+echo "DATASET_DIR: $DATASET_DIR"
+echo
+
+if [ -d "$BASE_PATH/../train" ];
+then
+    rm -rf $BASE_PATH/../train
+fi
+mkdir $BASE_PATH/../train
+cd $BASE_PATH/../train || exit
+
+python ${BASE_PATH}/../train.py --device GPU --config_path $CONFIG --data_dir $DATASET_DIR --result_dir . &> train.log &

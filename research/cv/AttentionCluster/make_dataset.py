@@ -25,7 +25,7 @@ import mindspore.train.callback as callback
 
 from mindspore.train.model import Model
 from src.datasets.mnist_noisy import MNISTNoisy
-from src.utils.config import parse_opts
+from src.utils.config import config as cfg
 from src.datasets.mnist_sampler import dump_pkl
 from src.datasets.mnist_flash import MNISTFlash
 from src.datasets.mnist_feature import MNISTFeature
@@ -130,22 +130,22 @@ def extract(net, loader, path):
 
 if __name__ == '__main__':
     # Training settings
-    args = parse_opts()
-    if not os.path.exists(args.result_dir):
-        os.makedirs(args.result_dir)
+    if not os.path.exists(cfg.result_dir):
+        os.makedirs(cfg.result_dir)
 
     # init context
-    common.set_seed(args.seed)
-    context.set_context(mode=context.GRAPH_MODE, save_graphs=False, device_target='Ascend',
-                        device_id=args.device_id)
+    common.set_seed(cfg.seed)
+    np.random.seed(1234)
+    context.set_context(mode=context.GRAPH_MODE, save_graphs=False, device_target=cfg.device,
+                        device_id=cfg.device_id)
 
     # train feature extractor
     # create dataset
-    train_dataset_generator = MNISTNoisy(root=args.data_dir, train=True, generate=True,
+    train_dataset_generator = MNISTNoisy(root=cfg.data_dir, train=True, generate=True,
                                          transform=c_trans.Normalize(mean=(0.1307,), std=(0.3081,)))
     train_dataset = ds.GeneratorDataset(source=train_dataset_generator, column_names=["image", "target"], shuffle=True)
     train_dataset = train_dataset.map(operations=[lambda x: np.expand_dims(x, 0)], input_columns=["image"])
-    train_dataset = train_dataset.batch(args.batch_size, drop_remainder=True)
+    train_dataset = train_dataset.batch(64, drop_remainder=True)
 
     #define net
     net1 = Net1()
@@ -154,7 +154,7 @@ if __name__ == '__main__':
     loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True)
 
     # define optimizer
-    optimizer = nn.Adam(params=net1.trainable_params(), learning_rate=args.lr)
+    optimizer = nn.Adam(params=net1.trainable_params(), learning_rate=0.001)
 
     # define model
     model = Model(network=net1, loss_fn=loss, optimizer=optimizer,
@@ -167,22 +167,26 @@ if __name__ == '__main__':
     time_cb = callback.TimeMonitor(data_size=step_size)
     loss_cb = callback.LossMonitor()
     config_ck = callback.CheckpointConfig(save_checkpoint_steps=step_size, keep_checkpoint_max=2)
-    ckpt_cb = callback.ModelCheckpoint(prefix='extractor', directory=args.result_dir, config=config_ck)
+    ckpt_cb = callback.ModelCheckpoint(prefix='extractor', directory=cfg.result_dir, config=config_ck)
     cb = [time_cb, loss_cb, ckpt_cb]
 
     # train
-    model.train(epoch=1, train_dataset=train_dataset, callbacks=cb, dataset_sink_mode=False)
+    if not os.path.isfile(os.path.join(cfg.result_dir, 'extractor-10_5156.ckpt')):
+        print("===> Training feature extractor")
+        model.train(epoch=10, train_dataset=train_dataset, callbacks=cb, dataset_sink_mode=False)
+    else:
+        print("===> Found existing extractor checkpoint")
 
     # extractor feature
     # create dataset
-    train_dataset_generator = MNISTFlash(args.data_dir, train=True, generate=True,
+    train_dataset_generator = MNISTFlash(cfg.data_dir, train=True, generate=True,
                                          transform=VideoWrap(transform=c_trans.Normalize(mean=(0.1307,), std=(0.3081,)))
                                          )
     train_dataset = ds.GeneratorDataset(source=train_dataset_generator, column_names=["images", "target"],
                                         shuffle=False)
     train_dataset = train_dataset.batch(1024, drop_remainder=True)
 
-    test_dataset_generator = MNISTFlash(args.data_dir, train=False,
+    test_dataset_generator = MNISTFlash(cfg.data_dir, train=False,
                                         transform=VideoWrap(transform=c_trans.Normalize(mean=(0.1307,), std=(0.3081,)))
                                         )
     test_dataset = ds.GeneratorDataset(source=test_dataset_generator, column_names=["images", "target"],
@@ -193,9 +197,9 @@ if __name__ == '__main__':
     net2 = Net2()
 
     # load checkpoint
-    param_dict = mindspore.load_checkpoint(os.path.join(args.result_dir, 'extractor-1_5156.ckpt'))
+    param_dict = mindspore.load_checkpoint(os.path.join(cfg.result_dir, 'extractor-10_5156.ckpt'))
     mindspore.load_param_into_net(net2.extractor, param_dict)
     net2.set_train(False)
 
-    extract(net2, train_dataset, os.path.join(args.data_dir, MNISTFeature.training_file))
-    extract(net2, test_dataset, os.path.join(args.data_dir, MNISTFeature.test_file))
+    extract(net2, train_dataset, os.path.join(cfg.data_dir, MNISTFeature.training_file))
+    extract(net2, test_dataset, os.path.join(cfg.data_dir, MNISTFeature.test_file))

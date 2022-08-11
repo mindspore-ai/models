@@ -16,25 +16,24 @@
 import numpy as np
 from mindspore.train.serialization import load_checkpoint, load_param_into_net, export, Tensor, context
 from src.models.attention_cluster import AttentionCluster
-from src.utils.config import parse_opts
+from src.utils.config import config as cfg
 
 
 if __name__ == "__main__":
-    args = parse_opts()
 
-    context.set_context(mode=context.GRAPH_MODE, save_graphs=False, device_target='Ascend', device_id=args.device_id)
+    context.set_context(mode=context.GRAPH_MODE, save_graphs=False, device_target=cfg.device, device_id=cfg.device_id)
 
     fdim = [50]
-    natt = [args.natt]
+    natt = [cfg.natt]
     nclass = 1024
     feature = Tensor(np.zeros([10240, 25, 50]).astype(np.float32))
 
     # define net
-    net = AttentionCluster(fdims=fdim, natts=natt, nclass=nclass, fc=args.fc)
+    net = AttentionCluster(fdims=fdim, natts=natt, nclass=nclass, fc=cfg.fc)
 
     # load checkpoint
-    param_dict = load_checkpoint(ckpt_file_name=args.ckpt)
+    param_dict = load_checkpoint(ckpt_file_name=cfg.ckpt)
     load_param_into_net(net, param_dict)
     net.set_train(False)
 
-    export(net, feature, file_name='attention_cluster_{}'.format(args.natt), file_format='MINDIR')
+    export(net, feature, file_name='attention_cluster_{}'.format(cfg.natt), file_format='MINDIR')
