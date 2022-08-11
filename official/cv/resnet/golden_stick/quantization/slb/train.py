@@ -137,6 +137,11 @@ def load_pretrained_ckpt(net):
                 config.has_trained_epoch = 0
                 config.has_trained_step = 0
 
+            if config.has_trained_epoch > config.epoch_size:
+                raise RuntimeError("If retrain, epoch_size should be bigger than has_trained_epoch after "
+                                   "loading pretrained weight, but got epoch_size {}, has_trained_epoch {}"
+                                   "".format(config.epoch_size, config.has_trained_epoch))
+
             if config.filter_weight:
                 filter_list = [x.name for x in net.end_point.get_parameters()]
                 filter_checkpoint_parameter_by_list(ckpt, filter_list)
