@@ -805,8 +805,8 @@ Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some com
 
 - **Q: Why does modifying the max_instance_count parameter in the yaml configuration file report the problem that the shape does not correspond?**
 
-  **A**: Because the values of max_instance_count and num_gts are not equal. When modifying max_instance_count, num_gts also needs to be modified accordingly, and their values need to remain equal.
+  **A**: Because the max_instance_count parameter and the num_gts parameter both represent the maximum number of positive samples in the picture, the former is used in the data and the latter is used in the network. When the parameters are modified, they should be kept equal.
 
 - **Q: Why does modifying the mask_shape parameter in the yaml configuration file report the problem that the shape does not correspond?**
 
-  **A**: Because the value relationship between mask_shape and mask_out_size is incorrect. The value of mask_shape should be twice the value of mask_out_size. For example: when mask_shape=[46, 46], mask_out_size=23。
+  **A**: Because the mask_shape parameter represents the shape of the mask label in the rcnn_mask network and the mask_out_size parameter represents the shape of the input ROI area in the rcnn network, since the ROI area in the rcnn network needs to be upsampled twice before Logits are obtained, in order to ensure that the shape of the label and Logits are the same, the mask_shape parameter needs to satisfy the relationship of twice the mask_out_size parameter. For example: when mask_shape=[46, 46], mask_out_size=23。

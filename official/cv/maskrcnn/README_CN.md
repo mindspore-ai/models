@@ -748,8 +748,8 @@ Accumulating evaluation results...
 
 - **Q: 为什么修改yaml配置文件中的max_instance_count参数会报shape对应不上的问题？**
 
-  **A**: 是因为max_instance_count和num_gts的值不相等导致。在修改max_instance_count时，num_gts也需要做相应修改，且它们的值需保持相等。
+  **A**: 因为max_instance_count参数和num_gts参数二者均表示图片中的最大正样本个数，前者在数据中使用，后者在网络中使用，在参数修改时，二者应该保持相等。
 
 - **Q: 为什么修改yaml配置文件中的mask_shape参数会报shape对应不上的问题？**
 
-  **A**: 是因为mask_shape和mask_out_size的取值关系不对导致。mask_shape的取值应该是mask_out_size值的二倍。 例如:当mask_shape=[46, 46]时，mask_out_size=23。
+  **A**: 因为mask_shape参数表示rcnn_mask网络中掩码label的shape，mask_out_size参数表示rcnn网络中输入roi区域的shape，由于rcnn网络中的roi区域需要做2倍上采样后才得到logits，为了保证label和logits的shape相同，mask_shape需要满足mask_out_size的2倍关系。
