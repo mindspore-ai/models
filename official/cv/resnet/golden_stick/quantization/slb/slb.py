@@ -17,12 +17,19 @@
 from mindspore_gs.quantization.slb import SlbQuantAwareTraining as SlbQAT
 from mindspore_gs.quantization.constant import QuantDtype
 
-def create_slb(quant_type="W1"):
+def create_slb(config):
     algo = SlbQAT()
-    if "W4" in quant_type:
-        algo.set_weight_quant_dtype(QuantDtype.INT4)
-    elif "W2" in quant_type:
-        algo.set_weight_quant_dtype(QuantDtype.INT2)
-    elif "W1" in quant_type:
+    if "W1" in config.quant_type:
         algo.set_weight_quant_dtype(QuantDtype.INT1)
+    elif "W2" in config.quant_type:
+        algo.set_weight_quant_dtype(QuantDtype.INT2)
+    elif "W4" in config.quant_type:
+        algo.set_weight_quant_dtype(QuantDtype.INT4)
+
+    algo.set_epoch_size(config.epoch_size)
+    algo.set_has_trained_epoch(config.has_trained_epoch)
+    algo.set_t_start_val(config.t_start_val)
+    algo.set_t_start_time(config.t_start_time)
+    algo.set_t_end_time(config.t_end_time)
+    algo.set_t_factor(config.t_factor)
     return algo

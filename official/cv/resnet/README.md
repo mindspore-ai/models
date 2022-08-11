@@ -824,7 +824,7 @@ MindSpore Golden Stick provides SLB algorithm for ResNet18. SLB is provided by H
 | **supported backend**  | GPU | GPU、Ascend | GPU |
 | **support pretrain** | yes | must provide pretrained ckpt | don't need and can't load pretrained ckpt |
 | **support continue-train** | yes | yes | yes |
-| **support distribute train** | yes | yes | no |
+| **support distribute train** | yes | yes | yes |
 
 - `pretrain` means training the network without applying algorithm. `pretrained ckpt` is loaded when training network with algorithm applied.
 - `continue-train` means stop the training process after applying algorithm and continue training process from checkpoint file of previous training process.
