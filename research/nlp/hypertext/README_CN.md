@@ -300,7 +300,7 @@ acc: 0.8180614591317679
 | 优化器                  | radam                                                     |  radam|
 | 损失函数              | SoftmaxCrossEntropyWithLogits               | SoftmaxCrossEntropyWithLogits |
 | 输出                    | 精度                                                          |  精度 |
-| 损失                      | 0.9087                                                    |  0.905 |
+| 损失                      | 0.818                                                    |  0.818 |
 | 速度                      | 1958.810毫秒/步（单卡）                          | 315.949毫秒/步（单卡） |
 
 ##### iflytek上的HyperText
