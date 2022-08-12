@@ -335,7 +335,7 @@ def train_net():
         model = ms.Model(net, loss_fn=loss, optimizer=opt, metrics=metrics, eval_network=dist_eval_network)
     else:
         model = ms.Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale, metrics=metrics,
-                         amp_level="O2", boost_level=config.boost_mode, keep_batchnorm_fp32=False,
+                         amp_level="O3", boost_level=config.boost_mode,
                          eval_network=dist_eval_network,
                          boost_config_dict={"grad_freeze": {"total_steps": config.epoch_size * step_size}})
 
@@ -347,7 +347,7 @@ def train_net():
                       config.batch_size, split_indices=split_indices, frequency=config.frequency)
         model = ConvertModelUtils().convert_to_thor_model(model=model, network=net, loss_fn=loss, optimizer=opt,
                                                           loss_scale_manager=loss_scale, metrics={'acc'},
-                                                          amp_level="O2", keep_batchnorm_fp32=False)
+                                                          amp_level="O3")
         config.run_eval = False
         logger.warning("Thor optimizer not support evaluation while training.")
 
