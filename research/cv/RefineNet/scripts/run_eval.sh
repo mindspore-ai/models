@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# -ne 3 ]
+if [ $# -ne 4 ]
 then 
     echo "Usage: bash scripts/run_eval_ascend.sh [DATA_LST] [PRETRAINED_PATH] [DEVICE_TARGET] [DEVICE_ID]"
 exit 1
@@ -59,6 +59,6 @@ cp -r ../src $LOCAL_DIR
 cd $LOCAL_DIR || exit
 echo "start training for device $DEVICE_ID"
 env > env.log
-python eval.py --data_lst=$DATASET_PATH --ckpt_path=$PRETRAINED_PATH --device_target=DEVICE_TARGET --device_id=$DEVICE_ID --flip &> log &
+python eval.py --data_lst=$DATASET_PATH --ckpt_path=$PRETRAINED_PATH --device_target=$DEVICE_TARGET --device_id=$DEVICE_ID --flip &> log &
 cd ..
 
