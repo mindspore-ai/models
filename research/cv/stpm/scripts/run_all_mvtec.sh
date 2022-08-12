@@ -46,7 +46,7 @@ mod=$(($total_num % $device_num))
 
 arr=("bottle" "cable" "capsule" "carpet" "grid" "hazelnut" "leather" "metal_nut" "pill" "screw" "tile" "toothbrush" "transistor" "wood" "zipper")
 
-exec_train_eavl(){
+exec_train_eval(){
   for value in $arr_sub
   do
     sleep 2s
@@ -67,5 +67,5 @@ do
   arr_sub=${arr[*]:$start:$sclie}
   device_id=$i
   echo "start: $start, end: $end, category: "$arr_sub, $device_id
-  exec_train_eavl $arr_sub &> log$i &
+  exec_train_eval $arr_sub &> log$i &
 done

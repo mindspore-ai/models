@@ -17,21 +17,23 @@ import os
 import ast
 import codecs
 import argparse
-
 import cv2
 import numpy as np
 from sklearn.metrics import roc_auc_score
+
 from mindspore import context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore import ops
+
 from src.dataset import createDataset
 from src.stpm import STPM
 
 parser = argparse.ArgumentParser(description='test')
 
+parser.add_argument('--device_target', type=str, choices=['Ascend', 'GPU', 'CPU'], default='Ascend')
 parser.add_argument('--category', type=str, default='screw')
 parser.add_argument('--device_id', type=int, default=0, help='Device id')
-parser.add_argument('--data_url', type=str, default="/")
+parser.add_argument('--dataset_path', type=str, default="/")
 parser.add_argument('--save_sample', type=ast.literal_eval, default=False, help='Whether to save the infer image')
 parser.add_argument('--save_sample_path', type=str, default="", help='The path to save infer image')
 parser.add_argument('--ckpt_path', type=str, default='./', help="The path to save checkpoint")
@@ -129,14 +131,14 @@ def cal_anomaly_map(fs_list, ft_list, out_size=224):
 
 if __name__ == "__main__":
     context.set_context(mode=context.GRAPH_MODE,
-                        device_target='Ascend',
+                        device_target=args.device_target,
                         save_graphs=False,
                         device_id=args.device_id)
 
-    _, ds_test = createDataset(args.data_url, args.category, save_sample=args.save_sample, out_size=args.out_size)
+    _, ds_test = createDataset(args.dataset_path, args.category, save_sample=args.save_sample, out_size=args.out_size)
 
     net = STPM(args, is_train=False)
-    param = load_checkpoint(os.path.join(args.ckpt_path))
+    param = load_checkpoint(args.ckpt_path)
     load_param_into_net(net, param)
     net.set_train(False)
 

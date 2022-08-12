@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-'''
-STPM Network
-'''
+""" STPM Network """
 
 import mindspore.nn as nn
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -41,9 +39,7 @@ def load_ckpt_to_net(network, args):
 
 
 class STPM(nn.Cell):
-    '''
-    STPM Network
-    '''
+    """ STPM Network """
     def __init__(self, args, is_train=True, finetune=False):
         super(STPM, self).__init__()
         use_batch_statistics = False if is_train else None

@@ -1,199 +1,236 @@
-目录
+# Content
 
-- [目录](#目录)
-- [STPM概述](#STPM概述)
-- [数据集](#数据集)
-- [环境要求](#环境要求)
-- [快速入门](#快速入门)
-    - [脚本说明](#脚本说明)
-        - [脚本和样例代码](#脚本和样例代码)
-        - [脚本参数](#脚本参数)
-        - [预训练模型](#预训练模型)
-        - [训练过程](#训练过程)
-            - [训练](#训练)
-        - [评估过程](#评估过程)
-            - [评估](#评估)
-        - [导出mindir模型](#导出mindir模型)
-        - [推理过程](#推理过程)
-            - [用法](#用法)
-            - [结果](#结果)
-- [模型描述](#模型描述)
-    - [性能](#性能)
-        - [训练性能](#训练性能)
-- [随机情况说明](#随机情况说明)
-- [ModelZoo主页](#ModelZoo主页)
+[查看中文](./README_CN.md)
+
+<!-- TOC -->
+
+- [Content](#content)
+- [STPM Description](#stpm-description)
+- [Dataset](#dataset)
+- [Model Architecture](#model-architecture)
+- [Environment Requirements](#environment-requirements)
+- [Quick Start](#quick-start)
+- [Script Description](#script-description)
+    - [Script and Sample Code](#script-and-sample-code)
+    - [Script Parameters](#script-parameters)
+    - [Pretrained Model](#pretrained-model)
+    - [Training Process](#training-process)
+        - [Usage](#usage)
+    - [Evaluation Process](#evaluation-process)
+        - [Usage](#usage-2)
+        - [Result](#result-2)
+    - [Export mindir model](#export-mindir-model)
+    - [Inference Process](#inference-process)
+        - [Usage](#usage-3)
+        - [Result](#result-3)
+- [Model Description](#model-description)
+    - [Performance](#performance)
+- [Description of Random State](#description-of-random-state)
+- [ModelZoo Homepage](#modelzoo-homepage)
 
 <!-- /TOC -->
 
-# STPM概述
+# STPM Model
 
-该模型总体分为两个网络，教师与学生网络。教师网络是个在图片分类任务中预训练的网络，学生网络则具有与之相同的架构。如果测试图像或像素在两个网络中的特征有显著差异，则其具有较高的异常分数。两个网络之间具有分层特征对齐的功能，使其能够通过一次正向检测出不同大小的异常。
+The model is generally divided into two networks, the teacher and the student network. The teacher network is a network pretrained on the image classification task, and the student network has the same architecture. A test image or pixel has a high anomaly score if its features in the two networks are significantly different. Hierarchical feature alignment between the two networks enables it to detect anomalies of different sizes in one forward pass.
 
-[论文](https://arxiv.org/pdf/2103.04257v2.pdf)： Wang G ,  Han S ,  Ding E , et al. Student-Teacher Feature Pyramid Matching for Unsupervised Anomaly Detection[J].  2021.
+[Paper](https://arxiv.org/pdf/2103.04257v2.pdf)： Wang G ,  Han S ,  Ding E , et al. Student-Teacher Feature Pyramid Matching for Unsupervised Anomaly Detection[J].  2021.
 
-# 数据集
+# Dataset
 
-使用的训练数据集：[MVTec AD](https://www.mvtec.com/company/research/datasets/mvtec-ad/)
+Dataset used：[MVTec AD](https://www.mvtec.com/company/research/datasets/mvtec-ad/)
 
-- 数据集大小：4.9G，共15个类、5354张图片(尺寸在700x700~1024x1024之间)
-    - 训练集：共3629张
-    - 测试集：共1725张
+- Dataset size：4.9G，15 classes、5354 images(700x700-1024x1024)
+    - Train：3629 images
+    - Val：1725 images
 
-# 环境要求
+# Environment Requirements
 
-- 硬件：昇腾处理器（Ascend）
-    - 使用Ascend处理器来搭建硬件环境。
-
-- 框架
+- Hardware: Ascend/GPU
+    - Prepare hardware environment with Ascend or GPU.
+- Framework
     - [MindSpore](https://www.mindspore.cn/install)
-- 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+- For more information about MindSpore, please check the resources below:
+    - [MindSpore tutorial](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
-# 快速入门
+# Quick start
 
-通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
+After installing MindSpore through the official website, you can follow the steps below for training and evaluation:
+
+- Ascend
 
 ```shell
-# 单机训练运行示例
+# single card training
 cd scripts
 bash run_standalone_train.sh  /path/dataset /path/backbone_ckpt category 1
-在单张卡上执行所有的mvtec数据
+# train all mvtec datasets on single card
 cd scripts
 bash run_all_mvtec.sh  /path/dataset /path/backbone_ckpt 1
 
-# 运行评估示例
-cd scripts
+# eval
 bash run_eval.sh  /path/dataset /path/ckpt category 1
 ```
 
-## 脚本说明
+- GPU
 
-## 脚本和样例代码
+```python
+# train
+bash scripts/run_standalone_train_gpu.sh [DATASET_PATH] [CKPT_PATH] [CATEGORY] [DEVICE_ID]
+
+# eval
+bash scripts/run_eval_gpu.sh [DATASET_PATH] [CKPT_PATH] [CATEGORY] [DEVICE_ID]
+```
+
+## Script Description
+
+## Script and Sample Code
 
 ```text
-└── stpm
- ├── README.md                          // STPM相关描述
- ├── ascend_310_infer                   // 310推理相关文件
-  ├── inc
-   └── utils.h
-  ├── src
-   ├── main.cc
-   └── utils.cc
-  ├── build.sh
-  ├── Cmakelists.txt
+├── STPM  
+ ├── README.md
+ ├── README_CN.md
+ ├── ascend_310_infer              // 310 inference
+   ├── inc
+     └── utils.h
+   ├── src
+     ├── main.cc
+     └── utils.cc
+   ├── build.sh
+   └── Cmakelists.txt
  ├── scripts
-  ├── run_310_infer.sh                  // 用于310推理的脚本
-  ├── run_all_mvtec.sh                  // 执行所有mvtec数据集的训练推理
-  ├── run_standalone_train.sh           // 用于单机训练的shell脚本
-  └── run_eval.sh                       // 用于评估的shell脚本
+   ├── run_310_infer.sh            // 310 inference
+   ├── run_standalone_train.sh     // train on Ascend
+   ├── run_standalone_train_gpu.sh
+   ├── run_all_mvtec.sh            // Perform training and evaluation on all mvtec datasets on Ascend
+   ├── run_eval_gpu.sh
+   └── run_eval.sh                 // Eval on Ascend
  ├──src
-  ├── loss.py                           //损失函数
-  ├── dataset.py                        // 创建数据集
-  ├── callbacks.py                      // 回调
-  ├── resnet.py                         // ResNet架构
-  ├── stpm.py
-  ├── pth2ckpt.py                       // 该脚本可将torch的pth文件转为ckpt
-  ├── utils.py
- ├── test.py                            // 测试脚本
- ├── train.py                           // 训练脚本
- ├── preprocess.py                      // 310推理前处理脚本
- ├── postprocess.py                     // 310推理后处理脚本
- ├── requirements.txt                   //requirements
+   ├── loss.py
+   ├── dataset.py
+   ├── callbacks.py
+   ├── resnet.py
+   ├── stpm.py
+   ├── pth2ckpt.py
+   └── utils.py
+ ├── eval.py
+ ├── train.py
+ ├── preprocess.py                  // 310 inference
+ ├── postprocess.py                 // 310 inference
+ └── requirements.txt
 ```
 
-## 脚本参数
+## Script Parameters
 
 ```text
-train.py和test.py中主要参数如下：
+main parameters in train.py and eval.py:
 
--- modelarts：是否使用modelarts平台训练。可选值为True、False。默认为False。
--- device_id：用于训练或评估数据集的设备ID。当使用train.sh进行分布式训练时，忽略此参数。
--- train_url：checkpoint的输出路径。
--- pre_ckpt_path：预训练模型的加载路径。
--- save_sample：是否保存推理时的图片。
--- save_sample_path：保存推理图片的路径。
--- data_url：训练集路径。
--- ckpt_url：checkpoint路径。
--- eval_url：验证集路径。
-
+-- modelarts：whether to use the modelarts platform to train. Choose from True, False. Default is False.
+-- device_target: Choose from [Ascend, GPU]. Default is Ascend.
+-- device_id：Device ID used to train or evaluate the dataset. This parameter is ignored when using train.sh for distributed training.
+-- train_url：output path for checkpoints
+-- pre_ckpt_path：path to resnet18 pretrained checkpoints
+-- save_sample：whether to save the picture during inference
+-- save_sample_path：path to save the inference image
+-- dataset_path：path to dataset
+-- ckpt_path：path to checkpoint
+-- eval_url：path to test dataset
 ```
 
-## 预训练模型
+## pretrained model
 
-本模型的预训练模型为ResNet18，使用该预训练模型加载到教师网络中，而学生网络则不使用预训练模型。可以从以下方式进行预训练模型的获取。
+The pretrained model is ResNet18. Load pretrained model into the teacher network,
+while the student network does not use a pretrained model. Pretrained model can be obtained in the following ways:
 
-1. 从modelzoo中下载ResNet18在ImageNet2012上进行训练得到预训练模型。由于modelzoo中ImageNet2012设置的类别数为1001，此时在训练推理时需要将参数num_class改为1001。
-2. 下载pytorch的ResNet18预训练模型，通过src/pth2ckpt.py脚本完成转换。
-3. 直接下载我们通过方式2转换完成的模型，[点此下载](https://download.mindspore.cn/thirdparty/stpm_backbone.ckpt)。
+- Download ResNet18 from modelzoo and train on ImageNet2012 to get a pretrained model. Since the number of categories set by ImageNet2012 in modelzoo is 1001. At this point, you need to change the parameter num_class to 1001 when training inference.
+- Download pytorch's ResNet18 pretrained model and convert to mindspore format via src/pth2ckpt.py script.
+- Download ready checkpoints from [here](https://download.mindspore.cn/model_zoo/r1.3/resnet18_ascend_v130_imagenet2012_official_cv_bs256_acc70.64/).
 
-## 训练过程
+## Training Process
 
-### 训练
+### Usage
+
+- Ascend
 
 ```shell
 bash scripts/run_standalone_train.sh [DATASET_PATH] [BACKONE_PATH] [CATEGORY] [DEVICE_ID]
-对于mvtec数据集，可以执行以下命令，DEVICE_NUM为需要执行的卡数，mvtec下的15个数据集将分别独立运行于各个卡上。
+# For all mvtec dataset you can execute the following command, DEVICE_NUM is the number of cards to be executed, and the 15 datasets under mvtec will run independently on each card.
 bash scripts/run_all_mvtec.sh [DATASET_PATH] [BACKONE_PATH] [DEVICE_NUM]
 ```
 
-上述shell脚本将在后台运行训练。可以通过对应的类别目录下的`train.log`文件查看结果。
+- GPU
 
-## 评估过程
+```shell
+bash scripts/run_standalone_train_gpu.sh [DATASET_PATH] [BACKONE_PATH] [CATEGORY] [DEVICE_ID]
+# For all mvtec dataset you can execute the following command, DEVICE_NUM is the number of cards to be executed, and the 15 datasets under mvtec will run independently on each card.
+bash scripts/run_all_mvtec.sh [DATASET_PATH] [BACKONE_PATH] [DEVICE_NUM]
+```
 
-### 评估
+The above shell script will run the training in the background. The results can be viewed through the `train.log` file.
 
-- 在Ascend环境运行时评估
+## Evaluation process
 
-  ```bash
-  bash scripts/run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [CATEGORY]
-  ```
+### Usage
 
-  上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
+- Ascend
+
+```shell
+bash scripts/run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [CATEGORY] [DEVICE_ID]
+```
+
+- GPU
+
+```shell
+bash scripts/run_eval_gpu.sh [DATASET_PATH] [CKPT_PATH] [CATEGORY] [DEVICE_ID]
+```
+
+### Result
+
+The above python command will run in the background and you can view the results in `eval.log` file. The accuracy of the test dataset is as follows:
 
 |  Category  | pixel-level | image-level |
 | :--------: | :---------: | :---------: |
-| bottle  | 0.987  | 1.000  |
-| cable  | 0.959  | 0.983  |
-| capsule  | 0.984  | 0.868  |
-| carpet  | 0.988  | 0.998  |
-| grid  | 0.990  | 0.997  |
-| hazelnut  | 0.989  | 1.000  |
-| leather  | 0.994  | 1.000  |
-| metal_nut  | 0.976  | 1.000  |
-| pill  | 0.973  | 0.962  |
-| screw  | 0.962  | 0.921  |
-| tile  | 0.965  | 0.978  |
-| toothbrush  | 0.985  | 0.911  |
-| transistor  | 0.829  | 0.942  |
-| wood  | 0.964  | 0.992  |
-| zipper  | 0.981  | 0.910  |
-| mean  | 0.968  | 0.964  |
+| bottle     | 0.987       | 1.000  |
+| cable      | 0.959       | 0.983  |
+| capsule    | 0.984       | 0.868  |
+| carpet     | 0.988       | 0.998  |
+| grid       | 0.990       | 0.997  |
+| hazelnut   | 0.989       | 1.000  |
+| leather    | 0.994       | 1.000  |
+| metal_nut  | 0.976       | 1.000  |
+| pill       | 0.973       | 0.962  |
+| screw      | 0.962       | 0.921  |
+| tile       | 0.965       | 0.978  |
+| toothbrush | 0.985       | 0.911  |
+| transistor | 0.829       | 0.942  |
+| wood       | 0.964       | 0.992  |
+| zipper     | 0.981       | 0.910  |
+| mean       | 0.968       | 0.964  |
 
-## 导出mindir模型
+## Export mindir model
 
 ```python
 python export.py --ckpt_file [CKPT_PATH] --category [FILE_NAME] --file_format [FILE_FORMAT]
 ```
 
-参数`ckpt_file` 是必需的，`EXPORT_FORMAT` 必须在 ["AIR", "MINDIR"]中进行选择。
+Argument `ckpt_file` is required, `EXPORT_FORMAT` choose from ["AIR", "MINDIR"].
 
-# 推理过程
+# Inference Process
 
-## 用法
+## Usage
 
-在执行推理之前，需要通过export.py导出mindir文件。
+Before performing inference, the mindir file needs to be exported via `export.py`.
 
-```bash
-# Ascend310 推理
-bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CATEGORY]
+```shell
+# Ascend310 inference
+bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
 ```
 
-`DEVICE_TARGET` 可选值范围为：['GPU', 'CPU', 'Ascend']，`NEED_PREPROCESS` 表示数据是否需要预处理，可选值范围为：'y' 或者 'n'，这里直接选择‘y’，`DEVICE_ID` 为设备id，`CATEGORY` 为类别。
+`DEVICE_TARGET` choose from：['GPU', 'CPU', 'Ascend']，`NEED_PREPROCESS` Indicates whether the data needs to be preprocessed. The optional value range is:'y' or 'n'，choose ‘y’，`DEVICE_ID` optional, default is 0.
 
-### 结果
+### Result
 
-推理结果保存在当前路径，可在acc.log中看到最终精度结果。推理结果示例如下。
+The inference result is saved in the current path, and the final accuracy result can be seen in `acc.log`.
 
 ```text
 category:  zipper
@@ -201,31 +238,32 @@ Total pixel-level auc-roc score :  0.980967986777201
 Total image-level auc-roc score :  0.909926470588235
 ```
 
-# 模型描述
+# Model Description
 
-## 性能
+## Performance
 
-### 训练性能
+### Training Performance
 
-| 参数          | stpm                                            |
-| ------------- | ----------------------------------------------- |
-| 模型版本      | stpm                                            |
-| 资源          | Ascend 910； CPU： 2.60GHz，192内核；内存，755G |
-| 上传日期      | 2021-12-25                                      |
-| MindSpore版本 | 1.5.0                                           |
-| 数据集        | MVTec AD                                        |
-| 训练参数      | lr=0.4                                          |
-| 优化器        | SGD                                             |
-| 损失函数      | MSELoss                                         |
-| 输出          | 概率                                            |
-| 损失          | 2.6                                             |
-| 总时间        | 1卡：0.6小时                                    |
+| Parameter     | Ascend                                          | GPU |
+| ------------- | ----------------------------------------------- | --- |
+| Model         | STPM                                            | STPM |
+| Environment   | Ascend 910; CPU: 2.60GHz, 192 cores; memory, 755G | Ubuntu 18.04.6, Tesla V100 1p, CPU 2.90GHz, 64cores, RAM 252GB |
+| Upload Date   | 2021-12-25                                      | 2022-03-01 |
+| MindSpore version | 1.5.0                                       | 1.5.0 |
+| Dataset       | MVTec AD                                        | MVTec AD (zipper) |
+| Training parameters | lr=0.4, epochs=100                        | lr=0.4, epochs=100 |
+| Optimizer     | SGD                                             | SGD |
+| Loss func     | MSELoss                                         | MSELoss |
+| Output        | probability                                     | probability |
+| Loss          | 2.6                                             | 2.46 |
+| Speed         |                                                 | 860 ms/step |
+| Total time    | 1 card: 0.6h                                    | 0.5h |
+| ROC-AUC (pixel-level) | 0.981                                   | 0.9874 |
 
-# 随机情况说明
+# Description of Random State
 
-网络的初始参数均为随即初始化。
+The initial parameters of the network are all initialized at random.
 
-# ModelZoo主页  
+# ModelZoo Homepage  
 
- 请浏览官网[主页](https://gitee.com/mindspore/models)。
-
+Please check the official [homepage](https://gitee.com/mindspore/models).
