@@ -18,7 +18,6 @@ import os
 import numpy as np
 import mindspore as ms
 import mindspore.nn as nn
-import mindspore.train.callback as callback
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.communication.management import init, get_rank
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
@@ -98,6 +97,8 @@ def set_parameter():
         ms.set_auto_parallel_context(device_num=config.device_num,
                                      parallel_mode=ms.ParallelMode.DATA_PARALLEL,
                                      gradients_mean=True)
+        # Allreduce is not supported for network with dynamic control flow.
+        ms.set_auto_parallel_context(comm_fusion={"allreduce": {"mode": "size", "config": 0}})
 
 
 def init_weight(net):
@@ -126,7 +127,8 @@ def init_weight(net):
                 cell.weight.set_data(weight)
 
 
-def load_pretrained_ckpt(net):
+def get_pretrained_epoch(net):
+    """get_pretrained_epoch"""
     if config.pre_trained:
         if os.path.isfile(config.pre_trained):
             ckpt = ms.load_checkpoint(config.pre_trained)
@@ -141,7 +143,29 @@ def load_pretrained_ckpt(net):
                 raise RuntimeError("If retrain, epoch_size should be bigger than has_trained_epoch after "
                                    "loading pretrained weight, but got epoch_size {}, has_trained_epoch {}"
                                    "".format(config.epoch_size, config.has_trained_epoch))
+        else:
+            print(f"Invalid pre_trained {config.pre_trained} parameter.")
+    else:
+        config.has_trained_epoch = 0
+        config.has_trained_step = 0
 
+
+def load_pretrained_ckpt(net):
+    """load_pretrained_ckpt"""
+    if config.pre_trained:
+        if os.path.isfile(config.pre_trained):
+            ckpt = ms.load_checkpoint(config.pre_trained)
+            if ckpt.get("epoch_num") and ckpt.get("step_num"):
+                config.has_trained_epoch = int(ckpt["epoch_num"].data.asnumpy())
+                config.has_trained_step = int(ckpt["step_num"].data.asnumpy())
+            else:
+                config.has_trained_epoch = 0
+                config.has_trained_step = 0
+
+            if config.has_trained_epoch > config.epoch_size:
+                raise RuntimeError("If retrain, epoch_size should be bigger than has_trained_epoch after "
+                                   "loading pretrained weight, but got epoch_size {}, has_trained_epoch {}"
+                                   "".format(config.epoch_size, config.has_trained_epoch))
             if config.filter_weight:
                 filter_list = [x.name for x in net.end_point.get_parameters()]
                 filter_checkpoint_parameter_by_list(ckpt, filter_list)
@@ -184,41 +208,6 @@ def init_loss_scale():
     return loss
 
 
-class TemperatureScheduler(callback.Callback):
-    """
-    TemperatureScheduler for SLB.
-    """
-    def __init__(self, model, epoch_size=100, has_trained_epoch=0,
-                 t_start_val=1.0, t_start_time=0.2, t_end_time=0.6, t_factor=1.2):
-        super().__init__()
-        self.epochs = epoch_size
-        self.has_trained_epoch = has_trained_epoch
-        self.t_start_val = t_start_val
-        self.t_start_time = t_start_time
-        self.t_end_time = t_end_time
-        self.t_factor = t_factor
-        self.model = model
-
-    def epoch_begin(self, run_context):
-        """
-        Epoch_begin.
-        """
-        cb_params = run_context.original_args()
-        epoch = cb_params.cur_epoch_num + self.has_trained_epoch
-        # Compute temperature value
-        t = self.t_start_val
-        t_start_epoch = int(self.epochs*self.t_start_time)
-        t_end_epoch = int(self.epochs*self.t_end_time)
-        if epoch > t_start_epoch:
-            t *= self.t_factor**(min(epoch, t_end_epoch) - t_start_epoch)
-        # Assign new value to temperature parameter
-        for _, cell in self.model.train_network.cells_and_names():
-            if cell.cls_name == 'SlbFakeQuantizerPerLayer': # for SLB
-                cell.set_temperature(t)
-                if epoch >= t_end_epoch:
-                    cell.set_temperature_end_flag()
-
-
 def train_net():
     """train net"""
     print("Train configure: {}".format(config))
@@ -234,7 +223,8 @@ def train_net():
     net = resnet(class_num=config.class_num)
 
     init_weight(net)
-    algo = create_slb(config.quant_type)
+    get_pretrained_epoch(net)
+    algo = create_slb(config)
     net = algo.apply(net)
     load_pretrained_ckpt(net)
 
@@ -270,10 +260,9 @@ def train_net():
 
     cb = [time_cb, loss_cb]
     if algo:
-        algo_cb = algo.callback()
-        cb.append(algo_cb)
-        cb.append(TemperatureScheduler(model, config.epoch_size, config.has_trained_epoch, config.t_start_val,
-                                       config.t_start_time, config.t_end_time, config.t_factor))
+        algo_cb_list = algo.callbacks(model)
+        cb += algo_cb_list
+
     ckpt_save_dir = set_save_ckpt_dir()
     if config.save_checkpoint:
         ckpt_append_info = [{"epoch_num": config.has_trained_epoch, "step_num": config.has_trained_step}]
@@ -286,7 +275,6 @@ def train_net():
     dataset_sink_mode = target != "CPU"
     model.train(config.epoch_size - config.has_trained_epoch, dataset, callbacks=cb,
                 sink_size=dataset.get_dataset_size(), dataset_sink_mode=dataset_sink_mode)
-
 
 if __name__ == '__main__':
     train_net()

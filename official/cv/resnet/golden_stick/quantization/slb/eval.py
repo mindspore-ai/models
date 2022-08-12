@@ -46,7 +46,7 @@ def eval_net():
 
     # define net
     net = resnet(class_num=config.class_num)
-    algo = create_slb(config.quant_type)
+    algo = create_slb(config)
     net = algo.apply(net)
 
     # load checkpoint
