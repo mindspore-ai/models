@@ -11,7 +11,11 @@
     - [训练过程](#训练过程)
         - [启动](#启动)
         - [结果](#结果)
-    - [评估过程](#评估过程)
+    - [评估过程](#ckpt模型评估过程)
+        - [启动](#启动-1)
+        - [结果](#结果-1)
+    - [导出ONNX模型](#导出ONNX模型)
+    - [评估过程](#onnx模型评估过程)
         - [启动](#启动-1)
         - [结果](#结果-1)
 - [模型说明](#模型说明)
@@ -76,6 +80,7 @@ Mnasnet总体网络架构如下：
   │   ├──lr_generator.py           # 配置学习率
   │   └──Monitor.py                # 监控网络损失和其他数据
   ├── eval.py                      # 评估脚本
+  ├── eval_onnx.py                 # ONNX模型评估脚本
   ├── export.py                    # 模型格式转换脚本
   └── train.py                     # 训练脚本
 ```
@@ -152,7 +157,7 @@ epoch: [  6/250], step:[  624/  625], loss:[3.689/3.689], time:[300148.012], lr:
 epoch time: 301278.408, per step time: 482.045, avg loss: 3.689
 ```
 
-## 评估过程
+## ckpt模型评估过程
 
 ### 启动
 
@@ -177,6 +182,39 @@ epoch time: 301278.408, per step time: 482.045, avg loss: 3.689
 
 ```shell
 result: {'Loss': 2.0364865480325163, 'Top_1_Acc': 0.7412459935897436, 'Top_5_Acc': 0.9159655448717948} ckpt= /disk2/mnas3/model_0/Mnasnet-rank0-250_625.ckpt
+```
+
+## 导出ONNX模型
+
+```shell
+python export.py --file_format onnx --checkpoint_path [PATH_CHECKPOINT] --file_name [FILE_NAME] --device_target GPU
+```
+
+## onnx模型评估过程
+
+### 启动
+
+您可以使用python或shell脚本进行评估。
+
+```shell
+# 评估示例
+  python:
+      Ascend评估：python eval_onnx.py --dataset_path [DATA_DIR] --onnx_url [ONNX_PATH] --device_target="Ascend"
+      GPU评估：python ./eval_onnx.py --dataset_path [DATA_DIR] --onnx_url [ONNX_PATH]
+  shell:
+      Ascend评估：bash ./scripts/run_eval_onnx.sh [DATA_DIR] [ONNX_PATH]
+      GPU评估：bash scripts/run_eval_gpu_onnx.sh [DATA_DIR] [ONNX_PATH]
+
+```
+
+### 结果
+
+可以在 `eval.log` 查看评估结果。
+
+```shell
+Top1-Acc: 0.7398
+Top5-Acc: 0.9169
+
 ```
 
 # 模型说明

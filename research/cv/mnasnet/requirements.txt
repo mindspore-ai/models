@@ -1,0 +1,6 @@
+python-Levenshtein
+Pillow
+xml-python
+pyyaml
+numpy
+onnxruntime-gpu
