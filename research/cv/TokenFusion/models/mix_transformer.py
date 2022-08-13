@@ -65,7 +65,7 @@ class Mlp(nn.Cell):
         hidden_features = hidden_features or in_features
         self.fc1 = ModuleParallel(nn.Dense(in_features, hidden_features))
         self.dwconv = DWConv(hidden_features)
-        self.act = ModuleParallel(nn.GELU())
+        self.act = ModuleParallel(nn.GELU(False))
         self.fc2 = ModuleParallel(nn.Dense(hidden_features, out_features))
         self.drop = ModuleParallel(nn.Dropout(drop))
 
@@ -292,11 +292,11 @@ class PredictorLG(nn.Cell):
                 nn.SequentialCell(
                     nn.LayerNorm([embed_dim]),
                     nn.Dense(embed_dim, embed_dim),
-                    nn.GELU(),
+                    nn.GELU(False),
                     nn.Dense(embed_dim, embed_dim // 2),
-                    nn.GELU(),
+                    nn.GELU(False),
                     nn.Dense(embed_dim // 2, embed_dim // 4),
-                    nn.GELU(),
+                    nn.GELU(False),
                     nn.Dense(embed_dim // 4, 2),
                     nn.LogSoftmax(axis=-1),
                 )

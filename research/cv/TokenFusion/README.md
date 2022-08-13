@@ -18,7 +18,7 @@
 
 TokenFusion is a multimodal token fusion method tailored for transformer-based vision tasks. To effectively fuse multiple modalities, TokenFusion dynamically detects uninformative tokens and substitutes these tokens with projected and aggregated inter-modal features. Residual positional alignment is also adopted to enable explicit utilization of the inter-modal alignments after fusion. The design of TokenFusion allows the transformer to learn correlations among multimodal features, while the single-modal transformer architecture remains largely intact. Extensive experiments are conducted on a variety of homogeneous and heterogeneous modalities and demonstrate that TokenFusion surpasses state-of-the-art methods in three typical vision tasks: multimodal image-to-image translation, RGB-depth semantic segmentation, and 3D object detection with point cloud and images.
 
-[Paper](https://arxiv.org/abs/2204.08721): Yikai Wang, Xinghao Chen, Lele Cao, Wenbing Huang, Fuchun Sun, Yunhe Wang. Multimodal Token Fusion for Vision Transformers. In CVPR 2022.
+[Paper](https://openaccess.thecvf.com/content/CVPR2022/papers/Wang_Multimodal_Token_Fusion_for_Vision_Transformers_CVPR_2022_paper.pdf): Yikai Wang, Xinghao Chen, Lele Cao, Wenbing Huang, Fuchun Sun, Yunhe Wang. **Multimodal Token Fusion for Vision Transformers**. In **CVPR 2022**.
 
 # [Model architecture](#contents)
 
@@ -80,10 +80,12 @@ To Be Done
 python eval.py --checkpoint_path  [CHECKPOINT_PATH]
 ```
 
+> Checkpoint can be downloaded at [here](https://download.mindspore.cn/models/r1.8/tokenfusion_ascend_v180_nyudv2_research_cv_acc54.8.ckpt) or [Mindspore Hub](https://www.mindspore.cn/resources/hub).
+
 ### Result
 
 ```bash
-result: IoU=54.2
+result: IoU=54.8, ckpt= ./tokenfusion_ascend_v180_nyudv2_research_cv_acc54.8.ckpt
 ```
 
 | Parameters                 | Ascend                                                       |
@@ -91,11 +93,11 @@ result: IoU=54.2
 |Model|TokenFusion|
 | Model Version              | tokenfusion_seg_mitb3_nyudv2                                                |
 | Resource                   | Ascend 910               |
-| Uploaded Date              | 2022-06-07                                 |
-| MindSpore Version          | 1.7.0                                                 |
+| Uploaded Date              | 2022-08-10                                |
+| MindSpore Version          | 1.8.0                                                 |
 | Dataset                    | NYUDv2                                              |
 | Outputs | probability                                                 |
-| Accuracy             | 1pc: 54.2%                   |
+| Accuracy             | 1pc: 54.8%                   |
 | Speed                      | 1pc：1s/step                        |
 
 # [Description of Random Situation](#contents)

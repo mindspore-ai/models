@@ -92,21 +92,20 @@ class SegFormerHead(nn.Cell):
 
         ############## MLP decoder on C1-C4 ###########
         n, _, _, _ = c4.shape
-        resize = ops.ResizeNearestNeighbor(c1.shape[2:], align_corners=False)
         _c4 = self.transpose(self.linear_c4(c4), (0, 2, 1)).reshape(
             n, -1, c4.shape[2], c4.shape[3]
         )
-        _c4 = resize(_c4)
+        _c4 = ops.interpolate(_c4, sizes=c1.shape[2:], coordinate_transformation_mode='half_pixel', mode='bilinear')
 
         _c3 = self.transpose(self.linear_c3(c3), (0, 2, 1)).reshape(
             n, -1, c3.shape[2], c3.shape[3]
         )
-        _c3 = resize(_c3)
+        _c3 = ops.interpolate(_c3, sizes=c1.shape[2:], coordinate_transformation_mode='half_pixel', mode='bilinear')
 
         _c2 = self.transpose(self.linear_c2(c2), (0, 2, 1)).reshape(
             n, -1, c2.shape[2], c2.shape[3]
         )
-        _c2 = resize(_c2)
+        _c2 = ops.interpolate(_c2, sizes=c1.shape[2:], coordinate_transformation_mode='half_pixel', mode='bilinear')
 
         _c1 = self.transpose(self.linear_c1(c1), (0, 2, 1)).reshape(
             n, -1, c1.shape[2], c1.shape[3]
