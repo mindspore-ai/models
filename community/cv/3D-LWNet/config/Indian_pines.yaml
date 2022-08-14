@@ -1,0 +1,46 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+data_path: "/cache/data"
+output_path: "/cache/train"
+load_path: "./checkpoint/train_Indian/"
+device_target: GPU
+checkpoint_path: "./checkpoint/"
+run_distribute: False
+enable_profiling: False
+ckpt_path: './checkpoint/train_Indian/'
+ckpt_file: './checkpoint/train_Indian/best_acc.ckpt'
+
+# ==============================================================================
+# Pre-training options
+class_num: 16
+momentum: 0.9
+weight_decay: 0.00001
+epoch_size: 30
+lr: 0.01
+warm: 0.1
+low_begin_epoch: 10
+save_checkpoint: True
+save_checkpoint_epochs: 3
+keep_checkpoint_max: 10
+model_name: "LWNet_3"
+dataset_name: "Indian"
+dataset_HSI: "indian_pines_corrected"
+dataset_gt: "indian_pines_gt"
+batch_size: 64
+window_size: 27
+pre_trained: False
+save_graphs: False
+
+---
+# Config description for each option
+enable_modelarts: 'Whether training on modelarts, default: False'
+data_url: 'Dataset url for obs'
+train_url: 'Training output url for obs'
+data_path: 'Dataset path for local'
+output_path: 'Training output path for local'
+device_target: 'Target device type'
+enable_profiling: 'Whether enable profiling while training, default: False'
+---
