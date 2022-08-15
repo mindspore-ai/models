@@ -348,7 +348,8 @@ if __name__ == '__main__':
         max_call_depth=2000)
 
     # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
-    context.set_context(mempool_block_size="31GB")
+    if context.get_context("mode") == context.PYNATIVE_MODE:
+        context.set_context(mempool_block_size="31GB")
 
     _rank_size = os.getenv('RANK_SIZE')
     get_config()

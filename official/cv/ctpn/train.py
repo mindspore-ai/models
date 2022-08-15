@@ -45,7 +45,8 @@ context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target,
     device_id=get_device_id(), save_graphs=True)
 
 # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
-context.set_context(mempool_block_size="20GB")
+if context.get_context("mode") == context.PYNATIVE_MODE:
+    context.set_context(mempool_block_size="20GB")
 
 binOps = {
     ast.Add: operator.add,
