@@ -1,0 +1,70 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unlesee you know exactly what you are doing)
+enable_modelarts: False
+# url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+# path for local
+data_path: ""
+output_path: ""
+load_path: ""
+device_target: "CPU"
+enable_profiling: False
+
+# ======================================================================================
+# common options
+num_classes: 5
+label_smooth_factor: 0.1
+model_size: "2.0x"
+device_id: 0
+dataset_path: "../flower_photos/"
+
+# ======================================================================================
+# Training options
+is_transfer: True
+epoch_size: 100
+save_ckpt_path: "./ckpt/"
+save_checkpoint: True
+amp_level: "O0"
+is_distributed: False
+resume: "./ckpt/shufflenetv1_ascend_v170_imagenet2012_official_cv_top1acc73.83_top5acc91.54.ckpt"
+
+# Dataset config
+batch_size: 128
+
+# learning rate config
+decay_method: "cosine"
+lr_init: 0.00
+lr_max: 0.50
+lr_end: 0.00
+warmup_epochs: 4
+loss_scale: 1024
+
+# optimization config
+weight_decay: 0.00004
+momentum: 0.9
+
+# ======================================================================================
+# Eval options
+ckpt_path: "./ckpt/shufflenetv1_transfer_best.ckpt"
+
+# ======================================================================================
+# export options
+file_name: "shufflenetv1"
+file_format: "MINDIR"
+
+---
+# Help description for each configuration
+enable_modelarts: "Whether training on modelarts default: False"
+data_url: "Url for modelarts"
+train_url: "Url for modelarts"
+data_path: "The location of input data"
+output_pah: "The location of the output file"
+device_target: "device id of GPU or Ascend. (Default: None)"
+enable_profiling: "Whether enable profiling while training default: False"
+is_distributed: "distributed training"
+resume: "resume training with existed checkpoint"
+model_size: "shuffleNetV1 model size choices 2.0x, 1.5x, 1.0x, 0.5x"
+device_id: "device id"
+file_name: "output file name"
+file_format: "file format choices [AIR MINDIR ONNX]"

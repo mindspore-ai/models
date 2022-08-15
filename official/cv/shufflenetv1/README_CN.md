@@ -51,7 +51,7 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
     - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
 # 脚本说明
 
@@ -68,6 +68,8 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
     ├─run_eval.sh                             # Ascend环境下的评估脚本
     ├─run_eval_gpu.sh                             # GPU环境下的评估脚本
     ├─run_infer_310.sh                        # Ascend 310 推理shell脚本
+    ├─run_transfer.sh                         # CPU环境下的迁移训练脚本
+    ├─run_transfer_eval.sh                    # CPU环境下的迁移推理脚本
   ├─src
     ├─dataset.py                              # 数据预处理
     ├─shufflenetv1.py                         # 网络模型定义
@@ -85,6 +87,9 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
   ├─eval.py                                   # 网络评估脚本
   ├─mindspore_hub_conf.py                     # hub配置脚本
   ├─postprogress.py                           # 310推理后处理脚本
+  ├─transfer_config.yaml                      # 迁移学习参数文件
+  ├─transfer_dataset_process.py               # 迁移学习数据集处理脚本
+  ├─mindspore_quick_start.ipynb               # 迁移学习推理可视化展示脚本
 ```
 
 ## 脚本参数
@@ -149,6 +154,11 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
   shell:
       GPU单卡训练示例: sh scripts/run_standalone_train_gpu.sh [DEVICE_ID] [DATA_DIR]
       GPU八卡并行训练: sh scripts/run_distribute_train_gpu.sh [RANK_SIZE] [TRAIN_DATA_DIR]
+
+- running transfer learning on CPU with default parameters
+
+  python:
+      CPU训练示例: python train.py --config_path=./transfer_config.yaml
 ```
 
   分布式训练需要提前创建JSON格式的HCCL配置文件。
@@ -191,6 +201,10 @@ epoch time: 99864.092, per step time: 79.827, avg loss: 3.442
 
   shell:
       sh scripts/run_eval_gpu.sh [DEVICE_ID] [DATA_DIR] [PATH_CHECKPOINT]
+
+# CPU迁移训练评估示例
+  python:
+      python eval.py --config_path=./transfer_config.yaml
 ```
 
 ### 结果
@@ -331,3 +345,36 @@ Densenet121网络使用ImageNet推理得到的结果如下:
 # ModelZoo
 
 请核对官方 [主页](https://gitee.com/mindspore/models)。
+
+# 迁移学习
+
+## 迁移数据集
+
+迁移学习数据集将划分80%用于训练，20%用于验证。
+
+> 你可以从[数据集下载页面](https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz)下载。
+
+下载的数据集文件的目录结构如下：
+
+```text
+./flower_photos/
+├── daisy
+├── dandelion
+├── roses
+├── sunflowers
+└── tulips
+```
+
+通过 `transfer_dataset_process.py` 脚本中的函数 `create_flower_dataset()` 获取切分并预处理好的训练集和验证集，在 `transfer_dataset_process.py` 中设定了随机种子
+
+## 迁移训练
+
+在 `transfer_config.yaml` 中设定了迁移训练的参数。在迁移训练前需设定预训练模型ckpt路径到参数`resume`，以及设定数据集路径到参数`dataset_path`
+
+> 你可以从[ckpt下载页面](https://www.mindspore.cn/resources/hub/details?MindSpore/1.7/shufflenetv1_imagenet2012)下载预训练好的ckpt。
+
+在MindSpore CPU环境上运行100轮次，使用MindVision下的ValAccMonitor保存验证集上推理精度最高的ckpt。
+
+## 训练结果
+
+'Top_1_Acc': 0.94375

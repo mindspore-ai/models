@@ -1,2 +1,5 @@
 easydict
 numpy
+pyyaml
+mindvision
+matplotlib

@@ -13,18 +13,18 @@
 # limitations under the License.
 # ============================================================================
 """test ShuffleNetV1"""
+import argparse
 import time
 from mindspore import context, nn
 from mindspore.train.model import Model
 from mindspore.common import set_seed
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.shufflenetv1 import ShuffleNetV1 as shufflenetv1
-from src.dataset import create_dataset
+from src.dataset import create_dataset, create_flower_dataset
 from src.crossentropysmooth import CrossEntropySmooth
-from src.model_utils.config import config
+from src.model_utils.config import get_config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id
-
 
 set_seed(1)
 
@@ -35,7 +35,10 @@ def test():
                         device_id=get_device_id())
 
     # create dataset
-    dataset = create_dataset(config.eval_dataset_path, do_train=False, device_num=1, rank=0)
+    if config.is_transfer:
+        _, dataset = create_flower_dataset()
+    else:
+        dataset = create_dataset(config.eval_dataset_path, do_train=False, device_num=1, rank=0)
     # step_size = dataset.get_dataset_size()
 
     # define net
@@ -51,15 +54,22 @@ def test():
                               num_classes=config.num_classes)
 
     # define model
-    eval_metrics = {'Loss': nn.Loss(), 'Top_1_Acc': nn.Top1CategoricalAccuracy(),
-                    'Top_5_Acc': nn.Top5CategoricalAccuracy()}
+    if config.is_transfer:
+        eval_metrics = {'Loss': nn.Loss(), 'Top_1_Acc': nn.Top1CategoricalAccuracy()}
+    else:
+        eval_metrics = {'Loss': nn.Loss(), 'Top_1_Acc': nn.Top1CategoricalAccuracy(),
+                        'Top_5_Acc': nn.Top5CategoricalAccuracy()}
     model = Model(net, loss_fn=loss, metrics=eval_metrics)
 
     # eval model
     start_time = time.time()
-    res = model.eval(dataset, dataset_sink_mode=True)
-    log = "result:" + str(res) + ", ckpt:'" + config.ckpt_path + "', time: " + str(
-        (time.time() - start_time) * 1000)
+    res = model.eval(dataset, dataset_sink_mode=False)
+    use_time = time.time() - start_time
+    hour = str(int(use_time // 60 // 60))
+    minute = str(int(use_time // 60 % 60))
+    second = str(int(use_time % 60))
+    log = "result:" + str(res) + ", ckpt:'" + config.ckpt_path \
+          + "', time: " + hour + "h " + minute + "m " + second + "s"
     print(log)
     filename = './eval_log.txt'
     with open(filename, 'a') as file_object:
@@ -67,4 +77,9 @@ def test():
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='train', add_help=False)
+    parser.add_argument('--config_path', type=str, default='../../default_config.yaml',
+                        help='Config file path')
+    args = parser.parse_args()
+    config = get_config(args.config_path)
     test()
