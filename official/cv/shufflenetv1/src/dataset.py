@@ -16,8 +16,8 @@
 from src.model_utils.config import config
 import mindspore.common.dtype as mstype
 import mindspore.dataset as ds
-import mindspore.dataset.transforms as C2
-import mindspore.dataset.vision as C
+import mindspore.dataset.transforms.c_transforms as C2
+import mindspore.dataset.vision.c_transforms as C
 
 
 def create_dataset(dataset_path, do_train, device_num=1, rank=0):

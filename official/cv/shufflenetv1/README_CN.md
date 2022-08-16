@@ -70,6 +70,7 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
     ├─run_infer_310.sh                        # Ascend 310 推理shell脚本
     ├─run_transfer.sh                         # CPU环境下的迁移训练脚本
     ├─run_transfer_eval.sh                    # CPU环境下的迁移推理脚本
+    ├─run_onnx.sh                             # ONNX推理shell脚本
   ├─src
     ├─dataset.py                              # 数据预处理
     ├─shufflenetv1.py                         # 网络模型定义
