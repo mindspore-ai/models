@@ -11,11 +11,16 @@
         - [Usage](#usage)
         - [Launch](#launch)
         - [Result](#result)
+    - [Eval process](#eval-process)
+        - [Usage](#usage-1)
+        - [Launch](#launch-1)
+        - [Result](#result-1)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
-        - [Result](#result)
-    - [Export MindIR](#export-mindir)
+            - [Result](#result-2)
+        - [Infer with ONNX](#infer-with-onnx)
+            - [Result](#result-3)
 - [Model description](#model-description)
     - [Performance](#performance)
         - [Training Performance](#training-performance)
@@ -65,6 +70,7 @@ Dataset used: [imagenet](http://www.image-net.org/)
   │   ├──run_train.sh        # shell script for train
   │   ├──run_eval.sh         # shell script for evaluation
   │   ├──run_infer_310.sh         # shell script for inference
+  │   ├──run_onnx.sh         # shell script for onnx inference
   ├── src
   │   ├──config.py           # parameter configuration
   │   ├──dataset.py          # creating dataset
@@ -72,6 +78,7 @@ Dataset used: [imagenet](http://www.image-net.org/)
   │   ├──mobilenetV3.py      # MobileNetV3 architecture
   ├── train.py               # training script
   ├── eval.py                #  evaluation script
+  ├── infer_onnx.py          #  onnx inference script
   ├── export.py              # export mindir script
   ├── preprocess.py              # inference data preprocess script
   ├── postprocess.py              # inference result calculation script  
@@ -168,12 +175,61 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 - `DATA_PATH` specifies path of imagenet datasets.
 - `DEVICE_ID` is optional, default value is 0.
 
-### [Result](#contents)
+#### [Result](#contents)
 
 Inference result is saved in current path, you can find result like this in acc.log file.
 
 ```bash
 Eval: top1_correct=37051, tot=50000, acc=74.10%
+```
+
+### [Infer with ONNX](#contents)
+
+Before Inferring, you need to export the ONNX model.
+
+- Download the [ckpt] of the model from the [mindspore official website](https://mindspore.cn/resources/hub/details?MindSpore/1.8/mobilenetv3_imagenet2012).
+- The command to export the ONNX model is as follows
+
+```shell
+python export.py --checkpoint_path[ckpt_path] --device_target "GPU" --file_name mobilenetv3.onnx --file_format  "ONNX"
+```
+
+- Infer with Python scripts
+
+```shell
+python3 infer_onnx.py --onnx_path 'mobilenetv3.onnx' --dataset_path './imagenet/val'
+```
+
+- Infer with shell scripts
+
+```shell
+bash ./scripts/run_onnx.sh [ONNX_PATH] [DATASET_PATH] [PLATFORM]
+```
+
+Infer results are output in `infer_onnx.log`
+
+- Note 1: the above scripts need to be run in the mobilenetv3 directory.
+
+- Note 2: the validation data set needs to be preprocessed in the form of folder. For example,
+
+  ```reStructuredText
+  imagenet
+   -- val
+    -- n01985128
+    -- n02110063
+    -- n03041632
+    -- ...
+  ```
+
+- Note 3: `PLATFORM` only supports CPU and GPU, default value is GPU.
+
+#### [Result](#contents)
+
+The reasoning results are output on the command line, and the results are as follows
+
+```log
+ACC_TOP1 = 0.74436
+ACC_TOP5 = 0.91762
 ```
 
 # [Model description](#contents)
