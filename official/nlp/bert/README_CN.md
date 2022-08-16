@@ -1,4 +1,4 @@
-﻿# 目录
+# 目录
 
 [View English](./README.md)
 
@@ -69,6 +69,59 @@ BERT的主干结构为Transformer。对于BERT_base，Transformer包含12个编�
 - 生成下游任务数据集
     - 下载数据集进行微调和评估，如中文实体识别任务[CLUENER](https://github.com/CLUEbenchmark/CLUENER2020)、中文文本分类任务[TNEWS](https://github.com/CLUEbenchmark/CLUE)、中文实体识别任务[ChineseNER](https://github.com/zjy-ucas/ChineseNER)、英文问答任务[SQuAD v1.1训练集](https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json)、[SQuAD v1.1验证集](https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json)、英文分类任务集合[GLUE](https://gluebenchmark.com/tasks)等。
     - 将数据集文件从JSON格式转换为TFRecord格式。详见[BERT](https://github.com/google-research/bert)代码仓中的run_classifier.py或run_squad.py文件。
+- 生成MindRecord数据集
+    - 生成预训练mindrecord数据集
+        - 如果已按上面步骤下载原始预训练数据集，并使用WikiExtractor提取文本数据，你可以按以下操作获取对应的mindrecord数据集
+
+        ```bash
+           bash ./generate_pretrain_mindrecords.sh INPUT_FILES_PATH OUTPUT_FILES_PATH VOCAB_FILE
+           比如:
+           bash ./generate_pretrain_mindrecords.sh /path/wiki-clean-aa /path/output/ /path/bert-base-uncased-vocab.txt
+        ```
+
+        - 如果已将json格式的数据转换为tfrecord数据集，你也可以通过以下方式将tfrecord转换成对应的mindrecord格式
+
+        ```python
+           python parallel_tfrecord_to_mindrecord.py --input_tfrecord_dir /path/tfrecords_path --output_mindrecord_dir /path/save_mindrecord_path
+        ```
+
+        - 同时也可以按以下操作对tfrecord或mindrecord数据进行可视化
+
+        ```python
+            python vis_tfrecord_or_mindrecord.py --file_name /path/train.mindrecord --vis_option vis_mindrecord > mindrecord.txt
+            `vis_option` 需要从["vis_tfrecord", "vis_mindrecord"]中选择
+            注：在执行之前，需要确保需要已安装tensorflow==1.15.0
+        ```
+
+    - 为ner下游任务生成CLUENER和ChineseNER mindrecord数据集
+        在生成mindrecord数据集之前，你需要按以上指导下载下游任务对应的CLUENER及ChineseNER原始数据集及[vocab.txt](https://github.com/CLUEbenchmark/CLUENER2020/blob/master/tf_version/vocab.txt)
+        - 生成ner下游任务：CLUENER数据集的mindrecord数据集
+
+          ```python
+             python generate_cluener_mindrecord.py --data_dir /path/ClueNER/cluener_public/ --vocab_file /path/vocab.txt --output_dir /path/ClueNER/
+          ```
+
+        - 生成ner下游任务：ChineseNER数据集的mindrecord数据集
+
+          ```python
+             python generate_chinese_mindrecord.py --data_dir /path/ChineseNER/data/ --vocab_file /path/vocab.txt --output_dir /path/ChineseNER/
+          ```
+
+    - 为squad下游任务生成SquadV1.1 mindrecord数据集
+      在生成mindrecord数据集之前，你需要按以上指导下载下游任务对应的SquadV1.1原始数据集及[vocab.txt](https://github.com/yuanxiaosc/BERT-for-Sequence-Labeling-and-Text-Classification/blob/master/pretrained_model/uncased_L-12_H-768_A-12/vocab.txt)
+      - 生成squad下游任务：SquadV1.1数据集的mindrecord数据集
+
+          ```python
+             python generate_squad_mindrecord.py --vocab_file /path/squad/vocab.txt --train_file /path/squad/train-v1.1.json --predict_file /path/squad/dev-v1.1.json --output_dir /path/squad
+          ```
+
+    - 为classifier下游任务生成tnews mindrecord数据集
+      在生成mindrecord数据集之前，你需要按以上指导下载下游任务对应的tnews原始数据集及[vocab.txt](https://github.com/CLUEbenchmark/CLUENER2020/blob/master/tf_version/vocab.txt)
+      - 生成classifier下游任务：tnews数据集的mindrecord数据集
+
+          ```python
+             python generate_tnews_mindrecord.py --data_dir /path/tnews/ --task_name tnews --vocab_file /path/tnews/vocab.txt --output_dir /path/tnews
+          ```
 
 # 预训练模型
 
@@ -292,11 +345,21 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
     ├─run_distributed_pretrain_gpu.sh         # GPU设备上分布式预训练shell脚本
     └─run_standaloned_pretrain_gpu.sh         # GPU设备上单机预训练shell脚本
   ├─src
+    ├─generate_mindrecord
+      ├── generate_chinesener_mindrecord.py   # 为ner下游任务产生ChineseNER对应的mindrecord数据集
+      ├── generate_cluener_mindrecord.py      # 为ner下游任务产生CLUENER对应的mindrecord数据集
+      ├── generate_pretrain_mindrecord.py     # 为预训练产生预训练mindrecord数据集
+      ├── generate_pretrain_mindrecords.sh    # 并行调用generate_pretrain_mindrecord.py产生预训练mindrecord数据集
+      ├── generate_squad_mindrecord.py        # 为squad下游任务产生SquadV1.1对应的mindrecord数据集
+      └── generate_tnews_mindrecord.py        # 为classifier下游任务产生tnews对应的mindrecord数据集
     ├─model_utils
       ├── config.py                           # 解析 *.yaml参数配置文件
       ├── devcie_adapter.py                   # 区分本地/ModelArts训练
       ├── local_adapter.py                    # 本地训练获取相关环境变量
       └── moxing_adapter.py                   # ModelArts训练获取相关环境变量、交换数据
+    ├─tools
+      ├── parallel_tfrecord_to_mindrecord.py  # 多线程池将tfrecord数据集转换成mindrecord数据集
+      └── vis_tfrecord_or_mindrecord.py       # 可视化tfrecord或mindrecord数据集
     ├─__init__.py
     ├─assessment_method.py                    # 评估过程的测评方法
     ├─bert_for_finetune.py                    # 网络骨干编码
@@ -353,6 +416,7 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
     --save_checkpoint_num      保存的检查点文件数量，默认为1
     --train_steps              训练步数，默认为-1
     --data_dir                 数据目录，默认为""
+    --dataset_format           数据集格式，支持tfrecord和mindrecord，默认为mindrecord
     --schema_dir               schema.json的路径，默认为""
 ```
 
@@ -388,7 +452,7 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
     --load_finetune_checkpoint_path   如仅执行评估，提供微调检查点保存路径
     --train_data_file_path            用于保存训练数据的TFRecord文件，如train.tfrecord文件
     --eval_data_file_path             如采用f1来评估结果，则为TFRecord文件保存预测；如采用clue_benchmark来评估结果，则为JSON文件保存预测
-    --dataset_format                  数据集格式，支持tfrecord和mindrecord格式
+    --dataset_format                  数据集格式，支持tfrecord和mindrecord格式，默认为mindrecord
     --schema_file_path                模式文件保存路径
 
 用法：run_squad.py [--device_target DEVICE_TARGET] [--do_train DO_TRAIN] [----do_eval DO_EVAL]
@@ -446,6 +510,7 @@ options:
     --load_finetune_checkpoint_path   如仅执行评估，提供微调检查点保存路径
     --train_data_file_path            用于保存训练数据的TFRecord文件，如train.tfrecord文件
     --eval_data_file_path             用于保存预测数据的TFRecord文件，如dev.tfrecord
+    --dataset_format                  数据集格式，支持tfrecord和mindrecord，默认为mindrecord
     --schema_file_path                模式文件保存路径
 ```
 
@@ -546,6 +611,12 @@ epoch: 0.0, current epoch percent: 0.000, step: 2, outputs are (Tensor(shape=[1]
 
 #### Ascend处理器上运行
 
+在多卡运行之前，您可以按以下操作生成distributed_cmd.sh:
+
+```python
+python scripts/ascend_distributed_launcher/get_distribute_pretrain_cmd.py --run_script_dir ./scripts/run_distributed_pretrain_ascend.sh --hyper_parameter_config_dir ./scripts/ascend_distributed_launcher/hyper_parameter_config.ini --data_dir /path/data_dir/ --hccl_config /path/hccl.json --cmd_file ./distributed_cmd.sh
+```
+
 ```bash
 bash scripts/run_distributed_pretrain_ascend.sh /path/cn-wiki-128 /path/hccl.json
 ```
@@ -570,7 +641,9 @@ epoch: 0.0, current epoch percent: 0.002, step: 200, outputs are (Tensor(shape=[
 
 ### 用法
 
-#### Ascend处理器上运行后评估cola数据集
+> **注意** 如果推理数据集是mindrecord或tfrecord格式，对应yaml中dataset_format参数需要修改为mindrecord或tfrecord。对应sh脚本中：'train_data_file_path'和'eval_data_file_path'参数需要适配修改，同时不需要设置'schema_file_path'
+
+#### Ascend处理器上运行后评估tnews数据集
 
 运行以下命令前，确保已设置加载与训练检查点路径。请将检查点路径设置为绝对全路径，例如，
 
@@ -879,3 +952,8 @@ run_pretrain.py中设置了随机种子，确保分布式训练中每个节点�
 - **Q: 修改了yaml文件中的配置，为什么没有效果？**
 
   **A**：实际运行的参数，由`yaml`文件和`命令行参数`共同控制，使用`ascend_dsitributed_launcher`的情况下，也会受`ini`配置文件的影响。起作用的优先级是**bash参数 > ini文件参数 > yaml文件参数**。
+
+- **Q: 运行过程中出现因get_dataset_size失败导致的RuntimeError？**
+
+  **A**：实际运行的dataset_format参数，由`yaml`文件定义。如果你遇到get_dataset_size失败的问题，你需要校验一下脚本中设置的输入数据格式是否和yaml文件中定义的dataset_format一致。当前dataset_format只支持[tfrecord，mindrecord]。
+

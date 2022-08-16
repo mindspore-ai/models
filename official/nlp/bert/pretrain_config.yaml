@@ -31,6 +31,7 @@ train_steps: -1
 save_checkpoint_num: 1
 data_dir: ''
 schema_dir: ''
+dataset_format: "mindrecord"
 
 # ==============================================================================
 # pretrain related
@@ -198,3 +199,4 @@ enable_lossscale: ["true", "false"]
 do_shuffle: ["true", "false"]
 enable_data_sink: ["true", "false"]
 allreduce_post_accumulation: ["true", "false"]
+dataset_format: ["tfrecord", "mindrecord"]

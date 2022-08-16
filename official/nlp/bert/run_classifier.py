@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -183,6 +183,7 @@ def run_classifier():
                                            assessment_method=assessment_method,
                                            data_file_path=args_opt.train_data_file_path,
                                            schema_file_path=args_opt.schema_file_path,
+                                           dataset_format=args_opt.dataset_format,
                                            do_shuffle=(args_opt.train_data_shuffle.lower() == "true"))
         do_train(ds, netwithloss, load_pretrain_checkpoint_path, save_finetune_checkpoint_path, epoch_num)
 
@@ -198,6 +199,7 @@ def run_classifier():
                                            assessment_method=assessment_method,
                                            data_file_path=args_opt.eval_data_file_path,
                                            schema_file_path=args_opt.schema_file_path,
+                                           dataset_format=args_opt.dataset_format,
                                            do_shuffle=(args_opt.eval_data_shuffle.lower() == "true"))
         do_eval(ds, BertCLS, args_opt.num_class, assessment_method, load_finetune_checkpoint_path)
 

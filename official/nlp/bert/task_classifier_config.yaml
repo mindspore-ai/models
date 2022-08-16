@@ -29,6 +29,7 @@ load_finetune_checkpoint_path: ""
 train_data_file_path: ""
 eval_data_file_path: ""
 schema_file_path: ""
+dataset_format: "mindrecord"
 # export related
 export_batch_size: 1
 export_ckpt_file: ''
@@ -111,3 +112,4 @@ do_eval: ["true", "false"]
 train_data_shuffle: ["true", "false"]
 eval_data_shuffle: ["true", "false"]
 file_format: ["AIR", "ONNX", "MINDIR"]
+dataset_format: ["tfrecord", "mindrecord"]

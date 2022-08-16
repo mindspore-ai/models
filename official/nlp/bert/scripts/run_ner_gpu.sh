@@ -54,5 +54,4 @@ python ${PROJECT_DIR}/../run_ner.py  \
     --load_finetune_checkpoint_path="" \
     --train_data_file_path="" \
     --eval_data_file_path="" \
-    --dataset_format="tfrecord" \
     --schema_file_path="" > ner_log.txt 2>&1 &

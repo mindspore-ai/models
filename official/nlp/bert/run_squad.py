@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -170,7 +170,8 @@ def run_squad():
         ds = create_squad_dataset(batch_size=args_opt.train_batch_size,
                                   data_file_path=args_opt.train_data_file_path,
                                   schema_file_path=args_opt.schema_file_path,
-                                  do_shuffle=(args_opt.train_data_shuffle.lower() == "true"))
+                                  do_shuffle=(args_opt.train_data_shuffle.lower() == "true"),
+                                  dataset_format=args_opt.dataset_format)
         do_train(ds, netwithloss, load_pretrain_checkpoint_path, save_finetune_checkpoint_path, epoch_num)
         if args_opt.do_eval.lower() == "true":
             if save_finetune_checkpoint_path == "":
@@ -195,10 +196,19 @@ def run_squad():
             is_training=False,
             output_fn=None,
             vocab_file=args_opt.vocab_file_path)
-        ds = create_squad_dataset(batch_size=args_opt.eval_batch_size,
-                                  data_file_path=eval_features,
-                                  schema_file_path=args_opt.schema_file_path, is_training=False,
-                                  do_shuffle=(args_opt.eval_data_shuffle.lower() == "true"))
+        # need to set eval_data_file_path when train with mindrecord data
+        if args_opt.eval_data_file_path != "":
+            ds = create_squad_dataset(batch_size=args_opt.eval_batch_size,
+                                      data_file_path=args_opt.eval_data_file_path,
+                                      schema_file_path=args_opt.schema_file_path, is_training=False,
+                                      do_shuffle=(args_opt.eval_data_shuffle.lower() == "true"),
+                                      dataset_format=args_opt.dataset_format)
+        else:
+            ds = create_squad_dataset(batch_size=args_opt.eval_batch_size,
+                                      data_file_path=eval_features,
+                                      schema_file_path=args_opt.schema_file_path, is_training=False,
+                                      do_shuffle=(args_opt.eval_data_shuffle.lower() == "true"),
+                                      dataset_format=args_opt.dataset_format)
         outputs = do_eval(ds, load_finetune_checkpoint_path, args_opt.eval_batch_size)
         all_predictions = write_predictions(eval_examples, eval_features, outputs, 20, 30, True)
         SQuad_postprocess(args_opt.eval_json_path, all_predictions, output_metrics="output.json")

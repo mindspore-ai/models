@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,5 +50,6 @@ python ${PROJECT_DIR}/../run_squad.py  \
     --load_pretrain_checkpoint_path="" \
     --load_finetune_checkpoint_path="" \
     --train_data_file_path="" \
+    --eval_data_file_path="" \
     --eval_json_path="" \
     --schema_file_path="" > squad_log.txt 2>&1 &

@@ -103,19 +103,29 @@ class BucketDatasetGenerator:
 
 
 def create_bert_dataset(device_num=1, rank=0, do_shuffle="true", data_dir=None, schema_dir=None, batch_size=32,
-                        bucket_list=None):
+                        bucket_list=None, dataset_format="mindrecord"):
     """create train dataset"""
     # apply repeat operations
     files = os.listdir(data_dir)
     data_files = []
     for file_name in files:
-        if "tfrecord" in file_name:
+        if (dataset_format == "tfrecord" and "tfrecord" in file_name) or \
+                (dataset_format == "mindrecord" and "mindrecord" in file_name and "mindrecord.db" not in file_name):
             data_files.append(os.path.join(data_dir, file_name))
-    data_set = ds.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
+    if dataset_format == "mindrecord":
+        data_set = ds.MindDataset(data_files,
                                   columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
                                                 "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
                                   shuffle=ds.Shuffle.FILES if do_shuffle == "true" else False,
-                                  num_shards=device_num, shard_id=rank, shard_equal_rows=True)
+                                  num_shards=device_num, shard_id=rank)
+    elif dataset_format == "tfrecord":
+        data_set = ds.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
+                                      columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
+                                                    "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
+                                      shuffle=ds.Shuffle.FILES if do_shuffle == "true" else False,
+                                      num_shards=device_num, shard_id=rank, shard_equal_rows=True)
+    else:
+        raise NotImplementedError("Only supported dataset_format for tfrecord or mindrecord.")
     if bucket_list:
         bucket_dataset = BucketDatasetGenerator(data_set, batch_size, bucket_list=bucket_list)
         data_set = ds.GeneratorDataset(bucket_dataset,
@@ -148,10 +158,12 @@ def create_ner_dataset(batch_size=1, assessment_method="accuracy", data_file_pat
         dataset = ds.MindDataset([data_file_path],
                                  columns_list=["input_ids", "input_mask", "segment_ids", "label_ids"],
                                  shuffle=do_shuffle)
-    else:
+    elif dataset_format == "tfrecord":
         dataset = ds.TFRecordDataset([data_file_path], schema_file_path if schema_file_path != "" else None,
                                      columns_list=["input_ids", "input_mask", "segment_ids", "label_ids"],
                                      shuffle=do_shuffle)
+    else:
+        raise NotImplementedError("Only supported dataset_format for tfrecord or mindrecord.")
     if assessment_method == "Spearman_correlation":
         type_cast_op_float = C.TypeCast(mstype.float32)
         dataset = dataset.map(operations=type_cast_op_float, input_columns="label_ids")
@@ -165,13 +177,20 @@ def create_ner_dataset(batch_size=1, assessment_method="accuracy", data_file_pat
     return dataset
 
 
-def create_classification_dataset(batch_size=1, assessment_method="accuracy",
-                                  data_file_path=None, schema_file_path=None, do_shuffle=True):
+def create_classification_dataset(batch_size=1, assessment_method="accuracy", data_file_path=None,
+                                  schema_file_path=None, dataset_format="mindrecord", do_shuffle=True):
     """create finetune or evaluation dataset"""
     type_cast_op = C.TypeCast(mstype.int32)
-    data_set = ds.TFRecordDataset([data_file_path], schema_file_path if schema_file_path != "" else None,
+    if dataset_format == "mindrecord":
+        data_set = ds.MindDataset([data_file_path],
                                   columns_list=["input_ids", "input_mask", "segment_ids", "label_ids"],
                                   shuffle=do_shuffle)
+    elif dataset_format == "tfrecord":
+        data_set = ds.TFRecordDataset([data_file_path], schema_file_path if schema_file_path != "" else None,
+                                      columns_list=["input_ids", "input_mask", "segment_ids", "label_ids"],
+                                      shuffle=do_shuffle)
+    else:
+        raise NotImplementedError("Only supported dataset_format for tfrecord or mindrecord.")
     if assessment_method == "Spearman_correlation":
         type_cast_op_float = C.TypeCast(mstype.float32)
         data_set = data_set.map(operations=type_cast_op_float, input_columns="label_ids")
@@ -191,19 +210,34 @@ def generator_squad(data_features):
 
 
 def create_squad_dataset(batch_size=1, data_file_path=None, schema_file_path=None,
-                         is_training=True, do_shuffle=True):
+                         is_training=True, do_shuffle=True, dataset_format="mindrecord"):
     """create finetune or evaluation dataset"""
     type_cast_op = C.TypeCast(mstype.int32)
     if is_training:
-        data_set = ds.TFRecordDataset([data_file_path], schema_file_path if schema_file_path != "" else None,
+        if dataset_format == "mindrecord":
+            data_set = ds.MindDataset([data_file_path],
                                       columns_list=["input_ids", "input_mask", "segment_ids", "start_positions",
                                                     "end_positions", "unique_ids", "is_impossible"],
                                       shuffle=do_shuffle)
+        elif dataset_format == "tfrecord":
+            data_set = ds.TFRecordDataset([data_file_path], schema_file_path if schema_file_path != "" else None,
+                                          columns_list=["input_ids", "input_mask", "segment_ids", "start_positions",
+                                                        "end_positions", "unique_ids", "is_impossible"],
+                                          shuffle=do_shuffle)
+        else:
+            raise NotImplementedError("Only supported dataset_format for tfrecord or mindrecord.")
         data_set = data_set.map(operations=type_cast_op, input_columns="start_positions")
         data_set = data_set.map(operations=type_cast_op, input_columns="end_positions")
     else:
-        data_set = ds.GeneratorDataset(generator_squad(data_file_path), shuffle=do_shuffle,
-                                       column_names=["input_ids", "input_mask", "segment_ids", "unique_ids"])
+        if dataset_format == "mindrecord":
+            data_set = ds.MindDataset([data_file_path],
+                                      columns_list=["input_ids", "input_mask", "segment_ids", "unique_ids"],
+                                      shuffle=do_shuffle)
+        elif dataset_format == "tfrecord":
+            data_set = ds.GeneratorDataset(generator_squad(data_file_path), shuffle=do_shuffle,
+                                           column_names=["input_ids", "input_mask", "segment_ids", "unique_ids"])
+        else:
+            raise NotImplementedError("Only supported dataset_format for tfrecord or mindrecord.")
     data_set = data_set.map(operations=type_cast_op, input_columns="segment_ids")
     data_set = data_set.map(operations=type_cast_op, input_columns="input_mask")
     data_set = data_set.map(operations=type_cast_op, input_columns="input_ids")
@@ -213,20 +247,29 @@ def create_squad_dataset(batch_size=1, data_file_path=None, schema_file_path=Non
     return data_set
 
 
-def create_eval_dataset(batchsize=32, device_num=1, rank=0, data_dir=None, schema_dir=None):
+def create_eval_dataset(batchsize=32, device_num=1, rank=0, data_dir=None, schema_dir=None,
+                        dataset_format="mindrecord"):
     """create evaluation dataset"""
     data_files = []
     if os.path.isdir(data_dir):
         files = os.listdir(data_dir)
         for file_name in files:
-            if "tfrecord" in file_name:
+            if (dataset_format == "tfrecord" and "tfrecord" in file_name) or \
+                    (dataset_format == "mindrecord" and "mindrecord" in file_name and "mindrecord.db" not in file_name):
                 data_files.append(os.path.join(data_dir, file_name))
     else:
         data_files.append(data_dir)
-    data_set = ds.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
+    if dataset_format == "mindrecord":
+        data_set = ds.MindDataset(data_files,
                                   columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
-                                                "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
-                                  shard_equal_rows=True)
+                                                "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"])
+    elif dataset_format == "tfrecord":
+        data_set = ds.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
+                                      columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
+                                                    "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
+                                      shard_equal_rows=True)
+    else:
+        raise NotImplementedError("Only supported dataset_format for tfrecord or mindrecord.")
     ori_dataset_size = data_set.get_dataset_size()
     print("origin eval size: ", ori_dataset_size)
     dtypes = data_set.output_types()
@@ -248,10 +291,18 @@ def create_eval_dataset(batchsize=32, device_num=1, rank=0, data_dir=None, schem
         sampler = ds.DistributedSampler(num_shards=device_num, shard_id=rank, shuffle=False)
         eval_ds.use_sampler(sampler)
     else:
-        eval_ds = ds.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
+        if dataset_format == "mindrecord":
+            eval_ds = ds.MindDataset(data_files,
                                      columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
                                                    "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
-                                     num_shards=device_num, shard_id=rank, shard_equal_rows=True)
+                                     num_shards=device_num, shard_id=rank)
+        elif dataset_format == "tfrecord":
+            eval_ds = ds.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
+                                         columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
+                                                       "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
+                                         num_shards=device_num, shard_id=rank, shard_equal_rows=True)
+        else:
+            raise NotImplementedError("Only supported dataset_format for tfrecord or mindrecord.")
 
     type_cast_op = C.TypeCast(mstype.int32)
     eval_ds = eval_ds.map(input_columns="masked_lm_ids", operations=type_cast_op)
