@@ -19,6 +19,7 @@ import mindspore.numpy as np
 import mindspore.common.dtype as mstype
 from mindspore import Tensor
 
+
 class MarginRankingLoss(nn.Cell):
     """function MarginRankingLoss"""
     def __init__(self, margin=0.0, reduction='mean'):
@@ -28,7 +29,7 @@ class MarginRankingLoss(nn.Cell):
         self.sum = ops.ReduceSum(keep_dims=False)
 
     def construct(self, input1, input2, target):
-        output = np.maximum(0, -target*(input1 - input2) + self.margin)
+        output = ops.Maximum()(0, -target*(input1 - input2) + self.margin)
         if self.reduction == 'mean':
             output = np.mean(output)
         elif self.reduction == 'sum':
@@ -68,8 +69,8 @@ class TripletLoss(nn.Cell):
         dist = self.expand(inputs_)  # (32, 32)
         dist = dist + dist.T
         dist = self.addmm(dist, 1, -2, inputs, inputs.T)
-        dist = np.sqrt(np.clip(dist, xmin=1e-12, xmax=np.amax(dist)), dtype=dist.dtype)
-
+        dist = ops.clip_by_value(dist, clip_value_min=1e-12, clip_value_max=np.amax(dist))
+        dist = ops.Sqrt()(dist)
         targets = self.cast(targets, mstype.float32)
         mask = self.equal(self.expand(targets), self.expand(targets).T)
         dist_ap = self.select(mask, dist, self.zeros)

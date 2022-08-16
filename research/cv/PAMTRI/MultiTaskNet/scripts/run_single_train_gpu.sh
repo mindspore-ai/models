@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run_eval.sh DATASET_NAME CKPT_PATH DEVICE_ID HEATMAP_SEGMENT"
-echo "For example: bash run_eval.sh ./*.ckpt ./data/ 0 h"
+echo "bash run_single_train_gpu.sh DATA_PATH PRETRAINED_PATH DEVICE_ID HEATMAP_SEGMENT"
+echo "For example: bash run_single_train_gpu.sh /path/dataset /path/pretrained_path 0 s"
 echo "It is better to use the absolute path."
 echo "=============================================================================================================="
 set -e
@@ -28,9 +28,12 @@ get_real_path(){
     echo "$(realpath -m $PWD/$1)"
   fi
 }
-DATA_PATH=$(get_real_path $1)
-CKPT_PATH=$(get_real_path $2)
 
+rm -rf ckpt
+
+DATA_PATH=$(get_real_path $1)
+PRE_CKPT_PATH=$(get_real_path $2)
+PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 if [ "$4" == "h" ] || [ "$4" == "s" ];then
     if [ "$4" == "h" ];then
       need_heatmap=True
@@ -49,16 +52,18 @@ echo "$EXEC_PATH"
 
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
-cd ../
+export DEVICE_ID=$3
 export RANK_SIZE=1
-env > env.log
-python eval.py --root ${DATA_PATH} --ckpt_path ${CKPT_PATH} --device_id $3 --heatmapaware ${need_heatmap} --segmentaware ${need_segment} > eval.log 2>&1
+echo "Start training on GPU"
 
-if [ $? -eq 0 ];then
-    echo "eval success"
-else
-    echo "eval failed"
-    exit 2
-fi
-echo "finish"
-cd ../
+python ${PROJECT_DIR}/../train.py \
+  --pre_ckpt_path  ${PRE_CKPT_PATH} \
+  --root ${DATA_PATH} \
+  --distribute False \
+  --device_target GPU \
+  --lr 0.0003 \
+  --heatmapaware ${need_heatmap} \
+  --segmentaware ${need_segment} > ${PROJECT_DIR}/../train_gpu.log 2>&1 &
+
+
+

@@ -22,7 +22,7 @@ from .transforms import get_affine_transform
 from .transforms import affine_transform
 from .transforms import fliplr_joints
 
-class JointsDataset():
+class JointsDataset:
     """JointsDataset"""
     def __init__(self, cfg, root, is_train):
         self.num_joints = 0
@@ -66,7 +66,6 @@ class JointsDataset():
 
     def __getitem__(self, idx):
         db_rec = copy.deepcopy(self.db[idx])
-
         image_file = db_rec['image']
         filename = db_rec['filename'] if 'filename' in db_rec else ''
         imgnum = db_rec['imgnum'] if 'imgnum' in db_rec else ''

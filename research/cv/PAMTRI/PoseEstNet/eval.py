@@ -46,12 +46,10 @@ if __name__ == '__main__':
     context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False, device_id=device_id)
 
     data, dataset = create_dataset(cfg, args.data_dir, is_train=False)
-
     json_path = get_label(cfg, args.data_dir)
     dst_json_path = Path(json_path)
     with dst_json_path.open('r') as dst_file:
         allImage = json.load(dst_file)
-
     ckpt_path = args.ckpt_path
 
     # define net

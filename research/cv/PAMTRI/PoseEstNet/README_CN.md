@@ -37,7 +37,7 @@
 
 # 数据集
 
-使用的数据集：[VeRi](https://vehiclereid.github.io/VeRi/)
+使用的原始数据集：[VeRi](https://vehiclereid.github.io/VeRi/)
 
 - 数据集大小：961M，共776个id、5万张彩色图像
     - 训练集：9068张图像
@@ -61,14 +61,16 @@
         ├── annot
         |   ├── label_test.csv
         |   ├── label_train.csv
+        |   ├── image_test.json
     ```
 
-其中[data/annot](data/annot)中内容可以通过此链接获得[点击获取](https://github.com/NVlabs/PAMTRI/tree/master/PoseEstNet/data/veri/annot)
+其中data/annot中的csv文件通过此链接[点击获取](https://github.com/NVlabs/PAMTRI/tree/master/PoseEstNet/data/veri/annot)，image_test.json会在eval阶段自动生成
 
 # 环境要求
 
-- 硬件（Ascend）
+- 硬件（Ascend or GPU）
     - 使用Ascend处理器来搭建硬件环境。
+    - 使用GPU处理器来搭建硬件环境。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
@@ -84,26 +86,50 @@
 pip install -r requirements.txt
 ```
 
-安装完依赖包后，可以将下载后的VeRi数据集中`image_train/`文件下的图片复制到`data/images/image_train`和`data/images/image_test`中
+安装完依赖包后，需要对原始Veri数据集进行处理，用于训练PoseEstNet模型。
 
 ```bash
-# 运行训练示例
-bash run_single_train.sh [DATA_PATH] [PRETRAINED_PATH] [DEVICE_ID]
-# example: bash run_single_train.sh ../data/ /path/pretrained_path 0
+# 制作数据集
+python src/utils/create_dataset.py --veri  原始veri数据集路径  --PoseData  PoseEstNet_Dataset路径
+```
 
-# 运行分布式训练示例
-bash run_distribute_train.sh [DATA_PATH] [pretrain_path] [RANK_TABLE]
-# example: bash run_distribute_train.sh ../data/ /path/pretrain_path /path/rank_table
+其中PoseEstNet_Dataset/annot中含有label_test.csv和label_train.csv，即通过[链接](https://github.com/NVlabs/PAMTRI/tree/master/PoseEstNet/data/veri/annot)获取的csv文件
 
-# 运行评估示例
-bash run_eval.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
-# example: bash run_eval.sh ../data/ /path/ckpt 0
+```bash
+# 在Ascend处理器上运行训练示例
+bash run_single_train_ascend.sh [DATA_PATH] [PRETRAINED_PATH] [DEVICE_ID]
+# example: bash run_single_train_ascend.sh ../data/ PoseEstNet_pretrained.ckpt 0
+
+# 在GPU处理器上运行训练实例
+bash run_single_train_gpu.sh [DATA_PATH] [PRETRAINED_PATH] [DEVICE_ID]
+# example: bash run_single_train_gpu.sh ../data/ PoseEstNet_pretrained.ckpt 0
+
+# 在Ascend处理器上运行分布式训练示例
+bash run_distribute_train_ascend.sh [DATA_PATH] [pretrain_path] [RANK_TABLE]
+# example: bash run_distribute_train_ascend.sh ../data/ PoseEstNet_pretrained.ckpt /path/rank_table
+
+# 在GPU处理器上运行分布式训练示例
+bash run_distribute_train_gpu.sh [DATA_PATH] [pretrain_path] [RANK_SIZE]
+# example: bash run_distribute_train_gpu.sh ../data/ PoseEstNet_pretrained.ckpt 8
+
+# 在Ascend处理器上运行评估示例
+bash run_eval_ascend.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
+# example: bash run_eval_ascend.sh ../data/ /path/ckpt 0
+
+# 在GPU处理器上运行评估示例
+bash run_eval_gpu.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
+# example: bash run_eval_gpu.sh ../data/ /path/ckpt 0
 
 # 运行转换数据示例
 # 保留精度最高的ckpt, 然后运行trans生成MultiTaskNet所需要的数据集
 # DATA_PATH 应该是MuitiTaskNet的数据集, 文件结构在MultiTaskNet中描述
-bash run_trans.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
-# example: bash run_trans.sh ../../MultiTaskNet/data/ /path/ckpt 0
+# 在Ascend处理器上运行转换数据
+bash run_trans_ascend.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
+# example: bash run_trans_ascend.sh ../../MultiTaskNet/data/ PoseEstNet3-210_283.ckpt 0
+
+# 在GPU处理器上运行转换数据
+bash run_trans_gpu.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
+# example: bash run_trans_gpu.sh ../../MultiTaskNet/data/ PoseEstNet3-210_283.ckpt 0
 ```
 
 对于分布式训练，需要提前创建JSON格式的hccl配置文件。
@@ -121,10 +147,14 @@ bash run_trans.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
         ├── PoseEstNet
             ├── ascend_310_infer                    // 实现310推理源代码
             ├── scripts
-            |   ├── run_single_train.sh             // 单卡到Ascend的shell脚本
-            |   ├── run_distribute_train.sh         // 分布式到Ascend的shell脚本
-            |   ├── run_eval.sh                     // Ascend评估的shell脚本
-            |   ├── run_trans.sh                    // 生成数据集脚本
+            |   ├── run_single_train_ascend.sh      // 单卡到Ascend的shell脚本
+            |   ├── run_single_train_gpu.sh         // 单卡到GPU的shell脚本
+            |   ├── run_distribute_train_ascend.sh  // 分布式到Ascend的shell脚本
+            |   ├── run_distribute_train_gpu.sh     // 分布式到GPU的shell脚本
+            |   ├── run_eval_ascend.sh              // Ascend评估的shell脚本
+            |   ├── run_eval_gpu.sh                 // GPU评估的shell脚本
+            |   ├── run_trans_ascend.sh             // Ascend环境下生成数据集脚本
+            |   ├── run_trans_gpu.sh                // GPU环境下生成数据集脚本
             |   ├── run_infer_310.sh                // Ascend推理shell脚本
             ├── src
             |   ├── config
@@ -144,7 +174,7 @@ bash run_trans.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
             |   ├── model
             |   |   ├── HRNet.py                    // 模型
             |   ├── scheduler
-            |   |   ├── lr.py                           // 学习率
+            |   |   ├── lr.py                       // 学习率
             |   ├── utils
             |   |   ├── function.py                 // 推理函数
             |   |   ├── grid.py                     // 部分缺失算子实现
@@ -152,7 +182,9 @@ bash run_trans.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
             |   |   ├── pthtockpt.py                // pth格式的预训练参数转换为ckpt
             |   |   ├── transform.py                // 转换数据集函数
             |   |   ├── vis.py                      // 转换数据集函数
+            |   |   ├── create_dataset.py.py        // 制作PoseEstNet数据集
             ├── config.yaml                         // 固定参数
+            ├── config_gpu.yaml                     // 固定参数（gpu）
             ├── eval.py                             // 精度验证脚本
             ├── train.py                            // 训练脚本
             ├── trans.py                            // 转换数据集脚本
@@ -179,10 +211,10 @@ bash run_trans.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
 
 ### 加载预训练权重
 
-pytorch的HRNet预训练模型, [点击获取](https://drive.google.com/file/d/1aTXmxKAJVLsXbvM-TmQ0ZjJxP868G73q/view)
+pytorch的HRNet预训练模型, [点击获取](https://pan.baidu.com/s/1E6cTlPoCKYiQdIufgxHytg?pwd=1h08)
 
 ```bash
-python pth2ckpt.py --pth_path /path/hrnet_w32-36af842e.pth
+python pthtockpt.py --pth_path /path/hrnet_w32-36af842e.pth
 ```
 
 ### 训练
@@ -190,15 +222,15 @@ python pth2ckpt.py --pth_path /path/hrnet_w32-36af842e.pth
 - Ascend处理器环境运行
 
   ```bash
-  bash run_single_train.sh ../data/ /path/pretrained_path 0
+  bash run_single_train_ascend.sh ../data/ /path/pretrained_path 0
   ```
 
-  上述python命令将在后台运行，您可以通过train.log文件查看结果。
+  上述python命令将在后台运行，您可以通过train_ascend.log文件查看结果。
 
   训练结束后，您可在默认脚本文件夹下找到检查点文件。采用以下方式达到损失值：
 
   ```bash
-  # grep "loss is " train.log
+  # grep "loss is " train_ascend.log
   epoch:1 step:, loss is 2.4842823
   epcoh:2 step:, loss is 3.0897788
   ...
@@ -206,12 +238,31 @@ python pth2ckpt.py --pth_path /path/hrnet_w32-36af842e.pth
 
   模型检查点保存在当前目录下。
 
+- GPU处理器环境运行
+
+```bash
+bash run_single_train_gpu.sh ../data/ /path/pretrained_path 0
+```
+
+上述python命令将在后台运行，您可以通过train_gpu.log文件查看结果。
+
+训练结束后，您可在默认脚本文件夹下找到检查点文件。采用以下方式达到损失值：
+
+```bash
+# grep "loss is " train_gpu.log
+epoch:1 step:, loss is 2.4842823
+epcoh:2 step:, loss is 3.0897788
+...
+```
+
+模型检查点保存在当前目录下。
+
 ### 分布式训练
 
 - Ascend处理器环境运行
 
   ```bash
-  bash run_distribute_train.sh ../data/ /path/pretrain_path /path/rank_table
+  bash run_distribute_train_ascend.sh ../data/ /path/pretrain_path /path/rank_table
   ```
 
   上述shell脚本将在后台运行分布训练。您可以通过`device[X]/train.log`文件查看结果。采用以下方式达到损失值：
@@ -227,6 +278,25 @@ python pth2ckpt.py --pth_path /path/hrnet_w32-36af842e.pth
   ...
   ```
 
+- GPU处理器环境运行
+
+  ```bash
+  bash run_distribute_train_gpu.sh ../data/ /path/pretrain_path rank_size
+  ```
+
+  上述shell脚本将在后台运行分布训练。您可以通过`distribute_train.log`文件查看结果。采用以下方式达到损失值：
+
+  ```bash
+  #
+  epoch: 1 step: 70, loss is 1252.768
+  epoch: 2 step: 70, loss is 757.1177
+  ...
+  #
+  epoch: 1 step: 70, loss is 1293.7272
+  epoch: 2 step: 70, loss is 746.15564
+  ...
+  ```
+
 ## 评估过程
 
 ### 评估
@@ -234,7 +304,7 @@ python pth2ckpt.py --pth_path /path/hrnet_w32-36af842e.pth
 - 在Ascend环境运行时评估VeRi数据集
 
   ```bash
-  bash run_eval.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
+  bash run_eval_ascend.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
   ```
 
   上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
@@ -245,6 +315,20 @@ python pth2ckpt.py --pth_path /path/hrnet_w32-36af842e.pth
   | pose_hrnet | 85.334 | 81.334 | 70.501 | 76.727 | 86.651 | 89.610 | 82.324 | 16.704 |
   ```
 
+- 在GPU环境运行时评估VeRi数据集
+
+  ```bash
+  bash run_eval_gpu.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
+  ```
+
+  上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
+
+  ```bash
+  | Arch | Wheel | Fender | Back | Front | WindshieldBack | WindshieldFront | Mean | Mean@0.1 |
+  | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+  | pose_hrnet | 85.968 | 81.682 | 70.630 | 76.568 | 86.492 | 89.771 | 82.577 | 16.681 |
+  ```
+
 ## 导出过程
 
 ### 导出
@@ -252,7 +336,7 @@ python pth2ckpt.py --pth_path /path/hrnet_w32-36af842e.pth
 将checkpoint文件导出成mindir格式模型。
 
 ```bash
-python3.7 export.py --cfg config.yaml --ckpt_path CKPT_PATH
+python3 export.py --cfg config.yaml --ckpt_path CKPT_PATH
 ```
 
 ## 推理过程
@@ -285,23 +369,25 @@ python3.7 export.py --cfg config.yaml --ckpt_path CKPT_PATH
 
 #### VeRi上的PoseEstNet
 
-| 参数                 | Ascend                    |
-| -------------------- | ------------------------- |
-| 模型版本              | PoseEstNet             |
-| 资源                  | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8                |
-| 上传日期              | 2021-9-30                 |
-| MindSpore版本         | 1.3.0            |
-| 数据集                | VeRi             |
-| 训练参数              | epoch=210, batch_size = 16(单卡可以为32), lr=0.001  |
-| 优化器                | adam                 |
-| 损失函数              | JointsMSELoss             |
-| 输出                  | 概率                      |
-| 损失                       | 92.459                                                     |
-| 速度                  | 8卡：130毫秒/步 |
-| 总时长                | 8卡：40分钟 |
-| 微调检查点 | 335M (.ckpt文件)                                         |
-| 推理模型        | 113M (.mindir文件)                     |
-| 脚本                    | [PoseEstNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/PoseEstNet) |
+| 参数                 | Ascend                    | GPU |
+| -------------------- | ------------------------- | -------------------- |
+| 模型版本              | PoseEstNet             | PoseEstNet |
+| 资源                  | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8                | GPU: Geforce RTX3090；CPU 2.90GHz，64核；内存 251G；Ubuntu18.04 |
+| 上传日期              | 2021-9-30                 | 2022-2-28 |
+| MindSpore版本         | 1.3.0            | 1.5.0 |
+| 数据集                | VeRi             | VeRi |
+| 训练参数              | epoch=210, batch_size = 16(单卡可以为32), lr=0.001  | epoch=210, batch_size = 32, lr=0.001 |
+| 优化器                | adam                 | adam |
+| 损失函数              | JointsMSELoss             | JointsMSELoss |
+| 输出                  | 概率                      | 概率 |
+| 损失                       | 92.459                                                     | 74.523 |
+| 速度                  | 8卡：130毫秒/步 | 单卡：412毫秒/步；8卡：770毫秒/步 |
+| 总时长                | 8卡：40分钟 | 单卡：6小时48分钟；8卡：1小时34分钟 |
+| 微调检查点 | 335M (.ckpt文件)                                         | 328M（.ckpt文件） |
+| 推理模型        | 113M (.mindir文件)                     |  |
+| 脚本                    | [PoseEstNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/PoseEstNet) | [PoseEstNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/PoseEstNet) |
+
+####
 
 ### 推理性能
 

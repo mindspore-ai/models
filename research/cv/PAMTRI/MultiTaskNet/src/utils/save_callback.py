@@ -13,7 +13,6 @@
 # limitations under the License.
 # ============================================================================
 """saveCallBack"""
-import os
 import time
 from mindspore import load_param_into_net, load_checkpoint
 from mindspore.train.callback import Callback
@@ -24,7 +23,7 @@ class SaveCallback(Callback):
     define savecallback, save best model while training.
     """
     def __init__(self, model, query_dataset, gallery_dataset,
-                 vcolor2label, vtype2label, epoch_per_eval, max_epoch, path, step_size):
+                 vcolor2label, vtype2label, epoch_per_eval, max_epoch, path, step_size, device_id):
         super(SaveCallback, self).__init__()
         self.model = model
         self.query_dataset = query_dataset
@@ -35,6 +34,7 @@ class SaveCallback(Callback):
         self.max_epoch = max_epoch
         self.path = path
         self.step_size = step_size
+        self.device_id = device_id
 
     def epoch_end(self, run_context):
         """
@@ -48,7 +48,9 @@ class SaveCallback(Callback):
         load_param_into_net(self.model, param_dict)
 
         print("\n--------------------{} / {}--------------------\n".format(cur_epoch, self.max_epoch))
-        print("----------device is {}".format(int(os.getenv('DEVICE_ID'))))
+
+        print("----------device is {}".format(self.device_id))
+
         _ = test(self.model, True, True, self.query_dataset, self.gallery_dataset, \
             self.vcolor2label, self.vtype2label, return_distmat=True)
         t2 = time.time()

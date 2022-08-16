@@ -1,6 +1,6 @@
-EasyDict==1.7
+EasyDict
 opencv-python
-shapely==1.6.4
+shapely
 Cython
 scipy
 pandas

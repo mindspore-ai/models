@@ -215,9 +215,11 @@ class DenseNet121(nn.Cell):
                 pretrained_weights = densenet121.features[0].weight
                 self.base[0] = nn.Conv2d(num_channels, 64, kernel_size=7, stride=2,
                                          has_bias=False, padding=3, pad_mode="pad")
-                self.base[0].weight.set_data(init.initializer(init.Normal(sigma=0.02), \
-                    self.base[0].weight.shape, self.base[0].weight.dtype))
-                self.base[0].weight.data[:, :3, :, :] = pretrained_weights
+                weight_init = init.initializer(init.Normal(sigma=0.02), \
+                    self.base[0].weight.shape, self.base[0].weight.dtype)
+                weight_init[:, :3, :, :] = pretrained_weights
+                self.base[0].weight.set_data(weight_init)
+
             else:
                 self.base[0] = nn.Conv2d(num_channels, 64, kernel_size=7, stride=2,
                                          has_bias=False, padding=3, pad_mode="pad")

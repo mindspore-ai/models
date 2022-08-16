@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,10 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run_eval.sh DATA_PATH CKPT_PATH DEVICE_ID"
-echo "For example: bash run_eval.sh /path/dataset /path/ckpt 0"
+echo "bash run_eval_gpu.sh DATASET_NAME CKPT_PATH DEVICE_ID HEATMAP_SEGMENT"
+echo "For example: bash run_eval_gpu.sh ../data/ ./*.ckpt 0 h"
 echo "It is better to use the absolute path."
 echo "=============================================================================================================="
 set -e
@@ -29,23 +30,30 @@ get_real_path(){
 }
 DATA_PATH=$(get_real_path $1)
 CKPT_PATH=$(get_real_path $2)
+PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
+if [ "$4" == "h" ] || [ "$4" == "s" ];then
+    if [ "$4" == "h" ];then
+      need_heatmap=True
+      need_segment=False
+    else
+      need_heatmap=False
+      need_segment=True
+    fi
+else
+    echo "heatmap_segment must be h or s"
+    exit 1
+fi
 
 EXEC_PATH=$(pwd)
 echo "$EXEC_PATH"
 
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
-cd ../
-export DEVICE_ID=$3
 export RANK_SIZE=1
-env > env.log
-python eval.py --cfg config.yaml --data_dir ${DATA_PATH} --ckpt_path ${CKPT_PATH} > eval.log 2>&1
 
-if [ $? -eq 0 ];then
-    echo "eval success"
-else
-    echo "eval failed"
-    exit 2
-fi
-echo "finish"
-cd ../
+python ${PROJECT_DIR}/../eval.py --root ${DATA_PATH} \
+  --ckpt_path ${CKPT_PATH} \
+  --device_id $3 \
+  --device_target GPU \
+  --heatmapaware ${need_heatmap} \
+  --segmentaware ${need_segment} > ${PROJECT_DIR}/../eval_gpu.log 2>&1 &
