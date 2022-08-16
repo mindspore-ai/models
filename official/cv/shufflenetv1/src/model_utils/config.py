@@ -20,7 +20,7 @@ import argparse
 from pprint import pprint, pformat
 import yaml
 
-
+_config_path = '../../default_config.yaml'
 
 class Config:
     """
@@ -113,13 +113,13 @@ def merge(args, cfg):
     return cfg
 
 
-def get_config(config_path='../../default_config.yaml'):
+def get_config():
     """
     Get Config according to the yaml file and cli arguments
     """
     parser = argparse.ArgumentParser(description='default name', add_help=False)
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    parser.add_argument('--config_path', type=str, default=os.path.join(current_dir, config_path),
+    parser.add_argument('--config_path', type=str, default=os.path.join(current_dir, _config_path),
                         help='Config file path')
     path_args, _ = parser.parse_known_args()
     default, helper, choices = parse_yaml(path_args.config_path)
