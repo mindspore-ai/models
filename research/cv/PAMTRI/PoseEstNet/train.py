@@ -24,8 +24,9 @@ import mindspore
 import mindspore.nn as nn
 
 from mindspore import Tensor
+from mindspore.common import set_seed
 from mindspore import context
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank
 from mindspore.train.model import Model, ParallelMode
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
@@ -54,18 +55,21 @@ if args.isModelArts:
     import moxing as mox
 
 if __name__ == '__main__':
+    set_seed(1)
     update_config(cfg, args)
 
     target = args.device_target
-    device_id = int(os.getenv('DEVICE_ID'))
     context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
     if args.distribute:
-        context.set_context(device_id=device_id, enable_auto_mixed_precision=True)
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
         init()
+        device_num = int(os.getenv('RANK_SIZE', '1'))
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
+                                          gradients_mean=True, device_num=device_num)
     else:
+        device_id = int(os.getenv('DEVICE_ID', '0'))
         context.set_context(device_id=device_id)
+
 
     #define dataset
     if args.isModelArts:
@@ -131,10 +135,12 @@ if __name__ == '__main__':
 
     if args.isModelArts:
         save_checkpoint_path = '/cache/train_output/'
-    else:
+    elif not args.distribute:
         save_checkpoint_path = './ckpt/'
+    else:
+        save_checkpoint_path = './ckpt_' + str(get_rank()) + '/'
 
-    ckpt_cb = ModelCheckpoint(prefix='PoseEstNet' + os.getenv('DEVICE_ID'),
+    ckpt_cb = ModelCheckpoint(prefix='PoseEstNet',
                               directory=save_checkpoint_path,
                               config=config_ck)
     cb += [ckpt_cb]
@@ -143,8 +149,6 @@ if __name__ == '__main__':
     print("Total epoch: {}".format(cfg.TRAIN.END_EPOCH))
     print("Batch size: {}".format(cfg.TRAIN.BATCH_SIZE))
     print("==========Training begin===========")
-
     model.train(cfg.TRAIN.END_EPOCH, dataset, callbacks=cb, dataset_sink_mode=True)
-
     if args.isModelArts:
         mox.file.copy_parallel(src_url='/cache/train_output', dst_url=args.train_url)

@@ -23,8 +23,7 @@ from .JointsDataset import JointsDataset
 class VeRiDataset(JointsDataset):
     """VeRiDataset"""
     def __init__(self, root, is_train, transform=None):
-        super().__init__(root, is_train, transform)
-
+        super(VeRiDataset, self).__init__(root, is_train, transform)
         self.num_joints = 36
         self.flip_pairs = [[0, 18], [1, 19], [2, 20], [3, 21], [4, 22], [5, 23], [6, 24], [7, 25], [8, 26], [9, 27],
                            [10, 28], [11, 29], [12, 30], [13, 31], [14, 32], [15, 33], [16, 34], [17, 35]]
@@ -40,6 +39,7 @@ class VeRiDataset(JointsDataset):
         file_name = os.path.join(
             self.root, 'annot', 'label_' + self.image_set + '.csv'
         )
+        print(file_name)
 
         hash_annot = {}
         with open(file_name) as annot_file:

@@ -16,7 +16,10 @@
 import os
 import mindspore.dataset as ds
 import mindspore.common.dtype as mstype
-import mindspore.dataset.transforms as C2
+
+import mindspore.dataset.transforms.c_transforms as C2
+from mindspore.communication.management import get_rank
+
 
 from .data_manager import DatasetManager
 from .data_loader import ImageDataset
@@ -126,9 +129,9 @@ def _get_rank_info():
 
     if rank_size > 1:
         rank_size = int(os.environ.get("RANK_SIZE"))
-        rank_id = int(os.environ.get("RANK_ID"))
+        rank_id = get_rank()
     else:
         rank_size = 1
-        rank_id = 0
+        rank_id = int(os.environ.get("DEVICE_ID"))
 
     return rank_size, rank_id

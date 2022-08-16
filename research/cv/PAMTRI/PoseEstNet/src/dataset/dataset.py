@@ -18,8 +18,10 @@ import copy
 import json
 from pathlib import Path
 import mindspore.dataset as ds
-import mindspore.dataset.vision as vision
-from mindspore.dataset.transforms.transforms import Compose
+
+import mindspore.dataset.vision.py_transforms as py_vision
+from mindspore.dataset.transforms.py_transforms import Compose
+from mindspore.communication.management import get_rank
 
 from .veri import VeRiDataset
 
@@ -42,8 +44,8 @@ def create_dataset(cfg, data_dir, is_train=True):
                 "joints", "joints_vis"], num_parallel_workers=1, shuffle=False, num_shards=1, shard_id=0)
 
     trans = Compose([
-        vision.ToTensor(),
-        vision.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225), is_hwc=False)
+        py_vision.ToTensor(),
+        py_vision.Normalize((0.485, 0.456, 0.406), (0.229, 0.224, 0.225), is_hwc=False)
     ])
 
     dataset = dataset.map(operations=trans, input_columns="input", num_parallel_workers=8)
@@ -83,10 +85,11 @@ def _get_rank_info():
     get rank size and rank id
     """
     rank_size = int(os.environ.get("RANK_SIZE"))
-
+    print(rank_size)
     if rank_size > 1:
         rank_size = int(os.environ.get("RANK_SIZE"))
-        rank_id = int(os.environ.get("RANK_ID"))
+
+        rank_id = get_rank()
     else:
         rank_size = 1
         rank_id = 0

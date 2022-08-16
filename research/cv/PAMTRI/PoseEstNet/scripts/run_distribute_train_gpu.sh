@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run_single_train.sh DATA_PATH PRETRAINED_PATH DEVICE_ID"
-echo "For example: bash run_single_train.sh /path/dataset /path/pretrained_path 0 "
+echo "bash run_distribute_train_gpu.sh DATA_PATH pretrain_path RANK_SIZE"
+echo "For example: bash run_distribute_train_gpu.sh /path/dataset /path/pretrain_path 8"
 echo "It is better to use the absolute path."
 echo "=============================================================================================================="
 set -e
@@ -29,24 +29,18 @@ get_real_path(){
   fi
 }
 DATA_PATH=$(get_real_path $1)
-PRE_CKPT=$(get_real_path $2)
-
-EXEC_PATH=$(pwd)
-echo "$EXEC_PATH"
+PRETRAINED_PATH=$(get_real_path $2)
+PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
+export DATA_PATH=${DATA_PATH}
+export RANK_SIZE=$3
 
 export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
-cd ../
-export DEVICE_ID=$3
-export RANK_SIZE=1
-env > env.log
-python3 train.py --cfg config.yaml --data_dir ${DATA_PATH} --distribute False --pre_ckpt_path ${PRE_CKPT} > train.log 2>&1
+echo "Start distribute training on GPU"
 
-if [ $? -eq 0 ];then
-    echo "training success"
-else
-    echo "training failed"
-    exit 2
-fi
-echo "finish"
-cd ../
+mpirun -n $3 --allow-run-as-root python ${PROJECT_DIR}/../train.py --cfg ${PROJECT_DIR}/../config_gpu.yaml \
+  --data_dir ${DATA_PATH} \
+  --distribute True \
+  --device_target GPU \
+  --pre_ckpt_path ${PRETRAINED_PATH} > ${PROJECT_DIR}/../distributed_train.log 2>&1 &
+

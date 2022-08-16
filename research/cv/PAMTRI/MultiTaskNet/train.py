@@ -17,11 +17,13 @@ import os
 import ast
 import random
 import argparse
+import time
 import numpy as np
 import mindspore
+from mindspore.common import set_seed
 from mindspore import dataset as de
 from mindspore import context, Tensor
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank
 from mindspore.train.model import Model, ParallelMode
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
@@ -49,6 +51,7 @@ parser.add_argument('--height', type=int, default=256, help="height of an image 
 parser.add_argument('--width', type=int, default=256, help="width of an image (default: 256)")
 
 # Optimization options
+parser.add_argument('--amp-level', type=str, default='O0', help="choose O0 or O3")
 parser.add_argument('--optim', type=str, default='adam', help="optimization algorithm")
 parser.add_argument('--max-epoch', default=10, type=int, help="maximum epochs to run")
 parser.add_argument('--train-batch', default=32, type=int, help="train batch size")
@@ -78,17 +81,21 @@ np.random.seed(1)
 de.config.set_seed(1)
 
 if __name__ == '__main__':
+    set_seed(1)
     target = args.device_target
     context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
 
     if args.distribute:
-        device_id = int(os.getenv('DEVICE_ID'))
-        context.set_context(device_id=device_id, enable_auto_mixed_precision=True)
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
         init()
+        device_num = int(os.getenv('RANK_SIZE', '1'))
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL,
+                                          gradients_mean=True, device_num=device_num)
+
     else:
-        device_id = int(os.getenv('DEVICE_ID'))
+        device_id = int(os.getenv('DEVICE_ID', '0'))
         context.set_context(device_id=device_id)
+
 
     if args.isModelArts:
         mox.file.copy_parallel(src_url=args.data_url, dst_url='/cache/dataset/device_' + os.getenv('DEVICE_ID'))
@@ -105,7 +112,6 @@ if __name__ == '__main__':
                                                                                   heatmapaware=args.heatmapaware,
                                                                                   segmentaware=args.segmentaware,
                                                                                   train_batch=args.train_batch)
-
     query_dataloader, gallery_dataloader, _, _, _, _vcolor2label, \
         _vtype2label = eval_create_dataset(dataset_dir=args.dataset,
                                            root=train_dataset_path,
@@ -162,9 +168,9 @@ if __name__ == '__main__':
                 lr_step=args.stepsize,
                 gamma=args.gamma)
     lr = Tensor(lr, mindspore.float32)
-
     decayed_params = []
     no_decayed_params = []
+
     for param in _model.trainable_params():
         if 'beta' not in param.name and 'gamma' not in param.name and 'bias' not in param.name:
             decayed_params.append(param)
@@ -175,9 +181,11 @@ if __name__ == '__main__':
                     {'order_params': _model.trainable_params()}]
 
     manager = FixedLossScaleManager(64, drop_overflow_update=False)
-    optimizer = init_optim(args.optim, group_params, lr, args.weight_decay)
 
-    model = Model(net_with_loss, optimizer=optimizer, loss_scale_manager=manager, amp_level="O3")
+    loss_scale = 64 if target == 'Ascend' else 1
+    optimizer = init_optim(args.optim, group_params, lr, args.weight_decay, loss_scale)
+
+    model = Model(net_with_loss, optimizer=optimizer, loss_scale_manager=manager, amp_level=args.amp_level)
 
     # define callbacks
     time_cb = TimeMonitor(data_size=step_size)
@@ -189,22 +197,25 @@ if __name__ == '__main__':
 
     if args.isModelArts:
         save_checkpoint_path = '/cache/train_output/device_' + os.getenv('DEVICE_ID') + '/'
-    else:
+    elif not args.distribute:
         save_checkpoint_path = './ckpt/'
+    else:
+        save_checkpoint_path = './ckpt_' + str(get_rank()) + '/'
 
     ckpt_cb = ModelCheckpoint(prefix="MultipleNet",
                               directory=save_checkpoint_path,
                               config=config_ck)
     save_cb = SaveCallback(test_model, query_dataloader, gallery_dataloader, \
-            _vcolor2label, _vtype2label, 1, args.max_epoch, save_checkpoint_path, step_size)
+            _vcolor2label, _vtype2label, 1, args.max_epoch, save_checkpoint_path, step_size, device_id)
     cb += [ckpt_cb, save_cb]
 
     print("##################### heatmapaware is #####################:{}".format(args.heatmapaware))
     print("##################### segmentaware is #####################:{}".format(args.segmentaware))
     print("##################### batch size is #####################:{}".format(args.train_batch))
     print("######################## start train ########################")
-
-    model.train(args.max_epoch, dataset, callbacks=cb, dataset_sink_mode=True)
-
+    begin = time.time()
+    model.train(args.max_epoch, dataset, callbacks=cb, dataset_sink_mode=False)
+    end = time.time()
+    print('total time: ', str(end-begin))
     if args.isModelArts:
         mox.file.copy_parallel(src_url='/cache/train_output', dst_url=args.train_url)

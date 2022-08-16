@@ -73,7 +73,20 @@
         |    ├── label_query.csv
     ```
 
-其中`*.csv`标签已经提供，`image_train`、`image_test`和`image_query`是数据集VeRI中数据。其他未提供的数据由第一个模型PoseEstNet的`trans.py`转换。
+其中`*.csv`标签已经提供，点击[获取](https://github.com/NVlabs/PAMTRI/tree/master/MultiTaskNet/data/veri)，`image_train`、`image_test`和`image_query`是数据集VeRI中数据。其他未提供的数据由第一个模型PoseEstNet中的`run_trans_gpu(ascend).sh`脚本生成。
+
+生成过程如下：
+
+```bash
+#Ascend环境
+bash PoseEstNet/scripts/run_trans_ascend.sh /data/veri PoseEstNet.ckpt device_id
+#GPU环境
+bash PoseEstNet/scripts/run_trans_gpu.sh /data/veri PoseEstNet.ckpt gpu_id
+
+```
+
+注意：
+数据集路径有二级文件夹veri, PoseEstNet.ckpt在[PoseEstNet](../PoseEstNet/)中训练生成的ckpt文件夹中，请选择精度最高的ckpt
 
 # 环境要求
 
@@ -98,23 +111,23 @@ pip install -r requirements.txt
 
   ```python
   # 运行训练示例
-  bash scripts/run_single_train.sh [DATA_PATH] [PRETRAINED_PATH] [DEVICE_ID] [HEATMAP_SEGMENT]
-  # example: bash scripts/run_single_train.sh ../data/ ../MultiTask_pretrained.ckpt 1 s
-  # example: bash scripts/run_single_train.sh ../data/ ../MultiTask_pretrained.ckpt 1 h
+  bash scripts/run_single_train_ascend.sh [DATA_PATH] [PRETRAINED_PATH] [DEVICE_ID] [HEATMAP_SEGMENT]
+  # example: bash scripts/run_single_train_ascend.sh ../data/ ../MultiTask_pretrained.ckpt 1 s
+  # example: bash scripts/run_single_train_ascend.sh ../data/ ../MultiTask_pretrained.ckpt 1 h
 
   # 运行分布式训练示例
-  bash scripts/run_distribute_train.sh [DATASET_PATH] [PRETRAIN_CKPT_PATH] [RANK_TABLE_FILE] [HEATMAP_SEGMENT]
-  # example: bash scripts/run_distribute_train.sh ./data/ ./MultiTask_pretrained.ckpt ./scripts/rank_table_8pcs.json h
-  # example: bash scripts/run_distribute_train.sh ./data/ ./MultiTask_pretrained.ckpt ./scripts/rank_table_8pcs.json s
+  bash scripts/run_distribute_train_ascend.sh [DATASET_PATH] [PRETRAIN_CKPT_PATH] [RANK_TABLE_FILE] [HEATMAP_SEGMENT]
+  # example: bash scripts/run_distribute_train_ascend.sh ./data/ ./MultiTask_pretrained.ckpt ./scripts/rank_table_8pcs.json h
+  # example: bash scripts/run_distribute_train_ascend.sh ./data/ ./MultiTask_pretrained.ckpt ./scripts/rank_table_8pcs.json s
 
   # 运行评估示例
   python eval.py --ckpt_path path/ckpt --root path/dataset --device_id device_id --heatmapaware --segmentaware > eval.log 2>&1 &
   # example: python eval.py --ckpt_path path/ckpt --root ./data/ --device_id 0 --heatmapaware True > eval.log 2>&1 &
   # example: python eval.py --ckpt_path path/ckpt --root ./data/ --device_id 0 --segmentaware True > eval.log 2>&1 &
   或
-  bash scripts/run_eval.sh [CKPT_PATH] [DATASET_NAME] [DEVICE_ID] [HEATMAP_SEGMENT]
-  # example: bash scripts/run_eval.sh ./*.ckpt ./data/ 0 h
-  # example: bash scripts/run_eval.sh ./*.ckpt ./data/ 0 s
+  bash scripts/run_eval_ascend.sh [CKPT_PATH] [DATASET_NAME] [DEVICE_ID] [HEATMAP_SEGMENT]
+  # example: bash scripts/run_eval_ascend.sh ./*.ckpt ./data/ 0 h
+  # example: bash scripts/run_eval_ascend.sh ./*.ckpt ./data/ 0 s
 
   # 运行推理示例
   bash scripts/run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID] [NEED_HEATMAP] [NEED_SEGMENT]
@@ -127,6 +140,30 @@ pip install -r requirements.txt
 
  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
 
+- GPU处理器环境运行
+
+```python
+# 运行训练示例
+bash scripts/run_single_train_gpu.sh [DATA_PATH] [PRETRAINED_PATH] [DEVICE_ID] [HEATMAP_SEGMENT]
+# example: bash scripts/run_single_train_gpu.sh ../data/ ../MultiTask_pretrained.ckpt 1 s
+# example: bash scripts/run_single_train_gpu.sh ../data/ ../MultiTask_pretrained.ckpt 1 h
+
+# 运行分布式训练示例
+bash scripts/run_distribute_train_gpu.sh [DATASET_PATH] [PRETRAIN_CKPT_PATH] [RANK_SIZE] [HEATMAP_SEGMENT]
+# example: bash scripts/run_distribute_train_gpu.sh ./data/ ./MultiTask_pretrained.ckpt 8 h
+# example: bash scripts/run_distribute_train_gpu.sh ./data/ ./MultiTask_pretrained.ckpt 8 s
+
+# 运行评估示例
+python eval.py --ckpt_path path/ckpt --device_target GPU --root path/dataset --device_id device_id --heatmapaware --segmentaware > eval.log 2>&1 &
+# example: python eval.py --ckpt_path path/ckpt --device_target GPU --root ./data/ --device_id 0 --heatmapaware True > eval.log 2>&1 &
+# example: python eval.py --ckpt_path path/ckpt --device_target GPU --root ./data/ --device_id 0 --segmentaware True > eval.log 2>&1 &
+或
+bash scripts/run_eval_gpu.sh [DATASET_NAME] [CKPT_PATH] [DEVICE_ID] [HEATMAP_SEGMENT]
+# example: bash scripts/run_eval_gpu.sh ./data/ ./*.ckpt 0 h
+# example: bash scripts/run_eval_gpu.sh ./data/ ./*.ckpt 0 s
+
+```
+
 # 脚本说明
 
 ## 脚本及样例代码
@@ -138,9 +175,12 @@ pip install -r requirements.txt
         ├── MultiTaskNet
             ├── ascend_310_infer                    // 实现310推理源代码
             ├── scripts
-            |   ├── run_distribute_train.sh             // 分布式到Ascend的shell脚本
-            |   ├── run_single_train.sh                 // 单卡到Ascend的shell脚本
-            |   ├── run_eval.sh                         // Ascend评估的shell脚本
+            |   ├── run_distribute_train_ascend.sh      // 分布式到Ascend的shell脚本
+            |   ├── run_distribute_train_gpu.sh         // 分布式到GPU的shell脚本
+            |   ├── run_single_train_ascend.sh          // 单卡到Ascend的shell脚本
+            |   ├── run_single_train_gpu.sh             // 单卡到GPU的shell脚本
+            |   ├── run_eval_ascend.sh                  // Ascend评估的shell脚本
+            |   ├── run_eval_gpu.sh                     // GPU评估的shell脚本
             |   ├── run_infer_310.sh                    // Ascend推理shell脚本
             ├── src
             |   ├── dataset
@@ -159,6 +199,7 @@ pip install -r requirements.txt
             |   ├── utils
             |   |   ├── evaluate.py                     // 推理函数
             |   |   ├── save_callback.py                // 边训练边推理的实现
+            |   |   ├── pthtockpt.py                    // pth格式的预训练模型转换为ckpt
             ├── eval.py                             // 精度验证脚本
             ├── train.py                            // 训练脚本
             ├── export.py                           // 推理模型导出脚本
@@ -188,7 +229,7 @@ pip install -r requirements.txt
 pytorch的DensenNet121预训练模型，[点击获取](https://download.pytorch.org/models/densenet121-a639ec97.pth)
 
 ```bash
-python pth2ckpt.py --pth_path /path/densenet121-a639ec97.pth
+python src/utils/pthtockpt.py --pth_path /path/densenet121-a639ec97.pth
 ```
 
 ### 训练
@@ -196,13 +237,30 @@ python pth2ckpt.py --pth_path /path/densenet121-a639ec97.pth
 - Ascend处理器环境运行
 
   ```bash
-  python train.py --distribute False --pre_ckpt_path path/pretain_ckpt --root path/dataset --heatmapaware --segmentaware > train.log 2>&1 &
+  python train.py --distribute False --pre_ckpt_path path/pretain_ckpt --root path/dataset --heatmapaware --segmentaware > train_ascend.log 2>&1 &
   ```
 
-  上述python命令将在后台运行，您可以通过train.log文件查看结果。训练结束后，您可在默认脚本文件夹下找到检查点文件。采用以下方式达到损失值：
+  上述python命令将在后台运行，您可以通过train_ascend.log文件查看结果。训练结束后，您可在默认脚本文件夹下找到检查点文件。采用以下方式达到损失值：
 
   ```bash
-  # grep "loss is " train.log
+  # grep "loss is " train_ascend.log
+  epoch:1 step:1136, loss is 1.4842823
+  epcoh:2 step:1136, loss is 1.0897788
+  ...
+  ```
+
+  模型检查点保存在当前目录下。
+
+- GPU处理器环境运行
+
+  ```bash
+  python train.py --distribute False --pre_ckpt_path path/pretain_ckpt --device_target GPU --root path/dataset --heatmapaware --segmentaware > train_gpu.log 2>&1 &
+  ```
+
+  上述python命令将在后台运行，您可以通过train_gpu.log文件查看结果。训练结束后，您可在默认脚本文件夹下找到检查点文件。采用以下方式达到损失值：
+
+  ```bash
+  # grep "loss is " train_gpu.log
   epoch:1 step:1136, loss is 1.4842823
   epcoh:2 step:1136, loss is 1.0897788
   ...
@@ -215,7 +273,7 @@ python pth2ckpt.py --pth_path /path/densenet121-a639ec97.pth
 - Ascend处理器环境运行
 
   ```bash
-  bash scripts/run_distribute_train.sh [DATASET_PATH] [PRETRAIN_CKPT_PATH] [DATASET_PATH] [RANK_TABLE_FILE] [HEATMAP_SEGMENT]
+  bash scripts/run_distribute_train_ascend.sh [DATASET_PATH] [PRETRAIN_CKPT_PATH] [DATASET_PATH] [RANK_TABLE_FILE] [HEATMAP_SEGMENT]
   ```
 
   上述shell脚本将在后台运行分布训练。您可以通过device[X]/train[X].log文件查看结果。采用以下方式达到损失值：
@@ -231,6 +289,25 @@ python pth2ckpt.py --pth_path /path/densenet121-a639ec97.pth
   ...
   ```
 
+- GPU处理器环境运行
+
+  ```bash
+  bash scripts/run_distribute_train_gpu.sh [DATASET_PATH] [PRETRAIN_CKPT_PATH] [RANK_SIZE] [HEATMAP_SEGMENT]
+  ```
+
+  上述shell脚本将在后台运行分布训练。您可以通过distribute_train_gpu.log文件查看结果。采用以下方式达到损失值：
+
+  ```bash
+  #
+  epoch: 1 step: 284, loss is 2.924
+  epoch: 2 step: 284, loss is 1.293
+  ...
+  #
+  epoch: 1 step: 284, loss is 2.652
+  epoch: 2 step: 284, loss is 1.242
+  ...
+  ```
+
 ## 评估过程
 
 ### 评估
@@ -240,12 +317,12 @@ python pth2ckpt.py --pth_path /path/densenet121-a639ec97.pth
   在运行以下命令之前，请检查用于评估的检查点路径。请将检查点路径设置为绝对全路径，例如“username/PAMTRI/MultiTaskNet/MultiTaskNet-1_142.ckpt”。
 
   ```bash
-  python eval.py --ckpt_path path/ckpt --root path/dataset --device_id device_id --heatmapaware --segmentaware > eval.log 2>&1 &
+  python eval.py --ckpt_path path/ckpt --root path/dataset --device_id device_id --heatmapaware --segmentaware > eval_ascend.log 2>&1 &
   OR
-  bash scripts/run_eval.sh [CKPT_PATH] [DATASET_NAME] [DEVICE_ID] [HEATMAP_SEGMENT]
+  bash scripts/run_eval_ascend.sh [CKPT_PATH] [DATASET_NAME] [DEVICE_ID] [HEATMAP_SEGMENT]
   ```
 
-  上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
+  上述python命令将在后台运行，您可以通过eval_ascend.log文件查看结果。测试数据集的准确性如下：
 
   ```bash
   Computing CMC and mAP
@@ -266,6 +343,56 @@ python pth2ckpt.py --pth_path /path/densenet121-a639ec97.pth
   ```
 
   注：对于分布式训练后评估，请将checkpoint_path设置为最后保存的检查点文件，如“username/PAMTRI/MultiTaskNet/device0/ckpt/best.ckpt”。测试数据集的准确性如下：
+
+  ```bash
+  Computing CMC and mAP
+  Results ----------
+  mAP: 31.01%
+  CMC curve
+  Rank-1  : 53.34%
+  Rank-2  : 62.16%
+  Rank-3  : 68.41%
+  Rank-4  : 71.99%
+  Rank-5  : 74.85%
+  ...
+  Rank-50 : 95.71%
+  ------------------
+  Compute attribute classification accuracy
+  Color classification accuracy: 90.25%
+  Type classification accuracy: 87.27%
+  ```
+
+- 在GPU环境运行时评估VeRi数据集
+
+  在运行以下命令之前，请检查用于评估的检查点路径。请将检查点路径设置为绝对全路径，例如“username/PAMTRI/MultiTaskNet/MultiTaskNet-1_142.ckpt”。
+
+  ```bash
+  python eval.py --ckpt_path path/ckpt --device_target GPU --root path/dataset --device_id device_id --heatmapaware --segmentaware > eval_gpu.log 2>&1 &
+  OR
+  bash scripts/run_eval_gpu.sh [CKPT_PATH] [DATASET_NAME] [DEVICE_ID] [HEATMAP_SEGMENT]
+  ```
+
+  上述python命令将在后台运行，您可以通过eval_gpu.log文件查看结果。测试数据集的准确性如下：
+
+  ```bash
+  Computing CMC and mAP
+  Results ----------
+  mAP: 31.01%
+  CMC curve
+  Rank-1  : 53.34%
+  Rank-2  : 62.16%
+  Rank-3  : 68.41%
+  Rank-4  : 71.99%
+  Rank-5  : 74.85%
+  ...
+  Rank-50 : 95.71%
+  ------------------
+  Compute attribute classification accuracy
+  Color classification accuracy: 90.25%
+  Type classification accuracy: 87.27%
+  ```
+
+  注：对于分布式训练后评估，请将checkpoint_path设置为最后保存的检查点文件，如“username/PAMTRI/MultiTaskNet/ckpt_0/best.ckpt”。测试数据集的准确性如下：
 
   ```bash
   Computing CMC and mAP
@@ -321,23 +448,23 @@ python export.py --root /path/dataset --ckpt_path /path/ckpt --segmentaware --he
 
 #### VeRi上的MulTiTaskNet
 
-| 参数                 | Ascend                                                      |
-| -------------------------- | ----------------------------------------------------------- |
-| 模型版本              | MultiTaskNet                                                |
-| 资源                   | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8             |
-| 上传日期              | 2021-09-30                                 |
-| MindSpore版本          | 1.3.0                                                       |
-| 数据集                    | VeRi                                                    |
-| 训练参数        | epoch=10, steps=1136(八卡：142), batch_size = 32, lr=0.0005              |
-| 优化器                  | adam                                                    |
-| 损失函数              | CrossEntropyLabelSmooth和TripletLoss                                       |
-| 输出                    | 概率                                                 |
-| 损失                       | 100.14                                                      |
-| 速度                      | 8卡：2503毫秒/步(segment) 1364.692毫秒/步(heatmap)                        |
-| 总时长                 | 8卡：2小时50分钟(segment)  2小时50分钟(heatmap)                       |
-| 微调检查点 | 118M (.ckpt文件)                                         |
-| 推理模型        | 40M (.mindir文件)                     |
-| 脚本                    | [MultiTaskNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/MultiTaskNet) |
+| 参数                 | Ascend                                                      | GPU |
+| -------------------------- | ----------------------------------------------------------- | -------------------------- |
+| 模型版本              | MultiTaskNet                                                | MultiTaskNet |
+| 资源                   | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8             | GPU: Geforce RTX3090；CPU 2.90GHz，64核；内存 251G；Ubuntu18.04 |
+| 上传日期              | 2021-09-30                                 | 2021-02-28 |
+| MindSpore版本          | 1.3.0                                                       | 1.5.0 |
+| 数据集                    | VeRi                                                    | Veri |
+| 训练参数        | epoch=10, steps=1136(八卡：142), batch_size = 32, lr=0.0005              | epoch=10, steps=1136(八卡：142), batch_size = 32, lr=0.0003 |
+| 优化器                  | adam                                                    | adam |
+| 损失函数              | CrossEntropyLabelSmooth和TripletLoss                                       | CrossEntropyLabelSmooth和TripletLoss |
+| 输出                    | 概率                                                 | 概率 |
+| 损失                       | 100.14                                                      | 1.59 |
+| 速度                      | 8卡：2503毫秒/步(segment) 1364.692毫秒/步(heatmap)                        | 单卡：347毫秒/步(segment)   8卡：384毫秒/步(segment)  单卡：950毫秒/步(heatmap)  8卡：1020毫秒/步(heatmap) |
+| 总时长                 | 8卡：2小时50分钟(segment)  2小时50分钟(heatmap)                       | 单卡：1小时58分钟(segment) 8卡：1小时10分钟(segment) 单卡：5小时20分钟(heatmap) 8卡：3小时15分钟(heatmap) |
+| 微调检查点 | 118M (.ckpt文件)                                         | 114M(.ckpt文件  segment)  115M(.ckpt文件  heatmap) |
+| 推理模型        | 40M (.mindir文件)                     |  |
+| 脚本                    | [MultiTaskNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/MultiTaskNet) | [MultiTaskNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/MultiTaskNet) |
 
 ### 推理性能
 
