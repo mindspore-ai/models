@@ -13,7 +13,6 @@
 # limitations under the License.
 # ============================================================================
 """test ShuffleNetV1"""
-import argparse
 import time
 from mindspore import context, nn
 from mindspore.train.model import Model
@@ -22,7 +21,7 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.shufflenetv1 import ShuffleNetV1 as shufflenetv1
 from src.dataset import create_dataset, create_flower_dataset
 from src.crossentropysmooth import CrossEntropySmooth
-from src.model_utils.config import get_config
+from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id
 
@@ -77,9 +76,4 @@ def test():
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='train', add_help=False)
-    parser.add_argument('--config_path', type=str, default='../../default_config.yaml',
-                        help='Config file path')
-    args = parser.parse_args()
-    config = get_config(args.config_path)
     test()

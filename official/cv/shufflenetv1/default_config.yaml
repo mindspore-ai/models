@@ -20,6 +20,7 @@ device_id: 0
 
 # ======================================================================================
 # Training options
+is_transfer: False
 epoch_size: 250
 keep_checkpoint_max: 5
 save_ckpt_path: "./"
