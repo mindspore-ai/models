@@ -1,0 +1,130 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unlesee you know exactly what you are doing)
+# common options
+device_target: "Ascend"
+run_distribute: False
+device_id: 0
+norm: "instance"
+batch_size: 1
+load_size: 1024
+fine_size: 512
+label_nc: 35
+input_nc: 3
+output_nc: 3
+resize_or_crop: "scale_width"
+no_flip: False
+netG: "global"
+ngf: 64
+n_downsample_global: 4
+n_blocks_global: 9
+n_blocks_local: 3
+n_local_enhancers: 1
+niter_fix_global: 0
+no_instance: False
+instance_feat: False
+label_feat: False
+feat_num: 3
+load_features: False
+n_downsample_E: 4
+nef: 16
+n_clusters: 10
+data_root: './datasets/cityscapes'
+
+# optimiter options
+loss_scale: 1
+
+# train options
+vgg_pre_trained: "./vgg19.ckpt"
+continue_train: False
+load_pretrain: ''
+which_epoch: 'latest'
+save_ckpt_dir: './checkpoints'
+name: "label2city"
+init_type: 'normal'
+init_gain: 0.02
+pad_mode: 'CONSTANT'
+beta1: 0.5
+beta2: 0.999
+lr: 0.0002
+phase: 'train'
+niter: 100
+niter_decay: 100
+num_D: 2
+n_layers_D: 3
+ndf: 64
+lambda_feat: 10.0
+no_ganFeat_loss: False
+no_vgg_loss: False
+no_lsgan: False
+serial_batches: False
+device_num: 1
+
+# eval options
+predict_dir: "results/predict/"
+use_encoded_image: False
+cluster_path: "features_clustered_010.npy"
+load_ckpt: ''
+
+---
+# Help description for each configuration
+device_target: "Device id of GPU or Ascend, default is Ascend."
+run_distribute: "Run distribute or not, default is false."
+device_id: "Device id, default is 0."
+norm: "Instance normalization or batch normalization, default is instance."
+batch_size: "Batch size, default is 1."
+load_size: "Scale images to this size, default is 1024"
+fine_size: "Crop to this size, default is 512."
+label_nc: "Input label channels, default is 35."
+input_nc: "Input image channels, default is 3."
+output_nc: "Output image channels, default is 3."
+resize_or_crop: "Scaling and cropping of images at load time, default is scale_width."
+no_flip: "If true, do not flip the images for data argumentation. Default is false."
+netG: "Selects model to use for netG [global,local,encoder], default is global."
+ngf: "Gen filters in first conv layer, default is 64."
+n_downsample_global: "Number of downsampling layers in netG, default is 4."
+n_blocks_global: "Number of residual blocks in the global enhancer network. Default is 9."
+n_blocks_local: "Number of residual blocks in the local enhancer network. Default is 3."
+n_local_enhancers: "Number of local enhancers to use, default is 1."
+niter_fix_global: "Number of epochs that we only train the outmost local enhancer, default is 0."
+no_instance: "If true, do not add instance map as input. Default is false."
+instance_feat: "If true, add encoded instance features as input. Default is false."
+label_feat: "If true, add encode label features as input. Default is false."
+feat_num: "Vector length for encoded features, default is 3."
+load_features: "If true, load precomputed features maps. Default is false."
+n_downsample_E: "Number of downsampling layers in encoder, default is 4."
+nef: "Number of encoder filters in the first conv layer, default is 16."
+n_clusters: "Number of clusters for features, default is 10."
+data_root: 'Data root path, default is ./datasets/cityscapes'
+
+# optimiter options
+loss_scale: "Loss scale, default is 1."
+
+# train options
+vgg_pre_trained: "Vgg ckpt path."
+continue_train: "If true, continue training and load the latest model. Default is false."
+load_pretrain: "Load the pretrained model from the specified location."
+which_epoch: "Set to which epoch cached model to load, default is latest."
+save_ckpt_dir: "file path of stored checkpoint file in training"
+name: "Name of the experiment. It decides where to store samples and models."
+init_type: "Network init type, default is normal."
+init_gain: "Scaling factor for normal xavier and orthogonal, default is 0.02."
+pad_mode: "Pad mode, default is CONSTANT."
+beta1: "Adam beta1, default is 0.5."
+beta2: "Adam beta2, default is 0.999."
+lr: "Learning rate, default is 0.0002."
+phase: "An identifier:[train, val, test]."
+niter: "Number of iter at starting learning rate, default is 100."
+niter_decay: "Number of iter to linearly decay learning rate to zero."
+num_D: "Number of discriminators to use, default is 2."
+n_layers_D: "Only used if which_model_netD==n_layers, default is 3."
+ndf: "Number of discriminators filters in first conv layer, default is 64."
+lambda_feat: "Weight for feature matching loss. default is 10.0."
+no_ganFeat_loss: "If true, do not use discriminator feature matching loss. Default is false."
+no_vgg_loss: "If true, do not use VGG features matching loss. Default is false."
+no_lsgan: "Do not use least square GAN, if false, use vanilla GAN. Default is false."
+serial_batches: "If true, takes images in order to make batches, otherwise takes them randomly. Default is false."
+device_num: "Number of device, default is 1."
+# eval options
+predict_dir: "Predict result saved path."
+use_encoded_image: "If true, encode the real image to get the feature map. Default is false."
+cluster_path: "The path for clustered results of encode features."
+load_ckpt: "File path of checking point file used in validation."
