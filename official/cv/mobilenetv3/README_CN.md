@@ -20,7 +20,9 @@
     - [推理过程](#推理过程)
         - [导出MindIR](#导出mindir)
         - [在Ascend310执行推理](#在ascend310执行推理)
-        - [结果](#结果)
+            - [结果](#结果-2)
+        - [使用ONNX执行推理](#使用onnx执行推理)
+            - [结果](#结果-3)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [训练性能](#训练性能)
@@ -72,6 +74,7 @@ MobileNetV3总体网络架构如下：
   │   ├──run_train.sh   # 用于训练的shell脚本
   │   ├──run_eval.sh    # 用于评估的shell脚本
   │   ├──run_infer_310.sh    # 用于Ascend310推理的脚本
+  │   ├──run_onnx.sh    # 用于onnx模型推理的脚本
   ├── src
   │   ├──config.py      # 参数配置
   │   ├──dataset.py     # 创建数据集
@@ -80,6 +83,7 @@ MobileNetV3总体网络架构如下：
   │   ├──mobilenetV3.py      # MobileNetV3架构
   ├── train.py      # 训练脚本
   ├── eval.py       #  评估脚本
+  ├── infer_onnx.py       #  onnx推理脚本
   ├── preprocess.py      # 310推理数据预处理脚本
   ├── postprocess.py       #  310推理结果计算脚本
   ├── mindspore_hub_conf.py       #  MindSpore Hub接口
@@ -175,12 +179,61 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 - `DATA_PATH` 推理数据集路径
 - `DEVICE_ID` 可选，默认值为0。
 
-### 结果
+#### 结果
 
 推理结果保存在脚本执行的当前路径，你可以在acc.log中看到以下精度计算结果。
 
 ```bash
 Eval: top1_correct=37051, tot=50000, acc=74.10%
+```
+
+### 使用ONNX执行推理
+
+在推理前，需要先导出ONNX模型。
+
+- 首先需要从 [mindspore官网](https://mindspore.cn/resources/hub/details?MindSpore/1.8/mobilenetv3_imagenet2012)上下载模型的ckpt权重文件。
+- 导出ONNX模型的命令如下
+
+```shell
+python export.py --checkpoint_path[ckpt_path] --device_target "GPU" --file_name mobilenetv3.onnx --file_format  "ONNX"
+```
+
+- 使用ONNX模型推理
+
+```shell
+python3 infer_onnx.py --onnx_path 'mobilenetv3.onnx' --dataset_path './imagenet/val'
+```
+
+- 使用shell命令行推理
+
+```shell
+bash ./scripts/run_onnx.sh [ONNX_PATH] [DATASET_PATH] [PLATFORM]
+```
+
+推理结果将保存到 `infer_onnx.log`中。
+
+- 注意点1：该命令需要在mobilenetv3文件夹目录下执行。
+
+- 注意点2：数据集需要将同类图片分到同一个文件夹中，处理成如下形式。
+
+  ```reStructuredText
+  imagenet
+   -- val
+    -- n01985128
+    -- n02110063
+    -- n03041632
+    -- ...
+  ```
+
+- 注意点3：平台只支持GPU和CPU，默认是GPU。
+
+#### 结果
+
+准确度结果将显示在命令行中，结果如下所示。
+
+```log
+ACC_TOP1 = 0.74436
+ACC_TOP5 = 0.91762
 ```
 
 # 模型描述
