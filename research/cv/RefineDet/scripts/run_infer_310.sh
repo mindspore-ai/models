@@ -14,9 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 3 || $# -gt 4 ]]; then
-    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [DEVICE_ID]
-    DVPP is mandatory, and must choose from [DVPP|CPU], it's case-insensitive
+if [[ $# -lt 2 || $# -gt 3 ]]; then
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi
@@ -30,29 +29,29 @@ get_real_path(){
 }
 model=$(get_real_path $1)
 data_path=$(get_real_path $2)
-DVPP=${3^^}
 
 device_id=0
-if [ $# == 4 ]; then
-    device_id=$4
+if [ $# == 3 ]; then
+    device_id=$3
 fi
 
 echo "mindir name: "$model
 echo "dataset path: "$data_path
-echo "image process mode: "$DVPP
+echo "image process mode: CPU"
 echo "device id: "$device_id
 
 export ASCEND_HOME=/usr/local/Ascend/
 if [ -d ${ASCEND_HOME}/ascend-toolkit ]; then
-    export PATH=$ASCEND_HOME/ascend-toolkit/latest/fwkacllib/ccec_compiler/bin:$ASCEND_HOME/ascend-toolkit/latest/atc/bin:$PATH
-    export LD_LIBRARY_PATH=/usr/local/lib:$ASCEND_HOME/ascend-toolkit/latest/atc/lib64:$ASCEND_HOME/ascend-toolkit/latest/fwkacllib/lib64:$ASCEND_HOME/driver/lib64:$ASCEND_HOME/add-ons:$LD_LIBRARY_PATH
+    export PATH=$ASCEND_HOME/fwkacllib/bin:$ASCEND_HOME/fwkacllib/ccec_compiler/bin:$ASCEND_HOME/ascend-toolkit/latest/fwkacllib/ccec_compiler/bin:$ASCEND_HOME/ascend-toolkit/latest/atc/bin:$PATH
+    export LD_LIBRARY_PATH=$ASCEND_HOME/fwkacllib/lib64:/usr/local/lib:$ASCEND_HOME/ascend-toolkit/latest/atc/lib64:$ASCEND_HOME/ascend-toolkit/latest/fwkacllib/lib64:$ASCEND_HOME/driver/lib64:$ASCEND_HOME/add-ons:$LD_LIBRARY_PATH
     export TBE_IMPL_PATH=$ASCEND_HOME/ascend-toolkit/latest/opp/op_impl/built-in/ai_core/tbe
-    export PYTHONPATH=${TBE_IMPL_PATH}:$ASCEND_HOME/ascend-toolkit/latest/fwkacllib/python/site-packages:$PYTHONPATH
+    export PYTHONPATH=$ASCEND_HOME/fwkacllib/python/site-packages:${TBE_IMPL_PATH}:$ASCEND_HOME/ascend-toolkit/latest/fwkacllib/python/site-packages:$PYTHONPATH
     export ASCEND_OPP_PATH=$ASCEND_HOME/ascend-toolkit/latest/opp
 else
-    export PATH=$ASCEND_HOME/atc/ccec_compiler/bin:$ASCEND_HOME/atc/bin:$PATH
-    export LD_LIBRARY_PATH=/usr/local/lib:$ASCEND_HOME/atc/lib64:$ASCEND_HOME/acllib/lib64:$ASCEND_HOME/driver/lib64:$ASCEND_HOME/add-ons:$LD_LIBRARY_PATH
-    export PYTHONPATH=$ASCEND_HOME/atc/python/site-packages:$PYTHONPATH
+    export ASCEND_HOME=/usr/local/Ascend/latest/
+    export PATH=$ASCEND_HOME/fwkacllib/bin:$ASCEND_HOME/fwkacllib/ccec_compiler/bin:$ASCEND_HOME/atc/ccec_compiler/bin:$ASCEND_HOME/atc/bin:$PATH
+    export LD_LIBRARY_PATH=$ASCEND_HOME/fwkacllib/lib64:/usr/local/lib:$ASCEND_HOME/atc/lib64:$ASCEND_HOME/acllib/lib64:$ASCEND_HOME/driver/lib64:$ASCEND_HOME/add-ons:$LD_LIBRARY_PATH
+    export PYTHONPATH=$ASCEND_HOME/fwkacllib/python/site-packages:$ASCEND_HOME/atc/python/site-packages:$PYTHONPATH
     export ASCEND_OPP_PATH=$ASCEND_HOME/opp
 fi
 
@@ -73,19 +72,12 @@ function infer()
     fi
     mkdir result_Files
     mkdir time_Result
-    if [ "$DVPP" == "DVPP" ];then
-      ./ascend310_infer/out/main --mindir_path=$model --dataset_path=$data_path --device_id=$device_id --cpu_dvpp=$DVPP --aipp_path=./ascend310_infer/aipp.cfg --image_height=320 --image_width=320 &> infer.log
-    elif [ "$DVPP" == "CPU"  ]; then
-      ./ascend310_infer/out/main --mindir_path=$model --dataset_path=$data_path --cpu_dvpp=$DVPP --device_id=$device_id --image_height=320 --image_width=320 &> infer.log
-    else
-      echo "image process mode must be in [DVPP|CPU]"
-      exit 1
-    fi
+    ./ascend310_infer/out/main --mindir_path=$model --dataset_path=$data_path --device_id=$device_id --image_height=320 --image_width=320 &> infer.log
 }
 
 function cal_acc()
 {
-    python3 ./postprocess.py --result_path=./result_Files --img_path=$data_path --drop &> acc.log 
+    python ./postprocess.py --result_path=./result_Files --img_path=$data_path --drop &> acc.log 
 }
 
 compile_app

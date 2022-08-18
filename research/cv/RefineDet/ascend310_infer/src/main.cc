@@ -43,7 +43,6 @@ using mindspore::kSuccess;
 using mindspore::MSTensor;
 using mindspore::dataset::Execute;
 using mindspore::dataset::TensorTransform;
-using mindspore::dataset::vision::DvppDecodeResizeJpeg;
 using mindspore::dataset::vision::Resize;
 using mindspore::dataset::vision::HWC2CHW;
 using mindspore::dataset::vision::Normalize;
@@ -52,8 +51,6 @@ using mindspore::dataset::vision::Decode;
 DEFINE_string(mindir_path, "", "mindir path");
 DEFINE_string(dataset_path, ".", "dataset path");
 DEFINE_int32(device_id, 0, "device id");
-DEFINE_string(aipp_path, "./aipp.cfg", "aipp path");
-DEFINE_string(cpu_dvpp, "DVPP", "cpu or dvpp process");
 DEFINE_int32(image_height, 320, "image height");
 DEFINE_int32(image_width, 320, "image width");
 
@@ -71,14 +68,6 @@ int main(int argc, char **argv) {
   context->MutableDeviceInfo().push_back(ascend310);
   mindspore::Graph graph;
   Serialization::Load(FLAGS_mindir_path, ModelType::kMindIR, &graph);
-  if (FLAGS_cpu_dvpp == "DVPP") {
-    if (RealPath(FLAGS_aipp_path).empty()) {
-      std::cout << "Invalid aipp path" << std::endl;
-      return 1;
-    } else {
-      ascend310->SetInsertOpConfigPath(FLAGS_aipp_path);
-    }
-  }
 
   Model model;
   Status ret = model.Build(GraphCell(graph), context);
@@ -104,32 +93,23 @@ int main(int argc, char **argv) {
     std::vector<MSTensor> inputs;
     std::vector<MSTensor> outputs;
     std::cout << "Start predict input files:" << all_files[i] << std::endl;
-    if (FLAGS_cpu_dvpp == "DVPP") {
-      auto resizeShape = {static_cast <uint32_t>(FLAGS_image_height), static_cast <uint32_t>(FLAGS_image_width)};
-      Execute resize_op(std::shared_ptr<DvppDecodeResizeJpeg>(new DvppDecodeResizeJpeg(resizeShape)));
-      auto imgDvpp = std::make_shared<MSTensor>();
-      resize_op(ReadFileToTensor(all_files[i]), imgDvpp.get());
-      inputs.emplace_back(imgDvpp->Name(), imgDvpp->DataType(), imgDvpp->Shape(),
-                        imgDvpp->Data().get(), imgDvpp->DataSize());
-    } else {
-      std::shared_ptr<TensorTransform> decode(new Decode());
-      std::shared_ptr<TensorTransform> hwc2chw(new HWC2CHW());
-      std::shared_ptr<TensorTransform> normalize(
-      new Normalize({123.675, 116.28, 103.53}, {58.395, 57.120, 57.375}));
-      auto resizeShape = {FLAGS_image_height, FLAGS_image_width};
-      std::shared_ptr<TensorTransform> resize(new Resize(resizeShape));
-      Execute composeDecode({decode, resize, normalize, hwc2chw});
-      auto img = MSTensor();
-      auto image = ReadFileToTensor(all_files[i]);
-      composeDecode(image, &img);
-      std::vector<MSTensor> model_inputs = model.GetInputs();
-      if (model_inputs.empty()) {
-        std::cout << "Invalid model, inputs is empty." << std::endl;
-        return 1;
-      }
-      inputs.emplace_back(model_inputs[0].Name(), model_inputs[0].DataType(), model_inputs[0].Shape(),
-                       img.Data().get(), img.DataSize());
+    std::shared_ptr<TensorTransform> decode(new Decode());
+    std::shared_ptr<TensorTransform> hwc2chw(new HWC2CHW());
+    std::shared_ptr<TensorTransform> normalize(
+    new Normalize({123.675, 116.28, 103.53}, {58.395, 57.120, 57.375}));
+    auto resizeShape = {FLAGS_image_height, FLAGS_image_width};
+    std::shared_ptr<TensorTransform> resize(new Resize(resizeShape));
+    Execute composeDecode({decode, resize, normalize, hwc2chw});
+    auto img = MSTensor();
+    auto image = ReadFileToTensor(all_files[i]);
+    composeDecode(image, &img);
+    std::vector<MSTensor> model_inputs = model.GetInputs();
+    if (model_inputs.empty()) {
+    std::cout << "Invalid model, inputs is empty." << std::endl;
+    return 1;
     }
+    inputs.emplace_back(model_inputs[0].Name(), model_inputs[0].DataType(), model_inputs[0].Shape(),
+                    img.Data().get(), img.DataSize());
 
     gettimeofday(&start, nullptr);
     ret = model.Predict(inputs, &outputs);
