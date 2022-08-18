@@ -1,0 +1,223 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+data_path: "/cache/data"
+output_path: "/cache/train"
+load_path: "/cache/checkpoint_path"
+device_target: GPU
+enable_profiling: False
+
+# ==============================================================================
+# config
+img_width: 1344
+img_height: 768
+keep_ratio: False
+flip_ratio: 0.5
+expand_ratio: 0.0
+
+# anchor
+anchor_scales: [8]
+anchor_ratios: [0.5, 1.0, 2.0]
+anchor_strides: [4, 8, 16, 32, 64]
+num_anchors: 3
+
+# resnet
+resnet_block: [3, 4, 6, 3]
+resnet_in_channels: [64, 256, 512, 1024]
+resnet_out_channels: [256, 512, 1024, 2048]
+
+# fpn
+fpn_in_channels: [256, 512, 1024, 2048]
+fpn_out_channels: 256
+fpn_num_outs: 5
+
+# rpn
+rpn_in_channels: 256
+rpn_feat_channels: 256
+rpn_loss_cls_weight: 1.0
+rpn_loss_reg_weight: 1.0
+rpn_cls_out_channels: 1
+
+# bbox_assign_sampler
+neg_iou_thr: 0.3
+pos_iou_thr: 0.7
+min_pos_iou: 0.3
+num_gts: 128
+num_expected_neg: 256
+num_expected_pos: 128
+
+# proposal
+activate_num_classes: 2
+use_sigmoid_cls: True
+
+# roi_align
+roi_layer: {type: 'RoIAlign', out_size: 7, sample_num: 2}
+roi_align_out_channels: 256
+roi_align_featmap_strides: [4, 8, 16, 32]
+roi_align_finest_scale: 56
+roi_sample_num: 640
+
+# bbox_assign_sampler_stage2
+neg_iou_thr_stage2: 0.5
+pos_iou_thr_stage2: 0.5
+min_pos_iou_stage2: 0.5
+num_bboxes_stage2: 2000
+num_expected_pos_stage2: 128
+num_expected_neg_stage2: 512
+num_expected_total_stage2: 512
+
+# rcnn
+rcnn_in_channels: 256
+rcnn_fc_out_channels: 1024
+rcnn_loss_cls_weight: 1
+rcnn_loss_reg_weight: 1
+rcnn_target_means: [0., 0., 0., 0.]
+rcnn_target_stds: [0.1, 0.1, 0.2, 0.2]
+
+# train proposal
+rpn_proposal_nms_across_levels: False
+rpn_proposal_nms_pre: 2000
+rpn_proposal_nms_post: 2000
+rpn_proposal_max_num: 2000
+rpn_proposal_nms_thr: 0.7
+rpn_proposal_min_bbox_size: 0
+
+# test proposal
+rpn_nms_across_levels: False
+rpn_nms_pre: 1000
+rpn_nms_post: 1000
+rpn_max_num: 1000
+rpn_nms_thr: 0.7
+rpn_min_bbox_min_size: 0
+test_score_thr: 0.05
+test_iou_thr: 0.5
+test_max_per_img: 100
+test_batch_size: 1
+
+# LR
+base_lr: 0.06
+warmup_step: 1000
+warmup_ratio: 0.001
+
+# train
+batch_size: 2
+loss_scale: 256
+momentum: 0.91
+weight_decay: 0.00001
+epoch_size: 30
+run_eval: False
+interval: 1
+save_checkpoint: True
+save_checkpoint_epochs: 1
+keep_checkpoint_max: 5
+save_checkpoint_path: "./"
+
+# Number of threads used to process the dataset in parallel
+num_parallel_workers: 8
+# Parallelize Python operations with multiple worker processes
+python_multiprocessing: True
+mindrecord_dir: "./MOT17DET/MindRecord_COCO_TRAIN"
+coco_classes: ['person']
+num_classes: 2
+prefix: ""
+
+# train.py FasterRcnn training
+run_distribute: False
+dataset: "other"
+pre_trained: "./fasterrcnnresnetv1550_ascend_v130_coco2017_official_cv_bs2_acc61.7.ckpt"
+device_id: 0
+device_num: 1
+rank_id: 0
+image_dir: './MOT17DET/train/'
+anno_path: './MOT17DET/train/shuffled_det_annotations.txt'
+mot_dataset_path: './data'
+backbone: 'resnet_v1.5_50'
+
+# eval.py FasterRcnn evaluation
+checkpoint_path: "./tracktor.ckpt"
+reid_weight: "./reid.ckpt"
+
+# export.py fasterrcnn_export
+file_name: "faster_rcnn"
+file_format: "MINDIR"
+ckpt_file: "./faster_rcnn-30_299.ckpt"
+
+detection_person_thresh: 0.5
+# FRCNN score threshold for keeping the track alive
+regression_person_thresh: 0.5
+# NMS threshold for detection
+detection_nms_thresh: 0.3
+# NMS threshold while tracking
+regression_nms_thresh: 0.6
+# motion model settings
+motion_model:
+  enabled: False
+  n_steps: 5
+  center_only: False
+# DPM or DPM_RAW or 0, raw includes the unfiltered (no nms) versions of the provided detections,
+# 0 tells the tracker to use private detections (Faster R-CNN)
+# Do camera motion compensation
+do_align: True
+# Which warp mode to use (MOTION_EUCLIDEAN, MOTION_AFFINE, ...)
+warp_mode: 'MOTION_EUCLIDEAN'
+# maximal number of iterations (original 50)
+number_of_iterations: 100
+# Threshold increment between two iterations (original 0.001)
+termination_eps: 0.00001
+# Use siamese network to do reid
+do_reid: True
+# How much timesteps dead tracks are kept and cosidered for reid
+inactive_patience: 50
+# How many last appearance features are to keep
+max_features_num: 10
+# How similar do image and old track need to be to be considered the same person
+reid_sim_threshold: 200.0
+# How much IoU do track and image need to be considered for matching
+reid_iou_threshold: 0.0
+
+validation_sequences: [
+  'MOT17-02-FRCNN',
+  'MOT17-04-FRCNN',
+  'MOT17-05-FRCNN',
+  'MOT17-09-FRCNN',
+  'MOT17-10-FRCNN',
+  'MOT17-11-FRCNN',
+  'MOT17-13-FRCNN',
+]
+
+# postprocess
+result_path: ''
+
+---
+# Config description for each option
+enable_modelarts: 'Whether training on modelarts, default: False'
+data_url: 'Dataset url for obs'
+train_url: 'Training output url for obs'
+data_path: 'Dataset path for local'
+output_path: 'Training output path for local'
+
+device_target: "device where the code will be implemented, default is Ascend"
+file_name: "output file name."
+dataset: "Dataset, either cifar10 or imagenet2012"
+img_width: 'input width'
+img_height: 'input height'
+enable_profiling: 'Whether enable profiling while training, default: False'
+run_distribute: 'Run distribute, default is false.'
+pre_trained: 'Pretrained checkpoint path'
+device_id: 'Device id, default is 0.'
+device_num: 'Use device nums, default is 1.'
+rank_id: 'Rank id, default is 0.'
+file_format: 'file format'
+checkpoint_path: "Checkpoint file path."
+ckpt_file: 'fasterrcnn ckpt file.'
+result_path: "result file path."
+backbone: "backbone network name, options:resnet_v1_50, resnet_v1.5_50, resnet_v1_101, resnet_v1_152"
+interval: "val interval"
+mot_dataset_path: "path mot17 dataset for validation"
+validation_sequences: "sequences that will be evaluated"
+
+---
+device_target: ['Ascend', 'GPU', 'CPU']
+file_format: ["AIR", "ONNX", "MINDIR"]
