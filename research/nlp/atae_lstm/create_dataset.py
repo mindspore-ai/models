@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ from mindspore.mindrecord import FileWriter
 
 
 class XmlParser():
+
     """
     parse xml dataset to cor file
     """
@@ -144,6 +145,7 @@ class DataManager():
         for fname in self.fileList:
             data = []
             with open('%s/%s.cor' % (dataset, fname)) as f:
+                print('reading file:', '%s/%s.cor' % (dataset, fname))
                 sentences = f.readlines()
                 for i in range(int(len(sentences)/3)):
                     content, target = sentences[i * 3].strip(), sentences[i * 3 + 1].strip()
@@ -273,7 +275,7 @@ def _convert_to_mindrecord(mindrecord_path, data):
     writer.commit()
 
 
-def wordlist_to_glove_weight(wordlist, glove_file):
+def wordlist_to_glove_weight(wordlist, glove_file, out_dir):
     """load glove word vector"""
     glove_word_dict = {}
     with open(glove_file) as f:
@@ -297,7 +299,7 @@ def wordlist_to_glove_weight(wordlist, glove_file):
     print(np.shape(weight))
     print(weight.dtype)
 
-    np.savez('./data/weight.npz', weight=weight)
+    np.savez(os.path.join(out_dir, 'weight.npz'), weight=weight)
 
 
 if __name__ == "__main__":
@@ -329,7 +331,7 @@ if __name__ == "__main__":
     word_list = data_all.gen_word()
     print("word_list: ", type(word_list))
 
-    wordlist_to_glove_weight(word_list, args.glove_file)
+    wordlist_to_glove_weight(word_list, args.glove_file, args.data_folder)
 
     train_data, dev_data, test_data = data_all.gen_data(grained=3)
 

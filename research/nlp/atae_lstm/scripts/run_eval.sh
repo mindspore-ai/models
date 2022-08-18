@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021-2022 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,37 +14,41 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]; then
+if [ $# != 3 ]; then
   echo "=============================================================================================================="
   echo "Please run the script as: "
-  echo "bash convert_dataset.sh DATA_FOLDER GLOVE_FILE"
+  echo "bash run_eval.sh [DEVICE] [DATA_DIR] [CKPT_FILE]"
   echo "for example:"
-  echo "  bash convert_dataset.sh \\"
-  echo "      /home/workspace/atae_lstm/data \\"
-  echo "      /home/workspace/atae_lstm/data/glove.840B.300d.txt"
+  echo "  bash run_eval.sh GPU \\"
+  echo "      /home/workspace/atae_lstm/data/ \\"
+  echo "      /home/workspace/atae_lstm/train/atae-lstm_max.ckpt"
   echo "It is better to use absolute path."
   echo "=============================================================================================================="
-  exit 1
 fi
 
-get_real_path() {
+get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
     echo "$1"
   else
-    echo "$(realpath -m $PWD/$1)"
+    realpath -m "$PWD"/"$1"
   fi
 }
-
-DATA_FOLDER=$(get_real_path $1)
-GLOVE_FILE=$(get_real_path $2)
-TRAIN_DATA=$DATA_FOLDER/train.mindrecord
-EVAL_DATA=$DATA_FOLDER/test.mindrecord
 
 BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
 echo ${BASE_PATH}
 
-python $BASE_PATH/../create_dataset.py \
-    --data_folder=$DATA_FOLDER \
-    --glove_file=$GLOVE_FILE \
-    --train_data=$TRAIN_DATA \
-    --eval_data=$EVAL_DATA
+DEVICE=$1
+DATA_DIR=$(get_real_path "$2")
+CKPT_FILE=$(get_real_path "$3")
+
+if [ -d "$BASE_PATH/../eval" ];
+then
+    rm -rf $BASE_PATH/../eval
+fi
+mkdir $BASE_PATH/../eval
+cd $BASE_PATH/../eval || exit
+
+python $BASE_PATH/../eval.py \
+    --eval_ckpt=$CKPT_FILE \
+    --device=$DEVICE \
+    --data_url=$DATA_DIR > eval_log.log 2>&1 &

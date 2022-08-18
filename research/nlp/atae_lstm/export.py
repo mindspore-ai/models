@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,6 @@
 # ============================================================================
 """export checkpoint file into air models"""
 
-import argparse
 import numpy as np
 
 from mindspore import Tensor, context
@@ -23,29 +22,9 @@ from mindspore.common import dtype as mstype
 from mindspore.train.serialization import export
 from mindspore import set_seed
 
-from src.config import Config
+from src.config import config
 from src.model import AttentionLstm
 
-parser = argparse.ArgumentParser(description="ATAE_LSTM export")
-parser.add_argument("--word_path", type=str, required=True, help="word vector path")
-parser.add_argument("--config",
-                    type=str,
-                    default="src/model_utils/config.json",
-                    help="configuration address.")
-parser.add_argument("--existed_ckpt",
-                    type=str,
-                    default="train/atae-lstm_max.ckpt",
-                    help="existed checkpoint address.")
-parser.add_argument("--file_name",
-                    type=str,
-                    default="ATAE_LSTM",
-                    help="output file name.")
-parser.add_argument("--file_format",
-                    type=str,
-                    choices=["AIR", "ONNX", "MINDIR"],
-                    default="MINDIR",
-                    help="file format")
-args = parser.parse_args()
 
 context.set_context(
     mode=context.GRAPH_MODE,
@@ -54,17 +33,11 @@ context.set_context(
     device_id=0
 )
 
-def get_config(config_json):
-    """get atae_lstm configuration"""
-    cfg = Config.from_json_file(config_json)
-    return cfg
 
 if __name__ == "__main__":
-    config = get_config(args.config)
+    existed_ckpt = config.existed_ckpt
 
-    existed_ckpt = args.existed_ckpt
-
-    word_path = args.word_path
+    word_path = config.word_path
     set_seed(config.rseed)
     r = np.load(word_path)
     word_vector = r['weight']
@@ -80,5 +53,5 @@ if __name__ == "__main__":
     x_len = Tensor(np.array([20]).astype(np.int32))
     aspect = Tensor(np.array([1]).astype(np.int32))
 
-    export(network, x, x_len, aspect, file_name=args.file_name, file_format=args.file_format)
+    export(network, x, x_len, aspect, file_name=config.file_name, file_format=config.file_format)
     

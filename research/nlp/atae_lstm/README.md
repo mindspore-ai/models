@@ -1,213 +1,259 @@
-# 目录
+# Content
 
 <!-- TOC -->
 
-- [目录](#目录)
-- [[AttentionLSTM描述](#AttentionLSTM描述)]
-- [模型架构](#模型架构)
-- [数据集](#数据集)
-- [特性](#特性)
-    - [混合精度](#混合精度)
-- [环境要求](#环境要求)
-- [快速入门](#快速入门)
-- [脚本说明](#脚本说明)
-    - [脚本及样例代码](#脚本及样例代码)
-    - [脚本参数](#脚本参数)
-    - [训练过程](#训练过程)
-        - [训练](#训练)
-    - [评估过程](#评估过程)
-        - [评估](#评估)
-    - [导出过程](#导出过程)
-        - [导出](#导出)
-- [模型描述](#模型描述)
-    - [性能](#性能)
-        - [评估性能](#评估性能)
-        - [迁移学习](#迁移学习)
-- [随机情况说明](#随机情况说明)
-- [ModelZoo主页](#modelzoo主页)  
+- [Content](#content)
+- [AttentionLSTM description](#attentionlstm-description)]
+- [Model architecture](#model-architecture)
+- [Dataset](#dataset)
+- [Features](#features)
+    - [Mixed Precision](#mixed-precision)
+- [Environment Requirements](#environment-requirements)
+- [Quick Start](#quick-start)
+    - [Requirements Installation](#requirements-installation)
+    - [Dataset preprocessing](#dataset-preprocessing)
+    - [Running](#running)
+- [Script description](#script-description)
+    - [Script and sample code](#script-and-sample-code)
+    - [Script parameters](#script-parameters)
+    - [Training process](#training-process)
+        - [Train](#train)
+    - [Evaluation process](#evaluation-process)
+        - [evaluate](#evaluate)
+    - [Export process](#export-process)
+        - [Export](#export)
+- [Model description](#model-description)
+    - [Performance](#performance)
+        - [Inference performance](#inference-performance)
+        - [Transfer learning](#transfer-learning)
+- [Random](#random)
+- [ModelZoo Homepage](#modelzoo-homepage)  
 
 <!-- /TOC -->
 
-# AttentionLSTM描述
+# AttentionLSTM Description
 
-AttentionLSTM也可简称为atae_lstm，论文主要提出了一种适用于细粒度（fine-grained）文本情感极性分析的网络模型。我们知道，一些酒店或者商品评论往往不止针对商品的一个方面，例如，“披萨的味道棒极了!但是服务真的很差！”评论里涉及了“food”，“service”两个方面的评价，普通的LSTM模型由于无法捕捉有关方面（aspect）的信息，因此无论对于哪个方面的评价，都只会产生一个结果。本文提出的Attention-based LSTM with Aspect Embedding 模型利用方面（aspect）向量以及attention机制为这种分方面评价的问题提供了一个很好的解决方法。
+AttentionLSTM can also be referred to as ATAE_LSTM. The paper mainly proposes a network model suitable for fine-grained text emotional polarity analysis.We know that some hotels or commodity comments are often more than a good aspects of goods, for example, "Pizza's taste is great! But the service is really poor!" The review involved "Food", "Service" evaluationThe ordinary LSTM model cannot capture information about aspects, so it will only produce one result regardless of which aspects.The ATTENTION-based LSTM with Aspect Embedding model uses aspect vector and the Attention mechanism provides a good solution to this sub-evaluation problem.
 
-[论文](https://www.aclweb.org/anthology/D16-1058.pdf)：Wang, Y. , et al. "Attention-based LSTM for Aspect-level Sentiment Classification." Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing 2016.
+[Paper](https://www.aclweb.org/anthology/D16-1058.pdf)：Wang, Y. , et al. "Attention-based LSTM for Aspect-level Sentiment Classification." Proceedings of the 2016 Conference on Empirical Methods in Natural Language Processing 2016.
 
-# 模型架构
+# Model Architecture
 
 ![62486723912](https://gitee.com/honghu-zero/mindspore/raw/atae_r1.2/model_zoo/research/nlp/atae_lstm/src/model_utils/ATAE_LSTM.png)
 
-AttentionLSTM模型的输入由aspect和word向量组成，输入部分输入单层LSTM网络中得到状态向量，再将状态向量与aspect进行连接，计算attention权重，最后用attention权重和状态向量运算得到情感极性分类。
+The input of the AttentionLSTM model consists of an ASPECT and WORD versions, and the input section Enter a single layer LSTM network to obtain a status vector, then connect the status vector to the aspect, calculate the Attention weight, and finally use Attention weight and state vectors to obtain an emotional polarity classification.
 
-# 数据集
+# Dataset
 
-使用的数据集：[SemEval 2014 task4](https://alt.qcri.org/semeval2014/task4) Restaurant (aspect category)
+Used data set：[SemEval 2014 task4](https://alt.qcri.org/semeval2014/task4) Restaurant (aspect category)
 
-- 数据集大小：
-    - 训练集：2990个句子，每个句子对应一个aspect和一个极性分类
-    - 测试集：973个句子，每个句子对应一个aspect和一个极性分类
-- 数据格式：xml或者cor文件
-    - 注：数据将在create_dataset.py中处理，转换为mindrecord格式。
+- Dataset size:
+    - Training set: 2990 sentences, each sentence corresponds to an Aspect and a polar classification
+    - Test set: 973 sentences, each sentence corresponds to an Aspect and a polar classification
+- Data format: XML or COR file
+    - Note: The data will be processed in create_dataset.py to convert to the MindRecord format.
 
-# 特性
+# Characteristics
 
-## 混合精度
+## Mixed Precision
 
-采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
-以FP16算子为例，如果输入数据类型为FP32，MindSpore后台会自动降低精度来处理数据。用户可打开INFO日志，搜索“reduce precision”查看精度降低的算子。
+**Mixed Precision:** the training method uses support for single-precision and semi-precision data to increase the training speed of deep learning neural network while maintaining the network accuracy that single-precision training can achieve. Mixed precision training increases the calculation speed, reducing memory usage, supports a larger training on a particular hardware or a larger batch training. Taking the FP16 operator as an example, if the input data type is FP32, the MINDSPORE background will automatically reduce precision to process data. Users can open the INFO log, search "Reduce Precision" to see the accuracy reduced operator.
 
-# 环境要求
+# Environment Requirements
 
-- 硬件（Ascend）
-    - 使用Ascend处理器来搭建硬件环境。
-- 框架
+- Hardware (ASCEND of GPU)
+    - Use the Ascend processor of GPU to build a hardware environment.
+- Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
-- 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+- For details, please refer to the following resources:
+    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
-# 快速入门
+# Quick Start
 
-通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
+## Dataset preprocessing
 
-- Ascend处理器环境运行
+To convert data to MindRecord format, GloVe file is needed. Global Vector or GloVe is an unsupervised learning algorithm for obtaining vector representations for words. Preprocessing can be made with shell script `convert_dataset.sh`
 
-  ```python
-  # 运行训练示例
-  bash run_train_ascend.sh [DATA_DIR] [OUTPUT_DIR]
-
-  # 运行评估示例
-  bash run_eval_ascend.sh [DATA_DIR] [CKPT_FILE]
-  ```
-
-# 脚本说明
-
-## 脚本及样例代码
+Link to GloVe file: [glove.840B.300d] (http://downloads.cs.stanford.edu/nlp/data/glove.840B.300d.zip)
+Link to folder with COR files used during training: [SemEval 2014 task4 cor files](https://github.com/TianHongZXY/pytorch-atae-lstm/tree/master/data)
 
 ```bash
-├── atae_lstm
-    ├── README.md         // AttentionLSTM相关说明
-    ├── scripts
-    │   ├──run_train_ascend.sh   // 在Ascend上训练的shell脚本
-    │   ├──run_eval_ascend.sh    // 在Ascend上评估的shell脚本
-    │   ├──convert_dataset.sh    // 在Ascend上评估的shell脚本
-    ├── src
-    │   ├──model_utils
-    │   │   ├──my_utils.py  // LSTM相关组件
-    │   │   ├──rnn_cells.py // LSTM单元
-    │   │   ├──rnns.py      // LSTM
-    │   │   ├──config.json  // 参数设置
-    │   ├──config.py        // 参数生成
-    │   ├──load_dataset.py  // 加载数据集
-    │   ├──model.py         // 模型文件
-    │   ├──atae_for_train.py // 模型训练文件
-    │   ├──atae_for_test.py  // 模型评估文件
-    ├── train.py     // 训练脚本
-    ├── eval.py      // 评估脚本
-    ├── preprocess.py   // 310推理前处理脚本
-    ├── export.py       // 将checkpoint文件导出到air/mindir
+bash scripts/convert_dataset.sh [PATH_TO_DATA_FOLDER] [PATH_TO_GLOVE_FILE]
 ```
 
-## 脚本参数
-
-在config.json中可以同时配置训练参数和评估参数。
-
-```python
-'batch_size':1          # 训练批次大小
-'epoch_size':25         # 总计训练epoch数
-'momentum':0.89         # 动量
-'weight_decay':1e-3     # 权重衰减值
-'dim_hidden': 300       # hidden层维度
-'rseed': 1
-'dim_word': 300         # 词向量维度
-'dim_aspect': 100       # aspect向量维度
-'optimizer': 'Momentum' # 优化器类型
-'vocab_size': 5177      # 单词表大小
-'dropout_prob': 0.6     # dropout概率
-'aspect_num': 5         # aspect词的数量
-'grained': 3            # 极性分类个数
-'lr': 0.0125             # 学习率
-```
-
-更多配置细节请参考脚本`config.json`。
-
-## 训练过程
-
-### 训练
-
-- 处理原始数据集：
-
-  ```shell
-  bash convert_dataset.sh \
-    ./data \
-    ./data/glove.840B.300d.txt \
-    ./data/train.mindrecord \
-    ./data/test.mindrecord
-  ```
-
-  上述命令可以可以生成mindrecord数据集
-
-- Ascend处理器环境运行
+- Example of command for handling the original data set：
 
   ```bash
-  bash run_train_ascend.sh  \
+  bash scripts/convert_dataset.sh \
+      /home/workspace/atae_lstm/data \
+      /home/workspace/atae_lstm/data/glove.840B.300d.txt
+  ```
+
+  The above command will convert data set to MindRecord format. It will appear in `train.mindrecord` and `test.mindrecord` files. Also file `weight.npz` will be created, it is necessary for training process.
+
+## Running
+
+After installing MINDSPORE through the official website, you can follow the steps:
+
+- Ascend processor environment operation
+
+  ```bash
+  # Run training example
+  bash scripts/run_train_ascend.sh [DATA_DIR]
+
+  # evaluation
+  bash scripts/run_eval.sh [DEVICE] [DATA_DIR] [CKPT_FILE]
+  ```
+
+- GPU environment
+
+  ```bash
+  # Standalone training
+  bash scripts/run_standalone_train_gpu.sh [DATA_DIR]
+
+  # Distributed training
+  bash scripts/run_distribute_train_gpu.sh [DEVICE_NUM] [DATA_DIR]
+
+  # evaluation
+  bash scripts/run_eval.sh [DEVICE] [DATA_DIR] [CKPT_FILE]
+  ```
+
+# Script Description
+
+## Script and sample code
+
+```text
+├── atae_lstm
+    ├── README.md        // AttentionLSTM related instructions
+    ├── ascend310_infer  // Application for 310 inference
+    ├── modelarts        // Folder for modelarts mode
+    ├── infer            // Conponents for Ascend inference
+    ├── scripts
+    │   ├──convert_dataset.sh           // Shell script for converting original data
+    │   ├──run_distribute_train_gpu.sh  // Shell script for distributed training on GPU
+    │   ├──run_eval.sh                  // Shell script evaluated on Ascend or GPU
+    │   ├──run_standalone_train_gpu.sh  // Shell script for standalone training on GPU
+    │   ├──run_train_ascend.sh          // Shell script for training on Ascend
+    ├── src
+    │   ├──model_utils
+    │   │   ├──my_utils.py   // LSTM related components
+    │   │   ├──rnn_cells.py  // LSTM unit
+    │   │   ├──rnns.py       // LSTM
+    │   ├──config.py          // Parameter generation
+    │   ├──load_dataset.py    // Data loader
+    │   ├──model.py           // Model file
+    │   ├──atae_for_train.py  // Model training file
+    │   ├──atae_for_test.py   // Model assessment file
+    ├── create_dataset.py  // Dataset preprocessing
+    ├── eval.py            // Evaluation script
+    ├── export.py          // Export checkpoint files to Air/mindir
+    ├── postprocess.py     // 310 post-processing script
+    ├── preprocess.py      // 310 pre-processing script
+    ├── README_CN.md       // Chinese readme
+    ├── README.md          // English readme
+    ├── requirements.txt   // pip requirements
+    ├── train.py           // Training script
+```
+
+## Script parameters
+
+Training parameters and evaluation parameters can be simultaneously configured in default_config.yaml.
+
+```text
+batch_size: 25          # training batch size
+epoch_size: 25          # Total number of training epochs
+momentum: 0.9           # momentum
+weight_decay: 0.001     # Weight decay value
+dim_hidden: 300         # hidden layer dimension
+rseed: 4373337
+dim_word: 300           # word vector dimension
+dim_aspect: 300         # aspect vector dimension
+optimizer: 'Adagrad'    # optimizer type
+vocab_size: 5177        # vocabulary size
+dropout_prob: 0.6       # dropout probability
+aspect_num: 5           # number of aspect words
+grained: 3              # Number of polar classifications
+lr: 0.01                # learning rate
+lr_word_vector: 0.001   # learning rate for word vector
+```
+
+For more configuration details, please refer to the script `default_config.yaml`.
+
+## Training process
+
+### Train
+
+- Training on Ascend
+
+  ```bash
+  bash scripts/run_train_ascend.sh  \
       /home/workspace/atae_lstm/data/  \
       /home/workspace/atae_lstm/train/
   ```
 
-  上述训练网络的命令将在后台运行，您可以通过net_log.log文件查看结果。
+  The command of the above training network will run in the background, results will appear in net_log.log.
 
-  训练结束后，您可在默认脚本文件夹下找到检查点文件。采用以下方式达到损失值：
+  After training, you can find checkpoint files under the default script folder. The loss value is achieved in the following ways:
 
-  ```bash
+  ```text
   # grep "loss is " net.log
   epoch:1 step:2990, loss is 1.4842823
   epcoh:2 step:2990, loss is 1.0897788
   ...
   ```
 
-  模型检查点保存在当前目录下。
+  Model checkpoints are saved in the current directory.
 
-  训练结束后，您可在默认`./train/`脚本文件夹下找到检查点文件。
+  After training, you can find the checkpoint file in the default `./train/` script folder.
 
-## 评估过程
-
-### 评估
-
-- 在Ascend环境运行时评估数据集
+- Training on GPU
 
   ```bash
-    sh run_eval_ascend.sh \
+  # Standalone training
+  bash scripts/run_standalone_train_gpu.sh /home/workspace/atae_lstm/data/
+
+  # Distributed training
+  bash scripts/run_distribute_train_gpu.sh 8 /home/workspace/atae_lstm/data/
+  ```
+
+## Evaluation process
+
+### Evaluation
+
+- Evaluation on Ascend or GPU
+
+  ```bash
+    bash scripts/run_eval.sh [DEVICE] \
         /home/workspace/atae_lstm/data/ \
         /home/workspace/atae_lstm/train/atae-lstm_max.ckpt
   ```
 
-  上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
+  The above Python command will run in the background, you can view the results via the `eval/eval.log` file. The accuracy of the test data set is as follows:
 
-  ```bash
+  ```text
   # grep "accuracy:" eval.log
   accuracy:{'acc':0.8253}
   ```
 
-## 导出过程
+## Export process
 
-### 导出
+### Export
 
-可以使用如下命令导出mindir文件
+You can use the following command to export the mindir file
 
-```shell
+```bash
 python export.py --existed_ckpt="./train/atae-lstm_max.ckpt" \
                  --word_path="./data/weight.npz"
 ```
 
-## 推理过程
+## Inference process
 
-### 用法
+### Usage
 
-在执行推理之前，需要通过export.py导出mindir文件。输入文件为bin格式。
+Before performing inference, you need to export the mindir file via export.py. Convert the file to bin format.
 
-```shell
+```bash
 # 文件预处理
 python preprocess.py --data_path="./data/test.mindrecord"
 
@@ -215,35 +261,32 @@ python preprocess.py --data_path="./data/test.mindrecord"
 bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_TARGET] [DEVICE_ID]
 ```
 
-`DEVICE_TARGET` 可选值范围为：['GPU', 'CPU', 'Ascend']；
-`DEVICE_ID` 可选, 默认值为0.
+`DEVICE_TARGET` Optional value range：['GPU', 'CPU', 'Ascend']；
+`DEVICE_ID` Optional, the default is 0.
 
-### 结果
+### Result
 
-推理结果保存在当前路径，可在acc.log中看到最终精度结果。
+The reasoning result is saved in the current path, and the final accuracy result can be seen in acc.log.
 
-# 模型描述
+# Model description
 
-## 性能
+|     parameter     |                          Ascend                       |    GPU              |
+| :---------------: | :---------------------------------------------------: | :-----------------: |
+|     resource      | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 | 8x RTX3090          |
+|   upload date     |                        2021-12-11                     | 2022-05-17          |
+| MindSpore version |                          1.5.0                        | 1.6.1               |
+|    dataset        |                    SemEval 2014 task4                 | SemEval 2014 task4  |
+| training parameters |      epoch=25, batch_size=1, lr=0.0125              | epoch=25, batch_size=25, lr=0.01 |
+| optimizer         |                     Momentum                          | Adagrad             |
+| Accuracy          |   0.8253                                              | 0.8336              |
+|   parameter (M)   |                        2.68                           | 2.68                |
+| Fine-tune checkpoints |                    26M                            | 26M                 |
+|  inference model  |            9.9M(.air文件)、11M(.mindir文件)             | 9.9M(.air文件)、11M(.mindir文件) |
 
-### 评估性能
+# Random
 
-|     参数      |                          Ascend                          |
-| :-----------: | :------------------------------------------------------: |
-|     资源      | Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 |
-|   上传日期    |                        2021-12-11                        |
-| MindSpore版本 |                          1.5.0                           |
-|    数据集     |                    SemEval 2014 task4                    |
-|   训练参数    |       epoch=25, step=2990, batch_size=1, lr=0.0125        |
-|    优化器     |                         Momentum                          |
-|   参数（M)    |                           2.68                           |
-|  微调检查点   |                           26M                            |
-|   推理模型    |             9.9M(.air文件)、11M(.mindir文件)             |
+In train.py and eval.py, we set a random seed.
 
-# 随机情况说明
+# ModelZoo Homepage
 
-在train.py和eval.py中，我们设置了随机种子。
-
-# ModelZoo主页  
-
- 请浏览官网[主页](https://gitee.com/mindspore/models)。
+ Please browse official website [Homepage](https://gitee.com/mindspore/models).

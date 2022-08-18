@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -243,7 +243,7 @@ class RNNBase(nn.Cell):
                 w_ih, w_hh = self.w_ih_list[i], self.w_hh_list[i]
                 b_ih, b_hh = None, None
             if self.is_lstm:
-                h_i = (h[0][i], h[1][i])
+                h_i = (h[0][:, i], h[1][:, i])
             else:
                 h_i = h[i]
             output, h_t = self.rnn(pre_layer, h_i, seq_length, w_ih, w_hh, b_ih, b_hh)
