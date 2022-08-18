@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ import mindspore.nn as nn
 from mindspore.common.initializer import HeNormal, HeUniform, Uniform
 from mindspore.ops import operations as ops
 from mindspore import Tensor
+
+from src.config import config as cfg
 
 
 class Bottleneck(nn.Cell):
@@ -135,7 +137,7 @@ class TemporalBlock(nn.Cell):
 class Stnet_Res_model(nn.Cell):
     """main model"""
     def __init__(
-            self, block, layers, cardinality=32, num_classes=400, T=7, N=5, input_channels=3,
+            self, block, layers, cardinality=32, num_classes=101, T=7, N=5, input_channels=3,
     ):
         super(Stnet_Res_model, self).__init__()
         self.inplanes = 64
@@ -155,7 +157,7 @@ class Stnet_Res_model(nn.Cell):
 
         self.temp1 = TemporalBlock(512)
         self.temp2 = TemporalBlock(1024)
-        self.op_avg = nn.AvgPool2d(kernel_size=(7, 7), pad_mode="valid")
+        self.op_avg = nn.AvgPool2d(kernel_size=cfg.avgpool_kernel_size, pad_mode="valid")
         self.xception = TemporalXception(2048, 2048)
         self.maxpool1 = nn.MaxPool2d(kernel_size=(self.T, 1))
         self.reshape = ops.Reshape()
@@ -204,8 +206,8 @@ class Stnet_Res_model(nn.Cell):
     def construct(self, x):
         """construct"""
         # size (batch_size, T, video_length = channels* N, height, width)
-        B, _, L, H, W = x.shape
-        x = self.reshape(x, (-1, L, H, W))
+        B, C, _, H, W = x.shape
+        x = self.reshape(x, (B * self.T, self.N * C, H, W))
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 import os
 import functools
 from mindspore import context
-from src.config import cfg_res50
+from src.config import config as cfg
 
 _global_sync_count = 0
 
@@ -143,22 +143,22 @@ def moxing_wrapper(pre_process=None, post_process=None):
         @functools.wraps(run_func)
         def wrapped_func(*args, **kwargs):
             # Download data from data_url
-            config = cfg_res50
-            if config['run_online']:
-                if config['data_url']:
-                    sync_data(config['data_url'], config['local_data_url'], mode=1)
-                    print("Dataset downloaded: ", os.listdir(config['local_data_url']))
-                if config['pre_url']:
-                    sync_data(config['pre_url'], config['load_path'])
-                    print("Preload downloaded: ", os.listdir(config['load_path']))
-                if config['train_url']:
-                    sync_data(config['train_url'], config['output_path'])
-                    print("Workspace downloaded: ", os.listdir(config['output_path']))
+            config = cfg
+            if config.run_online:
+                if config.data_url:
+                    sync_data(config.data_url, config.local_data_url, mode=1)
+                    print("Dataset downloaded: ", os.listdir(config.local_data_url))
+                if config.pre_url:
+                    sync_data(config.pre_url, config.load_path)
+                    print("Preload downloaded: ", os.listdir(config.load_path))
+                if config.train_url:
+                    sync_data(config.train_url, config.output_path)
+                    print("Workspace downloaded: ", os.listdir(config.output_path))
 
-                context.set_context(save_graphs_path=os.path.join(config['output_path'], str(get_rank_id())))
+                context.set_context(save_graphs_path=os.path.join(config.output_path, str(get_rank_id())))
 
-                if not os.path.exists(config['output_path']):
-                    os.makedirs(config['output_path'])
+                if not os.path.exists(config.output_path):
+                    os.makedirs(config.output_path)
 
                 if pre_process:
                     pre_process()
@@ -166,12 +166,12 @@ def moxing_wrapper(pre_process=None, post_process=None):
             run_func(*args, **kwargs)
 
             # Upload data to train_url
-            if config['run_online']:
+            if config.run_online:
                 if post_process:
                     post_process()
 
-                if config['train_url']:
+                if config.train_url:
                     print("Start to copy output directory")
-                    sync_data(config['output_path'], config['train_url'])
+                    sync_data(config.output_path, config.train_url)
         return wrapped_func
     return wrapper
