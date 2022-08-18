@@ -16,7 +16,9 @@
 dataset processing.
 """
 import os
+import multiprocessing
 from PIL import Image, ImageFile
+import mindspore as ms
 from mindspore.common import dtype as mstype
 import mindspore.dataset as de
 import mindspore.dataset.transforms as C
@@ -25,6 +27,20 @@ from src.utils.sampler import DistributedSampler
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
+def get_num_parallel_workers(num_parallel_workers):
+    """
+    Get num_parallel_workers used in dataset operations.
+    If num_parallel_workers > the real CPU cores number, set num_parallel_workers = the real CPU cores number.
+    """
+    cores = multiprocessing.cpu_count()
+    if isinstance(num_parallel_workers, int):
+        if cores < num_parallel_workers:
+            print("The num_parallel_workers {} is set too large, now set it {}".format(num_parallel_workers, cores))
+            num_parallel_workers = cores
+    else:
+        print("The num_parallel_workers {} is invalid, now set it {}".format(num_parallel_workers, min(cores, 8)))
+        num_parallel_workers = min(cores, 8)
+    return num_parallel_workers
 
 def vgg_create_dataset(data_home, image_size, batch_size, rank_id=0, rank_size=1, training=True):
     """Data operations."""
@@ -162,6 +178,66 @@ def classification_dataset(data_dir, image_size, per_batch_size, rank=0, group_s
     de_dataset = de_dataset.batch(per_batch_size, drop_remainder=drop_remainder)
 
     return de_dataset
+
+def create_dataset(dataset_path, do_train, batch_size=32, train_image_size=224, eval_image_size=224,
+                   enable_cache=False, cache_session_id=None):
+    """
+    create a train or eval flower dataset for vgg16
+
+    Args:
+        dataset_path(string): the path of dataset.
+        do_train(bool): whether dataset is used for train or eval.
+        batch_size(int): the batch size of dataset. Default: 32
+        enable_cache(bool): whether tensor caching service is used for eval. Default: False
+        cache_session_id(int): If enable_cache, cache session_id need to be provided. Default: None
+
+    Returns:
+        dataset
+    """
+    de.config.set_prefetch_size(64)
+    data_set = de.ImageFolderDataset(dataset_path, num_parallel_workers=get_num_parallel_workers(12), shuffle=True)
+
+    mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
+    std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
+
+    # define map operations
+    if do_train:
+        trans = [
+            de.vision.RandomCropDecodeResize(train_image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
+            de.vision.RandomHorizontalFlip(prob=0.5)
+        ]
+    else:
+        trans = [
+            de.vision.Decode(),
+            de.vision.Resize(256),
+            de.vision.CenterCrop(eval_image_size)
+        ]
+    trans_norm = [de.vision.Normalize(mean=mean, std=std), de.vision.HWC2CHW()]
+
+    type_cast_op = de.transforms.TypeCast(ms.int32)
+    trans_work_num = 24
+    data_set = data_set.map(operations=trans, input_columns="image",
+                            num_parallel_workers=get_num_parallel_workers(trans_work_num))
+    data_set = data_set.map(operations=trans_norm, input_columns="image",
+                            num_parallel_workers=get_num_parallel_workers(12))
+    # only enable cache for eval
+    if do_train:
+        enable_cache = False
+    if enable_cache:
+        if not cache_session_id:
+            raise ValueError("A cache session_id must be provided to use cache.")
+        eval_cache = de.DatasetCache(session_id=int(cache_session_id), size=0)
+        data_set = data_set.map(operations=type_cast_op, input_columns="label",
+                                num_parallel_workers=get_num_parallel_workers(12),
+                                cache=eval_cache)
+    else:
+        data_set = data_set.map(operations=type_cast_op, input_columns="label",
+                                num_parallel_workers=get_num_parallel_workers(12))
+
+    # apply batch operations
+    data_set = data_set.batch(batch_size, drop_remainder=True)
+
+    return data_set
 
 
 class TxtDataset:
