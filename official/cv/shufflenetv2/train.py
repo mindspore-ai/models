@@ -110,7 +110,8 @@ if __name__ == '__main__':
         print('mode = GRAPH_MODE')
 
     # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
-    context.set_context(mempool_block_size="25GB")
+    if context.get_context("mode") == context.PYNATIVE_MODE:
+        context.set_context(mempool_block_size="25GB")
 
     # init distributed
     if args_opt.is_distributed:

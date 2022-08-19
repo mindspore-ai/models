@@ -140,7 +140,8 @@ def main():
             context.set_context(device_id=get_device_id())
 
         # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
-        context.set_context(mempool_block_size="31GB")
+        if context.get_context("mode") == context.PYNATIVE_MODE:
+            context.set_context(mempool_block_size="31GB")
 
     elif config.device_target == "GPU":
         context.set_context(mode=context.GRAPH_MODE, device_target="GPU")

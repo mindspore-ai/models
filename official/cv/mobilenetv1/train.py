@@ -66,7 +66,8 @@ def train_mobilenetv1():
     ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=False)
 
     # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
-    ms.set_context(mempool_block_size="31GB")
+    if ms.get_context("mode") == context.PYNATIVE_MODE:
+        ms.set_context(mempool_block_size="31GB")
 
     if config.parameter_server:
         ms.set_ps_context(enable_ps=True)
