@@ -1,7 +1,6 @@
-
 <!-- TOC -->
 
-- <span id="content">[Retinanet 描述](#Retinanet-描述)</span>
+- [retinanet 描述](#retinanet-描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [环境要求](#环境要求)
@@ -16,13 +15,15 @@
         - [用法](#usage)
         - [运行](#running)
         - [结果](#outcome)
-     - [模型导出](#模型导出)
+    - [模型导出](#模型导出)
         - [用法](#usage)
         - [运行](#running)
     - [推理过程](#推理过程)
         - [用法](#usage)
         - [运行](#running)
+        - [在onnx执行推理](#span-idonnxrunning在onnx执行推理)
         - [结果](#outcome)
+        - [Onnx结果](#span-idonnxoutcomeonnx结果)
     - [模型说明](#模型说明)
         - [性能](#性能)
             - [训练性能](#训练性能)
@@ -32,7 +33,7 @@
 
 <!-- /TOC -->
 
-## [Retinanet 描述](#content)
+## [retinanet 描述](#content)
 
 RetinaNet算法源自2018年Facebook AI Research的论文 Focal Loss for Dense Object Detection。该论文最大的贡献在于提出了Focal Loss用于解决类别不均衡问题，从而创造了RetinaNet（One Stage目标检测算法）这个精度超越经典Two Stage的Faster-RCNN的目标检测网络。
 
@@ -54,9 +55,7 @@ MSCOCO2017
 - 数据集大小: 19.3G, 123287张80类彩色图像
 
     - 训练:19.3G, 118287张图片
-
     - 测试:1814.3M, 5000张图片
-
 - 数据格式:RGB图像.
 
     - 注意：数据将在src/dataset.py 中被处理
@@ -86,6 +85,8 @@ MSCOCO2017
     ├─run_distribute_train_gpu.sh             # 使用GPU环境八卡并行训练
     ├─run_single_train_gpu.sh                 # 使用GPU环境单卡训练
     ├─run_infer_310.sh                        # Ascend推理shell脚本
+    ├─run_onnx_eval.sh                        # onnx推理的shell脚本
+    ├─run_onnx_eval_gpu.sh                    # 使用GPU环境运行onnx推理的shell脚本
     ├─run_eval.sh                             # 使用Ascend环境运行推理脚本
     ├─run_eval_gpu.sh                         # 使用GPU环境运行推理脚本
   ├─src
@@ -105,6 +106,7 @@ MSCOCO2017
   ├─export.py                                 # 导出 AIR,MINDIR模型的脚本
   ├─postprogress.py                           # 310推理后处理脚本
   └─eval.py                                   # 网络推理脚本
+  └─onnx_eval.py                              # 用于onnx推理
   └─create_data.py                            # 构建Mindrecord数据集脚本
   └─default_config.yaml                       # 参数配置
 
@@ -316,7 +318,7 @@ Epoch time: 164531.610, per step time: 359.239
 
 ### [评估过程](#content)
 
-#### <span id="usage">用法</span>
+#### 用法
 
 使用shell脚本进行评估。shell脚本的用法如下:
 
@@ -334,7 +336,7 @@ bash scripts/run_eval_gpu.sh [DEVICE_ID] [DATASET] [MINDRECORD_DIR] [CHECKPOINT_
 
 > checkpoint 可以在训练过程中产生.
 
-#### <span id="outcome">结果</span>
+#### 结果
 
 计算结果将存储在示例路径中，您可以在 `eval.log` 查看.
 
@@ -380,17 +382,17 @@ mAP: 0.34852168035724435
 
 ### [模型导出](#content)
 
-#### <span id="usage">用法</span>
+#### 用法
 
 导出模型前要修改config.py文件中的checkpoint_path配置项，值为checkpoint的路径。
 
-```shell
+```bash
 python export.py --file_name [RUN_PLATFORM] --file_format[EXPORT_FORMAT] --checkpoint_path [CHECKPOINT PATH]
 ```
 
-`EXPORT_FORMAT` 可选 ["AIR", "MINDIR"]
+`EXPORT_FORMAT` 可选 ["AIR", "MINDIR", "ONNX"]
 
-#### <span id="running">运行</span>
+#### 运行
 
 ```运行
 python export.py  --file_name retinanet --file_format MINDIR --checkpoint_path /cache/checkpoint/retinanet_550-458.ckpt
@@ -418,7 +420,7 @@ python export.py  --file_name retinanet --file_format MINDIR --checkpoint_path /
 
 ### [推理过程](#content)
 
-#### <span id="usage">用法</span>
+#### 用法
 
 在推理之前需要在昇腾910环境上完成模型的导出。推理时要将iscrowd为true的图片排除掉。在ascend310_infer目录下保存了去排除后的图片id。
 还需要修改config.py文件中的coco_root、val_data_type、instances_set配置项，值分别取coco数据集的目录，推理所用数据集的目录名称，推理完成后计算精度用的annotation文件，instances_set是用val_data_type拼接起来的，要保证文件正确并且存在。
@@ -428,17 +430,36 @@ python export.py  --file_name retinanet --file_format MINDIR --checkpoint_path /
 bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
 ```
 
-#### <span id="running">运行</span>
+#### 运行
 
 ```运行
  bash run_infer_310.sh ./retinanet.mindir ./dataset/coco2017/val2017 ./image_id.txt 0
 ```
 
-#### <span id="outcome">结果</span>
+#### 在onnx执行推理
+
+在执行推理前，onnx文件必须通过 `export.py`脚本导出,通过config_path选择适用于不同平台的config文件。以下展示了使用onnx模型执行推理的示例。
+
+```shell
+# Onnx inference
+python export.py --file_name [RUN_PLATFORM] --file_format[EXPORT_FORMAT] --checkpoint_path [CHECKPOINT PATH] --config_path [CONFIG PATH]
+```
+
+EXPORT_FORMAT 选择 ["ONNX"]
+
+使用shell脚本进行评估。shell脚本的用法如下:
+
+```bash
+GPU:
+bash scripts/run_onnx_eval_gpu.sh [DEVICE_ID] [DATASET] [MINDRECORD_DIR] [ONNX_PATH] [ANN_FILE PATH] [CONFIG_PATH]
+# example: bash scripts/run_onnx_eval_gpu.sh 0 coco ./MindRecord_COCO/ /home/retinanet/retinanet.onnx ./cocodataset/annotations/instances_{}.json ./config/default_config_gpu.yaml
+```
+
+#### 结果
 
 推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
 
-```mAP
+```log
  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.350
  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.509
  Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.385
@@ -457,40 +478,63 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
 mAP: 0.3499478734634595
 ```
 
+#### Onnx结果
+
+推理的结果保存在当前目录下，在log.txt日志文件中可以找到类似以下的结果。
+
+```text
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.350
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.508
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.387
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.133
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.365
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.517
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.304
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.415
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.417
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.151
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.433
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.614
+
+========================================
+
+mAP: 0.35043225294034314
+```
+
 ## [模型说明](#content)
 
 ### [性能](#content)
 
 #### 训练性能
 
-| 参数                        | Ascend                                |GPU|
-| -------------------------- | ------------------------------------- |------------------------------------- |
-| 模型名称                    | Retinanet                             |Retinanet                             |
-| 运行环境                    | Ascend 910；CPU 2.6GHz，192cores；Memory 755G；系统 Euler2.8  | Rtx3090;Memory 512G |
-| 上传时间                    | 10/01/2021                            |17/02/2022                            |
-| MindSpore 版本             | 1.2.0                                 |1.5.0|
-| 数据集                      | 123287 张图片                          |123287 张图片                          |
-| Batch_size                 | 32                                   |32                                   |
-| 训练参数                    | src/config.py                         |config/default_config_gpu.yaml
-| 优化器                      | Momentum                              |Momentum                              |
-| 损失函数                    | Focal loss                            |Focal loss                            |
-| 最终损失                    | 0.582                                  |0.57|
-| 精确度 (8p)                 | mAP[0.3475]               |mAP[0.3499]               |
-| 训练总时间 (8p)             | 23h16m54s                              |51h39m6s|
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) |[链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) |
+| 参数            | Ascend                                                                    | GPU                                                                       |
+| --------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| 模型名称        | Retinanet                                                                 | Retinanet                                                                 |
+| 运行环境        | Ascend 910；CPU 2.6GHz，192cores；Memory 755G；系统 Euler2.8              | Rtx3090;Memory 512G                                                       |
+| 上传时间        | 10/01/2021                                                                | 17/02/2022                                                                |
+| MindSpore 版本  | 1.2.0                                                                     | 1.5.0                                                                     |
+| 数据集          | 123287 张图片                                                             | 123287 张图片                                                             |
+| Batch_size      | 32                                                                        | 32                                                                        |
+| 训练参数        | src/config.py                                                             | config/default_config_gpu.yaml                                            |
+| 优化器          | Momentum                                                                  | Momentum                                                                  |
+| 损失函数        | Focal loss                                                                | Focal loss                                                                |
+| 最终损失        | 0.582                                                                     | 0.57                                                                      |
+| 精确度 (8p)     | mAP[0.3475]                                                               | mAP[0.3499]                                                               |
+| 训练总时间 (8p) | 23h16m54s                                                                 | 51h39m6s                                                                  |
+| 脚本            | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) |
 
 #### 推理性能
 
-| 参数                 | Ascend                      |GPU|
-| ------------------- | --------------------------- |--|
-| 模型名称             | Retinanet                |Retinanet                |
-| 运行环境             | Ascend 910；CPU 2.6GHz，192cores；Memory 755G；系统 Euler2.8|Rtx3090;Memory 512G |
-| 上传时间             | 10/01/2021                  |17/02/2022 |
-| MindSpore 版本      | 1.2.0                        |1.5.0|
-| 数据集              | 5k 张图片                   |5k 张图片                   |
-| Batch_size          | 32                          |32                          |
-| 精确度              | mAP[0.3475]                  |mAP[0.3499]               |
-| 总时间              | 10 mins and 50 seconds       |13 mins and 40 seconds       |
+| 参数           | Ascend                                                       | GPU                    |
+| -------------- | ------------------------------------------------------------ | ---------------------- |
+| 模型名称       | Retinanet                                                    | Retinanet              |
+| 运行环境       | Ascend 910；CPU 2.6GHz，192cores；Memory 755G；系统 Euler2.8 | Rtx3090;Memory 512G    |
+| 上传时间       | 10/01/2021                                                   | 17/02/2022             |
+| MindSpore 版本 | 1.2.0                                                        | 1.5.0                  |
+| 数据集         | 5k 张图片                                                    | 5k 张图片              |
+| Batch_size     | 32                                                           | 32                     |
+| 精确度         | mAP[0.3475]                                                  | mAP[0.3499]            |
+| 总时间         | 10 mins and 50 seconds                                       | 13 mins and 40 seconds |
 
 ## [随机情况的描述](#content)
 

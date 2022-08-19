@@ -3,3 +3,4 @@ opencv-python
 pyyaml
 pillow
 pycocotools
+onnxruntime-gpu
