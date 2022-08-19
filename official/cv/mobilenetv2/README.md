@@ -230,9 +230,11 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 
 You can start training using python or shell scripts. The usage of shell scripts as follows:
 
-- Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH] [CKPT_PATH(optional)] [FREEZE_LAYER(optional)] [FILTER_HEAD(optional)]
+- Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH(optional)] [FREEZE_LAYER(optional)] [FILTER_HEAD(optional)]
 - GPU: bash run_trian.sh GPU [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
 - CPU: bash run_trian.sh CPU [CONFIG_PATH] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
+
+> Notice! Currently, when using the Ascend platform, the `VISIABLE_DEVICES` parameter is invalid, that is, you can NOT specify the computing device through this parameter.
 
 `DATASET_PATH` is the dataset path. We use `ImageFolderDataset` as default dataset, which is a source dataset that reads images from a tree of directories. The directory structure is as follows, and you should use `DATASET_PATH=dataset/` for training and evaluation:
 
@@ -262,13 +264,6 @@ You can start training using python or shell scripts. The usage of shell scripts
 
 `CKPT_PATH` `FREEZE_LAYER` and `FILTER_HEAD` are optional, when set `CKPT_PATH`, `FREEZE_LAYER` must be set. `FREEZE_LAYER` should be in ["none", "backbone"], and if you set `FREEZE_LAYER`="backbone", the parameter in backbone will be freezed when training and the parameter in head will not be load from checkpoint. if `FILTER_HEAD`=True, the parameter in head will not be load from checkpoint.
 
-> RANK_TABLE_FILE is HCCL configuration file when running on Ascend.
-> If you run stand alone please set `RANK_TABLE_FILE=None`.
-> The common restrictions on using the distributed service are as follows. For details, see the HCCL documentation.
->
-> - In a single-node system, a cluster of 1, 2, 4, or 8 devices is supported. In a multi-node system, a cluster of 8 x N devices is supported.
-> - Each host has four devices numbered 0 to 3 and four devices numbered 4 to 7 deployed on two different networks. During training of 2 or 4 devices, the devices must be connected and clusters cannot be created across networks.
-
 ### Launch
 
 ```shell
@@ -279,8 +274,8 @@ You can start training using python or shell scripts. The usage of shell scripts
       CPU: python train.py --platform CPU --config_path [CONFIG_PATH] --dataset_path [TRAIN_DATASET_PATH]
 
   shell:
-      Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH]
-      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/
+      Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]
+      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 /home/DataSet/ImageNet_Original/
 
       GPU: bash run_train.sh GPU [CONFIG_PATH] 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH]
       CPU: bash run_train.sh CPU [CONFIG_PATH] [TRAIN_DATASET_PATH]
@@ -292,8 +287,8 @@ You can start training using python or shell scripts. The usage of shell scripts
       CPU: python train.py --platform CPU --config_path [CONFIG_PATH] --dataset_path [TRAIN_DATASET_PATH] --pretrain_ckpt [CKPT_PATH] --freeze_layer none --filter_head True
 
   shell:
-      Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
-      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/predtrain/mobilenet-200_625.ckpt none True
+      Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
+      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/predtrain/mobilenet-200_625.ckpt none True
 
       GPU: bash run_train.sh GPU --config_path [CONFIG_PATH] 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH] [CKPT_PATH] none True
       CPU: bash run_train.sh CPU [TRAIN_DATASET_PATH] [CKPT_PATH] none True
@@ -305,8 +300,8 @@ You can start training using python or shell scripts. The usage of shell scripts
       CPU: python train.py --platform CPU --config_path ../default_config_cpu.yaml --dataset_path [TRAIN_DATASET_PATH] --pretrain_ckpt [CKPT_PATH] --freeze_layer backbone
 
   shell:
-      Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER]
-      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/backbone/mobilenet-200_625.ckpt backbone
+      Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER]
+      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/backbone/mobilenet-200_625.ckpt backbone
 
       GPU: bash run_train.sh GPU [CONFIG_PATH] 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH] [CKPT_PATH] backbone
       CPU: bash run_train.sh CPU [TRAIN_DATASET_PATH] [CKPT_PATH] backbone
@@ -314,7 +309,7 @@ You can start training using python or shell scripts. The usage of shell scripts
 
 ### Result
 
-Training result will be stored in the example path. Checkpoints will be stored at `. /checkpoint` by default, and training log  will be redirected to `./train.log` like followings with the platform CPU and GPU, will be wrote to `./train/rank*/log*.log` with the platform Ascend .
+Training result will be stored in the example path. Checkpoints will be stored at `. /checkpoint` by default, and training log  will be redirected to `./train.log` like followings with the platform CPU and GPU.
 
 ```log
 epoch: [  0/200], step:[  624/  625], loss:[5.258/5.258], time:[140412.236], lr:[0.100]
