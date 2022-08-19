@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 echo "Please run the script as: "
-echo "sh scripts/run_standalone_train.sh DEVICE_ID DEVICE_TARGET DATASET_PATH"
-echo "for example: sh scripts/run_standalone_train.sh 0 Ascend /dataset_path"
+echo "bash scripts/run_standalone_train_ascend.sh DEVICE_ID DEVICE_TARGET DATASET_PATH"
+echo "for example: bash scripts/run_standalone_train_ascend.sh 0 Ascend /dataset_path"
 echo "After running the script, the network runs in the background, The log will be generated in ms_log/output.log"
 
 DEVICE_TARGET=$2

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ def _get_mindrecord_dataset(directory, train_mode=True, epochs=1, batch_size=100
     """
     # not file name, just prefix to identify train or test data
     file_prefix_name = 'train_input_part.mindrecord' if train_mode else 'test_input_part.mindrecord'
-    file_suffix_name = '00' if train_mode else '0'
+    file_suffix_name = '000' if train_mode else '00'
     shuffle = train_mode
 
     if rank_size is not None and rank_id is not None:

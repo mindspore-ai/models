@@ -51,7 +51,7 @@ DLRM 可以分为底部和顶部两部分。底部包含一个用于处理数值
 - 硬件（Ascend 或 GPU）
     - 使用 Ascend 或 GPU 处理器准备硬件环境。
 - 框架
-    - [MindSpore](https://www.mindspore.cn/install) (1.3 / 1.5)
+    - [MindSpore](https://www.mindspore.cn/install) (1.3 / 1.5 / 1.6)
 - 第三方库
 
   ```bash
@@ -86,10 +86,10 @@ DLRM 可以分为底部和顶部两部分。底部包含一个用于处理数值
     --device_target=Ascend \
     --do_eval=True > ms_log/output.log 2>&1 &
   OR
-  sh scripts/run_standalone_train.sh DEVICE_ID/CUDA_VISIBLE_DEVICES DEVICE_TARGET DATASET_PATH
+  bash scripts/run_standalone_train_ascend.sh DEVICE_ID/CUDA_VISIBLE_DEVICES DEVICE_TARGET DATASET_PATH
 
   # 运行分布式训练示例
-  bash scripts/run_distribute_train.sh 8 /dataset_path /rank_table_8p.json
+  bash scripts/run_distribute_train_ascend.sh 8 /dataset_path /rank_table_8p.json
 
   # 运行评估示例
   python eval.py \
@@ -117,9 +117,11 @@ DLRM 可以分为底部和顶部两部分。底部包含一个用于处理数值
   ├─README.md
   ├─mindspore_hub_conf.md             # mindspore hub 配置
   ├─scripts
-    ├─run_standalone_train.sh         # 在 Ascend 处理器或 GPU 上进行单机训练(单卡)
-    ├─run_distribute_train.sh         # 在 Ascend 处理器上进行分布式训练
+    ├─run_standalone_train_ascend.sh         # 在 Ascend
+    ├─run_distribute_train_ascend.sh         # 在 Ascend
+    ├─run_standalone_train_gpu.sh         # 在 Ascend
     ├─run_eval.sh                     # 在 Ascend 处理器或 GPU 上进行评估
+    ├─run_eval_gpu.sh
     └─run_infer_310.sh                # 在 Ascend 310 上推理
 
   ├─src
@@ -135,6 +137,7 @@ DLRM 可以分为底部和顶部两部分。底部包含一个用于处理数值
     ├─dataset.py                      # 创建数据集
     └─preprocess_data.py              # 数据预处理
   ├─npu_config.yaml                   # 默认配置文件
+  ├─gpu_config.yaml                   # 默认配置文件
   ├─eval.py                           # 评估网络
   ├─export.py                         # 导出 MindIR 模型
   ├─preprocess.py                     # 预处理用于推理的数据
@@ -197,8 +200,11 @@ DLRM 可以分为底部和顶部两部分。底部包含一个用于处理数值
 
   训练结束后, 您可在默认文件夹`./checkpoint`中找到检查点文件。损失值保存在 loss.log 文件中。
 
-- GPU上运行
-  待运行。
+- GPU
+
+  ```bash
+  bash scripts/run_standalone_train_gpu.sh DEVICE_ID DEVICE_TARGET DATASET_PATH
+  ```
 
 #### 分布式训练
 
@@ -209,9 +215,6 @@ DLRM 可以分为底部和顶部两部分。底部包含一个用于处理数值
   ```
 
   上述 shell 脚本将在后台运行分布式训练。请在 `log[X]/output.log` 文件中查看结果。损失值保存在 `loss.log` 文件中。
-
-- GPU 上运行
-  待运行。
 
 #### 训练结果
 
@@ -241,8 +244,11 @@ DLRM 可以分为底部和顶部两部分。底部包含一个用于处理数值
 
   上述 python 命令将在后台运行，请在 eval_output.log 路径下查看结果。准确率保存在 acc.log 文件中。
 
-- GPU 运行评估
-  待运行。
+- GPU
+
+    ```bash
+    bash scripts/run_eval.sh DEVICE_ID DEVICE_TARGET DATASET_PATH CHECKPOINT_PATH
+    ```
 
 #### 评估结果
 
@@ -284,38 +290,38 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 
 #### 训练性能
 
-| 参数                    | Ascend                                                      |
-| -------------------------- | ----------------------------------------------------------- |
-| 模型版本              | DLRM                                                  |
-| 资源                   |Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8             |
-| 上传日期              | 2021-11-09                           |
-| MindSpore版本          | 1.3.0/1.5.0                                           |
-| 数据集                    | Criteo                                           |
-| 训练参数        | epoch=1,  batch_size=128, lr=0.15                        |
-| 优化器                  | SGD                                                      |
-| 损失函数              | Sigmoid Cross Entropy With Logits                           |
-| 输出                    | 准确率                                                    |
-| 损失                       | 0.3277069926261902                                                    |
-| 速度| 单卡：144 毫秒/步;                                      |
-| 总时长| 单卡：9 小时;                                               |
-| 参数(M)             | 540                                                        |
-| 微调检查点 | 6.1G (.ckpt 文件)                                     |
+| 参数                    | Ascend                                                      | GPU |
+| -------------------------- | ----------------------------------------------------------- |----|
+| 模型版本              | DLRM                                                  | DLRM   |
+| 资源                   |Ascend 910；CPU 2.60GHz，192核；内存 755G；系统 Euler2.8             | CPU: Intel(R) Xeon(R) Gold 6226R RAM: 252G GPU: RTX3090 24G |
+| 上传日期              | 2021-11-09                           | 2022-02-23 |
+| MindSpore版本          | 1.3.0/1.5.0                                           | 1.6.0 |
+| 数据集                    | Criteo                                           | Criteo |
+| 训练参数        | epoch=1,  batch_size=128, lr=0.15                        |epoch=1,  batch_size=1280, lr=0.15  |
+| 优化器                  | SGD                                                      |SGD   |
+| 损失函数              | Sigmoid Cross Entropy With Logits                           |Sigmoid Cross Entropy With Logits                           |
+| 输出                    | 准确率                                                    |准确率 |
+| 损失                       | 0.3277069926261902                                                    | 0.452256|
+| 速度| 单卡：144 毫秒/步;                                      | 单卡：38 毫秒/步;|
+| 总时长| 单卡：9 小时;                                               | 单卡：20 min;|
+| 参数(M)             | 540                                                        | 540 |
+| 微调检查点 | 6.1G (.ckpt 文件)                                     | 6.1G (.ckpt 文件)  
 | 脚本                    |  |
 
 #### 推理性能
 
-| 参数          | Ascend                      |
-| ------------------- | --------------------------- |
-| 模型版本       | DLRM                |
-| 资源            | Ascend 910；系统 Euler2.8                  |
-| 上传日期       | 2021-11-09 |
-| MindSpore版本   | 1.3.0/1.5.0      |
-| 数据集           | Criteo                    |
-| batch_size          | 16384                        |
-| 输出             | 准确率                    |
-| 总耗时           | 1H50min                  |
-| 准确率| 0.787175917087641                |
-| 推理模型 | 6.1G (.ckpt文件)           |
+| 参数          | Ascend                      | GPU |
+| ------------------- | --------------------------- | --- |
+| 模型版本       | DLRM                | DLRM   |
+| 资源            | Ascend 910；系统 Euler2.8                  | CPU: Intel(R) Xeon(R) Gold 6226R RAM: 252G GPU: RTX3090 24G |
+| 上传日期       | 2021-11-09 | 2022-02-23 |
+| MindSpore版本   | 1.3.0/1.5.0      |  1.6.0 |
+| 数据集           | Criteo                    | Criteo |
+| batch_size          | 16384                        | 16384  |
+| 输出             | 准确率                    | 准确率 |
+| 总耗时           | 1H50min                  | 155 s|
+| 准确率| 0.787175917087641                | 0.7876784245770677 |
+| 推理模型 | 6.1G (.ckpt文件)           | 6.1G (.ckpt文件) |
 
 ## 随机情况说明
 
