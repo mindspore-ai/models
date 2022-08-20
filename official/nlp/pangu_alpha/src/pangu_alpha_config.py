@@ -161,7 +161,7 @@ def set_parse_1_3B(args_opt):
     r"""
         Set config for 1.3B mode
     """
-    args_opt.embedding_size = 2560
+    args_opt.embedding_size = 1024
     args_opt.num_layers = 16
     args_opt.num_heads = 32
     args_opt.op_level_model_parallel_num = 8

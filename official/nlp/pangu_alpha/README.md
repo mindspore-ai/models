@@ -20,6 +20,12 @@
         - [Download Checkpoint](#download-checkpoint)
         - [Prediction in Distributed mode](#prediction-in-distributed-mode)
         - [Prediction in Standalone mode](#prediction-in-standalone-mode)
+    - [Evaluation on Downstream Tasks](#evaluation-on-downstream-tasks)
+        - [Download the Dataset](#download-the-dataset)
+        - [Download the Checkpoint](#download-the-checkpoint)
+        - [Run the Evaluation](#run-the-evaluation)
+        - [Run the Evaluation with Server Enabled](#run-the-evaluation-with-the-server-enabled)
+        - [The Evaluation Results of Zero-Shot for 2.6B Model](#the-evaluation-results-of-zero-shot-for-26b-model)
     - [Serving](#serving)
         - [Preparation](#preparation)
         - [Serving 13B or 2.6B in Standalone mode [Ascend910/Nvidia GPU]](#serving-13b-or-26b-in-standalone-mode-ascend910nvidia-gpu)
@@ -117,20 +123,20 @@ The script will chunk the each line with 1025 tokens. For the chunk with no more
 
 The output files is under `./output`.  The default tokenizer adopts the transformers's tokenizer. Note the `vocab_szie` is determined by the vocab file.
 
-- tokenizer: The tokenizer used for tokening the  text. It can be `gpt`(required `transformers`) or `jieba`. Note the `gpt` tokenizer requires the `transformers`,`pytorch` or `tensorflow`.  `jieba` tokenizer requires two addition files `vocab.model` and `vocab.vocab`. Click [here](https://git.openi.org.cn/PCL-Platform.Intelligence/PanGu-Alpha/src/branch/master/tokenizer) to download them.
+- tokenizer: The tokenizer used for tokening the  text. It can be `gpt`(required `transformers`) or `jieba`. Note the `gpt` tokenizer requires the `transformers`,`pytorch` or `tensorflow`.  `jieba` tokenizer requires two addition files `vocab.model`. Click [here](https://git.openi.org.cn/PCL-Platform.Intelligence/PanGu-Alpha/src/branch/master/tokenizer) to download them.
 - eod_id: The id of `end of the document`.
 - data_column_name: The name of feature columns for mindrecord.
 - seq_length: Default 1025. The preprocess will generate mindrecord with sequence length 1025 for each example.
 
 ### Incremental Training
 
-For users who want to do incremental training on the ckpts released by [PCL-Platform](https://git.openi.org.cn/PCL-Platform.Intelligence/PanGu-Alpha), please download the `vocab.model` and `vocab.vocab` from [here](https://git.openi.org.cn/PCL-Platform.Intelligence/PanGu-Alpha/src/branch/master/tokenizer). Then run the following command to tokenize the raw text with same vocab used for pre-training (**using jieba tokenizer**).
+For users who want to do incremental training on the ckpts released by [PCL-Platform](https://git.openi.org.cn/PCL-Platform.Intelligence/PanGu-Alpha), please download the `vocab.model` from [here](https://git.openi.org.cn/PCL-Platform.Intelligence/PanGu-Alpha/src/branch/master/tokenizer). Then run the following command to tokenize the raw text with same vocab used for pre-training (**using jieba tokenizer**).
 
 ```bash
-python -m src.preprocess --input_glob  data/*.txt --tokenizer jieba --vocab_file vocab.vocab --model_file vocab.model --eot 6
+python -m src.preprocess --input_glob  data/*.txt --tokenizer jieba --model_file vocab.model --eot 6
 ```
 
-The vocab size of `vocab.vocab` is 40000, and the `eod id` is 6.
+The vocab size of `vocab.model` is 40000, and the `eod id` is 6.
 
 ## [Training](#contents)
 
@@ -284,6 +290,8 @@ Please refer to the [website](https://git.openi.org.cn/PCL-Platform.Intelligence
 
 Here we suppose the downloaded checkpoint, tokenizer and strategy file is organized as follows:
 
+**Note**: In the following sections, we will refer the path as `ckpts` as `/home/your_path/ckpts`.
+
 ```shell
 ckpts
 ├── checkpoint_file
@@ -294,8 +302,7 @@ ckpts
 ├── strategy_load_ckpt
 │   └── strategy.ckpt
 └── tokenizer
-    ├── vocab10.model
-    └── vocab10.vocab
+    └── vocab.model
 ```
 
 We provide two predict methods. The first one is the normal way which needs to pad the input to a certain length every
@@ -325,6 +332,156 @@ bash scripts/run_standalone_predict.sh ${FILE_PATH}/strategy_load_ckpt/strategy.
 ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TARGET
 ```
 
+## Evaluation on Downstream Tasks
+
+This script provides the evaluation of following tasks:
+
+- [C3](https://github.com/nlpdata/c3)
+
+### Download the Dataset
+
+Click the link of above tasks and download the data. Take the C3 for example, unzip the dataset to
+`/home/my_path/data/c3`
+
+Its structure should be as followings:
+
+```text
+c3
+├── annotation
+│   ├── c3-d-dev.txt
+│   ├── c3-d-test.txt
+│   ├── c3-m-dev.txt
+│   └── c3-m-test.txt
+├── bert
+│   ├── convert_tf_checkpoint_to_pytorch.py
+│   ├── extract_features.py
+│   ├── __init__.py
+│   ├── LICENSE
+│   ├── modeling.py
+│   ├── optimization.py
+│   ├── run_classifier.py
+│   └── tokenization.py
+├── data
+│   ├── c3-d-dev.json
+│   ├── c3-d-test.json
+│   ├── c3-d-train.json
+│   ├── c3-m-dev.json
+│   ├── c3-m-test.json
+│   └── c3-m-train.json
+├── license.txt
+└── README.md
+```
+
+### Download the Checkpoint
+
+Please follow the instructions in section [Prediction](#prediction) to download the checkpoint.
+
+### Run the Evaluation
+
+The most of the arguments are same with the section [Prediction in Standalone mode](#prediction-in-standalone-mode),
+except the last argument `TASK` and `TASK_PATH`. Currently, we support only `c3` task.
+
+```bash
+export FILE_PATH=/home/your_path/ckpts
+export DEVICE_TARGET=Ascend # or GPU
+export TASK=c3
+export TASK_PATH=/home/your_c3_data_path
+bash scripts/run_standalone_eval.sh ${FILE_PATH}/strategy_load_ckpt/strategy.ckpt \
+${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TARGET $TASK $TASK_PATH
+```
+
+For the model with 2.6B, it takes about 13 minutes to get the results. Log can be found under the `device0/log0.log`.
+It should look like this:
+
+```text
+Metric for dataset c3 is {'top1_acc': 0.5452}
+```
+
+If you want to evaluate the model with 13B model, use the following commands to launch the program with 8 devices:
+
+```bash
+export FILE_PATH=/home/your_path/ckpts
+export DEVICE_TARGET=Ascend # or GPU
+export TASK=c3
+export TASK_PATH=/home/your_c3_data_path
+export RANK_TABLE=/home/rank_table_8p.json
+bash scripts/run_distribute_eval.sh 8 $RANK_TABLE ${FILE_PATH}/strategy_load_ckpt/strategy.ckpt \
+${FILE_PATH}/tokenizer/ ${FILE_PATH}/checkpoint_file 13B fp32 $TASK $TASK_PATH
+```
+
+### Run the Evaluation with the Server Enabled
+
+#### Start the server
+
+Follows the section [Serving](./Serving) to launch the server.
+
+In summary, user can use the following commands to export the mindir files
+
+```bash
+set -e
+export FILE_PATH=/home/your_path/ckpts
+export DEVICE_TARGET=Ascend # or GPU
+export TASK=c3
+bash scripts/run_standalone_export.sh ${FILE_PATH}/strategy_load_ckpt/strategy.ckpt \
+${FILE_PATH}/checkpoint_file 2.6B ${DEVICE_TARGET} $TASK
+```
+
+Log can be found under the device0/log0.log. Once you see the following output at the final of the log,
+the export process is done:
+
+```text
+Export finished and now exit.
+```
+
+There is another step to copy the vocab.model file, which is needed for the tokenization.
+
+```bash
+mkdir -p serving_increment/pangu_standalone/pangu/tokenizer
+cp -r your_path/vocab.model serving_increment/pangu_standalone/pangu/tokenizer/
+```
+
+After the model is exported, we can use the following commands to start the serving
+
+```bash
+mkdir -p serving_increment/pangu_standalone/pangu/1/
+mv device0/* serving_increment/pangu_standalone/pangu/1/
+cd serving_increment && bash start_pangu_standalone.sh
+```
+
+You can see the log as followings:
+
+```text
+* Running on all addresses (0, 0, 0, 0)
+* Running on http://127.0.0.1: 5000
+* Running on http://your_server_ip:5000
+Press CTRL+C to quit
+```
+
+#### Run the evaluation with the Server
+
+```bash
+TOKENIZER_PATH=/home/your_path/ckpts/tokenizer/
+EVAL_DATA_URL=/home/my_path/data/c3
+EVAL_TASK=c3
+python predict.py --enable_client --eval_task=$EVAL_TASK \
+                  --tokenizer_path=$TOKENIZER_PATH \
+                  --eval_data_url=$EVAL_DATA_URL
+```
+
+After the program finished(takes about 20 minutes), the output should be same as the followings.
+
+```text
+Metric for dataset c3 is {'top1_acc': 0.5432}
+```
+
+### The Evaluation Results of Zero-Shot for 2.6B Model
+
+The following results are obtained by PanGu-Alpha 2.6B model.
+
+| Task Name         | Metric   | Paper | ReProduced | Platform |
+|-------------------|----------|-------|------------|----------|
+| C3                | accuracy | 53.42 | 54.32      | Ascend   |
+
 ## [Serving](#contents)
 
 ### Preparation
@@ -347,12 +504,12 @@ ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TAR
 
 ### Serving 13B or 2.6B in Standalone mode [Ascend910/Nvidia GPU]
 
-- Use scripts/run_standalone_export.sh to export MindIR models, and move all device_0/* to
+- Use scripts/run_standalone_export.sh to export MindIR models, and move all device0/* to
   'serving_increment/pangu_standalone/pangu/1/'.
 
   ```shell
   >>> cd scripts
-  >>> bash run_standalone_export.sh ${strategy_file_path} ${ckpt_dir_path}
+  >>> bash run_standalone_export.sh ${strategy_file_path} ${ckpt_dir_path} 2.6B Ascend
   ```
 
   Update the parameter `MODE` in `run_standalone_export.sh` from `13B` to `2.6B` if we want to export 2.6B model.
@@ -375,7 +532,7 @@ ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TAR
   >>> cd serving_increment
   ```
 
-- Copy `pangu-alpha/tokenizer` to directory serving_increment/pangu_standalone/pangu/tokenizer.
+- Copy `pangu_alpha/tokenizer` to directory serving_increment/pangu_standalone/pangu/tokenizer.
 
   The directory hierarchy of the required files is shown below. The pangu_alpha_1024_variables and pangu_alpha_1_variables are folded for easy display.
 
@@ -391,8 +548,7 @@ ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TAR
   │   ├── servable_config.py
   │   ├── tokenization_jieba.py
   │   └── tokenizer
-  │       ├── vocab.model
-  │       └── vocab.vocab
+  │       └── vocab.model
   └── serving_server.py
   ```
 
@@ -473,8 +629,7 @@ ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TAR
   │   ├── servable_config.py
   │   ├── tokenization_jieba.py
   │   └── tokenizer
-  │       ├── vocab.model
-  │       └── vocab.vocab
+  │       └── vocab.model
   ├── serving_agent.py
   └── serving_server.py
   ```
@@ -563,7 +718,7 @@ Please check the official [homepage](https://gitee.com/mindspore/models).
 
 # [Requirements](#contents)
 
-- mindspore 1.5.0 or higher version
+- mindspore 1.9.0 or higher version
 - jieba 0.42.1
 - sentencepiece 0.1.94
 - transformers >= 4.7.0

@@ -16,6 +16,7 @@
 
 import os
 import time
+from glob import glob
 from easydict import EasyDict
 import numpy as np
 from mindspore_serving.server import register
@@ -24,7 +25,7 @@ from pangu.tokenization_jieba import JIEBATokenizer
 
 cur_dir = os.path.abspath(os.path.dirname(__file__))
 tokenizer_path = os.path.join(cur_dir, "tokenizer")
-tokenizer = JIEBATokenizer(os.path.join(tokenizer_path, "vocab.vocab"), os.path.join(tokenizer_path, "vocab.model"))
+tokenizer = JIEBATokenizer(os.path.join(tokenizer_path, "vocab.model"))
 end_token = tokenizer.eot_id
 
 config = EasyDict({
@@ -39,6 +40,17 @@ config = EasyDict({
 })
 
 
+def convert_text_to_ids(text, local_tokenizer, seq_length, pad, plus=0):
+    input_ids = local_tokenizer.encode(text)
+    input_ids = local_tokenizer.convert_tokens_to_ids(input_ids)
+    input_ids = np.array(input_ids).reshape(1, -1)
+    if input_ids.shape[-1] > seq_length:
+        input_ids = input_ids[:, :seq_length + plus]
+    pad_length = seq_length + plus - input_ids.shape[-1]
+    input_ids = np.pad(input_ids, ((0, 0), (0, pad_length)), 'constant', constant_values=(0, pad))
+    return input_ids
+
+
 def topk_fun(logits, topk=5):
     """Get topk"""
     target_column = logits[0].tolist()
@@ -51,15 +63,49 @@ def topk_fun(logits, topk=5):
     return value, index
 
 
-model = register.declare_model(model_file=["pangu_alpha_1024_graph.mindir", "pangu_alpha_1_graph.mindir"],
+files = glob(os.path.join(os.path.dirname(__file__), '*/*.mindir'))
+sorted_files = sorted(files, key=os.path.getctime)
+mindirs = [item.split('/')[-1] for item in sorted_files]
+print("Got the mindir files:", mindirs, flush=True)
+model = register.declare_model(model_file=mindirs,
                                model_format="MINDIR", with_batch_dim=False)
 
 
-def predict_stage(input_sentence):
+def gather(data, index):
+    result = []
+    for i in range(data.shape[0]):
+        result.append(data[i, index[i]])
+    return np.array(result)
+
+
+def compute_loss(logits, labels, mask):
+    labels = labels.astype(np.int32)
+    select = gather(logits, labels[0])
+    loss = -select * mask
+    loss = np.mean(loss)
+    return loss
+
+
+def get_scores(origin_inputs, prompt_ids, labels):
+    logits, mask = model.call(np.array(origin_inputs, np.int32),
+                              np.array(prompt_ids, np.int32),
+                              subgraph=0)
+    loss = compute_loss(logits, labels, mask)
+
+    return loss
+
+
+def predict_stage(input_sentence, prompt, return_scores):
     """generate sentence with given input_sentence"""
 
     print(f"----------------------------- begin {input_sentence} ---------", flush=True)
     time_start = time.time()
+    if return_scores:
+        tokens = convert_text_to_ids(input_sentence, tokenizer, config.seq_length, pad=tokenizer.pad_id, plus=0)
+        prompt_ids = convert_text_to_ids(prompt, tokenizer, config.seq_length, pad=tokenizer.pad_id, plus=0)
+        labels = np.concatenate((tokens[:, 1:], np.ones((tokens.shape[0], 1)) * tokenizer.pad_id), axis=-1)
+        outputs = get_scores(tokens, prompt_ids, labels)
+        return outputs
 
     tokens = tokenizer.tokenize(input_sentence)
     input_ids = tokenizer.convert_tokens_to_ids(tokens)
@@ -187,6 +233,6 @@ def generate_increment(origin_inputs):
 
 
 @register.register_method(output_names=["output_sentence"])
-def predict(input_sentence):
-    reply = register.add_stage(predict_stage, input_sentence, outputs_count=1)
+def predict(input_sentence, prompt, return_scores):
+    reply = register.add_stage(predict_stage, input_sentence, prompt, return_scores, outputs_count=1)
     return reply

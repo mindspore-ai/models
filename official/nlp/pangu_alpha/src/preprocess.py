@@ -170,7 +170,6 @@ if __name__ == '__main__':
     parser.add_argument('--output_file', type=str,
                         default='./output/transfered_mindrecord')
     parser.add_argument('--tokenizer', type=str, default='gpt', choices=['gpt', 'jieba'])
-    parser.add_argument('--vocab_file', type=str, default=None)
     parser.add_argument('--model_file', type=str, default=None)
     parser.add_argument('--file_partition', type=int, default=1)
     parser.add_argument('--file_batch_size', type=int, default=1024)
@@ -199,11 +198,9 @@ if __name__ == '__main__':
             print("module 'transformers' not installed.")
         word_tokenizer = GPT2Tokenizer.from_pretrained("gpt2")
     else:
-        if not os.path.exists(args.vocab_file):
-            raise FileNotFoundError(f"file {args.vocab_file} do not exists.")
         if not os.path.exists(args.model_file):
             raise FileNotFoundError(f"file {args.model_file} do not exists.")
-        word_tokenizer = JIEBATokenizer(vocab_file=args.vocab_file, model_file=args.model_file)
+        word_tokenizer = JIEBATokenizer(model_file=args.model_file)
 
     transforms_count = 0
     if args.dataset_type == 'wiki':

@@ -24,6 +24,7 @@ def start():
     server.start_servables(config)
 
     server.start_grpc_server("127.0.0.1:5500")
+    server.start_restful_server("127.0.0.1:1500")
 
 
 if __name__ == "__main__":

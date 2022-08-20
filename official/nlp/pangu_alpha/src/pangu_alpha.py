@@ -216,8 +216,12 @@ def set_parallel_configure_for_layer(network, layer_id, offset, parallel_config,
     else:
         network.set_comm_fusion(int((layer_id + offset) / dis) + 1)
     # Used for enabling recomputation of the block
-    if parallel_config.recompute.recompute:
-        network.recompute(recompute_slice_activation=parallel_config.recompute.recompute_slice_activation)
+    if isinstance(parallel_config.recompute, bool):
+        if parallel_config.recompute:
+            network.recompute()
+    else:
+        if parallel_config.recompute.recompute:
+            network.recompute(recompute_slice_activation=parallel_config.recompute.recompute_slice_activation)
 
 
 class PanguAlpha_Model(Cell):
@@ -284,9 +288,14 @@ class PanguAlpha_Model(Cell):
                                           use_past=config.use_past,
                                           softmax_compute_type=config.softmax_compute_type,
                                           parallel_config=config.parallel_config)
-        if config.parallel_config.recompute.recompute:
-            self.top_query_layer.recompute(recompute_slice_activation=
-                                           config.parallel_config.recompute.recompute_slice_activation)
+        if isinstance(config.parallel_config.recompute, bool):
+            if config.parallel_config.recompute:
+                self.top_query_layer.recompute()
+        else:
+            if config.parallel_config.recompute.recompute:
+                self.top_query_layer.recompute(recompute_slice_activation=
+                                               config.parallel_config.recompute.recompute_slice_activation)
+
         self.top_query_layer.set_comm_fusion(config.parallel_config.gradient_aggregation_group)
         self.top_query_layer.pipeline_stage = config.parallel_config.pipeline_stage - 1
 
@@ -450,6 +459,56 @@ class PanGUAlphaWithLoss(Cell):
         return output
 
 
+class PanGUAlphaLossWithPrompt(Cell):
+    """
+    PanguAlpha training loss for generation.
+    Args:
+        config(PanGUConfig)
+    Inputs:
+        input_ids: the tokenized inputs
+        past: the previous feature map
+    Returns:
+        output: Tensor, the loss of the network
+    """
+
+    def __init__(self, config, network, loss):
+        super(PanGUAlphaLossWithPrompt, self).__init__(auto_prefix=False)
+        self.batch_size = config.batch_size
+        self.seq_length = config.seq_length
+        dp = config.parallel_config.data_parallel
+        self.network = network
+        self.pad_token = config.pad_token
+        self.loss = loss
+
+        self.slice = P.StridedSlice().shard(((dp, 1),))
+        self.not_equal = P.NotEqual().shard(((dp, 1), ()))
+        self.batch_size = config.batch_size
+        self.len = config.seq_length
+        self.slice2 = P.StridedSlice().shard(((dp, 1, 1),))
+        self.micro_batch_step = 1
+        if config.parallel_config.pipeline_stage > 1:
+            self.micro_batch_step = config.parallel_config.micro_batch_num
+        self.log_softmax = P.LogSoftmax().shard(((1, 1),))
+        self.get_attention_mask = AttentionMask(config.seq_length)
+        self.equal = P.Equal()
+
+    def construct(self, input_ids, prompt_ids):
+        r"""Forward process of the pangu alpha model"""
+        tokens = input_ids
+        input_mask = F.cast(self.not_equal(tokens, self.pad_token), mstype.float32)
+        input_position = F.tuple_to_array(F.make_range(self.len))
+        input_position = P.Tile()(input_position, (self.batch_size, 1))
+
+        input_mask_a = F.cast(self.equal(prompt_ids, self.pad_token), mstype.float32)
+        attention_mask = self.get_attention_mask(input_mask)
+
+        logits = self.network(tokens, input_position, attention_mask)
+
+        log_probs = self.log_softmax(logits)
+        input_mask_b = input_mask * input_mask_a
+        return log_probs, input_mask_b
+
+
 class EvalNet(nn.Cell):
     """
     PanguAlpha evaluation net
@@ -472,7 +531,7 @@ class EvalNet(nn.Cell):
         self.generate = generate
         self.topk = P.TopK(sorted=True).shard(((1, 1),))
         self.gather = P.GatherV2().shard(((1, 1), (1,)))
-        self.log_softmax = P.LogSoftmax().shard(((1, 1, 1),))
+        self.log_softmax = P.LogSoftmax().shard(((1, 1),))
         self.get_attention_mask = AttentionMask(seq_length)
         self.expand = P.ExpandDims().shard(((1, 1, 1),))
         # used for incremental prediction
@@ -490,8 +549,9 @@ class EvalNet(nn.Cell):
             attention_mask = self.get_attention_mask(input_mask)
         logits = self.backbone(input_ids, input_position, attention_mask,
                                init_reset, batch_valid_length)
-        index = current_index.view(1,)
-        logits = self.gather(logits, index, 0)
-        logits = logits.view(bs, 1, -1)
         log_probs = self.log_softmax(logits)
-        return log_probs
+
+        index = current_index.view(1,)
+        logits = self.gather(log_probs, index, 0)
+        logits = logits.view(bs, 1, -1)
+        return logits
