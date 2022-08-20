@@ -16,7 +16,6 @@
 ##############export checkpoint file into air, mindir models#################
 python export.py
 """
-import argparse
 import numpy as np
 import mindspore as ms
 from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
@@ -25,16 +24,9 @@ from nets.predrnn_pp import PreRNN
 
 from config import config
 
-
 def run_export():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--device_id', type=int, default=0)
-    parser.add_argument('--pretrained_model', type=str, default='')
-    parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='MINDIR',
-                        help='file format')
-    args_opt = parser.parse_args()
 
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=args_opt.device_id)
+    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=config.device_id)
 
     num_hidden = [int(x) for x in config.num_hidden.split(',')]
     num_layers = len(num_hidden)
@@ -56,7 +48,7 @@ def run_export():
                      input_length=config.input_length,
                      tln=config.layer_norm)
 
-    param_dict = load_checkpoint(args_opt.pretrained_model)
+    param_dict = load_checkpoint(config.pretrained_model)
     load_param_into_net(network, param_dict)
     network.set_train(False)
     patched_width = int(config.img_width/config.patch_size)
@@ -68,7 +60,7 @@ def run_export():
                           int(config.patch_size)**2*int(config.img_channel)))
     input_arr = (Tensor(np.ones(shape), dtype=ms.float32), Tensor(mask_true, dtype=ms.float32))
 
-    export(network, *input_arr, file_name=config.file_name, file_format=args_opt.file_format)
+    export(network, *input_arr, file_name=config.file_name, files_format=config.file_format)
 
 
 if __name__ == '__main__':

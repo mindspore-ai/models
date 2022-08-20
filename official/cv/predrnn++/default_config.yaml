@@ -38,6 +38,7 @@ sink_size: 10
 device_num: 1
 device_id: 0
 result_path: "./scripts/preprocess_Result/"
+file_format: "MINDIR"
 
 result_dir: ""
 input0_path: ""
