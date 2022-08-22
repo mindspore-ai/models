@@ -43,8 +43,8 @@ LSTM模型包含嵌入层、编码器和解码器这几个模块，编码器模�
 
 # 数据集
 
-- aclImdb_v1用于训练评估。[大型电影评论数据集](http://ai.stanford.edu/~amaas/data/sentiment/)
-- 单词表示形式的全局矢量（GloVe）：用于单词的向量表示。[GloVe](https://nlp.stanford.edu/projects/glove/)
+- aclImdb_v1用于训练评估。[大型电影评论数据集](https://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz)
+- 单词表示形式的全局矢量（GloVe）：用于单词的向量表示。[GloVe](https://nlp.stanford.edu/data/glove.6B.zip)
 
 # 环境要求
 
@@ -199,6 +199,21 @@ LSTM模型包含嵌入层、编码器和解码器这几个模块，编码器模�
 .
 ├── lstm
     ├── README.md               # LSTM相关说明
+    ├── alimdb                  # aclimdb 数据集
+    │   ├── test                # 测试集
+    │   │    ├──  neg
+    │   │    ├──  pos
+    │   │    ├── ...
+    │   ├── train               # 训练集
+    │   │    ├──  neg
+    │   │    ├──  pos
+    │   │    ├── ...
+    │   ├── ...
+    ├── glove                   # glove 预训练的词向量文件
+    │   ├── glove.6B.50d.txt
+    │   ├── glove.6B.100d.txt
+    │   ├── glove.6B.200d.txt
+    │   ├── glove.6B.300d.txt
     ├── script
     │   ├── run_eval_ascend.sh  # Ascend评估的shell脚本
     │   ├── run_eval_gpu.sh     # GPU评估的shell脚本
@@ -206,7 +221,8 @@ LSTM模型包含嵌入层、编码器和解码器这几个模块，编码器模�
     │   ├── run_train_ascend.sh # Ascend训练的shell脚本
     │   ├── run_train_gpu.sh    # GPU训练的shell脚本
     │   ├── run_train_cpu.sh    # CPU训练的shell脚本
-    │   └── run_infer_310.sh    # infer310的shell脚本
+    │   ├── run_infer_310.sh    # infer310的shell脚本
+    │   ├── run_infer_onnx.sh   # ONNX模型推理脚本
     ├── src
     │   ├── lstm.py             # 情感模型
     │   ├── dataset.py          # 数据集预处理
@@ -218,10 +234,12 @@ LSTM模型包含嵌入层、编码器和解码器这几个模块，编码器模�
     │     ├── local_adapter.py              # 获取本地id
     │     └── moxing_adapter.py             # 云上数据准备
     ├── default_config.yaml                 # 训练配置参数(cpu/gpu)
+    ├── onnx_infer_config.yaml              # onnx推理配置参数(cpu/gpu)
     ├── config_ascend.yaml                  # 训练配置参数(ascend)
     ├── config_ascend_8p.yaml               # 训练配置参数(ascend_8p)
     ├── eval.py                 # GPU、CPU和Ascend的评估脚本
-    └── train.py                # GPU、CPU和Ascend的训练脚本
+    ├── train.py                # GPU、CPU和Ascend的训练脚本
+    └── eval_onnx.py            # GPU、CPU和Ascend的onnx推理脚本
 ```
 
 ## 脚本参数
@@ -397,14 +415,15 @@ Ascend:
   bash run_eval_cpu.sh 0 ./aclimdb ./glove_dir lstm-20_390.ckpt
   ```
 
-## 导出mindir模型
+## 导出模型
 
 ```shell
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [YAML_CONFIG_PATH]
 ```
 
+- `weight.txt` 文件在导出脚本中要用到，需要运行preprocess.py文件生成。
 - `ckpt_file` 是必需的。
-- `FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中进行选择。
+- `FILE_FORMAT` 必须在 ["AIR", "MINDIR", "ONNX"]中进行选择。
 - `YAML_CONFIG_PATH` 默认是 `default_config.yaml`。
 
 ## 推理过程
@@ -421,6 +440,14 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TAR
 - `DEVICE_TARGET` 可选值范围为：['GPU', 'CPU', 'Ascend']
 - `NEED_PREPROCESS` 表示数据是否需要预处理，可选值范围为：'y' 或者 'n'
 - `DEVICE_ID` 可选, 默认值为0
+
+### ONNX模型评估
+
+```shell
+    bash run_infer_onnx.sh [DEVICE_ID]
+    # example: bash run_infer_onnx.sh 0
+    注意:此处推理使用的是onnx_infer_config.yaml配置文件,详细参数请见此文件
+```
 
 ### 结果
 

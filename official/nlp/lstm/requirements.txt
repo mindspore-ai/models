@@ -1,3 +1,4 @@
 gensim
 numpy
 pyyaml
+onnxruntime-gpu

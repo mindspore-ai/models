@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ class ImdbParser():
         """
         parse imdb data to memory
         """
-        self.__wvmodel = gensim.models.KeyedVectors.load_word2vec_format(self.__glove_file)
+        self.__wvmodel = gensim.models.KeyedVectors.load_word2vec_format(self.__glove_file, no_header=True)
 
         for seg in self.__segs:
             self.__parse_imdb_datas(seg)

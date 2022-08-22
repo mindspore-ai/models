@@ -42,8 +42,8 @@ LSTM contains embeding, encoder and decoder modules. Encoder module consists of 
 
 Note that you can run the scripts based on the dataset mentioned in original paper or widely used in relevant domain/network architecture. In the following sections, we will introduce how to run the scripts using the related dataset below.
 
-- aclImdb_v1 for training evaluation.[Large Movie Review Dataset](http://ai.stanford.edu/~amaas/data/sentiment/)
-- GloVe: Vector representations for words.[GloVe: Global Vectors for Word Representation](https://nlp.stanford.edu/projects/glove/)
+- aclImdb_v1 for training evaluation.[Large Movie Review Dataset](https://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz)
+- GloVe: Vector representations for words.[GloVe: Global Vectors for Word Representation](https://nlp.stanford.edu/data/glove.6B.zip)
 
 # [Environment Requirements](#contents)
 
@@ -198,6 +198,21 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 .
 ├── lstm
     ├── README.md               # descriptions about LSTM
+    ├── alimdb                  # aclimdb dataset
+    │   ├── test                # test set
+    │   │    ├──  neg
+    │   │    ├──  pos
+    │   │    ├── ...
+    │   ├── train               # train set
+    │   │    ├──  neg
+    │   │    ├──  pos
+    │   │    ├── ...
+    │   ├── ...
+    ├── glove                   # glove pretrained word vector files
+    │   ├── glove.6B.50d.txt
+    │   ├── glove.6B.100d.txt
+    │   ├── glove.6B.200d.txt
+    │   ├── glove.6B.300d.txt
     ├── script
     │   ├── run_eval_gpu.sh     # shell script for evaluation on GPU
     │   ├── run_eval_ascend.sh  # shell script for evaluation on Ascend
@@ -217,10 +232,12 @@ Note that you can run the scripts based on the dataset mentioned in original pap
     │     ├── local_adapter.py        # Get local ID
     │     └── moxing_adapter.py       # Parameter processing
     ├── default_config.yaml           # Training parameter profile(cpu/gpu)
+    ├── onnx_infer_config.yaml        # Onnx infer parameter profile(cpu/gpu)
     ├── config_ascend.yaml            # Training parameter profile(ascend)
     ├── config_ascend_8p.yaml         # Training parameter profile(ascend_8p)
     ├── eval.py                 # evaluation script on GPU, CPU and Ascend
-    └── train.py                # training script on GPU, CPU and Ascend
+    ├── train.py                # training script on GPU, CPU and Ascend
+    └── eval_onnx.py            # Onnx infer script on GPU, CPU and Ascend
 ```
 
 ## [Script Parameters](#contents)
@@ -402,8 +419,9 @@ Ascend:
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [YAML_CONFIG_PATH]
 ```
 
+- `weight.txt` is required, please generate it by run preprocess.py. Then you will see this file in /preprocess.
 - `ckpt_file` parameter is required.
-- `FILE_FORMAT` should be in ["AIR", "MINDIR"].
+- `FILE_FORMAT` should be in ["AIR", "MINDIR", "ONNX"].
 - `YAML_CONFIG_PATH` default is `default_config.yaml`.
 
 ## [Inference Process](#contents)
@@ -420,6 +438,14 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TAR
 `DEVICE_TARGET` must choose from ['GPU', 'CPU', 'Ascend']
 `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'
 `DEVICE_ID` is optional, default value is 0.
+
+### ONNX Model Eval
+
+```shell
+    bash run_infer_onnx.sh [DEVICE_ID]
+    # example: bash run_infer_onnx.sh 0
+    Warning: Default config file is onnx_infer_config.yaml, for more detail information please refer to this file.
+```
 
 #### result
 
