@@ -74,7 +74,6 @@ MaskRCNN是一个两级目标检测网络，作为FasterRCNN的扩展模型，�
 ```bash
 pip install Cython
 pip install pycocotools
-pip install mmcv=0.2.14
 ```
 
 # 快速入门

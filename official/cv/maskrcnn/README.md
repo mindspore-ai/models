@@ -76,7 +76,6 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 ```bash
 pip install Cython
 pip install pycocotools
-pip install mmcv=0.2.14
 ```
 
 # [Quick Start](#contents)

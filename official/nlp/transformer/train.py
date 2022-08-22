@@ -120,7 +120,7 @@ def run_transformer_train():
     ms.set_context(reserve_class_name_in_scope=False)
 
     # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
-    if ms.get_context("mode") == context.PYNATIVE_MODE:
+    if ms.get_context("mode") == ms.PYNATIVE_MODE:
         ms.set_context(mempool_block_size="31GB")
 
     if config.device_target == "GPU":
