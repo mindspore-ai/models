@@ -208,6 +208,7 @@ bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]  [CONFIG_PATH]
     ├── resnet18_imagenet2012_config_gpu.yaml
     ├── resnet34_imagenet2012_config.yaml
     ├── resnet50_cifar10_config.yaml
+    ├── resnet34_cpu_config.yaml
     ├── resnet50_imagenet2012_Boost_config.yaml     # 高性能版本：性能提高超过10%而精度下降少于1%
     ├── resnet50_imagenet2012_Ascend_Thor_config.yaml
     ├── resnet50_imagenet2012_config.yaml
@@ -226,6 +227,7 @@ bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]  [CONFIG_PATH]
     ├── run_standalone_train_gpu.sh        # 启动GPU单机训练（单卡）
     └── cache_util.sh                      # 使用单节点緩存的帮助函数
   ├── src
+    ├── data_split.py                      # 切分迁移数据集脚本（cpu）
     ├── dataset.py                         # 数据预处理
     ├── eval_callback.py                   # 训练时推理回调函数
     ├── CrossEntropySmooth.py              # ImageNet2012数据集的损失定义
@@ -236,6 +238,9 @@ bash run_eval_gpu.sh [DATASET_PATH] [CHECKPOINT_PATH]  [CONFIG_PATH]
        ├── device_adapter.py               # 设备配置
        ├── local_adapter.py                # 本地设备配置
        └── moxing_adapter.py               # modelarts设备配置
+  ├── fine_tune.py                         # 迁移训练网络（cpu）
+  ├── quick_start.py                       # quick start演示文件（cpu）
+  ├── requirements.txt                     # 第三方依赖
   ├── eval.py                              # 评估网络
   └── train.py                             # 训练网络
 ```
@@ -474,6 +479,48 @@ bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [RUN_EVAL](optiona
 默认情况下我们将启动一个独立的缓存服务器将推理数据集的图片以tensor的形式保存在内存中以带来推理性能的提升。用户在使用缓存前需确保内存大小足够缓存推理集中的图片（缓存ImageNet2012的推理集大约需要30GB的内存，缓存CIFAR-10的推理集约需要使用6GB的内存）。
 
 在训练结束后，可以选择关闭缓存服务器或不关闭它以继续为未来的推理提供缓存服务。
+
+## 迁移训练过程
+
+### 迁移数据集处理
+
+[根据提供的数据集链接下载数据集](https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz ),将切分数据集脚本data_split.py放置在下载好的flower_photos目录下，运行后会生成train文件夹及test文件夹，将train文件夹及test文件夹保存到新建文件夹datasets里.
+
+### 迁移训练Ckpt获取
+
+[根据提供的Ckpt链接下载数据集](https://download.mindspore.cn/models/r1.5/ ),Ckpt文件名称为“resnet34_ascend_v170_imagenet2012_official_cv_top1acc73.61_top5acc91.74.ckpt”，下载后存放在fine_tune.py同路径下。
+
+### 用法
+
+您可以通过python脚本开始训练：
+
+```shell
+python fine_tune.py --config_path ./config/resnet34_cpu_config.yaml
+```
+
+### 结果
+
+- 使用flower_photos据集训练ResNet34
+
+```text
+# 迁移训练结果（CPU）
+epoch: 1 step: 1, loss is 1.5975518
+epoch: 1 step: 2, loss is 1.5453123
+epoch: 1 step: 3, loss is 1.3293151
+epoch: 1 step: 4, loss is 1.491757
+epoch: 1 step: 5, loss is 1.3044931
+...
+```
+
+## 迁移训练推理过程
+
+### 用法
+
+您可以通过python脚本开始推理(需要先到resnet34_cpu_config.yaml配置文件中将ckpt_path设为最好的ckpt文件路径):
+
+```shell
+python eval.py --config_path ./cpu_default_config.yaml --data_path ./dataset/flower_photos/test
+```
 
 ## 续训过程
 
@@ -1038,6 +1085,26 @@ result:{'top_1_accuracy': 0.928385416666666} prune_rate=0.45 ckpt=~/resnet50_cif
 | 参数(M)             | 20.79                                                         |
 | 微调检查点| 166M（.ckpt文件）                                         |
 | 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config)|
+
+#### flower_photos上的ResNet34
+
+| 参数                 | CPU                                                                           |
+| -------------------------- |-------------------------------------------------------------------------------|
+| 模型版本              | ResNet34                                                                      |
+| 资源                   | CPU 3.40GHz，4核；内存 8G；系统 win7                                                  |
+| 上传日期              | 2022-08-30                                                                    |
+| MindSpore版本          | 1.8.1                                                                         |
+| 数据集                    | flower_photos                                                                 |
+| 训练参数        | epoch=10, steps per epoch=85, batch_size = 32                                 |
+| 优化器                  | Momentum                                                                      |
+| 损失函数              | Softmax交叉熵                                                                    |
+| 输出                    | 概率                                                                            |
+| 损失                       | 0.32727173                                                                    |
+| 速度                      | 6859毫秒/步                                                                      |
+| 总时长                 | 70分钟                                                                          |
+| 参数(M)             | 20.28                                                                         |
+| 微调检查点| 81M（.ckpt文件）                                                                  |
+| 配置文件                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
 
 #### ImageNet2012上的ResNet101
 
