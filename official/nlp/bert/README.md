@@ -469,8 +469,7 @@ config for lossscale and etc.
 ```text
 Parameters for dataset and network (Pre-Training/Fine-Tuning/Evaluation):
     seq_length                      length of input sequence: N, default is 128
-    vocab_size                      size of each embedding vector: N, must be consistent with the dataset you use. Default is 21128.
-                                    Usually, we use 21128 for CN vocabs and 30522 for EN vocabs according to the origin paper.
+    vocab_size                      size of each embedding vector: N, must be consistent with the dataset you use. Default is 21128. Usually, we use 21128 for CN vocabs and 30522 for EN vocabs according to the origin paper.
     hidden_size                     size of bert encoder layers: N, default is 768
     num_hidden_layers               number of hidden layers: N, default is 12
     num_attention_heads             number of attention heads: N, default is 12
@@ -901,7 +900,7 @@ Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some com
 
 - **Q: Why the training process failed with error about operator `Gather`?**
 
-  **A**: Bert use operator `Gather` for embedding. The size of vocab is configured by `vocab_size` in yaml config file. If the vocab used to construct the dataset is larger than config, the operator will failed for the violation access.
+  **A**: Bert use operator `Gather` for embedding. The size of vocab is configured by `vocab_size` in yaml config file, usually 21128 for CN vocabs, 30522 for EN vocabs. If the vocab used to construct the dataset is larger than config, the operator will failed for the violation access.
 
 - **Q: Why the modification in yaml config file doesn't take effect?**
 
