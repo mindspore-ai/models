@@ -259,8 +259,8 @@ def train_net():
     loss_cb = LossCallBack(config.has_trained_epoch)
     cb = [time_cb, loss_cb]
     if algo:
-        algo_cb = algo.callback()
-        cb.append(algo_cb)
+        algo_cb = algo.callbacks()
+        cb += algo_cb
     ckpt_save_dir = set_save_ckpt_dir()
     if config.save_checkpoint:
         ckpt_append_info = [{"epoch_num": config.has_trained_epoch, "step_num": config.has_trained_step}]
