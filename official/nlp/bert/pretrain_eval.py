@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ def bert_predict():
     '''
     devid = int(os.getenv('DEVICE_ID'))
     context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=devid)
-    dataset = create_eval_dataset(cfg.batch_size, 1, data_dir=cfg.eval_data_dir)
+    dataset = create_eval_dataset(cfg.batch_size, 1, data_dir=cfg.eval_data_dir, dataset_format=cfg.dataset_format)
     net_for_pretraining = BertPretrainEval(bert_net_cfg)
     net_for_pretraining.set_train(False)
     param_dict = load_checkpoint(cfg.eval_ckpt)

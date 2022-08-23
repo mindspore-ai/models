@@ -28,6 +28,8 @@ save_finetune_checkpoint_path: "./squad_finetune/ckpt/"
 load_pretrain_checkpoint_path: ""
 load_finetune_checkpoint_path: ""
 train_data_file_path: ""
+eval_data_file_path: ""
+dataset_format: "mindrecord"
 schema_file_path: ""
 # export related
 export_batch_size: 1
@@ -95,7 +97,8 @@ eval_json_path: "Evaluation json file path, can be eval.json"
 save_finetune_checkpoint_path: "Save checkpoint path"
 load_pretrain_checkpoint_path: "Load checkpoint file path"
 load_finetune_checkpoint_path: "Load checkpoint file path"
-train_data_file_path: "Data path, it is better to use absolute path"
+train_data_file_path: "Train data path, it is better to use absolute path"
+eval_data_file_path: "Eval data path, it is better to use absolute path"
 schema_file_path: "Schema path, it is better to use absolute path"
 
 export_batch_size: "export batch size."
@@ -110,3 +113,4 @@ do_eval: ["true", "false"]
 train_data_shuffle: ["true", "false"]
 eval_data_shuffle: ["true", "false"]
 file_format: ["AIR", "ONNX", "MINDIR"]
+dataset_format: ["tfrecord", "mindrecord"]

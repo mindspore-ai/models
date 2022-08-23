@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,5 +55,4 @@ python ${PROJECT_DIR}/../run_ner.py  \
     --load_finetune_checkpoint_path="" \
     --train_data_file_path="" \
     --eval_data_file_path="" \
-    --dataset_format="tfrecord" \
     --schema_file_path="" > ner_log.txt 2>&1 &

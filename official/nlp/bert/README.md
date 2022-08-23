@@ -67,6 +67,59 @@ The backbone structure of BERT is transformer. For BERT_base, the transformer co
 - Create fine-tune dataset
     - Download dataset for fine-tuning and evaluation such as Chinese Named Entity Recognition[CLUENER](https://github.com/CLUEbenchmark/CLUENER2020), Chinese sentences classification[TNEWS](https://github.com/CLUEbenchmark/CLUE), Chinese Named Entity Recognition[ChineseNER](https://github.com/zjy-ucas/ChineseNER), English question and answering[SQuAD v1.1 train dataset](https://rajpurkar.github.io/SQuAD-explorer/dataset/train-v1.1.json), [SQuAD v1.1 eval dataset](https://rajpurkar.github.io/SQuAD-explorer/dataset/dev-v1.1.json), package of English sentences classification[GLUE](https://gluebenchmark.com/tasks).
     - We haven't provide the scripts to create tfrecord yet, while converting dataset files from JSON format to TFRECORD format, please refer to run_classifier.py or run_squad.py file in [BERT](https://github.com/google-research/bert) repository or the CLUE official repository [CLUE](https://github.com/CLUEbenchmark/CLUE/blob/master/baselines/models/bert/run_classifier.py) and [CLUENER](https://github.com/CLUEbenchmark/CLUENER2020/tree/master/tf_version)
+- Create MindRecord dataset
+    - Generate pretrain mindrecord
+        - If you download original dataset, extract and refine texts in the dataset with WikiExtractor follow the instructions above, you can generate mindrecord as follows:
+
+        ```bash
+           bash ./generate_pretrain_mindrecords.sh INPUT_FILES_PATH OUTPUT_FILES_PATH VOCAB_FILE
+           for example:
+           bash ./generate_pretrain_mindrecords.sh /path/wiki-clean-aa /path/output/ /path/bert-base-uncased-vocab.txt
+        ```
+
+        - If you have converted dataset from JSON format to tfrecord format, you can generate mindrecord as follows:
+
+        ```python
+            python parallel_tfrecord_to_mindrecord.py --input_tfrecord_dir /path/tfrecords_path --output_mindrecord_dir /path/save_mindrecord_path
+        ```
+
+        - you can visualize the dataset as follows:
+
+        ```python
+            python vis_tfrecord_or_mindrecord.py --file_name /path/train.mindrecord --vis_option vis_mindrecord > mindrecord.txt
+            `vis_option` should be in ["vis_tfrecord", "vis_mindrecord"]
+            Notice, before run vis_tfrecord_or_mindrecord.py, need to install tensorflow==1.15.0
+        ```
+
+    - Generate CLUENER and ChineseNER mindrecord for ner task
+        Before generate mindrecord files, you need download original dataset follow the instructions above, and download [vocab.txt](https://github.com/CLUEbenchmark/CLUENER2020/blob/master/tf_version/vocab.txt)
+        - Generate CLUENER mindrecord for ner task
+
+            ```python
+                python generate_cluener_mindrecord.py --data_dir /path/ClueNER/cluener_public/ --vocab_file /path/vocab.txt --output_dir /path/ClueNER/
+            ```
+
+        - Generate ChineseNER mindrecord for ner task
+
+            ```python
+                python generate_chinese_mindrecord.py --data_dir /path/ChineseNER/data/ --vocab_file /path/vocab.txt --output_dir /path/ChineseNER/
+            ```
+
+    - Generate SQuAD v1.1 mindrecord for squad task
+        Before generate mindrecord files, you need download original dataset follow the instructions above, and download [vocab.txt](https://github.com/yuanxiaosc/BERT-for-Sequence-Labeling-and-Text-Classification/blob/master/pretrained_model/uncased_L-12_H-768_A-12/vocab.txt)
+        - Generate SQuAD v1.1 mindrecord for squad task
+
+            ```python
+                python generate_squad_mindrecord.py --vocab_file /path/squad/vocab.txt --train_file /path/squad/train-v1.1.json --predict_file /path/squad/dev-v1.1.json --output_dir /path/squad
+            ```
+
+    - Generate tnews mindrecord for classifier task
+        Before generate mindrecord files, you need download original dataset follow the instructions above, and download [vocab.txt](https://github.com/CLUEbenchmark/CLUENER2020/blob/master/tf_version/vocab.txt)
+        - Generate tnews mindrecord for classifier task
+
+            ```python
+                python generate_tnews_mindrecord.py --data_dir /path/tnews/ --task_name tnews --vocab_file /path/tnews/vocab.txt --output_dir /path/tnews
+            ```
 
 # [Pretrained models](#contents)
 
@@ -289,11 +342,21 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
     ├─run_distributed_pretrain_gpu.sh         # shell script for distributed pretrain on gpu
     └─run_standaloned_pretrain_gpu.sh         # shell script for distributed pretrain on gpu
   ├─src
+    ├─generate_mindrecord
+      ├── generate_chinesener_mindrecord.py   # generate mindrecord for ChineseNER dataset for ner task
+      ├── generate_cluener_mindrecord.py      # generate mindrecord for CLUENER dataset for ner task
+      ├── generate_pretrain_mindrecord.py     # generate mindrecord for pretrain dataset for pretrain
+      ├── generate_pretrain_mindrecords.sh    # generate mindrecord for pretrain dataset parallel
+      ├── generate_squad_mindrecord.py        # generate mindrecord for SquadV1.1 dataset for squad task
+      └── generate_tnews_mindrecord.py        # generate mindrecord for tnews dataset for classifier task
     ├─model_utils
       ├── config.py                           # parse *.yaml parameter configuration file
       ├── devcie_adapter.py                   # distinguish local/ModelArts training
       ├── local_adapter.py                    # get related environment variables in local training
       └── moxing_adapter.py                   # get related environment variables in ModelArts training
+    ├─tools
+      ├── parallel_tfrecord_to_mindrecord.py  # multi pool for converting tfrecord to mindrecord
+      └── vis_tfrecord_or_mindrecord.py       # visualize tfrecord or mindrecord dataset
     ├─__init__.py
     ├─assessment_method.py                    # assessment method for evaluation
     ├─bert_for_finetune.py                    # backbone code of network
@@ -352,6 +415,7 @@ options:
     --save_checkpoint_num          number for saving checkpoint files: N, default is 1
     --train_steps                  Training Steps: N, default is -1
     --data_dir                     path to dataset directory: PATH, default is ""
+    --dataset_format               dataset format, support mindrecord or tfrecord, default is mindrecord
     --schema_dir                   path to schema.json file, PATH, default is ""
 ```
 
@@ -387,7 +451,7 @@ options:
     --load_finetune_checkpoint_path   give a finetuning checkpoint path if only do eval
     --train_data_file_path            ner tfrecord for training. E.g., train.tfrecord
     --eval_data_file_path             ner tfrecord for predictions if f1 is used to evaluate result, ner json for predictions if clue_benchmark is used to evaluate result
-    --dataset_format                  dataset format, support mindrecord or tfrecord
+    --dataset_format                  dataset format, support mindrecord or tfrecord, default is mindrecord
     --schema_file_path                path to datafile schema file
 
 usage: run_squad.py [--device_target DEVICE_TARGET] [--do_train DO_TRAIN] [----do_eval DO_EVAL]
@@ -418,6 +482,7 @@ options:
     --load_finetune_checkpoint_path   give a finetuning checkpoint path if only do eval
     --train_data_file_path            squad tfrecord for training. E.g., train1.1.tfrecord
     --eval_data_file_path             squad tfrecord for predictions. E.g., dev1.1.tfrecord
+    --dataset_format                  dataset format, support mindrecord or tfrecord, default is mindrecord
     --schema_file_path                path to datafile schema file
 
 usage: run_classifier.py [--device_target DEVICE_TARGET] [--do_train DO_TRAIN] [----do_eval DO_EVAL]
@@ -445,6 +510,7 @@ options:
     --load_finetune_checkpoint_path   give a finetuning checkpoint path if only do eval
     --train_data_file_path            tfrecord for training. E.g., train.tfrecord
     --eval_data_file_path             tfrecord for predictions. E.g., dev.tfrecord
+    --dataset_format                  dataset format, support mindrecord or tfrecord, default is mindrecord
     --schema_file_path                path to datafile schema file
 ```
 
@@ -558,6 +624,12 @@ epoch: 0.0, current epoch percent: 0.000, step: 2, outputs are (Tensor(shape=[1]
 
 #### Running on Ascend
 
+Before distribute pretrain on ascend, you need to generate distributed_cmd.sh as follows:
+
+```python
+python scripts/ascend_distributed_launcher/get_distribute_pretrain_cmd.py --run_script_dir ./scripts/run_distributed_pretrain_ascend.sh --hyper_parameter_config_dir ./scripts/ascend_distributed_launcher/hyper_parameter_config.ini --data_dir /path/data_dir/ --hccl_config /path/hccl.json --cmd_file ./distributed_cmd.sh
+```
+
 ```bash
 bash scripts/run_distributed_pretrain_ascend.sh /path/cn-wiki-128 /path/hccl.json
 ```
@@ -598,7 +670,9 @@ epoch: 0.0, current epoch percent: 0.002, step: 200, outputs are (Tensor(shape=[
 
 ### Evaluation
 
-#### evaluation on cola dataset when running on Ascend
+> **Attention** If the evaluate dataset used is mindrecord/tfrecord format, the 'dataset_format' in *yaml file need to change to 'mindrecord'/'tfrecord'. Parameters of 'train_data_file_path' and 'eval_data_file_path' need to modify, and no need to set 'schema_file_path' in *sh files
+
+#### evaluation on tnews dataset when running on Ascend
 
 Before running the command below, please check the load pretrain checkpoint path has been set. Please set the checkpoint path to be the absolute full path, e.g:
 
@@ -905,3 +979,7 @@ Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some com
 - **Q: Why the modification in yaml config file doesn't take effect?**
 
   **A**: Configuration is defined by both `yaml` file and `command line arguments`, additionally with the `ini` file if you are using `ascend_distributed_launcher`. The priority of these configuration is **command line arguments > ini file > yaml file**.
+
+- **Q: How to resolve the RuntimeError by get_dataset_size error?**
+
+  **A**: Configuration of 'dataset_format' is defined in `yaml` file. If get_dataset_size error,  you need to check whether the dataset format set in the 'sh' file is the same as the dataset format set in the yaml file. The current dataset format only supports [tfrecord, mindrecord].

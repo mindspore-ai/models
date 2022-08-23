@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -159,69 +159,8 @@ def modelarts_pre_process():
     cfg.save_checkpoint_path = os.path.join(cfg.output_path, cfg.save_checkpoint_path)
 
 
-@moxing_wrapper(pre_process=modelarts_pre_process)
-def run_pretrain():
-    """pre-train bert_clue"""
-    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target, device_id=cfg.device_id)
-    context.set_context(reserve_class_name_in_scope=False)
-    _set_graph_kernel_context(cfg.device_target)
-    ckpt_save_dir = cfg.save_checkpoint_path
-    if cfg.distribute == "true":
-        if cfg.device_target == 'Ascend':
-            D.init()
-            device_num = cfg.device_num
-            rank = cfg.device_id % device_num
-        else:
-            D.init()
-            device_num = D.get_group_size()
-            rank = D.get_rank()
-        ckpt_save_dir = os.path.join(cfg.save_checkpoint_path, 'ckpt_' + str(get_rank()))
-
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
-                                          device_num=device_num)
-        _set_bert_all_reduce_split()
-    else:
-        rank = 0
-        device_num = 1
-
-    _check_compute_type(cfg)
-
-    if cfg.accumulation_steps > 1:
-        logger.info("accumulation steps: {}".format(cfg.accumulation_steps))
-        logger.info("global batch size: {}".format(cfg.batch_size * cfg.accumulation_steps))
-        if cfg.enable_data_sink == "true":
-            cfg.data_sink_steps *= cfg.accumulation_steps
-            logger.info("data sink steps: {}".format(cfg.data_sink_steps))
-        if cfg.enable_save_ckpt == "true":
-            cfg.save_checkpoint_steps *= cfg.accumulation_steps
-            logger.info("save checkpoint steps: {}".format(cfg.save_checkpoint_steps))
-
-    ds = create_bert_dataset(device_num, rank, cfg.do_shuffle, cfg.data_dir, cfg.schema_dir, cfg.batch_size,
-                             cfg.bucket_list)
-    net_with_loss = BertNetworkWithLoss(bert_net_cfg, True)
-
-    new_repeat_count = cfg.epoch_size * ds.get_dataset_size() // cfg.data_sink_steps
-    if cfg.train_steps > 0:
-        train_steps = cfg.train_steps * cfg.accumulation_steps
-        new_repeat_count = min(new_repeat_count, train_steps // cfg.data_sink_steps)
-    else:
-        cfg.train_steps = cfg.epoch_size * ds.get_dataset_size() // cfg.accumulation_steps
-        logger.info("train steps: {}".format(cfg.train_steps))
-
-    optimizer = _get_optimizer(cfg, net_with_loss)
-    callback = [TimeMonitor(cfg.data_sink_steps), LossCallBack(ds.get_dataset_size())]
-    if cfg.enable_save_ckpt == "true" and cfg.device_id % min(8, device_num) == 0:
-        config_ck = CheckpointConfig(save_checkpoint_steps=cfg.save_checkpoint_steps,
-                                     keep_checkpoint_max=cfg.save_checkpoint_num)
-        ckpoint_cb = ModelCheckpoint(prefix='checkpoint_bert',
-                                     directory=None if ckpt_save_dir == "" else ckpt_save_dir, config=config_ck)
-        callback.append(ckpoint_cb)
-
-    if cfg.load_checkpoint_path:
-        param_dict = load_checkpoint(cfg.load_checkpoint_path)
-        load_param_into_net(net_with_loss, param_dict)
-
+def InitNetWithGrads(net_with_loss, optimizer):
+    '''init net with grads'''
     if cfg.enable_lossscale == "true":
         update_cell = DynamicLossScaleUpdateCell(loss_scale_value=cfg.loss_scale_value,
                                                  scale_factor=cfg.scale_factor,
@@ -251,12 +190,79 @@ def run_pretrain():
 
     if cfg.bucket_list:
         net_with_grads = BertNetworkMatchBucket(net_with_grads, bert_net_cfg.seq_length, cfg.bucket_list)
+    return net_with_grads
+
+
+@moxing_wrapper(pre_process=modelarts_pre_process)
+def run_pretrain():
+    """pre-train bert_clue"""
+    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target, device_id=cfg.device_id)
+    context.set_context(reserve_class_name_in_scope=False)
+    _set_graph_kernel_context(cfg.device_target)
+    ckpt_save_dir = cfg.save_checkpoint_path
+    rank = 0
+    device_num = 1
+    if cfg.distribute == "true":
+        if cfg.device_target == 'Ascend':
+            D.init()
+            device_num = cfg.device_num
+            rank = cfg.device_id % device_num
+        else:
+            D.init()
+            device_num = D.get_group_size()
+            rank = D.get_rank()
+        ckpt_save_dir = os.path.join(cfg.save_checkpoint_path, 'ckpt_' + str(get_rank()))
+
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
+                                          device_num=device_num)
+        _set_bert_all_reduce_split()
+
+    _check_compute_type(cfg)
+
+    if cfg.accumulation_steps > 1:
+        logger.info("accumulation steps: {}".format(cfg.accumulation_steps))
+        logger.info("global batch size: {}".format(cfg.batch_size * cfg.accumulation_steps))
+        if cfg.enable_data_sink == "true":
+            cfg.data_sink_steps *= cfg.accumulation_steps
+            logger.info("data sink steps: {}".format(cfg.data_sink_steps))
+        if cfg.enable_save_ckpt == "true":
+            cfg.save_checkpoint_steps *= cfg.accumulation_steps
+            logger.info("save checkpoint steps: {}".format(cfg.save_checkpoint_steps))
+
+    ds = create_bert_dataset(device_num, rank, cfg.do_shuffle, cfg.data_dir, cfg.schema_dir, cfg.batch_size,
+                             cfg.bucket_list, cfg.dataset_format)
+    net_with_loss = BertNetworkWithLoss(bert_net_cfg, True)
+
+    new_repeat_count = cfg.epoch_size * ds.get_dataset_size() // cfg.data_sink_steps
+    if cfg.train_steps > 0:
+        train_steps = cfg.train_steps * cfg.accumulation_steps
+        new_repeat_count = min(new_repeat_count, train_steps // cfg.data_sink_steps)
+    else:
+        cfg.train_steps = cfg.epoch_size * ds.get_dataset_size() // cfg.accumulation_steps
+        logger.info("train steps: {}".format(cfg.train_steps))
+
+    optimizer = _get_optimizer(cfg, net_with_loss)
+    callback = [TimeMonitor(cfg.data_sink_steps), LossCallBack(ds.get_dataset_size())]
+    if cfg.enable_save_ckpt == "true" and cfg.device_id % min(8, device_num) == 0:
+        config_ck = CheckpointConfig(save_checkpoint_steps=cfg.save_checkpoint_steps,
+                                     keep_checkpoint_max=cfg.save_checkpoint_num)
+        ckpoint_cb = ModelCheckpoint(prefix='checkpoint_bert',
+                                     directory=None if ckpt_save_dir == "" else ckpt_save_dir, config=config_ck)
+        callback.append(ckpoint_cb)
+
+    if cfg.load_checkpoint_path:
+        param_dict = load_checkpoint(cfg.load_checkpoint_path)
+        load_param_into_net(net_with_loss, param_dict)
+
+    net_with_grads = InitNetWithGrads(net_with_loss, optimizer)
 
     model = Model(net_with_grads)
 
     if cfg.train_with_eval == 'true':
         net_eval = BertPretrainEval(bert_net_cfg, network=net_with_loss.bert)
-        eval_ds = create_eval_dataset(cfg.batch_size, device_num, rank, cfg.eval_data_dir, cfg.schema_dir)
+        eval_ds = create_eval_dataset(cfg.batch_size, device_num, rank, cfg.eval_data_dir, cfg.schema_dir,
+                                      cfg.dataset_format)
         model = Model(net_with_grads, eval_network=net_eval, metrics={'bert_acc': BertMetric(cfg.batch_size)})
         eval_callback = EvalCallBack(model, eval_ds, device_num * cfg.batch_size, cfg.eval_samples)
         callback.append(eval_callback)

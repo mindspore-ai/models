@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -98,6 +98,7 @@ def run_classifier_onnx():
                                        assessment_method=assessment_method,
                                        data_file_path=args_opt.eval_data_file_path,
                                        schema_file_path=args_opt.schema_file_path,
+                                       dataset_format=args_opt.dataset_format,
                                        do_shuffle=(args_opt.eval_data_shuffle.lower() == "true"))
     do_eval_onnx(ds, args_opt.num_class, assessment_method)
 
