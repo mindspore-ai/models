@@ -29,11 +29,9 @@ from src.weight_init import lstm_default_state
 if context.get_context("device_target") == "Ascend":
     mtype = mstype.float16
     nptype = np.float16
-    device_target = "Ascend"
 else:
     mtype = mstype.float32
     nptype = np.float32
-    device_target = "GPU"
 
 class BiLSTM(nn.Cell):
     """
@@ -115,6 +113,7 @@ class CTPN(nn.Cell):
         self.transpose = P.Transpose()
         self.cast = P.Cast()
         self.is_training = is_training
+        self.device_target = context.get_context("device_target")
 
         # rpn block
         self.rpn_with_loss = RPN(config,
@@ -139,7 +138,7 @@ class CTPN(nn.Cell):
         x = self.transpose(x, (0, 2, 1, 3))
         x = self.reshape(x, (-1, self.input_size, self.num_step))
         x = self.transpose(x, (2, 0, 1))
-        if device_target == "Ascend":
+        if self.device_target == "Ascend":
             x = self.rnn(x)
         else:
             x, _ = self.rnn2(x, (self.h, self.c))
