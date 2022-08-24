@@ -1,30 +1,23 @@
 # Contents
 
-- [Contents](#contents)
 - [ShuffleNetV2 Description](#shufflenetv2-description)
-- [Model architecture](#model-architecture)
+- [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
-- [Script description](#script-description)
-    - [Script and sample code](#script-and-sample-code)
-    - [Training process](#training-process)
-        - [Usage](#usage)
-        - [Launch](#launch)
-        - [Result](#result)
-    - [Eval process](#eval-process)
-        - [Usage](#usage-1)
-        - [Launch](#launch-1)
-        - [Result](#result-1)
+- [Script Description](#script-description)
+    - [Script and Sample Code](#script-and-sample-code)
+    - [Training Process](#training-process)
+    - [Evaluation Process](#evaluation-process)
+        - [Evaluation](#evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
-            - [result](#result-2)
-        - [Infer with ONNX](#infer-with-onnx)
-            - [result](#result-3)
-- [Model description](#model-description)
+        - [result](#result-2)
+- [Model Description](#model-description)
     - [Performance](#performance)
-        - [Training Performance](#training-performance)
-        - [Inference Performance](#inference-performance)
+        - [Training Performance](#evaluation-performance)
+        - [Inference Performance](#evaluation-performance)
+
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 # [ShuffleNetV2 Description](#contents)
@@ -48,15 +41,23 @@ Dataset used: [imagenet](http://www.image-net.org/)
 - Data format: RGB images.
     - Note: Data will be processed in src/dataset.py
 
+Dataset for transfermation:[flower_photos](https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz)
+
+- Dataset size: 221MB, 3670 colorful images in 5 classes
+    - Train: 177MB, 2934images
+    - Test: 44MB, 736 images
+- Data format: RGB images.
+    - Note: Data will be processed in src/dataset.py
+
 # [Environment Requirements](#contents)
 
-- Hardware(Ascend/GPU)
-    - Prepare hardware environment with Ascend or GPU processor.
+- Hardware(Ascend/GPU/CPU)
+    - Prepare hardware environment with Ascend, GPU or CPU processor.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below:
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
 
 # [Script description](#contents)
 
@@ -71,7 +72,6 @@ Dataset used: [imagenet](http://www.image-net.org/)
     +--run_eval_for_ascend.sh               # shell script for Ascend evaluation
     +--run_eval_for_gpu.sh                  # shell script for GPU evaluation
     +--run_standalone_train_for_gpu.sh      # shell script for standalone GPU training
-    +--run_onnx.sh                          # shell script for onnx inference
   +-- src
     +--config.py                            # parameter configuration
     +--CrossEntropySmooth.py                # loss function for GPU training
@@ -79,10 +79,11 @@ Dataset used: [imagenet](http://www.image-net.org/)
     +--loss.py                              # loss function for network
     +--lr_generator.py                      # learning rate config
     +--shufflenetv2.py                      # ShuffleNetV2 model network
+  +-- cpu_transfer.py                       # transfer script
+  +-- dataset_split.py                      # splitting dataset for transfermation script
+  +-- quick_start.py                        # quick_start script
   +-- train.py                              # training script
   +-- eval.py                               # evaluation script
-  +-- infer_shufflenetv2_onnx.py            # onnx inference script
-
 ```
 
 ## [Training process](#contents)
@@ -101,7 +102,7 @@ You can start training using python or shell scripts. The usage of shell scripts
 # training example
   python:
       GPU: mpirun --allow-run-as-root -n 8 --output-filename log_output --merge-stderr-to-stdout python train.py --is_distributed=True --platform='GPU' --dataset_path='~/imagenet' > train.log 2>&1 &
-
+      CPU: python cpu_transfer.py --checkpoint_input_path ./input_ckpt/shufflenetv2_top1acc69.63_top5acc88.72.ckpt --checkpoint_save_path ./save_ckpt/Graph_mode --train_dataset ./data/flower_photos_split/train --use_pynative_mode False --platform CPU
   shell:
       GPU: cd scripts & sh run_distribute_train_for_gpu.sh 8 0,1,2,3,4,5,6,7 ~/imagenet
 ```
@@ -126,7 +127,7 @@ You can start evaluation using python or shell scripts. The usage of shell scrip
   python:
       Ascend: python eval.py --platform='Ascend' --dataset_path='~/imagenet' --checkpoint='checkpoint_file' > eval.log 2>&1 &
       GPU: CUDA_VISIBLE_DEVICES=0 python eval.py --platform='GPU' --dataset_path='~/imagenet/val/' --checkpoint='checkpoint_file'> eval.log 2>&1 &
-
+      CPU: python eval.py --dataset_path ./data/flower_photos_split/eval --checkpoint_dir ./save_ckpt/Graph_mode --platform CPU --checkpoint ./save_ckpt/Graph_mode/shufflenetv2_1-154_18.ckpt --enable_checkpoint_dir True --use_pynative_mode False
   shell:
       Ascend: cd scripts & sh run_eval_for_ascend.sh '~/imagenet' 'checkpoint_file'
       GPU: cd scripts & sh run_eval_for_gpu.sh '~/imagenet' 'checkpoint_file'
@@ -166,72 +167,24 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 - `NEED_PREPROCESS` can be y or n.
 - `DEVICE_ID` is optional, default value is 0.
 
-#### result
+### result
 
 Inference result is saved in current path, you can find result like this in acc.log file.
 Top1 acc:  0.69608
 Top5 acc:  0.88726
 
-### Infer with ONNX
+### Infer on CPU After Transfermation
 
-Before Inferring, you need to export the ONNX model.
-
-- Download the [ckpt] of the model from the [mindspore official website](https://mindspore.cn/resources/hub/details?MindSpore/1.8/shufflenetv2_imagenet2012 ).
-- Find the following code of `trian.py`
-
-```python
-context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False)
+```Python
+# CPU inference
+python eval.py --dataset_path [eval dataset] --checkpoint_dir [ckpt dir for eavl ] --platform [CPU] --checkpoint [ckpt path for eval] --enable_checkpoint_dir [True/False]--use_pynative_mode [True/False]
 ```
 
-- Change to
+### result
 
-```python
-context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=True)
-```
-
-The command to export the ONNX model is as follows
-
-```shell
-python export.py --device_target "GPU" --ckpt_file [ckpt_path] --file_format "ONNX" --file_name shufflenetv2.onnx
-```
-
-- Infer with Python scripts
-
-```shell
-python infer_shufflenetv2_onnx.py --onnx_path [onnx_path]  --onnx_dataset_path [onnx_dataset_path] --platform [platform] --device_id [device_id]
-```
-
-- Infer with shell scripts
-
-```shell
-bash ./scripts/run_onnx.sh [ONNX_PATH] [DATASET_PATH] [PLATFORM] [DEVICE_ID]
-```
-
-Infer results are output in `infer_onnx.log`
-
-- Note 1: the above scripts need to be run in the shufflenetv2 directory.
-- Note 2: the validation data set needs to be preprocessed in the form of folder. For example,
-
-    ```reStructuredText
-    imagenet
-     -- val
-      -- n01985128
-      -- n02110063
-      -- n03041632
-      -- ...
-    ```
-
-- Note 3: `PLATFORM` only supports CPU and GPU.
-- Note 4: `DEVICE_ID` is optional, default value is 0.
-
-#### result
-
-The reasoning results are output on the command line, and the results are as follows
-
-```log
-ACC_TOP1 = 0.69472
-ACC_TOP5 = 0.88652
-```
+Inference result is saved in current path, you can find result like this in acc.log file.
+Top1 acc:  0.86
+Top5 acc:  1
 
 # [Model description](#contents)
 
@@ -239,30 +192,30 @@ ACC_TOP5 = 0.88652
 
 ### Training Performance
 
-| Parameters                 | Ascend 910                    | GPU                           |
-| -------------------------- | ----------------------------- |-------------------------------|
-| Model Version              | ShuffleNetV2                  | ShuffleNetV2                  |
-| Resource                   | Ascend 910                    | NV SMX2 V100-32G              |
-| uploaded Date              | 10/09/2021 (month/day/year)   | 09/24/2020 (month/day/year)   |
-| MindSpore Version          | 1.3.0                         | 1.0.0                         |
-| Dataset                    | ImageNet                      | ImageNet                      |
-| Training Parameters        | src/config.py                 | src/config.py                 |
-| Optimizer                  | Momentum                      | Momentum                      |
-| Loss Function              | SoftmaxCrossEntropyWithLogits | CrossEntropySmooth            |
-| Accuracy                   | 69.59%(TOP1)                  | 69.4%(TOP1)                   |
-| Total time                 | 11.6 h 8ps                    | 49 h 8ps                      |
+| Parameters                 | Ascend 910                    | GPU                           |CPU(Transfer)                           |
+| -------------------------- | ----------------------------- |-------------------------------|-------------------------------|
+| Model Version              | ShuffleNetV2                  | ShuffleNetV2                  | ShuffleNetV2                  |
+| Resource                   | Ascend 910                    | NV SMX2 V100-32G              |Intel(R)Core(TM) i5-7200U CPU@2.50GHz(4 CPUs) |
+| uploaded Date              | 10/09/2021 (month/day/year)   | 09/24/2020 (month/day/year)   | 08/30/2022 (month/day/year)   |
+| MindSpore Version          | 1.3.0                         | 1.0.0                         | 1.8                           |
+| Dataset                    | ImageNet                      | ImageNet                      |Flower_photos                      |
+| Training Parameters        | src/config.py                 | src/config.py                 | src/config.py                 |
+| Optimizer                  | Momentum                      | Momentum                      | Momentum                      |
+| Loss Function              | SoftmaxCrossEntropyWithLogits | CrossEntropySmooth            | CrossEntropySmooth            |
+| Accuracy                   | 69.59%(TOP1)                  | 69.4%(TOP1)                   | 86.4%(TOP1)                   |
+| Total time                 | 11.6 h 8ps                    | 49 h 8ps                      |15h18m8.6s                      |
 
 ### Inference Performance
 
-| Parameters                 | Ascend 910                    | GPU                           |
-| -------------------------- | ----------------------------- |-------------------------------|
-| Resource                   | Ascend 910                    | NV SMX2 V100-32G              |
-| uploaded Date              | 10/09/2021 (month/day/year)   | 09/24/2020 (month/day/year)   |
-| MindSpore Version          | 1.3.0                         | 1.0.0                         |
-| Dataset                    | ImageNet                      | ImageNet                      |
-| batch_size                 | 125                           | 128                           |
-| outputs                    | probability                   | probability                   |
-| Accuracy                   | acc=69.59%(TOP1)              | acc=69.4%(TOP1)               |
+| Parameters                 | Ascend 910                    | GPU                           | CPU(Transfer)                           |
+| -------------------------- | ----------------------------- |-------------------------------|-------------------------------|
+| Resource                   | Ascend 910                    | NV SMX2 V100-32G              |Intel(R)Core(TM) i5-7200U CPU@2.50GHz(4 CPUs)              |
+| uploaded Date              | 10/09/2021 (month/day/year)   | 09/24/2020 (month/day/year)   | 08/30/2022 (month/day/year)   |
+| MindSpore Version          | 1.3.0                         | 1.0.0                         | 1.8.0                         |
+| Dataset                    | ImageNet                      | ImageNet                      |Flower_photos                      |
+| batch_size                 | 125                           | 128                           |128                     |
+| outputs                    | probability                   | probability                   | probability                   |
+| Accuracy                   | acc=69.59%(TOP1)              | acc=69.4%(TOP1)               | acc=86.4%(TOP1)               |
 
 # [ModelZoo Homepage](#contents)
 

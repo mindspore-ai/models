@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ from mindspore import context
 from mindspore.train.model import Model
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
-from src.config import config_gpu, config_ascend
+from src.config import config_gpu, config_ascend, config_cpu
 from src.dataset import create_dataset
 from src.shufflenetv2 import ShuffleNetV2
 from src.CrossEntropySmooth import CrossEntropySmooth
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     parser.add_argument('--checkpoint_dir', type=str, default='',
                         help='the directory that contains one or more checkpoint files(Default: None)')
     parser.add_argument('--dataset_path', type=str, default='../imagenet', help='Dataset path')
-    parser.add_argument('--platform', type=str, default='Ascend', choices=('Ascend', 'GPU'),
+    parser.add_argument('--platform', type=str, default='Ascend', choices=('Ascend', 'GPU', 'CPU'),
                         help='run platform(Default:Ascend)')
     parser.add_argument('--device_id', type=int, default=0, help='device id(Default:0)')
 
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     parser.add_argument('--data_url', type=str, default=None, help='Dataset path for modelarts')
     parser.add_argument('--train_url', type=str, default=None, help='Output path for modelarts')
 
-    parser.add_argument('--use_pynative_mode', type=ast.literal_eval, default=False,
+    parser.add_argument('--use_pynative_mode', type=ast.literal_eval, default=True,
                         help='whether to use pynative mode for device(Default: False)')
     parser.add_argument('--normalize', type=ast.literal_eval, default=True,
                         help='whether to normalize the dataset(Default: True)')
@@ -69,6 +69,9 @@ if __name__ == '__main__':
 
     if args_opt.platform == 'GPU':
         config = config_gpu
+        drop_remainder = True
+    elif args_opt.platform == 'CPU':
+        config = config_cpu
         drop_remainder = True
     else:
         config = config_ascend
@@ -132,7 +135,8 @@ if __name__ == '__main__':
                              group_size=1, batch_size=config.val_batch_size,
                              drop_remainder=drop_remainder, shuffle=False,
                              normalize=args_opt.normalize,
-                             enable_tobgr=args_opt.enable_tobgr)
+                             enable_tobgr=args_opt.enable_tobgr,
+                             num_parallel_workers=config.num_parallel_workers)
     if not args_opt.use_nn_default_loss:
         loss = CrossEntropySmooth(sparse=True, reduction="mean",
                                   smooth_factor=config.label_smooth_factor, num_classes=config.num_classes)
@@ -140,6 +144,7 @@ if __name__ == '__main__':
         loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
 
     net = ShuffleNetV2(n_class=config.num_classes)
+
     eval_metrics = {'Loss': nn.Loss(),
                     'Top1-Acc': nn.Top1CategoricalAccuracy(),
                     'Top5-Acc': nn.Top5CategoricalAccuracy()}
