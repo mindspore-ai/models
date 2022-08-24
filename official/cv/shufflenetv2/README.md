@@ -1,23 +1,30 @@
 # Contents
 
+- [Contents](#contents)
 - [ShuffleNetV2 Description](#shufflenetv2-description)
-- [Model Architecture](#model-architecture)
+- [Model architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
-- [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Training Process](#training-process)
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+- [Script description](#script-description)
+    - [Script and sample code](#script-and-sample-code)
+    - [Training process](#training-process)
+        - [Usage](#usage)
+        - [Launch](#launch)
+        - [Result](#result)
+    - [Eval process](#eval-process)
+        - [Usage](#usage-1)
+        - [Launch](#launch-1)
+        - [Result](#result-1)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
-        - [result](#result-2)
-- [Model Description](#model-description)
+            - [result](#result-2)
+        - [Infer with ONNX](#infer-with-onnx)
+            - [result](#result-3)
+- [Model description](#model-description)
     - [Performance](#performance)
-        - [Training Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
-
+        - [Training Performance](#training-performance)
+        - [Inference Performance](#inference-performance)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 # [ShuffleNetV2 Description](#contents)
@@ -64,6 +71,7 @@ Dataset used: [imagenet](http://www.image-net.org/)
     +--run_eval_for_ascend.sh               # shell script for Ascend evaluation
     +--run_eval_for_gpu.sh                  # shell script for GPU evaluation
     +--run_standalone_train_for_gpu.sh      # shell script for standalone GPU training
+    +--run_onnx.sh                          # shell script for onnx inference
   +-- src
     +--config.py                            # parameter configuration
     +--CrossEntropySmooth.py                # loss function for GPU training
@@ -73,6 +81,8 @@ Dataset used: [imagenet](http://www.image-net.org/)
     +--shufflenetv2.py                      # ShuffleNetV2 model network
   +-- train.py                              # training script
   +-- eval.py                               # evaluation script
+  +-- infer_shufflenetv2_onnx.py            # onnx inference script
+
 ```
 
 ## [Training process](#contents)
@@ -156,11 +166,72 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 - `NEED_PREPROCESS` can be y or n.
 - `DEVICE_ID` is optional, default value is 0.
 
-### result
+#### result
 
 Inference result is saved in current path, you can find result like this in acc.log file.
 Top1 acc:  0.69608
 Top5 acc:  0.88726
+
+### Infer with ONNX
+
+Before Inferring, you need to export the ONNX model.
+
+- Download the [ckpt] of the model from the [mindspore official website](https://mindspore.cn/resources/hub/details?MindSpore/1.8/shufflenetv2_imagenet2012 ).
+- Find the following code of `trian.py`
+
+```python
+context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False)
+```
+
+- Change to
+
+```python
+context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=True)
+```
+
+The command to export the ONNX model is as follows
+
+```shell
+python export.py --device_target "GPU" --ckpt_file [ckpt_path] --file_format "ONNX" --file_name shufflenetv2.onnx
+```
+
+- Infer with Python scripts
+
+```shell
+python infer_shufflenetv2_onnx.py --onnx_path [onnx_path]  --onnx_dataset_path [onnx_dataset_path] --platform [platform] --device_id [device_id]
+```
+
+- Infer with shell scripts
+
+```shell
+bash ./scripts/run_onnx.sh [ONNX_PATH] [DATASET_PATH] [PLATFORM] [DEVICE_ID]
+```
+
+Infer results are output in `infer_onnx.log`
+
+- Note 1: the above scripts need to be run in the shufflenetv2 directory.
+- Note 2: the validation data set needs to be preprocessed in the form of folder. For example,
+
+    ```reStructuredText
+    imagenet
+     -- val
+      -- n01985128
+      -- n02110063
+      -- n03041632
+      -- ...
+    ```
+
+- Note 3: `PLATFORM` only supports CPU and GPU.
+- Note 4: `DEVICE_ID` is optional, default value is 0.
+
+#### result
+
+The reasoning results are output on the command line, and the results are as follows
+
+```log
+ACC_TOP1 = 0.69472
+ACC_TOP5 = 0.88652
+```
 
 # [Model description](#contents)
 
