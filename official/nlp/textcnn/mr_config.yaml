@@ -22,6 +22,7 @@ sink_size: -1
 weight_decay: 3e-5
 keep_checkpoint_max: 1
 checkpoint_path: "./checkpoint/"
+onnx_file: "./"
 checkpoint_file_path: "train_textcnn-4_149.ckpt"
 word_len: 51
 vec_length: 40
@@ -56,5 +57,6 @@ weight_decay: "Weight decay."
 keep_checkpoint_max: "keep the last keep_checkpoint_max checkpoint"
 num_factors: "The Embedding size of MF model."
 checkpoint_path: "The location of the checkpoint file."
+onnx_file: "The location of the onnx file."
 eval_file_name: "Eval output file."
 checkpoint_file_path: "The location of the checkpoint file."
