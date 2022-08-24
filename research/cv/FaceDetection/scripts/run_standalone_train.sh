@@ -42,6 +42,7 @@ export RANK_SIZE=1
 SCRIPT_NAME='train.py'
 
 ulimit -c unlimited
+ulimit -n 65536
 
 PLATFORM=$1
 MINDRECORD_FILE=$(get_real_path $2)
