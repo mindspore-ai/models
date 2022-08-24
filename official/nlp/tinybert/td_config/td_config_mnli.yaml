@@ -30,6 +30,7 @@ data_sink_steps: 1
 load_teacher_ckpt_path: ""
 load_gd_ckpt_path: ""
 load_td1_ckpt_path: ""
+onnx_path: ""
 train_data_dir: ""
 eval_data_dir: ""
 schema_dir: ""

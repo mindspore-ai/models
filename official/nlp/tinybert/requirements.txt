@@ -1,2 +1,3 @@
 easydict
 scipy>=1.7.1
+onnxruntime-gpu
