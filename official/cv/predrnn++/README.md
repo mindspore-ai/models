@@ -110,7 +110,7 @@ Predrnn++
 ├── eval.py                                     # Evaluation script
 ├── preprocess.py                               # 310 Inference Preprocessing Script
 ├── postprocess.py                              # 310 Inference Postprocessing Scripts
-├── export.py                                   # Export checkpoint files to air/mindir
+├── export.py                                   # Export checkpoint files to air/mindir/onnx
 ├── default_config.yaml                         # Config file
 ```
 
@@ -126,6 +126,7 @@ Parameters for both training and evaluation can be set in default_config.yaml.
 
 ```
 
+```python
 train_mindrecord: ""                            # path to train dataset
 test_mindrecord: ""                             # path to test dataset
 pretrained_model: ""                            # path to pretrained model
@@ -152,6 +153,7 @@ device_id: 0                                    # id of NPU used
 result_path: "./preprocess_Result/"             # export result path
 result_dir: ""                                  # Inference result path
 input0_path: ""                                 # export input path
+```
 
 ```lang-yaml
 
