@@ -259,6 +259,8 @@ def get_args(phase):
                     help='file format')
     parser.add_argument('--file_name', type=str, default='STGAN', help='output file name prefix.')
     parser.add_argument('--ckpt_path', default=None, help='path of checkpoint file.')
+    parser.add_argument('--onnx_path', default=None, help='path of onnx file.')
+    parser.add_argument('--onnx_output', default='./infer_onnx_outputs', help='path of onnx infer output.')
 
     args = parser.parse_args()
     if phase == 'test':
