@@ -33,6 +33,7 @@ class BucketDatasetGenerator:
         batch_size (Int): The training batchsize.
         bucket_list (List): List of different sentence lengths, such as [128, 256, 512]. Default: None.
     """
+
     def __init__(self, dataset, batch_size, bucket_list=None):
         self.dataset = dataset
         self.batch_size = batch_size
@@ -85,9 +86,21 @@ class BucketDatasetGenerator:
 
     def _process_remaining_data(self):
         """process remaining data."""
+        for key in self.data_bucket.keys():
+            data = self.data_bucket[key]
+            if len(data) >= self.batch_size:
+                self.data_bucket[key] = self.data_bucket[key][self.batch_size:]
+                self.iter += 1
+                return self._package_data(data, key)
+
+        for value in self.data_bucket.values():
+            self.remaining_data += list(value)
+        self.data_bucket = dict()
+
         if self.batch_size > len(self.remaining_data) or self.iter >= self.__len__():
             self._init_variables()
             raise StopIteration
+
         remaining_data = self.remaining_data[:self.batch_size]
         self.remaining_data = self.remaining_data[self.batch_size:]
         self.iter += 1
