@@ -228,9 +228,11 @@ MobileNetV2总体网络架构如下：
 
 使用python或shell脚本开始训练。shell脚本的使用方法如下：
 
-- Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH] [CKPT_PATH(optional)] [FREEZE_LAYER(optional)] [FILTER_HEAD(optional)]
+- Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH(optional)] [FREEZE_LAYER(optional)] [FILTER_HEAD(optional)]
 - GPU: bash run_trian.sh GPU [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
 - CPU: bash run_trian.sh CPU [CONFIG_PATH] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
+
+>注意！目前在使用 Ascend 平台时， `VISIABLE_DEVICES` 参数是无效的，也就是说，无法通过该参数指定运算设备。
 
 `DATASET_PATH`是数据集的路径. 我们使用`ImageFolderDataset` 作为默认数据处理方式, 这种数据处理方式是从原始目录中读取图片，目录结构如下, 训练和验证时设置`DATASET_PATH=dataset/`:
 
@@ -260,13 +262,6 @@ MobileNetV2总体网络架构如下：
 
 `CKPT_PATH` `FREEZE_LAYER` 和 `FILTER_HEAD` 是可选择的选项, 如果设置`CKPT_PATH`, `FREEZE_LAYER` 也必须同时设置. `FREEZE_LAYER` 可以是 ["none", "backbone"], 如果设置 `FREEZE_LAYER`="backbone", 训练过程中backbone中的参数会被冻结，同时不会从checkpoint中加载head部分的参数. 如果`FILTER_HEAD`=True, 不会从checkpoint中加载head部分的参数.
 
-> RANK_TABLE_FILE 是在Ascned上运行分布式任务时HCCL的配置文件
-> 单卡运行时请设置为RANK_TABLE_FILE=None
-> 我们列出使用分布式服务常见的使用限制，详细的可以查看HCCL对应的使用文档。
->
-> - 单机场景下支持1、2、4、8卡设备集群，多机场景下支持8*n卡设备集群。
-> - 每台机器的0-3卡和4-7卡各为1个组网，2卡和4卡训练时卡必须相连且不支持跨组网创建集群。
-
 ### 启动
 
 ```shell
@@ -277,8 +272,8 @@ MobileNetV2总体网络架构如下：
       CPU: python train.py --platform CPU --config_path [CONFIG_PATH] --dataset_path [TRAIN_DATASET_PATH]
 
   shell:
-      Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH]
-      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/
+      Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH]
+      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 /home/DataSet/ImageNet_Original/
 
       GPU: bash run_train.sh GPU [CONFIG_PATH] 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH]
       CPU: bash run_train.sh CPU [CONFIG_PATH] [TRAIN_DATASET_PATH]
@@ -290,8 +285,8 @@ MobileNetV2总体网络架构如下：
       CPU: python train.py --platform CPU --config_path [CONFIG_PATH] --dataset_path [TRAIN_DATASET_PATH] --pretrain_ckpt [CKPT_PATH] --freeze_layer none --filter_head True
 
   shell:
-      Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
-      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/predtrain/mobilenet-200_625.ckpt none True
+      Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER] [FILTER_HEAD]
+      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/predtrain/mobilenet-200_625.ckpt none True
 
       GPU: bash run_train.sh GPU --config_path [CONFIG_PATH] 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH] [CKPT_PATH] none True
       CPU: bash run_train.sh CPU --config_path [CONFIG_PATH] [TRAIN_DATASET_PATH] [CKPT_PATH] none True
@@ -303,15 +298,15 @@ MobileNetV2总体网络架构如下：
       CPU: python train.py --platform CPU --config_path ../default_config_cpu.yaml --dataset_path [TRAIN_DATASET_PATH] --pretrain_ckpt [CKPT_PATH] --freeze_layer backbone
 
   shell:
-      Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [RANK_TABLE_FILE] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER]
-      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 ~/hccl_8p.json /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/backbone/mobilenet-200_625.ckpt backbone
+      Ascend: bash run_train.sh Ascend [CONFIG_PATH] [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATASET_PATH] [CKPT_PATH] [FREEZE_LAYER]
+      # example: bash run_train.sh Ascend ../default_config.yaml 8 0,1,2,3,4,5,6,7 /home/DataSet/ImageNet_Original/ /home/model/mobilenetv2/backbone/mobilenet-200_625.ckpt backbone
       GPU: bash run_train.sh GPU [CONFIG_PATH] 8 0,1,2,3,4,5,6,7 [TRAIN_DATASET_PATH] [CKPT_PATH] backbone
       CPU: bash run_train.sh CPU [CONFIG_PATH] [TRAIN_DATASET_PATH] [CKPT_PATH] backbone
 ```
 
 ### 结果
 
-训练结果保存在示例路径。检查点默认保存在 `./checkpoint`，训练日志会重定向到的CPU和GPU的`./train.log`，写入到Ascend的`./train/rank*/log*.log`。
+训练结果保存在示例路径。检查点默认保存在 `./checkpoint`，训练日志会重定向到的CPU和GPU的`./train.log`。
 
 ```log
 epoch:[  0/200], step:[  624/  625], loss:[5.258/5.258], time:[140412.236], lr:[0.100]
