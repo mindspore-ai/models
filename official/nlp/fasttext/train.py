@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ def get_ms_timestamp():
     t = time.time()
     return int(round(t * 1000))
 
-set_seed(5)
+set_seed(1)
 time_stamp_init = False
 time_stamp_first = 0
 context.set_context(mode=context.GRAPH_MODE, save_graphs=False, device_target=config.device_target)
