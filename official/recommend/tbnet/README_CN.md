@@ -77,7 +77,6 @@ TB-Net将用户和物品的交互信息以及物品的属性信息在知识图�
 ```bash
 wget https://mindspore-website.obs.myhuaweicloud.com/notebook/datasets/xai/tbnet_data.tar.gz
 tar -xf tbnet_data.tar.gz
-cd scripts
 ```
 
 然后按照以下步骤运行代码。
@@ -85,13 +84,13 @@ cd scripts
 - 训练
 
 ```bash
-bash run_standalone_train.sh [DATA_NAME] [DEVICE_ID] [DEVICE_TARGET]
+bash scripts/run_standalone_train.sh [DATA_NAME] [DEVICE_ID] [DEVICE_TARGET]
 ```
 
 示例：
 
 ```bash
-bash run_standalone_train.sh steam 0 Ascend
+bash scripts/run_standalone_train.sh steam 0 Ascend
 ```
 
 - 评估
@@ -99,7 +98,7 @@ bash run_standalone_train.sh steam 0 Ascend
 评估模型在测试集上的指标。
 
 ```bash
-bash run_eval.sh [CHECKPOINT_ID] [DATA_NAME] [DEVICE_ID] [DEVICE_TARGET]
+bash scripts/run_eval.sh [CHECKPOINT_ID] [DATA_NAME] [DEVICE_ID] [DEVICE_TARGET]
 ```
 
 参数`[CHECKPOINT_ID]`是必填项。
@@ -107,7 +106,7 @@ bash run_eval.sh [CHECKPOINT_ID] [DATA_NAME] [DEVICE_ID] [DEVICE_TARGET]
 示例：
 
 ```bash
-bash run_eval.sh 19 steam 0 Ascend
+bash scripts/run_eval.sh 19 steam 0 Ascend
 ```
 
 - 推理和解释
@@ -282,6 +281,7 @@ python export.py \
 
 ```shell
 # Ascend310 inference
+cd scripts
 bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 ```
 
@@ -292,6 +292,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 示例：
 
 ```bash
+cd scripts
 bash run_infer_310.sh ../model.mindir ../data/steam/test.csv 0
 ```
 

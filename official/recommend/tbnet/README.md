@@ -82,7 +82,6 @@ Download the data package(e.g. 'steam' dataset) and put it underneath the curren
 ```bash
 wget https://mindspore-website.obs.myhuaweicloud.com/notebook/datasets/xai/tbnet_data.tar.gz
 tar -xf tbnet_data.tar.gz
-cd scripts
 ```
 
 and then run code as follows.
@@ -90,13 +89,13 @@ and then run code as follows.
 - Training
 
 ```bash
-bash run_standalone_train.sh [DATA_NAME] [DEVICE_ID] [DEVICE_TARGET]
+bash scripts/run_standalone_train.sh [DATA_NAME] [DEVICE_ID] [DEVICE_TARGET]
 ```
 
 Example:
 
 ```bash
-bash run_standalone_train.sh steam 0 Ascend
+bash scripts/run_standalone_train.sh steam 0 Ascend
 ```
 
 - Evaluation
@@ -104,7 +103,7 @@ bash run_standalone_train.sh steam 0 Ascend
 Evaluation model on test dataset.
 
 ```bash
-bash run_eval.sh [CHECKPOINT_ID] [DATA_NAME] [DEVICE_ID] [DEVICE_TARGET]
+bash scripts/run_eval.sh [CHECKPOINT_ID] [DATA_NAME] [DEVICE_ID] [DEVICE_TARGET]
 ```
 
 Argument `[CHECKPOINT_ID]` is required.
@@ -112,7 +111,7 @@ Argument `[CHECKPOINT_ID]` is required.
 Example:
 
 ```bash
-bash run_eval.sh 19 steam 0 Ascend
+bash scripts/run_eval.sh 19 steam 0 Ascend
 ```
 
 - Inference and Explanation
@@ -281,6 +280,7 @@ Before performing inference, the mindir file must be exported by `export.py` scr
 
 ```shell
 # Ascend310 inference
+cd scripts
 bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 ```
 
@@ -291,6 +291,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 Example：
 
 ```bash
+cd scripts
 bash run_infer_310.sh ../model.mindir ../data/steam/test.csv 0
 ```
 

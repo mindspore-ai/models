@@ -14,21 +14,31 @@
 # limitations under the License.
 # ============================================================================
 if [[ $# -lt 2 || $# -gt 3 ]]; then
-    echo "Usage: bash run_train.sh [DATA_NAME] [DEVICE_ID] [DEVICE_TARGET]
+    echo "Usage: bash run_train.sh [DATA_NAME] [CUDA_VISIBLE_DEVICES]/[DEVICE_ID] [DEVICE_TARGET]
     DATA_NAME means dataset name, it's value is 'steam'.
+    CUDA_VISIBLE_DEVICES means cuda visible device id.
     DEVICE_ID means device id, it can be set by environment variable DEVICE_ID.
     DEVICE_TARGET is optional, it's value is ['GPU', 'Ascend'], default 'GPU'."
 exit 1
 fi
 
 DATA_NAME=$1
-DEVICE_ID=$2
-
 DEVICE_TARGET='GPU'
+
 if [ $# == 3 ]; then
     DEVICE_TARGET=$3
 fi
 
-cd ..
-python preprocess_dataset.py --dataset $DATA_NAME --device_target $DEVICE_TARGET &> scripts/train_standalone_log &&
-python train.py --dataset $DATA_NAME --device_target $DEVICE_TARGET --device_id $DEVICE_ID &>> scripts/train_standalone_log &
+python preprocess_dataset.py --dataset $DATA_NAME --device_target $DEVICE_TARGET &> scripts/train_standalone_log &
+
+if [ "$DEVICE_TARGET" = "GPU" ];
+then
+  export CUDA_VISIBLE_DEVICES=$2
+  python train.py --dataset $DATA_NAME --device_target $DEVICE_TARGET --device_id 0 &>> scripts/train_standalone_log &
+fi
+
+if [ "$DEVICE_TARGET" = "Ascend" ];
+then
+  export DEVICE_ID=$2
+  python train.py --dataset $DATA_NAME --device_target $DEVICE_TARGET --device_id $DEVICE_ID &>> scripts/train_standalone_log &
+fi
