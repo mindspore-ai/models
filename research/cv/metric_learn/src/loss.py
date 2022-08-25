@@ -22,6 +22,7 @@ from mindspore.nn.loss.loss import LossBase
 from mindspore.ops import operations as P
 from mindspore.ops import functional as F
 
+
 class Softmaxloss(LossBase):
     """Softmaxloss"""
     def __init__(self, sparse=True, smooth_factor=0.1, num_classes=5184):
@@ -31,12 +32,14 @@ class Softmaxloss(LossBase):
         self.on_value = Tensor(1.0 - smooth_factor, mstype.float32)
         self.off_value = Tensor(1.0 * smooth_factor / (num_classes - 1), mstype.float32)
         self.ce = nn.SoftmaxCrossEntropyWithLogits(sparse=sparse, reduction="mean")
+
     def construct(self, logit, label=None):
         """Tripletloss"""
         if not self.sparse:
             label = self.onehot(label, F.shape(logit)[1], self.on_value, self.off_value)
         loss = self.ce(logit, label)
         return loss
+
 
 class Tripletloss(LossBase):
     """Tripletloss"""
@@ -51,8 +54,9 @@ class Tripletloss(LossBase):
         self.split = P.Split(1, 3)
         self.relu = nn.ReLU()
         self.expand_dims = P.ExpandDims()
+
     def construct(self, logit, label=None):
-        """Tripletloss c"""
+        """Tripletloss construct"""
         fea_dim = logit.shape[1]
         input_norm = self.sqrt(self.reduce_sum(self.square(logit), 1))
         logit = self.div(logit, input_norm)
@@ -68,6 +72,7 @@ class Tripletloss(LossBase):
         loss = a_p - a_n + self.margin
         loss = self.relu(loss)
         return loss
+
 
 def generate_index(batch_size, samples_each_class):
     """generate_index"""
@@ -119,7 +124,7 @@ class Quadrupletloss(LossBase):
         self.index_var = mindspore.Parameter(Tensor(np.zeros(self.train_batch_size * self.train_batch_size),
                                                     mindspore.int32), name='index_var')
     def construct(self, logit, label=None):
-        """Quadrupletloss c"""
+        """Quadrupletloss construct"""
         input_norm = self.sqrt(self.reduce_sum(self.square(logit), 1))
         logit = self.div(logit, input_norm)
         margin = self.margin

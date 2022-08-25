@@ -148,7 +148,7 @@ class ResidualBlock(nn.Cell):
             else:
                 self.down_sample_layer = nn.SequentialCell([_conv1x1(in_channel, out_channel, stride,
                                                                      use_se=self.use_se), _bn(out_channel)])
-        self.add = P.TensorAdd()
+        self.add = P.Add()
 
     def construct(self, x):
         """construct"""
