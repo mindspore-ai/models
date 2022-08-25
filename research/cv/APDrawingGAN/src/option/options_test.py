@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,9 @@ class TestOptions():
         self.parser.add_argument('--bg_dir', type=str, default='test_dataset/mask/ALL', help='path to background masks')
         self.parser.add_argument('--results_dir', type=str, default='test_dataset/result', help='path to test results')
         self.parser.add_argument('--model_path', type=str, default='checkpoint/netG_300.ckpt')
+        self.parser.add_argument('--onnx_path', type=str, default='onnx_file/')
         self.parser.add_argument('--mindir_filename', type=str, default='infer_model')
+        self.parser.add_argument('--onnx_filename', type=str, default='apdrawinggan_onnx')
         self.parser.add_argument('--config_path', type=str, default="config_eval_and_export.yaml")
         self.parser.add_argument('--device_id', type=int, default=0, help='device id')
         self.parser.add_argument("--device_target", type=str, default="Ascend", help="GPU or Ascned")
