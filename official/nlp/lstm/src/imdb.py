@@ -47,7 +47,7 @@ class ImdbParser():
         """
         parse imdb data to memory
         """
-        self.__wvmodel = gensim.models.KeyedVectors.load_word2vec_format(self.__glove_file, no_header=True)
+        self.__wvmodel = gensim.models.KeyedVectors.load_word2vec_format(self.__glove_file)
 
         for seg in self.__segs:
             self.__parse_imdb_datas(seg)
