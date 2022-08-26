@@ -183,7 +183,7 @@ Parameters for both training and evaluation can be set in config.py
   'noise':0.0     # noise intensity
   'num_neuron':20  # number of neurons in fully connected hidden layer
   'ck_path':'./navier_ckpoints/'  # path to save checkpoint files (.ckpt)
-  'seed':0        # random seed
+  'seed':7        # random seed
   'batch_size':500  # batch size
   ```
 

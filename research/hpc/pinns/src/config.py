@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,4 +23,4 @@ config_Sch = {'epoch': 50000, 'lr': 0.0001, 'N0': 50, 'Nb': 50, 'Nf': 20000, 'nu
 
 # config for Navier-Stokes equation scenario
 config_navier = {'epoch': 19000, 'lr': 0.01, 'n_train': 5000, 'path': './Data/cylinder_nektar_wake.mat',
-                 'noise': 0.0, 'num_neuron': 20, 'ck_path': './navier_ckpoints/', 'seed': 2000, 'batch_size': 500}
+                 'noise': 0.0, 'num_neuron': 20, 'ck_path': './navier_ckpoints/', 'seed': 7, 'batch_size': 500}

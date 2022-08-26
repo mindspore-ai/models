@@ -181,7 +181,7 @@ Navier-Stokes方程是流体力学中描述粘性牛顿流体的方程。针对N
   'noise':0.0     # 噪声强度
   'num_neuron':20  # 全连接隐藏层的神经元数量
   'ck_path':'./navier_ckpoints/'  # 保存checkpoint文件(.ckpt)的路径
-  'seed':1        # 随机种子
+  'seed':7        # 随机种子
   'batch_size':500  # 训练批次大小
   ```
 
