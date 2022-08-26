@@ -3,3 +3,4 @@ pillow
 opencv-python
 pycocotools
 pyyaml
+onnxruntime
