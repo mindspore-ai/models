@@ -97,6 +97,10 @@ def set_graph_kernel_context(device_target, model):
         ms.context.set_context(enable_graph_kernel=True,
                                graph_kernel_flags="--enable_parallel_fusion --enable_expand_ops=Conv2D")
 
+def set_ascend_pynative_mempool_block_size():
+    if ms.get_context("mode") == ms.PYNATIVE_MODE and config.device_target == "Ascend":
+        ms.set_context(mempool_block_size="31GB")
+
 @moxing_wrapper()
 def train_net():
     if hasattr(config, 'num_ssd_boxes') and config.num_ssd_boxes == -1:
@@ -115,6 +119,7 @@ def train_net():
     else:
         ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, device_id=config.device_id)
         set_graph_kernel_context(config.device_target, config.model_name)
+        set_ascend_pynative_mempool_block_size()
         if config.run_distribute:
             device_num = config.device_num
             ms.reset_auto_parallel_context()
