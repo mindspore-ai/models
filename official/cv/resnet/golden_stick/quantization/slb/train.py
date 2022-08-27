@@ -144,7 +144,7 @@ def get_pretrained_epoch(net):
                                    "loading pretrained weight, but got epoch_size {}, has_trained_epoch {}"
                                    "".format(config.epoch_size, config.has_trained_epoch))
         else:
-            print(f"Invalid pre_trained {config.pre_trained} parameter.")
+            raise RuntimeError("Pretrained ckpt file {} does not exist.".format(config.pre_trained))
     else:
         config.has_trained_epoch = 0
         config.has_trained_step = 0
@@ -169,9 +169,11 @@ def load_pretrained_ckpt(net):
             if config.filter_weight:
                 filter_list = [x.name for x in net.end_point.get_parameters()]
                 filter_checkpoint_parameter_by_list(ckpt, filter_list)
-            ms.load_param_into_net(net, ckpt)
+            not_load_param = ms.load_param_into_net(net, ckpt)
+            if not_load_param:
+                raise RuntimeError("Load param into net fail.")
         else:
-            print(f"Invalid pre_trained {config.pre_trained} parameter.")
+            raise RuntimeError("Pretrained ckpt file {} does not exist.".format(config.pre_trained))
 
 
 def init_group_params(net):
