@@ -12,6 +12,7 @@
         - [训练](#训练)
     - [评估步骤](#评估步骤)
         - [评估](#评估)
+    - [ONNX评估](#ONNX评估)
     - [导出mindir模型](#导出mindir模型)
     - [推理过程](#推理过程)
         - [用法](#用法)
@@ -48,7 +49,7 @@ Dataset used:
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需获取更多信息，请查看如下链接：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
 # [快速开始](#contents)
 
@@ -84,6 +85,7 @@ Dataset used:
         ├── run_distribute_gpu.sh                //training on GPU with 8P
         ├── run_eval_gpu.sh.sh               //evaling Flow+RGB on GPU
         ├── run_standalone_train_gpu.sh      //training on GPU with 1P
+        ├── run_test_onnx_gpu.sh                  //testing onnx Flow or RGB on GPU
         ├── run_test_gpu.sh                  //testing Flow or RGB on GPU
     ├── src
         ├──basic_ops.py                     // basic operation
@@ -97,7 +99,9 @@ Dataset used:
         ├──util.py                          // util
         ├──video_funcs.py                   // util for test
     ├── eval_scores.py                      // fusion accuracy
+    ├── requirement.txt                     // requirement
     ├── test_net.py                         // tesing network performance
+    ├── test_net_onnx.py                    // tesing network onnx performance
     ├── train.py                            // traing network
 ```
 
@@ -224,29 +228,124 @@ Dataset used:
 
 - 在GPU上使用ucf101 测试集进行评估
 
-  在使用命令运行时，需要传入模型参数地址、模型参数名称、空域卷积方式、预测时段。
+  在使用命令运行时，需要传入模型参数地址、模型参数名称、使用设备id。同时需将各文件按如下格式放置。
+
+  ```path
+  ├── root_path
+      ├── tsn
+      ├── data
+          ├──data_extracted
+              ├──ucf101
+                  ├──tvl1                      // RGB和Flow图片存放路径
+                  ├──ucf101_val_split_1_rawframes.txt         // 标签存放路径
+  ```
 
   ```bash
   #For flow models:
-  bash run_test_gpu.sh [ROOT_PATH] [CKPT_PATH] [MODALITY] [DEVICE_ID]
+  用法：bash run_test_gpu.sh [ROOT_PATH] [CKPT_PATH] [MODALITY] [DEVICE_ID]
+  实例：bash run_test_gpu.sh /path1/ /path2/ucf101_bninception_Flow-340_597.ckpt Flow 0
 
   #For rgb models:
-  bash run_test_gpu.sh [ROOT_PATH] [CKPT_PATH] [MODALITY] [DEVICE_ID]
-
-  #For RGB+Flow:
-  bash run_eval_gpu.sh [ROOT_PATH] [RGB_NAME] [FLOW_NAME]
-
+  用法：bash run_test_gpu.sh [ROOT_PATH] [CKPT_PATH] [MODALITY] [DEVICE_ID]
+  实例：bash run_test_gpu.sh /path1/ /path2/ucf101_bninception_RGB-340_597.ckpt RGB 0
   ```
 
- - score_files_flow、score_files_rgb为在test_net.py中生成的npz文件
+    - `[ROOT_PATH]` 模型存放的根路径，即tsn文件夹的上层路径
+    - `[CKPT_PATH]` ckpt文件的存放路径
+    - `[MODALITY]` 数据集格式，此处为RGB或者Flow
+    - `[DEVICE_ID]` 使用的设备id
 
-  以上的python命令会在终端上运行，你可以在终端上查看此次评估的结果。测试集的精确度会以如下方式呈现：
+  Flow和RGB模型评估完成后，会分别生成一个npz文件，需分别将npz文件放置在/path/tsn/checkpoint/RGB以及/path/tsn/checkpoint/Flow目录中，然后执行如下命令评估flow+rgb。
 
   ```bash
+  #For RGB+Flow:
+  用法：bash run_eval_gpu.sh [ROOT_PATH] [RGB_NAME] [FLOW_NAME]
+  实例：bash run_eval_gpu.sh /path/ score_warmupRGB.npz score_warmupFlow.npz
+  ```
+
+  - `[ROOT_PATH]` 模型存放的根路径，即tsn文件夹的上层路径
+  - `[RGB_NAME]` 推理RGB生成的npz文件的名称
+  - `[FLOW_NAME]` 推理Flow生成的npz文件的名称
+
+RGB和Flow的评估结果保存在示例路径中，文件名为“~/{MODALITY}_test.log”。您可在此路径下的日志找到如下结果：
+
+- 使用ucf101_RGB评估tsn
+
+  ```text
   RGB:Accuracy 85.5%
+  ```
+
+- 使用ucf101_Flow评估tsn
+
+  ```text
   Flow:Accuracy 88.4%
+  ```
+
+RGB+Flow的评估结果保存在示例路径中，文件名为“~/eval_score.log”。您可在此路径下的日志找到如下结果：
+
+  ```text
   RGB+Flow:Accuracy 93.7%
   ```
+
+## ONNX评估
+
+### 导出onnx模型
+
+```bash
+python export.py --ckpt_path /path/ucf101_bninception_RGB-21_597.ckpt --modality RGB --platform GPU --file_format ONNX
+```
+
+- `ckpt_file` ckpt文件路径
+- `modality` 数据集格式，RGB或者Flow
+- `platform` 目前仅支持GPU或CPU
+- `file_format` 导出模型格式，此处为ONNX
+
+### 运行ONNX模型评估
+
+```bash
+用法：bash run_test_onnx_gpu.sh [ONNX_PATH] [MODALITY] [DATA_DIR] [TEST_LIST] [SCORE_SAVE_PATH]
+实例：bash run_test_onnx_gpu.sh /path/tsn_RGB.onnx RGB /path/ucf101/ /path/ucf101_val_split_1_rawframes.txt /path/scores_RGB_onnx
+ ```
+
+- `[ONNX_PATH]` onnx模型路径
+- `[MODALITY]` 数据集格式，此处为RG或者Flow
+- `[DATA_DIR]` 数据集路径
+- `[TEST_LIST]` 模型标签的路径
+- `[SCORE_SAVE_PATH]` npz文件保存的路径
+
+flow和rgb模型评估完成后，会分别生成一个npz文件，需分别将npz文件放置在/path/tsn/checkpoint/RGB以及/path/tsn/checkpoint/Flow中，然后执行如下命令评估flow+rgb。
+
+  ```bash
+  #For RGB+Flow:
+  用法：bash run_eval_gpu.sh [ROOT_PATH] [RGB_NAME] [FLOW_NAME]
+  实例：bash run_eval_gpu.sh /path/ scores_RGB_onnxRGB.npz scores_Flow_onnxFlow.npz
+  ```
+
+- `[ROOT_PATH]` 模型存放的根路径，即tsn文件夹的上层路径
+- `[RGB_NAME]` 推理RGB生成的npz文件的名称
+- `[FLOW_NAME]` 推理Flow生成的npz文件的名称
+
+### 结果
+
+RGB和Flow评估结果保存在示例路径中，文件名为“~/{MODALITY}_test.log”。您可在此路径下的日志找到如下结果：
+
+- 使用ucf101_RGB评估tsn
+
+```text
+RGB:Accuracy 85.5%
+```
+
+- 使用ucf101_Flow数据集评估tsn
+
+```text
+Flow:Accuracy 88.4%
+```
+
+RGB+Flow的评估结果保存在示例路径中，文件名为“~/eval_score.log”。您可在此路径下的日志找到如下结果：
+
+```text
+RGB+Flow:Accuracy 93.7%
+```
 
 ## [导出mindir模型](#contents)
 
