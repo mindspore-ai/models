@@ -231,7 +231,7 @@ def run_pretrain():
             logger.info("save checkpoint steps: {}".format(cfg.save_checkpoint_steps))
 
     ds = create_bert_dataset(device_num, rank, cfg.do_shuffle, cfg.data_dir, cfg.schema_dir, cfg.batch_size,
-                             cfg.bucket_list, cfg.dataset_format)
+                             cfg.bucket_list, cfg.dataset_format, cfg.num_samples)
     net_with_loss = BertNetworkWithLoss(bert_net_cfg, True)
 
     new_repeat_count = cfg.epoch_size * ds.get_dataset_size() // cfg.data_sink_steps
@@ -262,7 +262,7 @@ def run_pretrain():
     if cfg.train_with_eval == 'true':
         net_eval = BertPretrainEval(bert_net_cfg, network=net_with_loss.bert)
         eval_ds = create_eval_dataset(cfg.batch_size, device_num, rank, cfg.eval_data_dir, cfg.schema_dir,
-                                      cfg.dataset_format)
+                                      cfg.dataset_format, cfg.num_samples)
         model = Model(net_with_grads, eval_network=net_eval, metrics={'bert_acc': BertMetric(cfg.batch_size)})
         eval_callback = EvalCallBack(model, eval_ds, device_num * cfg.batch_size, cfg.eval_samples)
         callback.append(eval_callback)

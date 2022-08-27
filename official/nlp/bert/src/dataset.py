@@ -116,7 +116,7 @@ class BucketDatasetGenerator:
 
 
 def create_bert_dataset(device_num=1, rank=0, do_shuffle="true", data_dir=None, schema_dir=None, batch_size=32,
-                        bucket_list=None, dataset_format="mindrecord"):
+                        bucket_list=None, dataset_format="mindrecord", num_samples=None):
     """create train dataset"""
     # apply repeat operations
     files = os.listdir(data_dir)
@@ -126,11 +126,17 @@ def create_bert_dataset(device_num=1, rank=0, do_shuffle="true", data_dir=None, 
                 (dataset_format == "mindrecord" and "mindrecord" in file_name and "mindrecord.db" not in file_name):
             data_files.append(os.path.join(data_dir, file_name))
     if dataset_format == "mindrecord":
-        data_set = ds.MindDataset(data_files,
-                                  columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
-                                                "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
-                                  shuffle=ds.Shuffle.FILES if do_shuffle == "true" else False,
-                                  num_shards=device_num, shard_id=rank)
+        if num_samples is not None:
+            data_set = ds.MindDataset(data_files,
+                                      columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
+                                                    "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
+                                      shuffle=False, num_shards=device_num, shard_id=rank, num_samples=num_samples)
+        else:
+            data_set = ds.MindDataset(data_files,
+                                      columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
+                                                    "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
+                                      shuffle=ds.Shuffle.FILES if do_shuffle == "true" else False,
+                                      num_shards=device_num, shard_id=rank)
     elif dataset_format == "tfrecord":
         data_set = ds.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
                                       columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
@@ -261,7 +267,7 @@ def create_squad_dataset(batch_size=1, data_file_path=None, schema_file_path=Non
 
 
 def create_eval_dataset(batchsize=32, device_num=1, rank=0, data_dir=None, schema_dir=None,
-                        dataset_format="mindrecord"):
+                        dataset_format="mindrecord", num_samples=None):
     """create evaluation dataset"""
     data_files = []
     if os.path.isdir(data_dir):
@@ -275,7 +281,8 @@ def create_eval_dataset(batchsize=32, device_num=1, rank=0, data_dir=None, schem
     if dataset_format == "mindrecord":
         data_set = ds.MindDataset(data_files,
                                   columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",
-                                                "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"])
+                                                "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"],
+                                  num_samples=num_samples)
     elif dataset_format == "tfrecord":
         data_set = ds.TFRecordDataset(data_files, schema_dir if schema_dir != "" else None,
                                       columns_list=["input_ids", "input_mask", "segment_ids", "next_sentence_labels",

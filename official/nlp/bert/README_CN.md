@@ -272,7 +272,8 @@ For ner or classification task, schema file contains ["input_ids", "input_mask",
 
 For squad task, training: schema file contains ["start_positions", "end_positions", "input_ids", "input_mask", "segment_ids"], evaluation: schema file contains ["input_ids", "input_mask", "segment_ids"].
 
-`numRows` is the only option which could be set by user, other values must be set according to the dataset.
+`numRows` is the only option in schema file which could be set by user when dataset_format is tfrecord, other values must be set according to the dataset.
+`num_samlpes` is the only option in yaml file which could be set by user when dataset_format is mindrecord, other values must be set according to the dataset.
 
 For example, the schema file of cn-wiki-128 dataset for pretraining shows as follows:
 {

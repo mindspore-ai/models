@@ -32,6 +32,7 @@ save_checkpoint_num: 5
 data_dir: ''
 schema_dir: ''
 dataset_format: "mindrecord"
+num_samples: None   # is the option which could be set by user to specify steps
 
 # ==============================================================================
 # pretrain related
