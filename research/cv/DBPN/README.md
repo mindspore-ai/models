@@ -210,7 +210,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Resource                   | CentOs 8.2; Ascend 910; CPU 2.60GHz, 192cores; Memory 755G  |
 | MindSpore Version          | 1.3.0                                                       |
 | Dataset                    | DIV2K                                                       |
-| Training Parameters        | ddbpn:epoch=2000, batch_size = 16; dbpngan:epoch=1000,batch_size=4|
+| Training Parameters        | ddbpn:epoch=2000, batch_size = 16; dbpngan:epoch=1100,batch_size=4|
 | Optimizer                  | Adam                                                        |
 | Loss Function              | BCELoss  MSELoss VGGLoss                                    |
 | outputs                    | super-resolution pictures                                   |

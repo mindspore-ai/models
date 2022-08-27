@@ -52,7 +52,7 @@ def get_args(is_gan=False):
     # additional parameters
     parser.add_argument('--sens', type=float, default=1024.0)
     if is_gan:
-        parser.add_argument('--nEpochs', type=int, default=1000, help='number of epochs to train for')
+        parser.add_argument('--nEpochs', type=int, default=1100, help='number of epochs to train for')
         parser.add_argument('--batchSize', type=int, default=4, choices=[4, 8, 16], help='training batch size')
         parser.add_argument('--patch_size', type=int, default=60, choices=[40, 60], help='Size of cropped HR image')
         parser.add_argument('--pretrained_iter', type=int, default=100, help='number of epochs to train for')
