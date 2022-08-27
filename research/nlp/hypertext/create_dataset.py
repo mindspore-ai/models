@@ -35,6 +35,8 @@ def create_dir_not_exist(path):
 
 
 create_dir_not_exist(args.out_data_dir)
+args.data_dir = os.path.abspath(os.path.realpath(args.data_dir))
+args.out_data_dir = os.path.abspath(os.path.realpath(args.out_data_dir))
 
 if args.datasetType == 'iflytek':
     changeIflytek(args.data_dir, args.out_data_dir)
