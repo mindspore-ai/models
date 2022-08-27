@@ -26,6 +26,7 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.net import SBNetWork
 from src.logger import get_logger
 from src.model_utils.config import config
+from src.model_utils.device_adapter import get_device_id
 from src.model_utils.moxing_adapter import moxing_wrapper
 
 from src.data import Featurizer, make_grid
@@ -100,16 +101,26 @@ def load_evaldata(configs, data_path):
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_eval():
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=5)
+    config.logger = get_logger('./', config.device_id)
+    config.logger.save_args(config)
+    if config.enable_modelarts:
+        path = config.data_path
+        config.ckpt_path = config.load_path
+        param_dict = load_checkpoint(os.path.join(config.ckpt_path, config.ckpt_file))
+        hdf_file_path = os.path.join(path, config.hdf_file)
+    else:
+        path = config.predict_input
+        param_dict = load_checkpoint(config.ckpt_file)
+        hdf_file_path = path
+    device_id = get_device_id()
+    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=device_id)
     network = SBNetWork(in_chanel=[19, 64, 128],
                         out_chanle=config.conv_channels,
                         dense_size=config.dense_sizes,
                         lmbda=config.lmbda,
                         isize=config.isize, keep_prob=1.0, is_training=False)
     network.set_train(False)
-    hdf_file_path = input_file(config.hdf_file)
     data_loader, names = load_evaldata(config, hdf_file_path)
-    param_dict = load_checkpoint(config.ckpt_file)
     load_param_into_net(network, param_dict)
     prediction = []
     for data in data_loader.create_dict_iterator(output_numpy=True):
@@ -129,9 +140,4 @@ def run_eval():
 
 
 if __name__ == '__main__':
-    config.logger = get_logger('./', config.device_id)
-    config.logger.save_args(config)
-    path = config.predict_input
-    paths = input_file(path)
-    config.hdf_file = paths
     run_eval()

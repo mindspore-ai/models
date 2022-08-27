@@ -128,6 +128,35 @@ After installing MindSpore via the official website, you can start training and 
 
   <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
 
+If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training and evaluation as follows:
+
+```python
+# run distributed training on modelarts example
+# (1) First, Perform a or b.
+#       a. Set "enable_modelarts=True" on yaml file.
+#          Set other parameters on yaml file you need.
+#       b. Add "enable_modelarts=True" on the website UI interface.
+#          Add other parameters on the website UI interface.
+# (2) Set the code directory to "/path/resnet" on the website UI interface.
+# (3) Set the startup file to "train.py" on the website UI interface.
+# (4) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
+# (5) Create your job.
+
+# run evaluation on modelarts example
+# (1) Copy or upload your trained model to S3 bucket.
+# (2) Perform a or b.
+#       a. Set "enable_modelarts=True" on yaml file.
+#          Set "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" on yaml file.
+#          Set "checkpoint_url=/The path of checkpoint in S3/" on yaml file.
+#       b. Add "enable_modelarts=True" on the website UI interface.
+#          Add "ckpt_file='checkpoint_file_name'" on the website UI interface.
+#          Add "checkpoint_url=/The path of checkpoint in S3/" on the website UI interface.
+# (3) Set the code directory to "/path/resnet" on the website UI interface.
+# (4) Set the startup file to "eval.py" on the website UI interface.
+# (5) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
+# (6) Create your job.
+```
+
 # [Script Description](#contents)
 
 ## [Script and Sample Code](#contents)

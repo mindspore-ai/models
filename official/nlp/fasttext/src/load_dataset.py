@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,14 +35,14 @@ def load_dataset(dataset_path,
                                   shuffle=shuffle,
                                   num_shards=rank_size,
                                   shard_id=rank_id,
-                                  num_parallel_workers=4)
+                                  num_parallel_workers=32)
         ori_dataset_size = data_set.get_dataset_size()
         print(f"Dataset size: {ori_dataset_size}")
         repeat_count = epoch_count
 
         data_set = data_set.rename(input_columns=['src_tokens', 'src_tokens_length', 'label_idx'],
                                    output_columns=['src_token_text', 'src_tokens_text_length', 'label_idx_tag'])
-        data_set = data_set.batch(batch_size, drop_remainder=False)
+        data_set = data_set.batch(batch_size, drop_remainder=False, num_parallel_workers=32)
         data_set = data_set.repeat(repeat_count)
         return data_set
 
