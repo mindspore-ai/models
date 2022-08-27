@@ -21,16 +21,8 @@ from src.losses import FocalLoss, SmoothL1LossNew, SmoothL1LossNewCMask
 
 import mindspore as ms
 import mindspore.nn as nn
-from mindspore.common.tensor import Tensor
-from mindspore import context
-from mindspore.parallel._auto_parallel_context import auto_parallel_context
-from mindspore.communication.management import get_group_size
 from mindspore.ops import operations as P
-from mindspore.ops import functional as F
 from mindspore.ops import composite as C
-from mindspore.common import dtype as mstype
-from mindspore.ops.operations import NPUGetFloatStatus, NPUAllocFloatStatus, NPUClearFloatStatus, ReduceSum, LessEqual
-from mindspore.context import ParallelMode
 
 _grad_scale = C.MultitypeFuncGraph("grad_scale")
 reciprocal = P.Reciprocal()
@@ -192,9 +184,6 @@ class CenterFaceLoss(nn.Cell):
         loss = self.hm_weight * hm_loss + self.wh_weight * wh_loss + \
                self.off_weight * off_loss + self.lm_weight * lm_loss
 
-        # depend is needed when wight_mask and reg_mask is not been used
-        F.depend(loss, F.sqrt(F.cast(wight_mask, mstype.float32)))
-        F.depend(loss, F.sqrt(F.cast(reg_mask, mstype.float32)))
         # add print when you want to see loss detail and do debug
         return loss
 
@@ -217,68 +206,25 @@ class CenterFaceWithLossCell(nn.Cell):
                          hps_mask, landmarks)
         return loss
 
-class TrainingWrapper(nn.Cell):
+class TrainingWrapper(nn.TrainOneStepWithLossScaleCell):
     """
     Training wrapper
     """
     def __init__(self, network, optimizer, sens=1.0):
-        super(TrainingWrapper, self).__init__(auto_prefix=False)
-        self.network = network
-        self.network.set_grad() #False
-        self.network.add_flags(defer_inline=True)
-        self.weights = optimizer.parameters
-        self.optimizer = optimizer
-        self.grad = C.GradOperation(get_by_list=True, sens_param=True)
+        scaling_sens = sens
+        if isinstance(scaling_sens, (int, float)):
+            scaling_sens = ms.Tensor(scaling_sens, ms.float32)
+        super(TrainingWrapper, self).__init__(network, optimizer, scaling_sens)
         self.sens = sens
-        self.reducer_flag = False
-        self.grad_reducer = None
-
-        self.parallel_mode = context.get_auto_parallel_context("parallel_mode")
-        if self.parallel_mode in [ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL]:
-            self.reducer_flag = True
-        if self.reducer_flag:
-            mean = context.get_auto_parallel_context("gradients_mean")
-            if auto_parallel_context().get_device_num_is_set():
-                degree = context.get_auto_parallel_context("device_num")
-            else:
-                degree = get_group_size()
-            self.grad_reducer = nn.DistributedGradReducer(optimizer.parameters, mean, degree)
-
-        self.hyper_map = C.HyperMap()
-        if context.get_context("device_target") == "GPU":
-            self.gpu_target = True
-            self.float_status = P.FloatStatus()
-            self.addn = P.AddN()
-            self.reshape = P.Reshape()
-        else:
-            self.gpu_target = False
-            self.alloc_status = NPUAllocFloatStatus()
-            self.get_status = NPUGetFloatStatus()
-            self.clear_status = NPUClearFloatStatus()
-        self.reduce_sum = ReduceSum(keep_dims=False)
-        self.base = Tensor(1, mstype.float32)
-        self.less_equal = LessEqual()
-        self.allreduce = P.AllReduce()
-        self.is_distributed = self.parallel_mode != ParallelMode.STAND_ALONE
-
     # x, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks
     def construct(self, x, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks):
         """
         Construct method.
         """
         weights = self.weights
+        scaling_sens = self.scale_sense
         loss = self.network(x, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks)
-
-        init = False
-
-        if not self.gpu_target:
-            # init overflow buffer
-            init = self.alloc_status()
-            init = F.depend(init, loss)
-            # clear overflow buffer
-            clear_status = self.clear_status(init)
-            loss = F.depend(loss, clear_status)
-
+        status, scaling_sens = self.start_overflow_check(loss, scaling_sens)
         #sens = sens_input #P.Fill()(P.DType()(loss), P.Shape()(loss), sens_input) # user can contral loss scale by add a sens_input
         sens = P.Fill()(P.DType()(loss), P.Shape()(loss), self.sens)
         grads = self.grad(self.network, weights)(x, hm, reg_mask, ind, wh, wight_mask, hm_offset, hps_mask, landmarks,
@@ -286,30 +232,11 @@ class TrainingWrapper(nn.Cell):
         #grads = self.hyper_map(F.partial(_grad_scale, sens), grads) # if add this, the loss_scale optimizer is needed to set to 1
         if self.reducer_flag:
             grads = self.grad_reducer(grads)
-
-        if not self.gpu_target:
-            # get the overflow buffer
-            init = F.depend(init, grads)
-
-            get_status = self.get_status(init)
-            init = F.depend(init, get_status)
-            # sum overflow buffer elements, 0:not overflow , >0:overflow
-            flag_sum = self.reduce_sum(init, (0,))
-        else:
-            flag_sum = self.hyper_map(F.partial(_grad_overflow), grads)
-            flag_sum = self.addn(flag_sum)
-            # convert flag_sum to scalar
-            flag_sum = self.reshape(flag_sum, (()))
-
-        if self.is_distributed:
-            # sum overflow flag over devices
-            flag_reduce = self.allreduce(flag_sum)
-            cond = self.less_equal(self.base, flag_reduce)
-        else:
-            cond = self.less_equal(self.base, flag_sum)
-
+        cond = self.get_overflow_status(status, grads)
+        overflow = self.process_loss_scale(cond)
         ret = (loss, cond, sens)
-        self.optimizer(grads)
+        if not overflow:
+            self.optimizer(grads)
         return ret
 
 
