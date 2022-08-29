@@ -61,7 +61,7 @@ parser.add_argument(
     '--per_batch_size',
     default=8,
     type=int,
-    help='Batch size for Training. Default: 24.')
+    help='Batch size for Training. Default: 8.')
 parser.add_argument(
     '--outputs_dir',
     default='outputs/',
