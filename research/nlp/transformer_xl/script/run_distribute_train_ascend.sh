@@ -15,9 +15,9 @@
 # ============================================================================
 
 if [ $# != 6 ]; then
-  echo "Usage: bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+  echo "Usage: bash run_distribute_train_ascend.sh [DEVICE_NUM] [RANK_TABLE_FILE]
    [DATA_DIR] [DATA_NAME] [TRAIN_URL] [CONFIG_PATH]"
-exit 1
+  exit 1
 fi
 
 if [ $1 -lt 1 ] || [ $1 -gt 8 ]; then
@@ -38,6 +38,7 @@ echo "CONFIG_PATH="$CONFIG_PATH
 export CONFIG_PATH=${CONFIG_PATH}
 export DEVICE_NUM=$1
 export RANK_SIZE=$1
+export RANK_TABLE_FILE=$2
 
 BASEPATH=$(
   cd "$(dirname $0)" || exit
@@ -51,13 +52,12 @@ fi
 mkdir ./train
 cd ./train || exit
 
-export CUDA_VISIBLE_DEVICES="$2"
-
 echo "Start Training :)"
 
-if [ $1 -gt 1 ]; then
-  mpirun -np $1 --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
-  python ${BASEPATH}/../train.py --device_target="GPU" --datadir=$DATA_DIR --dataset=$DATA_NAME --train_url=$TRAIN_URL >train_gpu.log 2>&1 &
-else
-  python ${BASEPATH}/../train.py --device_target="GPU" --datadir=$DATA_DIR --dataset=$DATA_NAME --train_url=$TRAIN_URL >train_gpu.log 2>&1 &
-fi
+for ((i=0;i<$RANK_SIZE;i++))
+do
+  export DEVICE_ID=$i
+  export RANK_ID=$i
+  export GLOV_v=1
+  python -u ${BASEPATH}/../train.py --device_target="Ascend" --datadir=$DATA_DIR --dataset=$DATA_NAME --train_url=$TRAIN_URL > train_ascend_$i.log 2>&1 &
+done

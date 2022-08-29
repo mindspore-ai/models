@@ -19,18 +19,18 @@ from mindspore.common import initializer as init
 
 
 def uniform_(tensor, a=0., b=1.):
-    r"""Fills the input Tensor with values drawn from the uniform
-        distribution :math:`\mathcal{U}(a, b)`.
-
-        Args:
-            tensor: an n-dimensional `torch.Tensor`
-            a: the lower bound of the uniform distribution
-            b: the upper bound of the uniform distribution
-
-        Examples:
-            #>>> w = torch.empty(3, 5)
-            #>>> nn.init.uniform_(w)
-        """
+    # r"""Fills the input Tensor with values drawn from the uniform
+    #     distribution :math:`\mathcal{U}(a, b)`.
+    #
+    #     Args:
+    #         tensor: an n-dimensional `torch.Tensor`
+    #         a: the lower bound of the uniform distribution
+    #         b: the upper bound of the uniform distribution
+    #
+    #     Examples:
+    #         >>> w = torch.empty(3, 5)
+    #         >>> nn.init.uniform_(w)
+    #     """
     tensor += Tensor(dtype=mindspore.float32, init=init.Zero(), shape=tensor.shape).fill((b - a) / 2)
     init.Uniform((b - a) / 2)(tensor.asnumpy())
 

@@ -14,8 +14,13 @@
 # ============================================================================
 
 from mindspore.nn import Cell
-from src.model.attn import RelPartialLearnableMultiHeadAttn
-from src.model.positionwiseFF import PositionwiseFF
+from src.model_utils.config import config
+if config.device_target == 'GPU':
+    from src.model.attn import RelPartialLearnableMultiHeadAttn
+    from src.model.positionwiseFF import PositionwiseFF
+else:
+    from src.model.attn_for_ascend import RelPartialLearnableMultiHeadAttn
+    from src.model.positionwiseFF_for_ascend import PositionwiseFF
 
 
 class RelPartialLearnableDecoderLayer(Cell):

@@ -15,12 +15,17 @@
 
 import mindspore as ms
 import mindspore.nn as nn
-from mindspore.nn import Tril, Triu
+from mindspore.nn import Tril, Triu, Dense
 from mindspore.ops import Zeros, Ones
 from mindspore.ops import ExpandDims, Concat, Split
-from mindspore.ops import Transpose, BatchMatMul, Tile
-from mindspore.ops import Softmax, Mul
+from mindspore.ops import Transpose, Tile
+from mindspore.ops import Softmax
+
+from src.common.ac import AcCell
+from src.common.attnveccell import AttnVecCell
+from src.common.bd import BdCell
 from src.utils.additional_algorithms import MaskerFill
+
 
 class RelMultiHeadAttn(nn.Cell):
     def __init__(self, n_head, d_model, d_head, dropout, dropatt=0.0, pre_lnorm=False):
@@ -31,23 +36,21 @@ class RelMultiHeadAttn(nn.Cell):
         self.split_n_1_2, self.split_n_1_3 = Split(-1, 2), Split(-1, 3)
         self.tril, self.triu = Tril(), Triu()
         self.transpose = Transpose()
-        self.batchMatMul = BatchMatMul()
         self.tile = Tile()
         self.maskerFill = MaskerFill()
         self.softmax_1 = Softmax(1)
-        self.mul = Mul()
 
         self.n_head = n_head
         self.d_model = d_model
         self.d_head = d_head
         self.dropout = dropout
 
-        self.qkv_net = nn.Dense(d_model, 3 * n_head * d_head, has_bias=False)
+        self.qkv_net = Dense(d_model, 3 * n_head * d_head, has_bias=False).to_float(ms.float16)
 
         self.drop = nn.Dropout(1 - dropout, dtype=ms.float32)
         self.dropatt = nn.Dropout(1 - dropout, dtype=ms.float32)
 
-        self.o_net = nn.Dense(n_head * d_head, d_model, has_bias=False)
+        self.o_net = Dense(n_head * d_head, d_model, has_bias=False).to_float(ms.float16)
 
         self.layer_norm = nn.LayerNorm([d_model])
 
@@ -79,7 +82,10 @@ class RelPartialLearnableMultiHeadAttn(RelMultiHeadAttn):
     def __init__(self, *args, **kwargs):
         super(RelPartialLearnableMultiHeadAttn, self).__init__(*args, **kwargs)
 
-        self.r_net = nn.Dense(self.d_model, self.n_head * self.d_head, has_bias=False)
+        self.r_net = Dense(self.d_model, self.n_head * self.d_head, has_bias=False).to_float(ms.float16)
+        self.ac_cell = AcCell().to_float(ms.float16)
+        self.bd_cell = BdCell().to_float(ms.float16)
+        self.AttnVecCell = AttnVecCell().to_float(ms.float16)
 
     def construct(self, w, r, r_w_bias, r_r_bias, mems=None, attn_mask=None):
         qlen, rlen, bsz = w.shape[0], r.shape[0], w.shape[1]
@@ -115,17 +121,15 @@ class RelPartialLearnableMultiHeadAttn(RelMultiHeadAttn):
         rw_head_q = w_head_q + r_w_bias  # qlen x bsz x n_head x d_head
         rr_head_q = w_head_q + r_r_bias
 
-        # qlen x klen x bsz x n_head
+        rw_head_q_fp16 = self.cast(rw_head_q, ms.float16)
+        w_head_k_fp16 = self.cast(w_head_k, ms.float16)
+        AC = self.ac_cell(rw_head_q_fp16, w_head_k_fp16)
+        AC = self.cast(AC, ms.float32)
 
-        AC = self.transpose(
-            self.batchMatMul(self.transpose(rw_head_q, (1, 2, 0, 3)), self.transpose(w_head_k, (1, 2, 3, 0))),
-            (2, 3, 0, 1))
-
-        rr_head_q_t = self.transpose(rr_head_q, (1, 2, 0, 3))
-        r_head_k_t = self.transpose(r_head_k, (1, 2, 0))
-        BD = self.transpose(
-            self.batchMatMul(rr_head_q_t, self.tile(self.expandDims(r_head_k_t, 0), (rr_head_q_t.shape[0], 1, 1, 1))),
-            (2, 3, 0, 1))
+        rr_head_q_fp16 = self.cast(rr_head_q, ms.float16)
+        r_head_k_fp16 = self.cast(r_head_k, ms.float16)
+        BD = self.bd_cell(rr_head_q_fp16, r_head_k_fp16)
+        BD = self.cast(BD, ms.float32)
 
         BD = self._rel_shift(BD)
 
@@ -148,10 +152,11 @@ class RelPartialLearnableMultiHeadAttn(RelMultiHeadAttn):
         attn_prob = self.softmax_1(attn_score)
         attn_prob = self.dropatt(attn_prob)
         # compute attention vector
-        attn_vec = self.transpose(
-            self.batchMatMul(self.transpose(attn_prob, (2, 3, 0, 1)), self.transpose(w_head_v, (1, 2, 0, 3))),
-            (2, 0, 1, 3))
 
+        attn_prob_fp16 = self.cast(attn_prob, ms.float16)
+        w_head_v_fp16 = self.cast(w_head_v, ms.float16)
+        attn_vec = self.AttnVecCell(attn_prob_fp16, w_head_v_fp16)
+        attn_vec = self.cast(attn_vec, ms.float32)
         # [qlen x bsz x n_head x d_head]
         attn_vec = attn_vec.reshape(
             attn_vec.shape[0], attn_vec.shape[1], self.n_head * self.d_head)

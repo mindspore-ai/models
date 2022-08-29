@@ -116,15 +116,45 @@ text8同样包含了100MB的Wikipedia文本，区别在于在enwik8数据集的�
 
 # 运行非分布式训练示例
 bash run_standalone_train_gpu.sh [DEVICE_ID] [DATA_DIR] [DATA_NAME] [TRAIN_URL] [CONFIG_PATH]
-# for example: bash run_standalone_train_gpu.sh 0 /home/mindspore/transformer-xl/data/enwik8/ enwik8 experiments /home/mindspore/transformer-xl/yaml/enwik8_base.yaml
+# for example: bash run_standalone_train_gpu.sh 0 /home/mindspore/transformer-xl/data/enwik8/ enwik8 experiments ../../yaml/enwik8_base_train.yaml
 
 # 运行分布式训练示例
 bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATA_DIR] [DATA_NAME] [TRAIN_URL] [CONFIG_PATH]
-# for example: bash run_distribute_train_gpu.sh 4 0,1,2,3 /home/mindspore/transformer-xl/data/enwik8/ enwik8 experiments /home/mindspore/transformer-xl/yaml/enwik8_base.yaml
+# for example: bash run_distribute_train_gpu.sh 4 0,1,2,3 /home/mindspore/transformer-xl/data/enwik8/ enwik8 experiments ../../yaml/enwik8_base_train.yaml
 
 # 运行评估示例
-bash run_eval_gpu.sh [DATA_URL] [DATA_NAME] [CKPT_PATH] [CONFIG_PATH] [DEVICE_ID(optional)]
-# for example: bash run_eval_gpu.sh  /home/mindspore/transformer-xl/data/enwik8/ enwik8 /home/mindspore/transformer-xl/script/experiments-enwik8/20220416-140816/model7.ckpt /home/mindspore/transformer-xl/yaml/enwik8_base.yaml 0
+bash run_eval_gpu.sh [DATA_URL] [DATA_NAME] [LOAD_PATH] [CKPT_FILENAME] [CONFIG_PATH] [DEVICE_ID(optional)]
+# for example: bash run_eval_gpu.sh  /home/mindspore/transformer-xl/data/enwik8/ enwik8 /home/mindspore/transformer-xl/script/experiments-enwik8/20220416-140816/ model_40W ../../yaml/enwik8_base_eval.yaml 0
+```
+
+- 在Ascend上运行
+
+数据集准备完成后，请按照如下步骤开始训练和评估：
+
+```bash
+# 对参数进行微调: enwik8_base.yaml中对超参数进行调整
+# 其中[DATA_NAME]属于缺省参数[enwik8，text8]
+# 其中[TRAIN_URL]参数可以设置为一个字符名称，这样会自动按照这个名称在/script/train/下面创建对应的模型训练文件，也可以设置为一个路径，例如 `"/home/mindspore/transformer-xl/enwik8_8p"`  这种方式会将训练的模型单独保存在这个目录下。
+
+# 运行分布式训练示例
+bash run_distribute_train_ascend.sh [DEVICE_NUM] [RANK_TABLE_FILE] [DATA_DIR] [DATA_NAME] [TRAIN_URL] [CONFIG_PATH]
+# for example: bash run_distribute_train_ascend.sh 8 /data2/txl_final/hccl_8p_01234567_127.0.0.1.json /data2/txl_final/data/enwik8/ enwik8 experiments /data2/txl_final/yaml/enwik8_base_train.yaml
+
+# 运行评估示例
+bash run_eval_ascend.sh [DATA_DIR] [DATA_NAME] [CKPT_PATH] [CONFIG_PATH] [DEVICE_ID(optional)]
+# for example: bash run_eval_ascend.sh /data2/txl_final/data/enwik8/ enwik8 /data2/txl/script/experiments-enwik8/20220526-225545/device_0/CKP-400000_1.ckpt /data2/txl_final/yaml/enwik8_base_eval.yaml 0
+
+# 导出模型示例
+export CONFIG_PATH=[CONFIG_PATH]
+python export.py --ckpt_path=[CKPT_PATH]
+# for example:
+# export CONFIG_PATH=/data2/txl_final/yaml/enwik8_base_eval.yaml
+# python export.py --ckpt_path=/home/transformer_xl/CKP-400000_ascend.ckpt
+
+# 推理模型示例
+bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CONFIG_PATH]
+# for example: bash run_infer_310.sh /home/transformer_xl/script/model_output_ascend_graph.mindir y 0 /home/transformer_xl/yaml/enwik8_base_eval.yaml
+
 ```
 
 ## 脚本说明
@@ -136,8 +166,19 @@ bash run_eval_gpu.sh [DATA_URL] [DATA_NAME] [CKPT_PATH] [CONFIG_PATH] [DEVICE_ID
 └─Transformer-XL
   ├─README.md             // descriptions about Transformer-XL
   ├─README_CN.md          // descriptions about Transformer-XL
-  ├─scripts
+  ├─ascend310_infer
+    ├─build.sh
+    ├─CMakeLists.txt
+    ├─inc
+    │ └─utils.h
+    └─src
+      ├─main.cc
+      └─utils.cc
+  ├─script
+    ├─run_distribute_train_ascend.sh   // shell script for distributed training on Ascend
     ├─run_distribute_train_gpu.sh   // shell script for distributed training on GPU
+    ├─run_eval_ascend.sh               // shell script for testing on Ascend
+    ├─run_infer_310.sh               // shell script for inferring on Ascend
     ├─run_standalone_train_gpu.sh   // shell script for training on GPU
     └─run_eval_gpu.sh               // shell script for testing on GPU
   ├─src
@@ -145,19 +186,28 @@ bash run_eval_gpu.sh [DATA_URL] [DATA_NAME] [CKPT_PATH] [CONFIG_PATH] [DEVICE_ID
       ├─eval.py           // callback function(eval)
       ├─flag.py           // callback function(flag)
       └─log.py            // callback function(log)
+    ├─common
+      ├─__init__.py           // init.py
+      ├─ac.py           // define ac cell
+      ├─attn_vec_cell.py           // define attn_vec cell
+      └─bd.py            // define bd cell
     ├─loss_fn
       └─ProjectedAdaptiveLogSoftmaxLoss.py    // loss
     ├─metric
       └─calc.py               // get bpc and ppl
     ├─model
       ├─attn.py               // Attention code
+      ├─attn_for_ascend.py    // Attention code for Ascend
       ├─dataset.py            // get dataset
       ├─embedding.py          // PositionalEmbedding and AdaptiveEmbedding
       ├─layer.py              // layer code
       ├─mem_transformer.py    // Transformer-XL model
+      ├─mem_transformer_for_ascend.py    // Transformer-XL model for Ascend
       ├─positionwiseFF.py     // positionwiseFF
+      ├─positionwiseFF_for_ascend.py     // positionwiseFF for Ascend
       └─vocabulary.py         // construct vocabulary
     ├─model_utils
+      ├─__init__.py           // init.py
       ├─config.py             // parameter configuration
       ├─device_adapter.py     // device adapter
       ├─local_adapter.py      // local adapter
@@ -165,13 +215,22 @@ bash run_eval_gpu.sh [DATA_URL] [DATA_NAME] [CKPT_PATH] [CONFIG_PATH] [DEVICE_ID
     ├─utils
       ├─additional_algorithms.py  // General method
       ├─dataset_util.py           // Interface to get dataset
-      └─nnUtils.py                // Basic method
+      ├─nnUtils.py                // Basic method
   ├─yaml
-      ├─enwik8_base.yaml          // parameter configuration on gpu
-      ├─enwik8_large.yaml         // parameter configuration on gpu
-      └─text8_large.yaml          // parameter configuration on gpu
+    ├─enwik8_base.yaml              // parameter configuration of enwik8 on gpu/Ascend(40 million parameters)
+    ├─enwik8_base_eval.yaml         // parameter configuration of enwik8 on gpu/Ascend for eval(40 million parameters)
+    ├─enwik8_base_train.yaml        // parameter configuration of enwik8 on gpu/Ascend for train(40 million parameters)
+    ├─enwik8_large.yaml             // parameter configuration of enwik8 on gpu/Ascend(0.4 billion parameters)
+    ├─enwik8_base_eval.yaml         // parameter configuration of enwik8 on gpu/Ascend for eval(0.4 billion parameters)
+    ├─enwik8_base_train.yaml        // parameter configuration of enwik8 on gpu/Ascend for train(0.4 billion parameters)
+    ├─text8_large.yaml             // parameter configuration of text8 on gpu/Ascend(0.4 billion parameters)
+    ├─text8_base_eval.yaml         // parameter configuration of text8 on gpu/Ascend for eval(0.4 billion parameters)
+    ├─text8_base_train.yaml        // parameter configuration of text8 on gpu/Ascend for train(0.4 billion parameters)
   ├─getdata.sh                    // shell script for preprocessing dataset
   ├─eval.py                       // evaluation script
+  ├─export.py                     // export script
+  ├─postprocess.py                // process after infer
+  ├─preprocess.py                // process before infer
   └─train.py                      // training script
 ```
 
@@ -223,7 +282,7 @@ train.py
     ```
     # 运行非分布式训练示例
     bash run_standalone_train_gpu.sh [DEVICE_ID] [DATA_DIR] [DATA_NAME] [TRAIN_URL] [CONFIG_PATH]
-    # for example: bash run_standalone_train_gpu.sh 0 /home/mindspore/transformer-xl/data/enwik8/ enwik8 experiments /home/mindspore/transformer-xl/yaml/enwik8_base.yaml
+    # for example: bash run_standalone_train_gpu.sh 0 /home/mindspore/transformer-xl/data/enwik8/ enwik8 experiments ../../yaml/enwik8_base_train.yaml
     ```
 
 - 运行`run_distribute_train_gpu.sh`，进行Transformer-XL模型的分布式训练。
@@ -231,19 +290,36 @@ train.py
     ```
     # 运行分布式训练示例
     bash run_distribute_train_gpu.sh [DEVICE_NUM] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)] [DATA_DIR] [DATA_NAME] [TRAIN_URL] [CONFIG_PATH]
-    # for example: bash run_distribute_train_gpu.sh 4 0,1,2,3 /home/mindspore/transformer-xl/data/enwik8/ enwik8 experiments /home/mindspore/transformer-xl/yaml/enwik8_base.yaml
+    # for example: bash run_distribute_train_gpu.sh 4 0,1,2,3 /home/mindspore/transformer-xl/data/enwik8/ enwik8 experiments ../../yaml/enwik8_base_train.yaml
+    ```
+
+    Ascend分布式训练需要提前创建JSON格式的HCCL配置文件。
+    具体操作，参见hccn_tools中的说明。
+
+    ```
+    # 运行Ascend分布式训练示例
+    bash run_distribute_train_ascend.sh [DEVICE_NUM] [RANK_TABLE_FILE] [DATA_DIR] [DATA_NAME] [TRAIN_URL] [CONFIG_PATH]
+    # for example: bash run_distribute_train_ascend.sh 8 /data2/txl_final/hccl_8p_01234567_127.0.0.1.json /data2/txl_final/data/enwik8/ enwik8 experiments /data2/txl_final/yaml/enwik8_base_train.yaml
     ```
 
 ### 评估过程
 
 - 通过直接用sh输入参数的方式输入路径，或在`enwik8_base.yaml`中设置选项，设置 'load_path' 文件路径。
 
-- 运行`run_eval_gpu.sh`，评估Transformer-XL模型。
+- GPU下运行`run_eval_gpu.sh`，评估Transformer-XL模型。
 
     ```
     # 运行评估示例
-    bash run_eval_gpu.sh [DATA_URL] [DATA_NAME] [CKPT_PATH] [CONFIG_PATH] [DEVICE_ID(optional)]
-    # for example: bash run_eval_gpu.sh  /home/mindspore/transformer-xl/data/enwik8/ enwik8 /home/mindspore/transformer-xl/script/experiments-enwik8/20220416-140816/model7.ckpt /home/mindspore/transformer-xl/yaml/enwik8_base.yaml 0
+    bash run_eval_gpu.sh [DATA_URL] [DATA_NAME] [LOAD_PATH] [CKPT_FILENAME] [CONFIG_PATH] [DEVICE_ID(optional)]
+    # for example: bash run_eval_gpu.sh  /home/mindspore/transformer-xl/data/enwik8/ enwik8 /home/mindspore/transformer-xl/script/experiments-enwik8/20220416-140816/ model_40W ../../yaml/enwik8_base_eval.yaml 0
+    ```
+
+- Ascend下运行`run_eval_ascend.sh`，评估Transformer-XL模型。
+
+    ```
+    # 运行评估示例
+    bash run_eval_ascend.sh [DATA_DIR] [DATA_NAME] [CKPT_PATH] [CONFIG_PATH] [DEVICE_ID(optional)]
+    # for example: bash run_eval_ascend.sh /data2/txl_final/data/enwik8/ enwik8 /data2/txl/script/experiments-enwik8/20220526-225545/device_0/CKP-400000_1.ckpt /data2/txl_final/yaml/enwik8_base_eval.yaml 0
     ```
 
 ## 模型描述
@@ -252,33 +328,33 @@ train.py
 
 #### 训练性能
 
-| 参数           | GPU                            |
-| ------------- | ------------------------------ |
-| 资源           | MindSpore                      |
-| 上传日期        | 2022-04-22                     |
-| MindSpore版本  | 1.6.1                           |
-| 数据集         | enwik8                          |
-| 训练参数       | max_step=400000, batch_size=22  |
-| 优化器         | Adam                            |
-| 损失函数       | Softmax Cross Entropy           |
-| BPC分数       | 1.07906                         |
-| 速度          | 421.24ms/step(1p,bsz=8)  |
-| 损失          | 0.75                            |
-| 推理检查点     | 1.45G(.ckpt文件)                |
-| 脚本          | Transformer-XL script           |
+| 参数           | GPU                            | Ascend                            |
+| ------------- | ------------------------------ | --------------------------------- |
+| 资源           | MindSpore                      | MindSpore                      |
+| 上传日期        | 2022-04-22                     | 2022-07-18                     |
+| MindSpore版本  | 1.6.1                           | 1.6.1                           |
+| 数据集         | enwik8                          | enwik8                          |
+| 训练参数       | max_step=400000, batch_size=22  | max_step=400000, batch_size=22  |
+| 优化器         | Adam                            | Adam                            |
+| 损失函数       | Softmax Cross Entropy           | Softmax Cross Entropy           |
+| BPC分数       | 1.07906                         | 1.13204                         |
+| 速度          | 421.24ms/step(1p)  | 311ms/step(8p)  |
+| 损失          | 0.75                            | 0.78                            |
+| 推理检查点     | 1.45G(.ckpt文件)                | 1.16G(.ckpt文件)                |
+| 脚本          | Transformer-XL script           | Transformer-XL script           |
 
 #### 评估性能
 
-| 参数           | GPU                   |
-| ------------- | --------------------------- |
-|资源            | MindSpore               |
-| 上传日期        | 2022-04-22                |
-| MindSpore版本  | 1.6.1                      |
-| 数据集         | enwik8                     |
-| batch_size    | 22                        |
-| 输出           | 损失loss,BPC分数                   |
-| 损失loss       | 0.75                      |
-| BPC分数       | 1.07906                      |
+| 参数           | GPU                   | Ascend                            |
+| ------------- | --------------------------- | --------------------------------- |
+|资源            | MindSpore               | MindSpore               |
+| 上传日期        | 2022-04-22                | 2022-07-18                     |
+| MindSpore版本  | 1.6.1                      | 1.6.1                      |
+| 数据集         | enwik8                     | enwik8                     |
+| batch_size    | 22                        | 22                        |
+| 输出           | 损失loss,BPC分数                   | 损失loss,BPC分数                   |
+| 损失loss       | 0.75                      | 0.78(310下推理为0.79)                      |
+| BPC分数       | 1.07906                      | 1.13204(310下推理为1.13778)                         |
 
 ## 随机情况说明
 

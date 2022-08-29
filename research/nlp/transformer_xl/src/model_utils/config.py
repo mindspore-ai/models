@@ -112,13 +112,14 @@ def merge(args, cfg):
     return cfg
 
 
-def reset_config(args):
+def reset_config(args, config_path):
     if args.d_embed < 0:
         args.d_embed = args.d_model
     args.train_url = '{}-{}'.format(args.train_url, args.dataset)
     args.train_url = os.path.join(args.train_url, time.strftime('%Y%m%d-%H%M%S'))
-    if not os.path.exists(args.train_url):
-        os.makedirs(args.train_url, exist_ok=True)
+    if 'train' in config_path:
+        if not os.path.exists(args.train_url):
+            os.makedirs(args.train_url, exist_ok=True)
 
 
 def get_config():
@@ -131,7 +132,7 @@ def get_config():
     default, helper, choices = parse_yaml(config_path)
     args = parse_cli_to_yaml(parser=parser, cfg=default, helper=helper, choices=choices, cfg_path=config_path)
 
-    reset_config(args)
+    reset_config(args, config_path)
     final_config = merge(args, default)
     return Config(final_config)
 

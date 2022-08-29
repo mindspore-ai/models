@@ -69,6 +69,7 @@ eta_min: 0.0
 max_eval_steps: -1
 sample_softmax: -1
 patience: 0
+pos_loss: 0.22
 adaptive: False
 varlen: False
 pre_lnorm: False
