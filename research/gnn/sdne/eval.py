@@ -15,6 +15,7 @@
 """
 python eval.py
 """
+
 import argparse
 
 from mindspore import context
@@ -26,37 +27,35 @@ from src import check_reconstruction
 from src import reconstruction_precision_k
 from src import cfg
 
+
 parser = argparse.ArgumentParser(description='Mindspore SDNE Training')
 
 # Datasets
 parser.add_argument('--data_url', type=str, default='', help='dataset path')
 parser.add_argument('--data_path', type=str, default='', help='data path')
 parser.add_argument('--label_path', type=str, default='', help='label path')
-parser.add_argument('--dataset', type=str, default='WIKI',
-                    choices=['WIKI', 'GRQC'])
+parser.add_argument('--dataset', type=str, default='WIKI', choices=['WIKI', 'GRQC'])
 
 # Checkpoints
 parser.add_argument('-c', '--checkpoint', required=True, type=str, metavar='PATH',
                     help='path to save checkpoint (default: checkpoint)')
 
 # Device options
+parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"], default="Ascend")
 parser.add_argument('--device_id', type=int, default=0)
 
-args = parser.parse_args()
 
-if __name__ == "__main__":
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=args.device_id)
+def run_eval():
+    args = parser.parse_args()
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
 
     config = cfg[args.dataset]
 
     data_path = ''
-    label_path = ''
     if args.data_url == '':
         data_path = args.data_path
-        label_path = args.label_path
     else:
         data_path = args.data_url + (config['data_path'] if args.data_path == '' else args.data_path)
-        label_path = args.data_url + (config['label_path'] if args.label_path == '' else args.label_path)
 
     dataset = GraphDataset(args.dataset, data_path, batch=config['batch'], delimiter=config['delimiter'])
     net = SDNEWithLossCell(SDNE(dataset.get_node_size(), hidden_size=config['hidden_size']), SDNELoss1())
@@ -75,3 +74,7 @@ if __name__ == "__main__":
         else:
             check_reconstruction(embeddings, dataset.get_graph(), idx2node,
                                  config['reconstruction']['k_query'])
+
+
+if __name__ == "__main__":
+    run_eval()

@@ -39,8 +39,8 @@ cfg = EasyDict({
         'ckpt_step': 32,
         'ckpt_max': 10,
         'generate_emb': False,
-        'data_path': './Wiki_edgelist.txt',
-        'label_path': './wiki_labels.txt',
+        'data_path': 'Wiki_edgelist.txt',
+        'label_path': 'wiki_labels.txt',
         'reconstruction': {
             'check': True,
             'k_query': [1, 10, 20, 100, 200, 1000, 2000, 6000, 8000, 10000],
@@ -71,7 +71,7 @@ cfg = EasyDict({
         'ckpt_step': 32,
         'ckpt_max': 1,
         'generate_emb': False,
-        'data_path': './ca-Grqc.txt',
+        'data_path': 'ca-Grqc.txt',
         'label_path': '',
         'reconstruction': {
             'check': True,
