@@ -39,10 +39,7 @@ if args.datasetType == 'tnews':
     config.useTnews()
 else:
     config.useIflyek()
-if config.device == 'GPU':
-    context.set_context(mode=context.GRAPH_MODE, device_target='GPU')
-elif config.device == 'Ascend':
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
+context.set_context(mode=context.GRAPH_MODE, device_target=config.device)
 vocab, train_data, dev_data, test_data = build_dataset(config, use_word=True, min_freq=int(config.min_freq))
 test_iter = build_dataloader(test_data, config.batch_size, config.max_length)
 config.n_vocab = len(vocab)

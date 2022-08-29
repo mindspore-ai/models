@@ -63,7 +63,7 @@ HyperText 基于双曲空间的庞加莱球模型。首先利用单词或 ngram 
 # 环境要求
 
 - 硬件（Ascend处理器）
-    - 准备Ascend或GPU处理器搭建硬件环境。
+    - 准备Ascend/GPU/CPU处理器搭建硬件环境。
 - 框架
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - 更多关于Mindspore的信息，请查看以下资源：
@@ -74,7 +74,7 @@ HyperText 基于双曲空间的庞加莱球模型。首先利用单词或 ngram 
 
 通过官方网站安装MindSpore和下载数据集后，您可以按照如下步骤进行训练和评估：
 
-- Ascend和GPU处理器环境运行
+- Ascend/GPU/CPU处理器环境运行
 
 ```shell
 # 数据处理示例
@@ -90,7 +90,7 @@ cd ./scripts
 bash run_eval.sh [DATASET_DIR] [DATASET_TYPE] [MODEL_PATH] [DEVICE]
 ```
 
-- device should be in["Ascend","GPU"].
+- device should be in["Ascend","GPU","CPU"].
 
 # 脚本说明
 
@@ -119,6 +119,7 @@ bash run_eval.sh [DATASET_DIR] [DATASET_TYPE] [MODEL_PATH] [DEVICE]
     │── train.py   # 训练脚本
     │── eval.py   # 评估脚本
     │── preprocess.py   # 推理预处理脚本
+    │── quick_start.py   # quick start脚本
     │── postprocess.py   # 推理精度计算脚本
     │── create_dataset.py   # 数据处理脚本
     │── export.py   # 将checkpoint文件导出到air/mindir
@@ -168,9 +169,9 @@ lr_decay_rate 0.94    #decay率
 
 ```bash
 tnews
-python create_dataset.py --data_dir /data/tnews --out_data_dir /data/tnews_public --datasetType tnews
+python create_dataset.py --data_dir ./data/tnews --out_data_dir ./data/tnews_public --datasetType tnews
 iflytek
-python create_dataset.py --data_dir /data/iflytek --out_data_dir /data/iflytek_public --datasetType iflytek
+python create_dataset.py --data_dir ./data/iflytek --out_data_dir ./data/iflytek_public --datasetType iflytek
 ```
 
 - Ascend处理器环境运行
@@ -189,6 +190,15 @@ tnews
 python train.py --datasetdir ./data/tnews_public --datasetType tnews --device GPU
 iflytek
 python train.py --datasetdir ./data/iflytek_public --datasetType iflytek --device GPU
+```
+
+- CPU处理器环境运行
+
+```bash
+tnews
+python train.py --datasetdir ./data/tnews_public --datasetType tnews --device CPU
+iflytek
+python train.py --datasetdir ./data/iflytek_public --datasetType iflytek --device CPU
 ```
 
 ## 分布式训练
@@ -226,6 +236,24 @@ tnews
 python eval.py --datasetdir ./data/tnews_public --modelPath ./output/hypertext_tnews.ckpt --datasetType tnews --device GPU
 iflytek
 python eval.py --datasetdir ./data/iflytek_public --datasetType iflytek  --modelPath ./output/hypertext_iflytek.ckpt --device GPU
+```
+
+- CPU处理器环境运行
+
+```bash
+tnews
+python eval.py --datasetdir ./data/tnews_public --modelPath ./output/hypertext_tnews.ckpt --datasetType tnews --device CPU
+iflytek
+python eval.py --datasetdir ./data/iflytek_public --datasetType iflytek  --modelPath ./output/hypertext_iflytek.ckpt --device CPU
+```
+
+# quick start
+
+```bash
+tnews
+python quick_start.py --modelPath ./output/hypertext_tnews.ckpt --datasetType tnews
+iflytek
+python quick_start.py --datasetType iflytek  --modelPath ./output/hypertext_iflytek.ckpt
 ```
 
 # 推理过程
