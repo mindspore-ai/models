@@ -188,5 +188,7 @@ def main():
     else:
         cb += [ckpt_cb]
         model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
+    print('train success!')
+
 if __name__ == '__main__':
     main()

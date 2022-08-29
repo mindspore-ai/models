@@ -66,6 +66,6 @@ python train.py \
     --is_distributed=0 \
     --lr=0.001 \
     --max_epoch=600 \
-    --per_batch_size=24 \
+    --per_batch_size=8 \
     --lr_scheduler=my_lr  > log.txt 2>&1 &
 cd ..
