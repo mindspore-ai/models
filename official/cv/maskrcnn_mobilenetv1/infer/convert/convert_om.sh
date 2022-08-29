@@ -29,11 +29,6 @@ input_air_path=$1
 aipp_cfg_file=$2
 output_om_path=$3
 
-export install_path=/usr/local/Ascend/
-export ASCEND_ATC_PATH=${install_path}/atc
-
-export ASCEND_SLOG_PRINT_TO_STDOUT=1
-
 echo "Input AIR file path: ${input_air_path}"
 echo "Output OM file path: ${output_om_path}"
 
