@@ -14,6 +14,7 @@
     - [脚本参数](#脚本参数)
     - [训练过程](#训练过程)
     - [评估过程](#评估过程)
+    - [ONNX评估过程](#ONNX评估过程)
 - [推理过程](#推理过程)
 - [模型描述](#模型描述)
     - [性能](#性能)
@@ -150,6 +151,7 @@ Midas的总体网络架构如下：
   ├── scripts
     ├── run_distribute_train.sh            # 启动Ascend分布式训练（8卡）
     ├── run_eval.sh                        # 启动Ascend评估
+    ├── run_eval_onnx.sh                   # 启动ONNX评估
     ├── run_standalone_train.sh            # 启动Ascend单机训练（单卡）
     ├── run_train_gpu.sh                   # 启动GPU训练
     └── run_infer_310.sh                   # 启动Ascend的310推理
@@ -165,6 +167,7 @@ Midas的总体网络架构如下：
     └── midas_net.py                       # 主干网络定义
   ├── config.yaml                          # 训练参数配置文件
   ├── midas_eval.py                        # 评估网络
+  ├── midas_eval_onnx.py                   # ONNX评估网络
   ├── midas_export.py                      # 模型导出
   ├── midas_run.py                         # 模型运行
   ├── postprocess.py                       # 310后处理
@@ -322,15 +325,32 @@ bash run_eval.sh [DEVICE_ID] [DATA_NAME] [CKPT_PATH] [DEVICE_TARGET]
 {"Kitti": 24.222 "Sintel":0.323 "TUM":15.08 }
 ```
 
+## ONNX评估过程
+
+可通过改变config.yaml文件中的"data_name"进行对应的数据集推理，默认为全部数据集。
+
+评估所需ckpt获取网址：[获取链接](https://mindspore.cn/resources/hub/details?MindSpore/1.7/midas_redweb)
+
+修改config.yaml中model_weights和ckpt_path参数为下载的ckpt文件名；device_target为GPU；file_format为ONNX
+
+修改完成后运行midas_export.py文件，导出ONNX文件，应该导出3个不同输入大小的ONNX文件对应三个数据集。
+
+```bash
+# ONNX评估
+bash run_eval_onnx.sh [DEVICE_ID] [DATA_NAME] [DEVICE_TARGET]
+```
+
+推理结果保存在脚本执行的当前路径，你可以在onnx_val.json中查看精度计算结果。
+
 # 推理过程
 
 ## 导出MindIR
 
 ```shell
-python midas_export.py
+python midas_export.py --img_width [IMG_WIDTH] --img_height [IMG_HEIGHT]
 ```
 
-参数在config.yaml文件中设置
+参数在config.yaml文件中设置,其中img——width和img_height分别取160，384；384，1280；288，384时分别对应Sintel，Kitti，TUM数据集
 
 ### 在Ascend310执行推理
 
