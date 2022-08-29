@@ -107,7 +107,7 @@ def test():
         # get data
         img, img_resized, img_name = data
         img = img[0].astype(np.uint8).copy()
-        img_name = img_name[0].decode('utf-8')
+        img_name = img_name[0]
 
         get_data_pts = time.time()
         get_data_time.update(get_data_pts - end_pts)

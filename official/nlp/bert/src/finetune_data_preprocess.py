@@ -58,8 +58,8 @@ def process_tnews_clue_dataset(data_dir, label_list, bert_vocab_path, data_usage
     lookup = text.Lookup(vocab, unknown_token='[UNK]')
     dataset = dataset.map(operations=tokenizer, input_columns=["sentence"])
     dataset = dataset.map(operations=ops.Slice(slice(0, max_seq_len)), input_columns=["sentence"])
-    dataset = dataset.map(operations=ops.Concatenate(prepend=np.array(["[CLS]"], dtype='S'),
-                                                     append=np.array(["[SEP]"], dtype='S')), input_columns=["sentence"])
+    dataset = dataset.map(operations=ops.Concatenate(prepend=np.array(["[CLS]"]),
+                                                     append=np.array(["[SEP]"])), input_columns=["sentence"])
     dataset = dataset.map(operations=lookup, input_columns=["sentence"], output_columns=["text_ids"])
     dataset = dataset.map(operations=ops.PadEnd([max_seq_len], 0), input_columns=["text_ids"])
     dataset = dataset.map(operations=ops.Duplicate(), input_columns=["text_ids"],
@@ -107,10 +107,10 @@ def process_cmnli_clue_dataset(data_dir, label_list, bert_vocab_path, data_usage
     dataset = dataset.map(operations=text.TruncateSequencePair(max_seq_len - 3),
                           input_columns=["sentence1", "sentence2"])
     ### Adding special tokens
-    dataset = dataset.map(operations=ops.Concatenate(prepend=np.array(["[CLS]"], dtype='S'),
-                                                     append=np.array(["[SEP]"], dtype='S')),
+    dataset = dataset.map(operations=ops.Concatenate(prepend=np.array(["[CLS]"]),
+                                                     append=np.array(["[SEP]"])),
                           input_columns=["sentence1"])
-    dataset = dataset.map(operations=ops.Concatenate(append=np.array(["[SEP]"], dtype='S')),
+    dataset = dataset.map(operations=ops.Concatenate(append=np.array(["[SEP]"])),
                           input_columns=["sentence2"])
     ### Generating segment_ids
     dataset = dataset.map(operations=ops.Duplicate(), input_columns=["sentence1"],
@@ -209,8 +209,8 @@ def process_ner_msra_dataset(data_dir, label_list, bert_vocab_path, max_seq_len=
     unicode_char_tokenizer = text.UnicodeCharTokenizer()
     dataset = dataset.map(operations=unicode_char_tokenizer, input_columns=["text"], output_columns=["sentence"])
     dataset = dataset.map(operations=ops.Slice(slice(0, max_seq_len-2)), input_columns=["sentence"])
-    dataset = dataset.map(operations=ops.Concatenate(prepend=np.array(["[CLS]"], dtype='S'),
-                                                     append=np.array(["[SEP]"], dtype='S')), input_columns=["sentence"])
+    dataset = dataset.map(operations=ops.Concatenate(prepend=np.array(["[CLS]"]),
+                                                     append=np.array(["[SEP]"])), input_columns=["sentence"])
     dataset = dataset.map(operations=lookup, input_columns=["sentence"], output_columns=["input_ids"])
     dataset = dataset.map(operations=ops.PadEnd([max_seq_len], 0), input_columns=["input_ids"])
     dataset = dataset.map(operations=ops.Duplicate(), input_columns=["input_ids"],

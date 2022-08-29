@@ -78,9 +78,9 @@ def preprocess():
         images, labels, image_name, image_size = data[0:4]
         images = Image.fromarray(images[0].astype('uint8')).convert('RGB')
         images.save(os.path.join(images_path, image_name[0].decode() + ".jpg"))
-        labels.tofile(os.path.join(labels_path, image_name[0].decode() + ".bin"))
-        image_name.tofile(os.path.join(image_name_path, image_name[0].decode() + ".bin"))
-        image_size.tofile(os.path.join(image_size_path, image_name[0].decode() + ".bin"))
+        labels.tofile(os.path.join(labels_path, image_name[0] + ".bin"))
+        image_name.tofile(os.path.join(image_name_path, image_name[0] + ".bin"))
+        image_size.tofile(os.path.join(image_size_path, image_name[0] + ".bin"))
 
 
 if __name__ == '__main__':

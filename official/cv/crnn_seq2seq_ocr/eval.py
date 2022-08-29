@@ -167,7 +167,7 @@ def run_eval():
                 batch_decoded_label.append(ele.asnumpy())
 
             for b in range(config.eval_batch_size):
-                text = data["annotation"][b].decode("utf8")
+                text = data["annotation"][b]
                 text = text_standardization(text)
                 decoded_label = list(np.array(batch_decoded_label)[:, b])
                 decoded_words = []

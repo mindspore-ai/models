@@ -45,7 +45,7 @@ def predict():
     reporter.start_predict("A to B")
     for data in ds.create_dict_iterator(output_numpy=True):
         img_A = Tensor(data["image"])
-        path_A = str(data["image_name"][0], encoding="utf-8")
+        path_A = data["image_name"][0]
         path_B = path_A[0:-4] + "_fake_B.jpg"
         fake_B = G_A(img_A)
         save_image(fake_B, os.path.join(imgs_out, "fake_B", path_B))
@@ -58,7 +58,7 @@ def predict():
     reporter.start_predict("B to A")
     for data in ds.create_dict_iterator(output_numpy=True):
         img_B = Tensor(data["image"])
-        path_B = str(data["image_name"][0], encoding="utf-8")
+        path_B = data["image_name"][0]
         path_A = path_B[0:-4] + "_fake_A.jpg"
         fake_A = G_B(img_B)
         save_image(fake_A, os.path.join(imgs_out, "fake_A", path_A))
