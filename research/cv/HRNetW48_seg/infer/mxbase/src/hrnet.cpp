@@ -24,6 +24,14 @@
 #include "MxBase/DvppWrapper/DvppWrapper.h"
 #include "MxBase/Log/Log.h"
 
+namespace localParameter {
+    const uint32_t VECTOR_FIRST_INDEX = 0;
+    const uint32_t VECTOR_SECOND_INDEX = 1;
+    const uint32_t VECTOR_THIRD_INDEX = 2;
+    const uint32_t VECTOR_FOURTH_INDEX = 3;
+    const uint32_t VECTOR_FIFTH_INDEX = 4;
+}
+
 APP_ERROR HRNetW48Seg::Init(const InitParam& initParam) {
     deviceId_ = initParam.deviceId;
     APP_ERROR ret = MxBase::DeviceManager::GetInstance()->InitDevices();
@@ -151,9 +159,9 @@ APP_ERROR HRNetW48Seg::PostProcess(std::vector<MxBase::TensorBase>& inputs,
     }
     uint32_t imgHeight = resizedInfo.heightOriginal;
     uint32_t imgWidth = resizedInfo.widthOriginal;
-    uint32_t outputModelWidth = tensor.GetShape()[MxBase::VECTOR_FOURTH_INDEX];
-    uint32_t outputModelHeight = tensor.GetShape()[MxBase::VECTOR_THIRD_INDEX];
-    uint32_t outputModelChannel = tensor.GetShape()[MxBase::VECTOR_SECOND_INDEX];
+    uint32_t outputModelWidth = tensor.GetShape()[localParameter::VECTOR_FOURTH_INDEX];
+    uint32_t outputModelHeight = tensor.GetShape()[localParameter::VECTOR_THIRD_INDEX];
+    uint32_t outputModelChannel = tensor.GetShape()[localParameter::VECTOR_SECOND_INDEX];
     auto data = reinterpret_cast<float(*)[outputModelHeight][outputModelWidth]>(tensor.GetBuffer());
     std::vector<cv::Mat> tensorChannels = {};
     for (size_t c = 0; c < outputModelChannel; ++c) {

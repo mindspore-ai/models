@@ -9,7 +9,7 @@ add_definitions(-D_GLIBCXX_USE_CXX11_ABI=0)
 set(TARGET_LIBRARY yolov5postprocessor)
 set(TARGET_MAIN yolov5)
 
-set(ACL_LIB_PATH $ENV{ASCEND_HOME}/nnrt/latest/acllib)
+set(ACL_LIB_PATH $ENV{ASCEND_HOME}/ascend-toolkit/latest/acllib)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -19,6 +19,7 @@ include_directories($ENV{MX_SDK_HOME}/opensource/include/opencv4)
 include_directories($ENV{MX_SDK_HOME}/opensource/include/gstreamer-1.0)
 include_directories($ENV{MX_SDK_HOME}/opensource/include/glib-2.0)
 include_directories($ENV{MX_SDK_HOME}/opensource/lib/glib-2.0/include)
+include_directories($ENV{MX_SDK_HOME}/ascend-toolkit/latest/include)
 
 link_directories($ENV{MX_SDK_HOME}/lib)
 link_directories($ENV{MX_SDK_HOME}/opensource/lib/)

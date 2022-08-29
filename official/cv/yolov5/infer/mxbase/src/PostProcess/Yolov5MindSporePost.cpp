@@ -38,6 +38,14 @@ namespace {
     auto uint8Deleter = [] (uint8_t* p) { };
 }  // namespace
 
+namespace localParameter {
+    const uint32_t VECTOR_FIRST_INDEX = 0;
+    const uint32_t VECTOR_SECOND_INDEX = 1;
+    const uint32_t VECTOR_THIRD_INDEX = 2;
+    const uint32_t VECTOR_FOURTH_INDEX = 3;
+    const uint32_t VECTOR_FIFTH_INDEX = 4;
+}
+
 namespace MxBase {
     Yolov5PostProcess& Yolov5PostProcess::operator=(const Yolov5PostProcess &other) {
         if (this == &other) {
@@ -95,13 +103,14 @@ namespace MxBase {
         if (yoloVersion_ == YOLOV5_VERSION) {
             for (size_t i = 0; i < tensors.size(); i++) {
                 auto shape = tensors[i].GetShape();
-                if (shape.size() < VECTOR_FIFTH_INDEX) {
-                    LogError << "dimensions of tensor [" << i << "] is less than " << VECTOR_FIFTH_INDEX << ".";
+                if (shape.size() < localParameter::VECTOR_FIFTH_INDEX) {
+                    LogError << "dimensions of tensor [" << i << "] is less than " <<
+                                localParameter::VECTOR_FIFTH_INDEX << ".";
                     return false;
                 }
                 uint32_t channelNumber = 1;
-                int startIndex = modelType_ ? VECTOR_SECOND_INDEX : VECTOR_FOURTH_INDEX;
-                int endIndex = modelType_ ? (shape.size() - VECTOR_THIRD_INDEX) : shape.size();
+                int startIndex = modelType_ ? localParameter::VECTOR_SECOND_INDEX : localParameter::VECTOR_FOURTH_INDEX;
+                int endIndex = modelType_ ? (shape.size() - localParameter::VECTOR_THIRD_INDEX) : shape.size();
                 for (int j = startIndex; j < endIndex; j++) {
                     channelNumber *= shape[j];
                 }

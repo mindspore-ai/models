@@ -19,6 +19,14 @@
 #include "MxBase/Log/Log.h"
 #include "SEResNeXtClassifyOpencv.h"
 
+namespace localParameter {
+    const uint32_t VECTOR_FIRST_INDEX = 0;
+    const uint32_t VECTOR_SECOND_INDEX = 0;
+    const uint32_t VECTOR_THIRD_INDEX = 0;
+    const uint32_t VECTOR_FOURTH_INDEX = 0;
+    const uint32_t VECTOR_FIFTH_INDEX = 0;
+}
+
 APP_ERROR SEResNeXtClassifyOpencv::Init(const InitParam &initParam) {
     deviceId_ = initParam.deviceId;
     APP_ERROR ret = MxBase::DeviceManager::GetInstance()->InitDevices();
@@ -110,10 +118,10 @@ APP_ERROR SEResNeXtClassifyOpencv::Crop(const cv::Mat &srcImageMat, cv::Mat &dst
 
 APP_ERROR SEResNeXtClassifyOpencv::Inference(const std::vector<MxBase::TensorBase> &inputs,
                                       std::vector<MxBase::TensorBase> &outputs) {
-    uint32_t first = inputs[0].GetShape()[MxBase::VECTOR_FIRST_INDEX];
-    uint32_t second = inputs[0].GetShape()[MxBase::VECTOR_SECOND_INDEX];
-    uint32_t third = inputs[0].GetShape()[MxBase::VECTOR_THIRD_INDEX];
-    uint32_t fourth = inputs[0].GetShape()[MxBase::VECTOR_FOURTH_INDEX];
+    uint32_t first = inputs[0].GetShape()[localParameter::VECTOR_FIRST_INDEX];
+    uint32_t second = inputs[0].GetShape()[localParameter::VECTOR_SECOND_INDEX];
+    uint32_t third = inputs[0].GetShape()[localParameter::VECTOR_THIRD_INDEX];
+    uint32_t fourth = inputs[0].GetShape()[localParameter::VECTOR_FOURTH_INDEX];
     std::cout << "++ inputs: " << inputs.size() << " " << first << " "
     << second << " " << third << " " << fourth << std::endl;
 

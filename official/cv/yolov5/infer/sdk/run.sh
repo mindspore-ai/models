@@ -56,7 +56,7 @@ if [[ $ann_file  == "" ]];then
    exit 1
 fi
 
-python3.7 main.py --pipeline_path=$pipeline_path \
+python3 main.py --pipeline_path=$pipeline_path \
                   --dataset_path=$dataset_path \
                   --ann_file=$ann_file \
                   --result_files=$result_files

@@ -70,7 +70,7 @@ class Yolov5PostProcess : public ObjectPostProcessBase {
                       const std::map<std::string, std::shared_ptr<void>> &configParamMap = {}) override;
 
  protected:
-    bool IsValidTensors(const std::vector<TensorBase> &tensors) const override;
+    bool IsValidTensors(const std::vector<TensorBase> &tensors) const;
 
     void ObjectDetectionOutput(const std::vector<TensorBase> &tensors,
                                std::vector<std::vector<ObjectInfo>> *objectInfos,

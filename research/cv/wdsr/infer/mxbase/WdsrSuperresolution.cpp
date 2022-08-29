@@ -23,6 +23,13 @@
 #include "MxBase/DvppWrapper/DvppWrapper.h"
 #include "MxBase/Log/Log.h"
 
+namespace localParameter {
+    const uint32_t VECTOR_FIRST_INDEX = 0;
+    const uint32_t VECTOR_SECOND_INDEX = 1;
+    const uint32_t VECTOR_THIRD_INDEX = 2;
+    const uint32_t VECTOR_FOURTH_INDEX = 3;
+    const uint32_t VECTOR_FIFTH_INDEX = 4;
+}
 
 APP_ERROR WdsrSuperresolution::Init(const InitParam &initParam) {
     deviceId_ = initParam.deviceId;
@@ -43,9 +50,9 @@ APP_ERROR WdsrSuperresolution::Init(const InitParam &initParam) {
         return ret;
     }
 
-    uint32_t outputModelHeight = modelDesc_.outputTensors[0].tensorDims[MxBase::VECTOR_THIRD_INDEX];
-    uint32_t inputModelHeight = modelDesc_.inputTensors[0].tensorDims[MxBase::VECTOR_SECOND_INDEX];
-    uint32_t inputModelWidth = modelDesc_.inputTensors[0].tensorDims[MxBase::VECTOR_THIRD_INDEX];
+    uint32_t outputModelHeight = modelDesc_.outputTensors[0].tensorDims[localParameter::VECTOR_THIRD_INDEX];
+    uint32_t inputModelHeight = modelDesc_.inputTensors[0].tensorDims[localParameter::VECTOR_SECOND_INDEX];
+    uint32_t inputModelWidth = modelDesc_.inputTensors[0].tensorDims[localParameter::VECTOR_THIRD_INDEX];
 
     scale_ = outputModelHeight/inputModelHeight;
     maxEdge_ = inputModelWidth > inputModelHeight ? inputModelWidth:inputModelHeight;
@@ -122,9 +129,9 @@ APP_ERROR WdsrSuperresolution::PostProcess(std::vector<MxBase::TensorBase> *inpu
             LogError << GetError(ret) << "Tensor deploy to host failed.";
             return ret;
         }
-        uint32_t outputModelChannel = tensor.GetShape()[MxBase::VECTOR_SECOND_INDEX];
-        uint32_t outputModelHeight = tensor.GetShape()[MxBase::VECTOR_THIRD_INDEX];
-        uint32_t outputModelWidth = tensor.GetShape()[MxBase::VECTOR_FOURTH_INDEX];
+        uint32_t outputModelChannel = tensor.GetShape()[localParameter::VECTOR_SECOND_INDEX];
+        uint32_t outputModelHeight = tensor.GetShape()[localParameter::VECTOR_THIRD_INDEX];
+        uint32_t outputModelWidth = tensor.GetShape()[localParameter::VECTOR_FOURTH_INDEX];
         LogInfo << "Channel:" << outputModelChannel << " Height:"
                 << outputModelHeight << " Width:" <<outputModelWidth;
 
