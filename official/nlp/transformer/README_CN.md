@@ -333,7 +333,7 @@ Parameters for learning rate:
 
 - 将原数据转化为MindRecord数据格式进行评估：
 
-    - 'bucket' 参数通过yaml文件配置
+    - 'bucket' 参数通过yaml文件配置为[128]
 
     ``` bash
     paste newstest2014.tok.bpe.32000.en newstest2014.tok.bpe.32000.de > test.all
