@@ -242,9 +242,9 @@ class RPN(nn.Cell):
                 valid_flag_list = self.concat(multi_level_flags)
                 anchor_using_list = self.concat(anchor_list_tuple)
 
-                gt_bboxes_i = self.squeeze(gt_bboxes[i:i + 1:1, ::])
-                gt_labels_i = self.squeeze(gt_labels[i:i + 1:1, ::])
-                gt_valids_i = self.squeeze(gt_valids[i:i + 1:1, ::])
+                gt_bboxes_i = self.squeeze(gt_bboxes[i])
+                gt_labels_i = self.squeeze(gt_labels[i])
+                gt_valids_i = self.squeeze(gt_valids[i])
 
                 bbox_target, bbox_weight, label, label_weight = self.get_targets(gt_bboxes_i,
                                                                                  gt_labels_i,

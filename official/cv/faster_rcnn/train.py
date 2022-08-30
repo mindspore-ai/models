@@ -20,7 +20,9 @@ import time
 from pprint import pprint
 import numpy as np
 import mindspore as ms
-from mindspore import Tensor, Parameter
+import mindspore.ops as ops
+import mindspore.nn as nn
+from mindspore import Tensor, Parameter, ParameterTuple
 from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
 from mindspore.train import Model
@@ -28,6 +30,7 @@ from mindspore.context import ParallelMode
 from mindspore.nn import SGD, Adam
 from mindspore.common import set_seed
 from mindspore.train.callback import SummaryCollector
+from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
 from src.FasterRcnn.faster_rcnn import Faster_Rcnn
 from src.network_define import LossCallBack, WithLossCell, TrainOneStepCell, LossNet
 from src.dataset import data_to_mindrecord_byte_image, create_fasterrcnn_dataset
@@ -35,6 +38,44 @@ from src.lr_schedule import dynamic_lr, multistep_lr
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.device_adapter import get_device_id
+
+class TrainOneStepCellCPU(nn.Cell):
+    """
+    Network training package class.
+
+    Append an optimizer to the training network after that the construct function
+    can be called to create the backward graph.
+
+    Args:
+        network (Cell): The training network.
+        optimizer (Cell): Optimizer for updating the weights.
+        sens (Number): The adjust parameter. Default value is 1.0.
+        reduce_flag (bool): The reduce flag. Default value is False.
+        mean (bool): Allreduce method. Default value is False.
+        degree (int): Device number. Default value is None.
+    """
+
+    def __init__(self, network, optimizer, sens=1.0, reduce_flag=False, mean=True, degree=None):
+        super(TrainOneStepCellCPU, self).__init__(auto_prefix=False)
+        self.network = network
+        self.network.set_grad()
+        self.weights = ParameterTuple(network.trainable_params())
+        self.optimizer = optimizer
+        self.grad = ops.GradOperation(get_by_list=True,
+                                      sens_param=True)
+        self.sens = Tensor([sens,], ms.float32)
+        self.reduce_flag = reduce_flag
+        if reduce_flag:
+            self.grad_reducer = DistributedGradReducer(optimizer.parameters, mean, degree)
+
+    def construct(self, x, img_shape, gt_bboxe, gt_label, gt_num):
+        weights = self.weights
+        loss = self.network(x, img_shape, gt_bboxe, gt_label, gt_num)
+        grads = self.grad(self.network, weights)(x, img_shape, gt_bboxe, gt_label, gt_num, self.sens)
+        if self.reduce_flag:
+            grads = self.grad_reducer(grads)
+
+        return ops.depend(loss, self.optimizer(grads))
 
 
 def train_fasterrcnn_():
@@ -186,7 +227,10 @@ def train_fasterrcnn():
         opt = Adam(params=net.trainable_params(), learning_rate=lr, weight_decay=config.weight_decay)
     net_with_loss = WithLossCell(net, loss)
     print(f"[{rank}]", "\tDone!\n")
-    net = TrainOneStepCell(net_with_loss, opt, scale_sense=config.loss_scale)
+    if config.device_target == "CPU":
+        net = TrainOneStepCellCPU(net_with_loss, opt, sens=config.loss_scale)
+    else:
+        net = TrainOneStepCell(net_with_loss, opt, scale_sense=config.loss_scale)
     print(f"\n[{rank}]", "===> Creating callbacks...")
     time_cb = TimeMonitor(data_size=dataset_size)
     loss_cb = LossCallBack(per_print_times=dataset_size, rank_id=rank, lr=lr.asnumpy())

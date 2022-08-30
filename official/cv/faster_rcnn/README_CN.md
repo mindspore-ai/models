@@ -46,9 +46,58 @@ Faster R-CNN是一个两阶段目标检测网络，该网络采用RPN，可以�
 - 数据格式：图像和json文件
     - 注意：数据在dataset.py中处理。
 
+使用的数据集：[FaceMaskDetection](<https://www.kaggle.com/datasets/andrewmvd/face-mask-detection/>)
+
+- 数据集大小：417M
+    - 训练集：415M，853个图像  
+    - 标注集：1.6M，实例，字幕，person_keypoints等
+- 数据格式：图像和json文件
+    - 需要将XML格式数据转化为COCO格式数据
+
+ ```text
+1.数据划分,splitdata.py，将下载的原始数据解压放在/data目录下，包含images图像目录和annotations标注目录（格式为XML格式），在执行split_data.py之后，会对原始数据进行划分，得到训练集/data/train/和验证集/data/val/
+此时/data目录结构如下
+└─data
+  ├─train
+    ├─images
+    └─annotations
+  ├─val
+    ├─images
+    └─annotations
+  ├─images
+  └─annotations
+2.xml转coco,xml2coco.py,第1步对数据划分后，标注格式是XML格式，需要将XML转成COCO格式
+2.0 在/data目录下新建face_detction目录，在facedetection新建annotations目录
+2.1 生成COCO格式训练集，python xml2coco.py --data_path /data/train/ --save_path /data/face_detection/annotations/instances_train2017.json
+2.2 生存COCO格式验证集, python xml2coco.py --data_path /data/val/ --save_path /data/face_detection/annotations/instances_val2017.json
+2.3 将/data/train/images 复制到/data/face_detection/下，并重命名为train2017；将/data/val/images 复制到/data/face_detection/下，并重命名为val2017
+最终数据及目录结构如下,在训练和推理中主要涉及face_detction目录
+└─data
+  ├─train
+    ├─images
+        └─*.png
+    └─annotations
+        └─*.xml
+  ├─val
+    ├─images
+        └─*.png
+    └─annotations
+        └─*.xml
+  ├─images
+  ├─annotations
+  └─face_detection
+    ├─train2017
+        └─*.png
+    ├─val2017
+        └─*.png
+    └─annotations
+        ├─instances_train2017.json
+        └─instances_val2017.json
+```
+
 # 环境要求
 
-- 硬件（Ascend/GPU）
+- 硬件（Ascend/GPU/CPU）
 
     - 使用Ascend处理器来搭建硬件环境。
 
@@ -139,7 +188,18 @@ bash run_standalone_train_gpu.sh [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MIND
 bash run_distribute_train_gpu.sh [DEVICE_NUM] [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
 
 # 评估
-bash run_eval_gpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
+python eval.py --anno_path=[ANN_FILE] --checkpoint_path=[CHECKPOINT_PATH] --coco_root=[FACE_DETECTION_PATH] --config_path=[CONFIG_PATH]
+```
+
+## 在CPU上运行
+
+```shell
+
+
+# 单机训练
+python train.py --config_path=[CONFIG_PATH] --pre_trained=[PRE_TRAINED] --coco_root=[FACE_DETECTION_PATH]
+# 评估
+python eval.py --anno_path=[ANN_FILE] --checkpoint_path=[CHECKPOINT_PATH] --coco_root=[FACE_DETECTION_PATH] --config_path=[CONFIG_PATH]
 ```
 
 ## 在docker上运行
@@ -172,7 +232,7 @@ bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_MODEL] [BACKBO
 
 ```shell
 # 评估
-bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
+python eval.py --anno_path=[ANN_FILE] --checkpoint_path=[CHECKPOINT_PATH] --coco_root=[FACE_DETECTION_PATH] --config_path=[CONFIG_PATH]
 ```
 
 5. 推理
@@ -326,7 +386,8 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
       ├─device_adapter.py            // 获取云上id
       ├─local_adapter.py             // 获取本地id
       └─moxing_adapter.py            // 云上数据准备
-  ├─default_config.yaml              // Resnet50相关配置
+  ├─default_config.yaml              // Resnet50相关配置,COCO数据集
+  ├─fasterrcnn_facemask_config_cpu.yaml              // Resnet50相关配置，FaceMaskDetection数据集
   ├─default_config_101.yaml          // Resnet101相关配置
   ├─default_config_152.yaml          // Resnet152相关配置
   ├─default_config_InceptionResnetV2.yaml   // inception resnet v2相关配置
@@ -373,6 +434,13 @@ bash run_standalone_train_gpu.sh [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MIND
 
 # GPU分布式训练
 bash run_distribute_train_gpu.sh [DEVICE_NUM] [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
+```
+
+#### 在CPU上运行
+
+```shell
+# CPU单机训练
+python train.py --config_path=[CONFIG_PATH] --pre_trained=[PRE_TRAINED] --coco_root=[FACE_DETECTION_PATH]
 ```
 
 Notes:
@@ -439,6 +507,13 @@ bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COC
 bash run_eval_gpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
 ```
 
+#### 在CPU上运行
+
+```shell
+# CPU评估
+python eval.py --anno_path=[ANN_FILE] --checkpoint_path=[CHECKPOINT_PATH] --coco_root=[FACE_DETECTION_PATH] --config_path=[CONFIG_PATH]
+```
+
 > 在训练过程中生成检查点。
 >
 > 数据集中图片的数量要和VALIDATION_JSON_FILE文件中标记数量一致，否则精度结果展示格式可能出现异常。
@@ -448,6 +523,7 @@ bash run_eval_gpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_R
 评估结果将保存在示例路径中，文件夹名为“eval”。在此文件夹下，您可以在日志中找到类似以下的结果。
 
 ```log
+COCO2017数据集结果
  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.360
  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.586
  Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.385
@@ -460,6 +536,22 @@ bash run_eval_gpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_R
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.346
  Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.562
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.631
+```
+
+```log
+FaceMaskDetction结果
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.595
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.906
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.722
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.564
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.618
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.827
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.252
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.599
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.647
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.616
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.672
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.857
 ```
 
 ## 模型导出
@@ -512,34 +604,34 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
 
 ### 训练性能
 
-| 参数 |Ascend |GPU |
-| -------------------------- | ----------------------------------------------------------- |----------------------------------------------------------- |
-| 模型版本 | V1 |V1 |
-| 资源 | Ascend 910；CPU 2.60GHz，192核；内存：755G |V100-PCIE 32G            |
-| 上传日期 | 2020/8/31 | 2021/2/10 |
-| MindSpore版本 | 1.0.0 |1.2.0 |
-| 数据集 | COCO 2017 |COCO 2017 |
-| 训练参数 | epoch=12, batch_size=2 |epoch=12, batch_size=2 |
-| 优化器 | SGD |SGD |
-| 损失函数 | Softmax交叉熵，Sigmoid交叉熵，SmoothL1Loss |Softmax交叉熵，Sigmoid交叉熵，SmoothL1Loss |
-| 速度 | 1卡：190毫秒/步；8卡：200毫秒/步 | 1卡：320毫秒/步；8卡：335毫秒/步 |
-| 总时间 | 1卡：37.17小时；8卡：4.89小时 |1卡：63.09小时；8卡：8.25小时 |
-| 参数(M) | 250 |250 |
-| 脚本 | [Faster R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) | [Faster R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
+| 参数 |Ascend |GPU |CPU|
+| -------------------------- | ----------------------------------------------------------- |----------------------------------------------------------- |------|
+| 模型版本 | V1 |V1 |V1|
+| 资源 | Ascend 910；CPU 2.60GHz，192核；内存：755G |V100-PCIE 32G            |V100-PCIE 32G|
+| 上传日期 | 2020/8/31 | 2021/2/10 |2022/8/10|
+| MindSpore版本 | 1.0.0 |1.2.0 |1.7.0|
+| 数据集 | COCO 2017 |COCO 2017 |FaceMaskDetection|
+| 训练参数 | epoch=12, batch_size=2 |epoch=12, batch_size=2 |epoch=20,batch_size=2|
+| 优化器 | SGD |SGD |SGD|
+| 损失函数 | Softmax交叉熵，Sigmoid交叉熵，SmoothL1Loss |Softmax交叉熵，Sigmoid交叉熵，SmoothL1Loss |Softmax交叉熵，Sigmoid交叉熵，SmoothL1Loss|
+| 速度 | 1卡：190毫秒/步；8卡：200毫秒/步 | 1卡：320毫秒/步；8卡：335毫秒/步 |1卡：7328毫秒/步|
+| 总时间 | 1卡：37.17小时；8卡：4.89小时 |1卡：63.09小时；8卡：8.25小时 |1卡：13.88小时|
+| 参数(M) | 250 |250 |495|
+| 脚本 | [Faster R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) | [Faster R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |[Faster R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
 
 ### 评估性能
 
-| 参数 | Ascend |GPU |
-| ------------------- | --------------------------- | --------------------------- |
-| 模型版本 | V1 |V1 |
-| 资源 | Ascend 910 |V100-PCIE 32G  |
-| 上传日期 | 2020/8/31 |2021/2/10 |
-| MindSpore版本 | 1.0.0 |1.2.0 |
-| 数据集 | COCO2017 |COCO2017 |
-| batch_size | 2 | 2 |
-| 输出 | mAP |mAP |
-| 准确率 | IoU=0.50：58.6%  |IoU=0.50：59.1%  |
-| 推理模型 | 250M（.ckpt文件） |250M（.ckpt文件） |
+| 参数 | Ascend |GPU |CPU|
+| ------------------- | --------------------------- | --------------------------- |-----|
+| 模型版本 | V1 |V1 |V1|
+| 资源 | Ascend 910 |V100-PCIE 32G  |V100-PCIE 32G|
+| 上传日期 | 2020/8/31 |2021/2/10 |2022/8/10|
+| MindSpore版本 | 1.0.0 |1.2.0 |1.7.0|
+| 数据集 | COCO2017 |COCO2017 |FaceMaskDetection|
+| batch_size | 2 | 2 |2|
+| 输出 | mAP |mAP |mAP|
+| 准确率 | IoU=0.50：58.6%  |IoU=0.50：59.1%  |IoU=0.5: 90.6%|
+| 推理模型 | 250M（.ckpt文件） |250M（.ckpt文件） |495M（.ckpt文件）|
 
 # ModelZoo主页
 

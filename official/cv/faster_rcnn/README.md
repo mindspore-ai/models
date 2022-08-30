@@ -46,9 +46,18 @@ Dataset used: [COCO2017](<https://cocodataset.org/>)
 - Data format：image and json files
     - Note：Data will be processed in dataset.py
 
+Dataset used: [FaceMaskDetection](<https://cocodataset.org/>)
+
+- Dataset size：417M
+    - Train：415M，853 images
+    - Val：1G，5000 images
+    - Annotations：1.6M，instances
+- Data format：image and json files
+    - Note：Data will be processed in dataset.py
+
 # Environment Requirements
 
-- Hardware（Ascend/GPU）
+- Hardware（Ascend/GPU/CPU）
 
     - Prepare hardware environment with Ascend processor.
 
@@ -140,6 +149,17 @@ bash run_distribute_train_gpu.sh [DEVICE_NUM] [PRETRAINED_MODEL] [BACKBONE] [COC
 
 # eval
 bash run_eval_gpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
+```
+
+## Run on CPU
+
+```shell
+
+# standalone training
+bash run_standalone_train_cpu.sh [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
+
+# eval
+bash run_eval_cpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
 ```
 
 ## Run in docker
@@ -299,9 +319,11 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
     ├─run_standalone_train_gpu.sh     // shell script for standalone on GPU
     ├─run_distribute_train_ascend.sh  // shell script for distributed on ascend
     ├─run_distribute_train_gpu.sh     // shell script for distributed on GPU
+    ├─run_distribute_train_cpu.sh     // shell script for distributed on CPU
     ├─run_infer_310.sh                // shell script for 310 inference
     └─run_eval_ascend.sh              // shell script for eval on ascend
     └─run_eval_gpu.sh                 // shell script for eval on GPU
+    └─run_eval_cpu.sh                 // shell script for eval on CPU
     └─run_eval_onnx.sh                // shell script for ONNX model evaluation
   ├─src
     ├─FasterRcnn
@@ -376,6 +398,13 @@ bash run_standalone_train_gpu.sh [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MIND
 bash run_distribute_train_gpu.sh [DEVICE_NUM] [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
 ```
 
+#### on CPU
+
+```shell
+# standalone training on cpu
+bash run_standalone_train_cpu.sh [PRETRAINED_MODEL] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
+```
+
 Notes:
 
 1. Rank_table.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
@@ -440,6 +469,13 @@ bash run_eval_ascend.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COC
 bash run_eval_gpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
 ```
 
+#### on CPU
+
+```shell
+# eval on CPU
+bash run_eval_cpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](optional)
+```
+
 > checkpoint can be produced in training process.
 >
 > Images size in dataset should be equal to the annotation size in VALIDATION_JSON_FILE, otherwise the evaluation result cannot be displayed properly.
@@ -449,6 +485,7 @@ bash run_eval_gpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_R
 Eval result will be stored in the example path, whose folder name is "eval". Under this, you can find result like the following in log.
 
 ```log
+Result on COCO2017 dataset
  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.360
  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.586
  Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.385
@@ -461,6 +498,22 @@ Eval result will be stored in the example path, whose folder name is "eval". Und
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.346
  Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.562
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.631
+```
+
+```log
+Result on FaceMaskDetection dataset
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.593
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.905
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.721
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.554
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.640
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.843
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.256
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.605
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.649
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.611
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.694
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.871
 ```
 
 ## Model Export
@@ -547,20 +600,20 @@ Inference result is saved in current path, you can find result like this in acc.
 
 #### ResNet-50 backbone
 
-| Parameters                 | Ascend                                                      | GPU                                                 |
-| -------------------------- | ----------------------------------------------------------- |---------------------------------------------------- |
-| Model Version              | V1                                                          | V1                                                  |
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | 8 x RTX3090 24GB                                    |
-| uploaded Date              | 08/31/2020 (month/day/year)                                 | 11/19/2021 (month/day/year)                         |
-| MindSpore Version          | 1.0.0                                                       | 1.3.0                                               |
-| Dataset                    | COCO2017                                                    | COCO2017                                            |
-| Training Parameters        | epoch=12,  batch_size=2                                     | epoch=20,  batch_size=2                             |
-| Optimizer                  | SGD                                                         | SGD                                                 |
-| Loss Function              | Softmax Cross Entropy ,Sigmoid Cross Entropy,SmoothL1Loss   | Softmax Cross Entropy ,Sigmoid Cross Entropy,SmoothL1Loss |
-| Speed                      | 1pc: 190 ms/step;  8pcs: 200 ms/step                        | 1pc: 288 ms/step;  8pcs: 346 ms/step                |
-| Total time                 | 1pc: 37.17 hours;  8pcs: 4.89 hours                         | 1pc: 63.09 hours;  8pcs: 8.25 hours                 |
-| Parameters (M)             | 250                                                         | 250                                                 |
-| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
+| Parameters                 | Ascend                                                      | GPU                                                 |CPU|
+| -------------------------- | ----------------------------------------------------------- |---------------------------------------------------- |---|
+| Model Version              | V1                                                          | V1                                                  |V1|
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | 8 x RTX3090 24GB                                    |OS Euler2.8 |
+| uploaded Date              | 08/31/2020 (month/day/year)                                 | 11/19/2021 (month/day/year)                         |8/10/2022 (month/day/year)|
+| MindSpore Version          | 1.0.0                                                       | 1.3.0                                               |1.7.0|
+| Dataset                    | COCO2017                                                    | COCO2017                                            |FaceMaskDetection|
+| Training Parameters        | epoch=12,  batch_size=2                                     | epoch=20,  batch_size=2                             |epoch=20,batch_size=2|
+| Optimizer                  | SGD                                                         | SGD                                                 |SGD|
+| Loss Function              | Softmax Cross Entropy ,Sigmoid Cross Entropy,SmoothL1Loss   | Softmax Cross Entropy ,Sigmoid Cross Entropy,SmoothL1Loss |Softmax Cross Entropy ,Sigmoid Cross Entropy,SmoothL1Loss |
+| Speed                      | 1pc: 190 ms/step;  8pcs: 200 ms/step                        | 1pc: 288 ms/step;  8pcs: 346 ms/step                |1pc: 7328 ms/step|
+| Total time                 | 1pc: 37.17 hours;  8pcs: 4.89 hours                         | 1pc: 63.09 hours;  8pcs: 8.25 hours                 |1pc:13.88 hours|
+| Parameters (M)             | 250                                                         | 250                                                 |495M|
+| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
 
 #### ResNet-101 backbone
 
@@ -582,17 +635,17 @@ Inference result is saved in current path, you can find result like this in acc.
 
 #### ResNet-50 backbone
 
-| Parameters          | Ascend                      | GPU                        |
-| ------------------- | --------------------------- |--------------------------- |
-| Model Version       | V1                          | V1                         |
-| Resource            | Ascend 910; OS Euler2.8     | 8 x RTX3090 24GB           |
-| Uploaded Date       | 08/31/2020 (month/day/year) | 11/19/2021 (month/day/year)|
-| MindSpore Version   | 1.0.0                       | 1.3.0                      |
-| Dataset             | COCO2017                    | COCO2017                   |
-| batch_size          | 2                           | 2                          |
-| outputs             | mAP                         | mAP                        |
-| Accuracy            | IoU=0.50: 58.6%             | IoU=0.50: 61.3%            |
-| Model for inference | 250M (.ckpt file)           | 500M (.ckpt file)          |
+| Parameters          | Ascend                      | GPU                        |CPU|
+| ------------------- | --------------------------- |--------------------------- |----------|
+| Model Version       | V1                          | V1                         |V1|
+| Resource            | Ascend 910; OS Euler2.8     | 8 x RTX3090 24GB           |OS Euler2.8|
+| Uploaded Date       | 08/31/2020 (month/day/year) | 11/19/2021 (month/day/year)|8/10/2022 (month/day/year)|
+| MindSpore Version   | 1.0.0                       | 1.3.0                      |1.7.0|
+| Dataset             | COCO2017                    | COCO2017                   |FaceMaskDetection|
+| batch_size          | 2                           | 2                          |2|
+| outputs             | mAP                         | mAP                        |mAP|
+| Accuracy            | IoU=0.50: 58.6%             | IoU=0.50: 61.3%            |IoU=0.5: 90.5%|
+| Model for inference | 250M (.ckpt file)           | 500M (.ckpt file)          |495M(.ckpt file)|
 
 #### ResNet-101 backbone
 
