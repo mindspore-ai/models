@@ -144,8 +144,7 @@ class sphere20a(nn.Cell):
         self.relu4_3 = nn.PReLU(512)
 
         self.fc5 = nn.Dense(512*7*6, 512, bias_init='normal')
-        if not self.feature:
-            self.fc6 = AngleLinear(512, self.classnum)
+        self.fc6 = AngleLinear(512, self.classnum)
         print('*'*20)
         print(self.classnum)
         print('*'*20)
@@ -171,7 +170,6 @@ class sphere20a(nn.Cell):
         x = reshape(x, (x.shape[0], -1))
 
         x = self.fc5(x)
-
-        if self.feature: return x
-        x = self.fc6(x)
+        if not self.feature:
+            return self.fc6(x)
         return x
