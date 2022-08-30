@@ -24,6 +24,14 @@
 #include "acl/acl.h"
 
 
+namespace localParameter {
+    const uint32_t VECTOR_FIRST_INDEX = 0;
+    const uint32_t VECTOR_SECOND_INDEX = 1;
+    const uint32_t VECTOR_THIRD_INDEX = 2;
+    const uint32_t VECTOR_FOURTH_INDEX = 3;
+    const uint32_t VECTOR_FIFTH_INDEX = 4;
+}
+
 namespace {
 // Output Tensor
 const int OUTPUT_TENSOR_SIZE = 4;
@@ -133,39 +141,45 @@ bool MaskRcnnMindsporePost::IsValidTensors(const std::vector<TensorBase> &tensor
     }
 
     uint32_t total_num = classNum_ * rpnMaxNum_;
-    if (bboxShape[VECTOR_SECOND_INDEX] != total_num) {
-        LogError << "The output tensor is mismatched: " << total_num << "/" << bboxShape[VECTOR_SECOND_INDEX] << ").";
+    if (bboxShape[localParameter::VECTOR_SECOND_INDEX] != total_num) {
+        LogError << "The output tensor is mismatched: " << total_num << "/"
+                 << bboxShape[localParameter::VECTOR_SECOND_INDEX] << ").";
         return false;
     }
 
-    if (bboxShape[VECTOR_THIRD_INDEX] != OUTPUT_BBOX_TWO_INDEX_SHAPE) {
-        LogError << "The number of bbox[" << VECTOR_THIRD_INDEX << "] dimensions (" << bboxShape[VECTOR_THIRD_INDEX]
+    if (bboxShape[localParameter::VECTOR_THIRD_INDEX] != OUTPUT_BBOX_TWO_INDEX_SHAPE) {
+        LogError << "The number of bbox[" << localParameter::VECTOR_THIRD_INDEX << "] dimensions ("
+                 << bboxShape[localParameter::VECTOR_THIRD_INDEX]
                  << ") is not equal to (" << OUTPUT_BBOX_TWO_INDEX_SHAPE << ")";
         return false;
     }
 
     auto classShape = tensors[OUTPUT_CLASS_INDEX].GetShape();
-    if (classShape[VECTOR_SECOND_INDEX] != total_num) {
-        LogError << "The output tensor is mismatched: (" << total_num << "/" << classShape[VECTOR_SECOND_INDEX]
+    if (classShape[localParameter::VECTOR_SECOND_INDEX] != total_num) {
+        LogError << "The output tensor is mismatched: (" << total_num << "/"
+                 << classShape[localParameter::VECTOR_SECOND_INDEX]
                  << "). ";
         return false;
     }
 
     auto maskShape = tensors[OUTPUT_MASK_INDEX].GetShape();
-    if (maskShape[VECTOR_SECOND_INDEX] != total_num) {
-        LogError << "The output tensor is mismatched: (" << total_num << "/" << maskShape[VECTOR_SECOND_INDEX] << ").";
+    if (maskShape[localParameter::VECTOR_SECOND_INDEX] != total_num) {
+        LogError << "The output tensor is mismatched: (" << total_num << "/"
+                 << maskShape[localParameter::VECTOR_SECOND_INDEX] << ").";
         return false;
     }
 
     auto maskAreaShape = tensors[OUTPUT_MASK_AREA_INDEX].GetShape();
-    if (maskAreaShape[VECTOR_SECOND_INDEX] != total_num) {
-        LogError << "The output tensor is mismatched: (" << total_num << "/" << maskAreaShape[VECTOR_SECOND_INDEX]
+    if (maskAreaShape[localParameter::VECTOR_SECOND_INDEX] != total_num) {
+        LogError << "The output tensor is mismatched: (" << total_num << "/"
+                 << maskAreaShape[localParameter::VECTOR_SECOND_INDEX]
                  << ").";
         return false;
     }
 
-    if (maskAreaShape[VECTOR_THIRD_INDEX] != maskSize_) {
-        LogError << "The output tensor of mask is mismatched: (" << maskAreaShape[VECTOR_THIRD_INDEX] << "/"
+    if (maskAreaShape[localParameter::VECTOR_THIRD_INDEX] != maskSize_) {
+        LogError << "The output tensor of mask is mismatched: ("
+                 << maskAreaShape[localParameter::VECTOR_THIRD_INDEX] << "/"
                  << maskSize_ << ").";
         return false;
     }
@@ -186,8 +200,8 @@ static void GetDetectBoxesTopK(std::vector<MxBase::DetectBox> &detBoxes, size_t 
     detBoxes.erase(detBoxes.begin() + kVal, detBoxes.end());
 }
 
-void MaskRcnnMindsporePost::GetValidDetBoxes(const std::vector<TensorBase> &tensors, std::vector<DetectBox> &detBoxes,
-                                             const uint32_t batchNum) {
+void MaskRcnnMindsporePost::GetValidDetBoxes(const std::vector<TensorBase> &tensors,
+                                             std::vector<DetectBox> &detBoxes, const uint32_t batchNum) {
     LogInfo << "Begin to GetValidDetBoxes Mask GetValidDetBoxes.";
     auto *bboxPtr = reinterpret_cast<aclFloat16 *>(GetBuffer(tensors[OUTPUT_BBOX_INDEX], batchNum));
     auto *labelPtr = reinterpret_cast<int32_t *>(GetBuffer(tensors[OUTPUT_CLASS_INDEX], batchNum));
@@ -228,8 +242,8 @@ APP_ERROR MaskRcnnMindsporePost::GetMaskSize(const ObjectInfo &objInfo, const Re
     int width = static_cast<int>(objInfo.x1 - objInfo.x0 + 1);
     int height = static_cast<int>(objInfo.y1 - objInfo.y0 + 1);
     if (width < 1 || height < 1) {
-        LogError << "The mask bbox is invalid, will be ignored, bboxWidth: " << width << ", bboxHeight: " << height
-                 << ".";
+        LogError << "The mask bbox is invalid, will be ignored, bboxWidth: " <<
+                 width << ", bboxHeight: " << height << ".";
         return APP_ERR_COMM_FAILURE;
     }
 
@@ -238,7 +252,8 @@ APP_ERROR MaskRcnnMindsporePost::GetMaskSize(const ObjectInfo &objInfo, const Re
     return APP_ERR_OK;
 }
 
-APP_ERROR MaskRcnnMindsporePost::MaskPostProcess(ObjectInfo &objInfo, void *maskPtr, const ResizedImageInfo &imgInfo) {
+APP_ERROR MaskRcnnMindsporePost::MaskPostProcess(ObjectInfo &objInfo, void *maskPtr,
+                                                 const ResizedImageInfo &imgInfo) {
     // resize
     cv::Mat maskMat(maskSize_, maskSize_, CV_32FC1);
     auto *maskAclPtr = reinterpret_cast<aclFloat16 *>(maskPtr);
