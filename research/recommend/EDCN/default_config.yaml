@@ -68,6 +68,13 @@ TrainConfig:
     eval_callback: True
     loss_callback: True
 
+# src/preprocess_data.py  "Recommendation dataset"
+dense_dim: 13
+slot_dim: 26
+threshold: 100
+train_line_count: 45840617
+skip_id_convert: 0
+
 ---
 # Help description for each configuration
 # Parameters that been used on ModelArts
@@ -89,6 +96,12 @@ checkpoint_path: " Relative path of '*.ckpt' to be evaluated relative to the eva
 ckpt_file: "Checkpoint file path."
 file_name: "Output file name."
 file_format: "Output file format, you can choose from AIR or MINDIR, default is AIR"
+# Parameters that been used for preprocessing data
+dense_dim: 'The number of your continues fields'
+slot_dim: 'The number of your sparse fields, it can also be called catelogy features.'
+threshold: 'Word frequency below this will be regarded as OOV. It aims to reduce the vocab size'
+train_line_count: 'The number of examples in your dataset'
+skip_id_convert: 'Skip the id convert, regarding the original id as the final id.'
 ---
 #Choices
 device_target: ["Ascend"]
