@@ -29,16 +29,17 @@ if [ $# == 3 ]; then
     DEVICE_TARGET=$3
 fi
 
-python preprocess_dataset.py --dataset $DATA_NAME --device_target $DEVICE_TARGET &> scripts/train_standalone_log &
 
 if [ "$DEVICE_TARGET" = "GPU" ];
 then
   export CUDA_VISIBLE_DEVICES=$2
+  python preprocess_dataset.py --dataset $DATA_NAME --device_target $DEVICE_TARGET &> scripts/train_standalone_log &&
   python train.py --dataset $DATA_NAME --device_target $DEVICE_TARGET --device_id 0 &>> scripts/train_standalone_log &
 fi
 
 if [ "$DEVICE_TARGET" = "Ascend" ];
 then
   export DEVICE_ID=$2
+  python preprocess_dataset.py --dataset $DATA_NAME --device_target $DEVICE_TARGET &> scripts/train_standalone_log &&
   python train.py --dataset $DATA_NAME --device_target $DEVICE_TARGET --device_id $DEVICE_ID &>> scripts/train_standalone_log &
 fi
