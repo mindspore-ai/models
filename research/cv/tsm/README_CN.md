@@ -46,14 +46,11 @@ TSM应用了一种通用而有效的时间转移模块。  时间转移模块将
 
 # 数据集
 
-使用的数据集：[SomethingSometing-v2](<https://20bn.com/datasets/something-something/v2>)
+使用的数据集：[SomethingSometing-v2](https://download.mindspore.cn/dataset/somethingv2.tar)
 
-- 数据集大小：19.5G，共174个类、220,847段视频
-    - 训练集：16G，共168,913段视频
-    - 测试集：3.5G，共24,777段视频
-- 数据格式：Webm格式视频
-    - 注：数据将在src/tools/gen_label_sthv2.py中生成类标签。
-    - 注：数据将在src/tools/vid2img_sthv2.py中解析成jpg格式图像。
+- 数据集大小：281G，共174个类、220,847段视频
+    - 训练集：共168,913段视频
+    - 测试集：共24,777段视频
 
 # 特性
 
