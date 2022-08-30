@@ -22,14 +22,14 @@ from mindspore import context
 from mindspore.common.tensor import Tensor
 from mindspore.common import set_seed
 from mindspore.nn import TrainOneStepCell
+from mindspore.common import dtype as mstype
 from mindspore.communication.management import init
 from mindspore.context import ParallelMode
 from mindspore.train.serialization import save_checkpoint
-
 from src.logger import get_logger
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
-from src.model_utils.device_adapter import get_device_id, get_device_num
+from src.model_utils.device_adapter import get_device_id, get_device_num, get_rank_id
 from src.net import SBNetWork
 from src.dataloader import minddataset_loader, minddataset_loader_val
 
@@ -68,13 +68,22 @@ def run_train():
                         dense_size=config.dense_sizes,
                         lmbda=config.lmbda,
                         isize=config.isize, keep_prob=config.keep_prob)
-    lr = Tensor(float(config.lr))
+    lr = Tensor(float(config.lr), mstype.float32)
+    if config.enable_modelarts:
+        config.mindrecord_path = config.data_path
+        config.ckpt_path = os.path.join(config.output_path, 'ckpt_'+str(get_rank_id()))
+        if not os.path.exists(config.ckpt_path):
+            os.mkdir(config.ckpt_path)
+        config.logger.info("mkdir %s", config.ckpt_path)
+    else:
+        config.ckpt_path = './ckpt/'
     optimizer = nn.Adam(params=network.trainable_params(), learning_rate=lr, weight_decay=config.weight_decay)
     train_wrapper = TrainOneStepCell(network, optimizer=optimizer)
     train_size, val_size = get_data_size(config.mindrecord_path)
     rot_path = './train_rotation/train_rotation_dataset.mindrecord'
     nrot_path = './no_rotation/train_norotation_dataset.mindrecord'
     val_path = './val/validation_dataset.mindrecord'
+    print(os.listdir(config.mindrecord_path))
     rotation_data, _ = minddataset_loader(configs=config,
                                           mindfile=os.path.join(config.mindrecord_path, rot_path),
                                           no_batch_size=train_size)
@@ -130,7 +139,7 @@ def run_train():
         if final_mse_v <= stand_mse_v:
             stand_mse_v = final_mse_v
             config.logger.info("Saving checkpoint file")
-            save_checkpoint(train_wrapper, f'./ckpt/pafnucy_{final_mse_v}_{epoch}.ckpt')
+            save_checkpoint(train_wrapper, f'{config.ckpt_path}/pafnucy_{final_mse_v}_{epoch}.ckpt')
 
     config.logger.info("Finish Training.....")
 

@@ -38,6 +38,8 @@ def get_data_size(csv_path):
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_eval():
+    config.logger = get_logger('./', config.device_id)
+    config.logger.save_args(config)
     context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=config.device_id)
     network = SBNetWork(in_chanel=[19, 64, 128],
                         out_chanle=config.conv_channels,
@@ -45,7 +47,13 @@ def run_eval():
                         lmbda=config.lmbda,
                         isize=config.isize, keep_prob=1.0)
     network.set_train(False)
-    param_dict = load_checkpoint(config.ckpt_file)
+    if config.enable_modelarts:
+        config.mindrecord_path = config.data_path
+        config.ckpt_path = config.load_path
+        print("----------&&&&------", config.ckpt_path, flush=True)
+        param_dict = load_checkpoint(os.path.join(config.ckpt_path, config.ckpt_file))
+    else:
+        param_dict = load_checkpoint(config.ckpt_file)
     load_param_into_net(network, param_dict)
     val_size = get_data_size(config.mindrecord_path)
     val_path = './val/validation_dataset.mindrecord'
@@ -66,6 +74,4 @@ def run_eval():
 
 
 if __name__ == '__main__':
-    config.logger = get_logger('./', config.device_id)
-    config.logger.save_args(config)
     run_eval()

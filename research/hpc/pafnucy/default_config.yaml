@@ -3,9 +3,9 @@ enable_modelarts: False
 data_url: ""
 train_url: ""
 checkpoint_url: ""
-data_path: "/data/pafnucy/tests/data/dataset"
+data_path: "/cache/data"
 output_path: "/cache/train"
-load_path: "/cache/checkpoint_path"
+load_path: "/cache/data"
 mindrecord_path: ""
 device_target: Ascend
 enable_profiling: False
