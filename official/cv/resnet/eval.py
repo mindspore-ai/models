@@ -35,6 +35,7 @@ if config.net_name in ("resnet18", "resnet34", "resnet50", "resnet152"):
         from src.dataset import create_dataset1 as create_dataset
     else:
         from src.dataset import create_dataset2 as create_dataset
+
 elif config.net_name == "resnet101":
     from src.resnet import resnet101 as resnet
     from src.dataset import create_dataset3 as create_dataset
@@ -46,7 +47,6 @@ else:
 def eval_net():
     """eval net"""
     target = config.device_target
-
     # init context
     ms.set_context(mode=ms.GRAPH_MODE, device_target=target, save_graphs=False)
     if target == "Ascend":
