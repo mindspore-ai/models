@@ -69,7 +69,7 @@ def parallel_init(argv):
     context.set_auto_parallel_context(parallel_mode=parallel_mode, gradients_mean=True,
                                       device_num=degree, parameter_broadcast=True)
 
-if name == '__main__':
+if __name__ == '__main__':
     if args.is_distributed == 1:
         network_init(args)
         parallel_init(args)
