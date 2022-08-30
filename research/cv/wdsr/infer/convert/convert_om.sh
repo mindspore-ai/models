@@ -19,7 +19,7 @@ aipp_cfg_path=$2
 output_model_name=$3
 
 
-/usr/local/Ascend/atc/bin/atc \
+atc \
 --model=$model_path \
 --input_format=NCHW \
 --framework=1 \

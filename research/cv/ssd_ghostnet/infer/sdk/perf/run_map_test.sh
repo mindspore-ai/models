@@ -14,15 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-PY=/usr/bin/python3.7
-
 export PYTHONPATH=${PYTHONPATH}:.
 
 annotations_json=$1
 det_result_json=$2
 output_path_name=$3
 
-${PY} generate_map_report.py \
+python3 generate_map_report.py \
 --annotations_json=${annotations_json} \
 --det_result_json=${det_result_json} \
 --output_path_name=${output_path_name} \

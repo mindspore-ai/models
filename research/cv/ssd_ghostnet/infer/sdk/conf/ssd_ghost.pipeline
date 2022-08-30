@@ -31,7 +31,7 @@
         "mxpi_tensorinfer0": {
             "props": {
                 "dataSource": "mxpi_imageresize0",
-                "modelPath": "../../ssd_ghostnet.om"
+                "modelPath": "../ssd_ghostnet.om"
             },
             "factory": "mxpi_tensorinfer",
             "next": "mxpi_objectpostprocessor0"
@@ -41,7 +41,7 @@
                 "dataSource": "mxpi_tensorinfer0",
                 "postProcessConfigPath": "./ssd_ghost_fpn_ms_on_coco_postprocess.cfg",
                 "labelPath": "./coco.names",
-                "postProcessLibPath": "../mxManufacture/lib/libssdghostprocessor.so"
+                "postProcessLibPath": "libssdghostprocessor.so"
             },
             "factory": "mxpi_objectpostprocessor",
             "next": "mxpi_dataserialize0"

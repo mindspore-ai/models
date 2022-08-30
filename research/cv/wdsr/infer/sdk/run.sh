@@ -54,7 +54,7 @@ echo "enter $CUR_PATH"
 info() { echo -e "\033[1;34m[INFO ][MxStream] $1\033[1;37m" ; }
 warn() { echo >&2 -e "\033[1;31m[WARN ][MxStream] $1\033[1;37m" ; }
 
-export LD_LIBRARY_PATH=${MX_SDK_HOME}/lib:${MX_SDK_HOME}/opensource/lib:${MX_SDK_HOME}/opensource/lib64:/usr/local/Ascend/ascend-toolkit/latest/acllib/lib64:${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH=${MX_SDK_HOME}/lib:${MX_SDK_HOME}/opensource/lib:${MX_SDK_HOME}/opensource/lib64:/usr/local/Ascend/${ASCEND_VERSION}/latest/acllib/lib64:${LD_LIBRARY_PATH}
 
 #to set PYTHONPATH, import the StreamManagerApi.py
 export PYTHONPATH=$PYTHONPATH:${MX_SDK_HOME}/python

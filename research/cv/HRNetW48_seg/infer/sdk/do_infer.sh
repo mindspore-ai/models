@@ -48,7 +48,7 @@ mkdir ./inferResults
 
 echo "Inference results will be stored in ./inferResults/."
 
-python3.7 main.py --pipeline="../data/config/hrnetw48seg.pipeline" \
+python3 main.py --pipeline="../data/config/hrnetw48seg.pipeline" \
                   --data_path=$PATH1 \
                   --data_lst=$PATH2 \
                   --infer_result_path="./inferResults/"

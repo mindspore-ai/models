@@ -25,6 +25,15 @@ namespace {
     const int RIGHTBOTY = 2;
     const int RIGHTBOTX = 3;
 }
+
+namespace localParameter {
+    const uint32_t VECTOR_FIRST_INDEX = 0;
+    const uint32_t VECTOR_SECOND_INDEX = 1;
+    const uint32_t VECTOR_THIRD_INDEX = 2;
+    const uint32_t VECTOR_FOURTH_INDEX = 3;
+    const uint32_t VECTOR_FIFTH_INDEX = 4;
+}
+
 namespace MxBase {
     float SsdGhostPostProcess::CalcIou(DetectBox boxA, DetectBox boxB, IOUMethod method) {
         float left = std::max(boxA.x - boxA.width / 2.f, boxB.x - boxB.width / 2.f);
@@ -119,39 +128,43 @@ namespace MxBase {
 
     bool SsdGhostPostProcess::IsValidTensors(const std::vector<TensorBase> &tensors) const {
         auto shape = tensors[0].GetShape();
-        if (tensors.size() < VECTOR_THIRD_INDEX) {
+        if (tensors.size() < localParameter::VECTOR_THIRD_INDEX) {
             LogError << "number of tensors (" << tensors.size() << ") " << "is less than required ("
-                     << VECTOR_THIRD_INDEX << ")";
+                     << localParameter::VECTOR_THIRD_INDEX << ")";
             return false;
         }
-        if (shape.size() != VECTOR_FOURTH_INDEX) {
+        if (shape.size() != localParameter::VECTOR_FOURTH_INDEX) {
             LogError << "number of tensor[0] dimensions (" << shape.size() << ") " << "is not equal to ("
-                     << VECTOR_FOURTH_INDEX << ")";
+                     << localParameter::VECTOR_FOURTH_INDEX << ")";
             return false;
         }
-        if (shape[VECTOR_SECOND_INDEX] != (uint32_t)objectNum_) {
-            LogError << "dimension of tensor[0][1] (" << shape[VECTOR_SECOND_INDEX] << ") " << "is not equal to ("
+        if (shape[localParameter::VECTOR_SECOND_INDEX] != (uint32_t)objectNum_) {
+            LogError << "dimension of tensor[0][1] (" << shape[localParameter::VECTOR_SECOND_INDEX]
+                     << ") " << "is not equal to ("
                      << objectNum_ << ")";
             return false;
         }
-        if (shape[VECTOR_THIRD_INDEX] != BOX_DIM) {
-            LogError << "dimension of tensor[0][2] (" << shape[VECTOR_THIRD_INDEX] << ") " << "is not equal to ("
+        if (shape[localParameter::VECTOR_THIRD_INDEX] != BOX_DIM) {
+            LogError << "dimension of tensor[0][2] (" << shape[localParameter::VECTOR_THIRD_INDEX]
+                     << ") " << "is not equal to ("
                      << BOX_DIM << ")";
             return false;
         }
         shape = tensors[1].GetShape();
-        if (shape.size() != VECTOR_FOURTH_INDEX) {
+        if (shape.size() != localParameter::VECTOR_FOURTH_INDEX) {
             LogError << "number of tensor[1] dimensions (" << shape.size() << ") " << "is not equal to ("
-                     << VECTOR_FOURTH_INDEX << ")";
+                     << localParameter::VECTOR_FOURTH_INDEX << ")";
             return false;
         }
-        if (shape[VECTOR_SECOND_INDEX] != (uint32_t)objectNum_) {
-            LogError << "dimension of tensor[1][1] (" << shape[VECTOR_SECOND_INDEX] << ") " << "is not equal to ("
+        if (shape[localParameter::VECTOR_SECOND_INDEX] != (uint32_t)objectNum_) {
+            LogError << "dimension of tensor[1][1] (" << shape[localParameter::VECTOR_SECOND_INDEX] << ") "
+                     << "is not equal to ("
                      << objectNum_ << ")";
             return false;
         }
-        if (shape[VECTOR_THIRD_INDEX] != (uint32_t)classNum_) {
-            LogError << "dimension of tensor[1][2] (" << shape[VECTOR_THIRD_INDEX] << ") " << "is not equal to ("
+        if (shape[localParameter::VECTOR_THIRD_INDEX] != (uint32_t)classNum_) {
+            LogError << "dimension of tensor[1][2] (" << shape[localParameter::VECTOR_THIRD_INDEX] << ") "
+                     << "is not equal to ("
                      << classNum_ << ")";
             return false;
         }

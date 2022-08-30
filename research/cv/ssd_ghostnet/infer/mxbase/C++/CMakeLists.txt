@@ -34,7 +34,7 @@ endif()
 # Set up ACLLIB header files and dynamic link libraries
 set(ACL_INC_DIR $ENV{ASCEND_HOME}/${ASCEND_VERSION}/${ARCH_PATTERN}/acllib/include)
 set(ACL_LIB_DIR $ENV{ASCEND_HOME}/${ASCEND_VERSION}/${ARCH_PATTERN}/acllib/lib64)
-set(ACL_LIB_PATH $ENV{ASCEND_HOME}/nnrt/latest/acllib)
+set(ACL_LIB_PATH $ENV{ASCEND_HOME}/ascend-toolkit/latest/acllib)
 
 # Set the header file and dynamic link library of MXBase
 set(MXBASE_ROOT_DIR $ENV{MX_SDK_HOME})
