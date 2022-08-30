@@ -18,7 +18,6 @@ import pkuseg
 from tqdm import tqdm
 
 seg = pkuseg.pkuseg()
-current_path = os.path.abspath(os.path.dirname(os.getcwd()))
 
 
 def changeListToText(content):
@@ -36,14 +35,14 @@ def changeIflytek(in_data_dir='', out_data_dir=''):
     for name in changeList:
         print(name)
         data = []
-        with open(current_path + in_data_dir + "/" + name, 'r', encoding='utf-8') as f:
+        with open(os.path.join(in_data_dir, name), 'r', encoding='utf-8') as f:
             line = f.readline()
             while line:
                 spData = line.split('_!_')
                 content = spData[1].strip('\n').replace('\t', '')
                 data.append({'content': content, 'label': spData[0]})
                 line = f.readline()
-        with open(current_path + out_data_dir + "/" + name, "w", encoding='utf-8') as f:
+        with open(os.path.join(out_data_dir, name), "w", encoding='utf-8') as f:
             for d in tqdm(data):
                 content = changeListToText(d['content'])
                 f.write(content + '\t' + d['label'] + '\n')
@@ -57,14 +56,14 @@ def changeTnews(in_data_dir='', out_data_dir=''):
         print(k)
         print(changeDict[k])
         data = []
-        with open(current_path + in_data_dir + "/" + k, 'r', encoding='utf-8') as f:
+        with open(os.path.join(in_data_dir, k), 'r', encoding='utf-8') as f:
             line = f.readline()
             while line:
                 spData = line.split('_!_')
                 content = spData[3].strip('\n').replace('\t', '')
                 data.append({'content': content, 'label': spData[1]})
                 line = f.readline()
-        with open(current_path + out_data_dir  + "/" + changeDict[k], "w", encoding='utf-8') as f:
+        with open(os.path.join(out_data_dir, changeDict[k]), "w", encoding='utf-8') as f:
             for d in tqdm(data):
                 content = changeListToText(d['content'])
                 f.write(content + '\t' + d['label'] + '\n')
