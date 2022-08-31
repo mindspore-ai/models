@@ -1,0 +1,10 @@
+chumpy==0.69
+tqdm==4.42.0
+numpy==1.18.1
+spacepy==0.2.1
+opendr==0.78
+opencv_python==4.1.2.30
+h5py==2.10.0
+scipy==1.2.1
+mindspore==1.8.0
+ipdb==0.13.3
