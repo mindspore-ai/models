@@ -1,4 +1,4 @@
-# Copyright 2021-2022 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,14 +13,10 @@
 # limitations under the License.
 # ===========================================================================
 
-"""
-Eval DeepSpeech2
-"""
 import argparse
 import json
-import pickle
 import numpy as np
-from src.config import eval_config
+from src.qs_config import quickstart_config
 from src.deepspeech2 import DeepSpeechModel, PredictWithSoftmax
 from src.dataset import create_dataset
 from src.greedydecoder import MSGreedyDecoder
@@ -30,14 +26,14 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 parser = argparse.ArgumentParser(description='DeepSpeech evaluation')
 parser.add_argument('--bidirectional', action="store_false", default=True, help='Use bidirectional RNN')
 parser.add_argument('--pretrain_ckpt', type=str,
-                    default='./checkpoint/ckpt_0/DeepSpeech0-70_1287.ckpt', help='Pretrained checkpoint path')
-parser.add_argument('--device_target', type=str, default="GPU", choices=("GPU", "CPU"),
+                    default='', help='Pretrained checkpoint path')
+parser.add_argument('--device_target', type=str, default="CPU", choices=("GPU", "CPU"),
                     help='Device target, support GPU and CPU, Default: GPU')
 args = parser.parse_args()
 
 if __name__ == '__main__':
     context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, save_graphs=False)
-    config = eval_config
+    config = quickstart_config
     with open(config.DataConfig.labels_path) as label_file:
         labels = json.load(label_file)
 
@@ -63,7 +59,6 @@ if __name__ == '__main__':
         else:
             param_dict_new[k] = param_dict[k]
     load_param_into_net(model, param_dict_new)
-    # load_param_into_net(model, param_dict)
     print('Successfully loading the pre-trained model')
 
     if config.LMConfig.decoder_type == 'greedy':
@@ -73,12 +68,11 @@ if __name__ == '__main__':
     target_decoder = MSGreedyDecoder(labels, blank_index=labels.index('_'))
 
     model.set_train(False)
-    total_cer, total_wer, num_tokens, num_chars = 0, 0, 0, 0
+    num_tokens, num_chars = 0, 0
     output_data = []
     for data in ds_eval.create_dict_iterator():
         inputs, input_length, target_indices, targets = data['inputs'], data['input_length'], data['target_indices'], \
                                                         data['label_values']
-
         split_targets = []
         start, count, last_id = 0, 0, 0
         target_indices, targets = target_indices.asnumpy(), targets.asnumpy()
@@ -95,28 +89,10 @@ if __name__ == '__main__':
         decoded_output, _ = decoder.decode(out, output_sizes)
         target_strings = target_decoder.convert_to_strings(split_targets)
 
-        if config.save_output is not None:
-            output_data.append((out.asnumpy(), output_sizes.asnumpy(), target_strings))
+        output_data.append((out.asnumpy(), output_sizes.asnumpy(), target_strings))
         for doutput, toutput in zip(decoded_output, target_strings):
             transcript, reference = doutput[0], toutput[0]
-            wer_inst = decoder.wer(transcript, reference)
-            cer_inst = decoder.cer(transcript, reference)
-            total_wer += wer_inst
-            total_cer += cer_inst
             num_tokens += len(reference.split())
             num_chars += len(reference.replace(' ', ''))
-            if config.verbose:
-                print("Ref:", reference.lower())
-                print("Hyp:", transcript.lower())
-                print("WER:", float(wer_inst) / len(reference.split()),
-                      "CER:", float(cer_inst) / len(reference.replace(' ', '')), "\n")
-    wer = float(total_wer) / num_tokens
-    cer = float(total_cer) / num_chars
-
-    print('Test Summary \t'
-          'Average WER {wer:.3f}\t'
-          'Average CER {cer:.3f}\t'.format(wer=wer * 100, cer=cer * 100))
-
-    if config.save_output is not None:
-        with open(config.save_output + '.bin', 'wb') as output:
-            pickle.dump(output_data, output)
+            print("真实文本:", reference.lower())
+            print("预测文本:", transcript.lower())
