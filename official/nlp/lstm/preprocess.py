@@ -18,13 +18,12 @@
 import os
 import numpy as np
 
-from src.dataset import lstm_create_dataset, convert_to_mindrecord
+from src.dataset import lstm_create_dataset
 from src.model_utils.config import config
 
 
 if __name__ == '__main__':
     print("============== Starting Data Pre-processing ==============")
-    convert_to_mindrecord(config.embed_size, config.aclimdb_path, config.preprocess_path, config.glove_path)
     dataset = lstm_create_dataset(config.preprocess_path, config.batch_size, training=False)
     img_path = os.path.join(config.result_path, "00_data")
     os.makedirs(img_path)

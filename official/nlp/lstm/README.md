@@ -419,7 +419,7 @@ Ascend:
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [YAML_CONFIG_PATH]
 ```
 
-- `weight.txt` is required, please generate it by run preprocess.py. Then you will see this file in /preprocess.
+- `weight.txt` is required, it will be generated with mindrecords by training model.
 - `ckpt_file` parameter is required.
 - `FILE_FORMAT` should be in ["AIR", "MINDIR", "ONNX"].
 - `YAML_CONFIG_PATH` default is `default_config.yaml`.
