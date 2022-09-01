@@ -90,9 +90,9 @@ bash run_process_data.sh [SRC_PATH] [DATASET_NAME]
 
 ```text
 # 为Cora生成MindRecord格式的数据集
-bash run_process_data.sh ./data cora
+bash run_process_data.sh ./data/cora cora
 # 为Citeseer生成MindRecord格式的数据集
-bash run_process_data.sh ./data citeseer
+bash run_process_data.sh ./data/citeseer citeseer
 ```
 
 - Running on local with Ascend
