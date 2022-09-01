@@ -82,7 +82,8 @@ class DynamicRNN(nn.Cell):
             hidden_size = h.shape[-1]
             zero_output = P.ZerosLike()(h_t)
         seq_length = P.Cast()(seq_length, mindspore.float16)
-        seq_length = P.BroadcastTo((hidden_size, -1))(seq_length)
+        seq_length = P.reshape(seq_length, (1, -1))
+        seq_length = P.tile(seq_length, (hidden_size, 1))
         seq_length = P.Cast()(seq_length, mindspore.int32)
         seq_length = P.Transpose()(seq_length, (1, 0))
 

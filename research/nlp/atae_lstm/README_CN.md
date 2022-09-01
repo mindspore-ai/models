@@ -3,7 +3,7 @@
 <!-- TOC -->
 
 - [目录](#目录)
-- [[AttentionLSTM描述](#Attentionlstm描述)]
+- [AttentionLSTM描述](#Attentionlstm描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [特性](#特性)
@@ -19,6 +19,9 @@
         - [评估](#评估)
     - [导出过程](#导出过程)
         - [导出](#导出)
+        - [Ascend310推理](#Ascend310推理)
+        - [ONNX推理](#ONNX推理)
+        - [结果](#结果)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -92,6 +95,7 @@ AttentionLSTM模型的输入由aspect和word向量组成，输入部分输入单
     │   ├──run_train_ascend.sh   // 在Ascend上训练的shell脚本
     │   ├──run_eval_ascend.sh    // 在Ascend上评估的shell脚本
     │   ├──convert_dataset.sh    // 在Ascend上评估的shell脚本
+        |——run_eval_onnx.sh      // ONNX推理的shell脚本
     ├── src
     │   ├──model_utils
     │   │   ├──my_utils.py  // LSTM相关组件
@@ -107,6 +111,7 @@ AttentionLSTM模型的输入由aspect和word向量组成，输入部分输入单
     ├── eval.py      // 评估脚本
     ├── preprocess.py   // 310推理前处理脚本
     ├── export.py       // 将checkpoint文件导出到air/mindir
+    |—— eval_onnx.py    // ONNX推理脚本
 ```
 
 ## 脚本参数
@@ -194,16 +199,26 @@ AttentionLSTM模型的输入由aspect和word向量组成，输入部分输入单
 
 ### 导出
 
-可以使用如下命令导出mindir文件
+可以使用如下命令导出mindir文件或onnx文件。
+在进行ONNX推理前，首先需要指定onnx配置文件运行训练脚本得到ckpt文件，再利用ckpt文件导出onnx文件
 
 ```bash
+# export mindir
 python export.py --existed_ckpt="./train/atae-lstm_max.ckpt" \
                  --word_path="./data/weight.npz"
+                 --file_format="MINDIR"
+
+# export onnx
+python train.py --config="./onnx_config.yaml" \
+                --data_url="./mindrecord_data"
+
+python export.py --config="./onnx_config.yaml" \
+                 --existed_ckpt="./train/atae-lstm_max.ckpt" \
+                 --word_path="./data/weight.npz" \
+                 --file_format="ONNX"
 ```
 
-## 推理过程
-
-### 用法
+### Ascend310推理
 
 在执行推理之前，需要通过export.py导出mindir文件。输入文件为bin格式。
 
@@ -217,6 +232,17 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_TARGET] [DEVICE_ID]
 
 `DEVICE_TARGET` 可选值范围为：['GPU', 'CPU', 'Ascend']；
 `DEVICE_ID` 可选, 默认值为0.
+
+### ONNX推理
+
+在执行推理之前，需要通过export.py导出onnx文件。输入文件为bin格式。
+
+```shell
+# ONNX 推理
+bash run_eval_onnx.sh [ONNX_CONFIG] [ONNX_CKPT] [DATA_DIR] [DEVICE]
+```
+
+`DEVICE` Optional value range：['GPU', 'CPU', 'Ascend']；
 
 ### 结果
 

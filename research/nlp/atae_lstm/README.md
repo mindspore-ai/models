@@ -3,7 +3,7 @@
 <!-- TOC -->
 
 - [Content](#content)
-- [AttentionLSTM description](#attentionlstm-description)]
+- [AttentionLSTM description](#attentionlstm-description)
 - [Model architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Features](#features)
@@ -22,6 +22,9 @@
         - [evaluate](#evaluate)
     - [Export process](#export-process)
         - [Export](#export)
+        - [Ascend310 inference](#Ascend310-inference)
+        - [ONNX inference](#ONNX-inference)
+        - [Result](#result)
 - [Model description](#model-description)
     - [Performance](#performance)
         - [Inference performance](#inference-performance)
@@ -132,7 +135,8 @@ After installing MINDSPORE through the official website, you can follow the step
     ├── scripts
     │   ├──convert_dataset.sh           // Shell script for converting original data
     │   ├──run_distribute_train_gpu.sh  // Shell script for distributed training on GPU
-    │   ├──run_eval.sh                  // Shell script evaluated on Ascend or GPU
+    │   ├──run_eval.sh                  // Shell script evaluated on Ascend on GPU
+    │   ├──run_eval_onnx.sh             // ONNX script for inferencing on GPU
     │   ├──run_standalone_train_gpu.sh  // Shell script for standalone training on GPU
     │   ├──run_train_ascend.sh          // Shell script for training on Ascend
     ├── src
@@ -154,6 +158,7 @@ After installing MINDSPORE through the official website, you can follow the step
     ├── README.md          // English readme
     ├── requirements.txt   // pip requirements
     ├── train.py           // Training script
+    |—— eval_onnx.py       // ONNX infer script
 ```
 
 ## Script parameters
@@ -188,8 +193,7 @@ For more configuration details, please refer to the script `default_config.yaml`
 
   ```bash
   bash scripts/run_train_ascend.sh  \
-      /home/workspace/atae_lstm/data/  \
-      /home/workspace/atae_lstm/train/
+       /home/workspace/atae_lstm/data/
   ```
 
   The command of the above training network will run in the background, results will appear in net_log.log.
@@ -240,29 +244,50 @@ For more configuration details, please refer to the script `default_config.yaml`
 
 ### Export
 
-You can use the following command to export the mindir file
+You can use the following command to export the mindir or onnx file
+Before ONNX reasoning, you need to first specify the onnx configuration file to run the training script to get the ckpt file, and then use the ckpt file to export the onnx file
 
 ```bash
+# export mindir
 python export.py --existed_ckpt="./train/atae-lstm_max.ckpt" \
                  --word_path="./data/weight.npz"
+                 --file_format="MINDIR"
+
+# export onnx
+python train.py --config="./onnx_config.yaml" \
+                --data_url="./mindrecord_data"
+
+python export.py --config="./onnx_config.yaml" \
+                 --existed_ckpt="./train/atae-lstm_max.ckpt" \
+                 --word_path="./data/weight.npz" \
+                 --file_format="ONNX"
 ```
 
-## Inference process
-
-### Usage
+### Ascend310 Inference
 
 Before performing inference, you need to export the mindir file via export.py. Convert the file to bin format.
 
 ```bash
-# 文件预处理
+# preprocess
 python preprocess.py --data_path="./data/test.mindrecord"
 
-# Ascend310 推理
+# Ascend310 infer
 bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_TARGET] [DEVICE_ID]
 ```
 
 `DEVICE_TARGET` Optional value range：['GPU', 'CPU', 'Ascend']；
 `DEVICE_ID` Optional, the default is 0.
+
+### ONNX inference
+
+Before performing inference, you need to export the onnx file via export.py. Convert the file to bin format.
+
+```shell
+# ONNX infer
+bash run_eval_onnx.sh [ONNX_CONFIG] [ONNX_CKPT] [DATA_DIR] [DEVICE]
+```
+
+`DEVICE` Optional value range：['GPU', 'CPU', 'Ascend']；
 
 ### Result
 
