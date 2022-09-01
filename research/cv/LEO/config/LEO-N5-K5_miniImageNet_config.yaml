@@ -2,6 +2,8 @@
 enable_modelarts: False
 data_url: ""
 train_url: ""
+ckpt_url: 'ckpt files'
+result_url: 'infer result files'
 checkpoint_url: ""
 device_target: "GPU"
 device_num: 1
@@ -20,10 +22,11 @@ inner_unroll_length: 5
 finetuning_unroll_length: 5
 num_latents: 64
 inner_lr_init: 1.0
-finetuning_lr_init: 0.001
+finetuning_lr_init: 0.0005
 dropout_rate: 0.3 # parameters
 kl_weight: 0.001 # parameters
-encoder_penalty_weight: 2.66E-7 # parameters
+encoder_penalty_weight: 2.66E-7 # parameters origin
+
 l2_penalty_weight: 8.5E-6 # parameters
 orthogonality_penalty_weight: 0.00152 # parameters
 # ==============================================================================
@@ -36,15 +39,15 @@ metatrain_batch_size: 12
 metavalid_batch_size: 200
 metatest_batch_size: 200
 num_steps_limit: int(1e5)
-outer_lr: 0.004 # parameters
+outer_lr: 0.005 # parameters origin
 gradient_threshold: 0.1
 gradient_norm_threshold: 0.1
-total_steps: 100000
+total_steps: 200000
 
 # Model Description
 model_name: LEO
 file_name: 'leo'
-file_format: 'MINDIR'  # ['AIR', 'MINDIR']
+file_format: 'AIR'
 
 
 ---
@@ -54,6 +57,8 @@ data_url: 'Dataset url for obs'
 train_url: 'Training output url for obs'
 data_path: 'Dataset path for local'
 output_path: 'Training output path for local'
+ckpt_url: 'ckpt files'
+result_url: 'infer result files'
 
 device_target: 'Target device type'
 enable_profiling: 'Whether enable profiling while training, default: False'

@@ -56,6 +56,8 @@ def parse_cli_to_yaml(parser, cfg, helper=None, choices=None, cfg_path="LEO-N5-K
     helper = {} if helper is None else helper
     choices = {} if choices is None else choices
     for item in cfg:
+        if item in ("dataset_name", "num_tr_examples_per_class"):
+            continue
         if not isinstance(cfg[item], list) and not isinstance(cfg[item], dict):
             help_description = helper[item] if item in helper else "Please reference to {}".format(cfg_path)
             choice = choices[item] if item in choices else None
@@ -110,20 +112,28 @@ def merge(args, cfg):
     return cfg
 
 
-def get_config():
+def get_config(get_args=False):
     """
     Get Config according to the yaml file and cli arguments.
     """
     parser = argparse.ArgumentParser(description="default name", add_help=False)
-    config_dir = os.path.join(os.path.abspath(os.getcwd()), "config")
-    config_name = "LEO-N5-K" + str(os.getenv("NUM_TR_EXAMPLES_PER_CLASS")) \
-                  + "_" + os.getenv("DATA_NAME") + "_config.yaml"
-    parser.add_argument("--config_path", type=str,
-                        default=os.path.join(config_dir, config_name),
-                        help="Config file path")
+
+    parser.add_argument("--num_tr_examples_per_class", type=int,
+                        default=5,
+                        help="num_tr_examples_per_class")
+    parser.add_argument("--dataset_name", type=str,
+                        default="miniImageNet",
+                        help="dataset_name")
     path_args, _ = parser.parse_known_args()
-    default, helper, choices = parse_yaml(path_args.config_path)
-    args = parse_cli_to_yaml(parser=parser, cfg=default, helper=helper, choices=choices, cfg_path=path_args.config_path)
+    config_name = "LEO-N5-K" + str(path_args.num_tr_examples_per_class) \
+                  + "_" + path_args.dataset_name + "_config.yaml"
+    config_path = os.path.join(os.path.abspath(os.path.join(__file__, "../..")), "config", config_name)
+
+
+    default, helper, choices = parse_yaml(config_path)
+    args = parse_cli_to_yaml(parser=parser, cfg=default, helper=helper, choices=choices, cfg_path=config_path)
+    if get_args:
+        return args
     final_config = merge(args, default)
     return Config(final_config)
 

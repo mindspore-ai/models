@@ -105,8 +105,9 @@ LEO由以下几个模块组成，分类器，编码器，关系网络和编码�
 
 # 环境要求
 
-- 硬件（GPU）
+- 硬件（GPU or Ascend）
     - 使用GPU处理器来搭建硬件环境。
+    - 使用Ascend处理器来搭建硬件环境。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
@@ -130,6 +131,24 @@ LEO由以下几个模块组成，分类器，编码器，关系网络和编码�
   bash scripts/run_eval_gpu.sh [DATA_PATH] [DATA_NAME] [NUM_TR_EXAMPLES_PER_CLASS] [CKPT_FILE]
   # 运行评估示例
   bash scripts/run_eval_gpu.sh /home/mindspore/dataset/embeddings/ miniImageNet 1 ./ckpt/1P_mini_1/xxx.ckpt
+
+  ```
+
+- Ascend处理器环境运行
+
+  ```bash
+  # 运行训练示例
+  bash scripts/run_train_gpu.sh [DEVICE_ID] [DEVICE_TARGET] [DATA_PATH] [DATA_NAME] [NUM_TR_EXAMPLES_PER_CLASS] [SAVE_PATH]
+  # 例如：
+  bash scripts/run_train_ascend.sh 6 Ascend /home/mindspore/dataset/embeddings/ miniImageNet 5 ./ckpts/1P_mini_5
+  # 运行分布式训练示例
+  bash scripts/run_distribution_ascend.sh [RANK_TABLE_FILE] [DEVICE_TARGET] [DATA_PATH] [DATA_NAME] [NUM_TR_EXAMPLES_PER_CLASS] [SAVE_PATH]
+  # 例如：
+  bash scripts/run_distribution_ascend.sh ./hccl_8p_01234567_127.0.0.1.json Ascend /home/mindspore/dataset/embeddings/ miniImageNet 5 ./ckpts/8P_mini_5
+  # 运行评估示例
+  bash scripts/run_eval_gpu.sh [DEVICE_ID] [DATA_PATH] [CKPT_FILE]
+  # 例如
+  bash scripts/run_eval_ascend.sh 4 Ascend /home/mindspore/dataset/embeddings/ miniImageNet 5 ./ckpt/1P_mini_5/xxx.ckpt
   ```
 
 以上为第一个实验示例，其余三个实验请参考训练部分。
@@ -144,8 +163,11 @@ LEO由以下几个模块组成，分类器，编码器，关系网络和编码�
    ├─ train.py                    # 训练脚本
    ├─ eval.py                     # 评估脚本
    ├─ scripts
-   │  ├─ run_eval_gpu.sh          # 启动评估
-   │  └─ run_train_gpu.sh         # 启动训练
+   │  ├─ run_distribution_ascend.sh          # 启动8卡Ascend训练
+   │  ├─ run_eval_ascend.sh           # ascend启动评估
+   │  ├─ run_eval_gpu.sh              # gpu启动评估
+   │  ├─ run_train_ascend.sh          # ascend启动训练
+   │  └─ run_train_gpu.sh             # gpu启动训练
    ├─ src
    │  ├─ data.py                  # 数据处理
    │  ├─ model.py                 # LEO模型
@@ -211,7 +233,7 @@ LEO由以下几个模块组成，分类器，编码器，关系网络和编码�
   outer_lr: 0.004      #超参
   gradient_threshold: 0.1
   gradient_norm_threshold: 0.1
-  total_steps: 100000
+  total_steps: 200000
   ```
 
 更多配置细节请参考config文件夹，**启动训练之前请根据不同的实验设置上述超参数。**
@@ -221,13 +243,13 @@ LEO由以下几个模块组成，分类器，编码器，关系网络和编码�
 - 四个实验设置不同的超参
 
 | 超参                           | miniImageNet 1-shot | miniImageNet 5-shot | tieredImageNet 1-shot | tieredImageNet 5-shot |
-| ------------------------------ | ------------------- | ------------------- | --------------------- | --------------------- |
+| ------------------------------ |---------------------|---------------------|-----------------------| --------------------- |
 | `dropout`                      | 0.3                 | 0.3                 | 0.2                   | 0.3                   |
 | `kl_weight`                    | 0.001               | 0.001               | 0                     | 0.001                 |
 | `encoder_penalty_weight`       | 1E-9                | 2.66E-7             | 5.7E-1                | 5.7E-6                |
 | `l2_penalty_weight`            | 0.0001              | 8.5E-6              | 5.10E-6               | 3.6E-10               |
-| `orthogonality_penalty_weight` | 303.0               | 0.00152             | 4.88E-1              | 0.188                 |
-| `outer_lr`                     | 0.004               | 0.004               | 0.004                 | 0.0025                |
+| `orthogonality_penalty_weight` | 303.0               | 0.00152             | 4.88E-1               | 0.188                 |
+| `outer_lr`                     | 0.005               | 0.005               | 0.005                 | 0.0025                |
 
 ### 训练
 
@@ -238,6 +260,15 @@ LEO由以下几个模块组成，分类器，编码器，关系网络和编码�
   bash scripts/run_train_gpu.sh 1 /home/mindspore/dataset/embeddings/ miniImageNet 5 ./ckpt/1P_mini_5
   bash scripts/run_train_gpu.sh 1 /home/mindspore/dataset/embeddings/ tieredImageNet 1 ./ckpt/1P_tiered_1
   bash scripts/run_train_gpu.sh 1 /home/mindspore/dataset/embeddings/ tieredImageNet 5 ./ckpt/1P_tiered_5
+  ```
+
+- 配置好上述参数后，AScend环境运行
+
+  ```bash
+  bash scripts/run_train_ascend.sh 6 Ascend /home/mindspore/dataset/embeddings/ miniImageNet 1 ./ckpts/1P_mini_1
+  bash scripts/run_train_ascend.sh 6 Ascend /home/mindspore/dataset/embeddings/ miniImageNet 5 ./ckpts/1P_mini_5
+  bash scripts/run_train_ascend.sh 6 Ascend /home/mindspore/dataset/embeddings/ tieredImageNet 1 ./ckpt/1P_tiered_1
+  bash scripts/run_train_ascend.sh 6 Ascend /home/mindspore/dataset/embeddings/ tieredImageNet 5 ./ckpt/1P_tiered_5
   ```
 
   训练将在后台运行，您可以通过`1P_miniImageNet_1_train.log`等日志文件查看训练过程。
@@ -254,6 +285,15 @@ LEO由以下几个模块组成，分类器，编码器，关系网络和编码�
   bash scripts/run_train_gpu.sh 8 /home/mindspore/dataset/embeddings/ miniImageNet 5 ./ckpt/8P_mini_5
   bash scripts/run_train_gpu.sh 8 /home/mindspore/dataset/embeddings/ tieredImageNet 1 ./ckpt/8P_tiered_1
   bash scripts/run_train_gpu.sh 8 /home/mindspore/dataset/embeddings/ tieredImageNet 5 ./ckpt/8P_tiered_5
+  ```
+
+- 配置好上述参数后，Ascend环境运行
+
+  ```bash
+  bash scripts/run_distribution_ascend.sh ./hccl_8p_01234567_127.0.0.1.json Ascend /home/mindspore/dataset/embeddings/ miniImageNet 1 ./ckpts/8P_mini_1
+  bash scripts/run_distribution_ascend.sh ./hccl_8p_01234567_127.0.0.1.json Ascend /home/mindspore/dataset/embeddings/ miniImageNet 5 ./ckpts/8P_mini_5
+  bash scripts/run_distribution_ascend.sh ./hccl_8p_01234567_127.0.0.1.json Ascend /home/mindspore/dataset/embeddings/ tieredImageNet 1 ./ckpts/8P_tired_1
+  bash scripts/run_distribution_ascend.sh ./hccl_8p_01234567_127.0.0.1.json Ascend /home/mindspore/dataset/embeddings/ tieredImageNet 5 ./ckpts/8P_tired_5
   ```
 
   与单卡训练一样，可以在`8P_miniImageNet_1_train.log`文件查看训练过程，并在默认`./ckpt/8P_mini_1`等checkpoint文件夹下找到检查点文件。
@@ -273,6 +313,15 @@ LEO由以下几个模块组成，分类器，编码器，关系网络和编码�
   bash scripts/run_eval_gpu.sh /home/mindspore/dataset/embeddings/ tieredImageNet 5 ./ckpt/1P_tiered_5/xxx.ckpt
   ```
 
+- Ascend环境运行
+
+  ```bash
+  bash scripts/run_eval_ascend.sh 0 Ascend /home/mindspore/dataset/embeddings/ miniImageNet 1 ./ckpt/1P_mini_1/xxx.ckpt
+  bash scripts/run_eval_ascend.sh 0 Ascend /home/mindspore/dataset/embeddings/ miniImageNet 5 ./ckpt/1P_mini_5/xxx.ckpt
+  bash scripts/run_eval_ascend.sh 0 Ascend /home/mindspore/dataset/embeddings/ tieredImageNet 1 ./ckpt/1P_tiered_1/xxx.ckpt
+  bash scripts/run_eval_ascend.sh 0 Ascend /home/mindspore/dataset/embeddings/ tieredImageNet 5 ./ckpt/1P_tiered_5/xxx.ckpt
+  ```
+
   评估将在后台运行，您可以通过`1P_miniImageNet_1_eval.log`等日志文件查看评估过程。
 
 # 模型描述
@@ -283,19 +332,19 @@ LEO由以下几个模块组成，分类器，编码器，关系网络和编码�
 
 - 训练参数
 
-| 参数          | LEO                                                         |
-| -------------| ----------------------------------------------------------- |
-| 资源          | NVIDIA GeForce RTX 3090；CUDA核心 10496个；显存 24GB |
-| 上传日期       | 2022-03-27                                             |
-| MindSpore版本 | 1.7.0                                                      |
-| 数据集        | miniImageNet                                                 |
-| 优化器        | Adam                                                         |
-| 损失函数       | Cross Entropy Loss                                           |
-| 输出          | 准确率                                                        |
-| 损失          | GANLoss,L1Loss,localLoss,DTLoss                             |
-| 微调检查点     | 672KB (.ckpt文件)                                     |
+| 参数          | LEO                                                         | Ascend                                        |
+| -------------| ----------------------------------------------------------- |-----------------------------------------------|
+| 资源          | NVIDIA GeForce RTX 3090；CUDA核心 10496个；显存 24GB | Ascend 910; CPU 24cores; 显存 256G; OS Euler2.8 |
+| 上传日期       | 2022-03-27                                             | 2022-06-12                                    |
+| MindSpore版本 | 1.7.0                                                      | 1.5.0                                         |
+| 数据集        | miniImageNet                                                 | miniImageNet                                  |
+| 优化器        | Adam                                                         | Adam                                          |
+| 损失函数       | Cross Entropy Loss                                           | Cross Entropy Loss                            |
+| 输出          | 准确率                                                        | 准确率                                           |
+| 损失          | GANLoss,L1Loss,localLoss,DTLoss                             | GANLoss,L1Loss,localLoss,DTLoss               |
+| 微调检查点     | 672KB (.ckpt文件)                                     | 672KB (.ckpt文件)                               |
 
-- 评估性能
+- GPU评估性能
 
 | 实验 | miniImageNet 1-shot | miniImageNet 5-shot | tieredImageNet 1-shot | tieredImageNet 5-shot |
 | ----- | ------------------- | ------------------- | --------------------- | --------------------- |
@@ -306,13 +355,13 @@ LEO由以下几个模块组成，分类器，编码器，关系网络和编码�
 
 - 评估参数
 
-| 参数          | LEO                                                         |
-| ------------ | ----------------------------------------------------------- |
-| 资源          | NVIDIA GeForce RTX 3090；CUDA核心 10496个；显存 24GB |
-| 上传日期       | 2022-03-27                                              |
-| MindSpore版本 | 1.7.0                                                      |
-| 数据集        | miniImageNet                                                 |
-| 输出          | 准确率                                                        |
+| 参数          | LEO                                                         | Ascend                                        |
+| ------------ | ----------------------------------------------------------- |-----------------------------------------------|
+| 资源          | NVIDIA GeForce RTX 3090；CUDA核心 10496个；显存 24GB | Ascend 910; CPU 24cores; 显存 256G; OS Euler2.8 |
+| 上传日期       | 2022-03-27                                              | 2022-06-12                                    |
+| MindSpore版本 | 1.7.0                                                      |1.5.0                                         |
+| 数据集        | miniImageNet                                                 | miniImageNet                                  |
+| 输出          | 准确率                                                        | 准确率                                           |
 
 - 评估精度
 

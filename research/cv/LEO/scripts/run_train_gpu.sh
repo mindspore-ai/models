@@ -12,20 +12,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-echo "===================================================================================================================="
-echo "Please run the script as: "
-echo "bash scripts/run_train_gpu.sh [DEVICE_NUM] [DATA_PATH] [DATA_NAME] [NUM_TR_EXAMPLES_PER_CLASS] [SAVE_PATH] "
-echo "For example: bash scripts/run_train_gpu.sh 1 /home/mindspore/dataset/embeddings/ miniImageNet 1 ./ckpt/1P_mini_1"
-echo " ============bash scripts/run_train_gpu.sh 1 /home/mindspore/dataset/embeddings/ miniImageNet 5 ./ckpt/1P_mini_5"
-echo " ============bash scripts/run_train_gpu.sh 1 /home/mindspore/dataset/embeddings/ tieredImageNet 1 ./ckpt/1P_tiered_1"
-echo " ============bash scripts/run_train_gpu.sh 1 /home/mindspore/dataset/embeddings/ tieredImageNet 5 ./ckpt/1P_tiered_5"  
-echo "===================================================================================================================="
-echo "Please run distributed training script as: "
-echo "For example: bash scripts/run_train_gpu.sh 8 /home/mindspore/dataset/embeddings/ miniImageNet 1 ./ckpt/8P_mini_1 "
-echo " ============bash scripts/run_train_gpu.sh 8 /home/mindspore/dataset/embeddings/ miniImageNet 5 ./ckpt/8P_mini_5"
-echo " ============bash scripts/run_train_gpu.sh 8 /home/mindspore/dataset/embeddings/ tieredImageNet 1 ./ckpt/8P_tiered_1"
-echo " ============bash scripts/run_train_gpu.sh 8 /home/mindspore/dataset/embeddings/ tieredImageNet 5 ./ckpt/8P_tiered_5"            
-echo "===================================================================================================================="
+if [[ $# -ne 6 ]]; then
+    echo "===================================================================================================================="
+    echo "Please run the script as: "
+    echo "bash scripts/run_train_gpu.sh [DEVICE_NUM] [DATA_PATH] [DATA_NAME] [NUM_TR_EXAMPLES_PER_CLASS] [SAVE_PATH] "
+    echo "For example: bash scripts/run_train_gpu.sh 1 /home/mindspore/dataset/embeddings/ miniImageNet 1 ./ckpt/1P_mini_1"
+    echo " ============bash scripts/run_train_gpu.sh 1 /home/mindspore/dataset/embeddings/ miniImageNet 5 ./ckpt/1P_mini_5"
+    echo " ============bash scripts/run_train_gpu.sh 1 /home/mindspore/dataset/embeddings/ tieredImageNet 1 ./ckpt/1P_tiered_1"
+    echo " ============bash scripts/run_train_gpu.sh 1 /home/mindspore/dataset/embeddings/ tieredImageNet 5 ./ckpt/1P_tiered_5"  
+    echo "===================================================================================================================="
+    echo "Please run distributed training script as: "
+    echo "For example: bash scripts/run_train_gpu.sh 8 /home/mindspore/dataset/embeddings/ miniImageNet 1 ./ckpt/8P_mini_1 "
+    echo " ============bash scripts/run_train_gpu.sh 8 /home/mindspore/dataset/embeddings/ miniImageNet 5 ./ckpt/8P_mini_5"
+    echo " ============bash scripts/run_train_gpu.sh 8 /home/mindspore/dataset/embeddings/ tieredImageNet 1 ./ckpt/8P_tiered_1"
+    echo " ============bash scripts/run_train_gpu.sh 8 /home/mindspore/dataset/embeddings/ tieredImageNet 5 ./ckpt/8P_tiered_5"            
+    echo "===================================================================================================================="
+    exit 1;
+fi
+
 export  DEVICE_NUM=$1
 export  DEVICE_TARGET=GPU
 export  DATA_PATH=$2
