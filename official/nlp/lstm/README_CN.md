@@ -421,7 +421,7 @@ Ascend:
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [YAML_CONFIG_PATH]
 ```
 
-- `weight.txt` 文件在导出脚本中要用到，需要运行preprocess.py文件生成。
+- `weight.txt` 文件需要在训练模型时获得。
 - `ckpt_file` 是必需的。
 - `FILE_FORMAT` 必须在 ["AIR", "MINDIR", "ONNX"]中进行选择。
 - `YAML_CONFIG_PATH` 默认是 `default_config.yaml`。
