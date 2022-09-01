@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.config import config as cfg
 from src.model_utils.device_adapter import get_device_id
 
-set_seed(0)
+set_seed(2)
 os.system("pip3 install gensim==4.0.1 python-Levenshtein urllib3==1.26.5 chardet==3.0.4")
 sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 

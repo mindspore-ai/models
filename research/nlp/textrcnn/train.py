@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ from src.model_utils.moxing_adapter import moxing_wrapper
 from src.model_utils.config import config as cfg
 from src.model_utils.device_adapter import get_device_id
 
-set_seed(0)
+set_seed(2)
 
 
 def modelarts_pre_process():
