@@ -63,7 +63,7 @@ def predict():
     reporter.start_predict("A to B")
     for data in ds.create_dict_iterator(output_numpy=True):
         img_a = data["image"]
-        path_a = str(data["image_name"][0], encoding="utf-8")
+        path_a = data["image_name"][0]
         path_b = path_a[0:-4] + "_fake_B.jpg"
         [fake_b] = gen_a.run(None, {gen_a_input_name: img_a})
         save_image(fake_b, os.path.join(imgs_out, "fake_B", path_b))
@@ -77,7 +77,7 @@ def predict():
     reporter.start_predict("B to A")
     for data in ds.create_dict_iterator(output_numpy=True):
         img_b = data["image"]
-        path_b = str(data["image_name"][0], encoding="utf-8")
+        path_b = data["image_name"][0]
         path_a = path_b[0:-4] + "_fake_A.jpg"
         [fake_a] = gen_b.run(None, {gen_b_input_name: img_b})
         save_image(fake_a, os.path.join(imgs_out, "fake_A", path_a))

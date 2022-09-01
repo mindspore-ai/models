@@ -40,7 +40,7 @@ def show_predict_info(label_list, prediction_list, filename_list, predict_ng):
     """show_predict_info"""
     label_index = 0
     for label_index, predict_index, filename in zip(label_list, prediction_list, filename_list):
-        filename = np.array(filename).tostring().decode('utf8')
+        filename = np.array(filename).tostring()
         if label_index == -1:
             print("file: '{}' predict class id is: {}".format(
                 filename, predict_index))

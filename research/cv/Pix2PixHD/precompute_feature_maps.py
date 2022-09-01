@@ -47,6 +47,6 @@ for i, data in enumerate(data_loader):
     inst = ms.Tensor(data['inst'])
     feat_map = netE(image, inst)
     feat_map = resizeBilinear(feat_map, scale_factor=2)
-    save_path = data['path'][0].decode('utf-8').replace('/train_label', '/train_feat')
+    save_path = data['path'][0].replace('/train_label', '/train_feat')
     save_path = os.path.splitext(save_path)[0]
     save_image(feat_map, save_path, format_name='.png')

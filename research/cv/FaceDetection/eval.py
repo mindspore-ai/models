@@ -232,9 +232,9 @@ def run_eval():
                     single_dets.extend(tdets[op][b])
                 dets.append(single_dets)
 
-            det.update({batch_image_name[k].decode('UTF-8'): v for k, v in enumerate(dets)})
-            img_size.update({batch_image_name[k].decode('UTF-8'): v for k, v in enumerate(batch_image_size)})
-            img_anno.update({batch_image_name[k].decode('UTF-8'): v for k, v in enumerate(batch_labels)})
+            det.update({batch_image_name[k]: v for k, v in enumerate(dets)})
+            img_size.update({batch_image_name[k]: v for k, v in enumerate(batch_image_size)})
+            img_anno.update({batch_image_name[k]: v for k, v in enumerate(batch_labels)})
 
         print('eval times:', eval_times)
         print('batch size: ', config.batch_size)
