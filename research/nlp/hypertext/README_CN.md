@@ -238,23 +238,25 @@ python eval.py --datasetdir ./data/iflytek_public --datasetType iflytek  --model
 
 ```shell
 tnews
-python export.py --modelPath ./output/hypertext_tnews.ckpt --datasetType tnews --device Ascend --batch_size 1
+python export.py --modelPath ./output/hypertext_tnews.ckpt --datasetType tnews --device Ascend --batch_size 1 --file_format MINDIR
 iflytek
-python export.py --modelPath ./output/hypertext_iflytek.ckpt --datasetType iflytek --device Ascend --batch_size 1
+python export.py --modelPath ./output/hypertext_iflytek.ckpt --datasetType iflytek --device Ascend --batch_size 1 --file_format MINDIR
 ```
 
 - GPU处理器环境运行
 
 ```shell
 tnews
-python export.py --modelPath ./output/hypertext_tnews.ckpt --datasetType tnews --device GPU
+python export.py --modelPath ./output/hypertext_tnews.ckpt --datasetType tnews --device GPU --file_format MINDIR
 iflytek
-python export.py --modelPath ./output/hypertext_iflytek.ckpt --datasetType iflytek --device GPU
+python export.py --modelPath ./output/hypertext_iflytek.ckpt --datasetType iflytek --device GPU --file_format MINDIR
 ```
+
+注意：`file_format`必须在["AIR", "MINDIR"]中进行选择。
 
 ## 在Ascend310执行推理
 
-在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
+在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用mindir模型执行推理的示例。
 使用配置文件默认的export_batch_size导出MINDIR文件
 
 ```shell

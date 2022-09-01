@@ -35,6 +35,7 @@ parser.add_argument("--file_name",
                     default="hypertext",
                     help="output file name.")
 parser.add_argument('--device', default='GPU', type=str, help='device GPU Ascend')
+parser.add_argument('--file_format', default="MINDIR", type=str, chioces=['AIR', "MINDIR"], help="file format")
 args = parser.parse_args()
 
 config = Config(None, None, args.device)
@@ -79,7 +80,7 @@ def run_export():
     ht_infer = HyperTextTextInferExportCell(hmodel)
     x1 = Tensor(np.ones((args.batch_size, config.max_length)).astype(np.int32))
     x2 = Tensor(np.ones((args.batch_size, config.max_length)).astype(np.int32))
-    export(ht_infer, x1, x2, file_name=file_name, file_format='MINDIR')
+    export(ht_infer, x1, x2, file_name=file_name, file_format=args.file_format)
 
 
 if __name__ == '__main__':
