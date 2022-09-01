@@ -1,0 +1,79 @@
+name: train
+use_tb_logger: true
+model: SRFlow
+distortion: sr
+scale: 4
+gpu_ids: [ 0 ]
+
+#### datasets
+datasets:
+  train:
+    name: CelebA_160_tr
+    mode: LRHR_PKL
+    dataroot: src/dataset/DF2K_4X/train/DIV2K_X4_train.mindrecord
+    epoch: 30
+    batch_size: 12
+    quant: 32
+    HR_size: 160
+
+  val:
+    name: CelebA_160_va
+    mode: LRHR_PKL
+    dataroot: src/dataset/DF2K_4X/valid/DIV2K_X4_valid.mindrecord
+    quant: 32
+    n_max: 20
+
+#### Test Settings
+dataroot_GT: src/dataset/DF2K_4X/valid/DIV2K_X4_valid.mindrecord
+test_pretrained_model_path: DF2K_4X_test.ckpt
+heat: 0.9 # This is the standard deviation of the latent vectors
+
+#### network structures
+network_G:
+  which_model_G: SRFlowNet
+  in_nc: 3
+  out_nc: 3
+  nf: 64
+  nb: 23
+  upscale: 4
+
+  flow:
+    K: 16
+    L: 3
+    noInitialInj: true
+    coupling: CondAffineSeparatedAndCond
+    additionalFlowNoAffine: 2
+    split:
+      enable: true
+      consume_ratio: 0.5
+    fea_up0: true
+    stackRRDB:
+      blocks: [ 1, 8, 15, 22 ]
+      concat: true
+    CondAffineSeparatedAndCond:
+      hidden_channels: False
+      eps: False
+
+#### path
+path:
+  train_pretrain_model_G: DF2K_4X_train.ckpt
+  strict_load: true
+  resume_state: auto
+
+#### training settings: learning rate scheme, loss
+train:
+  manual_seed: 10
+  lr_G: !!float 2.5e-4
+  weight_decay_G: 0
+  beta1: 0.9
+  beta2: 0.99
+  lr_scheme: MultiStepLR
+  warmup_iter: -1  # no warm up
+  lr_steps_rel: [ 0.5, 0.75, 0.9, 0.95 ]
+  lr_decay: 2
+  lr_init: 0
+  lr_max: !!float 5e-4
+  lr_gamma: 0.5
+
+  niter: 200000
+  val_freq: 40000
