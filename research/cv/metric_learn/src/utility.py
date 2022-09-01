@@ -21,6 +21,7 @@ import numpy as np
 import cv2
 from src.config import config2
 
+
 def resize_short(img, target_size):
     """ resize_short """
     percent = float(target_size) / min(img.shape[0], img.shape[1])
@@ -28,6 +29,7 @@ def resize_short(img, target_size):
     resized_height = int(round(img.shape[0] * percent))
     resized = cv2.resize(img, (resized_width, resized_height), interpolation=cv2.INTER_LANCZOS4)
     return resized
+
 
 def functtt(param):
     """ fun """
@@ -39,6 +41,7 @@ def functtt(param):
         d[i][s + i] += 1e8
     sorted_index = np.argsort(d, 1)[:, :10]
     return sorted_index
+
 
 def recall_topk_parallel(fea, lab, k):
     """ recall_topk_parallel """
@@ -76,6 +79,7 @@ def recall_topk_parallel(fea, lab, k):
     res = res / len(fea)
     return res
 
+
 class GetDatasetGenerator_eval():
     """ GetDatasetGenerator_eval"""
     def __init__(self, data_dir, train_list):
@@ -95,13 +99,16 @@ class GetDatasetGenerator_eval():
         random.shuffle(train_image_list, random=r)
         self.__data = [i[0] for i in train_image_list]
         self.__label = [i[1] for i in train_image_list]
+
     def __getitem__(self, index):
         self.__img = cv2.imread(os.path.join(self.DATA_DIR, self.__data[index]))
         self.__img = resize_short(self.__img, 224)
         item = (self.__img, self.__label[index])
         return item
+
     def __len__(self):
         return len(self.__data)
+
 
 class GetDatasetGenerator_softmax():
     """ GetDatasetGenerator_softmax """
@@ -122,12 +129,15 @@ class GetDatasetGenerator_softmax():
         random.shuffle(train_image_list, random=r)
         self.__data = [i[0] for i in train_image_list]
         self.__label = [i[1] for i in train_image_list]
+
     def __getitem__(self, index):
         self.__img = cv2.imread(os.path.join(self.DATA_DIR, self.__data[index]))
         item = (self.__img, self.__label[index])
         return item
+
     def __len__(self):
         return len(self.__data)
+
 
 class GetDatasetGenerator_triplet():
     """ GetDatasetGenerator_triplet """
@@ -182,8 +192,10 @@ class GetDatasetGenerator_triplet():
         img = cv2.imread(self.__data[index])
         item = (img, self.__label[index])
         return item
+
     def __len__(self):
         return len(self.__data)
+
 
 class GetDatasetGenerator_quadruplet():
     """GetDatasetGenerator_quadruplet."""
@@ -238,5 +250,6 @@ class GetDatasetGenerator_quadruplet():
         img = cv2.imread(self.__data[index])
         item = (img, self.__label[index])
         return item
+
     def __len__(self):
         return len(self.__data)

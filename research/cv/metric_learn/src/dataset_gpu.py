@@ -17,17 +17,17 @@ create train or eval dataset.
 """
 import mindspore.common.dtype as mstype
 import mindspore.dataset as dss
-import mindspore.dataset.vision as C
-import mindspore.dataset.transforms as C2
+import mindspore.dataset.vision.c_transforms as C
+import mindspore.dataset.transforms.c_transforms as C2
 from mindspore.dataset.vision import Inter
 
 
 def create_dataset0(dataset_generator, do_train, batch_size=80, device_num=1, rank_id=0):
     """softmax dataset"""
     if device_num == 1:
-        ds = dss.GeneratorDataset(dataset_generator, ["image", "label"], num_parallel_workers=8, shuffle=True)
+        ds = dss.GeneratorDataset(dataset_generator, ["image", "label"], num_parallel_workers=4, shuffle=True)
     else:
-        ds = dss.GeneratorDataset(dataset_generator, ["image", "label"], num_parallel_workers=8, shuffle=True,
+        ds = dss.GeneratorDataset(dataset_generator, ["image", "label"], num_parallel_workers=4, shuffle=True,
                                   num_shards=device_num, shard_id=rank_id)
     trans = []
     if do_train:
@@ -41,9 +41,9 @@ def create_dataset0(dataset_generator, do_train, batch_size=80, device_num=1, ra
         C.HWC2CHW(),
         C2.TypeCast(mstype.float32)
     ]
-    ds = ds.map(operations=trans, input_columns="image", num_parallel_workers=8)
+    ds = ds.map(operations=trans, input_columns="image", num_parallel_workers=4)
     type_cast_op = C2.TypeCast(mstype.int32)
-    ds = ds.map(operations=type_cast_op, input_columns="label", num_parallel_workers=8)
+    ds = ds.map(operations=type_cast_op, input_columns="label", num_parallel_workers=4)
     # apply batch operations
     ds = ds.batch(batch_size, drop_remainder=True)
     return ds
@@ -52,9 +52,9 @@ def create_dataset0(dataset_generator, do_train, batch_size=80, device_num=1, ra
 def create_dataset1(dataset_generator, do_train, batch_size=80, device_num=1, rank_id=0):
     """triplet/quadruplet dataset"""
     if device_num == 1:
-        ds = dss.GeneratorDataset(dataset_generator, ["image", "label"], num_parallel_workers=8, shuffle=False)
+        ds = dss.GeneratorDataset(dataset_generator, ["image", "label"], num_parallel_workers=4, shuffle=False)
     else:
-        ds = dss.GeneratorDataset(dataset_generator, ["image", "label"], num_parallel_workers=8, shuffle=False,
+        ds = dss.GeneratorDataset(dataset_generator, ["image", "label"], num_parallel_workers=4, shuffle=False,
                                   num_shards=device_num, shard_id=rank_id)
     trans = []
     if do_train:
@@ -68,9 +68,9 @@ def create_dataset1(dataset_generator, do_train, batch_size=80, device_num=1, ra
         C.HWC2CHW(),
         C2.TypeCast(mstype.float32)
     ]
-    ds = ds.map(operations=trans, input_columns="image", num_parallel_workers=8)
+    ds = ds.map(operations=trans, input_columns="image", num_parallel_workers=4)
     type_cast_op = C2.TypeCast(mstype.int32)
-    ds = ds.map(operations=type_cast_op, input_columns="label", num_parallel_workers=8)
+    ds = ds.map(operations=type_cast_op, input_columns="label", num_parallel_workers=4)
     # apply batch operations
-    ds = ds.batch(batch_size, drop_remainder=False)
+    ds = ds.batch(batch_size, drop_remainder=True)
     return ds

@@ -35,6 +35,9 @@ parser.add_argument('--dataset_path', type=str, default=None, help='Dataset path
 parser.add_argument('--ckpt_path', type=str, default=None, help='Checkpoint file path')
 parser.add_argument('--device_id', type=int, default=0, help='Device id')
 parser.add_argument('--run_modelarts', type=ast.literal_eval, default=False, help='Run distribute')
+
+parser.add_argument("--device_target", type=str, default='Ascend', choices=['Ascend', 'GPU'],
+                    help="Device target, support Ascend and GPU.")
 args_opt = parser.parse_args()
 set_seed(1)
 
@@ -56,10 +59,10 @@ if __name__ == '__main__':
         context.set_context(device_id=args_opt.device_id)
         DATA_DIR = args_opt.dataset_path
 
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', save_graphs=False)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, save_graphs=False)
 
     #dataset
-    VAL_LIST = DATA_DIR + "/test_half.txt"
+    VAL_LIST = DATA_DIR + "/test.txt"
     dataset_generator_val = GetDatasetGenerator_eval(DATA_DIR, VAL_LIST)
 
     eval_dataset = create_dataset(dataset_generator_val, do_train=False, batch_size=30,
