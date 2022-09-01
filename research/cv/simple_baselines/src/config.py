@@ -12,14 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-'''
-config
-'''
+"""Config parameters for simple baselines."""
 from easydict import EasyDict as edict
 
 config = edict()
 
-#general
+# general
 config.GENERAL = edict()
 config.GENERAL.VERSION = 'commit'
 config.GENERAL.TRAIN_SEED = 1
@@ -27,7 +25,7 @@ config.GENERAL.EVAL_SEED = 1
 config.GENERAL.DATASET_SEED = 1
 config.GENERAL.RUN_DISTRIBUTE = True
 
-#model arts
+# model arts
 config.MODELARTS = edict()
 config.MODELARTS.IS_MODEL_ARTS = False
 config.MODELARTS.CACHE_INPUT = '/cache/data_tzh/'
@@ -50,7 +48,6 @@ config.NETWORK.NUM_DECONV_FILTERS = [256, 256, 256]
 config.NETWORK.NUM_DECONV_KERNELS = [4, 4, 4]
 config.NETWORK.FINAL_CONV_KERNEL = 1
 config.NETWORK.REVERSE = True
-
 config.NETWORK.TARGET_TYPE = 'gaussian'
 config.NETWORK.HEATMAP_SIZE = [48, 64]
 config.NETWORK.SIGMA = 2
@@ -66,7 +63,7 @@ config.DATASET.ROOT = '/home/dataset/coco/'
 config.DATASET.TRAIN_SET = 'train2017'
 config.DATASET.TRAIN_JSON = 'annotations/person_keypoints_train2017.json'
 config.DATASET.TEST_SET = 'val2017'
-config.DATASET.TEST_JSON = 'annotations/COCO_val2017_detections_AP_H_56_person.json'
+config.DATASET.TEST_JSON = 'annotations/person_keypoints_val2017.json'
 
 # training data augmentation
 config.DATASET.FLIP = True
@@ -76,7 +73,7 @@ config.DATASET.ROT_FACTOR = 40
 # train
 config.TRAIN = edict()
 config.TRAIN.SHUFFLE = True
-config.TRAIN.BATCH_SIZE = 64
+config.TRAIN.BATCH_SIZE = 64  # 32 in paper
 config.TRAIN.BEGIN_EPOCH = 0
 config.TRAIN.END_EPOCH = 140
 config.TRAIN.LR = 0.001
@@ -84,7 +81,9 @@ config.TRAIN.LR_FACTOR = 0.1
 config.TRAIN.LR_STEP = [90, 120]
 config.TRAIN.NUM_PARALLEL_WORKERS = 8
 config.TRAIN.SAVE_CKPT = True
-config.TRAIN.CKPT_PATH = "/home/dataset/coco/"
+config.TRAIN.CKPT_PATH = "/home/model/"
+config.TRAIN.SAVE_CKPT_EPOCH = 3
+config.TRAIN.KEEP_CKPT_MAX = 10
 
 # valid
 config.TEST = edict()
@@ -93,10 +92,10 @@ config.TEST.FLIP_TEST = True
 config.TEST.POST_PROCESS = True
 config.TEST.SHIFT_HEATMAP = True
 config.TEST.USE_GT_BBOX = False
-config.TEST.NUM_PARALLEL_WORKERS = 2
-config.TEST.MODEL_FILE = '/home/dataset/coco/multi_train_poseresnet_commit_0-140_292.ckpt'
+config.TEST.NUM_PARALLEL_WORKERS = 8
+config.TEST.MODEL_FILE = '/home/model/multi_train_poseresnet_commit_5-140_292.ckpt'
 config.TEST.COCO_BBOX_FILE = '/home/dataset/coco/annotations/COCO_val2017_detections_AP_H_56_person.json'
-config.TEST.OUTPUT_DIR = 'results/'
+config.TEST.OUTPUT_DIR = '/home/results/'
 
 # nms
 config.TEST.OKS_THRE = 0.9
@@ -105,7 +104,7 @@ config.TEST.BBOX_THRE = 1.0
 config.TEST.IMAGE_THRE = 0.0
 config.TEST.NMS_THRE = 1.0
 
-#310 infer-related
+# 310 infer-related
 config.INFER = edict()
 config.INFER.PRE_RESULT_PATH = './preprocess_Result'
 config.INFER.POST_RESULT_PATH = './result_Files'

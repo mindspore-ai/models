@@ -2,6 +2,8 @@
 
 <!-- TOC -->
 
+[View English](./README.md)
+
 - [simple_baselines描述](#simple_baselines描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
@@ -17,7 +19,6 @@
         - [onnx推理](#onnx推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
-        - [评估性能](#评估性能)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#ModelZoo主页)
 
@@ -59,7 +60,7 @@ simple_baselines的总体网络架构如下：
 
 # 环境要求
 
-- 硬件(Ascend)
+- 硬件（Ascend/GPU）
     - 准备Ascend处理器搭建硬件环境。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
@@ -81,7 +82,7 @@ simple_baselines的总体网络架构如下：
 
 - Ascend处理器环境运行
 
-```text
+```shell
 # 分布式训练
 用法：bash run_distribute_train.sh RANK_TABLE
 
@@ -92,12 +93,25 @@ simple_baselines的总体网络架构如下：
 用法：bash run_eval.sh
 ```
 
+- GPU处理器环境运行
+
+```shell
+# 分布式训练
+用法：bash scripts/run_distribute_train_gpu.sh DEVICE_NUM
+
+# 单机训练
+用法：bash scripts/run_standalone_train_gpu.sh DEVICE_ID
+
+# 运行评估示例
+用法：bash scripts/run_eval_gpu.sh DEVICE_ID
+```
+
 # 脚本说明
 
 ## 脚本及样例代码
 
-```shell
-
+```text
+.
 └──simple_baselines
   ├── README.md
   ├── scripts
@@ -108,13 +122,13 @@ simple_baselines的总体网络架构如下：
   ├── src
     ├── utils
         ├── coco.py                        # COCO数据集评估结果
-        ├── inference.py                   # 热图关键点预测
         ├── nms.py                         # nms
         ├── transforms.py                  # 图像处理转换
     ├── config.py                          # 参数配置
     ├── dataset.py                         # 数据预处理
     ├── network_with_loss.py               # 损失函数定义
-    └── pose_resnet.py                     # 主干网络定义
+    ├── pose_resnet.py                     # 主干网络定义
+    └── predict.py                         # 热图关键点预测
   ├── eval.py                              # 评估网络
   ├── eval_onnx.py                         # onnx推理
   └── train.py                             # 训练网络
@@ -126,7 +140,7 @@ simple_baselines的总体网络架构如下：
 
 - 配置模型相关参数：
 
-```python
+```text
 config.MODEL.INIT_WEIGHTS = True                                 # 初始化模型权重
 config.MODEL.PRETRAINED = 'resnet50.ckpt'                        # 预训练模型
 config.MODEL.NUM_JOINTS = 17                                     # 关键点数量
@@ -135,7 +149,7 @@ config.MODEL.IMAGE_SIZE = [192, 256]                             # 图像大小
 
 - 配置网络相关参数：
 
-```python
+```text
 config.NETWORK.NUM_LAYERS = 50                                   # resnet主干网络层数
 config.NETWORK.DECONV_WITH_BIAS = False                          # 网络反卷积偏差
 config.NETWORK.NUM_DECONV_LAYERS = 3                             # 网络反卷积层数
@@ -147,7 +161,7 @@ config.NETWORK.HEATMAP_SIZE = [48, 64]                           # 热图尺寸
 
 - 配置训练相关参数：
 
-```python
+```text
 config.TRAIN.SHUFFLE = True                                      # 训练数据随机排序
 config.TRAIN.BATCH_SIZE = 64                                     # 训练批次大小
 config.TRAIN.BEGIN_EPOCH = 0                                     # 测试数据集文件名
@@ -162,7 +176,7 @@ config.TRAIN.LR_FACTOR = 0.1                                     # 学习率降�
 
 - 配置验证相关参数：
 
-```python
+```text
 config.TEST.BATCH_SIZE = 32                                      # 验证批次大小
 config.TEST.FLIP_TEST = True                                     # 翻转验证
 config.TEST.USE_GT_BBOX = False                                  # 使用标注框
@@ -170,7 +184,7 @@ config.TEST.USE_GT_BBOX = False                                  # 使用标注�
 
 - 配置nms相关参数：
 
-```python
+```text
 config.TEST.OKS_THRE = 0.9                                       # OKS阈值
 config.TEST.IN_VIS_THRE = 0.2                                    # 可视化阈值
 config.TEST.BBOX_THRE = 1.0                                      # 候选框阈值
@@ -182,9 +196,9 @@ config.TEST.NMS_THRE = 1.0                                       # nms阈值
 
 ### 用法
 
-#### Ascend处理器环境运行
+- Ascend处理器环境运行
 
-```text
+```shell
 # 分布式训练
 用法：bash run_distribute_train.sh RANK_TABLE
 
@@ -193,6 +207,19 @@ config.TEST.NMS_THRE = 1.0                                       # nms阈值
 
 # 运行评估示例
 用法：bash run_eval.sh
+```
+
+- GPU处理器环境运行
+
+```shell
+# 分布式训练
+bash scripts/run_distribute_train_gpu.sh DEVICE_NUM
+
+# 单机训练
+bash scripts/run_standalone_train_gpu.sh DEVICE_ID
+
+# 运行评估示例
+bash scripts/run_eval_gpu.sh DEVICE_ID
 ```
 
 ### 结果
@@ -216,13 +243,20 @@ epoch:140 step:2340, loss is 0.0003393
 
 ### 用法
 
-#### Ascend处理器环境运行
-
 可通过改变config.py文件中的"config.TEST.MODEL_FILE"文件进行相应模型推理。
 
-```bash
+- Ascend处理器环境运行
+
+```shell
 # 评估
 bash eval.sh
+```
+
+- GPU处理器环境运行
+
+```shell
+# Evaluation
+bash scripts/run_eval_gpu.sh DEVICE_ID
 ```
 
 ### 结果
@@ -230,7 +264,6 @@ bash eval.sh
 使用COCO2017数据集文件夹中val2017进行评估simple_baselines,如下所示：
 
 ```text
-coco eval results saved to /cache/train_output/multi_train_poseresnet_v5_2-140_2340/keypoints_results.pkl
 AP: 0.704
 ```
 
@@ -270,7 +303,7 @@ AP:0.72296
 
 ## 推理过程
 
-### [导出mindir]
+### 导出mindir
 
 - 本地导出
 
@@ -280,7 +313,7 @@ python export.py
 
 - 在ModelArts上导出（如果想在modelarts中运行，请查看【modelarts】官方文档（https://support huaweicloud.com/modelarts/），如下启动即可）
 
-```python
+```text
 # (1) Upload the code folder to S3 bucket.
 # (2) Click to "create training task" on the website UI interface.
 # (3) Set the code directory to "/{path}/simple_pose" on the website UI interface.
@@ -317,7 +350,7 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 
 推理结果保存在当前路径中，您可以在 acc.log 文件中找到这样的结果。
 
-```bash
+```text
 AP: 0.7139169694686592
 ```
 
@@ -325,24 +358,21 @@ AP: 0.7139169694686592
 
 ## 性能
 
-### 评估性能
-
-#### COCO2017上性能参数
-
-| Parameters          | Ascend 910                   |
-| ------------------- | --------------------------- |
-| 模型版本       | simple_baselines               |
-| 资源            | Ascend 910；CPU：2.60GHz，192核；内存：755G                  |
-| 上传日期       | 2021-03-29 |
-| MindSpore版本   | 1.1.0                       |
-| 数据集             | COCO2017                    |
-| 训练参数 | epoch=140, batch_size=64   |
-| 优化器           | Adam                        |
-| 损失函数       | Mean Squared Error          |
-| 输出             | heatmap                     |
-| 输出             | heatmap                     |
-| 速度               | 1pc: 251.4 ms/step        |
-| 训练性能   | AP: 0.704          |
+| Parameters     | Ascend 910                  | GPU 1p           | GPU 8p |
+| -------------- | --------------------------- | ---------------- | ------------ |
+| 模型版本         | simple_baselines           | simple_baselines | simple_baselines |
+| 资源            | Ascend 910；CPU：2.60GHz，192核；内存：755G | Ubuntu 18.04.6, 1p RTX3090, CPU 2.90GHz, 64cores, RAM 252GB; Mindspore 1.5.0 | Ubuntu 18.04.6, 8pcs RTX3090, CPU 2.90GHz, 64cores, RAM 252GB; Mindspore 1.5.0 |
+| 上传日期         | 2021-03-29                 | 2021-12-29       | 2021-12-29 |
+| MindSpore版本   | 1.1.0                       | 1.5.0           | 1.5.0 |
+| 数据集           | COCO2017                   | COCO2017        | COCO2017 |
+| 训练参数         | epoch=140, batch_size=64    | epoch=140, batch_size=64 | epoch=140, batch_size=64 |
+| 优化器           | Adam                       | Adam            | Adam |
+| 损失函数         | Mean Squared Error          | Mean Squared Error | Mean Squared Error |
+| 输出            | heatmap                     | heatmap        | heatmap |
+| 最终损失         |                             | 0.27           | 0.27 |
+| 速度            | 1pc: 251.4 ms/step         | 184 ms/step      | 285 ms/step |
+| 训练总时间       |                            | 17h              | 3.5h |
+| 精确度          | AP: 0.704                   | AP: 0.7143      | AP: 0.7143 |
 
 # 随机情况说明
 
@@ -350,4 +380,4 @@ dataset.py中设置了“create_dataset”函数内的种子，同时在model.py
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/models)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。

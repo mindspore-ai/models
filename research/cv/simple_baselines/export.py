@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""
-export simple_baseline to mindir or air
-"""
+""" Export simple_baseline to mindir or air """
 import argparse
 import numpy as np
 from mindspore import context, Tensor, export

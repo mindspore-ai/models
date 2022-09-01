@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-'''
-coco
-'''
+"""coco"""
 from __future__ import division
 
 import json
@@ -33,10 +31,8 @@ except ImportError:
 
 from src.utils.nms import oks_nms
 
+
 def _write_coco_keypoint_results(img_kpts, num_joints, res_file):
-    '''
-    _write_coco_keypoint_results
-    '''
     results = []
 
     for img, items in img_kpts.items():
@@ -62,9 +58,6 @@ def _write_coco_keypoint_results(img_kpts, num_joints, res_file):
 
 
 def _do_python_keypoint_eval(res_file, res_folder, ann_path):
-    '''
-    _do_python_keypoint_eval
-    '''
     coco = COCO(ann_path)
     coco_dt = coco.loadRes(res_file)
     coco_eval = COCOeval(coco, coco_dt, 'keypoints')
@@ -87,10 +80,8 @@ def _do_python_keypoint_eval(res_file, res_folder, ann_path):
 
     return info_str
 
+
 def evaluate(cfg, preds, output_dir, all_boxes, img_id, ann_path):
-    '''
-    evaluate
-    '''
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     res_file = os.path.join(output_dir, 'keypoints_results.json')

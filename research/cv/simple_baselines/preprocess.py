@@ -12,17 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""
-preprocess.
-"""
+""" preprocess script """
 import os
 import numpy as np
 
 from src.dataset import keypoint_dataset
 from src.config import config
 
+
 def get_bin():
-    ''' get bin files'''
+    """ get bin files"""
     valid_dataset, _ = keypoint_dataset(
         config,
         bbox_file=config.TEST.COCO_BBOX_FILE,
@@ -61,6 +60,7 @@ def get_bin():
         np.save(os.path.join(score_path, file_name), item['score'])
         np.save(os.path.join(id_path, file_name), item['id'])
     print("=" * 20, "export bin files finished", "=" * 20)
+
 
 if __name__ == '__main__':
     get_bin()

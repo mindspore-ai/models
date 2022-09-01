@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-'''
-simple_baselines network
-'''
+""" simple_baselines network """
 from __future__ import division
 import os
 import mindspore.nn as nn
@@ -24,10 +22,9 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 BN_MOMENTUM = 0.1
 
+
 class MPReverse(nn.Cell):
-    '''
-    MPReverse
-    '''
+    """MPReverse"""
     def __init__(self, kernel_size=1, stride=1, pad_mode="valid"):
         super(MPReverse, self).__init__()
         self.maxpool = nn.MaxPool2d(kernel_size=kernel_size, stride=stride, pad_mode=pad_mode)
@@ -39,10 +36,9 @@ class MPReverse(nn.Cell):
         x = self.reverse(x)
         return x
 
+
 class Bottleneck(nn.Cell):
-    '''
-    model part of network
-    '''
+    """model part of network"""
     expansion = 4
 
     def __init__(self, inplanes, planes, stride=1, downsample=None):
@@ -59,9 +55,7 @@ class Bottleneck(nn.Cell):
         self.stride = stride
 
     def construct(self, x):
-        '''
-        construct
-        '''
+        """construct"""
         residual = x
 
         out = self.conv1(x)
@@ -85,10 +79,7 @@ class Bottleneck(nn.Cell):
 
 
 class PoseResNet(nn.Cell):
-    '''
-    PoseResNet
-    '''
-
+    """pose-resnet"""
     def __init__(self, block, layers, cfg):
         self.inplanes = 64
         self.deconv_with_bias = cfg.NETWORK.DECONV_WITH_BIAS
@@ -122,9 +113,7 @@ class PoseResNet(nn.Cell):
         )
 
     def _make_layer(self, block, planes, blocks, stride=1):
-        '''
-        _make_layer
-        '''
+        """make layer"""
         downsample = None
         if stride != 1 or self.inplanes != planes * block.expansion:
             downsample = nn.SequentialCell([nn.Conv2d(self.inplanes, planes * block.expansion,
@@ -134,16 +123,13 @@ class PoseResNet(nn.Cell):
         layers = []
         layers.append(block(self.inplanes, planes, stride, downsample))
         self.inplanes = planes * block.expansion
-        for i in range(1, blocks):
+        for _ in range(1, blocks):
             layers.append(block(self.inplanes, planes))
-            print(i)
 
         return nn.SequentialCell(layers)
 
     def _make_deconv_layer(self, num_layers, num_filters, num_kernels):
-        '''
-        _make_deconv_layer
-        '''
+        """make deconvolutional layer"""
         assert num_layers == len(num_filters), \
             'ERROR: num_deconv_layers is different len(num_deconv_filters)'
         assert num_layers == len(num_kernels), \
@@ -171,9 +157,6 @@ class PoseResNet(nn.Cell):
         return nn.SequentialCell(layers)
 
     def construct(self, x):
-        '''
-        construct
-        '''
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -186,6 +169,7 @@ class PoseResNet(nn.Cell):
 
         x = self.deconv_layers(x)
         x = self.final_layer(x)
+
         return x
 
     def init_weights(self, pretrained=''):
@@ -205,18 +189,16 @@ resnet_spec = {50: (Bottleneck, [3, 4, 6, 3]),
 
 
 def GetPoseResNet(cfg):
-    '''
-    GetPoseResNet
-    '''
+    """get pose-resnet"""
     num_layers = cfg.NETWORK.NUM_LAYERS
     block_class, layers = resnet_spec[num_layers]
     network = PoseResNet(block_class, layers, cfg)
 
     if cfg.MODEL.IS_TRAINED and cfg.MODEL.INIT_WEIGHTS:
-        pretrained = ''
         if cfg.MODELARTS.IS_MODEL_ARTS:
-            pretrained = cfg.MODELARTS.CACHE_INPUT + cfg.MODEL.PRETRAINED
+            pretrained = os.path.join(cfg.MODELARTS.CACHE_INPUT, cfg.MODEL.PRETRAINED)
         else:
-            pretrained = cfg.TRAIN.CKPT_PATH + cfg.MODEL.PRETRAINED
+            pretrained = os.path.join(cfg.TRAIN.CKPT_PATH, cfg.MODEL.PRETRAINED)
         network.init_weights(pretrained)
+
     return network

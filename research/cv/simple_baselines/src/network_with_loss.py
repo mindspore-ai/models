@@ -12,9 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-'''
-network_with_loss
-'''
+""" network_with_loss """
 from __future__ import division
 
 import mindspore.nn as nn
@@ -23,10 +21,9 @@ from mindspore.ops import functional as F
 from mindspore.nn.loss.loss import LossBase
 from mindspore.common import dtype as mstype
 
+
 class JointsMSELoss(LossBase):
-    '''
-    JointsMSELoss
-    '''
+    """JointsMSELoss"""
     def __init__(self, use_target_weight):
         super(JointsMSELoss, self).__init__()
         self.criterion = nn.MSELoss(reduction='mean')
@@ -37,9 +34,7 @@ class JointsMSELoss(LossBase):
         self.mul = P.Mul()
 
     def construct(self, output, target, target_weight):
-        '''
-        construct
-        '''
+        """ construct """
         total_shape = self.shape(output)
         batch_size = total_shape[0]
         num_joints = total_shape[1]
@@ -63,6 +58,7 @@ class JointsMSELoss(LossBase):
                 loss += 0.5 * self.criterion(heatmap_pred_squeezed, heatmap_gt_squeezed)
 
         return loss / num_joints
+
 
 class PoseResNetWithLoss(nn.Cell):
     """
