@@ -168,6 +168,8 @@ def run_train():
         net.to_float(mstype.float16)
 
     loss = LossNet()
+    if device_type == "Ascend":
+        loss.to_float(mstype.float32)
     lr = Tensor(dynamic_lr(config, rank_size=device_num), mstype.float32)
 
     opt = Momentum(params=net.trainable_params(), learning_rate=lr, momentum=config.momentum,
