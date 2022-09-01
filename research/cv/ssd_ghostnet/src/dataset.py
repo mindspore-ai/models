@@ -30,6 +30,9 @@ from src.model_utils.config import config
 from .box_utils import jaccard_numpy, ssd_bboxes_encode
 
 
+de.config.set_seed(1)
+
+
 def _rand(a=0., b=1.):
     """Generate random."""
     return np.random.rand() * (b - a) + a

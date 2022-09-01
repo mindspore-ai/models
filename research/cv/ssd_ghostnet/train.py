@@ -16,6 +16,8 @@
 """Train SSD and get checkpoint files."""
 
 import os
+import random
+from numpy.random import seed as seed_np
 import mindspore.nn as nn
 from mindspore import context, Tensor
 from mindspore.communication.management import init, get_rank
@@ -23,12 +25,18 @@ from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, LossMoni
 from mindspore.train import Model
 from mindspore.context import ParallelMode
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore.common import set_seed as seed_ms
 from src.ssd_ghostnet import SSD300, SSDWithLossCell, TrainingWrapper, ssd_ghostnet
 from src.dataset import create_ssd_dataset, data_to_mindrecord_byte_image, voc_data_to_mindrecord
 from src.lr_schedule import get_lr
 from src.init_params import init_net_param, filter_checkpoint_parameter
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
+
+
+random.seed(0)
+seed_ms(0)
+seed_np(0)
 
 
 @moxing_wrapper()
