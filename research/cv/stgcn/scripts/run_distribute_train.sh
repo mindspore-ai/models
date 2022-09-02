@@ -15,7 +15,7 @@
 # ============================================================================
 
 if [ $# != 5 ]; then
-  echo "Usage: sh run_distribute_train.sh [train_code_path][data_path][n_pred][graph_conv_type] [rank_table]"
+  echo "Usage: bash scripts/run_distribute_train.sh [train_code_path] [data_path] [n_pred] [graph_conv_type] [rank_table]"
   exit 1
 fi
 
@@ -75,9 +75,11 @@ do
     mkdir ${train_code_path}/device${DEVICE_ID}
     cd ${train_code_path}/device${DEVICE_ID} || exit
     python ${train_code_path}/train.py    --data_url=${data_path}   \
-                                               --train_url=./checkpoint   \
-                                               --run_distribute=True   \
-                                               --run_modelarts=False \
-                                               --n_pred=$n_pred     \
-                                               --graph_conv_type=$graph_conv_type > out.log 2>&1 &
+                                          --device_target="Ascend" \
+                                          --epochs=500 \
+                                          --train_url=./checkpoint \
+                                          --run_distribute=True   \
+                                          --run_modelarts=False \
+                                          --n_pred=$n_pred     \
+                                          --graph_conv_type=$graph_conv_type > out.log 2>&1 &
 done

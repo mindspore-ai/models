@@ -20,6 +20,7 @@ import numpy as np
 import pandas as pd
 import mindspore.dataset as ds
 
+
 class STGCNDataset:
     """ BRDNetDataset.
     Args:
@@ -68,7 +69,6 @@ class STGCNDataset:
             self.x[i, :, :, :] = self.dataset[head: tail].reshape(1, self.n_his, self.n_vertex)
             self.y[i] = self.dataset[tail + self.n_pred - 1]
 
-
     def __getitem__(self, index):
         """
         Args:
@@ -89,18 +89,16 @@ def load_weighted_adjacency_matrix(file_path):
     return df.to_numpy()
 
 
-def create_dataset(data_path, batch_size, n_his, n_pred, zscore, is_sigle, device_num=1, device_id=0, mode=0):
+def create_dataset(data_path, batch_size, n_his, n_pred, zscore,
+                   device_num=1, device_id=0, mode=0):
     """
     generate dataset for train or test.
     """
-    data = STGCNDataset(data_path, n_his, n_pred, zscore, mode=mode)
     shuffle = True
     if mode != 0:
         shuffle = False
-    if not is_sigle:
-        dataset = ds.GeneratorDataset(data, column_names=["inputs", "labels"], num_parallel_workers=32, \
-         shuffle=shuffle, num_shards=device_num, shard_id=device_id)
-    else:
-        dataset = ds.GeneratorDataset(data, column_names=["inputs", "labels"], num_parallel_workers=32, shuffle=shuffle)
-    dataset = dataset.batch(batch_size)
+    data = STGCNDataset(data_path, n_his, n_pred, zscore, mode=mode)
+    dataset = ds.GeneratorDataset(data, column_names=["inputs", "labels"], num_parallel_workers=8,
+                                  shuffle=shuffle, num_shards=device_num, shard_id=device_id)
+    dataset = dataset.batch(batch_size, drop_remainder=False)
     return dataset

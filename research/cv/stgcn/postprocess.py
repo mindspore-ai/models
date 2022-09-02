@@ -14,23 +14,14 @@
 # ============================================================================
 """compute acc for ascend 310"""
 import os
-import argparse
 import numpy as np
-
-from src.config import stgcn_chebconv_45min_cfg
-from src import dataloader
 from sklearn import preprocessing
 
-parser = argparse.ArgumentParser('mindspore stgcn testing')
-# Path for data
-parser.add_argument('--data_url', type=str, default='./data/', help='Test dataset directory.')
-parser.add_argument('--label_dir', type=str, default='', help='label data directory.')
-parser.add_argument('--result_dir', type=str, default="./result_Files", help='infer result dir.')
-parser.add_argument('--data_path', type=str, default="vel.csv", help='Dataset file of vel.')
-# Super parameters for testing
-parser.add_argument('--n_pred', type=int, default=9, help='The number of time interval for predcition')
+from src.argparser import arg_parser
+from src.config import stgcn_chebconv_45min_cfg
+from src import dataloader
 
-args, _ = parser.parse_known_args()
+args = arg_parser()
 
 cfg = stgcn_chebconv_45min_cfg
 cfg.batch_size = 1
@@ -42,8 +33,8 @@ if __name__ == "__main__":
     rst_path = args.result_dir
     labels = np.load(args.label_dir)
 
-    dataset = dataloader.create_dataset(args.data_url+args.data_path, \
-     cfg.batch_size, cfg.n_his, cfg.n_pred, zscore, True, mode=2)
+    dataset = dataloader.create_dataset(args.data_url+args.data_path, cfg.batch_size,
+                                        cfg.n_his, cfg.n_pred, zscore, True, mode=2)
 
     mae, sum_y, mape, mse = [], [], [], []
 

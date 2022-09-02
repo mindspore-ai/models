@@ -71,7 +71,7 @@ parser = argparse.ArgumentParser('mindspore stgcn training')
 # The way of training
 parser.add_argument('--device_target', type=str, default='Ascend', \
  help='device where the code will be implemented. (Default: Ascend)')
-parser.add_argument('--save_check_point', type=bool, default=True, help='Whether save checkpoint')
+parser.add_argument('--save_checkpoint', type=bool, default=True, help='Whether save checkpoint')
 
 # Parameter
 parser.add_argument('--epochs', type=int, default=2, help='Whether save checkpoint')
@@ -209,7 +209,7 @@ if __name__ == "__main__":
     callbacks = [time_cb, loss_cb]
     prefix = ""
     #save training results
-    if args.save_check_point and (device_num == 1 or device_id == 0):
+    if args.save_checkpoint and (device_num == 1 or device_id == 0):
         config_ck = CheckpointConfig(
             save_checkpoint_steps=data_len*args.epochs, keep_checkpoint_max=args.epochs)
         prefix = 'STGCN' + cfg.graph_conv_type + str(cfg.n_pred) + '-'

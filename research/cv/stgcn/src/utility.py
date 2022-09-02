@@ -23,18 +23,18 @@ import mindspore.ops as ops
 from scipy.linalg import fractional_matrix_power
 from scipy.sparse.linalg import eigs
 
+
 def calculate_laplacian_matrix(adj_mat, mat_type):
     """
     calculate laplacian matrix used for graph convolution layer.
     """
-    n_vertex = adj_mat.shape[0]
 
     # row sum
     deg_mat_row = np.asmatrix(np.diag(np.sum(adj_mat, axis=1)))
     # column sum
-    #deg_mat_col = np.asmatrix(np.diag(np.sum(adj_mat, axis=0)))
     deg_mat = deg_mat_row
 
+    n_vertex = adj_mat.shape[0]
     adj_mat = np.asmatrix(adj_mat)
     id_mat = np.asmatrix(np.identity(n_vertex))
 
@@ -43,8 +43,8 @@ def calculate_laplacian_matrix(adj_mat, mat_type):
 
     # For SpectraConv
     # To [0, 1]
-    sym_normd_lap_mat = np.matmul(np.matmul(fractional_matrix_power(deg_mat, -0.5), \
-     com_lap_mat), fractional_matrix_power(deg_mat, -0.5))
+    sym_normd_lap_mat = np.matmul(np.matmul(fractional_matrix_power(deg_mat, -0.5), com_lap_mat),
+                                  fractional_matrix_power(deg_mat, -0.5))
 
     # For ChebConv
     # From [0, 1] to [-1, 1]
@@ -54,8 +54,8 @@ def calculate_laplacian_matrix(adj_mat, mat_type):
     # For GCNConv
     wid_deg_mat = deg_mat + id_mat
     wid_adj_mat = adj_mat + id_mat
-    hat_sym_normd_lap_mat = np.matmul(np.matmul(fractional_matrix_power(wid_deg_mat, -0.5), \
-     wid_adj_mat), fractional_matrix_power(wid_deg_mat, -0.5))
+    hat_sym_normd_lap_mat = np.matmul(np.matmul(fractional_matrix_power(wid_deg_mat, -0.5), wid_adj_mat),
+                                      fractional_matrix_power(wid_deg_mat, -0.5))
 
     # Random Walk
     rw_lap_mat = np.matmul(np.linalg.matrix_power(deg_mat, -1), adj_mat)
@@ -84,6 +84,7 @@ def calculate_laplacian_matrix(adj_mat, mat_type):
         return hat_rw_normd_lap_mat
     raise ValueError(f'ERROR: "{mat_type}" is unknown.')
 
+
 def evaluate_metric(model, dataset, scaler):
     """
     evaluate the performance of network.
@@ -104,6 +105,5 @@ def evaluate_metric(model, dataset, scaler):
     MAE = np.array(mae).mean()
     MAPE = np.array(mape).mean()
     RMSE = np.sqrt(np.array(mse).mean())
-    #WMAPE = np.sum(np.array(mae)) / np.sum(np.array(sum_y))
 
     return MAE, RMSE, MAPE

@@ -19,6 +19,7 @@ stgcn network with loss.
 import mindspore.nn as nn
 import mindspore.ops as P
 
+
 class LossCellWithNetwork(nn.Cell):
     """STGCN loss."""
     def __init__(self, network):
