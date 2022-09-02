@@ -63,7 +63,7 @@ class LoadData:
         """
         img_array = list()
         compatible_meta = dict()
-        filename = str(filename, encoding="utf-8")
+        filename = str(filename)
         filename = [filename]
         for name in filename:
             img = nib.load(name)
