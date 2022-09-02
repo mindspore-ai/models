@@ -35,7 +35,7 @@ parser.add_argument("--file_name",
                     default="hypertext",
                     help="output file name.")
 parser.add_argument('--device', default='GPU', type=str, help='device GPU Ascend')
-parser.add_argument('--file_format', default="MINDIR", type=str, chioces=['AIR', "MINDIR"], help="file format")
+parser.add_argument('--file_format', default="MINDIR", type=str, choices=['AIR', "MINDIR"], help="file format")
 args = parser.parse_args()
 
 config = Config(None, None, args.device)
