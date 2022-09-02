@@ -22,7 +22,8 @@ def tf_2_mr(item):
     item_path = item
     if not os.path.exists(args.output_mindrecord_dir):
         os.makedirs(args.output_mindrecord_dir, exist_ok=True)
-    mindrecord_path = args.output_mindrecord_dir + item[item.rfind('/') + 1:item.rfind('.')] + '.mindrecord'
+    mindrecord_path = os.path.join(args.output_mindrecord_dir,
+                                   item[item.rfind('/') + 1:item.rfind('.')] + '.mindrecord')
     print("Start convert {} to {}.".format(item_path, mindrecord_path))
     writer = FileWriter(file_name=mindrecord_path, shard_num=1, overwrite=True)
     nlp_schema = {"input_ids": {"type": "int64", "shape": [-1]},
