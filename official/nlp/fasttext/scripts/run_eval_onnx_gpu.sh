@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,10 +15,15 @@
 # ============================================================================
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "bash run_eval_gpu.sh DATASET_PATH DATASET_NAME MODEL_CKPT"
-echo "for example: bash run_eval_gpu.sh /home/workspace/ag/ ag device0/ckpt0/fasttext-5-118.ckpt"
+echo "bash run_eval_onnx.sh DATASET_PATH DATASET_NAME ONNX_PATH"
+echo "for example: bash run_eval_onnx.sh /home/workspace/ag/ ag device0/ckpt0"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
+if [ $# != 3 ]
+then
+    echo "Usage: bash run_eval_onnx.sh [DATASET_PATH] [DATASET_NAME] [ONNX_PATH]"
+exit 1
+fi
 
 get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
@@ -31,29 +36,29 @@ get_real_path(){
 DATASET=$(get_real_path $1)
 echo $DATASET
 DATANAME=$2
-MODEL_CKPT=$(get_real_path $3)
-echo "MODEL_CKPT:${MODEL_CKPT}"
+ONNX_PATH=$(get_real_path $3)
+echo "ONNX_PATH:${ONNX_PATH}"
 echo "DATANAME: ${DATANAME}"
 config_path="./${DATANAME}_config.yaml"
 echo "config path is : ${config_path}"
 
-if [ -d "eval" ];
+if [ -d "eval_onnx" ];
 then
-    rm -rf ./eval
+    rm -rf ./eval_onnx
 fi
-mkdir ./eval
-cp ../*.py ./eval
-cp ../*.yaml ./eval
-cp -r ../src ./eval
-cp -r ../model_utils ./eval
-cp -r ../scripts/*.sh ./eval
-cd ./eval || exit
+mkdir ./eval_onnx
+cp ../*.py ./eval_onnx
+cp ../*.yaml ./eval_onnx
+cp -r ../src ./eval_onnx
+cp -r ../model_utils ./eval_onnx
+cp -r ../scripts/*.sh ./eval_onnx
+cd ./eval_onnx || exit
 echo "start eval on standalone GPU"
 
-python ../../eval.py \
+python ../../eval_onnx.py \
 --config_path $config_path \
 --device_target GPU \
+--onnx_path $ONNX_PATH \
 --dataset_path $DATASET \
---data_name $DATANAME \
---model_ckpt $MODEL_CKPT> log_fasttext.log 2>&1 &
+--data_name $DATANAME > eval_onnx.log 2>&1 &
 cd ..

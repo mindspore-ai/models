@@ -65,7 +65,7 @@ fi
 
 if [ $DATASET_NAME == 'yelp_p' ];
 then
-  echo "Begin to process ag news data"
+  echo "Begin to process yelp_p news data"
   if [ -d "yelp_p" ];
   then
     rm -rf ./yelp_p
