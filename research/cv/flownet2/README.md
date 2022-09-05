@@ -86,8 +86,8 @@ Dataset used: [MpiSintel](http://sintel.cs.washington.edu)
 
 # [Environment Requirements](#contents)
 
-- Hardware（Ascend/GPU/CPU）
-    - Prepare hardware environment with Ascend/GPU/CPU processor.
+- Hardware（GPU）
+    - Prepare hardware environment with GPU processor.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
@@ -152,8 +152,6 @@ After installing MindSpore via the official website, you can start training and 
     ```
 
 - running on GPU
-
-  For running on GPU, please change `device_target` from `Ascend` to `GPU` in configuration file default_config.yaml
 
   ```python
   # run training example
