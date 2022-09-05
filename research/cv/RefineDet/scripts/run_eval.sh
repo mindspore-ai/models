@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,12 +16,12 @@
 
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_eval.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]"
+    echo "Usage: bash run_eval.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]"
 exit 1
 fi
 
 get_real_path(){
-  if [ "${1:0:1}" == "/" ]; then
+  if [ "${1:0:1}" = "/" ]; then
     echo "$1"
   else
     echo "$(realpath -m $PWD/$1)"
@@ -35,7 +35,7 @@ echo $CHECKPOINT_PATH
 
 if [ ! -f $CHECKPOINT_PATH ]
 then
-    echo "error: CHECKPOINT_PATH=$PATH2 is not a file"
+    echo "error: CHECKPOINT_PATH=$2 is not a file"
 exit 1
 fi
 

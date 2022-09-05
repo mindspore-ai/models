@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -307,7 +307,6 @@ def voc_eval(pred_data, config, ovthresh=0.5, use_07_metric=False):
         BB = np.array(cls_bboxes[cls])
         # sort by confidence
         sorted_ind = np.argsort(-confidence)
-        #sorted_scores = np.sort(-confidence)
         BB = BB[sorted_ind, :]
         image_ids = [image_ids[x] for x in sorted_ind]
 
@@ -349,7 +348,6 @@ def voc_eval(pred_data, config, ovthresh=0.5, use_07_metric=False):
         # compute precision recall
         fp = np.cumsum(fp)
         tp = np.cumsum(tp)
-        #print(npos, nd, fp[-1], tp[-1])
         rec = tp / float(npos)
         # avoid divide by zero in case the first detection matches a difficult
         # ground truth

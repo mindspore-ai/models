@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,14 +16,14 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_distribute_train.sh DEVICE_ID EPOCH_SIZE LR DATASET PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
-echo "for example: sh run_distribute_train.sh 0 500 0.2 coco /opt/ssd-300.ckpt(optional) 200(optional)"
+echo "bash run_distribute_train.sh DEVICE_ID EPOCH_SIZE LR DATASET PRE_TRAINED PRE_TRAINED_EPOCH_SIZE"
+echo "for example: bash run_distribute_train.sh 0 500 0.05 coco /models/refinedet.ckpt(optional) 200(optional)"
 echo "It is better to use absolute path."
 echo "================================================================================================================="
 
 if [ $# != 4 ] && [ $# != 6 ]
 then
-    echo "Usage: sh run_distribute_train.sh [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] \
+    echo "Usage: bash run_distribute_train.sh [DEVICE_ID] [EPOCH_SIZE] [LR] [DATASET] \
     [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)"
     exit 1
 fi
@@ -31,7 +31,7 @@ fi
 # Before start distribute train, first create mindrecord files.
 BASE_PATH=$(cd "`dirname $0`" || exit; pwd)
 cd $BASE_PATH/../ || exit
-python train.py --only_create_dataset=True --dataset=$4
+python train.py --only_create_dataset=True --dataset=$4 > mindrecord.log 2>&1
 
 echo "After running the script, the network runs in the background. The log will be generated in LOGx/log.txt"
 DEVICE_ID=$1
