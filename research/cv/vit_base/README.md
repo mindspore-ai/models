@@ -70,8 +70,17 @@ Adopt [mixed precision](https://www.mindspore.cn/docs/programming_guide/zh-CN/r1
 
 # Quick start
 
-After installing MindSpore through the official website，you can follow the steps below for training and evaluation，in particular，before training, you need to download the official baseImageNet21k pre-trained model [ViT-B_16](https://console.cloud.google.com/storage/vit_models/) , and convert it to the ckpt format model supported by MindSpore，named "cifar10_pre_checkpoint_based_imagenet21k.ckpt"，place the training set and test set data in the same level directory:
-Note: you can use .npz file, but only for ViT-base-16. For that, type the path to .npz in `config.py`.
+After installing MindSpore through the official website，you can follow the steps below for training and evaluation，in particular，before training, you need to download the official base [ImageNet21k](https://console.cloud.google.com/storage/vit_models/) pre-trained model [ViT-B_16](http://storage.googleapis.com/vit_models/imagenet21k/ViT-B_16.npz) , and convert it to the ckpt format model supported by MindSpore，named "cifar10_pre_checkpoint_based_imagenet21k.ckpt"，place the training set and test set data in the same level directory:
+
+ ```text
+└─dataset
+    ├─cifar10
+        ├─cifar-10-batches-bin
+        └─cifar-10-verify-bin
+    └─cifar10_pre_checkpoint_based_imagenet21k.ckpt
+```
+
+Note: you can use .npz file, but only for ViT-base-16. For that, change the `checkpoint_path` parameter in `config.py` to the path of .npz file.
 
 - Ascend or GPU
 
