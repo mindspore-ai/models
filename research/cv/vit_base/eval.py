@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ parser.add_argument('--sub_type', type=str, default='ViT-B_16',
                     choices=['ViT-B_16', 'ViT-B_32', 'ViT-L_16', 'ViT-L_32', 'ViT-H_14', 'testing'])
 parser.add_argument('--checkpoint_path', type=str, default='./ckpt_0', help='checkpoint file path')
 parser.add_argument('--device_target', type=str, default='GPU', help='device target Ascend or GPU. (Default: GPU)')
-parser.add_argument('--id', type=int, default=0, help='device id of Ascend or GPU. (Default: 0)')
+parser.add_argument('--device_id', type=int, default=0, help='device id of Ascend or GPU. (Default: 0)')
 args_opt = parser.parse_args()
 
 
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     context.set_context(
         mode=context.GRAPH_MODE,
         device_target=device_target,
-        device_id=args_opt.id,
+        device_id=args_opt.device_id,
     )
 
     dataset = create_dataset_cifar10(
