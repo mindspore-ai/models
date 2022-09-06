@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,4 +18,7 @@ echo "Usage: bash ./scripts/run_standalone_eval_ascend.sh [CKPT_PATH]"
 
 export CKPT=$1
 
-python eval.py --checkpoint_path $CKPT > ./eval.log 2>&1 &
+python eval.py \
+    --device_target="Ascend" \
+    --checkpoint_path $CKPT \
+    > ./eval.log 2>&1 &

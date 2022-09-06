@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,6 +21,6 @@ fi
 python ./eval.py \
     --device_target="GPU" \
     --dataset_name="$1" \
-    --id=$2 \
+    --device_id=$2 \
     --checkpoint_path=$3 \
     > ./eval.log 2>&1 &
