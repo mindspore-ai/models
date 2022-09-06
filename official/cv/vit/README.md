@@ -410,7 +410,7 @@ Current batch_ Size can only be set to 1.
 | Parameters                 | Ascend                                                      |
 | -------------------------- | ----------------------------------------------------------- |
 | Model Version              | Vit                                                         |
-| Resource                   | Ascend 910; CPU 2.60GHz, 56cores; Memory 314G; OS Euler2.8  |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8  |
 | uploaded Date              | 08/30/2021 (month/day/year)                                 |
 | MindSpore Version          | 1.3.0                                                       |
 | Dataset                    | 1200k images                                                |
