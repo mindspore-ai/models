@@ -83,10 +83,7 @@ if config.net_name in ("resnet18", "resnet34", "resnet50", "resnet152"):
     if config.dataset == "cifar10":
         from src.dataset import create_dataset1 as create_dataset
     else:
-        if config.mode_name == "GRAPH":
-            from src.dataset import create_dataset2 as create_dataset
-        else:
-            from src.dataset import create_dataset_pynative as create_dataset
+        from src.dataset import create_dataset2 as create_dataset
 elif config.net_name == "resnet101":
     from src.resnet import resnet101 as resnet
     from src.dataset import create_dataset3 as create_dataset
