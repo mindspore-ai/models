@@ -1223,10 +1223,7 @@ class TrainStepWrap(nn.Cell):
 
         overflow = self.loss_scaling_manager(self.loss_scale, cond)
 
-        if overflow:
-            succ = False
-        else:
-            succ = self.optimizer(grads)
+        if not overflow:
+            self.optimizer(grads)
 
-        ret = (loss, scale_sense)
-        return F.depend(ret, succ)
+        return loss, scale_sense
