@@ -154,7 +154,7 @@ python train.py --outdir ./output --device_target Ascend
 ```shell
 Ascend:
     # 分布式训练示例（8卡）
-    bash run_distribute_train.sh RANK_TABLE_FILE OUTPUT_DIR
+    bash run_distribute_train.sh RANK_TABLE_FILE
     # 单机训练
     bash run_train.sh OUTPUT_DIR
 ```
@@ -163,9 +163,9 @@ Ascend:
 
 ```shell
 # Ascend分布式训练示例（8卡）
-bash scripts/run_distribute_train.sh RANK_TABLE_FILE OUTPUT_DIR
+bash run_distribute_train.sh RANK_TABLE_FILE
 # Ascend单机训练示例
-bash scripts/run_train.sh OUTPUT_DIR
+bash run_train.sh OUTPUT_DIR
 ```
 
 您可以在日志中找到检查点文件和结果。
