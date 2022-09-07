@@ -23,7 +23,9 @@ from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
 
 
-context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+context.set_context(mode=context.GRAPH_MODE,
+                    device_target=config.device_target,
+                    max_call_depth=10000)
 
 def modelarts_pre_process():
     pass

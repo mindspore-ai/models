@@ -343,8 +343,7 @@ class NetWithLossClass(nn.Cell):
         sparse = config.sparse
         parallel_mode = context.get_auto_parallel_context("parallel_mode")
         is_auto_parallel = parallel_mode in (ParallelMode.SEMI_AUTO_PARALLEL, ParallelMode.AUTO_PARALLEL)
-        if sparse:
-            self.no_l2loss = True
+        self.no_l2loss = sparse
         self.network = network
         self.l2_coef = config.l2_coef
         self.loss = ops.SigmoidCrossEntropyWithLogits()

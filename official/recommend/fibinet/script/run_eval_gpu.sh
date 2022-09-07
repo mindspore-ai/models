@@ -17,24 +17,29 @@
 echo "=============================================================================================================="
 echo "Please run the script as: "
 echo "bash run_eval_gpu.sh"
-echo "         "
+echo "______________________________________________________________________________________________________________"
 echo "If your data_path or device_id or device_target is different from those in default_config.yaml, "
 echo "please run the script as: "
 echo "bash run_eval_gpu.sh DATA_PATH DEVICE_ID DEVICE_TARGET"
 echo "for example: bash ./script/run_eval_gpu.sh './data/mindrecord/' 1 GPU "
 echo "         "
 echo "**** FYI: only DEVICE_TARGET=GPU is supported currently. ****"
-echo "         "
+echo "______________________________________________________________________________________________________________"
 echo "Then you can find detailed log and results in files: eval_output.log, eval.log and loss.log. "
 echo "         "
 echo "If you want to set up more parameters by yourself, "
 echo "you are suggested to check the file default_config.yaml and change parameter values there. "
 echo "=============================================================================================================="
 
+if [ $# != 3 ]
+then
+  echo "Usage: bash run_train_gpu.sh [DATA_PATH] [DEVICE_ID] [DEVICE_TARGET] "
+exit 1
+fi
+
 DATA_PATH=$1
 DEVICE_ID=$2
-DEVICE_TARGET=GPU
-
+DEVICE_TARGET=$3
 
 export CUDA_VISIBLE_DEVICES=$DEVICE_ID
 python ./eval.py --data_path=$DATA_PATH --device_target=$DEVICE_TARGET > eval_output.log 2>&1 &

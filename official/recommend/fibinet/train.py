@@ -30,6 +30,7 @@ def train_eval_fibinet(config):
     data_path = config.data_path
     batch_size = config.batch_size
     epochs = config.epochs
+    sparse = config.sparse
     if config.dataset_type == "tfrecord":
         dataset_type = DataType.TFRECORD
     elif config.dataset_type == "mindrecord":
@@ -57,7 +58,6 @@ def train_eval_fibinet(config):
         auc_metric = AUCMetric()
         model = Model(train_net, eval_network=eval_net, metrics={"auc": auc_metric})
         eval_callback = EvalCallBack(model, ds_eval, auc_metric, config)
-        sparse = config.sparse
         out = model.eval(ds_eval, dataset_sink_mode=(not sparse))
         print("=====" * 5 + "model.eval() initialized: {}".format(out))
         model.train(epochs, ds_train,

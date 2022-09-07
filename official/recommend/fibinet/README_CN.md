@@ -81,10 +81,10 @@ python src/preprocess_data.py  --data_path=./data/ --dense_dim=13 --slot_dim=26 
 
 ```bash
 # 执行Python脚本
-python train.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=GPU --eval_while_train=True
+python train.py --data_path=./data/mindrecord --device_target=GPU --eval_while_train=True
 
 # 执行Shell脚本
-bash ./script/run_train_gpu.sh --data_path=./data/mindrecord --device_target=GPU --eval_while_train=True
+bash ./script/run_train_gpu.sh './data/mindrecord/' 1 GPU True
 ```
 
 按如下操作单独评估模型：
@@ -94,7 +94,7 @@ bash ./script/run_train_gpu.sh --data_path=./data/mindrecord --device_target=GPU
 python eval.py  --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=GPU
 
 # 执行Shell脚本
-bash ./script/run_eval_gpu.sh --data_path=./data/mindrecord --device_target=GPU
+bash ./script/run_eval_gpu.sh './data/mindrecord/' 1 GPU
 ```
 
 ## 脚本说明
@@ -107,7 +107,6 @@ bash ./script/run_eval_gpu.sh --data_path=./data/mindrecord --device_target=GPU
     ├── requirements.txt                          # python环境
     ├── script
     │   ├── common.sh
-    │   ├── run_train_and eval_gpu.sh             # GPU处理器单卡训练与评估shell脚本 （快速开始）
     │   ├── run_train_gpu.sh                      # GPU处理器单卡训练shell脚本
     │   └── run_eval_gpu.sh                       # GPU处理器单卡评估shell脚本
     ├──src
@@ -116,7 +115,6 @@ bash ./script/run_eval_gpu.sh --data_path=./data/mindrecord --device_target=GPU
     │   ├── generate_synthetic_data.py            # 生成虚拟数据
     │   ├── __init__.py
     │   ├── metrics.py                            # 模型表现评价指标脚本
-    │   ├── model_builder.py
     │   ├── preprocess_data.py                    # 数据预处理
     │   ├── process_data.py
     │   ├── fibinet.py                            # FiBiNET主体架构
@@ -142,7 +140,7 @@ Arguments:
 
   --device_target                     Device where the code will be implemented, only support GPU currently. (Default:GPU)
   --data_path                         Where the preprocessed data is put in
-  --epochs                            Total train epochs. (Default:100)
+  --epochs                            Total train epochs. (Default:10)
   --full_batch                        Enable loading the full batch. (Default:False)
   --batch_size                        Training batch size.(Default:1000)
   --eval_batch_size                   Eval batch size.(Default:1000)
@@ -164,7 +162,7 @@ Arguments:
   --loss_file_name                    Loss output file.(Default:loss.log)
   --dataset_type                      The data type of the training files, chosen from [tfrecord, mindrecord, hd5].(Default:mindrecord)
   --vocab_cache_size                  Enable cache mode.(Default:0)
-  --eval_while_train                  Whether to evaluate after each epoch
+  --eval_while_train                  Whether to evaluate after training each epoch
 ```
 
 ### 预处理脚本参数
@@ -246,7 +244,7 @@ python train.py --data_path=./data/mindrecord --dataset_type=mindrecord --device
 
 # Or
 
-bash ./script/run_train_gpu.sh --data_path=./data/mindrecord --device_target=GPU
+bash ./script/run_train_gpu.sh './data/mindrecord/' 1 GPU False
 ```
 
 ## 评估过程
@@ -254,11 +252,11 @@ bash ./script/run_train_gpu.sh --data_path=./data/mindrecord --device_target=GPU
 运行如下命令单独评估模型：
 
 ```bash
-python eval.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=GPU --ckpt_path=./ckpt/fibinet_train-100_45830.ckpt
+python eval.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=GPU --ckpt_path=./ckpt/fibinet_train-10_41265.ckpt
 
 # Or
 
-bash ./script/run_eval_gpu.sh --data_path=./data/mindrecord --device_target=GPU
+bash ./script/run_eval_gpu.sh './data/mindrecord/' 1 GPU
 ```
 
 ## 推理过程
@@ -269,7 +267,7 @@ bash ./script/run_eval_gpu.sh --data_path=./data/mindrecord --device_target=GPU
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --device_target [DEVICE_TARGET] --file_format [FILE_FORMAT]
 ```
 
-参数ckpt_file为必填项，默认值："./ckpt/fibinet_train-100_45830.ckpt"；
+参数ckpt_file为必填项，默认值："./ckpt/fibinet_train-10_41265.ckpt"；
 
 `FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择，默认值："MINDIR"。
 
@@ -278,7 +276,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --device_target
 推理结果保存在脚本执行的当前路径，在acc.log中可以看到以下精度计算结果。
 
 ```markdown
-auc : 0.7607724041538813
+auc :  0.7814143582416716
 ```
 
 # 模型描述
@@ -292,18 +290,18 @@ auc : 0.7607724041538813
 | 处理器                 | GPU                                             |
 | 资源                 | A100-SXM4-40GB                                  |
 | 上传日期            | 2022-07-29                                      |
-| MindSpore版本        | 1.7.1                                           |
+| MindSpore版本        | 1.9                                           |
 | 数据集                  | [1](#数据集)                                       |
-| 训练参数      | Epoch=100,<br />batch_size=1000,<br />lr=0.0001 |
+| 训练参数      | Epoch=10,<br />batch_size=1000,<br />lr=0.0001 |
 | 优化器                | FTRL,Adam                                       |
 | 损失函数       | Sigmoid交叉熵                                      |
-| AUC分数        | 0.76077                                         |
-| 速度           | 12.837毫秒/步                                      |
-| 损失           | 0.4269                                          |
+| AUC分数        |  0.7814143582416716                                         |
+| 速度           | 15.588毫秒/步                                      |
+| 损失           | 0.4702615                                          |
 | 参数(M)           | 30                                              |
-| 推理检查点 | 179.56MB（.ckpt文件）                               |
+| 推理检查点 | 180MB（.ckpt文件）                               |
 
-所有可执行脚本参见[此处](https://gitee.com/mindspore/models/tree/master/official/recommend/FiBiNet/script)。
+所有可执行脚本参见[此处](https://gitee.com/mindspore/models/tree/master/official/recommend/fibinet/script)。
 
 # 随机情况说明
 
