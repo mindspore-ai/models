@@ -137,7 +137,7 @@
     batch_size: 128                     # 批大小
     # ===== Hardware setup ===== #
     num_parallel_workers: 16            # 数据预处理线程数
-    device_target: Ascend               # GPU或者Ascend
+    device_target: Ascend               # Ascend
   ```
 
 更多配置细节请参考脚本`vig_s_patch16_224.yaml`。 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
