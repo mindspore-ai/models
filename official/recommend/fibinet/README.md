@@ -79,10 +79,10 @@ Once the dataset is ready, the model can be trained and evaluated by the command
 
 ```bash
 # Python command
-python train.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=GPU --eval_while_train=True
+python train.py --data_path=./data/mindrecord --device_target=GPU --eval_while_train=True
 
 # Shell command
-bash ./script/run_train_gpu.sh --data_path=./data/mindrecord --device_target=GPU --eval_while_train=True
+bash ./script/run_train_gpu.sh './data/mindrecord/' 1 GPU True
 ```
 
 To evaluate the model, command as follows:
@@ -92,7 +92,7 @@ To evaluate the model, command as follows:
 python eval.py  --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=GPU
 
 # Shell command
-bash ./script/run_eval_gpu.sh --data_path=./data/mindrecord --device_target=GPU
+bash ./script/run_eval_gpu.sh './data/mindrecord/' 1 GPU
 ```
 
 # [Script Description](#contents)
@@ -105,15 +105,13 @@ bash ./script/run_eval_gpu.sh --data_path=./data/mindrecord --device_target=GPU
     ├── requirements.txt                          # python environment
     ├── script
     │   ├── common.sh
-    │   ├── run_train_and eval_gpu.sh             # Shell script of GPU singledevice training and evaluation (quick start)
-    │   ├── run_train_gpu.sh                      # Shell script of GPU singledevice training
-    │   └── run_eval_gpu.sh                       # Shell script of GPU singledevice evaluation
+    │   ├── run_train_gpu.sh                      # Shell script of GPU single-device training
+    │   └── run_eval_gpu.sh                       # Shell script of GPU single-device evaluation
     ├──src
     │   ├── callbacks.py
     │   ├── datasets.py                           # Create dataset
     │   ├── generate_synthetic_data.py            # Generate synthetic data
     │   ├── __init__.py
-    │   ├── model_builder.py
     │   ├── metrics.py                            # Script of metrics
     │   ├── preprocess_data.py                    # Preprocess on dataset
     │   ├── process_data.py
@@ -142,7 +140,7 @@ Arguments:
 
   --device_target                     Device where the code will be implemented, only support GPU currently. (Default:GPU)
   --data_path                         Where the preprocessed data is put in
-  --epochs                            Total train epochs. (Default:100)
+  --epochs                            Total train epochs. (Default:10)
   --full_batch                        Enable loading the full batch. (Default:False)
   --batch_size                        Training batch size.(Default:1000)
   --eval_batch_size                   Eval batch size.(Default:1000)
@@ -164,7 +162,7 @@ Arguments:
   --loss_file_name                    Loss output file.(Default:loss.log)
   --dataset_type                      The data type of the training files, chosen from [tfrecord, mindrecord, hd5].(Default:mindrecord)
   --vocab_cache_size                  Enable cache mode.(Default:0)
-  --eval_while_train                  Whether to evaluate after each epoch
+  --eval_while_train                  Whether to evaluate after training each epoch
 ```
 
 ### [Preprocess Script Parameters](#contents)
@@ -194,7 +192,7 @@ usage: preprocess_data.py
   --threshold                         Word frequency below this value will be regarded as OOV. It aims to reduce the vocab size.(default: 100)
   --train_line_count                  The number of examples in your dataset.
   --skip_id_convert                   0 or 1. If set 1, the code will skip the id convert, regarding the original id as the final id.(default: 0)
-  --eval_size                         The percent of eval samples in the whole dataset.
+  --eval_size                         The percent of eval samples in the whole dataset.(default: 0.1)
   --line_per_sample                   The number of sample per line, must be divisible by batch_size.
 ```
 
@@ -235,30 +233,16 @@ python src/generate_synthetic_data.py --output_file=syn_data/origin_data/train.t
 python src/preprocess_data.py --data_path=./syn_data/  --dense_dim=13 --slot_dim=51 --threshold=0 --train_line_count=40000000 --skip_id_convert=1
 ```
 
-## [Training Process](#contents)
+## [Train Process](#contents)
 
-### [SingleDevice](#contents)
-
-To train and evaluate the model, command as follows:
+To train the model, command as follows:
 
 ```bash
 python train.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=GPU
 
 # Or
 
-bash ./script/run_train_gpu.sh --data_path=./data/mindrecord --device_target=GPU
-```
-
-### [SingleDevice For Cache Mode](#contents)
-
-To train and evaluate the model, command as follows:
-
-```bash
-python train.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=GPU
-
-# Or
-
-bash ./script/run_train_gpu.sh --data_path=./data/mindrecord --device_target=GPU
+bash ./script/run_train_gpu.sh './data/mindrecord/' 1 GPU False
 ```
 
 ## [Evaluation Process](#contents)
@@ -266,11 +250,11 @@ bash ./script/run_train_gpu.sh --data_path=./data/mindrecord --device_target=GPU
 To evaluate the model, command as follows:
 
 ```bash
-python eval.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=GPU --ckpt_path=./ckpt/fibinet_train-15_2582.ckpt
+python eval.py --data_path=./data/mindrecord --dataset_type=mindrecord --device_target=GPU --ckpt_path=./ckpt/fibinet_train-10_41265.ckpt
 
 # Or
 
-bash ./script/run_eval_gpu.sh --data_path=./data/mindrecord --device_target=GPU
+bash ./script/run_eval_gpu.sh './data/mindrecord/' 1 GPU
 ```
 
 ## Inference Process
@@ -289,7 +273,7 @@ The ckpt_file parameter is required,
 Inference result is saved in current path, you can find result like this in acc.log file.
 
 ```markdown
-auc : 0.7607724041538813
+auc : 0.7814143582416716
 ```
 
 # [Model Description](#contents)
@@ -302,17 +286,17 @@ auc : 0.7607724041538813
 | ----------------- | --------------------------- |
 | Resource          |A100-SXM4-40GB   |
 | Uploaded Date     | 07/29/2022 |
-| MindSpore Version | 1.7.1                       |
+| MindSpore Version | 1.9                       |
 | Dataset           | [1]                        |
 | Batch Size        | 1000                       |
-| Epoch           | 100                         |
+| Epoch           | 10                         |
 | Learning rate   | 0.0001               |
 | Optimizer           | FTRL,Adam                         |
 | Loss Function     | Sigmoid cross entropy    |
-| Loss           | 0.4269                         |
-| Speed           | 12.837 ms/step                         |
+| Loss           | 0.4702615                       |
+| Speed           | 15.588 ms/step                         |
 | Outputs           | AUC                         |
-| Accuracy          | AUC=0.76077                   |
+| Accuracy          | AUC= 0.7814143582416716                   |
 
 # [Description of Random Situation](#contents)
 

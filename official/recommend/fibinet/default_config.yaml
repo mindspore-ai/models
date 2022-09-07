@@ -1,4 +1,4 @@
-# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly the meaning of each parameter)
 enable_modelarts: False
 data_url: ""
 train_url: ""
@@ -12,7 +12,7 @@ enable_profiling: False
 
 # ==============================================================================
 # argparse_init 'fibinet'
-epochs: 100
+epochs: 10
 full_batch: False
 batch_size: 1000
 eval_batch_size: 1000
@@ -31,7 +31,7 @@ loss_file_name: "loss.log"
 dataset_type: "mindrecord"
 field_slice: False
 sparse: False
-eval_while_train: True
+eval_while_train: False
 deep_table_slice_mode: "column_slice"
 seed: 1024
 weight_bias_init: ['normal', 'normal']
@@ -45,7 +45,7 @@ bilinear_type: "all"  #bilinear_type: ['all', 'each', 'interaction']
 # ==============================================================================
 # fibinet export
 device_id: 0
-ckpt_file: "./ckpt/fibinet_train-100_45830.ckpt"
+ckpt_file: "./ckpt/fibinet_train-10_41265.ckpt"
 file_name: "fibinet"
 file_format: "MINDIR"
 
@@ -67,7 +67,7 @@ threshold: 100
 train_line_count: 45840617
 skip_id_convert: 0
 line_per_sample: 10
-eval_size: 0.2
+eval_size: 0.1
 
 # src/generate_synthetic_data.py 'Generate Synthetic Data'
 output_file: "./train.txt"
