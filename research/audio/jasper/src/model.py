@@ -30,7 +30,7 @@ activations = {
     "elu": nn.ELU,
 }
 
-TRAIN_INPUT_PAD_LENGTH = 1300
+TRAIN_INPUT_PAD_LENGTH = 1500
 TRAIN_LABEL_PAD_LENGTH = 350
 TEST_INPUT_PAD_LENGTH = 3500
 
@@ -289,9 +289,13 @@ class NetWithLossClass(nn.Cell):
     NetWithLossClass definition
     """
 
-    def __init__(self, network):
+    def __init__(self, network, ascend=False):
         super(NetWithLossClass, self).__init__(auto_prefix=False)
-        self.loss = P.CTCLoss(ctc_merge_repeated=True)
+        if ascend:
+            self.loss = P.CTCLoss(ctc_merge_repeated=True,
+                                  ignore_longer_outputs_than_inputs=True)
+        else:
+            self.loss = P.CTCLoss(ctc_merge_repeated=True)
         self.network = network
         self.ReduceMean_false = P.ReduceMean(keep_dims=False)
         self.squeeze_op = P.Squeeze(0)

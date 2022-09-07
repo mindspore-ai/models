@@ -27,7 +27,7 @@ train_config = ed({
 
     "TrainingConfig": {
         "epochs": 440,
-        "loss_scale": 128.0
+        "loss_scale": 128.0,
     },
 
     "DataConfig": {
@@ -110,6 +110,32 @@ eval_config = ed({
         "lm_workers": 4
     },
 
+})
+
+infer_config = ed({
+    "DataConfig": {
+        "Data_dir":
+        '/home/dataset/LibriSpeech',
+        "test_manifest":
+        ['/home/dataset/LibriSpeech/librispeech-test-clean-wav.json'],
+    },
+    "LMConfig": {
+        "decoder_type": "greedy",
+        "lm_path": './3-gram.pruned.3e-7.arpa',
+        "top_paths": 1,
+        "alpha": 1.818182,
+        "beta": 0,
+        "cutoff_top_n": 40,
+        "cutoff_prob": 1.0,
+        "beam_width": 1024,
+        "lm_workers": 4
+    },
+    "batch_size_infer": 1,
+    # for preprocess
+    "result_path": "./preprocess_Result",
+    # for postprocess
+    "result_dir": "./result_Files",
+    "post_out": "./infer_output.txt"
 })
 
 

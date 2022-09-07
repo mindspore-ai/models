@@ -42,8 +42,9 @@ parser.add_argument('--pre_trained_model_path', type=str,
                     default='', help='Pretrained checkpoint path')
 parser.add_argument('--is_distributed', action="store_true",
                     default=False, help='Distributed training')
-parser.add_argument('--device_target', type=str, default="GPU", choices=("GPU", "CPU"),
+parser.add_argument('--device_target', type=str, default="GPU", choices=("GPU", "CPU", "Ascend"),
                     help='Device target, support GPU and CPU, Default: GPU')
+parser.add_argument('--device_id', type=int, default=0, help='Device ID')
 args = parser.parse_args()
 
 ms.set_seed(1)
@@ -56,15 +57,20 @@ if __name__ == '__main__':
     data_sink = False
     context.set_context(mode=context.GRAPH_MODE,
                         device_target=args.device_target, save_graphs=False)
-    if args.device_target == "GPU":
-        context.set_context(enable_graph_kernel=False)
+
     if args.is_distributed:
         init()
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(
+            parallel_mode=ParallelMode.DATA_PARALLEL,
+            device_num=get_group_size(),
+            gradients_mean=True)
         rank_id = get_rank()
         group_size = get_group_size()
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(device_num=get_group_size(), parallel_mode=ParallelMode.DATA_PARALLEL,
-                                          gradients_mean=True)
+    else:
+        if args.device_target == "Ascend":
+            device_id = int(args.device_id)
+            context.set_context(device_id=device_id)
 
     with open(config.DataConfig.labels_path) as label_file:
         labels = json.load(label_file)
@@ -81,7 +87,7 @@ if __name__ == '__main__':
     jasper_net = Jasper(encoder_kw=encoder_kw,
                         decoder_kw=decoder_kw).to_float(ms.float16)
 
-    loss_net = NetWithLossClass(jasper_net)
+    loss_net = NetWithLossClass(jasper_net, ascend=(args.device_target == "Ascend"))
     init_weights(loss_net)
     weights = ParameterTuple(jasper_net.trainable_params())
     optimizer = AdamWeightDecay(weights, learning_rate=lr, eps=config.OptimConfig.epsilon, weight_decay=1e-3)

@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+
 DEVICE_ID=$1
 PATH_CHECKPOINT=$2
 export CUDA_VISIBLE_DEVICES=$DEVICE_ID

@@ -13,6 +13,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+if [ -d out ]; then
+    rm -rf out
+fi
 
-DEVICE_ID=$1
-CUDA_VISIBLE_DEVICES=$DEVICE_ID python ./train.py --device_target 'GPU' > train.log 2>&1 &
+mkdir out
+cd out || exit
+
+if [ -f "Makefile" ]; then
+  make clean
+fi
+
+cmake .. \
+    -DMINDSPORE_PATH="`pip show mindspore-ascend | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
+make
+

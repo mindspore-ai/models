@@ -12,16 +12,17 @@
   - [文件说明和运行说明](#文件说明和运行说明)
     - [代码目录结构说明](#代码目录结构说明)
     - [模型参数](#模型参数)
-    - [训练和推理过程](#训练和推理过程)
-    - [Export](#Export)
+    - [训练和评估](#训练和评估)
+    - [导出和推理](#导出和推理)
   - [性能](#性能)
     - [训练性能](#训练性能)
     - [推理性能](#推理性能)
+  - [FAQ](#FAQ)
   - [ModelZoo主页](#modelzoo主页)
 
 ## [Jasper介绍](#contents)
 
-Japser是一个使用 CTC 损失训练的端到端的语音识别模型。Jasper模型仅仅使用1D convolutions, batch normalization, ReLU, dropout和residual connections这些模块。训练和验证支持CPU和GPU。
+Japser是一个使用 CTC 损失训练的端到端的语音识别模型。Jasper模型仅仅使用1D convolutions, batch normalization, ReLU, dropout和residual connections这些模块。训练和验证支持CPU,GPU和Ascend。
 
 [论文](https://arxiv.org/pdf/1904.03288v3.pdf): Jason Li, et al. Jasper: An End-to-End Convolutional Neural Acoustic Model.
 
@@ -53,8 +54,8 @@ test-other.tar.gz [328M] (测试集, 有噪音)
 
 ## [环境要求](#contents)
 
-硬件（GPU）
-  GPU处理器
+硬件
+  GPU处理器或Ascend处理器
 框架
   [MindSpore](https://www.mindspore.cn/install/en)
 通过下面网址可以获得更多信息：
@@ -77,6 +78,8 @@ test-other.tar.gz [328M] (测试集, 有噪音)
         │  README.md                        //英文readme
         │  requirements.txt                 //需要的库文件
         │  train.py                         //训练文件
+        │  preprocess.py                    //推理预处理
+        │  postprocess.py                   //推理后处理
         │
         ├─scripts
         │      download_librispeech.sh      //下载数据集的脚本
@@ -86,6 +89,12 @@ test-other.tar.gz [328M] (测试集, 有噪音)
         │      run_eval_gpu.sh              //GPU推理
         │      run_standalone_train_cpu.sh  //CPU单卡训练
         │      run_standalone_train_gpu.sh  //GPU单卡训练
+        │      run_distribute_train_ascend.sh  //Ascend-910 8卡训练
+        │      run_standalone_train_ascend.sh  //Ascend-910单卡训练
+        │      run_eval_ascend.sh           //Ascend-910评估
+        │      run_infer_310.sh             //Ascend-310推理
+        |
+        ├─ascend310_infer                   //ascend-310推理代码
         │
         ├─src
         │      audio.py                     //数据处理相关代码
@@ -159,27 +168,26 @@ checkpoint相关参数
     keep_checkpoint_max          ckpt文件的最大数量限制，删除旧的检查点，默认是10
 ```
 
-## [训练和推理过程](#contents)
+## [训练和评估](#contents)
 
 ### 训练
 
 ```text
-运行: train.py   [--use_pretrained USE_PRETRAINED]
-                 [--pre_trained_model_path PRE_TRAINED_MODEL_PATH]
+运行: train.py   [--pre_trained_model_path PRE_TRAINED_MODEL_PATH]
                  [--is_distributed IS_DISTRIBUTED]
-                 [--bidirectional BIDIRECTIONAL]
                  [--device_target DEVICE_TARGET]
+                 [--device_id DEVICE_ID]
 参数:
     --pre_trained_model_path    预先训练的模型文件路径，默认为''
     --is_distributed            多卡训练，默认为False
-    --device_target             运行代码的设备："GPU" | “CPU”，默认为"GPU"
+    --device_target             运行代码的设备："GPU" | “CPU” | “Ascend”，默认为"GPU"
+    --device_target             运行代码的设备ID，使用Ascend训练时用到，默认为0
 ```
 
-### 推理
+### 评估
 
 ```text
-运行: eval.py   [--bidirectional BIDIRECTIONAL]
-                [--pretrain_ckpt PRETRAIN_CKPT]
+运行: eval.py   [--pretrain_ckpt PRETRAIN_CKPT]
                 [--device_target DEVICE_TARGET]
 
 参数:
@@ -244,9 +252,18 @@ bash ./scripts/run_standalone_train_cpu.sh
 # gpu多卡训练
 bash ./scripts/run_distribute_train_gpu.sh
 
+# Ascend单卡训练
+bash ./scripts/run_standalone_train_ascend.sh [DEVICE_ID]
+
+# Ascend多卡训练
+bash ./scripts/run_distribute_train_ascend.sh [RANK_SIZE] [BEGIN] [RANK_TABLE_FILE]
+# 其中，RANK_SIZE：训练的卡数，BEGIN：起始的卡号，RANK_TABLE_FILE：分布式配置文件路径
+
 ```
 
-推理：
+例如，可以这样进行Ascend八卡的训练：`bash ./scripts/run_distribute_train_ascend.sh 8 0 ./hccl_config/hccl_8.json`
+
+评估：
 
 ```shell
 
@@ -256,7 +273,52 @@ bash ./scripts/run_eval_cpu.sh [PATH_CHECKPOINT]
 # gpu评估
 bash ./scripts/run_eval_gpu.sh [DEVICE_ID] [PATH_CHECKPOINT]
 
+# Ascend评估
+bash ./scripts/run_eval_ascend.sh [DEVICE_ID] [PATH_CHECKPOINT]
+
 ```
+
+## [导出和推理](#contents)
+
+### 导出
+
+在推理之前需要先导出mindir，并准备好训练好的ckpt文件
+
+```shell
+# 在Ascend 910上执行导出
+DEVICE_ID=[DEVIC_ID] python export.py --pre_trained_model_path [CKPT_FILE] --device_target 'Ascend'
+```
+
+### 推理
+
+推理需要在Ascend 310上进行，将导出`jasper_graph.mindir`文件和`jasper_variables/`放置到当前路径，将处理好（从Ascend 910上）的测试集及对应的json文件存好，修改`src/config.py`中的推理配置的"DataConfig"，另外，推理需要用到第三方解码器，需要在环境中安装pytorch
+
+```shell
+# 推理配置
+"DataConfig": {
+    "Data_dir": '/home/dataset/LibriSpeech',
+    "test_manifest": ['/home/dataset/LibriSpeech/librispeech-test-clean-wav.json'],
+},
+"batch_size_infer": 1,
+# for preprocess
+"result_path": "./preprocess_Result",
+# for postprocess
+"result_dir": "./result_Files",
+"post_out": "./infer_output.txt"
+
+```
+
+执行推理脚本：
+
+```shell
+bash scripts/run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+```
+
+- `MINDIR_PATH` mindir文件
+- `NEED_PREPROCESS` 是否需要进行preprocess，需要设置'y'，不需要设置'n'
+- `DEVICE_ID` 是可选的，默认为0
+
+推理完成后，可以在`infer_output.txt`中看到推理结果
 
 ## [性能](#contents)
 
@@ -267,16 +329,16 @@ bash ./scripts/run_eval_gpu.sh [DEVICE_ID] [PATH_CHECKPOINT]
 | 参数                 | Jasper                                                      |
 | -------------------------- | ---------------------------------------------------------------|
 | 资源                   | NV SMX2 V100-32G              |
-| 更新日期              | 2/7/2022 (month/day/year)                                    |
+| 更新日期              | 7/2/2022 (month/day/year)                                    |
 | MindSpore版本           | 1.8.0                                                        |
 | 数据集                    | LibriSpeech                                                 |
 | 训练参数       | 8p, epoch=440, steps=1088 * epoch, batch_size = 64, lr=3e-4 |
 | 优化器                  | Adam                                                           |
 | 损失函数              | CTCLoss                                |
 | 输出                    | 概率值                                                    |
-| 损失值                       | 0.2-0.7                                                        |
-| 运行速度                      | 8p 2.7s/step                              |
-| 训练总时间       | 8p: around 194h;                          |
+| 损失值                       | 32-33                                                        |
+| 运行速度                      | GPU: 8p 2.7s/step; Ascend: 8p 1.7s/step    |
+| 训练总时间       | GPU: 8p around 194h; Ascend 8p around 220h  |
 | Checkpoint文件大小                 | 991M (.ckpt file)                                              |
 | 代码                   | [Japser script](https://gitee.com/mindspore/models/tree/master/research/audio/jasper) |
 
@@ -289,10 +351,19 @@ bash ./scripts/run_eval_gpu.sh [DEVICE_ID] [PATH_CHECKPOINT]
 | MindSpore版本          | 1.8.0                                                         |
 | 数据集                    | LibriSpeech                         |
 | 批处理大小                 | 64                                                         |
-| 输出                    | 概率值                       |
-| 精确度(无噪声)       | 8p: WER: 5.754  CER: 2.151 |
-| 精确度(有噪声)      | 8p: WER: 19.213 CER: 9.393 |
+| 输出                    | 错误率                       |
+| 精确度(无噪声)       | GPU: 8p WER: 5.754  CER: 2.151; Ascend: 8p, WER: 4.597  CER: 1.544 |
+| 精确度(有噪声)      | GPU: 8p, WER: 19.213 CER: 9.393; Ascend: 8p, WER, 12.871 CER: 5.618 |
 | 模型大小        | 330M (.mindir file)                                              |
+
+## [FAQ](#contents)
+
+Q1. 训练中断如何继续训练？  
+A1. 将中断时的ckpt文件作为训练脚本的pre_path参数，可以接着该断点继续训练。  
+Q2. 训练完成后如何选择ckpt文件去做推理？  
+A2. 可以根据输出的log文件，找到loss最小时对应的ckpt文件。  
+Q3. src/dataset.py, src/model.py和src/model_test.py中的常量TRAIN_INPUT_PAD_LENGTH如何设置？  
+A3. 该常量表示训练输入数据进行padding后的长度，可以适当增大牺牲训练时间以换取更低的错误率。
 
 ## [ModelZoo主页](#contents)
 
