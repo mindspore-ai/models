@@ -274,6 +274,7 @@ RetinaFace可以使用ResNet50或MobileNet0.25骨干提取图像特征进行检�
 - Ascend处理器环境运行（使用ResNet50作为backbone）
 
   ```bash
+  # 将src/config.py文件中nnpu参数改为1
   python train.py --backbone_name 'ResNet50' > train.log 2>&1 &
   OR
   bash ./scripts/run_standalone_train_ascend.sh

@@ -212,6 +212,9 @@ class BertTrainWithLossScaleCell(nn.TrainOneStepWithLossScaleCell):
     """
     def __init__(self, network, optimizer, scale_update_cell=None):
         super(BertTrainWithLossScaleCell, self).__init__(network, optimizer, scale_update_cell)
+        self.degree = 1
+        if self.reducer_flag:
+            self.degree = get_group_size()
         self.cast = P.Cast()
 
     def construct(self,
@@ -430,7 +433,11 @@ class BertEvaluationWithLossScaleCell(nn.TrainOneStepWithLossScaleCell):
     """
     def __init__(self, network, optimizer, scale_update_cell=None):
         super(BertEvaluationWithLossScaleCell, self).__init__(network, optimizer, scale_update_cell)
+        self.degree = 1
+        if self.reducer_flag:
+            self.degree = get_group_size()
         self.cast = P.Cast()
+
     def construct(self,
                   input_ids,
                   input_mask,

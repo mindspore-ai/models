@@ -24,4 +24,6 @@ fi
 data_path=$1
 ckpt_file=$2
 export DEVICE_ID=$3
-python ./eval.py --data_path $data_path --dataset 'ml-1m'  --eval_batch_size 160000 --output_path './output/' --eval_file_name 'eval.log' --checkpoint_file_path $ckpt_file --device_target=Ascend --device_id $DEVICE_ID > log.txt 2>&1 &
+python ./eval.py --data_path $data_path --dataset 'ml-1m'  --eval_batch_size 160000 \
+    --output_path './output/' --eval_file_name 'eval.log' --checkpoint_file_path $ckpt_file \
+    --device_target=Ascend --device_id $DEVICE_ID > eval.log 2>&1 &

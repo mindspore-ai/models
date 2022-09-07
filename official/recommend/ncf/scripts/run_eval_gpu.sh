@@ -25,4 +25,6 @@ fi
 data_path=$1
 ckpt_file=$2
 export CUDA_VISIBLE_DEVICES=$3
-python ./eval.py --data_path $data_path --dataset 'ml-1m'  --eval_batch_size 160000 --output_path './output/' --eval_file_name 'eval.log' --checkpoint_file_path $ckpt_file --device_target=GPU --device_id=0 > log.txt 2>&1 &
+python ./eval.py --data_path $data_path --dataset 'ml-1m'  --eval_batch_size 160000 \
+    --output_path './output/' --eval_file_name 'eval.log' --checkpoint_file_path $ckpt_file \
+    --device_target=GPU --device_id=0 > eval.log 2>&1 &
