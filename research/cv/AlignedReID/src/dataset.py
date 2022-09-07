@@ -263,7 +263,7 @@ def create_dataset(
         istrain=True,
         return_len=False,
 ):
-    """ Crate dataloader for ReID
+    """ Create dataloader for ReID
 
     Args:
         image_folder: path to image folder
@@ -328,7 +328,6 @@ def create_dataset(
         operations=compose_map_func,
         input_columns=["image", "label"],
         output_columns=["image", "label"],
-        column_order=["image", "label"],
         num_parallel_workers=num_parallel_workers,
     )
 

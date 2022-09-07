@@ -411,8 +411,6 @@ class COCOHP(ds.Dataset):
                                 input_columns=["image", "num_objects", "keypoints", "bbox", "category_id"],
                                 output_columns=["image", "hm", "reg_mask", "ind", "wh", "kps", "kps_mask",
                                                 "reg", "hm_hp", "hp_offset", "hp_ind", "hp_mask"],
-                                column_order=["image", "hm", "reg_mask", "ind", "wh", "kps", "kps_mask",
-                                              "reg", "hm_hp", "hp_offset", "hp_ind", "hp_mask"],
                                 num_parallel_workers=num_parallel_workers,
                                 python_multiprocessing=True)
         data_set = data_set.batch(batch_size, drop_remainder=True, num_parallel_workers=8)

@@ -270,18 +270,18 @@ def _get_tf_dataset(data_dir,
             'multi_doc_ad_topic_id_mask', 'ad_id', 'display_ad_and_is_leak',
             'display_id', 'is_leak'
         ],
-        column_order=[
-            'label', 'continue_val', 'indicator_id', 'emb_128_id',
-            'emb_64_single_id', 'multi_doc_ad_category_id',
-            'multi_doc_ad_category_id_mask', 'multi_doc_event_entity_id',
-            'multi_doc_event_entity_id_mask', 'multi_doc_ad_entity_id',
-            'multi_doc_ad_entity_id_mask', 'multi_doc_event_topic_id',
-            'multi_doc_event_topic_id_mask', 'multi_doc_event_category_id',
-            'multi_doc_event_category_id_mask', 'multi_doc_ad_topic_id',
-            'multi_doc_ad_topic_id_mask', 'display_id', 'ad_id',
-            'display_ad_and_is_leak', 'is_leak'
-        ],
         num_parallel_workers=8)
+    data_set = data_set.project([
+        'label', 'continue_val', 'indicator_id', 'emb_128_id',
+        'emb_64_single_id', 'multi_doc_ad_category_id',
+        'multi_doc_ad_category_id_mask', 'multi_doc_event_entity_id',
+        'multi_doc_event_entity_id_mask', 'multi_doc_ad_entity_id',
+        'multi_doc_ad_entity_id_mask', 'multi_doc_event_topic_id',
+        'multi_doc_event_topic_id_mask', 'multi_doc_event_category_id',
+        'multi_doc_event_category_id_mask', 'multi_doc_ad_topic_id',
+        'multi_doc_ad_topic_id_mask', 'display_id', 'ad_id',
+        'display_ad_and_is_leak', 'is_leak'
+        ])
 
     data_set = data_set.repeat(epochs)
     return data_set

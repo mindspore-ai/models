@@ -43,7 +43,6 @@ def GetDataLoader(per_batch_size,
         columns = ['image', "hm", 'reg_mask', 'ind', 'wh', 'wight_mask', 'hm_offset', 'hps_mask', 'landmarks']
         de_dataset = de_dataset.map(input_columns=["image", "anns"],
                                     output_columns=columns,
-                                    column_order=columns,
                                     operations=compose_map_func,
                                     num_parallel_workers=num_parallel_workers,
                                     python_multiprocessing=True)

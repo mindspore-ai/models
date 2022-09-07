@@ -131,7 +131,7 @@ def create_EfficientDet_datasets(mindrecord_file, batch_size, repeat_num, device
     output_columns = ["image", "anno"]
 
     ds = ds.map(operations=preprocess_fn, input_columns=["image", "annotation"],
-                output_columns=output_columns, column_order=output_columns,
+                output_columns=output_columns,
                 python_multiprocessing=is_training,
                 num_parallel_workers=num_parallel_workers)
 

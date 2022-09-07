@@ -296,7 +296,6 @@ def create_yolo_dataset(mindrecord_dir, batch_size=32, device_num=1, rank=0,
         hwc_to_chw = C.HWC2CHW()
         ds = ds.map(operations=compose_map_func, input_columns=["image", "annotation"],
                     output_columns=["image", "bbox_1", "bbox_2", "bbox_3", "gt_box1", "gt_box2", "gt_box3"],
-                    column_order=["image", "bbox_1", "bbox_2", "bbox_3", "gt_box1", "gt_box2", "gt_box3"],
                     num_parallel_workers=num_parallel_workers)
         if "x86" in platform.machine():
             ds = ds.map(operations=hwc_to_chw, input_columns=["image"], num_parallel_workers=num_parallel_workers)
@@ -306,6 +305,5 @@ def create_yolo_dataset(mindrecord_dir, batch_size=32, device_num=1, rank=0,
     else:
         ds = ds.map(operations=compose_map_func, input_columns=["image", "annotation"],
                     output_columns=["image", "image_shape", "annotation"],
-                    column_order=["image", "image_shape", "annotation"],
                     num_parallel_workers=num_parallel_workers)
     return ds

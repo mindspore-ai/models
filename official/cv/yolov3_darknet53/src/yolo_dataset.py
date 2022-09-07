@@ -182,7 +182,6 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, device_num, rank,
         compose_map_func = (lambda image, img_id: reshape_fn(image, img_id, config))
         dataset = dataset.map(operations=compose_map_func, input_columns=["image", "img_id"],
                               output_columns=["image", "image_shape", "img_id"],
-                              column_order=["image", "image_shape", "img_id"],
                               num_parallel_workers=8)
         dataset = dataset.map(operations=hwc_to_chw, input_columns=["image"], num_parallel_workers=8)
         dataset = dataset.batch(batch_size, drop_remainder=True)

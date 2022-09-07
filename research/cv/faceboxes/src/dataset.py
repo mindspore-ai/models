@@ -113,11 +113,9 @@ def create_dataset(data_dir, cfg, batch_size=32, repeat_num=1, shuffle=True, mul
 
     data_set = data_set.map(input_columns=["image", "annotation"],
                             output_columns=["image", "truths", "conf"],
-                            column_order=["image", "truths", "conf"],
                             operations=union_data,
                             python_multiprocessing=multiprocessing,
                             num_parallel_workers=num_worker)
-
     data_set = data_set.batch(batch_size, drop_remainder=True)
     data_set = data_set.repeat(repeat_num)
 

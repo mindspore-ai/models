@@ -118,15 +118,15 @@ class CscTokenizer:
     def get_token_ids(self, batch_size):
         dataset = get_dataset(self.fp, vocab_path=self.vocab_path, device_num=self.device_num, rank_id=self.rank_id)
         dataset = dataset.map(operations=self.tokenizer_op, input_columns=['original_tokens'])
-        dataset = dataset.map(operations=self.convert2id, input_columns=['original_tokens'], \
-                              output_columns=['original_tokens', 'original_tokens_mask', 'original_token_type_ids'], \
-                              column_order=['wrong_ids', 'original_tokens', 'original_tokens_mask', 'correct_tokens', \
-                              'original_token_type_ids'])
+        dataset = dataset.map(operations=self.convert2id, input_columns=['original_tokens'],
+                              output_columns=['original_tokens', 'original_tokens_mask', 'original_token_type_ids'])
+        dataset = dataset.project(['wrong_ids', 'original_tokens', 'original_tokens_mask', 'correct_tokens',
+                                   'original_token_type_ids'])
         dataset = dataset.map(operations=self.tokenizer_op, input_columns=['correct_tokens'])
-        dataset = dataset.map(operations=self.convert2id, input_columns=['correct_tokens'], \
-                              output_columns=['correct_tokens', 'correct_tokens_mask', 'correct_token_type_ids'], \
-                              column_order=['wrong_ids', 'original_tokens', 'original_tokens_mask', 'correct_tokens', \
-                              'correct_tokens_mask', 'original_token_type_ids', 'correct_token_type_ids'])
+        dataset = dataset.map(operations=self.convert2id, input_columns=['correct_tokens'],
+                              output_columns=['correct_tokens', 'correct_tokens_mask', 'correct_token_type_ids'])
+        dataset = dataset.project(['wrong_ids', 'original_tokens', 'original_tokens_mask', 'correct_tokens',
+                                   'correct_tokens_mask', 'original_token_type_ids', 'correct_token_type_ids'])
         dataset = dataset.map(operations=self.turn2int32, input_columns=['wrong_ids'])
         dataset = dataset.batch(batch_size=batch_size, drop_remainder=True)
         return dataset

@@ -297,7 +297,6 @@ def create_ctpn_dataset(mindrecord_file, batch_size=1, device_num=1, rank_id=0,
     if is_training:
         ds = ds.map(operations=compose_map_func, input_columns=["image", "annotation"],
                     output_columns=["image", "box", "label", "valid_num", "image_shape"],
-                    column_order=["image", "box", "label", "valid_num", "image_shape"],
                     num_parallel_workers=num_parallel_workers,
                     python_multiprocessing=True)
         ds = ds.map(operations=[normalize_op, type_cast0], input_columns=["image"],
@@ -310,10 +309,8 @@ def create_ctpn_dataset(mindrecord_file, batch_size=1, device_num=1, rank_id=0,
         ds = ds.map(operations=compose_map_func,
                     input_columns=["image", "annotation"],
                     output_columns=["image", "box", "label", "valid_num", "image_shape"],
-                    column_order=["image", "box", "label", "valid_num", "image_shape"],
                     num_parallel_workers=8,
                     python_multiprocessing=True)
-
         ds = ds.map(operations=[normalize_op, hwc_to_chw, type_cast1], input_columns=["image"],
                     num_parallel_workers=8)
     # transpose_column from python to c

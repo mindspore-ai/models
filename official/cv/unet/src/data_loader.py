@@ -261,7 +261,7 @@ def create_multi_class_dataset(data_dir, img_size, repeat, batch_size, num_class
     compose_map_func = (lambda image, mask: preprocess_img_mask(image, mask, num_classes, tuple(img_size),
                                                                 augment and is_train, eval_resize))
     dataset = dataset.map(operations=compose_map_func, input_columns=mc_dataset.column_names,
-                          output_columns=mc_dataset.column_names, column_order=mc_dataset.column_names,
+                          output_columns=mc_dataset.column_names,
                           num_parallel_workers=num_parallel_workers)
     dataset = dataset.batch(batch_size, drop_remainder=is_train, num_parallel_workers=num_parallel_workers)
     return dataset

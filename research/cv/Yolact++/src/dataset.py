@@ -479,19 +479,17 @@ def create_yolact_dataset(mindrecord_file, batch_size=2, device_num=1, rank_id=0
         ds = ds.map(operations=compose_map_func,
                     input_columns=["image", "annotation", "mask", "num_crowdses"],
                     output_columns=["image", "box", "label", "crowd_box", "mask"],
-                    column_order=["image", "box", "label", "crowd_box", "mask"],
                     python_multiprocessing=False,
                     num_parallel_workers=8)
 
         ds = ds.padded_batch(batch_size, drop_remainder=True,
                              pad_info={"mask": ([cfg['max_instance_count'], None, None], 0)})
-
     else:
         ds = ds.map(operations=compose_map_func,
                     input_columns=["image", "annotation", "mask", "mask_shape"],
                     output_columns=["image", "image_shape", "box", "label", "valid_num", "mask"],
-                    column_order=["image", "image_shape", "box", "label", "valid_num", "mask"],
                     num_parallel_workers=num_parallel_workers)
+        ds = ds.project(["image", "image_shape", "box", "label", "valid_num", "mask"])
         ds = ds.batch(batch_size, drop_remainder=True)
 
     return ds

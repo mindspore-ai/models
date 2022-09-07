@@ -488,7 +488,6 @@ def create_deeptext_dataset(mindrecord_file, batch_size=2, repeat_num=12, device
     if is_training:
         ds = ds.map(operations=compose_map_func, input_columns=["image", "annotation"],
                     output_columns=["image", "image_shape", "box", "label", "valid_num"],
-                    column_order=["image", "image_shape", "box", "label", "valid_num"],
                     num_parallel_workers=num_parallel_workers)
 
         flip = (np.random.rand() < config.flip_ratio)
@@ -508,9 +507,7 @@ def create_deeptext_dataset(mindrecord_file, batch_size=2, repeat_num=12, device
         ds = ds.map(operations=compose_map_func,
                     input_columns=["image", "annotation"],
                     output_columns=["image", "image_shape", "box", "label", "valid_num"],
-                    column_order=["image", "image_shape", "box", "label", "valid_num"],
                     num_parallel_workers=num_parallel_workers)
-
         ds = ds.map(operations=[normalize_op, hwc_to_chw, type_cast1], input_columns=["image"],
                     num_parallel_workers=24)
 

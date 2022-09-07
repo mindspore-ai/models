@@ -548,14 +548,12 @@ def create_fasterrcnn_dataset(config, mindrecord_file, batch_size=2, device_num=
     if is_training:
         ds = ds.map(input_columns=["image", "annotation"],
                     output_columns=["image", "image_shape", "box", "label", "valid_num"],
-                    column_order=["image", "image_shape", "box", "label", "valid_num"],
                     operations=compose_map_func, python_multiprocessing=python_multiprocessing,
                     num_parallel_workers=num_parallel_workers)
         ds = ds.batch(batch_size, drop_remainder=True)
     else:
         ds = ds.map(input_columns=["image", "annotation"],
                     output_columns=["image", "image_shape", "box", "label", "valid_num"],
-                    column_order=["image", "image_shape", "box", "label", "valid_num"],
                     operations=compose_map_func,
                     num_parallel_workers=num_parallel_workers)
         ds = ds.batch(batch_size, drop_remainder=True)

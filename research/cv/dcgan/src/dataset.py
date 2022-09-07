@@ -62,9 +62,9 @@ def create_dataset_imagenet(dataset_path, num_parallel_workers=None):
             np.random.normal(size=(dcgan_imagenet_cfg.latent_size, 1, 1)).astype("float32")
         ),
         output_columns=["image", "latent_code"],
-        column_order=["image", "latent_code"],
         num_parallel_workers=num_parallel_workers
     )
+    data_set = data_set.project(["image", "latent_code"])
 
     data_set = data_set.batch(dcgan_imagenet_cfg.batch_size)
 

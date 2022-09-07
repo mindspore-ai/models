@@ -39,7 +39,6 @@ def get_mindrecord_dataset(directory, train_mode=True, epochs=1, batch_size=1000
                                                          np.array(y).flatten().reshape(batch_size, 13),
                                                          np.array(z).flatten().reshape(batch_size, 1))),
                             input_columns=['cats_vals', 'num_vals', 'label'],
-                            column_order=['cats_vals', 'num_vals', 'label'],
                             num_parallel_workers=8)
     data_set = data_set.repeat(epochs)
     return data_set

@@ -221,7 +221,7 @@ def _get_tf_dataset(data_dir, train_mode=True, batch_size=1000,
 
     data_set = data_set.map(operations=_padding_func(batch_size, manual_shape, target_column),
                             input_columns=['feat_ids', 'feat_vals', 'label'],
-                            column_order=['feat_ids', 'feat_vals', 'label'], num_parallel_workers=8)
+                            num_parallel_workers=8)
     return data_set
 
 
@@ -259,7 +259,6 @@ def _get_mindrecord_dataset(directory, train_mode=True, batch_size=1000,
     data_set = data_set.batch(int(batch_size / line_per_sample), drop_remainder=True)
     data_set = data_set.map(_padding_func(batch_size, manual_shape, target_column),
                             input_columns=['feat_ids', 'feat_vals', 'label'],
-                            column_order=['feat_ids', 'feat_vals', 'label'],
                             num_parallel_workers=8)
     return data_set
 

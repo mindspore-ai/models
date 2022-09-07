@@ -255,11 +255,6 @@ def create_dataset(args):
                                 'conf_pos_mask_1', 'conf_neg_mask_1', 'cls_mask_1', 't_coord_1', 't_conf_1',
                                 't_cls_1', 'gt_list_1', 'coord_mask_2', 'conf_pos_mask_2', 'conf_neg_mask_2',
                                 'cls_mask_2', 't_coord_2', 't_conf_2', 't_cls_2', 'gt_list_2'],
-                column_order=["image", "annotation", 'coord_mask_0', 'conf_pos_mask_0', 'conf_neg_mask_0',
-                              'cls_mask_0', 't_coord_0', 't_conf_0', 't_cls_0', 'gt_list_0', 'coord_mask_1',
-                              'conf_pos_mask_1', 'conf_neg_mask_1', 'cls_mask_1', 't_coord_1', 't_conf_1',
-                              't_cls_1', 'gt_list_1', 'coord_mask_2', 'conf_pos_mask_2', 'conf_neg_mask_2',
-                              'cls_mask_2', 't_coord_2', 't_conf_2', 't_cls_2', 'gt_list_2'],
                 operations=compose_map_func, num_parallel_workers=get_num_parallel_workers(16),
                 python_multiprocessing=True)
 

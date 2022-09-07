@@ -97,8 +97,8 @@ def makeup_train_dataset(ds1, ds2, ds3, batchsize, epoch):
     ds_new = ds_new.project(columns=['data1', 'data2'])
     ds_new = ds.zip((ds3, ds_new))
     ds_new = ds_new.map(input_columns=['label'], output_columns=['label'],
-                        column_order=['data3', 'data2', 'data1', 'label'],
                         operations=lambda x: x)
+    ds_new = ds_new.project(['data3', 'data2', 'data1', 'label'])
     # to keep the order : data3 data2 data1 label
 
     # ds_new = ds_new.shuffle(ds_new.get_dataset_size())
@@ -164,11 +164,10 @@ def get_train_test_dataset(train_data_dir, test_data_dir, batchsize, epoch=1):
     func1 = lambda x, y: (x, y, np.array(1, dtype=np.int32))
     input_cols = ["image", "label"]
     output_cols = ["image", "label", "training"]
-    cols_order = ["image", "label", "training"]
     cifar10_test_dataset = cifar10_test_dataset.map(input_columns=input_cols, output_columns=output_cols,
-                                                    operations=func0, column_order=cols_order)
+                                                    operations=func0)
     cifar10_train_dataset = cifar10_train_dataset.map(input_columns=input_cols, output_columns=output_cols,
-                                                      operations=func1, column_order=cols_order)
+                                                      operations=func1)
     concat_dataset = cifar10_train_dataset + cifar10_test_dataset
     concat_dataset = concat_dataset.batch(batchsize)
     concat_dataset = concat_dataset.repeat(epoch)

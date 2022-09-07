@@ -37,8 +37,7 @@ def create_gru_dataset(epoch_count=1, batch_size=1, rank_size=1, rank_id=0, do_s
                         shuffle=do_shuffle, num_parallel_workers=10, num_shards=rank_size, shard_id=rank_id)
     operations = random_teacher_force
     ds = ds.map(operations=operations, input_columns=["source_ids", "target_ids", "target_mask"],
-                output_columns=["source_ids", "target_ids", "teacher_force"],
-                column_order=["source_ids", "target_ids", "teacher_force"])
+                output_columns=["source_ids", "target_ids", "teacher_force"])
     type_cast_op = deC.c_transforms.TypeCast(mstype.int32)
     type_cast_op_bool = deC.c_transforms.TypeCast(mstype.bool_)
     ds = ds.map(operations=type_cast_op, input_columns="source_ids")

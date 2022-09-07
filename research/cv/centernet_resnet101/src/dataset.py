@@ -379,9 +379,9 @@ class COCOHP(ds.Dataset):
         data_set = data_set.map(operations=self.preprocess_fn,
                                 input_columns=["image", "num_objects", "bboxes", "category_id"],
                                 output_columns=["image", "hm", "reg_mask", "ind", "wh", "reg"],
-                                column_order=["image", "hm", "reg_mask", "ind", "wh", "reg"],
                                 num_parallel_workers=num_parallel_workers,
                                 python_multiprocessing=True)
+        data_set = data_set.project(["image", "hm", "reg_mask", "ind", "wh", "reg"])
         data_set = data_set.batch(batch_size, drop_remainder=True, num_parallel_workers=8)
         logger.info("data size: {}".format(data_set.get_dataset_size()))
         logger.info("repeat count: {}".format(data_set.get_repeat_count()))
