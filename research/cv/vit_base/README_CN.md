@@ -70,7 +70,17 @@ vit_base的总体网络架构如下： [链接](https://arxiv.org/abs/2010.11929
 
 # 快速入门
 
-通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估，特别地，进行训练前需要先下载官方基于ImageNet21k的预训练模型[ViT-B_16](https://console.cloud.google.com/storage/vit_models/) ，并将其转换为MindSpore支持的ckpt格式模型，命名为"cifar10_pre_checkpoint_based_imagenet21k.ckpt"，和训练集测试集数据放于同一级目录下：
+通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估，特别地，进行训练前需要先下载官方基于[ImageNet21k](https://console.cloud.google.com/storage/vit_models/)的预训练模型[ViT-B_16](http://storage.googleapis.com/vit_models/imagenet21k/ViT-B_16.npz) ，并将其转换为MindSpore支持的ckpt格式模型，命名为"cifar10_pre_checkpoint_based_imagenet21k.ckpt"，和训练集测试集数据放于同一级目录下：
+
+ ```text
+└─dataset
+    ├─cifar10
+        ├─cifar-10-batches-bin
+        └─cifar-10-verify-bin
+    └─cifar10_pre_checkpoint_based_imagenet21k.ckpt
+```
+
+注：你可以使用 .npz 格式的文件，但是仅适用于ViT-base-16。为此，请将`config.py`文件的`checkpoint_path`参数改为 .npz 文件的路径。
 
 - Ascend or GPU 处理器环境运行
 
