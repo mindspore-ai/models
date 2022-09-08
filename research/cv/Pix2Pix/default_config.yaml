@@ -61,6 +61,12 @@ predict_dir: "results/predict/"
 # export options
 image_size: 256
 file_format: "MINDIR"
+
+# onnx infer options
+onnx_infer_data_dir: "data/facades/val/"
+onnx_infer_dir: "results/onnx_infer/"
+onnx_path: "pix2pix.onnx"
+
 file_name: "pix2pix"
 
 ---
@@ -113,3 +119,6 @@ ckpt_dir: "file path of stored checkpoint file in training"
 ckpt: "file path of checking point file used in validation"
 predict_dir: "file path of generated image in validation"
 image_size: "export image size default=256"
+path_onnx: "file path of onnx file used in validation"
+onnx_infer_dir: "file path of generated image in onnx infer"
+onnx_infer_data_dir: "file path of onnx infer input data"

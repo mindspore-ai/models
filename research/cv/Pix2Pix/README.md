@@ -68,6 +68,18 @@ Dataset_2 used: [maps](http://efrosgans.eecs.berkeley.edu/pix2pix/datasets/maps.
 
 **Note:** We provide data/download_Pix2Pix_dataset.sh to download the datasets.
 
+Download facades dataset
+
+```python
+bash data/download_Pix2Pix_dataset.sh facades
+```
+
+Download maps dataset
+
+```python
+bash data/download_Pix2Pix_dataset.sh maps
+```
+
 # [Environment Requirements](#contents)
 
 - Hardware（Ascend）
@@ -101,6 +113,7 @@ The entire code structure is as following:
   └─run_train.sh                       # launch gpu/ascend training(1 pcs)
   └─run_distribute_train_gpu.sh        # launch gpu training(8 pcs)
   └─run_eval_gpu.sh                    # launch gpu eval
+  └─run_infer_onnx.sh                  # launch onnx infer
 ├─ imgs
   └─Pix2Pix-examples.jpg               # Pix2Pix Imgs
 ├─ src
@@ -123,8 +136,11 @@ The entire code structure is as following:
     ├─ local_adapter.py                # Get local ID
     ├─ moxing_adapter.py               # Parameter processing
 ├─ eval.py                             # evaluate Pix2Pix Model
+├─ infer_onnx.py                       # Pix2Pix onnx inference
 ├─ train.py                            # train script
-└─ export.py                           # export mindir script
+├─ requirements.txt                    # requirements file
+├─ export_onnx.py                      # export onnx script
+└─ export.py                           # export mindir and air script
 ```
 
 ## [Script Parameters](#contents)
@@ -153,11 +169,14 @@ Major parameters in train.py and config.py as follows:
 "dataset_size": 400                         # for Facade_dataset,the number is 400; for Maps_dataset,the number is 1096.
 "train_data_dir": None                      # the file path of input data during training.
 "val_data_dir": None                        # the file path of input data during validating.
+"onnx_infer_data_dir": ./data/facades/val/  # the file path of input data during onnx infer.
 "train_fakeimg_dir": ./results/fake_img/    # during training, the file path of stored fake img.
 "loss_show_dir": ./results/loss_show        # during training, the file path of stored loss img.
 "ckpt_dir": ./results/ckpt                  # during training, the file path of stored CKPT.
 "ckpt": None                                # during validating, the file path of the CKPT used.
+"onnx_path": None                           # during onnx infer, the file path of the ONNX used.
 "predict_dir": ./results/predict/           # during validating, the file path of Generated images.
+"onnx_infer_dir": ./results/onnx_infer/     # during onnx infer, the file path of Generated images.
 ```
 
 ## [Training](#contents)
@@ -171,7 +190,7 @@ python train.py --device_target [Ascend] --device_id [0]
 - running distributed trainning on Ascend with fixed parameters
 
 ```python
-bash run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATASET_PATH]
+bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATASET_PATH]
 ```
 
 - running on GPU with fixed parameters
@@ -185,7 +204,7 @@ bash scripts/run_train.sh [DEVICE_TARGET] [DEVICE_ID]
 - running distributed trainning on GPU with fixed parameters
 
 ```python
-bash run_distribute_train_gpu.sh [DATASET_PATH] [DATASET_NAME]
+bash scripts/run_distribute_train_gpu.sh [DATASET_PATH] [DATASET_NAME]
 ```
 
 ## [Evaluation](#contents)
@@ -211,10 +230,24 @@ bash scripts/run_eval_gpu.sh [DATASET_PATH] [DATASET_NAME] [VAL_DATA_PATH] [CKPT
 ## [310 infer](#contents)
 
 ```python
-bash run_infer_310.sh [The path of the MINDIR for 310 infer] [The path of the dataset for 310 infer] y Ascend 0
+bash scripts/run_infer_310.sh [The path of the MINDIR for 310 infer] [The path of the dataset for 310 infer] y Ascend 0
 ```
 
 **Note:**: Before executing 310 infer, create the MINDIR/AIR model using "python export.py --ckpt [The path of the CKPT for exporting] --train_data_dir [The path of the training dataset]".
+
+## [Onnx export](#contents)
+
+```python
+python export_onnx.py --ckpt [/path/pix2pix.ckpt] --device_target [GPU] --device_id [0]
+```
+
+## [Onnx infer](#contents)
+
+```python
+python infer_onnx.py --device_target [GPU] --device_id [0] --onnx_infer_data_dir [/path/data] --onnx_path [/path/pix2pix.onnx]
+OR
+bash scripts/run_infer_onnx.sh [DEVICE_TARGET] [DEVICE_ID] [ONNX_INFER_DATA_DIR] [ONNX_PATH]
+```
 
 # [Model Description](#contents)
 
