@@ -74,6 +74,7 @@ You can download the dataset and put the directory in structure as follows:
   ├── MINDdemo_config.yaml         # Configurations for demo
   ├── MINDlarge_config.yaml        # Configurations for large
   ├── MINDsmall_config.yaml        # Configurations for small
+  ├── MINDslarge_config_cpu.yaml   # Configurations for large on cpu
   ├── ascend310_infer              # application for 310 inference
   ├── train.py                     # training script
   ├── eval.py                      # evaluation script
@@ -111,6 +112,36 @@ You can start training using python or shell scripts. The usage of shell scripts
     Please follow the instructions in the link below:
 
     <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+
+- running on CPU
+
+    ```shell
+    # train using python
+    python train.py --config_path=[CONFIG_PATH]
+                    --platform=[PLATFORM]
+                    --dataset=[DATASET]
+                    --dataset_path=[DATASET_PATH]
+                    --save_checkpoint_path=[SAVE_CHECKPOINT_PATH]
+                    --weight_decay=False
+                    --sink_mode=False
+    # example
+    python train.py --config_path=MINDlarge_config_cpu.yaml --platform=CPU --dataset=large --dataset_path=MINDlarge --save_checkpoint_path=./script/checkpoint --weight_decay=False --sink_mode=False
+    # evaluation using python
+    python eval.py --config_path=[CONFIG_PATH]
+                    --platform=[PLATFORM]
+                    --dataset=[DATASET]
+                    --dataset_path=[DATASET_PATH]
+                    --checkpoint_path=[CHECKPOINT_PATH]
+    # example
+    python eval.py --config_path=MINDlarge_config_cpu.yaml --platform=CPU --dataset=large --dataset_path=MINDlarge --checkpoint_path=./script/checkpoint/naml_last.ckpt
+    ```
+
+    - `PLATFORM` should be CPU.
+    - `DEVICE_ID` is the device id you want to run the network.
+    - `DATASET` MIND dataset, support large.
+    - `DATASET_PATH` is the dataset path, the structure as [Dataset](#dataset).
+    - `SAVE_CHECKPOINT_PATH` is a pre-trained checkpoint path to save.
+    - `CHECKPOINT_PATH` is a pre-trained checkpoint path.
 
 - ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows)
 
@@ -259,6 +290,19 @@ bash run_infer_310.sh [NEWS_MODEL] [USER_MODEL] [DEVICE_ID]
 | batch_size          | 16                          |
 | outputs             | probability                 |
 | Accuracy            | AUC: 0.6669                 |
+
+### Inference on CPU Performance
+
+| Parameters        | CPU                       |
+| ----------------- | ------------------------- |
+| Model Version     | NAML                      |
+| Resource          | CPU                       |
+| Uploaded Date     | 8/9/2022 (month/day/year) |
+| MindSpore Version | 1.8                       |
+| Dataset           | MINDlarge                 |
+| batch_size        | 64                        |
+| outputs           | probability               |
+| Accuracy          | AUC: 0.6727               |
 
 # [Description of Random Situation](#contents)
 

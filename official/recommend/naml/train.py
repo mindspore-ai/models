@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -141,7 +141,10 @@ def run_train():
         for _, cell in net_with_loss.cells_and_names():
             if isinstance(cell, (nn.Embedding, nn.Softmax, nn.SoftmaxCrossEntropyWithLogits)):
                 cell.to_float(mstype.float32)
-        model = Model(net_with_loss, optimizer=opt, loss_scale_manager=loss_scale_manager)
+        if config.platform == 'CPU':
+            model = Model(net_with_loss, optimizer=opt, loss_scale_manager=None)
+        else:
+            model = Model(net_with_loss, optimizer=opt, loss_scale_manager=loss_scale_manager)
     else:
         model = Model(net_with_loss, optimizer=opt)
 
