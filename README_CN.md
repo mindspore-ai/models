@@ -20,7 +20,7 @@
 | 语音 | 语音合成 | [lpcnet](https://gitee.com/mindspore/models/tree/master/official/audio/lpcnet) |✅| ✅ |   |
 | 语音 | 语音合成 | [melgan](https://gitee.com/mindspore/models/tree/master/official/audio/melgan) |✅| ✅ |   |
 | 语音 | 语音合成 | [tacotron2](https://gitee.com/mindspore/models/tree/master/research/audio/tacotron2) |✅|   |   |
-| 推荐 | 推荐系统 | [bgcf](https://gitee.com/mindspore/models/tree/master/official/gnn/bgcf) |✅| ✅ |   |
+| 图神经网络 | 文本分类 | [bgcf](https://gitee.com/mindspore/models/tree/master/official/gnn/bgcf) |✅| ✅ |   |
 | 图神经网络 | 文本分类 | [gat](https://gitee.com/mindspore/models/tree/master/official/gnn/gat) |✅| ✅ |   |
 | 图神经网络 | 文本分类 | [gcn](https://gitee.com/mindspore/models/tree/master/official/gnn/gcn) |✅| ✅ |   |
 | 推荐 | 推荐系统 | [naml](https://gitee.com/mindspore/models/tree/master/official/recommend/naml) |✅| ✅ |   |

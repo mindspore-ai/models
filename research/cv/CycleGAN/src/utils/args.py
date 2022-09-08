@@ -17,10 +17,6 @@
 
 import argparse
 import ast
-from mindspore import context
-from mindspore.context import ParallelMode
-from mindspore.communication.management import init, get_rank, get_group_size
-
 
 parser = argparse.ArgumentParser(description='Cycle GAN')
 # basic parameters
@@ -118,24 +114,6 @@ args = parser.parse_args()
 
 def get_args(phase):
     """Define the common options that are used in both training and test."""
-    if args.device_num > 1:
-
-        context.set_context(mode=context.GRAPH_MODE, device_target=args.platform, save_graphs=args.save_graphs)
-        context.reset_auto_parallel_context()
-        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
-                                          device_num=args.device_num)
-        init()
-        args.rank = get_rank()
-        args.group_size = get_group_size()
-    else:
-        context.set_context(mode=context.GRAPH_MODE, device_target=args.platform,
-                            save_graphs=args.save_graphs, device_id=args.device_id)
-        args.rank = 0
-        args.device_num = 1
-
-    if args.platform == "GPU":
-        context.set_context(enable_graph_kernel=True)
-
     if args.platform == "Ascend":
         args.pad_mode = "CONSTANT"
 

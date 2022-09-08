@@ -13,33 +13,8 @@
 # limitations under the License.
 # ============================================================================
 
-import mindspore as ms
-import mindspore.communication as comm
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
-
 from src.models import Monitor
-
-def context_device_init(config):
-    if config.platform == "GPU" and config.run_distribute:
-        config.device_id = 0
-    config.rank_id = 0
-    config.rank_size = 1
-    if config.platform == "CPU":
-        ms.set_context(mode=ms.GRAPH_MODE, device_target=config.platform, save_graphs=False)
-
-    elif config.platform in ["Ascend", "GPU"]:
-        ms.set_context(mode=ms.GRAPH_MODE, device_target=config.platform, device_id=config.device_id,
-                       save_graphs=False)
-        if config.run_distribute:
-            comm.init()
-            config.rank_id = comm.get_rank()
-            config.rank_size = comm.get_group_size()
-            ms.set_auto_parallel_context(device_num=config.rank_size,
-                                         parallel_mode=ms.ParallelMode.DATA_PARALLEL,
-                                         gradients_mean=True)
-    else:
-        raise ValueError("Only support CPU, GPU and Ascend.")
-
 
 def config_ckpoint(config, lr, step_size, model=None, eval_dataset=None):
     cb = [Monitor(lr_init=lr.asnumpy(), model=model, eval_dataset=eval_dataset)]

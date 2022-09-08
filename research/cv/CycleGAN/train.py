@@ -22,6 +22,7 @@ Example:
 
 import mindspore as ms
 import mindspore.nn as nn
+from mindspore.communication.management import init, get_rank, get_group_size
 from src.utils.args import get_args
 from src.utils.reporter import Reporter
 from src.utils.tools import get_lr, ImagePool, load_ckpt
@@ -34,6 +35,21 @@ ms.set_seed(1)
 def train():
     """Train function."""
     args = get_args("train")
+    if args.device_num > 1:
+        ms.set_context(mode=ms.GRAPH_MODE, device_target=args.platform, save_graphs=args.save_graphs)
+        init()
+        ms.reset_auto_parallel_context()
+        ms.set_auto_parallel_context(parallel_mode=ms.ParallelMode.DATA_PARALLEL, gradients_mean=True)
+        args.rank = get_rank()
+        args.group_size = get_group_size()
+    else:
+        ms.set_context(mode=ms.GRAPH_MODE, device_target=args.platform,
+                       save_graphs=args.save_graphs, device_id=args.device_id)
+        args.rank = 0
+        args.device_num = 1
+
+    if args.platform == "GPU":
+        ms.set_context(enable_graph_kernel=True)
     if args.need_profiler:
         from mindspore.profiler.profiling import Profiler
         profiler = Profiler(output_path=args.outputs_dir, is_detail=True, is_show_op_path=True)
