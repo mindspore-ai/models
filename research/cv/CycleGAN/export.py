@@ -16,16 +16,15 @@
 """export file."""
 
 import numpy as np
-from mindspore import context, Tensor
-from mindspore.train.serialization import export
+import mindspore as ms
 from src.models.cycle_gan import get_generator
 from src.utils.args import get_args
 from src.utils.tools import load_ckpt, enable_batch_statistics
 
-args = get_args("export")
-context.set_context(mode=context.GRAPH_MODE, device_target=args.platform)
 
 if __name__ == '__main__':
+    args = get_args("export")
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=args.platform)
     G_A = get_generator(args)
     G_B = get_generator(args)
     # Use BatchNorm2d with batchsize=1, affine=False, use_batch_statistics=True instead of InstanceNorm2d
@@ -35,8 +34,8 @@ if __name__ == '__main__':
     load_ckpt(args, G_A, G_B)
 
     input_shp = [args.export_batch_size, 3, args.image_size, args.image_size]
-    input_array = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp).astype(np.float32))
+    input_array = ms.Tensor(np.random.uniform(-1.0, 1.0, size=input_shp).astype(np.float32))
     G_A_file = f"{args.export_file_name}_AtoB"
-    export(G_A, input_array, file_name=G_A_file, file_format=args.export_file_format)
+    ms.export(G_A, input_array, file_name=G_A_file, file_format=args.export_file_format)
     G_B_file = f"{args.export_file_name}_BtoA"
-    export(G_B, input_array, file_name=G_B_file, file_format=args.export_file_format)
+    ms.export(G_B, input_array, file_name=G_B_file, file_format=args.export_file_format)

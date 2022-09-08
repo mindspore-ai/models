@@ -20,7 +20,6 @@ import mindspore as ms
 import mindspore.nn as nn
 from src.dataset import create_dataset
 from src.models import define_net, load_ckpt
-from src.utils import context_device_init
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper, modelarts_process
 from src.model_utils.device_adapter import get_device_id
@@ -30,11 +29,11 @@ config.is_training = config.is_training_eval
 
 @moxing_wrapper(pre_process=modelarts_process)
 def eval_mobilenetv2():
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=config.platform, save_graphs=False)
     config.dataset_path = os.path.join(config.dataset_path, 'validation_preprocess')
     print('\nconfig: \n', config)
     if not config.device_id:
         config.device_id = get_device_id()
-    context_device_init(config)
     _, _, net = define_net(config, config.is_training)
 
     load_ckpt(net, config.pretrain_ckpt)

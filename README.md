@@ -20,7 +20,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Audio | Speech Synthesis | [lpcnet](https://gitee.com/mindspore/models/tree/master/official/audio/lpcnet) |✅| ✅ |   |
 | Audio | Speech Synthesis | [melgan](https://gitee.com/mindspore/models/tree/master/official/audio/melgan) |✅| ✅ |   |
 | Audio | Speech Synthesis | [tacotron2](https://gitee.com/mindspore/models/tree/master/research/audio/tacotron2) |✅|   |   |
-| Graph Neural Network | Recommender System | [bgcf](https://gitee.com/mindspore/models/tree/master/official/gnn/bgcf) |✅| ✅ |   |
+| Graph Neural Network | Text Classification | [bgcf](https://gitee.com/mindspore/models/tree/master/official/gnn/bgcf) |✅| ✅ |   |
 | Graph Neural Network | Text Classification | [gat](https://gitee.com/mindspore/models/tree/master/official/gnn/gat) |✅| ✅ |   |
 | Graph Neural Network | Text Classification | [gcn](https://gitee.com/mindspore/models/tree/master/official/gnn/gcn) |✅| ✅ |   |
 | Recommendation | Recommender System | [naml](https://gitee.com/mindspore/models/tree/master/official/recommend/naml) |✅| ✅ |   |

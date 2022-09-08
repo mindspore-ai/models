@@ -68,7 +68,7 @@ run_ascend_or_gpu()
     fi
 
     export PYTHONPATH=${BASEPATH}:$PYTHONPATH
-    if [ $1 = "Ascend" ]; then
+    if [ $1 = "Ascend" ] && [ $3 -eq 1 ]; then
         export DEVICE_ID=${CANDIDATE_DEVICE[0]}
         export RANK_ID=0
     elif [ $1 = "GPU" ]; then

@@ -18,9 +18,7 @@ mobilenetv2 export file.
 import numpy as np
 import mindspore as ms
 from src.models import define_net, load_ckpt
-from src.utils import context_device_init
 from src.model_utils.config import config
-from src.model_utils.device_adapter import get_device_id
 from src.model_utils.moxing_adapter import moxing_wrapper
 
 config.batch_size = config.batch_size_export
@@ -31,9 +29,7 @@ config.is_training = config.is_training_export
 def export_mobilenetv2():
     """ export_mobilenetv2 """
     print('\nconfig: \n', config)
-    if not config.device_id:
-        config.device_id = get_device_id()
-    context_device_init(config)
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=config.platform, save_graphs=False)
     _, _, net = define_net(config, config.is_training)
 
     load_ckpt(net, config.ckpt_file)

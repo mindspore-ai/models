@@ -16,7 +16,7 @@
 """Cycle GAN test."""
 
 import os
-from mindspore import Tensor
+import mindspore as ms
 from src.models.cycle_gan import get_generator
 from src.utils.args import get_args
 from src.dataset.cyclegan_dataset import create_dataset
@@ -27,6 +27,12 @@ from src.utils.tools import save_image, load_ckpt
 def predict():
     """Predict function."""
     args = get_args("predict")
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=args.platform,
+                   save_graphs=args.save_graphs, device_id=args.device_id)
+    args.rank = 0
+    args.device_num = 1
+    if args.platform == "GPU":
+        ms.set_context(enable_graph_kernel=True)
     G_A = get_generator(args)
     G_B = get_generator(args)
     G_A.set_train(True)
@@ -44,7 +50,7 @@ def predict():
     reporter = Reporter(args)
     reporter.start_predict("A to B")
     for data in ds.create_dict_iterator(output_numpy=True):
-        img_A = Tensor(data["image"])
+        img_A = ms.Tensor(data["image"])
         path_A = data["image_name"][0]
         path_B = path_A[0:-4] + "_fake_B.jpg"
         fake_B = G_A(img_A)
@@ -57,7 +63,7 @@ def predict():
     reporter.dataset_size = args.dataset_size
     reporter.start_predict("B to A")
     for data in ds.create_dict_iterator(output_numpy=True):
-        img_B = Tensor(data["image"])
+        img_B = ms.Tensor(data["image"])
         path_B = data["image_name"][0]
         path_A = path_B[0:-4] + "_fake_A.jpg"
         fake_A = G_B(img_B)

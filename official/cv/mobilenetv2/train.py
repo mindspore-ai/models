@@ -20,11 +20,12 @@ import random
 import numpy as np
 
 import mindspore as ms
+import mindspore.communication as comm
 import mindspore.nn as nn
 
 from src.dataset import create_dataset, extract_features
 from src.lr_generator import get_lr
-from src.utils import context_device_init, config_ckpoint
+from src.utils import config_ckpoint
 from src.models import CrossEntropyWithLabelSmooth, define_net, load_ckpt, build_params_groups
 from src.metric import DistAccuracy, ClassifyCorrectCell
 from src.model_utils.config import config
@@ -38,13 +39,21 @@ ms.set_seed(1)
 @moxing_wrapper(pre_process=modelarts_process)
 def train_mobilenetv2():
     """ train_mobilenetv2 """
+    if config.platform == "CPU":
+        config.run_distribute = False
+    ms.set_context(mode=ms.GRAPH_MODE, device_target=config.platform, save_graphs=False)
+    if config.run_distribute:
+        comm.init()
+        config.rank_id = comm.get_rank()
+        config.rank_size = comm.get_group_size()
+        ms.set_auto_parallel_context(parallel_mode=ms.ParallelMode.DATA_PARALLEL,
+                                     gradients_mean=True)
     config.train_dataset_path = os.path.join(config.dataset_path, 'train')
     config.eval_dataset_path = os.path.join(config.dataset_path, 'validation_preprocess')
     if not config.device_id:
         config.device_id = get_device_id()
     start = time.time()
     # set context and device init
-    context_device_init(config)
     print('\nconfig: {} \n'.format(config))
     # define network
     backbone_net, head_net, net = define_net(config, config.is_training)
