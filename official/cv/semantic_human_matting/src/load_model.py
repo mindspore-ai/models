@@ -31,7 +31,7 @@ def acquire_max_epoch_ckpt(cfg, stage='pre_train_t_net'):
             del list_file[i]
     list_file = sorted(list_file, key=lambda x: int(x.split('/')[-1].split('_')[-1].split('.')[0]))
 
-    if not list_file:
+    if list_file:
         cur_epoch = int(list_file[-1].split('/')[-1].split('_')[-1].split('.')[0])
         pretrain_path = os.path.join(path_dir, list_file[-1])
         return cur_epoch, pretrain_path
