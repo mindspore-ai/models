@@ -58,13 +58,12 @@ NET = DenseNet(num_init_features=config.num_init_features, growth_rate=config.gr
             block_config=config.block_config, num_classes=config.num_classes, drop_rate=config.drop_rate)
 
 if __name__ == '__main__':
-    #Testing
     #Load the checkpoint (weights)
     Checkpoint = config.checkpoint_file_path
     print('Checkpoint: ', Checkpoint)
     load_checkpoint(Checkpoint, net=NET)
-    #Load testing data
-    test_path = config.test_dir
+    #Load eval data
+    eval_path = config.eval_dir
     index_file = 0
     xstep = 8
     ystep = 8  # 16
@@ -73,9 +72,9 @@ if __name__ == '__main__':
     label_flip_dims = [3, 2]
     subject_id = 9
     subject_name = 'subject-%d-' % subject_id
-    f_T1 = os.path.join(test_path, subject_name + 'T1.hdr')
-    f_T2 = os.path.join(test_path, subject_name + 'T2.hdr')
-    f_l = os.path.join(test_path, subject_name + 'label.hdr')
+    f_T1 = os.path.join(eval_path, subject_name + 'T1.hdr')
+    f_T2 = os.path.join(eval_path, subject_name + 'T2.hdr')
+    f_l = os.path.join(eval_path, subject_name + 'label.hdr')
     inputs_T1, img_T1_itk = read_med_image(f_T1, dtype=np.float32)
     inputs_T2, img_T2_itk = read_med_image(f_T2, dtype=np.float32)
     label, label_img_itk = read_med_image(f_l, dtype=np.uint8)
@@ -97,7 +96,7 @@ if __name__ == '__main__':
     width_slices = np.arange(0, W - crop_size[2] + zstep, zstep)
     whole_pred = np.zeros((1,) + (num_classes,) + image.shape[2:])
     count_used = np.zeros((image.shape[2], image.shape[3], image.shape[4])) + 1e-5
-    #no update parameter gradients during testing
+    #no update parameter gradients during eval
     for i in range(len(deep_slices)):
         for j in range(len(height_slices)):
             for k in range(len(width_slices)):
