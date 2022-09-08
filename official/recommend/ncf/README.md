@@ -78,7 +78,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 
 # [Environment Requirements](#contents)
 
-- Hardware(Ascend）
+- Hardware(Ascend/GPU/CPU）
     - Prepare hardware environment with Ascend.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
@@ -94,9 +94,6 @@ After installing MindSpore via the official website, you can start training and 
 #run data process
 bash scripts/run_download_dataset.sh
 
-# run training example
-bash scripts/run_train.sh
-
 # run training example on Ascend
 bash scripts/run_train_ascend.sh
 
@@ -105,9 +102,6 @@ bash scripts/run_train_gpu.sh
 
 # run training distribute example on Ascend
 bash scripts/run_distribute_train.sh /path/hccl.json /path/MovieLens
-
-# run evaluation example
-bash scripts/run_eval.sh
 
 # run evaluation example on Ascend
 bash scripts/run_eval_ascend.sh
@@ -170,10 +164,8 @@ If you want to run in modelarts, please check the official documentation of [mod
     │   ├──ascend_distributed_launcher
     │       ├──__init__.py                      // init file
     │       ├──get_distribute_pretrain_cmd.py   // create distribute shell script
-    │   ├──run_train.sh                    // shell script for train
     │   ├──run_train_ascend.sh             // shell script for train on Ascend
     │   ├──run_distribute_train.sh         // shell script for distribute train
-    │   ├──run_eval.sh                     // shell script for evaluation
     │   ├──run_eval_ascend.sh              // shell script for evaluation on Ascend
     │   ├──run_train_gpu.sh                // shell script for train on GPU
     │   ├──run_eval_gpu.sh                 // shell script for evaluation on GPU
@@ -233,12 +225,12 @@ Parameters for both training and evaluation can be set in config.py.
 
   ```bash
   bash scripts/run_train_gpu.sh [DATASET_PATH] [CKPT_FILE] [DEVICE_ID]
-  ```
+  ```run_train
 
 - on CPU
 
   ```bash
-  python train.py --data_path=./dataset --dataset=ml-1m --train_epochs=25 --batch_size=256 --output_path=./output/ --checkpoint_path=./checkpoint --device_target=CPU --device_id=0 --num_parallel_workers=2 > train.log 2>&1 &
+  pytrun_trainth=./dataset --dataset=ml-1m --train_epochs=25 --batch_size=256 --output_path=./output/ --crun_trainpoint --device_target=CPU --device_id=0 --num_parallel_workers=2 > train.log 2>&1 &
   ```
 
   The python command above will run in the background, you can view the results through the file `train.log`. After training, you'll get some checkpoint files under the script folder by default. The loss value will be achieved as follows:
@@ -284,7 +276,7 @@ Parameters for both training and evaluation can be set in config.py.
 - evaluation on ml-1m dataset when running on CPU
 
   ```bash
-  python eval.py --data_path=./dataset --dataset=ml-1m --eval_batch_size=160000 --output_path=./output/ --eval_file_name=eval.log --checkpoint_file_path=./ckpt --device_target=CPU --device_id=0 > log.txt 2>&1 &
+  python eval.py --data_path=./dataset --dataset=ml-1m --eval_batch_size=160000 --output_path=./output/ --eval_file_name=eval.log --checkpoint_file_path=./ckpt --device_target=CPU --device_id=0 > eval.log 2>&1 &
   ```
 
   The accuracy of the test dataset will be as follows:
