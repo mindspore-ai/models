@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]
+if [ $# != 3 ]
 then 
-    echo "Usage: bash run_train_distribute.sh [TRAINING_DATASET_PATH] [CHECKPOINT_SAVE_PATH]"
+    echo "Usage: bash run_train_distribute.sh [TRAINING_DATASET_PATH] [CHECKPOINT_SAVE_PATH] [RANK_TABLE_FILE]"
 exit 1
 fi
 
@@ -38,6 +38,7 @@ fi
 data_path=$1
 checkpoint=$2
 
+export RANK_TABLE_FILE=$3
 export RANK_SIZE=8
 
 current_exec_path=$(pwd)

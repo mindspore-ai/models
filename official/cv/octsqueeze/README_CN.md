@@ -87,8 +87,8 @@ bash run_train_standalone.sh [TRAINING_DATASET_PATH] [DEVICE] [CHECKPOINT_SAVE_P
 # example: bash run_train_standalone.sh /home/ma-user/work/training_dataset/ Ascend ./ckpt/ 0
 
 # 或分布式训练OctSqueeze (8P)
-bash run_train_distribute.sh [TRAINING_DATASET_PATH] [CHECKPOINT_SAVE_PATH]
-# example: bash run_train_distribute.sh /home/ma-user/work/training_dataset/ ./ckpt/
+bash run_train_distribute.sh [TRAINING_DATASET_PATH] [CHECKPOINT_SAVE_PATH]  [RANK_TABLE_FILE]
+# example: bash run_train_distribute.sh /home/ma-user/work/training_dataset/ ./ckpt/ /path/hccl_8p.json
 
 # 评估OctSqueeze
 bash run_eval.sh [TEST_DATASET_PATH] [COMPRESSED_DATA_PATH] [RECONSTRUCTED_DATA_PATH] [MODE] [DEVICE]
@@ -194,7 +194,7 @@ eval.py中的主要参数如下：
   # 或进入脚本目录，执行1P脚本
   bash bash run_train_standalone.sh /home/ma-user/work/training_dataset/ Ascend ./ckpt/ 0
   # 或进入脚本目录，执行8P脚本
-  bash run_train_distribute.sh /home/ma-user/work/training_dataset/ ./ckpt/
+  bash run_train_distribute.sh /home/ma-user/work/training_dataset/ ./ckpt/ /path/hccl_8p.json
   ```
 
   经过训练后，损失值如下：

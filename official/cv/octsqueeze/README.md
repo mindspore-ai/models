@@ -84,8 +84,8 @@ bash run_train_standalone.sh [TRAINING_DATASET_PATH] [DEVICE] [CHECKPOINT_SAVE_P
 # example: bash run_train_standalone.sh /home/ma-user/work/training_dataset/ Ascend ./ckpt/ 0
 
 # or tain OctSqueeze parallelly (8P)
-bash run_train_distribute.sh [TRAINING_DATASET_PATH] [CHECKPOINT_SAVE_PATH]
-# example: bash run_train_distribute.sh /home/ma-user/work/training_dataset/ ./ckpt/
+bash run_train_distribute.sh [TRAINING_DATASET_PATH] [CHECKPOINT_SAVE_PATH] [RANK_TABLE_FILE]
+# example: bash run_train_distribute.sh /home/ma-user/work/training_dataset/ ./ckpt/ /path/hccl_8p.json
 
 # evaluate OctSqueeze
 bash run_eval.sh [TEST_DATASET_PATH] [COMPRESSED_DATA_PATH] [RECONSTRUCTED_DATA_PATH] [MODE] [DEVICE]
@@ -190,7 +190,7 @@ Major parameters in eval.py:
   # or enter script dir, run 1P training script
   bash bash run_train_standalone.sh /home/ma-user/work/training_dataset/ Ascend ./ckpt/ 0
   # or enter script dir, run 8P training script
-  bash run_train_distribute.sh /home/ma-user/work/training_dataset/ ./ckpt/
+  bash run_train_distribute.sh /home/ma-user/work/training_dataset/ ./ckpt/ /path/hccl_8p.json
   ```
 
   After training, the loss value will be achieved as follows:
