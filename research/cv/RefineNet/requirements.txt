@@ -2,3 +2,4 @@ mindspore
 numpy
 Pillow
 python-opencv
+onnxruntime-gpu

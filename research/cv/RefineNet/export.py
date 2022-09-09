@@ -27,7 +27,8 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int, default=1, help='batch size')
     parser.add_argument('--crop_size', type=int, default=513, help='crop size')
     parser.add_argument('--file_name', type=str, default="refinenet", help='model name')
-    parser.add_argument('--file_format', type=str, choices=["MINDIR", "AIR"], default="MINDIR", help='model format')
+    parser.add_argument('--file_format', type=str, choices=["MINDIR", "AIR", "ONNX"], default="MINDIR",
+                        help='model format')
     args = parser.parse_args()
 
     network = RefineNet(Bottleneck, [3, 4, 23, 3], args.num_classes)

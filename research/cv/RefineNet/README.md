@@ -182,6 +182,7 @@ run_eval.sh
     ├── run_standalone_train_gpu_r2.sh          # 启动GPU单机finetune（单卡）
     ├── run_distribute_train_gpu_r1.sh          # 启动GPU分布式预训练（八卡）
     ├── run_distribute_train_gpu_r2.sh          # 启动GPU分布式finetune（八卡）
+    ├── run_infer_onnx.sh                       # 启动ONNX推理
   ├── src
     ├── tools
       ├── get_dataset_lst.py                    # 获取数据清单文件
@@ -192,6 +193,7 @@ run_eval.sh
     ├── loss.py                                 # RefineNet的损失定义
   ├── eval.py                                   # 训练时评估网络
   ├── train.py                                  # 训练网络
+  ├── infer_onnx.py                             # ONNX推理
   ├── requirements.txt                          # requirements文件
   └── README.md
 ```
@@ -468,7 +470,7 @@ python export.py --checkpoint [CKPT_PATH] --file_name [FILE_NAME] --file_format 
 ```
 
 - 参数`checkpoint`为必填项。
-- `file_format` 必须在 ["AIR", "MINDIR"]中选择。
+- `file_format` 必须在 ["AIR", "MINDIR", "ONNX]中选择。
 
 ### 在Ascend310执行推理
 
@@ -484,9 +486,21 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_ID]
 - `DATA_LIST` 表示进入模型推理数据集的文件列表。
 - `DEVICE_ID` 可选，默认值为0。
 
+### ONNX推理
+
+```shell
+# onnx infer
+bash scripts/run_infer_onnx.sh [DATA_LST] [ONNX_PATH] [DEVICE_TARGET] [DEVICE_ID] [BATCH_SIZE]
+OR
+python infer_onnx.py --data_lst [DATA_LST] --onnx_path [ONNX_PATH] --device_target [DEVICE_TARGET]
+--device_id [DEVICE_ID] --batch_size [BATCH_SIZE]
+```
+
+**Note:**: 推理时的`batch size`需与导出ONNX文件时的`batch size`一致
+
 ### 结果
 
-推理结果保存在脚本执行的当前路径，你可以在acc.log中看到以下精度计算结果。
+推理结果保存在脚本执行的当前路径，你可以在acc.log中看到Ascend310推理的精度计算结果，在infer_onnx.log中看到ONNX推理的精度计算结果。
 
 # 模型描述
 
