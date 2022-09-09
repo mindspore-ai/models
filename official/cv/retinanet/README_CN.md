@@ -1,6 +1,7 @@
+
 <!-- TOC -->
 
-- [retinanet 描述](#retinanet-描述)
+- <span id="content">[Retinanet 描述](#Retinanet-描述)</span>
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [环境要求](#环境要求)
@@ -21,19 +22,18 @@
     - [推理过程](#推理过程)
         - [用法](#usage)
         - [运行](#running)
-        - [在onnx执行推理](#span-idonnxrunning在onnx执行推理)
         - [结果](#outcome)
-        - [Onnx结果](#span-idonnxoutcomeonnx结果)
     - [模型说明](#模型说明)
         - [性能](#性能)
-            - [训练性能](#训练性能)
-            - [推理性能](#推理性能)
+        - [训练性能](#训练性能)
+        - [推理性能](#推理性能)
 - [随机情况的描述](#随机情况的描述)
 - [ModelZoo 主页](#modelzoo-主页)
+- [迁移学习](#迁移学习)
 
 <!-- /TOC -->
 
-## [retinanet 描述](#content)
+## [Retinanet 描述](#content)
 
 RetinaNet算法源自2018年Facebook AI Research的论文 Focal Loss for Dense Object Detection。该论文最大的贡献在于提出了Focal Loss用于解决类别不均衡问题，从而创造了RetinaNet（One Stage目标检测算法）这个精度超越经典Two Stage的Faster-RCNN的目标检测网络。
 
@@ -55,7 +55,16 @@ MSCOCO2017
 - 数据集大小: 19.3G, 123287张80类彩色图像
 
     - 训练:19.3G, 118287张图片
+
     - 测试:1814.3M, 5000张图片
+
+- 数据格式:RGB图像.
+
+    - 注意：数据将在src/dataset.py 中被处理
+
+face-mask-detection(迁移学习使用)
+
+- 数据集大小: 397.65MB, 853张3类彩色图像
 - 数据格式:RGB图像.
 
     - 注意：数据将在src/dataset.py 中被处理
@@ -85,10 +94,11 @@ MSCOCO2017
     ├─run_distribute_train_gpu.sh             # 使用GPU环境八卡并行训练
     ├─run_single_train_gpu.sh                 # 使用GPU环境单卡训练
     ├─run_infer_310.sh                        # Ascend推理shell脚本
-    ├─run_onnx_eval.sh                        # onnx推理的shell脚本
-    ├─run_onnx_eval_gpu.sh                    # 使用GPU环境运行onnx推理的shell脚本
     ├─run_eval.sh                             # 使用Ascend环境运行推理脚本
     ├─run_eval_gpu.sh                         # 使用GPU环境运行推理脚本
+  ├─config
+    ├─finetune_config.yaml                      # 迁移学习参数配置
+    └─default_config.yaml                       # 参数配置
   ├─src
     ├─dataset.py                              # 数据预处理
     ├─retinanet.py                            # 网络模型定义
@@ -106,8 +116,9 @@ MSCOCO2017
   ├─export.py                                 # 导出 AIR,MINDIR模型的脚本
   ├─postprogress.py                           # 310推理后处理脚本
   └─eval.py                                   # 网络推理脚本
-  └─onnx_eval.py                              # 用于onnx推理
   └─create_data.py                            # 构建Mindrecord数据集脚本
+  └─data_split.py                             # 迁移学习数据集划分脚本
+  └─quick_start.py                            # 迁移学习可视化脚本
   └─default_config.yaml                       # 参数配置
 
 ```
@@ -318,7 +329,7 @@ Epoch time: 164531.610, per step time: 359.239
 
 ### [评估过程](#content)
 
-#### 用法
+#### <span id="usage">用法</span>
 
 使用shell脚本进行评估。shell脚本的用法如下:
 
@@ -336,7 +347,7 @@ bash scripts/run_eval_gpu.sh [DEVICE_ID] [DATASET] [MINDRECORD_DIR] [CHECKPOINT_
 
 > checkpoint 可以在训练过程中产生.
 
-#### 结果
+#### <span id="outcome">结果</span>
 
 计算结果将存储在示例路径中，您可以在 `eval.log` 查看.
 
@@ -382,17 +393,17 @@ mAP: 0.34852168035724435
 
 ### [模型导出](#content)
 
-#### 用法
+#### <span id="usage">用法</span>
 
 导出模型前要修改config.py文件中的checkpoint_path配置项，值为checkpoint的路径。
 
-```bash
+```shell
 python export.py --file_name [RUN_PLATFORM] --file_format[EXPORT_FORMAT] --checkpoint_path [CHECKPOINT PATH]
 ```
 
-`EXPORT_FORMAT` 可选 ["AIR", "MINDIR", "ONNX"]
+`EXPORT_FORMAT` 可选 ["AIR", "MINDIR"]
 
-#### 运行
+#### <span id="running">运行</span>
 
 ```运行
 python export.py  --file_name retinanet --file_format MINDIR --checkpoint_path /cache/checkpoint/retinanet_550-458.ckpt
@@ -420,7 +431,7 @@ python export.py  --file_name retinanet --file_format MINDIR --checkpoint_path /
 
 ### [推理过程](#content)
 
-#### 用法
+#### <span id="usage">用法</span>
 
 在推理之前需要在昇腾910环境上完成模型的导出。推理时要将iscrowd为true的图片排除掉。在ascend310_infer目录下保存了去排除后的图片id。
 还需要修改config.py文件中的coco_root、val_data_type、instances_set配置项，值分别取coco数据集的目录，推理所用数据集的目录名称，推理完成后计算精度用的annotation文件，instances_set是用val_data_type拼接起来的，要保证文件正确并且存在。
@@ -430,36 +441,17 @@ python export.py  --file_name retinanet --file_format MINDIR --checkpoint_path /
 bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
 ```
 
-#### 运行
+#### <span id="running">运行</span>
 
 ```运行
  bash run_infer_310.sh ./retinanet.mindir ./dataset/coco2017/val2017 ./image_id.txt 0
 ```
 
-#### 在onnx执行推理
-
-在执行推理前，onnx文件必须通过 `export.py`脚本导出,通过config_path选择适用于不同平台的config文件。以下展示了使用onnx模型执行推理的示例。
-
-```shell
-# Onnx inference
-python export.py --file_name [RUN_PLATFORM] --file_format[EXPORT_FORMAT] --checkpoint_path [CHECKPOINT PATH] --config_path [CONFIG PATH]
-```
-
-EXPORT_FORMAT 选择 ["ONNX"]
-
-使用shell脚本进行评估。shell脚本的用法如下:
-
-```bash
-GPU:
-bash scripts/run_onnx_eval_gpu.sh [DEVICE_ID] [DATASET] [MINDRECORD_DIR] [ONNX_PATH] [ANN_FILE PATH] [CONFIG_PATH]
-# example: bash scripts/run_onnx_eval_gpu.sh 0 coco ./MindRecord_COCO/ /home/retinanet/retinanet.onnx ./cocodataset/annotations/instances_{}.json ./config/default_config_gpu.yaml
-```
-
-#### 结果
+#### <span id="outcome">结果</span>
 
 推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
 
-```log
+```mAP
  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.350
  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.509
  Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.385
@@ -478,63 +470,40 @@ bash scripts/run_onnx_eval_gpu.sh [DEVICE_ID] [DATASET] [MINDRECORD_DIR] [ONNX_P
 mAP: 0.3499478734634595
 ```
 
-#### Onnx结果
-
-推理的结果保存在当前目录下，在log.txt日志文件中可以找到类似以下的结果。
-
-```text
- Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.350
- Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.508
- Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.387
- Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.133
- Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.365
- Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.517
- Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.304
- Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.415
- Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.417
- Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.151
- Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.433
- Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.614
-
-========================================
-
-mAP: 0.35043225294034314
-```
-
 ## [模型说明](#content)
 
 ### [性能](#content)
 
 #### 训练性能
 
-| 参数            | Ascend                                                                    | GPU                                                                       |
-| --------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| 模型名称        | Retinanet                                                                 | Retinanet                                                                 |
-| 运行环境        | Ascend 910；CPU 2.6GHz，192cores；Memory 755G；系统 Euler2.8              | Rtx3090;Memory 512G                                                       |
-| 上传时间        | 10/01/2021                                                                | 17/02/2022                                                                |
-| MindSpore 版本  | 1.2.0                                                                     | 1.5.0                                                                     |
-| 数据集          | 123287 张图片                                                             | 123287 张图片                                                             |
-| Batch_size      | 32                                                                        | 32                                                                        |
-| 训练参数        | src/config.py                                                             | config/default_config_gpu.yaml                                            |
-| 优化器          | Momentum                                                                  | Momentum                                                                  |
-| 损失函数        | Focal loss                                                                | Focal loss                                                                |
-| 最终损失        | 0.582                                                                     | 0.57                                                                      |
-| 精确度 (8p)     | mAP[0.3475]                                                               | mAP[0.3499]                                                               |
-| 训练总时间 (8p) | 23h16m54s                                                                 | 51h39m6s                                                                  |
-| 脚本            | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) |
+| 参数                        | Ascend                                |GPU|
+| -------------------------- | ------------------------------------- |------------------------------------- |
+| 模型名称                    | Retinanet                             |Retinanet                             |
+| 运行环境                    | Ascend 910；CPU 2.6GHz，192cores；Memory 755G；系统 Euler2.8  | Rtx3090;Memory 512G |
+| 上传时间                    | 10/01/2021                            |17/02/2022                            |
+| MindSpore 版本             | 1.2.0                                 |1.5.0|
+| 数据集                      | 123287 张图片                          |123287 张图片                          |
+| Batch_size                 | 32                                   |32                                   |
+| 训练参数                    | src/config.py                         |config/default_config_gpu.yaml
+| 优化器                      | Momentum                              |Momentum                              |
+| 损失函数                    | Focal loss                            |Focal loss                            |
+| 最终损失                    | 0.582                                  |0.57|
+| 精确度 (8p)                 | mAP[0.3475]               |mAP[0.3499]               |
+| 训练总时间 (8p)             | 23h16m54s                              |51h39m6s|
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) |[链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) |
 
 #### 推理性能
 
-| 参数           | Ascend                                                       | GPU                    |
-| -------------- | ------------------------------------------------------------ | ---------------------- |
-| 模型名称       | Retinanet                                                    | Retinanet              |
-| 运行环境       | Ascend 910；CPU 2.6GHz，192cores；Memory 755G；系统 Euler2.8 | Rtx3090;Memory 512G    |
-| 上传时间       | 10/01/2021                                                   | 17/02/2022             |
-| MindSpore 版本 | 1.2.0                                                        | 1.5.0                  |
-| 数据集         | 5k 张图片                                                    | 5k 张图片              |
-| Batch_size     | 32                                                           | 32                     |
-| 精确度         | mAP[0.3475]                                                  | mAP[0.3499]            |
-| 总时间         | 10 mins and 50 seconds                                       | 13 mins and 40 seconds |
+| 参数                 | Ascend                      |GPU|
+| ------------------- | --------------------------- |--|
+| 模型名称             | Retinanet                |Retinanet                |
+| 运行环境             | Ascend 910；CPU 2.6GHz，192cores；Memory 755G；系统 Euler2.8|Rtx3090;Memory 512G |
+| 上传时间             | 10/01/2021                  |17/02/2022 |
+| MindSpore 版本      | 1.2.0                        |1.5.0|
+| 数据集              | 5k 张图片                   |5k 张图片                   |
+| Batch_size          | 32                          |32                          |
+| 精确度              | mAP[0.3475]                  |mAP[0.3499]               |
+| 总时间              | 10 mins and 50 seconds       |13 mins and 40 seconds       |
 
 ## [随机情况的描述](#content)
 
@@ -543,3 +512,125 @@ mAP: 0.35043225294034314
 ## [ModelZoo 主页](#content)
 
 请核对官方 [主页](https://gitee.com/mindspore/models).
+
+## [迁移学习](#content)
+
+### [迁移学习训练流程](#content)
+
+#### 数据集处理
+
+[数据集下载地址](https://www.kaggle.com/datasets/andrewmvd/face-mask-detection)
+
+下载数据集后解压至retinanet根目录下，使用data_split脚本划分出80%的训练集和20%的测试集
+
+```bash
+运行脚本示例
+python data_split.py
+```
+
+```text
+数据集结构
+└─dataset
+  ├─train
+  ├─val
+  ├─annotation
+
+```
+
+```text
+训练前，先创建MindRecord文件，以face_mask_detection数据集为例，yaml文件配置好facemask数据集路径和mindrecord存储路径
+# your dataset dir
+dataset_root: /home/mindspore/retinanet/dataset/
+# mindrecord dataset dir
+mindrecord_dir: /home/mindspore/retinanet/mindrecord
+```
+
+```bash
+# 生成训练数据集
+python create_data.py  --config_path
+(例如：python create_data.py  --config_path  './config/finetune_config.yaml')
+
+# 生成测试数据集
+测试数据集可以在训练完成由eval脚本自动生成
+```
+
+#### 迁移学习训练过程
+
+需要先从[Mindspore Hub](https://www.mindspore.cn/resources/hub/details?MindSpore/1.8/retinanet_coco2017)下载预训练的ckpt
+
+```text
+# 在finetune_config.yaml设置预训练模型的ckpt
+pre_trained: "/home/mindspore/retinanet/retinanet_ascend_v170_coco2017_official_cv_acc35.ckpt"
+```
+
+```bash
+#运行迁移学习训练脚本
+python train.py --config_path  './config/finetune_config.yaml'
+如果需要保存日志信息，可使用如下命令：
+python train.py --config_path ./config/finetune_config.yaml > log.txt 2>&1
+```
+
+**结果展示**
+
+训练结果将存储在示例路径中。checkpoint将存储在 `./ckpt` 路径下，训练loss输出示例如下：
+
+```text
+epoch: 1 step: 42, loss is 4.347288131713867
+lr:[0.000088]
+Train epoch time: 992053.072 ms, per step time: 23620.311 ms
+Epoch time: 164034.415, per step time: 358.154
+epoch: 3 step: 42, loss is 1.8387094736099243
+lr:[0.000495]
+Train epoch time: 738396.280 ms, per step time: 17580.864 ms
+epoch: 4 step: 42, loss is 1.3805917501449585
+lr:[0.000695]
+Train epoch time: 742051.709 ms, per step time: 17667.898 ms
+```
+
+#### 迁移学习推理过程
+
+```bash
+#运行迁移学习训练脚本
+python eval.py --config_path  './config/finetune_config.yaml'
+```
+
+**结果展示**
+
+```text
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.538
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.781
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.634
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.420
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.687
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.856
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.284
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.570
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.574
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.448
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.737
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.872
+
+========================================
+
+mAP: 0.5376701115352185
+
+```
+
+#### 迁移学习quick_start
+
+运行eval脚本后，会生成`instances_val.json` 和 `predictions.json`文件，需要修改`quick_start.py`脚本中`instances_val.json` 和 `predictions.json`文件的路径后再运行
+
+```bash
+# 运行quick_start脚本示例
+python quick_start.py --config_path './config/finetune_config.yaml'
+```
+
+**结果说明**
+图中颜色的含义分别是：
+
+- 浅蓝: 真实标签的mask_weared_incorrect
+- 浅绿: 真实标签的with_mask
+- 浅红: 真实标签的without_mask
+- 蓝色: 预测标签的mask_weared_incorrect
+- 绿色: 预测标签的with_mask
+- 红色: 预测标签的without_mask

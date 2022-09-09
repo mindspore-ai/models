@@ -19,6 +19,7 @@ from __future__ import division
 
 import os
 import json
+import re
 import xml.etree.ElementTree as et
 import numpy as np
 import cv2
@@ -40,6 +41,17 @@ def get_imageId_from_fileName(filename):
     if filename.isdigit():
         return int(filename)
     return id_iter
+
+
+def get_imageId_from_fackmask(filename):
+    """Get imageID from fileName"""
+    filename = os.path.splitext(filename)[0]
+    regex = re.compile(r'\d+')
+    iid = regex.search(filename).group(0)
+    image_id = int(iid)
+    if filename.isdigit():
+        return int(filename)
+    return image_id
 
 
 def random_sample_crop(image, boxes):
@@ -104,6 +116,7 @@ def random_sample_crop(image, boxes):
 def preprocess_fn(img_id, image, box, is_training):
     """Preprocess function for dataset."""
     cv2.setNumThreads(2)
+
     def _infer_data(image, input_shape):
         img_h, img_w, _ = image.shape
         input_h, input_w = input_shape
@@ -191,6 +204,98 @@ def create_voc_label(is_training):
         root_node = tree.getroot()
         file_name = root_node.find('filename').text
         img_id = get_imageId_from_fileName(file_name)
+        image_path = os.path.join(image_dir, file_name)
+        print(image_path)
+        if not os.path.isfile(image_path):
+            print(f'Cannot find image {file_name} according to annotations.')
+            continue
+
+        labels = []
+        for obj in root_node.iter('object'):
+            cls_name = obj.find('name').text
+            if cls_name not in cls_map:
+                print(f'Label "{cls_name}" not in "{config.coco_classes}"')
+                continue
+            bnd_box = obj.find('bndbox')
+            x_min = int(float(bnd_box.find('xmin').text)) - 1
+            y_min = int(float(bnd_box.find('ymin').text)) - 1
+            x_max = int(float(bnd_box.find('xmax').text)) - 1
+            y_max = int(float(bnd_box.find('ymax').text)) - 1
+            labels.append([y_min, x_min, y_max, x_max, cls_map[cls_name]])
+
+            if not is_training:
+                o_width = abs(x_max - x_min)
+                o_height = abs(y_max - y_min)
+                ann = {'area': o_width * o_height, 'iscrowd': 0, 'image_id': \
+                    img_id, 'bbox': [x_min, y_min, o_width, o_height], \
+                       'category_id': cls_map[cls_name], 'id': bnd_id, \
+                       'ignore': 0, \
+                       'segmentation': []}
+                json_dict['annotations'].append(ann)
+                bnd_id = bnd_id + 1
+
+        if labels:
+            images.append(img_id)
+            image_files_dict[img_id] = image_path
+            image_anno_dict[img_id] = np.array(labels)
+
+        if not is_training:
+            size = root_node.find("size")
+            width = int(size.find('width').text)
+            height = int(size.find('height').text)
+            image = {'file_name': file_name, 'height': height, 'width': width,
+                     'id': img_id}
+            json_dict['images'].append(image)
+
+    if not is_training:
+        for cls_name, cid in cls_map.items():
+            cat = {'supercategory': 'none', 'id': cid, 'name': cls_name}
+            json_dict['categories'].append(cat)
+        json_fp = open(json_file, 'w')
+        json_str = json.dumps(json_dict)
+        json_fp.write(json_str)
+        json_fp.close()
+
+    return images, image_files_dict, image_anno_dict
+
+
+def create_facemask_label(is_training):
+    """Get image path and annotation from VOC."""
+    facemask_dir = config.voc_dir
+    cls_map = {name: i for i, name in enumerate(config.coco_classes)}
+    sub_dir = 'train' if is_training else 'val'
+    facemask_dir = os.path.join(facemask_dir, sub_dir)
+    if not os.path.isdir(facemask_dir):
+        raise ValueError(f'Cannot find {sub_dir} dataset path.')
+
+    image_dir = anno_dir = facemask_dir
+    if os.path.isdir(os.path.join(facemask_dir, 'images')):
+        image_dir = os.path.join(facemask_dir, 'images')
+    if os.path.isdir(os.path.join(facemask_dir, 'annotations')):
+        anno_dir = os.path.join(facemask_dir, 'annotations')
+
+    if not is_training:
+        data_dir = config.facemask_root
+        json_file = os.path.join(data_dir, config.instances_set.format(sub_dir))
+        file_dir = os.path.split(json_file)[0]
+        if not os.path.isdir(file_dir):
+            os.makedirs(file_dir)
+        json_dict = {"images": [], "type": "instances", "annotations": [],
+                     "categories": []}
+        bnd_id = 1
+
+    image_files_dict = {}
+    image_anno_dict = {}
+    images = []
+    for anno_file in os.listdir(anno_dir):
+        print(anno_file)
+        if not anno_file.endswith('xml'):
+            continue
+        tree = et.parse(os.path.join(anno_dir, anno_file))
+        root_node = tree.getroot()
+        file_name = root_node.find('filename').text
+        file_name = file_name.split('.')[0] + '.jpg'
+        img_id = get_imageId_from_fackmask(file_name)
         image_path = os.path.join(image_dir, file_name)
         print(image_path)
         if not os.path.isfile(image_path):
@@ -359,6 +464,29 @@ def voc_data_to_mindrecord(mindrecord_dir, is_training, prefix="retinanet.mindre
     writer.commit()
 
 
+def facemask_data_to_mindrecord(mindrecord_dir, is_training, prefix="retinanet.mindrecord0", file_num=1):
+    mindrecord_path = os.path.join(mindrecord_dir, prefix + "0")
+    writer = FileWriter(mindrecord_path, file_num)
+    images, image_path_dict, image_anno_dict = create_facemask_label(is_training)
+
+    retinanet_json = {
+        "img_id": {"type": "int32", "shape": [1]},
+        "image": {"type": "bytes"},
+        "annotation": {"type": "int32", "shape": [-1, 5]},
+    }
+    writer.add_schema(retinanet_json, "retinanet_json")
+
+    for img_id in images:
+        image_path = image_path_dict[img_id]
+        with open(image_path, 'rb') as f:
+            img = f.read()
+        annos = np.array(image_anno_dict[img_id], dtype=np.int32)
+        img_id = np.array([img_id], dtype=np.int32)
+        row = {"img_id": img_id, "image": img, "annotation": annos}
+        writer.write_raw_data([row])
+    writer.commit()
+
+
 def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="retinanet.mindrecord", file_num=8):
     """Create MindRecord file."""
     mindrecord_dir = config.mindrecord_dir
@@ -395,7 +523,6 @@ def create_retinanet_dataset(mindrecord_file, batch_size, repeat_num, device_num
     decode = C.Decode()
     ds = ds.map(operations=decode, input_columns=["image"])
     change_swap_op = C.HWC2CHW()
-    # Computed from random subset of ImageNet training images
     normalize_op = C.Normalize(mean=[0.485 * 255, 0.456 * 255, 0.406 * 255],
                                std=[0.229 * 255, 0.224 * 255, 0.225 * 255])
     color_adjust_op = C.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4)
@@ -414,6 +541,7 @@ def create_retinanet_dataset(mindrecord_file, batch_size, repeat_num, device_num
                 num_parallel_workers=num_parallel_workers)
     ds = ds.batch(batch_size, drop_remainder=True)
     return ds
+
 
 def create_mindrecord(dataset="coco", prefix="retinanet.mindrecord", is_training=True):
     print("Start create dataset!")
@@ -437,6 +565,13 @@ def create_mindrecord(dataset="coco", prefix="retinanet.mindrecord", is_training
             if os.path.isdir(config.voc_dir):
                 print("Create Mindrecord.")
                 voc_data_to_mindrecord(mindrecord_dir, is_training, prefix)
+                print("Create Mindrecord Done, at {}".format(mindrecord_dir))
+            else:
+                print("voc_dir not exits.")
+        elif dataset == "facemask":
+            if os.path.isdir(config.facemask_dir):
+                print("Create Mindrecord.")
+                facemask_data_to_mindrecord(mindrecord_dir, is_training, prefix)
                 print("Create Mindrecord Done, at {}".format(mindrecord_dir))
             else:
                 print("voc_dir not exits.")

@@ -24,7 +24,8 @@ from pycocotools.cocoeval import COCOeval
 from mindspore import context, Tensor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.retinanet import retinanet50, resnet50, retinanetInferWithDecoder
-from src.dataset import create_retinanet_dataset, data_to_mindrecord_byte_image, voc_data_to_mindrecord
+from src.dataset import create_retinanet_dataset, data_to_mindrecord_byte_image, voc_data_to_mindrecord, \
+    facemask_data_to_mindrecord
 from src.box_utils import default_boxes
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
@@ -69,6 +70,8 @@ def apply_nms(all_boxes, all_scores, thres, max_boxes):
 def make_dataset_dir(mindrecord_dir, mindrecord_file, prefix):
     if config.dataset == "voc":
         config.coco_root = config.voc_root
+    if config.dataset == 'facemask':
+        config.coco_root = config.facemask_root
     if not os.path.exists(mindrecord_file):
         if not os.path.isdir(mindrecord_dir):
             os.makedirs(mindrecord_dir)
@@ -86,6 +89,13 @@ def make_dataset_dir(mindrecord_dir, mindrecord_file, prefix):
                 print("Create Mindrecord Done, at {}".format(mindrecord_dir))
             else:
                 print("voc_root or voc_dir not exits.")
+        elif config.dataset == 'facemask':
+            if os.path.isdir(config.facemask_dir) and os.path.isdir(config.facemask_root):
+                print("Create Mindrecord.")
+                facemask_data_to_mindrecord(mindrecord_dir, False, prefix)
+                print("Create Mindrecord Done, at {}".format(mindrecord_dir))
+            else:
+                print("facemask_root or facemask_dir not exits.")
         else:
             if os.path.isdir(config.image_dir) and os.path.exists(config.anno_path):
                 print("Create Mindrecord.")
@@ -98,6 +108,7 @@ def make_dataset_dir(mindrecord_dir, mindrecord_file, prefix):
 
 def modelarts_pre_process():
     '''modelarts pre process function.'''
+
     def unzip(zip_file, save_dir):
         import zipfile
         s_time = time.time()
@@ -150,7 +161,6 @@ def modelarts_pre_process():
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def retinanet_eval():
-
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
     prefix = "retinanet_eval.mindrecord"
     mindrecord_dir = config.mindrecord_dir
@@ -179,7 +189,7 @@ def retinanet_eval():
     num_classes = config.num_classes
     coco_root = config.coco_root
     data_type = config.val_data_type
-    #Classes need to train or test.
+    # Classes need to train or test.’
     val_cls = config.coco_classes
     val_cls_dict = {}
     for i, cls in enumerate(val_cls):
