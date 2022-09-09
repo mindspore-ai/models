@@ -23,6 +23,7 @@
 #include <string>
 #include <map>
 #include <opencv2/opencv.hpp>
+#include "MxBase/DvppWrapper/DvppWrapper.h"
 #include "MxBase/ModelInfer/ModelInferenceProcessor.h"
 #include "MxBase/Tensor/TensorContext/TensorContext.h"
 
