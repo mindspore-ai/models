@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ parser.add_argument('--data_range', type=str, default='1-800/801-810',
                     help='train/test data range')
 parser.add_argument('--ext', type=str, default='sep',
                     help='dataset file extension')
-parser.add_argument('--scale', type=str, default='4',
+parser.add_argument('--scale', type=int, default=2,
                     help='super resolution scale')
 parser.add_argument('--patch_size', type=int, default=48,
                     help='output patch size')
@@ -64,9 +64,14 @@ parser.add_argument('--reduction', type=int, default=16,
                     help='number of feature maps reduction')
 
 # Training specifications
+parser.add_argument("--run_distribute", type=ast.literal_eval, default=False,
+                    help="Run distribute, default is false.")
+parser.add_argument('--device_target', type=str, default='Ascend',
+                    help='device target, Ascend or GPU (Default: Ascend)')
+parser.add_argument('--device_id', type=int, default=0, help='device id')
 parser.add_argument('--test_every', type=int, default=4000,
                     help='do test per every N batches')
-parser.add_argument('--epochs', type=int, default=1000,
+parser.add_argument('--epochs', type=int, default=500,
                     help='number of epochs to train')
 parser.add_argument('--batch_size', type=int, default=16,
                     help='input batch size for training')
@@ -75,7 +80,7 @@ parser.add_argument('--test_only', action='store_true',
 
 
 # Optimization specifications
-parser.add_argument('--lr', type=float, default=1e-5,
+parser.add_argument('--lr', type=float, default=1e-4,
                     help='learning rate')
 parser.add_argument('--loss_scale', type=float, default=1024.0,
                     help='scaling factor for optim')
@@ -97,13 +102,12 @@ parser.add_argument('--ckpt_save_path', type=str, default='./ckpt/',
                     help='path to save ckpt')
 parser.add_argument('--ckpt_save_interval', type=int, default=10,
                     help='save ckpt frequency, unit is epoch')
-parser.add_argument('--ckpt_save_max', type=int, default=100,
+parser.add_argument('--ckpt_save_max', type=int, default=10,
                     help='max number of saved ckpt')
 parser.add_argument('--ckpt_path', type=str, default='',
                     help='path of saved ckpt')
-
-# Task
-parser.add_argument('--task_id', type=int, default=0)
+parser.add_argument('--onnx_path', type=str, default='',
+                    help='path of exported onnx model')
 
 # ModelArts
 parser.add_argument('--modelArts_mode', type=ast.literal_eval, default=False,
@@ -113,12 +117,11 @@ parser.add_argument('--data_url', type=str, default='', help='the directory path
 
 args, unparsed = parser.parse_known_args()
 
-args.scale = [int(x) for x in args.scale.split("+")]
 args.data_train = args.data_train.split('+')
 args.data_test = args.data_test.split('+')
 
 if args.epochs == 0:
-    args.epochs = 1e8
+    args.epochs = 100
 
 for arg in vars(args):
     if vars(args)[arg] == 'True':
