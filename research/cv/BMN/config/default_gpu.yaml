@@ -1,0 +1,66 @@
+# Copyright 2022 Huawei Technologies Co., Ltd
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#:===========================================================================
+
+mode: 'train' # 'validation'
+data_root: &data_root "/home/mindspore/MIPT_team/Datasets/activitynet_2" #"/data/ActivityNet1.3" #
+output_dir: &output_dir "/home/mindspore/MIPT_team/bezuglyj_vd/bmn_output" #"/data/bmn_output"#
+experiment_name: &experiment_name "default"
+log_level: "DEBUG"
+platform: "GPU" # GPU, Ascend
+summary_save_dir: "./summary"
+
+train:
+  learning_rate: 0.001 # 1e-3
+  weight_decay: 0.0001 # 1e-4
+  epoch: 9
+  batch_size: 16
+  step_size: 7
+  step_gamma: 0.1
+
+data:
+  threads: 4 #8
+  gt: !Path [*data_root, "activitynet_annotations/activity_net_1_3_new.json"]
+  video_info: !Path [*data_root, "activitynet_annotations/video_info_new.csv"]
+  video_anno: !Path [*data_root, "activitynet_annotations/anet_anno_action.json"]
+  video_annotations: !Path [*data_root, "activitynet_annotations/activitynet_1.3_annotations.json"]
+  feature_path: !Path [*data_root, "fix_feat_100/"]
+
+model:
+  temporal_scale: 100
+  num_sample: 32
+  num_sample_perbin: 3
+  prop_boundary_ratio: 0.5
+  feat_dim: 400
+
+ckpt:
+  save_dir: !Path [*output_dir, *experiment_name, "ckpt/"]
+  eval_freq: 1
+  start_epoch: 1
+  keep_checkpoint_max: 5
+
+eval:
+  checkpoint: ""
+  threads: 3
+  batch_size: 16
+  output_path: !Path [*output_dir, *experiment_name, "BMN_results/"]
+
+postprocessing:
+  threads: 4
+  soft_nms_alpha: 0.4
+  soft_nms_low_thres: 0.5
+  soft_nms_high_thres: 0.9
+  result_path: &result_path !Path [*output_dir, *experiment_name, "output"]
+  result_file: !Path [*result_path, "result_proposal.json"]
+  save_fig_path: !Path [*output_dir, *experiment_name, "output/evaluation_result.jpg"]
