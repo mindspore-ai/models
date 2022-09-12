@@ -112,6 +112,10 @@ def run_train():
     config.data_root = os.path.join(config.data_dir, 'train2014')
     config.annFile = os.path.join(config.data_dir, 'annotations/instances_train2014.json')
 
+    if config.finetune:
+        config.data_root = os.path.join(config.data_dir, 'train/images')
+        config.annFile = os.path.join(config.data_dir, 'annotations/train.json')
+
     profiler = network_init(config)
 
     loss_meter = AverageMeter('loss')
@@ -138,15 +142,20 @@ def run_train():
     opt = nn.Momentum(params=get_param_groups(network), momentum=config.momentum, learning_rate=ms.Tensor(lr),
                       weight_decay=config.weight_decay, loss_scale=config.loss_scale)
     is_gpu = ms.get_context("device_target") == "GPU"
-    if is_gpu:
-        loss_scale_value = 1.0
-        loss_scale = ms.FixedLossScaleManager(loss_scale_value, drop_overflow_update=False)
-        network = ms.build_train_network(network, optimizer=opt, loss_scale_manager=loss_scale,
-                                         level="O2", keep_batchnorm_fp32=False)
-        keep_loss_fp32(network)
-    else:
+
+    if config.finetune:
         network = nn.TrainOneStepCell(network, opt, sens=config.loss_scale)
         network.set_train()
+    else:
+        if is_gpu:
+            loss_scale_value = 1.0
+            loss_scale = ms.FixedLossScaleManager(loss_scale_value, drop_overflow_update=False)
+            network = ms.build_train_network(network, optimizer=opt, loss_scale_manager=loss_scale,
+                                             level="O2", keep_batchnorm_fp32=False)
+            keep_loss_fp32(network)
+        else:
+            network = nn.TrainOneStepCell(network, opt, sens=config.loss_scale)
+            network.set_train()
 
     t_end = time.time()
     data_loader = ds.create_dict_iterator(output_numpy=True)

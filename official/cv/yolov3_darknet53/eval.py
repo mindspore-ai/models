@@ -57,6 +57,10 @@ def run_test():
     config.data_root = os.path.join(config.data_dir, 'val2014')
     config.annFile = os.path.join(config.data_dir, 'annotations/instances_val2014.json')
 
+    if config.finetune:
+        config.data_root = os.path.join(config.data_dir, 'val/images')
+        config.annFile = os.path.join(config.data_dir, 'annotations/val.json')
+
     devid = int(os.getenv('DEVICE_ID')) if os.getenv('DEVICE_ID') else 0
     ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, save_graphs=False, device_id=devid)
 

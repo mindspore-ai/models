@@ -26,6 +26,11 @@
         - [推理性能](#推理性能)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
+- [迁移学习](#迁移学习)
+    - [迁移学习流程](#迁移学习流程)
+        - [数据处理](#数据处理)
+        - [迁移学习训练](#迁移学习训练)
+        - [迁移学习推理](#迁移学习推理)
 
 <!-- /TOC -->
 
@@ -53,9 +58,10 @@ YOLOv3使用DarkNet53执行特征提取，这是YOLOv2中的Darknet-19和残差�
     - 训练集：13G，82783张图像  
     - 验证集：6GM，40504张图像
     - 标注：241M，训练/验证标注
+
 - 数据集的文件目录结构如下所示
 
-    ```ext
+    ```text
         ├── dataset
             ├── coco2014
                 ├── annotations
@@ -74,6 +80,12 @@ YOLOv3使用DarkNet53执行特征提取，这是YOLOv2中的Darknet-19和残差�
 - 如果，用户使用的是用户自己的数据集，则需要将数据集格式转化为coco数据格式，并且，json文件中的数据要和图片数据对应好。
   接入用户数据后，因为图片数据尺寸和数量不一样，lr、anchor_scale和training_shape可能需要适当调整。
 
+迁移数据集：[face-mask-detection](https://www.kaggle.com/datasets/andrewmvd/face-mask-detection )
+
+- 数据集大小：397MB，853张图像
+
+- 数据格式：RGB图像，XML格式标注数据
+
 # 环境要求
 
 - 硬件（Ascend/GPU）
@@ -82,7 +94,7 @@ YOLOv3使用DarkNet53执行特征提取，这是YOLOv2中的Darknet-19和残差�
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.8/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.8/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.8/index.html)
 
 # 快速入门
 
@@ -221,9 +233,10 @@ YOLOv3使用DarkNet53执行特征提取，这是YOLOv2中的Darknet-19和残差�
   ├─src
     ├─__init__.py                     # python初始化文件
     ├─config.py                       # 参数配置
+    ├─data_split.py                   # 迁移学习数据集划分脚本
     ├─darknet.py                      # 网络骨干
     ├─distributed_sampler.py          # 数据集迭代器
-    ├─initializer.py                  #参数初始化器
+    ├─initializer.py                  # 参数初始化器
     ├─logger.py                       # 日志函数
     ├─loss.py                         # 损失函数
     ├─lr_scheduler.py                 # 生成学习率
@@ -231,8 +244,12 @@ YOLOv3使用DarkNet53执行特征提取，这是YOLOv2中的Darknet-19和残差�
     ├─util.py                         # 工具函数
     ├─yolo.py                         # yolov3网络
     ├─yolo_dataset.py                 # 为YOLOV3创建数据集
+  ├─xml2coco.py                       # 迁移学习数据集xml格式转换成COCO格式
+  ├─quick_start.py                    # 迁移学习可视化脚本
   ├─eval.py                           # 评估网络
-  └─train.py                          # 训练网络
+  ├─train.py                          # 训练网络
+  ├─finetune_config.yaml              # 迁移学习参数配置
+  └─default_config.yaml               # 参数配置
 ```
 
 ## 脚本参数
@@ -486,3 +503,108 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 # ModelZoo主页
 
  请浏览官网[主页](https://gitee.com/mindspore/models)。
+
+# 迁移学习
+
+## 迁移学习流程
+
+### 数据处理
+
+迁移数据集: [face-mask-detection](https://www.kaggle.com/datasets/andrewmvd/face-mask-detection )
+
+下载数据集后解压至yolov3-darknet53根目录的`dataset`下，数据包含images图像目录和annotations标注目录（格式为XML格式），使用data_split脚本划分出训练集和验证集，得到训练集`dataset/train/`和验证集`dataset/val/`
+
+```python
+# 运行数据划分脚本
+python src/data_split.py
+```
+
+划分后，使用xml2coco脚本，将数据集xml格式的标注转换成该模型可以处理的COCO格式
+
+```python
+# 将xml格式转换为COCO格式
+python xml2coco.py
+```
+
+数据集的文件结构如下图所示：
+
+```text
+└─dataset
+  ├─annotations
+    ├─...
+    ├─train.json
+    └─val.json
+  ├─images
+  ├─train
+    ├─images
+    └─annotations
+  ├─val
+    ├─images
+    └─annotations
+  ├─train_list.txt
+  └─val_list.txt
+```
+
+### 迁移学习训练
+
+先从[Mindspore Hub](https://www.mindspore.cn/resources/hub/details?MindSpore/1.8/yolov3darknet53shape416_coco2014)下载预训练的ckpt，在配置文件`finetune_config.yaml`中更改`resume_yolov3`字段来设置预训练模型的路径
+
+运行迁移训练脚本前，需要修改`train.py`脚本中的 data_root和annFile，
+
+分别为训练数据的图像文件夹和标注数据的文件路径。
+
+```python
+# 运行迁移训练脚本
+python train.py --config_path  './finetune_config.yaml'
+```
+
+**训练结果**
+
+训练的日志文件和checkpoint存储在 `ckpt` 路径下，可通过配置文件`finetune_config.yaml`中的`ckpt_path`字段进行修改
+
+训练loss输出示例如下：
+
+```text
+epoch[1], iter[1], loss:17251.888672, fps:0.17 imgs/sec, lr:2.380952309977147e-06, per step time: 91512.3462677002ms
+epoch[3], iter[17], loss:206.484127, fps:0.58 imgs/sec, lr:4.0476192225469276e-05, per step time: 27610.90795993805ms
+...
+```
+
+### 迁移学习推理
+
+运行迁移学习评估脚本前，需要修改`eval.py`脚本中的 data_root和annFile，
+
+分别为验证数据的图像文件夹和标注数据的文件路径
+
+```python
+# 运行迁移学习评估脚本
+python eval.py --config_path  './finetune_config.yaml'
+```
+
+评估结果保存在`outputs`路径下，可通过配置文件`finetune_config.yaml`中的`log_path`字段进行修改
+
+评估结果如下所示：
+
+```text
+# log.txt
+=============coco eval result=========
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.552
+Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.859
+Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.624
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.484
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.627
+Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.829
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.290
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.589
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.597
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.525
+Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.672
+Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.851
+```
+
+运行eval脚本后，会生成 `predictions.json`文件，需要修改`quick_start.py`脚本中`predictions.json`的路径后再运行，迁移学习quick_start脚本
+
+```python
+# 运行quick_start脚本
+python quick_start.py --config_path  './finetune_config.yaml'
+```
