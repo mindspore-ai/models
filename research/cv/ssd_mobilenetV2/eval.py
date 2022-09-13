@@ -32,7 +32,7 @@ def ssd_eval(dataset_path, ckpt_path, anno_json):
     """SSD evaluation."""
     batch_size = 1
     ds = create_ssd_dataset(dataset_path, batch_size=batch_size, repeat_num=1,
-                            is_training=False, use_multiprocessing=False)
+                            is_training=False, num_parallel_workers=32, use_multiprocessing=False)
     net = SSD320(ssd_mobilenet_v2(), config, is_training=False)
     net = SsdInferWithDecoder(net, Tensor(default_boxes), config)
 
