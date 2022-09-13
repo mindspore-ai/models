@@ -17,10 +17,14 @@
             - [用法](#用法)
         - [评估过程](#评估过程)
             - [用法](#用法-2)
-            - [结果](#结果-2)
+            - [结果](#结果-1)
         - [导出mindir模型](#导出mindir模型)
         - [推理过程](#推理过程)
             - [用法](#用法-3)
+            - [结果](#结果-2)
+        - [导出ONNX模型](#导出ONNX模型)
+        - [ONNX推理过程](#ONNX推理过程)
+            - [用法](#用法-4)
             - [结果](#结果-3)
 - [模型描述](#模型描述)
     - [性能](#性能)
@@ -105,6 +109,7 @@ bash scripts/run_eval_gpu.sh [DATASET_PATH] [CKPT_PATH] [CATEGORY] [DEVICE_ID]
    ├── run_standalone_train_gpu.sh
    ├── run_all_mvtec.sh              // 执行所有mvtec数据集的训练推理
    ├── run_eval_gpu.sh
+   ├── run_eval_onnx_gpu.sh          // 用于评估ONNX的shell脚本
    └── run_eval.sh                   // 用于评估的shell脚本
  ├──src
    ├── loss.py                       //损失函数
@@ -115,6 +120,7 @@ bash scripts/run_eval_gpu.sh [DATASET_PATH] [CKPT_PATH] [CATEGORY] [DEVICE_ID]
    ├── pth2ckpt.py                   // 该脚本可将torch的pth文件转为ckpt
    └── utils.py
  ├── eval.py                         // 测试脚本
+ ├── eval_onnx.py                    // 测试ONNX脚本
  ├── train.py                        // 训练脚本
  ├── preprocess.py
  ├── postprocess.py
@@ -236,6 +242,36 @@ bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TAR
 category:  zipper
 Total pixel-level auc-roc score :  0.980967986777201
 Total image-level auc-roc score :  0.909926470588235
+```
+
+## 导出ONNX模型
+
+```python
+python export.py --ckpt_file [CKPT_PATH] --category [FILE_NAME] --file_format [FILE_FORMAT] --device_target ["Ascend", "GPU", "CPU"]
+```
+
+参数`ckpt_file` 是必需的，`FILE_FORMAT` 选择"ONNX"，`device_target` 必须在 ["Ascend", "GPU", "CPU"] 中进行选择。
+
+# ONNX推理过程
+
+## 用法
+
+在执行ONNX推理之前，需要通过`export.py`导出ONNX文件。
+
+```shell
+# GPU 推理
+cd scripts
+bash run_eval_onnx_gpu.sh [DATASET_PATH] [ONNX_PATH] [CATEGORY] [DEVICE_ID]
+```
+
+### 结果
+
+ONNX推理结果保存在当前路径，可在eval_onnx.log中看到最终精度结果。推理结果示例如下。
+
+```text
+category:  bottle
+Total pixel-level auc-roc score :  0.9879933474254616
+Total image-level auc-roc score :  1.0
 ```
 
 # 模型描述
