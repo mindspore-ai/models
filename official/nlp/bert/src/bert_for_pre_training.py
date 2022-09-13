@@ -26,6 +26,7 @@ from mindspore.common.api import ms_function
 from mindspore.common import dtype as mstype
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
 from mindspore.context import ParallelMode
+import mindspore.common._monad as monad
 from mindspore.communication.management import get_group_size
 from mindspore import context
 from .bert_model import BertModel
@@ -366,6 +367,7 @@ class BertTrainOneStepWithLossScaleCell(nn.TrainOneStepWithLossScaleCell):
         if scale_update_cell:
             self.loss_scale = Parameter(Tensor(scale_update_cell.get_loss_scale(), dtype=mstype.float32))
         self.enable_tuple_broaden = True
+        self.load = P.Load()
 
     @ms_function
     def clip_grads(self, grads):
@@ -416,7 +418,7 @@ class BertTrainOneStepWithLossScaleCell(nn.TrainOneStepWithLossScaleCell):
             overflow = self.loss_scaling_manager(self.loss_scale, cond)
         if not overflow:
             self.optimizer(grads)
-        return (loss, cond, scaling_sens)
+        return loss, cond, self.load(scaling_sens, monad.U)
 
 
 class BertTrainOneStepWithLossScaleCellForAdam(nn.TrainOneStepWithLossScaleCell):
