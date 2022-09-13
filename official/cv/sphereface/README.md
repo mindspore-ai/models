@@ -93,7 +93,7 @@ After installing MindSpore via the official website, you can start training and 
   python train.py > train.log 2>&1 &
 
   # run distributed training example
-  bash scripts/run_distribute_train.sh
+  bash run_distribute_train.sh
 
   # run evaluation example
   python eval.py > eval.log 2>&1 &
@@ -282,7 +282,7 @@ For more configuration details, please refer the script `config.py`.
 
   ```bash
 
-  bash scripts/run_distribute_train.sh
+  bash run_distribute_train.sh
 
   ```
 
