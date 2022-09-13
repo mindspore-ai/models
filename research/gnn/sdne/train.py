@@ -35,10 +35,9 @@ from src import cfg
 
 if cfg.is_modelarts:
     import moxing as mox
-
-DATA_URL = "/cache/data/"
-CKPT_URL = "/cache/ckpt/"
-TMP_URL = "/cache/tmp/"
+    DATA_URL = "/cache/data/"
+    CKPT_URL = "/cache/ckpt/"
+    TMP_URL = "/cache/tmp/"
 
 parser = argparse.ArgumentParser(description='Mindspore SDNE Training')
 
@@ -60,16 +59,16 @@ parser.add_argument('-c', '--checkpoint', default='checkpoint', type=str, metava
 parser.add_argument('--pretrained', type=bool, default=False, help='use pre-trained model')
 
 # Device options
+parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"], default="Ascend")
 parser.add_argument('--device_id', type=int, default=0)
 
-args = parser.parse_args()
 
 class EvalCallBack(Callback):
     """
     Precision verification using callback function.
     """
     # define the operator required and config
-    def __init__(self, ds, c, lp='', tmp_dir='./tmp/'):
+    def __init__(self, ds, c, args, lp='', tmp_dir='./tmp/'):
         super(EvalCallBack, self).__init__()
         self.ds = ds
         self.gemb = c['generate_emb']
@@ -78,6 +77,7 @@ class EvalCallBack(Callback):
         self.batch = c['batch']
         self.label_path = lp
         self.tmp_dir = tmp_dir
+        self.args = args
 
     # define operator function after finishing train
     def end(self, run_context):
@@ -91,7 +91,7 @@ class EvalCallBack(Callback):
         idx2node = self.ds.get_idx2node()
         embeddings = None
         if self.rec['check']:
-            if args.dataset == 'WIKI':
+            if self.args.dataset == 'WIKI':
                 reconstructions, vertices = backbone.get_reconstructions(data, idx2node)
                 reconstruction_precision_k(reconstructions, vertices, graph, self.rec['k_query'])
             else:
@@ -113,15 +113,11 @@ def count_params(n):
         total_param += np.prod(param.shape)
     return total_param
 
-if __name__ == "__main__":
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', device_id=args.device_id)
-
+def run_train():
+    args = parser.parse_args()
     config = cfg[args.dataset]
 
-    # fix all random seed
-    mindspore.set_seed(1)
-    np.random.seed(1)
-    random.seed(1)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, device_id=args.device_id)
 
     # set all paths
     ckpt_url = ''
@@ -133,8 +129,8 @@ if __name__ == "__main__":
             os.makedirs(DATA_URL, 0o755)
         mox.file.copy_parallel(args.data_url, DATA_URL)
         print("data finish copy to %s." % DATA_URL)
-        data_path = DATA_URL + (config['data_path'] if args.data_path == '' else args.data_path)
-        label_path = DATA_URL + (config['label_path'] if args.label_path == '' else args.label_path)
+        data_path = os.path.join(DATA_URL, (config['data_path'] if args.data_path == '' else args.data_path))
+        label_path = os.path.join(DATA_URL, (config['label_path'] if args.label_path == '' else args.label_path))
         if not os.path.exists(CKPT_URL):
             os.makedirs(CKPT_URL, 0o755)
         ckpt_url = CKPT_URL
@@ -146,8 +142,9 @@ if __name__ == "__main__":
             data_path = args.data_path
             label_path = args.label_path
         else:
-            data_path = args.data_url + (config['data_path'] if args.data_path == '' else args.data_path)
-            label_path = args.data_url + (config['label_path'] if args.label_path == '' else args.label_path)
+            data_path = os.path.join(args.data_url, (config['data_path'] if args.data_path == '' else args.data_path))
+            label_path = os.path.join(args.data_url,
+                                      (config['label_path'] if args.label_path == '' else args.label_path))
         tmp_url = args.train_url
         ckpt_url = args.ckpt_url
 
@@ -173,7 +170,7 @@ if __name__ == "__main__":
     ckpoint_cb = ModelCheckpoint(prefix="SDNE_" + args.dataset, config=config_ck, directory=ckpt_url)
     time_cb = TimeMonitor(data_size=dataset.get_node_size())
     loss_cb = LossMonitor()
-    eval_cb = EvalCallBack(dataset, config, label_path, tmp_url)
+    eval_cb = EvalCallBack(dataset, config, args, label_path, tmp_url)
     cb = [ckpoint_cb, time_cb, loss_cb, eval_cb]
 
     model.train(args.epochs, dataset.get_dataset(), callbacks=cb, dataset_sink_mode=False)
@@ -181,3 +178,12 @@ if __name__ == "__main__":
     if cfg.is_modelarts:
         mox.file.copy_parallel(CKPT_URL, args.train_url)
         mox.file.copy_parallel(TMP_URL, args.train_url)
+
+
+if __name__ == "__main__":
+    # fix all random seed
+    mindspore.set_seed(1)
+    np.random.seed(1)
+    random.seed(1)
+
+    run_train()
