@@ -1223,3 +1223,7 @@ Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some com
 - **Q: How to use `boost` to get the best performance?**
 
   **A**: We provide the `boost_level` in the `Model` interface, when you set it to `O1` or `O2` mode, the network will automatically speed up. The high-performance mode has been fully verified on resnet50, you can use the `resnet50_imagenet2012_Boost_config.yaml` to experience this mode. Meanwhile, in `O1` or `O2` mode, it is recommended to set the following environment variables: ` export ENV_FUSION_CLEAR=1; export DATASET_ENABLE_NUMA=True; export ENV_SINGLE_EVAL=1; export SKT_ENABLE=1;`.
+
+- **Q: How to use to preprocess imagenet2012 dataset?**
+
+  **A**: Suggested reference:https://bbs.huaweicloud.com/forum/thread-134093-1-1.html
