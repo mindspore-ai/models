@@ -19,6 +19,7 @@ from __future__ import division
 
 import os
 import json
+import multiprocessing
 import xml.etree.ElementTree as et
 import numpy as np
 import cv2
@@ -393,6 +394,9 @@ def data_to_mindrecord_byte_image(dataset="coco", is_training=True, prefix="ssd.
 def create_ssd_dataset(mindrecord_file, batch_size=32, repeat_num=10, device_num=1, rank=0,
                        is_training=True, num_parallel_workers=64, use_multiprocessing=True):
     """Create SSD dataset with MindDataset."""
+    cores = multiprocessing.cpu_count()
+    num_parallel_workers = min(cores // device_num, num_parallel_workers)
+
     ds = de.MindDataset(mindrecord_file, columns_list=["img_id", "image", "annotation"], num_shards=device_num,
                         shard_id=rank, num_parallel_workers=num_parallel_workers, shuffle=is_training)
     decode = C.Decode()
