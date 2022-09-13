@@ -81,9 +81,9 @@
 
   ```text
   # 为Cora生成MindRecord格式的数据集
-  ./run_process_data_ascend.sh ./data cora
+  bash run_process_data_ascend.sh ./data/cora cora
   # 为Citeseer生成MindRecord格式的数据集
-  ./run_process_data_ascend.sh ./data citeseer
+  bash run_process_data_ascend.sh ./data/citeseer citeseer
   ```
 
 ## 特性
