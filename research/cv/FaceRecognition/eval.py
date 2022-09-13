@@ -125,8 +125,7 @@ def check_minmax(args, data, min_value=0.99, max_value=1.01):
 def get_model(args):
     '''get_model'''
     net = get_backbone(args)
-    if args.fp16:
-        net.add_flags_recursive(fp16=True)
+    net.add_flags_recursive(fp16=True)
     if args.weight.endswith('.ckpt'):
         param_dict = load_checkpoint(args.weight)
         param_dict_new = {}
@@ -267,7 +266,7 @@ def run_eval(args):
                      format(compile_time_used))
 
     img_transforms = transforms.Compose([vision.ToTensor(),
-        vision.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5), is_hwc=False)])
+                                         vision.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5), is_hwc=False)])
 
     #for test images
     args.logger.info('INFO, start step1, calculate test img embedding, weight file = {}'.format(args.weight))
