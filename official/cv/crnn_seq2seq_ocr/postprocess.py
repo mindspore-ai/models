@@ -55,7 +55,7 @@ def get_acc():
             annotation = np.load(os.path.join(ann_f, "ocr_bs" + str(config.eval_batch_size) + "_" + str(i) + ".npy"))
 
             for b in range(config.eval_batch_size):
-                text = annotation[b].decode("utf8")
+                text = annotation[b]
                 text = text_standardization(text)
                 decoded_label = list(np.array(batch_decoded_label)[:, b])
                 decoded_words = []
