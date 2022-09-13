@@ -1181,3 +1181,7 @@ result:{'top_1_accuracy': 0.928385416666666} prune_rate=0.45 ckpt=~/resnet50_cif
 - **Q: 如何使用`boost`功能获取最优的性能？**
 
   **A**： 我们在`Model`中提供了`boost_level`的入参，当你将其设置为O1或者O2模式时，框架会自动对网络的性能进行优化。当前这个模式已在resnet50上充分验证，你可以使用`resnet50_imagenet2012_Boost_config.yaml`来体验该模式。同时，在O1或者O2模式下，建议设置以下环境变量:`export  ENV_FUSION_CLEAR=1;export DATASET_ENABLE_NUMA=True;export ENV_SINGLE_EVAL=1;export SKT_ENABLE=1;`来获取更好的性能。
+
+- **Q: 如何使用对ImageNet2012数据集进行预处理？**
+
+  **A**： 建议参考https://bbs.huaweicloud.com/forum/thread-134093-1-1.html
