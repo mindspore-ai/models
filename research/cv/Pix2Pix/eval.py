@@ -19,13 +19,11 @@
 
 import os
 import mindspore as ms
-from mindspore import Tensor, nn
+from mindspore import Tensor
 from mindspore.train.serialization import load_checkpoint
-from mindspore.train.serialization import load_param_into_net
 from src.dataset.pix2pix_dataset import pix2pixDataset_val, create_val_dataset
-from src.models.pix2pix import Pix2Pix, get_generator, get_discriminator
-from src.models.loss import D_Loss, D_WithLossCell, G_Loss, G_WithLossCell, TrainOneStepCell
-from src.utils.tools import save_image, get_lr
+from src.models.pix2pix import get_generator
+from src.utils.tools import save_image
 from src.utils.config import config
 from src.utils.moxing_adapter import moxing_wrapper
 from src.utils.device_adapter import get_device_id
@@ -43,28 +41,9 @@ def pix2pix_eval():
     print("ds.shape:", ds_val.output_shapes())
 
     netG = get_generator()
-    netD = get_discriminator()
-
-    pix2pix = Pix2Pix(generator=netG, discriminator=netD)
-
-    d_loss_fn = D_Loss()
-    g_loss_fn = G_Loss()
-    d_loss_net = D_WithLossCell(backbone=pix2pix, loss_fn=d_loss_fn)
-    g_loss_net = G_WithLossCell(backbone=pix2pix, loss_fn=g_loss_fn)
-
-    d_opt = nn.Adam(pix2pix.netD.trainable_params(), learning_rate=get_lr(),
-                    beta1=config.beta1, beta2=config.beta2, loss_scale=1)
-    g_opt = nn.Adam(pix2pix.netG.trainable_params(), learning_rate=get_lr(),
-                    beta1=config.beta1, beta2=config.beta2, loss_scale=1)
-
-    train_net = TrainOneStepCell(loss_netD=d_loss_net, loss_netG=g_loss_net, optimizerD=d_opt, optimizerG=g_opt, sens=1)
-    train_net.set_train()
-
-    # Evaluating loop
-    ckpt_url = config.ckpt
-    print("CKPT:", ckpt_url)
-    param_G = load_checkpoint(ckpt_url)
-    load_param_into_net(netG, param_G)
+    netG.set_train()
+    print("CKPT:", config.ckpt)
+    load_checkpoint(config.ckpt, netG)
 
     if not os.path.isdir(config.predict_dir):
         os.makedirs(config.predict_dir)

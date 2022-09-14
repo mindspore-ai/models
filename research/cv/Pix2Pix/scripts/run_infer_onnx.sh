@@ -35,4 +35,4 @@ then
     exit 1
 fi
 
-python infer_onnx.py --device_target GPU --device_id 0 --onnx_infer_data_dir $PATH1 --onnx_path $ONNX_PATH &> infer_onnx.log 2>&1 &
+python infer_onnx.py --device_target=$1 --device_id=$2 --onnx_infer_data_dir=$PATH1 --onnx_path=$ONNX_PATH &> infer_onnx.log 2>&1 &

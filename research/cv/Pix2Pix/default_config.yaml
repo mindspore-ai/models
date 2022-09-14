@@ -16,7 +16,6 @@ need_modelarts_dataset_unzip: False
 run_distribute: False
 device_id: 0
 ckpt: None
-batch_size: 32
 
 # optimiter options
 workers: 24
@@ -82,7 +81,6 @@ workers: "Num parallel workers."
 lr: "Learning rate, default is 0.1."
 mode: "Run sink mode or not, default is sink."
 epoch_size: "Epoch size, default is 500."
-batch_size: "Batch size, default is 32."
 pre_trained: "Pretrained Checkpoint file path."
 pre_trained_epoch_size: "Pretrained epoch size."
 save_checkpoint_epochs: "Save checkpoint epochs, default is 1."
@@ -105,7 +103,6 @@ LAMBDA_GAN: "weight for GAN loss"
 LAMBDA_L1: "weight for L1 loss"
 beta1: "Adam beta1"
 beta2: "Adam beta2"
-lr: "initial learning rate"
 lr_policy: 'learning rate policy'
 epoch_num: "epoch number for training"
 n_epochs: "number of epochs with the initial learning rate"

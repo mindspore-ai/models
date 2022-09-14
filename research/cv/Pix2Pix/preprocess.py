@@ -16,12 +16,10 @@
     preprocess
 """
 import os
-import numpy as np
 from src.dataset.pix2pix_dataset import pix2pixDataset_val, create_val_dataset
 from src.utils.config import config
 
 if __name__ == '__main__':
-    args = get_args()
     result_path = "./preprocess_Result/"
     dataset_val = pix2pixDataset_val(root_dir=config.val_data_dir)
     ds_val = create_val_dataset(dataset_val)
@@ -32,7 +30,5 @@ if __name__ == '__main__':
         file_name = "Pix2Pix_data_bs" + str(config.batch_size) + "_" + str(i) + ".bin"
         file_path = img_path + "/" + file_name
         data['input_images'].tofile(file_path)
-        target_images_list.append(data['target_images'])
 
-    np.save(result_path + "target_images_ids.npy", target_images_list)
     print("=" * 20, "export bin files finished", "=" * 20)

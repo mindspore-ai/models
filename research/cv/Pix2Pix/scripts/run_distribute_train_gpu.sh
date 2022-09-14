@@ -16,7 +16,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: bash run_distribute_train_gpu.sh [DATASET_PATH] [DATASET_NAME]"
+    echo "Usage: bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATASET_PATH]"
     exit 1
 fi
 
@@ -55,11 +55,18 @@ cd ./train_parallel || exit
 
 if [ $2 == 'facades' ];
 then
-    mpirun -n $DEVICE_NUM --output-filename log_output --merge-stderr-to-stdout --allow-run-as-root python train.py --device_target GPU \
-    --run_distribute 1 --dataset_size 400 --train_data_dir $PATH1 --pad_mode REFLECT &> log &
+    mpirun -n $DEVICE_NUM --output-filename log_output --merge-stderr-to-stdout --allow-run-as-root \
+    python train.py --device_target=GPU \
+                    --run_distribute=1 \
+                    --dataset_size=400 \
+                    --train_data_dir=$PATH1 \
+                    --pad_mode=REFLECT &> log &
 elif [ $2 == 'maps' ];
 then
     mpirun --allow-run-as-root -n $DEVICE_NUM --output-filename log_output --merge-stderr-to-stdout \
-    python train.py --device_target GPU --dataset_size 1096 \
-    --run_distribute 1 --train_data_dir $PATH1 --pad_mode REFLECT &> log &
+    python train.py --device_target=GPU \
+                    --dataset_size=1096 \
+                    --run_distribute=1 \
+                    --train_data_dir=$PATH1 \
+                    --pad_mode=REFLECT &> log &
 fi

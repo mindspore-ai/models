@@ -21,7 +21,7 @@ echo "==========================================================================
 
 if [ $# != 4 ]
 then
-    echo "Usage: bash run_eval_gpu.sh [DEVICE_TARGET] [DEVICE_ID] [VAL_DATA_DIR] [CKPT_PATH]"
+    echo "Usage: bash scripts/run_eval.sh [DEVICE_TARGET] [DEVICE_ID] [VAL_DATA_DIR] [CKPT_PATH]"
     exit 1
 fi
 
@@ -41,5 +41,5 @@ then
     exit 1
 fi
 
-python eval.py --device_target GPU --device_id 0 --val_data_dir $PATH1 --ckpt $CKPT_PATH
+python eval.py --device_target=$1 --device_id=$2 --val_data_dir=$PATH1 --ckpt=$CKPT_PATH
 

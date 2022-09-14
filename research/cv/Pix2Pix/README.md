@@ -49,7 +49,7 @@ C64-C128-C256-C512
 
 Dataset_1 used: [facades](http://efrosgans.eecs.berkeley.edu/pix2pix/datasets/facades.tar.gz)
 
-```markdown
+```text
     Dataset size: 29M, 606 images
                   400 train images
                   100 validation images
@@ -59,7 +59,7 @@ Dataset_1 used: [facades](http://efrosgans.eecs.berkeley.edu/pix2pix/datasets/fa
 
 Dataset_2 used: [maps](http://efrosgans.eecs.berkeley.edu/pix2pix/datasets/maps.tar.gz)
 
-```markdown
+```text
     Dataset size: 239M, 2194 images
                   1096 train images
                   1098 validation images
@@ -70,13 +70,13 @@ Dataset_2 used: [maps](http://efrosgans.eecs.berkeley.edu/pix2pix/datasets/maps.
 
 Download facades dataset
 
-```python
+```shell
 bash data/download_Pix2Pix_dataset.sh facades
 ```
 
 Download maps dataset
 
-```python
+```shell
 bash data/download_Pix2Pix_dataset.sh maps
 ```
 
@@ -101,7 +101,7 @@ bash data/download_Pix2Pix_dataset.sh maps
 
 The entire code structure is as following:
 
-```markdown
+```text
 .Pix2Pix
 ├─ README.md                           # descriptions about Pix2Pix
 ├─ data
@@ -109,10 +109,9 @@ The entire code structure is as following:
 ├── scripts
   └─run_infer_310.sh                   # launch ascend 310 inference
   └─run_distribute_train_ascend.sh     # launch ascend training(8 pcs)
-  └─run_eval_ascend.sh                 # launch ascend eval
+  └─run_eval.sh                        # launch evaluation
   └─run_train.sh                       # launch gpu/ascend training(1 pcs)
   └─run_distribute_train_gpu.sh        # launch gpu training(8 pcs)
-  └─run_eval_gpu.sh                    # launch gpu eval
   └─run_infer_onnx.sh                  # launch onnx infer
 ├─ imgs
   └─Pix2Pix-examples.jpg               # Pix2Pix Imgs
@@ -139,7 +138,6 @@ The entire code structure is as following:
 ├─ infer_onnx.py                       # Pix2Pix onnx inference
 ├─ train.py                            # train script
 ├─ requirements.txt                    # requirements file
-├─ export_onnx.py                      # export onnx script
 └─ export.py                           # export mindir and air script
 ```
 
@@ -147,7 +145,7 @@ The entire code structure is as following:
 
 Major parameters in train.py and config.py as follows:
 
-```python
+```text
 "device_target": Ascend                     # run platform, only support Ascend.
 "device_num": 1                             # device num, default is 1.
 "device_id": 0                              # device id, default is 0.
@@ -183,27 +181,27 @@ Major parameters in train.py and config.py as follows:
 
 - running on Ascend with default parameters
 
-```python
-python train.py --device_target [Ascend] --device_id [0]
+```shell
+python train.py --device_target=[Ascend] --device_id=[0]
 ```
 
 - running distributed trainning on Ascend with fixed parameters
 
-```python
+```shell
 bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATASET_PATH]
 ```
 
 - running on GPU with fixed parameters
 
-```python
-python train.py --device_target [GPU] --device_id [0]
-OR
+```shell
+python train.py --device_target=[GPU] --device_id=[0]
+# OR
 bash scripts/run_train.sh [DEVICE_TARGET] [DEVICE_ID]
 ```
 
 - running distributed trainning on GPU with fixed parameters
 
-```python
+```shell
 bash scripts/run_distribute_train_gpu.sh [DATASET_PATH] [DATASET_NAME]
 ```
 
@@ -211,25 +209,25 @@ bash scripts/run_distribute_train_gpu.sh [DATASET_PATH] [DATASET_NAME]
 
 - running on Ascend
 
-```python
-python eval.py --device_target [Ascend] --device_id [0] --val_data_dir [./data/facades/test] --ckpt [./results/ckpt/Generator_200.ckpt] --pad_mode REFLECT
-OR
-bash scripts/run_eval_ascend.sh [DATASET_PATH] [DATASET_NAME] [CKPT_PATH] [RESULT_DIR]
+```shell
+python eval.py --device_target=[Ascend] --device_id=[0] --val_data_dir=[./data/facades/test] --ckpt=[./results/ckpt/Generator_200.ckpt] --pad_mode=REFLECT
+# OR
+bash scripts/run_eval.sh [DEVICE_TARGET] [DEVICE_ID] [VAL_DATA_DIR] [CKPT_PATH]
 ```
 
 - running on GPU
 
-```python
-python eval.py --device_target [GPU] --device_id [0] --val_data_dir [./data/facades/test] --ckpt [./train/results/ckpt/Generator_200.ckpt]
-OR
-bash scripts/run_eval_gpu.sh [DATASET_PATH] [DATASET_NAME] [VAL_DATA_PATH] [CKPT_PATH]
+```shell
+python eval.py --device_target=[GPU] --device_id=[0] --val_data_dir=[./data/facades/test] --ckpt=[./train/results/ckpt/Generator_200.ckpt]
+# OR
+bash scripts/run_eval.sh [DEVICE_TARGET] [DEVICE_ID] [VAL_DATA_DIR] [CKPT_PATH]
 ```
 
 **Note:**: Before training and evaluating, create folders like "./results/...". Then you will get the results as following in "./results/predict".
 
 ## [310 infer](#contents)
 
-```python
+```shell
 bash scripts/run_infer_310.sh [The path of the MINDIR for 310 infer] [The path of the dataset for 310 infer] y Ascend 0
 ```
 
@@ -237,14 +235,14 @@ bash scripts/run_infer_310.sh [The path of the MINDIR for 310 infer] [The path o
 
 ## [Onnx export](#contents)
 
-```python
-python export_onnx.py --ckpt [/path/pix2pix.ckpt] --device_target [GPU] --device_id [0]
+```shell
+python export.py --ckpt=[/path/pix2pix.ckpt] --device_target=[GPU] --device_id=[0] --file_format=ONNX
 ```
 
 ## [Onnx infer](#contents)
 
-```python
-python infer_onnx.py --device_target [GPU] --device_id [0] --onnx_infer_data_dir [/path/data] --onnx_path [/path/pix2pix.onnx]
+```shell
+python infer_onnx.py --device_target=[GPU] --device_id=[0] --onnx_infer_data_dir=[/path/data] --onnx_path=[/path/pix2pix.onnx]
 OR
 bash scripts/run_infer_onnx.sh [DEVICE_TARGET] [DEVICE_ID] [ONNX_INFER_DATA_DIR] [ONNX_PATH]
 ```
