@@ -82,9 +82,9 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 
     ```bash
     #Generate dataset in mindrecord format for cora
-    ./run_process_data_ascend.sh ./data cora
+    bash run_process_data_ascend.sh ./data/cora cora
     #Generate dataset in mindrecord format for citeseer
-    ./run_process_data_ascend.sh ./data citeseer
+    bash run_process_data_ascend.sh ./data/citeseer citeseer
     ```
 
 ## [Features](#contents)
