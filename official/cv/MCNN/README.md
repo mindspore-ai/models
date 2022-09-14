@@ -12,6 +12,9 @@
         - [Training](#training)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
+    - [ONNX Export And Evaluation](#onnx-export-and-evaluation)
+        - [ONNX Export](#onnx-export)
+        - [ONNX Evaluation](#onnx-evaluation)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
@@ -119,7 +122,8 @@ bash run_infer_310.sh ../mcnn.mindir ../test_data/images ../test_data/ground_tru
         ├── modelarts
         ├── scripts
         │   ├──run_distribute_train.sh             // train in distribute
-        │   ├──run_eval.sh                         // eval  in ascend
+        │   ├──run_eval.sh                         // eval in ascend
+        │   ├──run_eval_onnx_gpu.sh                // exported onnx eval in gpu
         │   ├──run_infer_310.sh                    // infer in 310
         │   ├──run_standalone_train.sh             // train in standalone
         │   ├──run_train_gpu.sh                    // train on GPU
@@ -134,7 +138,9 @@ bash run_infer_310.sh ../mcnn.mindir ../test_data/images ../test_data/ground_tru
         │   ├──Mcnn_Callback.py            // Mcnn Callback
         ├── train.py                // training script
         ├── eval.py                 //  evaluation script
+        ├── eval_onnx.py            //  exported onnx evaluation script
         ├── export.py               //  export script
+        ├── export_onnx.py          //  export onnx format script
 ```
 
 ## [Script Parameters](#contents)
@@ -147,6 +153,7 @@ Major parameters in train.py and config.py as follows:
 --batch_size: Training batch size.
 --device_target: Device where the code will be implemented. Optional values are "Ascend", "GPU".
 --ckpt_path: The absolute full path to the checkpoint file saved after training.
+--onnx_path: The absolute full path to the exported onnx file.
 --train_path: Training dataset's data
 --train_gt_path: Training dataset's label
 --val_path: Testing dataset's data
@@ -242,6 +249,34 @@ Before running the command below, please check the checkpoint path used for eval
   # grep "MAE: " eval_log
   MAE: 105.87984801910736 MSE: 161.6687899899305
   ```
+
+## [ONNX Export And Evaluation](#contents)
+
+Note that run all onnx concerned scripts on GPU.
+
+### ONNX Export
+
+The command below will produce lots of MCNN onnx files, named different input shapes due to different input shapes of evaluation data.
+
+```bash
+python export_onnx.py --ckpt_file [CKPT_PATH] --val_path [VAL_PATH] --val_gt_path [VAL_GT_PATH]
+# example: python export_onnx.py --ckpt_file mcnn_ascend_v170_shanghaitecha_official_cv_MAE112.11.ckpt  --val_path /data0/dc/mcnn/models/official/cv/MCNN/data/original/shanghaitech/part_A_final/test_data/images/  --val_gt_path /data0/dc/mcnn/models/official/cv/MCNN/data/original/shanghaitech/part_A_final/test_data/ground_truth_csv/
+```
+
+### ONNX Evaluation
+
+Note that ONNX_PATH should be the absolute directory to the exported onnx files, such as: '/data0/dc/mcnn/models/official/cv/MCNN/'.
+
+```bash
+bash run_eval_onnx_gpu.sh [VAL_PATH] [VAL_GT_PATH] [ONNX_PATH]
+# example: bash run_eval_onnx_gpu.sh  /data0/dc/mcnn/models/official/cv/MCNN/data/original/shanghaitech/part_A_final/test_data/images/ /data0/dc/mcnn/models/official/cv/MCNN/data/original/shanghaitech/part_A_final/test_data/ground_truth_csv/ /data0/dc/mcnn/models/official/cv/MCNN/
+ ```
+
+You can view the results through the file "log_onnx". The accuracy of the test dataset will be as follows:
+
+```text
+MAE: 112.11429375868578   MSE: 172.62108098880813
+```
 
 # [Model Description](#contents)
 
