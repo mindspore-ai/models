@@ -270,7 +270,7 @@ The ckpt_file parameter is required,
 
 ### Performance Result
 
-Inference result is saved in current path, you can find result like this in acc.log file.
+Inference result is saved in current path, you can find result like this in eval_output.log file.
 
 ```markdown
 auc : 0.7814143582416716

@@ -273,7 +273,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --device_target
 
 ### 模型表现
 
-推理结果保存在脚本执行的当前路径，在acc.log中可以看到以下精度计算结果。
+推理结果保存在脚本执行的当前路径，在eval_output.log中可以看到以下精度计算结果。
 
 ```markdown
 auc :  0.7814143582416716
