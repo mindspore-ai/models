@@ -32,7 +32,7 @@ from src.lr_schedule import get_lr
 from src.init_params import init_net_param, filter_checkpoint_parameter
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
-from src.model_utils.device_adapter import get_device_id, get_device_num, get_rank_id
+from src.model_utils.device_adapter import get_device_id, get_device_num
 
 set_seed(1)
 
@@ -58,11 +58,12 @@ class Monitor(Callback):
 
     def step_end(self, run_context):
         cb_params = run_context.original_args()
-        print("lr:[{:8.6f}]".format(self.lr_init[cb_params.cur_step_num-1]), flush=True)
+        print("lr:[{:8.6f}]".format(self.lr_init[cb_params.cur_step_num - 1]), flush=True)
 
 
 def modelarts_pre_process():
     '''modelarts pre process function.'''
+
     def unzip(zip_file, save_dir):
         import zipfile
         s_time = time.time()
@@ -112,55 +113,39 @@ def modelarts_pre_process():
 
         print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
 
+
 def set_graph_kernel_context(device_target):
     if device_target == "GPU":
         # Enable graph kernel for default model ssd300 on GPU back-end.
         context.set_context(enable_graph_kernel=True,
                             graph_kernel_flags="--enable_parallel_fusion --enable_expand_ops=Conv2D")
 
+
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def main():
-
     config.lr_init = ast.literal_eval(config.lr_init)
     config.lr_end_rate = ast.literal_eval(config.lr_end_rate)
-
+    device_id = get_device_id()
     if config.device_target == "Ascend":
-        context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
-        if config.distribute:
-            if os.getenv("DEVICE_ID", "not_set").isdigit():
-                context.set_context(device_id=get_device_id())
-            init()
-            device_num = get_device_num()
-            rank = get_rank_id()
-            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
-                                              device_num=device_num)
-        else:
-            rank = 0
-            device_num = 1
-            context.set_context(device_id=get_device_id())
-
-        # Set mempool block size in PYNATIVE_MODE for improving memory utilization, which will not take effect in GRAPH_MODE
-        if context.get_context("mode") == context.PYNATIVE_MODE:
-            context.set_context(mempool_block_size="31GB")
-
+        context.set_context(mempool_block_size="31GB")
     elif config.device_target == "GPU":
-        context.set_context(mode=context.GRAPH_MODE, device_target="GPU")
         set_graph_kernel_context(config.device_target)
-        if config.distribute:
-            if os.getenv("DEVICE_ID", "not_set").isdigit():
-                context.set_context(device_id=get_device_id())
-            init()
-            device_num = config.device_num
-            rank = get_rank()
-            context.reset_auto_parallel_context()
-            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
-                                              device_num=device_num)
-        else:
-            rank = 0
-            device_num = 1
-            context.set_context(device_id=get_device_id())
+    elif config.device_target == "CPU":
+        device_id = 0
+        config.distribute = False
     else:
-        raise ValueError("Unsupported platform.")
+        raise ValueError(f"device_target support ['Ascend', 'GPU', 'CPU'], but get {config.device_target}")
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+    if config.distribute:
+        init()
+        device_num = config.device_num
+        rank = get_rank()
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
+    else:
+        rank = 0
+        device_num = 1
+        context.set_context(device_id=device_id)
 
     mindrecord_file = os.path.join(config.mindrecord_dir, "retinanet.mindrecord0")
 
@@ -178,6 +163,10 @@ def main():
     retinanet = retinanet50(backbone, config)
     net = retinanetWithLossCell(retinanet, config)
     init_net_param(net)
+    if config.finetune:
+        init_net_param(net, initialize_mode='XavierUniform')
+    else:
+        init_net_param(net)
 
     if config.pre_trained:
         if config.pre_trained_epoch_size <= 0:

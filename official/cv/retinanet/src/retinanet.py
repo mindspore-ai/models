@@ -181,7 +181,8 @@ class MultiBox(nn.Cell):
         cls_layers = []
         for k, out_channel in enumerate(out_channels):
             loc_layers += [RegressionModel(in_channel=out_channel, num_anchors=num_default[k])]
-            cls_layers += [ClassificationModel(in_channel=out_channel, num_anchors=num_default[k])]
+            cls_layers += [ClassificationModel(in_channel=out_channel, num_anchors=num_default[k],
+                                               num_classes=config.num_classes)]
 
         self.multi_loc_layers = nn.layer.CellList(loc_layers)
         self.multi_cls_layers = nn.layer.CellList(cls_layers)

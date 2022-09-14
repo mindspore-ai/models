@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,7 +14,8 @@
 # ============================================================================
 """Parameters utils"""
 
-from mindspore.common.initializer import initializer, TruncatedNormal
+from mindspore.common.initializer import initializer, TruncatedNormal, XavierUniform
+
 
 def init_net_param(network, initialize_mode='TruncatedNormal'):
     """Init the parameters in net."""
@@ -23,9 +24,10 @@ def init_net_param(network, initialize_mode='TruncatedNormal'):
         if 'beta' not in p.name and 'gamma' not in p.name and 'bias' not in p.name:
             if initialize_mode == 'TruncatedNormal':
                 p.set_data(initializer(TruncatedNormal(), p.data.shape, p.data.dtype))
+            elif initialize_mode == 'XavierUniform':
+                p.set_data(initializer(XavierUniform(), p.data.shape, p.data.dtype))
             else:
                 p.set_data(initialize_mode, p.data.shape, p.data.dtype)
-
 
 
 def filter_checkpoint_parameter(param_dict):
