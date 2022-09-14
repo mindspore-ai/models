@@ -60,7 +60,7 @@ def run_export():
                           int(config.patch_size)**2*int(config.img_channel)))
     input_arr = (Tensor(np.ones(shape), dtype=ms.float32), Tensor(mask_true, dtype=ms.float32))
 
-    export(network, *input_arr, file_name=config.file_name, files_format=config.file_format)
+    export(network, *input_arr, file_name=config.file_name, file_format=config.file_format)
 
 
 if __name__ == '__main__':
