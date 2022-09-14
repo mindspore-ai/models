@@ -163,6 +163,7 @@ StNet是兼顾局部时空联系以及全局时空联系的视频时空联合建
 ```bash
 ├── scripts
     ├── run_distribute_train.sh                   // 多卡训练脚本
+    ├── run_infer_310.sh                          // 310上评估的shell脚本
     └── run_eval.sh                               // 验证脚本
 ├── src
     ├── model_utils
@@ -173,7 +174,18 @@ StNet是兼顾局部时空联系以及全局时空联系的视频时空联合建
     ├── Stnet_Res_model.py                        // 模型脚本
     ├── generate_label.py                         // 预处理生成标签脚本
     └── video2pkl.py                              // 预处理视频转pkl格式脚本
+├── ascend310_infer
+    ├── inc
+        └── utils.h                               // utils的头文件
+    ├── src
+        ├── main.cc                               // 310推理的主函数
+        └── utils.cc                              // utils 的源文件
+    ├── build.sh                                  // 构建可执行脚本
+    └── CMakeLists.txt                            // CMakeLists
 ├── README_CN.md                                  // 描述文件
+├── export.py                                     //导出Mindir接口
+├── preprocess.py                                 //前处理数据集
+├── postprocess.py                                //后处理
 ├── eval.py                                       // 测试脚本
 └── train.py                                      // 训练脚本
 ```
@@ -254,7 +266,7 @@ StNet是兼顾局部时空联系以及全局时空联系的视频时空联合建
 需要修改的配置项为 batch_size 和 ckpt_file.
 
   ```shell
-  python export.py --resume [CONFIG_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+  python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
   ```
 
 ## 推理过程
@@ -271,8 +283,8 @@ StNet是兼顾局部时空联系以及全局时空联系的视频时空联合建
 
   ```shell
   # Ascend310 inference
-  bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [NEED_PREPROCESS]  [DEVICE_ID]
-  after allreduce eval: top1_correct=9252, tot=10000, acc=92.52%
+  bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [NEED_PREPROCESS]    [DEVICE_ID]
+  after allreduce eval: top1_correct=12920, tot=18644, acc=69.29%
   ```
 
 需要四个参数：

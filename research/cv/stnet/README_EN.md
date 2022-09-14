@@ -232,6 +232,7 @@ After installing MindSpore through the official website, you can follow the step
     ├── run_distribute_train_ascend.sh // ascend distributed training script
     ├── run_distribute_train_gpu.sh // gpu distributed training script
     ├── run_eval.sh // verification script
+    ├── run_infer_310.sh // 310 verification script
     └── run_standalone_train_gpu.sh // gpu standalone training script
 ├── src
     ├── model_utils
@@ -243,8 +244,19 @@ After installing MindSpore through the official website, you can follow the step
     ├── generate_label.py // preprocessing to generate label script
     ├── preprocess_ucf101.py.py // preprocessing ucf101 dataset
     └── video2pkl.py // preprocessing video to pkl format script
+├── ascend310_infer
+    ├── inc
+        └── utils.h // utils header file
+    ├── src
+        ├── main.cc // 310 reasoning main file
+        └── utils.cc // 310 reasoning source file
+    ├── build.sh // build executable file
+    └── CMakeLists.txt // CMakeLists
 ├── README_CN.md // chinese description file
 ├── README_EN.md // english description file
+├── export.py // export Mindir file
+├── preprocess.py // preprocess dataset
+├── postprocess.py // postprocess dataset
 ├── eval.py // test script
 ├── requirements.txt  // pip requirements
 └── train.py // training script
@@ -350,7 +362,7 @@ Before exporting, you need to modify the configuration file config.py correspond
 The configuration items that need to be modified are batch_size and ckpt_file.
 
   ```bash
-  python export.py --resume [CONFIG_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+  python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
   ```
 
 ## Inference process
@@ -368,7 +380,7 @@ Before we can run inference we need to export the model first. Air models can on
   ```bash
   # Ascend310 inference
   bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [NEED_PREPROCESS] [DEVICE_ID]
-  after allreduce eval: top1_correct=9252, tot=10000, acc=92.52%
+  after allreduce eval: top1_correct=12920, tot=18644, acc=69.29%
   ```
 
 Four parameters are required:
