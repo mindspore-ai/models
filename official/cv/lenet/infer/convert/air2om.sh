@@ -16,7 +16,7 @@
 model_path=$1
 output_model_name=$2
 
-/usr/local/Ascend/atc/bin/atc \
+atc \
 --model=$model_path \
 --framework=1 \
 --output=$output_model_name \
