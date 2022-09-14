@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 if [ $# -ne 3 ]; then
-  echo "Usage: sh scripts/preprocess_data.sh [DATASET_DIR][TRAIN_DIR] [TEST_DIR]"
+  echo "Usage: bash scripts/preprocess_data.sh [DATASET_DIR][TRAIN_DIR][TEST_DIR]"
   exit 1
 else
   DATASET_DIR=$1
