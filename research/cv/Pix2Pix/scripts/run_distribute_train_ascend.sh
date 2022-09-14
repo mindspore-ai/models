@@ -15,7 +15,7 @@
 
 if [ $# != 2 ]
 then
-    echo "Usage: sh run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATASET_PATH]"
+    echo "Usage: bash scripts/run_distribute_train_gpu.sh [DATASET_PATH] [DATASET_NAME]"
     exit 1
 fi
 
@@ -53,7 +53,7 @@ do
         echo "start training for rank $i, device $DEVICE_ID"
         env > env.log
 
-        python train.py --run_distribute 1 --device_target Ascend \
-                        --device_id=$DEVICE_ID --train_data_dir $DATASET_PATH &> log &
+        python train.py --run_distribute=1 --device_target=Ascend \
+                        --device_id=$DEVICE_ID --train_data_dir=$DATASET_PATH &> log &
         cd ..
 done

@@ -45,16 +45,16 @@ def decode_image(img):
     return (img * std + mean).astype(np.uint8).transpose((1, 2, 0))
 
 if __name__ == '__main__':
-    args = get_args()
-
     result_dir = "./result_Files"
     object_imageSize = 256
     rst_path = result_dir
-
+    out_dir = "310_infer_img"
+    if not os.ipath.isdir(out_dir):
+        os.makedirs(out_dir)
     for i in range(len(os.listdir(rst_path))):
         file_name = os.path.join(rst_path, "Pix2Pix_data_bs" + str(config.batch_size) + '_' + str(i) + '_0.bin')
         output = np.fromfile(file_name, np.float32).reshape(3, object_imageSize, object_imageSize)
         print(output.shape)
-        save_image(output, './310_infer_img' + str(i + 1))
+        save_image(output, os.path.join(out_dir, f"{i + 1}"))
         print("=======image", i + 1, "saved success=======")
     print("Generate images success!")

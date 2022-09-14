@@ -53,8 +53,7 @@ def pix2pix_infer():
     print("=======Starting infer=======")
     for i, data in enumerate(data_loader_val):
         input_image = np.array(data["input_images"])
-        fake_image = onnx_session.run(None, {get_input_name(onnx_session)[0]: input_image,
-                                             get_input_name(onnx_session)[1]: None})
+        fake_image = onnx_session.run(None, {get_input_name(onnx_session)[0]: input_image})
         fake_image = Tensor(fake_image)[0]
         save_image(fake_image, config.onnx_infer_dir + str(i+1))
         print("=======image", i + 1, "saved success=======")
