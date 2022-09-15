@@ -56,16 +56,16 @@ After installing MindSpore via the official website, you can start training and 
 
 - preprocess dataset
 
-  '''bash
+  ```bash
   #download dataset
-  #Please refer to [1] to obtain the download link
+  #Please refer to [Criteo Kaggle Display Advertising Challenge Dataset] to get the download URL and assign it to `DATA_LINK`
   mkdir -p data/origin_data && cd data/origin_data
   wget DATA_LINK
   tar -zxvf dac.tar.gz
 
   #preprocess dataset
   python -m src.preprocess_data  --data_path=./data/ --dense_dim=13 --slot_dim=26 --threshold=100 --train_line_count=45840617 --skip_id_convert=0
-  '''
+  ```
 
 - running on Ascend
 
