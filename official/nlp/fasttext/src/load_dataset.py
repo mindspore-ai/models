@@ -35,7 +35,7 @@ def load_dataset(dataset_path,
                                   shuffle=shuffle,
                                   num_shards=rank_size,
                                   shard_id=rank_id,
-                                  num_parallel_workers=32)
+                                  num_parallel_workers=4)
         ori_dataset_size = data_set.get_dataset_size()
         print(f"Dataset size: {ori_dataset_size}")
         repeat_count = epoch_count
