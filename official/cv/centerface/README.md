@@ -34,12 +34,12 @@
 
 # [CenterFace Description](#contents)
 
-CenterFace is a practical anchor-free face detection and alignment method for edge devices, we support training and evaluation on Ascend910.
+CenterFace is a practical anchor-free object detection and alignment method for edge devices, we support training and evaluation on Ascend910.
 
-Face detection and alignment in unconstrained environment is always deployed on edge devices which have limited memory storage and low computing power.
+Object detection and alignment in unconstrained environment is always deployed on edge devices which have limited memory storage and low computing power.
 CenterFace proposes a one-stage method to simultaneously predict facial box and landmark location with real-time speed and high accuracy.
 
-[Paper](https://arxiv.org/ftp/arxiv/papers/1911/1911.03599.pdf): CenterFace: Joint Face Detection and Alignment Using Face as Point.
+[Paper](https://arxiv.org/ftp/arxiv/papers/1911/1911.03599.pdf): CenterFace: Joint Object Detection and Alignment Using Face as Point.
 Xu, Yuanyuan(Huaqiao University) and Yan, Wan(StarClouds) and Sun, Haixin(Xiamen University)
 and Yang, Genke(Shanghai Jiaotong University) and Luo, Jiliang(Huaqiao University)
 
