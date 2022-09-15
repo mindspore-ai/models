@@ -1,0 +1,88 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unlesee you know exactly what you are doing)
+enable_modelarts: False
+# url for modelarts
+data_url: ""
+train_url: ""
+ckpt_url: ""
+result_url: ""
+
+# path on cloud server
+data_path: "/home/work/user-job-dir/inputs/data/"
+output_path: "/home/work/user-job-dir/outputs/model/"
+load_path: "/home/work/user-job-dir/inputs/checkpoint/"
+
+device_target: "Ascend"
+#device_target: "GPU"
+#device_target: "CPU"
+enable_profiling: False
+
+# ======================================================================================
+# common options
+device_id: 0 
+rank: 0
+
+group_size: 1
+# ======================================================================================
+# Training options
+pretrain_epoch_size: 5 #10 #30
+
+finetrain_epoch_size: 300
+keep_checkpoint_max: 20
+save_ckpt_path: "./"
+save_checkpoint: True
+save_only_device_0: False
+
+amp_level: "O3"
+enable_reduce_precision: True
+
+is_distributed: False
+#is_distributed: True
+
+dataset_path: "./dataset"
+resume: ""
+resume_epoch: 1
+random_seed: 1
+
+work_nums: 8
+
+drop_remainder: False
+
+# Dataset config
+train_batch_size: 500
+val_batch_size: 1250 
+
+#learning rate config
+lr_init: [0.01, 0.01, 0.001, 0.001]
+
+#optimization config
+weight_decay: 0.0
+momentum: 0.9
+
+#mode config
+use_pynative_mode: False
+#use_pynative_mode: True
+# ======================================================================================
+# Eval options
+checkpoint: ""
+enable_checkpoint_dir: False
+checkpoint_dir: "./" 
+
+# ======================================================================================
+# export options
+file_name: "llnet"
+file_format: "MINDIR"
+
+---
+# Help description for each configuration
+enable_modelarts: "Whether training on modelarts default: False"
+data_url: "Url for modelarts"
+train_url: "Url for modelarts"
+data_path: "The location of input data"
+output_path: "The location of the output file"
+device_target: "device id of GPU or Ascend. (Default: Ascend)"
+enable_profiling: "Whether enable profiling while training default: False"
+is_distributed: "distributed training"
+resume: "resume training with existed checkpoint"
+device_id: "device id"
+file_name: "output file name"
+file_format: "file format choices [AIR MINDIR ONNX]"
