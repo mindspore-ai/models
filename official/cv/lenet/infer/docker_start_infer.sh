@@ -37,7 +37,7 @@ function param_check() {
 
 param_check
 
-docker run -it \
+docker run -u root -it \
   --device=/dev/davinci0 \
   --device=/dev/davinci_manager \
   --device=/dev/devmm_svm \
