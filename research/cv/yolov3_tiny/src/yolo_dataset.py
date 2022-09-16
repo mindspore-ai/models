@@ -316,9 +316,9 @@ def create_yolo_dataset(
                 CV.Normalize(mean, std),
                 hwc_to_chw
             ],
-            num_parallel_workers=num_parallel_workers
+            num_parallel_workers=8
         )
-        ds = ds.batch(batch_size, num_parallel_workers=num_parallel_workers, drop_remainder=True)
+        ds = ds.batch(batch_size, num_parallel_workers=8, drop_remainder=True)
     else:
         ds = de.GeneratorDataset(
             yolo_dataset,
@@ -331,9 +331,9 @@ def create_yolo_dataset(
             input_columns=["image", "img_id"],
             output_columns=["image", "image_shape", "img_id"],
             column_order=["image", "image_shape", "img_id"],
-            num_parallel_workers=num_parallel_workers
+            num_parallel_workers=8
         )
-        ds = ds.map(operations=hwc_to_chw, input_columns=["image"], num_parallel_workers=num_parallel_workers)
+        ds = ds.map(operations=hwc_to_chw, input_columns=["image"], num_parallel_workers=8)
         ds = ds.batch(batch_size, drop_remainder=True)
     ds = ds.repeat(max_epoch)
     return ds, len(yolo_dataset)

@@ -80,6 +80,7 @@ do
         --training_shape=640 \
         --weight_decay=0.016 \
         --loss_scale=1024 \
+        --num_parallel_workers=32 \
         --lr_scheduler=cosine_annealing  > log.txt 2>&1 &
     cd ..
 done
