@@ -33,6 +33,6 @@ warn() { echo >&2 -e "\033[1;31m[WARN ][MxStream] $1\033[1;37m" ; }
 info() { echo -e "\033[1;34m[INFO ][MxStream] $1\033[1;37m" ; }
 warn() { echo >&2 -e "\033[1;31m[WARN ][MxStream] $1\033[1;37m" ; }
 
-python3.7 main.py $image_path  $result_dir
+python3 main.py $image_path  $result_dir
 
 exit 0

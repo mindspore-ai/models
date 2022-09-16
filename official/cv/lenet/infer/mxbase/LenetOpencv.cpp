@@ -65,10 +65,10 @@ APP_ERROR LenetOpencv::DeInit() {
     return APP_ERR_OK;
 }
 
-APP_ERROR LenetOpencv::ReadImage(const std::string &imgPath, cv::Mat &imageMat) {
+void LenetOpencv::ReadImage(const std::string &imgPath, cv::Mat &imageMat) {
     imageMat = cv::imread(imgPath, cv::IMREAD_COLOR);
 }
-APP_ERROR LenetOpencv::ResizeImage(const cv::Mat &srcImageMat, cv::Mat &dstImageMat) {
+void LenetOpencv::ResizeImage(const cv::Mat &srcImageMat, cv::Mat &dstImageMat) {
     static constexpr uint32_t resizeHeight = 32;
     static constexpr uint32_t resizeWidth = 32;
 
@@ -90,6 +90,7 @@ APP_ERROR LenetOpencv::CVMatToTensorBase(const cv::Mat &imageMat, MxBase::Tensor
     tensorBase = TensorBase(memoryDataDst, false, shape, MxBase::TENSOR_DTYPE_UINT8);
     return APP_ERR_OK;
 }
+
 APP_ERROR LenetOpencv::Inference(const std::vector<MxBase::TensorBase> &inputs,
                                     std::vector<MxBase::TensorBase> &outputs) {
     auto dtypes = model_->GetOutputDataType();
@@ -127,7 +128,7 @@ APP_ERROR LenetOpencv::Process(const std::string &imgPath) {
     std::vector<MxBase::TensorBase> inputs = {};
     std::vector<MxBase::TensorBase> outputs = {};
     TensorBase tensorBase;
-    ret = CVMatToTensorBase(imageMat, tensorBase);
+    APP_ERROR ret = CVMatToTensorBase(imageMat, tensorBase);
     if (ret != APP_ERR_OK) {
         LogError << "CVMatToTensorBase failed, ret=" << ret << ".";
         return ret;
