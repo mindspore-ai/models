@@ -138,7 +138,6 @@ if __name__ == "__main__":
     random.seed(args.manualSeed)
     mindspore.set_seed(args.manualSeed)
     dataset_sink_mode = False
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", device_id=args.device_id)
 
     dataset_generator = ShapeNetDataset(
         root=local_data_url,
