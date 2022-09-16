@@ -233,10 +233,8 @@ class TrainingWrapper(nn.TrainOneStepWithLossScaleCell):
         if self.reducer_flag:
             grads = self.grad_reducer(grads)
         cond = self.get_overflow_status(status, grads)
-        overflow = self.process_loss_scale(cond)
         ret = (loss, cond, sens)
-        if not overflow:
-            self.optimizer(grads)
+        self.optimizer(grads)
         return ret
 
 

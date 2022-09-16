@@ -127,7 +127,8 @@ def main():
     config.lr_end_rate = ast.literal_eval(config.lr_end_rate)
     device_id = get_device_id()
     if config.device_target == "Ascend":
-        context.set_context(mempool_block_size="31GB")
+        if context.get_context("mode") == context.PYNATIVE_MODE:
+            context.set_context(mempool_block_size="31GB")
     elif config.device_target == "GPU":
         set_graph_kernel_context(config.device_target)
     elif config.device_target == "CPU":
@@ -138,7 +139,7 @@ def main():
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
     if config.distribute:
         init()
-        device_num = config.device_num
+        device_num = get_device_num()
         rank = get_rank()
         context.reset_auto_parallel_context()
         context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
@@ -163,7 +164,7 @@ def main():
     retinanet = retinanet50(backbone, config)
     net = retinanetWithLossCell(retinanet, config)
     init_net_param(net)
-    if config.finetune:
+    if hasattr(config, "finetune") and config.finetune:
         init_net_param(net, initialize_mode='XavierUniform')
     else:
         init_net_param(net)

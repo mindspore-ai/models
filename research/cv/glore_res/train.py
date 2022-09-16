@@ -46,7 +46,7 @@ from src.save_callback import SaveCallback
 
 if config.isModelArts:
     import moxing as mox
-if config.net == 'resnet200' or config.net == 'resnet101':
+if config.net == 'resnet200' or config.net == 'resnet101' or config.net == 'resnet50':
     if config.device_target == "GPU":
         config.cast_fp16 = False
 

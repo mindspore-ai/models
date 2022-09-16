@@ -45,7 +45,7 @@ def get_lr(global_step, lr_init, lr_end, lr_max, warmup_epochs1, warmup_epochs2,
     warmup_steps4 = warmup_steps3 + steps_per_epoch * warmup_epochs4
     warmup_steps5 = warmup_steps4 + steps_per_epoch * warmup_epochs5
     step_radio = [1e-4, 1e-3, 1e-2, 0.1]
-    if config.finetune:
+    if hasattr(config, finetune) and config.finetune:
         step_radio = [1e-4, 1e-2, 0.1, 1]
     for i in range(total_steps):
         if i < warmup_steps1:
