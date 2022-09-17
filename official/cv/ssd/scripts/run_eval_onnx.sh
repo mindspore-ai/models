@@ -36,7 +36,12 @@ COCO_ROOT=$2
 ONNX_MODEL_PATH=$3
 INSTANCES_SET=${4:-'annotations/instances_{}.json'}
 DEVICE_TARGET=${5:-"GPU"}
-CONFIG_PATH=${6:-"config/ssd300_config_gpu.yaml"}
+CONFIG_PATH=${6:-"config/ssd_vgg16_config_gpu.yaml"}
+
+echo $ONNX_MODEL_PATH
+echo $INSTANCES_SET
+echo $DEVICE_TARGET
+echo $CONFIG_PATH
 
 python eval_onnx.py \
     --dataset coco \

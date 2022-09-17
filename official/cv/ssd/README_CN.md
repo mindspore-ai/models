@@ -17,6 +17,7 @@
     - [评估过程](#评估过程)
         - [Ascend处理器环境评估](#ascend处理器环境评估)
         - [GPU处理器环境评估](#gpu处理器环境评估)
+        - [ONNX处理器环境评估](#onnx处理器环境评估)
     - [推理过程](#推理过程)
         - [导出MindIR](#导出mindir)
         - [在Ascend310执行推理](#在ascend310执行推理)
@@ -230,13 +231,16 @@ bash run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID] [CONFIG_PATH]
     "batch_size": 32                           # 输入张量的批次大小
     "pre_trained": None                        # 预训练检查点文件路径
     "pre_trained_epoch_size": 0                # 预训练轮次大小
-    "save_checkpoint_epochs": 10               # 两个检查点之间的轮次间隔。默认情况下，每10个轮次都会保存检查点。
+    "save_checkpoint_epochs": 10               # 两个检查点之间的轮次间隔。默认情况下，每10个轮次都会保存检查点
     "loss_scale": 1024                         # 损失放大
+    "data_path": "your_path/data"              # your_path是你自己的路径，一定要是绝对路径
+    "output_path": "your_path/data/train"      # your_path是你自己的路径，一定要是绝对路径
+    "load_path": "your_path/data/checkpoint"   # your_path是你自己的路径，一定要是绝对路径
 
     "class_num": 81                            # 数据集类数
-    "img_shape": [300, 300]                  # 作为模型输入的图像高和宽
+    "img_shape": [300, 300]                    # 作为模型输入的图像高和宽
     "mindrecord_dir": "/data/MindRecord_COCO"  # MindRecord路径
-    "coco_root": "/data/coco2017"              # COCO2017数据集路径
+    "coco_root": "your_path/cocodataset"       # COCO2017数据集路径
     "voc_root": ""                             # VOC原始数据集路径
     "image_dir": ""                            # 其他数据集图片路径，如果使用coco或voc，此参数无效。
     "anno_path": ""                            # 其他数据集标注路径，如果使用coco或voc，此参数无效。
@@ -390,18 +394,52 @@ Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.686
 mAP: 0.2244936111705981
 ```
 
+### ONNX处理器环境评估
+
+```shell script
+bash bash run_eval_onnx.sh <DATA_PATH> <COCO_ROOT> <ONNX_MODEL_PATH> [<INSTANCES_SET>] [<DEVICE_TARGET>] [<CONFIG_PATH>]
+```
+
+此脚本需要三个参数。
+
+- `DATA_PATH`：mindspore评估生成的data路径。
+- `COCO_ROOT`：COCO2017数据集路径。
+- `ONNX_MODEL_PATH`: onnx模型的路径。
+
+推理结果保存在示例路径中您可以在eval.log日志中找到类似以下的结果。
+
+```text
+Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.239
+  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.398
+  Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.242
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.035
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.198
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.436
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.251
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.388
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.423
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.117
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.435
+  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.688
+  mAP: 0.23850595066045968
+```
+
 ## 推理过程
 
-### [导出MindIR](#contents)
+### [导出模型](#contents)
 
-本地导出mindir
+本地导出模型
 
 ```shell
 python export.py --checkpoint_file_path [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [CONFIG_PATH]
 ```
 
-参数ckpt_file为必填项，
-`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
+此脚本需要四个参数。
+
+- `CKPT_PATH`：检查点文件的绝对路径。
+- `FILE_NAME`：模型文件名。
+- `FILE_FORMAT`：必须在 ["AIR", "MINDIR", "ONNX""]中选择。
+- `CONFIG_PATH`：参数配置。
 
 ModelArts导出mindir
 

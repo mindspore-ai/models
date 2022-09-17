@@ -24,7 +24,7 @@ from src.eval_utils import COCOMetrics
 from src.model_utils.config import config
 
 
-def create_session(checkpoint_path, target_device):
+def create_session(onnx_path, target_device):
     """Create onnxruntime session"""
     if target_device == 'GPU':
         providers = ['CUDAExecutionProvider']
@@ -35,19 +35,19 @@ def create_session(checkpoint_path, target_device):
             f'Unsupported target device {target_device}, '
             f'Expected one of: "CPU", "GPU"'
         )
-    session = ort.InferenceSession(checkpoint_path, providers=providers)
+    session = ort.InferenceSession(onnx_path, providers=providers)
     input_name = session.get_inputs()[0].name
     return session, input_name
 
 
-def ssd_eval(dataset_path, ckpt_path, anno_json):
+def ssd_eval(dataset_path, onnx_path, anno_json):
     """SSD evaluation."""
     # Silence false positive
     # pylint: disable=unexpected-keyword-arg
     ds = create_ssd_dataset(dataset_path, batch_size=config.batch_size,
                             is_training=False, use_multiprocessing=False)
 
-    session, input_name = create_session(ckpt_path, config.device_target)
+    session, input_name = create_session(onnx_path, config.device_target)
     total = ds.get_dataset_size() * config.batch_size
     print("\n========================================\n")
     print("total images num: ", total)
