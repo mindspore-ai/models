@@ -185,9 +185,11 @@ The entire code structure is as following:
     |---export.py    // export scripts
     |---preprocess.py     // preprocess scripts
     |---postprocess.py    // postprocess scripts
+    |---infer_cnnctc_onnx.py    // application for onnx inference
     |---ascend310_infer    // application for 310 inference
     |---scripts
         |---run_infer_310.sh    // shell script for infer on ascend310
+        |---run_infer_onnx.sh    //shell script for infer on onnx
         |---run_standalone_train_ascend.sh    // shell script for standalone on ascend
         |---run_standalone_train_gpu.sh    // shell script for standalone on gpu
         |---run_distribute_train_ascend.sh    // shell script for distributed on ascend
@@ -383,19 +385,19 @@ The model will be evaluated on the IIIT dataset, sample results and overall accu
 - GPU Evaluation:
 
 ```bash
-bash scripts/run_eval_gpu.sh [TRAINED_CKPT]
+bash scripts/run_eval_gpu.sh [TRAINED_CKPT] [TEST_DATASET_PATH] [TEST_BATCH_SIZE]
 ```
 
 ## [Inference process](#contents)
 
-### Export MindIR
+### Export AIR, MindIR, ONNX
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_format [EXPORT_FORMAT] --TEST_BATCH_SIZE [BATCH_SIZE]
+python export.py --ckpt_file [CKPT_PATH] --file_format [EXPORT_FORMAT] --TEST_BATCH_SIZE [BATCH_SIZE] --device_target [DEVICE_TARGET]
 ```
 
 The ckpt_file parameter is required,
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"].
+`EXPORT_FORMAT` should be in ["AIR", "MINDIR", "ONNX"].
 `BATCH_SIZE` current batch_size can only be set to 1.
 
 - Export MindIR on Modelarts
@@ -431,6 +433,19 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [DEVICE_ID]
 - `DVPP` is mandatory, and must choose from ["DVPP", "CPU"], it's case-insensitive. CNNCTC only support CPU mode .
 - `DEVICE_ID` is optional, default value is 0.
 
+### Infer on Onnx
+
+Before performing inference, the onnx file must be exported by `export.py` script. We only provide an example of inference using ONNX model.
+
+```shell
+# Onnx inference
+bash run_infer_onnx.sh [ONNX_PATH] [TEST_DATASET_PATH] [DEVICE_TARGET] [TEST_BATCH_SIZE]
+```
+
+- `ONNX_PATH` is the relative path of the exported onnx file.
+- `TEST_BATCH_SIZE` current batch_size can only be set to 1.
+- `DEVICE_ID` is optional, default value is 0.
+
 ### Result
 
 - Ascend Result
@@ -447,6 +462,14 @@ Inference result is saved in ./eval/log, you can find result like this.
 
 ```bash
 accuracy:  0.8533
+```
+
+- ONNX result
+
+Inference result is saved in current path, you can find result like this in infer_onnx.log file.
+
+```bash
+accuracy:  0.8427
 ```
 
 # [Model Description](#contents)

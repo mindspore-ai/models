@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -ne 1 ]
+if [ $# -ne 3 ]
 then
-    echo "Usage: sh run_eval_gpu.sh [TRAINED_CKPT]"
+    echo "Usage: bash run_eval_gpu.sh [TRAINED_CKPT] [TEST_DATASET_PATH] [TEST_BATCH_SIZE]"
 exit 1
 fi
 
@@ -29,7 +29,12 @@ get_real_path(){
 }
 
 PATH1=$(get_real_path $1)
+PATH2=$(get_real_path $2)
+test_batch_size=$3
+
 echo $PATH1
+echo $PATH2
+echo $test_batch_size
 if [ ! -f $PATH1 ]
 then
     echo "error: TRAINED_CKPT=$PATH1 is not a file"
@@ -51,5 +56,9 @@ cp ./*yaml ./eval
 cd ./eval || exit
 echo "start inferring for device $DEVICE_ID"
 env > env.log
-python eval.py --device_target="GPU" --device_id=$DEVICE_ID --CHECKPOINT_PATH=$PATH1 &> log &
+python eval.py --device_target="GPU" \
+               --device_id=$DEVICE_ID \
+               --CHECKPOINT_PATH=$PATH1 \
+               --TEST_DATASET_PATH=$PATH2 \
+               --TEST_BATCH_SIZE=$test_batch_size &> eval.log
 cd .. || exit

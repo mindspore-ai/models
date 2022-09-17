@@ -59,6 +59,9 @@ result_path: ""
 label_path: ""
 preprocess_output: ""
 
+# Onnx infer
+onnx_path: ""
+
 ---
 # Help description for each configuration
 enable_modelarts: "Whether training on modelarts default: False"
