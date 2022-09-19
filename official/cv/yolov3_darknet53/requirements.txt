@@ -1,6 +1,6 @@
 numpy
 pillow
 opencv-python
-pycocotools
+pycocotools >= 2.0.1
 pyyaml
 onnxruntime
