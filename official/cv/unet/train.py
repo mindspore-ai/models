@@ -129,7 +129,8 @@ def train_net(cross_valid_ind=1,
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
-    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False)
+    # to keep GetNext from timeout, set op_timeout=600
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False, op_timeout=600)
     if config.device_target == "Ascend":
         device_id = get_device_id()
         context.set_context(device_id=device_id)
