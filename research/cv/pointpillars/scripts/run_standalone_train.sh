@@ -13,27 +13,29 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-if [ $# != 4 ] && [ $# != 5 ]
+
+if [ $# != 3 ]
 then
-    echo "Usage: bash run_export_gpu.sh [CFG_PATH] [CKPT_PATH] [FILE_NAME] [DEVICE_ID] [FILE_FORMAT](optional)"
+    echo "Usage: bash run_standalone_train_gpu.sh [CFG_PATH] [SAVE_PATH] [DEVICE_ID]"
 exit 1
 fi
 
 CFG_PATH=$1
-CKPT_PATH=$2
-FILE_NAME=$3
+SAVE_PATH=$2
 
-export DEVICE_ID=$4
+export DEVICE_ID=$3
 
-if [ $# == 5 ]
+if [ -d $SAVE_PATH ];
 then
-    FILE_FORMAT="$5"
-else
-    FILE_FORMAT="MINDIR"
+    rm -rf $SAVE_PATH
 fi
 
-python export.py \
-  --cfg_path="$CFG_PATH" \
-  --ckpt_path="$CKPT_PATH" \
-  --file_name="$FILE_NAME" \
-  --file_format="$FILE_FORMAT"
+mkdir -p $SAVE_PATH
+
+cp $CFG_PATH $SAVE_PATH
+
+python train.py \
+  --is_distributed=0 \
+  --device_target=Ascend \
+  --cfg_path=$CFG_PATH \
+  --save_path=$SAVE_PATH > $SAVE_PATH/log.txt 2>&1 &

@@ -75,7 +75,10 @@ def second_box_decode(box_encodings, anchors, encode_angle_to_vector=False, smoo
     else:
         xt, yt, zt, wt, lt, ht, rt = ops.Split(axis=-1, output_num=7)(box_encodings)
     za = za + ha / 2
-    diagonal = ops.Sqrt()(la ** 2 + wa ** 2)
+    if isinstance(la, np.ndarray):
+        diagonal = np.sqrt(la**2 + wa**2)
+    else:
+        diagonal = ops.Sqrt()(la ** 2 + wa ** 2)
     xg = xt * diagonal + xa
     yg = yt * diagonal + ya
 
@@ -85,18 +88,32 @@ def second_box_decode(box_encodings, anchors, encode_angle_to_vector=False, smoo
         wg = (wt + 1) * wa
         hg = (ht + 1) * ha
     else:
-        lg = ops.Exp()(lt) * la
-        wg = ops.Exp()(wt) * wa
-        hg = ops.Exp()(ht) * ha
+        if isinstance(lt, np.ndarray):
+            lg = np.exp(lt) * la
+            wg = np.exp(wt) * wa
+            hg = np.exp(ht) * ha
+        else:
+            lg = ops.Exp()(lt) * la
+            wg = ops.Exp()(wt) * wa
+            hg = ops.Exp()(ht) * ha
     if encode_angle_to_vector:
-        rax = ops.Cos()(ra)
-        ray = ops.Sin()(ra)
+        if isinstance(ra, np.ndarray):
+            rax = np.cos(ra)
+            ray = np.sin(ra)
+        else:
+            rax = ops.Cos()(ra)
+            ray = ops.Sin()(ra)
         rgx = rtx + rax
         rgy = rty + ray
-        rg = ops.Atan2(rgy, rgx)
+        if isinstance(rgy, np.ndarray):
+            rg = np.arctan2(rgy, rgx)
+        else:
+            rg = ops.Atan2(rgy, rgx)
     else:
         rg = rt + ra
     zg = zg - hg / 2
+    if isinstance(xg, np.ndarray):
+        return np.concatenate([xg, yg, zg, wg, lg, hg, rg], axis=-1)
     return ops.Concat(axis=-1)([xg, yg, zg, wg, lg, hg, rg])
 
 
@@ -129,6 +146,39 @@ def bev_box_encode(boxes, anchors, encode_angle_to_vector=False, smooth_dim=Fals
         return ops.Concat(axis=-1)([xt, yt, wt, lt, rtx, rty])
     rt = rg - ra
     return ops.Concat(axis=-1)([xt, yt, wt, lt, rt])
+
+
+
+def bev_box_decode_np(box_encodings, anchors, encode_angle_to_vector=False, smooth_dim=False):
+    """box decode for VoxelNet in lidar
+    Args:
+        boxes ([N, 7] Tensor): normal boxes: x, y, z, w, l, h, r
+        anchors ([N, 7] Tensor): anchors
+    """
+    # need to convert box_encodings to z-bottom format
+    xa, ya, wa, la, ra = np.split(anchors, 5, axis=-1)
+    if encode_angle_to_vector:
+        xt, yt, wt, lt, rtx, rty = np.split(box_encodings, 6, axis=-1)
+    else:
+        xt, yt, wt, lt, rt = np.split(box_encodings, 5, axis=-1)
+    diagonal = np.sqrt(la**2 + wa**2)
+    xg = xt * diagonal + xa
+    yg = yt * diagonal + ya
+    if smooth_dim:
+        lg = (lt + 1) * la
+        wg = (wt + 1) * wa
+    else:
+        lg = np.exp(lt) * la
+        wg = np.exp(wt) * wa
+    if encode_angle_to_vector:
+        rax = np.cos(ra)
+        ray = np.sin(ra)
+        rgx = rtx + rax
+        rgy = rty + ray
+        rg = np.arctan2(rgy, rgx)
+    else:
+        rg = rt + ra
+    return np.concatenate([xg, yg, wg, lg, rg], axis=-1)
 
 
 def bev_box_decode(box_encodings, anchors, encode_angle_to_vector=False, smooth_dim=False):
@@ -165,6 +215,38 @@ def bev_box_decode(box_encodings, anchors, encode_angle_to_vector=False, smooth_
         rg = rt + ra
     return ops.Concat(axis=-1)([xg, yg, wg, lg, rg])
 
+def corners_nd_np(dims, origin=0.5):
+    """generate relative box corners based on length per dim and
+    origin point.
+
+    Args:
+        dims (float array, shape=[N, ndim]): array of length per dim
+        origin (list or array or float): origin point relate to smallest point.
+
+    Returns:
+        float array, shape=[N, 2 ** ndim, ndim]: returned corners.
+        point layout example: (2d) x0y0, x0y1, x1y0, x1y1;
+            (3d) x0y0z0, x0y0z1, x0y1z0, x0y1z1, x1y0z0, x1y0z1, x1y1z0, x1y1z1
+            where x0 < x1, y0 < y1, z0 < z1
+    """
+    ndim = int(dims.shape[1])
+    if isinstance(origin, float):
+        origin = [origin] * ndim
+    corners_norm = np.stack(
+        np.unravel_index(np.arange(2 ** ndim), [2] * ndim), axis=1).astype(dims.dtype)
+    # now corners_norm has format: (2d) x0y0, x0y1, x1y0, x1y1
+    # (3d) x0y0z0, x0y0z1, x0y1z0, x0y1z1, x1y0z0, x1y0z1, x1y1z0, x1y1z1
+    # so need to convert to a format which is convenient to do other computing.
+    # for 2d boxes, format is clockwise start from minimum point
+    # for 3d boxes, please draw them by your hand.
+    if ndim == 2:
+        # generate clockwise box corners
+        corners_norm = corners_norm[[0, 1, 3, 2]]
+    elif ndim == 3:
+        corners_norm = corners_norm[[0, 1, 3, 2, 4, 5, 7, 6]]
+    corners_norm = corners_norm - np.array(origin, dtype=dims.dtype)
+    corners = dims.reshape([-1, 1, ndim]) * corners_norm.reshape(1, 2 ** ndim, ndim)
+    return corners
 
 def corners_nd(dims, origin=0.5):
     """generate relative box corners based on length per dim and
@@ -201,6 +283,17 @@ def corners_nd(dims, origin=0.5):
     corners = dims.view(-1, 1, ndim) * corners_norm.view(1, 2 ** ndim, ndim)
     return corners
 
+def corner_to_standup_nd_np(boxes_corner):
+    num_boxes = boxes_corner.shape[0]
+    ndim = boxes_corner.shape[-1]
+    result = np.zeros((num_boxes, ndim * 2), dtype=boxes_corner.dtype)
+    for i in range(num_boxes):
+        for j in range(ndim):
+            result[i, j] = np.min(boxes_corner[i, :, j])
+        for j in range(ndim):
+            result[i, j + ndim] = np.max(boxes_corner[i, :, j])
+    return result
+
 
 def corner_to_standup_nd(boxes_corner):
     """corner to standup nd"""
@@ -211,6 +304,27 @@ def corner_to_standup_nd(boxes_corner):
     for i in range(ndim):
         standup_boxes.append(boxes_corner[:, :, i].max(axis=1))
     return ops.Stack(axis=1)(standup_boxes)
+
+
+def rotation_3d_in_axis_np(points, angles, axis=0):
+    # points: [N, point_size, 3]
+    rot_sin = np.sin(angles)
+    rot_cos = np.cos(angles)
+    ones = np.ones_like(rot_cos)
+    zeros = np.zeros_like(rot_cos)
+    if axis == 1:
+        rot_mat_T = np.stack([[rot_cos, zeros, -rot_sin], [zeros, ones, zeros],
+                              [rot_sin, zeros, rot_cos]])
+    elif axis in (2, -1):
+        rot_mat_T = np.stack([[rot_cos, -rot_sin, zeros],
+                              [rot_sin, rot_cos, zeros], [zeros, zeros, ones]])
+    elif axis == 0:
+        rot_mat_T = np.stack([[zeros, rot_cos, -rot_sin],
+                              [zeros, rot_sin, rot_cos], [ones, zeros, zeros]])
+    else:
+        raise ValueError("axis should in range")
+
+    return np.einsum('aij,jka->aik', points, rot_mat_T)
 
 
 def rotation_3d_in_axis(points, angles, axis=0):
@@ -242,6 +356,24 @@ def rotation_3d_in_axis(points, angles, axis=0):
     else:
         raise ValueError("axis should in range")
     return einsum('aij,jka->aik', points, rot_mat_t)
+
+
+def rotation_2d_np(points, angles):
+    """rotation 2d points based on origin point clockwise when angle positive.
+
+    Args:
+        points (float array, shape=[N, point_size, 2]): points to be rotated.
+        angles (float array, shape=[N]): rotation angle.
+
+    Returns:
+        float array: same shape as points
+    """
+    rot_sin = np.sin(angles)
+    rot_cos = np.cos(angles)
+    rot_mat_T = np.stack([[rot_cos, -rot_sin], [rot_sin, rot_cos]])
+    return np.einsum('aij,jka->aik', points, rot_mat_T)
+
+
 
 
 def rotation_2d(points, angles):
@@ -282,10 +414,15 @@ def center_to_corner_box3d(centers,
     # 'length' in kitti format is in x axis.
     # yzx(hwl)(kitti label file)<->xyz(lhw)(camera)<->z(-x)(-y)(wlh)(lidar)
     # center in kitti format is [0.5, 1.0, 0.5] in xyz.
-    corners = corners_nd(dims, origin=origin)
-    # corners: [N, 8, 3]
-    corners = rotation_3d_in_axis(corners, angles, axis=axis)
-    corners += centers.view(-1, 1, 3)
+    if isinstance(centers, np.ndarray):
+        corners = corners_nd_np(dims, origin=origin)
+        corners = rotation_3d_in_axis_np(corners, angles, axis=axis)
+        corners += centers.reshape(-1, 1, 3)
+    else:
+        corners = corners_nd(dims, origin=origin)
+        # corners: [N, 8, 3]
+        corners = rotation_3d_in_axis(corners, angles, axis=axis)
+        corners += centers.view(-1, 1, 3)
     return corners
 
 
@@ -303,12 +440,31 @@ def center_to_corner_box2d(centers, dims, angles=None, origin=0.5):
     # 'length' in kitti format is in x axis.
     # xyz(hwl)(kitti label file)<->xyz(lhw)(camera)<->z(-x)(-y)(wlh)(lidar)
     # center in kitti format is [0.5, 1.0, 0.5] in xyz.
-    corners = corners_nd(dims, origin=origin)
+    if isinstance(centers, np.ndarray):
+        corners = corners_nd_np(dims, origin=origin)
+    else:
+        corners = corners_nd(dims, origin=origin)
     # corners: [N, 4, 2]
     if angles is not None:
-        corners = rotation_2d(corners, angles)
-    corners += centers.view(-1, 1, 2)
+        if isinstance(centers, np.ndarray):
+            corners = rotation_2d_np(corners, angles)
+        else:
+            corners = rotation_2d(corners, angles)
+    if isinstance(centers, np.ndarray):
+        corners += centers.reshape(-1, 1, 2)
+    else:
+        corners += centers.view(-1, 1, 2)
     return corners
+
+
+
+def project_to_image_np(points_3d, proj_mat):
+    points_shape = list(points_3d.shape)
+    points_shape[-1] = 1
+    points_4 = np.concatenate([points_3d, np.zeros(points_shape)], axis=-1)
+    point_2d = points_4 @ proj_mat.T
+    point_2d_res = point_2d[..., :2] / point_2d[..., 2:3]
+    return point_2d_res
 
 
 def project_to_image(points_3d, proj_mat):
@@ -328,6 +484,15 @@ def project_to_image(points_3d, proj_mat):
     point_2d_res = point_2d[..., :2] / point_2d[..., 2:3]
     return point_2d_res
 
+def lidar_to_camera_np(points, r_rect, velo2cam):
+    """lidar to camera"""
+    # num_points = points.shape[0]
+    # points = ops.Concat(axis=-1)([points, ops.Ones()((num_points, 1), points.dtype)])
+    # camera_points = ops.MatMul()(points, ops.MatMul()(r_rect, velo2cam).T)
+    points_shape = list(points.shape[:-1])
+    points = np.concatenate([points, np.ones(points_shape + [1])], axis=-1)
+    camera_points = points @ (r_rect @ velo2cam).T
+    return camera_points[..., :3]
 
 def lidar_to_camera(points, r_rect, velo2cam):
     """lidar to camera"""
@@ -342,5 +507,10 @@ def box_lidar_to_camera(data, r_rect, velo2cam):
     xyz_lidar = data[..., 0:3]
     w, l, h = data[..., 3:4], data[..., 4:5], data[..., 5:6]
     r = data[..., 6:7]
-    xyz = lidar_to_camera(xyz_lidar, r_rect, velo2cam)
+    if isinstance(data, np.ndarray):
+        xyz = lidar_to_camera_np(xyz_lidar, r_rect, velo2cam)
+    else:
+        xyz = lidar_to_camera(xyz_lidar, r_rect, velo2cam)
+    if isinstance(xyz, np.ndarray):
+        return np.concatenate([xyz, l, h, w, r], axis=1)
     return ops.Concat(axis=-1)([xyz, l, h, w, r])

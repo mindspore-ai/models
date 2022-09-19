@@ -15,7 +15,7 @@
 """box coders"""
 from mindspore import numpy as mnp
 from mindspore import ops
-
+import numpy as np
 from src.core import box_np_ops
 from src.core import box_ops
 
@@ -33,6 +33,8 @@ class GroundBox3dCoder:
 
     def decode(self, inp, anchors):
         """decode"""
+        if isinstance(anchors, np.ndarray):
+            return box_np_ops.second_box_decode(inp, anchors, self.vec_encode, self.linear_dim)
         return box_ops.second_box_decode(inp, anchors, self.vec_encode, self.linear_dim)
 
     @property

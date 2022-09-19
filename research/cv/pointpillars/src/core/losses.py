@@ -69,7 +69,7 @@ def _sigmoid_cross_entropy_with_logits(logits, labels):
 def _softmax_cross_entropy_with_logits(logits, labels):
     """softmax cross entropy with logits"""
     loss_ftor = nn.SoftmaxCrossEntropyWithLogits(sparse=True)
-    loss = loss_ftor(logits, ops.ArgMaxWithValue(axis=-1)(labels)[0].astype(mstype.int32))
+    loss = loss_ftor(logits.astype(mstype.float32), ops.ArgMaxWithValue(axis=-1)(labels)[0].astype(mstype.int32))
     return loss
 
 
