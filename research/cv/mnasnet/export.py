@@ -27,10 +27,12 @@ parser.add_argument("--file_name", type=str, default="resnet", help="output file
 parser.add_argument('--width', type=int, default=224, help='input width')
 parser.add_argument('--height', type=int, default=224, help='input height')
 parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
+parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"], default="CPU",
+                    help="device target")
 args_opt = parser.parse_args()
 
 if __name__ == '__main__':
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
+    context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, save_graphs=False)
 
     net = Mnasnet()
 
