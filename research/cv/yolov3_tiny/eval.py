@@ -20,12 +20,11 @@ import time
 from collections import defaultdict
 
 import numpy as np
+import mindspore as ms
 from mindspore import Tensor
 from mindspore import context
 from mindspore import dtype as mstype
 from mindspore.context import ParallelMode
-from mindspore.train.serialization import load_checkpoint
-from mindspore.train.serialization import load_param_into_net
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 
@@ -57,16 +56,19 @@ class DetectionEngine:
 
     def __init__(self, config_detection):
         self.eval_ignore_threshold = config_detection.eval_ignore_threshold
-        self.labels = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
-                       'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat',
-                       'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack',
-                       'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball',
-                       'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket',
-                       'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
-                       'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair',
-                       'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote',
-                       'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book',
-                       'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush']
+        if config.finetune:
+            self.labels = ['without_mask', 'with_mask', 'mask_weared_incorrect']
+        else:
+            self.labels = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat',
+                           'traffic light', 'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat',
+                           'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'backpack',
+                           'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee', 'skis', 'snowboard', 'sports ball',
+                           'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard', 'tennis racket',
+                           'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
+                           'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair',
+                           'couch', 'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote',
+                           'keyboard', 'cell phone', 'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book',
+                           'clock', 'vase', 'scissors', 'teddy bear', 'hair drier', 'toothbrush']
         self.num_classes = len(self.labels)
         self.results = {}
         self.file_path = ''
@@ -193,6 +195,9 @@ class DetectionEngine:
         stdout = sys.stdout
         sys.stdout = rdct
         coco_eval.summarize()
+        mAP = coco_eval.stats[0]
+        print("\n======================================\n")
+        print(f"mAP: {mAP}")
         sys.stdout = stdout
         return rdct.content
 
@@ -341,8 +346,12 @@ def modelarts_pre_process():
 def run_test():
     """The function of eval."""
     start_time = time.time()
-    config.data_root = os.path.join(config.data_dir, 'val2017')
-    config.ann_file = os.path.join(config.data_dir, 'annotations/instances_val2017.json')
+    if config.finetune:
+        config.data_root = os.path.join(config.data_dir, 'val/images')
+        config.ann_file = os.path.join(config.data_dir, 'annotations_json/val.json')
+    else:
+        config.data_root = os.path.join(config.data_dir, 'val2017')
+        config.ann_file = os.path.join(config.data_dir, 'annotations/instances_val2017.json')
 
     device_id = int(os.getenv('DEVICE_ID')) if os.getenv('DEVICE_ID') else 0
     # device_id = 1
@@ -363,7 +372,7 @@ def run_test():
 
     config.logger.info(config.pretrained)
     if os.path.isfile(config.pretrained):
-        param_dict = load_checkpoint(config.pretrained)
+        param_dict = ms.load_checkpoint(config.pretrained)
         param_dict_new = {}
         for key, values in param_dict.items():
             if key.startswith('moments.'):
@@ -372,7 +381,7 @@ def run_test():
                 param_dict_new[key[13:]] = values
             else:
                 param_dict_new[key] = values
-        load_param_into_net(network, param_dict_new)
+        ms.load_param_into_net(network, param_dict_new)
         config.logger.info('load_model %s success', config.pretrained)
     else:
         config.logger.info('%s not exists or not a pre-trained file', config.pretrained)

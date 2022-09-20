@@ -44,7 +44,8 @@ YOLOv3 Tiny是YOLOv3的一个轻量级变体，它使用池化层并减少卷积
 
 # 数据集
 
-使用的数据集：[COCO 2017](<http://images.cocodataset.org/>)
+使用的数据集：
+[COCO 2017](<http://images.cocodataset.org/>)
 
 - 数据集大小：19 GB
     - 训练集：18 GB，118000张图片
@@ -52,6 +53,13 @@ YOLOv3 Tiny是YOLOv3的一个轻量级变体，它使用池化层并减少卷积
     - 标注：241 MB，包含实例，字幕，person_keypoints等
 - 数据格式：图片和json文件
     - 标注：数据在dataset.py中处理。
+
+[face-mask-detection](<https://www.kaggle.com/datasets/andrewmvd/face-mask-detection>)(迁移学习使用)
+
+- 数据集大小: 397.65MB, 853张3类彩色图像
+- 数据格式:RGB图像.
+
+    - 注意：数据将在src/dataset.py 中被处理
 
 - 数据集
 
@@ -431,4 +439,120 @@ YOLOv3-tiny应用于5000张图像上（标注和数据格式必须与COCO val 20
 
 # ModelZoo主页
 
- 请浏览官网[主页](https://gitee.com/mindspore/models)。
+请浏览官网[主页](https://gitee.com/mindspore/models)。
+
+## [迁移学习](#content)
+
+### [迁移学习训练流程](#content)
+
+#### 数据集处理
+
+[数据集下载地址](https://www.kaggle.com/datasets/andrewmvd/face-mask-detection)
+
+下载数据集后解压至yolov3_tiny的dataset目录下，进入src目录，使用data_split脚本划分出80%的训练集和20%的测试集，使用voc脚本生成训练集测试集标签的json文件
+
+```bash
+运行脚本示例
+cd src
+python data_split.py
+python voc.py
+```
+
+```text
+数据集结构
+└─dataset
+  ├─train
+  ├─val
+  ├─annotations
+  ├─images
+  ├─facemask
+  ├─annotations_json
+
+```
+
+```text
+训练前，为yaml文件配置好facemask数据集路径
+# your dataset dir
+dataset_root: /home/mindspore/yolov3_tiny/dataset/
+```
+
+#### 迁移学习训练过程
+
+需要先从[Mindspore Hub](https://www.mindspore.cn/resources/hub/details?MindSpore/1.8/yolov3tiny_coco2017)下载预训练的ckpt
+
+```text
+# 在finetune_config.yaml设置预训练模型的ckpt
+finetune_path: "/home/mindspore/yolov3_tiny/LoadPretrainedModel/yolov3tiny_ascend_v180_coco2017_research_cv_mAP17.5_AP50acc36.0.ckpt""
+```
+
+```bash
+#运行迁移学习训练脚本
+python train.py --config_path  './config/finetune_config.yaml'
+```
+
+**结果展示**
+
+训练结果将存储在示例路径中。checkpoint将存储在 `./outputs/%Y-%m-%d_time_%H_%M_%S/ckpt_0` 路径下，训练loss输出示例如下：
+
+```text
+2022-09-28 00:12:14,528:INFO:epoch[0], iter[0], loss:7826.489258, fps:0.38 imgs/sec, epoch time:84333.98 ms, per step time:84333.98 ms, lr:7.142857043618278e-07
+2022-09-28 00:12:25,968:INFO:epoch[1], iter[21], loss:1231.710783, fps:58.77 imgs/sec, epoch time:11435.29 ms, per step time:544.54 ms, lr:1.5714285837020725e-05
+2022-09-28 00:12:36,381:INFO:epoch[2], iter[42], loss:185.153160, fps:64.54 imgs/sec, epoch time:10411.45 ms, per step time:495.78 ms, lr:3.0714287277078256e-05
+2022-09-28 00:12:46,107:INFO:epoch[3], iter[63], loss:150.027618, fps:69.12 imgs/sec, epoch time:9722.47 ms, per step time:462.97 ms, lr:4.571428507915698e-05
+2022-09-28 00:12:55,684:INFO:epoch[4], iter[84], loss:128.305368, fps:70.22 imgs/sec, epoch time:9569.61 ms, per step time:455.70 ms, lr:6.071428651921451e-05
+2022-09-28 00:13:05,645:INFO:epoch[5], iter[105], loss:123.486393, fps:67.46 imgs/sec, epoch time:9960.92 ms, per step time:474.33 ms, lr:7.571428432129323e-05
+...
+...
+```
+
+#### 迁移学习推理过程
+
+```bash
+#运行迁移学习训练脚本
+python eval.py --config_path  './config/finetune_config.yaml'
+```
+
+**结果展示**
+
+```text
+=============coco eval reulst=========
+  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.476
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.769
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.560
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.366
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.642
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.588
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.297
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.512
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.548
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.461
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.680
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.601
+
+======================================
+
+mAP: 0.47645057246310263
+
+2022-09-27 23:31:00,800:INFO:testing cost time 0.01h
+
+```
+
+#### 迁移学习quick_start
+
+运行eval脚本后，会生成`predictions.json`文件，在finetune_config.yaml修改`predictions.json`文件的路径后再运行
+predict_path: "/home/mindspore/yolov3_tiny/outputs/%Y-%m-%d_time_%H_%M_%S/predict_%Y-%m-%d_time_%H_%M_%S.json"
+
+```bash
+# 运行quick_start脚本示例
+python quick_start.py --config_path './config/finetune_config.yaml'
+```
+
+**结果说明**
+图中颜色的含义分别是：
+
+- 浅蓝: 真实标签的mask_weared_incorrect
+- 浅绿: 真实标签的with_mask
+- 浅红: 真实标签的without_mask
+- 蓝色: 预测标签的mask_weared_incorrect
+- 绿色: 预测标签的with_mask
+- 红色: 预测标签的without_mask
