@@ -78,7 +78,7 @@ RefineDet的结构，图片来自原论文
         pip install opencv-python
         ```
 
-        并在`config.py`中更改COCO_ROOT和其他您需要的设置。目录结构如下：
+        并在模型对应的config文件中更改coco_root,mindrecord_dir和其他您需要的设置。目录结构如下：
 
         ```text
         .
@@ -123,10 +123,15 @@ bash run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [RANK_TABL
 bash run_distribute_train.sh 8 500 0.05 coco ./hccl_rank_tabel_8p.json
 ```
 
-在modelarts上训练请运行train_modelarts.py，参数设置除data_url与train_url外与直接运行单卡的参数相同
+在modelarts上训练请增加参数run_online，并设置data_url与train_url，其它与Ascend平台上运行的参数相同
 
 ```shell script
-# Ascend处理器环境运行eval
+# Ascend ModelArts训练示例
+python train.py --run_online=True --data_url=obs://xxx/coco2017 --train_url=obs://xxx/train_output --distribute=True --epoch_size=500 --dataset=coco
+```
+
+```shell script
+# Ascend处理器环境进行评估
 bash run_eval.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
 # 示例
 bash run_eval.sh coco  ./ckpt/refinedet.ckpt 0
@@ -201,7 +206,7 @@ sh run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
 
     "class_num": 81                            # 数据集类数
     "image_shape": [320, 320]                  # 作为模型输入的图像高和宽
-    "mindrecord_dir": "/data/MindRecord"  # MindRecord路径
+    "mindrecord_dir": "/data/MindRecord"       # MindRecord路径
     "coco_root": "/data/coco2017"              # COCO2017数据集路径
     "voc_root": ""                             # VOC原始数据集路径
     "image_dir": ""                            # 其他数据集图片路径，如果使用coco或voc，此参数无效。
@@ -216,6 +221,8 @@ sh run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
 ### Ascend上训练
 
 - 分布式
+
+注意训练前请确保对应模型的config中的数据集路径（例如coco数据集对应coco_root）以及mindrecord_dir路径设置正确，请使用绝对路径。
 
 ```shell script
     bash run_distribute_train.sh [DEVICE_NUM] [EPOCH_SIZE] [LR] [DATASET] [RANK_TABLE_FILE] [PRE_TRAINED](optional) [PRE_TRAINED_EPOCH_SIZE](optional)
@@ -291,7 +298,7 @@ epoch time: 150753.701, per step time: 329.157
 bash run_eval.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
 ```
 
-此脚本需要两个参数。
+此脚本需要三个参数。
 
 - `DATASET`：评估数据集的模式。
 - `CHECKPOINT_PATH`：检查点文件的绝对路径。
@@ -302,22 +309,22 @@ bash run_eval.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID]
 推理结果保存在示例路径中，文件夹名称以“eval”开头。您可以在日志中找到类似以下的结果。
 
 ```text
-Average Precision (AP) @[ IoU=0.50:0.95 | area= all | maxDets=100 ] = 0.238
-Average Precision (AP) @[ IoU=0.50 | area= all | maxDets=100 ] = 0.400
-Average Precision (AP) @[ IoU=0.75 | area= all | maxDets=100 ] = 0.240
-Average Precision (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.039
-Average Precision (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.198
-Average Precision (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.438
-Average Recall (AR) @[ IoU=0.50:0.95 | area= all | maxDets= 1 ] = 0.250
-Average Recall (AR) @[ IoU=0.50:0.95 | area= all | maxDets= 10 ] = 0.389
-Average Recall (AR) @[ IoU=0.50:0.95 | area= all | maxDets=100 ] = 0.424
-Average Recall (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.122
-Average Recall (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.434
-Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.697
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.289
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.447
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.304
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.072
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.302
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.451
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.288
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.462
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.504
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.212
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.558
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.702
 
 ========================================
 
-mAP: 0.23808886505483504
+mAP:0.2885878918173237
 ```
 
 <!--
