@@ -2,3 +2,4 @@ numpy
 pillow
 pyyaml
 matplotlib
+onnxruntime
