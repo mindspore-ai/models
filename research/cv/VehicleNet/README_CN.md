@@ -21,6 +21,7 @@
     - [推理过程](#推理过程)
         - [前处理](#前处理)
         - [推理](#推理)
+        - [进行onnx推理](#进行onnx推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
@@ -325,13 +326,14 @@ python sort_dataset_label.py
 
 ### 导出
 
-在执行推理之前，需要通过export.py导出mindir或air文件。
+在执行推理之前，需要通过export.py导出onnx、mindir或air文件。
 
 ```shell
-python export.py --ckpt_url [CKPT_URL] --device_id [DEVICE_ID]
+export DEVICE_ID=0
+python export.py --ckpt_url [CKPT_URL] --device_id [DEVICE_ID] --file_format [File_FORMAT] --device_target [DEVICE_TARGET]
 ```
 
-ckpt_url和device_id为必填项。
+ckpt_url和device_id为必填项,file_format、device_target为选填，如onnx的GPU导出，可为--file_format ONNX --device_target GPU。
 
 ## 推理过程
 
@@ -357,6 +359,23 @@ dataset_path为数据集路径，result_path为输出路径。
   # Ascend310 inference
   bash run_infer_310.sh [TEST_BIN_PATH] [QUERY_BIN_PATH] [MINDIR_PATH] [TEST_DATA_PATH] [QUERY_DATA_PATH] [TEST_LABEL] [QUERY_LABEL] [TEST_OUT_PATH] [QUERY_OUT_PATH] [DEVICE_ID]
   Rank@1:0.943981 Rank@5:0.963051 Rank@10:0.973182 mAP:0.835471
+  ```
+
+### 进行onnx推理
+
+在GPU环境运行时评估VeRi-776数据集
+
+  在运行以下命令之前，请检查用于评估的检查点路径。
+  请将检查点路径设置为相对路径，例如“../checkpoint/vehiclenet.onnx”。
+
+  ```bash
+  bash run_eval_onnx.sh [ONNX_PATH] [DEVICE_ID]
+  ```
+
+  上述python命令将在后台运行，您可以通过eval/eval.log文件查看结果。测试数据集的准确性如下：
+
+  ```text
+  Rank@1:0.949344 Rank@5:0.963647 Rank@10:0.973182 mAP:0.836560
   ```
 
 # 模型描述
