@@ -14,6 +14,7 @@
 # ============================================================================
 """train delf"""
 import os
+import time
 
 import mindspore.nn as nn
 from mindspore import context, Model
@@ -37,8 +38,10 @@ from model_utils.config import config as args
 from model_utils.moxing_adapter import moxing_wrapper
 from model_utils.device_adapter import get_device_id, get_device_num
 
+
 class LossFunc(nn.Cell):
     """loss function"""
+
     def __init__(self, attention_loss_weight=1.0, state='tuning'):
         super(LossFunc, self).__init__()
         self._loss_fn = nn.SoftmaxCrossEntropyWithLogits(
@@ -61,6 +64,7 @@ class LossFunc(nn.Cell):
 
 class MySGD(nn.SGD):
     """my SGD"""
+
     def __init__(self, *args_in, **kwargs):
         super().__init__(*args_in, **kwargs)
         self._original_construct = super().construct
@@ -75,6 +79,7 @@ class MySGD(nn.SGD):
 
 class EvalCallBack(Callback):
     """my callback"""
+
     def __init__(self, cur_iters, fianel_iter, state,
                  eval_interval=1000, eval_start_step=1):
         super(EvalCallBack, self).__init__()
@@ -130,10 +135,32 @@ class EvalCallBack(Callback):
             run_context.request_stop()
 
 
+class TimeMonitor_mine(Callback):
+    """my timeMonitor"""
+
+    def __init__(self, data_size=None):
+        super(TimeMonitor_mine, self).__init__()
+        self.step_size = data_size
+        self.interval_time = time.time()
+
+    def epoch_begin(self, run_context):
+        self.interval_time = time.time()
+
+    def step_end(self, run_context):
+        cb_params = run_context.original_args()
+        cur_step = cb_params.cur_step_num
+        if cur_step % self.step_size == 0:
+            interval_seconds = (time.time() - self.interval_time) * 1000
+            self.interval_time = time.time()
+            step_seconds = interval_seconds / self.step_size
+            print("interval time: {:5.3f} ms, per step time: {:5.3f} ms".format
+                  (interval_seconds, step_seconds), flush=True)
+
+
 def modelarts_pre_process():
     '''modelarts pre process function.'''
     args.save_ckpt = os.path.join(
-        args.output_path, args.save_ckpt+str(get_device_id()))
+        args.output_path, args.save_ckpt + str(get_device_id()))
 
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
@@ -175,7 +202,7 @@ def run_train():
                          state=args.train_state)
 
     # dynamic lr
-    init_lr = args.initial_lr * (1 - args.start_iter/250000)
+    init_lr = args.initial_lr * (1 - args.start_iter / 250000)
     lr_schedule = nn.PolynomialDecayLR(
         learning_rate=init_lr, end_learning_rate=0.0001, decay_steps=500000, power=1.0)
 
@@ -185,13 +212,14 @@ def run_train():
     config_ck = CheckpointConfig(
         save_checkpoint_steps=args.save_ckpt_step, keep_checkpoint_max=args.keep_checkpoint_max)
 
-    ckpoint_cb = ModelCheckpoint(prefix="checkpoint_delf_"+args.train_state,
+    ckpoint_cb = ModelCheckpoint(prefix="checkpoint_delf_" + args.train_state,
                                  directory=args.save_ckpt,
                                  config=config_ck)
 
     eval_cb = EvalCallBack(args.start_iter, args.max_iters, args.train_state)
 
-    callback_list = [eval_cb, LossMonitor(100)]
+    callback_size = 100
+    callback_list = [TimeMonitor_mine(callback_size), eval_cb, LossMonitor(callback_size)]
     if device_id == 0:
         callback_list.append(ckpoint_cb)
         if args.need_summary:
@@ -222,11 +250,11 @@ if __name__ == "__main__":
         context.set_context(device_id=device_id)
         if args.need_profile:
             profiler = Profiler(output_path=os.path.join(
-                args.save_summary, 'summary_dir'+str(device_id)))
+                args.save_summary, 'summary_dir' + str(device_id)))
         if args.need_summary:
             summary_collector = SummaryCollector(
                 summary_dir=os.path.join(
-                    args.save_summary, 'summary_dir'+str(device_id)),
+                    args.save_summary, 'summary_dir' + str(device_id)),
                 collect_specified_data=specified, collect_freq=200)
         context.reset_auto_parallel_context()
         context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
