@@ -310,7 +310,7 @@ Note the results is two-classification(person and face) used our own annotations
 
 ### Evaluation on Ascend
 
-To eval, run `eval.py` with the dataset `image_dir`, `anno_path`(eval txt), `mindrecord_dir` and `ckpt_path`. `ckpt_path` is the path of [checkpoint](https://www.mindspore.cn/tutorials/en/master/advanced/train/save.html) file.
+To eval, run `eval.py` with the dataset `image_dir`, `anno_path`(eval txt), `mindrecord_dir` and `ckpt_path`. `ckpt_path` is the path of [checkpoint](https://www.mindspore.cn/tutorials/en/master/beginner/save_load.html) file.
 
   ```bash
   bash run_eval.sh 0 yolo.ckpt ./Mindrecord_eval ./dataset ./dataset/eval.txt

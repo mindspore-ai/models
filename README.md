@@ -19,7 +19,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Audio | Speaker Recognition | [ecapa_tdnn](https://gitee.com/mindspore/models/tree/master/official/audio/ecapa_tdnn) |✅|   |   |
 | Audio | Speech Synthesis | [lpcnet](https://gitee.com/mindspore/models/tree/master/official/audio/lpcnet) |✅| ✅ |   |
 | Audio | Speech Synthesis | [melgan](https://gitee.com/mindspore/models/tree/master/official/audio/melgan) |✅| ✅ |   |
-| Audio | Speech Synthesis | [tacotron2](https://gitee.com/mindspore/models/tree/master/research/audio/tacotron2) |✅|   |   |
+| Audio | Speech Synthesis | [tacotron2](https://gitee.com/mindspore/models/tree/master/official/audio/tacotron2) |✅|   |   |
 | Graph Neural Network | Text Classification | [bgcf](https://gitee.com/mindspore/models/tree/master/official/gnn/bgcf) |✅| ✅ |   |
 | Graph Neural Network | Text Classification | [gat](https://gitee.com/mindspore/models/tree/master/official/gnn/gat) |✅| ✅ |   |
 | Graph Neural Network | Text Classification | [gcn](https://gitee.com/mindspore/models/tree/master/official/gnn/gcn) |✅| ✅ |   |
@@ -346,7 +346,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Image | Image Classification | [snn_mlp](https://gitee.com/mindspore/models/tree/master/research/cv/snn_mlp) | | ✅ |   |
 | Image | Object Detection | [Spnas](https://gitee.com/mindspore/models/tree/master/research/cv/Spnas) |✅|   |   |
 | Image | Image Classification | [SPPNet](https://gitee.com/mindspore/models/tree/master/research/cv/SPPNet) |✅| ✅ |   |
-| Image | Image Classification | [squeezenet1_1](https://gitee.com/mindspore/models/tree/master/research/cv/squeezenet1_1) |✅| ✅ |   |
+| Image | Image Classification | [squeezenet1_1](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet1_1) |✅| ✅ |   |
 | Image | Image Super Resolution | [sr_ea](https://gitee.com/mindspore/models/tree/master/research/cv/sr_ea) |✅|   |   |
 | Image | Image Super Resolution | [SRGAN](https://gitee.com/mindspore/models/tree/master/research/cv/SRGAN) |✅| ✅ |   |
 | Image | Image Classification | [ssc_resnet50](https://gitee.com/mindspore/models/tree/master/research/cv/ssc_resnet50) |✅| ✅ |   |
