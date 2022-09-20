@@ -62,6 +62,9 @@ class EvalCabllBack(TimeMonitor):
         self.callback = F1(len(self.tags_to_index_map))
         self._best_val_F1 = 0
 
+    def epoch_begin(self, run_context):
+        self.network.is_training = True
+
     def epoch_end(self, run_context):
         """save .ckpt files"""
         self.network.is_training = False
