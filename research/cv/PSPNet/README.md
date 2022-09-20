@@ -37,6 +37,12 @@ The pyramid pooling module fuses features under four different pyramid scales.Fo
 
 - [PASCAL VOC 2012 and SBD Dataset Website](http://home.bharathh.info/pubs/codes/SBD/download.html)
  - It contains 11,357 finely annotated images split into training and testing sets with 8,498 and 2,857 images respectively.
+ - The path formats in voc_train_lst.txt and voc_val_lst.txt are different, you can run create_train_lst.py to generate train_lst.txt in data dir for VOC2012. As follow：
+
+ ```python
+ python src/dataset/create_train_lst.py --data_dir [DATA_DIR]
+ ```
+
 - [ADE20K Dataset Website](http://groups.csail.mit.edu/vision/datasets/ADE20K/)
  - It contains 22,210 finely annotated images split into training and testing sets with 20,210 and 2,000 images respectively.
  - The ADE20k directory structure is as follows:
