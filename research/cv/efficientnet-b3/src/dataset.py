@@ -37,11 +37,11 @@ def create_dataset(dataset_path, do_train, batch_size=16, device_num=1, rank=0):
     """
     if device_num == 1:
         if do_train:
-            ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=64, shuffle=True)
+            ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=40, shuffle=True)
         else:
-            ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=64, shuffle=False)
+            ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=40, shuffle=False)
     else:
-        ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=64, shuffle=True,
+        ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=40, shuffle=True,
                                    num_shards=device_num, shard_id=rank)
     # define map operations
     if do_train:
