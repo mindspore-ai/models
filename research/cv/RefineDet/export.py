@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -46,9 +46,9 @@ if __name__ == '__main__':
     config = get_config(args.using_mode, args.dataset)
     default_boxes = box_init(config)
     if config.model == "refinedet_vgg16":
-        net = refinedet_vgg16(config=config)
+        net = refinedet_vgg16(config=config, is_training=False)
     elif config.model == "refinedet_resnet101":
-        net = refinedet_resnet101(config=config)
+        net = refinedet_resnet101(config=config, is_training=False)
     else:
         raise ValueError(f'config.model: {config.model} is not supported')
     net = RefineDetInferWithDecoder(net, Tensor(default_boxes), config)
