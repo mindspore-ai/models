@@ -1,0 +1,2 @@
+https://s3.amazonaws.com/google-landmark/metadata
+https://s3.amazonaws.com/google-landmark/md5sum
