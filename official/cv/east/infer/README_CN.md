@@ -100,7 +100,7 @@ python export.py \
 --device_id=0 \
 ```
 
-2、aipp配置，详细内容请参照[这里](#https://support.huaweicloud.com/atctool-cann330alphaXinfer/atlasatc_16_0066.html)配置
+2、aipp配置，详细内容请参照[这里](https://www.hiascend.com/document/detail/zh/CANNCommunityEdition/51RC2alpha003/infacldevg/atctool/atlasatc_16_0021.html)配置
 
 ```tex
 aipp_op {

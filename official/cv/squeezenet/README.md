@@ -68,7 +68,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 # [Environment Requirements](#contents)
 
 - Hardware（Ascend/CPU）
-    - Prepare hardware environment with Ascend processor. Squeezenet training on GPU performs is not good now, and it is still in research. See [squeezenet in research](https://gitee.com/mindspore/models/tree/master/research/cv/squeezenet) to get up-to-date details.
+    - Prepare hardware environment with Ascend processor. Squeezenet training on GPU performs is not good now, and it is still in research. See [squeezenet in research](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) to get up-to-date details.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：

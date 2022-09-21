@@ -309,7 +309,7 @@ YOLOv3整体网络架构如下：
 
 ### Ascend评估
 
-运行`eval.py`，数据集为`image_dir`、`anno_path`(评估TXT)、`mindrecord_dir`和`ckpt_path`。`ckpt_path`是[检查点](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/train/save.html)文件的路径。
+运行`eval.py`，数据集为`image_dir`、`anno_path`(评估TXT)、`mindrecord_dir`和`ckpt_path`。`ckpt_path`是[检查点](https://www.mindspore.cn/tutorials/zh-CN/master/beginner/save_load.html)文件的路径。
 
   ```shell script
   bash run_eval.sh 0 yolo.ckpt ./Mindrecord_eval ./dataset ./dataset/eval.txt
