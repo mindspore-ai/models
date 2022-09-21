@@ -157,6 +157,10 @@ parser.add_argument('--save_gt', action='store_true',
 
 parser.add_argument('--scalelr', type=int, default=0)
 
+# export
+parser.add_argument('--file_name', type=str, default='')
+parser.add_argument('--file_format', type=str, default='ONNX')
+
 # cloud
 parser.add_argument('--moxfile', type=int, default=1)
 parser.add_argument('--imagenet', type=int, default=0)

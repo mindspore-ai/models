@@ -28,7 +28,7 @@ if [[ $TASK_ID -lt 3 ]]; then
     cd ./run_eval$TASK_ID ||exit
     env > env$TASK_ID.log
     SCALE=$[$TASK_ID+2]
-    python eval.py --dir_data $DATA_PATH --data_test $DATA_TEST --test_only --ext img --pth_path $MODEL --task_id $TASK_ID --scale $SCALE > log 2>&1 &
+    python eval.py --dir_data $DATA_PATH --data_test $DATA_TEST --test_only --ext img --pth_path $MODEL --task_id 0 --scale $SCALE --num_queries 1 > log 2>&1 &
 fi
 
 if [[ $TASK_ID -eq 3 ]]; then
@@ -38,7 +38,7 @@ if [[ $TASK_ID -eq 3 ]]; then
     echo "start evaluation for Task $TASK_ID, device $DEVICE_ID"
     cd ./run_eval$TASK_ID ||exit
     env > env$TASK_ID.log
-    python eval.py --dir_data $DATA_PATH --data_test $DATA_TEST --test_only --ext img --pth_path $MODEL --task_id $TASK_ID --scale 1  --derain > log 2>&1 &
+    python eval.py --dir_data $DATA_PATH --data_test $DATA_TEST --test_only --ext img --pth_path $MODEL --task_id 0 --scale 1  --derain --num_queries 1 > log 2>&1 &
 fi
 
 if [[ $TASK_ID -eq 4 ]]; then
@@ -48,7 +48,7 @@ if [[ $TASK_ID -eq 4 ]]; then
     echo "start evaluation for Task $TASK_ID, device $DEVICE_ID"
     cd ./run_eval$TASK_ID ||exit
     env > env$TASK_ID.log
-    python eval.py --dir_data $DATA_PATH --data_test $DATA_TEST --test_only --ext img --pth_path $MODEL --task_id $TASK_ID --scale 1  --denoise --sigma 30  > log 2>&1 &
+    python eval.py --dir_data $DATA_PATH --data_test $DATA_TEST --test_only --ext img --pth_path $MODEL --task_id 0 --scale 1  --denoise --sigma 30 --num_queries 1 > log 2>&1 &
 fi
 
 if [[ $TASK_ID -eq 5 ]]; then
@@ -58,5 +58,5 @@ if [[ $TASK_ID -eq 5 ]]; then
     echo "start evaluation for Task $TASK_ID, device $DEVICE_ID"
     cd ./run_eval$TASK_ID ||exit
     env > env$TASK_ID.log
-    python eval.py --dir_data $DATA_PATH --data_test $DATA_TEST --test_only --ext img --pth_path $MODEL --task_id $TASK_ID --scale 1  --denoise --sigma 50  > log 2>&1 &
+    python eval.py --dir_data $DATA_PATH --data_test $DATA_TEST --test_only --ext img --pth_path $MODEL --task_id 0 --scale 1  --denoise --sigma 50 --num_queries 1 > log 2>&1 &
 fi
