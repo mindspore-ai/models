@@ -18,7 +18,8 @@ import os
 import numpy as np
 import pandas as pd
 from PIL import Image
-import mindspore.dataset.vision as C
+import mindspore.dataset.vision.py_transforms as P
+import mindspore.dataset.vision.c_transforms as C
 import mindspore.dataset as de
 
 
@@ -106,17 +107,17 @@ def get_dataloader(train_root_dir, valid_root_dir,
         'train': [
             C.RandomResize(size=(224, 224)),
             C.RandomHorizontalFlip(),
-            C.ToTensor(),
-            C.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], is_hwc=False)],
+            P.ToTensor(),
+            P.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])],
         'train_valid': [
             C.RandomResize(size=(224, 224)),
             C.RandomHorizontalFlip(),
-            C.ToTensor(),
-            C.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], is_hwc=False)],
+            P.ToTensor(),
+            P.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])],
         'valid': [
             C.RandomResize(size=(224, 224)),
-            C.ToTensor(),
-            C.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5], is_hwc=False)]}
+            P.ToTensor(),
+            P.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])]}
 
     dataset_column_names = ["anc_img", "pos_img", "neg_img", "pos_class", "neg_class"]
 
@@ -128,17 +129,18 @@ def get_dataloader(train_root_dir, valid_root_dir,
         face_dataset = TripletFaceDataset(root_dir=train_root_dir,
                                           csv_name=train_csv_name,
                                           num_triplets=num_train_triplets)
-        sampler = de.DistributedSampler(group_size, rank, shuffle=shuffle)
+        sampler2 = de.RandomSampler(replacement=False, num_samples=10000)
+        #sampler = de.DistributedSampler(group_size, rank, shuffle=shuffle)
         dataloaders[mode] = de.GeneratorDataset(face_dataset,
                                                 dataset_column_names,
                                                 num_samples=10000,
                                                 num_parallel_workers=num_workers,
                                                 python_multiprocessing=False)
-        dataloaders[mode].add_sampler(sampler)
+        dataloaders[mode].add_sampler(sampler2)
         dataloaders[mode] = dataloaders[mode].map(input_columns=["anc_img"], operations=data_transforms[mode])
         dataloaders[mode] = dataloaders[mode].map(input_columns=["pos_img"], operations=data_transforms[mode])
         dataloaders[mode] = dataloaders[mode].map(input_columns=["neg_img"], operations=data_transforms[mode])
-        dataloaders[mode] = dataloaders[mode].batch(batch_size, num_parallel_workers=32, drop_remainder=True)
+        dataloaders[mode] = dataloaders[mode].batch(batch_size, num_parallel_workers=1, drop_remainder=True)
         data_size1 = len(face_dataset)
     elif mode == "train_valid":
         face_dataset = TripletFaceDataset(root_dir=train_root_dir,

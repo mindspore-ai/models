@@ -49,6 +49,10 @@ LFW测试集和已生成的三元组：[LFW](https://pan.baidu.com/s/1BqiMaK-jp0
    └─n000003     # id2
 ```
 
+resnet50 checkpoint文件，放在./src目录下：[resnet50](https://www.mindspore.cn/resources/hub/details?MindSpore/1.7/resnet50_imagenet2012)
+
+本项目以及提前生成三元组序列csv文件[triplets.csv](https://pan.baidu.com/s/1BqiMaK-jp0Wi0Ez1Exdg8g?pwd=vfka)，建议使用data_loader.py加载此文件
+
 # 环境要求
 
 - 硬件（GPU）
@@ -71,6 +75,7 @@ LFW测试集和已生成的三元组：[LFW](https://pan.baidu.com/s/1BqiMaK-jp0
    ├──run_distribute_train_gpu.sh       # 用于GPU分布式训练脚本
    ├──run_standalone_train.sh           # 用于Ascend单卡训练脚本
    ├──run_standalone_train_gpu.sh       # 用于GPU单卡训练脚本
+   ├──run_eval.sh                       # 用于测试脚本
   ├── src
    ├──config.py                         # 参数配置
    ├──data_loader.py                    # 训练集dataloader(读取生成好的triplets)
@@ -81,10 +86,11 @@ LFW测试集和已生成的三元组：[LFW](https://pan.baidu.com/s/1BqiMaK-jp0
    ├──loss.py                           # tripletloss损失函数
    ├──models                            # FaceNet模型
    ├──resnet.py                         # ResNet骨干网络
-   ├──write_csv_for_making_triplets.py  # 生成csv
+   ├──write_csv_for_making_triplets.py  # 通过原始数据生成训练用的数据读取序列csv
+   ├──generating_training_triplets.py   # 通过读取序列csv生成训练用的三元组csv
   ├── eval.py                           # 验证脚本
   ├── export.py                         # 导出模型
-  ├──train.py                           # 训练脚本
+  ├── train.py                          # 训练脚本
 ```
 
 ## 脚本参数
@@ -93,7 +99,7 @@ LFW测试集和已生成的三元组：[LFW](https://pan.baidu.com/s/1BqiMaK-jp0
 
 ```python
 'rank': 0,                                              # 默认rank
-"num_epochs":600,                                       # 训练epoch数
+"num_epochs":240(Ascend) or 600(GPU),                                      # 训练epoch数
 "num_train_triplets":3000000,                           # 生成的训练三元组数
 "num_valid_triplets":10000,                             # 生成的评估三元组数
 "batch_size":64,                                        # 数据批次大小
@@ -112,6 +118,23 @@ LFW测试集和已生成的三元组：[LFW](https://pan.baidu.com/s/1BqiMaK-jp0
 
 ### 训练用法
 
+生成训练用triplets
+
+```python
+
+# 生成数据读取序列csv
+
+python write_csv_for_making_triplets.py --data_root [root to your dataset] --csv_name [dir/csv_name.csv]
+
+# 生成训练用三元组序列csv(使用data_loader_generate_triplets_online.py作为dataloader时可跳过这一步）
+
+python generating_training_triplets.py --data_url [root to your dataset] --csv_dir [root to your data sequence csv file (generated from previous step)] \
+--output_dir [outputdir/] --triplet_num [number of triplets]
+
+```
+
+VGGFACE2下载后解压VGGFACE2.zip到项目文件夹中,确保解压文件夹中有triplets.csv,vggface2.csv,更改train.py中data_url默认参数为该文件夹路径，pretrain_ckpt_path默认参数为./src/resnet50.ckpt
+
 使用GPU作为训练平台
 
 ```shell
@@ -121,6 +144,17 @@ bash run_standalone_train_gpu.sh
 # 8卡训练
 cd FaceNet/scripts
 bash run_distribute_train_gpu.sh 8
+```
+
+使用Ascend作为训练平台
+
+```shell
+# 单卡训练
+cd FaceNet/scripts
+bash run_standalone_train.sh [DATASET_PATH] [DEVICE_ID]
+# 8卡训练
+cd FaceNet/scripts
+bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
 ```
 
 ### 训练样例
@@ -158,10 +192,12 @@ Accuracy on LFW: 0.7186+-0.0117
 
 ### 推理用法
 
+LFW下载后解压lfw.tar.gz到项目文件夹中
+请在eval.py中更改"--eval_root_dir"参数为lfw.tar.gz解压后文件路径，"--eval_pairs_path"参数为LFW_pairs.txt路径
+
 ```shell
 # 推理示例
-python eval.py --ckpt [CKPT_PATH]
-example:python eval.py --ckpt "/data1/face/FaceNet_mindspore/result/330/facenet-rank0-300_56.ckpt"
+bash run_eval.sh [CKPT_PATH]
 ```
 
 ### 推理结果
@@ -175,30 +211,33 @@ Accuracy on LFW: 0.9401+-0.0118
 
 ## 训练性能
 
-| 参数                        | GPU                                |
-| -------------------------- | ------------------------------------- |
-| 模型名称                    | FaceNet                          |
-| 运行环境                    | GeForce RTX 3090 ；CPU 2.90GHz，16cores；内存，252G |
-| 上传时间                    | 2022-4-11                            |
-| MindSpore版本 | 1.6 |
-| 数据集                      | VGGFace2                              |
-| 训练参数                    | src/config.py                         |
-| 优化器                      | Adam                              |
-| 损失函数                    | TripletLoss         |
-| 损失 | 0.36 |
-| 调优检查点    | 143M                                                |
+| 参数 | Ascend | GPU | Ascend-8P |
+| -------------------------- | -------------------------- | -------------------------- | -------------------------- |
+| 资源 | Ascend 910；ARM CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 | Tesla V100-PCIE-32GB; X86_64 CPU Xeon 8180 2.50GHz; 112核 |  Ascend 910 * 8；ARM CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 |
+| 上传日期 | 2022-06-29 | 2022-4-11 | 2022-06-29 |
+| MindSpore版本 | 1.7.0 | 1.6.0 | 1.7.0 |
+| 数据集 | VGGFACE2 | VGGFACE2 | VGGFACE2 |
+| 训练参数 | epoch=240, step=156, batch_size=64, lr=0.004 | epoch=600, step=156, batch_size=64, lr=0.004 | epoch=240, step=20, batch_size=64*8, lr=0.004 |
+| 优化器 | Adam | Adam | Adam |
+| 损失函数 | TripletLoss | TripletLoss | TripletLoss |
+| 输出 | 概率 | 概率 | 概率 |
+| 损失 | 0.32 | 0.36 | 0.32 |
+| 速度 | 315毫秒/步 |   | 2194毫秒/步 |
+| 总时间 | 2h46m43s|  | 3h16m48s |
+| 微调检查点 | 402M （.ckpt文件） | 143M （.ckpt文件） | 402M （.ckpt文件）|
+| 脚本 | [Facenet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/facenet) | [Facenet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/facenet) | [Facenet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/facenet) |
+                                              |
 
 ## 推理性能
 
-| 参数          | GPU                                                 |
-| ------------- | --------------------------------------------------- |
-| 模型名称      | FaceNet                                             |
-| 运行环境      | GeForce RTX 3090 ；CPU 2.90GHz，16cores；内存，252G |
-| 上传时间      | 2022-4-11                                           |
-| MindSpore版本 | 1.6                                                 |
-| 数据集        | LFW                                                 |
-| batchsize     | 64                                                  |
-| 识别准确率    | 94.42%                                              |
+| 参数 | Ascend | GPU | Ascend-8P |
+| -------------------------- | -------------------------- | -------------------------- | -------------------------- |
+| 资源 | Ascend 910；ARM CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 | Tesla V100-PCIE-32GB; X86_64 CPU Xeon 8180 2.50GHz; 112核 |  Ascend 910 * 8；ARM CPU 2.60GHz，192核；内存 755G；系统 Euler2.8 |
+| 上传日期 | 2022-06-29 | 2022-4-11 | 2022-06-29 |
+| MindSpore版本 | 1.7.0 | 1.6.0 | 1.7.0 |
+| 数据集 | LFW | LFW | LFW |
+| 训练参数 | batch_size=64| batch_size=64 |batch_size=64 |
+| 识别准确率 | 90.5% | 94.42% |92.60%|
 
 # ModelZoo主页
 

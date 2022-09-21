@@ -19,7 +19,7 @@ import numpy as np
 from mindspore import load_checkpoint, load_param_into_net
 from mindspore.ops import stop_gradient
 from mindspore.common import set_seed
-
+from mindspore import context
 from src.eval_metrics import evaluate
 from src.LFWDataset import get_lfw_dataloader
 from src.models import FaceNetModelwithLoss
@@ -28,9 +28,9 @@ set_seed(0)
 
 parser = argparse.ArgumentParser(description='Face Recognition using Triplet Loss')
 
-parser.add_argument("--ckpt", type=str, default="/data1/face/FaceNet_mindspore/result/330/facenet-rank0-300_56.ckpt")
-parser.add_argument("--eval_root_dir", type=str, default="/data1/face/dataset/lfw_182/")
-parser.add_argument("--eval_pairs_path", type=str, default="/data1/face/dataset/LFW_pairs.txt")
+parser.add_argument("--ckpt", type=str, default="")
+parser.add_argument("--eval_root_dir", type=str, default="")
+parser.add_argument("--eval_pairs_path", type=str, default="")
 parser.add_argument("--eval_batch_size", type=int, default=64)
 
 args = parser.parse_args()
@@ -51,11 +51,12 @@ def validate_lfw(model_eval, lfw_dataloader):
     labels = np.array([sublabel for label in labels for sublabel in label])
     distances = np.array([subdist for distance in distances for subdist in distance])
     _, _, accuracy, _, _, _ = evaluate(distances, labels)
-    print("Accuracy on LFW:", np.mean(accuracy))
+    print(np.mean(accuracy))
 
 
 if __name__ == "__main__":
-    facenet = FaceNetModelwithLoss(num_classes=500, margin=0.5, mode='eval')
+    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend", save_graphs=False, device_id=1)
+    facenet = FaceNetModelwithLoss(num_classes=1001, margin=0.5, mode='eval', ckpt_path="")
     state_dict = load_checkpoint(ckpt_file_name=args.ckpt, net=facenet)
     print("Loading the trained models from ckpt")
     load_param_into_net(facenet, state_dict)

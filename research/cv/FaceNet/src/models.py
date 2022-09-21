@@ -20,6 +20,39 @@ import mindspore.nn as nn
 import mindspore.ops as ops
 from mindspore.ops import operations as P
 from mindspore import dtype as mstype
+from mindspore.ops import composite as C
+from mindspore import load_checkpoint, load_param_into_net
+
+GRADIENT_CLIP_TYPE = 1
+GRADIENT_CLIP_VALUE = 1.0
+
+clip_grad = C.MultitypeFuncGraph("clip_grad")
+
+
+@clip_grad.register("Number", "Number", "Tensor")
+def _clip_grad(clip_type, clip_value, grad):
+    """
+    Clip gradients.
+
+    Inputs:
+        clip_type (int): The way to clip, 0 for 'value', 1 for 'norm'.
+        clip_value (float): Specifies how much to clip.
+        grad (tuple[Tensor]): Gradients.
+
+    Outputs:
+        tuple[Tensor], clipped gradients.
+    """
+    if clip_type not in (0, 1):
+        return grad
+    dt = F.dtype(grad)
+    if clip_type == 0:
+        new_grad = C.clip_by_value(grad, F.cast(F.tuple_to_array((-clip_value,)), dt),
+                                   F.cast(F.tuple_to_array((clip_value,)), dt))
+    else:
+        new_grad = nn.ClipByNorm()(grad, F.cast(F.tuple_to_array((clip_value,)), dt))
+    return new_grad
+
+
 
 
 class FaceNetModel(nn.Cell):
@@ -27,11 +60,16 @@ class FaceNetModel(nn.Cell):
     the densenet121 architecture
     """
 
-    def __init__(self, num_classes, margin, mode):
+    def __init__(self, num_classes, margin, mode, ckpt_path):
         super(FaceNetModel, self).__init__()
         self.margin = margin
         self.mode = mode
-        self.resnet50_backbone = resnet50(class_num=num_classes)
+        net = resnet50(class_num=num_classes)
+        if ckpt_path is not None:
+            state_dict = load_checkpoint(ckpt_file_name=ckpt_path, net=net)
+            load_param_into_net(net, state_dict)
+        self.resnet50_backbone = net
+        print("pretrain model load")
         embedding_size = 128
         # num_classes = 500
         self.l2_dist = PairwiseDistance(2)
@@ -92,9 +130,9 @@ class FaceNetModel(nn.Cell):
 
 
 class FaceNetModelwithLoss(nn.Cell):
-    def __init__(self, num_classes, margin, mode):
+    def __init__(self, num_classes, margin, mode, ckpt_path):
         super(FaceNetModelwithLoss, self).__init__()
-        self.network = FaceNetModel(num_classes=num_classes, margin=margin, mode=mode)
+        self.network = FaceNetModel(num_classes=num_classes, margin=margin, mode=mode, ckpt_path=ckpt_path)
         self.loss = TripletLoss(margin)
         self.cast = P.Cast()
         print("Model has been built")
