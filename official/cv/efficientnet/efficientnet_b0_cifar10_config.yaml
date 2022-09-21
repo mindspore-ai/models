@@ -41,3 +41,10 @@ save_checkpoint: True
 keep_checkpoint_max: 10
 loss_scale: 1024
 resume_start_epoch: 0
+
+width: 224
+height: 224
+ckpt_file: ""
+file_name: "efficientnet"
+file_format: "MINDIR" # ["AIR", "ONNX", "MINDIR"]
+device_target: "GPU" # ["GPU", "CPU"]
