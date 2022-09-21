@@ -98,12 +98,12 @@ bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_P
     ```bash
     # Train 8p with Ascend
     # (1) Perform a or b.
-    #       a. Set "enable_modelarts=True" on default_config.yaml file.
-    #          Set "distribute=True" on default_config.yaml file.
-    #          Set "dataset_path='/cache/data'" on default_config.yaml file.
-    #          Set "epoch_size: 52" on default_config.yaml file.
-    #          (optional)Set "checkpoint_url='s3://dir_to_your_pretrained/'" on default_config.yaml file.
-    #          Set other parameters on default_config.yaml file you need.
+    #       a. Set "enable_modelarts=True" on default_config_large.yaml file.
+    #          Set "distribute=True" on default_config_large.yaml file.
+    #          Set "dataset_path='/cache/data'" on default_config_large.yaml file.
+    #          Set "epoch_size: 52" on default_config_large.yaml file.
+    #          (optional)Set "checkpoint_url='s3://dir_to_your_pretrained/'" on default_config_large.yaml file.
+    #          Set other parameters on default_config_large.yaml file you need.
     #       b. Add "enable_modelarts=True" on the website UI interface.
     #          Add "distribute=True" on the website UI interface.
     #          Add "dataset_path=/cache/data" on the website UI interface.
@@ -124,11 +124,11 @@ bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_P
     #
     # Train 1p with Ascend
     # (1) Perform a or b.
-    #       a. Set "enable_modelarts=True" on default_config.yaml file.
-    #          Set "dataset_path='/cache/data'" on default_config.yaml file.
-    #          Set "epoch_size: 52" on default_config.yaml file.
-    #          (optional)Set "checkpoint_url='s3://dir_to_your_pretrained/'" on default_config.yaml file.
-    #          Set other parameters on default_config.yaml file you need.
+    #       a. Set "enable_modelarts=True" on default_config_large.yaml file.
+    #          Set "dataset_path='/cache/data'" on default_config_large.yaml file.
+    #          Set "epoch_size: 52" on default_config_large.yaml file.
+    #          (optional)Set "checkpoint_url='s3://dir_to_your_pretrained/'" on default_config_large.yaml file.
+    #          Set other parameters on default_config_large.yaml file you need.
     #       b. Add "enable_modelarts=True" on the website UI interface.
     #          Add "dataset_path='/cache/data'" on the website UI interface.
     #          Add "epoch_size: 52" on the website UI interface.
@@ -148,11 +148,11 @@ bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_P
     #
     # Eval 1p with Ascend
     # (1) Perform a or b.
-    #       a. Set "enable_modelarts=True" on default_config.yaml file.
+    #       a. Set "enable_modelarts=True" on default_config_large.yaml file.
     #          Set "checkpoint_url='s3://dir_to_your_trained_model/'" on base_config.yaml file.
-    #          Set "checkpoint='./transformer/transformer_trained.ckpt'" on default_config.yaml file.
-    #          Set "dataset_path='/cache/data'" on default_config.yaml file.
-    #          Set other parameters on default_config.yaml file you need.
+    #          Set "checkpoint='./transformer/transformer_trained.ckpt'" on default_config_large.yaml file.
+    #          Set "dataset_path='/cache/data'" on default_config_large.yaml file.
+    #          Set other parameters on default_config_large.yaml file you need.
     #       b. Add "enable_modelarts=True" on the website UI interface.
     #          Add "checkpoint_url='s3://dir_to_your_trained_model/'" on the website UI interface.
     #          Add "checkpoint='./transformer/transformer_trained.ckpt'" on the website UI interface.
@@ -272,7 +272,7 @@ options:
 #### Running Options
 
 ```text
-default_config.yaml:
+default_config_large.yaml:
     transformer_network             version of Transformer model: base | large, default is large
     init_loss_scale_value           initial value of loss scale: N, default is 2^10
     scale_factor                    factor used to update loss scale: N, default is 2
@@ -342,7 +342,7 @@ Parameters for learning rate:
 
 ## [Training Process](#contents)
 
-- Set options in `default_config.yaml`, including loss_scale, learning rate and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
+- Set options in `default_config_large.yaml`, including loss_scale, learning rate and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/r1.7/advanced/dataset.html) for more information about dataset.
 
 - Run `run_standalone_train.sh` for non-distributed training of Transformer model.
 
@@ -390,7 +390,7 @@ Parameters for learning rate:
 - Export your model to ONNX:
 
   ```bash
-  python export.py --device_target GPU --config default_config.yaml --model_file /path/to/transformer.ckpt --file_name /path/to/transformer.onnx --file_format ONNX
+  python export.py --device_target GPU --config default_config_large.yaml --model_file /path/to/transformer.ckpt --file_name /path/to/transformer.onnx --file_format ONNX
   ```
 
 - Run ONNX evaluation:
@@ -460,19 +460,21 @@ Inference result is saved in current path, 'output_file' will generate in path s
 | Loss                       | 2.8                                        | 2.9                             |
 | Params (M)                 | 213.7                                      | 213.7                           |
 | Checkpoint for inference   | 2.4G (.ckpt file)                          | 2.4G (.ckpt file)               |
-| Scripts                    | [Transformer scripts](https://gitee.com/mindspore/models/tree/master/official/nlp/transformer) |
+| Scripts                    | [Transformer scripts](https://gitee.com/mindspore/models/tree/r1.7/official/nlp/transformer) |
+| Model Version       | large |large|
 
 #### Evaluation Performance
 
-| Parameters          | Ascend                      | GPU                         |
-| ------------------- | --------------------------- | ----------------------------|
-| Resource            | Ascend 910; OS Euler2.8     | GPU(Tesla V100 SXM2)        |
-| Uploaded Date       | 07/05/2021 (month/day/year) | 12/21/2021 (month/day/year) |
-| MindSpore Version   | 1.3.0                       | 1.5.0                       |
-| Dataset             | WMT newstest2014            | WMT newstest2014            |
-| batch_size          | 1                           | 1                           |
-| outputs             | BLEU score                  | BLEU score                  |
-| Accuracy            | BLEU=28.7                   | BLEU=24.4                   |
+| Parameters        | Ascend                      | GPU                         |
+| ----------------- | --------------------------- | --------------------------- |
+| Resource          | Ascend 910; OS Euler2.8     | GPU(Tesla V100 SXM2)        |
+| Uploaded Date     | 07/05/2021 (month/day/year) | 12/21/2021 (month/day/year) |
+| MindSpore Version | 1.3.0                       | 1.5.0                       |
+| Dataset           | WMT newstest2014            | WMT newstest2014            |
+| batch_size        | 1                           | 1                           |
+| outputs           | BLEU score                  | BLEU score                  |
+| Accuracy          | BLEU=28.7                   | BLEU=24.4                   |
+| Model Version     | large                       | large                       |
 
 ## [Description of Random Situation](#contents)
 
@@ -482,7 +484,7 @@ There are three random situations:
 - Initialization of some model weights.
 - Dropout operations.
 
-Some seeds have already been set in train.py to avoid the randomness of dataset shuffle and weight initialization. If you want to disable dropout, please set the corresponding dropout_prob parameter to 0 in default_config.yaml.
+Some seeds have already been set in train.py to avoid the randomness of dataset shuffle and weight initialization. If you want to disable dropout, please set the corresponding dropout_prob parameter to 0 in default_config_large.yaml.
 
 ## [ModelZoo Homepage](#contents)
 
