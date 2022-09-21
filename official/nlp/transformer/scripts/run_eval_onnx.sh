@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ get_real_path(){
 
 ONNX_MODEL=$(get_real_path $1)
 MINDRECORD_DATA=$(get_real_path $2)
-CONFIG_PATH=${3:-"./default_config.yaml"}
+CONFIG_PATH=${3:-"./default_config_large.yaml"}
 CONFIG_PATH=$(get_real_path $CONFIG_PATH)
 DEVICE_TARGET=${4:-"GPU"}
 DEVICE_ID=${5:-0}
