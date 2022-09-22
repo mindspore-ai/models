@@ -32,7 +32,7 @@ def parse_arguments():
 
     parser.add_argument("-a", "--arch", metavar="ARCH", default="ResNet18", help="model architecture")
     parser.add_argument("--accumulation_step", default=1, type=int, help="accumulation step")
-    parser.add_argument("--amp_level", default="O2", choices=["O0", "O1", "O2", "O3"], help="AMP Level")
+    parser.add_argument("--amp_level", default="O0", choices=["O0", "O1", "O2", "O3"], help="AMP Level")
     parser.add_argument("--batch_size", default=256, type=int, metavar="N",
                         help="mini-batch size (default: 256), this is the total "
                              "batch size of all Devices on the current node when "
@@ -47,7 +47,8 @@ def parse_arguments():
     parser.add_argument("--device_target", default="Ascend", choices=["GPU", "Ascend"], type=str)
     parser.add_argument("--epochs", default=300, type=int, metavar="N", help="number of total epochs to run")
     parser.add_argument("--eps", default=1e-8, type=float)
-    parser.add_argument("--file_format", type=str, choices=["AIR", "MINDIR"], default="MINDIR", help="file format")
+    parser.add_argument("--file_format", type=str, choices=["AIR", "MINDIR", "ONNX"], default="MINDIR",
+                        help="file format")
     parser.add_argument("--in_chans", default=3, type=int)
     parser.add_argument("--is_dynamic_loss_scale", default=1, type=int, help="is_dynamic_loss_scale ")
     parser.add_argument("--keep_checkpoint_max", default=20, type=int, help="keep checkpoint max num")
@@ -70,8 +71,10 @@ def parse_arguments():
     parser.add_argument("--lr_gamma", default=0.97, type=int, help="multistep multiplier")
     parser.add_argument("--momentum", default=0.9, type=float, metavar="M", help="momentum")
     parser.add_argument("--num_classes", default=1000, type=int)
-    parser.add_argument("--pretrained", dest="pretrained", default=None, type=str, help="use pre-trained model")
-    parser.add_argument("--config", help="Config file to use (see configs dir)", default=None, required=True)
+    parser.add_argument("--pretrained", dest="pretrained", default=None, type=str,
+                        help="use pre-trained model")
+    parser.add_argument("--config", help="Config file to use (see configs dir)",
+                        default="./src/configs/RepVGG-A0.yaml", required=False)
     parser.add_argument("--seed", default=0, type=int, help="seed for initializing training. ")
     parser.add_argument("--save_every", default=2, type=int, help="save every ___ epochs(default:2)")
     parser.add_argument("--label_smoothing", type=float, help="label smoothing to use, default 0.1", default=0.1)
@@ -79,6 +82,8 @@ def parse_arguments():
     parser.add_argument('--train_url', default="./", help='location of training outputs.')
     parser.add_argument("--run_modelarts", type=ast.literal_eval, default=False, help="whether run on modelarts")
     parser.add_argument("--deploy", type=ast.literal_eval, default=False, help="whether run deploy")
+    parser.add_argument("--onnx_path", type=str, default=None, help="ONNX file path")
+    parser.add_argument("--dataset_path", type=str, default=None, help="Dataset path")
     args = parser.parse_args()
 
     get_config()
