@@ -19,6 +19,10 @@ from mindspore.ops import operations as P
 
 class FCN8s(nn.Cell):
     def __init__(self, n_class):
+        """
+        FCN8S network
+        n_class: the number of the class
+        """
         super().__init__()
         self.n_class = n_class
         self.conv1 = nn.SequentialCell(
@@ -118,6 +122,11 @@ class FCN8s(nn.Cell):
         self.add2 = P.Add()
 
     def set_model_parallel_shard_strategy(self, device_num):
+        """
+        set model parallel
+        device_num: the number of the device
+        """
+
         self.conv2d_strategy = ((1, 1, 1, device_num), (1, 1, 1, 1))
         self.bn_strategy = ((1, 1, 1, device_num), (1,), (1,), (1,), (1,))
         self.relu_strategy = ((1, 1, 1, device_num),)
@@ -184,6 +193,9 @@ class FCN8s(nn.Cell):
         self.add2.shard(self.add_strategy)
 
     def construct(self, x):
+        """
+        construct method
+        """
         x1 = self.conv1(x)
         p1 = self.pool1(x1)
         x2 = self.conv2(p1)

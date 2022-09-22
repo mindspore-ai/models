@@ -56,8 +56,8 @@ Dataset used:
 
 # [环境要求](#contents)
 
-- 硬件（Ascend/GPU）
-    - 需要准备具有Ascend或GPU处理能力的硬件环境.
+- 硬件（Ascend/GPU/CPU）
+    - 需要准备具有Ascend或GPU或CPU处理能力的硬件环境.
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需获取更多信息，请查看如下链接：
@@ -71,14 +71,16 @@ Dataset used:
 ```backbone
 vgg16训练ImageNet数据集的ckpt文件做为FCN8s的backbone
 vgg16网络路径: model_zoo/official/cv/vgg16
+FCN8S网络GPU训练的ckpt文件做为FCN8s CPU训练的CKPT
+FCN8S网络路径: ./FCN8s_2-499_1322.ckpt
 ```
 
 ```default_config.yaml
-data_file: /home/DataSet/voc2012/vocaug_mindrecords/vocaug.mindrecord0
-ckpt_vgg16: /home/DataSet/predtrained/vgg16_predtrained.ckpt
-data_root: /home/DataSet/voc2012/VOCdevkit/VOC2012
-data_lst: /home/DataSet/voc2012/VOCdevkit/VOC2012/ImageSets/Segmentation/val.txt
-ckpt_file: /home/FCN8s/ckpt/FCN8s_1-133_300.ckpt
+data_file: ./src/data/a.mindrecord
+ckpt_vgg16: ./vgg16_predtrained.ckpt
+data_root: ./src/data/path_to_data/fcn8s/VOCdevkit/VOC2012
+data_lst: ./src/data/path_to_data/fcn8s/VOCdevkit/VOC2012/ImageSets/Segmentation/val.txt
+ckpt_file: ./FCN8s-39_254.ckpt
 
 根据本地数据存放路径修改参数
 ```
@@ -114,6 +116,16 @@ ckpt_file: /home/FCN8s/ckpt/FCN8s_1-133_300.ckpt
   --device_target=GPU
   ```
 
+- running on CPU with cpu default parameters
+
+  ```python
+  # CPU训练示例
+  python train.py
+
+  # CPU评估示例
+  python eval.py
+  ```
+
 # [脚本介绍](#contents)
 
 ## [脚本以及简单代码](#contents)
@@ -134,6 +146,7 @@ ckpt_file: /home/FCN8s/ckpt/FCN8s_1-133_300.ckpt
             ├── build_data.sh
         ├── src
         │   ├──data
+                ├──path_to_data           // the path of dataset
         │       ├──build_seg_data.py       // creating dataset
         │       ├──dataset.py          // loading dataset
         │   ├──nets
@@ -149,8 +162,10 @@ ckpt_file: /home/FCN8s/ckpt/FCN8s_1-133_300.ckpt
         │       ├──moxing_adapter.py          // Decorator
         ├── default_config.yaml               // Ascend parameters config
         ├── gpu_default_config.yaml           // GPU parameters config
+        ├── cpu_default_config.yaml           // CPU parameters config
         ├── train.py                 // training script
         ├── postprogress.py          // 310推理后处理脚本
+        ├── quick_start.py          // quick_start
         ├── export.py                // 将checkpoint文件导出到air/mindir
         ├── eval.py                  //  evaluation script
 ```
@@ -189,7 +204,7 @@ ckpt_file: /home/FCN8s/ckpt/FCN8s_1-133_300.ckpt
     'ckpt_dir': './ckpt',
   ```
 
-如需获取更多信息，Ascend请查看`default_config.yaml`, GPU请查看`gpu_default_config.yaml`.
+如需获取更多信息，Ascend请查看`default_config.yaml`, GPU请查看`gpu_default_config.yaml`,CPU请查看`cpu_default_config.yaml`.
 
 ## [生成数据步骤](#contents)
 
@@ -259,10 +274,21 @@ ckpt_file: /home/FCN8s/ckpt/FCN8s_1-133_300.ckpt
   --device_target=GPU
   ```
 
+- running on CPU with cpu default parameters
+
+  ```python
+  # CPU训练示例
+  python train.py  \
+  --config_path=cpu_default_config.yaml
+
+  # CPU评估示例
+  python eval.py
+  ```
+
   训练时，训练过程中的epch和step以及此时的loss和精确度会呈现log.txt中:
 
   ```python
-  epoch: * step: **, loss is ****
+  epoch: 1 step: 1, loss is 3.054
   ...
   ```
 
@@ -345,9 +371,9 @@ ckpt_file: /home/FCN8s/ckpt/FCN8s_1-133_300.ckpt
 
 ### 评估
 
-- 在Ascend或GPU上使用PASCAL VOC 2012 验证集进行评估
+- 在Ascend或GPU或CPU上使用PASCAL VOC 2012 验证集进行评估
 
-  在使用命令运行前，请检查用于评估的checkpoint的路径。请设置路径为到checkpoint的绝对路径，如 "/data/workspace/mindspore_dataset/FCN/FCN/model_new/FCN8s-500_82.ckpt"。
+  在使用命令运行前，请检查用于评估的checkpoint的路径。请设置路径为到checkpoint的绝对路径，如 "./FCN8s-39_254.ckpt"。
 
 - eval on Ascend
 
@@ -365,6 +391,18 @@ ckpt_file: /home/FCN8s/ckpt/FCN8s_1-133_300.ckpt
 
   ```python
   mean IoU  0.6467
+  ```
+
+- eval on CPU
+
+  ```python
+  python eval.py  
+  ```
+
+  以上的python命令会在终端上运行，你可以在终端上查看此次评估的结果。测试集的精确度会以类似如下方式呈现：
+
+  ```python
+  mean IoU  0.6238
   ```
 
 ## 导出过程
@@ -412,7 +450,7 @@ python export.py
 推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
 
   ```python
-  mean IoU  0.0.64519877
+  mean IoU  0.64519877
   ```
 
 - eval on GPU
@@ -437,41 +475,51 @@ python export.py
 
 #### FCN8s on PASCAL VOC 2012
 
-| Parameters                 | Ascend                                                      | GPU                                              |
-| -------------------------- | ------------------------------------------------------------| -------------------------------------------------|
-| Model Version              | FCN-8s                                                      | FCN-8s                                           |
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | NV SMX2 V100-32G                                 |
-| uploaded Date              | 12/30/2020 (month/day/year)                                 | 06/11/2021 (month/day/year)                      |
-| MindSpore Version          | 1.1.0                                                       | 1.2.0                                            |
-| Dataset                    | PASCAL VOC 2012 and SBD                                     | PASCAL VOC 2012 and SBD                          |
-| Training Parameters        | epoch=500, steps=330, batch_size = 32, lr=0.015             | epoch=500, steps=330, batch_size = 8, lr=0.005   |
-| Optimizer                  | Momentum                                                    | Momentum                                         |
-| Loss Function              | Softmax Cross Entropy                                       | Softmax Cross Entropy                            |
-| outputs                    | probability                                                 | probability                                      |
-| Loss                       | 0.038                                                       | 0.036                                            |
-| Speed                      | 1pc: 564.652 ms/step;                                       | 1pc: 455.460 ms/step;                            |
+| Parameters                 | Ascend                                                      | GPU                                              | CPU                                             |
+| -------------------------- | ------------------------------------------------------------| -------------------------------------------------|-------------------------------------------------|
+| Model Version              | FCN-8s                                                      | FCN-8s                                           | FCN-8s                                          |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 | NV SMX2 V100-32G                                 | AMD Ryzen 7 5800X 8-Core Processor              |
+| uploaded Date              | 12/30/2020 (month/day/year)                                 | 06/11/2021 (month/day/year)                      | 09/21/2022(month/day/year)                      |
+| MindSpore Version          | 1.1.0                                                       | 1.2.0                                            | 1.8.1                                           |
+| Dataset                    | PASCAL VOC 2012 and SBD                                     | PASCAL VOC 2012 and SBD                          | PASCAL VOC 2012 and SBD                         |
+| Training Parameters        | epoch=500, steps=330, batch_size = 32, lr=0.015             | epoch=500, steps=330, batch_size = 8, lr=0.005   | epoch=500, steps=330, batch_size = 8, lr=0.0008 |
+| Optimizer                  | Momentum                                                    | Momentum                                         | Momentum                                        |
+| Loss Function              | Softmax Cross Entropy                                       | Softmax Cross Entropy                            | Softmax Cross Entropy                           |
+| outputs                    | probability                                                 | probability                                      | probability                                     |
+| Loss                       | 0.038                                                       | 0.036                                            | 0.041                                           |
+| Speed                      | 1pc: 564.652 ms/step;                                       | 1pc: 455.460 ms/step;                            | 1pc: 29041.912 ms/step;                         |
 | Scripts                    | [FCN script](https://gitee.com/mindspore/models/tree/master/official/cv/FCN8s)
 
 ### Inference Performance
 
 #### FCN8s on PASCAL VOC
 
-| Parameters          | Ascend                      | GPU
-| ------------------- | --------------------------- | ---------------------------
-| Model Version       | FCN-8s                      | FCN-8s
-| Resource            | Ascend 910; OS Euler2.8     | NV SMX2 V100-32G
-| Uploaded Date       | 10/29/2020 (month/day/year) | 06/11/2021 (month/day/year)
-| MindSpore Version   | 1.1.0                       | 1.2.0
-| Dataset             | PASCAL VOC 2012             | PASCAL VOC 2012
-| batch_size          | 16                          | 16
-| outputs             | probability                 | probability
-| mean IoU            | 64.67                       | 64.72
+| Parameters          | Ascend                      | GPU                         | CPU                                |
+| ------------------- | --------------------------- |-----------------------------|------------------------------------|
+| Model Version       | FCN-8s                      | FCN-8s                      | FCN-8s                             |
+| Resource            | Ascend 910; OS Euler2.8     | NV SMX2 V100-32G            | AMD Ryzen 7 5800X 8-Core Processor |
+| Uploaded Date       | 10/29/2020 (month/day/year) | 06/11/2021 (month/day/year) | 09/21/2022(month/day/year)         |
+| MindSpore Version   | 1.1.0                       | 1.2.0                       | 1.8.1                              |
+| Dataset             | PASCAL VOC 2012             | PASCAL VOC 2012             | PASCAL VOC 2012                    |
+| batch_size          | 16                          | 16                          | 16                                 |
+| outputs             | probability                 | probability                 | probability                        |
+| mean IoU            | 64.67                       | 64.72      | 62.38                              |
+
+## [quick start](#contents)
+
+对eval_batch_size个数据进行预测并可视化结果。
+
+  ```python
+  python quick_start.py  
+  ```
+
+  以上的python命令会在终端上运行，你可以在终端上查看此次可视化的结果。
 
 ## [如何使用](#contents)
 
 ### 教程
 
-如果你需要在不同硬件平台（如GPU，Ascend 910 或者 Ascend 310）使用训练好的模型，你可以参考这个 [Link](https://www.mindspore.cn/tutorials/experts/zh-CN/master/infer/inference.html)。以下是一个简单例子的步骤介绍：
+如果你需要在不同硬件平台（如CPU，GPU，Ascend 910 或者 Ascend 310）使用训练好的模型，你可以参考这个 [Link](https://www.mindspore.cn/tutorials/experts/zh-CN/master/infer/inference.html)。以下是一个简单例子的步骤介绍：
 
 - Running on Ascend
 

@@ -20,6 +20,23 @@ cv2.setNumThreads(0)
 
 
 class SegDataset:
+    """preprocess data.
+
+        image_mean:the mean of images
+        image_std: the standard variance of images
+        data_file: the file of data
+        batch_size: batch_size,     Default=32,
+        crop_size:the size of crop, Default=512,
+        max_scale:maximum scale,    Default=2.0,
+        min_scale:minimum scale,    Default=0.5,
+        ignore_label, Default=255,
+        num_classes:the number of the classes,  Default=21,
+        num_readers: the number of the readers,  Default=2,
+        num_parallel_calls:the number of the parallel_calls,   Default=4,
+        shard_id=None,
+        shard_num=None
+
+        """
     def __init__(self,
                  image_mean,
                  image_std,
@@ -51,6 +68,12 @@ class SegDataset:
         assert max_scale > min_scale
 
     def preprocess_(self, image, label):
+        """preprocess data.
+
+        image:   A batch of input images
+        label:   A batch of input labels
+
+        """
         # bgr image
         image_out = cv2.imdecode(np.frombuffer(image, dtype=np.uint8), cv2.IMREAD_COLOR)
         label_out = cv2.imdecode(np.frombuffer(label, dtype=np.uint8), cv2.IMREAD_GRAYSCALE)
@@ -81,6 +104,7 @@ class SegDataset:
         return image_out, label_out
 
     def get_dataset(self, repeat=1):
+        """get dataset"""
         de.config.set_numa_enable(True)
         data_set = de.MindDataset(self.data_file, columns_list=["data", "label"],
                                   shuffle=True, num_parallel_workers=self.num_readers,

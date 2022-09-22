@@ -38,6 +38,7 @@ class SoftmaxCrossEntropyLoss(nn.Cell):
         self.transpose.shard(((1, 1, 1, device_num),))
 
     def construct(self, logits, labels):
+        """construct loss"""
         labels_int = self.cast(labels, mstype.int32)
         labels_int = self.reshape(labels_int, (-1,))
         logits_ = self.transpose(logits, (0, 2, 3, 1))

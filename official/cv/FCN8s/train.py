@@ -145,11 +145,11 @@ def train():
 
     # loss scale
     manager_loss_scale = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
-    if config.device_target == "Ascend":
+    if config.device_target == "Ascend":    #choose Ascend
         optimizer = nn.Momentum(params=net.trainable_params(), learning_rate=lr, momentum=0.9, weight_decay=0.0001,
                                 loss_scale=config.loss_scale)
         model = Model(net, loss_fn=loss_, loss_scale_manager=manager_loss_scale, optimizer=optimizer, amp_level="O3")
-    elif config.device_target == "GPU":
+    elif config.device_target == "GPU" or config.device_target == "CPU":     #choose GPU or CPU
         optimizer = nn.Momentum(params=net.trainable_params(), learning_rate=lr, momentum=0.9, weight_decay=0.0001)
         model = Model(net, loss_fn=loss_, optimizer=optimizer)
     else:
