@@ -115,7 +115,7 @@ bash wmt16_en_de.sh
 paste newstest2014.tok.bpe.32000.en newstest2014.tok.bpe.32000.de > test.all
 ```
 
-将default_config.yaml中bucket改为bucket: [128]
+将default_config_large.yaml中bucket改为bucket: [128]
 
 ```text
 # create_data.py
@@ -134,7 +134,7 @@ bucket: [128]
 python3 create_data.py --input_file ./infer/data/data/test.all --vocab_file ./infer/data/data/vocab.bpe.32000 --output_file ./infer/data/data/newstest2014-l128-mindrecord --num_splits 1 --max_seq_length 128 --clip_to_max_len True
 ```
 
-更改default_config.yaml中参数：
+更改default_config_large.yaml中参数：
 
 ```text
 #eval_config/cfg edict

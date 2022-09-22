@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ class Config:
         return self.__str__()
 
 
-def parse_cli_to_yaml(parser, cfg, helper=None, choices=None, cfg_path="default_config.yaml"):
+def parse_cli_to_yaml(parser, cfg, helper=None, choices=None, cfg_path="default_config_large.yaml"):
     """
     Parse command line arguments to the configuration according to the default yaml.
 
@@ -115,7 +115,7 @@ def get_config():
     """
     parser = argparse.ArgumentParser(description="default name", add_help=False)
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    parser.add_argument("--config_path", type=str, default=os.path.join(current_dir, "../../default_config.yaml"),
+    parser.add_argument("--config_path", type=str, default=os.path.join(current_dir, "../../default_config_large.yaml"),
                         help="Config file path")
     path_args, _ = parser.parse_known_args()
     default, helper, choices = parse_yaml(path_args.config_path)
