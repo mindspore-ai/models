@@ -8,6 +8,7 @@
     - [数据集](#数据集)
         - [使用的数据集：CIFAR-10](#使用的数据集cifar-10)
         - [使用的数据集：ImageNet2012](#使用的数据集imagenet2012)
+        - [使用的数据集：自定义数据集](#使用的数据集：自定义数据集)
         - [数据集组织方式](#数据集组织方式)
     - [特性](#特性)
         - [混合精度](#混合精度)
@@ -25,6 +26,10 @@
                 - [GPU处理器环境运行VGG16](#gpu处理器环境运行vgg16)
         - [评估过程](#评估过程)
             - [评估](#评估-1)
+        - [迁移过程](#迁移过程)
+            - [数据集划分](#数据集划分)
+            - [数据集迁移](#数据集迁移)
+            - [quick start](#quick start)
     - [推理过程](#推理过程)
         - [导出MindIR](#导出mindir)
         - [在Ascend310执行推理](#在ascend310执行推理)
@@ -67,6 +72,11 @@ VGG 16网络主要由几个基本模块（包括卷积层和池化层）和三�
 - 数据格式：RGB图像。
     - 注：数据在src/dataset.py中处理。
 
+### 使用的数据集：自定义数据集
+
+- 数据格式：RGB图像。
+    - 注：注：数据在src/data_split.py中处理,用来划分训练、验证集。
+
 ### 数据集组织方式
 
   CIFAR-10
@@ -88,6 +98,21 @@ VGG 16网络主要由几个基本模块（包括卷积层和池化层）和三�
   > └─dataset
   >   ├─ilsvrc                # 训练数据集
   >   └─validation_preprocess # 评估数据集
+  > ```
+
+  自定义数据集
+
+  > 将自定义数据集解压到任意路径，文件夹结构应包含类名的文件夹以及在此文件夹下的所有图片，如下所示：
+  >
+  > ```bash
+  > .
+  > └─dataset
+  > ├─class_name1                # 类名
+  >  ├─xx.jpg                    # 对应类名的所有图片
+  >  ├─ ...
+  >  ├─xx.jpg
+  > ├─class_name2
+  > ├─  ...
   > ```
 
 ## 特性
@@ -140,6 +165,23 @@ bash scripts/run_distribute_train_gpu.sh [DATA_PATH] --dataset=[DATASET_TYPE]
 
 # 评估示例
 python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=[DATASET_TYPE] --data_dir=[DATA_PATH]  --pre_trained=[PRE_TRAINED] > output.eval.log 2>&1 &
+```
+
+- CPU处理器环境运行
+
+```python
+
+# 数据集处理实例
+python src/data_split.py --split_path [SPLIT_PATH]
+
+# 迁移示例
+python fine_tune.py --config_path [YAML_CONFIG_PATH]
+
+# 评估示例
+python eval.py --config_path [YAML_CONFIG_PATH]
+
+# quick start示例
+python quick_start.py --config_path [YAML_CONFIG_PATH]
 ```
 
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
@@ -303,14 +345,18 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=
         │   ├── linear_warmup.py                  // 线性学习率
         │   ├── warmup_cosine_annealing_lr.py     // 余弦退火学习率
         │   ├── warmup_step_lr.py                 // 单次或多次迭代学习率
-        │   ├──vgg.py                             // VGG架构
+        │   ├── vgg.py                            // VGG架构
+        │   ├── data_split.py                     // CPU迁移数据集划分脚本
         ├── train.py                              // 训练脚本
         ├── eval.py                               // 评估脚本
+        ├── finetune.py                           // CPU迁移脚本
+        ├── quick_start.py                        // CPU quick start脚本
         ├── postprocess.py                        // 后处理脚本
         ├── preprocess.py                         // 预处理脚本
         ├── mindspore_hub_conf.py                 // mindspore hub 脚本
         ├── cifar10_config.yaml                   // cifar10 配置文件
         ├── imagenet2012_config.yaml              // imagenet2012 配置文件
+        ├── cpu_config.yaml                       // CPU迁移配置文件
         ├── export.py                             // 模型格式转换脚本
         └── requirements.txt                      // requirements
 ```
@@ -413,6 +459,29 @@ initialize_mode: "KaimingNormal"    # conv2d init模式
 has_dropout: True                   # 是否使用Dropout层
 ```
 
+- 配置VGG16，自定义数据集
+
+```bash
+num_classes: 5                    # 数据集类别数
+lr: 0.001                         # 学习率
+batch_size: 64                    # 输入张量批次大小
+num_epoch: 10                     # 训练轮数
+momentum: 0.9                     # 动量
+pad_mode: 'pad'                   # conv2d的填充方式
+padding: 0                        # conv2d的填充值
+has_bias: False                   # conv2d是否有偏差
+batch_norm: False                 # 在conv2d中是否有batch_norm
+initialize_mode: "KaimingNormal"  # conv2d init模式
+has_dropout: True                 # 是否使用Dropout层
+ckpt_file: "./vgg16_bn_ascend_v170_imagenet2012_official_cv_top1acc74.33_top5acc92.1.ckpt" # 迁移使用的预训练权重文件路径
+save_file: "./vgg16.ckpt"         # 迁移后保存的权重文件路径
+train_path: "./datasets/train/"   # 迁移数据集训练集路径
+eval_path: "./datasets/test/"     # 迁移数据集验证集路径
+split_path: "./datasets/"         # 迁移数据集路径
+infer_ckpt_path: "./vgg16.ckpt"   # CPU推理使用的权重文件路径
+
+```
+
 ### 训练过程
 
 #### 训练
@@ -502,6 +571,40 @@ result: {'acc': 0.92}
 # 使用ImageNet2012数据集
 after allreduce eval: top1_correct=36636, tot=50000, acc=73.27%
 after allreduce eval: top5_correct=45582, tot=50000, acc=91.16%
+```
+
+## 迁移过程
+
+### 数据集划分
+
+- 数据集划分过程如下，会在数据集目录下生成/train和/test文件夹，保存训练、验证集图片。
+
+```bash
+python src/data_split.py --split_path /dir_to_code/{SPLIT_PATH}
+```
+
+### 数据集迁移
+
+- 迁移过程如下，需要将预训练权重文件[(https://download.mindspore.cn/models/r1.7/vgg16_bn_ascend_v170_imagenet2012_official_cv_top1acc74.33_top5acc92.1.ckpt)](https://download.mindspore.cn/models/r1.7/vgg16_bn_ascend_v170_imagenet2012_official_cv_top1acc74.33_top5acc92.1.ckpt)下载到vgg16文件夹下，训练完成后默认将文件保存成./vgg16.ckpt。
+
+```bash
+python fine_tune.py --config_path /dir_to_code/cpu_config.yaml
+```
+
+### 数据集评估
+
+- 迁移过程如下，需要指定迁移完成的权重文件(默认是./vgg16.ckpt)。
+
+```bash
+python eval.py --config_path /dir_to_code/cpu_config.yaml
+```
+
+### quick start
+
+- quick start过程如下，需要指定训练完成的权重文件路径和数据集路径。
+
+```bash
+python quick_start.py --config_path /dir_to_code/cpu_config.yaml
 ```
 
 ## 推理过程

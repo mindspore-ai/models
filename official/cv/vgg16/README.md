@@ -6,6 +6,7 @@
     - [Dataset](#dataset)
         - [Dataset used: CIFAR-10](#dataset-used-cifar-10)
         - [Dataset used: ImageNet2012](#dataset-used-imagenet2012)
+        - [Dataset used: Custom Dataset](#dataset-used-custom-dataset)
             - [Dataset organize way](#dataset-organize-way)
     - [Features](#features)
         - [Mixed Precision](#mixed-precision)
@@ -24,6 +25,10 @@
         - [Evaluation Process](#evaluation-process)
             - [Evaluation](#evaluation-1)
             - [ONNX Evaluation](#onnx-evaluation)
+        - [Migration process](#Migration process)
+            - [Dataset split](#Dataset split)
+            - [Migration](#Migration)
+            - [Model quick start](#Model quick start)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
@@ -66,6 +71,11 @@ Note that you can run the scripts based on the dataset mentioned in original pap
     - Data format: RGB images
     - Note: Data will be processed in src/dataset.py
 
+### Dataset used: Custom Dataset
+
+- Data format: RGB images
+    - Note: Data will be processed in src/data_split.py,Used to divide training and validation sets.
+
 #### Dataset organize way
 
   CIFAR-10
@@ -87,6 +97,21 @@ Note that you can run the scripts based on the dataset mentioned in original pap
   > └─dataset
   >   ├─ilsvrc                # train dataset
   >   └─validation_preprocess # evaluate dataset
+  > ```
+
+  Custom Dataset
+
+  > Unzip the custom dataset to any path, the folder structure should contain the folder with the class name and all the pictures under this folder, as shown below:
+  >
+  > ```bash
+  > .
+  > └─dataset
+  >   ├─class_name1                # class name
+  >     ├─xx.jpg                    # All images corresponding to the class name
+  >     ├─ ...
+  >     ├─xx.jpg
+  >   ├─class_name2
+  >   ├─  ...
   > ```
 
 ## [Features](#contents)
@@ -139,6 +164,23 @@ bash scripts/run_distribute_train_gpu.sh [DATA_PATH] --dataset=[DATASET_TYPE]
 
 # run evaluation example
 python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=[DATASET_TYPE] --data_dir=[DATA_PATH]  --pre_trained=[PRE_TRAINED] > output.eval.log 2>&1 &
+```
+
+- Running on CPU
+
+```python
+
+# run dataset processing example
+python src/data_split.py --split_path [SPLIT_PATH]
+
+# run finetune example
+python tine_tune.py --config_path [YAML_CONFIG_PATH]
+
+# run eval example
+python eval.py --config_path [YAML_CONFIG_PATH]
+
+# quick start
+python quick_start.py --config_path [YAML_CONFIG_PATH]
 ```
 
 - Running on [ModelArts](https://support.huaweicloud.com/modelarts/)
@@ -300,6 +342,7 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=
         │   │   ├── var_init.py                   // network parameter init method
         │   ├── crossentropy.py                   // loss calculation
         │   ├── dataset.py                        // creating dataset
+        │   ├── data_split.py                     // CPU dataset split script
         │   ├── linear_warmup.py                  // linear leanring rate
         │   ├── warmup_cosine_annealing_lr.py     // consine anealing learning rate
         │   ├── warmup_step_lr.py                 // step or multi step learning rate
@@ -307,11 +350,14 @@ python eval.py --config_path=[YAML_CONFIG_PATH] --device_target="GPU" --dataset=
         ├── train.py                              // training script
         ├── eval.py                               // evaluation script
         ├── eval_onnx.py                          // ONNX evaluation script
+        ├── finetune.py                           // CPU transfer script
+        ├── quick_start.py                        // CPU quick start script
         ├── postprocess.py                        // postprocess script
         ├── preprocess.py                         // preprocess script
         ├── mindspore_hub_conf.py                 // mindspore_hub_conf script
         ├── cifar10_config.yaml                   // Configurations for cifar10
         ├── imagenet2012_config.yaml              // Configurations for imagenet2012
+        ├── cpu_config.yaml                       // Configurations for CPU transfer
         ├── export.py                             // model convert script
         └── requirements.txt                      // requirements
 ```
@@ -412,6 +458,29 @@ batch_norm: False                   # whether has batch_norm in conv2d
 keep_checkpoint_max: 10             # only keep the last keep_checkpoint_max checkpoint
 initialize_mode: "KaimingNormal"    # conv2d init mode
 has_dropout: True                   # whether using Dropout layer
+```
+
+- config for vgg16, custom dataset
+
+```bash
+num_classes: 5                    # number of dataset categories
+lr: 0.001                         # learning rate
+batch_size: 64                    # batch size of input tensor
+num_epoch: 10                     # number of training epochs
+momentum: 0.9                     # momentum
+pad_mode: 'pad'                   # pad mode for conv2d
+padding: 0                        # padding value for conv2d
+has_bias: False                   # whether has bias in conv2d
+batch_norm: False                 # whether has batch_norm in conv2d
+initialize_mode: "KaimingNormal"  # conv2d init mode
+has_dropout: True                 # whether using Dropout layer
+ckpt_file: "./vgg16_bn_ascend_v170_imagenet2012_official_cv_top1acc74.33_top5acc92.1.ckpt" # The path to the pretrained weights file used by the migration
+save_file: "./vgg16.ckpt"         # Weight file path saved after migration
+train_path: "./datasets/train/"   # Migration train set path
+eval_path: "./datasets/test/"     # Migration valid set path
+split_path: "./datasets/"         # Migration dataset path
+infer_ckpt_path: "./vgg16.ckpt"   # Weight file path used by CPU inference
+
 ```
 
 ### [Training Process](#contents)
@@ -536,6 +605,40 @@ accuracy: 0.9894
 # when using the imagenet2012 dataset
 top-1 accuracy: 0.7332
 top-5 accuracy: 0.9149
+```
+
+## Migration process
+
+### Dataset split
+
+- The data set division process is as follows, the /train and /test folders will be generated in the dataset directory, and the training and validation set images will be saved.
+
+```bash
+python src/data_split.py --split_path /dir_to_code/{SPLIT_PATH}
+```
+
+### Migration
+
+- The migration process is as follows. The pre-training weight file needs to be downloaded [(https://download.mindspore.cn/models/r1.7/vgg16_bn_ascend_v170_imagenet2012_official_cv_top1acc74.33_top5acc92.1.ckpt)](https://download.mindspore.cn/models/r1.7/vgg16_bn_ascend_v170_imagenet2012_official_cv_top1acc74.33_top5acc92.1.ckpt) to ./vgg16 folder. After the training is completed, the file is saved as ./vgg16.ckpt by default.
+
+```bash
+python fine_tune.py --config_path /dir_to_code/cpu_config.yaml
+```
+
+### Eval
+
+- The migration process is as follows, you need to specify the weight file to be migrated (default is ./vgg16.ckpt).
+
+```bash
+python eval.py --config_path /dir_to_code/cpu_config.yaml
+```
+
+### Model quick start
+
+- The quick start process is as follows, you need to specify the weight file path and dataset path after training.
+
+```bash
+python quick_start.py --config_path /dir_to_code/cpu_config.yaml
 ```
 
 ## Inference Process

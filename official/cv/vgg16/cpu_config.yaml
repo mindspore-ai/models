@@ -1,0 +1,58 @@
+# ==============================================================================
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# device options
+device_target: "CPU"
+
+# dataset options
+train_path: "./datasets/train/"
+eval_path: "./datasets/test/"
+split_path: "./datasets/"
+
+# finetune options
+dataset: 'custom'
+image_size: '224,224'
+log_path: "outputs/"
+num_classes: 5
+lr: 0.001
+batch_size: 64
+num_epochs: 10
+momentum: 0.9
+ckpt_file: "./vgg16_bn_ascend_v170_imagenet2012_official_cv_top1acc74.33_top5acc92.1.ckpt"
+save_file: "./vgg16.ckpt"
+initialize_mode: "KaimingNormal"
+pad_mode: 'pad'
+padding: 1
+has_bias: False
+batch_norm: False
+has_dropout: True
+
+# infer options
+pre_trained: "./vgg16.ckpt"
+
+
+
+---
+
+# Help description for each configuration
+
+# device options
+device_target: "device where the code will be implemented."
+
+# dataset options
+train_path: "the training dataset path"
+eval_path: "the eval dataset path"
+split_path: "the original dataset path to split"
+
+# finetune options
+num_classes: "num of class in dataset"
+lr: "learning rate"
+batch_size: "batch size"
+num_epochs: "num of train epochs"
+momentum: "num of train momentum"
+ckpt_file: "the .ckpt file used for finetune"
+save_file: "the .ckpt for saving"
+
+
+# infer options
+pre_trained: "the .ckpt file path to infer"

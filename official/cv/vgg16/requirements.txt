@@ -2,3 +2,4 @@ numpy
 onnxruntime-gpu
 pillow
 pyyaml
+matplotlib

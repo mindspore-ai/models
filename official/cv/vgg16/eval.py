@@ -29,16 +29,22 @@ from mindspore.ops import functional as F
 from mindspore.common import dtype as mstype
 
 from src.utils.logging import get_logger
-from src.vgg import vgg16
+from src.vgg import vgg16, Vgg
 from src.dataset import vgg_create_dataset
 from src.dataset import classification_dataset
+from src.dataset import create_dataset
 
 from model_utils.moxing_adapter import config
 from model_utils.moxing_adapter import moxing_wrapper
 from model_utils.device_adapter import get_device_id, get_rank_id, get_device_num
 
+from model_utils.config import get_config
+from fine_tune import DenseHead, cfg
+
+
 class ParameterReduce(nn.Cell):
     """ParameterReduce"""
+
     def __init__(self):
         super(ParameterReduce, self).__init__()
         self.cast = P.Cast()
@@ -61,6 +67,7 @@ def get_top5_acc(top5_arg, gt_class):
 
 def modelarts_pre_process():
     '''modelarts pre process function.'''
+
     def unzip(zip_file, save_dir):
         import zipfile
         s_time = time.time()
@@ -132,7 +139,6 @@ def run_eval():
     config.rank = get_rank_id()
     config.group_size = get_device_num()
 
-
     _enable_graph_kernel = config.device_target == "GPU"
     context.set_context(mode=context.GRAPH_MODE, enable_graph_kernel=_enable_graph_kernel,
                         device_target=config.device_target, save_graphs=False)
@@ -168,11 +174,24 @@ def run_eval():
             config.models = sorted(models, key=f)
         else:
             config.models = [config.pre_trained,]
-
         for model in config.models:
-            dataset = classification_dataset(config.data_dir, config.image_size, config.per_batch_size, mode='eval')
+            if config.dataset == "custom":
+                dataset = create_dataset(dataset_path=config.eval_path, do_train=False,
+                                         batch_size=config.batch_size,
+                                         eval_image_size=config.image_size,
+                                         enable_cache=False)
+                model_config = get_config()
+                network = Vgg(cfg['16'], num_classes=1000, args=model_config, batch_norm=True)
+
+                # replace head
+                src_head = network.classifier[6]
+                in_channels = src_head.in_channels
+                head = DenseHead(in_channels, config.num_classes)
+                network.classifier[6] = head
+            else:
+                dataset = classification_dataset(config.data_dir, config.image_size, config.per_batch_size, mode='eval')
+                network = vgg16(config.num_classes, config, phase="test")
             eval_dataloader = dataset.create_tuple_iterator(output_numpy=True, num_epochs=1)
-            network = vgg16(config.num_classes, config, phase="test")
 
             # pre_trained
             load_param_into_net(network, load_checkpoint(model))
