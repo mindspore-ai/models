@@ -31,6 +31,8 @@ def preLauch():
                         help='device id of Ascend or GPU (Default: 0)')
     parser.add_argument('--ckpt_dir', type=str,
                         default='ckpt', help='checkpoint dir of CGAN')
+    parser.add_argument('--file_format', type=str,
+                        default='MINDIR', help='file_format of model')
     args = parser.parse_args()
     context.set_context(device_id=args.device_id, mode=context.GRAPH_MODE, device_target=args.device_target)
     return args
@@ -54,7 +56,7 @@ def main():
     param_G = load_checkpoint(args.ckpt_dir)
     load_param_into_net(netG, param_G)
     netG.set_train(False)
-    export(netG, latent_code_eval, label_eval, file_name="CGAN", file_format="MINDIR")
+    export(netG, latent_code_eval, label_eval, file_name="CGAN", file_format=args.file_format)
     print("CGAN exported")
 
 if __name__ == '__main__':
