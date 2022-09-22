@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ from mindspore.profiler import Profiler
 
 from src.dataset import COCOHP
 from src.centernet_det import CenterNetLossCell, CenterNetWithLossScaleCell
-from src.centernet_det import CenterNetWithoutLossScaleCell
+from src.centernet_det import CenterNetWithoutLossScaleCell, CenterNetGPULossScaleCell
 from src.utils import LossCallBack, CenterNetPolynomialDecayLR, CenterNetMultiEpochsDecayLR
 from src.model_utils.config import config, dataset_config, net_config, train_config
 from src.model_utils.moxing_adapter import moxing_wrapper
@@ -107,25 +107,23 @@ def train():
     ckpt_save_dir = config.save_checkpoint_path
     rank = 0
     device_num = 1
-    num_workers = 8
+    num_workers = 4
 
     if config.device_target == "Ascend":
         context.set_context(device_id=get_device_id())
-        if config.distribute == "true":
 
-            D.init()
-            device_num = get_device_num()
-            rank = get_rank_id()
-            ckpt_save_dir = config.save_checkpoint_path + 'ckpt_' + str(get_rank()) + '/'
+    if config.distribute == "true":
 
-            context.reset_auto_parallel_context()
-            context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
-                                              device_num=device_num)
+        D.init()
+        device_num = get_device_num()
+        rank = get_rank_id()
+        ckpt_save_dir = config.save_checkpoint_path + 'ckpt_' + str(get_rank()) + '/'
+
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True,
+                                          device_num=device_num)
+        if config.device_target == "Ascend":
             _set_parallel_all_reduce_split()
-    else:
-        config.distribute = "false"
-        config.need_profiler = "false"
-        config.enable_data_sink = "false"
 
     # Start create dataset!
     # mindrecord files will be generated at args_opt.mindrecord_dir such as centernet.mindrecord0, 1, ... file_num.
@@ -159,6 +157,9 @@ def train():
     if config.device_target == "Ascend":
         net_with_grads = CenterNetWithLossScaleCell(net_with_loss, optimizer=optimizer,
                                                     sens=train_config.loss_scale_value)
+    elif config.device_target == "GPU" and config.distribute == "true":
+        net_with_grads = CenterNetGPULossScaleCell(net_with_loss, optimizer=optimizer,
+                                                   sens=train_config.loss_scale_value)
     else:
         net_with_grads = CenterNetWithoutLossScaleCell(net_with_loss, optimizer=optimizer)
 

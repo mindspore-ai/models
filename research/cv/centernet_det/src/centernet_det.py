@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -236,6 +236,55 @@ class CenterNetWithoutLossScaleCell(nn.Cell):
         weights = self.weights
         loss = self.network(image, hm, reg_mask, ind, wh, reg)
         grads = self.grad(self.network, weights)(image, hm, reg_mask, ind, wh, reg)
+        succ = self.optimizer(grads)
+        ret = loss
+        return ops.depend(ret, succ)
+
+
+class CenterNetGPULossScaleCell(nn.Cell):
+    """
+    Encapsulation class of centernet training.
+
+    Append an optimizer to the training network after that the construct
+    function can be called to create the backward graph.
+
+    Args:
+        network (Cell): The training network. Note that loss function should have been added.
+        optimizer (Optimizer): Optimizer for updating the weights.
+
+    Returns:
+        Tuple of Tensors, the loss, overflow flag and scaling sens of the network.
+    """
+    def __init__(self, network, optimizer, sens=1):
+        super(CenterNetGPULossScaleCell, self).__init__(auto_prefix=False)
+        self.image = ImagePreProcess()
+        self.network = network
+        self.network.set_grad()
+        self.weights = optimizer.parameters
+        self.optimizer = optimizer
+        self.cast = ops.Cast()
+        self.grad = ops.GradOperation(get_by_list=True, sens_param=False)
+        self.parallel_mode = context.get_auto_parallel_context("parallel_mode")
+        if self.parallel_mode in [ParallelMode.DATA_PARALLEL, ParallelMode.HYBRID_PARALLEL]:
+            self.reducer_flag = True
+        self.grad_reducer = ops.identity
+        self.degree = 1
+        if self.reducer_flag:
+            self.degree = get_group_size()
+            self.grad_reducer = DistributedGradReducer(optimizer.parameters, False, self.degree)
+        self.grad_scale = GradScale()
+        self.loss_scale = sens
+
+    @ops.add_flags(has_effect=True)
+    def construct(self, image, hm, reg_mask, ind, wh, reg):
+        """Defines the computation performed."""
+        scaling_sens = self.cast(self.loss_scale, mstype.float32) * 2.0 / 2.0
+        image = self.image(image)
+        weights = self.weights
+        loss = self.network(image, hm, reg_mask, ind, wh, reg)
+        grads = self.grad(self.network, weights)(image, hm, reg_mask, ind, wh, reg)
+        grads = self.grad_reducer(grads)
+        grads = self.grad_scale(scaling_sens * self.degree, grads)
         succ = self.optimizer(grads)
         ret = loss
         return ops.depend(ret, succ)
