@@ -78,6 +78,7 @@ A single natural image, for example, 'thunder.jpg'
   ├─ scripts
     ├─ run_train_ascend.sh  # Ascend training(1 pcs)
     ├─ run_eval_ascend.sh   # Ascend eval
+    ├─ run_infer_onnx.sh    # Ascend onnx infer
     └─ run_infer_310.sh     # Ascend-310 infer
   ├─ data
     └─ thunder.jpg          # A single nature image
@@ -102,6 +103,7 @@ A single natural image, for example, 'thunder.jpg'
   ├─ train.py               # SinGAN training
   ├─ train_modelarts.py     # SinGAN training on modelarts
   ├─ eval.py                # SinGAN evaluation
+  ├─ infer_onnx.py          # SinGAN onnx inference
   ├─ export.py              # SinGAN export
   ├─ postprocess.py         # Ascend-310 inference postprocess
   └─ preprocess.py          # Ascend-310 inference preprocess
@@ -175,13 +177,19 @@ python eval.py --input_dir [INPUT_DIR] --input_name [INPUT_NAME] --device_id [DE
 
 ## [Inference Process](#contents)
 
-### [Export MINDIR](#content)
+### [Export](#content)
 
-Before performing inference, the mindir files must be exported by `export.py`.
+在进行推理之前我们需要先导出模型。mindir可以在任意环境上导出，air模型只能在昇腾910环境上导出。onnx可以在CPU/GPU/Ascend环境下导出。
 
 ```bash
-python export.py --input_dir [INPUT_DIR] --input_name [INPUT_NAME] --device_id [DEVICE_ID]
+python export.py --input_dir [INPUT_DIR] --input_name [INPUT_NAME] --output_dir [OUTPUT_DIR] --device_id [DEVICE_ID] --device_target [DEVICE_TARGET] --model_dir [MODEL_DIR] --file_format [FILE_FORMAT]
 ```
+
+- INPUT_DIR：图片数据集所在的目录
+- INPUT_NAME：图片数据集的文件名
+- OUTPUT_DIR：导出结果的目录
+- MODEL_DIR：ckpt所在的目录
+- FILE_FORMAT：导出的模型类型，必须在 ["AIR", "MINDIR", "ONNX"]中选择
 
 ### [Ascend310 Inference](#content)
 
@@ -199,6 +207,21 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [INPUT_DIR] [INPUT_NAME] [NOISE_AMP]
 - [STOP_SCALE]：There are 8 scales for singan, you can choose 1~8 to generate an image at different scale.
 
 Ascend310 inference result will be stored in the postprocess_Result path. Under this, you can find generator results.
+
+### [ONNX Inference](#content)
+
+- Run `run_infer_onnx.sh` for ONNX inference.
+
+```bash
+# infer
+bash scripts/run_infer_onnx.sh [INPUT_DIR] [INPUT_NAME] [DEVICE_TARGET] [ONNX_DIR] [MODEL_DIR] [INFER_OUTPUT] [DEVICE_ID]
+```
+
+- INPUT_DIR：图片数据集所在的目录
+- INPUT_NAME：图片数据集的文件名
+- ONNX_DIR：onnx所在的目录
+- MODEL_DIR：噪声文件所在的目录
+- INFER_OUTPUT：推理结果目录
 
 # Model Description
 
