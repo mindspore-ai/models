@@ -483,7 +483,8 @@ def create_yolact_dataset(mindrecord_file, batch_size=2, device_num=1, rank_id=0
                     python_multiprocessing=False,
                     num_parallel_workers=8)
 
-        ds = ds.batch(batch_size, drop_remainder=True, pad_info={"mask": ([cfg['max_instance_count'], None, None], 0)})
+        ds = ds.padded_batch(batch_size, drop_remainder=True,
+                             pad_info={"mask": ([cfg['max_instance_count'], None, None], 0)})
 
     else:
         ds = ds.map(operations=compose_map_func,

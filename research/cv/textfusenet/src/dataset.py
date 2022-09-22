@@ -519,7 +519,8 @@ def create_textfusenet_dataset(mindrecord_file, batch_size=2, device_num=1, rank
                     column_order=["image", "image_shape", "box", "label", "valid_num", "mask"],
                     python_multiprocessing=False,
                     num_parallel_workers=num_parallel_workers)
-        ds = ds.batch(batch_size, drop_remainder=True, pad_info={"mask": ([config.max_instance_count, None, None], 0)})
+        ds = ds.padded_batch(batch_size, drop_remainder=True,
+                             pad_info={"mask": ([config.max_instance_count, None, None], 0)})
 
     else:
         ds = ds.map(operations=compose_map_func,
