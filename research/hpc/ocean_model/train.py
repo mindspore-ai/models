@@ -15,6 +15,7 @@
 """train"""
 
 import argparse
+import time
 import numpy as np
 import mindspore.context as context
 from mindspore import Tensor
@@ -62,6 +63,7 @@ if __name__ == "__main__":
                  q2b=q2b, q2lb=q2lb, aam=aam, cbc=cbc, rmean=rmean)
 
     # time step of GOMO Model
+    begin_time = time.time()
     for step in range(1, args_gomo.step+1):
         vfluxb = Tensor(vfluxb.asnumpy())
         elf, etf, ua, uab, va, vab, el, elb, d, u, v, w, kq, km, kh, q2, q2l, tb, t, sb, s, rho, wubot, wvbot, ub, vb, \
@@ -72,9 +74,11 @@ if __name__ == "__main__":
                ub, vb, egb, etb, dt, dhb, utb, vtb, vfluxb, et
         for var in vars_list:
             var.asnumpy()
+        print("per step cost time", time.time() - begin_time)
         # save output
         if step % 5 == 0:
             np.save(args_gomo.outputs_path + "u_"+str(step)+".npy", u.asnumpy())
             np.save(args_gomo.outputs_path + "v_" + str(step) + ".npy", v.asnumpy())
             np.save(args_gomo.outputs_path + "t_" + str(step) + ".npy", t.asnumpy())
             np.save(args_gomo.outputs_path + "et_" + str(step) + ".npy", et.asnumpy())
+        begin_time = time.time()
