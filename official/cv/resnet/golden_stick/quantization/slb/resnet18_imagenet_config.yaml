@@ -10,7 +10,7 @@ enable_profiling: False
 data_path: "/cache/data"
 output_path: "/cache/train"
 load_path: "/cache/checkpoint_path/"
-device_target: "Ascend"
+device_target: "GPU"
 checkpoint_path: "./checkpoint/"
 checkpoint_file_path: ""
 
@@ -18,30 +18,30 @@ checkpoint_file_path: ""
 # Training options
 optimizer: "Momentum"
 infer_label: ""
-class_num: 10
-batch_size: 32
+class_num: 1001
+batch_size: 256
 loss_scale: 1024
 momentum: 0.9
 weight_decay: 0.0001
 epoch_size: 100
+pretrain_epoch_size: 0
 save_checkpoint: True
 save_checkpoint_epochs: 5
 keep_checkpoint_max: 10
-warmup_epochs: 5
+warmup_epochs: 2
+lr_decay_mode: "linear"
 use_label_smooth: True
 label_smooth_factor: 0.1
-lr_decay_mode: "poly"
-lr_init: 0.01
-lr_end: 0.00001
-lr_max: 0.1
+lr_init: 0
+lr_max: 0.8
+lr_end: 0.0
 lars_epsilon: 0.0
 lars_coefficient: 0.001
 
 net_name: "resnet18"
-dataset: "cifar10"
+dataset: "imagenet2012"
 device_num: 1
 pre_trained: ""
-fp32_ckpt: ""
 run_eval: False
 eval_dataset_path: ""
 parameter_server: False
@@ -54,7 +54,7 @@ cache_session_id: ""
 mode_name: "GRAPH"
 boost_mode: "O0"
 conv_init: "XavierUniform"
-dense_init: "RandomNormal"
+dense_init: "TruncatedNormal"
 train_image_size: 224
 eval_image_size: 224
 
@@ -63,9 +63,9 @@ comp_algo: "SLB"
 enable_bn_calibration: False
 quant_type: "W1"
 t_start_val: 1.0
-t_start_time: 0.2
-t_end_time: 0.6
-t_factor: 1.2
+t_start_time: 0.4
+t_end_time: 0.9
+t_factor: 1.12
 
 # Export options
 device_id: 0
@@ -74,7 +74,7 @@ height: 224
 file_name: "resnet18"
 file_format: "MINDIR"
 ckpt_file: ""
-network_dataset: "resnet18_cifar10"
+network_dataset: "resnet18_imagenet2012"
 
 # Retrain options
 save_graphs: False
