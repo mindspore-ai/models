@@ -98,9 +98,27 @@
 
   ```shell
   # Google Landmarks Dataset v2 训练集下载以及转化为mindrecord文件
-  # 【注】请准备至少1.1TB的存储空间，若空间不足可以将可选参数[NEED_ROMOVE_TAR]设置为'y'，设置后占用约633G存储空间
-  bash scripts/download_gldv2.sh 500 [DATASET_PATH] [NEED_ROMOVE_TAR]
-  # example: bash scripts/download_gldv2.sh 500 /home/gldv2 y
+
+  # 【注】一共要下载4个csv文件，500个tar文件，500个md5文件，共占用约633G存储空间，请预留足够空间
+  # 下载数据集时间较长，并且由于网络波动等原因存在，一次执行可能会下载失败，download_gldv2.sh的三个参数分别代码下载的数据集编号最小值，
+  # 最大值，和保存路径
+  bash scripts/download_gldv2.sh 0 499 [DATASET_PATH]
+  # example: bash scripts/download_gldv2.sh 0 499 /home/gldv2
+  # 下载完成后，可以比较下载得到的tar文件的md5值和md5文件，若一致，表明下载正确，否则下载错误，需要重新下载．
+  # 重新下载时，修改前两个参数指定要下载的文件，例如指定'1, 1'表示下载images_001.tar，另外，train.csv, train_clean.csv,
+  # train_attribution.csv, train_label_to_category.csv若已下载成功，可参考脚本注释进行适当修改
+
+  cd [DATASET_PATH]/train
+  # 对下载得到的500个tar文件解压
+  tar xvf images_xxx.tar # 000, 001, 002, 003, ...
+
+  python3 src/build_image_dataset.py \
+  --train_csv_path=[DATASET_PATH]/train/train.csv \
+  --train_clean_csv_path=[DATASET_PATH]/train/train_clean.csv \
+  --train_directory=[DATASET_PATH]/train/*/*/*/ \
+  --output_directory=[DATASET_PATH]/mindrecord/ \
+  --num_shards=128 \
+  --validation_split_size=0.2
 
   # Oxford5k和Paris6k以及它们对应的ground truth文件下载
   bash scripts/download_oxf.sh [DATASET_PATH]
@@ -276,11 +294,9 @@
 ​ 使用以下命令可以下载`Google Landmarks Dataset v2`数据集的训练集，并且自动提取它的clean子集（具体定义参考[数据集](#数据集)中数据集对应的论文）转化为mindrecord格式：
 
 ```shell
-bash scripts/download_gldv2.sh 500 [DATASET_PATH] [NEED_ROMOVE_TAR]
-# example: bash scripts/download_gldv2.sh 500 /home/gldv2 y
+bash scripts/download_gldv2.sh 0 499 [DATASET_PATH]
+# example: bash scripts/download_gldv2.sh 0 499 /home/gldv2
 ```
-
-​ 请准备至少1.1TB的存储空间，若空间不足可以将可选参数`[NEED_ROMOVE_TAR]`设置为`y`，这样会在解压完tar包后将tar包删除，设置后数据集占用约633G存储空间。如果空间仍然不够，可以尝试在`src/build_image_dataset.py`中，搜索`os.remove`语句，将对应语句从注释中恢复过来，如此一来，在转化mindrecord格式的过程中，会边转化边将源图像删除，更改该设置后数据集约占用450G存储空间。转化完成后，如果空间紧缺，那么可以直接将`train`目录删除，剩下`mindrecord`目录文件约占103G。
 
 ​ 目录以及说明：
 
