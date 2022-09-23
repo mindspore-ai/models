@@ -35,12 +35,12 @@ The pyramid pooling module fuses features under four different pyramid scales.Fo
 
 # [Dataset](#Content)
 
-- [PASCAL VOC 2012 and SBD Dataset Website](http://home.bharathh.info/pubs/codes/SBD/download.html)
+- [Semantic Boundaries Dataset](http://home.bharathh.info/pubs/codes/SBD/download.html)
  - It contains 11,357 finely annotated images split into training and testing sets with 8,498 and 2,857 images respectively.
- - The path formats in voc_train_lst.txt and voc_val_lst.txt are different, you can run create_train_lst.py to generate train_lst.txt in data dir for VOC2012. As follow：
+ - The path formats in train.txt and val.txt are partial. And the mat file in the cls needs to be converted to image. You can run preprocess_dataset.py to convert the mat file and generate train_list.txt and val_list.txt. As follow：
 
  ```python
- python src/dataset/create_train_lst.py --data_dir [DATA_DIR]
+ python src/dataset/preprocess_dataset.py --data_dir [DATA_DIR]
  ```
 
 - [ADE20K Dataset Website](http://groups.csail.mit.edu/vision/datasets/ADE20K/)
