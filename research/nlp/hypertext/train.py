@@ -42,10 +42,7 @@ args = parser.parse_args()
 
 config = Config(args.datasetdir, args.outputdir, args.device)
 
-if config.device == 'GPU':
-    context.set_context(mode=context.GRAPH_MODE, device_target='GPU')
-elif config.device == 'Ascend':
-    context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
+context.set_context(mode=context.GRAPH_MODE, device_target=config.device)
 config.num_epochs = int(args.num_epochs)
 config.batch_size = int(args.batch_size)
 config.outputdir = args.outputdir
