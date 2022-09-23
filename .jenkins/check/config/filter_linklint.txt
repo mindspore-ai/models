@@ -1,2 +1,4 @@
 http://www.vision.caltech.edu/visipedia/CUB-200-2011.html
 http://dl.yf.io/dla/models/imagenet/dla34-ba72cf86.pth
+https://s3.amazonaws.com/google-landmark/metadata
+https://s3.amazonaws.com/google-landmark/md5sum
