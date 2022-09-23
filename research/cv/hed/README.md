@@ -249,7 +249,7 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CONFIG_PATH]
 ```
 
 - `MINDIR_PATH` means the path of mindir file.
-- `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n', if you choose y, the cifar10 dataset will be processed in bin format, the imagenet2012 dataset will generate label json file.  
+- `NEED_PREPROCESS` means whether need preprocess or not, it's value is 'y' or 'n', if you choose y, the dataset will be processed in bin format. Default is 'y'.
 - `DEVICE_ID` is optional, default value is 0.
 
 ### result
