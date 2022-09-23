@@ -82,7 +82,7 @@ def write_instance_to_example_files(instances, tokenizer, max_seq_length,
         "masked_lm_positions": {"type": "int32", "shape": [-1]},
         "masked_lm_ids": {"type": "int32", "shape": [-1]},
         "masked_lm_weights": {"type": "float32", "shape": [-1]},
-        "next_sentence_label": {"type": "int32", "shape": [-1]},
+        "next_sentence_labels": {"type": "int32", "shape": [-1]},
     }
     writer = FileWriter(output_file, overwrite=True)
     writer.add_schema(schema)
@@ -127,7 +127,7 @@ def write_instance_to_example_files(instances, tokenizer, max_seq_length,
                 "masked_lm_positions": masked_lm_positions,
                 "masked_lm_ids": masked_lm_ids,
                 "masked_lm_weights": masked_lm_weights,
-                "next_sentence_label": next_sentence_label}
+                "next_sentence_labels": next_sentence_label}
         all_data.append(data)
         if all_data:
             writer.write_raw_data(all_data)
