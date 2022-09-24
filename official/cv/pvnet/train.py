@@ -49,7 +49,7 @@ class Train:
             rank=cfg.rank
         )
         self.current_dir = os.path.dirname(os.path.abspath(__file__))
-        if cfg.pretrained_path is None:
+        if str(cfg.pretrained_path).lower() == 'none':
             self.pretrained_path = None
         else:
             self.pretrained_path = os.path.join(self.current_dir, cfg.pretrained_path)
