@@ -119,6 +119,8 @@ def get_config():
     current_dir = os.path.dirname(os.path.abspath(__file__))
     parser.add_argument("--config_path", type=str, default=os.path.join(current_dir, \
         "../squeezenet_cifar10_config.yaml"), help="Config file path")
+    parser.add_argument('--net-name', type=str, default='suqeezenet', help='Net Name')
+    parser.add_argument('--checkpoint_file_path', type=str, default='', help='Checkpoint File Path')
     path_args, _ = parser.parse_known_args()
     default, helper, choices = parse_yaml(path_args.config_path)
     args = parse_cli_to_yaml(parser=parser, cfg=default, helper=helper, choices=choices, cfg_path=path_args.config_path)

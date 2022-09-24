@@ -31,12 +31,17 @@ if config.net_name == "squeezenet":
         from src.dataset import create_dataset_cifar as create_dataset
     else:
         from src.dataset import create_dataset_imagenet as create_dataset
-else:
+elif config.net_name == "suqeezenet_residual":
     from src.squeezenet import SqueezeNet_Residual as squeezenet
     if config.dataset == "cifar10":
         from src.dataset import create_dataset_cifar as create_dataset
     else:
         from src.dataset import create_dataset_imagenet as create_dataset
+elif config.net_name == "finetune":
+    from src.dataset import create_dataset_imagenet as create_dataset
+    from src.squeezenet import SqueezeNet as squeezenet
+else:
+    print("error: the selected net_name is not in supported set{squeezenet, squeezenet_residual, finetune}")
 
 @moxing_wrapper()
 def eval_net():

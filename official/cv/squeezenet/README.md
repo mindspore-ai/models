@@ -24,7 +24,12 @@
     - [How to use](#how-to-use)
         - [Inference](#inference)
         - [Continue Training on the Pretrained Model](#continue-training-on-the-pretrained-model)
-       - [Transfer Learning](#transfer-learning)
+        - [Transfer Learning](#transfer-learning)
+            - [Dataset Process](#dataset-process1)
+            - [Quick Start](#quick_start1)
+            - [Training Process](#training-process1)
+            - [Evaluation Process](#evaluation-process1)
+            - [Parameters Setting](#parameters_setting)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -178,6 +183,7 @@ After installing MindSpore via the official website, you can start training and 
       ├── dataset.py                         # data preprocessing
       ├── CrossEntropySmooth.py              # loss definition for ImageNet dataset
       ├── lr_generator.py                    # generate learning rate for each step
+      ├── data_split.py                      # script for splitting transfer learning dataset (cpu)
       └── squeezenet.py                      # squeezenet architecture, including squeezenet and squeezenet_residual
   ├── model_utils
   │   ├── device_adapter.py                  # device adapter
@@ -190,6 +196,8 @@ After installing MindSpore via the official website, you can start training and 
   ├── squeezenet_residual_imagenet_config.yaml  # parameter configuration
   ├── train.py                                  # train net
   ├── eval.py                                   # eval net
+  ├── finetune.py                               # transfer train and test (cpu)
+  ├── quick_start.py                            # quick start demo (cpu)
   ├── export.py                                 # export checkpoint files into geir/onnx
   ├── postprocess.py                         # postprocess script
   ├── preprocess.py                          # preprocess script
@@ -282,6 +290,29 @@ Parameters for both training and evaluation can be set in *.yaml
   "save_checkpoint_path": "./",     # path to save checkpoint
   "warmup_epochs": 0,               # number of warmup epoch
   "lr_decay_mode": "cosine"         # decay mode for generating learning rate
+  "use_label_smooth": True,         # label smooth
+  "label_smooth_factor": 0.1,       # label smooth factor
+  "lr_init": 0,                     # initial learning rate
+  "lr_end": 0,                      # final learning rate
+  "lr_max": 0.01,                   # maximum learning rate
+  ```
+
+- config for SqueezeNet, pretrained with ImageNet dataset, finetune with flower_dataset
+
+  ```py
+  "class_num": 5,                # dataset class num
+  "batch_size": 256,                # Batch_size for training, evaluation and export
+  "loss_scale": 1024,               # loss scale
+  "momentum": 0.9,                  # momentum
+  "weight_decay": 7e-5,             # weight decay
+  "epoch_size": 200,                # only valid for taining, which is always 1 for inference
+  "pretrain_epoch_size": 0,         # epoch size that model has been trained before loading pretrained checkpoint, actual training epoch size is equal to epoch_size minus pretrain_epoch_size
+  "save_checkpoint": True,          # whether save checkpoint or not
+  "save_checkpoint_epochs": 1,      # the epoch interval between two checkpoints. By default, the last checkpoint will be saved after the last step
+  "keep_checkpoint_max": 10,        # only keep the last keep_checkpoint_max checkpoint
+  "save_checkpoint_path": "./",     # path to save checkpoint
+  "warmup_epochs": 0,               # number of warmup epoch
+  "lr_decay_mode": "poly"           # decay mode for generating learning rate
   "use_label_smooth": True,         # label smooth
   "label_smooth_factor": 0.1,       # label smooth factor
   "lr_init": 0,                     # initial learning rate
@@ -787,7 +818,85 @@ If you need to use the trained model to perform inference on multiple hardware p
 
 ### Transfer Learning
 
-To be added.
+#### Dataset process
+
+1. Download flower dataset([link](https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz)) and unzip it.
+2. move script splitting transfer learning dataset(`data_split.py`) into `flower_photos/` directory.
+3. run `python data_split.py`, folder `train` and `test` will be generated in `flower_photos/`.
+
+#### Quick Start
+
+```bash
+python quick_start.py --train_url=[FLOWER_DATASET_PATH] --pre_trained=[CKPT_PATH] --config_path=./squeezenet_cpu_config.yaml
+```
+
+#### Training Process
+
+##### Running on CPU
+
+```bash
+# transfer training example and eval example
+Usage: python finetune.py --train_url=[FLOWER_DATASET_PATH] --pre_trained=[PRETRAINED_CKPT_PATH] --config_path=./squeezenet_cpu_config.yaml
+ ```
+
+##### Running on GPU
+
+```bash
+# transfer training example and eval example
+Usage: python finetune.py --train_url=[FLOWER_DATASET_PATH] --pre_trained=[PRETRAINED_CKPT_PATH] --config_path=./squeezenet_cpu_config.yaml
+```
+
+#### Result
+
+- finetune SqueezeNet with flower dataset
+
+- finetune result log:
+
+```log
+epoch: 1 step: 1, loss is 1.619088888168335
+epoch: 1 step: 2, loss is 1.4574248790740967
+epoch: 1 step: 3, loss is 1.3140548467636108
+epoch: 1 step: 4, loss is 1.1410305500030518
+epoch: 1 step: 5, loss is 0.9972432851791382
+...
+```
+
+#### Evaluation Process
+
+```bash
+# transfer eval example
+Usage: python eval.py --net_name=finetune --device_target=CPU --data_path=[FLOWER_TEST_DATASET_PATH] --checkpoint_file_path=[CKPT_PATH] --config_path=./squeezenet_cpu_config.yaml
+ ```
+
+#### Result
+
+- Evaluation SqueezeNet with flower test dataset
+
+- Evaluation process log:
+
+```log
+result: {'top_1_accuracy': 0.94921875, 'top_5_accuracy': 1.0} ckpt= .\squeezenet_finetune_flowerset_1-200_11.ckpt
+...
+```
+
+#### Parameters Setting
+
+| Parameters                 | Contents                              |
+| -------------------------- |---------------------------------------|
+| Model Version              | SqueezeNet                            |
+| Resource                   | CPU 2.60GHz, 6cores; Memory 16G;   |
+| uploaded Date              | 12/08/2022 (month/day/year)           |
+| MindSpore Version          | 1.8.0                                 |
+| Dataset                    | Flower dataset                        |
+| Training Parameters        | epoch=200, steps=2200, batch_size=256, lr=0.01 |
+| Optimizer                  | Momentum                              |
+| Loss Function              | Softmax Cross Entropy                 |
+| outputs                    | probability                           |
+| Loss                       | 0.6812986731529236                    |
+| Speed(CPU)                 | 3803.792 ms/step;                     |
+| Total time(CPU)            | 2.3 hours                             |
+| Parameters                 | 723K                                   |
+| Checkpoint for Fine tuning | 2.83M (.ckpt)                         |
 
 # [Description of Random Situation](#contents)
 
