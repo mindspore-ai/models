@@ -107,6 +107,12 @@ BERT的主干结构为Transformer。对于BERT_base，Transformer包含12个编�
              python generate_chinese_mindrecord.py --data_dir /path/ChineseNER/data/ --vocab_file /path/vocab.txt --output_dir /path/ChineseNER/
           ```
 
+        - 生成ner下游任务：ChineseNER数据集在CPU上的mindrecord数据集
+
+          ```python
+             python generate_chinese_mindrecord.py --data_dir /path/ChineseNER/data/ --vocab_file /path/vocab.txt --output_dir /path/ChineseNER/ --max_seq_length 128
+          ```
+
     - 为squad下游任务生成SquadV1.1 mindrecord数据集
       在生成mindrecord数据集之前，你需要按以上指导下载下游任务对应的SquadV1.1原始数据集及[vocab.txt](https://github.com/yuanxiaosc/BERT-for-Sequence-Labeling-and-Text-Classification/blob/master/pretrained_model/uncased_L-12_H-768_A-12/vocab.txt)
       - 生成squad下游任务：SquadV1.1数据集的mindrecord数据集
@@ -134,7 +140,7 @@ BERT的主干结构为Transformer。对于BERT_base，Transformer包含12个编�
 # 环境要求
 
 - 硬件（Ascend处理器）
-    - 准备Ascend或GPU处理器搭建硬件环境。
+    - 准备Ascend或GPU或CPU处理器搭建硬件环境。
 - 框架
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - 更多关于Mindspore的信息，请查看以下资源：
@@ -364,10 +370,12 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
     ├─__init__.py
     ├─assessment_method.py                    # 评估过程的测评方法
     ├─bert_for_finetune.py                    # 网络骨干编码
+    ├─bert_for_finetune_cpu.py                # 网络骨干编码
     ├─bert_for_pre_training.py                # 网络骨干编码
     ├─bert_model.py                           # 网络骨干编码
     ├─finetune_data_preprocess.py             # 数据预处理
     ├─cluner_evaluation.py                    # 评估线索生成工具
+    ├─cluner_evaluation_cpu.py                # 评估线索生成工具
     ├─CRF.py                                  # 线索数据集评估方法
     ├─dataset.py                              # 数据预处理
     ├─finetune_eval_model.py                  # 网络骨干编码
@@ -375,7 +383,9 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
     ├─utils.py                                # util函数
   ├─pretrain_config.yaml                      # 预训练参数配置
   ├─task_ner_config.yaml                      # 下游任务_ner 参数配置
+  ├─task_ner_cpu_config.yaml                  # 下游任务_ner 参数配置
   ├─task_classifier_config.yaml               # 下游任务_classifier 参数配置
+  ├─task_classifier_cpu_config.yaml           # 下游任务_classifier 参数配置
   ├─task_squad_config.yaml                    # 下游任务_squad 参数配置
   ├─pretrain_eval.py                          # 训练和评估网络
   ├─run_classifier.py                         # 分类器任务的微调和评估网络
@@ -668,6 +678,26 @@ bash scripts/run_classifier.sh
 acc_num XXX, total_num XXX, accuracy 0.588986
 ```
 
+#### CPU处理器上运行后评估tnews数据集
+
+运行以下命令前，确保已设置加载与训练检查点路径。请将检查点路径设置为绝对全路径，例如，
+
+--load_pretrain_checkpoint_path="/data/scripts/checkpoint_bert-20000_1.ckpt" \
+
+--train_data_file_path="/data/tnews/train.mindrecord" \
+
+--eval_data_file_path="/data/tnews/dev.mindrecord"
+
+```bash
+python run_classifier.py --config_path=../../task_classifier_cpu_config.yaml --device_target CPU --do_train=true --do_eval=true --num_class=15 --train_data_file_path="" --eval_data_file_path="" --load_pretrain_checkpoint_path=""
+```
+
+如您选择准确性作为评估方法，可得到如下结果：
+
+```text
+acc_num XXX, total_num XXX, accuracy 0.554200
+```
+
 #### Ascend处理器上运行后评估cluener数据集
 
 运行以下命令前，确保已设置加载与训练检查点路径。请将检查点路径设置为绝对全路径，例如，
@@ -696,6 +726,28 @@ Recall 0.865611
 F1 0.866926
 ```
 
+#### CPU处理器上运行后评估cluener数据集
+
+运行以下命令前，确保已设置加载与训练检查点路径。请将检查点路径设置为绝对全路径，例如，
+
+--label_file_path="/data/finetune/cluener/label_file" \
+
+--load_pretrain_checkpoint_path="/data/scripts/checkpoint_bert-20000_1.ckpt" \
+
+--train_data_file_path="/data/cluener/train.mindrecord" \
+
+--eval_data_file_path="/data/cluener/dev.mindrecord"
+
+```bash
+python run_ner.py --config_path=../../task_ner_cpu_config.yaml --device_target CPU --do_train=true --do_eval=true --assessment_method=Accuracy --use_crf=false --with_lstm=false --label_file_path="" --train_data_file_path="" --eval_data_file_path="" --load_pretrain_checkpoint_path=""
+```
+
+如您选择accuracy作为评估方法，可得到如下结果：
+
+```text
+acc_num XXX, total_num XXX, accuracy 0.916855
+```
+
 #### Ascend处理器上运行后评估chineseNer数据集
 
 运行以下命令前，确保已设置加载与训练检查点路径。请将检查点路径设置为绝对全路径，例如，
@@ -720,6 +772,30 @@ bash scripts/run_ner.sh
 
 ```text
 F1 0.986526
+```
+
+#### CPU处理器上运行后评估chineseNer数据集
+
+运行以下命令前，确保已设置加载与训练检查点路径。请将检查点路径设置为绝对全路径，例如，
+
+--label_file_path="/data/finetune/chineseNer/label_file" \
+
+--load_pretrain_checkpoint_path="/data/scripts/checkpoint_bert-20000_1.ckpt" \
+
+--train_data_file_path="/data/chineseNer/train.mindrecord" \
+
+--eval_data_file_path="/data/chineseNer/dev.mindrecord"
+
+```bash
+python run_ner.py --config_path=../../task_ner_cpu_config.yaml --device_target CPU --do_train=true --do_eval=true --assessment_method=BF1 --use_crf=true --with_lstm=true --label_file_path="" --train_data_file_path="" --eval_data_file_path="" --load_pretrain_checkpoint_path=""
+```
+
+如您选择BF1作为评估方法，可得到如下结果：
+
+```text
+Precision 0.983121
+Recall 0.978546
+F1 0.980828
 ```
 
 #### Ascend处理器上运行后评估msra数据集
@@ -764,6 +840,28 @@ bash scripts/squad.sh
 
 ```text
 {"exact_match": 80.3878923040233284, "f1": 87.6902384023850329}
+```
+
+#### CPU处理器上运行后评估squad v1.1数据集
+
+运行以下命令前，确保已设置加载与训练检查点路径。请将检查点路径设置为绝对全路径，例如，
+
+--vocab_file_path="/data/squad/vocab_bert_large_en.txt" \
+
+--load_pretrain_checkpoint_path="/data/scripts/bert_converted.ckpt" \
+
+--train_data_file_path="/data/squad/train.mindrecord" \
+
+--eval_json_path="/data/squad/dev-v1.1.json" \
+
+```bash
+python run_squad.py --config_path=../../task_squad_config.yaml --device_target CPU --do_train=true --do_eval=true --vocab_file_path="" --train_data_file_path="" --eval_json_path="" --dataset_format tfrecord --load_pretrain_checkpoint_path=""
+```
+
+结果如下：
+
+```text
+{"exact_match": 79.62157048249763, "f1": 87.24089125977054}
 ```
 
 ## 导出mindir模型
