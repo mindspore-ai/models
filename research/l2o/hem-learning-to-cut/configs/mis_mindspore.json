@@ -1,0 +1,85 @@
+{
+  "experiment": {
+    "seed": null,
+    "exp_prefix": "reinforce_mis",
+    "base_log_dir": null,
+    "snapshot_mode": "gap_and_last",
+    "snapshot_gap": 1
+  },
+  "env": {
+    "instance_file_path": "./mis/train",
+    "scip_time_limit": 300,
+    "single_instance_file": "all",
+    "presolving": true,
+    "separating": true,
+    "conflict": true,
+    "heuristics": true,
+    "max_rounds_root": 1
+  },
+  "algorithm": {
+    "evaluate_freq": 0,
+    "evaluate_samples": 4,
+    "optimizer_class": "Adam",
+    "actor_net_lr": 1e-4,
+    "critic_net_lr": 1e-4,
+    "reward_scale": 1e-3,
+    "num_epochs": 800,
+    "max_grad_norm": 2.0,
+    "batch_size": 32,
+    "train_decode_type": "stochastic",
+    "evaluate_decode_type": "greedy",
+    "reward_type": "solving_time",
+    "baseline_type": "simple",
+    "critic_beta": 0.9
+  },
+  "trainer": {
+    "samples_per_epoch": 10,
+    "n_jobs": 10
+  },
+  "net_share": {
+    "embedding_dim": 13,
+    "hidden_dim": 128,
+    "tanh_exploration": 5,
+    "use_tanh": true
+  },
+  "policy": {
+    "n_glimpses": 1,
+    "beam_size": 1
+  },
+  "value": {
+    "n_process_block_iters": 3
+  },
+  "cutsel_percent_policy": {
+    "use_cutsel_percent_policy": true,
+    "train_freq": 2,
+    "train_highlevel_batch_size": 32,
+    "highlevel_actor_lr": 5e-4
+  },
+  "devices": {
+    "global_device": "cuda:0",
+    "multi_devices": [
+      "0",
+      "1"
+    ]
+  },
+  "test_kwargs": {
+    "test_instance_path": "/datasets/learning_to_cut/dataset/data/instances/indset/transfer_500_4",
+    "test_model_path": "/datasets/learning_to_cut/data/parallel_reinforce_with_baseline_fix_logprobsall/parallel_reinforce_with_baseline_fix_logprobsall_2022_04_06_23_52_16_0000--s-1840/params.pkl",
+    "n_jobs": 10
+  },
+  "online_test_kwargs": {
+    "test_freq": 3,
+    "test_instance_path": "./mis/test",
+    "test_n_jobs": 6,
+    "test_env_kwargs": {
+      "scip_time_limit": 300,
+      "single_instance_file": "all",
+      "presolving": true,
+      "separating": true,
+      "conflict": true,
+      "heuristics": true,
+      "max_rounds_root": 1
+    }
+  },
+  "start_epoch": 0
+}
