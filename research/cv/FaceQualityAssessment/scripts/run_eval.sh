@@ -16,7 +16,7 @@
 
 if [ $# != 3 ]
 then
-    echo "Usage: bash run_eval.sh [EVAL_DIR] [USE_DEVICE_ID] [PRETRAINED_BACKBONE]"
+    echo "Usage: bash run_eval.sh [EVAL_DIR] [USE_DEVICE_ID] [CKPT_DIR]"
     exit 1
 fi
 
@@ -44,17 +44,17 @@ ulimit -c unlimited
 
 EVAL_DIR=$(get_real_path $1)
 USE_DEVICE_ID=$2
-PRETRAINED_BACKBONE=$(get_real_path $3)
+CKPT_DIR=$(get_real_path $3)
 
-if [ ! -f $PRETRAINED_BACKBONE ]
+if [ ! -d $CKPT_DIR ]
     then
-    echo "error: PRETRAINED_PATH=$PRETRAINED_BACKBONE is not a file"
+    echo "error: CKPT_DIR=$CKPT_DIR is not a dir"
 exit 1
 fi
 
 echo $EVAL_DIR
 echo $USE_DEVICE_ID
-echo $PRETRAINED_BACKBONE
+echo $CKPT_DIR
 
 echo 'start evaluating'
 export RANK_ID=0
@@ -66,6 +66,6 @@ dev=`expr $USE_DEVICE_ID + 0`
 export DEVICE_ID=$dev
 python ${dirname_path}/${SCRIPT_NAME} \
     --eval_dir=$EVAL_DIR \
-    --pretrained=$PRETRAINED_BACKBONE > eval.log  2>&1 &
+    --ckpt_dir=$CKPT_DIR > eval.log  2>&1 &
 
 echo 'running'

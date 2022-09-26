@@ -348,29 +348,29 @@ epoch[69], iter[6150], loss:1.167064, 9300.77 imgs/sec
 
 ```bash Ascend
 cd ./scripts
-sh run_eval.sh [MINDRECORD_FILE] [USE_DEVICE_ID] [PRETRAINED_BACKBONE]
+sh run_eval.sh [MINDRECORD_FILE] [USE_DEVICE_ID] [CKPT_DIR]
 ```
 
 for example:
 
 ```bash Ascend
 cd ./scripts
-sh run_eval.sh /home/eval.mindrecord 0 /home/a.ckpt
+sh run_eval.sh /home/eval.mindrecord 0 /home/ckpt_dir
 ```
 
 ```bash GPU
 cd ./scripts
-sh run_eval_gpu.sh [MINDRECORD_FILE] [CUDA_VISIBLE_DEVICES] [PRETRAINED_BACKBONE]
+sh run_eval_gpu.sh [MINDRECORD_FILE] [CUDA_VISIBLE_DEVICES] [CKPT_DIR]
 ```
 
 for example:
 
 ```bash GPU
 cd ./scripts
-sh run_eval.sh /home/eval.mindrecord 0 /home/a.ckpt
+sh run_eval.sh /home/eval.mindrecord 0 /home/ckpt_dir
 ```
 
-You will get the result as following in "./scripts/device0/eval.log" or txt file in [PRETRAINED_BACKBONE]'s folder:
+You will get the result as following in "./scripts/device0/eval.log":
 
 ```python
 age accuracy:  0.45773233522001094

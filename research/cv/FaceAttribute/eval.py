@@ -105,31 +105,14 @@ def modelarts_pre_process():
 
         print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
 
-
-@moxing_wrapper(pre_process=modelarts_pre_process)
-def run_eval():
-    '''run eval.'''
-    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False,
-                        device_id=get_device_id())
-
-    network = get_resnet18(config)
-    ckpt_path = config.model_path
-    network = load_pretrain(ckpt_path, network)
-
-    network.set_train(False)
-
-    de_dataloader, steps_per_epoch, _ = data_generator_eval(config)
-
+def eval_func(eval_network, eval_dataloader):
     total_data_num_age, total_data_num_gen, total_data_num_mask = 0, 0, 0
     age_num, gen_num, mask_num = 0, 0, 0
     gen_tp_num, mask_tp_num, gen_fp_num = 0, 0, 0
     mask_fp_num, gen_fn_num, mask_fn_num = 0, 0, 0
-    for step_i, (data, gt_classes) in enumerate(de_dataloader):
-
-        print('evaluating {}/{} ...'.format(step_i + 1, steps_per_epoch))
-
+    for data, gt_classes in eval_dataloader:
         data_tensor = Tensor(data, dtype=mstype.float32)
-        fea = network(data_tensor)
+        fea = eval_network(data_tensor)
 
         gt_age, gt_gen, gt_mask = gt_classes[0]
 
@@ -188,39 +171,46 @@ def run_eval():
     mask_accuracy = float(mask_num) / float(total_data_num_mask)
     mask_f1 = 2. * mask_precision * mask_recall / (mask_precision + mask_recall)
 
-    print('model: ', ckpt_path)
-    print('total age num: ', total_data_num_age)
-    print('total gen num: ', total_data_num_gen)
-    print('total mask num: ', total_data_num_mask)
-    print('age accuracy: ', age_accuracy)
-    print('gen accuracy: ', gen_accuracy)
-    print('mask accuracy: ', mask_accuracy)
-    print('gen precision: ', gen_precision)
-    print('gen recall: ', gen_recall)
-    print('gen f1: ', gen_f1)
-    print('mask precision: ', mask_precision)
-    print('mask recall: ', mask_recall)
-    print('mask f1: ', mask_f1)
+    return total_data_num_age, total_data_num_gen, total_data_num_mask, age_accuracy, \
+        gen_accuracy, mask_accuracy, gen_precision, gen_recall, gen_f1, mask_precision, \
+        mask_recall, mask_f1
 
-    model_name = os.path.basename(ckpt_path).split('.')[0]
-    model_dir = os.path.dirname(ckpt_path)
-    result_txt = os.path.join(model_dir, model_name + '.txt')
-    if os.path.exists(result_txt):
-        os.remove(result_txt)
-    with open(result_txt, 'a') as ft:
-        ft.write('model: {}\n'.format(ckpt_path))
-        ft.write('total age num: {}\n'.format(total_data_num_age))
-        ft.write('total gen num: {}\n'.format(total_data_num_gen))
-        ft.write('total mask num: {}\n'.format(total_data_num_mask))
-        ft.write('age accuracy: {}\n'.format(age_accuracy))
-        ft.write('gen accuracy: {}\n'.format(gen_accuracy))
-        ft.write('mask accuracy: {}\n'.format(mask_accuracy))
-        ft.write('gen precision: {}\n'.format(gen_precision))
-        ft.write('gen recall: {}\n'.format(gen_recall))
-        ft.write('gen f1: {}\n'.format(gen_f1))
-        ft.write('mask precision: {}\n'.format(mask_precision))
-        ft.write('mask recall: {}\n'.format(mask_recall))
-        ft.write('mask f1: {}\n'.format(mask_f1))
+
+@moxing_wrapper(pre_process=modelarts_pre_process)
+def run_eval():
+    '''run eval.'''
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False,
+                        device_id=get_device_id())
+
+    network = get_resnet18(config)
+    de_dataloader, _, _ = data_generator_eval(config)
+    ckpt_files = os.listdir(config.ckpt_dir)
+
+    best_multiply_accuracy = 0
+    for ckpt_file in ckpt_files:
+        if not ckpt_file.endswith(".ckpt"):
+            continue
+        ckpt_path = os.path.join(config.ckpt_dir, ckpt_file)
+        network = load_pretrain(ckpt_path, network)
+        network.set_train(False)
+        result = eval_func(network, de_dataloader)
+
+        if result[3] * result[4] * result[5] > best_multiply_accuracy:
+            best_multiply_accuracy = result[3] * result[4] * result[5]
+            print("===============================", flush=True)
+            print("current best ckpt_path is", ckpt_path, flush=True)
+            print('total age num: ', result[0], flush=True)
+            print('total gen num: ', result[1], flush=True)
+            print('total mask num: ', result[2], flush=True)
+            print('age accuracy: ', result[3], flush=True)
+            print('gen accuracy: ', result[4], flush=True)
+            print('mask accuracy: ', result[5], flush=True)
+            print('gen precision: ', result[6], flush=True)
+            print('gen recall: ', result[7], flush=True)
+            print('gen f1: ', result[8], flush=True)
+            print('mask precision: ', result[9], flush=True)
+            print('mask recall: ', result[10], flush=True)
+            print('mask f1: ', result[11], flush=True)
 
 
 if __name__ == '__main__':

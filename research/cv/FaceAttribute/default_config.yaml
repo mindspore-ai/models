@@ -48,6 +48,7 @@ pretrained: ""
 local_rank: 0
 world_size: 8
 model_path: ""
+ckpt_dir: ""
 
 # export option
 ckpt_file: ""

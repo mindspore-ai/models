@@ -33,6 +33,7 @@ momentum: 0.9
 max_epoch: 40
 warmup_epochs: 0
 pretrained: ''    # change to your own pretrained ckpt
+ckpt_dir: ''
 
 # logging related
 log_interval: 10

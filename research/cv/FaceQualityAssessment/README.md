@@ -326,31 +326,31 @@ epoch[39], iter[19110], loss:2.111101, 8791.05 imgs/sec
 Ascend
 
 cd ./scripts
-sh run_eval.sh [EVAL_DIR] [USE_DEVICE_ID] [PRETRAINED_BACKBONE]
+sh run_eval.sh [EVAL_DIR] [USE_DEVICE_ID] [CKPT_DIR]
 ```
 
 ```bash
 GPU
 
 cd ./scripts
-sh run_eval_gpu.sh [EVAL_DIR] [PRETRAINED_BACKBONE]
+sh run_eval_gpu.sh [EVAL_DIR] [CKPT_DIR]
 ```
 
 ```bash
 CPU
 
 cd ./scripts
-sh run_eval_cpu.sh [EVAL_DIR] [PRETRAINED_BACKBONE]
+sh run_eval_cpu.sh [EVAL_DIR] [CKPT_DIR]
 ```
 
 for example, on Ascend:
 
 ```bash
 cd ./scripts
-sh run_eval.sh /home/eval/ 0 /home/a.ckpt
+sh run_eval.sh /home/eval/ 0 /home/ckpt_path/
 ```
 
-You will get the result as following in "./scripts/device0/eval.log" or txt file in [PRETRAINED_BACKBONE]'s folder:
+You will get the result as following in "./scripts/device0/eval.log":
 
 ```python
 5 keypoints average err:['4.069', '3.439', '4.001', '3.206', '3.413']
