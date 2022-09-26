@@ -185,7 +185,7 @@ class RCAN(nn.Cell):
         n_feats = args.n_feats
         kernel_size = 3
         reduction = args.reduction
-        scale = args.scale[0]
+        scale = args.scale
         self.dytpe = mstype.float16
 
         # RGB mean for DIV2K
