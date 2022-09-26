@@ -48,7 +48,7 @@ env >env.log
 nohup python train.py \
       --batch_size 16 \
       --lr 1e-4 \
-      --scale 2+3+4 \
+      --scale 2 \
       --task_id 0 \
       --dir_data $PATH1 \
       --epochs 500 \
