@@ -21,11 +21,10 @@ from mindspore.common import set_seed
 from mindspore.nn.optim.momentum import Momentum
 from mindspore.context import ParallelMode
 from mindspore.train.model import Model
-from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor, LossMonitor
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor, LossMonitor, Callback
+from mindspore.train.serialization import load_checkpoint, load_param_into_net, save_checkpoint
 from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
-from mindvision.engine.callback import ValAccMonitor
 from src.lr_generator import get_lr
 from src.shufflenetv1 import ShuffleNetV1
 from src.dataset import create_dataset, create_flower_dataset
@@ -36,6 +35,74 @@ from src.model_utils.device_adapter import get_device_id
 
 set_seed(1)
 
+class ValAccMonitor(Callback):
+    """
+    Train loss and validation accuracy monitor, after each epoch save the
+    best checkpoint file with highest validation accuracy.
+    """
+
+    def __init__(self,
+                 model,
+                 dataset_val,
+                 num_epochs,
+                 interval=1,
+                 eval_start_epoch=1,
+                 save_best_ckpt=True,
+                 ckpt_directory="./",
+                 best_ckpt_name="best.ckpt",
+                 metric_name="Accuracy",
+                 dataset_sink_mode=True):
+        super(ValAccMonitor, self).__init__()
+        self.model = model
+        self.dataset_val = dataset_val
+        self.num_epochs = num_epochs
+        self.eval_start_epoch = eval_start_epoch
+        self.save_best_ckpt = save_best_ckpt
+        self.metric_name = metric_name
+        self.interval = interval
+        self.best_res = 0
+        self.dataset_sink_mode = dataset_sink_mode
+
+        if not os.path.isdir(ckpt_directory):
+            os.makedirs(ckpt_directory)
+        self.best_ckpt_path = os.path.join(ckpt_directory, best_ckpt_name)
+
+    def apply_eval(self):
+        """Model evaluation, return validation accuracy."""
+        return self.model.eval(self.dataset_val, dataset_sink_mode=self.dataset_sink_mode)[self.metric_name]
+
+    def epoch_end(self, run_context):
+        """
+        After epoch, print train loss and val accuracy,
+        save the best ckpt file with highest validation accuracy.
+        """
+        def remove_ckpt_file(file_name):
+            os.chmod(file_name, stat.S_IWRITE)
+            os.remove(file_name)
+
+        callback_params = run_context.original_args()
+        cur_epoch = callback_params.cur_epoch_num
+
+        if cur_epoch >= self.eval_start_epoch and (cur_epoch - self.eval_start_epoch) % self.interval == 0:
+            # Validation result
+            res = self.apply_eval()
+            print("-" * 20)
+            print(f"Epoch: [{cur_epoch: 3d} / {self.num_epochs: 3d}], "
+                  f"Train Loss: [{callback_params.net_outputs.asnumpy() :5.3f}], "
+                  f"{self.metric_name}: {res: 5.3f}")
+            # Save the best ckpt file
+            if res >= self.best_res:
+                self.best_res = res
+                if self.save_best_ckpt:
+                    if os.path.exists(self.best_ckpt_path):
+                        remove_ckpt_file(self.best_ckpt_path)
+                    save_checkpoint(callback_params.train_network, self.best_ckpt_path)
+
+    # pylint: disable=unused-argument
+    def end(self, run_context):
+        print("=" * 80)
+        print(f"End of validation the best {self.metric_name} is: {self.best_res: 5.3f}, "
+              f"save the best ckpt file in {self.best_ckpt_path}", flush=True)
 
 def modelarts_pre_process():
     pass
