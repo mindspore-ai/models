@@ -59,7 +59,7 @@ for ((i = 0; i < ${DEVICE_NUM}; i++)); do
   nohup python train.py \
         --batch_size 16 \
         --lr 1e-4 \
-        --scale 2+3+4 \
+        --scale 2 \
         --task_id 0 \
         --dir_data $PATH2 \
         --epochs 500 \
