@@ -374,7 +374,7 @@ Densenet121网络使用ImageNet推理得到的结果如下:
 
 > 你可以从[ckpt下载页面](https://www.mindspore.cn/resources/hub/details?MindSpore/1.7/shufflenetv1_imagenet2012)下载预训练好的ckpt。
 
-在MindSpore CPU环境上运行100轮次，使用MindVision下的ValAccMonitor保存验证集上推理精度最高的ckpt。
+在MindSpore CPU环境上运行100轮次，使用ValAccMonitor保存验证集上推理精度最高的ckpt。
 
 ## 训练结果
 
