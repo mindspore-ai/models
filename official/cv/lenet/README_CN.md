@@ -307,10 +307,6 @@ bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/
 # 训练示例（应用SimQAT算法并加载预训练的全精度checkoutpoint，并进行量化训练）
 cd ./golden_stick/scripts/
 bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/lenet_mnist_config.yaml /path/to/dataset FP32 /path/to/fp32_ckpt
-
-# 训练示例（应用SimQAT算法并加载上次量化训练的checkoutpoint，继续进行量化训练）
-cd ./golden_stick/scripts/
-bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/lenet_mnist_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt
 ```
 
 ## 评估过程
