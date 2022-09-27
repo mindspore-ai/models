@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 if [ $# != 5 ] ; then
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh scripts/run_eval.sh DEVICE_TARGET DEVICE_ID MINDRECORD_DATA CKPT_PATH CONFIG_PATH"
-echo "for example: sh run_eval.sh Ascend 0 /your/path/evaluation.mindrecord /your/path/checkpoint_file ./default_config_large_gpu.yaml"
-echo "Note: set the checkpoint and dataset path in default_config.yaml"
+echo "bash scripts/run_eval.sh DEVICE_TARGET DEVICE_ID MINDRECORD_DATA CKPT_PATH CONFIG_PATH"
+echo "for example: bash run_eval.sh Ascend 0 /your/path/evaluation.mindrecord /your/path/checkpoint_file ./default_config_large_gpu.yaml"
+echo "Note: set the checkpoint and dataset path in default_config_large.yaml"
 echo "=============================================================================================================="
 exit 1;
 fi
