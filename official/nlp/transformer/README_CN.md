@@ -99,12 +99,12 @@ bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_P
     ```python
     # 在 ModelArts 上使用8卡训练
     # (1) 执行a或者b
-    #       a. 在 default_config.yaml 文件中设置 "enable_modelarts=True"
-    #          在 default_config.yaml 文件中设置 "distribute=True"
-    #          在 default_config.yaml 文件中设置 "dataset_path='/cache/data'"
-    #          在 default_config.yaml 文件中设置 "epoch_size: 52"
-    #          (可选)在 default_config.yaml 文件中设置 "checkpoint_url='s3://dir_to_your_pretrained/'"
-    #          在 default_config.yaml 文件中设置 其他参数
+    #       a. 在 default_config_large.yaml 文件中设置 "enable_modelarts=True"
+    #          在 default_config_large.yaml 文件中设置 "distribute=True"
+    #          在 default_config_large.yaml 文件中设置 "dataset_path='/cache/data'"
+    #          在 default_config_large.yaml 文件中设置 "epoch_size: 52"
+    #          (可选)在 default_config_large.yaml 文件中设置 "checkpoint_url='s3://dir_to_your_pretrained/'"
+    #          在 default_config_large.yaml 文件中设置 其他参数
     #       b. 在网页上设置 "enable_modelarts=True"
     #          在网页上设置 "distribute=True"
     #          在网页上设置 "dataset_path=/cache/data"
@@ -125,11 +125,11 @@ bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_P
     #
     # 在 ModelArts 上使用单卡训练
     # (1) 执行a或者b
-    #       a. 在 default_config.yaml 文件中设置 "enable_modelarts=True"
-    #          在 default_config.yaml 文件中设置 "dataset_path='/cache/data'"
-    #          在 default_config.yaml 文件中设置 "epoch_size: 52"
-    #          (可选)在 default_config.yaml 文件中设置 "checkpoint_url='s3://dir_to_your_pretrained/'"
-    #          在 default_config.yaml 文件中设置 其他参数
+    #       a. 在 default_config_large.yaml 文件中设置 "enable_modelarts=True"
+    #          在 default_config_large.yaml 文件中设置 "dataset_path='/cache/data'"
+    #          在 default_config_large.yaml 文件中设置 "epoch_size: 52"
+    #          (可选)在 default_config_large.yaml 文件中设置 "checkpoint_url='s3://dir_to_your_pretrained/'"
+    #          在 default_config_large.yaml 文件中设置 其他参数
     #       b. 在网页上设置 "enable_modelarts=True"
     #          在网页上设置 "dataset_path='/cache/data'"
     #          在网页上设置 "epoch_size: 52"
@@ -149,11 +149,11 @@ bash scripts/run_eval.sh GPU [DEVICE_ID] [MINDRECORD_DATA] [CKPT_PATH] [CONFIG_P
     #
     # 在 ModelArts 上使用单卡验证
     # (1) 执行a或者b
-    #       a. 在 default_config.yaml 文件中设置 "enable_modelarts=True"
-    #          在 default_config.yaml 文件中设置 "checkpoint_url='s3://dir_to_your_trained_model/'"
-    #          在 default_config.yaml 文件中设置 "checkpoint='./transformer/transformer_trained.ckpt'"
-    #          在 default_config.yaml 文件中设置 "dataset_path='/cache/data'"
-    #          在 default_config.yaml 文件中设置 其他参数
+    #       a. 在 default_config_large.yaml 文件中设置 "enable_modelarts=True"
+    #          在 default_config_large.yaml 文件中设置 "checkpoint_url='s3://dir_to_your_trained_model/'"
+    #          在 default_config_large.yaml 文件中设置 "checkpoint='./transformer/transformer_trained.ckpt'"
+    #          在 default_config_large.yaml 文件中设置 "dataset_path='/cache/data'"
+    #          在 default_config_large.yaml 文件中设置 其他参数
     #       b. 在网页上设置 "enable_modelarts=True"
     #          在网页上设置 "checkpoint_url='s3://dir_to_your_trained_model/'"
     #          在网页上设置 "checkpoint='./transformer/transformer_trained.ckpt'"
@@ -271,7 +271,7 @@ options:
 #### 运行选项
 
 ```text
-default_config.yaml:
+default_config_large.yaml:
     transformer_network             version of Transformer model: base | large, default is large
     init_loss_scale_value           initial value of loss scale: N, default is 2^10
     scale_factor                    factor used to update loss scale: N, default is 2
@@ -342,7 +342,7 @@ Parameters for learning rate:
 
 ### 训练过程
 
-- 在`default_config.yaml`中设置选项，包括loss_scale、学习率和网络超参数。点击[这里](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/dataset.html)查看更多数据集信息。
+- 在`default_config_large.yaml`中设置选项，包括loss_scale、学习率和网络超参数。点击[这里](https://www.mindspore.cn/tutorials/zh-CN/r1.7/advanced/dataset.html)查看更多数据集信息。
 
 - 运行`run_standalone_train.sh`，进行Transformer模型的单卡训练。
 
@@ -432,7 +432,8 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 | 损失                        | 2.8                               | 2.9                            |
 | 参数 (M)                    | 213.7                             | 213.7                          |
 | 推理检查点                   | 2.4G （.ckpt文件）                 | 2.4G                            |
-| 脚本                        | <https://gitee.com/mindspore/models/tree/master/official/nlp/transformer> |
+| 脚本                        | [Transformer 脚本](https://gitee.com/mindspore/models/tree/r1.7/official/nlp/transformer) |
+| 模型版本            | large                                                                                   |large|
 
 #### 评估性能
 
@@ -445,6 +446,7 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 | batch_size          | 1                           | 1                           |
 | 输出             | BLEU score                  | BLEU score                  |
 | 准确率            | BLEU=28.7                   | BLEU=24.4                   |
+| 模型版本 | large | large |
 
 ## 随机情况说明
 
@@ -454,7 +456,7 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 - 初始化部分模型权重
 - 随机失活运行
 
-train.py已经设置了一些种子，避免数据集轮换和权重初始化的随机性。若需关闭随机失活，将default_config.yaml中相应的dropout_prob参数设置为0。
+train.py已经设置了一些种子，避免数据集轮换和权重初始化的随机性。若需关闭随机失活，将default_config_large.yaml中相应的dropout_prob参数设置为0。
 
 ## ModelZoo主页
 
