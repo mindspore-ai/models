@@ -20,4 +20,4 @@ export RANK_SIZE=8
 RANK_TABLE_FILE=$(realpath $1)
 export RANK_TABLE_FILE
 
-python3 -m vega.tools.run_pipeline ../src/spnas_distributed.yml -b m -d NPU
+python3 ../train.py --config_path=../src/spnas_distributed.yml

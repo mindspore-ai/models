@@ -86,13 +86,13 @@ Spnas
 ### For training
 
 ```bash
-python3 train.py
+python3 train.py --config_path=src/spnas.yaml
 ```
 
 > Or one can run following script for all tasks.
 
 ```bash
-sh scripts/run_distributed.sh
+sh scripts/run_distributed.sh [RANK_TABLE_PATH]
 ```
 
 ## Evaluation

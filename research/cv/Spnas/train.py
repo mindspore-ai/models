@@ -13,9 +13,15 @@
 # limitations under the License.
 # ============================================================================
 """train"""
+import argparse
 import vega
 
 
 if __name__ == '__main__':
-    vega.run('./src/spnas.yml')
+    parser = argparse.ArgumentParser(description="Spnas network")
+    parser.add_argument("--config_path", type=str, required=True, help="spnas config path.")
+    args = parser.parse_args()
+
+    config_path = args.config_path
     vega.set_backend('mindspore', 'NPU')
+    vega.run(config_path)
