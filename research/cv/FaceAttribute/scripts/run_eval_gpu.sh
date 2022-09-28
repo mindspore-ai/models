@@ -16,7 +16,7 @@
 
 if [ $# != 3 ]
 then
-    echo "Usage: sh run_eval.sh [MINDRECORD_FILE] [CUDA_VISIBLE_DEVICES] [PRETRAINED_BACKBONE]"
+    echo "Usage: sh run_eval.sh [MINDRECORD_FILE] [CUDA_VISIBLE_DEVICES] [CKPT_DIR]"
 exit 1
 fi
 
@@ -42,5 +42,5 @@ cd eval_gpu
 python ${dirname_path}/${SCRIPT_NAME} \
     --mindrecord_path=$1 \
     --device_target="GPU" \
-    --model_path=$3 > eval.log  2>&1 &
+    --ckpt_dir=$3 > eval.log  2>&1 &
 echo 'running'

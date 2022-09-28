@@ -16,7 +16,7 @@
 
 if [ $# -lt 2 ]
 then
-  echo "Usage: bash run_eval_cpu.sh [EVALDATA_PATH] [PRETRAINED_BACKBONE]"
+  echo "Usage: bash run_eval_cpu.sh [EVALDATA_PATH] [CKPT_DIR]"
   exit 1
 fi
 
@@ -28,4 +28,4 @@ cd ..
 python ${BASEPATH}/../eval.py \
           --eval_dir=$1 \
           --device_target='CPU' \
-          --pretrained=$2 > eval.log  2>&1 &
+          --ckpt_dir=$2 > eval.log  2>&1 &

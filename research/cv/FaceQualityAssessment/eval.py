@@ -18,7 +18,6 @@ import time
 import warnings
 import numpy as np
 import cv2
-from tqdm import tqdm
 
 import mindspore.nn as nn
 from mindspore import Tensor
@@ -155,45 +154,15 @@ def modelarts_pre_process():
         print("Device: {}, Finish sync unzip data from {} to {}.".format(get_device_id(), zip_file_1, save_dir_1))
 
 
-@moxing_wrapper(pre_process=modelarts_pre_process)
-def run_eval():
+def eval_func(network):
     '''run eval'''
-    print('----eval----begin----')
-
-    model_path = config.pretrained
-    result_file = model_path.replace('.ckpt', '.txt')
-    if os.path.exists(result_file):
-        os.remove(result_file)
-    epoch_result = open(result_file, 'a')
-    epoch_result.write(model_path + '\n')
-
-    network = FaceQABackbone()
-    ckpt_path = model_path
-
-    if os.path.isfile(ckpt_path):
-        param_dict = load_checkpoint(ckpt_path)
-
-        param_dict_new = {}
-        for key, values in param_dict.items():
-            if key.startswith('moments.'):
-                continue
-            elif key.startswith('network.'):
-                param_dict_new[key[8:]] = values
-            else:
-                param_dict_new[key] = values
-        load_param_into_net(network, param_dict_new)
-
-    else:
-        print('wrong model path')
-        return 1
-
     path = config.eval_dir
     kp_error_all = [[], [], [], [], []]
     eulers_error_all = [[], [], []]
     kp_ipn = []
 
     file_list = os.listdir(path)
-    for file_name in tqdm(file_list):
+    for file_name in file_list:
         if file_name.endswith('jpg'):
             img_path = os.path.join(path, file_name)
             img, img_ori = read_img(img_path)
@@ -249,16 +218,43 @@ def run_eval():
         euler_ave_error.append("%.3f" % (sum(eulers_error_all[eulers])/len(eulers_error_all[eulers])))
         elur_mae.append((sum(eulers_error_all[eulers])/len(eulers_error_all[eulers])))
 
-    print(r'5 keypoints average err:'+str(kp_ave_error))
-    print(r'3 eulers average err:'+str(euler_ave_error))
-    print('IPN of 5 keypoints:'+str(sum(kp_ipn)/len(kp_ipn)*100))
-    print('MAE of elur:'+str(sum(elur_mae)/len(elur_mae)))
+    ipn = sum(kp_ipn)/len(kp_ipn)*100
+    mae = sum(elur_mae)/len(elur_mae)
+    return kp_ave_error, euler_ave_error, ipn, mae
 
-    epoch_result.write(str(sum(kp_ipn)/len(kp_ipn)*100)+'\t'+str(sum(elur_mae)/len(elur_mae))+'\t'
-                       + str(kp_ave_error)+'\t'+str(euler_ave_error)+'\n')
+
+@moxing_wrapper(pre_process=modelarts_pre_process)
+def run_eval():
+    '''run eval'''
+    print('----eval----begin----')
+    ckpt_files = os.listdir(config.ckpt_dir)
+    network = FaceQABackbone()
+
+    best_ipn = 100
+    for ckpt_file in ckpt_files:
+        if not ckpt_file.endswith(".ckpt"):
+            continue
+        ckpt_path = os.path.join(config.ckpt_dir, ckpt_file)
+        param_dict = load_checkpoint(ckpt_path)
+        param_dict_new = {}
+        for key, values in param_dict.items():
+            if key.startswith('moments.'):
+                continue
+            elif key.startswith('network.'):
+                param_dict_new[key[8:]] = values
+            else:
+                param_dict_new[key] = values
+        load_param_into_net(network, param_dict_new)
+        err1, err2, ipn, mae = eval_func(network)
+        if ipn < best_ipn:
+            best_ipn = ipn
+            print("current best result as follows, ckpt path {}", ckpt_path, flush=True)
+            print(r'5 keypoints average err:', err1, flush=True)
+            print(r'3 eulers average err:', err2, flush=True)
+            print('IPN of 5 keypoints:', ipn, flush=True)
+            print('MAE of elur:', mae, flush=True)
 
     print('----eval----end----')
-    return 0
 
 
 if __name__ == "__main__":
