@@ -307,10 +307,6 @@ bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/
 # standalone training example, apply SimQAT and train from full precision checkpoint
 cd ./golden_stick/scripts/
 bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/lenet_mnist_config.yaml /path/to/dataset FP32 /path/to/fp32_ckpt
-
-# standalone training example, apply SimQAT and train from pretrained checkpoint
-cd ./golden_stick/scripts/
-bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/lenet_mnist_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt
 ```
 
 ## Evaluation Process

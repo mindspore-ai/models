@@ -89,9 +89,6 @@ cd ./train || exit
 if [ "x$CKPT_TYPE" == "xFP32" ]; then
   python train.py --config_path=$CONFIG_FILE --device_target="GPU" --data_path=$DATASET_PATH \
           --fp32_ckpt=$CKPT_FILE &> log &
-elif [ "x$CKPT_TYPE" == "xPRETRAINED" ]; then
-  python train.py --config_path=$CONFIG_FILE --device_target="GPU" --data_path=$DATASET_PATH \
-          --pre_trained=$CKPT_FILE &> log &
 else
   python train.py --config_path=$CONFIG_FILE --device_target="GPU" --data_path=$DATASET_PATH &> log &
 fi
