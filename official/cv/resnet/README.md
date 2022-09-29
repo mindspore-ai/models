@@ -874,8 +874,6 @@ cd ./golden_stick/scripts/
 bash run_distribute_train_gpu.sh ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml /path/to/dataset FP32 /path/to/fp32_ckpt
 ```
 
-- SLB only support standalone training now, and not support train from full precision checkpoint.
-
 ## Evaluation Process
 
 ### Running on GPU
@@ -913,19 +911,145 @@ result:{'top_1_accuracy': 0.9273838141025641} prune_rate=0.45 ckpt=~/resnet50_ci
 - Apply SLB on ResNet18 with W4, and evaluating with CIFAR-10 dataset. W4 means quantize weight with 4bit:
 
 ```text
-result:{'top_1_accuracy': 0.9534254807692307, 'top_5_accuracy': 0.9969951923076923} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+result:{'top_1_accuracy': 0.9534254807692307, 'top_5_accuracy': 0.9969951923076923} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- Apply SLB on ResNet18 with W4, enable BatchNorm calibration and evaluating with CIFAR-10 dataset. W4 means quantize weight with 4bit:
+
+```text
+result:{'top_1_accuracy': 0.9537259230480767, 'top_5_accuracy': 0.9970251907601913} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- Apply SLB on ResNet18 with W4A8, and evaluating with CIFAR-10 dataset. W4 means quantize weight with 4bit, A8 means quantize activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.9493423482907600, 'top_5_accuracy': 0.9965192030237169} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- Apply SLB on ResNet18 with W4A8, enable BatchNorm calibration and evaluating with CIFAR-10 dataset. W4 means quantize weight with 4bit, A8 means quantize activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.9502425480769207, 'top_5_accuracy': 0.99679551926923707} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
 ```
 
 - Apply SLB on ResNet18 with W2, and evaluating with CIFAR-10 dataset. W2 means quantize weight with 2bit:
 
 ```text
-result:{'top_1_accuracy': 0.9503205128205128, 'top_5_accuracy': 0.9966947115384616} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+result:{'top_1_accuracy': 0.9503205128205128, 'top_5_accuracy': 0.9966947115384616} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- Apply SLB on ResNet18 with W2, enable BatchNorm calibration and evaluating with CIFAR-10 dataset. W2 means quantize weight with 2bit:
+
+```text
+result:{'top_1_accuracy': 0.9509508250132057, 'top_5_accuracy': 0.9967347384161105} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- Apply SLB on ResNet18 with W2A8, and evaluating with CIFAR-10 dataset. W2 means quantize weight with 2bit, A8 means quantize activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.9463205184161728, 'top_5_accuracy': 0.9963947115384616} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- Apply SLB on ResNet18 with W2A8, enable BatchNorm calibration and evaluating with CIFAR-10 dataset. W2 means quantize weight with 2bit, A8 means quantize activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.9473382052115128, 'top_5_accuracy': 0.9964718041530417} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
 ```
 
 - Apply SLB on ResNet18 with W1, and evaluating with CIFAR-10 dataset. W1 means quantize weight with 1bit:
 
 ```text
-result:{'top_1_accuracy': 0.9485176282051282, 'top_5_accuracy': 0.9965945512820513} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+result:{'top_1_accuracy': 0.9485176282051282, 'top_5_accuracy': 0.9965945512820513} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- Apply SLB on ResNet18 with W1, enable BatchNorm calibration and evaluating with CIFAR-10 dataset. W1 means quantize weight with 1bit:
+
+```text
+result:{'top_1_accuracy': 0.9491012820516176, 'top_5_accuracy': 0.9966351282059453} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- Apply SLB on ResNet18 with W1A8, and evaluating with CIFAR-10 dataset. W1 means quantize weight with 1bit, A8 means quantize activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.9450068910250512, 'top_5_accuracy': 0.9962450312382200} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- Apply SLB on ResNet18 with W1A8, enable BatchNorm calibration and evaluating with CIFAR-10 dataset. W1 means quantize weight with 1bit, A8 means quantize activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.9466145833333334, 'top_5_accuracy': 0.9964050320512820} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- Apply SLB on ResNet18 with W4, and evaluating with ImageNet2012 dataset. W4 means quantize weight with 4bit:
+
+```text
+result:{'top_1_accuracy': 0.6858173076923076, 'top_5_accuracy': 0.8850560897435897} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- Apply SLB on ResNet18 with W4, enable BatchNorm calibration and evaluating with ImageNet2012 dataset. W4 means quantize weight with 4bit:
+
+```text
+result:{'top_1_accuracy': 0.6865184294871795, 'top_5_accuracy': 0.8856570512820513} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- Apply SLB on ResNet18 with W4A8, and evaluating with ImageNet2012 dataset. W4 means quantize weight with 4bit, A8 means quantize activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.6809975961503861, 'top_5_accuracy': 0.8819477163043847} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- Apply SLB on ResNet18 with W4A8, enable BatchNorm calibration and evaluating with ImageNet2012 dataset. W4 means quantize weight with 4bit, A8 means quantize activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.6816538461538406, 'top_5_accuracy': 0.8826121794871795} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- Apply SLB on ResNet18 with W2, and evaluating with ImageNet2012 dataset. W2 means quantize weight with 2bit:
+
+```text
+result:{'top_1_accuracy': 0.6840144230769231, 'top_5_accuracy': 0.8825320512820513} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- Apply SLB on ResNet18 with W2, enable BatchNorm calibration and evaluating with ImageNet2012 dataset. W2 means quantize weight with 2bit:
+
+```text
+result:{'top_1_accuracy': 0.6841746794871795, 'top_5_accuracy': 0.8840344551282051} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- Apply SLB on ResNet18 with W2A8, and evaluating with ImageNet2012 dataset. W2 means quantize weight with 2bit, A8 means quantize activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.6791516410250210, 'top_5_accuracy': 0.8808693910256410} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- Apply SLB on ResNet18 with W2A8, enable BatchNorm calibration and evaluating with ImageNet2012 dataset. W2 means quantize weight with 2bit, A8 means quantize activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.6805694500104102, 'top_5_accuracy': 0.8814763916410150} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- Apply SLB on ResNet18 with W1, and evaluating with ImageNet2012 dataset. W1 means quantize weight with 1bit:
+
+```text
+result:{'top_1_accuracy': 0.6652945112820795, 'top_5_accuracy': 0.8690705128205128} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- Apply SLB on ResNet18 with W1, enable BatchNorm calibration and evaluating with ImageNet2012 dataset. W1 means quantize weight with 1bit:
+
+```text
+result:{'top_1_accuracy': 0.6675184294871795, 'top_5_accuracy': 0.8707516025641026} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- Apply SLB on ResNet18 with W1A8, and evaluating with ImageNet2012 dataset. W1 means quantize weight with 1bit, A8 means quantize activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.6589927884615384, 'top_5_accuracy': 0.8664262820512820} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- Apply SLB on ResNet18 with W1A8, enable BatchNorm calibration and evaluating with ImageNet2012 dataset. W1 means quantize weight with 1bit, A8 means quantize activation with 8bit:
+
+```text
+result:{'top_1_accuracy': 0.6609142628205128, 'top_5_accuracy': 0.8670873397435898} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
 ```
 
 # [Model Description](#contents)

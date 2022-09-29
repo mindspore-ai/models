@@ -954,22 +954,148 @@ result:{'top_1_accuracy': 0.9354967948717948, 'top_5_accuracy': 0.99819711538461
 result:{'top_1_accuracy': 0.9273838141025641} prune_rate=0.45 ckpt=~/resnet50_cifar10/train_parallel0/resnet-400_390.ckpt
 ```
 
-- 使用SLB算法对ResNet18做W4量化，并使用CIFAR-10数据集评估，W4表示weight量化为4bit：
+- 使用SLB算法对ResNet18做W4量化，并使用CIFAR-10数据集评估，W4表示权重量化为4bit：
 
 ```text
-result:{'top_1_accuracy': 0.9534254807692307, 'top_5_accuracy': 0.9969951923076923} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+result:{'top_1_accuracy': 0.9534254807692307, 'top_5_accuracy': 0.9969951923076923} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
 ```
 
-- 使用SLB算法对ResNet18做W2量化，并使用CIFAR-10数据集评估，W2表示weight量化为2bit：
+- 使用SLB算法对ResNet18做W4量化，开启BatchNorm层矫正功能，并使用CIFAR-10数据集评估，W4表示权重量化为4bit：
 
 ```text
-result:{'top_1_accuracy': 0.9503205128205128, 'top_5_accuracy': 0.9966947115384616} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+result:{'top_1_accuracy': 0.9537259230480767, 'top_5_accuracy': 0.9970251907601913} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
 ```
 
-- 使用SLB算法对ResNet18做W1量化，并使用CIFAR-10数据集评估，W1表示weight量化为1bit：
+- 使用SLB算法对ResNet18做W4A8量化，并使用CIFAR-10数据集评估，W4表示权重量化为4bit，A8表示激活量化为8bit：
 
 ```text
-result:{'top_1_accuracy': 0.9485176282051282, 'top_5_accuracy': 0.9965945512820513} ckpt=~/resnet18_cifar10/train_parallel/resnet-100_1562.ckpt
+result:{'top_1_accuracy': 0.9493423482907600, 'top_5_accuracy': 0.9965192030237169} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- 使用SLB算法对ResNet18做W4A8量化，开启BatchNorm层矫正功能，并使用CIFAR-10数据集评估，W4表示权重量化为4bit，A8表示激活量化为8bit：
+
+```text
+result:{'top_1_accuracy': 0.9502425480769207, 'top_5_accuracy': 0.99679551926923707} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- 使用SLB算法对ResNet18做W2量化，并使用CIFAR-10数据集评估，W2表示权重量化为2bit：
+
+```text
+result:{'top_1_accuracy': 0.9503205128205128, 'top_5_accuracy': 0.9966947115384616} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- 使用SLB算法对ResNet18做W2量化，开启BatchNorm层矫正功能，并使用CIFAR-10数据集评估，W2表示权重量化为2bit：
+
+```text
+result:{'top_1_accuracy': 0.9509508250132057, 'top_5_accuracy': 0.9967347384161105} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- 使用SLB算法对ResNet18做W2A8量化，并使用CIFAR-10数据集评估，W2表示权重量化为2bit，A8表示激活量化为8bit：
+
+```text
+result:{'top_1_accuracy': 0.9463205184161728, 'top_5_accuracy': 0.9963947115384616} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- 使用SLB算法对ResNet18做W2A8量化，开启BatchNorm层矫正功能，并使用CIFAR-10数据集评估，W2表示权重量化为2bit，A8表示激活量化为8bit：
+
+```text
+result:{'top_1_accuracy': 0.9473382052115128, 'top_5_accuracy': 0.9964718041530417} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- 使用SLB算法对ResNet18做W1量化，并使用CIFAR-10数据集评估，W1表示权重量化为1bit：
+
+```text
+result:{'top_1_accuracy': 0.9485176282051282, 'top_5_accuracy': 0.9965945512820513} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- 使用SLB算法对ResNet18做W1量化，开启BatchNorm层矫正功能，并使用CIFAR-10数据集评估，W1表示权重量化为1bit：
+
+```text
+result:{'top_1_accuracy': 0.9491012820516176, 'top_5_accuracy': 0.9966351282059453} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- 使用SLB算法对ResNet18做W1A8量化，并使用CIFAR-10数据集评估，W1表示权重量化为1bit，A8表示激活量化为8bit：
+
+```text
+result:{'top_1_accuracy': 0.9450068910250512, 'top_5_accuracy': 0.9962450312382200} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- 使用SLB算法对ResNet18做W1A8量化，开启BatchNorm层矫正功能，并使用CIFAR-10数据集评估，W1表示权重量化为1bit，A8表示激活量化为8bit：
+
+```text
+result:{'top_1_accuracy': 0.9466145833333334, 'top_5_accuracy': 0.9964050320512820} ckpt=~/resnet18_cifar10/train_parallel0/resnet-100_195.ckpt
+```
+
+- 使用SLB算法对ResNet18做W4量化，并使用ImageNet2012数据集评估，W4表示权重量化为4bit：
+
+```text
+result:{'top_1_accuracy': 0.6858173076923076, 'top_5_accuracy': 0.8850560897435897} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- 使用SLB算法对ResNet18做W4量化，开启BatchNorm层矫正功能，并使用ImageNet2012数据集评估，W4表示权重量化为4bit：
+
+```text
+result:{'top_1_accuracy': 0.6865184294871795, 'top_5_accuracy': 0.8856570512820513} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- 使用SLB算法对ResNet18做W4A8量化，并使用ImageNet2012数据集评估，W4表示权重量化为4bit，A8表示激活量化为8bit：
+
+```text
+result:{'top_1_accuracy': 0.6809975961503861, 'top_5_accuracy': 0.8819477163043847} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- 使用SLB算法对ResNet18做W4A8量化，开启BatchNorm层矫正功能，并使用ImageNet2012数据集评估，W4表示权重量化为4bit，A8表示激活量化为8bit：
+
+```text
+result:{'top_1_accuracy': 0.6816538461538406, 'top_5_accuracy': 0.8826121794871795} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- 使用SLB算法对ResNet18做W2量化，并使用ImageNet2012数据集评估，W2表示权重量化为2bit：
+
+```text
+result:{'top_1_accuracy': 0.6840144230769231, 'top_5_accuracy': 0.8825320512820513} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- 使用SLB算法对ResNet18做W2量化，开启BatchNorm层矫正功能，并使用ImageNet2012数据集评估，W2表示权重量化为2bit：
+
+```text
+result:{'top_1_accuracy': 0.6841746794871795, 'top_5_accuracy': 0.8840344551282051} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- 使用SLB算法对ResNet18做W2A8量化，并使用ImageNet2012数据集评估，W2表示权重量化为2bit，A8表示激活量化为8bit：
+
+```text
+result:{'top_1_accuracy': 0.6791516410250210, 'top_5_accuracy': 0.8808693910256410} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- 使用SLB算法对ResNet18做W2A8量化，开启BatchNorm层矫正功能，并使用ImageNet2012数据集评估，W2表示权重量化为2bit，A8表示激活量化为8bit：
+
+```text
+result:{'top_1_accuracy': 0.6805694500104102, 'top_5_accuracy': 0.8814763916410150} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- 使用SLB算法对ResNet18做W1量化，并使用ImageNet2012数据集评估，W1表示权重量化为1bit：
+
+```text
+result:{'top_1_accuracy': 0.6652945112820795, 'top_5_accuracy': 0.8690705128205128} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- 使用SLB算法对ResNet18做W1量化，开启BatchNorm层矫正功能，并使用ImageNet2012数据集评估，W1表示权重量化为1bit：
+
+```text
+result:{'top_1_accuracy': 0.6675184294871795, 'top_5_accuracy': 0.8707516025641026} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- 使用SLB算法对ResNet18做W1A8量化，并使用ImageNet2012数据集评估，W1表示权重量化为1bit，A8表示激活量化为8bit：
+
+```text
+result:{'top_1_accuracy': 0.6589927884615384, 'top_5_accuracy': 0.8664262820512820} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- 使用SLB算法对ResNet18做W1A8量化，开启BatchNorm层矫正功能，并使用ImageNet2012数据集评估，W1表示权重量化为1bit，A8表示激活量化为8bit：
+
+```text
+result:{'top_1_accuracy': 0.6609142628205128, 'top_5_accuracy': 0.8670873397435898} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
 ```
 
 #### Ascend结果
