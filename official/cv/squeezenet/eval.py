@@ -31,7 +31,7 @@ if config.net_name == "squeezenet":
         from src.dataset import create_dataset_cifar as create_dataset
     else:
         from src.dataset import create_dataset_imagenet as create_dataset
-elif config.net_name == "suqeezenet_residual":
+elif config.net_name == "squeezenet_residual":
     from src.squeezenet import SqueezeNet_Residual as squeezenet
     if config.dataset == "cifar10":
         from src.dataset import create_dataset_cifar as create_dataset
