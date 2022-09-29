@@ -1,0 +1,43 @@
+{
+    "im_slowfast": {
+        "stream_config": {
+            "deviceId": "0"
+        },
+        "appsrc0": {
+            "props": {
+                "blocksize": "40960000"
+            },
+           "factory": "appsrc",
+           "next": "mxpi_tensorinfer0:0"
+        },
+        "appsrc1": {
+            "props": {
+                "blocksize": "40960000"
+            },
+           "factory": "appsrc",
+           "next": "mxpi_tensorinfer0:1"
+        },
+        "appsrc2": {
+            "props": {
+                "blocksize": "40960000"
+            },
+           "factory": "appsrc",
+           "next": "mxpi_tensorinfer0:2"
+        },
+        "mxpi_tensorinfer0": {
+            "props": {
+                "dataSource": "appsrc0,appsrc1,appsrc2",
+                "modelPath": "../data/model/slowfast.om"
+            },
+            "factory": "mxpi_tensorinfer",
+            "next": "appsink0"
+        },
+        "appsink0": {
+            "props": {
+                "blocksize": "4096000"
+            },
+            "factory": "appsink"
+        }
+    }
+  }
+  
