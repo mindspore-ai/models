@@ -6,7 +6,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-3.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -34,5 +34,6 @@ atc --framework=1 \
     --model=$model_path \
     --output=$output_model_name \
     --fusion_switch_file=fusion_switch.cfg \
+    --precision_mode=allow_fp32_to_fp16 \
     --op_select_implmode=high_precision \
     --soc_version=Ascend310
