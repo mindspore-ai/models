@@ -47,8 +47,8 @@ class YOLOv3Tiny(nn.Cell):
         super(YOLOv3Tiny, self).__init__()
 
         self.backbone = backbone
-        self.head1 = nn.Conv2d(512, 255, kernel_size=1, stride=1, has_bias=True)
-        self.head2 = nn.Conv2d(256, 255, kernel_size=1, stride=1, has_bias=True)
+        self.head1 = nn.Conv2d(512, config.out_channel, kernel_size=1, stride=1, has_bias=True)
+        self.head2 = nn.Conv2d(256, config.out_channel, kernel_size=1, stride=1, has_bias=True)
         self.concat = P.Concat(axis=1)
 
     def construct(self, x):

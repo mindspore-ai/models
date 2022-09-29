@@ -55,11 +55,12 @@ def set_default():
         config.t_max = config.max_epoch
 
     config.lr_epochs = list(map(int, config.lr_epochs.split(',')))
-    config.data_root = os.path.join(config.data_dir, 'train2017')
-    config.ann_file = os.path.join(config.data_dir, 'annotations/instances_train2017.json')
-
-    config.data_val_root = os.path.join(config.data_dir, 'val2017')
-    config.ann_val_file = os.path.join(config.data_dir, 'annotations/instances_val2017.json')
+    if config.finetune:
+        config.data_root = os.path.join(config.data_dir, 'train/images')
+        config.ann_file = os.path.join(config.data_dir, 'annotations_json/train.json')
+    else:
+        config.data_root = os.path.join(config.data_dir, 'train2017')
+        config.ann_file = os.path.join(config.data_dir, 'annotations/instances_train2017.json')
 
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, device_id=get_device_id())
 
@@ -183,7 +184,28 @@ def prepare_network():
     network = YOLOv3(is_training=True)
     # default is kaiming-normal
     default_recurisive_init(network)
-    load_yolo_params(config, network)
+    if config.finetune:
+        param_dict = ms.load_checkpoint(config.finetune_path)
+        param_dict_new = {}
+        for key, values in param_dict.items():
+            if key.startswith('moments.'):
+                continue
+            elif key.startswith('yolo_network.'):
+                param_dict_new[key[13:]] = values
+            else:
+                param_dict_new[key] = values
+        for key in list(param_dict_new.keys()):
+            if 'feature_map.head1.weight' in key:
+                del param_dict_new[key]
+            if 'feature_map.head1.bias' in key:
+                del param_dict_new[key]
+            if 'feature_map.head2.weight' in key:
+                del param_dict_new[key]
+            if 'feature_map.head2.bias' in key:
+                del param_dict_new[key]
+        ms.load_param_into_net(network, param_dict_new)
+    else:
+        load_yolo_params(config, network)
 
     network = YOLOWithLossCell(network)
     return network
@@ -235,10 +257,10 @@ def run_train():
 
     if config.rank_save_ckpt_flag:
         # checkpoint save
-        ckpt_max_num = config.max_epoch * config.steps_per_epoch // config.ckpt_interval
+        ckpt_max_num = 5 * config.steps_per_epoch // config.ckpt_interval
         ckpt_config = CheckpointConfig(save_checkpoint_steps=config.ckpt_interval, keep_checkpoint_max=ckpt_max_num)
         save_ckpt_path = os.path.join(config.outputs_dir, f'ckpt_{config.rank}/')
-        ckpt_cb = ModelCheckpoint(config=ckpt_config, directory=save_ckpt_path, prefix='{}'.format(config.rank))
+        ckpt_cb = ModelCheckpoint(config=ckpt_config, directory=save_ckpt_path, prefix='yolov3_tiny')
         cb_params = _InternalCallbackParam()
         cb_params.train_network = network
         cb_params.epoch_num = ckpt_max_num
