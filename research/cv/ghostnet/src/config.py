@@ -36,4 +36,5 @@ config = ed({
     "save_checkpoint_epochs": 20,
     "keep_checkpoint_max": 10,
     "save_checkpoint_path": "./",
+    "filter_weight": True,
 })
