@@ -24,7 +24,7 @@ from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from slb import create_slb
 from src.lr_generator import get_lr
 from src.CrossEntropySmooth import CrossEntropySmooth
-from src.metric import DistAccuracy
+from src.metric import DistAccuracy, ClassifyCorrectCell
 from src.resnet import conv_variance_scaling_initializer
 from src.resnet import resnet18 as resnet
 from src.model_utils.config import config
@@ -215,7 +215,7 @@ def train_net():
     print("Train configure: {}".format(config))
     target = config.device_target
     if target != "GPU":
-        raise NotImplementedError("SLB only support running on GPU now!")
+        raise ValueError("SLB only support running on GPU now!")
     set_parameter()
     dataset = create_dataset(dataset_path=config.data_path, do_train=True,
                              batch_size=config.batch_size, train_image_size=config.train_image_size,
@@ -248,12 +248,14 @@ def train_net():
 
     loss = init_loss_scale()
     loss_scale = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
+    dist_eval_network = ClassifyCorrectCell(net) if config.run_distribute else None
 
     metrics = {"acc"}
     if config.run_distribute:
         metrics = {'acc': DistAccuracy(batch_size=config.batch_size, device_num=config.device_num)}
     model = ms.Model(net, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale, metrics=metrics,
                      amp_level="O0", boost_level=config.boost_mode, keep_batchnorm_fp32=False,
+                     eval_network=dist_eval_network,
                      boost_config_dict={"grad_freeze": {"total_steps": config.epoch_size * step_size}})
 
     # define callbacks
@@ -262,7 +264,7 @@ def train_net():
 
     cb = [time_cb, loss_cb]
     if algo:
-        algo_cb_list = algo.callbacks(model)
+        algo_cb_list = algo.callbacks(model, dataset)
         cb += algo_cb_list
 
     ckpt_save_dir = set_save_ckpt_dir()
