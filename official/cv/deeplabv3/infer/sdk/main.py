@@ -20,8 +20,9 @@ import json
 import os
 import cv2
 import numpy as np
-from StreamManagerApi import MxDataInput
 from StreamManagerApi import StreamManagerApi
+from StreamManagerApi import InProtobufVector, MxProtobufIn, MxDataInput
+import MxpiDataType_pb2 as MxpiDataType
 from get_dataset_colormap import label_to_color_image
 
 PIPELINE_PATH = "../data/config/deeplabv3.pipeline"
@@ -58,16 +59,35 @@ def _init_stream(pipeline_path):
         return stream_manager_api
 
 
-def _do_infer(stream_manager_api, data_input):
+def _do_infer(stream_manager_api, data_input, origin_img):
     stream_name = b'segmentation'
-    unique_id = stream_manager_api.SendDataWithUniqueId(
-        stream_name, 0, data_input)
+    vision_list = MxpiDataType.MxpiVisionList()
+    vision_vec = vision_list.visionVec.add()
+    vision_vec.visionInfo.format = 0
+    vision_vec.visionInfo.width = origin_img.shape[1]
+    vision_vec.visionInfo.height = origin_img.shape[0]
+    vision_vec.visionInfo.widthAligned = origin_img.shape[1]
+    vision_vec.visionInfo.heightAligned = origin_img.shape[0]
+
+    vision_vec.visionData.memType = 0
+
+    vision_vec.visionData.dataStr = data_input.tobytes()
+    vision_vec.visionData.dataSize = len(data_input)
+
+    protobuf = MxProtobufIn()
+    protobuf.key = b"appsrc0"
+    protobuf.type = b'MxTools.MxpiVisionList'
+    protobuf.protobuf = vision_list.SerializeToString()
+    protobuf_vec = InProtobufVector()
+
+    protobuf_vec.push_back(protobuf)
+    unique_id = stream_manager_api.SendProtobuf(stream_name, 0, protobuf_vec)
+
     if unique_id < 0:
         raise RuntimeError("Failed to send data to stream.")
 
-    timeout = 3000
-    infer_result = stream_manager_api.GetResultWithUniqueId(
-        stream_name, unique_id, timeout)
+    infer_result = stream_manager_api.GetResult(stream_name, unique_id)
+
     if infer_result.errorCode != 0:
         raise RuntimeError(
             "GetResultWithUniqueId error, errorCode=%d, errorMsg=%s" % (
@@ -79,6 +99,37 @@ def _do_infer(stream_manager_api, data_input):
     shape = image_mask['shape']
     return np.frombuffer(data_str, dtype=np.uint8).reshape(shape)
 
+
+def resize_long(img, long_size=513):
+    h, w, _ = img.shape
+    if h > w:
+        new_h = long_size
+        new_w = int(1.0 * long_size * w / h)
+    else:
+        new_w = long_size
+        new_h = int(1.0 * long_size * h / w)
+    imo = cv2.resize(img, (new_w, new_h))
+    return imo
+
+
+def pre_process(img_, crop_size=513):
+    image_mean = [103.53, 116.28, 123.675]
+    image_std = [57.375, 57.120, 58.395]
+    # resize
+    img_ = resize_long(img_, crop_size)
+
+    # mean, std
+    image_mean = np.array(image_mean)
+    image_std = np.array(image_std)
+    img_ = (img_ - image_mean) / image_std
+
+    # pad to crop_size
+    pad_h = crop_size - img_.shape[0]
+    pad_w = crop_size - img_.shape[1]
+    if pad_h > 0 or pad_w > 0:
+        img_ = cv2.copyMakeBorder(img_, 0, pad_h, 0, pad_w, cv2.BORDER_CONSTANT, value=0)
+
+    return img_
 
 def main():
     args = _parse_args()
@@ -97,9 +148,15 @@ def main():
             img_path = os.path.join(args.data_root, img_path)
             msk_path = os.path.join(args.data_root, msk_path)
             msk_ = cv2.imread(msk_path, cv2.IMREAD_GRAYSCALE)
-            with open(img_path, 'rb') as f:
-                data_input.data = f.read()
-            each_array = _do_infer(stream_manager_api, data_input)
+            img_ = cv2.imread(img_path)
+            re_img = img_
+
+            crop_size = 513
+            img_ = pre_process(img_, crop_size)
+
+            data_input = img_.astype("float32")
+
+            each_array = _do_infer(stream_manager_api, data_input, re_img)
 
             hist += _cal_hist(
                 msk_.flatten(), each_array.flatten(), args.num_classes)
@@ -115,7 +172,6 @@ def main():
         print("mean IoU", np.nanmean(iou))
 
     stream_manager_api.DestroyAllStreams()
-
 
 if __name__ == '__main__':
     main()

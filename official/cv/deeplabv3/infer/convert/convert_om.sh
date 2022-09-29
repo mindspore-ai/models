@@ -34,5 +34,6 @@ atc --framework=1 \
     --model=$model_path \
     --output=$output_model_name \
     --fusion_switch_file=fusion_switch.cfg \
+    --precision_mode=allow_fp32_to_fp16 \
     --op_select_implmode=high_precision \
     --soc_version=Ascend310
