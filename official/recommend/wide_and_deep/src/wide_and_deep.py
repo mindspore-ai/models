@@ -178,10 +178,15 @@ class WideDeepModel(nn.Cell):
             if config.deep_table_slice_mode == "column_slice":
                 self.deep_embeddinglookup = nn.EmbeddingLookup(config.vocab_size, self.emb_dim, target=target,
                                                                slice_mode=nn.EmbeddingLookup.TABLE_COLUMN_SLICE)
-                self.dense_layer_1.dropout.dropout.shard(((1, get_group_size()),))
-                self.dense_layer_1.matmul.shard(((1, get_group_size()), (get_group_size(), 1)))
+                if config.use_sp:
+                    self.dense_layer_1.matmul.shard(((1, get_group_size()), (get_group_size(), 1)))
+                    self.dense_layer_1.bias_add.shard(((get_group_size(), 1), (1,)))
+                    self.deep_mul.shard(((1, 1, get_group_size()), (1, 1, 1)))
+                else:
+                    self.dense_layer_1.dropout.dropout.shard(((1, get_group_size()),))
+                    self.dense_layer_1.matmul.shard(((1, get_group_size()), (get_group_size(), 1)))
+                    self.deep_mul.shard(((1, 1, get_group_size()), (1, 1, 1)))
                 self.dense_layer_1.matmul.add_prim_attr("field_size", self.field_size)
-                self.deep_mul.shard(((1, 1, get_group_size()), (1, 1, 1)))
                 self.deep_reshape.add_prim_attr("skip_redistribution", True)
             else:
                 self.deep_embeddinglookup = nn.EmbeddingLookup(config.vocab_size, self.emb_dim, target=target,

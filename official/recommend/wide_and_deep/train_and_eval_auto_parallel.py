@@ -21,6 +21,7 @@ import mindspore.dataset as ds
 from mindspore import Model, context
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor
 from mindspore.context import ParallelMode
+from mindspore.parallel import set_algo_parameters
 from mindspore.communication.management import get_rank, get_group_size, init
 from mindspore.nn.wrap.cell_wrapper import VirtualDatasetCellTriple
 
@@ -157,8 +158,14 @@ def train_wide_and_deep():
     init()
     context.set_context(save_graphs_path='./graphs_of_device_id_' + str(get_rank()), save_graphs=True)
     if cfg.sparse:
-        context.set_auto_parallel_context(
-            parallel_mode=ParallelMode.SEMI_AUTO_PARALLEL, gradients_mean=True)
+        if cfg.use_sp:
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.AUTO_PARALLEL, enable_alltoall=True,
+                                              search_mode="sharding_propagation", gradients_mean=True,
+                                              strategy_ckpt_save_file='strategy.ckpt')
+            set_algo_parameters(elementwise_op_strategy_follow=False, fully_use_devices=False)
+        else:
+            context.set_auto_parallel_context(
+                parallel_mode=ParallelMode.SEMI_AUTO_PARALLEL, gradients_mean=True)
     else:
         context.set_auto_parallel_context(
             parallel_mode=ParallelMode.AUTO_PARALLEL, gradients_mean=True)

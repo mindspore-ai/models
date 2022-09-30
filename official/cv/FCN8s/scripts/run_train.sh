@@ -33,6 +33,7 @@ export RANK_SIZE=$1
 RANK_TABLE_FILE=$(realpath $2)
 export RANK_TABLE_FILE
 echo "RANK_TABLE_FILE=${RANK_TABLE_FILE}"
+export HCCL_ALGO="level0:fullmesh;level1:fullmesh"
 
 export SERVER_ID=0
 rank_start=$((DEVICE_NUM * SERVER_ID))
