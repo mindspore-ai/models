@@ -26,7 +26,7 @@ import mindspore.nn as nn
 from mindspore import context
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.train import Model
-from mindspore.nn.metrics import Accuracy
+from mindspore.train.metrics import Accuracy
 from mindspore.common import set_seed
 from mindspore import load_checkpoint, load_param_into_net
 from algorithm import create_simqat
