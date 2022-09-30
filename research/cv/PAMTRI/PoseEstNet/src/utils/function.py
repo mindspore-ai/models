@@ -136,6 +136,97 @@ def validate(config, val_loader, val_dataset, model, allImage):
 
     return perf_indicator
 
+def onnx_validate(config, val_loader, val_dataset, InferenceSession, input_name, is_train, allImage):
+    """onnx_validate"""
+
+    num_samples = len(val_dataset)
+    all_preds = np.zeros(
+        (num_samples, config.MODEL.NUM_JOINTS, 3),
+        dtype=np.float32
+    )
+    all_boxes = np.zeros((num_samples, 6))
+    image_path = []
+    filenames = []
+    imgnums = []
+    idx = 0
+    for i, data in enumerate(val_loader.create_dict_iterator()):
+        _input = data["input"]
+        center = data["center"]
+        scale = data["scale"]
+        score = data["score"]
+        image_label = data["image"]
+        joints = data["joints"]
+        joints_vis = data["joints_vis"]
+
+        joints = joints.asnumpy()
+        joints_vis = joints_vis.asnumpy()
+
+        image = []
+        for j in range(config.TEST.BATCH_SIZE):
+            image.append(allImage['{}'.format(image_label[j])])
+
+        outputs = InferenceSession.run(None, {input_name: _input.asnumpy()})[0]
+
+        if isinstance(outputs, list):
+            print("output is tuple")
+            output = outputs[-1]
+        else:
+            output = outputs
+        if config.TEST.FLIP_TEST:
+            # this part is ugly, because pytorch has not supported negative index
+            input_flipped = np.flip(_input.asnumpy(), 3)
+            outputs_flipped = InferenceSession.run(None, {input_name: input_flipped})[0]
+
+            if isinstance(outputs_flipped, list):
+                output_flipped = outputs_flipped[-1]
+            else:
+                output_flipped = outputs_flipped
+
+            output_flipped = flip_back(output_flipped, val_dataset.flip_pairs)
+
+            # feature is not aligned, shift flipped heatmap for higher accuracy
+            if config.TEST.SHIFT_HEATMAP: # true
+                output_flipped_copy = output_flipped
+                output_flipped[:, :, :, 1:] = output_flipped_copy[:, :, :, 0:-1]
+
+            output = (output + output_flipped) * 0.5
+
+        # measure accuracy and record loss
+        num_images = _input.shape[0]
+
+        c = center.asnumpy()
+        s = scale.asnumpy()
+        score = score.asnumpy()
+
+        output_copy = output
+
+        preds, maxvals = get_final_preds(config, output_copy, c, s)
+
+        all_preds[idx:idx + num_images, :, 0:2] = preds[:, :, 0:2]
+        all_preds[idx:idx + num_images, :, 2:3] = maxvals
+        # double check this all_boxes parts
+        all_boxes[idx:idx + num_images, 0:2] = c[:, 0:2]
+        all_boxes[idx:idx + num_images, 2:4] = s[:, 0:2]
+        all_boxes[idx:idx + num_images, 4] = np.prod(s*200, 1)
+        all_boxes[idx:idx + num_images, 5] = score
+        image_path.extend(image)
+
+        idx += num_images
+
+        print('-------- Test: [{0}/{1}] ---------'.format(i, val_loader.get_dataset_size()))
+        name_values, perf_indicator = val_dataset.evaluate(
+            all_preds, '', all_boxes, image_path,
+            filenames, imgnums
+        )
+        model_name = config.MODEL.NAME
+        if isinstance(name_values, list):
+            for name_value in name_values:
+                _print_name_value(name_value, model_name)
+        else:
+            _print_name_value(name_values, model_name)
+
+    return perf_indicator
+
 def output_preds(config, val_loader, val_dataset, model, root, test_set, output_dir):
     """output_preds"""
     gt_file = os.path.join(root, 'label_{}.csv'.format(test_set))

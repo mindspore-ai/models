@@ -5,3 +5,4 @@ Pillow==5.1.0
 scipy==1.2.0
 opencv-python
 matplotlib
+onnxruntime-gpu

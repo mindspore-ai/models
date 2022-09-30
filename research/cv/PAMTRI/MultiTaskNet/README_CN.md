@@ -181,6 +181,7 @@ bash scripts/run_eval_gpu.sh [DATASET_NAME] [CKPT_PATH] [DEVICE_ID] [HEATMAP_SEG
             |   ├── run_single_train_gpu.sh             // 单卡到GPU的shell脚本
             |   ├── run_eval_ascend.sh                  // Ascend评估的shell脚本
             |   ├── run_eval_gpu.sh                     // GPU评估的shell脚本
+            |   ├—— run_onnx_eval_gpu.sh                // ONNX推理shell脚本
             |   ├── run_infer_310.sh                    // Ascend推理shell脚本
             ├── src
             |   ├── dataset
@@ -201,6 +202,7 @@ bash scripts/run_eval_gpu.sh [DATASET_NAME] [CKPT_PATH] [DEVICE_ID] [HEATMAP_SEG
             |   |   ├── save_callback.py                // 边训练边推理的实现
             |   |   ├── pthtockpt.py                    // pth格式的预训练模型转换为ckpt
             ├── eval.py                             // 精度验证脚本
+            ├—— eval_onnx.py                        // ONNX精度验证脚本
             ├── train.py                            // 训练脚本
             ├── export.py                           // 推理模型导出脚本
             ├── preprocess.py                       // 310推理前处理脚本
@@ -438,6 +440,18 @@ python export.py --root /path/dataset --ckpt_path /path/ckpt --segmentaware --he
     ```shell
     # Ascend310 inference
     bash scripts/run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID] [NEED_HEATMAP] [NEED_SEGMENT]
+    ```
+
+### ONNX推理
+
+在进行推理之前我们需要先导出模型。
+
+- 在GPU环境上使用VeRi数据集进行推理
+
+    执行推理的命令如下所示，其中`ONNX_PATH`是onnx文件路径；`DATASET_PATH`是推理数据集路径；`DEVICE_ID`可选，默认值为0；`HEATMAP_SEGMEN` 表示选择使用热图还是分段。
+
+    ```bash
+    bash run_onnx_eval_gpu.sh DATASET_NAME ONNX_PATH DEVICE_ID HEATMAP_SEGMENT
     ```
 
 # 模型描述

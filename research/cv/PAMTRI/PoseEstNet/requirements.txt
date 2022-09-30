@@ -8,3 +8,4 @@ pyyaml
 json_tricks
 scikit-image
 yacs
+onnxruntime-gpu
