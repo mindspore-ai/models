@@ -145,37 +145,6 @@ atom_energy: -94.38766   -94.294426  -94.39194   -94.70758   -94.51311   -94.457
 # (7) Start model inference。
 ```
 
-## Inference Process
-
-### [Export MindIR](#contents)
-
-Export MindIR on local
-
-```shell
-python export.py --checkpoint_path [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [CONFIG_PATH]
-```
-
-The `checkpoint_path` parameter is required,
-`FILE_FORMAT` should be in ["AIR", "MINDIR"].
-> If the model specifications need to be adjusted during export, please modify the corresponding parameters in the `export.py` file at first.
-
-### Infer on Ascend310
-
-Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
-Current batch_Size is set to 1.
-
-```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
-```
-
-- `NEED_PREPROCESS` means weather to convert raw data to the numpy format, it's value is 'y' or 'n'.
-- `DEVICE_ID` is optional, default value is 0.
-
-### result
-
-Inference result is saved in current path, you can find result like this in acc.log file.
-
 ## ModelZoo Homepage
 
 Please check the official [homepage](https://gitee.com/mindspore/models).
