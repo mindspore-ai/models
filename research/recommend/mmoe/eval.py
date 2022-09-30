@@ -39,6 +39,7 @@ def modelarts_process():
 @moxing_wrapper(pre_process=modelarts_process)
 def eval_mmoe():
     """MMoE eval"""
+    modelarts_process()
     device_num = get_device_num()
     if device_num > 1:
         context.set_context(mode=context.GRAPH_MODE,
