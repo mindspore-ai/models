@@ -32,6 +32,7 @@ dataset_type: "mindrecord"
 parameter_server: 0
 field_slice: False
 sparse: False
+use_sp: True
 deep_table_slice_mode: "column_slice"
 
 # WideDeepConfig
@@ -106,6 +107,7 @@ dataset_type: "tfrecord/mindrecord/hd5"
 parameter_server: "Open parameter server of not"
 field_slice: "Enable split field mode or not"
 sparse: "Enable sparse or not"
+use_sp: "Whether to use sharding_propagation instead of semi_parallel mode"
 deep_table_slice_mode: "column_slice/row_slice"
 
 epochs: "Total train epochs"

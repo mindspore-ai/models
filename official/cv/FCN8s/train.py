@@ -23,6 +23,7 @@ from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.callback import LossMonitor, TimeMonitor
+from mindspore.parallel import set_algo_parameters
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.common import set_seed
 from src.data import dataset as data_generator
@@ -63,10 +64,15 @@ def train():
     config.rank = 0
     config.group_size = 1
     if device_num > 1:
-        parallel_mode = ParallelMode.DATA_PARALLEL
-        if config.parallel_mode in ParallelMode.MODE_LIST:
-            parallel_mode = config.parallel_mode
-        context.set_auto_parallel_context(parallel_mode=parallel_mode, gradients_mean=True, device_num=device_num)
+        parallel_mode = config.parallel_mode if config.parallel_mode in ParallelMode.MODE_LIST \
+            else ParallelMode.DATA_PARALLEL
+        if config.parallel_mode == "sharding_propagation":
+            context.set_auto_parallel_context(parallel_mode=ParallelMode.AUTO_PARALLEL, enable_alltoall=True,
+                                              search_mode="sharding_propagation", device_num=device_num,
+                                              gradients_mean=True, strategy_ckpt_save_file='strategy.ckpt')
+            set_algo_parameters(elementwise_op_strategy_follow=False, fully_use_devices=False)
+        else:
+            context.set_auto_parallel_context(parallel_mode=parallel_mode, gradients_mean=True, device_num=device_num)
         init()
         config.rank = get_rank()
         config.group_size = get_group_size()
@@ -88,8 +94,7 @@ def train():
     dataset = dataset.get_dataset(repeat=1)
 
     net = FCN8s(n_class=config.num_classes)
-    if context.get_auto_parallel_context("parallel_mode") in [ParallelMode.SEMI_AUTO_PARALLEL,
-                                                              ParallelMode.AUTO_PARALLEL]:
+    if config.parallel_mode in [ParallelMode.SEMI_AUTO_PARALLEL, ParallelMode.AUTO_PARALLEL]:
         net.set_model_parallel_shard_strategy(device_num)
     loss_ = loss.SoftmaxCrossEntropyLoss(config.num_classes, config.ignore_label, device_num=device_num)
 
