@@ -257,6 +257,15 @@ bash ./scripts/run_eval_gpu.sh [DEVICE_ID] [PATH_CHECKPOINT]
 python export.py --pre_trained_model_path='ckpt_path'
 ```
 
+# Quick Start
+
+Before running, put the audio files and data into the quickstart folder, store their paths in the csv file, and set the path in the qs_config.py file. Run the following code.
+
+```bash
+python quick_start.py --pretrain_ckpt=[PRETRAINED_BACKBONE]
+# example: python quick_start.py --pretrain_ckpt=./checkpoint/ckpt_0/DeepSpeech0-70_1287.ckpt
+```
+
 # [Model Description](#contents)
 
 ## [Performance](#contents)
