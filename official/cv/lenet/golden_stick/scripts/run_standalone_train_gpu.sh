@@ -24,8 +24,6 @@ if [ $# != 3 ] && [ $# != 5 ]; then
     echo "    bash run_standalone_train_gpu.sh /path/to/train.py lenet_config.yaml /path/to/dataset"
     echo "  Train from full precision checkpoint:"
     echo "    bash run_standalone_train_gpu.sh /path/to/train.py lenet_config.yaml /path/to/dataset FP32 /path/to/fp32_ckpt"
-    echo "  Train from pretrained checkpoint:"
-    echo "    bash run_standalone_train_gpu.sh /path/to/train.py lenet_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt"
     exit 1
 fi
 
@@ -63,8 +61,8 @@ if [ $# == 5 ]; then
   CKPT_TYPE=$4
   CKPT_FILE=$(get_real_path $5)
 
-  if [ "x$CKPT_TYPE" != "xFP32" ] && [ "x$CKPT_TYPE" != "xPRETRAINED" ]; then
-      echo "error: CKPT_TYPE=$CKPT_TYPE is not valid, should be FP32 or PRETRAINED"
+  if [ "x$CKPT_TYPE" != "xFP32" ]; then
+      echo "error: CKPT_TYPE=$CKPT_TYPE is not valid, should be FP32"
       exit 1
   fi
   if [ ! -f $CKPT_FILE ]; then
