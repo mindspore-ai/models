@@ -18,7 +18,6 @@ import mindspore as ms
 from mindspore.communication.management import GlobalComm
 import mindspore.ops as ops
 import mindspore.nn as nn
-import mindspore.train as train
 
 class ClassifyCorrectCell(nn.Cell):
     r"""
@@ -62,7 +61,7 @@ class ClassifyCorrectCell(nn.Cell):
         return (total_correct,)
 
 
-class DistAccuracy(train.Metric):
+class DistAccuracy(nn.Metric):
     r"""
     Calculates the accuracy for classification data in distributed mode.
     The accuracy class creates two local variables, correct number and total number that are used to compute the

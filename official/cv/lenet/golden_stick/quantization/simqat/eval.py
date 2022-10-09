@@ -26,7 +26,7 @@ import mindspore.nn as nn
 from mindspore import context
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore.train import Model
-from mindspore.train.metrics import Accuracy
+from mindspore.nn.metrics import Accuracy
 from algorithm import create_simqat
 
 
