@@ -248,7 +248,7 @@ Parameters for both training and evaluation can be set in config.py
 | Total time                 | 4pcs: 6.4 hours                                               |
 | Parameters (M)             | 27.29M                                                        |
 | Checkpoint for Fine tuning | 336.3M (.ckpt file)                                           |
-| Scripts                    | [retinaface script](https://gitee.com/mindspore/models/tree/master/official/cv/retinaface_resnet50) |
+| Scripts                    | [retinaface script](https://gitee.com/mindspore/models/tree/r1.9/official/cv/retinaface_resnet50) |
 
 ### Inference Performance
 

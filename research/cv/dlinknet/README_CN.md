@@ -301,7 +301,7 @@ bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
 | 参数(M)  | 31M|
 | 微调检查点 | 118.70M (.ckpt文件)|
 | 配置文件 | dlinknet_config.yaml |
-| 脚本| [D-LinkNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/dlinknet) |
+| 脚本| [D-LinkNet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/dlinknet) |
 
 ### 推理性能
 

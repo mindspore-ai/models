@@ -854,7 +854,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_
 | 损失 | 0.0065883575 |
 | 速度 | 31 帧数/秒（单卡，s8）<br> 234 帧数/秒（8卡，s8） |  
 | 微调检查点 | 443M （.ckpt文件） |
-| 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/deeplabv3) |
+| 脚本 | [链接](https://gitee.com/mindspore/models/tree/r1.9/official/cv/deeplabv3) |
 
 ## 推理性能
 

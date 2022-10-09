@@ -253,7 +253,7 @@ The ckpt_file parameter is required,
 |loss function          |SoftmaxCrossEntropyLoss   |
 |training speed         |epoch time: 493974.632 ms, per step time: 464.699 ms(1p for voc2012)|
 |total time             |6h10m34s(1pcs)    |
-|Script URL             |https://gitee.com/mindspore/models/tree/master/research/cv/PSPNet|
+|Script URL             |https://gitee.com/mindspore/models/tree/r1.9/research/cv/PSPNet|
 |Random number seed     |set_seed = 1234     |
 
 ## Inference Performance

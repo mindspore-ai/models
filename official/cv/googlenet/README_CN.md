@@ -123,7 +123,7 @@ GoogleNet由多个inception模块串联起来，可以更加深入。  降维的
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools.>
 
 - GPU处理器环境运行
 

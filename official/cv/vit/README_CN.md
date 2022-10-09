@@ -108,7 +108,7 @@ Vit是基于多个transformer encoder模块串联起来，由多个inception模�
 
   请遵循以下链接中的说明：
 
- <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools.>
+ <https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools.>
 
 - 在 ModelArts 进行训练 (如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/))
 
@@ -429,7 +429,7 @@ python export.py --config_path=[CONFIG_PATH]
 | 总时长                     | 8卡：11小时                                                  |
 | 参数(M)                    | 86.0                                                        |
 | 微调检查点                 | 1000M (.ckpt文件)                                            |
-| 脚本                    | [vit脚本](https://gitee.com/mindspore/models/tree/master/official/cv/vit) |
+| 脚本                    | [vit脚本](https://gitee.com/mindspore/models/tree/r1.9/official/cv/vit) |
 
 ### 推理性能
 

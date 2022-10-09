@@ -285,7 +285,7 @@ To train the model, run `train.py` with the dataset `image_dir`, `anno_path` and
     bash run_distribute_train.sh 8 150 /data/Mindrecord_train /data /data/train.txt /data/hccl.json
     ```
 
-    The input variables are device numbers, epoch size, mindrecord directory path, dataset directory path, train TXT file path and [hccl json configuration file](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). **It is better to use absolute path.**
+    The input variables are device numbers, epoch size, mindrecord directory path, dataset directory path, train TXT file path and [hccl json configuration file](https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools). **It is better to use absolute path.**
 
 You will get the loss value and time of each step as following:
 
@@ -381,7 +381,7 @@ Inference result is saved in current path, you can find result in acc.log file.
 | Speed                      | 1pc: 120 ms/step;  8pcs: 160 ms/step                        |
 | Total time                 | 1pc: 150 mins;  8pcs: 70 mins                               |
 | Parameters (M)             | 189                                                         |
-| Scripts                    | [yolov3_resnet18 script](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_resnet18) | [yolov3_resnet18 script](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_resnet18) |
+| Scripts                    | [yolov3_resnet18 script](https://gitee.com/mindspore/models/tree/r1.9/official/cv/yolov3_resnet18) | [yolov3_resnet18 script](https://gitee.com/mindspore/models/tree/r1.9/official/cv/yolov3_resnet18) |
 
 ### Inference Performance
 

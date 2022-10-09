@@ -174,7 +174,7 @@ After installing MindSpore and python3, you can start training and evaluation as
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools>.
 
 # [Script Description](#contents)
 

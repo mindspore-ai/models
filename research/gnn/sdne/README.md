@@ -286,7 +286,7 @@ bash run_310_infer.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [DEVICE_ID]
 | total time        | 1p：44 sec                                    | 44 sec |
 | Parameters(M)     | 1.30                                         | 1.30 |
 | Checkpoints       | 15M （.ckpt file）                            | 15M （.ckpt file |
-| Scripts           | [SDNE script](https://gitee.com/mindspore/models/tree/master/research/gnn/sdne) | [SDNE script](https://gitee.com/mindspore/models/tree/master/research/gnn/sdne) |
+| Scripts           | [SDNE script](https://gitee.com/mindspore/models/tree/r1.9/research/gnn/sdne) | [SDNE script](https://gitee.com/mindspore/models/tree/r1.9/research/gnn/sdne) |
 
 | Parameters          | Ascend                                         |
 | ------------- | ----------------------------------------------- |
@@ -304,7 +304,7 @@ bash run_310_infer.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [DEVICE_ID]
 | total time | 1p：28sec |
 | Parameters(M) | 1.05 |
 | Checkpoints | 13M （.ckpt file） |
-| Scripts | [SDNE script](https://gitee.com/mindspore/models/tree/master/research/gnn/sdne) |
+| Scripts | [SDNE script](https://gitee.com/mindspore/models/tree/r1.9/research/gnn/sdne) |
 
 ### Evaluation performance
 

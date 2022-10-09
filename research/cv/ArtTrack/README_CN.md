@@ -364,7 +364,7 @@ python eval.py mpii_single --config config/mpii_eval.yaml --accuracy  --predicti
 | 速度          | 1292.854毫秒/步(8卡)                                                        |
 | 总时长        | 3.2小时                                                                     |
 | 微调检查点    | 496M (.ckpt文件)                                                            |
-| 脚本          | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/ArtTrack) |
+| 脚本          | [链接](https://gitee.com/mindspore/models/tree/r1.9/research/cv/ArtTrack) |
 
 # ModelZoo主页
 

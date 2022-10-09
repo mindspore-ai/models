@@ -298,7 +298,7 @@ FILE_FORMAT 可选 ['MINDIR', 'AIR', 'ONNX'], 默认['MINDIR']。
 | 总时长        | 1卡：4小时                                                     |8卡：1.5小时|
 |              | 8卡：0.5小时                                                   |          |
 | 微调检查点    | 35 MB(.ckpt文件)                                        |14 MB(.ckpt文件)|
-| 脚本          | [WDSR](https://gitee.com/mindspore/models/tree/master/research/cv/wdsr) |[WDSR](https://gitee.com/mindspore/models/tree/master/research/cv/wdsr)|
+| 脚本          | [WDSR](https://gitee.com/mindspore/models/tree/r1.9/research/cv/wdsr) |[WDSR](https://gitee.com/mindspore/models/tree/r1.9/research/cv/wdsr)|
 
 ### 评估性能
 

@@ -138,7 +138,7 @@
 - 分布式训练
 
   对于分布式训练，需要提前创建JSON格式的hccl配置文件。可将文件命名为`hccl_8p.json`，并存放在当前工程的根目录下。
-  请遵循以下链接中的说明：<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+  请遵循以下链接中的说明：<https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools>
 
   ```text
   # 运行分布式训练示例
@@ -544,7 +544,7 @@ python3 train.py --yaml_path=[YAML_PATH] --data_url=[DATASETS] --train_url=[OUTP
 1. 生成分布式训练json配置文件
 
 对于分布式训练，需要提前创建JSON格式的hccl配置文件。可将文件命名为`hccl_8p.json`，并存放在当前工程的根目录下。
-请遵循以下链接中的说明：<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+请遵循以下链接中的说明：<https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools>
 
 2. 配置`config.yaml`
 

@@ -107,7 +107,7 @@ python evaluate_motchallenge.py --data_url="" --train_url="" --detection_url=""
 python -m motmetrics.apps.eval_motchallenge <groundtruths> <tests>
 ```
 
-Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)
+Ascend训练：生成[RANK_TABLE_FILE](https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools)
 
 ## 脚本说明
 

@@ -251,7 +251,7 @@ Inference result is saved in ./infer.log.
 | Total Time | 1P：17.5h；8P：2.5h                               |
 | parameters(M) | 1.2M                                                        |
 | Checkpoint for Fine tuning | 15.7M (.ckpt file)                                               |
-| Scripts   | [lpcnet script](https://gitee.com/mindspore/models/tree/master/official/cv/octsqueeze) |
+| Scripts   | [lpcnet script](https://gitee.com/mindspore/models/tree/r1.9/official/cv/octsqueeze) |
 
 ### Inference Performance
 

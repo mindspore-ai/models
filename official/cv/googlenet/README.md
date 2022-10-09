@@ -121,7 +121,7 @@ After installing MindSpore via the official website, you can start training and 
 
   Please follow the instructions in the link below:
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools>.
 
 - running on GPU
 
@@ -540,7 +540,7 @@ Current batch_ Size can only be set to 1.
 | Parameters (M)             | 13.0                                                        | 13.0                   |
 | Checkpoint for Fine tuning | 43.07M (.ckpt file)                                         | 43.07M (.ckpt file)    |
 | Model for inference        | 21.50M (.onnx file),  21.60M(.air file)                     |      |
-| Scripts                    | [googlenet script](https://gitee.com/mindspore/models/tree/master/official/cv/googlenet) | [googlenet script](https://gitee.com/mindspore/models/tree/master/official/cv/googlenet) |
+| Scripts                    | [googlenet script](https://gitee.com/mindspore/models/tree/r1.9/official/cv/googlenet) | [googlenet script](https://gitee.com/mindspore/models/tree/r1.9/official/cv/googlenet) |
 
 #### GoogleNet train on ImageNet2012
 
