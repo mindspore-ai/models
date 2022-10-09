@@ -174,7 +174,7 @@ metric:  {'Loss': 6.346325377444248, 'Top1-Acc': 0.744024024024024, 'Top5-Acc': 
 | 训练总时间 (8p)             | 40h                                    |
 | 评估总时间                  | 2min                                    |
 | 参数量 (M)                 | 43.4M                                   |
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/mobilenetv3_large) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/r1.9/research/cv/mobilenetv3_large) |
 
 # 随机情况的描述
 

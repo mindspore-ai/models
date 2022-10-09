@@ -587,7 +587,7 @@ train.py中主要参数如下：
 | 速度 | 106毫秒/步 | 87毫秒/步 |
 | 总时间 | 22小时 | 18.5小时 |
 | 微调检查点 | 594M （.ckpt文件） | 594M (.ckpt文件) |
-| 脚本 | [SPPNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/SPPNet) | [SPPNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/SPPNet) |
+| 脚本 | [SPPNet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/SPPNet) | [SPPNet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/SPPNet) |
 
 #### Imagenet2012上的sppnet(single train)
 
@@ -605,7 +605,7 @@ train.py中主要参数如下：
 | 速度 | 203毫秒/步 | 87毫秒/步 |
 | 总时间 | 200小时 | 18.5小时 |
 | 微调检查点 | 594M （.ckpt文件） | 594M （.ckpt文件） |
-| 脚本 | [SPPNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/SPPNet) | [SPPNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/SPPNet) |
+| 脚本 | [SPPNet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/SPPNet) | [SPPNet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/SPPNet) |
 
 #### Imagenet2012上的sppnet(single mult)
 
@@ -623,7 +623,7 @@ train.py中主要参数如下：
 | 速度 | 180毫秒/步 | 213毫秒/步 |
 | 总时间 | 200小时 | 95小时                                                       |
 | 微调检查点 | 601M （.ckpt文件） | 601M （.ckpt文件） |
-| 脚本 | [SPPNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/SPPNet) | [SPPNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/SPPNet) |
+| 脚本 | [SPPNet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/SPPNet) | [SPPNet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/SPPNet) |
 
 # 随机情况说明
 

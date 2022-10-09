@@ -330,7 +330,7 @@ We need five or seven parameters for this scripts.
 - `EPOCH_NUM`: epoch num for distributed train.
 - `LR`: learning rate init value for distributed train.
 - `DATASET`：the dataset mode for distributed train.
-- `RANK_TABLE_FILE :` the path of [rank_table.json](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools), it is better to use absolute path.
+- `RANK_TABLE_FILE :` the path of [rank_table.json](https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools), it is better to use absolute path.
 - `CONFIG_PATH`: parameter configuration.
 - `PRE_TRAINED :` the path of pretrained checkpoint file, it is better to use absolute path.
 - `PRE_TRAINED_EPOCH_SIZE :` the epoch num of pretrained.
@@ -599,7 +599,7 @@ mAP: 0.33880018942412393
 | Accuracy            | IoU=0.50: 22%               | IoU=0.50: 22%             |
 | Model for inference | 34M(.ckpt file)             | 34M(.ckpt file)             |
 | configuration           | ssd300_config.yaml          |ssd300_config_gpu.yaml       |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/r1.9/official/cv/ssd> |
 
 | Parameters          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -617,7 +617,7 @@ mAP: 0.33880018942412393
 | Accuracy            | IoU=0.50: 29.1 %             | IoU=0.50: 29.1 %             |
 | Model for inference | 96M(.ckpt file)             | 96M(.ckpt file)             |
 | configuration           | ssd_mobilenet_v1_fpn_config.yaml  |ssd_mobilenet_v1_fpn_config_gpu.yaml       |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/r1.9/official/cv/ssd> |
 
 | Parameters          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -635,7 +635,7 @@ mAP: 0.33880018942412393
 | Accuracy            | IoU=0.50: 34.3%            | IoU=0.50: 34.3 %           |
 | Model for inference | 255M(.ckpt file)             | 255M(.ckpt file)             |
 | configuration           | ssd_resnet50_fpn_config.yaml | ssd_resnet50_fpn_config_gpu.yaml       |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/r1.9/official/cv/ssd> |
 
 | Parameters          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -653,7 +653,7 @@ mAP: 0.33880018942412393
 | Accuracy            | IoU=0.50: 23.2%               | IoU=0.50: 23.2%             |
 | Model for inference | 186M(.ckpt file)             | 186M(.ckpt file)             |
 | configuration           | ssd_vgg16_config.yaml      | ssd_vgg16_config_gpu.yaml      |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/r1.9/official/cv/ssd> |
 
 | Parameters          |                        GPU                         |
 | ------------------- | ------------------------------------------------------ |
@@ -671,7 +671,7 @@ mAP: 0.33880018942412393
 | Accuracy            | IoU=0.50: 21.5%                       |
 | Model for inference | 88M(.ckpt file)                        |
 | configuration           | ssd_mobilenet_v1_300_config_gpu.yaml    |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/r1.9/official/cv/ssd> |
 
 ## [Description of Random Situation](#contents)
 

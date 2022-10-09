@@ -407,7 +407,7 @@ recall_@10:0.10383,     recall_@20:0.15524,     ndcg_@10:0.07503,    ndcg_@20:0.
 | Recall@20                  | 0.1534                                     | 0.15524                                    |
 | NDCG@20                    | 0.0912                                     | 0.09249                                    |
 | 训练成本                   | 25min                                      | 60min                                      |
-| 脚本                       | [bgcf脚本](https://gitee.com/mindspore/models/tree/master/official/gnn/bgcf) | [bgcf脚本](https://gitee.com/mindspore/models/tree/master/official/gnn/bgcf) |
+| 脚本                       | [bgcf脚本](https://gitee.com/mindspore/models/tree/r1.9/official/gnn/bgcf) | [bgcf脚本](https://gitee.com/mindspore/models/tree/r1.9/official/gnn/bgcf) |
 
 ### 推理性能
 

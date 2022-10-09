@@ -160,7 +160,7 @@ bash scripts/run_distribute_gpu.sh ./ckpts ../shapenetcore_partanno_segmentation
 
 Distributed training requires the creation of an HCCL configuration file in JSON format in advance. For specific
 operations, see the instructions
-in [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+in [hccl_tools](https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools).
 
 After training, the loss value will be achieved as follows:
 

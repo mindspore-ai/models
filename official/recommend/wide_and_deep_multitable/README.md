@@ -182,7 +182,7 @@ python eval.py
 | Params(M)                | 349                             | 349                             |
 | Checkpoint for inference | 1.1GB(.ckpt file)               | 1.1GB(.ckpt file)               |
 
-All executable scripts can be found in [here](https://gitee.com/mindspore/models/tree/master/official/recommend/wide_and_deep_multitable/script)
+All executable scripts can be found in [here](https://gitee.com/mindspore/models/tree/r1.9/official/recommend/wide_and_deep_multitable/script)
 
 #### Evaluation Performance
 

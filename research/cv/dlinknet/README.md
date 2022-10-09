@@ -296,7 +296,7 @@ bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
 | Parameters (M)  | 31M|
 | Checkpoint for Fine tuning | 118.70M (.ckpt file)|
 | configuration | dlinknet_config.yaml |
-| Scripts| [D-LinkNet scripts](https://gitee.com/mindspore/models/tree/master/research/cv/dlinknet) |
+| Scripts| [D-LinkNet scripts](https://gitee.com/mindspore/models/tree/r1.9/research/cv/dlinknet) |
 
 ### infer-performance
 

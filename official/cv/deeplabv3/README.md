@@ -890,7 +890,7 @@ Inference result is saved in current path, you can find result in acc.log file.
 | Parameters (M)             | 58.2                                       |
 | Checkpoint for Fine tuning | 443M (.ckpt file)                       |
 | Model for inference        | 223M (.air file)                     |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/deeplabv3) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/r1.9/official/cv/deeplabv3) |
 
 ## Inference Performance
 

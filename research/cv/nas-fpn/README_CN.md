@@ -161,7 +161,7 @@ bash scripts/run_single_train.sh DEVICE_ID MINDRECORD_DIR PRE_TRAINED(optional) 
 ```
 
 > 注意:
-RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools).
 
 #### 运行
 
@@ -412,7 +412,7 @@ mAP: 0.41668179380388803
 | 精确度 (8p)                 | mAP[0.4170]                          |
 | 训练速度 (ms/step)                 | 443.071 ms                          |
 | 训练总时间 (8p)             | 34h18m58s                              |
-| 脚本                       |  [链接](https://gitee.com/mindspore/models/tree/master/research/cv/nas-fpn)|
+| 脚本                       |  [链接](https://gitee.com/mindspore/models/tree/r1.9/research/cv/nas-fpn)|
 
 #### 推理性能
 

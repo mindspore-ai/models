@@ -475,7 +475,7 @@ The above python command will run in the background. You can view the results th
 | Parameters (M)             | 93M                                                          | 93M                                                          |
 | Checkpoint for Fine tuning | 355.11M (.ckpt file)                                         | 355.11M (.ckpt file)                                         |
 | configuration              | unet_medical_config.yaml                                     | unet_medical_gpu_config.yaml                                 |
-| Scripts                    | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/unet) | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/unet) |
+| Scripts                    | [unet script](https://gitee.com/mindspore/models/tree/r1.9/official/cv/unet) | [unet script](https://gitee.com/mindspore/models/tree/r1.9/official/cv/unet) |
 
 | Parameters | Ascend | GPU |
 | -----| ----- | ----- |
@@ -496,7 +496,7 @@ The above python command will run in the background. You can view the results th
 | Parameters (M)  | 27M | 27M |
 | Checkpoint for Fine tuning | 103.4M(.ckpt file) | 103.4M(.ckpt file) |
 | configuration | unet_nested_cell_config.yaml | unet_nested_cell_config.yaml|
-| Scripts | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/unet) | [unet script](https://gitee.com/mindspore/models/tree/master/official/cv/unet) |
+| Scripts | [unet script](https://gitee.com/mindspore/models/tree/r1.9/official/cv/unet) | [unet script](https://gitee.com/mindspore/models/tree/r1.9/official/cv/unet) |
 
 ## [How to use](#contents)
 

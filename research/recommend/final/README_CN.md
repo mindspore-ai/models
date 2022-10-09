@@ -111,7 +111,7 @@ FINAL由两部分组成。组合式高阶交互模块，可以替代多层感知
 
   具体操作，参见：
 
-  <https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>.
+  <https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools>.
 
 - 在GPU上运行
 
@@ -425,7 +425,7 @@ auc : 0.810024
 | 损失函数              | Sigmoid Cross Entropy With Logits                           | 待运行                  |
 | 输出                    | AUC                                                    | 待运行                 |
 | 损失                       | 0.44                                                        | 待运行                 |
-| 脚本                    | [final脚本](https://gitee.com/mindspore/models/tree/master/research/recommend/final) | 待运行                  |
+| 脚本                    | [final脚本](https://gitee.com/mindspore/models/tree/r1.9/research/recommend/final) | 待运行                  |
 
 ### 推理性能
 

@@ -225,7 +225,7 @@ Accuracy on LFW: 0.9401+-0.0118
 | 速度 | 315毫秒/步 |   | 2194毫秒/步 |
 | 总时间 | 2h46m43s|  | 3h16m48s |
 | 微调检查点 | 402M （.ckpt文件） | 143M （.ckpt文件） | 402M （.ckpt文件）|
-| 脚本 | [Facenet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/facenet) | [Facenet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/facenet) | [Facenet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/facenet) |
+| 脚本 | [Facenet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/facenet) | [Facenet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/facenet) | [Facenet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/facenet) |
                                               |
 
 ## 推理性能
