@@ -67,6 +67,5 @@ python train.py \
     --training_shape=640 \
     --per_batch_size=32 \
     --weight_decay=0.016 \
-    --num_parallel_workers=32 \
     --lr_scheduler=cosine_annealing > log.txt 2>&1 &
 cd ..
