@@ -12,6 +12,14 @@
 "models/research/cv/FaceRecognitionForTracking/infer/util/plugins/MxpiTransposePlugin.h"  "runtime/references"
 "models/research/cv/FaceRecognitionForTracking/infer/util/plugins/MxpiTransposePlugin.h"  "build/namespaces"
 
+"models/community/cv/pointRCNN/src/lib/utils/iou3d/src/ms_ext.cpp" "build/include"
+"models/community/cv/pointRCNN/src/pointnet2_lib/src/pointnet2_cuda/sampling_gpu.cu" "build/include"
+"models/community/cv/pointRCNN/src/lib/utils/roipool3d/src/ms_ext.cpp" "build/include"
+"models/community/cv/pointRCNN/src/pointnet2_lib/src/pointnet2_cuda/ball_query_gpu.cu" "build/include"
+"models/community/cv/pointRCNN/src/pointnet2_lib/src/pointnet2_cuda/interpolate_gpu.cu" "build/include"
+"models/community/cv/pointRCNN/src/pointnet2_lib/src/pointnet2_cuda/group_points_gpu.cu" "build/include"
+"models/community/cv/pointRCNN/src/pointnet2_lib/src/pointnet2_cuda/ms_ext.cpp" "build/include"
+
 
 "models/research/cv/nas-fpn/infer/mxbase/src/Nasfpn.h"  "runtime/references"
 "models/research/cv/nas-fpn/infer/mxbase/src/Nasfpn.cpp"  "runtime/references"
