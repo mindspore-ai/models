@@ -26,13 +26,6 @@ def create_slb(config):
     elif "W4" in config.quant_type:
         algo.set_weight_quant_dtype(QuantDtype.INT4)
 
-    if "A8" in config.quant_type:
-        algo.set_act_quant_dtype(QuantDtype.INT8)
-        algo.set_enable_act_quant(True)
-    else:
-        algo.set_enable_act_quant(False)
-
-    algo.set_enable_bn_calibration(config.enable_bn_calibration)
     algo.set_epoch_size(config.epoch_size)
     algo.set_has_trained_epoch(config.has_trained_epoch)
     algo.set_t_start_val(config.t_start_val)

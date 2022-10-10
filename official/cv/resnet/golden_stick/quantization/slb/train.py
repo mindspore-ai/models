@@ -264,7 +264,7 @@ def train_net():
 
     cb = [time_cb, loss_cb]
     if algo:
-        algo_cb_list = algo.callbacks(model, dataset)
+        algo_cb_list = algo.callbacks(model)
         cb += algo_cb_list
 
     ckpt_save_dir = set_save_ckpt_dir()
