@@ -14,9 +14,11 @@ modelarts_dataset_unzip_name: "coco2017"
 
 # ==============================================================================
 # Training options
-
+finetune: 0
 # dataset related
 data_dir: "/cache/data/coco2017/"
+finetune_path: ""
+predict_path: ""
 per_batch_size: 32
 
 # network related
