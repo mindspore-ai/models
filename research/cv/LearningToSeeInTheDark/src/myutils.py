@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -228,4 +228,4 @@ class GNMTTrainOneStepWithLossScaleCell(nn.Cell):
         if not overflow:
             self.optimizer(grads)
         self.loss_scalar("loss", loss)
-        return (loss, cond, scaling_sens)
+        return (loss, cond, scaling_sens.value())

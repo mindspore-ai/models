@@ -138,7 +138,7 @@ class EmbeddingLookup(nn.Cell):
 
         out_shape = input_shape + (self.embedding_size,)
         output = self.reshape(output_for_reshape, out_shape)
-        return output, self.embedding_table
+        return output, self.embedding_table.value()
 
 
 def position_encoding(length,

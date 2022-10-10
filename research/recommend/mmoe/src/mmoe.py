@@ -306,5 +306,5 @@ class TrainStepWrap(nn.Cell):
         else:
             succ = self.optimizer(grads)
 
-        ret = (loss, scale_sense)
+        ret = (loss, scale_sense.value())
         return F.depend(ret, succ)
