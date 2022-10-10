@@ -19,7 +19,6 @@ import mindspore.nn as nn
 from mindspore import Tensor, Parameter
 from mindspore import ops
 from mindspore.common.parameter import ParameterTuple
-from mindspore.ops import composite as C
 from mindspore.ops import functional as F
 from mindspore.ops import operations as P
 
@@ -234,6 +233,8 @@ class YOLOLossCell(nn.Cell):
         self.grids = [(config.input_size[0] // _stride) * (config.input_size[1] // _stride) for _stride in
                       config.fpn_strides]
         self.use_l1 = config.use_l1
+        self.use_summary = config.use_summary
+        self.summary = ops.ScalarSummary()
 
     def construct(self, img, labels=None, pre_fg_mask=None, is_inbox_and_incenter=None):
         """ forward with loss return """
@@ -256,11 +257,11 @@ class YOLOLossCell(nn.Cell):
         gt_classes_ = self.one_hot(gt_classes, self.depth, self.on_value, self.off_value)
         gt_classes_expaned = ops.repeat_elements(self.unsqueeze(gt_classes_, 2), rep=total_num_anchors, axis=2)
         gt_classes_expaned = F.stop_gradient(gt_classes_expaned)
-
         cls_preds_ = P.Sigmoid()(ops.repeat_elements(self.unsqueeze(cls_preds, 1), rep=gt_max, axis=1)) * \
                      P.Sigmoid()(
                          ops.repeat_elements(self.unsqueeze(obj_preds, 1), rep=gt_max, axis=1)
                      )
+
         pair_wise_cls_loss = P.ReduceSum()(
             P.BinaryCrossEntropy(reduction="none")(P.Sqrt()(cls_preds_), gt_classes_expaned, None), -1)
         pair_wise_cls_loss = pair_wise_cls_loss * pre_fg_mask
@@ -333,7 +334,18 @@ class YOLOLossCell(nn.Cell):
 
         loss_cls = P.ReduceSum()(self.bce_loss(cls_preds, cls_target), -1) * obj_target
         loss_cls = P.ReduceSum()(loss_cls)
-        loss_all = (5 * loss_iou + loss_cls + loss_obj + loss_l1) / (P.ReduceSum()(obj_target) + 1e-3)
+
+        num_fg_mask = P.ReduceSum()(obj_target) == 0
+        num_fg = (num_fg_mask == 0) * P.ReduceSum()(obj_target) + 1.0 * num_fg_mask
+        loss_all = (5 * loss_iou + loss_cls + loss_obj + loss_l1) / num_fg
+
+        if self.use_summary:
+            self.summary('num_fg', num_fg)
+            self.summary('loss_iou', loss_iou * 5 / num_fg)
+            self.summary('loss_cls', loss_cls / num_fg)
+            self.summary('loss_obj', loss_obj / num_fg)
+            self.summary('loss_l1', loss_l1 / num_fg)
+
         return loss_all
 
     def get_l1_format_single(self, reg_target, stride, eps):
@@ -389,52 +401,31 @@ class IOUloss(nn.Cell):
         return loss
 
 
-grad_scale = C.MultitypeFuncGraph("grad_scale")
-reciprocal = P.Reciprocal()
-
-
-@grad_scale.register("Tensor", "Tensor")
-def tensor_grad_scale(scale, grad):
-    return grad * reciprocal(scale)
-
-
-_grad_overflow = C.MultitypeFuncGraph("_grad_overflow")
-grad_overflow = P.FloatStatus()
-
-
-@_grad_overflow.register("Tensor")
-def _tensor_grad_overflow(grad):
-    return grad_overflow(grad)
-
-
-class TrainOneStepWithEMA(nn.TrainOneStepWithLossScaleCell):
+class TrainOneStepWithEMA(nn.TrainOneStepCell):
     """ Train one step with ema model """
 
-    def __init__(self, network, optimizer, scale_sense, ema=True, decay=0.9998, updates=0, moving_name=None,
-                 ema_moving_weight=None):
-        super(TrainOneStepWithEMA, self).__init__(network, optimizer, scale_sense)
+    def __init__(self, network, optimizer, dataset_size, sens=1.0, ema=True, decay=0.9998, updates=0):
+        super(TrainOneStepWithEMA, self).__init__(network, optimizer, sens=sens)
+        self.dataset_size = dataset_size
         self.ema = ema
-        self.moving_name = moving_name
-        self.ema_moving_weight = ema_moving_weight
+        self.decay = decay
+        self.updates = Parameter(Tensor(updates, mindspore.float32))
         if self.ema:
             self.ema_weight = self.weights.clone("ema", init='same')
-            self.decay = decay
-            self.updates = Parameter(Tensor(updates, mindspore.float32))
+            self.moving_parameter = list()
+            self.ema_moving_parameter = list()
             self.assign = ops.Assign()
-            self.ema_moving_parameters()
+            self.get_moving_parameters()
 
-    def ema_moving_parameters(self):
-        self.moving_name = {}
-        moving_list = []
-        idx = 0
+    def get_moving_parameters(self):
         for key, param in self.network.parameters_and_names():
             if "moving_mean" in key or "moving_variance" in key:
                 new_param = param.clone()
                 new_param.name = "ema." + param.name
-                moving_list.append(new_param)
-                self.moving_name["ema." + key] = idx
-                idx += 1
-        self.ema_moving_weight = ParameterTuple(moving_list)
+                self.moving_parameter.append(param)
+                self.ema_moving_parameter.append(new_param)
+        self.moving_parameter = ParameterTuple(self.moving_parameter)
+        self.ema_moving_parameter = ParameterTuple(self.ema_moving_parameter)
 
     def ema_update(self):
         """Update EMA parameters."""
@@ -445,40 +436,19 @@ class TrainOneStepWithEMA(nn.TrainOneStepWithLossScaleCell):
             for ema_v, weight in zip(self.ema_weight, self.weights):
                 tep_v = ema_v * d
                 self.assign(ema_v, (1.0 - d) * weight + tep_v)
+
+            for ema_moving, moving in zip(self.ema_moving_parameter, self.moving_parameter):
+                tep_m = ema_moving * d
+                self.assign(ema_moving, (1.0 - d) * moving + tep_m)
         return self.updates
 
-    # moving_parameter_update is executed inside the callback(EMACallBack)
-    def moving_parameter_update(self):
-        if self.ema:
-            d = (self.decay * (1 - ops.Exp()(-self.updates / 2000))).asnumpy().item()
-            # update moving mean and moving var
-            for key, param in self.network.parameters_and_names():
-                if "moving_mean" in key or "moving_variance" in key:
-                    idx = self.moving_name["ema." + key]
-                    moving_weight = param.asnumpy()
-                    tep_v = self.ema_moving_weight[idx] * d
-                    ema_value = (1.0 - d) * moving_weight + tep_v
-                    self.ema_moving_weight[idx] = ema_value
-
     def construct(self, *inputs):
-        """ Forward """
-        weights = self.weights
         loss = self.network(*inputs)
-        scaling_sens = self.scale_sense
-
-        status, scaling_sens = self.start_overflow_check(loss, scaling_sens)
-
-        scaling_sens_filled = C.ones_like(loss) * F.cast(scaling_sens, F.dtype(loss))
-        grads = self.grad(self.network, weights)(*inputs, scaling_sens_filled)
-        grads = self.hyper_map(F.partial(grad_scale, scaling_sens), grads)
-        # apply grad reducer on grads
+        sens = F.fill(loss.dtype, loss.shape, self.sens)
+        grads = self.grad(self.network, self.weights)(*inputs, sens)
         grads = self.grad_reducer(grads)
-        self.ema_update()
+        loss = F.depend(loss, self.optimizer(grads))
+        if self.ema:
+            self.ema_update()
 
-        # get the overflow buffer
-        cond = self.get_overflow_status(status, grads)
-        overflow = self.process_loss_scale(cond)
-        # if there is no overflow, do optimize
-        if not overflow:
-            loss = F.depend(loss, self.optimizer(grads))
-        return loss, cond, scaling_sens
+        return loss

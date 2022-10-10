@@ -15,7 +15,6 @@
 """ image transform related """
 import random
 import math
-
 import cv2
 import numpy as np
 
@@ -128,21 +127,17 @@ def box_candidates(box1, box2, wh_thr=2, ar_thr=20, area_thr=0.2):
     return (w2 > wh_thr) & (h2 > wh_thr) & (w2 * h2 / (w1 * h1 + 1e-16) > area_thr) & (ar < ar_thr)  # candidates
 
 
-def augment_hsv(img, hgain=0.015, sgain=0.7, vgain=0.4):
-    """ hsv augment """
-    r = np.random.uniform(-1, 1, 3) * [hgain, sgain, vgain] + 1  # random gains
-    hue, sat, val = cv2.split(cv2.cvtColor(img, cv2.COLOR_BGR2HSV))
-    dtype = img.dtype
+def augment_hsv(img, hgain=5, sgain=30, vgain=30):
+    hsv_augs = np.random.uniform(-1, 1, 3) * [hgain, sgain, vgain]  # random gains
+    hsv_augs *= np.random.randint(0, 2, 3)  # random selection of h, s, v
+    hsv_augs = hsv_augs.astype(np.int16)
+    img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV).astype(np.int16)
 
-    x = np.arange(0, 256, dtype=np.int16)
-    lut_hue = ((x * r[0]) % 180).astype(dtype)
-    lut_sat = np.clip(x * r[1], 0, 255).astype(dtype)
-    lut_val = np.clip(x * r[2], 0, 255).astype(dtype)
+    img_hsv[..., 0] = (img_hsv[..., 0] + hsv_augs[0]) % 180
+    img_hsv[..., 1] = np.clip(img_hsv[..., 1] + hsv_augs[1], 0, 255)
+    img_hsv[..., 2] = np.clip(img_hsv[..., 2] + hsv_augs[2], 0, 255)
 
-    img_hsv = cv2.merge(
-        (cv2.LUT(hue, lut_hue), cv2.LUT(sat, lut_sat), cv2.LUT(val, lut_val))
-    ).astype(dtype)
-    cv2.cvtColor(img_hsv, cv2.COLOR_HSV2BGR, dst=img)
+    cv2.cvtColor(img_hsv.astype(img.dtype), cv2.COLOR_HSV2BGR, dst=img)  # no return needed
 
 
 def _mirror(image, boxes, prob=0.5):
@@ -183,8 +178,8 @@ class TrainTransform:
             self.strides = config.fpn_strides
             self.input_size = config.input_size
         else:
-            self.hsv_prob = 1.0
-            self.flip_prob = 0.5
+            self.hsv_prob = hsv_prob
+            self.flip_prob = flip_prob
             self.max_labels = max_labels
             self.strides = [8, 16, 32]
             self.input_size = (640, 640)
@@ -229,11 +224,11 @@ class TrainTransform:
 
         targets_t = np.hstack((labels_t, boxes_t))
         padded_labels = np.zeros((self.max_labels, 5))
-        true_labels = len(targets_t)
 
         padded_labels[range(len(targets_t))[: self.max_labels]] = targets_t[: self.max_labels]
         padded_labels = np.ascontiguousarray(padded_labels, dtype=np.float32)
         gt_bboxes_per_image = padded_labels[:, 1:5]
+        true_labels = np.sum(np.sum(padded_labels, axis=1) > 0)
         # is_in_boxes_all [gt_max, 8400]
         is_in_boxes_all, is_in_boxes_and_center = self.get_in_boxes_info(gt_bboxes_per_image, true_labels)
         # is_in_boxes_all [gt_max, 8400]

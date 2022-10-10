@@ -278,20 +278,12 @@ train.py中主要的参数如下:
     ```log
 
     ...
-    2021-12-24 16:16:14,099:INFO:epoch: 0 step: [612/1848], loss: 11.5023, overflow: False, scale: 262144, lr: 0.000044, time: 303.65
-    2021-12-24 16:16:25,031:INFO:epoch: 0 step: [648/1848], loss: 11.4281, overflow: False, scale: 262144, lr: 0.000049, time: 303.66
-    2021-12-24 16:16:35,966:INFO:epoch: 0 step: [684/1848], loss: 11.2717, overflow: False, scale: 262144, lr: 0.000055, time: 303.72
-    2021-12-24 16:16:46,900:INFO:epoch: 0 step: [720/1848], loss: 11.4875, overflow: False, scale: 262144, lr: 0.000061, time: 303.72
-    2021-12-24 16:16:57,834:INFO:epoch: 0 step: [756/1848], loss: 11.2793, overflow: False, scale: 262144, lr: 0.000067, time: 303.73
-    2021-12-24 16:17:08,770:INFO:epoch: 0 step: [792/1848], loss: 11.4845, overflow: False, scale: 262144, lr: 0.000074, time: 303.76
-    2021-12-24 16:17:19,705:INFO:epoch: 0 step: [828/1848], loss: 11.4574, overflow: False, scale: 262144, lr: 0.000080, time: 303.74
-    2021-12-24 16:17:30,638:INFO:epoch: 0 step: [864/1848], loss: 11.7713, overflow: False, scale: 262144, lr: 0.000088, time: 303.69
-    2021-12-24 16:17:41,571:INFO:epoch: 0 step: [900/1848], loss: 11.3390, overflow: False, scale: 262144, lr: 0.000095, time: 303.70
-    2021-12-24 16:17:52,503:INFO:epoch: 0 step: [936/1848], loss: 11.4625, overflow: False, scale: 262144, lr: 0.000103, time: 303.66
-    2021-12-24 16:18:03,437:INFO:epoch: 0 step: [972/1848], loss: 11.4421, overflow: False, scale: 262144, lr: 0.000111, time: 303.72
-    2021-12-24 16:18:14,372:INFO:epoch: 0 step: [1008/1848], loss: 11.1791, overflow: False, scale: 262144, lr: 0.000119, time: 303.74
-    2021-12-24 16:18:25,304:INFO:epoch: 0 step: [1044/1848], loss: 11.3785, overflow: False, scale: 262144, lr: 0.000128, time: 303.66
-    2021-12-24 16:18:36,236:INFO:epoch: 0 step: [1080/1848], loss: 11.4149, overflow: False, scale: 262144, lr: 0.000137, time: 303.64
+    2022-10-10 11:43:14,405:INFO:epoch: [1/300] step: [150/1848], loss: 15.9977, lr: 0.000003, avg step time: 332.07 ms
+    2022-10-10 11:43:37,711:INFO:epoch: [1/300] step: [160/1848], loss: 14.6404, lr: 0.000003, avg step time: 330.58 ms
+    2022-10-10 11:44:41,012:INFO:epoch: [1/300] step: [170/1848], loss: 16.2315, lr: 0.000004, avg step time: 330.08 ms
+    2022-10-10 11:43:44,326:INFO:epoch: [1/300] step: [180/1848], loss: 16.9418, lr: 0.000004, avg step time: 331.37 ms
+    2022-10-10 11:43:47,646:INFO:epoch: [1/300] step: [190/1848], loss: 17.1101, lr: 0.000005, avg step time: 331.87 ms
+    2022-10-10 11:43:50,943:INFO:epoch: [1/300] step: [200/1848], loss: 16.7288, lr: 0.000005, avg step time: 329.74 ms
     ...
 
     ```
@@ -317,18 +309,18 @@ bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [BACKBONE] [BATCH_SIZE]
 ```log
 
    ===============================coco eval result===============================
-   Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.468
-   Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.664
-   Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.509
-   Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.288
-   Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.513
-   Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.612
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.358
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.575
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.612
+   Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.451
+   Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.646
+   Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.494
+   Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.281
+   Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.493
+   Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.577
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.350
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.566
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.610
    Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.416
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.662
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.764
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.664
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.751
 
 ```
 
@@ -368,18 +360,18 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_DIR] [DEVICE_ID]
 
                             yolox-darknet53
 =============================coco eval result==================================
- Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.473
- Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.670
- Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.517
- Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.290
- Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.519
- Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.615
- Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.360
- Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.582
- Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.622
- Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.430
- Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.671
- Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.772
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.480
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.674
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.524
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.304
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.525
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.616
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.364
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.585
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.625
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.435
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.678
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.762
                                     yolox-x
 =============================coco eval result==================================
  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.502

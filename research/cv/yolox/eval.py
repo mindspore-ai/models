@@ -20,11 +20,10 @@ import datetime
 from tqdm import tqdm
 from model_utils.config import config
 from mindspore.context import ParallelMode
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from mindspore import context
 
 from src.logger import get_logger
-from src.util import DetectionEngine
+from src.util import DetectionEngine, load_weights
 from src.yolox import DetectionBlock
 from src.yolox_dataset import create_yolox_dataset
 from src.initializer import default_recurisive_init
@@ -58,16 +57,7 @@ def run_test():
     default_recurisive_init(network)
     config.logger.info(config.val_ckpt)
     if os.path.isfile(config.val_ckpt):
-        param_dict = load_checkpoint(config.val_ckpt)
-        ema_param_dict = {}
-        for param in param_dict:
-            if param.startswith("ema."):
-                new_name = param.split("ema.")[1]
-                data = param_dict[param]
-                data.name = new_name
-                ema_param_dict[new_name] = data
-
-        load_param_into_net(network, ema_param_dict)
+        network = load_weights(network, config.val_ckpt)
         config.logger.info('load model %s success', config.val_ckpt)
     else:
         config.logger.info('%s doesn''t exist or is not a pre-trained file', config.val_ckpt)

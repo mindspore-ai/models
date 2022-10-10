@@ -20,10 +20,11 @@ import os
 import numpy as np
 
 import mindspore as ms
-from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
+from mindspore import Tensor, export, context
 
 from model_utils.config import config
 from src.yolox import DetectionBlock
+from src.util import load_weights
 
 
 def run_export():
@@ -43,8 +44,7 @@ def run_export():
     network = DetectionBlock(config, backbone=backbone)  # default yolo-darknet53
     network.set_train(False)
     assert config.val_ckpt is not None, "config.ckpt_file is None."
-    param_dict = load_checkpoint(config.val_ckpt)
-    load_param_into_net(network, param_dict)
+    network = load_weights(network, config.val_ckpt)
     input_arr = Tensor(np.ones([config.export_bs, 3, config.input_size[0], config.input_size[1]]), ms.float32)
     file_name = backbone
     export(network, input_arr, file_name=file_name, file_format=config.file_format)

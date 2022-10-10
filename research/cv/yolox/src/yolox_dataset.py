@@ -22,7 +22,7 @@ import cv2
 import mindspore.dataset as de
 from pycocotools.coco import COCO
 
-from src.transform import box_candidates, random_affine, TrainTransform, ValTransform
+from src.transform import random_affine, TrainTransform, ValTransform
 
 min_keypoints_per_image = 10
 
@@ -101,7 +101,7 @@ class COCOYoloXDataset:
         self.enable_mosaic = enable_mosaic
         self.degrees = 10.0
         self.translate = 0.1
-        self.scale = (0.5, 1.5)
+        self.scale = (0.1, 2.0)
         self.mixup_scale = (0.5, 1.5)
         self.shear = 2.0
         self.perspective = 0.0
@@ -111,7 +111,7 @@ class COCOYoloXDataset:
         if remove_images_without_annotations:
             img_ids = []
             for img_id in self.img_ids:
-                ann_ids = self.coco.getAnnIds(imgIds=img_id, iscrowd=None)
+                ann_ids = self.coco.getAnnIds(imgIds=img_id, iscrowd=False)
                 anno = self.coco.loadAnns(ann_ids)
                 if has_valid_annotation(anno):
                     img_ids.append(img_id)
@@ -201,13 +201,12 @@ class COCOYoloXDataset:
         return img, label, pre_fg_mask, is_inbox_and_incenter
 
     def mixup(self, origin_img, origin_labels, input_dim):
-        """ Mixup data augment """
         jit_factor = random.uniform(*self.mixup_scale)
         FLIP = random.uniform(0, 1) > 0.5
-        cp_labels = np.empty(0)
-        while not cp_labels.size:
+        cp_labels = []
+        while cp_labels:
             cp_index = random.randint(0, self.__len__() - 1)
-            cp_labels, _, _ = self.load_anno_from_ids(cp_index)
+            cp_labels = self.load_anno_from_ids(cp_index)
         img, cp_labels, _, _ = self.pull_item(cp_index)
 
         if len(img.shape) == 3:
@@ -222,7 +221,9 @@ class COCOYoloXDataset:
             interpolation=cv2.INTER_LINEAR,
         )
 
-        cp_img[: int(img.shape[0] * cp_scale_ratio), : int(img.shape[1] * cp_scale_ratio)] = resized_img
+        cp_img[
+            : int(img.shape[0] * cp_scale_ratio), : int(img.shape[1] * cp_scale_ratio)
+        ] = resized_img
 
         cp_img = cv2.resize(
             cp_img,
@@ -245,13 +246,17 @@ class COCOYoloXDataset:
             y_offset = random.randint(0, padded_img.shape[0] - target_h - 1)
         if padded_img.shape[1] > target_w:
             x_offset = random.randint(0, padded_img.shape[1] - target_w - 1)
-        padded_cropped_img = padded_img[y_offset: y_offset + target_h, x_offset: x_offset + target_w]
+        padded_cropped_img = padded_img[
+            y_offset: y_offset + target_h, x_offset: x_offset + target_w
+        ]
 
         cp_bboxes_origin_np = adjust_box_anns(
             cp_labels[:, :4].copy(), cp_scale_ratio, 0, 0, origin_w, origin_h
         )
         if FLIP:
-            cp_bboxes_origin_np[:, 0::2] = (origin_w - cp_bboxes_origin_np[:, 0::2][:, ::-1])
+            cp_bboxes_origin_np[:, 0::2] = (
+                origin_w - cp_bboxes_origin_np[:, 0::2][:, ::-1]
+            )
         cp_bboxes_transformed_np = cp_bboxes_origin_np.copy()
         cp_bboxes_transformed_np[:, 0::2] = np.clip(
             cp_bboxes_transformed_np[:, 0::2] - x_offset, 0, target_w
@@ -259,15 +264,13 @@ class COCOYoloXDataset:
         cp_bboxes_transformed_np[:, 1::2] = np.clip(
             cp_bboxes_transformed_np[:, 1::2] - y_offset, 0, target_h
         )
-        keep_list = box_candidates(cp_bboxes_origin_np.T, cp_bboxes_transformed_np.T, 5)
 
-        if keep_list.sum() >= 1.0:
-            cls_labels = cp_labels[keep_list, 4:5].copy()
-            box_labels = cp_bboxes_transformed_np[keep_list]
-            labels = np.hstack((box_labels, cls_labels))
-            origin_labels = np.vstack((origin_labels, labels))
-            origin_img = origin_img.astype(np.float32)
-            origin_img = 0.5 * origin_img + 0.5 * padded_cropped_img.astype(np.float32)
+        cls_labels = cp_labels[:, 4:5].copy()
+        box_labels = cp_bboxes_transformed_np
+        labels = np.hstack((box_labels, cls_labels))
+        origin_labels = np.vstack((origin_labels, labels))
+        origin_img = origin_img.astype(np.float32)
+        origin_img = 0.5 * origin_img + 0.5 * padded_cropped_img.astype(np.float32)
 
         return origin_img.astype(np.uint8), origin_labels
 
