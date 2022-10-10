@@ -246,7 +246,7 @@ class BertTrainWithLossScaleCell(nn.TrainOneStepWithLossScaleCell):
         overflow = self.process_loss_scale(cond)
         if not overflow:
             self.optimizer(grads)
-        return (loss, cond, scaling_sens)
+        return (loss, cond, scaling_sens.value())
 
 class BertTrainCell(nn.Cell):
     """
@@ -470,7 +470,7 @@ class BertEvaluationWithLossScaleCell(nn.TrainOneStepWithLossScaleCell):
         overflow = self.process_loss_scale(cond)
         if not overflow:
             self.optimizer(grads)
-        return (loss, cond, scaling_sens)
+        return (loss, cond, scaling_sens.value())
 
 
 class BertEvaluationCell(nn.Cell):
