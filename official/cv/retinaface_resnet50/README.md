@@ -79,11 +79,19 @@ After installing MindSpore via the official website and download the dataset, yo
   # run distributed training example
   bash scripts/run_distribute_gpu_train.sh 4 0,1,2,3
 
+  # run exporting ONNX model example
+  python export.py
+
   # run evaluation example
   export CUDA_VISIBLE_DEVICES=0
   python eval.py > eval.log 2>&1 &
   OR
   bash run_standalone_gpu_eval.sh 0
+
+  # run evaluation of ONNX model example
+  python eval_onnx.py
+  OR
+  bash scripts/run_onnx_eval.sh
   ```
 
 # [Script Description](#contents)
@@ -98,6 +106,7 @@ After installing MindSpore via the official website and download the dataset, yo
         ├── scripts
         │   ├──run_distribute_gpu_train.sh         // shell script for distributed on GPU
         │   ├──run_standalone_gpu_eval.sh         // shell script for evaluation on GPU
+        │   ├──run_onnx_eval.sh                  // shell script for ONNX model evaluation on GPU or CPU
         ├── src
         │   ├──dataset.py             // creating dataset
         │   ├──network.py            // retinaface architecture
@@ -112,6 +121,8 @@ After installing MindSpore via the official website and download the dataset, yo
         │   ├──ground_truth               // eval label
         ├── train.py               // training script
         ├── eval.py               //  evaluation script
+        ├── export.py            // ONNX model exporting script
+        ├── eval_onnx.py        // ONNX model evaluation script
 ```
 
 ## [Script Parameters](#contents)
@@ -160,6 +171,10 @@ Parameters for both training and evaluation can be set in config.py
     'val_save_result': False,                                     # Whether save the resultss
     'val_predict_save_folder': './widerface_result',              # Result save path
     'val_gt_dir': './data/ground_truth/',                         # Path of val set ground_truth
+    # onnx
+    'ckpt_model': '../ckpt/retinaface.ckpt',                  # path of ckpt file to be exported
+    'onnx_model': '../ckpt/retinaface.onnx',                  # path of the ONNX model to be evaluated
+    'device': 'CPU',                                          # device type: CPU or GPU
   ```
 
 ## [Training Process](#contents)
@@ -188,6 +203,16 @@ Parameters for both training and evaluation can be set in config.py
   The above shell script will run distribute training in the background. You can view the results through the file `train/train.log`.
 
   After training, you'll get some checkpoint files under the folder `./checkpoint/ckpt_0/` by default.
+
+## ONNX EXPORTING
+
+- **preparation**：Modify the parameter  `device` in the `src/config.py` file to select the type of device: `CPU` or `GPU`; then modify the parameter  `ckpt_model` to specify the path of ckpt file that is uesd to export to onnx model.
+
+- **run script**：Run the following command to export the `ONNX` model and it will be saved in the current directory.
+
+  ```SHELL
+  python export.py
+  ```
 
 ## [Evaluation Process](#contents)
 
@@ -224,6 +249,32 @@ Parameters for both training and evaluation can be set in config.py
   Easy   Val AP : 0.9422
   Medium Val AP : 0.9325
   Hard   Val AP : 0.8900
+  ```
+
+## Evaluation for ONNX MODEL
+
+- **preparation**：Modify the following parameters in the `src/config.py` file according to the actual situation:
+
+    - `device`：type of device `CPU` 或 `GPU`；
+    - `onnx_model`：path of onnx model；
+    - `val_dataset_folder`：path of validation dataset;
+    - `val_gt_dir`：path of validation dataset ground_truth label.
+
+- **run script**：Run the following command to evaluate the `ONNX` model:
+
+  ```bash
+  export CUDA_VISIBLE_DEVICES="$1"
+  python eval_onnx.py
+  or
+  bash scripts/run_onnx_eval.sh 0
+  ```
+
+The evaluation results can be viewed in the window：
+
+  ```python
+  Easy   Val AP : 0.9390
+  Medium Val AP : 0.9306
+  Hard   Val AP : 0.8886
   ```
 
 # [Model Description](#contents)

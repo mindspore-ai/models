@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -65,4 +65,8 @@ cfg_res50 = {
     'val_predict_save_folder': './widerface_result',
     'val_gt_dir': './data/ground_truth/',
 
+    # onnx
+    'ckpt_model': '../ckpt/retinaface.ckpt',
+    'onnx_model': './retinaface.onnx',
+    'device': 'GPU',
 }

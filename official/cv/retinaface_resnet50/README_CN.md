@@ -84,11 +84,19 @@ RetinaFace使用ResNet50骨干提取图像特征进行检测。从ModelZoo获取
   # 分布式训练示例
   bash scripts/run_distribute_gpu_train.sh 3 0,1,2
 
+  # ONNX模型导出示例
+  python export.py
+
   # 评估示例
   export CUDA_VISIBLE_DEVICES=0
   python eval.py > eval.log 2>&1 &  
   OR
   bash run_standalone_gpu_eval.sh 0
+
+  # ONNX模型评估示例
+  python eval_onnx.py
+  OR
+  bash scripts/run_onnx_eval.sh
   ```
 
 # 脚本说明
@@ -103,6 +111,7 @@ RetinaFace使用ResNet50骨干提取图像特征进行检测。从ModelZoo获取
         ├── scripts
         │   ├──run_distribute_gpu_train.sh         // GPU分布式shell脚本
         │   ├──run_standalone_gpu_eval.sh         // GPU评估shell脚本
+        │   ├──run_onnx_eval.sh                  // ONNX模型评估shell脚本
         ├── src
         │   ├──dataset.py             // 创建数据集
         │   ├──network.py            // RetinaFace架构
@@ -116,6 +125,8 @@ RetinaFace使用ResNet50骨干提取图像特征进行检测。从ModelZoo获取
         │   ├──ground_truth               // 评估标签
         ├── train.py               // 训练脚本
         ├── eval.py               //  评估脚本
+        ├── export.py            // ONNX模型导出脚本
+        ├── eval_onnx.py        // ONNX模型评估脚本
 ```
 
 ## 脚本参数
@@ -169,6 +180,10 @@ RetinaFace使用ResNet50骨干提取图像特征进行检测。从ModelZoo获取
     'val_save_result': False,                                 # 是否保存结果
     'val_predict_save_folder': './widerface_result',          # 结果保存路径
     'val_gt_dir': './data/ground_truth/',                     # 验证集ground_truth路径
+    # onnx
+    'ckpt_model': '../ckpt/retinaface.ckpt',                  # 待转成ONNX模型的ckpt文件的路径
+    'onnx_model': '../ckpt/retinaface.onnx',                  # 评估所使用的ONNX模型的路径
+    'device': 'CPU',                                          # 评估ONNX模型和导出ONNX模型时的设备类型：CPU or GPU
   ```
 
 ## 训练过程
@@ -197,6 +212,16 @@ RetinaFace使用ResNet50骨干提取图像特征进行检测。从ModelZoo获取
   上述shell脚本在后台运行分布式训练，可通过`train/train.log`文件查看结果。
 
   训练结束后，可在默认文件夹`./checkpoint/ckpt_0/`中找到检查点文件。
+
+## 导出ONNX模型
+
+- **准备工作**：修改 `src/config.py` 文件中的 `device` 参数，选择设备的类型：`CPU` 或 `GPU`；然后再修改 `ckpt_model` 参数，用于给定导出 `ONNX` 模型所使用的 `CKPT` 文件的路径。
+
+- **运行模型导出脚本**：运行以下命令即可导出 `ONNX` 模型，`ONNX` 模型保存在当前目录下。
+
+  ```bash
+  python export.py
+  ```
 
 ## 评估过程
 
@@ -233,6 +258,32 @@ RetinaFace使用ResNet50骨干提取图像特征进行检测。从ModelZoo获取
   Easy   Val AP : 0.9437
   Medium Val AP : 0.9334
   Hard   Val AP : 0.8904
+  ```
+
+## ONNX模型评估过程
+
+- **准备工作**：根据实际情况修改 `src/config.py` 文件中以下参数：
+
+    - `device` 参数：设备类型 `CPU` 或 `GPU`；
+    - `onnx_model` 参数：评估所使用的 `ONNX` 模型的路径；
+    - `val_dataset_folder` 参数：验证集图片所在根目录；
+    - `val_gt_dir` 参数：`ground truth` 标签所在根目录。
+
+- **运行ONNX推理脚本**：运行以下命令即可对 `ONNX` 模型进行评估：
+
+  ```bash
+  export CUDA_VISIBLE_DEVICES="$1"
+  python eval_onnx.py
+  or
+  bash scripts/run_onnx_eval.sh 0
+  ```
+
+可在窗口中查看评估结果：
+
+  ```python
+Easy   Val AP : 0.9390
+Medium Val AP : 0.9306
+Hard   Val AP : 0.8886
   ```
 
 # 模型描述
