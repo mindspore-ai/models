@@ -1,0 +1,6 @@
+pandas
+numpy
+random
+mindspre==1.8.1
+tqdm
+sklearn
