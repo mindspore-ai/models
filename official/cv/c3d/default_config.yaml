@@ -47,6 +47,7 @@ device_id:         0                     # Device id
 ckpt_path:         ./result/ckpt         # Ckpt save path
 ckpt_interval:     1                     # Saving ckpt interval
 keep_checkpoint_max: 40                  # Max ckpt file number
+is_evalcallback:   1                     # Using evalcallback or not
 
 # Modelarts Setup
 enable_modelarts:  0                     # Is training on modelarts
