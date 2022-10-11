@@ -236,7 +236,7 @@ class GRUTrainOneStepWithLossScaleCell(nn.Cell):
             overflow = self.loss_scaling_manager(self.loss_scale, cond)
         if not overflow:
             self.optimizer(grads)
-        return (loss, cond, scaling_sens)
+        return (loss, cond, scaling_sens.value())
 
 class GRUTrainOneStepCell(nn.TrainOneStepCell):
     """

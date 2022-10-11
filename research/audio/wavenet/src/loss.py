@@ -446,5 +446,5 @@ class WaveNetTrainOneStepWithLossScaleCell(nn.Cell):
 
         self.scalar_summary("training.loss", loss)
 
-        ret = (loss, scale_sense)
+        ret = (loss, scale_sense.value())
         return F.depend(ret, succ)
