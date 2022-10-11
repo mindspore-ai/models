@@ -168,6 +168,10 @@ def train_fasterrcnn():
     if device_type == "Ascend":
         net.to_float(ms.float16)
 
+    # single card, original base_lr is for 8 cards
+    if not config.run_distribute:
+        config.base_lr = config.base_lr / 8
+
     print(f"\n[{rank}]", "===> Creating loss, lr and opt objects...")
     loss = LossNet()
     if config.lr_type.lower() not in ("dynamic", "multistep"):
