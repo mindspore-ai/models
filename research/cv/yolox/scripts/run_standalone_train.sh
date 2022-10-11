@@ -15,8 +15,8 @@
 # ============================================================================
 
 if [[ $# -lt 2 || $# -gt 3 ]];then
-    echo "Usage1: bash run_standalone_train.sh  [DATASET_PATH] [BACKBONE]  for first data aug epochs"
-    echo "Usage2: bash run_standalone_train.sh  [DATASET_PATH] [BACKBONE] [LATEST_CKPT] for last no data aug epochs"
+    echo "Usage1: bash run_standalone_train.sh  [DATASET_PATH] [BACKBONE]"
+    echo "Usage2: bash run_standalone_train.sh  [DATASET_PATH] [BACKBONE] [RESUME_CKPT] for resume train"
 exit 1
 fi
 
@@ -45,6 +45,12 @@ then
 exit 1
 fi
 
+if [ $# == 3 ]
+then
+  CKPT_FILE=$(get_real_path $3)
+  echo $CKPT_FILE
+fi
+
 export DEVICE_NUM=1
 export DEVICE_ID=0
 export RANK_ID=0
@@ -70,22 +76,17 @@ then
   python train.py \
         --config_path=$CONFIG_PATH \
         --data_dir=$DATASET_PATH \
-        --data_aug=True \
         --is_distributed=0 \
-        --eval_interval=10 \
         --backbone=$BACKBONE > log.txt 2>&1 &
 fi
 
 if [ $# == 3 ]
 then
-  echo "Start to launch last no data augment epochs..."
-  CKPT_FILE=$(get_real_path $3)
-  echo $CKPT_FILE
+  echo "Start to resume train..."
   python train.py \
+      --config_path=$CONFIG_PATH \
       --data_dir=$DATASET_PATH \
-      --data_aug=False \
       --is_distributed=0 \
-      --eval_interval=1 \
       --backbone=$BACKBONE \
-      --yolox_no_aug_ckpt=$CKPT_FILE > log.txt 2>&1 &
+      --resume_yolox=$CKPT_FILE > log.txt 2>&1 &
 fi

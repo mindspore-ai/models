@@ -14,8 +14,8 @@
 # limitations under the License.
 # ===========================================================================
 if [[ $# -lt 3 || $# -gt 4 ]];then
-    echo "Usage1: bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE] [BACKBONE]  for first data aug epochs"
-    echo "Usage2: bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE] [BACKBONE] [RESUME_CKPT] for last no data aug epochs"
+    echo "Usage1: bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE] [BACKBONE]"
+    echo "Usage2: bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE] [BACKBONE] [RESUME_CKPT] for resume"
 exit 1
 fi
 
@@ -90,23 +90,14 @@ then
       taskset -c $cmdopt python train.py \
           --config_path=$CONFIG_PATH\
           --data_dir=$DATASET_PATH \
-          --yolox_no_aug_ckpt=$RESUME_CKPT \
           --backbone=$BACKBONE \
-          --data_aug=True \
-          --is_distributed=1 \
-          --lr=0.011 \
-          --max_epoch=285 \
-          --warmup_epochs=5 \
-          --no_aug_epochs=15  \
-          --min_lr_ratio=0.001 \
-          --eval_interval=10 \
-          --lr_scheduler=yolox_warm_cos_lr  > log.txt 2>&1 &
+          --is_distributed=1 > log.txt 2>&1 &
       cd ..
   done
 fi
 if [ $# == 4 ]
 then
-  echo "Start to launch last no data augment epochs..."
+  echo "Start to resume train..."
   for((i=0; i<${DEVICE_NUM}; i++))
   do
       start=`expr $i \* $avg`
@@ -126,17 +117,9 @@ then
       taskset -c $cmdopt python train.py \
           --config_path=$CONFIG_PATH\
           --data_dir=$DATASET_PATH \
-          --yolox_no_aug_ckpt=$RESUME_CKPT \
           --backbone=$BACKBONE \
-          --data_aug=False \
           --is_distributed=1 \
-          --lr=0.011 \
-          --max_epoch=285 \
-          --warmup_epochs=5 \
-          --no_aug_epochs=15  \
-          --min_lr_ratio=0.001 \
-          --eval_interval=1 \
-          --lr_scheduler=yolox_warm_cos_lr  > log.txt 2>&1 &
+          --resume_yolox=$RESUME_CKPT > log.txt 2>&1 &
       cd ..
   done
 fi

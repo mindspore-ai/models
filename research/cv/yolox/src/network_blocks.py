@@ -61,7 +61,7 @@ class BaseConv(nn.Cell):
             group=groups,
             has_bias=bias
         )
-        self.bn = nn.BatchNorm2d(out_channels)
+        self.bn = nn.BatchNorm2d(num_features=out_channels, eps=1e-3, momentum=0.97)
         self.act = get_activation(act)
 
     def construct(self, x):
@@ -74,7 +74,7 @@ def use_syc_bn(network):
     for _, cell in network.cells_and_names():
         if isinstance(cell, BaseConv):
             out_channels = cell.bn.num_features
-            cell.bn = nn.SyncBatchNorm(out_channels)
+            cell.bn = nn.SyncBatchNorm(num_features=out_channels, eps=1e-3, momentum=0.97)
 
 
 class DWConv(nn.Cell):
@@ -154,25 +154,19 @@ class SPPBottleneck(nn.Cell):
         self.conv1 = BaseConv(in_channels, hidden_channels, 1, stride=1, act=activation)
         self.m = nn.CellList(
             [
-                nn.MaxPool2d(kernel_size=ks, stride=1)
+                nn.MaxPool2d(kernel_size=ks, stride=1, pad_mode='same')
                 for ks in kernel_sizes
             ]
         )
-        self.pad0 = ops.Pad(((0, 0), (0, 0), (kernel_sizes[0] // 2, kernel_sizes[0] // 2),
-                             (kernel_sizes[0] // 2, kernel_sizes[0] // 2)))
-        self.pad1 = ops.Pad(((0, 0), (0, 0), (kernel_sizes[1] // 2, kernel_sizes[1] // 2),
-                             (kernel_sizes[1] // 2, kernel_sizes[1] // 2)))
-        self.pad2 = ops.Pad(((0, 0), (0, 0), (kernel_sizes[2] // 2, kernel_sizes[2] // 2),
-                             (kernel_sizes[2] // 2, kernel_sizes[2] // 2)))
         conv2_channels = hidden_channels * (len(kernel_sizes) + 1)
         self.conv2 = BaseConv(conv2_channels, out_channels, 1, stride=1, act=activation)
 
     def construct(self, x):
         x = self.conv1(x)
         op = ops.Concat(axis=1)
-        x1 = self.m[0](self.pad0(x))
-        x2 = self.m[1](self.pad1(x))
-        x3 = self.m[2](self.pad2(x))
+        x1 = self.m[0](x)
+        x2 = self.m[1](x)
+        x3 = self.m[2](x)
         x = op((x, x1, x2, x3))
         x = self.conv2(x)
         return x

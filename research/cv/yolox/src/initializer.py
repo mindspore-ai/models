@@ -20,7 +20,7 @@ import numpy as np
 import mindspore.nn as nn
 from mindspore.common import initializer as init
 from mindspore.common.initializer import Initializer as MeInitializer
-from src.util import load_backbone
+from src.util import load_weights
 
 
 def calculate_gain(nonlinearity, param=None):
@@ -180,9 +180,6 @@ def default_recurisive_init(custom_cell, prior_prob=1e-2):
                 cell.bias.set_data(init.initializer(init.Uniform(bound),
                                                     cell.bias.shape,
                                                     cell.bias.dtype))
-        elif isinstance(cell, (nn.BatchNorm2d, nn.BatchNorm1d, nn.SyncBatchNorm)):
-            cell.momentum = 0.97
-            cell.eps = 0.001
         else:
             pass
         initialize_head_biases(custom_cell, prior_prob=0.01)
@@ -198,7 +195,7 @@ def initialize_head_biases(network, prior_prob):
 def load_yolox_params(args, network):
     """Load yolox darknet parameter from checkpoint."""
     if args.pretrained_backbone:
-        network = load_backbone(network, args.pretrained_backbone, args)
+        network = load_weights(network, args.pretrained_backbone, args)
         args.logger.info('load pre-trained backbone {} into network'.format(args.pretrained_backbone))
     else:
         args.logger.info('Not load pre-trained backbone, please be careful')
