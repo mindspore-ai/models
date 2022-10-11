@@ -329,7 +329,7 @@ class TransformerTrainOneStepWithLossScaleCell(nn.TrainOneStepWithLossScaleCell)
             overflow = self.loss_scaling_manager(self.loss_scale, cond)
         if not overflow:
             self.optimizer(grads)
-        return (loss, cond, scaling_sens)
+        return (loss, cond, scaling_sens.value())
 
 
 cast = P.Cast()
@@ -519,4 +519,4 @@ class TransformerTrainAccumulationAllReducePostWithLossScaleCell(nn.Cell):
             if not overflow:
                 self.optimizer(grads)
 
-        return mean_loss, overflow, scaling_sens
+        return mean_loss, overflow, scaling_sens.value()

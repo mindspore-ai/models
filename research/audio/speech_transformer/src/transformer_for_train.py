@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -285,7 +285,7 @@ class TransformerTrainOneStepWithLossScaleCell(nn.TrainOneStepWithLossScaleCell)
             overflow = self.loss_scaling_manager(self.loss_scale, cond)
         if not overflow:
             self.optimizer(grads)
-        return (loss, cond, scaling_sens)
+        return (loss, cond, scaling_sens.value())
 
 
 cast = P.Cast()
@@ -475,4 +475,4 @@ class TransformerTrainAccumulationAllReducePostWithLossScaleCell(nn.Cell):
             if not overflow:
                 self.optimizer(grads)
 
-        return mean_loss, overflow, scaling_sens
+        return mean_loss, overflow, scaling_sens.value()
