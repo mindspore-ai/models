@@ -18,6 +18,7 @@ import numpy as np
 
 import mindspore as ms
 import mindspore.nn as nn
+import mindspore.common.dtype as mstype
 import mindspore.ops as ops
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from mindspore.communication.management import init, get_rank
@@ -25,6 +26,7 @@ from mindspore.parallel import set_algo_parameters
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.nn.loss import SoftmaxCrossEntropyWithLogits
 from mindspore_gs import PrunerKfCompressAlgo, PrunerFtCompressAlgo
+from mindspore_gs.pruner.scop.scop_pruner import KfConv2d, MaskedConv2dbn
 from src.lr_generator import get_lr
 from src.CrossEntropySmooth import CrossEntropySmooth
 from src.resnet import conv_variance_scaling_initializer
@@ -57,6 +59,38 @@ class NetWithLossCell(nn.WithLossCell):
             output_list.append(out[igpu * num_pgpu * 2:igpu * num_pgpu * 2 + num_pgpu])
         out = ops.Concat(axis=0)(output_list)
         return self._loss_fn(out, label)
+
+
+class LossCallBack(LossMonitor):
+    """
+    Monitor the loss in training.
+    If the loss in NAN or INF terminating training.
+    """
+
+    def __init__(self, has_trained_epoch=0):
+        super(LossCallBack, self).__init__()
+        self.has_trained_epoch = has_trained_epoch
+
+    def step_end(self, run_context):
+        cb_params = run_context.original_args()
+        loss = cb_params.net_outputs
+
+        if isinstance(loss, (tuple, list)):
+            if isinstance(loss[0], ms.Tensor) and isinstance(loss[0].asnumpy(), np.ndarray):
+                loss = loss[0]
+
+        if isinstance(loss, ms.Tensor) and isinstance(loss.asnumpy(), np.ndarray):
+            loss = np.mean(loss.asnumpy())
+
+        cur_step_in_epoch = (cb_params.cur_step_num - 1) % cb_params.batch_num + 1
+
+        if isinstance(loss, float) and (np.isnan(loss) or np.isinf(loss)):
+            raise ValueError("epoch: {} step: {}. Invalid loss, terminating training.".format(
+                cb_params.cur_epoch_num, cur_step_in_epoch))
+        if self._per_print_times != 0 and cb_params.cur_step_num % self._per_print_times == 0:
+            # pylint: disable=line-too-long
+            print("epoch: %s step: %s, loss is %s" % (cb_params.cur_epoch_num + int(self.has_trained_epoch),
+                                                      cur_step_in_epoch, loss), flush=True)
 
 
 def filter_checkpoint_parameter_by_list(origin_dict, param_filter):
@@ -139,44 +173,6 @@ def init_weight(net, param_dict):
                     cell.weight.set_data(weight)
 
 
-def load_fp32_ckpt(net):
-    if config.fp32_ckpt:
-        if os.path.isfile(config.fp32_ckpt):
-            ckpt = ms.load_checkpoint(config.fp32_ckpt)
-            if config.filter_weight:
-                filter_list = [x.name for x in net.end_point.get_parameters()]
-                filter_checkpoint_parameter_by_list(ckpt, filter_list)
-            ms.load_param_into_net(net, ckpt)
-        else:
-            print(f"Invalid fp32_ckpt {config.fp32_ckpt} parameter.")
-
-
-def load_pretrained_ckpt(net):
-    if config.pre_trained:
-        if os.path.isfile(config.pre_trained):
-            ckpt = ms.load_checkpoint(config.pre_trained)
-            if ckpt.get("epoch_num") and ckpt.get("step_num"):
-                config.has_trained_epoch = int(ckpt["epoch_num"].data.asnumpy())
-                config.has_trained_step = int(ckpt["step_num"].data.asnumpy())
-            else:
-                config.has_trained_epoch = 0
-                config.has_trained_step = 0
-
-            if config.has_trained_epoch > config.epoch_size:
-                raise RuntimeError("If retrain, epoch_size should be bigger than has_trained_epoch after "
-                                   "loading pretrained weight, but got epoch_size {}, has_trained_epoch {}"
-                                   "".format(config.epoch_size, config.has_trained_epoch))
-
-            if config.filter_weight:
-                filter_list = [x.name for x in net.end_point.get_parameters()]
-                filter_checkpoint_parameter_by_list(ckpt, filter_list)
-            not_load_param = ms.load_param_into_net(net, ckpt)
-            if not_load_param:
-                raise RuntimeError("Load param into net fail.")
-        else:
-            raise RuntimeError("Pretrained ckpt file {} does not exist.".format(config.pre_trained))
-
-
 def init_group_params(net):
     decayed_params = []
     no_decayed_params = []
@@ -225,8 +221,22 @@ def train_net():
 
     # apply golden-stick algo
     algo_kf = PrunerKfCompressAlgo({})
-    load_fp32_ckpt(net)
-    net = algo_kf.apply(net)
+    pre_ckpt = ms.load_checkpoint(config.fp32_ckpt)
+    ms.load_param_into_net(net, pre_ckpt)
+    model = algo_kf.apply(net)
+
+    kfconv_list = []
+    for _, (_, module) in enumerate(model.cells_and_names()):
+        if isinstance(module, KfConv2d):
+            kfconv_list.append(module)
+    kfscale_list = [[] for _ in range(len(kfconv_list))]
+
+    for param in model.get_parameters():
+        param.requires_grad = False
+    for _, (_, module) in enumerate(model.cells_and_names()):
+        if isinstance(module, KfConv2d):
+            module.kfscale.requires_grad = True
+
     lr = get_lr(lr_init=config.lr_init,
                 lr_end=0.0,
                 lr_max=config.lr_max_kf,
@@ -235,35 +245,85 @@ def train_net():
                 steps_per_epoch=step_size,
                 lr_decay_mode='cosine')
 
-    optimizer = nn.Momentum(filter(lambda p: p.requires_grad, net.get_parameters()),
+    optimizer = nn.Momentum(filter(lambda p: p.requires_grad, model.get_parameters()),
                             learning_rate=lr,
                             momentum=config.momentum,
                             loss_scale=config.loss_scale
                             )
 
     kf_loss_fn = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-    time_cb = TimeMonitor(data_size=step_size)
-    loss_cb = LossMonitor()
-    algo_cb_list = algo_kf.callbacks()
-    cb = [loss_cb, time_cb]
-    cb += algo_cb_list
+
+    net_with_loss = NetWithLossCell(model, kf_loss_fn, 1)
+
+    net_train_step = nn.TrainOneStepCell(net_with_loss, optimizer)
     if config.pre_trained:
-        train_ft(net)
+        for param in model.get_parameters():
+            param.requires_grad = True
+        train_ft(model, dataset)
     else:
-        model = ms.Model(net, loss_fn=kf_loss_fn, optimizer=optimizer)
-        model.train(config.epoch_kf, dataset, callbacks=cb, dataset_sink_mode=False)
-        train_ft(net)
+        model = train_kf(dataset, net_train_step, model, kfconv_list, kfscale_list)
+        train_ft(model, dataset)
 
 
-def train_ft(net):
+def train_kf(dataset, net_train_step, model, kfconv_list, kfscale_list):
+    """train konckoff."""
+    for _ in range(0, config.epoch_kf):
+        from copy import deepcopy
+        for _, (kf_data, kf_target) in enumerate(dataset.create_tuple_iterator()):
+            kf = deepcopy(kf_data)
+            idx = ops.Randperm(max_length=kf.shape[0])(ms.Tensor([kf.shape[0]], dtype=mstype.int32))
+            kf_input = kf[idx, :].view(kf.shape)
+
+            input_list = []
+            kf_num_pgpu = kf_data.shape[0] // config.ngpu
+            for i_gpu in range(config.ngpu):
+                input_list.append(ops.Concat(axis=0)(
+                    [kf_data[i_gpu * kf_num_pgpu:(i_gpu + 1) * kf_num_pgpu],
+                     kf_input[i_gpu * kf_num_pgpu:(i_gpu + 1) * kf_num_pgpu]]))
+            kf_input = ops.Concat(axis=0)(input_list)
+            loss = net_train_step(kf_input, kf_target)
+            print('loss:{}'.format(loss))
+
+            for module in model.cells():
+                if isinstance(module, KfConv2d):
+                    module.kfscale = module.kfscale._update_tensor_data(
+                        ops.clip_by_value(module.kfscale.data, clip_value_max=ms.Tensor(1, mstype.float32),
+                                          clip_value_min=ms.Tensor(0, mstype.float32)))
+        for ikf in range(len(kfconv_list)):
+            kfscale_list[ikf].append(kfconv_list[ikf].kfscale.data.clone())
+
+    for param in model.get_parameters():
+        param.requires_grad = True
+    for _, (_, module) in enumerate(model.cells_and_names()):
+        if isinstance(module, KfConv2d):
+            module.score = module.bn.gamma.data.abs() * ops.Squeeze()(module.kfscale.data - (1 - module.kfscale.data))
+    for kfconv in kfconv_list:
+        kfconv.prune_rate = config.prune_rate
+    for _, (_, module) in enumerate(model.cells_and_names()):
+        if isinstance(module, KfConv2d):
+            _, index = ops.Sort()(module.score)
+            num_pruned_channel = int(module.prune_rate * module.score.shape[0])
+            module.out_index = index[num_pruned_channel:]
+    return model
+
+
+def train_ft(model, dataset):
     """train finetune."""
-    dataset = create_dataset(dataset_path=config.data_path, do_train=True,
-                             batch_size=config.batch_size, train_image_size=config.train_image_size,
-                             eval_image_size=config.eval_image_size, target=config.device_target,
-                             distribute=config.run_distribute)
-    algo_ft = PrunerFtCompressAlgo(prune_rate=config.prune_rate)
-    net = algo_ft.apply(net)
-    load_pretrained_ckpt(net)
+    algo_ft = PrunerFtCompressAlgo({})
+    if config.pre_trained:
+        pre_ckpt = ms.load_checkpoint(config.pre_trained)
+        out_index = []
+        param_dict = ms.load_checkpoint(config.checkpoint_file_path)
+        for key in param_dict.keys():
+            if 'out_index' in key:
+                out_index.append(param_dict[key])
+        for _, (_, module) in enumerate(model.cells_and_names()):
+            if isinstance(module, KfConv2d):
+                module.out_index = out_index.pop(0)
+        model = algo_ft.apply(model)
+        ms.load_param_into_net(model, pre_ckpt)
+    else:
+        model = algo_ft.apply(model)
     lr_ft_new = ms.Tensor(get_lr(lr_init=config.lr_init,
                                  lr_end=config.lr_end_ft,
                                  lr_max=config.lr_max_ft,
@@ -272,16 +332,17 @@ def train_ft(net):
                                  steps_per_epoch=dataset.get_dataset_size(),
                                  lr_decay_mode='poly'))
 
-    optimizer_ft = nn.Momentum(filter(lambda p: p.requires_grad, net.get_parameters()),
+    optimizer_ft = nn.Momentum(filter(lambda p: p.requires_grad, model.get_parameters()),
                                learning_rate=lr_ft_new,
                                momentum=config.momentum,
                                loss_scale=config.loss_scale
                                )
-    net.set_train()
+    model.set_train()
+
     metrics = {"acc"}
     loss_scale = FixedLossScaleManager(1024, drop_overflow_update=False)
     ft_loss_fn = SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-    model_ft = ms.Model(net, loss_fn=ft_loss_fn, optimizer=optimizer_ft, loss_scale_manager=loss_scale,
+    model_ft = ms.Model(model, loss_fn=ft_loss_fn, optimizer=optimizer_ft, loss_scale_manager=loss_scale,
                         metrics=metrics,
                         amp_level="O2", boost_level="O0", keep_batchnorm_fp32=False)
 
@@ -291,13 +352,21 @@ def train_ft(net):
     loss_cb = LossMonitor()
     ckpt_save_dir = set_save_ckpt_dir()
     config_ck = CheckpointConfig(save_checkpoint_steps=5 * step_size,
-                                 keep_checkpoint_max=config.keep_checkpoint_max)
+                                 keep_checkpoint_max=10)
     ckpt_cb = ModelCheckpoint(prefix="resnet", directory=ckpt_save_dir,
                               config=config_ck)
     ft_cb = [time_cb, loss_cb, ckpt_cb]
 
     model_ft.train(config.epoch_ft, dataset, callbacks=ft_cb,
                    sink_size=dataset.get_dataset_size(), dataset_sink_mode=True)
+
+    masked_conv_list = []
+    for _, (nam, module) in enumerate(model.cells_and_names()):
+        if isinstance(module, MaskedConv2dbn):
+            masked_conv_list.append((nam, module))
+    for imd in range(len(masked_conv_list)):
+        if 'conv2' in masked_conv_list[imd][0] or 'conv3' in masked_conv_list[imd][0]:
+            masked_conv_list[imd][1].in_index = masked_conv_list[imd - 1][1].out_index
 
 
 if __name__ == '__main__':
