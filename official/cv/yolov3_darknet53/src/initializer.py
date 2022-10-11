@@ -184,10 +184,19 @@ def load_yolov3_params(args, network):
     if args.resume_yolov3:
         param_dict = ms.load_checkpoint(args.resume_yolov3)
         param_dict_new = {}
+        filter_key = ["feature_map.backblock0.conv6.bias",
+                      "feature_map.backblock0.conv6.weight",
+                      "feature_map.backblock1.conv6.bias",
+                      "feature_map.backblock1.conv6.weight",
+                      "feature_map.backblock2.conv6.bias",
+                      "feature_map.backblock2.conv6.weight",
+                      ]
         for key, values in param_dict.items():
             if key.startswith('moments.'):
                 continue
             elif key.startswith('yolo_network.'):
+                if key[13:] in filter_key:
+                    continue
                 param_dict_new[key[13:]] = values
                 args.logger.info('in resume {}'.format(key))
             else:
