@@ -204,7 +204,7 @@ class COCOYoloXDataset:
         jit_factor = random.uniform(*self.mixup_scale)
         FLIP = random.uniform(0, 1) > 0.5
         cp_labels = []
-        while cp_labels:
+        while not cp_labels:
             cp_index = random.randint(0, self.__len__() - 1)
             cp_labels = self.load_anno_from_ids(cp_index)
         img, cp_labels, _, _ = self.pull_item(cp_index)
