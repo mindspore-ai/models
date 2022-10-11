@@ -60,7 +60,6 @@ eval_image_size: 224
 
 # Golden-stick options
 comp_algo: "SLB"
-enable_bn_calibration: False
 quant_type: "W1"
 t_start_val: 1.0
 t_start_time: 0.2
@@ -104,9 +103,7 @@ checkpoint_file_path: "The location of the checkpoint file."
 save_graphs: "Whether save graphs during training, default: False"
 save_graphs_path: "Path to save graphs."
 comp_algo: "The quantization algorithm, default: SLB"
-enable_act_quant: "Whether apply activation quantization while training, default: False"
-enable_bn_calibration: "Whether apply batchnorm calibration while training, default: False"
-quant_type: "Quantization bit number of weight and activation, available: [W1, W2, W4, W1A8, W2A8, W4A8]"
+quant_type: "Quantization bit number of weight, available: [W1, W2, W4]"
 t_start_val: "Initial value of temperature hyperparameters, default: 1.0"
 t_start_time: "Fraction of epochs after which temperature hyperparameters starting changing, default: 0.2"
 t_end_time: "Fraction of epochs after which temperature hyperparameters stopping changing, default: 0.6"
