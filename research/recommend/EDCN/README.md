@@ -79,6 +79,7 @@ After installing MindSpore via the official website, you can start training and 
     --eval_file_name='auc.log' \
     --loss_file_name='loss.log' \
     --device_target='Ascend' \
+    --epochs=10 \
     --do_eval=True > ms_log/output.log 2>&1 &
 
   # run evaluation example
@@ -185,6 +186,7 @@ Parameters for both training and evaluation can be set in `default_config.yaml`
   ckpt_path: 'ckpts'                  # the folder path to save '*.ckpt' files. Relative path.
   eval_file_name: "./auc.log"         # file path to record accuracy
   loss_file_name: "./loss.log"        # file path to record loss
+  epochs: 10                          # train epochs
   do_eval: "True"                     # whether do eval while training, default is 'True'.
   # Test
   test_data_dir: ''                   # test dataset path
@@ -209,6 +211,7 @@ Parameters for both training and evaluation can be set in `default_config.yaml`
     --eval_file_name='auc.log' \
     --loss_file_name='loss.log' \
     --device_target='Ascend' \
+    --epochs=10 \
     --do_eval=True > ms_log/output.log 2>&1 &
   ```
 
