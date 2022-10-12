@@ -145,6 +145,15 @@ bash scripts/run_distribution_ascend.sh [RANK_TABLE_FILE] ./ckpts ../shapenetcor
 
 ```
 
+- running on CPU
+
+```shell
+# Run stand-alone training for CPU
+python ./train.py --data_url=[DATA_URL] --device_target="CPU" --train_url=[TRAIN_URL]
+# example:
+python ./train.py --data_url=../shapenetcore_partanno_segmentation_benchmark_v0 --device_target="CPU" --train_url=./ckpts
+```
+
 - running on GPU
 
 ```shell
@@ -200,6 +209,23 @@ You can view the results through the file "log_standalone_eval_ascend". The accu
 
 ```bash
 # grep "mIOU " log_standalone_eval_ascend
+'mIOU for class Chair: 0.869'
+```
+
+- running on CPU
+
+```shell
+# Evaluate on CPU
+python ./eval.py --data_url=[DATA_URL] --device_target="CPU" --train_url=[TRAIN_URL]
+# example:
+python ./eval.py --data_url=../shapenetcore_partanno_segmentation_benchmark_v0 --device_target="CPU" --train_url=./ckpts
+
+```
+
+You can view the results through the file "log_standalone_eval_cpu". The accuracy of the test dataset will be as follows :
+
+```bash
+# grep "mIOU " log_standalone_eval_cpu
 'mIOU for class Chair: 0.869'
 ```
 
