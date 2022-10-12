@@ -46,14 +46,14 @@ from src.save_callback import SaveCallback
 
 if config.isModelArts:
     import moxing as mox
-if config.net == 'resnet200' or config.net == 'resnet101' or config.net == 'resnet50':
+if config.net == 'resnet200' or config.net == 'resnet101':
     if config.device_target == "GPU":
         config.cast_fp16 = False
 
 random.seed(1)
 np.random.seed(1)
 de.config.set_seed(1)
-if config.net == 'resnet200' or config.net == 'resnet101':
+if config.net == 'resnet200' or config.net == 'resnet101' or config.net == 'resnet50':
     set_seed(1)
 
 if __name__ == '__main__':
