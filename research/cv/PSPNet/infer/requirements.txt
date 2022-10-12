@@ -1,0 +1,3 @@
+Pillow==9.1.0
+onnx
+opencv-python
