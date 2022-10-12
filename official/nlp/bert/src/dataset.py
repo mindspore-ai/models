@@ -66,8 +66,6 @@ class BucketDatasetGenerator:
                     self.iter += 1
                     return self._package_data(data, key)
         self.stage = 1
-        for value in self.data_bucket.values():
-            self.remaining_data += list(value)
         return self._process_remaining_data()
 
     def _package_data(self, data, key):
