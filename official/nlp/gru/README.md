@@ -83,7 +83,7 @@ nltk.download()
 
 # [Quick Start](#content)
 
-- Running on local with Ascend
+- Running on local with Ascend,GPU or CPU
 
     After dataset preparation, you can start training and evaluation as follows:
 
@@ -100,15 +100,31 @@ nltk.download()
 
     # run training example
     bash run_standalone_train_{platform}.sh [TRAIN_DATASET_PATH]
+    # platform: ascend or gpu
+    python train.py --config_path=[CPU_CONFIG_PATH] --dataset_path=[TRAIN_DATASET_PATH]
+    # platform: cpu
 
     # run distributed training example
     bash run_distribute_train_{platform}.sh [RANK_TABLE_FILE] [TRAIN_DATASET_PATH]
     # platform: ascend or gpu
     # do not need [RANK_TABLE_FILE] if you use GPU
+    # do not need this step if you use CPU
 
     # run evaluation example
     bash run_eval_{platform}.sh [CKPT_FILE] [DATASET_PATH]
     # platform: ascend or gpu
+    python eval.py --dataset_path=[DATASET_PATH] --ckpt_file=[CKPT_FILE] --device_target=CPU
+    # platform: cpu
+    ```
+
+    After dataset preparation and training, you can run quick_start.py showing the results of training.
+
+    ```bash
+    # run quick_start.py
+    python quick_start.py --dataset_path=[DATASET_PATH] --ckpt_file=[CKPT_FILE] --device_target=CPU
+    # platform: cpu
+    # example
+    python quick_start.py --dataset_path=./data/mindrecord/multi30k_test_mindrecord_32 --ckpt_file=./ckpt_0/0-20_1807.ckpt --device_target=CPU
     ```
 
 - Running on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows)
@@ -204,12 +220,14 @@ The GRU network script and code result are as follows:
   │   ├──run_infer_310.sh                    // shell script for 310 inference.
   │   ├──run_standalone_train_ascend.sh      // shell script for standalone eval on ascend.
   │   ├──run_standalone_train_gpu.sh         // shell script for standalone eval on gpu.
-  ├── default_config.yaml                    // Configurations
+  ├── default_config.yaml                    // Configurations.
+  ├── cpu_config.yaml                        // Configurations for cpu.
   ├── postprocess.py                         // GRU postprocess script.
   ├── preprocess.py                          // GRU preprocess script.
   ├── export.py                              // Export API entry.
   ├── eval.py                                // Infer API entry.
   ├── eval_onnx.py                           // ONNX infer API entry.
+  ├── quick_start.py                         // GRU quickstart script.
   ├── requirements.txt                       // Requirements of third party package.
   ├── train.py                               // Train API entry.
 ```
@@ -253,7 +271,7 @@ Finally, we will get multi30k_train_mindrecord_0 ~ multi30k_train_mindrecord_8 a
 
 Parameters for both training and evaluation can be set in config.py. All the datasets are using same parameter name, parameters value could be changed according the needs.
 
-- Network Parameters
+- Network Parameters for Ascend and GPU
 
   ```text
     "batch_size": 16,                  # batch size of input dataset.
@@ -279,16 +297,47 @@ Parameters for both training and evaluation can be set in config.py. All the dat
     "teacher_force_ratio": 0.5         # teacher force ratio.
   ```
 
+- Network Parameters for Ascend and GPU
+
+  ```text
+    "batch_size": 16,                  # batch size of input dataset.
+    "src_vocab_size": 8154,            # source dataset vocabulary size.
+    "trg_vocab_size": 6113,            # target dataset vocabulary size.
+    "encoder_embedding_size": 256,     # encoder embedding size.
+    "decoder_embedding_size": 256,     # decoder embedding size.
+    "hidden_size": 512,                # hidden size of gru.
+    "max_length": 32,                  # max sentence length.
+    "num_epochs": 13,                  # total epoch.
+    "save_checkpoint": True,           # whether save checkpoint file.
+    "ckpt_epoch": 1,                   # frequence to save checkpoint file.
+    "target_file": "target.txt",       # the target file.
+    "output_file": "output.txt",       # the output file.
+    "keep_checkpoint_max": 5,          # the maximum number of checkpoint file.
+    "base_lr": 0.001,                  # init learning rate.
+    "warmup_step": 300,                # warmup step.
+    "momentum": 0.9,                   # momentum in optimizer.
+    "init_loss_scale_value": 1024,     # init scale sense.
+    'scale_factor': 2,                 # scale factor for dynamic loss scale.
+    'scale_window': 2000,              # scale window for dynamic loss scale.
+    "warmup_ratio": 1/3.0,             # warmup ratio.
+    "teacher_force_ratio": 0.5         # teacher force ratio.
+  ```
+
 ## [Training Process](#content)
 
-- Start task training on a single device and run the shell script
+- Start task training on a single device.Run the shell script if you use ascend or gpu, and run the python file if you use cpu.
 
     ```bash
     cd ./scripts
-    bash run_standalone_train_{platform}.sh [DATASET_PATH]
     # platform: ascend or gpu
-    #example：
+    bash run_standalone_train_{platform}.sh [DATASET_PATH]
+    # example：
     bash run_standalone_train_ascend.sh /Muti30k/mindrecord/multi30k_train_mindrecord_32_0
+
+    # platform: cpu
+    python train.py --config_path=[CPU_CONFIG_PATH] --dataset_path=[TRAIN_DATASET_PATH] --device_target=CPU
+    # example：
+    python train.py --config_path=cpu_config.yaml --dataset_path=./data/mindrecord/multi30k_train_mindrecord_32_0 --device_target=CPU
     ```
 
 - Running scripts for distributed training of GRU. Task training on multiple device and run the following command in bash to be executed in `scripts/`:
@@ -298,6 +347,7 @@ Parameters for both training and evaluation can be set in config.py. All the dat
     bash run_distributed_train_{platform}.sh [RANK_TABLE_PATH] [DATASET_PATH]
     # platform: ascend or gpu
     # do not need [RANK_TABLE_FILE] if you use GPU
+    # do not need this step if you use CPU
     ```
 
 ## [Inference Process](#content)
@@ -306,10 +356,15 @@ Parameters for both training and evaluation can be set in config.py. All the dat
 
     ``` bash
     cd ./scripts
-    bash run_eval_{platform}.sh [CKPT_FILE] [DATASET_PATH]
     # platform: ascend or gpu
+    bash run_eval_{platform}.sh [CKPT_FILE] [DATASET_PATH]
     # example:
     bash run_eval_ascend.sh /data/ckpt_0/0-20_1807.ckpt /data/mindrecord/multi30k_test_mindrecord_32
+
+    # platform: cpu
+    python eval.py --dataset_path=[DATASET_PATH] --ckpt_file=[CKPT_FILE] --device_target=CPU
+    # example:
+    python eval.py --dataset_path=./data/mindrecord/multi30k_test_mindrecord_32 --ckpt_file=./ckpt_0/0-20_1807.ckpt --device_target=CPU
     ```
 
 - After evaluation, we will get eval/target.txt and eval/output.txt.Then we can use parse_output.sh to get the translation.
@@ -431,35 +486,35 @@ perl multi-bleu.perl target.txt.forbleu < output.txt.forbleu
 
 ### Training Performance
 
-| Parameters                 | Ascend                        | GPU                       |
-| -------------------------- | ----------------------------- |---------------------------|
-| Resource                   | Ascend 910; OS Euler2.8       | GTX1080Ti, Ubuntu 18.04   |
-| uploaded Date              | 06/05/2021 (month/day/year)   | 06/05/2021 (month/day/year) |
-| MindSpore Version          | 1.2.0                         |1.2.0                      |
-| Dataset                    | Multi30k Dataset              | Multi30k Dataset          |
-| Training Parameters        | epoch=30, batch_size=16       | epoch=30, batch_size=16   |
-| Optimizer                  | Adam                          | Adam                      |
-| Loss Function              | NLLLoss                       | NLLLoss                   |
-| outputs                    | probability                   | probability               |
-| Speed                      | 35ms/step (1pcs)              | 200ms/step (1pcs)         |
-| Epoch Time                 | 64.4s (1pcs)                  | 361.5s (1pcs)             |
-| Loss                       | 3.86888                       |2.533958                   |
-| Params (M)                 | 21                            | 21                        |
-| Checkpoint for inference   | 272M (.ckpt file)             | 272M (.ckpt file)         |
-| Scripts                    | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/gru) |[gru](https://gitee.com/mindspore/models/tree/master/official/nlp/gru) |
+| Parameters                 | Ascend                        | GPU                       | CPU |
+| -------------------------- | ----------------------------- |---------------------------| -------------------------- |
+| Resource                   | Ascend 910; OS Euler2.8       | GTX1080Ti, Ubuntu 18.04   | Intel(R) Xeon(R) Gold 6226R CPU @ 2.90GHz,Ubuntu 18.04 |
+| uploaded Date              | 06/05/2021 (month/day/year)   | 06/05/2021 (month/day/year) | 09/28/2022 (month/day/year) |
+| MindSpore Version          | 1.2.0                         |1.2.0                      | 1.2.0 |
+| Dataset                    | Multi30k Dataset              | Multi30k Dataset          | Multi30k Dataset |
+| Training Parameters        | epoch=30, batch_size=16       | epoch=30, batch_size=16   | epoch=13, batch_size=16 |
+| Optimizer                  | Adam                          | Adam                      | Adam |
+| Loss Function              | NLLLoss                       | NLLLoss                   | NLLLoss |
+| outputs                    | probability                   | probability               | probability |
+| Speed                      | 35ms/step (1pcs)              | 200ms/step (1pcs)         | 1465ms/step (1pcs) |
+| Epoch Time | 64.4s (1pcs)                                                 | 361.5s (1pcs) | 2640s (1pcs) |
+| Loss | 3.86888 | 2.533958 | 2.9340835 |
+| Params (M) | 21 | 21 | 21 |
+| Checkpoint for inference | 272M (.ckpt file) | 272M (.ckpt file) | 321M(.ckpt file) |
+| Scripts | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/gru) | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/gru) | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/gru) |
 
 ### Inference Performance
 
-| Parameters          | Ascend                      | GPU |
-| ------------------- | --------------------------- |---------------------------|
-| Resource            | Ascend 910; OS Euler2.8     | GTX1080Ti, Ubuntu 18.04   |
-| Uploaded Date       | 06/05/2021 (month/day/year) | 06/05/2021 (month/day/year)|
-| MindSpore Version   | 1.2.0                       | 1.2.0                     |
-| Dataset             | Multi30K                    | Multi30K                  |
-| batch_size          | 1                           | 1                         |
-| outputs             | label index                 | label index               |
-| Accuracy            | BLEU: 31.26                 | BLEU: 29.30               |
-| Model for inference | 272M (.ckpt file)           | 272M (.ckpt file)         |
+| Parameters          | Ascend                      | GPU | CPU |
+| ------------------- | --------------------------- |---------------------------| ------------------- |
+| Resource            | Ascend 910; OS Euler2.8     | GTX1080Ti, Ubuntu 18.04   | Intel(R) Xeon(R) Gold 6226R CPU @ 2.90GHz,Ubuntu 18.04 |
+| Uploaded Date       | 06/05/2021 (month/day/year) | 06/05/2021 (month/day/year)| 09/28/2022 (month/day/year) |
+| MindSpore Version   | 1.2.0                       | 1.2.0                     | 1.2.0 |
+| Dataset             | Multi30K                    | Multi30K                  | Multi30K |
+| batch_size          | 1                           | 1                         | 1 |
+| outputs             | label index                 | label index               | label index |
+| Accuracy            | BLEU: 31.26                 | BLEU: 29.30               | BLEU: 30.19 |
+| Model for inference | 272M (.ckpt file)           | 272M (.ckpt file)         | 321M(.ckpt file) |
 
 # [Random Situation Description](#content)
 
