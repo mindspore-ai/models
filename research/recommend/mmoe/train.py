@@ -36,7 +36,7 @@ from src.model_utils.device_adapter import get_device_id, get_device_num, get_ra
 from src.get_lr import get_lr
 from src.callback import EvalCallBack
 
-set_seed(1)
+set_seed(5)
 
 
 def modelarts_pre_process():
@@ -57,6 +57,19 @@ def run_train():
     context.set_context(save_graphs=False)
 
     device_num = get_device_num()
+    if device_target == 'CPU':
+        config.epoch = 10
+        config.lr = 0.0001
+
+    if config.run_distribute:
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(device_num=device_num,
+                                          parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
+        if device_target == "Ascend":
+            context.set_context(device_id=get_device_id())
+            init()
+        elif device_target == "GPU":
+            init()
 
     if config.run_distribute:
         context.reset_auto_parallel_context()
@@ -105,14 +118,17 @@ def run_train():
                eps=1e-7,
                weight_decay=0.0,
                loss_scale=1.0)
-    scale_update_cell = DynamicLossScaleUpdateCell(
-        loss_scale_value=2 ** 12 if config.device_target == 'Ascend' else 1.0,
-        scale_factor=2,
-        scale_window=1000)
-    train_net = TrainStepWrap(
-        loss_net, opt, scale_update_cell, config.device_target)
-    train_net.set_train()
-    model = Model(train_net)
+    if device_target == 'CPU':
+        model = Model(loss_net, optimizer=opt)
+    else:
+        scale_update_cell = DynamicLossScaleUpdateCell(
+            loss_scale_value=2 ** 12 if config.device_target == 'Ascend' else 1.0,
+            scale_factor=2,
+            scale_window=1000)
+        train_net = TrainStepWrap(
+            loss_net, opt, scale_update_cell, config.device_target)
+        train_net.set_train()
+        model = Model(train_net)
 
     time_cb = TimeMonitor()
     loss_cb = LossMonitor()
