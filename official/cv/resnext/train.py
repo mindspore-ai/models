@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ from src.utils.var_init import load_pretrain_model
 from src.image_classification import get_network
 from src.model_utils.config import config
 from src.model_utils.moxing_adapter import moxing_wrapper
+from src.eval_callback import EvalCallBack, ProgressMonitor
 
 set_seed(1)
 
@@ -84,13 +85,23 @@ def set_graph_kernel_context(device_target):
     if device_target == "GPU":
         context.set_context(enable_graph_kernel=True)
 
+def apply_eval(eval_param):
+    eval_model = eval_param["model"]
+    eval_ds = eval_param["dataset"]
+    metrics_name = eval_param["metrics_name"]
+    res = eval_model.eval(eval_ds)
+    return res[metrics_name]
+
 @moxing_wrapper()
 def train():
     """training process"""
     set_parameters()
-    if os.getenv('DEVICE_ID', "not_set").isdigit():
-        context.set_context(device_id=int(os.getenv('DEVICE_ID')))
-    set_graph_kernel_context(config.device_target)
+    if config.device_target == "Ascend":
+        if os.getenv('DEVICE_ID', "not_set").isdigit():
+            context.set_context(device_id=int(os.getenv('DEVICE_ID')))
+    elif config.device_target == "GPU":
+        if os.getenv('CUDA_VISIBLE_DEVICES', "not_set").isdigit():
+            context.set_context(device_id=0)
 
     # init distributed
     if config.run_distribute:
@@ -101,6 +112,7 @@ def train():
     de_dataset = classification_dataset(config.data_path, config.image_size,
                                         config.per_batch_size, 1,
                                         config.rank, config.group_size, num_parallel_workers=8)
+    de_dataset.map_model = 4  # !!!important
     config.steps_per_epoch = de_dataset.get_dataset_size()
 
     config.logger.save_args(config)
@@ -133,11 +145,37 @@ def train():
     else:
         loss_scale_manager = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
 
-    model = Model(network, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale_manager,
-                  metrics={'acc'}, amp_level="O3")
+    if config.network == "resnext101":
+        model = Model(network, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale_manager,
+                      metrics={'acc'}, amp_level="O2")
+        # checkpoint save
+        callbacks = [ProgressMonitor(config), LossMonitor()]
+    else:
+        model = Model(network, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale_manager,
+                      metrics={'acc'}, amp_level="O3")
+        callbacks = [TimeMonitor(data_size=config.steps_per_epoch), LossMonitor()]
 
-    # checkpoint save
-    callbacks = [TimeMonitor(data_size=config.steps_per_epoch), LossMonitor()]
+    if config.run_eval and config.rank_save_ckpt_flag:
+        if config.eval_data_path is None or (not os.path.isdir(config.eval_data_path)):
+            raise ValueError("{} is not a existing path.".format(config.eval_data_path))
+        eval_de_dataset = classification_dataset(config.eval_data_path,
+                                                 image_size=config.image_size,
+                                                 per_batch_size=config.eval_per_batch_size,
+                                                 max_epoch=1,
+                                                 rank=config.rank,
+                                                 group_size=config.group_size,
+                                                 mode='eval')
+        eval_param_dict = {"model": model, "dataset": eval_de_dataset, "metrics_name": "acc"}
+        eval_callback = EvalCallBack(apply_eval,
+                                     eval_param_dict,
+                                     interval=config.eval_interval,
+                                     eval_start_epoch=config.eval_start_epoch,
+                                     save_best_ckpt=config.save_best_ckpt,
+                                     ckpt_directory=config.ckpt_path,
+                                     best_ckpt_name="best_acc.ckpt",
+                                     metrics_name="acc"
+                                     )
+        callbacks.append(eval_callback)
     if config.rank_save_ckpt_flag:
         ckpt_config = CheckpointConfig(save_checkpoint_steps=config.ckpt_interval * config.steps_per_epoch,
                                        keep_checkpoint_max=config.ckpt_save_max)
@@ -146,7 +184,6 @@ def train():
                                   directory=save_ckpt_path,
                                   prefix='{}'.format(config.rank))
         callbacks.append(ckpt_cb)
-
     model.train(config.max_epoch, de_dataset, callbacks=callbacks, dataset_sink_mode=True)
 
 

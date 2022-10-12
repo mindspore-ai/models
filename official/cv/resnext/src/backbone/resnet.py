@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 ResNet based ResNext
 """
 import mindspore.nn as nn
-from mindspore.ops.operations import Add, Split, Concat
+from mindspore.ops.operations import TensorAdd, Split, Concat
 from mindspore.ops import operations as P
 from mindspore.common.initializer import TruncatedNormal
 
@@ -105,7 +105,7 @@ class BasicBlock(nn.Cell):
             self.down_sample = down_sample
             self.down_sample_flag = True
 
-        self.add = Add()
+        self.add = TensorAdd()
 
     def construct(self, x):
         identity = x
@@ -176,7 +176,7 @@ class Bottleneck(nn.Cell):
             self.down_sample_flag = True
 
         self.cast = P.Cast()
-        self.add = Add()
+        self.add = TensorAdd()
 
     def construct(self, x):
         identity = x
@@ -279,4 +279,6 @@ def resnext50(platform="Ascend"):
     return ResNet(Bottleneck, [3, 4, 6, 3], width_per_group=4, groups=32, platform=platform)
 
 def resnext101(platform="Ascend"):
-    return ResNet(Bottleneck, [3, 4, 23, 3], width_per_group=4, groups=32, platform=platform)
+    if platform == "Ascend":
+        return ResNet(Bottleneck, [3, 4, 23, 3], width_per_group=4, groups=32, platform=platform)
+    return ResNet(Bottleneck, [3, 4, 23, 3], width_per_group=4, groups=64, platform=platform)

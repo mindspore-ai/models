@@ -203,6 +203,11 @@ GPU:
     bash run_distribute_train_for_gpu.sh DATA_PATH
     # 单机训练
     bash run_standalone_train_for_gpu.sh DEVICE_ID DATA_PATH
+GPU_ResNext101:
+    # 分布式训练示例（8卡）
+    bash scripts/run_distribute_train_for_gpu_resnext101.sh DATA_PATH CONFIG_PATH
+    # 单机训练
+    bash scripts/run_standalone_train_for_gpu_resnext101.sh DEVICE_ID DATA_PATH CONFIG_PATH
 ```
 
 ## 迁移训练过程
@@ -232,6 +237,8 @@ python eval.py --data_path ~/imagenet/val/ --device_target Ascend --checkpoint_f
 或通过shell脚本开始训练：
 
 ```shell
+# GPU_ResNext101评估
+bash scripts/run_eval_for_gpu_resnext101.sh DEVICE_ID DATA_PATH CHECKPOINT_FILE_PATH CONFIG_PATH
 # 评估
 bash scripts/run_eval.sh DEVICE_ID DATA_PATH CHECKPOINT_FILE_PATH PLATFORM
 ```
@@ -243,6 +250,8 @@ DEVICE_TARGET is Ascend or GPU, default is Ascend.
 ```shell
 # 检查点评估
 bash scripts/run_eval.sh 0 /opt/npu/datasets/classification/val /ResNeXt_100.ckpt Ascend
+# GPU_ResNext101评估
+bash scripts/run_eval_for_gpu_resnext101.sh 0 ~/ImageNet2012/val ~/outputs_demo/best_acc.ckpt ./resnext101_config.yaml
 ```
 
 #### 结果
@@ -348,6 +357,20 @@ Total data:50000, top1 accuracy:0.79858, top5 accuracy:0.94716
 | 总时长                 | 7.8小时 （8卡） | 21.5小时 （8卡） |
 | 调优检查点 | 192 M（.ckpt文件） | 192 M（.ckpt文件） |
 
+| 参数          | ResNeXt101                                        |
+| ------------- | ------------------------------------------------- |
+| 资源          | GeForce RTX 3090；CPU：3.50GHz，64核；内存：264GB |
+| 上传日期      | 2022-6-30                                         |
+| MindSpore版本 | 1.7.0                                             |
+| 数据集        | ImageNet                                          |
+| 训练参数      | src/config.py                                     |
+| 优化器        | Momentum                                          |
+| 损失函数      | Softmax交叉熵                                     |
+| 损失          | 1.2427                                            |
+| 准确率        | 78.04%(TOP1)                                      |
+| 总时长        | 50小时 （8卡）                                    |
+| 调优检查点    | 638 M（.ckpt文件）                                |
+
 #### 推理性能
 
 | 参数                 |ResNeXt50                            |                           |                      |
@@ -360,15 +383,15 @@ Total data:50000, top1 accuracy:0.79858, top5 accuracy:0.94716
 | 输出 | 概率 | 概率 | 概率 |
 | 准确率 | acc=78.16%(TOP1)              | acc=78.05%(TOP1)          |                      |
 
-| 参数                | ResNeXt101                      |
-| ------------------- | --------------------------- |
-| 资源            | Ascend 310; OS Euler2.8     |
-| 上传日期        | 06/22/2021 (month/day/year) |
-| MindSpore版本   | 1.2.0                       |
-| 数据集             | ImageNet                    |
-| batch_size          | 1                           |
-| 输出             | 概率                    |
-| 准确率            | TOP1: 79.85%, TOP5: 94.71%  |
+| 参数                | ResNeXt101                      |                       |
+| ------------------- | --------------------------- | --------------------------- |
+| 资源            | Ascend 310; OS Euler2.8     | GeForce RTX 3090 |
+| 上传日期        | 06/22/2021 (month/day/year) | 2022-6-30 |
+| MindSpore版本   | 1.2.0                       | 1.7.0                  |
+| 数据集             | ImageNet                    | ImageNet            |
+| batch_size          | 1                           | 1                          |
+| 输出             | 概率                    | 概率                  |
+| 准确率            | TOP1: 79.85%, TOP5: 94.71%  | 78.04%(TOP1) |
 
 # 随机情况说明
 
