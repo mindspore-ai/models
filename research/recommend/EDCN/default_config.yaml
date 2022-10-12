@@ -17,6 +17,7 @@ train_data_dir: ''
 ckpt_path: 'ckpts'
 eval_file_name: "./auc.log"
 loss_file_name: "./loss.log"
+epochs: 10
 do_eval: "True"
 # Test
 test_data_dir: ''
@@ -60,7 +61,6 @@ TrainConfig:
     learning_rate: 0.0003
     epsilon: 0.00000001
     loss_scale: 1024.0
-    train_epochs: 10
     save_checkpoint: True
     ckpt_file_name_prefix: "edcn"
     save_checkpoint_steps: 1
@@ -83,6 +83,7 @@ train_data_dir: "Train dataset dir, default is None"
 ckpt_path: "ckpt dir to save, default is None"
 eval_file_name: "Loss log file path. Default: './loss.log'"
 loss_file_name: "Loss log file path. Default: './loss.log'"
+epochs: "Training epochs. Default: 10"
 do_eval: 'Do evaluation or not, only support "True" or "False". Default: "True"'
 test_data_dir: "Test dataset dir, default is None"
 checkpoint_path: " Relative path of '*.ckpt' to be evaluated relative to the eval.py"
