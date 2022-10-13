@@ -248,8 +248,9 @@ def main():
         names = os.listdir(args.images_path)
         image_paths = []
         for name in names:
-            image_name = name.replace('.jpg', '')
-            image_paths.append(image_name)
+            if name.endswith('.jpg'):
+                image_name = name.replace('.jpg', '')
+                image_paths.append(image_name)
 
     num_images = len(image_paths)
     print(f'done! Found {num_images} images')
