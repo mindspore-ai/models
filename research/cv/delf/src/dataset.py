@@ -38,9 +38,10 @@ def read_ground_truth(gt_file, image_file):
     index_list = []
     num = 0
     for name in names:
-        image_name = name.replace('.jpg', '')
-        index_list.append(image_name)
-        num += 1
+        if name.endswith('.jpg'):
+            image_name = name.replace('.jpg', '')
+            index_list.append(image_name)
+            num += 1
 
     path = gt_file
     names = os.listdir(path)
