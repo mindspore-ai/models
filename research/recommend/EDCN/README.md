@@ -37,7 +37,7 @@ Specifically, in EDCN, two novel modules, namely bridge module and regulation mo
 
 # [Dataset](#contents)
 
-- [1] A dataset Criteo used in  Huifeng Guo, Ruiming Tang, Yunming Ye, Zhenguo Li, Xiuqiang He. DeepFM: A Factorization-Machine based Neural Network for CTR Prediction[J]. 2017.
+- [1] A dataset Criteo used in  Huifeng Guo, Ruiming Tang, Yunming Ye, Zhenguo Li, Xiuqiang He. DeepFM: A Factorization-Machine based Neural Network for CTR Prediction[J]. 2017. [download](http://go.criteo.net/criteo-research-kaggle-display-advertising-challenge-dataset.tar.gz)
 
 # [Environment Requirements](#contents)
 
@@ -53,12 +53,28 @@ Specifically, in EDCN, two novel modules, namely bridge module and regulation mo
 
 After installing MindSpore via the official website, you can start training and evaluation as follows:
 
+- preprocess dataset
+
+  ```shell
+  # download dataset
+  # Please refer to [1] to obtain the download link
+  mkdir -p data/origin_data && cd data/origin_data
+  wget DATA_LINK
+  tar -zxvf dac.tar.gz
+
+  #preprocess dataset
+  python -m src.preprocess_data  --data_path=./data/ --dense_dim=13 --slot_dim=26 --threshold=100 --train_line_count=45840617 --skip_id_convert=0 --device_target=Ascend
+
+  # OR
+  python -m src.preprocess_data  --data_path=./data/ --dense_dim=13 --slot_dim=26 --threshold=100 --train_line_count=45840617 --skip_id_convert=0 --device_target=GPU
+  ```
+
 - running on Ascend
 
-  ```python
+  ```shell
   # run training example
   python train.py \
-    --train_data_dir='dataset/train' \
+    --train_data_dir='./data/mindrecord' \
     --ckpt_path='./checkpoint' \
     --eval_file_name='auc.log' \
     --loss_file_name='loss.log' \
@@ -68,10 +84,11 @@ After installing MindSpore via the official website, you can start training and 
 
   # run evaluation example
   python eval.py \
-    --test_data_dir='dataset/test' \
+    --test_data_dir='./data/mindrecord' \
     --checkpoint_path='./checkpoint/EDCN.ckpt' \
     --device_target='Ascend' > ms_log/eval_output.log 2>&1 &
-  OR
+
+  # OR
   bash scripts/run_eval.sh 0 Ascend /test_data_dir /checkpoint_path/edcn.ckpt
   ```
 
@@ -129,7 +146,7 @@ After installing MindSpore via the official website, you can start training and 
 
 ## [Script and Sample Code](#contents)
 
-```bash
+```text
 .
 └─EDCN
   ├─README.md                         # descriptions of warpctc
@@ -163,7 +180,7 @@ Parameters for both training and evaluation can be set in `default_config.yaml`
 
 - Parameters that can be modified at the terminal
 
-  ```bash
+  ```text
   # Train
   train_data_dir: ''                  # train dataset path
   ckpt_path: 'ckpts'                  # the folder path to save '*.ckpt' files. Relative path.
@@ -187,9 +204,9 @@ Parameters for both training and evaluation can be set in `default_config.yaml`
 
 - running on Ascend
 
-  ```python
+  ```shell
   python train.py \
-    --train_data_dir='dataset/train' \
+    --train_data_dir='./data/mindrecord' \
     --ckpt_path='./checkpoint' \
     --eval_file_name='auc.log' \
     --loss_file_name='loss.log' \
@@ -226,12 +243,12 @@ Parameters for both training and evaluation can be set in `default_config.yaml`
 
   Before running the command below, please check the checkpoint path used for evaluation.
 
-  ```python
+  ```shell
   python eval.py \
-    --test_data_dir='dataset/test' \
+    --test_data_dir='./data/mindrecord' \
     --checkpoint_path='./checkpoint/edcn.ckpt' \
     --device_target='Ascend' > ms_log/eval_output.log 2>&1 &
-  OR
+  # OR
   bash scripts/run_eval.sh 0 Ascend /test_data_dir /checkpoint_path/edcn.ckpt
   ```
 
@@ -293,7 +310,7 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
 
 Inference result is saved in current path, you can find result in acc.log file.
 
-```bash
+```text
 auc: 0.6288036416334053
 ```
 
