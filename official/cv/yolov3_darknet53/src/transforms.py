@@ -515,8 +515,7 @@ class MultiScaleTrans:
             gt2.append(gt_box2)
             gt3.append(gt_box3)
             ret_annos.append(0)
-        return np.array(ret_imgs), np.array(ret_annos), np.array(bbox1), np.array(bbox2), np.array(bbox3), \
-               np.array(gt1), np.array(gt2), np.array(gt3)
+        return ret_imgs, ret_annos, bbox1, bbox2, bbox3, gt1, gt2, gt3
 
 
 def thread_batch_preprocess_true_box(annos, config, input_shape, result_index, batch_bbox_true_1, batch_bbox_true_2,

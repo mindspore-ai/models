@@ -170,8 +170,7 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, device_num, rank,
             dataset = ds.GeneratorDataset(yolo_dataset, column_names=dataset_column_names, sampler=distributed_sampler)
             dataset = dataset.map(operations=ds.vision.Decode(), input_columns=["image"])
             dataset = dataset.batch(batch_size, per_batch_map=multi_scale_trans, input_columns=dataset_column_names,
-                                    num_parallel_workers=min(32, num_parallel_workers), drop_remainder=True,
-                                    python_multiprocessing=True)
+                                    num_parallel_workers=min(32, num_parallel_workers), drop_remainder=True)
         else:
             dataset = ds.GeneratorDataset(yolo_dataset, column_names=dataset_column_names, sampler=distributed_sampler)
             dataset = dataset.map(operations=ds.vision.Decode(), input_columns=["image"])
