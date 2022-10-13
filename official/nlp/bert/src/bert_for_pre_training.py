@@ -1,4 +1,4 @@
-# Copyright 2020-2021 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,6 @@ from mindspore.common.api import ms_function
 from mindspore.common import dtype as mstype
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
 from mindspore.context import ParallelMode
-import mindspore.common._monad as monad
 from mindspore.communication.management import get_group_size
 from mindspore import context
 from .bert_model import BertModel
@@ -418,7 +417,7 @@ class BertTrainOneStepWithLossScaleCell(nn.TrainOneStepWithLossScaleCell):
             overflow = self.loss_scaling_manager(self.loss_scale, cond)
         if not overflow:
             self.optimizer(grads)
-        return loss, cond, self.load(scaling_sens, monad.U)
+        return loss, cond, scaling_sens.value()
 
 
 class BertTrainOneStepWithLossScaleCellForAdam(nn.TrainOneStepWithLossScaleCell):
@@ -495,7 +494,7 @@ class BertTrainOneStepWithLossScaleCellForAdam(nn.TrainOneStepWithLossScaleCell)
         if self.loss_scaling_manager is not None:
             overflow = self.loss_scaling_manager(scaling_sens, cond)
         self.optimizer(grads, overflow)
-        return (loss, cond, scaling_sens)
+        return (loss, cond, scaling_sens.value())
 
 cast = P.Cast()
 add_grads = C.MultitypeFuncGraph("add_grads")
@@ -672,7 +671,7 @@ class BertTrainAccumulationAllReducePostWithLossScaleCell(nn.Cell):
             if not overflow:
                 self.optimizer(grads)
 
-        return (mean_loss, overflow, scaling_sens)
+        return (mean_loss, overflow, scaling_sens.value())
 
 
 class BertTrainAccumulationAllReduceEachWithLossScaleCell(nn.Cell):
@@ -819,7 +818,7 @@ class BertTrainAccumulationAllReduceEachWithLossScaleCell(nn.Cell):
             accu_succ = self.hyper_map(reset_accu_grads, self.accu_grads)
             succ = F.depend(succ, accu_succ)
 
-        ret = (mean_loss, overflow, scaling_sens)
+        ret = (mean_loss, overflow, scaling_sens.value())
         return F.depend(ret, succ)
 
 

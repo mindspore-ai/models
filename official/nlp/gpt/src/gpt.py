@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ class EmbeddingLookup(nn.Cell):
         self.shape = (-1, config.seq_length, config.embedding_size)
     def construct(self, input_ids):
         output = self.gather(self.embedding_table, input_ids, 0)
-        return output, self.embedding_table
+        return output, self.embedding_table.value()
 
 
 class GPT_Model(nn.Cell):

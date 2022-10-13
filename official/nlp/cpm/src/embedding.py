@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -111,7 +111,7 @@ class EmbeddingLookup(nn.Cell):
         zero_tiled = self.cast(zero_tiled, self.get_dtype(output))
         output = self.select(self.cast(input_mask_tile, mstype.bool_), zero_tiled, output)
         output = self.cast(output, mstype.float32)
-        return output, self.embedding_table
+        return output, self.embedding_table.value()
 
 
 class EmbeddingPostprocessor(nn.Cell):

@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -152,7 +152,7 @@ class EmbeddingLookup(nn.Cell):
 
         out_shape = input_shape + (self.embedding_dim,)
         output = self.reshape(output_for_reshape, out_shape)  # [batch_size, seq_length, embedidng_dim]
-        return output, self.embedding_table
+        return output, self.embedding_table.value()
 
 
 class EmbeddingPostprocessor(nn.Cell):
