@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -404,7 +404,7 @@ class ErnieTrainOneStepWithLossScaleCell(nn.TrainOneStepWithLossScaleCell):
             succ = False
         else:
             succ = self.optimizer(grads)
-        ret = (loss, cond, scaling_sens)
+        ret = (loss, cond, scaling_sens.value())
         return F.depend(ret, succ)
 
 
@@ -476,7 +476,7 @@ class ErnieTrainOneStepWithLossScaleCellForAdam(nn.TrainOneStepWithLossScaleCell
         if self.loss_scaling_manager is not None:
             overflow = self.loss_scaling_manager(scaling_sens, cond)
         succ = self.optimizer(grads, overflow)
-        ret = (loss, cond, scaling_sens)
+        ret = (loss, cond, scaling_sens.value())
         return F.depend(ret, succ)
 
 cast = P.Cast()
@@ -658,7 +658,7 @@ class ErnieTrainAccumulationAllReducePostWithLossScaleCell(nn.Cell):
             else:
                 succ = self.optimizer(grads)
 
-        ret = (mean_loss, overflow, scaling_sens)
+        ret = (mean_loss, overflow, scaling_sens.value())
         return F.depend(ret, succ)
 
 
@@ -806,5 +806,5 @@ class ErnieTrainAccumulationAllReduceEachWithLossScaleCell(nn.Cell):
             accu_succ = self.hyper_map(reset_accu_grads, self.accu_grads)
             succ = F.depend(succ, accu_succ)
 
-        ret = (mean_loss, overflow, scaling_sens)
+        ret = (mean_loss, overflow, scaling_sens.value())
         return F.depend(ret, succ)

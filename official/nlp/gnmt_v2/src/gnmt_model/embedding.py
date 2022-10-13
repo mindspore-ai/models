@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -91,4 +91,4 @@ class EmbeddingLookup(nn.Cell):
         if self.is_training:
             output = self.cast(output, mstype.float32)
             embedding_table = self.cast(embedding_table, mstype.float32)
-        return output, embedding_table
+        return output, embedding_table.value()
