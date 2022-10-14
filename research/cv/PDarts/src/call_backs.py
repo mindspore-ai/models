@@ -13,12 +13,6 @@
 # limitations under the License.
 # ============================================================================
 """train callbacks"""
-try:
-    from moxing.framework import file
-    print("import moxing success")
-except ModuleNotFoundError as e:
-    print(f'not modelarts env, error={e}')
-
 import os
 import time
 
@@ -131,6 +125,7 @@ class Val_Callback(Callback):
             ckpt_file = os.path.join(ckpt_path, 'model_checkpoint.ckpt')
             save_checkpoint(cb_params.train_network, ckpt_file)
             if self.checkpoint_path.startswith('s3://') or self.checkpoint_path.startswith('obs://'):
+                from moxing.framework import file
                 file.copy_parallel(save_path, os.path.join(
                     self.checkpoint_path, model_info))
             print('==============save checkpoint finished===================')
