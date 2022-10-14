@@ -904,6 +904,12 @@ Evaluation result will be stored in the example path, whose folder name is "eval
 result:{'top_1_accuracy': 0.9354967948717948, 'top_5_accuracy': 0.9981971153846154} ckpt=~/resnet50_cifar10/train_parallel0/resnet-180_195.ckpt
 ```
 
+- Apply SimQAT on ResNet50, and evaluating with ImageNet2012 dataset:
+
+```text
+result:{'top_1_accuracy': 0.7254057298335468, 'top_5_accuracy': 0.9312684058898848} ckpt=~/resnet50_imagenet2012/train_parallel0/resnet-180_6672.ckpt
+```
+
 - Apply SCOP on ResNet50, and evaluating with CIFAR-10 dataset:
 
 ```text

@@ -950,6 +950,12 @@ bash run_eval_gpu.sh ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml
 result:{'top_1_accuracy': 0.9354967948717948, 'top_5_accuracy': 0.9981971153846154} ckpt=~/resnet50_cifar10/train_parallel0/resnet-180_195.ckpt
 ```
 
+- 使用SimQAT算法量化ResNet50，并使用ImageNet2012数据集评估：
+
+```text
+result:{'top_1_accuracy': 0.7254057298335468, 'top_5_accuracy': 0.9312684058898848} ckpt=~/resnet50_imagenet2012/train_parallel0/resnet-180_6672.ckpt
+```
+
 - 使用SCOP算法剪枝ResNet50，并使用CIFAR-10数据集评估：
 
 ```text
