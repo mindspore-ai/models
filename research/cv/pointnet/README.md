@@ -90,6 +90,7 @@ bash scripts/run_standalone_eval.sh '/home/pointnet/shapenetcore_partanno_segmen
         │   ├── run_distribute_gpu.sh           # launch distributed training with gpu platform (8p)
         │   ├── run_standalone_eval_ascend.sh          # launch evaluating with ascend platform (1p)
         │   ├── run_standalone_eval_gpu.sh      # launch evaluating with gpu platform (1p)
+        │   ├── run_standalone_eval_onnx_gpu.sh      # launch evaluating onnx with gpu platform (1p)
         │   ├── run_infer_310.sh                # run 310 infer
         │   ├── run_standalone_train_ascend.sh         # launch standalone training with ascend platform (1p)
         │   └── run_standalone_train_gpu.sh     # launch standalone training with gpu platform (1p)
@@ -101,6 +102,7 @@ bash scripts/run_standalone_eval.sh '/home/pointnet/shapenetcore_partanno_segmen
         │   ├── network.py               # network definition
         │   └── preprocess.py            # data preprocessing for training
         ├── eval.py                      # eval net
+        ├── eval_onnx.py                 # eval onnx
         ├── postprocess.py               # 310 postprocess
         ├── preprocess.py                # 310 preprocess
         ├── README.md
@@ -143,15 +145,6 @@ bash scripts/run_distribution_ascend.sh [RANK_TABLE_FILE] [CKPTS_DIR] [DATA_PATH
 bash scripts/run_distribution_ascend.sh [RANK_TABLE_FILE] ./ckpts ../shapenetcore_partanno_segmentation_benchmark_v0
 
 
-```
-
-- running on CPU
-
-```shell
-# Run stand-alone training for CPU
-python ./train.py --data_url=[DATA_URL] --device_target="CPU" --train_url=[TRAIN_URL]
-# example:
-python ./train.py --data_url=../shapenetcore_partanno_segmentation_benchmark_v0 --device_target="CPU" --train_url=./ckpts
 ```
 
 - running on GPU
@@ -202,7 +195,7 @@ Before running the command below, please check the checkpoint path used for eval
 # Evaluate on ascend
 bash scripts/run_standalone_eval_ascend.sh [DATA_PATH] [MODEL_PATH] [DEVICE_ID]
 # example:
-bash scripts/run_standalone_eval_ascend.sh shapenetcore_partanno_segmentation_benchmark_v0 pointnet.ckpt 0
+bash scripts/run_standalone_eval_ascend.sh shapenetcore_partanno_segmentation_benchmark_v0 pointnet.ckpt 1
 ```
 
 You can view the results through the file "log_standalone_eval_ascend". The accuracy of the test dataset will be as follows:
@@ -212,30 +205,13 @@ You can view the results through the file "log_standalone_eval_ascend". The accu
 'mIOU for class Chair: 0.869'
 ```
 
-- running on CPU
-
-```shell
-# Evaluate on CPU
-python ./eval.py --data_url=[DATA_URL] --device_target="CPU" --train_url=[TRAIN_URL]
-# example:
-python ./eval.py --data_url=../shapenetcore_partanno_segmentation_benchmark_v0 --device_target="CPU" --train_url=./ckpts
-
-```
-
-You can view the results through the file "log_standalone_eval_cpu". The accuracy of the test dataset will be as follows :
-
-```bash
-# grep "mIOU " log_standalone_eval_cpu
-'mIOU for class Chair: 0.869'
-```
-
 - running on GPU
 
 ```shell
   # Evaluate on GPU
 bash scripts/run_standalone_eval_gpu.sh [DATA_PATH] [MODEL_PATH] [DEVICE_ID]
 # example:
-bash scripts/run_standalone_eval_gpu.sh shapenetcore_partanno_segmentation_benchmark_v0 pointnet.ckpt 0
+bash scripts/run_standalone_eval_gpu.sh shapenetcore_partanno_segmentation_benchmark_v0 pointnet.ckpt 1
 ```
 
 You can view the results through the file "log_standalone_eval_gpu". The accuracy of the test dataset will be as follows:
@@ -244,6 +220,24 @@ You can view the results through the file "log_standalone_eval_gpu". The accurac
 # grep "mIOU " log_standalone_eval_gpu
 'mIOU for class Chair: 0.869'
 ```
+
+## ONNX Evaluation
+
+- running on GPU
+
+  ```shell
+  # Evaluate on GPU
+  bash scripts/run_standalone_eval_onnx_gpu.sh [DATA_PATH] [MODEL_PATH] [DEVICE_ID]
+  # example
+  bash scripts/run_standalone_eval_onnx_gpu.sh dataset/shapenetcore_partanno_segmentation_benchmark_v0 mindir/pointnet.onnx 1
+  ```
+
+  You can view the results through the file "log_standalone_eval_onnx_gpu". The accuracy of the test dataset will be as follows:
+
+  ```bash
+  # grep "mIOU " log_standalone_eval_onnx_gpu
+  'mIOU for class Chair: 0.869'
+  ```
 
 # [310 Inference Process](#310-infer-process)
 
@@ -282,7 +276,7 @@ Here, DVPP should be 'N'!
 ## Training Performance
 
 | Parameters                 | Ascend                                            | GPU(V100(PCIE))                             |
-| -------------------------- |---------------------------------------------------|---------------------------------------------|
+| -------------------------- | ------------------------------------------------- | ------------------------------------------- |
 | Model Version              | PointNet                                          | PointNet                                    |
 | Resource                   | Ascend 910; CPU 24cores; Memory 256G; OS Euler2.8 | NVIDIA RTX Titan-24G                        |
 | uploaded Date              | 11/30/2021 (month/day/year)                       | 4/19/2022 (month/day/year)                  |
@@ -299,17 +293,17 @@ Here, DVPP should be 'N'!
 
 ## Inference Performance
 
-| Parameters          | Ascend                                            | GPU(V100(PCIE))            |
-| ------------------- |---------------------------------------------------|---------------------------|
-| Model Version       | PointNet                                          | PointNet                  |
-| Resource            | Ascend 910; CPU 24cores; Memory 256G; OS Euler2.8 | NVIDIA RTX Titan-24G      |
-| Uploaded Date       | 11/30/2021 (month/day/year)                       | 4/19/2022 (month/day/year) |
-| MindSpore Version   | 1.3.0                                             | 1.3.0 1.5.0 1.6.0         |
-| Dataset             | A subset of ShapeNet                              | A subset of ShapeNet      |
-| Batch_size          | 64                                                | 64                        |
-| Outputs             | probability                                       | probability               |
-| mIOU                | 86.3% (1p)                                        | 86.3% (1p)                |
-| Total time          | 1 min                                             | 1 min                     |
+| Parameters        | Ascend                                            | GPU(V100(PCIE))            |
+| ----------------- | ------------------------------------------------- | -------------------------- |
+| Model Version     | PointNet                                          | PointNet                   |
+| Resource          | Ascend 910; CPU 24cores; Memory 256G; OS Euler2.8 | NVIDIA RTX Titan-24G       |
+| Uploaded Date     | 11/30/2021 (month/day/year)                       | 4/19/2022 (month/day/year) |
+| MindSpore Version | 1.3.0                                             | 1.3.0 1.5.0 1.6.0          |
+| Dataset           | A subset of ShapeNet                              | A subset of ShapeNet       |
+| Batch_size        | 64                                                | 64                         |
+| Outputs           | probability                                       | probability                |
+| mIOU              | 86.3% (1p)                                        | 86.3% (1p)                 |
+| Total time        | 1 min                                             | 1 min                      |
 
 # [Description of Random Situation](#contents)
 
