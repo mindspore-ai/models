@@ -323,6 +323,30 @@ bash run_infer_onnx.sh [ONNX_PATH] [TEST_ROOT_DIR]
 
 - `DEVICE_ID` 可选，默认值为0。
 
+### 在CPU执行训练+推理
+
+在CPU上执行时，支持使用Linux平台或者Win平台的docker上运行，对预训练模型进行转化，转化为ckpt文件，然后安装opencv-python等包，执行下面脚本即可。
+
+```shell
+# 训练
+bash run_train_cpu.sh [DATA_PATH] [CKPT_PATH]
+# 推理
+bash run_eval_cpu.sh [DATA_PATH] [CKPT_PATH]
+```
+
+验证过程：
+当执行推理结束后，会在上层目录生成./res文件夹，进入./res/submit_15目录，在本地执行压缩命令,生成submit.zip压缩包
+
+```shell
+zip -vr submit.zip ./
+```
+
+将其拷贝至评估脚本目录下./script，执行如下命令，即可验证结果
+
+```shell
+python ./script.py -s=submit.zip -g=gt.zip
+```
+
 ### result
 
 在运行目录的上一级目录将生成`res`文件夹，最终精度计算过程，请参照[ICDAR2015评估脚本](#icdar2015评估脚本).
@@ -410,3 +434,4 @@ net.set_train(False)
 acc = model.eval(dataset)
 print("accuracy: ", acc)
 ```
+
