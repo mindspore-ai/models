@@ -18,7 +18,7 @@ checkpoint_file_path: "suqeezenet_residual_cifar10-150_195.ckpt"
 
 # ==============================================================================
 # Training options
-net_name: "suqeezenet_residual"
+net_name: "squeezenet_residual"
 dataset : "cifar10"
 class_num: 10
 batch_size: 32
