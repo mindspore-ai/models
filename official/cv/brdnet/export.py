@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import mindspore as ms
 from mindspore import context, Tensor, load_checkpoint, load_param_into_net, export
 
 from src.models import BRDNet
-
+from src.models_onnx import BRDNet_onnx
 
 ## Params
 parser = argparse.ArgumentParser()
@@ -42,11 +42,14 @@ parser.add_argument("--device_id", type=int, default=0, help="Device id")
 
 args_opt = parser.parse_args()
 
-context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target, device_id=args_opt.device_id)
+context.set_context(mode=context.GRAPH_MODE, device_target=args_opt.device_target,
+                    device_id=args_opt.device_id)
 
 if __name__ == '__main__':
-
-    net = BRDNet(args_opt.channel)
+    if args_opt.file_format == "ONNX":
+        net = BRDNet_onnx(args_opt.channel)
+    else:
+        net = BRDNet(args_opt.channel)
 
     param_dict = load_checkpoint(args_opt.ckpt_file)
     load_param_into_net(net, param_dict)

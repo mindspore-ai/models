@@ -16,6 +16,8 @@ output_path: './output/'
 outer_path: 's3://output/'
 
 test_dir: ''
+onnx_name: ''
+
 pretrain_path: ''
 ckpt_name: ''
 
