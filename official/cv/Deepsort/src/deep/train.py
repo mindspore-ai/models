@@ -20,7 +20,7 @@ import mindspore.dataset.vision as C
 import mindspore.dataset as ds
 import mindspore.nn as nn
 from mindspore import Tensor, context
-from mindspore.communication.management import init, get_rank
+from mindspore.communication.management import init
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, LossMonitor, TimeMonitor
 from mindspore.train.model import Model
 from mindspore.context import ParallelMode
@@ -62,12 +62,11 @@ if target not in ('GPU', "Ascend"):
 
 context.set_context(mode=context.GRAPH_MODE, device_target=target, save_graphs=False)
 
-device_num = int(os.getenv('RANK_SIZE'))
+device_num = int(os.getenv('RANK_SIZE', '1'))
+device_id = int(os.getenv('DEVICE_ID', '0'))
 
 if args.run_modelarts:
     import moxing as mox
-    device_id = int(os.getenv('DEVICE_ID'))
-    device_num = int(os.getenv('RANK_SIZE'))
     cfg.batch_size = cfg.batch_size*int(8/device_num)
     context.set_context(device_id=device_id)
     local_data_url = '/cache/data'
@@ -80,8 +79,6 @@ if args.run_modelarts:
     DATA_DIR = local_data_url + '/'
 elif target == "Ascend":
     if args.run_distribute:
-        device_id = int(os.getenv('DEVICE_ID'))
-        device_num = int(os.getenv('RANK_SIZE'))
         cfg.batch_size = cfg.batch_size*int(8/device_num)
         context.set_context(device_id=device_id)
         init()
@@ -89,25 +86,25 @@ elif target == "Ascend":
         context.set_auto_parallel_context(device_num=device_num,\
              parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
     else:
-        context.set_context(device_id=args.device_id)
+        context.set_context(device_id=device_id)
         device_num = 1
         cfg.batch_size = cfg.batch_size*int(8/device_num)
-        device_id = args.device_id
     DATA_DIR = args.data_url + '/'
 elif target == "GPU":
     if args.run_distribute:
         init("nccl")
         context.reset_auto_parallel_context()
-        rank = get_rank()
         context.set_auto_parallel_context(device_num=device_num,
                                           parallel_mode=ParallelMode.DATA_PARALLEL,
                                           gradients_mean=True)
     else:
-        rank = 0
-        device_id = int(os.getenv('DEVICE_ID'))
         context.set_context(device_id=device_id)
     DATA_DIR = args.data_url
 
+if device_num > 1:
+    rank = get_rank()
+else:
+    rank = 0
 data = ds.ImageFolderDataset(DATA_DIR, decode=True, shuffle=True,\
      num_parallel_workers=args.num_parallel_workers, num_shards=device_num, shard_id=rank)
 

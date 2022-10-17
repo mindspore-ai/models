@@ -217,6 +217,8 @@ if __name__ == "__main__":
     if target not in ('GPU', "Ascend"):
         raise ValueError("Unsupported device target.")
 
+    device_id = int(os.getenv('DEVICE_ID', '0'))
+    device_num = int(os.getenv('RANK_SIZE', '1'))
     context.set_context(mode=context.GRAPH_MODE,
                         device_target=target,
                         save_graphs=False,
@@ -224,8 +226,6 @@ if __name__ == "__main__":
 
     if args.run_modelarts:
         import moxing as mox
-        device_id = int(os.getenv('DEVICE_ID'))
-        device_num = int(os.getenv('RANK_SIZE'))
         context.set_context(device_id=device_id)
         local_data_url = '/cache/data'
         local_ckpt_url = '/cache/ckpt'
@@ -243,17 +243,14 @@ if __name__ == "__main__":
         det_dir = local_det_url + '/'
     elif target == "Ascend":
         if args.run_distribute:
-            device_id = int(os.getenv('DEVICE_ID'))
-            device_num = int(os.getenv('RANK_SIZE'))
             context.set_context(device_id=device_id)
             init()
             context.reset_auto_parallel_context()
             context.set_auto_parallel_context(device_num=device_num,
                                               parallel_mode=ParallelMode.DATA_PARALLEL, gradients_mean=True)
         else:
-            context.set_context(device_id=args.device_id)
+            context.set_context(device_id=device_id)
             device_num = 1
-            device_id = args.device_id
         DATA_DIR = args.data_url
         local_train_url = args.train_url
         ckpt_dir = args.ckpt_url
@@ -268,7 +265,6 @@ if __name__ == "__main__":
                                               parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
         else:
-            device_id = 0
             context.set_context(device_id=device_id)
         DATA_DIR = args.data_url
         local_train_url = args.train_url
