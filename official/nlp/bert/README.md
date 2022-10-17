@@ -984,3 +984,7 @@ Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some com
 - **Q: How to resolve the RuntimeError by get_dataset_size error?**
 
   **A**: Configuration of 'dataset_format' is defined in `yaml` file. If get_dataset_size error,  you need to check whether the dataset format set in the 'sh' file is the same as the dataset format set in the yaml file. The current dataset format only supports [tfrecord, mindrecord].
+
+- **Q: Why the network result overflowed when using the Boost configuration to train bert network in some cases?**
+
+  **A** : The current Boost training configuration is a super parameter configuration for fast accuracy improvement, which is an aggressive parameter update policy. Therefore, it is necessary to train with the pre-training model, otherwise it is easy to cause overflow problems due to excessive learning rate (the pre-training model can be obtained from MindSpore Hub: https://www.mindspore.cn/resources/hub/details?MindSpore/1.9/bertlarge_boost_enwiki512). If you want to use Boost configuration to train the bert model from the beginning, it is recommended to reduce the learning rate appropriately and increase the warm up step number to make the model converge smoothly.
