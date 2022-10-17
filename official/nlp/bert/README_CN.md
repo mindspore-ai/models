@@ -958,3 +958,8 @@ run_pretrain.py中设置了随机种子，确保分布式训练中每个节点�
 
   **A**：实际运行的dataset_format参数，由`yaml`文件定义。如果你遇到get_dataset_size失败的问题，你需要校验一下脚本中设置的输入数据格式是否和yaml文件中定义的dataset_format一致。当前dataset_format只支持[tfrecord，mindrecord]。
 
+- **Q: 使用Boost配置文件训练bert网络，为什么有的时候会计算溢出？**
+
+  **A**：当前Boost训练配置文件为快速提升精度的超参配置，在参数更新上是较为激进的，因此需要配合预训练模型进行训练，否则容易因为学习率过大出现溢出问题（预训练模型可以从MindSpore Hub获取：https://www.mindspore.cn/resources/hub/details?MindSpore/1.9/bertlarge_boost_enwiki512）；如果想使用Boost配置从头训练bert模型，建议适当减小学习率，增加warm up步数，让模型训练收敛更加平滑。
+
+
