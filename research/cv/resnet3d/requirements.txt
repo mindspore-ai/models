@@ -1,0 +1,4 @@
+numpy 1.21.6
+onnxruntime-gpu 1.11.1
+pyyaml 6.0
+Pillow 9.2.0

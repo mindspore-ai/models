@@ -14,6 +14,7 @@
   - [脚本参数](#脚本参数)
   - [训练过程](#训练过程)
   - [评估过程](#评估过程)
+  - [ONNX评估](#ONNX评估)
   - [导出过程](#导出过程)
   - [导出](#导出)
   - [推理过程](#推理过程)
@@ -54,9 +55,11 @@ resnet3d的总体网络架构如下：
 - [MIT](http://moments.csail.mit.edu/)
   - MIT-IBM Watson AI Lab 推出的一个全新的百万规模视频理解数据集Moments in Time,共有100,0000 个视频, 用于预训练
 - [hmdb51](https://serre-lab.clps.brown.edu/resource/hmdb-a-large-human-motion-database/#Downloads)
-  - 一个小型的视频行为识别数据集，包含51类动作，共有6849个视频，每个动作至少包含51个视频, 用于Fine-tune
+  - 一个小型的视频行为识别数据集，包含51类动作，共有6849个视频，每个动作至少包含51个视频, 用于Fine-tune，此处使用Stabilized HMDB51
+  - labels地址(http://serre-lab.clps.brown.edu/wp-content/uploads/2013/10/test_train_splits.rar)
 - [UCF101](https://www.crcv.ucf.edu/data/UCF101/UCF101.rar)
   - 从YouTube收集的具有101个动作类别的真实动作视频的动作识别数据集, 共计13320个视频, 用于Fine-tune
+  - labels地址(https://www.crcv.ucf.edu/data/UCF101/UCF101TrainTestSplits-RecognitionTask.zip)
 
 预训练模型获取地址：
 [链接](https://github.com/kenshohara/3D-ResNets-PyTorch)
@@ -68,7 +71,7 @@ python pth_to_ckpt.py --pth_path=./pretrained.pth --ckpt_path=./pretrained.ckpt
 
 特别说明：
 
-原始数据集下载后格式为：
+按照下面格式创建目录，将下载好的hmdb51_sta.rar解压，把解压出来的文件夹放到videos目录中。将数据集对应的labels解压，把解压出的txt文件移动到labels目录中。
 
 ```text
 .
@@ -87,18 +90,18 @@ python pth_to_ckpt.py --pth_path=./pretrained.pth --ckpt_path=./pretrained.ckpt
   └──json
 ```
 
-使用src/generate_hmdb51_json.py生成json格式的标注文件
-
-```text
-cd ~/src
-python3 generate_hmdb51_json.py --dir_path ~/dataset/hmdb51/labels/ --video_path ~/dataset/hmdb51/videos/ --dst_dir_path ~/dataset/hmdb51/json
-```
-
 使用src/generate_video_jpgs.py将avi格式的视频文件转换为jpg格式的图片文件
 
 ```text
 cd ~/src
 python3 generate_video_jpgs.py --video_path ~/dataset/hmdb51/videos/ --target_path ~/dataset/hmdb51/jpg/
+```
+
+使用src/generate_hmdb51_json.py生成json格式的标注文件
+
+```text
+cd ~/src
+python3 generate_hmdb51_json.py --dir_path ~/dataset/hmdb51/labels/ --video_path ~/dataset/hmdb51/jpg/ --dst_dir_path ~/dataset/hmdb51/json
 ```
 
 # 特性
@@ -115,7 +118,7 @@ python3 generate_video_jpgs.py --video_path ~/dataset/hmdb51/videos/ --target_pa
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
   - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-  - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
 # 快速入门
 
@@ -146,6 +149,7 @@ python3 generate_video_jpgs.py --video_path ~/dataset/hmdb51/videos/ --target_pa
     ├── run_distribute_train.sh            # 启动Ascend分布式训练（8卡）
     ├── run_eval.sh                        # 启动Ascend评估
     ├── run_standalone_train.sh            # 启动Ascend单机训练（单卡）
+    ├──run_eval_onnx.sh                    # ONNX评估的shell脚本
   ├── src
     ├── __init__.py
     ├── config.py                          # yaml文件解析
@@ -165,6 +169,7 @@ python3 generate_video_jpgs.py --video_path ~/dataset/hmdb51/videos/ --target_pa
     └──  videodataset_multiclips.py        # 自定义数据集加载方式
   ├── pth_to_ckpt.py                       # 将预训练模型从pth格式转换为ckpt格式
   ├── eval.py                              # 评估网络
+  ├── eval_onnx.py                         # ONNX评估脚本
   ├── train.py                             # 训练网络
   ├── hmdb51_config.yaml                   # 参数配置
   └── ucf101_config.yaml                   # 参数配置  
@@ -180,6 +185,7 @@ python3 generate_video_jpgs.py --video_path ~/dataset/hmdb51/videos/ --target_pa
     'result_path': './results/ucf101',                                             # 训练、推理结果路径
     'pretrain_path': '~/your_path/pretrained.ckpt',                                # 预训练模型文件路径
     'inference_ckpt_path': "~/your_path/results/ucf101/result.ckpt",               # 用于推理的模型文件路径
+    'onnx_path': "~/your_path/results/result-3d.onnx",               # 用于推理的模型文件路径
     'n_classes': 101,                                                              # 数据集类别数
     'sample_size': 112,                                                            # 图片分辨率
     'sample_duration': 16,                                                         # 视频片段长度，单位：帧
@@ -303,6 +309,48 @@ clip: 66.5% top-1: 69.7%  top-5: 93.8%
 clip: 88.8% top-1: 92.7%  top-5: 99.3%
 ```
 
+## ONNX评估
+
+### 导出onnx模型
+
+```bash
+python export.py --ckpt_file=/path/best.ckpt --file_format=ONNX --n_classes=51 --batch_size=1 --device_target=GPU
+ ```
+
+- `ckpt_file` ckpt文件路径
+- `file_format` 导出模型格式，此处为ONNX
+- `n_classes` 使用数据集类别数，hmdb51数据集此参数为51，ucf101数据集此参数为101
+- `batch_size` 批次数，固定为1
+- `device_target` 目前仅支持GPU或CPU
+
+### 运行ONNX模型评估
+
+```bash
+用法：bash run_eval_onnx.sh [ucf101|hmdb51] [VIDEO_PATH] [ANNOTATION_PATH] [ONNX_PATH]
+实例：bash run_eval_onnx.sh ucf101 /path/ucf101/jpg /path/ucf101/json/ucf101_01.json /path/resnet-3d.onnx
+ ```
+
+- `[ucf101|hmdb51]` 选择所使用的数据集
+- `[VIDEO_PATH]` 视频路径
+- `[ANNOTATION_PATH]` 标签路径
+- `[ONNX_PATH]` onnx模型的路径
+
+### 结果
+
+评估结果保存在示例路径中，文件名为“~/eval_onnx.log”。您可在此路径下的日志找到如下结果：
+
+- 使用hmdb51数据集评估resnet3d
+
+```text
+clip: 66.5% top-1: 69.7%  top-5: 93.8%
+```
+
+- 使用ucf101数据集评估resnet3d
+
+```text
+clip: 88.8% top-1: 92.7%  top-5: 99.3%
+```
+
 ## 导出过程
 
 ### 导出
@@ -310,7 +358,7 @@ clip: 88.8% top-1: 92.7%  top-5: 99.3%
 在导出时，hmdb51数据集,参数n_classes设置为51,ucf101数据集,参数n_classes设置为101, 参数batch_size只能设置为1.
 
 ```shell
-python export.py --ckpt_file=./saved_model/best.ckpt --file_format=MINDIR --n_classes=51, --batch_size=1
+python export.py --ckpt_file=./saved_model/best.ckpt --file_format=MINDIR --n_classes=51 --batch_size=1
 ```
 
 ## 推理过程

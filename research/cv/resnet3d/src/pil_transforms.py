@@ -33,7 +33,7 @@ class PILTrans:
                                      ratio=(opt.train_crop_min_ratio, 1.0 / opt.train_crop_min_ratio))
         self.random_horizontal_flip = vision.RandomHorizontalFlip(prob=0.5)
         self.color = vision.RandomColorAdjust(0.4, 0.4, 0.4, 0.1)
-        self.normalize = vision.Normalize(mean=mean, std=std, is_hwc=False)
+        self.normalize = vision.Normalize(mean=mean, std=std)
         self.to_tensor = vision.ToTensor()
         self.resize = vision.Resize(opt.sample_size)
         self.center_crop = vision.CenterCrop(opt.sample_size)
@@ -75,7 +75,7 @@ class EvalPILTrans:
         self.to_pil = vision.ToPIL()
         self.resize = vision.Resize(opt.sample_size)
         self.center_crop = vision.CenterCrop(opt.sample_size)
-        self.normalize = vision.Normalize(mean=mean, std=std, is_hwc=False)
+        self.normalize = vision.Normalize(mean=mean, std=std)
         self.to_tensor = vision.ToTensor()
 
     def __call__(self, data, labels, batchInfo):
