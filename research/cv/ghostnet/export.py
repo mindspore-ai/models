@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     parser.add_argument('--device_target', type=str, choices=['Ascend', 'GPU', 'CPU'], default='Ascend',
                         help='device where the code will be implemented')
     parser.add_argument('--device_id', type=int, default=0, help='device id')
-    parser.add_argument('--file_format', type=str, choices=['AIR', 'MINDIR'], default='MINDIR',
+    parser.add_argument('--file_format', type=str, choices=['AIR', 'ONNX', 'MINDIR'], default='ONNX',
                         help='file format')
     parser.add_argument('--checkpoint_path', required=True, default=None, help='ckpt file path')
     args = parser.parse_args()
@@ -41,4 +41,4 @@ if __name__ == '__main__':
 
     input_data = Tensor(np.zeros([1, 3, 224, 224]), ms.float32)
     print(input_data.shape)
-    export(net, input_data, file_name='ghost', file_format=args.file_format)
+    export(net, input_data, file_name='ghostnet', file_format=args.file_format)

@@ -115,11 +115,12 @@ GhostNet的总体网络架构如下：[链接](https://arxiv.org/pdf/1911.11907.
       ├── CMakeLists.txt                   # ascend310推理
       ├── main.cc                          # ascend310推理
       └──  utils.cc                        # ascend310推理
-  ├── scripts
-    ├── run_distribute_train.sh            # 启动Ascend分布式训练（8卡）
-    ├── run_eval.sh                        # 启动Ascend评估
-    ├── run_infer_310.sh                   # 启动Ascend310推理
-    └── run_standalone_train.sh            # 启动Ascend单机训练（单卡）
+    ├── scripts
+      ├── run_distribute_train.sh          # 启动Ascend分布式训练（8卡）
+      ├── run_eval.sh                      # 启动Ascend评估
+      ├── run_eval_onnx.sh                 # 启动ONNX评估
+      ├── run_infer_310.sh                 # 启动Ascend310推理
+      └── run_standalone_train.sh          # 启动Ascend单机训练（单卡）
   ├── src
     ├── config.py                          # 参数配置
     ├── dataset.py                         # 数据预处理
@@ -131,6 +132,7 @@ GhostNet的总体网络架构如下：[链接](https://arxiv.org/pdf/1911.11907.
     ├── launch.py
     └── ghostnet.py                        # ghostnet网络
   ├── eval.py                              # 评估网络
+  ├── eval_onnx.py                         # ONNX评估
   ├── create_imagenet2012_label.py         # 创建ImageNet2012标签
   ├── export.py                            # 导出MindIR模型
   ├── postprocess.py                       # 310推理的后期处理
@@ -240,11 +242,11 @@ ckpt = /home/lzu/ghost_Mindspore/scripts/device0/ghostnet-500_1251.ckpt
 ## [导出MindIR](#contents)
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --device_target [DEVICE_TARGET] --file_format [FILE_FORMAT] --checkpoint_path [CKPT_PATH]
 ```
 
 参数ckpt_file为必填项，
-`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
+`FILE_FORMAT` 必须在 ["AIR", "ONNX", "MINDIR"]中选择。
 
 ## 在Ascend310执行推理
 
@@ -258,9 +260,9 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 
 ## 结果
 
-推理结果保存在脚本执行的当前路径， 你可以在acc.log中看到以下精度计算结果。
+推理结果保存在脚本执行的当前路径， 你可以在 acc.log 中看到以下精度计算结果。
 
-- 使用ImageNet2012数据集评估ghostnet
+- 使用 ImageNet2012 数据集评估 ghostnet
 
 ```shell
 Total data: 50000, top1 accuracy: 0.73816, top5 accuracy: 0.9178.

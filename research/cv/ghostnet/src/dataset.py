@@ -43,9 +43,9 @@ def create_dataset(dataset_path, do_train, infer_910=False, device_id=0, batch_s
         device_num = int(os.getenv('RANK_SIZE'))
 
     if not do_train:
-        dataset_path = os.path.join(dataset_path, 'test')
+        dataset_path = os.path.join(dataset_path)
     else:
-        dataset_path = os.path.join(dataset_path, 'train')
+        dataset_path = os.path.join(dataset_path)
 
     if device_num == 1:
         ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers, shuffle=True)
