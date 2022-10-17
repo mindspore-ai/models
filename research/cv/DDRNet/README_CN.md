@@ -26,13 +26,13 @@
 
 <!-- /TOC -->
 
-# [DDRNet描述](#目录)
+## [DDRNet描述](#目录)
 
 语义分割是自主车辆理解周围场景的关键技术。对于实际的自主车辆，不希望花费大量的推理时间来获得高精度的分割结果。使用轻量级架构(编码器解码器或双通道)或对低分辨率图像进行推理，最近的方法实现了非常快速的场景解析，甚至可以在单个1080Ti GPU上以100 FPS以上的速度运行。然而，在这些实时方法和基于膨胀主干的模型之间仍然存在明显的性能差距。
 
 为了解决这个问题，受HRNet的启发，作者提出了一种具有深度高分辨率表示能力的深度双分辨率网络，用于高分辨率图像的实时语义分割，特别是道路行驶图像。作者提出了一种新的深度双分辨率网络用于道路场景的实时语义分割。 DDRNet从一个主干开始，然后被分成两个具有不同分辨率的平行深分支。一个深分支生成相对高分辨率的特征映射，另一个通过多次下采样操作提取丰富的上下文信息。为了有效的信息融合，在两个分支之间桥接多个双边连接。此外，我们还提出了一个新的模块DAPPM，它大大增加了接受域，比普通的PPM更充分地提取了上下文信息。
 
-# [数据集](#目录)
+## [数据集](#目录)
 
 使用的数据集：[ImageNet2012](http://www.image-net.org/)
 
@@ -49,14 +49,14 @@
     └─val                   # 评估数据集
 ```
 
-# [特性](#目录)
+## [特性](#目录)
 
-## 混合精度
+### 混合精度
 
 采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html)
 的训练方法，使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
 
-# [环境要求](#目录)
+## [环境要求](#目录)
 
 - 硬件（Ascend）
     - 使用Ascend来搭建硬件环境。
@@ -66,9 +66,9 @@
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.3/index.html)
     - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
-# [脚本说明](#目录)
+## [脚本说明](#目录)
 
-## 脚本及样例代码
+### 脚本及样例代码
 
 ```bash
 ├── DDRNet
@@ -79,6 +79,7 @@
       ├──run_distribute_train_ascend.sh   // 多卡Ascend910训练脚本
       ├──run_eval_ascend.sh               // 测试脚本
       ├──run_infer_310.sh                 // 310推理脚本
+      ├──run_eval_onnx.sh                 // onnx推理脚本
   ├── src
       ├──configs                          // DDRNet的配置文件
       ├──data                             // 数据集配置文件
@@ -96,6 +97,7 @@
           ┕──schedulers.py                // 学习率衰减的工具函数
   ├── train.py                            // 训练文件
   ├── eval.py                             // 评估文件
+  ├── eval_onnx.py                        // ONNX评估文件
   ├── export.py                           // 导出模型文件
   ├── postprocess.py                      // 推理计算精度文件
   ├── preprocess.py                       // 推理预处理图片文件
@@ -160,7 +162,7 @@
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
-# [训练和测试](#目录)
+## [训练和测试](#目录)
 
 - Ascend处理器环境运行
 
@@ -219,13 +221,13 @@
   Top5 acc: 0.9331
   ```
 
-# [模型描述](#目录)
+## [模型描述](#目录)
 
-## 性能
+### 性能
 
-### 评估性能
+#### 评估性能
 
-#### ImageNet-1k上的DDRNet
+##### ImageNet-1k上的DDRNet
 
 | 参数                 | Ascend                                                       |
 | -------------------------- | ----------------------------------------------------------- |
@@ -246,8 +248,6 @@
 
 ### 推理性能
 
-#### ImageNet-1k上的DDRNet
-
 | 参数                 | Ascend                                                       |
 | -------------------------- | ----------------------------------------------------------- |
 |模型                 |DDRNet|
@@ -260,6 +260,24 @@
 | 速度                      | 平均耗时3.29687 ms每张|
 | 推理耗时| 约38min|
 
-# ModelZoo主页
+## ONNX推理
+
+- ONNX的导出与推理
+
+  ```bash
+  ### 导出ONNX模型
+  python export.py --pretrained /path/best.ckpt \
+  --ddr_config ./src/configs/ddrnet23_imagenet.yaml \
+  --device_target 'GPU'
+
+  -`best.ckpt`ckpt文件路径
+  -`ddr_config`模型文件配置
+  -`device_target`使用GPU导出
+
+  ### ONNX推理
+  python eval_onnx.py --device_id 6 --ddr_config ./src/configs/ddrnet23_imagenet.yaml
+  或者sh run_eval_onnx.sh [device_id] [ddr_config]
+
+## ModelZoo主页
 
 请浏览官网[主页](https://gitee.com/mindspore/models)
