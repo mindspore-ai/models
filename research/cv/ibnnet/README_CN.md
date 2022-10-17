@@ -91,7 +91,8 @@ bash scripts/run_eval.sh
   ├── run_standalone_train.sh        // 用于单机训练的shell脚本
   ├── run_standalone_train.sh        // 用于GPU单机训练的shell脚本
   ├── run_eval.sh                    // 用于评估的shell脚本
-  └── run_eval.sh                    // 用于GPU评估的shell脚本
+  ├── run_eval.sh                    // 用于GPU评估的shell脚本
+  └── run_eval_onnx.sh               // 用于评估onnx的shell脚本
  ├── src
   ├── loss.py                         //损失函数
   ├── lr_generator.py                 //生成学习率
@@ -102,6 +103,7 @@ bash scripts/run_eval.sh
   ├── pth2ckpt.py                       //转换pth文件为ckpt文件
  ├── export.py
  ├── eval.py                             // 测试脚本
+ ├── eval_onnx.py                        // onnx模型评估脚本
  ├── train.py                            // 训练脚本
  ├── preprocess.py                       // 310推理数据预处理
  ├── preprocess.py                       // 310推理数据后处理
@@ -210,6 +212,31 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 
 参数`ckpt_file` 是必需的，`FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中进行选择。
 
+## onnx模型导出与推理
+
+- 导出 ONNX:  
+
+```shell
+python export.py --ckpt_file [CKPT_PATH] --file_format [FILE_FORMAT] --device_target [DEVICE_TARGET]
+e.g. python export.py --ckpt_file ibnnet_top1acc77.12_top5acc93.58.ckpt --file_format ONNX --device_target GPU
+```
+
+- 运行推理-python方式:
+
+```shell
+python ./eval_onnx.py --onnx_path=[ONNX_PATH] --dataset_path=[DATASET_PATH] --device_target=[DEVICE_TARGET]
+e.g. python ./eval_onnx.py --onnx_path=./ibnnet.onnx --dataset_path=../ghost/dataset/ILSVRC2012_img_val --device_target=GPU
+```
+
+- 运行推理-bash方式:
+
+```shell
+bash run_eval_onnx.sh [ONNX_PATH] [DATASET_PATH] [DEVICE_TARGET]
+bash run_eval_onnx.sh ./ibnnet.onnx ../ghost/dataset/ILSVRC2012_img_val/ GPU
+```
+
+- 评估结果将存放在 eval_onnx.log 中.
+
 # 推理过程
 
 ## 用法
@@ -270,4 +297,3 @@ bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH]
 # ModelZoo主页  
 
  请浏览官网[主页](https://gitee.com/mindspore/models)。
-
