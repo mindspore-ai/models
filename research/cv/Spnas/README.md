@@ -86,7 +86,7 @@ Spnas
 ### For training
 
 ```bash
-python3 train.py --config_path=src/spnas.yaml
+python3 train.py --config_file=src/spnas.yaml
 ```
 
 > Or one can run following script for all tasks.
