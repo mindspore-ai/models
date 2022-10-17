@@ -23,7 +23,7 @@ from collections import namedtuple
 import numpy as np
 from mindspore.mindrecord import FileWriter
 from mindspore.log import logging
-from src.tokenizer import FullTokenizer, convert_to_unicode, tokenize_chinese_chars
+from .tokenizer import FullTokenizer, convert_to_unicode, tokenize_chinese_chars
 
 def csv_reader(fd, delimiter='\t'):
     """
