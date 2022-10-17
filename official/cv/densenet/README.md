@@ -16,6 +16,7 @@
         - [Distributed Training](#distributed-training)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
+        - [ONNX Evaluation](#onnx-evaluation)
     - [Export Process](#export-process)
         - [export](#export)
     - [Inference Process](#inference-process)
@@ -215,6 +216,7 @@ After installing MindSpore via the official website, you can start training and 
         ├── densenet100_config.yaml          // config file
         ├── densenet121_config.yaml          // config file
         ├── eval.py                          // evaluation script
+        ├── eval_onnx.py                     // evaluation script for onnx model
         ├── export.py                        // export script
         ├── mindspore_hub_conf.py            // hub config script
         ├── postprocess.py                   // 310 Inference post-processing script
@@ -448,6 +450,37 @@ You can modify the training behaviour through the various flags in the `densenet
   2021-03-18 09:06:43,247:INFO:after allreduce eval: top1_correct=9492, tot=9984, acc=95.07%
 
   ```
+
+#### ONNX Evaluation
+
+- Export your model to ONNX
+
+  ```bash
+  # when using cifar10 dataset
+  python export.py --net densenet100 --ckpt_file /path/to/checkpoint.ckpt --device_target CPU --file_format ONNX --batch_size 32
+
+  # when using imagenet dataset
+  python export.py --net densenet121 --ckpt_file /path/to/checkpoint.ckpt --device_target CPU --file_format ONNX --batch_size 32
+  ```
+
+- Run ONNX evaluation. Specify dataset type as "cifar10" or "imagenet"
+
+  ```bash
+  # when using cifar10 dataset
+  python eval_onnx.py  --eval_data_dir cifar-10-verify-bin --ckpt_files /path/to/exported.onnx --device_target GPU > output.eval_onnx.log 2>&1 &
+
+  # when using imagenet dataset
+  python eval_onnx.py --eval_data_dir imagenet_val --ckpt_files /path/to/exported.onnx --device_target GPU > output.eval_onnx.log 2>&1 &
+  ```
+
+    - The above python command will run in the background, you can view the results through the file `output.eval_onnx.log`. You will get the accuracy as following:
+
+    ```bash
+
+    # when using the imagenet dataset
+    top-1 accuracy: 0.7554
+    top-5 accuracy: 0.9273
+    ```
 
 ## [Export Process](#contents)
 
