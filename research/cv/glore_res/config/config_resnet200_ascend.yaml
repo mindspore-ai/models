@@ -12,6 +12,7 @@ output_path: "/cache/train"
 load_path: "/cache/checkpoint_path/"
 device_target: "Ascend"
 checkpoint_path: "./checkpoint/"
+onnx_path: "resnet200.onnx"
 
 # ==============================================================================
 # Training options
