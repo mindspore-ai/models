@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
+"""get dataset list"""
 
 import argparse
 import os
@@ -22,7 +22,7 @@ import scipy.io
 from PIL import Image
 
 parser = argparse.ArgumentParser('dataset list generator')
-parser.add_argument("--data_dir", type=str, default='./', help='where dataset stored.')
+parser.add_argument("--data_dir", type=str, default='./path_to_data/fcn8s', help='where dataset stored.')
 
 args, _ = parser.parse_known_args()
 
