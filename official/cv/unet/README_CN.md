@@ -1,7 +1,5 @@
 # Unet
 
-<!-- TOC -->
-
 - [Unet](#unet)
     - [U-Net说明](#u-net说明)
     - [模型架构](#模型架构)
@@ -14,20 +12,26 @@
     - [训练过程](#训练过程)
         - [用法](#用法)
         - [分布式训练](#分布式训练)
+            - [训练时推理](#训练时推理)
     - [评估过程](#评估过程)
         - [评估](#评估)
+    - [推理过程](#推理过程)
+        - [导出AIR、MindIRonically、ONNX模型](#导出airmindironicallyonnx模型)
+            - [本地导出AIR、MindIRonically、ONNX](#本地导出airmindironicallyonnx)
+            - [ModelArts导出mindir](#modelarts导出mindir)
+        - [ONNX推理](#onnx推理)
+            - [ONNX导出](#onnx导出)
+            - [ONNX推理评估](#onnx推理评估)
+            - [结果](#结果)
     - [模型描述](#模型描述)
         - [性能](#性能)
             - [评估性能](#评估性能)
-        - [用法](#用法-1)
-            - [推理](#推理)
-                - [Ascend 310环境运行](#ascend-310环境运行)
-            - [继续训练预训练模型](#继续训练预训练模型)
-            - [迁移学习](#迁移学习)
+    - [功能用法](#功能用法)
+        - [推理](#推理)
+        - [继续训练预训练模型](#继续训练预训练模型)
+        - [迁移学习](#迁移学习)
     - [随机情况说明](#随机情况说明)
     - [ModelZoo主页](#modelzoo主页)
-
-<!-- /TOC -->
 
 ## U-Net说明
 
@@ -102,7 +106,7 @@ UNet++是U-Net的增强版本，使用了新的跨层链接方式和深层监督
 
 我们提供了一个脚本来将 COCO 和 Cell_Nuclei 数据集（[Unet++ 原论文](https://arxiv.org/abs/1912.05074) 中使用）转换为multi-class格式。
 
-1. 在unet下根据不同数据集选择 unet_*_cell_config.yaml 或 unet_*_coco_config.yaml 文件，根据需要修改参数。
+1. 在unet下根据不同数据集选择 unet_**cell_config.yaml 或 unet**_coco_config.yaml 文件，根据需要修改参数。
 
 2. 运行转换脚本:
 
@@ -118,7 +122,7 @@ python preprocess_dataset.py --config_path path/unet/unet_nested_cell_config.yam
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
 ## 快速入门
 
@@ -184,7 +188,7 @@ bash scripts/docker_start.sh unet:20.1.0 [DATA_DIR] [MODEL_DIR]
 
 然后在容器里的操作就和Ascend平台上是一样的。
 
-如果要在modelarts上进行模型的训练，可以参考modelarts的官方指导文档(https://support.huaweicloud.com/modelarts/)
+如果要在modelarts上进行模型的训练，可以参考modelarts的官方指导文档 (<https://support.huaweicloud.com/modelarts/>)
 开始进行模型的训练和推理，具体操作如下：
 
 ```text
@@ -218,8 +222,6 @@ bash scripts/docker_start.sh unet:20.1.0 [DATA_DIR] [MODEL_DIR]
 # (7) 开始模型的推理。
 ```
 
-# 脚本说明
-
 ## 脚本说明
 
 ### 脚本及样例代码
@@ -241,6 +243,7 @@ bash scripts/docker_start.sh unet:20.1.0 [DATA_DIR] [MODEL_DIR]
         │   ├──run_standalone_train_gpu.sh  // GPU 上训练脚本
         │   ├──run_standalone_eval_gpu.sh   // GPU 上评估脚本
         │   ├──run_distribute_train_gpu.sh  // GPU 上分布式训练脚本
+        │   ├──run_eval_onnx.sh             // ONNX评估脚本
         ├── src
         │   ├──__init__.py
         │   ├──data_loader.py               // 数据处理
@@ -268,8 +271,10 @@ bash scripts/docker_start.sh unet:20.1.0 [DATA_DIR] [MODEL_DIR]
         ├── unet_nested_config.yaml         // 配置文件
         ├── unet_simple_config.yaml         // 配置文件
         ├── unet_simple_coco_config.yaml    // 配置文件
+        ├── default_config.yaml    // 配置文件
         ├── train.py                        // 训练脚本
         ├── eval.py                         // 推理脚本
+        ├── infer_unet_onnx.py              // ONNX推理脚本
         ├── export.py                       // 导出脚本
         ├── mindspore_hub_conf.py           // hub 配置脚本
         ├── postprocess.py                  // 310 推理后处理脚本
@@ -451,11 +456,110 @@ bash scripts/run_distribute_train_gpu.sh [RANKSIZE] [DATASET] [CONFIG_PATH]
   ============== Cross valid dice coeff is: {'dice_coeff': 0.9089390969777261}
   ```
 
-# 模型描述
+## 推理过程
 
-## 性能
+### 导出AIR、MindIRonically、ONNX模型
 
-### 评估性能
+在执行导出前需要修改配置文件中的checkpoint_file_path和batch_size参数。checkpoint_file_path为ckpt文件路径，batch_size设置为1。
+
+#### 本地导出AIR、MindIRonically、ONNX
+
+```shell
+python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[model_name] --file_format=[EXPORT_FORMAT]
+```
+
+`EXPORT_FORMAT` 可选 ["AIR", "MINDIR", "ONNX"]. BATCH_SIZE 目前仅支持batch_size为1的推理
+
+#### ModelArts导出mindir
+
+```text
+# (1) 把训练好的模型地方到桶的对应位置。
+# (2) 选择a或者b其中一种方式。
+#       a.  设置 "enable_modelarts=True"
+#          设置 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt" 在 yaml 文件。
+#          设置 "checkpoint_url=/The path of checkpoint in S3/" 在 yaml 文件。
+#          设置 "file_name='./unet'"参数在yaml文件。
+#          设置 "file_format='MINDIR'" 参数在yaml文件。
+#       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
+#          增加 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" 参数在modearts的界面上。
+#          增加 "checkpoint_url=/The path of checkpoint in S3/" 参数在modearts的界面上。
+#          设置 "file_name='./unet'"参数在modearts的界面上。
+#          设置 "file_format='MINDIR'" 参数在modearts的界面上。
+# (3) 设置网络配置文件的路径 "config_path=/The path of config in S3/"
+# (4) 在modelarts的界面上设置代码的路径 "/path/unet"。
+# (5) 在modelarts的界面上设置模型的启动文件 "export.py" 。
+# 模型的输出路径"Output file path" 和模型的日志路径 "Job log path" 。
+# (6) 开始导出mindir。
+```
+
+在执行推理前，MINDIR文件必须通过export.py文件导出。
+
+```shell
+# Ascend310 推理
+bash run_infer_310.sh [NETWORK] [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+```
+
+`NETWORK` 目前支持的网络为unet及unet++，对应的配置文件分别为`unet_simple_config.yaml`及`unet_nested_cell_config.yaml`。
+`NEED_PREPROCESS` 表示是否需要对数据进行预处理，`y`表示需要预处理，`n`表示不需要，如果选择`y`，unet的数据集将会被处理为numpy格式，`unet++`的数据集将会分离出验证集进行推理，另外，预处理所调用的配置文件中需要修改batch_size值为1，数据集路径也需要设置。
+`DEVICE_ID` 可选，默认值为 0。
+
+推理结果保存在当前路径，可在acc.log中看到最终精度结果。
+
+```text
+Cross valid dice coeff is: 0.9054352151297033
+```
+
+### ONNX推理
+
+在执行推理前，ONNX文件必须通过`export.py`脚本导出。  
+进行推理精度验证时只支持batch size为1的ONNX模型，因此在ONNX导出是设置`--batch_size=1` 。
+
+#### ONNX导出
+
+```shell
+python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[model_name] --file_format=ONNX --batch_size=1
+```
+
+#### ONNX推理评估
+
+命令行运行  
+
+```shell
+ python infer_unet_onnx.py [CONFIG_PATH] [ONNX_MODEL] [DATASET_PATH] [DEVICE_TARGET]
+```
+
+ `CONFIG_PATH`： 是yaml配置文件的相对路径。  
+ `ONNX_MODEL`：是ONNX文件的相对路径。  
+ `DATASET_PATH`：是数据集的相对路径。  
+ `DEVICE_TARGET`：使用的处理芯片类型，例如GPU、Ascend  
+
+脚本运行
+
+```shell
+bash ./scripts/run_eval_onnx.sh [DATASET_PATH] [ONNX_MODEL] [DEVICE_TARGET] [CONFIG_PATH]
+```
+
+#### 结果
+
+在GPU上的推理结果
+
+```shell
+============== Cross valid dice coeff is: 0.9138285672951554
+============== Cross valid IOU is: 0.8414870790389525
+```
+
+在ONNX上的推理结果
+
+```shell
+============== Cross valid dice coeff is: 0.9138280814519938
+============== Cross valid IOU is: 0.8414862558573599
+```
+
+## 模型描述
+
+### 性能
+
+#### 评估性能
 
 | 参数                 | Ascend     | GPU |
 | -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -498,64 +602,13 @@ bash scripts/run_distribute_train_gpu.sh [RANKSIZE] [DATASET] [CONFIG_PATH]
 | 配置文件 | unet_nested_cell_config.yaml | unet_nested_cell_config.yaml|
 | 脚本 | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) | [U-Net脚本](https://gitee.com/mindspore/models/tree/master/official/cv/unet) |
 
-### 用法
+## 功能用法
 
-#### 推理
+### 推理
 
 如果您需要使用训练好的模型在Ascend 910、Ascend 310等多个硬件平台上进行推理上进行推理，可参考此[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/infer/inference.html)。下面是一个简单的操作步骤示例：
 
-##### Ascend 310环境运行
-
-导出mindir模型
-
-在执行导出前需要修改配置文件中的checkpoint_file_path和batch_size参数。checkpoint_file_path为ckpt文件路径，batch_size设置为1。
-
-本地导出mindir
-
-```shell
-python export.py --config_path=[CONFIG_PATH] --checkpoint_file_path=[model_ckpt_path] --file_name=[model_name] --file_format=MINDIR
-```
-
-ModelArts导出mindir
-
-```text
-# (1) 把训练好的模型地方到桶的对应位置。
-# (2) 选择a或者b其中一种方式。
-#       a.  设置 "enable_modelarts=True"
-#          设置 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt" 在 yaml 文件。
-#          设置 "checkpoint_url=/The path of checkpoint in S3/" 在 yaml 文件。
-#          设置 "file_name='./unet'"参数在yaml文件。
-#          设置 "file_format='MINDIR'" 参数在yaml文件。
-#       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
-#          增加 "checkpoint_file_path='/cache/checkpoint_path/model.ckpt'" 参数在modearts的界面上。
-#          增加 "checkpoint_url=/The path of checkpoint in S3/" 参数在modearts的界面上。
-#          设置 "file_name='./unet'"参数在modearts的界面上。
-#          设置 "file_format='MINDIR'" 参数在modearts的界面上。
-# (3) 设置网络配置文件的路径 "config_path=/The path of config in S3/"
-# (4) 在modelarts的界面上设置代码的路径 "/path/unet"。
-# (5) 在modelarts的界面上设置模型的启动文件 "export.py" 。
-# 模型的输出路径"Output file path" 和模型的日志路径 "Job log path" 。
-# (6) 开始导出mindir。
-```
-
-在执行推理前，MINDIR文件必须在910上通过export.py文件导出。
-
-```shell
-# Ascend310 推理
-bash run_infer_310.sh [NETWORK] [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
-```
-
-`NETWORK` 目前支持的网络为unet及unet++，对应的配置文件分别为`unet_simple_config.yaml`及`unet_nested_cell_config.yaml`。
-`NEED_PREPROCESS` 表示是否需要对数据进行预处理，`y`表示需要预处理，`n`表示不需要，如果选择`y`，unet的数据集将会被处理为numpy格式，`unet++`的数据集将会分离出验证集进行推理，另外，预处理所调用的配置文件中需要修改batch_size值为1，数据集路径也需要设置。
-`DEVICE_ID` 可选，默认值为 0。
-
-推理结果保存在当前路径，可在acc.log中看到最终精度结果。
-
-```text
-Cross valid dice coeff is: 0.9054352151297033
-```
-
-#### 继续训练预训练模型
+### 继续训练预训练模型
 
 在`*.yaml`里将`resume`设置成True，并将`resume_ckpt`设置成对应的权重文件路径，例如：
 
@@ -566,7 +619,7 @@ Cross valid dice coeff is: 0.9054352151297033
     'filter_weight': ["final.weight"]
 ```
 
-#### 迁移学习
+### 迁移学习
 
 首先像上面讲的那样将继续训练的权重加载进来。然后将`transfer_training`设置成True。配置中还有一个 `filter_weight`参数，用于将一些不能适用于不同数据集的权重过滤掉。通常这个`filter_weight`的参数不需要修改，其默认值通常是和模型的分类数相关的参数。例如：
 
