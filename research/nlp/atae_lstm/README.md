@@ -66,8 +66,8 @@ Used data set：[SemEval 2014 task4](https://alt.qcri.org/semeval2014/task4) Res
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For details, please refer to the following resources:
-    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
 
 # Quick Start
 

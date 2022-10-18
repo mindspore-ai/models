@@ -67,8 +67,8 @@ Dataset used: [ImageNet2012](http://www.image-net.org/)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
 
 # [Quick Start](#contents)
 
@@ -304,7 +304,7 @@ Inference result is saved in current path, you can find result like this in acc.
 
 ### Inference
 
-If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/master/infer/inference.html). Following the steps below, this is a simple example:
+If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/r1.9/infer/inference.html). Following the steps below, this is a simple example:
 
 - Running on Ascend
 

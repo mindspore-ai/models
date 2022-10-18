@@ -40,7 +40,7 @@ Dataset used: [ImageNet 2012](http://image-net.org/challenges/LSVRC/2012/)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below:
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
 
 # [Script Description](#contents)
 

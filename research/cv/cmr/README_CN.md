@@ -101,8 +101,8 @@ ${DATASET root}
 - 框架
     [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.9/index.html)
 - 下载数据集并更改`src/config`中相应的数据集路径
 - PyTorch的Resnet50预训练模型[点此下载](https://download.pytorch.org/models/resnet50-19c8e357.pth)
 - 从[百度云](https://pan.baidu.com/s/1jMBIDCGicfFROLBCE9YP7w?pwd=bwq0)下载data.zip文件并解压到cmr主目录下

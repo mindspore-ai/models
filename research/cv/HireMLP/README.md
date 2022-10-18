@@ -43,8 +43,8 @@ Dataset used: [ImageNet2012]
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below£º
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
 
 ## [Script description](#contents)
 

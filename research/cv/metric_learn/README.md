@@ -139,7 +139,7 @@ cd Stanford_Online_Products && head -n 1048 test.txt > test_tiny.txt
 
 ## Mixed precision
 
-The [mixed precision](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html) training
+The [mixed precision](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.9/others/mixed_precision.html) training
 method uses single-precision and half-precision data to improve the training speed of deep learning neural networks,
 while maintaining the network accuracy that can be achieved by single-precision training. Mixed-precision training
 improves computing speed and reduces memory usage, while supporting training larger models or achieving larger batches
@@ -154,8 +154,8 @@ reduce precision" to view the operators with reduced precision.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.9/index.html)
 
 # Quick Start
 

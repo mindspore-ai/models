@@ -54,8 +54,8 @@ Dataset used:
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需获取更多信息，请查看如下链接：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 - Other
     - pandas
     - sklearn

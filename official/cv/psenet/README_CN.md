@@ -70,8 +70,8 @@ python psenet_model_torch2mindspore.py --torch_file=/path_to_model/resnet50-19c8
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 - 安装Mindspore
 - 安装[pyblind11](https://github.com/pybind/pybind11)
 - 安装[Opencv3.4](https://docs.opencv.org/3.4.9/)
@@ -368,7 +368,7 @@ bash run_infer_onnx.sh [ONNX_PATH] [TEST_ROOT_DIR]
 
 ### 推理
 
-如果您需要使用已训练模型在GPU、Ascend 910、Ascend 310等多个硬件平台上进行推理，可参考[此处](https://www.mindspore.cn/tutorials/experts/zh-CN/master/infer/inference.html)。操作示例如下：
+如果您需要使用已训练模型在GPU、Ascend 910、Ascend 310等多个硬件平台上进行推理，可参考[此处](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.9/infer/inference.html)。操作示例如下：
 
 ```python
 # 加载未知数据集进行推理

@@ -60,8 +60,8 @@ BERT的总体架构包含3个嵌入层，用于查找令牌嵌入、位置嵌入
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 更多关于Mindspore的信息，请查看以下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 
 ## 快速入门
 

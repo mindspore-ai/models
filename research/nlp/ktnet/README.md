@@ -204,8 +204,8 @@ The overall directory structure of the data files is as follows:
     - NLTK >= 3.3 (with WordNet 3.0)
 
 - For more information about MindSpore, please check the resources below:
-  - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-  - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+  - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 
 # Script Description
 

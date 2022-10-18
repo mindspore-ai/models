@@ -57,8 +57,8 @@ In this model, we use the Multi30K dataset as our train and test dataset.As trai
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
 
 ## Requirements
 

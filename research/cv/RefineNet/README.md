@@ -126,8 +126,8 @@ Usage: python ~src/tool/build_MRcd.py --data_root=~/data/ --data_lst=~/voc_train
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 - 安装requirements.txt中的python包。
 - 生成config json文件用于8卡训练。
 
