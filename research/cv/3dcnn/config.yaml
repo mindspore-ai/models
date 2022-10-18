@@ -51,6 +51,9 @@ image_width: 240
 image_height: 240
 image_channel: 155
 
+# onnx eval
+onnx_path: ""
+
 ---
 # Help description for each configuration
 data_path: "The directory of data."

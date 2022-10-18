@@ -139,6 +139,7 @@ BraTS 2017原始数据集的文件目录结构如下所示：
     │   ├── run_distribute_train_gpu.sh   # 启动GPU分布式训练（8卡）
     │   ├── run_standalone_train_gpu.sh   # 启动GPU单机训练（单卡）
     │   ├── run_eval_gpu.sh               # 启动GPU评估
+    │   ├── run_onnx_eval.sh              # ONNX推理shell脚本
     ├── src
     │   ├── config.py                     # yaml文件解析
     │   ├── dataset.py                    # 创建数据集
@@ -152,6 +153,7 @@ BraTS 2017原始数据集的文件目录结构如下所示：
     │   ├── train.txt                     # 训练数据集
     ├── train.py                          # 训练脚本
     ├── eval.py                           # 评估脚本
+    ├── eval_onnx.py                      # ONNX评估脚本
     ├── export.py                         # 推理模型导出脚本
     ├── preprocess.py                     # 310推理数据预处理
     ├── postprocess.py                    # 310推理数据后处理
@@ -303,7 +305,7 @@ mean dice enhance:
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
 ```
 
-参数ckpt_file 是必需的，EXPORT_FORMAT 必须在 ["AIR", "MINDIR"]中进行选择。
+参数ckpt_file 是必需的，EXPORT_FORMAT 必须在 ["AIR", "MINDIR", "ONNX"]中进行选择。
 
 ## 推理过程
 
@@ -321,6 +323,21 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
   # Ascend310 推理
   bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [TEST_PATH] [DEVICE_ID]
   ```
+
+### ONNX推理
+
+在执行推理之前，需要通过export.py导出onnx文件
+
+- 在GPU上使用修正后的BraST 2017训练数据集进行推理
+
+  执行推理的命令如下所示，其中`DATA_PATH`是数据集路径；`TEST_PATH`是推理数据路径；`ONNX_PATH`是ONNX文件路径；`DEVICE_ID`可选，默认值为0。
+
+  ```shell
+  # ONNX 推理
+  bash run_onnx_eval.sh [DATA_PATH] [TEST_PATH] [ONNX_PATH] [CONFIG_PATH] [DEVICE_ID]
+  ```
+
+  上述python命令将在后台运行，您可以通过eval_onnx.log文件查看结果。
 
 # 模型描述
 

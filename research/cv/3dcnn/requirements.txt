@@ -1,0 +1,4 @@
+onnxruntime-gpu
+numpy
+pyyaml
+nibabel
