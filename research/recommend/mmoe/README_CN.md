@@ -389,6 +389,8 @@ python export.py
 
 ## 在Ascend310执行推理
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 在执行推理前，mindir文件必须通过`export.py`脚本导出，同时使用的验证数据集必须在910场景下通过`data.py`将原验证数据处理成mindrecord格式，其中`data.py`中do_train=False。以下展示了使用mindir模型执行推理的示例。
 
 ```shell

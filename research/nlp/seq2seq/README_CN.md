@@ -202,12 +202,16 @@ bash wmt14_en_fr.sh
        seq2seq/dataset_menu/newstest2014.fr
   ```
 
-  上述python命令将在后台运行，您可以通scripts/eval/log_infer.log文件查看结果。测试数据集的准确性如下：
+上述python命令将在后台运行，您可以通scripts/eval/log_infer.log文件查看结果。测试数据集的准确性如下：
 
-  ```bash
-  # grep "accuracy:"
-  BLEU scores is :12.1
-  ```
+```bash
+# grep "accuracy:"
+BLEU scores is :12.1
+```
+
+## 310推理
+
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
 
 # 模型描述
 

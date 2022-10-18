@@ -385,6 +385,8 @@ standalone_bitcoin_otc_auc.mindir exported successfully!
 
 ### [Ascend310 Inference](#contents)
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 #### Run
 
 Note that when inferring on different datasets, you need to modify the corresponding `checkpoint` parameters in the

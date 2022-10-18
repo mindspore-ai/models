@@ -102,6 +102,9 @@ python eval.py --dataset_path [DATASET_PATH] --checkpoint_path [CHECKPOINT_PATH]
 ```
 
 > checkpoint can be trained by using DeePMD-kit, and convert into the ckpt of MindSpore.
+### 310infer
+
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
 
 ### Result
 

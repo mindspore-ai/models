@@ -267,6 +267,8 @@ python export.py --eval_checkpoint [EVAL_CHECKPOINT] --file_format [FILE_FORMAT]
 
 ## [推理过程](#目录)
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 在进行完上述导出模型过程之后，我们可以进行推理过程。请注意AIR模型只能在昇腾910环境上导出，MINDIR可以在任意环境上导出。本模型默认MINDIR格式，batch_size在推理时默认为1，在执行推理过程之前需要手动修改default_config.yaml中的test_batch_size为1。
 
 - 在昇腾310上使用wn18rr数据集进行推理

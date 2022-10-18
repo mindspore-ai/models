@@ -271,6 +271,8 @@ python export.py --model_name [MODEL_NAME] --ckpt_path [CKPT_PATH] --ckpt_name [
 
 ## Inference Process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### Usage
 
 Before performing inference, the model file must be exported by export script on the Ascend910 environment.

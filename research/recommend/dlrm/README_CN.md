@@ -272,6 +272,8 @@ python export.py --config_path [/path/to/npu_config.yaml]
 
 #### 在 Ascend310 执行推理
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 由于模型过大无法加载，推理尚未完成。
 
 在执行推理前，mindir 文件必须通过 `export.py` 脚本导出。

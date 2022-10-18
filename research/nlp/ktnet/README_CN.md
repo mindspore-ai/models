@@ -214,7 +214,7 @@ mv wn_concept2vec.txt nell_concept2vec.txt data/KB_embeddings
 
   ```bash
   cd data
-  wget https://bert-models.bj.bcebos.com/cased_L-24_H-1024_A-16.tar.gz --no-check-certificate
+  wget https://storage.googleapis.com/xlnet/released_models/cased_L-24_H-1024_A-16.zip --no-check-certificate
   tar xvf cased_L-24_H-1024_A-16.tar.gz
   ```
 
@@ -407,6 +407,8 @@ python run_KTNET_record_eval.py
 ```
 
 ## 推理过程
+
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
 
 ### 用法
 
