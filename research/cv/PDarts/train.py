@@ -13,12 +13,6 @@
 # limitations under the License.
 # ============================================================================
 """train the PDarts model"""
-try:
-    from moxing.framework import file
-    print("import moxing success")
-except ModuleNotFoundError as e:
-    print(f'not modelarts env, error={e}')
-
 import os
 import time
 import logging
@@ -136,6 +130,7 @@ def main():
         load_param_into_net(network, param_dict)
 
     if args.data_url.startswith('s3://') or args.data_url.startswith('obs://'):
+        from moxing.framework import file
         data_url_cache = os.path.join(args.local_data_root, 'data')
         file.copy_parallel(args.data_url, data_url_cache)
         args.data_url = data_url_cache
