@@ -131,9 +131,10 @@ def train_net(distribute, imagenet, epochs):
     resize_fuc = bicubic()
     train_de_dataset = train_de_dataset.project(columns=["HR", "Rain", "LRx2", "LRx3", "LRx4", "filename"])
     train_de_dataset = train_de_dataset.batch(args.batch_size,
+                                              drop_remainder=True,
+                                              per_batch_map=resize_fuc.forward,
                                               input_columns=["HR", "Rain", "LRx2", "LRx3", "LRx4", "filename"],
-                                              output_columns=["LR", "HR", "idx", "filename"],
-                                              drop_remainder=True, per_batch_map=resize_fuc.forward)
+                                              output_columns=["LR", "HR", "idx", "filename"])
     train_loader = train_de_dataset.create_dict_iterator(output_numpy=True)
 
     net_work = IPT(args)

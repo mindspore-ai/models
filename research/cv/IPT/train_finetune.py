@@ -68,9 +68,10 @@ def train_net(distribute, imagenet):
         resize_fuc = bicubic()
         train_de_dataset = train_de_dataset.batch(
             args.batch_size,
+            drop_remainder=True,
+            per_batch_map=resize_fuc.forward,
             input_columns=["HR", "Rain", "LRx2", "LRx3", "LRx4", "scales", "filename"],
-            output_columns=["LR", "HR", "idx", "filename"], drop_remainder=True,
-            per_batch_map=resize_fuc.forward)
+            output_columns=["LR", "HR", "idx", "filename"])
     else:
         train_de_dataset = train_de_dataset.batch(args.batch_size, drop_remainder=True)
 

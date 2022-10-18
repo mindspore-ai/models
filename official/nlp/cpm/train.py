@@ -89,17 +89,17 @@ def _load_dataset(dataset_path, batch_size, rank_size=None, rank_id=None, shuffl
                           per_batch_map=collate,
                           input_columns=["truth", "input_ids"],
                           output_columns=["input_ids", "attention_mask", "position_ids", "truth"],
-                          column_order=["input_ids", "attention_mask", "position_ids", "loss_mask", "labels"],
                           num_parallel_workers=4,
                           drop_remainder=drop_remainder)
+        data = data.project(["input_ids", "attention_mask", "position_ids", "loss_mask", "labels"])
     else:
         data = data.batch(batch_size,
                           per_batch_map=collate,
                           input_columns=["truth", "input_ids"],
                           output_columns=["input_ids", "attention_mask", "position_ids", "truth"],
-                          column_order=["input_ids", "attention_mask", "position_ids", "loss_mask", "labels", "truth"],
                           num_parallel_workers=4,
                           drop_remainder=drop_remainder)
+        data = data.project(["input_ids", "attention_mask", "position_ids", "loss_mask", "labels", "truth"])
 
     return data
 

@@ -170,9 +170,9 @@ def run_train():
     random_input_dropout = RandomInputDropout()
 
     train_ds = train_ds.batch(batch_size=args.batch_size,
+                              drop_remainder=True,
                               per_batch_map=random_input_dropout,
                               input_columns=["data", "label"],
-                              drop_remainder=True,
                               num_parallel_workers=num_workers,
                               python_multiprocessing=True)
 
