@@ -511,6 +511,8 @@ If you want to infer the network on Ascend 310, you should convert the model to 
 
 ### Infer on Ascend310
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 Before performing inference, the mindir file must be exported by export.py script. We only provide an example of inference using MINDIR model. Current batch_size can only be set to 1.
 
   ```shell

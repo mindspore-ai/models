@@ -343,6 +343,8 @@ optional arguments:
 
 ### 推理脚本用法
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 将Ascend 910导出好的MINDIR模型传至Ascend 310服务器，运行run_infer_310脚本：
 
 ```bash

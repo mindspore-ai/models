@@ -42,16 +42,6 @@ echo "mindir name: "$model
 echo "dataset name: "$dataset_name
 echo "dataset path: "$dataset_path
 
-export driver_home=/usr/local/Ascend
-export install_path=${driver_home}/ascend-toolkit/latest
-export DDK_PATH=${install_path}
-export PATH=/usr/local/python3.7.5/bin:${install_path}/toolkit/bin:${install_path}/atc/ccec_compiler/bin:${install_path}/atc/bin:${install_path}/fwkacllib/ccec_compiler/bin:${install_path}/fwkacllib/bin:${PATH}
-export LD_LIBRARY_PATH=/usr/local/lib/:/usr/lib/:${install_path}/acllib/lib64:${install_path}/atc/lib64:${install_path}/fwkacllib/lib64:${driver_home}/driver/lib64:${driver_home}/add-ons:${LD_LIBRARY_PATH}
-export PYTHONPATH=${install_path}/pyACL/python/site-packages:${install_path}/fwkacllib/python/site-packages:${install_path}/fwkacllib/python/site-packages/auto_tune.egg:${install_path}/fwkacllib/python/site-packages/schedule_search.egg:${install_path}/toolkit/python/site-packages:${install_path}/atc/python/site-packages:${install_path}/atc/python/site-packages/auto_tune.egg/auto_tune:${install_path}/atc/python/site-packages/schedule_search.egg:${install_path}/opp/op_impl/built-in/ai_core/tbe:${install_path}/toolkit/latest/acllib/lib64:${PYTHONPATH}
-export ASCEND_OPP_PATH=${install_path}/opp
-export NPU_HOST_LIB=${install_path}/acllib/lib64/stub
-export SOC_VERSION=Ascend310
-
 function preprocess_data()
 {
     if [ -d preprocess_Result ]; then

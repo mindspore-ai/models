@@ -418,6 +418,8 @@ result: {'acc': 0.706} ckpt=~/ResNet50_quadruplet.ckpt
 
 # Inference Process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ## Export MindIR
 
 Modify the export file ckpt_file and run.

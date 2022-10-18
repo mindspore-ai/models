@@ -184,6 +184,10 @@ Transformer最近已进行了大规模图像分类，获得了很高的分数，
 
 导出的模型会以模型的结构名字命名并且保存在当前目录下
 
+## 推理过程
+
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 # [模型描述](#目录)
 
 ## 性能

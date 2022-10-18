@@ -538,6 +538,8 @@ pointpillars.mindir exported successfully!
 
 ### [310 Infer](#contents)
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 Before performing inference, the mindir file must be exported by export.py script. We only provide an example of inference using MINDIR model.
 
 - `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n', if you choose y, the kitti dataset will be preprocessd. (Recommend to use 'y' at the first running.)

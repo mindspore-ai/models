@@ -517,6 +517,8 @@ python export.py --ckpt_file ./r2plus1d_best_map.ckpt --file_name r2plus1d --fil
 
 ### Perform inference on Ascend310
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 Before performing inference, the mindir file must be exported via the `export.py` script. The following shows an example of performing inference using the mindir model.
 
 ```bash

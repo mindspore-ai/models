@@ -325,6 +325,8 @@ The parameter ckpt_file is required and file_formatmust be selected in ["AIR", "
 
 ### [Perform inference on Ascend310](#contents)
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 Before performing inference, the mindir file must be export.pyexported through a script. The following shows an example of using the mindir model to perform inference.
 
 ```bash

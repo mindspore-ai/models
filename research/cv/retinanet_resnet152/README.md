@@ -427,6 +427,8 @@ python export.py
 
 ### [Inference Process](#content)
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 #### Usage
 
 Before inference, model needs to be exported to the Ascend 910 environment. Pictures with iscrowd set to true should be excluded. The image id after removal is saved in the ascend310_infer directory.

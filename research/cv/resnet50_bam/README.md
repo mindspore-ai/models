@@ -237,6 +237,8 @@ python export.py --ckpt_file [CKPT_FILE] --device_target [DEVICE_TARGET] --file_
 
 ## Inference process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### Inference
 
 Before inference, we need to export the model first. Mindir can be exported in any environment, and the air/mindir model can only be exported in the Shengteng 910 environment. The following shows an example of using the mindir model to perform inference.

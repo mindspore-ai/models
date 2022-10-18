@@ -318,6 +318,8 @@ SZ-taxi_1.mindir exported successfully!
 
 ## [Ascend310推理流程](#目录)
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 ### [运行](#目录)
 
 在完成MINDIR模型导出的基础上，基于`./src/config.py`脚本中的参数设定，Ascend310推理流程将加载对应任务导出的MINDIR模型（.mindir 文件）用于对应Ascend310推理任务。

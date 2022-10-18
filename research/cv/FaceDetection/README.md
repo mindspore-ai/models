@@ -338,6 +338,8 @@ And the detect result and P-R graph will also be saved in "./results/[MODEL_NAME
 
 ### Inference process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 #### Convert model
 
 If you want to infer the network on Ascend 310, you should convert the model to MINDIR or AIR:

@@ -278,6 +278,8 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
 
 #### 310评估
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 - 评估过程如下，需要vot数据集对应video的图片放于对应文件夹的color文件夹下，标签groundtruth.txt放于该目录下，并到script目录。
 
 ```bash

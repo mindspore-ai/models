@@ -231,6 +231,8 @@ The ckpt_file parameter is required,
 
 ## 310 infer
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 - Note: Before executing 310 infer, create the MINDIR/AIR model using "python export.py --ckpt_file [The path of the CKPT for exporting] --config [The yaml file]".
 
 ```shell

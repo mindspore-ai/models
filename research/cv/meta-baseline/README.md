@@ -206,6 +206,8 @@ python eval.py --load_encoder (dir) --num_shots 1 --root_path ./dataset/ --devic
 
 ## Inference Process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### [Export MindIR](#contents)
 
 ```shell

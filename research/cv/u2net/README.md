@@ -187,6 +187,8 @@ python export.py --ckpt_dir [/path/to/ckpt_file]
 
 ## [Ascend310 Inference Process](#contents)
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### Export MINDIR file
 
 ```bash

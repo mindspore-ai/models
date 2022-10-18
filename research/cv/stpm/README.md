@@ -217,6 +217,8 @@ Argument `ckpt_file` is required, `EXPORT_FORMAT` choose from ["AIR", "MINDIR"].
 
 # Inference Process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ## Usage
 
 Before performing inference, the mindir file needs to be exported via `export.py`.

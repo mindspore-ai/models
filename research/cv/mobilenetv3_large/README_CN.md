@@ -154,6 +154,10 @@ epoch 5: epoch time: 150594.088, per step time: 141.138, avg loss: 3.607
 metric:  {'Loss': 6.346325377444248, 'Top1-Acc': 0.744024024024024, 'Top5-Acc': 0.916956956956957}
 ```
 
+## 310推理
+
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 # 模型说明
 
 ## 训练性能

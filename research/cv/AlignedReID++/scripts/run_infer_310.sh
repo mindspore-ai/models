@@ -22,12 +22,6 @@ echo "mindir name: "$model_path
 echo "query dataset path: "$query_datapath
 echo "gallery dataset path: "$gallery_datapath
 echo "-----------------------------------"
-export ASCEND_HOME=/usr/local/Ascend/
-export PATH=$ASCEND_HOME/ascend-toolkit/latest/fwkacllib/ccec_compiler/bin:$ASCEND_HOME/ascend-toolkit/latest/atc/bin:$PATH
-export LD_LIBRARY_PATH=/usr/local/lib:$ASCEND_HOME/ascend-toolkit/latest/atc/lib64:$ASCEND_HOME/ascend-toolkit/latest/fwkacllib/lib64:$ASCEND_HOME/driver/lib64:$ASCEND_HOME/add-ons:$LD_LIBRARY_PATH
-export TBE_IMPL_PATH=$ASCEND_HOME/ascend-toolkit/latest/opp/op_impl/built-in/ai_core/tbe
-export PYTHONPATH=${TBE_IMPL_PATH}:$ASCEND_HOME/ascend-toolkit/latest/fwkacllib/python/site-packages:$PYTHONPATH
-export ASCEND_OPP_PATH=$ASCEND_HOME/ascend-toolkit/latest/opp
 
 function compile_app()
 {

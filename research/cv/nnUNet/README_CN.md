@@ -248,6 +248,8 @@ Note:如果推理3d_fullres网络之前推理过2d网络，需要清空inferTs�
 
 ## 导出过程
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 ### 导出
 
 可利用配置文件导出模型为MINDIR格式，Task04_Hippocampus的配置文件分别为config_Task004_2D_infrence.yaml,config_Task004_3D_infrence.yaml
