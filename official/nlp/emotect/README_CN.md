@@ -213,6 +213,8 @@ bash scripts/run_classifier_eval_{platform}.sh
 
 ## 310推理
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 ### 导出模型
 
 ```shell
