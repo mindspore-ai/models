@@ -286,6 +286,8 @@ python export.py  --format [EXPORT_FORMAT] --checkpoint_path [CKPT_PATH]
 
 ### 推理
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 在昇腾310上进行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
 
 ```bash
