@@ -16,6 +16,7 @@
     - [评估过程](#评估过程)
     - [导出过程](#导出过程)
     - [推理过程](#推理过程)
+    - [onnx模型导出与推理](#onnx模型导出与推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [训练性能](#训练性能)
@@ -232,6 +233,7 @@ I3D的模型架构主要涉及 Two-stream构造，使用两个通过ImageNet预�
         │   ├── run_standalone_train.sh       # 启动Ascend单机训练（单卡）
         │   ├── run_single_eval.sh            # 启动单模式（RGB/FLOW）评估
         │   ├── run_joint_eval.sh             # 启动联合模式（RGB+FLOW）评估
+        │   ├── run_eval_onnx.sh             # 启动联合模式（RGB+FLOW）评估
         ├── src
         │   ├── factory
         │   │   ├── data_factory.py           # 获得数据集对象
@@ -260,6 +262,7 @@ I3D的模型架构主要涉及 Two-stream构造，使用两个通过ImageNet预�
         ├── ma-pre-start.sh                   # 在openI平台上运行时自动运行的脚本
         ├── train.py                          # 训练脚本
         ├── eval.py                           # 评估脚本
+        ├── eval__onnx.py                           # 评估脚本
         ├── export.py                         # 推理模型导出脚本
         ├── config.py                         # Ascend训练参数配置
         ├── postprocess.py                    # 后处理
@@ -535,7 +538,7 @@ I3D的模型架构主要涉及 Two-stream构造，使用两个通过ImageNet预�
 
 ### 导出
 
-- 参数名称及含义请参考 **脚本参数** 部分，请注意，参数 CHECKPOINT_PATH 为必填项， FILE_FORMAT 必须在 ["AIR", "MINDIR"]中选择，MODE必须在 ["flow", "rgb"]中选择。导出用HMDB51数据集训练的模型时， NUM_CLASS 为51。导出用UCF101数据集训练的模型时， NUM_CLASS 为101。
+- 参数名称及含义请参考 **脚本参数** 部分，请注意，参数 CHECKPOINT_PATH 为必填项， FILE_FORMAT 必须在 ["AIR", "MINDIR", "ONNX"]中选择，MODE必须在 ["flow", "rgb"]中选择。导出用HMDB51数据集训练的模型时， NUM_CLASS 为51。导出用UCF101数据集训练的模型时， NUM_CLASS 为101。
 
 ```bash
 python export.py --checkpoint_path=[CHECKPOINT_PATH] --file_name=[FILE_NAME] --file_format=[FILE_FORMAT] --mode=[MODE] --num_class=[NUM_CLASS]
@@ -653,6 +656,30 @@ bash ./scripts/run_infer_310_all.sh [MINDIR_PATH_HMDB51_RGB] [MINDIR_PATH_HMDB51
 推理的结果可以在相应的log文件中查询得到（infer_hmdb51_rgb、infer_hmdb51_flow.log、infer_ucf101_rgb.log、infer_ucf101_flow.log）
 
 精度结果可以在相应的log文件中查询得到（acc_hmdb51_rgb.log、acc_hmdb51_flow.log、acc_ucf101_rgb.log、acc_ucf101_flow.log）
+
+## onnx模型导出与推理
+
+### onnx模型文件导出
+
+```bash
+python export.py --checkpoint_path /path/to/I3D.ckpt --file_name /path/to/I3D --file_format ONNX --batch_size 8 --device GPU --device_id 0 --mode rgb
+```
+
+### 评估
+
+```bash
+# joint模式
+bash ./scripts/run_eval_onnx.sh [test_mode] [device_target] [device_id] [dataset] [video_path] [video_path_joint_flow] [annotation_path] [annotation_path_joint_flow] [rgb_onnx_path] [flow_onnx_path]
+# 示例
+bash ./scripts/run_eval_onnx.sh joint GPU 0 hmdb51 ./data/rgb/hmdb51/jpg ./data/flow/hmdb51/jpg ./data/rgb/hmdb51/annotation/hmdb51_1.json ./data/flow/hmdb51/annotation/hmdb51_1.json ./i3d_h_rgb.onnx ./i3d_h_flow.onnx
+```
+
+```bash
+# rgb模式, flow模式请修改对应参数
+bash ./scripts/run_eval_onnx.sh [test_mode] [device_target] [device_id] [dataset] [video_path]  [annotation_path] [rgb_onnx_path]
+# 示例
+bash ./scripts/run_eval_onnx.sh rgb GPU 0 hmdb51 ./data/rgb/hmdb51/jpg ./data/rgb/hmdb51/annotation/hmdb51_1.json ./i3d_h_rgb.onnx
+```
 
 # 模型描述
 
