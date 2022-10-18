@@ -3,3 +3,4 @@ https://github.com/mcordts/cityscapesScripts/blob/master/cityscapesscripts/helpe
 https://persagen.com/files/misc/wang2014knowledge.pdf
 https://s3.amazonaws.com/google-landmark/metadata
 https://s3.amazonaws.com/google-landmark/md5sum
+http://vllab.ucmerced.edu/wlai24/LapSRN/results/*

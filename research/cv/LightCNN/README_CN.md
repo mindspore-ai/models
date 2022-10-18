@@ -516,7 +516,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 [3]: https://drive.google.com/file/d/0ByNaVHFekDPRbFg1YTNiMUxNYXc/view?usp=sharing
 [4]: https://hyper.ai/datasets/5543
 [5]: https://pan.baidu.com/s/1eR6vHFO
-[6]: https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html
+[6]: https://www.mindspore.cn/tutorials/zh-CN/master/advanced/mixed_precision.html
 [7]: http://www.cbsr.ia.ac.cn/users/scliao/projects/blufr/BLUFR.zip
 [8]: https://github.com/AlfredXiangWu/face_verification_experiment/blob/master/code/lfw_pairs.mat
 [9]: https://github.com/AlfredXiangWu/face_verification_experiment/blob/master/results/LightenedCNN_B_lfw.mat
