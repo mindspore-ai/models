@@ -298,7 +298,7 @@ def create_yolo_dataset(
             input_columns=dataset_column_names,
             output_columns=map1_out_column_names,
             column_order=map1_out_column_names,
-            num_parallel_workers=num_parallel_workers,
+            num_parallel_workers=16,
             python_multiprocessing=True
         )
         ds = ds.map(
@@ -306,7 +306,7 @@ def create_yolo_dataset(
             input_columns=map2_in_column_names,
             output_columns=map2_out_column_names,
             column_order=output_column_names,
-            num_parallel_workers=num_parallel_workers,
+            num_parallel_workers=2,
             python_multiprocessing=False
         )
         mean = [m * 255 for m in [0.485, 0.456, 0.406]]
@@ -316,9 +316,9 @@ def create_yolo_dataset(
                 CV.Normalize(mean, std),
                 hwc_to_chw
             ],
-            num_parallel_workers=num_parallel_workers
+            num_parallel_workers=2
         )
-        ds = ds.batch(batch_size, num_parallel_workers=num_parallel_workers, drop_remainder=True)
+        ds = ds.batch(batch_size, num_parallel_workers=1, drop_remainder=True)
     else:
         ds = de.GeneratorDataset(
             yolo_dataset,
