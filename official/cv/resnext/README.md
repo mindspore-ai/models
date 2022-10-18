@@ -110,7 +110,8 @@ If you want to run in modelarts, please check the official documentation of [mod
     ├─run_distribute_train.sh         # launch distributed training for ascend(8p)
     ├─run_standalone_train_for_gpu.sh # launch standalone training for gpu(1p)
     ├─run_distribute_train_for_gpu.sh # launch distributed training for gpu(8p)
-    └─run_eval.sh                     # launch evaluating
+    ├─run_eval.sh                     # launch evaluating
+    └─run_onnx_eval.sh                # launch onnx evaluating
   ├─src
     ├─backbone
       ├─_init_.py                     # initialize
@@ -138,6 +139,7 @@ If you want to run in modelarts, please check the official documentation of [mod
     ├──moxing_adapter.py              # moxing adapter
   ├── default_config.yaml             # parameter configuration
   ├──eval.py                          # eval net
+  ├──eval_onnx.py                     # eval_onnx net
   ├──train.py                         # train net
   ├──export.py                        # export mindir script
   ├──mindspore_hub_conf.py            # mindspore hub interface
@@ -224,12 +226,24 @@ You can start training by python script:
 python eval.py --data_path ~/imagenet/val/ --device_target Ascend --checkpoint_file_path resnext.ckpt
 ```
 
+```script
+# Onnx Evaluation
+
+python eval_onnx.py --data_path ~/imagenet/val/ --device_target GPU --onnx_file_path resnext.onnx
+```
+
 or shell script:
 
 ```script
 # Evaluation
 
 bash scripts/run_eval.sh DEVICE_ID DATA_PATH CHECKPOINT_FILE_PATH DEVICE_TARGET
+```
+
+```script
+# Onnx Evaluation
+
+bash scripts/run_onnx_eval.sh DEVICE_ID DATA_PATH ONNX_FILE_PATH DEVICE_TARGET
 ```
 
 PLATFORM is Ascend or GPU, default is Ascend.
@@ -259,7 +273,7 @@ python export.py --device_target [PLATFORM] --checkpoint_file_path [CKPT_PATH] -
 ```
 
 The `checkpoint_file_path` parameter is required.
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"].
+`EXPORT_FORMAT` should be in ["AIR", "MINDIR", "ONNX"].
 
 Export on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start as follows)
 

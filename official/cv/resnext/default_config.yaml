@@ -14,6 +14,7 @@ load_path: "/cache/checkpoint_path/"
 device_target: "Ascend"
 checkpoint_path: "./checkpoint/"
 checkpoint_file_path: ""
+onnx_file_path: ""
 
 # ==============================================================================
 # Training options
@@ -71,3 +72,4 @@ epoch_size: "Total training epochs."
 keep_checkpoint_max: "keep the last keep_checkpoint_max checkpoint"
 checkpoint_path: "The location of the checkpoint file."
 checkpoint_file_path: "The location of the checkpoint file."
+onnx_file_path: "The location of the onnx file."

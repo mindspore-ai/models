@@ -114,7 +114,8 @@ ResNeXt整体网络架构如下：
     ├─run_distribute_train.sh         # 启动Ascend分布式训练（8卡）
     ├─run_standalone_train_for_gpu.sh # 启动GPU单机训练（单卡）
     ├─run_distribute_train_for_gpu.sh # 启动GPU分布式训练（8卡）
-    └─run_eval.sh                     # 启动评估
+    ├─run_eval.sh                     # 启动评估
+    └─run_onnx_eval.sh                # 启动Onnx评估
   ├─src
     ├─backbone
       ├─_init_.py                     # 初始化
@@ -141,6 +142,7 @@ ResNeXt整体网络架构如下：
     ├──local_adapter.py               # 本地设备配置
     ├──moxing_adapter.py              # modelarts设备配置
   ├──eval.py                          # 评估网络
+  ├──eval_onnx.py                     # onnx评估网络
   ├──train.py                         # 训练网络
   ├──fine_tune.py                     # 迁移训练网络（cpu）
   ├──cpu_default_config.yaml          # 训练配置参数（cpu）
@@ -234,6 +236,11 @@ python fine_tune.py --config_path ./cpu_default_config.yaml
 python eval.py --data_path ~/imagenet/val/ --device_target Ascend --checkpoint_file_path resnext.ckpt
 ```
 
+```shell
+# Onnx评估
+python eval_onnx.py --data_path ~/imagenet/val/ --device_target GPU --onnx_file_path resnext.onnx
+```
+
 或通过shell脚本开始训练：
 
 ```shell
@@ -241,6 +248,11 @@ python eval.py --data_path ~/imagenet/val/ --device_target Ascend --checkpoint_f
 bash scripts/run_eval_for_gpu_resnext101.sh DEVICE_ID DATA_PATH CHECKPOINT_FILE_PATH CONFIG_PATH
 # 评估
 bash scripts/run_eval.sh DEVICE_ID DATA_PATH CHECKPOINT_FILE_PATH PLATFORM
+```
+
+```shell
+# Onnx评估
+bash scripts/run_onnx_eval.sh DEVICE_ID DATA_PATH ONNX_FILE_PATH PLATFORM
 ```
 
 DEVICE_TARGET is Ascend or GPU, default is Ascend.
@@ -287,7 +299,7 @@ python export.py --device_target [PLATFORM] --checkpoint_file_path [CKPT_PATH] -
 ```
 
 `checkpoint_file_path` 参数为必填项。
-`EXPORT_FORMAT` 可选 ["AIR", "MINDIR"]。
+`EXPORT_FORMAT` 可选 ["AIR", "MINDIR", "ONNX"]。
 
 ModelArts导出mindir
 
