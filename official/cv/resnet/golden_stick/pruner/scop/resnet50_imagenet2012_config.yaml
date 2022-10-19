@@ -13,6 +13,7 @@ load_path: "/cache/checkpoint_path/"
 device_target: "Ascend"
 checkpoint_path: "./checkpoint/"
 checkpoint_file_path: ""
+mindir_path: ""
 
 # ==============================================================================
 # Training options
