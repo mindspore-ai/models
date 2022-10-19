@@ -117,9 +117,9 @@ class VeRiDataset(JointsDataset):
             for row in reader:
                 joints = []
                 vis = []
-                top_lft = btm_rgt = [int(row[3]), int(row[4])]
+                top_lft = btm_rgt = [int(float(row[3])), int(float(row[4]))]
                 for j in range(36):
-                    joint = [int(row[j*3+3]), int(row[j*3+4]), int(row[j*3+5])]
+                    joint = [int(float(row[j*3+3])), int(float(row[j*3+4])), int(float(row[j*3+5]))]
                     joints.append(joint)
                     vis.append(joint[2])
                     if joint[0] < top_lft[0]:

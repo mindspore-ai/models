@@ -153,6 +153,7 @@ bash run_trans_gpu.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
             |   ├── run_distribute_train_gpu.sh     // 分布式到GPU的shell脚本
             |   ├── run_eval_ascend.sh              // Ascend评估的shell脚本
             |   ├── run_eval_gpu.sh                 // GPU评估的shell脚本
+            |   ├—— run_onnx_eval_gpu.sh            // ONNX推理shell脚本
             |   ├── run_trans_ascend.sh             // Ascend环境下生成数据集脚本
             |   ├── run_trans_gpu.sh                // GPU环境下生成数据集脚本
             |   ├── run_infer_310.sh                // Ascend推理shell脚本
@@ -186,6 +187,7 @@ bash run_trans_gpu.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
             ├── config.yaml                         // 固定参数
             ├── config_gpu.yaml                     // 固定参数（gpu）
             ├── eval.py                             // 精度验证脚本
+            ├—— eval_onnx.py                        // ONNX精度验证脚本
             ├── train.py                            // 训练脚本
             ├── trans.py                            // 转换数据集脚本
             ├── export.py                           // 推理模型导出脚本
@@ -328,6 +330,25 @@ epcoh:2 step:, loss is 3.0897788
   | --- | --- | --- | --- | --- | --- | --- | --- | --- |
   | pose_hrnet | 85.968 | 81.682 | 70.630 | 76.568 | 86.492 | 89.771 | 82.577 | 16.681 |
   ```
+
+### ONNX推理
+
+在进行推理之前我们需要先导出模型。ONNX可以在GPU环境下导出。
+
+- 在GPU环境上使用VeRi数据集进行推理
+    执行推理的命令如下所示，其中'ONNX_PATH'是onnx文件路径；'DATA_PATH'是推理数据集路径；'DEVICE_TARGET'是设备类型，默认'GPU'。
+
+   ```bash
+   bash run_eval_gpu.sh DATA_PATH ONNX_PATH DEVICE_ID
+   ```
+
+    推理的精度结果保存在scripts目录下，在onnx_eval.log日志文件中可以找到类似以下的分类准确率结果。
+
+    ```bash
+   | Arch | Wheel | Fender | Back | Front | WindshieldBack | WindshieldFront | Mean | Mean@0.1 |
+   | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+   | pose_hrnet | 85.968 | 81.669 | 70.630 | 77.568 | 86.492 | 89.771 | 82.574 | 16.681 |
+    ```
 
 ## 导出过程
 
