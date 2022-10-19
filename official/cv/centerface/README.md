@@ -20,7 +20,9 @@
     - [Inference process](#inference-process)
         - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
-        - [result](#result)
+            - [Ascend310 result](#ascend310-result)
+        - [Infer on ONNX](#infer-on-onnx)
+            - [ONNX result](#onnx-result)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
@@ -312,7 +314,8 @@ bash eval_all.sh [GROUND_TRUTH_PATH] [FILTER_EASY](optional) [FILTER_MEDIUM](opt
     ├── centerface
         ├── train.py                     // training scripts
         ├── test.py                      // testing training outputs
-        ├── export.py                    // convert mindspore model to air model
+        ├── export.py                    // convert mindspore model to air, mindir, onnx model
+        ├── infer_onnx.py                // application for ONNX inference
         ├── preprocess.py                // 310infer preprocess scripts
         ├── postprocess.py               // 310infer postprocess scripts
         ├── README.md                    // descriptions about CenterFace
@@ -320,6 +323,7 @@ bash eval_all.sh [GROUND_TRUTH_PATH] [FILTER_EASY](optional) [FILTER_MEDIUM](opt
         ├── default_config.yaml          // Training parameter profile
         ├── scripts
         │   ├──run_infer_310.sh          // shell script for infer on ascend310
+        │   ├──run_infer_onnx.sh         // shell script for infer on ONNX
         │   ├──eval.sh                   // evaluate a single testing result
         │   ├──eval.sh                   // evaluate a single testing result
         │   ├──eval_all.sh               // choose a range of testing results to evaluate
@@ -780,11 +784,11 @@ python setup.py install;
 ### Export MindIR
 
 ```shell
-python export.py --ckpt_file [CKPT_PATH] --file_format [EXPORT_FORMAT] --TEST_BATCH_SIZE [BATCH_SIZE]
+python export.py --ckpt_file [CKPT_PATH] --file_format [EXPORT_FORMAT] --test_batch_size [BATCH_SIZE]
 ```
 
 The ckpt_file parameter is required,
-`EXPORT_FORMAT` should be in ["AIR", "MINDIR"].
+`EXPORT_FORMAT` should be in ["AIR", "MINDIR", "ONNX"].
 `BATCH_SIZE` current batch_size can only be set to 1.
 
 ### Infer on Ascend310
@@ -800,7 +804,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [SAVE_PATH] [LABEL_PATH] [DVPP] 
 - `DVPP` is mandatory, and must choose from ["DVPP", "CPU"], it's case-insensitive. Only support CPU mode .
 - `DEVICE_ID` is optional, default value is 0.
 
-### result
+#### Ascend310 result
 
 Inference result is saved in current path, you can find result like this in ap.log file.
 
@@ -810,6 +814,35 @@ Easy   Val AP: 0.924429369476229
 Medium Val AP: 0.918026660923143
 Hard   Val AP: 0.776737419299741
 =================================================
+```
+
+### Infer on ONNX
+
+Before performing inference, the ONNX file must be exported by `export.py` script. We only provide an example of inference using ONNX model.
+Need to install OpenCV(Version >= 4.0), You can download it from [OpenCV](https://opencv.org/).
+
+```shell
+# ONNX inference
+bash run_infer_onnx.sh [DEVICE_ID] [ONNX] [DATASET] [GROUND_TRUTH_MAT]
+
+eg: bash run_infer_onnx.sh 0 ../centerface.onnx ../dataset/centerface/imagesal/images/ ../dataset/centerface/ground_truth/wider_easy_val.mat
+```
+
+- `DEVICE_ID` is training device number.
+- `ONNX` is test ONNX model path.
+- `DATASET` is img dir.
+- `GROUND_TRUTH_MAT` is ground_truth file, mat type
+
+#### ONNX result
+
+Inference result is saved in current path, you can find result like this in device_test0/test_onnx.log.
+
+```bash
+==================== Results =====================
+Easy   Val AP: 0.9247080414451792
+Medium Val AP: 0.9157020285779195
+Hard   Val AP: 0.7517627571674546
+==================================================
 ```
 
 # [Model Description](#contents)

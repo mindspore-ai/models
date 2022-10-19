@@ -4,3 +4,4 @@ Cython
 opencv-python
 pycocotools
 scipy
+onnxruntime-gpu
