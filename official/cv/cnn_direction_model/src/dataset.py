@@ -195,7 +195,7 @@ def create_dataset_train(mindrecord_file_pos, config, dataset_name='ocr'):
         data_set = data_set.map(operations=crop_image((0, 150), (0, 150)),
                                 input_columns=["image"], num_parallel_workers=8)
         data_set = data_set.map(operations=create_label(), input_columns=["image"], output_columns=["image", "label"],
-                                column_order=["image", "label"], num_parallel_workers=8)
+                                num_parallel_workers=8)
     augmentor = Augmentor(config.augment_severity, config.augment_prob)
     operation = augmentor.process
     data_set = data_set.map(operations=operation, input_columns=["image"],
@@ -252,7 +252,7 @@ def create_dataset_eval(mindrecord_file_pos, config, dataset_name='ocr'):
         data_set = data_set.map(operations=crop_image((0, 150), (0, 150)),
                                 input_columns=["image"], num_parallel_workers=8)
         data_set = data_set.map(operations=create_label(), input_columns=["image"], output_columns=["image", "label"],
-                                column_order=["image", "label"], num_parallel_workers=8)
+                                num_parallel_workers=8)
     global image_height
     global image_width
     image_height = config.im_size_h

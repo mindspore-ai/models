@@ -38,7 +38,6 @@ data_set = data_set.map(operations=(lambda x, y, z: (np.array(x).flatten().resha
                                                          batch_size, 39),
                                                      np.array(z).flatten().reshape(batch_size, 1))),
                         input_columns=['feat_ids', 'feat_vals', 'label'],
-                        column_order=['feat_ids', 'feat_vals', 'label'],
                         num_parallel_workers=8)
 d = data_set.create_dict_iterator()
 

@@ -298,7 +298,7 @@ def get_dataset(cfg, dataset, priors, setname='train_sets', random_seed=None, di
                                  shuffle=shuffle)
     target_preprocess_function = (lambda img, annotation: target_preprocess(img, annotation, cfg, priors))
     ds = ds.map(operations=target_preprocess_function, input_columns=['img', 'annotation'],
-                output_columns=['img', 'loc', 'conf'], column_order=['img', 'loc', 'conf'])
+                output_columns=['img', 'loc', 'conf'])
     ds = ds.batch(cfg.train_cfg['per_batch_size'], drop_remainder=True)
 
     return ds, generator

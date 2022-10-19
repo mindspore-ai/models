@@ -447,7 +447,6 @@ def create_ssd_dataset(
         operations=compose_map_func,
         input_columns=["img_id", "image", "annotation"],
         output_columns=output_columns,
-        column_order=output_columns,
         python_multiprocessing=use_multiprocessing,
         num_parallel_workers=num_parallel_workers
     )

@@ -562,7 +562,6 @@ def create_maskrcnn_dataset(mindrecord_file, batch_size=2, device_num=1, rank_id
         ds = ds.map(operations=compose_map_func,
                     input_columns=["image", "annotation", "mask", "mask_shape"],
                     output_columns=["image", "image_shape", "box", "label", "valid_num", "mask"],
-                    column_order=["image", "image_shape", "box", "label", "valid_num", "mask"],
                     python_multiprocessing=False,
                     num_parallel_workers=num_parallel_workers)
         ds = ds.padded_batch(batch_size, drop_remainder=True,
@@ -572,7 +571,6 @@ def create_maskrcnn_dataset(mindrecord_file, batch_size=2, device_num=1, rank_id
         ds = ds.map(operations=compose_map_func,
                     input_columns=["image", "annotation", "mask", "mask_shape"],
                     output_columns=["image", "image_shape", "box", "label", "valid_num", "mask"],
-                    column_order=["image", "image_shape", "box", "label", "valid_num", "mask"],
                     num_parallel_workers=num_parallel_workers)
         ds = ds.batch(batch_size, drop_remainder=True)
 

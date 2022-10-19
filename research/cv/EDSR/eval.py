@@ -113,7 +113,6 @@ def create_dataset_benchmark(dataset_path, scale):
         # pre-process hr lr
         generator_dataset = generator_dataset.map(input_columns=column_names,
                                                   output_columns=column_names,
-                                                  column_order=column_names,
                                                   operations=transform_img)
 
         # apply batch operations

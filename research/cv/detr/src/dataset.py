@@ -176,9 +176,9 @@ def build_dataset(cfg):
         partial(pad_image_to_max_size, max_size=cfg.max_img_size),
         input_columns=['image'],
         output_columns=['image', 'mask'],
-        column_order=['image', 'mask', 'bboxes', 'labels', 'orig_sizes', 'n_boxes', 'img_id'],
         num_parallel_workers=cfg.num_workers
     )
+    dataset = dataset.project(['image', 'mask', 'bboxes', 'labels', 'orig_sizes', 'n_boxes', 'img_id'])
     if cfg.eval:
         dataset = dataset.batch(cfg.batch_size)
         dataset = dataset.repeat(1)

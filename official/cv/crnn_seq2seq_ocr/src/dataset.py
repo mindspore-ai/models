@@ -114,8 +114,7 @@ def create_ocr_train_dataset(mindrecord_file, batch_size=32, rank_size=1, rank_i
                 num_parallel_workers=num_parallel_workers)
     ds = ds.map(operations=ops.PadEnd([config.max_length], 0), input_columns=["decoder_target"])
     ds = ds.map(operations=random_teacher_force, input_columns=["image", "decoder_input", "decoder_target"],
-                output_columns=["image", "decoder_input", "decoder_target", "teacher_force"],
-                column_order=["image", "decoder_input", "decoder_target", "teacher_force"])
+                output_columns=["image", "decoder_input", "decoder_target", "teacher_force"])
     type_cast_op_bool = ops.TypeCast(mstype.bool_)
     ds = ds.map(operations=type_cast_op_bool, input_columns="teacher_force")
     print("Train dataset size= %s" % (int(ds.get_dataset_size())))

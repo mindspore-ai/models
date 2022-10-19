@@ -125,8 +125,7 @@ def create_dataset(batch_size, data_path, device_num=1, rank=0, drop=True, full_
     if eod_reset:
         dataset = dataset.batch(batch_size, drop_remainder=drop)
         dataset = dataset.map(operations=map_func, input_columns=[column_name],
-                              output_columns=[column_name, "position_id", "attention_mask"],
-                              column_order=[column_name, "position_id", "attention_mask"])
+                              output_columns=[column_name, "position_id", "attention_mask"])
         dataset = dataset.map(input_columns="position_id", operations=type_cast_op)
         dataset = dataset.map(input_columns="attention_mask", operations=type_cast_op_float)
     else:

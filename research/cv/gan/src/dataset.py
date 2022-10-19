@@ -133,9 +133,9 @@ def create_dataset_train(batch_size=5, repeat_size=1, latent_size=100):
             x.astype("float32"),
             np.random.normal(size=(latent_size)).astype("float32")
         ),
-        output_columns=["image", "latent_code"],
-        column_order=["image", "latent_code"]
+        output_columns=["image", "latent_code"]
     )
+    mnist_ds = mnist_ds.project(["image", "latent_code"])
     mnist_ds = mnist_ds.batch(batch_size, True)
     mnist_ds = mnist_ds.repeat(1)
     return mnist_ds
@@ -150,9 +150,9 @@ def create_dataset_train_dis(batch_size=5, repeat_size=1, latent_size=100):
             x.astype("float32"),
             np.random.normal(size=(latent_size)).astype("float32")
         ),
-        output_columns=["image", "latent_code"],
-        column_order=["image", "latent_code"]
+        output_columns=["image", "latent_code"]
     )
+    mnist_ds = mnist_ds.project(["image", "latent_code"])
     mnist_ds = mnist_ds.batch(batch_size, True)
     mnist_ds = mnist_ds.repeat(1)
     return mnist_ds
@@ -167,10 +167,9 @@ def create_dataset_valid(batch_size=5, repeat_size=1, latent_size=100):
             x[-10000:].astype("float32"),
             np.random.normal(size=(latent_size)).astype("float32")
         ),
-        output_columns=["image", "latent_code"],
-        column_order=["image", "latent_code"]
+        output_columns=["image", "latent_code"]
     )
-
+    mnist_ds = mnist_ds.project(["image", "latent_code"])
     mnist_ds = mnist_ds.batch(batch_size, True)
     mnist_ds = mnist_ds.repeat(1)
     return mnist_ds

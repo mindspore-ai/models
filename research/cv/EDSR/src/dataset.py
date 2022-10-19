@@ -309,7 +309,6 @@ def create_dataset_DIV2K(config, dataset_type="train", num_parallel_workers=10, 
     # pre-process hr lr
     generator_dataset = generator_dataset.map(input_columns=column_names,
                                               output_columns=column_names,
-                                              column_order=column_names,
                                               operations=transform_img)
 
     # apply batch operations

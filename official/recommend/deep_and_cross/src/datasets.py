@@ -229,7 +229,7 @@ def _get_tf_dataset(data_dir, train_mode=True, epochs=1, batch_size=1000,
 
     ds = ds.map(operations=_padding_func(batch_size, manual_shape, target_column),
                 input_columns=['feat_ids', 'feat_vals', 'label'],
-                column_order=['feat_ids', 'feat_vals', 'label'], num_parallel_workers=8)
+                num_parallel_workers=8)
     ds = ds.repeat(epochs)
     return ds
 
@@ -268,7 +268,6 @@ def _get_mindrecord_dataset(directory, train_mode=True, epochs=10, batch_size=16
     ds = ds.batch(int(batch_size / line_per_sample), drop_remainder=True)
     ds = ds.map(_padding_func(batch_size, manual_shape, target_column, target_column-1),
                 input_columns=['feat_ids', 'feat_vals', 'label'],
-                column_order=['feat_ids', 'feat_vals', 'label'],
                 num_parallel_workers=8)
     ds = ds.repeat(epochs)
     return ds

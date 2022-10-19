@@ -260,11 +260,12 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, device_num, rank,
         dataset = ds.GeneratorDataset(yolo_dataset, column_names=dataset_column_names, sampler=distributed_sampler,
                                       python_multiprocessing=True, num_parallel_workers=min(4, num_parallel_workers))
         dataset = dataset.map(operations=multi_scale_trans, input_columns=dataset_column_names,
-                              output_columns=map1_out_column_names, column_order=map1_out_column_names,
+                              output_columns=map1_out_column_names,
                               num_parallel_workers=min(12, num_parallel_workers), python_multiprocessing=True)
         dataset = dataset.map(operations=PreprocessTrueBox(config), input_columns=map2_in_column_names,
-                              output_columns=map2_out_column_names, column_order=output_column_names,
+                              output_columns=map2_out_column_names,
                               num_parallel_workers=min(4, num_parallel_workers), python_multiprocessing=False)
+        dataset = dataset.project(output_column_names)
         # Computed from random subset of ImageNet training images
         mean = [m * 255 for m in [0.485, 0.456, 0.406]]
         std = [s * 255 for s in [0.229, 0.224, 0.225]]
@@ -284,7 +285,6 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, device_num, rank,
         compose_map_func = (lambda image, img_id: reshape_fn(image, img_id, config))
         dataset = dataset.map(operations=compose_map_func, input_columns=["image", "img_id"],
                               output_columns=["image", "image_shape", "img_id"],
-                              column_order=["image", "image_shape", "img_id"],
                               num_parallel_workers=8)
         dataset = dataset.map(operations=hwc_to_chw, input_columns=["image"], num_parallel_workers=8)
         dataset = dataset.batch(batch_size, drop_remainder=True)

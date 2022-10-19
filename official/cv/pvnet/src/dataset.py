@@ -234,7 +234,6 @@ def create_dataset(cls_list, batch_size=16, workers=16, devices=1, rank=0, multi
 
     ds = ds.map(input_columns=["image", "mask", "farthest"],
                 output_columns=["image", "mask", "vertex", "vertex_weight"],
-                column_order=["image", "mask", "vertex", "vertex_weight"],
                 operations=preprocess_fn, num_parallel_workers=workers, python_multiprocessing=multi_process)
 
     img_transforms = C.Compose([

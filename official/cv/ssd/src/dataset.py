@@ -413,7 +413,7 @@ def create_ssd_dataset(mindrecord_file, batch_size=32, device_num=1, rank=0,
         output_columns = ["img_id", "image", "image_shape"]
         trans = [normalize_op, change_swap_op]
     ds = ds.map(operations=compose_map_func, input_columns=["img_id", "image", "annotation"],
-                output_columns=output_columns, column_order=output_columns,
+                output_columns=output_columns,
                 python_multiprocessing=use_multiprocessing,
                 num_parallel_workers=num_parallel_workers)
     ds = ds.map(operations=trans, input_columns=["image"], python_multiprocessing=use_multiprocessing,

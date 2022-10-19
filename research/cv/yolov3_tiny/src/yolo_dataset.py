@@ -281,7 +281,6 @@ def create_yolo_dataset(
         yolo_dataset.transforms = multi_scale_trans
 
         dataset_column_names = ["image", "annotation", "input_size", "mosaic_flag"]
-        output_column_names = ["image", "annotation", "bbox1", "bbox2", "gt_box1", "gt_box2"]
         map1_out_column_names = ["image", "annotation", "size"]
         map2_in_column_names = ["annotation", "size"]
         map2_out_column_names = ["annotation", "bbox1", "bbox2", "gt_box1", "gt_box2"]
@@ -297,7 +296,6 @@ def create_yolo_dataset(
             operations=multi_scale_trans,
             input_columns=dataset_column_names,
             output_columns=map1_out_column_names,
-            column_order=map1_out_column_names,
             num_parallel_workers=16,
             python_multiprocessing=True
         )
@@ -305,10 +303,10 @@ def create_yolo_dataset(
             operations=PreprocessTrueBox(config),
             input_columns=map2_in_column_names,
             output_columns=map2_out_column_names,
-            column_order=output_column_names,
             num_parallel_workers=2,
             python_multiprocessing=False
         )
+        ds = ds.project(["image", "annotation", "bbox1", "bbox2", "gt_box1", "gt_box2"])
         mean = [m * 255 for m in [0.485, 0.456, 0.406]]
         std = [s * 255 for s in [0.229, 0.224, 0.225]]
         ds = ds.map(
@@ -330,7 +328,6 @@ def create_yolo_dataset(
             operations=compose_map_func,
             input_columns=["image", "img_id"],
             output_columns=["image", "image_shape", "img_id"],
-            column_order=["image", "image_shape", "img_id"],
             num_parallel_workers=8
         )
         ds = ds.map(operations=hwc_to_chw, input_columns=["image"], num_parallel_workers=8)

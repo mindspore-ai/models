@@ -238,9 +238,7 @@ def create_comatch_dataset(args):
 
     ds = ds.batch(args.batch_size, num_parallel_workers=4, drop_remainder=True)
     ds = ds.map(num_parallel_workers=8, operations=[concate],
-                input_columns=["unlabel_weak", "unlabel_strong0", "unlabel_strong1"],
-                output_columns=["unlabel_weak", "unlabel_strong0", "unlabel_strong1"],
-                column_order=["label", "unlabel_weak", "unlabel_strong0", "unlabel_strong1", "target"])
+                input_columns=["unlabel_weak", "unlabel_strong0", "unlabel_strong1"])
 
     return ds, len(comatch_dataset)
 
@@ -404,9 +402,7 @@ def create_select_dataset(args):
                              shuffle=True, num_parallel_workers=1, shard_id=args.rank, num_shards=args.device_num)
 
     ds = ds.batch(args.batch_size, num_parallel_workers=1, drop_remainder=True)
-    ds = ds.map(operations=[concate_data], input_columns=["img_data"],
-                output_columns=["img_data"],
-                column_order=["img_data", "label_target", "label_path"])
+    ds = ds.map(operations=[concate_data], input_columns=["img_data"])
 
     return ds, len(comatch_dataset)
 

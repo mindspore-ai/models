@@ -433,13 +433,10 @@ def create_train_dataset(mindrecord_files, labels, batch_size, train_mode, rank=
         batch_spect, batch_script, len(labels) - 1))
     ds = ds.map(operations=compose_map_func, input_columns=["batch_spect", "batch_script"],
                 output_columns=["inputs", "input_length", "targets"],
-                column_order=["inputs", "input_length", "targets"],
                 num_parallel_workers=8)
     ds = ds.batch(batch_size, drop_remainder=True)
     ds = ds.map(operations=postprocess, input_columns=["inputs", "input_length", "targets"],
-                output_columns=["inputs", "input_length",
-                                "target_indices", "targets"],
-                column_order=["inputs", "input_length", "target_indices", "targets"])
+                output_columns=["inputs", "input_length", "target_indices", "targets"])
     return ds
 
 

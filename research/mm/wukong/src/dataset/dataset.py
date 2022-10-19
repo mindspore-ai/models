@@ -43,6 +43,6 @@ def get_dataset(dataset_path, batch_size):
          C.CenterCrop(224),
          C.HWC2CHW(),
          C2.TypeCast(mstype.float32)],
-        input_columns=["image"], output_columns=None, column_order=["image", "label"])
+        input_columns=["image"])
     val_dataset = val_dataset.batch(batch_size)
     return val_dataset

@@ -87,7 +87,7 @@ def create_dataset(args, dataset_mode, repeat_num=1):
     data_set = data_set.map(operations=type_cast_op, input_columns="label", num_parallel_workers=8)
     data_set = data_set.map(operations=copy_column, input_columns=["image", "label"],
                             output_columns=["image1", "image2", "label"],
-                            column_order=["image1", "image2", "label"], num_parallel_workers=8)
+                            num_parallel_workers=8)
     data_set = data_set.map(operations=trans, input_columns=["image1"], num_parallel_workers=8)
     data_set = data_set.map(operations=trans, input_columns=["image2"], num_parallel_workers=8)
     # apply batch operations
