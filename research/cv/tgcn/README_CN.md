@@ -58,8 +58,8 @@ T-GCN模型主要由两大模块构成，分别为图卷积网络（Graph Convol
 - 框架
     - [MindSpore](https://www.mindspore.cn/)
 - 如需获取更多信息，请查看如下链接：
-    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 
 # [快速开始](#目录)
 

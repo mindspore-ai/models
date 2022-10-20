@@ -41,9 +41,9 @@
 
     <table>
       <tr>
-        <td><center><img src="https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/master/docs/lite/docs/source_zh_cn/images/segmentation3.png"><br>图1  白色背景</br> </center></td>
-        <td><center><img src="https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/master/docs/lite/docs/source_zh_cn/images/segmentation4.png"><br>图2  蓝色背景</br> </center></td>
-        <td><center><img src="https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/master/docs/lite/docs/source_zh_cn/images/segmentation5.png"><br>图3  油画背景</br> </center></td>
+        <td><center><img src="https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.9/docs/lite/docs/source_zh_cn/images/segmentation3.png"><br>图1  白色背景</br> </center></td>
+        <td><center><img src="https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.9/docs/lite/docs/source_zh_cn/images/segmentation4.png"><br>图2  蓝色背景</br> </center></td>
+        <td><center><img src="https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.9/docs/lite/docs/source_zh_cn/images/segmentation5.png"><br>图3  油画背景</br> </center></td>
       </tr>
     </table>
 
@@ -78,7 +78,7 @@ app
 
 ### 配置MindSpore Lite依赖项
 
-Android调用MindSpore Android AAR时，需要相关库文件支持。可通过MindSpore Lite[源码编译](https://www.mindspore.cn/lite/docs/zh-CN/master/use/build.html)生成`mindspore-lite-maven-{version}.zip`库文件包并解压缩（包含`mindspore-lite-{version}.aar`库文件）。
+Android调用MindSpore Android AAR时，需要相关库文件支持。可通过MindSpore Lite[源码编译](https://www.mindspore.cn/lite/docs/zh-CN/r1.9/use/build.html)生成`mindspore-lite-maven-{version}.zip`库文件包并解压缩（包含`mindspore-lite-{version}.aar`库文件）。
 
 > version：输出件版本号，与所编译的分支代码对应的版本一致。
 >
@@ -88,7 +88,7 @@ Android调用MindSpore Android AAR时，需要相关库文件支持。可通过M
 
 本示例中，build过程由`app/download.gradle`文件自动下载MindSpore Lite版本文件，并放置在`app/libs`目录下。
 
-> 注： 若自动下载失败，请手动下载相关库文件[mindspore-lite-{version}-android-{arch}.tar.gz](https://www.mindspore.cn/lite/docs/zh-CN/master/use/downloads.html)，解压后将其放在对应位置。
+> 注： 若自动下载失败，请手动下载相关库文件[mindspore-lite-{version}-android-{arch}.tar.gz](https://www.mindspore.cn/lite/docs/zh-CN/r1.9/use/downloads.html)，解压后将其放在对应位置。
 
 ### 下载及部署模型文件
 
@@ -240,8 +240,8 @@ Android调用MindSpore Android AAR时，需要相关库文件支持。可通过M
 
         <table>
            <tr>
-            <td><center><img src="https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/master/docs/lite/docs/source_zh_cn/images/segmentation6.png"><br>图1  推理前</br></center></td>
-            <td><center><img src="https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/master/docs/lite/docs/source_zh_cn/images/segmentation7.png"><br>图2  推理后</br></center></td>
+            <td><center><img src="https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.9/docs/lite/docs/source_zh_cn/images/segmentation6.png"><br>图1  推理前</br></center></td>
+            <td><center><img src="https://mindspore-website.obs.cn-north-4.myhuaweicloud.com/website-images/r1.9/docs/lite/docs/source_zh_cn/images/segmentation7.png"><br>图2  推理后</br></center></td>
           </tr>
         </table>
 

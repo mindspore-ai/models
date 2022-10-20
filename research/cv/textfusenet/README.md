@@ -48,7 +48,7 @@ Arbitrary shape text detection in natural scenes is an extremely challenging tas
     - [Ascend Hub](ascend.huawei.com/ascendhub/#/home)
 - For more information, please check the resources below:
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.3/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
 
 - third-party libraries
 

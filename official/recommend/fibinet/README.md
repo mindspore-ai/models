@@ -45,8 +45,8 @@ The FiBiNET model contains a wide linear model and a deep learning neural networ
     - Prepare hardware environment with GPU processor.
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore), for more information, please check the resources below:
-        - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-        - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+        - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
+        - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/r1.9/index.html)
 
 # [Quick Start](#contents)
 

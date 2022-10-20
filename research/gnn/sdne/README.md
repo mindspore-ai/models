@@ -54,8 +54,8 @@ Used dataset:
 - Framework
     - [MindSpore](https://www.mindspore.cn/install)
 - For more information about MindSpore, please check the resources below:
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/r1.9/index.html)
 - Other
     - networkx
     - numpy
