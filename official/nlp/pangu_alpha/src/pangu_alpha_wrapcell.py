@@ -213,6 +213,12 @@ class PanguAlphaTrainPipelineWithLossScaleCell(nn.Cell):
         self.clip = ClipByGlobalNorm(self.weights, self.config)
         self.micro_size = config.parallel_config.micro_batch_num
         self.opt_shard = _get_enable_parallel_optimizer()
+        self.enable_offload = config.enable_offload
+        self.clip_value = Tensor([1.0], dtype=mstype.float32)
+        if config.enable_offload:
+            self.clip = GlobalNorm(self.weights, config)
+        else:
+            self.clip = ClipByGlobalNorm(self.weights, config)
 
     @C.add_flags(has_effect=True)
     def construct(self,
@@ -249,6 +255,7 @@ class PanguAlphaTrainPipelineWithLossScaleCell(nn.Cell):
         else:
             accu_grads = self.grad_reducer(self.accu_grads)
             grads = self.hyper_map(F.partial(grad_scale, scaling_sens * self.degree), grads, accu_grads)
+        clip_value = self.clip_value
         if self.enable_global_norm:
             grads, _ = self.clip(grads)
         else:
@@ -265,5 +272,8 @@ class PanguAlphaTrainPipelineWithLossScaleCell(nn.Cell):
         if sens is None:
             overflow = self.loss_scaling_manager(self.loss_scale, cond)
         if not overflow:
-            self.optimizer(grads)
+            if self.enable_offload:
+                self.optimizer(grads, clip_value)
+            else:
+                self.optimizer(grads)
         return (loss, overflow, scaling_sens.value())
