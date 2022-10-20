@@ -53,8 +53,8 @@ RotatE模型将每个关系定义为在复矢量空间中从源实体到目标�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 # [快速入门](#目录)
 
@@ -86,7 +86,7 @@ bash run_infer_310.sh [MINDIR_HEAD_PATH] [MINDIR_TAIL_PATH] [DATASET_PATH] [NEED
 
 在裸机环境（本地有Ascend 910 AI 处理器）进行分布式训练时，需要配置当前多卡环境的组网信息文件。
 请遵循一下链接中的说明创建json文件：
-<https://www.mindspore.cn/tutorials/experts/zh-CN/r1.9/parallel/train_ascend.html#配置分布式环境变量>
+<https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html#配置分布式环境变量>
 
 - GPU处理器环境运行
 

@@ -53,8 +53,8 @@ Train DCGAN Dataset used: [Imagenet-1k](<http://www.image-net.org/index>)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
 # [Script Description](#contents)
 
@@ -156,7 +156,7 @@ dcgan_cifar10_cfg {
 
 ## [Training Process](#contents)
 
-- Set options in `config.py`, including learning rate, output filename and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/r1.9/advanced/dataset.html) for more information about dataset.
+- Set options in `config.py`, including learning rate, output filename and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
 
 ### [Training](#content)
 

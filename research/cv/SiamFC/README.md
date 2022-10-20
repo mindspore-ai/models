@@ -45,8 +45,8 @@ used Dataset :[ILSVRC2015-VID](http://bvisionweb1.cs.unc.edu/ilsvrc2015/ILSVRC20
 - frame:
     - [Mindspore](https://www.mindspore.cn/install/en)
 - For details, please refer to the following resources:
-    - [MindSpore course](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
+    - [MindSpore course](https://www.mindspore.cn/tutorials/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 - more API
     - got10k toolkit
     - opencv

@@ -29,8 +29,8 @@ Mindconverter转换出ckpt文件后，再使用export.py脚本导出MINDIR文件
 - 准备Ascend或GPU处理器搭建硬件环境。
 - 框架
 - [MindSpore](https://www.mindspore.cn/install)
-- [MindInsight] (https://www.mindspore.cn/mindinsight/docs/zh-CN/r1.9/mindinsight_install.html)
+- [MindInsight] (https://www.mindspore.cn/mindinsight/docs/zh-CN/master/mindinsight_install.html)
 - 如需查看详情，请参见如下资源：
-- [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
-- [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
-- [MindConverter教程] (https://www.mindspore.cn/mindinsight/docs/zh-CN/r1.9/migrate_3rd_scripts_mindconverter.html)
+- [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+- [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+- [MindConverter教程] (https://www.mindspore.cn/mindinsight/docs/zh-CN/master/migrate_3rd_scripts_mindconverter.html)

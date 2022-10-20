@@ -97,9 +97,9 @@ The directory structure of the unzipped and organized data set should be as foll
 
 - For details, please refer to the following resources：
 
-    - [MindSpore tutorial](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore tutorial](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
 
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 ## [Quick Start](#contents)
 

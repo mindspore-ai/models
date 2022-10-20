@@ -47,8 +47,8 @@ Dataset used: Segmentation on A subset of shapenet [shapenet](<https://shapenet.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 # [Quick Start](#contents)
 

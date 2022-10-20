@@ -213,7 +213,7 @@ bash scripts/docker_start.sh ssd:20.1.0 [DATA_DIR] [MODEL_DIR]
 
 ### [Training Process](#contents)
 
-To train the model, run `train.py`. If the `mindrecord_dir` is empty, it will generate [mindrecord](https://www.mindspore.cn/tutorials/en/r1.9/advanced/dataset/record.html) files by `coco_root`(coco dataset). **Note if mindrecord_dir isn't empty, it will use mindrecord_dir instead of raw images.**
+To train the model, run `train.py`. If the `mindrecord_dir` is empty, it will generate [mindrecord](https://www.mindspore.cn/tutorials/en/master/advanced/dataset/record.html) files by `coco_root`(coco dataset). **Note if mindrecord_dir isn't empty, it will use mindrecord_dir instead of raw images.**
 
 #### Training on GPU
 

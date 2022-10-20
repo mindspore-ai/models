@@ -35,8 +35,8 @@ More benchmark of the multi-modality modal please refer to [Noah-Wukong Benchmar
 - Framework
     - [Mindspore](https://www.mindspore.cn/ "Mindspore")
 - Tutorial
-    - [Mindspore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
-    - [Mindspore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
+    - [Mindspore Tutorial](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+    - [Mindspore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 ## Quick Start
 
@@ -148,7 +148,7 @@ where IMG_DIR refer to the downloaded image dir, option start_id and end_id defi
 
 ### Generate MindRecord
 
-In order to be used in Mindspore, we convert the raw data into [MindRecord](https://www.mindspore.cn/docs/en/r1.9/api_python/mindspore.mindrecord.html#module-mindspore.mindrecord) format. To do this, run code
+In order to be used in Mindspore, we convert the raw data into [MindRecord](https://www.mindspore.cn/docs/en/master/api_python/mindspore.mindrecord.html#module-mindspore.mindrecord) format. To do this, run code
 
 ```shell
 cd models/research/mm/wukong/
