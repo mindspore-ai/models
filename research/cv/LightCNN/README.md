@@ -119,7 +119,7 @@ Dataset structure:
 
 ## [Mixed Precision](#mixedprecision)
 
-The [mixed-precision](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html) training
+The [mixed-precision](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/mixed_precision.html) training
 method uses single-precision and half-precision data to improve the training speed of deep learning neural networks,
 while maintaining the network accuracy that can be achieved by single-precision training. Mixed-precision training
 increases computing speed and reduces memory usage, while supporting training larger models or achieving larger batches
@@ -637,7 +637,7 @@ Please check the official [homepage](https://gitee.com/mindspore/models).
 
 [5]: https://pan.baidu.com/s/1eR6vHFO
 
-[6]: https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html
+[6]: https://www.mindspore.cn/tutorials/zh-CN/master/advanced/mixed_precision.html
 
 [7]: http://www.cbsr.ia.ac.cn/users/scliao/projects/blufr/BLUFR.zip
 
