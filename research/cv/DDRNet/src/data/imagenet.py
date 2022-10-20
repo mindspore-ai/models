@@ -140,7 +140,6 @@ def create_dataset_imagenet(dataset_dir, args, repeat_num=1, training=True):
 
     # apply dataset repeat operation
     data_set = data_set.repeat(repeat_num)
-
     return data_set
 
 
