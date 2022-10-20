@@ -95,7 +95,7 @@ R-CNN的整体网络架构详情，请参考链接: [Link](https://arxiv.org/abs
 
 ```shell
 python process_data.py
- ```
+```
 
 ### [训练过程](#contents)
 
@@ -104,7 +104,7 @@ python process_data.py
 - 在Ascend上进行训练：
 
 ```shell
-bash scripts/run_standalone_train_ascend.sh 0
+bash run_standalone_train_ascend.sh 0
  ```
 
 上述命令将在后台运行，你可以在日志文件查看结果。
@@ -135,7 +135,7 @@ bash scripts/run_standalone_train_ascend.sh 0
 
 通过执行如下命令进行训练：
 
-bash scripts/run_standalone_train_gpu.sh 0
+bash run_standalone_train_gpu.sh 0
 
 训练后，默认会在脚本文件夹下得到一些checkpoints文件，可以在日志文件中查看结果，loss如下所示：
 
@@ -174,7 +174,7 @@ bash scripts/run_standalone_train_gpu.sh 0
 - 在Ascend上进行分布式训练：
 
 ```shell
-bash ./scripts/run_distribute_train_ascend.sh rank_table.json
+bash run_distribute_train_ascend.sh rank_table.json
 ```
 
 上述脚本将在后台运行. 您可以通过文件 train_parallel[X]/logs 查看结果。 损失如下:
@@ -200,7 +200,7 @@ bash ./scripts/run_distribute_train_ascend.sh rank_table.json
 - 在GPU上进行分布式训练：
 
 ```shell
-bash scripts/run_distribute_train_gpu.sh
+bash run_distribute_train_gpu.sh
 ```
 
 上述脚本将在后台运行。
@@ -243,7 +243,7 @@ scripts/log_train_regression:[2021-11-09 14:40:58.586][DEBUG] trainer.py(121)->t
 在运行以下命令之前，请检查用于评估的checkpoints路径，请将checkpoints路径设置为绝对完整路径。
 
 ```shell
-bash scripts/run_standalone_eval_ascend.sh 0
+bash run_standalone_eval_ascend.sh 0
  ```
 
 上面的脚本将在后台运行。您可以通过“eval.log”查看结果,测试数据集的准确率如下：
@@ -261,7 +261,7 @@ svm_thresh: 0.6, map: 0.31060216644862054
 
 ```shell
 
-bash scripts/run_standalone_eval_gpu.sh 0
+bash run_standalone_eval_gpu.sh 0
 
  ```
 

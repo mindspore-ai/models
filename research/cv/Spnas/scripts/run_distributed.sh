@@ -20,4 +20,4 @@ export RANK_SIZE=8
 RANK_TABLE_FILE=$(realpath $1)
 export RANK_TABLE_FILE
 
-python3 ../train.py --config_path=../src/spnas_distributed.yml
+python3 ../train.py --config_file=../src/spnas_distributed.yml

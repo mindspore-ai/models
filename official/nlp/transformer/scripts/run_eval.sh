@@ -26,6 +26,7 @@ fi
 export DEVICE_TARGET=$1
 export CONFIG_PATH=$5
 DEVICE_ID=$2
+export DEVICE_ID=$2
 
 get_real_path(){
   if [ "${1:0:1}" == "/" ]; then

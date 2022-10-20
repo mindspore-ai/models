@@ -20,5 +20,6 @@ exit 1
 fi
 
 export DEVICE_ID=$1
+cd ../
 python eval.py --device_id=${DEVICE_ID} 1>scripts/result.txt 2>scripts/eval_log.txt &
 cd ..

@@ -16,13 +16,18 @@
 
 PWD_DIR=`pwd`
 DATA=$1
+scripts_path=$(dirname $0)
 LOAD_CHECKPOINT_PATH=$2
 
 BERT_DIR=$DATA/cased_L-24_H-1024_A-16
 WN_CPT_EMBEDDING_PATH=$DATA/KB_embeddings/wn_concept2vec.txt
 NELL_CPT_EMBEDDING_PATH=$DATA/KB_embeddings/nell_concept2vec.txt
 
-python3 run_KTNET_squad_eval.py \
+if [ ! -d log ]; then
+    mkdir log
+fi
+
+python3 $scripts_path/../run_KTNET_squad_eval.py \
   --device_target "Ascend" \
   --device_id 0 \
   --batch_size 8 \

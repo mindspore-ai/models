@@ -27,10 +27,8 @@ echo "===============================================start evaling==============
 
 task_name=$1
 device_target=$2
-device_id=$3
-model_dir=$4
-data_dir=$5
-device_id=$6
+model_dir=$3
+data_dir=$4
 
 mkdir -p ms_log
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
@@ -40,6 +38,6 @@ export GLOG_logtostderr=0
 python ${PROJECT_DIR}/../eval.py \
     --task_name=$task_name \
     --device_target=$device_target \
-    --device_id=$device_id \
+    --device_id=$DEVICE_ID \
     --model_dir=$model_dir \
     --data_dir=$data_dir > eval_log.txt 2>&1 &
