@@ -1,5 +1,6 @@
 # Contents
 
+- [Contents](#contents)
 - [PSPNet Description](#PSPNet-description)
 - [Model Architecture](#PSPNet-Architeture)
 - [Dataset](#PSPNet-Dataset)
@@ -16,10 +17,11 @@
         - [Evaluation Result](#evaluation-resul)
     - [Export MindIR](#export-mindir)
     - [310 infer](#310-inference)
+    - [ONNX CPU infer](#onnx-cpu-infer)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
-    - [Inference Performance](#inference-performance)
+    - [Distributed Training Performance](#distributed-training-performance)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -36,6 +38,8 @@ The pyramid pooling module fuses features under four different pyramid scales.Fo
 # [Dataset](#Content)
 
 - [Semantic Boundaries Dataset](http://home.bharathh.info/pubs/codes/SBD/download.html)
+
+- [PASCAL VOC 2012 Website](http://host.robots.ox.ac.uk/pascal/VOC/voc2012)
  - It contains 11,357 finely annotated images split into training and testing sets with 8,498 and 2,857 images respectively.
  - The path formats in train.txt and val.txt are partial. And the mat file in the cls needs to be converted to image. You can run preprocess_dataset.py to convert the mat file and generate train_list.txt and val_list.txt. As follow：
 
@@ -112,9 +116,10 @@ Datasets: attributes (names and colors) are needed, and please download as follo
 │   └── voc2012_pspnet50.yaml
 ├── src                                        # PSPNet
 │   ├── dataset                          # data processing
-│   │   ├── dataset.py
+│   │   ├── pt_dataset.py
 │   │   ├── create_data_txt.py           # generate train_list.txt and val_list.txt
-│   │   └── transform.py
+│   │   ├── create_voc_list.py           # generate train_list.txt and val_list.txt
+│   │   └── pt_transform.py
 │   ├── model                            # models for training and test
 │   │   ├── PSPNet.py
 │   │   ├── resnet.py
@@ -130,6 +135,7 @@ Datasets: attributes (names and colors) are needed, and please download as follo
 │   ├── run_distribute_train_ascend.sh         # multi cards distributed training in ascend
 │   ├── run_train1p_ascend.sh                  # 1P training in ascend
 │   ├── run_infer_310.sh                       # 310 infer
+│   ├── run_eval_onnx_cpu.sh                   # ONNX infer
 │   └── run_eval.sh                            # validation script
 └── train.py                                         # The training python file for ADE20K/VOC2012
 ```
@@ -208,8 +214,16 @@ epoch time: 428776.845 ms, per step time: 403.365 ms
 
 Check the checkpoint path in config/ade20k_pspnet50.yaml and config/voc2012_pspnet50.yaml used for evaluation before running the following command.
 
+#### Evalueation on gpu
+
 ```shell
     bash run_eval.sh [YAML_PATH] [DEVICE_ID]
+```
+
+#### Evalueation on cpu
+
+```shell
+    bash run_eval.sh [YAML_PATH] cpu
 ```
 
 ### Evaluation Result
@@ -221,13 +235,21 @@ ADE20K:mIoU/mAcc/allAcc 0.4164/0.5319/0.7996.
 VOC2012:mIoU/mAcc/allAcc 0.7380/0.8229/0.9293.
 ````
 
-## [Export MindIR](#contents)
+## [Export](#contents)
+
+### Export MINDIR
 
 ```shell
 python export.py --yaml_path [YAML_PTAH] --ckpt_file [CKPT_PATH]
 ```
 
-The ckpt_file parameter is required,
+### Export ONNX
+
+```shell
+python export.py --yaml_path [YAML_PTAH] --ckpt_file [CKPT_PATH] --file_format ONNX
+```
+
+The ckpt_file parameter and yaml_path are required.
 
 ## 310 infer
 
@@ -235,6 +257,14 @@ The ckpt_file parameter is required,
 
 ```shell
     bash run_infer_310.sh [MINDIR PTAH [YAML PTAH] [DATA PATH] [DEVICE ID]
+```
+
+## ONNX CPU infer
+
+- Note: Before executing ONNX CPU infer, please export onnx model first.
+
+```shell
+    bash PSPNet/scripts/run_eval_onnx_cpu.sh PSPNet/config/voc2012_pspnet50.yaml
 ```
 
 # [Model Description](#Content)

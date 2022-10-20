@@ -51,3 +51,8 @@ TEST:
   result_path: ./result/voc/
   color_txt: ./voc2012/voc2012_colors.txt
   name_txt: ./voc2012/voc2012_names.txt
+
+
+ONNX_INFER:
+  onnx_path: /home/mindspore/pspnet/PSPNet/PSPNet.onnx
+  device_target: cpu
