@@ -83,7 +83,7 @@ if __name__ == '__main__':
 
     load_param_into_net(net, param_dict)
     net.set_train(False)
-    model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'})
+    model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'}, amp_level='O3')
 
     acc = model.eval(dataset)
     print(f"model's accuracy is {acc}")
