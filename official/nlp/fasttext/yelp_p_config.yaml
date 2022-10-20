@@ -37,6 +37,7 @@ dataset_path: ""
 data_name: "yelp_p"
 run_distribute: False
 model_ckpt: ""
+onnx_path: ""
 # export option
 device_id: 0
 ckpt_file: ""

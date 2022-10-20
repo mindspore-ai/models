@@ -95,7 +95,7 @@ class FastTextDataPreProcess():
         train_dataset_list = []
         test_dataset_list = []
         spacy_nlp = spacy.load('en_core_web_lg', disable=['parser', 'tagger', 'ner'])
-        spacy_nlp.add_pipe(spacy_nlp.create_pipe('sentencizer'))
+        spacy_nlp.add_pipe('sentencizer')
 
         with open(self.train_path, 'r', newline='', encoding='utf-8') as src_file:
             reader = csv.reader(src_file, delimiter=",", quotechar='"')

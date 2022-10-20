@@ -12,6 +12,9 @@
     - [Configuration File](#configuration-file)
     - [Training Process](#training-process)
     - [Inference Process](#inference-process)
+    - [ONNX Export And Evaluation](#onnx-export-and-evaluation)
+        - [ONNX Export](#onnx-export)
+        - [ONNX Evaluation](#onnx-evaluation)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Training Performance](#training-performance)
@@ -55,7 +58,7 @@ architecture. In the following sections, we will introduce how to run the script
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
 
 ## [Quick Start](#content)
 
@@ -162,13 +165,15 @@ The FastText network script and code result are as follows:
   │   ├──run_standalone_train.sh             // shell script for standalone eval on ascend.
   │   ├──run_distribute_train_gpu.sh        // shell script for distributed train on GPU.
   │   ├──run_eval_gpu.sh                     // shell script for standalone eval on GPU.
+  │   ├──run_eval_onnx_gpu.sh                // shell script for standalone eval_onnx on GPU.
   │   ├──run_standalone_train_gpu.sh         // shell script for standalone train on GPU.
   ├── ag_config.yaml                         // ag dataset arguments
   ├── dbpedia_config.yaml                    // dbpedia dataset arguments
-  ├── yelpp_config.yaml                      // yelpp dataset arguments
+  ├── yelp_p_config.yaml                      // yelpp dataset arguments
   ├── mindspore_hub_conf.py                  // mindspore hub scripts
   ├── export.py                              // Export API entry.
   ├── eval.py                                // Infer API entry.
+  ├── eval_onnx.py                           // Infer onnx API entry.
   ├── requirements.txt                       // Requirements of third party package.
   ├── train.py                               // Train API entry.
 ```
@@ -184,6 +189,7 @@ The FastText network script and code result are as follows:
     bash creat_dataset.sh [SOURCE_DATASET_PATH] [DATASET_NAME]
     ```
 
+    example:bash create_dataset.sh your_path/fasttext/dataset/ag_news_csv ag
 ### [Configuration File](#content)
 
 Parameters for both training and evaluation can be set in config.py. All the datasets are using same parameter name, parameters value could be changed according the needs.
@@ -237,7 +243,7 @@ Parameters for both training and evaluation can be set in config.py. All the dat
         bash run_eval.sh [DATASET_PATH] [DATASET_NAME] [MODEL_CKPT]
         ```
 
-  Note: The `DATASET_PATH` is path to mindrecord. eg. `/dataset_path/*.mindrecord`
+  Note: The `DATASET_PATH` is path to mindrecord. eg. `/dataset_path/`
 
 - Running on GPU
 
@@ -248,7 +254,35 @@ Parameters for both training and evaluation can be set in config.py. All the dat
         bash run_eval_gpu.sh [DATASET_PATH] [DATASET_NAME] [MODEL_CKPT]
         ```
 
-  Note: The `DATASET_PATH` is path to mindrecord. eg. `/dataset_path/*.mindrecord`
+  Note: The `DATASET_PATH` is path to mindrecord. eg. `/dataset_path/`
+
+### [ONNX Export And Evaluation](#content)
+
+Note that run all onnx concerned scripts on GPU.
+
+- ONNX Export
+
+    - The command below will produce lots of fasttext onnx files, named different input shapes due to different input shapes of evaluation data.
+
+        ```bash
+        python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [ONNX] --config_path [CONFIG_PATH]
+        --onnx_path [ONNX_PATH] --dataset_path [DATASET_PATH]
+        ```
+
+    example:python export_onnx.py --ckpt_file ./checkpoint/fasttext_ascend_v170_dbpedia_official_nlp_acc98.62.ckpt --file_name fasttext --file_format ONNX --config_path ./dbpedia_config.yaml
+    --onnx_path ./fasttext --dataset_path ./fasttext/scripts/ag/
+
+- ONNX Evaluation
+    - Note that ONNX_PATH should be the absolute directory to the exported onnx files, such as: '/home/mindspore/ls/models/official/nlp/fasttext'.
+
+        ```bash
+        cd ./scripts
+        bash run_eval_onnx_gpu.sh DATASET_PATH DATASET_NAME ONNX_PATH
+        ```
+
+    example:bash run_eval_onnx_gpu.sh /home/mindspore/fasttext/scripts/dbpedia/ dbpedia  /home/mindspore/official/nlp/fasttext
+
+You can view the results through the file "eval_onnx.log".
 
 ## [Model Description](#content)
 

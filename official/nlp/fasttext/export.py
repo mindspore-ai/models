@@ -24,6 +24,7 @@ from  src.fasttext_model import FastText
 
 from model_utils.config import config
 from model_utils.moxing_adapter import moxing_wrapper
+from eval import load_infer_dataset
 
 if config.data_name == "ag":
     target_label1 = ['0', '1', '2', '3']
@@ -75,10 +76,22 @@ def run_fasttext_export():
         src_tokens_shape = [batch_size, 2955]
         src_tokens_length_shape = [batch_size, 1]
 
-    file_name = config.file_name + '_' + config.data_name
-    src_tokens = Tensor(np.ones((src_tokens_shape)).astype(np.int32))
-    src_tokens_length = Tensor(np.ones((src_tokens_length_shape)).astype(np.int32))
-    export(ft_infer, src_tokens, src_tokens_length, file_name=file_name, file_format=config.file_format)
+    if config.file_format == 'ONNX':
+        dataset = load_infer_dataset(batch_size=config.batch_size, datafile=config.dataset_path,
+                                     bucket=config.test_buckets)
+        for batch in dataset.create_dict_iterator(output_numpy=True, num_epochs=1):
+            src_tokens_shape = batch['src_tokens'].shape
+            src_tokens_length_shape = batch['src_tokens_length'].shape
+            file_name = config.file_name + '_' + str(src_tokens_shape[0]) + '_' + str(src_tokens_shape[1]) + '_' \
+                        + config.data_name
+            src_tokens = Tensor(np.ones((src_tokens_shape)).astype(np.int32))
+            src_tokens_length = Tensor(np.ones((src_tokens_length_shape)).astype(np.int32))
+            export(ft_infer, src_tokens, src_tokens_length, file_name=file_name, file_format=config.file_format)
+    else:
+        file_name = config.file_name + '_' + config.data_name
+        src_tokens = Tensor(np.ones((src_tokens_shape)).astype(np.int32))
+        src_tokens_length = Tensor(np.ones((src_tokens_length_shape)).astype(np.int32))
+        export(ft_infer, src_tokens, src_tokens_length, file_name=file_name, file_format=config.file_format)
 
 
 def modelarts_pre_process():
