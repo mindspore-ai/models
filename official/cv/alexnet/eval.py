@@ -48,8 +48,8 @@ def eval_alexnet():
         elif config.device_target == "GPU":
             init()
 
+    network = AlexNet(config.num_classes, phase='test', dataset_name=config.dataset_name)
     if config.dataset_name == 'cifar10':
-        network = AlexNet(config.num_classes, phase='test')
         loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
         opt = nn.Momentum(network.trainable_params(), config.learning_rate, config.momentum)
         ds_eval = create_dataset_cifar10(cfg=config, data_path=config.data_path,
@@ -63,7 +63,6 @@ def eval_alexnet():
         model = Model(network, loss, opt, metrics={"Accuracy": Accuracy()})
 
     elif config.dataset_name == 'imagenet':
-        network = AlexNet(config.num_classes, phase='test', off_load=True)
         loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction="mean")
         ds_eval = create_dataset_imagenet(cfg=config, dataset_path=config.data_path,
                                           num_parallel_workers=config.num_parallel_workers,
