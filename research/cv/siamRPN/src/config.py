@@ -63,7 +63,7 @@ class Config:
     gray_ratio = 0.25
     score_size = int((instance_size - exemplar_size) / 8 + 1)
     penalty_k = 0.22
-    window_influence = 0.40
+    window_influence = 0.20
     lr_box = 0.30
     min_scale = 0.1
     max_scale = 10

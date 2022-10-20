@@ -117,6 +117,7 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
                 |    |──run_distribute_train_gpu.sh      // 本地GPU多卡训练脚本
                 |    |──run_infer_310.sh    //310推理评估脚本
                 |    |──run_gpu.sh          //GPU单卡训练脚本
+                |    |──run_evalonnx.sh          //onnx推理数据集脚本
                 ├── src
                 │    ├── data_loader.py      // 数据集加载处理脚本
                 │    ├── net.py              //  siamRPN架构
@@ -146,8 +147,9 @@ Siam-RPN提出了一种基于RPN的孪生网络结构。由孪生子网络和RPN
                 │    ├── ······
                 │    └── list.txt
                 ├── train.py               // 训练脚本
-                ├── eval.py                // 评估脚本
-                ├── export_mindir.py       // 将checkpoint文件导出到air/mindir
+                ├── evalonnx.py                // onnx评估脚本
+                ├── eval.py                // ckpt评估脚本
+                ├── export.py                // 将checkpoint文件导出到onnx或mindir
 ```
 
 ## 脚本参数
@@ -330,6 +332,30 @@ cat acc.log
 # 随机情况说明
 
 在train.py中，我们设置了随机种子。
+
+# ONNX推理
+
+```bash
+# 生成onnx文件
+  python export.py --ckpt_file=/path/ckpt/siamRPN-xx_xxxx.ckpt
+```
+
+# onnx推理,根据vot2015数据集和vot2016数据集分别选择对应的onnx推理代码
+
+# 例如选择vot2015数据集推理
+
+```bash
+python evalonnx.py --checkpoint_path=/path/siamrpn.onnx
+或者 sh run_evalonnx.sh [dataset_path] [model_path] [filename]
+#vot2016同理
+```
+
+-结果保存在filename当中，例如
+
+```bash
+{"all_videos": {"accuracy": 0.5890433443656077, "robustness": 0.3868562106735027, "eao": 0.30735406482761557}}
+}
+```
 
 # ModelZoo主页  
 
