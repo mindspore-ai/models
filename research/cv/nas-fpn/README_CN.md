@@ -68,8 +68,8 @@ MSCOCO2017
 - 架构
     - [MindSpore](https://www.mindspore.cn/install)
 - 想要获取更多信息，请检查以下资源：
-    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
+    - [MindSpore 教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 ## [脚本说明](#content)
 
@@ -161,7 +161,7 @@ bash scripts/run_single_train.sh DEVICE_ID MINDRECORD_DIR PRE_TRAINED(optional) 
 ```
 
 > 注意:
-RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.9/parallel/train_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools).
+RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools).
 
 #### 运行
 

@@ -97,11 +97,11 @@ VNet适用于医学图像分割，使用3D卷积，能够处理3D MR图像数据
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 - 生成config json文件用于多卡训练。
     - [简易教程](https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools)
-    - 详细配置方法请参照[官网教程](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.9/parallel/train_ascend.html#配置分布式环境变量)。
+    - 详细配置方法请参照[官网教程](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html#配置分布式环境变量)。
 
 # 快速入门
 

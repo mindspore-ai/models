@@ -52,8 +52,8 @@ CPM is implemented by GPT, which includes multi-layer decoder module.
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below:
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
 # Quick Start
 
@@ -309,7 +309,7 @@ After processing, the mindrecord file of training and reasoning is generated in 
 
 ### Finetune Training Process
 
-- Set options in `src/config.py`, including loss_scale, learning rate and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/r1.9/advanced/dataset.html) for more information about dataset.
+- Set options in `src/config.py`, including loss_scale, learning rate and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
 
 - Run `run_distribute_train_ascend_single_machine.sh` for distributed and single machine training of CPM model.
 

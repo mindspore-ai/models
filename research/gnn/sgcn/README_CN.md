@@ -50,8 +50,8 @@ SGCN根据正负连接分别包含三个图卷积层。每一层都以相应的�
 - 安装[MindSpore](https://www.mindspore.cn/install)
 - 安装相关依赖 pip install -r requirements.txt
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 - 下载数据集Bitcoin-Alpha和Bitcoin-OTC，[可点此下载](https://github.com/benedekrozemberczki/SGCN/tree/master/input)并放到根目录下input文件夹中。
 
 ## 快速开始

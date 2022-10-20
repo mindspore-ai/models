@@ -75,8 +75,8 @@ Dataset used: [COCO2017](<http://images.cocodataset.org/>), labeling uses unpubl
 - Framework
   - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-  - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
-  - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
+  - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
+  - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
 # [Quick Start](#contents)
 
@@ -269,7 +269,7 @@ After installing MindSpore via the official website, you can start training and 
 
 ### Training on Ascend
 
-To train the model, run `train.py` with the dataset `image_dir`, `anno_path` and `mindrecord_dir`. If the `mindrecord_dir` is empty, it wil generate [mindrecord](https://www.mindspore.cn/tutorials/en/r1.9/advanced/dataset/record.html) file by `image_dir` and `anno_path`(the absolute image path is joined by the `image_dir` and the relative path in `anno_path`). **Note if `mindrecord_dir` isn't empty, it will use `mindrecord_dir` rather than `image_dir` and `anno_path`.**
+To train the model, run `train.py` with the dataset `image_dir`, `anno_path` and `mindrecord_dir`. If the `mindrecord_dir` is empty, it wil generate [mindrecord](https://www.mindspore.cn/tutorials/en/master/advanced/dataset/record.html) file by `image_dir` and `anno_path`(the absolute image path is joined by the `image_dir` and the relative path in `anno_path`). **Note if `mindrecord_dir` isn't empty, it will use `mindrecord_dir` rather than `image_dir` and `anno_path`.**
 
 - Stand alone mode
 
@@ -310,7 +310,7 @@ Note the results is two-classification(person and face) used our own annotations
 
 ### Evaluation on Ascend
 
-To eval, run `eval.py` with the dataset `image_dir`, `anno_path`(eval txt), `mindrecord_dir` and `ckpt_path`. `ckpt_path` is the path of [checkpoint](https://www.mindspore.cn/tutorials/en/r1.9/beginner/save_load.html) file.
+To eval, run `eval.py` with the dataset `image_dir`, `anno_path`(eval txt), `mindrecord_dir` and `ckpt_path`. `ckpt_path` is the path of [checkpoint](https://www.mindspore.cn/tutorials/en/master/beginner/save_load.html) file.
 
   ```bash
   bash run_eval.sh 0 yolo.ckpt ./Mindrecord_eval ./dataset ./dataset/eval.txt

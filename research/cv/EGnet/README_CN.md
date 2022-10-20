@@ -204,8 +204,8 @@ bash convert_model.sh [MODEL_NAME] [PTH_FILE] [MSP_FILE]
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 ## 快速入门
 
@@ -363,7 +363,7 @@ bash run_standalone_train_gpu.sh
 bash run_distribute_train.sh 8 [RANK_TABLE_FILE]
 ```
 
-线下运行分布式训练请参照[mindspore分布式并行训练基础样例（Ascend）](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.9/parallel/train_ascend.html)
+线下运行分布式训练请参照[mindspore分布式并行训练基础样例（Ascend）](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html)
 
 - 线上modelarts分布式训练
 

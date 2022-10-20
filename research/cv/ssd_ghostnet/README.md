@@ -53,8 +53,8 @@ Dataset used: [COCO2017](<http://images.cocodataset.org/>)
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
 
 - Install [MindSpore](https://www.mindspore.cn/install/en).
 
@@ -210,7 +210,7 @@ If you want to run in modelarts, please check the official documentation of [mod
 
 ### Training on Ascend
 
-To train the model, run `train.py`. If the `mindrecord_dir` is empty, it will generate [mindrecord](https://www.mindspore.cn/tutorials/en/r1.9/advanced/dataset/record.html) files by `coco_root`(coco dataset) or `iamge_dir` and `anno_path`(own dataset). **Note if mindrecord_dir isn't empty, it will use mindrecord_dir instead of raw images.**
+To train the model, run `train.py`. If the `mindrecord_dir` is empty, it will generate [mindrecord](https://www.mindspore.cn/tutorials/en/master/advanced/dataset/record.html) files by `coco_root`(coco dataset) or `iamge_dir` and `anno_path`(own dataset). **Note if mindrecord_dir isn't empty, it will use mindrecord_dir instead of raw images.**
 
 - Distribute mode
 

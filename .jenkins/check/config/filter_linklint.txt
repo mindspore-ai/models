@@ -3,8 +3,3 @@ https://github.com/mcordts/cityscapesScripts/blob/master/cityscapesscripts/helpe
 https://persagen.com/files/misc/wang2014knowledge.pdf
 https://s3.amazonaws.com/google-landmark/metadata
 https://s3.amazonaws.com/google-landmark/md5sum
-https://www.mindspore.cn*/r1.9/*
-https://mindspore.cn*/r1.9/*
-http://vllab.ucmerced.edu/wlai24/LapSRN*
-https://mind201910small.blob.core.windows.net*
-https://bert-models.bj.bcebos.com/cased_L-24_H-1024_A-16.tar.gz
