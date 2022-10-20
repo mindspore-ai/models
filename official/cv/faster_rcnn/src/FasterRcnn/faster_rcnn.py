@@ -108,7 +108,7 @@ class Faster_Rcnn(nn.Cell):
         config.fpn_out_channels, config.fpn_num_outs)
 
         # Rpn and rpn loss
-        self.gt_labels_stage1 = Tensor(np.ones((self.train_batch_size, config.num_gts)).astype(np.int16))
+        self.gt_labels_stage1 = Tensor(np.ones((self.train_batch_size, config.num_gts)).astype(np.uint8))
         self.rpn_with_loss = RPN(config,
                                  self.train_batch_size,
                                  config.rpn_in_channels,
