@@ -181,6 +181,30 @@ def inference(img, net, c, s):
     return post_process(det, mat_, "valid", c, s, res)
 
 
+def onnx_inference(img, session, input_name, c, s):
+    """
+        Onnx inference.
+    """
+    scale_ratio = 200
+    height, width = img.shape[0:2]
+    center = (width / 2, height / 2)
+    scale = max(height, width) / scale_ratio
+    res = (args.input_res, args.input_res)
+
+    mat_ = src.utils.img.get_transform(center, scale, res, scale_ratio)[:2]
+    inp = img / 255
+    tmp1 = session.run(None, dict(zip(input_name, [mindspore.Tensor([inp], dtype=mindspore.float32).asnumpy()])))[0]
+    tmp2 = session.run(None, dict(zip(input_name, [mindspore.Tensor([inp[:, ::-1]],
+                                                                    dtype=mindspore.float32).asnumpy()])))[0]
+    tmp = np.concatenate((tmp1, tmp2), axis=0)
+    det = tmp[0, -1] + tmp[1, -1, :, :, ::-1][ds.flipped_parts["mpii"]]
+    if det is None:
+        return [], []
+    det = det / 2
+    det = np.minimum(det, 1)
+    return post_process(det, mat_, "valid", c, s, res)
+
+
 class MPIIEval:
     """
     eval for MPII dataset
