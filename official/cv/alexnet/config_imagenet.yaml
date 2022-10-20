@@ -29,7 +29,7 @@ keep_checkpoint_max: 10
 air_name: 'alexnet.air'
 
 weight_decay: 0.0001
-loss_scale: 1024
+loss_scale: 1
 is_dynamic_loss_scale: 0
 
 # Model Description
