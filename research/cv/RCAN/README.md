@@ -42,7 +42,7 @@
 - 数据集大小：约7.12GB，共900张图像
  - 训练集：800张图像
  - 测试集：100张图像
-- 基准数据集可下载如下：[Set5](http://people.rennes.inria.fr/Aline.Roumy/results/SR_BMVC12.html)、[Set14](https://deepai.org/dataset/set14-super-resolution)、[B100](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/bsds/)、[Urban100](http://vllab.ucmerced.edu/wlai24/LapSRN/)。
+- 基准数据集可下载如下：[Set5](http://people.rennes.inria.fr/Aline.Roumy/results/SR_BMVC12.html)、[Set14](https://deepai.org/dataset/set14-super-resolution)、[B100](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/bsds/)、[Urban100](https://deepai.org/dataset/urban100-4x-upscaling/)。
 - 数据格式：png文件
  - 注：数据将在src/data/DIV2K.py中处理。
  - 注：dir_data中需要指定数据集所在位置的上一层目录。
@@ -128,6 +128,7 @@ DIV2K
         ├── script
         │   ├── run_distribute_train.sh           // Ascend分布式训练shell脚本
         │   ├── run_eval.sh                       // eval验证shell脚本
+        │   ├── run_eval_onnx.sh                  // eval_onnx验证shell脚本
         │   ├── run_ascend_standalone.sh          // Ascend训练shell脚本
         ├── src
         │   ├── data
@@ -139,6 +140,7 @@ DIV2K
         │   ├── args.py                           //超参数
         ├── train.py                              //训练脚本
         ├── eval.py                               //评估脚本
+        ├── eval_onnx.py                          //评估ONNX脚本
         ├── export.py                             //模型导出
         ├── README.md                             // 自述文件
 ```
@@ -256,6 +258,32 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATASET_TYPE] [SCALE] [DEVICE_I
 - SCALE 超分辨率比例(2, 3, 4)
 - DEVICE_ID 设备ID， 默认为：0
 - 上述python命令在后台运行，可通过`run_infer.log`文件查看结果。
+
+## ONNX评估
+
+### 导出ONNX模型
+
+```bash
+python export.py [--dir_data] [--file_format] [--ckpt_path]
+```
+
+选项：
+  --dir_data        数据集目录
+  --file_format     需为 [ONNX]
+  --ckpt_path       检查点路径
+
+### ONNX评估
+
+- 评估过程如下，需要指定数据集类型为“DIV2K”
+
+```bash
+bash script/run_eval_onnx.sh [TEST_DATA_DIR] [ONNX_PATH] [DATASET_TYPE]
+```
+
+- TEST_DATA_DIR 测试数据文件路径
+- ONNX_PATH ONNX模型路径
+- DATASET_TYPE 数据集名称(DIV2K)
+- 上述python命令在后台运行，可通过`eval_onnx.log`文件查看结果。
 
 ## 模型导出
 

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -40,7 +40,8 @@ class SRData:
         self.benchmark = benchmark
         self.input_large = (args.model == 'VDSR')
         self.scale = args.scale
-        self.idx_scale = 0
+        self.scales = [2, 3, 4]
+        self.set_scale()
         self._set_filesystem(args.dir_data)
         self._set_img(args)
         if train:
@@ -56,13 +57,13 @@ class SRData:
             self.images_hr, self.images_lr = list_hr, list_lr
         elif args.ext.find('sep') >= 0:
             os.makedirs(self.dir_hr.replace(self.apath, path_bin), exist_ok=True)
-            for s in self.scale:
+            for s in self.scales:
                 if s == 1:
                     os.makedirs(os.path.join(self.dir_hr), exist_ok=True)
                 else:
                     os.makedirs(
                         os.path.join(self.dir_lr.replace(self.apath, path_bin), 'X{}'.format(s)), exist_ok=True)
-            self.images_hr, self.images_lr = [], [[] for _ in self.scale]
+            self.images_hr, self.images_lr = [], [[] for _ in self.scales]
             for h in list_hr:
                 b = h.replace(self.apath, path_bin)
                 b = b.replace(self.ext[0], '.pt')
@@ -88,15 +89,15 @@ class SRData:
         """_scan"""
         names_hr = sorted(
             glob.glob(os.path.join(self.dir_hr, '*' + self.ext[0])))
-        names_lr = [[] for _ in self.scale]
+        names_lr = [[] for _ in self.scales]
         for f in names_hr:
             filename, _ = os.path.splitext(os.path.basename(f))
-            for si, s in enumerate(self.scale):
+            for si, s in enumerate(self.scales):
                 if s != 1:
                     scale = s
                     names_lr[si].append(os.path.join(self.dir_lr, 'X{}/{}x{}{}' \
                                                      .format(s, filename, scale, self.ext[1])))
-        for si, s in enumerate(self.scale):
+        for si, s in enumerate(self.scales):
             if s == 1:
                 names_lr[si] = names_hr
         return names_hr, names_lr
@@ -182,7 +183,7 @@ class SRData:
 
     def get_patch(self, lr, hr):
         """get_patch"""
-        scale = self.scale[self.idx_scale]
+        scale = self.scales[self.idx_scale]
         if self.train:
             lr, hr = common.get_patch(
                 lr, hr,
@@ -195,9 +196,14 @@ class SRData:
             hr = hr[0:ih * scale, 0:iw * scale]
         return lr, hr
 
-    def set_scale(self, idx_scale):
+    def set_scale(self):
         """set_scale"""
         if not self.input_large:
-            self.idx_scale = idx_scale
+            if self.scale == 2:
+                self.idx_scale = 0
+            elif self.scale == 3:
+                self.idx_scale = 1
+            elif self.scale == 4:
+                self.idx_scale = 2
         else:
-            self.idx_scale = random.randint(0, len(self.scale) - 1)
+            self.idx_scale = random.randint(0, len(self.scales) - 1)

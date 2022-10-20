@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,36 +48,26 @@ class MeanShift(nn.Conv2d):
         self.has_bias = True
 
 
-def _pixelsf_(x, scale):
-    """rcan"""
-    n, c, ih, iw = x.shape
-    oh = ih * scale
-    ow = iw * scale
-    oc = c // (scale ** 2)
-    output = P.Transpose()(x, (0, 2, 1, 3))
-    output = P.Reshape()(output, (n, ih, oc * scale, scale, iw))
-    output = P.Transpose()(output, (0, 1, 2, 4, 3))
-    output = P.Reshape()(output, (n, ih, oc, scale, ow))
-    output = P.Transpose()(output, (0, 2, 1, 3, 4))
-    output = P.Reshape()(output, (n, oc, oh, ow))
-    return output
 
-
-class SmallUpSampler(nn.Cell):
-    """rcan"""
-    def __init__(self, conv, upsize, n_feats, has_bias=True):
-        """rcan"""
-        super(SmallUpSampler, self).__init__()
-        self.conv = conv(n_feats, upsize * upsize * n_feats, 3, has_bias)
-        self.reshape = P.Reshape()
-        self.upsize = upsize
-        self.pixelsf = _pixelsf_
+class PixelShuffle(nn.Cell):
+    """PixelShuffle"""
+    def __init__(self, scale):
+        super(PixelShuffle, self).__init__()
+        self.scale = scale
 
     def construct(self, x):
-        """rcan"""
-        x = self.conv(x)
-        output = self.pixelsf(x, self.upsize)
+        n, c, ih, iw = x.shape
+        oh = ih * self.scale
+        ow = iw * self.scale
+        oc = c // (self.scale ** 2)
+        output = P.Transpose()(x, (0, 2, 1, 3))
+        output = P.Reshape()(output, (n, ih, oc * self.scale, self.scale, iw))
+        output = P.Transpose()(output, (0, 1, 2, 4, 3))
+        output = P.Reshape()(output, (n, ih, oc, self.scale, ow))
+        output = P.Transpose()(output, (0, 2, 1, 3, 4))
+        output = P.Reshape()(output, (n, oc, oh, ow))
         return output
+
 
 
 class Upsampler(nn.Cell):
@@ -88,15 +78,18 @@ class Upsampler(nn.Cell):
         m = []
         if (scale & (scale - 1)) == 0:
             for _ in range(int(math.log(scale, 2))):
-                m.append(SmallUpSampler(conv, 2, n_feats, has_bias=has_bias))
+                m.append(conv(n_feats, 4 * n_feats, 3, has_bias))
+                m.append(PixelShuffle(2))
         elif scale == 3:
-            m.append(SmallUpSampler(conv, 3, n_feats, has_bias=has_bias))
+            m.append(conv(n_feats, 9 * n_feats, 3, has_bias))
+        else:
+            raise NotImplementedError
+
         self.net = nn.SequentialCell(m)
 
     def construct(self, x):
         """rcan"""
         return self.net(x)
-
 
 class AdaptiveAvgPool2d(nn.Cell):
     """rcan"""
@@ -107,8 +100,7 @@ class AdaptiveAvgPool2d(nn.Cell):
 
     def construct(self, x):
         """rcan"""
-        return self.ReduceMean(x, 0)
-
+        return self.ReduceMean(x, (2, 3))
 
 class CALayer(nn.Cell):
     """rcan"""
@@ -130,7 +122,6 @@ class CALayer(nn.Cell):
         y = self.avg_pool(x)
         y = self.conv_du(y)
         return x * y
-
 
 class RCAB(nn.Cell):
     """rcan"""
@@ -159,7 +150,6 @@ class ResidualGroup(nn.Cell):
     def __init__(self, conv, n_feat, kernel_size, reduction, n_resblocks):
         """rcan"""
         super(ResidualGroup, self).__init__()
-        modules_body = []
         modules_body = [
             RCAB(
                 conv, n_feat, kernel_size, reduction, has_bias=True, bn=False, act=nn.ReLU(), res_scale=1) \
@@ -192,27 +182,26 @@ class RCAN(nn.Cell):
         rgb_mean = (0.4488, 0.4371, 0.4040)
         rgb_std = (1.0, 1.0, 1.0)
 
-        self.sub_mean = MeanShift(args.rgb_range, rgb_mean, rgb_std).to_float(self.dytpe)
+        self.sub_mean = MeanShift(args.rgb_range, rgb_mean, rgb_std)
 
         # define head module
-        modules_head = conv(args.n_colors, n_feats, kernel_size).to_float(self.dytpe)
+        modules_head = [conv(args.n_colors, n_feats, kernel_size)]
 
         # define body module
         modules_body = [
             ResidualGroup(
-                conv, n_feats, kernel_size, reduction, n_resblocks=n_resblocks).to_float(self.dytpe) \
+                conv, n_feats, kernel_size, reduction, n_resblocks=n_resblocks)\
             for _ in range(n_resgroups)]
 
-        modules_body.append(conv(n_feats, n_feats, kernel_size).to_float(self.dytpe))
+        modules_body.append(conv(n_feats, n_feats, kernel_size))
 
         # define tail module
         modules_tail = [
-            Upsampler(conv, scale, n_feats).to_float(self.dytpe),
-            conv(n_feats, args.n_colors, kernel_size).to_float(self.dytpe)]
+            Upsampler(conv, scale, n_feats),
+            conv(n_feats, args.n_colors, kernel_size)]
 
-        self.add_mean = MeanShift(args.rgb_range, rgb_mean, rgb_std, 1).to_float(self.dytpe)
-
-        self.head = modules_head
+        self.add_mean = MeanShift(args.rgb_range, rgb_mean, rgb_std, 1)
+        self.head = nn.SequentialCell(modules_head)
         self.body = nn.SequentialCell(modules_body)
         self.tail = nn.SequentialCell(modules_tail)
 
