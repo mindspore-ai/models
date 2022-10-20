@@ -39,11 +39,15 @@ class DataNormTranspose(nn.Cell):
         std (sequence): Sequence of standard deviations for R, G, B channels
             respectively.
     """
-    def __init__(self):
+    def __init__(self, dataset_name='imagenet'):
         super(DataNormTranspose, self).__init__()
         # Computed from random subset of ImageNet training images
-        self.mean = Tensor(np.array([0.485 * 255, 0.456 * 255, 0.406 * 255]).reshape((1, 1, 1, 3)), mstype.float32)
-        self.std = Tensor(np.array([0.229 * 255, 0.224 * 255, 0.225 * 255]).reshape((1, 1, 1, 3)), mstype.float32)
+        if dataset_name == 'imagenet':
+            self.mean = Tensor(np.array([0.485 * 255, 0.456 * 255, 0.406 * 255]).reshape((1, 1, 1, 3)), mstype.float32)
+            self.std = Tensor(np.array([0.229 * 255, 0.224 * 255, 0.225 * 255]).reshape((1, 1, 1, 3)), mstype.float32)
+        else:
+            self.mean = Tensor(np.array([0.4914, 0.4822, 0.4465]).reshape((1, 1, 1, 3)), mstype.float32)
+            self.std = Tensor(np.array([0.2023, 0.1994, 0.2010]).reshape((1, 1, 1, 3)), mstype.float32)
 
     def construct(self, x):
         x = (x - self.mean) / self.std
@@ -54,11 +58,9 @@ class AlexNet(nn.Cell):
     """
     Alexnet
     """
-    def __init__(self, num_classes=10, channel=3, phase='train', include_top=True, off_load=False):
+    def __init__(self, num_classes=10, channel=3, phase='train', include_top=True, dataset_name='imagenet'):
         super(AlexNet, self).__init__()
-        self.off_load = off_load
-        if self.off_load is True:
-            self.data_trans = DataNormTranspose()
+        self.data_trans = DataNormTranspose(dataset_name=dataset_name)
         self.conv1 = conv(channel, 64, 11, stride=4, pad_mode="same", has_bias=True)
         self.conv2 = conv(64, 128, 5, pad_mode="same", has_bias=True)
         self.conv3 = conv(128, 192, 3, pad_mode="same", has_bias=True)
@@ -79,8 +81,7 @@ class AlexNet(nn.Cell):
 
     def construct(self, x):
         """define network"""
-        if self.off_load is True:
-            x = self.data_trans(x)
+        x = self.data_trans(x)
         x = self.conv1(x)
         x = self.relu(x)
         x = self.max_pool2d(x)
