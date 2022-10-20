@@ -110,7 +110,7 @@ def train_alexnet():
         if config.is_dynamic_loss_scale == 1:
             loss_scale_manager = DynamicLossScaleManager(init_loss_scale=65536, scale_factor=2, scale_window=2000)
         else:
-            loss_scale_manager = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
+            loss_scale_manager = FixedLossScaleManager(config.loss_scale, drop_overflow_update=True)
 
     else:
         raise ValueError("Unsupported dataset.")
