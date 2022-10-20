@@ -16,6 +16,7 @@
 
 import argparse
 import numpy as np
+import mindspore.nn as nn
 
 from mindspore import Tensor, context, Parameter
 from mindspore.common import dtype as mstype
@@ -23,7 +24,6 @@ from mindspore.train.serialization import export
 
 from config import Seq2seqConfig
 from src.seq2seq_model.seq2seq import Seq2seqModel
-from src.seq2seq_model.seq2seq_for_infer import Seq2seqInferCell
 from src.utils import zero_weight
 from src.utils.load_weights import load_infer_weights
 
@@ -34,14 +34,39 @@ parser.add_argument('--infer_config', type=str, required=True, help='seq2seq con
 parser.add_argument("--existed_ckpt", type=str, required=True, help="existed checkpoint address.")
 parser.add_argument('--vocab_file', type=str, required=True, help='vocabulary file')
 parser.add_argument("--bpe_codes", type=str, required=True, help="bpe codes to use.")
+parser.add_argument("--device_target", type=str, required=True, default="GPU")
 args = parser.parse_args()
 
 context.set_context(
     mode=context.GRAPH_MODE,
     save_graphs=False,
-    device_target="Ascend",
+    device_target=args.device_target,
     reserve_class_name_in_scope=False)
 
+class Seq2seqInferCell(nn.Cell):
+    """
+    Encapsulation class of Seq2seqModel network infer.
+
+    Args:
+        network (nn.Cell): Seq2seqModel model.
+
+    Returns:
+        Tuple[Tensor, Tensor], predicted_ids and predicted_probs.
+    """
+
+    def __init__(self, network):
+        super(Seq2seqInferCell, self).__init__(auto_prefix=False)
+        self.network = network
+
+    def construct(self,
+                  source_ids_,
+                  source_mask_):
+        """Defines the computation performed."""
+
+        predicted_ids = self.network(source_ids_,
+                                     source_mask_)
+
+        return predicted_ids
 
 def get_config(config_file):
     tfm_config = Seq2seqConfig.from_json_file(config_file)

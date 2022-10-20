@@ -149,7 +149,7 @@ class Seq2seqConfig:
                  warmup_lr_remain_steps=0.666, warmup_lr_decay_interval=-1,
                  decay_start_step=-1, warmup_steps=200,
                  existed_ckpt="", save_ckpt_steps=3452, keep_ckpt_max=6,
-                 ckpt_prefix="seq2seq", ckpt_path: str = None,
+                 ckpt_prefix="seq2seq", ckpt_path: str = None, onnx_file="",
                  save_graphs=False,
                  dtype=mstype.float32):
 
@@ -171,6 +171,7 @@ class Seq2seqConfig:
         self.save_ckpt_steps = save_ckpt_steps
         self.ckpt_prefix = ckpt_prefix
         self.existed_ckpt = existed_ckpt
+        self.onnx_file = onnx_file
 
         self.batch_size = batch_size
         self.seq_length = seq_length

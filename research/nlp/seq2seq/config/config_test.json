@@ -45,6 +45,7 @@
     "save_ckpt_steps": 3452,
     "keep_ckpt_max": 6,
     "ckpt_prefix": "seq2seq",
-    "ckpt_path": "text_translation"
+    "ckpt_path": "text_translation",
+    "onnx_file": " "
   }
 }

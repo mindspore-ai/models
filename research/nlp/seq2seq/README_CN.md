@@ -4,7 +4,7 @@
 
 # Seq2seq描述
 
-Seq2seq是2014年由谷歌公司的研究人员Ilya Sutskever提出的NLP模型，主要用于英语-法语的机器翻译工作。  
+Seq2seq是2014年由谷歌公司的研究人员Ilya Sutskever提出的NLP模型，主要用于英语-法语的机器翻译工作。
 
 [论文](https://arxiv.org/abs/1409.3215)：Ilya Sutskever, Oriol Vinyals, and Quoc V. Le. 2014. Sequence to sequence learning with neural networks. In <i>Proceedings of the 27th International Conference on Neural Information Processing Systems - Volume 2 (NIPS'14). MIT Press, Cambridge, MA, USA, 3104–3112.
 
@@ -33,7 +33,7 @@ bash wmt14_en_fr.sh
 
 ## 混合精度
 
-采用[混合精度](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/mixed_precision.html))的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
+采用[混合精度]的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
 以FP16算子为例，如果输入数据类型为FP32，MindSpore后台会自动降低精度来处理数据。用户可打开INFO日志，搜索“reduce precision”查看精度降低的算子。
 
 # 环境要求
@@ -44,7 +44,7 @@ bash wmt14_en_fr.sh
     - [MindSpore](https://www.mindspore.cn/install/)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
 
 # 快速入门
 
@@ -85,12 +85,12 @@ bash wmt14_en_fr.sh
 ├── seq2seq
   ├── README.md                            // Introduction of Seq2seq model.
   ├── config
-  │   ├──__init__.py                       // User interface.  
+  │   ├──__init__.py                       // User interface.
   │   ├──config.py                         // Configuration instance definition.
   │   ├──config.json                       // Configuration file for pre-train or finetune.
   │   ├──config_test.json                  // Configuration file for test.
   ├── src
-  │   ├──__init__.py                       // User interface.  
+  │   ├──__init__.py                       // User interface.
   │   ├──dataset
   │      ├──__init__.py                    // User interface.
   │      ├──base.py                        // Base class of data loader.
@@ -110,6 +110,7 @@ bash wmt14_en_fr.sh
   │      ├──encoder.py                     // seq2seq encoder component.
   │      ├──seq2seq.py                     // seq2seq model architecture.
   │      ├──seq2seq_for_infer.py           // Use Seq2seq to infer.
+  │      ├ ─ ─ seq2seq_for_infer_onnx.py   // Use Seq2seq to infer on Onnx.
   │      ├──seq2seq_for_train.py           // Use Seq2seq to train.
   │   ├──utils
   │      ├──__init__.py                    // User interface.
@@ -121,11 +122,13 @@ bash wmt14_en_fr.sh
   ├── scripts
   │   ├──run_distributed_train_ascend.sh   // Shell script for distributed train on ascend.
   │   ├──run_standalone_eval_ascend.sh     // Shell script for standalone eval on ascend.
+  │   ├  ─run_standalone_eval_gpu_onnx.sh   // Shell script for standalone eval on onnx.
   │   ├──run_standalone_train_ascend.sh    // Shell script for standalone eval on ascend.
   │   ├──wmt14_en_fr.sh                    // Shell script for download dataset.
   │   ├──filter_dataset.py                 // dataset filter
   ├── create_dataset.py                    // Dataset preparation.
   ├── eval.py                              // Infer API entry.
+  ├ ─  eval_onnx.py                         // Onnx_Infer API entry.
   ├── export.py                            // Export checkpoint file into air/mindir models.
   ├── mindspore_hub_conf.py                // Hub config.
   ├── requirements.txt                     // Requirements of third party package.
@@ -186,6 +189,16 @@ bash wmt14_en_fr.sh
 
   训练结束后，您可在默认脚本文件夹下找到检查点文件。模型检查点保存scripts/device0/text_translation/ckpt_0下。
 
+## 导出过程
+
+### 导出
+
+  ```bash
+  python export.py --file_format=[FILE_FORMAT] --infer_config=[CONFIG_FILE] --existed_ckpt=[CKPT_FILE] --vocab_file=[VOCAB_FILE] --bpe_codes=[BPE_CODES] --device_target=[DEVICE_TARGET]
+  ```
+
+  导出的模型会以模型的结构名字命名并且保存在当前目录下, 注意: FILE_FORMAT 必须在 ["AIR", "MINDIR", "ONNX"]中选择, DEVICE_TARGET 必须在 ["CPU", "GPU", "Ascend"]中选择。
+
 ## 评估过程
 
 ### 评估
@@ -207,6 +220,25 @@ bash wmt14_en_fr.sh
   ```bash
   # grep "accuracy:"
   BLEU scores is :12.1
+  ```
+
+- 在GPU环境下进行Onnx评估，脚本示例如下(注意，在进行Onnx推理前需要先导出onnx文件)
+
+   ```bash
+  cd ./scripts
+  bash run_standalone_eval_onnx.sh \
+       seq2seq/dataset_menu/newstest2014.en.mindrecord \
+       seq2seq/seq2seq.onnx \
+       seq2seq/dataset_menu/vocab.bpe.32000  \
+       seq2seq/dataset_menu/bpe.32000   \
+       seq2seq/dataset_menu/newstest2014.fr
+  ```
+
+   上述python命令将在后台运行，您可以通scripts/eval/log_infer.log文件查看结果。测试数据集的准确性如下：
+
+  ```bash
+  # grep "accuracy:"
+  BLEU scores is :12.9
   ```
 
 # 模型描述
@@ -249,6 +281,6 @@ bash wmt14_en_fr.sh
 
 在train.py中我们设置了随机种子，可在config.json文件中更改随机种子。
 
-# ModelZoo主页  
+# ModelZoo主页
 
  请浏览官网[主页](https://gitee.com/mindspore/models)。

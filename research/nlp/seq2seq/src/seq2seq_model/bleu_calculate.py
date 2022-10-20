@@ -61,8 +61,7 @@ def calculate_sacrebleu(predict_path, target_path):
     """
 
     sacrebleu_params = '--score-only -lc --tokenize intl'
-    sacrebleu = subprocess.run([f'sacrebleu --input {predict_path} \
-                                {target_path} {sacrebleu_params}'],
+    sacrebleu = subprocess.run([f'sacrebleu {target_path} --input {predict_path} {sacrebleu_params}'],
                                stdout=subprocess.PIPE, shell=True)
     bleu_scores = round(float(sacrebleu.stdout.strip()), 2)
     return bleu_scores
