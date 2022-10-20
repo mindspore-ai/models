@@ -18,6 +18,7 @@
         - [分布式训练](#分布式训练)
     - [评估过程](#评估过程)
         - [评估](#评估)
+        - [ONNX评估](#ONNX评估)
     - [推理过程](#推理过程)
         - [导出MindIR](#导出MindIR)
         - [在Ascend310执行推理](#在Ascend310执行推理)
@@ -140,6 +141,7 @@ HarDNet指的是Harmonic DenseNet: A low memory traffic network，其突出的�
         |   ├──run_single_train_gpu.sh             // 单卡到GPU的shell脚本
         │   ├──run_distribute_train_gpu.sh             // 分布式到GPU的shell脚本
         │   ├──run_eval_gpu.sh              // GPU评估的shell脚本
+        │   ├──run_onnx_eval_gpu.sh                  // ONNX评估的shell脚本
         ├── src
         │   ├──dataset.py             // 创建数据集
         │   ├──hardnet.py          //  hardnet架构
@@ -151,6 +153,7 @@ HarDNet指的是Harmonic DenseNet: A low memory traffic network，其突出的�
         ├── train.py               // 训练脚本
         ├── eval.py               // 评估脚本
         ├── export.py             //将checkpoint文件导出到air/onnx下
+        ├── eval_onnx.py          // ONNX评估脚本
 ```
 
 ## 脚本参数
@@ -338,6 +341,31 @@ HarDNet指的是Harmonic DenseNet: A low memory traffic network，其突出的�
   ```bash
   # grep "accuracy:" dist.eval.log
   accuracy:{'acc':0.777}
+  ```
+
+### ONNX评估
+
+- 导出ONNX模型
+
+  ```bash
+  python export.py --batch_size 256 --ckpt_file /path/to/checkpoint.ckpt --file_name hardnet --file_format ONNX --device_target GPU
+  ```
+
+- 运行ONNX模型评估
+
+  ```bash
+  bash scripts/run_onnx_eval_gpu.sh DATA_PATH DEVICE_ID ONNX_MODEL_PATH
+      DATA_PATH 为推理数据路径
+      DEVICE_ID 为GPU设备id
+      ONNX_MODEL_PATH 为onnx模型路径
+  #example: bash scripts/run_onnx_eval_gpu.sh /path/to/imagenet2012/validation 0 /path/to/hardnet.onnx
+  ```
+
+- 上述命令将在后台运行，运行结束后可以通过文件`eval_onnx.log`查看结果。将会得到如下精度：
+
+  ```bash
+  top-1 accuracy: 0.7771
+  top-5 accuracy: 0.9330
   ```
 
 ## 推理过程
