@@ -65,6 +65,7 @@ def init_dataset(cfg, dataset_type="train"):
         "lr_type": cfg.lr_type,
         "batch_size": cfg.batch_size,
         "patch_size": cfg.patch_size,
+        "eval_type": cfg.eval_type,
     }
     if cfg.dataset_name == "DIV2K":
         dataset = create_dataset_DIV2K(config=ds_cfg,

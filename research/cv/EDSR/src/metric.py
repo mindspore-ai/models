@@ -199,13 +199,12 @@ class Quantizer(nn.Cell):
     """
     def __init__(self, _min=0.0, _max=255.0):
         super(Quantizer, self).__init__()
-        self.round = ops.Round()
         self._min = _min
         self._max = _max
 
     def construct(self, x):
         x = ops.clip_by_value(x, self._min, self._max)
-        x = self.round(x)
+        x = x.astype("Int32")
         return x
 
 
@@ -239,6 +238,7 @@ class _DistMetric(nn.Metric):
         if get_device_num is not None and get_device_num() > 1:
             self.all_reduce_sum = TensorSyncer(_type="sum")
         self.clear()
+        self.sum = None
 
     def _accumulate(self, value):
         if isinstance(value, (list, tuple)):
@@ -293,7 +293,7 @@ class PSNR(_DistMetric):
         diff = (sr - hr) / self.rgb_range
         valid = diff
         if self.shave is not None and self.shave != 0:
-            valid = valid[..., self.shave:(-self.shave), self.shave:(-self.shave)]
+            valid = valid[..., int(self.shave):int(-self.shave), int(self.shave):int(-self.shave)]
         mse_list = (valid ** 2).mean(axis=(1, 2, 3))
         mse_list = self._convert_data(mse_list).tolist()
         psnr_list = [float(1e32) if mse == 0 else(- 10.0 * math.log10(mse)) for mse in mse_list]

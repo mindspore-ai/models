@@ -241,7 +241,10 @@ def create_dataset_DIV2K(config, dataset_type="train", num_parallel_workers=10, 
     """
     dataset_path = config["dataset_path"]
     lr_scale = config["scale"]
-    lr_type = config.get("lr_type", "bicubic")
+    if config["eval_type"] == "ONNX":
+        lr_type = config.get("lr_type", "bicubic_AUG_self_ensemble")
+    else:
+        lr_type = config.get("lr_type", "bicubic")
     batch_size = config.get("batch_size", 1)
     patch_size = config.get("patch_size", -1)
     epoch_size = config.get("epoch_size", None)
@@ -261,7 +264,10 @@ def create_dataset_DIV2K(config, dataset_type="train", num_parallel_workers=10, 
     lrs_pattern = []
     for lr_scale in multi_lr_scale:
         dir_lr = os.path.join(dataset_path, f"DIV2K_{dataset_type}_LR_{lr_type}", f"X{lr_scale}")
-        lr_pattern = os.path.join(dir_lr, f"*x{lr_scale}.png")
+        if config["eval_type"] == "ONNX":
+            lr_pattern = os.path.join(dir_lr, f"*x{lr_scale}_0.png")
+        else:
+            lr_pattern = os.path.join(dir_lr, f"*x{lr_scale}.png")
         lrs_pattern.append(lr_pattern)
         column_names.append(f"lrx{lr_scale}")
     column_names.append("hr")  # ["lrx2","lrx3","lrx4",..., "hr"]
