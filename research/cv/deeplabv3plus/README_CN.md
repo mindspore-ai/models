@@ -641,6 +641,32 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_
 | 微调检查点 | 453M （.ckpt文件） | 454M （.ckpt文件）|
 | 脚本 | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/deeplabv3plus) |[链接](https://gitee.com/mindspore/models/tree/master/research/cv/deeplabv3plus) |
 
+#### Running ONNX evaluation
+
+First, export your model:
+
+```shell
+python export.py \
+  --checkpoint /path/to/checkpoint.ckpt \
+  --filename /path/to/exported.onnx \
+  --model [deeplab_v3_s16 or deeplab_v3_s8]  
+```
+
+Next, run evaluation:
+
+```shell
+python eval_onnx.py \
+  --file_name /path/to/exported.onnx
+  --data_root /path/to/VOC2012/
+  --data_lst /path/to/VOC2012/voc_val_lst.txt \
+  --device_target GPU \
+  --batch_size [batch size]
+
+or
+
+bash run_eval_onnx.sh [DATA_ROOT] [DATA_LST] [FILE_NAME]
+```
+
 # 随机情况说明
 
 dataset.py中设置了“create_dataset”函数内的种子，同时还使用了train.py中的随机种子。
