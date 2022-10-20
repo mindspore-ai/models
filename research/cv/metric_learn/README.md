@@ -139,7 +139,7 @@ cd Stanford_Online_Products && head -n 1048 test.txt > test_tiny.txt
 
 ## Mixed precision
 
-The [mixed precision](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html) training
+The [mixed precision](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/mixed_precision.html) training
 method uses single-precision and half-precision data to improve the training speed of deep learning neural networks,
 while maintaining the network accuracy that can be achieved by single-precision training. Mixed-precision training
 improves computing speed and reduces memory usage, while supporting training larger models or achieving larger batches
