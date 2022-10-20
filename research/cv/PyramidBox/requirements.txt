@@ -1,0 +1,7 @@
+easydict==1.9
+mindspore-gpu==1.8.1
+numpy==1.21.5
+opencv-python==4.5.5.62
+Pillow==9.0.0
+scikit-image==0.18.3
+tqdm==4.64.1
