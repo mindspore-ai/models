@@ -46,18 +46,16 @@ def create_dataset_cifar10(cfg, data_path, batch_size=32, status="train", target
 
     resize_op = CV.Resize((cfg.image_height, cfg.image_width))
     rescale_op = CV.Rescale(rescale, shift)
-    normalize_op = CV.Normalize((0.4914, 0.4822, 0.4465), (0.2023, 0.1994, 0.2010))
     if status == "train":
         random_crop_op = CV.RandomCrop([32, 32], [4, 4, 4, 4])
         random_horizontal_op = CV.RandomHorizontalFlip()
-    channel_swap_op = CV.HWC2CHW()
     typecast_op = C.TypeCast(mstype.int32)
     cifar_ds = cifar_ds.map(input_columns="label", operations=typecast_op,
                             num_parallel_workers=1)
     if status == "train":
-        compose_op = [random_crop_op, random_horizontal_op, resize_op, rescale_op, normalize_op, channel_swap_op]
+        compose_op = [random_crop_op, random_horizontal_op, resize_op, rescale_op]
     else:
-        compose_op = [resize_op, rescale_op, normalize_op, channel_swap_op]
+        compose_op = [resize_op, rescale_op]
     cifar_ds = cifar_ds.map(input_columns="image", operations=compose_op, num_parallel_workers=num_parallel_workers)
 
     cifar_ds = cifar_ds.batch(batch_size, drop_remainder=True)
