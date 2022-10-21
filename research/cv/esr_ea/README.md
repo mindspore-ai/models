@@ -251,3 +251,7 @@ The Results on super resolution tasks are listed as below.
 ## ModeZoo Homepage
 
 Please check the official [homepage](https://gitee.com/mindspore/models).
+
+## FAQ
+
+- **this network doesn't support PYNATIVE mode.**
