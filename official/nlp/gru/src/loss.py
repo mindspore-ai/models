@@ -27,6 +27,6 @@ class NLLLoss(LossBase):
         self.reduce_sum = P.ReduceSum()
 
     def construct(self, logits, label):
-        label_one_hot = self.one_hot(label, F.shape(logits)[-1], F.scalar_to_array(1.0), F.scalar_to_array(0.0))
+        label_one_hot = self.one_hot(label, F.shape(logits)[-1], F.scalar_to_tensor(1.0), F.scalar_to_tensor(0.0))
         loss = self.reduce_sum(-1.0 * logits * label_one_hot, (1,))
         return self.get_loss(loss)

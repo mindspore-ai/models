@@ -100,10 +100,10 @@ class CrossEntropy(MyLoss):
             self.cast(label, mstype.int32), F.shape(logit)[1], self.on_value, self.off_value)
         loss = self.sum((self.log(softmax_result + self.eps_const) *
                          self.cast(one_hot_label, mstype.float32) *
-                         self.cast(F.scalar_to_array(-1), mstype.float32)), -1)
+                         self.cast(F.scalar_to_tensor(-1), mstype.float32)), -1)
         batch_size = F.shape(logit)[0]
         batch_size_tensor = self.cast(
-            F.scalar_to_array(batch_size), mstype.float32)
+            F.scalar_to_tensor(batch_size), mstype.float32)
         loss = self.sum(loss, -1) / batch_size_tensor
         return loss
 

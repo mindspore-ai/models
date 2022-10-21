@@ -64,14 +64,14 @@ class CEWithIgnoreIndex3D(LossBase):
         '''construct'''
         mask = self.reshape(label, (F.shape(label)[0], F.shape(label)[1], 1))
         mask = self.cast(mask, mstype.float32)
-        mask = mask + F.scalar_to_array(0.00001)
+        mask = mask + F.scalar_to_tensor(0.00001)
         mask = self.relu(mask) / (mask)
         logit = logit * mask
 
         softmax_result = self.logsoftmax(logit)
         one_hot_label = self.onehot(
             self.cast(label, mstype.int32), F.shape(logit)[2], self.on_value, self.off_value)
-        loss = (softmax_result * self.cast(one_hot_label, mstype.float32) * self.cast(F.scalar_to_array(-1),
+        loss = (softmax_result * self.cast(one_hot_label, mstype.float32) * self.cast(F.scalar_to_tensor(-1),
                                                                                       mstype.float32))
 
         loss = self.sum(loss, -1)

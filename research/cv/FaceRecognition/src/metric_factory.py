@@ -75,7 +75,7 @@ class CombineMarginFC(Cell):
             theta = self.m_const + theta
             body = self.cos(theta)
             body = body - self.b_const
-            cos_mask = self.cast(F.scalar_to_array(
+            cos_mask = self.cast(F.scalar_to_tensor(
                 1.0), mstype.float16) - one_hot_float
             output = body * one_hot_float + cosine * cos_mask
             output = output * self.s_const

@@ -210,17 +210,17 @@ class Iou(nn.Cell):
         """
         box1_xy = box1[:, :, :, :, :, :2]
         box1_wh = box1[:, :, :, :, :, 2:4]
-        box1_mins = box1_xy - box1_wh / ops.scalar_to_array(2.0) # topLeft
-        box1_maxs = box1_xy + box1_wh / ops.scalar_to_array(2.0) # rightDown
+        box1_mins = box1_xy - box1_wh / ops.scalar_to_tensor(2.0) # topLeft
+        box1_maxs = box1_xy + box1_wh / ops.scalar_to_tensor(2.0) # rightDown
 
         box2_xy = box2[:, :, :, :, :, :2]
         box2_wh = box2[:, :, :, :, :, 2:4]
-        box2_mins = box2_xy - box2_wh / ops.scalar_to_array(2.0)
-        box2_maxs = box2_xy + box2_wh / ops.scalar_to_array(2.0)
+        box2_mins = box2_xy - box2_wh / ops.scalar_to_tensor(2.0)
+        box2_maxs = box2_xy + box2_wh / ops.scalar_to_tensor(2.0)
 
         intersect_mins = self.max(box1_mins, box2_mins)
         intersect_maxs = self.min(box1_maxs, box2_maxs)
-        intersect_wh = self.max(intersect_maxs - intersect_mins, ops.scalar_to_array(0.0))
+        intersect_wh = self.max(intersect_maxs - intersect_mins, ops.scalar_to_tensor(0.0))
         # self.squeeze: for effiecient slice
         intersect_area = self.squeeze(intersect_wh[:, :, :, :, :, 0:1]) * \
                          self.squeeze(intersect_wh[:, :, :, :, :, 1:2])
