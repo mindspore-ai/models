@@ -332,9 +332,10 @@ ModelArts导出mindir
 
 ```shell
 #Ascend310 推理
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [DEVICE_TARGET] [DATA_PATH] [DEVICE_ID]
 ```
 
+`DEVICE_TARGET` 生成MindIR的环境, 在'Ascend'，'GPU'和'CPU'中选择。
 `DEVICE_ID` 可选，默认值为 0。
 
 ### 结果

@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 2 || $# -gt 3 ]]; then
-    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
+if [[ $# -lt 3 || $# -gt 4 ]]; then
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DEVICE_TARGET] [DATA_PATH] [DEVICE_ID]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi
@@ -28,14 +28,16 @@ get_real_path(){
     fi
 }
 model=$(get_real_path $1)
-data_path=$(get_real_path $2)
+device_target=$2
+data_path=$(get_real_path $3)
 
 device_id=0
-if [ $# == 3 ]; then
-    device_id=$3
+if [ $# == 4 ]; then
+    device_id=$4
 fi
 
 echo "mindir name: "$model
+echo "mindir device target: "$device_target
 echo "dataset path: "$data_path
 echo "device id: "$device_id
 
@@ -75,7 +77,7 @@ function infer()
 function cal_acc()
 {
     python ../create_imagenet2012_label.py  --img_path=$data_path
-    python ../postprocess.py --result_path=./result_Files --label_path=./imagenet_label.json  &> acc.log &
+    python ../postprocess.py --result_path=./result_Files --label_path=./imagenet_label.json --device_target=$device_target &> acc.log &
 }
 
 compile_app
