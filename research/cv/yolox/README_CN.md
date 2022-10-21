@@ -58,8 +58,8 @@ head中的回归分支和分类分支进行了解耦(Decoupled head),并且将ob
             ├── dataset
                 ├── coco2017
                     ├── annotations
-                    │   ├─ train.json
-                    │   └─ val.json
+                    │   ├─ instances_train2017.json
+                    │   └─ instances_val2017.json
                     ├─ train
                     │   ├─picture1.jpg
                     │   ├─ ...
@@ -100,12 +100,12 @@ head中的回归分支和分类分支进行了解耦(Decoupled head),并且将ob
 
     ```shell
   # 单卡训练(前285轮)
-  python train.py --data_aug=True --is_distributed=0 --backbone='yolox_darknet53'
+  python train.py --config_path=yolox_darknet53.yaml --data_aug=True --is_distributed=0 --backbone='yolox_darknet53'
     ```
 
   ```shell
   # 单卡训练(后15轮)
-  python train.py --data_aug=False --is_distributed=0 --backbone='yolox_darknet53' --yolox_no_aug_ckpt="your_285_ckpt_file.ckpt"
+  python train.py --config_path=yolox_darknet53.yaml --data_aug=False --is_distributed=0 --backbone='yolox_darknet53' --resume_yolox="your_285_ckpt_file.ckpt"
   ```
 
   ```shell
@@ -121,7 +121,7 @@ head中的回归分支和分类分支进行了解耦(Decoupled head),并且将ob
 - 在本地进行评估
 
     ```shell
-    python eval.py --data_dir=./dataset/xxx --val_ckpt=your_val_ckpt_file_path --per_batch_size=8
+    python eval.py --config_path=yolox_darknet53.yaml --data_dir=./dataset/xxx --val_ckpt=your_val_ckpt_file_path --per_batch_size=8
     ```
 
 # 脚本说明
@@ -129,8 +129,7 @@ head中的回归分支和分类分支进行了解耦(Decoupled head),并且将ob
 ## 脚本及样例代码
 
 ```text
-    |----README.en.md
-    |----README.md
+    |----README_CN.md
     |----ascend310_infer
     |    |----build.sh
     |    |----CMakeLists.txt
@@ -169,7 +168,8 @@ head中的回归分支和分类分支进行了解耦(Decoupled head),并且将ob
     |----export.py
     |----postprocess.py
     |----preprocess.py
-    |----default_config.yaml
+    |----yolox_darknet53_config.yaml
+    |----yolox_x_config.yaml
 ```
 
 ## 脚本参数
@@ -184,7 +184,7 @@ train.py中主要的参数如下:
                             实现代码的设备，默认为'Ascend'
 --outputs_dir               训练信息的保存文件目录
 --save_graphs               是否保存图文件，默认为False
---max_epoch                 开启数据增强的训练轮次，默认为285
+--aug_epochs                 开启数据增强的训练轮次，默认为285
 --no_aug_epochs             关闭数据增强的训练轮次，默认为15
 --data_dir                  数据集的目录
 --need_profiler
@@ -225,7 +225,7 @@ train.py中主要的参数如下:
 
     ```shell
     # 单卡训练(前285轮，开启数据增强)
-    python train.py --data_aug=True --is_distributed=0 --backbone='yolox_darknet53'
+    python train.py --config_path=yolox_darknet53.yaml --data_dir=~/coco2017 --is_distributed=0 --backbone='yolox_darknet53'
     ```
 
     shell脚本启动
@@ -241,13 +241,13 @@ train.py中主要的参数如下:
 
     ```shell
     # 单卡训练(后15轮，关闭数据增强)
-    python train.py --data_aug=False --is_distributed=0 --backbone='yolox_darknet53' --yolox_no_aug_ckpt="your_285_ckpt_file_path.ckpt"
+    python train.py --config_path=yolox_darknet53.yaml --data_dir=~/coco2017 --is_distributed=0 --backbone='yolox_darknet53' --resume_yolox="your_285_ckpt_file_path.ckpt"
      ```
 
     shell脚本启动
 
     ```shell
-    bash run_standalone_train.sh  [DATASET_PATH] [BACKBONE] [LATEST_CKPT]
+    bash run_standalone_train.sh  [DATASET_PATH] [BACKBONE] [RESUME_CKPT]
     ```
 
 ### 分布式训练
@@ -295,7 +295,7 @@ train.py中主要的参数如下:
 #### python命令启动
 
 ```shell
-python eval.py --data_dir=./dataset/xxx --val_ckpt=your_val_ckpt_file_path --per_batch_size=8 --backbone=yolox_x
+python eval.py --data_dir=./dataset/xxx --val_ckpt=your_val_ckpt_file_path --per_batch_size=8 --backbone=yolox_darknet53
 ```
 
 backbone参数指定为yolox_darknet53或者yolox_x,上述python命令将在后台运行。 您可以通过```%Y-%m-%d_time_%H_%M_%S.log```文件查看结果。
@@ -309,18 +309,18 @@ bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [BACKBONE] [BATCH_SIZE]
 ```log
 
    ===============================coco eval result===============================
-   Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.451
-   Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.646
-   Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.494
-   Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.281
-   Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.493
-   Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.577
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.350
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.566
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.610
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.416
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.664
-   Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.751
+   Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.480
+   Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.674
+   Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.524
+   Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.304
+   Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.525
+   Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.616
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.364
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.585
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.625
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.435
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.678
+   Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.762
 
 ```
 
@@ -328,7 +328,7 @@ bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [BACKBONE] [BATCH_SIZE]
 
 ```shell
 
-python export.py --backbone [backbone] --val_ckpt [CKPT_PATH] --file_format [MINDIR/AIR]
+python export.py --config_path=yolox_darknet53.yaml --backbone=yolox_darknet53 --val_ckpt [CKPT_PATH] --file_format [MINDIR/AIR]
 
 ```
 
@@ -397,51 +397,51 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_DIR] [DEVICE_ID]
 
 YOLOX应用于118000张图像上（标注和数据格式必须与COCO 2017相同）
 
-|参数| YOLOX-darknet53 |
-| -------------------------- | ----------------------------------------------------------- |
-|资源| Ascend 910；CPU 2.60GHz, 192核；内存：755G；系统：EulerOS 2.8；|
-|上传日期|2022年3月11日|
-| MindSpore版本|1.3.0-alpha|
-|数据集|coco2017|
-|训练参数|epoch=300, batch_size=8, lr=0.011,momentum=0.9|
-| 优化器                  | Momentum                                                    |
-|损失函数|Sigmoid Cross Entropy, Iou Loss, L1 Loss|
-|输出|框和标签|
-|速度| 1卡：25FPS；8卡：190FPS (shape=640)|
-|总时长|52小时|
-|微调检查点|约750M（.ckpt文件）|
-|脚本| <https://gitee.com/mindspore/models/tree/master/official/cv/yolov4> |
+|参数| YOLOX-darknet53                                                    |
+| -------------------------- |--------------------------------------------------------------------|
+|资源| Ascend 910；CPU 2.60GHz, 192核；内存：755G；系统：EulerOS 2.8；               |
+|上传日期| 2022年10月21日                                                        |
+| MindSpore版本| 1.8.1-alpha                                                        |
+|数据集| coco2017                                                           |
+|训练参数| epoch=300, batch_size=8, lr=0.01,momentum=0.9                      |
+| 优化器                  | SGD                                                                |
+|损失函数| Sigmoid Cross Entropy, Iou Loss, L1 Loss                           |
+|输出| 框和标签                                                               |
+|速度| 1卡：25FPS；8卡：190FPS (shape=640)                                     |
+|总时长| 52小时                                                               |
+|微调检查点| 约1000M（.ckpt文件）                                                    |
+|脚本| <https://gitee.com/mindspore/models/tree/master/research/cv/yolox> |
 
-|参数| YOLOX-x |
-| -------------------------- | ----------------------------------------------------------- |
-|资源| Ascend 910；CPU 2.60GHz, 192核；内存：755G；系统：EulerOS 2.8；|
-|上传日期|2022年3月11日|
-| MindSpore版本|1.3.0-alpha|
-|数据集|118000张图像|
-|训练参数|epoch=300, batch_size=8, lr=0.04,momentum=0.9|
-| 优化器                  | Momentum                                                    |
-|损失函数|Sigmoid Cross Entropy, Iou Loss, L1 Loss|
-|输出|框和标签|
-|损失| 50 |
-|速度| 1卡：12FPS；8卡：93FPS (shape=640)|
-|总时长|106小时|
-|微调检查点|约1100M（.ckpt文件）|
-|脚本| <https://gitee.com/mindspore/models/tree/master/official/cv/yolov4> |
+|参数| YOLOX-x                                                            |
+| -------------------------- |--------------------------------------------------------------------|
+|资源| Ascend 910；CPU 2.60GHz, 192核；内存：755G；系统：EulerOS 2.8；               |
+|上传日期| 2022年3月11日                                                         |
+| MindSpore版本| 1.3.0-alpha                                                        |
+|数据集| 118000张图像                                                          |
+|训练参数| epoch=300, batch_size=8, lr=0.04,momentum=0.9                      |
+| 优化器                  | Momentum                                                           |
+|损失函数| Sigmoid Cross Entropy, Iou Loss, L1 Loss                           |
+|输出| 框和标签                                                               |
+|损失| 50                                                                 |
+|速度| 1卡：12FPS；8卡：93FPS (shape=640)                                      |
+|总时长| 106小时                                                              |
+|微调检查点| 约1100M（.ckpt文件）                                                    |
+|脚本| <https://gitee.com/mindspore/models/tree/master/research/cv/yolox> |
 
 ### 推理性能
 
 YOLOX应用于118000张图像上（标注和数据格式必须与COCO test 2017相同）
 
-|参数| YOLOX-darknet53 |
-| -------------------------- | ----------------------------------------------------------- |
-| 资源                   | Ascend 910；CPU 2.60GHz，192核；内存：755G             |
-|上传日期|2020年10月16日|
-| MindSpore版本|1.3.0-alpha|
-|数据集|118000张图像|
-|批处理大小|1|
-|输出|边框位置和分数，以及概率|
-|精度|map = 47.4%(shape=640)|
-|推理模型|约750M（.ckpt文件）|
+|参数| YOLOX-darknet53                     |
+| -------------------------- |-------------------------------------|
+| 资源                   | Ascend 910；CPU 2.60GHz，192核；内存：755G |
+|上传日期| 2022年10月21日                         |
+| MindSpore版本| 1.3.0-alpha                         |
+|数据集| 118000张图像                           |
+|批处理大小| 1                                   |
+|输出| 边框位置和分数，以及概率                        |
+|精度| map = 48.0%(shape=640)              |
+|推理模型| 约1000M（.ckpt文件）                     |
 
 |参数| YOLOX-x |
 | -------------------------- | ----------------------------------------------------------- |

@@ -195,7 +195,7 @@ def initialize_head_biases(network, prior_prob):
 def load_yolox_params(args, network):
     """Load yolox darknet parameter from checkpoint."""
     if args.pretrained_backbone:
-        network = load_weights(network, args.pretrained_backbone, args)
+        network = load_weights(network, args.pretrained, pretrained=True)
         args.logger.info('load pre-trained backbone {} into network'.format(args.pretrained_backbone))
     else:
         args.logger.info('Not load pre-trained backbone, please be careful')
@@ -204,7 +204,7 @@ def load_yolox_params(args, network):
 def load_resume_params(args, network):
     if args.resume_yolox:
         args.logger.info('Start to load resume parameters...')
-        network = load_backbone(network, args.resume_yolox, args)
+        network = load_weights(network, args.pretrained)
         args.logger.info('resume finished')
         args.logger.info('load_model {} success'.format(args.resume_yolox))
     else:

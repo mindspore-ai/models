@@ -235,6 +235,7 @@ class YOLOLossCell(nn.Cell):
         self.use_l1 = config.use_l1
         self.use_summary = config.use_summary
         self.summary = ops.ScalarSummary()
+        self.assign = ops.Assign()
 
     def construct(self, img, labels=None, pre_fg_mask=None, is_inbox_and_incenter=None):
         """ forward with loss return """
@@ -404,9 +405,8 @@ class IOUloss(nn.Cell):
 class TrainOneStepWithEMA(nn.TrainOneStepCell):
     """ Train one step with ema model """
 
-    def __init__(self, network, optimizer, dataset_size, sens=1.0, ema=True, decay=0.9998, updates=0):
+    def __init__(self, network, optimizer, sens=1.0, ema=True, decay=0.9998, updates=0):
         super(TrainOneStepWithEMA, self).__init__(network, optimizer, sens=sens)
-        self.dataset_size = dataset_size
         self.ema = ema
         self.decay = decay
         self.updates = Parameter(Tensor(updates, mindspore.float32))

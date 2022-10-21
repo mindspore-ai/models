@@ -15,6 +15,7 @@
 """ utils """
 import os
 import sys
+import re
 import time
 import math
 import json
@@ -264,7 +265,7 @@ def get_param_groups(network, weight_decay, use_group_params=True):
     return network.trainable_params()
 
 
-def load_weights(net, ckpt_path):
+def load_weights(net, ckpt_path, pretrained=False):
     """Load darknet53 backbone checkpoint."""
     checkpoint_param = load_checkpoint(ckpt_path)
     ema_param_dict = dict()
@@ -275,8 +276,12 @@ def load_weights(net, ckpt_path):
             new_name = param.split("ema.")[1]
             ema_data = checkpoint_param[param]
             ema_data.name = new_name
+            if re.search('cls_preds|reg_preds|obj_preds', new_name) and pretrained:
+                continue
             ema_param_dict[new_name] = ema_data
         elif param.startswith('network.'):
+            if re.search('cls_preds|reg_preds|obj_preds', param) and pretrained:
+                continue
             param_dict[param] = checkpoint_param[param]
 
     if ema_param_dict:
@@ -357,7 +362,7 @@ class YOLOXCB(Callback):
         self.max_epoch = config.max_epoch
         self.is_modelarts = is_modelart
         self.current_step = 0
-        self.iter_time = time.time()
+        self.step_start_time = time.time()
         self.epoch_start_time = time.time()
         self.average_loss = []
 
@@ -369,7 +374,7 @@ class YOLOXCB(Callback):
             run_context (RunContext): Include some information of the model.
         """
         self.epoch_start_time = time.time()
-        self.iter_time = time.time()
+        self.step_start_time = time.time()
 
     def epoch_end(self, run_context):
         """
@@ -381,10 +386,11 @@ class YOLOXCB(Callback):
         cb_params = run_context.original_args()
         cur_epoch = cb_params.cur_epoch_num
         loss = cb_params.net_outputs
-        loss = "loss: %.4f" % (float(loss.asnumpy()))
-        self.logger.info(
-            "epoch: [%s/%s] time %.2fs %s" % (
-                cur_epoch, self.max_epoch, time.time() - self.epoch_start_time, loss))
+        epoch_time = time.time() - self.epoch_start_time
+        avg_step_time = epoch_time * 1000 / self.step_per_epoch
+        loss = "total loss: %.4f" % (float(loss.asnumpy()))
+        self.logger.info("epoch: [%s/%s] epoch time: %.2fs %s avg step time: %.2fms" % (
+            cur_epoch, self.max_epoch, epoch_time, loss, avg_step_time))
 
         if self.current_step % (self.step_per_epoch * 1) == 0:
             if self.is_modelarts:
@@ -410,18 +416,18 @@ class YOLOXCB(Callback):
         Args:
             run_context (RunContext): Include some information of the model.
         """
-
+        cb_params = run_context.original_args()
+        data_sink_mode = cb_params.dataset_sink_mode
         cur_epoch_step = (self.current_step + 1) % self.step_per_epoch
-        if cur_epoch_step % self._per_print_times == 0 and cur_epoch_step != 0:
-            cb_params = run_context.original_args()
+        if cur_epoch_step % self._per_print_times == 0 and cur_epoch_step != 0 and not data_sink_mode:
             cur_epoch = cb_params.cur_epoch_num
+            avg_step_time = (time.time() - self.step_start_time) * 1000 / self._per_print_times
             loss = cb_params.net_outputs
-            loss = "loss: %.4f" % (float(loss.asnumpy()))
-            self.logger.info("epoch: [%s/%s] step: [%s/%s], %s, lr: %.6f, avg step time: %.2f ms" % (
-                cur_epoch, self.max_epoch, cur_epoch_step, self.step_per_epoch, loss,
-                self.lr[self.current_step],
-                (time.time() - self.iter_time) * 1000 / self._per_print_times))
-            self.iter_time = time.time()
+            loss = "total loss: %.4f" % (float(loss.asnumpy()))
+            self.logger.info("epoch: [%s/%s] step: [%s/%s], lr: %.6f, %s, avg step time: %.2fms" % (
+                cur_epoch, self.max_epoch, cur_epoch_step, self.step_per_epoch, self.lr[self.current_step],
+                loss, avg_step_time))
+            self.step_start_time = time.time()
         self.current_step += 1
 
     def end(self, run_context):

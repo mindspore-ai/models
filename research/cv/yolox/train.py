@@ -37,7 +37,6 @@ from src.util import get_specified, get_param_groups, YOLOXCB, get_lr, load_weig
 from src.yolox import YOLOLossCell, TrainOneStepWithEMA, DetectionBlock
 from src.yolox_dataset import create_yolox_dataset
 
-
 set_seed(888)
 
 
@@ -51,7 +50,11 @@ def set_default():
         config.data_root = os.path.join(config.data_dir, 'train2017')
         config.annFile = os.path.join(config.data_dir, 'annotations/instances_train2017.json')
         outputs_dir = os.getcwd()
-        config.save_ckpt_dir = os.path.join(config.ckpt_dir, config.backbone)
+        if config.resume_yolox:
+            base_dir = os.path.abspath(config.resume_yolox)
+            config.save_ckpt_dir = os.path.dirname(base_dir)
+        else:
+            config.save_ckpt_dir = os.path.join(config.ckpt_dir, config.backbone)
 
     # logger
     config.outputs_dir = os.path.join(outputs_dir, datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
@@ -199,6 +202,7 @@ def get_val_dataset():
 def get_optimizer(cfg, network, lr):
     if cfg.opt == "SGD":
         from mindspore.nn import SGD
+        # SGD grouping parameters is currently not supported
         params = get_param_groups(network, cfg.weight_decay, use_group_params=False)
         opt = SGD(params=params, learning_rate=Tensor(lr), momentum=config.momentum, weight_decay=config.weight_decay,
                   nesterov=True)
@@ -243,8 +247,8 @@ def run_train():
     default_recurisive_init(base_network)
     config.logger.info("Network weights have been initialized...")
     if config.pretrained:
-        base_network = load_weights(base_network, config.pretrained)
-        config.logger.info('pretrained is: ', config.pretrained)
+        base_network = load_weights(base_network, config.pretrained, pretrained=True)
+        config.logger.info('pretrained is: %s' % config.pretrained)
     config.logger.info('Training backbone is: %s' % config.backbone)
 
     network = YOLOLossCell(base_network, config)
@@ -253,7 +257,9 @@ def run_train():
     if config.resume_yolox:
         if not os.path.isfile(config.resume_yolox):
             raise TypeError('resume_yolox should be checkpoint path')
-        resume_param = load_checkpoint(config.resume_yolox, filter_prefix=['learning_rate', 'global_step'])
+        resume_param = load_checkpoint(config.resume_yolox,
+                                       filter_prefix=['learning_rate', 'global_step', 'updates', 'momentum',
+                                                      'best_result', 'best_epoch'])
         resume_epoch = config.resume_yolox.split('-')[1].split('_')[0]
         config.start_epoch = int(resume_epoch)
         if config.start_epoch >= config.aug_epochs:
@@ -278,11 +284,10 @@ def run_train():
     config.logger.info("Learning rate scheduler:%s, base_lr:%s, min lr ratio:%s" % (config.lr_scheduler, config.lr,
                                                                                     config.min_lr_ratio))
     opt = get_optimizer(config, network, lr)
-    network_ema = TrainOneStepWithEMA(network, opt, config.steps_per_epoch, ema=config.use_ema,
-                                      decay=0.9998).set_train()
+    network_ema = TrainOneStepWithEMA(network, opt, ema=config.use_ema, decay=0.9998).set_train()
     if config.resume_yolox:
         load_param_into_net(network_ema, resume_param)
-    config.logger.info("Add ema model")
+    config.logger.info("use ema model: %s" % config.use_ema)
     model = Model(network_ema)
 
     cb = []
