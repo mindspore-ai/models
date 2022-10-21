@@ -104,7 +104,7 @@ sh scripts/run_distributed.sh [RANK_TABLE_PATH]
 Modify src/eval.yml:
 
 ```bash
-models_folder: [CHECKPOINT_PATH]
+models_folder: [CHECKPOINT_PATH] # /xxx/tasks/1013.135941.325/parallel/1/
 ```
 
 ```bash

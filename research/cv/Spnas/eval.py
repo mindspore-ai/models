@@ -16,5 +16,5 @@
 import vega
 
 if __name__ == '__main__':
-    vega.run('./src/eval.yml')
     vega.set_backend('mindspore', 'NPU')
+    vega.run('./src/eval.yml')

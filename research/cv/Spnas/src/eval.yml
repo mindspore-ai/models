@@ -8,6 +8,11 @@ eval:
         type: TrainPipeStep
         models_folder: ~
 
+    search_algorithm:
+        type: SpNasS
+        max_sample: 20
+        objective_keys: AP50
+
     model:
         model_desc:
             type: Faster_Rcnn_MD
