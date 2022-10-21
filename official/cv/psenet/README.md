@@ -324,6 +324,8 @@ Calculated!{"precision": 0.814796668299853, "recall": 0.8006740491092923, "hmean
 
 ## Inference Process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### [Export MindIR](#contents)
 
 ```shell

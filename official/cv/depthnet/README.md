@@ -249,6 +249,8 @@ python export.py --coarse_or_fine fine
 
 ### 推理
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 - 在推理环境运行时评估NYU数据集
 
   在还行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。
@@ -321,4 +323,3 @@ train.py中设置了随机种子。
 # ModelZoo主页
 
  请浏览官网[主页](https://gitee.com/mindspore/models)。
-

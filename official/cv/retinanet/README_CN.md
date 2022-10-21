@@ -431,6 +431,8 @@ python export.py  --file_name retinanet --file_format MINDIR --checkpoint_path /
 
 ### [推理过程](#content)
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 #### <span id="usage">用法</span>
 
 在推理之前需要在昇腾910环境上完成模型的导出。推理时要将iscrowd为true的图片排除掉。在ascend310_infer目录下保存了去排除后的图片id。

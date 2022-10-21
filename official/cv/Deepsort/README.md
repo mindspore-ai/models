@@ -21,6 +21,9 @@
         - [Usage](#usage-1)
             - [Running on GPU](#running-on-gpu-1)
             - [Running on Ascend](#running-on-ascend-1)
+        - [Result](#result)
+    - [Inference Process](#inference-process)
+        - [Export mindir model](export-mindir-model)
         - [Result](#result-1)
 - [Model Description](#model-description)
     - [Performance](#performance)
@@ -274,11 +277,32 @@ Example of output in log file：
 
 ## [Inference Process](#contents)
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
+Currently only batch_Size of 1 can be processed.
+
 ### Export mindir model
 
 ```shell
 python export.py --device_id [DEVICE_ID] --ckpt_file [CKPT_PATH]
 ```
+
+Argument `ckpt_file` is required, `FILE_FORMAT` must be selected from ["AIR", "MINDIR"].
+
+```shell
+# Ascend310 infer
+bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATA_ROOT] [DATA_LIST] [DEVICE_ID]
+```
+
+`DEVICE_ID` is optional, default is 0.
+
+### Result
+
+The inference result is saved in the current path, and the final accuracy result can be seen in acc.log.
+
+| **Network**    | OS=16 | OS=8 | MS   | Flip  | mIOU  | mIOU in paper |
+| :----------: | :-----: | :----: | :----: | :-----: | :-----: | :-------------: |
+| deeplab_v3 |       | √    |      |       | 78.84 | 78.51    |
 
 # [Model Description](#contents)
 
