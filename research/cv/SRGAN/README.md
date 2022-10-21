@@ -65,35 +65,47 @@ The process of training SRGAN needs a pretrained VGG19 based on Imagenet.
 ```shell
 SRGAN
 
-├─ README.md                   # descriptions about SRGAN
-├── scripts  
- ├─ run_distribute_train.sh                # launch ascend training(8 pcs Ascend)
+├──README.md                      # descriptions about SRGAN
+├── scripts
+ ├─ run_distribute_train.sh       # launch ascend training(8 pcs Ascend)
  ├─ run_eval.sh                   # launch ascend eval (Ascend)
- ├─ run_stranalone_train.sh             # launch ascend training(1 pcs Ascend)
- ├─ run_distribute_train_gpu.sh                # launch ascend training(8 pcs GPU)
- ├─ run_eval_gpu.sh                   # launch ascend eval(GPU)
- └─ run_stranalone_train_gpu.sh             # launch ascend training(1 pcs GPU)
-├─ src  
- ├─ ckpt                       # save ckpt  
+ ├─ run_stranalone_train.sh       # launch ascend training(1 pcs Ascend)
+ ├─ run_distribute_train_gpu.sh   # launch ascend training(8 pcs GPU)
+ ├─ run_eval_gpu.sh               # launch ascend eval(GPU)
+ ├─ run_infer_310.sh              # 310 infer bash file
+ ├─ run_stranalone_train_gpu.sh   # launch ascend training(1 pcs GPU)
+ └─ run_infer_onnx.sh             # onnx infer bash file
+├──ascend310_infer
+├──src
+ ├─ ckpt                          # save ckpt
  ├─ dataset
-  ├─ testdataset.py                    # dataset for evaling  
-  └─ traindataset.py                   # dataset for training
-├─ loss
- ├─  gan_loss.py                      #srgan losses function define
- ├─  Meanshift.py                     #operation for ganloss
- └─  gan_loss.py                      #srresnet losses function define
-├─ models
- ├─ dicriminator.py                  # discriminator define  
- ├─ generator.py                     # generator define  
- └─ ops.py                           # part of network  
-├─ result                              #result
-├─ trainonestep
-  ├─ train_gan.py                     #training process for srgan
-  ├─ train_psnr.py                    #training process for srresnet
-└─ util
- └─ util.py                         # initialization for srgan
-├─ test.py                           # generate images
-└─train.py                            # train script
+  ├─ testdataset.py               # dataset for evaling
+  └─ traindataset.py              # dataset for training
+ ├─ loss
+   ├─  gan_loss.py                #srgan losses function define
+   ├─  Meanshift.py               #operation for ganloss
+   └─  gan_loss.py                #srresnet losses function define
+ ├─ model
+   ├─ dicriminator.py             # discriminator define
+   └─ generator.py                # generator define
+ ├─ trainonestep
+   ├─ train_gan.py                #training process for srgan
+   └─ train_psnr.py               #training process for srresnet
+ ├─ util
+   └─ util.py                     # initialization for srgan
+ ├─ vgg19
+   ├─ define.py
+   ├─ var_init.py
+   └─ config.py
+├──export.py                       # export file
+├──train.py                        # train file
+├──eval.py                         # eval file
+├──infer_onnx.py                   # onnx infer file
+├──requirements.txt                # requirements file
+├──postprocess.py
+├──postprocess.py
+├──eval                            # eval result
+├──infer                           # infer result
 ```
 
 ## [Script Parameters](#contents)
@@ -163,7 +175,7 @@ Evaluation result will be stored in the scripts/result. Under this, you can find
 ## [Export MindIR](#contents)
 
 ```shell
-python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --generator_path [GENERATOR_PATH] --device_id [DEVICE_ID] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
 ```
 
 The ckpt_file parameter is required,
@@ -184,6 +196,38 @@ Inference result is saved in current path, you can find result like this in acc.
 
 ```bash
 'avg psnr': 27.4
+```
+
+## [Export Onnx](#contents)
+
+```shell
+python export.py --generator_path [GENERATOR_PATH] --device_id [DEVICE_ID] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+```
+
+The ckpt_file parameter is required,
+`EXPORT_FORMAT` should be  "ONNX"
+
+## [Infer on GPU](#contents)
+
+Before performing inference, the Set14 must be load and constructed into the following structure. And we use scale=4 dataset
+
+```shell
+   ├─ Set14
+    ├─HR
+    └─LR
+```
+
+```shell
+# GPU inference
+bash ./scripts/run_infer_onnx.sh [TEST_LR_PATH] [TEST_GT_PATH] [ONNX_PATH] [DEVICE_TARGET]
+```
+
+### [Result](#contents)
+
+Inference result is saved in infer file folder, you can find result like this in log file.
+
+```bash
+'avg psnr': 26.79
 ```
 
 # [Model Description](#contents)
