@@ -21,6 +21,7 @@ import numpy as np
 parser = argparse.ArgumentParser(description="resnet inference")
 parser.add_argument("--result_path", type=str, required=True, help="result files path.")
 parser.add_argument("--label_path", type=str, required=True, help="image file path.")
+parser.add_argument("--device_target", type=str, choices=["Ascend", "GPU", "CPU"], help="MindIR device target.")
 args = parser.parse_args()
 
 batch_size = 1
@@ -31,13 +32,18 @@ def get_result(result_path, label_path):
     with open(label_path, "r") as label:
         labels = json.load(label)
 
+    if args.device_target == "Ascend":
+        output_dtype = np.float16
+    else:
+        output_dtype = np.float32
+
     top1 = 0
     top5 = 0
     total_data = len(files)
     for file in files:
         img_ids_name = file.split('_0.')[0]
         data_path = os.path.join(result_path, img_ids_name + "_0.bin")
-        result = np.fromfile(data_path, dtype=np.float16).reshape(batch_size, num_classes)
+        result = np.fromfile(data_path, dtype=output_dtype).reshape(batch_size, num_classes)
         for batch in range(batch_size):
             predict = np.argsort(-result[batch], axis=-1)
             if labels[img_ids_name+".JPEG"] == predict[0]:
