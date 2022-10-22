@@ -39,7 +39,7 @@ set_seed(1)
 def parse_args():
     """parameters"""
     parser = argparse.ArgumentParser('mindspore adveast training')
-    parser.add_argument('--device_target', type=str, default='Ascend', choices=['Ascend', 'GPU'],
+    parser.add_argument('--device_target', type=str, default='Ascend', choices=['Ascend', 'GPU', 'CPU'],
                         help='device where the code will be implemented. (Default: Ascend)')
     parser.add_argument('--device_id', type=int, default=0, help='device id of GPU or Ascend.')
 

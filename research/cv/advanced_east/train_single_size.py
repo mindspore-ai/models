@@ -38,7 +38,7 @@ set_seed(1)
 def parse_args(cloud_args=None):
     """parameters"""
     parser = argparse.ArgumentParser('mindspore adveast training')
-    parser.add_argument('--device_target', type=str, default='Ascend', choices=['Ascend', 'GPU'],
+    parser.add_argument('--device_target', type=str, default='Ascend', choices=['Ascend', 'GPU', 'CPU'],
                         help='device where the code will be implemented. (Default: Ascend)')
     parser.add_argument('--device_id', type=int, default=0, help='device id of GPU or Ascend.')
 
@@ -83,7 +83,7 @@ if __name__ == '__main__':
             device_num = int(os.environ.get("RANK_SIZE"))
             rank = int(os.environ.get("RANK_ID"))
             args.rank = args.device_id
-        elif args.device_target == "GPU":
+        elif args.device_target == "GPU" or "CPU":
             context.set_context(device_target=args.device_target)
             device_num = get_group_size()
             args.rank = get_rank()

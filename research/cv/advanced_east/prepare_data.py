@@ -31,7 +31,7 @@ set_seed(1)
 def parse_args(cloud_args=None):
     """parameters"""
     parser = argparse.ArgumentParser('mindspore data prepare')
-    parser.add_argument('--device_target', type=str, default='Ascend', choices=['Ascend', 'GPU'],
+    parser.add_argument('--device_target', type=str, default='Ascend', choices=['Ascend', 'GPU', 'CPU'],
                         help='device where the code will be implemented. (Default: Ascend)')
     parser.add_argument('--device_id', type=int, default=3, help='device id of GPU or Ascend. (Default: None)')
     args_opt = parser.parse_args()

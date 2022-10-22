@@ -23,7 +23,6 @@ from mindspore.ops import ResizeNearestNeighbor
 from mindspore import Tensor, ParameterTuple, Parameter
 from mindspore.common.initializer import initializer, TruncatedNormal
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore._checkparam import twice
 import numpy as np
 
 from src.vgg import Vgg
@@ -153,7 +152,7 @@ class AdvancedEast(nn.Cell):
                         out_channels, in_channels, filter_size, _ = filters.shape
                     else:
                         out_channels, in_channels, filter_size, _ = shape_dict[name]
-                    self.conv2d = P.Conv2D(out_channels, twice(filter_size), pad_mode='same', mode=1)
+                    self.conv2d = P.Conv2D(out_channels, filter_size, pad_mode='same', mode=1)
                     self.bias_add = P.BiasAdd()
                     self.weight = Parameter(initializer(filters if args.is_train else TruncatedNormal(),
                                                         [out_channels, in_channels, filter_size, filter_size]),
