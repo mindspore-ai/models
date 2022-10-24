@@ -45,6 +45,46 @@ The pyramid pooling module fuses features under four different pyramid scales.Fo
 
 - [ADE20K Dataset Website](http://groups.csail.mit.edu/vision/datasets/ADE20K/)
  - It contains 22,210 finely annotated images split into training and testing sets with 20,210 and 2,000 images respectively.
+ - The ADE20k directory structure is as follows:
+
+     ```text
+         ├── ADE
+             ├── annotations
+                 ├─ training
+                 │   ├─ADE_train_***.png
+                 │   ├─ ...
+                 │   └─ADE_train_***.png
+                 └─ validation
+                     ├─ADE_val_***.png
+                     ├─ ...
+                     └─ADE_val_***.png
+             ├── images
+                 ├─ training
+                 │   ├─ADE_train_***.jpg
+                 │   ├─ ...
+                 │   └─ADE_train_***.jpg
+                 └─ validation
+                     ├─ADE_val_***.jpg
+                     ├─ ...
+                     └─ADE_val_***.jpg
+     ```
+
+ - After download dataset, you can run create_data_txt.py to generate train_list.txt and val_list.txt for ADE20K as follows:
+
+ ```bash
+  python create_data_txt.py --data_root [DATA_ROOT] --image_prefix [IMAGE_PREFIX] --mask_prefix [MASK_PREFIX] --output_txt [OUTPUT_TXT]
+  example:
+  python create_data_txt.py --data_root /root/ADE/ --image_prefix images/training --mask_prefix annotations/training --output_txt training_list.txt
+ ```
+
+Datasets: attributes (names and colors) are needed, and please download as follows:
+
+- [PASCAL VOC 2012 names.txt and colors.txt Website](https://github.com/hszhao/semseg/tree/master/data/voc2012)
+- [ADE20K names.txt and colors.txt Website](https://github.com/hszhao/semseg/tree/master/data/ade20k)
+
+# [Pretrained model](#contents)
+
+[resnet50-imagenet pretrained model](https://download.mindspore.cn/thirdparty/pspnet/resnet_deepbase.ckpt)
 
 # [Environmental requirements](#Contents)
 
@@ -67,23 +107,24 @@ The pyramid pooling module fuses features under four different pyramid scales.Fo
 ├── eval.py                                    # Evaluation python file for ADE20K/VOC2012
 ├── export.py                                  # export mindir
 ├── README.md                                  # descriptions about PSPnet
+├── config                                     # the training config file
+│   ├── ade20k_pspnet50.yaml
+│   └── voc2012_pspnet50.yaml
 ├── src                                        # PSPNet
-│   ├── config                           # the training config file
-│   │   ├── ade20k_pspnet50.yaml
-│   │   └── voc2012_pspnet50.yaml
-│   ├── dataset                          # data processing
-│   │   ├── dataset.py
-│   │   └── transform.py
-│   ├── model                            # models for training and test
-│   │   ├── PSPNet.py
-│   │   ├── resnet.py
-│   │   └── cell.py                # loss function
-│   └── utils
-│       ├── functions_args.py                  # test helper
-│       ├── lr.py                              # learning rate
-│       ├── metric_and_evalcallback.py         # evalcallback
-│       ├── aux_loss.py                        # loss function helper
-│       └── p_util.py                          # some functions
+│   ├── dataset                          # data processing
+│   │   ├── dataset.py
+│   │   ├── create_data_txt.py           # generate train_list.txt and val_list.txt
+│   │   └── transform.py
+│   ├── model                            # models for training and test
+│   │   ├── PSPNet.py
+│   │   ├── resnet.py
+│   │   └── cell.py                # loss function
+│   └── utils
+│       ├── functions_args.py                  # test helper
+│       ├── lr.py                              # learning rate
+│       ├── metric_and_evalcallback.py         # evalcallback
+│       ├── aux_loss.py                        # loss function helper
+│       └── p_util.py                          # some functions
 │
 ├── scripts
 │   ├── run_distribute_train_ascend.sh         # multi cards distributed training in ascend
@@ -95,7 +136,7 @@ The pyramid pooling module fuses features under four different pyramid scales.Fo
 
 ## Script Parameters
 
-Set script parameters in src/config/ade20k_pspnet50.yaml and src/config/voc2012_pspnet50.yaml
+Set script parameters in ./config/ade20k_pspnet50.yaml and ./config/voc2012_pspnet50.yaml
 
 ### Model
 
