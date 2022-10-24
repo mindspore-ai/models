@@ -153,7 +153,7 @@ class Pix2PixHD(nn.Cell):
         edge[:, :, :-1, :] = edge[:, :, :-1, :] | (t[:, :, 1:, :] != t[:, :, :-1, :])
         return ms.Tensor(edge, dtype=ms.float32)
 
-    @ms.ms_function()
+    @ms.jit()
     def one_hot_encode(self, label_map):
         size = label_map.shape
         label_map = self.cast(label_map, ms.int32)

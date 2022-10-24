@@ -21,7 +21,7 @@ import mindspore.nn as nn
 import mindspore.common.dtype as mstype
 from mindspore.ops import operations as P
 from mindspore.common.initializer import Normal, Zero, One, Uniform
-from mindspore import ms_function
+from mindspore import jit
 from mindspore import Tensor
 
 # Imagenet constant values
@@ -378,7 +378,7 @@ class Swish(nn.Cell):
         return x * self.sigmoid(x)
 
 
-@ms_function
+@jit
 def swish(x):
     return x * nn.Sigmoid()(x)
 

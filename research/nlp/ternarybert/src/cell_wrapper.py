@@ -84,7 +84,7 @@ class ClipByNorm(nn.Cell):
         self.dtype = P.DType()
 
     def construct(self, x, clip_norm):
-        """add ms_function decorator for pynative mode"""
+        """add jit decorator for pynative mode"""
         mul_x = F.square(x)
         if mul_x.shape == (1,):
             l2sum = self.cast(mul_x, mstype.float32)

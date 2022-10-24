@@ -14,7 +14,7 @@
 # ============================================================================
 """Transformer for training."""
 import numpy as np
-from mindspore import ms_function
+from mindspore import jit
 
 from mindspore.common.initializer import initializer
 import mindspore as ms
@@ -153,7 +153,7 @@ class TransformerTrainOneStepCell(nn.TrainOneStepCell):
     def set_sens(self, value):
         self.sens = value
 
-    @ms_function
+    @jit
     def clip_grads(self, grads):
         grads = self.hyper_map(ops.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
         return grads
@@ -236,12 +236,12 @@ class TransformerTrainOneStepWithLossScaleCell(nn.TrainOneStepWithLossScaleCell)
             self.loss_scale = Parameter(Tensor(scale_update_cell.get_loss_scale(), dtype=ms.float32))
         self.enable_tuple_broaden = True
 
-    @ms_function
+    @jit
     def clip_grads(self, grads):
         grads = self.hyper_map(ops.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
         return grads
 
-    @ms_function
+    @jit
     def clip_scale_grads(self, scale, grads):
         grads = self.hyper_map(ops.partial(grad_scale, scale * self.degree), grads)
         return grads
@@ -397,21 +397,21 @@ class TransformerTrainAccumulationAllReducePostWithLossScaleCell(nn.Cell):
             self.loss_scale = Parameter(Tensor(scale_update_cell.get_loss_scale(), dtype=ms.float32))
         self.enable_tuple_broaden = True
 
-    @ms_function
+    @jit
     def clip_grads(self, grads):
         grads = self.hyper_map(ops.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
         return grads
 
-    @ms_function
+    @jit
     def clip_scale_grads(self, scale, grads):
         grads = self.hyper_map(ops.partial(grad_scale, scale * self.degree), grads)
         return grads
 
-    @ms_function
+    @jit
     def clip_accumlate_hyper_map(self, grads):
         return self.hyper_map(accumulate_accu_grads, self.accu_grads, grads)
 
-    @ms_function
+    @jit
     def clip_reset_hyper_map(self):
         return self.hyper_map(reset_accu_grads, self.accu_grads)
 
