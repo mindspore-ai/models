@@ -73,7 +73,7 @@ Dataset used: [CIFAR-10](http://www.cs.toronto.edu/~kriz/cifar.html)
 
 ### Mixed Precision(Ascend)
 
-The [mixed precision](https://www.mindspore.cn/tutorials/experts/en/master/others/mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
+The [mixed precision](https://www.mindspore.cn/tutorials/en/master/advanced/mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
 For FP16 operators, if the input data type is FP32, the backend of MindSpore will automatically handle it with reduced precision. Users could check the reduced-precision operators by enabling INFO log and then searching ‘reduce precision’.
 
 ## Environment Requirements
@@ -338,6 +338,8 @@ result: {'top_5_accuracy': 0.9011217948717949, 'top_1_accuracy': 0.7129206730769
 ```
 
 ## Inference Process
+
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
 
 ### [Export MindIR](#contents)
 

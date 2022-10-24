@@ -460,6 +460,8 @@ In addition, the metrics.csv file in this folder records the processing results 
 
 - Run in Ascend 310 processor environment
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
   ```shell
   # Start inference by bash command
   bash run_infer_310.sh [model_path] [data_path] [noise_image_path] [sigma] [channel] [device_id]

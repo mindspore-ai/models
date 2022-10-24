@@ -323,6 +323,8 @@ CKPT_URL和DATASET为必填项, FILE_FORMAT默认为MINDIR，可配值MINDIR或A
 
 ## 推理过程
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 ### 前处理
 
 在执行推理前，需要进行数据集预处理，将image和label转换为bin文件。

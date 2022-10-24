@@ -313,6 +313,8 @@ python export.py --device_id 0 --ckpt_file ../pretrain/PatchCore_pretrain.ckpt
 
 ## Inference process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### Inference
 
 Before running inference we need to export the model. Air models can only be exported on the Ascend 910 environment, mindir can be exported on any environment.

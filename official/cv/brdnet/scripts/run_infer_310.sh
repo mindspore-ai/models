@@ -50,16 +50,6 @@ echo "sigma: "$sigma
 echo "channel: "$channel 
 echo "device id: "$device_id
 
-export ASCEND_HOME=/usr/local/Ascend/
-if [ -d ${ASCEND_HOME}/ascend-toolkit ]; then
-    export ASCEND_HOME=/usr/local/Ascend/ascend-toolkit/latest
-else
-    export ASCEND_HOME=/usr/local/Ascend/latest
-fi
-export PATH=$ASCEND_HOME/compiler/ccec_compiler/bin:$PATH
-export LD_LIBRARY_PATH=$ASCEND_HOME/lib64:/usr/local/Ascend/driver/lib64:$LD_LIBRARY_PATH
-export ASCEND_OPP_PATH=$ASCEND_HOME/opp
-
 function compile_app()
 {
     cd ../ascend310_infer/ || exit

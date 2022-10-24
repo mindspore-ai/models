@@ -564,6 +564,8 @@ cal_psnr.py 中的主要参数如下:
 
 - 在 Ascend 310 处理器环境运行
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
   ```python
   #通过 bash 命令启动推理
   bash run_infer_310.sh [model_path] [data_path] [noise_image_path] [sigma] [channel] [device_id]

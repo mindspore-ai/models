@@ -454,6 +454,8 @@ python export.py --net [NET_NAME] --ckpt_file [CKPT_PATH] --device_target [DEVIC
 
 ### 推理
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 在推理之前需要先导出模型，AIR模型只能在昇腾910环境上导出，MINDIR可以在任意环境上导出。
 
 ```shell

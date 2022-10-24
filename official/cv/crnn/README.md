@@ -398,6 +398,8 @@ Data storage method is the same as training
 
 ### Infer on Ascend310
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 Before performing inference, the mindir file must bu exported by export script on the 910 environment. We only provide an example of inference using MINDIR model.
 Current batch_Size can only be set to 1. The inference result will be just the network outputs, which will be save in binary file. The accuracy is calculated by `src/metric.`.
 

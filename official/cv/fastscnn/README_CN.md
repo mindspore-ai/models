@@ -317,6 +317,8 @@ cal_mIoU.py 中的主要参数如下:
 
 #### 310 推理
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 - 在 Ascend 310 处理器环境运行
 
 ```python

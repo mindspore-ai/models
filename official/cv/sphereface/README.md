@@ -406,6 +406,8 @@ python export.py --file_format [EXPORT_FORMAT]
 
 ## [Inference Process](#contents)
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### Inference
 
 Before performing inference, we need to export the model first. Air model can only be exported in Ascend 910 environment, mindir can be exported in any environment.
