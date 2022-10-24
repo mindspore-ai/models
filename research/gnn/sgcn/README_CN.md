@@ -236,6 +236,8 @@ sgcn.mindir exported successfully!
 
 ### Ascend310推理过程
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 #### 运行
 
 在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用mindir模型执行推理的示例。注意，对不同数据集的精度指标进行推理时，需要修改`postprocess.py`文件中对应的`checkpoint`参数。

@@ -207,6 +207,8 @@ Epoch: 1 Step: 15, Loss is 7.755488395690918
 
 ### [Inference](#contents)
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 #### Reasoning process
 
 Before performing inference, the mindir file must be exported by export.py. Input files must be in bin format.

@@ -251,18 +251,20 @@ Argument `ckpt_file` is required, `dataset` is a name of a dataset must be selec
 
 ### Usage
 
-在执行推理之前，需要通过`export.py`导出`mindir`文件。
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
+Before performing inference, the `mindir` file needs to be exported via `export.py`.
 
 ```bash
-# Ascend310 推理
+# Ascend310 inference
 bash run_310_infer.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [DEVICE_ID]
 ```
 
-`MINDIR_PATH`为`mindir`文件路径，`DATASET_NAME`为数据集名称，`DATASET_PATH`表示数据集文件的路径（例如`/datapath/sdne_wiki_dataset/WIKI/Wiki_edgelist.txt`）。
+`MINDIR_PATH` is the `mindir` file path, `DATASET_NAME` is the dataset name, `DATASET_PATH` is the path to the dataset file (eg `/datapath/sdne_wiki_dataset/WIKI/Wiki_edgelist.txt`).
 
 ### Result
 
-推理结果保存在当前路径，可在`acc.log`中看到最终精度结果。
+The inference results are saved in the current path, and the final accuracy results can be seen in `acc.log`.
 
 # Model description
 

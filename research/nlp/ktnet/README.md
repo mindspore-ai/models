@@ -116,7 +116,7 @@ KT-NET consists of four major modules:
 
   ```bash
   cd data
-  wget https://bert-models.bj.bcebos.com/cased_L-24_H-1024_A-16.tar.gz --no-check-certificate
+  wget https://storage.googleapis.com/xlnet/released_models/cased_L-24_H-1024_A-16.zip --no-check-certificate
   tar xvf cased_L-24_H-1024_A-16.tar.gz
   rm -rf cased_L-24_H-1024_A-16.tar.gz
   ```
@@ -530,6 +530,8 @@ The above command runs in the background, you can view the training log in eval_
 ```
 
 ## Inference Process
+
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
 
 ### Usage
 
