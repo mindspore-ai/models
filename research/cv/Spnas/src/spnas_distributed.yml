@@ -2,6 +2,7 @@ general:
     backend: mindspore
     parallel_search: True
     parallel_fully_train: True
+    clean_worker_dir: False
 
 pipeline: [serial, parallel, fullytrain]
 
