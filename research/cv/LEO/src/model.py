@@ -227,7 +227,7 @@ class NLLLoss(nn.Cell):
             label = self.onehot(label, ops.shape(logit)[1], self.on_value, self.off_value)
 
         loss = self.sum_cross_entropy((self.mul(logit, label)), -1)
-        loss = self.mul2(ops.scalar_to_array(-1.0), loss)
+        loss = self.mul2(ops.scalar_to_tensor(-1.0), loss)
         loss = self.mean(loss, -1)
 
         return loss

@@ -180,7 +180,7 @@ class SingleRoIExtractor(nn.Cell):
         res = self.res_
         target_lvls = self._c_map_roi_levels(rois)
         for i in range(self.num_levels):
-            mask = self.equal(target_lvls, P.ScalarToArray()(i))
+            mask = self.equal(target_lvls, P.ScalarToTensor()(i, mstype.int32))
             mask = P.Reshape()(mask, (-1, 1, 1, 1))
             roi_feats_t = self.roi_layers[i](feats[i], rois)
             mask = self.cast(P.Tile()(self.cast(mask, mstype.int32), (1, 256, self.out_size, self.out_size)),

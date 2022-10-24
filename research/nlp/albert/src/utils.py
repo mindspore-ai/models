@@ -59,7 +59,7 @@ class GlobalNorm(nn.Cell):
 
     def construct(self, grads):
         square_sum = self.hyper_map(get_square_sum, grads)
-        global_norms = F.sqrt(F.addn(square_sum) / F.scalar_to_array(len(square_sum)))
+        global_norms = F.sqrt(F.addn(square_sum) / F.scalar_to_tensor(len(square_sum), mstype.int32))
         return global_norms
 
 

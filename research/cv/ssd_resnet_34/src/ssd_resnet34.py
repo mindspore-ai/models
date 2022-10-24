@@ -356,7 +356,7 @@ class TrainingWrapper(nn.Cell):
             # apply grad reducer on grads
             grads = self.grad_reducer(grads)
         if self.use_grad_clip:
-            grads = self.hyper_map(F.partial(grad_scale, F.scalar_to_array(self.sens)), grads)
+            grads = self.hyper_map(F.partial(grad_scale, F.scalar_to_tensor(self.sens)), grads)
             grads = C.clip_by_global_norm(grads)
         self.optimizer(grads)
         return loss

@@ -254,7 +254,7 @@ class mix_gaussian_loss(nn.Cell):
         self.lse = log_sum_exp()
         self.sq = P.Square()
         self.sqrt = P.Sqrt()
-        self.const = P.ScalarToArray()
+        self.const = P.ScalarToTensor()
         self.log = P.Log()
         self.tensor_one = Tensor(1., ms.float32)
 

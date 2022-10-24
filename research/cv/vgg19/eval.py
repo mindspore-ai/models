@@ -46,7 +46,7 @@ class ParameterReduce(nn.Cell):
         self.reduce = P.AllReduce()
 
     def construct(self, x):
-        one = self.cast(F.scalar_to_array(1.0), mstype.float32)
+        one = self.cast(F.scalar_to_tensor(1.0), mstype.float32)
         out = x * one
         ret = self.reduce(out)
         return ret
