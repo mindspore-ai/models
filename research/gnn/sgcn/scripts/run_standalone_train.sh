@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,20 +14,30 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -gt 2 ]]; then
+if [[ $# != 2 ]]; then
     echo "Usage: bash ./scripts/run_standalone_train.sh [DEVICE_ID] [DATASET]"
-exit 1
+    exit 1
 fi
+
+get_real_path(){
+    if [ "${1:0:1}" == "/" ]; then
+        echo "$1"
+    else
+        realpath -m "$PWD/$1"
+    fi
+}
+
+DATASET=$(get_real_path "$2")
 
 export DEVICE_ID=$1
 if [ -d "train" ]; then
-        rm -rf ./train
+    rm -rf ./train
 fi
 
 mkdir train
 cp -r ./src ./train
 cp ./train.py ./train
 cd ./train || exit
-scho "start training for device $DEVICE_ID"
+echo "start training for device $DEVICE_ID"
 
-nohup python -u train.py --device_id=$1 --edge-path=$2 --features-path=$2 > train.log 2>&1 &
+nohup python -u train.py --device_id="$1" --edge-path="$DATASET" --features-path="$DATASET" > train.log 2>&1 &

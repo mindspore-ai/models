@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 """Data reading utils."""
 import numpy as np
 import pandas as pd
-from mindspore import Tensor
-from mindspore import numpy as mnp
 from scipy import sparse
 from sklearn.decomposition import TruncatedSVD
 from sklearn.metrics import f1_score
@@ -58,8 +56,8 @@ def calculate_auc(targets, predictions):
     """
     Calculate performance measures on test dataset.
     Args:
-        targets(Tensor): Ground truth.
-        predictions(Tensor): Model outputs.
+        targets(list of int): Ground truth.
+        predictions(np.ndarray): Model outputs.
 
     Returns:
         auc(Float32): AUC result.
@@ -91,13 +89,13 @@ def setup_features(args, positive_edges, negative_edges, node_count):
         node_count(Int): Number of nodes.
 
     Returns:
-        X(Tensor): Dataset.
+        X(np.ndarray): Dataset.
     """
     if args.spectral_features:
         X = create_spectral_features(args, positive_edges, negative_edges, node_count)
     else:
         X = create_general_features(args)
-    return X
+    return np.array(X, np.float32)
 
 
 def create_general_features(args):
@@ -107,9 +105,9 @@ def create_general_features(args):
         args(Arguments): Arguments object.
 
     Returns:
-        X(Tensor): Dataset.
+        X(np.ndarray): Dataset.
     """
-    X = mnp.array(pd.read_csv(args.features_path))
+    X = np.array(pd.read_csv(args.features_path))
     return X
 
 
@@ -148,25 +146,3 @@ def create_spectral_features(args, positive_edges, negative_edges, node_count):
     svd.fit(signed_A)
     X = svd.components_.T
     return X
-
-
-def maybe_num_nodes(edge_index, num_nodes=None):
-    """
-    Calculate the number of nodes
-    Args:
-        edge_index(Tensor): Indices of edges.
-        num_nodes(Int): Number of nodes.
-
-    Returns:
-        res(Int): Max index of edges.
-    """
-    if num_nodes is not None:
-        res = num_nodes
-    elif isinstance(edge_index, Tensor):
-        res = int(edge_index.max()) + 1
-    else:
-        if edge_index.size(0) > edge_index.size(1):
-            res = edge_index.size(0)
-        else:
-            res = edge_index.size(1)
-    return res
