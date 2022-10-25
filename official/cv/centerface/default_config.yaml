@@ -121,6 +121,10 @@ steps_per_epoch: 198
 start: 0
 end: 18
 
+# infer_onnx.py
+onnx_path: ''
+onnx_name: ''
+
 # export.py centerface export'
 device_id: 0
 batch_size: 1
@@ -230,5 +234,5 @@ save_path: "label file"
 
 ---
 platform: ['Ascend', 'GPU', 'CPU']
-file_format: ["AIR", "MINDIR"]
+file_format: ["AIR", "MINDIR", "ONNX"]
 freeze_layer: ["", "none", "backbone"]

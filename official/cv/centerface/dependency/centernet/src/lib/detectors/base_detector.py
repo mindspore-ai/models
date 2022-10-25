@@ -112,6 +112,26 @@ class CenterFaceDetector():
 
         return dets
 
+    def process_onnx(self, images):
+        """
+        Process method
+        """
+        # test with onnx model
+        input_name = self.model.get_inputs()[0].name
+        onnx_output = self.model.run(None, {input_name: images})
+        # get outputs
+        output_hm = onnx_output[0].astype(np.float32)
+        output_wh = onnx_output[1].astype(np.float32)
+        output_off = onnx_output[2].astype(np.float32)
+        output_kps = onnx_output[3].astype(np.float32)
+        topk_inds = onnx_output[4].astype(np.long)
+
+        reg = output_off if self.opt.reg_offset else None
+
+        dets = self.centerface_decode(output_hm, output_wh, output_kps, reg=reg, opt_k=self.opt.K, topk_inds=topk_inds)
+
+        return dets
+
     def post_process(self, dets, meta, scale=1):
         """
         Post process process
@@ -161,6 +181,38 @@ class CenterFaceDetector():
                 meta = {k: v.numpy()[0] for k, v in meta.items()}
 
             dets = self.process(images) # --2: process
+
+            dets = self.post_process(dets, meta, scale)     # box:4+score:1+kpoints:10+class:1=16     ## --3: post_process
+
+            detections.append(dets)
+
+        results = self.merge_outputs(detections) # --4: merge_outputs
+        return {'results': results}
+
+    def run_onnx(self, image_or_path_or_tensor, meta=None):
+        """
+        Run method
+        """
+        pre_processed = False
+        if isinstance(image_or_path_or_tensor, np.ndarray):
+            image = image_or_path_or_tensor
+        elif isinstance(image_or_path_or_tensor, str):
+            image = cv2.imread(image_or_path_or_tensor)
+        else:
+            image = image_or_path_or_tensor['image'][0].numpy()
+            pre_processed_images = image_or_path_or_tensor
+            pre_processed = True
+
+        detections = []
+        for scale in self.scales: # [1]
+            if not pre_processed:
+                images, meta = self.pre_process(image, scale, meta) # --1: pre_process
+            else:
+                images = pre_processed_images['images'][scale][0]
+                meta = pre_processed_images['meta'][scale]
+                meta = {k: v.numpy()[0] for k, v in meta.items()}
+
+            dets = self.process_onnx(images) # --2: process
 
             dets = self.post_process(dets, meta, scale)     # box:4+score:1+kpoints:10+class:1=16     ## --3: post_process
 
