@@ -192,7 +192,7 @@ Before running the command below, please check the checkpoint path used for eval
 
 ## [Inference Process](#contents)
 
-### Generate input data for network：
+### Generate input data for network
 
 ```shell
 # Enter script dir, run run_process_data.sh script
@@ -212,6 +212,8 @@ python export.py --ckpt_file='./checkpoint/ms-4_37721.ckpt'  --out_file=lpcnet -
 The ckpt_file parameter is required
 
 ### [Infer on Ascend310](#contents)
+
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
 
 Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
 
