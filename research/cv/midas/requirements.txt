@@ -1,3 +1,4 @@
 h5py
 opencv-python
 numpy
+onnxruntime-gpu
