@@ -280,6 +280,8 @@ bash ./scripts/run_eval_ascend.sh [DEVICE_ID] [PATH_CHECKPOINT]
 
 ## [导出和推理](#contents)
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 ### 导出
 
 在推理之前需要先导出mindir，并准备好训练好的ckpt文件
