@@ -251,7 +251,7 @@ The ckpt_file parameter is required,
 |training parameter     |epoch=100,batch_size=8   |
 |optimizer              |SGD optimizer，momentum=0.9,weight_decay=0.0001    |
 |loss function          |SoftmaxCrossEntropyLoss   |
-|training speed         |epoch time: 493974.632 ms, per step time: 464.699 ms(1p for voc2012)|
+|training speed         |epoch time: 493974.632 ms, per step time: 464.699 ms(1p for voc2012), 485 ms(8p for voc2012), 998 ms(1p for ADE20K), 1050 ms(8p for ADE20K)|
 |total time             |6h10m34s(1pcs)    |
 |Script URL             |https://gitee.com/mindspore/models/tree/r1.9/research/cv/PSPNet|
 |Random number seed     |set_seed = 1234     |

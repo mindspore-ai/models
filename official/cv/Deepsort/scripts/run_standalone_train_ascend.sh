@@ -1,4 +1,5 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+#!/bin/bash
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,16 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""train"""
-import argparse
-import vega
 
+if [ $# != 2 ]; then
+  echo "Usage: bash run_distribute_train_ascend.sh [DATA_PATH] [CKPT_PATH]"
+  exit 1
+fi
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Spnas network")
-    parser.add_argument("--config_file", type=str, required=True, help="spnas config path.")
-    args = parser.parse_args()
+export RANK_SIZE=1
+python src/deep/train.py --data_url [DATA_PATH] --train_url [CKPT_PATH] --device=Ascend > out.log 2>&1
 
-    config_file = args.config_file
-    vega.set_backend('mindspore', 'NPU')
-    vega.run(config_file)

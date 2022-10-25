@@ -24,11 +24,11 @@ export RANK_SIZE=8
 
 echo "start training ... "
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 mpirun --allow-run-as-root -n 8 --output-filename log_output_finetune --merge-stderr-to-stdout \
-python train.py  --step 0 >log_train_finetune 2>&1 &
+python ../train.py  --step 0 >log_train_finetune 2>&1 &
 wait
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 mpirun --allow-run-as-root -n 8 --output-filename log_output_svm --merge-stderr-to-stdout \
-python train.py  --step 1 >log_train_svm 2>&1 &
+python ../train.py  --step 1 >log_train_svm 2>&1 &
 wait
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 mpirun --allow-run-as-root -n 8 --output-filename log_output_regression --merge-stderr-to-stdout \
-python train.py  --step 2 >log_train_regression 2>&1 &
+python ../train.py  --step 2 >log_train_regression 2>&1 &
 cd ..

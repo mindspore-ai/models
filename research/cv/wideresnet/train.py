@@ -27,12 +27,12 @@ from mindspore.context import ParallelMode
 from mindspore import Tensor
 from mindspore.nn.optim import Momentum
 from mindspore.train.loss_scale_manager import FixedLossScaleManager
-from mindspore.train.callback import ModelCheckpoint, CheckpointConfig
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, TimeMonitor
 from mindspore.train.model import Model
 import mindspore.nn as nn
 import mindspore.common.initializer as weight_init
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from src.callbacks import CustomLossMonitor, TimeMonitor, EvalCallback
+from src.callbacks import CustomLossMonitor, EvalCallback
 from src.wide_resnet import wideresnet
 from src.dataset import create_dataset
 from src.model_utils.config import config as cfg

@@ -105,8 +105,8 @@ python process_data.py
 - running on Ascend：
 
 ```shell
-bash scripts/run_standalone_train_ascend.sh 0
- ```
+bash run_standalone_train_ascend.sh 0
+```
 
   The command above will run in the background, you can view the results through the file logs
 
@@ -137,7 +137,7 @@ bash scripts/run_standalone_train_ascend.sh 0
 - running on GPU：
 
 ```shell
-bash scripts/run_standalone_train_gpu.sh 0
+bash run_standalone_train_gpu.sh 0
  ```
 
   The command above will run in the background, you can view the results through the file logs
@@ -181,7 +181,7 @@ bash scripts/run_standalone_train_gpu.sh 0
 - distributed running on Ascend：
 
 ```shell
-bash ./scripts/run_distribute_train_ascend.sh rank_table.json
+bash run_distribute_train_ascend.sh rank_table.json
 ```
 
   The above shell script will run distribute training in the background. You can view the results through the file train_parallel[X]/logs. The loss value will be achieved as follows:
@@ -207,7 +207,7 @@ bash ./scripts/run_distribute_train_ascend.sh rank_table.json
 - distributed running on GPU：
 
 ```shell
-bash scripts/run_distribute_train_gpu.sh
+bash run_distribute_train_gpu.sh
 ```
 
 The above shell script will run distribute training in the background.
@@ -250,7 +250,7 @@ scripts/log_train_regression:[2021-11-09 14:40:58.586][DEBUG] trainer.py(121)->t
   Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path.
 
 ```shell
-bash scripts/run_standalone_eval_ascend.sh 0
+bash run_standalone_eval_ascend.sh 0
  ```
 
   The above python command will run in the background. You can view the results through the file "eval.log". The accuracy of the test dataset will be as follows:
@@ -267,7 +267,7 @@ svm_thresh: 0.6, map: 0.31060216644862054
   Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path.
 
 ```shell
-bash scripts/run_standalone_eval_gpu.sh 0
+bash run_standalone_eval_gpu.sh 0
  ```
 
   The above python command will run in the background. You can view the results through the file "eval.log". The accuracy of the test dataset will be as follows:
