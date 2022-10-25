@@ -24,7 +24,7 @@ batch_size: 64
 loss_scale: 1024
 momentum: 0.9
 weight_decay: 0.0001
-epoch_size: 50
+epoch_kf: 50
 epochs_ft: 90
 pretrain_epoch_size: 0
 save_checkpoint: True
@@ -35,12 +35,12 @@ lr_decay_mode: "linear"
 use_label_smooth: True
 label_smooth_factor: 0.1
 lr_init: 0.04
-lr_end: 0.0
-lr_max: 0.4
+lr_end_kf: 0.0
+lr_max_kf: 0.4
 lars_epsilon: 0.0
 lars_coefficient: 0.001
-lr_ft_end: 0.0
-lr_ft_max: 0.8
+lr_end_ft: 0.0
+lr_max_ft: 0.8
 
 net_name: "resnet50"
 dataset: "imagenet2012"
