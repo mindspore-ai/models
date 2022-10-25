@@ -427,6 +427,8 @@ Parameters for learning rate:
 
 ## Inference Process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### [Export MindIR](#contents)
 
 ```shell

@@ -236,6 +236,8 @@ python export.py --platform [PLATFORM] --checkpoint_path [CHECKPOINT_PATH] --fil
 
 ## [Infer on Ascend310](#contents)
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ```shell
 # Ascend310 inference
 bash run_infer_310.sh [NEWS_MODEL] [USER_MODEL] [DEVICE_ID]

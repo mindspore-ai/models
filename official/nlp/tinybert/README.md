@@ -605,6 +605,8 @@ The command above will run in the background, you can view the results the file 
 
 ## Inference Process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### [Export MindIR](#contents)
 
 - Export on local
