@@ -23,7 +23,7 @@ from mindspore import Tensor, context, load_checkpoint, load_param_into_net, exp
 parser = argparse.ArgumentParser(description='maskrcnn export')
 parser.add_argument("--device_id", type=int, default=0, help="Device id")
 parser.add_argument("--batch_size", type=int, default=1, help="batch size")
-parser.add_argument("--yaml_path", type=str, required=True, default='./src/config/voc2012_pspnet50.yaml',
+parser.add_argument("--yaml_path", type=str, required=True, default='./config/voc2012_pspnet50.yaml',
                     help='yaml file path')
 parser.add_argument("--ckpt_file", type=str, required=True, default='./checkpoints/voc/ADE-50_1063.ckpt',
                     help="Checkpoint file path.")

@@ -48,8 +48,8 @@ Model_Art = False
 def get_parser():
     """
     Read parameter file
-        -> for ADE20k: ./src/config/voc2012_pspnet50.yaml
-        -> for voc2012: ./src/config/voc2012_pspnet50.yaml
+        -> for ADE20k: ./config/ade20k_pspnet50.yaml
+        -> for voc2012: ./config/voc2012_pspnet50.yaml
     """
     global Model_Art
     parser = argparse.ArgumentParser(description='MindSpore Semantic Segmentation')
@@ -63,7 +63,7 @@ def get_parser():
                         help='Location of training outputs.')
     parser.add_argument('--dataset_name', type=str, default='',
                         help='aux parameter for ModelArt')
-    parser.add_argument('opts', help='see ./src/config/voc2012_pspnet50.yaml for all options', default=None,
+    parser.add_argument('opts', help='see ./config/voc2012_pspnet50.yaml for all options', default=None,
                         nargs=argparse.REMAINDER)
     args_ = parser.parse_args()
     if args_.model_art:
@@ -253,4 +253,4 @@ def psp_train():
 if __name__ == "__main__":
     args = get_parser()
     print(args.obs_save)
-    # psp_train()
+    psp_train()

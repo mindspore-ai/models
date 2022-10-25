@@ -14,7 +14,7 @@
 # ============================================================================
 """ eval_callback """
 from mindspore.nn.metrics.metric import Metric
-from src.utils.metrics import SoftmaxCrossEntropyLoss
+from src.utils.aux_loss import SoftmaxCrossEntropyLoss
 
 
 class pspnet_metric(Metric):
