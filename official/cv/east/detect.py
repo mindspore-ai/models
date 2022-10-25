@@ -203,3 +203,37 @@ def detect_dataset(model, test_img_path, submit_path):
         with open(os.path.join(submit_path, 'res_' +
                                os.path.basename(img_file).replace('.jpg', '.txt')), 'w') as f:
             f.writelines(seq)
+
+
+def detect_onnx(img, session):
+    """detect text regions of img using model
+        Input:
+                img   : PIL Image
+                model : detection model
+                device: gpu if gpu is available
+        Output:
+                detected polys
+        """
+    img, ratio_h, ratio_w = resize_img(img)
+    inputs = {session.get_inputs()[0].name: load_pil(img).asnumpy()}
+    score, geo = session.run(None, inputs)
+    score = np.squeeze(score, axis=0)
+    geo = np.squeeze(geo, axis=0)
+    boxes = get_boxes(score, geo)
+    return adjust_ratio(boxes, ratio_w, ratio_h)
+
+
+def detect_dataset_onnx(session, test_img_path, submit_path):
+    img_files = os.listdir(test_img_path)
+    img_files = sorted([os.path.join(test_img_path, img_file)
+                        for img_file in img_files])
+    for i, img_file in enumerate(img_files):
+        print('evaluating {} image'.format(i), end='\r')
+        boxes = detect_onnx(Image.open(img_file), session)
+        seq = []
+        if boxes is not None:
+            seq.extend([','.join([str(int(b))
+                                  for b in box[:-1]]) + '\n' for box in boxes])
+        with open(os.path.join(submit_path, 'res_' +
+                               os.path.basename(img_file).replace('.jpg', '.txt')), 'w') as f:
+            f.writelines(seq)
