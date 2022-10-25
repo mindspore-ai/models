@@ -239,6 +239,8 @@ bash run_eval_onnx.sh ./ibnnet.onnx ../ghost/dataset/ILSVRC2012_img_val/ GPU
 
 # 推理过程
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 ## 用法
 
 在执行推理之前，需要通过export.py导出mindir文件。

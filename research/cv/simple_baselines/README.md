@@ -67,7 +67,7 @@ Dataset used: [COCO2017](https://gitee.com/link?target=https%3A%2F%2Fcocodataset
 
 ## Mixed Precision
 
-The [mixed precision](https://www.mindspore.cn/tutorials/experts/en/master/others/mixed_precision.html) training
+The [mixed precision](https://www.mindspore.cn/tutorials/en/master/advanced/mixed_precision.html) training
 method accelerates the deep learning neural network training process by using both the single-precision and half-precision
 data types, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision
 training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained
@@ -290,6 +290,8 @@ AP: 0.704
 ## Inference Process
 
 ### Model Export
+
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
 
 - Export in local
 

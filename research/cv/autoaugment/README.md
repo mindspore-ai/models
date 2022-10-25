@@ -433,6 +433,8 @@ optional arguments:
 
 ### Inference script usage
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 Transfer the MINDIR model exported by Ascend 910 to the Ascend 310 server,
 and run the run_infer_310 script:
 

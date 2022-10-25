@@ -197,6 +197,8 @@ epoch: [ 5/350], epoch time: 236639.009, steps: 625, per step time: 378.622, avg
 
 # 推理过程
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 ## 导出MINDIR
 
 ```bash

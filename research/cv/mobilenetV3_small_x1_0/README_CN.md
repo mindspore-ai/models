@@ -192,6 +192,10 @@ epoch 5: epoch time: 150594.088, per step time: 141.138, avg loss: 3.607
 result: {'Loss': 2.3101649037352554, 'Top_1_Acc': 0.6746546546546547, 'Top_5_Acc': 0.8722122122122122} ckpt= ./checkpoint/model_0/mobilenetV3-370_625.ckpt
 ```
 
+## 310推理
+
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 # 模型说明
 
 ## 训练性能

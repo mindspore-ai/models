@@ -276,6 +276,8 @@ Export the checkpoint file into a MINDIR format model.
 
 ## Inference process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### Inference
 
 Before inference, we need to export the model. MINDIR can be exported in any environment, and the AIR model can only be exported in the Ascend 910 environment. The following shows an example of performing inference using the MINDIR model.

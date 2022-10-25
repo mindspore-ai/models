@@ -208,6 +208,10 @@ python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 
 `EXPORT_FORMAT` 可选 ["AIR", "MINDIR"]
 
+## 310推理
+
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 # 模型描述
 
 ## 性能

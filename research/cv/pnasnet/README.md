@@ -214,6 +214,8 @@ Evaluation result will be stored in the scripts path. Under this, you can find r
   acc=74.3%(TOP1)
 ## Inference Process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### [Export MindIR](#contents)
 
 Export MindIR on local

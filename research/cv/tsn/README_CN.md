@@ -355,6 +355,8 @@ python export.py --device_id [DEVICE_ID] --weights [WEIGHT] --modality [Flow]
 
 ## [推理过程](#contents)
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 ### 用法
 
 执行推断之前，minirir文件必须由export.py导出。输入文件必须为bin格式

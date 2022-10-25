@@ -185,6 +185,8 @@ The model checkpoint will be saved in the 'SAVE_DIR' directory.
 
 # [Evaluation Process](#contents)
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ## Evaluation
 
 Before running the command below, please check the checkpoint path used for evaluation.

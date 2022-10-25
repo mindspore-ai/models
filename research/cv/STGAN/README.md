@@ -216,6 +216,8 @@ python export.py --ckpt_path [CHECKPOINT_PATH] --platform [PLATFORM] --file_form
 
 ## Inference Process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### Infer on Ascend310
 
 Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model. The batch_size can only be set to 1.

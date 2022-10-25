@@ -219,9 +219,11 @@ pretrained....
 avgmiou 0.69962835
 avg_pixacc 0.94285786
 avgtime 0.19648232793807982
-````
+```
 
 ## 310 infer
+
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
 
 ```shell
     bash run_infer_310.sh [The path of the MINDIR for 310 infer] [The path of the dataset for 310 infer]  0

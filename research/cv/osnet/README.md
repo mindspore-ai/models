@@ -364,6 +364,8 @@ Rank-20 : 96.8%
 
 ## Inference Process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### [Export MindIR](#contents)
 
 Before export model, you must modify the config file osnet_config.yaml , The config items you should modify are data_path, target, batch_size_test and ckpt_file.

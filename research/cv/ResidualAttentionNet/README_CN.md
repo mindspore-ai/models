@@ -385,6 +385,8 @@ python export.py --config_path [CONFIG_PATH] --data_path [DATA_PATH] --ckpt_file
 
 ## 推理过程
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### 推理
 
 在还行推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。

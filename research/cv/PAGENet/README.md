@@ -162,6 +162,8 @@ bash scripts/eval.sh [DEVICE_ID] [CONFIG_PATH] #运行推理
 python export.py --config_path=[CONFIG_PATH]  #导出mindir，模型文件路径为config中的ckpt_file
 ```
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 ```text
 成功导出模型之后，执行以下指令进行310推理
 首先需修改default_config_ascend.yaml文件：

@@ -299,6 +299,8 @@ The parameter checkpoint_path is required, and `EXPORT_FORMAT`must be selected i
 
 #### [Inference on Ascend310](#contents)
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 Run the run_310_infer.sh to inference on ascend310.
 
 ```bash

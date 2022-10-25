@@ -247,6 +247,8 @@ these params are not loaded:  {'genA2B': []}
 
 # 310推理
 
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 在训练得到生成器的ckpt文件以后，可以将ckpt文件通过export.py导出为MINDIR格式文件并在Ascend 310上进行推理：
 
 - 生成.mindir文件

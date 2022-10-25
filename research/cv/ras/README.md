@@ -238,6 +238,8 @@ python export.py --pre_model [PRE_MODEL_PATH] --ckpt_file [CKPT_PATH] --file_for
 
 ## 推理过程
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### 用法
 
 - **注：在推理数据路径的最后一级目录下建立文件夹images和gts,分别将图片和groundtruth存入其中;modelarts模式下无需建立images，直接存储images.zip和gts.zip**

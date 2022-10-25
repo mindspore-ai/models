@@ -182,6 +182,10 @@ python export.py --checkpoint_path [CHECKPOINT_FILE_PATH] --file_name [OUTPUT_FI
 bash scripts/run_infer_onnx.sh [ONNX_PATH] [DATA_PATH] [DEVICE_TARGET]
 ```
 
+## 在310执行推理
+
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+
 # 模型说明
 
 ## 训练性能

@@ -483,6 +483,8 @@ overall performance on coco2017 validation dataset
 
 ## [Inference Process](#contents)
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ### Convert
 
 If you want to infer the network on Ascend 310, you should convert the model to MINDIR:

@@ -388,6 +388,8 @@ sh run_export.sh 1 0 ./0-1_1.ckpt
 
 ### Inference
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 ```bash
 cd ./scripts
 sh run_infer_310.sh [MINDIR_PATH] [USE_DEVICE_ID]

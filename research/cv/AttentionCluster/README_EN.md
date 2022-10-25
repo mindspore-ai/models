@@ -265,6 +265,8 @@ Python export.py --fc [FC] --night [NIGHT] --ckpt [CHECKPOINT_PATH]
 
 ### Inference process
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 #### inference
 
 After exporting the model we can do inference, the following shows an example of performing inference using the mindir model:

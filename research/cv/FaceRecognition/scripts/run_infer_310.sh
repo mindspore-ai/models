@@ -33,20 +33,7 @@ dirname_path=$(dirname "$(pwd)")
 USE_DEVICE_ID=$2
 echo 'start device '$USE_DEVICE_ID
 echo ${dirname_path}
-dev=`expr $USE_DEVICE_ID + 0`
-export DEVICE_ID=$dev
-export PYTHONPATH=${dirname_path}:$PYTHONPATH
-export RANK_SIZE=1
-export RANK_ID=0
-export ASCEND_HOME=/usr/local/Ascend/
-if [ -d ${ASCEND_HOME}/ascend-toolkit ]; then
-    export ASCEND_HOME=/usr/local/Ascend/ascend-toolkit/latest
-else
-    export ASCEND_HOME=/usr/local/Ascend/latest
-fi
-export PATH=$ASCEND_HOME/compiler/ccec_compiler/bin:$PATH
-export LD_LIBRARY_PATH=$ASCEND_HOME/lib64:/usr/local/Ascend/driver/lib64:$LD_LIBRARY_PATH
-export ASCEND_OPP_PATH=$ASCEND_HOME/opp
+# dev=`expr $USE_DEVICE_ID + 0`
 
 function preprocess_data()
 {

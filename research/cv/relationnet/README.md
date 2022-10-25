@@ -230,6 +230,8 @@ Average accuracy: 0.9911
 
 ### Evaluation On Ascend310
 
+**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+
 Enter ./scripts and execute run_infer_310.sh
 
 ```shell
