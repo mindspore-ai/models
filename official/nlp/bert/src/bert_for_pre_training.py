@@ -22,7 +22,7 @@ from mindspore.ops import functional as F
 from mindspore.ops import composite as C
 from mindspore.common.tensor import Tensor
 from mindspore.common.parameter import Parameter
-from mindspore.common.api import ms_function
+from mindspore.common.api import jit
 from mindspore.common import dtype as mstype
 from mindspore.nn.wrap.grad_reducer import DistributedGradReducer
 from mindspore.context import ParallelMode
@@ -283,7 +283,7 @@ class BertTrainOneStepCell(nn.TrainOneStepCell):
     def set_sens(self, value):
         self.sens = value
 
-    @ms_function
+    @jit
     def clip_grads(self, grads):
         grads = self.hyper_map(F.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
         return grads
@@ -367,7 +367,7 @@ class BertTrainOneStepWithLossScaleCell(nn.TrainOneStepWithLossScaleCell):
             self.loss_scale = Parameter(Tensor(scale_update_cell.get_loss_scale(), dtype=mstype.float32))
         self.enable_tuple_broaden = True
 
-    @ms_function
+    @jit
     def clip_grads(self, grads):
         grads = self.hyper_map(F.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
         return grads
@@ -446,7 +446,7 @@ class BertTrainOneStepWithLossScaleCellForAdam(nn.TrainOneStepWithLossScaleCell)
             self.loss_scale = Parameter(Tensor(scale_update_cell.get_loss_scale(), dtype=mstype.float32))
         self.enable_tuple_broaden = True
 
-    @ms_function
+    @jit
     def clip_grads(self, grads):
         grads = self.hyper_map(F.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE), grads)
         return grads

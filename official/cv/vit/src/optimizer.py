@@ -18,7 +18,7 @@ import numpy as np
 
 import mindspore as ms
 import mindspore.ops as ops
-from mindspore import ms_function
+from mindspore import jit
 from mindspore._checkparam import Validator as validator
 
 from mindspore.common.initializer import initializer
@@ -146,7 +146,7 @@ class AdamW(Optimizer):
         self.reciprocal_scale = Tensor(1.0 / loss_scale, ms.float32)
         self.clip = clip
 
-    @ms_function
+    @jit
     def construct(self, gradients):
         lr = self.get_lr()
         gradients = scale_grad(gradients, self.reciprocal_scale)
