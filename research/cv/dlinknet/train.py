@@ -14,7 +14,8 @@
 # ============================================================================
 
 import os
-
+import time
+import mindspore
 import mindspore.dataset as ds
 import mindspore.nn as nn
 from mindspore import DynamicLossScaleManager, Model
@@ -61,17 +62,16 @@ if __name__ == "__main__":
 
     batch_size = config.batch_size
     learning_rate = config.learning_rate
-
-    if config.device_target != 'Ascend':
-        raise Exception("Only support on Ascend currently.")
+    time_start = time.time()
+    if config.device_target not in ['Ascend', 'GPU']:
+        raise Exception("Only support on Ascend or GPU currently.")
 
     # set context
-    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target,
-                        device_id=int(os.environ["DEVICE_ID"]))
+    context.set_context(mode=context.GRAPH_MODE,
+                        device_target=config.device_target,
+                        )
 
     epoch_num = config.epoch_num
-    device_num = 1
-    rank_id = 0
     if config.run_distribute == "True":
         init()
         device_num = get_group_size()
@@ -84,6 +84,13 @@ if __name__ == "__main__":
                                           gradients_mean=True,
                                           parallel_mode=ParallelMode.DATA_PARALLEL
                                           )
+        if config.device_target == 'Ascend':
+            context.set_context(device_id=int(os.environ["DEVICE_ID"]))
+    else:
+        device_num = 1
+        rank_id = 0
+        context.set_context(device_id=int(os.environ["DEVICE_ID"]))
+    mindspore.common.set_seed(2022)
     # mox copy parallel
     if config.enable_modelarts:
         import moxing as mox
@@ -129,7 +136,6 @@ if __name__ == "__main__":
     # define loss
     loss = dice_bce_loss()
 
-    amp_level = "O2" if config.device_target != "Ascend" else "O0"
     dataset_sink_mode = True
     if config.device_target == "Ascend":
         dataset_sink_mode = False
@@ -148,9 +154,12 @@ if __name__ == "__main__":
                             learning_rate=learning_rate, model_name=config.model_name)
 
     # define model
-    model = Model(network, loss, optimizer, amp_level=amp_level, loss_scale_manager=loss_scale_manager)
+    model = Model(network, loss, optimizer, loss_scale_manager=loss_scale_manager)
     # train
     model.train(epoch_num, dataset, callbacks=[TimeMonitor(), myCallback], dataset_sink_mode=dataset_sink_mode)
 
     if config.enable_modelarts:
         mox.file.copy_parallel('/cache/train_out', config.train_url)
+
+    time_end = time.time()
+    print('train_time: %f' % (time_end - time_start))

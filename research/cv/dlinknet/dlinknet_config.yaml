@@ -12,8 +12,9 @@ device_target: "Ascend"
 # Training options
 epoch_num: 300
 run_distribute: "False"
+device_id: 0
 distribute_epoch_num: 300
-pretrained_ckpt: "~/resnet34_ascend_v130_imagenet2012_official_cv_bs256_top1acc73.83__top5acc91.61.ckpt"
+pretrained_ckpt: "../resnet34_ascend_v130_imagenet2012_official_cv_bs256_top1acc73.83__top5acc91.61.ckpt"
 log_name: "weight01_dink34"
 batch_size: 4
 learning_rate: 0.0002

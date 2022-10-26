@@ -26,8 +26,8 @@ if [ $# != 5 ] && [ $# != 6 ]
 then
     echo "=============================================================================================================="
     echo "Please run the script as: "
-    echo "bash scripts/run_standalone_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH] [DEVICE_ID](option, default is 0)"
-    echo "for example: bash run_standalone_eval.sh /path/to/data/ /path/to/label/ /path/to/checkpoint/ /path/to/predict/ /path/to/config/ 0"
+    echo "bash scripts/run_standalone_ascend_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH] [DEVICE_ID](option, default is 0)"
+    echo "for example: bash run_standalone_ascend_eval.sh /path/to/data/ /path/to/label/ /path/to/checkpoint/ /path/to/predict/ /path/to/config/ 0"
     echo "=============================================================================================================="
     exit 1
 fi
@@ -46,4 +46,4 @@ PREDICT_PATH=$(get_real_path $4)
 CONFIG_PATH=$(get_real_path $5)
 echo "========== start run evaluation ==========="
 echo "please get log at eval.log"
-python ${PROJECT_DIR}/../eval.py --data_path=$DATASET --label_path=$LABEL_PATH --trained_ckpt=$CHECKPOINT --predict_path=$PREDICT_PATH --config_path=$CONFIG_PATH > eval.log 2>&1 &
+python ${PROJECT_DIR}/../eval.py --data_path=$DATASET --label_path=$LABEL_PATH --trained_ckpt=$CHECKPOINT --predict_path=$PREDICT_PATH --config_path=$CONFIG_PATH --device_target=Ascend > eval.log 2>&1 &

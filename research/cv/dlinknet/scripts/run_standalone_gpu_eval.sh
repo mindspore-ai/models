@@ -22,41 +22,28 @@ get_real_path() {
   fi
 }
 
-if [ $# != 3 ]
+if [ $# != 5 ] && [ $# != 6 ]
 then
     echo "=============================================================================================================="
-    echo "Usage: bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]"
     echo "Please run the script as: "
-    echo "bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]"
-    echo "for example: bash run_distribute_train.sh /absolute/path/to/RANK_TABLE_FILE /absolute/path/to/data /absolute/path/to/config"
+    echo "bash scripts/run_standalone_gpu_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH] [DEVICE_ID](option, default is 0)"
+    echo "for example: bash run_standalone_gpu_eval.sh /path/to/data/ /path/to/label/ /path/to/checkpoint/ /path/to/predict/ /path/to/config/ 0"
     echo "=============================================================================================================="
     exit 1
 fi
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
-export HCCL_CONNECT_TIMEOUT=600
-export RANK_SIZE=8
-DATASET=$(get_real_path $2)
-CONFIG_PATH=$(get_real_path $3)
-RANK_TABLE=$(get_real_path $1)
-export RANK_TABLE_FILE=$RANK_TABLE
-for((i=0;i<RANK_SIZE;i++))
-do
-    rm -rf LOG$i
-    mkdir ./LOG$i
-    cp ./*.py ./LOG$i
-    cp -r ./src ./LOG$i
-    cd ./LOG$i || exit
-    export RANK_SIZE=8
-    export RANK_ID=$i
-    export DEVICE_ID=$i
-    echo "start training for rank $i, device $DEVICE_ID"
-    env > env.log
-    mkdir "./output"
-    python ${PROJECT_DIR}/../train.py \
-    --data_path=$DATASET \
-    --config_path=$CONFIG_PATH \
-    --output_path './output' \
-    --run_distribute=True > log.txt 2>&1 &
-
-    cd ../
-done
+export DEVICE_ID=0
+if [ $# != 5 ]
+then
+  export DEVICE_ID=$6
+fi
+rm -rf "$4"
+mkdir "$4"
+DATASET=$(get_real_path $1)
+LABEL_PATH=$(get_real_path $2)
+CHECKPOINT=$(get_real_path $3)
+PREDICT_PATH=$(get_real_path $4)
+CONFIG_PATH=$(get_real_path $5)
+echo "========== start run evaluation ==========="
+echo "please get log at eval.log"
+python ${PROJECT_DIR}/../eval.py --data_path=$DATASET --label_path=$LABEL_PATH --trained_ckpt=$CHECKPOINT --predict_path=$PREDICT_PATH --config_path=$CONFIG_PATH --device_target=GPU > eval.log 2>&1 &
