@@ -47,7 +47,7 @@ DEFINE_string(input0_path, ".", "input0 path");
 DEFINE_string(input1_path, ".", "input1 path");
 DEFINE_string(input2_path, ".", "input2 path");
 DEFINE_string(input3_path, ".", "input3 path");
-DEFINE_bool(use_crf, true, "use crf or not");
+DEFINE_string(task, "ner", "downstream task");
 DEFINE_int32(device_id, 0, "device id");
 
 int main(int argc, char **argv) {
@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
                         input1.Data().get(), input1.DataSize());
     inputs.emplace_back(model_inputs[2].Name(), model_inputs[2].DataType(), model_inputs[2].Shape(),
                         input2.Data().get(), input2.DataSize());
-    if (FLAGS_use_crf) {
+    if (FLAGS_task == "ner_crf") {
       auto input3 = ReadFileToTensor(input3_files[i]);
       inputs.emplace_back(model_inputs[3].Name(), model_inputs[3].DataType(), model_inputs[3].Shape(),
                         input3.Data().get(), input3.DataSize());

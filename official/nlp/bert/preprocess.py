@@ -25,12 +25,13 @@ from src.dataset import create_ner_dataset
 def parse_args():
     """set and check parameters."""
     parser = argparse.ArgumentParser(description="bert preprocess")
-    parser.add_argument("--assessment_method", type=str, default="BF1", choices=["BF1", "clue_benchmark", "MF1"],
-                        help="assessment_method include: [BF1, clue_benchmark, MF1], default is BF1")
+    parser.add_argument("--assessment_method", type=str, default="BF1",
+                        choices=["BF1", "clue_benchmark", "MF1", "Accuracy"],
+                        help="assessment_method include: [BF1,clue_benchmark,MF1,Accuracy], default BF1")
     parser.add_argument("--do_eval", type=str, default="false", choices=["true", "false"],
                         help="Eable eval, default is false")
-    parser.add_argument("--use_crf", type=str, default="false", choices=["true", "false"],
-                        help="Use crf, default is false")
+    parser.add_argument("--task", type=str, default="ner", choices=["ner", "ner_crf", "classifier"],
+                        help="task, include: [ner, ner_crf, classifier], default is ner")
     parser.add_argument("--eval_data_shuffle", type=str, default="false", choices=["true", "false"],
                         help="Enable eval data shuffle, default is false")
     parser.add_argument("--eval_batch_size", type=int, default=1, help="Eval batch size, default is 1")
@@ -50,8 +51,8 @@ def parse_args():
         raise ValueError("'eval_data_file_path' must be set when do evaluation task")
     if args_opt.assessment_method.lower() == "clue_benchmark" and args_opt.vocab_file_path == "":
         raise ValueError("'vocab_file_path' must be set to do clue benchmark")
-    if args_opt.use_crf.lower() == "true" and args_opt.label_file_path == "":
-        raise ValueError("'label_file_path' must be set to use crf")
+    if args_opt.task.lower() == "ner_crf" and args_opt.label_file_path == "":
+        raise ValueError("'label_file_path' must be set to use ner_crf")
     if args_opt.assessment_method.lower() == "clue_benchmark" and args_opt.label_file_path == "":
         raise ValueError("'label_file_path' must be set to do clue benchmark")
     if args_opt.assessment_method.lower() == "clue_benchmark":
@@ -82,7 +83,7 @@ if __name__ == "__main__":
             token_type_id = data["segment_ids"]
             label_ids = data["label_ids"]
 
-            file_name = "cluener_bs" + str(args.eval_batch_size) + "_" + str(idx) + ".bin"
+            file_name = str(args.task) + "_bs" + str(args.eval_batch_size) + "_" + str(idx) + ".bin"
             ids_file_path = os.path.join(ids_path, file_name)
             input_ids.tofile(ids_file_path)
 

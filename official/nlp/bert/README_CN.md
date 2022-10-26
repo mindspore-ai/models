@@ -832,7 +832,7 @@ bash run_infer_310.sh [MINDIR_PATH] [LABEL_PATH] [DATA_FILE_PATH] [DATASET_FORMA
 推理结果保存在当前路径，可在acc.log中看到最终精度结果。
 
 ```eval log
-F1 0.931243
+Classifier: Accuracy=0.5539  NER: F1=0.931243
 ```
 
 ## 导出onnx模型与推理
