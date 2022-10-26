@@ -105,6 +105,12 @@ The backbone structure of BERT is transformer. For BERT_base, the transformer co
                 python generate_chinese_mindrecord.py --data_dir /path/ChineseNER/data/ --vocab_file /path/vocab.txt --output_dir /path/ChineseNER/
             ```
 
+        - Generate ChineseNER mindrecord for ner task on CPU
+
+            ```python
+                python generate_chinese_mindrecord.py --data_dir /path/ChineseNER/data/ --vocab_file /path/vocab.txt --output_dir /path/ChineseNER/ --max_seq_length 128
+            ```
+
     - Generate SQuAD v1.1 mindrecord for squad task
         Before generate mindrecord files, you need download original dataset follow the instructions above, and download [vocab.txt](https://github.com/yuanxiaosc/BERT-for-Sequence-Labeling-and-Text-Classification/blob/master/pretrained_model/uncased_L-12_H-768_A-12/vocab.txt)
         - Generate SQuAD v1.1 mindrecord for squad task
@@ -131,8 +137,8 @@ We have provided several kinds of pretrained checkpoint.
 
 # [Environment Requirements](#contents)
 
-- Hardware（Ascend/GPU）
-    - Prepare hardware environment with Ascend/GPU processor.
+- Hardware（Ascend/GPU/CPU）
+    - Prepare hardware environment with Ascend/GPU/CPU processor.
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
@@ -361,10 +367,12 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
     ├─__init__.py
     ├─assessment_method.py                    # assessment method for evaluation
     ├─bert_for_finetune.py                    # backbone code of network
+    ├─bert_for_finetune_cpu.py                # backbone code of network
     ├─bert_for_pre_training.py                # backbone code of network
     ├─bert_model.py                           # backbone code of network
     ├─finetune_data_preprocess.py             # data preprocessing
     ├─cluner_evaluation.py                    # evaluation for cluner
+    ├─cluner_evaluation_cpu.py                # evaluation for cluner on cpu
     ├─CRF.py                                  # assessment method for clue dataset
     ├─dataset.py                              # data preprocessing
     ├─finetune_eval_model.py                  # backbone code of network
@@ -372,9 +380,12 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
     ├─utils.py                                # util function
   ├─pretrain_config.yaml                      # parameter configuration for pretrain
   ├─task_ner_config.yaml                      # parameter configuration for downstream_task_ner
+  ├─task_ner_cpu_config.yaml                  # parameter configuration for downstream_task_ner on cpu
   ├─task_classifier_config.yaml               # parameter configuration for downstream_task_classifier
+  ├─task_classifier_cpu_config.yaml           # parameter configuration for downstream_task_classifier on cpu
   ├─task_squad_config.yaml                    # parameter configuration for downstream_task_squad
   ├─pretrain_eval.py                          # train and eval net  
+  ├─quick_start.py                            # quick start  
   ├─run_classifier.py                         # finetune and eval net for classifier task
   ├─run_ner.py                                # finetune and eval net for ner task
   ├─run_pretrain.py                           # train net for pretraining phase
@@ -697,6 +708,28 @@ If you choose accuracy as assessment method, the result will be as follows:
 acc_num XXX, total_num XXX, accuracy 0.588986
 ```
 
+#### evaluation on tnews dataset when running on CPU
+
+Before running the command below, please check the load pretrain checkpoint path has been set. Please set the checkpoint path to be the absolute full path, e.g:
+
+--load_pretrain_checkpoint_path="/data/scripts/checkpoint_bert-20000_1.ckpt" \
+
+--train_data_file_path="/data/tnews/train.mindrecord" \
+
+--eval_data_file_path="/data/tnews/dev.mindrecord"
+
+```bash
+python run_classifier.py --config_path=../../task_classifier_cpu_config.yaml --device_target CPU --do_train=true --do_eval=true --num_class=15 --train_data_file_path="" --eval_data_file_path="" --load_pretrain_checkpoint_path=""
+```
+
+The command above will run in the background, you can view training logs in classfier_log.txt.
+
+If you choose accuracy as assessment method, the result will be as follows:
+
+```text
+acc_num XXX, total_num XXX, accuracy 0.554200
+```
+
 #### evaluation on cluener dataset when running on Ascend
 
 Before running the command below, please check the load pretrain checkpoint path has been set. Please set the checkpoint path to be the absolute full path, e.g:
@@ -725,6 +758,30 @@ Recall 0.865611
 F1 0.866926
 ```
 
+#### evaluation on cluener dataset when running on CPU
+
+Before running the command below, please check the load pretrain checkpoint path has been set. Please set the checkpoint path to be the absolute full path, e.g:
+
+--label_file_path="/data/cluener/label_file" \
+
+--load_pretrain_checkpoint_path="/data/scripts/checkpoint_bert-20000_1.ckpt" \
+
+--train_data_file_path="/data/cluener/train.mindrecord" \
+
+--eval_data_file_path="/data/cluener/dev.mindrecord"
+
+```bash
+python run_ner.py --config_path=../../task_ner_cpu_config.yaml --device_target CPU --do_train=true --do_eval=true --assessment_method=Accuracy --use_crf=false --with_lstm=false --label_file_path="" --train_data_file_path="" --eval_data_file_path="" --load_pretrain_checkpoint_path=""
+```
+
+The command above will run in the background, you can view training logs in ner_log.txt.
+
+If you choose accuracy as assessment method, the result will be as follows:
+
+```text
+acc_num XXX, total_num XXX, accuracy 0.916855
+```
+
 #### evaluation on chineseNer dataset when running on Ascend
 
 Before running the command below, please check the load pretrain checkpoint path has been set. Please set the checkpoint path to be the absolute full path, e.g:
@@ -749,6 +806,32 @@ If you choose F1 as assessment method, the result will be as follows:
 
 ```text
 F1 0.986526
+```
+
+#### evaluation on chineseNer dataset when running on CPU
+
+Before running the command below, please check the load pretrain checkpoint path has been set. Please set the checkpoint path to be the absolute full path, e.g:
+
+--label_file_path="/data/chineseNer/label_file" \
+
+--load_pretrain_checkpoint_path="/data/scripts/checkpoint_bert-20000_1.ckpt" \
+
+--train_data_file_path="/data/chineseNer/train.mindrecord" \
+
+--eval_data_file_path="/data/chineseNer/dev.mindrecord"
+
+```bash
+python run_ner.py --config_path=../../task_ner_cpu_config.yaml --device_target CPU --do_train=true --do_eval=true --assessment_method=BF1 --use_crf=true --with_lstm=true --label_file_path="" --train_data_file_path="" --eval_data_file_path="" --load_pretrain_checkpoint_path=""
+```
+
+The command above will run in the background, you can view training logs in ner_log.txt.
+
+If you choose BF1 as assessment method, the result will be as follows:
+
+```text
+Precision 0.983121
+Recall 0.978546
+F1 0.980828
 ```
 
 #### evaluation on msra dataset when running on Ascend
@@ -794,6 +877,29 @@ The result will be as follows:
 
 ```text
 {"exact_match": 80.3878923040233284, "f1": 87.6902384023850329}
+```
+
+#### evaluation on squad v1.1 dataset when running on CPU
+
+Before running the command below, please check the load pretrain checkpoint path has been set. Please set the checkpoint path to be the absolute full path, e.g:
+
+--vocab_file_path="/data/squad/vocab_bert_large_en.txt" \
+
+--load_pretrain_checkpoint_path="/data/scripts/bert_converted.ckpt" \
+
+--train_data_file_path="/data/squad/train.mindrecord" \
+
+--eval_json_path="/data/squad/dev-v1.1.json" \
+
+```bash
+python run_squad.py --config_path=../../task_squad_config.yaml --device_target CPU --do_train=true --do_eval=true --vocab_file_path="" --train_data_file_path="" --eval_json_path="" --dataset_format tfrecord --load_pretrain_checkpoint_path=""
+```
+
+The command above will run in the background, you can view training logs in squad_log.txt.
+The result will be as follows:
+
+```text
+{"exact_match": 79.62157048249763, "f1": 87.24089125977054}
 ```
 
 ### [Export MindIR](#contents)

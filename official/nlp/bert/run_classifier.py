@@ -18,6 +18,8 @@ Bert finetune and evaluation script.
 '''
 
 import os
+from tqdm import tqdm
+import mindspore as ms
 import mindspore.common.dtype as mstype
 from mindspore import context
 from mindspore import log as logger
@@ -27,6 +29,7 @@ from mindspore.train.model import Model
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
+from src.bert_for_finetune_cpu import BertFinetuneCellCPU
 from src.bert_for_finetune import BertFinetuneCell, BertCLS
 from src.dataset import create_classification_dataset
 from src.assessment_method import Accuracy, F1, MCC, Spearman_Correlation
@@ -78,8 +81,11 @@ def do_train(dataset=None, network=None, load_checkpoint_path="", save_checkpoin
     param_dict = load_checkpoint(load_checkpoint_path)
     load_param_into_net(network, param_dict)
 
-    update_cell = DynamicLossScaleUpdateCell(loss_scale_value=2**32, scale_factor=2, scale_window=1000)
-    netwithgrads = BertFinetuneCell(network, optimizer=optimizer, scale_update_cell=update_cell)
+    if ms.get_context("device_target") == "CPU":
+        netwithgrads = BertFinetuneCellCPU(network, optimizer=optimizer)
+    else:
+        update_cell = DynamicLossScaleUpdateCell(loss_scale_value=2**32, scale_factor=2, scale_window=1000)
+        netwithgrads = BertFinetuneCell(network, optimizer=optimizer, scale_update_cell=update_cell)
     model = Model(netwithgrads)
     callbacks = [TimeMonitor(dataset.get_dataset_size()), LossCallBack(dataset.get_dataset_size()), ckpoint_cb]
     model.train(epoch_num, dataset, callbacks=callbacks)
@@ -124,7 +130,7 @@ def do_eval(dataset=None, network=None, num_class=2, assessment_method="accuracy
         raise ValueError("Assessment method not supported, support: [accuracy, f1, mcc, spearman_correlation]")
 
     columns_list = ["input_ids", "input_mask", "segment_ids", "label_ids"]
-    for data in dataset.create_dict_iterator(num_epochs=1):
+    for data in tqdm(dataset.create_dict_iterator(num_epochs=1), total=dataset.get_dataset_size()):
         input_data = []
         for i in columns_list:
             input_data.append(data[i])
@@ -172,8 +178,13 @@ def run_classifier():
         if bert_net_cfg.compute_type != mstype.float32:
             logger.warning('GPU only support fp32 temporarily, run with fp32.')
             bert_net_cfg.compute_type = mstype.float32
+    elif target == "CPU":
+        if args_opt.use_pynative_mode:
+            context.set_context(mode=context.PYNATIVE_MODE, device_target="CPU", device_id=args_opt.device_id)
+        else:
+            context.set_context(mode=context.GRAPH_MODE, device_target="CPU", device_id=args_opt.device_id)
     else:
-        raise Exception("Target error, GPU or Ascend is supported.")
+        raise Exception("Target error, CPU or GPU or Ascend is supported.")
 
     netwithloss = BertCLS(bert_net_cfg, True, num_labels=args_opt.num_class, dropout_prob=0.1,
                           assessment_method=assessment_method)

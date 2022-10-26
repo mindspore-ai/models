@@ -28,6 +28,7 @@ from mindspore.train.model import Model
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
+from src.bert_for_finetune_cpu import BertSquadCellCPU
 from src.bert_for_finetune import BertSquadCell, BertSquad
 from src.dataset import create_squad_dataset
 from src.utils import make_directory, LossCallBack, LoadNewestCkpt, BertLearningRate
@@ -38,7 +39,7 @@ from src.model_utils.device_adapter import get_device_id
 _cur_dir = os.getcwd()
 
 
-def do_train(dataset=None, network=None, load_checkpoint_path="", save_checkpoint_path="", epoch_num=1):
+def do_train(dataset=None, network=None, load_checkpoint_path="", save_checkpoint_path="", epoch_num=1, target=None):
     """ do train """
     if load_checkpoint_path == "":
         raise ValueError("Pretrain model missed, finetune task must load pretrain model!")
@@ -78,8 +79,11 @@ def do_train(dataset=None, network=None, load_checkpoint_path="", save_checkpoin
     param_dict = load_checkpoint(load_checkpoint_path)
     load_param_into_net(network, param_dict)
 
-    update_cell = DynamicLossScaleUpdateCell(loss_scale_value=2 ** 32, scale_factor=2, scale_window=1000)
-    netwithgrads = BertSquadCell(network, optimizer=optimizer, scale_update_cell=update_cell)
+    if target == "CPU":
+        netwithgrads = BertSquadCellCPU(network, optimizer=optimizer)
+    else:
+        update_cell = DynamicLossScaleUpdateCell(loss_scale_value=2 ** 32, scale_factor=2, scale_window=1000)
+        netwithgrads = BertSquadCell(network, optimizer=optimizer, scale_update_cell=update_cell)
     model = Model(netwithgrads)
     callbacks = [TimeMonitor(dataset.get_dataset_size()), LossCallBack(dataset.get_dataset_size()), ckpoint_cb]
     model.train(epoch_num, dataset, callbacks=callbacks)
@@ -161,8 +165,13 @@ def run_squad():
         if bert_net_cfg.compute_type != mstype.float32:
             logger.warning('GPU only support fp32 temporarily, run with fp32.')
             bert_net_cfg.compute_type = mstype.float32
+    elif target == "CPU":
+        if args_opt.use_pynative_mode:
+            context.set_context(mode=context.PYNATIVE_MODE, device_target="CPU", device_id=args_opt.device_id)
+        else:
+            context.set_context(mode=context.GRAPH_MODE, device_target="CPU", device_id=args_opt.device_id)
     else:
-        raise Exception("Target error, GPU or Ascend is supported.")
+        raise Exception("Target error, CPU or GPU or Ascend is supported.")
 
     netwithloss = BertSquad(bert_net_cfg, True, 2, dropout_prob=0.1)
 
@@ -172,7 +181,7 @@ def run_squad():
                                   schema_file_path=args_opt.schema_file_path,
                                   do_shuffle=(args_opt.train_data_shuffle.lower() == "true"),
                                   dataset_format=args_opt.dataset_format)
-        do_train(ds, netwithloss, load_pretrain_checkpoint_path, save_finetune_checkpoint_path, epoch_num)
+        do_train(ds, netwithloss, load_pretrain_checkpoint_path, save_finetune_checkpoint_path, epoch_num, target)
         if args_opt.do_eval.lower() == "true":
             if save_finetune_checkpoint_path == "":
                 load_finetune_checkpoint_dir = _cur_dir

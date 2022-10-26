@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ Bert finetune and evaluation script.
 
 import os
 import time
+from tqdm import tqdm
+import mindspore as ms
 import mindspore.common.dtype as mstype
 from mindspore import context
 from mindspore import log as logger
@@ -28,6 +30,7 @@ from mindspore.train.model import Model
 from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, TimeMonitor
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
+from src.bert_for_finetune_cpu import BertFinetuneCellCPU
 from src.bert_for_finetune import BertFinetuneCell, BertNER
 from src.dataset import create_ner_dataset
 from src.utils import make_directory, LossCallBack, LoadNewestCkpt, BertLearningRate, convert_labels_to_index
@@ -77,8 +80,11 @@ def do_train(dataset=None, network=None, load_checkpoint_path="", save_checkpoin
     param_dict = load_checkpoint(load_checkpoint_path)
     load_param_into_net(network, param_dict)
 
-    update_cell = DynamicLossScaleUpdateCell(loss_scale_value=2**32, scale_factor=2, scale_window=1000)
-    netwithgrads = BertFinetuneCell(network, optimizer=optimizer, scale_update_cell=update_cell)
+    if ms.get_context("device_target") == "CPU":
+        netwithgrads = BertFinetuneCellCPU(network, optimizer=optimizer)
+    else:
+        update_cell = DynamicLossScaleUpdateCell(loss_scale_value=2**32, scale_factor=2, scale_window=1000)
+        netwithgrads = BertFinetuneCell(network, optimizer=optimizer, scale_update_cell=update_cell)
     model = Model(netwithgrads)
     callbacks = [TimeMonitor(dataset.get_dataset_size()), LossCallBack(dataset.get_dataset_size()), ckpoint_cb]
     train_begin = time.time()
@@ -119,7 +125,10 @@ def do_eval(dataset=None, network=None, use_crf="", with_lstm="", num_class=41, 
     model = Model(net_for_pretraining)
 
     if assessment_method == "clue_benchmark":
-        from src.cluener_evaluation import submit
+        if ms.get_context("device_target") == "CPU":
+            from src.cluener_evaluation_cpu import submit
+        else:
+            from src.cluener_evaluation import submit
         submit(model=model, path=data_file, vocab_file=vocab_file, use_crf=use_crf,
                label_file=label_file, tag_to_index=tag_to_index)
     else:
@@ -137,7 +146,7 @@ def do_eval(dataset=None, network=None, use_crf="", with_lstm="", num_class=41, 
             raise ValueError("Assessment method not supported, support: [accuracy, f1, mcc, spearman_correlation]")
 
         columns_list = ["input_ids", "input_mask", "segment_ids", "label_ids"]
-        for data in dataset.create_dict_iterator(num_epochs=1):
+        for data in tqdm(dataset.create_dict_iterator(num_epochs=1), total=dataset.get_dataset_size()):
             input_data = []
             for i in columns_list:
                 input_data.append(data[i])
@@ -199,8 +208,13 @@ def run_ner():
         if bert_net_cfg.compute_type != mstype.float32:
             logger.warning('GPU only support fp32 temporarily, run with fp32.')
             bert_net_cfg.compute_type = mstype.float32
+    elif target == "CPU":
+        if args_opt.use_pynative_mode:
+            context.set_context(mode=context.PYNATIVE_MODE, device_target="CPU", device_id=args_opt.device_id)
+        else:
+            context.set_context(mode=context.GRAPH_MODE, device_target="CPU", device_id=args_opt.device_id)
     else:
-        raise Exception("Target error, GPU or Ascend is supported.")
+        raise Exception("Target error, CPU or GPU or Ascend is supported.")
     label_list = []
     with open(args_opt.label_file_path) as f:
         for label in f:
