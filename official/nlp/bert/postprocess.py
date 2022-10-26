@@ -48,25 +48,29 @@ parser.add_argument("--seq_length", type=int, default=128, help="seq_length, def
                                                                 "through the relevant'*.yaml' filer")
 parser.add_argument("--batch_size", type=int, default=1, help="Eval batch size, default is 1")
 parser.add_argument("--label_dir", type=str, default="", help="label data dir")
-parser.add_argument("--assessment_method", type=str, default="BF1", choices=["BF1", "clue_benchmark", "MF1"],
+parser.add_argument("--assessment_method", type=str, default="BF1",
+                    choices=["BF1", "clue_benchmark", "MF1", "Accuracy"],
                     help="assessment_method include: [BF1, clue_benchmark, MF1], default is BF1")
 parser.add_argument("--result_dir", type=str, default="./result_Files", help="infer result Files")
-parser.add_argument("--use_crf", type=str, default="false", choices=["true", "false"],
-                    help="Use crf, default is false")
+parser.add_argument("--task", type=str, default="ner", choices=["ner", "ner_crf", "classifier"],
+                    help="task, include: [ner, ner_crf, classifier], default is ner")
 
 args, _ = parser.parse_known_args()
 
 if __name__ == "__main__":
-    num_class = 41
-    assessment_method = args.assessment_method.lower()
-    use_crf = args.use_crf
+    task = args.task.lower()
+    if task == "classifier":
+        num_class = 15
+    else:
+        num_class = 41
 
+    assessment_method = args.assessment_method.lower()
     if assessment_method == "accuracy":
         callback = Accuracy()
     elif assessment_method == "bf1":
-        callback = F1((use_crf.lower() == "true"), num_class)
+        callback = F1((task == "ner_crf"), num_class)
     elif assessment_method == "mf1":
-        callback = F1((use_crf.lower() == "true"), num_labels=num_class, mode="MultiLabel")
+        callback = F1((task == "ner_crf"), num_labels=num_class, mode="MultiLabel")
     elif assessment_method == "mcc":
         callback = MCC()
     elif assessment_method == "spearman_correlation":
@@ -76,7 +80,7 @@ if __name__ == "__main__":
 
     file_name = os.listdir(args.label_dir)
     for f in file_name:
-        if use_crf.lower() == "true":
+        if task == "ner_crf":
             logits = ()
             for j in range(args.seq_length):
                 f_name = f.split('.')[0] + '_' + str(j) + '.bin'

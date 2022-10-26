@@ -15,8 +15,9 @@
 # ============================================================================
 
 if [[ $# -lt 7 || $# -gt 8 ]]; then
-    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [LABEL_PATH] [DATA_FILE_PATH] [DATASET_FORMAT] [SCHEMA_PATH] [USE_CRF] [NEED_PREPROCESS] [DEVICE_ID]
-    USE_CRF is mandatory, and must choose from [true|false], it's case-insensitive
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [LABEL_PATH] [DATA_FILE_PATH] [DATASET_FORMAT] [SCHEMA_PATH] [TASK]
+    [NEED_PREPROCESS] [DEVICE_ID]
+    TASK is mandatory, and must choose from [ner|ner_crf|classifier]
     NEED_PREPROCESS means weather need preprocess or not, it's value is 'y' or 'n'.
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
@@ -37,12 +38,14 @@ eval_data_file_path=$(get_real_path $3)
 dataset_format=$4
 schema_file_path=$(get_real_path $5)
 net_type=${6,,}
-if [ $net_type == 'true' ]; then
-  echo "downstream: CRF"
-elif [ $net_type == 'false' ]; then
+if [ $net_type == 'ner' ]; then
   echo "downstream: NER"
+elif [ $net_type == 'ner_crf' ]; then
+  echo "downstream: NER-CRF"
+elif [ $net_type == 'classifier' ]; then
+  echo "downstream: Classifier"
 else
-  echo "[USE_CRF]:true or false"
+  echo "[TASK] must choose from [ner|ner_crf|classifier]"
   exit 1
 fi
 
@@ -72,7 +75,8 @@ function preprocess_data()
         rm -rf ./preprocess_Result
     fi
     mkdir preprocess_Result
-    python ../preprocess.py --use_crf=$net_type --do_eval=true --label_file_path=$label_file_path --eval_data_file_path=$eval_data_file_path --dataset_format=$dataset_format --schema_file_path=$schema_file_path --result_path=./preprocess_Result/
+    python ../preprocess.py --task=$net_type --do_eval=true --label_file_path=$label_file_path --eval_data_file_path=$eval_data_file_path \
+        --dataset_format=$dataset_format --schema_file_path=$schema_file_path --result_path=./preprocess_Result/
 }
 
 function compile_app()
@@ -93,13 +97,19 @@ function infer()
     mkdir result_Files
     mkdir time_Result
 
-    ../ascend310_infer/out/main --mindir_path=$model --input0_path=./preprocess_Result/00_data --input1_path=./preprocess_Result/01_data --input2_path=./preprocess_Result/02_data --input3_path=./preprocess_Result/03_data --use_crf=$net_type --device_id=$device_id &> infer.log
+    ../ascend310_infer/out/main --mindir_path=$model --input0_path=./preprocess_Result/00_data --input1_path=./preprocess_Result/01_data \
+        --input2_path=./preprocess_Result/02_data --input3_path=./preprocess_Result/03_data --task=$net_type --device_id=$device_id &> infer.log
 
 }
 
 function cal_acc()
 {
-    python ../postprocess.py --result_path=./result_Files --label_dir=./preprocess_Result/03_data --use_crf=$net_type &> acc.log
+    if [ $net_type == 'classifier' ]; then
+        python ../postprocess.py --result_path=./result_Files --label_dir=./preprocess_Result/03_data --task=$net_type \
+            --seq_length=1 --assessment_method=Accuracy &> acc.log
+    else
+        python ../postprocess.py --result_path=./result_Files --label_dir=./preprocess_Result/03_data --task=$net_type &> acc.log
+    fi
 }
 
 if [ $need_preprocess == "y" ]; then
