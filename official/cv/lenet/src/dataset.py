@@ -38,14 +38,12 @@ def create_dataset(data_path, batch_size=32, num_parallel_workers=1):
     # define map operations
     resize_op = CV.Resize((resize_height, resize_width), interpolation=Inter.LINEAR)  # Bilinear mode
     rescale_nml_op = CV.Rescale(rescale_nml * rescale, shift_nml)
-    hwc2chw_op = CV.HWC2CHW()
     type_cast_op = C.TypeCast(mstype.int32)
 
     # apply map operations on images
     mnist_ds = mnist_ds.map(operations=type_cast_op, input_columns="label", num_parallel_workers=num_parallel_workers)
     mnist_ds = mnist_ds.map(operations=resize_op, input_columns="image", num_parallel_workers=num_parallel_workers)
     mnist_ds = mnist_ds.map(operations=rescale_nml_op, input_columns="image", num_parallel_workers=num_parallel_workers)
-    mnist_ds = mnist_ds.map(operations=hwc2chw_op, input_columns="image", num_parallel_workers=num_parallel_workers)
 
     # apply DatasetOps
     mnist_ds = mnist_ds.shuffle(buffer_size=1024)

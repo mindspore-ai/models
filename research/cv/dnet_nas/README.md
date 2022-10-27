@@ -223,3 +223,6 @@ For details about inference performance, see noah-vega [modelzoo](https://github
 
 Please check the official [homepage](https://gitee.com/mindspore/models).
 
+## FAQ
+
+- **this network doesn't support PYNATIVE mode.**
