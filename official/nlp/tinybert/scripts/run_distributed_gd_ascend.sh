@@ -27,7 +27,6 @@ EPOCH_SIZE=$2
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 export RANK_TABLE_FILE=$3
 export RANK_SIZE=$1
-export HCCL_CONNECT_TIMEOUT=600
 cores=`cat /proc/cpuinfo|grep "processor" |wc -l`
 echo "the number of logical core" $cores
 avg_core_per_rank=`expr $cores \/ $RANK_SIZE`
