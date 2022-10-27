@@ -58,8 +58,8 @@ Up to 15 cars and 30 pedestrians are visible per image. The 3D object detection 
 
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
 - Download [KITTI](http://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=3d), data from [ImageSets](https://github.com/traveller59/second.pytorch/tree/master/second/data/ImageSets), put files from `ImageSets` into `pointpillars/src/data/ImageSets/`
 
   For the dataset preparation instructions see the [Dataset preparation](#dataset-preparation) section.

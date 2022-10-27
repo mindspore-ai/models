@@ -114,8 +114,8 @@ DIV2K
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 
 # 脚本说明
 
@@ -228,7 +228,7 @@ bash script/run_ascend_distribute.sh [TRAIN_DATA_DIR]
 bash script/run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
 ```
 
-- 分布式训练需要提前创建JSON格式的HCCL配置文件。具体操作，参见：<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+- 分布式训练需要提前创建JSON格式的HCCL配置文件。具体操作，参见：<https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools>
 
 ## 评估过程
 
@@ -290,7 +290,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATASET_TYPE] [SCALE] [DEVICE_I
 | 速度 | 8卡：205毫秒/步 |
 | 总时长 | 8卡：14.74小时 |
 | 调优检查点 |    0.2 GB（.ckpt 文件）               |
-| 脚本                  |[RCAN](https://gitee.com/mindspore/models/tree/master/research/cv/RCAN) |                   |
+| 脚本                  |[RCAN](https://gitee.com/mindspore/models/tree/r1.9/research/cv/RCAN) |                   |
 
 ### 评估性能
 

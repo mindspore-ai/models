@@ -83,8 +83,8 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
 
 ## [Quick Start](#contents)
 
@@ -440,7 +440,7 @@ train_parallel1/log:epcoh: 2 step: 97, loss is 1.7133579
 ...
 ```
 
-> About rank_table.json, you can refer to the [distributed training tutorial](https://www.mindspore.cn/tutorials/experts/en/master/parallel/introduction.html).
+> About rank_table.json, you can refer to the [distributed training tutorial](https://www.mindspore.cn/tutorials/experts/en/r1.9/parallel/introduction.html).
 > **Attention** This will bind the processor cores according to the `device_num` and total processor numbers. If you don't expect to run pretraining with binding processor cores, remove the operations about `taskset` in `scripts/run_distribute_train.sh`
 
 ##### Run vgg19 on GPU

@@ -77,8 +77,8 @@ WideResNet的总体网络架构如下：[链接](https://arxiv.org/abs/1605.0714
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 
 # 快速入门
 
@@ -211,7 +211,7 @@ bash run_standalone_train_gpu.sh [DATASET_PATH] [CONFIG_PATH] [EXPERIMENT_LABEL]
 
 对于分布式培训，需要提前创建主机文件配置。
 
-请按照链接中的说明操作 [GPU-Multi-Host](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_gpu.html).
+请按照链接中的说明操作 [GPU-Multi-Host](https://www.mindspore.cn/tutorials/experts/en/r1.9/parallel/train_gpu.html).
 
 ## 培训时的评估
 

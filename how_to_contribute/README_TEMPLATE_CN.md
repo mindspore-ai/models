@@ -174,11 +174,11 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [LABEL_FILE] [DEVICE_I
 ## 参考模板
 
 此部分不需要出现在你的README中
-[maskrcnn_readme](https://gitee.com/mindspore/models/blob/master/official/cv/maskrcnn/README_CN.md)
+[maskrcnn_readme](https://gitee.com/mindspore/models/blob/r1.9/official/cv/maskrcnn/README_CN.md)
 
 ## 贡献指南
 
-如果你想参与贡献昇思的工作当中，请阅读[昇思贡献指南](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/r1.9/how_to_contribute)
+如果你想参与贡献昇思的工作当中，请阅读[昇思贡献指南](https://gitee.com/mindspore/models/blob/r1.9/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/r1.9/how_to_contribute)
 
 ### 贡献者
 

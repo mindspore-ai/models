@@ -54,7 +54,7 @@ Dataset used can refer to paper.
 
 ## [Mixed Precision](#contents)
 
-The [mixed precision](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
+The [mixed precision](https://mindspore.cn/tutorials/experts/zh-CN/r1.9/others/mixed_precision.html) training method accelerates the deep learning neural network training process by using both the single-precision and half-precision data formats, and maintains the network precision achieved by the single-precision training at the same time. Mixed precision training can accelerate the computation process, reduce memory usage, and enable a larger model or batch size to be trained on specific hardware.
 
 For FP16 operators, if the input data type is FP32, the backend of MindSpore will automatically handle it with reduced precision. Users could check the reduced-precision operators by enabling INFO log and then searching ‘reduce precision’.
 
@@ -65,8 +65,8 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
 
 # [Script description](#contents)
 
@@ -193,7 +193,7 @@ bash run_eval_gpu.sh DEVICE_ID DATASET_PATH CHECKPOINT_PATH
 bash run_infer_310.sh MINDIR_PATH DATA_PATH LABEL_FILE DEVICE_ID
 ```
 
-> Notes: RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html), and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools).
+> Notes: RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorials/experts/en/r1.9/parallel/train_ascend.html), and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/r1.9/utils/hccl_tools).
 
 ### Launch
 

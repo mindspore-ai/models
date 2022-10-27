@@ -47,8 +47,8 @@ RedNet30是一个使用encoder-decoder处理图像降噪任务的模型， 本�
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 - 安装requirements.txt中的python包。
 - 生成config json文件用于8卡训练。
 
@@ -137,7 +137,7 @@ RedNet30是一个使用encoder-decoder处理图像降噪任务的模型， 本�
 
   分布式训练需要提前创建JSON格式的HCCL配置文件。
 
-  运行分布式任务时需要用到RANK_TABLE_FILE指定的rank_table.json。您可以使用hccl_tools生成该文件，详见[链接](https://gitee.com/mindspore/models/blob/master/utils/hccl_tools/hccl_tools.py) 。
+  运行分布式任务时需要用到RANK_TABLE_FILE指定的rank_table.json。您可以使用hccl_tools生成该文件，详见[链接](https://gitee.com/mindspore/models/blob/r1.9/utils/hccl_tools/hccl_tools.py) 。
 
 ## 评估过程
 

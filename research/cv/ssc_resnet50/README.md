@@ -48,7 +48,7 @@ SSC-ResNet：通过半监督+主动学习的方式，进行resnet50分类网络�
 
 ### 混合精度（Ascend）
 
-采用[混合精度](https://www.mindspore.cn/tutorials/zh-CN/master/advanced/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。 以FP16算子为例，如果输入数据类型为FP32，MindSpore后台会自动降低精度来处理数据。用户可打开INFO日志，搜索“reduce precision”查看精度降低的算子
+采用[混合精度](https://mindspore.cn/tutorials/experts/zh-CN/r1.9/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。 以FP16算子为例，如果输入数据类型为FP32，MindSpore后台会自动降低精度来处理数据。用户可打开INFO日志，搜索“reduce precision”查看精度降低的算子
 
 ### 半监督
 
@@ -72,8 +72,8 @@ SSC-ResNet：通过半监督+主动学习的方式，进行resnet50分类网络�
     - [MindSpore](https://www.mindspore.cn/install/en)
 
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 
 ## 快速入门
 
@@ -302,7 +302,7 @@ acc1:>=76.5
 | 总时长         | 270h\*2                            | 370h\*2                            |
 | 参数(M)        | 25.5                               | 25.5                               |
 | 微调检查点     | 720.27M(ckpt)                       | 720.27M(ckpt)                      |
-| 配置文件       | [链接](https://gitee.com/mindspore/models/blob/master/research/cv/ssc_resnet50/default_config.yaml) | [链接](https://gitee.com/mindspore/models/blob/master/research/cv/ssc_resnet50/default_config.yaml) |
+| 配置文件       | [链接](https://gitee.com/mindspore/models/blob/r1.9/research/cv/ssc_resnet50/default_config.yaml) | [链接](https://gitee.com/mindspore/models/blob/r1.9/research/cv/ssc_resnet50/default_config.yaml) |
 
 ## 随机情况说明
 

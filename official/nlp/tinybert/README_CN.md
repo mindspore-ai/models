@@ -127,8 +127,8 @@ TinyBERT模型的主干结构是转换器，转换器包含四个编码器模块
     - [MindSpore](https://gitee.com/mindspore/mindspore)
     - scipy>=1.7
 - 更多关于Mindspore的信息，请查看以下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 
 # 快速入门
 
@@ -161,7 +161,7 @@ TinyBERT模型的主干结构是转换器，转换器包含四个编码器模块
     详情参见如下链接：
     https:gitee.com/mindspore/models/tree/master/utils/hccl_tools.
 
-    如需设置数据集格式和参数，请创建JSON格式的视图配置文件，详见[TFRecord](https://www.mindspore.cn/docs/zh-CN/master/api_python/dataset/mindspore.dataset.TFRecordDataset.html) 格式。
+    如需设置数据集格式和参数，请创建JSON格式的视图配置文件，详见[TFRecord](https://www.mindspore.cn/docs/zh-CN/r1.9/api_python/dataset/mindspore.dataset.TFRecordDataset.html) 格式。
 
     ```text
     For general task, schema file contains ["input_ids", "input_mask", "segment_ids"].

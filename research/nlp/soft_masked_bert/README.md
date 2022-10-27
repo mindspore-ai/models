@@ -64,8 +64,8 @@ python preprocess_dataset.py
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
 - Dependencies
     - The installation depends on
       > pip install -r requirements.txt
@@ -255,7 +255,7 @@ Inference result is saved in the project's main path, you can find result in acc
 | Speed                      | 1p：349.7ms/step;  8p：314.7ms/step                          |
 | Total time                 | 1p：4076mins;  8p：458mins                          |
 | Checkpoint for Fine tuning | 459M (.ckpt文件)                                         |
-| Scripts                    | [link](https://gitee.com/rafeal8830/soft-maksed-bert/edit/master/README_TEMPLATE_CN.md) |
+| Scripts                    | [link](https://gitee.com/rafeal8830/soft-maksed-bert/edit/r1.9/README_TEMPLATE_CN.md) |
 
 ### Inference Performance
 
@@ -277,7 +277,7 @@ e.g. you can reference the following template
 
 ## Contribution Guide
 
-If you want to contribute, please review the [contribution guidelines](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING.md) and [how_to_contribute](https://gitee.com/mindspore/models/tree/r1.9/how_to_contribute)
+If you want to contribute, please review the [contribution guidelines](https://gitee.com/mindspore/models/blob/r1.9/CONTRIBUTING.md) and [how_to_contribute](https://gitee.com/mindspore/models/tree/r1.9/how_to_contribute)
 
 ### Contributors
 

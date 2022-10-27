@@ -48,8 +48,8 @@ It contains 5,000 finely annotated images split into training, validation and te
 - frame:
     - [Mindspore](https://www.mindspore.cn/install)
 - For details, please refer to the following resources:
-    - [MindSpore course](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore course](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 
 # [Scription Description](#Content)
 
