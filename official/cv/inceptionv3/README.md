@@ -50,6 +50,8 @@ The overall network architecture of InceptionV3 is show below:
 
 Dataset used can refer to paper.
 
+Dataset used: [ImageNet2012](http://www.image-net.org/)
+
 - Dataset size: 125G, 1250k colorful images in 1000 classes
     - Train: 120G, 1200k images
     - Test: 5G, 50k images
