@@ -846,11 +846,11 @@ Before performing inference, the mindir file must be exported by export.py. Inpu
 
 ```shell
 # Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [LABEL_PATH] [DATA_FILE_PATH] [DATASET_FORMAT] [SCHEMA_PATH] [USE_CRF] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [LABEL_PATH] [DATA_FILE_PATH] [DATASET_FORMAT] [SCHEMA_PATH] [TASK] [NEED_PREPROCESS] [DEVICE_ID]
 ```
 
 `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'.
-`USE_CRF` is mandatory, and must choose from [true|false], it's case-insensitive.
+`TASK` is mandatory, and must choose from [ner|ner_crf|classifier].
 `DEVICE_ID` is optional, default value is 0.
 
 #### result

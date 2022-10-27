@@ -820,11 +820,11 @@ python export.py --config_path [/path/*.yaml] --export_ckpt_file [CKPT_PATH] --e
 
 # Ascend310 推理
 
-bash run_infer_310.sh [MINDIR_PATH] [LABEL_PATH] [DATA_FILE_PATH] [DATASET_FORMAT] [SCHEMA_PATH] [USE_CRF] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_310.sh [MINDIR_PATH] [LABEL_PATH] [DATA_FILE_PATH] [DATASET_FORMAT] [SCHEMA_PATH] [TASK] [NEED_PREPROCESS] [DEVICE_ID]
 ```
 
 `NEED_PREPROCESS` 为必选项, 在[y|n]中取值，表示数据是否预处理为bin格式。
-`USE_CRF` 为必选项, 在 [true|false]中取值，大小写不敏感。
+`TASK` 为必选项, 在 [ner|ner_crf|classifier]中取值。
 `DEVICE_ID` 可选，默认值为 0。
 
 ### 结果
