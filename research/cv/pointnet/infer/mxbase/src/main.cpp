@@ -16,6 +16,7 @@
 
 #include <unistd.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -29,7 +30,7 @@ std::vector<double> g_inferCost;
 
 void InitPointnetParam(InitParam* initParam) {
     initParam->deviceId = 0;
-    initParam->modelPath = "../../convert/pointnet.om";
+    initParam->modelPath = "../convert/pointnet.om";
 }
 
 APP_ERROR ReadFilesFromPath(const std::string &path, std::vector<std::string> *files) {
@@ -54,6 +55,10 @@ APP_ERROR ReadFilesFromPath(const std::string &path, std::vector<std::string> *f
 
 
 int main(int argc, char* argv[]) {
+    if (argc <= 1) {
+        LogError << "Please input path, such as '../../data/datapath_BS1/00_data/'";
+        return APP_ERR_OK;
+    }
     InitParam initParam;
     InitPointnetParam(&initParam);
     auto pointnet = std::make_shared<Pointnet>();
@@ -64,13 +69,19 @@ int main(int argc, char* argv[]) {
         return ret;
     }
 
-    std::string inferPath = "../../data/datapath_BS1/00_data/";
+    std::string inferPath = argv[1];
     std::vector<std::string> files;
     ret = ReadFilesFromPath(inferPath, &files);
     LogInfo << "successfully read files";
     if (ret != APP_ERR_OK) {
         LogError << "Read files from path failed, ret=" << ret << ".";
         return ret;
+    }
+    std::string infer_result_path;
+    infer_result_path = "./result";
+    int res = mkdir(infer_result_path.c_str(), S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH);
+    if (res == 0) {
+        LogInfo << "create result dir success";
     }
     // do infer
     LogInfo << "begin infer";
