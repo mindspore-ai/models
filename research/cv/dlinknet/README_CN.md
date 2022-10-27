@@ -72,8 +72,8 @@ D-LinkNet的解码器与原始LinkNet相同，这在计算上是有效的。解�
 
 ## 环境要求
 
-- 硬件（Ascend）
-    - 准备Ascend处理器搭建硬件环境。
+- 硬件（Ascend or GPU）
+    - 准备Ascend or GPU处理器搭建硬件环境。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
@@ -94,21 +94,26 @@ D-LinkNet的解码器与原始LinkNet相同，这在计算上是有效的。解�
 
     注意，在线下机器运行前，请确认`dlinknet_config.yaml`文件中的`enable_modelarts`参数被设置为`False`。
 
-    另外，在运行训练和评估推理脚本前，请确认在[这里](https://download.mindspore.cn/model_zoo/r1.3/resnet34_ascend_v130_imagenet2012_official_cv_bs256_top1acc73.83__top5acc91.61/) 下载了resnet34的预训练权重文件，并将`dlinknet_config.yaml`文件中的`pretrained_ckpt`参数设置为其绝对路径。
+    另外，在运行训练和评估推理脚本前，请确认在[这里](https://download.mindspore.cn/model_zoo/r1.3/resnet34_ascend_v130_imagenet2012_official_cv_bs256_top1acc73.83__top5acc91.61/resnet34_ascend_v130_imagenet2012_official_cv_bs256_top1acc73.83__top5acc91.61.ckpt) 下载了resnet34的预训练权重文件，并将`dlinknet_config.yaml`文件中的`pretrained_ckpt`参数设置为其绝对路径。
 
   ```shell
   # 训练示例
-  python train.py --data_path=/path/to/data/ --config_path=/path/to/yaml > train.log 2>&1 &
-  OR
-  bash scripts/run_standalone_train.sh [DATASET] [CONFIG_PATH]
+  python train.py --data_path=[DATASET] --config_path=[CONFIG_PATH] --output_path=[OUTPUT_PATH] --device_target=[DEVICE_TARGET] > train.log 2>&1 &  # on Ascend or GPU
+
+  # 训练脚本启动
+  bash scripts/run_standalone_ascend_train.sh [DATASET] [CONFIG_PATH] # on Ascend
+  bash scripts/run_standalone_gpu_train.sh [DATASET] [CONFIG_PATH]  # on GPU
 
   # 分布式训练示例
-  bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
+  bash scripts/run_distribute_ascend_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]  # on Ascend
+  bash scripts/run_distribute_gpu_train.sh [DATASET] [CONFIG_PATH] [DEVICE_NUM] [CUDA_VISIBLE_DEVICES]  # on GPU
 
   # 评估示例
-  python eval.py --data_path=$DATASET --label_path=$LABEL_PATH --trained_ckpt=$CHECKPOINT --predict_path=$PREDICT_PATH --config_path=$CONFIG_PATH > eval.log 2>&1 &
-  OR
-  bash scripts/run_standalone_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH]
+  python eval.py --data_path=[DATASET] --label_path=[LABEL_PATH] --trained_ckpt=[CHECKPOINT] --predict_path=[PREDICT_PATH] --config_path=[CONFIG_PATH] --device_target=[DEVICE] > eval.log 2>&1 &   # on Ascend or GPU
+
+  # 评估脚本启动
+  bash scripts/run_standalone_ascend_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH]  # on Ascend
+  bash scripts/run_standalone_gpu_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH]  # on GPU
 
   # 模型导出
   python export.py --config_path=[CONFIG_PATH] --trained_ckpt=[model_ckpt_path] --file_name=[model_name] --file_format=MINDIR --batch_size=1
@@ -151,36 +156,37 @@ D-LinkNet的解码器与原始LinkNet相同，这在计算上是有效的。解�
 ### 脚本及样例代码
 
 ```text
-├── model_zoo
-    ├── README.md                           // 模型描述
-    ├── dlinknet
-        ├── README.md                       // DLinknet描述
-        ├── README_CN.md                    // DLinknet中文描述
-        ├── ascend310_infer                 // Ascend 310 推理代码
-        ├── scripts
-        │   ├──run_disribute_train.sh       // Ascend 上分布式训练脚本
-        │   ├──run_standalone_train.sh      // Ascend 上单卡训练脚本
-        │   ├──run_standalone_eval.sh       // Ascend 上推理评估脚本
-        │   ├──run_infer_310.sh             // Ascend 310 推理脚本
-        ├── src
-        │   ├──__init__.py
-        │   ├──callback.py                  // 自定义Callback
-        │   ├──data.py                      // 数据处理
-        │   ├──loss.py                      // 损失函数
-        │   ├──resnet.py                    // resnet网络结构（引用自站内modelzoo）
-        │   ├──dinknet.py                   // dlinknet网络结构
-        │   ├──model_utils
-                ├──__init__.py
-                ├──config.py                // 参数配置
-                ├──device_adapter.py        // 设备配置
-                ├──local_adapter.py         // 本地设备配置
-                └──moxing_adapter.py        // modelarts设备配置
-        ├── dlinknet_config.yaml            // 配置文件
-        ├── train.py                        // 训练脚本
-        ├── eval.py                         // 推理脚本
-        ├── export.py                       // 导出脚本
-        ├── postprocess.py                  // 310 推理后处理脚本
-        └── requirements.txt                // 需要的三方库.
+├── dlinknet
+    ├── README.md                       // DLinknet描述
+    ├── README_CN.md                    // DLinknet中文描述
+    ├── ascend310_infer                 // Ascend 310 推理代码
+    ├── scripts
+    │   ├──run_distribute_ascend_train.sh    // Ascend 上分布式训练脚本
+    │   ├──run_standalone_ascend_train.sh    // Ascend 上单卡训练脚本
+    │   ├──run_standalone_ascend_eval.sh     // Ascend 上推理评估脚本
+    │   ├──run_infer_310.sh                  // Ascend 310 推理脚本
+    │   ├──run_distribute_gpu_train.sh       // GPU 上分布式训练脚本
+    │   ├──run_standalone_gpu_train.sh       // GPU 上单卡训练脚本
+    │   ├──run_standalone_gpu_eval.sh        // GPU 上推理评估脚本
+    ├── src
+    │   ├──__init__.py
+    │   ├──callback.py                  // 自定义Callback
+    │   ├──data.py                      // 数据处理
+    │   ├──loss.py                      // 损失函数
+    │   ├──resnet.py                    // resnet网络结构（引用自站内modelzoo）
+    │   ├──dinknet.py                   // dlinknet网络结构
+    │   ├──model_utils
+            ├──__init__.py
+            ├──config.py                // 参数配置
+            ├──device_adapter.py        // 设备配置
+            ├──local_adapter.py         // 本地设备配置
+            └──moxing_adapter.py        // modelarts设备配置
+    ├── dlinknet_config.yaml            // 配置文件
+    ├── train.py                        // 训练脚本
+    ├── eval.py                         // 推理脚本
+    ├── export.py                       // 导出脚本
+    ├── postprocess.py                  // 310 推理后处理脚本
+    └── requirements.txt                // 需要的三方库.
 ```
 
 ### 脚本参数
@@ -225,12 +231,13 @@ D-LinkNet的解码器与原始LinkNet相同，这在计算上是有效的。解�
 
 ### 单机训练
 
-- Ascend处理器环境运行
+- 单机脚本启动
 
   ```shell
-  python train.py --data_path=/path/to/data/ --config_path=/path/to/yaml > train.log 2>&1 &
-  OR
-  bash scripts/run_standalone_train.sh [DATASET] [CONFIG_PATH]
+  # Ascend
+  bash scripts/run_standalone_ascend_train.sh [DATASET] [CONFIG_PATH] [DEVICE_ID](option, default is 0)
+  # GPU
+  bash scripts/run_standalone_gpu_train.sh [DATASET] [CONFIG_PATH] [DEVICE_ID](option, default is 0)
   ```
 
   `[DATASET]`参数对应的路径是数据集解压后的train文件，请记得从中划出十分之一用于接下来验证iou的过程。
@@ -241,10 +248,13 @@ D-LinkNet的解码器与原始LinkNet相同，这在计算上是有效的。解�
 
 ### 分布式训练
 
-- Ascend处理器环境运行
+- 多卡脚本启动
 
 ```shell
-bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
+# Ascend
+bash scripts/run_distribute_ascend_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
+# GPU
+bash scripts/run_distribute_gpu_train.sh [DATASET] [CONFIG_PATH] [DEVICE_NUM] [CUDA_VISIBLE_DEVICES]
 ```
 
   `[DATASET]`参数对应的路径是数据集解压后的train文件，请记得**从中划出十分之一用于接下来验证iou的过程**。
@@ -257,12 +267,13 @@ bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
 
 ### 评估
 
-- Ascend处理器环境运行评估
+- 评估脚本启动
 
   ```shell
-  python eval.py --data_path=$DATASET --label_path=$LABEL_PATH --trained_ckpt=$CHECKPOINT --predict_path=$PREDICT_PATH --config_path=$CONFIG_PATH > eval.log 2>&1 &
-  OR
-  bash scripts/run_standalone_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH] [DEVICE_ID](option, default is 0)
+  # Ascend
+  bash scripts/run_standalone_ascend_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH] [DEVICE_ID](option, default is 0)
+  # GPU
+  bash scripts/run_standalone_gpu_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH] [DEVICE_ID](option, default is 0)
   ```
 
   `[DATASET]`参数对应的路径是我们之前划出的十分之一的train文件中的图像部分所在的路径。
@@ -283,38 +294,38 @@ bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
 
 ### 训练性能
 
-| 参数                 | Ascend     |
-| -------------------------- | ------------------------------------------------------------ |
-| 模型版本 | D-LinkNet(DinkNet34) |
-| 资源 | Ascend 910；CPU：2.60GHz，192核；内存：755 GB；系统 Euler2.8  |
-| 上传日期 | 2022-1-22 |
-| MindSpore版本 | 1.5.0 |
-| 数据集             | DeepGlobe Road Extraction Dataset|
-| 训练参数   | 1pc: epoch=300, total steps=1401, batch_size = 4, lr=0.0002  |
-| 优化器 | ADAM |
-| 损失函数              | Dice Bce Loss|
-| 输出 | 概率 |
-| 损失 | 0.249542944|
-| 速度 | 1卡：407 ms/step；8卡：430 ms/step |
-| 训练总时长 | 1卡：25.30h；8卡：6.27h |
-| 精度 | IOU 98% |
-| 参数(M)  | 31M|
-| 微调检查点 | 118.70M (.ckpt文件)|
-| 配置文件 | dlinknet_config.yaml |
-| 脚本| [D-LinkNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/dlinknet) |
+| 参数                 | Ascend     | GPU  |
+| -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 模型版本 | D-LinkNet(DinkNet34) | D-LinkNet(DinkNet34) |
+| 资源 | Ascend 910；CPU：2.60GHz，192核；内存：755 GB；系统 Euler2.8  | GPU RTX 3090；CPU 2.90GHz, 64core；内存：256G；系统 Ubuntu 18.04 |
+| 上传日期 | 2022-1-22 | 2022-09-09 |
+| MindSpore版本 | 1.5.0 | 1.8.0 |
+| 数据集             | DeepGlobe Road Extraction Dataset| DeepGlobe Road Extraction Dataset |
+| 训练参数   | 1pc: epoch=300, total steps=1401, batch_size = 4, lr=0.0002  | 1pc: epoch=300, total steps=1401, batch_size = 4, lr=0.0002 |
+| 优化器 | ADAM | ADAM |
+| 损失函数              | Dice Bce Loss| Dice Bce Loss |
+| 输出 | 概率 | 概率 |
+| 损失 | 0.249542944| 0.2359 |
+| 速度 | 1卡：407 ms/step；8卡：430 ms/step | 1卡：437 ms/step；8卡：753 ms/step |
+| 训练总时长 | 1卡：25.30h；8卡：6.27h | 1卡：4.08h (early stop at 24 epoch); 8卡: 11.04h(300epoch) |
+| 精度 | IOU 98% | IOU 97.86% |
+| 参数(M)  | 31M| 31M |
+| 微调检查点 | 118.70M (.ckpt文件)| 475M (.ckpt文件) |
+| 配置文件 | dlinknet_config.yaml | dlinknet_config.yaml |
+| 脚本| [D-LinkNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/dlinknet) | [D-LinkNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/dlinknet) |
 
 ### 推理性能
 
-| 参数          | Ascend                      |
-| ------------------- | --------------------------- |
-| 模型版本             | D-LinkNet(DinkNet34)                |
-| 资源                 | Ascend 310；OS Euler2.8                  |
-| 上传日期       | 2022-02-11 |
-| MindSpore 版本   | 1.5.0                 |
-| 数据集             | DeepGlobe Road Extraction Dataset    |
-| batch_size          | 1                         |
-| 准确率            | acc: 98.13% <br>  acc_cls: 87.19% <br>  iou: 0.9807  |
-| 推理模型 | 118M (.mindir 文件)         |
+| 参数          | Ascend                      | GPU                   |
+| ------------------- | --------------------------- | --------------------------- |
+| 模型版本             | D-LinkNet(DinkNet34)                | D-LinkNet(DinkNet34) |
+| 资源                 | Ascend 310；OS Euler2.8                  | GPU RTX 3090；CPU 2.90GHz, 64core；内存：256G；系统 Ubuntu 18.04 |
+| 上传日期       | 2022-02-11 | 2022-09-09 |
+| MindSpore 版本   | 1.5.0                 | 1.8.0            |
+| 数据集             | DeepGlobe Road Extraction Dataset    | DeepGlobe Road Extraction Dataset |
+| batch_size          | 1                         | 1                        |
+| 准确率            | acc: 98.13% <br>acc_cls: 87.19% <br>iou: 0.9807  | acc: 97.92% <br/>acc_cls: 84.97% <br/>iou: 0.9786 |
+| 推理模型 | 118M (.mindir 文件)         | 475M (.ckpt文件) |
 
 ### 用法
 

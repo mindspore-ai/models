@@ -12,7 +12,7 @@
         - [Script and Sample Code](#script-and-sample-code)
         - [Script Parameters](#script-parameters)
     - [Training Process](#training-process)
-        - [running on Ascend](#running-on-ascend)
+        - [Standalone-training](#standalone-training)
         - [Distributed Training](#distributed-training)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
@@ -72,13 +72,13 @@ Dataset used： [DeepGlobe Road Extraction Dataset](https://www.kaggle.com/balra
 
 ## environment-requirements
 
-- Hardware（Ascend）
-    - Prepare hardware environment with Ascend processor.
+- Hardware（Ascend or GPU）
+    - Prepare hardware environment with Ascend or GPU processor.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
     - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
 
 ## quick-start
 
@@ -96,17 +96,22 @@ After installing MindSpore via the official website, you can start training and 
 
   ```shell
   # run training example
-  python train.py --data_path=/path/to/data/ --config_path=/path/to/yaml > train.log 2>&1 &
-  OR
-  bash scripts/run_standalone_train.sh [DATASET] [CONFIG_PATH]
+  python train.py --data_path=[DATASET] --config_path=[CONFIG_PATH] --output_path=[OUTPUT_PATH] --device_target=[DEVICE_TARGET] > train.log 2>&1 &  # on Ascend or GPU
 
-  # run distributed training example
-  bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
+  # run standalone training script
+  bash scripts/run_standalone_ascend_train.sh [DATASET] [CONFIG_PATH] # on Ascend
+  bash scripts/run_standalone_gpu_train.sh [DATASET] [CONFIG_PATH]  # on GPU
+
+  # run distributed training script
+  bash scripts/run_distribute_ascend_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]  # on Ascend
+  bash scripts/run_distribute_gpu_train.sh [DATASET] [CONFIG_PATH] [DEVICE_NUM] [CUDA_VISIBLE_DEVICES]  # on GPU
 
   # run evaluation example
-  python eval.py --data_path=$DATASET --label_path=$LABEL_PATH --trained_ckpt=$CHECKPOINT --predict_path=$PREDICT_PATH --config_path=$CONFIG_PATH > eval.log 2>&1 &
-  OR
-  bash scripts/run_standalone_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH]
+  python eval.py --data_path=[DATASET] --label_path=[LABEL_PATH] --trained_ckpt=[CHECKPOINT] --predict_path=[PREDICT_PATH] --config_path=[CONFIG_PATH] --device_target=[DEVICE] > eval.log 2>&1 &   # on Ascend or GPU
+
+  # run evaluation script
+  bash scripts/run_standalone_ascend_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH]  # on Ascend
+  bash scripts/run_standalone_gpu_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH]  # on GPU
 
   # run export
   python export.py --config_path=[CONFIG_PATH] --trained_ckpt=[model_ckpt_path] --file_name=[model_name] --file_format=MINDIR --batch_size=1
@@ -146,36 +151,38 @@ If you want to run in modelarts, please check the official documentation of [mod
 ### Script and Sample Code
 
 ```text
-├── model_zoo
-    ├── README.md                           // descriptions about all the models
-    ├── dlinknet
-        ├── README.md                       // descriptions about DLinknet
-        ├── README_CN.md                    // chinese descriptions about DLinknet
-        ├── ascend310_infer                 // code of infer on ascend 310
-        ├── scripts
-        │   ├──run_disribute_train.sh       // shell script for distributed on Ascend
-        │   ├──run_standalone_train.sh      // shell script for standalone on Ascend
-        │   ├──run_standalone_eval.sh       // shell script for evaluation on Ascend
-        │   ├──run_infer_310.sh             // shell script for infer on ascend 310
-        ├── src
-        │   ├──__init__.py
-        │   ├──callback.py                  // custom Callback
-        │   ├──data.py                      // data processing
-        │   ├──loss.py                      // loss
-        │   ├──resnet.py                    // resnet network structure (reference to intra-site ModelZoo)
-        │   ├──dinknet.py                   // dlinknet model
-        │   ├──model_utils
-                ├──__init__.py
-                ├──config.py                // parameter configuration
-                ├──device_adapter.py        // device adapter
-                ├──local_adapter.py         // local adapter
-                └──moxing_adapter.py        // moxing adapter
-        ├── dlinknet_config.yaml            // parameter configuration
-        ├── train.py                        // training script
-        ├── eval.py                         // evaluation script
-        ├── export.py                       // export script
-        ├── postprocess.py                  // dlinknet 310 infer postprocess
-        └── requirements.txt                // Requirements of third party package.
+
+├── dlinknet
+    ├── README.md                       // descriptions about DLinknet
+    ├── README_CN.md                    // chinese descriptions about DLinknet
+    ├── ascend310_infer                 // code of infer on ascend 310
+    ├── scripts
+    │   ├──run_distribute_ascend_train.sh       // shell script for distributed on Ascend
+    │   ├──run_standalone_ascend_train.sh       // shell script for standalone on Ascend
+    │   ├──run_standalone_ascend_eval.sh        // shell script for evaluation on Ascend
+    │   ├──run_infer_310.sh                     // shell script for infer on ascend 310
+    │   ├──run_distribute_gpu_train.sh          // shell script for distributed on GPU
+    │   ├──run_standalone_gpu_train.sh          // shell script for standalone on GPU
+    │   ├──run_standalone_gpu_eval.sh           // shell script for evaluation on GPU
+    ├── src
+    │   ├──__init__.py
+    │   ├──callback.py                  // custom Callback
+    │   ├──data.py                      // data processing
+    │   ├──loss.py                      // loss
+    │   ├──resnet.py                    // resnet network structure (reference to intra-site ModelZoo)
+    │   ├──dinknet.py                   // dlinknet model
+    │   ├──model_utils
+            ├──__init__.py
+            ├──config.py                // parameter configuration
+            ├──device_adapter.py        // device adapter
+            ├──local_adapter.py         // local adapter
+            └──moxing_adapter.py        // moxing adapter
+    ├── dlinknet_config.yaml            // parameter configuration
+    ├── train.py                        // training script
+    ├── eval.py                         // evaluation script
+    ├── export.py                       // export script
+    ├── postprocess.py                  // dlinknet 310 infer postprocess
+    └── requirements.txt                // Requirements of third party package.
 ```
 
 ### script-parameters
@@ -216,16 +223,17 @@ Parameters for both training , evaluation and export can be set in *.yaml
 
 - Note that before the offline machine runs, make sure that the `enable_Modelarts` parameter in the `dlinknet_config.yaml` file is set to `False`.
 
-- Also, before running the training and evaluation scripts, make sure you download the resnet34 pre-training weights file [here](https://download.mindspore.cn/model_zoo/r1.3/resnet34_ascend_v130_imagenet2012_official_cv_bs256_top1acc73.83__top5acc91.61/) and set the `pretrained_ckpt` parameter in the `dlinknet_config.yaml` file to its absolute path.
+- Also, before running the training and evaluation scripts, make sure you download the resnet34 pre-training weights file [here](https://download.mindspore.cn/model_zoo/r1.3/resnet34_ascend_v130_imagenet2012_official_cv_bs256_top1acc73.83__top5acc91.61/resnet34_ascend_v130_imagenet2012_official_cv_bs256_top1acc73.83__top5acc91.61.ckpt) and set the `pretrained_ckpt` parameter in the `dlinknet_config.yaml` file to its absolute path.
 
-### running-on-ascend
+### standalone-training
 
-#### running on Ascend
+#### running standalone-training script
 
   ```shell
-  python train.py --data_path=/path/to/data/ --config_path=/path/to/yaml > train.log 2>&1 &
-  OR
-  bash scripts/run_standalone_train.sh [DATASET] [CONFIG_PATH]
+# Ascend
+bash scripts/run_standalone_ascend_train.sh [DATASET] [CONFIG_PATH] [DEVICE_ID](option, default is 0)
+# GPU
+bash scripts/run_standalone_gpu_train.sh [DATASET] [CONFIG_PATH] [DEVICE_ID](option, default is 0)
   ```
 
   The path to the `[DATASET]` parameter is the train file extracted from the DATASET. Please remember to draw a tenth of it for subsequent and validation of the IOU.
@@ -236,10 +244,13 @@ Parameters for both training , evaluation and export can be set in *.yaml
 
 ### distributed-training
 
-#### running on Ascend
+#### running distributed-training script
 
 ```shell
-bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
+# Ascend
+bash scripts/run_distribute_ascend_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
+# GPU
+bash scripts/run_distribute_gpu_train.sh [DATASET] [CONFIG_PATH] [DEVICE_NUM] [CUDA_VISIBLE_DEVICES]
 ```
 
   The path to the `[DATASET]` parameter is the train file extracted from the DATASET. Please remember to draw a tenth of it for subsequent and validation of the IOU.
@@ -252,12 +263,13 @@ bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
 
 ### evaluation
 
-#### running evaluation on Ascend
+#### running evaluation script
 
   ```shell
-  python eval.py --data_path=$DATASET --label_path=$LABEL_PATH --trained_ckpt=$CHECKPOINT --predict_path=$PREDICT_PATH --config_path=$CONFIG_PATH > eval.log 2>&1 &
-  OR
-  bash scripts/run_standalone_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH] [DEVICE_ID](option, default is 0)
+  # Ascend
+  bash scripts/run_standalone_ascend_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH] [DEVICE_ID](option, default is 0)
+  # GPU
+  bash scripts/run_standalone_gpu_eval.sh [DATASET] [LABEL_PATH] [CHECKPOINT] [PREDICT_PATH] [CONFIG_PATH] [DEVICE_ID](option, default is 0)
   ```
 
   The `[DATASET]` parameter corresponds to the path of the image part of the train file we previously mapped.
@@ -278,38 +290,38 @@ bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATASET] [CONFIG_PATH]
 
 ### training-performance
 
-| Parameters                 | Ascend     |
-| -------------------------- | ------------------------------------------------------------ |
-| Model Version | D-LinkNet(DinkNet34) |
-| Resource | Ascend 910 ; CPU 2.60GHz,192cores; Memory,755G; OS Euler2.8 |
-| uploaded Date | 01/22/2022 (month/day/year)  |
-| MindSpore Version  | 1.3.0 |
-| Dataset             | DeepGlobe Road Extraction Dataset|
-| Training Parameters    | 1pc: epoch=300, total steps=1401, batch_size = 4, lr=0.0002  |
-| Optimizer | ADAM |
-| Loss Function              | Dice Bce Loss|
-| outputs | probability |
-| Loss | 0.249542944|
-| Speed | 1pc：407 ms/step; 8pc：430 ms/step |
-| Total training time | 1pc：25.30h; 8pc：6.27h |
-| Accuracy | IOU 98% |
-| Parameters (M)  | 31M|
-| Checkpoint for Fine tuning | 118.70M (.ckpt file)|
-| configuration | dlinknet_config.yaml |
-| Scripts| [D-LinkNet scripts](https://gitee.com/mindspore/models/tree/master/research/cv/dlinknet) |
+| Parameters                 | Ascend     | GPU  |
+| -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Model Version | D-LinkNet(DinkNet34) | D-LinkNet(DinkNet34) |
+| Resource | Ascend 910 ; CPU 2.60GHz,192cores; Memory,755G; OS Euler2.8 | GPU RTX 3090；CPU 2.90GHz, 64core；Memory：256G；OS Ubuntu 18.04 |
+| uploaded Date | 01/22/2022 (month/day/year)  | 09/09/2022 (month/day/year) |
+| MindSpore Version  | 1.3.0 | 1.8.0 |
+| Dataset             | DeepGlobe Road Extraction Dataset| DeepGlobe Road Extraction Dataset |
+| Training Parameters    | 1pc: epoch=300, total steps=1401, batch_size = 4, lr=0.0002  | 1pc: epoch=300, total steps=1401, batch_size = 4, lr=0.0002 |
+| Optimizer | ADAM | ADAM |
+| Loss Function              | Dice Bce Loss| Dice Bce Loss |
+| outputs | probability | probability |
+| Loss | 0.249542944| 0.2359 |
+| Speed | 1pc：407 ms/step; 8pc：430 ms/step | 1卡：437 ms/step；8卡：753 ms/step |
+| Total training time | 1pc：25.30h; 8pc：6.27h | 1pc：4.08h (early stop at 24 epoch); 8pc: 11.04h(300epoch) |
+| Accuracy | IOU 98% | IOU 98% |
+| Parameters (M)  | 31M| 31M |
+| Checkpoint for Fine tuning | 118.70M (.ckpt file)| 475M (.ckpt file) |
+| configuration | dlinknet_config.yaml | dlinknet_config.yaml |
+| Scripts| [D-LinkNet scripts](https://gitee.com/mindspore/models/tree/master/research/cv/dlinknet) | [D-LinkNet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/dlinknet) |
 
 ### infer-performance
 
-| Parameters          | Ascend                      |
-| ------------------- | --------------------------- |
-| Model Version             | D-LinkNet(DinkNet34)                |
-| Resource                 | Ascend 310；OS Euler2.8                  |
-| uploaded Date       | 02/11/2022 (month/day/year)  |
-| MindSpore Version   | 1.5.0                 |
-| Dataset             | DeepGlobe Road Extraction Dataset    |
-| batch size          | 1                         |
-| Accuracy            | acc: 98.13% <br>  acc_cls: 87.19% <br>  iou: 0.9807  |
-| Inference model | 118M (.mindir file)         |
+| Parameters          | Ascend                      | GPU                   |
+| ------------------- | --------------------------- | --------------------------- |
+| Model Version             | D-LinkNet(DinkNet34)                | D-LinkNet(DinkNet34) |
+| Resource                 | Ascend 310；OS Euler2.8                  | GPU RTX 3090；CPU 2.90GHz, 64core；Memory：256G；OS Ubuntu 18.04 |
+| uploaded Date       | 02/11/2022 (month/day/year)  | 09/09/2022 (month/day/year) |
+| MindSpore Version   | 1.5.0                 | 1.8.0            |
+| Dataset             | DeepGlobe Road Extraction Dataset    | DeepGlobe Road Extraction Dataset |
+| batch size          | 1                         | 1                        |
+| Accuracy            | acc: 98.13% <br>acc_cls: 87.19% <br>iou: 0.9807  | acc: 97.92% <br/>acc_cls: 84.97% <br/>iou: 0.9786 |
+| Inference model | 118M (.mindir file)         | 119M (.mindir file) |
 
 ### how-to-use
 
