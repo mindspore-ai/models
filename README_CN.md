@@ -346,7 +346,7 @@
 | 图像 | 图像分类 | [snn_mlp](https://gitee.com/mindspore/models/tree/master/research/cv/snn_mlp) | | ✅ |   |
 | 图像 | 目标检测 | [Spnas](https://gitee.com/mindspore/models/tree/master/research/cv/Spnas) |✅|   |   |
 | 图像 | 图像分类 | [SPPNet](https://gitee.com/mindspore/models/tree/master/research/cv/SPPNet) |✅| ✅ |   |
-| 图像 | 图像分类 | [squeezenet1_1](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet1_1) |✅| ✅ |   |
+| 图像 | 图像分类 | [squeezenet](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) |✅| ✅ |   |
 | 图像 | 图像超分 | [sr_ea](https://gitee.com/mindspore/models/tree/master/research/cv/sr_ea) |✅|   |   |
 | 图像 | 图像超分 | [SRGAN](https://gitee.com/mindspore/models/tree/master/research/cv/SRGAN) |✅| ✅ |   |
 | 图像 | 图像分类 | [ssc_resnet50](https://gitee.com/mindspore/models/tree/master/research/cv/ssc_resnet50) |✅| ✅ |   |
