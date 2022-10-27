@@ -1,0 +1,34 @@
+train_dataset:
+  type: MattingDataset
+  name: P3M-10k
+  dataset_root: './data/P3M-10k/'
+  img_subpath: 'train/blurred_image'
+  alpha_subpath: 'train/mask'
+  workers: 4
+  batch_size: 16
+  transforms:
+    - type: LoadImages
+      gt_field: [ 'alpha' ]
+    - type: ResizeByShort
+    - type: RandomCrop
+      crop_size: [ 512, 512 ]
+    - type: GenTrimap
+    - type: RandomHorizontalFlip
+    - type: Normalize
+    - type: Transpose
+
+val_dataset:
+  type: MattingDataset
+  name: P3M-10k
+  dataset_root: './data/P3M-10k/'
+  img_subpath: 'validation/P3M-500-P/blurred_image'
+  alpha_subpath: 'validation/P3M-500-P/mask'
+  transforms:
+    - type: LoadImages
+    - type: ResizeByShort
+      gt_field: []
+    - type: Normalize
+    - type: Transpose
+
+backbone_pretrained: True
+
