@@ -1,0 +1,3 @@
+numpy==1.23.0
+pillow==9.1.1
+mindspore-gpu==1.7.0
