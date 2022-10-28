@@ -22,13 +22,14 @@ import numpy as np
 
 import mindspore as ms
 import mindspore.dataset.engine as de
-import mindspore.dataset.vision as C
-import mindspore.dataset.transforms as C2
+import mindspore.dataset.vision as vision
+import mindspore.dataset.transforms as transforms
 from mindspore.dataset.vision.utils import Inter
 
 from .autoaugment import ImageNetPolicy
 
 warnings.filterwarnings("ignore", "(Possibly )?corrupt EXIF data", UserWarning)
+
 
 class ToNumpy:
     def __init__(self):
@@ -36,6 +37,7 @@ class ToNumpy:
 
     def __call__(self, img):
         return np.asarray(img)
+
 
 def create_dataset(dataset_path,
                    do_train,
@@ -60,7 +62,7 @@ def create_dataset(dataset_path,
     rank_id = int(os.getenv('RANK_ID', '0'))
 
     if do_train:
-        ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=num_workers, shuffle=True,
+        ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=1, shuffle=True,
                                    num_shards=device_num, shard_id=rank_id)
     else:
         batch_per_step = batch_size * device_num
@@ -86,60 +88,63 @@ def create_dataset(dataset_path,
             ds_pad = de.PaddedDataset(sample)
             ds_imagefolder = de.ImageFolderDataset(dataset_path, num_parallel_workers=num_workers)
             ds = ds_pad + ds_imagefolder
-            distribute_sampler = de.DistributedSampler(num_shards=device_num, shard_id=rank_id, \
-              shuffle=False, num_samples=None)
+            distribute_sampler = de.DistributedSampler(num_shards=device_num, shard_id=rank_id,
+                                                       shuffle=False, num_samples=None)
             ds.use_sampler(distribute_sampler)
         else:
-            ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=num_workers, \
-              shuffle=False, num_shards=device_num, shard_id=rank_id)
+            ds = de.ImageFolderDataset(dataset_path, num_parallel_workers=num_workers,
+                                       shuffle=False, num_shards=device_num, shard_id=rank_id)
             print("eval dataset size: {}".format(ds.get_dataset_size()))
 
     # Computed from random subset of ImageNet training images
-    mean = [0.485*255, 0.456*255, 0.406*255]
-    std = [0.229*255, 0.224*255, 0.225*255]
+    mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
+    std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
+
+    ds = ds.repeat(repeat_num)
 
     # define map operations
     if do_train:
-        trans = [
-            C.RandomCropDecodeResize(image_size, scale=(crop_min, 1.0), \
-              ratio=(0.75, 1.333), interpolation=interpolation),
-            C.RandomHorizontalFlip(prob=0.5),
+        c_trans = [
+            vision.RandomCropDecodeResize(image_size, scale=(crop_min, 1.0),
+                                          ratio=(0.75, 1.333), interpolation=interpolation),
+            vision.RandomHorizontalFlip(prob=0.5),
         ]
+        ds = ds.map(input_columns="image", num_parallel_workers=num_workers, operations=c_trans)
         if autoaugment:
-            trans += [
-                C.ToPIL(),
+            py_trans = [
+                vision.ToPIL(),
                 ImageNetPolicy(),
                 ToNumpy(),
             ]
-        trans += [
-            C.Normalize(mean=mean, std=std),
-            C.HWC2CHW(),
+            ds = ds.map(input_columns="image", num_parallel_workers=8, operations=py_trans, python_multiprocessing=True)
+        extra_trans = [
+            vision.Normalize(mean=mean, std=std),
+            vision.HWC2CHW(),
         ]
+        ds = ds.map(input_columns="image", num_parallel_workers=2, operations=extra_trans)
     else:
         resize = int(int(image_size / 0.875 / 16 + 0.5) * 16)
         print('eval, resize:{}'.format(resize))
-        trans = [
-            C.Decode(),
-            C.Resize(resize, interpolation=interpolation),
-            C.CenterCrop(image_size),
-            C.Normalize(mean=mean, std=std),
-            C.HWC2CHW()
+        c_trans = [
+            vision.Decode(),
+            vision.Resize(resize, interpolation=interpolation),
+            vision.CenterCrop(image_size),
+            vision.Normalize(mean=mean, std=std),
+            vision.HWC2CHW()
         ]
+        ds = ds.map(input_columns="image", num_parallel_workers=num_workers, operations=c_trans)
 
-    type_cast_op = C2.TypeCast(ms.int32)
-
-    ds = ds.repeat(repeat_num)
-    ds = ds.map(input_columns="image", num_parallel_workers=num_workers, operations=trans, python_multiprocessing=True)
-    ds = ds.map(input_columns="label", num_parallel_workers=num_workers, operations=type_cast_op)
+    type_cast_op = transforms.TypeCast(ms.int32)
+    ds = ds.map(input_columns="label", num_parallel_workers=1, operations=type_cast_op)
 
     if do_train and mixup > 0:
-        one_hot_encode = C2.OneHot(num_classes)
-        ds = ds.map(operations=one_hot_encode, input_columns=["label"])
+        one_hot_encode = transforms.OneHot(num_classes)
+        ds = ds.map(operations=one_hot_encode, input_columns=["label"], num_parallel_workers=1)
 
-    ds = ds.batch(batch_size, drop_remainder=True)
+    ds = ds.batch(batch_size, drop_remainder=True, num_parallel_workers=1)
 
     if do_train and mixup > 0:
-        trans_mixup = C.MixUpBatch(alpha=mixup)
+        trans_mixup = vision.MixUpBatch(alpha=mixup)
         ds = ds.map(input_columns=["image", "label"], num_parallel_workers=num_workers, operations=trans_mixup)
 
     return ds

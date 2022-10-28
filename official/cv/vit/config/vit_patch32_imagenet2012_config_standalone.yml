@@ -6,7 +6,7 @@ train_image_size: 224
 interpolation: 'BILINEAR'
 crop_min: 0.05
 batch_size: 256
-train_num_workers: 14
+train_num_workers: 4
 
 # eval datasets
 eval_path: '/opt/npu/datasets/imagenet/val'
