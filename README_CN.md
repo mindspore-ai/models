@@ -1,4 +1,4 @@
-# ![MindSpore Logo](https://gitee.com/mindspore/mindspore/raw/master/docs/MindSpore-logo.png)
+# ![MindSpore Logo](https://gitee.com/mindspore/mindspore/raw/r1.9/docs/MindSpore-logo.png)
 
 ## 欢迎来到MindSpore ModelZoo
 
@@ -346,7 +346,7 @@
 | 图像 | 图像分类 | [snn_mlp](https://gitee.com/mindspore/models/tree/r1.9/research/cv/snn_mlp) | | ✅ |   |
 | 图像 | 目标检测 | [Spnas](https://gitee.com/mindspore/models/tree/r1.9/research/cv/Spnas) |✅|   |   |
 | 图像 | 图像分类 | [SPPNet](https://gitee.com/mindspore/models/tree/r1.9/research/cv/SPPNet) |✅| ✅ |   |
-| 图像 | 图像分类 | [squeezenet1_1](https://gitee.com/mindspore/models/tree/r1.9/official/cv/squeezenet1_1) |✅| ✅ |   |
+| 图像 | 图像分类 | [squeezenet](https://gitee.com/mindspore/models/tree/r1.9/official/cv/squeezenet) |✅| ✅ |   |
 | 图像 | 图像超分 | [sr_ea](https://gitee.com/mindspore/models/tree/r1.9/research/cv/sr_ea) |✅|   |   |
 | 图像 | 图像超分 | [SRGAN](https://gitee.com/mindspore/models/tree/r1.9/research/cv/SRGAN) |✅| ✅ |   |
 | 图像 | 图像分类 | [ssc_resnet50](https://gitee.com/mindspore/models/tree/r1.9/research/cv/ssc_resnet50) |✅| ✅ |   |
@@ -459,11 +459,11 @@ MindSpore已获得Apache 2.0许可，请参见LICENSE文件。
 
 ## 许可证
 
-[Apache 2.0许可证](https://gitee.com/mindspore/mindspore/blob/master/LICENSE)
+[Apache 2.0许可证](https://gitee.com/mindspore/mindspore/blob/r1.9/LICENSE)
 
 ## FAQ
 
-想要获取更多关于`MindSpore`框架使用本身的FAQ问题的，可以参考[官网FAQ](https://www.mindspore.cn/docs/zh-CN/master/faq/installation.html)
+想要获取更多关于`MindSpore`框架使用本身的FAQ问题的，可以参考[官网FAQ](https://www.mindspore.cn/docs/zh-CN/r1.9/faq/installation.html)
 
 - **Q: 直接使用models下的模型出现内存不足错误，例如*Failed to alloc memory pool memory*, 该怎么处理?**
 

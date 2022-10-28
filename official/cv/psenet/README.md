@@ -70,8 +70,8 @@ python psenet_model_torch2mindspore.py --torch_file=/path_to_model/resnet50-19c8
 - Framework
     - [MindSpore](http://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
 - install Mindspore
 - install [pyblind11](https://github.com/pybind/pybind11)
 - install [Opencv3.4](https://docs.opencv.org/3.4.9/)
@@ -431,7 +431,7 @@ The `res` folder is generated in the upper-level directory. For details about th
 
 ### Inference
 
-If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/master/infer/inference.html). Following the steps below, this is a simple example:
+If you need to use the trained model to perform inference on multiple hardware platforms, such as GPU, Ascend 910 or Ascend 310, you can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/r1.9/infer/inference.html). Following the steps below, this is a simple example:
 
 ```python
 # Load unseen dataset for inference

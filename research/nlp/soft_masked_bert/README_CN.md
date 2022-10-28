@@ -63,8 +63,8 @@ python preprocess_dataset.py
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 - 依赖
     - 安装所需依赖 pip install -r requirements.txt
 - 版本问题
@@ -242,7 +242,7 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_FILE_PATH] [NEED_PREPROCESS] [
 | 速度                      | 单卡：349.7毫秒/步;  8卡：314.7毫秒/步                          |
 | 总时长                 | 单卡：4076分钟;  8卡：458分钟                          |
 | 微调检查点 | 459M (.ckpt文件)                                         |
-| 脚本                    | [Soft-Masked BERT脚本](https://gitee.com/rafeal8830/soft-maksed-bert/edit/master/README_TEMPLATE_CN.md) |
+| 脚本                    | [Soft-Masked BERT脚本](https://gitee.com/rafeal8830/soft-maksed-bert/edit/r1.9/README_TEMPLATE_CN.md) |
 
 ### 推理性能
 
@@ -264,7 +264,7 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_FILE_PATH] [NEED_PREPROCESS] [
 
 # 贡献指南
 
-如果你想参与贡献昇思的工作当中，请阅读[昇思贡献指南](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/r1.9/how_to_contribute)
+如果你想参与贡献昇思的工作当中，请阅读[昇思贡献指南](https://gitee.com/mindspore/models/blob/r1.9/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/r1.9/how_to_contribute)
 
 ## 贡献者
 

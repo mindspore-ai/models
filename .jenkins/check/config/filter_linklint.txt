@@ -4,3 +4,4 @@ https://persagen.com/files/misc/wang2014knowledge.pdf
 https://s3.amazonaws.com/google-landmark/metadata
 https://s3.amazonaws.com/google-landmark/md5sum
 http://vllab.ucmerced.edu/wlai24/*
+https://bert-models.bj.bcebos.com/cased_L-24_H-1024_A-16.tar.gz

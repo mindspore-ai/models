@@ -76,8 +76,8 @@ DnCNN由N层网络构成，其中第一层是Conv+ReLU，中间N-2层是Conv+BN+
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 
 # 快速入门
 
@@ -206,7 +206,7 @@ python train.py
 sh run_distribute_train.sh RANK_TABLE_FILE DATA_PATH
 ```
 
-- 生成八卡训练需要的RANK_TABLE_FILE可参考[此处](https://gitee.com/mindspore/models/blob/master/utils/hccl_tools/hccl_tools.py)
+- 生成八卡训练需要的RANK_TABLE_FILE可参考[此处](https://gitee.com/mindspore/models/blob/r1.9/utils/hccl_tools/hccl_tools.py)
 
 ## 评估过程
 

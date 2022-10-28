@@ -60,8 +60,8 @@ resnet50 checkpoint文件，放在./src目录下：[resnet50](https://www.mindsp
 - 框架
     - [MindSpore](https://www.mindspore.cn/install)
 - 如需查看详情，请参见如下资源：
-    - [MindSpore 教程](https://www.mindspore.cn/tutorial/training/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore 教程](https://mindspore.cn/tutorials/zh-CN/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/r1.9/index.html)
 
 # 脚本说明
 
@@ -225,7 +225,7 @@ Accuracy on LFW: 0.9401+-0.0118
 | 速度 | 315毫秒/步 |   | 2194毫秒/步 |
 | 总时间 | 2h46m43s|  | 3h16m48s |
 | 微调检查点 | 402M （.ckpt文件） | 143M （.ckpt文件） | 402M （.ckpt文件）|
-| 脚本 | [Facenet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/facenet) | [Facenet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/facenet) | [Facenet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/facenet) |
+| 脚本 | [Facenet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/FaceNet) | [Facenet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/FaceNet) | [Facenet脚本](https://gitee.com/mindspore/models/tree/r1.9/research/cv/FaceNet) |
                                               |
 
 ## 推理性能

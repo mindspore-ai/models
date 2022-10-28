@@ -49,8 +49,8 @@ You can download dataset by this [link](http://www.openslr.org/33/)
 - Framework
     - [MindSpore](https://gitee.com/mindspore/mindspore)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
 
 ## [Quick Start](#contents)
 
@@ -187,7 +187,7 @@ Dataset is preprocessed using `Kaldi` and converts kaldi binaries into Python pi
 
 ## [Training Process](#contents)
 
-- Set options in `default_config.yaml`, including loss_scale, learning rate and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/master/advanced/dataset.html) for more information about dataset.
+- Set options in `default_config.yaml`, including loss_scale, learning rate and network hyperparameters. Click [here](https://www.mindspore.cn/tutorials/en/r1.9/advanced/dataset.html) for more information about dataset.
 
 - Run `run_standalone_train_gpu.sh` for non-distributed training of Transformer model.
 

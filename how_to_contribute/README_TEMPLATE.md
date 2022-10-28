@@ -163,12 +163,12 @@ e.g. you can reference the following template
 
 ## Reference Example
 
-[maskrcnn_readme](https://gitee.com/mindspore/models/blob/master/official/cv/maskrcnn/README.md)
+[maskrcnn_readme](https://gitee.com/mindspore/models/blob/r1.9/official/cv/maskrcnn/README.md)
 
 ## Contributions
 
 This part should not exist in your readme.
-If you want to contribute, please review the [contribution guidelines](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING.md) and [how_to_contribute](https://gitee.com/mindspore/models/tree/r1.9/how_to_contribute)
+If you want to contribute, please review the [contribution guidelines](https://gitee.com/mindspore/models/blob/r1.9/CONTRIBUTING.md) and [how_to_contribute](https://gitee.com/mindspore/models/tree/r1.9/how_to_contribute)
 
 ### Contributors
 

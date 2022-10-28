@@ -74,8 +74,8 @@ Dataset used：[ImageNet2012](https://gitee.com/link?target=http%3A%2F%2Fwww.ima
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
-    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/api/en/master/index.html)
+    - [MindSpore Tutorials](https://www.mindspore.cn/tutorials/en/r1.9/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/en/r1.9/index.html)
 
 # [Quick Start](#contents)
 
@@ -544,7 +544,7 @@ If you need to use the trained model to perform inference on multiple hardware p
 
 # [Contribution to guide](#contents)
 
-If you want to be a part of this effort,Please read[Ascend Contribution to guide](https://gitee.com/mindspore/models/blob/master/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/r1.9/how_to_contribute)
+If you want to be a part of this effort,Please read[Ascend Contribution to guide](https://gitee.com/mindspore/models/blob/r1.9/CONTRIBUTING_CN.md)和[how_to_contribute](https://gitee.com/mindspore/models/tree/r1.9/how_to_contribute)
 
 # [ModelZoo Homepage](#contents)  
 

@@ -1,4 +1,4 @@
-# ![MindSpore Logo](https://gitee.com/mindspore/mindspore/raw/master/docs/MindSpore-logo.png)
+# ![MindSpore Logo](https://gitee.com/mindspore/mindspore/raw/r1.9/docs/MindSpore-logo.png)
 
 ## Welcome to the Model Zoo for MindSpore
 
@@ -346,7 +346,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Image | Image Classification | [snn_mlp](https://gitee.com/mindspore/models/tree/r1.9/research/cv/snn_mlp) | | ✅ |   |
 | Image | Object Detection | [Spnas](https://gitee.com/mindspore/models/tree/r1.9/research/cv/Spnas) |✅|   |   |
 | Image | Image Classification | [SPPNet](https://gitee.com/mindspore/models/tree/r1.9/research/cv/SPPNet) |✅| ✅ |   |
-| Image | Image Classification | [squeezenet1_1](https://gitee.com/mindspore/models/tree/r1.9/official/cv/squeezenet1_1) |✅| ✅ |   |
+| Image | Image Classification | [squeezenet](https://gitee.com/mindspore/models/tree/r1.9/official/cv/squeezenet) |✅| ✅ |   |
 | Image | Image Super Resolution | [sr_ea](https://gitee.com/mindspore/models/tree/r1.9/research/cv/sr_ea) |✅|   |   |
 | Image | Image Super Resolution | [SRGAN](https://gitee.com/mindspore/models/tree/r1.9/research/cv/SRGAN) |✅| ✅ |   |
 | Image | Image Classification | [ssc_resnet50](https://gitee.com/mindspore/models/tree/r1.9/research/cv/ssc_resnet50) |✅| ✅ |   |
@@ -457,11 +457,11 @@ MindSpore is Apache 2.0 licensed. Please see the LICENSE file.
 
 ## License
 
-[Apache License 2.0](https://gitee.com/mindspore/mindspore/blob/master/LICENSE)
+[Apache License 2.0](https://gitee.com/mindspore/mindspore/blob/r1.9/LICENSE)
 
 ## FAQ
 
-For more information about `MindSpore` framework, please refer to [FAQ](https://www.mindspore.cn/docs/en/master/faq/installation.html)
+For more information about `MindSpore` framework, please refer to [FAQ](https://www.mindspore.cn/docs/en/r1.9/faq/installation.html)
 
 - **Q: How to resolve the lack of memory while using the model directly under "models" with errors such as *Failed to alloc memory pool memory*?**
 
