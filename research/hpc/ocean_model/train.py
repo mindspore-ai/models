@@ -18,7 +18,6 @@ import argparse
 import time
 import numpy as np
 import mindspore.context as context
-from mindspore import Tensor
 from src.read_var import read_nc
 from src.GOMO import GOMO_init, GOMO, read_init
 
@@ -65,19 +64,14 @@ if __name__ == "__main__":
     # time step of GOMO Model
     begin_time = time.time()
     for step in range(1, args_gomo.step+1):
-        vfluxb = Tensor(vfluxb.asnumpy())
         elf, etf, ua, uab, va, vab, el, elb, d, u, v, w, kq, km, kh, q2, q2l, tb, t, sb, s, rho, wubot, wvbot, ub, vb, \
         egb, etb, dt, dhb, utb, vtb, vfluxb, et, steps, vamax, q2b, q2lb = Model(
             etf, ua, uab, va, vab, el, elb, d, u, v, w, kq, km, kh, q2, q2l, tb, t, sb, s, rho,
             wubot, wvbot, ub, vb, egb, etb, dt, dhb, utb, vtb, vfluxb, et)
-        vars_list = etf, ua, uab, va, vab, el, elb, d, u, v, w, kq, km, kh, q2, q2l, tb, t, sb, s, rho, wubot, wvbot, \
-               ub, vb, egb, etb, dt, dhb, utb, vtb, vfluxb, et
-        for var in vars_list:
-            var.asnumpy()
         print("per step cost time", time.time() - begin_time)
         # save output
         if step % 5 == 0:
-            np.save(args_gomo.outputs_path + "u_"+str(step)+".npy", u.asnumpy())
+            np.save(args_gomo.outputs_path + "u_" + str(step) + ".npy", u.asnumpy())
             np.save(args_gomo.outputs_path + "v_" + str(step) + ".npy", v.asnumpy())
             np.save(args_gomo.outputs_path + "t_" + str(step) + ".npy", t.asnumpy())
             np.save(args_gomo.outputs_path + "et_" + str(step) + ".npy", et.asnumpy())
