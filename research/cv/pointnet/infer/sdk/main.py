@@ -30,13 +30,13 @@ def parser_args():
         required=False,
         default="../data/datapath_BS1/",
         help=
-        "cache dir of datapath. The default is '../data/sdk_result'.")
+        "cache dir of datapath. The default is '../data/datapath_BS1/'")
     parser.add_argument(
         "--pipeline_path",
         type=str,
         required=False,
-        default="../data/config/pointnet.pipeline",
-        help="image file path. The default is '../data/config/pointnet.pipeline'. ")
+        default="./config/pointnet.pipeline",
+        help="image file path. The default is './config/pointnet.pipeline'. ")
 
     parser.add_argument(
         "--infer_result_dir",
@@ -81,7 +81,8 @@ def image_inference(dataset_path, pipeline_path, stream_name, result_dir):
         result = sdk_api.get_result(stream_name)
 
         data = np.frombuffer(result.tensorPackageVec[0].tensorVec[0].dataStr, dtype=np.float32)
-        #
+        file_path = os.path.join(result_dir, file_name[-25:])
+        data.tofile(file_path)
 
         print(file_name)
         pred = data.reshape(1, 2500, -1)
