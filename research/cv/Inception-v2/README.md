@@ -53,7 +53,7 @@ Dataset used: [ImageNet2012](http://www.image-net.org/)
 
 ## Mixed precision
 
-The training method using [mixed precision](https://www.mindspore.cn/tutorials/experts/en/master/others/mixed_precision.html) uses support for single-precision and
+The training method using [mixed precision](https://mindspore.cn/tutorials/en/master/advanced/mixed_precision.html) uses support for single-precision and
 half-precision data to improve the training speed of deep learning neural networks, while maintaining the network accuracy that single-precision training can achieve.
 Mixed-precision training increases computational speed and reduces memory usage while enabling training of larger models on specific hardware or enabling larger batches of
 training.
