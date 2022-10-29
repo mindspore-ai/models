@@ -33,6 +33,7 @@ max_epoch: 70
 warmup_epochs: 0
 log_interval: 10
 ckpt_path: './output'
+ckpt_max_num: 10
 
 # data_to_mindrecord parameter
 eval_dataset_txt_file: 'Your_label_txt_file'

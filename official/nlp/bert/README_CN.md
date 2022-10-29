@@ -1,4 +1,4 @@
-# 目录
+﻿# 目录
 
 [View English](./README.md)
 
@@ -127,7 +127,7 @@ BERT的主干结构为Transformer。对于BERT_base，Transformer包含12个编�
 
 我们提供了一些预训练权重以供使用
 
-- [Bert-base-zh](https://download.mindspore.cn/model_zoo/r1.3/bert_base_ascend_v130_zhwiki_official_nlp_bs256_acc91.72_recall95.06_F1score93.36/), 在128句长的中文wiki数据集上进行了训练
+- [Bert-base-zh](https://download.mindspore.cn/models/r1.9/bert_base_ascend_v190_zhwiki_official_nlp_bs256_acc91.72_recall95.06_F1score93.36.ckpt), 在128句长的中文wiki数据集上进行了训练
 - [Bert-large-zh](https://download.mindspore.cn/model_zoo/r1.3/bert_large_ascend_v130_zhwiki_official_nlp_bs3072_loss0.8/), 在128句长的中文wiki数据集上进行了训练
 - [Bert-large-en](https://download.mindspore.cn/model_zoo/r1.3/bert_large_ascend_v130_enwiki_official_nlp_bs768_loss1.1/), 在512句长的英文wiki数据集上进行了训练
 

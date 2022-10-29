@@ -197,6 +197,12 @@ def run_train():
         if config.local_rank % 8 == 0:
             save_checkpoint(train_net, os.path.join(config.outputs_dir, "{}-{}_{}.ckpt".format(
                 config.local_rank, epoch_idx, config.steps_per_epoch)))
+            ckpt_files = os.listdir(os.path.join(config.outputs_dir))
+            ckpt_files = sorted([f for f in ckpt_files if f.endswith(".ckpt")],
+                                key=lambda f: os.path.getmtime(os.path.join(config.outputs_dir, f)))
+            if len(ckpt_files) > config.ckpt_max_num:
+                for i in range(len(ckpt_files) - config.ckpt_max_num):
+                    os.remove(os.path.join(config.outputs_dir, ckpt_files[i]))
 
     config.logger.info('--------- trains out ---------')
 
