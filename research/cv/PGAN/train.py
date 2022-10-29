@@ -285,7 +285,6 @@ def run_train():
                 time_monitor.data_iter_end()
             time_monitor.epoch_end()
         save_checkpoints(avg_gnet, gnet, dnet, this_scale_checkpoint_path, i_batch)
-        dataset.close_pool()
 
 
 if __name__ == '__main__':
