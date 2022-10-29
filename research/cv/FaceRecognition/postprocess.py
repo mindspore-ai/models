@@ -186,7 +186,7 @@ def run_acc(args):
     for i, data in enumerate(data_loader):
         _, path, idxs = data["image"], data["path"], data["index"]
         for k, idx_value in enumerate(idxs):
-            path_01 = str(path[k]).split('\'')[-2]
+            path_01 = str(path[k])
             new_name = path_01.split('/')[-3] + '_' + path_01.split('/')[-2]
             new_name = new_name + '_' +path_01.split('/')[-1].split('.')[0] + '_0.bin'
             path_new = os.path.join('./result_Files/', new_name)
@@ -220,7 +220,7 @@ def run_acc(args):
     for idx, data in enumerate(data_loader):
         _, path, idxs = data["image"], data["path"], data["index"]
         for k, _ in enumerate(idxs):
-            path_01 = str(path[k]).split('\'')[-2]
+            path_01 = str(path[k])
             new_name = path_01.split('/')[-3] + '_' + path_01.split('/')[-2]
             new_name = new_name + '_' +path_01.split('/')[-1].split('.')[0] + '_0.bin'
             path_new = os.path.join('./result_Files/', new_name)
