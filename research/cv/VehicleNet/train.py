@@ -37,14 +37,16 @@ from src.lr_generator import lr_steps, lr_steps_2
 
 set_seed(1)
 
-def get_base_param(load_ckpt_path):
+
+def get_base_param(source_net):
     """filter parameters"""
-    par_dict = load_checkpoint(load_ckpt_path)
     new_params_dict = {}
-    for name in par_dict:
+    for name, value in source_net.parameters_and_names():
         if 'classifier' not in name:
-            new_params_dict[name] = par_dict[name]
+            new_params_dict[name] = value
+
     return new_params_dict
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='VehicleNet train.')
@@ -90,6 +92,7 @@ if __name__ == '__main__':
     pre_trained_file = cfg.pre_trained_file
     if args_opt.is_modelarts:
         import moxing as mox
+
         mox.file.copy_parallel(src_url=args_opt.data_url,
                                dst_url='/cache/dataset_train/device_' + os.getenv('DEVICE_ID'))
         zip_command = "unzip -o /cache/dataset_train/device_" + os.getenv('DEVICE_ID') \
@@ -209,6 +212,8 @@ if __name__ == '__main__':
                 cb += [ckpt_cb]
 
     model.train(VehicleNet_cfg.epoch_size, dataset, callbacks=cb)
+    param_dict = get_base_param(net)
+
     time.sleep(120)
 
     if args_opt.is_modelarts:
@@ -232,12 +237,6 @@ if __name__ == '__main__':
 
     net = VehicleNet(class_num=VeRi_cfg.num_classes)
 
-
-    first_trained_file = '/cache/train_output/checkpoint/first_train_vehiclenet-80_' + \
-                         str(step_per_epoch_first) + '.ckpt'
-    # first_trained_file = '../../checkpoint/first_train_vehiclenet-80_' + str(step_per_epoch_first) + '.ckpt'
-
-    param_dict = get_base_param(first_trained_file)
     load_param_into_net(net, param_dict)
 
     loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
