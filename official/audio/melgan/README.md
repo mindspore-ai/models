@@ -49,7 +49,16 @@ Dataset used: [LJ Speech](<https://keithito.com/LJ-Speech-Dataset/>)
 - Dataset size：2.6GB，13,100 short audio clips of a single speaker reading passages from 7 non-fiction books.
 
 - Data format：Each audio file is a single-channel 16-bit PCM WAV with a sample rate of 22050 Hz
-    - The audio data needs to be processed to a mel-spectrum, and you can refer to the script in [mel-spectrogram data creation](https://github.com/seungwonpark/melgan/blob/master/preprocess.py).
+    - The audio data needs to be processed to a mel-spectrum, and you can refer to the script in [mel-spectrogram data creation](https://github.com/seungwonpark/melgan/blob/master/preprocess.py). Non CUDA environment needs to delete `. cuda()` in `utils/stfy.py`. To save data in the `npy` format, `preprocess.py` also needs to be modified. As follows:
+
+    ```
+    # 37 - 38 lines
+    melpath = wavpath.replace('.wav', '.npy').replace('wavs', 'mel')
+    if not os.path.exists(os.path.dirname(melpath)):
+        os.makedirs(os.path.dirname(melpath), exist_ok=True)
+    np.save(melpath, mel.squeeze(0).detach().numpy())
+    ```
+
     - The directory structure is as follows:
 
       ```
