@@ -46,7 +46,16 @@ MelGAN模型是非自回归全卷积模型。它的参数比同类模型少得�
 - Dataset size：2.6GB，包含13,100条只有一个说话人的短语音。语音的内容来自7本纪实书籍。
 
 - 数据格式：每条语音文件都是单声道、16-bit以及采样率为22050。
-    - 语音需要被处理为Mel谱, 可以参考脚本[Mel谱处理脚本](https://github.com/seungwonpark/melgan/blob/master/preprocess.py).
+    - 语音需要被处理为Mel谱, 可以参考脚本[Mel谱处理脚本](https://github.com/seungwonpark/melgan/blob/master/preprocess.py)。非CUDA环境需删除`utils/stfy.py`中的`.cuda()`，因为要保存`npy`格式的数据，所以`preproccess.py`也需要修改以下，参考代码如下：
+
+    ```
+    # 37 - 38 行
+    melpath = wavpath.replace('.wav', '.npy').replace('wavs', 'mel')
+    if not os.path.exists(os.path.dirname(melpath)):
+        os.makedirs(os.path.dirname(melpath), exist_ok=True)
+    np.save(melpath, mel.squeeze(0).detach().numpy())
+    ```
+
     - 数据目录结构如下:
 
       ```
@@ -70,7 +79,7 @@ MelGAN模型是非自回归全卷积模型。它的参数比同类模型少得�
 
 ## 混合精度
 
-采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/master/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
+采用[混合精度](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.7/others/mixed_precision.html)的训练方法使用支持单精度和半精度数据来提高深度学习神经网络的训练速度，同时保持单精度训练所能达到的网络精度。混合精度训练提高计算速度、减少内存使用的同时，支持在特定硬件上训练更大的模型或实现更大批次的训练。
 以FP16算子为例，如果输入数据类型为FP32，MindSpore后台会自动降低精度来处理数据。用户可打开INFO日志，搜索“reduce precision”查看精度降低的算子。
 
 # 环境要求
