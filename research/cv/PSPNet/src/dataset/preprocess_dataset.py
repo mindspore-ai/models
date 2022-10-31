@@ -77,7 +77,7 @@ def main():
             img_ = os.path.join('img', line + '.jpg')
             anno_ = os.path.join('cls_png', line + '.png')
             f.write(f'{img_} {anno_}\n')
-    print('Generate train_list to data_dir.')
+    print('Generate val_list to data_dir.')
     print('Finish.')
 
 

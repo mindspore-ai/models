@@ -49,7 +49,16 @@ MelGAN模型是非自回归全卷积模型。它的参数比同类模型少得�
 - Dataset size：2.6GB，包含13,100条只有一个说话人的短语音。语音的内容来自7本纪实书籍。
 
 - 数据格式：每条语音文件都是单声道、16-bit以及采样率为22050。
-    - 语音需要被处理为Mel谱, 可以参考脚本[Mel谱处理脚本](https://github.com/seungwonpark/melgan/blob/master/preprocess.py).
+    - 语音需要被处理为Mel谱, 可以参考脚本[Mel谱处理脚本](https://github.com/seungwonpark/melgan/blob/master/preprocess.py)。非CUDA环境需删除`utils/stfy.py`中的`.cuda()`，因为要保存`npy`格式的数据，所以`preproccess.py`也需要修改以下，参考代码如下：
+
+    ```
+    # 37 - 38 行
+    melpath = wavpath.replace('.wav', '.npy').replace('wavs', 'mel')
+    if not os.path.exists(os.path.dirname(melpath)):
+        os.makedirs(os.path.dirname(melpath), exist_ok=True)
+    np.save(melpath, mel.squeeze(0).detach().numpy())
+    ```
+
     - 数据目录结构如下:
 
       ```
