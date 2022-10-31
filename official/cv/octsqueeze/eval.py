@@ -41,7 +41,7 @@ def def_arguments():
         '--model', '-m', type=str, default='/home/OctSqueeze/checkpoint/octsqueeze.ckpt', help='route of model')
     parser.add_argument('--device_target', type=str, default="Ascend", choices=['Ascend', 'GPU', 'CPU'],
                         help='device where the code will be implemented')
-    parser.add_argument('device_id', type=int, default=0)
+    parser.add_argument('--device_id', type=int, default=0)
     return parser.parse_args()
 
 

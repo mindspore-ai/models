@@ -73,6 +73,6 @@ do
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     cd ./$BASE_PATH$i ||exit
     env > env.log
-    python train.py --device_id=$i --train_path=$TRAIN_PATH --eval_path=$EVAL_PATH --device_num=$DEVICE_NUM --train_model=$TRAIN_MODEL > log 2>&1 &
+    python train.py --is_distributed=1 --device_id=$i --train_path=$TRAIN_PATH --eval_path=$EVAL_PATH --device_num=$DEVICE_NUM --train_model=$TRAIN_MODEL > log 2>&1 &
     cd ..
 done

@@ -490,7 +490,7 @@ class HighResolutionNet(nn.Cell):
 
         out1, out2, out3, out4 = x
         h, w = ops.Shape()(out1)[2:]
-        x1 = ops.Cast()(out1, mindspore.dtype.float32)
+        x1 = ops.Cast()(out1, mindspore.dtype.float16)
         x2 = self.resize_bilinear(out2, size=(h, w))
         x3 = self.resize_bilinear(out3, size=(h, w))
         x4 = self.resize_bilinear(out4, size=(h, w))
