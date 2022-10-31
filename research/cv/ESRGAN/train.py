@@ -205,6 +205,8 @@ if __name__ == '__main__':
         os.makedirs("./ckpt", exist_ok=True)
     if not os.path.exists("./runs"):
         os.makedirs("./runs", exist_ok=True)
+    if not os.path.exists(best_ckpt_path):
+        os.makedirs(best_ckpt_path, exist_ok=True)
     print('start training:')
 
     print('start training PSNR:')
@@ -235,7 +237,7 @@ if __name__ == '__main__':
             print("best_psnr saving ckpt    ", end="")
             print(best_psnr)
             save_checkpoint(generator, os.path.join(best_ckpt_path, 'psnr_best.ckpt'))
-            save_ckeckpoint(generator, os.path.join(local_train_ckpt_path, f'{epoch}_psnr_generator.ckpt'))
+            save_checkpoint(generator, os.path.join(local_train_ckpt_path, f'{epoch}_psnr_generator.ckpt'))
             print(f"{epoch + 1}/{total_psnr_epochs} epoch finished")
     # for esrgan
     test_gan_ds = create_testdataset(args.val_batch_size, args.val_GAN_LR_path, args.val_GAN_GT_path)
