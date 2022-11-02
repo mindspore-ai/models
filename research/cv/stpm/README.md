@@ -18,10 +18,14 @@
         - [Usage](#usage)
     - [Evaluation Process](#evaluation-process)
         - [Usage](#usage-2)
-        - [Result](#result-2)
+        - [Result](#result-1)
     - [Export mindir model](#export-mindir-model)
     - [Inference Process](#inference-process)
         - [Usage](#usage-3)
+        - [Result](#result-2)
+    - [Export ONNX model](#export-ONNX-model)
+    - [ONNX Inference Process](#ONNX-inference-process)
+        - [Usage](#usage-4)
         - [Result](#result-3)
 - [Model Description](#model-description)
     - [Performance](#performance)
@@ -104,6 +108,7 @@ bash scripts/run_eval_gpu.sh [DATASET_PATH] [CKPT_PATH] [CATEGORY] [DEVICE_ID]
    ├── run_standalone_train_gpu.sh
    ├── run_all_mvtec.sh            // Perform training and evaluation on all mvtec datasets on Ascend
    ├── run_eval_gpu.sh
+   ├── run_eval_onnx_gpu.sh        // Eval ONNX on GPU
    └── run_eval.sh                 // Eval on Ascend
  ├──src
    ├── loss.py
@@ -114,6 +119,7 @@ bash scripts/run_eval_gpu.sh [DATASET_PATH] [CKPT_PATH] [CATEGORY] [DEVICE_ID]
    ├── pth2ckpt.py
    └── utils.py
  ├── eval.py
+ ├── eval_onnx.py                   // Eval ONNX
  ├── train.py
  ├── preprocess.py                  // 310 inference
  ├── postprocess.py                 // 310 inference
@@ -238,6 +244,36 @@ The inference result is saved in the current path, and the final accuracy result
 category:  zipper
 Total pixel-level auc-roc score :  0.980967986777201
 Total image-level auc-roc score :  0.909926470588235
+```
+
+## Export ONNX model
+
+```python
+python export.py --ckpt_file [CKPT_PATH] --category [FILE_NAME] --file_format [FILE_FORMAT] --device_target ["Ascend", "GPU", "CPU"]
+```
+
+Argument `ckpt_file` is required,`File_FORMAT` choose "ONNX", `device_target` choose from ["Ascend", "GPU", "CPU"].
+
+# ONNX Inference Process
+
+## Usage
+
+Before performing ONNX inference, the ONNX file needs to be exported via `export.py`.
+
+```shell
+# GPU inference
+cd scripts
+bash run_eval_onnx_gpu.sh [DATASET_PATH] [ONNX_PATH] [CATEGORY] [DEVICE_ID]
+```
+
+### Result
+
+The ONNX inference result is saved in the current path, and the final accuracy result can be seen in `eval_onnx.log`.
+
+```text
+category:  bottle
+Total pixel-level auc-roc score :  0.9879933474254616
+Total image-level auc-roc score :  1.0
 ```
 
 # Model Description
