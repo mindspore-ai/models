@@ -213,7 +213,6 @@ auxiliary.ckpt文件获取：从 https://cg.cs.tsinghua.edu.cn/people/~Yongjin/A
        ├─ data                             # 数据处理
        │  ├─ aligned_dataset.py            # 生成训练数据集
        │  ├─ base_dataset.py               # 数据集基类
-       │  ├─ image_folder.py               # 图片处理
        │  ├─ base_dataloader.py            # 数据加载基类
        │  ├─ single_dataloader.py          # 加载测试数据
        │  ├─ single_dataset.py             # 生成测试数据集
