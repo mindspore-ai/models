@@ -131,12 +131,12 @@ if __name__ == '__main__':
 
     print('dataset_val_path = ', dataset_val_path)
 
-    if config.device_target != 'CPU':
-        create_dataset(dataset_val_path, do_train=False, rank=device_id,
-                       group_size=1, batch_size=config.val_batch_size,
-                       drop_remainder=drop_remainder, shuffle=False,
-                       normalize=args_opt.normalize,
-                       enable_tobgr=args_opt.enable_tobgr)
+    if args_opt.platform != 'CPU':
+        dataset = create_dataset(dataset_val_path, do_train=False, rank=device_id,
+                                 group_size=1, batch_size=config.val_batch_size,
+                                 drop_remainder=drop_remainder, shuffle=False,
+                                 normalize=args_opt.normalize,
+                                 enable_tobgr=args_opt.enable_tobgr)
     else:
         dataset = create_dataset(dataset_val_path, do_train=False, rank=device_id,
                                  group_size=1, batch_size=config.val_batch_size,
