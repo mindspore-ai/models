@@ -334,6 +334,7 @@ auc: 0.6288036416334053
 | Loss Function              | Sigmoid Cross Entropy With Logits                           |
 | outputs                    | Accuracy                                                    |
 | Loss                       | 0.44                                                        |
+| Per Step Time              | 25.22 ms                                                        |
 
 ### Inference Performance
 
