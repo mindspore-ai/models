@@ -58,8 +58,9 @@ def get_test_data(test_dataset, batch_size=32, device_num=None, rank_id=None):
 
     test_data_set = ds.GeneratorDataset(test_dataset,
                                         cols,
-                                        shuffle=False,
-                                        num_parallel_workers=1)
+                                        num_shards=device_num,
+                                        shard_id=rank_id,
+                                        shuffle=False)
     test_data_set = test_data_set.batch(batch_size,
                                         False,
                                         num_parallel_workers=1)

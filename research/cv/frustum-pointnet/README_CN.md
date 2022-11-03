@@ -3,7 +3,7 @@
 <!-- TOC -->
 
 - [目录](#目录)
-- [Frustum Pointnets](#frustum-pointnets描述)
+- [Frustum Pointnets描述](#frustum-pointnets描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [环境要求](#环境要求)
@@ -101,13 +101,37 @@ g++ -o2 evaluate_object_3d_offline.cpp -o evaluate_object_3d_offline
 
 ```
 
+- 预处理数据集于主目录`kitti`文件夹中，数据集目录结构如下：
+
+```bash
+.
+├── image_sets
+    ├── test.txt
+    ├── train.txt
+    ├── trainval.txt
+    ├── val.txt
+├── kitti_val
+├── rgb_detections
+    ├── rgb_detection_train.txt
+    ├── rgb_detection_val.txt
+├── kitti_object.py
+├── kitti_util.py
+├── prepare_data.py
+├── frustum_caronly_val.pickle
+├── frustum_caronly_train.pickle
+├── frustum_caronly_val_rgb_detection.pickle
+
+```
+
+image_sets & rgb_detections txt file can be download here: https://github.com/charlesq34/frustum-pointnets/tree/master/kitti
+
 ## 训练模型
 
 - GPU单卡训练
 
 ```bash
-bash scripts/run_standalone_train_gpu [LOG_DIR]
-# example bash scripts/run_standalone_train_gpu logs
+bash scripts/run_standalone_train_gpu.sh [LOG_DIR] [DEVICE_TARGET] [DEVICE_ID]
+# example bash scripts/run_standalone_train_gpu.sh log GPU 0
 ```
 
 训练日志保存在`$LOG_DIR/train.log`中，查看日志信息可以通过如下命令：
@@ -129,14 +153,40 @@ bash scripts/run_distributed_train_gpu.sh [DEVICE_NUM]
 tail -f $LOG_DIR/train.log
 ```
 
+- Ascend单卡训练
+
+```bash
+bash scripts/run_standalone_train.sh [LOG_DIR] [DEVICE_TARGET] [DEVICE_ID]
+# example bash scripts/run_standalone_train.sh log Ascend 0
+```
+
+训练日志保存在`$LOG_DIR/train.log`中，查看日志信息可以通过如下命令：
+
+```bash
+tail -f $LOG_DIR/train.log
+```
+
+- Ascend多卡训练
+
+```bash
+bash scripts/run_distributed_train_ascend.sh [RANK_TABLE_FILE]
+# example: bash scripts/run_distributed_train_ascend.sh ./hccl_8p.json
+```
+
+训练日志保存在`train{device_id}.log`中，查看日志信息可以通过如下命令：
+
+```bash
+tail -f train0.log
+```
+
 ## 评估模型
 
 ```bash
-bash scripts/run_eval_gpu.sh [OUTPUT_PATH] [PRETRAINDE_CKPT]
-# example: bash scripts/run_eval_gpu.sh eval_result net.ckpt
+bash [OUTPUT_PATH] [PRETRAINDE_CKPT] [DEVICE_TARGET] [DEVICE_ID]
+# example: bash scripts/run_eval_gpu.sh eval_result net.ckpt Ascend 0
 ```
 
-评估日志为`theFpointnet_eval.log`。
+评估日志为`the Fpointnet_eval.log`。
 
 # 脚本说明
 
@@ -167,9 +217,10 @@ bash scripts/run_eval_gpu.sh [OUTPUT_PATH] [PRETRAINDE_CKPT]
 │       └── rgb_detection_val.txt
 ├── scripts
 │   ├── command_prep_data.sh                        // 数据预处理shell脚本
-│   ├── run_distributed_train_gpu.sh                // 多卡训练shell脚本
-│   ├── run_eval_gpu.sh                             // 模型评估shell脚本
-│   └── run_standalone_train_gpu.sh                 // 单卡训练shell脚本
+│   ├── run_distributed_train_gpu.sh                // 多卡训练shell脚本-GPU
+    ├── run_distributed_train_ascend.sh             // 多卡训练shell脚本-Ascend
+│   ├── run_eval.sh                                 // 模型评估shell脚本
+│   └── run_standalone_train.sh                     // 单卡训练shell脚本
 ├── src
 │   ├── datautil.py                                 // 数据集处理工具脚本
 │   ├── frustum_pointnets_v1.py                     // Frustum Pointnets脚本
@@ -272,10 +323,8 @@ optional arguments:
 - GPU处理器环境运行
 
   ```python
-  bash scripts/run_standalone_train_gpu [LOG_DIR]
-  # example: bash scripts/run_standalone_train_gpu log
-  OR
-  python train.py --log_dir log
+  bash scripts/run_standalone_train.sh [LOG_DIR] [DEVICE_TARGET] [DEVICE_ID]
+  # example bash scripts/run_standalone_train.sh log GPU 0
   ```
 
   上述python命令将在后台运行，您可以通过`$LOG_DIR/train.log`文件查看结果。
@@ -287,6 +336,30 @@ optional arguments:
   epoch: 1 step: 200, loss is 40.0536003112793
   epoch: 1 step: 300, loss is 64.46954345703125
   epoch: 1 step: 400, loss is 43.03189468383789
+  ```
+
+- Ascend处理器环境运行
+
+  ```bash
+  bash scripts/run_standalone_train.sh [LOG_DIR] [DEVICE_TARGET] [DEVICE_ID]
+  # example bash scripts/run_standalone_train.sh log Ascend 0
+  ```
+
+  训练日志保存在`$LOG_DIR/train.log`中，查看日志信息可以通过如下命令：
+
+  ```bash
+  tail -f $LOG_DIR/train.log
+  ```
+
+  训练过程的日志如下所示：
+
+  ```log
+  epoch: 1 step: 100, loss is 86.37467193603516
+  epoch: 1 step: 200, loss is 41.17808532714844
+  epoch: 1 step: 300, loss is 103.21517944335938
+  epoch: 1 step: 400, loss is 21.88726806640625
+  epoch: 1 step: 500, loss is 33.24089050292969
+  epoch: 1 step: 600, loss is 103.6310806274414
   ```
 
 ### 多卡训练
@@ -307,18 +380,32 @@ optional arguments:
   epoch: 1 step: 400, loss is 43.03189468383789
   ```
 
+- Ascned处理器环境运行
+
+  ```bash
+  bash scripts/run_distributed_train_ascend.sh [RANK_TABLE_FILE]
+  # example: bash scripts/run_distributed_train_ascend.sh ./hccl_8p.json
+  ```
+
+  上述shell脚本将在后台运行分布训练。您可以在`train{device_id}.log`文件下查看结果。
+
+  ```log
+  epoch: 1 step: 100, loss is 37.824676513671875
+  epoch: 1 step: 200, loss is 14.480133056640625
+  Train epoch time: 134025.120 ms, per step time: 580.195 ms
+  save checkpoint acc 0.13 > best.ckpt
+  {"eval_accuracy": 0.7726795430086097, "eval_box_IoU_(ground/3D)": [0.5129166744193252, 0.44038378219215235], "eval_box_estimation_accuracy_(IoU=0.7)": 0.1256377551020408, "Best Test acc: %f(Epoch %d)": [0.1256377551020408, 1]}
+  ```
+
 ## 评估过程
 
 ### 评估
 
-- 在GPU环境运行时评估kitti数据集
+- 评估kitti数据集
 
   ```bash
-  python test.py --model_path <log/xx.ckpt> --output [test_results]
-  kitti/kitti_eval/evaluate_object_3d_offline dataset/KITTI/object/training/label_2/ [test_results]
-  OR
-  bash scripts/run_eval_gpu.sh [OUTPUT_PATH] [PRETRAINDE_CKPT]
-  # example: bash scripts/run_eval_gpu.sh results net.ckpt
+  bash scripts/run_eval.sh [OUTPUT_PATH] [PRETRAINDE_CKPT] [DEVICE_TARGET] [DEVICE_ID]
+  # example: bash scripts/run_eval_gpu.sh results net.ckpt Ascend 0
   ```
 
   上述python命令将在后台运行，您可以通过`theFpointnet_eval.log`文件查看结果。测试数据集的日志文件如下：
@@ -369,34 +456,34 @@ optional arguments:
 
 ### 训练性能
 
-| 参数          | GPU                                                   |
-| ------------- | ----------------------------------------------------- |
-| 模型版本      | frustum pointnets                                     |
-| 资源          | GPU(Tesla V100 SXM2)，CPU 2.1GHz 24cores，Memory 128G |
-| 上传日期      | 2022-09-23                                            |
-| MindSpore版本 | 1.8.0                                                 |
-| 数据集        | KITTI                                                 |
-| 训练参数      | epoch=200, steps per epoch=1849, batch_size = 32      |
-| 优化器        | Adam                                                  |
-| 损失函数      | NLLLoss, huber_loss                                   |
-| 输出          | 坐标，特征向量，尺寸                                  |
-| 损失          | 1.02                                                  |
-| 速度          | 单卡：118毫秒/步；八卡：230毫秒/步                    |
-| 总时长        | 单卡：12小时19分钟；八卡：3小时                       |
-| ckpt模型      | 25.2MB (.ckpt文件)                                    |
+| 参数          | GPU       | Ascend |
+| ------------- | --------- | ----- |
+| MindSpore版本 | 1.8.0                                                 | 1.8.1 |
+| ckpt模型      | 25.2MB (.ckpt文件)                                    | 25.2MB (.ckpt文件) |
+| 上传日期      | 2022-09-23                                            | 2022-11-03 |
+| 优化器        | Adam                                                  | Adam |
+| 总时长        | 单卡：12小时19分钟；八卡：3小时                       |单卡：20小时；八卡：5小时
+| 损失          | 1.02                                                  | 1.03 |
+| 损失函数      | NLLLoss, huber_loss                                   | NLLLoss, huber_loss |
+| 数据集        | KITTI                                                 | KITTI |
+| 模型版本      | frustum pointnets                                     | frustum pointnets |
+| 训练参数      | epoch=200, steps per epoch=1849, batch_size = 32      | epoch=200, steps per epoch=1849, batch_size = 32 |
+| 资源          | GPU(Tesla V100 SXM2)，CPU 2.1GHz 24cores，Memory 128G | Ascend 910 |
+| 输出          | 坐标，特征向量，尺寸                                  |  坐标，特征向量，尺寸 |
+| 速度          | 单卡：118毫秒/步；八卡：230毫秒/步                    | 单卡：267毫秒/步；八卡：350毫秒/步 |
 
 ### 推理性能
 
-| 参数          | GPU                    |
-| ------------- | ------------------------- |
-| 模型版本      | frustum pointnets              |
-| 资源          | GPU(Tesla V100 SXM2)，CPU 2.1GHz 24cores，Memory 128G |
-| 上传日期      | 2022-09-23                |
-| MindSpore版本 | 1.8.0                     |
-| 数据集        | KITTI              |
-| batch_size    | 32                       |
-| 输出          | 概率                      |
-| 准确性        | 76.96%               |
+| 参数          | GPU                    | Ascend |
+| ------------- | ------------------------- | ----- |
+| 模型版本      | frustum pointnets              | frustum pointnets |
+| 资源          | GPU(Tesla V100 SXM2)，CPU 2.1GHz 24cores，Memory 128G | Ascend 910 |
+| 上传日期      | 2022-09-23                | 2022-11-03 |
+| MindSpore版本 | 1.8.0                     | 1.8.1 |
+| 数据集        | KITTI              | KITTI |
+| batch_size    | 32                       | 32 |
+| 输出          | 概率                      | 概率 |
+| 准确性        | 76.96%               | 78.57% |
 
 # 随机情况说明
 

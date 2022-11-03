@@ -80,14 +80,15 @@ class WarpConv1d(nn.Cell):
                  use_activity=True,
                  has_bias: bool = True):
         super(WarpConv1d, self).__init__()
-        self.conv1d = nn.Conv1d(input_chan, \
-                                output_chan, \
-                                kernel_size=kernel_size, \
-                                has_bias=True)
+        self.conv1d = nn.Conv1d(input_chan,
+                                output_chan,
+                                pad_mode='valid',
+                                kernel_size=kernel_size,
+                                has_bias=has_bias)
         self.BN = BN
         self.use_activity = use_activity
         if BN:
-            self.BatchNorm2d = nn.BatchNorm2d(output_chan, momentum=0.9)
+            self.BatchNorm2d = nn.BatchNorm2d(num_features=output_chan)
         if use_activity:
             self.relu = nn.ReLU()
 
@@ -258,8 +259,8 @@ class PointNetEstimation(nn.Cell):
         self.fc3 = nn.Dense(256,
                             3 + NUM_HEADING_BIN * 2 + NUM_SIZE_CLUSTER * 4)
 
-        self.fcbn1 = nn.BatchNorm1d(512)
-        self.fcbn2 = nn.BatchNorm1d(256)
+        self.fcbn1 = nn.BatchNorm2d(512)
+        self.fcbn2 = nn.BatchNorm2d(256)
         self.relu1 = nn.ReLU()
         self.relu2 = nn.ReLU()
 
@@ -286,9 +287,20 @@ class PointNetEstimation(nn.Cell):
             mF.cast(global_feat, ms.float32),
             mF.cast(expand_one_hot_vec, ms.float32)
         ])  #bs,515
-
-        x = self.relu1(self.fcbn1(self.fc1(expand_global_feat)))  #bs,512
-        x = self.relu1(self.fcbn2(self.fc2(x)))  # bs,256
+        x = self.fc1(expand_global_feat)
+        x = mF.expand_dims(x, 2)
+        x = mF.expand_dims(x, 3)
+        x = self.fcbn1(x)
+        x = mF.squeeze(x)
+        x = mF.squeeze(x)
+        x = self.relu1(x)  #bs,512
+        x = self.fc2(x)
+        x = mF.expand_dims(x, 2)
+        x = mF.expand_dims(x, 3)
+        x = self.fcbn2(x)
+        x = mF.squeeze(x)
+        x = mF.squeeze(x)
+        x = self.relu1(x)  # bs,256
         box_pred = self.fc3(x)  # bs,3+NUM_HEADING_BIN*2+NUM_SIZE_CLUSTER*4
         return box_pred
 
@@ -321,8 +333,8 @@ class STNxyz(nn.Cell):
         self.fc2 = nn.Dense(256, 128)
         self.fc3 = nn.Dense(128, 3)
 
-        self.fcbn1 = nn.BatchNorm1d(256)
-        self.fcbn2 = nn.BatchNorm1d(128)
+        self.fcbn1 = nn.BatchNorm2d(256)
+        self.fcbn2 = nn.BatchNorm2d(128)
         self.relu = nn.ReLU()
 
     def construct(self, pts: ms.Tensor, one_hot_vec: ms.Tensor):
@@ -340,14 +352,20 @@ class STNxyz(nn.Cell):
             [mF.cast(x, ms.float32),
              mF.cast(expand_one_hot_vec, ms.float32)])  #bs,259
         x = self.fc1(x)
-
+        x = mF.expand_dims(x, 2)
+        x = mF.expand_dims(x, 3)
         x = self.fcbn1(x)
-
+        x = mF.squeeze(x)
+        x = mF.squeeze(x)
         x = self.relu(x)  # bs,256
-
-        x = self.relu(self.fcbn2(self.fc2(x)))  # bs,128
+        x = self.fc2(x)
+        x = mF.expand_dims(x, 2)
+        x = mF.expand_dims(x, 3)
+        x = self.fcbn2(x)
+        x = mF.squeeze(x)
+        x = mF.squeeze(x)
+        x = self.relu(x)  # bs,128
         x = self.fc3(x)  # bs,3
-
         return x
 
 

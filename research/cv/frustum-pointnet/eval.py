@@ -47,13 +47,13 @@ ROOT_DIR = os.path.dirname(BASE_DIR)
 sys.path.append(BASE_DIR)
 sys.path.append(os.path.join(ROOT_DIR, 'src'))
 
-context.set_context(mode=context.PYNATIVE_MODE,
-                    device_target="GPU", device_id=0)
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--gpu', type=int, default=0,
-                    help='GPU to use [default: GPU 0]')
+parser.add_argument('--device_target', type=str, default='Ascend',
+                    help='[Ascend, GPU]')
+parser.add_argument('--device_id', type=int, default=0,
+                    help='default 0')
 parser.add_argument('--num_point', type=int, default=1024,
                     help='Point Number [default: 1024]')
 parser.add_argument('--model', default='frustum_pointnets_v1',
@@ -69,6 +69,7 @@ parser.add_argument('--output', default='test_results',
 parser.add_argument('--data_path', default='kitti/frustum_caronly_val.pickle',
                     help='frustum dataset pickle filepath [default: None]')
 # ex. nuscenes2kitti/frustum_caronly_CAM_FRONT_val.pickle
+parser.add_argument('--val_sets', type=str, default='val')
 parser.add_argument('--from_rgb_detection', action='store_true',
                     help='test from dataset files from rgb detection.')
 parser.add_argument('--idx_path', default='kitti/image_sets/val.txt',
@@ -91,10 +92,13 @@ parser.add_argument('--debug', default=False,
                     action='store_true', help='debug mode')
 FLAGS = parser.parse_args()
 
+
+context.set_context(mode=context.PYNATIVE_MODE,
+                    device_target=FLAGS.device_target, device_id=FLAGS.device_id)
+
 # Set training configurations
 BATCH_SIZE = FLAGS.batch_size
 MODEL_PATH = FLAGS.model_path
-GPU_INDEX = FLAGS.gpu
 NUM_POINT = FLAGS.num_point
 
 NUM_CLASSES = 2
@@ -111,7 +115,7 @@ Loss = FrustumPointNetLoss()
 if FLAGS.dataset == 'kitti':
     if FLAGS.data_path is None:
         overwritten_data_path = 'kitti/frustum_' + \
-            FLAGS.objtype + '_' + FLAGS.split + '.pickle'
+            FLAGS.objtype + '_' + FLAGS.val_sets + '.pickle'
     else:
         overwritten_data_path = FLAGS.data_path
     TEST_DATASET = provider.FrustumDataset(npoints=NUM_POINT, split='val',
