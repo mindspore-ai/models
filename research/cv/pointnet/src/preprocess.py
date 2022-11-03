@@ -20,10 +20,11 @@ import mindspore.dataset as ds
 import numpy as np
 from src.dataset import ShapeNetDataset
 
+batch_size = 1
 parser = argparse.ArgumentParser(description="lenet preprocess data")
 parser.add_argument("--dataset_path", type=str, default=
                     '/home/pointnet/shapenetcore_partanno_segmentation_benchmark_v0', help="dataset path.")
-parser.add_argument("--output_path", type=str, default='./datapath_BS1/', help="output path.")
+parser.add_argument("--output_path", type=str, default='../datapath_BS1/', help="output path.")
 parser.add_argument("--device_target", type=str, default='Ascend', help="output path.")
 parser.add_argument("--device_id", default=4, help="output path.")
 parser.add_argument('--class_choice', type=str, default='Chair', help="class_choice")
