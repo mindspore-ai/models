@@ -20,12 +20,16 @@ import time
 import math
 import json
 import stat
+import copy
 from datetime import datetime
 from collections import Counter
 import numpy as np
+import mindspore
 import mindspore.common.dtype as mstype
+import mindspore.nn as nn
 from mindspore import load_checkpoint, load_param_into_net, save_checkpoint, Parameter
 from mindspore.train.callback import Callback
+from mindspore import ops
 from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
 
@@ -455,6 +459,10 @@ class EvalCallBack(Callback):
         self.interval = interval
         self.best_result = 0
         self.best_epoch = 0
+        self.eval_parallel = config.eval_parallel
+        self.device_num = config.device_num
+        if config.eval_parallel:
+            self.reduce = AllReduce()
 
     def load_ema_parameter(self, network):
         param_dict = {}
@@ -491,13 +499,16 @@ class EvalCallBack(Callback):
             else:
                 self.load_network_parameter(cb_param.train_network)
             self.test_network.set_train(False)
-            eval_print_str, results = self.inference()
+            if self.eval_parallel:
+                cur_step = cb_param.cur_step_num
+                eval_print_str, results = self.inference(cur_epoch=cur_epoch, cur_step=cur_step, rank_id=self.rank)
+            else:
+                eval_print_str, results = self.inference()
             if results >= self.best_result:
                 self.best_result = results
                 self.best_epoch = cur_epoch
-                if os.path.exists('best.ckpt'):
-                    self.remove_ckpoint_file('best.ckpt')
-                self.save_best_checkpoint(cb_param.train_network)
+                if self.rank == 0:
+                    self.save_best_checkpoint(cb_param.train_network)
                 self.logger.info("Best result %s at %s epoch" % (self.best_result, self.best_epoch))
             self.logger.info(eval_print_str)
             self.logger.info('Ending inference...')
@@ -505,26 +516,43 @@ class EvalCallBack(Callback):
     def end(self, run_context):
         self.logger.info("Best result %s at %s epoch" % (self.best_result, self.best_epoch))
 
-    def inference(self):
+    def synchronize(self):
+        sync = mindspore.Tensor(np.array([1]).astype(np.int32))
+        sync = self.reduce(sync)    # For synchronization
+        sync = sync.asnumpy()[0]
+        if sync != self.device_num:
+            raise ValueError(f"Sync value {sync} is not equal to number of device {self.device_num}. "
+                             f"There might be wrong with devices.")
+
+    def inference(self, cur_epoch=None, cur_step=None, rank_id=None):
         self.logger.info('Start inference...')
         self.logger.info("eval dataset size, %s" % self.dataset.get_dataset_size())
-        counts = 0
-        for data in self.dataset.create_dict_iterator(num_epochs=1):
+        img_ids = []
+        for idx, data in enumerate(self.dataset.create_dict_iterator(num_epochs=1), start=1):
             image = data['image']
-            img_info = data['image_shape']
+            img_shape = data['image_shape']
             img_id = data['img_id']
             prediction = self.test_network(image)
             prediction = prediction.asnumpy()
-            img_shape = img_info.asnumpy()
+            img_shape = img_shape.asnumpy()
             img_id = img_id.asnumpy()
-            counts = counts + 1
-            self.detection.detection(prediction, img_shape, img_id)
-            self.logger.info('Calculating mAP...%s' % counts)
+            if self.eval_parallel and cur_epoch is not None and cur_step is not None and rank_id is not None:
+                mask = np.isin(img_id.squeeze(), img_ids, invert=True)
+                prediction, img_shape, img_id = prediction[mask], img_shape[mask], img_id[mask]
+                if prediction.shape[0] > 0:
+                    self.detection.detection(prediction, img_shape, img_id)
+                img_ids.extend(img_id.tolist())
+            else:
+                self.detection.detection(prediction, img_shape, img_id)
+            self.logger.info(f'Detection...{idx} / {self.dataset.get_dataset_size()}')
 
-        self.logger.info('Calculating mAP...%s' % counts)
-        result_file_path = self.detection.evaluate_prediction()
+        result_file_path = self.detection.evaluate_prediction(cur_epoch, cur_step, rank_id)
         self.logger.info('result file path: %s', result_file_path)
-        eval_result, results = self.detection.get_eval_result()
+        if self.eval_parallel:
+            self.synchronize()
+            eval_result, results = self.detection.get_eval_result_parallel()
+        else:
+            eval_result, results = self.detection.get_eval_result()
         if eval_result is not None and results is not None:
             eval_print_str = '\n=============coco eval result=========\n' + eval_result
             return eval_print_str, results
@@ -543,8 +571,10 @@ class EvalCallBack(Callback):
     def save_best_checkpoint(self, net):
         param_list = [{'name': 'best_result', 'data': Parameter(self.best_result)},
                       {'name': 'best_epoch', 'data': Parameter(self.best_epoch)}]
+        prefix = "network."
         for name, param in net.parameters_and_names():
-            param_list.append({'name': name, 'data': param})
+            # Remove duplicate prefix 'network.'
+            param_list.append({'name': name[len(prefix):], 'data': param})
         save_checkpoint(param_list, os.path.join(self.save_ckpt_path, 'best.ckpt'))
 
 
@@ -562,7 +592,7 @@ class Redirct:
 class DetectionEngine:
     """ Detection engine """
 
-    def __init__(self, config):
+    def __init__(self, config, save_prefix=None):
         self.config = config
         self.input_size = self.config.input_size
         self.strides = self.config.fpn_strides  # [8, 16, 32]
@@ -578,8 +608,9 @@ class DetectionEngine:
         self._coco = COCO(self.annFile)
         self._img_ids = list(sorted(self._coco.imgs.keys()))
         self.coco_catIds = self._coco.getCatIds()
-        self.save_prefix = config.outputs_dir
+        self.save_prefix = config.outputs_dir if save_prefix is None else save_prefix
         self.file_path = ''
+        self.dir_path = ''
 
         self.data_list = []
 
@@ -699,14 +730,20 @@ class DetectionEngine:
                 data_list.append(pred_data)
         return data_list
 
-    def evaluate_prediction(self):
+    def evaluate_prediction(self, cur_epoch=None, cur_step=None, rank_id=None):
         """ generate prediction coco json file """
         print('Evaluate in main process...')
         # write result to coco json format
-
-        t = datetime.now().strftime('_%Y_%m_%d_%H_%M_%S')
-        try:
+        if cur_epoch is not None and cur_step is not None and rank_id is not None:
+            self.dir_path = os.path.join(self.save_prefix, f"e{cur_epoch}-s{cur_step}")
+            if not os.path.exists(self.dir_path):
+                os.makedirs(self.dir_path, exist_ok=True)
+            file_name = f"e{cur_epoch}-s{cur_step}-r{rank_id}.json"
+            self.file_path = os.path.join(self.dir_path, file_name)
+        else:
+            t = datetime.now().strftime('_%Y_%m_%d_%H_%M_%S')
             self.file_path = self.save_prefix + '/predict' + t + '.json'
+        try:
             f = open(self.file_path, 'w')
             json.dump(self.data_list, f)
         except IOError as e:
@@ -720,13 +757,53 @@ class DetectionEngine:
             self.data_list.clear()
             return self.file_path
 
-    def get_eval_result(self):
-        """Get eval result"""
-        if not self.file_path:
-            return None, None
+    def get_dt_list(self):
+        dt_files = os.listdir(self.dir_path)
+        dt_list = []
+        dt_ids_set = set([])
+        self.config.logger.info(f"Total {len(dt_files)} json files")
+        self.config.logger.info(f"File list: {dt_files}")
 
+        for file in dt_files:
+            file_path = os.path.join(self.dir_path, file)
+            ann_list = []
+            with open(file_path, 'r') as f:
+                try:
+                    ann_list = json.load(f)
+                except json.decoder.JSONDecodeError:
+                    pass    # json file is empty
+            ann_ids = set(ann['image_id'] for ann in ann_list)
+            diff_ids = ann_ids - dt_ids_set
+            ann_list = [ann for ann in ann_list if ann['image_id'] in diff_ids]
+            dt_ids_set = dt_ids_set | diff_ids
+            dt_list.extend(ann_list)
+        return dt_list
+
+    def get_coco_from_dt_list(self, dt_list):
+        cocoDt = COCO()
+        cocoDt.dataset = {}
+        cocoDt.dataset['images'] = [img for img in self._coco.dataset['images']]
+        cocoDt.dataset['categories'] = copy.deepcopy(self._coco.dataset['categories'])
+        self.config.logger.info(f"Number of dt boxes: {len(dt_list)}")
+        for idx, ann in enumerate(dt_list):
+            bb = ann['bbox']
+            x1, x2, y1, y2 = [bb[0], bb[0] + bb[2], bb[1], bb[1] + bb[3]]
+            if not 'segmentation' in ann:
+                ann['segmentation'] = [[x1, y1, x1, y2, x2, y2, x2, y1]]
+            ann['area'] = bb[2] * bb[3]
+            ann['id'] = idx + 1
+            ann['iscrowd'] = 0
+        cocoDt.dataset['annotations'] = dt_list
+        cocoDt.createIndex()
+        return cocoDt
+
+    def get_eval_result_parallel(self):
+        dt_list = self.get_dt_list()
+        cocoDt = self.get_coco_from_dt_list(dt_list)
         cocoGt = self._coco
-        cocoDt = cocoGt.loadRes(self.file_path)
+        return self.compute_coco(cocoGt, cocoDt)
+
+    def compute_coco(self, cocoGt, cocoDt):
         cocoEval = COCOeval(cocoGt, cocoDt, 'bbox')
         cocoEval.evaluate()
         cocoEval.accumulate()
@@ -736,6 +813,14 @@ class DetectionEngine:
         cocoEval.summarize()
         sys.stdout = stdout
         return rdct.content, cocoEval.stats[0]
+
+    def get_eval_result(self):
+        """Get eval result"""
+        if not self.file_path:
+            return None, None
+        cocoGt = self._coco
+        cocoDt = cocoGt.loadRes(self.file_path)
+        return self.compute_coco(cocoGt, cocoDt)
 
 
 def get_specified():
@@ -762,3 +847,11 @@ def get_specified():
     ]
 
     return res
+
+class AllReduce(nn.Cell):
+    def __init__(self):
+        super(AllReduce, self).__init__()
+        self.all_reduce = ops.AllReduce()
+
+    def construct(self, x):
+        return self.all_reduce(x)

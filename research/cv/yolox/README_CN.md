@@ -122,6 +122,9 @@ head中的回归分支和分类分支进行了解耦(Decoupled head),并且将ob
 
     ```shell
     python eval.py --config_path=yolox_darknet53.yaml --data_dir=./dataset/xxx --val_ckpt=your_val_ckpt_file_path --per_batch_size=8
+
+    # 多卡评估
+    bash run_distribute_eval.sh xx/dataset/ your_val_ckpt_file_path yolox_darknet53 8 rank_table_8pcs.json
     ```
 
 # 脚本说明
@@ -147,6 +150,7 @@ head中的回归分支和分类分支进行了解耦(Decoupled head),并且将ob
     |    |----moxing_adapter.py
     |----scripts
     |    |----run_distribute_train.sh
+    |    |----run_distribute_eval.sh
     |    |----run_infer_310.sh
     |    |----run_eval.sh
     |    |----run_standalone_train.sh
@@ -209,7 +213,7 @@ train.py中主要的参数如下:
 --rank                      分布式本地进程序号。 默认值：0
 --group_size                设备进程总数。 默认值：1
 --run_eval                  是否开启边训练边推理。默认为False
-
+--eval_parallel             是否开启并行推理。默认为 False。仅在 run_eval 为 True，并且 is_distributed 为 1 时有效
 ```
 
 ## 训练过程

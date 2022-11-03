@@ -14,6 +14,7 @@
 # =======================================================================================
 """ Train entrance module """
 import os
+import shutil
 import time
 import datetime
 import argparse
@@ -215,13 +216,27 @@ def get_optimizer(cfg, network, lr):
     return opt
 
 
-@moxing_wrapper(pre_process=modelarts_pre_process)
-def run_train():
-    """ Launch Train process """
-    parser = parser_init()
-    args_opt, _ = parser.parse_known_args()
-    set_default()
+def set_resume_config():
+    if not os.path.isfile(config.resume_yolox):
+        raise TypeError('resume_yolox should be checkpoint path')
+    resume_param = load_checkpoint(config.resume_yolox,
+                                   filter_prefix=['learning_rate', 'global_step', 'updates', 'momentum',
+                                                  'best_result', 'best_epoch'])
+    resume_epoch = config.resume_yolox.split('-')[1].split('_')[0]
+    config.start_epoch = int(resume_epoch)
+    if config.start_epoch >= config.aug_epochs:
+        config.data_aug = False
+        config.use_l1 = True
+        config.run_eval = True
+        config.eval_interval = 1
+        config.ckpt_interval = 1
+        config.train_epoch = config.max_epoch - config.start_epoch
+    else:
+        config.train_epoch = config.aug_epochs - config.start_epoch
+    return resume_param, resume_epoch
 
+
+def set_modelarts_config():
     if config.enable_modelarts:
         import moxing as mox
         local_data_url = os.path.join(config.data_path, str(config.rank))
@@ -230,8 +245,34 @@ def run_train():
         config.data_dir = os.path.join(config.data_path, 'coco2017')
         mox.file.copy_parallel(config.annFile, local_annFile)
         config.annFile = os.path.join(local_data_url, 'instances_train2017.json')
+
+
+def set_callback():
+    cb = []
+    if config.rank_save_ckpt_flag:
+        if config.use_summary:
+            specified = {'collect_input_data': False, 'histogram_regular': '|'.join(get_specified())}
+            cb.append(SummaryCollector(summary_dir="./summary_dir", collect_freq=10, collect_specified_data=specified))
+        ckpt_config = CheckpointConfig(save_checkpoint_steps=config.steps_per_epoch * config.ckpt_interval,
+                                       keep_checkpoint_max=config.ckpt_max_num)
+        cb.append(
+            ModelCheckpoint(config=ckpt_config, directory=config.save_ckpt_dir, prefix='{}'.format(config.backbone)))
+        if config.resume_yolox:
+            cb.append(ResumeCallback(config.start_epoch))
+    return cb
+
+
+@moxing_wrapper(pre_process=modelarts_pre_process)
+def run_train():
+    """ Launch Train process """
+    parser = parser_init()
+    args_opt, _ = parser.parse_known_args()
+    set_default()
+    set_modelarts_config()
+
     profiler = network_init()
     parallel_init(config)
+    config.device_num = get_group_size()
     if config.backbone == "yolox_darknet53":
         backbone = "yolofpn"
     elif config.backbone == 'yolox_x':
@@ -255,24 +296,9 @@ def run_train():
     config.logger.info('Finish getting network...')
 
     if config.resume_yolox:
-        if not os.path.isfile(config.resume_yolox):
-            raise TypeError('resume_yolox should be checkpoint path')
-        resume_param = load_checkpoint(config.resume_yolox,
-                                       filter_prefix=['learning_rate', 'global_step', 'updates', 'momentum',
-                                                      'best_result', 'best_epoch'])
-        resume_epoch = config.resume_yolox.split('-')[1].split('_')[0]
-        config.start_epoch = int(resume_epoch)
-        if config.start_epoch >= config.aug_epochs:
-            config.data_aug = False
-            config.use_l1 = True
-            config.run_eval = True
-            config.eval_interval = 1
-            config.ckpt_interval = 1
-            config.train_epoch = config.max_epoch - config.start_epoch
-        else:
-            config.train_epoch = config.aug_epochs - config.start_epoch
+        resume_param, resume_epoch = set_resume_config()
         config.logger.info('resume train from epoch: %s data_aug: %s' % (resume_epoch, config.data_aug))
-
+    config.eval_parallel = config.run_eval and config.is_distributed and config.eval_parallel
     ds = create_yolox_dataset(image_dir=config.data_root, anno_path=config.annFile, batch_size=config.per_batch_size,
                               device_num=config.group_size, rank=config.rank, data_aug=config.data_aug)
     ds_test = get_val_dataset()
@@ -290,23 +316,18 @@ def run_train():
     config.logger.info("use ema model: %s" % config.use_ema)
     model = Model(network_ema)
 
-    cb = []
-    if config.rank_save_ckpt_flag:
-        if config.use_summary:
-            specified = {'collect_input_data': False, 'histogram_regular': '|'.join(get_specified())}
-            cb.append(SummaryCollector(summary_dir="./summary_dir", collect_freq=10, collect_specified_data=specified))
-        ckpt_config = CheckpointConfig(save_checkpoint_steps=config.steps_per_epoch * config.ckpt_interval,
-                                       keep_checkpoint_max=config.ckpt_max_num)
-        cb.append(
-            ModelCheckpoint(config=ckpt_config, directory=config.save_ckpt_dir, prefix='{}'.format(config.backbone)))
-        if config.resume_yolox:
-            cb.append(ResumeCallback(config.start_epoch))
+    cb = set_callback()
     cb.append(YOLOXCB(config, lr=lr, is_modelart=config.enable_modelarts, per_print_times=config.log_interval,
                       train_url=args_opt.train_url))
     if config.run_eval:
         test_block = DetectionBlock(config, backbone=backbone)
-        cb.append(
-            EvalCallBack(ds_test, test_block, DetectionEngine(config), config, interval=config.eval_interval))
+        save_prefix = None
+        if config.eval_parallel:
+            save_prefix = config.eval_parallel_dir
+            if os.path.exists(save_prefix):
+                shutil.rmtree(save_prefix, ignore_errors=True)
+        cb.append(EvalCallBack(ds_test, test_block, DetectionEngine(config, save_prefix),
+                               config, interval=config.eval_interval))
     if config.need_profiler:
         model.train(3, ds, callbacks=cb, dataset_sink_mode=True, sink_size=config.log_interval)
         profiler.analyse()

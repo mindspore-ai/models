@@ -16,6 +16,7 @@
 import multiprocessing
 import random
 import os
+import math
 
 import numpy as np
 import cv2
@@ -86,8 +87,8 @@ class COCOYoloXDataset:
 
     def __init__(self, root, ann_file, remove_images_without_annotations=True,
                  filter_crowd_anno=True, is_training=True, mosaic=True, img_size=(640, 640),
-                 preproc=None, input_dim=(640, 640), mosaic_prob=1.0, enable_mosaic=True, eable_mixup=True,
-                 mixup_prob=1.0):
+                 preproc=None, input_dim=(640, 640), mosaic_prob=1.0, enable_mosaic=True, enable_mixup=True,
+                 mixup_prob=1.0, eval_parallel=False, device_num=1, batch_size=8):
         self.coco = COCO(ann_file)
         self.img_ids = list(self.coco.imgs.keys())
         self.filter_crowd_anno = filter_crowd_anno
@@ -106,7 +107,7 @@ class COCOYoloXDataset:
         self.shear = 2.0
         self.perspective = 0.0
         self.mixup_prob = mixup_prob
-        self.enable_mixup = eable_mixup
+        self.enable_mixup = enable_mixup
 
         if remove_images_without_annotations:
             img_ids = []
@@ -119,6 +120,15 @@ class COCOYoloXDataset:
         self.categories = {cat["id"]: cat["name"] for cat in self.coco.cats.values()}
         self.cat_ids_to_continuous_ids = {v: i for i, v in enumerate(self.coco.getCatIds())}
         self.continuous_ids_cat_ids = {v: k for k, v in self.cat_ids_to_continuous_ids.items()}
+
+        if not is_training and eval_parallel:
+            from model_utils.config import config
+            step_img_size = device_num * batch_size
+            append_img_num = math.ceil(len(self.img_ids) / step_img_size) * step_img_size - len(self.img_ids)
+            if append_img_num > 0:
+                config.logger.info(f"[INFO]: Dataset size {len(self.img_ids)} is not divisible "
+                                   f"by step_img_size {step_img_size}. Append duplicate images.")
+                self.img_ids.extend(self.img_ids[:append_img_num])
 
     def pull_item(self, index):
         """
@@ -351,18 +361,17 @@ def create_yolox_dataset(image_dir, anno_path, batch_size, device_num, rank,
     img_size = config.input_size
     input_dim = img_size
     if is_training:
-
         yolo_dataset = COCOYoloXDataset(root=image_dir, ann_file=anno_path, filter_crowd_anno=filter_crowd,
                                         remove_images_without_annotations=remove_empty_anno, is_training=is_training,
-                                        mosaic=data_aug, eable_mixup=data_aug, enable_mosaic=data_aug,
+                                        mosaic=data_aug, enable_mixup=data_aug, enable_mosaic=data_aug,
                                         preproc=TrainTransform(config=config), img_size=img_size, input_dim=input_dim)
     else:
         yolo_dataset = COCOYoloXDataset(
             root=image_dir, ann_file=anno_path, filter_crowd_anno=filter_crowd,
             remove_images_without_annotations=remove_empty_anno, is_training=is_training, mosaic=False,
-            eable_mixup=False,
-            img_size=img_size, input_dim=input_dim, preproc=ValTransform(legacy=False)
-        )
+            enable_mixup=False,
+            img_size=img_size, input_dim=input_dim, preproc=ValTransform(legacy=False),
+            device_num=device_num, batch_size=batch_size, eval_parallel=config.eval_parallel)
     cores = multiprocessing.cpu_count()
     num_parallel_workers = int(cores / device_num)
     if is_training:
@@ -373,8 +382,13 @@ def create_yolox_dataset(image_dir, anno_path, batch_size, device_num, rank,
                                  shard_id=rank, num_shards=device_num, shuffle=True)
         ds = ds.batch(batch_size, drop_remainder=True)
     else:  # for val
-        ds = de.GeneratorDataset(yolo_dataset, column_names=["image", "image_shape", "img_id"],
-                                 num_parallel_workers=min(32, num_parallel_workers), shuffle=False)
+        if config.eval_parallel:
+            ds = de.GeneratorDataset(yolo_dataset, column_names=["image", "image_shape", "img_id"],
+                                     num_parallel_workers=min(8, num_parallel_workers), shuffle=False,
+                                     python_multiprocessing=True, shard_id=rank, num_shards=device_num)
+        else:
+            ds = de.GeneratorDataset(yolo_dataset, column_names=["image", "image_shape", "img_id"],
+                                     num_parallel_workers=min(8, num_parallel_workers), shuffle=False)
         ds = ds.batch(batch_size, drop_remainder=False)
     ds = ds.repeat(1)
     return ds
