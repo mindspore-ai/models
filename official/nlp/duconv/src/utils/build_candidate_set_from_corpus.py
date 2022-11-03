@@ -20,6 +20,7 @@ from __future__ import print_function
 import json
 import collections
 import functools
+import sys
 
 def cmp(a, b):
     len_a, len_b = len(a[1]), len(b[1])
@@ -99,3 +100,7 @@ def build_candidate_set_from_corpus(corpus_file, candidate_set_file):
     fout.write(json.dumps(candidate_set_list, ensure_ascii=False) + "\n")
     fout.write(json.dumps(slot_dict, ensure_ascii=False))
     fout.close()
+
+
+if __name__ == '__main__':
+    build_candidate_set_from_corpus(sys.argv[1], sys.argv[2])
