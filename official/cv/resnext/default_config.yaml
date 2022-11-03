@@ -15,6 +15,7 @@ device_target: "Ascend"
 checkpoint_path: "./checkpoint/"
 checkpoint_file_path: ""
 onnx_file_path: ""
+run_eval: False
 
 # ==============================================================================
 # Training options

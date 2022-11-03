@@ -14,6 +14,7 @@ load_path: "./"
 device_target: "CPU"
 checkpoint_path: "./"
 checkpoint_file_path: "resnext50_ascend_v170_imagenet2012_official_cv_top1acc78.51_top5acc94.18.ckpt"
+run_eval: False
 
 # ==============================================================================
 # Training options
