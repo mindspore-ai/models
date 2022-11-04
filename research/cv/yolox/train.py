@@ -33,8 +33,8 @@ from model_utils.moxing_adapter import moxing_wrapper
 from src.initializer import default_recurisive_init
 from src.logger import get_logger
 from src.network_blocks import use_syc_bn
-from src.util import get_specified, get_param_groups, YOLOXCB, get_lr, load_weights, EvalCallBack, DetectionEngine, \
-    ResumeCallback
+from src.util import get_specified, get_param_groups, YOLOXCB, get_lr, load_weights, EvalCallback, DetectionEngine, \
+    ResumeCallback, EvalWrapper
 from src.yolox import YOLOLossCell, TrainOneStepWithEMA, DetectionBlock
 from src.yolox_dataset import create_yolox_dataset
 
@@ -272,7 +272,6 @@ def run_train():
 
     profiler = network_init()
     parallel_init(config)
-    config.device_num = get_group_size()
     if config.backbone == "yolox_darknet53":
         backbone = "yolofpn"
     elif config.backbone == 'yolox_x':
@@ -320,14 +319,21 @@ def run_train():
     cb.append(YOLOXCB(config, lr=lr, is_modelart=config.enable_modelarts, per_print_times=config.log_interval,
                       train_url=args_opt.train_url))
     if config.run_eval:
-        test_block = DetectionBlock(config, backbone=backbone)
+        test_network = DetectionBlock(config, backbone=backbone)
         save_prefix = None
         if config.eval_parallel:
             save_prefix = config.eval_parallel_dir
             if os.path.exists(save_prefix):
                 shutil.rmtree(save_prefix, ignore_errors=True)
-        cb.append(EvalCallBack(ds_test, test_block, DetectionEngine(config, save_prefix),
-                               config, interval=config.eval_interval))
+        detection_engine = DetectionEngine(config)
+        eval_wrapper = EvalWrapper(
+            config=config,
+            dataset=ds_test,
+            network=test_network,
+            detection_engine=detection_engine,
+            save_prefix=save_prefix
+        )
+        cb.append(EvalCallback(config, eval_wrapper))
     if config.need_profiler:
         model.train(3, ds, callbacks=cb, dataset_sink_mode=True, sink_size=config.log_interval)
         profiler.analyse()
