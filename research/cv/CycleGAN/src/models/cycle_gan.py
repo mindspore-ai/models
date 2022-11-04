@@ -47,6 +47,10 @@ def get_generator(args):
                                    pad_mode=args.pad_mode)
         init_weights(net, args.init_type, args.init_gain)
     elif args.model == "UNet":
+        if args.image_size % (2 ** (args.gl_num + 1)) != 0:
+            raise ValueError(f"For UNet Generator, the image_size must be a multiple of 2 ** (gl_num + 1), "
+                             f"please adjust the image_size or gl_num, now the image_size is {args.image_size} "
+                             f"gl_num is {args.gl_num}, it is recommended that gl_num = 7.")
         net = UnetGenerator(in_planes=args.in_planes, out_planes=args.in_planes, ngf=args.ngf, n_layers=args.gl_num,
                             alpha=args.slope, norm_mode=args.norm_mode, dropout=args.need_dropout)
         init_weights(net, args.init_type, args.init_gain)

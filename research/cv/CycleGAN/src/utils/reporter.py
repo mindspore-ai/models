@@ -124,6 +124,7 @@ class Reporter(logging.Logger):
                     os.remove(ckpt_files[i])
 
 
+
     def visualizer(self, img_A, img_B, fake_A, fake_B):
         if self.save_imgs and self.step % self.dataset_size == 0:
             save_image(img_A, os.path.join(self.imgs_dir, f"{self.epoch}_img_A.jpg"))
