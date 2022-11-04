@@ -120,5 +120,7 @@ class UnetSkipConnectionBlock(nn.Cell):
     def construct(self, x):
         out = self.model(x)
         if self.skip_connections:
+            if x.shape[-1] != out.shape[-1]:
+                out = ops.ResizeBilinear(x.shape)(out)
             out = self.concat((out, x))
         return out
