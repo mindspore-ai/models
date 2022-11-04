@@ -220,16 +220,16 @@ iou_class [0.96626199 0.75290523 0.87924483 0.43634233 0.44190292 0.50485979
 
 ## 310推理
 
-需要导出训练好的ckpt文件, 得到能在310上直接推理的mindir模型文件:
+需要导出训练好的ckpt文件, 得到能在310上直接推理的mindir模型文件或者air文件:
 
 ```sh
-python export.py --model_path /path/to/net.ckpt
+python export.py --model_path /path/to/net.ckpt --file_format MINDIR/AIR
 ```
 
-会在当前目录下得到enet.mindir文件。
+会在当前目录下得到Enet.mindir或者Enet.air文件。
 
 ```sh
-bash scripts/run_infer_310.sh /path/to/enet.mindir /path/to/images /path/to/result  /path/to/label 0
+bash scripts/run_infer_310.sh /path/to/Enet.mindir /path/to/images /path/to/result  /path/to/label 0
 ```
 
 其中/path/to/images指验证集的图片, 由于原始数据集的路径cityscapes/leftImg8bit/val/的图片根据拍摄的城市进行了分类, 需要先将其归到一个文件夹下才能供推理。
@@ -241,6 +241,6 @@ cp /path/to/cityscapes/leftImg8bit/val/lindau/* /path/to/images/
 cp /path/to/cityscapes/leftImg8bit/val/munster/* /path/to/images/
 ```
 
-验证集的ground truth, 同理也要归到/path/to/labels/下. 其余的参数/path/to/enet.mindir指mindir文件的路径, /path/to/result推理结果的输出路径(也需要提前生成该文件夹), 0指的是device_id
+验证集的ground truth, 同理也要归到/path/to/labels/下. 其余的参数/path/to/Enet.mindir指mindir文件的路径, /path/to/result推理结果的输出路径(也需要提前生成该文件夹), 0指的是device_id
 
 最终推理结果会输出在/res/result/文件夹下, 当前目录下会生成metric.txt, 其中包含精度.

@@ -60,15 +60,15 @@ After installing MindSpore via the official website, you can start training and 
 
 # run training example
 
-bash scripts/run_train.sh [TASK_NAME] [DEVICE_TARGET] [TEACHER_MODEL_DIR] [STUDENT_MODEL_DIR] [DATA_DIR] [DEVICE_ID](optional)
+bash scripts/run_standalone_train_ascend.sh [TASK_NAME] [DEVICE_TARGET] [DEVICE_ID] [TEACHER_MODEL_DIR] [STUDENT_MODEL_DIR] [DATA_DIR]
 
-Before running the shell script, please set the `task_name`, `device_target`, `teacher_model_dir`, `student_model_dir`, `data_dir` and `device_id`(optional) in the run_train.sh file first.
+Before running the shell script, please set the `task_name`, `device_target`, `device_id`, `teacher_model_dir`, `student_model_dir`, and `data_dir` in the run_standalone_train_ascend.sh file first.
 
 # run evaluation example
 
-bash scripts/run_eval.sh [TASK_NAME] [DEVICE_TARGET] [MODEL_DIR] [DATA_DIR]
+bash scripts/run_standalone_eval_ascend.sh [TASK_NAME] [DEVICE_TARGET] [MODEL_DIR] [DATA_DIR]
 
-Before running the shell script, please set the `task_name`, `device_target`, `model_dir` and `data_dir` in the run_eval.sh file first.
+Before running the shell script, please set the `task_name`, `device_target`, `model_dir` and `data_dir` in the run_standalone_eval_ascend.sh file first.
 ```
 
 # [Script Description](#contents)
@@ -81,8 +81,8 @@ Before running the shell script, please set the `task_name`, `device_target`, `m
 └─ternarybert
   ├─README.md
   ├─scripts
-    ├─run_train.sh                  # shell script for training phase
-    ├─run_eval.sh                   # shell script for evaluation phase
+    ├─run_standalone_train_ascend.sh                  # shell script for training phase
+    ├─run_standalone_eval_ascend.sh                   # shell script for evaluation phase
   ├─src
     ├─__init__.py
     ├─assessment_method.py          # assessment method for evaluation
@@ -238,7 +238,7 @@ Before running the command below, please check `teacher_model_dir`, `student_mod
 python
     python train.py --task_name='sts-b' --device_target="GPU" --teacher_model_dir='/home/xxx/model_dir/' --student_model_dir='/home/xxx/model_dir/' --data_dir='/home/xxx/data_dir/'
 shell
-    bash scripts/run_train.sh [TASK_NAME] [DEVICE_TARGET] [TEACHER_MODEL_DIR] [STUDENT_MODEL_DIR] [DATA_DIR] [DEVICE_ID](optional)
+    bash scripts/run_standalone_train_ascend.sh [TASK_NAME] [DEVICE_TARGET] [DEVICE_ID] [TEACHER_MODEL_DIR] [STUDENT_MODEL_DIR] [DATA_DIR]
 
 ```
 
@@ -268,7 +268,7 @@ If you want to after running and continue to eval.
 python
     python eval.py --task_name='sts-b' --device_target="GPU" --model_dir='/home/xxx/model_dir/' --data_dir='/home/xxx/data_dir/'
 shell
-    bash scripts/run_eval.sh [TASK_NAME] [DEVICE_TARGET] [MODEL_DIR] [DATA_DIR]
+    bash scripts/run_standalone_eval_ascend.sh [TASK_NAME] [DEVICE_TARGET] [MODEL_DIR] [DATA_DIR]
 
 
 ```

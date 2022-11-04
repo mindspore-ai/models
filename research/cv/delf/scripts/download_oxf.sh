@@ -40,7 +40,7 @@ make_folder() {
 
 make_folder "${dataset_root_folder}"
 cd ${dataset_root_folder}
-wget https://www.robots.ox.ac.uk/~vgg/data/oxbuildings/oxbuild_images.tgz
-tar -xzvf oxbuild_images.tgz
-wget https://www.robots.ox.ac.uk/~vgg/data/oxbuildings/gt_files_170407.tgz
+wget https://www.robots.ox.ac.uk/~vgg/data/oxbuildings/oxbuild_images-v1.tgz --no-check-certificate
+tar -xzvf oxbuild_images-v1.tgz
+wget https://www.robots.ox.ac.uk/~vgg/data/oxbuildings/gt_files_170407.tgz --no-check-certificate
 tar -xzvf gt_files_170407.tgz

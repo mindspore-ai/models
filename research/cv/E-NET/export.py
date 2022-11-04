@@ -22,6 +22,7 @@ if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument('--model_path', type=str)
     parser.add_argument('--device_id', type=int, default=0)
+    parser.add_argument('--file_format', type=str, choices=["MINDIR", "AIR"], default="MINDIR")
     config = parser.parse_args()
 
     net = Enet(20, "XavierUniform", train=False)
@@ -33,4 +34,8 @@ if __name__ == "__main__":
     load_checkpoint(config.model_path, net=net)
     net.set_train(False)
     input_data = Tensor(np.zeros([1, 3, 512, 1024]).astype(np.float32))
-    export(net, input_data, file_name="Enet.mindir", file_format="MINDIR")
+    if config.file_format == "MINDIR":
+        file_name = "Enet.mindir"
+    else:
+        file_name = "Enet.air"
+    export(net, input_data, file_name="Enet.mindir", file_format=config.file_format)
