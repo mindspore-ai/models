@@ -13,10 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
-MINDSPORE_PATH="`pip show mindspore-ascend | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
-if [[ ! $MINDSPORE_PATH ]];then
-    MINDSPORE_PATH="`pip show mindspore | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
+if [ $MS_LITE_HOME ];then
+  MINDSPORE_PATH=$MS_LITE_HOME/runtime
+else
+  MINDSPORE_PATH="`pip show mindspore-ascend | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
+  if [[ ! $MINDSPORE_PATH ]];then
+      MINDSPORE_PATH="`pip show mindspore | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
+  fi
 fi
 cmake . -DMINDSPORE_PATH=$MINDSPORE_PATH
 make
