@@ -14,10 +14,10 @@
 # limitations under the License.
 # ============================================================================
 
-curl -Os http://storage.googleapis.com/delf/resnet50_imagenet_weights.tar.gz
+wget http://storage.googleapis.com/delf/resnet50_imagenet_weights.tar.gz --no-check-certificate
 tar -xzvf resnet50_imagenet_weights.tar.gz
 
-wget https://gitee.com/LinPeijia/delf_-pca/repository/archive/master.zip
+wget https://gitee.com/LinPeijia/delf_-pca/repository/archive/master.zip --no-check-certificate
 unzip master -d .
 mv delf_-pca-master/pca .
 rm -rf delf_-pca-master/

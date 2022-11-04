@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,45 +14,30 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# != 5 && $# != 6 ]]
+if [ $# != 4 ]
 then
     echo "============================================================================================================"
     echo "Please run the script as: "
-    echo "sh scripts/run_train.sh [TASK_NAME] [DEVICE_TARGET] [TEACHER_MODEL_DIR] [STUDENT_MODEL_DIR] [DATA_DIR] [DEVICE_ID]"
-    echo "DEVICE_ID is optional, it can be set by command line argument DEVICE_ID , otherwise the value is zero"
+    echo "bash scripts/run_standalone_eval_ascend.sh [TASK_NAME] [DEVICE_TARGET] [MODEL_DIR] [DATA_DIR]"
     echo "============================================================================================================"
 exit 1
 fi
 
-echo "===============================================start training==============================================="
+echo "===============================================start evaling================================================"
 
 task_name=$1
 device_target=$2
-teacher_model_dir=$3
-student_model_dir=$4
-data_dir=$5
-
-if [ $# == 6 ]
-then
-device_id=$6
-else
-device_id=0
-fi
-
-if [ $device_target ==  "GPU" ]
-then
-    export CUDA_VISIBLE_DEVICES=$device_id
-fi
+model_dir=$3
+data_dir=$4
 
 mkdir -p ms_log
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 CUR_DIR=`pwd`
 export GLOG_log_dir=${CUR_DIR}/ms_log
 export GLOG_logtostderr=0
-python ${PROJECT_DIR}/../train.py \
+python ${PROJECT_DIR}/../eval.py \
     --task_name=$task_name \
     --device_target=$device_target \
-    --device_id=$device_id \
-    --teacher_model_dir=$teacher_model_dir \
-    --student_model_dir=$student_model_dir \
-    --data_dir=$data_dir> train_log.txt 2>&1 &
+    --device_id=$DEVICE_ID \
+    --model_dir=$model_dir \
+    --data_dir=$data_dir > eval_log.txt 2>&1 &

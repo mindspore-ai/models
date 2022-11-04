@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,30 +14,26 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 4 ]
-then
-    echo "============================================================================================================"
-    echo "Please run the script as: "
-    echo "sh scripts/run_eval.sh [TASK_NAME] [DEVICE_TARGET] [MODEL_DIR] [DATA_DIR]"
-    echo "============================================================================================================"
-exit 1
-fi
-
-echo "===============================================start evaling================================================"
+echo "===============================================start training==============================================="
 
 task_name=$1
 device_target=$2
-model_dir=$3
-data_dir=$4
+device_id=$3
+teacher_model_dir=$4
+student_model_dir=$5
+data_dir=$6
 
 mkdir -p ms_log
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 CUR_DIR=`pwd`
 export GLOG_log_dir=${CUR_DIR}/ms_log
 export GLOG_logtostderr=0
-python ${PROJECT_DIR}/../eval.py \
+python ${PROJECT_DIR}/../train.py \
     --task_name=$task_name \
     --device_target=$device_target \
-    --device_id=0 \
-    --model_dir=$model_dir \
-    --data_dir=$data_dir > eval_log.txt 2>&1 &
+    --device_id=$device_id \
+    --teacher_model_dir=$teacher_model_dir \
+    --student_model_dir=$student_model_dir \
+    --output_dir=$task_name \
+    --data_dir=$data_dir> train_log.txt 2>&1 &
+    
