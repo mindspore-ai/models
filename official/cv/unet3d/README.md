@@ -13,13 +13,15 @@
         - [Training](#training)
             - [Training on Ascend](#training-on-ascend)
             - [Training on GPU](#training-on-gpu)
+            - [Training on CPU](#training-on-cpu)
         - [Distributed Training](#distributed-training)
             - [Distributed training on Ascend](#distributed-training-on-ascend)
             - [Distributed training on GPU](#distributed-training-on-gpu)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
             - [Evaluating on Ascend](#evaluating-on-ascend)
-            - [Evaluating on GPU](#training-on-gpu)
+            - [Evaluating on GPU](#evaluating-on-gpu)
+            - [Evaluating on CPU](#evaluating-on-cpu)
         - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
@@ -124,6 +126,16 @@ bash ./run_standalone_eval_gpu_fp16.sh [VALIDATING_DATA_PATH] [CHECKPOINT_FILE_P
 
 ```
 
+- Run on CPU
+
+```python
+# run training example
+python train.py --device_target=CPU --data_path=/path/to/data/ > train.log 2>&1 &
+
+# run evaluation example
+python eval.py --device_target=CPU --data_path=/path/to/data/ --checkpoint_file_path=/path/to/checkpoint/ > eval.log 2>&1 &
+```
+
 If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training and evaluation as follows:
 
 ```python
@@ -193,6 +205,7 @@ If you want to run in modelarts, please check the official documentation of [mod
   ├── train.py                                  // training script
   ├── eval.py                                   // evaluation script
   ├── eval_onnx.py                              // ONNX evaluation script
+  ├── quick_start.py                            // quick start script
 
 ```
 
@@ -266,6 +279,17 @@ epoch: 4 step: 878, loss is 0.06556784
 epoch time: 1180467.795 ms, per step time: 1380.664 ms
 
 ```
+
+#### Training on CPU
+
+```shell
+python train.py --device_target=CPU --data_path=/path/to/data/ > train.log 2>&1 &
+
+```
+
+The python command above will run in the background, you can view the results through the file `train.log`.
+
+After training, you'll get some checkpoint files under the script folder by default.
 
 ### Distributed Training
 
@@ -354,6 +378,19 @@ The above python command will run in the background. You can view the results th
 eval average dice is 0.9502010010453671
 
 ```
+
+#### Evaluating on CPU
+
+- evaluation on dataset when running on CPU
+
+Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path, e.g., "username/unet3d/Unet3d-10_110.ckpt".
+
+```shell
+python eval.py --device_target=CPU --data_path=/path/to/data/ --checkpoint_file_path=/path/to/checkpoint/ > eval.log 2>&1 &
+
+```
+
+The above python command will run in the background. You can view the results through the file "eval.log".
 
 ### ONNX Evaluation
 
