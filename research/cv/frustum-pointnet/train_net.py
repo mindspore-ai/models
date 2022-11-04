@@ -27,6 +27,7 @@ from mindspore import nn, context, dtype
 from mindspore.ops import functional as F
 
 from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
+from mindspore.train.loss_scale_manager import FixedLossScaleManager
 from mindspore.nn import Metric
 from mindspore.communication.management import init, get_rank
 from mindspore.nn import rearrange_inputs
@@ -56,6 +57,8 @@ parser.add_argument('--model',
                     default='frustum_pointnets_v1_ms',
                     help='Model name [default: frustum_pointnets_v1_ms]')
 parser.add_argument('--log_dir', default='log', help='Log dir [default: log]')
+parser.add_argument('--device_target', default='Ascend', type=str,
+                    help='device_target [Ascned, GPU]')
 parser.add_argument('--num_point',
                     type=int,
                     default=1024,
@@ -113,6 +116,7 @@ parser.add_argument('--keep_checkpoint_max',
                     default=5,
                     help='max checkpoints to save [default: 5]')
 parser.add_argument('--disable_datasink_mode',
+                    default=False,
                     action="store_false",
                     help='disable datasink mode [default: False]')
 FLAGS = parser.parse_args()
@@ -184,32 +188,25 @@ def get_learning_rate(step_per_epoch):
     return lr_list
 
 
-def content_init(device_id, device_num, _platform="gpu"):
+def content_init(device_id, device_num, device_target):
     '''content_init'''
-    if _platform not in ("ascend", "gpu"):
-        raise ValueError("Unsupported platform {}".format(_platform))
-
-    if _platform == "gpu":
-        if not DEBUG:
-            context.set_context(mode=context.GRAPH_MODE, device_target="GPU")
-            if device_num > 1:
-                init('nccl')
-                context.set_auto_parallel_context(
-                    parallel_mode=context.ParallelMode.DATA_PARALLEL,
-                    gradients_mean=True)
-                ms.common.set_seed(1234)
-
-        else:
-            context.set_context(mode=context.PYNATIVE_MODE)
-            if device_num > 1:
-                init('nccl')
-                context.set_auto_parallel_context(
-                    parallel_mode=context.ParallelMode.DATA_PARALLEL,
-                    gradients_mean=True)
-                ms.common.set_seed(1234)
+    if device_target in ("Ascend", "GPU"):
+        ms.common.set_seed(1234)
     else:
-        raise ValueError("Unsupported platform {}".format(_platform))
+        raise ValueError("Unsupported platform {}".format(device_target))
 
+    if not DEBUG:
+        context.set_context(mode=context.GRAPH_MODE, device_target=device_target)
+    else:
+        context.set_context(mode=context.PYNATIVE_MODE, device_target=device_target)
+    if device_num > 1:
+        context.reset_auto_parallel_context()
+        context.set_auto_parallel_context(device_num=device_num,
+                                          parallel_mode=context.ParallelMode.DATA_PARALLEL,
+                                          gradients_mean=True)
+        init()
+
+    context.set_context(device_id=device_id)
 
 def pack(d):
     point_cloud = d["data"].astype(dtype.float32)
@@ -358,12 +355,13 @@ def lr_func(epoch, _init=BASE_LEARNING_RATE, step_size=DECAY_STEP, gamma=DECAY_R
 def train_ms_v3():
     log_string("init environment ... ")
     device_id = int(os.getenv('DEVICE_ID', '0'))
-    # device_id = 0
     device_num = int(os.getenv('RANK_SIZE', '1'))
-    content_init(device_id, device_num)
+    content_init(device_id, device_num, FLAGS.device_target)
+    if FLAGS.device_target == "Ascend":
+        loss_scale_manager = FixedLossScaleManager(1024, drop_overflow_update=False)
 
     import frustum_pointnets_v1 as MODEL_OLD
-    rank_id = get_rank() if device_num > 1 else device_id
+    rank_id = get_rank() if device_num > 1 else 0
     log_string(f"device_num:{device_num}, rank_id:{rank_id}")
     log_string(
         f"{datetime.datetime.now().isoformat()}:loading train dataset ...")
@@ -382,14 +380,17 @@ def train_ms_v3():
         split=FLAGS.val_sets,
         rotate_to_center=True,
         one_hot=True,
-        overwritten_data_path='kitti/frustum_' + FLAGS.objtype + '_' +
-        FLAGS.val_sets + '.pickle')
+        overwritten_data_path='kitti/frustum_'+FLAGS.objtype+'_'+FLAGS.val_sets+'.pickle')
     train_data_set = datautil.get_train_data(TRAIN_DATASET,
+                                             BATCH_SIZE,
                                              device_num=device_num,
                                              rank_id=rank_id)
     batch_step = train_data_set.get_dataset_size()
 
-    test_data_set = datautil.get_test_data(TEST_DATASET, BATCH_SIZE)
+    test_data_set = datautil.get_test_data(TEST_DATASET,
+                                           BATCH_SIZE,
+                                           device_num=device_num,
+                                           rank_id=rank_id)
     log_string(f"{datetime.datetime.now().isoformat()}:construct net ...")
     # build model
     net: nn.Cell = MODEL_OLD.FrustumPointNetv1(n_classes=n_classes,
@@ -397,7 +398,7 @@ def train_ms_v3():
     lossfn = MODEL_OLD.FrustumPointNetLoss(enable_summery=False)
     _ = MODEL_OLD.FrustumPointNetLoss(return_all=True, enable_summery=False)
 
-    net_eval = MODEL_OLD.FpointWithEval(net)
+    net_eval = MODEL_OLD.FpointWithEval(net, lossfn)
     net_with_criterion: nn.Cell = MODEL_OLD.FpointWithLoss_old(net, lossfn)
 
     lr = [lr_func(i//batch_step) for i in range(FLAGS.max_epoch*batch_step)]
@@ -405,11 +406,19 @@ def train_ms_v3():
                         learning_rate=lr,
                         weight_decay=FLAGS.weight_decay)
     ckpt_path = f"./{FLAGS.name}_" + datetime.datetime.now().strftime("%Y%m%d_%H%M")
-    model = ms.Model(net_with_criterion,
-                     loss_fn=None,
-                     eval_network=net_eval,
-                     optimizer=optimizer,
-                     metrics={"Fmatrix": Fmatrix()})
+    if FLAGS.device_target == "Ascend":
+        model = ms.Model(net_with_criterion,
+                         loss_fn=None,
+                         eval_network=net_eval,
+                         optimizer=optimizer,
+                         loss_scale_manager=loss_scale_manager,
+                         metrics={"Fmatrix": Fmatrix()})
+    else:
+        model = ms.Model(net_with_criterion,
+                         loss_fn=None,
+                         eval_network=net_eval,
+                         optimizer=optimizer,
+                         metrics={"Fmatrix": Fmatrix()})
 
     cb = []
 
@@ -425,15 +434,16 @@ def train_ms_v3():
     ckpt_cb = ModelCheckpoint(prefix="fpoint_v1",
                               directory=ckpt_path,
                               config=config_ck)
+
     if rank_id == 0:
         cb += [ckpt_cb]
         cb += [myCallback(model, test_data_set, ckpt_path)]
+
 
     model.train(train_epoch,
                 train_data_set,
                 dataset_sink_mode=DATASINK,
                 callbacks=cb)
-
     print("train down!")
 
 if __name__ == "__main__":

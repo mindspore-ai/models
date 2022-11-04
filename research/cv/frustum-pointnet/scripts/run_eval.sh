@@ -20,20 +20,14 @@ export DEVICE_ID=0
 export RANK_SIZE=$DEVICE_NUM
 export RANK_ID=0
 
-chmod +x kitti/kitti_eval/evaluate_object_3d_offline
-
-if [ ! -d dataset/KITTI/object/training/label_2/ ]; then
-    echo "error: KITTI dataset label is not found"
-    echo "please ensure that the KITTI dataset is downloaded and placed in the correct path"
-    echo "dataset/KITTI/object/training/label_2/"
-fi
-
-if [ $# != 1 ] && [ $# != 2 ]
+if [ $# != 4 ]
 then
-    echo "Usage: bash scripts/run_eval_gpu.sh [OUTPUT_PATH] [PRETRAINDE_CKPT]"
+    echo "Usage: bash scripts/run_eval.sh [OUTPUT_PATH] [PRETRAINDE_CKPT] [DEVICE_TARGET] [DEVICE_ID]"
     echo "============================================================"
     echo "[OUTPUT_PATH]: The path to the output for kitti eval."
     echo "[PRETRAINDE_CKPT]: The path to the checkpoint file."
+    echo "[DEVICE_TARGET]: Platform used."
+    echo "[DEVICE_ID]: card id want to use."
     echo "============================================================"
 exit 1
 fi
@@ -67,7 +61,9 @@ then
     exit 1
     fi
 fi
+export DEVICE_ID=$4
 
 echo 'running test'
 
-python eval.py --output=$OUTPUT_PATH --model_path=$PRETRAINED_CKPT > "Fpointnet_eval.log" && kitti/kitti_eval/evaluate_object_3d_offline dataset/KITTI/object/training/label_2/ $OUTPUT_PATH  >> "Fpointnet_eval.log" 2>&1 &
+python eval.py --output=$OUTPUT_PATH --model_path=$PRETRAINED_CKPT --device_target=$3 \
+ --device_id=$4 > "Fpointnet_eval.log" 2>&1 &

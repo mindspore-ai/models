@@ -20,11 +20,13 @@ export DEVICE_ID=0
 export RANK_SIZE=$DEVICE_NUM
 export RANK_ID=0
 
-if [ $# != 1 ]
+if [ $# != 3 ]
 then
-    echo "Usage: bash scripts/run_standalone_train_gpu.sh [LOG_DIR]"
+    echo "Usage: bash scripts/run_standalone_train.sh [LOG_DIR] [DEVICE_TARGET] [DEVICE_ID]"
     echo "============================================================"
     echo "[LOG_DIR]: The path to save the train and evaluation log."
+    echo "[DEVICE_TARGET]: Platform used."
+    echo "[DEVICE_ID]: card id want to use."
     echo "============================================================"
 exit 1
 fi
@@ -39,7 +41,7 @@ then
     exit 1
     fi
 fi
-
+export DEVICE_ID=$3
 echo "start training, log will output to $LOG_DIR/train.log and the model file will save to $LOG_DIR/Fpointnet*.ckpt by default"
-python -u train_net.py --log_dir=$LOG_DIR > $LOG_DIR/train.log 2>&1 &
+python -u train_net.py --log_dir=$LOG_DIR --device_target=$2 > $LOG_DIR/train.log 2>&1 &
 echo 'running'

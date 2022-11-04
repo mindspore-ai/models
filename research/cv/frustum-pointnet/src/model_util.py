@@ -114,8 +114,8 @@ def parse_output_to_tensors(box_pred, logits, mask, stage1_center):
     size_residuals_normalized = \
         size_residuals_normalized.view(bs, NUM_SIZE_CLUSTER, 3)  # [32,8,3]
 
-    temp = ms.ops.functional.expand_dims(g_mean_size_arr_ms, 0)  # [1,8,3]
-    temp = ms.numpy.tile(temp, (bs, 1, 1))  # [32,8,3]
+    temp = ms.ops.functional.expand_dims(g_mean_size_arr_ms.astype(ms.float32), 0)  # [1,8,3]
+    temp = ms.ops.tile(temp, (bs, 1, 1))  # [32,8,3]
     size_residuals = size_residuals_normalized * temp
     return center_boxnet,\
         heading_scores, heading_residuals_normalized, heading_residuals,\
@@ -131,7 +131,8 @@ def point_cloud_masking_v2(point_cloud, logits, xyz_only=True):
 
     mask = logits[:, :, 0] < logits[:, :, 1]  # (bs, n)
     mask: ms.Tensor = ms.numpy.expand_dims(mask, 1)  # (bs, 1, n)
-    temp = mask.sum(2, keepdims=True)
+    temp = mask.astype(ms.float32)
+    temp = temp.sum(2, keepdims=True)
     mask_count = repeat(temp, (1, 3, 1))  # (bs, 3, 1)
 
     pts_xyz = point_cloud[:, :3, :]  # (bs,3,n)
@@ -434,7 +435,7 @@ class FrustumPointNetLoss(ms.nn.Cell):
         mean_size_arr_expand = g_mean_size_arr_ms.view(1, NUM_SIZE_CLUSTER,
                                                        3)  # 1,8,3
         mean_size_label = mF.reduce_sum(scls_onehot_repeat *
-                                        mean_size_arr_expand, 1)  # 32,3
+                                        mean_size_arr_expand.astype(ms.float32), 1)  # 32,3
         size_residuals_label_normalized = size_residuals_label / mean_size_label
         size_normalized_dist = self.norm_op(
             size_residuals_label_normalized.astype(ms.float32) -
