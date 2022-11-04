@@ -51,7 +51,8 @@ TEST:
   result_path: ./result/ade/
   color_txt: ./ade20k/ade20k_colors.txt
   name_txt: ./ade20k/ade20k_names.txt
+  device_target: Ascend
+
 
 ONNX_INFER:
   onnx_path: /home/mindspore/pspnet/PSPNet/PSPNet.onnx
-  device_target: cpu

@@ -1,9 +1,9 @@
 DATA:
-  data_root: ./data/voc/voc/
+  data_root: ./data/SBD/
   art_data_root: /cache/data
-  train_list: ./data/voc/voc/train_list.txt
+  train_list: ./data/SBD/train_list.txt
   art_train_list: /cache/data/train_list.txt
-  val_list: ./data/voc/voc/val_list.txt
+  val_list: ./data/SBD/val_list.txt
   art_val_list: /cache/data/val_list.txt
   classes: 21
   prefix: voc
@@ -51,8 +51,8 @@ TEST:
   result_path: ./result/voc/
   color_txt: ./voc2012/voc2012_colors.txt
   name_txt: ./voc2012/voc2012_names.txt
+  device_target: Ascend
 
 
 ONNX_INFER:
   onnx_path: /home/mindspore/pspnet/PSPNet/PSPNet.onnx
-  device_target: cpu
