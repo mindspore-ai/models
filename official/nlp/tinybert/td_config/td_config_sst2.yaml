@@ -41,6 +41,8 @@ ckpt_file: ''
 file_name: "tinybert"
 file_format: "MINDIR"
 num_labels: 2
+seed1: 101
+seed2: 1001
 phase1_cfg:
     batch_size: 32
     loss_scale_value: 256

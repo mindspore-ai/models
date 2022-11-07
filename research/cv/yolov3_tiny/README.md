@@ -495,6 +495,8 @@ YOLOv3-tiny on 118K images(The annotation and data format must be the same as co
 | Checkpoint for Fine tuning | 69M (.ckpt file)                                            | 69M (.ckpt file)                                           |
 | Scripts                    | https://gitee.com/mindspore/models/                         | https://gitee.com/mindspore/models/                        |
 
+> yolov3_tiny network training performance depends on the number of CPU cores, CPU frequency, memory size. It is normal to get different performance information for different configurations environments.
+
 ### Inference Performance
 
 YOLOv3-Tiny on 5K images(The annotation and data format must be the same as coco val2017 )

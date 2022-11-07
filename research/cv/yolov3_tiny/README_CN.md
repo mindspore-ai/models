@@ -421,6 +421,8 @@ YOLOv3-tiny应用于118000张图像上（标注和数据格式必须与COCO 2017
 | 参数(M)                    | 69                                                          |
 | 脚本                       | [YOLOv3_Tiny脚本](https://gitee.com/mindspore/models/tree/master/research/cv/yolov3_tiny) |
 
+> yolov3_tiny网络训练性能瓶颈在于CPU核数，CPU频率，内存大小，不同配置的环境得到不同的性能信息属于正常结果
+
 ### 推理性能
 
 YOLOv3-tiny应用于5000张图像上（标注和数据格式必须与COCO val 2017相同）

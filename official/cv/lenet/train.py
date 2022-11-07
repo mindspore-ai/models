@@ -41,7 +41,7 @@ def modelarts_pre_process():
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def train_lenet():
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
-    ds_train = create_dataset(os.path.join(config.data_path, "train"), config.batch_size)
+    ds_train = create_dataset(os.path.join(config.data_path, "train"), config.batch_size, 2)
     if ds_train.get_dataset_size() == 0:
         raise ValueError("Please check dataset size > 0 and batch_size <= dataset size")
 

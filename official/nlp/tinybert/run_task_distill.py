@@ -45,8 +45,8 @@ if not os.path.exists(td_phase1_save_ckpt_dir):
 if not os.path.exists(td_phase2_save_ckpt_dir):
     os.makedirs(td_phase2_save_ckpt_dir)
 enable_loss_scale = True
-set_seed(123)
-ds.config.set_seed(12345)
+set_seed(args_opt.seed1)
+ds.config.set_seed(args_opt.seed2)
 
 if args_opt.dataset_type == "tfrecord":
     dataset_type = DataType.TFRECORD
