@@ -54,6 +54,21 @@ AlexNet由5个卷积层和3个全连接层组成。多个卷积核用于提取�
 └─cifar-10-verify-bin
 ```
 
+使用的数据集：[ImageNet2012](http://www.image-net.org/)
+
+- 数据集大小：共1000个类、224*224彩色图像
+    - 训练集：共1,281,167张图像
+    - 测试集：共50,000张图像
+- 数据格式：JPEG
+    - 注：数据在dataset.py中处理。
+- 下载数据集，目录结构如下：
+
+ ```text
+└─dataset
+    ├─train                 # 训练数据集
+    └─validation_preprocess # 评估数据集
+```
+
 ## 环境要求
 
 - 硬件（Ascend/GPU）
