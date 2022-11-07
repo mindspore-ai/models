@@ -2,6 +2,6 @@ torch
 numpy
 Cython
 opencv-python
-pycocotools
+pycocotools >= 2.0.5
 scipy
 onnxruntime-gpu

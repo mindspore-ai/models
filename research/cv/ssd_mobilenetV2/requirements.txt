@@ -1,6 +1,6 @@
 numpy
 easydict
 opencv-python
-pycocotools
+pycocotools >= 2.0.5
 pillow
 

@@ -1,4 +1,4 @@
 opencv-python
 numpy
-pycocotools
+pycocotools >= 2.0.5
 Cython

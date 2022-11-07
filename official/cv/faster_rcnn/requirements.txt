@@ -3,7 +3,7 @@ mindinsight
 mmcv==0.2.14
 numpy~=1.21.2
 opencv-python~=4.5.4.58
-pycocotools~=2.0.2
+pycocotools >= 2.0.5
 matplotlib
 seaborn
 pandas

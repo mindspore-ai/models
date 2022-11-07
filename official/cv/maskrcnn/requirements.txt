@@ -1,7 +1,6 @@
 Cython
-pycocotools
+pycocotools >= 2.0.5
 numpy
 onnxruntime-gpu
 opencv-python
-pycocotools
 pyyaml
