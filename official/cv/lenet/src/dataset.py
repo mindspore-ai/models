@@ -28,7 +28,7 @@ def create_dataset(data_path, batch_size=32, num_parallel_workers=1):
     create dataset for train or test
     """
     # define dataset
-    mnist_ds = ds.MnistDataset(data_path)
+    mnist_ds = ds.MnistDataset(data_path, shuffle=True, num_parallel_workers=num_parallel_workers)
 
     resize_height, resize_width = 32, 32
     rescale = 1.0 / 255.0
@@ -39,14 +39,15 @@ def create_dataset(data_path, batch_size=32, num_parallel_workers=1):
     resize_op = CV.Resize((resize_height, resize_width), interpolation=Inter.LINEAR)  # Bilinear mode
     rescale_nml_op = CV.Rescale(rescale_nml * rescale, shift_nml)
     type_cast_op = C.TypeCast(mstype.int32)
+    hwc2chw_op = CV.HWC2CHW()
 
     # apply map operations on images
     mnist_ds = mnist_ds.map(operations=type_cast_op, input_columns="label", num_parallel_workers=num_parallel_workers)
     mnist_ds = mnist_ds.map(operations=resize_op, input_columns="image", num_parallel_workers=num_parallel_workers)
     mnist_ds = mnist_ds.map(operations=rescale_nml_op, input_columns="image", num_parallel_workers=num_parallel_workers)
+    mnist_ds = mnist_ds.map(operations=hwc2chw_op, input_columns="image", num_parallel_workers=num_parallel_workers)
 
     # apply DatasetOps
-    mnist_ds = mnist_ds.shuffle(buffer_size=1024)
     mnist_ds = mnist_ds.batch(batch_size, drop_remainder=True)
 
     return mnist_ds

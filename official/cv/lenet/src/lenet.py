@@ -14,7 +14,6 @@
 # ============================================================================
 """LeNet."""
 import mindspore.nn as nn
-from mindspore import ops
 from mindspore.common.initializer import Normal
 
 
@@ -39,7 +38,6 @@ class LeNet5(nn.Cell):
         self.relu = nn.ReLU()
         self.max_pool2d = nn.MaxPool2d(kernel_size=2, stride=2)
         self.include_top = include_top
-        self.transpose = ops.Transpose()
         if self.include_top:
             self.flatten = nn.Flatten()
             self.fc1 = nn.Dense(16 * 5 * 5, 120, weight_init=Normal(0.02))
@@ -48,7 +46,6 @@ class LeNet5(nn.Cell):
 
 
     def construct(self, x):
-        x = self.transpose(x, (0, 3, 1, 2))
         x = self.conv1(x)
         x = self.relu(x)
         x = self.max_pool2d(x)
