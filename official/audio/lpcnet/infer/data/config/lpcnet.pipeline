@@ -1,0 +1,98 @@
+{
+    "lpcnet_encoder": {
+        "stream_config": {
+            "deviceId": "0"
+        },
+        "appsrc0": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_encoder0:0"
+        },
+        "appsrc1": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_encoder0:1"
+        },
+        "mxpi_encoder0": {
+            "props": {
+                "dataSource": "appsrc0,appsrc1",
+                "modelPath": "../data/enc.om"
+            },
+            "factory": "mxpi_tensorinfer",
+            "next": "mxpi_dataserialize0"
+        },
+        "mxpi_dataserialize0": {
+            "props": {
+                "outputDataKeys": "mxpi_encoder0"
+            },
+            "factory": "mxpi_dataserialize",
+            "next": "appsink0"
+        },
+        "appsink0": {
+            "props": {
+                "blocksize": "4096000"
+            },
+            "factory": "appsink"
+        }
+    },
+
+    "lpcnet_decoder": {
+        "stream_config": {
+            "deviceId": "0"
+        },
+        "appsrc0": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_decoder0:0"
+        },
+        "appsrc1": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_decoder0:1"
+        },
+        "appsrc2": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_decoder0:2"
+        },
+        "appsrc3": {
+            "props": {
+                "blocksize": "409600"
+            },
+            "factory": "appsrc",
+            "next": "mxpi_decoder0:3"
+        },
+        "mxpi_decoder0": {
+            "props": {
+                "dataSource": "appsrc0,appsrc1,appsrc2,appsrc3",
+                "modelPath": "../data/dec.om",
+                "outputDeviceId": "0"
+            },
+            "factory": "mxpi_tensorinfer",
+            "next": "mxpi_dataserialize0"
+        },
+        "mxpi_dataserialize0": {
+            "props": {
+                "outputDataKeys": "mxpi_decoder0"
+            },
+            "factory": "mxpi_dataserialize",
+            "next": "appsink0"
+        },
+        "appsink0": {
+            "props": {
+                "blocksize": "4096000"
+            },
+            "factory": "appsink"
+        }
+    }
+}
