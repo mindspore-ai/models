@@ -468,7 +468,7 @@ Evaluation result will be stored in the example path, you can find result like t
 | MindSpore Version          | 1.1.1                                                        | 1.5.0                                                        |
 | Dataset                    | 16930 images                                                 | 16930 images                                                 |
 | Batch_size                 | 2                                                            | 2                                                            |
-| Training Parameters        | src/config.py                                                | src/config.py                                                |
+| Training Parameters        | default_config.yaml                                          | default_config.yaml                                          |
 | Optimizer                  | Momentum                                                     | Momentum                                                     |
 | Loss Function              | SoftmaxCrossEntropyWithLogits for classification, SmoothL2Loss for bbox regression| SoftmaxCrossEntropyWithLogits for classification, SmoothL2Loss for bbox regression|
 | Loss                       | ~0.04                                                        | ~0.04                                                       |
