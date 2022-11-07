@@ -2,4 +2,4 @@ numpy
 opencv-python
 pyyaml
 pillow
-pycocotools
+pycocotools >= 2.0.5

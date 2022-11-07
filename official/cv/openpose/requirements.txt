@@ -1,6 +1,6 @@
 opencv-python
 tdqm
 numpy
-pycocotools
+pycocotools >= 2.0.5
 pyyaml
 

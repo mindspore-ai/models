@@ -1,6 +1,5 @@
 Cython
-pycocotools
+pycocotools >= 2.0.5
 mmcv==0.2.14
 numpy
 opencv-python
-pycocotools

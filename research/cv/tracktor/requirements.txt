@@ -1,9 +1,9 @@
 Cython
-pycocotools
+pycocotools >= 2.0.5
 mmcv==0.2.14
 numpy
 opencv-python
-pycocotools
+pycocotools >= 2.0.5
 motmetrics
 opencv-python
 Pillow
