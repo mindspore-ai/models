@@ -32,10 +32,7 @@ from src.model_utils.config import config
 if config.dataset == "cifar10":
     from src.dataset import create_dataset1 as create_dataset
 else:
-    if config.mode_name == "GRAPH":
-        from src.dataset import create_dataset2 as create_dataset
-    else:
-        from src.dataset import create_dataset_pynative as create_dataset
+    from src.dataset import create_dataset2 as create_dataset
 
 ms.set_seed(1)
 
