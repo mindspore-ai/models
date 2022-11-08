@@ -99,6 +99,8 @@ python process-npy.py
 python prepare.py
 # 在 Ascend 上训练 DeepSort 特征提取器
 python src/deep/train.py --run_modelarts=False --run_distribute=True --data_url="" --train_url=""
+# 或者
+bash run_distribute_train_ascend.sh [DATA_PATH] [CKPT_PATH]
 # 生成特征信息
 python generater_detection.py --run_modelarts=False --run_distribute=True --data_url="" --train_url="" --det_url="" --ckpt_url="" --model_name=""
 # 生成结果

@@ -104,6 +104,8 @@ python process-npy.py
 python prepare.py
 # Train DeepSort feature extractor on Ascend
 python src/deep/train.py --run_modelarts=False --run_distribute=True --data_url="" --train_url=""
+# or
+bash run_distribute_train_ascend.sh [DATA_PATH] [CKPT_PATH]
 # Generate features information
 python generater_detection.py --run_modelarts=False --run_distribute=True --data_url="" --train_url="" --det_url="" --ckpt_url="" --model_name=""
 # Generate tracking result
