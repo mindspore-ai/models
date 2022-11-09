@@ -1,0 +1,56 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+modelArts_mode: False
+is_distributed: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+# Path for local
+dataroot: "/home/ma-user/work/data"
+device_target: "Ascend"
+rank: 0
+group_size: 1
+
+# ==============================================================================
+# options
+seed: 0
+training_set: "liberty" # Other options: liberty, notredame, yosemite
+eval_set: "yosemite"
+imageSize: 32
+mean_image: 0.443728476019
+std_image: 0.20197947209
+epochs: 10
+batch_size: 1024
+test_batch_size: 2048
+n_triplets: 5000000
+fliprot: True
+augmentation: False
+wd: 0.0001 #1e-4
+checkpoint_path: "./ckpt/liberty/checkpoint_Cnet_10.ckpt"
+ckpt_save_dir: "./ckpt/"
+
+# optimizer and lr related
+optimizer: sgd
+freq: 10.0
+lr: 10.0
+lr_decay: 1e-6
+
+# loss related
+loss: triplet_margin
+batch_reduce: min #Other options: average, random, random_global, L2Net
+decor: False
+anchorave: False
+anchorswap: True
+margin: 1.0
+gor: False
+alpha: 1.0
+scale: 4.0
+
+---
+
+# Help description for each configuration
+modelArts_mode: "Whether training on modelarts, default: False"
+data_url: "Url for modelarts"
+train_url: "Url for modelarts"
+data_path: "The location of the input data."
+output_path: "The location of the output file."
+device_target: 'Target device type'
