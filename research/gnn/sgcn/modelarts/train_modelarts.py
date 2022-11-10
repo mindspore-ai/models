@@ -42,7 +42,7 @@ def remove_self_loops(edge_index):
         Tensor(edge_index): removed self loops
     """
     mask = edge_index[0] != edge_index[1]
-    edge_index = edge_index.asnumpy()[:, mask.asnumpy()]
+    edge_index = edge_index[:, mask]
     return Tensor(edge_index)
 
 def main():
