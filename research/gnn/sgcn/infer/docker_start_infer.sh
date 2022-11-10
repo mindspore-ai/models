@@ -27,7 +27,7 @@ if [ ! -d "${model_dir}" ]; then
     exit 1
 fi
 
-docker run -it -u root\
+docker run -it \
            --device=/dev/davinci0 \
            --device=/dev/davinci_manager \
            --device=/dev/devmm_svm \
