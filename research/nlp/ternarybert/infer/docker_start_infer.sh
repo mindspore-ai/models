@@ -29,12 +29,11 @@ if [ ! -d "${share_dir}" ]; then
 fi
 
 
-docker run -it -u root \
+docker run -it \
     --device=/dev/davinci0 \
     --device=/dev/davinci_manager \
     --device=/dev/devmm_svm \
     --device=/dev/hisi_hdc \
-    --privileged \
     -v //usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
     -v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
     -v ${data_dir}:${data_dir}  \
