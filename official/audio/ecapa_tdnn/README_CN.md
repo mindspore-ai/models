@@ -157,9 +157,6 @@ ECAPA-TDNN由多个SE-Res2Block模块串联起来，可以更加深入。SE-Res2
   # 使用脚本的单卡训练
   bash run_standalone_train_ascend.sh DEVICE_ID
 
-  # 使用脚本的分布式训练
-  bash run_distribute_train_ascend.sh RANK_TABLE_FILE
-
   # 运行推理示例
   bash run_eval_ascend.sh DEVICE_ID PATH_CHECKPOINT
   ```
@@ -272,12 +269,6 @@ ECAPA-TDNN由多个SE-Res2Block模块串联起来，可以更加深入。SE-Res2
   ```
 
   模型检查点保存在指定目录下。
-
-### 分布式训练
-
-  ```bash
-  bash scripts/run_distribute_train_ascend.sh
-  ```
 
   上述shell脚本将在后台运行分布训练。您可以通过log文件查看结果。损失值如下所示：
 

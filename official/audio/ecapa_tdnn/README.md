@@ -163,9 +163,6 @@ After installing MindSpore and python3, you can start training and evaluation as
   # For Ascend device, standalone training example(1p) by shell script
   bash run_standalone_train_ascend.sh DEVICE_ID
 
-  # For Ascend device, distributed training example(8p) by shell script
-  bash run_distribute_train.sh RANK_TABLE_FILE
-
   # run evaluation example
   bash run_eval_ascend.sh DEVICE_ID PATH_CHECKPOINT
   ```
@@ -276,14 +273,6 @@ The python command above will run in the background, you can view the results th
   ```
 
   The model checkpoint will be saved in the ckpt_save_dir.
-
-### Distributed Training
-
-  ```python
-  bash scripts/run_distribute_train_ascend.sh
-  ```
-
-  The above shell script will run distribute training in the background. You can view the results through the file `train_parallel[X]/log`. The loss value will be achieved as follows:
 
   ```bash
   # grep "loss: " train.log
