@@ -19,5 +19,7 @@ if [ $# != 2 ]; then
   exit 1
 fi
 
+DATA_PATH=$1
+CKPT_PATH=$2
 export RANK_SIZE=1
-python src/deep/train.py --data_url [DATA_PATH] --train_url [CKPT_PATH] --device=Ascend > out.log 2>&1
+python src/deep/train.py --data_url $DATA_PATH --train_url $CKPT_PATH --device=Ascend > out.log 2>&1

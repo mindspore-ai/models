@@ -30,6 +30,11 @@ device_target=$2
 model_dir=$3
 data_dir=$4
 
+if [ -z $DEVICE_ID ]
+then
+    DEVICE_ID=0
+fi
+
 mkdir -p ms_log
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 CUR_DIR=`pwd`

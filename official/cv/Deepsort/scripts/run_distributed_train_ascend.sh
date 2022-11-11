@@ -71,10 +71,9 @@ do
     fi
     mkdir ${train_code_path}/device${DEVICE_ID}
     cd ${train_code_path}/device${DEVICE_ID} || exit
-    python ${train_code_path}/deep_sort/deep/train.py    --data_url=${DATA_PATH}   \
+    python ${train_code_path}/src/deep/train.py    --data_url=${DATA_PATH}   \
                                                --train_url=./checkpoint   \
                                                --run_distribute=True   \
                                                --run_modelarts=False \
-                                               --device=Ascend \
-                                               --config_name=ascend_config.yaml > out.log 2>&1 &
+                                               --device=Ascend > out.log 2>&1 &
 done
