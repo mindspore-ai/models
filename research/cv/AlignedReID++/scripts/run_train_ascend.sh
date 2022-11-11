@@ -25,6 +25,8 @@ set -e
 data_url=$1
 pre_trained=$2
 rank_table_8pcs_file=$3
+export HCCL_CONNECT_TIMEOUT=7200
+export HCCL_EXEC_TIMEOUT=3600
 
 EXEC_PATH=$(pwd)
 
