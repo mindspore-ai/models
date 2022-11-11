@@ -68,9 +68,6 @@ After dataset preparation, you can start training and evaluation as follows:
     cd ./scripts
     bash run_standalone_train.sh [TRAIN_DATASET] [DEVICEID] [DATANAME]
 
-    # run distributed training example
-    bash run_distribute_train.sh [TRAIN_DATASET] [RANK_TABLE_PATH] [DATANAME]
-
     # run evaluation example
     bash run_eval.sh [EVAL_DATASET_PATH] [DATASET_NAME] [MODEL_CKPT] [DEVICEID]
     ```
@@ -160,10 +157,8 @@ The FastText network script and code result are as follows:
   │   ├──load_dataset.py                     // Dataset loader to feed into model.
   │   ├──lr_scheduler.py                     // Learning rate scheduler.
   ├── scripts
-  │   ├──run_distributed_train.sh            // shell script for distributed train on ascend.
   │   ├──run_eval.sh                         // shell script for standalone eval on ascend.
   │   ├──run_standalone_train.sh             // shell script for standalone eval on ascend.
-  │   ├──run_distributed_train_gpu.sh        // shell script for distributed train on GPU.
   │   ├──run_eval_gpu.sh                     // shell script for standalone eval on GPU.
   │   ├──run_standalone_train_gpu.sh         // shell script for standalone train on GPU.
   ├── ag_config.yaml                         // ag dataset arguments
@@ -220,13 +215,6 @@ Parameters for both training and evaluation can be set in config.py. All the dat
         bash run_standalone_train.sh [DATASET_PATH] [DEVICE_ID] [DATANAME]
         ```
 
-    - Running scripts for distributed training of FastText. Task training on multiple device and run the following command in bash to be executed in `scripts/`:
-
-        ```bash
-        cd ./scripts
-        bash run_distributed_train.sh [DATASET_PATH] [RANK_TABLE_PATH] [DATANAME]
-        ```
-
 - Running on GPU
 
     - Start task training on a single device and run the shell script
@@ -234,13 +222,6 @@ Parameters for both training and evaluation can be set in config.py. All the dat
         ```bash
         cd ./scripts
         bash run_standalone_train_gpu.sh [DATASET_PATH]
-        ```
-
-    - Running scripts for distributed training of FastText. Task training on multiple device and run the following command in bash to be executed in `scripts/`:
-
-        ```bash
-        cd ./scripts
-        bash run_distributed_train_gpu.sh [DATASET_PATH] [NUM_OF_DEVICES]
         ```
 
 ### [Inference Process](#content)
