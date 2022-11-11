@@ -53,6 +53,21 @@ Dataset used: [CIFAR-10](<http://www.cs.toronto.edu/~kriz/cifar.html>)
 └─cifar-10-verify-bin
 ```
 
+Dataset used: [ImageNet2012](http://www.image-net.org/)
+
+- Dataset size 224*224 colorful images in 1000 classes
+    - Train：1,281,167 images  
+    - Test： 50,000 images
+- Data format：jpeg
+    - Note：Data will be processed in dataset.py
+- Download the dataset, the directory structure is as follows:
+
+ ```bash
+└─dataset
+    ├─train                 # train dataset
+    └─validation_preprocess # evaluate dataset
+```
+
 ## [Environment Requirements](#contents)
 
 - Hardware（Ascend/GPU）

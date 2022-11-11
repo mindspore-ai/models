@@ -58,7 +58,7 @@ DeepLab是一系列图像语义分割模型，DeepLabV3版本相比以前的版�
 
 # 数据集
 
-Pascal VOC数据集和语义边界数据集（Semantic Boundaries Dataset，SBD）
+Pascal VOC数据集: [链接](https://host.robots.ox.ac.uk/pascal/VOC/), 和语义边界数据集（Semantic Boundaries Dataset，SBD): [链接](https://www2.eecs.berkeley.edu/Research/Projects/CS/vision/grouping/semantic_contours/benchmark.tgz)
 
 - 准备Backbone模型
 
