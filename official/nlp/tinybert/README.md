@@ -108,6 +108,11 @@ The backbone structure of TinyBERT is transformer, the transformer contains four
     ...
     ```
 
+    - download task distill phase pretrain models for following datasets:
+        [sst2 pretrain model](https://download.mindspore.cn/models/r1.9/tinybert_ascend_v190_enwiki128_sst2_official_nlp_acc90.28.ckpt)
+        [mnli pretrain model](https://download.mindspore.cn/models/r1.9/tinybert_ascend_v190_enwiki128_mnli_official_nlp_acc81.31.ckpt)
+        [qnli pretrain model](https://download.mindspore.cn/models/r1.9/tinybert_ascend_v190_enwiki128_qnli_official_nlp_acc88.86.ckpt)
+
 # [Environment Requirements](#contents)
 
 - Hardware（Ascend/GPU）

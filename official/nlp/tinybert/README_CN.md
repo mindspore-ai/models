@@ -113,6 +113,11 @@ TinyBERT模型的主干结构是转换器，转换器包含四个编码器模块
     ...
     ```
 
+    - 下载下游训练任务所需要的预训练模型：
+        [sst2预训练模型](https://download.mindspore.cn/models/r1.9/tinybert_ascend_v190_enwiki128_sst2_official_nlp_acc90.28.ckpt)
+        [mnli预训练模型](https://download.mindspore.cn/models/r1.9/tinybert_ascend_v190_enwiki128_mnli_official_nlp_acc81.31.ckpt)
+        [qnli预训练模型](https://download.mindspore.cn/models/r1.9/tinybert_ascend_v190_enwiki128_qnli_official_nlp_acc88.86.ckpt)
+
 # 环境要求
 
 - 硬件（Ascend或GPU）
