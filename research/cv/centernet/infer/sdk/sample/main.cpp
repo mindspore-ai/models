@@ -254,11 +254,24 @@ bool writeImageObjectList(std::vector<json::value>& jsonObjs,
         jsonObj["bbox"][3] = json::value::number(obj.y1 - obj.y0);
 
         std::vector<json::value> keyPoints;
-        for (auto& point : obj.mask) {
+        float x, y;
+        auto temp_x = reinterpret_cast<unsigned char*> (&x);
+        auto temp_y = reinterpret_cast<unsigned char*> (&y);
+        for (auto &point : obj.mask) {
+            *temp_x = point[0];
+            *(temp_x+1) = point[1];
+            *(temp_x+2) = point[2];
+            *(temp_x+3) = point[3];
+
+            *temp_y = point[4];
+            *(temp_y+1) = point[5];
+            *(temp_y+2) = point[6];
+            *(temp_y+3) = point[7];
+
             keyPoints.push_back(
-                json::value::number(static_cast<float>(point[0]) / 1000));
+                json::value::number(x));
             keyPoints.push_back(
-                json::value::number(static_cast<float>(point[1]) / 1000));
+                json::value::number(y));
             keyPoints.push_back(json::value::number(static_cast<float>(1.0)));
         }
         jsonObj["keypoints"] = json::value::array(keyPoints);
