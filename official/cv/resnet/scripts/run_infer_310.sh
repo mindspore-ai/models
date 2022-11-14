@@ -18,114 +18,13 @@ if [[ $# -lt 5 || $# -gt 6 ]]; then
     echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [NET_TYPE] [DATASET] [DATA_PATH] [CONFIG_PATH] [DEVICE_ID]
     NET_TYPE can choose from [resnet18, resnet34, se-resnet50, resnet50, resnet101, resnet152]
     DATASET can choose from [cifar10, imagenet]
-    DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
+    DEVICE_ID is optional, it can be set by environment variable DEVICE_ID, otherwise the value is zero"
 exit 1
 fi
 
-get_real_path(){
-    if [ "${1:0:1}" == "/" ]; then
-        echo "$1"
-    else
-        echo "$(realpath -m $PWD/$1)"
-    fi
-}
-model=$(get_real_path $1)
-if [ $2 == 'resnet18' ] || [ $2 == 'resnet34' ] || [ $2 == 'se-resnet50' ] || [ $2 == 'resnet50' ] || [ $2 == 'resnet152' ] || [ $2 == 'resnet101' ]; then
-  network=$2
-else
-  echo "NET_TYPE can choose from [resnet18, se-resnet50]"
-  exit 1
-fi
+shell_dir=$(cd "$(dirname $0)";pwd)
+echo "Shell dir " $shell_dir
 
-if [ $3 == 'cifar10' ] || [ $3 == 'imagenet' ]; then
-  dataset=$3
-else
-  echo "DATASET can choose from [cifar10, imagenet]"
-  exit 1
-fi
+export DEVICE_TYPE=Ascend
 
-data_path=$(get_real_path $4)
-config_path=$(get_real_path $5)
-
-device_id=0
-if [ $# == 6 ]; then
-    device_id=$6
-fi
-
-echo "mindir name: "$model
-echo "dataset path: "$data_path
-echo "network: "$network
-echo "dataset: "$dataset
-echo "device id: "$device_id
-
-function compile_app()
-{
-    cd ../ascend310_infer/src/ || exit
-    if [ -f "Makefile" ]; then
-        make clean
-    fi
-    bash build.sh &> build.log
-}
-
-function preprocess_data()
-{
-    if [ -d preprocess_Result ]; then
-        rm -rf ./preprocess_Result
-    fi
-    mkdir preprocess_Result
-    python ../preprocess.py --data_path=$data_path --output_path=./preprocess_Result --config_path=$config_path &> preprocess.log
-}
-
-function infer()
-{
-    cd - || exit
-    if [ -d result_Files ]; then
-        rm -rf ./result_Files
-    fi
-    if [ -d time_Result ]; then
-        rm -rf ./time_Result
-    fi
-    mkdir result_Files
-    mkdir time_Result
-    ../ascend310_infer/src/main --mindir_path=$model --dataset_path=$data_path --network=$network --dataset=$dataset --device_id=$device_id  &> infer.log
-}
-
-function cal_acc()
-{
-    if [ "x${dataset}" == "xcifar10" ] || [ "x${dataset}" == "xCifar10" ]; then
-        python ../postprocess.py --dataset=$dataset --label_path=./preprocess_Result/label --result_path=result_Files --config_path=$config_path &> acc.log
-    else
-        python ../create_imagenet2012_label.py  --img_path=$data_path
-        python ../postprocess.py --dataset=$dataset --result_path=./result_Files --label_path=./imagenet_label.json --config_path=$config_path &> acc.log
-    fi
-    if [ $? -ne 0 ]; then
-        echo "calculate accuracy failed"
-        exit 1
-    fi
-}
-
-if [ "x${dataset}" == "xcifar10" ] || [ "x${dataset}" == "xCifar10" ]; then
-    if [ $2 == 'resnet18' ]; then
-        CONFIG_PATH=resnet18_cifar10_config.yaml
-    else
-        CONFIG_PATH=resnet50_cifar10_config.yaml
-    fi
-    preprocess_data ${CONFIG_PATH}
-    data_path=./preprocess_Result/img_data
-fi
-
-compile_app
-if [ $? -ne 0 ]; then
-    echo "compile app code failed"
-    exit 1
-fi
-infer
-if [ $? -ne 0 ]; then
-    echo " execute inference failed"
-    exit 1
-fi
-cal_acc
-if [ $? -ne 0 ]; then
-    echo "calculate accuracy failed"
-    exit 1
-fi
+bash $shell_dir/run_infer_cpp.sh "$@"
