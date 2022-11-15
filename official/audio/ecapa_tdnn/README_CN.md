@@ -299,7 +299,7 @@ ECAPA-TDNN由多个SE-Res2Block模块串联起来，可以更加深入。SE-Res2
   由于测试集的语音长度不固定，所以mindspore推理速度较慢，需要数小时才能完成计算
 
   ```bash
-  python3 scripts/run_eval_ascend.py > eval.log 2>&1 &
+  bash run_eval_ascend.sh DEVICE_ID PATH_CHECKPOINT
   ```
 
   上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：
@@ -362,7 +362,7 @@ python3 export.py
 | 损失函数              | AAM-Softmax交叉熵
 | 输出                    | 概率
 | 损失                       | 1.3
-| 速度                      | 单卡：17步/秒
+| 速度                      | 单卡：565步/秒(fps:339)
 | 总时长                 | 单卡：264小时
 | 参数(M)             | 13.0
 | 微调检查点 | 254M (.ckpt文件)
