@@ -268,18 +268,29 @@ ODS=0.773, OIS=0.793, AP=0.800, R50=0.906 - HED
 
 #### Training Performance
 
+| Parameters                 | Hed(Ascend)                                                 |
+| -------------------------- | ----------------------------------------------------------- |
+| Model Version              | V1                                                          |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 |
+| MindSpore Version          | 1.5.0                                                       |
+| Dataset                    | BSDS500                                                     |
+| Training Parameters        | epoch=500, batch_size=10                                    |
+| Optimizer                  | SGD                                                         |
+| Loss Function              | BinaryCrossEntropyLoss                                      |
+| Speed                      | 1pc: 810 ms/step                 |
+
 #### Evaluation Performance
 
-| Parameters          | HED(Ascend)                     |HED(GPU)|
-| ------------------- |---------------------           |------|
-| Model Version       |    HED                       |HED|
-| Resource            |   Ascend                          |GPU|
-| Uploaded Date       | 30/12/2021                      |15/4/2022|
-| MindSpore Version   | 1.5.0                          |1.5.0|
-| Dataset             |BSDS500, 500 images       |BSDS500, 500 images       |
-| batch_size          |    10                          |10                          |
-| outputs             |    ODS                 | ODS                 |
-| Accuracy            |     77.3%    |77.3%    |
+| Parameters          | HED(Ascend)               | HED(GPU)                  |
+| ------------------- | ------------------------- | ------------------------- |
+| Model Version       | HED                       | HED                       |
+| Resource            | Ascend                    | GPU                       |
+| Uploaded Date       | 30/12/2021                | 15/4/2022                 |
+| MindSpore Version   | 1.5.0                     | 1.5.0                     |
+| Dataset             | BSDS500, 500 images       | BSDS500, 500 images       |
+| batch_size          | 10                        | 10                        |
+| outputs             | ODS                       | ODS                       |
+| Accuracy            | 77.3%                     | 77.3%                     |
 
 ## [Description of Random Situation](#contents)
 

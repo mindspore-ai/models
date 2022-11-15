@@ -350,7 +350,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DEVICE_ID]
 | 损失函数              | Triplet loss                                       |
 | 输出                    | 概率                                                 |
 | 损失                       | 0.115702                                                       |
-| 速度                      | 110毫秒/步（8卡）                     |
+| 速度                      | 569毫秒/步（8卡）                     |
 | 总时长                 | 21分钟                          |
 
 #### SOP上的ResNet50-Quadruplet
