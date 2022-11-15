@@ -186,7 +186,7 @@ Transformer最近已进行了大规模图像分类，获得了很高的分数，
 
 ## 推理过程
 
-**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+**推理前需参照 [MindSpore C++推理部署指南](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README_CN.md) 进行环境变量设置。**
 
 # [模型描述](#目录)
 

@@ -1,21 +1,42 @@
-## Description
+# MindSpore Inference with C++ Deployment Guide
+
+## Overview
+
+This tutorial aims at the edge scenarios inference deployment based on the MindIR model file exported by MindSpot.
 
 When the C++ inference backend is MindSpore, the MindIR model exported from MindSpore can be deployed on Ascend310 and Ascend310P.
 When the C++ inference backend is MindSpore Lite, MindIR models can be deployed on Ascend310/310P, Nvidia GPU and CPU.
 
-In order to ensure that the script can run normally, environment variables need to be set before inference is executed.
+## Installing MindSpore Inference Environment
 
-## Environment variables on Ascend
+MindSpore currently supports two kinds of running environments for inference with C++.
 
-### Check the installation path
+One is to deploy the running environment directly using the installation package of MindSpore310,
+and the other is to deploy the inference environment using MindSpore Lite.
 
-If the root user is used to install the run package, the default path is '/usr/local/Ascend', and the default installation path for non-root users is '/home/HwHiAiUser/Ascend'.
+The running environment are realized through `MS_LITE_HOME` identify whether to use MindSpot Lite. If setting `MS_LITE_HOME`, it will compile the scripts on MindSpore Lite, otherwise it will compile the scripts on MindSpore310.
 
-Take the path of the root user as an example, set the environment variables as follows:
+### MindSpore310
+
+MindSpore310 support Ascend310 and Ascend310P.
+
+From [MindSpore Install](https://mindspore.cn/versions) download MindSpore whl package or MindSpore 310 whl package to deployment reasoning development environment.
+
+### MindSpore Lite
+
+MindSpore Lite support Ascend310、Ascend310P、GPU、CPU.
+
+From [MindSpore Install](https://mindspore.cn/versions) download MindSpore whl package, and MindSpore Lite tar package. After unzipping, set `MS_LITE_HOME` to the unzipped path, such as:
 
 ```bash
-export ASCEND_HOME=/usr/local/Ascend  # the root directory of run package
+export MS_LITE_HOME=$some_path/mindpsore-lite-2.0.0-linux-x64
 ```
+
+## Environment Variables
+
+**In order to ensure that the script running, you need to set the environment variables before executing the inference.**
+
+### Ascend
 
 ### Identify the run package version
 
@@ -67,44 +88,85 @@ export LD_LIBRARY_PATH=$TENSORRT_PATH/lib:$LD_LIBRARY_PATH
 export GLOG_v=2 # 0-DEBUG, 1-INFO, 2-WARNING, 3-ERROR, 4-CRITICAL, default level is WARNING.
 ```
 
-## Inference Backend
+## Inference process
 
-If the build script identifies the environment variable `MS_LITE_HOME`, MindSpore Lite is used as the inference backend.
-Otherwise, MindSpore is used as the inference backend.
+A typical inference process includes:
 
-### Use MindSpore Lite as the inference backend
+- Export MindIR
+- Data pre-processing(optional)
+- Inference model compilation and execution
+- Inference result post-processing
 
-When the MindSpore Lite is used as the inference backend, MindIR models can be deployed on Ascend310/310P, Nvidia GPU and CPU.
+### Export MindIR
 
-Download the MindSpore Lite Ascend, GPU and CPU three-in-one tar package from the [official website](https://mindspore.cn/versions).
-Decompress the tar package and set the `MS_LITE_HOME` environment variable to the decompressed path. For example:
+MindSpore provides a unified Intermediate Representation (IR) for cloud side (training) and end side (inference). Models can be saved as MindIR directly by using the export interface.
 
-```bash
-export MS_LITE_HOME=$some_path/mindpsore-lite-2.0.0-linux-x64
+```python
+import mindspore as ms
+from src.model_utils.config import config
+from src.model_utils.env import init_env
+# Environment initialization
+init_env(config)
+# Inference model
+net = Net()
+# Load model
+ms.load_checkpoint("xxx.ckpt", net)
+# Construct the input, only need to set the shape and type of the input
+inp = ms.ops.ones((1, 3, 224, 224), ms.float32)
+# Export model, file_format support 'MINDIR', 'ONNX' and 'AIR'
+ms.export(net, ms.export(net, inp, file_name=config.file_name, file_format=config.file_format))
+# When using multi inputs
+# inputs = [inp1, inp2, inp3]
+# ms.export(net, ms.export(net, *inputs, file_name=config.file_name, file_format=config.file_format))
 ```
 
-### Use MindSpore as the inference backend
+### Data pre-processing(optional)
 
-When the MindSpore Lite is used as the inference backend, MindIR models can be deployed on Ascend310 and Ascend310P.
+Some data processing is difficult to implement in C++, sometime saving the data as bin files first.
 
-Download the MindSpore three-in-on or the corresponding hardware environment whl package from the [official website](https://mindspore.cn/versions).
-The C++ build script identifies the installation path of MindSpore whl as the path of the dependent header file and dynamic link library.
+```python
+import os
+from src.dataset import create_dataset
+from src.model_utils.config import config
 
-### Build and Run inference
-
-Generally, the `cpp_infer` directory exists in each model script directory, such as `official/cv/resnet`. The `build.sh` script
-is used to compile C++ inference program. The C++ main.cc file depends on the header files in the `utils/cpp_infer/common_inc` relative to the top
-directory. If you copy the model script directory to another directory for compilation, you need to copy the `utils/cpp_infer/common_inc` directory
-to the `cpp_infer` directory.
-
-Using resnet as an example:
-
-```bash
-cp -r utils/cpp_infer/common_inc official/cv/resnet/cpp_infer/
-cd official/cv/resnet/cpp_infer/src/
-bash build.sh
+dataset = create_dataset(config, is_train=False)
+it = dataset.create_dict_iterator(output_numpy=True)
+input_dir = config.input_dir
+for i,data in enumerate(it):
+    input_name = "eval_input_" + str(i+1) + ".bin"
+    input_path = os.path.join(input_dir, input_name)
+    data['img'].tofile(input_path)
 ```
 
-Generally, the `scrpits` directory exists in each model script directory, such as `official/cv/resnet`. The `run_infer_cpp.sh`
-is used for inference evaluation. You can set the `DEVICE_TYPE` environment variable to set the running inference hardware backend.
-Currently, the following options are supported: `Ascend`, `GPU` and `CPU`.
+The input bin file is generated in the dir directory `config.input_path`.
+
+### Inference model development
+
+This involves the creation and compilation process of the C++ project. Generally, the directory structure of a C++ inference project is as follows:
+
+```text
+└─cpp_infer
+    ├─build.sh                # C++ compilation script
+    ├─CmakeLists.txt          # Cmake configuration file
+    ├─main.cc                 # Model execution script
+    └─common_inc              # Common header file
+```
+
+Generally, it doesn't need to change `build.sh`, `CmakeLists.txt`, `common_inc`, a general script is provided under the 'example' directory.
+
+When developing a new model, you need to copy these files to the execution directory and write the 'main.cc' execution of the corresponding model.
+
+**There is no 'common_inc' under execution directory in some models, you need to copy it to the same directory as 'main.cc' during execution.**
+
+`main.cc` generally including:
+
+- Model loading and construction
+- Dataset construction / bin file loading
+- Model Inference
+- Inference result saving
+
+Please refer to [MindSpore 310 infer](https://www.mindspore.cn/tutorials/experts/en/master/infer/ascend_310_mindir.html), and implemented inference model, for example[resnet C++ inference](https://gitee.com/mindspore/models/blob/master/official/cv/resnet/cpp_infer/src/main.cc).
+
+### Inference model compilation and execution
+
+Generally, we need to provide a `run_infer_cpp.sh` for connecting the whole inference process. For details, please refer to [resnet](https://gitee.com/mindspore/models/blob/master/official/cv/resnet/scripts/run_infer_cpp.sh).

@@ -221,7 +221,7 @@ WGAN网络包含两部分，生成器网络和判别器网络。判别器网络�
 
 ## Ascend310推理过程
 
-**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+**推理前需参照 [MindSpore C++推理部署指南](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README_CN.md) 进行环境变量设置。**
 
 ### [导出MindIR](#contents)
 

@@ -441,7 +441,7 @@ result: {'top_1_accuracy': 0.6094950384122919, 'top_5_accuracy': 0.8263244238156
 
 ## [Inference process](#contents)
 
-**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+**Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
 ### Export MindIR
 

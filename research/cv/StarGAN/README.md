@@ -111,7 +111,7 @@ python export.py --batch_size [BATCH_SIZE] --device_target GPU --gen_checkpoint_
 
 ### Infer on Ascend 310
 
-**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+**Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
 ```bash
 bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]

@@ -251,7 +251,7 @@ Argument `ckpt_file` is required, `dataset` is a name of a dataset must be selec
 
 ### Usage
 
-**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+**Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
 Before performing inference, the `mindir` file needs to be exported via `export.py`.
 

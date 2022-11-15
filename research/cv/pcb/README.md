@@ -85,7 +85,6 @@ Dataset used: [Market-1501](<http://zheng-lab.cecs.anu.edu.au/Project/project_re
 ```
 
 Dataset used: [DukeMTMC-reID](http://vision.cs.duke.edu/DukeMTMC/)
-[Download Link](https://pan.baidu.com/share/init?surl=jS0XM7Var5nQGcbf9xUztw) Access code：bhbh
 
 - Dataset size：
     - training set：16522 RGB images containing 702 pedestrians
@@ -741,7 +740,7 @@ CMC Scores      cuhk03
 
 ## Inference Process
 
-**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+**Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
 ### Export MindIR
 

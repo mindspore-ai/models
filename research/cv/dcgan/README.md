@@ -206,7 +206,7 @@ bush run_eval_ascend.sh [IMG_URL] [CKPT_URL] [DEVICE_ID]
 
 - Implement inference at Ascend310 or GPU platform.
 
-**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+**Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
 ```bash
 # infer on ascend or gpu

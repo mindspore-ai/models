@@ -90,7 +90,6 @@ PCB的总体网络架构如下：
 ```
 
 使用的数据集：[DukeMTMC-reID](http://vision.cs.duke.edu/DukeMTMC/)
-[下载地址](https://pan.baidu.com/share/init?surl=jS0XM7Var5nQGcbf9xUztw) 提取码：bhbh
 
 - 数据集组成：
     - 训练集：包含702个行人的16522个RGB图像
@@ -762,7 +761,7 @@ CMC Scores      cuhk03
 
 ## 推理过程
 
-**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+**推理前需参照 [MindSpore C++推理部署指南](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README_CN.md) 进行环境变量设置。**
 
 ### 导出MindIR
 

@@ -615,7 +615,7 @@ Result on ONNX
 
 ### Inference
 
-**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+**Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
 If you need to use the trained model to perform inference on multiple hardware platforms, such as Ascend 910 or Ascend 310, you
 can refer to this [Link](https://www.mindspore.cn/tutorials/experts/en/master/infer/inference.html). Following

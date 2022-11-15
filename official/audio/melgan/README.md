@@ -293,7 +293,7 @@ python export.py  --format [EXPORT_FORMAT] --checkpoint_path [CKPT_PATH]
 
 ### [Inference](#content)
 
-**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+**Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
 Before performing inference, the mindir file must be exported by export.py. Currently, only batchsize 1 is supported.
 
