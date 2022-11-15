@@ -61,7 +61,7 @@ def get_bin():
     columns_list = ["input_ids", "input_mask", "segment_ids", "label_ids"]
     label_list = []
     for j, data in enumerate(eval_dataset.create_dict_iterator(output_numpy=True, num_epochs=1)):
-        file_name = "tinybert_bs" + str(BATCH_SIZE) + "_" + str(j) + ".bin"
+        file_name = "ternarybert_bs" + str(BATCH_SIZE) + "_" + str(j) + ".bin"
         input_data = []
         for i in columns_list:
             input_data.append(data[i])

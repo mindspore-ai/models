@@ -123,6 +123,12 @@
   # Oxford5k和Paris6k以及它们对应的ground truth文件下载
   bash scripts/download_oxf.sh [DATASET_PATH]
   bash scripts/download_paris.sh [DATASET_PATH]
+  # 以上脚本涉及到较多的使用wget做网络下载，若执行失败，建议用户根据shell脚本及报错信息，对脚本作出修改
+  # 例如:
+  # 1. ERROR: The certificate of 'xxx.com' is not trusted.
+  # 解决办法: 增加 `--no-check-certificate`
+  # 2. ERROR: 404 Not Found
+  # 解决办法: 数据集在网站中位置发生变动，可以通过浏览器查询修改后的链接地址
   ```
 
 - 预训练权重下载

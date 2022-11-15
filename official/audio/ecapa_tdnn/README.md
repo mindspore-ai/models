@@ -291,7 +291,7 @@ The python command above will run in the background, you can view the results th
   Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path, e.g., "/username/xxx/saved_model/xxx_20-215_176000.ckpt".
 
   ```bash
-    python3 scripts/run_eval_ascend.py > eval.log 2>&1 &
+    bash run_eval_ascend.sh DEVICE_ID PATH_CHECKPOINT
   ```
 
   The above python command will run in the background. You can view the result in eval.log：
