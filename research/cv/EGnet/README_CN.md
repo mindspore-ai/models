@@ -399,7 +399,7 @@ model: "EGNet/run-nnet/models/final_vgg_bone.ckpt"      # 测试时使用的chec
 bash run_eval_gpu.sh
 ```
 
-**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+**推理前需参照 [MindSpore C++推理部署指南](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README_CN.md) 进行环境变量设置。**
 
 - Ascend310处理器环境运行，需修改default_config.yaml文件：
 1. 修改infer_path路径为所有推理数据集存放的根目录

@@ -486,7 +486,7 @@ after allreduce eval: top5_correct=45582, tot=50000, acc=91.59%
 
 ## Inference Process
 
-**Before inference, please refer to [Environment Variable Setting Guide](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README.md) to set environment variables.**
+**Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
 ### [Export MindIR](#contents)
 

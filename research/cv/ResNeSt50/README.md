@@ -240,7 +240,7 @@ GPU评估结果保存在脚本路径`/output1/valid下。您可以在日志中�
 
 ## 推理过程
 
-**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+**推理前需参照 [MindSpore C++推理部署指南](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README_CN.md) 进行环境变量设置。**
 
 在Ascend310执行推理，执行推理之前，需要通过`export.py`文件导出MINDIR模型
 

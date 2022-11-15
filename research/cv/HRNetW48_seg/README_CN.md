@@ -390,7 +390,7 @@ python export.py --device_id [DEVICE_ID] --checkpoint_file [CKPT_PATH] --file_na
 
 ### 在Ascend310执行推理
 
-**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+**推理前需参照 [MindSpore C++推理部署指南](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README_CN.md) 进行环境变量设置。**
 
 在执行推理之前，必须先通过 `export.py` 脚本到本mindir文件。以下展示了使用mindir模型执行推理的示例。目前只支持Cityscapes数据集batchsize为1的推理。
 

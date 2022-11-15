@@ -129,7 +129,7 @@ bash run_eval_gpu.sh [DATA_URL] [DATA_NAME] [LOAD_PATH] [CKPT_FILENAME] [CONFIG_
 
 - 在Ascend上运行
 
-**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
+**推理前需参照 [MindSpore C++推理部署指南](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README_CN.md) 进行环境变量设置。**
 
 数据集准备完成后，请按照如下步骤开始训练和评估：
 
