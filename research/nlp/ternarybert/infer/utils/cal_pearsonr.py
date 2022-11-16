@@ -57,7 +57,7 @@ if __name__ == '__main__':
     callback = Pearsonr()
     file_num = len(os.listdir(args.result_path))
     for i in range(file_num):
-        f_name = "tinybert_bs" + str(BATCH_SIZE) + "_" + str(i) + ".bin"
+        f_name = "ternarybert_bs" + str(BATCH_SIZE) + "_" + str(i) + ".bin"
         result_numpy = np.fromfile(os.path.join(args.result_path, f_name), np.float32)
         print(f_name)
         print(result_numpy)
