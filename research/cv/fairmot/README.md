@@ -143,6 +143,7 @@ The structure of the files in this repository is shown below.
 └─fairmot
  ├─scripts
  │ ├─run_eval.sh                    // launch ascend standalone evaluation
+ │ ├─run_onnx_eval.sh               // launch GPU standalone onnx model evaluation
  │ ├─run_distribute_train_ascend.sh // launch ascend distributed training
  | ├─run_distribute_train_gpu.sh    // launch gpu distributed training
  │ ├─run_standalone_train_ascend.sh // launch ascend standalone training
@@ -151,6 +152,7 @@ The structure of the files in this repository is shown below.
  │ ├─tracker
  │ │ ├─basetrack.py               // basic tracker
  │ │ ├─matching.py                // calculating box distance
+ │ │ ├─multitracker_onnx.py       // onnx calculating box distance
  │ │ └─multitracker.py            // JDETracker
  │ ├─tracking_utils
  │ │ ├─evaluation.py              // evaluate tracking results
@@ -175,6 +177,7 @@ The structure of the files in this repository is shown below.
  │ ├─infer_net.py                 // infer net
  │ └─backbone_dla_conv.py         // dla34_conv net
  ├─eval.py                        // eval fairmot
+ ├─eval_onnx.py                   // eval onnx fairmot
  ├─fairmot_run.py                 // run fairmot
  ├─train.py                       // train fairmot
  ├─fairmot_export.py              // export fairmot
@@ -262,6 +265,21 @@ For example, you can run the shell command below to launch the validation proced
 ```shell
 bash scripts/run_eval.sh GPU ./default_config.yaml ./fairmot-30.ckpt data_path
 ```
+
+If you want to evaluate the ONNXM model, you need to run fairmot_ export. Py, select file_ format="ONNX"
+Run scripts/run_onnx_eval.sh to evaluate the onnx model. The usage of the script is:
+
+```shell
+bash scripts/run_onnx_eval.sh [device] [config] [load_ckpt] [dataset_dir]
+```
+
+For example, you can run the shell command below to launch the validation procedure.
+
+```shell
+bash scripts/run_onnx_eval.sh [device] [config] [load_onnx] [dataset_dir]
+```
+
+When I evaluate, it is invalid to run the above described ckpt file directly. You need to train 30 epochs as the pre training weight to obtain a MOTA value of 43.5 on the mot20.
 
 The eval results can be viewed in `eval/eval.log`.
 
