@@ -83,7 +83,7 @@ def read_dataset(img_path, annotation):
     if isinstance(img_path, str):
         img = cv2.imread(img_path)
     else:
-        img = cv2.imread(img_path.tostring().decode("utf-8"))
+        img = cv2.imread(img_path.item())
 
     labels = annotation
     anns = np.zeros((0, 15))
