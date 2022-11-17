@@ -12,79 +12,196 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""
-Process the test set with the .ckpt model in turn.
-"""
-import argparse
+"""Eval"""
 import os
+import time
+import datetime
+import glob
+import numpy as np
 import mindspore.nn as nn
-from mindspore import context
-from mindspore.train.model import Model
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
-from mindspore.common import set_seed
-from mindspore import Tensor
-from mindspore.common import dtype as mstype
-from mindspore.nn.loss.loss import LossBase
-from mindspore.ops import functional as F
+
+from mindspore import Tensor, context
+from mindspore.context import ParallelMode
+from mindspore.communication.management import init, get_rank, get_group_size, release
 from mindspore.ops import operations as P
+from mindspore.ops import functional as F
+from mindspore.common import dtype as mstype
 
-from src.config import imagenet_cfg
-from src.dataset import create_dataset_imagenet
-import src.senet_ms as senets
-
-set_seed(1)
-
-parser = argparse.ArgumentParser(description='senet_ms')
-parser.add_argument('--dataset_name', type=str, default='imagenet', choices=['imagenet', 'cifar10'],
-                    help='dataset name.')
-parser.add_argument('--checkpoint_path', type=str, default='./ckpt_0', help='Checkpoint file path')
-args_opt = parser.parse_args()
+from src.utils.logging import get_logger
+from src.utils.auto_mixed_precision import auto_mixed_precision
+from src.utils.var_init import load_pretrain_model
+from src.image_classification import get_network
+from src.dataset import classification_dataset
+from src.model_utils.config import config
+from src.model_utils.moxing_adapter import moxing_wrapper
 
 
-class CrossEntropySmooth(LossBase):
-    """CrossEntropy"""
-    def __init__(self, sparse=True, reduction='mean', smooth_factor=0., num_classes=1000):
-        super(CrossEntropySmooth, self).__init__()
-        self.onehot = P.OneHot()
-        self.sparse = sparse
-        self.on_value = Tensor(1.0 - smooth_factor, mstype.float32)
-        self.off_value = Tensor(1.0 * smooth_factor / (num_classes - 1), mstype.float32)
-        self.ce = nn.SoftmaxCrossEntropyWithLogits(reduction=reduction)
+class ParameterReduce(nn.Cell):
+    """ParameterReduce"""
+    def __init__(self):
+        super(ParameterReduce, self).__init__()
+        self.cast = P.Cast()
+        self.reduce = P.AllReduce()
 
-    def construct(self, logit, label):
-        if self.sparse:
-            label = self.onehot(label, F.shape(logit)[1], self.on_value, self.off_value)
-        loss_ = self.ce(logit, label)
-        return loss_
+    def construct(self, x):
+        one = self.cast(F.scalar_to_tensor(1.0), mstype.float32)
+        out = x * one
+        ret = self.reduce(out)
+        return ret
 
 
-if __name__ == '__main__':
-
-    if args_opt.dataset_name == "imagenet":
-        cfg = imagenet_cfg
-        if not cfg.use_label_smooth:
-            cfg.label_smooth_factor = 0.0
+def set_parameters():
+    """set_parameters"""
+    if config.run_distribute:
+        init()
+        config.rank = get_rank()
+        config.group_size = get_group_size()
     else:
-        raise ValueError("dataset is not support.")
+        config.rank = 0
+        config.group_size = 1
 
-    device_target = cfg.device_target
-    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target)
-    if device_target == "Ascend":
-        context.set_context(device_id=cfg.device_id)
+    config.outputs_dir = os.path.join(config.log_path,
+                                      datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
 
-    dataset = create_dataset_imagenet(cfg.val_data_path, 1, False)
-    loss = CrossEntropySmooth(sparse=True, reduction="mean",
-                              smooth_factor=cfg.label_smooth_factor, num_classes=cfg.num_classes)
-    net = senets.se_resnext50_32x4d(cfg.num_classes)
-    model = Model(net, loss_fn=loss, metrics={'top_1_accuracy', 'top_5_accuracy'})
+    config.logger = get_logger(config.outputs_dir, config.rank)
+    return config
 
-    file_list = os.listdir(args_opt.checkpoint_path)
-    for filename in file_list:
-        de_path = os.path.join(args_opt.checkpoint_path, filename)
-        if de_path.endswith('.ckpt'):
-            param_dict = load_checkpoint(de_path)
-            load_param_into_net(net, param_dict)
-            net.set_train(False)
 
-            acc = model.eval(dataset)
-            print(f"model {de_path}'s accuracy is {acc}")
+def get_top5_acc(top5_arg, gt_class):
+    sub_count = 0
+    for top5, gt in zip(top5_arg, gt_class):
+        if gt in top5:
+            sub_count += 1
+    return sub_count
+
+
+def get_result(model, top1_correct, top5_correct, img_tot):
+    """calculate top1 and top5 value."""
+    results = [[top1_correct], [top5_correct], [img_tot]]
+    config.logger.info('before results=%s', results)
+    if config.run_distribute:
+        model_md5 = model.replace('/', '')
+        tmp_dir = '/cache'
+        if not os.path.exists(tmp_dir):
+            os.mkdir(tmp_dir)
+        top1_correct_npy = '/cache/top1_rank_{}_{}.npy'.format(config.rank, model_md5)
+        top5_correct_npy = '/cache/top5_rank_{}_{}.npy'.format(config.rank, model_md5)
+        img_tot_npy = '/cache/img_tot_rank_{}_{}.npy'.format(config.rank, model_md5)
+        np.save(top1_correct_npy, top1_correct)
+        np.save(top5_correct_npy, top5_correct)
+        np.save(img_tot_npy, img_tot)
+        while True:
+            rank_ok = True
+            for other_rank in range(config.group_size):
+                top1_correct_npy = '/cache/top1_rank_{}_{}.npy'.format(other_rank, model_md5)
+                top5_correct_npy = '/cache/top5_rank_{}_{}.npy'.format(other_rank, model_md5)
+                img_tot_npy = '/cache/img_tot_rank_{}_{}.npy'.format(other_rank, model_md5)
+                if not os.path.exists(top1_correct_npy) or not os.path.exists(top5_correct_npy) or \
+                   not os.path.exists(img_tot_npy):
+                    rank_ok = False
+            if rank_ok:
+                break
+
+        top1_correct_all = 0
+        top5_correct_all = 0
+        img_tot_all = 0
+        for other_rank in range(config.group_size):
+            top1_correct_npy = '/cache/top1_rank_{}_{}.npy'.format(other_rank, model_md5)
+            top5_correct_npy = '/cache/top5_rank_{}_{}.npy'.format(other_rank, model_md5)
+            img_tot_npy = '/cache/img_tot_rank_{}_{}.npy'.format(other_rank, model_md5)
+            top1_correct_all += np.load(top1_correct_npy)
+            top5_correct_all += np.load(top5_correct_npy)
+            img_tot_all += np.load(img_tot_npy)
+        results = [[top1_correct_all], [top5_correct_all], [img_tot_all]]
+        results = np.array(results)
+    else:
+        results = np.array(results)
+
+    config.logger.info('after results=%s', results)
+    return results
+
+@moxing_wrapper()
+def test():
+    """test"""
+    set_parameters()
+    context.set_context(mode=context.GRAPH_MODE,
+                        device_target=config.device_target, save_graphs=False)
+    if os.getenv('DEVICE_ID', "not_set").isdigit():
+        context.set_context(device_id=int(os.getenv('DEVICE_ID')))
+
+    # init distributed
+    if config.run_distribute:
+        parallel_mode = ParallelMode.DATA_PARALLEL
+        context.set_auto_parallel_context(parallel_mode=parallel_mode, device_num=config.group_size,
+                                          gradients_mean=True)
+
+    config.logger.save_args(config)
+
+    # network
+    config.logger.important_info('start create network')
+    if os.path.isdir(config.checkpoint_file_path):
+        models = list(glob.glob(os.path.join(config.checkpoint_file_path, '*.ckpt')))
+        print(models)
+        if config.checkpoint_file_path:
+            f = lambda x: -1 * int(os.path.splitext(os.path.split(x)[-1])[0].split('-')[-1].split('_')[0])
+        else:
+            f = lambda x: -1 * int(os.path.splitext(os.path.split(x)[-1])[0].split('_')[-1])
+        config.models = sorted(models, key=f)
+    else:
+        config.models = [config.checkpoint_file_path,]
+
+    for model in config.models:
+        de_dataset = classification_dataset(config.data_path, image_size=config.image_size,
+                                            per_batch_size=config.per_batch_size,
+                                            max_epoch=1, rank=config.rank, group_size=config.group_size,
+                                            mode='eval')
+        eval_dataloader = de_dataset.create_tuple_iterator(output_numpy=True, num_epochs=1)
+        network = get_network(network=config.network, num_classes=config.num_classes, platform=config.device_target)
+
+        load_pretrain_model(model, network, config)
+
+        img_tot = 0
+        top1_correct = 0
+        top5_correct = 0
+        if config.device_target == "Ascend":
+            network.to_float(mstype.float16)
+        else:
+            auto_mixed_precision(network)
+        network.set_train(False)
+        t_end = time.time()
+        it = 0
+        for data, gt_classes in eval_dataloader:
+            output = network(Tensor(data, mstype.float32))
+            output = output.asnumpy()
+
+            top1_output = np.argmax(output, (-1))
+            top5_output = np.argsort(output)[:, -5:]
+
+            t1_correct = np.equal(top1_output, gt_classes).sum()
+            top1_correct += t1_correct
+            top5_correct += get_top5_acc(top5_output, gt_classes)
+            img_tot += config.per_batch_size
+
+            if config.rank == 0 and it == 0:
+                t_end = time.time()
+                it = 1
+        if config.rank == 0:
+            time_used = time.time() - t_end
+            fps = (img_tot - config.per_batch_size) * config.group_size / time_used
+            config.logger.info('Inference Performance: {:.2f} img/sec'.format(fps))
+        results = get_result(model, top1_correct, top5_correct, img_tot)
+        top1_correct = results[0, 0]
+        top5_correct = results[1, 0]
+        img_tot = results[2, 0]
+        acc1 = 100.0 * top1_correct / img_tot
+        acc5 = 100.0 * top5_correct / img_tot
+        config.logger.info('after allreduce eval: top1_correct={}, tot={},'
+                           'acc={:.2f}%(TOP1)'.format(top1_correct, img_tot, acc1))
+        config.logger.info('after allreduce eval: top5_correct={}, tot={},'
+                           'acc={:.2f}%(TOP5)'.format(top5_correct, img_tot, acc5))
+    if config.run_distribute:
+        release()
+
+
+if __name__ == "__main__":
+    test()

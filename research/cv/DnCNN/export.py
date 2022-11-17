@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,8 +14,6 @@
 # limitations under the License.
 # ============================================================================
 
-"""export file of MINDIR format"""
-
 import argparse
 import numpy as np
 
@@ -23,19 +22,31 @@ from mindspore import Tensor, load_checkpoint, load_param_into_net, export, cont
 
 from src.model import DnCNN
 
-parse = argparse.ArgumentParser(description='DnCNN export')
-parse.add_argument("--batch_size", type=int, default=128, help="batch size")
-parse.add_argument("--image_height", type=int, default=256, help="height of each input image")
-parse.add_argument("--image_width", type=int, default=256, help="width of each input image")
-parse.add_argument("--ckpt_path", type=str, required=True, help="Checkpoint file path.")
-parse.add_argument("--file_name", type=str, default="DnCNN", help="output file name.")
-parse.add_argument("--file_format", type=str, default="MINDIR", help="output file format")
-args = parse.parse_args()
+parser = argparse.ArgumentParser(description='DnCNN')
+parser.add_argument("--batch_size", type=int, default=1, help="batch size")
+parser.add_argument("--image_height", type=int, default=256, help="image_height")
+parser.add_argument("--image_width", type=int, default=256, help="image_width")
+parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
+parser.add_argument("--file_name", type=str, default="DnCNN", help="output file name.")
+parser.add_argument('--file_format', type=str, choices=["AIR", "ONNX", "MINDIR"], default='MINDIR', help='file format')
+parser.add_argument('--model_type', type=str, default='DnCNN-S', \
+                    choices=['DnCNN-S', 'DnCNN-B', 'DnCNN-3'], help='type of DnCNN')
+
+args = parser.parse_args()
+
 
 if __name__ == '__main__':
-    context.set_context(mode=context.GRAPH_MODE, device_target="Ascend")
-    dncnn = DnCNN()
-    param_dict = load_checkpoint(args.ckpt_path)
-    load_param_into_net(dncnn, param_dict)
+    context.set_context(mode=context.GRAPH_MODE, device_target="GPU")
+    if args.model_type == 'DnCNN-S':
+        network = DnCNN(1, num_of_layers=17)
+    elif args.model_type == 'DnCNN-3' or args.model_type == 'DnCNN-B':
+        network = DnCNN(1, num_of_layers=20)
+    else:
+        print("wrong model type")
+        exit()
+
+    param_dict = load_checkpoint(args.ckpt_file)
+    load_param_into_net(network, param_dict)
+
     input_arr = Tensor(np.ones([args.batch_size, 1, args.image_height, args.image_width]), ms.float32)
-    export(dncnn, input_arr, file_name=args.file_name, file_format=args.file_format)
+    export(network, input_arr, file_name=args.file_name, file_format=args.file_format)

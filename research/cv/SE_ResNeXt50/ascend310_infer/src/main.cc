@@ -34,6 +34,12 @@
 #include "include/dataset/vision.h"
 #include "inc/utils.h"
 
+using mindspore::dataset::vision::Decode;
+using mindspore::dataset::vision::Resize;
+using mindspore::dataset::vision::CenterCrop;
+using mindspore::dataset::vision::Normalize;
+using mindspore::dataset::vision::HWC2CHW;
+using mindspore::dataset::TensorTransform;
 using mindspore::Context;
 using mindspore::Serialization;
 using mindspore::Model;
@@ -43,128 +49,78 @@ using mindspore::GraphCell;
 using mindspore::kSuccess;
 using mindspore::MSTensor;
 using mindspore::dataset::Execute;
-using mindspore::dataset::vision::Decode;
-using mindspore::dataset::vision::Resize;
-using mindspore::dataset::vision::CenterCrop;
-using mindspore::dataset::vision::Normalize;
-using mindspore::dataset::vision::HWC2CHW;
 
 
 DEFINE_string(mindir_path, "", "mindir path");
-DEFINE_string(dataset_name, "cifar10", "['cifar10', 'imagenet2012']");
-DEFINE_string(input0_path, ".", "input0 path");
+DEFINE_string(dataset_path, ".", "dataset path");
 DEFINE_int32(device_id, 0, "device id");
 
-int load_model(Model *model, std::vector<MSTensor> *model_inputs, std::string mindir_path, int device_id) {
-  if (RealPath(mindir_path).empty()) {
+int main(int argc, char **argv) {
+  gflags::ParseCommandLineFlags(&argc, &argv, true);
+  if (RealPath(FLAGS_mindir_path).empty()) {
     std::cout << "Invalid mindir" << std::endl;
     return 1;
   }
 
   auto context = std::make_shared<Context>();
   auto ascend310 = std::make_shared<mindspore::Ascend310DeviceInfo>();
-  ascend310->SetDeviceID(device_id);
+  ascend310->SetDeviceID(FLAGS_device_id);
   context->MutableDeviceInfo().push_back(ascend310);
   mindspore::Graph graph;
-  Serialization::Load(mindir_path, ModelType::kMindIR, &graph);
-
-  Status ret = model->Build(GraphCell(graph), context);
+  Serialization::Load(FLAGS_mindir_path, ModelType::kMindIR, &graph);
+  Model model;
+  Status ret = model.Build(GraphCell(graph), context);
   if (ret != kSuccess) {
     std::cout << "ERROR: Build failed." << std::endl;
     return 1;
   }
 
-  *model_inputs = model->GetInputs();
-  if (model_inputs->empty()) {
-    std::cout << "Invalid model, inputs is empty." << std::endl;
+  auto all_files = GetAllInputData(FLAGS_dataset_path);
+  if (all_files.empty()) {
+    std::cout << "ERROR: no input data." << std::endl;
     return 1;
   }
-  return 0;
-}
-
-int main(int argc, char **argv) {
-  gflags::ParseCommandLineFlags(&argc, &argv, true);
-
-  Model model;
-  std::vector<MSTensor> model_inputs;
-  load_model(&model, &model_inputs, FLAGS_mindir_path, FLAGS_device_id);
 
   std::map<double, double> costTime_map;
-  struct timeval start = {0};
-  struct timeval end = {0};
-  double startTimeMs;
-  double endTimeMs;
+  size_t size = all_files.size();
 
-  if (FLAGS_dataset_name == "cifar10") {
-    auto input0_files = GetAllFiles(FLAGS_input0_path);
-    if (input0_files.empty()) {
-      std::cout << "ERROR: no input data." << std::endl;
-      return 1;
-    }
-    size_t size = input0_files.size();
-    for (size_t i = 0; i < size; ++i) {
+  std::shared_ptr<TensorTransform> decode(new Decode());
+  std::shared_ptr<TensorTransform> resize(new Resize({256, 256}));
+  std::shared_ptr<TensorTransform> centercrop(new CenterCrop({224, 224}));
+  std::shared_ptr<TensorTransform> normalize(new Normalize({123.675, 116.28, 103.53},
+                                                           {58.395, 57.12, 57.375}));
+  std::shared_ptr<TensorTransform> hwc2chw(new HWC2CHW());
+
+  std::vector<std::shared_ptr<TensorTransform>> trans_list;
+  trans_list = {decode, resize, centercrop, normalize, hwc2chw};
+
+  mindspore::dataset::Execute SingleOp(trans_list);
+
+  for (size_t i = 0; i < size; ++i) {
+    for (size_t j = 0; j < all_files[i].size(); ++j) {
+      struct timeval start = {0};
+      struct timeval end = {0};
+      double startTimeMs;
+      double endTimeMs;
       std::vector<MSTensor> inputs;
       std::vector<MSTensor> outputs;
-      std::cout << "Start predict input files:" << input0_files[i] <<std::endl;
-      auto input0 = ReadFileToTensor(input0_files[i]);
-      inputs.emplace_back(model_inputs[0].Name(), model_inputs[0].DataType(), model_inputs[0].Shape(),
-                          input0.Data().get(), input0.DataSize());
+      std::cout << "Start predict input files:" << all_files[i][j] <<std::endl;
+      auto imgDvpp = std::make_shared<MSTensor>();
+      SingleOp(ReadFileToTensor(all_files[i][j]), imgDvpp.get());
 
+      inputs.emplace_back(imgDvpp->Name(), imgDvpp->DataType(), imgDvpp->Shape(),
+                          imgDvpp->Data().get(), imgDvpp->DataSize());
       gettimeofday(&start, nullptr);
-      Status ret = model.Predict(inputs, &outputs);
+      ret = model.Predict(inputs, &outputs);
       gettimeofday(&end, nullptr);
       if (ret != kSuccess) {
-        std::cout << "Predict " << input0_files[i] << " failed." << std::endl;
+        std::cout << "Predict " << all_files[i][j] << " failed." << std::endl;
         return 1;
       }
       startTimeMs = (1.0 * start.tv_sec * 1000000 + start.tv_usec) / 1000;
       endTimeMs = (1.0 * end.tv_sec * 1000000 + end.tv_usec) / 1000;
       costTime_map.insert(std::pair<double, double>(startTimeMs, endTimeMs));
-      int rst = WriteResult(input0_files[i], outputs);
-      if (rst != 0) {
-          std::cout << "write result failed." << std::endl;
-          return rst;
-      }
-    }
-  } else {
-    auto input0_files = GetAllInputData(FLAGS_input0_path);
-    if (input0_files.empty()) {
-      std::cout << "ERROR: no input data." << std::endl;
-      return 1;
-    }
-    size_t size = input0_files.size();
-    for (size_t i = 0; i < size; ++i) {
-      for (size_t j = 0; j < input0_files[i].size(); ++j) {
-        std::vector<MSTensor> inputs;
-        std::vector<MSTensor> outputs;
-        std::cout << "Start predict input files:" << input0_files[i][j] <<std::endl;
-        auto decode = Decode();
-        auto resize = Resize({256, 256});
-        auto centercrop = CenterCrop({224, 224});
-        auto normalize = Normalize({123.675, 116.28, 103.53}, {58.395, 57.12, 57.375});
-        auto hwc2chw = HWC2CHW();
-
-        Execute SingleOp({decode, resize, centercrop, normalize, hwc2chw});
-        auto imgDvpp = std::make_shared<MSTensor>();
-        SingleOp(ReadFileToTensor(input0_files[i][j]), imgDvpp.get());
-        inputs.emplace_back(model_inputs[0].Name(), model_inputs[0].DataType(), model_inputs[0].Shape(),
-                            imgDvpp->Data().get(), imgDvpp->DataSize());
-      gettimeofday(&start, nullptr);
-      Status ret = model.Predict(inputs, &outputs);
-      gettimeofday(&end, nullptr);
-      if (ret != kSuccess) {
-        std::cout << "Predict " << input0_files[i][j] << " failed." << std::endl;
-        return 1;
-      }
-      startTimeMs = (1.0 * start.tv_sec * 1000000 + start.tv_usec) / 1000;
-      endTimeMs = (1.0 * end.tv_sec * 1000000 + end.tv_usec) / 1000;
-      costTime_map.insert(std::pair<double, double>(startTimeMs, endTimeMs));
-      int rst = WriteResult(input0_files[i][j], outputs);
-      if (rst != 0) {
-          std::cout << "write result failed." << std::endl;
-          return rst;
-      }
-    }
+      WriteResult(all_files[i][j], outputs);
     }
   }
   double average = 0.0;

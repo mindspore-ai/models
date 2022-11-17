@@ -1,265 +1,154 @@
 # 目录
 
-<!-- TOC -->
-
 - [目录](#目录)
-- [DnCNN描述](#DnCNN描述)
-- [模型架构](#模型架构)
-- [数据集](#数据集)
-- [环境要求](#环境要求)
-- [快速入门](#快速入门)
-- [脚本说明](#脚本说明)
-    - [脚本及样例代码](#脚本及样例代码)
-    - [脚本参数](#脚本参数)
-        - [训练](#训练)
-        - [评估](#评估)
-        - [export](#export)
-    - [参数配置](#参数配置)
+    - [DnCNN描述](#DnCNN描述)
+    - [模型架构](#模型架构)
+    - [数据集](#数据集)
+    - [环境要求](#环境要求)
+    - [快速入门](#快速入门)
+    - [脚本说明](#脚本说明)
     - [训练过程](#训练过程)
-        - [训练](#训练-1)
+        - [训练参数](#训练参数)
+        - [默认训练参数](#默认训练参数)
+        - [训练](#训练)
     - [评估过程](#评估过程)
-        - [评估](#评估-1)
-    - [导出过程](#导出过程)
-        - [导出](#导出)
-- [模型描述](#模型描述)
-    - [精度](#精度)
-- [ModelZoo主页](#modelzoo主页)
+    - [模型描述](#模型描述)
+        - [训练准确率结果](#训练准确率结果)
+        - [训练性能结果](#训练性能结果)
 
 <!-- /TOC -->
 
-# DnCNN描述
+## DnCNN描述
 
-于2017年提出的DnCNN是用于处理图像降噪任务的卷积神经网络。
+DnCNN是一个使用FCN处理图像降噪任务的模型， 本项目是图像去躁模型DnCNN在mindspore上的复现。
+论文\: Zhang, K., Zuo, W., Chen, Y., Meng, D., & Zhang, L. (2017). Beyond a gaussian denoiser: Residual learning of deep cnn for image denoising. IEEE transactions on image processing, 26(7), 3142-3155.
 
-[论文：Beyond a Gaussian Denoiser: Residual Learning of Deep CNN for Image Denoising](https://ieeexplore.ieee.org/document/7839189): K. Zhang, W. Zuo, Y. Chen, D. Meng and L. Zhang, "Beyond a Gaussian Denoiser: Residual Learning of Deep CNN for Image Denoising," in IEEE Transactions on Image Processing, vol. 26, no. 7, pp. 3142-3155, July 2017, doi: 10.1109/TIP.2017.2662206.
+## 模型结构
 
-# 模型架构
+网络由N层convolution block组成。其中第一层是conv加reLU，中间n-2层是conv+BN+ReLU，最后一层是单独的conv
 
-DnCNN由N层网络构成，其中第一层是Conv+ReLU，中间N-2层是Conv+BN+ReLU，最后一层是Conv
+## 数据集
 
-# 数据集
+训练集DnCNN-S、DnCNN-B使用BSD500中的400张图片
+DnCNN-3使用BSD500中的200张图片和T91中的91张图片
 
-## 使用的训练集：
+测试集包括BDS68，Set5， Set14， clasic5， live1等
 
-- 训练集：
-    - BSD500中的400张图片：[Train400](https://github.com/SaoYan/DnCNN-PyTorch/tree/master/data/train)
-    - 注：数据在src/data_generator.py中处理。
-- 测试集：（BSD68在本项目中文件夹被命名为Set68）
-    - [BSD68](https://github.com/cszn/DnCNN/tree/master/testsets/BSD68)
-    - [Set12](https://github.com/cszn/DnCNN/tree/master/testsets/Set12)
+## 环境要求
 
-## 数据集组织方式
+mindspore=1.1
+skimage=0.18.1
+numpy
+PIL
+opencv
+argparse
 
-  > 文件夹结构应包含训练数据集和测试数据集，如下所示：
-  >
-  > ```bash
-  > .
-  > └─data
-  >   ├─Train400                # 训练数据集
-  >   └─Test                    # 测试数据集
-  >     ├─Set12
-  >     └─Set68
-  > ```
-
-# 环境要求
-
-- mindspore=1.2.0
-- 第三方库
-    - scikit-image=0.18.1
-    - numpy=1.20.3
-    - PIL=8.2.0
-    - OpenCV=4.5.2
-    - argparse=1.1
-    - easydict=1.9
-- 硬件（Ascend）
-    - 准备Ascend处理器搭建硬件环境。
-- 框架
-    - [MindSpore](https://www.mindspore.cn/install)
-- 如需查看详情，请参见如下资源：
-    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
-
-# 快速入门
+## 快速入门
 
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
-- Ascend处理器环境运行
-
 ```bash
 # 训练示例
-python train.py
+python train.py --dataset_path=/path/to/training/data --model_type DnCNN-S --ckpt-prefix=DnCNN-S_25noise  --noise_level=25
 # 或者
-sh ./scripts/run_standalone_train.sh 0 ./data/Train400
-## 0代表使用的机器id，根据机器具体使用情况可变
+bash ./scripts/run_train_gpu.sh /path/to/training/data DnCNN-S DnCNN-S_25noise 25
 
 # 评估示例
-python eval.py --test_data_path=data/Test/Set12 --ckpt_path=models/DnCNN_sigma25/ckpt0
-## 若要评估Set68数据集，则test_data_path=data/Test/Set68
+python eval.py --dataset_path=/path/to/test/data --ckpt_path=./ckpt/DnCNN-S-50_1800.ckpt --model_type=DnCNN-S --noise_level=25 --noise_type=denoise
+# 或者
+bash ./scripts/run_eval_gpu.sh /path/to/test/data ./ckpt/DnCNN-S-50_1800.ckpt DnCNN-S 25 denoise
 ```
 
-# 脚本说明
+## 脚本说明
 
-## 脚本及样例代码
-
-```bash
-├── model_zoo
-    ├── README.md                                 // 所有模型相关说明
-    ├── DnCNN
-        ├── README.md                             // DnCNN相关说明
-        ├── scripts
-        │   ├── run_distribute_train.sh           // Ascend分布式训练shell脚本
-        │   ├── run_eval.sh                       // 评估脚本
-        │   ├── run_standalone_train.sh           // Ascend单设备训练shell脚本
-        ├── src
-        │   ├── config.py                         // 参数配置
-        │   ├── data_generator.py                 // 训练集数据处理
-        │   ├── lr_generator.py                   // 学习率
-        │   ├── metric.py                         // 评估指标PSNR
-        │   ├── model.py                          // DnCNN网络架构定义
-        │   ├── show_image.py                     // 显示图片
-        ├── train.py                              // 训练脚本
-        ├── eval.py                               // 评估脚本
-        ├── export.py                             // 导出MINDIR文件
-```
-
-## 脚本参数
-
-### 训练
-
-```bash
-用法：train.py [--train_data DATASET_PATH][--is_distributed AST.LITERAL_EVAL]
-                [--device_target TARGET][--device_id VALUE]
-                [--run_modelart AST.LITERAL_EVAL][--data_url PATH]
-                [--train_url PATH]
-
-选项：
-  --train_data          训练数据集存储路径
-  --is_distributed      训练方式，是否为分布式训练，值可以是True或False
-  --device_target       训练后端类型，Ascend
-  --device_id           用于训练模型的设备
-  --run_modelart        标志是否是modelArt云端训练
-  --data_url            modelArt云端训练时必须传入的参数，表示OBS桶中的训练集数据路径
-  --train_url           modelArt云端训练时必须传入的参数，表示OBS桶中用于存储ckpt文件的路径
-```
-
-### 评估
-
-```bash
-用法：eval.py [--ckpt_path PATH] [--test_data_path PATH]
-                [--test_noiseL VALUE] [--verbose AST.LITERAL_EVAL]
-                [--device_target TARGET] [--device_id DEVICE_ID]
-
-选项：
-  --ckpt_path           训练所得到的模型参数的存储路径
-  --test_data_path      测试集存储路径
-  --test_noiseL         指定噪声类型，需要和config.py中sigma参数的值保持一致
-  --verbose             指定评估时是否存储降噪后的图片
-  --device_target       评估后端类型，Ascend
-  --device_id           用于评估模型的设备
-```
-
-### export
-
-```bash
-用法：export.py [--ckpt_path PATH] [--batch_size NUM]
-                [--image_height NUM] [--image_width NUM]
-                [--file_name FILE_NAME] [--file_format FORMAT]
-
-选项：
-  --ckpt_path           导出所用的ckpt文件，该参数为必选项
-  --batch_size          batch_size
-  --image_height        图像高
-  --image_width         图像宽
-  --file_name           生成的目标文件名称
-  --file_format         生成的目标文件格式
-```
-
-## 参数配置
-
-在config.py中配置默认参数。
-
-- DnCNN配置
-
-```bash
-"model": "DnCNN",                 # 模型名称
-"batch_size": 128,                # 批量大小
-"basic_lr": 0.001,                # 学习率
-"epoch": 95,                      # 训练epoch
-"sigma": 25,                      # 训练时噪声大小
-"lr_gamma": 0.2,                  # 学习率衰减程度
-"save_checkpoint": True           # 是否保存ckpt文件
-```
+├── readme.md
+├── scripts
+│   ├── run_eval_gpu.sh //训练shell脚本
+│   └── run_train_gpu.sh //评估shell脚本
+├── src
+│   ├── dataset.py //数据读取
+│   └──model.py  //模型定义
+├── eval.py  //评估脚本
+├── export.py //导出模型
+└── train.py  //训练脚本
 
 ## 训练过程
 
+可通过`train.py`脚本中的参数修改训练行为。`train.py`脚本中的参数如下：
+
+### 训练参数
+
+--dataset_path 训练数据路径
+--model_type 模型类型 = ['DnCNN-S', 'DnCNN-B', 'DnCNN-3']
+--ckpt-prefix 检查点前缀
+--noise_level 噪音等级
+--batch_size 批次大小
+--lr 学习率
+--epoch_num 轮次数
+
+### 默认训练参数
+
+optimizer=adam
+learning rate=0.001
+batch_size=128
+weight_decay=0.0001
+epoch=50
+
 ### 训练
 
-- 单设备训练
+只有DnCNN-S 需要指定noise_level
 
-```bash
-python train.py
+```python
+python train.py --dataset_path=/path/to/training/data --model_type=DnCNN-S --ckpt-prefix=DnCNN-S_25noise  --noise_level=25
+python train.py --dataset_path=/path/to/training/data --model_type=DnCNN-B --ckpt-prefix=DnCNN-B
+python train.py --dataset_path=/path/to/training/data --model_type=DnCNN-3 --ckpt-prefix=DnCNN-3
 ```
 
-- 8卡训练，进入scripts目录，输入运行shell脚本的命令
-
-```bash
-sh run_distribute_train.sh RANK_TABLE_FILE DATA_PATH
-```
-
-- 生成八卡训练需要的RANK_TABLE_FILE可参考[此处](https://gitee.com/mindspore/models/blob/master/utils/hccl_tools/hccl_tools.py)
+在ckpt文件夹下保存检查点
 
 ## 评估过程
 
-### 评估
+评估需要通过命令行提供以下参数：
+--dataset_path 数据路径
+--ckpt_path 检查点路径
+--model_type 模型类型
+--noise_type 噪音类型， 通过noise_type选择图像测试噪音的类型：["denoise", "super-resolution","jpeg-deblock"]
+--noise_level 噪音等级：对应三种noise type的强度，噪音sigma/下采样上采样scale/jpeg压缩quality
 
-- 评估过程如下，需要指定数据集类型为Set68或Set12。
+ex:
 
-```bash
-# 使用Set12数据集
-python命令：python eval.py --test_data_path=data/Test/Set12 --ckpt_path=models/DnCNN_sigma25/ckpt0
-shell命令：sh scripts/run_eval.sh 0 data/Test/Set12 models/DnCNN_sigma25/ckpt0
-# 使用Set68数据集
-python命令：python eval.py --test_data_path=data/Test/Set68 --ckpt_path=models/DnCNN_sigma25/ckpt0
-shell命令：sh scripts/run_eval.sh 0 data/Test/Set68 models/DnCNN_sigma25/ckpt0
+```python
+python eval.py --dataset_path=/path/to/test/data --ckpt_path=./ckpt/DnCNN-B-50_3000.ckpt --model_type=DnCNN-B --noise_level=50 --noise_type=denoise
 ```
 
-- 评估时需确保：
+## 模型描述
 
-```bash
-# 推荐在DnCNN目录下进行评估
-# 参数 --test_noiseL 的值和config.py文件中参数sigma的值相同；
-# 参数 --ckpt_path 的路径需要匹配训练时的sigma
-# 例如：在训练前设置config.py中sigma为50，则评估Set68时:
-python eval.py --test_data_path=data/Test/Set68 --ckpt_path=models/DnCNN_sigma50/ckpt0 --test_noiseL=50
-```
+### 训练准确率结果
 
-## 导出过程
-
-### 导出
-
-- 导出指定格式的文件
-
-```bash
-python export.py CKPT_PATH
-# 参数CKPT_PATH为必填项，为使用的ckpt文件所在路径。执行后将会默认生成DnCNN.mindir文件，用户可参照export.py提供的参数进行自定义具体信息
-```
-
-# 模型描述
-
-## 精度
-
-| 参数          | Ascend                                                      |
+| 参数          | GPU                                                      |
 | ------------- | -------------------------------------------------------- |
-| 模型版本      | DnCNN                                                  |
-| 资源          | Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8                                            |
-| mindspore版本 | mindspore 1.2.0                                            |
-| 数据集        | Berkeley Segmentation Dataset                             |
-| 轮次          | 95                                                       |
+| 模型版本      | DnCNN-S                                                  |
+| 资源          | Nvidia V100                                              |
+| mindspore版本 | mindspore 1.1                                            |
+| 数据集        | Berkeley Segmentation Datase                             |
+| 轮次          | 50                                                       |
 | 输出          | noise残差                                                |
-| 噪声水平          | 25                                                |
-| 性能          | 在Set68测试，PSNR=29.24，在Set12测试，PSNR=30.46|
-| 说明          | 每次训练将保存5个检查点文件，在保证其中一定存在满足指标的文件的基础上，每次评估将会输出该5个文件中最优结果       |
+| 性能          | 在BSD68测试，PSNR=32.92(σ=15)， 31.73(σ=25)，30.59(σ=50) |
 
-# ModelZoo主页
+### 训练性能结果
 
- 请浏览官网[主页](https://gitee.com/mindspore/models)。  
+| 参数          | GPU                                |
+| ------------- | ---------------------------------- |
+| 模型版本      | DnCNN-S                            |
+| 资源          | Nvidia V100                        |
+| mindspore版本 | mindspore 1.1                      |
+| 训练参数      | lr 0.001, batch_size 128, epoch 50 |
+| 优化器        | adam                               |
+| 损失函数      | MSE                                |
+| 输出          | noise残差                          |
+| 速度          | 320ms/batch                        |
+| 总时长        | 7h9min                             |
+| 检查点        | 6.38M                              |
+
+
+

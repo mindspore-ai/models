@@ -13,88 +13,147 @@
 # limitations under the License.
 # ============================================================================
 """
-Data operations, will be used in train.py and eval.py
+dataset processing.
 """
 import os
-
-import mindspore.common.dtype as mstype
-import mindspore.dataset as ds
+from PIL import Image, ImageFile
+from mindspore.common import dtype as mstype
+import mindspore.dataset as de
 import mindspore.dataset.transforms as C
-import mindspore.dataset.vision as vision
-from src.config import imagenet_cfg
+import mindspore.dataset.vision as V_C
+from src.utils.sampler import DistributedSampler
+
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 
-def create_dataset_imagenet(dataset_path, repeat_num=1, training=True, num_parallel_workers=16, shuffle=None):
+class TxtDataset():
     """
-    create a train or eval imagenet2012 dataset for resnet50
+    create txt dataset.
 
     Args:
-        dataset_path(string): the path of dataset.
-        do_train(bool): whether dataset is used for train or eval.
-        repeat_num(int): the repeat times of dataset. Default: 1
-        batch_size(int): the batch size of dataset. Default: 32
-        target(str): the device target. Default: Ascend
-
     Returns:
-        dataset
+        de_dataset.
     """
 
-    device_num, rank_id = _get_rank_info()
+    def __init__(self, root, txt_name):
+        super(TxtDataset, self).__init__()
+        self.imgs = []
+        self.labels = []
+        fin = open(txt_name, "r")
+        for line in fin:
+            img_name, label = line.strip().split(' ')
+            self.imgs.append(os.path.join(root, img_name))
+            self.labels.append(int(label))
+        fin.close()
 
-    if device_num == 1:
-        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers, shuffle=shuffle)
-    else:
-        data_set = ds.ImageFolderDataset(dataset_path, num_parallel_workers=num_parallel_workers, shuffle=shuffle,
-                                         num_shards=device_num, shard_id=rank_id)
+    def __getitem__(self, index):
+        img = Image.open(self.imgs[index]).convert('RGB')
+        return img, self.labels[index]
 
-    assert imagenet_cfg.image_height == imagenet_cfg.image_width, "image_height not equal image_width"
-    image_size = imagenet_cfg.image_height
+    def __len__(self):
+        return len(self.imgs)
+
+
+def classification_dataset(data_dir, image_size, per_batch_size, max_epoch, rank, group_size,
+                           mode='train',
+                           input_mode='folder',
+                           root='',
+                           num_parallel_workers=None,
+                           shuffle=None,
+                           sampler=None,
+                           class_indexing=None,
+                           drop_remainder=True,
+                           transform=None,
+                           target_transform=None):
+    """
+    A function that returns a dataset for classification. The mode of input dataset could be "folder" or "txt".
+    If it is "folder", all images within one folder have the same label. If it is "txt", all paths of images
+    are written into a textfile.
+
+    Args:
+        data_dir (str): Path to the root directory that contains the dataset for "input_mode="folder"".
+            Or path of the textfile that contains every image's path of the dataset.
+        image_size (Union(int, sequence)): Size of the input images.
+        per_batch_size (int): the batch size of evey step during training.
+        max_epoch (int): the number of epochs.
+        rank (int): The shard ID within num_shards (default=None).
+        group_size (int): Number of shards that the dataset should be divided
+            into (default=None).
+        mode (str): "train" or others. Default: " train".
+        input_mode (str): The form of the input dataset. "folder" or "txt". Default: "folder".
+        root (str): the images path for "input_mode="txt"". Default: " ".
+        num_parallel_workers (int): Number of workers to read the data. Default: None.
+        shuffle (bool): Whether or not to perform shuffle on the dataset
+            (default=None, performs shuffle).
+        sampler (Sampler): Object used to choose samples from the dataset. Default: None.
+        class_indexing (dict): A str-to-int mapping from folder name to index
+            (default=None, the folder names will be sorted
+            alphabetically and each class will be given a
+            unique index starting from 0).
+
+    Examples:
+        >>> from src.dataset import classification_dataset
+        >>> # path to imagefolder directory. This directory needs to contain sub-directories which contain the images
+        >>> data_dir = "/path/to/imagefolder_directory"
+        >>> de_dataset = classification_dataset(data_dir, image_size=[224, 244],
+        >>>                               per_batch_size=64, max_epoch=100,
+        >>>                               rank=0, group_size=4)
+        >>> # Path of the textfile that contains every image's path of the dataset.
+        >>> data_dir = "/path/to/dataset/images/train.txt"
+        >>> images_dir = "/path/to/dataset/images"
+        >>> de_dataset = classification_dataset(data_dir, image_size=[224, 244],
+        >>>                               per_batch_size=64, max_epoch=100,
+        >>>                               rank=0, group_size=4,
+        >>>                               input_mode="txt", root=images_dir)
+    """
+
+    # Computed from random subset of ImageNet training images
     mean = [0.485 * 255, 0.456 * 255, 0.406 * 255]
     std = [0.229 * 255, 0.224 * 255, 0.225 * 255]
 
-    # define map operations
-    if training:
-        transform_img = [
-            vision.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
-            vision.RandomHorizontalFlip(prob=0.5),
-            vision.RandomColorAdjust(0.4, 0.4, 0.4, 0.1),
-            vision.Normalize(mean=mean, std=std),
-            vision.HWC2CHW()
-        ]
+    if transform is None:
+        if mode == 'train':
+            transform_img = [
+                V_C.RandomCropDecodeResize(image_size, scale=(0.08, 1.0), ratio=(0.75, 1.333)),
+                V_C.RandomHorizontalFlip(prob=0.5),
+                V_C.RandomColorAdjust(brightness=0.4, contrast=0.4, saturation=0.4),
+                V_C.Normalize(mean=mean, std=std),
+                V_C.HWC2CHW()
+            ]
+        else:
+            transform_img = [
+                V_C.Decode(),
+                V_C.Resize((256, 256)),
+                V_C.CenterCrop(image_size),
+                V_C.Normalize(mean=mean, std=std),
+                V_C.HWC2CHW()
+            ]
     else:
-        transform_img = [
-            vision.Decode(),
-            vision.Resize(256),
-            vision.CenterCrop(image_size),
-            vision.Normalize(mean=mean, std=std),
-            vision.HWC2CHW()
-        ]
+        transform_img = transform
 
-    transform_label = [C.TypeCast(mstype.int32)]
-
-    data_set = data_set.map(input_columns="image", num_parallel_workers=16, operations=transform_img)  # 12////
-    data_set = data_set.map(input_columns="label", num_parallel_workers=4, operations=transform_label)
-
-    # apply batch operations
-    data_set = data_set.batch(imagenet_cfg.batch_size, drop_remainder=True)
-
-    # apply dataset repeat operation
-    data_set = data_set.repeat(repeat_num)
-
-    return data_set
-
-
-def _get_rank_info():
-    """
-    get rank size and rank id
-    """
-    rank_size = int(os.environ.get("RANK_SIZE", 1))
-
-    if rank_size > 1:
-        from mindspore.communication.management import get_rank, get_group_size
-        rank_size = get_group_size()
-        rank_id = get_rank()
+    if target_transform is None:
+        transform_label = [C.TypeCast(mstype.int32)]
     else:
-        rank_size = rank_id = None
+        transform_label = target_transform
 
-    return rank_size, rank_id
+    if input_mode == 'folder':
+        de_dataset = de.ImageFolderDataset(data_dir, num_parallel_workers=num_parallel_workers,
+                                           shuffle=shuffle, sampler=sampler, class_indexing=class_indexing,
+                                           num_shards=group_size, shard_id=rank)
+    else:
+        dataset = TxtDataset(root, data_dir)
+        sampler = DistributedSampler(dataset, rank, group_size, shuffle=shuffle)
+        de_dataset = de.GeneratorDataset(dataset, ["image", "label"], sampler=sampler)
+
+    de_dataset = de_dataset.map(operations=transform_img, input_columns="image",
+                                num_parallel_workers=num_parallel_workers)
+    de_dataset = de_dataset.map(operations=transform_label, input_columns="label",
+                                num_parallel_workers=num_parallel_workers)
+
+    columns_to_project = ["image", "label"]
+    de_dataset = de_dataset.project(columns=columns_to_project)
+
+    de_dataset = de_dataset.batch(per_batch_size, drop_remainder=drop_remainder)
+    de_dataset = de_dataset.repeat(max_epoch)
+
+    return de_dataset

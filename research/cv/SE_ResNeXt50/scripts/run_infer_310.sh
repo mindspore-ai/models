@@ -14,10 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 4 || $# -gt 5 ]]; then
-    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
-    DATASET_NAME can choose from ['cifar10', 'imagenet2012'].
-    NEED_PREPROCESS means weather need preprocess or not, it's value is 'y' or 'n'.
+if [[ $# -lt 2 || $# -gt 3 ]]; then
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi
@@ -30,45 +28,23 @@ get_real_path(){
     fi
 }
 model=$(get_real_path $1)
-if [ $2 == 'cifar10' ] || [ $2 == 'imagenet2012' ]; then
-  dataset_name=$2
-else
-  echo "DATASET_NAME can choose from ['cifar10', 'imagenet2012']"
-  exit 1
-fi
-
-dataset_path=$(get_real_path $3)
-
-if [ "$4" == "y" ] || [ "$4" == "n" ];then
-    need_preprocess=$4
-else
-  echo "weather need preprocess or not, it's value must be in [y, n]"
-  exit 1
-fi
+data_path=$(get_real_path $2)
 
 device_id=0
-if [ $# == 5 ]; then
-    device_id=$5
+if [ $# == 3 ]; then
+    device_id=$3
 fi
 
 echo "mindir name: "$model
-echo "dataset name: "$dataset_name
-echo "dataset path: "$dataset_path
-echo "need preprocess: "$need_preprocess
+echo "dataset path: "$data_path
 echo "device id: "$device_id
-
-function preprocess_data()
-{
-    if [ -d preprocess_Result ]; then
-        rm -rf ./preprocess_Result
-    fi
-    mkdir preprocess_Result
-    python ../preprocess.py --dataset_name=$dataset_name --data_path=$dataset_path #--result_path=./preprocess_Result/
-}
 
 function compile_app()
 {
-    cd ../ascend310_infer/ || exit
+    cd ../ascend310_infer/src/ || exit
+    if [ -f "Makefile" ]; then
+        make clean
+    fi
     bash build.sh &> build.log
 }
 
@@ -83,26 +59,15 @@ function infer()
     fi
     mkdir result_Files
     mkdir time_Result
-
-    if [ "$dataset_name" == "cifar10" ]; then
-        ../ascend310_infer/out/main --mindir_path=$model --dataset_name=$dataset_name --input0_path=./preprocess_Result/00_data --device_id=$device_id  &> infer.log
-    else
-        ../ascend310_infer/out/main --mindir_path=$model --dataset_name=$dataset_name --input0_path=$dataset_path --device_id=$device_id  &> infer.log
-    fi
+    ../ascend310_infer/src/main --mindir_path=$model --dataset_path=$data_path --device_id=$device_id  &> infer.log
 }
 
 function cal_acc()
 {
-    python ../postprocess.py --dataset_name=$dataset_name  &> acc.log
+    python ../create_imagenet2012_label.py  --img_path=$data_path
+    python ../postprocess.py --result_path=./result_Files --label_path=./imagenet_label.json  &> acc.log &
 }
 
-if [ $need_preprocess == "y" ]; then
-    preprocess_data
-    if [ $? -ne 0 ]; then
-        echo "preprocess dataset failed"
-        exit 1
-    fi
-fi
 compile_app
 if [ $? -ne 0 ]; then
     echo "compile app code failed"

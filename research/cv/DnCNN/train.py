@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,115 +14,79 @@
 # limitations under the License.
 # ============================================================================
 
-"""train DnCNN"""
-
-import os
-import ast
 import argparse
-import mindspore.dataset as ds
-from mindspore import nn
-from mindspore import context, Model
-from mindspore.common import set_seed
-from mindspore.context import ParallelMode
-from mindspore.communication.management import init, get_rank, get_group_size
-from mindspore.train.callback import CheckpointConfig, ModelCheckpoint, LossMonitor, TimeMonitor
+import datetime
+import mindspore.nn as nn
+from mindspore import context
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, LearningRateScheduler
+from mindspore.train import Model
+from mindspore.train.callback import Callback
 
+from src.dataset import create_train_dataset
 from src.model import DnCNN
-from src.config import config
-from src.lr_generator import step_lr
-from src.data_generator import DenoisingDataset
 
 
-set_seed(1)
-parser = argparse.ArgumentParser(description='Mindspore DnCNN in Ascend')
-parser.add_argument('--train_data', default='./data/Train400', type=str, help='the path of train dataset')
-parser.add_argument('--run_modelart', default=False, type=ast.literal_eval, help='run on modelArt, default is false')
-parser.add_argument('--is_distributed', default=False, type=ast.literal_eval, help='distribute training')
-parser.add_argument('--device_target', type=str, default='Ascend', help='run in Ascend')
-parser.add_argument('--device_id', default=0, type=int, help='device id')
-# used for adapting to cloud
-parser.add_argument('--data_url', default=None, help='Location of data.')
-parser.add_argument('--train_url', default=None, help='Location of training outputs.')
-args = parser.parse_args()
+class BatchAverageMSELoss(nn.Cell):
+    def __init__(self, batch_size):
+        super(BatchAverageMSELoss, self).__init__()
+        self.batch_size = batch_size
+        self.sumMSELoss = nn.MSELoss(reduction='sum')
 
-model = config.model
-basic_lr = config.basic_lr
-lr_gamma = config.lr_gamma
-batch_size = config.batch_size
-epochs = config.epoch
-sigma = config.sigma
-run_modelart = args.run_modelart
+    def construct(self, logits, labels):
+        #equation 1 on the paper
+        loss = self.sumMSELoss(logits, labels) / self.batch_size / 2
+        return loss
 
-save_dir = os.path.join('models', model+'_' + 'sigma'+str(sigma))
-if not os.path.exists(save_dir):
-    os.makedirs(save_dir)
+class Print_info(Callback):
+    def epoch_end(self, run_context):
+        cb_params = run_context.original_args()
+        print(datetime.datetime.now(), "end epoch", cb_params.cur_epoch_num)
 
-if __name__ == '__main__':
-    if args.device_target == "Ascend":
-        context.set_context(mode=context.GRAPH_MODE, device_target='Ascend', save_graphs=False)
-        if run_modelart:
-            device_id = int(os.getenv('DEVICE_ID'))
-            device_num = int(os.getenv('RANK_SIZE'))
-            local_input_url = os.path.join('/cache/data' + str(device_id))
-            local_output_url = os.path.join('/cache/ckpt' + str(device_id))
-            context.set_context(device_id=device_id)
-            if device_num > 1:
-                init()
-                context.set_auto_parallel_context(device_num=device_num, global_rank=device_id,
-                                                  parallel_mode=ParallelMode.DATA_PARALLEL,
-                                                  gradients_mean=True)
-                args.rank = get_rank()
-            else:
-                args.rank = 0
-            import moxing as mox
-            mox.file.copy_parallel(src_url=args.data_url, dst_url=local_input_url)
-            args.train_data = local_input_url
-            save_dir = local_output_url
-        elif args.is_distributed:
-            if os.getenv('DEVICE_ID', "not_set").isdigit():
-                context.set_context(device_id=int(os.getenv('DEVICE_ID')))
-            init()
-            args.rank = get_rank()
-            args.group_size = get_group_size()
-            device_num = args.group_size
-            context.reset_auto_parallel_context()
-            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True, all_reduce_fusion_config=[2, 18])
-        else:
-            args.rank = 0 # record of different training process
-            args.group_size = 1
-            context.set_context(device_id=args.device_id)
-        print('======> Building model <======')
-        # define network
-        dncnn = DnCNN()
-        # dataset
-        DDataset = DenoisingDataset(args.train_data, sigma)
-        train_dataset = ds.GeneratorDataset(DDataset, ["noised_img", "noise"], shuffle=True)
-        train_dataset = train_dataset.batch(config.batch_size, drop_remainder=True)
-        train_data_size = train_dataset.get_dataset_size()  # num of total patches div batch_size. means num of steps in one epoch
-        # loss
-        criterion = nn.MSELoss(reduction='sum')
-        # learning rate
-        lr = step_lr(basic_lr, lr_gamma, epochs*train_data_size, train_data_size)
-        # optimizer
-        optimizer = nn.Adam(dncnn.trainable_params(), learning_rate=lr)
-        # define model
-        dncnn_model = Model(dncnn, loss_fn=criterion, optimizer=optimizer, amp_level="O3")
-        # call back
-        loss_cb = LossMonitor(per_print_times=train_data_size)
-        time_cb = TimeMonitor(data_size=train_data_size)
-        cb = [loss_cb, time_cb]
-        if config.save_checkpoint:
-            ckpt_config = CheckpointConfig(save_checkpoint_steps=train_data_size, keep_checkpoint_max=5)
-            ckpt_save_path = os.path.join(save_dir, 'ckpt' + str(args.rank) + '/')
-            ckpt_cb = ModelCheckpoint(prefix="dncnn", directory=ckpt_save_path, config=ckpt_config)
-            cb.append(ckpt_cb)
-        print("======> start training <======")
-        dncnn_model.train(epoch=epochs, train_dataset=train_dataset,
-                          callbacks=cb, dataset_sink_mode=True)
-        if run_modelart:
-            import moxing as mox
-            mox.file.copy_parallel(src_url=save_dir, dst_url=args.train_url)
-        print("======> end training <======")
+def learning_rate_function(lr, cur_step_num):
+    if cur_step_num % 40000 == 0:
+        lr = lr*0.8
+        print("current lr: ", str(lr))
+    return lr
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="DnCNN")
+    parser.add_argument("--dataset_path", type=str, default="/code/BSR_bsds500/BSR/BSDS500/data/images/", \
+                        help='training image path')
+    parser.add_argument("--batch_size", type=int, default=128, help='training batch size')
+    parser.add_argument('--lr', type=float, default=0.001, help='learning rate')
+    parser.add_argument('--weight_decay', type=float, default=0.0001, help='weight_decay')
+    parser.add_argument('--model_type', type=str, default='DnCNN-S', \
+                        choices=['DnCNN-S', 'DnCNN-B', 'DnCNN-3'], help='type of DnCNN')
+    parser.add_argument('--noise_level', type=int, default=25, help="noise level only for DnCNN-S")
+    parser.add_argument('--ckpt_prefix', type=str, default="dncnn_mindspore", help='ckpt name prefix')
+    parser.add_argument('--epoch_num', type=int, default=50, help='epoch number')
+    args = parser.parse_args()
+
+    context.set_context(mode=context.GRAPH_MODE, device_target="GPU")
+
+    if args.model_type == 'DnCNN-S':
+        network = DnCNN(1, num_of_layers=17)
+    elif args.model_type == 'DnCNN-3' or args.model_type == 'DnCNN-B':
+        network = DnCNN(1, num_of_layers=20)
     else:
-        raise ValueError("Unsupported device. The device should be Ascend.")
+        print("wrong model type")
+        exit()
+
+    ds_train = create_train_dataset(args.dataset_path, args.model_type, noise_level=args.noise_level, \
+                                    batch_size=args.batch_size)
+    opt = nn.AdamWeightDecay(network.trainable_params(), args.lr, weight_decay=args.weight_decay)
+    loss_fun = BatchAverageMSELoss(args.batch_size)
+
+    model = Model(network, loss_fun, opt)
+
+    #training callbacks
+    checkpoint_config = CheckpointConfig(save_checkpoint_steps=1000, keep_checkpoint_max=3)
+    ckpoint_cb = ModelCheckpoint(prefix=args.ckpt_prefix, directory='./ckpt/', config=checkpoint_config)
+    print_cb = Print_info()
+    lr_cb = LearningRateScheduler(learning_rate_function)
+    loss_monitor_cb = LossMonitor(per_print_times=100)
+
+    print(datetime.datetime.now(), " training starts")
+    model.train(args.epoch_num, ds_train, callbacks=[lr_cb, ckpoint_cb, print_cb, loss_monitor_cb], \
+                dataset_sink_mode=False)
