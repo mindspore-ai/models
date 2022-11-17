@@ -41,4 +41,4 @@ python ../../eval.py  \
     --device_target="Ascend" \
     --preprocess=false \
     --preprocess_path=$PREPROCESS_DIR \
-    --ckpt_file=$CKPT_FILE > log.txt 2>&1 &
+    --ckpt_file=$CKPT_FILE > eval.log 2>&1 &

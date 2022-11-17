@@ -12,6 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+if [ $# != 2 ]
+then
+    echo "Usage: bash scripts/run_train_ascend.sh [DATA_PATH] [EPOCH_SIZE]"
+exit 1
+fi
 
-python train.py --platform Ascend --device_id 0 --model DepthResNet --max_epoch 200 --dataroot ./data/horse2zebra/ \
-       --outputs_dir ./outputs > output.train.log 2>&1 &
+DATA_PATH=$1
+EPOCH_SIZE=$2
+python train.py --platform Ascend --device_id 0 --model DepthResNet --max_epoch $EPOCH_SIZE \
+    --dataroot $DATA_PATH --outputs_dir ./outputs > output.train.log 2>&1 &

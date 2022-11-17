@@ -40,4 +40,4 @@ python ../train.py  \
     --aclimdb_path=$ACLIMDB_DIR \
     --glove_path=$GLOVE_DIR \
     --preprocess=true  \
-    --preprocess_path=./preprocess > log.txt 2>&1 &
+    --preprocess_path=./preprocess > train.log 2>&1 &

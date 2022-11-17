@@ -39,4 +39,4 @@ python ../eval.py  \
     --glove_path=$GLOVE_DIR \
     --preprocess=false \
     --preprocess_path=./preprocess \
-    --ckpt_file=$CKPT_FILE > log.txt 2>&1 &
+    --ckpt_file=$CKPT_FILE > eval.log 2>&1 &

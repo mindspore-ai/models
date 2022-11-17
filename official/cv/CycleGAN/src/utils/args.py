@@ -20,7 +20,7 @@ import ast
 
 parser = argparse.ArgumentParser(description='Cycle GAN')
 # basic parameters
-parser.add_argument('--platform', type=str, default='Ascend', help='only support GPU and Ascend')
+parser.add_argument('--platform', type=str, default='Ascend', help='support GPU and Ascend, and CPU')
 parser.add_argument('--device_id', type=int, default=0, help='device id, default is 0.')
 parser.add_argument('--device_num', type=int, default=1, help='device num, default is 1.')
 parser.add_argument('--is_save_on_master', type=int, default=1,
