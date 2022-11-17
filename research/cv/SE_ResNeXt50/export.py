@@ -13,40 +13,41 @@
 # limitations under the License.
 # ============================================================================
 """
-##############export checkpoint file into air, onnx or mindir model#################
-python export.py
+se_resnext50 export mindir.
 """
-import argparse
+import os
 import numpy as np
+from mindspore.common import dtype as mstype
+from mindspore import context, Tensor, load_checkpoint, load_param_into_net, export
+from src.model_utils.config import config
+from src.model_utils.moxing_adapter import moxing_wrapper
+from src.image_classification import get_network
+from src.utils.auto_mixed_precision import auto_mixed_precision
 
-from mindspore import Tensor, load_checkpoint, load_param_into_net, export, context
 
-import src.senet_ms as senets
+context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
+if config.device_target == "Ascend":
+    context.set_context(device_id=config.device_id)
 
-parser = argparse.ArgumentParser(description='senet export')
-parser.add_argument("--device_id", type=int, default=0, help="Device id")
-parser.add_argument("--batch_size", type=int, default=1, help="batch size")
-parser.add_argument("--ckpt_file", type=str, required=True, help="Checkpoint file path.")
-parser.add_argument("--file_name", type=str, default="senet", help="output file name.")
-parser.add_argument('--width', type=int, default=224, help='input width')
-parser.add_argument('--height', type=int, default=224, help='input height')
-parser.add_argument("--file_format", type=str, choices=["AIR", "ONNX", "MINDIR"], default="MINDIR", help="file format")
-parser.add_argument("--device_target", type=str, default="Ascend",
-                    choices=["Ascend", "GPU", "CPU"], help="device target(default: Ascend)")
-args = parser.parse_args()
+def modelarts_pre_process():
+    '''modelarts pre process function.'''
+    config.file_name = os.path.join(config.output_path, config.file_name)
 
-context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target)
-if args.device_target == "Ascend":
-    context.set_context(device_id=args.device_id)
+@moxing_wrapper(pre_process=modelarts_pre_process)
+def run_export():
+    """run export."""
+    network = get_network(network=config.network, num_classes=config.num_classes, platform=config.device_target)
+
+    param_dict = load_checkpoint(config.checkpoint_file_path)
+    load_param_into_net(network, param_dict)
+    if config.device_target == "Ascend":
+        network.to_float(mstype.float16)
+    else:
+        auto_mixed_precision(network)
+    network.set_train(False)
+    input_shp = [config.batch_size, 3, config.height, config.width]
+    input_array = Tensor(np.random.uniform(-1.0, 1.0, size=input_shp).astype(np.float32))
+    export(network, input_array, file_name=config.file_name, file_format=config.file_format)
 
 if __name__ == '__main__':
-
-    net = senets.se_resnext50_32x4d(1000)
-
-    assert args.ckpt_file is not None, "checkpoint_path is None."
-
-    param_dict = load_checkpoint(args.ckpt_file)
-    load_param_into_net(net, param_dict)
-
-    input_arr = Tensor(np.zeros([args.batch_size, 3, args.height, args.width], np.float32))
-    export(net, input_arr, file_name=args.file_name, file_format=args.file_format)
+    run_export()

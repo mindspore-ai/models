@@ -12,286 +12,197 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-"""
-Train.
-"""
-import argparse
+"""train ImageNet."""
 import os
-
-from collections import Counter
-import math
-import numpy as np
+import time
+import datetime
 
 import mindspore.nn as nn
-from mindspore import Tensor
-from mindspore import context
-from mindspore.communication.management import init, get_rank
-from mindspore.nn.optim.momentum import Momentum
-from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
-from mindspore.train.loss_scale_manager import DynamicLossScaleManager, FixedLossScaleManager
-from mindspore.train.model import Model
+from mindspore import Tensor, context
 from mindspore.context import ParallelMode
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+from mindspore.nn.optim import Momentum
+from mindspore.communication.management import init, get_rank, get_group_size
+from mindspore.train.callback import ModelCheckpoint
+from mindspore.train.callback import CheckpointConfig, Callback
+from mindspore.train.model import Model
+from mindspore.train.loss_scale_manager import DynamicLossScaleManager, FixedLossScaleManager
 from mindspore.common import set_seed
-from mindspore.common import dtype as mstype
-from mindspore.nn.loss.loss import LossBase
-from mindspore.ops import functional as F
-from mindspore.ops import operations as P
 
-from src.config import imagenet_cfg
-from src.dataset import create_dataset_imagenet
-import src.senet_ms as senets
+from src.dataset import classification_dataset
+from src.crossentropy import CrossEntropy
+from src.lr_generator import get_lr
+from src.utils.logging import get_logger
+from src.utils.optimizers__init__ import get_param_groups
+from src.utils.var_init import load_pretrain_model
+from src.image_classification import get_network
+from src.model_utils.config import config
+
+from src.model_utils.moxing_adapter import moxing_wrapper
+
 
 set_seed(1)
 
-def lr_steps_cifar10(global_step, lr_max=None, total_epochs=None, steps_per_epoch=None):
-    """Set learning rate."""
-    lr_each_step = []
-    total_steps = steps_per_epoch * total_epochs
-    decay_epoch_index = [0.3 * total_steps, 0.6 * total_steps, 0.8 * total_steps]
-    for i in range(total_steps):
-        if i < decay_epoch_index[0]:
-            lr_each_step.append(lr_max)
-        elif i < decay_epoch_index[1]:
-            lr_each_step.append(lr_max * 0.1)
-        elif i < decay_epoch_index[2]:
-            lr_each_step.append(lr_max * 0.01)
-        else:
-            lr_each_step.append(lr_max * 0.001)
-    current_step = global_step
-    lr_each_step = np.array(lr_each_step).astype(np.float32)
-    learning_rate = lr_each_step[current_step:]
 
-    return learning_rate
+class BuildTrainNetwork(nn.Cell):
+    """build training network"""
+    def __init__(self, network, criterion):
+        super(BuildTrainNetwork, self).__init__()
+        self.network = network
+        self.criterion = criterion
+
+    def construct(self, input_data, label):
+        output = self.network(input_data)
+        loss = self.criterion(output, label)
+        return loss
 
 
-def lr_steps_imagenet(_cfg, steps_per_epoch):
-    """lr step for imagenet"""
-    if _cfg.lr_scheduler == 'exponential':
-        _lr = warmup_step_lr(_cfg.lr_init,
-                             _cfg.lr_epochs,
-                             steps_per_epoch,
-                             _cfg.warmup_epochs,
-                             _cfg.epoch_size,
-                             gamma=_cfg.lr_gamma,
-                             )
-    elif _cfg.lr_scheduler == 'cosine_annealing':
-        _lr = warmup_cosine_annealing_lr(_cfg.lr_init,
-                                         steps_per_epoch,
-                                         _cfg.warmup_epochs,
-                                         _cfg.epoch_size,
-                                         _cfg.T_max,
-                                         _cfg.eta_min)
+class ProgressMonitor(Callback):
+    """monitor loss and time"""
+    def __init__(self, args):
+        super(ProgressMonitor, self).__init__()
+        self.me_epoch_start_time = 0
+        self.me_epoch_start_step_num = 0
+        self.args = args
+        self.ckpt_history = []
+
+    def begin(self, run_context):
+        self.args.logger.info('start network train...')
+
+    def epoch_begin(self, run_context):
+        pass
+
+    def epoch_end(self, run_context, *me_args):
+        cb_params = run_context.original_args()
+        me_step = cb_params.cur_step_num - 1
+
+        real_epoch = me_step // self.args.steps_per_epoch
+        time_used = time.time() - self.me_epoch_start_time
+        fps_mean = self.args.per_batch_size * (me_step-self.me_epoch_start_step_num) * self.args.group_size / time_used
+        self.args.logger.info('epoch[{}], iter[{}], loss:{}, mean_fps:{:.2f}'
+                              'imgs/sec'.format(real_epoch, me_step, cb_params.net_outputs, fps_mean))
+
+        if self.args.rank_save_ckpt_flag:
+            import glob
+            ckpts = glob.glob(os.path.join(self.args.outputs_dir, '*.ckpt'))
+            for ckpt in ckpts:
+                ckpt_fn = os.path.basename(ckpt)
+                if not ckpt_fn.startswith('{}-'.format(self.args.rank)):
+                    continue
+                if ckpt in self.ckpt_history:
+                    continue
+                self.ckpt_history.append(ckpt)
+                self.args.logger.info('epoch[{}], iter[{}], loss:{}, ckpt:{},'
+                                      'ckpt_fn:{}'.format(real_epoch, me_step, cb_params.net_outputs, ckpt, ckpt_fn))
+
+
+        self.me_epoch_start_step_num = me_step
+        self.me_epoch_start_time = time.time()
+
+    def step_begin(self, run_context):
+        pass
+
+    def step_end(self, run_context, *me_args):
+        pass
+
+    def end(self, run_context):
+        self.args.logger.info('end network train...')
+
+
+def set_parameters():
+    """parameters"""
+    context.set_context(mode=context.GRAPH_MODE,
+                        device_target=config.device_target, save_graphs=False)
+    # init distributed
+    if config.run_distribute:
+        init()
+        config.rank = get_rank()
+        config.group_size = get_group_size()
     else:
-        raise NotImplementedError(_cfg.lr_scheduler)
+        config.rank = 0
+        config.group_size = 1
 
-    return _lr
+    if config.is_dynamic_loss_scale == 1:
+        config.loss_scale = 1  # for dynamic loss scale can not set loss scale in momentum opt
 
-
-def linear_warmup_lr(current_step, warmup_steps, base_lr, init_lr):
-    lr_inc = (float(base_lr) - float(init_lr)) / float(warmup_steps)
-    lr1 = float(init_lr) + lr_inc * current_step
-    return lr1
-
-
-def warmup_step_lr(lr2, lr_epochs, steps_per_epoch, warmup_epochs, max_epoch, gamma=0.1):
-    """warmup step lr"""
-    base_lr = lr2
-    warmup_init_lr = 0
-    total_steps = int(max_epoch * steps_per_epoch)
-    warmup_steps = int(warmup_epochs * steps_per_epoch)
-    milestones = lr_epochs
-    milestones_steps = []
-    for milestone in milestones:
-        milestones_step = milestone * steps_per_epoch
-        milestones_steps.append(milestones_step)
-
-    lr_each_step = []
-    lr2 = base_lr
-    milestones_steps_counter = Counter(milestones_steps)
-    for i in range(total_steps):
-        if i < warmup_steps:
-            lr2 = linear_warmup_lr(i + 1, warmup_steps, base_lr, warmup_init_lr)
-        else:
-            lr2 = lr2 * gamma ** milestones_steps_counter[i]
-        lr_each_step.append(lr2)
-
-    return np.array(lr_each_step).astype(np.float32)
-
-
-def multi_step_lr(lr3, milestones, steps_per_epoch, max_epoch, gamma=0.1):
-    """lr"""
-    return warmup_step_lr(lr3, milestones, steps_per_epoch, 0, max_epoch, gamma=gamma)
-
-
-def step_lr(lr4, epoch_size, steps_per_epoch, max_epoch, gamma=0.1):
-    """lr"""
-    lr_epochs = []
-    for i in range(1, max_epoch):
-        if i % epoch_size == 0:
-            lr_epochs.append(i)
-    return multi_step_lr(lr4, lr_epochs, steps_per_epoch, max_epoch, gamma=gamma)
-
-
-def warmup_cosine_annealing_lr(lr5, steps_per_epoch, warmup_epochs, max_epoch, T_max, eta_min=0):
-    """ warmup cosine annealing lr"""
-    base_lr = lr5
-    warmup_init_lr = 0
-    total_steps = int(max_epoch * steps_per_epoch)
-    warmup_steps = int(warmup_epochs * steps_per_epoch)
-
-    lr_each_step = []
-    for i in range(total_steps):
-        last_epoch = i // steps_per_epoch
-        if i < warmup_steps:
-            lr5 = linear_warmup_lr(i + 1, warmup_steps, base_lr, warmup_init_lr)
-        else:
-            lr5 = eta_min + (base_lr - eta_min) * (1. + math.cos(math.pi * last_epoch / T_max)) / 2
-        lr_each_step.append(lr5)
-
-    return np.array(lr_each_step).astype(np.float32)
-
-
-class CrossEntropySmooth(LossBase):
-    """CrossEntropy"""
-    def __init__(self, sparse=True, reduction='mean', smooth_factor=0., num_classes=1000):
-        super(CrossEntropySmooth, self).__init__()
-        self.onehot = P.OneHot()
-        self.sparse = sparse
-        self.on_value = Tensor(1.0 - smooth_factor, mstype.float32)
-        self.off_value = Tensor(1.0 * smooth_factor / (num_classes - 1), mstype.float32)
-        self.ce = nn.SoftmaxCrossEntropyWithLogits(reduction=reduction)
-
-    def construct(self, logit, label):
-        if self.sparse:
-            label = self.onehot(label, F.shape(logit)[1], self.on_value, self.off_value)
-        loss2 = self.ce(logit, label)
-        return loss2
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Classification')
-    parser.add_argument('--dataset_name', type=str, default='imagenet', choices=['imagenet', 'cifar10'],
-                        help='dataset name.')
-    parser.add_argument('--device_id', type=int, default=None, help='device id of GPU or Ascend. (Default: None)')
-    args_opt = parser.parse_args()
-
-    if args_opt.dataset_name == "imagenet":
-        cfg = imagenet_cfg
+    # select for master rank save ckpt or all rank save, compatible for model parallel
+    config.rank_save_ckpt_flag = 0
+    if config.is_save_on_master:
+        if config.rank == 0:
+            config.rank_save_ckpt_flag = 1
     else:
-        raise ValueError("Unsupported dataset.")
+        config.rank_save_ckpt_flag = 1
 
-    # set context
-    device_target = cfg.device_target
+    # logger
+    config.outputs_dir = os.path.join(config.output_path,
+                                      datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
+    config.logger = get_logger(config.outputs_dir, config.rank)
+    return config
 
-    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.device_target)
-    # context.set_context(enable_graph_kernel=True)
-    device_num = int(os.getenv('RANK_SIZE', '1'))
+@moxing_wrapper()
+def train():
+    """training process"""
+    set_parameters()
+    if int(os.getenv('DEVICE_ID', "0")):
+        context.set_context(device_id=int(os.getenv('DEVICE_ID')))
 
-    if device_target == "Ascend":
-        device_id = int(os.getenv('DEVICE_ID', '0'))
-        if args_opt.device_id is not None:
-            context.set_context(device_id=args_opt.device_id)
-        else:
-            context.set_context(device_id=cfg.device_id)
+    # init distributed
+    if config.run_distribute:
+        parallel_mode = ParallelMode.DATA_PARALLEL
+        context.set_auto_parallel_context(parallel_mode=parallel_mode, device_num=config.group_size,
+                                          gradients_mean=True)
+    # dataloader
+    de_dataset = classification_dataset(config.data_path, config.image_size,
+                                        config.per_batch_size, 1,
+                                        config.rank, config.group_size, num_parallel_workers=8)
+    config.steps_per_epoch = de_dataset.get_dataset_size()
 
-        if device_num > 1:
-            context.reset_auto_parallel_context()
-            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
-            init()
-    elif device_target == "GPU":
-        if args_opt.device_id is not None:
-            device_id = args_opt.device_id
-            context.set_context(device_id=device_id)
-        else:
-            device_id = cfg.device_id
-            context.set_context(device_id=device_id)
-        if device_num > 1:
-            init()
-            context.reset_auto_parallel_context()
-            context.set_auto_parallel_context(device_num=device_num, parallel_mode=ParallelMode.DATA_PARALLEL,
-                                              gradients_mean=True)
-            device_id = get_rank()
+    config.logger.save_args(config)
+
+    # network
+    config.logger.important_info('start create network')
+    # get network and init
+    network = get_network(network=config.network, num_classes=config.num_classes, platform=config.device_target)
+
+    load_pretrain_model(config.checkpoint_file_path, network, config)
+
+    # lr scheduler
+    lr = get_lr(config)
+
+    # optimizer
+    opt = Momentum(params=get_param_groups(network),
+                   learning_rate=Tensor(lr),
+                   momentum=config.momentum,
+                   weight_decay=config.weight_decay,
+                   loss_scale=config.loss_scale)
+
+
+    # loss
+    if not config.label_smooth:
+        config.label_smooth_factor = 0.0
+    loss = CrossEntropy(smooth_factor=config.label_smooth_factor, num_classes=config.num_classes)
+
+    if config.is_dynamic_loss_scale == 1:
+        loss_scale_manager = DynamicLossScaleManager(init_loss_scale=65536, scale_factor=2, scale_window=2000)
     else:
-        raise ValueError("Unsupported platform.")
+        loss_scale_manager = FixedLossScaleManager(config.loss_scale, drop_overflow_update=False)
 
-    if args_opt.dataset_name == "imagenet":
-        dataset = create_dataset_imagenet(cfg.data_path, 1)
-    else:
-        raise ValueError("Unsupported dataset.")
+    model = Model(network, loss_fn=loss, optimizer=opt, loss_scale_manager=loss_scale_manager,
+                  metrics={'acc'}, amp_level="O3")
 
-    batch_num = dataset.get_dataset_size()
+    # checkpoint save
+    progress_cb = ProgressMonitor(config)
+    callbacks = [progress_cb,]
+    if config.rank_save_ckpt_flag:
+        ckpt_config = CheckpointConfig(save_checkpoint_steps=config.ckpt_interval * config.steps_per_epoch,
+                                       keep_checkpoint_max=config.ckpt_save_max)
+        save_ckpt_path = os.path.join(config.outputs_dir, 'ckpt_' + str(config.rank) + '/')
+        ckpt_cb = ModelCheckpoint(config=ckpt_config,
+                                  directory=save_ckpt_path,
+                                  prefix='{}'.format(config.rank))
+        callbacks.append(ckpt_cb)
 
-    net = senets.se_resnext50_32x4d(cfg.num_classes)
-    # Continue training if set pre_trained to be True
-    if cfg.pre_trained:
-        param_dict = load_checkpoint(cfg.checkpoint_path)
-        load_param_into_net(net, param_dict)
-
-    loss_scale_manager = None
-    if args_opt.dataset_name == 'cifar10':
-        lr = lr_steps_cifar10(0, lr_max=cfg.lr_init, total_epochs=cfg.epoch_size, steps_per_epoch=batch_num)
-        opt = Momentum(filter(lambda x: x.requires_grad, net.get_parameters()),
-                       learning_rate=Tensor(lr),
-                       momentum=cfg.momentum,
-                       weight_decay=cfg.weight_decay)
-        loss = nn.SoftmaxCrossEntropyWithLogits(sparse=True, reduction='mean')
-
-    elif args_opt.dataset_name == 'imagenet':
-        lr = lr_steps_imagenet(cfg, batch_num)
+    model.train(config.max_epoch, de_dataset, callbacks=callbacks, dataset_sink_mode=True)
 
 
-        def get_param_groups(network):
-            """ get param groups """
-            decay_params = []
-            no_decay_params = []
-            for x in network.trainable_params():
-                parameter_name = x.name
-                if parameter_name.endswith('.bias'):
-                    # all bias not using weight decay
-                    no_decay_params.append(x)
-                elif parameter_name.endswith('.gamma'):
-                    # bn weight bias not using weight decay, be carefully for now x not include BN
-                    no_decay_params.append(x)
-                elif parameter_name.endswith('.beta'):
-                    # bn weight bias not using weight decay, be carefully for now x not include BN
-                    no_decay_params.append(x)
-                else:
-                    decay_params.append(x)
-
-            return [{'params': no_decay_params, 'weight_decay': 0.0}, {'params': decay_params}]
-
-
-        if cfg.is_dynamic_loss_scale:
-            cfg.loss_scale = 1
-
-        opt = Momentum(params=get_param_groups(net),
-                       learning_rate=Tensor(lr),
-                       momentum=cfg.momentum,
-                       weight_decay=cfg.weight_decay,
-                       loss_scale=cfg.loss_scale)
-        if not cfg.use_label_smooth:
-            cfg.label_smooth_factor = 0.0
-        loss = CrossEntropySmooth(sparse=True, reduction="mean",
-                                  smooth_factor=cfg.label_smooth_factor, num_classes=cfg.num_classes)
-
-        if cfg.is_dynamic_loss_scale == 1:
-            loss_scale_manager = DynamicLossScaleManager(init_loss_scale=65536, scale_factor=2, scale_window=2000)
-        else:
-            loss_scale_manager = FixedLossScaleManager(cfg.loss_scale, drop_overflow_update=False)
-
-    model = Model(net, loss_fn=loss, optimizer=opt, metrics={'acc'},
-                  amp_level="O3", keep_batchnorm_fp32=False, loss_scale_manager=loss_scale_manager)
-
-    config_ck = CheckpointConfig(save_checkpoint_steps=batch_num * 2, keep_checkpoint_max=cfg.keep_checkpoint_max)
-    time_cb = TimeMonitor(data_size=batch_num)
-    ckpt_save_dir = "./ckpt" + "/"
-    ckpoint_cb = ModelCheckpoint(prefix="train_senet_" + args_opt.dataset_name, directory=ckpt_save_dir,
-                                 config=config_ck)
-    loss_cb = LossMonitor()
-    cbs = [time_cb, ckpoint_cb, loss_cb]
-    if device_num > 1 and device_id != 0:
-        cbs = [time_cb, loss_cb]
-    model.train(cfg.epoch_size, dataset, callbacks=cbs)
-    print("train success")
+if __name__ == "__main__":
+    train()
