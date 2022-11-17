@@ -1,0 +1,49 @@
+#data
+data_root: 
+train_list: voc_train_lst.txt
+val_list: voc_val_lst.txt
+classes: 21
+prefix: VOC
+save_dir: ./checkpoints/
+backbone: resnet50
+pretrain_path: 
+ckpt: 
+
+#train
+device_target: GPU
+device_num: 7
+collection_freq: 2
+distribute: False
+arch: cp
+feature_size: 60
+train_h: 473
+train_w: 473
+scale_min: 0.5  # minimum random scale
+scale_max: 2.0  # maximum random scale
+rotate_min: -10  # minimum random rotate
+rotate_max: 10  # maximum random rotate
+zoom_factor: 8  # zoom factor for final prediction during training, be in [1, 2, 4, 8]
+ignore_label: 255
+aux_weight: 0.4
+data_name:
+batch_size: 6  # batch size for training
+batch_size_val: 6  # batch size for validation during training, memory and speed tradeoff
+base_lr: 0.02
+epochs: 200
+start_epoch: 0
+power: 0.9
+momentum: 0.9
+weight_decay: 0.0001
+
+# test
+test_list: 
+split: val  # split in [train, val and test]
+base_size: 512  # based size for scaling
+test_h: 473
+test_w: 473
+scales: [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]  # evaluation scales, ms as [0.5, 0.75, 1.0, 1.25, 1.5, 1.75]
+index_start: 0  # evaluation start index in list
+index_step: 0  # evaluation step index in list, 0 means to end
+result_path: 
+color_txt: ./config/voc2012_colors.txt
+name_txt: ./config/voc2012_names.txt
