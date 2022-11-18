@@ -53,6 +53,7 @@ cp ../*.py ./train
 cp ../*.yaml ./train
 cp -r ../src ./train
 cp -r ../model_utils ./train
+cp -r ../third_party ./train
 cd ./train || exit
 echo "start training for device $DEVICE_ID"
 env > env.log

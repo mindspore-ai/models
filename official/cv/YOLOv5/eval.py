@@ -15,14 +15,16 @@
 """YoloV5 eval."""
 import os
 import time
-
-import numpy as np
+import shutil
 
 import mindspore as ms
+from mindspore import context
+from mindspore.context import ParallelMode
+from mindspore.communication.management import init, get_group_size, get_rank
 
 from src.yolo import YOLOV5
 from src.logger import get_logger
-from src.util import DetectionEngine
+from src.util import DetectionEngine, EvalWrapper
 from src.yolo_dataset import create_yolo_dataset
 
 from model_utils.config import config
@@ -32,10 +34,21 @@ from model_utils.moxing_adapter import moxing_wrapper, modelarts_pre_process
 
 
 def eval_preprocess():
-    config.data_root = os.path.join(config.data_dir, 'val2017')
-    config.ann_file = os.path.join(config.data_dir, 'annotations/instances_val2017.json')
+    config.val_img_dir = os.path.join(config.data_dir, config.val_img_dir)
+    config.val_ann_file = os.path.join(config.data_dir, config.val_ann_file)
     device_id = int(os.getenv('DEVICE_ID', '0'))
     ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, device_id=device_id)
+    parallel_mode = ParallelMode.STAND_ALONE
+    config.eval_parallel = config.is_distributed and config.eval_parallel
+    device_num = 1
+    if config.eval_parallel:
+        init()
+        config.rank = get_rank()
+        config.group_size = get_group_size()
+        device_num = get_group_size()
+        parallel_mode = ParallelMode.DATA_PARALLEL
+    context.reset_auto_parallel_context()
+    context.set_auto_parallel_context(parallel_mode=parallel_mode, gradients_mean=True, device_num=device_num)
 
     # logger module is managed by config, it is used in other function. e.x. config.logger.info("xxx")
     config.logger = get_logger(config.output_dir, device_id)
@@ -68,9 +81,12 @@ def run_eval():
         load_parameters(network, config.pretrained)
     else:
         raise FileNotFoundError(f"{config.pretrained} is not a filename.")
-
-    ds = create_yolo_dataset(config.data_root, config.ann_file, is_training=False, batch_size=config.per_batch_size,
-                             device_num=1, rank=0, shuffle=False, config=config)
+    rank_id = int(os.getenv('RANK_ID', '0'))
+    if config.eval_parallel:
+        rank_id = get_rank()
+    ds = create_yolo_dataset(config.val_img_dir, config.val_ann_file, is_training=False,
+                             batch_size=config.per_batch_size, device_num=config.group_size,
+                             rank=rank_id, shuffle=False, config=config)
 
     config.logger.info('testing shape : %s', config.test_img_shape)
     config.logger.info('total %d images to eval', ds.get_dataset_size() * config.per_batch_size)
@@ -79,31 +95,14 @@ def run_eval():
 
     # init detection engine
     detection = DetectionEngine(config, config.test_ignore_threshold)
+    if config.eval_parallel:
+        if os.path.exists(config.save_prefix):
+            shutil.rmtree(config.save_prefix, ignore_errors=True)
 
-    input_shape = ms.Tensor(tuple(config.test_img_shape), ms.float32)
     config.logger.info('Start inference....')
-    for index, data in enumerate(ds.create_dict_iterator(output_numpy=True, num_epochs=1)):
-        image = data["image"]
-        # adapt network shape of input data
-        image = np.concatenate((image[..., ::2, ::2], image[..., 1::2, ::2],
-                                image[..., ::2, 1::2], image[..., 1::2, 1::2]), axis=1)
-        image = ms.Tensor(image)
-        image_shape_ = data["image_shape"]
-        image_id_ = data["img_id"]
-        output_big, output_me, output_small = network(image, input_shape)
-        output_big = output_big.asnumpy()
-        output_me = output_me.asnumpy()
-        output_small = output_small.asnumpy()
-        detection.detect([output_small, output_me, output_big], config.per_batch_size, image_shape_, image_id_)
-
-        if index % 50 == 0:
-            config.logger.info('Processing... {:.2f}% '.format(index / ds.get_dataset_size() * 100))
-
-    config.logger.info('Calculating mAP...')
-    detection.do_nms_for_results()
-    result_file_path = detection.write_result()
-    config.logger.info('result file path: %s', result_file_path)
-    eval_result = detection.get_eval_result()
+    eval_wrapper = EvalWrapper(config, network, ds, detection)
+    eval_wrapper.inference()
+    eval_result, _ = eval_wrapper.get_results()
 
     cost_time = time.time() - start_time
     eval_log_string = '\n=============coco eval result=========\n' + eval_result
