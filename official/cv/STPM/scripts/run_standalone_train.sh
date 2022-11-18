@@ -47,7 +47,7 @@ cd ./$train_path
 env > env0.log
 echo "[INFO] start train dataset $category with device_id: $device_id"
 python ../../train.py \
---data_url $DATA_PATH \
+--dataset_path $DATA_PATH \
 --pre_ckpt_path $CKPT_APTH \
 --category $category \
 --device_id $device_id \

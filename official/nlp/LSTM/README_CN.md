@@ -349,7 +349,7 @@ Ascend:
   上述shell脚本在后台执行训练，得到如下损失值：
 
   ```shell
-  # grep "loss is " log.txt
+  # grep "loss is " train.log
   epoch: 1 step: 390, loss is 0.6003723
   epcoh: 2 step: 390, loss is 0.35312173
   ...
@@ -366,7 +366,7 @@ Ascend:
   上述shell脚本在后台运行分布式训练，得到如下损失值：
 
   ```shell
-  # grep "loss is " log.txt
+  # grep "loss is " train.log
   epoch: 1 step: 390, loss is 0.6003723
   epcoh: 2 step: 390, loss is 0.35312173
   ...
@@ -383,7 +383,7 @@ Ascend:
   上述shell脚本在后台执行训练，得到如下损失值：
 
   ```shell
-  # grep "loss is " log.txt
+  # grep "loss is " train.log
   epoch: 1 step: 390, loss is 0.6003723
   epcoh: 2 step: 390, loss is 0.35312173
   ...

@@ -206,37 +206,37 @@ bash run_distribute_train_s8_r2_gpu.sh /PATH/TO/MINDRECORD_NAME /PATH/TO/PRETRAI
 1.使用voc val数据集评估s16。评估脚本如下：
 
 ```bash
-bash run_eval_s16_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL DEVICE_ID
+bash run_eval_s16_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
 ```
 
 2.使用voc val数据集评估多尺度s16。评估脚本如下：
 
 ```bash
-bash run_eval_s16_multiscale_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL DEVICE_ID
+bash run_eval_s16_multiscale_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
 ```
 
 3.使用voc val数据集评估多尺度和翻转s16。评估脚本如下：
 
 ```bash
-bash run_eval_s16_multiscale_flip_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL DEVICE_ID
+bash run_eval_s16_multiscale_flip_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
 ```
 
 4.使用voc val数据集评估s8。评估脚本如下：
 
 ```bash
-bash run_eval_s8_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL DEVICE_ID
+bash run_eval_s8_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
 ```
 
 5.使用voc val数据集评估多尺度s8。评估脚本如下：
 
 ```bash
-bash run_eval_s8_multiscale_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL DEVICE_ID
+bash run_eval_s8_multiscale_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
 ```
 
 6.使用voc val数据集评估多尺度和翻转s8。评估脚本如下：
 
 ```bash
-bash run_eval_s8_multiscale_flip_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL DEVICE_ID
+bash run_eval_s8_multiscale_flip_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
 ```
 
 # 脚本说明
@@ -559,7 +559,7 @@ python ${train_code_path}/eval.py --data_root=/PATH/TO/DATA  \
                     --scales=1.75  \
                     --flip  \
                     --freeze_bn  \
-                    --ckpt_path=/PATH/TO/PRETRAIN_MODEL >${eval_path}/eval_log 2>&1 &
+                    --ckpt_dir=/PATH/TO/PRETRAIN_MODEL_DIR >${eval_path}/eval_log 2>&1 &
 ```
 
 #### GPU处理器环境运行

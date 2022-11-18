@@ -155,6 +155,7 @@ RetinaFace可以使用ResNet50或MobileNet0.25骨干提取图像特征进行检�
         │   ├──run_standalone_eval_ascend.sh       // Ascend评估的shell脚本
         │   ├──run_standalone_eval_gpu.sh          // GPU评估的shell脚本
         │   ├──run_standalone_train_ascend.sh      // Ascend单卡训练的shell脚本
+        |   ├──run_standalone_train_gpu.sh         // GPU单卡训练的shell脚本
         ├── src
         │   ├──augmentation.py                     // 数据增强方法
         │   ├──config.py                           // 参数配置
@@ -296,6 +297,8 @@ RetinaFace可以使用ResNet50或MobileNet0.25骨干提取图像特征进行检�
   ```bash
   export CUDA_VISIBLE_DEVICES=0
   python train.py --backbone_name 'MobileNet025' > train.log 2>&1 &
+  OR
+  bash ./scripts/run_standalone_train_gpu.sh
   ```
 
   上述python命令在后台运行，可通过`train.log`文件查看结果。

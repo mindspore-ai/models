@@ -129,7 +129,7 @@ class MovieReview(DataProcessor):
         self.Pos = []
         self.Neg = []
         if ms.get_context("device_target") == "CPU":
-            encoding = "Latin1"
+            encoding = "utf-8"
         else:
             encoding = None
         for filename in self.files:
@@ -149,7 +149,7 @@ class MovieReview(DataProcessor):
         input:
             filePath: the path where the data is stored in
         """
-        with open(filePath, 'r') as f:
+        with open(filePath, 'r', 'utf-8') as f:
             for sentence in f.readlines():
                 sentence = sentence.replace('\n', '')\
                                     .replace('"', '')\

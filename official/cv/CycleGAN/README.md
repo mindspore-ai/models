@@ -38,8 +38,8 @@ Download CycleGAN datasets and create your own datasets. We provide data/downloa
 
 # [Environment Requirements](#contents)
 
-- Hardware（Ascend/GPU）
-    - Prepare hardware environment with Ascend or GPU processor.
+- Hardware（Ascend/GPU/CPU）
+    - Prepare hardware environment with Ascend or GPU or CPU processor.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
@@ -61,9 +61,6 @@ The entire code structure is as following:
   └─ run_train_ascend.sh                # launch ascend training(1 pcs)
   └─ run_train_standalone_gpu.sh        # launch gpu training(1 pcs)
   └─ run_train_distributed_gpu.sh       # launch gpu training(8 pcs)
-  └─ run_eval_ascend.sh                 # launch ascend eval
-  └─ run_eval_gpu.sh                    # launch gpu eval
-  └─ run_eval_onnx.sh                   # launch ONNX eval
   └─ run_infer_310.sh                   # launch 310 infer
 ├─ imgs
   └─ objects-transfiguration.jpg        # CycleGAN Imgs
@@ -106,7 +103,7 @@ The entire code structure is as following:
 Major parameters in train.py and config.py as follows:
 
 ```python
-"platform": Ascend       # run platform, only support GPU and Ascend.
+"platform": Ascend       # run platform, support GPU and Ascend and CPU.
 "device_id": 0           # device id, default is 0.
 "model": "resnet"        # generator model.
 "pool_size": 50          # the size of image buffer that stores previously generated images, default is 50.
@@ -133,19 +130,28 @@ Major parameters in train.py and config.py as follows:
 - running on Ascend with default parameters
 
 ```bash
-sh ./scripts/run_train_ascend.sh
+bash scripts/run_train_ascend.sh [DATA_PATH] [EPOCH_SIZE]
+# epoch_size is recommended 200
 ```
 
 - running on GPU with default parameters
 
 ```bash
-sh ./scripts/run_train_standalone_gpu.sh
+bash scripts/run_train_standalone_gpu.sh [DATA_PATH] [EPOCH_SIZE]
+# epoch_size is recommended 200
 ```
 
 - running on 8 GPUs with default parameters
 
 ```bash
-sh ./scripts/run_train_distributed_gpu.sh
+bash scripts/run_train_distributed_gpu.sh [DATA_PATH] [EPOCH_SIZE]
+# epoch_size is recommended 600
+```
+
+- running on CPU with default parameters
+
+```bath
+python train.py --platform CPU --dataroot [DATA_PATH] --use_random False --max_epoch [EPOCH_SIZE] --print_iter 1 pool_size 0
 ```
 
 ## [Evaluation](#contents)

@@ -12,14 +12,13 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-if [ $# != 2 ]
-then
-    echo "Usage: bash scripts/run_train_distributed_gpu.sh [DATA_PATH] [EPOCH_SIZE]"
-exit 1
-fi
+# ============================================================================
 
-DATA_PATH=$1
-EPOCH_SIZE=$2
-mpirun -n 8 --output-filename log_output --merge-stderr-to-stdout --allow-run-as-root \
-    python train.py --platform GPU --model ResNet --max_epoch $EPOCH_SIZE --n_epochs 300 \
-    --device_num 8 --dataroot $DATA_PATH  > output.train.log 2>&1 &
+echo "Usage: bash ./scripts/run_standalone_train_gpu.sh"
+
+export DEVICE_NUM=1
+export DEVICE_ID=0
+export RANK_ID=0
+export RANK_SIZE=1
+
+python train.py --backbone_name 'MobileNet025' > train.log 2>&1 &
