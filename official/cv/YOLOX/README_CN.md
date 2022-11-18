@@ -167,6 +167,14 @@ head中的回归分支和分类分支进行了解耦(Decoupled head),并且将ob
     |    |----yolox_dataset.py
     |    |----yolo_fpn.py
     |    |----yolo_pafpn.py
+    |----third_party
+    │    |----__init__.py
+    │    |----build.sh
+    │    |----cocoeval
+    │    │    |----cocoeval.cpp
+    │    │    |----cocoeval.h
+    │    |----fast_coco_eval_api.py
+    │    |----setup.py
     |----train.py
     |----eval.py
     |----export.py
@@ -213,7 +221,7 @@ train.py中主要的参数如下:
 --rank                      分布式本地进程序号。 默认值：0
 --group_size                设备进程总数。 默认值：1
 --run_eval                  是否开启边训练边推理。默认为False
---eval_parallel             是否开启并行推理。默认为 False。仅在 run_eval 为 True，并且 is_distributed 为 1 时有效
+--eval_parallel             是否开启并行推理。默认为 True。仅在 run_eval 为 True，并且 is_distributed 为 1 时有效
 ```
 
 ## 训练过程
@@ -302,7 +310,9 @@ train.py中主要的参数如下:
 python eval.py --data_dir=./dataset/xxx --val_ckpt=your_val_ckpt_file_path --per_batch_size=8 --backbone=yolox_darknet53
 ```
 
-backbone参数指定为yolox_darknet53或者yolox_x,上述python命令将在后台运行。 您可以通过```%Y-%m-%d_time_%H_%M_%S.log```文件查看结果。
+backbone参数指定为yolox_darknet53或者yolox_x，上述python命令将在后台运行。 您可以通过```%Y-%m-%d_time_%H_%M_%S.log```文件查看结果。
+
+由于 `pycocotools` 中评估结果的程序速度较慢，建议使用 `third_party` 文件夹中提供的第三方库，提升结果评估的速度。进入 `third_party` 文件夹下，运行 `bash build.sh` 命令构建动态链接库即可，程序会自动调用该工具。
 
 #### shell脚本启动
 

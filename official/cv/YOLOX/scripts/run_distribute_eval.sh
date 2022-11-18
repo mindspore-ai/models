@@ -95,6 +95,7 @@ do
     cp ../*.yaml $dir_path
     cp -r ../src $dir_path
     cp -r ../model_utils $dir_path
+    cp -r ../third_party $dir_path
     cd $dir_path || exit
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     env > env.log

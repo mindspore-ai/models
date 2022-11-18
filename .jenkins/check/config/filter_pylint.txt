@@ -8,9 +8,12 @@
 # official
 "models/official/"                                                                       "missing-docstring"
 "models/official/cv"                                                                     "c-extension-no-member"
+
 "models/official/nlp/Bert_thor/src/bert_model.py"                                        "redefined-outer-name"
 "models/official/cv/ResNet/golden_stick/pruner/scop/train.py"                            "protected-access"
 "models/official/cv/ResNet/golden_stick/pruner/scop/eval.py"                            "protected-access"
+"models/official/cv/YOLOX/third_party/fast_coco_eval_api.py"                             "access-member-before-definition"
+
 
 # research
 "models/research/"                                                                       "missing-docstring"
