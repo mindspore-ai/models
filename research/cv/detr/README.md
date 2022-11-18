@@ -16,6 +16,7 @@
         - [Training Performance on GPU](#training-performance-gpu)
     - [Description of Random Situation](#description-of-random-situation)
     - [ModelZoo Homepage](#modelzoo-homepage)
+    - [FAQ](#FAQ)
 
 ## [DETR description](#contents)
 
@@ -72,6 +73,8 @@ After preparing the dataset you can start training and evaluation as follows：
 ### [Running on GPU](#contents)
 
 #### Train
+
+The resnet50 pre-training model download [link](https://download.mindspore.cn/models/r1.3/resnet50_ascend_v130_imagenet2012_official_cv_top1acc76.97_top5acc93.44.ckpt).
 
 ```shell
 # standalone train
@@ -302,3 +305,11 @@ Logs will be saved to parent dir of ckpt, converted model will have the same nam
 ## [ModelZoo Homepage](#contents)
 
 Please visit the official website [homepage](https://gitee.com/mindspore/models).
+
+## FAQ
+
+Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some common question.
+
+- **Q: How to resolve when `You can override this protection bu adding the "overload-allowed" option to your binding directive` in the distributed training log?**
+
+**A**: You can add the `--bind-to core:overload-allowed` parameter to the `mpirun` command as prompted.
