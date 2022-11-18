@@ -61,7 +61,7 @@ cp -r ../model_utils ./test
 cd ./test || exit
 env > env.log
 echo "start inferring for device $DEVICE_ID"
-python test.py \
+python3 test.py \
     --data_dir=$DATASET_PATH \
     --is_distributed=0 \
     --per_batch_size=1 \
