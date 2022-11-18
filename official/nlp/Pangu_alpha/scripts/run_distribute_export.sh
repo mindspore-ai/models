@@ -19,9 +19,10 @@ self_path=$(cd "$(dirname "$0")" || exit; pwd)
 export RANK_SIZE=8
 export RANK_TABLE_FILE=${execute_path}/../serving_increment/pangu_distributed/hccl_8p.json
 export MODE=13B
-export PARAM_INIT_TYPE=fp16
+export PARAM_INIT_TYPE=fp32
 export STRATEGY=$1
 export CKPT_PATH=$2
+export EVAL_TASK=$3
 export CKPT_NAME='filerted'
 
 for((i=0;i<$RANK_SIZE;i++));
@@ -33,5 +34,5 @@ do
   export DEVICE_ID=$i
   python -s ${self_path}/../predict.py --strategy_load_ckpt_path=$STRATEGY --load_ckpt_path=$CKPT_PATH \
                   --load_ckpt_name=$CKPT_NAME --mode=$MODE --run_type=predict --param_init_type=$PARAM_INIT_TYPE \
-                  --export=1 >log$i.log 2>&1 &
+                  --export=1 --eval_task=$EVAL_TASK >log$i.log 2>&1 &
 done

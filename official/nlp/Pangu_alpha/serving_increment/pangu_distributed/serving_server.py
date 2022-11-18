@@ -26,6 +26,7 @@ def start():
                                distributed_address="0.0.0.0:6200")
 
     server.start_grpc_server("127.0.0.1:5500")
+    server.start_restful_server("127.0.0.1:1500")
 
 
 if __name__ == "__main__":

@@ -23,6 +23,47 @@ from mindspore.common.tensor import Tensor
 from mindspore.ops import operations as P
 
 
+def convert_text_to_ids(text, tokenizer, seq_length, pad, plus=0):
+    input_ids = tokenizer.encode(text)
+    input_ids = tokenizer.convert_tokens_to_ids(input_ids)
+    input_ids = np.array(input_ids).reshape(1, -1)
+    if input_ids.shape[-1] > seq_length:
+        input_ids = input_ids[:, :seq_length + plus]
+    pad_length = seq_length + plus - input_ids.shape[-1]
+    input_ids = np.pad(input_ids, ((0, 0), (0, pad_length)), 'constant', constant_values=(0, pad))
+    return input_ids
+
+
+def gather(data, index):
+    result = []
+    for i in range(data.shape[0]):
+        result.append(data[i, index[i]])
+    return np.array(result)
+
+
+def compute_loss(logits, labels, mask):
+    labels = labels.astype(np.int32)
+    select = gather(logits, labels[0])
+    loss = -select * mask
+    loss = np.mean(loss)
+    return loss
+
+
+def get_scores(model_predict, item, tokenizer, pad_length=1024):
+    input_sentence = item['input_str']
+    prompt = item['prompt']
+
+    tokens = convert_text_to_ids(input_sentence, tokenizer, pad_length, pad=tokenizer.pad_id, plus=0)
+    prompt_ids = convert_text_to_ids(prompt, tokenizer, pad_length, pad=tokenizer.pad_id, plus=0)
+    labels = np.concatenate((tokens[:, 1:], np.ones((tokens.shape[0], 1)) * tokenizer.pad_id), axis=-1)
+
+    logits, mask = model_predict.predict(Tensor(np.array(tokens, np.int32)),
+                                         Tensor(np.array(prompt_ids, np.int32)))
+    loss = compute_loss(logits.asnumpy(), labels, mask.asnumpy())
+
+    return loss
+
+
 def topk_fun(logits, topk=5):
     """Get topk"""
     target_column = logits[0].tolist()
@@ -91,6 +132,7 @@ def generate(model, origin_inputs, config):
         model: the model for inferencing
         origin_inputs: the original inputs based on which the model will continue writing
         config: inference configurations
+        return_scores: return the score on the given sentence rather than generating the words. Default False.
 
     Returns:
         outputs: the ids for the generated text

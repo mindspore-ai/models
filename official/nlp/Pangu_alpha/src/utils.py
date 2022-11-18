@@ -417,6 +417,28 @@ def add_context_args_mode(opt):
                      default="semi_auto_parallel",
                      choices=['data_parallel', "semi_auto_parallel", "auto_parallel"], help="The parallel context mode")
 
+
+def add_downstream_params(opt):
+    opt.add_argument("--eval_task",
+                     help="Enable evaluating the tasks. Currently supports WPLC, C3.",
+                     default=None,
+                     choices=['wplc', 'ocnli', 'c3', 'chid'],
+                     type=str)
+    opt.add_argument("--enable_client",
+                     help="Enable evaluation as an client.",
+                     action='store_true')
+    opt.add_argument("--server_ip",
+                     help="The server ip of the model. The evaluation will send the data to the server, so the option"
+                          "should be enabled with enable_client together",
+                     type=str,
+                     default="127.0.0.1")
+    opt.add_argument("--port",
+                     help="The server port of the model. The evaluation will send the data to the server, so the option"
+                          "should be enabled with enable_client together",
+                     type=str,
+                     default="1500")
+
+
 def add_retrain_params(opt):
     """
     Add parameters about retrain.
@@ -548,6 +570,7 @@ def get_args(inference=False):
     add_retrain_params(parser)
     if inference:
         add_inference_params(parser)
+        add_downstream_params(parser)
     args_opt = parser.parse_args()
 
     return args_opt
