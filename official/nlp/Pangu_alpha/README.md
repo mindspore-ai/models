@@ -99,7 +99,7 @@ To obtain the pangu_alpha's script, you need `git` to clone the mindspore's code
 
 ```bash
 git clone https://gitee.com/mindspore/models.git -b master
-cd models/official/nlp/pangu_alpha
+cd models/official/nlp/Pangu_alpha
 ```
 
 For requirements, please refer to [Requirements](#requirements) to install the dependency.
