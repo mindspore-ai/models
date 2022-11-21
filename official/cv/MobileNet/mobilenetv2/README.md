@@ -460,7 +460,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 753 min                                                    | 845 min                   |
 | Params (M)                 | 3.3 M                                                      | 3.3 M                     |
 | Checkpoint for Fine tuning | 27.3 M                                                     | 27.3 M                    |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/mobilenetv2)|
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv2)|
 
 ### Inference Performance
 

@@ -53,7 +53,7 @@ Validation and eval evaluationdataset used: [Set5](http://people.rennes.inria.fr
 
 The process of training ESRGAN needs a pretrained VGG19 based on Imagenet.
 
-[Training scripts](<https://gitee.com/mindspore/models/tree/master/official/cv/vgg16>)|
+[Training scripts](<https://gitee.com/mindspore/models/tree/master/official/cv/VGG/vgg16>)|
 [VGG19 pretrained model](<https://download.mindspore.cn/model_zoo/>)
 
 # [Environment Requirements](#contents)

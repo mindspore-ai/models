@@ -171,8 +171,8 @@ for i,data in enumerate(it):
 - 模型推理
 - 推理结果保存
 
-具体请参考[官网介绍](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.9/infer/ascend_310_mindir.html)，以及已实现的推理模型实现，比如[resnet C++推理](https://gitee.com/mindspore/models/blob/master/official/cv/resnet/cpp_infer/src/main.cc)。
+具体请参考[官网介绍](https://www.mindspore.cn/tutorials/experts/zh-CN/r1.9/infer/ascend_310_mindir.html)，以及已实现的推理模型实现，比如[resnet C++推理](https://gitee.com/mindspore/models/blob/master/official/cv/ResNet/cpp_infer/src/main.cc)。
 
 ### 推理模型编译及执行
 
-一般我们会在scripts目录下写一个`run_infer_cpp.sh`的文件将整个推理流程串起来。详情请参考[resnet](https://gitee.com/mindspore/models/blob/master/official/cv/resnet/scripts/run_infer_cpp.sh)。
+一般我们会在scripts目录下写一个`run_infer_cpp.sh`的文件将整个推理流程串起来。详情请参考[resnet](https://gitee.com/mindspore/models/blob/master/official/cv/ResNet/scripts/run_infer_cpp.sh)。

@@ -383,7 +383,7 @@ Inference result is saved in current path, you can find result in acc.log file.
 | Speed                      | 1pc: 120 ms/step;  8pcs: 160 ms/step                        |
 | Total time                 | 1pc: 150 mins;  8pcs: 70 mins                               |
 | Parameters (M)             | 189                                                         |
-| Scripts                    | [yolov3_resnet18 script](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_resnet18) | [yolov3_resnet18 script](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_resnet18) |
+| Scripts                    | [yolov3_resnet18 script](https://gitee.com/mindspore/models/tree/master/research/cv/yolov3_resnet18) | [yolov3_resnet18 script](https://gitee.com/mindspore/models/tree/master/research/cv/yolov3_resnet18) |
 
 ### Inference Performance
 

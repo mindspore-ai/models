@@ -108,8 +108,8 @@ After installing MindSpore through the official website, you can follow the step
 Notice:
 
 1. It takes a long time to generate the MindRecord file for the first run.
-2. The pre-trained model is a ResNet-50 checkpoint trained on ImageNet2012. You can use the [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) script in ModelZoo to train.
-3. BACKBONE_MODEL is trained through the ResNet-50 [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) script in modelzoo.
+2. The pre-trained model is a ResNet-50 checkpoint trained on ImageNet2012. You can use the [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) script in ModelZoo to train.
+3. BACKBONE_MODEL is trained through the ResNet-50 [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) script in modelzoo.
 4. PRETRAINED_MODEL is the converted weight file. VALIDATION_JSON_FILE is a label file. CHECKPOINT_PATH is the checkpoint file after training.
 
 > For GPU training please use [GPU pretrained ResNet-50 model](https://download.mindspore.cn/model_zoo/r1.3/resnet50_gpu_v130_imagenet_official_cv_bs32_acc0/) (resnet50_gpu_v130_imagenet_official_cv_bs32_acc0)

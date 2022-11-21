@@ -555,7 +555,7 @@ python export.py --config_path [YMAL_CONFIG_PATH] --ckpt_file [CKPT_PATH] --file
 | 速度 | 8卡：97.4毫秒/步 |
 | 总时长 | 8卡：6.1小时 |
 | 调优检查点 |    1.1 GB（.ckpt 文件）               |
-| 脚本                  |[VGG19](https://gitee.com/mindspore/models/tree/master/research/cv/vgg19) |                   |
+| 脚本                  |[VGG19](https://gitee.com/mindspore/models/tree/master/official/cv/VGG/vgg19) |                   |
 
 ### 评估性能
 

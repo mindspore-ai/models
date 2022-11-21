@@ -151,8 +151,8 @@ Faster R-CNN是一个两阶段目标检测网络，该网络采用RPN，可以�
 注意：
 
 1. 第一次运行生成MindRecord文件，耗时较长。
-2. 预训练模型是在ImageNet2012上训练的ResNet-50检查点。你可以使用ModelZoo中 [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) 脚本来训练, 然后使用src/convert_checkpoint.py把训练好的resnet50的权重文件转换为可加载的权重文件。
-3. BACKBONE_MODEL是通过modelzoo中的[resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)脚本训练的。PRETRAINED_MODEL是经过转换后的权重文件。VALIDATION_JSON_FILE为标签文件。CHECKPOINT_PATH是训练后的检查点文件。
+2. 预训练模型是在ImageNet2012上训练的ResNet-50检查点。你可以使用ModelZoo中 [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) 脚本来训练, 然后使用src/convert_checkpoint.py把训练好的resnet50的权重文件转换为可加载的权重文件。
+3. BACKBONE_MODEL是通过modelzoo中的[resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet)脚本训练的。PRETRAINED_MODEL是经过转换后的权重文件。VALIDATION_JSON_FILE为标签文件。CHECKPOINT_PATH是训练后的检查点文件。
 
 ## 在Ascend上运行
 
@@ -619,7 +619,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [IMAGE_WIDTH](optiona
 | 速度 | 1卡：190毫秒/步；8卡：200毫秒/步 | 1卡：320毫秒/步；8卡：335毫秒/步 |1卡：7328毫秒/步|
 | 总时间 | 1卡：37.17小时；8卡：4.89小时 |1卡：63.09小时；8卡：8.25小时 |1卡：13.88小时|
 | 参数(M) | 250 |250 |495|
-| 脚本 | [Faster R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) | [Faster R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |[Faster R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
+| 脚本 | [Faster R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) | [Faster R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) |[Faster R-CNN脚本](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) |
 
 ### 评估性能
 

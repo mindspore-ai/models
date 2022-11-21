@@ -327,7 +327,7 @@ Annotation precision precision = 0.746213
 | Speed                      | 1pc: 355 ms/step;  8pcs: 385 ms/step                  |
 | Total time                 | 1pc: 64 hours;  8pcs: 9 hours                       |
 | Parameters (M)             | 12                                                          |
-| Scripts                    | [crnn_seq2seq_ocr script](https://gitee.com/mindspore/models/tree/master/official/cv/crnn_seq2seq_ocr) |
+| Scripts                    | [crnn_seq2seq_ocr script](https://gitee.com/mindspore/models/tree/master/research/cv/crnn_seq2seq_ocr) |
 
 ### Inference Performance
 

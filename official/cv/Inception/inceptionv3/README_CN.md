@@ -411,14 +411,14 @@ python export.py --config_path [CONFIG_FILE] --ckpt_file [CKPT_PATH] --device_ta
 
 ```bash
 python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format "ONNX"
-# example:python export.py --ckpt_file /home/models/official/cv/inceptionv3/inceptionv3_ascend_v160_imagenet2012_official_cv_top1acc78.69_top5acc94.3.ckpt --device_target "GPU" --file_format "ONNX"
+# example:python export.py --ckpt_file /home/models/official/cv/Inception/inceptionv3/inceptionv3_ascend_v160_imagenet2012_official_cv_top1acc78.69_top5acc94.3.ckpt --device_target "GPU" --file_format "ONNX"
 ```
 
 ### ONNX模型评估
 
 ```bash
     bash run_eval_onnx_gpu.sh [DEVICE_ID] [DATA_DIR] [PATH_ONNX]
-    # example: bash run_eval_onnx_gpu.sh 2 /home/data/ /home/models/official/cv/inceptionv3/inceptionv3.onnx
+    # example: bash run_eval_onnx_gpu.sh 2 /home/data/ /home/models/official/cv/Inception/inceptionv3/inceptionv3.onnx
 ```
 
 ## 推理过程
@@ -467,7 +467,7 @@ accuracy:78.742
 | 参数(M)                    | 103M                                                    |
 | 微调检查点                 | 313M                                                    |
 | 训练速度                   | 单卡：1200img/s;8卡：9500 img/s                         |
-| 脚本                       | [inceptionv3脚本](https://gitee.com/mindspore/models/tree/master/official/cv/inceptionv3) |
+| 脚本                       | [inceptionv3脚本](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv3) |
 
 ### 推理性能
 

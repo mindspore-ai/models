@@ -14,7 +14,7 @@
 # ============================================================================
 
 # This file was copied from project [MindSpore][deeplabv3]
-# https://gitee.com/mindspore/models/blob/master/official/cv/deeplabv3/src/data/get_dataset_lst.py
+# https://gitee.com/mindspore/models/blob/master/official/cv/DeepLabv3/src/data/get_dataset_lst.py
 
 """get_dataset_list"""
 import argparse

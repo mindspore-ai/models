@@ -422,7 +422,7 @@ Top_1_Acc: 0.79886%, Top_5_Acc: 0.94882%
 | Per step time (8p)         | 479 ms/step               | 282 ms/step               |
 | Total time (8p)            | 42h                       | 51h                       |
 | Params (M)                 | 180M                      | 180M                      |
-| Scripts                    | [Xception script](https://gitee.com/mindspore/models/tree/master/official/cv/xception) | [Xception script](https://gitee.com/mindspore/models/tree/master/official/cv/xception) |
+| Scripts                    | [Xception script](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/xception) | [Xception script](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/xception) |
 
 #### Inference Performance
 

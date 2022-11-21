@@ -416,7 +416,7 @@ auc : 0.8057789065281104
 | 总时长| 单卡：90 分钟;                                               | 待运行                 |
 | 参数(M)             | 16.5                                                        | 待运行                  |
 | 微调检查点 | 190M (.ckpt 文件)                                           | 待运行                  |
-| 脚本                    | [DeepFM脚本](https://gitee.com/mindspore/models/tree/master/official/recommend/deepfm) | 待运行                  |
+| 脚本                    | [DeepFM脚本](https://gitee.com/mindspore/models/tree/master/official/recommend/DeepFM) | 待运行                  |
 
 ### 推理性能
 

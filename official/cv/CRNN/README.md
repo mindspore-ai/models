@@ -445,7 +445,7 @@ result CRNNAccuracy is: 0.806666666666
 | Total time                 | 557 mins                                          | 189 mins                                          |
 | Parameters (M)             | 83M (.ckpt file)                                  | 96M                                               |
 | Checkpoint for Fine tuning | 20.3M (.ckpt file)                                |                                                   |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/crnn) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/crnn) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) |
 
 #### [Evaluation Performance](#contents)
 

@@ -220,7 +220,7 @@ step:  3000 Accuracy:  [0.71377236]
 | Total time                 | 11 mins                          |
 | Parameters (M)             | 330                                                       |
 | Checkpoint for Fine tuning | 4.5G(.ckpt file)                                         |
-| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/nlp/bert_thor |
+| Scripts                    | https://gitee.com/mindspore/models/tree/master/official/nlp/Bert_thor |
 
 ## Description of Random Situation
 

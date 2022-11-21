@@ -697,7 +697,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 1pc: 79 ms/step;  8pcs: 104 ms/step              |1pc: 81 ms/step; 8pcs 94.4ms/step                |
 | Total time                 | 1pc: 72 mins;  8pcs: 11.8 mins              |8pcs: 19.7 hours                                 |
 | Checkpoint for Fine tuning | 1.1G(.ckpt file)                             |1.1G(.ckpt file)                                 |
-| Scripts                    |[vgg16](https://gitee.com/mindspore/models/tree/master/official/cv/vgg16) |                   |
+| Scripts                    |[vgg16](https://gitee.com/mindspore/models/tree/master/official/cv/VGG/vgg16) |                   |
 
 #### Evaluation Performance
 

@@ -224,7 +224,7 @@ step:  3000 Accuracy:  [0.71377236]
 | 总时长 | 11分钟 |
 | 参数（M） | 330 |
 | 微调检查点 | 4.5G （.ckpt文件） |
-| 脚本                    | https://gitee.com/mindspore/models/tree/master/official/nlp/bert_thor |
+| 脚本                    | https://gitee.com/mindspore/models/tree/master/official/nlp/Bert_thor |
 
 ## 随机情况说明
 

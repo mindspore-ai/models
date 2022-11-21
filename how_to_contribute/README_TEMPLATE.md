@@ -137,7 +137,7 @@ e.g. you can reference the following template
 | Total time                 | 4 mins                                                       | 11 minds                                      |
 | Parameters (M)             | 11.2                                                         | 11.2                                          |
 | Checkpoint for Fine tuning | 86M (.ckpt file)                                             | 85.4 (.ckpt file)                             |
-| Scripts                    | [link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet)                                    |
+| Scripts                    | [link](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet)                                    |
 
 ### Inference Performance
 
@@ -163,7 +163,7 @@ e.g. you can reference the following template
 
 ## Reference Example
 
-[maskrcnn_readme](https://gitee.com/mindspore/models/blob/master/official/cv/maskrcnn/README.md)
+[maskrcnn_readme](https://gitee.com/mindspore/models/blob/master/official/cv/ResNeXt/README.md)
 
 ## Contributions
 

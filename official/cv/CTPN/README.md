@@ -206,7 +206,7 @@ bash scripts/run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
 # /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
 ```
 
-The `pretrained_path` should be a checkpoint of vgg16 trained on Imagenet2012. The name of weight in dict should be totally the same, also the batch_norm should be enabled in the trainig of vgg16, otherwise fails in further steps.COCO_TEXT_PARSER_PATH coco_text.py can refer to [Link](https://github.com/andreasveit/coco-text).To get the vgg16 backbone, you can use the network structure defined in src/CTPN/vgg16.py.To train the backbone, copy the src/CTPN/vgg16.py under modelzoo/official/cv/vgg16/src/, and modify the vgg16/train.py to suit the new construction.You can fix it as below:
+The `pretrained_path` should be a checkpoint of vgg16 trained on Imagenet2012. The name of weight in dict should be totally the same, also the batch_norm should be enabled in the trainig of vgg16, otherwise fails in further steps.COCO_TEXT_PARSER_PATH coco_text.py can refer to [Link](https://github.com/andreasveit/coco-text).To get the vgg16 backbone, you can use the network structure defined in src/CTPN/vgg16.py.To train the backbone, copy the src/CTPN/vgg16.py under modelzoo/official/cv/VGG/vgg16/src/, and modify the vgg16/train.py to suit the new construction.You can fix it as below:
 
 ```python
 ...
@@ -217,7 +217,7 @@ network = VGG16(num_classes=cfg.num_classes)
 
 ```
 
-To train a better model, you can modify some parameter in modelzoo/official/cv/vgg16/src/config.py, here we suggested you modify the "warmup_epochs" just like below, you can also try to adjust other parameter.
+To train a better model, you can modify some parameter in modelzoo/official/cv/VGG/vgg16/src/config.py, here we suggested you modify the "warmup_epochs" just like below, you can also try to adjust other parameter.
 
 ```python
 
@@ -473,7 +473,7 @@ Evaluation result will be stored in the example path, you can find result like t
 | Loss Function              | SoftmaxCrossEntropyWithLogits for classification, SmoothL2Loss for bbox regression| SoftmaxCrossEntropyWithLogits for classification, SmoothL2Loss for bbox regression|
 | Loss                       | ~0.04                                                        | ~0.04                                                       |
 | Total time (8p)            | 6h                                                           | 11h                                                           |
-| Scripts                    | [ctpn script](https://gitee.com/mindspore/models/tree/master/official/cv/ctpn) | [ctpn script](https://gitee.com/mindspore/models/tree/master/official/cv/ctpn)     |
+| Scripts                    | [ctpn script](https://gitee.com/mindspore/models/tree/master/official/cv/ShuffleNet/shufflenetv1) | [ctpn script](https://gitee.com/mindspore/models/tree/master/official/cv/ShuffleNet/shufflenetv1)     |
 
 #### Inference Performance
 

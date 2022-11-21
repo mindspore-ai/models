@@ -379,7 +379,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 | 速度                      | 1pc：120毫秒/步;  8卡：160毫秒/步                        |
 | 总时长                 | 1pc：150分钟;  8卡: 70分钟                               |
 | 参数(M)             | 189                                                         |
-| 脚本                    | [yolov3_resnet18脚本](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_resnet18) | [yolov3_resnet18脚本](https://gitee.com/mindspore/models/tree/master/official/cv/yolov3_resnet18) |
+| 脚本                    | [yolov3_resnet18脚本](https://gitee.com/mindspore/models/tree/master/research/cv/yolov3_resnet18) | [yolov3_resnet18脚本](https://gitee.com/mindspore/models/tree/master/research/cv/yolov3_resnet18) |
 
 ### 推理性能
 

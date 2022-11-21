@@ -62,7 +62,7 @@ Currently we support host-device mode with multi-dimensional partition parallel 
 
 ```bash
 git clone https://gitee.com/mindspore/models.git
-cd models/official/recommend/wide_and_deep
+cd models/official/recommend/Wide_and_Deep
 ```
 
 2. Download the Dataset
@@ -460,7 +460,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Params(M)                | 75.84                           | 75.84                           | 75.84                           | 75.84                           |
 | Checkpoint for inference | 233MB(.ckpt file)               | 230MB(.ckpt)                    | 233MB(.ckpt file)               | 233MB(.ckpt file)               |
 
-All executable scripts can be found in [here](https://gitee.com/mindspore/models/tree/master/official/recommend/wide_and_deep/script)
+All executable scripts can be found in [here](https://gitee.com/mindspore/models/tree/master/official/recommend/Wide_and_Deep/script)
 
 Note: The result of GPU is tested under the master version. The parameter server mode of the Wide&Deep model is still under development.
 

@@ -380,7 +380,7 @@ class 1 precision is 84.24%, recall is 87.40%, F1 is 85.79%
 | Loss Function              | SoftmaxCrossEntropyWithLogits for classification, SmoothL2Loss for bbox regression                  | SoftmaxCrossEntropyWithLogits for classification, SmoothL2Loss for bbox regression  |
 | Loss                       | ~0.008                                                                                              | ~0.116               |
 | Total time (8p)            | 4h                                                                                                  | 9h                   |
-| Scripts                    | [deeptext script](https://gitee.com/mindspore/models/tree/master/official/cv/deeptext) | [deeptext script](https://gitee.com/mindspore/models/tree/master/official/cv/deeptext)  |
+| Scripts                    | [deeptext script](https://gitee.com/mindspore/models/tree/master/official/cv/DeepText) | [deeptext script](https://gitee.com/mindspore/models/tree/master/official/cv/DeepText)  |
 
 #### Inference Performance
 

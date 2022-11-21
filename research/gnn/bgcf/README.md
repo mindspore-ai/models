@@ -387,7 +387,7 @@ recall_@10:0.10383,     recall_@20:0.15524,     ndcg_@10:0.07503,    ndcg_@20:0.
 | Optimizer                      | Adam                                       | Adam                                       |
 | Loss Function                  | BPR loss                                   | BPR loss                                   |
 | Training Cost                  | 25min                                      | 60min                                      |
-| Scripts                        | [bgcf script](https://gitee.com/mindspore/models/tree/master/official/gnn/bgcf) | [bgcf script](https://gitee.com/mindspore/models/tree/master/official/gnn/bgcf) |
+| Scripts                        | [bgcf script](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) | [bgcf script](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) |
 
 #### Inference Performance
 

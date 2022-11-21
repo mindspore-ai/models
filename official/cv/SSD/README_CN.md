@@ -518,7 +518,7 @@ mAP: 0.33880018942412393
 | 评价指标            | IoU=0.50: 22%               | IoU=0.50: 22%             |
 | 推理模型大小 | 34M(.ckpt file)             | 34M(.ckpt file)             |
 | 参数文件           | ssd300_config.yaml          |ssd300_config_gpu.yaml       |
-| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
 
 | 参数          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -536,7 +536,7 @@ mAP: 0.33880018942412393
 | 评价指标            | IoU=0.50: 29.1 %             | IoU=0.50: 29.1 %             |
 | 推理模型大小 | 96M(.ckpt file)             | 96M(.ckpt file)             |
 | 参数文件           | ssd_mobilenet_v1_fpn_config.yaml  |ssd_mobilenet_v1_fpn_config_gpu.yaml       |
-| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
 
 | 参数          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -554,7 +554,7 @@ mAP: 0.33880018942412393
 | 评价指标            | IoU=0.50: 34.3%            | IoU=0.50: 34.3 %           |
 | 推理模型大小 | 255M(.ckpt file)             | 255M(.ckpt file)             |
 | 参数文件           | ssd_resnet50_fpn_config.yaml | ssd_resnet50_fpn_config_gpu.yaml       |
-| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
 
 | 参数          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -572,7 +572,7 @@ mAP: 0.33880018942412393
 | 评价指标            | IoU=0.50: 23.2%               | IoU=0.50: 23.2%             |
 | 推理模型大小 | 186M(.ckpt file)             | 186M(.ckpt file)             |
 | 参数文件           | ssd_vgg16_config.yaml      | ssd_vgg16_config_gpu.yaml      |
-| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
 
 | 参数           |                        GPU                         |
 | ------------------- | ------------------------------------------------------ |
@@ -590,7 +590,7 @@ mAP: 0.33880018942412393
 | 评价指标            | IoU=0.50: 21.5%                       |
 | 推理模型大小 | 88M(.ckpt file)                |
 | 参数文件          | ssd_mobilenet_v1_300_config_gpu.yaml    |
-| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| 脚本链接             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
 
 # 随机情况说明
 

@@ -5,7 +5,7 @@
 #    file_path:function_name1, function_name2
 #
 models/official/recommend/Wide_and_Deep/src/wide_and_deep.py:__init__
-models/official/recommend/Wide_and_Deep_multitable/src/wide_and_deep.py:__init__
+models/official/recommend/Wide_and_Deep_Multitable/src/wide_and_deep.py:__init__
 models/research/cv/centernet/src/dataset.py:preprocess_fn
 models/research/cvtmodel/wide_resnet/src/wide_resnet101_2.py:__init__
 models/research/cvtmodel/resnest/src/resnest200.py:__init__
@@ -55,7 +55,7 @@ models/research/cvtmodel/resnet_ipl/src/resnest101e.py:__init__
 models/research/cvtmodel/resnet_ipl/src/resnet26t.py:__init__
 models/research/cvtmodel/resnet_ipl/src/resnet101d.py:__init__
 models/research/cvtmodel/resnet_ipl/src/resnetrs50.py:__init__
-models/official/audio/LPCNet/ascend310_infer/src/main.cc:main
+models/official/audio/IPCNet/ascend310_infer/src/main.cc:main
 models/official/nlp/Bert/src/finetune_data_preprocess.py:process_msra
 models/official/nlp/Transformer/create_data.py:main
 models/official/nlp/GRU/src/create_data.py:main

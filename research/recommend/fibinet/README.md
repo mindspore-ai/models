@@ -54,7 +54,7 @@ The FiBiNET model contains a wide linear model and a deep learning neural networ
 
 ```bash
 git clone https://gitee.com/mindspore/models.git
-cd models/official/recommend/fibinet
+cd models/research/recommend/fibinet
 ```
 
 2. Download the Dataset

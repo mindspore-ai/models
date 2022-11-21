@@ -517,7 +517,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_PATH] [DVPP] [DEVICE_ID]
 | 速度                       | 8卡: 104 ms/step                                            | 8卡: 255 ms/step                                    |                          单卡：11081 ms/step                     |
 | 总时间                     | 8卡: 17.8小时                                               | 8卡: 46.9小时                                       |                             > 200小时                    |
 | 参数(M)                    | 4.0;                                                        | 4.0;                                              |                             4.0;                       |
-| 脚本                       | [Tiny-Darknet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/tinydarknet)
+| 脚本                       | [Tiny-Darknet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/tinydarknet)
 
 ### [评估性能](#目录)
 

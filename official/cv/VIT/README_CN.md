@@ -431,7 +431,7 @@ python export.py --config_path=[CONFIG_PATH]
 | 总时长                     | 8卡：11小时                                                  |
 | 参数(M)                    | 86.0                                                        |
 | 微调检查点                 | 1000M (.ckpt文件)                                            |
-| 脚本                    | [vit脚本](https://gitee.com/mindspore/models/tree/master/official/cv/vit) |
+| 脚本                    | [vit脚本](https://gitee.com/mindspore/models/tree/master/official/cv/VIT) |
 
 ### 推理性能
 

@@ -561,7 +561,7 @@ python export.py --ckpt_file [CKPT_PATH] --task_name [TASK_NAME] --file_name [FI
 
 #### 基于SST-2数据集进行ONNX评估
 
-运行如下命令前，请确保已设置ONNX模型路径。请将ONNX模型路径设置为绝对全路径，例如:"/home/username/models/official/nlp/tinybert/SST-2.onnx".
+运行如下命令前，请确保已设置ONNX模型路径。请将ONNX模型路径设置为绝对全路径，例如:"/home/username/models/research/nlp/tinybert/SST-2.onnx".
 
 ```bash
 bash scripts/run_eval_onnx.sh {path}/*.yaml
@@ -577,7 +577,7 @@ bash scripts/run_eval_onnx.sh {path}/*.yaml
 
 #### 基于MNLI数据集进行ONNX评估
 
-运行如下命令前，请确保已设置ONNX模型路径。请将ONNX模型路径设置为绝对全路径，例如:"/home/username/models/official/nlp/tinybert/MNLI.onnx".
+运行如下命令前，请确保已设置ONNX模型路径。请将ONNX模型路径设置为绝对全路径，例如:"/home/username/models/research/nlp/tinybert/MNLI.onnx".
 
 ```bash
 bash scripts/run_eval_onnx.sh {path}/*.yaml
@@ -593,7 +593,7 @@ bash scripts/run_eval_onnx.sh {path}/*.yaml
 
 #### 基于QNLI数据集进行ONNX评估
 
-运行如下命令前，请确保已设置ONNX模型路径。请将ONNX模型路径设置为绝对全路径，例如:"/home/username/models/official/nlp/tinybert/QNLI.onnx".
+运行如下命令前，请确保已设置ONNX模型路径。请将ONNX模型路径设置为绝对全路径，例如:"/home/username/models/research/nlp/tinybert/QNLI.onnx".
 
 ```bash
 bash scripts/run_eval_onnx.sh {path}/*.yaml

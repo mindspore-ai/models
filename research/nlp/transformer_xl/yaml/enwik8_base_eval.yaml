@@ -10,7 +10,7 @@ output_file: './output_eval.txt'
 # Path for local
 datadir: "/home/transformer_xl/data/enwik8"
 dataset: "enwik8"
-ckpt_path: "/home/mindspore/msp_txl/official/nlp/transformer_xl/script/experiments-enwik8/20220416-140816/model0.ckpt"
+ckpt_path: "/home/mindspore/msp_txl/official/nlp/Transformer_xl/script/experiments-enwik8/20220416-140816/model0.ckpt"
 device_target: "GPU"
 device_id: 0
 

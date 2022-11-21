@@ -373,7 +373,7 @@ result_path 为输出路径。
 | 参数(M)             | 10.7                                                        | 10.7                   |
 | 微调检查点 | 82.91M (.ckpt文件)                                         | 82.91M (.ckpt文件)                |
 | 推理模型        | 41.66M (.mindir文件)                     | 41.66M (.mindir文件)                 |
-| 脚本                    | <https://gitee.com/mindspore/models/tree/master/official/cv/posenet> | <https://gitee.com/mindspore/models/tree/master/official/cv/posenet> |
+| 脚本                    | <https://gitee.com/mindspore/models/tree/master/research/cv/PoseNet> | <https://gitee.com/mindspore/models/tree/master/research/cv/PoseNet> |
 
 #### StMarysChurch上的PoseNet
 
@@ -393,7 +393,7 @@ result_path 为输出路径。
 | 参数(M)             | 10.7                                                        | 10.7                   |
 | 微调检查点 | 82.91M (.ckpt文件)                                         | 82.91M (.ckpt文件)                |
 | 推理模型        | 41.66M (.mindir文件)                     | 41.66M (.mindir文件)                 |
-| 脚本                    | [posenet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/posenet) | [posenet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/posenet) |
+| 脚本                    | [posenet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PoseNet) | [posenet脚本](https://gitee.com/mindspore/models/tree/master/research/cv/PoseNet) |
 
 ### 推理性能
 

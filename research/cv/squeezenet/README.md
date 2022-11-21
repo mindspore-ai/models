@@ -73,7 +73,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 # [Environment Requirements](#contents)
 
 - Hardware（Ascend/CPU）
-    - Prepare hardware environment with Ascend processor. Squeezenet training on GPU performs is not good now, and it is still in research. See [squeezenet in research](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) to get up-to-date details.
+    - Prepare hardware environment with Ascend processor. Squeezenet training on GPU performs is not good now, and it is still in research. See [squeezenet in research](https://gitee.com/mindspore/models/tree/master/research/cv/squeezenet) to get up-to-date details.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
@@ -546,7 +546,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 1pc: 55.5 mins;  8pcs: 15.0 mins                            | 1pc: 90mins; 8pcs: 34mins |
 | Parameters (M)             | 4.8                                                         | 0.74 |
 | Checkpoint for Fine tuning | 6.4M (.ckpt file)                                           | 6.4M (.ckpt file)|
-| Scripts                    | [squeezenet script](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) | [squeezenet script](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) |
+| Scripts                    | [squeezenet script](https://gitee.com/mindspore/models/tree/master/research/cv/squeezenet) | [squeezenet script](https://gitee.com/mindspore/models/tree/master/research/cv/squeezenet) |
 
 #### SqueezeNet on ImageNet
 
@@ -566,7 +566,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 8pcs: 5.2 hours                                             | 8pcs: 12.1 hours |
 | Parameters (M)             | 4.8                                                         | 1.25 |
 | Checkpoint for Fine tuning | 13.3M (.ckpt file)                                          | 13.3M (.ckpt file) |
-| Scripts                    | [squeezenet script](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) | [squeezenet script](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) |
+| Scripts                    | [squeezenet script](https://gitee.com/mindspore/models/tree/master/research/cv/squeezenet) | [squeezenet script](https://gitee.com/mindspore/models/tree/master/research/cv/squeezenet) |
 
 #### SqueezeNet_Residual on CIFAR-10
 
@@ -586,7 +586,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 1pc: 68.6 mins;  8pcs: 20.9 mins                            | 1pc: 115 mins; 8pcs: 43.5 mins |
 | Parameters (M)             | 4.8                                                         | 0.74 |
 | Checkpoint for Fine tuning | 6.5M (.ckpt file)                                           | 6.5M (.ckpt file) |
-| Scripts                    | [squeezenet script](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) | [squeezenet script](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) |
+| Scripts                    | [squeezenet script](https://gitee.com/mindspore/models/tree/master/research/cv/squeezenet) | [squeezenet script](https://gitee.com/mindspore/models/tree/master/research/cv/squeezenet) |
 
 #### SqueezeNet_Residual on ImageNet
 
@@ -606,7 +606,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 8pcs: 8.0 hours                                             | 8pcs: 18.4 hours |
 | Parameters (M)             | 4.8                                                         | 1.25 |
 | Checkpoint for Fine tuning | 15.3M (.ckpt file)                                          | 15.3M (.ckpt file) |
-| Scripts                    | [squeezenet script](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) | [squeezenet script](https://gitee.com/mindspore/models/tree/master/official/cv/squeezenet) |
+| Scripts                    | [squeezenet script](https://gitee.com/mindspore/models/tree/master/research/cv/squeezenet) | [squeezenet script](https://gitee.com/mindspore/models/tree/master/research/cv/squeezenet) |
 
 ### Inference Performance
 

@@ -455,7 +455,7 @@ sphereface网络使用LFW推理得到的结果如下:
 | 总时长                 | 单卡：469.98分钟;  8卡：68.79分钟                     |单卡：412.39分钟;  8卡：220.69分钟                     |
 | 参数(M)             | 13.0                                                 |13.0                                                 |
 | 微调检查点 | 214.58M (.ckpt文件)                                        |214.58M (.ckpt文件)                                        |
-| 脚本                    | [sphereface脚本](https://gitee.com/mindspore/models/tree/master/official/cv/sphereface) | [sphereface脚本](https://gitee.com/mindspore/models/tree/master/official/cv/sphereface) |
+| 脚本                    | [sphereface脚本](https://gitee.com/mindspore/models/tree/master/research/cv/sphereface) | [sphereface脚本](https://gitee.com/mindspore/models/tree/master/research/cv/sphereface) |
 
 ### 推理性能
 

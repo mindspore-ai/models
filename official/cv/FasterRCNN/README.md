@@ -111,8 +111,8 @@ After installing MindSpore via the official website, you can start training and 
 Note:
 
 1. the first run will generate the mindeocrd file, which will take a long time.
-2. pretrained model is a resnet50 checkpoint that trained over ImageNet2012.you can train it with [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) scripts in modelzoo, and use src/convert_checkpoint.py to get the pretrain model.
-3. BACKBONE_MODEL is a checkpoint file trained with [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) scripts in modelzoo.PRETRAINED_MODEL is a checkpoint file after convert.VALIDATION_JSON_FILE is label file. CHECKPOINT_PATH is a checkpoint file after trained.
+2. pretrained model is a resnet50 checkpoint that trained over ImageNet2012.you can train it with [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) scripts in modelzoo, and use src/convert_checkpoint.py to get the pretrain model.
+3. BACKBONE_MODEL is a checkpoint file trained with [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) scripts in modelzoo.PRETRAINED_MODEL is a checkpoint file after convert.VALIDATION_JSON_FILE is label file. CHECKPOINT_PATH is a checkpoint file after trained.
 
 ## Run on Ascend
 
@@ -615,7 +615,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Speed                      | 1pc: 190 ms/step;  8pcs: 200 ms/step                        | 1pc: 288 ms/step;  8pcs: 346 ms/step                |1pc: 7328 ms/step|
 | Total time                 | 1pc: 37.17 hours;  8pcs: 4.89 hours                         | 1pc: 63.09 hours;  8pcs: 8.25 hours                 |1pc:13.88 hours|
 | Parameters (M)             | 250                                                         | 250                                                 |495M|
-| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
+| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) |
 
 #### ResNet-101 backbone
 
@@ -631,7 +631,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Loss Function              | Softmax Cross Entropy, Sigmoid Cross Entropy, SmoothL1Loss |
 | Speed                      | 1pc: 369 ms/step;  8pcs: 456 ms/step                |
 | Total time                 | 8pcs: 18.98 hours                                   |
-| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn) |
+| Scripts                    | [fasterrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) |
 
 ### Inference Performance
 

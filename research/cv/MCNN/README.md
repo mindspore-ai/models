@@ -262,16 +262,16 @@ The command below will produce lots of MCNN onnx files, named different input sh
 
 ```bash
 python export_onnx.py --ckpt_file [CKPT_PATH] --val_path [VAL_PATH] --val_gt_path [VAL_GT_PATH]
-# example: python export_onnx.py --ckpt_file mcnn_ascend_v170_shanghaitecha_official_cv_MAE112.11.ckpt  --val_path /data0/dc/mcnn/models/official/cv/MCNN/data/original/shanghaitech/part_A_final/test_data/images/  --val_gt_path /data0/dc/mcnn/models/official/cv/MCNN/data/original/shanghaitech/part_A_final/test_data/ground_truth_csv/
+# example: python export_onnx.py --ckpt_file mcnn_ascend_v170_shanghaitecha_official_cv_MAE112.11.ckpt  --val_path /data0/dc/mcnn/models/research/cv/MCNN/data/original/shanghaitech/part_A_final/test_data/images/  --val_gt_path /data0/dc/mcnn/models/research/cv/MCNN/data/original/shanghaitech/part_A_final/test_data/ground_truth_csv/
 ```
 
 ### ONNX Evaluation
 
-Note that ONNX_PATH should be the absolute directory to the exported onnx files, such as: '/data0/dc/mcnn/models/official/cv/MCNN/'.
+Note that ONNX_PATH should be the absolute directory to the exported onnx files, such as: '/data0/dc/mcnn/models/research/cv/MCNN/'.
 
 ```bash
 bash run_eval_onnx_gpu.sh [VAL_PATH] [VAL_GT_PATH] [ONNX_PATH]
-# example: bash run_eval_onnx_gpu.sh  /data0/dc/mcnn/models/official/cv/MCNN/data/original/shanghaitech/part_A_final/test_data/images/ /data0/dc/mcnn/models/official/cv/MCNN/data/original/shanghaitech/part_A_final/test_data/ground_truth_csv/ /data0/dc/mcnn/models/official/cv/MCNN/
+# example: bash run_eval_onnx_gpu.sh  /data0/dc/mcnn/models/research/cv/MCNN/data/original/shanghaitech/part_A_final/test_data/images/ /data0/dc/mcnn/models/research/cv/MCNN/data/original/shanghaitech/part_A_final/test_data/ground_truth_csv/ /data0/dc/mcnn/models/research/cv/MCNN/
  ```
 
 You can view the results through the file "log_onnx". The accuracy of the test dataset will be as follows:

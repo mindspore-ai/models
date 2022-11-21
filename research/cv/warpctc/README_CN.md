@@ -375,7 +375,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID]
 | 总时长                 | 30分钟                                       | 5分钟|
 | 参数(M)             | 2.75                                          | 2.75 |
 | 微调检查点 | 20.3M (.ckpt文件)                            | 20.3M (.ckpt文件) |
-| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/warpctc) | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/warpctc) |
+| 脚本                    | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/warpctc) | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/warpctc) |
 
 #### 评估性能
 

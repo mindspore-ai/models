@@ -445,7 +445,7 @@ accuracy:80.044
 | Total time (8p)            | 20h                                           | 95h                              |
 | Params (M)                 | 153M                                          | 153M                             |
 | Checkpoint for Fine tuning | 2135M                                         | 489M                             |
-| Scripts                    | [inceptionv4 script](https://gitee.com/mindspore/models/tree/master/official/cv/inceptionv4) | [inceptionv4 script](https://gitee.com/mindspore/models/tree/master/official/cv/inceptionv4) |
+| Scripts                    | [inceptionv4 script](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv4) | [inceptionv4 script](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv4) |
 
 #### Inference Performance
 

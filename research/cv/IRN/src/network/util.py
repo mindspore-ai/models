@@ -157,7 +157,7 @@ class GroupConv(nn.Cell):
         tensor, output tensor.
 
     Examples:
-        https://gitee.com/mindspore/models/blob/master/official/cv/resnext/src/backbone/resnet.py
+        https://gitee.com/mindspore/models/blob/master/official/cv/ResNeXt/src/backbone/resnet.py
     """
 
     def __init__(self, out_channels, kernel_size, stride=1, pad_mode="pad", pad=0, groups=1):

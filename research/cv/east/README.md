@@ -372,7 +372,7 @@ Calculated!{"precision": 0.8214109521460287, "recall": 0.8016369764082811, "hmea
 | Loss Function       | Dice for classification, Iou for bbox regression             | Dice for classification, Iou for bbox regression             |
 | Loss                | ~0.27                                                        | ~0.27                                                        |
 | Total time (8p)     | 1h20m                                                        | 1h05m                                                        |
-| Scripts             | [east script](https://gitee.com/mindspore/models/tree/master/official/cv/east) |[east script](https://gitee.com/mindspore/models/tree/master/official/cv/east) |
+| Scripts             | [east script](https://gitee.com/mindspore/models/tree/master/research/cv/PoseNet) |[east script](https://gitee.com/mindspore/models/tree/master/research/cv/PoseNet) |
 
 #### Inference Performance
 

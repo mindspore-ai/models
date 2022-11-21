@@ -332,7 +332,7 @@ SRCC: 0.6571463000995645.
 | 总时长                 | 174分钟                                |
 | 参数(M)                | 25.57                                  |
 | 微调检查点             | 195M（.ckpt文件）                      |
-| 配置文件               | [链接](https://gitee.com/mindspore/models/blob/master/official/cv/nima/config.yaml) |
+| 配置文件               | [链接](https://gitee.com/mindspore/models/blob/master/research/cv/nima/config.yaml) |
 
 # 随机情况说明
 
