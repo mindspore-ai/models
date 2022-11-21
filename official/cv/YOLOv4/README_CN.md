@@ -73,6 +73,46 @@ YOLOv4需要CSPDarknet53主干来提取图像特征进行检测。 您可以从[
 建议用户使用MS COCO数据集来体验模型，
 其他数据集需要使用与MS COCO相同的格式。
 
+**迁移学习的数据集**：face mask detection
+
+数据集大小：397.65MB，853张3类彩色图像
+
+数据格式：RGB图像
+
+- 目录结构如下，由用户定义目录和文件的名称：
+
+  ```text
+      ├── dataset
+          ├── annotations
+              ├─ train.json
+              ├─ val.json
+              ├─ msksssksksss0.xml
+              ├─ ...
+              └─ msksssksksss853.xml
+          ├─train
+              ├─images
+              │   ├─maksssksksss0.png
+              │   ├─ ...
+              │   └─maksssksksssn.png
+              └─annotations
+              │   ├─maksssksksss0.xml
+              │   ├─ ...
+              │   └─maksssksksssn.xml
+          ├─ val
+              ├─images
+              │   ├─maksssksksss0.png
+              │   ├─ ...
+              │   └─maksssksksssn.png
+              └─annotations
+              │   ├─maksssksksss0.xml
+              │   ├─ ...
+              │   └─maksssksksssn.xml
+          └─images
+              ├─ msksssksksss0.png
+              ├─ ...
+              └─ msksssksksss853.png
+  ```
+
 # [环境要求](#目录)
 
 - 硬件 Ascend
@@ -269,6 +309,11 @@ YOLOv4需要CSPDarknet53主干来提取图像特征进行检测。 您可以从[
     ├─yolo_dataset.py                 # 为YOLOv4创建数据集
   ├─eval.py                           # 评估验证结果
   ├─test.py#                          # 评估测试结果
+  ├─cpu_default_config.yaml           # cpu运行环境下参数配置
+  ├─finetune_cpu_default_config.yaml  # 迁移学习参数配置
+  ├─data_split.py                     # 迁移学习数据集划分脚本
+  ├─xml2coco.py                       # 迁移数据集处理脚本
+  ├─quick_start.py                    # 迁移学习可视化脚本
   └─train.py                          # 训练网络
 ```
 
@@ -425,6 +470,130 @@ bash run_distribute_train.sh dataset/coco2017 cspdarknet53_backbone.ckpt rank_ta
    4) 修改`run_eval` 为 `True` 开启训练中验证集评估的功能。
 3. 使用新的配置和参数构建自己的bash脚本。
 
+**数据集处理**
+
+[数据集下载地址]( (https://www.kaggle.com/datasets/andrewmvd/face-mask-detection)
+下载数据集后解压至../../dataset根目录下，使用data_split脚本划分出80%的训练集和20%的测试集
+
+```bash
+#运行脚本示例
+python data_split.py
+```
+
+训练前，需要将face mask detection数据集使用xml2coco脚本处理成与COCO2017格式相同的形式，具体将数据集xml格式的标注转换成该模型可以处理的COCO格式
+
+```bash
+#运行脚本示例
+python xml2coco.py
+```
+
+经数据处理后的数据集结构如下：
+
+```text
+├── dataset
+        ├── annotations
+            ├─ train.json
+            ├─ val.json
+            ├─ msksssksksss0.xml
+            ├─ ...
+            └─ msksssksksss853.xml
+        ├─train
+            ├─images
+            │   ├─maksssksksss0.png
+            │   ├─ ...
+            │   └─maksssksksssn.png
+            └─annotations
+            │   ├─maksssksksss0.xml
+            │   ├─ ...
+            │   └─maksssksksssn.xml
+        ├─ val
+            ├─images
+            │   ├─maksssksksss0.png
+            │   ├─ ...
+            │   └─maksssksksssn.png
+            └─annotations
+            │   ├─maksssksksss0.xml
+            │   ├─ ...
+            │   └─maksssksksssn.xml
+        └─images
+            ├─ msksssksksss0.png
+            ├─ ...
+            └─ msksssksksss853.png
+```
+
+**迁移学习训练过程**
+
+从[Mindspore Hub](https://gitee.com/mindspore/models/tree/master/official/cv/yolov4#)下载预训练的ckpt，然后在finetune_cpu_default_config.yaml设置预训练模型的ckpt
+
+```text
+pretrained_backbone=ckpt/cspdarknet53_ascend_v120_imagenet2012_official_cv_bs64_top1acc7854_top5acc9428.ckpt
+```
+
+训练前，需要根据数据集格式修改`train.py`脚本中的config.data_root、config.annFile、config.data_val_root、config.ann_val_file
+分别为训练数据的图像文件夹和标注数据的文件路径，验证数据的图像文件夹和标注数据的文件路径。
+
+```bash
+#运行迁移学习训练脚本
+python train.py --config_path=finetune_cpu_default_config.yaml
+#如果需要保存日志信息，可使用如下命令：
+python train.py --config_path=finetune_cpu_default_config.yaml > log.txt 2>&1
+```
+
+训练的日志文件和checkpoint存储在 `outputs` 路径下，可通过配置文件`finetune_cpu_default_config.yaml`中的`ckpt_path`字段进行修改
+
+**结果展示**
+
+训练loss输出示例如下：
+
+```text
+epoch[0], iter[0], loss:17378.679688, 0.12 imgs/sec, lr:4.7058824748091865e-06
+epoch[1], iter[100], loss:1699.774157, 0.45 imgs/sec, lr:0.0004752941313199699
+epoch[2], iter[200], loss:275.121917, 0.63 imgs/sec, lr:0.0009458823478780687
+epoch[3], iter[300], loss:237.489561, 0.70 imgs/sec, lr:0.0014164706226438284
+...
+```
+
+**迁移学习推理过程**
+
+运行迁移学习评估脚本前，需要修改`eval.py`脚本中的config.data_root和config.ann_val_file， 分别为验证数据的图像文件夹和标注数据的文件路径
+
+```bash
+#运行迁移学习训练脚本
+python eval.py --config_path=finetune_cpu_default_config.yaml
+```
+
+评估结果保存在`outputs`路径下，可通过配置文件`finetune_config.yaml`中的`log_path`字段进行修改
+**结果展示**
+
+评估结果如下所示：
+
+```text
+=============coco eval reulst=========
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.552
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.821
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.650
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.465
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.636
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.796
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.351
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.608
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.621
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.524
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.692
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.817
+
+2022-10-12 23:09:49,196:INFO:testing cost time 0.03 h
+```
+
+**迁移学习quick_start**
+
+运行eval脚本后，会在outputs对应文件夹下生成`predict.json`文件，需要修改`quick_start.py`脚本中`predict.json`文件的路径后再运行
+
+```bash
+#运行quick_start.py脚本示例
+python quick_start.py --config_path=finetune_cpu_default_config.yaml
+```
+
 ## [评估过程](#目录)
 
 ### 验证
@@ -504,7 +673,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 
 ## [推理过程](#目录)
 
-**推理前需参照 [MindSpore C++推理部署指南](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README_CN.md) 进行环境变量设置。**
+**推理前需参照 [环境变量设置指引](https://gitee.com/mindspore/models/tree/master/utils/ascend310_env_set/README_CN.md) 进行环境变量设置。**
 
 ### 用法
 
