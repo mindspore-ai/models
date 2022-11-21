@@ -15,6 +15,7 @@
 """
 Accuracy calculation of model
 """
+
 import argparse
 
 from pycocotools.coco import COCO
@@ -32,10 +33,15 @@ parser.add_argument(
     default="",
     help="pred_anno")
 args_opt = parser.parse_args()
+
 def run_eval(gt_anno, pred_anno):
     """evaluation by coco api"""
     coco = COCO(gt_anno)
     coco_dets = coco.loadRes(pred_anno)
+    coco_eval = COCOeval(coco, coco_dets, "keypoints")
+    coco_eval.evaluate()
+    coco_eval.accumulate()
+    coco_eval.summarize()
     coco_eval = COCOeval(coco, coco_dets, "bbox")
     coco_eval.evaluate()
     coco_eval.accumulate()
