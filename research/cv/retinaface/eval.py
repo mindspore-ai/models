@@ -17,6 +17,7 @@ import argparse
 import os
 import time
 import datetime
+import moxing as mox
 import numpy as np
 import cv2
 
@@ -25,6 +26,32 @@ from mindspore.train.serialization import load_checkpoint, load_param_into_net
 
 from src.config import cfg_res50, cfg_mobile025
 from src.utils import decode_bbox, prior_box
+
+parser = argparse.ArgumentParser(description='Retinaface Infer And Eval Args')
+parser.add_argument("--modelarts_FLAG", type=bool, default=True, help="use modelarts or not")
+parser.add_argument('--data_url', type=str, default='./data/')
+parser.add_argument("--modelarts_data_dir", type=str, default="/cache/dataset/")
+parser.add_argument('--ckpt_url', type=str, default='/cache/dataset/model/Retinaface.ckpt')
+parser.add_argument("--val_dataset", type=str, default="/cache/dataset/val/")
+parser.add_argument('--infer_gt_url', type=str, default='/cache/dataset/ground_truth/')
+parser.add_argument("--val_url", type=str, default="./output/val_save")
+parser.add_argument('--device_id', type=int, default=0, help='device id.')
+parser.add_argument('--backbone_name', type=str, default='ResNet50', help='backbone name')
+args = parser.parse_args()
+
+
+def obs_data2modelarts(FLAGS):
+    """
+    Copy train data from obs to modelarts by using moxing api.
+    """
+    start = datetime.datetime.now()
+    print("===>>>Copy files from obs:{} to modelarts dir:{}".format(FLAGS.data_url, FLAGS.modelarts_data_dir))
+    mox.file.copy_parallel(src_url=FLAGS.data_url, dst_url=FLAGS.modelarts_data_dir)
+    end = datetime.datetime.now()
+    print("===>>>Copy from obs to modelarts, time use:{}(s)".format((end - start).seconds))
+    files = os.listdir(FLAGS.modelarts_data_dir)
+    print("===>>>Files:", files)
+
 
 class Timer():
     def __init__(self):
@@ -45,6 +72,9 @@ class DetectionEngine:
         self.conf_thresh = cfg['val_confidence_threshold']
         self.iou_thresh = cfg['val_iou_threshold']
         self.var = cfg['variance']
+        if args.modelarts_FLAG:
+            cfg['val_predict_save_folder'] = args.val_url
+            cfg['val_gt_dir'] = args.infer_gt_url
         self.save_prefix = cfg['val_predict_save_folder']
         self.gt_dir = cfg['val_gt_dir']
 
@@ -311,13 +341,17 @@ def val_with_resnet(args_opt):
     network.set_train(False)
 
     # load checkpoint
-    assert args_opt.val_model is not None, 'val_model is None.'
-    param_dict = load_checkpoint(args_opt.val_model)
-    print('Load trained model done. {}'.format(args_opt.val_model))
+    if args_opt.modelarts_FLAG:
+        obs_data2modelarts(FLAGS=args_opt)
+    assert args_opt.ckpt_url is not None, 'val_model is None.'
+    param_dict = load_checkpoint(args_opt.ckpt_url)
+    print('Load trained model done. {}'.format(args_opt.ckpt_url))
     network.init_parameters_data()
     load_param_into_net(network, param_dict)
 
     # testing dataset
+    if args_opt.modelarts_FLAG:
+        cfg['val_dataset_folder'] = args_opt.val_dataset
     testset_folder = cfg['val_dataset_folder']
     testset_label_path = cfg['val_dataset_folder'] + "label.txt"
     with open(testset_label_path, 'r') as f:
@@ -416,7 +450,7 @@ def val_with_resnet(args_opt):
         print('predict result path is {}'.format(predict_result_path))
 
     detection.get_eval_result()
-    print(args_opt.val_model)
+    print(args_opt.ckpt_url)
     print('Eval done.')
 
 
@@ -437,13 +471,17 @@ def val_with_mobilenet(args_opt):
     network.set_train(False)
 
     # load checkpoint
-    assert args_opt.val_model is not None, 'val_model is None.'
-    param_dict = load_checkpoint(args_opt.val_model)
-    print('Load trained model done. {}'.format(args_opt.val_model))
+    if args_opt.modelarts_FLAG:
+        obs_data2modelarts(FLAGS=args_opt)
+    assert args_opt.ckpt_url is not None, 'val_model is None.'
+    param_dict = load_checkpoint(args_opt.ckpt_url)
+    print('Load trained model done. {}'.format(args_opt.ckpt_url))
     network.init_parameters_data()
     load_param_into_net(network, param_dict)
 
     # testing dataset
+    if args_opt.modelarts_FLAG:
+        cfg['val_dataset_folder'] = args_opt.val_dataset
     testset_folder = cfg['val_dataset_folder']
     testset_label_path = cfg['val_dataset_folder'] + "label.txt"
     with open(testset_label_path, 'r') as f:
@@ -546,12 +584,6 @@ def val_with_mobilenet(args_opt):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='val')
-    parser.add_argument('--backbone_name', type=str, default='ResNet50',
-                        help='backbone name')
-    parser.add_argument('--val_model', type=str, default='./train_parallel3/checkpoint/ckpt_3/RetinaFace-56_201.ckpt',
-                        help='val_model location')
-    args = parser.parse_args()
     if args.backbone_name == 'ResNet50':
         val_with_resnet(args_opt=args)
     elif args.backbone_name == 'MobileNet025':

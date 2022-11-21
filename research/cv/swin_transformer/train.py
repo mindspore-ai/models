@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 # ============================================================================
 """train"""
 import os
+import moxing as mox
 
 from mindspore import Model
 from mindspore import context
@@ -27,6 +28,18 @@ from src.tools.cell import cast_amp
 from src.tools.criterion import get_criterion, NetWithLoss
 from src.tools.get_misc import get_dataset, set_device, get_model, pretrained, get_train_one_step
 from src.tools.optimizer import get_optimizer
+
+
+def modelarts_result2obs(FLAGS):
+    """
+    Copy debug data from modelarts to obs.
+    According to the switch FLAGS, the debug data may contains auto tune repository,
+    dump data for precision comparison, even the computation graph and profiling data.
+    """
+
+    mox.file.copy_parallel(src_url=FLAGS.modelarts_result_dir, dst_url=FLAGS.train_url)
+    print("===>>>Copy Event or Checkpoint from modelarts dir:{} to obs:{}".
+          format(FLAGS.modelarts_result_dir, FLAGS.train_url))
 
 
 def main():
@@ -68,8 +81,6 @@ def main():
     time_cb = TimeMonitor(data_size=data.train_dataset.get_dataset_size())
 
     ckpt_save_dir = "./ckpt_" + str(rank)
-    if args.run_modelarts:
-        ckpt_save_dir = "/cache/ckpt_" + str(rank)
 
     ckpoint_cb = ModelCheckpoint(prefix=args.arch + str(rank), directory=ckpt_save_dir,
                                  config=config_ck)
@@ -85,8 +96,9 @@ def main():
     print("train success")
 
     if args.run_modelarts:
-        import moxing as mox
-        mox.file.copy_parallel(src_url=ckpt_save_dir, dst_url=os.path.join(args.train_url, "ckpt_" + str(rank)))
+        mox.file.copy_parallel(src_url=ckpt_save_dir, dst_url=args.train_url)
+        print("===>>>Copy Event or Checkpoint from modelarts dir:{} to obs:{}".
+              format(ckpt_save_dir, args.train_url))
 
 
 if __name__ == '__main__':

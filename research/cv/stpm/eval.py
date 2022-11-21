@@ -15,8 +15,10 @@
 """eval"""
 import os
 import ast
+import datetime
 import codecs
 import argparse
+import moxing as mox
 
 import cv2
 import numpy as np
@@ -27,18 +29,34 @@ from mindspore import ops
 from src.dataset import createDataset
 from src.stpm import STPM
 
-parser = argparse.ArgumentParser(description='test')
+parser = argparse.ArgumentParser(description='STPM Infer And Eval Args')
 
-parser.add_argument('--category', type=str, default='screw')
+parser.add_argument("--modelarts_FLAG", type=bool, default=True, help="use modelarts or not")
+parser.add_argument('--category', type=str, default='zipper')
 parser.add_argument('--device_id', type=int, default=0, help='Device id')
-parser.add_argument('--data_url', type=str, default="/")
+parser.add_argument('--data_url', type=str, default="./data/mvtec/")
+parser.add_argument("--modelarts_data_dir", type=str, default="/cache/dataset/")
+parser.add_argument("--val_dataset", type=str, default="/cache/dataset/")
 parser.add_argument('--save_sample', type=ast.literal_eval, default=False, help='Whether to save the infer image')
 parser.add_argument('--save_sample_path', type=str, default="", help='The path to save infer image')
-parser.add_argument('--ckpt_path', type=str, default='./', help="The path to save checkpoint")
+parser.add_argument('--ckpt_path', type=str, default='./data/model/', help="The path to save checkpoint")
 parser.add_argument('--num_class', type=int, default=1000, help="The num of class")
 parser.add_argument('--out_size', type=int, default=256, help="out size")
 
 args = parser.parse_args()
+
+
+def obs_data2modelarts(FLAGS):
+    """
+    Copy train data from obs to modelarts by using moxing api.
+    """
+    start = datetime.datetime.now()
+    print("===>>>Copy files from obs:{} to modelarts dir:{}".format(FLAGS.data_url, FLAGS.modelarts_data_dir))
+    mox.file.copy_parallel(src_url=FLAGS.data_url, dst_url=FLAGS.modelarts_data_dir)
+    end = datetime.datetime.now()
+    print("===>>>Copy from obs to modelarts, time use:{}(s)".format((end - start).seconds))
+    files = os.listdir(FLAGS.modelarts_data_dir)
+    print("===>>>Files:", files)
 
 
 class SaveImageTool:
@@ -133,7 +151,14 @@ if __name__ == "__main__":
                         save_graphs=False,
                         device_id=args.device_id)
 
-    _, ds_test = createDataset(args.data_url, args.category, save_sample=args.save_sample, out_size=args.out_size)
+    if args.modelarts_FLAG:
+        obs_data2modelarts(args)
+        _, ds_test = createDataset(args.val_dataset, args.category, save_sample=args.save_sample,
+                                   out_size=args.out_size)
+
+    else:
+        _, ds_test = createDataset(args.data_url, args.category, save_sample=args.save_sample,
+                                   out_size=args.out_size)
 
     net = STPM(args, is_train=False)
     param = load_checkpoint(os.path.join(args.ckpt_path))

@@ -20,6 +20,8 @@ Model testing entrypoint.
 import os
 import argparse
 import time
+import datetime
+import moxing as mox
 import mindspore as ms
 from mindspore import context
 from mindspore import Model, load_checkpoint, load_param_into_net
@@ -31,19 +33,43 @@ from src.data.util import bgr2ycbcr
 from src.data import create_dataset
 from src.network import create_model, IRN_loss
 
+
+def obs_data2modelarts(FLAGS):
+    """
+    Copy train data from obs to modelarts by using moxing api.
+    """
+    start = datetime.datetime.now()
+    print("===>>>Copy files from obs:{} to modelarts dir:{}".format(FLAGS.data_url, FLAGS.modelarts_data_dir))
+    mox.file.copy_parallel(src_url=FLAGS.data_url, dst_url=FLAGS.modelarts_data_dir)
+    end = datetime.datetime.now()
+    print("===>>>Copy from obs to modelarts, time use:{}(s)".format((end - start).seconds))
+    files = os.listdir(FLAGS.modelarts_data_dir)
+    print("===>>>Files:", files)
+
+
 current_path = os.path.abspath(__file__)
 root_path = os.path.dirname(current_path)
 # Path to option YMAL file.
-X2_TEST_YAML_FILE = os.path.join(
-    root_path, "src", "options", "test", "test_IRN_x2.yml")
+X2_TEST_YAML_FILE = os.path.join(root_path, "src", "options", "test", "test_IRN_x2.yml")
 # Path to option YMAL file.
-X4_TEST_YAML_FILE = os.path.join(
-    root_path, "src", "options", "test", "test_IRN_x4.yml")
+X4_TEST_YAML_FILE = os.path.join(root_path, "src", "options", "test", "test_IRN_x4.yml")
 
 
 if __name__ == '__main__':
     begin = time.time()
-    parser = argparse.ArgumentParser(description="irn testing")
+    parser = argparse.ArgumentParser(description="IRN testing args")
+    parser.add_argument("--modelarts_FLAG", type=bool, default=True,
+                        help="use modelarts or not")
+    parser.add_argument('--data_url', type=str, default='./data/',
+                        help="local obs data path, used for obs_data2modelarts")
+    parser.add_argument("--modelarts_data_dir", type=str, default="/cache/dataset/",
+                        help="modelarts data path, used for obs_data2modelarts")
+    parser.add_argument("--testing_dataset", type=str, default="/cache/dataset/DIV2K/DIV2K_train_HR",
+                        help="modelarts dataset path, used for testing")
+    parser.add_argument("--ckpt_url", type=str,
+                        default="/cache/dataset/model/IRN.ckpt",
+                        help="modelarts ckpt path, used for testing")
+
     parser.add_argument('--scale', type=int, default=4, choices=(2, 4),
                         help='Rescaling Parameter.')
     parser.add_argument('--dataset_GT_path', type=str, default='/home/nonroot/DIV2K/DIV2K_train_HR',
@@ -56,12 +82,16 @@ if __name__ == '__main__':
                         help="Device target, support GPU, Ascend.")
 
     args = parser.parse_args()
+
+    if args.modelarts_FLAG:
+        obs_data2modelarts(FLAGS=args)
+        args.dataset_GT_path = args.testing_dataset
+        args.resume_state = args.ckpt_url
+
     if args.scale == 2:
-        opt = option.parse(X2_TEST_YAML_FILE, args.dataset_GT_path,
-                           args.dataset_LQ_path, is_train=False)
+        opt = option.parse(X2_TEST_YAML_FILE, args.dataset_GT_path, args.dataset_LQ_path, is_train=False)
     elif args.scale == 4:
-        opt = option.parse(X4_TEST_YAML_FILE, args.dataset_GT_path,
-                           args.dataset_LQ_path, is_train=False)
+        opt = option.parse(X4_TEST_YAML_FILE, args.dataset_GT_path, args.dataset_LQ_path, is_train=False)
     else:
         raise ValueError("Unsupported scale.")
 
@@ -70,11 +100,12 @@ if __name__ == '__main__':
     except TypeError:
         device_id = 0
     # initialize context
-    context.set_context(mode=context.GRAPH_MODE,
-                        device_target=args.device_target,
-                        save_graphs=False,
-                        device_id=device_id,
-                        )
+    context.set_context(
+        mode=context.PYNATIVE_MODE,
+        device_target=args.device_target,
+        save_graphs=False,
+        device_id=device_id
+    )
 
     # loading options for model
     opt = option.dict_to_nonedict(opt)
@@ -87,7 +118,8 @@ if __name__ == '__main__':
         args.dataset_GT_path,
         args.scale,
         do_train=False,
-        batch_size=1)
+        batch_size=1
+    )
 
     step_size = val_dataset.get_dataset_size()
     print("Step size : {}".format(step_size))
@@ -105,8 +137,7 @@ if __name__ == '__main__':
     loss = IRN_loss(net, opt)
 
     # warp network with optimizer
-    optimizer = nn.Momentum(params=net.trainable_params(),
-                            learning_rate=0.1, momentum=0.9)
+    optimizer = nn.Momentum(params=net.trainable_params(), learning_rate=0.1, momentum=0.9)
 
     # Model
     model = Model(network=loss, optimizer=optimizer, amp_level="O3")
