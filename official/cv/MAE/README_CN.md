@@ -344,7 +344,7 @@ This is a MindSpore/NPU re-implementation of the paper [Masked Autoencoders Are 
 | 速度                       | 64卡：481ms/step（ModelArts训练数据） |
 | 总时长                     | 64卡：38h（ModelArts训练数据）                                 |
 | 微调检查点                 | 1.34G (.ckpt文件)                                         |
-| 脚本                    | [mae脚本](https://gitee.com/Lin-Bert/models/blob/master/research/cv/mae/pretrain.py)                                             |
+| 脚本                    | [mae脚本](https://gitee.com/mindspore/models/blob/master/official/cv/MAE/pretrain.py)                                             |
 
 #### imagenet 120万张图像上的Finetune-Vit-B-P16
 
@@ -364,7 +364,7 @@ This is a MindSpore/NPU re-implementation of the paper [Masked Autoencoders Are 
 | 总时长        | 32卡：6h（ModelArts训练数据）                           |
 | 准确率Top1    | 0.807                                                   |
 | 微调检查点    | 1009M (.ckpt文件)                                       |
-| 脚本          | [finetune脚本](https://gitee.com/Lin-Bert/models/blob/master/research/cv/mae/finetune.py)                                        |
+| 脚本          | [finetune脚本](https://gitee.com/mindspore/models/blob/master/research/cv/squeezenet/finetune.py)                                        |
 
 #### imagenet 120万张图像上的Vit-B-P16
 
@@ -384,7 +384,7 @@ This is a MindSpore/NPU re-implementation of the paper [Masked Autoencoders Are 
 | 总时长        | 64卡：16h（ModelArts训练数据）                          |
 | 准确率Top1    | 0.799                                                  |
 | 微调检查点    | 1009M (.ckpt文件)                                       |
-| 脚本          | [vit脚本](https://gitee.com/Lin-Bert/models/blob/master/research/cv/mae/eval.py)                                             |
+| 脚本          | [vit脚本](https://gitee.com/mindspore/models/blob/master/official/cv/MAE/eval.py)                                             |
 
 ## 使用流程
 

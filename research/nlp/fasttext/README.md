@@ -273,14 +273,14 @@ Note that run all onnx concerned scripts on GPU.
     --onnx_path ./fasttext --dataset_path ./fasttext/scripts/ag/
 
 - ONNX Evaluation
-    - Note that ONNX_PATH should be the absolute directory to the exported onnx files, such as: '/home/mindspore/ls/models/official/nlp/fasttext'.
+    - Note that ONNX_PATH should be the absolute directory to the exported onnx files, such as: '/home/mindspore/ls/models/research/nlp/fasttext'.
 
         ```bash
         cd ./scripts
         bash run_eval_onnx_gpu.sh DATASET_PATH DATASET_NAME ONNX_PATH
         ```
 
-    example:bash run_eval_onnx_gpu.sh /home/mindspore/fasttext/scripts/dbpedia/ dbpedia  /home/mindspore/official/nlp/fasttext
+    example:bash run_eval_onnx_gpu.sh /home/mindspore/fasttext/scripts/dbpedia/ dbpedia  /home/mindspore/research/nlp/fasttext
 
 You can view the results through the file "eval_onnx.log".
 
@@ -305,7 +305,7 @@ You can view the results through the file "eval_onnx.log".
 | Loss                     | 0.0067                                                       | 0.0085                                                       |
 | Params (M)               | 22                                                           | 22                                                           |
 | Checkpoint for inference | 254M (.ckpt file)                                            | 254M (.ckpt file)                                            |
-| Scripts                  | [fasttext](https://gitee.com/mindspore/models/tree/master/official/nlp/fasttext) | [fasttext](https://gitee.com/mindspore/models/tree/master/official/nlp/fasttext) |
+| Scripts                  | [fasttext](https://gitee.com/mindspore/models/tree/master/research/nlp/fasttext) | [fasttext](https://gitee.com/mindspore/models/tree/master/research/nlp/fasttext) |
 
 | Parameters               | Ascend                                                       | GPU                                                          |
 | ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -322,7 +322,7 @@ You can view the results through the file "eval_onnx.log".
 | Loss                     | 2.6e-4                                                       | 0.0004                                                       |
 | Params (M)               | 106                                                          | 106                                                          |
 | Checkpoint for inference | 1.2G (.ckpt file)                                            | 1.2G (.ckpt file)                                            |
-| Scripts                  | [fasttext](https://gitee.com/mindspore/models/tree/master/official/nlp/fasttext) | [fasttext](https://gitee.com/mindspore/models/tree/master/official/nlp/fasttext) |
+| Scripts                  | [fasttext](https://gitee.com/mindspore/models/tree/master/research/nlp/fasttext) | [fasttext](https://gitee.com/mindspore/models/tree/master/research/nlp/fasttext) |
 
 | Parameters               | Ascend                                                       | GPU                                                          |
 | ------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -339,7 +339,7 @@ You can view the results through the file "eval_onnx.log".
 | Loss                     | 0.062                                                        | 0.002                                                        |
 | Params (M)               | 103                                                          | 103                                                          |
 | Checkpoint for inference | 1.2G (.ckpt file)                                            | 1.2G (.ckpt file)                                            |
-| Scripts                  | [fasttext](https://gitee.com/mindspore/models/tree/master/official/nlp/fasttext) | [fasttext](https://gitee.com/mindspore/models/tree/master/official/nlp/fasttext) |
+| Scripts                  | [fasttext](https://gitee.com/mindspore/models/tree/master/research/nlp/fasttext) | [fasttext](https://gitee.com/mindspore/models/tree/master/research/nlp/fasttext) |
 
 #### Inference Performance
 

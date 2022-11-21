@@ -508,7 +508,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Loss Function                   | Softmax Cross Entropy                                       | Softmax Cross Entropy                               |                   Softmax Cross Entropy                  |
 | Speed                       | 8pc: 104 ms/step                                            | 8pc: 255 ms/step                                          |                          1p：11081 ms/step                     |
 | Parameters(M)                    | 4.0;                                                        | 4.0;                               |                             4.0;                       |
-| Scripts                       | [Tiny-Darknet scripts](https://gitee.com/mindspore/models/tree/master/official/cv/tinydarknet)
+| Scripts                       | [Tiny-Darknet scripts](https://gitee.com/mindspore/models/tree/master/research/cv/tinydarknet)
 
 ### [Evaluation Performance](#contents)
 

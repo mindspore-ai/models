@@ -491,7 +491,7 @@ BRDNet on “waterloo5050step40colorimage”
 | Speed                      | 8p about 7000FPS to 7400FPS                                                    | 8p 78ms/step |
 | Total time                 | 8p  about 2h 14min                                                             | 8p 5h |
 | Checkpoint for Fine tuning | 8p: 13.68MB , 1p: 19.76MB (.ckpt file)                                         | 14M (.ckpt file) |
-| Scripts                    | [BRDNet](https://gitee.com/mindspore/models/tree/master/official/cv/brdnet) | [BRDNet](https://gitee.com/mindspore/models/tree/master/official/cv/brdnet) |
+| Scripts                    | [BRDNet](https://gitee.com/mindspore/models/tree/master/official/cv/Arcface) | [BRDNet](https://gitee.com/mindspore/models/tree/master/official/cv/Arcface) |
 
 ## Random description
 

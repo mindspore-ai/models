@@ -42,7 +42,7 @@ python run_eval_onnx.py \
     --max_ckpt_num=1 \
     --load_teacher_ckpt_path="" \
     --load_gd_ckpt_path="" \
-    --onnx_path="/home/username/models/official/nlp/tinybert/MNLI.onnx" \
+    --onnx_path="/home/username/models/research/nlp/tinybert/MNLI.onnx" \
     --train_data_dir="" \
     --eval_data_dir="/home/username/GLUE-baselines/glue_data/MNLI/" \
     --schema_dir="" \

@@ -39,10 +39,10 @@
 
 "models/research/cv/vnet/infer/mxbase/src/Vnet.h"  "runtime/references"
 "models/research/cv/vnet/infer/mxbase/src/Vnet.cpp"  "runtime/references"
-"models/official/cv/MaskRCNN/maskrcnn_mobilenetv1/infer/mxbase/src/PostProcess/MaskRcnnMindsporePost.h" "runtime/references"
-"models/official/cv/MaskRCNN/maskrcnn_mobilenetv1/infer/mxbase/src/MaskRCNN.h" "runtime/references"
-"models/official/cv/MaskRCNN/maskrcnn_mobilenetv1/infer/mxbase/src/PostProcess/MaskRcnnMindsporePost.cpp" "runtime/references"
-"models/official/cv/MaskRCNN/maskrcnn_mobilenetv1/infer/mxbase/src/MaskRCNN.cpp" "runtime/references"
+"models/official/cv/ResNeXt/maskrcnn_mobilenetv1/infer/mxbase/src/PostProcess/MaskRcnnMindsporePost.h" "runtime/references"
+"models/official/cv/ResNeXt/maskrcnn_mobilenetv1/infer/mxbase/src/MaskRCNN.h" "runtime/references"
+"models/official/cv/ResNeXt/maskrcnn_mobilenetv1/infer/mxbase/src/PostProcess/MaskRcnnMindsporePost.cpp" "runtime/references"
+"models/official/cv/ResNeXt/maskrcnn_mobilenetv1/infer/mxbase/src/MaskRCNN.cpp" "runtime/references"
 
 "models/official/cv/OctSqueeze/infer/mxbase/src/Octsqueeze.cpp" "runtime/references"
 "models/official/cv/OctSqueeze/infer/mxbase/src/Octsqueeze.h" "runtime/references"
@@ -56,7 +56,7 @@
 "models/research/cv/Deepsort/infer/mxbase/src/KalmanFilter/tracker.h" "runtime/references"
 
 "models/research/cv/stgcn/infer/mxbase/src/stgcnUtil.h" "runtime/references"
-"models/research/cv/stgcn/infer/mxbase/src/stgcnUtil.cpp" "runtime/references""models/official/cv/resnext/infer/mxbase/src/resnext50Classify.h" "runtime/references"
+"models/research/cv/stgcn/infer/mxbase/src/stgcnUtil.cpp" "runtime/references""models/official/cv/ResNeXt/infer/mxbase/src/resnext50Classify.h" "runtime/references"
 "models/research/cv/stgcn/infer/mxbase/src/main.cpp" "runtime/references"
 
 "models/research/nlp/tinybert/infer/mxbase/MxBaseInfer.h" "runtime/references"
@@ -91,9 +91,9 @@
 "models/research/cv/squeezenet/infer/mxbase/src/squeezenetResidual.h"  "runtime/references"
 "models/research/cv/squeezenet/infer/mxbase/src/main.cpp"    "runtime/references"
 
-"models/official/cv/PoseNet/infer/mxbase/src/Posenet.h" "runtime/references"
-"models/official/cv/PoseNet/infer/mxbase/src/Posenet.cpp" "runtime/references"
-"models/official/cv/PoseNet/infer/mxbase/src/main.cpp" "runtime/references"
+"models/research/cv/PoseNet/infer/mxbase/src/Posenet.h" "runtime/references"
+"models/research/cv/PoseNet/infer/mxbase/src/Posenet.cpp" "runtime/references"
+"models/research/cv/PoseNet/infer/mxbase/src/main.cpp" "runtime/references"
 "models/research/cv/ssd_resnet50/infer/mxbase/C++/SSDResNet50.h" "runtime/references"
 
 "models/research/cv/ssd_ghostnet/infer/mxbase/C++/SSDGhost.h" "runtime/references"
@@ -150,7 +150,7 @@
 "models/research/cv/textfusenet/infer/mxbase/src/PostProcess/TextfusenetMindsporePost.h" "runtime/references"
 "models/research/cv/textfusenet/infer/mxbase/src/PostProcess/TextfusenetMindsporePost.cpp" "runtime/references"
 "models/research/cv/fairmot/infer/mxbase/src/PostProcess/FairmotMindsporePost.h" "runtime/references"
-"models/research/cv/efficientnet-b3/infer/mxbase/Efficientnet_b3Classify.h"  "runtime/references"
+"models/official/cv/Efficientnet/efficientnet-b3/infer/mxbase/Efficientnet_b3Classify.h"  "runtime/references"
 "models/research/cv/tinydarknet/infer/mxbase/TinydarknetClassify.h" "runtime/references"
 "models/research/cv/tinydarknet/infer/mxbase/TinydarknetClassify.cpp" "runtime/references"
 "models/research/cv/tinydarknet/infer/mxbase/main.cpp" "runtime/references"

@@ -544,8 +544,8 @@ cal_psnr.py 中的主要参数如下:
   评估完成后，您可以在 --output_path 参数指定的目录下找到 加高斯噪声后的图片和经过模型去除高斯噪声后的图片，图片命名方式代表了处理结果。例如 00001_sigma15_psnr24.62.bmp 是加噪声后的图片（加噪声后 psnr=24.62），00001_psnr31.18.bmp 是去噪声后的图片（去噪后 psnr=31.18）。
   同时，您还可以在 --output_path 参数指定的目录下找到测试结果记录文件，结果记录文件按照日期-时间的方式命名，如2022-07-14_time_16_29_22_rank_0.log，通过 bash 命令运行的结果默认放在brdnet/eval文件夹下。
   打开log文件即可查看ONNX模型验证的结果，验证结果示例如下：
-  2022-07-14 16:31:52,317:INFO:Start to test on /data1/models/official/cv/brdnet/waterloo5050step40colorimage
-  2022-07-14 16:31:53,317:INFO:Start to test on load test weights from /data1/models/official/cv/brdnet/brdnet.onnx
+  2022-07-14 16:31:52,317:INFO:Start to test on /data1/models/official/cv/Arcface/waterloo5050step40colorimage
+  2022-07-14 16:31:53,317:INFO:Start to test on load test weights from /data1/models/official/cv/Arcface/brdnet.onnx
   2022-07-14 16:31:54,528:INFO:start testing....
   2022-07-14 18:42:41,267:INFO:Before denoise: Average PSNR_b = 24.712742, SSIM_b = 0.520469;After denoise: Average PSNR = 36.140112, SSIM = 0.943783
   2022-07-14 18:42:41,294:INFO:testing finished....
@@ -595,7 +595,7 @@ BRDNet on “waterloo5050step40colorimage”
 | Speed                      | 8p about 7000FPS to 7400FPS                                                    |
 | Total time                 | 8p  about 2h 14min                                                             |
 | Checkpoint for Fine tuning | 8p: 13.68MB , 1p: 19.76MB (.ckpt file)                                         |
-| Scripts                    | [BRDNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/brdnet) |
+| Scripts                    | [BRDNet脚本](https://gitee.com/mindspore/models/tree/master/official/cv/Arcface) |
 
 ## 随机情况说明
 

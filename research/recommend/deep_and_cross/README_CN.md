@@ -49,7 +49,7 @@ DCN模型最开始是Embedding and stacking layer，然后是并行的Cross Netw
 
 ```bash
 git clone https://gitee.com/mindspore/mindspore.git
-cd mindspore/model_zoo/official/recommend/deep_and_cross
+cd mindspore/model_zoo/research/recommend/deep_and_cross
 ```
 
 2. 下载数据集。

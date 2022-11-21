@@ -51,7 +51,7 @@ Wide&Deep模型训练了宽线性模型和深度学习神经网络，结合了�
 
 ```bash
     git clone https://gitee.com/mindspore/mindspore.git
-    cd mindspore/model_zoo/official/recommend/wide_and_deep_multitable
+    cd mindspore/model_zoo/official/recommend/Wide_and_Deep_Multitable
 ```
 
 2.下载数据集。
@@ -183,7 +183,7 @@ python eval.py
 | 参数(M)                 | 349                             | 349                             |
 | 推理检查点 | 1.1GB(.ckpt文件)               | 1.1GB(.ckpt文件)               |
 
-所有可执行脚本参见[这里](https://gitee.com/mindspore/models/tree/master/official/recommend/wide_and_deep/script)。
+所有可执行脚本参见[这里](https://gitee.com/mindspore/models/tree/master/official/recommend/Wide_and_Deep/script)。
 
 #### 评估性能
 

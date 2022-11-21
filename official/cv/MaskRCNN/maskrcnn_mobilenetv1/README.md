@@ -715,7 +715,7 @@ Accumulating evaluation results...
 | Loss                       | 0.88387                                                     | 0.60763                                                     |
 | Speed                      | 8pcs: 249 ms/step                                           | 8pcs: 795.645 ms/step                                       |
 | Total time                 | 8pcs: 6.23 hours                                            | 8pcs: 19.6 hours                                            |
-| Scripts                    | [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/maskrcnn_mobilenetv1) |  [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/maskrcnn_mobilenetv1) |
+| Scripts                    | [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/MaskRCNN/maskrcnn_mobilenetv1) |  [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/MaskRCNN/maskrcnn_mobilenetv1) |
 
 ### Inference Performance
 

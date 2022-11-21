@@ -39,7 +39,7 @@ For training and evaluation, we use the French Street Name Signs (FSNS) released
 - Data format：binary files
     - Note：Data will be processed in dataset.py
 
-you can find how to generate dataset in [crnn_seq2seq_ocr](https://gitee.com/mindspore/models/tree/master/official/cv/crnn_seq2seq_ocr#quick-start)
+you can find how to generate dataset in [crnn_seq2seq_ocr](https://gitee.com/mindspore/models/tree/master/research/cv/crnn_seq2seq_ocr#quick-start)
 
 # [Environment Requirements](#contents)
 

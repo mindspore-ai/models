@@ -411,14 +411,14 @@ python export.py --config_path CONFIG_FILE --ckpt_file [CKPT_PATH] --device_targ
 
 ```bash
 python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_format "ONNX"
-# example:python export.py --ckpt_file /home/models/official/cv/inceptionv3/inceptionv3_ascend_v160_imagenet2012_official_cv_top1acc78.69_top5acc94.3.ckpt --device_target "GPU" --file_format "ONNX"
+# example:python export.py --ckpt_file /home/models/official/cv/Inception/inceptionv3/inceptionv3_ascend_v160_imagenet2012_official_cv_top1acc78.69_top5acc94.3.ckpt --device_target "GPU" --file_format "ONNX"
 ```
 
 ### ONNX Evaluation
 
 ```bash
     bash run_eval_onnx_gpu.sh [DEVICE_ID] [DATA_DIR] [PATH_ONNX]
-    # example: bash run_eval_onnx_gpu.sh 2 /home/data/ /home/models/official/cv/inceptionv3/inceptionv3.onnx
+    # example: bash run_eval_onnx_gpu.sh 2 /home/data/ /home/models/official/cv/Inception/inceptionv3/inceptionv3.onnx
 ```
 
 ## Inference Process
@@ -468,7 +468,7 @@ accuracy:78.742
 | Checkpoint for Fine tuning | 313M                                           |
 | Model for inference        | 92M (.onnx file)                               |
 | Speed                      | 1pc:1200 img/s;8pc:9500 img/s                  |
-| Scripts                    | [inceptionv3 script](https://gitee.com/mindspore/models/tree/master/official/cv/inceptionv3) |
+| Scripts                    | [inceptionv3 script](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv3) |
 
 ### Inference Performance
 

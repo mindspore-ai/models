@@ -111,8 +111,8 @@ Faster R-CNN-DCN是一个两阶段目标检测网络，该网络采用RPN，可�
 注意：
 
 1. 第一次运行生成MindRecord文件，耗时较长。
-2. 预训练模型是在ImageNet2012上训练的ResNet-50检查点。你可以使用ModelZoo中 [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) 脚本来训练。
-3. BACKBONE_MODEL是通过modelzoo中的ResNet-50 [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) 脚本训练的。
+2. 预训练模型是在ImageNet2012上训练的ResNet-50检查点。你可以使用ModelZoo中 [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) 脚本来训练。
+3. BACKBONE_MODEL是通过modelzoo中的ResNet-50 [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) 脚本训练的。
 4. PRETRAINED_MODEL是经过转换后的权重文件。VALIDATION_JSON_FILE为标签文件。CHECKPOINT_PATH是训练后的检查点文件。
 
 ## 在Ascend上运行

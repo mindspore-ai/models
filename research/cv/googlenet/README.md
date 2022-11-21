@@ -542,7 +542,7 @@ Current batch_ Size can only be set to 1.
 | Parameters (M)             | 13.0                                                        | 13.0                   |
 | Checkpoint for Fine tuning | 43.07M (.ckpt file)                                         | 43.07M (.ckpt file)    |
 | Model for inference        | 21.50M (.onnx file),  21.60M(.air file)                     |      |
-| Scripts                    | [googlenet script](https://gitee.com/mindspore/models/tree/master/official/cv/googlenet) | [googlenet script](https://gitee.com/mindspore/models/tree/master/official/cv/googlenet) |
+| Scripts                    | [googlenet script](https://gitee.com/mindspore/models/tree/master/research/cv/googlenet) | [googlenet script](https://gitee.com/mindspore/models/tree/master/research/cv/googlenet) |
 
 #### GoogleNet train on ImageNet2012
 
@@ -562,7 +562,7 @@ Current batch_ Size can only be set to 1.
 | Total time                 | 8pcs: 8.8 hours                                             |
 | Parameters (M)             | 13.0                                                        |
 | Checkpoint for Fine tuning | 52M (.ckpt file)                                            |
-| Scripts                    | [googlenet script](https://gitee.com/mindspore/mindspore/tree/r0.7/model_zoo/official/cv/googlenet) |
+| Scripts                    | [googlenet script](https://gitee.com/mindspore/models/tree/master/research/cv/googlenet) |
 
 ### Inference Performance
 

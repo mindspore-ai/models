@@ -120,7 +120,7 @@ pip install pycocotools
     Note:
     1. To speed up data preprocessing, MindSpore provide a data format named MindRecord, hence the first step is to generate MindRecord files based on COCO2017 dataset before training. The process of converting raw COCO2017 dataset to MindRecord format may take about 4 hours.
     2. For distributed training, a [hccl configuration file](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools) with JSON format needs to be created in advance.
-    3. PRETRAINED_CKPT is a resnet50 checkpoint that trained over ImageNet2012.you can train it with [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/resnet) scripts in modelzoo, and use src/convert_checkpoint.py to get the pretrain checkpoint file.
+    3. PRETRAINED_CKPT is a resnet50 checkpoint that trained over ImageNet2012.you can train it with [resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet) scripts in modelzoo, and use src/convert_checkpoint.py to get the pretrain checkpoint file.
     4. For large models like MaskRCNN, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
 
 4. Execute eval script.
@@ -776,7 +776,7 @@ Accumulating evaluation results...
 | Parameters (M)             | 84.8                                                        | 84.8                                                        |
 | Checkpoint for Fine tuning | 85M(.ckpt file)                                             | 85M(.ckpt file)                                             |
 | Model for inference        | 571M(.air file)                                             | N/A                                                         |
-| Scripts                    | [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/maskrcnn) | [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/maskrcnn) |
+| Scripts                    | [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/ResNeXt) | [maskrcnn script](https://gitee.com/mindspore/models/tree/master/official/cv/ResNeXt) |
 
 ### Inference Performance
 

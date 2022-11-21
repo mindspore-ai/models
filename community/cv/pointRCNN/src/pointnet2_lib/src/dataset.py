@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-# This file was copied from project [https://gitee.com/mindspore/models/tree/master/research/cv/pointnet2]
+# This file was copied from project [https://gitee.com/mindspore/models/tree/master/official/cv/PointNet2]
 """data preprocessing"""
 
 import os

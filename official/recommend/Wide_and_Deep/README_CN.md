@@ -65,7 +65,7 @@ Wide&Deep模型训练了宽线性模型和深度学习神经网络，结合了�
 
 ```bash
 git clone https://gitee.com/mindspore/models.git
-cd models/official/recommend/wide_and_deep
+cd models/official/recommend/Wide_and_Deep
 ```
 
 2. 下载数据集。
@@ -464,7 +464,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [DATA_TYPE] [NEED_PREPROCESS]
 | 参数(M)                 | 75.84                           | 75.84                           | 75.84                           | 75.84                           |
 | 推理检查点 | 233MB（.ckpt文件）               | 230MB（.ckpt文件）                    | 233Mb（.ckpt文件）               | 233MB（.ckpt文件）               |
 
-所有可执行脚本参见[此处](https://gitee.com/mindspore/models/tree/master/official/recommend/wide_and_deep/script)。
+所有可执行脚本参见[此处](https://gitee.com/mindspore/models/tree/master/official/recommend/Wide_and_Deep/script)。
 
 说明：GPU的结果是在主版本下测试的。Wide&Deep模型的参数服务模式尚处于开发中。
 

@@ -308,7 +308,7 @@ Total data: 50000, top1 accuracy: 0.78458, top5 accuracy: 0.94254
 | Total time (8p)            | 8ps: 14h                                       |
 | Checkpoint for Fine tuning | 217M (.ckpt file)                              |
 | Speed                      | 8pc: 3977 imgs/sec                             |
-| Scripts                    | [cspdarknet53 script](https://gitee.com/mindspore/models/tree/master/official/cv/cspdarknet53) |
+| Scripts                    | [cspdarknet53 script](https://gitee.com/mindspore/models/tree/master/official/cv/ResNeXt) |
 
 ### Inference Performance
 

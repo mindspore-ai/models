@@ -310,7 +310,7 @@ At precision 0.08: bpip =  1.22112; each frame cost 53100 ms
 | 总时长        | 单卡：3.3h；8卡：0.6h                                        |
 | 参数(M)       | 0.34M                                                        |
 | 微调检查点    | 3M (.ckpt文件)                                               |
-| 脚本          | [octsqueeze脚本](https://gitee.com/mindspore/models/tree/master/official/cv/octsqueeze) |
+| 脚本          | [octsqueeze脚本](https://gitee.com/mindspore/models/tree/master/official/cv/OctSqueeze) |
 
 ### 推理性能
 

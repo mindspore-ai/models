@@ -1016,7 +1016,7 @@ python run_eval_onnx.py --config_path [/path/*.yaml] --eval_data_file_path [EVAL
 | Total time                 | 63H                                                        | 610H                      |
 | Params (M)                 | 110M                                                       | 110M                      |
 | Checkpoint for Fine tuning | 1.2G(.ckpt file)                                           | 1.2G(.ckpt file)          |
-| Scripts                    | [BERT_base](https://gitee.com/mindspore/models/tree/master/official/nlp/bert)  | [BERT_base](https://gitee.com/mindspore/models/tree/master/official/nlp/bert)     |
+| Scripts                    | [BERT_base](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert)  | [BERT_base](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert)     |
 
 | Parameters                 | Ascend                                                     |
 | -------------------------- | ---------------------------------------------------------- |
@@ -1036,7 +1036,7 @@ python run_eval_onnx.py --config_path [/path/*.yaml] --eval_data_file_path [EVAL
 | Total time                 | 180h                                                       |
 | Params (M)                 | 340M                                                       |
 | Checkpoint for Fine tuning | 3.2G(.ckpt file)                                           |
-| Scripts                    | [BERT_NEZHA](https://gitee.com/mindspore/models/tree/master/official/nlp/bert)  |
+| Scripts                    | [BERT_NEZHA](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert)  |
 
 #### Inference Performance
 

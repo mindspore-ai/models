@@ -56,7 +56,7 @@ FiBiNET模型训练了宽线性模型和深度学习神经网络，并在Wide&De
 
 ```bash
 git clone https://gitee.com/mindspore/models.git
-cd models/official/recommend/fibinet
+cd models/research/recommend/fibinet
 ```
 
 2. 下载数据集。
@@ -301,7 +301,7 @@ auc :  0.7814143582416716
 | 参数(M)           | 30                                              |
 | 推理检查点 | 180MB（.ckpt文件）                               |
 
-所有可执行脚本参见[此处](https://gitee.com/mindspore/models/tree/master/official/recommend/fibinet/script)。
+所有可执行脚本参见[此处](https://gitee.com/mindspore/models/tree/master/research/recommend/fibinet/script)。
 
 # 随机情况说明
 

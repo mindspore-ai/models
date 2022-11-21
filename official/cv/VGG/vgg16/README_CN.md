@@ -663,7 +663,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 | 速度 | 1卡：79 毫秒/步；8卡：104毫秒/步 | 1卡：81毫秒/步；8卡：94.4毫秒/步 |
 | 总时长 | 1卡：72分钟；8卡：11.8分钟 | 8卡：19.7小时 |
 | 调优检查点 | 1.1 GB（.ckpt 文件）                                           |    1.1 GB（.ckpt 文件）               |
-| 脚本                  |[VGG16](https://gitee.com/mindspore/models/tree/master/official/cv/vgg16) |                   |
+| 脚本                  |[VGG16](https://gitee.com/mindspore/models/tree/master/official/cv/VGG/vgg16) |                   |
 
 #### 评估性能
 

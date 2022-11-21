@@ -282,7 +282,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_format [EXPORT_FORMAT] --config_
 ```
 
 例如：python expor
---ckpt_file /root/zj/models/official/cv/FCN8s/checkpoint/fcn8s_ascend_v180_voc2012_official_cv_meanIoU62.7.ckpt  --file_format ONNX  --config_path /root/zj/models/official/cv/FCN8s/default_config.yaml
+--ckpt_file /root/zj/models/research/cv/FCN8s/checkpoint/fcn8s_ascend_v180_voc2012_official_cv_meanIoU62.7.ckpt  --file_format ONNX  --config_path /root/zj/models/research/cv/FCN8s/default_config.yaml
 
 参数ckpt_file为必填项， `EXPORT_FORMAT` 可选 ["AIR", "MINDIR", "ONNX"]. config_path 为相关配置文件.
 
@@ -316,7 +316,7 @@ python export.py --ckpt_file [CKPT_PATH] --file_format [EXPORT_FORMAT] --config_
 bash scripts/run_eval_onnx.sh [ONNX_PATH][DATA_ROOT] [DATA_LST]
 ```
 
-例如：bash scripts/run_eval_onnx.sh /root/zj/models/official/cv/FCN8s/fcn8s.onnx /root/zj/models/official/cv/FCN8s/dataset/VOC2012 /root/zj/models/official/cv/FCN8s/dataset/VOC2012/ImageSets/Segmentation/val.txt
+例如：bash scripts/run_eval_onnx.sh /root/zj/models/research/cv/FCN8s/fcn8s.onnx /root/zj/models/research/cv/FCN8s/dataset/VOC2012 /root/zj/models/research/cv/FCN8s/dataset/VOC2012/ImageSets/Segmentation/val.txt
 
 ## 结果
 
@@ -348,7 +348,7 @@ mean IoU 0.6388868594659682
 | 最终损失 | 0.036                                                        |
 | 速度     | 1pc: 455.460 ms/step;                                        |
 | mean IoU | 0.6388868594659682                                           |
-| 脚本     | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/FCN8s) |
+| 脚本     | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/FCN8s) |
 
 # 随机情况的描述
 

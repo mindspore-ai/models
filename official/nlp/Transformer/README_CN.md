@@ -448,7 +448,7 @@ bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CONFIG_PATH]
 | 损失                        | 2.8                                                                                       | 2.9                            |
 | 参数 (M)                    | 213.7                                                                                     | 213.7                          |
 | 推理检查点                   | 2.4G （.ckpt文件）                                                                            | 2.4G                            |
-| 脚本                        | [Transformer 脚本](https://gitee.com/mindspore/models/tree/master/official/nlp/transformer) |
+| 脚本                        | [Transformer 脚本](https://gitee.com/mindspore/models/tree/master/official/nlp/Transformer) |
 | 模型版本            | large                                                                                     |large|
 
 #### 评估性能

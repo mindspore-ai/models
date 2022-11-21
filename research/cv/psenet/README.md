@@ -397,7 +397,7 @@ The `res` folder is generated in the upper-level directory. For details about th
 | Total time                 | 1pc: 75.48 h;  8pcs: 7.11 h                                 |
 | Parameters (M)             | 27.36                                                       |
 | Checkpoint for Fine tuning | 109.44M (.ckpt file)                                        |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/official/cv/psenet> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/cv/psenet> |
 
 | Parameters                 | GPU                                                   |
 | -------------------------- | ----------------------------------------------------------- |
@@ -415,7 +415,7 @@ The `res` folder is generated in the upper-level directory. For details about th
 | Total time                 | 1pc: 335.6 h;  8pcs: 41.95 h                                |
 | Parameters (M)             | 27.36                                                       |
 | Checkpoint for Fine tuning | 109.44M (.ckpt file)                                        |
-| Scripts                    | <https://gitee.com/mindspore/models/tree/master/official/cv/psenet> |
+| Scripts                    | <https://gitee.com/mindspore/models/tree/master/research/cv/psenet> |
 
 ### Inference Performance
 

@@ -49,7 +49,7 @@ Wide&Deep model jointly trained wide linear models and deep neural network, whic
 
 ```bash
     git clone https://gitee.com/mindspore/mindspore.git
-    cd mindspore/model_zoo/official/recommend/wide_and_deep_multitable
+    cd mindspore/model_zoo/official/recommend/Wide_and_Deep_Multitable
 ```
 
 2.Download the Dataset
@@ -182,7 +182,7 @@ python eval.py
 | Params(M)                | 349                             | 349                             |
 | Checkpoint for inference | 1.1GB(.ckpt file)               | 1.1GB(.ckpt file)               |
 
-All executable scripts can be found in [here](https://gitee.com/mindspore/models/tree/master/official/recommend/wide_and_deep_multitable/script)
+All executable scripts can be found in [here](https://gitee.com/mindspore/models/tree/master/official/recommend/Wide_and_Deep_Multitable/script)
 
 #### Evaluation Performance
 

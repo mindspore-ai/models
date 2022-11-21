@@ -558,7 +558,7 @@ Total data: 50000, top1 accuracy: 0.76844, top5 accuracy: 0.93522.
 | Total time                 | 114 mins                          | 260 mins|
 | Parameters (M)             | 25.5                                                         | 25.5 |
 | Checkpoint for Fine tuning | 197M (.ckpt file)                                         |197M (.ckpt file)     |
-| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/resnet/config) |
+| config                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet/config) |
 
 ### Inference Performance
 

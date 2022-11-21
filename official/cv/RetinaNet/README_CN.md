@@ -492,7 +492,7 @@ mAP: 0.3499478734634595
 | 最终损失                    | 0.582                                  |0.57|
 | 精确度 (8p)                 | mAP[0.3475]               |mAP[0.3499]               |
 | 训练总时间 (8p)             | 23h16m54s                              |51h39m6s|
-| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) |[链接](https://gitee.com/mindspore/models/tree/master/official/cv/retinanet) |
+| 脚本                       | [链接](https://gitee.com/mindspore/models/tree/master/official/cv/RetinaNet) |[链接](https://gitee.com/mindspore/models/tree/master/official/cv/RetinaNet) |
 
 #### 推理性能
 

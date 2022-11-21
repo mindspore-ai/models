@@ -392,7 +392,7 @@ bash scripts/run_eval_onnx.sh [TASK_TYPE]
 onnx模型路径为 `ONNX_PATH=${CUR_DIR}/ernie_finetune.onnx`
 
 eval数据集路径为 `EVAL_DATA_PATH=${CUR_DIR}/data/${TASK_TYPE}/${TASK_TYPE}_test.mindrecord`
-    如：`home/models/official/nlp/ernie/data/chnsenticorp/chnsenticorp_test.mindrecord`
+    如：`home/models/research/nlp/ernie/data/chnsenticorp/chnsenticorp_test.mindrecord`
 
 具体请看 scripts/run_eval_onnx.sh 脚本
 

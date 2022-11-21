@@ -562,7 +562,7 @@ python export.py --ckpt_file [CKPT_PATH] --task_name [TASK_NAME] --file_name [FI
 
 #### ONNX evaluation on SST-2 dataset  
 
-Before running the command below, please check the onnx path has been set. Please set the onnx path to be the absolute full path, e.g:"/home/username/models/official/nlp/tinybert/SST-2.onnx".
+Before running the command below, please check the onnx path has been set. Please set the onnx path to be the absolute full path, e.g:"/home/username/models/research/nlp/tinybert/SST-2.onnx".
 
 ```bash
 bash scripts/run_eval_onnx.sh {path}/*.yaml
@@ -578,7 +578,7 @@ The command above will run in the background, you can view the results the file 
 
 #### ONNX evaluation on MNLI dataset
 
-Before running the command below, please check the onnx path has been set. Please set the onnx path to be the absolute full path, e.g:"/home/username/models/official/nlp/tinybert/MNLI.onnx".
+Before running the command below, please check the onnx path has been set. Please set the onnx path to be the absolute full path, e.g:"/home/username/models/research/nlp/tinybert/MNLI.onnx".
 
 ```bash
 bash scripts/run_eval_onnx.sh {path}/*.yaml
@@ -594,7 +594,7 @@ The command above will run in the background, you can view the results the file 
 
 #### ONNX evaluation on QNLI dataset
 
-Before running the command below, please check the onnx path has been set. Please set the onnx path to be the absolute full path, e.g:"/home/username/models/official/nlp/tinybert/QNLI.onnx".
+Before running the command below, please check the onnx path has been set. Please set the onnx path to be the absolute full path, e.g:"/home/username/models/research/nlp/tinybert/QNLI.onnx".
 
 ```bash
 bash scripts/run_eval_onnx.sh {path}/*.yaml
@@ -705,7 +705,7 @@ Inference result is saved in current path, you can find result like this in acc.
 | Total time                 | 17.3h(3poch, 8p)                                           | 48h(3poch, 8p)            |
 | Params (M)                 | 15M                                                        | 15M                       |
 | Checkpoint for task distill| 74M(.ckpt file)                                            | 74M(.ckpt file)           |
-| Scripts                    | [TinyBERT](https://gitee.com/mindspore/models/tree/master/official/nlp/tinybert) |          |
+| Scripts                    | [TinyBERT](https://gitee.com/mindspore/models/tree/master/research/nlp/tinybert) |          |
 
 #### Inference Performance
 

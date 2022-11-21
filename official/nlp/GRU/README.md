@@ -424,7 +424,7 @@ Note: The `DATASET_PATH` is path to mindrecord. eg. train: /dataset_path/multi30
 
 ```bash
 python export.py --device_target="GPU" --file_format="ONNX" --ckpt_file [CKPT_PATH]
-# example:python export.py --device_target="GPU" --file_format="ONNX" --ckpt_file models/official/nlp/gru/0-25_1807.ckpt
+# example:python export.py --device_target="GPU" --file_format="ONNX" --ckpt_file models/official/nlp/GRU/0-25_1807.ckpt
 ```
 
 ### ONNX Evaluation
@@ -503,7 +503,7 @@ perl multi-bleu.perl target.txt.forbleu < output.txt.forbleu
 | Loss | 3.86888 | 2.533958 | 2.9340835 |
 | Params (M) | 21 | 21 | 21 |
 | Checkpoint for inference | 272M (.ckpt file) | 272M (.ckpt file) | 321M(.ckpt file) |
-| Scripts | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/gru) | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/gru) | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/gru) |
+| Scripts | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/GRU) | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/GRU) | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/GRU) |
 
 ### Inference Performance
 

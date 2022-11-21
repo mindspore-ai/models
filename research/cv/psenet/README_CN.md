@@ -376,7 +376,7 @@ python ./script.py -s=submit.zip -g=gt.zip
 | 总时间 | 1卡：75.48小时；8卡：7.11小时|
 | 参数(M) | 27.36 |
 | 微调检查点 | 109.44M （.ckpt file） |
-| 脚本 | <https://gitee.com/mindspore/models/tree/master/official/cv/psenet> |
+| 脚本 | <https://gitee.com/mindspore/models/tree/master/research/cv/psenet> |
 
 ### 推理性能
 

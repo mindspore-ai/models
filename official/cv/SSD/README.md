@@ -601,7 +601,7 @@ mAP: 0.33880018942412393
 | Accuracy            | IoU=0.50: 22%               | IoU=0.50: 22%             |
 | Model for inference | 34M(.ckpt file)             | 34M(.ckpt file)             |
 | configuration           | ssd300_config.yaml          |ssd300_config_gpu.yaml       |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
 
 | Parameters          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -619,7 +619,7 @@ mAP: 0.33880018942412393
 | Accuracy            | IoU=0.50: 29.1 %             | IoU=0.50: 29.1 %             |
 | Model for inference | 96M(.ckpt file)             | 96M(.ckpt file)             |
 | configuration           | ssd_mobilenet_v1_fpn_config.yaml  |ssd_mobilenet_v1_fpn_config_gpu.yaml       |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
 
 | Parameters          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -637,7 +637,7 @@ mAP: 0.33880018942412393
 | Accuracy            | IoU=0.50: 34.3%            | IoU=0.50: 34.3 %           |
 | Model for inference | 255M(.ckpt file)             | 255M(.ckpt file)             |
 | configuration           | ssd_resnet50_fpn_config.yaml | ssd_resnet50_fpn_config_gpu.yaml       |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
 
 | Parameters          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -655,7 +655,7 @@ mAP: 0.33880018942412393
 | Accuracy            | IoU=0.50: 23.2%               | IoU=0.50: 23.2%             |
 | Model for inference | 186M(.ckpt file)             | 186M(.ckpt file)             |
 | configuration           | ssd_vgg16_config.yaml      | ssd_vgg16_config_gpu.yaml      |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
 
 | Parameters          |                        GPU                         |
 | ------------------- | ------------------------------------------------------ |
@@ -673,7 +673,7 @@ mAP: 0.33880018942412393
 | Accuracy            | IoU=0.50: 21.5%                       |
 | Model for inference | 88M(.ckpt file)                        |
 | configuration           | ssd_mobilenet_v1_300_config_gpu.yaml    |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/ssd> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
 
 ## [Description of Random Situation](#contents)
 

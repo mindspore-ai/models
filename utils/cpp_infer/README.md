@@ -165,8 +165,8 @@ When developing a new model, you need to copy these files to the execution direc
 - Model Inference
 - Inference result saving
 
-Please refer to [MindSpore 310 infer](https://www.mindspore.cn/tutorials/experts/en/master/infer/ascend_310_mindir.html), and implemented inference model, for example[resnet C++ inference](https://gitee.com/mindspore/models/blob/master/official/cv/resnet/cpp_infer/src/main.cc).
+Please refer to [MindSpore 310 infer](https://www.mindspore.cn/tutorials/experts/en/master/infer/ascend_310_mindir.html), and implemented inference model, for example[resnet C++ inference](https://gitee.com/mindspore/models/blob/master/official/cv/ResNet/cpp_infer/src/main.cc).
 
 ### Inference model compilation and execution
 
-Generally, we need to provide a `run_infer_cpp.sh` for connecting the whole inference process. For details, please refer to [resnet](https://gitee.com/mindspore/models/blob/master/official/cv/resnet/scripts/run_infer_cpp.sh).
+Generally, we need to provide a `run_infer_cpp.sh` for connecting the whole inference process. For details, please refer to [resnet](https://gitee.com/mindspore/models/blob/master/official/cv/ResNet/scripts/run_infer_cpp.sh).

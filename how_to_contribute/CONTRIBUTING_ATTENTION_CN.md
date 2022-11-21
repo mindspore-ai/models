@@ -47,7 +47,7 @@
 
 参考[CONTRIBUTING_CN.md](../CONTRIBUTING_CN.md)中关于CodeStyle的说明，你应该确保自己的代码与MindSpore的现有代码风格保持一致。
 
-关于一些细节实现和用法，可以参考一些我们推荐的模型，例如:[Resnet](https://gitee.com/mindspore/models/tree/master/official/cv/resnet), [Yolov5](https://gitee.com/mindspore/models/tree/master/official/cv/yolov5), [IPT](https://gitee.com/mindspore/models/tree/master/research/cv/IPT), [Transformer](https://gitee.com/mindspore/models/tree/master/official/nlp/transformer), etc.
+关于一些细节实现和用法，可以参考一些我们推荐的模型，例如:[Resnet](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet), [Yolov5](https://gitee.com/mindspore/models/tree/master/official/cv/YOLOv5), [IPT](https://gitee.com/mindspore/models/tree/master/research/cv/IPT), [Transformer](https://gitee.com/mindspore/models/tree/master/official/nlp/Transformer), etc.
 
 ### 目录结构
 

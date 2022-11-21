@@ -284,7 +284,7 @@ Parameters for both training and evaluation can be set in [DATASET]_config.yaml
 | Speed|1264ms/step|
 | Total time: training       | 8p: 24h/19m/41s;;                                  |
 | Checkpoint                 | 328.9M (.ckpt file)                                              |
-| Scripts                    | [Tacotron2 script](https://gitee.com/mindspore/models/tree/master/official/audio/tacotron2) |
+| Scripts                    | [Tacotron2 script](https://gitee.com/mindspore/models/tree/master/official/audio/Tacotron2) |
 
 ### Inference Performance
 
