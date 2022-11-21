@@ -138,6 +138,9 @@ TEST_DATASET_PATH: /home/DataSet/MJ-ST-IIIT/IIIT5K_3000
 ```shell
 bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [PRETRAINED_CKPT(options)]
 # example: bash scripts/run_standalone_train_ascend.sh 0
+
+bash scripts/run_standalone_train_gpu.sh [PRETRAINED_CKPT(options)]
+# example: bash scripts/run_standalone_train_gpu.sh
 ```
 
 - 分布式训练：
@@ -145,6 +148,9 @@ bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [PRETRAINED_CKPT(options
 ```shell
 bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_CKPT(options)]
 # example: bash scripts/run_distribute_train_ascend.sh ~/hccl_8p.json
+
+bash scripts/run_distribute_train_gpu.sh [PRETRAINED_CKPT(options)]
+# example: bash scripts/run_distribute_train_gpu.sh
 ```
 
 - 评估：
@@ -152,6 +158,9 @@ bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [PRETRAINED_CKPT(o
 ```shell
 bash scripts/run_eval_ascend.sh DEVICE_ID TRAINED_CKPT
 # example: scripts/run_eval_ascend.sh 0 /home/model/cnnctc/ckpt/CNNCTC-1_8000.ckpt
+
+bash scripts/run_eval_gpu.sh $TRAINED_CKPT
+# example: scripts/run_eval_gpu.sh /home/model/cnnctc/ckpt/CNNCTC-1_8000.ckpt
 ```
 
 # 脚本说明
