@@ -62,7 +62,7 @@ def predict(east_detect, img_path, pixel_threshold, quiet=True):
     img = np.asarray(img)
     img = img / 127.5 - 1
     img = img.transpose((2, 0, 1))
-    x = Tensor(np.expand_dims(img, axis=0), "float32")
+    x = Tensor(np.expand_dims(img, axis=0), mindspore.float32)
     y = east_detect(x).asnumpy()
     y = np.squeeze(y, axis=0)
 

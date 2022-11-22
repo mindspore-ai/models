@@ -9,8 +9,6 @@
     - [Data Preprocess](#data-preprocess)
     - [Training Process](#training-process)
     - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
-        - [ONNX Evaluation](#onnx-evaluation)
 - [Performance](#performance)
     - [Training Performance](#training-performance)
     - [Evaluation Performance](#evaluation-performance)
@@ -29,7 +27,6 @@ This project is inherited by [huoyijie/AdvancedEAST](https://github.com/huoyijie
 
 # [Dependences](#contents)
 
-- mindspore==1.2.0
 - shapely==1.7.1
 - numpy==1.19.4
 - tqdm==4.36.1
@@ -63,12 +60,10 @@ This project is inherited by [huoyijie/AdvancedEAST](https://github.com/huoyijie
     ├── run_distribute_train_ascend.sh        # launch ascend distributed training(8 pcs)
     ├── run_standalone_train_ascend.sh     # launch ascend standalone training(1 pcs)
     ├── run_distribute_train_gpu.sh        # launch gpu distributed training(8 pcs)
-    ├── run_standalone_train_gpu.sh        # launch gpu standalone training(1 pcs)
-    ├── run_eval_ascend.sh                 # evaluate model(1 pcs)
-    ├── run_eval_gpu.sh                    # evaluate model(1 pcs)
-    └── run_eval_onnx.sh                   # evaluate model(1 pcs)
+    └── run_standalone_train_gpu.sh        # launch gpu standalone training(1 pcs)
+    └── eval.sh                            # evaluate model(1 pcs)
   ├── src
-    ├── cfg.py                             # parameter configuration
+    ├── config.py                             # parameter configuration
     ├── dataset.py                         # data preprocessing
     ├── label.py                           # produce label info
     ├── logger.py                          # generate learning rate for each step
@@ -80,7 +75,6 @@ This project is inherited by [huoyijie/AdvancedEAST](https://github.com/huoyijie
     └── vgg.py                             # vgg model
   ├── export.py                            # export model for inference
   ├── prepare_data.py                      # exec data preprocessing
-  ├── eval_onnx.py                         # eval onnx
   ├── eval.py                              # eval net
   ├── train.py                             # train net on multi-size input
   └── train_single_size.py                 # train net on fix-size input
@@ -119,10 +113,10 @@ Some parameters in config.py：
 
 ## [Data Preprocess](#contents)
 
-Resize all the images to fixed size, and convert the label information(the vertex of text box) into the format used in training and evaluation, then the Mindsrecord files are generated.
+Change the 'total_img','data_dir','origin_image_dir_name' and 'origin_txt_dir_name' in ./src/config.py according to the downloaded dataset. Resize all the images to fixed size, and convert the label information(the vertex of text box) into the format used in training and evaluation, then the Mindsrecord files are generated.
 
 ```bash
-python preparedata.py
+python prepare_data.py
 ```
 
 ## [Training Process](#contents)
@@ -140,6 +134,12 @@ python train.py  --device_target="Ascend" --is_distributed=0 --device_id=0  > ou
 
 ```bash
 python train.py  --device_target="GPU" --is_distributed=0 --device_id=0  > output.train.log 2>&1 &
+```
+
+- single CPU
+
+```bash
+python train.py  --device_target="CPU" --is_distributed=0 --device_id=0  > output.train.log 2>&1 &
 ```
 
 - single device with specific size
@@ -186,47 +186,39 @@ config.py：
 
 ## [Evaluation Process](#contents)
 
-### Evaluation
-
 The above python command will run in the background, you can view the results through the file output.eval.log. You will get the accuracy as following.
 You can get loss, accuracy, recall, F1 score and the box vertices of an image.
+The "GPU" can be replaced by with "CPU" and "Ascend"
 
 - loss
 
 ```bash
-# evaluate loss of the model
-bash scripts/run_distribute_train_gpu.sh
+# evaluate loss of the model (bash)
+bash run_eval.sh 0_8-24_1012.ckpt loss
+
+# evaluate loss of the model (python)
+python eval.py --device_target="GPU" --ckpt=0_8-24_1012.ckpt --method=loss > output.eval.log 2>&1 &
 ```
 
 - score
 
 ```bash
-# evaluate loss of the model
-bash scripts/run_distribute_train_gpu.sh
+# evaluate score of the model (bash)
+bash run_eval.sh 0_8-24_1012.ckpt score
+
+# evaluate score of the model (python)
+python eval.py --device_target="GPU" --ckpt=0_8-24_1012.ckpt --method=score > output.eval.log 2>&1 &
 ```
 
-- prediction
+- prediction ( demo )
 
 ```bash
-# get prediction of an image
-bash run_eval.sh 0_8-24_1012.ckpt pred ./demo/001.png
+# get prediction of an image (bash)
+bash run_eval.sh 0_8-24_1012.ckpt pred ./demo.png
+
+# get prediction of an image (python)
+python eval.py --device_target="GPU" --ckpt=0_8-24_1012.ckpt --method=pred --path=./demo.png > output.eval.log 2>&1 &
 ```
-
-### ONNX Evaluation
-
-- Export your model to ONNX:  
-
-  ```shell
-  python export.py --ckpt_file /path/to/AdvancedEast.ckpt --file_name /path/to/AdvancedEast --file_format ONNX --device_target CPU
-  ```
-
-- Run ONNX evaluation from advanced_east directory:
-
-  ```shell
-  bash scripts/run_eval_onnx.sh ./icpr/ GPU AdvancedEast.onnx
-  ```
-
-- You can view the results through the file output.eval.log.
 
 ## Inference Process
 
@@ -264,32 +256,32 @@ Inference result is saved in current path, you can find result in acc.log file.
 
 The performance listed below are acquired with the default configurations in /src/config.py.
 The Normalization of model training on Ascend is GN, the model training on GPU is used BN.
-| Parameters           | single Ascend                            |  8 GPUs                            |
-| -------------------- | ------------------------------------- |---------------------------------------------- |
-| Model Version        | AdvancedEAST            | AdvancedEAST              |
-| Resources            | Ascend 910 | Tesla V100S-PCIE 32G|
-| MindSpore Version    | 1.1             |1.1                     |
-| Dataset              | MTWI-2018           |MTWI-2018                 |
-| Training Parameters  | epoch=6, batch_size=2, lr=1e-4  |epoch=6, batch_size=2, lr=1e-3  |
-| Optimizer            | AdamWeightDecay             |AdamWeightDecay             |
-| Loss Function        | QuadLoss |QuadLoss |
-| Outputs              |  matrix with size of 3x64x64,3x96x96,3x112x112  |matrix with size of 3x64x64,3x96x96,3x112x112       |
-| Loss                 | 0.1           |0.1           |
-| Total Time           | 28 mins, 60 mins, 90 mins | 4.9 mins, 10.3 mins, 14.5 mins
-| Checkpoints          | 173MB（.ckpt file）                |173MB（.ckpt file）                |
+| Parameters           | single Ascend                            |  8 GPUs                            | CPU
+| -------------------- | ------------------------------------- |---------------------------------------------- |---------------------------------------------- |
+| Model Version        | AdvancedEAST            | AdvancedEAST              | AdvancedEAST               |
+| Resources            | Ascend 910 | Tesla V100S-PCIE 32G| Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz |
+| MindSpore Version    | 1.1             |1.1                     |1.8                     |
+| Dataset              | MTWI-2018           |MTWI-2018                 |MTWI-2018                 |
+| Training Parameters  | epoch=6, batch_size=2, lr=1e-4  |epoch=6, batch_size=2, lr=1e-3  |epoch=6, batch_size=2, lr=1e-3 
+| Optimizer            | AdamWeightDecay             |AdamWeightDecay             |AdamWeightDecay             |
+| Loss Function        | QuadLoss |QuadLoss |QuadLoss |
+| Outputs              |  matrix with size of 3x64x64,3x96x96,3x112x112  |matrix with size of 3x64x64,3x96x96,3x112x112       |matrix with size of 3x64x64,3x96x96,3x112x112       |
+| Loss                 | 0.1           |0.1           |0.1           |
+| Total Time           | 28 mins, 60 mins, 90 mins | 4.9 mins, 10.3 mins, 14.5 mins | 367 mins,    ,    |
+| Checkpoints          | 173MB（.ckpt file）                |173MB（.ckpt file）                |173MB（.ckpt file）                |
 
 ## [Evaluation Performance](#contents)
 
 On the default
-| Parameters  | single Ascend          | 8 GPUs                            |
-| ------------------- | --------------------------- |--------------------------- |
-| Model Version      | AdvancedEAST        |AdvancedEAST        |
-| Resources        | Ascend 910         |Tesla V100S-PCIE 32G|
-| MindSpore Version   | 1.1                 | 1.1                 |
-| Dataset | 1000 images |1000 images |
-| batch_size          |   8                        | 8                        |
-| Outputs | precision, recall, F score |precision, recall, F score |
-| performance | 94.35, 55.45, 66.31 | 92.53 55.49 66.01 |
+| Parameters  | single Ascend          | 8 GPUs                            | CPU                            |
+| ------------------- | --------------------------- |--------------------------- |--------------------------- |
+| Model Version      | AdvancedEAST        |AdvancedEAST        |AdvancedEAST        |
+| Resources        | Ascend 910         |Tesla V100S-PCIE 32G| Intel(R) Xeon(R) Gold 6248 CPU @ 2.50GHz |
+| MindSpore Version   | 1.1                 | 1.1                 |1.8              |
+| Dataset | 1000 images |1000 images |1000 images |
+| batch_size          |   8                        | 8                        | 8                   |
+| Outputs | precision, recall, F score |precision, recall, F score |precision, recall, F score |
+| performance | 94.35, 55.45, 66.31 | 92.53 55.49 66.01 |93.74, 55.48, 66.06|
 
 # [ModelZoo Homepage](#contents)
 
