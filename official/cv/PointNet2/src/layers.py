@@ -17,6 +17,7 @@
 import math
 
 import mindspore.nn as nn
+import mindspore.ops as P
 from mindspore.common.initializer import initializer, HeUniform, Uniform
 
 
@@ -66,11 +67,42 @@ class Dense(nn.Dense):
 
 class Conv2d(nn.Conv2d):
     """Conv2d"""
-
-    def __init__(self, in_channels, out_channels, kernel_size, stride=1, pad_mode='same', padding=0, dilation=1,
-                 group=1, has_bias=True):
-        super(Conv2d, self).__init__(in_channels, out_channels, kernel_size, stride, pad_mode, padding, dilation, group,
-                                     has_bias, weight_init='normal', bias_init='zeros')
+    def __init__(self,
+                 in_channels,
+                 out_channels,
+                 kernel_size,
+                 stride=1,
+                 pad_mode='same',
+                 padding=0,
+                 dilation=1,
+                 group=1,
+                 has_bias=False,
+                 weight_init='normal',
+                 bias_init='zeros',
+                 data_format='NCHW'):
+        """Initialize Conv2d."""
+        super(Conv2d, self).__init__(
+            in_channels,
+            out_channels,
+            kernel_size,
+            stride,
+            pad_mode,
+            padding,
+            dilation,
+            group,
+            has_bias,
+            weight_init,
+            bias_init,
+            data_format)
+        self.conv2d = P.Conv2D(out_channel=self.out_channels,
+                               kernel_size=self.kernel_size,
+                               mode=1,
+                               pad_mode=self.pad_mode,
+                               pad=self.padding,
+                               stride=self.stride,
+                               dilation=self.dilation,
+                               group=self.group,
+                               data_format=self.data_format)
         self.reset_parameters()
 
     def reset_parameters(self):
@@ -80,3 +112,8 @@ class Conv2d(nn.Conv2d):
             fan_in, _ = calculate_fan_in_and_fan_out(self.weight.shape)
             bound = 1 / math.sqrt(fan_in)
             self.bias.set_data(initializer(Uniform(bound), [self.out_channels]))
+    def construct(self, x):
+        output = self.conv2d(x, self.weight)
+        if self.has_bias:
+            output = output+self.bias
+        return output

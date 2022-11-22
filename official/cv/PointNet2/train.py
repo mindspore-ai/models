@@ -160,7 +160,7 @@ def run_train():
     # DATA LOADING
     print('Load dataset ...')
     data_path = local_data_url
-    num_workers = 8
+    num_workers = 16
     train_ds_generator = DatasetGenerator(root=data_path,
                                           args=args,
                                           split='train',
