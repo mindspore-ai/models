@@ -179,3 +179,9 @@
 "models/research/recommend/mmoe/infer/mxbase/src/main.cpp"  "runtime/references"
 "models/research/recommend/mmoe/infer/mxbase/src/Vgg19Classify.h"  "runtime/references"
 "models/research/recommend/mmoe/infer/mxbase/src/Vgg19Classify.cpp"  "runtime/references"
+
+"models/official/cv/YOLOX/third_party/cocoeval/*"   "whitespace/comments"
+"models/official/cv/YOLOX/third_party/cocoeval/*"   "whitespace/braces]"
+"models/official/cv/YOLOX/third_party/cocoeval/*"   "build/include_subdir"
+"models/official/cv/YOLOX/third_party/cocoeval/*"   "readability/casting"
+"models/official/cv/YOLOX/third_party/cocoeval/*"   "build/namespaces_literals"

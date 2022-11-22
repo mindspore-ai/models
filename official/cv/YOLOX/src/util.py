@@ -29,8 +29,11 @@ import mindspore.nn as nn
 from mindspore import load_checkpoint, load_param_into_net, save_checkpoint, Parameter, Tensor
 from mindspore.train.callback import Callback
 from mindspore import ops
+try:
+    from third_party.fast_coco_eval_api import Fast_COCOeval as COCOeval
+except ImportError:
+    from pycocotools.cocoeval import COCOeval
 from pycocotools.coco import COCO
-from pycocotools.cocoeval import COCOeval
 
 from src.transform import xyxy2xywh
 from model_utils.config import Config
