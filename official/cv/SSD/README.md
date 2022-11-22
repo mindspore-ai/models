@@ -21,9 +21,8 @@
             - [Evaluation on GPU](#evaluation-on-gpu)
             - [ONNX Evaluation](#onnx-evaluation)
     - [Inference Process](#inference-process)
-        - [Export MindIR](#export-mindir)
         - [Infer on Ascend310](#infer-on-ascend310)
-        - [result](#result)
+        - [ONNX Infer](#ONNX Infer)
     - [Model Description](#model-description)
         - [Performance](#performance)
     - [Description of Random Situation](#description-of-random-situation)
@@ -291,14 +290,11 @@ Then you can run everything just like on ascend.
     "save_best_ckpt": True                           # Save best checkpoint when run_eval is True
     "eval_start_epoch": 40                           # Evaluation start epoch when run_eval is True
     "eval_interval": 1                               # valuation interval when run_eval is True
-    "data_path": "your_path/data"                    # your_path represents absolute path
-    "output_path": "your_path/data/train"            # your_path represents absolute path
-    "load_path": "your_path/data/checkpoint"         # your_path represents absolute path
 
     "class_num": 81                                  # Dataset class number
-    "img_shape": [300, 300]                          # Image height and width used as input to the model
+    "img_shape": [300, 300]                        # Image height and width used as input to the model
     "mindrecord_dir": "/data/MindRecord_COCO"        # MindRecord path
-    "coco_root": "your_path/cocodataset"             # COCO2017 dataset path
+    "coco_root": "/data/coco2017"                    # COCO2017 dataset path
     "voc_root": "/data/voc_dataset"                  # VOC original dataset path
     "voc_json": "annotations/voc_instances_val.json" # is the path of json file with coco format for evaluation
     "image_dir": ""                                  # Other dataset image path, if coco or voc used, it will be useless
@@ -486,12 +482,6 @@ mAP: 0.2244936111705981
   bash scripts/run_eval_onnx.sh <DATA_DIR> <COCO_SUBDIR> <ONNX_MODEL_PATH> [<INSTANCES_SET>] [<DEVICE_TARGET>] [<CONFIG_PATH>]
   ```
 
-We need three parameters for this scripts.
-
-- `DATA_DIR`：mindspore evaluation generate the data path.
-- `COCO_SUBDIR`: COCO2017 dataset path.
-- `ONNX_MODEL_PATH`: ONNX model path.
-
   Results will be saved in eval.log and have the following form:
 
   ```log
@@ -512,18 +502,18 @@ We need three parameters for this scripts.
 
 ## Inference Process
 
-**Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
+### Infer on Ascend310
 
-### [Export Model](#contents)
+#### [Export MindIR](#contents)
 
-Export Model on local
+Export MindIR on local
 
 ```shell
 python export.py --checkpoint_file_path [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --config_path [CONFIG_PATH]
 ```
 
 The ckpt_file parameter is required,
-`FILE_FORMAT` should be in ["AIR", "MINDIR", "ONNX"]
+`FILE_FORMAT` should be in ["AIR", "MINDIR"]
 
 Export on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start as follows)
 
@@ -549,7 +539,7 @@ Export on ModelArts (If you want to run in modelarts, please check the official 
 # (6) Create your job.
 ```
 
-### Infer on Ascend310
+#### Infer
 
 Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
 Current batch size can only be set to 1. The precision calculation process needs about 70G+ memory space, otherwise the process will be killed for execeeding memory limits.
@@ -562,7 +552,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [CONFIG_PATH] [DEVICE_ID]
 - `DVPP` is mandatory, and must choose from ["DVPP", "CPU"], it's case-insensitive. Note that the image shape of ssd_vgg16 inference is [300, 300], The DVPP hardware restricts width 16-alignment and height even-alignment. Therefore, the network needs to use the CPU operator to process images.
 - `DEVICE_ID` is optional, default value is 0.
 
-### result
+#### result
 
 Inference result is saved in current path, you can find result like this in acc.log file.
 
@@ -579,6 +569,49 @@ Average Recall    (AR) @[ IoU=0.50:0.95 | area= all   | maxDets=100 ] = 0.515
 Average Recall    (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.293
 Average Recall    (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.659
 mAP: 0.33880018942412393
+```
+
+### ONNX Infer
+
+#### [Export ONNX](#contents)
+
+```shell
+python export.py --checkpoint_file_path /path/to/ssd.ckpt --file_name /path/to/ssd.onnx --file_format ONNX --config_path config/ssd300_config_gpu.yaml --batch_size 1
+```
+
+Parameter ckpt_file is mandatory.
+
+'FILE_FORMAT' select ONNX.
+
+#### Infer
+
+Currently, only inference with batch_Size equal to 1 is supported. Batch_Size is given in the inference script.
+
+```shell
+/bin/bash ./infer_ssd_mobilenet_v1_fpn_onnx.sh <DATA_PATH> <COCO_ROOT> <ONNX_MODEL_PATH> [<INSTANCES_SET>] [<DEVICE_TARGET>] [<CONFIG_PATH>]
+
+# Example
+/bin/bash ./infer_ssd_mobilenet_v1_fpn_onnx.sh ../cocodataset/ val2017 ../SSDMOBILE.onnx /home/workspace/ssd/cocodataset/annotations/instances_{}.json GPU ../config/ssd_mobilenet_v1_fpn_ONNX_config.yaml
+```
+
+#### Result
+
+Inference result is saved in current path, you can find result like this in acc.log file.
+
+```bash
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.351
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.522
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.382
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.179
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.353
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.485
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.325
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.516
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.548
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.325
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.567
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.702
+mAP: 0.3510597974549167
 ```
 
 ## [Model Description](#contents)
@@ -601,7 +634,7 @@ mAP: 0.33880018942412393
 | Accuracy            | IoU=0.50: 22%               | IoU=0.50: 22%             |
 | Model for inference | 34M(.ckpt file)             | 34M(.ckpt file)             |
 | configuration           | ssd300_config.yaml          |ssd300_config_gpu.yaml       |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> ||
 
 | Parameters          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -619,7 +652,7 @@ mAP: 0.33880018942412393
 | Accuracy            | IoU=0.50: 29.1 %             | IoU=0.50: 29.1 %             |
 | Model for inference | 96M(.ckpt file)             | 96M(.ckpt file)             |
 | configuration           | ssd_mobilenet_v1_fpn_config.yaml  |ssd_mobilenet_v1_fpn_config_gpu.yaml       |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> ||
 
 | Parameters          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -637,7 +670,7 @@ mAP: 0.33880018942412393
 | Accuracy            | IoU=0.50: 34.3%            | IoU=0.50: 34.3 %           |
 | Model for inference | 255M(.ckpt file)             | 255M(.ckpt file)             |
 | configuration           | ssd_resnet50_fpn_config.yaml | ssd_resnet50_fpn_config_gpu.yaml       |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> ||
 
 | Parameters          | Ascend                      | GPU                         |
 | ------------------- | --------------------------- | --------------------------- |
@@ -655,7 +688,7 @@ mAP: 0.33880018942412393
 | Accuracy            | IoU=0.50: 23.2%               | IoU=0.50: 23.2%             |
 | Model for inference | 186M(.ckpt file)             | 186M(.ckpt file)             |
 | configuration           | ssd_vgg16_config.yaml      | ssd_vgg16_config_gpu.yaml      |
-| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> |
+| Scripts             | <https://gitee.com/mindspore/models/tree/master/official/cv/SSD> ||
 
 | Parameters          |                        GPU                         |
 | ------------------- | ------------------------------------------------------ |
