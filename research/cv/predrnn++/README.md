@@ -91,7 +91,8 @@ Predrnn++
 ├── scripts
 │   ├── run_eval.sh                             # Launch evaluation in Ascend
 │   ├── run_infer_310.sh                         # Ascend inference shell script
-│   └── run_standalone_train.sh                 # Launch standalone training in Ascend (1 pcs)
+│   ├──run_standalone_train.sh                 # Launch standalone training in Ascend (1 pcs)
+    ├──run_onnx_eval_gpu.sh                    # Launch evaluation in GPU
 ├── nets
 │   ├── predrnn_pp.py                           # Model definition
 ├── layers
@@ -108,6 +109,7 @@ Predrnn++
 ├── config.py                                   # Dataset patch functions
 ├── train.py                                    # Training script
 ├── eval.py                                     # Evaluation script
+├── eval_onnx.py                                # ONNX Evaluation script
 ├── preprocess.py                               # 310 Inference Preprocessing Script
 ├── postprocess.py                              # 310 Inference Postprocessing Scripts
 ├── export.py                                   # Export checkpoint files to air/mindir/onnx
@@ -201,6 +203,45 @@ mse per frame: 47.858854093653633
 
 ```
 
+### [ONNX Evaluation](#contents)
+
+- Run `run_onnx_eval_gpu.sh` for onnx evaluation. TEST_MINDRECORD_PATH is the path of the file mnist_test.mindrecord
+
+```bash
+
+bash scripts/run_onnx_eval_gpu.sh [TEST_MINDRECORD_PATH] [DEVICE_ID] [ONNX_PATH]
+
+```
+
+Check the `log_eval_onnx.txt` and you will get outputs as following:
+
+```shell
+
+mse per frame: 49.656566874356194
+21.269986471390343
+27.755035290743578
+34.40210470413779
+40.78885927557308
+47.202049734758184
+53.275564770010064
+59.65047627209342
+65.19822068647905
+70.80047457485912
+76.2228969635173
+ssim per frame: 0.89109135
+0.9380267
+0.9277069
+0.9198755
+0.9081956
+0.89688635
+0.8865062
+0.8747493
+0.8639205
+0.8530709
+0.84197533
+
+```
+
 ## [Export Process](#contents)
 
 ### [Export](#contents)
@@ -224,8 +265,6 @@ mse per frame: 47.858854093653633
 ```
 
 ## [Infer Process](#contents)
-
-**Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
 ### [Infer](#contents)
 
@@ -259,7 +298,7 @@ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DE
 | Speed                      | 1000 ms/step(1pcs)                                |
 | Total time                 | 22h                                               |
 | Checkpoint for Fine tuning | 177.27M (.ckpt file)                              |
-| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/research/cv/predrnn++) |
+| Scripts                    | [Link](https://gitee.com/mindspore/models/tree/master/official/cv/predrnn++) |
 
 #### [Evaluation Performance](#contents)
 
