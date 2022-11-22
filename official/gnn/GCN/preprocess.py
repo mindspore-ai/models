@@ -29,6 +29,7 @@ def generate_bin():
     parser.add_argument('--data_dir', type=str, default='./data/cora/cora_mr', help='Dataset directory')
     parser.add_argument('--test_nodes_num', type=int, default=1000, help='Nodes numbers for test')
     parser.add_argument('--result_path', type=str, default='./preprocess_Result/', help='Result path')
+    parser.add_argument('--device_type', type=str, default='', help='device type')
     args_opt = parser.parse_args()
 
     adj, feature, label_onehot, _ = get_adj_features_labels(args_opt.data_dir)
@@ -38,6 +39,8 @@ def generate_bin():
     feature_path = os.path.join(args_opt.result_path, "01_data")
     os.makedirs(adj_path)
     os.makedirs(feature_path)
+    if args_opt.device_type != 'Ascend':
+        adj = adj.astype(np.float32)
     adj.tofile(os.path.join(adj_path, "adj.bin"))
     feature.tofile(os.path.join(feature_path, "feature.bin"))
     np.save(os.path.join(args_opt.result_path, 'label_onehot.npy'), label_onehot)

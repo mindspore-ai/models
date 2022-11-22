@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14.1)
-project(MindSporeCxxTestcase[CXX])
+project(Ascend310Infer)
 add_compile_definitions(_GLIBCXX_USE_CXX11_ABI=0)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O0 -g -std=c++17 -Werror -Wall -fPIE -Wl,--allow-shlib-undefined")
 set(PROJECT_SRC_ROOT ${CMAKE_CURRENT_LIST_DIR}/)
@@ -8,7 +8,7 @@ include_directories(${MINDSPORE_PATH})
 include_directories(${MINDSPORE_PATH}/include)
 include_directories(${PROJECT_SRC_ROOT}/../)
 
-set(TOP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../..)
+set(TOP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../../../..)
 include_directories(${TOP_DIR}/utils/cpp_infer/example)  # common_inc in top dir
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../)  # common_inc in local dir
 

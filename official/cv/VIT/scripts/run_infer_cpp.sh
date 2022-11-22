@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2022 Huawei Technologies Co., Ltd
+# Copyright 2021 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,10 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 6 || $# -gt 7 ]]; then
-    echo "Usage: bash run_infer_cpp.sh [MINDIR_PATH] [NET_TYPE] [DATASET] [DATA_PATH] [CONFIG_PATH] [DEVICE_TYPE] [DEVICE_ID]
-    NET_TYPE can choose from [resnet18, resnet34, se-resnet50, resnet50, resnet101, resnet152]
-    DATASET can choose from [cifar10, imagenet]
+if [[ $# -lt 5 || $# -gt 6 ]]; then
+    echo "Usage: bash run_infer_cpp.sh [MINDIR_PATH] [NET_TYPE] [DATASET] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
+    NET_TYPE can choose from [vit]
     DEVICE_TYPE can choose from [Ascend, GPU, CPU]
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
@@ -31,42 +30,34 @@ get_real_path(){
     fi
 }
 model=$(get_real_path $1)
-if [ $2 == 'resnet18' ] || [ $2 == 'resnet34' ] || [ $2 == 'se-resnet50' ] || [ $2 == 'resnet50' ] || [ $2 == 'resnet152' ] || [ $2 == 'resnet101' ]; then
+if [ $2 == 'vit' ]; then
   network=$2
 else
-  echo "NET_TYPE can choose from [resnet18, se-resnet50]"
+  echo "NET_TYPE can choose from [vit]"
   exit 1
 fi
 
-if [ $3 == 'cifar10' ] || [ $3 == 'imagenet' ]; then
-  dataset=$3
-else
-  echo "DATASET can choose from [cifar10, imagenet]"
-  exit 1
-fi
-
+dataset=$3
 data_path=$(get_real_path $4)
-config_path=$(get_real_path $5)
 
 device_id=0
-if [ $# == 7 ]; then
-    device_id=$7
+if [ $# == 6 ]; then
+    device_id=$6
 fi
-
-# shellcheck disable=SC2153
-if [ $6 == 'Ascend' ] || [ $6 == 'GPU' ] || [ $6 == 'CPU' ]; then
-  device_type=$6
-else
-  echo "DEVICE_TYPE can choose from [Ascend, GPU, CPU]"
-  exit 1
-fi
-echo "device type: "$device_type
 
 echo "mindir name: "$model
 echo "dataset path: "$data_path
 echo "network: "$network
 echo "dataset: "$dataset
 echo "device id: "$device_id
+
+if [ $5 == 'Ascend' ] || [ $5 == 'GPU' ] || [ $5 == 'CPU' ]; then
+  device_type=$5
+else
+  echo "DEVICE_TYPE can choose from [Ascend, GPU, CPU]"
+  exit 1
+fi
+echo "device type: "$device_type
 
 if [ $MS_LITE_HOME ]; then
   RUNTIME_HOME=$MS_LITE_HOME/runtime
@@ -86,15 +77,6 @@ function compile_app()
     bash build.sh &> build.log
 }
 
-function preprocess_data()
-{
-    if [ -d preprocess_Result ]; then
-        rm -rf ./preprocess_Result
-    fi
-    mkdir preprocess_Result
-    python ../preprocess.py --data_path=$data_path --output_path=./preprocess_Result --config_path=$config_path &> preprocess.log
-}
-
 function infer()
 {
     cd - || exit
@@ -111,27 +93,14 @@ function infer()
 
 function cal_acc()
 {
-    if [ "x${dataset}" == "xcifar10" ] || [ "x${dataset}" == "xCifar10" ]; then
-        python ../postprocess.py --dataset=$dataset --label_path=./preprocess_Result/label --result_path=result_Files --config_path=$config_path &> acc.log
-    else
-        python ../create_imagenet2012_label.py  --img_path=$data_path
-        python ../postprocess.py --dataset=$dataset --result_path=./result_Files --label_path=./imagenet_label.json --config_path=$config_path &> acc.log
-    fi
+    python ../create_imagenet2012_label.py  --img_path=$data_path
+    python ../postprocess.py --dataset=$dataset --result_path=./result_Files --label_path=./imagenet_label.json  &> acc.log
+
     if [ $? -ne 0 ]; then
         echo "calculate accuracy failed"
         exit 1
     fi
 }
-
-if [ "x${dataset}" == "xcifar10" ] || [ "x${dataset}" == "xCifar10" ]; then
-    if [ $2 == 'resnet18' ]; then
-        CONFIG_PATH=resnet18_cifar10_config.yaml
-    else
-        CONFIG_PATH=resnet50_cifar10_config.yaml
-    fi
-    preprocess_data ${CONFIG_PATH}
-    data_path=./preprocess_Result/img_data
-fi
 
 compile_app
 if [ $? -ne 0 ]; then
