@@ -578,7 +578,7 @@ class IPT(nn.Cell):
         self.head = nn.CellList([
             nn.SequentialCell(conv(args.n_colors, n_feats, kernel_size).to_float(self.dytpe),
                               ResBlock(conv, n_feats, 5, act=act).to_float(self.dytpe),
-                              ResBlock(conv, n_feats, 5, act=act).to_float(self.dytpe)) for _ in range(6)])
+                              ResBlock(conv, n_feats, 5, act=act).to_float(self.dytpe)) for _ in args.scale])
 
         self.body = VisionTransformer(img_dim=args.patch_size,
                                       patch_dim=args.patch_dim,
@@ -597,7 +597,7 @@ class IPT(nn.Cell):
         self.tail = nn.CellList([
             nn.SequentialCell(Upsampler(conv, s, n_feats).to_float(self.dytpe),
                               conv(n_feats, args.n_colors, kernel_size).to_float(self.dytpe)) \
-                                  for s in [2, 3, 4, 1, 1, 1]])
+                                  for s in args.scale])
 
         self.reshape = ops.Reshape()
         self.tile = ops.Tile()
@@ -607,7 +607,10 @@ class IPT(nn.Cell):
 
     def construct(self, x, idx):
         """ipt"""
-        idx_num = idx.shape[0]
+        if idx.shape[0] == 6:
+            idx_num = 0
+        else:
+            idx_num = idx.shape[0]
         x = self.head[idx_num](x)
         idx_tensor = self.cast(self.s2t(idx_num), ms.int32)
         if self.con_loss:
