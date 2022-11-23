@@ -819,14 +819,16 @@ MindSpore Golden Stick provides SimQAT and SCOP algorithm for ResNet50. SimQAT i
 
 MindSpore Golden Stick provides SLB algorithm for ResNet18. SLB is provided by Huawei Noah's Ark Lab. SLB is a quantization algorithm with low-bit weight searching, it regards the discrete weights in an arbitrary quantized neural network as searchable variables, and utilize a differential method to search them accurately. In particular, each weight is represented as a probability distribution over the discrete value set. The probabilities are optimized during training and the values with the highest probability are selected to establish the desired quantized network. SLB have more advantage when quantize with low-bit compared with SimQAT.
 
+MindSpore Golden Stick provides UniPruning algorithm for ResNet18/34/50/101/152 and other ResNet-like and VGG-like models.  UniPruning is provided by Intelligent Systems and Data Science Technology center of Huawei Moscow Research Center. UniPruning is a soft-pruning algorithm. It measures relative importance of channels in a hardware-friendly manner. Particularly, it groups channels in groups of size G, where each channel's importance is measured as a L2 norm of its weights multiplied by consecutive BatchNorm's gamma and the absolute group importance is given as the median of channel importances. The relative importance criteria of a channel group G group of a layer L is measured as the highest median of the layer L divided by the median of group G. The higher the relative importance of a group, the less a group contributes to the layer output. During training UniPruning algorithm every N epochs searches for channel groups with the highest relative criteria network-wise and zeroes channels in that groups until reaching target sparsity, which is gives as a % of parameters to prune. To obtain pruned model after training, pruning mask and zeroed weights from the last UniPruning step are used to physically prune the network.
+
 ## Training Process
 
-| **Algorithm**  | SimQAT | SCOP | SLB |
-| --------- | ------ | --- | ---- |
-| **supported backend**  | GPU | GPU、Ascend | GPU |
-| **support pretrain** | yes | must provide pretrained ckpt | don't need and can't load pretrained ckpt |
-| **support continue-train** | yes | yes | yes |
-| **support distribute train** | yes | yes | yes |
+| **Algorithm**  | SimQAT | SCOP | SLB | UniPruning |
+| --------- | ------ | --- | ---- | ---- |
+| **supported backend**  | GPU | GPU、Ascend | GPU | GPU, Ascend |
+| **support pretrain** | yes | must provide pretrained ckpt | don't need and can't load pretrained ckpt | pretrained ckpt optional |
+| **support continue-train** | yes | yes | yes | yes |
+| **support distribute train** | yes | yes | yes | yes |
 
 - `pretrain` means training the network without applying algorithm. `pretrained ckpt` is loaded when training network with algorithm applied.
 - `continue-train` means stop the training process after applying algorithm and continue training process from checkpoint file of previous training process.
@@ -874,6 +876,28 @@ bash run_standalone_train_gpu.sh ../quantization/slb/ ../quantization/slb/resnet
 Or if we want to train ResNet50 distributively with SCOP algorithm applied
 cd ./golden_stick/scripts/
 bash run_distribute_train_gpu.sh ../pruner/scop/ ../pruner/scop/resnet50_cifar10_config.yaml /path/to/dataset FP32 /path/to/fp32_ckpt
+
+# For UniPruning on GPU set config.device_target = 'GPU'
+
+# standalone training example, apply UniPruning and train from pretrained checkpoint
+cd ./golden_stick/scripts/
+bash run_standalone_train_gpu.sh ../pruner/uni_pruning/ ../pruner/uni_pruning/resnet50_config.yaml /path/to/dataset FP32 ./checkpoint/resnet-90.ckpt
+
+# distributed training example, apply UniPruning and train from full precision checkpoint
+cd ./golden_stick/scripts/
+bash run_distribute_train_gpu.sh ../pruner/uni_pruning/ ../pruner/uni_pruning/resnet50_config.yaml /path/to/dataset FP32 ./checkpoint/resnet-90.ckpt
+```
+
+### Running on Ascend
+
+```text
+# For UniPruning on Ascend config.device_target = 'Ascend'
+
+# distributed training example, apply UniPruning and train from pretrained checkpoint
+bash scripts/run_distribute_train.sh /path/to/rank_table_file pruner/uni_pruning/ pruner/uni_pruning/resnet50_config.yaml /path/to/dataset FP32 ./checkpoint/resnet-90.ckpt
+
+# standalone training example, apply UniPruning and train from pretrained checkpoint
+bash scripts/run_standalone_train.sh pruner/uni_pruning/ /path/to/rank_table_file  pruner/uni_pruning/resnet50_config.yaml /path/to/dataset FP32 ./checkpoint/resnet-90.ckpt
 ```
 
 ## Evaluation Process
@@ -892,6 +916,18 @@ bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cif
 
 # Just replace PYTHON_PATH CONFIG_FILE for applying different algorithm, take SLB algorithm as an example
 bash run_eval_gpu.sh ../quantization/slb/ ../quantization/slb/resnet18_cifar10_config.yaml ./cifar10/train/ ./checkpoint/resnet-100.ckpt
+```
+
+### Running on Ascend
+
+```text
+#Evaluation for UniPruning consists of : loading pretrained checkpoint, physically pruning model according to the pruning mask that we got from train procedure and evaluation.
+#At the end the pruned model is also exported as .MINDIR and .AIR for inference deployment
+
+!!! # To get pruned model, config.mask_path (pruning mask) should be set:
+    # Pruning masks are saved as .json during training in the os.path.join(config.output_path, config.exp_name)
+
+bash scripts/run_eval.sh pruner/uni_pruning pruner/uni_pruning/resnet50_config.yaml /path/to/val/dataset /path/to/checkpoint
 ```
 
 ### Result
@@ -1058,6 +1094,18 @@ result:{'top_1_accuracy': 0.6589927884615384, 'top_5_accuracy': 0.86642628205128
 
 ```text
 result:{'top_1_accuracy': 0.6609142628205128, 'top_5_accuracy': 0.8670873397435898} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
+```
+
+- Apply UniPruning on ResNet50 with 85% target sparsity on ImageNet2012 dataset:
+
+```text
+result:{'top_1_accuracy': 0.7622}, Parameters pruned = 15%, Ascend310 acceleration = 31%
+```
+
+- Apply UniPruning on ResNet50 with 85% target sparsity on ImageNet2012 dataset:
+
+```text
+result:{'top_1_accuracy': 0.7582}, Parameters pruned = 25%, Ascend310 acceleration = 35%
 ```
 
 # [Model Description](#contents)
