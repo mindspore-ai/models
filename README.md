@@ -17,7 +17,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 |  Domain | Sub Domain    | Network  | Ascend  | GPU | CPU |
 |:------   |:------| :-----------  |:------:   |:------:  |:-----: |
 | Audio | Speaker Recognition | [ecapa_tdnn](https://gitee.com/mindspore/models/tree/master/official/audio/EcapaTDNN) |✅|   |   |
-| Audio | Speech Synthesis | [lpcnet](https://gitee.com/mindspore/models/tree/master/official/audio/IPCNet) |✅| ✅ |   |
+| Audio | Speech Synthesis | [lpcnet](https://gitee.com/mindspore/models/tree/master/official/audio/LPCNet) |✅| ✅ |   |
 | Audio | Speech Synthesis | [melgan](https://gitee.com/mindspore/models/tree/master/official/audio/MELGAN) |✅| ✅ |   |
 | Audio | Speech Synthesis | [tacotron2](https://gitee.com/mindspore/models/tree/master/official/audio/Tacotron2) |✅|   |   |
 | Graph Neural Network | Text Classification | [bgcf](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) |✅| ✅ |   |

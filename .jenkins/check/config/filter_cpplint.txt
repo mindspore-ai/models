@@ -166,13 +166,13 @@
 "models/official/audio/MELGAN/infer/mxbase/src/Melgan.h" "runtime/references"
 "models/official/audio/MELGAN/infer/mxbase/src/Melgan.cpp" "runtime/references"
 
-"models/official/audio/IPCNet/ascend310_infer/inc/lpcnet.h" "runtime/int"
-"models/official/audio/IPCNet/ascend310_infer/src/main.cc" "build/include_subdir"
-"models/official/audio/IPCNet/third_party/src/*" "runtime/*"
-"models/official/audio/IPCNet/third_party/src/*" "build/*"
-"models/official/audio/IPCNet/third_party/src/*" "readability/*"
-"models/official/audio/IPCNet/third_party/src/*" "whitespace/*"
-"models/official/audio/IPCNet/third_party/src/*" "[legal/copyright] "
+"models/official/audio/LPCNet/ascend310_infer/inc/lpcnet.h" "runtime/int"
+"models/official/audio/LPCNet/ascend310_infer/src/main.cc" "build/include_subdir"
+"models/official/audio/LPCNet/third_party/src/*" "runtime/*"
+"models/official/audio/LPCNet/third_party/src/*" "build/*"
+"models/official/audio/LPCNet/third_party/src/*" "readability/*"
+"models/official/audio/LPCNet/third_party/src/*" "whitespace/*"
+"models/official/audio/LPCNet/third_party/src/*" "[legal/copyright] "
 
 "models/research/cv/simclr/infer/mxbase/SimCLRClassifyOpencv.h"                 "runtime/references"
 
