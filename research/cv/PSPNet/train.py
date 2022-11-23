@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -38,9 +38,9 @@ from mindspore.train.loss_scale_manager import FixedLossScaleManager
 import mindspore.dataset as ds
 
 set_seed(1234)
-rank_id = int(os.getenv('RANK_ID'))
-device_id = int(os.getenv('DEVICE_ID'))
-device_num = int(os.getenv('RANK_SIZE'))
+rank_id = int(os.getenv('RANK_ID', '0'))
+device_id = int(os.getenv('DEVICE_ID', '0'))
+device_num = int(os.getenv('RANK_SIZE', '1'))
 context.set_context(mode=context.GRAPH_MODE, device_target='Ascend')
 Model_Art = False
 
