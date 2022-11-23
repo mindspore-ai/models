@@ -53,6 +53,8 @@ transfer_train: False
 pretrained: ""
 log_path: "outputs/"
 ann_val_file: ""
+result_view: False
+recommend_threshold: False
 
 # Test option
 test_nms_thresh: 0.45

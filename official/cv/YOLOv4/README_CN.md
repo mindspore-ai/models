@@ -457,6 +457,8 @@ bash run_eval.sh dataset/coco2017 checkpoint/yolov4.ckpt
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.717
 ```
 
+同时可以通过设置`result_view`为True, 将推理的结果坐标、类别和score值绘至原图并保存到当前推理路径。若设置`recommend_threshold`为True, 实现各个类别map计算，推荐每个类别的最佳score阈值和区分保存正确和错误推理图片等功能。
+
 ### Test-dev
 
 ```bash
