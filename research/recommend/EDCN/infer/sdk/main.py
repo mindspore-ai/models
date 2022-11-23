@@ -107,7 +107,7 @@ if __name__ == '__main__':
         data_source_vector = StringVector()
         data_source_vector.push_back(b'mxpi_tensorinfer0')
         infer_result = stream_manager_api.GetProtobuf(stream_name, 0, keyVec)
-        infer_total_time += time.time() - start.time
+        infer_total_time += time.time() - start_time
 
         result = MxpiDataType.MxpiTensorPackageList()
         result.ParseFromString(infer_result[0].messageBuf)
