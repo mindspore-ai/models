@@ -17,7 +17,7 @@
 |  领域 | 子领域  | 网络   | Ascend | GPU | CPU |
 |:------   |:------| :-----------  |:------:   |:------:  |:-----: |
 | 语音 | 声纹识别 | [ecapa_tdnn](https://gitee.com/mindspore/models/tree/master/official/audio/EcapaTDNN) |✅|   |   |
-| 语音 | 语音合成 | [lpcnet](https://gitee.com/mindspore/models/tree/master/official/audio/IPCNet) |✅| ✅ |   |
+| 语音 | 语音合成 | [lpcnet](https://gitee.com/mindspore/models/tree/master/official/audio/LPCNet) |✅| ✅ |   |
 | 语音 | 语音合成 | [melgan](https://gitee.com/mindspore/models/tree/master/official/audio/MELGAN) |✅| ✅ |   |
 | 语音 | 语音合成 | [tacotron2](https://gitee.com/mindspore/models/tree/master/official/audio/Tacotron2) |✅|   |   |
 | 图神经网络 | 文本分类 | [bgcf](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) |✅| ✅ |   |
