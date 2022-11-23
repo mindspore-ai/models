@@ -40,12 +40,16 @@ def get_acc():
     parser.add_argument('--result_path', type=str, default='./result_Files', help='result Files')
     parser.add_argument('--label_path', type=str, default='', help='y_test npy Files')
     parser.add_argument('--mask_path', type=str, default='', help='test_mask npy Files')
+    parser.add_argument('--device_type', type=str, default='', help='device type')
     args_opt = parser.parse_args()
 
     label_onehot = np.load(args_opt.label_path)
     test_mask = np.load(args_opt.mask_path)
 
-    pred = np.fromfile(os.path.join(args_opt.result_path, 'adj_0.bin'), np.float16)
+    if args_opt.device_type == 'Ascend':
+        pred = np.fromfile(os.path.join(args_opt.result_path, 'adj_0.bin'), np.float16)
+    else:
+        pred = np.fromfile(os.path.join(args_opt.result_path, 'adj_0.bin'), np.float32)
     if args_opt.dataset_name == 'cora':
         pred = pred.reshape(2708, 7)
     else:

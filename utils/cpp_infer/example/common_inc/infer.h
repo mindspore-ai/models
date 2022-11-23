@@ -30,8 +30,8 @@
 #include "include/dataset/vision_lite.h"
 #else
 #include "include/dataset/vision.h"
-#include "include/dataset/vision_ascend.h"
 #endif
+#include "include/dataset/vision_ascend.h"
 
 using mindspore::Context;
 using mindspore::DataType;
@@ -41,6 +41,7 @@ using mindspore::ModelType;
 using mindspore::MSTensor;
 using mindspore::Serialization;
 using mindspore::Status;
+using mindspore::GraphCell;
 
 using mindspore::dataset::Execute;
 using mindspore::dataset::InterpolationMode;
