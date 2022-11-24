@@ -249,22 +249,22 @@ You can start training using python or shell scripts. The usage of shell scripts
 
 - Ascend:
 
-```yaml
-ds_type:imagenet
-or
-ds_type:cifar10
-Take training cifar10 as an example, the ds_type parameter is set to cifar10
-````
+    ```yaml
+    ds_type:imagenet
+    or
+    ds_type:cifar10
+    Take training cifar10 as an example, the ds_type parameter is set to cifar10
+    ````
 
-```bash
-# distribute training example(8p)
-bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATA_DIR]
-# example: bash scripts/run_distribute_train_ascend.sh ~/hccl_8p.json /home/DataSet/cifar10/
+    ```bash
+    # distribute training example(8p)
+    bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [DATA_DIR]
+    # example: bash scripts/run_distribute_train_ascend.sh ~/hccl_8p.json /home/DataSet/cifar10/
 
-# standalone training
-bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [DATA_DIR]
-# example: bash scripts/run_standalone_train_ascend.sh 0 /home/DataSet/cifar10/
-```
+    # standalone training
+    bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [DATA_DIR]
+    # example: bash scripts/run_standalone_train_ascend.sh 0 /home/DataSet/cifar10/
+    ```
 
 > Notes:
 > RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
@@ -273,17 +273,17 @@ bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [DATA_DIR]
 
 - GPU:
 
-```bash
-# distribute training example(8p)
-bash scripts/run_distribute_train_gpu.sh DATA_PATH
-```
+    ```bash
+    # distribute training example(8p)
+    bash scripts/run_distribute_train_gpu.sh DATA_PATH
+    ```
 
 - CPU:
 
-```bash
-# standalone training example with shell
-bash scripts/run_standalone_train_cpu.sh DATA_PATH
-```
+    ```bash
+    # standalone training example with shell
+    bash scripts/run_standalone_train_cpu.sh DATA_PATH
+    ```
 
 ### Launch
 
@@ -313,25 +313,25 @@ Training result will be stored in the example path. Checkpoints will be stored a
 
 - Ascend
 
-```python
-epoch: 1 step: 1251, loss is 5.4833196
-Epoch time: 520274.060, per step time: 415.887
-epoch: 2 step: 1251, loss is 4.093194
-Epoch time: 288520.628, per step time: 230.632
-epoch: 3 step: 1251, loss is 3.6242008
-Epoch time: 288507.506, per step time: 230.622
-```
+    ```python
+    epoch: 1 step: 1251, loss is 5.4833196
+    Epoch time: 520274.060, per step time: 415.887
+    epoch: 2 step: 1251, loss is 4.093194
+    Epoch time: 288520.628, per step time: 230.632
+    epoch: 3 step: 1251, loss is 3.6242008
+    Epoch time: 288507.506, per step time: 230.622
+    ```
 
 - GPU
 
-```python
-epoch: 1 step: 1251, loss is 6.49775
-Epoch time: 1487493.604, per step time: 1189.044
-epoch: 2 step: 1251, loss is 5.6884665
-Epoch time: 1421838.433, per step time: 1136.561
-epoch: 3 step: 1251, loss is 5.5168786
-Epoch time: 1423009.501, per step time: 1137.498
-```
+    ```python
+    epoch: 1 step: 1251, loss is 6.49775
+    Epoch time: 1487493.604, per step time: 1189.044
+    epoch: 2 step: 1251, loss is 5.6884665
+    Epoch time: 1421838.433, per step time: 1136.561
+    epoch: 3 step: 1251, loss is 5.5168786
+    Epoch time: 1423009.501, per step time: 1137.498
+    ```
 
 ## [Eval process](#contents)
 
@@ -341,16 +341,16 @@ You can start training using python or shell scripts. The usage of shell scripts
 
 - Ascend:
 
-```bash
-  bash scripts/run_eval_ascend.sh [DEVICE_ID] [DATA_DIR] [CHECKPOINT_PATH]
-  # example: bash scripts/run_eval_ascend.sh 0 /home/DataSet/cifar10/ /home/model/inceptionv4/ckpt/inceptionv4-train-250_1251
-```
+    ```bash
+    bash scripts/run_eval_ascend.sh [DEVICE_ID] [DATA_DIR] [CHECKPOINT_PATH]
+    # example: bash scripts/run_eval_ascend.sh 0 /home/DataSet/cifar10/ /home/model/inceptionv4/ckpt/inceptionv4-train-250_1251
+    ```
 
 - GPU
 
-```bash
-  bash scripts/run_eval_gpu.sh DATA_DIR CHECKPOINT_PATH
-```
+    ```bash
+    bash scripts/run_eval_gpu.sh DATA_DIR CHECKPOINT_PATH
+    ```
 
 ### Launch
 
@@ -377,9 +377,9 @@ metric: {'Loss': 0.9849, 'Top1-Acc':0.7985, 'Top5-Acc':0.9460}
 
 - GPU(8p)
 
-```python
-metric: {'Loss': 0.8144, 'Top1-Acc': 0.8009, 'Top5-Acc': 0.9457}
-```
+    ```python
+    metric: {'Loss': 0.8144, 'Top1-Acc': 0.8009, 'Top5-Acc': 0.9457}
+    ```
 
 ## Model Export
 

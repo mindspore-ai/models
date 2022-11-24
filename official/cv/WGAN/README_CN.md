@@ -98,7 +98,7 @@ WGAN网络包含两部分，生成器网络和判别器网络。判别器网络�
         │   ├── run_eval_onnx.sh         // shell script for ONNX evaluation
         ├── src
         │   ├── dataset.py             // 创建数据集及数据预处理
-        │   ├── dcgan_model.py            // WGAN架构,标准的DCGAN架构
+        │   ├── dcgan_model.py            // WGAN架构，标准的DCGAN架构
         │   ├── dcgannobn_model.py            // WGAN架构，没有BatchNorm的DCGAN架构
         │   ├── args.py               // 参数配置文件
         │   ├── cell.py               // 模型单步训练文件

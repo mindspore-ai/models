@@ -212,7 +212,7 @@
 
 - 在Ascend环境运行时评估NYU数据集
 
- 将最终训练好的.ckpt的Coarse和Fine模型分别命名为FinalCoarseNet.ckpt和FinalFineNet.ckpt，放在./Model/Ckpt文件夹下，加载训练好的.ckpt模型，然后进行评估。
+  将最终训练好的.ckpt的Coarse和Fine模型分别命名为FinalCoarseNet.ckpt和FinalFineNet.ckpt，放在./Model/Ckpt文件夹下，加载训练好的.ckpt模型，然后进行评估。
 
   ```bash
   ## bash脚本命令
@@ -259,11 +259,11 @@ python export.py --coarse_or_fine fine
 
   使用以下命令
 
-```bash
- bash run_infer_310.sh [MINDIR1_PATH] [MINDIR2_PATH] [DATA_PATH] [DEVICE_ID]
-```
+  ```bash
+   bash run_infer_310.sh [MINDIR1_PATH] [MINDIR2_PATH] [DATA_PATH] [DEVICE_ID]
+  ```
 
-其中MINDIR1_PATH为coarse_net路径，MINDIR2_PATH为fine_net路径，DATA_PATH为测试集路径
+  其中MINDIR1_PATH为coarse_net路径，MINDIR2_PATH为fine_net路径，DATA_PATH为测试集路径
 
   ```bash
   cd scripts

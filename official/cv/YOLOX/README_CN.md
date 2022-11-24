@@ -39,17 +39,17 @@
 
 # 模型架构
 
-作为2021年 YOLO 系列的后起之秀， 也为了更加公平的对比，YOLOX 的模型主干网络参考了YOLOv3 的**DarkNet-53**以及YOLOv4~5中的 CSP、Focus 模块、SPP(spatial pyramid
-pooling)模块、PANet path-aggregation neck等。DarkNet53以及其它的网络模块具体可以参考YOLOv3、YOLOv4、YOLOv5的设计。为了解决目标检测中分类和回归的冲突问题， YOLOX 将
-head中的回归分支和分类分支进行了解耦(Decoupled head),并且将obj分支加在了回归分支中。
+作为2021年 YOLO 系列的后起之秀，也为了更加公平的对比，YOLOX 的模型主干网络参考了YOLOv3 的**DarkNet-53**以及YOLOv4~5中的 CSP、Focus 模块、SPP(spatial pyramid
+pooling)模块、PANet path-aggregation neck等。DarkNet53以及其它的网络模块具体可以参考YOLOv3、YOLOv4、YOLOv5的设计。为了解决目标检测中分类和回归的冲突问题，YOLOX 将
+head中的回归分支和分类分支进行了解耦(Decoupled head)，并且将obj分支加在了回归分支中。
 
 # 数据集
 
-使用的数据集:[COCO 2017](https://cocodataset.org/#download)
+使用的数据集：[COCO 2017](https://cocodataset.org/#download)
 
-支持的数据集: COCO2017 或者与 MS COCO 格式相同的数据集
+支持的数据集：COCO2017 或者与 MS COCO 格式相同的数据集
 
-支持的标注: COCO2017 或者与 MS COCO 相同格式的标注
+支持的标注：COCO2017 或者与 MS COCO 相同格式的标注
 
 - 目录结构如下，由用户定义目录和文件的名称
 
@@ -92,7 +92,7 @@ head中的回归分支和分类分支进行了解耦(Decoupled head),并且将ob
     python hccl_tools.py
     ```
 
-- 选择backbone:训练支持 yolox-darknet53 以及 yolox-x, 在训练之前需要指定backbone的名称，比如在default_config.yaml文件指定backbone为
+- 选择backbone：训练支持 yolox-darknet53 以及 yolox-x, 在训练之前需要指定backbone的名称，比如在default_config.yaml文件指定backbone为
   "yolox_darknet53"或者"yolox_x",你也可以在命令行手动指定backbone的名称，如 ```python train.py --backbone="yolox_darknet53"```
 - 训练分为前285轮和后15轮，区别主要在于后15轮的训练关闭了数据增强以及使用了L1 loss，若您不打算训练完300轮便打算终止，请将default_config.yaml文件中的no_aug_epochs调小。
   **注意在训练后15轮的时候需要指定第285轮的检查点文件作为训练开始的网络权重，见如下示例**
@@ -186,7 +186,7 @@ head中的回归分支和分类分支进行了解耦(Decoupled head),并且将ob
 
 ## 脚本参数
 
-train.py中主要的参数如下:
+train.py中主要的参数如下：
 
 ```text
 
@@ -200,13 +200,13 @@ train.py中主要的参数如下:
 --no_aug_epochs             关闭数据增强的训练轮次，默认为15
 --data_dir                  数据集的目录
 --need_profiler
-                            是否使用profiler。 0表示否，1表示是。 默认值：0
---per_batch_size            训练的批处理大小。 默认值：8
+                            是否使用profiler。0表示否，1表示是。默认值：0
+--per_batch_size            训练的批处理大小。默认值：8
 --max_gt                    图片中gt的最大数量，默认值：50
 --num_classes               数据集中类别的个数，默认值：80
 --input_size                输入网络的尺度大小，默认值：640
 --fpn_strides               fpn缩放的步幅，默认：[8, 16, 32]
---use_l1                    是否使用L1 loss,只有在关闭数据增强的训练轮次中才为True，默认为False
+--use_l1                    是否使用L1 loss，只有在关闭数据增强的训练轮次中才为True，默认为False
 --use_syc_bn                是否开启同步BN，默认True
 --n_candidate_k             动态k中候选iou的个数，默认为10
 --lr                        学习率，默认为0.01
@@ -215,11 +215,11 @@ train.py中主要的参数如下:
 --weight_decay              权重衰减，默认为0.0005
 --momentum                  动量
 --log_interval              日志记录间隔步数
---ckpt_interval             保存checkpoint间隔。 默认值：-1
+--ckpt_interval             保存checkpoint间隔。默认值：-1
 --is_save_on_master         在master或all rank上保存ckpt，1代表master，0代表all ranks。 默认值：1
---is_distributed            是否分发训练，1代表是，0代表否。 默认值：1
---rank                      分布式本地进程序号。 默认值：0
---group_size                设备进程总数。 默认值：1
+--is_distributed            是否分发训练，1代表是，0代表否。默认值：1
+--rank                      分布式本地进程序号。默认值：0
+--group_size                设备进程总数。默认值：1
 --run_eval                  是否开启边训练边推理。默认为False
 --eval_parallel             是否开启并行推理。默认为 True。仅在 run_eval 为 True，并且 is_distributed 为 1 时有效
 ```
@@ -285,7 +285,7 @@ train.py中主要的参数如下:
 
   ```
 
-  上述shell脚本将在后台运行分布式训练。 您可以通过train_parallel0/log.txt文件查看结果。 得到如下损失值：
+  上述shell脚本将在后台运行分布式训练。您可以通过train_parallel0/log.txt文件查看结果。得到如下损失值：
 
     ```log
 
@@ -310,7 +310,7 @@ train.py中主要的参数如下:
 python eval.py --data_dir=./dataset/xxx --val_ckpt=your_val_ckpt_file_path --per_batch_size=8 --backbone=yolox_darknet53
 ```
 
-backbone参数指定为yolox_darknet53或者yolox_x，上述python命令将在后台运行。 您可以通过```%Y-%m-%d_time_%H_%M_%S.log```文件查看结果。
+backbone参数指定为yolox_darknet53或者yolox_x，上述python命令将在后台运行。您可以通过```%Y-%m-%d_time_%H_%M_%S.log```文件查看结果。
 
 由于 `pycocotools` 中评估结果的程序速度较慢，建议使用 `third_party` 文件夹中提供的第三方库，提升结果评估的速度。进入 `third_party` 文件夹下，运行 `bash build.sh` 命令构建动态链接库即可，程序会自动调用该工具。
 
@@ -346,7 +346,7 @@ python export.py --config_path=yolox_darknet53.yaml --backbone=yolox_darknet53 -
 
 ```
 
-参数```backbone```用于指定主干网络，你可以选择 yolox_darknet53 或者是 yolox_x ,```val_ckpt```用于指定模型的检查点文件
+参数```backbone```用于指定主干网络，你可以选择 yolox_darknet53 或者是 yolox_x ，```val_ckpt```用于指定模型的检查点文件
 
 ## 推理过程
 
@@ -430,7 +430,7 @@ YOLOX应用于118000张图像上（标注和数据格式必须与COCO 2017相同
 
 |参数| YOLOX-x                                                            |
 | -------------------------- |--------------------------------------------------------------------|
-|资源| Ascend 910；CPU 2.60GHz, 192核；内存：755G；系统：EulerOS 2.8；               |
+|资源| Ascend 910；CPU 2.60GHz，192核；内存：755G；系统：EulerOS 2.8；               |
 |上传日期| 2022年3月11日                                                         |
 | MindSpore版本| 1.3.0-alpha                                                        |
 |数据集| 118000张图像                                                          |
@@ -472,7 +472,7 @@ YOLOX应用于118000张图像上（标注和数据格式必须与COCO test 2017�
 
 # 随机情况说明
 
-在dataset.py中，我们设置了“create_dataset”函数内的种子。 在var_init.py中，我们设置了权重初始化的种子。
+在dataset.py中，我们设置了“create_dataset”函数内的种子。在var_init.py中，我们设置了权重初始化的种子。
 
 # ModelZoo主页
 

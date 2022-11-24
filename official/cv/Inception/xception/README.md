@@ -110,51 +110,51 @@ Parameters for both training and evaluation can be set in `default_config.yaml`.
 
 - Config on ascend
 
-```python
-Major parameters in train.py and config.py are:
-'num_classes': 1000                # dataset class numbers
-'batch_size': 128                  # input batchsize
-'loss_scale': 1024                 # loss scale
-'momentum': 0.9                    # momentum
-'weight_decay': 1e-4               # weight decay
-'epoch_size': 250                  # total epoch numbers
-'save_checkpoint': True            # save checkpoint
-'save_checkpoint_epochs': 1        # save checkpoint epochs
-'keep_checkpoint_max': 5           # max numbers to keep checkpoints
-'save_checkpoint_path': "./"       # save checkpoint path
-'warmup_epochs': 1                 # warmup epoch numbers
-'lr_decay_mode': "liner"           # lr decay mode
-'use_label_smooth': True           # use label smooth
-'finish_epoch': 0                  # finished epochs numbers
-'label_smooth_factor': 0.1         # label smoothing factor
-'lr_init': 0.00004                 # initiate learning rate
-'lr_max': 0.4                      # max bound of learning rate
-'lr_end': 0.00004                  # min bound of learning rate
-```
+    ```python
+    Major parameters in train.py and config.py are:
+    'num_classes': 1000                # dataset class numbers
+    'batch_size': 128                  # input batchsize
+    'loss_scale': 1024                 # loss scale
+    'momentum': 0.9                    # momentum
+    'weight_decay': 1e-4               # weight decay
+    'epoch_size': 250                  # total epoch numbers
+    'save_checkpoint': True            # save checkpoint
+    'save_checkpoint_epochs': 1        # save checkpoint epochs
+    'keep_checkpoint_max': 5           # max numbers to keep checkpoints
+    'save_checkpoint_path': "./"       # save checkpoint path
+    'warmup_epochs': 1                 # warmup epoch numbers
+    'lr_decay_mode': "liner"           # lr decay mode
+    'use_label_smooth': True           # use label smooth
+    'finish_epoch': 0                  # finished epochs numbers
+    'label_smooth_factor': 0.1         # label smoothing factor
+    'lr_init': 0.00004                 # initiate learning rate
+    'lr_max': 0.4                      # max bound of learning rate
+    'lr_end': 0.00004                  # min bound of learning rate
+    ```
 
 - Config on gpu
 
-```python
-Major parameters in train.py and config.py are:
-'num_classes': 1000                # dataset class numbers
-'batch_size': 64                   # input batchsize
-'loss_scale': 1024                 # loss scale
-'momentum': 0.9                    # momentum
-'weight_decay': 1e-4               # weight decay
-'epoch_size': 250                  # total epoch numbers
-'save_checkpoint': True            # save checkpoint
-'save_checkpoint_epochs': 1        # save checkpoint epochs
-'keep_checkpoint_max': 5           # max numbers to keep checkpoints
-'save_checkpoint_path': "./gpu-ckpt"       # save checkpoint path
-'warmup_epochs': 1                 # warmup epoch numbers
-'lr_decay_mode': "linear"          # lr decay mode
-'use_label_smooth': True           # use label smooth
-'finish_epoch': 0                  # finished epochs numbers
-'label_smooth_factor': 0.1         # label smoothing factor
-'lr_init': 0.00004                 # initiate learning rate
-'lr_max': 0.4                      # max bound of learning rate
-'lr_end': 0.00004                  # min bound of learning rate
-```
+    ```python
+    Major parameters in train.py and config.py are:
+    'num_classes': 1000                # dataset class numbers
+    'batch_size': 64                   # input batchsize
+    'loss_scale': 1024                 # loss scale
+    'momentum': 0.9                    # momentum
+    'weight_decay': 1e-4               # weight decay
+    'epoch_size': 250                  # total epoch numbers
+    'save_checkpoint': True            # save checkpoint
+    'save_checkpoint_epochs': 1        # save checkpoint epochs
+    'keep_checkpoint_max': 5           # max numbers to keep checkpoints
+    'save_checkpoint_path': "./gpu-ckpt"       # save checkpoint path
+    'warmup_epochs': 1                 # warmup epoch numbers
+    'lr_decay_mode': "linear"          # lr decay mode
+    'use_label_smooth': True           # use label smooth
+    'finish_epoch': 0                  # finished epochs numbers
+    'label_smooth_factor': 0.1         # label smoothing factor
+    'lr_init': 0.00004                 # initiate learning rate
+    'lr_max': 0.4                      # max bound of learning rate
+    'lr_end': 0.00004                  # min bound of learning rate
+    ```
 
 ## [Training process](#contents)
 
@@ -164,34 +164,34 @@ You can start training using python or shell scripts. The usage of shell scripts
 
 - Ascend:
 
-```shell
-# distribute training example(8p)
-bash scripts/run_distribute_train.sh RANK_TABLE_FILE DATA_PATH
-# standalone training
-bash scripts/run_standalone_train.sh DEVICE_ID DATA_PATH
-```
+    ```shell
+    # distribute training example(8p)
+    bash scripts/run_distribute_train.sh RANK_TABLE_FILE DATA_PATH
+    # standalone training
+    bash scripts/run_standalone_train.sh DEVICE_ID DATA_PATH
+    ```
 
 - GPU:
 
-```shell
-# fp32 distributed training example(8p)
-bash scripts/run_train_gpu_fp32.sh DEVICE_NUM DATASET_PATH PRETRAINED_CKPT_PATH(optional)
+    ```shell
+    # fp32 distributed training example(8p)
+    bash scripts/run_train_gpu_fp32.sh DEVICE_NUM DATASET_PATH PRETRAINED_CKPT_PATH(optional)
 
-# fp32 standalone training example
-bash scripts/run_train_gpu_fp32.sh 1 DATASET_PATH PRETRAINED_CKPT_PATH(optional)
+    # fp32 standalone training example
+    bash scripts/run_train_gpu_fp32.sh 1 DATASET_PATH PRETRAINED_CKPT_PATH(optional)
 
-# fp16 distributed training example(8p)
-bash scripts/run_train_gpu_fp16.sh DEVICE_NUM DATASET_PATH PRETRAINED_CKPT_PATH(optional)
+    # fp16 distributed training example(8p)
+    bash scripts/run_train_gpu_fp16.sh DEVICE_NUM DATASET_PATH PRETRAINED_CKPT_PATH(optional)
 
-# fp16 standalone training example
-bash scripts/run_train_gpu_fp16.sh 1 DATASET_PATH PRETRAINED_CKPT_PATH(optional)
+    # fp16 standalone training example
+    bash scripts/run_train_gpu_fp16.sh 1 DATASET_PATH PRETRAINED_CKPT_PATH(optional)
 
-# infer example
-bash run_eval_gpu.sh DEVICE_ID DATASET_PATH CHECKPOINT_PATH
+    # infer example
+    bash run_eval_gpu.sh DEVICE_ID DATASET_PATH CHECKPOINT_PATH
 
-#ascend310 infer example
-bash run_infer_310.sh MINDIR_PATH DATA_PATH LABEL_FILE DEVICE_ID
-```
+    #ascend310 infer example
+    bash run_infer_310.sh MINDIR_PATH DATA_PATH LABEL_FILE DEVICE_ID
+    ```
 
 > Notes: RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html), and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 
@@ -224,21 +224,21 @@ Training result will be stored in the example path. Checkpoints will be stored a
 
 - Ascend:
 
-``` shell
-epoch: 1 step: 1251, loss is 4.8427444
-epoch time: 701242.350 ms, per step time: 560.545 ms
-epoch: 2 step: 1251, loss is 4.0637593
-epoch time: 598591.422 ms, per step time: 478.490 ms
-```
+    ``` shell
+    epoch: 1 step: 1251, loss is 4.8427444
+    epoch time: 701242.350 ms, per step time: 560.545 ms
+    epoch: 2 step: 1251, loss is 4.0637593
+    epoch time: 598591.422 ms, per step time: 478.490 ms
+    ```
 
 - GPU:
 
-``` shell
-epoch: 1 step: 20018, loss is 5.479554
-epoch time: 5664051.330 ms, per step time: 282.948 ms
-epoch: 2 step: 20018, loss is 5.179064
-epoch time: 5628609.779 ms, per step time: 281.177 ms
-```
+    ``` shell
+    epoch: 1 step: 20018, loss is 5.479554
+    epoch time: 5664051.330 ms, per step time: 282.948 ms
+    epoch: 2 step: 20018, loss is 5.179064
+    epoch time: 5628609.779 ms, per step time: 281.177 ms
+    ```
 
 ### Training with 8 cards on ModelArts
 
@@ -275,15 +275,15 @@ You can start training using python or shell scripts. The usage of shell scripts
 
 - Ascend:
 
-```shell
-bash scripts/run_eval.sh DEVICE_ID DATA_DIR PATH_CHECKPOINT
-```
+    ```shell
+    bash scripts/run_eval.sh DEVICE_ID DATA_DIR PATH_CHECKPOINT
+    ```
 
 - GPU:
 
-```shell
-bash scripts/run_eval_gpu.sh DEVICE_ID DATA_DIR PATH_CHECKPOINT
-```
+    ```shell
+    bash scripts/run_eval_gpu.sh DEVICE_ID DATA_DIR PATH_CHECKPOINT
+    ```
 
 ### Launch
 
@@ -306,42 +306,42 @@ Evaluation result will be stored in the example path, you can find result like t
 
 - Evaluating with ascend
 
-```shell
-result: {'Loss': 1.7797744848789312, 'Top_1_Acc': 0.7985777243589743, 'Top_5_Acc': 0.9485777243589744}
-```
+    ```shell
+    result: {'Loss': 1.7797744848789312, 'Top_1_Acc': 0.7985777243589743, 'Top_5_Acc': 0.9485777243589744}
+    ```
 
 - Evaluating with gpu
 
-```shell
-result: {'Loss': 1.7846775874590903, 'Top_1_Acc': 0.798735595390525, 'Top_5_Acc': 0.9498439500640204}
-```
+    ```shell
+    result: {'Loss': 1.7846775874590903, 'Top_1_Acc': 0.798735595390525, 'Top_5_Acc': 0.9498439500640204}
+    ```
 
 ### Evaluating with single card on ModelArts
 
-  If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows
+If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows
 
-  ```python
-  # (1) Upload the code folder 'xception' to S3 bucket.
-  # (2) Click to "create training task" on the website UI interface.
-  # (3) Set the code directory to "/{path}/xception" on the website UI interface.
-  # (4) Set the startup file to /{path}/xception/eval.py" on the website UI interface.
-  # (5) Perform a or b.
-  #     a. setting parameters in /{path}/xception/default_config.yaml.
-  #         1. Set ”enable_modelarts: True“
-  #         2. Set “checkpoint_path: ./{path}/*.ckpt”('load_checkpoint_path' indicates the path of the weight file to be evaluated relative to the file `eval.py`, and the weight file must be included in the code directory.)
-  #         3. Set “modelarts_dataset_unzip_name: {folder_name}", if the data is uploaded in the form of zip package.
-  #         4. Set “folder_name_under_zip_file: {path}”, (dateset path under the unzip folder, such as './ImageNet_Original/validation_preprocess')
-  #     b. adding on the website UI interface.
-  #         1. Add ”enable_modelarts: True“
-  #         2. Add “checkpoint_path: ./{path}/*.ckpt”('load_checkpoint_path' indicates the path of the weight file to be evaluated relative to the file `eval.py`, and the weight file must be included in the code directory.)
-  #         3. Add “modelarts_dataset_unzip_name: {folder_name}", if the data is uploaded in the form of zip package.
-  #         4. Add “folder_name_under_zip_file: {path}”, (dateset path under the unzip folder, such as './ImageNet_Original/validation_preprocess')
-  # (6) Upload the dataset(not mindrecord format) to S3 bucket.
-  # (7) Check the "data storage location" on the website UI interface and set the "Dataset path" path.
-  # (8) Set the "Output file path" and "Job log path" to your path on the website UI interface.
-  # (9) Under the item "resource pool selection", select the specification of a single card.
-  # (10) Create your job.
-  ```
+```python
+# (1) Upload the code folder 'xception' to S3 bucket.
+# (2) Click to "create training task" on the website UI interface.
+# (3) Set the code directory to "/{path}/xception" on the website UI interface.
+# (4) Set the startup file to /{path}/xception/eval.py" on the website UI interface.
+# (5) Perform a or b.
+#     a. setting parameters in /{path}/xception/default_config.yaml.
+#         1. Set ”enable_modelarts: True“
+#         2. Set “checkpoint_path: ./{path}/*.ckpt”('load_checkpoint_path' indicates the path of the weight file to be evaluated relative to the file `eval.py`, and the weight file must be included in the code directory.)
+#         3. Set “modelarts_dataset_unzip_name: {folder_name}", if the data is uploaded in the form of zip package.
+#         4. Set “folder_name_under_zip_file: {path}”, (dateset path under the unzip folder, such as './ImageNet_Original/validation_preprocess')
+#     b. adding on the website UI interface.
+#         1. Add ”enable_modelarts: True“
+#         2. Add “checkpoint_path: ./{path}/*.ckpt”('load_checkpoint_path' indicates the path of the weight file to be evaluated relative to the file `eval.py`, and the weight file must be included in the code directory.)
+#         3. Add “modelarts_dataset_unzip_name: {folder_name}", if the data is uploaded in the form of zip package.
+#         4. Add “folder_name_under_zip_file: {path}”, (dateset path under the unzip folder, such as './ImageNet_Original/validation_preprocess')
+# (6) Upload the dataset(not mindrecord format) to S3 bucket.
+# (7) Check the "data storage location" on the website UI interface and set the "Dataset path" path.
+# (8) Set the "Output file path" and "Job log path" to your path on the website UI interface.
+# (9) Under the item "resource pool selection", select the specification of a single card.
+# (10) Create your job.
+```
 
 ## [Export process](#contents)
 

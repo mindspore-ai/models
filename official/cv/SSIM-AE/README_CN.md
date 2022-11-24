@@ -116,10 +116,10 @@ MVTec AD数据集
 - 硬件（Ascend/CPU）
     - 使用Ascend/CPU处理器来搭建硬件环境。
 - 框架
-  - [MindSpore](https://www.mindspore.cn/install/en)
+    - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
-  - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-  - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
 
 # 快速入门
 
@@ -170,18 +170,18 @@ MVTec AD数据集
 
 2. 执行训练
 
-- Ascend处理器环境运行
+    - Ascend处理器环境运行
 
-  ```shell
-  # 运行训练示例
-  bash scripts/run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID]
+      ```shell
+      # 运行训练示例
+      bash scripts/run_standalone_train.sh [CONFIG_PATH] [DEVICE_ID]
 
-  # 910运行推理示例
-  bash scripts/run_eval.sh [CONFIG_PATH] [DEVICE_ID]
+      # 910运行推理示例
+      bash scripts/run_eval.sh [CONFIG_PATH] [DEVICE_ID]
 
-  # 310运行推理示例
-  bash scripts/run_infer_310.sh [MINDIR_PATH] [CONFIG_PATH] [SSIM_THRESHOLD] [L1_THRESHOLD] [DEVICE_ID]
-  ```
+      # 310运行推理示例
+      bash scripts/run_infer_310.sh [MINDIR_PATH] [CONFIG_PATH] [SSIM_THRESHOLD] [L1_THRESHOLD] [DEVICE_ID]
+      ```
 
 ## 训练过程
 
@@ -270,7 +270,7 @@ python export.py --config_path=[CONFIG_PATH]
 
 ### Ascend310处理器环境推理
 
-   在推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
+在推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
 
 - 在昇腾310上使用MVTec AD bottle数据集进行推理
 

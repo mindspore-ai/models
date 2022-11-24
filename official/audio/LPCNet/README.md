@@ -47,20 +47,20 @@ Dataset used: [LibriSpeech](<https://www.openslr.org/12/>)
 
 - Download the dataset (only .flac files are needed), the directory structure is as follows:
 
-```train-clean-100
-├─README.TXT
-├─READERS.TXT
-├─CHAPTERS.TXT
-├─BOOKS.TXT
-└─train-clean-100
-  ├─19
-    ├─198
-      ├─19-198.trans.txt
-      ├─19-198-0001.flac
-      ├─19-198-0002.flac
-      ...
-      └─19-198-0014.flac
-```
+    ```train-clean-100
+    ├─README.TXT
+    ├─READERS.TXT
+    ├─CHAPTERS.TXT
+    ├─BOOKS.TXT
+    └─train-clean-100
+    ├─19
+        ├─198
+        ├─19-198.trans.txt
+        ├─19-198-0001.flac
+        ├─19-198-0002.flac
+        ...
+        └─19-198-0014.flac
+    ```
 
 ## [Environment Requirements](#contents)
 

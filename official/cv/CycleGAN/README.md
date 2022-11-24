@@ -129,30 +129,30 @@ Major parameters in train.py and config.py as follows:
 
 - running on Ascend with default parameters
 
-```bash
-bash scripts/run_train_ascend.sh [DATA_PATH] [EPOCH_SIZE]
-# epoch_size is recommended 200
-```
+    ```bash
+    bash scripts/run_train_ascend.sh [DATA_PATH] [EPOCH_SIZE]
+    # epoch_size is recommended 200
+    ```
 
 - running on GPU with default parameters
 
-```bash
-bash scripts/run_train_standalone_gpu.sh [DATA_PATH] [EPOCH_SIZE]
-# epoch_size is recommended 200
-```
+    ```bash
+    bash scripts/run_train_standalone_gpu.sh [DATA_PATH] [EPOCH_SIZE]
+    # epoch_size is recommended 200
+    ```
 
 - running on 8 GPUs with default parameters
 
-```bash
-bash scripts/run_train_distributed_gpu.sh [DATA_PATH] [EPOCH_SIZE]
-# epoch_size is recommended 600
-```
+    ```bash
+    bash scripts/run_train_distributed_gpu.sh [DATA_PATH] [EPOCH_SIZE]
+    # epoch_size is recommended 600
+    ```
 
 - running on CPU with default parameters
 
-```bath
-python train.py --platform CPU --dataroot [DATA_PATH] --use_random False --max_epoch [EPOCH_SIZE] --print_iter 1 pool_size 0
-```
+    ```bath
+    python train.py --platform CPU --dataroot [DATA_PATH] --use_random False --max_epoch [EPOCH_SIZE] --print_iter 1 pool_size 0
+    ```
 
 ## [Evaluation](#contents)
 

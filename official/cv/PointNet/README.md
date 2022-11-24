@@ -131,34 +131,34 @@ Major parameters in train.py are as follows:
 
 - running on Ascend
 
-```shell
-# Run stand-alone training for Ascend
-bash scripts/run_standalone_train_ascend.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
-# example:
-bash scripts/run_standalone_train_ascend.sh ../shapenetcore_partanno_segmentation_benchmark_v0 ./ckpts 1
+    ```shell
+    # Run stand-alone training for Ascend
+    bash scripts/run_standalone_train_ascend.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
+    # example:
+    bash scripts/run_standalone_train_ascend.sh ../shapenetcore_partanno_segmentation_benchmark_v0 ./ckpts 1
 
 
 
-# Run distributed training for Ascend
-bash scripts/run_distribution_ascend.sh [RANK_TABLE_FILE] [CKPTS_DIR] [DATA_PATH]
-# example:
-bash scripts/run_distribution_ascend.sh [RANK_TABLE_FILE] ./ckpts ../shapenetcore_partanno_segmentation_benchmark_v0
+    # Run distributed training for Ascend
+    bash scripts/run_distribution_ascend.sh [RANK_TABLE_FILE] [CKPTS_DIR] [DATA_PATH]
+    # example:
+    bash scripts/run_distribution_ascend.sh [RANK_TABLE_FILE] ./ckpts ../shapenetcore_partanno_segmentation_benchmark_v0
 
 
-```
+    ```
 
 - running on GPU
 
-```shell
-# Run stand-alone training for GPU
-bash scripts/run_standalone_train_gpu.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
-# example:
-bash scripts/run_standalone_train_gpu.sh ../shapenetcore_partanno_segmentation_benchmark_v0 ./ckpts 1
-# Run distributed training for GPU
-bash scripts/run_distribute_gpu.sh [DATA_PATH] [CKPT_PATH]
-# example:
-bash scripts/run_distribute_gpu.sh ./ckpts ../shapenetcore_partanno_segmentation_benchmark_v0
-```
+    ```shell
+    # Run stand-alone training for GPU
+    bash scripts/run_standalone_train_gpu.sh [DATA_PATH] [CKPT_PATH] [DEVICE_ID]
+    # example:
+    bash scripts/run_standalone_train_gpu.sh ../shapenetcore_partanno_segmentation_benchmark_v0 ./ckpts 1
+    # Run distributed training for GPU
+    bash scripts/run_distribute_gpu.sh [DATA_PATH] [CKPT_PATH]
+    # example:
+    bash scripts/run_distribute_gpu.sh ./ckpts ../shapenetcore_partanno_segmentation_benchmark_v0
+    ```
 
 Distributed training requires the creation of an HCCL configuration file in JSON format in advance. For specific
 operations, see the instructions
@@ -193,35 +193,35 @@ Before running the command below, please check the checkpoint path used for eval
 
 - running on Ascend
 
-```shell
-# Evaluate on ascend
-bash scripts/run_standalone_eval_ascend.sh [DATA_PATH] [MODEL_PATH] [DEVICE_ID]
-# example:
-bash scripts/run_standalone_eval_ascend.sh shapenetcore_partanno_segmentation_benchmark_v0 pointnet.ckpt 1
-```
+    ```shell
+    # Evaluate on ascend
+    bash scripts/run_standalone_eval_ascend.sh [DATA_PATH] [MODEL_PATH] [DEVICE_ID]
+    # example:
+    bash scripts/run_standalone_eval_ascend.sh shapenetcore_partanno_segmentation_benchmark_v0 pointnet.ckpt 1
+    ```
 
-You can view the results through the file "log_standalone_eval_ascend". The accuracy of the test dataset will be as follows:
+    You can view the results through the file "log_standalone_eval_ascend". The accuracy of the test dataset will be as follows:
 
-```bash
-# grep "mIOU " log_standalone_eval_ascend
-'mIOU for class Chair: 0.869'
-```
+    ```bash
+    # grep "mIOU " log_standalone_eval_ascend
+    'mIOU for class Chair: 0.869'
+    ```
 
 - running on GPU
 
-```shell
-  # Evaluate on GPU
-bash scripts/run_standalone_eval_gpu.sh [DATA_PATH] [MODEL_PATH] [DEVICE_ID]
-# example:
-bash scripts/run_standalone_eval_gpu.sh shapenetcore_partanno_segmentation_benchmark_v0 pointnet.ckpt 1
-```
+    ```shell
+    # Evaluate on GPU
+    bash scripts/run_standalone_eval_gpu.sh [DATA_PATH] [MODEL_PATH] [DEVICE_ID]
+    # example:
+    bash scripts/run_standalone_eval_gpu.sh shapenetcore_partanno_segmentation_benchmark_v0 pointnet.ckpt 1
+    ```
 
-You can view the results through the file "log_standalone_eval_gpu". The accuracy of the test dataset will be as follows:
+    You can view the results through the file "log_standalone_eval_gpu". The accuracy of the test dataset will be as follows:
 
-```bash
-# grep "mIOU " log_standalone_eval_gpu
-'mIOU for class Chair: 0.869'
-```
+    ```bash
+    # grep "mIOU " log_standalone_eval_gpu
+    'mIOU for class Chair: 0.869'
+    ```
 
 ## ONNX Evaluation
 

@@ -99,7 +99,7 @@ EfficientNet总体网络架构如下：
 
 ## 脚本参数
 
-模型训练和评估过程中使用的参数可以在config.py中设置:
+模型训练和评估过程中使用的参数可以在config.py中设置：
 
 ```text
 'train_url': None,                      # 训练输出路径（桶）

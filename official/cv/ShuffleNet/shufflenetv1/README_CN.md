@@ -35,12 +35,12 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
 
 # 数据集
 
-使用的数据集: imagenet
+使用的数据集：imagenet
 
-- 数据集大小: 146G, 1330k 1000类彩色图像
-    - 训练: 140G, 1280k张图片
-    - 测试: 6G, 50k张图片
-- 数据格式: RGB图像.
+- 数据集大小：146G, 1330k 1000类彩色图像
+    - 训练：140G, 1280k张图片
+    - 测试：6G, 50k张图片
+- 数据格式：RGB图像
     - 注意：数据在src/dataset.py中被处理
 
 # 环境要求
@@ -95,7 +95,7 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
 
 ## 脚本参数
 
-模型训练和评估过程中使用的参数可以在default_config.yaml中设置:
+模型训练和评估过程中使用的参数可以在default_config.yaml中设置：
 
 ```default_config.yaml
 'epoch_size': 250,                  # 模型迭代次数  
@@ -117,7 +117,7 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
 'momentum': 0.9                     # Momentum中的动量参数
 ```
 
-如需获取更多信息，Ascend请查看`default_config.yaml`, GPU请查看`gpu_default_config.yaml`.
+如需获取更多信息，Ascend请查看`default_config.yaml`, GPU请查看`gpu_default_config.yaml`。
 
 ## 训练过程
 
@@ -218,54 +218,54 @@ result:{'Loss': 2.0479587888106323, 'Top_1_Acc': 0.7385817307692307, 'Top_5_Acc'
 
 - 如果要在modelarts上进行模型的训练，可以参考modelarts的[官方指导文档](https://support.huaweicloud.com/modelarts/) 开始进行模型的训练和推理，具体操作如下：
 
-```ModelArts
-#  在ModelArts上使用分布式训练示例:
-#  数据集存放方式
+    ```ModelArts
+    #  在ModelArts上使用分布式训练示例：
+    #  数据集存放方式
 
-#  ├── ImageNet_Original         # dir
-#    ├── train                   # train dir
-#       ├── train_dataset        # train_dataset dir
-#       ├── train_predtrained    # predtrained dir
-#    ├── eval                    # eval dir
-#       ├── eval_dataset         # eval dataset dir
-#       ├── checkpoint           # ckpt files dir
+    #  ├── ImageNet_Original         # dir
+    #    ├── train                   # train dir
+    #       ├── train_dataset        # train_dataset dir
+    #       ├── train_predtrained    # predtrained dir
+    #    ├── eval                    # eval dir
+    #       ├── eval_dataset         # eval dataset dir
+    #       ├── checkpoint           # ckpt files dir
 
-# (1) 选择a(修改yaml文件参数)或者b(ModelArts创建训练作业修改参数)其中一种方式。
-#       a. 设置 "enable_modelarts=True" 。
-#          设置 "is_distributed=True"
-#          设置 "save_ckpt_path=/cache/train/outputs_imagenet/"
-#          设置 "train_dataset_path=/cache/data/train/train_dataset/"
-#          设置 "resume=/cache/data/train/train_predtrained/pred file name" 如果没有预训练权重 resume=""
+    # (1) 选择a(修改yaml文件参数)或者b(ModelArts创建训练作业修改参数)其中一种方式。
+    #       a. 设置 "enable_modelarts=True" 。
+    #          设置 "is_distributed=True"
+    #          设置 "save_ckpt_path=/cache/train/outputs_imagenet/"
+    #          设置 "train_dataset_path=/cache/data/train/train_dataset/"
+    #          设置 "resume=/cache/data/train/train_predtrained/pred file name" 如果没有预训练权重 resume=""
 
-#       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
-#          在modelarts的界面上设置方法a所需要的参数
-#          注意：路径参数不需要加引号
+    #       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
+    #          在modelarts的界面上设置方法a所需要的参数
+    #          注意：路径参数不需要加引号
 
-# (2)设置网络配置文件的路径 "_config_path=/The path of config in default_config.yaml/"
-# (3) 在modelarts的界面上设置代码的路径 "/path/shufflenetv1"。
-# (4) 在modelarts的界面上设置模型的启动文件 "train.py" 。
-# (5) 在modelarts的界面上设置模型的数据路径 ".../ImageNet_Original"(选择ImageNet_Original文件夹路径) ,
-# 模型的输出路径"Output file path" 和模型的日志路径 "Job log path" 。
-# (6) 开始模型的训练。
+    # (2)设置网络配置文件的路径 "_config_path=/The path of config in default_config.yaml/"
+    # (3) 在modelarts的界面上设置代码的路径 "/path/shufflenetv1"。
+    # (4) 在modelarts的界面上设置模型的启动文件 "train.py" 。
+    # (5) 在modelarts的界面上设置模型的数据路径 ".../ImageNet_Original"(选择ImageNet_Original文件夹路径) ,
+    # 模型的输出路径"Output file path" 和模型的日志路径 "Job log path" 。
+    # (6) 开始模型的训练。
 
-# 在modelarts上使用模型推理的示例
-# (1) 把训练好的模型地方到桶的对应位置。
-# (2) 选择a或者b其中一种方式。
-#        a.设置 "enable_modelarts=True"
-#          设置 "eval_dataset_path=/cache/data/eval/eval_dataset/"
-#          设置 "ckpt_files=/cache/data/eval/checkpoint/ckpt file"
+    # 在modelarts上使用模型推理的示例
+    # (1) 把训练好的模型地方到桶的对应位置。
+    # (2) 选择a或者b其中一种方式。
+    #        a.设置 "enable_modelarts=True"
+    #          设置 "eval_dataset_path=/cache/data/eval/eval_dataset/"
+    #          设置 "ckpt_files=/cache/data/eval/checkpoint/ckpt file"
 
-#       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
-#          在modelarts的界面上设置方法a所需要的参数
-#          注意：路径参数不需要加引号
+    #       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
+    #          在modelarts的界面上设置方法a所需要的参数
+    #          注意：路径参数不需要加引号
 
-# (3) 设置网络配置文件的路径 "_config_path=/The path of config in default_config.yaml/"
-# (4) 在modelarts的界面上设置代码的路径 "/path/shufflenetv1"。
-# (5) 在modelarts的界面上设置模型的启动文件 "eval.py" 。
-# (6) 在modelarts的界面上设置模型的数据路径 "../ImageNet_Original"(选择ImageNet_Original文件夹路径) ,
-# 模型的输出路径"Output file path" 和模型的日志路径 "Job log path" 。
-# (7) 开始模型的推理。
-```
+    # (3) 设置网络配置文件的路径 "_config_path=/The path of config in default_config.yaml/"
+    # (4) 在modelarts的界面上设置代码的路径 "/path/shufflenetv1"。
+    # (5) 在modelarts的界面上设置模型的启动文件 "eval.py" 。
+    # (6) 在modelarts的界面上设置模型的数据路径 "../ImageNet_Original"(选择ImageNet_Original文件夹路径) ,
+    # 模型的输出路径"Output file path" 和模型的日志路径 "Job log path" 。
+    # (7) 开始模型的推理。
+    ```
 
 ## 导出过程
 
@@ -279,24 +279,24 @@ python export.py --ckpt_path [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 
 - Export MindIR on Modelarts
 
-```Modelarts
-Export MindIR example on ModelArts
-Data storage method is the same as training
-# (1) Choose either a (modify yaml file parameters) or b (modelArts create training job to modify parameters)。
-#       a. set "enable_modelarts=True"
-#          set "file_name=shufflenetv1"
-#          set "file_format=MINDIR"
-#          set "ckpt_file=/cache/data/checkpoint file name"
+    ```Modelarts
+    Export MindIR example on ModelArts
+    Data storage method is the same as training
+    # (1) Choose either a (modify yaml file parameters) or b (modelArts create training job to modify parameters)。
+    #       a. set "enable_modelarts=True"
+    #          set "file_name=shufflenetv1"
+    #          set "file_format=MINDIR"
+    #          set "ckpt_file=/cache/data/checkpoint file name"
 
-#       b. Add "enable_modelarts=True" parameter on the interface of modearts。
-#          Set the parameters required by method a on the modelarts interface
-#          Note: The path parameter does not need to be quoted
-# (2)Set the path of the network configuration file "_config_path=/The path of config in default_config.yaml/"
-# (3) Set the code path on the modelarts interface "/path/shufflenetv1"。
-# (4) Set the model's startup file on the modelarts interface "export.py" 。
-# (5) Set the data path of the model on the modelarts interface ".../ImageNet_Original/eval/checkpoint"(choices ImageNet_Original/eval/checkpoint Folder path) ,
-# The output path of the model "Output file path" and the log path of the model "Job log path"  。
-```
+    #       b. Add "enable_modelarts=True" parameter on the interface of modearts。
+    #          Set the parameters required by method a on the modelarts interface
+    #          Note: The path parameter does not need to be quoted
+    # (2)Set the path of the network configuration file "_config_path=/The path of config in default_config.yaml/"
+    # (3) Set the code path on the modelarts interface "/path/shufflenetv1"。
+    # (4) Set the model's startup file on the modelarts interface "export.py" 。
+    # (5) Set the data path of the model on the modelarts interface ".../ImageNet_Original/eval/checkpoint"(choices ImageNet_Original/eval/checkpoint Folder path) ,
+    # The output path of the model "Output file path" and the log path of the model "Job log path"  。
+    ```
 
 ## 推理过程
 
@@ -311,10 +311,10 @@ Data storage method is the same as training
 bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_FILE] [DEVICE_ID]
 ```
 
--注: shufflenetv1网络使用ImageNet数据集,图片的label是将文件夹排序后从0开始编号所得的数字.
+-注: shufflenetv1网络使用ImageNet数据集，图片的label是将文件夹排序后从0开始编号所得的数字。
 
 推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
-Densenet121网络使用ImageNet推理得到的结果如下:
+Densenet121网络使用ImageNet推理得到的结果如下：
 
   ```log
   Top_1_Acc=73.85%, Top_5_Acc=91.526%
@@ -368,7 +368,7 @@ Densenet121网络使用ImageNet推理得到的结果如下:
 └── tulips
 ```
 
-通过 `transfer_dataset_process.py` 脚本中的函数 `create_flower_dataset()` 获取切分并预处理好的训练集和验证集，在 `transfer_dataset_process.py` 中设定了随机种子
+通过 `transfer_dataset_process.py` 脚本中的函数 `create_flower_dataset()` 获取切分并预处理好的训练集和验证集，在 `transfer_dataset_process.py` 中设定了随机种子。
 
 ## 迁移训练
 

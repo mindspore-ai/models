@@ -164,47 +164,47 @@ python src/create_dataset.py
 
 - Ascend:
 
-```default_config.yaml
-if pretraining set pretraining_dataset_file: /home/DataSet/ctpn_dataset/pretrain/ctpn_pretrain.mindrecord0
-if finetune set pretraining_dataset_file: /home/DataSet/ctpn_dataset/finetune/ctpn_finetune.mindrecord0
-img_dir:/home/DataSet/ctpn_dataset/ICDAR2013/test
+    ```default_config.yaml
+    if pretraining set pretraining_dataset_file: /home/DataSet/ctpn_dataset/pretrain/ctpn_pretrain.mindrecord0
+    if finetune set pretraining_dataset_file: /home/DataSet/ctpn_dataset/finetune/ctpn_finetune.mindrecord0
+    img_dir:/home/DataSet/ctpn_dataset/ICDAR2013/test
 
-Modify the parameters according to the actual path
-```
+    Modify the parameters according to the actual path
+    ```
 
-```bash
-# distribute training
-bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH]
-# example: bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json Pretraining(or Finetune) \
-# /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
+    ```bash
+    # distribute training
+    bash scripts/run_distribute_train_ascend.sh [RANK_TABLE_FILE] [TASK_TYPE] [PRETRAINED_PATH]
+    # example: bash scripts/run_distribute_train_ascend.sh /home/hccl_8p_01234567_10.155.170.71.json Pretraining(or Finetune) \
+    # /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
 
-# standalone training
-bash scrpits/run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]
-example: bash scrpits/run_standalone_train_ascend.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt 0
+    # standalone training
+    bash scrpits/run_standalone_train_ascend.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]
+    example: bash scrpits/run_standalone_train_ascend.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt 0
 
-# evaluation:
-bash scripts/run_eval_ascend.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
-# example: bash script/run_eval_ascend.sh /home/DataSet/ctpn_dataset/ICDAR2013/test \
-# /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
-```
+    # evaluation:
+    bash scripts/run_eval_ascend.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+    # example: bash script/run_eval_ascend.sh /home/DataSet/ctpn_dataset/ICDAR2013/test \
+    # /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
+    ```
 
 - GPU:
 
-```bash
-# distribute training
-bash scripts/run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH]
-# example: bash scripts/run_distribute_train_gpu.sh Pretraining(or Finetune) \
-# /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
+    ```bash
+    # distribute training
+    bash scripts/run_distribute_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH]
+    # example: bash scripts/run_distribute_train_gpu.sh Pretraining(or Finetune) \
+    # /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt
 
-# standalone training
-bash scrpits/run_standalone_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]
-example: bash scrpits/run_standalone_train_gpu.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt 0
+    # standalone training
+    bash scrpits/run_standalone_train_gpu.sh [TASK_TYPE] [PRETRAINED_PATH] [DEVICE_ID]
+    example: bash scrpits/run_standalone_train_gpu.sh Pretraining(or Finetune) /home/DataSet/ctpn_dataset/backbone/0-150_5004.ckpt 0
 
-# evaluation:
-bash scripts/run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
-# example: bash script/run_eval_gpu.sh /home/DataSet/ctpn_dataset/ICDAR2013/test \
-# /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
-```
+    # evaluation:
+    bash scripts/run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+    # example: bash script/run_eval_gpu.sh /home/DataSet/ctpn_dataset/ICDAR2013/test \
+    # /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
+    ```
 
 The `pretrained_path` should be a checkpoint of vgg16 trained on Imagenet2012. The name of weight in dict should be totally the same, also the batch_norm should be enabled in the trainig of vgg16, otherwise fails in further steps.COCO_TEXT_PARSER_PATH coco_text.py can refer to [Link](https://github.com/andreasveit/coco-text).To get the vgg16 backbone, you can use the network structure defined in src/CTPN/vgg16.py.To train the backbone, copy the src/CTPN/vgg16.py under modelzoo/official/cv/VGG/vgg16/src/, and modify the vgg16/train.py to suit the new construction.You can fix it as below:
 
@@ -342,17 +342,17 @@ You can start training using python or shell scripts. The usage of shell scripts
 
 - Ascend:
 
-```bash
-  bash run_eval_ascend.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
-  # example: bash script/run_eval_ascend.sh /home/DataSet/ctpn_dataset/ICDAR2013/test /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
-```
+    ```bash
+    bash run_eval_ascend.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+    # example: bash script/run_eval_ascend.sh /home/DataSet/ctpn_dataset/ICDAR2013/test /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
+    ```
 
 - GPU:
 
-```bash
-  bash run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
-  # example: bash script/run_eval_gpu.sh /home/DataSet/ctpn_dataset/ICDAR2013/test /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
-```
+    ```bash
+    bash run_eval_gpu.sh [IMAGE_PATH] [DATASET_PATH] [CHECKPOINT_PATH]
+    # example: bash script/run_eval_gpu.sh /home/DataSet/ctpn_dataset/ICDAR2013/test /home/DataSet/ctpn_dataset/ctpn_final_dataset/test/ctpn_test.mindrecord /home/model/cv/ctpn/train_parallel0/ckpt_0/
+    ```
 
 After eval, you can get serval archive file named submit_ctpn-xx_xxxx.zip, which contains the name of your checkpoint file.To evalulate it, you can use the scripts provided by the ICDAR2013 network, you can download the Deteval scripts from the [link](https://rrc.cvc.uab.es/?com=downloads&action=download&ch=2&f=aHR0cHM6Ly9ycmMuY3ZjLnVhYi5lcy9zdGFuZGFsb25lcy9zY3JpcHRfdGVzdF9jaDJfdDFfZTItMTU3Nzk4MzA2Ny56aXA=)
 After download the scripts, unzip it and put it under ctpn/scripts and use eval_res.sh to get the result.You will get files as below:
@@ -396,26 +396,26 @@ python export.py --ckpt_file [CKPT_PATH] --file_format [EXPORT_FORMAT]
 
 - Export MindIR on Modelarts
 
-```Modelarts
-Export MindIR example on ModelArts
-Data storage method is the same as training
-# (1) Choose either a (modify yaml file parameters) or b (modelArts create training job to modify parameters)。
-#       a. set "enable_modelarts=True"
-#          set "file_name=ctpn"
-#          set "file_format=MINDIR"
-#          set "ckpt_file=/cache/data/checkpoint file name"
+    ```Modelarts
+    Export MindIR example on ModelArts
+    Data storage method is the same as training
+    # (1) Choose either a (modify yaml file parameters) or b (modelArts create training job to modify parameters)。
+    #       a. set "enable_modelarts=True"
+    #          set "file_name=ctpn"
+    #          set "file_format=MINDIR"
+    #          set "ckpt_file=/cache/data/checkpoint file name"
 
-#       b. Add "enable_modelarts=True" parameter on the interface of modearts。
-#          Set the parameters required by method a on the modelarts interface
-#          Note: The path parameter does not need to be quoted
-# (2)Set the path of the network configuration file "_config_path=/The path of config in default_config.yaml/"
-# (3) Set the code path on the modelarts interface "/path/ctpn"。
-# (4) Set the model's startup file on the modelarts interface "export.py" 。
-# (5) Set the data path of the model on the modelarts interface ".../ctpn_dataset/eval/checkpoint"(choices CNNCTC_Data/eval/checkpoint Folder path) ,
-# The output path of the model "Output file path" and the log path of the model "Job log path"  。
-```
+    #       b. Add "enable_modelarts=True" parameter on the interface of modearts。
+    #          Set the parameters required by method a on the modelarts interface
+    #          Note: The path parameter does not need to be quoted
+    # (2)Set the path of the network configuration file "_config_path=/The path of config in default_config.yaml/"
+    # (3) Set the code path on the modelarts interface "/path/ctpn"。
+    # (4) Set the model's startup file on the modelarts interface "export.py" 。
+    # (5) Set the data path of the model on the modelarts interface ".../ctpn_dataset/eval/checkpoint"(choices CNNCTC_Data/eval/checkpoint Folder path) ,
+    # The output path of the model "Output file path" and the log path of the model "Job log path"  。
+    ```
 
-`EXPORT_FORMAT` should be in ["AIR",  "MINDIR"]
+    `EXPORT_FORMAT` should be in ["AIR",  "MINDIR"]
 
 ## [Inference process](#contents)
 

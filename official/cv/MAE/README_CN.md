@@ -51,11 +51,11 @@ This is a MindSpore/NPU re-implementation of the paper [Masked Autoencoders Are 
     - 训练集：120G，共120万张图像
     - 测试集：5G，共5万张图像
 - 数据格式：RGB
-    - 注：预训练阶段数据将在src/datasets/imagenet.py中处理， finetune阶段数据将在src/datasets/dataset.py中处理。
+    - 注：预训练阶段数据将在src/datasets/imagenet.py中处理，finetune阶段数据将在src/datasets/dataset.py中处理。
 
  ```bash
 └─dataset
-    ├─train                # 训练集, 云上训练得是 .tar压缩文件格式
+    ├─train                # 训练集，云上训练得是 .tar压缩文件格式
     └─val                  # 评估数据集
  ```
 

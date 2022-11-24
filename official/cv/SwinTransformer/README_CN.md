@@ -157,7 +157,7 @@ SwinTransformer是新型的视觉Transformer，它可以用作计算机视觉的
     image_size: 224                     # 图像大小
   ```
 
-更多配置细节请参考脚本`config.py`。 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
+更多配置细节请参考脚本`config.py`。通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
 # [训练和测试](#目录)
 
