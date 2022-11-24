@@ -13,8 +13,12 @@
         - [Training](#training)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
+        - [ONNX Evaluation](#evaluation)
     - [310 Inference Process](#310-infer-process)
         - [Export MindIR](#evaluation)
+        - [Export ONNX](#evaluation)
+        - [310 Infer](#evaluation)
+        - [Result](#evaluation)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Training Performance](#training-performance)
@@ -88,11 +92,11 @@ bash scripts/run_standalone_eval.sh '/home/pointnet/shapenetcore_partanno_segmen
         ├── scripts
         │   ├── run_distribute_ascend.sh        # launch distributed training with ascend platform (8p)
         │   ├── run_distribute_gpu.sh           # launch distributed training with gpu platform (8p)
-        │   ├── run_standalone_eval_ascend.sh          # launch evaluating with ascend platform (1p)
+        │   ├── run_standalone_eval_ascend.sh   # launch evaluating with ascend platform (1p)
         │   ├── run_standalone_eval_gpu.sh      # launch evaluating with gpu platform (1p)
-        │   ├── run_standalone_eval_onnx_gpu.sh      # launch evaluating onnx with gpu platform (1p)
+        │   ├── run_standalone_eval_onnx_gpu.sh # launch evaluating onnx with gpu platform (1p)
         │   ├── run_infer_310.sh                # run 310 infer
-        │   ├── run_standalone_train_ascend.sh         # launch standalone training with ascend platform (1p)
+        │   ├── run_standalone_train_ascend.sh  # launch standalone training with ascend platform (1p)
         │   └── run_standalone_train_gpu.sh     # launch standalone training with gpu platform (1p)
         ├── src
         │   ├── misc                     # dataset part
@@ -185,8 +189,6 @@ The model checkpoint will be saved in the 'SAVE_DIR' directory.
 
 # [Evaluation Process](#contents)
 
-**Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
-
 ## Evaluation
 
 Before running the command below, please check the checkpoint path used for evaluation.
@@ -243,15 +245,15 @@ You can view the results through the file "log_standalone_eval_gpu". The accurac
 
 # [310 Inference Process](#310-infer-process)
 
-## [Export MindIR](#evaluation)
+## [Export MindIR/ONNX](#evaluation)
 
 ```bash
 python src/export.py --model [CKPT_PATH] --file_format [FILE_FORMAT]
 ```
 
-FILE_FORMAT should be one of ['AIR','MINDIR'].
+FILE_FORMAT should be one of ['AIR','MINDIR','ONNX'].
 
-The MindIR model will be exported to './mindir/pointnet.mindir'
+The MindIR/ONNX model will be exported to './mindir/pointnet.mindir'/'./mindir/pointnet.onnx'
 
 ## [310 Infer](#evaluation)
 
