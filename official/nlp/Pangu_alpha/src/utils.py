@@ -66,6 +66,10 @@ class FP32StateAdamWeightDecay(AdamWeightDecay):
         for old_param in parameter_tuple:
             new_state = Parameter(initializer(init, shape=old_param.shape, dtype=mstype.float32))
             new_state.param_info = old_param.param_info.clone()
+            if hasattr(old_param.param_info, "cloned_obj"):
+                old_param.param_info.cloned_obj.append(new_state)
+            else:
+                old_param.param_info.cloned_obj = [new_state]
             new_state.is_init = False
             new_state.set_data(initializer(init, shape=old_param.shape, dtype=mstype.float32))
             new_state.name = prefix + '.' + new_state.name
