@@ -449,6 +449,8 @@ The above python command will run in the background. You can view the results th
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.717
 ```
 
+Furthermore, set `result_view` as true, it will draw the result bbox, categories and score values to the original image and save them to the current eval path. Also can set `recommend_threshold` as true, which enables map calculation of every categories, recommends the best score threshold, and distinguishes between saving correct and negative prediction result.
+
 ### Test-dev
 
 ```bash

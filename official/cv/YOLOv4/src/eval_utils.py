@@ -56,6 +56,7 @@ class DetectionEngine:
                              'score': dets[i][4].astype(float)}
                             for i in keep_index]
                 self.det_boxes.extend(keep_box)
+        return self.det_boxes
 
     def _nms(self, predicts, threshold):
         """Calculate NMS."""
@@ -127,14 +128,14 @@ class DetectionEngine:
             order = order[inds + 1]
         return keep
 
-    def write_result(self):
+    def write_result(self, result):
         """Save result to file."""
         import json
         t = datetime.datetime.now().strftime('_%Y_%m_%d_%H_%M_%S')
         try:
             self.file_path = self.save_prefix + '/predict' + t + '.json'
             f = open(self.file_path, 'w')
-            json.dump(self.det_boxes, f)
+            json.dump(result, f)
         except IOError as e:
             raise RuntimeError("Unable to open json file to dump. What(): {}".format(str(e)))
         else:
@@ -309,6 +310,18 @@ class EvalCallBack(Callback):
                               "the best {0} epoch is {2}".format(self.metrics_name, self.best_res, self.best_epoch))
 
 
+def view_result(args, result, score_threshold=None, recommend_threshold=False):
+    from src.coco_visual import CocoVisualUtil
+    dataset_coco = COCO(args.ann_val_file)
+    coco_visual = CocoVisualUtil()
+    eval_types = ["bbox"]
+    config.dataset = "coco"
+    im_path_dir = config.data_root
+    result_files = coco_visual.results2json(dataset_coco, result, "./results.pkl")
+    coco_visual.coco_eval(config, result_files, eval_types, dataset_coco, im_path_dir=im_path_dir,
+                          score_threshold=score_threshold, recommend_threshold=recommend_threshold)
+
+
 def apply_eval(eval_param_dict):
     network = eval_param_dict["net"]
     network.set_train(False)
@@ -333,8 +346,11 @@ def apply_eval(eval_param_dict):
             args.logger.info('Processing... {:.2f}% '.format(index * args.per_batch_size / data_size * 100))
 
     args.logger.info('Calculating mAP...')
-    detection.do_nms_for_results()
-    result_file_path = detection.write_result()
+    result = detection.do_nms_for_results()
+    result_file_path = detection.write_result(result)
     args.logger.info('result file path: {}'.format(result_file_path))
     eval_result = detection.get_eval_result()
+    if config.result_view or config.recommend_threshold:
+        view_result(args, result, score_threshold=None, recommend_threshold=config.recommend_threshold)
+        print("View eval result completed!", flush=True)
     return eval_result
