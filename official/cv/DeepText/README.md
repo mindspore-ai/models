@@ -112,25 +112,25 @@ Here we used 4 datasets for training, and 1 datasets for Evaluation.
 
 - Ascend:
 
-```bash
-# distribute training example(8p)
-bash run_distribute_train_ascend.sh [IMGS_PATH] [ANNOS_PATH] [RANK_TABLE_FILE] [PRETRAINED_PATH] [COCO_TEXT_PARSER_PATH]
-# standalone training
-bash run_standalone_train_ascend.sh [IMGS_PATH] [ANNOS_PATH] [PRETRAINED_PATH] [COCO_TEXT_PARSER_PATH] [DEVICE_ID]
-# evaluation:
-bash run_eval_ascend.sh [IMGS_PATH] [ANNOS_PATH] [CHECKPOINT_PATH] [COCO_TEXT_PARSER_PATH] [DEVICE_ID]
-```
+    ```bash
+    # distribute training example(8p)
+    bash run_distribute_train_ascend.sh [IMGS_PATH] [ANNOS_PATH] [RANK_TABLE_FILE] [PRETRAINED_PATH] [COCO_TEXT_PARSER_PATH]
+    # standalone training
+    bash run_standalone_train_ascend.sh [IMGS_PATH] [ANNOS_PATH] [PRETRAINED_PATH] [COCO_TEXT_PARSER_PATH] [DEVICE_ID]
+    # evaluation:
+    bash run_eval_ascend.sh [IMGS_PATH] [ANNOS_PATH] [CHECKPOINT_PATH] [COCO_TEXT_PARSER_PATH] [DEVICE_ID]
+    ```
 
 - GPU:
 
-```bash
-# distribute training example(8p)
-sh run_distribute_train_gpu.sh [IMGS_PATH] [ANNOS_PATH] [PRETRAINED_PATH] [COCO_TEXT_PARSER_PATH]
-# standalone training
-sh run_standalone_train_gpu.sh [IMGS_PATH] [ANNOS_PATH] [PRETRAINED_PATH] [COCO_TEXT_PARSER_PATH] [DEVICE_ID]
-# evaluation:
-sh run_eval_gpu.sh [IMGS_PATH] [ANNOS_PATH] [CHECKPOINT_PATH] [COCO_TEXT_PARSER_PATH] [DEVICE_ID]
-```
+    ```bash
+    # distribute training example(8p)
+    sh run_distribute_train_gpu.sh [IMGS_PATH] [ANNOS_PATH] [PRETRAINED_PATH] [COCO_TEXT_PARSER_PATH]
+    # standalone training
+    sh run_standalone_train_gpu.sh [IMGS_PATH] [ANNOS_PATH] [PRETRAINED_PATH] [COCO_TEXT_PARSER_PATH] [DEVICE_ID]
+    # evaluation:
+    sh run_eval_gpu.sh [IMGS_PATH] [ANNOS_PATH] [CHECKPOINT_PATH] [COCO_TEXT_PARSER_PATH] [DEVICE_ID]
+    ```
 
 > Notes:
 > RANK_TABLE_FILE can refer to [Link](https://www.mindspore.cn/tutorials/experts/en/master/parallel/train_ascend.html) , and the device_ip can be got as [Link](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools). For large models like InceptionV4, it's better to export an external environment variable `export HCCL_CONNECT_TIMEOUT=600` to extend hccl connection checking time from the default 120 seconds to 600 seconds. Otherwise, the connection could be timeout since compiling time increases with the growth of model size.
@@ -143,111 +143,111 @@ sh run_eval_gpu.sh [IMGS_PATH] [ANNOS_PATH] [CHECKPOINT_PATH] [COCO_TEXT_PARSER_
 
 - ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training as follows)
 
-```bash
-# Train 8p on ModelArts
-# (1) copy [COCO_TEXT_PARSER_PATH] file to /CODE_PATH/deeptext/src/
-# (2) Perform a or b.
-#       a. Set "enable_modelarts=True" on default_config.yaml file.
-#          Set "imgs_path='/YOUR IMGS_PATH/'" on default_config.yaml file.
-#          Set "annos_path='/YOUR ANNOS_PATH/'" on default_config.yaml file.
-#          Set "run_distribute=True" on default_config.yaml file.
-#          Set "checkpoint_url='s3://dir_to_your_pretrain/'" on default_config.yaml file.
-#          Set "pre_trained='/cache/checkpoint_path/YOUR PRETRAINED_PATH/'" on default_config.yaml file.
-#          Set "mindrecord_dir='/cache/data/deeptext_dataset/mindrecord'" on default_config.yaml file.
-#          Set "coco_root='/cache/data/deeptext_dataset/coco2017'" on default_config.yaml file.
-#          Set "cocotext_json='/cache/data/deeptext_dataset/cocotext.v2.json'" on default_config.yaml file.
-#          Set other parameters on default_config.yaml file you need.
-#       b. Add "enable_modelarts=True" on the website UI interface.
-#          Add "imgs_path=/YOUR IMGS_PATH/" on the website UI interface.
-#          Add "annos_path=/YOUR ANNOS_PATH/" on the website UI interface.
-#          Add "run_distribute=True" on the website UI interface.
-#          Add "checkpoint_url='s3://dir_to_your_pretrain/'" on the website UI interface.
-#          Add "pre_trained=/cache/checkpoint_path/YOUR PRETRAINED_PATH/" on the website UI interface.
-#          Add "mindrecord_dir=/cache/data/deeptext_dataset/mindrecord" on the website UI interface.
-#          Add "coco_root=/cache/data/deeptext_dataset/coco2017" on the website UI interface.
-#          Add "cocotext_json=/cache/data/deeptext_dataset/cocotext.v2.json" on the website UI interface.
-#          Add other parameters on the website UI interface.
-# (3) Upload a zip dataset to S3 bucket. (you could also upload the origin dataset, but it can be so slow.)
-# (4) Set the code directory to "/path/deeptext" on the website UI interface.
-# (5) Set the startup file to "train.py" on the website UI interface.
-# (6) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
-# (7) Create your job.
-#
-# Train 1p on ModelArts
-# (1) copy [COCO_TEXT_PARSER_PATH] file to /CODE_PATH/deeptext/src/
-# (2) Perform a or b.
-#       a. Set "enable_modelarts=True" on default_config.yaml file.
-#          Set "imgs_path='/YOUR IMGS_PATH/'" on default_config.yaml file.
-#          Set "annos_path='/YOUR ANNOS_PATH/'" on default_config.yaml file.
-#          Set "run_distribute=False" on default_config.yaml file.
-#          Set "checkpoint_url='s3://dir_to_your_pretrain/'" on default_config.yaml file.
-#          Set "pre_trained='/cache/checkpoint_path/YOUR PRETRAINED_PATH/'" on default_config.yaml file.
-#          Set "mindrecord_dir='/cache/data/deeptext_dataset/mindrecord'" on default_config.yaml file.
-#          Set "coco_root='/cache/data/deeptext_dataset/coco2017'" on default_config.yaml file.
-#          Set "cocotext_json='/cache/data/deeptext_dataset/cocotext.v2.json'" on default_config.yaml file.
-#          Set other parameters on default_config.yaml file you need.
-#       b. Add "enable_modelarts=True" on the website UI interface.
-#          Add "imgs_path=/YOUR IMGS_PATH/" on the website UI interface.
-#          Add "annos_path=/YOUR ANNOS_PATH/" on the website UI interface.
-#          Add "run_distribute=False" on the website UI interface.
-#          Add "checkpoint_url='s3://dir_to_your_pretrain/'" on the website UI interface.
-#          Add "pre_trained=/cache/data/YOUR PRETRAINED_PATH/" on the website UI interface.
-#          Add "mindrecord_dir=/cache/data/deeptext_dataset/mindrecord" on the website UI interface.
-#          Add "coco_root=/cache/data/deeptext_dataset/coco2017" on the website UI interface.
-#          Add "cocotext_json=/cache/data/deeptext_dataset/cocotext.v2.json" on the website UI interface.
-#          Add other parameters on the website UI interface.
-# (3) Upload a zip dataset to S3 bucket. (you could also upload the origin dataset, but it can be so slow.)
-# (4) Set the code directory to "/path/deeptext" on the website UI interface.
-# (5) Set the startup file to "train.py" on the website UI interface.
-# (6) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
-# (7) Create your job.
-#
-# Eval 1p on ModelArts
-# (1) copy [COCO_TEXT_PARSER_PATH] file to /CODE_PATH/deeptext/src/
-# (2) Perform a or b.
-#       a. Set "enable_modelarts=True" on default_config.yaml file.
-#          Set "imgs_path='/YOUR IMGS_PATH/'" on default_config.yaml file.
-#          Set "annos_path='/YOUR ANNOS_PATH/'" on default_config.yaml file.
-#          Set "checkpoint_url='s3://dir_to_trained_model/'" on default_config.yaml file.
-#          Set "checkpoint_path='/cache/checkpoint_path/YOUR CHECKPOINT_PATH/'" on default_config.yaml file.
-#          Set "mindrecord_dir='/cache/data/deeptext_dataset/mindrecord'" on default_config.yaml file.
-#          Set "coco_root='/cache/data/deeptext_dataset/coco2017'" on default_config.yaml file.
-#          Set "cocotext_json='/cache/data/deeptext_dataset/cocotext.v2.json'" on default_config.yaml file.
-#          Set other parameters on default_config.yaml file you need.
-#       b. Add "enable_modelarts=True" on the website UI interface.
-#          Add "imgs_path=/YOUR IMGS_PATH/" on the website UI interface.
-#          Add "annos_path=/YOUR ANNOS_PATH/" on the website UI interface.
-#          Add "checkpoint_url='s3://dir_to_trained_model/'" on the website UI interface.
-#          Add "checkpoint_path=/cache/checkpoint_path/YOUR CHECKPOINT_PATH/" on the website UI interface.
-#          Add "mindrecord_dir=/cache/data/deeptext_dataset/mindrecord" on the website UI interface.
-#          Add "coco_root=/cache/data/deeptext_dataset/coco2017" on the website UI interface.
-#          Add "cocotext_json=/cache/data/deeptext_dataset/cocotext.v2.json" on the website UI interface.
-#          Add other parameters on the website UI interface.
-# (3) Upload a zip dataset to S3 bucket. (you could also upload the origin dataset, but it can be so slow.)
-# (4) Set the code directory to "/path/deeptext" on the website UI interface.
-# (5) Set the startup file to "eval.py" on the website UI interface.
-# (6) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
-# (7) Create your job.
-#
-# Export 1p on ModelArts
-# (1) Perform a or b.
-#       a. Set "enable_modelarts=True" on default_config.yaml file.
-#          Set "checkpoint_url='s3://dir_to_trained_model/'" on default_config.yaml file.
-#          Set "ckpt_file='/cache/checkpoint_path/model.ckpt'" on default_config.yaml file.
-#          Set "device_target=Ascend" on default_config.yaml file.
-#          Set "file_format='MINDIR'" on default_config.yaml file.
-#          Set other parameters on default_config.yaml file you need.
-#       b. Add "enable_modelarts=True" on the website UI interface.
-#          Add "checkpoint_url='s3://dir_to_trained_model/'" on the website UI interface.
-#          Add "ckpt_file='/cache/checkpoint_path/model.ckpt'" on the website UI interface.
-#          Add "device_target=Ascend" on the website UI interface.
-#          Add "file_format='MINDIR'" on the website UI interface.
-#          Add other parameters on the website UI interface.
-# (2) Set the code directory to "/path/deeptext" on the website UI interface.
-# (3) Set the startup file to "export.py" on the website UI interface.
-# (4) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
-# (5) Create your job.
-```
+    ```bash
+    # Train 8p on ModelArts
+    # (1) copy [COCO_TEXT_PARSER_PATH] file to /CODE_PATH/deeptext/src/
+    # (2) Perform a or b.
+    #       a. Set "enable_modelarts=True" on default_config.yaml file.
+    #          Set "imgs_path='/YOUR IMGS_PATH/'" on default_config.yaml file.
+    #          Set "annos_path='/YOUR ANNOS_PATH/'" on default_config.yaml file.
+    #          Set "run_distribute=True" on default_config.yaml file.
+    #          Set "checkpoint_url='s3://dir_to_your_pretrain/'" on default_config.yaml file.
+    #          Set "pre_trained='/cache/checkpoint_path/YOUR PRETRAINED_PATH/'" on default_config.yaml file.
+    #          Set "mindrecord_dir='/cache/data/deeptext_dataset/mindrecord'" on default_config.yaml file.
+    #          Set "coco_root='/cache/data/deeptext_dataset/coco2017'" on default_config.yaml file.
+    #          Set "cocotext_json='/cache/data/deeptext_dataset/cocotext.v2.json'" on default_config.yaml file.
+    #          Set other parameters on default_config.yaml file you need.
+    #       b. Add "enable_modelarts=True" on the website UI interface.
+    #          Add "imgs_path=/YOUR IMGS_PATH/" on the website UI interface.
+    #          Add "annos_path=/YOUR ANNOS_PATH/" on the website UI interface.
+    #          Add "run_distribute=True" on the website UI interface.
+    #          Add "checkpoint_url='s3://dir_to_your_pretrain/'" on the website UI interface.
+    #          Add "pre_trained=/cache/checkpoint_path/YOUR PRETRAINED_PATH/" on the website UI interface.
+    #          Add "mindrecord_dir=/cache/data/deeptext_dataset/mindrecord" on the website UI interface.
+    #          Add "coco_root=/cache/data/deeptext_dataset/coco2017" on the website UI interface.
+    #          Add "cocotext_json=/cache/data/deeptext_dataset/cocotext.v2.json" on the website UI interface.
+    #          Add other parameters on the website UI interface.
+    # (3) Upload a zip dataset to S3 bucket. (you could also upload the origin dataset, but it can be so slow.)
+    # (4) Set the code directory to "/path/deeptext" on the website UI interface.
+    # (5) Set the startup file to "train.py" on the website UI interface.
+    # (6) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
+    # (7) Create your job.
+    #
+    # Train 1p on ModelArts
+    # (1) copy [COCO_TEXT_PARSER_PATH] file to /CODE_PATH/deeptext/src/
+    # (2) Perform a or b.
+    #       a. Set "enable_modelarts=True" on default_config.yaml file.
+    #          Set "imgs_path='/YOUR IMGS_PATH/'" on default_config.yaml file.
+    #          Set "annos_path='/YOUR ANNOS_PATH/'" on default_config.yaml file.
+    #          Set "run_distribute=False" on default_config.yaml file.
+    #          Set "checkpoint_url='s3://dir_to_your_pretrain/'" on default_config.yaml file.
+    #          Set "pre_trained='/cache/checkpoint_path/YOUR PRETRAINED_PATH/'" on default_config.yaml file.
+    #          Set "mindrecord_dir='/cache/data/deeptext_dataset/mindrecord'" on default_config.yaml file.
+    #          Set "coco_root='/cache/data/deeptext_dataset/coco2017'" on default_config.yaml file.
+    #          Set "cocotext_json='/cache/data/deeptext_dataset/cocotext.v2.json'" on default_config.yaml file.
+    #          Set other parameters on default_config.yaml file you need.
+    #       b. Add "enable_modelarts=True" on the website UI interface.
+    #          Add "imgs_path=/YOUR IMGS_PATH/" on the website UI interface.
+    #          Add "annos_path=/YOUR ANNOS_PATH/" on the website UI interface.
+    #          Add "run_distribute=False" on the website UI interface.
+    #          Add "checkpoint_url='s3://dir_to_your_pretrain/'" on the website UI interface.
+    #          Add "pre_trained=/cache/data/YOUR PRETRAINED_PATH/" on the website UI interface.
+    #          Add "mindrecord_dir=/cache/data/deeptext_dataset/mindrecord" on the website UI interface.
+    #          Add "coco_root=/cache/data/deeptext_dataset/coco2017" on the website UI interface.
+    #          Add "cocotext_json=/cache/data/deeptext_dataset/cocotext.v2.json" on the website UI interface.
+    #          Add other parameters on the website UI interface.
+    # (3) Upload a zip dataset to S3 bucket. (you could also upload the origin dataset, but it can be so slow.)
+    # (4) Set the code directory to "/path/deeptext" on the website UI interface.
+    # (5) Set the startup file to "train.py" on the website UI interface.
+    # (6) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
+    # (7) Create your job.
+    #
+    # Eval 1p on ModelArts
+    # (1) copy [COCO_TEXT_PARSER_PATH] file to /CODE_PATH/deeptext/src/
+    # (2) Perform a or b.
+    #       a. Set "enable_modelarts=True" on default_config.yaml file.
+    #          Set "imgs_path='/YOUR IMGS_PATH/'" on default_config.yaml file.
+    #          Set "annos_path='/YOUR ANNOS_PATH/'" on default_config.yaml file.
+    #          Set "checkpoint_url='s3://dir_to_trained_model/'" on default_config.yaml file.
+    #          Set "checkpoint_path='/cache/checkpoint_path/YOUR CHECKPOINT_PATH/'" on default_config.yaml file.
+    #          Set "mindrecord_dir='/cache/data/deeptext_dataset/mindrecord'" on default_config.yaml file.
+    #          Set "coco_root='/cache/data/deeptext_dataset/coco2017'" on default_config.yaml file.
+    #          Set "cocotext_json='/cache/data/deeptext_dataset/cocotext.v2.json'" on default_config.yaml file.
+    #          Set other parameters on default_config.yaml file you need.
+    #       b. Add "enable_modelarts=True" on the website UI interface.
+    #          Add "imgs_path=/YOUR IMGS_PATH/" on the website UI interface.
+    #          Add "annos_path=/YOUR ANNOS_PATH/" on the website UI interface.
+    #          Add "checkpoint_url='s3://dir_to_trained_model/'" on the website UI interface.
+    #          Add "checkpoint_path=/cache/checkpoint_path/YOUR CHECKPOINT_PATH/" on the website UI interface.
+    #          Add "mindrecord_dir=/cache/data/deeptext_dataset/mindrecord" on the website UI interface.
+    #          Add "coco_root=/cache/data/deeptext_dataset/coco2017" on the website UI interface.
+    #          Add "cocotext_json=/cache/data/deeptext_dataset/cocotext.v2.json" on the website UI interface.
+    #          Add other parameters on the website UI interface.
+    # (3) Upload a zip dataset to S3 bucket. (you could also upload the origin dataset, but it can be so slow.)
+    # (4) Set the code directory to "/path/deeptext" on the website UI interface.
+    # (5) Set the startup file to "eval.py" on the website UI interface.
+    # (6) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
+    # (7) Create your job.
+    #
+    # Export 1p on ModelArts
+    # (1) Perform a or b.
+    #       a. Set "enable_modelarts=True" on default_config.yaml file.
+    #          Set "checkpoint_url='s3://dir_to_trained_model/'" on default_config.yaml file.
+    #          Set "ckpt_file='/cache/checkpoint_path/model.ckpt'" on default_config.yaml file.
+    #          Set "device_target=Ascend" on default_config.yaml file.
+    #          Set "file_format='MINDIR'" on default_config.yaml file.
+    #          Set other parameters on default_config.yaml file you need.
+    #       b. Add "enable_modelarts=True" on the website UI interface.
+    #          Add "checkpoint_url='s3://dir_to_trained_model/'" on the website UI interface.
+    #          Add "ckpt_file='/cache/checkpoint_path/model.ckpt'" on the website UI interface.
+    #          Add "device_target=Ascend" on the website UI interface.
+    #          Add "file_format='MINDIR'" on the website UI interface.
+    #          Add other parameters on the website UI interface.
+    # (2) Set the code directory to "/path/deeptext" on the website UI interface.
+    # (3) Set the startup file to "export.py" on the website UI interface.
+    # (4) Set the "Dataset path" and "Output file path" and "Job log path" to your path on the website UI interface.
+    # (5) Create your job.
+    ```
 
 ### Launch
 
@@ -279,9 +279,9 @@ You can start training using python or shell scripts. The usage of shell scripts
 
 - Ascend:
 
-```bash
-  bash run_eval_ascend.sh [IMGS_PATH] [ANNOS_PATH] [CHECKPOINT_PATH] [COCO_TEXT_PARSER_PATH] [DEVICE_ID]
-```
+    ```bash
+    bash run_eval_ascend.sh [IMGS_PATH] [ANNOS_PATH] [CHECKPOINT_PATH] [COCO_TEXT_PARSER_PATH] [DEVICE_ID]
+    ```
 
 ### Launch
 

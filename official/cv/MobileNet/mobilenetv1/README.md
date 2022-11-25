@@ -57,17 +57,17 @@ Dataset used: [CIFAR-10](http://www.cs.toronto.edu/~kriz/cifar.html)
 
 - Download the dataset, the directory structure is as follows:
 
-```ImageNet2012
-└─ImageNet_Original
-    ├─train                # train dataset
-    └─validation_preprocess # evaluate dataset
-```
+    ```ImageNet2012
+    └─ImageNet_Original
+        ├─train                # train dataset
+        └─validation_preprocess # evaluate dataset
+    ```
 
-```cifar10
-└─cifar10
-    ├─cifar-10-batches-bin  # train dataset
-    └─cifar-10-verify-bin  # evaluate dataset
-```
+    ```cifar10
+    └─cifar10
+        ├─cifar-10-batches-bin  # train dataset
+        └─cifar-10-verify-bin  # evaluate dataset
+    ```
 
 ## Features
 

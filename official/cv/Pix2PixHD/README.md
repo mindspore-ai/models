@@ -209,23 +209,23 @@ load_ckpt: ''
 
 - running on Ascend with default parameters.
 
-```python
-bash ./scripts/train_512p.sh
-```
+    ```python
+    bash ./scripts/train_512p.sh
+    ```
 
 - running distributed trainning on Ascend.
 
-```python
-bash ./scripts/distribute_train_512p.sh [DEVICE_NUM] [DISTRIBUTE] [DATASET_PATH]
-```
+    ```python
+    bash ./scripts/distribute_train_512p.sh [DEVICE_NUM] [DISTRIBUTE] [DATASET_PATH]
+    ```
 
 #### [Training at 2048x1024 resolution](#contents)
 
 - running on Ascend with default parameters.
 
-```python
-bash ./scripts/train_1024p.sh
-```
+    ```python
+    bash ./scripts/train_1024p.sh
+    ```
 
 ### [Training adding instances and encoded features](#contents)
 
@@ -233,23 +233,23 @@ bash ./scripts/train_1024p.sh
 
 - running on Ascend with default parameters.
 
-```python
-bash ./scripts/train_512p_feat.sh
-```
+    ```python
+    bash ./scripts/train_512p_feat.sh
+    ```
 
 - running distributed trainning on Ascend.
 
-```python
-bash ./scripts/distribute_train_512p_feat.sh [DEVICE_NUM] [DISTRIBUTE] [DATASET_PATH]
-```
+    ```python
+    bash ./scripts/distribute_train_512p_feat.sh [DEVICE_NUM] [DISTRIBUTE] [DATASET_PATH]
+    ```
 
 #### [Training at 2048x1024 resolution](#contents)
 
 - running on Ascend with default parameters.
 
-```python
-bash ./scripts/train_1024p_feat.sh
-```
+    ```python
+    bash ./scripts/train_1024p_feat.sh
+    ```
 
 ### [Training with your own dataset](#contents)
 

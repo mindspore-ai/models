@@ -36,63 +36,63 @@ We use about 22872 image pairs and corresponding flow fields as training dataset
 
 - The directory structure of train dataset is as follows:
 
-```bash
-.
-└─training
-  ├── 00001_img1.ppm        // img1 file
-  ├── 00001_img2.ppm        // img2 file
-  ├── 00001_flow.flo       // flo file
-  │    ...
-  ...
-```
+    ```bash
+    .
+    └─training
+    ├── 00001_img1.ppm        // img1 file
+    ├── 00001_img2.ppm        // img2 file
+    ├── 00001_flow.flo       // flo file
+    │    ...
+    ...
+    ```
 
 - The directory structure of evaluating dataset is as follows:
 
-```bash
-.
-└─training
-  ├── albedo
-  ├── clean
-  ├── final
-     ├── alley_1
-       ├── frame_0001.png
-       ├── frame_0002.png
-       ├── frame_0003.png
-       ├── ....
-       ├── frame_0050.png
-    ├── ....
-    ├── ....
-  ├── flow
-     ├── alley_1
-       ├── frame_0001.flo
-       ├── frame_0002.flo
-       ├── ....
-       ├── frame_0049.flo
-  ├── flow_viz
-  ├── invalid
-  ├── occlusions
-  ├── occlusions1
-  ├── occlusions-clean
-  │    ...
-  ...
-```
+    ```bash
+    .
+    └─training
+    ├── albedo
+    ├── clean
+    ├── final
+        ├── alley_1
+        ├── frame_0001.png
+        ├── frame_0002.png
+        ├── frame_0003.png
+        ├── ....
+        ├── frame_0050.png
+        ├── ....
+        ├── ....
+    ├── flow
+        ├── alley_1
+        ├── frame_0001.flo
+        ├── frame_0002.flo
+        ├── ....
+        ├── frame_0049.flo
+    ├── flow_viz
+    ├── invalid
+    ├── occlusions
+    ├── occlusions1
+    ├── occlusions-clean
+    │    ...
+    ...
+    ```
 
 # [pretrained](#contents)
 
 - Download pretrained model
 
-```bash
-mkdir ./pretrained_model
-# download PWCNet pretrained file
-wget -O ./pretrained_model/pwcnet-pretrained.pth https://github.com/visinf/irr/blob/master/saved_check_point/pwcnet/PWCNet/checkpoint_best.ckpt
-```
+    ```bash
+    mkdir ./pretrained_model
+    # download PWCNet pretrained file
+    wget -O ./pretrained_model/pwcnet-pretrained.pth https://github.com/visinf/irr/blob/master/saved_check_point/pwcnet/PWCNet/checkpoint_best.ckpt
+    ```
 
 - Convert pretrained model (from pytorch to mindspore, both Pytorch and Mindspore must be installed.)
 
-```bash
-# Convert pytorch pretrained model file to mindspore file.
-bash scripts/run_ckpt_convert.sh [PYTORCH_FILE_PATH] [MINDSPORE_FILE_PATH]
-```
+    ```bash
+    # Convert pytorch pretrained model file to mindspore file.
+    bash scripts/run_ckpt_convert.sh [PYTORCH_FILE_PATH] [MINDSPORE_FILE_PATH]
+    ```
 
 # [Environment Requirements](#contents)
 

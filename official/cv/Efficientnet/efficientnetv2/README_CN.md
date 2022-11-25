@@ -222,11 +222,11 @@
 
 - 在GPU/CPU上使用ImageNet-1k数据集进行推理
 
-    推理的结果保存在主目录下，在infer_onnx.log日志文件中可以找到推理结果。
+  推理的结果保存在主目录下，在infer_onnx.log日志文件中可以找到推理结果。
 
-   ```shell
-   bash run_infer_onnx.sh [ONNX_PATH] [CONFIG] [DEVICE_TARGET]
-   ```
+  ```shell
+  bash run_infer_onnx.sh [ONNX_PATH] [CONFIG] [DEVICE_TARGET]
+  ```
 
 # [模型描述](#目录)
 

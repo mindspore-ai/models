@@ -55,17 +55,17 @@ Dataset used: [LUNA16](https://luna16.grand-challenge.org/)
     - Note：Data will be processed in convert_nifti.py, and one of them will be ignored during data processing.
 - Data Content Structure
 
-```text
+    ```text
 
-.
-└─LUNA16
-  ├── train
-  │   ├── image         // contains 877 image files
-  |   ├── seg           // contains 877 seg files
-  ├── val
-  │   ├── image         // contains 10 image files
-  |   ├── seg           // contains 10 seg files
-```
+    .
+    └─LUNA16
+    ├── train
+    │   ├── image         // contains 877 image files
+    |   ├── seg           // contains 877 seg files
+    ├── val
+    │   ├── image         // contains 10 image files
+    |   ├── seg           // contains 10 seg files
+    ```
 
 ## [Environment Requirements](#contents)
 
@@ -83,58 +83,58 @@ After installing MindSpore via the official website, you can start training and 
 
 - Select the network and dataset to use
 
-```shell
+    ```shell
 
-Convert dataset into mifti format.
-python ./src/convert_nifti.py --data_path=/path/to/input_image/ --output_path=/path/to/output_image/
+    Convert dataset into mifti format.
+    python ./src/convert_nifti.py --data_path=/path/to/input_image/ --output_path=/path/to/output_image/
 
-```
+    ```
 
-Refer to `default_config.yaml`. We support some parameter configurations for quick start.
+    Refer to `default_config.yaml`. We support some parameter configurations for quick start.
 
 - Run on Ascend
 
-```python
+    ```python
 
-# run training example
-python train.py --data_path=/path/to/data/ > train.log 2>&1 &
+    # run training example
+    python train.py --data_path=/path/to/data/ > train.log 2>&1 &
 
-# run distributed training example
-bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH]
+    # run distributed training example
+    bash scripts/run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH]
 
-# run evaluation example
-python eval.py --data_path=/path/to/data/ --checkpoint_file_path=/path/to/checkpoint/ > eval.log 2>&1 &
-```
+    # run evaluation example
+    python eval.py --data_path=/path/to/data/ --checkpoint_file_path=/path/to/checkpoint/ > eval.log 2>&1 &
+    ```
 
 - Run on GPU
 
-```shell
-# enter scripts directory
-cd scripts
-# run training example(fp32)
-bash ./run_standalone_train_gpu_fp32.sh [TRAINING_DATA_PATH]
-# run training example(fp16)
-bash ./run_standalone_train_gpu_fp16.sh [TRAINING_DATA_PATH]
-# run distributed training example(fp32)
-bash ./run_distribute_train_gpu_fp32.sh [TRAINING_DATA_PATH]
-# run distributed training example(fp16)
-bash ./run_distribute_train_gpu_fp16.sh [TRAINING_DATA_PATH]
-# run evaluation example(fp32)
-bash ./run_standalone_eval_gpu_fp32.sh [VALIDATING_DATA_PATH] [CHECKPOINT_FILE_PATH]
-# run evaluation example(fp16)
-bash ./run_standalone_eval_gpu_fp16.sh [VALIDATING_DATA_PATH] [CHECKPOINT_FILE_PATH]
+    ```shell
+    # enter scripts directory
+    cd scripts
+    # run training example(fp32)
+    bash ./run_standalone_train_gpu_fp32.sh [TRAINING_DATA_PATH]
+    # run training example(fp16)
+    bash ./run_standalone_train_gpu_fp16.sh [TRAINING_DATA_PATH]
+    # run distributed training example(fp32)
+    bash ./run_distribute_train_gpu_fp32.sh [TRAINING_DATA_PATH]
+    # run distributed training example(fp16)
+    bash ./run_distribute_train_gpu_fp16.sh [TRAINING_DATA_PATH]
+    # run evaluation example(fp32)
+    bash ./run_standalone_eval_gpu_fp32.sh [VALIDATING_DATA_PATH] [CHECKPOINT_FILE_PATH]
+    # run evaluation example(fp16)
+    bash ./run_standalone_eval_gpu_fp16.sh [VALIDATING_DATA_PATH] [CHECKPOINT_FILE_PATH]
 
-```
+    ```
 
 - Run on CPU
 
-```python
-# run training example
-python train.py --device_target=CPU --data_path=/path/to/data/ > train.log 2>&1 &
+    ```python
+    # run training example
+    python train.py --device_target=CPU --data_path=/path/to/data/ > train.log 2>&1 &
 
-# run evaluation example
-python eval.py --device_target=CPU --data_path=/path/to/data/ --checkpoint_file_path=/path/to/checkpoint/ > eval.log 2>&1 &
-```
+    # run evaluation example
+    python eval.py --device_target=CPU --data_path=/path/to/data/ --checkpoint_file_path=/path/to/checkpoint/ > eval.log 2>&1 &
+    ```
 
 If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start training and evaluation as follows:
 
@@ -215,26 +215,26 @@ Parameters for both training and evaluation can be set in config.py
 
 - config for Unet3d, luna16 dataset
 
-```python
+    ```python
 
-  'model': 'Unet3d',                  # model name
-  'lr': 0.0005,                       # learning rate
-  'epochs': 10,                       # total training epochs when run 1p
-  'batchsize': 1,                     # training batch size
-  "warmup_step": 120,                 # warmp up step in lr generator
-  "warmup_ratio": 0.3,                # warpm up ratio
-  'num_classes': 4,                   # the number of classes in the dataset
-  'in_channels': 1,                   # the number of channels
-  'keep_checkpoint_max': 5,           # only keep the last keep_checkpoint_max checkpoint
-  'loss_scale': 256.0,                # loss scale
-  'roi_size': [224, 224, 96],         # random roi size
-  'overlap': 0.25,                    # overlap rate
-  'min_val': -500,                    # intersity original range min
-  'max_val': 1000,                    # intersity original range max
-  'upper_limit': 5                    # upper limit of num_classes
-  'lower_limit': 3                    # lower limit of num_classes
+    'model': 'Unet3d',                  # model name
+    'lr': 0.0005,                       # learning rate
+    'epochs': 10,                       # total training epochs when run 1p
+    'batchsize': 1,                     # training batch size
+    "warmup_step": 120,                 # warmp up step in lr generator
+    "warmup_ratio": 0.3,                # warpm up ratio
+    'num_classes': 4,                   # the number of classes in the dataset
+    'in_channels': 1,                   # the number of channels
+    'keep_checkpoint_max': 5,           # only keep the last keep_checkpoint_max checkpoint
+    'loss_scale': 256.0,                # loss scale
+    'roi_size': [224, 224, 96],         # random roi size
+    'overlap': 0.25,                    # overlap rate
+    'min_val': -500,                    # intersity original range min
+    'max_val': 1000,                    # intersity original range max
+    'upper_limit': 5                    # upper limit of num_classes
+    'lower_limit': 3                    # lower limit of num_classes
 
-```
+    ```
 
 ## [Training Process](#contents)
 
@@ -363,12 +363,12 @@ bash ./run_standalone_eval_gpu_fp16.sh /path_prefix/LUNA16/val /path_prefix/trai
 
 - evaluation on dataset when running on Ascend
 
-Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path, e.g., "username/unet3d/Unet3d-10_110.ckpt".
+    Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path, e.g., "username/unet3d/Unet3d-10_110.ckpt".
 
-```shell
-python eval.py --data_path=/path/to/data/ --checkpoint_file_path=/path/to/checkpoint/ > eval.log 2>&1 &
+    ```shell
+    python eval.py --data_path=/path/to/data/ --checkpoint_file_path=/path/to/checkpoint/ > eval.log 2>&1 &
 
-```
+    ```
 
 The above python command will run in the background. You can view the results through the file "eval.log". The accuracy of the test dataset will be as follows:
 
@@ -383,12 +383,12 @@ eval average dice is 0.9502010010453671
 
 - evaluation on dataset when running on CPU
 
-Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path, e.g., "username/unet3d/Unet3d-10_110.ckpt".
+    Before running the command below, please check the checkpoint path used for evaluation. Please set the checkpoint path to be the absolute full path, e.g., "username/unet3d/Unet3d-10_110.ckpt".
 
-```shell
-python eval.py --device_target=CPU --data_path=/path/to/data/ --checkpoint_file_path=/path/to/checkpoint/ > eval.log 2>&1 &
+    ```shell
+    python eval.py --device_target=CPU --data_path=/path/to/data/ --checkpoint_file_path=/path/to/checkpoint/ > eval.log 2>&1 &
 
-```
+    ```
 
 The above python command will run in the background. You can view the results through the file "eval.log".
 

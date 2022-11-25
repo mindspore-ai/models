@@ -165,17 +165,17 @@ bash scripts/run_distributed_train.sh hccl_8p_01234567_127.0.0.1.json modelnet40
 
 - running on GPU
 
-```shell
-# Run stand-alone training
-bash scripts/run_standalone_train_gpu.sh [DATA_PATH] [SAVE_DIR] [PRETRAINDE_CKPT(optional)]
-# example:
-bash scripts/run_standalone_train_gpu.sh modelnet40_normal_resampled save pointnet2.ckpt
+    ```shell
+    # Run stand-alone training
+    bash scripts/run_standalone_train_gpu.sh [DATA_PATH] [SAVE_DIR] [PRETRAINDE_CKPT(optional)]
+    # example:
+    bash scripts/run_standalone_train_gpu.sh modelnet40_normal_resampled save pointnet2.ckpt
 
-# Run distributed training
-bash scripts/run_distributed_train_gpu.sh [DEVICE_NUM] [DATA_PATH] [SAVE_DIR] [PRETRAINDE_CKPT(optional)]
-# example:
-bash scripts/run_distributed_train_gpu.sh 8 modelnet40_normal_resampled save pointnet2.ckpt
-```
+    # Run distributed training
+    bash scripts/run_distributed_train_gpu.sh [DEVICE_NUM] [DATA_PATH] [SAVE_DIR] [PRETRAINDE_CKPT(optional)]
+    # example:
+    bash scripts/run_distributed_train_gpu.sh 8 modelnet40_normal_resampled save pointnet2.ckpt
+    ```
 
 After training, the loss value will be achieved as follows:
 
@@ -204,21 +204,21 @@ Before running the command below, please check the checkpoint path used for eval
 
 - running on Ascend
 
-```shell
-# Evaluate
-bash scripts/run_eval.sh [DATA_PATH] [CKPT_NAME]
-# example:
-bash scripts/run_eval.sh modelnet40_normal_resampled pointnet2.ckpt
-```
+    ```shell
+    # Evaluate
+    bash scripts/run_eval.sh [DATA_PATH] [CKPT_NAME]
+    # example:
+    bash scripts/run_eval.sh modelnet40_normal_resampled pointnet2.ckpt
+    ```
 
 - running on GPU
 
-```shell
-# Evaluate
-bash scripts/run_eval_gpu.sh [DATA_PATH] [CKPT_NAME]
-# example:
-bash scripts/run_eval_gpu.sh modelnet40_normal_resampled pointnet2.ckpt
-```
+    ```shell
+    # Evaluate
+    bash scripts/run_eval_gpu.sh [DATA_PATH] [CKPT_NAME]
+    # example:
+    bash scripts/run_eval_gpu.sh modelnet40_normal_resampled pointnet2.ckpt
+    ```
 
 You can view the results through the file "eval.log". The accuracy of the test dataset will be as follows:
 

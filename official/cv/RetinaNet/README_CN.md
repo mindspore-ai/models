@@ -48,24 +48,24 @@ Retinanet的整体网络架构如下所示：
 
 ## [数据集](#content)
 
-数据集可参考文献.
+数据集可参考文献：
 
 MSCOCO2017
 
-- 数据集大小: 19.3G, 123287张80类彩色图像
+- 数据集大小：19.3G, 123287张80类彩色图像
 
-    - 训练:19.3G, 118287张图片
+    - 训练：19.3G, 118287张图片
 
-    - 测试:1814.3M, 5000张图片
+    - 测试：1814.3M, 5000张图片
 
-- 数据格式:RGB图像.
+- 数据格式：RGB图像.
 
     - 注意：数据将在src/dataset.py 中被处理
 
 face-mask-detection(迁移学习使用)
 
-- 数据集大小: 397.65MB, 853张3类彩色图像
-- 数据格式:RGB图像.
+- 数据集大小：397.65MB, 853张3类彩色图像
+- 数据格式：RGB图像.
 
     - 注意：数据将在src/dataset.py 中被处理
 
@@ -126,7 +126,7 @@ face-mask-detection(迁移学习使用)
 ### [脚本参数](#content)
 
 ```default_config.yaml
-在脚本中使用到的主要参数是:
+在脚本中使用到的主要参数是：
 "img_shape": [600, 600],                                                                        # 图像尺寸
 "num_retinanet_boxes": 67995,                                                                   # 设置的先验框总数
 "match_thershold": 0.5,                                                                         # 匹配阈值
@@ -188,7 +188,7 @@ face-mask-detection(迁移学习使用)
 
 #### 用法
 
-使用shell脚本进行训练。shell脚本的用法如下:
+使用shell脚本进行训练。shell脚本的用法如下：
 
 ```训练
 # 八卡并行训练示例：
@@ -202,9 +202,9 @@ bash scripts/run_single_train.sh DEVICE_ID MINDRECORD_DIR CONFIG_PATH PRE_TRAINE
 
 ```
 
-> 注意:
+> 注意：
 
-  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
+  RANK_TABLE_FILE相关参考资料见[链接](https://www.mindspore.cn/tutorials/experts/zh-CN/master/parallel/train_ascend.html), 获取device_ip方法详见[链接](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools)。
 
 #### 运行
 
@@ -331,7 +331,7 @@ Epoch time: 164531.610, per step time: 359.239
 
 #### <span id="usage">用法</span>
 
-使用shell脚本进行评估。shell脚本的用法如下:
+使用shell脚本进行评估。shell脚本的用法如下：
 
 ```bash
 Ascend:
@@ -345,11 +345,11 @@ bash scripts/run_eval_gpu.sh [DEVICE_ID] [DATASET] [MINDRECORD_DIR] [CHECKPOINT_
 # example: bash scripts/run_eval_gpu.sh 0 coco /home/DataSet/MindRecord_COCO/ /home/model/retinanet/ckpt/retinanet_500-458.ckpt /home/DataSet/cocodataset/annotations/instances_{}.json /home/retinanet/config/default_config_gpu.yaml
 ```
 
-> checkpoint 可以在训练过程中产生.
+> checkpoint 可以在训练过程中产生。
 
 #### <span id="outcome">结果</span>
 
-计算结果将存储在示例路径中，您可以在 `eval.log` 查看.
+计算结果将存储在示例路径中，您可以在 `eval.log` 查看。
 
 ```mAP
 Ascend:
@@ -411,23 +411,23 @@ python export.py  --file_name retinanet --file_format MINDIR --checkpoint_path /
 
 - 在modelarts上导出MindIR
 
-```Modelarts
-在ModelArts上导出MindIR示例
-# (1) 选择a(修改yaml文件参数)或者b(ModelArts创建训练作业修改参数)其中一种方式。
-#       a. 设置 "enable_modelarts=True"
-#          设置 "file_name=retinanet"
-#          设置 "file_format=MINDIR"
-#          设置 "checkpoint_path=/cache/data/checkpoint/checkpoint file name"
+    ```Modelarts
+    在ModelArts上导出MindIR示例
+    # (1) 选择a(修改yaml文件参数)或者b(ModelArts创建训练作业修改参数)其中一种方式。
+    #       a. 设置 "enable_modelarts=True"
+    #          设置 "file_name=retinanet"
+    #          设置 "file_format=MINDIR"
+    #          设置 "checkpoint_path=/cache/data/checkpoint/checkpoint file name"
 
-#       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
-#          在modelarts的界面上设置方法a所需要的参数
-#          注意：路径参数不需要加引号
-# (2)设置网络配置文件的路径 "_config_path=/The path of config in default_config.yaml/"
-# (3) 在modelarts的界面上设置代码的路径 "/path/retinanet"。
-# (4) 在modelarts的界面上设置模型的启动文件 "export.py" 。
-# (5) 在modelarts的界面上设置模型的数据路径 ".../MindRecord_COCO"(选择MindRecord_COCO文件夹路径) ,
-# MindIR的输出路径"Output file path" 和模型的日志路径 "Job log path" 。
-```
+    #       b. 增加 "enable_modelarts=True" 参数在modearts的界面上。
+    #          在modelarts的界面上设置方法a所需要的参数
+    #          注意：路径参数不需要加引号
+    # (2)设置网络配置文件的路径 "_config_path=/The path of config in default_config.yaml/"
+    # (3) 在modelarts的界面上设置代码的路径 "/path/retinanet"。
+    # (4) 在modelarts的界面上设置模型的启动文件 "export.py" 。
+    # (5) 在modelarts的界面上设置模型的数据路径 ".../MindRecord_COCO"(选择MindRecord_COCO文件夹路径) ,
+    # MindIR的输出路径"Output file path" 和模型的日志路径 "Job log path" 。
+    ```
 
 ### [推理过程](#content)
 
@@ -513,7 +513,7 @@ mAP: 0.3499478734634595
 
 ## [ModelZoo 主页](#content)
 
-请核对官方 [主页](https://gitee.com/mindspore/models).
+请核对官方 [主页](https://gitee.com/mindspore/models)。
 
 ## [迁移学习](#content)
 
@@ -630,9 +630,9 @@ python quick_start.py --config_path './config/finetune_config.yaml'
 **结果说明**
 图中颜色的含义分别是：
 
-- 浅蓝: 真实标签的mask_weared_incorrect
-- 浅绿: 真实标签的with_mask
-- 浅红: 真实标签的without_mask
-- 蓝色: 预测标签的mask_weared_incorrect
-- 绿色: 预测标签的with_mask
-- 红色: 预测标签的without_mask
+- 浅蓝：真实标签的mask_weared_incorrect
+- 浅绿：真实标签的with_mask
+- 浅红：真实标签的without_mask
+- 蓝色：预测标签的mask_weared_incorrect
+- 绿色：预测标签的with_mask
+- 红色：预测标签的without_mask

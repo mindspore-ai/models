@@ -113,7 +113,7 @@
 
   1. 从github获取torch版源代码： https://github.com/lizhengwei1992/Semantic_Human_Matting
 
-  2. 将`src`目录下的`get_init_weight.py`文件拷贝到`torch版源代码的根目录`下， 并执行以下命令
+  2. 将`src`目录下的`get_init_weight.py`文件拷贝到`torch版源代码的根目录`下，并执行以下命令
 
   ```text
   python3 get_init_weight.py
@@ -167,23 +167,23 @@
 
 - **模型导出**
 
-在模型导出之前需要修改`config.yaml`中的`export`字段下面的参数，以及配置模型导出的相关参数，当前导出格式为`MINDIR`。更多配置请参考[脚本参数](#脚本参数)，详细导出过程请参考[导出过程](#导出过程)
+    在模型导出之前需要修改`config.yaml`中的`export`字段下面的参数，以及配置模型导出的相关参数，当前导出格式为`MINDIR`。更多配置请参考[脚本参数](#脚本参数)，详细导出过程请参考[导出过程](#导出过程)
 
-```text
-python3 export.py --config_path=[CONFIG_PATH]
-# example: python3 export.py --config_path=./config.yaml
-```
+    ```text
+    python3 export.py --config_path=[CONFIG_PATH]
+    # example: python3 export.py --config_path=./config.yaml
+    ```
 
 - **运行推理**
 
-执行前需要修改`config.yaml`中的`infer`字段下面的参数，其中`file_test_list`为绝对路径，是`制作数据集`步骤中生成的`test.txt`，`size`固定为320 。更多配置请参考[脚本参数](#脚本参数)，详细导出过程请参考[推理过程](#推理过程)
+    执行前需要修改`config.yaml`中的`infer`字段下面的参数，其中`file_test_list`为绝对路径，是`制作数据集`步骤中生成的`test.txt`，`size`固定为320 。更多配置请参考[脚本参数](#脚本参数)，详细导出过程请参考[推理过程](#推理过程)
 
-```text
-# 运行推理示例
-bash run_infer_310.sh [MINDIR_PATH]
-# [MINDIR_PATH]：上个步骤配置的导出模型文件路径
-# example: bash run_infer_310.sh ../shm_export.mindir
-```
+    ```text
+    # 运行推理示例
+    bash run_infer_310.sh [MINDIR_PATH]
+    # [MINDIR_PATH]：上个步骤配置的导出模型文件路径
+    # example: bash run_infer_310.sh ../shm_export.mindir
+    ```
 
 # 脚本说明
 
@@ -236,43 +236,43 @@ bash run_infer_310.sh [MINDIR_PATH]
 
 5. 首次运行时，下列参数全置为`True`，后续可根据需要进行调整
 
-```text
-copy_pic: True                               # 是否从下载的数据集中复制图片到制作的数据集保存路径
-generate_mask: True                          # 是否生成mask图片集
-generate_txt: True                           # 是否生成训练、评估、测试用的图片路径列举文本文件
-generate_trimap: True                        # 是否生成trimap图片集
-fixed_ksize: True                            # 是否生成trimap图片集时，设置kernel尺寸固定或者随机扰动
-generate_alpha: True                         # 是否生成alpha图片集
-generate_debug: True                         # 是否生成调试图片集
-generate_mean_std: True                      # 是否计算训练集和验证集的均值和方差
-```
+    ```text
+    copy_pic: True                               # 是否从下载的数据集中复制图片到制作的数据集保存路径
+    generate_mask: True                          # 是否生成mask图片集
+    generate_txt: True                           # 是否生成训练、评估、测试用的图片路径列举文本文件
+    generate_trimap: True                        # 是否生成trimap图片集
+    fixed_ksize: True                            # 是否生成trimap图片集时，设置kernel尺寸固定或者随机扰动
+    generate_alpha: True                         # 是否生成alpha图片集
+    generate_debug: True                         # 是否生成调试图片集
+    generate_mean_std: True                      # 是否计算训练集和验证集的均值和方差
+    ```
 
 6. `kernel size`的设置策略: `kernel size`是制作`trimap`图片集时针对图片的`alpha`通道进行腐蚀膨胀时的窗口核尺寸。其中`fixed_ksize`为`True`时，`kernel size`为固定值，为`False`时，`kernel size`会随机变化
 
-详细配置如下
+    详细配置如下
 
-```text
-generate_data:
-  path_mt_human: /cache/human_matting          # 下载的数据集
-  path_save: /cache/datasets                   # 制作的数据集保存路径
-  path_debug: /cache/datasets_debug            # 生成的调试用数据集保存路径
+    ```text
+    generate_data:
+    path_mt_human: /cache/human_matting          # 下载的数据集
+    path_save: /cache/datasets                   # 制作的数据集保存路径
+    path_debug: /cache/datasets_debug            # 生成的调试用数据集保存路径
 
-  proportion: '6:2:2'                          # 训练集、验证集和测试集的划分比例
-  debug_pic_nums: 400                          # 调试集的总图片数量
-  copy_pic: True                               # 是否从下载的数据集中复制图片到制作的数据集保存路径
-  generate_mask: True                          # 是否生成mask图片集
-  generate_txt: True                           # 是否生成训练、评估、测试用的图片路径列举文本文件
-  generate_trimap: True                        # 是否生成trimap图片集
-  ksize: 10                                    # kernel尺寸设置
-  fixed_ksize: True                            # 是否生成trimap图片集时，设置kernel尺寸固定或者随机扰动
-  generate_alpha: True                         # 是否生成alpha图片集
-  generate_debug: True                         # 是否生成调试图片集
-  generate_mean_std: True                      # 是否计算训练集和验证集的均值和方差
+    proportion: '6:2:2'                          # 训练集、验证集和测试集的划分比例
+    debug_pic_nums: 400                          # 调试集的总图片数量
+    copy_pic: True                               # 是否从下载的数据集中复制图片到制作的数据集保存路径
+    generate_mask: True                          # 是否生成mask图片集
+    generate_txt: True                           # 是否生成训练、评估、测试用的图片路径列举文本文件
+    generate_trimap: True                        # 是否生成trimap图片集
+    ksize: 10                                    # kernel尺寸设置
+    fixed_ksize: True                            # 是否生成trimap图片集时，设置kernel尺寸固定或者随机扰动
+    generate_alpha: True                         # 是否生成alpha图片集
+    generate_debug: True                         # 是否生成调试图片集
+    generate_mean_std: True                      # 是否计算训练集和验证集的均值和方差
 
-  # 下载的数据集中存在的错误文件，添加在此处，以便代码执行过程中过滤
-  list_error_files: ['/cache/human_matting/matting/1803201916/._matting_00000000',
-                      '/cache/human_matting/clip_img/1803241125/clip_00000000/._1803241125-00000005.jpg']
-```
+    # 下载的数据集中存在的错误文件，添加在此处，以便代码执行过程中过滤
+    list_error_files: ['/cache/human_matting/matting/1803201916/._matting_00000000',
+                        '/cache/human_matting/clip_img/1803241125/clip_00000000/._1803241125-00000005.jpg']
+    ```
 
 ### 训练配置
 
@@ -367,17 +367,17 @@ export:
 
 - 下载数据集
 
-[Matting Human Datasets](<https://github.com/aisegmentcn/matting_human_datasets>)
+    [Matting Human Datasets](<https://github.com/aisegmentcn/matting_human_datasets>)
 
 - 配置`config.yaml`
 
-配置`generate_data`字段即可
+    配置`generate_data`字段即可
 
 - 执行命令
 
-```bassh
-python3 generate_datasets.py --yaml_path=../config.yaml
-```
+    ```bassh
+    python3 generate_datasets.py --yaml_path=../config.yaml
+    ```
 
 - 输出
 
@@ -444,36 +444,36 @@ python3 generate_datasets.py --yaml_path=../config.yaml
 
 2. 将`src`文件夹下的`get_init_weight.py`文件拷贝到`torch版源代码的根目录`下
 
-```text
-├── shm_original_code         // torch版源代码
-    ├── data
-    │   ├── data.py
-    │   ├── gen_trimap.py
-    │   ├── gen_trimap.sh
-    │   ├── knn_matting.py
-    │   ├── knn_matting.sh
-    ├── model
-    │   ├── M_Net.py
-    │   ├── network.py
-    │   ├── N_Net.py
-    ├── network.png
-    ├── README.md
-    ├── test_camera.py
-    ├── test_camera.sh
-    ├── train.py
-    ├── train.sh
-    ├── get_init_weight.py    // 将文件拷贝到此处
-```
+    ```text
+    ├── shm_original_code         // torch版源代码
+        ├── data
+        │   ├── data.py
+        │   ├── gen_trimap.py
+        │   ├── gen_trimap.sh
+        │   ├── knn_matting.py
+        │   ├── knn_matting.sh
+        ├── model
+        │   ├── M_Net.py
+        │   ├── network.py
+        │   ├── N_Net.py
+        ├── network.png
+        ├── README.md
+        ├── test_camera.py
+        ├── test_camera.sh
+        ├── train.py
+        ├── train.sh
+        ├── get_init_weight.py    // 将文件拷贝到此处
+    ```
 
 3. 执行以下命令
 
-```text
-python3 get_init_weight.py
-```
+    ```text
+    python3 get_init_weight.py
+    ```
 
 4. 输出
 
-执行命令后，会在`torch版源代码根目录`生成`init_weight.ckpt`初始化权重文件，可将**初始化权重文件**拷贝到该**项目根目录**下。
+    执行命令后，会在`torch版源代码根目录`生成`init_weight.ckpt`初始化权重文件，可将**初始化权重文件**拷贝到该**项目根目录**下。
 
 ## 训练过程
 
@@ -481,83 +481,84 @@ python3 get_init_weight.py
 
 1. 配置`config.yaml`
 
-设置`pre_train_t_net`、`pre_train_m_net`、`train_phase`字段以及其他字段，详情参考[脚本参数](#脚本参数)下的`训练配置`
+    设置`pre_train_t_net`、`pre_train_m_net`、`train_phase`字段以及其他字段，详情参考[脚本参数](#脚本参数)下的`训练配置`
 
 2. 执行以下命令
 
-```text
-python3 train.py --yaml_path=[YAML_PATH] --data_url=[DATASETS] --train_url=[OUTPUT] --init_weight=[INIT_WEIGHT][OPTIONAL] > train.log 2>&1 &
-# example:  python3 train.py --yaml_path=./config.yaml --data_url=/cache/datasets --train_url=/cache/output --init_weight=./init_weight.ckpt > train.log 2>&1 &
-```
+    ```text
+    python3 train.py --yaml_path=[YAML_PATH] --data_url=[DATASETS] --train_url=[OUTPUT] --init_weight=[INIT_WEIGHT][OPTIONAL] > train.log 2>&1 &
+    # example:  python3 train.py --yaml_path=./config.yaml --data_url=/cache/datasets --train_url=/cache/output --init_weight=./init_weight.ckpt > train.log 2>&1 &
+    ```
 
-上述python命令将在后台运行，您可以通过`train.log`文件查看结果。
+    上述python命令将在后台运行，您可以通过`train.log`文件查看结果。
 
-训练过程中会输出以下损失值、速度（秒）等信息：
+    训练过程中会输出以下损失值、速度（秒）等信息：
 
-```text
-  train epoch: 553 step: 1, loss: 0.022731708, speed: 0.14632129669189453
-  train epoch: 553 step: 2, loss: 0.016247142, speed: 0.22849583625793457
-  train epoch: 553 step: 3, loss: 0.015720012, speed: 0.19010353088378906
-...
-```
+    ```text
+    train epoch: 553 step: 1, loss: 0.022731708, speed: 0.14632129669189453
+    train epoch: 553 step: 2, loss: 0.016247142, speed: 0.22849583625793457
+    train epoch: 553 step: 3, loss: 0.015720012, speed: 0.19010353088378906
+    ...
+    ```
 
-  模型检查点保存在`/cache/output/single/ckpt_s2(yaml配置文件中的ckpt_version选项)`目录下，最终推理模型为
-  `/cache/output/single/ckpt_s2/end_to_end/semantic_hm_best.ckpt`
+    模型检查点保存在`/cache/output/single/ckpt_s2(yaml配置文件中的ckpt_version选项)`目录下，最终推理模型为
+    `/cache/output/single/ckpt_s2/end_to_end/semantic_hm_best.ckpt`
 
 3. 训练输出目录结构
 
-```text
-├── /cache/output/[single或distribute]/ckpt_s2/
-    ├── pre_train_t_net                       // T-Net训练阶段模型文件及日志保存目录
-    │   ├── log_best.txt                      // 未使用
-    │   ├── log_latest.txt                   // T-Net训练阶段loss等信息日志
-    │   ├── semantic_hm_latest_1.ckpt        // 保存的epoch对应checkpoint文件
-    │   ├── semantic_hm_latest_2.ckpt
-    │   ├── semantic_hm_latest_3.ckpt
-    │   ├── ···
-    ├── pre_train_m_net                       // M-Net训练阶段模型文件及日志保存目录，训练时若添加了M-Net训练，则会生成此目录
-    │   ├── log_best.txt                      // 相对于前面epoch出现最好精度时的loss等信息日志
-    │   ├── log_latest.txt                   // M-Net训练阶段loss等信息日志
-    │   ├── semantic_hm_best.ckpt             // 每个epoch最好精度出现时，会覆盖该checkpoint文件
-    │   ├── semantic_hm_latest_1.ckpt        // 保存的epoch对应checkpoint文件
-    │   ├── semantic_hm_latest_2.ckpt
-    │   ├── semantic_hm_latest_3.ckpt
-    │   ├── ···
-    ├── end_to_end                            // End-to-End训练阶段模型文件及日志保存目录
-    │   ├── log_best.txt
-    │   ├── log_latest.txt
-    │   ├── semantic_hm_best.ckpt
-    │   ├── semantic_hm_latest_1.ckpt
-    │   ├── semantic_hm_latest_2.ckpt
-    │   ├── semantic_hm_latest_3.ckpt
-    │   ├── ···
-    ├── log_best.txt                          // 所有训练阶段，相对于前面epoch出现最好精度时的loss等信息日志
-    ├── log_latest.txt                        // 所有训练阶段loss等信息日志
-```
+    ```text
+    ├── /cache/output/[single或distribute]/ckpt_s2/
+        ├── pre_train_t_net                       // T-Net训练阶段模型文件及日志保存目录
+        │   ├── log_best.txt                      // 未使用
+        │   ├── log_latest.txt                   // T-Net训练阶段loss等信息日志
+        │   ├── semantic_hm_latest_1.ckpt        // 保存的epoch对应checkpoint文件
+        │   ├── semantic_hm_latest_2.ckpt
+        │   ├── semantic_hm_latest_3.ckpt
+        │   ├── ···
+        ├── pre_train_m_net                       // M-Net训练阶段模型文件及日志保存目录，训练时若添加了M-Net训练，则会生成此目录
+        │   ├── log_best.txt                      // 相对于前面epoch出现最好精度时的loss等信息日志
+        │   ├── log_latest.txt                   // M-Net训练阶段loss等信息日志
+        │   ├── semantic_hm_best.ckpt             // 每个epoch最好精度出现时，会覆盖该checkpoint文件
+        │   ├── semantic_hm_latest_1.ckpt        // 保存的epoch对应checkpoint文件
+        │   ├── semantic_hm_latest_2.ckpt
+        │   ├── semantic_hm_latest_3.ckpt
+        │   ├── ···
+        ├── end_to_end                            // End-to-End训练阶段模型文件及日志保存目录
+        │   ├── log_best.txt
+        │   ├── log_latest.txt
+        │   ├── semantic_hm_best.ckpt
+        │   ├── semantic_hm_latest_1.ckpt
+        │   ├── semantic_hm_latest_2.ckpt
+        │   ├── semantic_hm_latest_3.ckpt
+        │   ├── ···
+        ├── log_best.txt                          // 所有训练阶段，相对于前面epoch出现最好精度时的loss等信息日志
+        ├── log_latest.txt                        // 所有训练阶段loss等信息日志
+    ```
 
 4. 注意
 
-`End-to-End`训练阶段（或者`M-Net`训练阶段）输出日志中的`Sad指标`为图片尺寸为`patch_size`（yaml配置的选项）时直接用预测的alpha和groundtruth计算`Sad指标`，而推理中的`Sad指标`，会将尺寸resize回图片原尺寸再进行计算
+    `End-to-End`训练阶段（或者`M-Net`训练阶段）输出日志中的`Sad指标`为图片尺寸为`patch_size`（yaml配置的选项）时直接用预测的alpha和groundtruth计算`Sad指标`，而推理中的`Sad指标`，会将尺寸resize回图片原尺寸再进行计算
 
 ### 分布式训练
 
 1. 生成分布式训练json配置文件
 
-对于分布式训练，需要提前创建JSON格式的hccl配置文件。可将文件命名为`hccl_8p.json`，并存放在当前工程的根目录下。
-请遵循以下链接中的说明：<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
+    对于分布式训练，需要提前创建JSON格式的hccl配置文件。可将文件命名为`hccl_8p.json`，并存放在当前工程的根目录下。
+    请遵循以下链接中的说明：<https://gitee.com/mindspore/models/tree/master/utils/hccl_tools>
 
 2. 配置`config.yaml`
 
-设置`pre_train_t_net`、`pre_train_m_net`、`train_phase`字段以及其他字段，详情参考[脚本参数](#脚本参数)下的`训练配置`
+    设置`pre_train_t_net`、`pre_train_m_net`、`train_phase`字段以及其他字段，详情参考[脚本参数](#脚本参数)下的`训练配置`
 
 3. 执行以下命令
 
-```bash
-bash run_train.sh [RANK_TABLE_FILE] [YAML_PATH] [DATASETS] [OUTPUT] [INIT_WEIGHT][OPTIONAL]
-# example: bash run_train.sh ../hccl_8p.json ../config.yaml /cache/datasets /cache/output ../init_weight.ckpt
-```
+    ```bash
+    bash run_train.sh [RANK_TABLE_FILE] [YAML_PATH] [DATASETS] [OUTPUT] [INIT_WEIGHT][OPTIONAL]
+    # example: bash run_train.sh ../hccl_8p.json ../config.yaml /cache/datasets /cache/output ../init_weight.ckpt
+    ```
 
 4. 输出
+
    上述shell脚本将在后台运行分布训练。训练的输出`OUTPUT/distribute/..`和上一节训练的输出`OUTPUT/single/..`类似
 
    - 查看日志
@@ -575,30 +576,30 @@ bash run_train.sh [RANK_TABLE_FILE] [YAML_PATH] [DATASETS] [OUTPUT] [INIT_WEIGHT
 
 1. 配置`config.yaml`
 
-设置`test`字段的相关参数
+    设置`test`字段的相关参数
 
 2. 执行以下命令
 
-```bash
-python3 eval.py --yaml_path=[YAML_PATH] > eval.log 2>&1 &
-# example: python3 eval.py --yaml_path=./config.yaml > eval.log 2>&1 &
-```
+    ```bash
+    python3 eval.py --yaml_path=[YAML_PATH] > eval.log 2>&1 &
+    # example: python3 eval.py --yaml_path=./config.yaml > eval.log 2>&1 &
+    ```
 
-或者
+    或者
 
-```bash
-bash run_eval.sh [DEVICE_ID][OPTIONAL]
-# example: bash run_eval.sh
-```
+    ```bash
+    bash run_eval.sh [DEVICE_ID][OPTIONAL]
+    # example: bash run_eval.sh
+    ```
 
-4. 输出
+3. 输出
 
-上述python命令将在后台运行，您可以通过`eval.log`文件查看结果。测试数据集的准确性如下：
+    上述python命令将在后台运行，您可以通过`eval.log`文件查看结果。测试数据集的准确性如下：
 
-```text
-# grep "ave_sad: " ./eval.log
-ave_sad: 5.4309
-```
+    ```text
+    # grep "ave_sad: " ./eval.log
+    ave_sad: 5.4309
+    ```
 
 ## 导出过程
 
@@ -627,50 +628,50 @@ ave_sad: 5.4309
 
 1. 配置`config.yaml`
 
-设置`infer`字段下面的参数。修改的项包括`file_test_list`（测试集文件列表, .txt文件绝对路径）和`size`（输入网络的图片尺寸）。
+    设置`infer`字段下面的参数。修改的项包括`file_test_list`（测试集文件列表, .txt文件绝对路径）和`size`（输入网络的图片尺寸）。
 
 2. 执行以下命令
 
-```bash
-bash run_infer_310.sh [MINDIR_PATH]
-# [MINDIR_PATH]：上个步骤yaml配置文件中的导出模型文件路径
-# example: bash run_infer_310.sh ../shm_export.mindir
-```
+    ```bash
+    bash run_infer_310.sh [MINDIR_PATH]
+    # [MINDIR_PATH]：上个步骤yaml配置文件中的导出模型文件路径
+    # example: bash run_infer_310.sh ../shm_export.mindir
+    ```
 
 3. 输出
 
-推理的结果保存在当前目录下
+    推理的结果保存在当前目录下
 
-```text
-├── scripts
-    ├── preprocess_Result                                  // 前处理输出目录
-    │   ├── clip_data                                      // 原图片保存目录
-    │   │   ├── matting_0000_1803280628-00000477.jpg       // 原图片——命名规则：matting_[图片编号4位]_[原数据集图片名称]
-    │   │   ├── matting_0001_1803280628-00000478.jpg
-    │   │   ├── ···
-    │   ├── img_data                                       // 原图片预处理成能够输入网络的bin数据目录
-    │   │   ├── matting_0000_1803280628-00000477.bin
-    │   │   ├── matting_0001_1803280628-00000478.bin
-    │   │   ├── ···
-    │   ├── label                                          // label目录
-    │   │   ├── matting_0000_1803280628-00000477.png
-    │   │   ├── matting_0001_1803280628-00000478.png
-    │   │   ├── ···
-    ├── result_Files                                       // 模型推理输出目录
-    │   │   ├── matting_0000_1803280628-00000477_0.bin     // 模型输出第一个值：trimap
-    │   │   ├── matting_0000_1803280628-00000477_1.bin     // 模型输出第二个值：alpha
-    │   │   ├── matting_0001_1803280628-00000478_0.bin
-    │   │   ├── matting_0001_1803280628-00000478_1.bin
-    │   │   ├── ···
-    ├── postprocess_Result                                 // 后处理输出目录，可在此目录主观查看模型推理效果
-    │   │   ├── matting_0000_1803280628-00000477.jpg
-    │   │   ├── matting_0001_1803280628-00000478.jpg
-    │   │   ├── ···
-    ├── time_Result                                        // 推理执行耗时结果保存目录
-    │   │   ├── test_perform_static.txt
-    ├── infer.log                                          // 模型推理过程日志
-    ├── acc.log                                            // 精度输出日志
-```
+    ```text
+    ├── scripts
+        ├── preprocess_Result                                  // 前处理输出目录
+        │   ├── clip_data                                      // 原图片保存目录
+        │   │   ├── matting_0000_1803280628-00000477.jpg       // 原图片——命名规则：matting_[图片编号4位]_[原数据集图片名称]
+        │   │   ├── matting_0001_1803280628-00000478.jpg
+        │   │   ├── ···
+        │   ├── img_data                                       // 原图片预处理成能够输入网络的bin数据目录
+        │   │   ├── matting_0000_1803280628-00000477.bin
+        │   │   ├── matting_0001_1803280628-00000478.bin
+        │   │   ├── ···
+        │   ├── label                                          // label目录
+        │   │   ├── matting_0000_1803280628-00000477.png
+        │   │   ├── matting_0001_1803280628-00000478.png
+        │   │   ├── ···
+        ├── result_Files                                       // 模型推理输出目录
+        │   │   ├── matting_0000_1803280628-00000477_0.bin     // 模型输出第一个值：trimap
+        │   │   ├── matting_0000_1803280628-00000477_1.bin     // 模型输出第二个值：alpha
+        │   │   ├── matting_0001_1803280628-00000478_0.bin
+        │   │   ├── matting_0001_1803280628-00000478_1.bin
+        │   │   ├── ···
+        ├── postprocess_Result                                 // 后处理输出目录，可在此目录主观查看模型推理效果
+        │   │   ├── matting_0000_1803280628-00000477.jpg
+        │   │   ├── matting_0001_1803280628-00000478.jpg
+        │   │   ├── ···
+        ├── time_Result                                        // 推理执行耗时结果保存目录
+        │   │   ├── test_perform_static.txt
+        ├── infer.log                                          // 模型推理过程日志
+        ├── acc.log                                            // 精度输出日志
+    ```
 
 在`time_Result`目录下的`test_perform_static.txt`文件中会记录推理的耗时结果
 

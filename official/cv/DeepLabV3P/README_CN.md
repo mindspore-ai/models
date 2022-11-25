@@ -100,12 +100,12 @@ Pascal VOC数据集和语义边界数据集（Semantic Boundaries Dataset，SBD�
 - 安装requirements.txt中的python包。
 - 生成config json文件用于8卡训练。
 
-     ```
-     # 从项目根目录进入
-     cd src/tools/
-     python3 get_multicards_json.py 10.111.*.*
-     # 10.111.*.*为计算机IP地址
-     ```
+    ```
+    # 从项目根目录进入
+    cd src/tools/
+    python3 get_multicards_json.py 10.111.*.*
+    # 10.111.*.*为计算机IP地址
+    ```
 
 # 快速入门
 
@@ -113,131 +113,131 @@ Pascal VOC数据集和语义边界数据集（Semantic Boundaries Dataset，SBD�
 
 - Ascend处理器环境运行
 
-在DeepLabV3+原始论文的基础上，我们对VOCaug（也称为trainaug）数据集进行了两次训练实验，并对voc val数据集进行了评估。
+    在DeepLabV3+原始论文的基础上，我们对VOCaug（也称为trainaug）数据集进行了两次训练实验，并对voc val数据集进行了评估。
 
-运行以下训练脚本配置单卡训练参数：
+    运行以下训练脚本配置单卡训练参数：
 
-```bash
-run_alone_train.sh
-```
+    ```bash
+    run_alone_train.sh
+    ```
 
 按照以下训练步骤进行8卡训练：
 
-1.使用VOCaug数据集训练s16，微调ResNet-101预训练模型。脚本如下：
+1. 使用VOCaug数据集训练s16，微调ResNet-101预训练模型。脚本如下：
 
-```bash
-run_distribute_train_s16_r1.sh
-```
+    ```bash
+    run_distribute_train_s16_r1.sh
+    ```
 
-2.使用VOCaug数据集训练s8，微调上一步的模型。脚本如下：
+2. 使用VOCaug数据集训练s8，微调上一步的模型。脚本如下：
 
-```bash
-run_distribute_train_s8_r1.sh
-```
+    ```bash
+    run_distribute_train_s8_r1.sh
+    ```
 
-3.使用VOCtrain数据集训练s8，微调上一步的模型。脚本如下：
+3. 使用VOCtrain数据集训练s8，微调上一步的模型。脚本如下：
 
-```bash
-run_distribute_train_s8_r2.sh
-```
+    ```bash
+    run_distribute_train_s8_r2.sh
+    ```
 
 评估步骤如下：
 
-1.使用voc val数据集评估s16。评估脚本如下：
+1. 使用voc val数据集评估s16。评估脚本如下：
 
-```bash
-run_eval_s16.sh
-```
+    ```bash
+    run_eval_s16.sh
+    ```
 
-2.使用voc val数据集评估多尺度s16。评估脚本如下：
+2. 使用voc val数据集评估多尺度s16。评估脚本如下：
 
-```bash
-run_eval_s16_multiscale.sh
-```
+    ```bash
+    run_eval_s16_multiscale.sh
+    ```
 
-3.使用voc val数据集评估多尺度和翻转s16。评估脚本如下：
+3. 使用voc val数据集评估多尺度和翻转s16。评估脚本如下：
 
-```bash
-run_eval_s16_multiscale_flip.sh
-```
+    ```bash
+    run_eval_s16_multiscale_flip.sh
+    ```
 
-4.使用voc val数据集评估s8。评估脚本如下：
+4. 使用voc val数据集评估s8。评估脚本如下：
 
-```bash
-run_eval_s8.sh
-```
+    ```bash
+    run_eval_s8.sh
+    ```
 
-5.使用voc val数据集评估多尺度s8。评估脚本如下：
+5. 使用voc val数据集评估多尺度s8。评估脚本如下：
 
-```bash
-run_eval_s8_multiscale.sh
-```
+    ```bash
+    run_eval_s8_multiscale.sh
+    ```
 
-6.使用voc val数据集评估多尺度和翻转s8。评估脚本如下：
+6. 使用voc val数据集评估多尺度和翻转s8。评估脚本如下：
 
-```bash
-run_eval_s8_multiscale_flip.sh
-```
+    ```bash
+    run_eval_s8_multiscale_flip.sh
+    ```
 
 - GPU处理器环境运行
 
-按照以下训练步骤进行8卡训练：
+    按照以下训练步骤进行8卡训练：
 
-1.使用VOCaug数据集训练s16，微调ResNet-101预训练模型。脚本如下：
+    1. 使用VOCaug数据集训练s16，微调ResNet-101预训练模型。脚本如下：
 
-```bash
-bash run_distribute_train_s16_r1_gpu.sh /PATH/TO/MINDRECORD_NAME /PATH/TO/PRETRAIN_MODEL
-```
+    ```bash
+    bash run_distribute_train_s16_r1_gpu.sh /PATH/TO/MINDRECORD_NAME /PATH/TO/PRETRAIN_MODEL
+    ```
 
-2.使用VOCaug数据集训练s8，微调上一步的模型。脚本如下：
+    2. 使用VOCaug数据集训练s8，微调上一步的模型。脚本如下：
 
-```bash
-bash run_distribute_train_s8_r1_gpu.sh /PATH/TO/MINDRECORD_NAME /PATH/TO/PRETRAIN_MODEL
-```
+    ```bash
+    bash run_distribute_train_s8_r1_gpu.sh /PATH/TO/MINDRECORD_NAME /PATH/TO/PRETRAIN_MODEL
+    ```
 
-3.使用VOCtrain数据集训练s8，微调上一步的模型。脚本如下：
+    3. 使用VOCtrain数据集训练s8，微调上一步的模型。脚本如下：
 
-```bash
-bash run_distribute_train_s8_r2_gpu.sh /PATH/TO/MINDRECORD_NAME /PATH/TO/PRETRAIN_MODEL
-```
+    ```bash
+    bash run_distribute_train_s8_r2_gpu.sh /PATH/TO/MINDRECORD_NAME /PATH/TO/PRETRAIN_MODEL
+    ```
 
 评估步骤如下：
 
-1.使用voc val数据集评估s16。评估脚本如下：
+1. 使用voc val数据集评估s16。评估脚本如下：
 
-```bash
-bash run_eval_s16_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
-```
+    ```bash
+    bash run_eval_s16_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
+    ```
 
-2.使用voc val数据集评估多尺度s16。评估脚本如下：
+2. 使用voc val数据集评估多尺度s16。评估脚本如下：
 
-```bash
-bash run_eval_s16_multiscale_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
-```
+    ```bash
+    bash run_eval_s16_multiscale_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
+    ```
 
-3.使用voc val数据集评估多尺度和翻转s16。评估脚本如下：
+3. 使用voc val数据集评估多尺度和翻转s16。评估脚本如下：
 
-```bash
-bash run_eval_s16_multiscale_flip_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
-```
+    ```bash
+    bash run_eval_s16_multiscale_flip_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
+    ```
 
-4.使用voc val数据集评估s8。评估脚本如下：
+4. 使用voc val数据集评估s8。评估脚本如下：
 
-```bash
-bash run_eval_s8_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
-```
+    ```bash
+    bash run_eval_s8_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
+    ```
 
-5.使用voc val数据集评估多尺度s8。评估脚本如下：
+5. 使用voc val数据集评估多尺度s8。评估脚本如下：
 
-```bash
-bash run_eval_s8_multiscale_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
-```
+    ```bash
+    bash run_eval_s8_multiscale_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
+    ```
 
-6.使用voc val数据集评估多尺度和翻转s8。评估脚本如下：
+6. 使用voc val数据集评估多尺度和翻转s8。评估脚本如下：
 
-```bash
-bash run_eval_s8_multiscale_flip_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
-```
+    ```bash
+    bash run_eval_s8_multiscale_flip_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID
+    ```
 
 # 脚本说明
 
@@ -338,97 +338,97 @@ python ${train_code_path}/train.py --data_file=/PATH/TO/MINDRECORD_NAME  \
 
 按照以下训练步骤进行8卡训练：
 
-1.使用VOCaug数据集训练s16，微调ResNet-101预训练模型。脚本如下：
+1. 使用VOCaug数据集训练s16，微调ResNet-101预训练模型。脚本如下：
 
-```bash
-# run_distribute_train_s16_r1.sh
-for((i=0;i<=$RANK_SIZE-1;i++));
-do
-    export RANK_ID=$i
-    export DEVICE_ID=`expr $i + $RANK_START_ID`
-    echo 'start rank='$i', device id='$DEVICE_ID'...'
-    mkdir ${train_path}/device$DEVICE_ID
-    cd ${train_path}/device$DEVICE_ID
-    python ${train_code_path}/train.py --train_dir=${train_path}/ckpt  \
-                                               --data_file=/PATH/TO/MINDRECORD_NAME  \
-                                               --train_epochs=300  \
-                                               --batch_size=32  \
-                                               --crop_size=513  \
-                                               --base_lr=0.08  \
-                                               --lr_type=cos  \
-                                               --min_scale=0.5  \
-                                               --max_scale=2.0  \
-                                               --ignore_label=255  \
-                                               --num_classes=21  \
-                                               --model=DeepLabV3plus_s16  \
-                                               --ckpt_pre_trained=/PATH/TO/PRETRAIN_MODEL  \
-                                               --is_distributed  \
-                                               --save_steps=410  \
-                                               --keep_checkpoint_max=200 >log 2>&1 &
-done
-```
+    ```bash
+    # run_distribute_train_s16_r1.sh
+    for((i=0;i<=$RANK_SIZE-1;i++));
+    do
+        export RANK_ID=$i
+        export DEVICE_ID=`expr $i + $RANK_START_ID`
+        echo 'start rank='$i', device id='$DEVICE_ID'...'
+        mkdir ${train_path}/device$DEVICE_ID
+        cd ${train_path}/device$DEVICE_ID
+        python ${train_code_path}/train.py --train_dir=${train_path}/ckpt  \
+                                                --data_file=/PATH/TO/MINDRECORD_NAME  \
+                                                --train_epochs=300  \
+                                                --batch_size=32  \
+                                                --crop_size=513  \
+                                                --base_lr=0.08  \
+                                                --lr_type=cos  \
+                                                --min_scale=0.5  \
+                                                --max_scale=2.0  \
+                                                --ignore_label=255  \
+                                                --num_classes=21  \
+                                                --model=DeepLabV3plus_s16  \
+                                                --ckpt_pre_trained=/PATH/TO/PRETRAIN_MODEL  \
+                                                --is_distributed  \
+                                                --save_steps=410  \
+                                                --keep_checkpoint_max=200 >log 2>&1 &
+    done
+    ```
 
-2.使用VOCaug数据集训练s8，微调上一步的模型。脚本如下：
+2. 使用VOCaug数据集训练s8，微调上一步的模型。脚本如下：
 
-```bash
-# run_distribute_train_s8_r1.sh
-for((i=0;i<=$RANK_SIZE-1;i++));
-do
-    export RANK_ID=$i
-    export DEVICE_ID=`expr $i + $RANK_START_ID`
-    echo 'start rank='$i', device id='$DEVICE_ID'...'
-    mkdir ${train_path}/device$DEVICE_ID
-    cd ${train_path}/device$DEVICE_ID
-    python ${train_code_path}/train.py --train_dir=${train_path}/ckpt  \
-                                               --data_file=/PATH/TO/MINDRECORD_NAME  \
-                                               --train_epochs=800  \
-                                               --batch_size=16  \
-                                               --crop_size=513  \
-                                               --base_lr=0.02  \
-                                               --lr_type=cos  \
-                                               --min_scale=0.5  \
-                                               --max_scale=2.0  \
-                                               --ignore_label=255  \
-                                               --num_classes=21  \
-                                               --model=DeepLabV3plus_s8  \
-                                               --loss_scale=2048  \
-                                               --ckpt_pre_trained=/PATH/TO/PRETRAIN_MODEL  \
-                                               --is_distributed  \
-                                               --save_steps=820  \
-                                               --keep_checkpoint_max=200 >log 2>&1 &
-done
-```
+    ```bash
+    # run_distribute_train_s8_r1.sh
+    for((i=0;i<=$RANK_SIZE-1;i++));
+    do
+        export RANK_ID=$i
+        export DEVICE_ID=`expr $i + $RANK_START_ID`
+        echo 'start rank='$i', device id='$DEVICE_ID'...'
+        mkdir ${train_path}/device$DEVICE_ID
+        cd ${train_path}/device$DEVICE_ID
+        python ${train_code_path}/train.py --train_dir=${train_path}/ckpt  \
+                                                --data_file=/PATH/TO/MINDRECORD_NAME  \
+                                                --train_epochs=800  \
+                                                --batch_size=16  \
+                                                --crop_size=513  \
+                                                --base_lr=0.02  \
+                                                --lr_type=cos  \
+                                                --min_scale=0.5  \
+                                                --max_scale=2.0  \
+                                                --ignore_label=255  \
+                                                --num_classes=21  \
+                                                --model=DeepLabV3plus_s8  \
+                                                --loss_scale=2048  \
+                                                --ckpt_pre_trained=/PATH/TO/PRETRAIN_MODEL  \
+                                                --is_distributed  \
+                                                --save_steps=820  \
+                                                --keep_checkpoint_max=200 >log 2>&1 &
+    done
+    ```
 
-3.使用VOCtrain数据集训练s8，微调上一步的模型。脚本如下：
+3. 使用VOCtrain数据集训练s8，微调上一步的模型。脚本如下：
 
-```bash
-# run_distribute_train_s8_r2.sh
-for((i=0;i<=$RANK_SIZE-1;i++));
-do
-    export RANK_ID=$i
-    export DEVICE_ID=`expr $i + $RANK_START_ID`
-    echo 'start rank='$i', device id='$DEVICE_ID'...'
-    mkdir ${train_path}/device$DEVICE_ID
-    cd ${train_path}/device$DEVICE_ID
-    python ${train_code_path}/train.py --train_dir=${train_path}/ckpt  \
-                                               --data_file=/PATH/TO/MINDRECORD_NAME  \
-                                               --train_epochs=300  \
-                                               --batch_size=16  \
-                                               --crop_size=513  \
-                                               --base_lr=0.008  \
-                                               --lr_type=cos  \
-                                               --min_scale=0.5  \
-                                               --max_scale=2.0  \
-                                               --ignore_label=255  \
-                                               --num_classes=21  \
-                                               --model=DeepLabV3plus_s8  \
-                                               --loss_scale=2048  \
-                                               --ckpt_pre_trained=/PATH/TO/PRETRAIN_MODEL  \
-                                               --is_distributed  \
-                                               --save_steps=110  \
-                                               --keep_checkpoint_max=200 >log 2>&1 &
-done
-```
+    ```bash
+    # run_distribute_train_s8_r2.sh
+    for((i=0;i<=$RANK_SIZE-1;i++));
+    do
+        export RANK_ID=$i
+        export DEVICE_ID=`expr $i + $RANK_START_ID`
+        echo 'start rank='$i', device id='$DEVICE_ID'...'
+        mkdir ${train_path}/device$DEVICE_ID
+        cd ${train_path}/device$DEVICE_ID
+        python ${train_code_path}/train.py --train_dir=${train_path}/ckpt  \
+                                                --data_file=/PATH/TO/MINDRECORD_NAME  \
+                                                --train_epochs=300  \
+                                                --batch_size=16  \
+                                                --crop_size=513  \
+                                                --base_lr=0.008  \
+                                                --lr_type=cos  \
+                                                --min_scale=0.5  \
+                                                --max_scale=2.0  \
+                                                --ignore_label=255  \
+                                                --num_classes=21  \
+                                                --model=DeepLabV3plus_s8  \
+                                                --loss_scale=2048  \
+                                                --ckpt_pre_trained=/PATH/TO/PRETRAIN_MODEL  \
+                                                --is_distributed  \
+                                                --save_steps=110  \
+                                                --keep_checkpoint_max=200 >log 2>&1 &
+    done
+    ```
 
 #### ModelArts环境运行
 
@@ -459,71 +459,71 @@ python  train.py    --train_url=/PATH/TO/OUTPUT_DIR \
 
 - 使用s16结构训练VOCaug
 
-```bash
-# 分布式训练结果（8P）
-epoch: 1 step: 41, loss is 0.81338423
-epoch time: 202199.339 ms, per step time: 4931.691 ms
-epoch: 2 step: 41, loss is 0.34089813
-epoch time: 23811.338 ms, per step time: 580.764 ms
-epoch: 3 step: 41, loss is 0.32335973
-epoch time: 23794.863 ms, per step time: 580.363 ms
-epoch: 4 step: 41, loss is 0.18254203
-epoch time: 23796.674 ms, per step time: 580.407 ms
-epoch: 5 step: 41, loss is 0.27708685
-epoch time: 23794.654 ms, per step time: 580.357 ms
-epoch: 6 step: 41, loss is 0.37388346
-epoch time: 23845.658 ms, per step time: 581.601 ms
-...
-```
+    ```bash
+    # 分布式训练结果（8P）
+    epoch: 1 step: 41, loss is 0.81338423
+    epoch time: 202199.339 ms, per step time: 4931.691 ms
+    epoch: 2 step: 41, loss is 0.34089813
+    epoch time: 23811.338 ms, per step time: 580.764 ms
+    epoch: 3 step: 41, loss is 0.32335973
+    epoch time: 23794.863 ms, per step time: 580.363 ms
+    epoch: 4 step: 41, loss is 0.18254203
+    epoch time: 23796.674 ms, per step time: 580.407 ms
+    epoch: 5 step: 41, loss is 0.27708685
+    epoch time: 23794.654 ms, per step time: 580.357 ms
+    epoch: 6 step: 41, loss is 0.37388346
+    epoch time: 23845.658 ms, per step time: 581.601 ms
+    ...
+    ```
 
 - 使用s8结构训练VOCaug
 
-```bash
-# 分布式训练结果（8P）
-epoch: 1 step: 82, loss is 0.073864505
-epoch time: 226610.999 ms, per step time: 2763.549 ms
-epoch: 2 step: 82, loss is 0.06908825
-epoch time: 44474.187 ms, per step time: 542.368 ms
-epoch: 3 step: 82, loss is 0.059860937
-epoch time: 44485.142 ms, per step time: 542.502 ms
-epoch: 4 step: 82, loss is 0.084193744
-epoch time: 44472.924 ms, per step time: 542.353 ms
-epoch: 5 step: 82, loss is 0.072242916
-epoch time: 44466.738 ms, per step time: 542.277 ms
-epoch: 6 step: 82, loss is 0.04948996
-epoch time: 44474.549 ms, per step time: 542.373 ms
-...
-```
+    ```bash
+    # 分布式训练结果（8P）
+    epoch: 1 step: 82, loss is 0.073864505
+    epoch time: 226610.999 ms, per step time: 2763.549 ms
+    epoch: 2 step: 82, loss is 0.06908825
+    epoch time: 44474.187 ms, per step time: 542.368 ms
+    epoch: 3 step: 82, loss is 0.059860937
+    epoch time: 44485.142 ms, per step time: 542.502 ms
+    epoch: 4 step: 82, loss is 0.084193744
+    epoch time: 44472.924 ms, per step time: 542.353 ms
+    epoch: 5 step: 82, loss is 0.072242916
+    epoch time: 44466.738 ms, per step time: 542.277 ms
+    epoch: 6 step: 82, loss is 0.04948996
+    epoch time: 44474.549 ms, per step time: 542.373 ms
+    ...
+    ```
 
 - 使用s8结构训练VOCtrain
 
-```bash
-# 分布式训练结果（8P）
-epoch: 1 step: 11, loss is 0.0055908263
-epoch time: 183966.044 ms, per step time: 16724.186 ms
-epoch: 2 step: 11, loss is 0.008914589
-epoch time: 5985.108 ms, per step time: 544.101 ms
-epoch: 3 step: 11, loss is 0.0073758443
-epoch time: 5977.932 ms, per step time: 543.448 ms
-epoch: 4 step: 11, loss is 0.00677738
-epoch time: 5978.866 ms, per step time: 543.533 ms
-epoch: 5 step: 11, loss is 0.0053799236
-epoch time: 5987.879 ms, per step time: 544.353 ms
-epoch: 6 step: 11, loss is 0.0049248594
-epoch time: 5979.642 ms, per step time: 543.604 ms
-...
-```
+    ```bash
+    # 分布式训练结果（8P）
+    epoch: 1 step: 11, loss is 0.0055908263
+    epoch time: 183966.044 ms, per step time: 16724.186 ms
+    epoch: 2 step: 11, loss is 0.008914589
+    epoch time: 5985.108 ms, per step time: 544.101 ms
+    epoch: 3 step: 11, loss is 0.0073758443
+    epoch time: 5977.932 ms, per step time: 543.448 ms
+    epoch: 4 step: 11, loss is 0.00677738
+    epoch time: 5978.866 ms, per step time: 543.533 ms
+    epoch: 5 step: 11, loss is 0.0053799236
+    epoch time: 5987.879 ms, per step time: 544.353 ms
+    epoch: 6 step: 11, loss is 0.0049248594
+    epoch time: 5979.642 ms, per step time: 543.604 ms
+    ...
+    ```
 
 #### ModelArts环境运行
 
 - 使用s16结构训练VOCaug
 
-```bash
-epoch: 1 step: 41, loss is 0.6122837
-epoch: 2 step: 41, loss is 0.4066103
-epoch: 3 step: 41, loss is 0.3504579
-...
-```
+    ```bash
+    epoch: 1 step: 41, loss is 0.6122837
+    epoch: 2 step: 41, loss is 0.4066103
+    epoch: 3 step: 41, loss is 0.3504579
+    ...
+    ```
 
 ## 评估过程
 

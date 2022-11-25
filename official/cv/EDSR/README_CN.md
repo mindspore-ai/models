@@ -39,7 +39,7 @@
 
 增强的深度超分辨率网络(EDSR)是2017年提出的单图超分辨重建网络，在NTIRE2017超分辨重建比赛中获取第一名。它通过删除传统剩余网络中不必要的模块（BatchNorm），扩大模型的大小，同时应用了稳定训练的方法进行优化，显著提升了性能。
 
-论文: [Enhanced Deep Residual Networks for Single Image Super-Resolution](https://arxiv.org/pdf/1707.02921.pdf): Lim B ,  Son S ,  Kim H , et al. Enhanced Deep Residual Networks for Single Image Super-Resolution[C]// 2017 IEEE Conference on Computer Vision and Pattern Recognition Workshops (CVPRW). IEEE, 2017.
+论文：[Enhanced Deep Residual Networks for Single Image Super-Resolution](https://arxiv.org/pdf/1707.02921.pdf): Lim B ,  Son S ,  Kim H , et al. Enhanced Deep Residual Networks for Single Image Super-Resolution[C]// 2017 IEEE Conference on Computer Vision and Pattern Recognition Workshops (CVPRW). IEEE, 2017.
 
 # 模型架构
 
@@ -197,23 +197,23 @@ EDSR是由多个优化后的residual blocks串联而成，相比原始版本的r
 
 - 在 ModelArts 上训练 DIV2K 数据集
 
-如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/)
+  如果你想在modelarts上运行，可以参考以下文档 [modelarts](https://support.huaweicloud.com/modelarts/)
 
-```python
-# (1) 选择上传代码到 S3 桶
-#     选择代码目录/s3_path_to_code/EDSR/
-#     选择启动文件/s3_path_to_code/EDSR/train.py
-# (2) 在网页上设置参数, DIV2K_config.yaml中的参数均可以在网页上配置
-#     scale = 2
-#     config_path = /local_path_to_code/DIV2K_config.yaml
-#     enable_modelarts = True
-#     pre_trained = [模型s3地址] 或者 [不设置]
-#     [其他参数] = [参数值]
-# (3) 上传DIV2K数据集到 S3 桶上, 配置"训练数据集"路径，如果未解压，可以在(2)中配置
-#     need_unzip_in_modelarts = True
-# (4) 在网页上设置"训练输出文件路径"、"作业日志路径"等
-# (5) 选择8卡/单卡机器，创建训练作业
-```
+  ```python
+  # (1) 选择上传代码到 S3 桶
+  #     选择代码目录/s3_path_to_code/EDSR/
+  #     选择启动文件/s3_path_to_code/EDSR/train.py
+  # (2) 在网页上设置参数, DIV2K_config.yaml中的参数均可以在网页上配置
+  #     scale = 2
+  #     config_path = /local_path_to_code/DIV2K_config.yaml
+  #     enable_modelarts = True
+  #     pre_trained = [模型s3地址] 或者 [不设置]
+  #     [其他参数] = [参数值]
+  # (3) 上传DIV2K数据集到 S3 桶上, 配置"训练数据集"路径，如果未解压，可以在(2)中配置
+  #     need_unzip_in_modelarts = True
+  # (4) 在网页上设置"训练输出文件路径"、"作业日志路径"等
+  # (5) 选择8卡/单卡机器，创建训练作业
+  ```
 
 # 脚本说明
 

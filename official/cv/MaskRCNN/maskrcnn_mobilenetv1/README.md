@@ -68,11 +68,11 @@ Note that you can run the scripts based on the dataset mentioned in original pap
 
 - third-party libraries
 
-```bash
-pip install Cython
-pip install pycocotools
-pip install mmcv=0.2.14
-```
+    ```bash
+    pip install Cython
+    pip install pycocotools
+    pip install mmcv=0.2.14
+    ```
 
 # [Quick Start](#contents)
 
@@ -527,27 +527,27 @@ Usage: bash run_distribute_train_gpu.sh [DATA_PATH] [PRETRAINED_PATH] (optional)
 
 - Run `run_standalone_train.sh` for non-distributed training of maskrcnn_mobilenetv1 model on Ascend.
 
-```bash
-# standalone training
-bash run_standalone_train.sh [DATA_PATH] [PRETRAINED_CKPT(optional)]
-# example: bash run_standalone_train.sh /home/DataSet/cocodataset/
-```
+    ```bash
+    # standalone training
+    bash run_standalone_train.sh [DATA_PATH] [PRETRAINED_CKPT(optional)]
+    # example: bash run_standalone_train.sh /home/DataSet/cocodataset/
+    ```
 
 - Run `run_standalone_train_cpu.sh` for non-distributed training of maskrcnn_mobilenetv1 model on CPU.
 
-```bash
-# standalone training
-bash run_standalone_train_cpu.sh [PRETRAINED_MODEL](optional)
-```
+    ```bash
+    # standalone training
+    bash run_standalone_train_cpu.sh [PRETRAINED_MODEL](optional)
+    ```
 
 ### [Distributed Training](#content)
 
 - Run `run_distribute_train.sh` for distributed training of Mask model on Ascend.
 
-```bash
-bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH] [PRETRAINED_MODEL(optional)]
-# example: bash run_distribute_train.sh ~/hccl_8p.json /home/DataSet/cocodataset/
-```
+    ```bash
+    bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH] [PRETRAINED_MODEL(optional)]
+    # example: bash run_distribute_train.sh ~/hccl_8p.json /home/DataSet/cocodataset/
+    ```
 
 > hccl.json which is specified by RANK_TABLE_FILE is needed when you are running a distribute task. You can generate it by using the [hccl_tools](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools).
 > As for PRETRAINED_MODEL, if not set, the model will be trained from the very beginning. Ready-made pretrained_models are not available now. Stay tuned.
@@ -555,9 +555,9 @@ bash run_distribute_train.sh [RANK_TABLE_FILE] [DATA_PATH] [PRETRAINED_MODEL(opt
 
 - Run `run_distribute_train_gpu.sh` for distributed training of Mask model on GPU.
 
-```bash
-bash run_distribute_train_gpu.sh [DATA_PATH] [PRETRAINED_PATH]
-```
+    ```bash
+    bash run_distribute_train_gpu.sh [DATA_PATH] [PRETRAINED_PATH]
+    ```
 
 ### [Training Result](#content)
 
@@ -582,22 +582,22 @@ Training result will be stored in the example path, whose folder name begins wit
 
 - Run `run_eval.sh` for evaluation.
 
-```bash
-# infer
-bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
-# example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-5_7393.ckpt /home/DataSet/cocodataset/ "Ascend"
-```
+    ```bash
+    # infer
+    bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
+    # example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-5_7393.ckpt /home/DataSet/cocodataset/ "Ascend"
+    ```
 
 > As for the COCO2017 dataset, VALIDATION_ANN_FILE_JSON is refer to the annotations/instances_val2017.json in the dataset directory.  
 > Checkpoint can be produced and saved in training process, whose folder name begins with "train/checkpoint" or "train_parallel*/checkpoint".
 
 - Run `run_eval.sh` for evaluation on gpu.
 
-```bash
-# infer
-bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
-# example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-12_7393.ckpt /home/DataSet/cocodataset/ "GPU"
-```
+    ```bash
+    # infer
+    bash run_eval.sh [VALIDATION_ANN_FILE_JSON] [CHECKPOINT_PATH] [DATA_PATH] [DEVICE_TARGET]
+    # example: bash run_eval.sh /home/DataSet/cocodataset/annotations/instances_val2017.json /home/model/maskrcnn_mobilenetv1/ckpt/mask_rcnn-12_7393.ckpt /home/DataSet/cocodataset/ "GPU"
+    ```
 
 ### [Evaluation result](#content)
 
