@@ -78,8 +78,8 @@ then
 fi
 mkdir ./train
 echo "Create a dir ./train."
-cp ./ssd_inceptionv2/train.py ./train
-cp -r ./ssd_inceptionv2/src ./train
+cp ./train.py ./train
+cp -r ./src ./train
 cd ./train || exit
 echo "Start training for device $DEVICE_ID"
 env > env.log
