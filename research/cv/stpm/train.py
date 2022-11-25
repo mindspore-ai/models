@@ -29,17 +29,17 @@ from src.stpm import STPM
 from src.loss import MyLoss
 from src.callbacks import EvalCallBack
 
-parser = argparse.ArgumentParser(description='train')
+parser = argparse.ArgumentParser(description='STPM Training Args')
 
 parser.add_argument('--train_url', type=str)
 parser.add_argument('--data_url', type=str)
-parser.add_argument('--modelarts', type=ast.literal_eval, default=False, help="using modelarts")
+parser.add_argument('--modelarts', type=bool, default=True, help="using modelarts")
 
-parser.add_argument('--category', type=str, default='screw')
-parser.add_argument('--epoch', type=int, default=100, help="epoch size")
+parser.add_argument('--category', type=str, default='zipper')
+parser.add_argument('--epoch', type=int, defaype=str, help='Pretrain checkpoint file path')
+parser.add_argument('--device_id', typeult=100, help="epoch size")
 parser.add_argument('--lr', type=float, default=0.4, help="learning rate")
-parser.add_argument('--pre_ckpt_path', type=str, help='Pretrain checkpoint file path')
-parser.add_argument('--device_id', type=int, default=0, help='Device id')
+parser.add_argument('--pre_ckpt_path', t=int, default=0, help='Device id')
 
 parser.add_argument("--finetune", type=ast.literal_eval, default=False)
 parser.add_argument("--run_eval", type=ast.literal_eval, default=True)
@@ -86,8 +86,6 @@ def train():
 
         ds_train, ds_test = createDataset(train_dataset_path, args.category,
                                           args.out_size, train_batch_size=args.train_batch_size)
-        if not os.path.exists("cache/train_output"):
-            os.makedirs("cache/train_output")
     else:
         ds_train, ds_test = createDataset(args.data_url, args.category, args.out_size,
                                           train_batch_size=args.train_batch_size)
@@ -118,18 +116,23 @@ def train():
     eval_cb = EvalCallBack(ds_test, eval_network, args)
     time_cb = TimeMonitor()
     loss_cb = LossMonitor()
-    ckpt_config = CheckpointConfig(save_checkpoint_steps=step, keep_checkpoint_max=1)
+    ckpt_config = CheckpointConfig(save_checkpoint_steps=step, keep_checkpoint_max=5)
     if args.modelarts:
-        check_cb = ModelCheckpoint(prefix=args.category, directory='/cache/train_output', config=ckpt_config)
+        if not os.path.exists("/cache/train_output/"):
+            os.makedirs("/cache/train_output/")
+            print("create result path successfully!")
+        check_cb = ModelCheckpoint(prefix=args.category, directory='/cache/train_output/', config=ckpt_config)
     else:
-        check_cb = ModelCheckpoint(prefix=args.category, directory='./ckpt', config=ckpt_config)
+        check_cb = ModelCheckpoint(prefix=args.category, directory='./ckpt/', config=ckpt_config)
     cb = [check_cb, time_cb, loss_cb, eval_cb]
     if args.run_eval:
         cb.append(eval_cb)
     model.train(epoch=epochs, train_dataset=ds_train, callbacks=cb, dataset_sink_mode=True)
 
+    files = os.listdir('/cache/train_output/')
+    print("====>train results:", files)
     if args.modelarts:
-        mox.file.copy_parallel(src_url='/cache/train_output', dst_url=args.train_url)
+        mox.file.copy_parallel(src_url='/cache/train_output/', dst_url=args.train_url)
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,55 +13,47 @@
 # limitations under the License.
 # ============================================================================
 """
-python train.py
+python start.py
 """
-import argparse
 import os
+import argparse
 import numpy as np
 import mindspore
 import mindspore.nn as nn
-from mindspore import context, Tensor
 import mindspore.ops as ops
-from mindspore.train.model import Model, ParallelMode
+from mindspore import context, Tensor
 from mindspore import dtype as mstype
-from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
+from mindspore.parallel import set_algo_parameters
+from mindspore.train.model import Model, ParallelMode
 from mindspore.communication.management import init, get_rank
 from mindspore.parallel import _cost_model_context as cost_model_context
-from mindspore.parallel import set_algo_parameters
-
+from mindspore.train.callback import ModelCheckpoint, CheckpointConfig, LossMonitor, TimeMonitor
 from src.dataset import create_dataset
 from src.iresnet import iresnet100
 from src.loss import PartialFC
-mindspore.common.set_seed(1024)
-parser = argparse.ArgumentParser(description='Training')
 
+mindspore.common.set_seed(1024)
+
+parser = argparse.ArgumentParser(description='Arcface Training Args')
 # Datasets
-parser.add_argument('--train_url', default='.', type=str,
-                    help='output path')
-parser.add_argument('--data_url', default='data path', type=str)
+parser.add_argument('--train_url', default='', type=str, help='output path')
+parser.add_argument('--data_url', default='', type=str)
 # Optimization options
-parser.add_argument('--epochs', default=25, type=int, metavar='N',
-                    help='number of total epochs to run')
-parser.add_argument('--num_classes', default=85742, type=int, metavar='N',
-                    help='num of classes')
-parser.add_argument('--batch_size', default=64, type=int, metavar='N',
-                    help='train batchsize (default: 256)')
-parser.add_argument('--lr', '--learning-rate', default=0.08, type=float,
-                    metavar='LR', help='initial learning rate')
+parser.add_argument('--epochs', default=25, type=int, metavar='N', help='number of total epochs to run')
+parser.add_argument('--num_classes', default=85742, type=int, metavar='N', help='num of classes')
+parser.add_argument('--batch_size', default=64, type=int, metavar='N', help='train batchsize (default: 256)')
+parser.add_argument('--lr', '--learning-rate', default=0.08, type=float, metavar='LR', help='initial learning rate')
 parser.add_argument('--schedule', type=int, nargs='+', default=[10, 16, 21],
                     help='Decrease learning rate at these epochs.')
-parser.add_argument('--gamma', type=float, default=0.1,
-                    help='LR is multiplied by gamma on schedule.')
-parser.add_argument('--momentum', default=0.9, type=float, metavar='M',
-                    help='momentum')
+parser.add_argument('--gamma', type=float, default=0.1, help='LR is multiplied by gamma on schedule.')
+parser.add_argument('--momentum', default=0.9, type=float, metavar='M', help='momentum')
 parser.add_argument('--weight-decay', '--wd', default=1e-4, type=float,
                     metavar='W', help='weight decay (default: 1e-4)')
 # Device options
-parser.add_argument('--device_target', type=str,
-                    default='Ascend', choices=['GPU', 'Ascend'])
-parser.add_argument('--device_num', type=int, default=8)
+parser.add_argument('--device_target', type=str, default='Ascend', choices=['GPU', 'Ascend', 'CPU'])
+parser.add_argument('--device_num', type=int, default=1)
 parser.add_argument('--device_id', type=int, default=0)
-parser.add_argument('--modelarts', action="store_true", help="using modelarts")
+parser.add_argument('--modelarts', type=bool, default=True)
 
 args = parser.parse_args()
 
@@ -83,6 +75,7 @@ class MyNetWithLoss(nn.Cell):
     """
     WithLossCell
     """
+
     def __init__(self, backbone, cfg):
         super(MyNetWithLoss, self).__init__(auto_prefix=False)
         self._backbone = backbone.to_float(mstype.float16)
@@ -125,15 +118,15 @@ if __name__ == "__main__":
 
     if args.modelarts:
         import moxing as mox
-
-        mox.file.copy_parallel(
-            src_url=args.data_url, dst_url='/cache/data_path_' + os.getenv('DEVICE_ID'))
-        zip_command = "unzip -o -q /cache/data_path_" + os.getenv('DEVICE_ID') \
-                      + "/MS1M.zip -d /cache/data_path_" + \
-                      os.getenv('DEVICE_ID')
+        modelarts_data_path = '/cache/data_path_' + os.getenv('DEVICE_ID')
+        if not os.path.exists(modelarts_data_path):
+            os.makedirs(modelarts_data_path)
+        mox.file.copy_parallel(src_url=args.data_url, dst_url=modelarts_data_path)
+        zip_command = "unzip -o -q " + modelarts_data_path + "/jpg_dataset_part.zip -d " + modelarts_data_path
         os.system(zip_command)
-        train_dataset = create_dataset(dataset_path='/cache/data_path_' + os.getenv('DEVICE_ID') + '/MS1M/',
-                                       do_train=True,
+        files = os.listdir(modelarts_data_path)
+        print("===>>>Files:", files)
+        train_dataset = create_dataset(dataset_path=modelarts_data_path + '/jpg_dataset_part/', do_train=True,
                                        repeat_num=1, batch_size=args.batch_size, target=target)
     else:
         train_dataset = create_dataset(dataset_path=args.data_url, do_train=True,
@@ -150,6 +143,8 @@ if __name__ == "__main__":
     config_ck = CheckpointConfig(
         save_checkpoint_steps=60, keep_checkpoint_max=20)
     if args.modelarts:
+        if not os.path.exists('/cache/train_output/'):
+            os.makedirs('/cache/train_output/')
         ckpt_cb = ModelCheckpoint(prefix="ArcFace-", config=config_ck,
                                   directory='/cache/train_output/')
     else:
@@ -167,5 +162,4 @@ if __name__ == "__main__":
     else:
         model.train(train_epoch, train_dataset, dataset_sink_mode=True)
     if args.modelarts:
-        mox.file.copy_parallel(
-            src_url='/cache/train_output', dst_url=args.train_url)
+        mox.file.copy_parallel(src_url='/cache/train_output', dst_url=args.train_url)

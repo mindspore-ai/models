@@ -18,7 +18,9 @@ Model training entrypoint.
 
 import os
 import ast
+import datetime
 import argparse
+import moxing as mox
 
 import src.options.options as option
 import src.utils.util as util
@@ -37,16 +39,52 @@ from mindspore.common import set_seed
 set_seed(0)
 
 
+def obs_data2modelarts(FLAGS):
+    """
+    Copy train data from obs to modelarts by using moxing api.
+    """
+    start = datetime.datetime.now()
+    print("===>>>Copy files from obs:{} to modelarts dir:{}".format(FLAGS.data_url, FLAGS.modelarts_data_dir))
+    mox.file.copy_parallel(src_url=FLAGS.data_url, dst_url=FLAGS.modelarts_data_dir)
+    end = datetime.datetime.now()
+    print("===>>>Copy from obs to modelarts, time use:{}(s)".format((end - start).seconds))
+    files = os.listdir(FLAGS.modelarts_data_dir)
+    print("===>>>Files:", files)
+
+
+def modelarts_result2obs(FLAGS):
+    """
+    Copy debug data from modelarts to obs.
+    According to the switch FLAGS, the debug data may contains auto tune repository,
+    dump data for precision comparison, even the computation graph and profiling data.
+    """
+
+    mox.file.copy_parallel(src_url=FLAGS.modelarts_result_dir, dst_url=FLAGS.train_url)
+    print("===>>>Copy Event or Checkpoint from modelarts dir:{} to obs:{}".
+          format(FLAGS.modelarts_result_dir, FLAGS.train_url))
+
+
 current_path = os.path.abspath(__file__)
 root_path = os.path.dirname(current_path)
-X2_TRAIN_YAML_FILE = os.path.join(
-    root_path, "src", "options", "train", "train_IRN_x2.yml")
-X4_TRAIN_YAML_FILE = os.path.join(
-    root_path, "src", "options", "train", "train_IRN_x4.yml")
+X2_TRAIN_YAML_FILE = os.path.join(root_path, "src", "options", "train", "train_IRN_x2.yml")
+X4_TRAIN_YAML_FILE = os.path.join(root_path, "src", "options", "train", "train_IRN_x4.yml")
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="irn training")
+    parser = argparse.ArgumentParser(description="IRN training args")
+    parser.add_argument("--modelarts_FLAG", type=bool, default=True,
+                        help="use modelarts or not")
+    parser.add_argument('--data_url', type=str, default='./data/',
+                        help="local obs data path, used for obs_data2modelarts")
+    parser.add_argument("--modelarts_data_dir", type=str, default="/cache/dataset/",
+                        help="modelarts data path, used for obs_data2modelarts")
+    parser.add_argument("--train_url", type=str, default="./output/checkpoint",
+                        help="local obs output path, used for modelarts_result2obs")
+    parser.add_argument("--modelarts_result_dir", type=str, default="/cache/train_output/",
+                        help="modelarts output path, used for modelarts_result2obs")
+    parser.add_argument("--training_dataset", type=str, default="/cache/dataset/DIV2K/DIV2K_train_HR",
+                        help="modelarts dataset path, used for training")
+
     parser.add_argument('--scale', type=int, default=4, choices=(2, 4),
                         help='Rescaling Parameter.')
     parser.add_argument('--dataset_GT_path', type=str, default='/home/nonroot/DIV2K/DIV2K_train_HR',
@@ -63,6 +101,11 @@ if __name__ == '__main__':
                         help="Run distribute, default: false.")
 
     args = parser.parse_args()
+
+    if args.modelarts_FLAG:
+        obs_data2modelarts(FLAGS=args)
+        args.dataset_GT_path = args.training_dataset
+
     if args.scale == 2:
         opt = option.parse(X2_TRAIN_YAML_FILE, args.dataset_GT_path,
                            args.dataset_LQ_path, is_train=True)
@@ -73,7 +116,7 @@ if __name__ == '__main__':
         raise ValueError("Unsupported scale.")
 
     # initialize context
-    context.set_context(mode=context.GRAPH_MODE,
+    context.set_context(mode=context.PYNATIVE_MODE,
                         device_target=args.device_target,
                         save_graphs=False)
 
@@ -165,14 +208,17 @@ if __name__ == '__main__':
     # define callbacks
     ckpt_save_steps = step_size*100
     callbacks = [LossMonitor(), TimeMonitor(data_size=ckpt_save_steps)]
-    config_ck = CheckpointConfig(
-        save_checkpoint_steps=ckpt_save_steps, keep_checkpoint_max=50)
-    save_ckpt_path = os.path.join(
-        'ckpt/', 'ckpt_one_step_x4/', util.get_timestamp() + '/')
-    ckpt_cb = ModelCheckpoint(
-        prefix="irn_onestep", directory=save_ckpt_path, config=config_ck)
+    config_ck = CheckpointConfig(save_checkpoint_steps=ckpt_save_steps, keep_checkpoint_max=50)
+    save_ckpt_path = os.path.join('ckpt_one_step_x4/', util.get_timestamp() + '/')
+    if args.modelarts_FLAG:
+        save_ckpt_path = os.path.join(args.modelarts_result_dir, save_ckpt_path)
+        if not os.path.exists(save_ckpt_path):
+            os.makedirs(save_ckpt_path)
+    ckpt_cb = ModelCheckpoint(prefix="irn_onestep", directory=save_ckpt_path, config=config_ck)
     callbacks.append(ckpt_cb)
 
     # training
-    model.train(total_epochs, train_dataset, callbacks=callbacks,
-                dataset_sink_mode=True)
+    model.train(total_epochs, train_dataset, callbacks=callbacks, dataset_sink_mode=True)
+
+    if args.modelarts_FLAG:
+        modelarts_result2obs(FLAGS=args)

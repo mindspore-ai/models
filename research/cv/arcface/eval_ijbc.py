@@ -17,34 +17,33 @@
 evaluation of IJBB or IJBC
 '''
 
+import argparse
+import datetime
 import os
 import pickle
-from pathlib import Path
-import timeit
-import argparse
-import warnings
 import sys
-
-import matplotlib
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-
-import sklearn
-from sklearn.metrics import roc_curve, auc
-
-from menpo.visualize.viewmatplotlib import sample_colours_from_colourmap
-from prettytable import PrettyTable
+import timeit
+import warnings
+from pathlib import Path
 
 import cv2
-
-from skimage import transform as trans
-
-from mindspore.train.serialization import load_checkpoint, load_param_into_net
+import matplotlib
+import matplotlib.pyplot as plt
+import mindspore.nn as nn
+import mindspore.ops as ops
 from mindspore import Tensor, context
 from mindspore import dtype as mstype
-import mindspore.ops as ops
-import mindspore.nn as nn
+from mindspore.train.serialization import load_checkpoint, load_param_into_net
+
+import moxing as mox
+import numpy as np
+import pandas as pd
+import sklearn
+from sklearn.metrics import roc_curve, auc
+from menpo.visualize.viewmatplotlib import sample_colours_from_colourmap
+from prettytable import PrettyTable
+from skimage import transform as trans
+
 from src.iresnet import iresnet100
 
 matplotlib.use('Agg')
@@ -52,21 +51,45 @@ matplotlib.use('Agg')
 sys.path.insert(0, "../")
 warnings.filterwarnings("ignore")
 
-parser = argparse.ArgumentParser(description='do ijb test')
+parser = argparse.ArgumentParser(description='Arcface Evaling Args-IJB')
 # general
-parser.add_argument('--model-prefix', default='', help='path to load model.')
-parser.add_argument('--image-path', default='', type=str, help='')
-parser.add_argument('--result-dir', default='.', type=str, help='')
-parser.add_argument('--batch-size', default=128, type=int, help='')
+parser.add_argument("--data_url", type=str, default="./data", help="obs data path")
+parser.add_argument("--modelarts_FLAG", type=bool, default=True, help="use modelarts or not")
+parser.add_argument("--modelarts_data_dir", type=str, default="/cache/dataset/")
+parser.add_argument("--val_dataset", type=str, default="/cache/dataset/ijb/IJBB",
+                    help="dataset path of Modelarts")
+parser.add_argument("--image_path", type=str, default="./", help="dataset path of local")
+parser.add_argument('--model_prefix',
+                    default='/cache/dataset/model/arcface_ascend_v170_ms1mv2_research_cv_IJBB97.67_IJBC98.36.ckpt',
+                    help='path to load model.')
+parser.add_argument('--result_dir', default='.', type=str, help='')
+parser.add_argument('--batch_size', default=128, type=int, help='')
 parser.add_argument('--network', default='iresnet50', type=str, help='')
 parser.add_argument('--job', default='insightface', type=str, help='job name')
-parser.add_argument('--target', default='IJBC', type=str,
-                    help='target, set to IJBC or IJBB')
+parser.add_argument('--target', default='IJBB', type=str, help='target, set to IJBC or IJBB')
 args = parser.parse_args()
+
+
+def obs_data2modelarts(FLAGS):
+    """
+    Copy train data from obs to modelarts by using moxing api.
+    """
+    start = datetime.datetime.now()
+    print("===>>>Copy files from obs:{} to modelarts dir:{}".format(FLAGS.data_url, FLAGS.modelarts_data_dir))
+    mox.file.copy_parallel(src_url=FLAGS.data_url, dst_url=FLAGS.modelarts_data_dir)
+    end = datetime.datetime.now()
+    print("===>>>Copy from obs to modelarts, time use:{}(s)".format((end - start).seconds))
+    files = os.listdir(FLAGS.modelarts_data_dir)
+    print("===>>>Files:", files)
+
 
 target = args.target
 model_path = args.model_prefix
-image_path = args.image_path
+if args.modelarts_FLAG:
+    image_path = args.val_dataset
+    obs_data2modelarts(FLAGS=args)
+else:
+    image_path = args.image_path
 result_dir = args.result_dir
 gpu_id = None
 use_norm_score = True  # if Ture, TestMode(N1)
