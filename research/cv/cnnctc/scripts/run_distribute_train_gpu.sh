@@ -14,6 +14,12 @@
 # limitations under the License.
 # ============================================================================
 
+if [ $# != 0 ] && [ $# != 1 ]
+then 
+    echo "run as bash scripts/run_distribute_train_gpu.sh PRED_TRAINED(options)"
+exit 1
+fi
+
 get_real_path(){
   if [ "${1:0:1}" == "/" ]; then
     echo "$1"

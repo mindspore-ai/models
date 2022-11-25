@@ -19,6 +19,14 @@ then
     exit 1
 fi
 
+get_real_path(){
+    if [ "${1:0:1}" == "/" ]; then
+        echo "$1"
+    else
+        echo "$(realpath -m $PWD/$1)"
+    fi
+}
+
 if [ ! -d "$(get_real_path $2)" ]
 then
     echo "error: EVAL_DATA_DIR=$2 is not a directory"
