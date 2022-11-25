@@ -63,7 +63,7 @@ cd ./train || exit
 echo "start training for device $DEVICE_ID"
 env > env.log
 
-python train.py \
+python3 train.py \
     --data_dir=$DATASET_PATH \
     --pretrained_backbone=$PRETRAINED_BACKBONE \
     --is_distributed=0 \

@@ -79,7 +79,7 @@ do
     cd ./train_parallel$i || exit
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     env > env.log
-    taskset -c $cmdopt python train.py \
+    taskset -c $cmdopt python3 train.py \
         --data_dir=$DATASET_PATH \
         --pretrained_backbone=$PRETRAINED_BACKBONE \
         --is_distributed=1 \

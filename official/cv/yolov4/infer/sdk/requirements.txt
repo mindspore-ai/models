@@ -1,0 +1,3 @@
+opencv-python
+tqdm
+pycocotools >= 2.0.5
