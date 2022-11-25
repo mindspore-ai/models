@@ -47,7 +47,7 @@ cd ./$eval_path
 env > env0.log
 echo "[INFO] start eval dataset $category with device_id: $device_id"
 python ../../eval.py \
---data_url $DATA_PATH  \
+--dataset_path $DATA_PATH  \
 --ckpt_path $CKPT_APTH \
 --category $category \
 --device_id $device_id \
