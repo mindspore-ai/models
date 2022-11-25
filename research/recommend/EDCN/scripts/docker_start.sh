@@ -17,7 +17,7 @@ docker_image=$1
 data_dir=$2
 model_dir=$3
 
-docker run -it -u root --ipc=host \
+docker run -it --ipc=host \
               --device=/dev/davinci0 \
               --device=/dev/davinci1 \
               --device=/dev/davinci2 \
