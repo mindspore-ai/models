@@ -28,6 +28,7 @@ python train.py  \
     --train_url "$EXE_PATH" \
     --data_url "$DATA_PATH" \
     --device_target "GPU" \
+    --device_num 1 \
     > train.log 2>&1 &
 echo "start training"
 cd ../
