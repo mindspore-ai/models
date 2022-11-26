@@ -37,8 +37,8 @@ class MDense(nn.Cell):
         self.dense_layers = nn.CellList([nn.Dense(input_dim, outputs, kernel_initializer, bias_initializer,
                                                   use_bias, activation='tanh') for _ in range(self.channels)])
 
-        self.factor = mindspore.ParameterTuple([Parameter(initializer('ones', (outputs,))) \
-                                                for _ in range(self.channels)])
+        self.factor = mindspore.ParameterTuple([Parameter(initializer('ones', (outputs,)), name=f"factor_{i}") \
+                                                for i in range(self.channels)])
 
     def construct(self, inputs):
         output = self.dense_layers[0](inputs) * self.factor[0]
