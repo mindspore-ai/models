@@ -1,3 +1,4 @@
+#!/bin/bash
 # Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,5 +14,16 @@
 # limitations under the License.
 # ============================================================================
 
-from .util import DATASET_TYPE_MPII_MR, DATASET_TYPE_MPII_RAW, DATASET_TYPE_COCO
-from .mpii import MPII
+if [ -d out ]; then
+    rm -rf out
+fi
+
+mkdir out
+cd out || exit
+
+if [ -f "Makefile" ]; then
+  make clean
+fi
+
+cmake .. -DMINDSPORE_PATH="`pip show mindspore-ascend | grep Location | awk '{print $2"/mindspore"}' | xargs realpath`"
+make

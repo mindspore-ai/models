@@ -66,7 +66,7 @@ def crop_data(option):
         mode = 'multPerson'
         for _, v in enumerate(dataset['img_list']):
             single_person = v['single_person']
-            if v['rect']:
+            if not v['rect']:
                 rect_ids.append([])
             else:
                 r_len = len(v['rect'])
@@ -194,7 +194,6 @@ def update_position_new(b_crop_isolated, rect, rect2, r_id, img_list, img_id, sc
             for f_p in points2:
                 pp = [f_p['x'], f_p['y']]
                 points2_all.append(pp)
-        points2_all = np.array(points2_all)
         log.debug("points2_all: %s", points2_all)
         if points2_all:
             def max_index(d, idx):

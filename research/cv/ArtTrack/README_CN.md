@@ -7,22 +7,35 @@
 - [环境要求](#环境要求)
 - [快速入门](#快速入门)
     - [MPII数据集](#mpii数据集)
-        - [单卡](#单卡)
-        - [多卡](#多卡)
-        - [推理与评估](#推理与评估)
+        - [GPU单卡训练](#GPU单卡训练)
+        - [GPU多卡训练](#GPU多卡训练)
+        - [Ascend单卡训练](#Ascend单卡训练)
+        - [Ascend多卡训练](#Ascend多卡训练)
+        - [GPU推理与评估](#GPU推理与评估)
+        - [Ascend推理与评估](#Ascend推理与评估)
 - [脚本说明](#脚本说明)
     - [脚本及样例代码](#脚本及样例代码)
     - [脚本参数](#脚本参数)
     - [训练过程](#训练过程)
         - [MPII数据集](#mpii数据集-1)
-            - [环境](#环境)
+            - [GPU环境](#GPU环境)
+            - [Ascend环境](#Ascend环境)
             - [训练](#训练)
-                - [单卡](#单卡-1)
-                - [多卡](#多卡-1)
-            - [推理与评估](#推理与评估-1)
+                - [GPU单卡训练](#GPU单卡训练)
+                - [GPU多卡训练](#GPU多卡训练)
+                - [Ascend单卡训练](#Ascend单卡训练)
+                - [Ascend多卡训练](#Ascend多卡训练)
     - [评估过程](#评估过程)
         - [MPII数据集](#mpii数据集-2)
-            - [评估](#评估)
+            - [GPU评估](#GPU评估)
+            - [GPU结果](#GPU结果)
+            - [Ascend评估](#Ascend评估)
+            - [Ascend结果](#Ascend结果)
+    - [导出过程](#导出过程)
+        - [导出](#导出)
+    - [Ascend310推理过程](#Ascend310推理过程)
+        - [MPII数据集](#mpii数据集-2)
+            - [推理与评估](#推理与评估)
             - [结果](#结果)
 - [模型描述](#模型描述)
     - [性能](#性能)
@@ -66,8 +79,8 @@ mpii
 
 # 环境要求
 
-- 硬件（GPU）
-    - 使用GPU训练模型。
+- 硬件（GPU/Ascend910/Ascend310）
+    - 使用GPU/Ascend910训练模型。
 - 框架
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
@@ -80,21 +93,35 @@ mpii
 
 ## MPII数据集
 
-### 单卡
+### GPU单卡训练
 
 ```bash
 # 用法 bash scripts/run_train_single_gpu.sh TARGET CONFIG_PATH [OPTION] ...
 bash scripts/run_train_single_gpu.sh mpii_single config/mpii_train_single_gpu.yaml
 ```
 
-### 多卡
+### GPU多卡训练
 
 ```bash
 # 用法 bash scripts/run_train_multiple_gpu.sh TARGET CONFIG_PATH CUDA_VISIBLE_DEVICES DEVICE_NUM [OPTION] ...
 bash scripts/run_train_multiple_gpu.sh mpii_single config/mpii_train_multiple_gpu.yaml "0,1,2,3,4,5,6,7" 8
 ```
 
-### 推理与评估
+### Ascend单卡训练
+
+```bash
+# 用法 bash scripts/run_standalone_train.sh DEVICE_ID
+bash scripts/run_standalone_train.sh 0
+```
+
+### Ascend多卡训练
+
+```bash
+# 用法 bash scripts/run_distribute.sh RANK_TABLE
+bash scripts/run_distribute.sh ./rank_table_8pcs.json
+```
+
+### GPU推理与评估
 
 ```bash
 # 推理与评估
@@ -109,6 +136,15 @@ python eval.py mpii_single --config config/mpii_eval.yaml --option "load_ckpt=ck
 python eval.py mpii_single --config config/mpii_eval.yaml --accuracy  --prediction "out/prediction.mat"
 ```
 
+### Ascend推理与评估
+
+```bash
+# 推理与评估
+# 用法 bash scripts/eval_ascend.sh mpii_single CKPT_PATH
+# 根据实际情况替换ckpt文件
+bash scripts/eval_ascend.sh mpii_single ./art_track.ckpt
+```
+
 # 脚本说明
 
 ## 脚本及样例代码
@@ -121,9 +157,11 @@ ArtTrack
 │  ├── coco_train_multiple_gpu.yaml         # coco数据集多卡训练配置
 │  ├── coco_train_single_gpu.yaml           # coco数据集单卡训练配置
 │  ├── mpii_eval.yaml                       # mpii数据集推理配置
+│  ├── mpii_eval_ascend.yaml                # Ascend版本mpii数据集推理配置
 │  ├── mpii_train_multiple_gpu.yaml         # mpii数据集多卡训练配置
 │  ├── mpii_train_single_gpu.yaml           # mpii数据集单卡训练配置
 │  └── tf2ms.json                           # tf模型参数转mindspord映射表
+├── config.py                               # Ascend版本配置相关
 ├── environment.yaml                        # conda环境
 ├── log.yaml                                # log配置
 ├── patch
@@ -131,12 +169,17 @@ ArtTrack
 │  ├── 0002-pybind11.patch                  # tf代码补丁
 │  └── 0003-split-dataset.patch             # tf代码补丁
 ├── preprocess.py                           # 预处理脚本
+├── postprocess.py                           # 310后处理求精度
 ├── README_CN.md                            # 模型相关说明
 ├── requirements.txt                        # 依赖列表
 ├── scripts
 │  ├── download.sh                          # 下载预训练和数据集
 │  ├── eval.sh                              # 推理与评估
+│  ├── eval_ascend.sh                       # Ascend版本推理与评估
 │  ├── prepare.sh                           # 环境预处理
+│  ├── run_distribute_train.sh              # Ascend版本多卡训练
+│  ├── run_infer_310.sh                     # 310推理
+│  ├── run_standalone_train.sh              # Ascend版本单卡训练
 │  ├── run_train_multiple_gpu.sh            # 多卡训练
 │  └── run_train_single_gpu.sh              # 单卡训练
 ├── src
@@ -146,9 +189,11 @@ ArtTrack
 │  │  ├── preprocess
 │  │  │  ├── __init__.py
 │  │  │  ├── crop.py                        # mpii图片放缩
+│  │  │  ├── image2bin.py                   # mpii图片保存为二进制文件
 │  │  │  ├── mat2json.py                    # 由mat索引转为json
 │  │  │  ├── pairwise_stats.py              # 生成pairwise
 │  │  │  ├── parts.json
+│  │  │  ├── preprocess_ckpt.py             # 预训练模型 预处理
 │  │  │  ├── preprocess_single.py           # mpii 预处理
 │  │  │  ├── split.py                       # 数据集划分
 │  │  │  ├── tf2ms.py                       # tf ckpt转为mindspore模型
@@ -263,7 +308,7 @@ multi_step:
 
 ### MPII数据集
 
-#### 环境
+#### GPU环境
 
 ```bash
 # conda 环境
@@ -284,23 +329,70 @@ bash scripts/download.sh dataset_mpii
 bash scripts/prepare.sh mpii
 ```
 
+#### Ascend环境
+
+```text
+# 此过程比较慢，如果已有mpii数据集，可将mpii数据集解压到 ArtTrack/mpii/images/ 目录里，结构如下
+# 如果没有mpii数据集也没有关系，运行下面命令将自动下载mpii数据集
+mpii
+└── images
+   ├── 099890470.jpg
+   ├── 099894296.jpg
+   ├── 099914957.jpg
+   ├── 099920730.jpg
+   ├── 099927653.jpg
+   └── ....
+```
+
+```bash
+pip install -r requeirments.txt
+
+# 下载ResNet101预训练模型
+bash scripts/download.sh pretrained_resnet101
+
+# 安装依赖，转换模型
+bash scripts/prepare.sh env_ascend
+
+# 下载mpii数据集
+bash scripts/download.sh dataset_mpii
+
+# mpii数据集预处理
+bash scripts/prepare.sh mpii
+```
+
 #### 训练
 
-##### 单卡
+##### GPU单卡训练
 
 ```bash
 # 用法 bash scripts/run_train_single_gpu.sh TARGET CONFIG_PATH [OPTION] ...
 bash scripts/run_train_single_gpu.sh mpii_single config/mpii_train_single_gpu.yaml
 ```
 
-##### 多卡
+##### GPU多卡训练
 
 ```bash
 # 用法 bash scripts/run_train_multiple_gpu.sh TARGET CONFIG_PATH CUDA_VISIBLE_DEVICES DEVICE_NUM [OPTION] ...
 bash scripts/run_train_multiple_gpu.sh mpii_single config/mpii_train_multiple_gpu.yaml "0,1,2,3,4,5,6,7" 8
 ```
 
+##### Ascend单卡训练
+
+```bash
+# 用法 bash scripts/run_standalone_train.sh DEVICE_ID
+bash scripts/run_standalone_train.sh 0
+```
+
+##### Ascend多卡训练
+
+```bash
+# 用法 bash scripts/run_distribute.sh RANK_TABLE
+bash scripts/run_distribute.sh ./scripts/rank_table_8pcs.json
+```
+
 #### 推理与评估
+
+##### GPU推理与评估
 
 ```bash
 # 推理与评估
@@ -315,11 +407,20 @@ python eval.py mpii_single --config config/mpii_eval.yaml --option "load_ckpt=ck
 python eval.py mpii_single --config config/mpii_eval.yaml --accuracy  --prediction "out/prediction.mat"
 ```
 
+##### Ascend推理与评估
+
+```bash
+# 推理与评估
+# 用法 bash scripts/eval_ascend.sh mpii_single CKPT_PATH
+# 根据实际情况替换ckpt文件
+bash scripts/eval_ascend.sh mpii_single art_track.ckpt
+```
+
 ## 评估过程
 
 ### MPII数据集
 
-#### 评估
+#### GPU评估
 
 ```bash
 # 推理与评估
@@ -334,11 +435,71 @@ python eval.py mpii_single --config config/mpii_eval.yaml --option "load_ckpt=ck
 python eval.py mpii_single --config config/mpii_eval.yaml --accuracy  --prediction "out/prediction.mat"
 ```
 
-#### 结果
+#### GPU结果
 
 ```text
 & ankle & knee & hip & wrist & elbow & shoulder & chin & forehead & total
 & 66.0 & 70.9 & 74.7 & 65.5 & 72.4 & 83.4 & 87.0 & 84.2 & 74.1
+```
+
+#### Ascend评估
+
+```bash
+# 推理与评估
+# 用法 bash scripts/eval_ascend.sh mpii_single CKPT_PATH
+# 根据实际情况替换ckpt文件
+bash scripts/eval_ascend.sh mpii_single art_track.ckpt
+```
+
+#### Ascend结果
+
+```text
+ & ankle & knee & hip & wrist & elbow & shoulder & chin & forehead & total
+ & 63.8 & 72.2 & 79.9 & 70.7 & 76.0 & 85.1 & 90.0 & 81.2 & 76.2
+```
+
+## 导出过程
+
+### 导出
+
+```bash
+# 用法: python export.py --ckpt_url [ckpt_path] --file_format [MINDIR or AIR]
+python export.py --ckpt_url ./art_track.ckpt --file_format MINDIR
+```
+
+## Ascend 310推理过程
+
+推理之前我们需要先导出模型。air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。
+
+### MPII数据集
+
+#### 数据集准备
+
+```bash
+# 数据集准备
+# 此过程比较慢，可以将Ascend 910上已经生成的./mpii/ ./out/ 两个文件夹复制到Ascend 310对应的地方，这样可以加快此过程
+# 安装依赖
+bash scripts/prepare.sh env_ascend
+# 下载mpii数据集
+bash scripts/download.sh dataset_mpii
+# 切分数据集
+bash scripts/prepare.sh mpii
+```
+
+#### 推理与评估
+
+```bash
+# 推理与评估
+# 用法  bash run_infer_310.sh [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+# 根据实际情况替换ckpt文件
+bash scripts/run_infer_310.sh art_track.mindir y 0
+```
+
+#### 结果
+
+```text
+ & ankle & knee & hip & wrist & elbow & shoulder & chin & forehead & total
+ & 63.8 & 72.2 & 79.9 & 70.7 & 76.0 & 85.1 & 90.0 & 81.2 & 76.2
 ```
 
 # 模型描述
@@ -349,22 +510,22 @@ python eval.py mpii_single --config config/mpii_eval.yaml --accuracy  --predicti
 
 #### MPII上的ArtTrack
 
-| 参数          | GPU V100                                                                    |
-| ------------- | --------------------------------------------------------------------------- |
-| 模型版本      | ArtTrack                                                                    |
-| 资源          | Telsa GPU V100                                                              |
-| 上传日期      | 2022-01-11                                                                  |
-| MindSpore版本 | 1.5.0                                                                       |
-| 数据集        | MPII                                                                        |
-| 训练参数      | epoch=25, steps per epoch=356, batch_size=16                                |
-| 优化器        | SGD                                                                         |
-| 损失函数      | SigmoidCrossEntropyWithLogits                                               |
-| 输出          | 关键点坐标                                                                  |
-| 损失          | 0.016214851                                                                 |
-| 速度          | 1292.854毫秒/步(8卡)                                                        |
-| 总时长        | 3.2小时                                                                     |
-| 微调检查点    | 496M (.ckpt文件)                                                            |
-| 脚本          | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/ArtTrack) |
+| 参数          | GPU V100                                                                    |Ascend 910|
+| ------------- | --------------------------------------------------------------------------- | ------------ |
+| 模型版本      | ArtTrack                                                                    |ArtTrack                                                                    |
+| 资源          | Telsa GPU V100                                                              |Ascend 910 ；CPU 2.60GHz，192核；内存：755G                                                              |
+| 上传日期      | 2022-01-11                                                                  |2022-04-13|
+| MindSpore版本 | 1.5.0                                                                       |1.5.0     |
+| 数据集        | MPII                                                                        | MPII  |
+| 训练参数      | epoch=25, steps per epoch=356, batch_size=16                                |epoch=15, steps per epoch=356, batch_size=16 |
+| 优化器        | SGD                                                                         |SGD      |  
+| 损失函数      | SigmoidCrossEntropyWithLogits                                               |SigmoidCrossEntropyWithLogits|
+| 输出          | 关键点坐标                                                                  | 关键点坐标  |
+| 损失          | 0.016214851                                                                 | 0.02267912 |
+| 速度          | 1292.854毫秒/步(8卡)                                                        |    189.02毫秒/步(8卡)             |
+| 总时长        | 3.2小时                                                                     |      0.5小时          |
+| 微调检查点    | 496M (.ckpt文件)                                                            |496M (.ckpt文件)          |
+| 脚本          | [链接](https://gitee.com/mindspore/models/tree/master/research/cv/ArtTrack) |[链接](https://gitee.com/mindspore/models/tree/master/research/cv/ArtTrack) |
 
 # ModelZoo主页
 

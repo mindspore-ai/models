@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 # Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
-
-from .util import DATASET_TYPE_MPII_MR, DATASET_TYPE_MPII_RAW, DATASET_TYPE_COCO
-from .mpii import MPII
+if [ $# -ne 2 ]
+then
+    echo "Please run the script as: "
+    echo "bash scripts/eval_ascend.sh [mpii_single or coco_multi] [CKPT_PATH]"
+    echo "For example: bash scripts/eval_ascend.sh mpii_ single ckpt/rand_0/arttrack-1_356.ckpt"
+exit 1
+fi
+python eval.py "$1" --config config/mpii_eval_ascend.yaml --option "$2" --device_target Ascend

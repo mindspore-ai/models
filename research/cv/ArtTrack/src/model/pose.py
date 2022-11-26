@@ -17,6 +17,7 @@ import mindspore as ms
 import mindspore.numpy as np
 from mindspore import nn
 from mindspore.ops import stop_gradient
+from mindspore import load_checkpoint, load_param_into_net
 from src.model.losses import HuberLossWithWeight, MSELossWithWeight, WeightLoss
 from src.model.resnet import util
 
@@ -59,7 +60,16 @@ class PoseNet(nn.Cell):
         """
         super(PoseNet, self).__init__()
         self.cfg = cfg
+        if cfg.context.device_target == "Ascend":
+            if cfg.model_arts.IS_MODEL_ARTS:
+                pretrained = cfg.model_arts.CACHE_INPUT + 'crop/' +'resnet101.ckpt'
+            else:
+                pretrained = cfg.under_line.DATASET_ROOT + 'resnet101.ckpt'
+                print(pretrained)
+            param_dict = load_checkpoint(pretrained)
         self.resnet101 = util.resnet_101(3, output_stride=16, global_pool=False)
+        if cfg.context.device_target == "Ascend":
+            load_param_into_net(self.resnet101, param_dict)
         self.resnet101.set_train(False)
         self.resnet101.set_grad(requires_grad=False)
         self.mean = np.array(self.cfg.mean_pixel)
@@ -113,6 +123,42 @@ class PoseNetTest(nn.Cell):
         if self.location_refinement:
             locref = self.net.locref(features)
 
+        return self.sigmoid(out), pairwise_pred, locref
+
+class PoseNetTestExport(nn.Cell):
+    """
+    pose net for export
+    """
+
+    def __init__(self, net, cfg):
+        """
+        Args:
+            net: pose net
+            cfg: net config
+        """
+        super(PoseNetTestExport, self).__init__()
+        self.net = net
+        self.cfg = cfg
+        self.location_refinement = cfg.location_refinement
+        self.pairwise_predict = cfg.pairwise_predict
+        self.sigmoid = nn.Sigmoid()
+
+    def construct(self, *inputs):
+        features, _ = self.net(inputs[0])
+        out = self.net.part_pred(features)
+        pairwise_pred = None
+        locref = None
+        if self.pairwise_predict:
+            pairwise_pred = self.net.pairwise_pred(features)
+        if self.location_refinement:
+            locref = self.net.locref(features)
+
+        if (not self.pairwise_predict) and (not self.location_refinement):
+            return self.sigmoid(out)
+        if not self.pairwise_predict:
+            return self.sigmoid(out), locref
+        if not self.location_refinement:
+            return self.sigmoid(out), pairwise_pred
         return self.sigmoid(out), pairwise_pred, locref
 
 

@@ -16,6 +16,7 @@
 import argparse
 import re
 from typing import List
+import ast
 
 from src.config import load_config, merge_a_into_b
 from src.log import setup_log
@@ -85,7 +86,7 @@ def create_arg_parser():
     common_parser = argparse.ArgumentParser(add_help=False)
     common_parser.add_argument('-c', '--config', type=str, nargs='?')
     common_parser.add_argument('--log', default="log.yaml", type=str, nargs='?', help="log config file")
-    common_parser.add_argument('--option', type=str, nargs='+', help="extra option will override config file. "
+    common_parser.add_argument('--option', type=str, nargs='+', help="extra option will override config file."
                                                                      "example: context.device_target=GPU")
 
     parser = argparse.ArgumentParser(description='tool')
@@ -114,11 +115,11 @@ def create_arg_parser():
 
     pre_group_mat2json = parser_pre.add_argument_group(TARGET_MAT2JSON)
     pre_group_mat2json.add_argument('--index-mat', type=str, nargs='?', help='mat format index file path')
-    pre_group_mat2json.add_argument('--name', type=str, nargs='?', help='field name in mat format index file. '
-                                                                        'this option is also used as a filename '
+    pre_group_mat2json.add_argument('--name', type=str, nargs='?', help='field name in mat format index file.'
+                                                                        'this option is also used as a filename'
                                                                         'for output')
-    pre_group_mat2json.add_argument('--dataset-json', type=str, nargs='?', help='json format dataset file path. '
-                                                                                'output dataset related to index, '
+    pre_group_mat2json.add_argument('--dataset-json', type=str, nargs='?', help='json format dataset file path.'
+                                                                                'output dataset related to index,'
                                                                                 'if this option appears')
     pre_group_mat2json.add_argument('--output-dir', type=str, nargs='?', help='all output will in this dir.')
     pre_group_mat2json.add_argument('--index-offset', type=int, nargs='?', default=-1)
@@ -128,8 +129,22 @@ def create_arg_parser():
     parser_train = subparsers.add_parser(
         'train', help='train', parents=[common_parser])
     train_targets = [TARGET_MPII_SINGLE, TARGET_COCO_MULTI]
-    parser_train.add_argument('target', metavar='TARGET', choices=train_targets,
+    parser_train.add_argument('--device_target', type=str, nargs='?', default='GPU',
+                              help="device_target:GPU,CPU,or Ascend")
+    parser_train.add_argument('target', metavar='TARGET', choices=train_targets, default=TARGET_MPII_SINGLE,
                               help='option choices: %s' % join_targets(train_targets), nargs='?')
+
+    parser_train.add_argument('--data_url', required=False,
+                              default=None, help='Location of data.')
+    parser_train.add_argument('--train_url', required=False,
+                              default=None, help='Location of training outputs.')
+    parser_train.add_argument('--device_id', required=False, default=1,
+                              type=int, help='Location of training outputs.')
+    parser_train.add_argument('--run_distribute', type=ast.literal_eval, required=False,
+                              default=False, help='Location of training outputs.')
+    parser_train.add_argument('--is_model_arts', type=ast.literal_eval,
+                              default=False, help='Location of training outputs.')
+
     # eval
     parser_test = subparsers.add_parser(
         'eval', help='eval', parents=[common_parser])
@@ -141,11 +156,13 @@ def create_arg_parser():
                                    help='visualize result')
     test_group_single.add_argument('--cache', default=False, action='store_true',
                                    help='cache score map')
+    test_group_single.add_argument('--device_target', type=str, nargs='?',
+                                   default='GPU', help="device_target: GPU, CPU, or Ascend")
     test_group_single.add_argument('--accuracy', default=False, action='store_true',
                                    help='only calculate accuracy')
     test_group_single.add_argument('--output', type=str, nargs='?', help="path to save prediction result")
-    test_group_single.add_argument('--prediction', type=str, nargs='?', help='prediction path for accuracy. '
-                                                                             'or use yaml config, '
+    test_group_single.add_argument('--prediction', type=str, nargs='?', help='prediction path for accuracy.'
+                                                                             'or use yaml config,'
                                                                              'single:output multi:gt_segm_output')
     test_group_multi = parser_test.add_argument_group(TARGET_COCO_MULTI)
     test_group_multi.add_argument('--dev', default=False, action='store_true',

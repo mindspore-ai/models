@@ -148,6 +148,14 @@ class PoseDataset:
         """
         cfg = self.cfg
         file_name = cfg.dataset.path
+        if cfg.context.device_target == "Ascend" and cfg.train:
+            if self.cfg.model_arts.IS_MODEL_ARTS:
+                file_name = self.cfg.model_arts.CACHE_INPUT + \
+                    'crop/' + 'cropped/' + 'dataset.json'
+            else:
+                file_name = self.cfg.under_line.DATASET_ROOT + \
+                  'mpii/' + 'cropped/' + 'dataset.json'
+
         # Load Matlab file dataset annotation
         with open(file_name, 'r') as f:
             mlab = f.read()
@@ -319,9 +327,16 @@ class PoseDataset:
         """
         make sample
         """
+        cfg = self.cfg
         im_file = data_item.im_path
         logging.debug('image %s', im_file)
         logging.debug('mirror %r', mirror)
+        if cfg.context.device_target == "Ascend":
+            if self.cfg.model_arts.IS_MODEL_ARTS:
+                im_file = self.cfg.model_arts.CACHE_INPUT + \
+                    'crop' + '/cropped/' + im_file.split('/')[-1]
+            else:
+                im_file = self.cfg.under_line.DATASET_ROOT + im_file
         image = imread(im_file, pilmode='RGB')
 
         if self.has_gt:
