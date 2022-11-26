@@ -246,3 +246,4 @@ if __name__ == '__main__':
             speed = (time.time() - start_epoch_time)*1000/train_dataset.get_dataset_size()
             with open('performance.log', "a") as f:
                 f.write('average speed: {}ms/step\n'.format(speed))
+    print("Finish")
