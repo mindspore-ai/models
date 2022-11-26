@@ -52,7 +52,7 @@ faster_rcnn_ssod：通过半监督+主动学习的方式，进行fasterrcnn检�
 
 ### 半监督
 
-本实验模型以[mindspore fasterrcnn](<https://gitee.com/mindspore/models/tree/master/official/cv/faster_rcnn>)模型为基础，在有限的标注数据上，充分利用大量无标注数据，进行伪标签的学习，提升模型能力。
+本实验模型以[mindspore fasterrcnn](<https://gitee.com/mindspore/models/tree/master/research/cv/faster_rcnn_ssod>)模型为基础，在有限的标注数据上，充分利用大量无标注数据，进行伪标签的学习，提升模型能力。
 
 ## 数据集
 
@@ -554,7 +554,7 @@ bash run_eval_gpu.sh [DEVICE_ID] [CKPT_PATH] [EVAL_ROOT] [EVAL_ANN_FILE]
 | 速度           | 2.375s/step(1卡)                         | 1.521s/step(1卡)                      |
 | 总时长         | 12h\*2                                   | 8h\*2                                 |
 | 参数(M)        | 158                                      | 158                                   |
-| 配置文件       | [链接](https://gitee.com/mindspore/models/research/faster_rcnn_ssod/src/config.py) | [链接](https://gitee.com/mindspore/models/research/faster_rcnn_ssod/src/config.py) |
+| 配置文件       | [链接](https://gitee.com/mindspore/models/blob/master/research/cv/faster_rcnn_ssod/src/config.py) | [链接](https://gitee.com/mindspore/models/blob/master/research/cv/faster_rcnn_ssod/src/config.py) |
 
 ## 随机情况说明
 

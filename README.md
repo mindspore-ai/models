@@ -135,7 +135,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Text | Natural Language Understanding | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/GRU) |✅| ✅ |   |
 | Text | Emotion Classification | [lstm](https://gitee.com/mindspore/models/tree/master/official/nlp/LSTM) |✅| ✅ |   |
 | Text | Natural Language Understanding | [mass](https://gitee.com/mindspore/models/tree/master/research/nlp/mass) |✅| ✅ |   |
-| Text | Pre Training | [pangu_alpha](https://gitee.com/mindspore/models/tree/master/official/nlp/pangu_alpha) |✅| ✅ |   |
+| Text | Pre Training | [pangu_alpha](https://gitee.com/mindspore/models/tree/master/official/nlp/Pangu_alpha) |✅| ✅ |   |
 | Text | Natural Language Understanding | [textcnn](https://gitee.com/mindspore/models/tree/master/research/nlp/textcnn) |✅| ✅ |   |
 | Text | Natural Language Understanding | [tinybert](https://gitee.com/mindspore/models/tree/master/research/nlp/tinybert) |✅| ✅ |   |
 | Text | Natural Language Understanding | [transformer](https://gitee.com/mindspore/models/tree/master/official/nlp/Transformer) |✅| ✅ |   |
