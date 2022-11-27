@@ -220,9 +220,9 @@ def set_resume_config():
     if not os.path.isfile(config.resume_yolox):
         raise TypeError('resume_yolox should be checkpoint path')
     resume_param = load_checkpoint(config.resume_yolox,
-                                   filter_prefix=['learning_rate', 'global_step', 'updates', 'momentum',
-                                                  'best_result', 'best_epoch'])
-    resume_epoch = config.resume_yolox.split('-')[1].split('_')[0]
+                                   filter_prefix=['learning_rate', 'global_step', 'best_result', 'best_epoch'])
+    ckpt_name = os.path.basename(config.resume_yolox)
+    resume_epoch = ckpt_name.split('-')[1].split('_')[0]
     config.start_epoch = int(resume_epoch)
     if config.start_epoch >= config.aug_epochs:
         config.data_aug = False
@@ -257,8 +257,8 @@ def set_callback():
                                        keep_checkpoint_max=config.ckpt_max_num)
         cb.append(
             ModelCheckpoint(config=ckpt_config, directory=config.save_ckpt_dir, prefix='{}'.format(config.backbone)))
-        if config.resume_yolox:
-            cb.append(ResumeCallback(config.start_epoch))
+    if config.resume_yolox:
+        cb.append(ResumeCallback(config.start_epoch))
     return cb
 
 

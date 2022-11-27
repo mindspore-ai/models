@@ -1,4 +1,4 @@
-backbone: "yolox_darknet53" #option for backbone
+backbone: "yolox_x" #option for backbone
 data_aug: True
 # path for local
 device_target: "Ascend"
