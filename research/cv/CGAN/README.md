@@ -16,6 +16,9 @@
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
         - [Evaluation Result](#evaluation-result)
+    - [ONNX Inference](#onnx-inference)
+        - [Export ONNX](#export-onnx)
+        - [Infer ONNX](#infer-onnx)
     - [Model Export](#model-export)
     - [Ascend310 Inference Process](#ascend310-inference-process)
         - [Export MINDIR file](#export-mindir-file)
@@ -23,7 +26,7 @@
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
-- [Evaluation Index](#Evaluation Index)
+- [Evaluation Index](#Evaluation-Index)
 - [Description of Random Situation](#description-of-random-situation)
 - [Model_Zoo Homepage](#model_zoo-homepage)
 
@@ -86,6 +89,7 @@ Train CGAN Dataset used: [MNIST](<http://yann.lecun.com/exdb/mnist/>)
     ├─run_distributed_train_gpu.sh           # training in parallel mode(8 pcs)
     ├─run_eval_ascend.sh    # evaluation
     ├─run_eval_gpu.sh       # evaluation
+    ├─run_infer_onnx.sh     # onnxinference
     └─run_infer_310.sh      # 310inference
   ├─ src
     ├─dataset.py            # dataset create
@@ -97,6 +101,7 @@ Train CGAN Dataset used: [MNIST](<http://yann.lecun.com/exdb/mnist/>)
     └─reporter.py           # reporter the training process
   ├─ train.py               # train cgan
   ├─ eval.py                # eval cgan
+  ├─ infer_onnx.py          # infer onnx_cgan
   ├─ export.py              # export mindir
   ├─ postprocess.py         # 310 postprocess
   ├─ preprocess.py          # 310 preprocess
@@ -162,14 +167,36 @@ bash run_eval_ascend.sh /path/to/ckpt /path/to/MNIST_Data/train /path/to/result 
 # bash run_eval_gpu.sh /path/to/ckpt /path/to/MNIST_Data/train /path/to/result 0
 ```
 
+- Run `run_onnx_eval_gpu.sh` for onnx evaluation.
+
+```bash
+# eval
+bash run_onnx_eval_gpu.sh /path/to/onnx /path/to/MNIST_Data/train /path/to/result 0
+# bash run_onnx_eval_gpu.sh /path/to/onnx /path/to/MNIST_Data/train /path/to/result 0
+```
+
 ### [Evaluation Result](#content)
 
 Evaluation result will be stored in the /path/to/result/eval/random_results. Under this, you can find generator result.
 
-## Model Export
+## [ONNX Inference](#contents)
+
+### [Export ONNX](#content)
 
 ```bash
-python  export.py --ckpt_dir [G_CKPT] --device_target [DEVICE_TARGET]
+python  export.py --ckpt_dir [G_CKPT] --device_target [DEVICE_TARGET] --file_format [FILE_FORMAT]
+```
+
+### [Infer ONNX](#content)
+
+```bash
+bash run_infer_onnx.sh [ONNX_PATH] [DATA_PATH] [OUTPUT_PATH] [DEVICE_ID]
+```
+
+## [Model Export](#content)
+
+```bash
+python  export.py --ckpt_dir [G_CKPT] --device_target [DEVICE_TARGET] --file_format [FILE_FORMAT]
 ```
 
 ## [Ascend310 Inference Process](#contents)
