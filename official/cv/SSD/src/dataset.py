@@ -276,7 +276,6 @@ def create_coco_label(is_training):
     images = []
     image_path_dict = {}
     image_anno_dict = {}
-
     for img_id in image_ids:
         image_info = coco.loadImgs(img_id)
         file_name = image_info[0]["file_name"]
