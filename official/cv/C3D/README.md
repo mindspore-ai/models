@@ -191,6 +191,7 @@ After installing MindSpore via the official website, you can start training and 
   │   ├──run_distribute_train_gpu.sh  // shell script for distributed training on GPU
   │   ├──run_infer_310.sh                // shell script for inference on 310
   │   ├──run_standalone_train_ascend.sh  // shell script for training on Ascend
+  │   ├──run_onnx_eval_gpu.sh            // shell script for infer on onnx
   │   ├──run_standalone_train_gpu.sh  // shell script for training on GPU
   │   ├──run_standalone_eval_ascend.sh   // shell script for testing on Ascend
   │   ├──run_standalone_eval_gpu.sh   // shell script for testing on GPU
@@ -216,6 +217,7 @@ After installing MindSpore via the official website, you can start training and 
   ├── export.py                         // convert mindspore ckpt file to MINDIR file
   ├── train.py                          // evaluation script
   ├── eval.py                           // training script
+  ├── eval_onnx.py                      // onnx script
 ```
 
 ### [Script Parameters](#contents)
@@ -346,6 +348,9 @@ Parameters for both training and evaluation can be set in default_config.yaml
     result_url:        ''                    # Result save path
     data_url:          ''                    # Data path
     train_url:         ''                    # Train path
+
+    # Onnx infer
+    onnx_path:         ''                    # Onnx path
 
     # Export Setup
     ckpt_file:         './C3D.ckpt'          # Mindspore ckpt file path
@@ -684,18 +689,79 @@ bash run_distribute_train_gpu.sh [CONFIG_PATH]
     eval result: top_1 80.412%
     ```
 
+#### Evaluating on GPU(Onnx)
+
+- evaluation on onnx when running on GPU
+
+Before running the command below, please check the onnx path used for evaluation. Please set the onnx path to be the absolute full path, e.g., "./results/c3d_hmdb51.onnx".
+
+```text
+# enter scripts directory
+cd scripts
+# eval
+bash run_onnx_eval_gpu.sh [ONNX_PATH] [CONFIG_PATH]
+```
+
+- eval.log for HMDB51
+
+```text
+GPU
+setep: 1/191, acc: 0.625
+setep: 21/191, acc: 0.625
+setep: 41/191, acc: 0.375
+setep: 61/191, acc: 0.625
+setep: 81/191, acc: 0.125
+setep: 101/191, acc: 0.5
+setep: 121/191, acc: 0.5
+setep: 141/191, acc: 0.375
+setep: 161/191, acc: 0.375
+setep: 181/191, acc: 0.5
+eval result: top_1 49.804%
+```
+
+- eval.log for UCF101
+
+```text
+GPU
+setep: 1/472, acc: 0.875
+setep: 21/472, acc: 0.75
+setep: 41/472, acc: 0.875
+setep: 61/472, acc: 0.875
+setep: 81/472, acc: 0.75
+setep: 101/472, acc: 0.875
+setep: 121/472, acc: 0.875
+setep: 141/472, acc: 0.875
+setep: 161/472, acc: 0.875
+setep: 181/472, acc: 0.75
+setep: 201/472, acc: 1.0
+setep: 221/472, acc: 0.75
+setep: 241/472, acc: 0.875
+setep: 261/472, acc: 0.875
+setep: 281/472, acc: 0.875
+setep: 301/472, acc: 0.625
+setep: 321/472, acc: 0.875
+setep: 341/472, acc: 0.875
+setep: 361/472, acc: 0.875
+setep: 381/472, acc: 0.875
+setep: 401/472, acc: 0.625
+setep: 421/472, acc: 0.75
+setep: 441/472, acc: 0.875
+setep: 461/472, acc: 1.0
+eval result: top_1 79.555%
+```
+
 ## Inference Process
 
-### [Export MindIR](#contents)
+### [Export AIR, MINDIR, ONNX](#contents)
 
 ```shell
 python export.py --ckpt_file [CKPT_PATH] --mindir_file_name [FILE_NAME] --file_format [FILE_FORMAT] --num_classes [NUM_CLASSES] --batch_size [BATCH_SIZE]
 ```
 
 - `ckpt_file` parameter is mandotory.
-- `file_format` should be in ["AIR", "MINDIR"].
+- `file_format` should be in ["AIR", "MINDIR", "ONNX"].
 - `NUM_CLASSES` Number of total classes in the dataset, 51 for HMDB51 and 101 for UCF101.
-- `BATCH_SIZE` Since currently mindir does not support dynamic shapes, this network only supports inference with batch_size of 1.
+- `BATCH_SIZE` Since currently mindir does not support dynamic shapes, this network only supports inference with batch_size of 1, for ONNX export, set BATCH_SIZE = 1.
 
 ### Infer on Ascend310
 

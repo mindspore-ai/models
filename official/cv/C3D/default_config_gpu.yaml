@@ -54,6 +54,9 @@ result_url:        ''                    # Result save path
 data_url:          ''                    # Data path
 train_url:         ''                    # Train path
 
+# Onnx infer
+onnx_path:         ''                    # Onnx path
+
 # Export Setup
 ckpt_file:         './C3D.ckpt'          # Mindspore ckpt file path
 mindir_file_name:  './C3D'               # Save file path
