@@ -56,5 +56,6 @@ if __name__ == '__main__':
         print('loading ', i)
     print('begin saving label')
     print(len(label_list))
-    np.save(args.output_path+'labels_ids.npy', np.array(label_list))
+    save_path = os.path.join(args.output_path, 'labels_ids.npy')
+    np.save(save_path, np.array(label_list))
     print('='*20, 'export bin file finished', '='*20)

@@ -51,7 +51,7 @@ function preprocess_data()
     fi
     mkdir preprocess_Result
     python ../preprocess.py --dataset_path=$data_path --output_path=./preprocess_Result &> preprocess.log
-    data_path=./preprocess_Result
+    data_path=./preprocess_Result/00_data
 }
 
 function compile_app()
@@ -85,28 +85,37 @@ function infer()
 
 function cal_acc()
 {
-    python ../postprocess.py --result_path=./result_Files --label_path=$label_path &> acc.log &
+    if [ "$DVPP" == "N" ];then
+        python ../postprocess.py --result_path=./result_Files --label_path=./preprocess_Result/labels_ids.npy &> acc.log &
+    else
+        python ../postprocess.py --result_path=./result_Files --label_path=$label_path &> acc.log &
+    fi
 }
 
 # preprocess_data
+preprocess_data
 if [ $? -ne 0 ]; then
     echo "preprocess data failed"
     exit 1
 fi
+echo "reprocess data success"
+
 echo "compiling app"
 compile_app
-echo "successfully complied app"
 if [ $? -ne 0 ]; then
     echo "compile app code failed"
     exit 1
 fi
+echo "successfully complied app"
+
 echo "inferring"
 infer
-echo "successfully inferred"
 if [ $? -ne 0 ]; then
     echo " execute inference failed"
     exit 1
 fi
+echo "successfully inferred"
+
 echo "calculating acc"
 cal_acc
 if [ $? -ne 0 ]; then
