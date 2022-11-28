@@ -20,7 +20,7 @@ from mindspore.common import initializer as init
 from mindspore.common.initializer import Initializer as MeInitializer
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 import mindspore.nn as nn
-from .util import load_backbone, download_pretrain_ckpt
+from .util import load_backbone
 
 def calculate_gain(nonlinearity, param=None):
     r"""Return the recommended gain value for the given nonlinearity function.
@@ -202,10 +202,7 @@ def load_yolov4_params(args, network):
         args.logger.info('resume finished')
         load_param_into_net(network, param_dict_new)
         args.logger.info('load_model {} success'.format(args.resume_yolov4))
-    if args.transfer_train:
-        args.filter_weight = True
-        if not args.pretrained_checkpoint:
-            args.pretrained_checkpoint = download_pretrain_ckpt(args.logger)
+
     if args.filter_weight:
         if args.pretrained_checkpoint:
             param_dict = load_checkpoint(args.pretrained_checkpoint)
