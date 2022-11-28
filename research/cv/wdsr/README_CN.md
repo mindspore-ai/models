@@ -117,7 +117,7 @@ WDSR网络主要由几个基本模块（包括卷积层和池化层）组成。�
     - [MindSpore](https://www.mindspore.cn/install/en)
 - 如需查看详情，请参见如下资源：
     - [MindSpore教程](https://www.mindspore.cn/tutorials/zh-CN/master/index.html)
-    - [MindSpore Python API](https://www.mindspore.cn/docs/zh-CN/master/index.html)
+    - [MindSpore Python API](https://www.mindspore.cn/docs/api/zh-CN/master/index.html)
 
 # 快速入门
 
@@ -126,23 +126,26 @@ WDSR网络主要由几个基本模块（包括卷积层和池化层）组成。�
 ```shell
 # 单卡训练
 # Ascend
-sh run_ascend_standalone.sh [TRAIN_DATA_DIR]
+sh ./script/run_ascend_standalone.sh [TRAIN_DATA_DIR]
 # GPU
-bash run_gpu_standalone.sh [TRAIN_DATA_DIR]
+bash ./script/run_gpu_standalone.sh [TRAIN_DATA_DIR]
 ```
 
 ```shell
 # 分布式训练
 # Ascend
-sh run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
+sh ./script/run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
 # GPU
-bash run_gpu_distribute.sh [TRAIN_DATA_DIR] [DEVICE_NUM]
+bash ./script/run_gpu_distribute.sh [TRAIN_DATA_DIR] [DEVICE_NUM]
 ```
 
 ```python
 #评估
-bash run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] [DATASET_TYPE]
+bash ./script/run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] DIV2K
 ```
+
+- TEST_DATA_DIR = ".../wdsr/"
+- CHECKPOINT_PATH ckpt文件目录。
 
 # 脚本说明
 
@@ -157,6 +160,7 @@ WDSR
    │        ├── run_gpu_distribute.sh         //GPU分布式训练shell脚本
    │        ├── run_gpu_standalone.sh         //GPU单卡训练shell脚本
    │        └── run_eval.sh                   //eval验证shell脚本
+   │        └── run_eval_onnx_gpu.sh          //onnx验证shell脚本
    ├── src
    │     ├── args.py                          //超参数
    │     ├── common.py                        //公共网络模块
@@ -169,6 +173,7 @@ WDSR
    │     └── utils.py                         //辅助函数
    ├── train.py                               //训练脚本
    ├── eval.py                                //评估脚本
+   ├── eval_onnx.py                           //onnx评估脚本
    └── export.py
 ```
 
@@ -212,13 +217,13 @@ WDSR
 - Ascend处理器环境运行
 
   ```bash
-  sh run_ascend_standalone.sh [TRAIN_DATA_DIR]
+  sh ./script/run_ascend_standalone.sh [TRAIN_DATA_DIR]
   ```
 
 - GPU环境运行
 
   ```bash
-  sh run_gpu_standalone.sh [TRAIN_DATA_DIR]
+  sh ./script/run_gpu_standalone.sh [TRAIN_DATA_DIR]
   ```
 
   上述python命令将在后台运行，您可以通过train.log文件查看结果。
@@ -228,16 +233,16 @@ WDSR
 - Ascend处理器环境运行
 
   ```bash
-  sh run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
+  sh ./script/run_ascend_distribute.sh [RANK_TABLE_FILE] [TRAIN_DATA_DIR]
   ```
 
 - GPU环境运行
 
   ```bash
-  sh run_gpu_distribute.sh [TRAIN_DATA_DIR] [DEVICE_NUM]
+  sh ./script/run_gpu_distribute.sh [TRAIN_DATA_DIR] [DEVICE_NUM]
   ```
 
-TRAIN_DATA_DIR = "~DATA/"。
+TRAIN_DATA_DIR = ".../wdsr/"
 
 ## 评估过程
 
@@ -246,24 +251,25 @@ TRAIN_DATA_DIR = "~DATA/"。
 在运行以下命令之前，请检查用于评估的检查点路径。
 
 ```bash
-sh run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] DIV2K
+bash ./script/run_eval.sh [TEST_DATA_DIR] [CHECKPOINT_PATH] DIV2K
 ```
 
-TEST_DATA_DIR = "~DATA/"。
+- TEST_DATA_DIR = ".../wdsr/"
+- CHECKPOINT_PATH ckpt文件目录。
 
 您可以通过eval.log文件查看结果。
 
 ### Ascend310评估
 
-- 评估过程如下，需要指定数据集类型为“div2k”。
+- 评估过程如下，需要指定数据集类型为“DIV2K”。
 
 ```bash
-sh run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATASET_TYPE] [SCALE] [DEVICE_ID]
+sh ./script/run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATASET_TYPE] [SCALE] [DEVICE_ID]
 ```
 
 - MINDIR_PATH mindir模型文件路径
 - DATA_PATH 数据集路径
-- DATASET_TYPE 数据集名称(div2k)
+- DATASET_TYPE 数据集名称(DIV2K)
 - SCALE 超分辨率比例(2, 3, 4)
 - DEVICE_ID 设备ID， 默认为：0
 - 上述python命令在后台运行，可通过`run_infer.log`文件查看结果。
@@ -271,10 +277,22 @@ sh run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DATASET_TYPE] [SCALE] [DEVICE_ID]
 # 模型导出
 
 ```bash
-python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT]
+python export.py --ckpt_path [CKPT_PATH] --file_format [FILE_FORMAT] --device_target [DEVICE_TARGET] --dir_data [DIR_DATA] --test_only --ext "img"  --data_test DIV2K --data_range "801-900"
 ```
 
-FILE_FORMAT 可选 ['MINDIR', 'AIR', 'ONNX'], 默认['MINDIR']。
+- CKPT_PATH ckpt文件目录。
+- FILE_FORMAT 可选 ['MINDIR', 'AIR', 'ONNX'], 默认['MINDIR']。
+- DEVICE_TARGET 可选 ['Ascend', 'GPU'], 默认['Ascend']。
+- DIR_DATA = ".../wdsr/" 数据集所在文件夹目录
+
+## ONNX模型评估
+
+```bash
+bash ./script/run_eval_onnx_gpu.sh [DIR_DATA] [ONNX_PATH] DIV2K
+```
+
+- DIR_DATA = ".../wdsr/"
+- ONNX_PATH = ".../wdsr/wdsr"  不指定特定的onnx模型，对于不同大小的图像采用不同的onnx文件
 
 ## 310推理
 
@@ -328,6 +346,18 @@ FILE_FORMAT 可选 ['MINDIR', 'AIR', 'ONNX'], 默认['MINDIR']。
 | batch_size    | 1                                                           |
 | 输出          | 超分辨率图片                                                |
 | PSNR          | DIV2K 33.5745                                               |
+
+### ONNX评估性能
+
+| 参数          | GPU           |
+| ------------- |---------------|
+| 资源          | RTX 3090      |
+| 上传日期      | 2022-10-19    |
+| MindSpore版本 | 1.8.0         |
+| 数据集        | DIV2K         |
+| batch_size    | 1             |
+| 输出          | 超分辨率图片        |
+| PSNR          | DIV2K 35.3531 |
 
 # 随机情况说明
 
