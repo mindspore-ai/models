@@ -81,6 +81,7 @@ SwinTransformer是新型的视觉Transformer，它可以用作计算机视觉的
       ├──run_eval_ascend.sh               // Ascend测试脚本
       ├──run_eval_gpu.sh                  // GPU测试脚本
       ├──run_infer_310.sh                 // 310推理脚本
+      ├──run_infer_onnx.sh                 // ONNX推理脚本
   ├── src
       ├──configs                          // SwinTransformer的配置文件
       ├──data                             // 数据集配置文件
@@ -99,6 +100,7 @@ SwinTransformer是新型的视觉Transformer，它可以用作计算机视觉的
           ┕──schedulers.py                // 学习率衰减的工具函数
   ├── train.py                            // 训练文件
   ├── eval.py                             // 评估文件
+  ├── eval_onnx.py                        // onnx评估文件
   ├── export.py                           // 导出模型文件
   ├── postprocess.py                      // 推理计算精度文件
   ├── preprocess.py                       // 推理预处理图片文件
@@ -200,17 +202,20 @@ SwinTransformer是新型的视觉Transformer，它可以用作计算机视觉的
 
   # 使用脚本启用单卡评估
   bash ./scripts/run_eval_gpu.sh [DEVICE_ID] [CONFIG_PATH] [CHECKPOINT_PATH]
+
+  # 使用脚本启用onnx模型单卡评估
+  bash ./scripts/run_infer_onnx.sh [ONNX_PATH] [DATASET_PATH] [DEVICE_TARGET] [DEVICE_ID]
   ```
 
 ## 导出过程
 
 ### 导出
 
-  ```shell
-  python export.py --pretrained [CKPT_FILE] --swin_config [CONFIG_PATH] --device_target [DEVICE_TARGET]
-  ```
+```shell
+python export.py --pretrained [CKPT_FILE] --swin_config [CONFIG_PATH] --device_target [DEVICE_TARGET] --file_format [FILE_FORMAT]
+```
 
-导出的模型会以模型的结构名字命名并且保存在当前目录下
+导出的模型会以模型的结构名字命名并且保存在当前目录下, 注意: FILE_FORMAT 必须在 ["AIR", "MINDIR", "ONNX"]中选择。
 
 ## 推理过程
 
@@ -218,7 +223,7 @@ SwinTransformer是新型的视觉Transformer，它可以用作计算机视觉的
 
 ### 推理
 
-在进行推理之前我们需要先导出模型。mindir可以在任意环境上导出，air模型只能在昇腾910环境上导出。以下展示了使用mindir模型执行推理的示例。
+在进行推理之前我们需要先导出模型。mindir可以在任意环境上导出，air模型只能在昇腾910环境上导出。onnx可以在CPU/GPU/Ascend环境下导出。以下展示了使用mindir模型执行推理的示例。
 
 - 在昇腾310上使用ImageNet-1k数据集进行推理
 
@@ -228,6 +233,17 @@ SwinTransformer是新型的视觉Transformer，它可以用作计算机视觉的
   # Ascend310 inference
   bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [DEVICE_ID]
   Total data: 50000, top1 accuracy: 81.02%
+  ```
+
+- 在GPU/CPU上使用ImageNet-1k数据集进行ONNX推理
+
+  推理的结果保存在主目录下，在infer_onnx.log日志文件中可以找到推理结果。
+
+  ```shell
+  # onnx inference
+  bash ./scripts/run_infer_onnx.sh [ONNX_PATH] [DATASET_PATH] [DEVICE_TARGET] [DEVICE_ID]
+  top-1 accuracy 0.80908
+  top-5 accuracy 0.95326
   ```
 
 # [模型描述](#目录)
