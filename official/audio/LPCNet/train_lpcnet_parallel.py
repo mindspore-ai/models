@@ -42,6 +42,7 @@ class MyTrainStep(nn.TrainOneStepCell):
         self.t_end = sparcify_end
         self.interval = sparcify_interval
         self.grua_density = grua_density
+        self.cast = ops.Cast()
 
     def construct(self, in_data, features, periods, out_data, noise=None):
         loss = super(MyTrainStep, self).construct(in_data, features, periods, out_data, noise)
@@ -59,9 +60,10 @@ class MyTrainStep(nn.TrainOneStepCell):
             N = p.shape[1]
             total_mask = []
             for k in range(nb):
-                density = self.grua_density[k]
+                density = self.cast(self.grua_density[k], mindspore.float32)
                 if self.batch < self.t_end:
                     r = 1 - (self.batch - self.t_start).astype(mindspore.float32) / (self.t_end - self.t_start)
+                    r = self.cast(r, mindspore.float32)
                     density = 1 - (1 - density) * (1 - r * r * r)
                 A = p[k * N:(k + 1) * N, :]
                 A = A - np.diag(np.diag(A))
