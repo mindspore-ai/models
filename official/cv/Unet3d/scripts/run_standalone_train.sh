@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -ne 1 ]
+if [ $# -ne 2 ]
 then
-    echo "Usage: sh run_distribute_train_ascend.sh [DATA_PATH]"
+    echo "Usage: sh run_distribute_train_ascend.sh [DATA_PATH] [DEVICE_ID]"
 exit 1
 fi
 
@@ -38,7 +38,7 @@ fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=0
+export DEVICE_ID=$2
 export RANK_ID=0
 export RANK_SIZE=1
 
