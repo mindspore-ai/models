@@ -25,14 +25,12 @@ from mindspore import set_seed
 from src.config import config
 from src.model import AttentionLstm
 
-
 context.set_context(
     mode=context.GRAPH_MODE,
     save_graphs=False,
-    device_target="Ascend",
+    device_target=config.device,
     device_id=0
 )
-
 
 if __name__ == "__main__":
     existed_ckpt = config.existed_ckpt
@@ -49,9 +47,8 @@ if __name__ == "__main__":
     ms_ckpt = load_checkpoint(model_path)
     load_param_into_net(network, ms_ckpt)
 
-    x = Tensor(np.zeros((1, 50)).astype(np.int32))
-    x_len = Tensor(np.array([20]).astype(np.int32))
-    aspect = Tensor(np.array([1]).astype(np.int32))
+    x = Tensor(np.ones((config.batch_size, 50)).astype(np.int32))
+    x_len = Tensor(np.ones(config.batch_size).astype(np.int32))
+    aspect = Tensor(np.ones(config.batch_size).astype(np.int32))
 
     export(network, x, x_len, aspect, file_name=config.file_name, file_format=config.file_format)
-    

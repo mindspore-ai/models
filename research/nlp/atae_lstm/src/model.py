@@ -38,6 +38,7 @@ class AttentionLstm(nn.Cell):
         self.embedding_table = weight
         self.is_train = is_train
         self.dropout_prob = config.dropout_prob
+        self.batch_size = config.batch_size
 
         self.dropout = nn.Dropout(keep_prob=1 - self.dropout_prob)
         self.mask = Tensor(np.random.uniform(size=(1, self.dimh)) > self.dropout_prob)
@@ -112,30 +113,52 @@ class AttentionLstm(nn.Cell):
         output, (h_n, _) = self.lstm(lstm_input, (h_0, c_0), x_len)
 
         # H: [B, N, 300]  h_n [B, 1, 300]
-        H = output
+        if self.batch_size == 1:
+            H = self.squeeze_0(output)
+            h_n = self.reshape(h_n, (1, 300))
+        else:
+            H = output
 
         # Wh_H.size = (B, N, 300)
-        H_Wh = P.matmul(H, self.Wh)
         # a_Wv.size = (B, N, 300)
-        a_Wv = P.matmul(aspect_vector, self.Wv)
+        if self.batch_size == 1:
+            H_Wh = self.matmul(H, self.Wh)
+            a_Wv = self.matmul(self.reshape(aspect_vector, (-1, self.dim_aspect)), self.Wv)
+        else:
+            H_Wh = P.matmul(H, self.Wh)
+            a_Wv = P.matmul(aspect_vector, self.Wv)
+
         # M.size = (B, N, 600)
         H_Wh = self.cast(H_Wh, mindspore.float32)
         a_Wv = self.cast(a_Wv, mindspore.float32)
-        M = self.tanh(self.concat_2((H_Wh, a_Wv)))
+        if self.batch_size == 1:
+            M = self.tanh(self.concat_1((H_Wh, a_Wv)))
+        else:
+            M = self.tanh(self.concat_2((H_Wh, a_Wv)))
+
         # tmp.size = (B, 1, N)
         M = self.cast(M, mindspore.float32)
-        tmp = P.matmul(M, self.w)
-        tmp = self.squeeze_2(tmp)
-        tmp = self.expand(tmp, 1)
+        if self.batch_size == 1:
+            tmp = self.matmul(M, self.w)
+            tmp = self.reshape(tmp, (1, -1))
+        else:
+            tmp = P.matmul(M, self.w)
+            tmp = self.squeeze_2(tmp)
+            tmp = self.expand(tmp, 1)
+
         # alpha.size = (B, N)
         tmp = self.cast(tmp, mindspore.float32)
         alpha = self.softmax_1(tmp)
         # r.size = (B, 1, 300)
         alpha = self.cast(alpha, mindspore.float32)
-        r = P.matmul(alpha, H)
-
-        r_Wp = P.matmul(r, self.Wp)
-        h_Wx = P.matmul(h_n, self.Wx)
+        if self.batch_size == 1:
+            r = self.matmul(alpha, H)
+            r_Wp = self.matmul(r, self.Wp)
+            h_Wx = self.matmul(h_n, self.Wx)
+        else:
+            r = P.matmul(alpha, H)
+            r_Wp = P.matmul(r, self.Wp)
+            h_Wx = P.matmul(h_n, self.Wx)
         # h_star.size = (B, 1, 300)
         r_Wp = self.cast(r_Wp, mindspore.float32)
         h_Wx = self.cast(h_Wx, mindspore.float32)
@@ -147,9 +170,13 @@ class AttentionLstm(nn.Cell):
             h_star = h_star * 0.5
 
         h_star = self.cast(h_star, mindspore.float32)
-        y_hat = P.matmul(h_star, self.Ws) + self.bs
+        if self.batch_size == 1:
+            y_hat = self.matmul(h_star, self.Ws) + self.bs
+        else:
+            y_hat = P.matmul(h_star, self.Ws) + self.bs
         y_hat = self.cast(y_hat, mindspore.float32)
-        y_hat = self.squeeze_1(y_hat)
+        if self.batch_size != 1:
+            y_hat = self.squeeze_1(y_hat)
         y = self.softmax_1(y_hat)
         # y.size = (B, self.grained)
         return y
