@@ -49,5 +49,5 @@ if __name__ == '__main__':
         p.requires_grad = False
 
 
-    input_arr = Tensor(np.ones([32, 3, 224, 224]), ms.float32)
+    input_arr = Tensor(np.ones([1, 3, 224, 224]), ms.float32)
     export(model, input_arr, file_name=args.file_name, file_format=args.file_format)
