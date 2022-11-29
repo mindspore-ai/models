@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # =======================================================================================
+
+# This file refers to https://github.com/Megvii-BaseDetection/YOLOX/blob/main/yolox/data/data_augment.py
 """ image transform related """
 import random
 import math
@@ -185,7 +187,8 @@ class TrainTransform:
             self.input_size = (640, 640)
         self.grid_size = [(self.input_size[0] / x) * (self.input_size[1] / x) for x in
                           self.strides]
-        self.num_total_anchor = int(sum(self.grid_size))
+        self.num_total_anchor, self.expanded_strides, self.x_centers_per_image, self.y_centers_per_image = \
+            self.get_grid()
 
     def __call__(self, image, targets, input_dim):
         """ Tran transform call """
@@ -257,14 +260,9 @@ class TrainTransform:
             expanded_strides.append(this_stride)
         x_shifts = np.concatenate(x_shifts, axis=1)
         y_shifts = np.concatenate(y_shifts, axis=1)
-        expanded_strides = np.concatenate(expanded_strides, axis=1)
-        return x_shifts, y_shifts, expanded_strides
+        expanded_strides = np.concatenate(expanded_strides, axis=1)[0]
 
-    def get_in_boxes_info(self, gt_bboxes_per_image, true_labels):
-        """ get the pre in-center and in-box info for each image """
-        x_shifts, y_shifts, expanded_strides = self.get_grid()
         num_total_anchor = x_shifts.shape[1]
-        expanded_strides = expanded_strides[0]
         x_shifts_per_image = x_shifts[0] * expanded_strides
         y_shifts_per_image = y_shifts[0] * expanded_strides
 
@@ -274,17 +272,25 @@ class TrainTransform:
         y_centers_per_image = np.expand_dims((y_shifts_per_image + 0.5 * expanded_strides), axis=0)
         y_centers_per_image = np.repeat(y_centers_per_image, self.max_labels, axis=0)
 
+        return num_total_anchor, expanded_strides, x_centers_per_image, y_centers_per_image
+
+    def get_in_boxes_info(self, gt_bboxes_per_image, true_labels):
+        """ get the pre in-center and in-box info for each image """
+        x_centers_per_image = self.x_centers_per_image[:true_labels,]
+        y_centers_per_image = self.y_centers_per_image[:true_labels,]
+        gt_bboxes_per_image = gt_bboxes_per_image[:true_labels,]
+
         gt_bboxes_per_image_l = np.expand_dims((gt_bboxes_per_image[:, 0] - 0.5 * gt_bboxes_per_image[:, 2]), axis=1)
-        gt_bboxes_per_image_l = np.repeat(gt_bboxes_per_image_l, num_total_anchor, axis=1)
+        gt_bboxes_per_image_l = np.repeat(gt_bboxes_per_image_l, self.num_total_anchor, axis=1)
 
         gt_bboxes_per_image_r = np.expand_dims((gt_bboxes_per_image[:, 0] + 0.5 * gt_bboxes_per_image[:, 2]), axis=1)
-        gt_bboxes_per_image_r = np.repeat(gt_bboxes_per_image_r, num_total_anchor, axis=1)
+        gt_bboxes_per_image_r = np.repeat(gt_bboxes_per_image_r, self.num_total_anchor, axis=1)
 
         gt_bboxes_per_image_t = np.expand_dims((gt_bboxes_per_image[:, 1] - 0.5 * gt_bboxes_per_image[:, 3]), axis=1)
-        gt_bboxes_per_image_t = np.repeat(gt_bboxes_per_image_t, num_total_anchor, axis=1)
+        gt_bboxes_per_image_t = np.repeat(gt_bboxes_per_image_t, self.num_total_anchor, axis=1)
 
         gt_bboxes_per_image_b = np.expand_dims((gt_bboxes_per_image[:, 1] + 0.5 * gt_bboxes_per_image[:, 3]), axis=1)
-        gt_bboxes_per_image_b = np.repeat(gt_bboxes_per_image_b, num_total_anchor, axis=1)
+        gt_bboxes_per_image_b = np.repeat(gt_bboxes_per_image_b, self.num_total_anchor, axis=1)
 
         b_l = x_centers_per_image - gt_bboxes_per_image_l
         b_r = gt_bboxes_per_image_r - x_centers_per_image
@@ -296,17 +302,17 @@ class TrainTransform:
         is_in_boxes[true_labels:, ...] = False
 
         center_radius = 2.5
-        gt_bboxes_per_image_l = np.repeat(np.expand_dims((gt_bboxes_per_image[:, 0]), 1), num_total_anchor, 1) - \
-                                center_radius * np.expand_dims(expanded_strides, 0)
+        gt_bboxes_per_image_l = np.repeat(np.expand_dims((gt_bboxes_per_image[:, 0]), 1), self.num_total_anchor,
+                                          1) - center_radius * np.expand_dims(self.expanded_strides, 0)
 
-        gt_bboxes_per_image_r = np.repeat(np.expand_dims((gt_bboxes_per_image[:, 0]), 1), num_total_anchor, 1) + \
-                                center_radius * np.expand_dims(expanded_strides, 0)
+        gt_bboxes_per_image_r = np.repeat(np.expand_dims((gt_bboxes_per_image[:, 0]), 1), self.num_total_anchor,
+                                          1) + center_radius * np.expand_dims(self.expanded_strides, 0)
 
-        gt_bboxes_per_image_t = np.repeat(np.expand_dims((gt_bboxes_per_image[:, 1]), 1), num_total_anchor, 1) - \
-                                center_radius * np.expand_dims(expanded_strides, 0)
+        gt_bboxes_per_image_t = np.repeat(np.expand_dims((gt_bboxes_per_image[:, 1]), 1), self.num_total_anchor,
+                                          1) - center_radius * np.expand_dims(self.expanded_strides, 0)
 
-        gt_bboxes_per_image_b = np.repeat(np.expand_dims((gt_bboxes_per_image[:, 1]), 1), num_total_anchor, 1) + \
-                                center_radius * np.expand_dims(expanded_strides, 0)
+        gt_bboxes_per_image_b = np.repeat(np.expand_dims((gt_bboxes_per_image[:, 1]), 1), self.num_total_anchor,
+                                          1) + center_radius * np.expand_dims(self.expanded_strides, 0)
 
         c_l = x_centers_per_image - gt_bboxes_per_image_l
         c_r = gt_bboxes_per_image_r - x_centers_per_image
@@ -319,6 +325,13 @@ class TrainTransform:
 
         is_in_boxes_all = is_in_boxes | is_in_centers
         is_in_boxes_and_center = is_in_boxes & is_in_centers
+
+        if self.max_labels > true_labels:
+            fill_x = self.max_labels - true_labels
+            in_bboxes_mask = np.zeros((fill_x, is_in_boxes_all.shape[1]), np.bool)
+            in_center_mask = np.zeros((fill_x, is_in_boxes_and_center.shape[1]), np.bool)
+            is_in_boxes_all = np.vstack((is_in_boxes_all, in_bboxes_mask))
+            is_in_boxes_and_center = np.vstack((is_in_boxes_and_center, in_center_mask))
         return is_in_boxes_all, is_in_boxes_and_center
 
 
