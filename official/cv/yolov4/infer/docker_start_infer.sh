@@ -34,11 +34,9 @@ docker run -it \
     --device=/dev/davinci_manager \
     --device=/dev/devmm_svm \
     --device=/dev/hisi_hdc \
-    --privileged \
-    -v //usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
+    -v /usr/local/bin/npu-smi:/usr/local/bin/npu-smi \
     -v /usr/local/Ascend/driver:/usr/local/Ascend/driver \
     -v ${data_dir}:${data_dir}  \
     -v ${share_dir}:${share_dir} \
-    -u root \
     ${docker_image} \
     /bin/bash

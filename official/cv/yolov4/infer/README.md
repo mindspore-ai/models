@@ -336,7 +336,7 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
       ```shell
       # 导出txt推理数据
       python coco_trainval_anns.py --data_url=./datasets/ --train_url=./infer/data/models/ --val_url=./infer/data/images/
-      #data_url参数为数据集datasets存储路径，train_url参数为存储txt路径,val_url为推理数据集存放的路径
+      #data_url参数为数据集datasets存储路径，train_url参数为存储trainval.txt路径,val_url为推理数据集存放的路径
       ```
 
    AIR模型可通过“模型训练”后转换生成。
@@ -429,6 +429,7 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
       ```
       cd ./infer/mxbase
       bash build.sh
+      执行推理如遇权限问题,解决办法: chmod 400 libyolov4_mindspore_post.so
       ```
 
    4. 运行推理服务。
@@ -630,7 +631,7 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
       chmod 640 ./mxpi/build/libyolov4_mindspore_post.so #此处为后处理文件路径
       ```
 
-      d. 确保result文件夹为空，或者不存在
+      d. 确保result文件夹为空，或者不存在（每次执行推理前请手动删除该文件，程序不会覆盖原有内容）
 
       ```shell
       #可以通过以下命令确保结果文件夹为空，或者不存在
@@ -643,7 +644,7 @@ context.set_auto_parallel_context(parallel_mode = ParallelMode.DATA_PARALLEL, de
 
       ```shell
       cd infer/sdk
-      bash run.sh
+      bash run.sh ./trainval.txt
       ```
 
    4. 观察结果。
