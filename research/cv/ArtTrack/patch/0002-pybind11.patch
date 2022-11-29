@@ -1,0 +1,165 @@
+From dd3e9d7203a49b25c3acc199c314794dd998f48b Mon Sep 17 00:00:00 2001
+From: yiguangzheng <78542727@qq.com>
+Date: Sat, 6 Nov 2021 14:37:26 +0800
+Subject: [PATCH 2/2] pybind11
+
+---
+ lib/multicut_cython/multicut.cxx      | 45 +++++++++++++++++++++++++++
+ lib/multicut_cython/setup_pybind11.py | 13 ++++++++
+ lib/nms_cython/nms_grid.cxx           | 38 ++++++++++++++++++++++
+ lib/nms_cython/setup_pybind11.py      | 22 +++++++++++++
+ 4 files changed, 118 insertions(+)
+ create mode 100644 lib/multicut_cython/multicut.cxx
+ create mode 100644 lib/multicut_cython/setup_pybind11.py
+ create mode 100644 lib/nms_cython/nms_grid.cxx
+ create mode 100644 lib/nms_cython/setup_pybind11.py
+
+diff --git a/lib/multicut_cython/multicut.cxx b/lib/multicut_cython/multicut.cxx
+new file mode 100644
+index 0000000..03d52af
+--- /dev/null
++++ b/lib/multicut_cython/multicut.cxx
+@@ -0,0 +1,45 @@
++#include <pybind11/pybind11.h>
++#include <pybind11/numpy.h>
++#include <iostream>
++#include "solve_nl_lmp.hxx"
++
++namespace py = pybind11;
++
++py::array_t<uint64_t> solve_nl_lmp(py::array_t<double>& unary_array, 
++                    py::array_t<uint16_t>& pwidx_array,
++                    py::array_t<double>& pw_array,
++                    bool is_sparse_graph, 
++                    bool solver_type, 
++                    bool do_suppression, 
++                    bool logit_in_solver
++                    ) {
++    py::buffer_info unary_array_buf = unary_array.request();
++    py::buffer_info pwidx_array_buf = pwidx_array.request();
++    py::buffer_info pw_array_buf = pw_array.request();
++
++    if (unary_array_buf.ndim != 2 || pwidx_array_buf.ndim != 2 || pw_array_buf.ndim != 2)
++    {
++        throw std::runtime_error("numpy.ndarray dims must be 2!");
++    }
++     //申请空间
++    auto result = py::array_t<uint64_t>(unary_array_buf.shape[0] * 2);
++    result.resize(py::array::ShapeContainer({unary_array_buf.shape[0], 2}));
++    py::buffer_info result_buf = result.request();
++
++    //获取numpy.ndarray 数据指针
++    double* unary_array_ptr = static_cast<double*>(unary_array_buf.ptr);
++    uint16_t* pwidx_array_ptr = static_cast<uint16_t*>(pwidx_array_buf.ptr);
++    double* pw_array_ptr = static_cast<double*>(pw_array_buf.ptr);
++    uint64_t* result_ptr = static_cast<uint64_t*>(result_buf.ptr);
++
++    solve_nl_lmp_cpp(unary_array_ptr, unary_array_buf.shape[0], unary_array_buf.shape[1],
++                   pwidx_array_ptr, pwidx_array_buf.shape[0], pwidx_array_buf.shape[1],
++                   pw_array_ptr, pw_array_buf.shape[0], pw_array_buf.shape[1],
++                   is_sparse_graph, solver_type, do_suppression, logit_in_solver,
++                   result_ptr);
++
++    return result;
++}
++PYBIND11_MODULE(multicut, m) {
++    m.def("solve_nl_lmp", &solve_nl_lmp);
++}
+\ No newline at end of file
+diff --git a/lib/multicut_cython/setup_pybind11.py b/lib/multicut_cython/setup_pybind11.py
+new file mode 100644
+index 0000000..31bb337
+--- /dev/null
++++ b/lib/multicut_cython/setup_pybind11.py
+@@ -0,0 +1,13 @@
++from setuptools import setup, Extension
++import pybind11
++functions_module = Extension(
++    name='multicut',
++    sources=['multicut.cxx','src/nl-lmp.cxx'],
++    language="c++",
++    include_dirs=[pybind11.get_include(),'.', 'include', 'src'],
++    extra_compile_args=['-std=c++11','-O3','-fPIC', '-DHAVE_CPP11_INITIALIZER_LISTS'],
++    extra_link_args=['-std=c++11', '-L./']
++)
++
++
++setup(name = 'multicut', ext_modules=[functions_module])
+\ No newline at end of file
+diff --git a/lib/nms_cython/nms_grid.cxx b/lib/nms_cython/nms_grid.cxx
+new file mode 100644
+index 0000000..563cebd
+--- /dev/null
++++ b/lib/nms_cython/nms_grid.cxx
+@@ -0,0 +1,38 @@
++#include <pybind11/pybind11.h>
++#include <pybind11/numpy.h>
++#include <pybind11/stl.h>
++#include <iostream>
++#include "nms_scoremap.hxx"
++
++namespace py = pybind11;
++py::list nms_grid(py::array_t<float> &scoremap,
++                  py::array_t<uint8_t> &grid,
++                  double prob_thresh)
++{
++    py::buffer_info scoremap_buf = scoremap.request();
++    py::buffer_info grid_buf = grid.request();
++
++    if (scoremap_buf.ndim != 2 || grid_buf.ndim != 2)
++    {
++        throw std::runtime_error("numpy.ndarray dims must be 2!");
++    }
++    int W = scoremap_buf.shape[1];
++    int H = scoremap_buf.shape[0];
++
++    int grid_W = grid_buf.shape[1];
++    int grid_H = grid_buf.shape[0];
++
++    auto scoremap_ptr = static_cast<float *>(scoremap_buf.ptr);
++    auto grid_ptr = static_cast<uint8_t *>(grid_buf.ptr);
++
++    auto v = nms_grid_cpp(scoremap_ptr, H, W,
++                          grid_ptr, grid_H, grid_W,
++                          prob_thresh);
++    py::list result = py::cast(v);
++
++    return result;
++}
++PYBIND11_MODULE(nms_grid, m)
++{
++    m.def("nms_grid", &nms_grid);
++}
+\ No newline at end of file
+diff --git a/lib/nms_cython/setup_pybind11.py b/lib/nms_cython/setup_pybind11.py
+new file mode 100644
+index 0000000..9dd7bcb
+--- /dev/null
++++ b/lib/nms_cython/setup_pybind11.py
+@@ -0,0 +1,22 @@
++from setuptools import setup, Extension
++import pybind11
++functions_module = Extension(
++    name='nms_grid',
++    sources=['nms_grid.cxx'],
++    language="c++",
++    include_dirs=[pybind11.get_include(),'.', 'include'],
++    extra_compile_args=['-DILOUSESTL','-DIL_STD','-std=c++11','-O3','-fPIC', '-DHAVE_CPP11_INITIALIZER_LISTS'],
++    extra_link_args=['-std=c++11', '-L./']
++)
++
++# extensions = [
++#   Extension(
++#     'nms_grid', ['nms_grid.pyx'],
++#     language="c++",
++#     include_dirs=[np.get_include(), '.','include'],
++#     extra_compile_args=['-DILOUSESTL','-DIL_STD','-std=c++11','-O3'],
++#     extra_link_args=['-std=c++11']
++#   )
++# ]
++
++setup(name = 'nms_grid', ext_modules=[functions_module])
+\ No newline at end of file
+-- 
+2.32.0.windows.1
+

@@ -1,0 +1,14 @@
+numpy~=1.21.2
+matplotlib~=3.4.3
+pillow~=8.3.2
+scipy~=1.7.0
+imageio~=2.9.0
+pyyaml~=5.4.1
+easydict~=1.9
+pycocotools~=2.0.2
+pybind11~=2.7.0
+psutil~=5.8.0
+munkres~=1.1.4
+cython~=0.29.24
+tensorflow~=1.15
+mindspore-gpu
