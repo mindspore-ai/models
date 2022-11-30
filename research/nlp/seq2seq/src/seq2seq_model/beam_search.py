@@ -215,7 +215,7 @@ class BeamSearchDecoder(nn.Cell):
         self.start_ids = Tensor(np.full([batch_size * beam_width, 1], sos_id), mstype.int32)
         if self.is_using_while:
             self.start = Tensor(0, dtype=mstype.int32)
-            self.init_seq = Tensor(np.full([batch_size, beam_width, self.max_decode_length],
+            self.init_seq = Tensor(np.full([batch_size, beam_width, self.max_decode_length+1],
                                            sos_id), mstype.int32)
         else:
             self.init_seq = Tensor(np.full([batch_size, beam_width, 1], sos_id), mstype.int32)

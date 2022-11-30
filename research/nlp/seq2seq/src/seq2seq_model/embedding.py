@@ -68,6 +68,7 @@ class EmbeddingLookup(nn.Cell):
         Returns:
             Tensor, word embeddings with shape (N, T, D)
         """
+
         _shape = self.get_shape(input_ids)  # (N, T).
         _batch_size = _shape[0]
         _max_len = _shape[1]
