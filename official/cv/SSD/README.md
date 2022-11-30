@@ -64,14 +64,17 @@ Dataset used: [COCO2017](<https://cocodataset.org/#download>)
 
 - Download the dataset COCO2017.
 
+    `scripts` directory provides script `run_download_dataset.sh` for automatically downloading coco2017,
+which can be used to automatically download and decompress data sets.
+
+    At present, only downloading of coco2017 datasets is supported.
+
 - We use COCO2017 as training dataset in this example by default, and you can also use your own datasets.
   First, install Cython ,pycocotool and opencv to process data and to get evaluation result.
 
     ```shell
     pip install Cython
-
     pip install pycocotools
-
     pip install opencv-python
     ```
 
@@ -228,9 +231,11 @@ Then you can run everything just like on ascend.
       ├─ docker start.sh              ## shell script for start docker container
       ├─ run_distribute_train.sh      ## shell script for distributed on ascend
       ├─ run_distribute_train_gpu.sh  ## shell script for distributed on gpu
+      ├─ run_download_dataset.sh      ## shell script for downloading dataset
       ├─ run_eval.sh                  ## shell script for eval on ascend
       ├─ run_eval_onnx.sh             ## shell script for onnx model evaluation
       ├─ run_eval_gpu.sh              ## shell script for eval on gpu
+      ├─ run_export.sh                ## shell script for exporting to MINDIR,AIR,ONNX
       └─ run_infer_310.sh             ## shell script for 310 inference
     ├─ src
       ├─ __init__.py                      ## init file
@@ -262,6 +267,7 @@ Then you can run everything just like on ascend.
         ├─ ssd_vgg16_config_gpu.yaml ## GPU parameter configuration
         ├─ ssd300_config_gpu.yaml ## GPU parameter configuration
     ├─ Dockerfile                         ## docker file
+    ├─ download_dataset.py                ## download dataset script
     ├─ eval.py                            ## eval scripts
     ├─ eval_onnx.py                       ## eval onnx model
     ├─ export.py                          ## export mindir script
@@ -514,6 +520,13 @@ python export.py --checkpoint_file_path [CKPT_PATH] --file_name [FILE_NAME] --fi
 
 The ckpt_file parameter is required,
 `FILE_FORMAT` should be in ["AIR", "MINDIR"]
+
+You can also use the shell script in 'scripts' to export, just to give the configuration script path and export type.
+The FILE_FORMAT is optional in `air`/`mindir`/`onnx`.
+
+```shell
+bash run_export.sh [CONFIG_FILE_PATH] [FILE_FORMAT]
+```
 
 Export on ModelArts (If you want to run in modelarts, please check the official documentation of [modelarts](https://support.huaweicloud.com/modelarts/), and you can start as follows)
 
