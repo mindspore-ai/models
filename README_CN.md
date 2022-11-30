@@ -135,7 +135,7 @@
 | 文本 | 自然语言理解 | [gru](https://gitee.com/mindspore/models/tree/master/official/nlp/GRU) |✅| ✅ |   |
 | 文本 | 情绪分类 | [lstm](https://gitee.com/mindspore/models/tree/master/official/nlp/LSTM) |✅| ✅ |   |
 | 文本 | 自然语言理解 | [mass](https://gitee.com/mindspore/models/tree/master/research/nlp/mass) |✅| ✅ |   |
-| 文本 | 预训练 | [pangu_alpha](https://gitee.com/mindspore/models/tree/master/official/nlp/pangu_alpha) |✅| ✅ |   |
+| 文本 | 预训练 | [pangu_alpha](https://gitee.com/mindspore/models/tree/master/official/nlp/Pangu_alpha) |✅| ✅ |   |
 | 文本 | 自然语言理解 | [textcnn](https://gitee.com/mindspore/models/tree/master/research/nlp/textcnn) |✅| ✅ |   |
 | 文本 | 自然语言理解 | [tinybert](https://gitee.com/mindspore/models/tree/master/research/nlp/tinybert) |✅| ✅ |   |
 | 文本 | 自然语言理解 | [transformer](https://gitee.com/mindspore/models/tree/master/official/nlp/Transformer) |✅| ✅ |   |
