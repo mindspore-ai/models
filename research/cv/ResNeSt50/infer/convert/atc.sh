@@ -24,4 +24,4 @@ atc --model="${air_path}" \
     --output="${om_path}" \
     --soc_version=Ascend310 \
     --input_format=NCHW \
-    --output_type=  FP32
+    --output_type=FP32
