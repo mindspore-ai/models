@@ -45,7 +45,8 @@ Dataset used: [COCO2017](https://cocodataset.org/)
     - Test: 6.3G, 40000 images
     - Annotations：808M，instances，captions，person_keypoints etc
 - Data format：image and json files
-    - Note：Data will be processed in dataset.py
+
+- Note：Data will be processed in dataset.py
 
 - The directory structure is as follows, name of directory and file is user defined:
 
@@ -77,8 +78,10 @@ Dataset used: [COCO2017](https://cocodataset.org/)
 # [Environment Requirements](#contents)
 
 - Hardware（Ascend）
+
     - Prepare hardware environment with Ascend processor.
 - Framework
+
     - [MindSpore](https://www.mindspore.cn/install/en)
 - For more information, please check the resources below：
     - [MindSpore tutorials](https://www.mindspore.cn/tutorials/en/master/index.html)
@@ -143,6 +146,9 @@ Dataset used: [COCO2017](https://cocodataset.org/)
 
     # eval on CPU
     bash scripts/run_standalone_eval_cpu.sh [RUN_MODE] [DATA_DIR] [LOAD_CHECKPOINT_PATH]
+
+    # eval on GPU
+    bash scripts/run_standalone_eval_onnx.sh [DATASET_PATH]  [DEVICE_TARGET]
     ```
 
 - running on ModelArts
@@ -211,6 +217,8 @@ Dataset used: [COCO2017](https://cocodataset.org/)
         ├── train.py                     // training scripts
         ├── eval.py                      // testing and evaluation outputs
         ├── export.py                    // convert mindspore model to air/mindir model
+        ├── eval_onnx.py                 // testing and evaluation onnx outputs
+        ├── export_onnx.py               // Convert model to onnx model
         ├── README.md                    // descriptions about CenterNet
         ├── default_config.yaml          // parameter configuration
         ├── scripts
@@ -223,6 +231,7 @@ Dataset used: [COCO2017](https://cocodataset.org/)
         │   ├──run_standalone_train_ascend.sh          // shell script for standalone training on ascend
         │   ├──run_distributed_train_ascend.sh         // shell script for distributed training on ascend
         │   ├──run_standalone_eval_ascend.sh           // shell script for standalone evaluation on ascend
+        │   ├──run_standalone_eval_onnx.sh           // shell script for standalone  onnx evaluation on gpu
         │   ├──run_standalone_train_cpu.sh             // shell script for standalone training on cpu
         │   ├──run_standalone_eval_cpu.sh              // shell script for standalone evaluation on cpu
         └── src
@@ -240,6 +249,7 @@ Dataset used: [COCO2017](https://cocodataset.org/)
             ├──utils.py                  // auxiliary functions for train, to log and preload
             ├──image.py                  // image preprocess functions
             ├──post_process.py           // post-process functions after decode in inference
+            ├──post_process_onnx.py      // post-process-onnx functions after decode in inference
             └──visual.py                 // visualization image, bbox, score and keypoints
 ```
 
@@ -489,6 +499,9 @@ bash scripts/run_standalone_eval_ascend.sh device_id val(or test) /path/coco_dat
 
 # On CPU
 bash scripts/run_standalone_eval_cpu.sh val(or test) /path/coco_dataset /path/load_ckpt
+
+# ONNX  On GPU
+bash scripts/run_standalone_eval_onnx.sh /path/coco_dataset GPU val
 ```
 
 you can see the MAP result below as below:
@@ -556,6 +569,17 @@ If you want to infer the network on Ascend 310, you should convert the model to 
   # You will see centernet.mindir under {Output file path}.
   ```
 
+If you want to infer the network on GPU, you should convert the model to ONNX:
+
+- export  onnx model
+
+  ```python
+   python export_onnx.py --export_load_ckpt [CKPT_FILE__PATH] --data_dir  [DataSet_Path]  --run_mode val
+
+  ```
+
+Because dynamic input is not supported, the ONNX diagram with multiple dimensions will be output, but it can be reasoned at the same time
+
 # [Model Description](#contents)
 
 ## [Performance](#contents)
@@ -596,6 +620,22 @@ CenterNet on validation(5K images) and test-dev(40K images)
 | Accuracy(validation)       | MAP: 52.1%, AP50: 79.1%, AP75: 56.4, Medium: 44.6%, Large: 63.9%|
 | Accuracy(test-dev)         | MAP: 51.3%, AP50: 79.5%, AP75: 55.0, Medium: 44.3%, Large: 62.3%|
 | Model for inference        | 87M (.mindir file)                                              |
+
+### Inference Performance On GPU for Onnx
+
+CenterNet on validation(5K images) and test-dev(40K images)
+
+| Parameters                 | CenterNet                                                       |
+| -------------------------- | ----------------------------------------------------------------|
+| Resource                   | RTX3070; CPU 2.60GHz, 192cores; Memory 755G; OS Ubantu20.04               |
+| uploaded Date              | 10/23/2022 (month/day/year)                                     |
+| MindSpore Version          | 1.8.1                                                           |
+| Dataset                    | 5K images(val), 40K images(test-dev)                            |
+| batch_size                 | 1                                                               |
+| outputs                    | boxes and keypoints position and scores                         |
+| Accuracy(validation)       | MAP: 52.1%, AP50: 79.1%, AP75: 56.4, Medium: 44.6%, Large: 63.9%|
+| Accuracy(test-dev)         | MAP: 51.3%, AP50: 79.5%, AP75: 55.0, Medium: 44.3%, Large: 62.3%|
+| Model for inference        | 83.7M (.onnx file)                                              |
 
 # [Description of Random Situation](#contents)
 

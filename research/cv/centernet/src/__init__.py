@@ -1,4 +1,4 @@
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2020-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,10 +20,11 @@ from .dataset import COCOHP
 from .visual import visual_allimages, visual_image
 from .decode import MultiPoseDecode
 from .post_process import convert_eval_format, to_float, resize_detection, post_process, merge_outputs
+from .post_process_onnx import post_process_onnx
 
 __all__ = [
     "GatherMultiPoseFeatureCell", "CenterNetMultiPoseLossCell", "CenterNetWithLossScaleCell", \
     "CenterNetMultiPoseEval", "CenterNetWithoutLossScaleCell", "COCOHP", "visual_allimages", \
     "visual_image", "MultiPoseDecode", "convert_eval_format", "to_float", "resize_detection", \
-    "post_process", "merge_outputs"
+    "post_process", "merge_outputs", "post_process_onnx"
 ]
