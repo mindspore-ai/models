@@ -29,6 +29,7 @@
         - [结果](#结果-1)
     - [推理过程](#推理过程)
         - [导出MindIR](#导出mindir)
+        - [onnx模型导出与推理](#onnx的导出与推理)
         - [在Ascend310执行推理](#在ascend310执行推理)
         - [结果](#结果-2)
 - [应用MindSpore Golden Stick模型压缩算法](#应用mindspore-golden-stick模型压缩算法)
@@ -751,6 +752,43 @@ ModelArts导出mindir
 # 模型的输出路径"Output file path" 和模型的日志路径 "Job log path" 。
 # (6) 开始导出mindir。
 ```
+
+### ONNX的导出与推理
+
+- 导出ONNX模型
+
+    ```bash
+    python export.py --checkpoint_file_path=[CKPT_PATH] --device_target="GPU" --file_format="ONNX" --config_path=[CONFIG]
+
+    其中：
+        CKPT_PATH：ckpt所在路径
+        CONFIG：参数配置文件的路径
+
+    ```
+
+- 启动推理：python方式
+
+    ```bash
+    python eval_onnx.py --net_name=[NETWORK] --dataset=[DATASET] --dataset_path=[DATAPATH] --onnx_path=[ONNX_PATH]
+
+    #example: python eval_onnx.py --net_name="resnet18" dataset="imagenet2012" --dataset_path=/hy-tmp/data/imagenet2012/val onnx_path=/hy-tmp/resnet/hardnet.onnx
+    ```
+
+- 启动推理：bash(脚本)方式
+
+    ```bash
+    bash script/run_eval_onnx_gpu.sh [NETWORK] [DATASET] [DATAPATH] [ONNXPATH]
+
+    其中：
+        NETWORK：网络模型名称(如resnet18)
+        DATASET：数据集(如imagenet2012、cifar10)
+        DATAPATH：数据集路径
+        ONNXPATH：onnx路径
+
+    #example: bash scripts/run_onnx_eval_gpu.sh "resnet18" "imagenet2012" /hy-tmp/data/imagenet2012/val /hy-tmp/resnet/hardnet.onnx
+    ```
+
+- onnx推理结果将存放在 eval_onnx.log 中
 
 ### 在Ascend310执行推理
 
