@@ -25,5 +25,5 @@ atc --model="${air_path}" \
     --soc_version=Ascend310 \
     --input_format=NCHW \
     --input_shape="images:1,3,2496,1056" \
-    --output_type=  FP32 \
+    --output_type=FP32 \
     --insert_op_conf=./faceboxes.aippconfig
