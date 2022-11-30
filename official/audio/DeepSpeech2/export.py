@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,16 +24,20 @@ from src.deepspeech2 import DeepSpeechModel
 from src.config import train_config
 
 parser = argparse.ArgumentParser(description='Export DeepSpeech model to Mindir')
-parser.add_argument('--pre_trained_model_path', type=str, default='', help=' existed checkpoint path')
+parser.add_argument('--pre_trained_model_path', type=str, default='', help='existed checkpoint path')
+parser.add_argument('--batch_size', type=int, default='1', help='batch size')
+parser.add_argument('--device_target', type=str, choices=["Ascend", "GPU", "CPU"], default='GPU', help='device target')
+parser.add_argument('--file_name', type=str, default='deepspeech2', help='MINDIR file name')
+parser.add_argument('--file_format', type=str, choices=["MINDIR", "AIR", "ONNX"], default='MINDIR', help='file format')
 args = parser.parse_args()
 
 if __name__ == '__main__':
     config = train_config
-    context.set_context(mode=context.GRAPH_MODE, device_target="GPU", save_graphs=False)
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, save_graphs=False)
     with open(config.DataConfig.labels_path) as label_file:
         labels = json.load(label_file)
 
-    deepspeech_net = DeepSpeechModel(batch_size=1,
+    deepspeech_net = DeepSpeechModel(batch_size=args.batch_size,
                                      rnn_hidden_size=config.ModelConfig.hidden_size,
                                      nb_layers=config.ModelConfig.hidden_layers,
                                      labels=labels,
@@ -46,6 +50,6 @@ if __name__ == '__main__':
     print('Successfully loading the pre-trained model')
     # 3500 is the max length in evaluation dataset(LibriSpeech). This is consistent with that in dataset.py
     # The length is fixed to this value because Mindspore does not support dynamic shape currently
-    input_np = np.random.uniform(0.0, 1.0, size=[1, 1, 161, 3500]).astype(np.float32)
+    input_np = np.random.uniform(0.0, 1.0, size=[args.batch_size, 1, 161, 3500]).astype(np.float32)
     length = np.array([15], dtype=np.int32)
-    export(deepspeech_net, Tensor(input_np), Tensor(length), file_name="deepspeech2.mindir", file_format='MINDIR')
+    export(deepspeech_net, Tensor(input_np), Tensor(length), file_name=args.file_name, file_format=args.file_format)
