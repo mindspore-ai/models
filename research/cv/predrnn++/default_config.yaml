@@ -27,7 +27,7 @@ img_channel: 1
 stride: 1
 filter_size: 5
 num_hidden: '128,64,64,64'
-patch_size: 4
+patch_size: 4 # 需要能够被img_width整除
 layer_norm: True
 lr: 0.001
 reverse_input: True

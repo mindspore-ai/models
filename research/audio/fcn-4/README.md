@@ -46,7 +46,7 @@ For FP16 operators, if the input data type is FP32, the backend of MindSpore wil
 
 ## [Environment Requirements](#contents)
 
-- Hardware（Ascend
+- Hardware（Ascend)
     - Prepare hardware environment with Ascend processor.
 - Framework
     - [MindSpore](https://www.mindspore.cn/install/en)
@@ -60,7 +60,7 @@ After installing MindSpore via the official website, you can start training and 
 
 ### 1. Download and preprocess the dataset
 
-1. down load the classification dataset (for instance, MagnaTagATune Dataset, Million Song Dataset, etc)
+1. down load the classification dataset (for instance, MagnaTagATune Dataset, link: https://mirg.city.ac.uk/codeapps/the-magnatagatune-dataset, etc)
 2. Extract the dataset
 3. The information file of each clip should contain the label and path. Please refer to the annotations_final.csv in MagnaTagATune Dataset.
 4. The provided pre-processing script use MagnaTagATune Dataset as an example. Please modify the code accprding to your own need.

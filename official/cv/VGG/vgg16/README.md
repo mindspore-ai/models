@@ -682,35 +682,63 @@ Inference result is saved in current path, you can find result like this in acc.
 
 #### Training Performance
 
+| Parameters                 | VGG16(Ascend)                                  |
+| -------------------------- | ---------------------------------------------- |
+| Model Version              | VGG16                                          |
+| Resource                   |  Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 |
+| uploaded Date              | 07/05/2021                                     |
+| MindSpore Version          | 1.3.0                                          |
+| Dataset                    | CIFAR-10                                       |
+| Training Parameters        | epoch=70, steps=781, batch_size = 64, lr=0.1   |
+| Optimizer                  | Momentum                                       |
+| Loss Function              | SoftmaxCrossEntropy                            |
+| outputs                    | probability                                    |
+| Loss                       | 0.01                                           |
+| Speed                      | 1pc: 79 ms/step;  8pcs: 104 ms/step            |
+| Total time                 | 1pc: 72 mins;  8pcs: 11.8 mins                 |
+| Checkpoint for Fine tuning | 1.1G(.ckpt file)                               |
+| Scripts                    |[vgg16](https://gitee.com/mindspore/models/tree/master/official/cv/VGG/vgg16) |
+
 | Parameters                 | VGG16(Ascend)                                  | VGG16(GPU)                                      |
 | -------------------------- | ---------------------------------------------- |------------------------------------|
 | Model Version              | VGG16                                          | VGG16                                           |
 | Resource                   |  Ascend 910; CPU 2.60GHz, 192cores; Memory 755G; OS Euler2.8 |NV SMX2 V100-32G                                 |
 | uploaded Date              | 07/05/2021                                     | 07/05/2021                                       |
 | MindSpore Version          | 1.3.0                                          | 1.3.0                                             |
-| Dataset                    | CIFAR-10                                        |ImageNet2012                                     |
-| Training Parameters        | epoch=70, steps=781, batch_size = 64, lr=0.1   |epoch=150, steps=40036, batch_size = 32, lr=0.1  |
-| Optimizer                  | Momentum                                        |Momentum                                         |
-| Loss Function              | SoftmaxCrossEntropy                             |SoftmaxCrossEntropy                              |
-| outputs                    | probability                                     |probability                                                 |
-| Loss                       | 0.01                                          |1.5~2.0                                          |
-| Speed                      | 1pc: 79 ms/step;  8pcs: 104 ms/step              |1pc: 81 ms/step; 8pcs 94.4ms/step                |
-| Total time                 | 1pc: 72 mins;  8pcs: 11.8 mins              |8pcs: 19.7 hours                                 |
-| Checkpoint for Fine tuning | 1.1G(.ckpt file)                             |1.1G(.ckpt file)                                 |
+| Dataset                    | ImageNet2012                                   |ImageNet2012                                     |
+| Training Parameters        | epoch=70, steps=40036, batch_size = 32, lr=0.1 |epoch=150, steps=40036, batch_size = 32, lr=0.1  |
+| Optimizer                  | Momentum                                       |Momentum                                         |
+| Loss Function              | SoftmaxCrossEntropy                            |SoftmaxCrossEntropy                              |
+| outputs                    | probability                                    |probability                                                 |
+| Loss                       | 1.5~2.0                                        |1.5~2.0                                          |
+| Speed                      | 1pc: 58 ms/step;  8pcs: 58.2 ms/step           |1pc: 81 ms/step; 8pcs 94.4ms/step                |
+| Total time                 | 1pc: ~32h;  8pcs: ~4h                          |8pcs: 19.7 hours                                 |
+| Checkpoint for Fine tuning | 1.1G(.ckpt file)                               |1.1G(.ckpt file)                                 |
 | Scripts                    |[vgg16](https://gitee.com/mindspore/models/tree/master/official/cv/VGG/vgg16) |                   |
 
 #### Evaluation Performance
 
-| Parameters          | VGG16(Ascend)               | VGG16(GPU)
-| ------------------- | --------------------------- |---------------------
+| Parameters          | VGG16(Ascend)               |
+| ------------------- | --------------------------- |
+| Model Version       | VGG16                       |
+| Resource            | Ascend 910; OS Euler2.8     |
+| Uploaded Date       | 07/05/2021                  |
+| MindSpore Version   | 1.3.0                       |
+| Dataset             | CIFAR-10, 10,000 images     |
+| batch_size          |   64                        |
+| outputs             | probability                 |
+| Accuracy            | 1pc: 93.4%                  |
+
+| Parameters          | VGG16(Ascend)               | VGG16(GPU)                     |
+| ------------------- | --------------------------- |---------------------           |
 | Model Version       | VGG16                       |    VGG16                       |
-| Resource            | Ascend 910; OS Euler2.8                    |   GPU                          |
+| Resource            | Ascend 910; OS Euler2.8     |   GPU                          |
 | Uploaded Date       | 07/05/2021                  | 07/05/2021                     |
 | MindSpore Version   | 1.3.0                       | 1.3.0                          |
-| Dataset             | CIFAR-10, 10,000 images     |ImageNet2012, 5000 images       |
+| Dataset             | ImageNet2012, 5000 images   |ImageNet2012, 5000 images       |
 | batch_size          |   64                        |    32                          |
-| outputs             | probability                 |    probability                            |
-| Accuracy            | 1pc: 93.4%               |1pc: 73.0%;                     |
+| outputs             | probability                 |    probability                 |
+| Accuracy            | 1pc: 70.0%               |1pc: 73.0%;                        |
 
 ## [Description of Random Situation](#contents)
 
