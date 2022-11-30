@@ -15,8 +15,8 @@
 # ============================================================================
 
 if [[ $# -lt 4 || $# -gt 5 ]]; then
-    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_PATH] [DVPP] [DEVICE_ID]
-    DVPP is mandatory, and must choose from [DVPP|CPU], it's case-insensitive
+    echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [DEVICE_ID]
+    DVPP is mandatory, and must choose from [DVPP|CPU|N], it's case-insensitive
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
 fi
@@ -30,17 +30,15 @@ get_real_path(){
 }
 model=$(get_real_path $1)
 data_path=$(get_real_path $2)
-label_path=$(get_real_path $3)
-DVPP=${4^^}
+DVPP=${3^^}
 
 device_id=0
-if [ $# == 5 ]; then
-    device_id=$5
+if [ $# == 4 ]; then
+    device_id=$4
 fi
 
 echo "mindir name: "$model
 echo "dataset path: "$data_path
-echo "label path: "$label_path
 echo "image process mode: "$DVPP
 echo "device id: "$device_id
 
@@ -52,6 +50,7 @@ function preprocess_data()
     mkdir preprocess_Result
     python ../preprocess.py --dataset_path=$data_path --output_path=./preprocess_Result &> preprocess.log
     data_path=./preprocess_Result/00_data
+    label_path=./preprocess_Result/labels_ids.npy
 }
 
 function compile_app()
@@ -85,11 +84,7 @@ function infer()
 
 function cal_acc()
 {
-    if [ "$DVPP" == "N" ];then
-        python ../postprocess.py --result_path=./result_Files --label_path=./preprocess_Result/labels_ids.npy &> acc.log &
-    else
-        python ../postprocess.py --result_path=./result_Files --label_path=$label_path &> acc.log &
-    fi
+    python ../postprocess.py --result_path=./result_Files --label_path=$label_path &> acc.log &
 }
 
 # preprocess_data
