@@ -82,7 +82,7 @@ python src/rec2jpg_dataset.py --include rec/dataset/path --output output/path
   bash scripts/run_distribute_train_gpu.sh  /path/dataset rank_size
 
   # 单机训练运行示例
-  bash scripts/run_standalone_train_gpu.sh /path/dataset
+  bash scripts/run_standalone_train_gpu.sh /path/dataset 0
 
   # 运行评估示例
   bash scripts/run_eval_gpu.sh /path/evalset /path/ckpt
