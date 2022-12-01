@@ -32,11 +32,14 @@ def create_tinybert_dataset(task='td', batch_size=32, device_num=1, rank=0,
                             do_shuffle="true", data_dir=None, schema_dir=None,
                             data_type=DataType.TFRECORD):
     """create tinybert dataset"""
-    files = os.listdir(data_dir)
-    data_files = []
-    for file_name in files:
-        if "record" in file_name and "db" not in file_name:
-            data_files.append(os.path.join(data_dir, file_name))
+    if os.path.isdir(data_dir):
+        files = os.listdir(data_dir)
+        data_files = []
+        for file_name in files:
+            if "record" in file_name and "db" not in file_name:
+                data_files.append(os.path.join(data_dir, file_name))
+    else:
+        data_files = [data_dir]
     if task == "td":
         columns_list = ["input_ids", "input_mask", "segment_ids", "label_ids"]
     else:

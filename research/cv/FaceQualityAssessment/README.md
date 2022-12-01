@@ -31,7 +31,7 @@ Face Quality Assessment uses a modified-Resnet12 network for performing feature 
 
 This network can recognize the euler angel of human head and 5 key points of human face.
 
-We use about 122K face images as training dataset and 2K as evaluating dataset in this example, and you can also use your own datasets or open source datasets (e.g. 300W-LP as training dataset, AFLW2000 as evaluating dataset)
+We use about 122K face images as training dataset and 2K as evaluating dataset in this example, and you can also use your own datasets or open source datasets (e.g. 300W-LP as training dataset, AFLW2000 as evaluating dataset, link: http://www.cbsr.ia.ac.cn/users/xiangyuzhu/projects/3ddfa/main.htm)
 
 - step 1: The training dataset should be saved in a txt file, which contains the following contents:
 

@@ -648,24 +648,52 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 
 #### 训练性能
 
+| 参数           | VGG16(Ascend)                                  |
+| -------------------------- | ---------------------------------------------- |
+| 模型版本                | VGG16                                          |
+| 资源                   | Ascend 910；CPU 2.60GHz，192核；内存 755GB；系统 Euler2.8    |
+| 上传日期              | 2021-07-05                                           |
+| MindSpore版本        | 1.3.0                                     |
+| 数据集                | CIFAR-10                                        |
+| 训练参数  | epoch=70, steps=781, batch_size = 64, lr=0.1   |
+| 优化器                  | Momentum                                                        |
+| 损失函数 | SoftmaxCrossEntropy |
+| 输出              | 概率                                                |
+| 损失             | 0.01                                          |
+| 速度 | 1卡：79 毫秒/步；8卡：104毫秒/步 |
+| 总时长 | 1卡：72分钟；8卡：11.8分钟 |
+| 调优检查点 | 1.1 GB（.ckpt 文件）                                           |
+| 脚本                  |[VGG16](https://gitee.com/mindspore/models/tree/master/official/cv/VGG/vgg16) |
+
 | 参数           | VGG16(Ascend)                                  | VGG16(GPU)                                      |
 | -------------------------- | ---------------------------------------------- |------------------------------------|
 | 模型版本                | VGG16                                          | VGG16                                           |
 | 资源                   | Ascend 910；CPU 2.60GHz，192核；内存 755GB；系统 Euler2.8    |NV SMX2 V100-32G                                 |
 | 上传日期              | 2021-07-05                                           | 2021-07-05    |
 | MindSpore版本        | 1.3.0                                     |1.3.0                                             |
-| 数据集                | CIFAR-10                                        |ImageNet2012                                     |
-| 训练参数  | epoch=70, steps=781, batch_size = 64, lr=0.1   |epoch=150, steps=40036, batch_size = 32, lr=0.1  |
+| 数据集                | ImageNet2012                                        |ImageNet2012                                     |
+| 训练参数  | epoch=70, steps=40036, batch_size = 32, lr=0.1   |epoch=150, steps=40036, batch_size = 32, lr=0.1  |
 | 优化器                  | Momentum                                                        | Momentum                 |
 | 损失函数 | SoftmaxCrossEntropy | SoftmaxCrossEntropy |
 | 输出              | 概率                                                |      概率                  |
-| 损失             | 0.01                                          |1.5~2.0                                          |
-| 速度 | 1卡：79 毫秒/步；8卡：104毫秒/步 | 1卡：81毫秒/步；8卡：94.4毫秒/步 |
-| 总时长 | 1卡：72分钟；8卡：11.8分钟 | 8卡：19.7小时 |
+| 损失             | 1.5~2.0                                          |1.5~2.0                                          |
+| 速度 | 1卡：58 毫秒/步；8卡：58.2毫秒/步 | 1卡：81毫秒/步；8卡：94.4毫秒/步 |
+| 总时长 | 1卡：~32h；8卡：~4h | 8卡：19.7小时 |
 | 调优检查点 | 1.1 GB（.ckpt 文件）                                           |    1.1 GB（.ckpt 文件）               |
 | 脚本                  |[VGG16](https://gitee.com/mindspore/models/tree/master/official/cv/VGG/vgg16) |                   |
 
 #### 评估性能
+
+| 参数  | VGG16(Ascend)               |
+| ------------------- | --------------------------- |
+| 模型版本      | VGG16                       |
+| 资源        | Ascend 910；系统 Euler2.8           |
+| 上传日期              | 2021-07-05                    |
+| MindSpore版本   | 1.3.0                 |
+| 数据集 | CIFAR-10，10000张图像 |
+| batch_size          |   64                        |
+| 输出 | 概率 |
+| 准确率 | 1卡：93.4% |
 
 | 参数  | VGG16(Ascend)               | VGG16(GPU)
 | ------------------- | --------------------------- |---------------------
@@ -673,10 +701,10 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCE
 | 资源        | Ascend 910；系统 Euler2.8           |   GPU                          |
 | 上传日期              | 2021-07-05                    | 2021-07-05                 |
 | MindSpore版本   | 1.3.0                 |1.3.0                     |
-| 数据集 | CIFAR-10，10000张图像 | ImageNet2012，5000张图像 |
+| 数据集 | ImageNet2012，5000张图像 | ImageNet2012，5000张图像 |
 | batch_size          |   64                        |    32                          |
 | 输出 | 概率 | 概率 |
-| 准确率 | 1卡：93.4% |1卡：73.0%; |
+| 准确率 | 1卡：70.0% |1卡：73.0%; |
 
 ## 随机情况说明
 

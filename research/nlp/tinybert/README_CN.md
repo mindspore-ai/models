@@ -29,6 +29,8 @@
             - [基于SST-2数据集进行评估](#基于sst-2数据集进行评估)
             - [基于MNLI数据集进行评估](#基于mnli数据集进行评估)
             - [基于QNLI数据集进行评估](#基于qnli数据集进行评估)
+            - [基于TNEWS数据集进行评估](#基于tnews数据集进行评估)
+            - [基于CLUENER数据集进行评估](#基于cluener数据集进行评估)
     - [ONNX模型导出及评估](#onnx模型导出及评估)
         - [ONNX模型导出](#onnx模型导出)
         - [ONNX模型评估](#onnx模型评估)
@@ -78,8 +80,8 @@ TinyBERT模型的主干结构是转换器，转换器包含四个编码器模块
         ```
 
 - 生成下游任务蒸馏阶段数据集
-    - 下载数据集进行微调和评估，如[GLUE](https://github.com/nyu-mll/GLUE-baselines)，使用`download_glue_data.py`脚本下载SST2, MNLI, QNLI数据集
-    - 将数据集文件从JSON格式转换为TFRecord格式。使用通用蒸馏阶段的第三步BERT代码，参考readme使用代码仓中的`run_classifier.py`文件。转化SST2数据集需要[PR:327](https://github.com/google-research/bert/pull/327)，该PR是未合入状态，需要手动添加到代码中；转化QNLI数据集需要参考SST2在`run_classifier.py`合适的位置插入以下代码；另外，`run_classifier.py`代码中包含了训练，推理和预测的代码，对于转化tfrecord数据集来说，这部分代码是多余的，可以将这部分代码注释掉，只保留转化数据集的代码．其中task_name指定为SST2，bert_config_file指定为通用蒸馏阶段下载得到的bert_config.json文件，max_seq_length为64
+    - 下载数据集进行微调和评估，如[GLUE](https://github.com/nyu-mll/GLUE-baselines)，使用`download_glue_data.py`脚本下载SST2, MNLI, QNLI数据集, 中文文本分类任务[TNEWS](https://github.com/CLUEbenchmark/CLUE), 中文实体识别任务[CLUENER](https://github.com/CLUEbenchmark/CLUENER2020)
+    - 将数据集文件从JSON格式转换为TFRecord格式。使用通用蒸馏阶段的第三步BERT代码，参考readme使用代码仓中的`run_classifier.py`文件。转化SST2数据集需要[PR:327](https://github.com/google-research/bert/pull/327)，该PR是未合入状态，需要手动添加到代码中；转化QNLI数据集需要参考SST2在`run_classifier.py`合适的位置插入以下代码；另外，`run_classifier.py`代码中包含了训练，推理和预测的代码，对于转化tfrecord数据集来说，这部分代码是多余的，可以将这部分代码注释掉，只保留转化数据集的代码．其中task_name指定为SST2，bert_config_file指定为通用蒸馏阶段下载得到的bert_config.json文件，max_seq_length为64。对于TNEWS, CLUENER数据集，参考official/nlp/Bert网络。
 
     ```python
     ...
@@ -548,6 +550,46 @@ The best acc is 0.891176
 ...
 ```
 
+#### 基于TNEWS数据集进行评估
+
+运行如下命令前，请确保已设置加载与训练检查点路径。请将检查点路径设置为绝对全路径，例如/username/pretrain/checkpoint_100_300.ckpt。
+
+```bash
+bash scripts/run_standalone_td.sh {path}/*.yaml # 在CPU环境上执行
+```
+
+以上命令后台运行，您可以在log.txt文件中查看运行结果。测试数据集的准确率如下：
+
+```text
+# grep "The best acc" log.txt
+The best acc is 0.506787
+The best acc is 0.515646
+The best acc is 0.518760
+...
+The best acc is 0.534121
+...
+```
+
+#### 基于CLUENER数据集进行评估
+
+运行如下命令前，请确保已设置加载与训练检查点路径。请将检查点路径设置为绝对全路径，例如/username/pretrain/checkpoint_100_300.ckpt。
+
+```bash
+bash scripts/run_standalone_td.sh {path}/*.yaml # 在CPU环境上执行
+```
+
+以上命令后台运行，您可以在log.txt文件中查看运行结果。测试数据集的准确率如下：
+
+```text
+# grep "The best acc" log.txt
+The best acc is 0.889724
+The best acc is 0.894650
+The best acc is 0.900675
+...
+The best acc is 0.919423
+...
+```
+
 ## ONNX模型导出及评估
 
 ### ONNX模型导出
@@ -743,6 +785,32 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [SCHEMA_DIR] [DATASET_TYPE] [
 | batch_size           | 32                            | 32                        |
 | 准确率                | 0.8116                        | 0.9086                    |
 | 推理模型              | 74M(.ckpt 文件)                | 74M(.ckpt 文件)           |
+
+> TNEWS数据集
+
+| 参数                 | CPU                           |
+| --------------      | ----------------------------- |
+| 模型版本              |                               |
+| 资源                 | CPU, 192核                     |
+| 上传日期              | 2021-12-17                    |
+| MindSpore版本        | 1.5.0                         |
+| 数据集                | TNEWS                          |
+| batch_size           | 32                            |
+| 准确率                | 0.53                          |
+| 推理模型              | 74M(.ckpt 文件)                |
+
+> CLUENER数据集
+
+| 参数                 | CPU                        |
+| --------------      | ----------------------------- |
+| 模型版本              |                               |
+| 资源                 | CPU, 192核                     |
+| 上传日期              | 2021-12-17                    |
+| MindSpore版本        | 1.5.0                         |
+| 数据集                | CLUENER                       |
+| batch_size           | 32                            |
+| 准确率                | 0.9150                        |
+| 推理模型              | 74M(.ckpt 文件)                |
 
 # 随机情况说明
 

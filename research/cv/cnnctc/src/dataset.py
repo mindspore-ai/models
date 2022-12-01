@@ -36,6 +36,7 @@ class NormalizePAD():
         # toTensor
         img = np.array(img, dtype=np.float32)
         # normalize
+        # mean, std computed by used dataset.
         means = [121.58949, 123.93914, 123.418655]
         stds = [65.70353, 65.142426, 68.61079]
         img = np.subtract(img, means)

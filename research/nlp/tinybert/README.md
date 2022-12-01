@@ -26,6 +26,8 @@
             - [evaluation on SST-2 dataset](#evaluation-on-sst-2-dataset)
             - [evaluation on MNLI dataset](#evaluation-on-mnli-dataset)
             - [evaluation on QNLI dataset](#evaluation-on-qnli-dataset)
+            - [evaluation on TNEWS dataset](#evaluation-on-tnews-dataset)
+            - [evaluation on CLUENER dataset](#evaluation-on-cluener-dataset)
     - [ONNX Export And Evaluation](#onnx-export-and-evaluation)
         - [ONNX Export](#onnx-export)
         - [ONNX Evaluation](#onnx-evaluation)
@@ -73,8 +75,8 @@ The backbone structure of TinyBERT is transformer, the transformer contains four
         ```
 
 - Create dataset for task distill phase
-    - Download [GLUE](https://github.com/nyu-mll/GLUE-baselines) dataset for task distill phase, use `download_glue_data.py` to download sst2, mnli, qnli dataset.
-    - Transform dataset to TFRecord format. Use `run_classifier.py` in [BERT](https://github.com/google-research/bert), referring to readme. Besides, transforming sst2 dataset, you should add code in [PR:327](https://github.com/google-research/bert/pull/327); transforming qnli dataset, you should refer sst2 add add follow code. Parts of code, such as training, evaling, predicting, are useless, you can comment them and only left necessary code. task_name should be SST2, ber_config_files should be `bert_config.json`, max_seq_length should be 64.
+    - Download [GLUE](https://github.com/nyu-mll/GLUE-baselines) dataset for task distill phase, use `download_glue_data.py` to download sst2, mnli, qnli dataset, Chinese Named Entity Recognition[CLUENER](https://github.com/CLUEbenchmark/CLUENER2020), Chinese sentences classification[TNEWS](https://github.com/CLUEbenchmark/CLUE)
+    - Transform dataset to TFRecord format. Use `run_classifier.py` in [BERT](https://github.com/google-research/bert), referring to readme. Besides, transforming sst2 dataset, you should add code in [PR:327](https://github.com/google-research/bert/pull/327); transforming qnli dataset, you should refer sst2 add add follow code. Parts of code, such as training, evaling, predicting, are useless, you can comment them and only left necessary code. task_name should be SST2, ber_config_files should be `bert_config.json`, max_seq_length should be 64. For ClUENER and TNEWS dataset, please refer to official/nlp/Bert.
 
     ```python
     ...
@@ -549,6 +551,46 @@ The best acc is 0.891176
 ...
 ```
 
+#### evaluation on TNEWS dataset
+
+Before running the command below, please check the load pretrain checkpoint path has been set. Please set the checkpoint path to be the absolute full path, e.g:"/username/pretrain/checkpoint_100_300.ckpt".
+
+```bash
+bash scripts/run_standalone_td.sh {path}/*.yaml # on CPU device
+```
+
+The command above will run in the background, you can view the results the file log.txt. The accuracy of the test dataset will be as follows:
+
+```text
+# grep "The best acc" log.txt
+The best acc is 0.506787
+The best acc is 0.515646
+The best acc is 0.518760
+...
+The best acc is 0.534121
+...
+```
+
+#### evaluation on CLUENER dataset
+
+Before running the command below, please check the load pretrain checkpoint path has been set. Please set the checkpoint path to be the absolute full path, e.g:"/username/pretrain/checkpoint_100_300.ckpt".
+
+```bash
+bash scripts/run_standalone_td.sh {path}/*.yaml # on CPU device
+```
+
+The command above will run in the background, you can view the results the file log.txt. The accuracy of the test dataset will be as follows:
+
+```text
+# grep "The best acc" log.txt
+The best acc is 0.889724
+The best acc is 0.894650
+The best acc is 0.900675
+...
+The best acc is 0.919423
+...
+```
+
 ## [ONNX Export And Evaluation](#contents)
 
 ### ONNX Export
@@ -747,6 +789,32 @@ Inference result is saved in current path, you can find result like this in acc.
 | batch_size                 | 32                            | 32                        |
 | Accuracy                   | 0.8116                        | 0.9086                    |
 | Model for inference        | 74M(.ckpt file)               | 74M(.ckpt file)           |
+
+> TNEWS dataset
+
+| Parameters                 | CPU                        |
+| --------------             | ----------------------------- |
+| Model Version              |                               |
+| Resource                   | CPU, 192cores                 |
+| uploaded Date              | 2021-12-17                    |
+| MindSpore Version          | 1.5.0                         |
+| Dataset                    | QNLI                          |
+| batch_size                 | 32                            |
+| Accuracy                   | 0.53                          |
+| Model for inference        | 74M(.ckpt file)               |
+
+> CLUENER dataset
+
+| Parameters                 | CPU                        |
+| --------------             | ----------------------------- |
+| Model Version              |                               |
+| Resource                   | CPU, 192cores      |
+| uploaded Date              | 2021-12-17                    |
+| MindSpore Version          | 1.5.0                         |
+| Dataset                    | QNLI                          |
+| batch_size                 | 32                            |
+| Accuracy                   | 0.9150                        |
+| Model for inference        | 74M(.ckpt file)               |
 
 # [Description of Random Situation](#contents)
 
