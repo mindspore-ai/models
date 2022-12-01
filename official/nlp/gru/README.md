@@ -99,7 +99,7 @@ nltk.download()
     bash create_dataset.sh [DATASET_PATH] [OUTPUT_PATH]
 
     # run training example
-    bash run_standalone_train_{platform}.sh [TRAIN_DATASET_PATH]
+    bash run_standalone_train_{platform}.sh [TRAIN_DATASET_PATH] [DEVICE_ID]
 
     # run distributed training example
     bash run_distribute_train_{platform}.sh [RANK_TABLE_FILE] [TRAIN_DATASET_PATH]
@@ -285,10 +285,10 @@ Parameters for both training and evaluation can be set in config.py. All the dat
 
     ```bash
     cd ./scripts
-    bash run_standalone_train_{platform}.sh [DATASET_PATH]
+    bash run_standalone_train_{platform}.sh [DATASET_PATH] [DEVICE_ID]
     # platform: ascend or gpu
     #example：
-    bash run_standalone_train_ascend.sh /Muti30k/mindrecord/multi30k_train_mindrecord_32_0
+    bash run_standalone_train_ascend.sh /Muti30k/mindrecord/multi30k_train_mindrecord_32_0 0
     ```
 
 - Running scripts for distributed training of GRU. Task training on multiple device and run the following command in bash to be executed in `scripts/`:
