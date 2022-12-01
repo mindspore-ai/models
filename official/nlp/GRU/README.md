@@ -99,7 +99,7 @@ nltk.download()
     bash create_dataset.sh [DATASET_PATH] [OUTPUT_PATH]
 
     # run training example
-    bash run_standalone_train_{platform}.sh [TRAIN_DATASET_PATH]
+    bash run_standalone_train_{platform}.sh [TRAIN_DATASET_PATH] [DEVICE_ID]
     # platform: ascend or gpu
     python train.py --config_path=[CPU_CONFIG_PATH] --dataset_path=[TRAIN_DATASET_PATH]
     # platform: cpu
@@ -330,9 +330,9 @@ Parameters for both training and evaluation can be set in config.py. All the dat
     ```bash
     cd ./scripts
     # platform: ascend or gpu
-    bash run_standalone_train_{platform}.sh [DATASET_PATH]
+    bash run_standalone_train_{platform}.sh [DATASET_PATH] [DEVICE_ID]
     # example：
-    bash run_standalone_train_ascend.sh /Muti30k/mindrecord/multi30k_train_mindrecord_32_0
+    bash run_standalone_train_ascend.sh /Muti30k/mindrecord/multi30k_train_mindrecord_32_0 0
 
     # platform: cpu
     python train.py --config_path=[CPU_CONFIG_PATH] --dataset_path=[TRAIN_DATASET_PATH] --device_target=CPU

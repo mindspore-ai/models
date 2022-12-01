@@ -19,5 +19,6 @@ export DEVICE_ID=$1
 DATA_DIR=$2
 python ./train.py  \
     --device_target=Ascend \
+    --device_id=$DEVICE_ID \
     --train_dataset_path=$DATA_DIR > log.txt 2>&1 &
 
