@@ -44,7 +44,7 @@ By MindSpore's parallel feature, we adopt the efficient model parallel and data 
 to minimize the communication cost and maximize computation efficiency.
 The code is easy to scale to thousands of NPUs and trillion parameters with little modifications.
 
-In the mean while, we run our parallel training upon a language model, named PanGu-Alpha, to demonstrate the large model can be trained easily
+In the meanwhile, we run our parallel training upon a language model, named PanGu-Alpha, to demonstrate the large model can be trained easily
 with our parallel setting. We summarized the training tricks as followings:
 
 1. Op-level Model Parallelism
@@ -119,7 +119,7 @@ Suppose the text data is under the `./data` and **each text file ends with 'txt'
 python -m src.preprocess --input_glob  'data/*.txt' --tokenizer gpt --eot 50256 --data_column_name input_ids --seq_length 1025
 ```
 
-The script will chunk the each line with 1025 tokens. For the chunk with no more 1025 tokens, the chunk will be ignored.
+The script will chunk the line with 1025 tokens. For the chunk with no more 1025 tokens, the chunk will be ignored.
 
 The output files is under `./output`.  The default tokenizer adopts the transformers's tokenizer. Note the `vocab_szie` is determined by the vocab file.
 
@@ -142,7 +142,7 @@ The vocab size of `vocab.model` is 40000, and the `eod id` is 6.
 
 ### Training on Ascend
 
-Currently the scripts provide four default configures : `1.3B`  `2.6B` `13B` and `200B`. The following command will start training `2.6B` model on 8 **Ascend cards**.
+Currently, the scripts provide four default configures : `1.3B`  `2.6B` `13B` and `200B`. The following command will start training `2.6B` model on 8 **Ascend cards**.
 
 ```bash
 
@@ -284,7 +284,7 @@ bash scripts/run_distribute_incremental_train.sh DATASET RANK_TABLE 8 fp32 2.6B 
 
 Please refer to the [website](https://git.openi.org.cn/PCL-Platform.Intelligence/PanGu-Alpha) to download the following parts:
 
-- tokenizer: vocab.txt and vocab.model
+- tokenizer: vocab.model
 - checkpoint file: \*.part\[0-4\] (need to extract) and *.npy under the same parameter size
 - strategy file: a file described how the parameters are sliced across different devices.
 
@@ -379,13 +379,14 @@ Please follow the instructions in section [Prediction](#prediction) to download 
 ### Run the Evaluation
 
 The most of the arguments are same with the section [Prediction in Standalone mode](#prediction-in-standalone-mode),
-except the last argument `TASK` and `TASK_PATH`. Currently, we support only `c3` task.
+except the last argument `TASK` and `TASK_PATH`. Currently, we support only `c3` task. The following commands will
+launch the programs to start evaluation with 2.6B model.
 
 ```bash
 export FILE_PATH=/home/your_path/ckpts
 export DEVICE_TARGET=Ascend # or GPU
 export TASK=c3
-export TASK_PATH=/home/your_c3_data_path
+export TASK_PATH=/home/your_c3_data_path/data # You should point to the data directory under the c3 path
 bash scripts/run_standalone_eval.sh ${FILE_PATH}/strategy_load_ckpt/strategy.ckpt \
 ${FILE_PATH}/tokenizer/  ${FILE_PATH}/checkpoint_file filitered 2.6B $DEVICE_TARGET $TASK $TASK_PATH
 ```
@@ -394,19 +395,44 @@ For the model with 2.6B, it takes about 13 minutes to get the results. Log can b
 It should look like this:
 
 ```text
-Metric for dataset c3 is {'top1_acc': 0.5452}
+Metric for dataset c3 is {'top1_acc': 0.5430}
 ```
 
-If you want to evaluate the model with 13B model, use the following commands to launch the program with 8 devices:
+If you want to evaluate the model with 13B model, use the following commands to launch the program with 8 devices.
+Note, you should follow the instructions in the [Prediction](#prediction) to download the checkpoint.
 
 ```bash
 export FILE_PATH=/home/your_path/ckpts
-export DEVICE_TARGET=Ascend # or GPU
+export DEVICE_TARGET=Ascend
 export TASK=c3
-export TASK_PATH=/home/your_c3_data_path
+export TASK_PATH=/home/your_c3_data_path/data # You should point to the data directory under the c3 path
 export RANK_TABLE=/home/rank_table_8p.json
 bash scripts/run_distribute_eval.sh 8 $RANK_TABLE ${FILE_PATH}/strategy_load_ckpt/strategy.ckpt \
 ${FILE_PATH}/tokenizer/ ${FILE_PATH}/checkpoint_file 13B fp32 $TASK $TASK_PATH
+```
+
+The output should look like this:
+
+```text
+Metric for dataset c3 is {'top1_acc': 0.5512}
+```
+
+If you want to evaluate on the GPU with multi-devices, please use the following commands:
+
+```bash
+export FILE_PATH=/home/your_path/ckpts
+export DEVICE_TARGET=GPU
+export TASK=c3
+export TASK_PATH=/home/your_c3_data_path/data # You should point to the data directory under the c3 path
+export RANK_TABLE=/home/hostfile_8p
+bash scripts/run_distribute_eval_gpu.sh 8 $RANK_TABLE ${FILE_PATH}/strategy_load_ckpt/strategy.ckpt \
+${FILE_PATH}/tokenizer/ ${FILE_PATH}/checkpoint_file 13B fp32 $TASK $TASK_PATH $DEVICE_TARGET
+```
+
+where the file `/home/hostfile_8p` looks like the followings:
+
+```text
+your_server_ip slots=8
 ```
 
 ### Run the Evaluation with the Server Enabled
@@ -471,16 +497,16 @@ python predict.py --enable_client --eval_task=$EVAL_TASK \
 After the program finished(takes about 20 minutes), the output should be same as the followings.
 
 ```text
-Metric for dataset c3 is {'top1_acc': 0.5432}
+Metric for dataset c3 is {'top1_acc': 0.5430}
 ```
 
 ### The Evaluation Results of Zero-Shot for 2.6B Model
 
 The following results are obtained by PanGu-Alpha 2.6B model.
 
-| Task Name         | Metric   | Paper | ReProduced | Platform |
-|-------------------|----------|-------|------------|----------|
-| C3                | accuracy | 53.42 | 54.32      | Ascend   |
+| Task Name         | Metric   | Paper | ReProduced  | Platform   |
+|-------------------|----------|-------|-------------|------------|
+| C3                | accuracy | 53.42 | 54.32/54.57 | Ascend/GPU |
 
 ## [Serving](#contents)
 
