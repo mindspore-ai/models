@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright 2020 Huawei Technologies Co., Ltd
+# Copyright 2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,20 +14,22 @@
 # limitations under the License.
 # ============================================================================
 
-[ $# -ne 1 ] && {
-    echo "Usage: bash scripts/run_distribute_train_gpu.sh [DATASET_PATH]"
+[ $# -ne 2 ] && {
+    echo "Usage: bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [DATASET_PATH]"
     exit 1
 }
 
-DATA_DIR=$1
-export DEVICE_ID=0
-export RANK_SIZE=8
-
+export RANK_SIZE=1
+export DEVICE_ID=$1
+DATA_DIR=$2
 BASE_PATH=$(cd ./"`dirname $0`" || exit; pwd)
 CONFIG_FILE="${BASE_PATH}/../default_config_gpu.yaml"
 
-echo "start training"
-
-mpirun -n $RANK_SIZE --allow-run-as-root --output-filename log_output --merge-stderr-to-stdout \
-    python train.py --config_path=$CONFIG_FILE --dataset_path=$DATA_DIR \
---platform='GPU' > train.log 2>&1 &
+rm -rf train_standalone
+mkdir ./train_standalone
+cd ./train_standalone || exit
+echo  "start training for device id $DEVICE_ID"
+env > env.log
+python -u ../train.py --config_path=$CONFIG_FILE \
+    --dataset_path=$DATA_DIR --platform=GPU > log.txt 2>&1 &
+cd ../

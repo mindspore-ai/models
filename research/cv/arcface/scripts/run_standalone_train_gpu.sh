@@ -17,11 +17,12 @@
 echo "=============================================================================================================="
 echo "Please run the script as: "
 echo "bash run.sh DATA_PATH"
-echo "For example: bash run.sh /path/dataset"
+echo "For example: bash run.sh /path/dataset 0"
 echo "It is better to use the absolute path."
 echo "=============================================================================================================="
 EXE_PATH=$(pwd)
 DATA_PATH=$1
+export DEVICE_ID=$2
 
 python train.py  \
     --epochs 25 \
