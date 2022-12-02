@@ -918,6 +918,20 @@ bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/resnet50_cif
 bash run_eval_gpu.sh ../quantization/slb/ ../quantization/slb/resnet18_cifar10_config.yaml ./cifar10/train/ ./checkpoint/resnet-100.ckpt
 ```
 
+```text
+# Obtain pruned model from UniPruning training:
+cd ./golden_stick/scripts/
+# PYTHON_PATH represents path to directory of 'export.py'.
+bash run_export.sh [PYTHON_PATH] [CONFIG_FILE] [CHECKPOINT_PATH] [MASK_PATH]
+
+# .JSON pruning masks are saved during training in experiment directory
+
+# evaluation example
+cd ./golden_stick/scripts/
+bash run_export.sh ../pruner/uni_pruning/ ../pruner/uni_pruning/resnet50_config.yaml ./checkpoint/resnet-90.ckpt ./checkpoint/mask.json
+
+```
+
 ### Running on Ascend
 
 ```text
@@ -1096,13 +1110,13 @@ result:{'top_1_accuracy': 0.6589927884615384, 'top_5_accuracy': 0.86642628205128
 result:{'top_1_accuracy': 0.6609142628205128, 'top_5_accuracy': 0.8670873397435898} ckpt=~/resnet18_imagenet2012/train_parallel0/resnet-100_834.ckpt
 ```
 
-- Apply UniPruning on ResNet50 with 85% target sparsity on ImageNet2012 dataset:
+- Apply UniPruning on ResNet50 with 15% target sparsity on ImageNet2012 dataset:
 
 ```text
 result:{'top_1_accuracy': 0.7622}, Parameters pruned = 15%, Ascend310 acceleration = 31%
 ```
 
-- Apply UniPruning on ResNet50 with 85% target sparsity on ImageNet2012 dataset:
+- Apply UniPruning on ResNet50 with 25% target sparsity on ImageNet2012 dataset:
 
 ```text
 result:{'top_1_accuracy': 0.7582}, Parameters pruned = 25%, Ascend310 acceleration = 35%
