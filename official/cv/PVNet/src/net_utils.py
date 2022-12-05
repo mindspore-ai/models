@@ -14,6 +14,7 @@
 # ============================================================================
 """network utils"""
 import numpy as np
+from easydict import EasyDict
 import mindspore.nn as nn
 from mindspore.train.serialization import load_checkpoint
 

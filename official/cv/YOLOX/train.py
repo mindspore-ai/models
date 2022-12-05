@@ -56,6 +56,9 @@ def set_default():
             config.save_ckpt_dir = os.path.dirname(base_dir)
         else:
             config.save_ckpt_dir = os.path.join(config.ckpt_dir, config.backbone)
+    if not os.path.exists(config.save_ckpt_dir):
+        os.makedirs(config.save_ckpt_dir)
+
 
     # logger
     config.outputs_dir = os.path.join(outputs_dir, datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
