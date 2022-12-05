@@ -1,0 +1,68 @@
+{
+  "crnn":{
+    "stream_config":{
+      "deviceId": "0"
+    },
+    "mxpi_imagedecoder0":{
+      "props":{
+        "handleMethod": "opencv"
+      },
+      "factory": "mxpi_imagedecoder",
+      "next": "queue0"
+    },
+    "queue0":{
+      "factory": "queue",
+      "next": "mxpi_imageresize0"
+    },
+    "mxpi_imageresize0":{
+      "props":{
+        "handleMethod": "opencv",
+        "resizeType": "Resizer_Stretch",
+        "parentName": "mxpi_imagedecoder0",
+        "resizeHeight": "32",
+        "resizeWidth": "100"
+      },
+      "factory": "mxpi_imageresize",
+      "next": "mxpi_tensorinfer0"
+    },
+    "mxpi_tensorinfer0":{
+      "props":{
+        "dataSource": "mxpi_imageresize0",
+        "modelPath": "../model/crnn.om",
+        "outputHasBatchDim": "0"
+      },
+      "factory": "mxpi_tensorinfer",
+      "next": "mxpi_textgenerationpostprocessor0"
+    },
+    "mxpi_textgenerationpostprocessor0": {
+      "props":{
+        "dataSource": "mxpi_tensorinfer0",
+        "postProcessConfigPath": "../config/crnn.cfg",
+        "labelPath": "../config/crnn.names",
+        "postProcessLibPath": "libcrnnpostprocess.so"
+      },
+      "factory": "mxpi_textgenerationpostprocessor",
+      "next": "mxpi_dataserialize0"
+    },
+    "mxpi_dataserialize0":{
+      "props":{
+        "outputDataKeys": "mxpi_textgenerationpostprocessor0"
+      },
+      "factory": "mxpi_dataserialize",
+      "next": "appsink0"
+    },
+    "appsrc0":{
+      "props":{
+        "blocksize": "409600"
+      },
+      "factory": "appsrc",
+      "next": "mxpi_imagedecoder0"
+    },
+    "appsink0":{
+      "props":{
+        "blocksize": "409600"
+      },
+      "factory": "appsink"
+    }
+  }
+}
