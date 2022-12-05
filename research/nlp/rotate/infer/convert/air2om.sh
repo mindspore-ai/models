@@ -22,12 +22,12 @@ echo "Output OM file path: ${output_model_name}"
 
 atc --model=$model_path/rotate-head.air\
         --framework=1 \
-        --output=$output_model_name-head \ \
+        --output=$output_model_name-head \
         --input_format=NCHW \
         --soc_version=Ascend310
 
 atc --model=$model_path/rotate-tail.air \
         --framework=1 \
-        --output=$output_model_name-tail \ \
+        --output=$output_model_name-tail \
         --input_format=NCHW \
         --soc_version=Ascend310
