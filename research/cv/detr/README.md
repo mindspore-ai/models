@@ -306,10 +306,14 @@ Logs will be saved to parent dir of ckpt, converted model will have the same nam
 
 Please visit the official website [homepage](https://gitee.com/mindspore/models).
 
-## FAQ
+## FAQ(#contents)
 
 Refer to the [ModelZoo FAQ](https://gitee.com/mindspore/models#FAQ) for some common question.
 
 - **Q: How to resolve when `You can override this protection bu adding the "overload-allowed" option to your binding directive` in the distributed training log?**
 
 **A**: You can add the `--bind-to core:overload-allowed` parameter to the `mpirun` command as prompted.
+
+- **Q: How to resolve when `While computing bindings, we found no available cpus on the following node:` in the distributed training log?**
+
+**A**: You can try to lower the `num` in `socket:pe=num`. For Example: `socket:pe=3`.
