@@ -14,10 +14,9 @@
 # limitations under the License.
 # ============================================================================
 model=$1
-/usr/local/Ascend/atc/bin/atc \
+atc \
   --model=$model \
   --framework=1 \
   --output=../data/model/efficient_b3 \
   --insert_op_conf=./aipp_efficientnet.config \
-  --soc_version=Ascend310 \
-exit 0
+  --soc_version=Ascend310
