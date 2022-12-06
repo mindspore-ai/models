@@ -16,10 +16,10 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_standalone_train_ascend.sh PRE_TRAIN_DATASET"
+echo "bash run_standalone_train_ascend.sh PRE_TRAIN_DATASET DEVICE_ID"
 echo "for example:"
-echo "sh run_standalone_train_ascend.sh \
-  /home/workspace/dataset_menu/train.tok.clean.bpe.32000.en.mindrecord"
+echo "bash run_standalone_train_ascend.sh \
+  /home/workspace/dataset_menu/train.tok.clean.bpe.32000.en.mindrecord 0"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 
@@ -47,5 +47,6 @@ echo "config path is : ${config_path}"
 
 python train.py \
   --config_path=$config_path \
-  --pre_train_dataset=$PRE_TRAIN_DATASET > log_gnmt_network.log 2>&1 &
+  --pre_train_dataset=$PRE_TRAIN_DATASET \
+  --device_id=$2 > log_gnmt_network.log 2>&1 &
 cd ..

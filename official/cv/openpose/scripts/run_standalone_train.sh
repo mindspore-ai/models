@@ -14,13 +14,13 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 4 ]
+if [ $# != 5 ]
 then
-    echo "Usage: sh scripts/run_standalone_train.sh [IAMGEPATH_TRAIN] [JSONPATH_TRAIN] [MASKPATH_TRAIN] [VGG_PATH]"
+    echo "Usage: bash scripts/run_standalone_train.sh [IAMGEPATH_TRAIN] [JSONPATH_TRAIN] [MASKPATH_TRAIN] [VGG_PATH] [DEVICE_ID]"
 exit 1
 fi
 
-export DEVICE_ID=0
+export DEVICE_ID=$5
 export RANK_SIZE=1
 export RANK_ID=0
 rm -rf train

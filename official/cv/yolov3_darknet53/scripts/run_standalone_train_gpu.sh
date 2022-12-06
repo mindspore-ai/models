@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]
+if [ $# != 3 ]
 then
-    echo "Usage: sh run_standalone_train_gpu.sh [DATASET_PATH] [PRETRAINED_BACKBONE]"
+    echo "Usage: bash run_standalone_train_gpu.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [DEVICE_ID]"
 exit 1
 fi
 
@@ -46,7 +46,7 @@ exit 1
 fi
 
 export DEVICE_NUM=1
-export DEVICE_ID=0
+export CUDA_VISIBLE_DEVICES=$3
 export RANK_ID=0
 export RANK_SIZE=1
 
@@ -60,7 +60,7 @@ cp ../*.yaml ./train
 cp -r ../src ./train
 cp -r ../model_utils ./train
 cd ./train || exit
-echo "start training for device $DEVICE_ID"
+echo "start training for device $CUDA_VISIBLE_DEVICES"
 env > env.log
 
 python train.py \

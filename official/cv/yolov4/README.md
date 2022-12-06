@@ -118,7 +118,7 @@ other datasets need to use the same format as MS COCO.
       --lr_scheduler=cosine_annealing > log.txt 2>&1 &
 
   # standalone training example(1p) by shell script (Training with a single scale)
-  bash run_standalone_train.sh dataset/xxx cspdarknet53_backbone.ckpt
+  bash run_standalone_train.sh dataset/xxx cspdarknet53_backbone.ckpt 0
 
   # For Ascend device, distributed training example(8p) by shell script (Training with multi scale)
   bash run_distribute_train.sh dataset/xxx cspdarknet53_backbone.ckpt rank_table_8p.json
@@ -130,7 +130,7 @@ other datasets need to use the same format as MS COCO.
       --testing_shape=608 > log.txt 2>&1 &
 
   # run evaluation by shell script
-  bash run_eval.sh dataset/xxx checkpoint/xxx.ckpt
+  bash run_eval.sh dataset/xxx checkpoint/xxx.ckpt 0
   ```
 
 - Train on [ModelArts](https://support.huaweicloud.com/modelarts/)
@@ -341,7 +341,7 @@ Resnet50 is easy to get in mindspore model zoo.
 For Ascend device, standalone training example(1p) by shell script
 
 ```bash
-bash run_standalone_train.sh dataset/coco2017 cspdarknet53_backbone.ckpt
+bash run_standalone_train.sh dataset/coco2017 cspdarknet53_backbone.ckpt 0
 ```
 
 ```text
@@ -427,7 +427,7 @@ python eval.py \
     --pretrained=yolov4.ckpt \
     --testing_shape=608 > log.txt 2>&1 &
 OR
-bash run_eval.sh dataset/coco2017 checkpoint/yolov4.ckpt
+bash run_eval.sh dataset/coco2017 checkpoint/yolov4.ckpt 0
 ```
 
 The above python command will run in the background. You can view the results through the file "log.txt". The mAP of the test dataset will be as follows:
@@ -456,8 +456,8 @@ python test.py \
     --data_dir=./dataset/coco2017 \
     --pretrained=yolov4.ckpt \
     --testing_shape=608 > log.txt 2>&1 &
-OR
-bash run_test.sh dataset/coco2017 checkpoint/yolov4.ckpt
+ORDEVICE_ID
+bash run_test.sh dataset/coco2017 checkpoint/yolov4.ckpt 0
 ```
 
 The predict_xxx.json will be found in test/outputs/%Y-%m-%d_time_%H_%M_%S/.

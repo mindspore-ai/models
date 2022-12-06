@@ -160,7 +160,7 @@ The entire code structure is as following:
 
     ```bash
     cd ./scripts
-    bash run_standalone_train_gpu.sh [CONFIG_PATH]
+    bash run_standalone_train_gpu.sh [CONFIG_PATH] [DEVICE_ID]
     ```
 
 - Distribute mode (recommended)

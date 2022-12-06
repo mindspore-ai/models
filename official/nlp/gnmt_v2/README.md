@@ -80,7 +80,7 @@ After dataset preparation, you can start training and evaluation as follows:
     ```bash
     # run training example
     cd ./scripts
-    bash run_standalone_train_ascend.sh PRE_TRAIN_DATASET
+    bash run_standalone_train_ascend.sh PRE_TRAIN_DATASET DEVICE_ID
 
     # run distributed training example
     cd ./scripts
@@ -89,7 +89,7 @@ After dataset preparation, you can start training and evaluation as follows:
     # run evaluation example
     cd ./scripts
     bash run_standalone_eval_ascend.sh TEST_DATASET EXISTED_CKPT_PATH \
-      VOCAB_ADDR BPE_CODE_ADDR TEST_TARGET
+      VOCAB_ADDR BPE_CODE_ADDR TEST_TARGET DEVICE_ID
     ```
 
 - running on GPU
@@ -300,7 +300,7 @@ For more configuration details, please refer the script `./default_config.yaml` 
 
     ```bash
     cd ./scripts
-    bash run_standalone_train_ascend.sh PRE_TRAIN_DATASET
+    bash run_standalone_train_ascend.sh PRE_TRAIN_DATASET DEVICE_ID
     ```
 
     In this script, the `PRE_TRAIN_DATASET` is the dataset address.
@@ -356,7 +356,7 @@ For more configuration details, please refer the script `./default_config.yaml` 
     ```bash
     cd ./scripts
     bash run_standalone_eval_ascend.sh TEST_DATASET EXISTED_CKPT_PATH \
-      VOCAB_ADDR BPE_CODE_ADDR TEST_TARGET
+      VOCAB_ADDR BPE_CODE_ADDR TEST_TARGET DEVICE_ID
     ```
 
     The `TEST_DATASET` is the address of inference dataset, and `EXISTED_CKPT_PATH` is the path of the model file generated during training process.

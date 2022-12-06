@@ -136,7 +136,7 @@ The entire code structure is as following:
     GPU
 
     cd ./scripts
-    bash run_standalone_train_gpu.sh [TRAIN_LABEL_FILE]
+    bash run_standalone_train_gpu.sh [TRAIN_LABEL_FILE] [DEVICE_ID]
     ```
 
     ```bash
@@ -159,7 +159,7 @@ The entire code structure is as following:
     GPU
 
     cd ./scripts
-    bash run_standalone_train_gpu.sh [TRAIN_LABEL_FILE] [PRETRAINED_BACKBONE]
+    bash run_standalone_train_gpu.sh [TRAIN_LABEL_FILE] [DEVICE_ID] [PRETRAINED_BACKBONE]
     ```
 
     ```bash
@@ -333,7 +333,7 @@ sh run_eval.sh [EVAL_DIR] [USE_DEVICE_ID] [CKPT_DIR]
 GPU
 
 cd ./scripts
-sh run_eval_gpu.sh [EVAL_DIR] [CKPT_DIR]
+sh run_eval_gpu.sh [EVAL_DIR] [CKPT_DIR] [DEVICE_ID]
 ```
 
 ```bash

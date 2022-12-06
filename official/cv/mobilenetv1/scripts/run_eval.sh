@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 3 ]
+if [ $# != 4 ]
 then 
-    echo "Usage: sh run_eval.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH]"
+    echo "Usage: bash run_eval.sh [cifar10|imagenet2012] [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID]"
 exit 1
 fi
 
@@ -52,7 +52,7 @@ fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=0
+export DEVICE_ID=$4
 export RANK_SIZE=$DEVICE_NUM
 export RANK_ID=0
 

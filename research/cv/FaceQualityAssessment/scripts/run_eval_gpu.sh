@@ -14,14 +14,15 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -lt 2 ]
+if [ $# -lt 3 ]
 then
-  echo "Usage: bash run_eval_gpu.sh [EVALDATA_PATH] [CKPT_DIR]"
+  echo "Usage: bash run_eval_gpu.sh [EVALDATA_PATH] [CKPT_DIR] [DEVICE_ID]"
   exit 1
 fi
 
 BASEPATH=$(cd "`dirname $0`" || exit; pwd)
 export PYTHONPATH=${BASEPATH}:$PYTHONPATH
+export CUDA_VISIBLE_DEVICES=$3
 
 cd ..
 
