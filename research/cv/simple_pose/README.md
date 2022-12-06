@@ -150,7 +150,7 @@ In the example above, we put COCO2017 dataset in `../<ROOT>`.
     To train the model on GPU, run the shell script `scripts/run_standalone_train_gpu.sh` with the format below:
 
     ```shell
-    bash scripts/run_standalone_train_gpu.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+    bash scripts/run_standalone_train_gpu.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [DEVICE_ID]
     # example: bash scripts/run_standalone_train_gpu.sh ./ckpt/gpu_standalone/ 64 185 0
     ```
 
@@ -168,7 +168,7 @@ In the example above, we put COCO2017 dataset in `../<ROOT>`.
     Then, run the shell script `scripts/run_eval_gpu.sh` with the format below:
 
     ```shell
-    bash scripts/run_eval_gpu.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+    bash scripts/run_eval_gpu.sh [TEST_MODEL_FILE] [COCO_BBOX_FILE] [DEVICE_ID]
     # example: bash scripts/run_eval_gpu.sh ./ckpt/gpu_standalone/simplepose-185_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
     ```
 
@@ -368,7 +368,7 @@ The model checkpoint will be saved into `[CKPT_SAVE_DIR]`.
 Run `scripts/run_standalone_train_gpu.sh` to train the model standalone on GPU. The usage of the script is:
 
 ```shell
-bash scripts/run_standalone_train_gpu.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+bash scripts/run_standalone_train_gpu.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [DEVICE_ID]
 # example: bash scripts/run_standalone_train_gpu.sh ./ckpt/gpu_standalone/ 64 185 0
 ```
 

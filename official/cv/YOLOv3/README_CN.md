@@ -128,10 +128,10 @@ YOLOv3使用DarkNet53执行特征提取，这是YOLOv2中的Darknet-19和残差�
       --lr_scheduler=cosine_annealing > log.txt 2>&1 &
 
   # 对于Ascend设备，shell脚本单机训练示例(1卡)
-  bash run_standalone_train.sh dataset/coco2014 backbone_darknet53.ckpt
+  bash run_standalone_train.sh dataset/coco2014 backbone_darknet53.ckpt 0
 
   # 对于GPU设备，shell脚本单机训练示例(1卡)
-  bash run_standalone_train_gpu.sh dataset/coco2014 backbone_darknet53.ckpt
+  bash run_standalone_train_gpu.sh dataset/coco2014 backbone_darknet53.ckpt 0
 
   # 对于Ascend设备，使用shell脚本分布式训练示例(8卡)
   bash run_distribute_train.sh dataset/coco2014 backbone_darknet53.ckpt hccl_8p.json

@@ -178,7 +178,7 @@ YOLOv4需要CSPDarknet53主干来提取图像特征进行检测。 您可以从[
       --testing_shape=608 > log.txt 2>&1 &
 
   # 使用shell脚本评估
-  bash run_eval.sh dataset/xxx checkpoint/xxx.ckpt
+  bash run_eval.sh dataset/xxx checkpoint/xxx.ckpt 0
   ```
 
 - [ModelArts](https://support.huaweicloud.com/modelarts/)上训练
@@ -604,7 +604,7 @@ python eval.py \
     --pretrained=yolov4.ckpt \
     --testing_shape=608 > log.txt 2>&1 &
 OR
-bash run_eval.sh dataset/coco2017 checkpoint/yolov4.ckpt
+bash run_eval.sh dataset/coco2017 checkpoint/yolov4.ckpt 0
 ```
 
 上述python命令将在后台运行。 您可以通过log.txt文件查看结果。 测试数据集的mAP如下：
@@ -636,7 +636,7 @@ python test.py \
     --pretrained=yolov4.ckpt \
     --testing_shape=608 > log.txt 2>&1 &
 OR
-bash run_test.sh dataset/coco2017 checkpoint/yolov4.ckpt
+bash run_test.sh dataset/coco2017 checkpoint/yolov4.ckpt 0
 ```
 
 predict_xxx.json文件位于test/outputs/%Y-%m-%d_time_%H_%M_%S/。

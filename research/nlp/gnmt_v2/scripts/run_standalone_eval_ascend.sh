@@ -16,15 +16,16 @@
 
 echo "=============================================================================================================="
 echo "Please run the script as: "
-echo "sh run_standalone_eval_ascend.sh TEST_DATASET EXISTED_CKPT_PATH \
-  VOCAB_ADDR BPE_CODE_ADDR TEST_TARGET"
+echo "bash run_standalone_eval_ascend.sh TEST_DATASET EXISTED_CKPT_PATH \
+  VOCAB_ADDR BPE_CODE_ADDR TEST_TARGET DEVICE_ID"
 echo "for example:"
-echo "sh run_standalone_eval_ascend.sh \
+echo "bash run_standalone_eval_ascend.sh \
   /home/workspace/dataset_menu/newstest2014.en.mindrecord \
   /home/workspace/gnmt_v2/gnmt-6_3452.ckpt \
   /home/workspace/wmt16_de_en/vocab.bpe.32000 \
   /home/workspace/wmt16_de_en/bpe.32000 \
-  /home/workspace/wmt16_de_en/newstest2014.de"
+  /home/workspace/wmt16_de_en/newstest2014.de \
+  0"
 echo "It is better to use absolute path."
 echo "=============================================================================================================="
 
@@ -62,5 +63,6 @@ python eval.py \
   --existed_ckpt=$EXISTED_CKPT_PATH \
   --vocab=$VOCAB_ADDR \
   --bpe_codes=$BPE_CODE_ADDR \
-  --test_tgt=$TEST_TARGET >log_infer.log 2>&1 &
+  --test_tgt=$TEST_TARGET \
+  --device_id=$6 >log_infer.log 2>&1 &
 cd ..

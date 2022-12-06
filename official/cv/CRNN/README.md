@@ -84,10 +84,10 @@ We provide `convert_ic03.py`, `convert_iiit5k.py`, `convert_svt.py` as exmples f
         $ bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] Ascend [RANK_TABLE_FILE]
 
         # evaluation example in Ascend
-        $ bash scripts/run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] Ascend
+        $ bash scripts/run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID] Ascend
 
         # standalone training example in Ascend
-        $ bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] Ascend
+        $ bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [DEVICE_ID] Ascend
 
         # offline inference on Ascend310
         $ bash scripts/run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE_PATH] [DATASET] [DEVICE_ID]
@@ -101,10 +101,10 @@ We provide `convert_ic03.py`, `convert_iiit5k.py`, `convert_svt.py` as exmples f
         $ bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] GPU
 
         # evaluation example in GPU
-        $ bash scripts/run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] GPU
+        $ bash scripts/run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID] GPU
 
         # standalone training example in GPU
-        $ bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] GPU
+        $ bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [DEVICE_ID] GPU
         ```
 
     - Running on CPU
@@ -192,7 +192,7 @@ crnn
 Usage: bash scripts/run_distribute_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM] [RANK_TABLE_FILE](if Ascend)
 
 # standalone training in Ascend or GPU
-Usage: bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM]
+Usage: bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [DEVICE_ID] [PLATFORM]
 
 # standalone training in CPU
 Usage: bash scripts/run_standalone_train_cpu.sh [DATASET_NAME] [DATASET_PATH]
@@ -244,7 +244,7 @@ Parameters for both training and evaluation can be set in default_config.yaml.
 - Run `run_standalone_train.sh` for non-distributed training of CRNN model, support Ascend and GPU now.
 
     ``` bash
-    bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM](optional)
+    bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [DEVICE_ID] [PLATFORM](optional)
     ```
 
 - Or run `run_standalone_train_cpu.sh` for non-distributed training of CRNN model in CPU.
@@ -328,7 +328,7 @@ Parameters for both training and evaluation can be set in default_config.yaml.
 - Run `run_eval.sh` for evaluation.
 
     ``` bash
-    bash scripts/run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] [PLATFORM](optional)
+    bash scripts/run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID] [PLATFORM](optional)
 
     bash scripts/run_eval_cpu.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH]
     ```
