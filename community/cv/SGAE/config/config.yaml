@@ -1,0 +1,32 @@
+#data
+data_name: attack
+data_path: ./data
+inject_noise: True
+cont_rate: 0.01
+anomal_rate: default
+
+#trian
+out_dir: ./results/
+epochs: 50
+lr: 0.0001
+early_stop: False
+batch_size: 1024
+run_num: 1
+seed: 42
+np_seed: 25
+stop_train: 0.5
+verbose: True
+print_step: 5
+
+#eval
+run_idx: 0
+
+#model
+lam_out: 5
+lam_dist: 0.005
+a: 5
+epsilon: 93
+model_name: SG-AE
+hidden_dim: auto
+ms_mode: GRAPH
+device: CPU
