@@ -257,7 +257,7 @@ def run_train():
         input_val_shape = Tensor(tuple(config.test_img_shape), mindspore.float32)
         # init detection engine
         eval_dataset, eval_data_size = create_yolo_dataset(data_val_root, ann_val_file, is_training=False,
-                                                           batch_size=1, max_epoch=1, device_num=1,
+                                                           batch_size=config.per_batch_size, max_epoch=1, device_num=1,
                                                            rank=0, shuffle=False, default_config=config)
         eval_param_dict = {"net": network_eval, "dataset": eval_dataset, "data_size": eval_data_size,
                            "anno_json": ann_val_file, "input_shape": input_val_shape, "args": config}

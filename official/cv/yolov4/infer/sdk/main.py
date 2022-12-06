@@ -14,6 +14,7 @@
 # ============================================================================
 import json
 import os
+import sys
 from StreamManagerApi import StreamManagerApi, MxDataInput
 
 
