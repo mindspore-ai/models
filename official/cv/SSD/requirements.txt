@@ -6,4 +6,4 @@ Pillow
 numpy
 pyyaml
 onnxruntime-gpu
-
+requests

@@ -62,6 +62,15 @@ SSD方法基于前向卷积网络，该网络产生固定大小的边界框集�
 
 - 下载数据集COCO2017。
 
+    `scripts`中提供了自动下载COCO2017的脚本`run_download_dataset.sh`，可使用此脚本自动下载并解压数据集。
+    目前仅支持COCO2017数据集自动下载。
+
+```shell script
+bash run_download_dataset.sh [DATASET] [CONFIG_FILE]
+# 例如：
+bash run_download_dataset.sh coco config/ssd_resnet50_fpn_config.yaml
+```
+
 - 本示例默认使用COCO2017作为训练数据集，您也可以使用自己的数据集。
 
     1. 如果使用coco数据集。**执行脚本时选择数据集coco。**
@@ -178,8 +187,10 @@ bash run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID] [CONFIG_PATH]
       ├─ docker start.sh              ## 容器启动脚本
       ├─ run_distribute_train.sh      ## Ascend分布式shell脚本
       ├─ run_distribute_train_gpu.sh  ## GPU分布式shell脚本
+      ├─ run_download_dataset.sh      ## 下载数据集shell脚本
       ├─ run_eval.sh                  ## Ascend评估shell脚本
       ├─ run_eval_gpu.sh              ## GPU评估shell脚本
+      ├─ run_export.sh                ## MINDIR、AIR、ONNX导出脚本
       └─ run_infer_310.sh             ## 310推理脚本
     ├─ src
       ├─ __init__.py                      ## 初始化文件
@@ -211,6 +222,7 @@ bash run_eval_gpu.sh [DATASET] [CHECKPOINT_PATH] [DEVICE_ID] [CONFIG_PATH]
         ├─ ssd_vgg16_config_gpu.yaml ## GPU参数配置
         ├─ ssd300_config_gpu.yaml ## GPU参数配置
     ├─ Dockerfile                         ## docker文件
+    ├─ download_dataset.py                ## 下载数据集脚本
     ├─ eval.py                            ## 评估脚本
     ├─ export.py                          ## 导出 AIR,MINDIR模型的脚本
     ├─ postprocess.py                     ## 310推理后处理脚本
@@ -437,6 +449,12 @@ python export.py --checkpoint_file_path /path/to/ssd.ckpt --file_name /path/to/s
 
 参数ckpt_file为必填项，
 `FILE_FORMAT` 必须在 ["AIR", "MINDIR", "ONNX"]中选择。
+
+也可使用`scripts`中的shell脚本进行导出，仅需给出配置脚本路径和导出类型即可。导出类型可选`AIR`/`MINDIR`/`ONNX`。
+
+```shell
+bash run_export.sh [CONFIG_FILE_PATH] [FILE_FORMAT]
+```
 
 ModelArts导出mindir
 
