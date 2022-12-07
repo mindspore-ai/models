@@ -96,7 +96,7 @@ def load_model(args_opt):
                                                   model_parallel=model_parallel_num,
                                                   pipeline_stage=args_opt.stage_num,
                                                   micro_batch_num=args_opt.micro_size,
-                                                  recompute=True)
+                                                  recompute=False)
 
     per_batch_size = args_opt.per_batch_size
     batch_size = per_batch_size * data_parallel_num

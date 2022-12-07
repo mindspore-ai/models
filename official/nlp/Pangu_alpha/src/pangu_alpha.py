@@ -491,13 +491,14 @@ class PanGUAlphaLossWithPrompt(Cell):
         self.log_softmax = P.LogSoftmax().shard(((1, 1),))
         self.get_attention_mask = AttentionMask(config.seq_length)
         self.equal = P.Equal()
+        self.expand = P.ExpandDims()
 
     def construct(self, input_ids, prompt_ids):
         r"""Forward process of the pangu alpha model"""
         tokens = input_ids
         input_mask = F.cast(self.not_equal(tokens, self.pad_token), mstype.float32)
         input_position = F.tuple_to_array(F.make_range(self.len))
-        input_position = P.Tile()(input_position, (self.batch_size, 1))
+        input_position = P.Tile()(self.expand(input_position, 0), (self.batch_size, 1))
 
         input_mask_a = F.cast(self.equal(prompt_ids, self.pad_token), mstype.float32)
         attention_mask = self.get_attention_mask(input_mask)
