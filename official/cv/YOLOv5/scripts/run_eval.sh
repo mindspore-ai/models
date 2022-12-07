@@ -58,6 +58,7 @@ cp ../*.py ./eval
 cp ../*.yaml ./eval
 cp -r ../src ./eval
 cp -r ../model_utils ./eval
+cp -r ../third_party ./eval
 cd ./eval || exit
 env > env.log
 echo "start inferring for device $DEVICE_ID"

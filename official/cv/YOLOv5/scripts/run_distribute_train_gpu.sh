@@ -48,6 +48,7 @@ cp ../*.py ./distribute_train
 cp ../*.yaml ./distribute_train
 cp -r ../src ./distribute_train
 cp -r ../model_utils ./distribute_train
+cp -r ../third_party ./distribute_train
 cd ./distribute_train || exit
 
 mpirun --allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \

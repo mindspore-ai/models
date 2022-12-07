@@ -94,9 +94,8 @@ def run_eval():
 
     config.logger.info('Calculating mAP...')
     detection.do_nms_for_results()
-    result_file_path = detection.write_result()
-    config.logger.info('result file path: %s', result_file_path)
-    eval_result = detection.get_eval_result()
+    detection.write_result()
+    eval_result, _ = detection.get_eval_result()
 
     cost_time = time.time() - start_time
     eval_log_string = '\n=============coco eval result=========\n' + eval_result

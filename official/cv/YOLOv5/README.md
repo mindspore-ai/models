@@ -97,6 +97,7 @@ Note the default_config.yaml is the default parameters for yolov5s on 8p. The `b
         ├── README.md                          // descriptions about yolov5
         ├── scripts
         │   ├──docker_start.sh                 // shell script for docker start
+        |   ├──run_distribute_eval.sh          // launch distributed evaluation in ascend
         │   ├──run_distribute_train.sh         // launch distributed training(8p) in ascend
         │   ├──run_distribute_train_gpu.sh     // launch distributed training(8p) in GPU
         │   ├──run_standalone_train.sh         // launch 1p training
@@ -161,6 +162,9 @@ optional arguments:
   --resize_rate         Resize rate for multi-scale training. Default: 10
   --bind_cpu            Whether bind cpu when distributed training. Default: True
   --device_num          Device numbers per server. Default: 8
+  --save_ckpt_interval  Epoch interval to save checkpoint. Default: 1
+  --save_ckpt_max_num   Max number of checkpoints to save. If the number of saved checkpoints is larger than this value,
+                        the oldest chekpoint would be removed. Default: 10
 ```
 
 ## [Training Process](#contents)
@@ -279,6 +283,16 @@ Average Recall (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.395
 Average Recall (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.619
 Average Recall (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.677
 2020-12-21 17:16:40,322:INFO:testing cost time 0.35h
+```
+
+### Distributed Evaluation
+
+The script `run_distribute_eval.sh` in `scripts` folder can be used to do evaluation in parallel.
+
+The following is an usage example:
+
+```bash
+bash run_distribute_eval.sh /path/to/dataset /path/to/hccl_config.json
 ```
 
 ## Inference Process

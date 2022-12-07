@@ -66,6 +66,7 @@ do
     cp ../*.yaml ./train_parallel$i
     cp -r ../src ./train_parallel$i
     cp -r ../model_utils ./train_parallel$i
+    cp -r ../third_party ./train_parallel$i
     cd ./train_parallel$i || exit
     echo "start training for rank $RANK_ID, device $DEVICE_ID"
     env > env.log

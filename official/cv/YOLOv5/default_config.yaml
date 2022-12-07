@@ -23,7 +23,7 @@ resume_yolov5: ""
 pretrained_checkpoint: ""
 output_dir: "./output"
 train_img_dir: "train2017"
-train_json_file: "annotations/instances_train2017.json"
+train_ann_file: "annotations/instances_train2017.json"
 
 lr_scheduler: "cosine_annealing"
 lr: 0.01
@@ -48,6 +48,8 @@ group_size: 1
 need_profiler: 0
 resize_rate: 10
 filter_weight: False
+save_ckpt_interval: 1
+save_ckpt_max_num: 10
 
 # Eval options
 pretrained: ""
@@ -58,6 +60,14 @@ ignore_threshold: 0.7
 test_ignore_threshold: 0.001
 multi_label: True
 multi_label_thresh: 0.1
+
+save_prefix: "../eval_parallel"
+run_eval: True
+eval_epoch_interval: 10
+eval_start_epoch: 100
+eval_parallel: True
+val_img_dir: "val2017"
+val_ann_file: "annotations/instances_val2017.json"
 
 # Export options
 device_id: 0
@@ -159,11 +169,20 @@ each_multiscale: "Apply multi-scale for each scale"
 labels: "the label of train data"
 multi_label: "use multi label to nms"
 multi_label_thresh: "multi label thresh"
+train_img_dir: "relative path of training image directory to data_dir"
+train_ann_file: "relative path of training annotation file to data_dir"
 
 # Eval options
 pretrained: "model_path, local pretrained model to load"
 log_path: "checkpoint save location"
-ann_val_file: "path to annotation"
+save_prefix: "../eval_parallel"
+run_eval: "Whether enable validation after a training epoch"
+eval_epoch_interval: "Epoch interval to do validation"
+eval_start_epoch: "After which epoch, start to do validatation"
+eval_parallel: "Whether enable parallel evaluation to accelerate the validataion process"
+val_img_dir: "relative path of validation image directory to data_dir"
+val_ann_file: "relative path of validataion annotation file to data_dir"
+
 
 # Export options
 device_id: "Device id for export"
