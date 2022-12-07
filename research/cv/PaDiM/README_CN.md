@@ -213,7 +213,13 @@ python src/pthtockpt.py --pth_path ./models/wide_resnet50_2/wide_resnet50_2-95fa
 将checkpoint文件导出成mindir格式模型。
 
 ```shell
-python export.py --device_id 0 --ckpt_file eg./models/wide_resnet50_2/wide_resnet50_2.ckpt
+python export.py --device_id 0 --ckpt_file eg./models/wide_resnet50_2/wide_resnet50_2.ckpt --file_format MINDIR --device_target Ascend
+```
+
+将checkpoint文件导出成onnx格式模型。
+
+```shell
+python export.py --device_id 0 --ckpt_file eg./models/wide_resnet50_2/wide_resnet50_2.ckpt --file_format ONNX --device_target GPU
 ```
 
 ## 推理过程
@@ -241,6 +247,28 @@ python export.py --device_id 0 --ckpt_file eg./models/wide_resnet50_2/wide_resne
   ```
 
   推理的精度结果保存在acc_[CLASS_NAME].log日志文件中。
+
+在运行推理之前我们需要先导出模型。ONNX可以在任意环境上导出。
+
+- 在昇腾910/RTX3090上使用MVTec AD数据集进行推理
+
+  执行推理的命令如下所示, 其中``ONNX_PATH``是ONNX文件路径；
+
+  ``DATASET_PATH``是推理数据集路径, 为数据类(如bottle)的父级目录；
+
+  ``DEVICE_ID``可选，默认值为0；
+
+  ``SAVA_PATH``是训练结果保存路径；
+
+  在script路径下执行如下命令；
+
+  ```shell
+  # inference
+  bash run_all_mvtec_onnx.sh [DATASET_PATH] [ONNX_PATH] [SAVA_PATH] [DEVICE_ID]
+  # 例：bash run_all_mvtec_onnx.sh eg./data/mvtec_anomaly_detection/ eg./PaDiM.onnx eg./data/mvtec_result/ 0
+  ```
+
+  推理的精度结果保存在[CLASS_NAME]_eval文件夹中的eval.log中。
 
 # 模型描述
 
