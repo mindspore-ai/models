@@ -171,8 +171,8 @@ def random_split_trans2h5(in_file_path, output_path, recommendation_dataset_stat
 
     train_feature_file_name = os.path.join(output_path, "train_input_part_{}.h5")
     train_label_file_name = os.path.join(output_path, "train_output_part_{}.h5")
-    eval_feature_file_name = os.path.join(output_path, "eval_input_part_{}.h5")
-    eval_label_file_name = os.path.join(output_path, "eval_input_part_{}.h5")
+    eval_feature_file_name = os.path.join(output_path, "test_input_part_{}.h5")
+    eval_label_file_name = os.path.join(output_path, "test_input_part_{}.h5")
     train_feature_list = []
     train_label_list = []
     eval_feature_list = []

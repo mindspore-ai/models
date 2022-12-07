@@ -185,12 +185,12 @@ def random_split_trans2mindrecord(input_file_path, output_file_path, recommendat
     label_list = []
 
     writer_train = FileWriter(os.path.join(output_file_path, "train_input_part.mindrecord"), 21)
-    writer_eval = FileWriter(os.path.join(output_file_path, "eval_input_part.mindrecord"), 3)
+    writer_eval = FileWriter(os.path.join(output_file_path, "test_input_part.mindrecord"), 3)
 
     schema = {"label": {"type": "float32", "shape": [-1]}, "feat_vals": {"type": "float32", "shape": [-1]},
               "feat_ids": {"type": "int32", "shape": [-1]}}
     writer_train.add_schema(schema, "CRITEO_TRAIN")
-    writer_eval.add_schema(schema, "CRITEO_EVAL")
+    writer_eval.add_schema(schema, "CRITEO_TEST")
 
     with open(input_file_path, encoding="utf-8") as file_in:
         items_error_size_lineCount = []

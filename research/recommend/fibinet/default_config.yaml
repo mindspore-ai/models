@@ -45,7 +45,7 @@ bilinear_type: "all"  #bilinear_type: ['all', 'each', 'interaction']
 # ==============================================================================
 # fibinet export
 device_id: 0
-ckpt_file: "./ckpt/fibinet_train-10_41265.ckpt"
+ckpt_file: "./ckpt/fibinet_train-10_41322.ckpt"
 file_name: "fibinet"
 file_format: "MINDIR"
 
