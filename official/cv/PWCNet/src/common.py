@@ -34,8 +34,11 @@ def numpy2tensor(array):
 
 def read_flo_as_float32(filename):
     with open(filename, 'rb') as file:
-        w = np.fromfile(file, np.int32, count=1)[0]
-        h = np.fromfile(file, np.int32, count=1)[0]
-        data = np.fromfile(file, np.float32, count=2*h*w)
-    data2D = np.resize(data, (h, w, 2))
-    return data2D
+        magic = float(np.fromfile(file, np.float32, count=1)[0])
+        if magic == 202021.25:
+            w = np.fromfile(file, np.int32, count=1)[0]
+            h = np.fromfile(file, np.int32, count=1)[0]
+            data = np.fromfile(file, np.float32, count=2*h*w)
+            data2D = np.resize(data, (h, w, 2))
+            return data2D
+        return None
