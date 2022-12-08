@@ -438,6 +438,77 @@ Inference result is saved in current path, you can find result like this in acc.
 'Accuracy': 0.71654
 ```
 
+# Apply algorithm in MindSpore Golden Stick
+
+MindSpore Golden Stick is a compression algorithm set for MindSpore. We usually apply algorithm in Golden Stick before training for smaller model size, lower power consuming or faster inference process. MindSpore Golden Stick provides SimQAT algorithm for Mobilenetv2. SimQAT is a quantization-aware training algorithm that trains the quantization parameters of certain layers in the network by introducing fake-quantization nodes, so that the model can perform inference with less power consumption or higher performance during the deployment phase.
+
+## Training Process
+
+### Running on GPU
+
+```text
+# distributed training
+cd ./golden_stick/scripts/
+# PYTHON_PATH represents path to directory of 'train.py'.
+bash run_distribute_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DEVICE_NUM] [DATASET_PATH] [CKPT_TYPE](optional) [CKPT_PATH](optional)
+
+# distributed training example, apply SimQAT and train from beginning
+cd ./golden_stick/scripts/
+bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/ 4 mobilenetv2_cifar10_config.yaml /path/to/dataset
+
+# distributed training example, apply SimQAT and train from full precision checkpoint
+cd ./golden_stick/scripts/
+bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/ 4 mobilenetv2_cifar10_config.yaml /path/to/dataset FP32 /path/to/fp32_ckpt
+
+# distributed training example, apply SimQAT and train from pretrained checkpoint
+cd ./golden_stick/scripts/
+bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/ 4 mobilenetv2_cifar10_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt
+
+# standalone training
+cd ./golden_stick/scripts/
+# PYTHON_PATH represents path to directory of 'train.py'.
+bash run_standalone_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CKPT_TYPE](optional) [CKPT_PATH](optional)
+
+# standalone training example, apply SimQAT and train from beginning
+cd ./golden_stick/scripts/
+bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/mobilenetv2_cifar10_config.yaml /path/to/dataset
+
+# standalone training example, apply SimQAT and train from full precision checkpoint
+cd ./golden_stick/scripts/
+bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/mobilenetv2_cifar10_config.yaml /path/to/dataset FP32 /path/to/fp32_ckpt
+
+# standalone training example, apply SimQAT and train from pretrained checkpoint
+cd ./golden_stick/scripts/
+bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/mobilenetv2_cifar10_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt
+```
+
+## Evaluation Process
+
+### Running on GPU
+
+```text
+# evaluation
+cd ./golden_stick/scripts/
+# PYTHON_PATH represents path to directory of 'eval.py'.
+bash run_eval_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CHECKPOINT_PATH]
+```
+
+```text
+# evaluation example
+cd ./golden_stick/scripts/
+bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/mobilenetv2_cifar10_config.yaml /path/to/dataset /path/to/ckpt
+```
+
+### Result
+
+Evaluation result will be stored in the example path, whose folder name is "eval". Under this, you can find result like the following in log.
+
+- Apply SimQAT on Mobilenetv2, and evaluating with CIFAR-10 dataset:
+
+```text
+result:{'accuracy': 0.9356, ckpt=~/mobilenetv2/train_parallel0/mobilenetv2-200_166.ckpt}
+```
+
 # [Model description](#contents)
 
 ## [Performance](#contents)

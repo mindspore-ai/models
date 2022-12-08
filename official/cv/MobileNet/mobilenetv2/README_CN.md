@@ -403,6 +403,79 @@ bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_PATH] [DVPP] [DEVICE_ID]
 'Accuracy':0.71654
 ```
 
+# 应用MindSpore Golden Stick模型压缩算法
+
+MindSpore Golden Stick是MindSpore的模型压缩算法集，我们可以在模型训练前应用MindSpore Golden Stick中的模型压缩算法，从而达到压缩模型大小、降低模型推理功耗，或者加速推理过程的目的。
+
+针对Mobilenetv2，MindSpore Golden Stick提供了SimQAT算法，SimQAT是量化感知训练算法，通过引入伪量化节点来训练网络中的某些层的量化参数，从而在部署阶段，模型得以以更小的功耗或者更高的性能进行推理。
+
+## 训练过程
+
+### GPU处理器环境运行
+
+```text
+# 分布式训练
+cd ./golden_stick/scripts/
+# PYTHON_PATH 表示需要应用的算法的'train.py'脚本所在的目录。
+bash run_distribute_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DEVICE_NUM] [DATASET_PATH] [CKPT_TYPE](optional) [CKPT_PATH](optional)
+
+# 分布式训练示例（应用SimQAT算法并从头开始量化训练）
+cd ./golden_stick/scripts/
+bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/ 4 mobilenetv2_cifar10_config.yaml /path/to/dataset
+
+# 分布式训练示例（应用SimQAT算法并加载预训练的全精度checkpoint，进行量化训练）
+cd ./golden_stick/scripts/
+bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/ 4 mobilenetv2_cifar10_config.yaml /path/to/dataset FP32 /path/to/fp32_ckpt
+
+# 分布式训练示例（应用SimQAT算法并加载之前训练的checkpoint，继续进行量化训练）
+cd ./golden_stick/scripts/
+bash run_distribute_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/ 4 mobilenetv2_cifar10_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt
+
+# 单机训练
+cd ./golden_stick/scripts/
+# PYTHON_PATH 表示需要应用的算法的'train.py'脚本所在的目录。
+bash run_standalone_train_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CKPT_TYPE](optional) [CKPT_PATH](optional)
+
+# 单机训练示例（应用SimQAT算法并从头开始量化训练）
+cd ./golden_stick/scripts/
+bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/mobilenetv2_cifar10_config.yaml /path/to/dataset
+
+# 单机训练示例（应用SimQAT算法并加载预训练的全精度checkpoint，并进行量化训练）
+cd ./golden_stick/scripts/
+bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/mobilenetv2_cifar10_config.yaml /path/to/dataset FP32 /path/to/fp32_ckpt
+
+# 单机训练示例（应用SimQAT算法并加载上次量化训练的checkpoint，继续进行量化训练）
+cd ./golden_stick/scripts/
+bash run_standalone_train_gpu.sh ../quantization/simqat/ ../quantization/simqat/mobilenetv2_cifar10_config.yaml /path/to/dataset PRETRAINED /path/to/pretrained_ckpt
+```
+
+## 评估过程
+
+### GPU处理器环境运行
+
+```text
+# 评估
+cd ./golden_stick/scripts/
+# PYTHON_PATH 表示需要应用的算法的'eval.py'脚本所在的目录。
+bash run_eval_gpu.sh [PYTHON_PATH] [CONFIG_FILE] [DATASET_PATH] [CHECKPOINT_PATH]
+```
+
+```text
+# 评估示例
+cd ./golden_stick/scripts/
+bash run_eval_gpu.sh ../quantization/simqat/ ../quantization/simqat/mobilenetv2_cifar10_config.yaml /path/to/dataset /path/to/ckpt
+```
+
+### 结果
+
+评估结果保存在示例路径中，文件夹名为“eval”。您可在此路径下的日志找到如下结果：
+
+- 使用SimQAT算法量化mobilenetv2，并使用CIFAR-10数据集评估：
+
+```text
+result:{'accuracy': 0.9356, ckpt=~/mobilenetv2/train_parallel0/mobilenetv2-200_166.ckpt}
+```
+
 # 模型描述
 
 ## 性能
