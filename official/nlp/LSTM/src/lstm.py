@@ -30,6 +30,7 @@ class SentimentNet(nn.Cell):
                  weight,
                  batch_size):
         super(SentimentNet, self).__init__()
+        self.bidirectional = bidirectional
         # Mapp words to vectors
         self.embedding = nn.Embedding(vocab_size,
                                       embed_size,
@@ -47,7 +48,7 @@ class SentimentNet(nn.Cell):
 
         self.concat = P.Concat(1)
         self.squeeze = P.Squeeze(axis=0)
-        if bidirectional:
+        if self.bidirectional:
             self.decoder = nn.Dense(num_hiddens * 4, num_classes)
         else:
             self.decoder = nn.Dense(num_hiddens * 2, num_classes)
