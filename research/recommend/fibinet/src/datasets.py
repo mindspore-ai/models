@@ -47,7 +47,7 @@ class H5Dataset():
             self._file_prefix = 'train'
             self._num_of_parts = train_num_of_parts
         else:
-            self._file_prefix = 'eval'
+            self._file_prefix = 'test'
             self._num_of_parts = eval_num_of_parts
 
         self.data_size = self._bin_count(self._hdf_data_dir, self._file_prefix,
@@ -199,7 +199,7 @@ def _get_tf_dataset(data_dir, train_mode=True, batch_size=1000,
     get_tf_dataset
     """
     dataset_files = []
-    file_prefix_name = 'train' if train_mode else 'eval'
+    file_prefix_name = 'train' if train_mode else 'test'
     shuffle = train_mode
     for (dirpath, _, filenames) in os.walk(data_dir):
         for filename in filenames:
@@ -243,7 +243,7 @@ def _get_mindrecord_dataset(directory, train_mode=True, batch_size=1000,
     Returns:
         Dataset.
     """
-    file_prefix_name = 'train_input_part.mindrecord' if train_mode else 'eval_input_part.mindrecord'
+    file_prefix_name = 'train_input_part.mindrecord' if train_mode else 'test_input_part.mindrecord'
     file_suffix_name = '00' if train_mode else '0'
     shuffle = train_mode
 
