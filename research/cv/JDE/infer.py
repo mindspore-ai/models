@@ -21,7 +21,7 @@ from mindspore import Model
 from mindspore import context
 from mindspore.train.serialization import load_checkpoint
 
-from cfg.config import config as default_config
+from model_utils.config import config as default_config
 from eval import eval_seq
 from src.darknet import DarkNet, ResidualBlock
 from src.dataset import LoadVideo
@@ -94,7 +94,7 @@ def track(opt):
 if __name__ == '__main__':
     config = default_config
 
-    context.set_context(mode=context.GRAPH_MODE, device_target='GPU')
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
     context.set_context(device_id=config.device_id)
 
     track(config)

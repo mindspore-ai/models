@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+# This file was copied from project [tutu96177][FairMOT]
 """Checkpoint import."""
 from pathlib import Path
 
@@ -21,7 +22,7 @@ from mindspore import Tensor
 from mindspore import dtype as mstype
 from mindspore import save_checkpoint
 
-from cfg.config import config
+from model_utils.config import config
 from src.darknet import DarkNet
 from src.darknet import ResidualBlock
 

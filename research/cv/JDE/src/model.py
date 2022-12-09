@@ -13,20 +13,23 @@
 # limitations under the License.
 # ============================================================================
 """YOLOv3 based on DarkNet."""
+
 import math
 
 import mindspore as ms
 import mindspore.numpy as msnp
 from mindspore import nn
 from mindspore import ops
+from mindspore import dtype as mstype
 from mindspore.ops import constexpr
 from mindspore.ops import operations as P
 
-from cfg.config import config as default_config
+from model_utils.config import config as default_config
+
+from src.initializer import init_cov, init_bn, init_dense
 from src.utils import DecodeDeltaMap
 from src.utils import SoftmaxCE
 from src.utils import create_anchors_vec
-
 
 def _conv_bn_relu(
         in_channel,
@@ -58,7 +61,9 @@ def _conv_bn_relu(
             nn.LeakyReLU(alpha),
         ]
     )
-
+    if default_config.device_target == "Ascend":
+        init_cov(dbl[0])
+        init_bn(dbl[1])
     return dbl
 
 
@@ -197,8 +202,8 @@ class YOLOv3(nn.Cell):
             out_channels=out_channel,  # 24
         )
         self.concat = P.Concat(axis=1)
-
-        self.freeze_bn()
+        if default_config.device_target == "GPU":
+            self.freeze_bn()
 
     def freeze_bn(self):
         """Freeze batch norms."""
@@ -206,6 +211,7 @@ class YOLOv3(nn.Cell):
             if isinstance(cell, nn.BatchNorm2d):
                 cell.beta.requires_grad = False
                 cell.gamma.requires_grad = False
+
 
     def construct(self, x):
         """
@@ -296,14 +302,21 @@ class YOLOLayer(nn.Cell):
         # Get detections and embeddings from model concatenated output.
         p, p_emb = p_cat[:, :24, ...], p_cat[:, 24:, ...]
         nb, ngh, ngw = p.shape[0], p.shape[-2], p.shape[-1]
-
-        p = p.view(nb, self.na, self.nc + 5, ngh, ngw).transpose(0, 1, 3, 4, 2)  # prediction
-        p_emb = p_emb.transpose(0, 2, 3, 1)
-        p_box = p[..., :4]
-        p_conf = p[..., 4:6].transpose(0, 4, 1, 2, 3)
-
+        if default_config.device_target == "Ascend":
+            p = p.view(nb, self.na, self.nc + 5, ngh, ngw)
+            p = p.transpose(0, 1, 3, 2, 4).transpose(0, 1, 2, 4, 3)  # prediction
+            p_emb = p_emb.transpose(0, 2, 1, 3).transpose(0, 1, 3, 2)
+            p_box = p[..., :4]
+            p_conf = p[..., 4:6].transpose(0, 1, 2, 4, 3).transpose(0, 1, 3, 2, 4).transpose(0, 2, 1, 3, 4)
+            p_conf = p_conf.transpose(0, 2, 1, 3, 4).transpose(0, 1, 3, 2, 4).transpose(0, 1, 2, 4, 3)
+            lconf = self.softmax_loss(p_conf, tconf, ignore_index=-1)
+        elif default_config.device_target == "GPU":
+            p = p.view(nb, self.na, self.nc + 5, ngh, ngw).transpose(0, 1, 3, 4, 2)  # prediction
+            p_emb = p_emb.transpose(0, 2, 3, 1)
+            p_box = p[..., :4]
+            p_conf = p[..., 4:6].transpose(0, 4, 1, 2, 3)
+            lconf = self.softmax_loss(p_conf.transpose(0, 2, 3, 4, 1), tconf, ignore_index=-1)
         mask = (tconf > 0).astype('float32')
-
         # Compute losses
         nm = self.reduce_sum(mask)  # number of anchors (assigned to targets)
         p_box = p_box * self.expand_dims(mask, -1)
@@ -311,45 +324,46 @@ class YOLOLayer(nn.Cell):
         lbox = self.smooth_l1_loss(p_box, tbox)
         lbox = lbox * self.expand_dims(mask, -1)
         lbox = self.reduce_sum(lbox) / (nm * 4 + self.eps)
-
-        lconf = self.softmax_loss(p_conf.transpose(0, 2, 3, 4, 1), tconf, ignore_index=-1)
-
         # Construct indices for selecting embeddings
         # from the flattened view of the model output
         # (corresponding to the embeddings prediction).
         #
         # Set flattened mask to existing detections
         # and apply it to flattened indices to nullify if it is no detection.
-        emb_indices_batch_stride = emb_indices + batch_index(nb) * ngh * ngw  # Shape (nb, k_max)
-        emb_indices_mask_flat = (emb_indices.reshape(-1) > 0).astype('float32')  # Shape (nb x k_max)
+        if default_config.device_target == "Ascend":
+            add = ops.Add()
+            emb_indices_batch_stride = emb_indices + batch_index(nb) * ngh * ngw  # Shape (nb, k_max)
+            binb = batch_index(nb)
+            rpbinb = ops.repeat_elements(binb.astype('float32'), emb_indices.shape[-1], axis=-1)
+            emb_indices_batch_stride = add(emb_indices.astype('float32'), rpbinb * ngh * ngw)
+        elif default_config.device_target == "GPU":
+            emb_indices_batch_stride = emb_indices + batch_index(nb) * ngh * ngw  # Shape (nb, k_max)
+        emb_indices_mask_flat = emb_indices.reshape(-1).astype('float32') > 0 # Shape (nb x k_max)
         emb_indices_flat = (emb_indices_batch_stride.reshape(-1) * emb_indices_mask_flat).astype('int32')
-
         # Flatten embs and take which is associate to flattened emb index
         emb_flat = p_emb.view(-1, self.emb_dim)  # Shape (nb x ngh x ngw, emb_dim)
         embedding = emb_flat[emb_indices_flat]  # Shape (nb x k_max, emb_dim)
         embedding = self.emb_scale * self.normalize(embedding)
-
         # Flatten max tids and take according to index
         _, tids = self.argmax(tids.astype('float32'))  # Shape (nb, ngh, ngw)
         tids_flat = tids.view(-1)[emb_indices_flat]  # Shape (nb x k_max)
-
         # Apply flattened emb mask for nullify if it is no detections
         # and subtract 1 where no detection to apply ignore mask into loss calculation.
         tids_flat_masked = tids_flat * emb_indices_mask_flat
         tids_flat_with_ignore = tids_flat_masked + (emb_indices_mask_flat - 1)
-
         # Apply FC layer to embeddings
         # and compute loss by custom loss with ignore index = -1.
-        logits = classifier(embedding)
+        if default_config.device_target == "Ascend":
+            logits = classifier(embedding.astype('float16')).astype('float32')# cast to fp16, matmul, back to fp32
+        elif default_config.device_target == "GPU":
+            logits = classifier(embedding)
         lid = self.id_loss(logits, tids_flat_with_ignore.astype('int32'), ignore_index=-1)
-
         # Apply auto-balancing loss strategy
         loss = self.exp((-1) * self.s_r) * lbox + \
                self.exp((-1) * self.s_c) * lconf + \
                self.exp((-1) * self.s_id) * lid + \
                (self.s_r + self.s_c + self.s_id)
         loss *= 0.5
-
         return loss.squeeze()
 
 
@@ -386,7 +400,11 @@ class JDE(nn.Cell):
         self.head_b = YOLOLayer(anchors1, nid, ne)
 
         # Set classifier for embeddings
-        self.classifier = nn.Dense(ne, nid)
+        if default_config.device_target == "Ascend":
+            self.classifier = nn.Dense(ne, nid).to_float(mstype.float16)
+            init_dense(self.classifier)
+        elif default_config.device_target == "GPU":
+            self.classifier = nn.Dense(ne, nid)
 
     def construct(
             self,
@@ -463,11 +481,17 @@ class YOLOLayerEval(nn.Cell):
         """
         p, p_emb = p_cat[:, :24, ...], p_cat[:, 24:, ...]
         nb, ngh, ngw = p.shape[0], p.shape[-2], p.shape[-1]
-
-        p = p.view(nb, self.na, self.nc + 5, ngh, ngw).transpose(0, 1, 3, 4, 2)  # prediction
-        p_emb = p_emb.transpose(0, 2, 3, 1)
-        p_box = p[..., :4]
-        p_conf = p[..., 4:6].transpose(0, 4, 1, 2, 3)  # conf
+        if default_config.device_target == "Ascend":
+            p = p.view(nb, self.na, self.nc + 5, ngh, ngw)
+            p = p.transpose(0, 1, 3, 2, 4).transpose(0, 1, 2, 4, 3)
+            p_emb = p_emb.transpose(0, 2, 1, 3).transpose(0, 1, 3, 2)
+            p_box = p[..., :4]
+            p_conf = p[..., 4:6].transpose(0, 1, 2, 4, 3).transpose(0, 1, 3, 2, 4).transpose(0, 2, 1, 3, 4)
+        elif default_config.device_target == "GPU":
+            p = p.view(nb, self.na, self.nc + 5, ngh, ngw).transpose(0, 1, 3, 4, 2)  # prediction
+            p_emb = p_emb.transpose(0, 2, 3, 1)
+            p_box = p[..., :4]
+            p_conf = p[..., 4:6].transpose(0, 4, 1, 2, 3)  # conf
         p_conf = self.expand_dims(self.softmax(p_conf)[:, 1, ...], -1)
         p_emb = self.normalize(self.tile(self.expand_dims(p_emb, 1), (1, self.na, 1, 1, 1)))
 

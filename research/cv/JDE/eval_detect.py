@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 # ============================================================================
+# This file was copied from project [calendar_day_1][Towards-Realtime-MOT]
 """Evaluation script."""
 import json
 import time
+import os
 
 import numpy as np
 from mindspore import Model
@@ -23,10 +25,10 @@ from mindspore import dataset as ds
 from mindspore.common import set_seed
 from mindspore.communication.management import get_group_size
 from mindspore.communication.management import get_rank
-from mindspore.dataset.vision import transforms as vision
+from mindspore.dataset.vision import py_transforms as PY
 from mindspore.train.serialization import load_checkpoint
 
-from cfg.config import config as default_config
+from model_utils.config import config as default_config
 from src.darknet import DarkNet, ResidualBlock
 from src.dataset import JointDatasetDetection
 from src.model import JDEeval
@@ -64,12 +66,15 @@ def main(
     with open(opt.data_cfg_url) as f:
         data_config = json.load(f)
         test_paths = data_config['test']
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        for item in test_paths:
+            test_paths[item] = os.path.join(current_dir, test_paths[item])
 
     dataset = JointDatasetDetection(
         opt.dataset_root,
         test_paths,
         augment=False,
-        transforms=vision.ToTensor(),
+        transforms=PY.ToTensor(),
         config=opt,
     )
 

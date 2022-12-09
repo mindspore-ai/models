@@ -14,7 +14,8 @@
 # ============================================================================
 """Train script."""
 import json
-
+import os
+import datetime
 import numpy as np
 from mindspore import Model
 from mindspore import context
@@ -25,7 +26,7 @@ from mindspore.communication.management import get_group_size
 from mindspore.communication.management import get_rank
 from mindspore.communication.management import init
 from mindspore.context import ParallelMode
-from mindspore.dataset.vision import transforms as vision
+from mindspore.dataset.vision import py_transforms as PY
 from mindspore.train.callback import CheckpointConfig
 from mindspore.train.callback import LossMonitor
 from mindspore.train.callback import ModelCheckpoint
@@ -33,7 +34,9 @@ from mindspore.train.callback import TimeMonitor
 from mindspore.train.serialization import load_checkpoint
 from mindspore.train.serialization import load_param_into_net
 
-from cfg.config import config as default_config
+from model_utils.config import config as default_config
+from model_utils.moxing_adapter import moxing_wrapper
+
 from src.darknet import DarkNet, ResidualBlock
 from src.dataset import JointDataset
 from src.model import JDE
@@ -122,6 +125,21 @@ def set_context(cfg):
             dev_num = 1
             dev_id = cfg.device_id
             context.set_context(device_id=dev_id)
+    if dev_target == 'Ascend':
+        if cfg.is_distributed:
+            init(backend_name='hccl')
+            dev_num = get_group_size()
+            dev_id = get_rank()
+            context.reset_auto_parallel_context()
+            context.set_auto_parallel_context(
+                device_num=dev_num,
+                parallel_mode=ParallelMode.DATA_PARALLEL,
+                gradients_mean=True,
+            )
+        else:
+            dev_num = 1
+            dev_id = cfg.device_id
+            context.set_context(device_id=dev_id)
     else:
         raise ValueError("Unsupported platform.")
 
@@ -160,24 +178,42 @@ def init_callbacks(cfg, batch_number, dev_id):
         cbs = [loss_cb, time_cb, ckpt_cb]
 
     return cbs
+def is_profiling(config):
+    """
+    Set profiling.
 
+    Args:
+        config: Config parameters.
 
-if __name__ == "__main__":
+    Returns:
+        profiler: Model profiler.
+    """
+    profiler = None
+    if config.enable_profiling:
+        from mindspore.profiler import Profiler
+        profiling_dir = os.path.join(config.train_profiling_dir,
+                                     datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S'))
+        profiler = Profiler(output_path=profiling_dir, is_detail=True, is_show_op_path=True)
+    return profiler
+
+@moxing_wrapper()
+def main():
     config = default_config
-    device_target = config.device_target
-
     rank_size, rank_id = set_context(config)
-
+    profiler = is_profiling(config)
     with open(config.data_cfg_url) as f:
         data_config = json.load(f)
         trainset_paths = data_config['train']
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        for item in trainset_paths:
+            trainset_paths[item] = os.path.join(current_dir, rainset_paths[item])
 
     dataset = JointDataset(
         config.dataset_root,
         trainset_paths,
         k_max=config.k_max,
         augment=True,
-        transforms=vision.ToTensor(),
+        transforms=PY.ToTensor(),
         config=config,
     )
 
@@ -185,7 +221,7 @@ if __name__ == "__main__":
         dataset,
         column_names=config.col_names_train,
         shuffle=True,
-        num_parallel_workers=4,
+        num_parallel_workers=16,
         num_shards=rank_size,
         shard_id=rank_id,
         max_rowsize=12,
@@ -193,7 +229,6 @@ if __name__ == "__main__":
     )
 
     dataloader = dataloader.batch(config.batch_size, True)
-
     batch_num = dataloader.get_dataset_size()
 
     # Initialize backbone
@@ -207,8 +242,9 @@ if __name__ == "__main__":
 
     # Load weights into backbone
     if config.ckpt_url is not None:
+        current_dir = os.path.dirname(os.path.abspath(__file__))
         if config.ckpt_url.endswith(".ckpt"):
-            param_dict = load_checkpoint(config.ckpt_url)
+            param_dict = load_checkpoint(os.path.join(current_dir, config.ckpt_url))
         else:
             raise ValueError(f"Unsupported checkpoint extension: {config.ckpt_url}.")
 
@@ -244,10 +280,12 @@ if __name__ == "__main__":
         momentum=config.momentum,
         weight_decay=config.decay,
     )
-
     model = Model(net, optimizer=opt)
-
     callbacks = init_callbacks(config, batch_num, rank_id)
-
     model.train(epoch=config.epochs, train_dataset=dataloader, callbacks=callbacks, dataset_sink_mode=False)
+    if config.enable_profiling:
+        profiler.analyse()
     print("train success")
+
+if __name__ == "__main__":
+    main()
