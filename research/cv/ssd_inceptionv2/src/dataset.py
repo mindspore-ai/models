@@ -19,6 +19,8 @@ from __future__ import division
 
 import os
 import json
+import sys
+import shutil
 import xml.etree.ElementTree as et
 import numpy as np
 import cv2
@@ -453,49 +455,44 @@ def create_mindrecord(dataset="coco", prefix="ssd.mindrecord", is_training=True)
                 print("image_dir or anno_path not exits.")
     return mindrecord_file
 
-def modify_filename(file_dir):
-    """show file name"""
-    for root, dirs, files in os.walk(file_dir):
-        print('root_path:' + root)
-        print(dirs)
-        return files
+
+def create_if_not_exist(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
+def split_train_and_val(coco17_path, coco14_path, jpg_ids):
+    jpg_list = os.listdir(coco17_path)
+    for jpg in jpg_list:
+        if jpg in jpg_ids:
+            shutil.copy(os.path.join(coco17_path, jpg), os.path.join(coco14_path, 'val'))
+        else:
+            shutil.copy(os.path.join(coco17_path, jpg), os.path.join(coco14_path, 'train'))
+
 
 def coco2017_to_coco(configs, number_path):
     """convert dataset"""
-    number_path = os.path.join(number_path, 'number_id_val.txt')
-    f = open(number_path, "r")
-    number = f.readlines()
-    f.close()
     coco_train = os.path.join(configs.coco_root, 'train')
-    if not os.path.isdir(coco_train):
-        os.makedirs(coco_train)
     coco_val = os.path.join(configs.coco_root, 'val')
-    if not os.path.isdir(coco_val):
-        os.makedirs(coco_val)
-    if not os.listdir(coco_train):
-        path = os.path.join(configs.coco_root_raw, 'train2017')
-        for pictures in modify_filename(path):
-            flag = 0
-            picture_path = os.path.join(path, pictures)
-            for i in range(len(number)):
-                if number[i].strip('\n').zfill(12) in pictures:
-                    flag = 1
-                    os.system('cp' + ' ' + picture_path + ' ' + coco_val)
-            if flag == 0:
-                os.system('cp' + ' ' + picture_path + ' ' + coco_train)
-            print(f"Picture:{pictures}-train update")
-    if not os.listdir(coco_val):
-        path = os.path.join(configs.coco_root_raw, 'val2017')
-        for pictures in modify_filename(path):
-            flag = 0
-            picture_path = os.path.join(path, pictures)
-            for i in range(len(number)):
-                if number[i].strip('\n').zfill(12) in pictures:
-                    flag = 1
-                    os.system('cp' + ' ' + picture_path + ' ' + coco_val)
-            if flag == 0:
-                os.system('cp' + ' ' + picture_path + ' ' + coco_train)
-            print(f"Picture:{pictures}-val update")
+    create_if_not_exist(coco_train)
+    create_if_not_exist(coco_val)
+    if os.listdir(coco_train) or os.listdir(coco_val):
+        print(f'Error: {configs.coco_root}/train or val is not empty, ensure that the folder is empty and try angin.')
+        sys.exit(1)
+
+    number_path = os.path.join(number_path, 'number_id_val.txt')
+    with open(number_path, 'r') as f:
+        numbers = f.readlines()
+        jpg_ids = [i.strip('\n').zfill(12) + '.jpg' for i in numbers]
+        train2017_path = os.path.join(configs.coco_root_raw, 'train2017')
+        val2017_path = os.path.join(configs.coco_root_raw, 'val2017')
+        split_train_and_val(train2017_path, configs.coco_root, jpg_ids)
+        split_train_and_val(val2017_path, configs.coco_root, jpg_ids)
+
+        num1 = len(os.listdir(coco_val))
+        num2 = len(os.listdir(coco_train))
+        if num1 != 8059 or num2 != 115228:
+            print('Warning: coco2017 dataset is incomplete')
 
 
 def convert_anno(configs, number_path):
