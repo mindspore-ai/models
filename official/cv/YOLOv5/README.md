@@ -60,7 +60,7 @@ python train.py \
 
 ```bash
 # run 1p by shell script, please change `device_target` in config file to run on Ascend/GPU, and change `T_max`, `max_epoch`, `warmup_epochs` refer to contents of notes
-bash run_standalone_train.sh [DATASET_PATH]
+bash run_standalone_train.sh [DATASET_PATH] [DEVICE_ID]
 
 # For Ascend device, distributed training example(8p) by shell script
 bash run_distribute_train.sh [DATASET_PATH] [RANK_TABLE_FILE]
@@ -81,7 +81,7 @@ python eval.py \
 
 ```bash
 # run evaluation by shell script, please change `device_target` in config file to run on Ascend/GPU
-bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
+bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID]
 ```
 
 Note the default_config.yaml is the default parameters for yolov5s on 8p. The `batchsize` and `lr` are different on Ascend and GPU, see the settings in `scripts/run_distribute_train.sh` or `scripts/run_distribute_train_gpu.sh`.
@@ -262,7 +262,7 @@ python eval.py \
     --eval_shape=640 > log.txt 2>&1 &
 OR
 # run evaluation by shell script
-bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH]
+bash run_eval.sh [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID]
 ```
 
 The above python command will run in the background. You can view the results through the file "log.txt". The mAP of the test dataset will be as follows:

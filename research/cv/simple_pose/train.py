@@ -127,13 +127,12 @@ def run_train():
     if config.device_target == "GPU":
         context.set_context(mode=context.GRAPH_MODE,
                             device_target="GPU",
-                            save_graphs=False,
-                            device_id=get_rank_id())
+                            save_graphs=False)
     elif config.device_target == "Ascend":
         context.set_context(mode=context.GRAPH_MODE,
                             device_target="Ascend",
                             save_graphs=False,
-                            device_id=get_rank_id())
+                            device_id=get_device_id())
     else:
         raise ValueError("device target only support GPU and Ascend")
     if config.run_distribute:

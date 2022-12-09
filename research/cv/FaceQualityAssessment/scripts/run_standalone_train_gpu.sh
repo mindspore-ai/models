@@ -14,27 +14,28 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -lt 1 ]
+if [ $# -lt 2 ]
 then
-  echo "Usage: bash run_standalone_train_gpu.sh [TRAIN_LABEL_FILE] [PRETRAINED_BACKBONE](optional)"
+  echo "Usage: bash run_standalone_train_gpu.sh [TRAIN_LABEL_FILE] [DEVICE_ID] [PRETRAINED_BACKBONE](optional)"
   exit 1
 fi
 
 BASEPATH=$(cd "`dirname $0`" || exit; pwd)
 export PYTHONPATH=${BASEPATH}:$PYTHONPATH
+export DEVICE_ID=$2
 
 current_exec_path=$(pwd)
 rm -rf ${current_exec_path}/gpu
 mkdir ${current_exec_path}/gpu
 cd ${current_exec_path}/gpu || exit
 
-if [ $2 ] # pretrained ckpt
+if [ $3 ] # pretrained ckpt
 then
   python ${BASEPATH}/../train.py \
             --train_label_file=$1 \
             --per_batch_size=256 \
             --device_target='GPU' \
-            --pretrained=$2 > train.log  2>&1 &
+            --pretrained=$3 > train.log  2>&1 &
 else
   python ${BASEPATH}/../train.py \
             --train_label_file=$1 \

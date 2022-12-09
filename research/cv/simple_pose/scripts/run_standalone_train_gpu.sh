@@ -17,7 +17,7 @@
 if [ $# -lt 4 ]
 then
     echo "Usage: \
-          bash scripts/run_standalone_train_gpu.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]\
+          bash scripts/run_standalone_train_gpu.sh [CKPT_SAVE_DIR(relative)] [BATCH_SIZE] [END_EPOCH] [DEVICE_ID]\
           "
 exit 1
 fi

@@ -127,10 +127,10 @@ Dataset used: [COCO2014](https://cocodataset.org/#download)
       --lr_scheduler=cosine_annealing > log.txt 2>&1 &
 
   # For Ascend device, standalone training example(1p) by shell script
-  bash run_standalone_train.sh dataset/coco2014 backbone_darknet53.ckpt
+  bash run_standalone_train.sh dataset/coco2014 backbone_darknet53.ckpt 0
 
   # For GPU device, standalone training example(1p) by shell script
-  bash run_standalone_train_gpu.sh dataset/coco2014 backbone_darknet53.ckpt
+  bash run_standalone_train_gpu.sh dataset/coco2014 backbone_darknet53.ckpt 0
 
   # For Ascend device, distributed training example(8p) by shell script
   bash run_distribute_train.sh dataset/coco2014 backbone_darknet53.ckpt hccl_8p.json
@@ -148,7 +148,7 @@ Dataset used: [COCO2014](https://cocodataset.org/#download)
       --testing_shape=416 > log.txt 2>&1 &
 
   # run evaluation by shell script
-  bash run_eval.sh dataset/coco2014/ train_parallel0/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0/0-99_31680.ckpt
+  bash run_eval.sh dataset/coco2014/ train_parallel0/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0/0-99_31680.ckpt 0
   ```
 
 - Train on [ModelArts](https://support.huaweicloud.com/modelarts/)
@@ -380,7 +380,7 @@ python eval.py \
     --pretrained=train_parallel0/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0/0-99_31680.ckpt \
     --testing_shape=416 > log.txt 2>&1 &
 OR
-bash run_eval.sh dataset/coco2014/ train_parallel0/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0/0-99_31680.ckpt
+bash run_eval.sh dataset/coco2014/ train_parallel0/outputs/{year}-{month}-{day}_time_{hour}_{minute}_{second}/ckpt_0/0-99_31680.ckpt 0
 ```
 
 The above python command will run in the background. You can view the results through the file "log.txt". The mAP of the test dataset will be as follows:

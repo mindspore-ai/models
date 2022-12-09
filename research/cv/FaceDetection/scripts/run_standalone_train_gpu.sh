@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 1 ]
+if [ $# != 2 ]
 then
-    echo "Usage: bash run_standalone_train_gpu.sh [CONFIG_PATH]"
+    echo "Usage: bash run_standalone_train_gpu.sh [CONFIG_PATH] [DEVICE_ID]"
     exit 1
 fi
 
@@ -27,7 +27,7 @@ dirname_path=$(dirname "$(pwd)")
 echo ${dirname_path}
 
 export PYTHONPATH=${dirname_path}:$PYTHONPATH
-
+export DEVICE_ID=$2
 export RANK_SIZE=1
 
 SCRIPT_NAME='train.py'

@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ] && [ $# != 3 ]
+if [ $# != 3 ] && [ $# != 4 ]
 then 
-    echo "Usage: sh run_standalone_train_gpu.sh [cifar10|imagenet2012] [DATASET_PATH] [PRETRAINED_CKPT_PATH](optional)"
+    echo "Usage: bash run_standalone_train_gpu.sh [cifar10|imagenet2012] [DATASET_PATH] [DEVICE_ID] [PRETRAINED_CKPT_PATH](optional)"
 exit 1
 fi
 
@@ -35,27 +35,25 @@ get_real_path(){
 }
 
 PATH1=$(get_real_path $2)
-
-if [ $# == 3 ]
-then
-    PATH2=$(get_real_path $3)
-fi
-
 if [ ! -d $PATH1 ]
 then 
     echo "error: DATASET_PATH=$PATH1 is not a directory"
 exit 1
 fi
 
-if [ $# == 3 ] && [ ! -f $PATH2 ]
+if [ $# == 4 ]
 then
-    echo "error: PRETRAINED_CKPT_PATH=$PATH2 is not a file"
-exit 1
+    PATH2=$(get_real_path $4)
+    if [ ! -f $PATH2 ]
+    then
+        echo "error: PRETRAINED_CKPT_PATH=$PATH2 is not a file"
+        exit 1
+    fi
 fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=0
+export DEVICE_ID=$3
 export RANK_ID=0
 export RANK_SIZE=1
 
@@ -85,12 +83,12 @@ cp -r ../src ./train
 cd ./train || exit
 echo "start training for device $DEVICE_ID"
 env > env.log
-if [ $# == 2 ]
+if [ $# == 3 ]
 then
     python train.py --config_path=$CONFIG_FILE --dataset=$1 --dataset_path=$PATH1 &> log.txt &
 fi
 
-if [ $# == 3 ]
+if [ $# == 4 ]
 then
     python train.py --config_path=$CONFIG_FILE --dataset=$1 --dataset_path=$PATH1 --pre_trained=$PATH2 &> log.txt &
 fi

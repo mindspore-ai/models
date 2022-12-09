@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 2 ]
+if [ $# != 3 ]
 then
-    echo "Usage: sh run_standalone_train_gpu.sh [DATASET_PATH] [PRETRAINED_BACKBONE]"
+    echo "Usage: bash run_standalone_train_gpu.sh [DATASET_PATH] [PRETRAINED_BACKBONE] [DEVICE_ID]"
 exit 1
 fi
 
@@ -46,7 +46,7 @@ exit 1
 fi
 
 export DEVICE_NUM=1
-export DEVICE_ID=0
+export DEVICE_ID=$3
 export RANK_ID=0
 export RANK_SIZE=1
 

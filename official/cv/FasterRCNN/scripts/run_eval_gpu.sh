@@ -14,10 +14,10 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -le 3 ]
+if [ $# -le 5 ]
 then 
     echo "Usage: 
-    bash run_eval_gpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)
+    bash run_eval_gpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [DEVICE_ID] [MINDRECORD_DIR](option)
     "
 exit 1
 fi
@@ -61,9 +61,9 @@ exit 1
 fi
 
 mindrecord_dir=$PATH3/MindRecord_COCO_TRAIN/
-if [ $# -eq 5 ]
+if [ $# -eq 6 ]
 then
-    mindrecord_dir=$(get_real_path $5)
+    mindrecord_dir=$(get_real_path $6)
     if [ ! -d $mindrecord_dir ]
     then
         echo "error: mindrecord_dir=$mindrecord_dir is not a dir"
@@ -94,7 +94,7 @@ fi
 
 export DEVICE_NUM=1
 export RANK_SIZE=$DEVICE_NUM
-export DEVICE_ID=0
+export DEVICE_ID=$5
 export RANK_ID=0
 
 if [ -d "../eval" ];

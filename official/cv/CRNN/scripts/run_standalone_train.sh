@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 3 ] && [ $# != 2 ]; then
-  echo "Usage: sh scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [PLATFORM](optional)"
+if [ $# != 4 ] && [ $# != 3 ]; then
+  echo "Usage: bash scripts/run_standalone_train.sh [DATASET_NAME] [DATASET_PATH] [DEVICE_ID] [PLATFORM](optional)"
   exit 1
 fi
 
@@ -29,8 +29,9 @@ get_real_path() {
 
 DATASET_NAME=$1
 PATH1=$(get_real_path $2)
-if [ $# == 3 ]; then
-  PLATFORM=$3
+export DEVICE_ID=$3
+if [ $# == 4 ]; then
+  PLATFORM=$4
 else
   PLATFORM="Ascend"
 fi
@@ -40,7 +41,6 @@ if [ ! -d $PATH1 ]; then
   exit 1
 fi
 
-export DEVICE_ID=0
 run_ascend() {
   ulimit -u unlimited
   export DEVICE_NUM=1
