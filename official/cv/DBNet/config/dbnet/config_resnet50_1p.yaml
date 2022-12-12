@@ -1,0 +1,84 @@
+net: DBnet
+seed: 1
+device_num: 1
+device_id: 0
+run_eval: True
+eval_iter: 20
+device_target: "Ascend"
+context_mode: "graph"
+mix_precision: True
+ckpt_path: "./outputs/best_rank0.ckpt"
+output_dir: "./outputs"
+# Url for modelarts
+enable_modelarts: False
+data_url: ""
+train_url: ""
+data_path: "/cache/data"
+backbone:
+    initializer: resnet50
+    pretrained: True
+    backbone_ckpt: "./pretrained/resnet50-19c8e357.ckpt" # If on modelarts, set the name of checkpoint saved in data_url
+segdetector:
+    in_channels: [256, 512, 1024, 2048]  # R18: [64, 128, 256, 512]
+    inner_channels: 256
+    k: 50
+    bias: False
+    adaptive: True
+    serial: False
+loss:
+    eps: 0.000001
+    l1_scale: 10
+    bce_scale: 5
+    bce_replace: bceloss # diceloss / bceloss
+optimizer:
+    type: sgd
+    lr:
+        base_lr: 0.007
+        target_lr: 0.0
+        warmup_epoch: 3
+        factor: 0.9
+    momentum: 0.9
+    weight_decay: 0.0001
+dataset:
+    type: "IC15"
+    is_show: False
+    is_icdar2015: True
+    num_workers: 12
+    prefetch_size: 12
+    max_rowsize: 64
+    short_side: 736
+    random_angle: [-10, 10]
+    random_crop:
+        max_tries: 100
+        min_crop_side_ratio: 0.1
+train:
+    img_format: '.jpg'
+    img_dir: "./data/train_images/"
+    gt_dir: "./data/train_gts/"
+    log_filename: train
+    pretrained_ckpt: ""
+    start_epoch_num: 0
+    total_epochs: 1200
+    batch_size: 16
+    save_steps: 630
+    max_checkpoints: 5
+    is_transform: True
+    is_eval_before_saving: True
+    shrink_ratio: 0.4
+    min_text_size: 8
+    thresh_min: 0.3
+    thresh_max: 0.7
+    dataset_sink_mode: True
+eval:
+    img_format: '.jpg'
+    img_dir: "./data/test_images/"
+    gt_dir: "./data/test_gts/"
+    show_images: False
+    image_dir: './outputs_test/'
+    thresh: 0.3
+    box_thresh: 0.6
+    max_candidates: 1000
+    unclip_ratio: 1.5
+    eval_size: [736, 1280]    # h, w
+    polygon: False
+    dest: binary

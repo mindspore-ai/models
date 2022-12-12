@@ -70,3 +70,4 @@ models/official/recommend/Wide_and_Deep_Multitable/src/wide_and_deep.py:__init__
 models/official/audio/LPCNet/ascend310_infer/src/main.cc:main
 models/research/nlp/gnmt_v2/src/dataset/bi_data_loader.py:_load
 models/research/cv/centerface/dependency/centernet/src/lib/datasets/sample/multi_pose.py:preprocess_train
+models/official/cv/DBNet/src/utils/metric.py:evaluate_image
