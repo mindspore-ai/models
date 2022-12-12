@@ -196,15 +196,6 @@ def warmup_cosine_annealing_lr_sample(lr, steps_per_epoch, warmup_epochs, max_ep
     return np.array(lr_each_step).astype(np.float32)
 
 
-def yolox_no_aug_lr(base_lr, steps_per_epoch, max_epoch, min_lr_ratio=0.05):
-    total_iters = int(max_epoch * steps_per_epoch)
-    lr = base_lr * min_lr_ratio
-    lr_each_step = []
-    for _ in range(total_iters):
-        lr_each_step.append(lr)
-    return np.array(lr_each_step).astype(np.float32)
-
-
 def get_lr(args):
     """generate learning rate."""
     if args.lr_scheduler == 'exponential':
@@ -350,6 +341,15 @@ class ResumeCallback(Callback):
         run_context.original_args().cur_epoch_num += self.start_epoch
 
 
+class NoAugCallBack(Callback):
+    def __init__(self, use_l1=True):
+        super(NoAugCallBack, self).__init__()
+        self.use_l1 = use_l1
+
+    def begin(self, run_context):
+        run_context.original_args().network.network.use_l1 = self.use_l1
+
+
 class YOLOXCB(Callback):
     """
     YOLOX Callback.
@@ -395,7 +395,9 @@ class YOLOXCB(Callback):
         loss = cb_params.net_outputs
         epoch_time = time.time() - self.epoch_start_time
         avg_step_time = epoch_time * 1000 / self.step_per_epoch
-        loss = "total loss: %.4f" % (float(loss.asnumpy()))
+        loss = "loss: %.4f, overflow: %s, scale: %s" % (float(loss[0].asnumpy()),
+                                                        bool(loss[1].asnumpy()),
+                                                        int(loss[2].asnumpy()))
         self.logger.info("epoch: [%s/%s] epoch time: %.2fs %s avg step time: %.2fms" % (
             cur_epoch, self.max_epoch, epoch_time, loss, avg_step_time))
 
@@ -430,7 +432,9 @@ class YOLOXCB(Callback):
             cur_epoch = cb_params.cur_epoch_num
             avg_step_time = (time.time() - self.step_start_time) * 1000 / self._per_print_times
             loss = cb_params.net_outputs
-            loss = "total loss: %.4f" % (float(loss.asnumpy()))
+            loss = "loss: %.4f, overflow: %s, scale: %s" % (float(loss[0].asnumpy()),
+                                                            bool(loss[1].asnumpy()),
+                                                            int(loss[2].asnumpy()))
             self.logger.info("epoch: [%s/%s] step: [%s/%s], lr: %.6f, %s, avg step time: %.2fms" % (
                 cur_epoch, self.max_epoch, cur_epoch_step, self.step_per_epoch, self.lr[self.current_step],
                 loss, avg_step_time))
@@ -540,7 +544,7 @@ class EvalCallback(Callback):
         self.start_epoch = config.start_epoch
         self.max_epoch = config.max_epoch
         self.use_ema = config.use_ema
-        self.train_epoch = config.train_epoch
+        self.train_aug_epochs = config.train_aug_epochs
         self.save_ckpt_path = config.save_ckpt_dir
         self.rank = config.rank
         self.resume_yolox = config.resume_yolox
@@ -578,7 +582,7 @@ class EvalCallback(Callback):
     def epoch_end(self, run_context):
         cb_param = run_context.original_args()
         cur_epoch = cb_param.cur_epoch_num
-        if cur_epoch % self.interval == 0 or cur_epoch == self.start_epoch + self.train_epoch:
+        if cur_epoch % self.interval == 0 or cur_epoch == self.start_epoch + self.train_aug_epochs:
             if self.use_ema:
                 self.load_ema_parameter(cb_param.train_network)
             else:
