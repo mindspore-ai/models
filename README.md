@@ -200,7 +200,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Image | Image Generation | [CGAN](https://gitee.com/mindspore/models/tree/master/research/cv/CGAN) |✅| ✅ |   |
 | Image | Image Classification | [convnext](https://gitee.com/mindspore/models/tree/master/research/cv/convnext) |✅| ✅ |   |
 | Image | Image Super Resolution | [csd](https://gitee.com/mindspore/models/tree/master/research/cv/csd) |✅| ✅ |   |
-| Image | Image Generation | [CTSDG](https://gitee.com/mindspore/models/tree/master/research/cv/CTSDG) |✅| ✅ |   |
+| Image | Image Generation | [CTSDG](https://gitee.com/mindspore/models/tree/master/research/cv/CTSDG) |   | ✅ |   |
 | Image | Style Transfer | [CycleGAN](https://gitee.com/mindspore/models/tree/master/official/cv/CycleGAN) |✅| ✅ |   |
 | Image | Image Super Resolution | [DBPN](https://gitee.com/mindspore/models/tree/master/research/cv/DBPN) |✅|   |   |
 | Image | Image Super Resolution | [DBPN_GAN](https://gitee.com/mindspore/models/tree/master/research/cv/DBPN) |✅|   |   |

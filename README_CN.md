@@ -200,7 +200,7 @@
 | 图像 | 图像生成 | [CGAN](https://gitee.com/mindspore/models/tree/master/research/cv/CGAN) |✅| ✅ |   |
 | 图像 | 图像分类 | [convnext](https://gitee.com/mindspore/models/tree/master/research/cv/convnext) |✅| ✅ |   |
 | 图像 | 图像超分 | [csd](https://gitee.com/mindspore/models/tree/master/research/cv/csd) |✅| ✅ |   |
-| 图像 | 图像生成 | [CTSDG](https://gitee.com/mindspore/models/tree/master/research/cv/CTSDG) |✅| ✅ |   |
+| 图像 | 图像生成 | [CTSDG](https://gitee.com/mindspore/models/tree/master/research/cv/CTSDG) |   | ✅ |   |
 | 图像 | 风格转移 | [CycleGAN](https://gitee.com/mindspore/models/tree/master/official/cv/CycleGAN) |✅| ✅ |   |
 | 图像 | 图像超分 | [DBPN](https://gitee.com/mindspore/models/tree/master/research/cv/DBPN) |✅|   |   |
 | 图像 | 图像超分 | [DBPN_GAN](https://gitee.com/mindspore/models/tree/master/research/cv/DBPN) |✅|   |   |
