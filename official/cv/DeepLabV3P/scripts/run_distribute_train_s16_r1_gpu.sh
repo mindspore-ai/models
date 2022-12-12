@@ -49,7 +49,7 @@ cd ${train_path} || exit
 mpirun -allow-run-as-root -n $RANK_SIZE --output-filename log_output --merge-stderr-to-stdout \
 python ./train.py --train_dir=${train_path}/ckpt  \
                   --data_file=$DATA_FILE  \
-                  --train_epochs=300  \
+                  --train_epochs=160  \
                   --batch_size=16  \
                   --crop_size=513  \
                   --base_lr=0.04  \
@@ -61,6 +61,6 @@ python ./train.py --train_dir=${train_path}/ckpt  \
                   --model=DeepLabV3plus_s16  \
                   --ckpt_pre_trained=$CKPT_PRE_TRAINED  \
                   --is_distributed  \
-                  --save_steps=410  \
-                  --keep_checkpoint_max=200 \
+                  --save_steps=41  \
+                  --keep_checkpoint_max=10 \
                   --device_target="GPU"  >log 2>&1 &

@@ -13,7 +13,7 @@
 - [Script Description](#script-description)
     - [Scripts and Sample Code](#scripts-and-sample-code)
     - [Script Parameters](#script-parameters)
-    - [Training Process](#training process)
+    - [Training Process](#training-process)
         - [Usage](#usage)
             - [Ascend Runs](#ascend-runs)
             - [GPU Runs](#gpu-runs)
@@ -99,8 +99,8 @@ Cityscapes
 
 Install required libraries from **requirements.txt**.
 
-Training starts with trained backbone [hrnet_w48](https://disk.yandex.ru/d/vEPRqWnJVUbliQ).
-This backbone converted from [torch HRNet-W48-C](https://github.com/HRNet/HRNet-Image-Classification) by script
+Training starts with trained backbone [hrnet_w48](https://download.mindspore.cn/model_zoo/official/cv/ocrnet/ImageNet-torch-pretrained-hrnet48.ckpt).
+This backbone converted from [torch HRNet-W48-C](https://github.com/HRNet/HRNet-Image-Classification) by script.
 
 ```bash
 python convert_from_torch.py --torch_path [INPUT_TORCH_MODEL] --mindspore_path [OUT_MINDSPORE_MODEL]
@@ -517,6 +517,12 @@ iou array:
 # Random Situation Description
 
 A random seed is used in `train.py`.
+
+# Disclaimer
+
+Models only provide scripts for transforming models. We don't own these models, nor are we responsible for their quality and maintenance. The transformation of these models is only used for non-commercial research and teaching purposes.
+
+To the model owner: If you do not want to include the model in MindSpore models or want to convert it in any way, we will delete or update all public content as required. Please contact us through Gitee. Thank you very much for your understanding and contribution to this community.
 
 # ModelZoo homepage
 
