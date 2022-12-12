@@ -18,7 +18,6 @@
 import argparse
 import ast
 import os
-import shutil
 import mindspore
 import mindspore.nn as nn
 
@@ -152,8 +151,6 @@ def main():
             if args_opt.run_online:
                 import moxing as mox
                 mox.file.copy_parallel(config.mindrecord_dir, args_opt.mindrecord_url)
-            else:
-                shutil.copytree(config.mindrecord_dir, args_opt.mindrecord_url)
         else:
             file_num = len(os.listdir(config.mindrecord_dir))
             while file_num != 16:

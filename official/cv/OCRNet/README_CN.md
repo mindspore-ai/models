@@ -89,6 +89,12 @@ $SEG_ROOT/data
 
 # 快速入门
 
+通过运行`convert_from_torch.py`将[torch HRNet-W48-C](https://github.com/HRNet/HRNet-Image-Classification)转换成训练所需的[hrnet_w48](https://download.mindspore.cn/model_zoo/official/cv/ocrnet/ImageNet-torch-pretrained-hrnet48.ckpt)。
+
+```bash
+python convert_from_torch.py --torch_path [INPUT_TORCH_MODEL] --mindspore_path [OUT_MINDSPORE_MODEL]
+```
+
 通过官方网站安装MindSpore后，您可以按照如下步骤进行训练和评估：
 
 - Ascend处理器环境运行
@@ -445,6 +451,12 @@ iou array:
 # 随机情况说明
 
 `train.py`中使用了随机种子。
+
+# 免责说明
+
+models仅提供转换模型的脚本。我们不拥有这些模型，也不对它们的质量负责和维护。对这些模型进行转换仅用于非商业研究和教学目的。
+
+致模型拥有者：如果您不希望将模型包含在MindSpore models中，或者希望以任何方式对其进行转换，我们将根据要求删除或更新所有公共内容。请通过Gitee与我们联系。非常感谢您对这个社区的理解和贡献。
 
 # ModelZoo主页
 
