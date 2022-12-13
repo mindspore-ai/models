@@ -404,7 +404,7 @@ class TransformerTrainAccumulationAllReducePostWithLossScaleCell(nn.Cell):
 
     @ms_function
     def clip_scale_grads(self, scale, grads):
-        grads = self.hyper_map(ops.partial(grad_scale, scale * self.degree), grads)
+        grads = self.hyper_map(ops.partial(grad_scale, scale), grads)
         return grads
 
     @ms_function
@@ -488,7 +488,7 @@ class TransformerTrainAccumulationAllReducePostWithLossScaleCell(nn.Cell):
             accu_overflow = ops.depend(accu_overflow, grads)
             accu_overflow = self.overflow_reducer(accu_overflow)
             overflow = self.less_equal(self.base, accu_overflow)
-            accu_succ = self.clip_reset_hyper_map
+            accu_succ = self.clip_reset_hyper_map()
             overflow = ops.depend(overflow, accu_succ)
             overflow = self.reshape(overflow, (()))
             if sens is None:
