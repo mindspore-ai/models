@@ -14,10 +14,11 @@
 # limitations under the License.
 # ============================================================================
 
-if [[ $# -lt 7 || $# -gt 8 ]]; then
+if [[ $# -lt 7 || $# -gt 10 ]]; then
     echo "Usage: bash run_infer_310.sh [MINDIR_PATH] [LABEL_PATH] [DATA_FILE_PATH] [DATASET_FORMAT] [SCHEMA_PATH] [TASK]
-    [NEED_PREPROCESS] [DEVICE_ID]
-    TASK is mandatory, and must choose from [ner|ner_crf|classifier]
+    [VOCAB_FILE_PATH] [EVAL_JSON_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+    TASK is mandatory, and must choose from [ner|ner_crf|classifier|squad]
+    When TASK is squad, [VOCAB_FILE_PATH] and [EVAL_JSON_PATH] is needed.
     NEED_PREPROCESS means weather need preprocess or not, it's value is 'y' or 'n'.
     DEVICE_ID is optional, it can be set by environment variable device_id, otherwise the value is zero"
 exit 1
@@ -44,12 +45,20 @@ elif [ $net_type == 'ner_crf' ]; then
   echo "downstream: NER-CRF"
 elif [ $net_type == 'classifier' ]; then
   echo "downstream: Classifier"
+elif [ $net_type == 'squad' ]; then
+  echo "downstream: SQuAD"
+  vocab_file_path=$7
+  eval_json_path=$8
+  echo "vocab_file_path "$vocab_file_path
+  echo "eval_json_path: "$eval_json_path
 else
-  echo "[TASK] must choose from [ner|ner_crf|classifier]"
+  echo "[TASK] must choose from [ner|ner_crf|classifier|squad]"
   exit 1
 fi
 
 if [ "$7" == "y" ] || [ "$7" == "n" ];then
+    need_preprocess=$7
+elif [ "$9" == "y" ] || [ "$9" == "n" ];then
     need_preprocess=$7
 else
   echo "weather need preprocess or not, it's value must be in [y, n]"
@@ -59,6 +68,9 @@ fi
 device_id=0
 if [ $# == 8 ]; then
     device_id=$8
+fi
+if [ $# == 10 ]; then
+    device_id=${10}
 fi
 
 echo "mindir name: "$model
@@ -107,6 +119,9 @@ function cal_acc()
     if [ $net_type == 'classifier' ]; then
         python ../postprocess.py --result_path=./result_Files --label_dir=./preprocess_Result/03_data --task=$net_type \
             --seq_length=1 --assessment_method=Accuracy &> acc.log
+    elif [ $net_type == 'squad' ]; then
+        python ../postprocess.py --result_path=./result_Files --preprocess_path=./preprocess_Result --task=$net_type \
+            --seq_length=384 --vocab_file_path=$vocab_file_path --eval_json_path=$eval_json_path &> acc.log
     else
         python ../postprocess.py --result_path=./result_Files --label_dir=./preprocess_Result/03_data --task=$net_type &> acc.log
     fi

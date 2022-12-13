@@ -271,60 +271,6 @@ bash scripts/run_distributed_pretrain_for_gpu.sh 8 40 /path/cn-wiki-128
 
 在Ascend设备上做多机分布式训练时，训练命令需要在很短的时间间隔内在各台设备上执行。因此，每台设备上都需要准备HCCL配置文件。请参考[merge_hccl](https://gitee.com/mindspore/models/tree/master/utils/hccl_tools#merge_hccl)创建多机的HCCL配置文件。
 
-```text
-For pretraining, schema file contains ["input_ids", "input_mask", "segment_ids", "next_sentence_labels", "masked_lm_positions", "masked_lm_ids", "masked_lm_weights"].
-
-For ner or classification task, schema file contains ["input_ids", "input_mask", "segment_ids", "label_ids"].
-
-For squad task, training: schema file contains ["start_positions", "end_positions", "input_ids", "input_mask", "segment_ids"], evaluation: schema file contains ["input_ids", "input_mask", "segment_ids"].
-
-`numRows` is the only option in schema file which could be set by user when dataset_format is tfrecord, other values must be set according to the dataset.
-`num_samlpes` is the only option in yaml file which could be set by user when dataset_format is mindrecord, other values must be set according to the dataset.
-
-For example, the schema file of cn-wiki-128 dataset for pretraining shows as follows:
-{
-    "datasetType": "TF",
-    "numRows": 7680,
-    "columns": {
-        "input_ids": {
-            "type": "int64",
-            "rank": 1,
-            "shape": [128]
-        },
-        "input_mask": {
-            "type": "int64",
-            "rank": 1,
-            "shape": [128]
-        },
-        "segment_ids": {
-            "type": "int64",
-            "rank": 1,
-            "shape": [128]
-        },
-        "next_sentence_labels": {
-            "type": "int64",
-            "rank": 1,
-            "shape": [1]
-        },
-        "masked_lm_positions": {
-            "type": "int64",
-            "rank": 1,
-            "shape": [20]
-        },
-        "masked_lm_ids": {
-            "type": "int64",
-            "rank": 1,
-            "shape": [20]
-        },
-        "masked_lm_weights": {
-            "type": "float32",
-            "rank": 1,
-            "shape": [20]
-        }
-    }
-}
-```
-
 ## 脚本说明
 
 ## 脚本和样例代码
@@ -428,7 +374,8 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
     --train_steps              训练步数，默认为-1
     --data_dir                 数据目录，默认为""
     --dataset_format           数据集格式，支持tfrecord和mindrecord，默认为mindrecord
-    --schema_dir               schema.json的路径，默认为""
+    --schema_dir               schema.json的路径，默认为""，当 train_data_file_path 为TFRecord时，
+                               需要指定 schema_file，MindRecord则无需指定。
 ```
 
 ### 微调与评估
@@ -464,7 +411,8 @@ For example, the schema file of cn-wiki-128 dataset for pretraining shows as fol
     --train_data_file_path            用于保存训练数据的TFRecord文件，如train.tfrecord文件
     --eval_data_file_path             如采用f1来评估结果，则为TFRecord文件保存预测；如采用clue_benchmark来评估结果，则为JSON文件保存预测
     --dataset_format                  数据集格式，支持tfrecord和mindrecord格式，默认为mindrecord
-    --schema_file_path                模式文件保存路径
+    --schema_file_path                模式文件保存路径，当 train_data_file_path 为TFRecord时，需要指定 schema_file,
+                                      MindRecord则无需指定。
 
 用法：run_squad.py [--device_target DEVICE_TARGET] [--do_train DO_TRAIN] [----do_eval DO_EVAL]
                     [--device_id N] [--epoch_num N] [--num_class N]
@@ -494,7 +442,8 @@ options:
     --load_finetune_checkpoint_path   如仅执行评估，提供微调检查点保存路径
     --train_data_file_path            用于保存SQuAD训练数据的TFRecord文件，如train1.1.tfrecord
     --eval_data_file_path             用于保存SQuAD预测数据的TFRecord文件，如dev1.1.tfrecord
-    --schema_file_path                模式文件保存路径
+    --schema_file_path                模式文件保存路径，当 train_data_file_path 为TFRecord时，需要指定 schema_file,
+                                      MindRecord则无需指定。
 
 usage: run_classifier.py [--device_target DEVICE_TARGET] [--do_train DO_TRAIN] [----do_eval DO_EVAL]
                          [--assessment_method ASSESSMENT_METHOD] [--device_id N] [--epoch_num N] [--num_class N]
@@ -522,7 +471,8 @@ options:
     --train_data_file_path            用于保存训练数据的TFRecord文件，如train.tfrecord文件
     --eval_data_file_path             用于保存预测数据的TFRecord文件，如dev.tfrecord
     --dataset_format                  数据集格式，支持tfrecord和mindrecord，默认为mindrecord
-    --schema_file_path                模式文件保存路径
+    --schema_file_path                模式文件保存路径，当 train_data_file_path 为TFRecord时，需要指定 schema_file,
+                                      MindRecord则无需指定。
 ```
 
 ## 选项及参数
@@ -582,6 +532,112 @@ Parameters for optimizer:
     Momentum:
     learning_rate                   学习率
     momentum                        平均移动动量
+```
+
+### schema_file
+
+当使用TFRecord作为训练、评估数据时，需要用到`schema_file`这一数据，该数据需要自行生成，其具体含义如下：
+
+对于预训练，schema文件包含 `["input_ids"、"input_mask"、"segment_ids"、"next_sentence_labels"、"masked_lm_positions"、"masked_lm_ids"、"masked_lm_weights"]`。
+
+对于 ner 或分类任务，schema文件包含 `["input_ids"、"input_mask"、"segment_ids"、"label_ids"]`。
+
+对于squad任务，训练用到的schema文件包含`["start_positions"、"end_positions"、"input_ids"、"input_mask"、"segment_ids"]`，评估用到的schema文件包含`["input_ids"、"input_mask"、"segment_ids"]`。
+
+当 dataset_format 为 tfrecord 时，`numRows` 是schema文件中唯一可以由用户设置的选项，其他值必须根据数据集设置。
+
+当 dataset_format 为 mindrecord 时，`num_samlpes` 是 yaml 文件中唯一可由用户设置的选项，其他值必须根据数据集设置。
+
+例如，用于预训练的cn-wiki-128数据集的schema文件显示如下：
+
+```json
+{
+    "datasetType": "TF",
+    "numRows": 7680,
+    "columns": {
+        "input_ids": {
+            "type": "int64",
+            "rank": 1,
+            "shape": [128]
+        },
+        "input_mask": {
+            "type": "int64",
+            "rank": 1,
+            "shape": [128]
+        },
+        "segment_ids": {
+            "type": "int64",
+            "rank": 1,
+            "shape": [128]
+        },
+        "next_sentence_labels": {
+            "type": "int64",
+            "rank": 1,
+            "shape": [1]
+        },
+        "masked_lm_positions": {
+            "type": "int64",
+            "rank": 1,
+            "shape": [20]
+        },
+        "masked_lm_ids": {
+            "type": "int64",
+            "rank": 1,
+            "shape": [20]
+        },
+        "masked_lm_weights": {
+            "type": "float32",
+            "rank": 1,
+            "shape": [20]
+        }
+    }
+}
+```
+
+或者，SQuAD数据集的schema文件显示如下：
+
+```json
+{
+  "datasetType": "TF",
+  "numRows": 1000000,
+  "columns": {
+    "input_ids": {
+      "type": "int64",
+      "rank": 1,
+      "shape": [384]
+    },
+    "input_mask": {
+      "type": "int64",
+      "rank": 1,
+      "shape": [384]
+    },
+    "segment_ids" : {
+      "type": "int64",
+      "rank": 1,
+      "shape": [384]
+    },
+    "unique_ids": {
+      "type": "int64",
+      "rank": 1,
+      "shape": [1]
+    },
+    "start_positions": {
+      "type": "int64",
+      "rank": 1,
+      "shape": [1]
+    },
+    "end_positions": {
+      "type": "int64",
+      "rank": 1,
+      "shape": [1]
+    },
+    "is_impossible": {
+      "type": "int64",
+      "rank": 1,
+      "shape": [1]
+    }
+  }
+}
 ```
 
 ## 训练过程

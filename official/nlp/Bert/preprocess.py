@@ -19,7 +19,7 @@ Bert preprocess script.
 
 import os
 import argparse
-from src.dataset import create_ner_dataset
+from src.dataset import create_ner_dataset, create_squad_dataset
 
 
 def parse_args():
@@ -30,8 +30,8 @@ def parse_args():
                         help="assessment_method include: [BF1,clue_benchmark,MF1,Accuracy], default BF1")
     parser.add_argument("--do_eval", type=str, default="false", choices=["true", "false"],
                         help="Eable eval, default is false")
-    parser.add_argument("--task", type=str, default="ner", choices=["ner", "ner_crf", "classifier"],
-                        help="task, include: [ner, ner_crf, classifier], default is ner")
+    parser.add_argument("--task", type=str, default="ner", choices=["ner", "ner_crf", "classifier", "squad"],
+                        help="task, include: [ner, ner_crf, classifier, suqad], default is ner")
     parser.add_argument("--eval_data_shuffle", type=str, default="false", choices=["true", "false"],
                         help="Enable eval data shuffle, default is false")
     parser.add_argument("--eval_batch_size", type=int, default=1, help="Eval batch size, default is 1")
@@ -64,10 +64,18 @@ if __name__ == "__main__":
     args = parse_args()
     assessment_method = args.assessment_method.lower()
     if args.do_eval.lower() == "true":
-        ds = create_ner_dataset(batch_size=args.eval_batch_size,
-                                assessment_method=assessment_method, data_file_path=args.eval_data_file_path,
-                                schema_file_path=args.schema_file_path, dataset_format=args.dataset_format,
-                                do_shuffle=(args.eval_data_shuffle.lower() == "true"), drop_remainder=False)
+        if args.task == 'squad':
+            ds = create_squad_dataset(batch_size=args.eval_batch_size,
+                                      data_file_path=args.eval_data_file_path,
+                                      is_training=False,
+                                      schema_file_path=args.schema_file_path,
+                                      do_shuffle=(args.eval_data_shuffle.lower() == "true"),
+                                      dataset_format=args.dataset_format)
+        else:
+            ds = create_ner_dataset(batch_size=args.eval_batch_size,
+                                    assessment_method=assessment_method, data_file_path=args.eval_data_file_path,
+                                    schema_file_path=args.schema_file_path, dataset_format=args.dataset_format,
+                                    do_shuffle=(args.eval_data_shuffle.lower() == "true"), drop_remainder=False)
         ids_path = os.path.join(args.result_path, "00_data")
         mask_path = os.path.join(args.result_path, "01_data")
         token_path = os.path.join(args.result_path, "02_data")
@@ -81,7 +89,7 @@ if __name__ == "__main__":
             input_ids = data["input_ids"]
             input_mask = data["input_mask"]
             token_type_id = data["segment_ids"]
-            label_ids = data["label_ids"]
+            label_ids = data["unique_ids"] if args.task == "squad" else data["label_ids"]
 
             file_name = str(args.task) + "_bs" + str(args.eval_batch_size) + "_" + str(idx) + ".bin"
             ids_file_path = os.path.join(ids_path, file_name)
