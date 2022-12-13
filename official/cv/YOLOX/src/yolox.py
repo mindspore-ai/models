@@ -19,6 +19,7 @@ import mindspore.nn as nn
 from mindspore import Tensor, Parameter
 from mindspore import ops
 from mindspore.common.parameter import ParameterTuple
+from mindspore.ops import composite as C
 from mindspore.ops import functional as F
 from mindspore.ops import operations as P
 
@@ -402,11 +403,29 @@ class IOUloss(nn.Cell):
         return loss
 
 
-class TrainOneStepWithEMA(nn.TrainOneStepCell):
+grad_scale = C.MultitypeFuncGraph("grad_scale")
+reciprocal = P.Reciprocal()
+
+
+@grad_scale.register("Tensor", "Tensor")
+def tensor_grad_scale(scale, grad):
+    return grad * reciprocal(scale)
+
+
+_grad_overflow = C.MultitypeFuncGraph("_grad_overflow")
+grad_overflow = P.FloatStatus()
+
+
+@_grad_overflow.register("Tensor")
+def _tensor_grad_overflow(grad):
+    return grad_overflow(grad)
+
+
+class TrainOneStepWithEMA(nn.TrainOneStepWithLossScaleCell):
     """ Train one step with ema model """
 
     def __init__(self, network, optimizer, sens=1.0, ema=True, decay=0.9998, updates=0):
-        super(TrainOneStepWithEMA, self).__init__(network, optimizer, sens=sens)
+        super(TrainOneStepWithEMA, self).__init__(network, optimizer, sens)
         self.ema = ema
         self.decay = decay
         self.updates = Parameter(Tensor(updates, mindspore.float32))
@@ -443,12 +462,26 @@ class TrainOneStepWithEMA(nn.TrainOneStepCell):
         return self.updates
 
     def construct(self, *inputs):
+        weights = self.weights
         loss = self.network(*inputs)
-        sens = F.fill(loss.dtype, loss.shape, self.sens)
-        grads = self.grad(self.network, self.weights)(*inputs, sens)
+        scaling_sens = self.scale_sense
+
+        status, scaling_sens = self.start_overflow_check(loss, scaling_sens)
+
+        scaling_sens_filled = C.ones_like(loss) * F.cast(scaling_sens, F.dtype(loss))
+        grads = self.grad(self.network, weights)(*inputs, scaling_sens_filled)
+        grads = self.hyper_map(F.partial(grad_scale, scaling_sens), grads)
+        # apply grad reducer on grads
         grads = self.grad_reducer(grads)
-        loss = F.depend(loss, self.optimizer(grads))
+
+        # get the overflow buffer
+        cond = self.get_overflow_status(status, grads)
+        overflow = self.process_loss_scale(cond)
+
         if self.ema:
             self.ema_update()
 
-        return loss
+        # if there is no overflow, do optimize
+        if not overflow:
+            loss = F.depend(loss, self.optimizer(grads))
+        return loss, cond, scaling_sens
