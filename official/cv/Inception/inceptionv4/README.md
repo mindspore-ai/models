@@ -402,7 +402,7 @@ Before performing inference, the model file must be exported by export script on
 bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
 ```
 
--NOTE:Ascend310 inference use Imagenet dataset . The label of the image is the number of folder which is started from 0 after sorting.
+-NOTE:Ascend310 inference use Imagenet dataset . The label of the image is the number of folder which is started from 0 after sorting. This file can be converted by script from `models/utils/cpp_infer/imgid2label.py`
 
 Before performing inference, the model file must be exported by export script.
 

@@ -463,7 +463,7 @@ python export.py --net [NET_NAME] --ckpt_file [CKPT_PATH] --device_target [DEVIC
 bash run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [LABEL_FILE] [DEVICE_ID]
 ```
 
--注: Densnet121网络使用ImageNet数据集,图片的label是将文件夹排序后从0开始编号所得的数字.
+-注: Densnet121网络使用ImageNet数据集,图片的label是将文件夹排序后从0开始编号所得的数字。该文件可以利用脚本导出，该脚本可以从`models/utils/cpp_infer/imgid2label.py`取得。
 
 推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
 Densenet121网络使用ImageNet推理得到的结果如下:

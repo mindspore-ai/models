@@ -392,7 +392,7 @@ Current batch_size can only be set to 1.
 bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_FILE] [DEVICE_ID]
 ```
 
--Note: the Imagenet data set is used in densnet121 network. The label of the picture is the number from 0 after sorting the folder.
+-Note: the Imagenet data set is used in densnet121 network. The label of the picture is the number from 0 after sorting the folder. This file can be converted by script from `models/utils/cpp_infer/imgid2label.py`.
 
 Inference result will be stored in the script path, you can find result like the followings in acc.log.
 
