@@ -1,0 +1,5 @@
+opencv-python
+omegaconf
+einops
+ftfy
+regex
