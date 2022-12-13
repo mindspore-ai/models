@@ -14,6 +14,7 @@
 # ============================================================================
 
 """Dataset Cityscapes generator."""
+import os
 import cv2
 import numpy as np
 
@@ -47,16 +48,16 @@ class Cityscapes(BaseDataset):
         self._index = 0
         self.root = root
         if is_train:
-            self.list_path = root + "/train.lst"
+            self.list_path = os.path.join(self.root, 'train.lst')
         else:
-            self.list_path = root + "/val.lst"
+            self.list_path = os.path.join(self.root, 'val.lst')
         self.num_classes = num_classes
         self.multi_scale = multi_scale
         self.flip = flip
         list_file = open(self.list_path)
         img_list = [line.strip().split() for line in list_file]
         list_file.close()
-        self.img_list = [(self.root+"/"+vector[0], self.root+"/"+vector[1]) for vector in img_list]
+        self.img_list = [(os.path.join(self.root, v[0]), os.path.join(self.root, v[1])) for v in img_list]
         self._number = len(self.img_list)
 
         if num_samples:
