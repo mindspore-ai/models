@@ -68,6 +68,7 @@ class EvalCabllBack(TimeMonitor):
     def epoch_end(self, run_context):
         """save .ckpt files"""
         self.network.is_training = False
+        self.network.set_grad(False)
         self.model = Model(self.network)
         columns_list = ["feature", "label"]
         rest_golds_list = list()
@@ -111,6 +112,7 @@ class EvalCabllBack(TimeMonitor):
             self._best_val_F1 = val_current_F1
         print("current ACC {:.6f}%, current F1 {:.6f}%, self._best_val_F1 {:.6f}% "
               .format(acc*100, val_current_F1*100, self._best_val_F1*100))
+        self.network.set_grad(True)
 
 
 def train_lstm_crf():
