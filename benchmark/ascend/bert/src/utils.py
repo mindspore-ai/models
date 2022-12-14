@@ -101,17 +101,19 @@ class LossCallBack(Callback):
         Print loss after each step
         """
         cb_params = run_context.original_args()
+        loss, is_overflow, loss_scale = [output.asnumpy().item() for output in cb_params.net_outputs]
         if self._dataset_size > 0:
             percent, epoch_num = math.modf(cb_params.cur_step_num / self._dataset_size)
             if percent == 0:
                 percent = 1
                 epoch_num -= 1
-            print("epoch: {}, current epoch percent: {}, step: {}, outputs are {}"
-                  .format(int(epoch_num), "%.3f" % percent, cb_params.cur_step_num, str(cb_params.net_outputs)),
-                  flush=True)
+            print("epoch: {}, current epoch percent: {}, step: {}, loss: {}, overflow: {}, loss scale: {}"
+                  .format(int(epoch_num), "%.3f" % percent, cb_params.cur_step_num, loss, is_overflow,
+                          int(loss_scale)), flush=True)
         else:
-            print("epoch: {}, step: {}, outputs are {}".format(cb_params.cur_epoch_num, cb_params.cur_step_num,
-                                                               str(cb_params.net_outputs)), flush=True)
+            print("epoch: {}, step: {}, loss: {}, overflow: {}, loss scale: {}"
+                  .format(cb_params.cur_epoch_num, cb_params.cur_step_num, loss, is_overflow,
+                          int(loss_scale)), flush=True)
 
 
 def LoadNewestCkpt(load_finetune_checkpoint_dir, prefix):

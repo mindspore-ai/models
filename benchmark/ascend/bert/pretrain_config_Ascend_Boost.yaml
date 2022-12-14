@@ -50,6 +50,8 @@ eval_ckpt: ""
 eval_samples: 300000
 # bucket list, default: []
 bucket_list: [128, 256, 384, 512]
+# use packed dataset and model, which is incompatible with bucket
+use_packed: False
 # optimizer related
 AdamWeightDecay:
     learning_rate: 0.00003  # 3e-5

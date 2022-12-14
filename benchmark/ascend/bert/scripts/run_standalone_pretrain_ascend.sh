@@ -26,7 +26,7 @@ DATA_DIR=$3
 SCHEMA_DIR=$4
 ulimit -s 102400
 
-mkdir -p ms_log 
+mkdir -p ms_log
 PROJECT_DIR=$(cd "$(dirname "$0")" || exit; pwd)
 CUR_DIR=`pwd`
 export GLOG_log_dir=${CUR_DIR}/ms_log
@@ -39,7 +39,7 @@ python ${PROJECT_DIR}/../run_pretrain.py  \
     --enable_lossscale="true" \
     --do_shuffle="true" \
     --enable_data_sink="true" \
-    --data_sink_steps=1 \
+    --data_sink_steps=100 \
     --accumulation_steps=1 \
     --load_checkpoint_path="" \
     --save_checkpoint_steps=10000 \
