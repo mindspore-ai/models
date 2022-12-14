@@ -532,7 +532,7 @@ bash run_infer_310.sh [MINDIR_PATH] [DATASET] [DATA_PATH] [LABEL_FILE] [DEVICE_I
 
 ```
 
--NOTE:Ascend310 inference use Imagenet dataset . The label of the image is the number of folder which is started from 0 after sorting.
+-NOTE:Ascend310 inference use Imagenet dataset . The label of the image is the number of folder which is started from 0 after sorting. This file can be converted by script from `models/utils/cpp_infer/imgid2label.py`.
 
 Inference result is saved in current path, you can find result like this in acc.log file.
 The accuracy of evaluating DenseNet121 on the test dataset of ImageNet will be as follows:

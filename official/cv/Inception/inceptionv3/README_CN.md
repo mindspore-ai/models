@@ -434,7 +434,7 @@ python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_FILE] [DEVICE_ID]
 ```
 
--注意：310推理使用ImageNet数据集. 图片的标签是将所在文件夹排序后获得的从0开始的编号
+-注意：310推理使用ImageNet数据集. 图片的标签是将所在文件夹排序后获得的从0开始的编号。该文件可以利用脚本导出，该脚本可以从`models/utils/cpp_infer/imgid2label.py`取得。
 
 ### 结果
 
