@@ -1,0 +1,69 @@
+enable_modelarts: 1
+
+# Url for modelarts
+data_url: "s3://bucket-d/datasets/imagenet"
+train_url: "s3://bucket-d/train"
+checkpoint_url: 
+output_path: "/cache/train"
+data_path: "/cache/datasets/imagenet"
+
+# train datasets
+dataset_path: '/cache/datasets/imagenet/train'
+train_image_size: 224
+interpolation: 'BILINEAR'
+crop_min: 0.05
+batch_size: 128
+train_num_workers: 14
+
+# eval datasets
+eval_path: '/cache/datasets/imagenet/val'
+eval_image_size: 224
+eval_batch_size: 128
+eval_interval: 1
+eval_offset: -1
+eval_num_workers: 12
+
+# network
+backbone: 'hlg_mobile'
+class_num: 1001
+hlg_config_path: 'src.hlg.HLGConfig'
+pretrained: ''
+
+# lr
+lr_decay_mode: 'cosine'
+lr_init: 0.0
+lr_max: 0.001
+lr_min: 0.00001
+max_epoch: 300
+warmup_epochs: 20
+
+# optimizer
+opt: 'adamw'
+beta1: 0.9
+beta2: 0.999
+weight_decay: 0.05
+no_weight_decay_filter: "beta,bias"
+gc_flag: 0
+
+# loss
+loss_scale: 1024
+use_label_smooth: 1
+label_smooth_factor: 0.1
+mixup: 0.2
+autoaugment: 1
+loss_name: "ce_smooth_mixup"
+
+# ckpt
+save_checkpoint: 1
+save_checkpoint_epochs: 8
+keep_checkpoint_max: 3
+save_checkpoint_path: '/cache/train'
+
+# profiler
+open_profiler: 0
+
+# train
+context_mode: 0
+device_target: "Ascend"
+amp_level: "O3"
+run_distribute: 1

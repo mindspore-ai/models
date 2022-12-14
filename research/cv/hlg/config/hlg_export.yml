@@ -1,0 +1,22 @@
+enable_modelarts: 0
+
+device_target: 'Ascend'
+device_id: 0
+
+# Url for modelarts
+data_url: ""
+train_url: ""
+checkpoint_url: ""
+output_path: "/cache/train"
+
+file_name: 'hlg_mobile.mindir'
+file_format: 'MINDIR'
+
+backbone: 'hlg_mobile'
+train_image_size: 224
+class_num: 1001
+batch_size: 1
+hlg_config_path: 'src.hlg.HLGConfig'
+
+# load model
+pretrained: './hlg_mobile.ckpt'
