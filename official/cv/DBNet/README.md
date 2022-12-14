@@ -63,7 +63,7 @@ The above data are tested at:
 
 Ascend 910 32G 8 devices; Operating system: Euler2.8; Memory: 756 G; ARM 96 cores CPU;
 
-GPU v100 PCIE 32G 8 devices; Operating system: Ubuntu 18.04; Memory: 502 G; x86 72核 CPU.
+GPU v100 PCIE 32G 8 devices; Operating system: Ubuntu 18.04; Memory: 502 G; x86 72 cores CPU.
 
 ## Quickly Start
 
@@ -163,7 +163,7 @@ bash scripts/run_cpp_infer.sh [MINDIR_PATH] [CONFIG_PATH] [OUTPUT_DIR] [DEVICE_T
 
 Models only provide scripts for downloading and preprocessing public data sets. We do not own these datasets, nor are we responsible for their quality or maintenance. Please ensure that you have the permission to use the datasets under the permission of the datasets. The models trained on these datasets are only used for non-commercial research and teaching purposes.
 
-To the dataset owner: If you do not want to include the data set in MindSpot models or want to update it in any way, we will delete or update all public content as required. Please contact us through Gitee. Thank you for your understanding and contribution to the community.
+To the dataset owner: If you do not want to include the data set in MindSpore models or want to update it in any way, we will delete or update all public content as required. Please contact us through Gitee. Thank you for your understanding and contribution to the community.
 
 ## Thank
 

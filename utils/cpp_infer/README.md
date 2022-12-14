@@ -2,7 +2,7 @@
 
 ## Overview
 
-This tutorial aims at the edge scenarios inference deployment based on the MindIR model file exported by MindSpot.
+This tutorial aims at the edge scenarios inference deployment based on the MindIR model file exported by MindSpore.
 
 When the C++ inference backend is MindSpore, the MindIR model exported from MindSpore can be deployed on Ascend310 and Ascend310P.
 When the C++ inference backend is MindSpore Lite, MindIR models can be deployed on Ascend310/310P, Nvidia GPU and CPU.
@@ -14,7 +14,7 @@ MindSpore currently supports two kinds of running environments for inference wit
 One is to deploy the running environment directly using the installation package of MindSpore310,
 and the other is to deploy the inference environment using MindSpore Lite.
 
-The running environment are realized through `MS_LITE_HOME` identify whether to use MindSpot Lite. If setting `MS_LITE_HOME`, it will compile the scripts on MindSpore Lite, otherwise it will compile the scripts on MindSpore310.
+The running environment are realized through `MS_LITE_HOME` identify whether to use MindSpore Lite. If setting `MS_LITE_HOME`, it will compile the scripts on MindSpore Lite, otherwise it will compile the scripts on MindSpore310.
 
 ### MindSpore310
 
@@ -29,7 +29,7 @@ MindSpore Lite support Ascend310、Ascend310P、GPU、CPU.
 From [MindSpore Install](https://mindspore.cn/versions) download MindSpore whl package, and MindSpore Lite tar package. After unzipping, set `MS_LITE_HOME` to the unzipped path, such as:
 
 ```bash
-export MS_LITE_HOME=$some_path/mindpsore-lite-2.0.0-linux-x64
+export MS_LITE_HOME=$some_path/mindspore-lite-2.0.0-linux-x64
 ```
 
 ## Environment Variables
@@ -96,6 +96,8 @@ A typical inference process includes:
 - Data pre-processing(optional)
 - Inference model compilation and execution
 - Inference result post-processing
+
+Please referring to [resnet](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet#%E6%8E%A8%E7%90%86%E8%BF%87%E7%A8%8B)(data processing with C++) and [DBNet](https://gitee.com/mindspore/models/tree/master/official/cv/DBNet#%E7%A6%BB%E7%BA%BF%E6%8E%A8%E7%90%86)(data processing with python to bin file).
 
 ### Export MindIR
 
