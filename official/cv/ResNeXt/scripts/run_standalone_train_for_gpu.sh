@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 
-export DEVICE_ID=$1
+export CUDA_VISIBLE_DEVICES=$1
 DATA_DIR=$2
 PATH_CHECKPOINT=""
 if [ $# == 3 ]
