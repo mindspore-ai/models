@@ -1,4 +1,4 @@
-# Copyright 2021 Huawei Technologies Co., Ltd
+# Copyright 2021-2022 Huawei Technologies Co., Ltd
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -158,9 +158,9 @@ def visual_image(img, annos, save_path, ratio=None, height=None, width=None, nam
                 continue
             txt = '{}{:.2f}'.format(name, ann["score"])
             cat_size = cv2.getTextSize(txt, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)[0]
-            cv2.rectangle(img, (bbox[0], int(bbox[1] - cat_size[1] - 5)),
+            cv2.rectangle(img, (int(bbox[0]), int(bbox[1] - cat_size[1] - 5)),
                           (int(bbox[0] + cat_size[0]), int(bbox[1] - 2)), c, -1)
-            cv2.putText(img, txt, (bbox[0], int(bbox[1] - 5)),
+            cv2.putText(img, txt, (int(bbox[0]), int(bbox[1] - 5)),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 1, lineType=cv2.LINE_AA)
 
         ct = (int((bbox[0] + bbox[2]) / 2), int((bbox[1] + bbox[3]) / 2))

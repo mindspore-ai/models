@@ -1,6 +1,6 @@
 # Contents
 
-- [CenterNet Description](#CenterNet-description)
+- [CenterNet Description](#centernet-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
@@ -12,7 +12,7 @@
         - [Distributed Training](#distributed-training)
     - [Testing Process](#testing-process)
         - [Testing and Evaluation](#testing-and-evaluation)
-    - [Inference Process](#inference-process)
+    - [Ascend Inference Process](#ascend-inference-process)
         - [Convert](#convert)
         - [Infer on Ascend310](#infer-on-Ascend310)
         - [Result](#result)
@@ -52,7 +52,7 @@ Dataset used: [COCO2017](https://cocodataset.org/)
 
 - The directory structure is as follows, name of directory and file is user defined:
 
-    ```path
+    ```text
     .
     ├── dataset
         ├── centernet
@@ -94,7 +94,7 @@ Dataset used: [COCO2017](https://cocodataset.org/)
     1. If coco dataset is used. **Select dataset to coco when run script.**
         Install Cython and pycocotool, and you can also install mmcv to process data.
 
-        ```pip
+        ```bash
         pip install Cython
 
         pip install pycocotools
@@ -104,7 +104,7 @@ Dataset used: [COCO2017](https://cocodataset.org/)
 
         And change the COCO_ROOT and other settings you need in `config.py`. The directory structure is as follows:
 
-        ```path
+        ```text
         .
         └─cocodataset
           ├─annotations
@@ -120,36 +120,59 @@ Dataset used: [COCO2017](https://cocodataset.org/)
 
 # [Quick Start](#contents)
 
-- running on local
+## Running on local (Ascend or GPU)
 
-    After installing MindSpore via the official website, you can start training and evaluation as follows:
+After installing MindSpore via the official website, you can start training and evaluation as follows:
 
-    Note:
-    1.the first run of training will generate the mindrecord file, which will take a long time.
-    2.MINDRECORD_DATASET_PATH is the mindrecord dataset directory.
-    3.For `train.py`, LOAD_CHECKPOINT_PATH is the pretrained checkpoint file directory, if no just set "".
-    4.For `eval.py`, LOAD_CHECKPOINT_PATH is the checkpoint to be evaluated.
-    5.RUN_MODE support validation and testing, set to be "val"/"test"
+**Notes:**
 
-    ```shell
-    # create dataset in mindrecord format
-    bash scripts/convert_dataset_to_mindrecord.sh [COCO_DATASET_DIR] [MINDRECORD_DATASET_DIR]
+1. the first run of training will generate the mindrecord file, which will take a long time.
+2. MINDRECORD_DATASET_PATH is the mindrecord dataset directory.
+3. For `train.py`, LOAD_CHECKPOINT_PATH is the optional pretrained checkpoint file, if no just set "".
+4. For `eval.py`, LOAD_CHECKPOINT_PATH is the checkpoint to be evaluated.
+5. RUN_MODE argument support validation and testing, set to be "val"/"test"
 
-    # standalone training on Ascend
-    bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [MINDRECORD_DATASET_PATH] [LOAD_CHECKPOINT_PATH](optional)
+### Ascend
 
-    # distributed training on Ascend
-    bash scripts/run_distributed_train_ascend.sh [MINDRECORD_DATASET_PATH] [RANK_TABLE_FILE] [LOAD_CHECKPOINT_PATH](optional)
+The training configuration is in `default_config.yaml`.
 
-    # eval on Ascend
-    bash scripts/run_standalone_eval_ascend.sh [DEVICE_ID] [RUN_MODE] [DATA_DIR] [LOAD_CHECKPOINT_PATH]
-    ```
+```bash
+# create dataset in mindrecord format
+bash scripts/convert_dataset_to_mindrecord.sh [COCO_DATASET_DIR] [MINDRECORD_DATASET_DIR]
 
-- running on ModelArts
+# standalone training on Ascend
+bash scripts/run_standalone_train_ascend.sh [DEVICE_ID] [MINDRECORD_DATASET_PATH] [LOAD_CHECKPOINT_PATH](optional)
 
-  If you want to run in modelarts, please check the official documentation of modelarts, and you can start training as follows
+# distributed training on Ascend
+bash scripts/run_distributed_train_ascend.sh [MINDRECORD_DATASET_PATH] [RANK_TABLE_FILE] [LOAD_CHECKPOINT_PATH](optional)
 
-    - Creating mindrecord dataset with single cards on ModelArts
+# eval on Ascend
+bash scripts/run_standalone_eval_ascend.sh [DEVICE_ID] [RUN_MODE] [DATA_DIR] [LOAD_CHECKPOINT_PATH]
+```
+
+### GPU
+
+**Note:** the training configuration is in `centernetdet_gpu_config.yaml`.
+
+```bash
+# create dataset in mindrecord format
+bash scripts/convert_dataset_to_mindrecord.sh [COCO_DATASET_DIR] [MINDRECORD_DATASET_DIR]
+
+# standalone training on GPU
+bash scripts/run_standalone_train_gpu.sh [DEVICE_ID] [MINDRECORD_DIR] [LOAD_CHECKPOINT_PATH](optional)
+
+# distributed training on GPU
+bash scripts/run_distributed_train_gpu.sh [MINDRECORD_DIR] [NUM_DEVICES] [LOAD_CHECKPOINT_PATH](optional)
+
+# eval on GPU
+bash scripts/run_standalone_eval_gpu.sh [DEVICE_ID] [RUN_MODE] [DATA_DIR] [LOAD_CHECKPOINT_PATH]
+```
+
+## Running on ModelArts
+
+If you want to run in modelarts, please check the official documentation of modelarts, and you can start training as follows
+
+- Creating mindrecord dataset with single cards on ModelArts
 
     ```text
     # (1) Upload the code folder to S3 bucket.
@@ -168,7 +191,7 @@ Dataset used: [COCO2017](https://cocodataset.org/)
     # (10) Create your job.
     ```
 
-  - Training with single cards on ModelArts
+- Training with single cards on ModelArts
 
    ```text
     # (1) Upload the code folder to S3 bucket.
@@ -193,7 +216,7 @@ Dataset used: [COCO2017](https://cocodataset.org/)
     # (10) Create your job.
    ```
 
-  - evaluating with single card on ModelArts
+- evaluating with single card on ModelArts
 
    ```text
     # (1) Upload the code folder to S3 bucket.
@@ -230,7 +253,7 @@ Note: 1.the first run of training will generate the mindrecord file, which will 
 
 ## [Script and Sample Code](#contents)
 
-```path
+```text
 .
 ├── cv
     ├── centernet_det
@@ -238,7 +261,8 @@ Note: 1.the first run of training will generate the mindrecord file, which will 
         ├── eval.py                      // testing and evaluation outputs
         ├── export.py                    // convert mindspore model to mindir model
         ├── README.md                    // descriptions about centernet_det
-        ├── default_config.yaml          // parameter configuration
+        ├── default_config.yaml          // Ascend parameter configuration
+        ├── centernetdet_gpu_config.yaml // GPU parameter configuration
         ├── ascend310_infer              // application for 310 inference
         ├── preprocess.py                // preprocess scripts
         ├── postprocess.py               // postprocess scripts
@@ -247,12 +271,15 @@ Note: 1.the first run of training will generate the mindrecord file, which will 
         │   │    ├── __init__.py
         │   │    ├── hyper_parameter_config.ini         // hyper parameter for distributed training
         │   │    ├── get_distribute_train_cmd.py        // script for distributed training
-        │   │    ├── README.md
+        │   │    └── README.md
         │   ├── convert_dataset_to_mindrecord.sh        // shell script for converting coco type dataset to mindrecord
         │   ├── run_standalone_train_ascend.sh          // shell script for standalone training on ascend
+        │   ├── run_standalone_train_gpu.sh             // shell script for standalone training on GPU
         │   ├── run_infer_310.sh                        // shell script for 310 inference on ascend
         │   ├── run_distributed_train_ascend.sh         // shell script for distributed training on ascend
+        │   ├── run_distributed_train_gpu.sh            // shell script for distributed training on GPU
         │   ├── run_standalone_eval_ascend.sh           // shell script for standalone evaluation on ascend
+        │   └── run_standalone_eval_gpu.sh              // shell script for standalone evaluation on GPU
         └── src
             ├── model_utils
             │   ├── config.py            // parsing parameter configuration file of "*.yaml"
@@ -428,7 +455,7 @@ Parameters for optimizer and learning rate:
 
 Before your first training, convert coco type dataset to mindrecord files is needed to improve performance on host.
 
-```shell
+```bash
 bash scripts/convert_dataset_to_mindrecord.sh /path/coco_dataset_dir /path/mindrecord_dataset_dir
 ```
 
@@ -438,7 +465,7 @@ The command above will run in the background, after converting mindrecord files 
 
 #### Running on Ascend
 
-```shell
+```bash
 bash scripts/run_distributed_train_ascend.sh /path/mindrecord_dataset /path/hccl.json /path/load_ckpt(optional)
 ```
 
@@ -453,11 +480,40 @@ epoch time: 1214703.313 ms, per step time: 994.843 ms
 ...
 ```
 
+#### Running on GPU
+
+```bash
+bash scripts/run_distributed_train_gpu.sh /path/mindrecord_dataset 8
+```
+
+The command above will run in the background, you can view training logs in Train_parallel/training_log.txt. After training finished, you will get some checkpoint files under the Train_parallel/checkpointsckpt_0 folder by default. The loss value will be displayed as follows:
+
+```text
+epoch: 120, current epoch percent: 0.287, step: 195827, outputs are 1.628212
+epoch: 120, current epoch percent: 0.287, step: 195827, outputs are 2.0098093
+epoch: 120, current epoch percent: 0.287, step: 195827, outputs are 2.2687669
+epoch: 120, current epoch percent: 0.287, step: 195827, outputs are 2.0722423
+epoch: 120, current epoch percent: 0.287, step: 195827, outputs are 1.3634725
+epoch: 120, current epoch percent: 0.287, step: 195827, outputs are 1.933584
+epoch: 120, current epoch percent: 0.287, step: 195827, outputs are 1.5815283
+epoch: 120, current epoch percent: 0.287, step: 195827, outputs are 1.4993639
+epoch: 120, current epoch percent: 0.287, step: 195828, outputs are 2.063395
+epoch: 120, current epoch percent: 0.287, step: 195828, outputs are 1.83587
+epoch: 120, current epoch percent: 0.287, step: 195828, outputs are 1.8395581
+epoch: 120, current epoch percent: 0.287, step: 195828, outputs are 1.5058619
+epoch: 120, current epoch percent: 0.287, step: 195828, outputs are 2.1509295
+epoch: 120, current epoch percent: 0.287, step: 195828, outputs are 2.082848
+epoch: 120, current epoch percent: 0.287, step: 195828, outputs are 1.7891021
+epoch: 120, current epoch percent: 0.287, step: 195828, outputs are 2.2131023
+```
+
 ## [Testing Process](#contents)
 
 ### Testing and Evaluation
 
-```shell
+#### Ascend results
+
+```bash
 # Evaluation base on validation dataset will be done automatically, while for test or test-dev dataset, the accuracy should be upload to the CodaLab official website(https://competitions.codalab.org).
 # On Ascend
 bash scripts/run_standalone_eval_ascend.sh device_id val(or test) /path/coco_dataset /path/load_ckpt
@@ -465,7 +521,7 @@ bash scripts/run_standalone_eval_ascend.sh device_id val(or test) /path/coco_dat
 
 you can see the MAP result below as below:
 
-```log
+```text
 overall performance on coco2017 validation dataset
  Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.415
  Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.604
@@ -481,7 +537,31 @@ overall performance on coco2017 validation dataset
  Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.764
 ```
 
-## [Inference Process](#contents)
+#### GPU results
+
+```bash
+# example
+bash scripts/run_standalone_eval_gpu.sh 0 val /path/coco_dataset /path/load_ckpt
+```
+
+you can see the MAP result below as below:
+
+```text
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.409
+ Average Precision  (AP) @[ IoU=0.50      | area=   all | maxDets=100 ] = 0.600
+ Average Precision  (AP) @[ IoU=0.75      | area=   all | maxDets=100 ] = 0.441
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.235
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.450
+ Average Precision  (AP) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.536
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=  1 ] = 0.338
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets= 10 ] = 0.556
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=   all | maxDets=100 ] = 0.589
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= small | maxDets=100 ] = 0.387
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area=medium | maxDets=100 ] = 0.644
+ Average Recall     (AR) @[ IoU=0.50:0.95 | area= large | maxDets=100 ] = 0.755
+```
+
+## [Ascend Inference Process](#contents)
 
 **Before inference, please refer to [MindSpore Inference with C++ Deployment Guide](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README.md) to set environment variables.**
 
@@ -556,40 +636,40 @@ Inference result is saved in current path, you can find result like this in acc.
 
 ## [Performance](#contents)
 
-### Training Performance On Ascend 910
+### Training Performance
 
 CenterNet on 11.8K images(The annotation and data format must be the same as coco)
 
-| Parameters                 | CenterNet_Hourglass                                                      |
-| -------------------------- | ---------------------------------------------------------------|
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G                |
-| uploaded Date              | 3/27/2021 (month/day/year)                                    |
-| MindSpore Version          | 1.1.0                                                          |
-| Dataset                    | COCO2017                                                   |
-| Training Parameters        | 8p, epoch=130, steps=158730, batch_size = 12, lr=2.4e-4   |
-| Optimizer                  | Adam                                                           |
-| Loss Function              | Focal Loss, L1 Loss, RegLoss                                   |
-| outputs                    | detections                                                     |
-| Loss                       | 1.5-2.5                                                        |
-| Speed                      | 8p 20 img/s                                      |
-| Total time: training       | 8p: 44 h                                     |
-| Total time: evaluation     | keep res: test 1h, val 0.25h; fix res: test 40 min, val 8 min|
-| Checkpoint                 | 2.3G (.ckpt file)                                              |
+| Parameters                 | CenterNet_Hourglass (Ascend)                                 | CenterNet_Hourglass (GPU)                                    |
+| -------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G              | GPU RTX 3090 24GB                                            |
+| uploaded Date              | 3/27/2021 (month/day/year)                                   | 09/22/2022 (month/day/year)                                  |
+| MindSpore Version          | 1.1.0                                                        | 1.8.1                                                        |
+| Dataset                    | COCO2017                                                     | COCO2017                                                     |
+| Training Parameters        | 8p, epoch=130, steps=158730, batch_size = 12, lr=2.4e-4      | 8p, epoch=130, batch_size = 9, lr=2.4e-4                     |
+| Optimizer                  | Adam                                                         | Adam                                                         |
+| Loss Function              | Focal Loss, L1 Loss, RegLoss                                 | Focal Loss, L1 Loss, RegLoss                                 |
+| outputs                    | detections                                                   | detections                                                   |
+| Loss                       | 1.5-2.5                                                      | 1.5-2.5                                                      |
+| Speed                      | 8p 20 img/s                                                  | 8p 20 img/s                                                  |
+| Total time: training       | 8p: 44 h                                                     | 8p: 95 h                                                     |
+| Total time: evaluation     | keep res: test 1h, val 0.25h; fix res: test 40 min, val 8 min| keep res: test 1h, val 0.25h; fix res: test 40 min, val 8 min|
+| Checkpoint                 | 2.3G (.ckpt file)                                            | 2.3G (.ckpt file)                                            |
 | Scripts                    | [centernet_det script](https://gitee.com/mindspore/models/tree/master/research/cv/centernet_det) |
 
-### Inference Performance On Ascend 910
+### Inference Performance
 
-CenterNet on validation(5K images) and test-dev(40K images)
+CenterNet on validation(5K images)
 
-| Parameters                 | CenterNet_Hourglass                                                       |
-| -------------------------- | ----------------------------------------------------------------|
-| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G                 |
-| uploaded Date              | 3/27/2021 (month/day/year)                                     |
-| MindSpore Version          | 1.1.0                                                           |
-| Dataset                    | COCO2017                            |
-| batch_size                 | 1                                                               |
-| outputs                    | mAP                       |
-| Accuracy(validation)       | MAP: 41.5%, AP50: 60.4%, AP75: 44.7%, Medium: 45.7%, Large: 53.6%|
+| Parameters                 | CenterNet_Hourglass (Ascend)                                     | CenterNet_Hourglass (GPU)                                        |
+| -------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Resource                   | Ascend 910; CPU 2.60GHz, 192cores; Memory, 755G                  | GPU RTX 3090 24GB                                                |
+| uploaded Date              | 3/27/2021 (month/day/year)                                       | 09/22/2022 (month/day/year)                                      |
+| MindSpore Version          | 1.1.0                                                            | 1.8.1                                                            |
+| Dataset                    | COCO2017                                                         | COCO2017                                                         |
+| batch_size                 | 1                                                                | 1                                                                |
+| outputs                    | mAP                                                              | mAP                                                              |
+| Accuracy(validation)       | MAP: 41.5%, AP50: 60.4%, AP75: 44.7%, Medium: 45.7%, Large: 53.6%| MAP: 40.9%, AP50: 60.0%, AP75: 44.1%, Medium: 45.0%, Large: 53.6%|
 
 ### Inference Performance On Ascend 310
 
@@ -612,7 +692,7 @@ In train.py, we set a random seed to make sure that each node has the same initi
 
 # [ModelZoo Homepage](#contents)
 
- Please check the official [homepage](https://gitee.com/mindspore/models).
+Please check the official [homepage](https://gitee.com/mindspore/models).
 
 # FAQ
 
