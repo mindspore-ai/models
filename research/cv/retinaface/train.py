@@ -14,6 +14,7 @@
 # ============================================================================
 """Train Retinaface_resnet50ormobilenet0.25."""
 
+import os
 import argparse
 import math
 import mindspore
@@ -47,7 +48,8 @@ def train_with_resnet(cfg):
         else:
             context.set_context(device_id=cfg['device_id'])
     elif cfg['device_target'] == "GPU":
-        if cfg['ngpu'] > 1:
+        rank_size = int(os.environ.get("RANK_SIZE", "1"))
+        if rank_size > 1:
             init("nccl")
             context.set_auto_parallel_context(device_num=get_group_size(), parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
