@@ -1,0 +1,74 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+enable_modelarts: False
+# Path for local
+data_path: "/cache/data"
+output_path: "/cache/train"
+device_target: "GPU"
+
+# ==============================================================================
+# Training options
+model_name: "unet_medical"
+run_distribute: False
+crop: [388, 388]
+image_size: [572, 572]
+train_augment: True
+lr: 0.0001
+epoch_size: 400
+repeat: 1
+distribute_epochs: 1600
+batch_size: 12
+distribute_batchsize: 3
+cross_valid_ind: 1
+num_classes: 2
+num_channels: 1
+weight_decay: 0.0005
+loss_scale: 1024.0
+FixedLossScaleManager: 1024.0
+resume: False
+resume_ckpt: "./"
+
+#Eval options
+eval_metrics: "dice_coeff"
+eval_start_epoch: 0
+eval_interval: 1
+keep_checkpoint_max: 10
+eval_activate: "Softmax"
+eval_resize: False
+checkpoint_path: "./checkpoint/"
+checkpoint_file_path: "ckpt_unet_medical_adam-400_2.ckpt"
+rst_path: "./result_Files/"
+include_background: True
+show_eval: False
+
+#uni pruning
+exp_name: 'Unet_baseline'
+prune_flag: 1
+prune_rate: 0.25
+pruning_step: 16
+filter_lower_threshold: 32
+frequency: 20
+mask_path: ''
+
+---
+# Help description for each configuration
+enable_modelarts: "Whether training on modelarts, default: False"
+data_path: "Dataset path for local"
+output_path: "Training output path for local"
+device_target: "Target device type, available: [Ascend, GPU, CPU]"
+enable_profiling: "Whether enable profiling while training, default: False"
+num_classes: "Class for dataset"
+batch_size: "Batch size for training and evaluation"
+distribute_batchsize: "Batch size for distribute training"
+weight_decay: "Weight decay."
+keep_checkpoint_max: "keep the last keep_checkpoint_max checkpoint"
+checkpoint_path: "The location of the checkpoint file."
+checkpoint_file_path: "The location of the checkpoint file."
+train_augment: "Whether apply data augment when training."
+
+exp_name: "the name of the current experiment"
+prune_flag: "set to 1 to enable pruning"
+prune_rate: "pruning rate"
+pruning_step: "the number of filter to prune as a single group"
+filter_lower_threshold: "the minimal number of channels in a layer"
+frequency: "the number of fine-tune epochs between pruning steps"
+mask_path: "path to pruning mask saved as .json on train in os.path.join(output_path, exp_name)"
