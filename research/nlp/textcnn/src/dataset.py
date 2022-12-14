@@ -23,7 +23,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import mindspore.dataset as ds
-import mindspore as ms
 
 
 class Generator():
@@ -128,15 +127,8 @@ class MovieReview(DataProcessor):
         self.maxlen = float("-inf")
         self.Pos = []
         self.Neg = []
-        if ms.get_context("device_target") == "CPU":
-            encoding = "utf-8"
-        else:
-            encoding = None
         for filename in self.files:
-            with codecs.open(filename, 'r', encoding) as f:
-                ff = f.read()
-            with codecs.open(filename, 'w', 'utf-8') as file_object:
-                file_object.write(ff)
+            # file should be encoded as utf-8
             self.read_data(filename)
         self.PosNeg = self.Pos + self.Neg
         self.text2vec(maxlen=maxlen)
@@ -149,7 +141,7 @@ class MovieReview(DataProcessor):
         input:
             filePath: the path where the data is stored in
         """
-        with open(filePath, 'r', 'utf-8') as f:
+        with open(filePath, 'r') as f:
             for sentence in f.readlines():
                 sentence = sentence.replace('\n', '')\
                                     .replace('"', '')\
