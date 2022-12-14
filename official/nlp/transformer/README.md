@@ -333,7 +333,7 @@ Parameters for learning rate:
 
 - Convert the original data to mindrecord for evaluation:
 
-    - The 'bucket' parameter is configured through the yaml file
+    - The 'bucket' parameter is configured as [128] through the yaml file
 
     ``` bash
     paste newstest2014.tok.bpe.32000.en newstest2014.tok.bpe.32000.de > test.all
