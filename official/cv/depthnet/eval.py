@@ -44,13 +44,13 @@ if __name__ == "__main__":
     coarse_param_dict = load_checkpoint(coarse_ckpt_model)
     load_param_into_net(coarse_net, coarse_param_dict)
     coarse_net.set_train(mode=False)
-    coarse_model = Model(coarse_net, coarse_param_dict)
+    coarse_model = Model(coarse_net)
 
     fine_net = FineNet()
     fine_param_dict = load_checkpoint(fine_ckpt_model)
     load_param_into_net(fine_net, fine_param_dict)
     fine_net.set_train(mode=False)
-    fine_model = Model(fine_net, fine_param_dict)
+    fine_model = Model(fine_net)
 
     delta1 = 1.25
     delta2 = 1.25 ** 2

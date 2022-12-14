@@ -96,12 +96,12 @@ if __name__ == "__main__":
                         max_call_depth=5000, device_id=device_id)
 
     _model = lpcnet.WithLossLPCNet()
-    model.backbone.to_float(mindspore.float16)
+    _model.backbone.to_float(mindspore.float16)
     load_checkpoint(str(model_file), net=model)
-    model.set_train(False)
+    _model.set_train(False)
 
-    _enc = model.backbone.encoder
-    _dec = model.backbone.decoder
+    _enc = _model.backbone.encoder
+    _dec = _model.backbone.decoder
 
     for _f in tst_dir.glob('*.f32'):
         _feature_file = tst_dir / (_f.stem + '.f32')
