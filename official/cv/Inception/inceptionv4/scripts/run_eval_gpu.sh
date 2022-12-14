@@ -18,8 +18,7 @@ rm -rf evaluation
 mkdir evaluation
 cp ./*.py ./evaluation
 cp ./*.yaml ./evaluation
-cp -r ./src ./evaluation
-cd ./evaluation || exit
+cp -r ./src ./evaluation || exit
 
 export DEVICE_ID=0
 export RANK_SIZE=1
