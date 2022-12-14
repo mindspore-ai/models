@@ -1,0 +1,61 @@
+# Builtin Configurations(DO NOT CHANGE THESE CONFIGURATIONS unless you know exactly what you are doing)
+modelArts_mode: False
+is_distributed: False
+# Url for modelarts
+data_url: ""
+train_url: ""
+# Path for local
+dataroot: "/home/younger/dataset"
+device_target: "Ascend"
+rank: 0
+group_size: 1
+
+# ==============================================================================
+# options
+seed: 0
+imageSize: 64
+mean_image: 0.5
+std_image: 0.5
+epochs: 20
+batch_size: 500
+num_tests: 248274
+num_train: 583180
+test_batch_size: 600
+augmentation: False
+checkpoint_path: "./ckpt/checkpoint_SDNet_20.ckpt"
+onnx_filename: "SDNet"
+air_filename: "SDNet"
+ckpt_save_dir: "./ckpt/"
+
+# optimizer and lr related
+optimizer: adam
+lr: 0.004
+beta1: 0.5
+beta2: 0.9
+lr_decay: 1e-6
+wd: 0.0001 #1e-4
+
+# export option
+ckpt_file: ""
+file_name: "SDNet"
+file_format: "MINDIR"
+
+# loss related
+loss: triplet_margin
+batch_reduce: min #Other options: average, random, random_global, L2Net
+reconw: 0.001
+anchorave: False
+anchorswap: True
+margin: 1.0
+temp: 0.1
+weight: 10
+
+---
+
+# Help description for each configuration
+modelArts_mode: "Whether training on modelarts, default: False"
+data_url: "Url for modelarts"
+train_url: "Url for modelarts"
+data_path: "The location of the input data."
+output_path: "The location of the output file."
+device_target: 'Target device type'
