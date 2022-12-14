@@ -19,7 +19,7 @@ import os
 from mindspore import context, Model, nn
 from mindspore.train.callback import LossMonitor, CheckpointConfig, ModelCheckpoint, TimeMonitor
 from mindspore.context import ParallelMode
-from mindspore.communication.management import init
+from mindspore.communication.management import init, get_rank, get_group_size
 from mindspore.train.serialization import load_checkpoint, load_param_into_net
 from src.model import CTCModel
 from src.dataset import create_dataset
@@ -43,25 +43,40 @@ def modelarts_pre_process():
 
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_train():
-    '''train_function'''
+    """train_function"""
+
+    context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target)
     if config.device_target == 'Ascend':
         if not config.enable_modelarts and not config.run_distribute:
             device_id = config.device_id
         else:
             device_id = get_device_id()
-        context.set_context(device_id=device_id, mode=context.GRAPH_MODE)
-    if config.run_distribute:
-        if config.device_target == 'Ascend':
+        context.set_context(device_id=device_id)
+
+        if config.run_distribute:
             device_num = get_device_num()
-            rank = get_rank_id()
+            device_id = get_rank_id()
             context.reset_auto_parallel_context()
             context.set_auto_parallel_context(device_num=device_num,
                                               parallel_mode=ParallelMode.DATA_PARALLEL,
                                               gradients_mean=True)
             init()
-    else:
-        device_num = 1
-        rank = 0
+
+    elif config.device_target == 'GPU':
+        if config.run_distribute:
+            init()
+            device_id = get_rank()
+            device_num = get_group_size()
+            context.set_auto_parallel_context(device_num=device_num,
+                                              parallel_mode=ParallelMode.DATA_PARALLEL,
+                                              gradients_mean=True)
+            rank = device_id
+        else:
+            device_num = 1
+            device_id = config.device_id
+            context.set_context(device_id=device_id)
+            rank = 0
+
     ds_train = create_dataset(config.train_path, True, config.batch_size, num_shards=device_num, shard_id=rank)
     net = CTCModel(input_size=config.feature_dim, batch_size=config.batch_size, hidden_size=config.hidden_size,
                    num_class=config.n_class, num_layers=config.n_layer)
