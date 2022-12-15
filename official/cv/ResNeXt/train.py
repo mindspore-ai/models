@@ -99,9 +99,6 @@ def train():
     if config.device_target == "Ascend":
         if os.getenv('DEVICE_ID', "not_set").isdigit():
             context.set_context(device_id=int(os.getenv('DEVICE_ID')))
-    elif config.device_target == "GPU":
-        if os.getenv('CUDA_VISIBLE_DEVICES', "not_set").isdigit():
-            context.set_context(device_id=0)
 
     # init distributed
     if config.run_distribute:
