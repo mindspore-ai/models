@@ -131,12 +131,19 @@ if __name__ == '__main__':
 
     print('dataset_val_path = ', dataset_val_path)
 
-    dataset = create_dataset(dataset_val_path, do_train=False, rank=device_id,
-                             group_size=1, batch_size=config.val_batch_size,
-                             drop_remainder=drop_remainder, shuffle=False,
-                             normalize=args_opt.normalize,
-                             enable_tobgr=args_opt.enable_tobgr,
-                             num_parallel_workers=config.num_parallel_workers)
+    if args_opt.platform != 'CPU':
+        dataset = create_dataset(dataset_val_path, do_train=False, rank=device_id,
+                                 group_size=1, batch_size=config.val_batch_size,
+                                 drop_remainder=drop_remainder, shuffle=False,
+                                 normalize=args_opt.normalize,
+                                 enable_tobgr=args_opt.enable_tobgr)
+    else:
+        dataset = create_dataset(dataset_val_path, do_train=False, rank=device_id,
+                                 group_size=1, batch_size=config.val_batch_size,
+                                 drop_remainder=drop_remainder, shuffle=False,
+                                 normalize=args_opt.normalize,
+                                 enable_tobgr=args_opt.enable_tobgr,
+                                 num_parallel_workers=config.num_parallel_workers)
     if not args_opt.use_nn_default_loss:
         loss = CrossEntropySmooth(sparse=True, reduction="mean",
                                   smooth_factor=config.label_smooth_factor, num_classes=config.num_classes)
