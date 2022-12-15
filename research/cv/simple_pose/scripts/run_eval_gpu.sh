@@ -40,5 +40,5 @@ log_path="./logs/eval_gpu.log"
 echo "log_path is : ${log_path}"
 
 echo "start gpu evaluating, using device $3"
-export DEVICE_ID="$3"
+export CUDA_VISIBLE_DEVICES="$3"
 nohup python eval.py --device_target GPU --eval_model_file $1 --coco_bbox_file $2 > ${log_path} 2>&1 &

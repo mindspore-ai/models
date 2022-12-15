@@ -94,7 +94,7 @@ fi
 
 export DEVICE_NUM=1
 export RANK_SIZE=$DEVICE_NUM
-export DEVICE_ID=$5
+export CUDA_VISIBLE_DEVICES=$5
 export RANK_ID=0
 
 if [ -d "../eval" ];
@@ -104,8 +104,8 @@ fi
 mkdir ../eval
 cd ../eval || exit
 
-echo "start eval for device $DEVICE_ID"
+echo "start eval for device $CUDA_VISIBLE_DEVICES"
 env > env.log
 pwd
 python ${BASE_PATH}/../eval.py --config_path=$CONFIG_FILE --coco_root=$PATH3 --mindrecord_dir=$mindrecord_dir \
---device_target="GPU" --device_id=$DEVICE_ID --anno_path=$PATH1 --checkpoint_path=$PATH2 --backbone=$3 &> eval.log &
+--device_target="GPU" --anno_path=$PATH1 --checkpoint_path=$PATH2 --backbone=$3 &> eval.log &

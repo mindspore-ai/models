@@ -22,7 +22,7 @@ fi
 
 BASEPATH=$(cd "`dirname $0`" || exit; pwd)
 export PYTHONPATH=${BASEPATH}:$PYTHONPATH
-export DEVICE_ID=$3
+export CUDA_VISIBLE_DEVICES=$3
 
 cd ..
 
