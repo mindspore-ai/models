@@ -28,7 +28,7 @@
 
 E-NET主要用于图像分割领域，是一种端到端的分割方法。语义分割的落地（应用于嵌入式设备如手机、可穿戴设备等低功耗移动设备）是一个很重要的问题。基于VGG架构的语义分割模型需要大量的浮点运算，导致运行时间长，从而降低了时效性。 相比之下，ENet网络推理速度快，浮点计算量少，参数少，且有相似的精度。
 
-使用mindpsore复现E-NET[[论文]](https://arxiv.org/abs/1606.02147)。
+使用mindspore复现E-NET[[论文]](https://arxiv.org/abs/1606.02147)。
 这个项目迁移于ENet的Pytorch实现[[HERE]](https://github.com/davidtvs/PyTorch-ENet)。
 
 ### 论文

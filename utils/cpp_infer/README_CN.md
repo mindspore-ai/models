@@ -10,7 +10,7 @@
 
 MindSpore目前支持两种使用C++进行推理的运行环境，一种是直接使用MindSpore310的安装包部署运行环境，一种是使用MindSpore Lite进行推理环境部署。
 
-两种推理环境通过`MS_LITE_HOME`识别是否使用MindSpore Lite，编译脚本如果识别存在环境变量`MS_LITE_HOME`，则会使用MindSpore Lite作为推理后端，否则将使用MidSpore whl包作为推理后端。
+两种推理环境通过`MS_LITE_HOME`识别是否使用MindSpore Lite，编译脚本如果识别存在环境变量`MS_LITE_HOME`，则会使用MindSpore Lite作为推理后端，否则将使用MindSpore whl包作为推理后端。
 
 ### MindSpore310
 
@@ -25,7 +25,7 @@ MindSpore Lite推理后端支持Ascend310、Ascend310P、GPU、CPU硬件后端�
 从[官网](https://mindspore.cn/versions)下载MindSpore Lite Ascend、GPU、CPU三合一tar包，解压缩后，设置`MS_LITE_HOME`环境变量为解压缩的路径，比如：
 
 ```bash
-export MS_LITE_HOME=$some_path/mindpsore-lite-2.0.0-linux-x64
+export MS_LITE_HOME=$some_path/mindspore-lite-2.0.0-linux-x64
 ```
 
 ## 环境变量
@@ -103,6 +103,9 @@ export GLOG_v=2 # 0-DEBUG, 1-INFO, 2-WARNING, 3-ERROR, 4-CRITICAL, default level
 - 推理模型编译及执行
 - 推理结果后处理
 
+整个过程可以参考[resnet](https://gitee.com/mindspore/models/tree/master/official/cv/ResNet#%E6%8E%A8%E7%90%86%E8%BF%87%E7%A8%8B)（使用C++进行数据处理）和
+[DBNet](https://gitee.com/mindspore/models/tree/master/official/cv/DBNet#%E7%A6%BB%E7%BA%BF%E6%8E%A8%E7%90%86)（使用python进行数据处理并转成bin文件）。
+
 ### 导出MindIR文件
 
 MindSpore提供了云侧（训练）和端侧（推理）统一的中间表示（Intermediate Representation，[IR](https://www.mindspore.cn/docs/zh-CN/master/design/mindir.html)）。可使用export接口直接将模型保存为MindIR。
@@ -128,7 +131,7 @@ ms.export(net, ms.export(net, inp, file_name=config.file_name, file_format=confi
 
 ### 数据前处理(可选)
 
-有一些数据处理在C++测比较难实现，可以先将数据保存成bin文件。
+有一些数据处理在C++侧比较难实现，可以先将数据保存成bin文件。
 
 ```python
 import os
