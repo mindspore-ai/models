@@ -88,8 +88,9 @@ def set_graph_kernel_context(device_target):
 def train():
     """training process"""
     set_parameters()
-    if os.getenv('DEVICE_ID', "not_set").isdigit():
-        context.set_context(device_id=int(os.getenv('DEVICE_ID')))
+    if config.device_target == "Ascend":
+        if os.getenv('DEVICE_ID', "not_set").isdigit():
+            context.set_context(device_id=int(os.getenv('DEVICE_ID')))
     set_graph_kernel_context(config.device_target)
 
     # init distributed
