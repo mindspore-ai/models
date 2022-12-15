@@ -53,7 +53,7 @@ fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=$3
+export CUDA_VISIBLE_DEVICES=$3
 export RANK_ID=0
 export RANK_SIZE=1
 

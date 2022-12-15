@@ -27,7 +27,7 @@ dirname_path=$(dirname "$(pwd)")
 echo ${dirname_path}
 
 export PYTHONPATH=${dirname_path}:$PYTHONPATH
-export DEVICE_ID=$2
+export CUDA_VISIBLE_DEVICES=$2
 export RANK_SIZE=1
 
 SCRIPT_NAME='train.py'

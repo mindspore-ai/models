@@ -86,7 +86,7 @@ else
 fi
 
 export DEVICE_NUM=1
-export DEVICE_ID=$4
+export CUDA_VISIBLE_DEVICES=$4
 export RANK_ID=0
 export RANK_SIZE=1
 
@@ -98,8 +98,8 @@ fi
 mkdir ../train
 cd ../train || exit
 
-echo "start training for device $DEVICE_ID"
+echo "start training for device $CUDA_VISIBLE_DEVICES"
 env > env.log
 pwd
 python ${BASE_PATH}/../train.py --config_path=$CONFIG_FILE --coco_root=$PATH2 --mindrecord_dir=$mindrecord_dir \
---device_id=$DEVICE_ID --pre_trained=$PATH1 --device_target="GPU" --backbone=$2 &> train.log &
+--pre_trained=$PATH1 --device_target="GPU" --backbone=$2 &> train.log &
