@@ -20,6 +20,7 @@ import os
 import numpy as np
 from mindspore.common import set_seed
 from mindspore import Tensor, ops
+from mindspore import dataset as ds
 
 from src.metric import SelfEnsembleWrapperNumpy, PSNR, SaveSrHr
 from src.utils import init_env, init_dataset, init_net, modelarts_pre_process, do_eval
