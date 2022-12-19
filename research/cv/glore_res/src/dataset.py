@@ -189,12 +189,8 @@ def create_dataset_ImageNet(dataset_path, do_train, use_randaugment=False, repea
         Returns:
             dataset
         """
-    if target == "Ascend":
+    if target in ("Ascend", "GPU"):
         device_num, rank_id = _get_rank_info()
-    elif target == "GPU":
-        init("nccl")
-        rank_id = get_rank()
-        device_num = get_group_size()
     else:
         device_num = 1
 
