@@ -137,7 +137,7 @@ def run_train(args_opt):
     # env variable prepare
     group_info_file = os.getenv("GROUP_INFO_FILE")
     if group_info_file:
-        with open(os.path.expanduser("job/code/group_info_env"), "a") as outfile:
+        with open(os.path.expanduser("/job/code/group_info_env"), "a") as outfile:
             outfile.write(f"export GROUP_INFO_FILE_REFLECT={group_info_file}\n")
 
     # copy data from the cloud to the /cache/Data
