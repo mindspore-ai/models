@@ -189,12 +189,7 @@ def create_dataset_ImageNet(dataset_path, do_train, use_randaugment=False, repea
         Returns:
             dataset
         """
-    if target == "Ascend":
-        device_num, rank_id = _get_rank_info()
-    elif target == "GPU":
-        init("nccl")
-        rank_id = get_rank()
-        device_num = get_group_size()
+    device_num, rank_id = _get_rank_info()
 
     if device_num == 1:
         da = ds.ImageFolderDataset(dataset_path, num_parallel_workers=8, shuffle=True)
