@@ -1,0 +1,6 @@
+mindspore==1.8.1
+mindvision=0.1.0
+pandas==1.2.4
+numpy==1.21.5
+opencv-python==4.4.0.42
+opencv-python-headless==4.2.0.34
