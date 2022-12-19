@@ -33,6 +33,6 @@ python ${train_code_path}/eval.py --data_root=/PATH/TO/DATA  \
                     --model=DeepLabV3plus_s8  \
                     --scales=1.0  \
                     --freeze_bn  \
-                    --ckpt_path=/PATH/TO/PRETRAIN_MODEL_DIR \
+                    --ckpt_path=/PATH/TO/PRETRAIN_MODEL \
                     --device_id=$DEVICE_ID >${eval_path}/eval_log 2>&1 &
 

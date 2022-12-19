@@ -63,5 +63,5 @@ python ./train.py --train_dir=${train_path}/ckpt  \
                    --ckpt_pre_trained=$CKPT_PRE_TRAINED  \
                    --is_distributed  \
                    --save_steps=820  \
-                   --keep_checkpoint_max=200 \
+                   --keep_checkpoint_max=10 \
                    --device_target="GPU" >log 2>&1 &

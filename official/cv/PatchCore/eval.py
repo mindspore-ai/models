@@ -38,13 +38,40 @@ merge_from_cli_list(opts)
 cfg.freeze()
 print(cfg)
 
-def do_eval(model, data_iter, label, sample_path, index):
+if __name__ == '__main__':
+    current_path = os.path.abspath(os.path.dirname(__file__))
+    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.platform, device_id=cfg.device_id)
+
+    # dataset
+    mean = cfg.mean
+    std = cfg.std
+    _, test_dataset, _, test_json_path = createDataset(cfg.dataset_path, cfg.category)
+    json_path = Path(test_json_path)
+    with json_path.open('r') as label_file:
+        label = json.load(label_file)
+    data_iter = test_dataset.create_dict_iterator()
+    step_size = test_dataset.get_dataset_size()
+
+    embedding_dir_path, sample_path = prep_dirs(current_path, cfg.category)
+    index = faiss.read_index(os.path.join(embedding_dir_path, 'index.faiss'))
+
+    # network
+    network = wide_resnet50_2()
+    param_dict = load_checkpoint(cfg.pre_ckpt_path)
+    load_param_into_net(network, param_dict)
+
+    for p in network.trainable_params():
+        p.requires_grad = False
+
+    model = OneStepCell(network)
+
+    print("***************start eval***************")
     gt_list_px_lvl = []
     pred_list_px_lvl = []
     gt_list_img_lvl = []
     pred_list_img_lvl = []
     img_path_list = []
-    for data in data_iter:
+    for step, data in enumerate(data_iter):
         step_label = label['{}'.format(data['idx'][0])]
         file_name = step_label['name']
         x_type = step_label['img_type']
@@ -69,52 +96,13 @@ def do_eval(model, data_iter, label, sample_path, index):
         gt_list_img_lvl.append(data['label'].asnumpy()[0])
         pred_list_img_lvl.append(score)
         img_path_list.extend(file_name)
-        img = normalize(data['img'], cfg.mean, cfg.std)
+        img = normalize(data['img'], mean, std)
         input_img = cv2.cvtColor(np.transpose(img, (0, 2, 3, 1))[0] * 255, cv2.COLOR_BGR2RGB)
         save_anomaly_map(sample_path, anomaly_map_resized_blur, input_img, gt_np * 255, file_name, x_type)
 
     pixel_auc = roc_auc_score(gt_list_px_lvl, pred_list_px_lvl)
     img_auc = roc_auc_score(gt_list_img_lvl, pred_list_img_lvl)
-    return img_auc, pixel_auc
 
-def main():
-    current_path = os.path.abspath(os.path.dirname(__file__))
-    context.set_context(mode=context.GRAPH_MODE, device_target=cfg.platform, device_id=cfg.device_id)
-
-    # dataset
-    _, test_dataset, _, test_json_path = createDataset(cfg.dataset_path, cfg.category)
-    json_path = Path(test_json_path)
-    with json_path.open('r') as label_file:
-        label = json.load(label_file)
-    data_iter = test_dataset.create_dict_iterator()
-    embedding_dir_path, sample_path = prep_dirs(current_path, cfg.category)
-    index = faiss.read_index(os.path.join(embedding_dir_path, 'index.faiss'))
-
-    # network
-    network = wide_resnet50_2()
-    for p in network.trainable_params():
-        p.requires_grad = False
-    model = OneStepCell(network)
-
-    print("***************start eval***************")
-    if cfg.ckpt_dir:
-        ckpt_list = [f for f in os.listdir(cfg.ckpt_dir) if f.endswith(".ckpt")]
-        max_auc = 0
-        for ckpt_file in ckpt_list:
-            ckpt_path = os.path.join(cfg.ckpt_dir, ckpt_file)
-            param_dict = load_checkpoint(ckpt_path)
-            load_param_into_net(network, param_dict)
-            img_auc, pixel_auc = do_eval(model, data_iter, label, sample_path, index)
-            if img_auc * pixel_auc > max_auc:
-                max_auc = img_auc * pixel_auc
-                print(f"best checkpoint is {ckpt_path}, img_auc: {img_auc}, pixel_auc: {pixel_auc}")
-            else:
-                print(f"current checkpoint is {cfg.pre_ckpt_path}, img_auc: {img_auc}, pixel_auc: {pixel_auc}")
-    else:
-        param_dict = load_checkpoint(cfg.pre_ckpt_path)
-        load_param_into_net(network, param_dict)
-        img_auc, pixel_auc = do_eval(model, data_iter, label, sample_path, index)
-        print(f"current checkpoint is {cfg.pre_ckpt_path}, img_auc: {img_auc}, pixel_auc: {pixel_auc}")
-
-if __name__ == '__main__':
-    main()
+    print('\ntest_epoch_end')
+    print('category is {}'.format(cfg.category))
+    print("img_auc: {}, pixel_auc: {}".format(img_auc, pixel_auc))

@@ -119,10 +119,9 @@ PatchCore使用预训练的WideResNet50作为Encoder, 并去除layer3之后的�
   bash run_train.sh [dataset_path] [device_id] [pre_ckpt_path] [category]
 
   # 运行评估示例
-  python eval.py --dataset_path ../data/ --device_id 0 --ckpt_dir ../pretrain/ --category screw > eval.log 2>&1 &
+  python eval.py --dataset_path ../data/ --device_id 0 --pre_ckpt_path ../pretrain/PatchCore_pretrain.ckpt --category screw > eval.log 2>&1 &
   或
-  bash run_eval.sh [dataset_path] [device_id] [ckpt_dir] [category]
-  # 使用ckpt_dir参数下的预训练模型推理并得到推理结果最有的ckpt.
+  bash run_eval.sh [dataset_path] [device_id] [pre_ckpt_path] [category]
 
   # 运行推理示例
   bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CATEGORY]
@@ -204,9 +203,9 @@ python src/pthtockpt.py --pth_path /path/wide_resnet50_2-95faca4d.pth
 - 在Ascend环境运行评估
 
   ```shell
-  python eval.py --dataset_path ../data/ --device_id 0 --ckpt_dir ../pretrain/ --category screw > eval.log 2>&1 &
+  python eval.py --dataset_path ../data/ --device_id 0 --pre_ckpt_path ../pretrain/PatchCore_pretrain.ckpt --category screw > eval.log 2>&1 &
   或
-  bash run_eval.sh [dataset_path] [ckpt_dir] [category] [device_id]
+  bash run_eval.sh [dataset_path] [device_id] [pre_ckpt_path] [category]
   ```
 
   上述python命令将在后台运行，您可以通过eval.log文件查看结果。测试数据集的准确性如下：

@@ -123,9 +123,9 @@ After installing MindSpore through the official website, you can follow the step
   bash run_train.sh [dataset_path] [device_id] [pre_ckpt_path] [category]
 
   # Run evaluation example
-  python eval.py --dataset_path ../data/ --device_id 0 --ckpt_dir ../pretrain/ --category screw > eval.log 2>&1 &
+  python eval.py --dataset_path ../data/ --device_id 0 --pre_ckpt_path ../pretrain/PatchCore_pretrain.ckpt --category screw > eval.log 2>&1 &
   or
-  bash run_eval.sh [dataset_path] [device_id] [ckpt_dir] [category]
+  bash run_eval.sh [dataset_path] [device_id] [pre_ckpt_path] [category]
 
   # Run the inference example
   bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CATEGORY]

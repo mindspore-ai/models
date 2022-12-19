@@ -34,7 +34,6 @@ _C.coreset_sampling_ratio = 0.01
 _C.num_epochs = 1
 _C.device_id = 0
 _C.dataset_path = ""
-_C.ckpt_dir = ""
 _C.pre_ckpt_path = "" #Pretrain checkpoint file path
 
 _C.platform = "Ascend"
