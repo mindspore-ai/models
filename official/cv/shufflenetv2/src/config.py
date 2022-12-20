@@ -19,7 +19,7 @@ from easydict import EasyDict as edict
 
 #cpu
 config_cpu = edict({
-    'device_target': 'CPU',
+    'platform': 'CPU',
     'device_id': 0,
     'rank': 0,
     'group_size': 1,

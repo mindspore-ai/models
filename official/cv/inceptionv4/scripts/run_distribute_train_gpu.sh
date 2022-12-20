@@ -14,12 +14,10 @@
 # limitations under the License.
 # ============================================================================
 
-rm -rf device
-mkdir device
-cp ./*.py ./device
-cp ./*.yaml ./device
-cp -r ./src ./device
-cd ./device || exit
+[ $# -ne 1 ] && {
+    echo "Usage: bash scripts/run_distribute_train_gpu.sh [DATASET_PATH]"
+    exit 1
+}
 
 DATA_DIR=$1
 export DEVICE_ID=0
