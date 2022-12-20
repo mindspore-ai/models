@@ -14,9 +14,9 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -le 2 ]
+if [ $# -le 4 ]
 then 
-    echo "Usage: sh run_standalone_train_ascend.sh [PRETRAINED_PATH] [BACKBONE] [COCO_ROOT] [MINDRECORD_DIR](option)"
+    echo "Usage: bash run_standalone_train_ascend.sh [PRETRAINED_PATH] [BACKBONE] [COCO_ROOT] [DEVICE_ID] [MINDRECORD_DIR](option)"
 exit 1
 fi
 
@@ -52,9 +52,9 @@ exit 1
 fi
 
 mindrecord_dir=$PATH2/MindRecord_COCO_TRAIN/
-if [ $# -eq 4 ]
+if [ $# -eq 5 ]
 then
-    mindrecord_dir=$(get_real_path $4)
+    mindrecord_dir=$(get_real_path $5)
     if [ ! -d $mindrecord_dir ]
     then
         echo "error: mindrecord_dir=$mindrecord_dir is not a dir"
@@ -85,7 +85,7 @@ fi
 
 ulimit -u unlimited
 export DEVICE_NUM=1
-export DEVICE_ID=0
+export DEVICE_ID=$4
 export RANK_ID=0
 export RANK_SIZE=1
 

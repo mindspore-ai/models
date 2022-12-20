@@ -14,13 +14,13 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 3 ]
+if [ $# != 4 ]
 then
-    echo "Usage: sh scripts/run_eval_ascend.sh [MODEL_PATH] [IMPATH_VAL] [ANN]"
+    echo "Usage: bash scripts/run_eval_ascend.sh [MODEL_PATH] [IMPATH_VAL] [ANN] [DEVICE_ID]"
 exit 1
 fi
 
-export DEVICE_ID=0
+export DEVICE_ID=$4
 export RANK_SIZE=1
 export RANK_ID=0
 python eval.py \

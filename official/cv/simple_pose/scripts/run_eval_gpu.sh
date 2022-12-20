@@ -17,7 +17,7 @@
 if [ $# -lt 3 ]
 then
     echo "Usage:
-          bash scripts/run_eval_gpu.sh [EVAL_MODEL_FILE] [COCO_BBOX_FILE] [VISIABLE_DEVICES(0,1,2,3,4,5,6,7)]
+          bash scripts/run_eval_gpu.sh [EVAL_MODEL_FILE] [COCO_BBOX_FILE] [DEVICE_ID]
           e.g. bash scripts/eval_gpu.sh ./ckpt/gpu_distributed/simplepose-185_1170.ckpt ./experiments/COCO_val2017_detections_AP_H_56_person.json 0
           "
 exit 1

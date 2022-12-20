@@ -14,8 +14,8 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# != 4 ] && [ $# != 3 ]; then
-  echo "Usage: sh run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] [PLATFORM](optional) "
+if [ $# != 5 ] && [ $# != 4 ]; then
+  echo "Usage: bash run_eval.sh [DATASET_NAME] [DATASET_PATH] [CHECKPOINT_PATH] [DEVICE_ID] [PLATFORM](optional) "
   exit 1
 fi
 
@@ -30,9 +30,9 @@ get_real_path() {
 DATASET_NAME=$1
 PATH1=$(get_real_path $2)
 PATH2=$(get_real_path $3)
-
-if [ $# == 4 ]; then
-  PLATFORM=$4
+export DEVICE_ID=$4
+if [ $# == 5 ]; then
+  PLATFORM=$5
 else
   PLATFORM="Ascend"
 fi
@@ -50,7 +50,6 @@ fi
 run_ascend() {
   ulimit -u unlimited
   export DEVICE_NUM=1
-  export DEVICE_ID=0
   export RANK_SIZE=$DEVICE_NUM
   export RANK_ID=0
 

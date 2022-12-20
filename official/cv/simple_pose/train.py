@@ -124,6 +124,17 @@ def modelarts_pre_process():
 @moxing_wrapper(pre_process=modelarts_pre_process)
 def run_train():
     print('batch size :{}'.format(config.TRAIN.BATCH_SIZE))
+    if config.device_target == "GPU":
+        context.set_context(mode=context.GRAPH_MODE,
+                            device_target="GPU",
+                            save_graphs=False)
+    elif config.device_target == "Ascend":
+        context.set_context(mode=context.GRAPH_MODE,
+                            device_target="Ascend",
+                            save_graphs=False,
+                            device_id=get_device_id())
+    else:
+        raise ValueError("device target only support GPU and Ascend")
     if config.run_distribute:
         init()
         rank = get_rank()
@@ -140,18 +151,6 @@ def run_train():
     if rank == 0 or device_num == 1:
         rank_save_flag = True
 
-    # distribution and context
-    if config.device_target == "GPU":
-        context.set_context(mode=context.GRAPH_MODE,
-                            device_target="GPU",
-                            save_graphs=False,
-                            device_id=get_rank_id())
-    else:
-        assert config.device_target == "Ascend"
-        context.set_context(mode=context.GRAPH_MODE,
-                            device_target="Ascend",
-                            save_graphs=False,
-                            device_id=get_rank_id())
     dataset, _ = keypoint_dataset(config,
                                   rank=rank,
                                   group_size=device_num,
