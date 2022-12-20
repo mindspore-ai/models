@@ -87,15 +87,11 @@ class SelfEnsembleWrapperNumpy:
         return x, hx, vx, vhx, tx, thx, tvx, tvhx
 
     def to_numpy(self, *inputs):
-        if inputs:
-            return None
         if len(inputs) == 1:
             return inputs[0].asnumpy()
         return [x.asnumpy() for x in inputs]
 
     def to_tensor(self, *inputs):
-        if inputs:
-            return None
         if len(inputs) == 1:
             return Tensor(inputs[0])
         return [Tensor(x) for x in inputs]
