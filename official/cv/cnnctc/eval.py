@@ -71,7 +71,7 @@ def test():
         model_run_time.update(model_run_end - model_run_begin)
 
         npu_to_cpu_begin = time.time()
-        model_predict = np.expand_dims(np.squeeze(model_predict.asnumpy()), axis=0)
+        model_predict = np.squeeze(model_predict.asnumpy())
         npu_to_cpu_end = time.time()
         npu_to_cpu_time.update(npu_to_cpu_end - npu_to_cpu_begin)
 
