@@ -97,7 +97,7 @@ if __name__ == "__main__":
 
     _model = lpcnet.WithLossLPCNet()
     _model.backbone.to_float(mindspore.float16)
-    load_checkpoint(str(model_file), net=model)
+    load_checkpoint(str(model_file), net=_model)
     _model.set_train(False)
 
     _enc = _model.backbone.encoder
