@@ -20,30 +20,30 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Audio | Speech Synthesis | [lpcnet](https://gitee.com/mindspore/models/tree/master/official/audio/LPCNet) |✅| ✅ |   |
 | Audio | Speech Synthesis | [melgan](https://gitee.com/mindspore/models/tree/master/official/audio/MELGAN) |✅| ✅ |   |
 | Audio | Speech Synthesis | [tacotron2](https://gitee.com/mindspore/models/tree/master/official/audio/Tacotron2) |✅|   |   |
-| Graph Neural Network | Text Classification | [bgcf](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) |✅| ✅ |   |
-| Graph Neural Network | Text Classification | [gat](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) |✅| ✅ |   |
+| Graph Neural Network | Text Classification | [bgcf](https://gitee.com/mindspore/models/tree/master/research/gnn/bgcf) |✅| ✅ |   |
+| Graph Neural Network | Text Classification | [gat](https://gitee.com/mindspore/models/tree/master/research/gnn/gat) |✅| ✅ |   |
 | Graph Neural Network | Text Classification | [gcn](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) |✅| ✅ |   |
-| Recommendation | Recommender System | [naml](https://gitee.com/mindspore/models/tree/master/research/cv/lenet/src) |✅| ✅ |   |
+| Recommendation | Recommender System | [naml](https://gitee.com/mindspore/models/tree/master/research/recommend/naml) |✅| ✅ |   |
 | Recommendation | Recommender System | [ncf](https://gitee.com/mindspore/models/tree/master/research/recommend/ncf) |✅| ✅ |   |
 | Recommendation | Recommender System | [tbnet](https://gitee.com/mindspore/models/tree/master/official/recommend/Tbnet) |✅| ✅ |   |
 | Image | Image Classification | [alexnet](https://gitee.com/mindspore/models/tree/master/official/cv/Alexnet) |✅| ✅ |   |
-| Image | Image Denoise | [brdnet](https://gitee.com/mindspore/models/tree/master/official/cv/Arcface) |✅|   |   |
-| Image | Object Detection | [centerface](https://gitee.com/mindspore/models/tree/master/official/cv/CycleGAN) |✅| ✅ | ✅ |
-| Image | Image Classification | [cnn_direction_model](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) |✅| ✅ |   |
-| Image | Scene Text Recognition | [cnnctc](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) |✅| ✅ | ✅ |
-| Image | Scene Text Recognition | [crnn](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) |✅| ✅ | ✅ |
+| Image | Image Denoise | [brdnet](https://gitee.com/mindspore/models/tree/master/research/cv/brdnet) |✅|   |   |
+| Image | Object Detection | [centerface](https://gitee.com/mindspore/models/tree/master/research/cv/centerface) |✅| ✅ | ✅ |
+| Image | Image Classification | [cnn_direction_model](https://gitee.com/mindspore/models/tree/master/research/cv/cnn_direction_model) |✅| ✅ |   |
+| Image | Scene Text Recognition | [cnnctc](https://gitee.com/mindspore/models/tree/master/research/cv/cnnctc) |✅| ✅ | ✅ |
+| Image | Scene Text Recognition | [crnn](https://gitee.com/mindspore/models/tree/master/official/cv/CRNN) |✅| ✅ | ✅ |
 | Image | Scene Text Recognition | [crnn_seq2seq_ocr](https://gitee.com/mindspore/models/tree/master/research/cv/crnn_seq2seq_ocr) |✅|   |   |
-| Image | Image Classification | [cspdarknet53](https://gitee.com/mindspore/models/tree/master/official/cv/ResNeXt) |✅|   |   |
-| Image | Object Detection | [ctpn](https://gitee.com/mindspore/models/tree/master/official/cv/ShuffleNet/shufflenetv1) |✅| ✅ |   |
+| Image | Image Classification | [cspdarknet53](https://gitee.com/mindspore/models/tree/master/research/cv/cspdarknet53) |✅|   |   |
+| Image | Object Detection | [ctpn](https://gitee.com/mindspore/models/tree/master/official/cv/CTPN) |✅| ✅ |   |
 | Image | Object Detection | [darknet53](https://gitee.com/mindspore/models/tree/master/research/cv/darknet53) | | ✅ |   |
 | Image | Semantic Segmentation | [deeplabv3](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) |✅| ✅ | ✅ |
 | Image | Text Detection | [deeptext](https://gitee.com/mindspore/models/tree/master/official/cv/DeepText) |✅| ✅ |   |
-| Image | Image Classification | [densenet100](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv4) |✅| ✅ |   |
-| Image | Image Classification | [densenet121](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv4) |✅| ✅ |   |
-| Image | Depth Estimation | [depthnet](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/xception) |✅|   |   |
-| Image | Image Denoise | [dncnn](https://gitee.com/mindspore/models/tree/master/official/cv/OctSqueeze) | | ✅ |   |
-| Image | Image Classification | [dpn](https://gitee.com/mindspore/models/tree/master/research/cv/FCN8s) |✅| ✅ |   |
-| Image | Scene Text Detection | [east](https://gitee.com/mindspore/models/tree/master/research/cv/PoseNet) |✅| ✅ |   |
+| Image | Image Classification | [densenet100](https://gitee.com/mindspore/models/tree/master/research/cv/densenet) |✅| ✅ |   |
+| Image | Image Classification | [densenet121](https://gitee.com/mindspore/models/tree/master/research/cv/densenet) |✅| ✅ |   |
+| Image | Depth Estimation | [depthnet](https://gitee.com/mindspore/models/tree/master/official/cv/DepthNet) |✅|   |   |
+| Image | Image Denoise | [dncnn](https://gitee.com/mindspore/models/tree/master/research/cv/dncnn) | | ✅ |   |
+| Image | Image Classification | [dpn](https://gitee.com/mindspore/models/tree/master/research/cv/dpn) |✅| ✅ |   |
+| Image | Scene Text Detection | [east](https://gitee.com/mindspore/models/tree/master/research/cv/east) |✅| ✅ |   |
 | Image | Image Classification | [efficientnet](https://gitee.com/mindspore/models/tree/master/official/cv/Efficientnet) | | ✅ | ✅ |
 | Image | Image Classification | [erfnet](https://gitee.com/mindspore/models/tree/master/research/cv/erfnet) |✅| ✅ |   |
 | Image | Scene Text Recognition | [essay-recogination](https://gitee.com/mindspore/models/tree/master/research/cv/essay-recogination) | | ✅ |   |
@@ -52,20 +52,20 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Image | Object Detection | [FasterRCNN_ResNetV1_101](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) |✅| ✅ |   |
 | Image | Object Detection | [FasterRCNN_ResNetV1_152](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) |✅| ✅ |   |
 | Image | Object Detection | [FasterRCNN_ResNetV1_50](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) |✅| ✅ |   |
-| Image | Semantic Segmentation | [fastscnn](https://gitee.com/mindspore/models/tree/master/research/cv/brdnet) |✅|   |   |
+| Image | Semantic Segmentation | [fastscnn](https://gitee.com/mindspore/models/tree/master/research/cv/fastscnn) |✅|   |   |
 | Image | Semantic Segmentation | [FCN8s](https://gitee.com/mindspore/models/tree/master/research/cv/FCN8s) |✅| ✅ |   |
 | Image | Image Classification | [googlenet](https://gitee.com/mindspore/models/tree/master/research/cv/googlenet) |✅| ✅ |   |
 | Image | Image Classification | [inceptionv3](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv3) |✅| ✅ | ✅ |
 | Image | Image Classification | [inceptionv4](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv4) |✅| ✅ | ✅ |
 | Image | Image Denoise | [LearningToSeeInTheDark](https://gitee.com/mindspore/models/tree/master/research/cv/LearningToSeeInTheDark) |✅|   |   |
-| Image | Image Classification | [lenet](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv2) |✅| ✅ | ✅ |
-| Image | Object Detection | [maskrcnn_resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNeXt) |✅| ✅ |   |
+| Image | Image Classification | [lenet](https://gitee.com/mindspore/models/tree/master/research/cv/lenet) |✅| ✅ | ✅ |
+| Image | Object Detection | [maskrcnn_resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/MaskRCNN/maskrcnn_resnet50) |✅| ✅ |   |
 | Image | Object Detection | [maskrcnn_mobilenetv1](https://gitee.com/mindspore/models/tree/master/official/cv/MaskRCNN/maskrcnn_mobilenetv1) |✅| ✅ | ✅ |
 | Image | Crowd Counting | [MCNN](https://gitee.com/mindspore/models/tree/master/research/cv/MCNN) |✅| ✅ |   |
 | Image | Image Classification | [mobilenetv1](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv1) |✅| ✅ |   |
 | Image | Image Classification | [mobilenetv2](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv2) |✅| ✅ | ✅ |
 | Image | Image Classification | [mobilenetv3](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv3) |✅| ✅ | ✅ |
-| Image | Image Classification | [nasnet](https://gitee.com/mindspore/models/tree/master/official/cv/RetinaNet) |✅| ✅ |   |
+| Image | Image Classification | [nasnet](https://gitee.com/mindspore/models/tree/master/research/cv/nasnet) |✅| ✅ |   |
 | Image | Image Quality Assessment | [nima](https://gitee.com/mindspore/models/tree/master/research/cv/nima) |✅| ✅ |   |
 | Image | Point Cloud Model | [octsqueeze](https://gitee.com/mindspore/models/tree/master/official/cv/OctSqueeze) |✅| ✅ |   |
 | Image | Keypoint Detection | [openpose](https://gitee.com/mindspore/models/tree/master/official/cv/OpenPose) |✅|   |   |
@@ -122,7 +122,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Text | Natural Language Understanding | [bert_base](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert) |✅| ✅ |   |
 | Text | Natural Language Understanding | [bert_bilstm_crf](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert) |✅| ✅ |   |
 | Text | Natural Language Understanding | [bert_finetuning](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert) |✅| ✅ |   |
-| Text | Natural Language Understanding | [bert_large](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert_thor) |✅|   |   |
+| Text | Natural Language Understanding | [bert_large](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert) |✅|   |   |
 | Text | Natural Language Understanding | [bert_nezha](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert) |✅| ✅ |   |
 | Text | Natural Language Understanding | [cpm](https://gitee.com/mindspore/models/tree/master/research/nlp/cpm) |✅| ✅ |   |
 | Text | Dialogue | [dgu](https://gitee.com/mindspore/models/tree/master/research/nlp/dgu) |✅| ✅ |   |
@@ -279,7 +279,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Image | Image Classification | [mnasnet](https://gitee.com/mindspore/models/tree/master/research/cv/mnasnet) |✅| ✅ |   |
 | Image | Image Classification | [mobilenetv3_large](https://gitee.com/mindspore/models/tree/master/research/cv/mobilenetv3_large) |✅|   | ✅ |
 | Image | Image Classification | [mobilenetV3_small_x1_0](https://gitee.com/mindspore/models/tree/master/research/cv/mobilenetV3_small_x1_0) |✅| ✅ | ✅ |
-| Image | Image Classification | [MultiTaskNet](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI) |✅| ✅ |   |
+| Image | Image Classification | [MultiTaskNet](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/MultiTaskNet) |✅| ✅ |   |
 | Image | Re-Identification | [MVD](https://gitee.com/mindspore/models/tree/master/research/cv/MVD) |✅| ✅ |   |
 | Image | Object Detection | [nas-fpn](https://gitee.com/mindspore/models/tree/master/research/cv/nas-fpn) |✅|   |   |
 | Image | Image Denoise | [Neighbor2Neighbor](https://gitee.com/mindspore/models/tree/master/research/cv/Neighbor2Neighbor) |✅| ✅ |   |
@@ -300,7 +300,7 @@ In order to facilitate developers to enjoy the benefits of MindSpore framework, 
 | Image | Image Classification | [pnasnet](https://gitee.com/mindspore/models/tree/master/research/cv/pnasnet) |✅| ✅ |   |
 | Image | Point Cloud Model | [pointnet](https://gitee.com/mindspore/models/tree/master/official/cv/PointNet) |✅| ✅ |   |
 | Image | Point Cloud Model | [pointnet2](https://gitee.com/mindspore/models/tree/master/official/cv/PointNet2) |✅| ✅ |   |
-| Image | Image Classification | [PoseEstNet](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI) |✅| ✅ |   |
+| Image | Image Classification | [PoseEstNet](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/PoseEstNet) |✅| ✅ |   |
 | Image | Image Classification | [ProtoNet](https://gitee.com/mindspore/models/tree/master/research/cv/ProtoNet) |✅| ✅ |   |
 | Image | Image Classification | [proxylessnas](https://gitee.com/mindspore/models/tree/master/research/cv/proxylessnas) |✅| ✅ |   |
 | Image | Semantic Segmentation | [PSPNet](https://gitee.com/mindspore/models/tree/master/research/cv/PSPNet) |✅|   |   |
