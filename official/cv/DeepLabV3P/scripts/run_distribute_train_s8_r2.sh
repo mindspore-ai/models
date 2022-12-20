@@ -51,6 +51,6 @@ do
                                                --ckpt_pre_trained=/PATH/TO/PRETRAIN_MODEL  \
                                                --is_distributed  \
                                                --save_steps=110  \
-                                               --keep_checkpoint_max=200 \
+                                               --keep_checkpoint_max=10 \
                                                --device_id=$DEVICE_ID >log 2>&1 &
 done

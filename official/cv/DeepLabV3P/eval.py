@@ -50,12 +50,9 @@ def parse_args():
     parser.add_argument('--model', type=str, default='', help='select model')
     parser.add_argument('--freeze_bn', action='store_true', default=False, help='freeze bn')
     parser.add_argument('--ckpt_path', type=str, default='', help='model to evaluate')
-    parser.add_argument('--ckpt_dir', type=str, default='', help='select the best ckpt in ckpt_dir')
 
-    ret, _ = parser.parse_known_args()
-    return ret
-
-args = parse_args()
+    args, _ = parser.parse_known_args()
+    return args
 
 
 def cal_hist(a, b, n):
@@ -87,7 +84,7 @@ class BuildEvalNetwork(nn.Cell):
         return output
 
 
-def pre_process(img_, crop_size=513):
+def pre_process(args, img_, crop_size=513):
     """pre_process"""
     # resize
     img_ = resize_long(img_, crop_size)
@@ -109,7 +106,7 @@ def pre_process(img_, crop_size=513):
     return img_, resize_h, resize_w
 
 
-def eval_batch(eval_net, img_lst, crop_size=513, flip=True):
+def eval_batch(args, eval_net, img_lst, crop_size=513, flip=True):
     """eval_batch"""
     result_lst = []
     batch_size = len(img_lst)
@@ -117,7 +114,7 @@ def eval_batch(eval_net, img_lst, crop_size=513, flip=True):
     resize_hw = []
     for l in range(batch_size):
         img_ = img_lst[l]
-        img_, resize_h, resize_w = pre_process(img_, crop_size)
+        img_, resize_h, resize_w = pre_process(args, img_, crop_size)
         batch_img[l] = img_
         resize_hw.append([resize_h, resize_w])
 
@@ -139,14 +136,14 @@ def eval_batch(eval_net, img_lst, crop_size=513, flip=True):
     return result_lst
 
 
-def eval_batch_scales(eval_net, img_lst, scales,
+def eval_batch_scales(args, eval_net, img_lst, scales,
                       base_crop_size=513, flip=True):
     """eval_batch_scales"""
     sizes_ = [int((base_crop_size - 1) * sc) + 1 for sc in scales]
-    probs_lst = eval_batch(eval_net, img_lst, crop_size=sizes_[0], flip=flip)
+    probs_lst = eval_batch(args, eval_net, img_lst, crop_size=sizes_[0], flip=flip)
     print(sizes_)
     for crop_size_ in sizes_[1:]:
-        probs_lst_tmp = eval_batch(eval_net, img_lst, crop_size=crop_size_, flip=flip)
+        probs_lst_tmp = eval_batch(args, eval_net, img_lst, crop_size=crop_size_, flip=flip)
         for pl, _ in enumerate(probs_lst):
             probs_lst[pl] += probs_lst_tmp[pl]
 
@@ -156,14 +153,29 @@ def eval_batch_scales(eval_net, img_lst, scales,
     return result_msk
 
 
-def eval_checkpoint(ckpt_path, eval_net):
-    param_dict = load_checkpoint(ckpt_path)
-    load_param_into_net(eval_net, param_dict)
-    eval_net.set_train(False)
-
+def net_eval():
+    """net_eval"""
+    args = parse_args()
+    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, save_graphs=False,
+                        device_id=args.device_id)
     # data list
     with open(args.data_lst) as f:
         img_lst = f.readlines()
+
+    # network
+    if args.model == 'DeepLabV3plus_s16':
+        network = DeepLabV3Plus('eval', args.num_classes, 16, args.freeze_bn)
+    elif args.model == 'DeepLabV3plus_s8':
+        network = DeepLabV3Plus('eval', args.num_classes, 8, args.freeze_bn)
+    else:
+        raise NotImplementedError('model [{:s}] not recognized'.format(args.model))
+
+    eval_net = BuildEvalNetwork(network)
+
+    # load model
+    param_dict = load_checkpoint(args.ckpt_path)
+    load_param_into_net(eval_net, param_dict)
+    eval_net.set_train(False)
 
     # evaluate
     hist = np.zeros((args.num_classes, args.num_classes))
@@ -181,7 +193,7 @@ def eval_checkpoint(ckpt_path, eval_net):
         batch_msk_lst.append(msk_)
         bi += 1
         if bi == args.batch_size:
-            batch_res = eval_batch_scales(eval_net, batch_img_lst, scales=args.scales,
+            batch_res = eval_batch_scales(args, eval_net, batch_img_lst, scales=args.scales,
                                           base_crop_size=args.crop_size, flip=args.flip)
             for mi in range(args.batch_size):
                 hist += cal_hist(batch_msk_lst[mi].flatten(), batch_res[mi].flatten(), args.num_classes)
@@ -193,48 +205,16 @@ def eval_checkpoint(ckpt_path, eval_net):
         image_num = i
 
     if bi > 0:
-        batch_res = eval_batch_scales(eval_net, batch_img_lst, scales=args.scales,
+        batch_res = eval_batch_scales(args, eval_net, batch_img_lst, scales=args.scales,
                                       base_crop_size=args.crop_size, flip=args.flip)
         for mi in range(bi):
             hist += cal_hist(batch_msk_lst[mi].flatten(), batch_res[mi].flatten(), args.num_classes)
-        print('processed {} images'.format(image_num + bi))
+        print('processed {} images'.format(image_num + 1))
 
-    print("hist mat is", hist)
+    print(hist)
     iu = np.diag(hist) / (hist.sum(1) + hist.sum(0) - np.diag(hist))
-    miou = np.nanmean(iu)
-    return miou
-
-
-def net_eval():
-    """net_eval"""
-    context.set_context(mode=context.GRAPH_MODE, device_target=args.device_target, save_graphs=False,
-                        device_id=args.device_id)
-
-    # network
-    if args.model == 'DeepLabV3plus_s16':
-        network = DeepLabV3Plus('eval', args.num_classes, 16, args.freeze_bn)
-    elif args.model == 'DeepLabV3plus_s8':
-        network = DeepLabV3Plus('eval', args.num_classes, 8, args.freeze_bn)
-    else:
-        raise NotImplementedError('model [{:s}] not recognized'.format(args.model))
-
-    eval_net = BuildEvalNetwork(network)
-
-    # load model
-    if args.ckpt_dir:
-        ckpt_list = [f for f in os.listdir(args.ckpt_dir) if f.endswith(".ckpt")]
-        best_miou = 0
-        for ckpt_path in ckpt_list:
-            miou = eval_checkpoint(ckpt_path, eval_net)
-            if miou > best_miou:
-                best_miou = miou
-                print(f"best checkpoint is {ckpt_path}, best miou is {best_miou}", flush=True)
-            else:
-                print(f'current checkpoint is {ckpt_path}, mean IoU is {miou}', flush=True)
-    else:
-        ckpt_path = args.ckpt_path
-        miou = eval_checkpoint(ckpt_path, eval_net)
-        print(f'eval checkpoint is {ckpt_path}, mean IoU is {miou}', flush=True)
+    print('per-class IoU', iu)
+    print('mean IoU', np.nanmean(iu))
 
 
 if __name__ == '__main__':

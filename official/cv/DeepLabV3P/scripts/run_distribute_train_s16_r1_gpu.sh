@@ -61,6 +61,6 @@ python ./train.py --train_dir=${train_path}/ckpt  \
                   --model=DeepLabV3plus_s16  \
                   --ckpt_pre_trained=$CKPT_PRE_TRAINED  \
                   --is_distributed  \
-                  --save_steps=41  \
+                  --save_steps=410  \
                   --keep_checkpoint_max=10 \
                   --device_target="GPU"  >log 2>&1 &

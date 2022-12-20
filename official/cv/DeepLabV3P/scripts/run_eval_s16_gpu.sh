@@ -17,7 +17,7 @@ if [ $# != 4 ]
 then
     echo "=============================================================================================================="
     echo "Please run the script as: "
-    echo "bash run_eval_s16_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL_DIR DEVICE_ID"
+    echo "bash run_eval_s16_gpu.sh /PATH/TO/DATA /PATH/TO/DATA_lst.txt /PATH/TO/PRETRAIN_MODEL DEVICE_ID"
     echo "for example:"
     echo "bash run_eval_s16_gpu.sh \
       voc2012/VOCdevkit/VOC2012 voc2012/voc_val_lst.txt ckpt/DeepLabV3plus_s16-300_82.ckpt 0"
@@ -28,7 +28,7 @@ fi
 
 DATA_ROOT=$1
 DATA_LST=$2
-CKPT_DIR=$3
+CKPT_PATH=$3
 export CUDA_VISIBLE_DEVICES=$4
 
 export SLOG_PRINT_TO_STDOUT=0
@@ -50,7 +50,7 @@ python ./eval.py  --data_root=$DATA_ROOT  \
                   --model=DeepLabV3plus_s16  \
                   --scales=1.0  \
                   --freeze_bn  \
-                  --ckpt_dir=$CKPT_DIR \
+                  --ckpt_path=$CKPT_PATH \
                   --device_target="GPU" \
                   --device_id=0 > eval_log 2>&1 &
 
