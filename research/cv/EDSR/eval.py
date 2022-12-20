@@ -16,16 +16,18 @@
 #################evaluate EDSR example on DIV2K########################
 """
 import os
+import math
 
 import numpy as np
 from mindspore.common import set_seed
 from mindspore import Tensor, ops
+from mindspore import dataset as ds
 
 from src.metric import SelfEnsembleWrapperNumpy, PSNR, SaveSrHr
 from src.utils import init_env, init_dataset, init_net, modelarts_pre_process, do_eval
 from src.dataset import get_rank_info, LrHrImages, hwc2chw, uint8_to_float32
 from model_utils.config import config
-from model_utils.moxing_adapter import moxing_wrapper
+from model_utils.moxing_adapter import moxing_wrapper, get_rank_id
 
 
 set_seed(2021)
