@@ -20,30 +20,30 @@
 | 语音 | 语音合成 | [lpcnet](https://gitee.com/mindspore/models/tree/master/official/audio/LPCNet) |✅| ✅ |   |
 | 语音 | 语音合成 | [melgan](https://gitee.com/mindspore/models/tree/master/official/audio/MELGAN) |✅| ✅ |   |
 | 语音 | 语音合成 | [tacotron2](https://gitee.com/mindspore/models/tree/master/official/audio/Tacotron2) |✅|   |   |
-| 图神经网络 | 文本分类 | [bgcf](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) |✅| ✅ |   |
-| 图神经网络 | 文本分类 | [gat](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) |✅| ✅ |   |
+| 图神经网络 | 文本分类 | [bgcf](https://gitee.com/mindspore/models/tree/master/research/gnn/bgcf) |✅| ✅ |   |
+| 图神经网络 | 文本分类 | [gat](https://gitee.com/mindspore/models/tree/master/research/gnn/gat) |✅| ✅ |   |
 | 图神经网络 | 文本分类 | [gcn](https://gitee.com/mindspore/models/tree/master/official/gnn/GCN) |✅| ✅ |   |
-| 推荐 | 推荐系统 | [naml](https://gitee.com/mindspore/models/tree/master/research/cv/lenet/src) |✅| ✅ |   |
+| 推荐 | 推荐系统 | [naml](https://gitee.com/mindspore/models/tree/master/research/recommend/naml) |✅| ✅ |   |
 | 推荐 | 推荐系统 | [ncf](https://gitee.com/mindspore/models/tree/master/research/recommend/ncf) |✅| ✅ |   |
 | 推荐 | 推荐系统 | [tbnet](https://gitee.com/mindspore/models/tree/master/official/recommend/Tbnet) |✅| ✅ |   |
 | 图像 | 图像分类 | [alexnet](https://gitee.com/mindspore/models/tree/master/official/cv/Alexnet) |✅| ✅ |   |
-| 图像 | 图像去噪 | [brdnet](https://gitee.com/mindspore/models/tree/master/official/cv/Arcface) |✅|   |   |
-| 图像 | 目标检测 | [centerface](https://gitee.com/mindspore/models/tree/master/official/cv/CycleGAN) |✅| ✅ | ✅ |
-| 图像 | 图像分类 | [cnn_direction_model](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) |✅| ✅ |   |
-| 图像 | 文本识别 | [cnnctc](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) |✅| ✅ | ✅ |
-| 图像 | 文本识别 | [crnn](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) |✅| ✅ | ✅ |
+| 图像 | 图像去噪 | [brdnet](https://gitee.com/mindspore/models/tree/master/research/cv/brdnet) |✅|   |   |
+| 图像 | 目标检测 | [centerface](https://gitee.com/mindspore/models/tree/master/research/cv/centerface) |✅| ✅ | ✅ |
+| 图像 | 图像分类 | [cnn_direction_model](https://gitee.com/mindspore/models/tree/master/research/cv/cnn_direction_model) |✅| ✅ |   |
+| 图像 | 文本识别 | [cnnctc](https://gitee.com/mindspore/models/tree/master/research/cv/cnnctc) |✅| ✅ | ✅ |
+| 图像 | 文本识别 | [crnn](https://gitee.com/mindspore/models/tree/master/official/cv/CRNN) |✅| ✅ | ✅ |
 | 图像 | 文本识别 | [crnn_seq2seq_ocr](https://gitee.com/mindspore/models/tree/master/research/cv/crnn_seq2seq_ocr) |✅|   |   |
-| 图像 | 图像分类 | [cspdarknet53](https://gitee.com/mindspore/models/tree/master/official/cv/ResNeXt) |✅|   |   |
-| 图像 | 目标检测 | [ctpn](https://gitee.com/mindspore/models/tree/master/official/cv/ShuffleNet/shufflenetv1) |✅| ✅ |   |
+| 图像 | 图像分类 | [cspdarknet53](https://gitee.com/mindspore/models/tree/master/research/cv/cspdarknet53) |✅|   |   |
+| 图像 | 目标检测 | [ctpn](https://gitee.com/mindspore/models/tree/master/official/cv/CTPN) |✅| ✅ |   |
 | 图像 | 目标检测 | [darknet53](https://gitee.com/mindspore/models/tree/master/research/cv/darknet53) | | ✅ |   |
 | 图像 | 语义分割 | [deeplabv3](https://gitee.com/mindspore/models/tree/master/official/cv/DeepLabV3P) |✅| ✅ | ✅ |
 | 图像 | 文本检测 | [deeptext](https://gitee.com/mindspore/models/tree/master/official/cv/DeepText) |✅| ✅ |   |
-| 图像 | 图像分类 | [densenet100](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv4) |✅| ✅ |   |
-| 图像 | 图像分类 | [densenet121](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv4) |✅| ✅ |   |
-| 图像 | 深度估计 | [depthnet](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/xception) |✅|   |   |
-| 图像 | 图像去噪 | [dncnn](https://gitee.com/mindspore/models/tree/master/official/cv/OctSqueeze) | | ✅ |   |
-| 图像 | 图像分类 | [dpn](https://gitee.com/mindspore/models/tree/master/research/cv/FCN8s) |✅| ✅ |   |
-| 图像 | 文本检测 | [east](https://gitee.com/mindspore/models/tree/master/research/cv/PoseNet) |✅| ✅ |   |
+| 图像 | 图像分类 | [densenet100](https://gitee.com/mindspore/models/tree/master/research/cv/densenet) |✅| ✅ |   |
+| 图像 | 图像分类 | [densenet121](https://gitee.com/mindspore/models/tree/master/research/cv/densenet) |✅| ✅ |   |
+| 图像 | 深度估计 | [depthnet](https://gitee.com/mindspore/models/tree/master/official/cv/DepthNet) |✅|   |   |
+| 图像 | 图像去噪 | [dncnn](https://gitee.com/mindspore/models/tree/master/research/cv/dncnn) | | ✅ |   |
+| 图像 | 图像分类 | [dpn](https://gitee.com/mindspore/models/tree/master/research/cv/dpn) |✅| ✅ |   |
+| 图像 | 文本检测 | [east](https://gitee.com/mindspore/models/tree/master/research/cv/east) |✅| ✅ |   |
 | 图像 | 图像分类 | [efficientnet](https://gitee.com/mindspore/models/tree/master/official/cv/Efficientnet) | | ✅ | ✅ |
 | 图像 | 图像分类 | [erfnet](https://gitee.com/mindspore/models/tree/master/research/cv/erfnet) |✅| ✅ |   |
 | 图像 | 文本识别 | [essay-recogination](https://gitee.com/mindspore/models/tree/master/research/cv/essay-recogination) | | ✅ |   |
@@ -52,20 +52,20 @@
 | 图像 | 目标检测 | [FasterRCNN_ResNetV1_101](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) |✅| ✅ |   |
 | 图像 | 目标检测 | [FasterRCNN_ResNetV1_152](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) |✅| ✅ |   |
 | 图像 | 目标检测 | [FasterRCNN_ResNetV1_50](https://gitee.com/mindspore/models/tree/master/official/cv/FasterRCNN) |✅| ✅ |   |
-| 图像 | 语义分割 | [fastscnn](https://gitee.com/mindspore/models/tree/master/research/cv/brdnet) |✅|   |   |
+| 图像 | 语义分割 | [fastscnn](https://gitee.com/mindspore/models/tree/master/research/cv/fastscnn) |✅|   |   |
 | 图像 | 语义分割 | [FCN8s](https://gitee.com/mindspore/models/tree/master/research/cv/FCN8s) |✅| ✅ |   |
 | 图像 | 图像分类 | [googlenet](https://gitee.com/mindspore/models/tree/master/research/cv/googlenet) |✅| ✅ |   |
 | 图像 | 图像分类 | [inceptionv3](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv3) |✅| ✅ | ✅ |
 | 图像 | 图像分类 | [inceptionv4](https://gitee.com/mindspore/models/tree/master/official/cv/Inception/inceptionv4) |✅| ✅ | ✅ |
 | 图像 | 图像去噪 | [LearningToSeeInTheDark](https://gitee.com/mindspore/models/tree/master/research/cv/LearningToSeeInTheDark) |✅|   |   |
-| 图像 | 图像分类 | [lenet](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv2) |✅| ✅ | ✅ |
-| 图像 | 目标检测 | [maskrcnn_resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/ResNeXt) |✅| ✅ |   |
+| 图像 | 图像分类 | [lenet](https://gitee.com/mindspore/models/tree/master/research/cv/lenet) |✅| ✅ | ✅ |
+| 图像 | 目标检测 | [maskrcnn_resnet50](https://gitee.com/mindspore/models/tree/master/official/cv/MaskRCNN/maskrcnn_resnet50) |✅| ✅ |   |
 | 图像 | 目标检测 | [maskrcnn_mobilenetv1](https://gitee.com/mindspore/models/tree/master/official/cv/MaskRCNN/maskrcnn_mobilenetv1) |✅| ✅ | ✅ |
 | 图像 | 人群计数 | [MCNN](https://gitee.com/mindspore/models/tree/master/research/cv/MCNN) |✅| ✅ |   |
 | 图像 | 图像分类 | [mobilenetv1](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv1) |✅| ✅ |   |
 | 图像 | 图像分类 | [mobilenetv2](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv2) |✅| ✅ | ✅ |
 | 图像 | 图像分类 | [mobilenetv3](https://gitee.com/mindspore/models/tree/master/official/cv/MobileNet/mobilenetv3) |✅| ✅ | ✅ |
-| 图像 | 图像分类 | [nasnet](https://gitee.com/mindspore/models/tree/master/official/cv/RetinaNet) |✅| ✅ |   |
+| 图像 | 图像分类 | [nasnet](https://gitee.com/mindspore/models/tree/master/research/cv/nasnet) |✅| ✅ |   |
 | 图像 | 图像质量评估 | [nima](https://gitee.com/mindspore/models/tree/master/research/cv/nima) |✅| ✅ |   |
 | 图像 | 点云模型 | [octsqueeze](https://gitee.com/mindspore/models/tree/master/official/cv/OctSqueeze) |✅| ✅ |   |
 | 图像 | 关键点检测 | [openpose](https://gitee.com/mindspore/models/tree/master/official/cv/OpenPose) |✅|   |   |
@@ -122,7 +122,7 @@
 | 文本 | 自然语言理解 | [bert_base](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert) |✅| ✅ |   |
 | 文本 | 自然语言理解 | [bert_bilstm_crf](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert) |✅| ✅ |   |
 | 文本 | 自然语言理解 | [bert_finetuning](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert) |✅| ✅ |   |
-| 文本 | 自然语言理解 | [bert_large](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert_thor) |✅|   |   |
+| 文本 | 自然语言理解 | [bert_large](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert) |✅|   |   |
 | 文本 | 自然语言理解 | [bert_nezha](https://gitee.com/mindspore/models/tree/master/official/nlp/Bert) |✅| ✅ |   |
 | 文本 | 自然语言理解 | [cpm](https://gitee.com/mindspore/models/tree/master/research/nlp/cpm) |✅| ✅ |   |
 | 文本 | 对话 | [dgu](https://gitee.com/mindspore/models/tree/master/research/nlp/dgu) |✅| ✅ |   |
@@ -279,7 +279,7 @@
 | 图像 | 图像分类 | [mnasnet](https://gitee.com/mindspore/models/tree/master/research/cv/mnasnet) |✅| ✅ |   |
 | 图像 | 图像分类 | [mobilenetv3_large](https://gitee.com/mindspore/models/tree/master/research/cv/mobilenetv3_large) |✅|   | ✅ |
 | 图像 | 图像分类 | [mobilenetV3_small_x1_0](https://gitee.com/mindspore/models/tree/master/research/cv/mobilenetV3_small_x1_0) |✅| ✅ | ✅ |
-| 图像 | 图像分类 | [MultiTaskNet](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI) |✅| ✅ |   |
+| 图像 | 图像分类 | [MultiTaskNet](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/MultiTaskNet) |✅| ✅ |   |
 | 图像 | 重新识别 | [MVD](https://gitee.com/mindspore/models/tree/master/research/cv/MVD) |✅| ✅ |   |
 | 图像 | 目标检测 | [nas-fpn](https://gitee.com/mindspore/models/tree/master/research/cv/nas-fpn) |✅|   |   |
 | 图像 | 图像去噪 | [Neighbor2Neighbor](https://gitee.com/mindspore/models/tree/master/research/cv/Neighbor2Neighbor) |✅| ✅ |   |
@@ -300,7 +300,7 @@
 | 图像 | 图像分类 | [pnasnet](https://gitee.com/mindspore/models/tree/master/research/cv/pnasnet) |✅| ✅ |   |
 | 图像 | 点云模型 | [pointnet](https://gitee.com/mindspore/models/tree/master/official/cv/PointNet) |✅| ✅ |   |
 | 图像 | 点云模型 | [pointnet2](https://gitee.com/mindspore/models/tree/master/official/cv/PointNet2) |✅| ✅ |   |
-| 图像 | 图像分类 | [PoseEstNet](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI) |✅| ✅ |   |
+| 图像 | 图像分类 | [PoseEstNet](https://gitee.com/mindspore/models/tree/master/research/cv/PAMTRI/PoseEstNet) |✅| ✅ |   |
 | 图像 | 图像分类 | [ProtoNet](https://gitee.com/mindspore/models/tree/master/research/cv/ProtoNet) |✅| ✅ |   |
 | 图像 | 图像分类 | [proxylessnas](https://gitee.com/mindspore/models/tree/master/research/cv/proxylessnas) |✅| ✅ |   |
 | 图像 | 语义分割 | [PSPNet](https://gitee.com/mindspore/models/tree/master/research/cv/PSPNet) |✅|   |   |
