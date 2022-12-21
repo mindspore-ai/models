@@ -1,3 +1,0 @@
-easydict
-opencv-python
-torch

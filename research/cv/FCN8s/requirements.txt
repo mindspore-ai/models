@@ -1,8 +1,0 @@
-matplotlib==3.5.1
-mindspore==1.8.1
-mindspore_gpu==1.6.1
-numpy==1.22.3
-opencv_python_headless==4.6.0.66
-Pillow==9.2.0
-scipy==1.8.0
-six==1.14.0

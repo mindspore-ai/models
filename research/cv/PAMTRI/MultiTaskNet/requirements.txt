@@ -1,8 +1,0 @@
-Cython==0.28.3
-h5py==2.8.0
-numpy==1.14.5
-Pillow==5.1.0
-scipy==1.2.0
-opencv-python
-matplotlib
-onnxruntime-gpu

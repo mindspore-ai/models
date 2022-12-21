@@ -1,3 +1,0 @@
-json_tricks
-xtcocotools
-opencv-python

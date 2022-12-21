@@ -1,6 +1,0 @@
-paddlepaddle
-nltk
-wikiextractor
-jieba
-opencc-python-reimplemented
-onnxruntime-gpu

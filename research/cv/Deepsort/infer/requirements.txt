@@ -1,6 +1,0 @@
-numpy
-scipy
-pandas
-xmltodict
-opencv-python
-motmetrics

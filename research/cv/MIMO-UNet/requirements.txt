@@ -1,3 +1,0 @@
-scikit-image==0.19.2
-PyYAML==6.0
-Pillow

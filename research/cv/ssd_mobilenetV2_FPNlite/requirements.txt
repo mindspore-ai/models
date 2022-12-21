@@ -1,5 +1,0 @@
-opencv-python
-numpy
-Pillow
-pycocotools >= 2.0.5
-tqdm

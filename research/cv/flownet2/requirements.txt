@@ -1,8 +1,0 @@
-Pillow
-imageio
-matplotlib
-decorator
-numpy
-pytz
-PyYAML
-mindspore_gpu>=1.7.0

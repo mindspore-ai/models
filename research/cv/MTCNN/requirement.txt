@@ -1,3 +1,0 @@
-opencv-python==4.5.5.64
-tqdm==4.64.0
-mindspore-gpu==1.8.0

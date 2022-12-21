@@ -1,2 +1,0 @@
-scikit-image
-torch==1.8.1

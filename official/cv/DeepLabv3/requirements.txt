@@ -1,7 +1,0 @@
-onnxruntime-gpu
-opencv-python >= 4.1.2.30
-pillow >= 6.2.0
-numpy
-scipy
-pyyaml
-torch

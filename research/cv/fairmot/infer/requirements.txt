@@ -1,4 +1,0 @@
-motmetrics
-lap
-openpyxl
-cython_bbox

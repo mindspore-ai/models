@@ -1,4 +1,0 @@
-numpy
-onnxruntime-gpu
-easydict
-torch

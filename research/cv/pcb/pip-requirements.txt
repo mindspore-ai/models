@@ -1,4 +1,0 @@
-sympy==1.4
-imageio==2.16.0
-h5py==2.10.0
-PyYAML==5.3.1

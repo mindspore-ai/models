@@ -1,4 +1,0 @@
-numpy
-pandas
-opencv-python
-onnxruntime-gpu

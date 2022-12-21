@@ -1,4 +1,0 @@
-numpy
-sklearn
-cv2
-onnxruntime-gpu

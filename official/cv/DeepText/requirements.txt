@@ -1,5 +1,0 @@
-numpy
-mmcv
-pillow
-pyyaml
-onnxruntime-gpu

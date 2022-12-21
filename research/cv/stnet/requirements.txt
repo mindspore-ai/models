@@ -1,6 +1,0 @@
-opencv-python
-pytz
-python-dateutil
-pyyaml
-tqdm
-decord

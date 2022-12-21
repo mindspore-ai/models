@@ -1,6 +1,0 @@
-numpy
-opencv-python
-pyyaml
-pillow
-pycocotools >= 2.0.5
-onnxruntime-gpu

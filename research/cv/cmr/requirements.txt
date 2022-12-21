@@ -1,3 +1,0 @@
-imageio==2.4.1
-opencv-python==4.5.5.62
-h5py==3.6.0

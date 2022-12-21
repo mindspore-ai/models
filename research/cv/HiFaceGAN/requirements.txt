@@ -1,5 +1,0 @@
-opencv-python
-tqdm
-numpy
-imgaug
-scipy

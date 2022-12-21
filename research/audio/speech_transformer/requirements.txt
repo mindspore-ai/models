@@ -1,5 +1,0 @@
-easydict
-pyyaml
-jiwer
-tqdm
-decorator

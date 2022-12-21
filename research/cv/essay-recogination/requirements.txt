@@ -1,4 +1,0 @@
-editdistance
-gin-config
-scikit-image == 0.17.2
-tqdm

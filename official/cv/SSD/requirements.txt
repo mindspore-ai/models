@@ -1,9 +1,0 @@
-pycocotools >= 2.0.5
-Cython
-opencv-python
-xml-python
-Pillow
-numpy
-pyyaml
-onnxruntime-gpu
-requests

@@ -1,3 +1,0 @@
-opencv-python==4.5.1.48
-matplotlib==3.4.1
-protobuf==3.16.0

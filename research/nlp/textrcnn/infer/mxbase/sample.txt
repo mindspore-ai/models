@@ -1,2 +1,0 @@
-bash build.sh
-./textrcnn ../data/MR 1

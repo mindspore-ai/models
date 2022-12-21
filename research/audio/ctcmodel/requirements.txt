@@ -1,2 +1,0 @@
-edit-distance==1.0.4
-python-speech-features==0.6
