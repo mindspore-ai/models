@@ -15,7 +15,8 @@
 """Create SLB-QAT algorithm instance."""
 
 from mindspore_gs.quantization.slb import SlbQuantAwareTraining as SlbQAT
-from mindspore_gs.quantization.constant import QuantDtype
+from mindspore.common.dtype import QuantDtype
+
 
 def create_slb(config):
     algo = SlbQAT()
