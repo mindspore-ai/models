@@ -162,7 +162,7 @@ class RandomCropData:
         h_axis = np.where(h_array == 0)[0]
         w_axis = np.where(w_array == 0)[0]
 
-        if (not h_axis) or (not w_axis):
+        if (not h_axis.any()) or (not w_axis.any()):
             return 0, 0, w, h
 
         h_regions = self.split_regions(h_axis)

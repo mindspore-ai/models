@@ -4,9 +4,9 @@ device_num: 8
 device_id: 0
 run_eval: True
 eval_iter: 20
-device_target: "Ascend"
+device_target: "None"
 context_mode: "graph"
-mix_precision: True
+mix_precision: True       # Please set it to False on GPU/CPU
 ckpt_path: "./outputs/best_rank0.ckpt"
 output_dir: "./outputs"
 # Url for modelarts
