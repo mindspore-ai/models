@@ -93,7 +93,7 @@ class DetectionIoUEvaluator:
             det_polys.append(poly)
 
             # For dontcare gt
-            if gt_polys_dontcare.any():
+            if gt_polys_dontcare:
                 for idx in gt_polys_dontcare:
                     dontcare_poly = gt_polys[idx]
                     intersected_area = get_intersection(dontcare_poly, poly)
@@ -107,7 +107,7 @@ class DetectionIoUEvaluator:
         evaluation_log += f"DET polygons: {len(det_polys)}" + \
         (f" ({len(det_polys_dontcare)} don't care)\n" if det_polys_dontcare else "\n")
 
-        if gt_polys.any() and det_polys.any():
+        if gt_polys and det_polys:
             # visit arrays
             iou_mat = np.empty([len(gt_polys), len(det_polys)])
             gt_rect_mat = np.zeros(len(gt_polys), np.int8)

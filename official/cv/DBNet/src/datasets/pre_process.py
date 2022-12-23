@@ -71,7 +71,7 @@ class MakeSegDetectionData:
 
     def validate_polygons(self, polygons, ignore_tags, h, w):
         """polygons (numpy.array, required): of shape (num_instances, num_points, 2)"""
-        if not polygons.any():
+        if not polygons:
             return polygons, ignore_tags
         assert len(polygons) == len(ignore_tags)
 
