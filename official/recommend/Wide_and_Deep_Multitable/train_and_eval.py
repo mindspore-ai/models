@@ -95,8 +95,9 @@ def train_and_eval(config):
     ckpoint_cb = ModelCheckpoint(prefix='widedeep_train',
                                  directory=config.ckpt_path, config=ckptconfig)
 
-    model.train(epochs, ds_train, callbacks=[TimeMonitor(ds_train.get_dataset_size()), eval_callback,
-                                             callback, ckpoint_cb], sink_size=ds_train.get_dataset_size())
+    model.train(epochs, ds_train, \
+                callbacks=[TimeMonitor(ds_train.get_dataset_size()), eval_callback, callback, ckpoint_cb], \
+                dataset_sink_mode=True, sink_size=ds_train.get_dataset_size())
 
 
 if __name__ == "__main__":

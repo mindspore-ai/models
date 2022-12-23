@@ -122,7 +122,7 @@ def train_deepfm():
         eval_callback = EvalCallBack(model, ds_eval, auc_metric,
                                      eval_file_path=config.eval_file_name)
         callback_list.append(eval_callback)
-    model.train(config.train_epochs, ds_train, callbacks=callback_list)
+    model.train(config.train_epochs, ds_train, callbacks=callback_list, dataset_sink_mode=True)
 
 
 if __name__ == '__main__':

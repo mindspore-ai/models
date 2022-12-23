@@ -197,7 +197,7 @@ def train_maskrcnn_mobilenetv1():
             cb += [ckpoint_cb]
 
         model = Model(net)
-        model.train(config.epoch_size, dataset, callbacks=cb)
+        model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
 
 if __name__ == '__main__':
     train_maskrcnn_mobilenetv1()

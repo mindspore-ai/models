@@ -103,7 +103,8 @@ def train_and_eval(config):
     callback_list = [TimeMonitor(ds_train.get_dataset_size()), eval_callback, callback]
     if int(get_rank()) == 0:
         callback_list.append(ckpoint_cb)
-    model.train(epochs, ds_train, callbacks=callback_list, sink_size=ds_train.get_dataset_size())
+    model.train(epochs, ds_train, callbacks=callback_list, dataset_sink_mode=True, \
+                sink_size=ds_train.get_dataset_size())
 
 
 if __name__ == "__main__":

@@ -302,7 +302,8 @@ def run_train():
         callback_list.append(ckpt_cb)
 
     new_epoch_train = config.max_epoch * steps_per_epoch // config.log_interval
-    model.train(new_epoch_train, de_dataset, callbacks=callback_list, sink_size=config.log_interval)
+    model.train(new_epoch_train, de_dataset, callbacks=callback_list, \
+                dataset_sink_mode=True, sink_size=config.log_interval)
 
 
 if __name__ == "__main__":

@@ -132,7 +132,7 @@ def run_train():
 
 
     model = Model(gpt_with_grads)
-    model.train(actual_epoch_num, ds, callbacks=callback, sink_size=callback_size)
+    model.train(actual_epoch_num, ds, callbacks=callback, dataset_sink_mode=True, sink_size=callback_size)
 
 
 if __name__ == "__main__":
