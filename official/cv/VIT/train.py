@@ -227,7 +227,7 @@ def train_net():
         cb += [ckpt_cb]
 
     t0 = time.time()
-    model.train(epoch_size, dataset, callbacks=cb, sink_size=step_size)
+    model.train(epoch_size, dataset, callbacks=cb, sink_size=step_size, dataset_sink_mode=True)
     t1 = time.time()
     args.logger.info('training time used={:.2f}s'.format(t1 - t0))
     last_metric = 'last_metric[{}]'.format(state_cb.best_acc)

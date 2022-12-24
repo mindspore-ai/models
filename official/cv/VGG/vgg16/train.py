@@ -234,7 +234,7 @@ def run_train():
                                   prefix='{}'.format(config.rank))
         callbacks.append(ckpt_cb)
 
-    model.train(config.max_epoch, dataset, callbacks=callbacks)
+    model.train(config.max_epoch, dataset, callbacks=callbacks, dataset_sink_mode=True)
 
 if __name__ == '__main__':
     run_train()
