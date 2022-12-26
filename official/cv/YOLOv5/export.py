@@ -35,8 +35,7 @@ def run_export():
     param_dict = ms.load_checkpoint(config.ckpt_file)
     ms.load_param_into_net(network, param_dict)
 
-    ts = config.testing_shape[0] // 2
-    input_data = ms.numpy.zeros([config.batch_size, 12, ts, ts], ms.float32)
+    input_data = ms.numpy.zeros([config.batch_size, config.testing_shape[0], config.testing_shape[1], 3], ms.int8)
 
     ms.export(network, input_data, file_name=config.file_name, file_format=config.file_format)
     print('==========success export===============')

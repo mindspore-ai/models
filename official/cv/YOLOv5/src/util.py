@@ -476,9 +476,6 @@ class EvalWrapper:
     def inference(self):
         for index, data in enumerate(self.dataset.create_dict_iterator(output_numpy=True, num_epochs=1)):
             image = data["image"]
-            # adapt network shape of input data
-            image = np.concatenate((image[..., ::2, ::2], image[..., 1::2, ::2],
-                                    image[..., ::2, 1::2], image[..., 1::2, 1::2]), axis=1)
             image = ms.Tensor(image)
             image_shape_ = data["image_shape"]
             image_id_ = data["img_id"]
