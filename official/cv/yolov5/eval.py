@@ -16,8 +16,6 @@
 import os
 import time
 
-import numpy as np
-
 import mindspore as ms
 
 from src.yolo import YOLOV5
@@ -84,9 +82,6 @@ def run_eval():
     config.logger.info('Start inference....')
     for index, data in enumerate(ds.create_dict_iterator(output_numpy=True, num_epochs=1)):
         image = data["image"]
-        # adapt network shape of input data
-        image = np.concatenate((image[..., ::2, ::2], image[..., 1::2, ::2],
-                                image[..., ::2, 1::2], image[..., 1::2, 1::2]), axis=1)
         image = ms.Tensor(image)
         image_shape_ = data["image_shape"]
         image_id_ = data["img_id"]

@@ -13,6 +13,7 @@
 # limitations under the License.
 # ============================================================================
 """YOLOv5 based on DarkNet."""
+import numpy as np
 import mindspore as ms
 import mindspore.nn as nn
 import mindspore.ops as ops
@@ -352,8 +353,15 @@ class YOLOV5(nn.Cell):
         self.detect_1 = DetectionBlock('l', is_training=is_training)
         self.detect_2 = DetectionBlock('m', is_training=is_training)
         self.detect_3 = DetectionBlock('s', is_training=is_training)
+        self.mean = ms.Tensor(np.array([0.485 * 255, 0.456 * 255, 0.406 * 255],
+                                       dtype=np.float32)).reshape((1, 1, 1, 3))
+        self.std = ms.Tensor(np.array([0.229 * 255, 0.224 * 255, 0.225 * 255],
+                                      dtype=np.float32)).reshape((1, 1, 1, 3))
 
     def construct(self, x, input_shape):
+        x = (x - self.mean) / self.std
+        x = ops.transpose(x, (0, 3, 1, 2))
+        x = ops.concat((x[:, :, ::2, ::2], x[:, :, 1::2, ::2], x[:, :, ::2, 1::2], x[:, :, 1::2, 1::2]), 1)
         small_object_output, medium_object_output, big_object_output = self.feature_map(x)
         output_big = self.detect_1(big_object_output, input_shape)
         output_me = self.detect_2(medium_object_output, input_shape)
@@ -388,9 +396,6 @@ class YoloWithLossCell(nn.Cell):
         self.tenser_to_array = ops.TupleToArray()
 
     def construct(self, x, y_true_0, y_true_1, y_true_2, gt_0, gt_1, gt_2, input_shape):
-        input_shape = x.shape[2:4]
-        input_shape = ops.cast(self.tenser_to_array(input_shape) * 2, ms.float32)
-
         yolo_out = self.yolo_network(x, input_shape)
         loss_l = self.loss_big(*yolo_out[0], y_true_0, gt_0, input_shape)
         loss_m = self.loss_me(*yolo_out[1], y_true_1, gt_1, input_shape)

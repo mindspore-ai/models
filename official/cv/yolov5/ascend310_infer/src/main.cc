@@ -48,8 +48,6 @@ using mindspore::dataset::Execute;
 using mindspore::dataset::InterpolationMode;
 using mindspore::dataset::TensorTransform;
 using mindspore::dataset::vision::Resize;
-using mindspore::dataset::vision::HWC2CHW;
-using mindspore::dataset::vision::Normalize;
 using mindspore::dataset::vision::Decode;
 
 
@@ -58,55 +56,6 @@ DEFINE_string(dataset_path, ".", "dataset path");
 DEFINE_int32(device_id, 0, "device id");
 DEFINE_int32(image_height, 640, "image height");
 DEFINE_int32(image_width, 640, "image width");
-
-
-int TransFormImg(MSTensor *input, MSTensor *output) {
-  void *imgput;
-  void *imgoutput;
-  float *address_img;
-  float *address;
-  imgput = input->MutableData();
-  imgoutput = output->MutableData();
-  address_img = static_cast<float *>(imgput);
-  address = static_cast<float *>(imgoutput);
-  int new_height = static_cast<int>(FLAGS_image_height) / 2;
-  int new_width = static_cast<int>(FLAGS_image_width) / 2;
-  std::vector<int64_t> input_shape = input->Shape();
-  int channel = static_cast<int> (input_shape[0]);
-  int new_channel = channel * 4;  // concatenate image
-  int outIdx = 0;
-  int imgIdx = 0;
-  for (int new_c = 0; new_c < new_channel; new_c++) {
-    int c = new_c % channel;
-    for (int new_h = 0; new_h < new_height; new_h++) {
-        for (int new_w = 0; new_w < new_width; new_w++) {
-          if (new_c < channel) {
-            outIdx = new_c * new_height * new_width + new_h * new_width + new_w;
-            imgIdx = c * static_cast<int>(FLAGS_image_height) * static_cast<int>(FLAGS_image_width) +
-                         new_h * 2 * static_cast<int>(FLAGS_image_width) + new_w * 2;
-          } else if (channel <= new_c && new_c < channel * 2) {
-            outIdx = new_c * new_height * new_width + new_h * new_width + new_w;
-            imgIdx = c * static_cast<int>(FLAGS_image_height) * static_cast<int>(FLAGS_image_width) +
-                         static_cast<int>((new_h + 0.5) * 2 * static_cast<int>(FLAGS_image_width)) + new_w * 2;
-          } else if (channel * 2 <= new_c && new_c< channel * 3) {
-            outIdx = new_c * new_height * new_width + new_h * new_width + new_w;
-            imgIdx = c * static_cast<int>(FLAGS_image_height) * static_cast<int>(FLAGS_image_width) +
-                         new_h * 2 * static_cast<int>(FLAGS_image_width) + static_cast<int>((new_w + 0.5) * 2);
-          } else if (channel * 3 <= new_c && new_c< channel * 4) {
-            outIdx = new_c * new_height * new_width + new_h * new_width + new_w;
-            imgIdx = c * static_cast<int>(FLAGS_image_height) * static_cast<int>(FLAGS_image_width) +
-                         static_cast<int>((new_h + 0.5) * 2 * static_cast<int>(FLAGS_image_width)) +
-                         static_cast<int>((new_w + 0.5) * 2);
-          } else {
-            std::cout << "new channels Out of range." << std::endl;
-            return 1;
-          }
-          address[outIdx] = address_img[imgIdx];
-        }
-      }
-    }
-  return 0;
-}
 
 
 int main(int argc, char **argv) {
@@ -137,8 +86,6 @@ int main(int argc, char **argv) {
   size_t size = all_files.size();
   std::shared_ptr<TensorTransform> decode(new Decode());
   auto resize = Resize({FLAGS_image_height, FLAGS_image_width});
-  auto normalize = Normalize({123.675, 116.28, 103.53}, {58.395, 57.120, 57.375});
-  auto hwc2chw = HWC2CHW();
   Execute composeDecode({decode});
 
   for (size_t i = 0; i < size; ++i) {
@@ -166,19 +113,14 @@ int main(int argc, char **argv) {
       std::cout << "image channels is not 3." << std::endl;
       return 1;
     }
-    Execute transform({resize, normalize, hwc2chw});
+    Execute transform({resize});
     transform(imgDecode, &img);
 
     size_t buffer_size = img.DataSize();
     std::vector<int64_t> img_shape = img.Shape();
-    mindspore::MSTensor buffer("output", mindspore::DataType::kNumberTypeFloat32,
-                               {static_cast<int64_t>(img_shape[0] * 4), static_cast<int64_t>(FLAGS_image_height) / 2,
-                                static_cast<int64_t>(FLAGS_image_width) / 2},
-                               nullptr, buffer_size);
-    TransFormImg(&img, &buffer);
     std::vector<MSTensor> model_inputs = model.GetInputs();
     inputs.emplace_back(model_inputs[0].Name(), model_inputs[0].DataType(), model_inputs[0].Shape(),
-                        buffer.Data().get(), buffer.DataSize());
+                        img.Data().get(), img.DataSize());
     gettimeofday(&start, nullptr);
     ret = model.Predict(inputs, &outputs);
     gettimeofday(&end, nullptr);

@@ -60,20 +60,6 @@ def bbox_iou(bbox_a, bbox_b, offset=0):
     return area_i / (area_a[:, None] + area_b - area_i)
 
 
-def statistic_normalize_img(img, statistic_norm):
-    """Statistic normalize images."""
-    # img: RGB
-    if isinstance(img, Image.Image):
-        img = np.array(img)
-    img = img / 255.
-    # Computed from random subset of ImageNet training images
-    mean = np.array([0.485, 0.456, 0.406])
-    std = np.array([0.229, 0.224, 0.225])
-    if statistic_norm:
-        img = (img - mean) / std
-    return img
-
-
 def get_interp_method(interp, sizes=()):
     """
     Get the interpolation method for resize functions.
@@ -290,11 +276,10 @@ def _reshape_data(image, image_size):
     h, w = image_size
     interp = get_interp_method(interp=9, sizes=(ori_h, ori_w, h, w))
     image = image.resize((w, h), pil_image_reshape(interp))
-    image_data = statistic_normalize_img(image, statistic_norm=True)
+    image_data = np.array(image)
     if len(image_data.shape) == 2:
         image_data = np.expand_dims(image_data, axis=-1)
         image_data = np.concatenate([image_data, image_data, image_data], axis=-1)
-    image_data = image_data.astype(np.float32)
     return image_data, ori_image_shape
 
 
