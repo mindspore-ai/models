@@ -37,8 +37,6 @@ class ErrorRateAt95Recall(Metric):
         self.num_tests += ll.shape[0]
 
     def eval(self):
-        if self.labels:
-            raise RuntimeError('labels must not be 0.')
         distances = np.vstack(self.distances).reshape(self.num_tests)
         labels = np.vstack(self.labels).reshape(self.num_tests)
         recall_point = 0.95

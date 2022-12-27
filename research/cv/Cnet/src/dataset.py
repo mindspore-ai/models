@@ -23,7 +23,7 @@ import mindspore.dataset as ds
 import mindspore.dataset.transforms.c_transforms as C
 from mindspore import dtype as mstype
 from mindspore import load_checkpoint
-from src.prepare_data import prepare_patchdata
+from src.prepare_data import prepare_data
 
 
 class TripletPhotoTour:
@@ -45,7 +45,7 @@ class TripletPhotoTour:
         self.n_triplets = n_triplets
         self.batch_size = batch_size
 
-        prepare_patchdata(root, name, is_del_zip=False)
+        prepare_data(root, name)
         ckpt_name = '{}.ckpt'.format(name)
         ckpt_path = os.path.join(root, ckpt_name)
         ckpt_data = load_checkpoint(ckpt_path)
