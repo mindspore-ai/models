@@ -51,8 +51,11 @@ def train_preprocess():
     config.lr_epochs = list(map(int, config.lr_epochs.split(',')))
     config.data_root = os.path.join(config.data_dir, 'train2017')
     config.annFile = os.path.join(config.data_dir, 'annotations/instances_train2017.json')
-    device_id = get_device_id()
-    ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, device_id=device_id)
+    if config.device_target == "Ascend":
+        device_id = get_device_id()
+        ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target, device_id=device_id)
+    else:
+        ms.set_context(mode=ms.GRAPH_MODE, device_target=config.device_target)
 
     if config.is_distributed:
         # init distributed
@@ -98,8 +101,8 @@ def run_train():
     for epoch_idx in range(config.max_epoch):
         for step_idx, data in enumerate(data_loader):
             images = data[0]
-            input_shape = images.shape[2:4]
-            input_shape = ms.Tensor(tuple(input_shape[::-1]), ms.float32)
+            input_shape = images.shape[1:3]
+            input_shape = ms.Tensor(input_shape, ms.float32)
             loss = network(images, data[2], data[3], data[4], data[5], data[6],
                            data[7], input_shape)
             loss_meter.update(loss.asnumpy())
