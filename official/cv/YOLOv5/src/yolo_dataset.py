@@ -240,7 +240,6 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, device_num, rank,
                                    remove_images_without_annotations=remove_empty_anno, is_training=is_training)
     distributed_sampler = DistributedSampler(len(yolo_dataset), device_num, rank, shuffle=shuffle)
     yolo_dataset.size = len(distributed_sampler)
-    hwc_to_chw = ds.vision.HWC2CHW()
 
     config.dataset_size = len(yolo_dataset)
     cores = multiprocessing.cpu_count()
@@ -266,18 +265,6 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, device_num, rank,
                               output_columns=map2_out_column_names,
                               num_parallel_workers=min(4, num_parallel_workers), python_multiprocessing=False)
         dataset = dataset.project(output_column_names)
-        # Computed from random subset of ImageNet training images
-        mean = [m * 255 for m in [0.485, 0.456, 0.406]]
-        std = [s * 255 for s in [0.229, 0.224, 0.225]]
-        dataset = dataset.map([ds.vision.Normalize(mean, std), hwc_to_chw],
-                              num_parallel_workers=min(4, num_parallel_workers))
-
-        def concatenate(images):
-            images = np.concatenate((images[..., ::2, ::2], images[..., 1::2, ::2],
-                                     images[..., ::2, 1::2], images[..., 1::2, 1::2]), axis=0)
-            return images
-        dataset = dataset.map(operations=concatenate, input_columns="image",
-                              num_parallel_workers=min(4, num_parallel_workers))
         dataset = dataset.batch(batch_size, num_parallel_workers=min(4, num_parallel_workers), drop_remainder=True)
     else:
         dataset = ds.GeneratorDataset(yolo_dataset, column_names=["image", "img_id"],
@@ -286,6 +273,5 @@ def create_yolo_dataset(image_dir, anno_path, batch_size, device_num, rank,
         dataset = dataset.map(operations=compose_map_func, input_columns=["image", "img_id"],
                               output_columns=["image", "image_shape", "img_id"],
                               num_parallel_workers=8)
-        dataset = dataset.map(operations=hwc_to_chw, input_columns=["image"], num_parallel_workers=8)
         dataset = dataset.batch(batch_size, drop_remainder=True)
     return dataset
