@@ -1,5 +1,0 @@
-onnxruntime-gpu
-numpy
-opencv-python
-argparse
-mindspore-gpu

@@ -1,2 +1,0 @@
-got10k
-tqdm

@@ -1,4 +1,0 @@
-numpy
-six
-paddleocr
-onnxruntime-gpu

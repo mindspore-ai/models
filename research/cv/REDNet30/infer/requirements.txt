@@ -1,4 +1,0 @@
-numpy==1.21.5
-scikit-image==0.18.3
-Pillow==8.3.2
-tqdm==4.63.0

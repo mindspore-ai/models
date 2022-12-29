@@ -1,3 +1,0 @@
-numpy==1.21.5
-PyYAML==5.3.1
-natsort==7.0.1

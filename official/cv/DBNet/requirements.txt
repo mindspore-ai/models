@@ -1,5 +1,0 @@
-opencv-python
-pyclipper
-shapely
-imgaug
-tqdm

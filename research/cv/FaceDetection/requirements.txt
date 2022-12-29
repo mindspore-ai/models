@@ -1,8 +1,0 @@
-numpy
-pillow
-opencv-python
-pyyaml
-tqdm
-scipy
-Cython
-Cython_bbox

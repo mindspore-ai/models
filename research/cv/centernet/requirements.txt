@@ -1,4 +1,0 @@
-numpy
-opencv-python == 3.4.9
-pycocotools >= 2.0.5
-pyyaml

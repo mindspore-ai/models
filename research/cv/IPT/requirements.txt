@@ -1,4 +1,0 @@
-numpy
-imageio
-pillow
-onnxruntime-gpu

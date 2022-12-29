@@ -1,8 +1,0 @@
-easydict
-pyyaml
-mindspore
-pytorch
-shapely
-fire
-scikit-image
-numba

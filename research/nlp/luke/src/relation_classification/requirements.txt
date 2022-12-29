@@ -1,5 +1,0 @@
-regex
-requests
-marisa_trie
-filelock
-huggingface_hub

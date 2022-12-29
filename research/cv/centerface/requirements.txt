@@ -1,7 +1,0 @@
-torch
-numpy
-Cython
-opencv-python
-pycocotools >= 2.0.5
-scipy
-onnxruntime-gpu

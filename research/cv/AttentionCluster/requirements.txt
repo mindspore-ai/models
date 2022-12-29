@@ -1,5 +1,0 @@
-certifi==2021.5.30
-pycparser==2.20
-pyparsing==2.4.7
-six==1.16.0
-pyyaml

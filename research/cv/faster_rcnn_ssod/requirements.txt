@@ -1,5 +1,0 @@
-mindspore
-numpy
-Pillow
-pycocotools
-tqdm

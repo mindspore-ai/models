@@ -1,4 +1,0 @@
-onnxruntime-gpu
-pillow
-numpy
-pyyaml

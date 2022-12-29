@@ -1,5 +1,0 @@
-opencv
-pyyaml
-pytorch
-pandas
-Pillow

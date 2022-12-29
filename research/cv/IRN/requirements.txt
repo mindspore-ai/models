@@ -1,4 +1,0 @@
-PyYAML
-numpy
-opencv-python
-mindspore-gpu==1.6.1

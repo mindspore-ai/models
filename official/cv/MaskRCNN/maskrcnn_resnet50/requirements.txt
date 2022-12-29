@@ -1,6 +1,0 @@
-Cython
-pycocotools >= 2.0.5
-numpy
-onnxruntime-gpu
-opencv-python
-pyyaml

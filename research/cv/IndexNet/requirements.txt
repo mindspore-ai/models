@@ -1,5 +1,0 @@
-PyYAML
-opencv-python
-Pillow
-SciPy
-scikit-image

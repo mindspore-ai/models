@@ -1,4 +1,0 @@
-Cython
-pycocotools >= 2.0.5
-numpy
-opencv-python

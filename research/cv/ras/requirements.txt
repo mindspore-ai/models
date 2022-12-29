@@ -1,4 +1,0 @@
-numpy
-PIL
-argparse
-onnxruntime-gpu

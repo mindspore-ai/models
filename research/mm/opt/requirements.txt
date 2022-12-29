@@ -1,8 +1,0 @@
-tqdm
-cytoolz
-sympy
-lmdb
-lz4
-msgpack
-msgpack_numpy
-easydict
