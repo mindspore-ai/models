@@ -1,0 +1,4 @@
+numpy
+easydict
+pyyaml
+onnxruntime-gpu
