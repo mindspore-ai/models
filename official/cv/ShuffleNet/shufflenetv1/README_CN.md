@@ -98,7 +98,7 @@ ShuffleNetV1的核心部分被分成三个阶段，每个阶段重复堆积了�
 模型训练和评估过程中使用的参数可以在default_config.yaml中设置：
 
 ```default_config.yaml
-'epoch_size': 250,                  # 模型迭代次数  
+'epoch_size': 250,                  # 模型迭代次数
 'keep_checkpoint_max': 5,           # 保存ckpt文件的最大数量
 'save_ckpt_path': "./checkpoint/",       # 保存ckpt文件的路径
 'save_checkpoint_epochs': 1,        # 每迭代相应次数保存一个ckpt文件

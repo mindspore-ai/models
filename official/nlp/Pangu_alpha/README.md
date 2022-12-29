@@ -195,7 +195,7 @@ device0/log0.log).
 
 The script will launch the GPU training through `mpirun`, the user can run the following command on any machine to start training.
 Note when start training multi-node, the variables `NCCL_SOCKET_IFNAME` `NCCL_IB_HCA` may be different on some servers. If you meet some errors and
-strange phenomenon, please unset or set the NCCL variables. Details can be checked on this [link](https://www.mindspore.cn/docs/zh-CN/master/faq/distributed_configure.html).
+strange phenomenon, please unset or set the NCCL variables. Details can be checked on this [link](https://www.mindspore.cn/docs/zh-CN/r1.9/faq/distributed_configure.html).
 
 ```bash
 # The following variables are optional.
