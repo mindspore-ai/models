@@ -248,6 +248,13 @@ class PanguAlphaTrainPipelineWithLossScaleCell(nn.Cell):
         init = F.depend(init, get_status)
         flag_sum = self.reduce_sum(init, (0,))
         loss = F.depend(loss, status_clear)
+        if self.is_distributed:
+            # sum overflow flag over devices
+            flag_reduce = self.allreduce(flag_sum)
+            cond = self.less_equal(self.base, flag_reduce)
+        else:
+            cond = self.less_equal(self.base, flag_sum)
+        grads = F.depend(grads, cond)
         # apply grad reducer on grads
         if self.opt_shard:
             grads = self.grad_reducer(grads)
@@ -262,12 +269,6 @@ class PanguAlphaTrainPipelineWithLossScaleCell(nn.Cell):
             grads = self.hyper_map(
                 F.partial(clip_grad, GRADIENT_CLIP_TYPE, GRADIENT_CLIP_VALUE),
                 grads)
-        if self.is_distributed:
-            # sum overflow flag over devices
-            flag_reduce = self.allreduce(flag_sum)
-            cond = self.less_equal(self.base, flag_reduce)
-        else:
-            cond = self.less_equal(self.base, flag_sum)
         overflow = cond
         if sens is None:
             overflow = self.loss_scaling_manager(self.loss_scale, cond)
