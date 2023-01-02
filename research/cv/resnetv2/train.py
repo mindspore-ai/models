@@ -138,4 +138,4 @@ if __name__ == '__main__':
     else:
         callbacks = [time_cb, loss_cb, ckpoint_cb]
 
-    model.train(epoch_size, dataset, callbacks=callbacks)
+    model.train(epoch_size, dataset, callbacks=callbacks, dataset_sink_mode=True)

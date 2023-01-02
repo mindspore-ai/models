@@ -155,7 +155,8 @@ def train_net():
     # train model
     model.train(config.epoch_size - config.pretrain_epoch_size,
                 dataset,
-                callbacks=cb)
+                callbacks=cb,
+                dataset_sink_mode=True)
 
 if __name__ == '__main__':
     train_net()

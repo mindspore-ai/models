@@ -128,6 +128,7 @@ if __name__ == '__main__':
     config_ck = CheckpointConfig(save_checkpoint_steps=data_size, keep_checkpoint_max=cfg.keep_checkpoint_max)
     ckpoint_cb = ModelCheckpoint(prefix=args.ckpt_name, directory=args.ckpt_path, config=config_ck)
     net.set_train()
-    model.train(args.epoch_size, ds_train, callbacks=[ckpoint_cb, LossMonitor(per_print_times=1), TimeMonitor()])
+    model.train(args.epoch_size, ds_train, callbacks=[ckpoint_cb, LossMonitor(per_print_times=1), TimeMonitor()],
+                dataset_sink_mode=True)
     if args.run_online:
         mox.file.copy_parallel(args.ckpt_path, args.train_url)

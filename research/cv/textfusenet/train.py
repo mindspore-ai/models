@@ -188,7 +188,7 @@ def train_textfusenet():
             cb += [ckpoint_cb]
 
         model = Model(net)
-        model.train(config.epoch_size, dataset, callbacks=cb)
+        model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True)
 
 
 if __name__ == '__main__':

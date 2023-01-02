@@ -197,7 +197,7 @@ def train_lstm_crf():
     if config.device_target == "CPU":
         model.train(config.num_epochs, ds_train, callbacks=callbacks, dataset_sink_mode=False)
     else:
-        model.train(config.num_epochs, ds_train, callbacks=callbacks)
+        model.train(config.num_epochs, ds_train, callbacks=callbacks, dataset_sink_mode=True)
     print("============== Training Success ==============")
 
 

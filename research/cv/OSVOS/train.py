@@ -121,7 +121,7 @@ def train_parent(args, cfg):
 
     print("start train...")
     start = time.time()
-    model.train(epoch_size, dataset_train, callbacks=cb)
+    model.train(epoch_size, dataset_train, callbacks=cb, dataset_sink_mode=True)
     end = time.time()
     print(f"train success, use time {(end-start)/60} minutes")
 

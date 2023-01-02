@@ -222,7 +222,7 @@ def train_net():
 
     t0 = time.time()
     print(time.strftime("%y-%m-%d %H:%M:%S", time.localtime()))
-    model.train(epoch_size, dataset, callbacks=cb, sink_size=step_size)
+    model.train(epoch_size, dataset, callbacks=cb, sink_size=step_size, dataset_sink_mode=True)
     t1 = time.time()
     args.logger.info('training time used={:.2f}s'.format(t1 - t0))
     last_metric = 'last_metric[{}]'.format(state_cb.best_acc)

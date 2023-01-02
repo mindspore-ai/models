@@ -167,6 +167,7 @@ if __name__ == '__main__':
     # train model
     model.train(config.epoch_size - config.pretrain_epoch_size,
                 dataset,
-                callbacks=cb)
+                callbacks=cb,
+                dataset_sink_mode=True)
     if args_opt.run_cloudbrain:
         mox.file.copy_parallel("/cache/ckpt", args_opt.train_url)

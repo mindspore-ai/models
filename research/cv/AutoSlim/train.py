@@ -160,7 +160,7 @@ def main():
         callbacks += [ckpt_cb]
 
     print('Initialization may take a long time, please wait patiently...')
-    model.train(args.epoch_size, train_set, callbacks)
+    model.train(args.epoch_size, train_set, callbacks, dataset_sink_mode=True)
     print("Finish training.")
 
     if args.run_modelarts and args.is_save_checkpoint and (device_num == 1 or rank_id == 0):

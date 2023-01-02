@@ -90,7 +90,8 @@ def do_train(dataset=None, ds_eval=None, network=None, load_checkpoint_path="",
 
     eval_callback = albert_callback(netwithgrads, args, steps_per_epoch, ds_eval, save_checkpoint_path)
     model.train(epoch_num, dataset, callbacks=[TimeMonitor(dataset.get_dataset_size()), eval_callback,
-                                               LossCallBack(dataset.get_dataset_size()), ckpoint_cb])
+                                               LossCallBack(dataset.get_dataset_size()), ckpoint_cb],
+                dataset_sink_mode=True)
 
 
 def eval_result_print(assessment_method="accuracy", callback=None):

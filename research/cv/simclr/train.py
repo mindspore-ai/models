@@ -167,6 +167,6 @@ if __name__ == "__main__":
     ckpts_dir = os.path.join(args.train_output_path, "checkpoint")
     ckpoint_cb = ModelCheckpoint(prefix="checkpoint_simclr", directory=ckpts_dir, config=config_ck)
     print("============== Starting Training ==============")
-    model.train(args.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, LossMonitor()])
+    model.train(args.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, LossMonitor()], dataset_sink_mode=True)
     if args.run_cloudbrain and args.device_id == 0:
         mox.file.copy_parallel(src_url=_local_train_url, dst_url=args.train_url)
