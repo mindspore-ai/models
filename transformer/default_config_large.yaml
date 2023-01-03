@@ -18,10 +18,9 @@ scale_factor: 2
 scale_window: 2000
 optimizer: 'Adam'
 optimizer_adam_beta2: 0.997
-#lr_schedule: edict({'learning_rate': 2.0, 'warmup_steps': 8000, 'start_decay_step': 16000, 'min_lr': 0.0,})
 
 # transformer_net_cfg
-batch_size: 96
+batch_size: 32
 seq_length: 128
 vocab_size: 36560
 hidden_size: 1024
@@ -65,6 +64,7 @@ save_checkpoint_num: 30
 save_checkpoint_path: "./"
 bucket_boundaries: [16, 32, 48, 64, 128]
 accumulation_steps: 1
+enable_dynamic_mode: "true"
 
 # export.py /eval_config - transformer export
 file_name: "transformer"
@@ -95,6 +95,7 @@ train_url: 'Training output url for obs'
 data_path: 'Dataset path for local, it is better to use absolute path'
 output_path: 'Training output path for local'
 ann_file: 'Ann file, default is val.json.'
+enable_dynamic_mode: 'enable dynamic shape mode.'
 
 device_target: "device where the code will be implemented, default is Ascend"
 checkpoint_path: "Checkpoint file path"
@@ -133,3 +134,4 @@ distribute: ['true', 'false']
 enable_lossscale: ['true', 'false']
 do_shuffle: ['true', 'false']
 enable_save_ckpt: ['true', 'false']
+enable_dynamic_mode: ['true', 'false']

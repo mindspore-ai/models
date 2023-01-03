@@ -149,7 +149,7 @@ class EmbeddingLookup(nn.Cell):
         if self.enable_dynamic_mode == "true":
             out_shape = (self.batch_size, -1, self.embedding_size)
         output = self.reshape(output_for_reshape, out_shape)
-        return output, self.embedding_table
+        return output, self.embedding_table.value()
 
 
 def position_encoding(length,
@@ -866,11 +866,12 @@ class CreateAttentionMaskFromInputMask(nn.Cell):
         shape_left = input_shape + (1,)
 
         input_mask = self.cast(input_mask, ms.float32)
-        mask_left = self.reshape(input_mask, shape_left)
-        mask_right = self.reshape(input_mask, shape_right)
         if self.enable_dynamic_mode == "true":
             mask_left = self.expand_dims(input_mask, 2)
             mask_right = self.expand_dims(input_mask, 1)
+        else:
+            mask_left = self.reshape(input_mask, shape_left)
+            mask_right = self.reshape(input_mask, shape_right)
         attention_mask = self.batch_matmul(mask_left, mask_right)
 
         return attention_mask
@@ -1192,13 +1193,15 @@ class TransformerModel(nn.Cell):
                                           seq_length)
 
         if self.is_training:
-            future_mask = convert_np_to_tensor_encoder(seq_length)
             if self.enable_dynamic_mode == "true":
                 ones_inner = self.ones_like(source_ids[0, :])
                 seq_length = self.shape(ones_inner)
                 broadcast_shape = self.concatenate([seq_length, seq_length])
                 ones = self.dynamic_broadcast_to(ones_inner, broadcast_shape)
                 future_mask = self.tril(ones)
+            else:
+                future_mask = convert_np_to_tensor_encoder(seq_length)
+
 
             # process target sentence
             tgt_word_embeddings, _ = self.tfm_embedding_lookup(target_ids)

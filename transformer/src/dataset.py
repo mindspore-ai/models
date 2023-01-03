@@ -14,16 +14,10 @@
 # ============================================================================
 """Data operations, will be used in train.py."""
 
-import mindspore as ms
 import mindspore.dataset as de
-from .model_utils.config import config
 
 de.config.set_seed(1)
-
-if config.enable_dynamic_mode == "true":
-    de.config.set_prefetch_size(96)
-else:
-    de.config.set_prefetch_size(512)
+de.config.set_prefetch_size(96)
 
 def fun(data, shape):
     data = data.reshape(shape)
@@ -31,7 +25,9 @@ def fun(data, shape):
 
 
 def create_transformer_dynamic_dataset(dataset_path=None, rank_size=1, rank_id=0, do_shuffle="true"):
-    """create dynamic dataset"""
+    """
+    create transformer dynamic dataset.
+    """
     dataset = de.MindDataset(dataset_path,
                              columns_list=["batch_data", "batch_shape"],
                              shuffle=(do_shuffle == "true"), num_shards=rank_size, shard_id=rank_id)
@@ -40,42 +36,8 @@ def create_transformer_dynamic_dataset(dataset_path=None, rank_size=1, rank_id=0
                           output_columns=["source_eos_ids", "source_eos_mask",
                                           "target_sos_ids", "target_sos_mask",
                                           "target_eos_ids", "target_eos_mask"],
-                          column_order=["source_eos_ids", "source_eos_mask",
-                                        "target_sos_ids", "target_sos_mask",
-                                        "target_eos_ids", "target_eos_mask"])
+                          )
+    dataset = dataset.project(["source_eos_ids", "source_eos_mask",
+                               "target_sos_ids", "target_sos_mask",
+                               "target_eos_ids", "target_eos_mask"])
     return dataset
-
-
-def create_transformer_dataset(rank_size=1, rank_id=0, do_shuffle="true", dataset_path=None,
-                               bucket_boundaries=None, device_target="Ascend"):
-    """create dataset"""
-    def batch_per_bucket(bucket_len, dataset_path):
-        dataset_path = dataset_path + "_" + str(bucket_len) + "_00"
-        ds = de.MindDataset(dataset_path,
-                            columns_list=["source_eos_ids", "source_eos_mask",
-                                          "target_sos_ids", "target_sos_mask",
-                                          "target_eos_ids", "target_eos_mask"],
-                            shuffle=(do_shuffle == "true"), num_shards=rank_size, shard_id=rank_id)
-        type_cast_op = de.transforms.transforms.TypeCast(ms.int32)
-        ds = ds.map(operations=type_cast_op, input_columns="source_eos_ids")
-        ds = ds.map(operations=type_cast_op, input_columns="source_eos_mask")
-        ds = ds.map(operations=type_cast_op, input_columns="target_sos_ids")
-        ds = ds.map(operations=type_cast_op, input_columns="target_sos_mask")
-        ds = ds.map(operations=type_cast_op, input_columns="target_eos_ids")
-        ds = ds.map(operations=type_cast_op, input_columns="target_eos_mask")
-
-        # apply batch operations
-
-        ds = ds.batch(config.batch_size, drop_remainder=True)
-        return ds
-
-    for i, _ in enumerate(bucket_boundaries):
-        bucket_len = bucket_boundaries[i]
-        ds_per = batch_per_bucket(bucket_len, dataset_path)
-        if i == 0:
-            ds = ds_per
-        else:
-            ds = ds + ds_per
-    ds = ds.shuffle(ds.get_dataset_size())
-    ds.channel_name = 'transformer'
-    return ds

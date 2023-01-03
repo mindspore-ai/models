@@ -33,20 +33,19 @@ if [ $FILE_LIMIT -lt 2048 ] ; then
 ulimit -n 2048;
 fi
 
-export DEVICE_TARGET=$1
-DEVICE_ID=$2
+DEVICE_TARGET=$1
 EPOCH_SIZE=$3
 GRADIENT_ACCUMULATE_STEP=$4
 DATA_PATH=$5
 
 if [ $DEVICE_TARGET == 'Ascend' ];then
+    export DEVICE_ID=$2
     python train.py  \
         --config_path="./default_config_large.yaml" \
         --distribute="false" \
         --epoch_size=$EPOCH_SIZE \
         --accumulation_steps=$GRADIENT_ACCUMULATE_STEP \
         --device_target=$DEVICE_TARGET \
-        --device_id=$DEVICE_ID \
         --enable_save_ckpt="true" \
         --enable_lossscale="true" \
         --do_shuffle="true" \
@@ -68,7 +67,6 @@ elif [ $DEVICE_TARGET == 'GPU' ];then
         --checkpoint_path="" \
         --save_checkpoint_steps=2500 \
         --save_checkpoint_num=30 \
-        --enable_dynamic_mode="true" \
         --data_path=$DATA_PATH > log.txt 2>&1 &
 else
     echo "Not supported device target."
