@@ -187,4 +187,4 @@ if __name__ == '__main__':
     callbacks.append(ckpoint_cb)
 
     print("============== Starting Training ==============")
-    model.train(cfg['epochs'], ds_train, callbacks=callbacks)
+    model.train(cfg['epochs'], ds_train, callbacks=callbacks, dataset_sink_mode=True)

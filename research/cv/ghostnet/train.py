@@ -136,5 +136,5 @@ if __name__ == '__main__':
             cb += [ckpt_cb]
 
     # train model
-    model.train(config.epoch_size, dataset, callbacks=cb,
+    model.train(config.epoch_size, dataset, callbacks=cb, dataset_sink_mode=True,
                 sink_size=dataset.get_dataset_size())

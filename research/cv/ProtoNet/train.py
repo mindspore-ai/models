@@ -56,7 +56,7 @@ def train(opt, tr_dataloader, net, loss_fn, eval_loss_fn, optim, path, rank_id, 
 
     print('==========training test==========')
     starttime = datetime.datetime.now()
-    model.train(opt.epochs, inp, callbacks=[ckpoint_cb, eval_cb, TimeMonitor()])
+    model.train(opt.epochs, inp, callbacks=[ckpoint_cb, eval_cb, TimeMonitor()], dataset_sink_mode=True)
     endtime = datetime.datetime.now()
     print('epoch time: ', (endtime - starttime).seconds / 10, 'per step time:', (endtime - starttime).seconds / 1000)
 

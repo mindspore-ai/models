@@ -74,7 +74,7 @@ def do_train(dataset=None, network=None, load_checkpoint_path="", save_checkpoin
     netwithgrads = ErnieFinetuneCell(network, optimizer=optimizer, scale_update_cell=update_cell)
     model = Model(netwithgrads)
     callbacks = [TimeMonitor(dataset.get_dataset_size()), LossCallBack(dataset.get_dataset_size()), ckpoint_cb]
-    model.train(epoch_num, dataset, callbacks=callbacks)
+    model.train(epoch_num, dataset, callbacks=callbacks, dataset_sink_mode=True)
 
 def do_eval(dataset=None, network=None, num_class=2, load_checkpoint_path=""):
     """ do eval """

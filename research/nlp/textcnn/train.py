@@ -94,7 +94,7 @@ def train_net():
     else:
         epoch_count = config.epoch_size * batch_num // config.sink_size
         model.train(epoch_count, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb, eval_callback],
-                    sink_size=config.sink_size)
+                    sink_size=config.sink_size, dataset_sink_mode=True)
     print("train success")
 
 

@@ -216,7 +216,7 @@ def run_train():
     ckpoint_cb = ModelCheckpoint(prefix="train_tinydarknet_" + config.dataset_name, directory=ckpt_save_dir,
                                  config=config_ck)
     loss_cb = LossMonitor()
-    model.train(config.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb])
+    model.train(config.epoch_size, dataset, callbacks=[time_cb, ckpoint_cb, loss_cb], dataset_sink_mode=True)
     print("train success")
 
 if __name__ == '__main__':

@@ -61,7 +61,8 @@ def train_lenet():
         model = Model(network, net_loss, net_opt, metrics={"Accuracy": Accuracy()}, amp_level="O2")
 
     print("============== Starting Training ==============")
-    model.train(config.epoch_size, ds_train, callbacks=[time_cb, ckpoint_cb, LossMonitor()])
+    model.train(config.epoch_size, ds_train, callbacks=[time_cb, ckpoint_cb, LossMonitor()],
+                dataset_sink_mode=True)
 
 
 if __name__ == "__main__":

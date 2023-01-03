@@ -95,7 +95,8 @@ def train_netloss(args_netloss, netg_netloss, netf_netloss, netloss_netloss,
     model = Model(network=netloss_netloss,
                   loss_fn=None, optimizer=optim_netloss)
     model.train(args_netloss.f_epochs, dataset_netloss, callbacks=[callback.SaveCallbackNETLoss(
-        netf_netloss, args_netloss.f_path, InSet_netloss.x, InSet_l, InSet_g, InSet_netloss.ua)])
+                netf_netloss, args_netloss.f_path, InSet_netloss.x, InSet_l, InSet_g, InSet_netloss.ua)],
+                dataset_sink_mode=True)
 
 
 def trainer(args_er, netg_er, netf_er, netloss_er, lenfac_er, optim_g_er, optim_f_er,

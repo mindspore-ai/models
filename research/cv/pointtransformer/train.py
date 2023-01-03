@@ -112,7 +112,7 @@ def train(cfg):
 
     if get_rank_id() == 0:
         print("============== Starting Training ==============")
-    model.train(max_epoch, traindataset, callbacks=[loss_cb, time_cb, ckpoint_cb])
+    model.train(max_epoch, traindataset, callbacks=[loss_cb, time_cb, ckpoint_cb], dataset_sink_mode=True)
 
 
 if __name__ == '__main__':

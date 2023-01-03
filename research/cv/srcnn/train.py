@@ -107,7 +107,7 @@ def run_train():
         ckpt_cb = ModelCheckpoint(prefix="srcnn", directory=save_ckpt_path, config=config_ck)
         callbacks.append(ckpt_cb)
 
-    model.train(cfg.epoch_size, train_dataset, callbacks=callbacks)
+    model.train(cfg.epoch_size, train_dataset, callbacks=callbacks, dataset_sink_mode=True)
     if cfg.enable_modelarts == "True":
         sync_data(output_path, cfg.train_url)
 

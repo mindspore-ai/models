@@ -156,7 +156,7 @@ def train(mixdata_path):
     # train
     print("Starting Training:per_step_size={},batchsize={},epoch={}".format(per_step_size, batch_size,
                                                                             epoch_number_total))
-    model.train(epoch_number_total, mix_dataset, callbacks=callbacks)
+    model.train(epoch_number_total, mix_dataset, callbacks=callbacks, dataset_sink_mode=True)
     if config.is_modelarts:
         mox.file.copy_parallel(local_data_path + "/output", output_path)
 
