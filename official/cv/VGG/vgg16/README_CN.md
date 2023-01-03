@@ -8,7 +8,7 @@
     - [数据集](#数据集)
         - [使用的数据集：CIFAR-10](#使用的数据集cifar-10)
         - [使用的数据集：ImageNet2012](#使用的数据集imagenet2012)
-        - [使用的数据集：自定义数据集](#使用的数据集：自定义数据集)
+        - [使用的数据集：自定义数据集](#使用的数据集自定义数据集)
         - [数据集组织方式](#数据集组织方式)
     - [特性](#特性)
         - [混合精度](#混合精度)
@@ -26,13 +26,14 @@
                 - [GPU处理器环境运行VGG16](#gpu处理器环境运行vgg16)
         - [评估过程](#评估过程)
             - [评估](#评估-1)
-        - [迁移过程](#迁移过程)
-            - [数据集划分](#数据集划分)
-            - [数据集迁移](#数据集迁移)
-            - [quick start](#quick start)
+    - [迁移过程](#迁移过程)
+        - [数据集划分](#数据集划分)
+        - [数据集迁移](#数据集迁移)
+        - [数据集评估](#数据集评估)
+        - [quick start](#quick-start)
     - [推理过程](#推理过程)
         - [导出MindIR](#导出mindir)
-        - [在Ascend310执行推理](#在ascend310执行推理)
+        - [执行推理](#执行推理)
         - [结果](#结果)
     - [模型描述](#模型描述)
         - [性能](#性能)
@@ -620,14 +621,13 @@ python export.py --config_path [YMAL_CONFIG_PATH] --ckpt_file [CKPT_PATH] --file
 参数ckpt_file为必填项，
 `FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
 
-### 在Ascend310执行推理
+### 执行推理
 
 在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
 目前imagenet2012数据集仅支持batch_Size为1的推理。
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `DATASET_NAME` 选择范围为 ['cifar10', 'imagenet2012'].

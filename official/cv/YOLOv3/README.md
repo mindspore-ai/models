@@ -14,8 +14,10 @@
             - [Distributed Training](#distributed-training)
         - [Evaluation Process](#evaluation-process)
             - [Evaluation](#evaluation)
-        - [Export MindIR](#export-mindir)
+        - [Export MindIR or ONNX](#export-mindir-or-onnx)
         - [Inference Process](#inference-process)
+            - [Usage](#usage)
+            - [result](#result)
     - [Model Description](#model-description)
         - [Performance](#performance)
             - [Evaluation Performance](#evaluation-performance)
@@ -427,8 +429,8 @@ Before performing inference, the air or onnx file must be exported by export.py.
 Current batch_Size can only be set to 1. Because the DVPP hardware is used for processing, the picture must comply with the JPEG encoding format, Otherwise, an error will be reported. For example, the COCO_val2014_000000320612.jpg in coco2014 dataset needs to be deleted.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
+# Run inference
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 ```
 
 `DEVICE_ID` is optional, default value is 0. DATA_PATH is evaluation data path, ANNO_PATH is annotation file path, json format. e.g., instances_val2014.json.
@@ -442,7 +444,7 @@ DATA_PATH is evaluation data path, include annotation file path, json format. e.
 
 #### result
 
-Inference result in Ascend is saved in current path, you can find result in acc.log file.
+Inference result is saved in current path, you can find result in acc.log file.
 
 ```eval log
 # acc.log

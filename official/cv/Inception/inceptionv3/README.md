@@ -430,11 +430,10 @@ python export.py --ckpt_file [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 Before performing inference, the model file must be exported by export script on the Ascend910 environment.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_FILE] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [LABEL_FILE] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
--NOTE: Ascend310 inference use Imagenet dataset . The label of the image is the number of folder which is started from 0 after sorting. This file can be converted by script from `models/utils/cpp_infer/imgid2label.py`.
+-NOTE: Inference use Imagenet dataset . The label of the image is the number of folder which is started from 0 after sorting. This file can be converted by script from `models/utils/cpp_infer/imgid2label.py`.
 
 ### result
 

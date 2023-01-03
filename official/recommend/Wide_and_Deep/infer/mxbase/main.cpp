@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 #include <dirent.h>
-#include <gflags/gflags.h>
 #include <stdio.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -121,7 +120,10 @@ int load_bin_file(char *buffer, const std::string &filename, int struct_num) {
 int main(int argc, char *argv[]) {
     FLAGS_logtostderr = 1;
     LogInfo << "Usage: --model ../data/models/wide_and_deep.om --device 0";
-    gflags::ParseCommandLineFlags(&argc, &argv, true);
+    if (!ParseCommandLineFlags(argc, argv)) {
+    std::cout << "Failed to parse args" << std::endl;
+    return 1;
+  }
 
     LogInfo << "OM File Path :" << FLAGS_model;
     LogInfo << "deviceId :" << FLAGS_device;

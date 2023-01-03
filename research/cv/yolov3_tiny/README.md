@@ -1,25 +1,33 @@
 # Contents
 
-- [YOLOv3-Tiny Description](#YOLOv3-Tiny-description)
+- [Contents](#contents)
+- [YOLOv3-Tiny Description](#yolov3-tiny-description)
 - [Model Architecture](#model-architecture)
-- [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
 - [Quick Start](#quick-start)
 - [Script Description](#script-description)
     - [Script and Sample Code](#script-and-sample-code)
     - [Script Parameters](#script-parameters)
     - [Training Process](#training-process)
-        - [Training](#training)
-    - [Testing Process](#testing-process)
-        - [Evaluation](#testing)
+        - [Run on Ascend](#run-on-ascend)
+            - [Single Training](#single-training)
+            - [Distributed Training](#distributed-training)
+        - [Run on GPU](#run-on-gpu)
+            - [Single Training](#single-training-1)
+            - [Distributed Training](#distributed-training-1)
     - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
-    - [Convert Process](#convert-process)
-        - [Convert](#convert)
+        - [Valid](#valid)
+            - [Ascend](#ascend)
+            - [GPU](#gpu)
+    - [Export MindIR](#export-mindir)
+    - [Inference Process](#inference-process)
+        - [Usage](#usage)
+        - [Result](#result)
 - [Model Description](#model-description)
     - [Performance](#performance)
-        - [Evaluation Performance](#evaluation-performance)
+        - [Training Performance](#training-performance)
         - [Inference Performance](#inference-performance)
+- [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 # [YOLOv3-Tiny Description](#contents)
@@ -444,8 +452,8 @@ Before performing inference, the mindir file must be exported by export.py. Curr
 Images to be processed needs to be copied to the to-be-processed folder based on the annotation file.
 
 ```shell
-# Ascend310 Inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
+# Inference
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 ```
 
 DEVICE_ID is optional, default value is 0.

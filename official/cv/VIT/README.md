@@ -2,6 +2,7 @@
 
 [查看中文](./README_CN.md)
 
+- [Contents](#contents)
 - [Vit Description](#vit-description)
 - [Model Architecture](#model-architecture)
 - [Dataset](#dataset)
@@ -17,16 +18,18 @@
         - [Distributed Training](#distributed-training)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
-    - [Export Process](#Export-process)
-        - [Export](#Export)
-    - [Inference Process](#Inference-process)
-        - [Inference](#Inference)
+    - [Export Process](#export-process)
+        - [Export](#export)
+    - [Inference Process](#inference-process)
+        - [Inference](#inference)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
+            - [Vit on imagenet 1200k images](#vit-on-imagenet-1200k-images)
+        - [Inference Performance](#inference-performance)
+            - [Vit on 1200k images](#vit-on-1200k-images)
     - [How to use](#how-to-use)
-        - [Inference](#inference)
+        - [Inference](#inference-1)
         - [Continue Training on the Pretrained Model](#continue-training-on-the-pretrained-model)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
@@ -395,9 +398,8 @@ Current batch_ Size can only be set to 1.
   Inference result will be stored in the example path, you can find result like the followings in acc.log.
 
   ```shell
-  # Ascend310 inference
   cd scripts
-  bash run_infer_310.sh [MINDIR_PATH] [NET_TYPE] [DATASET] [DATA_PATH] [DEVICE_ID]
+  bash run_infer_cpp.sh [MINDIR_PATH] [NET_TYPE] [DATASET] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
   Total data: 50000, top1 accuracy: 0.74084, top5 accuracy: 0.91026
   ```
 

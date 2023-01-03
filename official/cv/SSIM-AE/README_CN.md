@@ -3,20 +3,20 @@
 <!-- TOC -->
 
 - [目录](#目录)
-- [SSIM-AE描述](#SSIM-AE描述)
+- [SSIM-AE描述](#ssim-ae描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [特性](#特性)
     - [混合精度](#混合精度)
 - [环境要求](#环境要求)
 - [快速入门](#快速入门)
-  - [训练过程](#训练过程)
-      - [训练](#训练)
-      - [ModelArt训练](#ModelArt训练)
-  - [推理过程](#推理过程)
-    - [Ascend910处理器环境推理](#Ascend910处理器环境推理)
-    - [导出过程](#导出过程)
-    - [Ascend310处理器环境推理](#Ascend310处理器环境推理)
+    - [训练过程](#训练过程)
+        - [训练](#训练)
+        - [ModelArt训练](#modelart训练)
+    - [推理过程](#推理过程)
+        - [Ascend910处理器环境推理](#ascend910处理器环境推理)
+        - [导出](#导出)
+        - [执行推理](#执行推理)
 - [模型描述](#模型描述)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
@@ -268,20 +268,19 @@ MVTec AD数据集
 python export.py --config_path=[CONFIG_PATH]
 ```
 
-### Ascend310处理器环境推理
+### 执行推理
 
 在推理之前我们需要先导出模型。Air模型只能在昇腾910环境上导出，mindir可以在任意环境上导出。batch_size只支持1。
 
-- 在昇腾310上使用MVTec AD bottle数据集进行推理
+- 使用MVTec AD bottle数据集进行推理
 
   在执行下面的命令之前，我们需要确认config文件中的配置和训练一致。其中ssim_threshold和l1_threshold需要手动添加，最好与910上自动获取的值一致。
 
   推理的结果保存在当前目录下，在acc.log日志文件中可以找到类似以下的结果。
 
   ```shell
-  # 310推理
-  bash scripts/run_infer_310.sh [MINDIR_PATH] [CONFIG_PATH] [SSIM_THRESHOLD] [L1_THRESHOLD] [DEVICE_ID]
-  # 示例: bash scripts/run_infer_310.sh  SSIM-AE-bottle.mindir config/bottle_config.yaml 0.777 0.3203 0
+  bash scripts/run_infer_cpp.sh [MINDIR_PATH] [CONFIG_PATH] [SSIM_THRESHOLD] [L1_THRESHOLD] [DEVICE_TYPE] [DEVICE_ID]
+  # 示例: bash scripts/run_infer_cpp.sh  SSIM-AE-bottle.mindir config/bottle_config.yaml 0.777 0.3203 0
   # 推理后结果
   ok: 0.9, nok: 0.9841269841269841, avg: 0.963855421686747
   ```

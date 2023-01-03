@@ -6,7 +6,6 @@
     - [Dataset](#dataset)
     - [Environment Requirements](#environment-requirements)
     - [Quick Start](#quick-start)
-        - [Prepare the model](#prepare-the-model)
         - [Run the scripts](#run-the-scripts)
     - [Script Description](#script-description)
         - [Script and Sample Code](#script-and-sample-code)
@@ -15,11 +14,12 @@
             - [Training on Ascend](#training-on-ascend)
         - [Evaluation Process](#evaluation-process)
             - [Evaluation on Ascend](#evaluation-on-ascend)
-            - [Performance](#performance)
-        - [Export Process](#Export-process)
-            - [Export](#Export)
-        - [Inference Process](#Inference-process)
-            - [Inference](#Inference)
+    - [Export Process](#export-process)
+        - [Export](#export)
+    - [Inference Process](#inference-process)
+        - [Inference](#inference)
+        - [Performance](#performance)
+    - [Export MindIR](#export-mindir)
     - [Description of Random Situation](#description-of-random-situation)
     - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -301,8 +301,7 @@ Before performing inference, we need to export model first. Air model can only b
 Current batch_ Size can only be set to 1.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP]  [ANNO_FILE]  [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [ANNO_FILE] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 Inference result will be stored in the example path, you can find result like the followings in acc.log.

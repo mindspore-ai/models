@@ -3,7 +3,7 @@
 <!-- TOC -->
 
 - [目录](#目录)
-- [YOLOv3_Tiny描述](#YOLOv3_Tiny描述)
+- [YOLOv3\_Tiny描述](#yolov3_tiny描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [环境要求](#环境要求)
@@ -25,6 +25,12 @@
         - [推理性能](#推理性能)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
+    - [迁移学习](#迁移学习)
+        - [迁移学习训练流程](#迁移学习训练流程)
+            - [数据集处理](#数据集处理)
+            - [迁移学习训练过程](#迁移学习训练过程)
+            - [迁移学习推理过程](#迁移学习推理过程)
+            - [迁移学习quick\_start](#迁移学习quick_start)
 
 <!-- /TOC -->
 
@@ -372,8 +378,8 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 目前仅可处理batch_Size为1，且图片需要根据关联的标签文件导出至待处理文件夹。
 
 ```shell
-# Ascend310 推理
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
+# 执行推理
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [ANNO_PATH] [DEVICE_ID]
 ```
 
 `DEVICE_ID` 可选，默认值为 0。

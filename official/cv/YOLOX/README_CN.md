@@ -2,19 +2,23 @@
 
 <!-- TOC -->
 
-- [YOLOX描述](#YOLOX描述)
+- [目录](#目录)
+- [YOLOX描述](#yolox描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [环境要求](#环境要求)
 - [快速入门](#快速入门)
+- [单卡训练(前285轮)](#单卡训练前285轮)
 - [脚本说明](#脚本说明)
     - [脚本及样例代码](#脚本及样例代码)
     - [脚本参数](#脚本参数)
     - [训练过程](#训练过程)
-        - [训练](#单卡训练)
+        - [单卡训练](#单卡训练)
         - [分布式训练](#分布式训练)
     - [评估过程](#评估过程)
         - [评估](#评估)
+            - [python命令启动](#python命令启动)
+            - [shell脚本启动](#shell脚本启动)
     - [导出mindir模型](#导出mindir模型)
     - [推理过程](#推理过程)
         - [用法](#用法)
@@ -25,7 +29,7 @@
         - [评估性能](#评估性能)
         - [推理性能](#推理性能)
 - [随机情况说明](#随机情况说明)
-- [ModelZoo主页](#ModelZoo主页)
+- [ModelZoo主页](#modelzoo主页)
 
 <!-- TOC -->
 
@@ -363,9 +367,7 @@ python export.py --config_path=yolox_darknet53.yaml --backbone=yolox_darknet53 -
 执行完整的推理脚本如下：
 
 ```shell
-
-# Ascend310 推理
-bash run_infer_310.sh [MINDIR_PATH] [DATA_DIR] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_DIR] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 ### 结果

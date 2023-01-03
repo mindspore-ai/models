@@ -1,6 +1,7 @@
 # Contents
 
-- [YOLOv4 Description](#YOLOv4-description)
+- [Contents](#contents)
+- [YOLOv4 Description](#yolov4-description)
 - [Model Architecture](#model-architecture)
 - [Pretrain Model](#pretrain-model)
 - [Dataset](#dataset)
@@ -11,14 +12,21 @@
     - [Script Parameters](#script-parameters)
     - [Training Process](#training-process)
         - [Training](#training)
+        - [Distributed Training](#distributed-training)
+        - [Transfer Training](#transfer-training)
     - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+        - [Valid](#valid)
+        - [Test-dev](#test-dev)
     - [Convert Process](#convert-process)
         - [Convert](#convert)
+    - [Inference Process](#inference-process)
+        - [Usage](#usage)
+        - [result](#result)
 - [Model Description](#model-description)
     - [Performance](#performance)
         - [Evaluation Performance](#evaluation-performance)
         - [Inference Performance](#inference-performance)
+- [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 # [YOLOv4 Description](#contents)
@@ -487,7 +495,7 @@ overall performance
 
 ### Convert
 
-If you want to infer the network on Ascend 310, you should convert the model to MINDIR:
+If you want to infer the network, you should convert the model to MINDIR:
 
 ```python
 python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [FILE_FORMAT] --keep_detect [Bool]
@@ -507,8 +515,7 @@ Before performing inference, the mindir file must be exported by export script o
 Current batch_Size can only be set to 1. The precision calculation process needs about 70G+ memory space.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID] [ANN_FILE]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_ID] [ANN_FILE]
 ```
 
 `DEVICE_ID` is optional, default value is 0.

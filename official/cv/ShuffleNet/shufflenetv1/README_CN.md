@@ -22,6 +22,10 @@
     - [训练性能](#训练性能)
 - [随机情况的描述](#随机情况的描述)
 - [ModelZoo](#modelzoo)
+- [迁移学习](#迁移学习)
+    - [迁移数据集](#迁移数据集)
+    - [迁移训练](#迁移训练)
+    - [训练结果](#训练结果)
 
 # ShuffleNetV1 描述
 
@@ -307,8 +311,7 @@ python export.py --ckpt_path [CKPT_PATH] --device_target [DEVICE_TARGET] --file_
 在推理之前需要先导出模型，AIR模型只能在昇腾910环境上导出，MINDIR可以在任意环境上导出。
 
 ```shell
-# 昇腾310 推理
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [LABEL_FILE] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [LABEL_FILE] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 -注: shufflenetv1网络使用ImageNet数据集，图片的label是将文件夹排序后从0开始编号所得的数字。该文件可以利用脚本导出，该脚本可以从`models/utils/cpp_infer/imgid2label.py`取得。

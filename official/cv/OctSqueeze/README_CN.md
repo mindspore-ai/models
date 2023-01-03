@@ -18,12 +18,17 @@
         - [评估过程](#评估过程)
             - [评估](#评估)
     - [推理过程](#推理过程)
+        - [以固定的batch\_size训练网络（已完成的话，可跳过）：](#以固定的batch_size训练网络已完成的话可跳过)
+        - [生成可输入网络的数据：](#生成可输入网络的数据)
         - [导出MindIR](#导出mindir)
-        - [在Ascend310执行推理](#在ascend310执行推理)
+        - [执行推理](#执行推理)
         - [结果](#结果)
     - [模型描述](#模型描述)
         - [性能](#性能)
             - [评估性能](#评估性能)
+            - [KITTI 数据集中的点云选取000000.bin~001023.bin生成训练集](#kitti-数据集中的点云选取000000bin001023bin生成训练集)
+        - [推理性能](#推理性能)
+            - [KITTI 数据集中的点云选取007000.bin~007099.bin作为测试集，结果如下：](#kitti-数据集中的点云选取007000bin007099bin作为测试集结果如下)
     - [ModelZoo主页](#modelzoo主页)
 
 <!-- /TOC -->
@@ -262,13 +267,12 @@ python export.py --ckpt_file='/home/ma-user/work/AM_OctSqueeze/checkpoint/CKP-19
 
 参数ckpt_file为必填项
 
-### 在Ascend310执行推理
+### 执行推理
 
 在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
 
 ```bash
-# Ascend 310 inference
-bash run_infer_310.sh [MODEL_PATH] [DATASETS_DIR] [BATCH_SIZE]
+bash run_cpp_infer.sh [MINDIR_PATH] [DATA_PATH] [BATCH_SIZE] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `MODEL_PATH` mindir文件路径

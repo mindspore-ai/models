@@ -20,7 +20,13 @@
         - [ONNX处理器环境评估](#onnx处理器环境评估)
     - [推理过程](#推理过程)
         - [Ascend310执行推理](#ascend310执行推理)
-        - [ONNX推理](#ONNX推理)
+            - [导出MindIR](#导出mindir)
+        - [执行推理](#执行推理)
+            - [结果](#结果)
+        - [ONNX推理](#onnx推理)
+            - [导出ONNX](#导出onnx)
+            - [执行推理](#执行推理-1)
+            - [结果](#结果-1)
 - [模型描述](#模型描述)
     - [性能](#性能)
 - [随机情况说明](#随机情况说明)
@@ -478,14 +484,13 @@ ModelArts导出mindir
 # (6) 开始导出mindir。
 ```
 
-#### 执行推理
+### 执行推理
 
 在执行推理前，mindir文件必须通过`export.py`脚本导出。以下展示了使用minir模型执行推理的示例。
 目前仅支持batch_Size为1的推理。精度计算过程需要70G+的内存，否则进程将会因为超出内存被系统终止。
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [CONFIG_PATH] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DVPP] [CONFIG_PATH] [DEVICE_TYPE] [DEVICE_ID]
 
 ```
 

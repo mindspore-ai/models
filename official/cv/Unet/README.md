@@ -504,8 +504,7 @@ The `checkpoint_file_path` parameter is required,
 Before performing inference, the mindir file must be exported by export.py script. We only provide an example of inference using MINDIR model.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [NETWORK] [MINDIR_PATH] [DEVICE_ID] [NEED_PREPROCESS]
+bash run_infer_cpp.sh [NETWORK] [MINDIR_PATH] [NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 `NETWORK` Now, the supported networks are `unet` and `unet++`. The corresponding configuration files are `unet_simple_config.yaml` and `unet_nested_cell_config.yaml` respectively.

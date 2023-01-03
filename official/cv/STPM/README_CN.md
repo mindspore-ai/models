@@ -10,27 +10,27 @@
 - [环境要求](#环境要求)
 - [快速入门](#快速入门)
     - [脚本说明](#脚本说明)
-        - [脚本和样例代码](#脚本和样例代码)
-        - [脚本参数](#脚本参数)
-        - [预训练模型](#预训练模型)
-        - [训练过程](#训练过程)
-            - [用法](#用法)
-        - [评估过程](#评估过程)
-            - [用法](#用法-2)
-            - [结果](#结果-1)
-        - [导出mindir模型](#导出mindir模型)
-        - [推理过程](#推理过程)
-            - [用法](#用法-3)
-            - [结果](#结果-2)
-        - [导出ONNX模型](#导出ONNX模型)
-        - [ONNX推理过程](#ONNX推理过程)
-            - [用法](#用法-4)
-            - [结果](#结果-3)
+    - [脚本和样例代码](#脚本和样例代码)
+    - [脚本参数](#脚本参数)
+    - [预训练模型](#预训练模型)
+    - [训练过程](#训练过程)
+        - [用法](#用法)
+    - [评估过程](#评估过程)
+        - [用法](#用法-1)
+        - [结果](#结果)
+    - [导出mindir模型](#导出mindir模型)
+- [推理过程](#推理过程)
+    - [用法](#用法-2)
+        - [结果](#结果-1)
+    - [导出ONNX模型](#导出onnx模型)
+- [ONNX推理过程](#onnx推理过程)
+    - [用法](#用法-3)
+        - [结果](#结果-2)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [训练性能](#训练性能)
 - [随机情况说明](#随机情况说明)
-- [ModelZoo主页](#ModelZoo主页)
+- [ModelZoo主页](#modelzoo主页)
 
 <!-- /TOC -->
 
@@ -230,11 +230,8 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 在执行推理之前，需要通过`export.py`导出mindir文件。
 
 ```shell
-# Ascend310 推理
-bash run_310_infer.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TARGET] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID] [CATEGORY] [DEVICE_TYPE]
 ```
-
-`DEVICE_TARGET` 可选值范围为：['GPU', 'CPU', 'Ascend']，`NEED_PREPROCESS` 表示数据是否需要预处理，可选值范围为：'y' 或者 'n'，这里直接选择‘y’，`DEVICE_ID` 可选, 默认值为0。
 
 ### 结果
 

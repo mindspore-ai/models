@@ -1,23 +1,30 @@
 # Contents
 
+- [Contents](#contents)
 - [ShuffleNetV2 Description](#shufflenetv2-description)
-- [Model Architecture](#model-architecture)
+- [Model architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Environment Requirements](#environment-requirements)
-- [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Training Process](#training-process)
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
+- [Script description](#script-description)
+    - [Script and sample code](#script-and-sample-code)
+    - [Training process](#training-process)
+        - [Usage](#usage)
+        - [Launch](#launch)
+        - [Result](#result)
+    - [Eval process](#eval-process)
+        - [Usage](#usage-1)
+        - [Launch](#launch-1)
+        - [Result](#result-1)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
-        - [Infer on Ascend310](#infer-on-ascend310)
+        - [Infer](#infer)
         - [result](#result-2)
-- [Model Description](#model-description)
+        - [Infer on CPU After Transfermation](#infer-on-cpu-after-transfermation)
+        - [result](#result-3)
+- [Model description](#model-description)
     - [Performance](#performance)
-        - [Training Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
-
+        - [Training Performance](#training-performance)
+        - [Inference Performance](#inference-performance)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
 # [ShuffleNetV2 Description](#contents)
@@ -153,14 +160,13 @@ The checkpoint_file_path parameter is required,
 `PLATFORM` should be in ["Ascend", "GPU", "CPU"]
 `FILE_FORMAT` should be in ["AIR", "ONNX", "MINDIR"]
 
-### Infer on Ascend310
+### Infer
 
 Before performing inference, the mindir file must bu exported by `export.py` script. We only provide an example of inference using MINDIR model.
 Current batch_Size can only be set to 1.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `MINDIR_PATH` should be the filename of the MINDIR model.

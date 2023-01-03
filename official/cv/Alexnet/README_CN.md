@@ -17,7 +17,7 @@
             - [评估](#评估)
     - [推理过程](#推理过程)
         - [导出MindIR](#导出mindir)
-        - [在Ascend310执行推理](#在ascend310执行推理)
+        - [执行推理](#执行推理)
         - [结果](#结果)
     - [模型描述](#模型描述)
         - [性能](#性能)
@@ -319,7 +319,7 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --file_name
 参数ckpt_file为必填项，
 `FILE_FORMAT` 必须在 ["AIR", "MINDIR"]中选择。
 
-### 在Ascend310执行推理
+### 执行推理
 
 **推理前需参照 [MindSpore C++推理部署指南](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README_CN.md) 进行环境变量设置。**
 
@@ -327,14 +327,14 @@ python export.py --config_path [CONFIG_PATH] --ckpt_file [CKPT_PATH] --file_name
 目前imagenet2012数据集仅支持batch_Size为1的推理。
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_NAME] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `MINDIR_PATH` mindir文件路径
 - `DATASET_NAME` 使用的推理数据集名称，默认为`cifar10`，可在`cifar10`或者`imagenet2012`中选择
 - `DATASET_PATH` 推理数据集路径
 - `NEED_PREPROCESS` 表示数据集是否需要预处理，可在`y`或者`n`中选择，如果选择`y`，cifar10数据集将被处理为bin格式。
+- `DEVICE_TYPE` 可以为Ascend, GPU, 或CPU。
 - `DEVICE_ID` 可选，默认值为0。
 
 ### 结果

@@ -17,6 +17,7 @@
     - [Options and Parameters](#options-and-parameters)
         - [Options](#options)
         - [Parameters](#parameters)
+        - [schema\_file](#schema_file)
     - [Training Process](#training-process)
         - [Training](#training)
             - [Running on Ascend](#running-on-ascend)
@@ -26,11 +27,15 @@
             - [running on GPU](#running-on-gpu-1)
     - [Evaluation Process](#evaluation-process)
         - [Evaluation](#evaluation)
-            - [evaluation on cola dataset when running on Ascend](#evaluation-on-cola-dataset-when-running-on-ascend)
+            - [evaluation on tnews dataset when running on Ascend](#evaluation-on-tnews-dataset-when-running-on-ascend)
+            - [evaluation on tnews dataset when running on CPU](#evaluation-on-tnews-dataset-when-running-on-cpu)
             - [evaluation on cluener dataset when running on Ascend](#evaluation-on-cluener-dataset-when-running-on-ascend)
+            - [evaluation on cluener dataset when running on CPU](#evaluation-on-cluener-dataset-when-running-on-cpu)
             - [evaluation on chineseNer dataset when running on Ascend](#evaluation-on-chinesener-dataset-when-running-on-ascend)
+            - [evaluation on chineseNer dataset when running on CPU](#evaluation-on-chinesener-dataset-when-running-on-cpu)
             - [evaluation on msra dataset when running on Ascend](#evaluation-on-msra-dataset-when-running-on-ascend)
             - [evaluation on squad v1.1 dataset when running on Ascend](#evaluation-on-squad-v11-dataset-when-running-on-ascend)
+            - [evaluation on squad v1.1 dataset when running on CPU](#evaluation-on-squad-v11-dataset-when-running-on-cpu)
         - [Export MindIR](#export-mindir)
         - [Inference Process](#inference-process)
             - [Usage](#usage)
@@ -1003,12 +1008,11 @@ The `export_ckpt_file` parameter is required, and `file_format` should be in ["A
 Before performing inference, the mindir file must be exported by export.py. Input files must be in bin format.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [LABEL_PATH] [DATA_FILE_PATH] [DATASET_FORMAT] [SCHEMA_PATH] [TASK] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [LABEL_PATH] [DATA_FILE_PATH] [DATASET_FORMAT] [SCHEMA_PATH] [TASK] [VOCAB_FILE_PATH] [EVAL_JSON_PATH] NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'.
-`TASK` is mandatory, and must choose from [ner|ner_crf|classifier].
+`TASK` is mandatory, and must choose from [ner|ner_crf|classifier|sqaud].
 `DEVICE_ID` is optional, default value is 0.
 
 #### result

@@ -3,7 +3,7 @@
 <!-- TOC -->
 
 - [目录](#目录)
-- [DepthNet描述](#DepthNet描述)
+- [DepthNet描述](#depthnet描述)
 - [模型架构](#模型架构)
 - [数据集](#数据集)
 - [特性](#特性)
@@ -12,21 +12,20 @@
 - [快速入门](#快速入门)
 - [脚本说明](#脚本说明)
     - [脚本及样例代码](#脚本及样例代码)
-    - [训练过程](#训练过程)
-        - [训练](#训练)
-        - [分布式训练](#分布式训练)
+        - [训练过程](#训练过程)
     - [评估过程](#评估过程)
         - [评估](#评估)
     - [导出过程](#导出过程)
-        - [导出](#导出)
+        - [模型导出](#模型导出)
     - [推理过程](#推理过程)
         - [推理](#推理)
 - [模型描述](#模型描述)
     - [性能](#性能)
         - [评估性能](#评估性能)
-            - [NYU上的DepthNet](#NYU上的DepthNet)
+            - [NYU上的DepthNet](#nyu上的depthnet)
+            - [](#)
         - [推理性能](#推理性能)
-            - [NYU上的DepthNet](#NYU上的DepthNet)
+            - [NYU上的DepthNet](#nyu上的depthnet-1)
 - [随机情况说明](#随机情况说明)
 - [ModelZoo主页](#modelzoo主页)
 
@@ -259,15 +258,15 @@ python export.py --coarse_or_fine fine
 
   使用以下命令
 
-  ```bash
-   bash run_infer_310.sh [MINDIR1_PATH] [MINDIR2_PATH] [DATA_PATH] [DEVICE_ID]
-  ```
+```bash
+bash run_infer_cpp.sh [MINDIR1_PATH] [MINDIR2_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
+```
 
   其中MINDIR1_PATH为coarse_net路径，MINDIR2_PATH为fine_net路径，DATA_PATH为测试集路径
 
   ```bash
   cd scripts
-  bash run_infer_310.sh ../Model/MindIR/FinalCoarseNet.mindir ../Model/MindIR/FinalFineNet.mindir ../NYU/Test/ 0
+  bash run_infer_cpp.sh ../Model/MindIR/FinalCoarseNet.mindir ../Model/MindIR/FinalFineNet.mindir ../NYU/Test/ Ascend 0
   ```
 
 推理的结果保存在当前目录下，preprocess_Result文件夹为预处理后的图片，result_Files模型推理后的图片结果，在acc.log日志文件中可以找到类似以下的结果。

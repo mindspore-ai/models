@@ -88,8 +88,8 @@ if __name__ == "__main__":
         detection.detect([output_small, output_me, output_big], args.per_batch_size, image_shape, img_id)
 
     args.logger.info('Calculating mAP...')
-    detection.do_nms_for_results()
-    result_file_path = detection.write_result()
+    result = detection.do_nms_for_results()
+    result_file_path = detection.write_result(result)
     args.logger.info('result file path: {}'.format(result_file_path))
     args.logger.info('\n=============coco eval reulst=========\n')
     eval_result = detection.get_eval_result()

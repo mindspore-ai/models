@@ -1,20 +1,32 @@
 # InceptionV4
 
-- [InceptionV4 Description](#InceptionV4-description)
-- [Model Architecture](#model-architecture)
+- [InceptionV4](#inceptionv4)
+- [InceptionV4 Description](#inceptionv4-description)
+- [Model architecture](#model-architecture)
 - [Dataset](#dataset)
 - [Features](#features)
-    - [Mixed Precision](#mixed-precision)
+    - [Mixed Precision(Ascend)](#mixed-precisionascend)
 - [Environment Requirements](#environment-requirements)
-- [Script Description](#script-description)
-    - [Script and Sample Code](#script-and-sample-code)
-    - [Training Process](#training-process)
-    - [Evaluation Process](#evaluation-process)
-        - [Evaluation](#evaluation)
-- [Model Description](#model-description)
+- [Script description](#script-description)
+    - [Script and sample code](#script-and-sample-code)
+    - [Script Parameters](#script-parameters)
+    - [Training process](#training-process)
+        - [Usage](#usage)
+        - [Launch](#launch)
+        - [Result](#result)
+    - [Eval process](#eval-process)
+        - [Usage](#usage-1)
+        - [Launch](#launch-1)
+        - [Result](#result-1)
+    - [Model Export](#model-export)
+    - [Inference Process](#inference-process)
+        - [Usage](#usage-2)
+        - [result](#result-2)
+- [Model description](#model-description)
     - [Performance](#performance)
-        - [Training Performance](#evaluation-performance)
-        - [Inference Performance](#evaluation-performance)
+        - [Training Performance](#training-performance)
+            - [Inference Performance](#inference-performance)
+            - [Training performance results](#training-performance-results)
 - [Description of Random Situation](#description-of-random-situation)
 - [ModelZoo Homepage](#modelzoo-homepage)
 
@@ -398,11 +410,10 @@ python export.py --config_path [CONFIG_FILE] --ckpt_file [CKPT_PATH] --device_ta
 Before performing inference, the model file must be exported by export script on the Ascend910 environment.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATA_PATH] [ANN_FILE] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [LABEL_FILE] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
--NOTE:Ascend310 inference use Imagenet dataset . The label of the image is the number of folder which is started from 0 after sorting. This file can be converted by script from `models/utils/cpp_infer/imgid2label.py`
+-NOTE: Inference use Imagenet dataset . The label of the image is the number of folder which is started from 0 after sorting. This file can be converted by script from `models/utils/cpp_infer/imgid2label.py`
 
 Before performing inference, the model file must be exported by export script.
 

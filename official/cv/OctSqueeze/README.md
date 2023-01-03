@@ -14,12 +14,17 @@
         - [Evaluation Process](#evaluation-process)
             - [Evaluation](#evaluation)
     - [Inference Process](#inference-process)
+        - [Train network with fixed batch\_size(Can skip, if already  done)](#train-network-with-fixed-batch_sizecan-skip-if-already--done)
+        - [Generate input dat a for network](#generate-input-dat-a-for-network)
         - [Export MindIR](#export-mindir)
-        - [Infer on Ascend310](#infer-on-ascend310)
+        - [Infer](#infer)
         - [Result](#result)
     - [Model Description](#model-description)
         - [Performance](#performance)
             - [Evaluation Performance](#evaluation-performance)
+            - [Take 000000.bin~001023.bin in KITTI to generate training dataset and train the network](#take-000000bin001023bin-in-kitti-to-generate-training-dataset-and-train-the-network)
+        - [Inference Performance](#inference-performance)
+            - [Take 007000.bin~007099.bin in KITTI as test date, evaluation result as follow](#take-007000bin007099bin-in-kitti-as-test-date-evaluation-result-as-follow)
     - [ModelZoo Homepage](#modelzoo-homepage)
 
 <!-- /TOC -->
@@ -258,13 +263,12 @@ python export.py --ckpt_file='/home/ma-user/work/AM_OctSqueeze/checkpoint/CKP-19
 
 The ckpt_file parameter is required
 
-### [Infer on Ascend310](#contents)
+### [Infer](#contents)
 
 Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
 
 ```bash
-# Ascend 310 inference
-bash run_infer_310.sh [MODEL_PATH] [DATASETS_DIR] [BATCH_SIZE]
+bash run_cpp_infer.sh [MINDIR_PATH] [DATA_PATH] [BATCH_SIZE] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `MODEL_PATH` Path of mindir

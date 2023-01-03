@@ -16,7 +16,7 @@
         - [Evaluation](#evaluation)
     - [Inference Process](#inference-process)
         - [Export MindIR](#export-mindir)
-        - [Infer on Ascend310](#infer-on-ascend310)
+        - [Infer](#infer)
         - [result](#result)
 - [Model Description](#model-description)
     - [Performance](#performance)
@@ -392,13 +392,12 @@ python export.py --ckpt_file [CKPT_PATH] --file_name [FILE_NAME] --file_format [
 The ckpt_file parameter is required,
 `FILE_FORMAT` should be in ["AIR", "MINDIR"]
 
-### Infer on Ascend310
+### Infer
 
 Before performing inference, the mindir file must be exported by `export.py` script. We only provide an example of inference using MINDIR model.
 
 ```shell
-# Ascend310 inference
-bash run_infer_310.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_ID]
+bash run_infer_cpp.sh [MINDIR_PATH] [DATASET_PATH] [NEED_PREPROCESS] [DEVICE_TYPE] [DEVICE_ID]
 ```
 
 - `NEED_PREPROCESS` means weather need preprocess or not, it's value is 'y' or 'n'.

@@ -6,7 +6,7 @@
 - [数据集](#数据集)
 - [环境要求](#环境要求)
 - [脚本说明](#脚本说明)
-    - [脚本和示例代码](#脚本和示例代码)
+    - [脚本和样例代码](#脚本和样例代码)
     - [脚本参数](#脚本参数)
     - [训练过程](#训练过程)
         - [启动](#启动)
@@ -14,10 +14,11 @@
     - [评估过程](#评估过程)
         - [启动](#启动-1)
         - [结果](#结果-1)
+    - [执行推理](#执行推理)
 - [模型说明](#模型说明)
     - [训练性能](#训练性能)
 - [随机情况的描述](#随机情况的描述)
-- [ModelZoo 主页](#modelzoo-主页)
+- [ModelZoo](#modelzoo)
 
 <!-- /TOC -->
 
@@ -192,9 +193,13 @@ epoch 5: epoch time: 150594.088, per step time: 141.138, avg loss: 3.607
 result: {'Loss': 2.3101649037352554, 'Top_1_Acc': 0.6746546546546547, 'Top_5_Acc': 0.8722122122122122} ckpt= ./checkpoint/model_0/mobilenetV3-370_625.ckpt
 ```
 
-## 310推理
+## 执行推理
 
 **推理前需参照 [MindSpore C++推理部署指南](https://gitee.com/mindspore/models/blob/master/utils/cpp_infer/README_CN.md) 进行环境变量设置。**
+
+```bash
+bash run_infer_cpp.sh [MINDIR_PATH] [DATA_PATH] [DEVICE_TYPE] [DEVICE_ID]
+```
 
 # 模型说明
 
