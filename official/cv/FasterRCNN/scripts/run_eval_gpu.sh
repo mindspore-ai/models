@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -le 5 ]
+if [ $# -lt 5 ]
 then 
     echo "Usage: 
     bash run_eval_gpu.sh [VALIDATION_JSON_FILE] [CHECKPOINT_PATH] [BACKBONE] [COCO_ROOT] [DEVICE_ID] [MINDRECORD_DIR](option)

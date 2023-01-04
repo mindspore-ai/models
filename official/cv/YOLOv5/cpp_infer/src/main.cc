@@ -89,11 +89,9 @@ int main(int argc, char **argv) {
       std::cout << "image channels is not 3." << std::endl;
       return 1;
     }
-    Execute transform({resize});
+    Execute transform(resize);
     transform(imgDecode, &img);
 
-    size_t buffer_size = img.DataSize();
-    std::vector<int64_t> img_shape = img.Shape();
     std::vector<MSTensor> model_inputs = model.GetInputs();
     inputs.emplace_back(model_inputs[0].Name(), model_inputs[0].DataType(), model_inputs[0].Shape(),
                         img.Data().get(), img.DataSize());
