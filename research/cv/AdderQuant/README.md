@@ -2,7 +2,7 @@
 
 - [Contents](#contents)
     - [AdderQuant Description](#AdderQuant-description)
-    - [Quantization Algorithm](#quantization algorithm)
+    - [Quantization Algorithm](#Quantization-Algorithm)
     - [Dataset](#dataset)
     - [Environment Requirements](#environment-requirements)
     - [Script description](#script-description)
@@ -97,8 +97,7 @@ After installing MindSpore via the official website, you can start evaluation as
   GPU: python eval.py --checkpoint_file_path path/to/ckpt --train_dataset_path path/to/cifar-10-batches-bin --eval_dataset_path path/to/cifar-10-verify-bin
 ```
 
-> checkpoint can be downloaded at (will be available before Nov. 30th,2022)
-
+> checkpoint can be downloaded at https://download.mindspore.cn/model_zoo/research/cv/AdderQuant/
 ### Result
 
 Quantization results of AdderNets(ResNet-20 with 90.44full-precision) on CIFAR-10:
