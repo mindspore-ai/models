@@ -67,7 +67,7 @@ PyObject* PyInitVoting(PyObject* self, PyObject* args) {
         return nullptr;
     }
 
-    if (voteTensorShape.H =0 || voteTensorShape.W = 0 || voteTensorShape.C = 0 ||
+    if (voteTensorShape.H == 0 || voteTensorShape.W == 0 || voteTensorShape.C == 0 ||
         classNum <= 0 || controlPointNum <= 0 ||
         static_cast<uint32_t>(classNum + controlPointNum * 2) != voteTensorShape.C) {
         LOGE("invalid parameters");
