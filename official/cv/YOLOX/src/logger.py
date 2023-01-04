@@ -16,7 +16,6 @@
 import os
 import sys
 import logging
-from datetime import datetime
 
 
 class LOGGER(logging.Logger):
@@ -37,12 +36,11 @@ class LOGGER(logging.Logger):
             console.setFormatter(formatter)
             self.addHandler(console)
 
-    def setup_logging_file(self, log_dir, rank=0):
+    def setup_logging_file(self, log_dir):
         """Setup logging file."""
-        self.rank = rank
         if not os.path.exists(log_dir):
             os.makedirs(log_dir, exist_ok=True)
-        log_name = datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S') + '_rank_{}.log'.format(rank)
+        log_name = 'log.txt'
         self.log_fn = os.path.join(log_dir, log_name)
         fh = logging.FileHandler(self.log_fn)
         fh.setLevel(logging.INFO)
@@ -76,5 +74,5 @@ class LOGGER(logging.Logger):
 def get_logger(path, rank):
     """Get Logger."""
     logger = LOGGER('yolox', rank)
-    logger.setup_logging_file(path, rank)
+    logger.setup_logging_file(path)
     return logger

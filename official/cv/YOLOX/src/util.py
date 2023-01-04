@@ -29,6 +29,7 @@ import mindspore.nn as nn
 from mindspore import load_checkpoint, load_param_into_net, save_checkpoint, Parameter, Tensor
 from mindspore.train.callback import Callback
 from mindspore import ops
+
 try:
     from third_party.fast_coco_eval_api import Fast_COCOeval as COCOeval
 except ImportError:
@@ -341,15 +342,6 @@ class ResumeCallback(Callback):
         run_context.original_args().cur_epoch_num += self.start_epoch
 
 
-class NoAugCallBack(Callback):
-    def __init__(self, use_l1=True):
-        super(NoAugCallBack, self).__init__()
-        self.use_l1 = use_l1
-
-    def begin(self, run_context):
-        run_context.original_args().network.network.use_l1 = self.use_l1
-
-
 class YOLOXCB(Callback):
     """
     YOLOX Callback.
@@ -428,13 +420,17 @@ class YOLOXCB(Callback):
         cb_params = run_context.original_args()
         data_sink_mode = cb_params.dataset_sink_mode
         cur_epoch_step = (self.current_step + 1) % self.step_per_epoch
-        if cur_epoch_step % self._per_print_times == 0 and cur_epoch_step != 0 and not data_sink_mode:
+        loss = cb_params.net_outputs
+        loss_all = float(loss[0].asnumpy())
+        overflow = bool(loss[1].asnumpy())
+        scale = int(loss[2].asnumpy())
+        loss = "loss: %.4f, overflow: %s, scale: %s" % (loss_all, overflow, scale)
+        log_condition = cur_epoch_step % self._per_print_times == 0 and cur_epoch_step != 0 and not data_sink_mode
+        overflow_condition = overflow and not data_sink_mode
+        if log_condition or overflow_condition:
             cur_epoch = cb_params.cur_epoch_num
             avg_step_time = (time.time() - self.step_start_time) * 1000 / self._per_print_times
-            loss = cb_params.net_outputs
-            loss = "loss: %.4f, overflow: %s, scale: %s" % (float(loss[0].asnumpy()),
-                                                            bool(loss[1].asnumpy()),
-                                                            int(loss[2].asnumpy()))
+
             self.logger.info("epoch: [%s/%s] step: [%s/%s], lr: %.6f, %s, avg step time: %.2fms" % (
                 cur_epoch, self.max_epoch, cur_epoch_step, self.step_per_epoch, self.lr[self.current_step],
                 loss, avg_step_time))
@@ -463,7 +459,7 @@ class EvalWrapper:
         self.data_list = []
         self.img_ids = []
         self.device_num: int = config.group_size
-        self.save_prefix = config.outputs_dir if save_prefix is None else save_prefix
+        self.save_prefix = config.log_dir if save_prefix is None else save_prefix
         self.file_path = ''
         self.dir_path = ''
         if config.eval_parallel:
@@ -471,7 +467,7 @@ class EvalWrapper:
 
     def synchronize(self):
         sync = Tensor(np.array([1]).astype(np.int32))
-        sync = self.reduce(sync)    # For synchronization
+        sync = self.reduce(sync)  # For synchronization
         sync = sync.asnumpy()[0]
         if sync != self.device_num:
             raise ValueError(
@@ -582,7 +578,8 @@ class EvalCallback(Callback):
     def epoch_end(self, run_context):
         cb_param = run_context.original_args()
         cur_epoch = cb_param.cur_epoch_num
-        if cur_epoch % self.interval == 0 or cur_epoch == self.start_epoch + self.train_aug_epochs:
+        aug_last_epoch = self.start_epoch + self.train_aug_epochs
+        if cur_epoch % self.interval == 0 or cur_epoch == aug_last_epoch or cur_epoch == self.max_epoch:
             if self.use_ema:
                 self.load_ema_parameter(cb_param.train_network)
             else:
@@ -609,10 +606,9 @@ class EvalCallback(Callback):
     def save_best_checkpoint(self, net):
         param_list = [{'name': 'best_result', 'data': Parameter(self.best_result)},
                       {'name': 'best_epoch', 'data': Parameter(self.best_epoch)}]
-        prefix = "network."
         for name, param in net.parameters_and_names():
             # Remove duplicate prefix 'network.'
-            param_list.append({'name': name[len(prefix):], 'data': param})
+            param_list.append({'name': name, 'data': param})
         save_checkpoint(param_list, os.path.join(self.save_ckpt_path, 'best.ckpt'))
 
 
@@ -652,7 +648,8 @@ class DetectionEngine:
 
         self.conf_thre = config.conf_thre
         self.nms_thre = config.nms_thre
-        self.coco_data = COCOData(os.path.join(config.data_dir, 'annotations/instances_val2017.json'))
+        self.annFile = os.path.join(config.data_dir, 'annotations/instances_val2017.json')
+        self.coco_data = COCOData(self.annFile) if os.path.exists(self.annFile) else None
 
     def detection(self, outputs, img_shape, img_ids):
         # post process nms
@@ -783,7 +780,7 @@ class DetectionEngine:
                 with open(path, 'r') as f:
                     ann_list = json.load(f)
             except json.decoder.JSONDecodeError:
-                pass    # json file is empty
+                pass  # json file is empty
             else:
                 ann_ids = set(ann['image_id'] for ann in ann_list)
                 diff_ids = ann_ids - dt_ids_set

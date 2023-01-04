@@ -39,12 +39,12 @@ def run_test():
     context.set_context(mode=context.GRAPH_MODE, device_target=config.device_target, save_graphs=False, device_id=devid)
 
     # logger
-    config.outputs_dir = os.path.join(
+    config.log_dir = os.path.join(
         config.log_path, datetime.datetime.now().strftime('%Y-%m-%d_time_%H_%M_%S')
     )
     config.eval_parallel = config.is_distributed and config.eval_parallel
     rank_id = int(os.getenv('RANK_ID', '0'))
-    config.logger = get_logger(config.outputs_dir, rank_id)
+    config.logger = get_logger(config.log_dir, rank_id)
     parallel_mode = ParallelMode.STAND_ALONE
     device_num = 1
     if config.eval_parallel:
