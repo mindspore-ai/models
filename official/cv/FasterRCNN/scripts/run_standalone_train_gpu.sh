@@ -14,7 +14,7 @@
 # limitations under the License.
 # ============================================================================
 
-if [ $# -le 4 ]
+if [ $# -lt 4 ]
 then 
     echo "Usage: 
     bash run_standalone_train_gpu.sh [PRETRAINED_PATH] [BACKBONE] [COCO_ROOT] [DEVICE_ID] [MINDRECORD_DIR](option)
