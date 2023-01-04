@@ -565,7 +565,7 @@ YOLOv4 on 20K images(The annotation and data format must be the same as coco tes
 | Dataset                    | 20K images                                                  |
 | batch_size                 | 1                                                           |
 | outputs                    | box position and sorces, and probability                    |
-| Accuracy                   | map >= 44.7%(shape=608)                                     |
+| Accuracy                   | map >= 43.8%(shape=608)                                     |
 | Model for inference        | about 500M (.ckpt file)                                     |
 
 # [Description of Random Situation](#contents)
